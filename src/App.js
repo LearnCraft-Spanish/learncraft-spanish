@@ -1,23 +1,24 @@
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
+
+import ExampleRetriever from './ExampleRetriever';
+import Menu from './Menu';
+import QuizInterface from './QuizInterface';
+import QuizInterfaceNoUpdate from './QuizInterfaceNoUpdate';
+import SRSBuilder from './SRSBuilder';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <HashRouter>
+        <Routes>
+          <Route exact path='/ExampleRetriever' element={<ExampleRetriever />} />
+          <Route exact path='/SRSBuilder' element={<SRSBuilder />} />
+          <Route exact path='/QuizInterface' element={<QuizInterface />} />
+          <Route exact path='/QuizInterfaceNoUpdate' element={<QuizInterfaceNoUpdate />} />
+          <Route exact path='/Menu' element={<Menu /> } />
+        </Routes>
+      </HashRouter>
     </div>
   );
 }

@@ -1,0 +1,122 @@
+/* Used by QuizInterface.js, QuizInterfaceNoUpdate.js */
+
+html, body {
+    height: 100%;
+}
+
+#root {
+    height: 100%;
+  }
+
+.App {
+    height: 100%;
+}
+
+.quizInterface2 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    
+}
+
+/* Container of entire page */
+.quizInterface {
+    text-align: center;
+    padding: 1vh 5vw;
+    font-size: xx-large;
+    height: 98vh;
+    width: 90vw;
+    background-color: darkcyan;
+    background-color: rgb(80, 80, 240);
+    background-color: darkcyan;
+}
+
+/* Conatiner of Progress Bar & Description */
+.progressBarContainer {
+    height: 10vh;
+    /* background-color: cyan; */
+}
+
+/* Container of the 20 boxes */
+.progressBar2 {
+    /* background-color: black; */
+    width: 100%;
+    margin: auto;
+    /* border-style: solid;
+    border-radius: 15px; */
+    
+}
+
+/* A single box in the progress bar */
+.progressBox {
+    background-color: grey;
+    width: 50%;
+    border-radius: 10px;
+    border-style: solid;
+    border-color: black;
+    display: inline-flex;
+    font-size: large;
+    font-weight: bold;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+}
+
+/* div where it says how many examples have been completed */
+.progressBarDescription {
+    font-size: x-large;
+    color: bisque;
+}
+
+/* The boxes containg the English sentence & the Spanish Sentence */
+.spanishExample, .englishTranslation {
+    padding: 0%;
+    margin: 4vh 0vw;
+    background-color:lightcyan;
+    height: 25vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-style: solid;
+    border-radius: 15px;
+}
+
+.spanishExample:hover {
+    background-color: lightblue;
+}
+
+/* Container of Bottom buttons */
+.buttonsContainer {
+    height: 20vh;
+    width: 100%;
+    /* background-color: cyan; */
+    margin-top: 0%;
+    
+}
+
+.buttonReviewMore {
+    background-color: lightcoral;
+    border-color: lightcoral;
+}
+
+.buttonReviewMore:hover {
+    background-color: orange;
+}
+
+.buttonReviewLess {
+    background-color: lightgreen;
+    border-color: lightgreen;
+    color: light
+}
+
+.buttonReviewLess:hover {
+    background-color: greenyellow;
+}
+
+.buttonsContainer button {
+    font-size: large;
+    padding: 20px;
+    /* background-color: lightgrey; */
+    border-radius: 10px;
+    font-weight: bold;
+}

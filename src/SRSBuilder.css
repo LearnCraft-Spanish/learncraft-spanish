@@ -1,0 +1,165 @@
+/* 
+
+This is a COPY/PASTE/EDIT of App.css
+Used by SRSBuilder.js 
+
+*/
+
+:root {
+    --overall: rgb(200, 220, 240);
+    /* --header: darkcyan; */
+    --suggestions: rgb(200, 240, 240);
+    --customVocab: rgb(171, 253, 171);
+    --tableHeader: rgb(80, 100, 120);
+    --tableRow: rgb(180, 200, 220);
+    --tableVocabIncluded: rgb(240, 240, 240);
+    --fontLight: ivory;
+    --fontDark: black
+  }
+  
+  
+  
+  body {
+    background-color: rgb(221, 209, 205);
+    background-color: var(--overall);
+  }
+  
+  /*ExampleRetriever*/
+  h1 {
+    /* background-color: var(--header);
+    background-color: darkcyan; */
+    color: var(--fontLight);
+  }
+  /*vocab*/
+  .div-vocab {
+    display: flex;
+  }
+  
+  .div-vocab-left, .div-vocab-right {
+    width: 50%
+  }
+  /*
+  .div-vocab-left {
+    display: flex;
+  }
+  */
+  .search {
+    width: 46%;
+    padding: 10px 0px;
+  }
+  .add-to-search-query {
+    width: 50%;
+    padding: 10px 0px;
+  }
+  .suggestions {
+    background-color: var(--suggestions);
+    color: black;
+    height: 200px;
+    overflow: auto;
+    resize: vertical;
+    list-style-type: none;
+    font-weight: bold;
+  }
+  .suggestions li:hover {
+    background-color: yellow;
+  }
+  .lesson-select {
+    display: inline-block;
+    padding: 10px 0px;
+  }
+  .retrieve-sentences {
+    width: 50%;
+    padding: 10px 0px;
+    font-weight: bold;
+  }
+  .custom-vocab {
+    background-color: var(--customVocab);
+  
+    border: none;
+    outline: none;
+    padding: 6px;
+    
+    margin: 2px;
+    border-radius: 10px;
+  }
+  
+  .custom-vocab:hover {
+    background-color: lightsalmon;
+  }
+  
+  /*examples*/
+  
+  .div-examples-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .div-examples-header button {
+    padding: 8px;
+  }
+  
+  .div-examples table {
+    width: 100%;
+    table-layout: auto;
+    vertical-align: baseline;
+    font-weight: bold;
+  }
+  
+  .div-examples th {
+    background-color: var(--tableHeader);
+    color:ivory
+  }
+  
+  .div-examples tr:nth-child(even) {
+    background-color: var(--tableRow);
+  }
+  
+  .vocab-included-button {
+    font-size: xx-small;
+    padding: 1px 1px;
+    margin: 0;
+    color: black;
+  
+  }
+  
+  
+  /**
+  .App {
+    text-align: center;
+  }
+  
+  .App-logo {
+    height: 40vmin;
+    pointer-events: none;
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+      animation: App-logo-spin infinite 20s linear;
+    }
+  }
+  
+  .App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
+  
+  .App-link {
+    color: #61dafb;
+  }
+  
+  @keyframes App-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  */
