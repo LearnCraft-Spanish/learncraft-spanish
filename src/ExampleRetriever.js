@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './QuickbaseTablesInfo';
-import { fetchAndCreateTable } from './QuickbaseFetchFuntions';
+import { fetchAndCreateTable } from './QuickbaseFetchFunctions';
 import './App.css';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word

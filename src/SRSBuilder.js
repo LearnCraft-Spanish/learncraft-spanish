@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './QuickbaseTablesInfo';
-import { fetchAndCreateTable, createStudentExample } from './QuickbaseFetchFuntions';
+import { fetchAndCreateTable, createStudentExample } from './QuickbaseFetchFunctions';
 import './SRSBuilder.css'
 
 // This is a COPY/PASTE/EDIT of ExampleRetriever.js

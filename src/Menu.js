@@ -1,6 +1,6 @@
 import React, {useState, useRef, useEffect} from 'react'
 import { qb } from './QuickbaseTablesInfo';
-import { fetchAndCreateTable } from './QuickbaseFetchFuntions';
+import { fetchAndCreateTable } from './QuickbaseFetchFunctions';
 import './App.css'
 
 // this script displays the Menu page, where user can access
@@ -19,8 +19,8 @@ export default function Menu() {
     function handleOnClick(pageName) {
         const queryParams = new URLSearchParams(window.location.search)
         const ut = queryParams.get('ut')
-        //const linkBase = 'http://localhost:3000/'
-        const linkBase = 'https://nicholas7238.github.io/'
+        const linkBase = 'http://localhost:3000/'
+        //const linkBase = 'https://classicalmoser.github.io/'
         const gitProjectName = pageName === 'ExampleRetrieverOld' ? 'as-quickbase4/' : 'asqb/'
         const linkStr = linkBase + gitProjectName + '?ut=' + ut + '&stuid=' + currentStudent + '#/' + pageName
         //console.log(linkStr)
