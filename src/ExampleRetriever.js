@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './QuickbaseTablesInfo';
-import { fetchAndCreateTable } from './QuickbaseFetchFunctions';
+import { fetchAndCreateTable, getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend} from './QuickbaseFetchFunctions';
 import './App.css';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
@@ -145,15 +145,17 @@ export default function ExampleRetriever() {
   // to set up all needed variables
   async function init() {
     // getting the user token
-    const queryParams = new URLSearchParams(window.location.search)
-    const ut = queryParams.get('ut') // user token
+    //const queryParams = new URLSearchParams(window.location.search)
+    //const ut = queryParams.get('ut') // user token
     
     // retrieving the table data
-    tables.current.vocab = await fetchAndCreateTable(ut, qb.vocabulary)
+    tables.current.vocab = await getVocabFromBackend();
+    console.log(tables.current.vocab[32]);
     console.log('vocab')
-    tables.current.examples = await fetchAndCreateTable(ut, qb.examples)
+    tables.current.examples = await getExamplesFromBackend();
     console.log('example')
-    tables.current.lessons = await fetchAndCreateTable(ut, qb.lessons)
+    console.log(tables.current.examples[12]);
+    tables.current.lessons = await getLessonsFromBackend();
     // this logic below sorts the lesssons in order by number
     tables.current.lessons.sort((a, b)=>{
       const splitArrA = a.lesson.split(' ')
@@ -167,6 +169,7 @@ export default function ExampleRetriever() {
       return titleA === titleB ? numA - numB : titleA - titleB
     })
     console.log('lessons')
+    console.log(tables.current.lessons[12]);
     setFilteredVocab(tables.current.vocab)
   }
 

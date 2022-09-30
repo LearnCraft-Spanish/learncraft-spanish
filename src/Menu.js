@@ -36,9 +36,11 @@ export default function Menu() {
     async function init() {
         const queryParams = new URLSearchParams(window.location.search)
         const ut = queryParams.get('ut')
-        const stuTable =  await fetchAndCreateTable(ut, qb.students)
-        setStudentsTable(stuTable)
-        console.log('students')
+        if (ut) {
+            const stuTable =  await fetchAndCreateTable(ut, qb.students)
+            setStudentsTable(stuTable)
+            console.log('students')
+        }
       }
     // called once in the beginning
     useEffect(() => {       
@@ -52,7 +54,6 @@ export default function Menu() {
         <div className='div-examples-header'>
             <div>
             <button onClick={()=>handleOnClick('ExampleRetriever')}>New DB Tool</button>
-            <button onClick={()=>handleOnClick('ExampleRetrieverOld')}>Old DB Tool</button>
             </div>
         </div>
         <h2>SRS Student Example Builder</h2>

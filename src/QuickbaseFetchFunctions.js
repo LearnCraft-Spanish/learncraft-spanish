@@ -221,3 +221,65 @@ export async function createStudentExample(exampleID, studentID, lastReviewDate,
         console.log(err)
     }
 }
+
+const backendUrl = 'http://localhost:8000/'
+//const backendUrl = 'https://as-vocab-backend.herokuapp.com/'
+
+export async function getVocabFromBackend() {
+    let fetchUrl = `${backendUrl}qb-vocabulary`
+
+    console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = JSON.parse(res);
+                return data;
+            }) 
+        }
+        
+    })
+    .catch(err => console.log(err))
+
+    return tableFromBackend
+    
+}
+
+export async function getExamplesFromBackend() {
+    let fetchUrl = `${backendUrl}qb-examples`
+
+    console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = JSON.parse(res);
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
+}
+
+export async function getLessonsFromBackend() {
+    let fetchUrl = `${backendUrl}qb-lessons`
+
+    console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = JSON.parse(res);
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
+}
