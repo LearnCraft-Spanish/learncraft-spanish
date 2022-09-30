@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/learncraft-spanish/static/css/main.5c31122a.css",
+    "main.js": "/learncraft-spanish/static/js/main.85bd20bc.js",
+    "static/js/787.be2a76c8.chunk.js": "/learncraft-spanish/static/js/787.be2a76c8.chunk.js",
+    "index.html": "/learncraft-spanish/index.html",
+    "main.5c31122a.css.map": "/learncraft-spanish/static/css/main.5c31122a.css.map",
+    "main.85bd20bc.js.map": "/learncraft-spanish/static/js/main.85bd20bc.js.map",
+    "787.be2a76c8.chunk.js.map": "/learncraft-spanish/static/js/787.be2a76c8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5c31122a.css",
+    "static/js/main.85bd20bc.js"
+  ]
+}
