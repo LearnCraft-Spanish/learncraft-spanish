@@ -41,8 +41,12 @@ export default function ExampleRetriever() {
   // helper function called by handleRetrieveSentencesOnClick()
   // returns an array of all lessons with same title and lower/equal lesson number
   // for example: AS Lesson 3 will return ['AS Lesson 1', 'AS Lesson 2', 'AS Lesson 3']
-  function retrieveCombinedLessonVocab(selectedLessonName, lessonsTable) {
-    const selectedSplitArr = selectedLessonName.split(' ')
+  /*function oldRetrieveCombinedLessonVocab(selectedLessonName, lessonsTable) {
+    const selectedSplitArr = selectedLessonName.split(' ');
+    const selectedCourseName = selectedSplitArr(0);
+  if(selectedCourseName === '2mc'){
+
+  } else {
     const selectedNum = parseInt(selectedSplitArr.pop())
     const selectedTitle = selectedSplitArr.join(' ')
 
@@ -54,7 +58,32 @@ export default function ExampleRetriever() {
             combinedLessonVocab = [...combinedLessonVocab, ...lesson.vocabIncluded]
         }
     })
-    return combinedLessonVocab
+    return combinedLessonVocab}
+  }*/
+
+  function retrieveCombinedLessonVocab (selectedLessonName, lessonsTable) {
+    let selectedLessonSortNumber;
+
+    lessonsTable.forEach((lesson) => {
+      if (lesson.lesson === selectedLessonName) {
+        selectedLessonSortNumber = lesson.sortReference
+      }
+    })
+
+    let firstRefIncluded
+    if (selectedLessonSortNumber > 12) {
+      firstRefIncluded = 13
+    } else {
+      firstRefIncluded = 1
+    }
+    let combinedLessonVocab = []
+    lessonsTable.forEach((lesson) => {
+      if(lesson.sortReference <= selectedLessonSortNumber && lesson.sortReference >= firstRefIncluded) {
+        combinedLessonVocab = [...combinedLessonVocab, ...lesson.vocabIncluded]
+    }
+    })
+    //console.log(combinedLessonVocab);
+    return combinedLessonVocab;
   }
 
   // helper function called by handleRetrieveSentencesOnClick()
@@ -140,6 +169,14 @@ export default function ExampleRetriever() {
     navigator.clipboard.writeText(copiedText)
   }
 
+  function createLoadingList () {
+    const loadingList = []
+    for (let i=0;i < 20;i++) {
+      loadingList.push({vocabName: 'Loading Suggestions...'})
+    }
+    return loadingList;
+  }
+
   // called by 1st useEffect(), when first loading the page
   // gets user token & retrieves all table data & stores it into tables variable
   // to set up all needed variables
@@ -147,14 +184,14 @@ export default function ExampleRetriever() {
     // getting the user token
     //const queryParams = new URLSearchParams(window.location.search)
     //const ut = queryParams.get('ut') // user token
-    
     // retrieving the table data
+    setFilteredVocab(createLoadingList())
     tables.current.vocab = await getVocabFromBackend();
-    console.log(tables.current.vocab[32]);
-    console.log('vocab')
+    //console.log(tables.current.vocab[32]);
+    //console.log('vocab')
     tables.current.examples = await getExamplesFromBackend();
-    console.log('example')
-    console.log(tables.current.examples[12]);
+    //console.log('example')
+    //console.log(tables.current.examples[12]);
     tables.current.lessons = await getLessonsFromBackend();
     // this logic below sorts the lesssons in order by number
     tables.current.lessons.sort((a, b)=>{
@@ -168,8 +205,8 @@ export default function ExampleRetriever() {
 
       return titleA === titleB ? numA - numB : titleA - titleB
     })
-    console.log('lessons')
-    console.log(tables.current.lessons[12]);
+    //console.log('lessons')
+    //console.log(tables.current.lessons[12]);
     setFilteredVocab(tables.current.vocab)
   }
 

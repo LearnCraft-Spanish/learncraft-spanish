@@ -228,13 +228,24 @@ const backendUrl = 'https://as-vocab-backend.herokuapp.com/'
 export async function getVocabFromBackend() {
     let fetchUrl = `${backendUrl}qb-vocabulary`
 
-    console.log(`Fetching ${fetchUrl}`)
+    //console.log(`Fetching ${fetchUrl}`)
 
     const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
     .then((res) => {
         if(res.ok){
             return res.json().then((res) => {
+                function sortFunction (a,b){
+                    if(a.frequencyRank > b.frequencyRank){
+                        return 1;
+                    }
+                    if(a.frequencyRank < b.frequencyRank){
+                        return -1;
+                    }
+                    return 0
+                }
                 const data = JSON.parse(res);
+                data.sort(sortFunction);
+                //console.log(data);
                 return data;
             }) 
         }
@@ -249,7 +260,7 @@ export async function getVocabFromBackend() {
 export async function getExamplesFromBackend() {
     let fetchUrl = `${backendUrl}qb-examples`
 
-    console.log(`Fetching ${fetchUrl}`)
+    //console.log(`Fetching ${fetchUrl}`)
 
     const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
     .then((res) => {
@@ -268,13 +279,25 @@ export async function getExamplesFromBackend() {
 export async function getLessonsFromBackend() {
     let fetchUrl = `${backendUrl}qb-lessons`
 
-    console.log(`Fetching ${fetchUrl}`)
+    //console.log(`Fetching ${fetchUrl}`)
 
     const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
     .then((res) => {
         if(res.ok){
             return res.json().then((res) => {
+                function sortFunction (a,b){
+                    if(a.sortReference > b.sortReference){
+                        return 1;
+                    }
+                    if(a.sortReference < b.sortReference){
+                        return -1;
+                    }
+                    return 0
+
+                }
                 const data = JSON.parse(res);
+                data.sort(sortFunction);
+                //console.log(data);
                 return data;
             }) 
         }
