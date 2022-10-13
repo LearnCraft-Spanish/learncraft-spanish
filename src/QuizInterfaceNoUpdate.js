@@ -1,7 +1,6 @@
 import React, {useState, useRef, useEffect, useCallback} from 'react'
 import { qb } from './QuickbaseTablesInfo';
 import { fetchAndCreateTable, updateStudentExample } from './QuickbaseFetchFunctions';
-import './QuizInterface.css';
 
 // related student 8
 // related example 9

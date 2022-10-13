@@ -22,7 +22,11 @@ export default function ExampleRetriever() {
   // it is split into 2 separate variables in order to avoid redundancy
   const [displayExamples, setDisplayExamples] = useState([])
 
-
+  function goBackToMenu(e) {
+    e.preventDefault();
+    const link = '#/Menu/';
+    window.location=link;
+}
 
   
   // called when user clicks 'Retrieve Sentences' button on top right of page
@@ -224,7 +228,10 @@ export default function ExampleRetriever() {
   }, [noSpanglish, shuffledSentences])
 
   return <div>
-      <div className='div-header'><h1>Example Retriever</h1></div>
+      <div className='div-header'>
+        <h1>Example Retriever</h1>
+        <div className='returnButton'><button onClick={goBackToMenu}>{'< Back to Menu'}</button></div>
+      </div>
       <div className='div-vocab'>
         {/* Top left section--------------------------------------------------------------------------- */}
         <div className='div-vocab-left'>
@@ -236,7 +243,7 @@ export default function ExampleRetriever() {
               setFilteredVocab(tables.current.vocab)
             }}>    
               <input className='search' type='text' onChange={(e)=>setFilteredVocab(tables.current.vocab.filter(vocab => vocab.vocabName.toLowerCase().includes(e.target.value.toLowerCase())))}></input>
-              <button className='add-to-search-query'>Add to Search Query {'>>'} </button>
+              <button className='add-to-search-query'>Add to Search {'>'} </button>
             </form>
           </div>
           <ul className='suggestions'>

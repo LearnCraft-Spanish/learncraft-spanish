@@ -13,7 +13,6 @@
 }
 
 
-
 body {
   background-color: rgb(221, 209, 205);
   background-color: var(--overall);
@@ -21,11 +20,46 @@ body {
 
 /*ExampleRetriever*/
 h1 {
-  background-color: var(--header);
   color: var(--fontLight);
+  text-align: center;
+  margin: 0;
 }
+
+h2 {
+  text-align: center;
+
+}
+
 /*vocab*/
+
+.div-header{
+  background-color: var(--header);
+  padding: 10px 10%;
+
+  margin: 0;
+}
+
+.menu-buttons {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: row;
+  min-height: 250px;
+  padding: 30px, 10%;
+}
+
+.menu-buttons button {
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: larger;
+  font-weight: bold;
+  text-align: center;
+  width: 45%;
+  margin: 10px;
+}
+
 .div-vocab {
+  margin-top: 10px;
   display: flex;
 }
 

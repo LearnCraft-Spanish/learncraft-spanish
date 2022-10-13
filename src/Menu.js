@@ -20,14 +20,12 @@ export default function Menu() {
         const queryParams = new URLSearchParams(window.location.search)
         const ut = queryParams.get('ut')
         const linkBase = 'http://localhost:3000/'
-        //const linkBase = 'https://classicalmoser.github.io/'
-        const gitProjectName = pageName === 'ExampleRetrieverOld' ? 'as-quickbase4/' : 'asqb/'
-        const linkStr = linkBase + gitProjectName + '?ut=' + ut + '&stuid=' + currentStudent + '#/' + pageName
+        //const linkBase = 'https://classicalmoser.github.io/learncraft-spanish/'
+        const linkStr = linkBase + '#/' + pageName
         //console.log(linkStr)
-        window.open(
+        window.location.href = (
             //'http://localhost:3000/',
-            linkStr,
-            '_blank'
+            linkStr
         )
     }
 
@@ -50,19 +48,16 @@ export default function Menu() {
   return (
     <div>
         <div className='div-header'><h1>Menu</h1></div>
-        <h2>Database Tool</h2>
-        <div className='div-examples-header'>
-            <div>
-            <button onClick={()=>handleOnClick('ExampleRetriever')}>New DB Tool</button>
-            </div>
+        <h2>App Options:</h2>
+        <div className= 'menu-buttons'>
+        <button onClick={()=>handleOnClick('ExampleRetriever')}>Example Lookup</button>
+        <button onClick={()=>handleOnClick('SimpleQuizApp')}>Quiz App</button>
         </div>
-        <h2>SRS Student Example Builder</h2>
-        <div className='div-examples-header'>
-        <div>
-            <button onClick={()=>handleOnClick('SRSBuilder')}>SRS Student Example Builder</button>
-        </div>
-        </div>
-        <h2>SRS Quiz Interface</h2>
+    </div>
+  )
+}
+
+/*<h2>SRS Quiz Interface</h2>
         <div className='div-examples-header'>
         <div>
             <select style={{'padding': '8px'}} value={currentStudent} onChange={(e)=>setCurrentStudent(parseInt(e.target.value))}>
@@ -71,7 +66,4 @@ export default function Menu() {
             <button onClick={()=>handleOnClick('QuizInterface')} style={{'fontWeight': 'bold'}} title='This uses the SRS logic & will update the DB'>Interface with SRS Logic</button>
             <button onClick={()=>handleOnClick('QuizInterfaceNoUpdate')} style={{'fontWeight': 'bold'}} title='This does not use the SRS logic & will not update the DB'>Interface only</button>
         </div>
-        </div>
-    </div>
-  )
-}
+        </div>*/

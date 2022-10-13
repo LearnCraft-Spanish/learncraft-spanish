@@ -1,11 +1,12 @@
 import './App.css';
-import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route, Navigate} from 'react-router-dom';
 
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
 import QuizInterface from './QuizInterface';
 import QuizInterfaceNoUpdate from './QuizInterfaceNoUpdate';
 import SRSBuilder from './SRSBuilder';
+import SimpleQuizApp from './SimpleQuizApp';
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
           <Route exact path='/QuizInterface' element={<QuizInterface />} />
           <Route exact path='/QuizInterfaceNoUpdate' element={<QuizInterfaceNoUpdate />} />
           <Route exact path='/Menu' element={<Menu /> } />
+          <Route exact path='/SimpleQuizApp' element = {<SimpleQuizApp />} />
+          <Route exact path='/' element = {<Navigate to ='/Menu'/>}/>
         </Routes>
       </HashRouter>
     </div>

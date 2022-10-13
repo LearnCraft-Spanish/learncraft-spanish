@@ -306,3 +306,24 @@ export async function getLessonsFromBackend() {
     
     return tableFromBackend;
 }
+
+export async function getStudentsFromBackend() {
+    let fetchUrl = `${backendUrl}qb-students`
+
+    //console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = JSON.parse(res);
+                //data.sort(sortFunction);
+                //console.log(data);
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
+}

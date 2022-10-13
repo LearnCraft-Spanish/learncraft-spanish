@@ -14,7 +14,7 @@ export const qb = { // quickbaseTablesInfo
     vocabulary: {
         name: 'vocabulary',
         id: 'brrcdgyix',
-        fields: ['word/idiom', 'Vocab Name']
+        fields: ['word/idiom', 'Vocab Name', 'frequency rank']
     },
     examples: {
         name: 'examples',
@@ -24,7 +24,7 @@ export const qb = { // quickbaseTablesInfo
     lessons: {
         name: 'Lessons',
         id: 'brrtcungb',
-        fields: ['Lesson', 'Vocab Included']
+        fields: ['Lesson', 'Vocab Included', 'Sort Reference']
         //fields: ['Lesson']
     }
 }
