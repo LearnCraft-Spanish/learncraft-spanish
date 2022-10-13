@@ -5,8 +5,65 @@ import './App.css';
 
 export default function SimpleQuizApp() {
 
-    const tables = useRef({ examples: [] , students: []});
-    const [currentStudent, setCurrentStudent] = useState([]);
+    function createStudentLoadingList () {
+        const loadingList = []
+        for (let i=0;i < 10;i++) {
+          loadingList.push({recordId: i, name: 'Loading Students...'})
+        }
+        return loadingList;
+      }
+
+    const loadingList = createStudentLoadingList()
+
+    const [loadStatus, setloadStatus] = useState([])
+    const tables = useRef({ examples: [], students: loadingList});
+    const [currentStudent, setCurrentStudent] = useState(tables.current.students[0].name);
+    const [quizReady,setQuizReady] = useState(false);
+    const [examplesToReview, setExamplesToReview] = useState ([])
+    const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
+
+    function toggleQuizReady() {
+        if (quizReady) {
+            setQuizReady(false)
+        } else {
+            setQuizReady(true)
+        }
+    }
+
+    function incrementExample() {
+        if (currentExampleNumber < examplesToReview.length){
+            setCurrentExampleNumber(currentExampleNumber+1)
+        } else {
+            setCurrentExampleNumber(examplesToReview.length)
+        }
+    }
+    
+    function decrementExample() {
+        if (currentExampleNumber > 1){
+            setCurrentExampleNumber(currentExampleNumber-1)
+        } else {
+            setCurrentExampleNumber(1)
+        }
+    }
+
+    function filterByCurrentStudent (example) {
+        if (example.combinedTextStudentName.length === 0){
+            return false
+        }
+        //console.log('has students')
+        for(const student of example.combinedTextStudentName) {
+            if(example.combinedTextStudentName.includes(currentStudent)) {
+                return true
+            }
+        }
+        return false
+    }
+
+    function handleSetupQuiz () {
+        setExamplesToReview(tables.current.examples.filter(filterByCurrentStudent));
+        console.log(examplesToReview)
+        toggleQuizReady();
+    }
 
     function goBackToMenu(e) {
         e.preventDefault();
@@ -29,38 +86,36 @@ export default function SimpleQuizApp() {
         return filteredExamples
       }
 
-      function createStudentLoadingList () {
-        const loadingList = []
-        for (let i=0;i < 10;i++) {
-          loadingList.push({name: 'Loading Students...'})
-        }
-        return loadingList;
-      }
+    function makeOptionFromStudent(student, key) {
+        return <option key={key} value = {student.name}>{student.name}</option>
+    }
 
-      async function init() {
+    async function init() {
+        console.log('init called')
         // getting the user token
         //const queryParams = new URLSearchParams(window.location.search)
         //const ut = queryParams.get('ut') // user token
         // retrieving the table data
-        console.log(tables.current.students)
-        tables.current.students = createStudentLoadingList()
-        console.log(tables.current.students)
         tables.current.students = await getStudentsFromBackend();
-        console.log(tables.current.students)
         //console.log(tables.current.vocab[32]);
         //console.log('vocab')
         tables.current.examples = await getExamplesFromBackend();
-        console.log(tables.current.examples)
+        //console.log(tables.current.examples)
+
         //console.log('example')
         //console.log(tables.current.examples[12]);
         //console.log('lessons')
         //console.log(tables.current.lessons[12]);
+        
+        console.log('init completed')
+        setloadStatus('loaded')
       }
 
-      useEffect(() => {       
-        init() 
-        //console.log(tables)       
+    useEffect(() => {
+        init()
     }, [tables])
+
+    
 
 return (
     <div className='quizInterface'>
@@ -69,31 +124,33 @@ return (
             <div className='returnButton'><button onClick={goBackToMenu}>{'< Back to Menu'}</button></div>
         </div>
 
-        <form onSubmit={goBackToMenu}>
+        <form style = {{display:quizReady?'none':'inline'}} onSubmit={handleSetupQuiz}>
             <p>Reviewing as:</p>
-              <select className='student-select'>
-                <option value=''>-Choose a Student-</option>
-                {tables.current.students.map((student, id)=>(<option key={id} title={student.name}>{student.name}</option>))}
-              </select>
-              <button className='begin-review'>Begin Review</button>
-            </form>
+            <select onChange={(e)=>setCurrentStudent(e.target.value)}>
+                {tables.current.students.map((student, id) => (<option key={id} value={student.name}>{student.name}</option>))}
+            {loadStatus}
+            {console.log('list rendered')}
+            </select>
+            <button className='begin-review'>Begin Review</button>
+        </form>
         
-        {/* Progress Bar */}
-        <div className='progressBarContainer'>
+        {/* Quiz App */}
+        <div style = {{display:quizReady?'block':'none'}} className='quiz'>
             <div className='progressBar2'>                
+            <div className='progressBarDescription'>{currentExampleNumber} of {examplesToReview.length} completed</div>
             </div>
-            <div className='progressBarDescription'>Number of number completed</div>
-        </div>
-        <div className='englishTranslation'></div>
-        <div className='spanishExample' >
-        </div>
-
-        {/* Bottom buttons: Prev, Next, Review More, Review Less */}
-        <div className='buttonsContainer'>
-            <div><button className='buttonReviewMore'>Review More ^</button></div>
-            <div>
-                <button>{'<-- Prev'}</button>
-            
+            <div className='exampleBox'>
+                <div className='englishTranslation'>
+                    {examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}
+                </div>
+                <div className='spanishExample' >
+                    {examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}
+                </div>
+            </div>
+            <div className='buttonBox'>
+                <button onClick={decrementExample}>Previous Example</button>
+                <button onClick={incrementExample}>Next Example</button>
+                <button onClick={toggleQuizReady}>Restart Quiz</button>
             </div>
         </div>
     </div>

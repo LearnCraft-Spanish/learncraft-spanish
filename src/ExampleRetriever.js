@@ -186,17 +186,16 @@ export default function ExampleRetriever() {
   // to set up all needed variables
   async function init() {
     // getting the user token
-    //const queryParams = new URLSearchParams(window.location.search)
-    //const ut = queryParams.get('ut') // user token
+    console.log('init called')
     // retrieving the table data
     setFilteredVocab(createLoadingList())
     tables.current.vocab = await getVocabFromBackend();
-    //console.log(tables.current.vocab[32]);
-    //console.log('vocab')
+    
     tables.current.examples = await getExamplesFromBackend();
-    //console.log('example')
-    //console.log(tables.current.examples[12]);
+    
+    console.log('lessons fetching')
     tables.current.lessons = await getLessonsFromBackend();
+    console.log('lessons fetched')
     // this logic below sorts the lesssons in order by number
     tables.current.lessons.sort((a, b)=>{
       const splitArrA = a.lesson.split(' ')
@@ -206,7 +205,7 @@ export default function ExampleRetriever() {
       const splitArrB = b.lesson.split(' ')
       const numB = parseInt(splitArrB.pop())
       const titleB = splitArrB.join(' ')
-
+      console.log('init finished')
       return titleA === titleB ? numA - numB : titleA - titleB
     })
     //console.log('lessons')
@@ -229,7 +228,7 @@ export default function ExampleRetriever() {
 
   return <div>
       <div className='div-header'>
-        <h1>Example Retriever</h1>
+        <h1>Example Lookup</h1>
         <div className='returnButton'><button onClick={goBackToMenu}>{'< Back to Menu'}</button></div>
       </div>
       <div className='div-vocab'>
@@ -261,6 +260,7 @@ export default function ExampleRetriever() {
                 {/*lessonTitleSelect.options.map((option, id) => (<option key={id} title={createLessonTitle(option)}>{option}</option>))*/
                 tables.current.lessons.map((lesson, id)=>(<option key={id} title={lesson.vocabIncluded.join('\n')}>{lesson.lesson}</option>))
                 }
+                {console.log('rerendering lessons')}
               </select>
               <button className='retrieve-sentences'>Retrieve Sentences</button>
             </form>

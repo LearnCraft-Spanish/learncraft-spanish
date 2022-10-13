@@ -47,11 +47,11 @@ export default function Menu() {
     }, [])
   return (
     <div>
-        <div className='div-header'><h1>Menu</h1></div>
+        <div className='div-header'><h1>LearnCraft Spanish</h1></div>
         <h2>App Options:</h2>
         <div className= 'menu-buttons'>
         <button onClick={()=>handleOnClick('ExampleRetriever')}>Example Lookup</button>
-        <button onClick={()=>handleOnClick('SimpleQuizApp')}>Quiz App</button>
+        <button onClick={()=>handleOnClick('SimpleQuizApp')}>Quizzing App</button>
         </div>
     </div>
   )

@@ -67,6 +67,21 @@ h2 {
   width: 50%
 }
 /*
+.quiz {
+  height: 350px;
+  display: flex;
+  justify-content: space-around;
+  align-content: space-around;
+}
+
+.exampleBox, .buttonBox {
+  display: block;
+}
+
+.spanishExample, .englishTranslation {
+  display: inline-block;
+}
+
 .div-vocab-left {
   display: flex;
 }
