@@ -19,8 +19,8 @@ export default function Menu() {
     function handleOnClick(pageName) {
         const queryParams = new URLSearchParams(window.location.search)
         const ut = queryParams.get('ut')
-        const linkBase = 'http://localhost:3000'
-        //const linkBase = 'https://classicalmoser.github.io/learncraft-spanish/'
+        //const linkBase = 'http://localhost:3000'
+        const linkBase = 'https://classicalmoser.github.io/learncraft-spanish/'
         const linkStr = linkBase + '#/' + pageName
         //console.log(linkStr)
         window.location.href = (
