@@ -21,10 +21,12 @@ export default function SimpleQuizApp() {
     const [quizReady,setQuizReady] = useState(false);
     const [examplesToReview, setExamplesToReview] = useState ([])
     const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
+    const [languageShowing, setLanguageShowing] = useState('english')
 
     function toggleQuizReady() {
         if (quizReady) {
             setQuizReady(false)
+            setCurrentExampleNumber(1)
         } else {
             setQuizReady(true)
         }
@@ -36,6 +38,7 @@ export default function SimpleQuizApp() {
         } else {
             setCurrentExampleNumber(examplesToReview.length)
         }
+        setLanguageShowing('english')
     }
     
     function decrementExample() {
@@ -43,6 +46,15 @@ export default function SimpleQuizApp() {
             setCurrentExampleNumber(currentExampleNumber-1)
         } else {
             setCurrentExampleNumber(1)
+        }
+        setLanguageShowing('english')
+    }
+
+    async function toggleLanguageShowing () {
+        if (languageShowing === 'spanish'){
+            setLanguageShowing('english')
+        } else {
+            setLanguageShowing('spanish')
         }
     }
 
@@ -60,8 +72,20 @@ export default function SimpleQuizApp() {
     }
 
     function handleSetupQuiz () {
-        setExamplesToReview(tables.current.examples.filter(filterByCurrentStudent));
-        console.log(examplesToReview)
+        const quizExamples = tables.current.examples.filter(filterByCurrentStudent);
+        function randomize (array) {
+            const randomizedArray = []
+            const vanishingArray = [...array];
+            for (let i = 0; i < array.length; i++) {
+                const randIndex = Math.floor(Math.random()*vanishingArray.length)
+                const randomArrayItem = vanishingArray[randIndex]
+                vanishingArray.splice(randIndex, 1)
+                randomizedArray[i] = randomArrayItem
+                }
+            return randomizedArray
+        }
+        const randomizedQuizExamples = randomize(quizExamples);
+        setExamplesToReview(randomizedQuizExamples)
         toggleQuizReady();
     }
 
@@ -71,49 +95,18 @@ export default function SimpleQuizApp() {
         window.location=link;
     }
 
-    function filterExamples(vocabArr, examplesTable) {
-        const filteredExamples = examplesTable.filter(example => {
-            if(example.vocabIncluded.length == 0) {
-                return false
-            }
-            for(const vocab of example.vocabIncluded) {
-                if(!vocabArr.includes(vocab)) {
-                    return false
-                }
-            }
-            return true
-        })
-        return filteredExamples
-      }
-
-    function makeOptionFromStudent(student, key) {
-        return <option key={key} value = {student.name}>{student.name}</option>
-    }
-
     async function init() {
         console.log('init called')
-        // getting the user token
-        //const queryParams = new URLSearchParams(window.location.search)
-        //const ut = queryParams.get('ut') // user token
-        // retrieving the table data
         tables.current.students = await getStudentsFromBackend();
-        //console.log(tables.current.vocab[32]);
-        //console.log('vocab')
         tables.current.examples = await getExamplesFromBackend();
-        //console.log(tables.current.examples)
-
-        //console.log('example')
-        //console.log(tables.current.examples[12]);
-        //console.log('lessons')
-        //console.log(tables.current.lessons[12]);
-        
         console.log('init completed')
+        setCurrentStudent(tables.current.students[0].name)
         setloadStatus('loaded')
       }
 
     useEffect(() => {
         init()
-    }, [tables])
+    }, [])
 
     
 
@@ -124,33 +117,37 @@ return (
             <div className='returnButton'><button onClick={goBackToMenu}>{'< Back to Menu'}</button></div>
         </div>
 
-        <form style = {{display:quizReady?'none':'inline'}} onSubmit={handleSetupQuiz}>
-            <p>Reviewing as:</p>
-            <select onChange={(e)=>setCurrentStudent(e.target.value)}>
-                {tables.current.students.map((student, id) => (<option key={id} value={student.name}>{student.name}</option>))}
-            {loadStatus}
-            {console.log('list rendered')}
-            </select>
-            <button className='begin-review'>Begin Review</button>
+        <form style = {{display:quizReady?'none':'flex'}} onSubmit={handleSetupQuiz} className='studentSelect'>
+            <h2>Reviewing as:</h2>
+            <div>
+                <select onChange={(e)=>setCurrentStudent(e.target.value)}>
+                    {tables.current.students.map((student, id) => (<option key={id} value={student.name}>{student.name}</option>))}
+                {loadStatus}
+                </select>
+                <input type = 'submit' className='begin-review' value ='Begin Review'></input>
+            </div>
         </form>
         
         {/* Quiz App */}
-        <div style = {{display:quizReady?'block':'none'}} className='quiz'>
-            <div className='progressBar2'>                
-            <div className='progressBarDescription'>{currentExampleNumber} of {examplesToReview.length} completed</div>
-            </div>
+        <div style = {{display:quizReady?'flex':'none'}} className='quiz'>
             <div className='exampleBox'>
-                <div className='englishTranslation'>
-                    {examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}
+                <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation'>
+                    <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}</p>
                 </div>
-                <div className='spanishExample' >
-                    {examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}
+                <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' >
+                    <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
                 </div>
             </div>
             <div className='buttonBox'>
                 <button onClick={decrementExample}>Previous Example</button>
                 <button onClick={incrementExample}>Next Example</button>
+            </div>
+            <div className='buttonBox'>
+                <button onClick={toggleLanguageShowing}>Flip Card</button>
                 <button onClick={toggleQuizReady}>Restart Quiz</button>
+            </div>
+            <div className='progressBar2'>                
+                <div className='progressBarDescription'>Example {currentExampleNumber} of {examplesToReview.length}</div>
             </div>
         </div>
     </div>

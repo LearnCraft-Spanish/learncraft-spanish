@@ -1,6 +1,6 @@
 import './App.css';
 import { BrowserRouter, HashRouter, Routes, Route, Navigate} from 'react-router-dom';
-
+import React from 'react';
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
 import QuizInterface from './QuizInterface';

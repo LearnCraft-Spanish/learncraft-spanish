@@ -318,7 +318,6 @@ export async function getStudentsFromBackend() {
             return res.json().then((res) => {
                 const data = JSON.parse(res);
                 //data.sort(sortFunction);
-                //console.log(data);
                 return data;
             }) 
         }
