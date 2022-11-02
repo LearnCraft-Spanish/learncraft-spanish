@@ -2,6 +2,10 @@ import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './QuickbaseTablesInfo';
 import { fetchAndCreateTable, getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend, getStudentsFromBackend} from './QuickbaseFetchFunctions';
 import './App.css';
+import ReactHowler from 'react-howler'
+
+
+
 
 export default function SimpleQuizApp() {
 
@@ -22,8 +26,20 @@ export default function SimpleQuizApp() {
     const [examplesToReview, setExamplesToReview] = useState ([])
     const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
     const [languageShowing, setLanguageShowing] = useState('english')
+    const [playing, setPlaying] = useState(false)
 
+    function togglePlaying() {
+        console.log(`Playing: ${!playing}`)
+        if (playing) {
+            setPlaying(false)
+        } else {
+            setPlaying(true)
+        }
+        
+    }
+    
     function toggleQuizReady() {
+        setPlaying(false)
         if (quizReady) {
             setQuizReady(false)
             setCurrentExampleNumber(1)
@@ -39,6 +55,7 @@ export default function SimpleQuizApp() {
             setCurrentExampleNumber(examplesToReview.length)
         }
         setLanguageShowing('english')
+        setPlaying(false)
     }
     
     function decrementExample() {
@@ -48,13 +65,16 @@ export default function SimpleQuizApp() {
             setCurrentExampleNumber(1)
         }
         setLanguageShowing('english')
+        setPlaying(false)
     }
 
     async function toggleLanguageShowing () {
         if (languageShowing === 'spanish'){
             setLanguageShowing('english')
+            setPlaying(false)
         } else {
             setLanguageShowing('spanish')
+            setPlaying(false)
         }
     }
 
@@ -95,6 +115,10 @@ export default function SimpleQuizApp() {
         window.location=link;
     }
 
+    const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
+
+    const currentAudioUrl = quizReady?examplesToReview[currentExampleNumber-1][whichAudio]:""
+
     async function init() {
         console.log('init called')
         tables.current.students = await getStudentsFromBackend();
@@ -117,6 +141,7 @@ return (
             <div className='returnButton'><button onClick={goBackToMenu}>{'< Back to Menu'}</button></div>
         </div>
 
+        {/* Student Selector */}
         <form style = {{display:quizReady?'none':'flex'}} onSubmit={handleSetupQuiz} className='studentSelect'>
             <h2>Reviewing as:</h2>
             <div>
@@ -137,9 +162,14 @@ return (
                 <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' >
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
                 </div>
+                <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
+                {console.log(currentAudioUrl)}
+                {console.log()}
+
             </div>
             <div className='buttonBox'>
                 <button onClick={decrementExample}>Previous Example</button>
+                <button style = {{display: (currentAudioUrl==="")? 'none' :'inherit'}} onClick = {togglePlaying}>Play/Pause Audio</button>
                 <button onClick={incrementExample}>Next Example</button>
             </div>
             <div className='buttonBox'>
