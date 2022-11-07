@@ -39,6 +39,7 @@ export default function SimpleQuizApp() {
     }
     
     function toggleQuizReady() {
+        setLanguageShowing('english')
         setPlaying(false)
         if (quizReady) {
             setQuizReady(false)
