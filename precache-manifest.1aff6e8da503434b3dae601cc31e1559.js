@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "0c54f48348f0bff51a08",
+    "revision": "d33a7ef472b36fafe48d",
     "url": "/learncraft-spanish/static/css/main.aaa3b3de.chunk.css"
   },
   {
-    "revision": "0c54f48348f0bff51a08",
-    "url": "/learncraft-spanish/static/js/main.0c54f483.chunk.js"
+    "revision": "d33a7ef472b36fafe48d",
+    "url": "/learncraft-spanish/static/js/main.d33a7ef4.chunk.js"
   },
   {
     "revision": "2c80ac1fe2aa0d16567f",
@@ -20,7 +20,7 @@ self.__precacheManifest = [
     "url": "/learncraft-spanish/static/js/runtime~main.c05649c4.js"
   },
   {
-    "revision": "66349eedcacce8ad679b7b85ca4c4ae3",
+    "revision": "57a86e94d13f42d13aace2992c77c503",
     "url": "/learncraft-spanish/index.html"
   }
 ];

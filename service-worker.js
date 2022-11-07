@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/learncraft-spanish/precache-manifest.94c6d85132b08488c4afd3a914af685c.js"
+  "/learncraft-spanish/precache-manifest.1aff6e8da503434b3dae601cc31e1559.js"
 );
 
 workbox.clientsClaim();
