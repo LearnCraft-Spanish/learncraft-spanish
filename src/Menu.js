@@ -20,7 +20,7 @@ export default function Menu() {
         const queryParams = new URLSearchParams(window.location.search)
         const ut = queryParams.get('ut')
         //const linkBase = 'http://localhost:3000'
-        const linkBase = 'https://classicalmoser.github.io/learncraft-spanish/'
+        const linkBase = 'https://app-lcs.s3.us-east-2.amazonaws.com/index.html'
         const linkStr = linkBase + '#/' + pageName
         //console.log(linkStr)
         window.location.href = (
