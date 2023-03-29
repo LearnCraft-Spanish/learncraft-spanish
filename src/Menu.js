@@ -2,6 +2,7 @@ import React, {useState, useRef, useEffect} from 'react'
 import { qb } from './QuickbaseTablesInfo';
 import { fetchAndCreateTable } from './QuickbaseFetchFunctions';
 import './App.css'
+import { useAuth0 } from "@auth0/auth0-react";
 
 // this script displays the Menu page, where user can access
 // - Database tool (Example Retriever)
@@ -10,6 +11,7 @@ import './App.css'
 // - SRS Quiz Platform (Quiz Interface)
 // - SRS Quiz Platform Version that does not update database
 export default function Menu() {
+    const { user, isAuthenticated, isLoading } = useAuth0();
     //const tables = useRef({ students: [] })
     const [studentsTable, setStudentsTable] = useState([])
     const [currentStudent, setCurrentStudent] = useState(3)
@@ -46,15 +48,15 @@ export default function Menu() {
         //console.log(tables)       
     }, [])
   return (
+    isAuthenticated && (
     <div>
-        <div className='div-header'><h1>LearnCraft Spanish</h1></div>
         <h2>App Options:</h2>
         <div className= 'menu-buttons'>
-        <button onClick={()=>handleOnClick('ExampleRetriever')}>Example Lookup</button>
-        <button onClick={()=>handleOnClick('SimpleQuizApp')}>Quizzing App</button>
+            <button onClick={()=>handleOnClick('ExampleRetriever')}>Example Lookup</button>
+            <button onClick={()=>handleOnClick('SimpleQuizApp')}>Quizzing App</button>
         </div>
     </div>
-  )
+  ))
 }
 
 /*<h2>SRS Quiz Interface</h2>
