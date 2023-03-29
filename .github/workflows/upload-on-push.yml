@@ -1,4 +1,4 @@
-name: Upload App
+name: Upload on Push
 
 on:
   push:
