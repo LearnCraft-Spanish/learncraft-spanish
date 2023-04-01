@@ -1,41 +1,65 @@
 import './App.css';
-import { BrowserRouter, HashRouter, Routes, Route, Navigate} from 'react-router-dom';
 import React from 'react';
+import { useEffect, useState } from 'react';
+import { getUserDataFromBackend } from './QuickbaseFetchFunctions';
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
-import QuizInterface from './QuizInterface';
-import QuizInterfaceNoUpdate from './QuizInterfaceNoUpdate';
-import SRSBuilder from './SRSBuilder';
 import SimpleQuizApp from './SimpleQuizApp';
 import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
 import { useAuth0 } from '@auth0/auth0-react';
+import Profile from './Profile';
 
 function App() {
-  const { user, isAuthenticated, isLoading } = useAuth0();
+  const { user, isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
+  const [userID, setUserID] = useState(undefined);
+  const [qbUserData, setQbUserData]= useState({name:'Loading Name',recordId:'Loading ID',emailAddress:'Loading Email'})
+
+  useEffect(() => {
+    if(user) {
+        setUserID(user.email)
+    }
+  }, [isAuthenticated, user])
+
+  useEffect(() => {
+    if(userID) {
+            async function getData() {
+              try {
+                const accessToken = await getAccessTokenSilently({
+                  authorizationParams: {
+                    audience: "https://lcs-api.herokuapp.com/",
+                    scope: "openID email profile read:current_user update:current_user_metadata",
+                  },
+                });
+                const userData = await getUserDataFromBackend(userID, accessToken)
+                .then((result) => {
+                  const usefulData = result[0].studentTable[0]
+                  return usefulData
+                });
+                //console.log(userData)
+                setQbUserData(userData)
+                return userData
+              } catch (e) {
+                console.log(e.message);
+              }
+            }
+            getData();
+    }
+  }, [userID])
+
   return (
     <div className="App">
-      <HashRouter>
       <div className='div-header'>
         <h1>LearnCraft Spanish</h1>
         <LoginButton />
         <LogoutButton />
       </div>
-        {isAuthenticated && (<div>
-            <img src={user.picture} alt={user.name} />
-            <h2>{user.name}</h2>
-            <p>{user.email}</p>
-        </div>)}
-        <Routes>
-          <Route exact path='/ExampleRetriever' element={<ExampleRetriever />} />
-          <Route exact path='/SRSBuilder' element={<SRSBuilder />} />
-          <Route exact path='/QuizInterface' element={<QuizInterface />} />
-          <Route exact path='/QuizInterfaceNoUpdate' element={<QuizInterfaceNoUpdate />} />
-          <Route exact path='/Menu' element={<Menu /> } />
-          <Route exact path='/SimpleQuizApp' element = {<SimpleQuizApp />} />
-          <Route exact path='/' element = {<Navigate to ='/Menu'/>}/>
-        </Routes>
-      </HashRouter>
+      {isAuthenticated && (
+        <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>
+      )}
+      {(qbUserData.recordId !== 'Loading ID') && (
+        <SimpleQuizApp studentID={qbUserData.recordId}/>
+      )}
     </div>
   );
 }

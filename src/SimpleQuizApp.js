@@ -1,13 +1,15 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './QuickbaseTablesInfo';
-import { fetchAndCreateTable, getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend, getStudentsFromBackend} from './QuickbaseFetchFunctions';
+import { fetchAndCreateTable, getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend, getStudentsFromBackend, getStudentExamplesFromBackend} from './QuickbaseFetchFunctions';
 import './App.css';
 import ReactHowler from 'react-howler'
+import { useAuth0 } from '@auth0/auth0-react';
 
 
 
 
-export default function SimpleQuizApp() {
+export default function SimpleQuizApp({studentID}) {
+    const {user, isAuthorized, getAccessTokenSilently} = useAuth0();
 
     function createStudentLoadingList () {
         const loadingList = []
@@ -18,6 +20,9 @@ export default function SimpleQuizApp() {
       }
 
     const loadingList = createStudentLoadingList()
+
+    const [studentExamplesTable, setStudentExamplesTable] = useState([])
+    const [examplesTable, setExamplesTable] = useState([])
 
     const [loadStatus, setloadStatus] = useState([])
     const tables = useRef({ examples: [], students: loadingList});
@@ -120,28 +125,59 @@ export default function SimpleQuizApp() {
 
     const currentAudioUrl = quizReady?examplesToReview[currentExampleNumber-1][whichAudio]:""
 
-    async function init() {
-        console.log('init called')
-        tables.current.students = await getStudentsFromBackend();
-        tables.current.examples = await getExamplesFromBackend();
-        console.log('init completed')
-        setCurrentStudent(tables.current.students[0].name)
-        setloadStatus('loaded')
-      }
-
     useEffect(() => {
+        async function init() {
+            console.log('init called')
+            tables.current.students = await getStudentsFromBackend();
+            console.log('init completed')
+            setCurrentStudent(tables.current.students[0].name)
+            setloadStatus('loaded')
+        }
         init()
     }, [])
+
+    useEffect(() => {
+        if(studentID !== 'Loading ID') {
+            console.log(studentID)
+                async function getData() {
+                  try {
+                    const accessToken = await getAccessTokenSilently({
+                      authorizationParams: {
+                        audience: "https://lcs-api.herokuapp.com/",
+                        scope: "openID email profile read:current_user update:current_user_metadata",
+                      },
+                    });
+                    const userData = await getStudentExamplesFromBackend(studentID, accessToken)
+                    .then((result) => {
+                      const usefulData = result
+                      //console.log(usefulData)
+                      return usefulData
+                    });
+                    //console.log(userData)
+                    setStudentExamplesTable(userData)
+                    const userExamples = await getExamplesFromBackend(studentID, accessToken)
+                    .then((result) => {
+                      const usefulData = result
+                      //console.log(usefulData)
+                      return usefulData
+                    });
+                    //console.log(userExamples)
+                    setExamplesTable(userExamples)
+                  } catch (e) {
+                    console.log(e.message);
+                  }
+                }
+                getData();
+        } else {
+            console.log('Student ID still loading')
+        }
+      }, [studentID])
+    
 
     
 
 return (
     <div className='quizInterface'>
-        <div className='div-header'>
-            <h1>Quizzing App</h1>
-            <div className='returnButton'><button onClick={goBackToMenu}>{'< Back to Menu'}</button></div>
-        </div>
-
         {/* Student Selector */}
         <form style = {{display:quizReady?'none':'flex'}} onSubmit={handleSetupQuiz} className='studentSelect'>
             <h2>Reviewing as:</h2>
@@ -164,8 +200,6 @@ return (
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
                 </div>
                 <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
-                {console.log(currentAudioUrl)}
-                {console.log()}
 
             </div>
             <div className='buttonBox'>

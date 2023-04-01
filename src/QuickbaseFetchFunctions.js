@@ -223,10 +223,11 @@ export async function createStudentExample(exampleID, studentID, lastReviewDate,
 }
 
 //const backendUrl = 'http://localhost:8000/'
-const backendUrl = 'https://as-vocab-backend.herokuapp.com/'
+const oldBackendUrl = 'https://as-vocab-backend.herokuapp.com/'
+const backendUrl = 'https://lcs-api.herokuapp.com/'
 
 export async function getVocabFromBackend() {
-    let fetchUrl = `${backendUrl}qb-vocabulary`
+    let fetchUrl = `${oldBackendUrl}qb-vocabulary`
 
     //console.log(`Fetching ${fetchUrl}`)
 
@@ -257,27 +258,8 @@ export async function getVocabFromBackend() {
     
 }
 
-export async function getExamplesFromBackend() {
-    let fetchUrl = `${backendUrl}qb-examples`
-
-    //console.log(`Fetching ${fetchUrl}`)
-
-    const tableFromBackend = await fetch(fetchUrl,{method:'GET'})
-    .then((res) => {
-        if(res.ok){
-            return res.json().then((res) => {
-                const data = JSON.parse(res);
-                return data;
-            }) 
-        }
-    })
-    .catch(err => console.log(err))
-    
-    return tableFromBackend;
-}
-
 export async function getLessonsFromBackend() {
-    let fetchUrl = `${backendUrl}qb-lessons`
+    let fetchUrl = `${oldBackendUrl}qb-lessons`
 
     //console.log(`Fetching ${fetchUrl}`)
 
@@ -308,7 +290,7 @@ export async function getLessonsFromBackend() {
 }
 
 export async function getStudentsFromBackend() {
-    let fetchUrl = `${backendUrl}qb-students`
+    let fetchUrl = `${oldBackendUrl}qb-students`
 
     //console.log(`Fetching ${fetchUrl}`)
 
@@ -318,6 +300,75 @@ export async function getStudentsFromBackend() {
             return res.json().then((res) => {
                 const data = JSON.parse(res);
                 //data.sort(sortFunction);
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
+}
+
+export async function getUserDataFromBackend(studentID, token) {//actually currently email address – FIX THIS
+    let fetchUrl = `${backendUrl}public/${studentID}`//actually currently email address – FIX THIS
+
+    //console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                function sortFunction (a,b){
+                    if(a.sortReference > b.sortReference){
+                        return 1;
+                    }
+                    if(a.sortReference < b.sortReference){
+                        return -1;
+                    }
+                    return 0
+
+                }
+                const data = [res];
+                data.sort(sortFunction);
+                //console.log(data);
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
+}
+
+export async function getStudentExamplesFromBackend(studentID, token) {
+    let fetchUrl = `${backendUrl}public/${studentID}/student-examples`
+
+    //console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
+}
+
+export async function getExamplesFromBackend(studentID, token) {
+    let fetchUrl = `${backendUrl}public/${studentID}/examples`
+
+    //console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
                 return data;
             }) 
         }
