@@ -224,7 +224,7 @@ export async function createStudentExample(exampleID, studentID, lastReviewDate,
 
 //const backendUrl = 'http://localhost:8000/'
 const oldBackendUrl = 'https://as-vocab-backend.herokuapp.com/'
-const backendUrl = 'https://lcs-api.herokuapp.com/'
+const backendUrl = 'https://lcs-api.herokuapp.com/api/'
 
 export async function getVocabFromBackend() {
     let fetchUrl = `${oldBackendUrl}qb-vocabulary`
@@ -311,6 +311,7 @@ export async function getStudentsFromBackend() {
 
 export async function getUserDataFromBackend(studentID, token) {//actually currently email address – FIX THIS
     let fetchUrl = `${backendUrl}public/${studentID}`//actually currently email address – FIX THIS
+    console.log(`Fetching ${fetchUrl}`)
 
     //console.log(`Fetching ${fetchUrl}`)
 
