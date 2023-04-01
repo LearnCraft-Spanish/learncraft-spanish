@@ -48,15 +48,15 @@ function App() {
   }, [userID])
 
   return (
-    <div className="App">
-      <div className='div-header'>
+    <div className="App" style = {{textAlign: 'center'}}>
+      <div className='div-header'style = {{textAlign: 'center'}}>
         <h1>LearnCraft Spanish</h1>
-        <LoginButton />
         <LogoutButton />
       </div>
       {/*isAuthenticated && (
         <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>
       )*/}
+      <LoginButton />
       {(qbUserData.recordId !== 'Loading ID') && (
         <SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name}/>
       )}
