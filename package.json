@@ -2,7 +2,7 @@
   "name": "learncraft-spanish",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://localhost:3000",
+  "homepage": "https://app.learncraftspanish.com",
   "dependencies": {
     "@auth0/auth0-react": "^2.0.1",
     "@testing-library/jest-dom": "^5.16.5",
