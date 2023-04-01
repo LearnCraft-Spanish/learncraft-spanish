@@ -8,25 +8,11 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 
 
-export default function SimpleQuizApp({studentID}) {
+export default function SimpleQuizApp({studentID, studentName}) {
     const {user, isAuthorized, getAccessTokenSilently} = useAuth0();
-
-    function createStudentLoadingList () {
-        const loadingList = []
-        for (let i=0;i < 10;i++) {
-          loadingList.push({recordId: i, name: 'Loading Students...'})
-        }
-        return loadingList;
-      }
-
-    const loadingList = createStudentLoadingList()
-
     const [studentExamplesTable, setStudentExamplesTable] = useState([])
     const [examplesTable, setExamplesTable] = useState([])
-
     const [loadStatus, setloadStatus] = useState([])
-    const tables = useRef({ examples: [], students: loadingList});
-    const [currentStudent, setCurrentStudent] = useState(tables.current.students[0].name);
     const [quizReady,setQuizReady] = useState(false);
     const [examplesToReview, setExamplesToReview] = useState ([])
     const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
@@ -84,21 +70,8 @@ export default function SimpleQuizApp({studentID}) {
         }
     }
 
-    function filterByCurrentStudent (example) {
-        if (example.combinedTextStudentName.length === 0){
-            return false
-        }
-        //console.log('has students')
-        for(const student of example.combinedTextStudentName) {
-            if(example.combinedTextStudentName.includes(currentStudent)) {
-                return true
-            }
-        }
-        return false
-    }
-
     function handleSetupQuiz () {
-        const quizExamples = tables.current.examples.filter(filterByCurrentStudent);
+        const quizExamples = examplesTable;
         function randomize (array) {
             const randomizedArray = []
             const vanishingArray = [...array];
@@ -115,26 +88,9 @@ export default function SimpleQuizApp({studentID}) {
         toggleQuizReady();
     }
 
-    function goBackToMenu(e) {
-        e.preventDefault();
-        const link = '#/Menu/';
-        window.location=link;
-    }
-
     const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
 
     const currentAudioUrl = quizReady?examplesToReview[currentExampleNumber-1][whichAudio]:""
-
-    useEffect(() => {
-        async function init() {
-            console.log('init called')
-            tables.current.students = await getStudentsFromBackend();
-            console.log('init completed')
-            setCurrentStudent(tables.current.students[0].name)
-            setloadStatus('loaded')
-        }
-        init()
-    }, [])
 
     useEffect(() => {
         if(studentID !== 'Loading ID') {
@@ -177,18 +133,15 @@ export default function SimpleQuizApp({studentID}) {
     
 
 return (
+    (studentID !== 'Loading ID') && (
     <div className='quizInterface'>
         {/* Student Selector */}
-        <form style = {{display:quizReady?'none':'flex'}} onSubmit={handleSetupQuiz} className='studentSelect'>
-            <h2>Reviewing as:</h2>
-            <div>
-                <select onChange={(e)=>setCurrentStudent(e.target.value)}>
-                    {tables.current.students.map((student, id) => (<option key={id} value={student.name}>{student.name}</option>))}
-                {loadStatus}
-                </select>
-                <input type = 'submit' className='begin-review' value ='Begin Review'></input>
-            </div>
-        </form>
+        <div>
+            <h2>Welcome back, {studentName}!</h2>
+        </div>
+        <div style = {{display:quizReady?'none':'flex', justifyContent: 'space-around'}}>
+            <button onClick={handleSetupQuiz}>Begin Review</button>
+        </div>
         
         {/* Quiz App */}
         <div style = {{display:quizReady?'flex':'none'}} className='quiz'>
@@ -216,5 +169,5 @@ return (
             </div>
         </div>
     </div>
-        
+    )
 )}

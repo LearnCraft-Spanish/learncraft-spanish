@@ -54,11 +54,11 @@ function App() {
         <LoginButton />
         <LogoutButton />
       </div>
-      {isAuthenticated && (
+      {/*isAuthenticated && (
         <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>
-      )}
+      )*/}
       {(qbUserData.recordId !== 'Loading ID') && (
-        <SimpleQuizApp studentID={qbUserData.recordId}/>
+        <SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name}/>
       )}
     </div>
   );
