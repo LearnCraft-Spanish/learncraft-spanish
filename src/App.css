@@ -67,8 +67,8 @@ button {
 }
 
 .spanishExample, .englishTranslation {
-  color: var(--light);
-  font-weight: 600;
+  color: var(--dark);
+  background-color: var(--light);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -78,7 +78,7 @@ button {
   width: 40%;
   min-width: 300px;
   padding: 25px;
-  background-color: var(--theme);
+  border: 4px solid var(--accent);
   margin: 5px 10px;
 }
 
