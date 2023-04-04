@@ -52,11 +52,17 @@ function App() {
       <div className='div-header'style = {{textAlign: 'center'}}>
         <h1>LearnCraft Spanish</h1>
         <LogoutButton />
+        <LoginButton />
       </div>
+      {isLoading && (
+        <h2>Loading...</h2>
+      )}
+      {!isLoading && !isAuthenticated && (qbUserData.recordId === 'Loading ID') && (
+        <h2>You must be logged in to use this app.</h2>
+      )}
       {/*isAuthenticated && (
         <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>
       )*/}
-      <LoginButton />
       {(qbUserData.recordId !== 'Loading ID') && (
         <SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name}/>
       )}

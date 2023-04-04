@@ -14,7 +14,13 @@ body {
 }
 
 /*ExampleRetriever*/
-h1, h2, h3, h4, h5, h6 {
+h1 {
+  color: var(--light);
+  text-align: center;
+  margin: 0;
+}
+
+h2, h3, h4, h5, h6 {
   color: var(--dark);
   text-align: center;
   margin: 0;
@@ -30,8 +36,18 @@ button {
 }
 
 .div-header{
-  padding: 10px 10%;
+  padding: 30px 5%;
+  background-color: var(--theme);
+  color: var(--light);
   margin: 0;
+  margin-bottom: 3%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.div-header button {
+  background-color: var(--light);
+  color: var(--dark);
 }
 
 .menu-buttons {

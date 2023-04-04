@@ -129,7 +129,13 @@ export default function SimpleQuizApp({studentID, studentName}) {
         }
       }, [studentID])
     
-
+if (studentID === 'Loading ID') {
+    return (
+        <div>
+            <h2>Loading...</h2>
+        </div>
+    )
+}
     
 
 return (
