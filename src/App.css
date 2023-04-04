@@ -20,15 +20,13 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
-/*vocab*/
-
 button {
   font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
   font-weight: 600;
+  padding: 10px 30px;
   color: var(--light);
   background-color: var(--brand);
   border: none;
-  padding: 10px;
 }
 
 .div-header{
@@ -42,17 +40,6 @@ button {
   align-content: center;
   flex-direction: row;
   min-height: 250px;
-  padding: 30px, 10%;
-}
-
-.menu-buttons button {
-  box-sizing: border-box;
-  font-family: inherit;
-  font-size: larger;
-  font-weight: bold;
-  text-align: center;
-  width: 45%;
-  margin: 10px;
 }
 
 .div-vocab {
@@ -118,101 +105,4 @@ button {
   display:block;
   text-align: center;
   justify-self: center;
-  padding: 10px;
-}
-
-/*.div-vocab-left {
-  display: flex;
-}*/
-
-
-/* Top Left Search Bar */
-.search {
-  width: 46%;
-  padding: 10px 0px;
-}
-
-/* Top Left 'Add to Search Query' Button */
-.add-to-search-query {
-  width: 50%;
-  padding: 10px 0px;
-}
-
-/* Top Left List of suggested vocab */
-.suggestions {
-  background-color: var(--suggestions);
-  color: black;
-  height: 200px;
-  overflow: auto;
-  resize: vertical;
-  list-style-type: none;
-  font-weight: bold;
-}
-.suggestions li:hover {
-  background-color: yellow;
-}
-
-/* Top Right Lesson select dropdown */
-.lesson-select {
-  display: inline-block;
-  padding: 10px 0px;
-}
-
-/* Top Right 'Retrieve Sentences' button */
-.retrieve-sentences {
-  width: 50%;
-  padding: 10px 0px;
-  font-weight: bold;
-}
-
-/* Top Right - Vocab added on the right side, to be searched */
-.custom-vocab {
-  background-color: var(--customVocab);
-
-  border: none;
-  outline: none;
-  padding: 6px;
-  
-  margin: 2px;
-  border-radius: 10px;
-}
-
-.custom-vocab:hover {
-  background-color: lightsalmon;
-}
-
-/* Bottom - Examples*/
-
-.div-examples-header {
-  display: flex;
-  justify-content: space-between;
-}
-
-.div-examples-header button {
-  padding: 8px;
-}
-
-.div-examples table {
-  width: 100%;
-  table-layout: fixed;
-  vertical-align: baseline;
-  font-weight: bold;
-}
-
-.div-examples th {
-  background-color: var(--tableHeader);
-  color:ivory
-}
-
-.div-examples tr:nth-child(even) {
-  background-color: var(--tableRow);
-}
-
-/* underneath Vocab/Idioms */
-.vocab-included-button {
-  font-size: xx-small;
-  padding: 1px 1px;
-  margin: 0;
-  color: black;
-
 }
