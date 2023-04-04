@@ -24,6 +24,7 @@ h2, h3, h4, h5, h6 {
   color: var(--dark);
   text-align: center;
   margin: 0;
+  margin-bottom: 10px;
 }
 
 button {
@@ -121,4 +122,15 @@ button {
   display:block;
   text-align: center;
   justify-self: center;
+}
+
+@media screen and (max-width: 767px) {
+  .div-header {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .div-header h1 {
+    margin-bottom: 20px;
+  }
 }
