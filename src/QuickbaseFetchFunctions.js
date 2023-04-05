@@ -222,9 +222,9 @@ export async function createStudentExample(exampleID, studentID, lastReviewDate,
     }
 }
 
-const backendUrl = 'http://localhost:3010/api/'
+//const backendUrl = 'http://localhost:3010/api/'
 const oldBackendUrl = 'https://as-vocab-backend.herokuapp.com/'
-//const backendUrl = 'https://lcs-api.herokuapp.com/api/'
+const backendUrl = 'https://lcs-api.herokuapp.com/api/'
 
 export async function getVocabFromBackend() {
     let fetchUrl = `${oldBackendUrl}qb-vocabulary`
