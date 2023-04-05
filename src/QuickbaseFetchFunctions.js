@@ -20,7 +20,7 @@ function createHeaders(userToken) {
 function createBody(tableID) {
     return {
         "from": tableID,
-        "select": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],
+        "select": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40],
     }
 }
 
@@ -222,9 +222,9 @@ export async function createStudentExample(exampleID, studentID, lastReviewDate,
     }
 }
 
-//const backendUrl = 'http://localhost:8000/'
+const backendUrl = 'http://localhost:3010/api/'
 const oldBackendUrl = 'https://as-vocab-backend.herokuapp.com/'
-const backendUrl = 'https://lcs-api.herokuapp.com/api/'
+//const backendUrl = 'https://lcs-api.herokuapp.com/api/'
 
 export async function getVocabFromBackend() {
     let fetchUrl = `${oldBackendUrl}qb-vocabulary`
@@ -309,10 +309,8 @@ export async function getStudentsFromBackend() {
     return tableFromBackend;
 }
 
-export async function getUserDataFromBackend(studentID, token) {//actually currently email address – FIX THIS
-    let fetchUrl = `${backendUrl}public/${studentID}`//actually currently email address – FIX THIS
-    console.log(`Fetching ${fetchUrl}`)
-
+export async function getUserDataFromBackend(token) {//actually currently email address – FIX THIS
+    let fetchUrl = `${backendUrl}my-data`//actually currently email address – FIX THIS
     //console.log(`Fetching ${fetchUrl}`)
 
     const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`}})
@@ -341,8 +339,8 @@ export async function getUserDataFromBackend(studentID, token) {//actually curre
     return tableFromBackend;
 }
 
-export async function getStudentExamplesFromBackend(studentID, token) {
-    let fetchUrl = `${backendUrl}public/${studentID}/student-examples`
+export async function getStudentExamplesFromBackend(token) {
+    let fetchUrl = `${backendUrl}my-student-examples`
 
     //console.log(`Fetching ${fetchUrl}`)
 
@@ -360,8 +358,8 @@ export async function getStudentExamplesFromBackend(studentID, token) {
     return tableFromBackend;
 }
 
-export async function getExamplesFromBackend(studentID, token) {
-    let fetchUrl = `${backendUrl}public/${studentID}/examples`
+export async function getExamplesFromBackend(token) {
+    let fetchUrl = `${backendUrl}my-examples`
 
     //console.log(`Fetching ${fetchUrl}`)
 

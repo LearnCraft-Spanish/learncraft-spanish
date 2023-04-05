@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './QuickbaseTablesInfo';
-import { fetchAndCreateTable, getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend, getStudentsFromBackend, getStudentExamplesFromBackend} from './QuickbaseFetchFunctions';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
@@ -8,11 +7,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 
 
-export default function SimpleQuizApp({studentID, studentName}) {
+export default function SimpleQuizApp({studentID, studentName, examplesTable, studentExamplesTable}) {
     const {user, isAuthorized, getAccessTokenSilently} = useAuth0();
-    const [studentExamplesTable, setStudentExamplesTable] = useState([])
-    const [examplesTable, setExamplesTable] = useState([])
-    const [loadStatus, setloadStatus] = useState([])
+    //const [studentExamplesTable, setStudentExamplesTable] = useState([])
+    //const [examplesTable, setExamplesTable] = useState([])
     const [quizReady,setQuizReady] = useState(false);
     const [examplesToReview, setExamplesToReview] = useState ([])
     const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
@@ -90,44 +88,7 @@ export default function SimpleQuizApp({studentID, studentName}) {
 
     const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
 
-    const currentAudioUrl = quizReady?examplesToReview[currentExampleNumber-1][whichAudio]:""
-
-    useEffect(() => {
-        if(studentID !== 'Loading ID') {
-            console.log(studentID)
-                async function getData() {
-                  try {
-                    const accessToken = await getAccessTokenSilently({
-                      authorizationParams: {
-                        audience: "https://lcs-api.herokuapp.com/",
-                        scope: "openID email profile read:current_user update:current_user_metadata",
-                      },
-                    });
-                    const userData = await getStudentExamplesFromBackend(studentID, accessToken)
-                    .then((result) => {
-                      const usefulData = result
-                      //console.log(usefulData)
-                      return usefulData
-                    });
-                    //console.log(userData)
-                    setStudentExamplesTable(userData)
-                    const userExamples = await getExamplesFromBackend(studentID, accessToken)
-                    .then((result) => {
-                      const usefulData = result
-                      //console.log(usefulData)
-                      return usefulData
-                    });
-                    //console.log(userExamples)
-                    setExamplesTable(userExamples)
-                  } catch (e) {
-                    console.log(e.message);
-                  }
-                }
-                getData();
-        } else {
-            console.log('Student ID still loading')
-        }
-      }, [studentID])
+    const currentAudioUrl = quizReady && (examplesToReview[currentExampleNumber-1])? examplesToReview[currentExampleNumber-1][whichAudio]:""
     
 if (studentID === 'Loading ID') {
     return (

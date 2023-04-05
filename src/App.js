@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { getUserDataFromBackend } from './QuickbaseFetchFunctions';
+import { getUserDataFromBackend, getStudentExamplesFromBackend, getExamplesFromBackend} from './QuickbaseFetchFunctions';
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
 import SimpleQuizApp from './SimpleQuizApp';
@@ -12,40 +12,77 @@ import Profile from './Profile';
 
 function App() {
   const { user, isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
-  const [userID, setUserID] = useState(undefined);
   const [qbUserData, setQbUserData]= useState({name:'Loading Name',recordId:'Loading ID',emailAddress:'Loading Email'})
+  const [studentExamplesTable, setStudentExamplesTable] = useState([])
+  const [examplesTable, setExamplesTable] = useState([])
+
+  async function userSetup () {
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const userData = await getUserDataFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result[0].userData[0];
+        return usefulData
+      });
+      //console.log(userData)
+      setQbUserData(userData)
+      return userData
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+
+  async function userSetup () {
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const userData = await getUserDataFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result[0].userData[0];
+        return usefulData
+      });
+      console.log(userData)
+      setQbUserData(userData)
+      const userStudentExampleData = await getStudentExamplesFromBackend(accessToken)
+      .then((result) => {
+        const usefulData = result
+        //console.log(usefulData)
+        return usefulData
+      });
+      console.log(userData)
+      setStudentExamplesTable(userStudentExampleData)
+      const userExampleData = await getExamplesFromBackend(accessToken)
+      .then((result) => {
+        const usefulData = result
+        //console.log(usefulData)
+        return usefulData
+      });
+      console.log(userExampleData)
+      setExamplesTable(userExampleData)
+      return userData
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
 
   useEffect(() => {
     if(user) {
-        setUserID(user.email)
+      userSetup()
     }
-  }, [isAuthenticated, user])
-
-  useEffect(() => {
-    if(userID) {
-            async function getData() {
-              try {
-                const accessToken = await getAccessTokenSilently({
-                  authorizationParams: {
-                    audience: "https://lcs-api.herokuapp.com/",
-                    scope: "openID email profile read:current_user update:current_user_metadata",
-                  },
-                });
-                const userData = await getUserDataFromBackend(userID, accessToken)
-                .then((result) => {
-                  const usefulData = result[0].studentTable[0]
-                  return usefulData
-                });
-                //console.log(userData)
-                setQbUserData(userData)
-                return userData
-              } catch (e) {
-                console.log(e.message);
-              }
-            }
-            getData();
-    }
-  }, [userID])
+  }, [user])
 
   return (
     <div className="App" style = {{textAlign: 'center'}}>
@@ -67,7 +104,7 @@ function App() {
         <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>
       )*/}
       {(qbUserData.recordId !== 'Loading ID') && (
-        <SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name}/>
+        <SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable}/>
       )}
     </div>
   );
