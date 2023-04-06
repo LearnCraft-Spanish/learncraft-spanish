@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { qb } from './QuickbaseTablesInfo';
+import { qb } from './DataModel';
 import { fetchAndCreateTable, getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend} from './QuickbaseFetchFunctions';
 import './App.css';
 

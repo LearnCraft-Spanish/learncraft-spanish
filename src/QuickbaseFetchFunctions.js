@@ -1,4 +1,4 @@
-import { qb } from './QuickbaseTablesInfo';
+import { qb } from './DataModel';
 // These are all the functions needed to access the data on the quickbase database
 // These get called whenever a page needs to retrieve, update, or create data on quickbase
 // Every request to quickbase requires a header & a body, so there are functions dedicated to just creating the header or the body
@@ -109,99 +109,6 @@ export async function fetchAndCreateTable(userToken, tableInitInfo) {
     }
 }
 
-// test func
-function createBodyForUpdateTest(tableID) {
-    return {
-        "to": tableID,
-        "data": [
-            {
-                "3": { "value": "3" },
-                "7": { "value": "5"}
-            }
-        ],
-        "fieldsToReturn": [3, 6, 7, 8, 9]
-    }
-}
-
-// test func
-export async function testUpdate(userToken, tableInitInfo) {
-    try {
-        const res = await fetch('https://api.quickbase.com/v1/records',
-        {
-        method: 'POST',
-        headers: createHeaders(userToken),
-        body: JSON.stringify(createBodyForUpdateTest(tableInitInfo.id))
-        })
-        if(res.ok) {
-            return res.json().then(res => console.log(res))
-        }
-        return res.json().then(resBody => Promise.reject({status: res.status, ...resBody}))
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-// 3: RecordID
-// 6: Last Review Date
-// 7: Review Interval
-// This is a COPY/PASTE/EDIT of createBody()
-// but is used for updating data on Student Examples table, instead of just retrieving data
-// called by updateStudentExample()
-function createBodyForUpdateStudentExample(recordID, lastReviewDate, reviewInterval, tableID) {
-    return {
-        "to": tableID,
-        "data": [
-            {
-                "3": { "value": recordID },
-                "6": { "value": lastReviewDate },
-                "7": { "value": reviewInterval }
-            }
-        ],
-        "fieldsToReturn": [3, 6, 7, 8, 9]
-    }
-}
-
-// This is a COPY/PASTE/EDIT of createBody()
-// but is used for creating data on Student Examples table, instead of just retrieving data
-// called by createStudentExample()
-function createBodyForCreateStudentExample(exampleID, studentID, lastReviewDate, reviewInterval, tableID) {
-    return {
-        "to": tableID,
-        "data": [
-            {
-                //"3": { "value": recordID },
-                "6": { "value": lastReviewDate },
-                "7": { "value": reviewInterval },
-                "8": { "value": studentID },
-                "9": { "value": exampleID }
-            }
-        ],
-        "fieldsToReturn": [3, 6, 7, 8, 9]
-    }
-}
-
-
-
-// This is a COPY/PASTE/EDIT of fetchAndCreateTable()
-// used by the SRS Quiz interface to update the review interval when user rates example
-export async function updateStudentExample(recordID, lastReviewDate, reviewInterval, userToken) {
-    try {
-        const res = await fetch('https://api.quickbase.com/v1/records',
-        {
-        method: 'POST',
-        headers: createHeaders(userToken),
-        body: JSON.stringify(createBodyForUpdateStudentExample(recordID, lastReviewDate, reviewInterval, qb.studentExamples.id))
-        })
-        if(res.ok) {
-            //return res.json().then(res => console.log(res))
-            return res.json().then(res => Promise.resolve(res))
-        }
-        return res.json().then(resBody => Promise.reject({status: res.status, ...resBody}))
-    } catch (err) {
-        console.log(err)
-    }
-}
-
 // This is a COPY/PASTE/EDIT of fetchAndCreateTable()
 // used by the SRSBuilder.js, to add examples to the student examples table that will be used for the corresponding student in the SRS quiz interface.
 export async function createStudentExample(exampleID, studentID, lastReviewDate, reviewInterval, userToken) {
@@ -210,7 +117,7 @@ export async function createStudentExample(exampleID, studentID, lastReviewDate,
         {
         method: 'POST',
         headers: createHeaders(userToken),
-        body: JSON.stringify(createBodyForCreateStudentExample(exampleID, studentID, lastReviewDate, reviewInterval, qb.studentExamples.id))
+        //body: JSON.stringify(createBodyForCreateStudentExample(exampleID, studentID, lastReviewDate, reviewInterval, qb.studentExamples.id))
         })
         if(res.ok) {
             //return res.json().then(res => console.log(res))
@@ -224,7 +131,7 @@ export async function createStudentExample(exampleID, studentID, lastReviewDate,
 
 const oldBackendUrl = 'lol'
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
-console.log(backendUrl);
+//console.log(backendUrl);
 
 
 export async function getVocabFromBackend() {
@@ -376,4 +283,23 @@ export async function getExamplesFromBackend(token) {
     .catch(err => console.log(err))
     
     return tableFromBackend;
+}
+
+export async function updateStudentExample(token, updateId, reviewDate, newInterval) {
+    const headers = {Authorization: `Bearer ${token}`, updateId: updateId, reviewDate: reviewDate, newInterval: newInterval}
+    //console.log(headers)
+    let fetchUrl = `${backendUrl}update-my-student-example`
+    //console.log(`Fetching ${fetchUrl}`)
+    const messageFromBackend = await fetch(fetchUrl,{method:'POST', headers: headers})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return messageFromBackend;
 }

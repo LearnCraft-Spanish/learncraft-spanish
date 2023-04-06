@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { qb } from './QuickbaseTablesInfo';
+import { qb } from './DataModel';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
@@ -7,10 +7,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 
 
-export default function SimpleQuizApp({studentID, studentName, examplesTable, studentExamplesTable}) {
-    const {user, isAuthorized, getAccessTokenSilently} = useAuth0();
-    //const [studentExamplesTable, setStudentExamplesTable] = useState([])
-    //const [examplesTable, setExamplesTable] = useState([])
+export default function SimpleQuizApp({studentID, studentName, examplesTable, studentExamplesTable, resetFunction}) {
     const [quizReady,setQuizReady] = useState(false);
     const [examplesToReview, setExamplesToReview] = useState ([])
     const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
@@ -24,15 +21,13 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
         } else {
             setPlaying(true)
         }
-        
     }
     
     function toggleQuizReady() {
         setLanguageShowing('english')
         setPlaying(false)
         if (quizReady) {
-            setQuizReady(false)
-            setCurrentExampleNumber(1)
+            resetFunction()
         } else {
             setQuizReady(true)
         }
@@ -103,20 +98,17 @@ return (
     (studentID !== 'Loading ID') && (
     <div className='quizInterface'>
         {/* Student Selector */}
-        <div>
-            <h2>Welcome back, {studentName}!</h2>
-        </div>
         <div style = {{display:quizReady?'none':'flex', justifyContent: 'space-around'}}>
-            <button onClick={handleSetupQuiz}>Begin Review</button>
+            <button onClick={handleSetupQuiz}>Basic Cumulative Review</button>
         </div>
         
         {/* Quiz App */}
         <div style = {{display:quizReady?'flex':'none'}} className='quiz'>
             <div className='exampleBox'>
-                <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation'>
+                <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation' onClick={toggleLanguageShowing}>
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}</p>
                 </div>
-                <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' >
+                <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' onClick={toggleLanguageShowing}>
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
                 </div>
                 <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
@@ -128,8 +120,7 @@ return (
                 <button onClick={incrementExample}>Next Example</button>
             </div>
             <div className='buttonBox'>
-                <button onClick={toggleLanguageShowing}>Flip Card</button>
-                <button onClick={toggleQuizReady}>Restart Quiz</button>
+                <button onClick={toggleQuizReady}>Back to Menu</button>
             </div>
             <div className='progressBar2'>                
                 <div className='progressBarDescription'>Example {currentExampleNumber} of {examplesToReview.length}</div>

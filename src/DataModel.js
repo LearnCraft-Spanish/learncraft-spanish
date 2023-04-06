@@ -4,28 +4,27 @@ export const qb = { // quickbaseTablesInfo
     studentExamples: {
         name: 'student-examples',
         id: 'br3juud42',
-        fields: ['Record ID#', 'Last Reviewed Date', 'Review Interval', 'Related Student', 'Related example', 'Date Created']
+        fields: ['Record ID#', 'Last Reviewed Date', 'Next Review Date', 'Review Interval', 'Related Student', 'Related example', 'Date Created']
     },
     students: {
         name: 'students',
         id: 'brrtdx784',
-        fields: ['Record ID#', 'Name']
+        fields: ['Record ID#', 'Name', 'Email address']
     },
     vocabulary: {
         name: 'vocabulary',
         id: 'brrcdgyix',
-        fields: ['word/idiom', 'Vocab Name', 'frequency rank']
+        fields: ['Record ID#', 'word/idiom', 'use', 'Vocabulary Subcategory - subcategory name', 'Vocab Name', 'frequency rank']
     },
     examples: {
         name: 'examples',
         id: 'brrcdgyjw',
-        fields: ['Record ID#', 'spanish example', 'english translation', 'vocab included', 'spanglish?']
+        fields: ['Record ID#', 'spanish example', 'english translation', 'vocab included', 'spanglish?', 'English Audio', 'Spanish Audio LA']
     },
     lessons: {
         name: 'Lessons',
         id: 'brrtcungb',
-        fields: ['Lesson', 'Vocab Included', 'Sort Reference']
-        //fields: ['Lesson']
+        fields: ['Record ID#', 'Lesson', 'Vocab Included', 'Sort Reference']
     }
 }
 
