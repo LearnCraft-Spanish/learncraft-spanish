@@ -14,8 +14,8 @@ export default function Menu({setCurrentApp}) {
         <h3>Review Options:</h3>
         <div className='menuBox'>
             <div className= 'buttonBox'>
-                <button className = 'basicQuizButton' onClick={() => setCurrentApp(1)}>All Examples</button>
-                <button className = 'basicQuizButton' onClick={() => setCurrentApp(2)}>Today's Examples</button>
+                <button className = 'basicQuizButton' onClick={() => setCurrentApp(1)}>All Flashcards</button>
+                <button className = 'basicQuizButton' onClick={() => setCurrentApp(2)}>Today's Flashcards</button>
             </div>
         </div>
     </div>

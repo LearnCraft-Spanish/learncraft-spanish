@@ -116,7 +116,7 @@ function App() {
         <h2>You must be logged in to use this app.</h2>
       )}
       {!isLoading && isAuthenticated && !userLoadingComplete && (
-        <h2>Fetching user data...</h2>
+        <h2>Loading user data...</h2>
       )}
       {/*isAuthenticated && (
         <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>

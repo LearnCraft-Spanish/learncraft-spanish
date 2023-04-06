@@ -99,7 +99,7 @@ return (
     <div className='quizInterface'>
         {/* Student Selector */}
         <div style = {{display:quizReady?'none':'flex', justifyContent: 'space-around'}}>
-            <button onClick={handleSetupQuiz}>Basic Cumulative Review</button>
+            <button onClick={handleSetupQuiz}>Begin Review</button>
         </div>
         
         {/* Quiz App */}
@@ -115,15 +115,15 @@ return (
 
             </div>
             <div className='buttonBox'>
-                <button onClick={decrementExample}>Previous Example</button>
+                <button onClick={decrementExample}>Previous</button>
                 <button style = {{display: (currentAudioUrl==="")? 'none' :'inherit'}} onClick = {togglePlaying}>Play/Pause Audio</button>
-                <button onClick={incrementExample}>Next Example</button>
+                <button onClick={incrementExample}>Next</button>
             </div>
             <div className='buttonBox'>
                 <button onClick={toggleQuizReady}>Back to Menu</button>
             </div>
             <div className='progressBar2'>                
-                <div className='progressBarDescription'>Example {currentExampleNumber} of {examplesToReview.length}</div>
+                <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>
             </div>
         </div>
     </div>

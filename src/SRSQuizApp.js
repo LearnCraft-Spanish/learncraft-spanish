@@ -215,12 +215,12 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
         (studentID) && (
         <div className='quizInterface'>
             <div style = {{display:quizReady?'none':'flex', justifyContent: 'space-around'}}>
-                <button onClick={handleSetupQuiz}>Recommended Review (SRS)</button>
+                <button onClick={handleSetupQuiz}>Begin Review</button>
             </div>
 
             {quizReady && !currentExample && (
                 <div className='finishedMessage'>
-                    <p>Looks like you're all caught up! Come back tomorrow for more, or ask your coach to assign more examples to you.</p>
+                    <p>Looks like you're all caught up! Come back tomorrow for another review, or ask your coach to give you more flashcards.</p>
                     <div className='buttonBox'>
                         <button onClick={toggleQuizReady}>Back to Menu</button>
                     </div>
@@ -246,15 +246,15 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
                         <button className = 'easyBanner' style = {{display: (!difficultySettable && currentExample.difficulty ==='easy')?'block':'none'}} >Labeled: Easy</button>
                     </div>
                     <div className='buttonBox'>
-                        <button onClick={decrementExample}>Previous Example</button>
+                        <button onClick={decrementExample}>Previous</button>
                         <button style = {{display: (currentAudioUrl==="")? 'none' :'block'}} onClick = {togglePlaying}>Play/Pause Audio</button>
-                        <button onClick={incrementExample}>Next Example</button>
+                        <button onClick={incrementExample}>Next</button>
                     </div>
                     <div className='buttonBox'>
                         <button onClick={toggleQuizReady}>Back to Menu</button>
                     </div>
                     <div className='progressBar2'>                
-                        <div className='progressBarDescription'>Example {currentExampleNumber} of {examplesToReview.length}</div>
+                        <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>
                     </div>
                 </div>
             </div>)}
