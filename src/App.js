@@ -1,13 +1,14 @@
 import './App.css';
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { getUserDataFromBackend, getStudentExamplesFromBackend, getExamplesFromBackend} from './QuickbaseFetchFunctions';
+import { getUserDataFromBackend, getMyStudentExamplesFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
 import SimpleQuizApp from './SimpleQuizApp';
 import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
 import SRSQuizApp from './SRSQuizApp';
+import LCSPQuizApp from './LCSPQuizApp'
 import { useAuth0 } from '@auth0/auth0-react';
 import Profile from './Profile';
 require('dotenv').config()
@@ -47,7 +48,7 @@ function App() {
     }
   }
 
-  async function updateExamplesTable () {
+  const updateExamplesTable= async () => {
     //console.log('resetting tables')
     setCurrentApp(0)
     try {
@@ -57,7 +58,7 @@ function App() {
           scope: "openID email profile",
         },
       });
-      const userStudentExampleData = await getStudentExamplesFromBackend(accessToken)
+      const userStudentExampleData = await getMyStudentExamplesFromBackend(accessToken)
       .then((result) => {
         const usefulData = result
         //console.log(usefulData)
@@ -65,7 +66,7 @@ function App() {
       });
       //console.log(userData)
       setStudentExamplesTable(userStudentExampleData)
-      const userExampleData = await getExamplesFromBackend(accessToken)
+      const userExampleData = await getMyExamplesFromBackend(accessToken)
       .then((result) => {
         const usefulData = result
         //console.log(usefulData)
@@ -97,38 +98,43 @@ function App() {
   }, [user])
 
   useEffect(() => {
-    if(qbUserData.emailAddress !== 'Loading Email' && studentExamplesTable.length > 0 && examplesTable.length > 0) {
+    if (!qbUserData) {
+     setUserLoadingComplete(true) 
+    } else if (qbUserData.emailAddress !== 'Loading Email') {
       setUserLoadingComplete(true);
     }
-  }, [qbUserData.emailAddress, studentExamplesTable.length, examplesTable.length])
+  }, [qbUserData, studentExamplesTable, examplesTable])
 
   return (
     <div className="App" style = {{textAlign: 'center'}}>
       <div className='div-header'style = {{textAlign: 'center'}}>
-        <h1>LearnCraft Spanish</h1>
+        <h1 onClick={updateExamplesTable} style={{cursor:'pointer'}}>LearnCraft Spanish</h1>
+        {(userLoadingComplete && qbUserData) && <p>Welcome back, {qbUserData.name}!</p>}
+        {!isLoading && !isAuthenticated && (
+        <p>You must be logged in to use this app.</p>
+      )}
+      {isAuthenticated && !userLoadingComplete && (
+        <p>Loading user data...</p>
+      )}
         <LogoutButton />
         <LoginButton />
       </div>
       {isLoading && (
         <h2>Loading...</h2>
       )}
-      {!isLoading && !isAuthenticated && (
-        <h2>You must be logged in to use this app.</h2>
-      )}
-      {!isLoading && isAuthenticated && !userLoadingComplete && (
-        <h2>Loading user data...</h2>
-      )}
+      
       {/*isAuthenticated && (
         <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>
       )*/}
       {//(qbUserData.recordId !== 'Loading ID') && (<SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable}/>)
       }
-      {(userLoadingComplete) && (
+      {(user) && (
         <div>
-          <h2>Welcome back, {qbUserData.name}!</h2>
-          {(currentApp===0) && (<Menu setCurrentApp={setCurrentApp} />)}
+          {(currentApp===0) && (<Menu setCurrentApp={setCurrentApp} examplesTable={examplesTable}/>)}
           {(currentApp===1) && (<SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} resetFunction={updateExamplesTable}/>)}
           {(currentApp===2) && (<SRSQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} resetFunction={updateExamplesTable}/>)}
+          {(currentApp===3) && (<LCSPQuizApp resetFunction={updateExamplesTable}/>)}
+          {/*(currentApp===4) && (<ExampleRetriever resetFunction={updateExamplesTable} />)*/}
         </div>
       )}
     </div>

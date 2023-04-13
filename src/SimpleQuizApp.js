@@ -85,14 +85,6 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
 
     const currentAudioUrl = quizReady && (examplesToReview[currentExampleNumber-1])? examplesToReview[currentExampleNumber-1][whichAudio]:""
     
-if (studentID === 'Loading ID') {
-    return (
-        <div>
-            <h2>Loading...</h2>
-        </div>
-    )
-}
-    
 
 return (
     (studentID !== 'Loading ID') && (

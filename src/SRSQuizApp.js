@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './DataModel';
-import { updateStudentExample } from './QuickbaseFetchFunctions';
+import { updateStudentExample } from './BackendFetchFunctions';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
@@ -203,13 +203,6 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
         //console.log(difficultySettable);
     }, [currentExampleNumber])
 
-    if (studentID === 'Loading ID') {
-        return (
-            <div>
-                <h2>Loading...</h2>
-            </div>
-        )
-    }
 
     return (
         (studentID) && (

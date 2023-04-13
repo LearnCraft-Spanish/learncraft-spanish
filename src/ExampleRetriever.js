@@ -1,34 +1,24 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { qb } from './DataModel';
-import { fetchAndCreateTable, getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend} from './QuickbaseFetchFunctions';
+import { getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend} from './BackendFetchFunctions';
 import './App.css';
+import { useAuth0 } from '@auth0/auth0-react';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-export default function ExampleRetriever() {
-  // stores data of tables
-  const tables = useRef({ vocab: [], lessons: [] })
-  // vocab related variables
-  // array of suggested vocab that shows up under search bar & changes whenever a user types something in the search bar
-  const [filteredVocab, setFilteredVocab] = useState([])
-  // array of vocab that user builds, which is then used to filter example sentences
-  const [customSearchVocab, setCustomSearchVocab] = useState([])
-
-  // examples related variables
-  const [noSpanglish, setNoSpanglish] = useState(false)
-  const [shuffledSentences, setShuffledSentences] = useState(false)
-  // array of examples, stores the first part of the filtering
+export default function ExampleRetriever({resetFunction}) {
+  const {getAccessTokenSilently} = useAuth0();
   const filteredExamples = useRef([])
-  // array of examples that are displayed, does the 2nd part of the filtering
-  // it is split into 2 separate variables in order to avoid redundancy
+  
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [lessonTable, setLessonTable] = useState([])
+  const [exampleTable, setExampleTable] = useState([])
+  const [vocabularyTable, setVocabularyTable] = useState([])
+  const [suggestedVocab, setSuggestedVocab] = useState([])
+  const [requiredVocab, setRequiredVocab] = useState([])
+  const [allowedVocab, setAllowedVocab] =useState([])
+  const [noSpanglish, setNoSpanglish] = useState(false)
   const [displayExamples, setDisplayExamples] = useState([])
 
-  function goBackToMenu(e) {
-    e.preventDefault();
-    const link = '#/Menu/';
-    window.location=link;
-}
-
-  
   // called when user clicks 'Retrieve Sentences' button on top right of page
   // makes the page display the filtered example sentences on the bottom of page
   function handleRetrieveSentencesOnClick(e) {
@@ -36,34 +26,9 @@ export default function ExampleRetriever() {
     const selectedLesson = e.target.firstChild.value // gets selected value in dropdown list of lessons
     // if selected lesson is '' display all examples,
     // else 
-    const filter1 = selectedLesson === '' ? tables.current.examples : filterExamplesStrict(retrieveCombinedLessonVocab(selectedLesson, tables.current.lessons), tables.current.examples)
-    const filter2 = filterExamplesLenient(customSearchVocab, filter1)
-    filteredExamples.current = filter2
-    filterExamplesHelper()
+    const filter1 = selectedLesson === '' ? exampleTable : filterExamplesBySelectedVocab(retrieveCombinedLessonVocab(selectedLesson, lessonTable), exampleTable)
+    filteredExamples.current = filter1
   }
-
-  // helper function called by handleRetrieveSentencesOnClick()
-  // returns an array of all lessons with same title and lower/equal lesson number
-  // for example: AS Lesson 3 will return ['AS Lesson 1', 'AS Lesson 2', 'AS Lesson 3']
-  /*function oldRetrieveCombinedLessonVocab(selectedLessonName, lessonsTable) {
-    const selectedSplitArr = selectedLessonName.split(' ');
-    const selectedCourseName = selectedSplitArr(0);
-  if(selectedCourseName === '2mc'){
-
-  } else {
-    const selectedNum = parseInt(selectedSplitArr.pop())
-    const selectedTitle = selectedSplitArr.join(' ')
-
-    let combinedLessonVocab = []
-    lessonsTable.forEach(lesson => {
-        const splitArr2 = lesson.lesson.split(' ')
-        const num2 = parseInt(splitArr2.pop())
-        if(lesson.lesson.includes(selectedTitle) && num2 <= selectedNum) {
-            combinedLessonVocab = [...combinedLessonVocab, ...lesson.vocabIncluded]
-        }
-    })
-    return combinedLessonVocab}
-  }*/
 
   function retrieveCombinedLessonVocab (selectedLessonName, lessonsTable) {
     let selectedLessonSortNumber;
@@ -90,10 +55,7 @@ export default function ExampleRetriever() {
     return combinedLessonVocab;
   }
 
-  // helper function called by handleRetrieveSentencesOnClick()
-  // returns filtered array of examples by vocab with a strict filter
-  // meaning each example MUST include all vocab in vocabArr
-  function filterExamplesStrict(vocabArr, examplesTable) {
+  function filterExamplesBySelectedVocab(vocabArr, examplesTable) {
     const filteredExamples = examplesTable.filter(example => {
         if(example.vocabIncluded.length == 0) {
             return false
@@ -108,43 +70,8 @@ export default function ExampleRetriever() {
     return filteredExamples
   }
 
-  // helper function called by handleRetrieveSentencesOnClick()
-  // returns filtered array of examples by vocab with a lenient filter
-  // meaning as long as the example contains at least one of the vocab in vocabArr, then the example will be in the returned array
-  function filterExamplesLenient(vocabArr, examplesTable) {
-      const filteredExamples = vocabArr.length === 0 ? examplesTable : examplesTable.filter(example => {
-          for(const parameterVocab of vocabArr) {
-              for(const exampleVocab of example.vocabIncluded) {
-                  if(exampleVocab.toLowerCase().includes(parameterVocab.toLowerCase())) {
-                      return true
-                  }
-              }
-          }
-          return false
-      })
-      return filteredExamples
-  }
+  function filterExamplesByAllowedVocab() {
 
-  // helper function called by handleRetrieveSentencesOnClick() & the 2nd useEffect() below
-  // checks if noSpanglish & shuffleSentences and then sets the displayExamples
-  function filterExamplesHelper() {
-    const filter2 = filteredExamples.current
-    const filter3 = noSpanglish ? filter2.filter(example => example.spanglish === 'esp') : filter2
-    const filter4 = shuffledSentences ? shuffleArray(filter3) : filter3
-    setDisplayExamples(filter4)
-  }
-
-  // helper function called by filterExamplesHelper()
-  // returns a shuffled array of examples array in parameter 
-  function shuffleArray(arr) {       
-    const shuffledArr = [...arr]
-    for(let i = shuffledArr.length; i > 0; i--) {
-        const newIndex = Math.floor(Math.random() * (i - 1))
-        const oldValue = shuffledArr[newIndex]
-        shuffledArr[newIndex] = shuffledArr[i - 1]
-        shuffledArr[i - 1] = oldValue
-    }
-    return shuffledArr
   }
 
   // called when user clicks 'Copy as List' button
@@ -173,135 +100,187 @@ export default function ExampleRetriever() {
     navigator.clipboard.writeText(copiedText)
   }
 
-  function createLoadingList () {
-    const loadingList = []
-    for (let i=0;i < 20;i++) {
-      loadingList.push({vocabName: 'Loading Suggestions...'})
+  function filterVocabularyByInput (input) {
+    function filterFunction (term) {
+      const lowerTerm = term.wordIdiom.toLowerCase()
+      const lowerInput = input.toLowerCase()
+      if (lowerTerm.includes(lowerInput)){
+        return true
+      }
+      return false
     }
-    return loadingList;
+    const filteredVocab = vocabularyTable.filter(filterFunction);
+    //console.log(filteredVocab)
+    const suggestTen = []
+    for (let i = 0; i < 10; i++){
+      if(filteredVocab[i]) {
+        suggestTen.push(filteredVocab[i])
+      }
+    }
+    setSuggestedVocab(suggestTen);
   }
 
-  // called by 1st useEffect(), when first loading the page
-  // gets user token & retrieves all table data & stores it into tables variable
-  // to set up all needed variables
-  async function init() {
-    // getting the user token
-    console.log('init called')
-    // retrieving the table data
-    setFilteredVocab(createLoadingList())
-    tables.current.vocab = await getVocabFromBackend();
-    
-    tables.current.examples = await getExamplesFromBackend();
-    
-    console.log('lessons fetching')
-    tables.current.lessons = await getLessonsFromBackend();
-    console.log('lessons fetched')
-    // this logic below sorts the lesssons in order by number
-    tables.current.lessons.sort((a, b)=>{
-      const splitArrA = a.lesson.split(' ')
-      const numA = parseInt(splitArrA.pop())
-      const titleA = splitArrA.join(' ')
-
-      const splitArrB = b.lesson.split(' ')
-      const numB = parseInt(splitArrB.pop())
-      const titleB = splitArrB.join(' ')
-      console.log('init finished')
-      return titleA === titleB ? numA - numB : titleA - titleB
-    })
-    //console.log('lessons')
-    //console.log(tables.current.lessons[12]);
-    setFilteredVocab(tables.current.vocab)
+  function sortVocab (a, b) {
+    if (a.frequencyRank===b.frequencyRank){
+        if (!a.wordIdiom.includes(" ") && b.wordIdiom.includes(" ")){
+          return 1;
+        } else if (a.wordIdiom.includes(" ") && !b.wordIdiom.includes(" ")){
+          return -1
+        }
+    } else {
+      return a.frequencyRank - b.frequencyRank
+    }
   }
 
+  async function getVocab () {
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const vocab = await getVocabFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result;
+        return usefulData
+      });
+      return vocab.sort(sortVocab)
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
+  async function getExamples () {
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const examples = await getExamplesFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result;
+        return usefulData
+      });
+      //console.log(examples)
+      return examples
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
+  async function getLessons () {
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const lessons = await getLessonsFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result;
+        return usefulData
+      });
+      //console.log(lessons) 
+      return lessons
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
+  
   // called onced at the beginning
-  useEffect(() => {       
-    init() 
-    //console.log(tables)       
-}, [tables])
-
-  // called everytime user clicks the checkbox for noSpanish or shuffleSentences
   useEffect(() => {
-    if(tables.current.lessons.length !== 0) {
-    filterExamplesHelper()
+    async function startUp () {
+      const getData = async () => {
+        console.log('init called')
+        // retrieving the table data
+        const vocabPromise = await getVocab()
+        const examplePromise = await getExamples()
+        const lessonPromise = await getLessons()
+        return [await vocabPromise, await examplePromise, await lessonPromise]
+      };
+      const beginningData = await getData()
+      //console.log(beginningData[0])
+      setVocabularyTable(beginningData[0])
+      setAllowedVocab(beginningData[0])
+      setExampleTable(beginningData[1])
+      setLessonTable(beginningData[2])
+      console.log('data fetched')
     }
-  }, [noSpanglish, shuffledSentences])
+    startUp()
+  }, [])
 
-  return <div>
-      <div className='div-header'>
-        <h1>Example Lookup</h1>
-        <div className='returnButton'><button onClick={goBackToMenu}>{'< Back to Menu'}</button></div>
-      </div>
-      <div className='div-vocab'>
-        {/* Top left section--------------------------------------------------------------------------- */}
-        <div className='div-vocab-left'>
-          <div className='div-vocab-left-header'>    
-            <form onSubmit={(e) => {
-              e.preventDefault()
-              setCustomSearchVocab([...customSearchVocab, e.target.firstChild.value])
-              e.target.firstChild.value = ''
-              setFilteredVocab(tables.current.vocab)
-            }}>    
-              <input className='search' type='text' onChange={(e)=>setFilteredVocab(tables.current.vocab.filter(vocab => vocab.vocabName.toLowerCase().includes(e.target.value.toLowerCase())))}></input>
-              <button className='add-to-search-query'>Add to Search {'>'} </button>
-            </form>
-          </div>
-          <ul className='suggestions'>
-            {filteredVocab.map((vocab, id) => {
-                return (<li key={id} onClick={(e) => setCustomSearchVocab([...customSearchVocab, vocab.vocabName])}>{vocab.vocabName}</li>)
-            })}
-          </ul>
-        </div>
-        {/* Top right section---------------------------------------------------------------------------- */}
-        <div className='div-vocab-right'>
-          <div className='div-vocab-right-header'>
-            <form onSubmit={(e)=>handleRetrieveSentencesOnClick(e)}>
-              <select className='lesson-select'>
-                <option value=''>No lesson filter</option>
-                {/*lessonTitleSelect.options.map((option, id) => (<option key={id} title={createLessonTitle(option)}>{option}</option>))*/
-                tables.current.lessons.map((lesson, id)=>(<option key={id} title={lesson.vocabIncluded.join('\n')}>{lesson.lesson}</option>))
-                }
-                {console.log('rerendering lessons')}
-              </select>
-              <button className='retrieve-sentences'>Retrieve Sentences</button>
-            </form>
-          </div>
-          <div>
-            {customSearchVocab.map((vocab, id) => (<button key={id} className='custom-vocab' onClick={(e)=>setCustomSearchVocab(customSearchVocab.filter(vocab=>vocab!==e.target.value))} value={vocab}>{vocab}</button>))}
-          </div>
-        </div>
-      </div>
-      {/* Mid section with the copy buttons------------------------------------------------------------------ */}
-      <div className='div-examples-header'>
+  useEffect(() => {
+    if(lessonTable[0] && vocabularyTable[0] && exampleTable[0]) {
+      setIsLoaded(true)
+    } else {
+      setIsLoaded(false)
+    }
+  }, [lessonTable, vocabularyTable, exampleTable])
+
+  useEffect(() => {
+    if(vocabularyTable[1]){
+      filterVocabularyByInput(searchTerm)
+      //console.log(suggestedVocab);
+    }
+  }, [searchTerm])
+
+  return(
+    <div className='sentenceLookup'>
+      {(!isLoaded) && (
         <div>
-          <button onClick={copySentences}>Copy as List</button>
-          <button onClick={copyTable}>Copy as Table</button>
-          <input type='checkbox' name='spanglishCheckbox' onChange={(e) => setNoSpanglish(e.target.checked)}></input><label htmlFor='spanglishCheckbox'>No Spanglish? </label>
-          <input type='checkbox' name='shuffledCheckbox'  onChange={(e) => setShuffledSentences(e.target.checked)}></input><label htmlFor='shuffledCheckbox'>Shuffle Sentences? </label>
+          <div className='buttonBox'>
+            <button onClick={resetFunction}>Back to Menu</button>
+          </div>
+          <h2>Loading Flashcard Data...</h2>
         </div>
-        <div>Num of Results: {displayExamples.length}</div>
+      )}
+      {(isLoaded)&&(<div className='filterSection'>
+        <div className='wordFilter'>
+          <div className = 'wordSearchBox'>
+              <p>Search By Word</p>
+              <input type='text' onChange={(e) =>setSearchTerm(e.target.value)}></input>
+          </div>
+          {suggestedVocab[0] && (
+            <div>
+              {suggestedVocab.map((item) => {
+                return(
+                  <div key={item.recordId} className='vocabCard'>
+                    <h4 className='vocabName'>{item.wordIdiom}</h4>
+                    <p className = 'vocabSubcategory'>{item.vocabularySubcategorySubcategoryName}</p>
+                    <p className='vocabUse'>{item.use}</p>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+        <div className='lessonFilter'>
+          <div className='buttonBox'>
+            <button onClick={resetFunction}>Back to Menu</button>
+          </div>
+          <form onSubmit={(e) => (e.preventDefault)}>
+            <select className='courseList'>
+              <list>
+                <li></li>
+              </list>
+            </select>
+          </form>
+
+        </div>
+      </div>)}
+      <div className='examplesTable'>
+
       </div>
-      {/* Bottom section with list of examples-------------------------------------------------------------- */}
-      <div className='div-examples'>
-        <table>
-          <thead>
-            <tr>
-              <th>Spanish</th>
-              <th>English</th>
-              <th>Vocab/Idioms</th>
-            </tr>
-          </thead>
-          <tbody>
-            { displayExamples.map((example, id) => {
-              return(<tr key={id}>
-                <td>{example.spanishExample}</td>
-                <td>{example.englishTranslation}</td>
-                <td>{example.vocabIncluded.map((vocab, id) => {
-                    return(<button key={id} className='vocab-included-button' disabled>{vocab}</button>)
-                })}</td>
-              </tr>)
-            })}
-          </tbody>
-        </table>
-      </div>
-  </div>;
+    </div>)
 }

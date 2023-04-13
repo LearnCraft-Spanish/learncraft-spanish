@@ -25,6 +25,16 @@ export const qb = { // quickbaseTablesInfo
         name: 'Lessons',
         id: 'brrtcungb',
         fields: ['Record ID#', 'Lesson', 'Vocab Included', 'Sort Reference']
+    },
+    quizzes: {
+        name: 'quiz',
+        id: 'brrcdgyma',
+        fields: ['Record ID#', 'quiz nickname', ]
+    },
+    quizExamples: {
+        name: 'quiz examples',
+        id: 'brrcdgym4',
+        fields: ['Record ID#','Related Example', 'Related Quiz', 'quiz nickname']
     }
 }
 

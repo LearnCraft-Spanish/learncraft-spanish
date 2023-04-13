@@ -13,6 +13,16 @@ body {
   background-image: url('./resources/paper-small.jpeg');
 }
 
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--dark);
+  border-radius: 0%;
+}
+
 /*ExampleRetriever*/
 h1 {
   color: var(--light);
@@ -23,8 +33,6 @@ h1 {
 h2, h3, h4, h5, h6 {
   color: var(--dark);
   text-align: center;
-  margin: 0;
-  margin-bottom: 10px;
 }
 
 button {
@@ -132,7 +140,7 @@ button:hover {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .buttonBox {
@@ -185,6 +193,53 @@ button:hover {
   display:block;
   text-align: center;
   justify-self: center;
+}
+
+.filterSection {
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  flex-shrink: 0;
+  flex-grow: 1;
+}
+
+.wordFilter {
+  width: 50%;
+  flex-grow: 2;
+  min-width: 300px;
+}
+
+.wordSearchBox {
+  display: flex;
+  flex-direction: row;
+  justify-items: flex-end;
+}
+
+.vocabCard {
+  text-align: center;
+  background-color: #fff;
+  color: #3c3c3c;
+  font-size: 12px;
+  width: 50%;
+  min-width: 300px;
+  padding: 0px 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 3px auto;
+}
+
+.vocabCard h4 {
+  margin: 0px
+}
+
+.vocabCard h4 {
+  font-size: 14px;
+  color: #449ac2;
+  text-align: center;
+  margin-bottom: 0;
+  margin: 0px;
 }
 
 @media screen and (max-width: 767px) {

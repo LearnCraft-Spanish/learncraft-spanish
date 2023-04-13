@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import React from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import { getUserDataFromBackend } from "./QuickbaseFetchFunctions";
+import { getUserDataFromBackend } from "./BackendFetchFunctions";
 
 const Profile = ({ID, Name, Email}) => {
     const { user, isAuthenticated, isLoading } = useAuth0();

@@ -3,7 +3,7 @@ import './App.css'
 import { useAuth0 } from "@auth0/auth0-react";
 
 
-export default function Menu({setCurrentApp}) {
+export default function Menu({setCurrentApp, examplesTable}) {
     const { user, isAuthenticated, isLoading } = useAuth0();
     
 
@@ -11,13 +11,22 @@ export default function Menu({setCurrentApp}) {
   return (
     isAuthenticated && (
     <div className='menu'>
-        <h3>Review Options:</h3>
         <div className='menuBox'>
-            <div className= 'buttonBox'>
-                <button className = 'basicQuizButton' onClick={() => setCurrentApp(1)}>All Flashcards</button>
-                <button className = 'basicQuizButton' onClick={() => setCurrentApp(2)}>Today's Flashcards</button>
+            <h3>Review Options:</h3>
+            {(examplesTable.length>0) && (<div className= 'buttonBox'>
+              <button className = 'basicQuizButton' onClick={() => setCurrentApp(1)}>All My Flashcards</button>
+              <button className = 'srsQuizButton' onClick={() => setCurrentApp(2)}>My Flashcards for Today</button>
+            </div>)}
+            <div className='buttonBox'>
+              <button className='officialQuizButton' onClick={() => setCurrentApp(3)}>Official Quizzes</button>
             </div>
         </div>
+        {/*<div className='menuBox'>
+            <h3>Free Tools:</h3>
+            <div className= 'buttonBox'>
+                <button className = 'exampleRetrieverButton' onClick={() => setCurrentApp(4)}>Find Flashcards</button>
+            </div>
+        </div>*/}
     </div>
   ))
 }
