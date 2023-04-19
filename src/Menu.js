@@ -3,10 +3,19 @@ import './App.css'
 import { useAuth0 } from "@auth0/auth0-react";
 
 
-export default function Menu({setCurrentApp, examplesTable}) {
+export default function Menu({setCurrentApp, examplesTable, userData}) {
     const { user, isAuthenticated, isLoading } = useAuth0();
-    
 
+    const sentenceLookup = () => {
+      if(userData === undefined) {
+        return (<div className='menuBox'>
+              <h3>Free Tools:</h3>
+              <div className= 'buttonBox'>
+                  <button className = 'exampleRetrieverButton' onClick={() => setCurrentApp(4)}>Find Flashcards</button>
+              </div>
+          </div>)
+      }
+    }
 
   return (
     isAuthenticated && (
@@ -21,12 +30,8 @@ export default function Menu({setCurrentApp, examplesTable}) {
               <button className='officialQuizButton' onClick={() => setCurrentApp(3)}>Official Quizzes</button>
             </div>
         </div>
-        {/*<div className='menuBox'>
-            <h3>Free Tools:</h3>
-            <div className= 'buttonBox'>
-                <button className = 'exampleRetrieverButton' onClick={() => setCurrentApp(4)}>Find Flashcards</button>
-            </div>
-        </div>*/}
+        {sentenceLookup()}
+
     </div>
   ))
 }

@@ -6,72 +6,259 @@ import { useAuth0 } from '@auth0/auth0-react';
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 export default function ExampleRetriever({resetFunction}) {
   const {getAccessTokenSilently} = useAuth0();
-  const filteredExamples = useRef([])
   
   const [isLoaded, setIsLoaded] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedCourse, setSelectedCourse] = useState('None Selected')
+  const [selectedLesson, setSelectedLesson] = useState({})
   const [lessonTable, setLessonTable] = useState([])
   const [exampleTable, setExampleTable] = useState([])
   const [vocabularyTable, setVocabularyTable] = useState([])
   const [suggestedVocab, setSuggestedVocab] = useState([])
   const [requiredVocab, setRequiredVocab] = useState([])
-  const [allowedVocab, setAllowedVocab] =useState([])
   const [noSpanglish, setNoSpanglish] = useState(false)
+  const [shuffleSentences, setShuffleSentences] = useState(false)
   const [displayExamples, setDisplayExamples] = useState([])
 
-  // called when user clicks 'Retrieve Sentences' button on top right of page
-  // makes the page display the filtered example sentences on the bottom of page
-  function handleRetrieveSentencesOnClick(e) {
-    e.preventDefault() // prevents page from refreshing
-    const selectedLesson = e.target.firstChild.value // gets selected value in dropdown list of lessons
-    // if selected lesson is '' display all examples,
-    // else 
-    const filter1 = selectedLesson === '' ? exampleTable : filterExamplesBySelectedVocab(retrieveCombinedLessonVocab(selectedLesson, lessonTable), exampleTable)
-    filteredExamples.current = filter1
+  function toggleSpanglish () {
+    if (noSpanglish) {
+      setNoSpanglish(false)
+    } else {
+      setNoSpanglish(true)
+    }
   }
 
-  function retrieveCombinedLessonVocab (selectedLessonName, lessonsTable) {
-    let selectedLessonSortNumber;
-
-    lessonsTable.forEach((lesson) => {
-      if (lesson.lesson === selectedLessonName) {
-        selectedLessonSortNumber = lesson.sortReference
+  function parseCourseLessons(lessonTableToParse) {
+    const lessonsParsedByCourse = [{name: 'LearnCraft Spanish',lessons:[]},{name: 'Accelerated Spanish',lessons:[]},{name: '1-Month Challenge',lessons:[]},{name: '2-Month Challenge',lessons:[]}]
+    lessonTableToParse.forEach((lesson)=> {
+      const lessonNameArray = lesson.lesson.split(" ")
+      //console.log(lessonNameArray[0])
+      function sortByLesson (a,b) {
+        if (a.lessonNumber > b.lessonNumber) {
+          return 1
+        } else {
+          return -1
+        }
+      }
+      switch (lessonNameArray[0]) {
+        case ('lcsp'): {
+          lesson.lessonNumber = parseInt(lessonNameArray[1])
+          //console.log(lesson.lessonNumber)
+          lessonsParsedByCourse[0].lessons.push(lesson)
+          lessonsParsedByCourse[0].lessons.sort(sortByLesson)
+          break
+        }
+        case('AS'): {
+          lesson.lessonNumber = parseInt(lessonNameArray[2])
+          //console.log(lesson.lessonNumber)
+          lessonsParsedByCourse[1].lessons.push(lesson)
+          lessonsParsedByCourse[1].lessons.sort(sortByLesson)
+          break
+        }
+        case('SI1M'): {
+          lesson.lessonNumber = parseInt(lessonNameArray[2])
+          //console.log(lesson.lessonNumber)
+          lessonsParsedByCourse[2].lessons.push(lesson)
+          lessonsParsedByCourse[2].lessons.sort(sortByLesson)
+          break
+        }
+        case('2mc'): {
+          lesson.lessonNumber = parseInt(lessonNameArray[1][1])*100 + parseInt(lessonNameArray[1][3])
+          //console.log(lesson.lessonNumber)
+          lessonsParsedByCourse[3].lessons.push(lesson)
+          lessonsParsedByCourse[3].lessons.sort(sortByLesson)
+          break
+        }
+        default:
       }
     })
+    function parseLessonsByVocab (courses) {
+      const lessonsParsedByVocab = [...courses]
+      courses.forEach((course, courseIndex) => {
+        if (courseIndex < 3) {
+          const combinedVocabulary = []
+          course.lessons.forEach((lesson, lessonIndex) => {
+            lesson.vocabIncluded.forEach((word) => {
+              if (!combinedVocabulary.includes(word)) {
+                combinedVocabulary.push(word)
+              }
+            })
+            lessonsParsedByVocab[courseIndex].lessons[lessonIndex].vocabKnown=[...combinedVocabulary]
+          })
+          //console.log(lessonsParsedByVocab[courseIndex])
+        } else {
+          const combinedVocabulary = [...lessonsParsedByVocab[2].lessons[19].vocabKnown]
+          //console.log(combinedVocabulary.length)
+          course.lessons.forEach((lesson, lessonIndex) => {
+            //console.log(lesson.vocabIncluded.length)
+            lesson.vocabIncluded.forEach((word) => {
+              if (!combinedVocabulary.includes(word)) {
+                combinedVocabulary.push(word)
+              }
+            })
+            lessonsParsedByVocab[courseIndex].lessons[lessonIndex].vocabKnown=[...combinedVocabulary]
+            //console.log(lessonsParsedByVocab[courseIndex].lessons[lessonIndex].vocabKnown.length)
+          })
+          //console.log(lessonsParsedByVocab[courseIndex])
+        }
+      })
+      return lessonsParsedByVocab
+    }
 
-    let firstRefIncluded
-    if (selectedLessonSortNumber > 12) {
-      firstRefIncluded = 13
+    const parsedLessons = parseLessonsByVocab(lessonsParsedByCourse)
+    //console.log(parsedLessons)
+    return parsedLessons
+  }
+
+  function makeCourseSelector () {
+    const courseSelector = []
+    lessonTable.forEach((item)=> {
+      courseSelector.push(<option key = {lessonTable.indexOf(item)} value = {item.name}>{item.name}</option>)
+    })
+    return courseSelector
+  }
+
+  function updateActiveCourse (name) {
+    //console.log(name)
+    const courseIndex = lessonTable.findIndex(item=> item.name === name)
+    //console.log(courseIndex)
+    const course = {...lessonTable[courseIndex]}
+    //console.log(course)
+    setSelectedCourse(course)
+    if (course.lessons) {
+      const lastIndex = course.lessons.length -1
+      //console.log(lastIndex)
+      //console.log(course.lessons[lastIndex])
+      setSelectedLesson(course.lessons[lastIndex])
     } else {
-      firstRefIncluded = 1
+      setSelectedLesson({})
     }
-    let combinedLessonVocab = []
-    lessonsTable.forEach((lesson) => {
-      if(lesson.sortReference <= selectedLessonSortNumber && lesson.sortReference >= firstRefIncluded) {
-        combinedLessonVocab = [...combinedLessonVocab, ...lesson.vocabIncluded]
-    }
-    })
-    //console.log(combinedLessonVocab);
-    return combinedLessonVocab;
   }
 
-  function filterExamplesBySelectedVocab(vocabArr, examplesTable) {
-    const filteredExamples = examplesTable.filter(example => {
-        if(example.vocabIncluded.length == 0) {
-            return false
+  function makeLessonSelector () {
+      const lessonSelector = []
+      selectedCourse.lessons.forEach((lesson)=>{
+        lessonSelector.push(<option key = {lesson.lessonNumber} value = {lesson.lessonNumber}> Lesson {lesson.lessonNumber}</option>)
+      })
+      return lessonSelector
+  }
+
+  function updateActiveLesson (number) {
+    //console.log(number)
+    const numberInt = parseInt(number)
+    const lesson = selectedCourse.lessons.find(element => element.lessonNumber===numberInt)
+    //console.log(lesson)
+    setSelectedLesson(lesson)
+  }
+
+  function addVocabToRequiredVocab (vocabNumber) {
+    const vocabObject = vocabularyTable.find(object => (object.recordId === vocabNumber))
+    //console.log(vocabObject)
+    const newRequiredVocab = [...requiredVocab];
+    newRequiredVocab.push(vocabObject)
+    //console.log(newRequiredVocab)
+    setRequiredVocab(newRequiredVocab)
+    setSearchTerm("")
+  }
+
+  function removeVocabFromRequiredVocab (vocabNumber) {
+    //console.log(vocabObject)
+    const newRequiredVocab = requiredVocab.filter((item) => item.recordId!==vocabNumber)
+    console.log(newRequiredVocab)
+    setRequiredVocab(newRequiredVocab)
+  }
+  
+  function filterExamplesByAllowedVocab(examples) {
+    if (selectedLesson.vocabKnown) {
+      const allowedVocab = selectedLesson.vocabKnown
+      //console.log(allowedVocab)
+      const filteredByAllowed = examples.filter((item) => {
+        let isAllowed = true
+        if (item.vocabIncluded.length === 0) {
+          isAllowed = false
         }
-        for(const vocab of example.vocabIncluded) {
-            if(!vocabArr.includes(vocab)) {
-                return false
+        item.vocabIncluded.forEach((word) => {
+          if (!allowedVocab.includes(word)) {
+            isAllowed = false;
+          }
+        })
+        //console.log(`Item: ${item.vocabIncluded} Status: ${isAllowed}`)
+        return isAllowed
+      })
+      return filteredByAllowed
+    } else {
+      return examples
+    }
+  }
+
+
+  function filterExamplesBySelectedVocab(examples) {
+    if (requiredVocab.length > 0){
+      const filteredExamples = examples.filter(example => {
+          if(example.vocabIncluded.length === 0) {
+              return false
+          }
+          //console.log(example.vocabIncluded)
+          let isGood = true
+          requiredVocab.forEach((word) => {
+            //console.log(word.vocabName)
+            if (isGood) {
+              isGood = example.vocabIncluded.includes(word.vocabName)
             }
-        }
-        return true
-    })
-    return filteredExamples
+          })
+          return isGood
+      })
+      return filteredExamples
+    } else {
+      return examples
+    }
   }
 
-  function filterExamplesByAllowedVocab() {
+  function filterBySpanglish (examples) {
+    if(noSpanglish){
+      const filteredBySpanglish = examples.filter((item) => {
+        if (item.spanglish === 'esp'){
+          return true
+        }
+          return false
+      })
+      return filteredBySpanglish
+    } else {
+      return examples
+    }
+  }
 
+  function shuffleExamples (examples) {
+    let shuffled = examples
+    .map(value => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value)
+    return shuffled
+  }
+
+
+  function makeExamplesTable() {
+    const allExamples = [...exampleTable]
+    const filteredBySpanglish = filterBySpanglish(allExamples)
+    const filteredByAllowed = filterExamplesByAllowedVocab(filteredBySpanglish)
+    const filteredByRequired = filterExamplesBySelectedVocab(filteredByAllowed)
+    const shuffledSentences = shuffleExamples(filteredByRequired)
+    //console.log(shuffledSentences)
+    setDisplayExamples(shuffledSentences)
+  }
+
+  function displayExamplesTable() {
+    const tableToDisplay = displayExamples.map((item) => {
+      return (<div className='exampleCard' key={item.recordId}>
+        <div className='exampleCardSpanishText'>
+          <h3>{item.spanishExample}</h3>
+        </div>
+        <div className='exampleCardEnglishText'>
+          <h4>{item.englishTranslation}</h4>
+        </div>
+      </div>)
+    })
+    return tableToDisplay
   }
 
   // called when user clicks 'Copy as List' button
@@ -202,7 +389,7 @@ export default function ExampleRetriever({resetFunction}) {
   useEffect(() => {
     async function startUp () {
       const getData = async () => {
-        console.log('init called')
+        //console.log('init called')
         // retrieving the table data
         const vocabPromise = await getVocab()
         const examplePromise = await getExamples()
@@ -212,10 +399,9 @@ export default function ExampleRetriever({resetFunction}) {
       const beginningData = await getData()
       //console.log(beginningData[0])
       setVocabularyTable(beginningData[0])
-      setAllowedVocab(beginningData[0])
       setExampleTable(beginningData[1])
-      setLessonTable(beginningData[2])
-      console.log('data fetched')
+      setLessonTable(parseCourseLessons(beginningData[2]))
+      //console.log('data fetched')
     }
     startUp()
   }, [])
@@ -223,6 +409,7 @@ export default function ExampleRetriever({resetFunction}) {
   useEffect(() => {
     if(lessonTable[0] && vocabularyTable[0] && exampleTable[0]) {
       setIsLoaded(true)
+      makeExamplesTable()
     } else {
       setIsLoaded(false)
     }
@@ -235,52 +422,75 @@ export default function ExampleRetriever({resetFunction}) {
     }
   }, [searchTerm])
 
+  useEffect(() => {
+    makeExamplesTable()
+  }, [selectedCourse, selectedLesson,requiredVocab,noSpanglish,shuffleSentences])
+
   return(
-    <div className='sentenceLookup'>
+    <div className='flashcardFinder'>
       {(!isLoaded) && (
         <div>
-          <div className='buttonBox'>
-            <button onClick={resetFunction}>Back to Menu</button>
-          </div>
           <h2>Loading Flashcard Data...</h2>
         </div>
       )}
-      {(isLoaded)&&(<div className='filterSection'>
-        <div className='wordFilter'>
-          <div className = 'wordSearchBox'>
-              <p>Search By Word</p>
-              <input type='text' onChange={(e) =>setSearchTerm(e.target.value)}></input>
-          </div>
-          {suggestedVocab[0] && (
-            <div>
-              {suggestedVocab.map((item) => {
+
+      {(isLoaded)&&(<div>
+      <div className = 'flashcardFinderHeader'>
+        <h2>Flashcard Finder</h2>
+        <button onClick={resetFunction}>Back to Menu</button>
+      </div>
+      <div className='filterSection'>
+        <div className='selectedVocab'>
+          <p>Required Words</p>
+          {requiredVocab.map((item) => {
                 return(
-                  <div key={item.recordId} className='vocabCard'>
+                  <div key={item.recordId} className='vocabCard' onClick = {() => removeVocabFromRequiredVocab(item.recordId)}>
                     <h4 className='vocabName'>{item.wordIdiom}</h4>
                     <p className = 'vocabSubcategory'>{item.vocabularySubcategorySubcategoryName}</p>
                     <p className='vocabUse'>{item.use}</p>
                   </div>
                 )
               })}
-            </div>
-          )}
-        </div>
-        <div className='lessonFilter'>
-          <div className='buttonBox'>
-            <button onClick={resetFunction}>Back to Menu</button>
           </div>
-          <form onSubmit={(e) => (e.preventDefault)}>
-            <select className='courseList'>
-              <list>
-                <li></li>
-              </list>
-            </select>
-          </form>
-
+          <div className='wordFilter'>
+            <div className = 'wordSearchBox'>
+                <p>Search By Word</p>
+                <input type='text' onChange={(e) =>setSearchTerm(e.target.value)}></input>
+            </div>
+            {searchTerm.length > 0 && suggestedVocab.length > 0 && (
+              <div className = 'vocabSuggestionBox'>
+                {suggestedVocab.map((item) => {
+                  return(
+                    <div key={item.recordId} className='vocabCard' onClick = {() => addVocabToRequiredVocab(item.recordId)}>
+                      <h4 className='vocabName'>{item.wordIdiom}</h4>
+                      <p className = 'vocabSubcategory'>{item.vocabularySubcategorySubcategoryName}</p>
+                      <p className='vocabUse'>{item.use}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+          <div className='lessonFilter'>
+            <p>Search By lesson</p>
+            <form onSubmit={(e) => (e.preventDefault)}>
+              <select className='courseList' onChange={(e) => updateActiveCourse(e.target.value)}>
+                <option>–Choose Course–</option>
+                {makeCourseSelector()}
+              </select>
+              {(selectedCourse.lessons) && (<select className='lessonList' value = {selectedLesson.lessonNumber} onChange={(e) => updateActiveLesson(e.target.value)}>
+                {makeLessonSelector()}
+              </select>)}
+            </form>
+          </div>
+          <div className='removeSpanglishBox'>
+            <p>Remove Spanglish?</p>
+            <input type='checkbox' onChange={toggleSpanglish}></input>
+          </div>
+        </div>
+        <div className='examplesTable'>
+        {displayExamplesTable()}
         </div>
       </div>)}
-      <div className='examplesTable'>
-
-      </div>
     </div>)
 }

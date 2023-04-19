@@ -56,7 +56,6 @@ button:hover {
   background-color: var(--theme);
   color: var(--light);
   margin: 0;
-  margin-bottom: 3%;
   display: flex;
   justify-content: space-between;
 }
@@ -194,25 +193,37 @@ button:hover {
   text-align: center;
   justify-self: center;
 }
+/* For Flashcard Finder */
 
-.filterSection {
-  display: flex;
-  flex-direction: row;
-  justify-items: center;
-  flex-shrink: 0;
-  flex-grow: 1;
+.flashcardFinderHeader {
+  background-color: var(--light);
+  margin: 0px;
+  padding: 20px;
 }
 
-.wordFilter {
-  width: 50%;
-  flex-grow: 2;
-  min-width: 300px;
+.flashcardFinderHeader h2 {
+  margin: 0px 0px 20px;
+}
+
+.filterSection {
+  padding: 20px 30px;
+  background-color: var(--light);
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  justify-content: space-evenly;
 }
 
 .wordSearchBox {
-  display: flex;
-  flex-direction: row;
   justify-items: flex-end;
+}
+
+.wordFilter, .selctedVocab {
+  flex-grow: 1;
+}
+
+.removeSpanglishBox, .lessonFilter {
+  flex-grow: 0;
 }
 
 .vocabCard {
@@ -220,26 +231,65 @@ button:hover {
   background-color: #fff;
   color: #3c3c3c;
   font-size: 12px;
-  width: 50%;
-  min-width: 300px;
   padding: 0px 20px;
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
   margin: 3px auto;
-}
-
-.vocabCard h4 {
-  margin: 0px
+  border: 2px solid var(--theme);
 }
 
 .vocabCard h4 {
   font-size: 14px;
-  color: #449ac2;
+  color: var(--brand);
   text-align: center;
   margin-bottom: 0;
-  margin: 0px;
+  margin: 5px;
+}
+
+.vocabCard p {
+  font-size: 14px;
+  color: var(--theme);
+  text-align: center;
+  margin-bottom: 0;
+  margin: 5px;
+}
+
+.exampleCard {
+  text-align: center;
+  background-color: var(--accent);
+  color: var(--light);
+  font-size: 12px;
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  margin: 5px 30px;
+}
+
+.exampleCardSpanishText, .exampleCardEnglishText {
+  flex-grow: 1;
+  width: 70px;
+  background-color: var(--light);
+  align-content: center;
+  margin: 2px;
+  padding: 5px 15px;
+}
+
+.exampleCardSpanishText h3 {
+  text-align: left;
+  font-size: 16px;
+  font-style: italic;
+  margin: 0;
+}
+
+.exampleCardEnglishText h4 {
+  text-align: left;
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0;
 }
 
 @media screen and (max-width: 767px) {

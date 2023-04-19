@@ -130,11 +130,11 @@ function App() {
       }
       {(user) && (
         <div>
-          {(currentApp===0) && (<Menu setCurrentApp={setCurrentApp} examplesTable={examplesTable}/>)}
+          {(currentApp===0) && (<Menu setCurrentApp={setCurrentApp} examplesTable={examplesTable} userData={qbUserData}/>)}
           {(currentApp===1) && (<SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} resetFunction={updateExamplesTable}/>)}
           {(currentApp===2) && (<SRSQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} resetFunction={updateExamplesTable}/>)}
           {(currentApp===3) && (<LCSPQuizApp resetFunction={updateExamplesTable}/>)}
-          {/*(currentApp===4) && (<ExampleRetriever resetFunction={updateExamplesTable} />)*/}
+          {(currentApp===4) && (<ExampleRetriever resetFunction={updateExamplesTable} />)}
         </div>
       )}
     </div>
