@@ -133,6 +133,10 @@ button:hover {
   font-style: italic;
 }
 
+.quizInterface {
+  margin-top: 40px;
+}
+
 .quizControls {
   height: 240px;
   width:100%;
