@@ -3,12 +3,13 @@ import { qb } from './DataModel';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
-import { getExamplesFromBackend, getLcspQuizzesFromBackend } from './BackendFetchFunctions';
+import { getExamplesFromBackend, getLcspQuizzesFromBackend, createStudentExample } from './BackendFetchFunctions';
 
 
 
 
-export default function LCSPQuizApp({resetFunction}) {
+export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentExamples, userData={}}) {
+    //console.log(userData)
     const {getAccessTokenSilently} =useAuth0()
     const [dataLoaded, setDataLoaded] = useState(false)
     const [quizReady,setQuizReady] = useState(false);
@@ -34,6 +35,7 @@ export default function LCSPQuizApp({resetFunction}) {
         setLanguageShowing('english')
         setPlaying(false)
         if (quizReady) {
+            updateWithoutReset()
             setQuizReady(false)
         } else {
             setQuizReady(true)
@@ -79,8 +81,13 @@ export default function LCSPQuizApp({resetFunction}) {
                 quizList.push(quizNumber)
             }
         })
-        quizList.sort()
         //console.log(quizList)
+        /*function sortQuizzes (a,b) {
+            const parsedA = a.split(' ')
+            const parsedB = b.split(' ')
+            return parseInt(parsedA[3]) - parseInt(parsedB[3])
+        }*/
+        //quizList.sort(sortQuizzes)
         return quizList
     }
 
@@ -91,6 +98,31 @@ export default function LCSPQuizApp({resetFunction}) {
             quizSelections.push(<option key = {item} value={item}>LearnCraft Spanish Quiz {item}</option>)
         })
         return quizSelections
+    }
+
+    async function addToExamples (recordId) {
+        const currentExample = examplesToReview.find(example => (example.recordId === recordId));
+        currentExample.isKnown = true;
+        incrementExample()
+        if (typeof(userData.recordId)==='number') {
+            //console.log(userData)
+            try {
+                const accessToken = await getAccessTokenSilently({
+                  authorizationParams: {
+                    audience: "https://lcs-api.herokuapp.com/",
+                    scope: "openID email profile",
+                  },
+                });
+                //console.log(accessToken)
+                //console.log(userData)
+                const data = await createStudentExample(accessToken, userData.recordId, recordId)
+                .then((result) => {
+                  //console.log(result)
+                });
+            }   catch (e) {
+                console.log(e.message);
+            }
+        }
     }
 
     function filterExamplesByCurrentQuiz () {
@@ -111,8 +143,26 @@ export default function LCSPQuizApp({resetFunction}) {
         return exampleReviewArray;
     }
 
+    function tagAssignedExamples (exampleArray) {
+        exampleArray.forEach((example)=> {
+            const getStudentExampleRecordId = () => {
+                const relatedStudentExample = studentExamples.find(element => (element.relatedExample
+                    ===example.recordId));
+                return relatedStudentExample;
+            }
+            if (getStudentExampleRecordId() !== undefined) {
+                example.isKnown = true
+            } else {
+                example.isKnown = false
+            }
+        })
+        console.log(exampleArray)
+        return exampleArray
+    }
+
     function handleSetupQuiz () {
         const quizExamples = filterExamplesByCurrentQuiz();
+        const taggedByKnown = tagAssignedExamples(quizExamples);
         //console.log(quizExamples)
         function randomize (array) {
             const randomizedArray = []
@@ -125,7 +175,7 @@ export default function LCSPQuizApp({resetFunction}) {
                 }
             return randomizedArray
         }
-        const randomizedQuizExamples = randomize(quizExamples);
+        const randomizedQuizExamples = randomize(taggedByKnown);
         setExamplesToReview(randomizedQuizExamples)
         toggleQuizReady();
     }
@@ -216,16 +266,17 @@ return (
         
         {/* Quiz App */}
         <div style = {{display:quizReady?'flex':'none'}} className='quiz'>
-            <div className='exampleBox'>
+            {(examplesToReview[currentExampleNumber-1] !== undefined) && (<div className='exampleBox'>
                 <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation' onClick={toggleLanguageShowing}>
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}</p>
                 </div>
                 <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' onClick={toggleLanguageShowing}>
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
+                    {(userData.recordId !== undefined && userData.recordId !== 'Loading ID' && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
                 </div>
                 <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
 
-            </div>
+            </div>)}
             <div className='buttonBox'>
                 <button onClick={decrementExample}>Previous</button>
                 <button style = {{display: (currentAudioUrl==="")? 'none' :'inherit'}} onClick = {togglePlaying}>Play/Pause Audio</button>

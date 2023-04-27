@@ -79,6 +79,36 @@ function App() {
     }
   }
 
+  const updateExamplesWithoutReset = async () => {
+    //console.log('resetting tables')
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      const userStudentExampleData = await getMyStudentExamplesFromBackend(accessToken)
+      .then((result) => {
+        const usefulData = result
+        //console.log(usefulData)
+        return usefulData
+      });
+      //console.log(userData)
+      setStudentExamplesTable(userStudentExampleData)
+      const userExampleData = await getMyExamplesFromBackend(accessToken)
+      .then((result) => {
+        const usefulData = result
+        //console.log(usefulData)
+        return usefulData
+      });
+      //console.log(userExampleData)
+      setExamplesTable(userExampleData)
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+
 
 
 
@@ -133,7 +163,7 @@ function App() {
           {(currentApp===0) && (<Menu setCurrentApp={setCurrentApp} examplesTable={examplesTable} userData={qbUserData}/>)}
           {(currentApp===1) && (<SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} resetFunction={updateExamplesTable}/>)}
           {(currentApp===2) && (<SRSQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} resetFunction={updateExamplesTable}/>)}
-          {(currentApp===3) && (<LCSPQuizApp resetFunction={updateExamplesTable}/>)}
+          {(currentApp===3) && (<LCSPQuizApp resetFunction={updateExamplesTable} updateWithoutReset = {updateExamplesWithoutReset} studentExamples={studentExamplesTable} userData={qbUserData}/>)}
           {(currentApp===4) && (<ExampleRetriever resetFunction={updateExamplesTable} />)}
         </div>
       )}

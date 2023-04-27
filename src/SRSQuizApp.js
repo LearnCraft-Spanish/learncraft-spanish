@@ -154,7 +154,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
             return true
         }
         const allExamples = [...examplesTable]
-        const dueExamples = allExamples.filter((example) => isBeforeToday(getDueDateFromExample(example))&&(example.spanglish ==='esp'))
+        const dueExamples = allExamples.filter((example) => isBeforeToday(getDueDateFromExample(example))/*&&(example.spanglish ==='esp')*/)
         //console.log(dueExamples)
         return dueExamples
         }
@@ -213,7 +213,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
 
             {quizReady && !currentExample && (
                 <div className='finishedMessage'>
-                    <p>Looks like you're all caught up! Come back tomorrow for another review, or ask your coach to give you more flashcards.</p>
+                    <p>Looks like you're all caught up! Come back tomorrow for another review.</p>
                     <div className='buttonBox'>
                         <button onClick={toggleQuizReady}>Back to Menu</button>
                     </div>

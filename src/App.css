@@ -108,6 +108,7 @@ button:hover {
 }
 
 .spanishExample, .englishTranslation {
+  position: relative;
   width: 50%;
   min-width: 300px;
   min-height:200px;
@@ -182,6 +183,10 @@ button:hover {
   background-color: darkred;
 }
 
+.hardButton:hover, .easyButton:hover {
+  background-color: var(--dark);
+}
+
 .easyBanner{
   background-color: darkgreen !important;
   cursor: default !important;
@@ -197,6 +202,34 @@ button:hover {
   text-align: center;
   justify-self: center;
 }
+
+.addFlashcardButton {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: fit-content;
+  background-color: darkgreen;
+  font-size: 10px;
+  padding: 5px 10px;
+  margin: 0 auto;
+}
+
+.removeFlashcardButton {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: fit-content;
+  background-color: darkred;
+  font-size: 10px;
+  padding: 5px 10px;
+  margin: 0 auto;
+}
+
+.addFlashcardButton:hover, .removeFlashcardButton:hover {
+  background-color: var(--dark);
+}
+
+
 /* For Flashcard Finder */
 
 .flashcardFinderHeader {
