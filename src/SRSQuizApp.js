@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './DataModel';
-import { updateStudentExample } from './BackendFetchFunctions';
+import { updateStudentExample, deleteStudentExample } from './BackendFetchFunctions';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
@@ -124,6 +124,40 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
         incrementExample()
     }
 
+    async function deleteFlashcard (exampleRecordId) {
+        const getStudentExampleRecordId = () => {
+            const relatedStudentExample = studentExamplesTable.find(element => (element.relatedExample
+                ===exampleRecordId));
+            return relatedStudentExample.recordId;
+        }
+        const updatedReviewList = [...examplesToReview]
+        updatedReviewList.splice(currentExampleNumber-1,1)
+        setExamplesToReview(updatedReviewList)
+        if(currentExampleNumber>updatedReviewList.length) {
+            setCurrentExampleNumber(updatedReviewList.length)
+        }
+        setLanguageShowing('english')
+        const studentExampleRecordId = getStudentExampleRecordId(exampleRecordId)
+        try {
+            const accessToken = await getAccessTokenSilently({
+              authorizationParams: {
+                audience: "https://lcs-api.herokuapp.com/",
+                scope: "openID email profile",
+              },
+            });
+            //console.log(accessToken)
+            const data = await deleteStudentExample(accessToken, studentExampleRecordId)
+            .then((result) => {
+              //console.log(result)
+            });
+        }   catch (e) {
+            console.log(e.message);
+        }
+        if(updatedReviewList.length<1) {
+            resetFunction()
+        }
+    }
+
     const getStudentExampleFromExample = (example) => {
         const relatedStudentExample = studentExamplesTable.find(element => (element.relatedExample
             ===example.recordId));
@@ -228,6 +262,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
                     </div>
                     <div style = {{display:(languageShowing==='spanish')?'flex':'none'}} className='spanishExample' onClick={toggleLanguageShowing}>
                         <p>{currentExample?currentExample.spanishExample:''}</p>
+                        <button className = 'removeFlashcardButton' onClick = {() =>deleteFlashcard(currentExample.recordId)}>Remove from My Flashcards</button>
                     </div>
                     <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
                 </div>

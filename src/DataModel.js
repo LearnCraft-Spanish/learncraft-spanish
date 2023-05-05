@@ -19,7 +19,7 @@ export const qb = { // quickbaseTablesInfo
     examples: {
         name: 'examples',
         id: 'brrcdgyjw',
-        fields: ['Record ID#', 'spanish example', 'english translation', 'vocab included', 'spanglish?', 'English Audio', 'Spanish Audio LA']
+        fields: ['Record ID#', 'spanish example', 'english translation', 'vocab included', 'spanglish?', 'English Audio', 'Spanish Audio LA', 'Vocab Complete?']
     },
     lessons: {
         name: 'Lessons',
@@ -37,5 +37,3 @@ export const qb = { // quickbaseTablesInfo
         fields: ['Record ID#','Related Example', 'Related Quiz', 'quiz nickname']
     }
 }
-
-

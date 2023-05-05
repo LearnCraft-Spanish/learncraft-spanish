@@ -8,7 +8,8 @@ export default function ExampleRetriever({resetFunction}) {
   const {getAccessTokenSilently} = useAuth0();
   
   const [isLoaded, setIsLoaded] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [vocabSearchTerm, setVocabSearchTerm] = useState('')
+  const [grammarSearchTerm, setGrammarSearchTerm] = useState('')
   const [selectedCourse, setSelectedCourse] = useState('None Selected')
   const [selectedLesson, setSelectedLesson] = useState({})
   const [lessonTable, setLessonTable] = useState([])
@@ -158,13 +159,14 @@ export default function ExampleRetriever({resetFunction}) {
     newRequiredVocab.push(vocabObject)
     //console.log(newRequiredVocab)
     setRequiredVocab(newRequiredVocab)
-    setSearchTerm("")
+    setVocabSearchTerm("")
+    setGrammarSearchTerm("")
   }
 
   function removeVocabFromRequiredVocab (vocabNumber) {
     //console.log(vocabObject)
     const newRequiredVocab = requiredVocab.filter((item) => item.recordId!==vocabNumber)
-    console.log(newRequiredVocab)
+    //console.log(newRequiredVocab)
     setRequiredVocab(newRequiredVocab)
   }
   
@@ -174,7 +176,7 @@ export default function ExampleRetriever({resetFunction}) {
       //console.log(allowedVocab)
       const filteredByAllowed = examples.filter((item) => {
         let isAllowed = true
-        if (item.vocabIncluded.length === 0) {
+        if (item.vocabIncluded.length === 0 || item.vocabComplete === false) {
           isAllowed = false
         }
         item.vocabIncluded.forEach((word) => {
@@ -195,14 +197,14 @@ export default function ExampleRetriever({resetFunction}) {
   function filterExamplesBySelectedVocab(examples) {
     if (requiredVocab.length > 0){
       const filteredExamples = examples.filter(example => {
-          if(example.vocabIncluded.length === 0) {
+          if(example.vocabIncluded.length === 0 || example.vocabComplete === false) {
               return false
           }
           //console.log(example.vocabIncluded)
-          let isGood = true
+          let isGood = false
           requiredVocab.forEach((word) => {
             //console.log(word.vocabName)
-            if (isGood) {
+            if (!isGood) {
               isGood = example.vocabIncluded.includes(word.vocabName)
             }
           })
@@ -287,11 +289,15 @@ export default function ExampleRetriever({resetFunction}) {
     navigator.clipboard.writeText(copiedText)
   }
 
-  function filterVocabularyByInput (input) {
+  function filterVocabularyByInput (vocabInput, grammarInput) {
+    //console.log(grammarInput)
     function filterFunction (term) {
       const lowerTerm = term.wordIdiom.toLowerCase()
-      const lowerInput = input.toLowerCase()
-      if (lowerTerm.includes(lowerInput)){
+      const lowerVocabInput = vocabInput.toLowerCase()
+      const lowerGrammar = term.vocabularySubcategorySubcategoryName.toLowerCase()
+      const lowerGrammarInput = grammarInput.toLowerCase()
+      
+      if (lowerTerm.includes(lowerVocabInput)&&lowerGrammar.includes(lowerGrammarInput)){
         return true
       }
       return false
@@ -417,10 +423,10 @@ export default function ExampleRetriever({resetFunction}) {
 
   useEffect(() => {
     if(vocabularyTable[1]){
-      filterVocabularyByInput(searchTerm)
+      filterVocabularyByInput(vocabSearchTerm,grammarSearchTerm)
       //console.log(suggestedVocab);
     }
-  }, [searchTerm])
+  }, [vocabSearchTerm,grammarSearchTerm])
 
   useEffect(() => {
     makeExamplesTable()
@@ -455,9 +461,10 @@ export default function ExampleRetriever({resetFunction}) {
           <div className='wordFilter'>
             <div className = 'wordSearchBox'>
                 <p>Search By Word</p>
-                <input type='text' onChange={(e) =>setSearchTerm(e.target.value)}></input>
+                <input type='text' onChange={(e) =>setVocabSearchTerm(e.target.value)}></input>
+                <input type='text' onChange={(e) =>setGrammarSearchTerm(e.target.value)}></input>
             </div>
-            {searchTerm.length > 0 && suggestedVocab.length > 0 && (
+            {(vocabSearchTerm.length > 0 || grammarSearchTerm.length > 0) && suggestedVocab.length > 0 && (
               <div className = 'vocabSuggestionBox'>
                 {suggestedVocab.map((item) => {
                   return(
