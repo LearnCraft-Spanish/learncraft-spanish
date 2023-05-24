@@ -137,13 +137,16 @@ export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentE
         const exampleReviewArray = []
         chosenExampleIdArray.forEach((item) => {
             const exampleToAdd = examplesTable.find(element => element.recordId === item)
-            exampleReviewArray.push(exampleToAdd)
+            if(exampleToAdd !== undefined) {
+                exampleReviewArray.push(exampleToAdd)
+            }
         })
         //console.log(exampleReviewArray)
         return exampleReviewArray;
     }
 
     function tagAssignedExamples (exampleArray) {
+        console.log(exampleArray);
         exampleArray.forEach((example)=> {
             const getStudentExampleRecordId = () => {
                 const relatedStudentExample = studentExamples.find(element => (element.relatedExample
@@ -162,6 +165,7 @@ export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentE
 
     function handleSetupQuiz () {
         const quizExamples = filterExamplesByCurrentQuiz();
+        console.log(quizExamples)
         const taggedByKnown = tagAssignedExamples(quizExamples);
         //console.log(quizExamples)
         function randomize (array) {
