@@ -443,26 +443,35 @@ export default function ExampleRetriever({resetFunction}) {
       {(isLoaded)&&(<div>
       <div className = 'flashcardFinderHeader'>
         <h2>Flashcard Finder</h2>
-        <button onClick={resetFunction}>Back to Menu</button>
-      </div>
-      <div className='filterSection'>
-        <div className='selectedVocab'>
-          <p>Required Words</p>
-          {requiredVocab.map((item) => {
-                return(
-                  <div key={item.recordId} className='vocabCard' onClick = {() => removeVocabFromRequiredVocab(item.recordId)}>
-                    <h4 className='vocabName'>{item.wordIdiom}</h4>
-                    <p className = 'vocabSubcategory'>{item.vocabularySubcategorySubcategoryName}</p>
-                    <p className='vocabUse'>{item.use}</p>
-                  </div>
-                )
-              })}
+        <div className='filterSection'>
+          <div className='removeSpanglishBox'>
+            <h3>Spanglish</h3>
+            {(!noSpanglish) && (<button style={{backgroundColor: 'darkgreen'}} onClick={toggleSpanglish}>Included</button>)}
+            {(noSpanglish) && (<button style={{backgroundColor: 'darkred'}} onClick={toggleSpanglish}>Excluded</button>)}
+          </div>
+          <div className='lessonFilter'>
+            <h3>Search By lesson</h3>
+            <form onSubmit={(e) => (e.preventDefault)}>
+              <select className='courseList' onChange={(e) => updateActiveCourse(e.target.value)}>
+                <option>–Choose Course–</option>
+                {makeCourseSelector()}
+              </select>
+              {(selectedCourse.lessons) && (<select className='lessonList' value = {selectedLesson.lessonNumber} onChange={(e) => updateActiveLesson(e.target.value)}>
+                {makeLessonSelector()}
+              </select>)}
+            </form>
           </div>
           <div className='wordFilter'>
+            <h3>Search By Word</h3>
             <div className = 'wordSearchBox'>
-                <p>Search By Word</p>
-                <input type='text' onChange={(e) =>setVocabSearchTerm(e.target.value)}></input>
-                <input type='text' onChange={(e) =>setGrammarSearchTerm(e.target.value)}></input>
+                <div className='searchTermBox'>
+                  <p>Word or Idiom</p>
+                  <input type='text' onChange={(e) =>setVocabSearchTerm(e.target.value)}></input><br></br>
+                </div>
+                <div className='searchTermBox'>
+                  <p>Grammatical Function</p>
+                  <input type='text' onChange={(e) =>setGrammarSearchTerm(e.target.value)}></input>
+                </div>
             </div>
             {(vocabSearchTerm.length > 0 || grammarSearchTerm.length > 0) && suggestedVocab.length > 0 && (
               <div className = 'vocabSuggestionBox'>
@@ -477,27 +486,27 @@ export default function ExampleRetriever({resetFunction}) {
                 })}
               </div>
             )}
-          </div>
-          <div className='lessonFilter'>
-            <p>Search By lesson</p>
-            <form onSubmit={(e) => (e.preventDefault)}>
-              <select className='courseList' onChange={(e) => updateActiveCourse(e.target.value)}>
-                <option>–Choose Course–</option>
-                {makeCourseSelector()}
-              </select>
-              {(selectedCourse.lessons) && (<select className='lessonList' value = {selectedLesson.lessonNumber} onChange={(e) => updateActiveLesson(e.target.value)}>
-                {makeLessonSelector()}
-              </select>)}
-            </form>
-          </div>
-          <div className='removeSpanglishBox'>
-            <p>Remove Spanglish?</p>
-            <input type='checkbox' onChange={toggleSpanglish}></input>
+            {(requiredVocab.length > 0) && (<div className='selectedVocab'>
+              <p>Required Words:</p>
+              {requiredVocab.map((item) => {
+                return(
+                  <div key={item.recordId} className='vocabCard' onClick = {() => removeVocabFromRequiredVocab(item.recordId)}>
+                    <h4 className='vocabName'>{item.wordIdiom}</h4>
+                    <p className = 'vocabSubcategory'>{item.vocabularySubcategorySubcategoryName}</p>
+                    <p className='vocabUse'>{item.use}</p>
+                  </div>
+                )
+              })}
+            </div>)}
           </div>
         </div>
-        <div className='examplesTable'>
+      </div>
+      <div className='examplesTable'>
+        <div className='buttonBox'>
+          <button onClick={copyTable}>Copy Table</button>
+        </div>
         {displayExamplesTable()}
-        </div>
-      </div>)}
-    </div>)
+      </div>
+    </div>)}
+  </div>)
 }

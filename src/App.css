@@ -233,34 +233,91 @@ button:hover {
 /* For Flashcard Finder */
 
 .flashcardFinderHeader {
-  background-color: var(--light);
   margin: 0px;
-  padding: 20px;
-}
-
-.flashcardFinderHeader h2 {
-  margin: 0px 0px 20px;
+  padding: 0px;
 }
 
 .filterSection {
-  padding: 20px 30px;
-  background-color: var(--light);
+  padding: 0px 20px;
   display: flex;
   flex-direction: row;
   flex-grow: 1;
-  justify-content: space-evenly;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
 
-.wordSearchBox {
-  justify-items: flex-end;
-}
-
-.wordFilter, .selctedVocab {
+.removeSpanglishBox {
+  margin: 0 10px;
   flex-grow: 1;
 }
 
-.removeSpanglishBox, .lessonFilter {
-  flex-grow: 0;
+.lessonFilter {
+  margin: 0 10px;
+  flex-grow: 1;
+}
+
+.wordFilter{
+  text-align: center;
+  margin: 0 10px;
+  position: relative;
+  flex-grow: 1;
+}
+
+.wordSearchBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: 450px;
+  margin: auto;
+}
+
+.searchTermBox {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 30px;
+  text-align: right;
+  justify-items: flex-end;
+}
+
+.searchTermBox p, .searchTermBox input {
+  display: block;
+  margin: 0 5px;
+}
+
+.vocabSuggestionBox {
+  position: absolute;
+  top: 128px;
+  right: 0px;
+}
+
+.examplesTable {
+  padding: 0px;
+}
+
+.examplesTable .buttonBox{
+  text-align: center;
+  color: var(--light);
+  font-size: 12px;
+  padding: 0px;
+  align-self: stretch;
+  margin: 5px 30px;
+  width: auto;
+}
+
+.examplesTable .buttonBox button {
+  width: 100%;
+  background-color: var(--theme);
+  margin: 0 auto;
+  padding: auto;
+}
+
+.examplesTable .buttonBox button:hover {
+  background-color: var(--accent);
+}
+
+.examplesTable .buttonBox button:active {
+  background-color: var(--brand);
 }
 
 .vocabCard {
@@ -274,7 +331,7 @@ button:hover {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  margin: 3px auto;
+  margin: 0 auto;
   border: 2px solid var(--theme);
 }
 
