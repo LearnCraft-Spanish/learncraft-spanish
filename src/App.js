@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import { useEffect, useState } from 'react';
-import jsonwebtoken from 'jsonwebtoken';
+//import jsonwebtoken from 'jsonwebtoken';
 import { getUserDataFromBackend, getMyStudentExamplesFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
