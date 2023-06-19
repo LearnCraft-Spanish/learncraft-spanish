@@ -14,7 +14,7 @@ root.render(
     authorizationParams={{
       redirect_uri: window.location.origin,
       audience: "https://lcs-api.herokuapp.com/",
-      scope: "openID email profile read:current_user update:current_user_metadata"
+      scopes: "openid profile email"
     }}
   >
       <App />

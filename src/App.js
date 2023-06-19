@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
 import { useEffect, useState } from 'react';
+import jsonwebtoken from 'jsonwebtoken';
 import { getUserDataFromBackend, getMyStudentExamplesFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
@@ -31,10 +32,14 @@ function App() {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
           audience: "https://lcs-api.herokuapp.com/",
-          scope: "openID email profile",
+          scopes: "openid profile email read:current-student update:current-student read:all-students update:all-students"
         },
       });
       //console.log(accessToken)
+      const decodedToken = jsonwebtoken.decode(accessToken);
+      console.log(decodedToken)
+      const scopes = decodedToken.scope;
+      console.log(scopes)
       const userData = await getUserDataFromBackend(accessToken)
       .then((result) => {
         //console.log(result)
@@ -55,7 +60,7 @@ function App() {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
           audience: "https://lcs-api.herokuapp.com/",
-          scope: "openID email profile",
+          scopes: "openid profile email read:current-student update:current-student read:all-students update:all-students"
         },
       });
       const userStudentExampleData = await getMyStudentExamplesFromBackend(accessToken)
@@ -85,7 +90,7 @@ function App() {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
           audience: "https://lcs-api.herokuapp.com/",
-          scope: "openID email profile",
+          scopes: "openid profile email read:current-student update:current-student read:all-students update:all-students"
         },
       });
       const userStudentExampleData = await getMyStudentExamplesFromBackend(accessToken)

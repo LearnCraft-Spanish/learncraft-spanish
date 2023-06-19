@@ -280,9 +280,9 @@ export default function ExampleRetriever({resetFunction}) {
   // called when user clicks 'Copy as Table' button
   // copies sentences in a table format to be pasted into a google doc or excel sheet
   function copyTable() {
-    const headers = 'Spanish\tEnglish\n'
+    const headers = 'ID\tSpanish\tEnglish\n'
     const table = displayExamples.map(example => {
-        return example.spanishExample + '\t' + example.englishTranslation
+        return example.recordId + '\t' + example.spanishExample + '\t' + example.englishTranslation
     }).join('\n')
 
     const copiedText = headers + table
