@@ -11,7 +11,6 @@ import LogoutButton from './LogoutButton';
 import SRSQuizApp from './SRSQuizApp';
 import LCSPQuizApp from './LCSPQuizApp'
 import { useAuth0 } from '@auth0/auth0-react';
-import Profile from './Profile';
 require('dotenv').config()
 
 function App() {
@@ -36,10 +35,10 @@ function App() {
         },
       });
       //console.log(accessToken)
-      const decodedToken = jsonwebtoken.decode(accessToken);
+      /*const decodedToken = jsonwebtoken.decode(accessToken);
       console.log(decodedToken)
       const scopes = decodedToken.scope;
-      console.log(scopes)
+      console.log(scopes)*/
       const userData = await getUserDataFromBackend(accessToken)
       .then((result) => {
         //console.log(result)
