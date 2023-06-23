@@ -150,7 +150,7 @@ return (
                 <button onClick={incrementExample}>Next</button>
             </div>
             <div className='buttonBox'>
-                <MenuButton resetFunction={updateExamplesTable}/>
+                <MenuButton />
             </div>
             <div className='progressBar2'>                
                 <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>

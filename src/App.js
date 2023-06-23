@@ -108,14 +108,14 @@ function App() {
       const userStudentExampleData = await getMyStudentExamplesFromBackend(accessToken)
       .then((result) => {
         const usefulData = result
-        console.log(usefulData)
+        //console.log(usefulData)
         return usefulData
       });
       setStudentExamplesTable(userStudentExampleData)
       const userExampleData = await getMyExamplesFromBackend(accessToken)
       .then((result) => {
         const usefulData = result
-        console.log(usefulData)
+        //console.log(usefulData)
         return usefulData
       });
       setExamplesTable(userExampleData)
@@ -175,7 +175,7 @@ function App() {
       }
       {userLoadingComplete && (
         <Routes>
-          <Route index element={userLoadingComplete && <Menu roles={roles} examplesTable={examplesTable} userData={qbUserData}/>} />
+          <Route index element={userLoadingComplete && <Menu updateExamplesTable={updateExamplesTable} roles={roles} examplesTable={examplesTable} userData={qbUserData}/>} />
           <Route exact path="/allflashcards" element={roles.includes('student') && <SimpleQuizApp updateExamplesTable= {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
           <Route exact path="/todaysflashcards" element={roles.includes('student') && <SRSQuizApp updateExamplesTable = {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
           <Route exact path="/officialquizzes" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} userData={qbUserData}/>} />

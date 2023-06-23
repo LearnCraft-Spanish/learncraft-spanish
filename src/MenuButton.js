@@ -1,9 +1,9 @@
 import React from "react";
-import { Link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
-const MenuButton = (resetFunction) => {
+const MenuButton = () => {
     return (
-        <Link className = 'linkButton' to = '/' onClick={resetFunction}>Back to Menu</Link>
+        <Link className = 'linkButton' to = '/'>Back to Menu</Link>
     )
 }
 

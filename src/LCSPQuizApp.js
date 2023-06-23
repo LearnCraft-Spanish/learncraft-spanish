@@ -279,7 +279,7 @@ return (
                 </div>
                 <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' onClick={toggleLanguageShowing}>
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
-                    {(userData.recordId !== undefined && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
+                    {userData && (userData.recordId !== undefined && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
                 </div>
                 <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
 
@@ -291,7 +291,7 @@ return (
             </div>
             <div className='buttonBox'>
                 <button onClick={toggleQuizReady}>Back to Quizzes</button>
-                <MenuButton resetFunction = {updateExamplesTable}/>
+                <MenuButton />
             </div>
             <div className='progressBar2'>                
                 <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>

@@ -4,10 +4,16 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Link, Route, Routes } from "react-router-dom";
 
 
-export default function Menu({roles, examplesTable, userData}) {
+export default function Menu({updateExamplesTable, roles, examplesTable, userData}) {
     const { user, isAuthenticated, isLoading } = useAuth0();
     //console.log(userData)
     //console.log(examplesTable)
+
+    useEffect(() => {
+      if (roles.includes('student')){
+        updateExamplesTable()
+      }
+    }, [])
 
   return (
     isAuthenticated && (

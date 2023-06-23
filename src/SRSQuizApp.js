@@ -241,7 +241,7 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
                 <div className='finishedMessage'>
                     <p>Looks like you're all caught up! Come back tomorrow for another review.</p>
                     <div className='buttonBox'>
-                        <MenuButton resetFunction={updateExamplesTable}/>
+                        <MenuButton />
                     </div>
                 </div>
             )}
@@ -271,7 +271,7 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
                         <button onClick={incrementExample}>Next</button>
                     </div>
                     <div className='buttonBox'>
-                        <MenuButton resetFunction = {updateExamplesTable}/>
+                        <MenuButton />
                     </div>
                     <div className='progressBar2'>                
                         <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>
