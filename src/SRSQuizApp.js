@@ -1,14 +1,16 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './DataModel';
+import { Link, redirect, useNavigate, Navigate } from 'react-router-dom';
 import { updateStudentExample, deleteStudentExample } from './BackendFetchFunctions';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
+import MenuButton from './MenuButton';
 
 
 
 
-export default function SimpleQuizApp({studentID, studentName, examplesTable, studentExamplesTable, resetFunction}) {
+export default function SimpleQuizApp({updateExamplesTable, studentID, studentName, examplesTable, studentExamplesTable}) {
     const quizLength = 20;
     const {user, isAuthorized, getAccessTokenSilently} = useAuth0();
     //const [studentExamplesTable, setStudentExamplesTable] = useState([])
@@ -33,16 +35,6 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
             setPlaying(true)
         }
         
-    }
-    
-    function toggleQuizReady() {
-        setLanguageShowing('english')
-        setPlaying(false)
-        if (quizReady) {
-            resetFunction()
-        } else {
-            setQuizReady(true)
-        }
     }
 
     function incrementExample() {
@@ -81,7 +73,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
             const accessToken = await getAccessTokenSilently({
               authorizationParams: {
                 audience: "https://lcs-api.herokuapp.com/",
-                scope: "openID email profile",
+                scopes: "openid profile email read:current-student update:current-student read:all-students update:all-students"
               },
             });
             //console.log(accessToken)
@@ -154,7 +146,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
             console.log(e.message);
         }
         if(updatedReviewList.length<1) {
-            resetFunction()
+            //resetFunction()
         }
     }
 
@@ -217,7 +209,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
         const examplesWithDifficulty = limitedExamples;
         //console.log(examplesWithDifficulty)
         setExamplesToReview(examplesWithDifficulty)
-        toggleQuizReady();
+        setQuizReady(true);
     }
 
     const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
@@ -249,7 +241,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
                 <div className='finishedMessage'>
                     <p>Looks like you're all caught up! Come back tomorrow for another review.</p>
                     <div className='buttonBox'>
-                        <button onClick={toggleQuizReady}>Back to Menu</button>
+                        <MenuButton resetFunction={updateExamplesTable}/>
                     </div>
                 </div>
             )}
@@ -279,7 +271,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
                         <button onClick={incrementExample}>Next</button>
                     </div>
                     <div className='buttonBox'>
-                        <button onClick={toggleQuizReady}>Back to Menu</button>
+                        <MenuButton resetFunction = {updateExamplesTable}/>
                     </div>
                     <div className='progressBar2'>                
                         <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>

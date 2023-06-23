@@ -4,11 +4,12 @@ import './App.css';
 import { deleteStudentExample } from './BackendFetchFunctions';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
+import MenuButton from './MenuButton';
 
 
 
 
-export default function SimpleQuizApp({studentID, studentName, examplesTable, studentExamplesTable, resetFunction}) {
+export default function SimpleQuizApp({updateExamplesTable, studentID, studentName, examplesTable, studentExamplesTable}) {
     const {getAccessTokenSilently} = useAuth0()
     const [quizReady,setQuizReady] = useState(false);
     const [examplesToReview, setExamplesToReview] = useState ([])
@@ -29,7 +30,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
         setLanguageShowing('english')
         setPlaying(false)
         if (quizReady) {
-            resetFunction()
+            //resetFunction()
         } else {
             setQuizReady(true)
         }
@@ -105,7 +106,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
             const accessToken = await getAccessTokenSilently({
               authorizationParams: {
                 audience: "https://lcs-api.herokuapp.com/",
-                scope: "openID email profile",
+                scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
               },
             });
             //console.log(accessToken)
@@ -117,7 +118,7 @@ export default function SimpleQuizApp({studentID, studentName, examplesTable, st
             console.log(e.message);
         }
         if(updatedReviewList.length<1) {
-            resetFunction()
+            //resetFunction()
         }
     }
     
@@ -149,7 +150,7 @@ return (
                 <button onClick={incrementExample}>Next</button>
             </div>
             <div className='buttonBox'>
-                <button onClick={toggleQuizReady}>Back to Menu</button>
+                <MenuButton resetFunction={updateExamplesTable}/>
             </div>
             <div className='progressBar2'>                
                 <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>

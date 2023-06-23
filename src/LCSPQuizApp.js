@@ -4,11 +4,12 @@ import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
 import { getExamplesFromBackend, getLcspQuizzesFromBackend, createStudentExample } from './BackendFetchFunctions';
+import MenuButton from './MenuButton';
 
 
 
 
-export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentExamples, userData={}}) {
+export default function LCSPQuizApp({updateExamplesTable, studentExamples, userData={}}) {
     //console.log(userData)
     const {getAccessTokenSilently} =useAuth0()
     const [dataLoaded, setDataLoaded] = useState(false)
@@ -35,7 +36,7 @@ export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentE
         setLanguageShowing('english')
         setPlaying(false)
         if (quizReady) {
-            updateWithoutReset()
+            updateExamplesTable()
             setQuizReady(false)
         } else {
             setQuizReady(true)
@@ -110,7 +111,7 @@ export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentE
                 const accessToken = await getAccessTokenSilently({
                   authorizationParams: {
                     audience: "https://lcs-api.herokuapp.com/",
-                    scope: "openID email profile",
+                    scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
                   },
                 });
                 //console.log(accessToken)
@@ -147,18 +148,20 @@ export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentE
 
     function tagAssignedExamples (exampleArray) {
         console.log(exampleArray);
-        exampleArray.forEach((example)=> {
-            const getStudentExampleRecordId = () => {
-                const relatedStudentExample = studentExamples.find(element => (element.relatedExample
-                    ===example.recordId));
-                return relatedStudentExample;
-            }
-            if (getStudentExampleRecordId() !== undefined) {
-                example.isKnown = true
-            } else {
-                example.isKnown = false
-            }
-        })
+        if (studentExamples) {
+            exampleArray.forEach((example)=> {
+                const getStudentExampleRecordId = () => {
+                    const relatedStudentExample = studentExamples.find(element => (element.relatedExample
+                        ===example.recordId));
+                    return relatedStudentExample;
+                }
+                if (getStudentExampleRecordId() !== undefined) {
+                    example.isKnown = true
+                } else {
+                    example.isKnown = false
+                }
+            })
+        }
         console.log(exampleArray)
         return exampleArray
     }
@@ -257,7 +260,7 @@ export default function LCSPQuizApp({resetFunction, updateWithoutReset, studentE
 
 return (
     <div className='quizInterface'>
-        {/* Student Selector */}
+        {/* Quiz Selector */}
         {!dataLoaded && (
             <h2>Loading...</h2>
         )}
@@ -276,7 +279,7 @@ return (
                 </div>
                 <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' onClick={toggleLanguageShowing}>
                     <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
-                    {(userData.recordId !== undefined && userData.recordId !== 'Loading ID' && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
+                    {(userData.recordId !== undefined && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
                 </div>
                 <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
 
@@ -288,7 +291,7 @@ return (
             </div>
             <div className='buttonBox'>
                 <button onClick={toggleQuizReady}>Back to Quizzes</button>
-                <button onClick={resetFunction}>Back to Menu</button>
+                <MenuButton resetFunction = {updateExamplesTable}/>
             </div>
             <div className='progressBar2'>                
                 <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>

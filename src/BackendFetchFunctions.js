@@ -90,6 +90,8 @@ export async function getUserDataFromBackend(token) {
                 //console.log(data);
                 return data;
             }) 
+        } else if (res.status === '403') {
+            console.log ('unauthorized')
         }
     })
     .catch(err => console.log(err))

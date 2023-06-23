@@ -13,6 +13,10 @@ body {
   background-image: url('./resources/paper-small.jpeg');
 }
 
+a {
+  text-decoration: none;
+}
+
 input,
 select,
 textarea {
@@ -35,10 +39,11 @@ h2, h3, h4, h5, h6 {
   text-align: center;
 }
 
-button {
+button, .linkButton {
   text-align: center;
   font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
   font-weight: 600;
+  font-size: 14px;
   padding: 10px 30px;
   color: var(--light);
   background-color: var(--brand);
@@ -80,6 +85,7 @@ button:hover {
 
 .finishedMessage {
   margin: auto;
+  text-align: center;
   width: 50%;
   min-width: 400px;
 }
@@ -109,7 +115,7 @@ button:hover {
 
 .spanishExample, .englishTranslation {
   position: relative;
-  width: 50%;
+  width: 65%;
   min-width: 300px;
   min-height:200px;
   color: var(--dark);
@@ -149,7 +155,7 @@ button:hover {
 
 .buttonBox {
   text-align: center;
-  width: 50%;
+  width: 65%;
   min-width: 300px;
   display: flex;
   flex-direction: row;
@@ -158,7 +164,7 @@ button:hover {
   margin: 10px auto;
 }
 
-.buttonBox button {
+.buttonBox button, .buttonBox .linkButton {
   margin: 0px 10px;
   display: block;
   flex-basis: 0;

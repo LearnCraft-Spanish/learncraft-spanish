@@ -1,36 +1,33 @@
 import React, {useState, useRef, useEffect} from 'react'
 import './App.css'
 import { useAuth0 } from "@auth0/auth0-react";
+import { Link, Route, Routes } from "react-router-dom";
 
 
-export default function Menu({setCurrentApp, examplesTable, userData}) {
+export default function Menu({roles, examplesTable, userData}) {
     const { user, isAuthenticated, isLoading } = useAuth0();
-
-    const sentenceLookup = () => {
-      if(userData === undefined) {
-        return (<div className='menuBox'>
-              <h3>Free Tools:</h3>
-              <div className= 'buttonBox'>
-                  <button className = 'exampleRetrieverButton' onClick={() => setCurrentApp(4)}>Find Flashcards</button>
-              </div>
-          </div>)
-      }
-    }
+    //console.log(userData)
+    //console.log(examplesTable)
 
   return (
     isAuthenticated && (
     <div className='menu'>
         <div className='menuBox'>
             <h3>Review Options:</h3>
-            {(examplesTable.length>0) && (<div className= 'buttonBox'>
-              <button className = 'basicQuizButton' onClick={() => setCurrentApp(1)}>All My Flashcards</button>
-              <button className = 'srsQuizButton' onClick={() => setCurrentApp(2)}>My Flashcards for Today</button>
+            {roles.includes('student') && examplesTable.length > 0 && (<div className= 'buttonBox'>
+              <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
+              <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
             </div>)}
             <div className='buttonBox'>
-              <button className='officialQuizButton' onClick={() => setCurrentApp(3)}>Official Quizzes</button>
+              <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>
             </div>
         </div>
-        {sentenceLookup()}
+        {(roles.includes('admin') && <div className='menuBox'>
+            <h3>Free Tools:</h3>
+            <div className= 'buttonBox'>
+                <Link className = 'linkButton' to='/flashcardfinder'>Find Flashcards</Link>
+            </div>
+        </div>)}
 
     </div>
   ))
