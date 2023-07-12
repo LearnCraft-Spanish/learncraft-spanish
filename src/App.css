@@ -203,6 +203,21 @@ button:hover {
   cursor: default !important;
 }
 
+.quizSelector {
+  flex-direction: column;
+  align-content: center;
+  margin: 0 auto;
+  justify-content: space-around;
+  width: 50%;
+}
+
+.quizMenu {
+  margin-bottom: 20px;
+  height: 65px;
+  text-align: center;
+
+}
+
 .progressBar2 {
   display:block;
   text-align: center;

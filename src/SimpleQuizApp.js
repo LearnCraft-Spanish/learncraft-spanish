@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './DataModel';
 import './App.css';
+import { Route, Navigate, redirect } from 'react-router-dom';
 import { deleteStudentExample } from './BackendFetchFunctions';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
@@ -117,9 +118,6 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
         }   catch (e) {
             console.log(e.message);
         }
-        if(updatedReviewList.length<1) {
-            //resetFunction()
-        }
     }
     
 
@@ -130,6 +128,9 @@ return (
         <div style = {{display:quizReady?'none':'flex', justifyContent: 'space-around'}}>
             <button onClick={handleSetupQuiz}>Begin Review</button>
         </div>
+
+        {/* Back to Menu if Empty */}
+        {quizReady && (examplesToReview.length < 1) && <Navigate to = '..'/>}
         
         {/* Quiz App */}
         <div style = {{display:quizReady?'flex':'none'}} className='quiz'>
@@ -150,7 +151,7 @@ return (
                 <button onClick={incrementExample}>Next</button>
             </div>
             <div className='buttonBox'>
-                <MenuButton />
+            <MenuButton />
             </div>
             <div className='progressBar2'>                
                 <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>

@@ -145,9 +145,6 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
         }   catch (e) {
             console.log(e.message);
         }
-        if(updatedReviewList.length<1) {
-            //resetFunction()
-        }
     }
 
     const getStudentExampleFromExample = (example) => {
@@ -237,7 +234,7 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
                 <button onClick={handleSetupQuiz}>Begin Review</button>
             </div>
 
-            {quizReady && !currentExample && (
+            {quizReady && examplesToReview.length < 1 && (
                 <div className='finishedMessage'>
                     <p>Looks like you're all caught up! Come back tomorrow for another review.</p>
                     <div className='buttonBox'>
@@ -279,6 +276,7 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
                 </div>
             </div>)}
         </div>
+        
     )
 )
 }
