@@ -135,8 +135,12 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, userD
                 <select className = 'quizMenu' onChange={(e) => setChosenQuiz(e.target.value)}>
                     {makeQuizSelections()}               
                 </select>
-                <Link className = 'linkButton' to = {chosenQuiz}>Begin Review</Link>
-                <MenuButton />
+                <div className='buttonBox'>
+                    <Link className = 'linkButton' to = {chosenQuiz}>Begin Review</Link>
+                </div>
+                <div className='buttonBox'>
+                    <MenuButton />
+                </div>
             </div>)}
             
             {/* Quiz App */}

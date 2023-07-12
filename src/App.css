@@ -204,10 +204,11 @@ button:hover {
 }
 
 .quizSelector {
+  display: flex;
   flex-direction: column;
-  align-content: center;
+  align-content: space-between;
   margin: 0 auto;
-  justify-content: space-around;
+  justify-content: space-between;
   width: 50%;
 }
 
