@@ -4,8 +4,10 @@ import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
 import { getExamplesFromBackend, getLcspQuizzesFromBackend} from './BackendFetchFunctions';
+import CourseQuizzes from './CourseQuizzes.js'
 import MenuButton from './MenuButton';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, Navigate, redirect, useNavigate, Route, Routes } from 'react-router-dom';
+import OfficialQuiz from './OfficialQuiz';
 
 
 
@@ -13,11 +15,49 @@ import { Outlet, Link } from 'react-router-dom';
 export default function LCSPQuizApp({updateExamplesTable, studentExamples, userData={}}) {
     //console.log(userData)
     const {getAccessTokenSilently} =useAuth0()
+    const navigate = useNavigate()
+    const [quizCourse, setQuizCourse] = useState('lcsp')
     const [dataLoaded, setDataLoaded] = useState(false)
     const [examplesTable, setExamplesTable] = useState([]);
     const [chosenQuiz, setChosenQuiz] = useState('2');
     const [quizTable, setQuizTable] = useState([]);
     const [hideMenu,setHideMenu] = useState(false);
+    const [rendered, setRendered] = useState(false);
+    const [quizReady, setQuizReady] = useState(false);
+    const courses = [
+        {name: 'Spanish in One Month', url:'si1m', code: 'si1m'},
+        {name: 'LearnCraft Spanish', url:'', code: 'lcsp'}
+    ]
+    
+    function makeMenuShow () {
+        if (hideMenu) {
+            setHideMenu(false)
+            makeQuizUnready()
+        }
+    }
+
+    function makeMenuHidden () {
+        if (!hideMenu) {
+            setHideMenu(true)
+        }
+    }
+
+    function makeQuizReady () {
+        setQuizReady(true)
+    }
+
+    function makeQuizUnready (){
+        setQuizReady(false)
+    }
+
+    function createRoutesFromCourses() {
+        const routes = []
+        courses.forEach((course) => {
+            routes.push( <Route key = {course.code} path = {`${course.url}/*`} element = {<CourseQuizzes thisCourse={course.code} quizCourse = {quizCourse} makeQuizList={makeQuizList} makeQuizReady={makeQuizReady} quizReady = {quizReady} updateChosenQuiz = {updateChosenQuiz} makeMenuHidden = {makeMenuHidden} courses = {courses} makeMenuShow = {makeMenuShow} updateQuizCourse = {updateQuizCourseWithoutNavigate} makeCourseList = {makeCourseList} createRoutesFromCourses={createRoutesFromCourses} makeQuizSelections = {makeQuizSelections} userData = {userData} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
+            chosenQuiz = {chosenQuiz} hideMenu = {hideMenu} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} />}/>)
+        })
+        return routes
+    }
 
     async function getExamples () {
         try {
@@ -63,12 +103,45 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, userD
         }
     }
 
+    function updateQuizCourseWithNavigate(courseCode) {
+        const newCourse = courses.find((course) => {
+            return (course.code === courseCode)})
+        setQuizCourse(courseCode)
+        const urlToNavigate = newCourse.url
+        navigate(urlToNavigate)
+    }
+
+    function updateQuizCourseWithoutNavigate(courseCode) {
+        const newCourse = courses.find((course) => {
+            return (course.code === courseCode)})
+        setQuizCourse(courseCode)
+        return newCourse
+    }
+
+    function updateChosenQuiz (quizNumber) {
+        console.log('chosen quiz now '+quizCourse+' '+quizNumber)
+        setChosenQuiz(quizNumber)
+    }
+
+
+    function makeCourseList () {
+        const courseList = []
+        let i = 1
+        courses.forEach((course) => {
+            const courseOption = <option key = {i} value = {course.code}>{course.name}</option>
+            courseList.push(courseOption)
+            i++
+        })
+        return courseList
+    }
+
     function makeQuizList () {
         const quizList = []
         quizTable.forEach((item) => {
             const itemArray = item.quizNickname.split(" ")
-            const quizNumber = parseInt(itemArray[2])
-            if (quizList.indexOf(quizNumber)===-1){
+            const quizNumber = parseInt(itemArray.slice(-1)[0])
+            const quizType = itemArray[0]
+            if (quizList.indexOf(quizNumber)===-1 && quizType === quizCourse){
                 quizList.push(quizNumber)
             }
         })
@@ -85,19 +158,29 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, userD
     function makeQuizSelections () {
         const quizList = makeQuizList()
         const quizSelections = []
+        function nameQuiz(quizNumber) {
+            if (quizCourse === 'lcsp'){
+                return `LearnCraft Spanish Quiz ${quizNumber}`
+            } else if (quizCourse === 'si1m') {
+                return `Spanish In One Month Quiz ${quizNumber}`
+            } else {
+                return `Quiz ${quizNumber}`
+            }
+        }
+        let i = 1
         quizList.forEach((item)=>{
-            quizSelections.push(<option key = {item} value={item}>LearnCraft Spanish Quiz {item}</option>)
+            //console.log(item)
+            quizSelections.push(<option key = {i} value={item}>{nameQuiz(item)}</option>)
+            i++
         })
         return quizSelections
     }
-
-    let rendered = false
 
     // called onced at the beginning
     useEffect(() => {
         async function startUp () {
             if (!rendered) {
-                rendered = true
+                setRendered(true)
                 const getData = async () => {
                     //console.log('init called')
                     // retrieving the table data
@@ -109,8 +192,6 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, userD
                 //console.log(beginningData[0])
                 setExamplesTable(beginningData[0])
                 setQuizTable(beginningData[1])
-                const chosenQuizNickname = beginningData[1][0].quizNickname
-                setChosenQuiz(chosenQuizNickname.split(" ")[2])
                 //console.log('init completed')
             }
         }
@@ -125,25 +206,46 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, userD
 
     }, [quizTable, examplesTable])
 
+    useEffect (() => {
+        if (quizReady && chosenQuiz && quizCourse ==='lcsp'){
+            console.log(chosenQuiz)
+            navigate(chosenQuiz.toString())
+        }
+
+    }, [quizReady, chosenQuiz])
+
+    useEffect(() => {
+        if (quizCourse && dataLoaded && !quizReady){
+            console.log(quizReady)
+            updateChosenQuiz(makeQuizList().slice(-1)[0])
+        }
+    }, [quizCourse, dataLoaded, quizReady])
+
     return (
         <div className='quizInterface'>
             {/* Quiz Selector */}
             {!dataLoaded && (
                 <h2>Loading...</h2>
             )}
-            {dataLoaded && chosenQuiz && !hideMenu && (<div className = 'quizSelector'>
-                <select className = 'quizMenu' onChange={(e) => setChosenQuiz(e.target.value)}>
+
+            {dataLoaded && chosenQuiz && (quizCourse==='lcsp') && !hideMenu && (<div className = 'quizSelector'>
+                <select className = 'quizMenu' value = {quizCourse} onChange={(e) => updateQuizCourseWithNavigate(e.target.value)}>
+                    {makeCourseList()}
+                </select>
+                <select className = 'quizMenu' value = {chosenQuiz} onChange={(e) => updateChosenQuiz(e.target.value)}>
                     {makeQuizSelections()}               
                 </select>
                 <div className='buttonBox'>
-                    <Link className = 'linkButton' to = {chosenQuiz}>Begin Review</Link>
+                    <button onClick = {makeQuizReady}>Begin Review</button>
                 </div>
                 <div className='buttonBox'>
                     <MenuButton />
                 </div>
             </div>)}
-            
-            {/* Quiz App */}
-            <Outlet context={[userData, dataLoaded, updateExamplesTable, chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples]}/>
+            {dataLoaded && (<Routes>
+                {createRoutesFromCourses()}
+                {quizCourse === 'lcsp' && <Route path=':number' element = {<OfficialQuiz  quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} userData = {userData} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
+                chosenQuiz = {chosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} />}></Route>}
+            </Routes>)}
         </div>
 )}

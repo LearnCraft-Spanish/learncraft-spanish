@@ -9,12 +9,19 @@ export const qb = { // quickbaseTablesInfo
     students: {
         name: 'students',
         id: 'brrtdx784',
-        fields: ['Record ID#', 'Name', 'Email address']
+        fields: ['Record ID#', 'Name', 'Email address', 'Related Program', 'Cohort']
     },
+
+    programs: {
+        name: 'programs',
+        id: 'btgeqa5um',
+        fields: ['Record ID#','Name', 'Lessons', 'Cohort A Current Lessons', 'Cohort B Current Lessons', 'Cohort C Current Lessons', 'Cohort D Current Lessons']
+    },
+
     vocabulary: {
         name: 'vocabulary',
         id: 'brrcdgyix',
-        fields: ['Record ID#', 'word/idiom', 'use', 'Vocabulary Subcategory - subcategory name', 'Vocab Name', 'frequency rank']
+        fields: ['Record ID#', 'word/idiom', 'use', 'Vocabulary Subcategory - subcategory name', 'Vocab Name', 'frequency rank', 'Verb Infinitive', 'Conjugation Tags']
     },
     examples: {
         name: 'examples',

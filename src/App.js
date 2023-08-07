@@ -15,6 +15,7 @@ import CallbackPage from './CallbackPage';
 import NotFoundPage from './NotFoundPage';
 import { useAuth0 } from '@auth0/auth0-react';
 import OfficialQuiz from './OfficialQuiz';
+import CourseQuizzes from './CourseQuizzes'
 require('dotenv').config()
 
 function App() {
@@ -48,7 +49,7 @@ function App() {
         //console.log(usefulData)
         return usefulData
       });
-      //console.log(userData)
+      console.log(userData)
       return userData;
     } catch (e) {
         console.log(e.message);
@@ -127,14 +128,20 @@ function App() {
     }
   }
 
+  useEffect(()=>{
+    setRendered(true)
+  }, [])
+
   useEffect(() => {
     if (isAuthenticated) {
+      console.log('user setup')
       userSetup()
     }
   }, [isAuthenticated])
 
   useEffect(() => {
     if (roles.includes('student')){
+      console.log('setting first tables')
       updateExamplesTable()
     } else if (rendered) {
       setUserLoadingComplete (true)
@@ -146,10 +153,6 @@ function App() {
       setUserLoadingComplete(true)
     } 
   }, [examplesTable])
-
-  useEffect(()=>{
-    setRendered(true)
-  }, [])
 
 
   return (
@@ -178,10 +181,8 @@ function App() {
           <Route index element={userLoadingComplete && <Menu updateExamplesTable={updateExamplesTable} roles={roles} examplesTable={examplesTable} userData={qbUserData}/>} />
           <Route exact path="/allflashcards" element={roles.includes('student') &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
           <Route exact path="/todaysflashcards" element={roles.includes('student') && <SRSQuizApp updateExamplesTable = {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
-          <Route exact path="/officialquizzes" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} userData={qbUserData}/>}>
-            <Route exact path="/officialquizzes/:number" element = {<OfficialQuiz />} />
-          </Route>
-          <Route exact path="/flashcardfinder" element={roles.includes('admin') && <ExampleRetriever />} />
+          <Route exact path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} userData={qbUserData}/>} />
+          <Route exact path="/flashcardfinder" element={(roles.includes('admin')||roles.includes('student')) && <ExampleRetriever roles = {roles} user = {qbUserData}/>} />
           <Route exact path="/callback" element={<CallbackPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>)

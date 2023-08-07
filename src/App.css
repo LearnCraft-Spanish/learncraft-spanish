@@ -343,13 +343,13 @@ button:hover {
 }
 
 .vocabCard {
-  text-align: center;
+  text-align: left;
   background-color: #fff;
   color: #3c3c3c;
   font-size: 12px;
-  padding: 0px 20px;
+  padding: 5px 20px;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
@@ -360,7 +360,7 @@ button:hover {
 .vocabCard h4 {
   font-size: 14px;
   color: var(--brand);
-  text-align: center;
+  text-align: left;
   margin-bottom: 0;
   margin: 5px;
 }
@@ -368,9 +368,38 @@ button:hover {
 .vocabCard p {
   font-size: 14px;
   color: var(--theme);
-  text-align: center;
+  text-align: left;
+  margin: 0;
+}
+
+.tagCard {
+  text-align: left;
+  background-color: #fff;
+  color: #3c3c3c;
+  font-size: 12px;
+  padding: 5px 20px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 auto;
+  border: 2px solid var(--theme);
+}
+
+.tagCard h4 {
+  font-size: 14px;
+  color: var(--brand);
+  text-align: left;
   margin-bottom: 0;
   margin: 5px;
+}
+
+.tagCard p {
+  font-size: 14px;
+  color: var(--theme);
+  text-align: left;
+  margin: 0;
 }
 
 .exampleCard {

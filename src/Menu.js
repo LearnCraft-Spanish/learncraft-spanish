@@ -10,14 +10,19 @@ export default function Menu({updateExamplesTable, roles, examplesTable, userDat
   //console.log(userData)
   //console.log(examplesTable)
 
-  let rendered = false
+  let [rendered, setRendered] = useState(false)
+
   
   useEffect(() => {
-    rendered = true
-    if (!rendered){
+    console.log('mounting menu')
+      setRendered(true)
+  }, [])
+  
+  useEffect(() => {
+    if (rendered){
       updateExamplesTable()
     }
-  }, [])
+  }, [rendered])
 
   return (
     isAuthenticated && (
@@ -32,8 +37,8 @@ export default function Menu({updateExamplesTable, roles, examplesTable, userDat
               <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>
             </div>
         </div>
-        {(roles.includes('admin') && <div className='menuBox'>
-            <h3>Free Tools:</h3>
+        {((roles.includes('student')||roles.includes('admin')) && <div className='menuBox'>
+            <h3>Practice Tools:</h3>
             <div className= 'buttonBox'>
                 <Link className = 'linkButton' to='/flashcardfinder'>Find Flashcards</Link>
             </div>

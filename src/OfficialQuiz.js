@@ -7,199 +7,187 @@ import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
 import MenuButton from './MenuButton';
 
-export default function OfficialQuiz () {
+export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow, setQuizCourse, setChosenQuiz, makeQuizSelections, userData, dataLoaded, updateExamplesTable,
+    chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples}) {
+        const thisQuiz = useParams().number
 
-    const thisQuiz = useParams().number
+        const {getAccessTokenSilently} = useAuth0();
 
-    const {getAccessTokenSilently} = useAuth0();
+        const [examplesToReview, setExamplesToReview] = useState ([]);
+        const [quizReady, setQuizReady] = useState(false)
+        const [currentExampleNumber, setCurrentExampleNumber] = useState(1);
+        const [languageShowing, setLanguageShowing] = useState('english');
+        const [playing, setPlaying] = useState(false);
 
-    const [userData, dataLoaded, updateExamplesTable, chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples] = useOutletContext()
-    const [examplesToReview, setExamplesToReview] = useState ([]);
-    const [quizReady, setQuizReady] = useState(false)
-    const [currentExampleNumber, setCurrentExampleNumber] = useState(1);
-    const [languageShowing, setLanguageShowing] = useState('english');
-    const [playing, setPlaying] = useState(false);
 
-    function filterExamplesByCurrentQuiz () {
-        const currentQuizNickname = `lcsp quiz ${thisQuiz}`
-        const chosenExampleIdArray = []
-        quizTable.forEach((item) => {
-            if (item.quizNickname === currentQuizNickname) {
-                chosenExampleIdArray.push(item.relatedExample)
-            }
-        })
-        //console.log(chosenExampleIdArray)
-        const exampleReviewArray = []
-        chosenExampleIdArray.forEach((item) => {
-            const exampleToAdd = examplesTable.find(element => element.recordId === item)
-            if(exampleToAdd !== undefined) {
-                exampleReviewArray.push(exampleToAdd)
-            }
-        })
-        //console.log(exampleReviewArray)
-        return exampleReviewArray;
-    }
-
-    const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
-
-    const currentAudioUrl = quizReady && (examplesToReview[currentExampleNumber-1])? examplesToReview[currentExampleNumber-1][whichAudio]:""
-
-    function tagAssignedExamples (exampleArray) {
-        //console.log(exampleArray);
-        if (studentExamples) {
-            exampleArray.forEach((example)=> {
-                const getStudentExampleRecordId = () => {
-                    const relatedStudentExample = studentExamples.find(element => (element.relatedExample
-                        ===example.recordId));
-                    return relatedStudentExample;
-                }
-                if (getStudentExampleRecordId() !== undefined) {
-                    example.isKnown = true
-                } else {
-                    example.isKnown = false
+        function filterExamplesByCurrentQuiz () {
+            console.log(quizCourse)
+            console.log(thisQuiz)
+            const chosenExampleIdArray = []
+            quizTable.forEach((item) => {
+                const quizArray = item.quizNickname.split(' ')
+                const quizCourseName = quizArray[0]
+                const quizNumber = quizArray.slice(-1)[0]
+                if (quizCourseName===quizCourse && quizNumber ===thisQuiz) {
+                    chosenExampleIdArray.push(item)
                 }
             })
-        }
-        //console.log(exampleArray)
-        return exampleArray
-    }
-
-    function handleSetupQuiz () {
-        console.log('setting up quiz')
-        //console.log(quizTable)
-        const quizExamples = filterExamplesByCurrentQuiz();
-        //console.log(quizExamples)
-        const taggedByKnown = tagAssignedExamples(quizExamples);
-        //console.log(quizExamples)
-        function randomize (array) {
-            const randomizedArray = []
-            const vanishingArray = [...array];
-            for (let i = 0; i < array.length; i++) {
-                const randIndex = Math.floor(Math.random()*vanishingArray.length)
-                const randomArrayItem = vanishingArray[randIndex]
-                vanishingArray.splice(randIndex, 1)
-                randomizedArray[i] = randomArrayItem
+            const exampleReviewArray = []
+            chosenExampleIdArray.forEach((item) => {
+                const exampleToAdd = examplesTable.find(element => element.recordId === item.relatedExample)
+                if(exampleToAdd) {
+                    exampleReviewArray.push(exampleToAdd)
                 }
-            return randomizedArray
+            })
+            return exampleReviewArray;
         }
-        const randomizedQuizExamples = randomize(taggedByKnown);
-        setExamplesToReview(randomizedQuizExamples);
-        setQuizReady(true);
-    }
 
-    function togglePlaying() {
-        console.log(`Playing: ${!playing}`)
-        if (playing) {
-            setPlaying(false)
-        } else {
-            setPlaying(true)
-        }
-    }
+        const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
 
-    function incrementExample() {
-        if (currentExampleNumber < examplesToReview.length){
-            const newExampleNumber = currentExampleNumber+1
-            setCurrentExampleNumber(newExampleNumber)
-        } else {
-            setCurrentExampleNumber(examplesToReview.length)
-        }
-        setLanguageShowing('english')
-        setPlaying(false)
-    }
-    
-    function decrementExample() {
-        if (currentExampleNumber > 1){
-            setCurrentExampleNumber(currentExampleNumber-1)
-        } else {
-            setCurrentExampleNumber(1)
-        }
-        setLanguageShowing('english')
-        setPlaying(false)
-    }
+        const currentAudioUrl = quizReady && (examplesToReview[currentExampleNumber-1])? examplesToReview[currentExampleNumber-1][whichAudio]:""
 
-    async function toggleLanguageShowing () {
-        if (languageShowing === 'spanish'){
-            setLanguageShowing('english')
-            setPlaying(false)
-        } else {
-            setLanguageShowing('spanish')
-            setPlaying(false)
+        function tagAssignedExamples (exampleArray) {
+            //console.log(exampleArray);
+            if (studentExamples) {
+                exampleArray.forEach((example)=> {
+                    const getStudentExampleRecordId = () => {
+                        const relatedStudentExample = studentExamples.find(element => (element.relatedExample
+                            ===example.recordId));
+                        return relatedStudentExample;
+                    }
+                    if (getStudentExampleRecordId() !== undefined) {
+                        example.isKnown = true
+                    } else {
+                        example.isKnown = false
+                    }
+                })
+            }
+            //console.log(exampleArray)
+            return exampleArray
         }
-    }
 
-    async function addToExamples (recordId) {
-        const currentExample = examplesToReview.find(example => (example.recordId === recordId));
-        currentExample.isKnown = true;
-        incrementExample()
-        if (typeof(userData.recordId)==='number') {
-            //console.log(userData)
-            try {
-                const accessToken = await getAccessTokenSilently({
-                  authorizationParams: {
-                    audience: "https://lcs-api.herokuapp.com/",
-                    scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
-                  },
-                });
-                //console.log(accessToken)
-                //console.log(userData)
-                const data = await createStudentExample(accessToken, userData.recordId, recordId)
-                .then((result) => {
-                  //console.log(result)
-                });
-            }   catch (e) {
-                console.log(e.message);
+        function handleSetupQuiz () {
+            const quizExamples = filterExamplesByCurrentQuiz();
+            //console.log(quizExamples)
+            const taggedByKnown = tagAssignedExamples(quizExamples);
+            //console.log(quizExamples)
+            function randomize (array) {
+                const randomizedArray = []
+                const vanishingArray = [...array];
+                for (let i = 0; i < array.length; i++) {
+                    const randIndex = Math.floor(Math.random()*vanishingArray.length)
+                    const randomArrayItem = vanishingArray[randIndex]
+                    vanishingArray.splice(randIndex, 1)
+                    randomizedArray[i] = randomArrayItem
+                    }
+                return randomizedArray
+            }
+            const randomizedQuizExamples = randomize(taggedByKnown);
+            setExamplesToReview(randomizedQuizExamples);
+            setQuizReady(true);
+        }
+
+        function togglePlaying() {
+            console.log(`Playing: ${!playing}`)
+            if (playing) {
+                setPlaying(false)
+            } else {
+                setPlaying(true)
             }
         }
-    }
 
-    function makeMenuShow () {
-        if (hideMenu) {
-            setHideMenu(false)
+        function incrementExample() {
+            if (currentExampleNumber < examplesToReview.length){
+                const newExampleNumber = currentExampleNumber+1
+                setCurrentExampleNumber(newExampleNumber)
+            } else {
+                setCurrentExampleNumber(examplesToReview.length)
+            }
+            setLanguageShowing('english')
+            setPlaying(false)
         }
-    }
-
-    function makeMenuHidden () {
-        if (!hideMenu) {
-            setHideMenu(true)
+        
+        function decrementExample() {
+            if (currentExampleNumber > 1){
+                setCurrentExampleNumber(currentExampleNumber-1)
+            } else {
+                setCurrentExampleNumber(1)
+            }
+            setLanguageShowing('english')
+            setPlaying(false)
         }
-    }
 
-    useEffect (() => {
-        if (dataLoaded) {
-            handleSetupQuiz()    
+        async function toggleLanguageShowing () {
+            if (languageShowing === 'spanish'){
+                setLanguageShowing('english')
+                setPlaying(false)
+            } else {
+                setLanguageShowing('spanish')
+                setPlaying(false)
+            }
         }
-    }, [dataLoaded])
 
-    useEffect (() => {
-        makeMenuHidden()
-    }, [])
+        async function addToExamples (recordId) {
+            const currentExample = examplesToReview.find(example => (example.recordId === recordId));
+            currentExample.isKnown = true;
+            incrementExample()
+            if (typeof(userData.recordId)==='number') {
+                //console.log(userData)
+                try {
+                    const accessToken = await getAccessTokenSilently({
+                    authorizationParams: {
+                        audience: "https://lcs-api.herokuapp.com/",
+                        scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
+                    },
+                    });
+                    //console.log(accessToken)
+                    //console.log(userData)
+                    const data = await createStudentExample(accessToken, userData.recordId, recordId)
+                    .then((result) => {
+                    //console.log(result)
+                    });
+                }   catch (e) {
+                    console.log(e.message);
+                }
+            }
+        }
 
-    //const quizNumber = parseInt(useParams().number)
-    //console.log(useParams())
-    return (quizReady &&
-        <div className='quiz'>
-            {(examplesToReview[currentExampleNumber-1] !== undefined) && (<div className='exampleBox'>
-                <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation' onClick={toggleLanguageShowing}>
-                    <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}</p>
+        useEffect (() => {
+            if (dataLoaded) {
+                handleSetupQuiz()    
+            }
+        }, [dataLoaded])
+
+        useEffect (() => {
+            makeMenuHidden()
+        }, [])
+
+        //const quizNumber = parseInt(useParams().number)
+        //console.log(useParams())
+        return (quizReady &&
+            <div className='quiz'>
+                {(examplesToReview[currentExampleNumber-1] !== undefined) && (<div className='exampleBox'>
+                    <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation' onClick={toggleLanguageShowing}>
+                        <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}</p>
+                    </div>
+                    <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' onClick={toggleLanguageShowing}>
+                        <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
+                        {userData && (userData.recordId !== undefined && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
+                    </div>
+                    {currentAudioUrl && <ReactHowler src={currentAudioUrl} playing={playing} />}
+                </div>)}
+                <div className='buttonBox'>
+                    <button onClick={decrementExample}>Previous</button>
+                    <button style = {{display: (currentAudioUrl==="")? 'none' :'inherit'}} onClick = {togglePlaying}>Play/Pause Audio</button>
+                    <button onClick={incrementExample}>Next</button>
                 </div>
-                <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' onClick={toggleLanguageShowing}>
-                    <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
-                    {userData && (userData.recordId !== undefined && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
+                <div className='buttonBox'>
+                    <Link className='linkButton' to = '../' onClick={makeMenuShow}>Back to Quizzes</Link>
+                    <MenuButton />
                 </div>
-                <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
-            </div>)}
-            <div className='buttonBox'>
-                <button onClick={decrementExample}>Previous</button>
-                <button style = {{display: (currentAudioUrl==="")? 'none' :'inherit'}} onClick = {togglePlaying}>Play/Pause Audio</button>
-                <button onClick={incrementExample}>Next</button>
+                <div className='progressBar2'>                
+                    <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>
+                </div>
             </div>
-            <div className='buttonBox'>
-                <Link className='linkButton' to = '../' onClick={makeMenuShow}>Back to Quizzes</Link>
-                <MenuButton />
-            </div>
-            <div className='progressBar2'>                
-                <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>
-            </div>
-        </div>
-    )
+        )
 }

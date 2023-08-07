@@ -1,25 +1,28 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { getVocabFromBackend, getExamplesFromBackend, getLessonsFromBackend} from './BackendFetchFunctions';
+import { getVocabFromBackend, getExamplesFromBackend, createStudentExample, getLessonsFromBackend, getProgramsFromBackend, getAllUsersFromBackend} from './BackendFetchFunctions';
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-export default function ExampleRetriever({resetFunction}) {
+export default function ExampleRetriever({roles, user}) {
   const {getAccessTokenSilently} = useAuth0();
-  
   const [isLoaded, setIsLoaded] = useState(false)
   const [vocabSearchTerm, setVocabSearchTerm] = useState('')
   const [grammarSearchTerm, setGrammarSearchTerm] = useState('')
-  const [selectedCourse, setSelectedCourse] = useState('None Selected')
+  const [activeStudent, setActiveStudent] = useState(user)
+  const [selectedCourse, setSelectedCourse] = useState({})
   const [selectedLesson, setSelectedLesson] = useState({})
-  const [lessonTable, setLessonTable] = useState([])
+  const [programTable, setProgramTable] = useState([])
   const [exampleTable, setExampleTable] = useState([])
   const [vocabularyTable, setVocabularyTable] = useState([])
   const [suggestedVocab, setSuggestedVocab] = useState([])
   const [requiredVocab, setRequiredVocab] = useState([])
+  const [requiredTags, setRequiredTags] = useState([])
   const [noSpanglish, setNoSpanglish] = useState(false)
   const [shuffleSentences, setShuffleSentences] = useState(false)
   const [displayExamples, setDisplayExamples] = useState([])
+  let studentList = []
+
 
   function toggleSpanglish () {
     if (noSpanglish) {
@@ -29,126 +32,78 @@ export default function ExampleRetriever({resetFunction}) {
     }
   }
 
-  function parseCourseLessons(lessonTableToParse) {
-    const lessonsParsedByCourse = [{name: 'LearnCraft Spanish',lessons:[]},{name: 'Accelerated Spanish',lessons:[]},{name: '1-Month Challenge',lessons:[]},{name: '2-Month Challenge',lessons:[]}]
-    lessonTableToParse.forEach((lesson)=> {
-      const lessonNameArray = lesson.lesson.split(" ")
-      //console.log(lessonNameArray[0])
-      function sortByLesson (a,b) {
-        if (a.lessonNumber > b.lessonNumber) {
-          return 1
-        } else {
-          return -1
-        }
-      }
-      switch (lessonNameArray[0]) {
-        case ('lcsp'): {
-          lesson.lessonNumber = parseInt(lessonNameArray[1])
-          //console.log(lesson.lessonNumber)
-          lessonsParsedByCourse[0].lessons.push(lesson)
-          lessonsParsedByCourse[0].lessons.sort(sortByLesson)
-          break
-        }
-        case('AS'): {
-          lesson.lessonNumber = parseInt(lessonNameArray[2])
-          //console.log(lesson.lessonNumber)
-          lessonsParsedByCourse[1].lessons.push(lesson)
-          lessonsParsedByCourse[1].lessons.sort(sortByLesson)
-          break
-        }
-        case('SI1M'): {
-          lesson.lessonNumber = parseInt(lessonNameArray[2])
-          //console.log(lesson.lessonNumber)
-          lessonsParsedByCourse[2].lessons.push(lesson)
-          lessonsParsedByCourse[2].lessons.sort(sortByLesson)
-          break
-        }
-        case('2mc'): {
-          lesson.lessonNumber = parseInt(lessonNameArray[1][1])*100 + parseInt(lessonNameArray[1][3])
-          //console.log(lesson.lessonNumber)
-          lessonsParsedByCourse[3].lessons.push(lesson)
-          lessonsParsedByCourse[3].lessons.sort(sortByLesson)
-          break
-        }
-        default:
-      }
-    })
-    function parseLessonsByVocab (courses) {
-      const lessonsParsedByVocab = [...courses]
-      courses.forEach((course, courseIndex) => {
-        if (courseIndex < 3) {
-          const combinedVocabulary = []
-          course.lessons.forEach((lesson, lessonIndex) => {
-            lesson.vocabIncluded.forEach((word) => {
-              if (!combinedVocabulary.includes(word)) {
-                combinedVocabulary.push(word)
-              }
-            })
-            lessonsParsedByVocab[courseIndex].lessons[lessonIndex].vocabKnown=[...combinedVocabulary]
-          })
-          //console.log(lessonsParsedByVocab[courseIndex])
-        } else {
-          const combinedVocabulary = [...lessonsParsedByVocab[2].lessons[19].vocabKnown]
-          //console.log(combinedVocabulary.length)
-          course.lessons.forEach((lesson, lessonIndex) => {
-            //console.log(lesson.vocabIncluded.length)
-            lesson.vocabIncluded.forEach((word) => {
-              if (!combinedVocabulary.includes(word)) {
-                combinedVocabulary.push(word)
-              }
-            })
-            lessonsParsedByVocab[courseIndex].lessons[lessonIndex].vocabKnown=[...combinedVocabulary]
-            //console.log(lessonsParsedByVocab[courseIndex].lessons[lessonIndex].vocabKnown.length)
-          })
-          //console.log(lessonsParsedByVocab[courseIndex])
-        }
+  function updateActiveCourse (id) {
+    console.log(id)
+    //console.log(name)
+    const chosenCourse = programTable.find(item=> item.recordId === parseInt(id))
+    console.log(programTable)
+    console.log(chosenCourse)
+    const course = chosenCourse
+    //console.log(course)
+    setSelectedCourse(course)
+    //console.log(course.lessons)
+    let lastLesson = 0
+    if (activeStudent) {
+      const studentCohort = activeStudent.cohort
+      const cohortFieldName = `cohort${studentCohort}CurrentLesson`
+      const currentLessonNumber = course[cohortFieldName].toString()
+      console.log(currentLessonNumber)
+      lastLesson = course.lessons.find(item => {
+        const itemArray = item.lesson.split(' ')
+        const itemString = itemArray.slice(-1)[0]
+        const solution = (itemString === currentLessonNumber)
+        return (solution)
       })
-      return lessonsParsedByVocab
+    } else {
+      const lastIndex = course.lessons.length -1
+      console.log(lastIndex)
+      lastLesson = course.lessons[lastIndex]
     }
-
-    const parsedLessons = parseLessonsByVocab(lessonsParsedByCourse)
-    //console.log(parsedLessons)
-    return parsedLessons
+    console.log(lastLesson)
+    setSelectedLesson(lastLesson||{})
   }
 
   function makeCourseSelector () {
-    const courseSelector = []
-    lessonTable.forEach((item)=> {
-      courseSelector.push(<option key = {lessonTable.indexOf(item)} value = {item.name}>{item.name}</option>)
-    })
-    return courseSelector
-  }
-
-  function updateActiveCourse (name) {
-    //console.log(name)
-    const courseIndex = lessonTable.findIndex(item=> item.name === name)
-    //console.log(courseIndex)
-    const course = {...lessonTable[courseIndex]}
-    //console.log(course)
-    setSelectedCourse(course)
-    if (course.lessons) {
-      const lastIndex = course.lessons.length -1
-      //console.log(lastIndex)
-      //console.log(course.lessons[lastIndex])
-      setSelectedLesson(course.lessons[lastIndex])
+    if (!activeStudent){
+      const courseSelector = [<option key = {-1} >–Choose Course–</option>]
+      programTable.forEach((item)=> {
+        courseSelector.push(<option key = {item.recordId} value = {item.recordId}> {item.name}</option>)
+      })
+      return courseSelector
     } else {
-      setSelectedLesson({})
+      const myCourse = programTable.find(item => item.recordId === activeStudent.relatedProgram)
+      const courseSelector = <option key = {myCourse.recordId} value = {myCourse.recordId}>{myCourse.name}</option>
+      return courseSelector
     }
   }
 
   function makeLessonSelector () {
+    if (!roles.includes('admin')){
       const lessonSelector = []
+      const studentCohort = activeStudent.cohort
+      const cohortFieldName = `cohort${studentCohort}CurrentLesson`
+      const currentLessonNumber = selectedCourse[cohortFieldName]
       selectedCourse.lessons.forEach((lesson)=>{
-        lessonSelector.push(<option key = {lesson.lessonNumber} value = {lesson.lessonNumber}> Lesson {lesson.lessonNumber}</option>)
+        const lessonArray = lesson.lesson.split(" ")
+        const lessonNumber = parseInt(lessonArray.slice(-1))
+        if (lessonNumber <= currentLessonNumber) {
+          lessonSelector.push(<option key = {lesson.lesson} value = {lesson.lesson}> Lesson {lessonNumber}</option>)
+        }
       })
       return lessonSelector
+    } else {
+      const lessonSelector = []
+      selectedCourse.lessons.forEach((lesson)=>{
+        const lessonArray = lesson.lesson.split(" ")
+        const lessonNumber = lessonArray.slice(-1)
+        lessonSelector.push(<option key = {lesson.lesson} value = {lesson.lesson}> Lesson {lessonNumber}</option>)
+      })
+        return lessonSelector
+    }
   }
 
-  function updateActiveLesson (number) {
-    //console.log(number)
-    const numberInt = parseInt(number)
-    const lesson = selectedCourse.lessons.find(element => element.lessonNumber===numberInt)
-    //console.log(lesson)
+  function updateActiveLesson (name) {
+    const lesson = selectedCourse.lessons.find(element => element.lesson===name)
     setSelectedLesson(lesson)
   }
 
@@ -164,9 +119,8 @@ export default function ExampleRetriever({resetFunction}) {
   }
 
   function removeVocabFromRequiredVocab (vocabNumber) {
-    //console.log(vocabObject)
     const newRequiredVocab = requiredVocab.filter((item) => item.recordId!==vocabNumber)
-    //console.log(newRequiredVocab)
+    console.log(newRequiredVocab)
     setRequiredVocab(newRequiredVocab)
   }
   
@@ -216,6 +170,28 @@ export default function ExampleRetriever({resetFunction}) {
     }
   }
 
+  function filterExamplesBySelectedTags(examples) {
+    if (requiredTags.length > 0){
+      const filteredExamples = examples.filter(example => {
+          if(example.vocabIncluded.length === 0 || example.vocabComplete === false) {
+              return false
+          }
+          //console.log(example.vocabIncluded)
+          let isGood = false
+          requiredTags.forEach((word) => {
+            //console.log(word.vocabName)
+            if (!isGood) {
+              isGood = example.vocabIncluded.includes(word.vocabName)
+            }
+          })
+          return isGood
+      })
+      return filteredExamples
+    } else {
+      return examples
+    }
+  }
+
   function filterBySpanglish (examples) {
     if(noSpanglish){
       const filteredBySpanglish = examples.filter((item) => {
@@ -228,6 +204,31 @@ export default function ExampleRetriever({resetFunction}) {
     } else {
       return examples
     }
+  }
+
+  async function addToMyFlashcards(recordId) {
+      const currentExample = displayExamples.find(example => (example.recordId === recordId));
+      //currentExample.isKnown = true;
+      console.log(`adding example ${recordId} to student ${activeStudent.recordId}`)
+      if (typeof(activeStudent.recordId)==='number') {
+          //console.log(userData)
+          try {
+              const accessToken = await getAccessTokenSilently({
+                authorizationParams: {
+                  audience: "https://lcs-api.herokuapp.com/",
+                  scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
+                },
+              });
+              //console.log(accessToken)
+              //console.log(userData)
+              const data = await createStudentExample(accessToken, activeStudent.recordId, recordId)
+              .then((result) => {
+                //console.log(result)
+              });
+          }   catch (e) {
+              console.log(e.message);
+          }
+      }
   }
 
   function shuffleExamples (examples) {
@@ -258,6 +259,7 @@ export default function ExampleRetriever({resetFunction}) {
         <div className='exampleCardEnglishText'>
           <h4>{item.englishTranslation}</h4>
         </div>
+        {(activeStudent && <button value = {item.recordId} onClick = {(e) => addToMyFlashcards(e.target.value)}>Add</button>)}
       </div>)
     })
     return tableToDisplay
@@ -294,7 +296,7 @@ export default function ExampleRetriever({resetFunction}) {
     function filterFunction (term) {
       const lowerTerm = term.wordIdiom.toLowerCase()
       const lowerVocabInput = vocabInput.toLowerCase()
-      const lowerGrammar = term.vocabularySubcategorySubcategoryName.toLowerCase()
+      const lowerGrammar = `${term.vocabularySubcategorySubcategoryName.toLowerCase()}; ${term.use.toLowerCase()}; ${term.verbInfinitive.toLowerCase()}; ${term.conjugationTags.toString().toLowerCase()}`
       const lowerGrammarInput = grammarInput.toLowerCase()
       
       if (lowerTerm.includes(lowerVocabInput)&&lowerGrammar.includes(lowerGrammarInput)){
@@ -312,6 +314,8 @@ export default function ExampleRetriever({resetFunction}) {
     }
     setSuggestedVocab(suggestTen);
   }
+
+  //function filterTagsByInput
 
   function sortVocab (a, b) {
     if (a.frequencyRank===b.frequencyRank){
@@ -345,7 +349,7 @@ export default function ExampleRetriever({resetFunction}) {
         console.log(e.message);
     }
   }
-
+  
   async function getExamples () {
     try {
       const accessToken = await getAccessTokenSilently({
@@ -390,36 +394,138 @@ export default function ExampleRetriever({resetFunction}) {
     }
   }
 
+  async function parseCourseLessons(courses) {
+    console.log(courses)
+    const lessonTable = await getLessons()
+    console.log('parsing lessons')
+    function parseLessonsByVocab () {
+      courses.forEach((course) => {
+          const combinedVocabulary = []
+          const lessonSortFunction = (a, b) => {
+            function findNumber (stringLesson) {
+              const lessonArray = stringLesson.split(' ')
+              const lessonNumber = lessonArray.slice(-1)
+              const lessonNumberInt = parseInt(lessonNumber)
+              return lessonNumberInt
+            }
+            return findNumber(a)-findNumber(b)
+          }
+          course.lessons.sort(lessonSortFunction)
+          //console.log(lessonTable)
+          const parsedLessonArray = []
+          
+          course.lessons.forEach((lesson) => {
+            const lessonTableItem = lessonTable.find((item) => (item.lesson === lesson))
+            //console.log(lessonTableItem)
+            parsedLessonArray.push(lessonTableItem)
+          })
+          course.lessons = parsedLessonArray
+          course.lessons.forEach((lesson) => {
+            lesson.vocabIncluded.forEach((word) => {
+              if (!combinedVocabulary.includes(word)) {
+                combinedVocabulary.push(word)
+              }
+            })
+            lesson.vocabKnown=[...combinedVocabulary]
+          })
+          //console.log(lessonsParsedByVocab[courseIndex])
+      })
+      return courses
+    }
+    const parsedLessons = parseLessonsByVocab(programTable)
+    return parsedLessons
+  }
+
+  async function getPrograms () {
+    console.log('getting Programs')
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const programs = await getProgramsFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result;
+        return usefulData
+      });
+      //console.log(examples)
+      const parsedPrograms = parseCourseLessons(programs)
+      return parsedPrograms
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
+  async function getStudentList () {
+    console.log('getting Student List')
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const allStudentData = await getAllUsersFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result;
+        return usefulData
+      });
+      //console.log(examples)
+      return allStudentData
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
+  let isMounted = false
+
   
   // called onced at the beginning
   useEffect(() => {
     async function startUp () {
+      isMounted = true
       const getData = async () => {
         //console.log('init called')
         // retrieving the table data
+        if (roles.includes('admin')){
+          const studentListPromise = await getStudentList()
+        }
+        const programPromise = await getPrograms()
         const vocabPromise = await getVocab()
         const examplePromise = await getExamples()
-        const lessonPromise = await getLessons()
-        return [await vocabPromise, await examplePromise, await lessonPromise]
+        setVocabularyTable(await vocabPromise)
+        setExampleTable(await examplePromise)
+        setProgramTable(await programPromise)
       };
-      const beginningData = await getData()
-      //console.log(beginningData[0])
-      setVocabularyTable(beginningData[0])
-      setExampleTable(beginningData[1])
-      setLessonTable(parseCourseLessons(beginningData[2]))
+      getData()
       //console.log('data fetched')
     }
-    startUp()
+    if (!isMounted) {
+      startUp()
+    }
   }, [])
 
   useEffect(() => {
-    if(lessonTable[0] && vocabularyTable[0] && exampleTable[0]) {
-      setIsLoaded(true)
-      makeExamplesTable()
-    } else {
-      setIsLoaded(false)
+    if (!isLoaded) {
+      if(vocabularyTable[0] && exampleTable[0] && programTable[0]) {
+        setIsLoaded(true)
+        if (activeStudent) {
+          const activeCourse = programTable.find((item) => (activeStudent.relatedProgram === item.recordId))
+          updateActiveCourse(activeCourse.recordId)
+        }
+        makeExamplesTable()
+        //console.log(programTable)
+      } else {
+        setIsLoaded(false)
+      }
     }
-  }, [lessonTable, vocabularyTable, exampleTable])
+  }, [vocabularyTable, exampleTable, programTable])
 
   useEffect(() => {
     if(vocabularyTable[1]){
@@ -452,14 +558,16 @@ export default function ExampleRetriever({resetFunction}) {
           <div className='lessonFilter'>
             <h3>Search By lesson</h3>
             <form onSubmit={(e) => (e.preventDefault)}>
-              <select className='courseList' onChange={(e) => updateActiveCourse(e.target.value)}>
-                <option>–Choose Course–</option>
+              <select className='courseList' value = {selectedCourse?selectedCourse.recordId:''} onChange={(e) => updateActiveCourse(e.target.value)}>
                 {makeCourseSelector()}
               </select>
-              {(selectedCourse.lessons) && (<select className='lessonList' value = {selectedLesson.lessonNumber} onChange={(e) => updateActiveLesson(e.target.value)}>
+              {(selectedCourse.lessons) && (<select className='lessonList' value = {selectedLesson?selectedLesson.lesson:''} onChange={(e) => updateActiveLesson(e.target.value)}>
                 {makeLessonSelector()}
               </select>)}
             </form>
+            {/*(roles.includes('admin') && <div className='buttonBox'>
+                <button>Change Student</button>
+            </div>)*/}
           </div>
           <div className='wordFilter'>
             <h3>Search By Word</h3>
@@ -479,8 +587,10 @@ export default function ExampleRetriever({resetFunction}) {
                   return(
                     <div key={item.recordId} className='vocabCard' onClick = {() => addVocabToRequiredVocab(item.recordId)}>
                       <h4 className='vocabName'>{item.wordIdiom}</h4>
-                      <p className = 'vocabSubcategory'>{item.vocabularySubcategorySubcategoryName}</p>
-                      <p className='vocabUse'>{item.use}</p>
+                      <p className = 'vocabSubcategory'>Subcategory: {item.vocabularySubcategorySubcategoryName}</p>
+                      <p className='vocabUse'>{item.use?'Use: ':undefined} {item.use}</p>
+                      <p className='vocabInfinitive'>{item.verbInfinitive?'Infinitive: ':undefined} {item.verbInfinitive}</p>
+                      <p className='vocabConjugation'>{item.conjugationTags[0]?'Conjugation: ':undefined} {item.conjugationTags.toString()}</p>
                     </div>
                   )
                 })}
@@ -492,13 +602,53 @@ export default function ExampleRetriever({resetFunction}) {
                 return(
                   <div key={item.recordId} className='vocabCard' onClick = {() => removeVocabFromRequiredVocab(item.recordId)}>
                     <h4 className='vocabName'>{item.wordIdiom}</h4>
-                    <p className = 'vocabSubcategory'>{item.vocabularySubcategorySubcategoryName}</p>
-                    <p className='vocabUse'>{item.use}</p>
+                    <p className = 'vocabSubcategory'>Subcategory: {item.vocabularySubcategorySubcategoryName}</p>
+                    <p className='vocabUse'>{item.use?'Use: ':undefined} {item.use}</p>
+                    <p className='vocabInfinitive'>{item.verbInfinitive?'Infinitive: ':undefined} {item.verbInfinitive}</p>
+                    <p className='vocabConjugation'>{item.conjugationTags[0]?'Conjugation: ':undefined} {item.conjugationTags.toString()}</p>
                   </div>
                 )
               })}
             </div>)}
           </div>
+          {/*<div className='tagFilter'>
+            <h3>Search By Tag</h3>
+            <div className = 'tagSearchBox'>
+                <div className='searchTermBox'>
+                  <p>Grammatical Tag</p>
+                  <input type='text' onChange={(e) =>setGrammarSearchTerm(e.target.value)}></input><br></br>
+                </div>
+            </div>
+            {(vocabSearchTerm.length > 0 || grammarSearchTerm.length > 0) && suggestedVocab.length > 0 && (
+              <div className = 'tagSuggestionBox'>
+                {suggestedVocab.map((item) => {
+                  return(
+                    <div key={item.recordId} className='vocabCard' onClick = {() => addVocabToRequiredVocab(item.recordId)}>
+                      <h4 className='vocabName'>{item.wordIdiom}</h4>
+                      <p className = 'vocabSubcategory'>Subcategory: {item.vocabularySubcategorySubcategoryName}</p>
+                      <p className='vocabUse'>{item.use?'Use: ':undefined} {item.use}</p>
+                      <p className='vocabInfinitive'>{item.verbInfinitive?'Infinitive: ':undefined} {item.verbInfinitive}</p>
+                      <p className='vocabConjugation'>{item.conjugationTags[0]?'Conjugation: ':undefined} {item.conjugationTags.toString()}</p>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+            {(requiredVocab.length > 0) && (<div className='selectedVocab'>
+              <p>Required Tags:</p>
+              {requiredVocab.map((item) => {
+                return(
+                  <div key={item.recordId} className='vocabCard' onClick = {() => removeVocabFromRequiredVocab(item.recordId)}>
+                    <h4 className='vocabName'>{item.wordIdiom}</h4>
+                    <p className = 'vocabSubcategory'>Subcategory: {item.vocabularySubcategorySubcategoryName}</p>
+                    <p className='vocabUse'>{item.use?'Use: ':undefined} {item.use}</p>
+                    <p className='vocabInfinitive'>{item.verbInfinitive?'Infinitive: ':undefined} {item.verbInfinitive}</p>
+                    <p className='vocabConjugation'>{item.conjugationTags[0]?'Conjugation: ':undefined} {item.conjugationTags.toString()}</p>
+                  </div>
+                )
+              })}
+            </div>)}
+            </div>*/}
         </div>
       </div>
       <div className='examplesTable'>

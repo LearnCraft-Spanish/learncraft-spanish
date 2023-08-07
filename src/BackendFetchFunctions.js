@@ -2,6 +2,22 @@
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 //console.log(backendUrl);
 
+export async function getProgramsFromBackend(token) {
+    let fetchUrl = `${backendUrl}public/programs`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+
 export async function getLessonsFromBackend(token) {
     let fetchUrl = `${backendUrl}public/lessons`
     //console.log(`Fetching ${fetchUrl}`)
@@ -52,7 +68,7 @@ export async function getExamplesFromBackend(token) {
 }
 
 export async function getLcspQuizzesFromBackend(token) {
-    let fetchUrl = `${backendUrl}public/lcspQuizExamples`
+    let fetchUrl = `${backendUrl}public/allQuizExamples`
     //console.log(`Fetching ${fetchUrl}`)
     const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
     .then((res) => {
@@ -65,6 +81,37 @@ export async function getLcspQuizzesFromBackend(token) {
     })
     .catch(err => console.log(err))
     return tableFromBackend; 
+}
+
+export async function getAllUsersFromBackend(token) {
+    let fetchUrl = `${backendUrl}all-students`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                function sortFunction (a,b){
+                    if(a.sortReference > b.sortReference){
+                        return 1;
+                    }
+                    if(a.sortReference < b.sortReference){
+                        return -1;
+                    }
+                    return 0
+
+                }
+                const data = [res];
+                data.sort(sortFunction);
+                //console.log(data);
+                return data;
+            }) 
+        } else if (res.status === '403') {
+            console.log ('unauthorized')
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
 }
 
 export async function getUserDataFromBackend(token) {

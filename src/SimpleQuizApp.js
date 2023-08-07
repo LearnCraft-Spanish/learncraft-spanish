@@ -130,7 +130,7 @@ return (
         </div>
 
         {/* Back to Menu if Empty */}
-        {quizReady && (examplesToReview.length < 1) && <Navigate to = '..'/>}
+        {quizReady && (examplesToReview.length < 1) && <Navigate to = '/'/>}
         
         {/* Quiz App */}
         <div style = {{display:quizReady?'flex':'none'}} className='quiz'>
