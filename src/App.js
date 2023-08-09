@@ -60,10 +60,11 @@ function App() {
     try {
       const firstTry = await getUserData()
       //console.log(await firstTry)
-      if (await firstTry[0] === 204) {
+      if (typeof await firstTry[0] === 'number') {
         //console.log('second try needed')
+        console.log(firstTry[0])
         const secondTry =  await getUserData()
-        //console.log(await secondTry[0])
+        console.log(await secondTry[0])
         setQbUserData(await secondTry[0])
         if (await secondTry[2]) {
           const rolesToAssign = []
