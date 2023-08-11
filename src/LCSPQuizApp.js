@@ -145,6 +145,7 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, userD
                 quizList.push(quizNumber)
             }
         })
+        quizList.sort()
         //console.log(quizList)
         /*function sortQuizzes (a,b) {
             const parsedA = a.split(' ')

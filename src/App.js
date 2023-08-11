@@ -25,6 +25,7 @@ function App() {
   const [studentExamplesTable, setStudentExamplesTable] = useState([])
   const [examplesTable, setExamplesTable] = useState([])
   const [userLoadingComplete, setUserLoadingComplete] = useState(false)
+  const [bannerMessage, setBannerMessage] = useState('')
   const [roles, setRoles] = useState([])
 
   async function getUserData () {
@@ -99,6 +100,10 @@ function App() {
     }
   }
 
+  const updateBannerMessage = function(message) {
+    setBannerMessage(message)
+  }
+
   const updateExamplesTable= async () => {
       if (roles.includes('student')){
       console.log('resetting tables')
@@ -155,6 +160,15 @@ function App() {
     } 
   }, [examplesTable])
 
+  useEffect(()=>{
+    function blankBanner ()  {
+      setBannerMessage('')
+    }
+    if (bannerMessage !== ''){
+      setTimeout(blankBanner, 1000)
+    } 
+  }, [bannerMessage])
+
 
   return (
     <div className="App">
@@ -171,6 +185,10 @@ function App() {
         <LogoutButton />
         <LoginButton />
       </div>
+
+      {bannerMessage && <div className='bannerMessage'>
+        <p>{bannerMessage}</p>
+        </div>}
       
       {/*isAuthenticated && (
         <Profile Name = {qbUserData.name} Email={qbUserData.emailAddress} ID = {qbUserData.recordId}/>
@@ -183,7 +201,7 @@ function App() {
           <Route exact path="/allflashcards" element={roles.includes('student') &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
           <Route exact path="/todaysflashcards" element={roles.includes('student') && <SRSQuizApp updateExamplesTable = {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
           <Route exact path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} userData={qbUserData}/>} />
-          <Route exact path="/flashcardfinder" element={(roles.includes('admin')||roles.includes('student')) && <ExampleRetriever roles = {roles} user = {qbUserData}/>} />
+          <Route exact path="/flashcardfinder" element={(roles.includes('admin')||roles.includes('student')) && <ExampleRetriever roles = {roles} user = {qbUserData||{}} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage}/>} />
           <Route exact path="/callback" element={<CallbackPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>)

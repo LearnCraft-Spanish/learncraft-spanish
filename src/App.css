@@ -39,6 +39,22 @@ h2, h3, h4, h5, h6 {
   text-align: center;
 }
 
+.bannerMessage {
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 5px;
+  margin: 0;
+  background-color: darkgreen;
+  border: 1px solid var(--light);
+  color: var(--light);
+}
+
+.bannerMessage p {
+  margin: 0;
+}
+
 button, .linkButton {
   text-align: center;
   font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;

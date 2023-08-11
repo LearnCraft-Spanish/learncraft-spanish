@@ -1,15 +1,16 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { getVocabFromBackend, getExamplesFromBackend, createStudentExample, getLessonsFromBackend, getProgramsFromBackend, getAllUsersFromBackend} from './BackendFetchFunctions';
+import { getVocabFromBackend, getExamplesFromBackend, createStudentExample, getLessonsFromBackend, getProgramsFromBackend, getAllUsersFromBackend, getStudentExamplesFromBackend} from './BackendFetchFunctions';
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-export default function ExampleRetriever({roles, user}) {
+export default function ExampleRetriever({roles, user, studentExamplesTable, updateBannerMessage}) {
   const {getAccessTokenSilently} = useAuth0();
   const [isLoaded, setIsLoaded] = useState(false)
+  const [activeStudentExamplesTable, setActiveStudentExamplesTable] = useState([])
   const [vocabSearchTerm, setVocabSearchTerm] = useState('')
   const [grammarSearchTerm, setGrammarSearchTerm] = useState('')
-  const [activeStudent, setActiveStudent] = useState(user)
+  const [activeStudent, setActiveStudent] = useState(user||{})
   const [selectedCourse, setSelectedCourse] = useState({})
   const [selectedLesson, setSelectedLesson] = useState({})
   const [programTable, setProgramTable] = useState([])
@@ -19,9 +20,9 @@ export default function ExampleRetriever({roles, user}) {
   const [requiredVocab, setRequiredVocab] = useState([])
   const [requiredTags, setRequiredTags] = useState([])
   const [noSpanglish, setNoSpanglish] = useState(false)
-  const [shuffleSentences, setShuffleSentences] = useState(false)
   const [displayExamples, setDisplayExamples] = useState([])
-  let studentList = []
+  const [studentList, setStudentList] = useState([])
+  const [choosingStudent, setChoosingStudent] = useState(false)
 
 
   function toggleSpanglish () {
@@ -30,6 +31,14 @@ export default function ExampleRetriever({roles, user}) {
     } else {
       setNoSpanglish(true)
     }
+  }
+
+  function changeStudent () {
+    setChoosingStudent(true)
+  }
+
+  function keepStudent() {
+    setChoosingStudent(false)
   }
 
   function updateActiveCourse (id) {
@@ -43,7 +52,7 @@ export default function ExampleRetriever({roles, user}) {
     setSelectedCourse(course)
     //console.log(course.lessons)
     let lastLesson = 0
-    if (activeStudent) {
+    if (activeStudent.recordId) {
       const studentCohort = activeStudent.cohort
       const cohortFieldName = `cohort${studentCohort}CurrentLesson`
       const currentLessonNumber = course[cohortFieldName].toString()
@@ -59,12 +68,68 @@ export default function ExampleRetriever({roles, user}) {
       console.log(lastIndex)
       lastLesson = course.lessons[lastIndex]
     }
-    console.log(lastLesson)
+    //console.log(lastLesson)
     setSelectedLesson(lastLesson||{})
   }
 
+  function updateActiveStudent(studentID) {
+    const studentIDNumber = parseInt(studentID)
+    const newStudent = studentList.find((student) => (student.recordId === studentIDNumber))||{}
+    setActiveStudent(newStudent)
+  }
+
+  async function updateActiveStudentExamplesTable() {
+    console.log(activeStudent)
+    if (activeStudent.recordId) {
+      if (activeStudent.recordId === user.recordId) {
+        console.log(studentExamplesTable)
+        setActiveStudentExamplesTable(studentExamplesTable)
+      } else {
+      //console.log(userData)
+        try {
+            const accessToken = await getAccessTokenSilently({
+              authorizationParams: {
+                audience: "https://lcs-api.herokuapp.com/",
+                scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
+              },
+            });
+            //console.log(accessToken)
+            //console.log(userData)
+            const data = await getStudentExamplesFromBackend(accessToken, activeStudent.recordId)
+            .then((result) => {
+              console.log(result)
+              setActiveStudentExamplesTable(result)
+            });
+        }   catch (e) {
+            console.log(e.message);
+        }
+      }
+    }
+  }
+
+  function makeStudentSelector () {
+    if (roles.includes('admin')){
+      const studentSelector = [<option key = {0} name = {'0'} value = {undefined}> – None Selected –</option>]
+      studentList.forEach((student) => {
+        studentSelector.push(<option key = {student.recordId} name={student.name} value = {student.recordId}>{student.name} ({student.emailAddress})</option>)
+      })
+      function studentSelectorSortFunction (a,b){
+        const aName = a.props.name
+        const bName = b.props.name
+        if (aName > bName) {
+          return 1
+        } else {
+          return -1
+        }
+
+      }
+      studentSelector.sort(studentSelectorSortFunction)
+      return studentSelector
+    }
+  }
+
   function makeCourseSelector () {
-    if (!activeStudent){
+    if (!activeStudent.recordId){
       const courseSelector = [<option key = {-1} >–Choose Course–</option>]
       programTable.forEach((item)=> {
         courseSelector.push(<option key = {item.recordId} value = {item.recordId}> {item.name}</option>)
@@ -78,7 +143,7 @@ export default function ExampleRetriever({roles, user}) {
   }
 
   function makeLessonSelector () {
-    if (!roles.includes('admin')){
+    if (activeStudent.recordId){
       const lessonSelector = []
       const studentCohort = activeStudent.cohort
       const cohortFieldName = `cohort${studentCohort}CurrentLesson`
@@ -120,7 +185,6 @@ export default function ExampleRetriever({roles, user}) {
 
   function removeVocabFromRequiredVocab (vocabNumber) {
     const newRequiredVocab = requiredVocab.filter((item) => item.recordId!==vocabNumber)
-    console.log(newRequiredVocab)
     setRequiredVocab(newRequiredVocab)
   }
   
@@ -223,6 +287,12 @@ export default function ExampleRetriever({roles, user}) {
               //console.log(userData)
               const data = await createStudentExample(accessToken, activeStudent.recordId, recordId)
               .then((result) => {
+                console.log(result)
+                if (result===1) {
+                  updateBannerMessage('Flashcard Added!')
+                } else {
+                  updateBannerMessage('Failed to add Flashcard')
+                }
                 //console.log(result)
               });
           }   catch (e) {
@@ -259,7 +329,7 @@ export default function ExampleRetriever({roles, user}) {
         <div className='exampleCardEnglishText'>
           <h4>{item.englishTranslation}</h4>
         </div>
-        {(activeStudent && <button value = {item.recordId} onClick = {(e) => addToMyFlashcards(e.target.value)}>Add</button>)}
+        {(activeStudent.recordId && <button value = {item.recordId} onClick = {(e) => addToMyFlashcards(e.target.value)}>Add</button>)}
       </div>)
     })
     return tableToDisplay
@@ -395,7 +465,6 @@ export default function ExampleRetriever({roles, user}) {
   }
 
   async function parseCourseLessons(courses) {
-    console.log(courses)
     const lessonTable = await getLessons()
     console.log('parsing lessons')
     function parseLessonsByVocab () {
@@ -495,6 +564,8 @@ export default function ExampleRetriever({roles, user}) {
         // retrieving the table data
         if (roles.includes('admin')){
           const studentListPromise = await getStudentList()
+          //console.log(studentListPromise)
+          setStudentList(studentListPromise[0])
         }
         const programPromise = await getPrograms()
         const vocabPromise = await getVocab()
@@ -512,20 +583,48 @@ export default function ExampleRetriever({roles, user}) {
   }, [])
 
   useEffect(() => {
-    if (!isLoaded) {
-      if(vocabularyTable[0] && exampleTable[0] && programTable[0]) {
-        setIsLoaded(true)
-        if (activeStudent) {
-          const activeCourse = programTable.find((item) => (activeStudent.relatedProgram === item.recordId))
-          updateActiveCourse(activeCourse.recordId)
-        }
-        makeExamplesTable()
-        //console.log(programTable)
-      } else {
-        setIsLoaded(false)
+    //console.log(activeStudent)
+    if (activeStudent.recordId) {
+      console.log('updating table with long name')
+      if (isLoaded) {
+        const studentCourse = activeStudent.relatedProgram
+        updateActiveCourse(studentCourse)
       }
+      updateActiveStudentExamplesTable()
     }
-  }, [vocabularyTable, exampleTable, programTable])
+    setChoosingStudent(false)
+  }, [activeStudent])
+
+  useEffect(() => {
+    if (!isLoaded) {
+      if (roles.includes('admin')) {
+        if(vocabularyTable[0] && exampleTable[0] && programTable[0] && studentList[0]) {
+          setIsLoaded(true)
+          console.log(studentList)
+          if (activeStudent.recordId) {
+            const activeCourse = programTable.find((item) => (activeStudent.relatedProgram === item.recordId))
+            updateActiveCourse(activeCourse.recordId)
+          }
+          makeExamplesTable()
+          //console.log(programTable)
+        } else {
+          setIsLoaded(false)
+        }
+      } else {
+        if(vocabularyTable[0] && exampleTable[0] && programTable[0]) {
+          setIsLoaded(true)
+          if (activeStudent.recordId) {
+            const activeCourse = programTable.find((item) => (activeStudent.relatedProgram === item.recordId))
+            updateActiveCourse(activeCourse.recordId)
+          }
+          makeExamplesTable()
+          //console.log(programTable)
+        } else {
+          setIsLoaded(false)
+        }
+      } 
+    }
+  }, [vocabularyTable, exampleTable, programTable, studentList])
 
   useEffect(() => {
     if(vocabularyTable[1]){
@@ -536,7 +635,7 @@ export default function ExampleRetriever({roles, user}) {
 
   useEffect(() => {
     makeExamplesTable()
-  }, [selectedCourse, selectedLesson,requiredVocab,noSpanglish,shuffleSentences])
+  }, [selectedCourse, selectedLesson,requiredVocab,noSpanglish])
 
   return(
     <div className='flashcardFinder'>
@@ -549,6 +648,10 @@ export default function ExampleRetriever({roles, user}) {
       {(isLoaded)&&(<div>
       <div className = 'flashcardFinderHeader'>
         <h2>Flashcard Finder</h2>
+        {roles.includes('admin') && !choosingStudent && <div className='buttonBox'>
+                {activeStudent.recordId && <button onClick={changeStudent}>Editing: {activeStudent.name} ({activeStudent.emailAddress})</button>}
+                {!activeStudent.recordId && <button onClick={changeStudent}>Choose Student</button>}
+            </div>}
         <div className='filterSection'>
           <div className='removeSpanglishBox'>
             <h3>Spanglish</h3>
@@ -556,18 +659,24 @@ export default function ExampleRetriever({roles, user}) {
             {(noSpanglish) && (<button style={{backgroundColor: 'darkred'}} onClick={toggleSpanglish}>Excluded</button>)}
           </div>
           <div className='lessonFilter'>
-            <h3>Search By lesson</h3>
-            <form onSubmit={(e) => (e.preventDefault)}>
-              <select className='courseList' value = {selectedCourse?selectedCourse.recordId:''} onChange={(e) => updateActiveCourse(e.target.value)}>
+            {roles.includes('admin') && choosingStudent && <form onSubmit={(e) => (e.preventDefault)}>
+              <h3>Change Student</h3>
+              <select className='studentList' value = {activeStudent?activeStudent.recordId:{}} onChange={(e) => updateActiveStudent(e.target.value)}>
+                {makeStudentSelector()}
+              </select>
+              <div className='buttonBox'>
+                <button onClick={keepStudent}>Select Student</button>
+              </div>
+            </form>}
+            {!choosingStudent && <form onSubmit={(e) => (e.preventDefault)}>
+              <h3>Search By lesson</h3>
+              <select className='courseList' value = {selectedCourse?selectedCourse.recordId:2} onChange={(e) => updateActiveCourse(e.target.value)}>
                 {makeCourseSelector()}
               </select>
               {(selectedCourse.lessons) && (<select className='lessonList' value = {selectedLesson?selectedLesson.lesson:''} onChange={(e) => updateActiveLesson(e.target.value)}>
                 {makeLessonSelector()}
               </select>)}
-            </form>
-            {/*(roles.includes('admin') && <div className='buttonBox'>
-                <button>Change Student</button>
-            </div>)*/}
+            </form>}
           </div>
           <div className='wordFilter'>
             <h3>Search By Word</h3>

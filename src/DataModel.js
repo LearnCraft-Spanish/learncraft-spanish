@@ -4,7 +4,7 @@ export const qb = { // quickbaseTablesInfo
     studentExamples: {
         name: 'student-examples',
         id: 'br3juud42',
-        fields: ['Record ID#', 'Last Reviewed Date', 'Next Review Date', 'Review Interval', 'Related Student', 'Related example', 'Date Created']
+        fields: ['Record ID#', 'Last Reviewed Date', 'Next Review Date', 'Review Interval', 'Related Student', 'Related example', 'Date Created', 'Student - Email address']
     },
     students: {
         name: 'students',

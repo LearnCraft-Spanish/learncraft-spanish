@@ -114,6 +114,27 @@ export async function getAllUsersFromBackend(token) {
     return tableFromBackend;
 }
 
+export async function getStudentExamplesFromBackend(token, studentId) {
+    let fetchUrl = `${backendUrl}${studentId}/student-examples`
+    //console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = [res];
+                //console.log(data);
+                return data;
+            }) 
+        } else if (res.status === '403') {
+            console.log ('unauthorized')
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend;
+}
+
 export async function getUserDataFromBackend(token) {
     let fetchUrl = `${backendUrl}my-data`
     //console.log(`Fetching ${fetchUrl}`)
