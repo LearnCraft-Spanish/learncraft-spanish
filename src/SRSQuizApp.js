@@ -257,8 +257,8 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
                 </div>
                 <div className='quizControls'>
                     <div className='buttonBox'>
-                        <button className = 'hardButton' style = {{display: (languageShowing==='spanish' && difficultySettable)?'block':'none'}} onClick={increaseDifficulty} >This was hard</button>
-                        <button className = 'easyButton' style = {{display: (languageShowing==='spanish' && difficultySettable)?'block':'none'}} onClick={decreaseDifficulty}>This was easy</button>
+                        <button className = 'redButton' style = {{display: (languageShowing==='spanish' && difficultySettable)?'block':'none'}} onClick={increaseDifficulty} >This was hard</button>
+                        <button className = 'greenButton' style = {{display: (languageShowing==='spanish' && difficultySettable)?'block':'none'}} onClick={decreaseDifficulty}>This was easy</button>
                         <button className = 'hardBanner' style = {{display: (!difficultySettable && currentExample.difficulty === 'hard')?'block':'none'}} >Labeled: Hard</button>
                         <button className = 'easyBanner' style = {{display: (!difficultySettable && currentExample.difficulty ==='easy')?'block':'none'}} >Labeled: Easy</button>
                     </div>

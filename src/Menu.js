@@ -33,6 +33,9 @@ export default function Menu({updateExamplesTable, roles, examplesTable, userDat
               <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
               <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
             </div>)}
+            {roles.includes('student') && <div className='buttonBox'>
+              <Link className= 'linkButton' to = '/audioquiz'>Comprehension Quiz</Link>
+            </div>}
             <div className='buttonBox'>
               <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>
             </div>

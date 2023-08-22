@@ -3,7 +3,7 @@ import React from 'react';
 import { Route, Routes, Link, useParams } from "react-router-dom";
 import { useEffect, useState } from 'react';
 //import jsonwebtoken from 'jsonwebtoken';
-import { getUserDataFromBackend, getMyStudentExamplesFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
+import { getUserDataFromBackend, getLessonsFromBackend, getProgramsFromBackend, getMyStudentExamplesFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
 import ExampleRetriever from './ExampleRetriever';
 import Menu from './Menu';
 import SimpleQuizApp from './SimpleQuizApp';
@@ -16,6 +16,7 @@ import NotFoundPage from './NotFoundPage';
 import { useAuth0 } from '@auth0/auth0-react';
 import OfficialQuiz from './OfficialQuiz';
 import CourseQuizzes from './CourseQuizzes'
+import AuidoQuiz from './AudioQuiz';
 require('dotenv').config()
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
   const [qbUserData, setQbUserData]= useState({})
   const [studentExamplesTable, setStudentExamplesTable] = useState([])
   const [examplesTable, setExamplesTable] = useState([])
+  const [programTable, setProgramTable] = useState([])
   const [userLoadingComplete, setUserLoadingComplete] = useState(false)
   const [bannerMessage, setBannerMessage] = useState('')
   const [roles, setRoles] = useState([])
@@ -104,6 +106,95 @@ function App() {
     setBannerMessage(message)
   }
 
+  async function getLessons () {
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const lessons = await getLessonsFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result;
+        return usefulData
+      });
+      //console.log(lessons) 
+      return lessons
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
+  async function parseCourseLessons(courses) {
+    const lessonTable = await getLessons()
+    console.log('parsing lessons')
+    function parseLessonsByVocab () {
+      courses.forEach((course) => {
+          const combinedVocabulary = []
+          const lessonSortFunction = (a, b) => {
+            function findNumber (stringLesson) {
+              const lessonArray = stringLesson.split(' ')
+              const lessonNumber = lessonArray.slice(-1)
+              const lessonNumberInt = parseInt(lessonNumber)
+              return lessonNumberInt
+            }
+            return findNumber(a)-findNumber(b)
+          }
+          course.lessons.sort(lessonSortFunction)
+          //console.log(lessonTable)
+          const parsedLessonArray = []
+          
+          course.lessons.forEach((lesson) => {
+            const lessonTableItem = lessonTable.find((item) => (item.lesson === lesson))
+            //console.log(lessonTableItem)
+            parsedLessonArray.push(lessonTableItem)
+          })
+          course.lessons = parsedLessonArray
+          course.lessons.forEach((lesson) => {
+            lesson.vocabIncluded.forEach((word) => {
+              if (!combinedVocabulary.includes(word)) {
+                combinedVocabulary.push(word)
+              }
+            })
+            lesson.vocabKnown=[...combinedVocabulary]
+          })
+          //console.log(lessonsParsedByVocab[courseIndex])
+      })
+      return courses
+    }
+    const parsedLessons = parseLessonsByVocab(programTable)
+    return parsedLessons
+  }
+
+  async function getPrograms () {
+    console.log('getting Programs')
+    try {
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: "https://lcs-api.herokuapp.com/",
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const programs = await getProgramsFromBackend(accessToken)
+      .then((result) => {
+        //console.log(result)
+        const usefulData = result;
+        return usefulData
+      });
+      //console.log(examples)
+      const parsedPrograms = await parseCourseLessons(programs)
+      console.log(parsedPrograms)
+      setProgramTable(parsedPrograms)
+      return parsedPrograms
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
   const updateExamplesTable= async () => {
       if (roles.includes('student')){
       console.log('resetting tables')
@@ -142,17 +233,18 @@ function App() {
     if (isAuthenticated) {
       console.log('user setup')
       userSetup()
+      getPrograms()
     }
   }, [isAuthenticated])
 
   useEffect(() => {
-    if (roles.includes('student')){
+    if (roles.includes('student') && programTable[0]){
       console.log('setting first tables')
       updateExamplesTable()
-    } else if (rendered) {
+    } else if (rendered && programTable[0]) {
       setUserLoadingComplete (true)
     }
-  }, [roles])
+  }, [roles, programTable])
 
   useEffect(()=>{
     if (roles.includes('student') && rendered){
@@ -201,7 +293,8 @@ function App() {
           <Route exact path="/allflashcards" element={roles.includes('student') &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
           <Route exact path="/todaysflashcards" element={roles.includes('student') && <SRSQuizApp updateExamplesTable = {updateExamplesTable} studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} />} />
           <Route exact path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} userData={qbUserData}/>} />
-          <Route exact path="/flashcardfinder" element={(roles.includes('admin')||roles.includes('student')) && <ExampleRetriever roles = {roles} user = {qbUserData||{}} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage}/>} />
+          <Route exact path="/flashcardfinder" element={(roles.includes('admin')||roles.includes('student')) && <ExampleRetriever roles = {roles} user = {qbUserData||{}} programTable= {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage}/>} />
+          <Route exact path="/audioquiz" element={roles.includes('student') && <AuidoQuiz roles = {roles} user = {qbUserData||{}} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage}/>} />
           <Route exact path="/callback" element={<CallbackPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>)

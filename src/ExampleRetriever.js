@@ -4,7 +4,7 @@ import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-export default function ExampleRetriever({roles, user, studentExamplesTable, updateBannerMessage}) {
+export default function ExampleRetriever({roles, user, programTable, studentExamplesTable, updateBannerMessage}) {
   const {getAccessTokenSilently} = useAuth0();
   const [isLoaded, setIsLoaded] = useState(false)
   const [activeStudentExamplesTable, setActiveStudentExamplesTable] = useState([])
@@ -13,7 +13,6 @@ export default function ExampleRetriever({roles, user, studentExamplesTable, upd
   const [activeStudent, setActiveStudent] = useState(user||{})
   const [selectedCourse, setSelectedCourse] = useState({})
   const [selectedLesson, setSelectedLesson] = useState({})
-  const [programTable, setProgramTable] = useState([])
   const [exampleTable, setExampleTable] = useState([])
   const [vocabularyTable, setVocabularyTable] = useState([])
   const [suggestedVocab, setSuggestedVocab] = useState([])
@@ -44,29 +43,28 @@ export default function ExampleRetriever({roles, user, studentExamplesTable, upd
   function updateActiveCourse (id) {
     console.log(id)
     //console.log(name)
-    const chosenCourse = programTable.find(item=> item.recordId === parseInt(id))
+    const chosenCourse = programTable.find(item=> item.recordId === parseInt(id))||{}
     console.log(programTable)
     console.log(chosenCourse)
-    const course = chosenCourse
     //console.log(course)
-    setSelectedCourse(course)
+    setSelectedCourse(chosenCourse)
     //console.log(course.lessons)
-    let lastLesson = 0
+    let lastLesson = {}
     if (activeStudent.recordId) {
       const studentCohort = activeStudent.cohort
       const cohortFieldName = `cohort${studentCohort}CurrentLesson`
-      const currentLessonNumber = course[cohortFieldName].toString()
+      const currentLessonNumber = chosenCourse[cohortFieldName].toString()
       console.log(currentLessonNumber)
-      lastLesson = course.lessons.find(item => {
+      lastLesson = chosenCourse.lessons.find(item => {
         const itemArray = item.lesson.split(' ')
         const itemString = itemArray.slice(-1)[0]
         const solution = (itemString === currentLessonNumber)
         return (solution)
       })
-    } else {
-      const lastIndex = course.lessons.length -1
+    } else if (chosenCourse.name) {
+      const lastIndex = chosenCourse.lessons.length -1
       console.log(lastIndex)
-      lastLesson = course.lessons[lastIndex]
+      lastLesson = chosenCourse.lessons[lastIndex]
     }
     //console.log(lastLesson)
     setSelectedLesson(lastLesson||{})
@@ -442,93 +440,6 @@ export default function ExampleRetriever({roles, user, studentExamplesTable, upd
     }
   }
 
-  async function getLessons () {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
-          scope: "openID email profile",
-        },
-      });
-      //console.log(accessToken)
-      const lessons = await getLessonsFromBackend(accessToken)
-      .then((result) => {
-        //console.log(result)
-        const usefulData = result;
-        return usefulData
-      });
-      //console.log(lessons) 
-      return lessons
-    } catch (e) {
-        console.log(e.message);
-    }
-  }
-
-  async function parseCourseLessons(courses) {
-    const lessonTable = await getLessons()
-    console.log('parsing lessons')
-    function parseLessonsByVocab () {
-      courses.forEach((course) => {
-          const combinedVocabulary = []
-          const lessonSortFunction = (a, b) => {
-            function findNumber (stringLesson) {
-              const lessonArray = stringLesson.split(' ')
-              const lessonNumber = lessonArray.slice(-1)
-              const lessonNumberInt = parseInt(lessonNumber)
-              return lessonNumberInt
-            }
-            return findNumber(a)-findNumber(b)
-          }
-          course.lessons.sort(lessonSortFunction)
-          //console.log(lessonTable)
-          const parsedLessonArray = []
-          
-          course.lessons.forEach((lesson) => {
-            const lessonTableItem = lessonTable.find((item) => (item.lesson === lesson))
-            //console.log(lessonTableItem)
-            parsedLessonArray.push(lessonTableItem)
-          })
-          course.lessons = parsedLessonArray
-          course.lessons.forEach((lesson) => {
-            lesson.vocabIncluded.forEach((word) => {
-              if (!combinedVocabulary.includes(word)) {
-                combinedVocabulary.push(word)
-              }
-            })
-            lesson.vocabKnown=[...combinedVocabulary]
-          })
-          //console.log(lessonsParsedByVocab[courseIndex])
-      })
-      return courses
-    }
-    const parsedLessons = parseLessonsByVocab(programTable)
-    return parsedLessons
-  }
-
-  async function getPrograms () {
-    console.log('getting Programs')
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
-          scope: "openID email profile",
-        },
-      });
-      //console.log(accessToken)
-      const programs = await getProgramsFromBackend(accessToken)
-      .then((result) => {
-        //console.log(result)
-        const usefulData = result;
-        return usefulData
-      });
-      //console.log(examples)
-      const parsedPrograms = parseCourseLessons(programs)
-      return parsedPrograms
-    } catch (e) {
-        console.log(e.message);
-    }
-  }
-
   async function getStudentList () {
     console.log('getting Student List')
     try {
@@ -567,12 +478,10 @@ export default function ExampleRetriever({roles, user, studentExamplesTable, upd
           //console.log(studentListPromise)
           setStudentList(studentListPromise[0])
         }
-        const programPromise = await getPrograms()
         const vocabPromise = await getVocab()
         const examplePromise = await getExamples()
         setVocabularyTable(await vocabPromise)
         setExampleTable(await examplePromise)
-        setProgramTable(await programPromise)
       };
       getData()
       //console.log('data fetched')

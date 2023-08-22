@@ -67,6 +67,22 @@ export async function getExamplesFromBackend(token) {
     return tableFromBackend; 
 }
 
+export async function getAudioExamplesFromBackend(token) {
+    let fetchUrl = `${backendUrl}public/audio-examples`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+
 export async function getLcspQuizzesFromBackend(token) {
     let fetchUrl = `${backendUrl}public/allQuizExamples`
     //console.log(`Fetching ${fetchUrl}`)
