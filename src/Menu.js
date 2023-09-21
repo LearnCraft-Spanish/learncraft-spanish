@@ -53,7 +53,7 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
               <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
               <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
             </div>)}
-            {audioQuiz === 'Yes' && <div className='buttonBox'>
+            {(audioQuiz === 'Yes' ||roles.includes('admin'))&& <div className='buttonBox'>
               <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
             </div>}
             <div className='buttonBox'>

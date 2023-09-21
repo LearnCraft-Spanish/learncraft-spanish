@@ -334,7 +334,10 @@ function App() {
     if (roles.includes('admin')){
       const studentSelector = [<option key = {0} name = {''} > – None Selected –</option>]
       studentList.forEach((student) => {
-        studentSelector.push(<option key = {student.recordId} name={student.name||"zzz"} value = {student.recordId}>{student.name} ({student.emailAddress})</option>)
+        const studentEmail = student.emailAddress
+        if (!studentEmail.includes("(")){
+          studentSelector.push(<option key = {student.recordId} name={student.name||"zzz"} value = {student.recordId}>{student.name} ({student.emailAddress})</option>)
+        }
       })
       function studentSelectorSortFunction (a,b){
         const aName = a.props.name
