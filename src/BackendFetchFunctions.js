@@ -130,11 +130,11 @@ export async function getAllUsersFromBackend(token) {
     return tableFromBackend;
 }
 
-export async function getStudentExamplesFromBackend(token, studentId) {
+export async function getActiveStudentExamplesFromBackend(token, studentId, studentEmail) {
     let fetchUrl = `${backendUrl}${studentId}/student-examples`
     //console.log(`Fetching ${fetchUrl}`)
 
-    const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`}})
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`, EmailAddress: studentEmail}})
     .then((res) => {
         if(res.ok){
             return res.json().then((res) => {
@@ -148,8 +148,31 @@ export async function getStudentExamplesFromBackend(token, studentId) {
     })
     .catch(err => console.log(err))
     
-    return tableFromBackend;
+    return tableFromBackend[0];
 }
+
+export async function getActiveExamplesFromBackend(token, studentId, studentEmail) {
+    let fetchUrl = `${backendUrl}${studentId}/examples`
+    //console.log(`Fetching ${fetchUrl}`)
+
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`, EmailAddress: studentEmail}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = [res];
+                //console.log(data);
+                return data;
+            }) 
+        } else if (res.status === '403') {
+            console.log ('unauthorized')
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return tableFromBackend[0];
+}
+
+
 
 export async function getUserDataFromBackend(token) {
     let fetchUrl = `${backendUrl}my-data`
@@ -221,8 +244,8 @@ export async function getMyExamplesFromBackend(token) {
     return tableFromBackend;
 }
 
-export async function createStudentExample(token, studentId, exampleId) {
-    const headers = {Authorization: `Bearer ${token}`, studentid: studentId, exampleid: exampleId}
+export async function createMyStudentExample(token, exampleId) {
+    const headers = {Authorization: `Bearer ${token}`, exampleid: exampleId}
     //console.log(headers)
     let fetchUrl = `${backendUrl}create-my-student-example`
     //console.log(`Fetching ${fetchUrl}`)
@@ -240,8 +263,27 @@ export async function createStudentExample(token, studentId, exampleId) {
     return messageFromBackend;
 }
 
-export async function updateStudentExample(token, updateId, reviewDate, newInterval) {
-    const headers = {Authorization: `Bearer ${token}`, updateId: updateId, reviewDate: reviewDate, newInterval: newInterval}
+export async function createStudentExample(token, studentId, exampleId) {
+    const headers = {Authorization: `Bearer ${token}`, studentid: studentId, exampleid: exampleId}
+    //console.log(headers)
+    let fetchUrl = `${backendUrl}create-student-example`
+    //console.log(`Fetching ${fetchUrl}`)
+    const messageFromBackend = await fetch(fetchUrl,{method:'POST', headers: headers})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return messageFromBackend;
+}
+
+export async function updateMyStudentExample(token, updateId, newInterval) {
+    const headers = {Authorization: `Bearer ${token}`, updateId: updateId, newInterval: newInterval}
     //console.log(headers)
     let fetchUrl = `${backendUrl}update-my-student-example`
     //console.log(`Fetching ${fetchUrl}`)
@@ -259,7 +301,26 @@ export async function updateStudentExample(token, updateId, reviewDate, newInter
     return messageFromBackend;
 }
 
-export async function deleteStudentExample(token, recordId) {
+export async function updateStudentExample(token, updateId, newInterval) {
+    const headers = {Authorization: `Bearer ${token}`, updateId: updateId, newInterval: newInterval}
+    //console.log(headers)
+    let fetchUrl = `${backendUrl}update-student-example`
+    //console.log(`Fetching ${fetchUrl}`)
+    const messageFromBackend = await fetch(fetchUrl,{method:'POST', headers: headers})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return messageFromBackend;
+}
+
+export async function deleteMyStudentExample(token, recordId) {
     const headers = {Authorization: `Bearer ${token}`, deleteid: recordId}
     //console.log(headers)
     let fetchUrl = `${backendUrl}delete-my-student-example`
@@ -268,6 +329,27 @@ export async function deleteStudentExample(token, recordId) {
     .then((res) => {
         if(res.ok){
             return res.json().then((res) => {
+                console.log(res)
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    
+    return messageFromBackend;
+}
+
+export async function deleteStudentExample(token, recordId) {
+    const headers = {Authorization: `Bearer ${token}`, deleteid: recordId}
+    //console.log(headers)
+    let fetchUrl = `${backendUrl}delete-student-example`
+    //console.log(`Fetching ${fetchUrl}`)
+    const messageFromBackend = await fetch(fetchUrl,{method:'DELETE', headers: headers})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                console.log(res)
                 const data = res;
                 return data;
             }) 

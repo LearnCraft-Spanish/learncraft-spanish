@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { qb } from './DataModel';
 import { Link, redirect, useNavigate, Navigate, useParams, useOutletContext } from 'react-router-dom';
 import { updateStudentExample, createStudentExample} from './BackendFetchFunctions';
 import './App.css';
@@ -8,7 +7,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import MenuButton from './MenuButton';
 
 export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow, setQuizCourse, setChosenQuiz, makeQuizSelections, userData, dataLoaded, updateExamplesTable,
-    chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples}) {
+    chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples, addFlashcard}) {
         const thisQuiz = useParams().number
 
         const {getAccessTokenSilently} = useAuth0();
@@ -128,28 +127,11 @@ export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow,
         }
 
         async function addToExamples (recordId) {
+            const newExampleSet = [...examplesToReview]
             const currentExample = examplesToReview.find(example => (example.recordId === recordId));
             currentExample.isKnown = true;
             incrementExample()
-            if (typeof(userData.recordId)==='number') {
-                //console.log(userData)
-                try {
-                    const accessToken = await getAccessTokenSilently({
-                    authorizationParams: {
-                        audience: "https://lcs-api.herokuapp.com/",
-                        scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
-                    },
-                    });
-                    //console.log(accessToken)
-                    //console.log(userData)
-                    const data = await createStudentExample(accessToken, userData.recordId, recordId)
-                    .then((result) => {
-                    //console.log(result)
-                    });
-                }   catch (e) {
-                    console.log(e.message);
-                }
-            }
+            addFlashcard(recordId)
         }
 
         useEffect (() => {

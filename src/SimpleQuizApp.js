@@ -10,7 +10,7 @@ import MenuButton from './MenuButton';
 
 
 
-export default function SimpleQuizApp({updateExamplesTable, studentID, studentName, examplesTable, studentExamplesTable}) {
+export default function SimpleQuizApp({updateExamplesTable, activeStudent, studentName, examplesTable, studentExamplesTable, removeFlashcard}) {
     const {getAccessTokenSilently} = useAuth0()
     const [quizReady,setQuizReady] = useState(false);
     const [examplesToReview, setExamplesToReview] = useState ([])
@@ -90,39 +90,26 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
     const currentAudioUrl = quizReady && (examplesToReview[currentExampleNumber-1])? examplesToReview[currentExampleNumber-1][whichAudio]:""
 
     async function deleteFlashcard (exampleRecordId) {
-        const getStudentExampleRecordId = () => {
-            const relatedStudentExample = studentExamplesTable.find(element => (element.relatedExample
-                ===exampleRecordId));
-            return relatedStudentExample.recordId;
-        }
-        const updatedReviewList = [...examplesToReview]
-        updatedReviewList.splice(currentExampleNumber-1,1)
-        setExamplesToReview(updatedReviewList)
-        if(currentExampleNumber>updatedReviewList.length) {
-            setCurrentExampleNumber(updatedReviewList.length)
-        }
-        setLanguageShowing('english')
-        const studentExampleRecordId = getStudentExampleRecordId(exampleRecordId)
-        try {
-            const accessToken = await getAccessTokenSilently({
-              authorizationParams: {
-                audience: "https://lcs-api.herokuapp.com/",
-                scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
-              },
-            });
-            //console.log(accessToken)
-            const data = await deleteStudentExample(accessToken, studentExampleRecordId)
-            .then((result) => {
-              //console.log(result)
-            });
-        }   catch (e) {
-            console.log(e.message);
-        }
+        const wasFlashcardRemoved = removeFlashcard(exampleRecordId).then(
+            (numberRemoved) => {
+                console.log(numberRemoved)
+                if (numberRemoved===1) {
+                    const updatedReviewList = [...examplesToReview]
+                    const removedExample = examplesToReview.find(item => item.recordId ===exampleRecordId)
+                    const removedExampleIndex = examplesToReview.indexOf(removedExample)
+                    updatedReviewList.splice(removedExampleIndex,1)
+                    setExamplesToReview(updatedReviewList)
+                    if(currentExampleNumber>updatedReviewList.length) {
+                        setCurrentExampleNumber(updatedReviewList.length)
+                    }
+                    setLanguageShowing('english')
+                }
+            })
+        return wasFlashcardRemoved
     }
     
 
-return (
-    (studentID !== 'Loading ID') && (
+return (activeStudent.recordId && (
     <div className='quizInterface'>
         {/* Student Selector */}
         <div style = {{display:quizReady?'none':'flex', justifyContent: 'space-around'}}>

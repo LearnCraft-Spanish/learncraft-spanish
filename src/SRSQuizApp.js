@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { qb } from './DataModel';
 import { Link, redirect, useNavigate, Navigate } from 'react-router-dom';
-import { updateStudentExample, deleteStudentExample } from './BackendFetchFunctions';
+import { updateStudentExample, updateMyStudentExample, deleteStudentExample } from './BackendFetchFunctions';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
@@ -10,9 +10,9 @@ import MenuButton from './MenuButton';
 
 
 
-export default function SimpleQuizApp({updateExamplesTable, studentID, studentName, examplesTable, studentExamplesTable}) {
+export default function SRSQuizApp({updateExamplesTable, flashcardDataComplete, roles, activeStudent, activeProgram, activeLesson, examplesTable, studentExamplesTable, removeFlashcard}) {
     const quizLength = 20;
-    const {user, isAuthorized, getAccessTokenSilently} = useAuth0();
+    const {getAccessTokenSilently} = useAuth0();
     //const [studentExamplesTable, setStudentExamplesTable] = useState([])
     //const [examplesTable, setExamplesTable] = useState([])
     const [quizReady,setQuizReady] = useState(false);
@@ -77,10 +77,19 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
               },
             });
             //console.log(accessToken)
-            const userData = await updateStudentExample(accessToken, exampleId, today, newInterval)
-            .then((result) => {
-              //console.log(result)
-            });
+            if (roles.includes('admin')){
+                const userData = await updateStudentExample(accessToken, exampleId, newInterval)
+                .then((result) => {
+                return result
+                });
+                console.log(userData)
+            } else if (roles.includes('student')){
+                const userData = await updateMyStudentExample(accessToken, exampleId, newInterval)
+                .then((result) => {
+                return result
+                });
+                console.log(userData)
+            }
         }   catch (e) {
             console.log(e.message);
         }
@@ -117,34 +126,22 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
     }
 
     async function deleteFlashcard (exampleRecordId) {
-        const getStudentExampleRecordId = () => {
-            const relatedStudentExample = studentExamplesTable.find(element => (element.relatedExample
-                ===exampleRecordId));
-            return relatedStudentExample.recordId;
-        }
-        const updatedReviewList = [...examplesToReview]
-        updatedReviewList.splice(currentExampleNumber-1,1)
-        setExamplesToReview(updatedReviewList)
-        if(currentExampleNumber>updatedReviewList.length) {
-            setCurrentExampleNumber(updatedReviewList.length)
-        }
-        setLanguageShowing('english')
-        const studentExampleRecordId = getStudentExampleRecordId(exampleRecordId)
-        try {
-            const accessToken = await getAccessTokenSilently({
-              authorizationParams: {
-                audience: "https://lcs-api.herokuapp.com/",
-                scope: "openID email profile",
-              },
-            });
-            //console.log(accessToken)
-            const data = await deleteStudentExample(accessToken, studentExampleRecordId)
-            .then((result) => {
-              //console.log(result)
-            });
-        }   catch (e) {
-            console.log(e.message);
-        }
+        const wasFlashcardRemoved = removeFlashcard(exampleRecordId).then(
+            (numberRemoved) => {
+                console.log(numberRemoved)
+                if (numberRemoved===1) {
+                    const updatedReviewList = [...examplesToReview]
+                    const removedExample = examplesToReview.find(item => item.recordId ===exampleRecordId)
+                    const removedExampleIndex = examplesToReview.indexOf(removedExample)
+                    updatedReviewList.splice(removedExampleIndex,1)
+                    setExamplesToReview(updatedReviewList)
+                    if(currentExampleNumber>updatedReviewList.length) {
+                        setCurrentExampleNumber(updatedReviewList.length)
+                    }
+                    setLanguageShowing('english')
+                }
+            })
+        return wasFlashcardRemoved
     }
 
     const getStudentExampleFromExample = (example) => {
@@ -166,7 +163,7 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
     }
 
     function getDueExamples() {
-        try {const isBeforeToday = (dateArg) => {
+        const isBeforeToday = (dateArg) => {
             const today = new Date()
             //console.log(today)
             const reviewDate = new Date(dateArg)
@@ -180,10 +177,6 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
         const dueExamples = allExamples.filter((example) => isBeforeToday(getDueDateFromExample(example))/*&&(example.spanglish ==='esp')*/)
         //console.log(dueExamples)
         return dueExamples
-        }
-        catch(err){
-            console.log(err)
-        }
     }
 
     function handleSetupQuiz () {
@@ -226,15 +219,19 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
         //console.log(difficultySettable);
     }, [currentExampleNumber])
 
+    useEffect(() => {
+        setQuizReady(false)
+    }, [activeStudent, activeProgram, activeLesson])
+
 
     return (
-        (studentID) && (
+        (activeStudent.recordId) && (
         <div className='quizInterface'>
-            <div style = {{display:quizReady?'none':'flex', justifyContent: 'space-around'}}>
+            {!quizReady && flashcardDataComplete && <div className = 'readyButton'>
                 <button onClick={handleSetupQuiz}>Begin Review</button>
-            </div>
+            </div>}
 
-            {quizReady && examplesToReview.length < 1 && (
+            {quizReady && !examplesToReview[currentExampleNumber] && (
                 <div className='finishedMessage'>
                     <p>Looks like you're all caught up! Come back tomorrow for another review.</p>
                     <div className='buttonBox'>
@@ -244,14 +241,14 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
             )}
         
             {/* Quiz App */}
-            {currentExample && (<div style = {{display:quizReady?'flex':'none'}} className='quiz'>
+            {examplesToReview[currentExampleNumber] && quizReady && (<div className='quiz'>
                 <div className='exampleBox'>
                     <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation' onClick={toggleLanguageShowing}>
                         <p>{currentExample?currentExample.englishTranslation:''}</p>
                     </div>
                     <div style = {{display:(languageShowing==='spanish')?'flex':'none'}} className='spanishExample' onClick={toggleLanguageShowing}>
                         <p>{currentExample?currentExample.spanishExample:''}</p>
-                        <button className = 'removeFlashcardButton' onClick = {() =>deleteFlashcard(currentExample.recordId)}>Remove from My Flashcards</button>
+                        <button className = 'removeFlashcardButton' onClick = {() => deleteFlashcard(currentExample.recordId)}>Remove from My Flashcards</button>
                     </div>
                     <ReactHowler src={(currentAudioUrl==="")?"https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3":currentAudioUrl} playing={playing} />
                 </div>
@@ -276,7 +273,6 @@ export default function SimpleQuizApp({updateExamplesTable, studentID, studentNa
                 </div>
             </div>)}
         </div>
-        
     )
 )
 }

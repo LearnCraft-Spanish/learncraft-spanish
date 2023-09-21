@@ -5,36 +5,56 @@ import { Link, Route, Routes } from "react-router-dom";
 
 
 
-export default function Menu({updateExamplesTable, roles, examplesTable, userData}) {
+export default function Menu({updateExamplesTable, roles, examplesTable, studentExamplesTable, activeStudent, activeLesson, flashcardDataComplete, audioExamplesTable, filterExamplesByAllowedVocab}) {
+  //console.log(examplesTable.length)
+  //console.log(examplesTable)
   const { user, isAuthenticated, isLoading } = useAuth0();
   //console.log(userData)
   //console.log(examplesTable)
 
-  let [rendered, setRendered] = useState(false)
+  const [rendered, setRendered] = useState(false)
+  const [audioQuiz, setAudioQuiz] = useState('')
 
+  function isAudioQuizAvailable () {
+    const allowedAudioExamples = filterExamplesByAllowedVocab(audioExamplesTable, activeLesson.recordId)
+    const numberOfExamplesAvailable = allowedAudioExamples.length
+    if (numberOfExamplesAvailable > 0) {
+      setAudioQuiz('Yes')
+    } else {
+      setAudioQuiz('No')
+    }
+  }
   
   useEffect(() => {
-    console.log('mounting menu')
+    if (!rendered){
       setRendered(true)
+    }
   }, [])
   
   useEffect(() => {
     if (rendered){
+      console.log('resetting for menu mount')
       updateExamplesTable()
     }
   }, [rendered])
 
+  useEffect(() =>{
+    if (audioExamplesTable[0]){
+      isAudioQuizAvailable()
+    }
+  }, [audioExamplesTable, activeLesson])
+
   return (
-    isAuthenticated && (
+    rendered && flashcardDataComplete && audioQuiz && (
     <div className='menu'>
         <div className='menuBox'>
             <h3>Review Options:</h3>
-            {roles.includes('student') && examplesTable.length > 0 && (<div className= 'buttonBox'>
+            {activeStudent.recordId && (studentExamplesTable.length > 0 && examplesTable.length === studentExamplesTable.length) && (<div className= 'buttonBox'>
               <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
               <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
             </div>)}
-            {roles.includes('student') && <div className='buttonBox'>
-              <Link className= 'linkButton' to = '/audioquiz'>Comprehension Quiz</Link>
+            {audioQuiz === 'Yes' && <div className='buttonBox'>
+              <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
             </div>}
             <div className='buttonBox'>
               <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>

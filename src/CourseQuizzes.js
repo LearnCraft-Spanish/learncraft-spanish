@@ -10,7 +10,7 @@ import MenuButton from './MenuButton';
 
 
 export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizReady, makeQuizReady, quizCourse, updateChosenQuiz, makeCourseList, setChosenQuiz, createRoutesFromCourses, updateQuizCourse, makeQuizSelections, userData, dataLoaded, updateExamplesTable,
-    chosenQuiz, hideMenu, makeMenuHidden, makeMenuShow, quizTable, examplesTable, studentExamples}) {
+    chosenQuiz, hideMenu, makeMenuHidden, makeMenuShow, quizTable, examplesTable, studentExamples, addFlashcard}) {
 
         const navigate = useNavigate()
 
@@ -55,7 +55,7 @@ export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizR
                 </div>)}
                 {dataLoaded && quizCourse !== 'lcsp' &&  <Routes>
                     <Route path=':number' element = {<OfficialQuiz  quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} userData = {userData} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
-                    chosenQuiz = {chosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} />}></Route>
+                    chosenQuiz = {chosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} addFlashcard={addFlashcard}/>}></Route>
                 </Routes>}
             </div>
     )}

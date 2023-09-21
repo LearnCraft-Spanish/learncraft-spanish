@@ -50,6 +50,7 @@ h2, h3, h4, h5, h6 {
   background-color: darkgreen;
   border: 1px solid var(--light);
   color: var(--light);
+  z-index: 999;
 }
 
 .bannerMessage p {
@@ -112,6 +113,40 @@ button:hover {
 .div-header button {
   background-color: var(--light);
   color: var(--dark);
+}
+
+.div-user-subheader {
+  padding: 10px 5%;
+  background-color: var(--accent);
+  color: var(--light);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.div-user-subheader button{
+  background-color: var(--light);
+  color: var(--dark);
+  font-size: 12px;
+  padding: 5px 15px;
+  margin: 0px;
+}
+
+.div-user-subheader p {
+  margin: 0px 15px;
+}
+
+.studentList input {
+  max-width: 70%;
+}
+
+.studentList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  margin: 0;
+  justify-content: space-between;
+  padding: 0px;
 }
 
 .menu-buttons {
@@ -185,6 +220,11 @@ button:hover {
 .spanishExample p {
   font-weight: 600;
   font-style: italic;
+}
+
+.readyButton {
+  display: flex;
+  justify-content: space-around;
 }
 
 .quizInterface {
@@ -300,6 +340,10 @@ button:hover {
 
 /* For Audio Quiz */
 
+.comprehensionHeader{
+  margin-bottom: 0px;
+}
+
 .audioBox {
   width: 100%;
   display: flex;
@@ -315,6 +359,7 @@ button:hover {
   width: 65%;
   min-width: 300px;
   min-height:200px;
+  margin: 20px auto;
   background-color: var(--dark);
   color: var(--light);
   text-align: center;
@@ -343,14 +388,23 @@ button:hover {
   padding: 0px 20px;
   display: flex;
   flex-direction: row;
-  flex-grow: 1;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
+  align-content: center;
+}
+
+.filterBox {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  justify-content: space-evenly;
 }
 
 .removeSpanglishBox {
+  text-align: center;
   margin: 0 10px;
-  flex-grow: 1;
+
 }
 
 .lessonFilter {
@@ -358,17 +412,18 @@ button:hover {
   flex-grow: 1;
 }
 
-.wordFilter{
+.wordFilter, .tagFilter{
   text-align: center;
   margin: 0 10px;
   position: relative;
-  flex-grow: 1;
+  flex-grow: 2;
+  max-width: 45%;
 }
 
-.wordSearchBox {
+.wordSearchBox .tagSearchBox{
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  justify-content: end;
   max-width: 450px;
   margin: auto;
 }
@@ -376,24 +431,25 @@ button:hover {
 .searchTermBox {
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
-  height: 30px;
+  flex-wrap: wrap;
   text-align: right;
-  justify-items: flex-end;
+  justify-content: center;
+  align-content: center;
 }
 
 .searchTermBox p, .searchTermBox input {
-  display: block;
   margin: 0 5px;
 }
 
-.vocabSuggestionBox {
+.vocabSuggestionBox, .tagSuggestionBox {
   position: absolute;
-  top: 128px;
+  top: 105px;
   right: 0px;
+  z-index: 999;
 }
 
 .examplesTable {
+  min-height: 1200px;
   padding: 0px;
 }
 
@@ -452,6 +508,30 @@ button:hover {
   margin: 0;
 }
 
+.vocabSmallCard{
+  text-align: left;
+  background-color: #fff;
+  color: #3c3c3c;
+  font-size: 11px;
+  padding: 2px 4px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 auto;
+  border: 2px solid var(--theme);
+}
+
+.vocabSmallCard h4 {
+  font-size: 11px;
+  color: var(--brand);
+  text-align: left;
+  margin-bottom: 0;
+  margin: 5px;
+}
+
+
 .tagCard {
   text-align: left;
   background-color: #fff;
@@ -501,6 +581,15 @@ button:hover {
   align-content: center;
   margin: 2px;
   padding: 5px 15px;
+}
+
+.addButton, .ownedButton {
+  width: 10%;
+  min-width: 120px;
+}
+
+.ownedButton, .ownedButton:hover, .ownedButton:active {
+  background-color: var(--dark);
 }
 
 .exampleCardSpanishText h3 {
