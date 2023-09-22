@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { getVocabFromBackend, getExamplesFromBackend, createStudentExample, createMyStudentExample, getLessonsFromBackend, getProgramsFromBackend, getAllUsersFromBackend} from './BackendFetchFunctions';
+import { getVocabFromBackend, getVerifiedExamplesFromBackend, createStudentExample, createMyStudentExample, getLessonsFromBackend, getProgramsFromBackend, getAllUsersFromBackend} from './BackendFetchFunctions';
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import LessonSelector from './LessonSelector' 
@@ -413,7 +413,7 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
         },
       });
       //console.log(accessToken)
-      const examples = await getExamplesFromBackend(accessToken)
+      const examples = await getVerifiedExamplesFromBackend(accessToken)
       .then((result) => {
         //console.log(result)
         const usefulData = result;
