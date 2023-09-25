@@ -6,7 +6,7 @@ import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
 import MenuButton from './MenuButton';
 
-export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow, setQuizCourse, setChosenQuiz, makeQuizSelections, userData, dataLoaded, updateExamplesTable,
+export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow, setQuizCourse, setChosenQuiz, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
     chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples, addFlashcard}) {
         const thisQuiz = useParams().number
 
@@ -154,7 +154,7 @@ export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow,
                     </div>
                     <div style = {{display:(languageShowing==='spanish')?'flex':'none'}}className='spanishExample' onClick={toggleLanguageShowing}>
                         <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].spanishExample:''}</p>
-                        {userData && (userData.recordId !== undefined && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
+                        {activeStudent && (activeStudent.recordId !== undefined && examplesToReview[currentExampleNumber-1].isKnown === false) && (<button className = 'addFlashcardButton' onClick = {()=>addToExamples(examplesToReview[currentExampleNumber-1].recordId)}>Add to My Flashcards</button>)}
                     </div>
                     {currentAudioUrl && <ReactHowler src={currentAudioUrl} playing={playing} />}
                 </div>)}

@@ -9,7 +9,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import MenuButton from './MenuButton';
 
 
-export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizReady, makeQuizReady, quizCourse, updateChosenQuiz, makeCourseList, setChosenQuiz, createRoutesFromCourses, updateQuizCourse, makeQuizSelections, userData, dataLoaded, updateExamplesTable,
+export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizReady, makeQuizReady, quizCourse, updateChosenQuiz, makeCourseList, setChosenQuiz, createRoutesFromCourses, updateQuizCourse, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
     chosenQuiz, hideMenu, makeMenuHidden, makeMenuShow, quizTable, examplesTable, studentExamples, addFlashcard}) {
 
         const navigate = useNavigate()
@@ -54,7 +54,7 @@ export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizR
                     </div>
                 </div>)}
                 {dataLoaded && quizCourse !== 'lcsp' &&  <Routes>
-                    <Route path=':number' element = {<OfficialQuiz  quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} userData = {userData} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
+                    <Route path=':number' element = {<OfficialQuiz  quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} activeStudent = {activeStudent} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
                     chosenQuiz = {chosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} addFlashcard={addFlashcard}/>}></Route>
                 </Routes>}
             </div>

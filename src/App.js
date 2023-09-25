@@ -285,14 +285,14 @@ function App() {
         const activeStudentExampleData = await getActiveStudentExamplesFromBackend(accessToken, activeStudent.recordId, activeStudent.emailAddress)
         .then((result) => {
           const usefulData = result
-          //console.log(usefulData)
+          console.log(usefulData)
           return usefulData
         });
         setStudentExamplesTable(activeStudentExampleData)
         const activeExampleData = await getActiveExamplesFromBackend(accessToken, activeStudent.recordId, activeStudent.emailAddress)
         .then((result) => {
           const usefulData = result
-          //console.log(usefulData)
+          console.log(usefulData)
           return usefulData
         });
         setExamplesTable(activeExampleData)
@@ -313,14 +313,14 @@ function App() {
         const userStudentExampleData = await getMyStudentExamplesFromBackend(accessToken)
         .then((result) => {
           const usefulData = result
-          //console.log(usefulData)
+          console.log(usefulData)
           return usefulData
         });
         setStudentExamplesTable(userStudentExampleData)
         const userExampleData = await getMyExamplesFromBackend(accessToken)
         .then((result) => {
           const usefulData = result
-          //console.log(usefulData)
+          console.log(usefulData)
           return usefulData
         });
         setExamplesTable(userExampleData)
