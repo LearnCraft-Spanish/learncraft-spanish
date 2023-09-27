@@ -65,6 +65,14 @@ export default function ComprehensionQuiz({roles, programTable, activeStudent, s
         }
       }
 
+      function shuffleExamples (examples) {
+        let shuffled = examples
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
+        return shuffled
+      }
+
     function incrementExample () {
         if (currentExample < examplesToPlay.length-1) {
             const nextExample = currentExample + 1
@@ -113,7 +121,8 @@ export default function ComprehensionQuiz({roles, programTable, activeStudent, s
     function makeComprehensionQuiz () {
         const allowedAudioExamples = filterExamplesByAllowedVocab(audioExamplesTable, selectedLesson.recordId)
         //console.log(allowedAudioExamples)
-        setExamplesToPlay(allowedAudioExamples)
+        const shuffledExamples = shuffleExamples(allowedAudioExamples)
+        setExamplesToPlay(shuffledExamples)
     }
 
     useEffect (() =>{
