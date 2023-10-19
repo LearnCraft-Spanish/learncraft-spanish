@@ -48,10 +48,14 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
     rendered && flashcardDataComplete && audioQuiz && (
     <div className='menu'>
         <div className='menuBox'>
-            {activeStudent.recordId && (studentExamplesTable.length > 0 && examplesTable.length === studentExamplesTable.length) && (<div className= 'buttonBox'>
-              <h3>Review Options:</h3>
+            {activeStudent.recordId && (studentExamplesTable.length > 0 && examplesTable.length === studentExamplesTable.length) && (
+            <div>
+            <h3>Review Options:</h3>
+            <div className= 'buttonBox'>
+              
               <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
               <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
+            </div>
             </div>)}
             <h3>Explore:</h3>
             {(audioQuiz === 'Yes' ||roles.includes('admin'))&& <div className='buttonBox'>
