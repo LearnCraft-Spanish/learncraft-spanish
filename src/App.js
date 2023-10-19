@@ -7,6 +7,7 @@ import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBacke
 import ExampleRetriever from './FlashcardFinder';
 import Menu from './Menu';
 import SimpleQuizApp from './SimpleQuizApp';
+import AudioQuiz from './AudioQuiz';
 import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
 import SRSQuizApp from './SRSQuizApp';
@@ -631,6 +632,7 @@ async function setupAudioExamplesTable () {
           <Route exact path="/todaysflashcards" element={(roles.includes('student')||roles.includes('admin')) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent} activeProgram={activeProgram} activeLesson={activeLesson} roles = {roles} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
           <Route exact path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} activeProgram = {activeProgram} activeLesson={activeLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
           <Route exact path="/flashcardfinder" element={(roles.includes('student')||roles.includes('admin')) && <FlashcardFinder roles = {roles} user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} activeProgram={activeProgram} activeLesson={activeLesson} addToActiveStudentFlashcards={addToActiveStudentFlashcards}/>} />
+          <Route exact path="/audioquiz" element={(roles.includes('student')||roles.includes('admin')) && <AudioQuiz roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram}/>} />
           <Route exact path="/comprehensionquiz" element={(roles.includes('student')||roles.includes('admin')) && <ComprehensionQuiz roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram}/>} />
           <Route exact path="/callback" element={<CallbackPage />} />
           <Route path="*" element={<NotFoundPage />} />

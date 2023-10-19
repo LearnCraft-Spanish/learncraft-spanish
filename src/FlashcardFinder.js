@@ -177,7 +177,7 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
                     }
                   })
                   break
-                case 'infinitive':
+                case 'verb':
                   example.vocabIncluded.forEach(item =>{
                     const word = vocabularyTable.find(element => element.vocabName === item)
                     if (word.verbInfinitive === tag.tag) {
@@ -383,8 +383,8 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
           }
         }
         if (term.verbInfinitive) {
-          const infinitiveTag = {type: 'infinitive', tag: term.verbInfinitive, id: tags.length}
-          if (!tags.find(item => item.type === 'infinitive' && item.tag === term.verbInfinitive)){
+          const infinitiveTag = {type: 'verb', tag: term.verbInfinitive, id: tags.length}
+          if (!tags.find(item => item.type === 'verb' && item.tag === term.verbInfinitive)){
             tags.push(infinitiveTag)
           }
         }

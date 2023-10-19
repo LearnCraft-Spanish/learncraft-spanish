@@ -3,6 +3,7 @@ import { getVocabFromBackend, getAudioExamplesFromBackend, getExamplesFromBacken
 import './App.css';
 import ReactHowler from 'react-howler'
 import MenuButton from './MenuButton';
+import AudioBasedReview from './AudioBasedReview';
 import { useAuth0 } from '@auth0/auth0-react';
 import LessonSelector from './LessonSelector';
 
@@ -172,43 +173,7 @@ export default function ComprehensionQuiz({roles, programTable, activeStudent, s
     return (
         <div className='quiz'>
             <h2 className='comprehensionHeader'>Comprehension Quiz</h2>
-            {!quizReady && <div className='audioBox'>
-                <LessonSelector programTable = {programTable} activeProgram = {activeProgram} activeLesson = {activeLesson} selectedLesson = {selectedLesson} updateSelectedLesson = {updateSelectedLesson} selectedProgram = {selectedProgram} updateSelectedProgram = {updateSelectedProgram} />
-                <div className='buttonBox'>
-                    {examplesToPlay.length>0 && <button onClick={readyQuiz}>Start</button>}
-                    {examplesToPlay.length <1 && <h4>There are no audio examples for this comprehension level</h4>}
-                </div>
-            </div>}
-
-            {quizReady && examplesToPlay.length > 0 && <div>
-                <div className='audioBox'>
-                    <p>Comprehension Level: {selectedLesson.lesson}</p>
-                    <button onClick = {unReadyQuiz}>Change Level</button>
-                    <div className = 'audioExample' onClick={cycle}>
-                        {currentStep===0 && <h3><em>Listen to audio</em></h3>}
-                        {currentStep===1 && <h3>{example.spanishExample}</h3>}
-                        {currentStep===2 && <h3>{example.englishTranslation}</h3>}
-                        <div className='navigateButtons'>
-                            {currentExample>0 && <a className= 'previousButton' onClick={decrementExample}>{'<'}</a>}
-                            {currentExample<examplesToPlay.length && <a className='nextButton' onClick={incrementExample}>{'>'}</a>}
-                        </div>
-                    </div>
-                    {example.spanishAudioLa && <ReactHowler src={example.spanishAudioLa} playing={playing} onEnd = {endPlay}/>}
-                </div>
-                <div className='buttonBox'>
-                    {playing && <button className='hardBanner'>Audio Playing...</button>}
-                    {!playing && <button onClick={setPlaying}>Replay Spanish</button>}
-                    {!playing && currentStep === 0 && <button className='greenButton' onClick={cycle}>Show Spanish</button>}
-                    {!playing && currentStep === 1 && <button className='greenButton' onClick={cycle}>Show English</button>}
-                    {!playing && currentStep === 2 && <button className='greenButton' onClick={incrementExample}>Next</button>}
-                </div>
-                <div className='buttonBox'>
-                    <MenuButton />
-                </div>
-                <div className='progressBar2'>                
-                    <div className='progressBarDescription'>Example {currentExample+1} of {examplesToPlay.length}</div>
-                </div>
-            </div>}
+            <AudioBasedReview roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram} willAutoplay={false} willStartWithSpanish={true}/>
         </div>
     )
 }

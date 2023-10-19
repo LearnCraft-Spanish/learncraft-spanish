@@ -54,6 +54,7 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
               <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
             </div>)}
             {(audioQuiz === 'Yes' ||roles.includes('admin'))&& <div className='buttonBox'>
+              <Link className= 'linkButton' to = '/audioquiz'>Audio Quiz</Link>
               <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
             </div>}
             <div className='buttonBox'>
