@@ -53,6 +53,7 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
               <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
               <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
             </div>)}
+            <h3>Explore:</h3>
             {(audioQuiz === 'Yes' ||roles.includes('admin'))&& <div className='buttonBox'>
               <Link className= 'linkButton' to = '/audioquiz'>Audio Quiz</Link>
               <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
@@ -62,7 +63,6 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
             </div>
         </div>
         {((roles.includes('student')||roles.includes('admin')) && <div className='menuBox'>
-            <h3>Practice Tools:</h3>
             <div className= 'buttonBox'>
                 <Link className = 'linkButton' to='/flashcardfinder'>Find Flashcards</Link>
             </div>
