@@ -238,7 +238,7 @@ function App() {
       });
       //console.log(examples)
       const parsedPrograms = await parseCourseLessons(programs)
-      console.log(parsedPrograms)
+      //console.log(parsedPrograms)
       setProgramTable(parsedPrograms)
       return parsedPrograms
     } catch (e) {
@@ -286,14 +286,14 @@ function App() {
         const activeStudentExampleData = await getActiveStudentExamplesFromBackend(accessToken, activeStudent.recordId, activeStudent.emailAddress)
         .then((result) => {
           const usefulData = result
-          console.log(usefulData)
+          //console.log(usefulData)
           return usefulData
         });
         setStudentExamplesTable(activeStudentExampleData)
         const activeExampleData = await getActiveExamplesFromBackend(accessToken, activeStudent.recordId, activeStudent.emailAddress)
         .then((result) => {
           const usefulData = result
-          console.log(usefulData)
+          //console.log(usefulData)
           return usefulData
         });
         setExamplesTable(activeExampleData)
@@ -552,9 +552,9 @@ async function setupAudioExamplesTable () {
     if (userLoadingComplete && programTable[0] && audioExamplesTable.length > 0){
       console.log(activeStudent.emailAddress)
       if (roles.includes('student')||roles.includes('admin')){
-        setFlashcardDataComplete(false)
+        //setFlashcardDataComplete(false)
         getStudentLevel()
-        updateExamplesTable()
+        //updateExamplesTable()
       }
     }
   }, [activeStudent, programTable, audioExamplesTable])
@@ -578,7 +578,7 @@ async function setupAudioExamplesTable () {
   return (
     <div className="App">
       <div className='div-header'>
-        <Link to='/' onClick={updateExamplesTable}>
+        <Link to='/'>
           <h1> LearnCraft Spanish </h1>
         </Link>
         <LogoutButton />

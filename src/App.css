@@ -376,6 +376,38 @@ button:hover {
   color: var(--light);
 }
 
+.progressBarHolder {
+  position: relative;
+  height: 150px;
+  margin: 10px 0;
+  width: 100%;
+  background-color: var(--dark);
+  color: var(--light);
+}
+
+.progressBarHolder h4 {
+  margin: auto;
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  text-align: center;
+  padding: 60px;
+  color: var(--light);
+  z-index: 5;
+}
+
+.progressStatus {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  background-color: var(--theme);
+  color: var(--light);
+  z-index: 1;
+}
+
 
 /* For Flashcard Finder */
 
@@ -423,7 +455,7 @@ button:hover {
 .wordSearchBox .tagSearchBox{
   display: flex;
   flex-direction: row;
-  justify-content: end;
+  justify-content: flex-end;
   max-width: 450px;
   margin: auto;
 }

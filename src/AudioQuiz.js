@@ -25,7 +25,7 @@ export default function AudioQuiz({roles, programTable, activeStudent, studentEx
 
     useEffect(() => {
         if (audioExamplesTable.length >0){
-            console.log(audioExamplesTable)
+            //console.log(audioExamplesTable)
             const filteredExamples = filterExamplesByEnglishAudio(audioExamplesTable)
             setAudioQuizExamples(filteredExamples)
         }
@@ -33,7 +33,7 @@ export default function AudioQuiz({roles, programTable, activeStudent, studentEx
 
     useEffect(() => {
         if (audioQuizExamples.length > 0) {
-            console.log(audioQuizExamples)
+            //console.log(audioQuizExamples)
             console.log('quiz ready')
             setAudioQuizReady(true)
         }

@@ -10,18 +10,25 @@ import LessonSelector from './LessonSelector';
 export default function AudioBasedReview({roles, programTable, activeStudent, studentExamplesTable, updateBannerMessage, audioExamplesTable, activeLesson, activeProgram, filterExamplesByAllowedVocab, willAutoplay, willStartWithSpanish}) {
     const {getAccessTokenSilently} = useAuth0()
     const [currentExample, setCurrentExample] = useState(0)
-    const [currentStep, setCurrentStep] = useState(0)
+    const [currentStep, setCurrentStep] = useState(1)
+    const [spanishHidden, setSpanishHidden] = useState(true)
     const [autoplay, setAutoplay] = useState(willAutoplay||false)
-    const [inEnglish, setInEnglish] = useState(false)
+    const [guessing, setGuessing] = useState(false)
     const [selectedLesson, setSelectedLesson] = useState(activeLesson)
     const [selectedProgram, setSelectedProgram] = useState(activeProgram)
     const [examplesToPlay, setExamplesToPlay] = useState([])
     const [quizReady, setQuizReady] = useState(false)
     const [startWithSpanish, setStartWithSpanish] = useState(willStartWithSpanish||false)
     const [countdown, setCountdown] = useState(0)
+    const [progressStatus, setProgressStatus] = useState(0)
+    const [answerPlayNumber, setAnswerPlayNumber] = useState(1)
+    const [paused, setPaused] = useState(false)
     const currentQuestion = useRef()
     const currentAnswer = useRef()
-    let rendered = false
+    const currentCountdownLength = useRef()
+    const currentCountdown = useRef(0)
+    const answerPause = useRef(0)
+    const rendered = useRef(false)
     const example = examplesToPlay[currentExample]||{}
 
     function readyQuiz () {
@@ -29,11 +36,103 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
     }
     
     function unReadyQuiz () {
+        setCurrentExample(0)
         setQuizReady(false)
     }
 
+    async function playCurrentQuestion() {
+        if (currentAnswer.current) {
+            currentAnswer.current.pause()
+            currentAnswer.current.currentTime = 0
+        }
+        if (currentQuestion.current){
+            currentQuestion.current.currentTime = 0
+            if (autoplay) {
+                const currentDuration = currentQuestion.current.duration
+                startCountdown(currentDuration)
+            }
+            try {
+                currentQuestion.current.play()
+            } catch (err) {
+            }
+        }
+    }
+
+    async function playCurrentAnswer() {
+        if (currentQuestion.current) {
+            currentQuestion.current.pause()
+            currentQuestion.current.currentTime = 0
+        }
+        if (currentAnswer.current){
+            if (answerPlayNumber === 1){
+                currentAnswer.current.currentTime = 0
+            }
+            try {
+                currentAnswer.current.play()
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    }
+
+    function pausePlayback () {
+        setPaused(true)
+        if (currentAnswer.current) {
+            currentAnswer.current.pause()
+        }
+        if (currentQuestion.current) {
+            currentQuestion.current.pause()
+        }
+        clearTimeout(currentCountdown.current)
+        clearTimeout(answerPause.current)
+    }
+
+    function updateCountdown () {
+        if (countdown > 0 && currentCountdownLength.current > 0) {
+            const newNumber = Math.floor((countdown -0.05)*100)/100
+            setCountdown(newNumber)
+            const progressPercent = (currentCountdownLength.current-newNumber)/currentCountdownLength.current
+            setProgressStatus(progressPercent)
+        } else {
+            setCountdown(0)
+        }
+    }
+
+    function resumePlayback () {
+        if (paused) {
+            setPaused(false)
+        }
+        if (currentStep === 1 && !guessing && currentQuestion.current) {
+            currentQuestion.current.play()
+        } else if (currentStep === 2 && currentAnswer.current) {
+            currentAnswer.current.play()
+        }
+        updateCountdown()
+    }
+
+    function clearCountDown() {
+        clearTimeout(currentCountdown.current)
+        currentCountdownLength.current = 0
+        setCountdown(0)
+    }
+
+    function hideSpanish () {
+        setSpanishHidden(true)
+    }
+
+    function showSpanish () {
+        setSpanishHidden(false)
+    }
+
+    function guess () {
+        setGuessing(true)
+    }
+
+    function endGuess() {
+        setGuessing(false)
+    }
+
     function updateSelectedLesson (lessonId) {
-        console.log(lessonId)
         let newLesson = {}
         programTable.forEach(program =>{
           const foundLesson = program.lessons.find(item => item.recordId === parseInt(lessonId))
@@ -69,6 +168,18 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
         }
       }
 
+      function progressBar () {
+        return(!startWithSpanish && autoplay &&
+        <div className='progressBarHolder'>
+            {currentStep===1 && !guessing && <h4>Playing English</h4>}
+            {currentStep===1 && guessing && <h4>Make a guess!</h4>}
+            {currentStep===2 && <h4>Playing Spanish</h4>}
+            <div className='progressStatus' style={{width: `${progressStatus*100}%`}}>
+            </div>
+        </div>
+        )
+      }
+
       function shuffleExamples (examples) {
         let shuffled = examples
         .map(value => ({ value, sort: Math.random() }))
@@ -88,7 +199,7 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
         } else {
             setCurrentExample(examplesToPlay.length-1)
         }
-        setCurrentStep(0)
+        setAnswerPlayNumber(1)
     }
 
     function decrementExample () {
@@ -98,6 +209,7 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
         } else {
             setCurrentExample(0)
         }
+        setAnswerPlayNumber(1)
 
     }
 
@@ -108,7 +220,7 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
             } else {
                 audioUrl = example.englishAudio
             }
-            const audioElement = <audio controls style = {{display: currentStep <2?'block':'none'}} ref = {currentQuestion} src={audioUrl} autoPlay={true} onEnded = {endPlay}/>
+            const audioElement = <audio ref = {currentQuestion} src={audioUrl} onEnded = {endQuestionAudio} onLoadedMetadata={playCurrentQuestion}/>
             return audioElement
     }
 
@@ -116,60 +228,86 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
             let audioUrl
             if (!startWithSpanish) {
                 audioUrl = example.spanishAudioLa
-            const audioElement = <audio controls style = {{display: (currentStep > 1 && countdown === 0)?'block':'none'}} ref = {currentAnswer} src={audioUrl} onEnded = {endPlay}/>
+            const audioElement = <audio ref = {currentAnswer} src={audioUrl} onEnded = {endAnswerAudio}/>
             return audioElement
             }
     }
 
-    function endPlay () {
-        console.log('ending play')
+    function endQuestionAudio() {
         if (autoplay) {
-            console.log('will cycle')
-            setTimeout(cycle, 3000);
+            cycle()
         }
     }
 
+    function endAnswerAudio () {
+        if (autoplay) {
+            if (answerPlayNumber === 2){
+                answerPause.current = setTimeout(cycle, 3000);
+            } else  if (answerPlayNumber ===1) {
+                setAnswerPlayNumber(2)
+                answerPause.current = setTimeout(playCurrentAnswer, 3000)
+            }
+        }
+    }
+
+    function  goToSpanish () {
+        clearCountDown()
+        setAnswerPlayNumber(1)
+        setCurrentStep(2)
+    }
+
+    function resetExample () {
+        setAnswerPlayNumber(1)
+        setCurrentStep(1)
+    }
+
     function cycle () {
-        console.log('cycling')
         switch (currentStep) {
-            case 0:
-                if (startWithSpanish) {
-                    setCurrentStep(1)
+            case 1:
+                if (startWithSpanish && spanishHidden) {
+                    console.log("Showing Spanish")
+                    showSpanish()
+                } else if (autoplay && !guessing){
+                    clearTimeout(currentCountdown.current)
+                    guess()
                 } else {
                     setCurrentStep(2)
                 }
                 break
-            case 1:
-                setCurrentStep(3)
-                break
             case 2:
-                    setCurrentStep(3)
-                break
-            case 3:
                 incrementExample()
                 break
             default:
-                setCurrentStep(0)
+                setCurrentStep(1)
         }
+    }
+
+    function startCountdown (length) {
+        currentCountdownLength.current = length
+        setCountdown(length)
     }
 
     function makeComprehensionQuiz () {
         const allowedAudioExamples = filterExamplesByAllowedVocab(audioExamplesTable, selectedLesson.recordId)
         //console.log(allowedAudioExamples)
         const shuffledExamples = shuffleExamples(allowedAudioExamples)
-        console.log(shuffledExamples)
+        //console.log(shuffledExamples)
         setExamplesToPlay(shuffledExamples)
     }
 
     useEffect (() =>{
-        if (!rendered){
-            rendered = true
-            console.log(activeStudent)
+        if (!rendered.current){
+            rendered.current = true
         }
+        return clearTimeout(currentCountdown.current)
     }, [])
 
     useEffect (() => {
-        setCurrentStep(0)
+        if (startWithSpanish) {
+            hideSpanish()
+        }
+        endGuess()
+        setCurrentStep(1)
     }, [currentExample])
 
     useEffect(() => {
@@ -180,63 +318,58 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
       }, [activeProgram, activeLesson])
 
     useEffect(() => {
+    unReadyQuiz()
     if (selectedLesson && selectedProgram) {
         makeComprehensionQuiz()
     }
     }, [selectedProgram, selectedLesson])
 
     useEffect (() =>{
-        console.log(currentStep)
-        switch (currentStep) {
-            case 0:
-                if (currentQuestion.current){
-                    currentQuestion.current.play()
-                }
-                break
-            case 1:
-                if (currentQuestion.current){
-                    currentQuestion.current.play()
-                }
-                break
-            case 2:
-                function playCurrentAnswer() {
-                    console.log("Attempting to Play")
-                    console.log(currentAnswer)
-                    console.log(currentAnswer.current)
-                    if (currentAnswer.current){
-                        console.log('playing')
-                        currentAnswer.current.play()
+        clearCountDown()
+        endGuess()
+        if (quizReady){
+            switch (currentStep) {
+                case 1:
+                    if (currentQuestion.current.duration){
+                        playCurrentQuestion()
                     }
-                }
-                if (currentAnswer.current){
-                    console.log(currentAnswer.current)
-                    const currentDuration = currentAnswer.current.duration*1000
-                    const countdownNumber = Math.floor(currentDuration/1000)
-                    setCountdown(countdownNumber)
-                    setTimeout(playCurrentAnswer, currentDuration);
-                }
-                break
-            case 3:
-                if (currentAnswer.current){
-                    currentAnswer.current.play()
-                }
-                break
-            default:
-        }
-    }, [currentStep])
-
-    useEffect(() => {
-        function updateCountdown () {
-            if (countdown > 0) {
-                const newNumber = countdown -1
-                setCountdown(newNumber)
-            } else {
-                setCountdown(0)
+                    break
+                case 2:
+                    if (!startWithSpanish && answerPlayNumber === 1){
+                        playCurrentAnswer()
+                    }
+                    if (autoplay) {
+                        const countdownLength = currentAnswer.current.duration*2+6
+                        startCountdown(countdownLength)
+                    }
+                    break
+                default:
             }
         }
-        if (countdown > 0) {
-            console.log(countdown)
-            setTimeout(updateCountdown, 1000)
+    }, [currentStep, quizReady])
+
+    useEffect(() => {
+        if (quizReady && startWithSpanish){
+            playCurrentQuestion()
+        }
+    }, [spanishHidden])
+
+    useEffect(() => {
+        if (quizReady && autoplay ){
+            if (currentStep === 1 && guessing && currentAnswer.current){
+                startCountdown(Math.floor(currentAnswer.current.duration+3))
+            }
+        }
+    }, [guessing])
+
+    useEffect(() => {
+        clearTimeout(currentCountdown.current)
+        setPaused(false)
+        if (countdown !== 0 && currentCountdownLength.current !==0) {
+            currentCountdown.current = setTimeout(updateCountdown, 50)
+        }
+        if (guessing && countdown === 0) {
+            cycle()
         }
     }, [countdown])
 
@@ -260,10 +393,10 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
                 <div className='audioBox'>
                     <p>Comprehension Level: {selectedLesson.lesson}</p>
                     <button onClick = {unReadyQuiz}>Change Level</button>
-                    {!autoplay && <div className='audioTextBox'>
+                    {startWithSpanish && <div className='audioTextBox'>
                         <div className = 'audioExample' onClick={cycle}>
-                            {currentStep===0 && <h3><em>Listen to audio</em></h3>}
-                            {currentStep===1 && <h3>{example.spanishExample}</h3>}
+                            {currentStep===1 && spanishHidden && <h3><em>Listen to audio</em></h3>}
+                            {currentStep===1 && spanishHidden === false && <h3>{example.spanishExample}</h3>}
                             {currentStep>1 && <h3>{example.englishTranslation}</h3>}
                             <div className='navigateButtons'>
                                 {currentExample>0 && <a className= 'previousButton' onClick={decrementExample}>{'<'}</a>}
@@ -271,13 +404,23 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
                             </div>
                         </div>
                     </div>}
+                    {progressBar()}
                     {questionAudio()}
-                    {countdown > 0 && <h4>Playing Spanish in {countdown}</h4>}
                     {answerAudio()}
                 </div>
                 <div className='buttonBox'>
                     {/*<button onClick={startPlay}>Replay Spanish</button>*/}
-                    <button className='greenButton' onClick={cycle}>Next</button>
+                    {startWithSpanish && currentStep ===1 && spanishHidden && <button className = 'greenButton' onClick={cycle}>Show Spanish</button>}
+                    {startWithSpanish && currentStep ===1 && !spanishHidden && <button className = 'greenButton' onClick={cycle}>Show English</button>}
+                    {startWithSpanish && currentStep ===2 && <button className = 'greenButton' onClick={cycle}>Next</button>}
+                    {!startWithSpanish && currentStep ===1 && <button  onClick={goToSpanish}>Hear Spanish</button>}
+                    {!startWithSpanish && currentStep ===2 && <button  onClick={resetExample}>Hear English</button>}
+                    {autoplay && !paused && !startWithSpanish && <button onClick={pausePlayback}>Pause</button>}
+                    {autoplay && paused && !startWithSpanish && <button onClick={resumePlayback}>Play</button>}
+                </div>
+                <div className='buttonBox'>
+                    {!startWithSpanish && <button onClick={decrementExample}>Previous</button>}
+                    {!startWithSpanish && <button onClick={incrementExample}>Next</button>}
                 </div>
                 <div className='buttonBox'>
                     <MenuButton />
