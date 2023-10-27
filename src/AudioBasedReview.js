@@ -108,6 +108,9 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
             currentAnswer.current.play()
         }
         updateCountdown()
+        if (answerPlayNumber ===0) {
+            cycle()
+        }
     }
 
     function clearCountDown() {
@@ -243,6 +246,7 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
         if (autoplay) {
             if (answerPlayNumber === 2){
                 answerPause.current = setTimeout(cycle, 3000);
+                setAnswerPlayNumber(0)
             } else  if (answerPlayNumber ===1) {
                 setAnswerPlayNumber(2)
                 answerPause.current = setTimeout(playCurrentAnswer, 3000)
@@ -251,7 +255,6 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
     }
 
     function  goToSpanish () {
-        clearCountDown()
         setAnswerPlayNumber(1)
         setCurrentStep(2)
     }
@@ -335,7 +338,7 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
                     }
                     break
                 case 2:
-                    if (!startWithSpanish && answerPlayNumber === 1){
+                    if (!startWithSpanish){
                         playCurrentAnswer()
                     }
                     if (autoplay) {
