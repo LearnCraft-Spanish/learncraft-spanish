@@ -26,7 +26,8 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
     const [quizReady, setQuizReady] = useState(false);
     const courses = [
         {name: 'Spanish in One Month', url:'si1m', code: 'si1m'},
-        {name: 'LearnCraft Spanish', url:'', code: 'lcsp'}
+        {name: 'LearnCraft Spanish', url:'', code: 'lcsp'},
+        {name: 'LearnCraft Spanish Extended', url: 'lcspx', code: 'lcspx'}
     ]
     
     function makeMenuShow () {
