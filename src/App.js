@@ -38,6 +38,8 @@ function App() {
   const [choosingStudent, setChoosingStudent] = useState(false)
   const [messageNumber, setMessageNumber] = useState(0)
 
+  const audience = process.env.REACT_APP_API_AUDIENCE
+
   function chooseStudent() {
     setChoosingStudent(true)
   }
@@ -58,7 +60,7 @@ function App() {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openid profile email read:current-student update:current-student read:all-students update:all-students",
         },
         cacheMode: 'off'
@@ -87,7 +89,7 @@ function App() {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openID email profile",
         },
       });
@@ -161,7 +163,7 @@ function App() {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openID email profile",
         },
       });
@@ -225,7 +227,7 @@ function App() {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openID email profile",
         },
       });
@@ -279,7 +281,7 @@ function App() {
       try {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
-            audience: "https://lcs-api.herokuapp.com/",
+            audience: audience,
             scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
           }
         });
@@ -307,7 +309,7 @@ function App() {
       try {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
-            audience: "https://lcs-api.herokuapp.com/",
+            audience: audience,
             scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
           }
         });
@@ -364,7 +366,7 @@ function App() {
         try {
             const accessToken = await getAccessTokenSilently({
               authorizationParams: {
-                audience: "https://lcs-api.herokuapp.com/",
+                audience: audience,
                 scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
               },
             });
@@ -388,7 +390,7 @@ function App() {
       try {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
-            audience: "https://lcs-api.herokuapp.com/",
+            audience: audience,
             scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
           },
         });
@@ -423,7 +425,7 @@ async function removeFlashcardFromActiveStudent (exampleRecordId) {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
         },
       });
@@ -445,7 +447,7 @@ async function removeFlashcardFromActiveStudent (exampleRecordId) {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
         },
       });
@@ -497,7 +499,7 @@ async function setupAudioExamplesTable () {
   try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
         },
       });

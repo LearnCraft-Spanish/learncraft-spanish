@@ -29,6 +29,8 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
         {name: 'LearnCraft Spanish', url:'', code: 'lcsp'},
         {name: 'LearnCraft Spanish Extended', url: 'lcspx', code: 'lcspx'}
     ]
+
+    const audience = process.env.REACT_APP_API_AUDIENCE
     
     function makeMenuShow () {
         if (hideMenu) {
@@ -64,7 +66,7 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
         try {
           const accessToken = await getAccessTokenSilently({
             authorizationParams: {
-              audience: "https://lcs-api.herokuapp.com/",
+                audience: audience,
               scope: "openID email profile",
             },
           });
@@ -86,8 +88,8 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
         try {
           const accessToken = await getAccessTokenSilently({
             authorizationParams: {
-              audience: "https://lcs-api.herokuapp.com/",
-              scope: "openID email profile",
+                audience: audience,
+                scope: "openID email profile",
             },
           });
           //console.log(accessToken)

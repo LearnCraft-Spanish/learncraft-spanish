@@ -23,6 +23,8 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
   const [noSpanglish, setNoSpanglish] = useState(false)
   const [displayExamples, setDisplayExamples] = useState([])
 
+  const audience = process.env.REACT_APP_API_AUDIENCE
+
   function toggleSpanglish () {
     if (noSpanglish) {
       setNoSpanglish(false)
@@ -363,7 +365,7 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openID email profile",
         },
       });
@@ -408,7 +410,7 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
-          audience: "https://lcs-api.herokuapp.com/",
+          audience: audience,
           scope: "openID email profile",
         },
       });
