@@ -7,26 +7,33 @@ import ReactHowler from 'react-howler'
 import OfficialQuiz from './OfficialQuiz';
 import { useAuth0 } from '@auth0/auth0-react';
 import MenuButton from './MenuButton';
+import { render } from '@testing-library/react';
 
 
-export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizReady, makeQuizReady, quizCourse, updateChosenQuiz, makeCourseList, setChosenQuiz, createRoutesFromCourses, updateQuizCourse, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
-    chosenQuiz, hideMenu, makeMenuHidden, makeMenuShow, quizTable, examplesTable, studentExamples, addFlashcard}) {
-
+export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizReady, makeQuizReady, quizCourse, updateChosenQuiz, makeCourseList, setChosenQuiz, createRoutesFromCourses, updateQuizCourseWithoutNavigate, updateQuizCourseWithNavigate, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
+    chosenQuiz, hideMenu, makeMenuHidden, makeMenuShow, quizTable, examplesTable, studentExamples, addFlashcard, studentHasDefaultQuiz}) {
+        const rendered = useRef(false)
         const navigate = useNavigate()
 
-        function updateQuizCourseWithNavigate (course) {
-            const newCourse = updateQuizCourse(course)
-            const urlToNavigate = `../${newCourse.url}`
-            navigate(urlToNavigate)
-        }
-
-        const updateQuizCourseWithoutNavigate = updateQuizCourse
-
+        useEffect(() => {
+            if (!rendered.current) {
+                rendered.current = true
+                console.log(`Course should be ${thisCourse}`)
+                console.log(`Course now ${quizCourse}`)
+                if (quizCourse !== thisCourse){
+                    console.log("hmm, active course needs updating...")
+                    updateQuizCourseWithoutNavigate(thisCourse)
+                }
+            }
+        }, [])
 
         useEffect(() => {
-            console.log(`Course now ${thisCourse}`)
-            updateQuizCourseWithoutNavigate(thisCourse)
-        }, [])
+            if (dataLoaded && !studentHasDefaultQuiz) {
+                console.log('setting first quiz active')
+                const firstQuiz = makeQuizList(quizCourse)[0]
+                updateChosenQuiz(firstQuiz)
+            }
+        }, [dataLoaded])
 
         useEffect (() => {
             if (quizReady && chosenQuiz ){

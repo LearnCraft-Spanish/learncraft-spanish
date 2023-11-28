@@ -157,6 +157,16 @@ button:hover {
   min-height: 250px;
 }
 
+/*Callback page Styles */
+
+
+.redirectMessage {
+  display: block;
+  text-align: center;
+  width: 50%;
+  margin: 10% 25%;
+}
+
 /*Sentence Retreiver Styles*/
 
 .div-vocab {

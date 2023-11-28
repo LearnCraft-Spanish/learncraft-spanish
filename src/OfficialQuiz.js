@@ -9,6 +9,7 @@ import MenuButton from './MenuButton';
 export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow, setQuizCourse, setChosenQuiz, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
     chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples, addFlashcard}) {
         const thisQuiz = useParams().number
+        const navigate = useNavigate()
 
         const {getAccessTokenSilently} = useAuth0();
 
@@ -135,14 +136,23 @@ export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow,
         }
 
         useEffect (() => {
+            makeMenuHidden()
+        }, [])
+
+        useEffect (() => {
             if (dataLoaded) {
                 handleSetupQuiz()    
             }
         }, [dataLoaded])
 
         useEffect (() => {
-            makeMenuHidden()
-        }, [])
+            if (quizReady){
+                if (examplesToReview.length < 1) {
+                    makeMenuShow()
+                    navigate('..')
+                }
+            }
+        }, [quizReady])
 
         //const quizNumber = parseInt(useParams().number)
         //console.log(useParams())
@@ -160,11 +170,11 @@ export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow,
                 </div>)}
                 <div className='buttonBox'>
                     <button onClick={decrementExample}>Previous</button>
-                    <button style = {{display: (currentAudioUrl==="")? 'none' :'inherit'}} onClick = {togglePlaying}>Play/Pause Audio</button>
+                    <button style = {{display: (currentAudioUrl==="")? 'none' :'block'}} onClick = {togglePlaying}>Play/Pause Audio</button>
                     <button onClick={incrementExample}>Next</button>
                 </div>
                 <div className='buttonBox'>
-                    <Link className='linkButton' to = '../' onClick={makeMenuShow}>Back to Quizzes</Link>
+                    <Link className='linkButton' to = '..' onClick={makeMenuShow}>Back to Quizzes</Link>
                     <MenuButton />
                 </div>
                 <div className='progressBar2'>                

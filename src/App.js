@@ -1,6 +1,6 @@
 import './App.css';
 import React from 'react';
-import { Route, Routes, Link, useParams } from "react-router-dom";
+import { Route, Routes, Link, useParams, Outlet } from "react-router-dom";
 import { useEffect, useState } from 'react';
 //import jsonwebtoken from 'jsonwebtoken';
 import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBackend, getActiveExamplesFromBackend, createStudentExample, createMyStudentExample, deleteStudentExample, deleteMyStudentExample, getActiveStudentExamplesFromBackend, getAllUsersFromBackend, getProgramsFromBackend, getMyStudentExamplesFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
@@ -12,11 +12,13 @@ import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
 import SRSQuizApp from './SRSQuizApp';
 import LCSPQuizApp from './LCSPQuizApp'
-import CallbackPage from './CallbackPage';
 import NotFoundPage from './NotFoundPage';
 import { useAuth0 } from '@auth0/auth0-react';
 import ComprehensionQuiz from './ComprehensionQuiz';
 import FlashcardFinder from './FlashcardFinder';
+import OfficialQuiz from './OfficialQuiz';
+import CallbackPage from './CallbackPage';
+import CourseQuizzes from './CourseQuizzes';
 require('dotenv').config()
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
   const [bannerMessage, setBannerMessage] = useState('')
   const [choosingStudent, setChoosingStudent] = useState(false)
   const [messageNumber, setMessageNumber] = useState(0)
+
+
 
   const audience = process.env.REACT_APP_API_AUDIENCE
 
@@ -629,15 +633,15 @@ async function setupAudioExamplesTable () {
       }
       {userLoadingComplete && (
         <Routes>
-          <Route index element={<Menu updateExamplesTable={updateExamplesTable} roles={roles} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} activeLesson={activeLesson} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
+          <Route path = "/" element={<Menu updateExamplesTable={updateExamplesTable} roles={roles} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} activeLesson={activeLesson} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
+          <Route exact path = "/callback" element = {<CallbackPage />} />
           <Route exact path="/allflashcards" element={(roles.includes('student')||roles.includes('admin')) &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} activeStudent = {activeStudent} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
           <Route exact path="/todaysflashcards" element={(roles.includes('student')||roles.includes('admin')) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent} activeProgram={activeProgram} activeLesson={activeLesson} roles = {roles} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
-          <Route exact path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} activeProgram = {activeProgram} activeLesson={activeLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
+          <Route path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} activeProgram = {activeProgram} activeLesson={activeLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
           <Route exact path="/flashcardfinder" element={(roles.includes('student')||roles.includes('admin')) && <FlashcardFinder roles = {roles} user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} activeProgram={activeProgram} activeLesson={activeLesson} addToActiveStudentFlashcards={addToActiveStudentFlashcards}/>} />
           <Route exact path="/audioquiz" element={(roles.includes('student')||roles.includes('admin')) && <AudioQuiz roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram}/>} />
           <Route exact path="/comprehensionquiz" element={(roles.includes('student')||roles.includes('admin')) && <ComprehensionQuiz roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram}/>} />
-          <Route exact path="/callback" element={<CallbackPage />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="/*" element={<NotFoundPage />} />
         </Routes>)
       }
     </div>
