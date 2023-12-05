@@ -8,13 +8,11 @@ import { useAuth0 } from '@auth0/auth0-react';
 import LessonSelector from './LessonSelector';
 
 
-export default function ComprehensionQuiz({roles, programTable, activeStudent, studentExamplesTable, updateBannerMessage, audioExamplesTable, activeLesson, activeProgram, filterExamplesByAllowedVocab}) {
+export default function ComprehensionQuiz({ programTable, activeStudent, studentExamplesTable, updateBannerMessage, audioExamplesTable, filterExamplesByAllowedVocab, selectedLesson, selectedProgram, updateSelectedLesson, updateSelectedProgram}) {
     const {getAccessTokenSilently} = useAuth0()
     const [currentExample, setCurrentExample] = useState(0)
     const [currentStep, setCurrentStep] = useState(0)
     const [playing, setPlaying] = useState(true)
-    const [selectedLesson, setSelectedLesson] = useState(activeLesson)
-    const [selectedProgram, setSelectedProgram] = useState(activeProgram)
     const [examplesToPlay, setExamplesToPlay] = useState([])
     const [quizReady, setQuizReady] = useState(false)
     let rendered = false
@@ -30,7 +28,7 @@ export default function ComprehensionQuiz({roles, programTable, activeStudent, s
     return (
         <div className='quiz'>
             <h2 className='comprehensionHeader'>Comprehension Quiz</h2>
-            <AudioBasedReview roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram} willAutoplay={false} willStartWithSpanish={true}/>
+            <AudioBasedReview activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} willAutoplay={false} willStartWithSpanish={true} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>
         </div>
     )
 }

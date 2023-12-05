@@ -10,7 +10,7 @@ import MenuButton from './MenuButton';
 import { render } from '@testing-library/react';
 
 
-export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizReady, makeQuizReady, quizCourse, updateChosenQuiz, makeCourseList, setChosenQuiz, createRoutesFromCourses, updateQuizCourseWithoutNavigate, updateQuizCourseWithNavigate, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
+export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizReady, makeQuizReady, quizCourse, updateChosenQuiz, makeCourseList, createRoutesFromCourses, updateQuizCourseWithoutNavigate, updateQuizCourseWithNavigate, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
     chosenQuiz, hideMenu, makeMenuHidden, makeMenuShow, quizTable, examplesTable, studentExamples, addFlashcard, studentHasDefaultQuiz}) {
         const rendered = useRef(false)
         const navigate = useNavigate()
@@ -61,8 +61,8 @@ export default function CourseQuizzes ({thisCourse, courses, makeQuizList, quizR
                     </div>
                 </div>)}
                 {dataLoaded && quizCourse !== 'lcsp' &&  <Routes>
-                    <Route path=':number' element = {<OfficialQuiz  quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} activeStudent = {activeStudent} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
-                    chosenQuiz = {chosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} addFlashcard={addFlashcard}/>}></Route>
+                    <Route path=':number' element = {<OfficialQuiz courses = {courses}  quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} activeStudent = {activeStudent} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
+                    chosenQuiz = {chosenQuiz} updateChosenQuiz = {updateChosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} addFlashcard={addFlashcard}/>}></Route>
                 </Routes>}
             </div>
     )}

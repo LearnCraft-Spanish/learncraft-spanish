@@ -1,40 +1,23 @@
 import React, {useState, useEffect, useRef} from 'react';
 
-export default function LessonSelector({programTable, activeProgram, activeLesson, selectedLesson, updateSelectedLesson, selectedProgram, updateSelectedProgram}) {
+export default function LessonSelector({programTable, selectedLesson, updateSelectedLesson, selectedProgram, updateSelectedProgram}) {
 
     
     function makeCourseSelector () {
-        if (!activeProgram.recordId){
-            const courseSelector = [<option key = {0} value = {0} >–Choose Course–</option>]
-            programTable.forEach((item)=> {
-                courseSelector.push(<option key = {item.recordId} value = {item.recordId}> {item.name}</option>)
-            })
-            return courseSelector
-        } else {
-            const courseSelector = <option key = {activeProgram.recordId} value = {activeProgram.recordId}>{activeProgram.name}</option>
-            return courseSelector
-        }
+        const courseSelector = [<option key = {0} value = {0} >–Choose Course–</option>]
+        programTable.forEach((item)=> {
+            courseSelector.push(<option key = {item.recordId} value = {item.recordId}> {item.name}</option>)
+        })
+        return courseSelector
     }
     
     function makeLessonSelector () {
-    const lessonSelector = []
-    if (activeProgram.recordId) {
-        const activeLessonArray = activeLesson.lesson.split(' ')
-        const activeLessonNumber = parseInt(activeLessonArray.slice(-1)[0])
+        const lessonSelector = []
         selectedProgram.lessons.forEach((lesson)=>{
-        const lessonArray = lesson.lesson.split(" ")
-        const lessonNumber = lessonArray.slice(-1)[0]
-        if (activeLessonNumber >= lessonNumber){
+            const lessonArray = lesson.lesson.split(" ")
+            const lessonNumber = lessonArray.slice(-1)[0]
             lessonSelector.push(<option key = {lesson.lesson} value = {lesson.recordId}> Lesson {lessonNumber}</option>)
-        }
         })
-    } else {
-        selectedProgram.lessons.forEach((lesson)=>{
-        const lessonArray = lesson.lesson.split(" ")
-        const lessonNumber = lessonArray.slice(-1)[0]
-        lessonSelector.push(<option key = {lesson.lesson} value = {lesson.recordId}> Lesson {lessonNumber}</option>)
-        })
-    }
         return lessonSelector
     }
 

@@ -13,7 +13,7 @@ import { findAllByAltText } from '@testing-library/react';
 
 
 
-export default function LCSPQuizApp({updateExamplesTable, studentExamples, activeStudent, activeProgram, activeLesson, addFlashcard}) {
+export default function LCSPQuizApp({updateExamplesTable, studentExamples, activeStudent, selectedProgram, selectedLesson, addFlashcard}) {
     //console.log(userData)
     const {getAccessTokenSilently} =useAuth0()
     const navigate = useNavigate()
@@ -181,15 +181,15 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
 
     function findDefaultQuiz () {
         studentHasDefaultQuiz.current = true
-        const activeCourse = courses.find(course => course.name === activeProgram.name)
+        const activeCourse = courses.find(course => course.name === selectedProgram.name)
         if (activeCourse) {
             console.log('setting course to student default: '+activeCourse.name)
             setQuizCourse(activeCourse.code)
             const urlToNavigate = activeCourse.url
             navigate(urlToNavigate)
         }
-        console.log(activeLesson)
-        const activeLessonArray = activeLesson.lesson.split(' ')
+        console.log(selectedLesson)
+        const activeLessonArray = selectedLesson.lesson.split(' ')
         const activeLessonString = activeLessonArray.slice(-1)[0]
         const activeLessonNumber = parseInt(activeLessonString)
         let lastQuizBeforeCurrentLesson = 0
@@ -245,7 +245,7 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
     }, [quizReady, chosenQuiz])
 
     useEffect(() => {
-        if (!studentHasDefaultQuiz.current && quizCourse && dataLoaded && !quizReady){
+        if (!studentHasDefaultQuiz.current && quizCourse && dataLoaded && !quizReady && window.location.pathname === getCourseUrlFromCode(quizCourse) ){
             console.log('setting first quiz active')
             const firstQuiz = makeQuizList(quizCourse)[0]
             setChosenQuiz(firstQuiz)
@@ -253,18 +253,14 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
     }, [quizCourse, dataLoaded, quizReady])
 
     useEffect(() => {
-        if (activeStudent.recordId && activeProgram.recordId && activeLesson.recordId && quizTable[0] && window.location.pathname === getCourseUrlFromCode(quizCourse)) {
+        if (activeStudent.recordId && selectedProgram.recordId && selectedLesson.recordId && quizTable[0] && window.location.pathname === getCourseUrlFromCode(quizCourse)) {
             console.log("setting quiz to student's default")
             findDefaultQuiz()
         } else if (!activeStudent.recordId) {
             console.log("student default doesn't apply")
             studentHasDefaultQuiz.current = false
         }
-    }, [activeStudent, activeProgram, activeLesson, quizTable])
-
-    useEffect(() => {
-        console.log('menu hidden? '+hideMenu)
-    }, [hideMenu])
+    }, [activeStudent, selectedProgram, selectedLesson, quizTable])
 
     return (
         <div className='quizInterface'>
@@ -291,8 +287,8 @@ export default function LCSPQuizApp({updateExamplesTable, studentExamples, activ
             </div>)}
             <Routes>
                 {createRoutesFromCourses()}
-                {quizCourse === 'lcsp' && <Route path=':number' element = {<OfficialQuiz  quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} activeStudent = {activeStudent} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
-                chosenQuiz = {chosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} addFlashcard={addFlashcard} />}></Route>}
+                {quizCourse === 'lcsp' && <Route path=':number' element = {<OfficialQuiz courses={courses} quizCourse = {quizCourse} makeCourseList = {makeCourseList} makeQuizSelections = {makeQuizSelections} activeStudent = {activeStudent} dataLoaded = {dataLoaded} updateExamplesTable = {updateExamplesTable}
+                chosenQuiz = {chosenQuiz} updateChosenQuiz = {updateChosenQuiz} hideMenu = {hideMenu} makeMenuHidden={makeMenuHidden} makeQuizReady = {makeQuizReady} makeMenuShow={makeMenuShow} quizTable = {quizTable} examplesTable = {examplesTable} studentExamples = {studentExamples} addFlashcard={addFlashcard} />}></Route>}
             </Routes>
         </div>
 )}

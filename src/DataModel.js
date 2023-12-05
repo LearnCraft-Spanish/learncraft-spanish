@@ -9,7 +9,7 @@ export const qb = { // quickbaseTablesInfo
     students: {
         name: 'students',
         id: 'brrtdx784',
-        fields: ['Record ID#', 'Name', 'Email address', 'Related Program', 'Cohort']
+        fields: ['Record ID#', 'Name', 'Email address', 'Related Program', 'Cohort', 'Role']
     },
 
     programs: {

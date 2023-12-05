@@ -5,7 +5,7 @@ import { Link, Route, Routes } from "react-router-dom";
 
 
 
-export default function Menu({updateExamplesTable, roles, examplesTable, studentExamplesTable, activeStudent, activeLesson, flashcardDataComplete, audioExamplesTable, filterExamplesByAllowedVocab}) {
+export default function Menu({userData, updateExamplesTable, examplesTable, studentExamplesTable, activeStudent, activeLesson, flashcardDataComplete, audioExamplesTable, filterExamplesByAllowedVocab}) {
   //console.log(examplesTable.length)
   //console.log(examplesTable)
   const { user, isAuthenticated, isLoading } = useAuth0();
@@ -13,17 +13,6 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
   //console.log(examplesTable)
 
   const [rendered, setRendered] = useState(false)
-  const [audioQuiz, setAudioQuiz] = useState('')
-
-  function isAudioQuizAvailable () {
-    const allowedAudioExamples = filterExamplesByAllowedVocab(audioExamplesTable, activeLesson.recordId)
-    const numberOfExamplesAvailable = allowedAudioExamples.length
-    if (numberOfExamplesAvailable > 0) {
-      setAudioQuiz('Yes')
-    } else {
-      setAudioQuiz('No')
-    }
-  }
   
   useEffect(() => {
     if (!rendered){
@@ -38,14 +27,9 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
     }
   }, [rendered])
 
-  useEffect(() =>{
-    if (audioExamplesTable[0]){
-      isAudioQuizAvailable()
-    }
-  }, [audioExamplesTable, activeLesson])
 
   return (
-    rendered && flashcardDataComplete && audioQuiz && (
+    rendered && flashcardDataComplete && (
     <div className='menu'>
         <div className='menuBox'>
             {activeStudent.recordId && (studentExamplesTable.length > 0 && examplesTable.length === studentExamplesTable.length) && (
@@ -58,7 +42,7 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
             </div>
             </div>)}
             <h3>Explore:</h3>
-            {(audioQuiz === 'Yes' ||roles.includes('admin'))&& <div className='buttonBox'>
+            {(userData.role === 'student' || userData.role === 'limited') && <div className='buttonBox'>
               <Link className= 'linkButton' to = '/audioquiz'>Audio Quiz</Link>
               <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
             </div>}
@@ -66,7 +50,7 @@ export default function Menu({updateExamplesTable, roles, examplesTable, student
               <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>
             </div>
         </div>
-        {((roles.includes('student')||roles.includes('admin')) && <div className='menuBox'>
+        {((userData.role === 'student'||userData.isAdmin) && <div className='menuBox'>
             <div className= 'buttonBox'>
                 <Link className = 'linkButton' to='/flashcardfinder'>Find Flashcards</Link>
             </div>

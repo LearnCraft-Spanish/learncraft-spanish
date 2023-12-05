@@ -6,7 +6,7 @@ import LessonSelector from './LessonSelector'
 import { isLabelWithInternallyDisabledControl } from '@testing-library/user-event/dist/utils';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-export default function FlashcardFinder({roles, activeStudent, programTable, studentExamplesTable, flashcardDataComplete, activeProgram, activeLesson, addToActiveStudentFlashcards}) {
+export default function FlashcardFinder({activeStudent, programTable, user, studentExamplesTable, flashcardDataComplete, selectedProgram, selectedLesson, updateSelectedProgram, updateSelectedLesson, addToActiveStudentFlashcards}) {
   const {getAccessTokenSilently} = useAuth0();
   const [isLoaded, setIsLoaded] = useState(false)
   const [vocabSearchTerm, setVocabSearchTerm] = useState('')
@@ -18,8 +18,6 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
   const [requiredVocab, setRequiredVocab] = useState([])
   const [requiredTags, setRequiredTags] = useState([])
   const [exampleTable, setExampleTable] = useState([])
-  const [selectedLesson, setSelectedLesson] = useState(activeLesson)
-  const [selectedProgram, setSelectedProgram] = useState(activeProgram)
   const [noSpanglish, setNoSpanglish] = useState(false)
   const [displayExamples, setDisplayExamples] = useState([])
 
@@ -30,41 +28,6 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
       setNoSpanglish(false)
     } else {
       setNoSpanglish(true)
-    }
-  }
-
-  //selected lesson is the one chosen up to a maximum of the student's Active lesson
-  function updateSelectedLesson (lessonId) {
-    console.log(lessonId)
-    let newLesson = {}
-    programTable.forEach(program =>{
-      const foundLesson = program.lessons.find(item => item.recordId === parseInt(lessonId))
-      if (foundLesson){
-        newLesson = foundLesson
-        console.log(foundLesson)
-      }
-    })
-    setSelectedLesson(newLesson||activeLesson)
-  }
-
-  function updateSelectedProgram (programId) {
-    const programIdNumber = parseInt(programId)
-    const newProgram = programTable.find(program => program.recordId === programIdNumber)
-    setSelectedProgram(newProgram||{})
-    if (activeProgram.recordId){
-      let lessonToSelect = 0
-      newProgram.lessons.forEach((lesson)=>{
-        if (parseInt(lesson.recordId) <= parseInt(activeLesson.recordId)){
-          lessonToSelect = lesson.recordId
-        }
-      })
-      updateSelectedLesson(lessonToSelect)
-    } else {
-      let lessonToSelect = 0
-      newProgram.lessons.forEach((lesson)=>{
-        lessonToSelect = lesson.recordId
-      })
-      updateSelectedLesson(lessonToSelect)
     }
   }
 
@@ -257,8 +220,8 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
         <div className='exampleCardEnglishText'>
           <h4>{item.englishTranslation}</h4>
         </div>
-        {(activeStudent.recordId && !item.isAssigned && <button className = 'addButton' value = {item.recordId} onClick = {(e) => addToActiveStudentFlashcards(e.target.value)}>Add</button>)}
-        {(activeStudent.recordId && item.isAssigned && <button className = 'ownedButton' value = {item.recordId} >Owned</button>)}
+        {(activeStudent.role === 'student' && !item.isAssigned && <button className = 'addButton' value = {item.recordId} onClick = {(e) => addFlashcard(e.target.value)}>Add</button>)}
+        {(activeStudent.role === 'student' && item.isAssigned && <button className = 'ownedButton' value = {item.recordId} >Owned</button>)}
       </div>)
     })
     return tableToDisplay
@@ -430,6 +393,18 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
 
   let isMounted = false
 
+  async function addFlashcard (exampleId) {
+    console.log(exampleId)
+    const exampleToUpdate = exampleTable.find(example => example.recordId === parseInt(exampleId))
+    exampleToUpdate.isAssigned = true
+    addToActiveStudentFlashcards(exampleId)
+    .then(addResponse => {
+      if (addResponse === 0) {
+        exampleToUpdate.isAssigned = false
+      }
+    })
+  }
+
   
   // called onced at the beginning
   useEffect(() => {
@@ -452,15 +427,7 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
   }, [])
 
   useEffect(() => {
-    if (selectedLesson && selectedProgram) {
-      setSelectedProgram(activeProgram)
-      setSelectedLesson(activeLesson)
-    }
-  }, [activeProgram, activeLesson])
-
-  useEffect(() => {
     if (!isLoaded) {
-        if (roles.includes('admin')) {
           if(vocabularyTable[0] && tagTable[0] && exampleTable[0] && programTable[0]) {
             setIsLoaded(true)
             if (activeStudent.recordId) {
@@ -472,19 +439,6 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
           } else {
             setIsLoaded(false)
           }
-        } else {
-          if(vocabularyTable[0] && tagTable[0] && exampleTable[0] && programTable[0]) {
-            setIsLoaded(true)
-            if (activeStudent.recordId) {
-              const activeCourse = programTable.find((item) => (activeStudent.relatedProgram === item.recordId))
-              updateSelectedProgram(activeCourse.recordId)
-            }
-            makeExamplesTable()
-            //console.log(programTable)
-          } else {
-            setIsLoaded(false)
-          }
-        } 
       }
   }, [vocabularyTable, tagTable, exampleTable, programTable])
 
@@ -523,7 +477,7 @@ export default function FlashcardFinder({roles, activeStudent, programTable, stu
               {(!noSpanglish) && (<button style={{backgroundColor: 'darkgreen'}} onClick={toggleSpanglish}>Included</button>)}
               {(noSpanglish) && (<button style={{backgroundColor: 'darkred'}} onClick={toggleSpanglish}>Excluded</button>)}
             </div>
-            <LessonSelector programTable = {programTable} activeProgram = {activeProgram} activeLesson = {activeLesson} selectedLesson = {selectedLesson} updateSelectedLesson = {updateSelectedLesson} selectedProgram = {selectedProgram} updateSelectedProgram = {updateSelectedProgram} />
+            <LessonSelector programTable = {programTable} selectedLesson = {selectedLesson} updateSelectedLesson = {updateSelectedLesson} selectedProgram = {selectedProgram} updateSelectedProgram = {updateSelectedProgram} />
           </div>
           <div className='filterBox'>
             <div className='wordFilter'>

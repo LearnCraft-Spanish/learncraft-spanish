@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
 import { Route, Routes, Link, useParams, Outlet } from "react-router-dom";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 //import jsonwebtoken from 'jsonwebtoken';
 import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBackend, getActiveExamplesFromBackend, createStudentExample, createMyStudentExample, deleteStudentExample, deleteMyStudentExample, getActiveStudentExamplesFromBackend, getAllUsersFromBackend, getProgramsFromBackend, getMyStudentExamplesFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
 import ExampleRetriever from './FlashcardFinder';
@@ -23,14 +23,15 @@ require('dotenv').config()
 
 function App() {
   const { user, isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
-  const [rendered, setRendered] = useState(false)
+  const rendered = useRef(false)
   const [qbUserData, setQbUserData]= useState({}) //The user data for the person using the app (if a student)
-  const [roles, setRoles] = useState([])
-  const [userLoadingComplete, setUserLoadingComplete] = useState(false)
+  const [menuReady, setMenuReady] = useState(false)
   const [activeStudent, setActiveStudent] = useState({}) //The user data for the selected user (same as the user if a student, or possibly another student if user is an admin)
   const [programTable, setProgramTable] = useState([]) //Array of course objects. Each has a property of 'lessons': an array of lesson objects
-  const [activeProgram, setActiveProgram] = useState({})
-  const [activeLesson, setActiveLesson] = useState({})
+  const activeProgram = useRef({})
+  const activeLesson = useRef({})
+  const [selectedLesson, setSelectedLesson] = useState(activeLesson)
+  const [selectedProgram, setSelectedProgram] = useState(activeProgram)
   const [studentList, setStudentList] = useState([])
   const [studentExamplesTable, setStudentExamplesTable] = useState([])
   const [examplesTable, setExamplesTable] = useState([])
@@ -41,7 +42,6 @@ function App() {
   const [messageNumber, setMessageNumber] = useState(0)
 
 
-
   const audience = process.env.REACT_APP_API_AUDIENCE
 
   function chooseStudent() {
@@ -50,6 +50,33 @@ function App() {
 
   function keepStudent() {
     setChoosingStudent(false)
+  }
+
+  function updateSelectedLesson (lessonId) {
+    let newLesson = {}
+    programTable.forEach(program =>{
+      const foundLesson = program.lessons.find(item => item.recordId === parseInt(lessonId))
+      if (foundLesson){
+        newLesson = foundLesson
+      }
+    })
+    console.log(newLesson)
+    setSelectedLesson(newLesson)
+  }
+
+  function updateSelectedProgram (programId) {
+    const programIdNumber = parseInt(programId)
+    const newProgram = programTable.find(program => (program.recordId === programIdNumber))||activeProgram.current.recordId?activeProgram.current:programTable.find(program => (program.recordId === 3))
+    console.log(newProgram)
+    setSelectedProgram(newProgram)
+    if (activeLesson.current.recordId && newProgram.recordId === activeProgram.current.recordId){
+      const lessonToSelect = activeLesson.current.recordId
+      updateSelectedLesson(lessonToSelect)
+    } else {
+      const firstLesson = newProgram.lessons[0]
+      const lessonToSelect = firstLesson.recordId
+      updateSelectedLesson(lessonToSelect)
+    }
   }
 
   function updateActiveStudent(studentID) {
@@ -113,44 +140,13 @@ function App() {
 
   async function userSetup () {
     try {
-      const firstTry = await getUserData()
+      const userData = await getUserData()
       //console.log(await firstTry)
-      if (typeof await firstTry[0] === 'number') {
-        //console.log('second try needed')
-        console.log(firstTry[0])
-        const secondTry =  await getUserData()
-        console.log(await secondTry[0])
-        setQbUserData(await secondTry[0]||{})
-        if (await secondTry[2]) {
-
-          const rolesToAssign = []
-          if(secondTry[1].isStudent){
-            rolesToAssign.push('student')
-          }
-          if (secondTry[2].isAdmin){
-            rolesToAssign.push('admin')
-          }
-          //console.log(rolesToAssign)
-          setRoles(rolesToAssign)
-        }
-        
-      } else {
-        //console.log('first try worked')
-        //console.log(await firstTry[0])
-        setQbUserData(await firstTry[0]||{})
-        if (await firstTry[2]) {
-          const rolesToAssign = []
-          if(firstTry[1].isStudent){
-            rolesToAssign.push('student')
-          }
-          if(firstTry[2].isAdmin){
-            rolesToAssign.push('admin')
-          }
-          //console.log(rolesToAssign)
-          setRoles(rolesToAssign)
-        }
-      }
-    } catch (e) {
+      //console.log('first try worked')
+      //console.log(await firstTry[0])
+      setQbUserData(await userData)
+    }
+    catch (e) {
       console.log(e.message);
     }
   }
@@ -274,12 +270,12 @@ function App() {
       studentProgram = programWithLessonList
       lastKnownLesson = programWithLessonList.lessons.slice(-1)[0]
     }
-    setActiveProgram(studentProgram)
-    setActiveLesson(lastKnownLesson)
+    activeProgram.current = studentProgram
+    activeLesson.current = lastKnownLesson
   }
 
   const updateExamplesTable= async () => {
-    if (roles.includes('admin')){ //Pulls examples and student-examples for any student (if admin)
+    if (qbUserData.isAdmin){ //Pulls examples and student-examples for any student (if admin)
       setFlashcardDataComplete(false)
       console.log('resetting studentExample tables')
       try {
@@ -306,7 +302,7 @@ function App() {
       } catch (e) {
         console.log(e.message);
       }
-    } else if (roles.includes('student')){ //Pulls examples and student examples ONLY for the current user
+    } else if (qbUserData.role === 'student'){ //Pulls examples and student examples ONLY for the current user
       console.log('incomplete')
       setFlashcardDataComplete(false)
       console.log('resetting tables')
@@ -338,7 +334,7 @@ function App() {
   }
 
   function makeStudentSelector () {
-    if (roles.includes('admin')){
+    if (qbUserData.isAdmin){
       const studentSelector = [<option key = {0} name = {''} > – None Selected –</option>]
       studentList.forEach((student) => {
         const studentEmail = student.emailAddress
@@ -365,7 +361,7 @@ function App() {
     console.log(recordId)
     updateBannerMessage('Adding Flashcard...')
     console.log(`adding example ${recordId} to student with email ${activeStudent.emailAddress}`)
-    if (activeStudent.recordId && roles.includes('admin')) {
+    if (activeStudent.recordId && qbUserData.isAdmin) {
         //console.log(userData)
         try {
             const accessToken = await getAccessTokenSilently({
@@ -384,13 +380,13 @@ function App() {
               } else {
                 updateBannerMessage('Failed to add Flashcard')
               }
-              updateExamplesTable()
-              //console.log(result)
+              return result
             });
+            return data
         }   catch (e) {
             console.log(e.message);
         }
-    } else if (activeStudent.recordId && roles.includes('student')) {
+    } else if (activeStudent.recordId && qbUserData.role === 'student') {
       try {
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
@@ -408,11 +404,12 @@ function App() {
           } else {
             updateBannerMessage('Failed to add Flashcard')
           }
-          updateExamplesTable()
-          //console.log(result)
+          return result
         });
+        return data
     }   catch (e) {
         console.log(e.message);
+        return false
     }
     }
 }
@@ -425,7 +422,7 @@ async function removeFlashcardFromActiveStudent (exampleRecordId) {
       return relatedStudentExample.recordId;
   }
   const studentExampleRecordId = getStudentExampleRecordId(exampleRecordId)
-  if (roles.includes('admin')){
+  if (qbUserData.isAdmin){
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
@@ -447,7 +444,7 @@ async function removeFlashcardFromActiveStudent (exampleRecordId) {
   }   catch (e) {
       console.log(e.message);
   }
-  } else if (roles.includes('student')){
+  } else if (qbUserData.role === 'student'){
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
@@ -520,56 +517,65 @@ async function setupAudioExamplesTable () {
 }
 
   useEffect(()=>{
-    if (!rendered){
-      setRendered(true)
+    if (!rendered.current){
+      rendered.current = true
     }
   }, [])
 
   useEffect(() => {
-    if (rendered && isAuthenticated && !userLoadingComplete) {
-      console.log('user setup')
+    if (rendered && isAuthenticated) {
       userSetup()
       getPrograms()
       setupAudioExamplesTable()
     }
-  }, [rendered, isAuthenticated])
+  }, [isAuthenticated])
 
   useEffect(() => {
-    if (qbUserData.recordId && roles.includes('student')){
+    if (qbUserData.recordId && (qbUserData.role === 'student'|| qbUserData.role === 'limited')){
+      console.log('user loading complete')
       setActiveStudent(qbUserData)
-      setUserLoadingComplete(true)
     }
-    if (roles.includes('admin')){
+    if (qbUserData.isAdmin){
       async function setupStudentList () {
-        setUserLoadingComplete(true)
         const studentListPromise = await getStudentList()
         setStudentList(studentListPromise)
       }
       setupStudentList()
     } else {
-      if (isAuthenticated && qbUserData && !qbUserData.recordId && roles){
-        setUserLoadingComplete(true)
+      if (isAuthenticated && qbUserData && !qbUserData.recordId){
+        setMenuReady(true)
         setFlashcardDataComplete(true)
       }
     }
-  }, [qbUserData, roles])
+  }, [qbUserData])
 
   useEffect(()=>{
-    if (userLoadingComplete && programTable[0] && audioExamplesTable.length > 0){
+    if (programTable[0] && audioExamplesTable.length > 0){
       console.log(activeStudent.emailAddress)
-      if (roles.includes('student')||roles.includes('admin')){
+      if ((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin){
         //setFlashcardDataComplete(false)
         getStudentLevel()
+        updateSelectedProgram(activeProgram.current.recordId)
+        if (selectedLesson.recordId !== activeLesson.current.recordId) {
+          updateSelectedLesson(activeLesson.current.recordId)
+        }
         //updateExamplesTable()
       }
     }
   }, [activeStudent, programTable, audioExamplesTable])
 
   useEffect(() => {
-    if (userLoadingComplete && examplesTable.length === studentExamplesTable.length){
+    if (qbUserData.recordId && selectedLesson.recordId === activeLesson.current.recordId && selectedProgram.recordId === activeLesson.current.recordId){
+      setMenuReady(true)
+    }
+  }, [qbUserData, selectedLesson, selectedProgram])
+
+  useEffect(() => {
+    if (menuReady && examplesTable.length === studentExamplesTable.length){
+        console.log('data complete')
         setFlashcardDataComplete(true)
     }
-  }, [userLoadingComplete, examplesTable, studentExamplesTable])
+  }, [menuReady, examplesTable, studentExamplesTable])
 
   useEffect(()=>{
     clearTimeout(messageNumber)
@@ -594,25 +600,25 @@ async function setupAudioExamplesTable () {
         {!isLoading && !isAuthenticated && (
           <p>You must be logged in to use this app.</p>
         )}
-        {isAuthenticated && !userLoadingComplete && (
+        {isAuthenticated && !menuReady && (
           <p>Loading user data...</p>
         )}
-        {userLoadingComplete && roles.includes('student') && !roles.includes('admin') &&
-          <p>Welcome back, {activeStudent.name}!</p>
+        {menuReady && (qbUserData.role === 'student'|| qbUserData.role === 'limited') && !qbUserData.isAdmin &&
+          <p>Welcome back, {qbUserData.name}!</p>
         }
 
-        {isAuthenticated && userLoadingComplete && !roles.includes('student') && !roles.includes('admin') &&
-          <p>Welcome, guest!</p>
+        {isAuthenticated && menuReady && qbUserData.role !== 'student' && qbUserData.role !== 'limited' && !qbUserData.isAdmin &&
+          <p>Welcome back!</p>
         }
 
-        {userLoadingComplete && roles.includes('admin') && !choosingStudent &&
+        {menuReady && qbUserData.isAdmin && !choosingStudent &&
         <div className='studentList'>
           {activeStudent.recordId && <p>Using as {activeStudent.name}{(activeStudent.recordId===qbUserData.recordId) && ' (you)'}</p>}
           {!activeStudent.recordId && <p>No student Selected</p>}
           <button onClick={chooseStudent}>Change</button>
         </div>
         }
-        {userLoadingComplete && roles.includes('admin') && choosingStudent &&
+        {menuReady && qbUserData.isAdmin && choosingStudent &&
         <form className='studentList' onSubmit={e => e.preventDefault}>
           <select value = {activeStudent?activeStudent.recordId:{}} onChange={(e) => updateActiveStudent(e.target.value)}>
             {makeStudentSelector()}
@@ -631,16 +637,16 @@ async function setupAudioExamplesTable () {
       )*/}
       {//(qbUserData.recordId !== 'Loading ID') && (<SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable}/>)
       }
-      {userLoadingComplete && (
+      {menuReady && (
         <Routes>
-          <Route path = "/" element={<Menu updateExamplesTable={updateExamplesTable} roles={roles} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} activeLesson={activeLesson} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
+          <Route path = "/" element={<Menu userData = {qbUserData} updateExamplesTable={updateExamplesTable} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} activeLesson={activeLesson.current} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
           <Route exact path = "/callback" element = {<CallbackPage />} />
-          <Route exact path="/allflashcards" element={(roles.includes('student')||roles.includes('admin')) &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} activeStudent = {activeStudent} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
-          <Route exact path="/todaysflashcards" element={(roles.includes('student')||roles.includes('admin')) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent} activeProgram={activeProgram} activeLesson={activeLesson} roles = {roles} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
-          <Route path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} activeProgram = {activeProgram} activeLesson={activeLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
-          <Route exact path="/flashcardfinder" element={(roles.includes('student')||roles.includes('admin')) && <FlashcardFinder roles = {roles} user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} activeProgram={activeProgram} activeLesson={activeLesson} addToActiveStudentFlashcards={addToActiveStudentFlashcards}/>} />
-          <Route exact path="/audioquiz" element={(roles.includes('student')||roles.includes('admin')) && <AudioQuiz roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram}/>} />
-          <Route exact path="/comprehensionquiz" element={(roles.includes('student')||roles.includes('admin')) && <ComprehensionQuiz roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram}/>} />
+          <Route exact path="/allflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} activeStudent = {activeStudent} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
+          <Route exact path="/todaysflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent} activeProgram={activeProgram} activeLesson={activeLesson} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
+          <Route path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} selectedProgram = {selectedProgram} selectedLesson={selectedLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
+          <Route exact path="/flashcardfinder" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <FlashcardFinder user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} addToActiveStudentFlashcards={addToActiveStudentFlashcards} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
+          <Route exact path="/audioquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <AudioQuiz activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
+          <Route exact path="/comprehensionquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <ComprehensionQuiz  activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>)
       }

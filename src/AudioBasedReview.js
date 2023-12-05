@@ -7,15 +7,13 @@ import { useAuth0 } from '@auth0/auth0-react';
 import LessonSelector from './LessonSelector';
 
 
-export default function AudioBasedReview({roles, programTable, activeStudent, studentExamplesTable, updateBannerMessage, audioExamplesTable, activeLesson, activeProgram, filterExamplesByAllowedVocab, willAutoplay, willStartWithSpanish}) {
+export default function AudioBasedReview({ programTable, activeStudent, studentExamplesTable, updateBannerMessage, audioExamplesTable, filterExamplesByAllowedVocab, willAutoplay, willStartWithSpanish, selectedLesson, selectedProgram, updateSelectedLesson, updateSelectedProgram}) {
     const {getAccessTokenSilently} = useAuth0()
     const [currentExample, setCurrentExample] = useState(0)
     const [currentStep, setCurrentStep] = useState(1)
     const [spanishHidden, setSpanishHidden] = useState(true)
     const [autoplay, setAutoplay] = useState(willAutoplay||false)
     const [guessing, setGuessing] = useState(false)
-    const [selectedLesson, setSelectedLesson] = useState(activeLesson)
-    const [selectedProgram, setSelectedProgram] = useState(activeProgram)
     const [examplesToPlay, setExamplesToPlay] = useState([])
     const [quizReady, setQuizReady] = useState(false)
     const [startWithSpanish, setStartWithSpanish] = useState(willStartWithSpanish||false)
@@ -135,53 +133,17 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
         setGuessing(false)
     }
 
-    function updateSelectedLesson (lessonId) {
-        let newLesson = {}
-        programTable.forEach(program =>{
-          const foundLesson = program.lessons.find(item => item.recordId === parseInt(lessonId))
-          if (foundLesson){
-            newLesson = foundLesson
-          }
-        })
-        setSelectedLesson(newLesson||activeLesson)
-      }
-    
-      function updateSelectedProgram (programId) {
-        const programIdNumber = parseInt(programId)
-        const newProgram = programTable.find(program => program.recordId === programIdNumber)||{}
-        setSelectedProgram(newProgram)
-        if (activeProgram.recordId){
-          let lessonToSelect = 0
-          newProgram.lessons.forEach((lesson)=>{
-            if (parseInt(lesson.recordId) <= parseInt(activeLesson.recordId)){
-              lessonToSelect = lesson.recordId
-              console.log(lesson)
-            }
-          })
-          console.log(lessonToSelect)
-          updateSelectedLesson(lessonToSelect)
-        } else {
-          let lessonToSelect = 0
-          if (newProgram.lessons){
-            newProgram.lessons.forEach((lesson)=>{
-                lessonToSelect = lesson.recordId
-              })
-          }
-          updateSelectedLesson(lessonToSelect)
-        }
-      }
-
-      function progressBar () {
-        return(!startWithSpanish && autoplay &&
-        <div className='progressBarHolder'>
-            {currentStep===1 && !guessing && <h4>Playing English</h4>}
-            {currentStep===1 && guessing && <h4>Make a guess!</h4>}
-            {currentStep===2 && <h4>Playing Spanish</h4>}
-            <div className='progressStatus' style={{width: `${progressStatus*100}%`}}>
-            </div>
+    function progressBar () {
+    return(!startWithSpanish && autoplay &&
+    <div className='progressBarHolder'>
+        {currentStep===1 && !guessing && <h4>Playing English</h4>}
+        {currentStep===1 && guessing && <h4>Make a guess!</h4>}
+        {currentStep===2 && <h4>Playing Spanish</h4>}
+        <div className='progressStatus' style={{width: `${progressStatus*100}%`}}>
         </div>
-        )
-      }
+    </div>
+    )
+    }
 
       function shuffleExamples (examples) {
         let shuffled = examples
@@ -314,13 +276,6 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
     }, [currentExample])
 
     useEffect(() => {
-        if (selectedLesson && selectedProgram) {
-          setSelectedProgram(activeProgram||{})
-          setSelectedLesson(activeLesson||{})
-        }
-      }, [activeProgram, activeLesson])
-
-    useEffect(() => {
     unReadyQuiz()
     if (selectedLesson && selectedProgram) {
         makeComprehensionQuiz()
@@ -380,7 +335,7 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
     return (
         <div className='quiz'>
             {!quizReady && (selectedLesson.recordId || !activeStudent.recordId) && <div className='audioBox'>
-                <LessonSelector programTable = {programTable} activeProgram = {activeProgram} activeLesson = {activeLesson} selectedLesson = {selectedLesson} updateSelectedLesson = {updateSelectedLesson} selectedProgram = {selectedProgram} updateSelectedProgram = {updateSelectedProgram} />
+                <LessonSelector programTable = {programTable} selectedLesson = {selectedLesson} updateSelectedLesson = {updateSelectedLesson} selectedProgram = {selectedProgram} updateSelectedProgram = {updateSelectedProgram} />
                 {/*<h3>Autoplay:</h3>
                     <select value={autoplay} onChange={e => {updateAutoplay(e.target.value)}}>
                         <option value={false}>Off</option>
@@ -394,7 +349,7 @@ export default function AudioBasedReview({roles, programTable, activeStudent, st
 
             {quizReady && examplesToPlay.length > 0 && <div>
                 <div className='audioBox'>
-                    <p>Comprehension Level: {selectedLesson.lesson}</p>
+                    <p>Comprehension Level: {selectedProgram.name} Lesson {selectedLesson.lesson.split(' ')[2]}</p>
                     <button onClick = {unReadyQuiz}>Change Level</button>
                     {startWithSpanish && <div className='audioTextBox'>
                         <div className = 'audioExample' onClick={cycle}>

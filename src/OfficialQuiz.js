@@ -6,8 +6,8 @@ import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
 import MenuButton from './MenuButton';
 
-export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow, setQuizCourse, setChosenQuiz, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
-    chosenQuiz, hideMenu, setHideMenu, quizTable, examplesTable, studentExamples, addFlashcard}) {
+export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, makeMenuShow, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
+    chosenQuiz, updateChosenQuiz, hideMenu, quizTable, examplesTable, studentExamples, addFlashcard}) {
         const thisQuiz = useParams().number
         const navigate = useNavigate()
 
@@ -136,6 +136,9 @@ export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow,
         }
 
         useEffect (() => {
+            if (chosenQuiz !== thisQuiz){
+                updateChosenQuiz(thisQuiz)
+            }
             makeMenuHidden()
         }, [])
 
@@ -158,6 +161,7 @@ export default function OfficialQuiz ({quizCourse, makeMenuHidden, makeMenuShow,
         //console.log(useParams())
         return (quizReady &&
             <div className='quiz'>
+                <h3>{(courses.find(course => course.code === quizCourse)||{name: quizCourse}).name} Quiz {chosenQuiz}</h3>
                 {(examplesToReview[currentExampleNumber-1] !== undefined) && (<div className='exampleBox'>
                     <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation' onClick={toggleLanguageShowing}>
                         <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}</p>

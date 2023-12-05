@@ -8,7 +8,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import LessonSelector from './LessonSelector';
 
 
-export default function AudioQuiz({roles, programTable, activeStudent, studentExamplesTable, updateBannerMessage, audioExamplesTable, activeLesson, activeProgram, filterExamplesByAllowedVocab}) {
+export default function AudioQuiz({ programTable, activeStudent, studentExamplesTable, updateBannerMessage, audioExamplesTable, filterExamplesByAllowedVocab, selectedLesson, selectedProgram, updateSelectedLesson, updateSelectedProgram}) {
     const [audioQuizExamples, setAudioQuizExamples] = useState([])
     const [audioQuizReady, setAudioQuizReady] = useState(false)
     function filterExamplesByEnglishAudio(examples) {
@@ -42,7 +42,7 @@ export default function AudioQuiz({roles, programTable, activeStudent, studentEx
     return (
         <div>
             <h2 className='comprehensionHeader'>Audio Quiz</h2>
-            {audioQuizReady && <AudioBasedReview roles = {roles} activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioQuizExamples} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} activeLesson={activeLesson} activeProgram={activeProgram} willAutoplay={true} willStartWithSpanish={false}/>}
+            {audioQuizReady && <AudioBasedReview activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioQuizExamples} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} willAutoplay={true} willStartWithSpanish={false} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>}
         </div>
     )
 }
