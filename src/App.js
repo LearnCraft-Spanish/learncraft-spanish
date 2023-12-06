@@ -31,8 +31,8 @@ function App() {
   const [programTable, setProgramTable] = useState([]) //Array of course objects. Each has a property of 'lessons': an array of lesson objects
   const activeProgram = useRef({})
   const activeLesson = useRef({})
-  const [selectedLesson, setSelectedLesson] = useState(activeLesson)
-  const [selectedProgram, setSelectedProgram] = useState(activeProgram)
+  const [selectedLesson, setSelectedLesson] = useState(activeLesson.current)
+  const [selectedProgram, setSelectedProgram] = useState(activeProgram.current)
   const [studentList, setStudentList] = useState([])
   const [studentExamplesTable, setStudentExamplesTable] = useState([])
   const [examplesTable, setExamplesTable] = useState([])
@@ -61,14 +61,12 @@ function App() {
         newLesson = foundLesson
       }
     })
-    console.log(newLesson)
     setSelectedLesson(newLesson)
   }
 
   function updateSelectedProgram (programId) {
     const programIdNumber = parseInt(programId)
-    const newProgram = programTable.find(program => (program.recordId === programIdNumber))||(activeProgram.current.recordId?activeProgram.current:programTable.find(program => (program.recordId === 3)))
-    console.log(newProgram)
+    const newProgram = programTable.find(program => (program.recordId === programIdNumber))||(activeProgram.current.recordId?activeProgram.current:programTable.find(program => (program.recordId === 2)))
     setSelectedProgram(newProgram)
     if (activeLesson.current.recordId && newProgram.recordId === activeProgram.current.recordId){
       const lessonToSelect = activeLesson.current.recordId

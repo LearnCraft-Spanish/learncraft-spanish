@@ -3,7 +3,7 @@ import LessonSelector from "./LessonSelector";
 import { getVocabFromBackend } from "./BackendFetchFunctions";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const FrequenSay = ({activeStudent, programTable, selectedLesson, updateSelectedLesson, selectedProgram, updateSelectedProgram}) => {
+export default function FrequenSay ({activeStudent, programTable, selectedLesson, updateSelectedLesson, selectedProgram, updateSelectedProgram}) {
   const { isAuthenticated, isLoading, getAccessTokenSilently, loginWithRedirect} = useAuth0();
   const [userInput, setUserInput] = useState("")
   const [vocabularyTable, setVocabularyTable] = useState([])
@@ -158,8 +158,8 @@ const FrequenSay = ({activeStudent, programTable, selectedLesson, updateSelected
   }, [selectedLesson, vocabularyTable])
 
   useEffect(() => {
-    if (selectedLesson && acceptableWordSpellings && vocabularyTable && userInput) {
-      if (selectedLesson.recordId && acceptableWordSpellings.length > 0 && acceptableWordSpellings.length > 0) {
+    if (selectedLesson) {
+      if (selectedLesson.recordId) {
         filterWordCountByUnknown()
       }
     }
@@ -183,5 +183,3 @@ const FrequenSay = ({activeStudent, programTable, selectedLesson, updateSelected
     </div>
   ))
 };
-
-export default FrequenSay;
