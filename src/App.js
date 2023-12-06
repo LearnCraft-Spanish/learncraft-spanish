@@ -12,6 +12,7 @@ import LoginButton from './LoginButton';
 import LogoutButton from './LogoutButton';
 import SRSQuizApp from './SRSQuizApp';
 import LCSPQuizApp from './LCSPQuizApp'
+import FrequenSay from './FrequenSay';
 import NotFoundPage from './NotFoundPage';
 import { useAuth0 } from '@auth0/auth0-react';
 import ComprehensionQuiz from './ComprehensionQuiz';
@@ -66,7 +67,7 @@ function App() {
 
   function updateSelectedProgram (programId) {
     const programIdNumber = parseInt(programId)
-    const newProgram = programTable.find(program => (program.recordId === programIdNumber))||activeProgram.current.recordId?activeProgram.current:programTable.find(program => (program.recordId === 3))
+    const newProgram = programTable.find(program => (program.recordId === programIdNumber))||(activeProgram.current.recordId?activeProgram.current:programTable.find(program => (program.recordId === 3)))
     console.log(newProgram)
     setSelectedProgram(newProgram)
     if (activeLesson.current.recordId && newProgram.recordId === activeProgram.current.recordId){
@@ -647,6 +648,7 @@ async function setupAudioExamplesTable () {
           <Route exact path="/flashcardfinder" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <FlashcardFinder user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} addToActiveStudentFlashcards={addToActiveStudentFlashcards} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route exact path="/audioquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <AudioQuiz activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route exact path="/comprehensionquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <ComprehensionQuiz  activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
+          <Route exact path="/frequensay" element={qbUserData.isAdmin && <FrequenSay activeStudent = {activeStudent} programTable = {programTable} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram} />} />
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>)
       }
