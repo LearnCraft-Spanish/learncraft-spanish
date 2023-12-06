@@ -175,6 +175,7 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
             </textarea>
         </form>
         {unknownWordCount.length && (<div>
+          <h3>Unknown Words:</h3>
           <div className="buttonBox">
             <button onClick={copyTable}>Copy Word List</button>
           </div>
