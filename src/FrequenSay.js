@@ -167,8 +167,8 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
   }
 
   function getAcceptableWordSpellingsFromSelectedLesson () {
+    const acceptableSpellings = []
     if (selectedLesson.recordId){
-      const acceptableSpellings = []
       selectedLesson.vocabKnown.forEach(vocabName => {
         const vocabularyItem = vocabularyTable.find(item => item.vocabName === vocabName)
         if (vocabularyItem) {
@@ -177,8 +177,8 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
           })
         }
       })
-      return acceptableSpellings
     }
+    return acceptableSpellings
   }
 
   function makeUnknownWordList() {
