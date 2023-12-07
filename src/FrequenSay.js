@@ -6,13 +6,29 @@ import { useAuth0 } from "@auth0/auth0-react";
 export default function FrequenSay ({activeStudent, programTable, selectedLesson, updateSelectedLesson, selectedProgram, updateSelectedProgram}) {
   const { isAuthenticated, isLoading, getAccessTokenSilently, loginWithRedirect} = useAuth0();
   const [userInput, setUserInput] = useState("")
+  const [userAddedVocabulary, setUserAddedVocabulary] = useState("")
+  const [addManualVocabulary, setAddManualVocabulary] = useState(false)
   const [vocabularyTable, setVocabularyTable] = useState([])
   const [unknownWordCount, setUnknownWordCount] = useState([])
   const [acceptableWordSpellings, setAcceptableWordSpellings] = useState([])
+  const passageLength = useRef(0)
+  const comprehensionPercentage = useRef(0)
   const wordCount = useRef([])
+  const extraAcceptableWords = useRef([])
   const rendered = useRef(false)
   const audience = process.env.REACT_APP_API_AUDIENCE
 
+  function additionalVocab () {
+    console.log('setting true')
+    setAddManualVocabulary(true)
+  }
+
+  function noAdditionalVocab () {
+    updateUserAddedVocabulary('')
+    console.log('setting')
+    setAddManualVocabulary(false)
+  }
+  
   function sortVocab (a, b) {
     if (a.frequencyRank===b.frequencyRank){
         if (!a.wordIdiom.includes(" ") && b.wordIdiom.includes(" ")){
@@ -83,10 +99,22 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
   }
 
   function updateUserInput (newInput) {
-    const sanitizedArray = countVocabularyWords(newInput)
+    const vocabWordCount = countVocabularyWords(newInput)
+    const uniqueWordsWithCounts = vocabWordCount[0]
+    const totalWordCount = vocabWordCount[1]
     setUserInput(newInput)
-    wordCount.current = sanitizedArray
-    return(sanitizedArray)
+    wordCount.current = uniqueWordsWithCounts
+    passageLength.current = totalWordCount
+    return(vocabWordCount)
+  }
+
+  function updateUserAddedVocabulary (newInput) {
+    const vocabWordCount = countVocabularyWords(newInput)
+    const uniqueWordsWithCounts = vocabWordCount[0]
+    const totalWordCount = vocabWordCount[1]
+    setUserAddedVocabulary(newInput)
+    extraAcceptableWords.current = uniqueWordsWithCounts
+    return(uniqueWordsWithCounts)
   }
 
   function countVocabularyWords (string) {
@@ -105,7 +133,6 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
     }
     */
     const sanitizedArray = [...segmentedText].filter(s => s.isWordLike).map(s => s.segment.toLowerCase());
-    console.log(sanitizedArray)
     let u = 0
     const wordCount = []
     while (u < sanitizedArray.length) {
@@ -113,14 +140,13 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
       const wordFound = wordCount.find(word => word.word===thisWord)
       if (wordFound) {
         wordFound.count++
-      } else {
+      } else  if (Number.isNaN(parseFloat(thisWord))) {
         wordCount.push({word: thisWord, count: 1 })
       }
       u++
     }
     wordCount.sort((a,b) => {return (b.count - a.count)})
-    console.log(wordCount)
-    return wordCount
+    return [wordCount, sanitizedArray.length]
   }
 
   function filterWordCountByUnknown () {
@@ -132,6 +158,11 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
       }
     }
     const unknownWordCount = wordCount.current.filter(filterWordsByUnknown)
+    let totalWordsUnknown = 0
+    unknownWordCount.forEach(count => {
+      totalWordsUnknown += count.count
+    })
+    comprehensionPercentage.current = passageLength.current > 0?100-Math.floor(totalWordsUnknown/passageLength.current*100):100
     setUnknownWordCount(unknownWordCount)
   }
 
@@ -141,7 +172,6 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
       selectedLesson.vocabKnown.forEach(vocabName => {
         const vocabularyItem = vocabularyTable.find(item => item.vocabName === vocabName)
         if (vocabularyItem) {
-          !vocabularyItem.spellings && console.log(vocabularyItem)
           vocabularyItem.spellings && vocabularyItem.spellings.forEach(word => {
             acceptableSpellings.push(word)
           })
@@ -193,9 +223,12 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
   useEffect(() => {
     if (vocabularyTable.length > 0){
       const acceptableSpellings = getAcceptableWordSpellingsFromSelectedLesson()
+      extraAcceptableWords.current.forEach(word => {
+        acceptableSpellings.push(word.word)
+      })
       setAcceptableWordSpellings(acceptableSpellings)
     }
-  }, [selectedLesson, vocabularyTable])
+  }, [selectedLesson, vocabularyTable, userAddedVocabulary])
 
   useEffect(() => {
     if (selectedLesson) {
@@ -204,18 +237,34 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
       }
     }
   }, [selectedLesson, vocabularyTable, userInput, acceptableWordSpellings])
+
+  useEffect (() => {
+    console.log(addManualVocabulary)
+  }, [addManualVocabulary])
   
 
   return ((
     <div className="frequensay">
         <h2>FrequenSay</h2>
         <LessonSelector programTable = {programTable} selectedLesson = {selectedLesson} updateSelectedLesson = {updateSelectedLesson} selectedProgram = {selectedProgram} updateSelectedProgram = {updateSelectedProgram} />
+        <div className="buttonBox">
+          {!addManualVocabulary && (<button className="greenButton" onClick={() => additionalVocab()}>Add Extra Vocabulary</button>)}
+          {addManualVocabulary && (<button className="'redButton" onClick={() => noAdditionalVocab()}>Cancel Extra Vocabulary</button>)}
+        </div>
+        {addManualVocabulary && (<form onSubmit={e => (e.preventDefault)}>
+            <textarea value={userAddedVocabulary} rows={7} cols={25} onChange={e => updateUserAddedVocabulary(e.target.value)}>
+            </textarea>
+        </form>)}
         <form onSubmit={e => (e.preventDefault)}>
             <textarea value={userInput} rows={12} cols={85} onChange={e => updateUserInput(e.target.value)}>
             </textarea>
         </form>
+        <div>
+          <p>Word Count: {passageLength.current}</p>
+          <p>Words Known: {comprehensionPercentage.current}%</p>
+        </div>
         {unknownWordCount.length && (<div>
-          <h3>Unknown Words:</h3>
+          <h3>{unknownWordCount.length} Unknown Words:</h3>
           <div className="buttonBox">
             <button onClick={copyTable}>Copy Word List</button>
           </div>
