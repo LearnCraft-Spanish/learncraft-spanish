@@ -51,6 +51,23 @@ export async function getVocabFromBackend(token) {
     
 }
 
+export async function getSpellingsFromBackend(token) {
+    let fetchUrl = `${backendUrl}public/spellings`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend;
+    
+}
+
 export async function getExamplesFromBackend(token) {
     let fetchUrl = `${backendUrl}public/examples`
     //console.log(`Fetching ${fetchUrl}`)

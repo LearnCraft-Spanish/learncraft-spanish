@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import LessonSelector from "./LessonSelector";
-import { getVocabFromBackend } from "./BackendFetchFunctions";
+import { getVocabFromBackend, getSpellingsFromBackend } from "./BackendFetchFunctions";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function FrequenSay ({activeStudent, programTable, selectedLesson, updateSelectedLesson, selectedProgram, updateSelectedProgram}) {
@@ -25,7 +25,7 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
     }
   }
 
-  async function getVocab () {
+  async function getSpellings () {
     try {
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
@@ -34,13 +34,49 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
         },
       });
       //console.log(accessToken)
-      const vocab = await getVocabFromBackend(accessToken)
+      const spellings = await getSpellingsFromBackend(accessToken)
       .then((result) => {
         //console.log(result)
         const usefulData = result;
         return usefulData
       });
-      return vocab.sort(sortVocab)
+      return spellings
+    } catch (e) {
+        console.log(e.message);
+    }
+  }
+
+  async function getVocab () {
+    try {
+      const spellings = getSpellings()
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: audience,
+          scope: "openID email profile",
+        },
+      });
+      //console.log(accessToken)
+      const vocab = await getVocabFromBackend(accessToken)
+      .then(async (result) => {
+        //console.log(result)
+        const usefulData = result;
+        await spellings
+        .then ( result => {
+          console.log(result)
+          result.forEach(element => {
+            const relatedVocab = usefulData.find(record => record.recordId === element.relatedWordIdiom)
+            if (relatedVocab && relatedVocab.spellings){
+              relatedVocab.spellings.push(element.spellingOption)
+            } else if (relatedVocab) {
+              relatedVocab.spellings = [element.spellingOption]
+            }
+          });
+        })
+        return usefulData
+      });
+      vocab.sort(sortVocab)
+      console.log(vocab)
+      return vocab
     } catch (e) {
         console.log(e.message);
     }
@@ -101,10 +137,14 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
 
   function getAcceptableWordSpellingsFromSelectedLesson () {
     if (selectedLesson.recordId){
-      const acceptableSpellings = selectedLesson.vocabKnown.map(vocabName => {
+      const acceptableSpellings = []
+      selectedLesson.vocabKnown.forEach(vocabName => {
         const vocabularyItem = vocabularyTable.find(item => item.vocabName === vocabName)
         if (vocabularyItem) {
-          return vocabularyItem.wordIdiom
+          !vocabularyItem.spellings && console.log(vocabularyItem)
+          vocabularyItem.spellings && vocabularyItem.spellings.forEach(word => {
+            acceptableSpellings.push(word)
+          })
         }
       })
       return acceptableSpellings

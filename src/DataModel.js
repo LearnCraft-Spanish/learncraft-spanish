@@ -23,6 +23,13 @@ export const qb = { // quickbaseTablesInfo
         id: 'brrcdgyix',
         fields: ['Record ID#', 'word/idiom', 'use', 'Vocabulary Subcategory - subcategory name', 'Vocab Name', 'frequency rank', 'Verb Infinitive', 'Conjugation Tags']
     },
+
+    spellings: {
+        name: 'spellings',
+        id: 'btdqqc2rb',
+        fields: ['Related word/idiom', 'spelling option']
+    },
+    
     examples: {
         name: 'examples',
         id: 'brrcdgyjw',
