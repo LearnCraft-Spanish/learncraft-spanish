@@ -78,7 +78,6 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
         const usefulData = result;
         await spellings
         .then ( result => {
-          console.log(result)
           result.forEach(element => {
             const relatedVocab = usefulData.find(record => record.recordId === element.relatedWordIdiom)
             if (relatedVocab && relatedVocab.spellings){
@@ -91,7 +90,6 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
         return usefulData
       });
       vocab.sort(sortVocab)
-      console.log(vocab)
       return vocab
     } catch (e) {
         console.log(e.message);
@@ -237,10 +235,6 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
       }
     }
   }, [selectedLesson, vocabularyTable, userInput, acceptableWordSpellings])
-
-  useEffect (() => {
-    console.log(addManualVocabulary)
-  }, [addManualVocabulary])
   
 
   return ((
@@ -252,10 +246,12 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
           {addManualVocabulary && (<button className="'redButton" onClick={() => noAdditionalVocab()}>Cancel Extra Vocabulary</button>)}
         </div>
         {addManualVocabulary && (<form onSubmit={e => (e.preventDefault)}>
+            <h3>Extra Vocabulary:</h3>
             <textarea value={userAddedVocabulary} rows={7} cols={25} onChange={e => updateUserAddedVocabulary(e.target.value)}>
             </textarea>
         </form>)}
         <form onSubmit={e => (e.preventDefault)}>
+            <h3>Text to Check:</h3>
             <textarea value={userInput} rows={12} cols={85} onChange={e => updateUserInput(e.target.value)}>
             </textarea>
         </form>
@@ -263,7 +259,7 @@ export default function FrequenSay ({activeStudent, programTable, selectedLesson
           <p>Word Count: {passageLength.current}</p>
           <p>Words Known: {comprehensionPercentage.current}%</p>
         </div>
-        {unknownWordCount.length && (<div>
+        {unknownWordCount.length > 0 && (<div>
           <h3>{unknownWordCount.length} Unknown Words:</h3>
           <div className="buttonBox">
             <button onClick={copyTable}>Copy Word List</button>

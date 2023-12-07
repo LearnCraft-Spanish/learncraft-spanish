@@ -530,11 +530,12 @@ async function setupAudioExamplesTable () {
   }, [isAuthenticated])
 
   useEffect(() => {
-    if (qbUserData.recordId && (qbUserData.role === 'student'|| qbUserData.role === 'limited')){
+    console.log('checking')
+    if (isAuthenticated && qbUserData.recordId && (qbUserData.role === 'student'|| qbUserData.role === 'limited')){
       console.log('user loading complete')
       setActiveStudent(qbUserData)
     }
-    if (qbUserData.isAdmin){
+    if (isAuthenticated && qbUserData.isAdmin){
       async function setupStudentList () {
         const studentListPromise = await getStudentList()
         setStudentList(studentListPromise)
@@ -542,11 +543,12 @@ async function setupAudioExamplesTable () {
       setupStudentList()
     } else {
       if (isAuthenticated && qbUserData && !qbUserData.recordId){
+        console.log('this should work')
         setMenuReady(true)
         setFlashcardDataComplete(true)
       }
     }
-  }, [qbUserData])
+  }, [qbUserData, isAuthenticated])
 
   useEffect(()=>{
     if (programTable[0] && audioExamplesTable.length > 0){
