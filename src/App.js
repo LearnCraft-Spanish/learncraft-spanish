@@ -180,47 +180,6 @@ function App() {
     }
   }
 
-  async function parseCourseLessons(courses) {
-    const lessonTable = await getLessons()
-    console.log('parsing lessons')
-    function parseLessonsByVocab () {
-      courses.forEach((course) => {
-          const combinedVocabulary = []
-          const lessonSortFunction = (a, b) => {
-            function findNumber (stringLesson) {
-              const lessonArray = stringLesson.split(' ')
-              const lessonNumber = lessonArray.slice(-1)
-              const lessonNumberInt = parseInt(lessonNumber)
-              return lessonNumberInt
-            }
-            return findNumber(a)-findNumber(b)
-          }
-          course.lessons.sort(lessonSortFunction)
-          //console.log(lessonTable)
-          const parsedLessonArray = []
-          
-          course.lessons.forEach((lesson) => {
-            const lessonTableItem = lessonTable.find((item) => (item.lesson === lesson))
-            //console.log(lessonTableItem)
-            parsedLessonArray.push(lessonTableItem)
-          })
-          course.lessons = parsedLessonArray
-          course.lessons.forEach((lesson) => {
-            lesson.vocabIncluded.forEach((word) => {
-              if (!combinedVocabulary.includes(word)) {
-                combinedVocabulary.push(word)
-              }
-            })
-            lesson.vocabKnown=[...combinedVocabulary]
-          })
-          //console.log(lessonsParsedByVocab[courseIndex])
-      })
-      return courses
-    }
-    const parsedLessons = parseLessonsByVocab(programTable)
-    return parsedLessons
-  }
-
   async function getPrograms () {
     console.log('getting Programs')
     try {
@@ -238,13 +197,59 @@ function App() {
         return usefulData
       });
       //console.log(examples)
-      const parsedPrograms = await parseCourseLessons(programs)
-      //console.log(parsedPrograms)
-      setProgramTable(parsedPrograms)
-      return parsedPrograms
+      return programs
     } catch (e) {
         console.log(e.message);
     }
+  }
+
+  async function parseCourseLessons() {
+    const courses = await getPrograms()
+    const lessonTable = await getLessons()
+    console.log('parsing lessons')
+    function parseLessonsByVocab () {
+      courses.forEach((course) => {
+          const combinedVocabulary = []
+          const lessonSortFunction = (a, b) => {
+            function findNumber (stringLesson) {
+              const lessonArray = stringLesson.split(' ')
+              const lessonNumber = lessonArray.slice(-1)
+              const lessonNumberInt = parseInt(lessonNumber)
+              return lessonNumberInt
+            }
+            return findNumber(a.lesson)-findNumber(b.lesson)
+          }
+          
+          //console.log(lessonTable)
+          const parsedLessonArray = []
+          
+          lessonTable.forEach((lesson) => {
+            console.log(lesson)
+            console.log(course.recordId)
+            if (parseInt(lesson.relatedProgram) === parseInt(course.recordId)) {
+              parsedLessonArray.push(lesson)
+            }
+          })
+          parsedLessonArray.sort(lessonSortFunction)
+          course.lessons = parsedLessonArray
+          course.lessons.forEach((lesson) => {
+            lesson.vocabIncluded.forEach((word) => {
+              if (!combinedVocabulary.includes(word)) {
+                combinedVocabulary.push(word)
+              }
+            })
+            lesson.vocabKnown=[...combinedVocabulary]
+          })
+          //console.log(lessonsParsedByVocab[courseIndex])
+      })
+      return courses
+    }
+    Promise.all(courses, lessonTable).then(() => {
+      const parsedLessons = parseLessonsByVocab()
+      console.log(parsedLessons)
+      setProgramTable(parsedLessons)
+      return parsedLessons
+    })
   }
 
   function getStudentLevel () {
@@ -524,7 +529,7 @@ async function setupAudioExamplesTable () {
   useEffect(() => {
     if (rendered && isAuthenticated) {
       userSetup()
-      getPrograms()
+      parseCourseLessons()
       setupAudioExamplesTable()
     }
   }, [isAuthenticated])

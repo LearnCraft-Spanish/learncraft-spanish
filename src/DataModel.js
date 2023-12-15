@@ -38,7 +38,7 @@ export const qb = { // quickbaseTablesInfo
     lessons: {
         name: 'Lessons',
         id: 'brrtcungb',
-        fields: ['Record ID#', 'Lesson', 'Vocab Included', 'Sort Reference']
+        fields: ['Record ID#', 'Lesson', 'Vocab Included', 'Sort Reference', 'Related Program']
     },
     quizzes: {
         name: 'quiz',
