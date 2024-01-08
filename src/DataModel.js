@@ -15,7 +15,7 @@ export const qb = { // quickbaseTablesInfo
     programs: {
         name: 'programs',
         id: 'btgeqa5um',
-        fields: ['Record ID#','Name', 'Lessons', 'Cohort A Current Lessons', 'Cohort B Current Lessons', 'Cohort C Current Lessons', 'Cohort D Current Lessons']
+        fields: ['Record ID#', 'Name', 'Lessons', 'Cohort A Current Lesson', 'Cohort B Current Lesson', 'Cohort C Current Lesson', 'Cohort D Current Lesson', 'Cohort E Current Lesson']
     },
 
     vocabulary: {
