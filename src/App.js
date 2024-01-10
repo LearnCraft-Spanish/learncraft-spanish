@@ -525,6 +525,11 @@ async function setupAudioExamplesTable () {
   }, [])
 
   useEffect(() => {
+    console.log(examplesTable.length?`Examples: ${examplesTable.length}`:'No Examples')
+    console.log(studentExamplesTable.length?`Student Examples: ${studentExamplesTable.length}`:'No Student Examples')
+  }, [examplesTable, studentExamplesTable])
+
+  useEffect(() => {
     if (rendered && isAuthenticated) {
       userSetup()
       parseCourseLessons()
@@ -533,9 +538,7 @@ async function setupAudioExamplesTable () {
   }, [isAuthenticated])
 
   useEffect(() => {
-    console.log('checking')
     if (isAuthenticated && qbUserData.recordId && (qbUserData.role === 'student'|| qbUserData.role === 'limited')){
-      console.log('user loading complete')
       setActiveStudent(qbUserData)
     }
     if (isAuthenticated && qbUserData.isAdmin){
@@ -546,7 +549,6 @@ async function setupAudioExamplesTable () {
       setupStudentList()
     } else {
       if (isAuthenticated && qbUserData && !qbUserData.recordId){
-        console.log('this should work')
         setMenuReady(true)
         setFlashcardDataComplete(true)
       }

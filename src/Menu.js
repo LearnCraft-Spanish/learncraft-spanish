@@ -21,11 +21,11 @@ export default function Menu({userData, updateExamplesTable, examplesTable, stud
   }, [])
   
   useEffect(() => {
-    if (rendered){
+    if (rendered && (userData.isAdmin || userData.role === 'student')){
       console.log('resetting for menu mount')
       updateExamplesTable()
     }
-  }, [rendered])
+  }, [rendered, userData])
 
 
   return (
