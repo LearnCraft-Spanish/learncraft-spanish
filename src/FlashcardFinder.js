@@ -399,7 +399,7 @@ export default function FlashcardFinder({activeStudent, programTable, user, stud
     exampleToUpdate.isAssigned = true
     addToActiveStudentFlashcards(exampleId)
     .then(addResponse => {
-      if (addResponse === 0) {
+      if (addResponse !== 1) {
         exampleToUpdate.isAssigned = false
       }
     })

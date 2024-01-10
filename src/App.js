@@ -224,8 +224,6 @@ function App() {
           const parsedLessonArray = []
           
           lessonTable.forEach((lesson) => {
-            console.log(lesson)
-            console.log(course.recordId)
             if (parseInt(lesson.relatedProgram) === parseInt(course.recordId)) {
               parsedLessonArray.push(lesson)
             }
