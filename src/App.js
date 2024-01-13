@@ -315,25 +315,20 @@ function App() {
             scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
           }
         });
-        const userStudentExampleData = await getMyStudentExamplesFromBackend(accessToken)
-        .then((result) => {
-          const usefulData = result
-          console.log(usefulData)
-          return usefulData
-        });
-        setStudentExamplesTable(userStudentExampleData)
         const userExampleData = await getMyExamplesFromBackend(accessToken)
         .then((result) => {
           const usefulData = result
           console.log(usefulData)
           return usefulData
         });
-        setExamplesTable(userExampleData)
+        setStudentExamplesTable(userExampleData.studentExamples)
+        setExamplesTable(userExampleData.examples)
       } catch (e) {
         console.log(e.message);
       }
     }
   }
+  
 
   function makeStudentSelector () {
     if (qbUserData.isAdmin){
@@ -645,10 +640,10 @@ async function setupAudioExamplesTable () {
       }
       {menuReady && (
         <Routes>
-          <Route path = "/" element={<Menu userData = {qbUserData} updateExamplesTable={updateExamplesTable} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} activeLesson={activeLesson.current} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
+          <Route path = "/" element={<Menu userData = {qbUserData} updateExamplesTable={updateExamplesTable} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
           <Route exact path = "/callback" element = {<CallbackPage />} />
           <Route exact path="/allflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} activeStudent = {activeStudent} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
-          <Route exact path="/todaysflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent} activeProgram={activeProgram} activeLesson={activeLesson} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
+          <Route exact path="/todaysflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent}  examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
           <Route path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} selectedProgram = {selectedProgram} selectedLesson={selectedLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
           <Route exact path="/flashcardfinder" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <FlashcardFinder user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} addToActiveStudentFlashcards={addToActiveStudentFlashcards} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route exact path="/audioquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <AudioQuiz activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
