@@ -287,20 +287,15 @@ function App() {
             scope: "openid profile email read:current-student update:current-student read:all-students update:all-students"
           }
         });
-        const activeStudentExampleData = await getActiveStudentExamplesFromBackend(accessToken, activeStudent.recordId, activeStudent.emailAddress)
+        const studentExampleData = await getActiveExamplesFromBackend(accessToken, activeStudent.recordId, activeStudent.emailAddress)
         .then((result) => {
           const usefulData = result
           //console.log(usefulData)
           return usefulData
         });
-        setStudentExamplesTable(activeStudentExampleData)
-        const activeExampleData = await getActiveExamplesFromBackend(accessToken, activeStudent.recordId, activeStudent.emailAddress)
-        .then((result) => {
-          const usefulData = result
-          //console.log(usefulData)
-          return usefulData
-        });
-        setExamplesTable(activeExampleData)
+        console.log(studentExampleData)
+        setExamplesTable(studentExampleData.examples)
+        setStudentExamplesTable(studentExampleData.studentExamples)
       } catch (e) {
         console.log(e.message);
       }
@@ -560,7 +555,7 @@ async function setupAudioExamplesTable () {
         if (selectedLesson.recordId !== activeLesson.current.recordId) {
           updateSelectedLesson(activeLesson.current.recordId)
         }
-        //updateExamplesTable()
+        updateExamplesTable()
       }
     }
   }, [activeStudent, programTable, audioExamplesTable])
