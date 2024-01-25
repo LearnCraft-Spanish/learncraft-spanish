@@ -56,8 +56,12 @@ export default function Menu({userData, updateExamplesTable, examplesTable, stud
             </div>
         </div>)}
         {(userData.isAdmin && <div className='menuBox'>
+            <h3>Staff Tools</h3>
             <div className= 'buttonBox'>
                 <Link className = 'linkButton' to='/frequensay'>FrequenSay</Link>
+            </div>
+            <div className= 'buttonBox'>
+              <Link className = 'linkButton' to='/coaching'>Coaching</Link>
             </div>
         </div>)}
 

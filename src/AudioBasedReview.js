@@ -230,7 +230,6 @@ export default function AudioBasedReview({ programTable, activeStudent, studentE
         switch (currentStep) {
             case 1:
                 if (startWithSpanish && spanishHidden) {
-                    console.log("Showing Spanish")
                     showSpanish()
                 } else if (autoplay && !guessing){
                     clearTimeout(currentCountdown.current)
@@ -377,6 +376,7 @@ export default function AudioBasedReview({ programTable, activeStudent, studentE
                     {autoplay && paused && !startWithSpanish && <button onClick={resumePlayback}>Play</button>}
                 </div>
                 <div className='buttonBox'>
+                    {startWithSpanish && currentStep < 2 && <button onClick={playCurrentQuestion}>Play Again</button>}
                     {!startWithSpanish && <button onClick={decrementExample}>Previous</button>}
                     {!startWithSpanish && <button onClick={incrementExample}>Next</button>}
                 </div>

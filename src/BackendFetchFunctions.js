@@ -163,27 +163,6 @@ export async function getAllUsersFromBackend(token) {
     return tableFromBackend;
 }
 
-export async function getActiveStudentExamplesFromBackend(token, studentId, studentEmail) {
-    let fetchUrl = `${backendUrl}${studentId}/student-examples`
-    //console.log(`Fetching ${fetchUrl}`)
-
-    const tableFromBackend = await fetch(fetchUrl,{method:'GET',headers: {Authorization: `Bearer ${token}`, EmailAddress: studentEmail}})
-    .then((res) => {
-        if(res.ok){
-            return res.json().then((res) => {
-                const data = [res];
-                //console.log(data);
-                return data;
-            }) 
-        } else if (res.status === '403') {
-            console.log ('unauthorized')
-        }
-    })
-    .catch(err => console.log(err))
-    
-    return tableFromBackend[0];
-}
-
 export async function getActiveExamplesFromBackend(token, studentId, studentEmail) {
     let fetchUrl = `${backendUrl}${studentId}/examples`
     //console.log(`Fetching ${fetchUrl}`)
@@ -373,3 +352,100 @@ export async function deleteStudentExample(token, recordId) {
     
     return messageFromBackend;
 }
+
+export async function getCoachList(token) {
+    let fetchUrl = `${backendUrl}coaching/coaches`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+
+export async function getCourseList(token) {
+    let fetchUrl = `${backendUrl}coaching/courses`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+
+export async function getLessonList(token) {
+    let fetchUrl = `${backendUrl}coaching/lessons`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+
+export async function getActiveStudents(token) {
+    let fetchUrl = `${backendUrl}coaching/active-students`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+
+export async function getActiveMemberships(token) {
+    let fetchUrl = `${backendUrl}coaching/active-memberships`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+
+export async function getLastThreeWeeks(token) {
+    let fetchUrl = `${backendUrl}coaching/last-three-weeks`
+    //console.log(`Fetching ${fetchUrl}`)
+    const tableFromBackend = await fetch(fetchUrl,{method:'GET', headers: {Authorization: `Bearer ${token}`}})
+    .then((res) => {
+        if(res.ok){
+            return res.json().then((res) => {
+                const data = res;
+                return data;
+            }) 
+        }
+    })
+    .catch(err => console.log(err))
+    return tableFromBackend; 
+}
+

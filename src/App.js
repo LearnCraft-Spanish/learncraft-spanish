@@ -20,6 +20,7 @@ import FlashcardFinder from './FlashcardFinder';
 import OfficialQuiz from './OfficialQuiz';
 import CallbackPage from './CallbackPage';
 import CourseQuizzes from './CourseQuizzes';
+import Coaching from './Coaching';
 require('dotenv').config()
 
 function App() {
@@ -644,6 +645,7 @@ async function setupAudioExamplesTable () {
           <Route exact path="/audioquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <AudioQuiz activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route exact path="/comprehensionquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <ComprehensionQuiz  activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route exact path="/frequensay" element={qbUserData.isAdmin && <FrequenSay activeStudent = {activeStudent} programTable = {programTable} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram} />} />
+          <Route exact path="/coaching" element={qbUserData.isAdmin && <Coaching />}/>
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>)
       }
