@@ -648,6 +648,72 @@ button:hover {
   margin: 0;
 }
 
+/*Styles for the coaching section*/
+.moreFilters {
+  padding: 5%;
+  background-color: var(--brand);
+  border: 5px solid var(--dark);
+  position: fixed;
+  top: 10%;
+  bottom: 10%;
+  left: 10%;
+  right: 10%;
+}
+
+.callPopup {
+  padding: 5%;
+  background-color: var(--light);
+  border: 5px solid var(--dark);
+  position: fixed;
+  top: 10%;
+  bottom: 10%;
+  left: 10%;
+  right: 10%;
+}
+
+.assignmentPopup {
+  padding: 5%;
+  background-color: var(--light);
+  border: 5px solid var(--dark);
+  position: fixed;
+  top: 10%;
+  bottom: 10%;
+  left: 10%;
+  right: 10%;
+}
+
+.studentRecords {
+  border-collapse: collapse;
+  margin: 15px;
+}
+
+.tableHeader {
+  background-color: var(--brand);
+  color: var(--light);
+  border: 2px solid var(--dark);
+}
+
+.tableHeader th {
+  padding: 10px;
+}
+
+.studentWeek {
+  background-color: var(--light);
+  margin: 9px;
+  border: 1px solid var(--dark);
+  padding: 5px 10px;
+}
+
+.studentHeader {
+  color: var(--light);
+  border-bottom: 1px solid var(--light);
+  background-color: var(--dark);
+}
+
+.studentWeek td {
+  padding: 10px 20px;
+}
+
 @media screen and (max-width: 767px) {
   .div-header {
     flex-direction: column;

@@ -61,7 +61,7 @@ export const qb = {grammar: // quickbaseTablesInfo
         students: {
             name: 'students',
             id: 'bqkme9fni',
-            fields: ['Record ID#', 'First Name', 'Last Name', 'Full Name', 'Email', 'Time Zone', 'US Phone', 'Starting Level', 'Related Coach']
+            fields: ['Record ID#', 'First Name', 'Last Name', 'Full Name', 'Email', 'Time Zone', 'US Phone', 'Starting Level', 'Primary Coach']
         },
         memberships: {
             name: 'memberships',
@@ -81,7 +81,7 @@ export const qb = {grammar: // quickbaseTablesInfo
         weeks: {
             name: 'weeks',
             id: 'bqkmqjb9r',
-            fields: ['Record ID#', 'Primary Coach (When Created)', 'Week Starts', 'Week Ends', 'Record Completable', 'Records Complete?', 'Week #', 'Notes', 'Related Membership', 'Current Lesson']
+            fields: ['Record ID#', 'Primary Coach (When Created)', 'Week Starts', 'Week Ends', 'Record Completable', 'Records Complete?', 'Week #', 'Notes', 'Related Membership', 'Current Lesson', 'Assignment Ratings', 'Private Call Ratings', 'Group Call Comments', 'Hold Week']
         }, 
         calls: {
             name: 'calls',

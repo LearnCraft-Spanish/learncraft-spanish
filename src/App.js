@@ -1,6 +1,6 @@
 import './App.css';
-import React from 'react';
-import { Route, Routes, Link, useParams, Outlet } from "react-router-dom";
+import React, { isValidElement } from 'react';
+import { Route, Routes, Link, useLocation, useParams, Outlet } from "react-router-dom";
 import { useEffect, useState, useRef } from 'react';
 //import jsonwebtoken from 'jsonwebtoken';
 import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBackend, getActiveExamplesFromBackend, createStudentExample, createMyStudentExample, deleteStudentExample, deleteMyStudentExample, getActiveStudentExamplesFromBackend, getAllUsersFromBackend, getProgramsFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
@@ -25,6 +25,7 @@ require('dotenv').config()
 
 function App() {
   const { user, isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
+  const location = useLocation()
   const rendered = useRef(false)
   const [qbUserData, setQbUserData]= useState({}) //The user data for the person using the app (if a student)
   const [menuReady, setMenuReady] = useState(false)
@@ -32,6 +33,7 @@ function App() {
   const [programTable, setProgramTable] = useState([]) //Array of course objects. Each has a property of 'lessons': an array of lesson objects
   const activeProgram = useRef({})
   const activeLesson = useRef({})
+  const currentContextual = useRef(null)
   const [selectedLesson, setSelectedLesson] = useState(activeLesson.current)
   const [selectedProgram, setSelectedProgram] = useState(activeProgram.current)
   const [studentList, setStudentList] = useState([])
@@ -42,10 +44,35 @@ function App() {
   const [bannerMessage, setBannerMessage] = useState('')
   const [choosingStudent, setChoosingStudent] = useState(false)
   const [messageNumber, setMessageNumber] = useState(0)
-
+  const [contextual, setContextual] = useState('')
 
   const audience = process.env.REACT_APP_API_AUDIENCE
 
+  function openContextual (elementClass) {
+    console.log(elementClass)
+    setContextual(elementClass)
+  }
+  
+  function closeContextual () {
+    setContextual('')
+  }
+
+  function closeContextualIfClickOut (e) {
+    if (isValidElement(currentContextual.current)||currentContextual.current instanceof Element) {
+      const contextualItemBounds = currentContextual.current.getBoundingClientRect()
+      const eventX = e.clientX
+      const eventY = e.clientY
+      const leftOfLeftBound = eventX <= contextualItemBounds.left
+      const rightOfRightBound = eventX >= contextualItemBounds.right
+      const aboveTopBound = eventY >= contextualItemBounds.bottom
+      const belowBottomBound = eventY <= contextualItemBounds.top
+      const outOfBounds =  (leftOfLeftBound  || rightOfRightBound || aboveTopBound || belowBottomBound)
+      if (outOfBounds) {
+        closeContextual()
+      }
+    }
+  }
+  
   function chooseStudent() {
     setChoosingStudent(true)
   }
@@ -525,6 +552,7 @@ async function setupAudioExamplesTable () {
       userSetup()
       parseCourseLessons()
       setupAudioExamplesTable()
+      console.log(location)
     }
   }, [isAuthenticated])
 
@@ -585,7 +613,7 @@ async function setupAudioExamplesTable () {
 
 
   return (
-    <div className="App">
+    <div className="App" onClick={closeContextualIfClickOut}>
       <div className='div-header'>
         <Link to='/'>
           <h1> LearnCraft Spanish </h1>
@@ -593,7 +621,7 @@ async function setupAudioExamplesTable () {
         <LogoutButton />
         <LoginButton />
       </div>
-      <div className = 'div-user-subheader'>
+      {location.pathname !== '/coaching' && <div className = 'div-user-subheader'>
         {!isLoading && !isAuthenticated && (
           <p>You must be logged in to use this app.</p>
         )}
@@ -623,7 +651,7 @@ async function setupAudioExamplesTable () {
           <button onClick={keepStudent}>Cancel</button>
         </form>
         }
-      </div>
+      </div>}
 
       {bannerMessage && <div className='bannerMessage'>
         <p>{bannerMessage}</p>
@@ -641,11 +669,11 @@ async function setupAudioExamplesTable () {
           <Route exact path="/allflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} activeStudent = {activeStudent} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
           <Route exact path="/todaysflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent}  examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
           <Route path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} selectedProgram = {selectedProgram} selectedLesson={selectedLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
-          <Route exact path="/flashcardfinder" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <FlashcardFinder user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} addToActiveStudentFlashcards={addToActiveStudentFlashcards} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
+          <Route exact path="/flashcardfinder" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <FlashcardFinder user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} addToActiveStudentFlashcards={addToActiveStudentFlashcards} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram} contextual={contextual} openContextual = {openContextual} closeContextual = {closeContextual} ref = {currentContextual}/>} />
           <Route exact path="/audioquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <AudioQuiz activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route exact path="/comprehensionquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <ComprehensionQuiz  activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
           <Route exact path="/frequensay" element={qbUserData.isAdmin && <FrequenSay activeStudent = {activeStudent} programTable = {programTable} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram} />} />
-          <Route exact path="/coaching" element={qbUserData.isAdmin && <Coaching />}/>
+          <Route exact path="/coaching" element={qbUserData.isAdmin && <Coaching userData = {qbUserData} contextual={contextual} openContextual = {openContextual} closeContextual = {closeContextual} ref = {currentContextual}/>}/>
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>)
       }

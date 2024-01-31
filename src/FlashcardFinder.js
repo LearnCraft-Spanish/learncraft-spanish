@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, forwardRef} from 'react';
 import { getVocabFromBackend, getVerifiedExamplesFromBackend, createStudentExample, createMyStudentExample, getLessonsFromBackend, getProgramsFromBackend, getAllUsersFromBackend} from './BackendFetchFunctions';
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -6,7 +6,7 @@ import LessonSelector from './LessonSelector'
 import { isLabelWithInternallyDisabledControl } from '@testing-library/user-event/dist/utils';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-export default function FlashcardFinder({activeStudent, programTable, user, studentExamplesTable, flashcardDataComplete, selectedProgram, selectedLesson, updateSelectedProgram, updateSelectedLesson, addToActiveStudentFlashcards}) {
+const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentExamplesTable, flashcardDataComplete, selectedProgram, selectedLesson, updateSelectedProgram, updateSelectedLesson, addToActiveStudentFlashcards, contextual, openContextual, closeContextual}, currentContextual) => {
   const {getAccessTokenSilently} = useAuth0();
   const [isLoaded, setIsLoaded] = useState(false)
   const [vocabSearchTerm, setVocabSearchTerm] = useState('')
@@ -30,27 +30,28 @@ export default function FlashcardFinder({activeStudent, programTable, user, stud
       setNoSpanglish(true)
     }
   }
+  function updateVocabSearchTerm(target){
+    openContextual('vocabSuggestionBox')
+    setVocabSearchTerm(target.value)
+  }
+
+  function updateTagSearchTerm(target){
+    openContextual('tagSuggestionBox')
+    setTagSearchTerm(target.value)
+  }
 
   function addVocabToRequiredVocab (vocabNumber) {
     const vocabObject = vocabularyTable.find(object => (object.recordId === vocabNumber))
-    //console.log(vocabObject)
     const newRequiredVocab = [...requiredVocab];
     newRequiredVocab.push(vocabObject)
-    //console.log(newRequiredVocab)
     setRequiredVocab(newRequiredVocab)
-    setVocabSearchTerm("")
   }
 
   function addTagToRequiredTags (id) {
-    console.log(id)
     const tagObject = tagTable.find(object => (object.id === id))
-    console.log(tagObject)
     const newRequiredTags = [...requiredTags];
     newRequiredTags.push(tagObject)
-    console.log(requiredTags)
-    console.log(newRequiredTags)
     setRequiredTags(newRequiredTags)
-    setTagSearchTerm("")
   }
 
   function removeVocabFromRequiredVocab (vocabNumber) {
@@ -443,15 +444,12 @@ export default function FlashcardFinder({activeStudent, programTable, user, stud
   }, [vocabularyTable, tagTable, exampleTable, programTable])
 
   useEffect(() => {
-    if(vocabularyTable[1]){
       filterVocabularyByInput(vocabSearchTerm)
-      //console.log(suggestedVocab);
-    }
-  }, [vocabSearchTerm])
+  }, [vocabSearchTerm, contextual])
 
   useEffect(() => {
-    filterTagsByInput(tagSearchTerm)
-  }, [tagSearchTerm])
+      filterTagsByInput(tagSearchTerm)
+  }, [tagSearchTerm, contextual])
 
   useEffect(() => {
     if (selectedProgram && selectedLesson && flashcardDataComplete) {
@@ -485,11 +483,11 @@ export default function FlashcardFinder({activeStudent, programTable, user, stud
               <div className = 'wordSearchBox'>
                   <div className='searchTermBox'>
                     <p>Word or Idiom</p>
-                    <input type='text' onChange={(e) =>setVocabSearchTerm(e.target.value)}></input><br></br>
+                    <input type='text' onChange={(e) => updateVocabSearchTerm(e.target)}></input><br></br>
                   </div>
               </div>
-              {(vocabSearchTerm.length > 0) && suggestedVocab.length > 0 && (
-                <div className = 'vocabSuggestionBox'>
+              {(vocabSearchTerm.length > 0) && contextual ==='vocabSuggestionBox' && suggestedVocab.length > 0 && (
+                <div className = 'vocabSuggestionBox' ref = {currentContextual}>
                   {suggestedVocab.map((item) => {
                     return(
                       <div key={item.recordId} className='vocabCard' onClick = {() => addVocabToRequiredVocab(item.recordId)}>
@@ -519,11 +517,11 @@ export default function FlashcardFinder({activeStudent, programTable, user, stud
               <div className = 'tagSearchBox'>
                   <div className='searchTermBox'>
                     <p>Grammar Tag</p>
-                    <input type='text' onChange={(e) =>setTagSearchTerm(e.target.value)}></input><br></br>
+                    <input type='text' onChange={(e) =>updateTagSearchTerm(e.target)}></input><br></br>
                   </div>
               </div>
-              {(tagSearchTerm.length > 0) && suggestedTags.length > 0 && (
-                <div className = 'tagSuggestionBox'>
+              {(tagSearchTerm.length > 0) && contextual === 'tagSuggestionBox' && suggestedTags.length > 0 && (
+                <div className = 'tagSuggestionBox' ref={currentContextual}>
                   {suggestedTags.map((item) => {
                     return(
                       <div key={item.tag} value = {item.id} className='vocabCard' onClick = {() => addTagToRequiredTags(item.id)}>
@@ -556,4 +554,6 @@ export default function FlashcardFinder({activeStudent, programTable, user, stud
       </div>
     </div>)}
   </div>)
-}
+})
+
+export default FlashcardFinder
