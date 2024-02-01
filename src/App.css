@@ -649,7 +649,22 @@ button:hover {
 }
 
 /*Styles for the coaching section*/
+
+.coachingFilterSection {
+  padding: 20px 20px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+
+
 .moreFilters {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow:scroll;
   padding: 5%;
   background-color: var(--brand);
   border: 5px solid var(--dark);
@@ -661,6 +676,10 @@ button:hover {
 }
 
 .callPopup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow:scroll;
   padding: 5%;
   background-color: var(--light);
   border: 5px solid var(--dark);
@@ -671,7 +690,40 @@ button:hover {
   right: 10%;
 }
 
+.groupSessionPopup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow:scroll;
+  padding: 5%;
+  background-color: var(--light);
+  border: 5px solid var(--dark);
+  position: fixed;
+  top: 10%;
+  bottom: 10%;
+  left: 10%;
+  right: 10%;
+}
+
+.groupAttendeeList {
+  display: flex;
+  flex-direction: row;
+}
+
+.groupAttendee {
+  margin-right: 7px;
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: row;
+  color: var(--light);
+  background-color: var(--dark);
+}
+
 .assignmentPopup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow:scroll;
   padding: 5%;
   background-color: var(--light);
   border: 5px solid var(--dark);
@@ -712,6 +764,12 @@ button:hover {
 
 .studentWeek td {
   padding: 10px 20px;
+}
+
+.assignmentBox {
+  margin: 5px;
+  display: flex;
+  justify-content: center;
 }
 
 @media screen and (max-width: 767px) {

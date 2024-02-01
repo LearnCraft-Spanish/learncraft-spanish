@@ -13,6 +13,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(0)
     const [filterCoachless, setFilterCoachless] = useState(1)
     const [filterHoldWeeks, setFilterHoldWeeks] = useState(1)
+    const [filterIncomplete, setFilterIncomplete] = useState(0)
     const [searchTerm, setSearchTerm] = useState('')
     const rendered = useRef(false)
     const students = useRef([])
@@ -42,11 +43,15 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     function updateCoachlessFilter(argument) {
-        setFilterCoachless(argument)
+        setFilterCoachless(parseInt(argument))
     }
 
     function updateHoldFilter(argument) {
-        setFilterHoldWeeks(argument)
+        setFilterHoldWeeks(parseInt(argument))
+    }
+
+    function updateFilterIncomplete(argument) {
+        setFilterIncomplete(parseInt(argument))
     }
 
     function openMoreFilters () {
@@ -55,6 +60,10 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
 
     function openCallPopup (recordId) {
         openContextual(`call${recordId}`)
+    }
+
+    function openGroupSessionPopup (recordId) {
+        openContextual(`groupSession${recordId}`)
     }
 
     function openAssignmentPopup (recordId) {
@@ -72,6 +81,15 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
           });
           const coachList = await getCoachList(accessToken)
           .then((result) => {
+            result.sort((a,b) => {
+                if (a.user && b.user) {
+                    if (a.user.name > b.user.name) {
+                        return 1
+                    } else {
+                        return -1
+                    }
+                }
+            })
             return result
           });
           return coachList;
@@ -91,6 +109,13 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
           });
           const coachList = await getCourseList(accessToken)
           .then((result) => {
+            result.sort((a,b) => {
+                if (a.name > b.name) {
+                    return 1
+                } else {
+                    return -1
+                }
+            })
             return result
           });
           return coachList;
@@ -192,7 +217,9 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             weekRecords.current = results[2][0]
             privateCalls.current = results[2][1]
             groupCalls.current = results[2][2]
+            console.log(groupCalls.current)
             groupAttendees.current = results[2][3]
+            console.log(groupAttendees.current)
             assignments.current = results[2][4]
             coaches.current = results[3]
             courses.current = results[4]
@@ -262,8 +289,23 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     function getGroupSessionsFromWeekId(weekId){
-        const groupAttendeeList = groupAttendees.current.filter((attendee)=> attendee.relatedStudent === weekId)
-        return groupAttendeeList
+        const groupAttendeeList = groupAttendees.current.filter((attendee)=> attendee.student === weekId)||[]
+        if (typeof(groupAttendeeList) !== 'object'){
+            console.log(typeof(groupAttendeeList))
+        }
+        if (groupAttendeeList.length > 0) {
+            const groupSessionList = groupAttendeeList.map((attendee) => groupCalls.current.find((call) => call.recordId === attendee.groupSession))||[]
+            const fixedSessionList = groupSessionList.filter((item) => item)
+            return fixedSessionList
+        } else {
+            return []
+        }
+    }
+
+    function getAttendeeWeeksFromGroupSessionId(sessionId) {
+        const attendeeList = groupAttendees.current.filter((attendee) => attendee.groupSession === sessionId) ||[]
+        const weekList = attendeeList.map((attendee) => weekRecords.current.find((week) => week.recordId === attendee.student)||{})||[]
+        return weekList
     }
 
     function getAssignmentsFromWeekId(weekId) {
@@ -282,7 +324,10 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     function makeCoachSelector () {
         const coachSelector = [<option key = {0} value = {0}>All Coaches</option>]
         coaches.current.forEach((coach)=>{
-            coachSelector.push(<option key = {coach.recordId} value = {coach.recordId}> {coach.user.name}</option>)
+            const coachHasActiveStudent = students.current.filter((student) => (student.primaryCoach?student.primaryCoach.id:undefined) === (coach.user?coach.user.id:0)).length > 0
+            if (coachHasActiveStudent){
+                coachSelector.push(<option key = {coach.recordId} value = {coach.recordId}> {coach.user.name}</option>)
+            }
         })
         return coachSelector
     }
@@ -290,7 +335,10 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     function makeCourseSelector () {
         const courseSelector = [<option key = {0} value = {0}>All Courses</option>]
         courses.current.forEach((course)=>{
-            courseSelector.push(<option key = {course.recordId} value = {course.recordId}> {course.name}</option>)
+            const courseHasActiveMembership = memberships.current.filter((item) => item.relatedCourse === course.recordId).length > 0
+            if (courseHasActiveMembership) {
+                courseSelector.push(<option key = {course.recordId} value = {course.recordId}> {course.name}</option>)
+            }
         })
         return courseSelector
     }
@@ -362,12 +410,27 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         }
     }
 
+    function filterWeeksByIncomplete (weeks) {
+        if (filterIncomplete === 1) {
+            console.log("Incomplete Only")
+            const filteredWeeks = weeks.filter((week) => !week.recordsComplete)
+            return filteredWeeks
+        } else  if (filterIncomplete === 2) {
+            console.log("Complete only")
+            const filteredWeeks = weeks.filter((week) => week.recordsComplete)
+            return filteredWeeks
+        } else {
+            return weeks
+        }
+    }
+
     function combinedFilterWeeks (weeks) {
         const filteredByCoachless = filterWeeksByCoachless(weeks)
         const filteredByWeeksAgo = filterWeeksByWeeksAgo(filteredByCoachless, filterByWeeksAgo)
         const filteredByCoach = filterWeeksByCoach(filteredByWeeksAgo, filterByCoach)
         const filteredByCourse = filterWeeksByCourse(filteredByCoach, filterByCourse)
-        const filteredByOnHold = filterWeeksByOnHold(filteredByCourse)
+        const filteredByIncomplete = filterWeeksByIncomplete(filteredByCourse)
+        const filteredByOnHold = filterWeeksByOnHold(filteredByIncomplete)
         function weekSorter (a,b,) {
             const courseA = getCourseFromMembershipId(a.relatedMembership).name;
             const courseB = getCourseFromMembershipId(b.relatedMembership).name;
@@ -390,6 +453,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             }
         }
         filteredByOnHold.sort(weekSorter)
+        console.log(filteredByOnHold)
         console.log(`Displaying ${filteredByOnHold.length} records`)
         return filteredByOnHold
     }
@@ -410,7 +474,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             return null
         } else {
             return data.map((call) => (
-                <div key = {call.recordId}>
+                <div className='assignmentBox' key = {call.recordId}>
                     <button onClick={() => openCallPopup(call.recordId)}>{call.rating}</button>
                     {contextual === `call${call.recordId}` && (
                         <div className="callPopup" ref={currentContextual}>
@@ -428,12 +492,40 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         }
     }
 
+    const GroupSessions = ({data}) => {
+        if (data.length === 0) {
+            return null
+        } else {
+            return data.map((groupSession) => (
+                <div className='assignmentBox' key = {groupSession.recordId}>
+                    <button onClick={() => openGroupSessionPopup(groupSession.recordId)}>{groupSession.sessionType}</button>
+                    {contextual === `groupSession${groupSession.recordId}` && (
+                        <div className="groupSessionPopup" ref={currentContextual}>
+                            <h4>{groupSession.sessionType} on {groupSession.date}</h4>
+                            <p>Coach: {groupSession.coach?groupSession.coach.name:''}</p>
+                            <p>Topic: {groupSession.topic}</p>
+                            <p>Comments: {groupSession.comments}</p>
+                            <p><strong>Attendees:</strong></p>
+                            <div className="groupAttendeeList">
+                                {getAttendeeWeeksFromGroupSessionId(groupSession.recordId).map((attendee) => <p className="groupAttendee" key={attendee.recordId}>{getStudentFromMembershipId(attendee.relatedMembership).fullName}</p>)}
+                            </div>
+                            {(groupSession.callDocument?groupSession.callDocument.length > 0:false) && <p><a target= {"_blank"} href={groupSession.callDocument}>Call Document</a></p>}
+                            {(groupSession.zoomLink?groupSession.zoomLink.length > 0:false) && <p><a target= {"_blank"} href={groupSession.zoomLink}>Recording Link</a></p>}
+                            <div className="buttonBox">
+                                <button className="redButton" onClick={closeContextual}>Close</button>
+                            </div>
+                        </div>
+                    )}
+                </div>))
+        }
+    }
+
     const Assignments = ({data}) => {
         if (data.length === 0){
             return null
         } else {
             return data.map((assignment) => (
-                <div key = {assignment.recordId}>
+                <div className='assignmentBox' key = {assignment.recordId}>
                     <button onClick={() => openAssignmentPopup(assignment.recordId)}>{assignment.assignmentType}: {assignment.rating}</button>
                     {contextual === `assignment${assignment.recordId}` && (
                         <div className="assignmentPopup" ref = {currentContextual}>
@@ -443,7 +535,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                             <p>Rating: {assignment.rating}</p>
                             <p>Notes: {assignment.notes}</p>
                             <p>Areas of Difficulty: {assignment.areasOfDifficulty}</p>
-                            {(assignment.assignmentLink.length > 0) && <a target= {"_blank"} href={assignment.assignmentLink}>Assignment Link</a>}
+                            {(assignment.assignmentLink?assignment.assignmentLink.length > 0:false) && <a target= {"_blank"} href={assignment.assignmentLink}>Assignment Link</a>}
                             <div className="buttonBox">
                                 <button className="redButton" onClick={closeContextual}>Close</button>
                             </div>
@@ -466,7 +558,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                     {(filterByWeeksAgo < 0) && item.weekStarts}
                 </td>
                 <td><Calls data = {getPrivateCallsFromWeekId(item.recordId)}/></td>
-                <td>{(getGroupSessionsFromWeekId(item.recordId).length > 0)?getGroupSessionsFromWeekId(item.recordId).length:null}</td>
+                <td><GroupSessions data = {getGroupSessionsFromWeekId(item.recordId)}/></td>
                 <td><Assignments data = {getAssignmentsFromWeekId(item.recordId)} /></td>
                 <td>{item.notes}</td>
                 <td>{getLessonFromRecordId(item.currentLesson).lessonName}</td>
@@ -502,14 +594,14 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             }
             setWeeksToDisplay(combinedFilterWeeks(weekRecords.current))
         }
-    }, [startupDataLoaded, filterByCoach, filterByCourse, filterByWeeksAgo, filterCoachless, filterHoldWeeks])
+    }, [startupDataLoaded, filterByCoach, filterByCourse, filterByWeeksAgo, filterCoachless, filterHoldWeeks, filterIncomplete])
 
 
     return ((
     <div className="coaching">
         {!startupDataLoaded && <p>This section is still under construction</p>}
         {startupDataLoaded && <div>
-            <div className="filterSection">
+            <div className="coachingFilterSection">
                 <select onChange={(e) => updateCoachFilter(e.target.value)}>
                     {makeCoachSelector()}
                 </select>
@@ -524,14 +616,25 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                 </select>
                 <button onClick = {openMoreFilters}>More Filters</button>
                 {(contextual === 'moreFilters') && <div className="moreFilters" ref={currentContextual}>
-                    <select value = {filterCoachless} onChange={(e) => updateCoachlessFilter(e.target.value)}>
-                        <option value={1}>Don't show students without coaches</option>
-                        <option value={0}>Show students without coaches</option>
-                    </select>
-                    <select value = {filterHoldWeeks} onChange={(e) => updateHoldFilter(e.target.value)}>
-                        <option value = {1}>Don't show weeks on hold</option>
-                        <option value={0}>Show weeks on hold</option>
-                    </select>
+                    <div className="coachingFilterSection">
+                        <select value = {filterCoachless} onChange={(e) => updateCoachlessFilter(e.target.value)}>
+                            <option value = {1}>Don't show students without coaches</option>
+                            <option value = {0}>Show students without coaches</option>
+                        </select>
+                    </div>
+                    <div className="coachingFilterSection">
+                        <select value = {filterHoldWeeks} onChange={(e) => updateHoldFilter(e.target.value)}>
+                            <option value = {1}>Don't show weeks on hold</option>
+                            <option value = {0}>Show weeks on hold</option>
+                        </select>
+                    </div>
+                    <div className="coachingFilterSection">
+                        <select value = {filterIncomplete} onChange={(e) => updateFilterIncomplete(e.target.value)}>
+                            <option value = {0}>All records</option>
+                            <option value = {1}>Incomplete only</option>
+                            <option value = {2}>Complete only</option>
+                        </select>
+                    </div>
                     <div className="buttonBox">
                         <button className = 'redButton' onClick={closeContextual}>Close</button>
                     </div>
