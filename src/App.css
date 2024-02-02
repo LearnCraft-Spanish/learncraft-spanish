@@ -675,6 +675,21 @@ button:hover {
   right: 10%;
 }
 
+.studentPopup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow:scroll;
+  padding: 5%;
+  background-color: var(--light);
+  border: 5px solid var(--dark);
+  position: fixed;
+  top: 10%;
+  bottom: 10%;
+  left: 10%;
+  right: 10%;
+}
+
 .callPopup {
   display: flex;
   flex-direction: column;
@@ -757,13 +772,15 @@ button:hover {
 }
 
 .studentHeader {
-  color: var(--light);
+  padding: 0px;
   border-bottom: 1px solid var(--light);
   background-color: var(--dark);
 }
 
-.studentWeek td {
+.studentBox {
+  color: var(--light);
   padding: 10px 20px;
+  cursor: pointer;
 }
 
 .assignmentBox {

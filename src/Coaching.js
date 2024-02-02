@@ -26,6 +26,8 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     const groupCalls = useRef([])
     const groupAttendees = useRef([])
     const assignments = useRef([])
+    const currentAttendee = useRef(null)
+    const coachUser = useRef(null)
 
     function updateCoachFilter(coachId){
         const coachToSet = coaches.current.find((coach)=>coach.recordId === Number(coachId))||{}
@@ -58,12 +60,21 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         openContextual('moreFilters')
     }
 
+    function openStudentPopup (recordId) {
+        openContextual(`student${recordId}`)
+    }
+
     function openCallPopup (recordId) {
         openContextual(`call${recordId}`)
     }
 
     function openGroupSessionPopup (recordId) {
+        currentAttendee.current = null
         openContextual(`groupSession${recordId}`)
+    }
+
+    function openAttendeePopup (recordId) {
+        openContextual(`attendee${recordId}`)
     }
 
     function openAssignmentPopup (recordId) {
@@ -266,8 +277,8 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         const membership = memberships.current.find((item) => item.recordId === membershipId)||{}
         const studentId = membership.relatedStudent
         const student = students.current.find((item)=> item.recordId === studentId)||{}
-        const coachUser = student.primaryCoach||{}
-        const coach = coaches.current.find((coach) => coach.user.id === coachUser.id)||{}
+        const userObject = student.primaryCoach||{}
+        const coach = coaches.current.find((coach) => coach.user.id === userObject.id)||{}
         return coach
     }
 
@@ -453,8 +464,6 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             }
         }
         filteredByOnHold.sort(weekSorter)
-        console.log(filteredByOnHold)
-        console.log(`Displaying ${filteredByOnHold.length} records`)
         return filteredByOnHold
     }
         
@@ -467,6 +476,45 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             <th>Notes</th>
             <th>Lesson</th>
         </tr>;
+    }
+
+    const Student = ({week}) => {
+        const student = getStudentFromMembershipId(week.relatedMembership)
+        const currentMemberships = memberships.current.filter((membership) => membership.relatedStudent === student.recordId)
+        return (
+            <div>
+                <div className="studentBox" onClick={student.recordId?() => openStudentPopup(student.recordId):null}>
+                    <strong>{student.fullName}</strong><br />
+                    {student.email}<br />
+                    {(!filterByCoach.recordId) && (student.primaryCoach?student.primaryCoach.name:"No Coach")}
+                    {(!filterByCoach.recordId) &&<br />}
+                    {(!filterByCourse.recordId) && (getCourseFromMembershipId(week.relatedMembership)?getCourseFromMembershipId(week.relatedMembership).name:"No Course")}
+                    {(!filterByCourse.recordId) &&<br />}
+                    {(filterByWeeksAgo < 0) && week.weekStarts}
+                </div>
+                {(contextual === `student${student.recordId}`) && student.recordId && (
+                    <div className="studentPopup" ref = {currentContextual}>
+                        {console.log(student)}
+                        <h4>{student.fullName}</h4>
+                        <p>Email: {student.email}</p>
+                        {student.primaryCoach.id && <p> Primary Coach: {student.primaryCoach.name}</p>}
+                        <h5>Active Memberships:</h5>
+                        {currentMemberships.map((membership) => {
+                            return (
+                                <p key = {membership.recordId}>{getCourseFromMembershipId(membership.recordId).name} since {membership.startDate}{membership.onHold?', currently on Hold.':"."}</p>
+                            )
+                        })}
+                        {student.fluencyGoal. length > 0 && <h5>Fluency Goal:</h5>}
+                        {student.fluencyGoal. length > 0 && <p>{student.fluencyGoal}</p>}
+                        {student.startingLevel.length > 0 && <h5>Starting Level:</h5>}
+                        {student.startingLevel.length > 0 && <p>{student.startingLevel}</p>}
+                        <div className="buttonBox">
+                            <button className="redButton" onClick={closeContextual}>Close</button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        )
     }
 
     const Calls = ({data}) => {
@@ -496,6 +544,10 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         if (data.length === 0) {
             return null
         } else {
+            function changeAttendee (attendeeId, groupSessionId) {
+                currentAttendee.current = students.current.find((student)=> student.recordId === attendeeId)||{}
+                openAttendeePopup(`${attendeeId}-${groupSessionId}`)
+            }
             return data.map((groupSession) => (
                 <div className='assignmentBox' key = {groupSession.recordId}>
                     <button onClick={() => openGroupSessionPopup(groupSession.recordId)}>{groupSession.sessionType}</button>
@@ -507,7 +559,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                             <p>Comments: {groupSession.comments}</p>
                             <p><strong>Attendees:</strong></p>
                             <div className="groupAttendeeList">
-                                {getAttendeeWeeksFromGroupSessionId(groupSession.recordId).map((attendee) => <p className="groupAttendee" key={attendee.recordId}>{getStudentFromMembershipId(attendee.relatedMembership).fullName}</p>)}
+                                {getAttendeeWeeksFromGroupSessionId(groupSession.recordId).map((attendee) => <button key={attendee.recordId} className="groupAttendee" onClick={() => changeAttendee(getStudentFromMembershipId(attendee.relatedMembership).recordId, groupSession.recordId)}>{getStudentFromMembershipId(attendee.relatedMembership).fullName}</button>)}
                             </div>
                             {(groupSession.callDocument?groupSession.callDocument.length > 0:false) && <p><a target= {"_blank"} href={groupSession.callDocument}>Call Document</a></p>}
                             {(groupSession.zoomLink?groupSession.zoomLink.length > 0:false) && <p><a target= {"_blank"} href={groupSession.zoomLink}>Recording Link</a></p>}
@@ -516,6 +568,21 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                             </div>
                         </div>
                     )}
+                    {(contextual === `attendee${currentAttendee.current?currentAttendee.current.recordId:undefined}-${groupSession.recordId}`) && (
+                        <div className="studentPopup" ref = {currentContextual}>
+                            <h4>{currentAttendee.current.fullName}</h4>
+                            <p>{currentAttendee.current.email}</p>
+                            <p> Primary Coach: {currentAttendee.current.primaryCoach.name}</p>
+                            <h5>Fluency Goal:</h5>
+                            <p>{currentAttendee.current.fluencyGoal}</p>
+                            <h5>Starting Level:</h5>
+                            <p>{currentAttendee.current.startingLevel}</p>
+                            <div className="buttonBox">
+                                <button className="redButton" onClick={() => openGroupSessionPopup(groupSession.recordId)}>Back</button>
+                            </div>
+                        </div>
+                    )}
+                    
                 </div>))
         }
     }
@@ -549,13 +616,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         return data.map((item) =>
             <tr key = {item.recordId} className="studentWeek">
                 <td className="studentHeader">
-                    <strong>{getStudentFromMembershipId(item.relatedMembership).fullName}</strong><br />
-                    {getStudentFromMembershipId(item.relatedMembership).email}<br />
-                    {(!filterByCourse.recordId) && (getCourseFromMembershipId(item.relatedMembership)?getCourseFromMembershipId(item.relatedMembership).name:"No Course")}
-                    {(!filterByCourse.recordId) &&<br />}
-                    {(!filterByCoach.recordId) && (getCoachFromMembershipId(item.relatedMembership).user?getCoachFromMembershipId(item.relatedMembership).user.name:"No Coach")}
-                    {(!filterByCoach.recordId) &&<br />}
-                    {(filterByWeeksAgo < 0) && item.weekStarts}
+                    <Student week = {item}/>
                 </td>
                 <td><Calls data = {getPrivateCallsFromWeekId(item.recordId)}/></td>
                 <td><GroupSessions data = {getGroupSessionsFromWeekId(item.recordId)}/></td>
@@ -587,11 +648,16 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }, [])
 
     useEffect(() => {
-        if (startupDataLoaded) {
-            const coachUser = coaches.current.find((coach) => coach.user.email === userData.emailAddress)
-            if (coachUser){
-                updateCoachFilter(coachUser.recordId)
+        if (startupDataLoaded){
+            coachUser.current = coaches.current.find((coach) => coach.user.email === userData.emailAddress)||null
+            if (coachUser.current?coachUser.current.recordId:false){
+                updateCoachFilter(coachUser.current.recordId)
             }
+        }
+    }, [startupDataLoaded, userData])
+
+    useEffect(() => {
+        if (startupDataLoaded) {
             setWeeksToDisplay(combinedFilterWeeks(weekRecords.current))
         }
     }, [startupDataLoaded, filterByCoach, filterByCourse, filterByWeeksAgo, filterCoachless, filterHoldWeeks, filterIncomplete])

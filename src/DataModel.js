@@ -61,7 +61,7 @@ export const qb = {grammar: // quickbaseTablesInfo
         students: {
             name: 'students',
             id: 'bqkme9fni',
-            fields: ['Record ID#', 'First Name', 'Last Name', 'Full Name', 'Email', 'Time Zone', 'US Phone', 'Starting Level', 'Primary Coach']
+            fields: ['Record ID#', 'First Name', 'Last Name', 'Full Name', 'Email', 'Time Zone', 'US Phone','Fluency Goal', 'Starting Level', 'Primary Coach']
         },
         memberships: {
             name: 'memberships',
