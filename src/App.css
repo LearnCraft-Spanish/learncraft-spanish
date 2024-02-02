@@ -659,6 +659,16 @@ button:hover {
   align-content: center;
 }
 
+.coachingFilterSection .searchOrButton {
+  display: flex;
+  padding: 0px 10px;
+  align-content: center;
+}
+
+.coachingFilterSection div h4{
+  margin: 0px;
+}
+
 
 .moreFilters {
   display: flex;
@@ -673,6 +683,10 @@ button:hover {
   bottom: 10%;
   left: 10%;
   right: 10%;
+}
+
+.numberShowing {
+  padding: 10px 20px;
 }
 
 .studentPopup {

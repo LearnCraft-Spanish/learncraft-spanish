@@ -29,6 +29,10 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     const currentAttendee = useRef(null)
     const coachUser = useRef(null)
 
+    function updateSearchTerm(term) {
+        setSearchTerm(term.toLowerCase())
+    }
+
     function updateCoachFilter(coachId){
         const coachToSet = coaches.current.find((coach)=>coach.recordId === Number(coachId))||{}
         console.log(coachToSet)
@@ -354,6 +358,21 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         return courseSelector
     }
 
+    function filterWeeksBySearchTerm(array, searchTerm) {
+        if (searchTerm.length > 0) {
+            function filterFunction (week) {
+                const student = getStudentFromMembershipId(week.relatedMembership)
+                const nameMatches = student.fullName?student.fullName.toLowerCase().includes(searchTerm):false
+                const emailMatches = student.email?student.email.toLowerCase().includes(searchTerm):false
+                const noteMatches = week.notes?week.notes.toLowerCase().includes(searchTerm):false
+                return (nameMatches||emailMatches||noteMatches)
+            }
+            return array.filter(filterFunction)
+        } else {
+            return array
+        }
+    }
+
     function filterWeeksByWeeksAgo(array, numberOfWeeksAgo) {
         if (numberOfWeeksAgo >= 0) {
             const nowTimestamp = Date.now()
@@ -436,7 +455,8 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     function combinedFilterWeeks (weeks) {
-        const filteredByCoachless = filterWeeksByCoachless(weeks)
+        const filteredBySearchTerm = filterWeeksBySearchTerm(weeks, searchTerm)
+        const filteredByCoachless = filterWeeksByCoachless(filteredBySearchTerm)
         const filteredByWeeksAgo = filterWeeksByWeeksAgo(filteredByCoachless, filterByWeeksAgo)
         const filteredByCoach = filterWeeksByCoach(filteredByWeeksAgo, filterByCoach)
         const filteredByCourse = filterWeeksByCourse(filteredByCoach, filterByCourse)
@@ -660,7 +680,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         if (startupDataLoaded) {
             setWeeksToDisplay(combinedFilterWeeks(weekRecords.current))
         }
-    }, [startupDataLoaded, filterByCoach, filterByCourse, filterByWeeksAgo, filterCoachless, filterHoldWeeks, filterIncomplete])
+    }, [startupDataLoaded, searchTerm, filterByCoach, filterByCourse, filterByWeeksAgo, filterCoachless, filterHoldWeeks, filterIncomplete])
 
 
     return ((
@@ -668,19 +688,18 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         {!startupDataLoaded && <p>This section is still under construction</p>}
         {startupDataLoaded && <div>
             <div className="coachingFilterSection">
-                <select onChange={(e) => updateCoachFilter(e.target.value)}>
-                    {makeCoachSelector()}
-                </select>
-                <select onChange={(e) => updateCourseFilter(e.target.value)}>
-                    {makeCourseSelector()}
-                </select>
-                <select onChange={(e) => updateWeeksAgoFilter(e.target.value)}>
-                    <option value = {0}>This Week</option>
-                    <option value = {1}>Last Week</option>
-                    <option value = {2}>Two Weeks Ago</option>
-                    <option value = {-1}>Last Three Weeks (All)</option>
-                </select>
-                <button onClick = {openMoreFilters}>More Filters</button>
+                <div className="numberShowing">
+                    <h4>Search:</h4>
+                </div>
+                <div className="searchOrButton">
+                    <input className="weekSearch" type="text" value={searchTerm} onChange={(e) => updateSearchTerm(e.target.value)}></input>
+                </div>
+                <div className="searchOrButton">
+                    <button className="moreFiltersButton" onClick = {openMoreFilters}>More Filters</button>
+                </div>
+                <div className="numberShowing">
+                    <h4>Showing: {weeksToDisplay.length} records</h4>
+                </div>
                 {(contextual === 'moreFilters') && <div className="moreFilters" ref={currentContextual}>
                     <div className="coachingFilterSection">
                         <select value = {filterCoachless} onChange={(e) => updateCoachlessFilter(e.target.value)}>
@@ -705,6 +724,20 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                         <button className = 'redButton' onClick={closeContextual}>Close</button>
                     </div>
                 </div>}
+            </div>
+            <div className="coachingFilterSection">
+                <select onChange={(e) => updateCoachFilter(e.target.value)}>
+                    {makeCoachSelector()}
+                </select>
+                <select onChange={(e) => updateCourseFilter(e.target.value)}>
+                    {makeCourseSelector()}
+                </select>
+                <select onChange={(e) => updateWeeksAgoFilter(e.target.value)}>
+                    <option value = {0}>This Week</option>
+                    <option value = {1}>Last Week</option>
+                    <option value = {2}>Two Weeks Ago</option>
+                    <option value = {-1}>Last Three Weeks (All)</option>
+                </select>
             </div>
             <div>
                 {weeksToDisplay.length > 0 && <DisplayWeeks data={weeksToDisplay} />}
