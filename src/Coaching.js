@@ -336,6 +336,18 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
 
     }
 
+    function weekMembershipHasPrivateCalls (week) {
+        const membership = getMembershipFromWeekId(week.recordId)
+        const hasPrivateCalls = (membership.weeklyPrivateCalls > 0)
+        return hasPrivateCalls
+    }
+
+    function weekMembershipHasGroupCalls (week) {
+        const membership = getMembershipFromWeekId(week.recordId)
+        const hasGroupCalls = membership.hasGroupCalls
+        return hasGroupCalls
+    }
+
     function makeCoachSelector () {
         const coachSelector = [<option key = {0} value = {0}>All Coaches</option>]
         coaches.current.forEach((coach)=>{
@@ -490,7 +502,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     const TableHeaderRow = () => {
         return <tr className="tableHeader">
             <th>Student</th>
-            <th>Private Calls</th>
+            {weeksToDisplay.find((week) => weekMembershipHasPrivateCalls(week)) && <th>Private Calls</th>}
             <th>Group Calls</th>
             <th>Assignments</th>
             <th>Notes</th>
@@ -524,10 +536,10 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                                 <p key = {membership.recordId}>{getCourseFromMembershipId(membership.recordId).name} since {membership.startDate}{membership.onHold?', currently on Hold.':"."}</p>
                             )
                         })}
-                        {student.fluencyGoal. length > 0 && <h5>Fluency Goal:</h5>}
-                        {student.fluencyGoal. length > 0 && <p>{student.fluencyGoal}</p>}
-                        {student.startingLevel.length > 0 && <h5>Starting Level:</h5>}
-                        {student.startingLevel.length > 0 && <p>{student.startingLevel}</p>}
+                        {student.fluencyGoal. length > 1 && <h5>Fluency Goal:</h5>}
+                        {student.fluencyGoal. length > 1 && <p>{student.fluencyGoal}</p>}
+                        {student.startingLevel.length > 1 && <h5>Starting Level:</h5>}
+                        {student.startingLevel.length > 1 && <p>{student.startingLevel}</p>}
                         <div className="buttonBox">
                             <button className="redButton" onClick={closeContextual}>Close</button>
                         </div>
@@ -638,7 +650,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                 <td className="studentHeader">
                     <Student week = {item}/>
                 </td>
-                <td><Calls data = {getPrivateCallsFromWeekId(item.recordId)}/></td>
+                {weeksToDisplay.find((week) => getMembershipFromWeekId(week.recordId).weeklyPrivateCalls > 0) && <td><Calls data = {getPrivateCallsFromWeekId(item.recordId)}/></td>}
                 <td><GroupSessions data = {getGroupSessionsFromWeekId(item.recordId)}/></td>
                 <td><Assignments data = {getAssignmentsFromWeekId(item.recordId)} /></td>
                 <td>{item.notes}</td>
