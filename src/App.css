@@ -9,6 +9,10 @@
   --dark: #3c3c3c;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 
 body {
   background-image: url('./resources/paper-small.jpeg');
@@ -38,6 +42,23 @@ h1 {
 h2, h3, h4, h5, h6 {
   color: var(--dark);
   text-align: center;
+}
+
+.homeButton {
+  display: flex;
+  height: 70px;
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 5px 0px 0px;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.homeButton img {
+  object-fit: contain;
 }
 
 .bannerMessage {
@@ -102,7 +123,7 @@ button:hover {
 /*Main Menu Styles*/
 
 .div-header{
-  padding: 30px 5%;
+  padding: calc(5px + 1.5%) 5%;
   background-color: var(--theme);
   color: var(--light);
   margin: 0;
@@ -804,10 +825,6 @@ button:hover {
 }
 
 @media screen and (max-width: 767px) {
-  .div-header {
-    flex-direction: column;
-    align-items: center;
-  }
 
   .div-header h1 {
     margin-bottom: 20px;

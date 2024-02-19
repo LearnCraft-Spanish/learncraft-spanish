@@ -1,46 +1,52 @@
 import React, {useState, useEffect, useRef} from 'react';
 import { Link, redirect, useNavigate, Navigate, useParams, useOutletContext } from 'react-router-dom';
-import { updateStudentExample, createStudentExample} from './BackendFetchFunctions';
+import { updateStudentExample, createStudentExample, getQuizExamplesFromBackend} from './BackendFetchFunctions';
 import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
 import MenuButton from './MenuButton';
 
-export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, makeMenuShow, makeQuizSelections, activeStudent, dataLoaded, updateExamplesTable,
+export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, makeMenuShow, makeQuizSelections, activeStudent, dataLoaded,
     chosenQuiz, updateChosenQuiz, hideMenu, quizTable, examplesTable, studentExamples, addFlashcard}) {
-        const thisQuiz = useParams().number
+        const thisQuiz = parseInt(useParams().number)
         const navigate = useNavigate()
-
+        const audience = process.env.REACT_APP_API_AUDIENCE
         const {getAccessTokenSilently} = useAuth0();
 
+        const rendered = useRef(false)
         const [examplesToReview, setExamplesToReview] = useState ([]);
         const [quizReady, setQuizReady] = useState(false)
         const [currentExampleNumber, setCurrentExampleNumber] = useState(1);
         const [languageShowing, setLanguageShowing] = useState('english');
         const [playing, setPlaying] = useState(false);
 
-
-        function filterExamplesByCurrentQuiz () {
+        async function  getExamplesForCurrentQuiz () {
             console.log(quizCourse)
             console.log(thisQuiz)
-            const chosenExampleIdArray = []
-            quizTable.forEach((item) => {
-                const quizArray = item.quizNickname.split(' ')
-                const quizCourseName = quizArray[0]
-                const quizNumber = quizArray.slice(-1)[0]
-                if (quizCourseName===quizCourse && quizNumber ===thisQuiz) {
-                    chosenExampleIdArray.push(item)
+            const quizToSearch = quizTable.find(quiz => (quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse))||{}
+            if (quizToSearch.recordId) {
+                try {
+                    const accessToken = await getAccessTokenSilently({
+                      authorizationParams: {
+                          audience: audience,
+                          scope: "openID email profile",
+                      },
+                    });
+                    //console.log(accessToken)
+                    const quizExamples = await getQuizExamplesFromBackend(accessToken, quizToSearch.recordId)
+                    .then((result) => {
+                      //console.log(result)
+                      const usefulData = result;
+                      return usefulData
+                    });
+                    console.log(quizExamples)
+                    return(quizExamples)
+                  } catch (e) {
+                      console.log(e.message);
+                  }
                 }
-            })
-            const exampleReviewArray = []
-            chosenExampleIdArray.forEach((item) => {
-                const exampleToAdd = examplesTable.find(element => element.recordId === item.relatedExample)
-                if(exampleToAdd) {
-                    exampleReviewArray.push(exampleToAdd)
-                }
-            })
-            return exampleReviewArray;
-        }
+                
+            }
 
         const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
 
@@ -48,7 +54,7 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
 
         function tagAssignedExamples (exampleArray) {
             //console.log(exampleArray);
-            if (studentExamples) {
+            if (studentExamples && exampleArray) {
                 exampleArray.forEach((example)=> {
                     const getStudentExampleRecordId = () => {
                         const relatedStudentExample = studentExamples.find(element => (element.relatedExample
@@ -67,24 +73,29 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
         }
 
         function handleSetupQuiz () {
-            const quizExamples = filterExamplesByCurrentQuiz();
-            //console.log(quizExamples)
-            const taggedByKnown = tagAssignedExamples(quizExamples);
-            //console.log(quizExamples)
-            function randomize (array) {
-                const randomizedArray = []
-                const vanishingArray = [...array];
-                for (let i = 0; i < array.length; i++) {
-                    const randIndex = Math.floor(Math.random()*vanishingArray.length)
-                    const randomArrayItem = vanishingArray[randIndex]
-                    vanishingArray.splice(randIndex, 1)
-                    randomizedArray[i] = randomArrayItem
+            getExamplesForCurrentQuiz()
+            .then(examples => {
+                console.log(examples)
+                if (examples) {
+                    const taggedByKnown = tagAssignedExamples(examples)
+                    function randomize (array) {
+                        const randomizedArray = []
+                        const vanishingArray = [...array];
+                        for (let i = 0; i < array.length; i++) {
+                            const randIndex = Math.floor(Math.random()*vanishingArray.length)
+                            const randomArrayItem = vanishingArray[randIndex]
+                            vanishingArray.splice(randIndex, 1)
+                            randomizedArray[i] = randomArrayItem
+                            }
+                        return randomizedArray
                     }
-                return randomizedArray
-            }
-            const randomizedQuizExamples = randomize(taggedByKnown);
-            setExamplesToReview(randomizedQuizExamples);
-            setQuizReady(true);
+                    const randomizedQuizExamples = randomize(taggedByKnown);
+                    setExamplesToReview(randomizedQuizExamples)
+                    setQuizReady(true)
+                } else {
+                    navigate('..')
+                }
+            })
         }
 
         function togglePlaying() {
@@ -136,10 +147,13 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
         }
 
         useEffect (() => {
-            if (chosenQuiz !== thisQuiz){
-                updateChosenQuiz(thisQuiz)
+            if (!rendered.current) {
+                rendered.current = true
+                if (chosenQuiz !== thisQuiz){
+                    updateChosenQuiz(thisQuiz)
+                }
+                makeMenuHidden()
             }
-            makeMenuHidden()
         }, [])
 
         useEffect (() => {
@@ -159,7 +173,11 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
 
         //const quizNumber = parseInt(useParams().number)
         //console.log(useParams())
-        return (quizReady &&
+        return (<div>
+            {dataLoaded && !quizReady && (
+                <h2>Loading Quiz...</h2>
+            )}
+            {quizReady &&
             <div className='quiz'>
                 <h3>{(courses.find(course => course.code === quizCourse)||{name: quizCourse}).name} Quiz {chosenQuiz}</h3>
                 {(examplesToReview[currentExampleNumber-1] !== undefined) && (<div className='exampleBox'>
@@ -184,6 +202,7 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
                 <div className='progressBar2'>                
                     <div className='progressBarDescription'>Flashcard {currentExampleNumber} of {examplesToReview.length}</div>
                 </div>
+            </div>}
             </div>
         )
 }

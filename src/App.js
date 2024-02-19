@@ -1,10 +1,10 @@
 import './App.css';
 import React, { isValidElement } from 'react';
-import { Route, Routes, Link, useLocation, useParams, Outlet } from "react-router-dom";
+import { Route, Routes, Link, useLocation, useParams, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from 'react';
 //import jsonwebtoken from 'jsonwebtoken';
 import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBackend, getActiveExamplesFromBackend, createStudentExample, createMyStudentExample, deleteStudentExample, deleteMyStudentExample, getActiveStudentExamplesFromBackend, getAllUsersFromBackend, getProgramsFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
-import ExampleRetriever from './FlashcardFinder';
+import logo from './resources/typelogosmall.png';
 import Menu from './Menu';
 import SimpleQuizApp from './SimpleQuizApp';
 import AudioQuiz from './AudioQuiz';
@@ -26,6 +26,7 @@ require('dotenv').config()
 function App() {
   const { user, isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
   const location = useLocation()
+  const navigate = useNavigate()
   const rendered = useRef(false)
   const [qbUserData, setQbUserData]= useState({}) //The user data for the person using the app (if a student)
   const [menuReady, setMenuReady] = useState(false)
@@ -615,9 +616,9 @@ async function setupAudioExamplesTable () {
   return (
     <div className="App" onClick={closeContextualIfClickOut}>
       <div className='div-header'>
-        <Link to='/'>
-          <h1> LearnCraft Spanish </h1>
-        </Link>
+        <div className='homeButton' onClick={() => navigate('/')}>
+          <img src = {logo} alt = 'Learncraft Spanish Logo'/>
+        </div>
         <LogoutButton />
         <LoginButton />
       </div>
