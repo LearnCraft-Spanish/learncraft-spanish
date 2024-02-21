@@ -42,7 +42,7 @@ export default function Menu({userData, updateExamplesTable, examplesTable, stud
             </div>
             </div>)}
             <h3>Explore:</h3>
-            {(userData.role === 'student' || userData.role === 'limited') && <div className='buttonBox'>
+            {((userData.role === 'student' || userData.role === 'limited')||userData.isAdmin) && <div className='buttonBox'>
               <Link className= 'linkButton' to = '/audioquiz'>Audio Quiz</Link>
               <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
             </div>}

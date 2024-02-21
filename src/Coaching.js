@@ -240,7 +240,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             courses.current = results[4]
             lessons.current = results[5]
             setStartupDataLoaded(true)
-        })
+        },console.log('couldn\'t load data'))
     }
 
     function dateObjectToText (dateObject) {

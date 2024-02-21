@@ -66,7 +66,7 @@ export const qb = {grammar: // quickbaseTablesInfo
         memberships: {
             name: 'memberships',
             id: 'bqkmhc9b6',
-            fields: ['Record ID#', 'Start Date', 'End Date', 'Active?', 'Related Course', 'Related Student', 'On Hold', 'Last Recorded Week Starts', 'Bundles Purchased']
+            fields: ['Record ID#', 'Start Date', 'End Date', 'Active?', 'Related Course', 'Related Student', 'On Hold', 'Last Recorded Week Starts']
         }, 
         courses: {
             name: 'courses',
