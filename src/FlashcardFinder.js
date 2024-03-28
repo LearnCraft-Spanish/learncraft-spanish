@@ -230,37 +230,6 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
     navigator.clipboard.writeText(copiedText)
   }
 
-
-  function filterVocabularyByInput (vocabInput) {
-    //console.log(grammarInput)
-    function filterByKnown (term) {
-      if (selectedLesson.vocabKnown.includes(term.vocabName)||!selectedLesson.vocabKnown){
-        return true
-      }
-      return false
-    }
-
-    function filterBySearch (term) {
-      const lowerTerm = term.wordIdiom.toLowerCase()
-      const lowerVocabInput = vocabInput.toLowerCase()
-      if (lowerTerm.includes(lowerVocabInput)){
-        return true
-      }
-      return false
-    }
-
-
-    const filteredByKnown = selectedLesson.vocabKnown?vocabularyTable.filter(filterByKnown):vocabularyTable
-    const filteredBySearch = filteredByKnown.filter(filterBySearch)
-    const suggestTen = []
-    for (let i = 0; i < 10; i++){
-      if(filteredBySearch[i]) {
-        suggestTen.push(filteredBySearch[i])
-      }
-    }
-    setSuggestedVocab(suggestTen);
-  }
-
   function filterTagsByInput (tagInput) {
     function filterBySearch (tag) {
       const lowerTerm = tag.tag.toLowerCase()
@@ -270,11 +239,20 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
       }
       return false
     }
+
+    function filterByActiveTags (tag) {
+      const matchFound = requiredTags.find(item => item.id === tag.id)
+      if (matchFound) {
+        return false
+      }
+      return true
+    }
     const filteredBySearch = tagTable.filter(filterBySearch);
+    const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags)
     const suggestTen = []
     for (let i = 0; i < 10; i++){
       if(filteredBySearch[i]) {
-        suggestTen.push(filteredBySearch[i])
+        suggestTen.push(filteredByActiveTags[i])
       }
     }
     setSuggestedTags(suggestTen);
@@ -427,7 +405,7 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
 
   useEffect(() => {
       filterTagsByInput(tagSearchTerm)
-  }, [tagSearchTerm, contextual])
+  }, [tagSearchTerm, requiredTags, contextual])
 
   useEffect(() => {
     if (selectedProgram && selectedLesson && flashcardDataComplete) {
@@ -459,8 +437,8 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
             <div className='searchFilter'>
               <h3>Search</h3>
               <div className = 'tagSearchBox'>
-                  <div className='searchTermBox'>
-                    <input type='text' onChange={(e) =>updateTagSearchTerm(e.target)}></input><br></br>
+                  <div className='searchTermBox' >
+                    <input type='text' onChange={(e) =>updateTagSearchTerm(e.target)} onClick={() => openContextual('tagSuggestionBox')}></input><br></br>
                   </div>
               </div>
               {(tagSearchTerm.length > 0) && contextual === 'tagSuggestionBox' && suggestedTags.length > 0 && (
