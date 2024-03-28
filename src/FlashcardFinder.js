@@ -9,13 +9,11 @@ import { isLabelWithInternallyDisabledControl } from '@testing-library/user-even
 const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentExamplesTable, flashcardDataComplete, selectedProgram, selectedLesson, updateSelectedProgram, updateSelectedLesson, addToActiveStudentFlashcards, contextual, openContextual, closeContextual}, currentContextual) => {
   const {getAccessTokenSilently} = useAuth0();
   const [isLoaded, setIsLoaded] = useState(false)
-  const [vocabSearchTerm, setVocabSearchTerm] = useState('')
   const [tagSearchTerm, setTagSearchTerm] = useState('')
   const [vocabularyTable, setVocabularyTable] = useState([])
   const [tagTable, setTagTable] = useState([])
   const [suggestedVocab, setSuggestedVocab] = useState([])
   const [suggestedTags, setSuggestedTags] = useState([])
-  const [requiredVocab, setRequiredVocab] = useState([])
   const [requiredTags, setRequiredTags] = useState([])
   const [exampleTable, setExampleTable] = useState([])
   const [noSpanglish, setNoSpanglish] = useState(false)
@@ -30,21 +28,10 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
       setNoSpanglish(true)
     }
   }
-  function updateVocabSearchTerm(target){
-    openContextual('vocabSuggestionBox')
-    setVocabSearchTerm(target.value)
-  }
 
   function updateTagSearchTerm(target){
     openContextual('tagSuggestionBox')
     setTagSearchTerm(target.value)
-  }
-
-  function addVocabToRequiredVocab (vocabNumber) {
-    const vocabObject = vocabularyTable.find(object => (object.recordId === vocabNumber))
-    const newRequiredVocab = [...requiredVocab];
-    newRequiredVocab.push(vocabObject)
-    setRequiredVocab(newRequiredVocab)
   }
 
   function addTagToRequiredTags (id) {
@@ -52,11 +39,6 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
     const newRequiredTags = [...requiredTags];
     newRequiredTags.push(tagObject)
     setRequiredTags(newRequiredTags)
-  }
-
-  function removeVocabFromRequiredVocab (vocabNumber) {
-    const newRequiredVocab = requiredVocab.filter((item) => item.recordId!==vocabNumber)
-    setRequiredVocab(newRequiredVocab)
   }
 
   function removeTagFromRequiredTags (id) {
@@ -82,29 +64,6 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
         return isAllowed
       })
       return filteredByAllowed
-    } else {
-      return examples
-    }
-  }
-
-
-  function filterExamplesBySelectedVocab(examples) {
-    if (requiredVocab.length > 0){
-      const filteredExamples = examples.filter(example => {
-          if(example.vocabIncluded.length === 0 || example.vocabComplete === false) {
-              return false
-          }
-          //console.log(example.vocabIncluded)
-          let isGood = false
-          requiredVocab.forEach((word) => {
-            //console.log(word.vocabName)
-            if (!isGood) {
-              isGood = example.vocabIncluded.includes(word.vocabName)
-            }
-          })
-          return isGood
-      })
-      return filteredExamples
     } else {
       return examples
     }
@@ -162,6 +121,16 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
                       }
                     })
                   })
+                  case 'vocabulary':
+                  example.vocabIncluded.forEach(item =>{
+                    const word = vocabularyTable.find(element => element.vocabName === item)
+                    word.conjugationTags.forEach(conjugationTag => {
+                      if (conjugationTag === tag.tag){
+                        isGood = true
+                        return
+                      }
+                    })
+                  })
                   break
               }
             } else {
@@ -200,11 +169,9 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
 
 
   function makeExamplesTable() {
-    console.log('refreshing example table')
     const allExamples = [...exampleTable]
     const filteredBySpanglish = filterBySpanglish(allExamples)
-    const filteredByRequired = filterExamplesBySelectedVocab(filteredBySpanglish)
-    const filteredByAllowed = filterExamplesByAllowedVocab(filteredByRequired)
+    const filteredByAllowed = filterExamplesByAllowedVocab(filteredBySpanglish)
     const filteredByTags = filterExamplesBySelectedTags(filteredByAllowed)
     const labeledByAssigned = labelAssignedExamples(filteredByTags)
     const shuffledSentences = shuffleExamples(labeledByAssigned)
@@ -273,20 +240,13 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
       return false
     }
 
-    function filterBySelected (term) {
-      if (requiredVocab.includes(term)){
-        return false
-      }
-      return true
-    }
 
     const filteredByKnown = selectedLesson.vocabKnown?vocabularyTable.filter(filterByKnown):vocabularyTable
     const filteredBySearch = filteredByKnown.filter(filterBySearch)
-    const filteredBySelected = filteredBySearch.filter(filterBySelected)
     const suggestTen = []
     for (let i = 0; i < 10; i++){
-      if(filteredBySelected[i]) {
-        suggestTen.push(filteredBySelected[i])
+      if(filteredBySearch[i]) {
+        suggestTen.push(filteredBySearch[i])
       }
     }
     setSuggestedVocab(suggestTen);
@@ -361,6 +321,19 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
               tags.push(conjugationTag)
             }
           })
+        }
+        if (term.wordIdiom) {
+          if (term.vocabularySubcategorySubcategoryName.toLowerCase().includes('idiom')) {
+            const idiomTag = {type: 'idiom', tag: term.wordIdiom, id: tags.length}
+            if (!tags.find(item => item.type ==='idiom' && item.tag === term.wordIdiom)){
+              tags.push(idiomTag)
+            }
+          } else {
+            const vocabTag = {type: 'vocabulary', tag: term.wordIdiom, id: tags.length}
+            if (!tags.find(item => item.type ==='vocabulary' && item.tag === term.wordIdiom)){
+              tags.push(vocabTag)
+            }
+          }
         }
       })
       setTagTable(tags)
@@ -444,10 +417,6 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
   }, [vocabularyTable, tagTable, exampleTable, programTable])
 
   useEffect(() => {
-      filterVocabularyByInput(vocabSearchTerm)
-  }, [vocabSearchTerm, contextual])
-
-  useEffect(() => {
       filterTagsByInput(tagSearchTerm)
   }, [tagSearchTerm, contextual])
 
@@ -455,7 +424,7 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
     if (selectedProgram && selectedLesson && flashcardDataComplete) {
       makeExamplesTable()
     }
-  }, [selectedProgram, selectedLesson, requiredVocab, requiredTags, noSpanglish, studentExamplesTable, flashcardDataComplete])
+  }, [selectedProgram, selectedLesson, requiredTags, noSpanglish, studentExamplesTable, flashcardDataComplete])
 
   return(
     <div className='flashcardFinder'>
@@ -478,45 +447,10 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
             <LessonSelector programTable = {programTable} selectedLesson = {selectedLesson} updateSelectedLesson = {updateSelectedLesson} selectedProgram = {selectedProgram} updateSelectedProgram = {updateSelectedProgram} />
           </div>
           <div className='filterBox'>
-            <div className='wordFilter'>
-              <h3>Search By Word</h3>
-              <div className = 'wordSearchBox'>
-                  <div className='searchTermBox'>
-                    <p>Word or Idiom</p>
-                    <input type='text' onChange={(e) => updateVocabSearchTerm(e.target)}></input><br></br>
-                  </div>
-              </div>
-              {(vocabSearchTerm.length > 0) && contextual ==='vocabSuggestionBox' && suggestedVocab.length > 0 && (
-                <div className = 'vocabSuggestionBox' ref = {currentContextual}>
-                  {suggestedVocab.map((item) => {
-                    return(
-                      <div key={item.recordId} className='vocabCard' onClick = {() => addVocabToRequiredVocab(item.recordId)}>
-                        <h4 className='vocabName'>{item.wordIdiom}</h4>
-                        <p className = 'vocabSubcategory'>Subcategory: {item.vocabularySubcategorySubcategoryName}</p>
-                        <p className='vocabUse'>{item.use?'Use: ':undefined} {item.use}</p>
-                        <p className='vocabInfinitive'>{item.verbInfinitive?'Infinitive: ':undefined} {item.verbInfinitive}</p>
-                        <p className='vocabConjugation'>{item.conjugationTags[0]?'Conjugation: ':undefined} {item.conjugationTags.toString()}</p>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-              {(requiredVocab.length > 0) && (<div className='selectedVocab'>
-                <h5>Required Words:</h5>
-                {requiredVocab.map((item) => {
-                  return(
-                    <div key={item.recordId} className='vocabSmallCard' onClick = {() => removeVocabFromRequiredVocab(item.recordId)}>
-                      <h4 className='vocabName'>{item.vocabName}</h4>
-                    </div>
-                  )
-                })}
-              </div>)}
-            </div>
-            <div className='tagFilter'>
-              <h3>Search By Tag</h3>
+            <div className='searchFilter'>
+              <h3>Search</h3>
               <div className = 'tagSearchBox'>
                   <div className='searchTermBox'>
-                    <p>Grammar Tag</p>
                     <input type='text' onChange={(e) =>updateTagSearchTerm(e.target)}></input><br></br>
                   </div>
               </div>
@@ -526,14 +460,14 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
                     return(
                       <div key={item.tag} value = {item.id} className='vocabCard' onClick = {() => addTagToRequiredTags(item.id)}>
                         <h4 className='vocabName'>{item.tag}</h4>
-                        <p className='vocabUse'>{'type: '+item.type}</p>
+                        <p className='vocabUse'>{item.type}</p>
                       </div>
                     )
                   })}
                 </div>
               )}
               {(requiredTags.length > 0) && (<div className='selectedVocab'>
-                <h5>Required Tags:</h5>
+                <h5>Search Terms:</h5>
                 {requiredTags.map((item) => {
                   return(
                     <div key={item.tag} value = {item.id} className='vocabSmallCard' onClick = {() => removeTagFromRequiredTags(item.id)}>

@@ -50,7 +50,6 @@ function App() {
   const audience = process.env.REACT_APP_API_AUDIENCE
 
   function openContextual (elementClass) {
-    console.log(elementClass)
     setContextual(elementClass)
   }
   

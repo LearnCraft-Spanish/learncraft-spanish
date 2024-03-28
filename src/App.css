@@ -478,7 +478,7 @@ button:hover {
   flex-grow: 1;
 }
 
-.wordFilter, .tagFilter{
+.searchFilter{
   text-align: center;
   margin: 0 10px;
   position: relative;
@@ -545,6 +545,7 @@ button:hover {
 }
 
 .vocabCard {
+  cursor: pointer;
   text-align: left;
   background-color: #fff;
   color: #3c3c3c;
@@ -575,6 +576,7 @@ button:hover {
 }
 
 .vocabSmallCard{
+  cursor: pointer;
   text-align: left;
   background-color: #fff;
   color: #3c3c3c;
@@ -599,6 +601,7 @@ button:hover {
 
 
 .tagCard {
+  cursor: pointer;
   text-align: left;
   background-color: #fff;
   color: #3c3c3c;
