@@ -72,6 +72,10 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         openContextual(`call${recordId}`)
     }
 
+    function openNewCallPopup (weekRecordId) {
+        openContextual(`newCallForWeek${weekRecordId}`)
+    }
+
     function openGroupSessionPopup (recordId) {
         currentAttendee.current = null
         openContextual(`groupSession${recordId}`)
@@ -232,12 +236,11 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             weekRecords.current = results[2][0]
             privateCalls.current = results[2][1]
             groupCalls.current = results[2][2]
-            console.log(groupCalls.current)
             groupAttendees.current = results[2][3]
-            console.log(groupAttendees.current)
             assignments.current = results[2][4]
             coaches.current = results[3]
             courses.current = results[4]
+            console.log(courses.current)
             lessons.current = results[5]
             setStartupDataLoaded(true)
         },console.log('couldn\'t load data'))
@@ -336,15 +339,17 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
 
     }
 
-    function weekMembershipHasPrivateCalls (week) {
-        const membership = getMembershipFromWeekId(week.recordId)
-        const hasPrivateCalls = (membership.weeklyPrivateCalls > 0)
+    function weekGetsPrivateCalls (weekId) {
+        const membership = getMembershipFromWeekId(weekId)
+        const course = getCourseFromMembershipId(membership.recordId)
+        const hasPrivateCalls = (course.weeklyPrivateCalls > 0)
         return hasPrivateCalls
     }
 
-    function weekMembershipHasGroupCalls (week) {
-        const membership = getMembershipFromWeekId(week.recordId)
-        const hasGroupCalls = membership.hasGroupCalls
+    function weekGetsGroupCalls (weekId) {
+        const membership = getMembershipFromWeekId(weekId)
+        const course = getCourseFromMembershipId(membership.recordId)
+        const hasGroupCalls = course.hasGroupCalls
         return hasGroupCalls
     }
 
@@ -502,8 +507,8 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     const TableHeaderRow = () => {
         return <tr className="tableHeader">
             <th>Student</th>
-            {weeksToDisplay.find((week) => weekMembershipHasPrivateCalls(week)) && <th>Private Calls</th>}
-            <th>Group Calls</th>
+            {weeksToDisplay.filter(item => weekGetsPrivateCalls(item.recordId)).length > 0 && <th>Private Calls</th>}
+            {weeksToDisplay.filter(item => weekGetsGroupCalls(item.recordId)).length > 0 && <th>Group Calls</th>}
             <th>Assignments</th>
             <th>Notes</th>
             <th>Lesson</th>
@@ -550,26 +555,45 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     const Calls = ({data}) => {
-        if (data.length === 0) {
-            return null
-        } else {
-            return data.map((call) => (
-                <div className='assignmentBox' key = {call.recordId}>
-                    <button onClick={() => openCallPopup(call.recordId)}>{call.rating}</button>
-                    {contextual === `call${call.recordId}` && (
-                        <div className="callPopup" ref={currentContextual}>
-                            <h4>{getStudentFromMembershipId(getMembershipFromWeekId(call.relatedWeek).recordId).fullName} on {call.date}</h4>
-                            <p>Rating: {call.rating}</p>
-                            <p>Notes: {call.notes}</p>
-                            <p>Difficulties: {call.areasOfDifficulty}</p>
-                            {(call.recording.length > 0) && <a target= {"_blank"} href={call.recording}>Recording Link</a>}
-                            <div className="buttonBox">
-                                <button className="redButton" onClick={closeContextual}>Close</button>
+        const callData = getPrivateCallsFromWeekId(data.recordId)
+        const callPopups = (data) => {
+            if (data.length === 0) {
+                return null
+            } else {
+                return data.map((call) => (
+                    <div className='assignmentBox' key = {call.recordId}>
+                        <button onClick={() => openCallPopup(call.recordId)}>{call.rating}</button>
+                        {contextual === `call${call.recordId}` && (
+                            <div className="callPopup" ref={currentContextual}>
+                                <h4>{getStudentFromMembershipId(getMembershipFromWeekId(call.relatedWeek).recordId).fullName} on {call.date}</h4>
+                                <p>Rating: {call.rating}</p>
+                                <p>Notes: {call.notes}</p>
+                                <p>Difficulties: {call.areasOfDifficulty}</p>
+                                {(call.recording.length > 0) && <a target= {"_blank"} href={call.recording}>Recording Link</a>}
+                                <div className="buttonBox">
+                                    <button className="redButton" onClick={closeContextual}>Close</button>
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </div>))
+                        )}
+                    </div>))
+            }
         }
+        return <div className="callBox">
+            {callPopups(callData)}
+            {weekGetsPrivateCalls(data.recordId) && <button className="greenButton" onClick={() => openNewCallPopup(data.recordId)}>New</button>}
+            {contextual === `newCallForWeek${data.recordId}` && (
+                <div className="callPopup" ref={currentContextual}>
+                    <h4>{getStudentFromMembershipId(getMembershipFromWeekId(data.recordId)).fullName} on {Date.now()}</h4>
+                    <p>Rating: {null}</p>
+                    <p>Notes: {null}</p>
+                    <p>Difficulties: {null}</p>
+                    <a target= {"_blank"} href={null}>Recording Link</a>
+                    <div className="buttonBox">
+                        <button className="redButton" onClick={closeContextual}>Close</button>
+                    </div>
+                </div>
+            )}
+        </div>
     }
 
     const GroupSessions = ({data}) => {
@@ -650,11 +674,11 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
                 <td className="studentHeader">
                     <Student week = {item}/>
                 </td>
-                {weeksToDisplay.find((week) => getMembershipFromWeekId(week.recordId).weeklyPrivateCalls > 0) && <td><Calls data = {getPrivateCallsFromWeekId(item.recordId)}/></td>}
-                <td><GroupSessions data = {getGroupSessionsFromWeekId(item.recordId)}/></td>
+                {weeksToDisplay.filter(item => weekGetsPrivateCalls(item.recordId)).length > 0 && <td><Calls data = {item}/></td>}
+                {weeksToDisplay.filter(item => weekGetsGroupCalls(item.recordId)).length > 0 && <td><GroupSessions data = {getGroupSessionsFromWeekId(data.recordId)}/></td>}
                 <td><Assignments data = {getAssignmentsFromWeekId(item.recordId)} /></td>
-                <td>{item.notes}</td>
-                <td>{getLessonFromRecordId(item.currentLesson).lessonName}</td>
+                <td className="studentWeekNotes">{item.notes}</td>
+                <td className="studentWeekNotes">{getLessonFromRecordId(item.currentLesson).lessonName}</td>
             </tr>   
         );
     }

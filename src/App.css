@@ -102,9 +102,11 @@ button:hover {
   margin: 0;
   top: 0px;
   bottom: 0px;
+  z-index: 10;
 }
 
  .nextButton {
+  cursor: pointer;
   font-size: 48px;
   position: absolute;
   top: 50%;
@@ -113,6 +115,7 @@ button:hover {
 }
 
  .previousButton {
+  cursor: pointer;
   font-size: 48px;
   position: absolute;
   top: 50%;
@@ -725,6 +728,13 @@ button:hover {
   right: 10%;
 }
 
+.callBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 5px;
+}
+
 .callPopup {
   display: flex;
   flex-direction: column;
@@ -804,6 +814,10 @@ button:hover {
   margin: 9px;
   border: 1px solid var(--dark);
   padding: 5px 10px;
+}
+
+.studentWeekNotes {
+  padding: 5px;
 }
 
 .studentHeader {
