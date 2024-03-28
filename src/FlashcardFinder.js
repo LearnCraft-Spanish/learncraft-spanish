@@ -36,9 +36,11 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
 
   function addTagToRequiredTags (id) {
     const tagObject = tagTable.find(object => (object.id === id))
-    const newRequiredTags = [...requiredTags];
-    newRequiredTags.push(tagObject)
-    setRequiredTags(newRequiredTags)
+    if (!requiredTags.find(tag => tag.id === id)){
+      const newRequiredTags = [...requiredTags];
+      newRequiredTags.push(tagObject)
+      setRequiredTags(newRequiredTags)
+    }
   }
 
   function removeTagFromRequiredTags (id) {
@@ -124,12 +126,19 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
                   case 'vocabulary':
                   example.vocabIncluded.forEach(item =>{
                     const word = vocabularyTable.find(element => element.vocabName === item)
-                    word.conjugationTags.forEach(conjugationTag => {
-                      if (conjugationTag === tag.tag){
-                        isGood = true
-                        return
-                      }
-                    })
+                    if (word.wordIdiom === tag.tag){
+                      isGood = true
+                      return
+                    }
+                  })
+                  break
+                  case 'idiom':
+                  example.vocabIncluded.forEach(item =>{
+                    const word = vocabularyTable.find(element => element.vocabName === item)
+                    if (word.wordIdiom === tag.tag){
+                      isGood = true
+                      return
+                    }
                   })
                   break
               }
