@@ -248,11 +248,11 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
       return true
     }
     const filteredBySearch = tagTable.filter(filterBySearch);
-    const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags)
+    const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags);
     const suggestTen = []
     for (let i = 0; i < 10; i++){
-      if(filteredBySearch[i]) {
-        suggestTen.push(filteredByActiveTags[i])
+      if(filteredByActiveTags[i]) {
+          suggestTen.push(filteredByActiveTags[i])
       }
     }
     setSuggestedTags(suggestTen);
@@ -404,7 +404,7 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
   }, [vocabularyTable, tagTable, exampleTable, programTable])
 
   useEffect(() => {
-      filterTagsByInput(tagSearchTerm)
+    filterTagsByInput(tagSearchTerm)
   }, [tagSearchTerm, requiredTags, contextual])
 
   useEffect(() => {
