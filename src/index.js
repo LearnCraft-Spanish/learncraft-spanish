@@ -11,6 +11,7 @@ Sentry.init({
   dsn: "https://e42f3e1acdc86e3e3119dbd586514255@o4507097747423232.ingest.us.sentry.io/4507097897500672",
   environment: process.env.REACT_APP_ENVIRONMENT,
   integrations: [
+    Sentry.replayIntegration(),
     Sentry.reactRouterV6BrowserTracingIntegration({
       useEffect: React.useEffect,
       useLocation,
