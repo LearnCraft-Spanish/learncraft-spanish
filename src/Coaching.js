@@ -90,7 +90,6 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     async function makeCoachList () {
-        //console.log('getting userdata')
         try {
           const accessToken = await getAccessTokenSilently({
             authorizationParams: {
@@ -118,7 +117,6 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     async function makeCourseList () {
-        //console.log('getting userdata')
         try {
           const accessToken = await getAccessTokenSilently({
             authorizationParams: {
@@ -144,7 +142,6 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     async function makeLessonList () {
-        //console.log('getting userdata')
         try {
           const accessToken = await getAccessTokenSilently({
             authorizationParams: {
@@ -164,7 +161,6 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
 
 
     async function getThreeWeeksOfRecords () {
-        //console.log('getting userdata')
         try {
             const accessToken = await getAccessTokenSilently({
                 authorizationParams: {
@@ -184,7 +180,6 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     async function makeStudentList () {
-        //console.log('getting userdata')
         try {
             const accessToken = await getAccessTokenSilently({
                 authorizationParams: {
@@ -204,7 +199,6 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     async function makeMembershipList () {
-        //console.log('getting userdata')
         try {
             const accessToken = await getAccessTokenSilently({
                 authorizationParams: {
@@ -247,6 +241,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
     }
 
     function dateObjectToText (dateObject) {
+        console.log(typeof(dateObject))
         function formatMonth (date) {
             const unformattedMonth = date.getMonth()+1
             if (unformattedMonth < 10) {
@@ -266,6 +261,7 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
         }
     
         function formatYear (date) {
+            console.log(date)
             const formattedYear = date.getFullYear().toString()
             return formattedYear
         }
@@ -583,13 +579,31 @@ const Coaching = forwardRef(function Coaching ({userData, contextual, openContex
             {weekGetsPrivateCalls(data.recordId) && <button className="greenButton" onClick={() => openNewCallPopup(data.recordId)}>New</button>}
             {contextual === `newCallForWeek${data.recordId}` && (
                 <div className="callPopup" ref={currentContextual}>
-                    <h4>{getStudentFromMembershipId(getMembershipFromWeekId(data.recordId)).fullName} on {Date.now()}</h4>
-                    <p>Rating: {null}</p>
-                    <p>Notes: {null}</p>
-                    <p>Difficulties: {null}</p>
-                    <a target= {"_blank"} href={null}>Recording Link</a>
+                    <h4>{getStudentFromMembershipId(getMembershipFromWeekId(data.recordId).recordId).fullName} {getCourseFromMembershipId(getMembershipFromWeekId(data.recordId).recordId).name} call on {dateObjectToText(new Date(Date.now()))}</h4>
+                    <label for="start">Start date:</label>
+                    <input type="date" id="start" name="trip-start" value={dateObjectToText(new Date(Date.now()))} min="2018-01-01" max="2026-12-31" />
+                    <p>Rating:</p>
+                    <select value = 'Fair'>
+                        <option value = 'Terrible'>Terrible</option>
+                        <option value = 'Poor'>Poor</option>
+                        <option value = 'Fair'>Fair</option>
+                        <option value = 'Good'>Good</option>
+                        <option value = 'Very Good'>Very Good</option>
+                        <option value = 'Excellent'>Excellent</option>
+                        <option value= 'Late Cancel'>Late Cancel</option>
+                        <option value= 'No-Show'>No-Show</option>
+                    </select>
+                    <p>Notes:</p>
+                    <input type="textArea" />
+                    <p>Difficulties:</p>
+                    <input type="textArea" />
+                    <p>Recording Link</p>
+                    <input type="textArea" />
                     <div className="buttonBox">
-                        <button className="redButton" onClick={closeContextual}>Close</button>
+                        <button className="greenButton" onClick={closeContextual}>Submit</button>
+                    </div>
+                    <div className="buttonBox">
+                        <button className="redButton" onClick={closeContextual}>Cancel</button>
                     </div>
                 </div>
             )}

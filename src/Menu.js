@@ -12,11 +12,11 @@ export default function Menu({userData, updateExamplesTable, examplesTable, stud
   //console.log(userData)
   //console.log(examplesTable)
 
-  const [rendered, setRendered] = useState(false)
+  const rendered = useRef(false)
   
   useEffect(() => {
-    if (!rendered){
-      setRendered(true)
+    if (!rendered.current){
+      rendered.current = true
     }
   }, [])
   
@@ -25,7 +25,7 @@ export default function Menu({userData, updateExamplesTable, examplesTable, stud
       console.log('resetting for menu mount')
       updateExamplesTable()
     }
-  }, [rendered, userData])
+  }, [userData])
 
 
   return (

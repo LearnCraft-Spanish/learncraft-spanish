@@ -631,6 +631,13 @@ button:hover {
   margin: 0;
 }
 
+.displayExamplesDescription {
+  width: 50%;
+  background-color: var(--light);
+  border: 2px solid var(--theme);
+  padding: 0px 20px;
+}
+
 .exampleCard {
   text-align: center;
   background-color: var(--accent);
@@ -752,6 +759,12 @@ button:hover {
   left: 10%;
   right: 10%;
 }
+
+
+.callPopup input{
+  min-height: 30px;
+}
+
 
 .groupSessionPopup {
   display: flex;

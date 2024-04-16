@@ -19,6 +19,18 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
   const [noSpanglish, setNoSpanglish] = useState(false)
   const [displayExamples, setDisplayExamples] = useState([])
 
+  function filterByHasAudio (example) {
+    if (example.spanishAudioLa) {
+      if (example.spanishAudioLa.length > 0) {
+        return true
+      }
+      return false
+    }
+    return false
+  }
+
+  const displayExamplesWithAudio = displayExamples.filter(filterByHasAudio)
+
   const audience = process.env.REACT_APP_API_AUDIENCE
 
   function toggleSpanglish () {
@@ -470,6 +482,9 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
       <div className='examplesTable'>
         <div className='buttonBox'>
           <button onClick={copyTable}>Copy Table</button>
+          <div className='displayExamplesDescription'>
+          <h4>{displayExamples.length} flashcards showing ({displayExamplesWithAudio.length} with audio)</h4>
+          </div>
         </div>
         {displayExamplesTable()}
       </div>

@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 //import jsonwebtoken from 'jsonwebtoken';
 import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBackend, getActiveExamplesFromBackend, createStudentExample, createMyStudentExample, deleteStudentExample, deleteMyStudentExample, getActiveStudentExamplesFromBackend, getAllUsersFromBackend, getProgramsFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
 import logo from './resources/typelogosmall.png';
+import * as Sentry from "@sentry/react";
 import Menu from './Menu';
 import SimpleQuizApp from './SimpleQuizApp';
 import AudioQuiz from './AudioQuiz';
@@ -23,7 +24,7 @@ import CourseQuizzes from './CourseQuizzes';
 import Coaching from './Coaching';
 require('dotenv').config()
 
-function App() {
+function App({SentryRoutes}) {
   const { user, isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
   const location = useLocation()
   const navigate = useNavigate()
@@ -135,7 +136,6 @@ function App() {
         //console.log(usefulData)
         return usefulData
       });
-      console.log(userData)
       return userData;
     } catch (e) {
         console.log(e.message);
@@ -298,7 +298,7 @@ function App() {
       })
       programWithLessonList.lessons = lessonList
       studentProgram = programWithLessonList
-      lastKnownLesson = programWithLessonList.lessons.slice(-1)[0]
+      lastKnownLesson = programWithLessonList.lessons.slice(-1)[0]||{}
     }
     activeProgram.current = studentProgram
     activeLesson.current = lastKnownLesson
@@ -321,7 +321,6 @@ function App() {
           //console.log(usefulData)
           return usefulData
         });
-        console.log(studentExampleData)
         setExamplesTable(studentExampleData.examples)
         setStudentExamplesTable(studentExampleData.studentExamples)
       } catch (e) {
@@ -552,7 +551,6 @@ async function setupAudioExamplesTable () {
       userSetup()
       parseCourseLessons()
       setupAudioExamplesTable()
-      console.log(location)
     }
   }, [isAuthenticated])
 
@@ -577,7 +575,7 @@ async function setupAudioExamplesTable () {
   useEffect(()=>{
     if (programTable[0] && audioExamplesTable.length > 0){
       console.log(activeStudent.emailAddress)
-      if ((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin){
+      if ((qbUserData.role === 'student'|| qbUserData.role === 'limited') || (qbUserData.isAdmin)){
         //setFlashcardDataComplete(false)
         getStudentLevel()
         updateSelectedProgram(activeProgram.current.recordId)
@@ -638,7 +636,7 @@ async function setupAudioExamplesTable () {
 
         {menuReady && qbUserData.isAdmin && !choosingStudent &&
         <div className='studentList'>
-          {activeStudent.recordId && <p>Using as {activeStudent.name}{(activeStudent.recordId===qbUserData.recordId) && ' (you)'}</p>}
+          {activeStudent.recordId && <p>Using as {activeStudent.name}{(activeStudent.recordId===qbUserData.recordId) && ' (yourself)'}</p>}
           {!activeStudent.recordId && <p>No student Selected</p>}
           <button onClick={chooseStudent}>Change</button>
         </div>
@@ -663,8 +661,8 @@ async function setupAudioExamplesTable () {
       {//(qbUserData.recordId !== 'Loading ID') && (<SimpleQuizApp studentID={qbUserData.recordId} studentName={qbUserData.name} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable}/>)
       }
       {menuReady && (
-        <Routes>
-          <Route path = "/" element={<Menu userData = {qbUserData} updateExamplesTable={updateExamplesTable} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
+        <SentryRoutes>
+          <Route exact path = "/" element={<Menu userData = {qbUserData} updateExamplesTable={updateExamplesTable} examplesTable={examplesTable} studentExamplesTable = {studentExamplesTable} activeStudent={activeStudent} flashcardDataComplete={flashcardDataComplete} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}/>} />
           <Route exact path = "/callback" element = {<CallbackPage />} />
           <Route exact path="/allflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} activeStudent = {activeStudent} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
           <Route exact path="/todaysflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent}  examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
@@ -675,7 +673,7 @@ async function setupAudioExamplesTable () {
           <Route exact path="/frequensay" element={qbUserData.isAdmin && <FrequenSay activeStudent = {activeStudent} programTable = {programTable} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram} />} />
           <Route exact path="/coaching" element={qbUserData.isAdmin && <Coaching userData = {qbUserData} contextual={contextual} openContextual = {openContextual} closeContextual = {closeContextual} ref = {currentContextual}/>}/>
           <Route path="/*" element={<NotFoundPage />} />
-        </Routes>)
+        </SentryRoutes>)
       }
     </div>
   );
