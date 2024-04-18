@@ -28,7 +28,8 @@ export default function LCSPQuizApp({studentExamples, activeStudent, selectedPro
     const courses = [
         {name: 'Spanish in One Month', url:'si1m', code: 'si1m'},
         {name: 'LearnCraft Spanish', url:'', code: 'lcsp'},
-        {name: 'LearnCraft Spanish Extended', url: 'lcspx', code: 'lcspx'}
+        {name: 'LearnCraft Spanish Extended', url: 'lcspx', code: 'lcspx'},
+        {name: 'Master Ser vs Estar', url: 'ser-estar', code: 'ser-estar'}
     ]
 
     const audience = process.env.REACT_APP_API_AUDIENCE
@@ -149,15 +150,50 @@ export default function LCSPQuizApp({studentExamples, activeStudent, selectedPro
     function parseQuizzes (quizzes) {
         quizzes.forEach((item) => {
             const itemArray = item.quizNickname.split(" ")
-            const quizNumber = parseInt(itemArray.slice(-1)[0])
             const quizType = itemArray[0]
-            item.quizNumber = quizNumber
             item.quizType = quizType
+            if (quizType === 'ser-estar') {
+                const quizBigNumber = parseInt(itemArray.slice(-1)[0])
+                item.quizNumber = quizBigNumber
+                item.lessonNumber = parseInt(itemArray.slice(-1)[0][0])
+                const quizSubNumber = parseInt(itemArray.slice(-1)[0][2])
+                const numberSubtitleMap = {
+                    0: 'Short Quiz',
+                    1: 'Good/Well',
+                    2: 'Adjectives',
+                    3: 'Prepositions',
+                    4: 'Adverbs',
+                    5: 'Actions',
+                    6: 'Right and Wrong',
+                    7: 'Events',
+                    8: 'Long Quiz',
+                    9: 'Long Quiz (Everything)'
+                }
+                const subtitle = numberSubtitleMap[quizSubNumber]
+                item.subtitle = subtitle
+            } else {
+            const quizNumber = parseInt(itemArray.slice(-1)[0])
+            item.quizNumber = quizNumber
+            }
         })
         function sortQuizzes (a,b) {
             const aNumber = a.quizNumber
             const bNumber = b.quizNumber
-            return parseInt(aNumber) - parseInt(bNumber)
+            const aLetter = a.quizLetter
+            const bLetter = b.quizLetter
+            if (aNumber === bNumber) {
+                if (aLetter && bLetter) {
+                    if (aLetter < bLetter) {
+                        return -1
+                    } else {
+                        return 1
+                    }
+                } else {
+                    return 0
+                }
+            } else {
+                return parseInt(aNumber) - parseInt(bNumber)
+            }
         }
         quizzes.sort(sortQuizzes)
         return quizzes
@@ -168,18 +204,25 @@ export default function LCSPQuizApp({studentExamples, activeStudent, selectedPro
         const quizSelections = []
         const courseName = courses.find(course => course.code === quizCourse).name
         let i = 1
-        quizList.forEach((item)=>{
-            //console.log(item)
-            quizSelections.push(<option key = {i} value={item.quizNumber}>{courseName} Quiz {item.quizNumber}</option>)
-            i++
-        })
+        if (quizCourse === 'ser-estar') {
+            quizList.forEach((item)=>{
+                quizSelections.push(<option key = {i} value={item.quizNumber}>Ser/Estar Lesson {item.lessonNumber}, {item.subtitle}</option>)
+                i++
+            })
+        } else {
+            quizList.forEach((item)=>{
+                //console.log(item)
+                quizSelections.push(<option key = {i} value={item.quizNumber}>{courseName} Quiz {item.quizNumber}</option>)
+                i++
+            })
+        }
         return quizSelections
     }
 
     function findDefaultQuiz () {
         studentHasDefaultQuiz.current = true
         const activeCourse = courses.find(course => course.name === selectedProgram.name)
-        if (activeCourse) {
+        if (activeCourse && activeCourse.code !== 'lcsp') {
             console.log('setting course to student default: '+activeCourse.name)
             setQuizCourse(activeCourse.code)
             const urlToNavigate = activeCourse.url

@@ -48,6 +48,20 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
                 
             }
 
+        function makeQuizTitle () {
+            const thisCourse = courses.find(course => course.code === quizCourse)
+            const courseName = thisCourse?thisCourse.name:quizCourse
+            if (quizCourse === 'ser-estar') {
+                const quizNumberAsString = thisQuiz.toString()
+                const lessonNumber = quizNumberAsString[0]
+                const thisQuizObject = quizTable.find(quiz => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse)
+                const subtitle = thisQuizObject?thisQuizObject.subtitle:quizNumberAsString
+                return <h3>Ser/Estar Lesson {lessonNumber}, {subtitle}</h3>
+            } else {
+                return <h3>{courseName} Quiz {thisQuiz}</h3>
+            }
+        }
+
         const whichAudio = (languageShowing === 'spanish')?'spanishAudioLa':'englishAudio'
 
         const currentAudioUrl = quizReady && (examplesToReview[currentExampleNumber-1])? examplesToReview[currentExampleNumber-1][whichAudio]:""
@@ -179,7 +193,7 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
             )}
             {quizReady &&
             <div className='quiz'>
-                <h3>{(courses.find(course => course.code === quizCourse)||{name: quizCourse}).name} Quiz {chosenQuiz}</h3>
+                {makeQuizTitle()}
                 {(examplesToReview[currentExampleNumber-1] !== undefined) && (<div className='exampleBox'>
                     <div style = {{display:(languageShowing==='english')?'flex':'none'}} className='englishTranslation' onClick={toggleLanguageShowing}>
                         <p>{examplesToReview[currentExampleNumber-1]?examplesToReview[currentExampleNumber-1].englishTranslation:''}</p>
