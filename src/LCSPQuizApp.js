@@ -222,11 +222,13 @@ export default function LCSPQuizApp({studentExamples, activeStudent, selectedPro
     function findDefaultQuiz () {
         studentHasDefaultQuiz.current = true
         const activeCourse = courses.find(course => course.name === selectedProgram.name)
-        if (activeCourse && activeCourse.code !== 'lcsp') {
-            console.log('setting course to student default: '+activeCourse.name)
-            setQuizCourse(activeCourse.code)
-            const urlToNavigate = activeCourse.url
-            navigate(urlToNavigate)
+        if (activeCourse) {
+            if (activeCourse.code !== 'lcsp' && quizCourse === 'lcsp') {
+                console.log('setting course to student default: '+activeCourse.name)
+                setQuizCourse(activeCourse.code)
+                const urlToNavigate = activeCourse.url
+                navigate(urlToNavigate)
+            }
         }
         console.log(selectedLesson)
         const activeLessonArray = selectedLesson.lesson.split(' ')
