@@ -50,6 +50,9 @@ export default function AudioBasedReview({ programTable, activeStudent, studentE
     }
 
     async function playCurrentQuestion() {
+        if (guessing) {
+            endGuess()
+        }
         if (currentAnswerAudio.current) {
             currentAnswerAudio.current.pause()
             currentAnswerAudio.current.currentTime = 0
@@ -157,7 +160,7 @@ export default function AudioBasedReview({ programTable, activeStudent, studentE
             <div className='progressBarHolder'>
                 {!showingAnswer && !guessing && <h4>{startWithSpanish?(spanishHidden?'Playing Spanish':currentQuestionText):'Playing English'}</h4>}
                 {!showingAnswer && guessing && <h4>Make a guess!</h4>}
-                {showingAnswer && <h4>{startWithSpanish?currentAnswerText:(answerPlayNumber < 2?'Playing Spanish':'Playing Spanish Again')}</h4>}
+                {showingAnswer && <h4>{startWithSpanish?currentAnswerText:(answerPlayNumber < 2?'Playing Spanish':example.spanishExample)}</h4>}
                 <div className='progressStatus' style={{width: `${progressStatus*100}%`}}>
                 </div>
                 <div className='navigateButtons'>
@@ -227,10 +230,12 @@ export default function AudioBasedReview({ programTable, activeStudent, studentE
         if (quizReady) {
             switch (showingAnswer) {
                 case false:
-                    if (startWithSpanish && spanishHidden) {
+                    if (startWithSpanish && !guessing && spanishHidden && autoplay) {
+                        guess()
+                    } else if (startWithSpanish && spanishHidden){
+                        endGuess()
                         showSpanish()
-                    } else if (autoplay && !guessing){
-                        clearCountDown()
+                    } else if (!startWithSpanish && !guessing && autoplay) {
                         guess()
                     } else {
                         setShowingAnswer(true)
@@ -385,9 +390,11 @@ export default function AudioBasedReview({ programTable, activeStudent, studentE
                     {answerAudio()}
                 </div>
                 <div className='buttonBox'>
-                    {startWithSpanish && !showingAnswer && spanishHidden && <button className = 'greenButton' onClick={cycle}>Show Spanish</button>}
-                    {!showingAnswer && (!spanishHidden || !startWithSpanish) && autoplay && !guessing && <button className = 'greenButton' onClick={cycle}>Guess!</button>}
-                    {startWithSpanish && !showingAnswer && !spanishHidden && (!autoplay || guessing) && <button className = 'greenButton' onClick={cycle}>Show English</button>}
+                    {startWithSpanish && !showingAnswer && spanishHidden && !guessing && autoplay && <button className = 'greenButton' onClick={cycle}>Skip to Guess</button>}
+                    {startWithSpanish && !showingAnswer && spanishHidden && !autoplay && <button className = 'greenButton' onClick={cycle}>Show Spanish</button>}
+                    {startWithSpanish && !showingAnswer && spanishHidden && guessing && <button className = 'greenButton' onClick={cycle}>Show Spanish</button>}
+                    {startWithSpanish && !showingAnswer && !spanishHidden && <button className = 'greenButton' onClick={cycle}>Show English</button>}
+                    {!startWithSpanish && !showingAnswer && !guessing && autoplay && <button className = 'greenButton' onClick={cycle}>Skip to Guess</button>}
                     {!startWithSpanish && !showingAnswer && (!autoplay || guessing) && <button className = 'greenButton' onClick={cycle}>Play Spanish</button>}
                     {showingAnswer && !startWithSpanish && answerPlayNumber < 2 && <button className = 'greenButton' onClick={cycle}>Play Again</button>}
                     {showingAnswer && (startWithSpanish || answerPlayNumber > 1) && <button className = 'greenButton' onClick={cycle}>Next</button>}
@@ -398,10 +405,12 @@ export default function AudioBasedReview({ programTable, activeStudent, studentE
                     {autoplay && paused && <button onClick={resumePlayback}>Play</button>}
                 </div>
                 <div className='buttonBox'>
-                    {startWithSpanish && showingAnswer && <button onClick={hideAnswer}>Show Spanish Again</button>}
-                    {!startWithSpanish && showingAnswer && <button onClick={hideAnswer}>Hear English Again</button>}
-                    {!autoplay && !showingAnswer && <button onClick={playCurrentQuestion}>Play Again</button>}
-                    {!autoplay && showingAnswer && !startWithSpanish && <button onClick={playCurrentAnswer}>Play Again</button>}
+                    {startWithSpanish && !showingAnswer && <button onClick={playCurrentQuestion}>Replay Spanish</button>}
+                    {startWithSpanish && showingAnswer && <button onClick={hideAnswer}>Replay Spanish</button>}
+                    {!startWithSpanish && !showingAnswer && <button onClick={playCurrentQuestion}>Replay English</button>}
+                    {!startWithSpanish && showingAnswer && <button onClick={hideAnswer}>Replay English</button>}
+                    {!startWithSpanish && !autoplay && !showingAnswer && <button onClick={playCurrentQuestion}>Play Again</button>}
+                    {!startWithSpanish && !autoplay && showingAnswer &&  <button onClick={playCurrentAnswer}>Play Again</button>}
                 </div>
                 <div className='buttonBox'>
                     {<button onClick={decrementExample}>Previous</button>}
