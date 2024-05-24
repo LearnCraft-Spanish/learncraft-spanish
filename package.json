@@ -23,6 +23,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build && npm run sentry:sourcemaps",
     "test": "react-scripts test",
+    "test-vitest": "vitest",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org learncraft-spanish --project learncraft-spanish-frontend ./src && sentry-cli sourcemaps upload --org learncraft-spanish --project learncraft-spanish-frontend ./src"
