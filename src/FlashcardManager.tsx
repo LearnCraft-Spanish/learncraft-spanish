@@ -14,7 +14,7 @@ interface FlashcardManagerProps {
 
 const FlashcardManager: React.FC<FlashcardManagerProps> = ({studentExamples}) => {
 
-  console.log(studentExamples)
+  console.log(studentExamples)//testing
 
   function removeFlashcard(recordId: string) {
     console.log("recordId", recordId)
