@@ -34,27 +34,28 @@ export default function Menu({userData, updateExamplesTable, examplesTable, stud
         <div className='menuBox'>
             {activeStudent.recordId && (studentExamplesTable.length > 0 && examplesTable.length === studentExamplesTable.length) && (
             <div>
-            <h3>Review Options:</h3>
+            <h3>My Flashcards:</h3>
             <div className= 'buttonBox'>
               
               <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
               <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
             </div>
+            <div className= 'buttonBox'>
+              <Link className= 'linkButton' to = '/manage-flashcards'>Manage My Flashcards</Link>
+            </div>
             </div>)}
-            <h3>Explore:</h3>
+            <h3>Quizzing Tools:</h3>
+            <div className='buttonBox'>
+              <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>
+            </div>
             {((userData.role === 'student' || userData.role === 'limited')||userData.isAdmin) && <div className='buttonBox'>
               <Link className= 'linkButton' to = '/audioquiz'>Audio Quiz</Link>
               <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
             </div>}
-            <div className='buttonBox'>
-              <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>
-            </div>
-        </div>
-        {((userData.role === 'student'||userData.isAdmin) && <div className='menuBox'>
-            <div className= 'buttonBox'>
+            {((userData.role === 'student'||userData.isAdmin) && <div className= 'buttonBox'>
                 <Link className = 'linkButton' to='/flashcardfinder'>Find Flashcards</Link>
-            </div>
-        </div>)}
+            </div>)} 
+        </div>
         {(userData.isAdmin && <div className='menuBox'>
             <h3>Staff Tools</h3>
             <div className= 'buttonBox'>

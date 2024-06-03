@@ -22,6 +22,7 @@ import OfficialQuiz from './OfficialQuiz';
 import CallbackPage from './CallbackPage';
 import CourseQuizzes from './CourseQuizzes';
 import Coaching from './Coaching';
+import FlashcardManager from './FlashcardManager';
 require('dotenv').config()
 
 function App({SentryRoutes}) {
@@ -666,6 +667,7 @@ async function setupAudioExamplesTable () {
           <Route exact path = "/callback" element = {<CallbackPage />} />
           <Route exact path="/allflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) &&  <SimpleQuizApp updateExamplesTable= {updateExamplesTable} activeStudent = {activeStudent} examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
           <Route exact path="/todaysflashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) && <SRSQuizApp flashcardDataComplete={flashcardDataComplete} updateExamplesTable = {updateExamplesTable} activeStudent = {activeStudent}  examplesTable={examplesTable} studentExamplesTable={studentExamplesTable} removeFlashcard = {removeFlashcardFromActiveStudent}/>} />
+          <Route exact path="/manage-flashcards" element={((qbUserData.role === 'student')||qbUserData.isAdmin) && <FlashcardManager studentExamples={examplesTable} activeStudent = {qbUserData} />} />
           <Route path="/officialquizzes/*" element={<LCSPQuizApp updateExamplesTable = {updateExamplesTable} studentExamples={studentExamplesTable} activeStudent={activeStudent} selectedProgram = {selectedProgram} selectedLesson={selectedLesson} addFlashcard = {addToActiveStudentFlashcards}/>} />
           <Route exact path="/flashcardfinder" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <FlashcardFinder user = {qbUserData||{}} activeStudent={activeStudent} programTable= {programTable} studentList = {studentList} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} addFlashcard = {addToActiveStudentFlashcards} updateExamplesTable={updateExamplesTable} flashcardDataComplete={flashcardDataComplete} addToActiveStudentFlashcards={addToActiveStudentFlashcards} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram} contextual={contextual} openContextual = {openContextual} closeContextual = {closeContextual} ref = {currentContextual}/>} />
           <Route exact path="/audioquiz" element={((qbUserData.role === 'student'|| qbUserData.role === 'limited')||qbUserData.isAdmin) && <AudioQuiz activeStudent = {activeStudent} programTable = {programTable} studentExamplesTable={studentExamplesTable} updateBannerMessage={updateBannerMessage} audioExamplesTable={audioExamplesTable} filterExamplesByAllowedVocab={filterExamplesByAllowedVocab} selectedLesson={selectedLesson} selectedProgram={selectedProgram} updateSelectedLesson={updateSelectedLesson} updateSelectedProgram={updateSelectedProgram}/>} />
