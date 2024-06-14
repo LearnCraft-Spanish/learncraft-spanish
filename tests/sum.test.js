@@ -9,6 +9,10 @@ test('can test', () => {
   expect (test).toBeDefined()
 })
 
+test('can divide', () => {
+  expect (6/3).toBe(2)
+})
+
 export function sum(a, b) {
     return a + b
   }

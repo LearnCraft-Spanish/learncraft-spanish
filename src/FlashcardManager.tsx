@@ -1,41 +1,41 @@
-import React, { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import MenuButton from "./MenuButton";
+import React from 'react';
 
-interface FlashcardManagerProps {
-  studentExamples: Array <{
-    recordId: string;
-    spanishExample: string;
-    englishTranslation: string;
-    spanglish: string;
-    isAssigned: boolean;
-  }>;
+interface Flashcard {
+  recordId: string;
+  spanishExample: string;
+  englishTranslation: string;
+  spanglish: string;
 }
 
-const FlashcardManager: React.FC<FlashcardManagerProps> = ({studentExamples}) => {
+interface FlashcardManagerProps {
+  studentExamples: Flashcard[];
+}
 
-  console.log(studentExamples)//testing
+const FlashcardManager: React.FC<FlashcardManagerProps> = ({ studentExamples }) => {
+  console.log(studentExamples); //testing
 
   function removeFlashcard(recordId: string) {
-    console.log("recordId", recordId)
+    console.log("recordId", recordId);
+    // Implementation to remove a flashcard
   }
 
   function displayExamplesTable() {
-    const tableToDisplay = studentExamples.map((item) => {
-      return (<div className='exampleCard' key={item.recordId}>
+    return studentExamples.map((item) => (
+      <div className='exampleCard' key={item.recordId}>
         <div className='exampleCardSpanishText'>
           <h3>{item.spanishExample}</h3>
         </div>
         <div className='exampleCardEnglishText'>
           <h4>{item.englishTranslation}</h4>
         </div>
-        {item.spanglish==='spanglish' && <div>
-          <h4>Spanglish</h4>
-        </div>}
-        <button className = 'redButton' value = {item.recordId} onClick = {(e) => removeFlashcard((e.target as HTMLButtonElement).value)}>Remove</button>
-      </div>)
-    })
-    return tableToDisplay
+        {item.spanglish === 'spanglish' && (
+          <div>
+            <h4>Spanglish</h4>
+          </div>
+        )}
+        <button className='redButton' value={item.recordId} onClick={(e) => removeFlashcard((e.target as HTMLButtonElement).value)}>Remove</button>
+      </div>
+    ));
   }
 
   return (
@@ -44,11 +44,8 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({studentExamples}) =>
       <div className='exampleCardContainer'>
         {displayExamplesTable()}
       </div>
-      <div className="buttonBox">
-        <MenuButton />
-      </div>
     </div>
   );
-}
+};
 
 export default FlashcardManager;

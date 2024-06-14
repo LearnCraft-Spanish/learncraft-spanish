@@ -24,14 +24,14 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-  "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
-  "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build && npm run sentry:sourcemaps",
-  "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts test",
-  "test-vitest": "vitest",
-  "eject": "react-scripts eject",
-  "predeploy": "npm run build",
-  "sentry:sourcemaps": "sentry-cli sourcemaps inject --org learncraft-spanish --project learncraft-spanish-frontend ./src && sentry-cli sourcemaps upload --org learncraft-spanish --project learncraft-spanish-frontend ./src"
-},
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build && npm run sentry:sourcemaps",
+    "test": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts test",
+    "test-vitest": "vitest",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org learncraft-spanish --project learncraft-spanish-frontend ./src && sentry-cli sourcemaps upload --org learncraft-spanish --project learncraft-spanish-frontend ./src"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -53,5 +53,14 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "vitest": "^1.6.0"
-  }
+  },
+  "version": "1.0.0",
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
