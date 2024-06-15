@@ -20,7 +20,8 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({ studentExamples }) 
   }
 
   function displayExamplesTable() {
-    return studentExamples.map((item) => (
+    const sortedExamples = studentExamples.sort((a) => a.spanglish==='spanglish' ? -1 : 1);
+    return sortedExamples.map((item) => (
       <div className='exampleCard' key={item.recordId}>
         <div className='exampleCardSpanishText'>
           <h3>{item.spanishExample}</h3>
@@ -29,8 +30,13 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({ studentExamples }) 
           <h4>{item.englishTranslation}</h4>
         </div>
         {item.spanglish === 'spanglish' && (
-          <div>
+          <div className='spanglishLabel'>
             <h4>Spanglish</h4>
+          </div>
+        )}
+        {item.spanglish !== 'spanglish' && (
+          <div className='spanishLabel'>
+            <h4>Spanish</h4>
           </div>
         )}
         <button className='redButton' value={item.recordId} onClick={(e) => removeFlashcard((e.target as HTMLButtonElement).value)}>Remove</button>

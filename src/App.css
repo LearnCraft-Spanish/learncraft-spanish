@@ -372,6 +372,25 @@ button:hover {
   background-color: var(--dark);
 }
 
+/*For Flashcard Manager */
+
+.spanglishLabel {
+  width: 8%;
+  min-width: 100px;
+  background-color: var(--dark);
+}
+
+.spanishLabel {
+  width: 8%;
+  min-width: 100px;
+  background-color: var(--brand);
+  
+}
+
+.spanglishLabel h4, .spanishLabel h4 {
+  color: var(--light)
+}
+
 /* For Audio Quiz */
 
 .comprehensionHeader{
