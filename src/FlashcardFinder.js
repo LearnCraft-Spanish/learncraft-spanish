@@ -3,7 +3,6 @@ import { getVocabFromBackend, getVerifiedExamplesFromBackend, createStudentExamp
 import './App.css';
 import { useAuth0 } from '@auth0/auth0-react';
 import LessonSelector from './LessonSelector' 
-import { isLabelWithInternallyDisabledControl } from '@testing-library/user-event/dist/utils';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentExamplesTable, flashcardDataComplete, selectedProgram, selectedLesson, updateSelectedProgram, updateSelectedLesson, addToActiveStudentFlashcards, contextual, openContextual, closeContextual}, currentContextual) => {

@@ -1,26 +1,61 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface Flashcard {
-  recordId: string;
+  recordId: number;
   spanishExample: string;
   englishTranslation: string;
   spanglish: string;
 }
 
-interface FlashcardManagerProps {
-  studentExamples: Flashcard[];
+interface StudentExample {
+  recordId: number;
+  dateCreated: string;
+  relatedExample: number;
 }
 
-const FlashcardManager: React.FC<FlashcardManagerProps> = ({ studentExamples }) => {
-  console.log(studentExamples); //testing
+interface FlashcardManagerProps {
+  examplesTable: Flashcard[];
+  studentExamplesTable: StudentExample[];
+  removeFlashcard: Function;
+}
 
-  function removeFlashcard(recordId: string) {
-    console.log("recordId", recordId);
-    // Implementation to remove a flashcard
+const FlashcardManager: React.FC<FlashcardManagerProps> = ({ examplesTable, studentExamplesTable, removeFlashcard }) => {
+
+  async function removeAndUpdate(recordId: number) {
+    removeFlashcard(recordId).then(
+      (numberRemoved: number) => {
+        if (numberRemoved > 0) {
+          displayExamplesTable();
+        } else {
+          console.log('Error removing flashcard');
+        }
+      })
+  }
+
+  function getStudentExampleFromExampleId(exampleId: number) {
+    const example = studentExamplesTable.find((item) => item.relatedExample === exampleId);
+    return example? example : {recordId: -1, dateCreated: '', relatedExample: -1};
   }
 
   function displayExamplesTable() {
-    const sortedExamples = studentExamples.sort((a) => a.spanglish==='spanglish' ? -1 : 1);
+    const sortedExamples = examplesTable.sort((a,b) => {
+      const aStudentExample = getStudentExampleFromExampleId(a?.recordId);
+      const bStudentExample = getStudentExampleFromExampleId(b?.recordId);
+      const aDate = new Date(aStudentExample.dateCreated);
+      const bDate = new Date(bStudentExample.dateCreated);
+      if (a.spanglish ==='spanglish' && b.spanglish !== 'spanglish') {
+        return -1
+      } else if (a.spanglish !=='spanglish' && b.spanglish === 'spanglish') {
+        return 1
+      } else if (aDate > bDate) {
+        return -1;
+      } else if (aDate < bDate) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
     return sortedExamples.map((item) => (
       <div className='exampleCard' key={item.recordId}>
         <div className='exampleCardSpanishText'>
@@ -39,7 +74,7 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({ studentExamples }) 
             <h4>Spanish</h4>
           </div>
         )}
-        <button className='redButton' value={item.recordId} onClick={(e) => removeFlashcard((e.target as HTMLButtonElement).value)}>Remove</button>
+        <button className='redButton' value={item.recordId} onClick={(e) => removeAndUpdate(parseInt((e.target as HTMLButtonElement).value))}>Remove</button>
       </div>
     ));
   }
@@ -47,6 +82,7 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({ studentExamples }) 
   return (
     <div>
       <h2>Flashcard Manager</h2>
+      <h4>Total flashcards: {examplesTable.length}</h4>
       <div className='exampleCardContainer'>
         {displayExamplesTable()}
       </div>

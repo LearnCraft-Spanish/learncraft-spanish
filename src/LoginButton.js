@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-require('dotenv').config()
 
 const LoginButton = () => {
   const { isAuthenticated, isLoading, loginWithRedirect} = useAuth0();

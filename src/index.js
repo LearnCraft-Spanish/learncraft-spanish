@@ -5,7 +5,6 @@ import './index.css';
 import * as Sentry from "@sentry/react";
 import App from './App';
 import { Auth0Provider } from "@auth0/auth0-react";
-require('dotenv').config()
 
 Sentry.init({
   dsn: "https://e42f3e1acdc86e3e3119dbd586514255@o4507097747423232.ingest.us.sentry.io/4507097897500672",
