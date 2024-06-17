@@ -1,3 +1,4 @@
+import { table } from 'console';
 import React, { useEffect } from 'react';
 
 interface Flashcard {
@@ -17,28 +18,39 @@ interface FlashcardManagerProps {
   examplesTable: Flashcard[];
   studentExamplesTable: StudentExample[];
   removeFlashcard: Function;
+  updateExamplesTable: Function;
 }
 
-const FlashcardManager: React.FC<FlashcardManagerProps> = ({ examplesTable, studentExamplesTable, removeFlashcard }) => {
+const FlashcardManager: React.FC<FlashcardManagerProps> = ({examplesTable, studentExamplesTable, removeFlashcard, updateExamplesTable}): React.JSX.Element => {
+
+  const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([]);
 
   async function removeAndUpdate(recordId: number) {
+    const filteredTable = displayExamplesTable.filter((item) => item.recordId !== getExamplefromStudentExampleId(recordId).recordId);
+    setDisplayExamplesTable(filteredTable);
     removeFlashcard(recordId).then(
       (numberRemoved: number) => {
         if (numberRemoved > 0) {
-          displayExamplesTable();
+          console.log('Flashcard Removed');
         } else {
           console.log('Error removing flashcard');
+          updateExamplesTable();
         }
       })
   }
 
   function getStudentExampleFromExampleId(exampleId: number) {
-    const example = studentExamplesTable.find((item) => item.relatedExample === exampleId);
-    return example? example : {recordId: -1, dateCreated: '', relatedExample: -1};
+    const studentExample = studentExamplesTable.find((item) => item.relatedExample === exampleId);
+    return studentExample? studentExample : {recordId: -1, dateCreated: '', relatedExample: -1};
   }
 
-  function displayExamplesTable() {
-    const sortedExamples = examplesTable.sort((a,b) => {
+  function getExamplefromStudentExampleId(studentExampleId: number) {
+    const example = examplesTable.find((item) => item.recordId === studentExampleId);
+    return example? example : {recordId: -1, spanishExample: '', englishTranslation: '', spanglish: ''};
+  }
+
+  function createDisplayExamplesTable(tableToDisplay: Flashcard[]) {
+    const sortedExamples = tableToDisplay.sort((a,b) => {
       const aStudentExample = getStudentExampleFromExampleId(a?.recordId);
       const bStudentExample = getStudentExampleFromExampleId(b?.recordId);
       const aDate = new Date(aStudentExample.dateCreated);
@@ -56,7 +68,7 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({ examplesTable, stud
       }
     });
 
-    return sortedExamples.map((item) => (
+    const finalTable  =  sortedExamples.map((item) => (
       <div className='exampleCard' key={item.recordId}>
         <div className='exampleCardSpanishText'>
           <h3>{item.spanishExample}</h3>
@@ -77,14 +89,19 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({ examplesTable, stud
         <button className='redButton' value={item.recordId} onClick={(e) => removeAndUpdate(parseInt((e.target as HTMLButtonElement).value))}>Remove</button>
       </div>
     ));
+    return finalTable;
   }
+
+  useEffect(() => {
+    setDisplayExamplesTable(examplesTable);
+  }, [examplesTable, studentExamplesTable]);
 
   return (
     <div>
       <h2>Flashcard Manager</h2>
       <h4>Total flashcards: {examplesTable.length}</h4>
       <div className='exampleCardContainer'>
-        {displayExamplesTable()}
+        {createDisplayExamplesTable(displayExamplesTable)}
       </div>
     </div>
   );
