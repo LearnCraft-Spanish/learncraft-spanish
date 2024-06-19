@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
+    "@sentry/vite-plugin": "^2.19.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@vitejs/plugin-react": "^4.0.0",
