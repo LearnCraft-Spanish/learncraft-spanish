@@ -24,7 +24,8 @@
     "start": "vite",
     "build": "vite build && npm run sentry:sourcemaps",
     "test": "vitest",
-    "predeploy": "npm run build && npm run sentry:sourcemaps"
+    "predeploy": "npm run build && npm run sentry:sourcemaps",
+    "sentry:sourcemaps": "sentry-cli sourcemaps upload --url-prefix '~/build' ./build/**/*.js.map --validate"
   },
   "eslintConfig": {
     "extends": [

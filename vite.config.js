@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
 
   // Access the environment variable
   console.log(env.VITE_PORT)
-  const port = parseInt(env.VITE_PORT || '3000', 10);
+  const port = env.VITE_ENVIRONMENT = "development"? parseInt(env.VITE_PORT || '3000', 10): undefined;
 
   return {
     plugins: [react()],
