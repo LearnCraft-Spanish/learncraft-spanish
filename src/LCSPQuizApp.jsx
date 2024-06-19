@@ -4,7 +4,7 @@ import './App.css';
 import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react';
 import { getExamplesFromBackend, getLcspQuizzesFromBackend} from './BackendFetchFunctions';
-import CourseQuizzes from './CourseQuizzes.js'
+import CourseQuizzes from './CourseQuizzes.jsx'
 import MenuButton from './MenuButton';
 import { Outlet, Link, Navigate, redirect, useNavigate, Route, Routes } from 'react-router-dom';
 import OfficialQuiz from './OfficialQuiz';

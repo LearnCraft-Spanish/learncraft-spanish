@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter,useLocation, useNavigationType, createRoutesFromChildren, matchRoutes, Routes} from "react-router-dom";
 import './index.css';
 import * as Sentry from "@sentry/react";
-import App from './App';
+import App from './App.jsx';
 import { Auth0Provider } from "@auth0/auth0-react";
 
 Sentry.init({

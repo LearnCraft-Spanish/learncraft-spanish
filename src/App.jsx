@@ -18,9 +18,7 @@ import NotFoundPage from './NotFoundPage';
 import { useAuth0 } from '@auth0/auth0-react';
 import ComprehensionQuiz from './ComprehensionQuiz';
 import FlashcardFinder from './FlashcardFinder';
-import OfficialQuiz from './OfficialQuiz';
 import CallbackPage from './CallbackPage';
-import CourseQuizzes from './CourseQuizzes';
 import Coaching from './Coaching';
 import FlashcardManager from './FlashcardManager';
 
