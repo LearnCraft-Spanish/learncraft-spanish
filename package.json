@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build && npm run sentry:fsourcemaps",
+    "build": "react-scripts build && npm run sentry:sourcemaps",
     "test": "vitest",
     "test-vitest": "vitest",
     "eject": "react-scripts eject",
