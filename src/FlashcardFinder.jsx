@@ -30,7 +30,7 @@ const FlashcardFinder = forwardRef(({activeStudent, programTable, user, studentE
 
   const displayExamplesWithAudio = displayExamples.filter(filterByHasAudio)
 
-  const audience = process.env.REACT_APP_API_AUDIENCE
+  const audience = import.meta.env.VITE_API_AUDIENCE
 
   function toggleSpanglish () {
     if (noSpanglish) {

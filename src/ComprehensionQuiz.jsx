@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { getVocabFromBackend, getAudioExamplesFromBackend, getExamplesFromBackend, createStudentExample, getLessonsFromBackend, getProgramsFromBackend, getAllUsersFromBackend, getStudentExamplesFromBackend} from './BackendFetchFunctions';
+
 import './App.css';
 import ReactHowler from 'react-howler'
 import MenuButton from './MenuButton';

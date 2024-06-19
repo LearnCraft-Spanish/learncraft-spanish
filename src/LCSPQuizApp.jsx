@@ -32,7 +32,7 @@ export default function LCSPQuizApp({studentExamples, activeStudent, selectedPro
         {name: 'Master Ser vs Estar', url: 'ser-estar', code: 'ser-estar'}
     ]
 
-    const audience = process.env.REACT_APP_API_AUDIENCE
+    const audience = import.meta.env.VITE_API_AUDIENCE
     
     function createRoutesFromCourses() {
         const routes = []

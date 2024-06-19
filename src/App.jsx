@@ -3,7 +3,7 @@ import React, { isValidElement } from 'react';
 import { Route, Routes, Link, useLocation, useParams, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from 'react';
 //import jsonwebtoken from 'jsonwebtoken';
-import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBackend, getActiveExamplesFromBackend, createStudentExample, createMyStudentExample, deleteStudentExample, deleteMyStudentExample, getActiveStudentExamplesFromBackend, getAllUsersFromBackend, getProgramsFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
+import { getUserDataFromBackend, getLessonsFromBackend,getAudioExamplesFromBackend, getActiveExamplesFromBackend, createStudentExample, createMyStudentExample, deleteStudentExample, deleteMyStudentExample, getAllUsersFromBackend, getProgramsFromBackend, getMyExamplesFromBackend} from './BackendFetchFunctions';
 import logo from './resources/typelogosmall.png';
 import * as Sentry from "@sentry/react";
 import Menu from './Menu';
@@ -46,7 +46,7 @@ function App({SentryRoutes}) {
   const [messageNumber, setMessageNumber] = useState(0)
   const [contextual, setContextual] = useState('')
 
-  const audience = process.env.REACT_APP_API_AUDIENCE
+  const audience = import.meta.env.VITE_API_AUDIENCE
 
   function openContextual (elementClass) {
     setContextual(elementClass)
@@ -122,7 +122,7 @@ function App({SentryRoutes}) {
         },
         cacheMode: 'off'
       });
-      //console.log(accessToken)
+      console.log(accessToken)
       /*const decodedToken = jsonwebtoken.decode(accessToken);
       console.log(decodedToken)
       const scopes = decodedToken.scope;
@@ -136,7 +136,7 @@ function App({SentryRoutes}) {
       });
       return userData;
     } catch (e) {
-        console.log(e.message);
+        console.log(e?.message);
     }
   }
 

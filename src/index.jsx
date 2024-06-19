@@ -8,7 +8,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 
 Sentry.init({
   dsn: "https://e42f3e1acdc86e3e3119dbd586514255@o4507097747423232.ingest.us.sentry.io/4507097897500672",
-  environment: process.env.REACT_APP_ENVIRONMENT,
+  environment: import.meta.env.MODE,
   integrations: [
     Sentry.replayIntegration(),
     Sentry.reactRouterV6BrowserTracingIntegration({
@@ -25,10 +25,10 @@ Sentry.init({
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
-const domain = process.env.REACT_APP_AUTH0_DOMAIN
-const clientId = process.env.REACT_APP_AUTH0_CLIENTID
-const audience = process.env.REACT_APP_API_AUDIENCE
-const redirect_uri = process.env.REACT_APP_LOCAL_DOMAIN
+const domain = import.meta.env.VITE_AUTH0_DOMAIN
+const clientId = import.meta.env.VITE_AUTH0_CLIENTID
+const audience = import.meta.env.VITE_API_AUDIENCE
+const redirect_uri = import.meta.env.VITE_LOCAL_DOMAIN
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
 root.render(

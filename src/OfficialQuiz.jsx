@@ -10,7 +10,7 @@ export default function OfficialQuiz ({courses, quizCourse, makeMenuHidden, make
     chosenQuiz, updateChosenQuiz, hideMenu, quizTable, examplesTable, studentExamples, addFlashcard}) {
         const thisQuiz = parseInt(useParams().number)
         const navigate = useNavigate()
-        const audience = process.env.REACT_APP_API_AUDIENCE
+        const audience = import.meta.env.VITE_API_AUDIENCE
         const {getAccessTokenSilently} = useAuth0();
 
         const rendered = useRef(false)

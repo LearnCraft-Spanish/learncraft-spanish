@@ -3,7 +3,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const LoginButton = () => {
   const { isAuthenticated, isLoading, loginWithRedirect} = useAuth0();
-  const thisDomain = process.env.REACT_APP_LOCAL_DOMAIN;
+  const thisDomain = import.meta.env.VITE_AUTH0_DOMAIN;
 
   function loginFunction() {
     function generateRandomString(length) {

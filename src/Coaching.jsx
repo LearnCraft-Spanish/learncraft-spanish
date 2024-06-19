@@ -5,7 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 const Coaching = forwardRef(function Coaching ({userData, contextual, openContextual, closeContextual}, currentContextual) {
     const { user, isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0();
-    const audience = process.env.REACT_APP_API_AUDIENCE
+    const audience = import.meta.env.VITE_API_AUDIENCE;
     const [weeksToDisplay, setWeeksToDisplay] = useState([])
     const [startupDataLoaded, setStartupDataLoaded] = useState(false)
     const [filterByCoach, setFilterByCoach] = useState({})
