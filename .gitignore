@@ -8,6 +8,9 @@
 # testing
 /coverage
 
+#build files
+build
+
 # misc
 .env
 .env.*

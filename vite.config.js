@@ -13,11 +13,6 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
         react(),
-        sentryVitePlugin({
-            authToken: env.SENTRY_AUTH_TOKEN,
-            org: "learncraft-spanish",
-            project: "learncraft-spanish-frontend",
-        }),
     ],
     build: {
       outDir: 'build',
