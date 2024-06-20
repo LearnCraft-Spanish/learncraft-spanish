@@ -24,7 +24,6 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "build": "vite build",
     "test": "vitest",
     "predeploy": "npm run build"
   },
@@ -62,7 +61,7 @@
   "version": "1.0.0",
   "type": "module",
   "description": "This project was bootstrapped with Create React App.",
-  "main": "index.js",
+  "main": "index.jsx",
   "directories": {
     "test": "tests"
   },
