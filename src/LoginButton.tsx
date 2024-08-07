@@ -6,7 +6,7 @@ const LoginButton = () => {
   const thisDomain = import.meta.env.VITE_AUTH0_DOMAIN;
 
   function loginFunction() {
-    function generateRandomString(length) {
+    function generateRandomString(length: number) {
       const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz+/'
       let result = ''
   

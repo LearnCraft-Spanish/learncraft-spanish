@@ -1,4 +1,3 @@
-import { table } from 'console';
 import React, { useEffect } from 'react';
 
 interface Flashcard {
