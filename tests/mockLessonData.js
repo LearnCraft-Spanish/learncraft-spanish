@@ -2537,7 +2537,7 @@ export const lessonData = [
       'esté/Verb, Verb/he/she/it be//3rd person singular "él/ella/eso" ; Subjunctive present',
       'estén/Verb, Verb/they be//3rd person plural "ellos" ; Subjunctive present',
       'estés/Verb, Verb/you be//2nd person singular "tú" ; 2nd person singular "vos" ; Subjunctive present',
-      'ya está/Cluster, Idiom/it\'s done/',
+      "ya está/Cluster, Idiom/it's done/",
     ],
     sortReference: 4,
     relatedProgram: null,
@@ -3644,14 +3644,10 @@ export const lessonData = [
   {
     recordId: 71,
     lesson: 'lcsp 2',
-    vocabIncluded: [
-      'eso/Pronoun, Demonstrative/',
-    ],
+    vocabIncluded: ['eso/Pronoun, Demonstrative/'],
     sortReference: null,
     relatedProgram: 2,
-    vocabKnown: [
-      'eso/Pronoun, Demonstrative/',
-    ],
+    vocabKnown: ['eso/Pronoun, Demonstrative/'],
   },
   {
     recordId: 72,
@@ -4487,4 +4483,4 @@ export const lessonData = [
       'está/Verb, Verb/he/she/it is//3rd person singular "él/ella/eso" ; Present indicative',
     ],
   },
-]
+];
