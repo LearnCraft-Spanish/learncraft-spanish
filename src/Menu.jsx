@@ -1,71 +1,102 @@
-import React, {useState, useRef, useEffect} from 'react'
-import './App.css'
-import { useAuth0 } from "@auth0/auth0-react";
-import { Link, Route, Routes } from "react-router-dom";
+import React, { useRef, useEffect } from 'react';
+import './App.css';
+import { Link } from 'react-router-dom';
 
-
-
-export default function Menu({userData, updateExamplesTable, examplesTable, studentExamplesTable, activeStudent, activeLesson, flashcardDataComplete, audioExamplesTable, filterExamplesByAllowedVocab}) {
+export default function Menu({
+  userData,
+  updateExamplesTable,
+  examplesTable,
+  studentExamplesTable,
+  activeStudent,
+  flashcardDataComplete,
+}) {
   //console.log(examplesTable.length)
   //console.log(examplesTable)
-  const { user, isAuthenticated, isLoading } = useAuth0();
   //console.log(userData)
   //console.log(examplesTable)
 
-  const rendered = useRef(false)
-  
-  useEffect(() => {
-    if (!rendered.current){
-      rendered.current = true
-    }
-  }, [])
-  
-  useEffect(() => {
-    if (rendered && (userData.isAdmin || userData.role === 'student')){
-      console.log('resetting for menu mount')
-      updateExamplesTable()
-    }
-  }, [userData])
+  const rendered = useRef(false);
 
+  useEffect(() => {
+    if (!rendered.current) {
+      rendered.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (rendered && (userData.isAdmin || userData.role === 'student')) {
+      console.log('resetting for menu mount');
+      updateExamplesTable();
+    }
+  }, [userData]);
 
   return (
-    rendered && flashcardDataComplete && (
-    <div className='menu'>
-        <div className='menuBox'>
-            {activeStudent.recordId && (studentExamplesTable.length > 0 && examplesTable.length === studentExamplesTable.length) && (
-            <div>
-            <h3>My Flashcards:</h3>
-            <div className= 'buttonBox'>
-              
-              <Link  className = 'linkButton' to='/allflashcards'>All My Flashcards</Link>
-              <Link className = 'linkButton' to = "/todaysflashcards" >My Flashcards for Today</Link>
+    rendered &&
+    flashcardDataComplete && (
+      <div className="menu">
+        <div className="menuBox">
+          {activeStudent.recordId &&
+            studentExamplesTable.length > 0 &&
+            examplesTable.length === studentExamplesTable.length && (
+              <div>
+                <h3>My Flashcards:</h3>
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/allflashcards">
+                    All My Flashcards
+                  </Link>
+                  <Link className="linkButton" to="/todaysflashcards">
+                    My Flashcards for Today
+                  </Link>
+                </div>
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/manage-flashcards">
+                    Manage My Flashcards
+                  </Link>
+                </div>
+              </div>
+            )}
+          <h3>Quizzing Tools:</h3>
+          <div className="buttonBox">
+            <Link className="linkButton" to="/officialquizzes">
+              Official Quizzes
+            </Link>
+          </div>
+          {(userData.role === 'student' ||
+            userData.role === 'limited' ||
+            userData.isAdmin) && (
+            <div className="buttonBox">
+              <Link className="linkButton" to="/audioquiz">
+                Audio Quiz
+              </Link>
+              <Link className="linkButton" to="/comprehensionquiz">
+                Comprehension Quiz
+              </Link>
             </div>
-            <div className= 'buttonBox'>
-              <Link className= 'linkButton' to = '/manage-flashcards'>Manage My Flashcards</Link>
+          )}
+          {(userData.role === 'student' || userData.isAdmin) && (
+            <div className="buttonBox">
+              <Link className="linkButton" to="/flashcardfinder">
+                Find Flashcards
+              </Link>
             </div>
-            </div>)}
-            <h3>Quizzing Tools:</h3>
-            <div className='buttonBox'>
-              <Link  className='linkButton' to='/officialquizzes'>Official Quizzes</Link>
-            </div>
-            {((userData.role === 'student' || userData.role === 'limited')||userData.isAdmin) && <div className='buttonBox'>
-              <Link className= 'linkButton' to = '/audioquiz'>Audio Quiz</Link>
-              <Link className= 'linkButton' to = '/comprehensionquiz'>Comprehension Quiz</Link>
-            </div>}
-            {((userData.role === 'student'||userData.isAdmin) && <div className= 'buttonBox'>
-                <Link className = 'linkButton' to='/flashcardfinder'>Find Flashcards</Link>
-            </div>)} 
+          )}
         </div>
-        {(userData.isAdmin && <div className='menuBox'>
+        {userData.isAdmin && (
+          <div className="menuBox">
             <h3>Staff Tools</h3>
-            <div className= 'buttonBox'>
-                <Link className = 'linkButton' to='/frequensay'>FrequenSay</Link>
+            <div className="buttonBox">
+              <Link className="linkButton" to="/frequensay">
+                FrequenSay
+              </Link>
             </div>
-            <div className= 'buttonBox'>
-              <Link className = 'linkButton' to='/coaching'>Coaching</Link>
+            <div className="buttonBox">
+              <Link className="linkButton" to="/coaching">
+                Coaching
+              </Link>
             </div>
-        </div>)}
-
-    </div>
-  ))
+          </div>
+        )}
+      </div>
+    )
+  );
 }

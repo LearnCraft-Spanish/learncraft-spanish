@@ -4,9 +4,8 @@ import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import importPlugin from 'eslint-plugin-import';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
+import typescriptParser from '@typescript-eslint/parser';
 import typescriptPlugin from '@typescript-eslint/eslint-plugin';
-import unicornPlugin from 'eslint-plugin-unicorn';
-import sonarjsPlugin from 'eslint-plugin-sonarjs';
 
 export default [
   {
@@ -14,7 +13,8 @@ export default [
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-      parser: '@typescript-eslint/parser',
+      parser: typescriptParser, // Use this if using TypeScript
+      // parser: 'espree', // Use this if not using TypeScript
       globals: {
         window: 'readonly',
         document: 'readonly',
@@ -28,8 +28,6 @@ export default [
       import: importPlugin,
       prettier: prettierPlugin,
       '@typescript-eslint': typescriptPlugin,
-      unicorn: unicornPlugin,
-      sonarjs: sonarjsPlugin,
     },
     rules: {
       ...prettierConfig.rules, // Prettier rules
@@ -44,7 +42,14 @@ export default [
       'import/order': [
         'warn',
         {
-          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
           'newlines-between': 'always',
         },
       ],
@@ -54,30 +59,14 @@ export default [
 
       // TypeScript rules
       ...typescriptPlugin.configs.recommended.rules,
+      '@typescript-eslint/no-unused-vars': 'warn', // Change this to 'warn' to reduce the severity
 
-      // Unicorn rules (opinionated)
-      'unicorn/prevent-abbreviations': 'off',
-      'unicorn/filename-case': [
-        'error',
-        {
-          case: 'kebabCase',
-          ignore: ['^index\\.(js|jsx|ts|tsx)$'],
-        },
-      ],
-      'unicorn/no-null': 'off', // Allow nulls if needed
-
-      // SonarJS rules (code quality)
-      'sonarjs/cognitive-complexity': ['warn', 15],
-      'sonarjs/no-duplicate-string': 'warn',
-      'sonarjs/no-identical-functions': 'error',
-      'sonarjs/no-collapsible-if': 'warn',
-
-      // Additional opinionated rules
+      // Additional rules
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'arrow-body-style': ['warn', 'as-needed'],
       'prefer-template': 'warn',
-      'eqeqeq': ['error', 'always'],
-      'curly': ['error', 'all'],
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
     },
     settings: {
       react: {
