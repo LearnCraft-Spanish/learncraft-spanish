@@ -90,7 +90,7 @@ button, .linkButton {
   cursor: pointer;
 }
 
-button:hover {
+button:hover, .linkButton:hover {
   background-color: #B0a96f;
   color: #ffffff;
 }
