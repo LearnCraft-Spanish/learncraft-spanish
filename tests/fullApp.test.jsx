@@ -1,21 +1,21 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, test, expect, beforeEach, vi } from 'vitest';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { useAuth0 } from '@auth0/auth0-react';
+import React from 'react'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, vi } from 'vitest'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
 
-import App from '../src/App.jsx';
-import Menu from '../src/Menu.jsx';
-import SimpleQuizApp from '../src/SimpleQuizApp.jsx';
-import AudioQuiz from '../src/AudioQuiz.jsx';
-import LoginButton from '../src/LoginButton';
-import LogoutButton from '../src/LogoutButton';
+import App from '../src/App.jsx'
+import Menu from '../src/Menu.jsx'
+import SimpleQuizApp from '../src/SimpleQuizApp.jsx'
+import AudioQuiz from '../src/AudioQuiz.jsx'
+import LoginButton from '../src/LoginButton'
+import LogoutButton from '../src/LogoutButton'
 
 // Mock the Auth0 hook
-vi.mock('@auth0/auth0-react');
-const mockAuth0 = useAuth0;
+vi.mock('@auth0/auth0-react')
+const mockAuth0 = useAuth0
 
-describe('App component', () => {
+describe('app component', () => {
   beforeEach(() => {
     mockAuth0.mockReturnValue({
       isAuthenticated: false,
@@ -24,30 +24,30 @@ describe('App component', () => {
       loginWithRedirect: vi.fn(),
       logout: vi.fn(),
       getAccessTokenSilently: vi.fn(),
-    });
-  });
+    })
+  })
 
-  test('renders without crashing', () => {
+  it('renders without crashing', () => {
     render(
       <Router>
         <App />
       </Router>,
-    );
+    )
     expect(
       screen.getByText(/You must be logged in to use this app/i),
-    ).toBeInTheDocument();
-  });
+    ).toBeInTheDocument()
+  })
 
-  test('renders Menu component correctly', () => {
+  it('renders Menu component correctly', () => {
     render(
       <Router>
         <Menu userData={{}} />
       </Router>,
-    );
-    expect(screen.getByText(/Welcome back!/i)).toBeInTheDocument();
-  });
+    )
+    expect(screen.getByText(/Welcome back!/i)).toBeInTheDocument()
+  })
 
-  test('renders SimpleQuizApp component correctly', () => {
+  it('renders SimpleQuizApp component correctly', () => {
     render(
       <Router>
         <SimpleQuizApp
@@ -57,11 +57,11 @@ describe('App component', () => {
           studentExamplesTable={[]}
         />
       </Router>,
-    );
-    expect(screen.getByText(/Simple Quiz/i)).toBeInTheDocument();
-  });
+    )
+    expect(screen.getByText(/Simple Quiz/i)).toBeInTheDocument()
+  })
 
-  test('renders AudioQuiz component correctly', () => {
+  it('renders AudioQuiz component correctly', () => {
     render(
       <Router>
         <AudioQuiz
@@ -77,19 +77,19 @@ describe('App component', () => {
           updateSelectedProgram={() => {}}
         />
       </Router>,
-    );
-    expect(screen.getByText(/Audio Quiz/i)).toBeInTheDocument();
-  });
+    )
+    expect(screen.getByText(/Audio Quiz/i)).toBeInTheDocument()
+  })
 
-  test('LoginButton renders and functions correctly', () => {
-    render(<LoginButton />);
-    const button = screen.getByText(/Log In/i);
-    expect(button).toBeInTheDocument();
-    fireEvent.click(button);
-    expect(mockAuth0().loginWithRedirect).toHaveBeenCalled();
-  });
+  it('loginButton renders and functions correctly', () => {
+    render(<LoginButton />)
+    const button = screen.getByText(/Log In/i)
+    expect(button).toBeInTheDocument()
+    fireEvent.click(button)
+    expect(mockAuth0().loginWithRedirect).toHaveBeenCalled()
+  })
 
-  test('LogoutButton renders and functions correctly', () => {
+  it('logoutButton renders and functions correctly', () => {
     mockAuth0.mockReturnValueOnce({
       isAuthenticated: true,
       user: { name: 'Test User' },
@@ -97,39 +97,39 @@ describe('App component', () => {
       loginWithRedirect: vi.fn(),
       logout: vi.fn(),
       getAccessTokenSilently: vi.fn(),
-    });
-    render(<LogoutButton />);
-    const button = screen.getByText(/Log Out/i);
-    expect(button).toBeInTheDocument();
-    fireEvent.click(button);
-    expect(mockAuth0().logout).toHaveBeenCalled();
-  });
+    })
+    render(<LogoutButton />)
+    const button = screen.getByText(/Log Out/i)
+    expect(button).toBeInTheDocument()
+    fireEvent.click(button)
+    expect(mockAuth0().logout).toHaveBeenCalled()
+  })
 
-  test('navigation links work correctly', () => {
+  it('navigation links work correctly', () => {
     render(
       <Router>
         <App />
       </Router>,
-    );
-    const homeLink = screen.getByText(/Home/i);
-    fireEvent.click(homeLink);
-    expect(screen.getByText(/Welcome back!/i)).toBeInTheDocument();
-  });
+    )
+    const homeLink = screen.getByText(/Home/i)
+    fireEvent.click(homeLink)
+    expect(screen.getByText(/Welcome back!/i)).toBeInTheDocument()
+  })
 
-  test('state updates correctly when updateSelectedLesson is called', () => {
+  it('state updates correctly when updateSelectedLesson is called', () => {
     const { container } = render(
       <Router>
         <App />
       </Router>,
-    );
-    const appInstance = container.firstChild._owner.stateNode;
-    appInstance.updateSelectedLesson(1);
+    )
+    const appInstance = container.firstChild._owner.stateNode
+    appInstance.updateSelectedLesson(1)
     expect(appInstance.state.selectedLesson).toEqual(
       expect.objectContaining({ recordId: 1 }),
-    );
-  });
+    )
+  })
 
-  test('handles API call correctly', async () => {
+  it('handles API call correctly', async () => {
     mockAuth0.mockReturnValueOnce({
       isAuthenticated: true,
       user: { name: 'Test User' },
@@ -137,29 +137,29 @@ describe('App component', () => {
       loginWithRedirect: vi.fn(),
       logout: vi.fn(),
       getAccessTokenSilently: vi.fn().mockResolvedValue('fakeToken'),
-    });
+    })
 
     const mockGetUserDataFromBackend = vi
       .fn()
-      .mockResolvedValue([{ name: 'Test User' }]);
+      .mockResolvedValue([{ name: 'Test User' }])
     render(
       <Router>
         <App />
       </Router>,
-    );
+    )
     await expect(mockGetUserDataFromBackend()).resolves.toEqual([
       { name: 'Test User' },
-    ]);
-  });
+    ])
+  })
 
-  test('closeContextualIfClickOut works correctly', () => {
+  it('closeContextualIfClickOut works correctly', () => {
     const { container } = render(
       <Router>
         <App />
       </Router>,
-    );
-    const appInstance = container.firstChild._owner.stateNode;
-    const mockEvent = { clientX: 0, clientY: 0 };
-    appInstance.closeContextualIfClickOut(mockEvent);
-  });
-});
+    )
+    const appInstance = container.firstChild._owner.stateNode
+    const mockEvent = { clientX: 0, clientY: 0 }
+    appInstance.closeContextualIfClickOut(mockEvent)
+  })
+})

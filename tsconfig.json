@@ -1,25 +1,26 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "jsx": "preserve",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "allowJs": true,
+    "strict": true,
     "noEmit": true,
-    "jsx": "preserve"
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "skipLibCheck": true
   },
   "include": [
-    "src", "vite-env.d.ts"
+    "src",
+    "vite-env.d.ts"
   ]
 }

@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import './App.css';
-import ReactHowler from 'react-howler';
-import { useAuth0 } from '@auth0/auth0-react';
+import './App.css'
+import { useAuth0 } from '@auth0/auth0-react'
 
-import MenuButton from './MenuButton';
-import AudioBasedReview from './AudioBasedReview';
-import LessonSelector from './LessonSelector';
+import AudioBasedReview from './AudioBasedReview'
 
 export default function ComprehensionQuiz({
   programTable,
@@ -20,20 +17,20 @@ export default function ComprehensionQuiz({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const { getAccessTokenSilently } = useAuth0();
-  const [currentExample, setCurrentExample] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const [examplesToPlay, setExamplesToPlay] = useState([]);
-  const [quizReady, setQuizReady] = useState(false);
-  let rendered = false;
-  const example = examplesToPlay[currentExample] || {};
+  const { getAccessTokenSilently } = useAuth0()
+  const [currentExample, setCurrentExample] = useState(0)
+  const [currentStep, setCurrentStep] = useState(0)
+  const [playing, setPlaying] = useState(true)
+  const [examplesToPlay, setExamplesToPlay] = useState([])
+  const [quizReady, setQuizReady] = useState(false)
+  let rendered = false
+  const example = examplesToPlay[currentExample] || {}
 
   useEffect(() => {
     if (!rendered) {
-      rendered = true;
+      rendered = true
     }
-  }, []);
+  }, [])
 
   return (
     <div className="quiz">
@@ -53,5 +50,5 @@ export default function ComprehensionQuiz({
         updateSelectedProgram={updateSelectedProgram}
       />
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { lessonData } from './mockLessonData';
+import { lessonData } from './mockLessonData'
 
 export const sampleStudent = [
   {
@@ -10,13 +10,13 @@ export const sampleStudent = [
     relatedProgram: 3,
     role: 'student',
   },
-];
+]
 
-export const sampleLessons = lessonData;
+export const sampleLessons = lessonData
 
-export const sampleActiveExamples = [];
+export const sampleActiveExamples = []
 
-export const sampleUserList = sampleStudent;
+export const sampleUserList = sampleStudent
 
 export const samplePrograms = [
   {
@@ -27,7 +27,7 @@ export const samplePrograms = [
     cohortECurrentLesson: 7,
     name: 'LearnCraft Spanish',
     recordId: 2,
-    lessons: [sampleLessons.filter((lesson) => lesson.relatedProgram === 2)],
+    lessons: [sampleLessons.filter(lesson => lesson.relatedProgram === 2)],
   },
   {
     cohortACurrentLesson: 1,
@@ -37,7 +37,7 @@ export const samplePrograms = [
     cohortECurrentLesson: null,
     name: 'SI1M',
     recordId: 3,
-    lessons: [sampleLessons.filter((lesson) => lesson.relatedProgram === 3)],
+    lessons: [sampleLessons.filter(lesson => lesson.relatedProgram === 3)],
   },
   {
     cohortACurrentLesson: 1,
@@ -47,9 +47,9 @@ export const samplePrograms = [
     cohortECurrentLesson: null,
     name: 'Ser Estar Mini Course',
     recordId: 4,
-    lessons: [sampleLessons.filter((lesson) => lesson.relatedProgram === 4)],
+    lessons: [sampleLessons.filter(lesson => lesson.relatedProgram === 4)],
   },
-];
+]
 
 export const sampleMyExamples = {
   studentExamples: [
@@ -264,8 +264,8 @@ export const sampleMyExamples = {
       vocabComplete: true,
     },
   ],
-};
+}
 
 export const sampleAudioExamples = sampleMyExamples.examples.filter(
-  (item) => item.spanishAudioLa.length > 0,
-);
+  item => item.spanishAudioLa.length > 0,
+)

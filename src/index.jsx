@@ -1,18 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 import {
   BrowserRouter,
-  useLocation,
-  useNavigationType,
+  Routes,
   createRoutesFromChildren,
   matchRoutes,
-  Routes,
-} from 'react-router-dom';
-import './index.css';
-import * as Sentry from '@sentry/react';
-import { Auth0Provider } from '@auth0/auth0-react';
+  useLocation,
+  useNavigationType,
+} from 'react-router-dom'
+import './index.css'
+import * as Sentry from '@sentry/react'
+import { Auth0Provider } from '@auth0/auth0-react'
 
-import App from './App.jsx';
+import App from './App.jsx'
 
 Sentry.init({
   dsn: 'https://e42f3e1acdc86e3e3119dbd586514255@o4507097747423232.ingest.us.sentry.io/4507097897500672',
@@ -30,14 +30,14 @@ Sentry.init({
   tracesSampleRate: 1.0,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
-});
+})
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-const domain = import.meta.env.VITE_AUTH0_DOMAIN;
-const clientId = import.meta.env.VITE_AUTH0_CLIENTID;
-const audience = import.meta.env.VITE_API_AUDIENCE;
-const redirect_uri = import.meta.env.VITE_LOCAL_DOMAIN;
-const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
+const root = ReactDOM.createRoot(document.getElementById('root'))
+const domain = import.meta.env.VITE_AUTH0_DOMAIN
+const clientId = import.meta.env.VITE_AUTH0_CLIENTID
+const audience = import.meta.env.VITE_API_AUDIENCE
+const redirect_uri = import.meta.env.VITE_LOCAL_DOMAIN
+const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes)
 
 root.render(
   <React.StrictMode>
@@ -47,7 +47,7 @@ root.render(
         clientId={clientId}
         authorizationParams={{
           redirect_uri: `${redirect_uri}callback`,
-          audience: audience,
+          audience,
           scope:
             'openid profile email read:current-student update:current-student read:all-students update:all-students',
         }}
@@ -56,4 +56,4 @@ root.render(
       </Auth0Provider>
     </BrowserRouter>
   </React.StrictMode>,
-);
+)

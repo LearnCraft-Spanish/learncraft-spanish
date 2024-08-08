@@ -1,115 +1,120 @@
-import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import ReactHowler from 'react-howler';
+import React, { useState } from 'react'
+import { Navigate } from 'react-router-dom'
+import ReactHowler from 'react-howler'
 
-import './App.css';
-import MenuButton from './MenuButton';
+import './App.css'
+import MenuButton from './MenuButton'
 
 export default function SimpleQuizApp({
   activeStudent,
   examplesTable,
   removeFlashcard,
 }) {
-  const [quizReady, setQuizReady] = useState(false);
-  const [examplesToReview, setExamplesToReview] = useState([]);
-  const [currentExampleNumber, setCurrentExampleNumber] = useState(1);
-  const [languageShowing, setLanguageShowing] = useState('english');
-  const [playing, setPlaying] = useState(false);
-  const environment = import.meta.env.VITE_ENVIRONMENT;
+  const [quizReady, setQuizReady] = useState(false)
+  const [examplesToReview, setExamplesToReview] = useState([])
+  const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
+  const [languageShowing, setLanguageShowing] = useState('english')
+  const [playing, setPlaying] = useState(false)
+  const environment = import.meta.env.VITE_ENVIRONMENT
 
   function togglePlaying() {
     if (playing) {
-      setPlaying(false);
-    } else {
-      setPlaying(true);
+      setPlaying(false)
+    }
+    else {
+      setPlaying(true)
     }
   }
 
   function toggleQuizReady() {
-    setLanguageShowing('english');
-    setPlaying(false);
+    setLanguageShowing('english')
+    setPlaying(false)
     if (quizReady) {
-      //resetFunction()
-    } else {
-      setQuizReady(true);
+      // resetFunction()
+    }
+    else {
+      setQuizReady(true)
     }
   }
 
   function incrementExample() {
     if (currentExampleNumber < examplesToReview.length) {
-      setCurrentExampleNumber(currentExampleNumber + 1);
-    } else {
-      setCurrentExampleNumber(examplesToReview.length);
+      setCurrentExampleNumber(currentExampleNumber + 1)
     }
-    setLanguageShowing('english');
-    setPlaying(false);
+    else {
+      setCurrentExampleNumber(examplesToReview.length)
+    }
+    setLanguageShowing('english')
+    setPlaying(false)
   }
 
   function decrementExample() {
     if (currentExampleNumber > 1) {
-      setCurrentExampleNumber(currentExampleNumber - 1);
-    } else {
-      setCurrentExampleNumber(1);
+      setCurrentExampleNumber(currentExampleNumber - 1)
     }
-    setLanguageShowing('english');
-    setPlaying(false);
+    else {
+      setCurrentExampleNumber(1)
+    }
+    setLanguageShowing('english')
+    setPlaying(false)
   }
 
   async function toggleLanguageShowing() {
     if (languageShowing === 'spanish') {
-      setLanguageShowing('english');
-      setPlaying(false);
-    } else {
-      setLanguageShowing('spanish');
-      setPlaying(false);
+      setLanguageShowing('english')
+      setPlaying(false)
+    }
+    else {
+      setLanguageShowing('spanish')
+      setPlaying(false)
     }
   }
 
   function handleSetupQuiz() {
-    const quizExamples = examplesTable;
+    const quizExamples = examplesTable
     function randomize(array) {
-      const randomizedArray = [];
-      const vanishingArray = [...array];
+      const randomizedArray = []
+      const vanishingArray = [...array]
       for (let i = 0; i < array.length; i++) {
-        const randIndex = Math.floor(Math.random() * vanishingArray.length);
-        const randomArrayItem = vanishingArray[randIndex];
-        vanishingArray.splice(randIndex, 1);
-        randomizedArray[i] = randomArrayItem;
+        const randIndex = Math.floor(Math.random() * vanishingArray.length)
+        const randomArrayItem = vanishingArray[randIndex]
+        vanishingArray.splice(randIndex, 1)
+        randomizedArray[i] = randomArrayItem
       }
-      return randomizedArray;
+      return randomizedArray
     }
-    const randomizedQuizExamples = randomize(quizExamples);
-    setExamplesToReview(randomizedQuizExamples);
-    toggleQuizReady();
+    const randomizedQuizExamples = randomize(quizExamples)
+    setExamplesToReview(randomizedQuizExamples)
+    toggleQuizReady()
   }
 
-  const whichAudio =
-    languageShowing === 'spanish' ? 'spanishAudioLa' : 'englishAudio';
+  const whichAudio
+    = languageShowing === 'spanish' ? 'spanishAudioLa' : 'englishAudio'
 
-  const currentAudioUrl =
-    quizReady && examplesToReview[currentExampleNumber - 1]
+  const currentAudioUrl
+    = quizReady && examplesToReview[currentExampleNumber - 1]
       ? examplesToReview[currentExampleNumber - 1][whichAudio]
-      : '';
+      : ''
 
   async function deleteFlashcard(exampleRecordId) {
     const wasFlashcardRemoved = removeFlashcard(exampleRecordId).then(
       (numberRemoved) => {
         if (numberRemoved === 1) {
-          const updatedReviewList = [...examplesToReview];
+          const updatedReviewList = [...examplesToReview]
           const removedExample = examplesToReview.find(
-            (item) => item.recordId === exampleRecordId,
-          );
-          const removedExampleIndex = examplesToReview.indexOf(removedExample);
-          updatedReviewList.splice(removedExampleIndex, 1);
-          setExamplesToReview(updatedReviewList);
+            item => item.recordId === exampleRecordId,
+          )
+          const removedExampleIndex = examplesToReview.indexOf(removedExample)
+          updatedReviewList.splice(removedExampleIndex, 1)
+          setExamplesToReview(updatedReviewList)
           if (currentExampleNumber > updatedReviewList.length) {
-            setCurrentExampleNumber(updatedReviewList.length);
+            setCurrentExampleNumber(updatedReviewList.length)
           }
-          setLanguageShowing('english');
+          setLanguageShowing('english')
         }
       },
-    );
-    return wasFlashcardRemoved;
+    )
+    return wasFlashcardRemoved
   }
 
   return (
@@ -141,7 +146,7 @@ export default function SimpleQuizApp({
               <p>
                 {examplesToReview[currentExampleNumber - 1]
                   ? examplesToReview[currentExampleNumber - 1]
-                      .englishTranslation
+                    .englishTranslation
                   : ''}
               </p>
             </div>
@@ -162,8 +167,7 @@ export default function SimpleQuizApp({
                 onClick={() =>
                   deleteFlashcard(
                     examplesToReview[currentExampleNumber - 1].recordId,
-                  )
-                }
+                  )}
               >
                 Remove from My Flashcards
               </button>
@@ -192,11 +196,17 @@ export default function SimpleQuizApp({
           </div>
           <div className="progressBar2">
             <div className="progressBarDescription">
-              Flashcard {currentExampleNumber} of {examplesToReview.length}
+              Flashcard
+              {' '}
+              {currentExampleNumber}
+              {' '}
+              of
+              {' '}
+              {examplesToReview.length}
             </div>
           </div>
         </div>
       </div>
     )
-  );
+  )
 }

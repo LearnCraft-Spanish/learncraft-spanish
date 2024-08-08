@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
+import React, { useEffect, useRef, useState } from 'react'
+import './App.css'
 
-import MenuButton from './MenuButton';
-import LessonSelector from './LessonSelector';
+import MenuButton from './MenuButton'
+import LessonSelector from './LessonSelector'
 
 export default function AudioBasedReview({
   programTable,
@@ -16,160 +16,166 @@ export default function AudioBasedReview({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const [currentExample, setCurrentExample] = useState(0);
-  const [showingAnswer, setShowingAnswer] = useState(false);
-  const [spanishHidden, setSpanishHidden] = useState(true);
-  const [autoplay, setAutoplay] = useState(willAutoplay || false);
-  const [guessing, setGuessing] = useState(false);
-  const [examplesToPlay, setExamplesToPlay] = useState([]);
-  const [quizReady, setQuizReady] = useState(false);
+  const [currentExample, setCurrentExample] = useState(0)
+  const [showingAnswer, setShowingAnswer] = useState(false)
+  const [spanishHidden, setSpanishHidden] = useState(true)
+  const [autoplay, setAutoplay] = useState(willAutoplay || false)
+  const [guessing, setGuessing] = useState(false)
+  const [examplesToPlay, setExamplesToPlay] = useState([])
+  const [quizReady, setQuizReady] = useState(false)
   const [startWithSpanish, setStartWithSpanish] = useState(
     willStartWithSpanish || false,
-  );
-  const [countdown, setCountdown] = useState(0);
-  const [progressStatus, setProgressStatus] = useState(0);
-  const [answerPlayNumber, setAnswerPlayNumber] = useState(1);
-  const [paused, setPaused] = useState(false);
-  const example = examplesToPlay[currentExample] || {};
+  )
+  const [countdown, setCountdown] = useState(0)
+  const [progressStatus, setProgressStatus] = useState(0)
+  const [answerPlayNumber, setAnswerPlayNumber] = useState(1)
+  const [paused, setPaused] = useState(false)
+  const example = examplesToPlay[currentExample] || {}
   const currentQuestionText = startWithSpanish
     ? example.spanishExample
-    : example.englishTranslation;
+    : example.englishTranslation
   const currentAnswerText = startWithSpanish
     ? example.englishTranslation
-    : example.spanishExample;
-  const currentQuestionAudio = useRef();
-  const currentAnswerAudio = useRef();
-  const currentCountdownLength = useRef();
-  const currentCountdown = useRef(0);
-  const answerPause = useRef(0);
-  const rendered = useRef(false);
+    : example.spanishExample
+  const currentQuestionAudio = useRef()
+  const currentAnswerAudio = useRef()
+  const currentCountdownLength = useRef()
+  const currentCountdown = useRef(0)
+  const answerPause = useRef(0)
+  const rendered = useRef(false)
 
   function updateAutoplay(string) {
-    console.log(string);
+    console.log(string)
     if (string === 'on') {
-      setAutoplay(true);
-    } else {
-      setAutoplay(false);
+      setAutoplay(true)
+    }
+    else {
+      setAutoplay(false)
     }
   }
 
   function readyQuiz() {
-    setQuizReady(true);
+    setQuizReady(true)
   }
 
   function unReadyQuiz() {
-    setCurrentExample(0);
-    setQuizReady(false);
+    setCurrentExample(0)
+    setQuizReady(false)
   }
 
   async function playCurrentQuestion() {
     if (guessing) {
-      endGuess();
+      endGuess()
     }
     if (currentAnswerAudio.current) {
-      currentAnswerAudio.current.pause();
-      currentAnswerAudio.current.currentTime = 0;
+      currentAnswerAudio.current.pause()
+      currentAnswerAudio.current.currentTime = 0
     }
     if (currentQuestionAudio.current) {
-      currentQuestionAudio.current.currentTime = 0;
+      currentQuestionAudio.current.currentTime = 0
       if (autoplay) {
-        const currentDuration = currentQuestionAudio.current.duration;
-        startCountdown(currentDuration + 1.5);
+        const currentDuration = currentQuestionAudio.current.duration
+        startCountdown(currentDuration + 1.5)
       }
       try {
-        currentQuestionAudio.current.play();
-      } catch (err) {}
+        currentQuestionAudio.current.play()
+      }
+      catch (err) {}
     }
   }
 
   async function playCurrentAnswer() {
     if (currentQuestionAudio.current) {
-      currentQuestionAudio.current.pause();
-      currentQuestionAudio.current.currentTime = 0;
+      currentQuestionAudio.current.pause()
+      currentQuestionAudio.current.currentTime = 0
     }
     if (currentAnswerAudio.current) {
-      currentAnswerAudio.current.currentTime = 0;
+      currentAnswerAudio.current.currentTime = 0
       if (
-        autoplay &&
-        currentAnswerAudio.current.duration &&
-        !startWithSpanish
+        autoplay
+        && currentAnswerAudio.current.duration
+        && !startWithSpanish
       ) {
-        startCountdown(currentAnswerAudio.current.duration + 3);
+        startCountdown(currentAnswerAudio.current.duration + 3)
       }
       try {
-        currentAnswerAudio.current.play();
-      } catch (err) {
-        console.log(err);
+        currentAnswerAudio.current.play()
+      }
+      catch (err) {
+        console.log(err)
       }
     }
   }
 
   function pausePlayback() {
-    setPaused(true);
+    setPaused(true)
     if (currentAnswerAudio.current) {
-      currentAnswerAudio.current.pause();
+      currentAnswerAudio.current.pause()
     }
     if (currentQuestionAudio.current) {
-      currentQuestionAudio.current.pause();
+      currentQuestionAudio.current.pause()
     }
-    clearTimeout(currentCountdown.current);
-    clearTimeout(answerPause.current);
+    clearTimeout(currentCountdown.current)
+    clearTimeout(answerPause.current)
   }
 
   function updateCountdown() {
     if (countdown > 0 && currentCountdownLength.current > 0) {
-      const newNumber = Math.floor((countdown - 0.05) * 100) / 100;
-      setCountdown(newNumber);
-      const progressPercent =
-        (currentCountdownLength.current - newNumber) /
-        currentCountdownLength.current;
-      setProgressStatus(progressPercent);
-    } else if (currentCountdownLength.current > 0) {
-      setCountdown(0);
-    } else {
-      setCountdown(undefined);
+      const newNumber = Math.floor((countdown - 0.05) * 100) / 100
+      setCountdown(newNumber)
+      const progressPercent
+        = (currentCountdownLength.current - newNumber)
+        / currentCountdownLength.current
+      setProgressStatus(progressPercent)
+    }
+    else if (currentCountdownLength.current > 0) {
+      setCountdown(0)
+    }
+    else {
+      setCountdown(undefined)
     }
   }
 
   function resumePlayback() {
     if (paused) {
-      setPaused(false);
+      setPaused(false)
     }
     if (showingAnswer === false && !guessing && currentQuestionAudio.current) {
-      currentQuestionAudio.current.play();
-    } else if (showingAnswer === true && currentAnswerAudio.current) {
-      currentAnswerAudio.current.play();
+      currentQuestionAudio.current.play()
     }
-    updateCountdown();
+    else if (showingAnswer === true && currentAnswerAudio.current) {
+      currentAnswerAudio.current.play()
+    }
+    updateCountdown()
   }
 
   function clearCountDown() {
-    clearTimeout(currentCountdown.current);
-    currentCountdownLength.current = 0;
-    setCountdown(undefined);
+    clearTimeout(currentCountdown.current)
+    currentCountdownLength.current = 0
+    setCountdown(undefined)
   }
 
   function hideAnswer() {
-    setAnswerPlayNumber(1);
-    setSpanishHidden(false);
-    setGuessing(false);
-    setShowingAnswer(false);
+    setAnswerPlayNumber(1)
+    setSpanishHidden(false)
+    setGuessing(false)
+    setShowingAnswer(false)
   }
 
   function hideSpanish() {
-    setSpanishHidden(true);
+    setSpanishHidden(true)
   }
 
   function showSpanish() {
-    setSpanishHidden(false);
+    setSpanishHidden(false)
   }
 
   function guess() {
-    setGuessing(true);
+    setGuessing(true)
   }
 
   function endGuess() {
-    setGuessing(false);
+    setGuessing(false)
   }
 
   function progressBar() {
@@ -197,7 +203,8 @@ export default function AudioBasedReview({
         <div
           className="progressStatus"
           style={{ width: `${progressStatus * 100}%` }}
-        ></div>
+        >
+        </div>
         <div className="navigateButtons">
           {currentExample > 0 && (
             <a className="previousButton" onClick={decrementExample}>
@@ -211,43 +218,46 @@ export default function AudioBasedReview({
           )}
         </div>
       </div>
-    );
+    )
   }
 
   function shuffleExamples(examples) {
-    let shuffled = examples
-      .map((value) => ({ value, sort: Math.random() }))
+    const shuffled = examples
+      .map(value => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
-      .map(({ value }) => value);
-    return shuffled;
+      .map(({ value }) => value)
+    return shuffled
   }
 
   function incrementExample() {
-    setAnswerPlayNumber(1);
+    setAnswerPlayNumber(1)
     if (currentExample < examplesToPlay.length - 1) {
-      const nextExample = currentExample + 1;
-      setCurrentExample(nextExample);
-    } else {
-      setCurrentExample(examplesToPlay.length - 1);
+      const nextExample = currentExample + 1
+      setCurrentExample(nextExample)
+    }
+    else {
+      setCurrentExample(examplesToPlay.length - 1)
     }
   }
 
   function decrementExample() {
     if (currentExample > 0) {
-      const prevExample = currentExample - 1;
-      setCurrentExample(prevExample);
-    } else {
-      setCurrentExample(0);
+      const prevExample = currentExample - 1
+      setCurrentExample(prevExample)
     }
-    setAnswerPlayNumber(1);
+    else {
+      setCurrentExample(0)
+    }
+    setAnswerPlayNumber(1)
   }
 
   function questionAudio() {
-    let audioUrl;
+    let audioUrl
     if (startWithSpanish) {
-      audioUrl = example.spanishAudioLa;
-    } else {
-      audioUrl = example.englishAudio;
+      audioUrl = example.spanishAudioLa
+    }
+    else {
+      audioUrl = example.englishAudio
     }
     const audioElement = (
       <audio
@@ -255,24 +265,25 @@ export default function AudioBasedReview({
         src={audioUrl}
         onLoadedMetadata={playCurrentQuestion}
       />
-    );
-    return audioElement;
+    )
+    return audioElement
   }
 
   function answerAudio() {
-    let audioUrl;
+    let audioUrl
     if (!startWithSpanish) {
-      audioUrl = example.spanishAudioLa;
-    } else {
-      audioUrl = example.englishAudio;
+      audioUrl = example.spanishAudioLa
     }
-    const audioElement = <audio ref={currentAnswerAudio} src={audioUrl} />;
-    return audioElement;
+    else {
+      audioUrl = example.englishAudio
+    }
+    const audioElement = <audio ref={currentAnswerAudio} src={audioUrl} />
+    return audioElement
   }
 
   function resetExample() {
-    setAnswerPlayNumber(1);
-    setShowingAnswer(false);
+    setAnswerPlayNumber(1)
+    setShowingAnswer(false)
   }
 
   function cycle() {
@@ -280,129 +291,133 @@ export default function AudioBasedReview({
       switch (showingAnswer) {
         case false:
           if (startWithSpanish && !guessing && spanishHidden && autoplay) {
-            guess();
-          } else if (startWithSpanish && spanishHidden) {
-            endGuess();
-            showSpanish();
-          } else if (!startWithSpanish && !guessing && autoplay) {
-            guess();
-          } else {
-            setShowingAnswer(true);
+            guess()
           }
-          break;
+          else if (startWithSpanish && spanishHidden) {
+            endGuess()
+            showSpanish()
+          }
+          else if (!startWithSpanish && !guessing && autoplay) {
+            guess()
+          }
+          else {
+            setShowingAnswer(true)
+          }
+          break
         case true:
           if (!startWithSpanish && answerPlayNumber < 2) {
-            setAnswerPlayNumber(2);
-          } else {
-            incrementExample();
+            setAnswerPlayNumber(2)
           }
-          break;
+          else {
+            incrementExample()
+          }
+          break
         default:
-          setShowingAnswer(false);
+          setShowingAnswer(false)
       }
     }
   }
 
   function startCountdown(length) {
-    currentCountdownLength.current = length;
-    setCountdown(length);
+    currentCountdownLength.current = length
+    setCountdown(length)
   }
 
   function makeComprehensionQuiz() {
     const allowedAudioExamples = filterExamplesByAllowedVocab(
       audioExamplesTable,
       selectedLesson.recordId,
-    );
-    //console.log(allowedAudioExamples)
-    const shuffledExamples = shuffleExamples(allowedAudioExamples);
-    //console.log(shuffledExamples)
-    setExamplesToPlay(shuffledExamples);
+    )
+    // console.log(allowedAudioExamples)
+    const shuffledExamples = shuffleExamples(allowedAudioExamples)
+    // console.log(shuffledExamples)
+    setExamplesToPlay(shuffledExamples)
   }
 
   useEffect(() => {
     if (!rendered.current) {
-      rendered.current = true;
+      rendered.current = true
     }
-    return clearCountDown();
-  }, []);
+    return clearCountDown()
+  }, [])
 
   useEffect(() => {
     if (startWithSpanish) {
-      hideSpanish();
+      hideSpanish()
     }
-    endGuess();
-    setShowingAnswer(false);
-  }, [currentExample]);
+    endGuess()
+    setShowingAnswer(false)
+  }, [currentExample])
 
   useEffect(() => {
-    unReadyQuiz();
+    unReadyQuiz()
     if (selectedLesson && selectedProgram) {
-      makeComprehensionQuiz();
+      makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson]);
+  }, [selectedProgram, selectedLesson])
 
   useEffect(() => {
-    clearCountDown();
-    endGuess();
+    clearCountDown()
+    endGuess()
     if (quizReady) {
       switch (showingAnswer) {
         case false:
           if (currentQuestionAudio.current.duration) {
-            playCurrentQuestion();
+            playCurrentQuestion()
           }
-          break;
+          break
         case true:
           if (!startWithSpanish && currentQuestionAudio.current.duration) {
-            playCurrentAnswer();
+            playCurrentAnswer()
           }
           if (autoplay) {
             if (startWithSpanish) {
-              const countdownLength = currentQuestionAudio.current.duration + 3;
-              startCountdown(countdownLength);
+              const countdownLength = currentQuestionAudio.current.duration + 3
+              startCountdown(countdownLength)
             }
           }
-          break;
+          break
         default:
       }
     }
-  }, [showingAnswer, quizReady]);
+  }, [showingAnswer, quizReady])
 
   useEffect(() => {
     if (quizReady && startWithSpanish) {
-      playCurrentQuestion();
+      playCurrentQuestion()
     }
-  }, [spanishHidden]);
+  }, [spanishHidden])
 
   useEffect(() => {
     if (quizReady && answerPlayNumber > 1) {
-      playCurrentAnswer();
+      playCurrentAnswer()
     }
-  }, [answerPlayNumber]);
+  }, [answerPlayNumber])
 
   useEffect(() => {
     if (quizReady && autoplay) {
       if (!showingAnswer && guessing && currentAnswerAudio.current) {
-        pausePlayback();
-        startCountdown(Math.floor(currentAnswerAudio.current.duration + 3));
+        pausePlayback()
+        startCountdown(Math.floor(currentAnswerAudio.current.duration + 3))
       }
     }
-  }, [guessing]);
+  }, [guessing])
 
   useEffect(() => {
-    clearTimeout(currentCountdown.current);
-    setPaused(false);
+    clearTimeout(currentCountdown.current)
+    setPaused(false)
     if (countdown !== 0 && currentCountdownLength.current !== 0) {
-      currentCountdown.current = setTimeout(updateCountdown, 50);
+      currentCountdown.current = setTimeout(updateCountdown, 50)
     }
     if (countdown === 0) {
-      cycle();
+      cycle()
     }
-  }, [countdown]);
+  }, [countdown])
 
   useEffect(() => {
-    console.log(`autoplay: ${autoplay}`);
-    console.log(`autoplay type: ${typeof autoplay}`);
-  }, [autoplay]);
+    console.log(`autoplay: ${autoplay}`)
+    console.log(`autoplay type: ${typeof autoplay}`)
+  }, [autoplay])
 
   return (
     <div className="quiz">
@@ -421,11 +436,11 @@ export default function AudioBasedReview({
               <select
                 value={autoplay ? 'on' : 'off'}
                 onChange={(e) => {
-                  updateAutoplay(e.target.value);
+                  updateAutoplay(e.target.value)
                 }}
               >
-                <option value={'off'}>Off</option>
-                <option value={'on'}>On</option>
+                <option value="off">Off</option>
+                <option value="on">On</option>
               </select>
             </div>
           )}
@@ -444,7 +459,12 @@ export default function AudioBasedReview({
         <div>
           <div className="audioBox">
             <p>
-              Comprehension Level: {selectedProgram.name} Lesson{' '}
+              Comprehension Level:
+              {' '}
+              {selectedProgram.name}
+              {' '}
+              Lesson
+              {' '}
               {selectedLesson.lesson.split(' ')[2]}
             </p>
             <button onClick={unReadyQuiz}>Change Level</button>
@@ -480,31 +500,31 @@ export default function AudioBasedReview({
             {answerAudio()}
           </div>
           <div className="buttonBox">
-            {startWithSpanish &&
-              !showingAnswer &&
-              spanishHidden &&
-              !guessing &&
-              autoplay && (
-                <button className="greenButton" onClick={cycle}>
-                  Skip to Guess
-                </button>
-              )}
-            {startWithSpanish &&
-              !showingAnswer &&
-              spanishHidden &&
-              !autoplay && (
-                <button className="greenButton" onClick={cycle}>
-                  Show Spanish
-                </button>
-              )}
-            {startWithSpanish &&
-              !showingAnswer &&
-              spanishHidden &&
-              guessing && (
-                <button className="greenButton" onClick={cycle}>
-                  Show Spanish
-                </button>
-              )}
+            {startWithSpanish
+            && !showingAnswer
+            && spanishHidden
+            && !guessing
+            && autoplay && (
+              <button className="greenButton" onClick={cycle}>
+                Skip to Guess
+              </button>
+            )}
+            {startWithSpanish
+            && !showingAnswer
+            && spanishHidden
+            && !autoplay && (
+              <button className="greenButton" onClick={cycle}>
+                Show Spanish
+              </button>
+            )}
+            {startWithSpanish
+            && !showingAnswer
+            && spanishHidden
+            && guessing && (
+              <button className="greenButton" onClick={cycle}>
+                Show Spanish
+              </button>
+            )}
             {startWithSpanish && !showingAnswer && !spanishHidden && (
               <button className="greenButton" onClick={cycle}>
                 Show English
@@ -563,19 +583,25 @@ export default function AudioBasedReview({
             )}
           </div>
           <div className="buttonBox">
-            {<button onClick={decrementExample}>Previous</button>}
-            {<button onClick={incrementExample}>Next</button>}
+            <button onClick={decrementExample}>Previous</button>
+            <button onClick={incrementExample}>Next</button>
           </div>
           <div className="buttonBox">
             <MenuButton />
           </div>
           <div className="progressBar2">
             <div className="progressBarDescription">
-              Example {currentExample + 1} of {examplesToPlay.length}
+              Example
+              {' '}
+              {currentExample + 1}
+              {' '}
+              of
+              {' '}
+              {examplesToPlay.length}
             </div>
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -1,32 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react'
 import {
-  Link,
-  redirect,
-  Navigate,
-  useNavigate,
-  Routes,
   Route,
-  useParams,
-  useOutletContext,
-  Outlet,
-} from 'react-router-dom';
+  Routes,
+  useNavigate,
+} from 'react-router-dom'
 
-import { qb } from './DataModel';
-import {
-  updateStudentExample,
-  createStudentExample,
-} from './BackendFetchFunctions';
+import './App.css'
 
-import './App.css';
-import ReactHowler from 'react-howler';
+import OfficialQuiz from './OfficialQuiz'
 
-import OfficialQuiz from './OfficialQuiz';
-
-import { useAuth0 } from '@auth0/auth0-react';
-
-import MenuButton from './MenuButton';
-
-import { render } from '@testing-library/react';
+import MenuButton from './MenuButton'
 
 export default function CourseQuizzes({
   thisCourse,
@@ -54,34 +37,34 @@ export default function CourseQuizzes({
   addFlashcard,
   studentHasDefaultQuiz,
 }) {
-  const rendered = useRef(false);
-  const navigate = useNavigate();
+  const rendered = useRef(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!rendered.current) {
-      rendered.current = true;
-      console.log(`Course should be ${thisCourse}`);
-      console.log(`Course now ${quizCourse}`);
+      rendered.current = true
+      console.log(`Course should be ${thisCourse}`)
+      console.log(`Course now ${quizCourse}`)
       if (quizCourse !== thisCourse) {
-        console.log('hmm, active course needs updating...');
-        updateQuizCourseWithoutNavigate(thisCourse);
+        console.log('hmm, active course needs updating...')
+        updateQuizCourseWithoutNavigate(thisCourse)
       }
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (dataLoaded && !studentHasDefaultQuiz) {
-      console.log('setting first quiz active');
-      const firstQuiz = makeQuizList(quizCourse)[0];
-      updateChosenQuiz(firstQuiz);
+      console.log('setting first quiz active')
+      const firstQuiz = makeQuizList(quizCourse)[0]
+      updateChosenQuiz(firstQuiz)
     }
-  }, [dataLoaded]);
+  }, [dataLoaded])
 
   useEffect(() => {
     if (quizReady && chosenQuiz) {
-      navigate(chosenQuiz.toString());
+      navigate(chosenQuiz.toString())
     }
-  }, [quizReady]);
+  }, [quizReady])
 
   return (
     <div className="quizInterface">
@@ -92,14 +75,14 @@ export default function CourseQuizzes({
           <select
             className="quizMenu"
             value={quizCourse}
-            onChange={(e) => updateQuizCourseWithNavigate(e.target.value)}
+            onChange={e => updateQuizCourseWithNavigate(e.target.value)}
           >
             {makeCourseList()}
           </select>
           <select
             className="quizMenu"
             value={chosenQuiz}
-            onChange={(e) => updateChosenQuiz(e.target.value)}
+            onChange={e => updateChosenQuiz(e.target.value)}
           >
             {makeQuizSelections()}
           </select>
@@ -115,7 +98,7 @@ export default function CourseQuizzes({
         <Routes>
           <Route
             path=":number"
-            element={
+            element={(
               <OfficialQuiz
                 courses={courses}
                 quizCourse={quizCourse}
@@ -135,10 +118,11 @@ export default function CourseQuizzes({
                 studentExamples={studentExamples}
                 addFlashcard={addFlashcard}
               />
-            }
-          ></Route>
+            )}
+          >
+          </Route>
         </Routes>
       )}
     </div>
-  );
+  )
 }

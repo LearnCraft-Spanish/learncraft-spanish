@@ -1,11 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
-import ReactHowler from 'react-howler';
-import { useAuth0 } from '@auth0/auth0-react';
+import React, { useEffect, useState } from 'react'
+import './App.css'
 
-import MenuButton from './MenuButton';
-import AudioBasedReview from './AudioBasedReview';
-import LessonSelector from './LessonSelector';
+import AudioBasedReview from './AudioBasedReview'
 
 export default function AudioQuiz({
   programTable,
@@ -19,35 +15,36 @@ export default function AudioQuiz({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const [audioQuizExamples, setAudioQuizExamples] = useState([]);
-  const [audioQuizReady, setAudioQuizReady] = useState(false);
+  const [audioQuizExamples, setAudioQuizExamples] = useState([])
+  const [audioQuizReady, setAudioQuizReady] = useState(false)
   function filterExamplesByEnglishAudio(examples) {
-    const newExampleTable = [...examples];
+    const newExampleTable = [...examples]
     const tableToSet = newExampleTable.filter((example) => {
       if (example.englishAudio.includes('.')) {
-        return true;
-      } else {
-        return false;
+        return true
       }
-    });
-    return tableToSet;
+      else {
+        return false
+      }
+    })
+    return tableToSet
   }
 
   useEffect(() => {
     if (audioExamplesTable.length > 0) {
-      //console.log(audioExamplesTable)
-      const filteredExamples = filterExamplesByEnglishAudio(audioExamplesTable);
-      setAudioQuizExamples(filteredExamples);
+      // console.log(audioExamplesTable)
+      const filteredExamples = filterExamplesByEnglishAudio(audioExamplesTable)
+      setAudioQuizExamples(filteredExamples)
     }
-  }, [audioExamplesTable]);
+  }, [audioExamplesTable])
 
   useEffect(() => {
     if (audioQuizExamples.length > 0) {
-      //console.log(audioQuizExamples)
-      console.log('quiz ready');
-      setAudioQuizReady(true);
+      // console.log(audioQuizExamples)
+      console.log('quiz ready')
+      setAudioQuizReady(true)
     }
-  }, [audioQuizExamples]);
+  }, [audioQuizExamples])
 
   return (
     <div>
@@ -69,5 +66,5 @@ export default function AudioQuiz({
         />
       )}
     </div>
-  );
+  )
 }

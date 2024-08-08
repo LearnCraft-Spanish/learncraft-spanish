@@ -1,14 +1,16 @@
-import React from 'react';
+import React from 'react'
 
-import MenuButton from './MenuButton';
+import MenuButton from './MenuButton'
 
-const NotFoundPage = () => (
-  <div>
-    <h3>404: Page Not Found</h3>
-    <div className="buttonBox">
-      <MenuButton />
+function NotFoundPage() {
+  return (
+    <div>
+      <h3>404: Page Not Found</h3>
+      <div className="buttonBox">
+        <MenuButton />
+      </div>
     </div>
-  </div>
-);
+  )
+}
 
-export default NotFoundPage;
+export default NotFoundPage
