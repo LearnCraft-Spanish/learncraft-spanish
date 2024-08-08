@@ -1,4 +1,4 @@
-interface lesson {
+export interface lesson {
     recordId: number;
     lesson: string;
     vocabIncluded: Array<string>;
@@ -7,7 +7,7 @@ interface lesson {
     vocabKnown: Array<string>;
   }
   
-  interface program {
+export interface program {
     recordId: number;
     name: string;
     lessons: Array<lesson>;

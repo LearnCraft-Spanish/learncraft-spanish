@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { program, lesson } from './interfaceDefinitions';
 
 export default function LessonSelector(
   programTable: Array<program>,
