@@ -1,13 +1,21 @@
 import React from 'react';
+
 import { program, lesson } from './interfaceDefinitions';
 
-export default function LessonSelector(
-  programTable: Array<program>,
-  selectedLesson: lesson | null,
-  updateSelectedLesson: Function,
-  selectedProgram: program,
-  updateSelectedProgram: Function,
-) {
+interface LessonSelectorProps {
+  programTable: Array<program>;
+  selectedLesson: lesson | null;
+  updateSelectedLesson: (lessonId: string | null) => void;
+  selectedProgram: program;
+  updateSelectedProgram: (programId: string) => void;
+}
+export default function LessonSelector({
+  programTable,
+  selectedLesson,
+  updateSelectedLesson,
+  selectedProgram,
+  updateSelectedProgram,
+}: LessonSelectorProps) {
   function makeCourseSelector() {
     const courseSelector = [
       <option key={0} value={0}>
@@ -47,7 +55,7 @@ export default function LessonSelector(
           <h3>Set Level</h3>
           <select
             className="courseList"
-            value={selectedProgram.recordId}
+            value={selectedProgram?.recordId}
             onChange={(e) => updateSelectedProgram(e.target.value)}
           >
             {makeCourseSelector()}
