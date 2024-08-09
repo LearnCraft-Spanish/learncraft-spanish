@@ -2,7 +2,7 @@ import React from 'react'
 
 import MenuButton from './MenuButton'
 
-function NotFoundPage() {
+function NotFoundPage(): JSX.Element {
   return (
     <div>
       <h3>404: Page Not Found</h3>

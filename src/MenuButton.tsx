@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-function MenuButton() {
+function MenuButton(): JSX.Element {
   return (
     <Link className="linkButton" to="/">
       Back to Menu

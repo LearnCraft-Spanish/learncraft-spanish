@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 
-function LoginButton() {
+function LoginButton(): JSX.Element | false {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()
   const thisDomain = import.meta.env.VITE_AUTH0_DOMAIN
 
