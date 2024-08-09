@@ -38,10 +38,9 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({
     setDisplayExamplesTable(filteredTable)
     removeFlashcard(recordId).then((numberRemoved: number) => {
       if (numberRemoved > 0) {
-        console.log('Flashcard Removed')
+        return []
       }
       else {
-        console.log('Error removing flashcard')
         updateExamplesTable()
       }
     })
@@ -108,6 +107,7 @@ const FlashcardManager: React.FC<FlashcardManagerProps> = ({
           </div>
         )}
         <button
+          type="button"
           className="redButton"
           value={item.recordId}
           onClick={e =>

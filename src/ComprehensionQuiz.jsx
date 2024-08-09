@@ -23,12 +23,12 @@ export default function ComprehensionQuiz({
   const [playing, setPlaying] = useState(true)
   const [examplesToPlay, setExamplesToPlay] = useState([])
   const [quizReady, setQuizReady] = useState(false)
-  let rendered = false
+  const rendered = false
   const example = examplesToPlay[currentExample] || {}
 
   useEffect(() => {
     if (!rendered) {
-      rendered = true
+      rendered.current = true
     }
   }, [])
 
@@ -43,7 +43,7 @@ export default function ComprehensionQuiz({
         audioExamplesTable={audioExamplesTable}
         filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
         willAutoplay={false}
-        willStartWithSpanish={true}
+        willStartWithSpanish
         selectedLesson={selectedLesson}
         selectedProgram={selectedProgram}
         updateSelectedLesson={updateSelectedLesson}

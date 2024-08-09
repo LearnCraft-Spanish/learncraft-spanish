@@ -446,7 +446,7 @@ export default function AudioBasedReview({
           )}
           <div className="buttonBox">
             {examplesToPlay.length > 0 && (
-              <button onClick={readyQuiz}>Start</button>
+              <button type="button" onClick={readyQuiz}>Start</button>
             )}
             {examplesToPlay.length < 1 && (
               <h4>There are no audio examples for this comprehension level</h4>
@@ -467,7 +467,7 @@ export default function AudioBasedReview({
               {' '}
               {selectedLesson.lesson.split(' ')[2]}
             </p>
-            <button onClick={unReadyQuiz}>Change Level</button>
+            <button type="button" onClick={unReadyQuiz}>Change Level</button>
             {!autoplay && (
               <div className="audioTextBox">
                 <div className="audioExample" onClick={cycle}>
@@ -505,7 +505,7 @@ export default function AudioBasedReview({
             && spanishHidden
             && !guessing
             && autoplay && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Skip to Guess
               </button>
             )}
@@ -513,7 +513,7 @@ export default function AudioBasedReview({
             && !showingAnswer
             && spanishHidden
             && !autoplay && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Show Spanish
               </button>
             )}
@@ -521,70 +521,70 @@ export default function AudioBasedReview({
             && !showingAnswer
             && spanishHidden
             && guessing && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Show Spanish
               </button>
             )}
             {startWithSpanish && !showingAnswer && !spanishHidden && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Show English
               </button>
             )}
             {!startWithSpanish && !showingAnswer && !guessing && autoplay && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Skip to Guess
               </button>
             )}
             {!startWithSpanish && !showingAnswer && (!autoplay || guessing) && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Play Spanish
               </button>
             )}
             {showingAnswer && !startWithSpanish && answerPlayNumber < 2 && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Play Again
               </button>
             )}
             {showingAnswer && (startWithSpanish || answerPlayNumber > 1) && (
-              <button className="greenButton" onClick={cycle}>
+              <button type="button" className="greenButton" onClick={cycle}>
                 Next
               </button>
             )}
           </div>
           <div className="buttonBox">
             {showingAnswer === 2 && (
-              <button onClick={resetExample}>Hear English</button>
+              <button type="button" onClick={resetExample}>Hear English</button>
             )}
             {autoplay && !paused && (
-              <button onClick={pausePlayback}>Pause</button>
+              <button type="button" onClick={pausePlayback}>Pause</button>
             )}
             {autoplay && paused && (
-              <button onClick={resumePlayback}>Play</button>
+              <button type="button" onClick={resumePlayback}>Play</button>
             )}
           </div>
           <div className="buttonBox">
             {startWithSpanish && !showingAnswer && (
-              <button onClick={playCurrentQuestion}>Replay Spanish</button>
+              <button type="button" onClick={playCurrentQuestion}>Replay Spanish</button>
             )}
             {startWithSpanish && showingAnswer && (
-              <button onClick={hideAnswer}>Replay Spanish</button>
+              <button type="button" onClick={hideAnswer}>Replay Spanish</button>
             )}
             {!startWithSpanish && !showingAnswer && (
-              <button onClick={playCurrentQuestion}>Replay English</button>
+              <button type="button" onClick={playCurrentQuestion}>Replay English</button>
             )}
             {!startWithSpanish && showingAnswer && (
-              <button onClick={hideAnswer}>Replay English</button>
+              <button type="button" onClick={hideAnswer}>Replay English</button>
             )}
             {!startWithSpanish && !autoplay && !showingAnswer && (
-              <button onClick={playCurrentQuestion}>Play Again</button>
+              <button type="button" onClick={playCurrentQuestion}>Play Again</button>
             )}
             {!startWithSpanish && !autoplay && showingAnswer && (
-              <button onClick={playCurrentAnswer}>Play Again</button>
+              <button type="button" onClick={playCurrentAnswer}>Play Again</button>
             )}
           </div>
           <div className="buttonBox">
-            <button onClick={decrementExample}>Previous</button>
-            <button onClick={incrementExample}>Next</button>
+            <button type="button" onClick={decrementExample}>Previous</button>
+            <button type="button" onClick={incrementExample}>Next</button>
           </div>
           <div className="buttonBox">
             <MenuButton />

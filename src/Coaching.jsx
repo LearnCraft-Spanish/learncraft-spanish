@@ -14,7 +14,7 @@ const Coaching = forwardRef((
   { userData, contextual, openContextual, closeContextual },
   currentContextual,
 ) => {
-  const { user, isAuthenticated, getAccessTokenSilently, isLoading }
+  const { getAccessTokenSilently }
     = useAuth0()
   const audience = import.meta.env.VITE_API_AUDIENCE
   const [weeksToDisplay, setWeeksToDisplay] = useState([])
@@ -638,7 +638,7 @@ const Coaching = forwardRef((
             {student.startingLevel.length > 1 && <h5>Starting Level:</h5>}
             {student.startingLevel.length > 1 && <p>{student.startingLevel}</p>}
             <div className="buttonBox">
-              <button className="redButton" onClick={closeContextual}>
+              <button type="button" className="redButton" onClick={closeContextual}>
                 Close
               </button>
             </div>
@@ -657,7 +657,7 @@ const Coaching = forwardRef((
       else {
         return data.map(call => (
           <div className="assignmentBox" key={call.recordId}>
-            <button onClick={() => openCallPopup(call.recordId)}>
+            <button type="button" onClick={() => openCallPopup(call.recordId)}>
               {call.rating}
             </button>
             {contextual === `call${call.recordId}` && (
@@ -691,7 +691,7 @@ const Coaching = forwardRef((
                   </a>
                 )}
                 <div className="buttonBox">
-                  <button className="redButton" onClick={closeContextual}>
+                  <button type="button" className="redButton" onClick={closeContextual}>
                     Close
                   </button>
                 </div>
@@ -706,6 +706,7 @@ const Coaching = forwardRef((
         {callPopups(callData)}
         {weekGetsPrivateCalls(data.recordId) && (
           <button
+            type="button"
             className="greenButton"
             onClick={() => openNewCallPopup(data.recordId)}
           >
@@ -758,12 +759,12 @@ const Coaching = forwardRef((
             <p>Recording Link</p>
             <textarea />
             <div className="buttonBox">
-              <button className="greenButton" onClick={closeContextual}>
+              <button type="button" className="greenButton" onClick={closeContextual}>
                 Submit
               </button>
             </div>
             <div className="buttonBox">
-              <button className="redButton" onClick={closeContextual}>
+              <button type="button" className="redButton" onClick={closeContextual}>
                 Cancel
               </button>
             </div>
@@ -786,7 +787,7 @@ const Coaching = forwardRef((
       }
       return data.map(groupSession => (
         <div className="assignmentBox" key={groupSession.recordId}>
-          <button onClick={() => openGroupSessionPopup(groupSession.recordId)}>
+          <button type="button" onClick={() => openGroupSessionPopup(groupSession.recordId)}>
             {groupSession.sessionType}
           </button>
           {contextual === `groupSession${groupSession.recordId}` && (
@@ -816,6 +817,7 @@ const Coaching = forwardRef((
                 {getAttendeeWeeksFromGroupSessionId(groupSession.recordId).map(
                   attendee => (
                     <button
+                      type="button"
                       key={attendee.recordId}
                       className="groupAttendee"
                       onClick={() =>
@@ -852,7 +854,7 @@ const Coaching = forwardRef((
                 </p>
               )}
               <div className="buttonBox">
-                <button className="redButton" onClick={closeContextual}>
+                <button type="button" className="redButton" onClick={closeContextual}>
                   Close
                 </button>
               </div>
@@ -878,6 +880,7 @@ const Coaching = forwardRef((
               <p>{currentAttendee.current.startingLevel}</p>
               <div className="buttonBox">
                 <button
+                  type="button"
                   className="redButton"
                   onClick={() => openGroupSessionPopup(groupSession.recordId)}
                 >
@@ -898,7 +901,7 @@ const Coaching = forwardRef((
     else {
       return data.map(assignment => (
         <div className="assignmentBox" key={assignment.recordId}>
-          <button onClick={() => openAssignmentPopup(assignment.recordId)}>
+          <button type="button" onClick={() => openAssignmentPopup(assignment.recordId)}>
             {assignment.assignmentType}
             :
             {assignment.rating}
@@ -943,7 +946,7 @@ const Coaching = forwardRef((
                 </a>
               )}
               <div className="buttonBox">
-                <button className="redButton" onClick={closeContextual}>
+                <button type="button" className="redButton" onClick={closeContextual}>
                   Close
                 </button>
               </div>
@@ -1042,11 +1045,10 @@ const Coaching = forwardRef((
                 type="text"
                 value={searchTerm}
                 onChange={e => updateSearchTerm(e.target.value)}
-              >
-              </input>
+              />
             </div>
             <div className="searchOrButton">
-              <button className="moreFiltersButton" onClick={openMoreFilters}>
+              <button type="button" className="moreFiltersButton" onClick={openMoreFilters}>
                 More Filters
               </button>
             </div>
@@ -1091,7 +1093,7 @@ const Coaching = forwardRef((
                   </select>
                 </div>
                 <div className="buttonBox">
-                  <button className="redButton" onClick={closeContextual}>
+                  <button type="button" className="redButton" onClick={closeContextual}>
                     Close
                   </button>
                 </div>

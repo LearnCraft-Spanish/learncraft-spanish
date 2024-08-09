@@ -776,7 +776,7 @@ function App({ SentryRoutes }) {
                 </p>
               )}
               {!activeStudent.recordId && <p>No student Selected</p>}
-              <button onClick={chooseStudent}>Change</button>
+              <button type="button" onClick={chooseStudent}>Change</button>
             </div>
           )}
           {menuReady && qbUserData.isAdmin && choosingStudent && (
@@ -787,7 +787,7 @@ function App({ SentryRoutes }) {
               >
                 {makeStudentSelector()}
               </select>
-              <button onClick={keepStudent}>Cancel</button>
+              <button type="button" onClick={keepStudent}>Cancel</button>
             </form>
           )}
         </div>

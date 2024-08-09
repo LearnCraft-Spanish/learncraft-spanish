@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
 import {
   getVerifiedExamplesFromBackend,
@@ -31,6 +31,7 @@ const FlashcardFinder = forwardRef(
     currentContextual,
   ) => {
     const { getAccessTokenSilently } = useAuth0()
+    const isMounted = useRef(false)
     const [isLoaded, setIsLoaded] = useState(false)
     const [tagSearchTerm, setTagSearchTerm] = useState('')
     const [vocabularyTable, setVocabularyTable] = useState([])
@@ -250,6 +251,7 @@ const FlashcardFinder = forwardRef(
           </div>
           {activeStudent.role === 'student' && !item.isAssigned && (
             <button
+              type="button"
               className="addButton"
               value={item.recordId}
               onClick={e => addFlashcard(e.target.value)}
@@ -258,7 +260,7 @@ const FlashcardFinder = forwardRef(
             </button>
           )}
           {activeStudent.role === 'student' && item.isAssigned && (
-            <button className="ownedButton" value={item.recordId}>
+            <button type="button" className="ownedButton" value={item.recordId}>
               Owned
             </button>
           )}
@@ -475,8 +477,6 @@ const FlashcardFinder = forwardRef(
       }
     }
 
-    let isMounted = false
-
     async function addFlashcard(exampleId) {
       console.log(exampleId)
       const exampleToUpdate = exampleTable.find(
@@ -493,7 +493,7 @@ const FlashcardFinder = forwardRef(
     // called onced at the beginning
     useEffect(() => {
       async function startUp() {
-        isMounted = true
+        isMounted.current = true
         const getData = async () => {
           // console.log('init called')
           // retrieving the table data
@@ -569,6 +569,7 @@ const FlashcardFinder = forwardRef(
                     <h3>Spanglish</h3>
                     {!noSpanglish && (
                       <button
+                        type="button"
                         style={{ backgroundColor: 'darkgreen' }}
                         onClick={toggleSpanglish}
                       >
@@ -577,6 +578,7 @@ const FlashcardFinder = forwardRef(
                     )}
                     {noSpanglish && (
                       <button
+                        type="button"
                         style={{ backgroundColor: 'darkred' }}
                         onClick={toggleSpanglish}
                       >
@@ -601,8 +603,7 @@ const FlashcardFinder = forwardRef(
                           type="text"
                           onChange={e => updateTagSearchTerm(e.target)}
                           onClick={() => openContextual('tagSuggestionBox')}
-                        >
-                        </input>
+                        />
                         <br></br>
                       </div>
                     </div>
@@ -647,7 +648,7 @@ const FlashcardFinder = forwardRef(
             </div>
             <div className="examplesTable">
               <div className="buttonBox">
-                <button onClick={copyTable}>Copy Table</button>
+                <button type="button" onClick={copyTable}>Copy Table</button>
                 <div className="displayExamplesDescription">
                   <h4>
                     {displayExamples.length}

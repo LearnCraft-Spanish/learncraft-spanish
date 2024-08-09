@@ -87,7 +87,7 @@ export default function CourseQuizzes({
             {makeQuizSelections()}
           </select>
           <div className="buttonBox">
-            <button onClick={makeQuizReady}>Begin Review</button>
+            <button type="button" onClick={makeQuizReady}>Begin Review</button>
           </div>
           <div className="buttonBox">
             <MenuButton />
