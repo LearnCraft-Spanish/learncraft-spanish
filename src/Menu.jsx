@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom'
 
 export default function Menu({
   userData,
-  updateExamplesTable,
-  examplesTable,
-  studentExamplesTable,
+  updateExamplesTable /* function,  */,
+  examplesTable /* array(examples)*/,
+  studentExamplesTable /* array(studentExamples)*/,
   activeStudent,
-  flashcardDataComplete,
+  flashcardDataComplete /* boolean */,
 }) {
   // console.log(examplesTable.length)
   // console.log(examplesTable)
