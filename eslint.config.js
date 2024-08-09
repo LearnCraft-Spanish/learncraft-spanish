@@ -2,7 +2,11 @@
 import antfu from '@antfu/eslint-config'
 
 export default antfu(
-  // Primary configuration
+  {
+    react: true,
+    typescript: true,
+  },
+  // Testing Customization
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     languageOptions: {
