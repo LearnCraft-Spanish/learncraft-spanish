@@ -1,15 +1,25 @@
-import React, { useEffect, useRef } from 'react'
-import './App.css'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import './App.css'
 
+import type { ActiveStudent, ExamplesTable, StudentExamplesTable, UserData } from './interfaceDefinitions'
+
+interface MenuProps {
+  userData: UserData
+  updateExamplesTable: () => void
+  examplesTable: ExamplesTable
+  studentExamplesTable: StudentExamplesTable
+  activeStudent: ActiveStudent
+  flashcardDataComplete: boolean
+}
 export default function Menu({
   userData,
-  updateExamplesTable /* function,  */,
-  examplesTable /* array(examples)*/,
-  studentExamplesTable /* array(studentExamples)*/,
+  updateExamplesTable,
+  examplesTable,
+  studentExamplesTable,
   activeStudent,
-  flashcardDataComplete /* boolean */,
-}) {
+  flashcardDataComplete,
+}: MenuProps) {
   // console.log(examplesTable.length)
   // console.log(examplesTable)
   // console.log(userData)
@@ -25,7 +35,7 @@ export default function Menu({
 
   useEffect(() => {
     if (rendered && (userData.isAdmin || userData.role === 'student')) {
-      console.log('resetting for menu mount')
+      // console.log('resetting for menu mount')
       updateExamplesTable()
     }
   }, [userData])
@@ -35,7 +45,7 @@ export default function Menu({
     && flashcardDataComplete && (
       <div className="menu">
         <div className="menuBox">
-          {activeStudent.recordId
+          {activeStudent?.recordId
           && studentExamplesTable.length > 0
           && examplesTable.length === studentExamplesTable.length && (
             <div>
