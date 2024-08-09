@@ -1,13 +1,13 @@
 import React from 'react'
 
-import { Program, Lesson } from './interfaceDefinitions';
+import type { Lesson, Program } from './interfaceDefinitions'
 
 interface LessonSelectorProps {
-  programTable: Array<Program>;
-  selectedLesson: Lesson | null;
-  updateSelectedLesson: (lessonId: string | null) => void;
-  selectedProgram: Program;
-  updateSelectedProgram: (programId: string) => void;
+  programTable: Array<Program>
+  selectedLesson: Lesson | null
+  updateSelectedLesson: (lessonId: string | null) => void
+  selectedProgram: Program
+  updateSelectedProgram: (programId: string) => void
 }
 export default function LessonSelector({
   programTable,
@@ -21,7 +21,7 @@ export default function LessonSelector({
       <option key={0} value={0}>
         –Choose Course–
       </option>,
-    ];
+    ]
     programTable.forEach((item: Program) => {
       courseSelector.push(
         <option key={item.recordId} value={item.recordId}>
@@ -34,10 +34,10 @@ export default function LessonSelector({
   }
 
   function makeLessonSelector() {
-    const lessonSelector: Array<JSX.Element> = [];
+    const lessonSelector: Array<JSX.Element> = []
     selectedProgram.lessons.forEach((lesson: Lesson) => {
-      const lessonArray = lesson.lesson.split(' ');
-      const lessonNumber = lessonArray.slice(-1)[0];
+      const lessonArray = lesson.lesson.split(' ')
+      const lessonNumber = lessonArray.slice(-1)[0]
       lessonSelector.push(
         <option key={lesson.lesson} value={lesson.recordId}>
           {' '}
