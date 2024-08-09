@@ -282,12 +282,12 @@ export default function FrequenSay({
       />
       <div className="buttonBox">
         {!addManualVocabulary && (
-          <button className="greenButton" onClick={() => additionalVocab()}>
+          <button type="button" className="greenButton" onClick={() => additionalVocab()}>
             Add Extra Vocabulary
           </button>
         )}
         {addManualVocabulary && (
-          <button className="'redButton" onClick={() => noAdditionalVocab()}>
+          <button type="button" className="'redButton" onClick={() => noAdditionalVocab()}>
             Cancel Extra Vocabulary
           </button>
         )}
@@ -333,7 +333,7 @@ export default function FrequenSay({
             Unknown Words:
           </h3>
           <div className="buttonBox">
-            <button onClick={copyTable}>Copy Word List</button>
+            <button type="button" onClick={copyTable}>Copy Word List</button>
           </div>
           {makeUnknownWordList()}
         </div>

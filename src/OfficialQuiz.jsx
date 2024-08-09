@@ -33,8 +33,6 @@ export default function OfficialQuiz({
   const [playing, setPlaying] = useState(false)
 
   async function getExamplesForCurrentQuiz() {
-    console.log(quizCourse)
-    console.log(thisQuiz)
     const quizToSearch
       = quizTable.find(
         quiz => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
@@ -56,11 +54,11 @@ export default function OfficialQuiz({
           const usefulData = result
           return usefulData
         })
-        console.log(quizExamples)
         return quizExamples
       }
       catch (e) {
-        console.log(e.message)
+        console.error(e)
+        return []
       }
     }
   }
@@ -132,7 +130,6 @@ export default function OfficialQuiz({
 
   function handleSetupQuiz() {
     getExamplesForCurrentQuiz().then((examples) => {
-      console.log(examples)
       if (examples) {
         const taggedByKnown = tagAssignedExamples(examples)
         function randomize(array) {
@@ -157,7 +154,6 @@ export default function OfficialQuiz({
   }
 
   function togglePlaying() {
-    console.log(`Playing: ${!playing}`)
     if (playing) {
       setPlaying(false)
     }
@@ -275,6 +271,7 @@ export default function OfficialQuiz({
                 && examplesToReview[currentExampleNumber - 1].isKnown
                 === false && (
                   <button
+                    type="button"
                     className="addFlashcardButton"
                     onClick={() =>
                       addToExamples(
@@ -291,14 +288,15 @@ export default function OfficialQuiz({
             </div>
           )}
           <div className="buttonBox">
-            <button onClick={decrementExample}>Previous</button>
+            <button type="button" onClick={decrementExample}>Previous</button>
             <button
+              type="button"
               style={{ display: currentAudioUrl === '' ? 'none' : 'block' }}
               onClick={togglePlaying}
             >
               Play/Pause Audio
             </button>
-            <button onClick={incrementExample}>Next</button>
+            <button type="button" onClick={incrementExample}>Next</button>
           </div>
           <div className="buttonBox">
             <Link className="linkButton" to=".." onClick={makeMenuShow}>

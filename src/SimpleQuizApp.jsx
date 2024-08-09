@@ -15,7 +15,6 @@ export default function SimpleQuizApp({
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
   const [languageShowing, setLanguageShowing] = useState('english')
   const [playing, setPlaying] = useState(false)
-  const environment = import.meta.env.VITE_ENVIRONMENT
 
   function togglePlaying() {
     if (playing) {
@@ -127,7 +126,7 @@ export default function SimpleQuizApp({
             justifyContent: 'space-around',
           }}
         >
-          <button onClick={handleSetupQuiz}>Begin Review</button>
+          <button type="button" onClick={handleSetupQuiz}>Begin Review</button>
         </div>
 
         {/* Back to Menu if Empty */}
@@ -163,6 +162,7 @@ export default function SimpleQuizApp({
                   : ''}
               </p>
               <button
+                type="button"
                 className="removeFlashcardButton"
                 onClick={() =>
                   deleteFlashcard(
@@ -182,14 +182,15 @@ export default function SimpleQuizApp({
             />
           </div>
           <div className="buttonBox">
-            <button onClick={decrementExample}>Previous</button>
+            <button type="button" onClick={decrementExample}>Previous</button>
             <button
+              type="button"
               style={{ display: currentAudioUrl === '' ? 'none' : 'inherit' }}
               onClick={togglePlaying}
             >
               Play/Pause Audio
             </button>
-            <button onClick={incrementExample}>Next</button>
+            <button type="button" onClick={incrementExample}>Next</button>
           </div>
           <div className="buttonBox">
             <MenuButton />

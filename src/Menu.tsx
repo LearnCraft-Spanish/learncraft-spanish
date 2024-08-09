@@ -38,7 +38,7 @@ export default function Menu({
       // console.log('resetting for menu mount')
       updateExamplesTable()
     }
-  }, [userData])
+  }, [userData, updateExamplesTable])
 
   return (
     rendered

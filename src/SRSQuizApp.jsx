@@ -8,6 +8,7 @@ import {
 } from './BackendFetchFunctions'
 import './App.css'
 import MenuButton from './MenuButton'
+import { c } from 'vite/dist/node/types.d-aGj9QkWt'
 
 export default function SRSQuizApp({
   flashcardDataComplete,
@@ -222,18 +223,16 @@ export default function SRSQuizApp({
     = quizReady && currentExample ? currentExample[whichAudio] : ''
 
   useEffect(() => {
-    if (currentExample) {
-      if (currentExample.difficulty === 'unset') {
-        // console.log(currentExample.difficulty)
-        setDifficultySettable(true)
-      }
-      else {
-        // console.log(currentExample.difficulty)
-        setDifficultySettable(false)
-      }
+    if (currentExample?.difficulty === 'unset') {
+      // console.log(currentExample.difficulty)
+      setDifficultySettable(true)
+    }
+    else {
+      // console.log(currentExample.difficulty)
+      setDifficultySettable(false)
     }
     // console.log(difficultySettable);
-  }, [currentExampleNumber])
+  }, [currentExampleNumber, currentExample])
 
   useEffect(() => {
     setQuizReady(false)
@@ -244,7 +243,7 @@ export default function SRSQuizApp({
       <div className="quizInterface">
         {!quizReady && flashcardDataComplete && (
           <div className="readyButton">
-            <button onClick={handleSetupQuiz}>Begin Review</button>
+            <button type="button" onClick={handleSetupQuiz}>Begin Review</button>
           </div>
         )}
 
@@ -282,6 +281,7 @@ export default function SRSQuizApp({
               >
                 <p>{currentExample ? currentExample.spanishExample : ''}</p>
                 <button
+                  type="button"
                   className="removeFlashcardButton"
                   onClick={() => deleteFlashcard(currentExample.recordId)}
                 >
@@ -300,6 +300,7 @@ export default function SRSQuizApp({
             <div className="quizControls">
               <div className="buttonBox">
                 <button
+                  type="button"
                   className="redButton"
                   style={{
                     display:
@@ -312,6 +313,7 @@ export default function SRSQuizApp({
                   This was hard
                 </button>
                 <button
+                  type="button"
                   className="greenButton"
                   style={{
                     display:
@@ -324,6 +326,7 @@ export default function SRSQuizApp({
                   This was easy
                 </button>
                 <button
+                  type="button"
                   className="hardBanner"
                   style={{
                     display:
@@ -336,6 +339,7 @@ export default function SRSQuizApp({
                   Labeled: Hard
                 </button>
                 <button
+                  type="button"
                   className="easyBanner"
                   style={{
                     display:
@@ -349,14 +353,15 @@ export default function SRSQuizApp({
                 </button>
               </div>
               <div className="buttonBox">
-                <button onClick={decrementExample}>Previous</button>
+                <button type="button" onClick={decrementExample}>Previous</button>
                 <button
+                  type="button"
                   style={{ display: currentAudioUrl === '' ? 'none' : 'block' }}
                   onClick={togglePlaying}
                 >
                   Play/Pause Audio
                 </button>
-                <button onClick={incrementExample}>Next</button>
+                <button type="button" onClick={incrementExample}>Next</button>
               </div>
               <div className="buttonBox">
                 <MenuButton />
