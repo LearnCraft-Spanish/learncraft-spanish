@@ -408,7 +408,7 @@ function App({ SentryRoutes }) {
       const studentSelector = [
         <option key={0} name="">
           {' '}
-          – None Selected –
+          -- None Selected --
         </option>,
       ]
       studentList.forEach((student) => {
