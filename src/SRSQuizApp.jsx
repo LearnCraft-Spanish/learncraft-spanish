@@ -39,12 +39,7 @@ export default function SRSQuizApp({
   }
 
   function incrementExample() {
-    if (currentExampleNumber < examplesToReview.length) {
-      setCurrentExampleNumber(currentExampleNumber + 1)
-    }
-    else {
-      setCurrentExampleNumber(examplesToReview.length)
-    }
+    setCurrentExampleNumber(currentExampleNumber + 1)
     setLanguageShowing('english')
     setPlaying(false)
   }
@@ -253,7 +248,7 @@ export default function SRSQuizApp({
           </div>
         )}
 
-        {quizReady && !examplesToReview[currentExampleNumber] && (
+        {quizReady && !examplesToReview[currentExampleNumber - 1] && (
           <div className="finishedMessage">
             <p>
               Looks like you're all caught up! Come back tomorrow for another
@@ -266,7 +261,7 @@ export default function SRSQuizApp({
         )}
 
         {/* Quiz App */}
-        {examplesToReview[currentExampleNumber] && quizReady && (
+        {examplesToReview[currentExampleNumber - 1] && quizReady && (
           <div className="quiz">
             <div className="exampleBox">
               <div
