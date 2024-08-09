@@ -8,7 +8,6 @@ import {
 } from './BackendFetchFunctions'
 import './App.css'
 import MenuButton from './MenuButton'
-import { c } from 'vite/dist/node/types.d-aGj9QkWt'
 
 export default function SRSQuizApp({
   flashcardDataComplete,

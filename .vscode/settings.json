@@ -9,7 +9,7 @@
     "source.organizeImports": "never"
   },
 
-  //Ensures that the ESLint extension is enabled
+  // Ensures that the ESLint extension is enabled
   "eslint.enable": true,
   "eslint.run": "onType", // or "onSave" depending on your preference
   "eslint.nodePath": "node_modules", // Ensure ESLint finds the correct path
@@ -51,5 +51,5 @@
     "scss",
     "pcss",
     "postcss"
-  ],
+  ]
 }
