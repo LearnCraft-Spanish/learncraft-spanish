@@ -32,7 +32,6 @@ export default function AudioQuiz({
 
   useEffect(() => {
     if (audioExamplesTable.length > 0) {
-      // console.log(audioExamplesTable)
       const filteredExamples = filterExamplesByEnglishAudio(audioExamplesTable)
       setAudioQuizExamples(filteredExamples)
     }
@@ -40,8 +39,6 @@ export default function AudioQuiz({
 
   useEffect(() => {
     if (audioQuizExamples.length > 0) {
-      // console.log(audioQuizExamples)
-      console.log('quiz ready')
       setAudioQuizReady(true)
     }
   }, [audioQuizExamples])
@@ -57,7 +54,7 @@ export default function AudioQuiz({
           updateBannerMessage={updateBannerMessage}
           audioExamplesTable={audioQuizExamples}
           filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-          willAutoplay={true}
+          willAutoplay
           willStartWithSpanish={false}
           selectedLesson={selectedLesson}
           selectedProgram={selectedProgram}

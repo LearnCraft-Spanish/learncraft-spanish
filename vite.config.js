@@ -5,6 +5,8 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+const process = require('node:process')
+
 export default defineConfig(({ mode }) => {
   // Load environment variables based on the mode
   const env = loadEnv(mode, process.cwd())

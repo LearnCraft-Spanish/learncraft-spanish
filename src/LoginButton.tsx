@@ -31,7 +31,6 @@ function LoginButton() {
     const randomString = generateRandomString(13)
     const currentLocation = window.location.pathname
     const expiresAt = Date.now() + 300000
-    console.log(`Expires at: ${expiresAt}`)
 
     const jsonToStore = JSON.stringify({
       navigateToUrl: currentLocation,
@@ -46,7 +45,7 @@ function LoginButton() {
 
   return (
     !isAuthenticated
-    && !isLoading && <button onClick={loginFunction}>Log in/Register</button>
+    && !isLoading && <button type="button" onClick={loginFunction}>Log in/Register</button>
   )
 }
 
