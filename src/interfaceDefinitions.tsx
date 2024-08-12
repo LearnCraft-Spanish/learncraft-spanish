@@ -59,7 +59,7 @@ export interface StudentExample {
 // StudentExamplesTable is an array of StudentExamples
 export type StudentExamplesTable = Array<StudentExample>
 // ExamplesTable is an array of Flashcards
-// export type ExamplesTable = Array<Flashcard>
+export type ExamplesTable = Array<Flashcard>
 
 // Active Student is  UserData, or null
 export type ActiveStudent = UserData | null
