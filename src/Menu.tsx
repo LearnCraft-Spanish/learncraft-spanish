@@ -15,7 +15,6 @@ interface MenuProps {
 export default function Menu({
   userData,
   updateExamplesTable,
-  examplesTable,
   studentExamplesTable,
   activeStudent,
   flashcardDataComplete,
@@ -45,9 +44,7 @@ export default function Menu({
     && flashcardDataComplete && (
       <div className="menu">
         <div className="menuBox">
-          {activeStudent?.recordId
-          && studentExamplesTable.length > 0
-          && examplesTable.length === studentExamplesTable.length && (
+          {activeStudent?.role === 'student' && studentExamplesTable.length > 0 && (
             <div>
               <h3>My Flashcards:</h3>
               <div className="buttonBox">
@@ -71,8 +68,7 @@ export default function Menu({
               Official Quizzes
             </Link>
           </div>
-          {(userData.role === 'student'
-          || userData.role === 'limited'
+          {(userData.role === ('student' || 'limited')
           || userData.isAdmin) && (
             <div className="buttonBox">
               <Link className="linkButton" to="/audioquiz">

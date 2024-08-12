@@ -67,12 +67,12 @@ function App({ SentryRoutes }) {
   const [choosingStudent, setChoosingStudent] = useState(false)
 
   // States for Students to see their flashcards
-  const studentExamplesTable = useRef([])
+  const [studentExamplesTable, setStudentExamplesTable] = useState([])
   const examplesTable = useRef([])
 
   // States for banner message
   const [bannerMessage, setBannerMessage] = useState('')
-  const [messageNumber, setMessageNumber] = useState(0)
+  const messageNumber = useRef(0)
 
   // Reference to the current contextual menu element
   const currentContextual = useRef(null)
@@ -334,7 +334,7 @@ function App({ SentryRoutes }) {
           activeStudent.emailAddress,
         ).then(result => result)
         examplesTable.current = studentExampleData.examples
-        studentExamplesTable.current = studentExampleData.studentExamples
+        setStudentExamplesTable(studentExampleData.studentExamples)
         setFlashcardDataComplete(true)
       }
       catch (e) {
@@ -348,7 +348,7 @@ function App({ SentryRoutes }) {
         const userExampleData = await getMyExamplesFromBackend(
           getAccessToken(),
         ).then(result => result)
-        studentExamplesTable.current = userExampleData.studentExamples
+        setStudentExamplesTable(userExampleData.studentExamples)
         examplesTable.current = userExampleData.examples
         setFlashcardDataComplete(true)
       }
@@ -444,7 +444,7 @@ function App({ SentryRoutes }) {
     }
   }, [activeStudent, qbUserData, getAccessToken, updateBannerMessage])
 
-  async function removeFlashcardFromActiveStudent(exampleRecordId) {
+  const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId) => {
     setBannerMessage('Removing Flashcard')
     const exampleRecordIdInt = Number.parseInt(exampleRecordId)
     const getStudentExampleRecordId = () => {
@@ -494,9 +494,9 @@ function App({ SentryRoutes }) {
         console.error(e.message)
       }
     }
-  }
+  }, [qbUserData, studentExamplesTable, getAccessToken])
 
-  function filterExamplesByAllowedVocab(examples, lessonId) {
+  const filterExamplesByAllowedVocab = useCallback((examples, lessonId) => {
     let allowedVocabulary = []
     programTable.forEach((program) => {
       const foundLesson = program.lessons.find(
@@ -524,7 +524,7 @@ function App({ SentryRoutes }) {
       return isAllowed
     })
     return filteredByAllowed
-  }
+  }, [programTable])
 
   const setupAudioExamplesTable = useCallback(async () => {
     try {
@@ -584,10 +584,11 @@ function App({ SentryRoutes }) {
   }, [flashcardDataComplete])
 
   useEffect(() => {
-    clearTimeout(messageNumber)
+    clearTimeout(messageNumber.current)
+    messageNumber.current = 0
     if (bannerMessage !== '') {
       const timeoutNumber = setTimeout(blankBanner, 1000)
-      setMessageNumber(timeoutNumber)
+      messageNumber.current = timeoutNumber
     }
   }, [bannerMessage, messageNumber, blankBanner])
 
@@ -714,7 +715,7 @@ function App({ SentryRoutes }) {
               (qbUserData.role === 'student' || qbUserData.isAdmin) && (
                 <FlashcardManager
                   examplesTable={examplesTable.current}
-                  studentExamplesTable={studentExamplesTable.current}
+                  studentExamplesTable={studentExamplesTable}
                   activeStudent={qbUserData}
                   removeFlashcard={removeFlashcardFromActiveStudent}
                   updateExamplesTable={updateExamplesTable}
@@ -728,7 +729,7 @@ function App({ SentryRoutes }) {
               <LCSPQuizApp
                 getAccessToken={getAccessToken}
                 updateExamplesTable={updateExamplesTable}
-                studentExamples={studentExamplesTable.current}
+                studentExamples={studentExamplesTable}
                 activeStudent={activeStudent}
                 selectedProgram={selectedProgram}
                 selectedLesson={selectedLesson}
@@ -748,7 +749,7 @@ function App({ SentryRoutes }) {
                   activeStudent={activeStudent}
                   programTable={programTable}
                   studentList={studentList}
-                  studentExamplesTable={studentExamplesTable.current}
+                  studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
                   addFlashcard={addToActiveStudentFlashcards}
                   updateExamplesTable={updateExamplesTable}
@@ -776,7 +777,7 @@ function App({ SentryRoutes }) {
                 <AudioQuiz
                   activeStudent={activeStudent}
                   programTable={programTable}
-                  studentExamplesTable={studentExamplesTable.current}
+                  studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
                   audioExamplesTable={audioExamplesTable}
                   filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
@@ -798,7 +799,7 @@ function App({ SentryRoutes }) {
                 <ComprehensionQuiz
                   activeStudent={activeStudent}
                   programTable={programTable}
-                  studentExamplesTable={studentExamplesTable.current}
+                  studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
                   audioExamplesTable={audioExamplesTable}
                   filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
