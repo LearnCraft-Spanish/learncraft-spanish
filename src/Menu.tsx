@@ -34,7 +34,7 @@ export default function Menu({
   }, [])
 
   useEffect(() => {
-    if (rendered && (userData.isAdmin || userData.role === 'student')) {
+    if (!rendered && (userData.isAdmin || userData.role === 'student')) {
       // console.log('resetting for menu mount')
       updateExamplesTable()
     }

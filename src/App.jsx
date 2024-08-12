@@ -567,9 +567,9 @@ function App({ SentryRoutes }) {
         }
         setupStudentList()
       }
-    }
-    else {
-      setFlashcardDataComplete(true)
+      else {
+        setFlashcardDataComplete(true)
+      }
     }
   }, [qbUserData, getStudentList, setupAudioExamplesTable])
 
@@ -612,7 +612,7 @@ function App({ SentryRoutes }) {
           && !qbUserData.isAdmin && (
             <p>
               Welcome back,
-              {qbUserData.name}
+              {` ${qbUserData.name}`}
               !
             </p>
           )}
