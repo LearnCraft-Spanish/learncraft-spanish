@@ -16,7 +16,7 @@ export async function getProgramsFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -35,7 +35,7 @@ export async function getLessonsFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -54,7 +54,7 @@ export async function getVocabFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -73,7 +73,7 @@ export async function getSpellingsFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -92,7 +92,7 @@ export async function getExamplesFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -111,7 +111,7 @@ export async function getVerifiedExamplesFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -130,7 +130,7 @@ export async function getAudioExamplesFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -149,7 +149,7 @@ export async function getLcspQuizzesFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -168,7 +168,7 @@ export async function getQuizExamplesFromBackend(token, quizId) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -198,10 +198,10 @@ export async function getAllUsersFromBackend(token) {
         })
       }
       else if (res.status === '403') {
-        console.log('unauthorized')
+        // console.log('unauthorized')
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return tableFromBackend
 }
@@ -227,10 +227,10 @@ export async function getActiveExamplesFromBackend(
         })
       }
       else if (res.status === '403') {
-        console.log('unauthorized')
+        // console.log('unauthorized')
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return tableFromBackend[0]
 }
@@ -262,10 +262,10 @@ export async function getUserDataFromBackend(token) {
         })
       }
       else if (res.status === '403') {
-        console.log('unauthorized')
+        // console.log('unauthorized')
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return tableFromBackend
 }
@@ -287,7 +287,7 @@ export async function getMyExamplesFromBackend(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return tableFromBackend
 }
@@ -309,7 +309,7 @@ export async function createMyStudentExample(token, exampleId) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return messageFromBackend
 }
@@ -335,7 +335,7 @@ export async function createStudentExample(token, studentId, exampleId) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return messageFromBackend
 }
@@ -361,7 +361,7 @@ export async function updateMyStudentExample(token, updateId, newInterval) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return messageFromBackend
 }
@@ -387,7 +387,7 @@ export async function updateStudentExample(token, updateId, newInterval) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return messageFromBackend
 }
@@ -404,13 +404,12 @@ export async function deleteMyStudentExample(token, recordId) {
     .then((res) => {
       if (res.ok) {
         return res.json().then((res) => {
-          console.log(res)
           const data = res
           return data
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return messageFromBackend
 }
@@ -427,13 +426,12 @@ export async function deleteStudentExample(token, recordId) {
     .then((res) => {
       if (res.ok) {
         return res.json().then((res) => {
-          console.log(res)
           const data = res
           return data
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
 
   return messageFromBackend
 }
@@ -453,7 +451,7 @@ export async function getCoachList(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -472,7 +470,7 @@ export async function getCourseList(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -491,7 +489,7 @@ export async function getLessonList(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -510,7 +508,7 @@ export async function getActiveStudents(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -529,7 +527,7 @@ export async function getActiveMemberships(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }
 
@@ -548,6 +546,6 @@ export async function getLastThreeWeeks(token) {
         })
       }
     })
-    .catch(err => console.log(err))
+    .catch(e => console.error(e))
   return tableFromBackend
 }

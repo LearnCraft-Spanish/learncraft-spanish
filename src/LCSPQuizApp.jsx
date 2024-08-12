@@ -4,7 +4,6 @@ import { useAuth0 } from '@auth0/auth0-react'
 
 import './App.css'
 import {
-  getExamplesFromBackend,
   getLcspQuizzesFromBackend,
 } from './BackendFetchFunctions'
 import CourseQuizzes from './CourseQuizzes.jsx'
@@ -105,29 +104,29 @@ export default function LCSPQuizApp({
     setQuizReady(false)
   }
 
-  async function getExamples() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope: 'openID email profile',
-        },
-      })
-      // console.log(accessToken)
-      const lessons = await getExamplesFromBackend(accessToken).then(
-        (result) => {
-          // console.log(result)
-          const usefulData = result
-          return usefulData
-        },
-      )
-      // console.log(lessons)
-      return lessons
-    }
-    catch (e) {
-      console.log(e.message)
-    }
-  }
+  // async function getExamples() {
+  //   try {
+  //     const accessToken = await getAccessTokenSilently({
+  //       authorizationParams: {
+  //         audience,
+  //         scope: 'openID email profile',
+  //       },
+  //     })
+  //     // console.log(accessToken)
+  //     const lessons = await getExamplesFromBackend(accessToken).then(
+  //       (result) => {
+  //         // console.log(result)
+  //         const usefulData = result
+  //         return usefulData
+  //       },
+  //     )
+  //     // console.log(lessons)
+  //     return lessons
+  //   }
+  //   catch (e) {
+  //     console.error(e.message)
+  //   }
+  // }
 
   async function getLCSPQuizzes() {
     try {
@@ -149,7 +148,7 @@ export default function LCSPQuizApp({
       return lessons
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -162,12 +161,12 @@ export default function LCSPQuizApp({
   }
 
   function updateQuizCourseWithoutNavigate(courseCode) {
-    const newCourse = courses.find(course => course.code === courseCode)
+    // const newCourse = courses.find(course => course.code === courseCode)
     setQuizCourse(courseCode)
   }
 
   function updateChosenQuiz(quizNumber) {
-    console.log(`chosen quiz now ${quizCourse} ${quizNumber}`)
+    // console.log(`chosen quiz now ${quizCourse} ${quizNumber}`)
     studentHasDefaultQuiz.current = false
     setChosenQuiz(quizNumber)
   }
@@ -289,13 +288,11 @@ export default function LCSPQuizApp({
     )
     if (activeCourse) {
       if (activeCourse.code !== 'lcsp' && quizCourse === 'lcsp') {
-        console.log(`setting course to student default: ${activeCourse.name}`)
         setQuizCourse(activeCourse.code)
         const urlToNavigate = activeCourse.url
         navigate(urlToNavigate)
       }
     }
-    console.log(selectedLesson)
     const activeLessonArray = selectedLesson.lesson.split(' ')
     const activeLessonString = activeLessonArray.slice(-1)[0]
     const activeLessonNumber = Number.parseInt(activeLessonString)
@@ -309,9 +306,6 @@ export default function LCSPQuizApp({
       }
     })
     if (lastQuizBeforeCurrentLesson > 0) {
-      console.log(
-        `setting quiz to student default: ${lastQuizBeforeCurrentLesson}`,
-      )
       setChosenQuiz(lastQuizBeforeCurrentLesson)
     }
     else {
@@ -341,7 +335,6 @@ export default function LCSPQuizApp({
 
   useEffect(() => {
     if (quizReady && chosenQuiz && quizCourse === 'lcsp') {
-      console.log(chosenQuiz)
       navigate(chosenQuiz.toString())
     }
   }, [quizReady, chosenQuiz])
@@ -354,7 +347,6 @@ export default function LCSPQuizApp({
       && !quizReady
       && window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
-      console.log('setting first quiz active')
       const firstQuiz = quizTable.filter(
         item => item.quizType === quizCourse,
       )[0].quizNumber
@@ -370,11 +362,9 @@ export default function LCSPQuizApp({
       && quizTable[0]
       && window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
-      console.log('setting quiz to student\'s default')
       findDefaultQuiz()
     }
     else if (!activeStudent.recordId) {
-      console.log('student default doesn\'t apply')
       studentHasDefaultQuiz.current = false
     }
   }, [activeStudent, selectedProgram, selectedLesson, quizTable])

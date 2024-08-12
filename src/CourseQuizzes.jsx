@@ -20,7 +20,6 @@ export default function CourseQuizzes({
   quizCourse,
   updateChosenQuiz,
   makeCourseList,
-  createRoutesFromCourses,
   updateQuizCourseWithoutNavigate,
   updateQuizCourseWithNavigate,
   makeQuizSelections,
@@ -43,10 +42,8 @@ export default function CourseQuizzes({
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true
-      console.log(`Course should be ${thisCourse}`)
-      console.log(`Course now ${quizCourse}`)
+
       if (quizCourse !== thisCourse) {
-        console.log('hmm, active course needs updating...')
         updateQuizCourseWithoutNavigate(thisCourse)
       }
     }
@@ -54,7 +51,6 @@ export default function CourseQuizzes({
 
   useEffect(() => {
     if (dataLoaded && !studentHasDefaultQuiz) {
-      console.log('setting first quiz active')
       const firstQuiz = makeQuizList(quizCourse)[0]
       updateChosenQuiz(firstQuiz)
     }

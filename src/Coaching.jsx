@@ -47,7 +47,6 @@ const Coaching = forwardRef((
   function updateCoachFilter(coachId) {
     const coachToSet
       = coaches.current.find(coach => coach.recordId === Number(coachId)) || {}
-    console.log(coachToSet)
     setFilterByCoach(coachToSet)
   }
 
@@ -124,7 +123,7 @@ const Coaching = forwardRef((
       return coachList
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -144,7 +143,7 @@ const Coaching = forwardRef((
       return courseList
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -161,7 +160,7 @@ const Coaching = forwardRef((
       return lessonList
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -178,7 +177,7 @@ const Coaching = forwardRef((
       return studentRecords
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -195,7 +194,7 @@ const Coaching = forwardRef((
       return studentRecords
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -212,7 +211,7 @@ const Coaching = forwardRef((
       return studentRecords
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -240,14 +239,12 @@ const Coaching = forwardRef((
       assignments.current = results[2][4]
       coaches.current = results[3]
       courses.current = results[4]
-      console.log(courses.current)
       lessons.current = results[5]
       setStartupDataLoaded(true)
-    }, console.log('couldn\'t load data'))
+    }, console.error('couldn\'t load data'))
   }
 
   function dateObjectToText(dateObject) {
-    console.log(typeof dateObject)
     function formatMonth(date) {
       const unformattedMonth = date.getMonth() + 1
       return unformattedMonth < 10
@@ -263,7 +260,6 @@ const Coaching = forwardRef((
     }
 
     function formatYear(date) {
-      console.log(date)
       return date.getFullYear().toString()
     }
     return `${formatYear(dateObject)}-${formatMonth(dateObject)}-${formatDate(dateObject)}`
@@ -308,9 +304,9 @@ const Coaching = forwardRef((
       = groupAttendees.current.filter(
         attendee => attendee.student === weekId,
       ) || []
-    if (typeof groupAttendeeList !== 'object') {
-      console.log(typeof groupAttendeeList)
-    }
+    // if (typeof groupAttendeeList !== 'object') {
+    //   console.log(typeof groupAttendeeList)
+    // }
     if (groupAttendeeList.length > 0) {
       const groupSessionList
         = groupAttendeeList.map(attendee =>
@@ -508,11 +504,9 @@ const Coaching = forwardRef((
 
   function filterWeeksByIncomplete(weeks) {
     if (filterIncomplete === 1) {
-      console.log('Incomplete Only')
       return weeks.filter(week => !week.recordsComplete)
     }
     else if (filterIncomplete === 2) {
-      console.log('Complete only')
       return weeks.filter(week => week.recordsComplete)
     }
     else {
@@ -609,7 +603,6 @@ const Coaching = forwardRef((
         </div>
         {contextual === `student${student.recordId}` && student.recordId && (
           <div className="studentPopup" ref={currentContextual}>
-            {console.log(student)}
             <h4>{student.fullName}</h4>
             <p>
               Email:

@@ -16,8 +16,8 @@ interface StudentExample {
 interface FlashcardManagerProps {
   examplesTable: Flashcard[]
   studentExamplesTable: StudentExample[]
-  removeFlashcard: Function
-  updateExamplesTable: Function
+  removeFlashcard: (recordId: number) => Promise<number>
+  updateExamplesTable: () => void
 }
 
 const FlashcardManager: React.FC<FlashcardManagerProps> = ({

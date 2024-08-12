@@ -45,7 +45,6 @@ export default function AudioBasedReview({
   const rendered = useRef(false)
 
   function updateAutoplay(string) {
-    console.log(string)
     if (string === 'on') {
       setAutoplay(true)
     }
@@ -80,7 +79,10 @@ export default function AudioBasedReview({
       try {
         currentQuestionAudio.current.play()
       }
-      catch (err) {}
+      catch (e) {
+        // Handle error
+        console.error(e?.message)
+      }
     }
   }
 
@@ -101,8 +103,9 @@ export default function AudioBasedReview({
       try {
         currentAnswerAudio.current.play()
       }
-      catch (err) {
-        console.log(err)
+      catch (e) {
+        // Handle error
+        console.error(e?.message)
       }
     }
   }
@@ -413,11 +416,6 @@ export default function AudioBasedReview({
       cycle()
     }
   }, [countdown])
-
-  useEffect(() => {
-    console.log(`autoplay: ${autoplay}`)
-    console.log(`autoplay type: ${typeof autoplay}`)
-  }, [autoplay])
 
   return (
     <div className="quiz">

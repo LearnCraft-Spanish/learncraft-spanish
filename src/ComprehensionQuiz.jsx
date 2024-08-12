@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 import './App.css'
-import { useAuth0 } from '@auth0/auth0-react'
 
 import AudioBasedReview from './AudioBasedReview'
 
@@ -17,14 +16,7 @@ export default function ComprehensionQuiz({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const { getAccessTokenSilently } = useAuth0()
-  const [currentExample, setCurrentExample] = useState(0)
-  const [currentStep, setCurrentStep] = useState(0)
-  const [playing, setPlaying] = useState(true)
-  const [examplesToPlay, setExamplesToPlay] = useState([])
-  const [quizReady, setQuizReady] = useState(false)
   const rendered = false
-  const example = examplesToPlay[currentExample] || {}
 
   useEffect(() => {
     if (!rendered) {

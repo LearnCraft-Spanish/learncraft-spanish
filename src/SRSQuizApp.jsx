@@ -81,6 +81,7 @@ export default function SRSQuizApp({
           exampleId,
           newInterval,
         ).then(result => result)
+        return userData
       }
       else if (roles.includes('student')) {
         const userData = await updateMyStudentExample(
@@ -88,11 +89,46 @@ export default function SRSQuizApp({
           exampleId,
           newInterval,
         ).then(result => result)
+        return userData
       }
     }
     catch (e) {
-      console.err(e.message)
+      console.error(e.message)
     }
+  }
+
+  async function deleteFlashcard(exampleRecordId) {
+    const wasFlashcardRemoved = removeFlashcard(exampleRecordId).then(
+      (numberRemoved) => {
+        if (numberRemoved === 1) {
+          const updatedReviewList = [...examplesToReview]
+          const removedExample = examplesToReview.find(
+            item => item.recordId === exampleRecordId,
+          )
+          const removedExampleIndex = examplesToReview.indexOf(removedExample)
+          updatedReviewList.splice(removedExampleIndex, 1)
+          setExamplesToReview(updatedReviewList)
+          if (currentExampleNumber > updatedReviewList.length) {
+            setCurrentExampleNumber(updatedReviewList.length)
+          }
+          setLanguageShowing('english')
+        }
+      },
+    )
+    return wasFlashcardRemoved
+  }
+
+  const getStudentExampleFromExample = (example) => {
+    const relatedStudentExample = studentExamplesTable.find(
+      element => element.relatedExample === example.recordId,
+    )
+    return relatedStudentExample
+  }
+
+  const getIntervalFromExample = (example) => {
+    const relatedStudentExample = getStudentExampleFromExample(example)
+    const interval = relatedStudentExample.reviewInterval
+    return interval
   }
 
   function increaseDifficulty() {
@@ -125,41 +161,6 @@ export default function SRSQuizApp({
       sendUpdate(exampleId, 1)
     }
     incrementExample()
-  }
-
-  async function deleteFlashcard(exampleRecordId) {
-    const wasFlashcardRemoved = removeFlashcard(exampleRecordId).then(
-      (numberRemoved) => {
-        console.log(numberRemoved)
-        if (numberRemoved === 1) {
-          const updatedReviewList = [...examplesToReview]
-          const removedExample = examplesToReview.find(
-            item => item.recordId === exampleRecordId,
-          )
-          const removedExampleIndex = examplesToReview.indexOf(removedExample)
-          updatedReviewList.splice(removedExampleIndex, 1)
-          setExamplesToReview(updatedReviewList)
-          if (currentExampleNumber > updatedReviewList.length) {
-            setCurrentExampleNumber(updatedReviewList.length)
-          }
-          setLanguageShowing('english')
-        }
-      },
-    )
-    return wasFlashcardRemoved
-  }
-
-  const getStudentExampleFromExample = (example) => {
-    const relatedStudentExample = studentExamplesTable.find(
-      element => element.relatedExample === example.recordId,
-    )
-    return relatedStudentExample
-  }
-
-  const getIntervalFromExample = (example) => {
-    const relatedStudentExample = getStudentExampleFromExample(example)
-    const interval = relatedStudentExample.reviewInterval
-    return interval
   }
 
   const getDueDateFromExample = (example) => {

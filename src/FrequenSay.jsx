@@ -8,7 +8,6 @@ import {
 } from './BackendFetchFunctions'
 
 export default function FrequenSay({
-  activeStudent,
   programTable,
   selectedLesson,
   updateSelectedLesson,
@@ -16,10 +15,7 @@ export default function FrequenSay({
   updateSelectedProgram,
 }) {
   const {
-    isAuthenticated,
-    isLoading,
     getAccessTokenSilently,
-    loginWithRedirect,
   } = useAuth0()
   const [userInput, setUserInput] = useState('')
   const [userAddedVocabulary, setUserAddedVocabulary] = useState('')
@@ -35,13 +31,11 @@ export default function FrequenSay({
   const audience = import.meta.env.VITE_API_AUDIENCE
 
   function additionalVocab() {
-    console.log('setting true')
     setAddManualVocabulary(true)
   }
 
   function noAdditionalVocab() {
     updateUserAddedVocabulary('')
-    console.log('setting')
     setAddManualVocabulary(false)
   }
 
@@ -67,10 +61,8 @@ export default function FrequenSay({
           scope: 'openID email profile',
         },
       })
-      // console.log(accessToken)
       const spellings = await getSpellingsFromBackend(accessToken).then(
         (result) => {
-          // console.log(result)
           const usefulData = result
           return usefulData
         },
@@ -78,7 +70,7 @@ export default function FrequenSay({
       return spellings
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -91,10 +83,8 @@ export default function FrequenSay({
           scope: 'openID email profile',
         },
       })
-      // console.log(accessToken)
       const vocab = await getVocabFromBackend(accessToken).then(
         async (result) => {
-          // console.log(result)
           const usefulData = result
           await spellings.then((result) => {
             result.forEach((element) => {
@@ -116,7 +106,7 @@ export default function FrequenSay({
       return vocab
     }
     catch (e) {
-      console.log(e.message)
+      console.error(e.message)
     }
   }
 
@@ -133,7 +123,6 @@ export default function FrequenSay({
   function updateUserAddedVocabulary(newInput) {
     const vocabWordCount = countVocabularyWords(newInput)
     const uniqueWordsWithCounts = vocabWordCount[0]
-    const totalWordCount = vocabWordCount[1]
     setUserAddedVocabulary(newInput)
     extraAcceptableWords.current = uniqueWordsWithCounts
     return uniqueWordsWithCounts

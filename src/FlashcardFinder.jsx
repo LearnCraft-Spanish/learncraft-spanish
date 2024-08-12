@@ -1,4 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 
 import {
   getVerifiedExamplesFromBackend,
@@ -6,7 +7,6 @@ import {
 } from './BackendFetchFunctions'
 
 import './App.css'
-import { useAuth0 } from '@auth0/auth0-react'
 
 import LessonSelector from './LessonSelector'
 
@@ -16,7 +16,6 @@ const FlashcardFinder = forwardRef(
     {
       activeStudent,
       programTable,
-      user,
       studentExamplesTable,
       flashcardDataComplete,
       selectedProgram,
@@ -26,7 +25,6 @@ const FlashcardFinder = forwardRef(
       addToActiveStudentFlashcards,
       contextual,
       openContextual,
-      closeContextual,
     },
     currentContextual,
   ) => {
@@ -36,7 +34,6 @@ const FlashcardFinder = forwardRef(
     const [tagSearchTerm, setTagSearchTerm] = useState('')
     const [vocabularyTable, setVocabularyTable] = useState([])
     const [tagTable, setTagTable] = useState([])
-    const [suggestedVocab, setSuggestedVocab] = useState([])
     const [suggestedTags, setSuggestedTags] = useState([])
     const [requiredTags, setRequiredTags] = useState([])
     const [exampleTable, setExampleTable] = useState([])
@@ -170,6 +167,7 @@ const FlashcardFinder = forwardRef(
                       }
                     })
                   })
+                  break
                 case 'vocabulary':
                   example.vocabIncluded.forEach((item) => {
                     const word = vocabularyTable.find(
@@ -193,7 +191,7 @@ const FlashcardFinder = forwardRef(
               }
             }
             else {
-
+              console.error('Error: variable isGood is not good')
             }
           })
           return isGood
@@ -271,17 +269,17 @@ const FlashcardFinder = forwardRef(
 
     // called when user clicks 'Copy as List' button
     // copies sentences in a list format with all english sentences first & then all spanish sentences
-    function copySentences() {
-      const englishSentences = displayExamples
-        .map(example => example.englishTranslation)
-        .join('\n')
-      const spanishSentences = displayExamples
-        .map(example => example.spanishExample)
-        .join('\n')
-      //
-      const copiedText = `${englishSentences}\n\n${spanishSentences}`
-      navigator.clipboard.writeText(copiedText)
-    }
+    // function copySentences() {
+    //   const englishSentences = displayExamples
+    //     .map(example => example.englishTranslation)
+    //     .join('\n')
+    //   const spanishSentences = displayExamples
+    //     .map(example => example.spanishExample)
+    //     .join('\n')
+    //   //
+    //   const copiedText = `${englishSentences}\n\n${spanishSentences}`
+    //   navigator.clipboard.writeText(copiedText)
+    // }
 
     // called when user clicks 'Copy as Table' button
     // copies sentences in a table format to be pasted into a google doc or excel sheet
@@ -449,7 +447,7 @@ const FlashcardFinder = forwardRef(
         return vocab.sort(sortVocab)
       }
       catch (e) {
-        console.log(e.message)
+        console.error(e.message)
       }
     }
 
@@ -473,12 +471,11 @@ const FlashcardFinder = forwardRef(
         return examples
       }
       catch (e) {
-        console.log(e.message)
+        console.error(e.message)
       }
     }
 
     async function addFlashcard(exampleId) {
-      console.log(exampleId)
       const exampleToUpdate = exampleTable.find(
         example => example.recordId === Number.parseInt(exampleId),
       )
