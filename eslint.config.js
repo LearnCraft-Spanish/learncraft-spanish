@@ -19,7 +19,7 @@ export default antfu(
       },
     },
     rules: {
-      // Add any custom rules here
+      'no-console': ['error', { allow: ['error'] }],
     },
   },
 
