@@ -20,12 +20,12 @@ interface FlashcardManagerProps {
   updateExamplesTable: () => void
 }
 
-const FlashcardManager: React.FC<FlashcardManagerProps> = ({
+function FlashcardManager({
   examplesTable,
   studentExamplesTable,
   removeFlashcard,
   updateExamplesTable,
-}): React.JSX.Element => {
+}: FlashcardManagerProps) {
   const [displayExamplesTable, setDisplayExamplesTable] = React.useState<
     Flashcard[]
   >([])

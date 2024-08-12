@@ -402,7 +402,6 @@ function App({ SentryRoutes }) {
   const addToActiveStudentFlashcards = useCallback(async (recordId) => {
     updateBannerMessage('Adding Flashcard...')
     if (activeStudent.recordId && qbUserData.isAdmin) {
-      // console.log(userData)
       try {
         const data = await createStudentExample(
           getAccessToken(),
@@ -667,7 +666,7 @@ function App({ SentryRoutes }) {
               <Menu
                 userData={qbUserData}
                 updateExamplesTable={updateExamplesTable}
-                examplesTable={examplesTable}
+                examplesTable={examplesTable.current}
                 studentExamplesTable={studentExamplesTable}
                 activeStudent={activeStudent}
                 flashcardDataComplete={flashcardDataComplete}
@@ -685,7 +684,7 @@ function App({ SentryRoutes }) {
                 <SimpleQuizApp
                   updateExamplesTable={updateExamplesTable}
                   activeStudent={activeStudent}
-                  examplesTable={examplesTable}
+                  examplesTable={examplesTable.current}
                   studentExamplesTable={studentExamplesTable}
                   removeFlashcard={removeFlashcardFromActiveStudent}
                 />
@@ -701,7 +700,7 @@ function App({ SentryRoutes }) {
                   flashcardDataComplete={flashcardDataComplete}
                   updateExamplesTable={updateExamplesTable}
                   activeStudent={activeStudent}
-                  examplesTable={examplesTable}
+                  examplesTable={examplesTable.current}
                   studentExamplesTable={studentExamplesTable}
                   removeFlashcard={removeFlashcardFromActiveStudent}
                 />
@@ -714,8 +713,8 @@ function App({ SentryRoutes }) {
             element={
               (qbUserData.role === 'student' || qbUserData.isAdmin) && (
                 <FlashcardManager
-                  examplesTable={examplesTable}
-                  studentExamplesTable={studentExamplesTable}
+                  examplesTable={examplesTable.current}
+                  studentExamplesTable={studentExamplesTable.current}
                   activeStudent={qbUserData}
                   removeFlashcard={removeFlashcardFromActiveStudent}
                   updateExamplesTable={updateExamplesTable}
@@ -727,8 +726,9 @@ function App({ SentryRoutes }) {
             path="/officialquizzes/*"
             element={(
               <LCSPQuizApp
+                getAccessToken={getAccessToken}
                 updateExamplesTable={updateExamplesTable}
-                studentExamples={studentExamplesTable}
+                studentExamples={studentExamplesTable.current}
                 activeStudent={activeStudent}
                 selectedProgram={selectedProgram}
                 selectedLesson={selectedLesson}
@@ -748,7 +748,7 @@ function App({ SentryRoutes }) {
                   activeStudent={activeStudent}
                   programTable={programTable}
                   studentList={studentList}
-                  studentExamplesTable={studentExamplesTable}
+                  studentExamplesTable={studentExamplesTable.current}
                   updateBannerMessage={updateBannerMessage}
                   addFlashcard={addToActiveStudentFlashcards}
                   updateExamplesTable={updateExamplesTable}
@@ -776,7 +776,7 @@ function App({ SentryRoutes }) {
                 <AudioQuiz
                   activeStudent={activeStudent}
                   programTable={programTable}
-                  studentExamplesTable={studentExamplesTable}
+                  studentExamplesTable={studentExamplesTable.current}
                   updateBannerMessage={updateBannerMessage}
                   audioExamplesTable={audioExamplesTable}
                   filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
@@ -798,7 +798,7 @@ function App({ SentryRoutes }) {
                 <ComprehensionQuiz
                   activeStudent={activeStudent}
                   programTable={programTable}
-                  studentExamplesTable={studentExamplesTable}
+                  studentExamplesTable={studentExamplesTable.current}
                   updateBannerMessage={updateBannerMessage}
                   audioExamplesTable={audioExamplesTable}
                   filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
