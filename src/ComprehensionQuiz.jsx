@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import './App.css'
 
@@ -16,10 +16,10 @@ export default function ComprehensionQuiz({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const rendered = false
+  const rendered = useRef(false)
 
   useEffect(() => {
-    if (!rendered) {
+    if (!rendered.current) {
       rendered.current = true
     }
   }, [])
