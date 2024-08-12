@@ -59,7 +59,7 @@ export interface StudentExample {
 // StudentExamplesTable is an array of StudentExamples
 export type StudentExamplesTable = Array<StudentExample>
 // ExamplesTable is an array of Flashcards
-export type ExamplesTable = Array<Flashcard>
+// export type ExamplesTable = Array<Flashcard>
 
 // Active Student is  UserData, or null
 export type ActiveStudent = UserData | null
@@ -68,3 +68,38 @@ export type ActiveStudent = UserData | null
 // export type AudioExample = Flashcard;
 // export type AudioExamplesTable = Array<AudioExample>;
 export type AudioExamplesTable = Array<Flashcard>
+
+export interface Spelling {
+  relatedWordIdiom: number
+  spellingOption: string
+}
+
+export interface Vocabulary {
+  recordId: number
+  wordIdiom: string
+  use: string
+  frequencyRank: number
+  vocabSubcategorySubcategoryName: string
+  vocabName: string
+  verbInfinitive: string
+  conjugationTags: Array<string>
+}
+// ['Record ID#', 'spanish example', 'english translation',
+//  'vocab included', 'spanglish?', 'All Students', 'English Audio',
+//  'Spanish Audio LA', 'Vocab Complete?']
+export interface Examples {
+  recordId: number
+  spanishExample: string
+  englishTranslation: string
+  vocabIncluded: Array<string>
+  spanglish: 'spanglish' | 'esp'
+  allStudents: Array<string>
+  englishAudio: string
+  spanishAudioLa: string
+  vocabComplete: boolean
+}
+
+export interface Quiz {
+  recordId: number
+  quizName: string
+}
