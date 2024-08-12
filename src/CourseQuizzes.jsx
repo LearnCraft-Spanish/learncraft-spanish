@@ -47,20 +47,20 @@ export default function CourseQuizzes({
         updateQuizCourseWithoutNavigate(thisCourse)
       }
     }
-  }, [])
+  }, [quizCourse, thisCourse, updateQuizCourseWithoutNavigate])
 
   useEffect(() => {
     if (dataLoaded && !studentHasDefaultQuiz) {
       const firstQuiz = makeQuizList(quizCourse)[0]
       updateChosenQuiz(firstQuiz)
     }
-  }, [dataLoaded])
+  }, [dataLoaded, studentHasDefaultQuiz, quizCourse, makeQuizList, updateChosenQuiz])
 
   useEffect(() => {
     if (quizReady && chosenQuiz) {
       navigate(chosenQuiz.toString())
     }
-  }, [quizReady])
+  }, [quizReady, chosenQuiz, navigate])
 
   return (
     <div className="quizInterface">
