@@ -103,3 +103,25 @@ export interface Quiz {
   recordId: number
   quizName: string
 }
+
+export interface Coach {
+  recordId: number
+  coach: string
+  user: string
+}
+
+export interface CoachingCourses {
+  recordId: number
+  name: string
+  membershipType: string
+  weeklyPrivateCalls: number
+  hasGroupCalls: boolean
+
+}
+
+export interface CoachingLessons {
+  recordId: number
+  lessonName: string
+  weekRef: number
+  type: string
+}
