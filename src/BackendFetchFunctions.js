@@ -1,12 +1,12 @@
 const backendUrl = import.meta.env.VITE_BACKEND_URL
 // console.log(backendUrl);
 
-export async function getProgramsFromBackend(token) {
+export async function getProgramsFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/programs`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -20,12 +20,12 @@ export async function getProgramsFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getLessonsFromBackend(token) {
+export async function getLessonsFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/lessons`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -39,12 +39,12 @@ export async function getLessonsFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getVocabFromBackend(token) {
+export async function getVocabFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/vocabulary`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -58,12 +58,12 @@ export async function getVocabFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getSpellingsFromBackend(token) {
+export async function getSpellingsFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/spellings`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -77,12 +77,12 @@ export async function getSpellingsFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getExamplesFromBackend(token) {
+export async function getExamplesFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/examples`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -96,12 +96,12 @@ export async function getExamplesFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getVerifiedExamplesFromBackend(token) {
+export async function getVerifiedExamplesFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/verified-examples`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -115,12 +115,12 @@ export async function getVerifiedExamplesFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getAudioExamplesFromBackend(token) {
+export async function getAudioExamplesFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/audio-examples`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -134,12 +134,12 @@ export async function getAudioExamplesFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getLcspQuizzesFromBackend(token) {
+export async function getLcspQuizzesFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}public/quizzes`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -153,12 +153,12 @@ export async function getLcspQuizzesFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getQuizExamplesFromBackend(token, quizId) {
+export async function getQuizExamplesFromBackend(tokenPromise, quizId) {
   const fetchUrl = `${backendUrl}public/quizExamples/${quizId}`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -172,12 +172,12 @@ export async function getQuizExamplesFromBackend(token, quizId) {
   return tableFromBackend
 }
 
-export async function getAllUsersFromBackend(token) {
+export async function getAllUsersFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}all-students`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -207,7 +207,7 @@ export async function getAllUsersFromBackend(token) {
 }
 
 export async function getActiveExamplesFromBackend(
-  token,
+  tokenPromise,
   studentId,
   studentEmail,
 ) {
@@ -216,7 +216,7 @@ export async function getActiveExamplesFromBackend(
 
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}`, EmailAddress: studentEmail },
+    headers: { Authorization: `Bearer ${await tokenPromise}`, EmailAddress: studentEmail },
   })
     .then((res) => {
       if (res.ok) {
@@ -235,13 +235,13 @@ export async function getActiveExamplesFromBackend(
   return tableFromBackend[0]
 }
 
-export async function getUserDataFromBackend(token) {
+export async function getUserDataFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}my-data`
   // console.log(`Fetching ${fetchUrl}`)
 
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -270,14 +270,14 @@ export async function getUserDataFromBackend(token) {
   return tableFromBackend
 }
 
-export async function getMyExamplesFromBackend(token) {
+export async function getMyExamplesFromBackend(tokenPromise) {
   const fetchUrl = `${backendUrl}my-examples`
 
   // console.log(`Fetching ${fetchUrl}`)
 
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -292,8 +292,8 @@ export async function getMyExamplesFromBackend(token) {
   return tableFromBackend
 }
 
-export async function createMyStudentExample(token, exampleId) {
-  const headers = { Authorization: `Bearer ${token}`, exampleid: exampleId }
+export async function createMyStudentExample(tokenPromise, exampleId) {
+  const headers = { Authorization: `Bearer ${await tokenPromise}`, exampleid: exampleId }
   // console.log(headers)
   const fetchUrl = `${backendUrl}create-my-student-example`
   // console.log(`Fetching ${fetchUrl}`)
@@ -314,9 +314,9 @@ export async function createMyStudentExample(token, exampleId) {
   return messageFromBackend
 }
 
-export async function createStudentExample(token, studentId, exampleId) {
+export async function createStudentExample(tokenPromise, studentId, exampleId) {
   const headers = {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${await tokenPromise}`,
     studentid: studentId,
     exampleid: exampleId,
   }
@@ -340,9 +340,9 @@ export async function createStudentExample(token, studentId, exampleId) {
   return messageFromBackend
 }
 
-export async function updateMyStudentExample(token, updateId, newInterval) {
+export async function updateMyStudentExample(tokenPromise, updateId, newInterval) {
   const headers = {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${await tokenPromise}`,
     updateId,
     newInterval,
   }
@@ -366,9 +366,9 @@ export async function updateMyStudentExample(token, updateId, newInterval) {
   return messageFromBackend
 }
 
-export async function updateStudentExample(token, updateId, newInterval) {
+export async function updateStudentExample(tokenPromise, updateId, newInterval) {
   const headers = {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${await tokenPromise}`,
     updateId,
     newInterval,
   }
@@ -392,8 +392,8 @@ export async function updateStudentExample(token, updateId, newInterval) {
   return messageFromBackend
 }
 
-export async function deleteMyStudentExample(token, recordId) {
-  const headers = { Authorization: `Bearer ${token}`, deleteid: recordId }
+export async function deleteMyStudentExample(tokenPromise, recordId) {
+  const headers = { Authorization: `Bearer ${await tokenPromise}`, deleteid: recordId }
   // console.log(headers)
   const fetchUrl = `${backendUrl}delete-my-student-example`
   // console.log(`Fetching ${fetchUrl}`)
@@ -414,8 +414,8 @@ export async function deleteMyStudentExample(token, recordId) {
   return messageFromBackend
 }
 
-export async function deleteStudentExample(token, recordId) {
-  const headers = { Authorization: `Bearer ${token}`, deleteid: recordId }
+export async function deleteStudentExample(tokenPromise, recordId) {
+  const headers = { Authorization: `Bearer ${await tokenPromise}`, deleteid: recordId }
   // console.log(headers)
   const fetchUrl = `${backendUrl}delete-student-example`
   // console.log(`Fetching ${fetchUrl}`)
@@ -436,12 +436,12 @@ export async function deleteStudentExample(token, recordId) {
   return messageFromBackend
 }
 
-export async function getCoachList(token) {
+export async function getCoachList(tokenPromise) {
   const fetchUrl = `${backendUrl}coaching/coaches`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -455,12 +455,12 @@ export async function getCoachList(token) {
   return tableFromBackend
 }
 
-export async function getCourseList(token) {
+export async function getCourseList(tokenPromise) {
   const fetchUrl = `${backendUrl}coaching/courses`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -474,12 +474,12 @@ export async function getCourseList(token) {
   return tableFromBackend
 }
 
-export async function getLessonList(token) {
+export async function getLessonList(tokenPromise) {
   const fetchUrl = `${backendUrl}coaching/lessons`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -493,12 +493,12 @@ export async function getLessonList(token) {
   return tableFromBackend
 }
 
-export async function getActiveStudents(token) {
+export async function getActiveStudents(tokenPromise) {
   const fetchUrl = `${backendUrl}coaching/active-students`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -512,12 +512,12 @@ export async function getActiveStudents(token) {
   return tableFromBackend
 }
 
-export async function getActiveMemberships(token) {
+export async function getActiveMemberships(tokenPromise) {
   const fetchUrl = `${backendUrl}coaching/active-memberships`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
@@ -531,12 +531,12 @@ export async function getActiveMemberships(token) {
   return tableFromBackend
 }
 
-export async function getLastThreeWeeks(token) {
+export async function getLastThreeWeeks(tokenPromise) {
   const fetchUrl = `${backendUrl}coaching/last-three-weeks`
   // console.log(`Fetching ${fetchUrl}`)
   const tableFromBackend = await fetch(fetchUrl, {
     method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${await tokenPromise}` },
   })
     .then((res) => {
       if (res.ok) {
