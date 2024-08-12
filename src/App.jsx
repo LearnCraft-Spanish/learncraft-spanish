@@ -69,7 +69,6 @@ function App({ SentryRoutes }) {
   // States for Students to see their flashcards
   const studentExamplesTable = useRef([])
   const examplesTable = useRef([])
-  const [examplesTableComplete, setExamplesTableComplete] = useState(false)
 
   // States for banner message
   const [bannerMessage, setBannerMessage] = useState('')
@@ -351,7 +350,7 @@ function App({ SentryRoutes }) {
         ).then(result => result)
         studentExamplesTable.current = userExampleData.studentExamples
         examplesTable.current = userExampleData.examples
-        setExamplesTableComplete(true)
+        setFlashcardDataComplete(true)
       }
       catch (e) {
         console.error(e.message)
@@ -542,59 +541,48 @@ function App({ SentryRoutes }) {
     }
   }, [getAccessToken])
 
-  /*
-  useEffect(() => {
-    if (rendered && isAuthenticated) {
-      userSetup()
-      parseCourseLessons()
-      setupAudioExamplesTable()
-    }
-  }, [isAuthenticated, userSetup, parseCourseLessons, setupAudioExamplesTable])
-
-  useEffect(() => {
-    if (
-      isAuthenticated
-      && qbUserData.recordId
-      && (qbUserData.role === 'student' || qbUserData.role === 'limited')
-    ) {
-      setActiveStudent(qbUserData)
-    }
-    if (isAuthenticated && qbUserData.isAdmin) {
-      async function setupStudentList() {
-        const studentListPromise = await getStudentList()
-        setStudentList(studentListPromise)
-      }
-      setupStudentList()
-    }
-    else {
-      if (isAuthenticated && qbUserData && !qbUserData.recordId) {
-        setMenuReady(true)
-        setFlashcardDataComplete(true)
-      }
-    }
-  }, [qbUserData, isAuthenticated, getStudentList])
-
-  useEffect(() => {
-    if (
-      qbUserData.recordId
-      && selectedLesson.recordId === activeLesson.current.recordId
-      && selectedProgram.recordId === activeLesson.current.recordId
-    ) {
-      setMenuReady(true)
-    }
-  }, [qbUserData, selectedLesson, selectedProgram])
-
-  useEffect(() => {
-    if (menuReady && examplesTable.length === studentExamplesTable.length) {
-      setFlashcardDataComplete(true)
-    }
-  }, [menuReady, examplesTable, studentExamplesTable])
-  */
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true
     }
   }, [])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      userSetup()
+      parseCourseLessons()
+    }
+  }, [isAuthenticated, userSetup, parseCourseLessons])
+
+  useEffect(() => {
+    if (qbUserData?.isAdmin !== undefined) {
+      if (qbUserData?.role === 'student' || qbUserData?.role === 'limited') {
+        setupAudioExamplesTable()
+        setActiveStudent(qbUserData)
+      }
+      if (qbUserData?.isAdmin) {
+        async function setupStudentList() {
+          const studentListPromise = await getStudentList()
+          setStudentList(studentListPromise)
+        }
+        setupStudentList()
+      }
+    }
+    else {
+      setFlashcardDataComplete(true)
+    }
+  }, [qbUserData, getStudentList, setupAudioExamplesTable])
+
+  useEffect(() => {
+    if (activeStudent?.recordId) {
+      getStudentLevel()
+      updateExamplesTable()
+    }
+  }, [activeStudent, getStudentLevel, updateExamplesTable])
+
+  useEffect(() => {
+    flashcardDataComplete && setMenuReady(true)
+  }, [flashcardDataComplete])
 
   useEffect(() => {
     clearTimeout(messageNumber)
