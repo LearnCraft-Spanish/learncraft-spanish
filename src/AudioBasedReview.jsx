@@ -16,27 +16,27 @@ export default function AudioBasedReview({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const [currentExample, setCurrentExample] = useState(0)
-  const [showingAnswer, setShowingAnswer] = useState(false)
-  const [spanishHidden, setSpanishHidden] = useState(true)
-  const [autoplay, setAutoplay] = useState(willAutoplay || false)
-  const [guessing, setGuessing] = useState(false)
-  const [examplesToPlay, setExamplesToPlay] = useState([])
-  const [quizReady, setQuizReady] = useState(false)
-  /* Will use this as a settable state that inherits a default from props
+  const [currentExample, setCurrentExample] = useState(0) // The number of the current example
+  const [showingAnswer, setShowingAnswer] = useState(false) // Whether the answer is showing (or the question)
+  const [spanishHidden, setSpanishHidden] = useState(true) // In the case of starting with Spanish, whether the Spanish is hidden
+  const [autoplay, setAutoplay] = useState(willAutoplay || false) // Default inherited from props or false, whether the audio will autoplay
+  const [guessing, setGuessing] = useState(false) // If true shows "make a guess" instead of question or answer
+  const [examplesToPlay, setExamplesToPlay] = useState([]) // The array of examples used in this review
+  const [quizReady, setQuizReady] = useState(false) // The switch between the selection and the quiz interface itself
+  /* Will use this as a settable state that inherits a default from props in the future
   const [startWithSpanish, setStartWithSpanish] = useState(
     willStartWithSpanish || false,
   ) */
-  const startWithSpanish = willStartWithSpanish || false
-  const [countdown, setCountdown] = useState(0)
-  const [progressStatus, setProgressStatus] = useState(0)
-  const [answerPlayNumber, setAnswerPlayNumber] = useState(1)
-  const [paused, setPaused] = useState(false)
-  const example = examplesToPlay[currentExample] || {}
-  const currentQuestionText = startWithSpanish
+  const startWithSpanish = willStartWithSpanish || false // For now, just use a constant
+  const [countdown, setCountdown] = useState(0) // The remaining duration of the track being played
+  const [progressStatus, setProgressStatus] = useState(0) // Tracks the progress through the current playback as a percentage
+  const [answerPlayNumber, setAnswerPlayNumber] = useState(1) // Whether playing the answer the first or second time
+  const [paused, setPaused] = useState(false) // Whether the playback is paused
+  const example = examplesToPlay[currentExample] || {} // The current example object
+  const currentQuestionText = startWithSpanish // The question is Spanish if spanish first, English if English first
     ? example.spanishExample
     : example.englishTranslation
-  const currentAnswerText = startWithSpanish
+  const currentAnswerText = startWithSpanish // Vice versa for the answer
     ? example.englishTranslation
     : example.spanishExample
   const currentQuestionAudio = useRef()
@@ -55,14 +55,36 @@ export default function AudioBasedReview({
     }
   }
 
-  function readyQuiz() {
+  const readyQuiz = useCallback(() => {
     setQuizReady(true)
-  }
+  }, [])
 
-  function unReadyQuiz() {
+  const unReadyQuiz = useCallback(() => {
     setCurrentExample(0)
     setQuizReady(false)
-  }
+  }, [])
+
+  const hideSpanish = useCallback(() => {
+    setSpanishHidden(true)
+  }, [])
+
+  const showSpanish = useCallback(() => {
+    setSpanishHidden(false)
+  }, [])
+
+  const guess = useCallback(() => {
+    setGuessing(true)
+  }, [])
+
+  const endGuess = useCallback(() => {
+    setGuessing(false)
+  }, [])
+
+  const startCountdown = useCallback((length) => {
+    console.log(`Starting Countdown of ${length}`)
+    currentCountdownLength.current = length
+    setCountdown(length)
+  }, [])
 
   const playCurrentQuestion = useCallback(async () => {
     if (guessing) {
@@ -86,7 +108,7 @@ export default function AudioBasedReview({
         console.error(e?.message)
       }
     }
-  }, [autoplay, guessing])
+  }, [autoplay, guessing, startCountdown, endGuess])
 
   const playCurrentAnswer = useCallback (async () => {
     if (currentQuestionAudio.current) {
@@ -110,9 +132,9 @@ export default function AudioBasedReview({
         console.error(e?.message)
       }
     }
-  }, [autoplay, startWithSpanish])
+  }, [autoplay, startWithSpanish, startCountdown])
 
-  function pausePlayback() {
+  const pausePlayback = useCallback(() => {
     setPaused(true)
     if (currentAnswerAudio.current) {
       currentAnswerAudio.current.pause()
@@ -122,7 +144,7 @@ export default function AudioBasedReview({
     }
     clearTimeout(currentCountdown.current)
     clearTimeout(answerPause.current)
-  }
+  }, [])
 
   const updateCountdown = useCallback(() => {
     if (countdown > 0 && currentCountdownLength.current > 0) {
@@ -154,33 +176,17 @@ export default function AudioBasedReview({
     updateCountdown()
   }
 
-  function clearCountDown() {
+  const clearCountDown = useCallback(() => {
     clearTimeout(currentCountdown.current)
     currentCountdownLength.current = 0
     setCountdown(undefined)
-  }
+  }, [])
 
   function hideAnswer() {
     setAnswerPlayNumber(1)
     setSpanishHidden(false)
     setGuessing(false)
     setShowingAnswer(false)
-  }
-
-  function hideSpanish() {
-    setSpanishHidden(true)
-  }
-
-  function showSpanish() {
-    setSpanishHidden(false)
-  }
-
-  function guess() {
-    setGuessing(true)
-  }
-
-  function endGuess() {
-    setGuessing(false)
   }
 
   const incrementExample = useCallback(() => {
@@ -321,12 +327,7 @@ export default function AudioBasedReview({
           setShowingAnswer(false)
       }
     }
-  }, [answerPlayNumber, incrementExample, showingAnswer, quizReady, startWithSpanish, guessing, spanishHidden, autoplay])
-
-  function startCountdown(length) {
-    currentCountdownLength.current = length
-    setCountdown(length)
-  }
+  }, [answerPlayNumber, showingAnswer, quizReady, startWithSpanish, guessing, spanishHidden, autoplay, incrementExample, endGuess, guess, showSpanish])
 
   const makeComprehensionQuiz = useCallback(() => {
     const allowedAudioExamples = filterExamplesByAllowedVocab(
@@ -344,22 +345,28 @@ export default function AudioBasedReview({
       rendered.current = true
     }
     return clearCountDown()
-  }, [])
+  }, [clearCountDown])
 
+  // When going to a new example, show the question, make sure it's not guessing,
+  // and in a comprehension quiz, hide the Spanish.
   useEffect(() => {
     if (startWithSpanish) {
       hideSpanish()
     }
     endGuess()
     setShowingAnswer(false)
-  }, [currentExample, startWithSpanish])
+  }, [currentExample, startWithSpanish, clearCountDown, hideSpanish, endGuess])
 
+  // Update the set of examples to be played when the selected lesson or program changes,
+  // but make sure the quiz is not ready.
   useEffect(() => {
     unReadyQuiz()
     if (selectedLesson && selectedProgram) {
       makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson, makeComprehensionQuiz])
+  }, [selectedProgram, selectedLesson, unReadyQuiz, makeComprehensionQuiz])
+
+  // Play the current audio when switching between question and answer.
 
   useEffect(() => {
     clearCountDown()
@@ -385,28 +392,32 @@ export default function AudioBasedReview({
         default:
       }
     }
-  }, [showingAnswer, quizReady, autoplay, playCurrentAnswer, playCurrentQuestion, startWithSpanish])
+  }, [showingAnswer, quizReady, autoplay, startWithSpanish, playCurrentAnswer, playCurrentQuestion, startCountdown, clearCountDown, endGuess])
 
+  // Play the question again when the spanish is shown.
   useEffect(() => {
     if (quizReady && startWithSpanish) {
       playCurrentQuestion()
     }
-  }, [spanishHidden, playCurrentQuestion, quizReady, startWithSpanish])
+  }, [spanishHidden, quizReady, startWithSpanish, playCurrentQuestion])
 
+  // Play the answer again when answer play number is set to 2
   useEffect(() => {
-    if (quizReady && answerPlayNumber > 1) {
+    if (!startWithSpanish && quizReady && answerPlayNumber === 2) {
       playCurrentAnswer()
     }
   }, [answerPlayNumber, quizReady, startWithSpanish, playCurrentAnswer])
 
+  // Starts the countdown for the guess
   useEffect(() => {
     if (quizReady && autoplay) {
-      if (!showingAnswer && guessing && currentAnswerAudio.current) {
+      if (!showingAnswer && guessing) {
+        console.log('Starting Guess Countdown')
         pausePlayback()
         startCountdown(Math.floor(currentAnswerAudio.current.duration + 3))
       }
     }
-  }, [guessing, autoplay, showingAnswer, currentAnswerAudio, startWithSpanish, quizReady])
+  }, [guessing, showingAnswer, autoplay, quizReady, startCountdown, pausePlayback])
 
   useEffect(() => {
     clearTimeout(currentCountdown.current)
@@ -415,9 +426,10 @@ export default function AudioBasedReview({
       currentCountdown.current = setTimeout(updateCountdown, 50)
     }
     if (countdown === 0) {
+      console.log('Countdown Ended')
       cycle()
     }
-  }, [countdown, updateCountdown, currentCountdownLength, cycle])
+  }, [countdown, updateCountdown, cycle])
 
   return (
     <div className="quiz">
