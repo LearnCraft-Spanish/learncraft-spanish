@@ -219,11 +219,9 @@ export default function LCSPQuizApp({
       quizList.forEach((item) => {
         quizSelections.push(
           <option key={i} value={item.quizNumber}>
-            Ser/Estar Lesson
-            {' '}
+            {'Ser/Estar Lesson '}
             {item.lessonNumber}
-            ,
-            {' '}
+            {', '}
             {item.subtitle}
           </option>,
         )
@@ -236,8 +234,7 @@ export default function LCSPQuizApp({
         quizSelections.push(
           <option key={i} value={item.quizNumber}>
             {courseName}
-            {' '}
-            Quiz
+            {' Quiz '}
             {item.quizNumber}
           </option>,
         )
