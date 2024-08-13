@@ -295,7 +295,7 @@ function App({ SentryRoutes }) {
     })
   }, [getAccessToken])
 
-  const getStudentLevel = useCallback(async () => {
+  const getStudentLevel = useCallback(() => {
     let studentProgram
       = programTable.find(
         program => program.recordId === activeStudent.relatedProgram,
@@ -322,7 +322,15 @@ function App({ SentryRoutes }) {
     }
     activeProgram.current = studentProgram
     activeLesson.current = lastKnownLesson
-  }, [activeStudent, programTable])
+    if (activeProgram.current.recordId && activeLesson.current.recordId) {
+      updateSelectedProgram(activeProgram.current.recordId)
+      updateSelectedLesson(activeLesson.current.recordId)
+    }
+    else {
+      updateSelectedProgram(2)
+      updateSelectedLesson(2)
+    }
+  }, [activeStudent, programTable, updateSelectedProgram, updateSelectedLesson])
 
   const updateExamplesTable = useCallback(async () => {
     if (qbUserData?.isAdmin) {
@@ -547,19 +555,19 @@ function App({ SentryRoutes }) {
   }, [])
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (rendered.current && isAuthenticated) {
       userSetup()
       parseCourseLessons()
     }
   }, [isAuthenticated, userSetup, parseCourseLessons])
 
   useEffect(() => {
-    if (qbUserData?.isAdmin !== undefined) {
+    if (rendered.current && qbUserData?.isAdmin !== undefined) {
       if (qbUserData?.role === 'student' || qbUserData?.role === 'limited') {
         setupAudioExamplesTable()
         setActiveStudent(qbUserData)
       }
-      if (qbUserData?.isAdmin) {
+      else if (qbUserData?.isAdmin) {
         async function setupStudentList() {
           const studentListPromise = await getStudentList()
           setStudentList(studentListPromise)
@@ -573,14 +581,15 @@ function App({ SentryRoutes }) {
   }, [qbUserData, getStudentList, setupAudioExamplesTable])
 
   useEffect(() => {
-    if (activeStudent?.recordId) {
+    if (rendered.current && activeStudent?.recordId && programTable.length > 0) {
       getStudentLevel()
       updateExamplesTable()
     }
-  }, [activeStudent, getStudentLevel, updateExamplesTable])
+  }, [activeStudent, programTable, getStudentLevel, updateExamplesTable])
 
   useEffect(() => {
     flashcardDataComplete && setMenuReady(true)
+    !flashcardDataComplete && setMenuReady(false)
   }, [flashcardDataComplete])
 
   useEffect(() => {

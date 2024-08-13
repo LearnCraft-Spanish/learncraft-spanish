@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import './App.css'
 
 import MenuButton from './MenuButton'
@@ -64,7 +64,7 @@ export default function AudioBasedReview({
     setQuizReady(false)
   }
 
-  async function playCurrentQuestion() {
+  const playCurrentQuestion = useCallback(async () => {
     if (guessing) {
       endGuess()
     }
@@ -86,9 +86,9 @@ export default function AudioBasedReview({
         console.error(e?.message)
       }
     }
-  }
+  }, [autoplay, guessing])
 
-  async function playCurrentAnswer() {
+  const playCurrentAnswer = useCallback (async () => {
     if (currentQuestionAudio.current) {
       currentQuestionAudio.current.pause()
       currentQuestionAudio.current.currentTime = 0
@@ -110,7 +110,7 @@ export default function AudioBasedReview({
         console.error(e?.message)
       }
     }
-  }
+  }, [autoplay, startWithSpanish])
 
   function pausePlayback() {
     setPaused(true)
@@ -124,7 +124,7 @@ export default function AudioBasedReview({
     clearTimeout(answerPause.current)
   }
 
-  function updateCountdown() {
+  const updateCountdown = useCallback(() => {
     if (countdown > 0 && currentCountdownLength.current > 0) {
       const newNumber = Math.floor((countdown - 0.05) * 100) / 100
       setCountdown(newNumber)
@@ -139,7 +139,7 @@ export default function AudioBasedReview({
     else {
       setCountdown(undefined)
     }
-  }
+  }, [countdown, currentCountdownLength])
 
   function resumePlayback() {
     if (paused) {
@@ -182,6 +182,28 @@ export default function AudioBasedReview({
   function endGuess() {
     setGuessing(false)
   }
+
+  const incrementExample = useCallback(() => {
+    setAnswerPlayNumber(1)
+    if (currentExample < examplesToPlay.length - 1) {
+      const nextExample = currentExample + 1
+      setCurrentExample(nextExample)
+    }
+    else {
+      setCurrentExample(examplesToPlay.length - 1)
+    }
+  }, [currentExample, examplesToPlay])
+
+  const decrementExample = useCallback(() => {
+    if (currentExample > 0) {
+      const prevExample = currentExample - 1
+      setCurrentExample(prevExample)
+    }
+    else {
+      setCurrentExample(0)
+    }
+    setAnswerPlayNumber(1)
+  }, [currentExample])
 
   function progressBar() {
     return (
@@ -234,28 +256,6 @@ export default function AudioBasedReview({
     return shuffled
   }
 
-  function incrementExample() {
-    setAnswerPlayNumber(1)
-    if (currentExample < examplesToPlay.length - 1) {
-      const nextExample = currentExample + 1
-      setCurrentExample(nextExample)
-    }
-    else {
-      setCurrentExample(examplesToPlay.length - 1)
-    }
-  }
-
-  function decrementExample() {
-    if (currentExample > 0) {
-      const prevExample = currentExample - 1
-      setCurrentExample(prevExample)
-    }
-    else {
-      setCurrentExample(0)
-    }
-    setAnswerPlayNumber(1)
-  }
-
   function questionAudio() {
     let audioUrl
     if (startWithSpanish) {
@@ -291,7 +291,7 @@ export default function AudioBasedReview({
     setShowingAnswer(false)
   }
 
-  function cycle() {
+  const cycle = useCallback(() => {
     if (quizReady) {
       switch (showingAnswer) {
         case false:
@@ -321,14 +321,14 @@ export default function AudioBasedReview({
           setShowingAnswer(false)
       }
     }
-  }
+  }, [answerPlayNumber, incrementExample, showingAnswer, quizReady, startWithSpanish, guessing, spanishHidden, autoplay])
 
   function startCountdown(length) {
     currentCountdownLength.current = length
     setCountdown(length)
   }
 
-  function makeComprehensionQuiz() {
+  const makeComprehensionQuiz = useCallback(() => {
     const allowedAudioExamples = filterExamplesByAllowedVocab(
       audioExamplesTable,
       selectedLesson.recordId,
@@ -337,7 +337,7 @@ export default function AudioBasedReview({
     const shuffledExamples = shuffleExamples(allowedAudioExamples)
     // console.log(shuffledExamples)
     setExamplesToPlay(shuffledExamples)
-  }
+  }, [audioExamplesTable, filterExamplesByAllowedVocab, selectedLesson])
 
   useEffect(() => {
     if (!rendered.current) {
@@ -352,14 +352,14 @@ export default function AudioBasedReview({
     }
     endGuess()
     setShowingAnswer(false)
-  }, [currentExample])
+  }, [currentExample, startWithSpanish])
 
   useEffect(() => {
     unReadyQuiz()
     if (selectedLesson && selectedProgram) {
       makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson])
+  }, [selectedProgram, selectedLesson, makeComprehensionQuiz])
 
   useEffect(() => {
     clearCountDown()
@@ -385,19 +385,19 @@ export default function AudioBasedReview({
         default:
       }
     }
-  }, [showingAnswer, quizReady])
+  }, [showingAnswer, quizReady, autoplay, playCurrentAnswer, playCurrentQuestion, startWithSpanish])
 
   useEffect(() => {
     if (quizReady && startWithSpanish) {
       playCurrentQuestion()
     }
-  }, [spanishHidden])
+  }, [spanishHidden, playCurrentQuestion, quizReady, startWithSpanish])
 
   useEffect(() => {
     if (quizReady && answerPlayNumber > 1) {
       playCurrentAnswer()
     }
-  }, [answerPlayNumber])
+  }, [answerPlayNumber, quizReady, startWithSpanish, playCurrentAnswer])
 
   useEffect(() => {
     if (quizReady && autoplay) {
@@ -406,7 +406,7 @@ export default function AudioBasedReview({
         startCountdown(Math.floor(currentAnswerAudio.current.duration + 3))
       }
     }
-  }, [guessing])
+  }, [guessing, autoplay, showingAnswer, currentAnswerAudio, startWithSpanish, quizReady])
 
   useEffect(() => {
     clearTimeout(currentCountdown.current)
@@ -417,7 +417,7 @@ export default function AudioBasedReview({
     if (countdown === 0) {
       cycle()
     }
-  }, [countdown])
+  }, [countdown, updateCountdown, currentCountdownLength, cycle])
 
   return (
     <div className="quiz">
