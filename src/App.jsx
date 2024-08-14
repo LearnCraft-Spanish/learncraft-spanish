@@ -410,7 +410,7 @@ function App({ SentryRoutes }) {
     }
   }, [qbUserData, studentList])
 
-  const addToActiveStudentFlashcards = useCallback(async (recordId) => {
+  const addToActiveStudentFlashcards = useCallback(async (recordId, updateTable = true) => {
     updateBannerMessage('Adding Flashcard...')
     if (activeStudent.recordId && qbUserData.isAdmin) {
       try {
@@ -421,7 +421,7 @@ function App({ SentryRoutes }) {
         ).then((result) => {
           if (result === 1) {
             updateBannerMessage('Flashcard Added!')
-            updateExamplesTableQuietly()
+            updateTable && updateExamplesTableQuietly()
           }
           else {
             updateBannerMessage('Failed to add Flashcard')
@@ -440,7 +440,7 @@ function App({ SentryRoutes }) {
           (result) => {
             if (result === 1) {
               updateBannerMessage('Flashcard Added!')
-              updateExamplesTableQuietly()
+              updateTable && updateExamplesTableQuietly()
             }
             else {
               updateBannerMessage('Failed to add Flashcard')
@@ -457,7 +457,7 @@ function App({ SentryRoutes }) {
     }
   }, [activeStudent, qbUserData, getAccessToken, updateBannerMessage, updateExamplesTableQuietly])
 
-  const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId) => {
+  const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId, updateTable = true) => {
     setBannerMessage('Removing Flashcard')
     const exampleRecordIdInt = Number.parseInt(exampleRecordId)
     const getStudentExampleRecordId = () => {
@@ -475,7 +475,7 @@ function App({ SentryRoutes }) {
         ).then((result) => {
           if (result === 1) {
             setBannerMessage('Flashcard removed!')
-            updateExamplesTableQuietly()
+            updateTable && updateExamplesTableQuietly()
           }
           else {
             setBannerMessage('Failed to remove flashcard')
@@ -496,7 +496,7 @@ function App({ SentryRoutes }) {
         ).then((result) => {
           if (result === 1) {
             setBannerMessage('Flashcard removed!')
-            updateExamplesTableQuietly()
+            updateTable && updateExamplesTableQuietly()
           }
           else {
             setBannerMessage('Failed to remove flashcard')
