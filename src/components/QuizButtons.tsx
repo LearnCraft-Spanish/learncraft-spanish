@@ -13,7 +13,6 @@ export default function QuizButtons({
   currentAudioUrl,
   togglePlaying,
 }: QuizButtonsProps): JSX.Element {
-  console.log(`currentAudioUrl: ${currentAudioUrl?.length}`)
   return (
     <div className="buttonBox">
 

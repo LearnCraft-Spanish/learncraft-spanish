@@ -13,8 +13,6 @@ describe('component QuizButtons', () => {
     render(<QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} togglePlaying={togglePlaying} currentAudioUrl="" />)
     expect(screen.getByText('Previous')).toBeTruthy()
     expect(screen.getByText('Next')).toBeTruthy()
-    // epect this component to have this, but have its display set to none
-
-    expect(screen.queryByText('Play/Pause Audio')).toHaveProperty('style', 'display: none;')
+    expect(screen.queryByText('Play/Pause Audio')).toBeNull()
   })
 })
