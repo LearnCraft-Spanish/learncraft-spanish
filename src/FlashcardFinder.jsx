@@ -1,5 +1,4 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 
 import {
   getVerifiedExamplesFromBackend,
@@ -16,6 +15,7 @@ const FlashcardFinder = forwardRef(
     {
       activeStudent,
       programTable,
+      getAccessToken,
       studentExamplesTable,
       flashcardDataComplete,
       selectedProgram,
@@ -28,7 +28,6 @@ const FlashcardFinder = forwardRef(
     },
     currentContextual,
   ) => {
-    const { getAccessTokenSilently } = useAuth0()
     const isMounted = useRef(false)
     const [isLoaded, setIsLoaded] = useState(false)
     const [tagSearchTerm, setTagSearchTerm] = useState('')
@@ -51,8 +50,6 @@ const FlashcardFinder = forwardRef(
     }
 
     const displayExamplesWithAudio = displayExamples.filter(filterByHasAudio)
-
-    const audience = import.meta.env.VITE_API_AUDIENCE
 
     function toggleSpanglish() {
       if (noSpanglish) {
@@ -189,9 +186,6 @@ const FlashcardFinder = forwardRef(
                   })
                   break
               }
-            }
-            else {
-              console.error('Error: variable isGood is not good')
             }
           })
           return isGood
@@ -344,14 +338,7 @@ const FlashcardFinder = forwardRef(
 
     async function getVocab() {
       try {
-        const accessToken = await getAccessTokenSilently({
-          authorizationParams: {
-            audience,
-            scope: 'openID email profile',
-          },
-        })
-        // console.log(accessToken)
-        const vocab = await getVocabFromBackend(accessToken).then((result) => {
+        const vocab = await getVocabFromBackend(getAccessToken()).then((result) => {
           // console.log(result)
           const usefulData = result
           return usefulData
@@ -453,21 +440,9 @@ const FlashcardFinder = forwardRef(
 
     async function getExamples() {
       try {
-        const accessToken = await getAccessTokenSilently({
-          authorizationParams: {
-            audience,
-            scope: 'openID email profile',
-          },
-        })
-        // console.log(accessToken)
-        const examples = await getVerifiedExamplesFromBackend(accessToken).then(
-          (result) => {
-            // console.log(result)
-            const usefulData = result
-            return usefulData
-          },
+        const examples = await getVerifiedExamplesFromBackend(getAccessToken()).then(
+          result => result,
         )
-        // console.log(examples)
         return examples
       }
       catch (e) {
@@ -492,17 +467,14 @@ const FlashcardFinder = forwardRef(
       async function startUp() {
         isMounted.current = true
         const getData = async () => {
-          // console.log('init called')
-          // retrieving the table data
           const vocabPromise = await getVocab()
           const examplePromise = await getExamples()
           setVocabularyTable(await vocabPromise)
           setExampleTable(await examplePromise)
         }
         getData()
-        // console.log('data fetched')
       }
-      if (!isMounted) {
+      if (!isMounted.current) {
         startUp()
       }
     }, [])

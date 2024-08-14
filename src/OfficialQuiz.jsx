@@ -90,8 +90,7 @@ export default function OfficialQuiz({
       return (
         <h3>
           {courseName}
-          {' '}
-          Quiz
+          {' Quiz '}
           {thisQuiz}
         </h3>
       )

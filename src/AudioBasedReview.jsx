@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './App.css'
 
 import MenuButton from './MenuButton'
@@ -335,9 +335,7 @@ export default function AudioBasedReview({
       audioExamplesTable,
       selectedLesson.recordId,
     )
-    // console.log(allowedAudioExamples)
     const shuffledExamples = shuffleExamples(allowedAudioExamples)
-    // console.log(shuffledExamples)
     setExamplesToPlay(shuffledExamples)
   }
 
@@ -345,7 +343,6 @@ export default function AudioBasedReview({
     if (!rendered.current) {
       rendered.current = true
     }
-    console.log("setting rendered current")
     return clearCountDown()
   }, [])
 

@@ -567,15 +567,15 @@ function App({ SentryRoutes }) {
         setupAudioExamplesTable()
         setActiveStudent(qbUserData)
       }
-      else if (qbUserData?.isAdmin) {
+      else {
+        setFlashcardDataComplete(true)
+      }
+      if (qbUserData?.isAdmin) {
         async function setupStudentList() {
           const studentListPromise = await getStudentList()
           setStudentList(studentListPromise)
         }
         setupStudentList()
-      }
-      else {
-        setFlashcardDataComplete(true)
       }
     }
   }, [qbUserData, getStudentList, setupAudioExamplesTable])
@@ -757,6 +757,7 @@ function App({ SentryRoutes }) {
                   user={qbUserData || {}}
                   activeStudent={activeStudent}
                   programTable={programTable}
+                  getAccessToken={getAccessToken}
                   studentList={studentList}
                   studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
