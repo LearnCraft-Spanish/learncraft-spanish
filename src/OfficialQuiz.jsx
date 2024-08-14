@@ -255,7 +255,7 @@ export default function OfficialQuiz({
       {quizReady && (
         <div className="quiz">
           {makeQuizTitle()}
-          <FlashcardDisplay example={examplesToReview[currentExampleNumber - 1]} isStudent={activeStudent.role === ('student')} startWithSpanish={false} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} />
+          <FlashcardDisplay example={examplesToReview[currentExampleNumber - 1]} isStudent={activeStudent.role === ('student')} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} />
           <div className="buttonBox">
             <button type="button" onClick={decrementExample}>Previous</button>
             <button

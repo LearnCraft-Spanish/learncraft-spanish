@@ -9,11 +9,11 @@ interface FlashcardProps {
   removeFlashcardAndUpdate: (recordId: number) => void
 }
 
-export default function FlashcardDisplay({ example, isStudent, startWithSpanish, addFlashcardAndUpdate, removeFlashcardAndUpdate }: FlashcardProps): JSX.Element {
+export default function FlashcardDisplay({ example, isStudent, startWithSpanish = false, addFlashcardAndUpdate, removeFlashcardAndUpdate }: FlashcardProps): JSX.Element {
   const currentAudio = useRef<HTMLAudioElement>(null)
   const [answerShowing, setAnswerShowing] = useState<boolean>(false)
 
-  const spanishText = 'soy el *big man* quien no es *the happy person.* '// example.spanishExample
+  const spanishText = example.spanishExample
   const englishText = example.englishTranslation
 
   function formatSpanishText() {

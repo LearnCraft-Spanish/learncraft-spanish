@@ -705,6 +705,7 @@ function App({ SentryRoutes }) {
             element={
               (qbUserData.role === 'student' || qbUserData.isAdmin) && (
                 <SimpleQuizApp
+                  updateBannerMessage={updateBannerMessage}
                   updateExamplesTable={updateExamplesTable}
                   activeStudent={activeStudent}
                   examplesTable={examplesTable.current}
