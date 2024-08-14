@@ -7,7 +7,7 @@ import {
   updateStudentExample,
 } from './BackendFetchFunctions'
 import './App.css'
-import MenuButton from './MenuButton'
+import MenuButton from './components/MenuButton'
 
 export default function SRSQuizApp({
   flashcardDataComplete,

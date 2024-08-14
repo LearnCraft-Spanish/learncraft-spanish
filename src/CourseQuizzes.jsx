@@ -9,7 +9,7 @@ import './App.css'
 
 import OfficialQuiz from './OfficialQuiz'
 
-import MenuButton from './MenuButton'
+import MenuButton from './components/MenuButton'
 
 export default function CourseQuizzes({
   thisCourse,
@@ -34,6 +34,7 @@ export default function CourseQuizzes({
   examplesTable,
   studentExamples,
   addFlashcard,
+  removeFlashcard,
   studentHasDefaultQuiz,
 }) {
   const rendered = useRef(false)
@@ -113,6 +114,7 @@ export default function CourseQuizzes({
                 examplesTable={examplesTable}
                 studentExamples={studentExamples}
                 addFlashcard={addFlashcard}
+                removeFlashcard={removeFlashcard}
               />
             )}
           >

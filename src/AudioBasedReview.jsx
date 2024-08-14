@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import './App.css'
 
-import MenuButton from './MenuButton'
+import MenuButton from './components/MenuButton'
 import LessonSelector from './LessonSelector'
 
 export default function AudioBasedReview({

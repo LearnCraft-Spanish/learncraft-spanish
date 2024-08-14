@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import MenuButton from './MenuButton'
+import MenuButton from './components/MenuButton'
 
 function CallbackPage() {
   const navigate = useNavigate()

@@ -6,7 +6,7 @@ import {
   getLcspQuizzesFromBackend,
 } from './BackendFetchFunctions'
 import CourseQuizzes from './CourseQuizzes.jsx'
-import MenuButton from './MenuButton'
+import MenuButton from './components/MenuButton'
 import OfficialQuiz from './OfficialQuiz'
 
 export default function LCSPQuizApp({
@@ -16,6 +16,8 @@ export default function LCSPQuizApp({
   selectedProgram,
   selectedLesson,
   addFlashcard,
+  removeFlashcard,
+  updateExamplesTable,
 }) {
   // console.log(userData)
   const navigate = useNavigate()
@@ -50,6 +52,7 @@ export default function LCSPQuizApp({
               makeQuizReady={makeQuizReady}
               quizCourse={quizCourse}
               updateChosenQuiz={updateChosenQuiz}
+              updateExamplesTable={updateExamplesTable}
               makeCourseList={makeCourseList}
               setChosenQuiz={setChosenQuiz}
               createRoutesFromCourses={createRoutesFromCourses}
@@ -65,6 +68,7 @@ export default function LCSPQuizApp({
               quizTable={quizTable}
               studentExamples={studentExamples}
               addFlashcard={addFlashcard}
+              removeFlashcard={removeFlashcard}
               studentHasDefaultQuiz={studentHasDefaultQuiz}
             />
           )}
@@ -376,6 +380,7 @@ export default function LCSPQuizApp({
                 dataLoaded={dataLoaded}
                 chosenQuiz={chosenQuiz}
                 updateChosenQuiz={updateChosenQuiz}
+                updateExamplesTable={updateExamplesTable}
                 hideMenu={hideMenu}
                 makeMenuHidden={makeMenuHidden}
                 makeQuizReady={makeQuizReady}
@@ -383,6 +388,7 @@ export default function LCSPQuizApp({
                 quizTable={quizTable}
                 studentExamples={studentExamples}
                 addFlashcard={addFlashcard}
+                removeFlashcard={removeFlashcard}
               />
             )}
           >

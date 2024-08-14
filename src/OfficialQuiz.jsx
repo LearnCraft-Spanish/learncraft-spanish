@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import ReactHowler from 'react-howler'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import './App.css'
 import { getQuizExamplesFromBackend } from './BackendFetchFunctions'
-import MenuButton from './MenuButton'
+import MenuButton from './components/MenuButton'
+import FlashcardDisplay from './components/Flashcard'
 
 export default function OfficialQuiz({
   courses,
@@ -19,6 +19,7 @@ export default function OfficialQuiz({
   quizTable,
   studentExamples,
   addFlashcard,
+  removeFlashcard,
 }) {
   const thisQuiz = Number.parseInt(useParams().number)
   const navigate = useNavigate()
@@ -184,6 +185,7 @@ export default function OfficialQuiz({
     setPlaying(false)
   }
 
+  /*
   async function toggleLanguageShowing() {
     if (languageShowing === 'spanish') {
       setLanguageShowing('english')
@@ -194,14 +196,30 @@ export default function OfficialQuiz({
       setPlaying(false)
     }
   }
+  */
 
-  async function addToExamples(recordId) {
+  async function addFlashcardAndUpdate(recordId) {
     const currentExample = examplesToReview.find(
       example => example.recordId === recordId,
     )
-    currentExample.isKnown = true
     incrementExample()
-    addFlashcard(recordId)
+    currentExample.isKnown = true
+    const flashcardAddedPromise = addFlashcard(recordId)
+    if (await flashcardAddedPromise !== 1) {
+      currentExample.isKnown = false
+    }
+  }
+
+  async function removeFlashcardAndUpdate(recordId) {
+    const currentExample = examplesToReview.find(
+      example => example.recordId === recordId,
+    )
+    decrementExample()
+    currentExample.isKnown = false
+    const flashcardRemovedPromise = removeFlashcard(recordId)
+    if (await flashcardRemovedPromise !== 1) {
+      currentExample.isKnown = true
+    }
   }
 
   useEffect(() => {
@@ -237,55 +255,7 @@ export default function OfficialQuiz({
       {quizReady && (
         <div className="quiz">
           {makeQuizTitle()}
-          {examplesToReview[currentExampleNumber - 1] !== undefined && (
-            <div className="exampleBox">
-              <div
-                style={{
-                  display: languageShowing === 'english' ? 'flex' : 'none',
-                }}
-                className="englishTranslation"
-                onClick={toggleLanguageShowing}
-              >
-                <p>
-                  {examplesToReview[currentExampleNumber - 1]
-                    ? examplesToReview[currentExampleNumber - 1]
-                      .englishTranslation
-                    : ''}
-                </p>
-              </div>
-              <div
-                style={{
-                  display: languageShowing === 'spanish' ? 'flex' : 'none',
-                }}
-                className="spanishExample"
-                onClick={toggleLanguageShowing}
-              >
-                <p>
-                  {examplesToReview[currentExampleNumber - 1]
-                    ? examplesToReview[currentExampleNumber - 1].spanishExample
-                    : ''}
-                </p>
-                {activeStudent
-                && activeStudent.recordId !== undefined
-                && examplesToReview[currentExampleNumber - 1].isKnown
-                === false && (
-                  <button
-                    type="button"
-                    className="addFlashcardButton"
-                    onClick={() =>
-                      addToExamples(
-                        examplesToReview[currentExampleNumber - 1].recordId,
-                      )}
-                  >
-                    Add to My Flashcards
-                  </button>
-                )}
-              </div>
-              {currentAudioUrl && (
-                <ReactHowler src={currentAudioUrl} playing={playing} />
-              )}
-            </div>
-          )}
+          <FlashcardDisplay example={examplesToReview[currentExampleNumber - 1]} isStudent={activeStudent.role === ('student')} startWithSpanish={false} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} />
           <div className="buttonBox">
             <button type="button" onClick={decrementExample}>Previous</button>
             <button

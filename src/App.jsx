@@ -20,8 +20,8 @@ import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
 import SimpleQuizApp from './SimpleQuizApp'
 import AudioQuiz from './AudioQuiz'
-import LoginButton from './LoginButton'
-import LogoutButton from './LogoutButton'
+import LoginButton from './components/LoginButton'
+import LogoutButton from './components/LogoutButton'
 import SRSQuizApp from './SRSQuizApp'
 import LCSPQuizApp from './LCSPQuizApp'
 import FrequenSay from './FrequenSay'
@@ -332,9 +332,8 @@ function App({ SentryRoutes }) {
     }
   }, [activeStudent, programTable, updateSelectedProgram, updateSelectedLesson])
 
-  const updateExamplesTable = useCallback(async () => {
+  const updateExamplesTableQuietly = useCallback(async () => {
     if (qbUserData?.isAdmin) {
-      setFlashcardDataComplete(false)
       try {
         const studentExampleData = await getActiveExamplesFromBackend(
           getAccessToken(),
@@ -351,7 +350,6 @@ function App({ SentryRoutes }) {
     }
     else if (qbUserData?.role === 'student') {
       // Pulls examples and student examples ONLY for the current user
-      setFlashcardDataComplete(false)
       try {
         const userExampleData = await getMyExamplesFromBackend(
           getAccessToken(),
@@ -365,6 +363,11 @@ function App({ SentryRoutes }) {
       }
     }
   }, [getAccessToken, activeStudent, qbUserData])
+
+  const updateExamplesTable = useCallback(async () => {
+    setFlashcardDataComplete(false)
+    updateExamplesTableQuietly()
+  }, [updateExamplesTableQuietly])
 
   const makeStudentSelector = useCallback(() => {
     if (qbUserData.isAdmin) {
@@ -418,6 +421,7 @@ function App({ SentryRoutes }) {
         ).then((result) => {
           if (result === 1) {
             updateBannerMessage('Flashcard Added!')
+            updateExamplesTableQuietly()
           }
           else {
             updateBannerMessage('Failed to add Flashcard')
@@ -436,6 +440,7 @@ function App({ SentryRoutes }) {
           (result) => {
             if (result === 1) {
               updateBannerMessage('Flashcard Added!')
+              updateExamplesTableQuietly()
             }
             else {
               updateBannerMessage('Failed to add Flashcard')
@@ -450,7 +455,7 @@ function App({ SentryRoutes }) {
         return false
       }
     }
-  }, [activeStudent, qbUserData, getAccessToken, updateBannerMessage])
+  }, [activeStudent, qbUserData, getAccessToken, updateBannerMessage, updateExamplesTableQuietly])
 
   const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId) => {
     setBannerMessage('Removing Flashcard')
@@ -459,10 +464,10 @@ function App({ SentryRoutes }) {
       const relatedStudentExample = studentExamplesTable.find(
         element => element.relatedExample === exampleRecordIdInt,
       )
-      return relatedStudentExample.recordId
+      return relatedStudentExample?.recordId
     }
     const studentExampleRecordId = getStudentExampleRecordId()
-    if (qbUserData.isAdmin) {
+    if (studentExampleRecordId && qbUserData.isAdmin) {
       try {
         const data = await deleteStudentExample(
           getAccessToken(),
@@ -470,6 +475,7 @@ function App({ SentryRoutes }) {
         ).then((result) => {
           if (result === 1) {
             setBannerMessage('Flashcard removed!')
+            updateExamplesTableQuietly()
           }
           else {
             setBannerMessage('Failed to remove flashcard')
@@ -482,7 +488,7 @@ function App({ SentryRoutes }) {
         console.error(e.message)
       }
     }
-    else if (qbUserData.role === 'student') {
+    else if (studentExampleRecordId && qbUserData.role === 'student') {
       try {
         const data = await deleteMyStudentExample(
           getAccessToken(),
@@ -490,6 +496,7 @@ function App({ SentryRoutes }) {
         ).then((result) => {
           if (result === 1) {
             setBannerMessage('Flashcard removed!')
+            updateExamplesTableQuietly()
           }
           else {
             setBannerMessage('Failed to remove flashcard')
@@ -502,7 +509,11 @@ function App({ SentryRoutes }) {
         console.error(e.message)
       }
     }
-  }, [qbUserData, studentExamplesTable, getAccessToken])
+    else {
+      setBannerMessage('Flashcard not found')
+      return 0
+    }
+  }, [qbUserData, studentExamplesTable, getAccessToken, updateExamplesTableQuietly])
 
   const filterExamplesByAllowedVocab = useCallback((examples, lessonId) => {
     let allowedVocabulary = []
@@ -739,12 +750,13 @@ function App({ SentryRoutes }) {
             element={(
               <LCSPQuizApp
                 getAccessToken={getAccessToken}
-                updateExamplesTable={updateExamplesTable}
+                updateExamplesTable={updateExamplesTableQuietly}
                 studentExamples={studentExamplesTable}
                 activeStudent={activeStudent}
                 selectedProgram={selectedProgram}
                 selectedLesson={selectedLesson}
                 addFlashcard={addToActiveStudentFlashcards}
+                removeFlashcard={removeFlashcardFromActiveStudent}
               />
             )}
           />
@@ -763,10 +775,10 @@ function App({ SentryRoutes }) {
                   studentList={studentList}
                   studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
-                  addFlashcard={addToActiveStudentFlashcards}
+                  addFlashcard={addToActiveStudentFlashcards} // PROBLEM: Duplicate Reference
                   updateExamplesTable={updateExamplesTable}
                   flashcardDataComplete={flashcardDataComplete}
-                  addToActiveStudentFlashcards={addToActiveStudentFlashcards}
+                  addToActiveStudentFlashcards={addToActiveStudentFlashcards} // PROBLEM: Duplicate Reference
                   selectedLesson={selectedLesson}
                   selectedProgram={selectedProgram}
                   updateSelectedLesson={updateSelectedLesson}

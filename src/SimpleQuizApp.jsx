@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom'
 import ReactHowler from 'react-howler'
 
 import './App.css'
-import MenuButton from './MenuButton'
+import MenuButton from './components/MenuButton'
 
 export default function SimpleQuizApp({
   activeStudent,

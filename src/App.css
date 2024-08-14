@@ -256,6 +256,18 @@ button:hover, .linkButton:hover {
   font-style: italic;
 }
 
+.englishFlashcardText {
+  font-size: 18px;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.spanishFlashcardText {
+  font-size: 18px;
+  font-weight: 600;
+  font-style: italic;
+}
+
 .readyButton {
   display: flex;
   justify-content: space-around;
