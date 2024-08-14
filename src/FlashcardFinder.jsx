@@ -455,7 +455,7 @@ const FlashcardFinder = forwardRef(
         example => example.recordId === Number.parseInt(exampleId),
       )
       exampleToUpdate.isAssigned = true
-      addToActiveStudentFlashcards(exampleId).then((addResponse) => {
+      addToActiveStudentFlashcards(exampleId, false).then((addResponse) => {
         if (addResponse !== 1) {
           exampleToUpdate.isAssigned = false
         }
