@@ -129,7 +129,7 @@ function FlashcardManager({
       <h2>Flashcard Manager</h2>
       <h4>
         Total flashcards:
-        {examplesTable.length}
+        {displayExamplesTable.length}
       </h4>
       <div className="exampleCardContainer">
         {createDisplayExamplesTable(displayExamplesTable)}

@@ -4,8 +4,10 @@ import { useAuth0 } from '@auth0/auth0-react'
 
 import './App.css'
 import { getQuizExamplesFromBackend } from './BackendFetchFunctions'
-import MenuButton from './components/MenuButton'
 import FlashcardDisplay from './components/Flashcard'
+import QuizButtons from './components/QuizButtons'
+import QuizProgress from './components/QuizProgress'
+import MenuButton from './components/MenuButton'
 
 export default function OfficialQuiz({
   courses,
@@ -32,6 +34,14 @@ export default function OfficialQuiz({
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
   const [languageShowing, setLanguageShowing] = useState('english')
   const [playing, setPlaying] = useState(false)
+
+  const whichAudio
+    = languageShowing === 'spanish' ? 'spanishAudioLa' : 'englishAudio'
+
+  const currentAudioUrl
+    = quizReady && examplesToReview[currentExampleNumber - 1]
+      ? examplesToReview[currentExampleNumber - 1][whichAudio]
+      : ''
 
   async function getExamplesForCurrentQuiz() {
     const quizToSearch
@@ -97,14 +107,6 @@ export default function OfficialQuiz({
       )
     }
   }
-
-  const whichAudio
-    = languageShowing === 'spanish' ? 'spanishAudioLa' : 'englishAudio'
-
-  const currentAudioUrl
-    = quizReady && examplesToReview[currentExampleNumber - 1]
-      ? examplesToReview[currentExampleNumber - 1][whichAudio]
-      : ''
 
   function tagAssignedExamples(exampleArray) {
     // console.log(exampleArray);
@@ -247,8 +249,6 @@ export default function OfficialQuiz({
     }
   }, [quizReady])
 
-  // const quizNumber = parseInt(useParams().number)
-  // console.log(useParams())
   return (
     <div>
       {dataLoaded && !quizReady && <h2>Loading Quiz...</h2>}
@@ -256,34 +256,12 @@ export default function OfficialQuiz({
         <div className="quiz">
           {makeQuizTitle()}
           <FlashcardDisplay example={examplesToReview[currentExampleNumber - 1]} isStudent={activeStudent.role === ('student')} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} />
+          <QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} currentAudioUrl={currentAudioUrl} togglePlaying={togglePlaying} playing={playing} />
           <div className="buttonBox">
-            <button type="button" onClick={decrementExample}>Previous</button>
-            <button
-              type="button"
-              style={{ display: currentAudioUrl === '' ? 'none' : 'block' }}
-              onClick={togglePlaying}
-            >
-              Play/Pause Audio
-            </button>
-            <button type="button" onClick={incrementExample}>Next</button>
-          </div>
-          <div className="buttonBox">
-            <Link className="linkButton" to=".." onClick={makeMenuShow}>
-              Back to Quizzes
-            </Link>
+            <Link className="linkButton" to=".." onClick={makeMenuShow}>Back to Quizzes</Link>
             <MenuButton />
           </div>
-          <div className="progressBar2">
-            <div className="progressBarDescription">
-              Flashcard
-              {' '}
-              {currentExampleNumber}
-              {' '}
-              of
-              {' '}
-              {examplesToReview.length}
-            </div>
-          </div>
+          <QuizProgress currentExampleNumber={currentExampleNumber} totalExamplesNumber={examplesToReview.length} />
         </div>
       )}
     </div>
