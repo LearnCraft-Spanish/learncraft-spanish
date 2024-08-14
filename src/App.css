@@ -351,8 +351,9 @@ button:hover, .linkButton:hover {
   text-align: center;
 
 }
-
-.progressBar {
+/* .progressBar2 is a legacy className
+will remove from .css when all instances are removed */
+.progressBar, .progressBar2 {
   display:block;
   text-align: center;
   justify-self: center;

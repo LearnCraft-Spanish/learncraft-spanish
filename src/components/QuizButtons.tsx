@@ -1,3 +1,5 @@
+import React from 'react'
+
 interface QuizButtonsProps {
   decrementExample: () => void
   incrementExample: () => void
@@ -11,23 +13,21 @@ export default function QuizButtons({
   currentAudioUrl,
   togglePlaying,
 }: QuizButtonsProps): JSX.Element {
-  const AudioButtonDisplay = currentAudioUrl === '' ? 'none' : 'inherit'
-
+  console.log(`currentAudioUrl: ${currentAudioUrl?.length}`)
   return (
     <div className="buttonBox">
 
       <button type="button" onClick={decrementExample}>
         Previous
       </button>
-
-      <button
-        type="button"
-        onClick={togglePlaying}
-        style={{ display: AudioButtonDisplay }}
-      >
-        Play/Pause Audio
-      </button>
-
+      {currentAudioUrl && (
+        <button
+          type="button"
+          onClick={togglePlaying}
+        >
+          Play/Pause Audio
+        </button>
+      )}
       <button type="button" onClick={incrementExample}>
         Next
       </button>
