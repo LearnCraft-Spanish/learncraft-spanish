@@ -563,8 +563,10 @@ function App({ SentryRoutes }) {
 
   useEffect(() => {
     if (rendered.current && qbUserData?.isAdmin !== undefined) {
-      if (qbUserData?.role === 'student' || qbUserData?.role === 'limited') {
+      if (qbUserData?.isAdmin || qbUserData?.role === ('student' || 'limited')) {
         setupAudioExamplesTable()
+      }
+      if (qbUserData?.role === 'student' || qbUserData?.role === 'limited') {
         setActiveStudent(qbUserData)
       }
       else {
@@ -581,9 +583,9 @@ function App({ SentryRoutes }) {
   }, [qbUserData, getStudentList, setupAudioExamplesTable])
 
   useEffect(() => {
-    if (rendered.current && activeStudent?.recordId && programTable.length > 0) {
+    if (rendered.current && programTable.length > 0) {
       getStudentLevel()
-      updateExamplesTable()
+      activeStudent?.recordId && updateExamplesTable()
     }
   }, [activeStudent, programTable, getStudentLevel, updateExamplesTable])
 
