@@ -23,8 +23,6 @@ export default function OfficialQuiz({
   studentExamples,
   updateChosenQuiz,
 }) {
-  console.log('rendering OfficialQuiz')
-
   const thisQuiz = Number.parseInt(useParams().number)
   const navigate = useNavigate()
 
@@ -58,7 +56,7 @@ export default function OfficialQuiz({
             <audio
               ref={currentAudio}
               src={spanishAudioUrl}
-              onEnded={setPlaying(false)}
+              onEnded={() => setPlaying(false)}
             />
           )
     return audioElement
@@ -70,7 +68,7 @@ export default function OfficialQuiz({
             <audio
               ref={currentAudio}
               src={englishAudioUrl}
-              onEnded={setPlaying(false)}
+              onEnded={() => setPlaying(false)}
             />
           )
     return audioElement
@@ -96,7 +94,6 @@ export default function OfficialQuiz({
   }, [playing, pauseCurrentAudio, playCurrentAudio])
 
   const getExamplesForCurrentQuiz = useCallback(async () => {
-    console.log('getting examples for current quiz')
     const quizToSearch
       = quizTable.find(
         quiz => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
@@ -150,7 +147,6 @@ export default function OfficialQuiz({
   }
 
   const tagAssignedExamples = useCallback((exampleArray) => {
-    console.log('tagging examples')
     if (studentExamples && exampleArray) {
       exampleArray.forEach((example) => {
         const getStudentExampleRecordId = () => {
@@ -172,7 +168,6 @@ export default function OfficialQuiz({
   }, [studentExamples])
 
   const handleSetupQuiz = useCallback(() => {
-    console.log('setting up quiz')
     getExamplesForCurrentQuiz().then((examples) => {
       if (examples) {
         const taggedByKnown = tagAssignedExamples(examples)
@@ -188,9 +183,7 @@ export default function OfficialQuiz({
           return randomizedArray
         }
         const randomizedQuizExamples = randomize(taggedByKnown)
-        console.log('setting examples to review')
         setExamplesToReview(randomizedQuizExamples)
-        console.log('set quiz ready!')
         setQuizReady(true)
       }
       else {
@@ -247,7 +240,6 @@ export default function OfficialQuiz({
   }
 
   useEffect(() => {
-    console.log(1)
     if (!rendered.current) {
       rendered.current = true
       makeMenuHidden()
@@ -258,16 +250,12 @@ export default function OfficialQuiz({
   }, [thisQuiz, chosenQuiz, updateChosenQuiz, makeMenuHidden])
 
   useEffect(() => {
-    console.log(2)
-    console.log(`dataLoaded: ${dataLoaded}`)
     if (dataLoaded) {
-      console.log('setting up quiz')
       handleSetupQuiz()
     }
   }, [dataLoaded, handleSetupQuiz])
 
   useEffect(() => {
-    console.log(3)
     if (quizReady) {
       if (examplesToReview.length < 1) {
         makeMenuShow()
