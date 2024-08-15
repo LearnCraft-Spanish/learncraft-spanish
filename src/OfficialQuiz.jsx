@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useAuth0 } from '@auth0/auth0-react'
 
 import './App.css'
 import { getQuizExamplesFromBackend } from './BackendFetchFunctions'
@@ -10,23 +9,22 @@ import QuizProgress from './components/QuizProgress'
 import MenuButton from './components/MenuButton'
 
 export default function OfficialQuiz({
+  activeStudent,
+  addFlashcard,
+  chosenQuiz,
   courses,
-  quizCourse,
+  dataLoaded,
+  getAccessToken,
   makeMenuHidden,
   makeMenuShow,
-  activeStudent,
-  dataLoaded,
-  chosenQuiz,
-  updateChosenQuiz,
+  quizCourse,
   quizTable,
-  studentExamples,
-  addFlashcard,
   removeFlashcard,
+  studentExamples,
+  updateChosenQuiz,
 }) {
   const thisQuiz = Number.parseInt(useParams().number)
   const navigate = useNavigate()
-  const audience = import.meta.env.VITE_API_AUDIENCE
-  const { getAccessTokenSilently } = useAuth0()
 
   const rendered = useRef(false)
   const currentAudio = useRef(null)
@@ -39,7 +37,7 @@ export default function OfficialQuiz({
   const currentExample = examplesToReview[currentExampleNumber - 1]
 
   const startWithSpanish = true
-  const spanishShowing = (startWithSpanish && !answerShowing) || (!startWithSpanish && answerShowing)
+  const spanishShowing = startWithSpanish !== answerShowing
 
   function hideAnswer() {
     setAnswerShowing(false)
@@ -49,8 +47,8 @@ export default function OfficialQuiz({
     setAnswerShowing(!answerShowing)
   }
 
-  const spanishAudioUrl = currentExample.spanishAudioLa
-  const englishAudioUrl = currentExample.englishAudioLa
+  const spanishAudioUrl = currentExample?.spanishAudioLa
+  const englishAudioUrl = currentExample?.englishAudioLa
 
   function spanishAudio() {
     const audioElement
@@ -58,6 +56,7 @@ export default function OfficialQuiz({
             <audio
               ref={currentAudio}
               src={spanishAudioUrl}
+              onEnded={setPlaying(false)}
             />
           )
     return audioElement
@@ -69,46 +68,49 @@ export default function OfficialQuiz({
             <audio
               ref={currentAudio}
               src={englishAudioUrl}
+              onEnded={setPlaying(false)}
             />
           )
     return audioElement
   }
 
-  const audioActive = spanishShowing ? currentExample.spanishAudioLa : currentExample.englishAudioLa
+  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudioLa
 
   const questionAudio = startWithSpanish ? spanishAudio : englishAudio
   const answerAudio = startWithSpanish ? englishAudio : spanishAudio
 
-  async function getExamplesForCurrentQuiz() {
+  const playCurrentAudio = useCallback(() => {
+    setPlaying(true)
+    currentAudio.current.play()
+  }, [currentAudio])
+
+  const pauseCurrentAudio = useCallback(() => {
+    setPlaying(false)
+    currentAudio.current.pause()
+  }, [currentAudio])
+
+  const togglePlaying = useCallback(() => {
+    playing ? pauseCurrentAudio() : playCurrentAudio()
+  }, [playing, pauseCurrentAudio, playCurrentAudio])
+
+  const getExamplesForCurrentQuiz = useCallback(async () => {
     const quizToSearch
       = quizTable.find(
         quiz => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
       ) || {}
     if (quizToSearch.recordId) {
       try {
-        const accessToken = await getAccessTokenSilently({
-          authorizationParams: {
-            audience,
-            scope: 'openID email profile',
-          },
-        })
-        // console.log(accessToken)
         const quizExamples = await getQuizExamplesFromBackend(
-          accessToken,
+          getAccessToken(),
           quizToSearch.recordId,
-        ).then((result) => {
-          // console.log(result)
-          const usefulData = result
-          return usefulData
-        })
+        )
         return quizExamples
       }
       catch (e) {
         console.error(e)
-        return []
       }
     }
-  }
+  }, [thisQuiz, quizCourse, quizTable, getAccessToken])
 
   function makeQuizTitle() {
     const thisCourse = courses.find(course => course.code === quizCourse)
@@ -144,7 +146,7 @@ export default function OfficialQuiz({
     }
   }
 
-  function tagAssignedExamples(exampleArray) {
+  const tagAssignedExamples = useCallback((exampleArray) => {
     // console.log(exampleArray);
     if (studentExamples && exampleArray) {
       exampleArray.forEach((example) => {
@@ -164,9 +166,9 @@ export default function OfficialQuiz({
     }
     // console.log(exampleArray)
     return exampleArray
-  }
+  }, [studentExamples])
 
-  function handleSetupQuiz() {
+  const handleSetupQuiz = useCallback(() => {
     getExamplesForCurrentQuiz().then((examples) => {
       if (examples) {
         const taggedByKnown = tagAssignedExamples(examples)
@@ -189,16 +191,7 @@ export default function OfficialQuiz({
         navigate('..')
       }
     })
-  }
-
-  function togglePlaying() {
-    if (playing) {
-      setPlaying(false)
-    }
-    else {
-      setPlaying(true)
-    }
-  }
+  }, [getExamplesForCurrentQuiz, tagAssignedExamples, navigate])
 
   function incrementExample() {
     if (currentExampleNumber < examplesToReview.length) {
@@ -248,29 +241,34 @@ export default function OfficialQuiz({
   }
 
   useEffect(() => {
+    console.log(1)
     if (!rendered.current) {
       rendered.current = true
+      makeMenuHidden()
       if (chosenQuiz !== thisQuiz) {
         updateChosenQuiz(thisQuiz)
       }
-      makeMenuHidden()
     }
-  }, [])
+  }, [thisQuiz, chosenQuiz, updateChosenQuiz, makeMenuHidden])
 
   useEffect(() => {
+    console.log(2)
+    console.log(`dataLoaded: ${dataLoaded}`)
     if (dataLoaded) {
+      console.log('setting up quiz')
       handleSetupQuiz()
     }
-  }, [dataLoaded])
+  }, [dataLoaded, handleSetupQuiz])
 
   useEffect(() => {
+    console.log(3)
     if (quizReady) {
       if (examplesToReview.length < 1) {
         makeMenuShow()
         navigate('..')
       }
     }
-  }, [quizReady])
+  }, [quizReady, examplesToReview, makeMenuShow, navigate])
 
   return (
     <div>
@@ -278,8 +276,8 @@ export default function OfficialQuiz({
       {quizReady && (
         <div className="quiz">
           {makeQuizTitle()}
-          {answerShowing && answerAudio()}
           {!answerShowing && questionAudio()}
+          {answerShowing && answerAudio()}
           <FlashcardDisplay example={currentExample} isStudent={activeStudent.role === ('student')} answerShowing={answerShowing} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} hideAnswer={hideAnswer} />
           <QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} audioActive={audioActive} togglePlaying={togglePlaying} playing={playing} />
           <div className="buttonBox">

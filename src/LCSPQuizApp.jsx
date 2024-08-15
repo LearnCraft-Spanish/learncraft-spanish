@@ -36,74 +36,32 @@ export default function LCSPQuizApp({
     { name: 'Master Ser vs Estar', url: 'ser-estar', code: 'ser-estar' },
   ])
 
-  function createRoutesFromCourses() {
-    const routes = []
-    courses.current.forEach((course) => {
-      routes.push(
-        <Route
-          key={course.code}
-          exact
-          path={`${course.url}/*`}
-          element={(
-            <CourseQuizzes
-              thisCourse={course.code}
-              courses={courses.current}
-              quizReady={quizReady}
-              makeQuizReady={makeQuizReady}
-              quizCourse={quizCourse}
-              updateChosenQuiz={updateChosenQuiz}
-              updateExamplesTable={updateExamplesTable}
-              makeCourseList={makeCourseList}
-              setChosenQuiz={setChosenQuiz}
-              createRoutesFromCourses={createRoutesFromCourses}
-              updateQuizCourseWithNavigate={updateQuizCourseWithNavigate}
-              updateQuizCourseWithoutNavigate={updateQuizCourseWithoutNavigate}
-              makeQuizSelections={makeQuizSelections}
-              activeStudent={activeStudent}
-              dataLoaded={dataLoaded}
-              chosenQuiz={chosenQuiz}
-              hideMenu={hideMenu}
-              makeMenuHidden={makeMenuHidden}
-              makeMenuShow={makeMenuShow}
-              quizTable={quizTable}
-              studentExamples={studentExamples}
-              addFlashcard={addFlashcard}
-              removeFlashcard={removeFlashcard}
-              studentHasDefaultQuiz={studentHasDefaultQuiz}
-            />
-          )}
-        />,
-      )
-    })
-    return routes
-  }
-
   const getCourseUrlFromCode = useCallback((code) => {
     const selectedCourse = courses.current.find(course => course.code === code)
     const url = `/officialquizzes${selectedCourse.url ? '/' : ''}${selectedCourse.url}`
     return url
   }, [courses])
 
-  function makeMenuShow() {
-    if (hideMenu) {
-      setHideMenu(false)
-      makeQuizUnready()
-    }
-  }
-
-  function makeMenuHidden() {
-    if (!hideMenu) {
-      setHideMenu(true)
-    }
-  }
-
   function makeQuizReady() {
     setQuizReady(true)
   }
 
-  function makeQuizUnready() {
+  const makeQuizUnready = useCallback(() => {
     setQuizReady(false)
-  }
+  }, [])
+
+  const makeMenuHidden = useCallback(() => {
+    if (!hideMenu) {
+      setHideMenu(true)
+    }
+  }, [hideMenu])
+
+  const makeMenuShow = useCallback(() => {
+    if (hideMenu) {
+      setHideMenu(false)
+      makeQuizUnready()
+    }
+  }, [hideMenu, makeQuizUnready])
 
   const getLCSPQuizzes = useCallback(async () => {
     try {
@@ -122,26 +80,26 @@ export default function LCSPQuizApp({
     }
   }, [getAccessToken])
 
-  function updateQuizCourseWithNavigate(courseCode) {
+  const updateQuizCourseWithNavigate = useCallback((courseCode) => {
     studentHasDefaultQuiz.current = false
     const newCourse = courses.current.find(course => course.code === courseCode)
     setQuizCourse(courseCode)
     const urlToNavigate = newCourse.url
     navigate(urlToNavigate)
-  }
+  }, [navigate])
 
-  function updateQuizCourseWithoutNavigate(courseCode) {
+  const updateQuizCourseWithoutNavigate = useCallback((courseCode) => {
     // const newCourse = courses.current.find(course => course.code === courseCode)
     setQuizCourse(courseCode)
-  }
+  }, [])
 
-  function updateChosenQuiz(quizNumber) {
+  const updateChosenQuiz = useCallback((quizNumber) => {
     // console.log(`chosen quiz now ${quizCourse} ${quizNumber}`)
     studentHasDefaultQuiz.current = false
     setChosenQuiz(quizNumber)
-  }
+  }, [])
 
-  function makeCourseList() {
+  const makeCourseList = useCallback(() => {
     const courseList = []
     let i = 1
     courses.current.forEach((course) => {
@@ -154,7 +112,7 @@ export default function LCSPQuizApp({
       i++
     })
     return courseList
-  }
+  }, [courses])
 
   function parseQuizzes(quizzes) {
     quizzes.forEach((item) => {
@@ -186,6 +144,7 @@ export default function LCSPQuizApp({
         item.quizNumber = quizNumber
       }
     })
+
     function sortQuizzes(a, b) {
       const aNumber = a.quizNumber
       const bNumber = b.quizNumber
@@ -212,7 +171,7 @@ export default function LCSPQuizApp({
     return quizzes
   }
 
-  function makeQuizSelections() {
+  const makeQuizSelections = useCallback(() => {
     const quizList = quizTable.filter(item => item.quizType === quizCourse)
     const quizSelections = []
     const courseName = courses.current.find(
@@ -246,7 +205,7 @@ export default function LCSPQuizApp({
       })
     }
     return quizSelections
-  }
+  }, [courses, quizCourse, quizTable])
 
   const findDefaultQuiz = useCallback(() => {
     studentHasDefaultQuiz.current = true
@@ -280,8 +239,52 @@ export default function LCSPQuizApp({
     }
   }, [selectedLesson, selectedProgram, quizCourse, quizTable, courses, navigate])
 
+  function createRoutesFromCourses() {
+    const routes = []
+    courses.current.forEach((course) => {
+      routes.push(
+        <Route
+          key={course.code}
+          exact
+          path={`${course.url}/*`}
+          element={(
+            <CourseQuizzes
+              activeStudent={activeStudent}
+              addFlashcard={addFlashcard}
+              chosenQuiz={chosenQuiz}
+              courses={courses.current}
+              createRoutesFromCourses={createRoutesFromCourses}
+              dataLoaded={dataLoaded}
+              getAccessToken={getAccessToken}
+              hideMenu={hideMenu}
+              makeCourseList={makeCourseList}
+              makeMenuHidden={makeMenuHidden}
+              makeMenuShow={makeMenuShow}
+              makeQuizReady={makeQuizReady}
+              makeQuizSelections={makeQuizSelections}
+              quizCourse={quizCourse}
+              quizReady={quizReady}
+              quizTable={quizTable}
+              removeFlashcard={removeFlashcard}
+              setChosenQuiz={setChosenQuiz}
+              studentExamples={studentExamples}
+              studentHasDefaultQuiz={studentHasDefaultQuiz}
+              thisCourse={course.code}
+              updateChosenQuiz={updateChosenQuiz}
+              updateExamplesTable={updateExamplesTable}
+              updateQuizCourseWithNavigate={updateQuizCourseWithNavigate}
+              updateQuizCourseWithoutNavigate={updateQuizCourseWithoutNavigate}
+            />
+          )}
+        />,
+      )
+    })
+    return routes
+  }
+
   // called onced at the beginning
   useEffect(() => {
+    console.log(1)
     async function startUp() {
       if (!rendered.current) {
         rendered.current = true
@@ -295,18 +298,22 @@ export default function LCSPQuizApp({
   }, [getLCSPQuizzes])
 
   useEffect(() => {
-    if (quizTable.length > 0 && !dataLoaded) {
+    console.log(2)
+    if (quizTable?.length > 0 && !dataLoaded) {
       setDataLoaded(true)
     }
   }, [quizTable, dataLoaded])
 
   useEffect(() => {
+    console.log(3)
+    console.log(quizReady, chosenQuiz)
     if (quizReady && chosenQuiz && quizCourse === 'lcsp') {
       navigate(chosenQuiz.toString())
     }
   }, [quizReady, chosenQuiz, navigate, quizCourse])
 
   useEffect(() => {
+    console.log(4)
     if (
       !studentHasDefaultQuiz.current
       && quizCourse
@@ -322,6 +329,7 @@ export default function LCSPQuizApp({
   }, [quizCourse, dataLoaded, quizReady, quizTable, studentHasDefaultQuiz, getCourseUrlFromCode])
 
   useEffect(() => {
+    console.log(5)
     if (
       activeStudent.recordId
       && selectedProgram.recordId
@@ -372,23 +380,24 @@ export default function LCSPQuizApp({
             path=":number"
             element={(
               <OfficialQuiz
-                courses={courses.current}
-                quizCourse={quizCourse}
-                makeCourseList={makeCourseList}
-                makeQuizSelections={makeQuizSelections}
                 activeStudent={activeStudent}
-                dataLoaded={dataLoaded}
+                addFlashcard={addFlashcard}
                 chosenQuiz={chosenQuiz}
+                courses={courses.current}
+                dataLoaded={dataLoaded}
+                getAccessToken={getAccessToken}
+                hideMenu={hideMenu}
+                makeCourseList={makeCourseList}
+                makeMenuHidden={makeMenuHidden}
+                makeMenuShow={makeMenuShow}
+                makeQuizReady={makeQuizReady}
+                makeQuizSelections={makeQuizSelections}
+                quizCourse={quizCourse}
+                quizTable={quizTable}
+                removeFlashcard={removeFlashcard}
+                studentExamples={studentExamples}
                 updateChosenQuiz={updateChosenQuiz}
                 updateExamplesTable={updateExamplesTable}
-                hideMenu={hideMenu}
-                makeMenuHidden={makeMenuHidden}
-                makeQuizReady={makeQuizReady}
-                makeMenuShow={makeMenuShow}
-                quizTable={quizTable}
-                studentExamples={studentExamples}
-                addFlashcard={addFlashcard}
-                removeFlashcard={removeFlashcard}
               />
             )}
           >
