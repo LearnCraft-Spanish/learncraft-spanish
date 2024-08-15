@@ -35,7 +35,7 @@ import FlashcardManager from './FlashcardManager'
 function App({ SentryRoutes }) {
   // initialize and destructure Auth0 hook and define audience
   const { isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0()
-  const audience = import.meta.env.VITE_API_AUDIENCE
+  const audience = useRef(import.meta.env.VITE_API_AUDIENCE)
 
   // React Router hooks
   const location = useLocation()
@@ -82,14 +82,14 @@ function App({ SentryRoutes }) {
   const getAccessToken = useCallback(async () => {
     const accessToken = await getAccessTokenSilently({
       authorizationParams: {
-        audience,
+        audience: audience.current,
         scope:
           'openid profile email read:current-student update:current-student read:all-students update:all-students',
       },
       cacheMode: 'off',
     })
     return accessToken
-  }, [audience, getAccessTokenSilently])
+  }, [getAccessTokenSilently])
 
   // global functions to open and close any contextual menus – hard limit to one at a time
   const openContextual = useCallback((elementClass) => {

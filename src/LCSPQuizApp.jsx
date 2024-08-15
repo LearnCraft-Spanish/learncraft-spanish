@@ -19,7 +19,7 @@ export default function LCSPQuizApp({
   removeFlashcard,
   updateExamplesTable,
 }) {
-  // console.log(userData)
+  console.log('rendering LCSPQuizApp')
   const navigate = useNavigate()
   const [quizCourse, setQuizCourse] = useState('lcsp')
   const [dataLoaded, setDataLoaded] = useState(false)
@@ -40,7 +40,7 @@ export default function LCSPQuizApp({
     const selectedCourse = courses.current.find(course => course.code === code)
     const url = `/officialquizzes${selectedCourse.url ? '/' : ''}${selectedCourse.url}`
     return url
-  }, [courses])
+  }, [])
 
   function makeQuizReady() {
     setQuizReady(true)
@@ -237,7 +237,7 @@ export default function LCSPQuizApp({
     else {
       studentHasDefaultQuiz.current = false
     }
-  }, [selectedLesson, selectedProgram, quizCourse, quizTable, courses, navigate])
+  }, [selectedLesson, selectedProgram, quizCourse, quizTable, navigate])
 
   function createRoutesFromCourses() {
     const routes = []
@@ -282,38 +282,33 @@ export default function LCSPQuizApp({
     return routes
   }
 
-  // called onced at the beginning
+  // called once at the beginning
   useEffect(() => {
-    console.log(1)
-    async function startUp() {
-      if (!rendered.current) {
-        rendered.current = true
+    if (!rendered.current) {
+      rendered.current = true
+      async function startUp() {
         getLCSPQuizzes().then((quizzes) => {
           const parsedQuizTable = parseQuizzes(quizzes)
           setQuizTable(parsedQuizTable)
         })
       }
+      startUp()
     }
-    startUp()
   }, [getLCSPQuizzes])
 
   useEffect(() => {
-    console.log(2)
     if (quizTable?.length > 0 && !dataLoaded) {
       setDataLoaded(true)
     }
-  }, [quizTable, dataLoaded])
+  }, [quizTable?.length, dataLoaded])
 
   useEffect(() => {
-    console.log(3)
-    console.log(quizReady, chosenQuiz)
     if (quizReady && chosenQuiz && quizCourse === 'lcsp') {
       navigate(chosenQuiz.toString())
     }
   }, [quizReady, chosenQuiz, navigate, quizCourse])
 
   useEffect(() => {
-    console.log(4)
     if (
       !studentHasDefaultQuiz.current
       && quizCourse
@@ -326,15 +321,14 @@ export default function LCSPQuizApp({
       )[0].quizNumber
       setChosenQuiz(firstQuiz)
     }
-  }, [quizCourse, dataLoaded, quizReady, quizTable, studentHasDefaultQuiz, getCourseUrlFromCode])
+  }, [quizCourse, dataLoaded, quizReady, quizTable, getCourseUrlFromCode])
 
   useEffect(() => {
-    console.log(5)
     if (
       activeStudent.recordId
       && selectedProgram.recordId
       && selectedLesson.recordId
-      && quizTable[0]
+      && quizTable?.length > 0
       && window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
       findDefaultQuiz()
@@ -342,7 +336,7 @@ export default function LCSPQuizApp({
     else if (!activeStudent.recordId) {
       studentHasDefaultQuiz.current = false
     }
-  }, [activeStudent, selectedProgram, selectedLesson, findDefaultQuiz, getCourseUrlFromCode, quizCourse, quizTable])
+  }, [activeStudent?.recordId, selectedProgram?.recordId, selectedLesson?.recordId, findDefaultQuiz, getCourseUrlFromCode, quizCourse, quizTable?.length])
 
   return (
     <div className="quizInterface">

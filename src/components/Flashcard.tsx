@@ -9,10 +9,9 @@ interface FlashcardProps {
   addFlashcardAndUpdate: (recordId: number) => void
   removeFlashcardAndUpdate: (recordId: number) => void
   toggleAnswer: () => void
-  hideAnswer: () => void
 }
 
-export default function FlashcardDisplay({ example, isStudent, answerShowing, startWithSpanish = false, addFlashcardAndUpdate, removeFlashcardAndUpdate, toggleAnswer, hideAnswer }: FlashcardProps): JSX.Element {
+export default function FlashcardDisplay({ example, isStudent, answerShowing, startWithSpanish = false, addFlashcardAndUpdate, removeFlashcardAndUpdate, toggleAnswer }: FlashcardProps): JSX.Element {
   const spanishText = example.spanishExample
   const englishText = example.englishTranslation
 
@@ -52,10 +51,6 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, st
 
   const questionText = startWithSpanish ? formatSpanishText : formatEnglishText
   const answerText = startWithSpanish ? formatEnglishText : formatSpanishText
-
-  useEffect(() => {
-    hideAnswer()
-  }, [example, hideAnswer])
 
   return (
     <div className="exampleBox">

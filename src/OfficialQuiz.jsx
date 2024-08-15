@@ -23,6 +23,8 @@ export default function OfficialQuiz({
   studentExamples,
   updateChosenQuiz,
 }) {
+  console.log('rendering OfficialQuiz')
+
   const thisQuiz = Number.parseInt(useParams().number)
   const navigate = useNavigate()
 
@@ -94,6 +96,7 @@ export default function OfficialQuiz({
   }, [playing, pauseCurrentAudio, playCurrentAudio])
 
   const getExamplesForCurrentQuiz = useCallback(async () => {
+    console.log('getting examples for current quiz')
     const quizToSearch
       = quizTable.find(
         quiz => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
@@ -147,7 +150,7 @@ export default function OfficialQuiz({
   }
 
   const tagAssignedExamples = useCallback((exampleArray) => {
-    // console.log(exampleArray);
+    console.log('tagging examples')
     if (studentExamples && exampleArray) {
       exampleArray.forEach((example) => {
         const getStudentExampleRecordId = () => {
@@ -169,6 +172,7 @@ export default function OfficialQuiz({
   }, [studentExamples])
 
   const handleSetupQuiz = useCallback(() => {
+    console.log('setting up quiz')
     getExamplesForCurrentQuiz().then((examples) => {
       if (examples) {
         const taggedByKnown = tagAssignedExamples(examples)
@@ -184,14 +188,16 @@ export default function OfficialQuiz({
           return randomizedArray
         }
         const randomizedQuizExamples = randomize(taggedByKnown)
+        console.log('setting examples to review')
         setExamplesToReview(randomizedQuizExamples)
+        console.log('set quiz ready!')
         setQuizReady(true)
       }
       else {
         navigate('..')
       }
     })
-  }, [getExamplesForCurrentQuiz, tagAssignedExamples, navigate])
+  }, [getExamplesForCurrentQuiz, navigate, tagAssignedExamples])
 
   function incrementExample() {
     if (currentExampleNumber < examplesToReview.length) {
