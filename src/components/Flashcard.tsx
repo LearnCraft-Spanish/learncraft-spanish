@@ -4,15 +4,15 @@ import type { Flashcard } from '../interfaceDefinitions'
 interface FlashcardProps {
   example: Flashcard
   isStudent: boolean
+  answerShowing: boolean
   startWithSpanish: boolean
   addFlashcardAndUpdate: (recordId: number) => void
   removeFlashcardAndUpdate: (recordId: number) => void
+  toggleAnswer: () => void
+  hideAnswer: () => void
 }
 
-export default function FlashcardDisplay({ example, isStudent, startWithSpanish = false, addFlashcardAndUpdate, removeFlashcardAndUpdate }: FlashcardProps): JSX.Element {
-  const currentAudio = useRef<HTMLAudioElement>(null)
-  const [answerShowing, setAnswerShowing] = useState<boolean>(false)
-
+export default function FlashcardDisplay({ example, isStudent, answerShowing, startWithSpanish = false, addFlashcardAndUpdate, removeFlashcardAndUpdate, toggleAnswer, hideAnswer }: FlashcardProps): JSX.Element {
   const spanishText = example.spanishExample
   const englishText = example.englishTranslation
 
@@ -50,42 +50,8 @@ export default function FlashcardDisplay({ example, isStudent, startWithSpanish 
     return <p className="englishFlashcardText">{englishText}</p>
   }
 
-  function spanishAudio() {
-    const audioUrl = example.spanishAudioLa
-    const audioElement
-      = (
-        <audio
-          ref={currentAudio}
-          src={audioUrl}
-        />
-      )
-    return audioElement
-  }
-
-  function englishAudio() {
-    const audioUrl = example.spanishAudioLa
-    const audioElement
-      = (
-        <audio
-          ref={currentAudio}
-          src={audioUrl}
-        />
-      )
-    return audioElement
-  }
-
   const questionText = startWithSpanish ? formatSpanishText : formatEnglishText
   const answerText = startWithSpanish ? formatEnglishText : formatSpanishText
-  const questionAudio = startWithSpanish ? spanishAudio : englishAudio
-  const answerAudio = startWithSpanish ? englishAudio : spanishAudio
-
-  const toggleAnswer = useCallback(() => {
-    setAnswerShowing(!answerShowing)
-  }, [answerShowing])
-
-  const hideAnswer = useCallback(() => {
-    setAnswerShowing(false)
-  }, [])
 
   useEffect(() => {
     hideAnswer()
@@ -96,13 +62,11 @@ export default function FlashcardDisplay({ example, isStudent, startWithSpanish 
       {!answerShowing && (
         <div className="englishTranslation" onClick={toggleAnswer}>
           {questionText()}
-          {questionAudio()}
         </div>
       )}
       {answerShowing && (
         <div className="spanishExample" onClick={toggleAnswer}>
           {answerText()}
-          {answerAudio()}
 
           {isStudent && (!example.isKnown
             ? (

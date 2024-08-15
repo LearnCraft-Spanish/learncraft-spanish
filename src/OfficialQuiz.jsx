@@ -29,19 +29,55 @@ export default function OfficialQuiz({
   const { getAccessTokenSilently } = useAuth0()
 
   const rendered = useRef(false)
+  const currentAudio = useRef(null)
   const [examplesToReview, setExamplesToReview] = useState([])
   const [quizReady, setQuizReady] = useState(false)
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
-  const [languageShowing, setLanguageShowing] = useState('english')
+  const [answerShowing, setAnswerShowing] = useState(false)
   const [playing, setPlaying] = useState(false)
 
-  const whichAudio
-    = languageShowing === 'spanish' ? 'spanishAudioLa' : 'englishAudio'
+  const currentExample = examplesToReview[currentExampleNumber - 1]
 
-  const currentAudioUrl
-    = quizReady && examplesToReview[currentExampleNumber - 1]
-      ? examplesToReview[currentExampleNumber - 1][whichAudio]
-      : ''
+  const startWithSpanish = true
+  const spanishShowing = (startWithSpanish && !answerShowing) || (!startWithSpanish && answerShowing)
+
+  function hideAnswer() {
+    setAnswerShowing(false)
+  }
+
+  function toggleAnswer() {
+    setAnswerShowing(!answerShowing)
+  }
+
+  const spanishAudioUrl = currentExample.spanishAudioLa
+  const englishAudioUrl = currentExample.englishAudioLa
+
+  function spanishAudio() {
+    const audioElement
+          = (
+            <audio
+              ref={currentAudio}
+              src={spanishAudioUrl}
+            />
+          )
+    return audioElement
+  }
+
+  function englishAudio() {
+    const audioElement
+          = (
+            <audio
+              ref={currentAudio}
+              src={englishAudioUrl}
+            />
+          )
+    return audioElement
+  }
+
+  const audioActive = spanishShowing ? currentExample.spanishAudioLa : currentExample.englishAudioLa
+
+  const questionAudio = startWithSpanish ? spanishAudio : englishAudio
+  const answerAudio = startWithSpanish ? englishAudio : spanishAudio
 
   async function getExamplesForCurrentQuiz() {
     const quizToSearch
@@ -172,7 +208,7 @@ export default function OfficialQuiz({
     else {
       setCurrentExampleNumber(examplesToReview.length)
     }
-    setLanguageShowing('english')
+    hideAnswer()
     setPlaying(false)
   }
 
@@ -183,22 +219,9 @@ export default function OfficialQuiz({
     else {
       setCurrentExampleNumber(1)
     }
-    setLanguageShowing('english')
+    hideAnswer()
     setPlaying(false)
   }
-
-  /*
-  async function toggleLanguageShowing() {
-    if (languageShowing === 'spanish') {
-      setLanguageShowing('english')
-      setPlaying(false)
-    }
-    else {
-      setLanguageShowing('spanish')
-      setPlaying(false)
-    }
-  }
-  */
 
   async function addFlashcardAndUpdate(recordId) {
     const currentExample = examplesToReview.find(
@@ -255,8 +278,10 @@ export default function OfficialQuiz({
       {quizReady && (
         <div className="quiz">
           {makeQuizTitle()}
-          <FlashcardDisplay example={examplesToReview[currentExampleNumber - 1]} isStudent={activeStudent.role === ('student')} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} />
-          <QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} currentAudioUrl={currentAudioUrl} togglePlaying={togglePlaying} playing={playing} />
+          {answerShowing && answerAudio()}
+          {!answerShowing && questionAudio()}
+          <FlashcardDisplay example={currentExample} isStudent={activeStudent.role === ('student')} answerShowing={answerShowing} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} hideAnswer={hideAnswer} />
+          <QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} audioActive={audioActive} togglePlaying={togglePlaying} playing={playing} />
           <div className="buttonBox">
             <Link className="linkButton" to=".." onClick={makeMenuShow}>Back to Quizzes</Link>
             <MenuButton />

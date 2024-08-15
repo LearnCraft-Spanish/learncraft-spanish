@@ -88,9 +88,7 @@ export default function SimpleQuizApp({
     = languageShowing === 'spanish' ? 'spanishAudioLa' : 'englishAudio'
 
   const currentAudioUrl
-    = quizReady && examplesToReview[currentExampleNumber - 1]
-      ? examplesToReview[currentExampleNumber - 1][whichAudio]
-      : ''
+    = quizReady && examplesToReview[currentExampleNumber - 1]?.[whichAudio]
 
   async function removeFlashcardAndUpdate(exampleRecordId) {
     setLanguageShowing('english')
