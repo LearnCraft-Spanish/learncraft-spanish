@@ -37,7 +37,7 @@ export interface Flashcard {
   recordId: number
   spanishExample: string
   englishTranslation: string
-  spanglish: 'spanglish' | 'esp'
+  spanglish: string
   vocabIncluded: Array<string>
   allStudents: Array<string>
   englishAudio: string
