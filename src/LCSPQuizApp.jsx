@@ -19,7 +19,6 @@ export default function LCSPQuizApp({
   removeFlashcard,
   updateExamplesTable,
 }) {
-  console.log('rendering LCSPQuizApp')
   const navigate = useNavigate()
   const [quizCourse, setQuizCourse] = useState('lcsp')
   const [dataLoaded, setDataLoaded] = useState(false)
