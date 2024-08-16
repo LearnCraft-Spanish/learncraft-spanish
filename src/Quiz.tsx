@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import type { Flashcard } from './interfaceDefinitions'
 import FlashcardDisplay from './components/Flashcard'
 import QuizButtons from './components/QuizButtons'
 import QuizProgress from './components/QuizProgress'
@@ -17,7 +18,6 @@ export default function Quiz({
   addFlashcard,
   removeFlashcard,
   makeMenuShow,
-  
 
 }) {
   const [answerShowing, setAnswerShowing] = useState(false)
@@ -25,6 +25,15 @@ export default function Quiz({
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
   const currentAudio = useRef(null)
   const [playing, setPlaying] = useState(false)
+
+  // will need to second pass these variables:
+  //  i think startWithSpanish is supposted to be optionally passed in
+  const startWithSpanish = false
+  const spanishShowing = startWithSpanish !== answerShowing
+
+  function hideAnswer() {
+    setAnswerShowing(false)
+  }
 
   function toggleAnswer() {
     if (currentAudio.current) {
@@ -104,9 +113,9 @@ export default function Quiz({
     hideAnswer()
     setPlaying(false)
   }
-  async function removeFlashcardAndUpdate(recordId) {
+  async function removeFlashcardAndUpdate(recordId: number) {
     const currentExample = examplesToReview.find(
-      example => example.recordId === recordId,
+      (example: Flashcard) => example.recordId === recordId,
     )
     decrementExample()
     currentExample.isKnown = false
@@ -115,9 +124,9 @@ export default function Quiz({
       currentExample.isKnown = true
     }
   }
-  async function addFlashcardAndUpdate(recordId) {
+  async function addFlashcardAndUpdate(recordId: number) {
     const currentExample = examplesToReview.find(
-      example => example.recordId === recordId,
+      (example: Flashcard) => example.recordId === recordId,
     )
     incrementExample()
     currentExample.isKnown = true
@@ -162,5 +171,4 @@ export default function Quiz({
       )}
     </div>
   )
-
 }

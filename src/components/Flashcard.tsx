@@ -5,7 +5,7 @@ interface FlashcardProps {
   example: Flashcard
   isStudent: boolean
   answerShowing: boolean
-  startWithSpanish: boolean
+  startWithSpanish?: boolean
   addFlashcardAndUpdate: (recordId: number) => void
   removeFlashcardAndUpdate: (recordId: number) => void
   toggleAnswer: () => void
