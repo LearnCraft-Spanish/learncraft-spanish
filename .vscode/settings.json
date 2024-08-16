@@ -51,5 +51,6 @@
     "scss",
     "pcss",
     "postcss"
-  ]
+  ],
+  "testing.coverageToolbarEnabled": true
 }

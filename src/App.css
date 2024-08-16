@@ -246,16 +246,6 @@ button:hover, .linkButton:hover {
   cursor: pointer;
 }
 
-.spanishExample p, .englishTranslation p {
-  font-size: 18px;
-  text-align: center;
-}
-
-.spanishExample p {
-  font-weight: 600;
-  font-style: italic;
-}
-
 .englishFlashcardText {
   font-size: 18px;
   font-weight: 400;

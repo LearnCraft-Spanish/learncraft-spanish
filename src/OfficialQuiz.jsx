@@ -36,7 +36,7 @@ export default function OfficialQuiz({
 
   const currentExample = examplesToReview[currentExampleNumber - 1]
 
-  const startWithSpanish = true
+  const startWithSpanish = false
   const spanishShowing = startWithSpanish !== answerShowing
 
   function hideAnswer() {
@@ -44,11 +44,15 @@ export default function OfficialQuiz({
   }
 
   function toggleAnswer() {
+    if (currentAudio.current) {
+      currentAudio.current.currentTime = 0
+    }
+    setPlaying(false)
     setAnswerShowing(!answerShowing)
   }
 
   const spanishAudioUrl = currentExample?.spanishAudioLa
-  const englishAudioUrl = currentExample?.englishAudioLa
+  const englishAudioUrl = currentExample?.englishAudio
 
   function spanishAudio() {
     const audioElement
@@ -74,7 +78,7 @@ export default function OfficialQuiz({
     return audioElement
   }
 
-  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudioLa
+  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
 
   const questionAudio = startWithSpanish ? spanishAudio : englishAudio
   const answerAudio = startWithSpanish ? englishAudio : spanishAudio
@@ -163,7 +167,6 @@ export default function OfficialQuiz({
         }
       })
     }
-    // console.log(exampleArray)
     return exampleArray
   }, [studentExamples])
 
@@ -272,7 +275,7 @@ export default function OfficialQuiz({
           {makeQuizTitle()}
           {!answerShowing && questionAudio()}
           {answerShowing && answerAudio()}
-          <FlashcardDisplay example={currentExample} isStudent={activeStudent.role === ('student')} answerShowing={answerShowing} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} hideAnswer={hideAnswer} />
+          <FlashcardDisplay example={currentExample} isStudent={activeStudent.role === ('student')} startWithSpanish={startWithSpanish} answerShowing={answerShowing} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} hideAnswer={hideAnswer} />
           <QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} audioActive={audioActive} togglePlaying={togglePlaying} playing={playing} />
           <div className="buttonBox">
             <Link className="linkButton" to=".." onClick={makeMenuShow}>Back to Quizzes</Link>

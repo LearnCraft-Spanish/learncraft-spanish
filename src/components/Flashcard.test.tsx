@@ -32,7 +32,7 @@ function FlashcardEnglishFirst() {
 function FlashcardSpanishFirstAnswerShowing() {
   return <Flashcard example={example} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />
 }
-function FlashcardEnglishFirsAnswerShowing() {
+function FlashcardEnglishFirstAnswerShowing() {
   return <Flashcard example={example} isStudent answerShowing startWithSpanish={false} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />
 }
 
@@ -67,7 +67,7 @@ describe('component Flashcard', () => {
       expect(screen.queryByText('Hola')).toBeNull()
     })
     it('renders correctly, english first', () => {
-      render(<FlashcardEnglishFirsAnswerShowing />)
+      render(<FlashcardEnglishFirstAnswerShowing />)
       toggleAnswer()
       expect(screen.getByText('Hola')).toBeTruthy()
       expect(screen.queryByText('Hello')).toBeNull()

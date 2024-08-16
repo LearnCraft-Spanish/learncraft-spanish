@@ -42,7 +42,6 @@ export default function CourseQuizzes({
   const rendered = useRef(false)
 
   useEffect(() => {
-    console.log(1)
     if (!rendered.current) {
       rendered.current = true
 
@@ -53,7 +52,6 @@ export default function CourseQuizzes({
   }, [quizCourse, thisCourse, updateQuizCourseWithoutNavigate])
 
   useEffect(() => {
-    console.log(2)
     if (dataLoaded && !studentHasDefaultQuiz) {
       const firstQuiz = makeQuizList(quizCourse)[0]
       updateChosenQuiz(firstQuiz)
@@ -61,7 +59,6 @@ export default function CourseQuizzes({
   }, [dataLoaded, studentHasDefaultQuiz, quizCourse, makeQuizList, updateChosenQuiz])
 
   useEffect(() => {
-    console.log(3)
     if (quizReady && chosenQuiz) {
       navigate(chosenQuiz.toString())
     }
