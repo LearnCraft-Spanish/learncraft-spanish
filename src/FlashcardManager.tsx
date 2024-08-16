@@ -16,6 +16,7 @@ interface StudentExample {
 interface FlashcardManagerProps {
   examplesTable: Flashcard[]
   studentExamplesTable: StudentExample[]
+  flashcardDataComplete: boolean
   removeFlashcard: (recordId: number) => Promise<number>
   updateExamplesTable: () => void
 }
@@ -23,12 +24,11 @@ interface FlashcardManagerProps {
 function FlashcardManager({
   examplesTable,
   studentExamplesTable,
+  flashcardDataComplete,
   removeFlashcard,
   updateExamplesTable,
 }: FlashcardManagerProps) {
-  const [displayExamplesTable, setDisplayExamplesTable] = React.useState<
-    Flashcard[]
-  >([])
+  const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([])
 
   async function removeAndUpdate(recordId: number) {
     const filteredTable = displayExamplesTable.filter(
@@ -37,7 +37,7 @@ function FlashcardManager({
     )
     setDisplayExamplesTable(filteredTable)
     removeFlashcard(recordId).then((numberRemoved: number) => {
-      if (numberRemoved > 0) {
+      if (numberRemoved === 1) {
         return []
       }
       else {
@@ -106,15 +106,28 @@ function FlashcardManager({
             <h4>Spanish</h4>
           </div>
         )}
-        <button
-          type="button"
-          className="redButton"
-          value={item.recordId}
-          onClick={e =>
-            removeAndUpdate(Number.parseInt((e.target as HTMLButtonElement).value))}
-        >
-          Remove
-        </button>
+        {flashcardDataComplete
+          ? (
+              <button
+                type="button"
+                className="redButton"
+                value={item.recordId}
+                onClick={e =>
+                  removeAndUpdate(Number.parseInt((e.target as HTMLButtonElement).value))}
+              >
+                Remove
+              </button>
+            )
+          : (
+              <button
+                type="button"
+                className="redButton"
+                value={item.recordId}
+              >
+                Syncing...
+              </button>
+            )}
+
       </div>
     ))
     return finalTable
@@ -122,7 +135,7 @@ function FlashcardManager({
 
   useEffect(() => {
     setDisplayExamplesTable(examplesTable)
-  }, [examplesTable, studentExamplesTable])
+  }, [examplesTable])
 
   return (
     <div>

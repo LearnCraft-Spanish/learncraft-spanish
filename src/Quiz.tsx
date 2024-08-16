@@ -242,6 +242,9 @@ export default function Quiz({
       )
       if (exampleToAdd) {
         const exampleIndex = examplesToReview.indexOf(exampleToAdd)
+        if (exampleIndex < examplesToReview.length - 1) {
+          incrementExampleNumber()
+        }
         const updatedArray = [...examplesToReview]
         updatedArray[exampleIndex].isCollected = true
         setExamplesToReview(updatedArray)

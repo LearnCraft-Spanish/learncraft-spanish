@@ -33,11 +33,10 @@ export default function Menu({
   }, [])
 
   useEffect(() => {
-    if (!rendered && (userData.isAdmin || userData.role === 'student')) {
-      // console.log('resetting for menu mount')
+    if (!rendered.current && (activeStudent?.role === 'student')) {
       updateExamplesTable()
     }
-  }, [userData, updateExamplesTable])
+  }, [activeStudent, updateExamplesTable])
 
   return (
     rendered

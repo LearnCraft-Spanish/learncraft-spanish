@@ -45,6 +45,7 @@ function App({ SentryRoutes }) {
   const rendered = useRef(false) // Flag to make useEffect run only once
   const [menuReady, setMenuReady] = useState(false) // Flag to indicate that the user data has been loaded and the menu can be displayed
   const [flashcardDataComplete, setFlashcardDataComplete] = useState(false) // Flag to indicate that the flashcard data has been loaded and the flashcard apps can be displayed
+  const flashcardDataCompleteQueue = useRef(0) // Queue to hold functions that need to run after the flashcard data has been loaded
 
   // User data and active student
   const [qbUserData, setQbUserData] = useState({}) // The user data for the person using the app (if a student)
@@ -333,6 +334,7 @@ function App({ SentryRoutes }) {
   }, [activeStudent, programTable, updateSelectedProgram, updateSelectedLesson])
 
   const updateExamplesTableQuietly = useCallback(async () => {
+    flashcardDataCompleteQueue.current++
     if (qbUserData?.isAdmin) {
       try {
         const studentExampleData = await getActiveExamplesFromBackend(
@@ -342,7 +344,10 @@ function App({ SentryRoutes }) {
         ).then(result => result)
         examplesTable.current = studentExampleData.examples
         setStudentExamplesTable(studentExampleData.studentExamples)
-        setFlashcardDataComplete(true)
+        flashcardDataCompleteQueue.current--
+        if (flashcardDataCompleteQueue.current === 0) {
+          setFlashcardDataComplete(true)
+        }
       }
       catch (e) {
         console.error(e.message)
@@ -356,7 +361,10 @@ function App({ SentryRoutes }) {
         ).then(result => result)
         setStudentExamplesTable(userExampleData.studentExamples)
         examplesTable.current = userExampleData.examples
-        setFlashcardDataComplete(true)
+        flashcardDataCompleteQueue.current--
+        if (flashcardDataCompleteQueue.current === 0) {
+          setFlashcardDataComplete(true)
+        }
       }
       catch (e) {
         console.error(e.message)
@@ -581,7 +589,9 @@ function App({ SentryRoutes }) {
         setActiveStudent(qbUserData)
       }
       else {
-        setFlashcardDataComplete(true)
+        if (flashcardDataCompleteQueue.current === 0) {
+          setFlashcardDataComplete(true)
+        }
       }
       if (qbUserData?.isAdmin) {
         async function setupStudentList() {
@@ -748,6 +758,7 @@ function App({ SentryRoutes }) {
                       examplesTable={examplesTable.current}
                       studentExamplesTable={studentExamplesTable}
                       activeStudent={qbUserData}
+                      flashcardDataComplete={flashcardDataComplete}
                       removeFlashcard={removeFlashcardFromActiveStudent}
                       updateExamplesTable={updateExamplesTable}
                     />
