@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
 import FlashcardDisplay from './components/Flashcard'
@@ -17,6 +17,7 @@ interface QuizProps {
   isSrsQuiz?: boolean
   addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
+  cleanupFunction: () => void
 }
 
 function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
@@ -82,6 +83,7 @@ export default function Quiz({
   isSrsQuiz = false,
   addFlashcard,
   removeFlashcard,
+  cleanupFunction = () => {},
 
 }: QuizProps) {
   const location = useLocation()
@@ -274,7 +276,7 @@ export default function Quiz({
           playing={playing}
         />
         <div className="buttonBox">
-          {!isMainLocation && <Link className="linkButton" to="..">Back</Link>}
+          {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
           <MenuButton />
         </div>
         <QuizProgress

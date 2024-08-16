@@ -70,16 +70,6 @@ export default function CourseQuizzes({
 
       {dataLoaded && chosenQuiz && quizCourse !== 'lcsp' && !hideMenu && (
         <div className="quizSelector">
-          <div className="buttonBox">
-            <MenuButton />
-          </div>
-          <select
-            className="quizMenu"
-            value={chosenQuiz}
-            onChange={e => updateChosenQuiz(e.target.value)}
-          >
-            {makeQuizSelections()}
-          </select>
           <select
             className="quizMenu"
             value={quizCourse}
@@ -87,8 +77,18 @@ export default function CourseQuizzes({
           >
             {makeCourseList()}
           </select>
+          <select
+            className="quizMenu"
+            value={chosenQuiz}
+            onChange={e => updateChosenQuiz(e.target.value)}
+          >
+            {makeQuizSelections()}
+          </select>
           <div className="buttonBox">
             <button type="button" onClick={makeQuizReady}>Begin Review</button>
+          </div>
+          <div className="buttonBox">
+            <MenuButton />
           </div>
         </div>
       )}

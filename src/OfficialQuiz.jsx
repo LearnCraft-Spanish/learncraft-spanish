@@ -105,16 +105,20 @@ export default function OfficialQuiz({
   }, [quizReady, examplesToReview, makeMenuShow, navigate])
 
   return (
-    dataLoaded && quizReady && (
-      <Quiz
-        activeStudent={activeStudent}
-        examplesToParse={examplesToReview}
-        quizTitle={makeQuizTitle()}
-        studentExamples={studentExamples}
-        addFlashcard={addFlashcard}
-        makeMenuShow={makeMenuShow}
-        removeFlashcard={removeFlashcard}
-      />
-    )
+    <>
+      {!(dataLoaded && quizReady) && (<div>Loading...</div>)}
+      {dataLoaded && quizReady && (
+        <Quiz
+          activeStudent={activeStudent}
+          examplesToParse={examplesToReview}
+          quizTitle={makeQuizTitle()}
+          studentExamples={studentExamples}
+          addFlashcard={addFlashcard}
+          makeMenuShow={makeMenuShow}
+          removeFlashcard={removeFlashcard}
+          cleanupFunction={makeMenuShow}
+        />
+      )}
+    </>
   )
 }
