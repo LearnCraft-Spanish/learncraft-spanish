@@ -63,7 +63,7 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, st
         <div className="spanishExample" onClick={toggleAnswer}>
           {answerText()}
 
-          {isStudent && (!example.isKnown
+          {isStudent && (!example.isCollected
             ? (
                 <button
                   type="button"

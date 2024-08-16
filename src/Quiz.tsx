@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
 import FlashcardDisplay from './components/Flashcard'
@@ -17,7 +17,6 @@ interface QuizProps {
   isSrsQuiz?: boolean
   addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
-  makeMenuShow: () => void
 }
 
 function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
@@ -82,7 +81,6 @@ export default function Quiz({
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
   addFlashcard,
-  makeMenuShow,
   removeFlashcard,
 
 }: QuizProps) {
@@ -233,6 +231,7 @@ export default function Quiz({
       }
     }
   }
+
   async function addFlashcardAndUpdate(recordId: number) {
     if (!quizOnlyCollectedExamples && !isSrsQuiz) {
       const flashcardAddedPromise = addFlashcard(recordId)
@@ -254,33 +253,35 @@ export default function Quiz({
   }
 
   return (
-    <div className="quiz">
-      <h3>{quizTitle}</h3>
-      {!answerShowing && questionAudio()}
-      {answerShowing && answerAudio()}
-      <FlashcardDisplay
-        example={currentExample}
-        isStudent={activeStudent.role === ('student')}
-        answerShowing={answerShowing}
-        addFlashcardAndUpdate={addFlashcardAndUpdate}
-        removeFlashcardAndUpdate={removeFlashcardAndUpdate}
-        toggleAnswer={toggleAnswer}
-      />
-      <QuizButtons
-        decrementExample={decrementExampleNumber}
-        incrementExample={incrementExampleNumber}
-        audioActive={audioActive}
-        togglePlaying={togglePlaying}
-        playing={playing}
-      />
-      <div className="buttonBox">
-        {!isMainLocation && <Link className="linkButton" to=".." onClick={makeMenuShow}>Back</Link>}
-        <MenuButton />
+    examplesToReview.length > 0 && (
+      <div className="quiz">
+        <h3>{quizTitle}</h3>
+        {!answerShowing && questionAudio()}
+        {answerShowing && answerAudio()}
+        <FlashcardDisplay
+          example={currentExample}
+          isStudent={activeStudent.role === ('student')}
+          answerShowing={answerShowing}
+          addFlashcardAndUpdate={addFlashcardAndUpdate}
+          removeFlashcardAndUpdate={removeFlashcardAndUpdate}
+          toggleAnswer={toggleAnswer}
+        />
+        <QuizButtons
+          decrementExample={decrementExampleNumber}
+          incrementExample={incrementExampleNumber}
+          audioActive={audioActive}
+          togglePlaying={togglePlaying}
+          playing={playing}
+        />
+        <div className="buttonBox">
+          {!isMainLocation && <Link className="linkButton" to="..">Back</Link>}
+          <MenuButton />
+        </div>
+        <QuizProgress
+          currentExampleNumber={currentExampleNumber}
+          totalExamplesNumber={examplesToReview.length}
+        />
       </div>
-      <QuizProgress
-        currentExampleNumber={currentExampleNumber}
-        totalExamplesNumber={examplesToReview.length}
-      />
-    </div>
+    )
   )
 }

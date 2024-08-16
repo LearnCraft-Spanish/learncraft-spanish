@@ -1,6 +1,6 @@
 import './App.css'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
-import { Route, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import {
@@ -18,7 +18,6 @@ import {
 } from './BackendFetchFunctions'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
-import SimpleQuizApp from './SimpleQuizApp'
 import AudioQuiz from './AudioQuiz'
 import LoginButton from './components/LoginButton'
 import LogoutButton from './components/LogoutButton'
@@ -31,6 +30,7 @@ import FlashcardFinder from './FlashcardFinder'
 import CallbackPage from './CallbackPage'
 import Coaching from './Coaching'
 import FlashcardManager from './FlashcardManager'
+import Quiz from './Quiz'
 
 function App({ SentryRoutes }) {
   // initialize and destructure Auth0 hook and define audience
@@ -703,47 +703,56 @@ function App({ SentryRoutes }) {
             exact
             path="/allflashcards"
             element={
-              (qbUserData.role === 'student' || qbUserData.isAdmin) && (
-                <SimpleQuizApp
-                  updateBannerMessage={updateBannerMessage}
-                  updateExamplesTable={updateExamplesTable}
-                  activeStudent={activeStudent}
-                  examplesTable={examplesTable.current}
-                  studentExamplesTable={studentExamplesTable}
-                  removeFlashcard={removeFlashcardFromActiveStudent}
-                />
-              )
+              (activeStudent?.role === 'student' && studentExamplesTable.length > 0)
+                ? (
+                    <Quiz
+                      activeStudent={activeStudent}
+                      examplesToParse={examplesTable.current}
+                      quizTitle="My Flashcards"
+                      studentExamples={studentExamplesTable}
+                      quizOnlyCollectedExamples
+                      addFlashcard={addToActiveStudentFlashcards}
+                      makeMenuShow={() => navigate('..')}
+                      removeFlashcard={removeFlashcardFromActiveStudent}
+                    />
+                  )
+                : (<Navigate to="/" />)
             }
           />
+
           <Route
             exact
             path="/todaysflashcards"
             element={
-              (qbUserData.role === 'student' || qbUserData.isAdmin) && (
-                <SRSQuizApp
-                  flashcardDataComplete={flashcardDataComplete}
-                  updateExamplesTable={updateExamplesTable}
-                  activeStudent={activeStudent}
-                  examplesTable={examplesTable.current}
-                  studentExamplesTable={studentExamplesTable}
-                  removeFlashcard={removeFlashcardFromActiveStudent}
-                />
-              )
+              (activeStudent?.role === 'student' && studentExamplesTable.length > 0)
+                ? (
+                    <SRSQuizApp
+                      flashcardDataComplete={flashcardDataComplete}
+                      updateExamplesTable={updateExamplesTable}
+                      activeStudent={activeStudent}
+                      examplesTable={examplesTable.current}
+                      studentExamplesTable={studentExamplesTable}
+                      removeFlashcard={removeFlashcardFromActiveStudent}
+                    />
+                  )
+                : (<Navigate to="/" />)
             }
           />
           <Route
             exact
             path="/manage-flashcards"
             element={
-              (qbUserData.role === 'student' || qbUserData.isAdmin) && (
-                <FlashcardManager
-                  examplesTable={examplesTable.current}
-                  studentExamplesTable={studentExamplesTable}
-                  activeStudent={qbUserData}
-                  removeFlashcard={removeFlashcardFromActiveStudent}
-                  updateExamplesTable={updateExamplesTable}
-                />
-              )
+              (activeStudent?.role === 'student' && studentExamplesTable.length > 0)
+                ? (
+                    <FlashcardManager
+                      examplesTable={examplesTable.current}
+                      studentExamplesTable={studentExamplesTable}
+                      activeStudent={qbUserData}
+                      removeFlashcard={removeFlashcardFromActiveStudent}
+                      updateExamplesTable={updateExamplesTable}
+                    />
+                  )
+                : (<Navigate to="/" />)
             }
           />
           <Route
