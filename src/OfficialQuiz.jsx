@@ -1,12 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import './App.css'
 import { getQuizExamplesFromBackend } from './BackendFetchFunctions'
-import FlashcardDisplay from './components/Flashcard'
-import QuizButtons from './components/QuizButtons'
-import QuizProgress from './components/QuizProgress'
-import MenuButton from './components/MenuButton'
 
 import Quiz from './Quiz'
 
@@ -29,75 +25,75 @@ export default function OfficialQuiz({
   const navigate = useNavigate()
 
   const rendered = useRef(false)
-  const currentAudio = useRef(null)
+  // const currentAudio = useRef(null)
   const [examplesToReview, setExamplesToReview] = useState([])
   const [quizReady, setQuizReady] = useState(false)
-  const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
-  const [answerShowing, setAnswerShowing] = useState(false)
-  const [playing, setPlaying] = useState(false)
+  // const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
+  // const [answerShowing, setAnswerShowing] = useState(false)
+  // const [playing, setPlaying] = useState(false)
 
-  const currentExample = examplesToReview[currentExampleNumber - 1]
+  // const currentExample = examplesToReview[currentExampleNumber - 1]
 
-  const startWithSpanish = false
-  const spanishShowing = startWithSpanish !== answerShowing
+  // const startWithSpanish = false
+  // const spanishShowing = startWithSpanish !== answerShowing
 
-  function hideAnswer() {
-    setAnswerShowing(false)
-  }
+  // function hideAnswer() {
+  //   setAnswerShowing(false)
+  // }
 
-  function toggleAnswer() {
-    if (currentAudio.current) {
-      currentAudio.current.currentTime = 0
-    }
-    setPlaying(false)
-    setAnswerShowing(!answerShowing)
-  }
+  // function toggleAnswer() {
+  //   if (currentAudio.current) {
+  //     currentAudio.current.currentTime = 0
+  //   }
+  //   setPlaying(false)
+  //   setAnswerShowing(!answerShowing)
+  // }
 
-  const spanishAudioUrl = currentExample?.spanishAudioLa
-  const englishAudioUrl = currentExample?.englishAudio
+  // const spanishAudioUrl = currentExample?.spanishAudioLa
+  // const englishAudioUrl = currentExample?.englishAudio
 
-  function spanishAudio() {
-    const audioElement
-          = (
-            <audio
-              ref={currentAudio}
-              src={spanishAudioUrl}
-              onEnded={() => setPlaying(false)}
-            />
-          )
-    return audioElement
-  }
+  // function spanishAudio() {
+  //   const audioElement
+  //         = (
+  //           <audio
+  //             ref={currentAudio}
+  //             src={spanishAudioUrl}
+  //             onEnded={() => setPlaying(false)}
+  //           />
+  //         )
+  //   return audioElement
+  // }
 
-  function englishAudio() {
-    const audioElement
-          = (
-            <audio
-              ref={currentAudio}
-              src={englishAudioUrl}
-              onEnded={() => setPlaying(false)}
-            />
-          )
-    return audioElement
-  }
+  // function englishAudio() {
+  //   const audioElement
+  //         = (
+  //           <audio
+  //             ref={currentAudio}
+  //             src={englishAudioUrl}
+  //             onEnded={() => setPlaying(false)}
+  //           />
+  //         )
+  //   return audioElement
+  // }
 
-  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
+  // const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
 
-  const questionAudio = startWithSpanish ? spanishAudio : englishAudio
-  const answerAudio = startWithSpanish ? englishAudio : spanishAudio
+  // const questionAudio = startWithSpanish ? spanishAudio : englishAudio
+  // const answerAudio = startWithSpanish ? englishAudio : spanishAudio
 
-  const playCurrentAudio = useCallback(() => {
-    setPlaying(true)
-    currentAudio.current.play()
-  }, [currentAudio])
+  // const playCurrentAudio = useCallback(() => {
+  //   setPlaying(true)
+  //   currentAudio.current.play()
+  // }, [currentAudio])
 
-  const pauseCurrentAudio = useCallback(() => {
-    setPlaying(false)
-    currentAudio.current.pause()
-  }, [currentAudio])
+  // const pauseCurrentAudio = useCallback(() => {
+  //   setPlaying(false)
+  //   currentAudio.current.pause()
+  // }, [currentAudio])
 
-  const togglePlaying = useCallback(() => {
-    playing ? pauseCurrentAudio() : playCurrentAudio()
-  }, [playing, pauseCurrentAudio, playCurrentAudio])
+  // const togglePlaying = useCallback(() => {
+  //   playing ? pauseCurrentAudio() : playCurrentAudio()
+  // }, [playing, pauseCurrentAudio, playCurrentAudio])
 
   const getExamplesForCurrentQuiz = useCallback(async () => {
     const quizToSearch
@@ -137,97 +133,84 @@ export default function OfficialQuiz({
     }
   }
 
-  const tagAssignedExamples = useCallback((exampleArray) => {
-    if (studentExamples && exampleArray) {
-      exampleArray.forEach((example) => {
-        const getStudentExampleRecordId = () => {
-          const relatedStudentExample = studentExamples.find(
-            element => element.relatedExample === example.recordId,
-          )
-          return relatedStudentExample
-        }
-        if (getStudentExampleRecordId() !== undefined) {
-          example.isKnown = true
-        }
-        else {
-          example.isKnown = false
-        }
-      })
-    }
-    return exampleArray
-  }, [studentExamples])
+  // const tagAssignedExamples = useCallback((exampleArray) => {
+  //   if (studentExamples && exampleArray) {
+  //     exampleArray.forEach((example) => {
+  //       const getStudentExampleRecordId = () => {
+  //         const relatedStudentExample = studentExamples.find(
+  //           element => element.relatedExample === example.recordId,
+  //         )
+  //         return relatedStudentExample
+  //       }
+  //       if (getStudentExampleRecordId() !== undefined) {
+  //         example.isKnown = true
+  //       }
+  //       else {
+  //         example.isKnown = false
+  //       }
+  //     })
+  //   }
+  //   return exampleArray
+  // }, [studentExamples])
 
   const handleSetupQuiz = useCallback(() => {
     getExamplesForCurrentQuiz().then((examples) => {
       if (examples) {
-        const taggedByKnown = tagAssignedExamples(examples)
-        function randomize(array) {
-          const randomizedArray = []
-          const vanishingArray = [...array]
-          for (let i = 0; i < array.length; i++) {
-            const randIndex = Math.floor(Math.random() * vanishingArray.length)
-            const randomArrayItem = vanishingArray[randIndex]
-            vanishingArray.splice(randIndex, 1)
-            randomizedArray[i] = randomArrayItem
-          }
-          return randomizedArray
-        }
-        const randomizedQuizExamples = randomize(taggedByKnown)
-        setExamplesToReview(randomizedQuizExamples)
+        setExamplesToReview(examples)
         setQuizReady(true)
       }
       else {
         navigate('..')
       }
     })
-  }, [getExamplesForCurrentQuiz, navigate, tagAssignedExamples])
+  }, [getExamplesForCurrentQuiz, navigate])
 
-  function incrementExample() {
-    if (currentExampleNumber < examplesToReview.length) {
-      const newExampleNumber = currentExampleNumber + 1
-      setCurrentExampleNumber(newExampleNumber)
-    }
-    else {
-      setCurrentExampleNumber(examplesToReview.length)
-    }
-    hideAnswer()
-    setPlaying(false)
-  }
+  // function incrementExample() {
+  //   if (currentExampleNumber < examplesToReview.length) {
+  //     const newExampleNumber = currentExampleNumber + 1
+  //     setCurrentExampleNumber(newExampleNumber)
+  //   }
+  //   else {
+  //     setCurrentExampleNumber(examplesToReview.length)
+  //   }
+  //   hideAnswer()
+  //   setPlaying(false)
+  // }
 
-  function decrementExample() {
-    if (currentExampleNumber > 1) {
-      setCurrentExampleNumber(currentExampleNumber - 1)
-    }
-    else {
-      setCurrentExampleNumber(1)
-    }
-    hideAnswer()
-    setPlaying(false)
-  }
+  // function decrementExample() {
+  //   if (currentExampleNumber > 1) {
+  //     setCurrentExampleNumber(currentExampleNumber - 1)
+  //   }
+  //   else {
+  //     setCurrentExampleNumber(1)
+  //   }
+  //   hideAnswer()
+  //   setPlaying(false)
+  // }
 
-  async function addFlashcardAndUpdate(recordId) {
-    const currentExample = examplesToReview.find(
-      example => example.recordId === recordId,
-    )
-    incrementExample()
-    currentExample.isKnown = true
-    const flashcardAddedPromise = addFlashcard(recordId)
-    if (await flashcardAddedPromise !== 1) {
-      currentExample.isKnown = false
-    }
-  }
+  // async function addFlashcardAndUpdate(recordId) {
+  //   const currentExample = examplesToReview.find(
+  //     example => example.recordId === recordId,
+  //   )
+  //   incrementExample()
+  //   currentExample.isKnown = true
+  //   const flashcardAddedPromise = addFlashcard(recordId)
+  //   if (await flashcardAddedPromise !== 1) {
+  //     currentExample.isKnown = false
+  //   }
+  // }
 
-  async function removeFlashcardAndUpdate(recordId) {
-    const currentExample = examplesToReview.find(
-      example => example.recordId === recordId,
-    )
-    decrementExample()
-    currentExample.isKnown = false
-    const flashcardRemovedPromise = removeFlashcard(recordId)
-    if (await flashcardRemovedPromise !== 1) {
-      currentExample.isKnown = true
-    }
-  }
+  // async function removeFlashcardAndUpdate(recordId) {
+  //   const currentExample = examplesToReview.find(
+  //     example => example.recordId === recordId,
+  //   )
+  //   decrementExample()
+  //   currentExample.isKnown = false
+  //   const flashcardRemovedPromise = removeFlashcard(recordId)
+  //   if (await flashcardRemovedPromise !== 1) {
+  //     currentExample.isKnown = true
+  //   }
+  // }
 
   useEffect(() => {
     if (!rendered.current) {
@@ -254,7 +237,7 @@ export default function OfficialQuiz({
     }
   }, [quizReady, examplesToReview, makeMenuShow, navigate])
 
-  return (
+  // return (
   // <div>
   //   {dataLoaded && !quizReady && <h2>Loading Quiz...</h2>}
   //   {quizReady && (
@@ -273,7 +256,7 @@ export default function OfficialQuiz({
   //   )}
   // </div>
 
-    /*
+  /*
   activeStudent,
   examplesToParse,
   quizTitle,
@@ -285,14 +268,17 @@ export default function OfficialQuiz({
   makeMenuShow,
   removeFlashcard,
     */
-    <Quiz
-      activeStudent={activeStudent}
-      examplesToParse={examplesToReview}
-      quizTitle={makeQuizTitle()}
-      studentExamples={studentExamples}
-      addFlashcard={addFlashcard}
-      makeMenuShow={makeMenuShow}
-      removeFlashcard={removeFlashcard}
-    />
+  return (
+    dataLoaded && quizReady && (
+      <Quiz
+        activeStudent={activeStudent}
+        examplesToParse={examplesToReview}
+        quizTitle={makeQuizTitle()}
+        studentExamples={studentExamples}
+        addFlashcard={addFlashcard}
+        makeMenuShow={makeMenuShow}
+        removeFlashcard={removeFlashcard}
+      />
+    )
   )
 }
