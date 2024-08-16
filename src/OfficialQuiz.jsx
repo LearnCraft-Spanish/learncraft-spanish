@@ -8,6 +8,8 @@ import QuizButtons from './components/QuizButtons'
 import QuizProgress from './components/QuizProgress'
 import MenuButton from './components/MenuButton'
 
+import Quiz from './Quiz'
+
 export default function OfficialQuiz({
   activeStudent,
   addFlashcard,
@@ -128,25 +130,10 @@ export default function OfficialQuiz({
       const subtitle = thisQuizObject
         ? thisQuizObject.subtitle
         : quizNumberAsString
-      return (
-        <h3>
-          Ser/Estar Lesson
-          {' '}
-          {lessonNumber}
-          ,
-          {' '}
-          {subtitle}
-        </h3>
-      )
+      return `Ser/Estar Lesson ${lessonNumber}, ${subtitle}`
     }
     else {
-      return (
-        <h3>
-          {courseName}
-          {' Quiz '}
-          {thisQuiz}
-        </h3>
-      )
+      return `${courseName} Quiz ${thisQuiz}`
     }
   }
 
@@ -268,22 +255,44 @@ export default function OfficialQuiz({
   }, [quizReady, examplesToReview, makeMenuShow, navigate])
 
   return (
-    <div>
-      {dataLoaded && !quizReady && <h2>Loading Quiz...</h2>}
-      {quizReady && (
-        <div className="quiz">
-          {makeQuizTitle()}
-          {!answerShowing && questionAudio()}
-          {answerShowing && answerAudio()}
-          <FlashcardDisplay example={currentExample} isStudent={activeStudent.role === ('student')} startWithSpanish={startWithSpanish} answerShowing={answerShowing} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} hideAnswer={hideAnswer} />
-          <QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} audioActive={audioActive} togglePlaying={togglePlaying} playing={playing} />
-          <div className="buttonBox">
-            <Link className="linkButton" to=".." onClick={makeMenuShow}>Back to Quizzes</Link>
-            <MenuButton />
-          </div>
-          <QuizProgress currentExampleNumber={currentExampleNumber} totalExamplesNumber={examplesToReview.length} />
-        </div>
-      )}
-    </div>
+  // <div>
+  //   {dataLoaded && !quizReady && <h2>Loading Quiz...</h2>}
+  //   {quizReady && (
+  //     <div className="quiz">
+  //       {makeQuizTitle()}
+  //       {!answerShowing && questionAudio()}
+  //       {answerShowing && answerAudio()}
+  //       <FlashcardDisplay example={currentExample} isStudent={activeStudent.role === ('student')} startWithSpanish={startWithSpanish} answerShowing={answerShowing} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} hideAnswer={hideAnswer} />
+  //       <QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} audioActive={audioActive} togglePlaying={togglePlaying} playing={playing} />
+  //       <div className="buttonBox">
+  //         <Link className="linkButton" to=".." onClick={makeMenuShow}>Back to Quizzes</Link>
+  //         <MenuButton />
+  //       </div>
+  //       <QuizProgress currentExampleNumber={currentExampleNumber} totalExamplesNumber={examplesToReview.length} />
+  //     </div>
+  //   )}
+  // </div>
+
+    /*
+  activeStudent,
+  examplesToParse,
+  quizTitle,
+  startWithSpanish = false,
+  studentExamples,
+  quizOnlyCollectedExamples = false,
+  isSrsQuiz = false,
+  addFlashcard,
+  makeMenuShow,
+  removeFlashcard,
+    */
+    <Quiz
+      activeStudent={activeStudent}
+      examplesToParse={examplesToReview}
+      quizTitle={makeQuizTitle()}
+      studentExamples={studentExamples}
+      addFlashcard={addFlashcard}
+      makeMenuShow={makeMenuShow}
+      removeFlashcard={removeFlashcard}
+    />
   )
 }

@@ -1,35 +1,106 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
-import type { Flashcard } from './interfaceDefinitions'
+import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
 import FlashcardDisplay from './components/Flashcard'
 import QuizButtons from './components/QuizButtons'
 import QuizProgress from './components/QuizProgress'
 import MenuButton from './components/MenuButton'
 
+interface QuizProps {
+  quizTitle: string
+  examplesToParse: Flashcard[]
+  activeStudent: UserData
+  startWithSpanish?: boolean
+  studentExamples: StudentExample[]
+  quizOnlyCollectedExamples?: boolean
+  isSrsQuiz?: boolean
+  addFlashcard: (recordId: number) => Promise<number>
+  removeFlashcard: (recordId: number) => Promise<number>
+  makeMenuShow: () => void
+}
+
+function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
+  function tagAssignedExamples() {
+    exampleArray.forEach((example) => {
+      const getStudentExampleRecordId = () => {
+        const relatedStudentExample = studentExampleArray.find(
+          element => element.relatedExample === example.recordId,
+        )
+        return relatedStudentExample
+      }
+      if (getStudentExampleRecordId() !== undefined) {
+        example.isCollected = true
+      }
+      else {
+        example.isCollected = false
+      }
+    })
+    return exampleArray
+  }
+
+  const taggedByCollected = tagAssignedExamples()
+
+  function filterIfCollectedOnly() {
+    if (quizOnlyCollectedExamples || isSrsQuiz) {
+      const filteredList = taggedByCollected.filter(
+        example => example.isCollected,
+      )
+      return filteredList
+    }
+    else {
+      return taggedByCollected
+    }
+  }
+
+  const completeListBeforeRandomization = filterIfCollectedOnly()
+
+  function randomize(array: Flashcard[]) {
+    const randomizedArray = []
+    const vanishingArray = [...array]
+    for (let i = 0; i < array.length; i++) {
+      const randIndex = Math.floor(Math.random() * vanishingArray.length)
+      const randomArrayItem = vanishingArray[randIndex]
+      vanishingArray.splice(randIndex, 1)
+      randomizedArray[i] = randomArrayItem
+    }
+    return randomizedArray
+  }
+
+  const randomizedQuizExamples = randomize(completeListBeforeRandomization)
+  return randomizedQuizExamples
+}
+
 // removeFlashcardAndUpdate
 // addFlashcardAndUpdate
 export default function Quiz({
-  dataLoaded,
-  quizReady,
-  makeQuizTitle,
-  examplesToReview,
   activeStudent,
+  examplesToParse,
+  quizTitle,
+  startWithSpanish = false,
+  studentExamples,
+  quizOnlyCollectedExamples = false,
+  isSrsQuiz = false,
   addFlashcard,
-  removeFlashcard,
   makeMenuShow,
+  removeFlashcard,
 
-}) {
+}: QuizProps) {
+  const location = useLocation()
+
+  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentExamples, quizOnlyCollectedExamples, isSrsQuiz))
   const [answerShowing, setAnswerShowing] = useState(false)
-  const [currentExample, setCurrentExample] = useState(examplesToReview[0])
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
-  const currentAudio = useRef(null)
+  const currentAudio = useRef<HTMLAudioElement | null>(null)
   const [playing, setPlaying] = useState(false)
 
+  // This is copied from OfficialQuiz, I think it might be causing excessive rerenders
+  const currentExample = examplesToReview[currentExampleNumber - 1]
+
   // will need to second pass these variables:
-  //  i think startWithSpanish is supposted to be optionally passed in
-  const startWithSpanish = false
   const spanishShowing = startWithSpanish !== answerShowing
+
+  const isMainLocation = location.pathname.split('/').length < 2
 
   function hideAnswer() {
     setAnswerShowing(false)
@@ -42,6 +113,7 @@ export default function Quiz({
     setPlaying(false)
     setAnswerShowing(!answerShowing)
   }
+
   /*      Audio Component Section       */
 
   const spanishAudioUrl = currentExample?.spanishAudioLa
@@ -78,20 +150,29 @@ export default function Quiz({
 
   const playCurrentAudio = useCallback(() => {
     setPlaying(true)
-    currentAudio.current.play()
+    if (currentAudio.current) {
+      currentAudio.current.play()
+    }
   }, [currentAudio])
 
   const pauseCurrentAudio = useCallback(() => {
     setPlaying(false)
-    currentAudio.current.pause()
+    if (currentAudio.current) {
+      currentAudio.current.pause()
+    }
   }, [currentAudio])
 
   const togglePlaying = useCallback(() => {
-    playing ? pauseCurrentAudio() : playCurrentAudio()
+    if (playing) {
+      pauseCurrentAudio()
+    }
+    else {
+      playCurrentAudio()
+    }
   }, [playing, pauseCurrentAudio, playCurrentAudio])
 
   /*     Add/Remove Flashcard Section       */
-  function incrementExample() {
+  function incrementExampleNumber() {
     if (currentExampleNumber < examplesToReview.length) {
       const newExampleNumber = currentExampleNumber + 1
       setCurrentExampleNumber(newExampleNumber)
@@ -103,7 +184,7 @@ export default function Quiz({
     setPlaying(false)
   }
 
-  function decrementExample() {
+  function decrementExampleNumber() {
     if (currentExampleNumber > 1) {
       setCurrentExampleNumber(currentExampleNumber - 1)
     }
@@ -113,62 +194,93 @@ export default function Quiz({
     hideAnswer()
     setPlaying(false)
   }
+
   async function removeFlashcardAndUpdate(recordId: number) {
-    const currentExample = examplesToReview.find(
+    const flashcardRemovedPromise = removeFlashcard(recordId)
+    const exampleToRemove = examplesToReview.find(
       (example: Flashcard) => example.recordId === recordId,
     )
-    decrementExample()
-    currentExample.isKnown = false
-    const flashcardRemovedPromise = removeFlashcard(recordId)
-    if (await flashcardRemovedPromise !== 1) {
-      currentExample.isKnown = true
+    if (exampleToRemove) {
+      const exampleIndex = examplesToReview.indexOf(exampleToRemove)
+      if (quizOnlyCollectedExamples || isSrsQuiz) {
+        if (exampleIndex === examplesToReview.length - 1) {
+          decrementExampleNumber()
+        }
+        const filteredArray = [...examplesToReview].filter(
+          example => example.recordId !== recordId,
+        )
+        setExamplesToReview(filteredArray)
+        flashcardRemovedPromise.then((result) => {
+          if (result !== 1) {
+            const updatedArray = [...examplesToReview]
+            updatedArray.splice(exampleIndex, 0, exampleToRemove)
+            setExamplesToReview(updatedArray)
+          }
+        })
+      }
+      else {
+        const updatedArray = [...examplesToReview]
+        updatedArray[exampleIndex].isCollected = false
+        setExamplesToReview(updatedArray)
+        flashcardRemovedPromise
+          .then((result) => {
+            if (result !== 1) {
+              const updatedArray = [...examplesToReview]
+              updatedArray[exampleIndex].isCollected = true
+              setExamplesToReview(updatedArray)
+            }
+          })
+      }
     }
   }
   async function addFlashcardAndUpdate(recordId: number) {
-    const currentExample = examplesToReview.find(
-      (example: Flashcard) => example.recordId === recordId,
-    )
-    incrementExample()
-    currentExample.isKnown = true
-    const flashcardAddedPromise = addFlashcard(recordId)
-    if (await flashcardAddedPromise !== 1) {
-      currentExample.isKnown = false
+    if (!quizOnlyCollectedExamples && !isSrsQuiz) {
+      const flashcardAddedPromise = addFlashcard(recordId)
+      const exampleToAdd = examplesToReview.find(
+        (example: Flashcard) => example.recordId === recordId,
+      )
+      if (exampleToAdd) {
+        const exampleIndex = examplesToReview.indexOf(exampleToAdd)
+        const updatedArray = [...examplesToReview]
+        updatedArray[exampleIndex].isCollected = true
+        setExamplesToReview(updatedArray)
+        if (await flashcardAddedPromise !== 1) {
+          const updatedArray = [...examplesToReview]
+          updatedArray[exampleIndex].isCollected = false
+          setExamplesToReview(updatedArray)
+        }
+      }
     }
   }
 
   return (
-    <div>
-      {dataLoaded && !quizReady && <h2>Loading Quiz...</h2>}
-      {quizReady && (
-        <div className="quiz">
-          {makeQuizTitle()}
-          {!answerShowing && questionAudio()}
-          {answerShowing && answerAudio()}
-          <FlashcardDisplay
-            example={currentExample}
-            isStudent={activeStudent.role === ('student')}
-            answerShowing={answerShowing}
-            addFlashcardAndUpdate={addFlashcardAndUpdate}
-            removeFlashcardAndUpdate={removeFlashcardAndUpdate}
-            toggleAnswer={toggleAnswer}
-          />
-          <QuizButtons
-            decrementExample={decrementExample}
-            incrementExample={incrementExample}
-            audioActive={audioActive}
-            togglePlaying={togglePlaying}
-            playing={playing}
-          />
-          <div className="buttonBox">
-            <Link className="linkButton" to=".." onClick={makeMenuShow}>Back to Quizzes</Link>
-            <MenuButton />
-          </div>
-          <QuizProgress
-            currentExampleNumber={currentExampleNumber}
-            totalExamplesNumber={examplesToReview.length}
-          />
-        </div>
-      )}
+    <div className="quiz">
+      <h3>{quizTitle}</h3>
+      {!answerShowing && questionAudio()}
+      {answerShowing && answerAudio()}
+      <FlashcardDisplay
+        example={currentExample}
+        isStudent={activeStudent.role === ('student')}
+        answerShowing={answerShowing}
+        addFlashcardAndUpdate={addFlashcardAndUpdate}
+        removeFlashcardAndUpdate={removeFlashcardAndUpdate}
+        toggleAnswer={toggleAnswer}
+      />
+      <QuizButtons
+        decrementExample={decrementExampleNumber}
+        incrementExample={incrementExampleNumber}
+        audioActive={audioActive}
+        togglePlaying={togglePlaying}
+        playing={playing}
+      />
+      <div className="buttonBox">
+        {!isMainLocation && <Link className="linkButton" to=".." onClick={makeMenuShow}>Back</Link>}
+        <MenuButton />
+      </div>
+      <QuizProgress
+        currentExampleNumber={currentExampleNumber}
+        totalExamplesNumber={examplesToReview.length}
+      />
     </div>
   )
 }

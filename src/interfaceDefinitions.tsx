@@ -43,7 +43,7 @@ export interface Flashcard {
   englishAudio: string
   spanishAudioLa: string
   vocabComplete: boolean
-  isKnown: boolean
+  isCollected: boolean
 }
 
 export interface StudentExample {
