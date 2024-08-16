@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react'
-import ReactHowler from 'react-howler'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import {
@@ -8,7 +7,13 @@ import {
 } from './BackendFetchFunctions'
 import './App.css'
 import MenuButton from './components/MenuButton'
+import QuizButtons from './components/QuizButtons'
+import QuizProgress from './components/QuizProgress'
+import FlashcardDisplay from './components/Flashcard'
 
+// TODO:
+// - Refactor SRSQuizApp to use the new .isCollected prop instead of .isKnown
+//      - this is implemented in Quiz.tsx, just need to modify this file to match Quiz.tsx
 export default function SRSQuizApp({
   flashcardDataComplete,
   roles,
@@ -29,18 +34,83 @@ export default function SRSQuizApp({
   const currentExample = examplesToReview[currentExampleNumber - 1]
   const [difficultySettable, setDifficultySettable] = useState(true)
 
-  function togglePlaying() {
+  const [answerShowing, setAnswerShowing] = useState(false)
+  const startWithSpanish = false
+  const currentAudio = useRef(null)
+  const spanishShowing = startWithSpanish !== answerShowing
+
+  function hideAnswer() {
+    setAnswerShowing(false)
+  }
+
+  function toggleAnswer() {
+    if (currentAudio.current) {
+      currentAudio.current.currentTime = 0
+    }
+    setPlaying(false)
+    setAnswerShowing(!answerShowing)
+  }
+
+  const spanishAudioUrl = currentExample?.spanishAudioLa
+  const englishAudioUrl = currentExample?.englishAudio
+
+  function spanishAudio() {
+    const audioElement
+            = (
+              <audio
+                ref={currentAudio}
+                src={spanishAudioUrl}
+                onEnded={() => setPlaying(false)}
+              />
+            )
+    return audioElement
+  }
+
+  function englishAudio() {
+    const audioElement
+            = (
+              <audio
+                ref={currentAudio}
+                src={englishAudioUrl}
+                onEnded={() => setPlaying(false)}
+              />
+            )
+    return audioElement
+  }
+
+  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
+
+  const questionAudio = startWithSpanish ? spanishAudio : englishAudio
+  const answerAudio = startWithSpanish ? englishAudio : spanishAudio
+
+  const playCurrentAudio = useCallback(() => {
+    setPlaying(true)
+    if (currentAudio.current) {
+      currentAudio.current.play()
+    }
+  }, [currentAudio])
+
+  const pauseCurrentAudio = useCallback(() => {
+    setPlaying(false)
+    if (currentAudio.current) {
+      currentAudio.current.pause()
+    }
+  }, [currentAudio])
+
+  const togglePlaying = useCallback(() => {
     if (playing) {
-      setPlaying(false)
+      pauseCurrentAudio()
     }
     else {
-      setPlaying(true)
+      playCurrentAudio()
     }
-  }
+  }, [playing, pauseCurrentAudio, playCurrentAudio])
 
   function incrementExample() {
     setCurrentExampleNumber(currentExampleNumber + 1)
-    setLanguageShowing('english')
+
+    // setLanguageShowing('english')
+    hideAnswer()
     setPlaying(false)
   }
 
@@ -51,7 +121,9 @@ export default function SRSQuizApp({
     else {
       setCurrentExampleNumber(1)
     }
-    setLanguageShowing('english')
+
+    // setLanguageShowing('english')
+    hideAnswer()
     setPlaying(false)
   }
 
@@ -215,13 +287,6 @@ export default function SRSQuizApp({
     setExamplesToReview(examplesWithDifficulty)
     setQuizReady(true)
   }
-
-  const whichAudio
-    = languageShowing === 'spanish' ? 'spanishAudioLa' : 'englishAudio'
-
-  const currentAudioUrl
-    = quizReady && currentExample ? currentExample[whichAudio] : ''
-
   useEffect(() => {
     if (currentExample?.difficulty === 'unset') {
       // console.log(currentExample.difficulty)
@@ -262,41 +327,16 @@ export default function SRSQuizApp({
         {/* Quiz App */}
         {examplesToReview[currentExampleNumber - 1] && quizReady && (
           <div className="quiz">
-            <div className="exampleBox">
-              <div
-                style={{
-                  display: languageShowing === 'english' ? 'flex' : 'none',
-                }}
-                className="englishTranslation"
-                onClick={toggleLanguageShowing}
-              >
-                <p>{currentExample ? currentExample.englishTranslation : ''}</p>
-              </div>
-              <div
-                style={{
-                  display: languageShowing === 'spanish' ? 'flex' : 'none',
-                }}
-                className="spanishExample"
-                onClick={toggleLanguageShowing}
-              >
-                <p>{currentExample ? currentExample.spanishExample : ''}</p>
-                <button
-                  type="button"
-                  className="removeFlashcardButton"
-                  onClick={() => deleteFlashcard(currentExample.recordId)}
-                >
-                  Remove from My Flashcards
-                </button>
-              </div>
-              <ReactHowler
-                src={
-                  currentAudioUrl === ''
-                    ? 'https://mom-academic.s3.us-east-2.amazonaws.com/dbexamples/example+1+spanish+LA.mp3'
-                    : currentAudioUrl
-                }
-                playing={playing}
-              />
-            </div>
+            {!answerShowing && questionAudio()}
+            {answerShowing && answerAudio()}
+            <FlashcardDisplay
+              example={currentExample}
+              isStudent
+              answerShowing={answerShowing}
+              startWithSpanish={startWithSpanish}
+              removeFlashcardAndUpdate={deleteFlashcard}
+              toggleAnswer={toggleAnswer}
+            />
             <div className="quizControls">
               <div className="buttonBox">
                 <button
@@ -304,7 +344,7 @@ export default function SRSQuizApp({
                   className="redButton"
                   style={{
                     display:
-                      languageShowing === 'spanish' && difficultySettable
+                      spanishShowing && difficultySettable
                         ? 'block'
                         : 'none',
                   }}
@@ -317,7 +357,7 @@ export default function SRSQuizApp({
                   className="greenButton"
                   style={{
                     display:
-                      languageShowing === 'spanish' && difficultySettable
+                      spanishShowing && difficultySettable
                         ? 'block'
                         : 'none',
                   }}
@@ -352,31 +392,21 @@ export default function SRSQuizApp({
                   Labeled: Easy
                 </button>
               </div>
-              <div className="buttonBox">
-                <button type="button" onClick={decrementExample}>Previous</button>
-                <button
-                  type="button"
-                  style={{ display: currentAudioUrl === '' ? 'none' : 'block' }}
-                  onClick={togglePlaying}
-                >
-                  Play/Pause Audio
-                </button>
-                <button type="button" onClick={incrementExample}>Next</button>
-              </div>
+              {/* QuizButtons: Will need audio props passed in when it is set up */}
+              <QuizButtons
+                decrementExample={decrementExample}
+                incrementExample={incrementExample}
+                togglePlaying={togglePlaying}
+                audioActive={audioActive}
+                playing={playing}
+              />
               <div className="buttonBox">
                 <MenuButton />
               </div>
-              <div className="progressBar2">
-                <div className="progressBarDescription">
-                  Flashcard
-                  {' '}
-                  {currentExampleNumber}
-                  {' '}
-                  of
-                  {' '}
-                  {examplesToReview.length}
-                </div>
-              </div>
+              <QuizProgress
+                currentExampleNumber={currentExampleNumber}
+                totalExamplesNumber={examplesToReview.length}
+              />
             </div>
           </div>
         )}
