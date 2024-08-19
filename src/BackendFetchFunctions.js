@@ -346,19 +346,15 @@ export async function updateMyStudentExample(tokenPromise, updateId, newInterval
     updateId,
     newInterval,
   }
-  // console.log(headers)
   const fetchUrl = `${backendUrl}update-my-student-example`
-  // console.log(`Fetching ${fetchUrl}`)
   const messageFromBackend = await fetch(fetchUrl, {
     method: 'POST',
     headers,
   })
     .then((res) => {
+      console.log(res)
       if (res.ok) {
-        return res.json().then((res) => {
-          const data = res
-          return data
-        })
+        return res.json()
       }
     })
     .catch(e => console.error(e))
@@ -380,11 +376,9 @@ export async function updateStudentExample(tokenPromise, updateId, newInterval) 
     headers,
   })
     .then((res) => {
+      console.log(res)
       if (res.ok) {
-        return res.json().then((res) => {
-          const data = res
-          return data
-        })
+        return res.json()
       }
     })
     .catch(e => console.error(e))

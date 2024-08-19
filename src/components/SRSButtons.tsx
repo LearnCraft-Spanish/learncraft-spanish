@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { send } from 'vite'
+import { c } from 'vite/dist/node/types.d-aGj9QkWt'
 import type { Flashcard, StudentExample, UserData } from '../interfaceDefinitions'
 import {
   updateMyStudentExample,
@@ -19,27 +20,24 @@ interface QuizButtonsProps {
 }
 
 export default function SRSQuizButtons({ currentExample, studentExamples, userData, answerShowing, updateExampleDifficulty, updateExampleDifficultySettable, incrementExampleNumber, getAccessToken }: QuizButtonsProps) {
+  console.log(currentExample)
   async function sendUpdate(exampleId: number, newInterval: number) {
-    try {
-      if (userData?.role?.includes('admin')) {
-        const updateReturn = await updateStudentExample(
-          getAccessToken(),
-          exampleId,
-          newInterval,
-        )
-        return updateReturn
-      }
-      else if (userData?.role?.includes('student')) {
-        const updateReturn = await updateMyStudentExample(
-          getAccessToken(),
-          exampleId,
-          newInterval,
-        )
-        return updateReturn
-      }
+    if (userData.isAdmin) {
+      return await updateStudentExample(
+        getAccessToken(),
+        exampleId,
+        newInterval,
+      )
     }
-    catch (e) {
-      console.error(e)
+    else if (userData.role === 'student') {
+      return await updateMyStudentExample(
+        getAccessToken(),
+        exampleId,
+        newInterval,
+      )
+    }
+    else {
+      return null
     }
   }
 
@@ -75,13 +73,13 @@ export default function SRSQuizButtons({ currentExample, studentExamples, userDa
     updateExampleDifficultySettable(exampleId, false)
     incrementExampleNumber()
     const newInterval = (currentInterval > 0) ? currentInterval - 1 : 0
-    const updatePromise = sendUpdate(exampleId, newInterval)
-    updatePromise.then((response) => {
+    const updateStatus = sendUpdate(exampleId, newInterval)
+    updateStatus.then((response) => {
       console.log(response)
     })
   }
 
-  function decreaseDifficulty() {
+  async function decreaseDifficulty() {
     const exampleId = getStudentExampleFromExample(currentExample)?.recordId
     const currentInterval = getIntervalFromExample(currentExample)
     if (exampleId === undefined) {
@@ -91,8 +89,8 @@ export default function SRSQuizButtons({ currentExample, studentExamples, userDa
     updateExampleDifficultySettable(exampleId, false)
     incrementExampleNumber()
     const newInterval = currentInterval + 1
-    const updatePromise = sendUpdate(exampleId, newInterval)
-    updatePromise.then((response) => {
+    const updateStatus = sendUpdate(exampleId, newInterval)
+    updateStatus.then((response) => {
       console.log(response)
     })
   }

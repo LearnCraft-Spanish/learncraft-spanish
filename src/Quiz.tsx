@@ -16,12 +16,12 @@ interface QuizProps {
   studentExamples: StudentExample[]
   quizOnlyCollectedExamples?: boolean
   isSrsQuiz?: boolean
-  addFlashcard: (recordId: number) => Promise<number> | null
+  userData: UserData
+  addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
-  cleanupFunction: () => void
+  cleanupFunction?: () => void
   // Fix Function Def!!!
-  getAccessToken?: () => string
-
+  getAccessToken: () => string
 }
 
 function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
@@ -50,6 +50,12 @@ function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: Stude
       const filteredList = taggedByCollected.filter(
         example => example.isCollected,
       )
+      if (isSrsQuiz) {
+        filteredList.forEach((example) => {
+          example.difficultySettable = true
+          example.difficulty = ''
+        })
+      }
       return filteredList
     }
     else {
@@ -85,10 +91,11 @@ export default function Quiz({
   studentExamples,
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
+  userData,
   addFlashcard,
   removeFlashcard,
   cleanupFunction = () => {},
-  getAccessToken = () => {},
+  getAccessToken,
 
 }: QuizProps) {
   const location = useLocation()
@@ -262,14 +269,7 @@ export default function Quiz({
     }
   }
 
-  /*    SRS Setup Section       */
-  function setupSRS() {
-    const newArray = [...examplesToReview]
-    newArray.forEach((example) => {
-      example.difficultySettable = true
-      example.difficulty = ''
-    })
-  }
+  /*    SRS Update Section       */
 
   function updateExampleDifficulty(recordId: number, difficulty: string) {
     const newArray = [...examplesToReview]
@@ -314,7 +314,7 @@ export default function Quiz({
           <SRSQuizButtons
             currentExample={currentExample}
             studentExamples={studentExamples}
-            userData={activeStudent}
+            userData={userData}
             answerShowing={answerShowing}
             updateExampleDifficulty={updateExampleDifficulty}
             updateExampleDifficultySettable={updateExampleDifficultySettable}

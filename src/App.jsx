@@ -737,6 +737,7 @@ function App({ SentryRoutes }) {
               (activeStudent?.role === 'student' && studentExamplesTable.length > 0)
                 ? (
                     <SRSQuizApp
+                      userData={qbUserData}
                       flashcardDataComplete={flashcardDataComplete}
                       updateExamplesTable={updateExamplesTable}
                       activeStudent={activeStudent}
@@ -744,7 +745,6 @@ function App({ SentryRoutes }) {
                       studentExamplesTable={studentExamplesTable}
                       removeFlashcard={removeFlashcardFromActiveStudent}
                       getAccessToken={getAccessToken}
-
                     />
                   )
                 : (<Navigate to="/" />)
