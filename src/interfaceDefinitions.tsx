@@ -108,6 +108,12 @@ export interface Quiz {
   quizName: string
 }
 
+export interface Spelling {
+  relatedWordidion: number
+  spellingOption: string
+}
+
+/*      Coaching Interfaces      */
 export interface Coach {
   recordId: number
   coach: string
