@@ -44,6 +44,9 @@ export interface Flashcard {
   spanishAudioLa: string
   vocabComplete: boolean
   isCollected: boolean
+  difficulty: string
+  difficultySettable: boolean
+
 }
 
 export interface StudentExample {

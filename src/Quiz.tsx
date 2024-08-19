@@ -6,6 +6,7 @@ import FlashcardDisplay from './components/Flashcard'
 import QuizButtons from './components/QuizButtons'
 import QuizProgress from './components/QuizProgress'
 import MenuButton from './components/MenuButton'
+import SRSQuizButtons from './components/SRSButtons'
 
 interface QuizProps {
   quizTitle: string
@@ -15,9 +16,12 @@ interface QuizProps {
   studentExamples: StudentExample[]
   quizOnlyCollectedExamples?: boolean
   isSrsQuiz?: boolean
-  addFlashcard: (recordId: number) => Promise<number>
+  addFlashcard: (recordId: number) => Promise<number> | null
   removeFlashcard: (recordId: number) => Promise<number>
   cleanupFunction: () => void
+  // Fix Function Def!!!
+  getAccessToken?: () => string
+
 }
 
 function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
@@ -84,6 +88,7 @@ export default function Quiz({
   addFlashcard,
   removeFlashcard,
   cleanupFunction = () => {},
+  getAccessToken = () => {},
 
 }: QuizProps) {
   const location = useLocation()
@@ -257,6 +262,39 @@ export default function Quiz({
     }
   }
 
+  /*    SRS Setup Section       */
+  function setupSRS() {
+    const newArray = [...examplesToReview]
+    newArray.forEach((example) => {
+      example.difficultySettable = true
+      example.difficulty = ''
+    })
+  }
+
+  function updateExampleDifficulty(recordId: number, difficulty: string) {
+    const newArray = [...examplesToReview]
+    const exampleToUpdate = newArray.find(
+      example => example.recordId === recordId,
+    )
+    if (exampleToUpdate) {
+      const exampleIndex = newArray.indexOf(exampleToUpdate)
+      newArray[exampleIndex].difficulty = difficulty
+      setExamplesToReview(newArray)
+    }
+  }
+
+  function updateExampleDifficultySettable(recordId: number, difficultySettable: boolean) {
+    const newArray = [...examplesToReview]
+    const exampleToUpdate = newArray.find(
+      example => example.recordId === recordId,
+    )
+    if (exampleToUpdate) {
+      const exampleIndex = newArray.indexOf(exampleToUpdate)
+      newArray[exampleIndex].difficultySettable = difficultySettable
+      setExamplesToReview(newArray)
+    }
+  }
+
   return (
     examplesToReview.length > 0 && (
       <div className="quiz">
@@ -271,6 +309,20 @@ export default function Quiz({
           removeFlashcardAndUpdate={removeFlashcardAndUpdate}
           toggleAnswer={toggleAnswer}
         />
+
+        {isSrsQuiz && (
+          <SRSQuizButtons
+            currentExample={currentExample}
+            studentExamples={studentExamples}
+            userData={activeStudent}
+            answerShowing={answerShowing}
+            updateExampleDifficulty={updateExampleDifficulty}
+            updateExampleDifficultySettable={updateExampleDifficultySettable}
+            incrementExampleNumber={incrementExampleNumber}
+            getAccessToken={getAccessToken}
+
+          />
+        )}
         <QuizButtons
           decrementExample={decrementExampleNumber}
           incrementExample={incrementExampleNumber}

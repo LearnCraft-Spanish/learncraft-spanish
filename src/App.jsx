@@ -743,6 +743,8 @@ function App({ SentryRoutes }) {
                       examplesTable={examplesTable.current}
                       studentExamplesTable={studentExamplesTable}
                       removeFlashcard={removeFlashcardFromActiveStudent}
+                      getAccessToken={getAccessToken}
+
                     />
                   )
                 : (<Navigate to="/" />)

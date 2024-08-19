@@ -114,7 +114,7 @@ export default function OfficialQuiz({
           quizTitle={makeQuizTitle()}
           studentExamples={studentExamples}
           addFlashcard={addFlashcard}
-          makeMenuShow={makeMenuShow}
+          // makeMenuShow={makeMenuShow}
           removeFlashcard={removeFlashcard}
           cleanupFunction={makeMenuShow}
         />
