@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import { c } from 'vite/dist/node/types.d-aGj9QkWt'
 import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
 import FlashcardDisplay from './components/Flashcard'
 import QuizButtons from './components/QuizButtons'
@@ -52,7 +53,6 @@ function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: Stude
       )
       if (isSrsQuiz) {
         filteredList.forEach((example) => {
-          example.difficultySettable = true
           example.difficulty = ''
         })
       }
@@ -110,7 +110,7 @@ export default function Quiz({
   const currentExample = examplesToReview[currentExampleNumber - 1]
 
   // will need to second pass these variables:
-  const spanishShowing = startWithSpanish !== answerShowing
+  const spanishShowing = (startWithSpanish !== answerShowing)
 
   const isMainLocation = location.pathname.split('/').length < 2
 
@@ -272,27 +272,12 @@ export default function Quiz({
   /*    SRS Update Section       */
 
   function updateExampleDifficulty(recordId: number, difficulty: string) {
-    const newArray = [...examplesToReview]
-    const exampleToUpdate = newArray.find(
-      example => example.recordId === recordId,
+    const newArray = examplesToReview.map(example =>
+      example.recordId === recordId
+        ? { ...example, difficulty }
+        : example,
     )
-    if (exampleToUpdate) {
-      const exampleIndex = newArray.indexOf(exampleToUpdate)
-      newArray[exampleIndex].difficulty = difficulty
-      setExamplesToReview(newArray)
-    }
-  }
-
-  function updateExampleDifficultySettable(recordId: number, difficultySettable: boolean) {
-    const newArray = [...examplesToReview]
-    const exampleToUpdate = newArray.find(
-      example => example.recordId === recordId,
-    )
-    if (exampleToUpdate) {
-      const exampleIndex = newArray.indexOf(exampleToUpdate)
-      newArray[exampleIndex].difficultySettable = difficultySettable
-      setExamplesToReview(newArray)
-    }
+    setExamplesToReview(newArray)
   }
 
   return (
@@ -317,7 +302,6 @@ export default function Quiz({
             userData={userData}
             answerShowing={answerShowing}
             updateExampleDifficulty={updateExampleDifficulty}
-            updateExampleDifficultySettable={updateExampleDifficultySettable}
             incrementExampleNumber={incrementExampleNumber}
             getAccessToken={getAccessToken}
 

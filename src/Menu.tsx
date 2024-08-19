@@ -11,6 +11,7 @@ interface MenuProps {
   studentExamplesTable: StudentExamplesTable
   activeStudent: ActiveStudent
   flashcardDataComplete: boolean
+  queueCount: number
 }
 export default function Menu({
   userData,
@@ -18,6 +19,7 @@ export default function Menu({
   studentExamplesTable,
   activeStudent,
   flashcardDataComplete,
+  queueCount,
 }: MenuProps) {
   // console.log(examplesTable.length)
   // console.log(examplesTable)
@@ -40,7 +42,7 @@ export default function Menu({
 
   return (
     rendered
-    && flashcardDataComplete && (
+    && flashcardDataComplete && queueCount === 0 && (
       <div className="menu">
         <div className="menuBox">
           {activeStudent?.role === 'student' && studentExamplesTable.length > 0 && (

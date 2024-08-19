@@ -43,7 +43,7 @@ function App({ SentryRoutes }) {
 
   // Flags and state for user data and menu readiness
   const rendered = useRef(false) // Flag to make useEffect run only once
-  const [menuReady, setMenuReady] = useState(false) // Flag to indicate that the user data has been loaded and the menu can be displayed
+  const [appsLoadable, setAppsloadable] = useState(false) // Flag to indicate that the user data has been loaded and the menu can be displayed
   const [flashcardDataComplete, setFlashcardDataComplete] = useState(false) // Flag to indicate that the flashcard data has been loaded and the flashcard apps can be displayed
   const flashcardDataCompleteQueue = useRef(0) // Queue to hold functions that need to run after the flashcard data has been loaded
 
@@ -334,40 +334,58 @@ function App({ SentryRoutes }) {
   }, [activeStudent, programTable, updateSelectedProgram, updateSelectedLesson])
 
   const updateExamplesTableQuietly = useCallback(async () => {
+    let studentTableData
     flashcardDataCompleteQueue.current++
+    console.log(flashcardDataCompleteQueue.current)
     if (qbUserData?.isAdmin) {
       try {
-        const studentExampleData = await getActiveExamplesFromBackend(
+        studentTableData = await getActiveExamplesFromBackend(
           getAccessToken(),
           activeStudent.recordId,
           activeStudent.emailAddress,
-        ).then(result => result)
-        examplesTable.current = studentExampleData.examples
-        setStudentExamplesTable(studentExampleData.studentExamples)
-        flashcardDataCompleteQueue.current--
-        if (flashcardDataCompleteQueue.current === 0) {
-          setFlashcardDataComplete(true)
-        }
+        )
       }
       catch (e) {
         console.error(e.message)
+      }
+      finally {
+        flashcardDataCompleteQueue.current--
+        console.log(flashcardDataCompleteQueue.current)
+        if (flashcardDataCompleteQueue.current === 0) {
+          if (studentTableData?.examples && studentTableData?.studentExamples) {
+            examplesTable.current = studentTableData.examples
+            setStudentExamplesTable(studentTableData.studentExamples)
+          }
+          setFlashcardDataComplete(true)
+        }
       }
     }
     else if (qbUserData?.role === 'student') {
       // Pulls examples and student examples ONLY for the current user
       try {
-        const userExampleData = await getMyExamplesFromBackend(
+        studentTableData = await getMyExamplesFromBackend(
           getAccessToken(),
-        ).then(result => result)
-        setStudentExamplesTable(userExampleData.studentExamples)
-        examplesTable.current = userExampleData.examples
-        flashcardDataCompleteQueue.current--
-        if (flashcardDataCompleteQueue.current === 0) {
-          setFlashcardDataComplete(true)
-        }
+          activeStudent.recordId,
+          activeStudent.emailAddress,
+        ).then((result) => {
+          console.log(result)
+          examplesTable.current = result.examples
+          setStudentExamplesTable(result.studentExamples)
+        })
       }
       catch (e) {
         console.error(e.message)
+      }
+      finally {
+        flashcardDataCompleteQueue.current--
+        console.log(flashcardDataCompleteQueue.current)
+        if (flashcardDataCompleteQueue.current === 0) {
+          if (studentTableData?.examples && studentTableData?.studentExamples) {
+            examplesTable.current = studentTableData.examples
+            setStudentExamplesTable(studentTableData.studentExamples)
+          }
+          setFlashcardDataComplete(true)
+        }
       }
     }
   }, [getAccessToken, activeStudent, qbUserData])
@@ -611,9 +629,10 @@ function App({ SentryRoutes }) {
   }, [activeStudent, programTable, getStudentLevel, updateExamplesTable])
 
   useEffect(() => {
-    flashcardDataComplete && setMenuReady(true)
-    !flashcardDataComplete && setMenuReady(false)
-  }, [flashcardDataComplete])
+    if (!appsLoadable && flashcardDataComplete) {
+      setAppsloadable(true)
+    }
+  }, [flashcardDataComplete, appsLoadable])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)
@@ -638,8 +657,8 @@ function App({ SentryRoutes }) {
           {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>
           )}
-          {isAuthenticated && !menuReady && <p>Loading user data...</p>}
-          {menuReady
+          {isAuthenticated && !appsLoadable && <p>Loading user data...</p>}
+          {appsLoadable
           && (qbUserData.role === 'student' || qbUserData.role === 'limited')
           && !qbUserData.isAdmin && (
             <p>
@@ -650,12 +669,12 @@ function App({ SentryRoutes }) {
           )}
 
           {isAuthenticated
-          && menuReady
+          && appsLoadable
           && qbUserData.role !== 'student'
           && qbUserData.role !== 'limited'
           && !qbUserData.isAdmin && <p>Welcome back!</p>}
 
-          {menuReady && qbUserData.isAdmin && !choosingStudent && (
+          {appsLoadable && qbUserData.isAdmin && !choosingStudent && (
             <div className="studentList">
               {activeStudent.recordId && (
                 <p>
@@ -670,7 +689,7 @@ function App({ SentryRoutes }) {
               <button type="button" onClick={chooseStudent}>Change</button>
             </div>
           )}
-          {menuReady && qbUserData.isAdmin && choosingStudent && (
+          {appsLoadable && qbUserData.isAdmin && choosingStudent && (
             <form className="studentList" onSubmit={e => e.preventDefault}>
               <select
                 value={activeStudent ? activeStudent.recordId : {}}
@@ -690,7 +709,7 @@ function App({ SentryRoutes }) {
         </div>
       )}
 
-      {menuReady && (
+      {appsLoadable && (
         <SentryRoutes>
           <Route
             exact
@@ -705,6 +724,7 @@ function App({ SentryRoutes }) {
                 flashcardDataComplete={flashcardDataComplete}
                 audioExamplesTable={audioExamplesTable}
                 filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
+                queueCount={flashcardDataCompleteQueue.current}
               />
             )}
           />

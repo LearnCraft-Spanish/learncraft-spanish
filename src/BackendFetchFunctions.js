@@ -329,10 +329,7 @@ export async function createStudentExample(tokenPromise, studentId, exampleId) {
   })
     .then((res) => {
       if (res.ok) {
-        return res.json().then((res) => {
-          const data = res
-          return data
-        })
+        return res.json()
       }
     })
     .catch(e => console.error(e))
@@ -352,7 +349,6 @@ export async function updateMyStudentExample(tokenPromise, updateId, newInterval
     headers,
   })
     .then((res) => {
-      console.log(res)
       if (res.ok) {
         return res.json()
       }
@@ -376,7 +372,6 @@ export async function updateStudentExample(tokenPromise, updateId, newInterval) 
     headers,
   })
     .then((res) => {
-      console.log(res)
       if (res.ok) {
         return res.json()
       }
@@ -397,10 +392,7 @@ export async function deleteMyStudentExample(tokenPromise, recordId) {
   })
     .then((res) => {
       if (res.ok) {
-        return res.json().then((res) => {
-          const data = res
-          return data
-        })
+        return res.json()
       }
     })
     .catch(e => console.error(e))

@@ -45,7 +45,6 @@ export interface Flashcard {
   vocabComplete: boolean
   isCollected: boolean
   difficulty: string
-  difficultySettable: boolean
 
 }
 

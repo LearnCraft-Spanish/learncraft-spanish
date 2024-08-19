@@ -1,7 +1,3 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-
-import { send } from 'vite'
-import { c } from 'vite/dist/node/types.d-aGj9QkWt'
 import type { Flashcard, StudentExample, UserData } from '../interfaceDefinitions'
 import {
   updateMyStudentExample,
@@ -14,13 +10,11 @@ interface QuizButtonsProps {
   userData: UserData
   answerShowing: boolean
   updateExampleDifficulty: (recordId: number, difficulty: string) => void
-  updateExampleDifficultySettable: (recordId: number, settable: boolean) => void
   incrementExampleNumber: () => void
   getAccessToken: () => string
 }
 
-export default function SRSQuizButtons({ currentExample, studentExamples, userData, answerShowing, updateExampleDifficulty, updateExampleDifficultySettable, incrementExampleNumber, getAccessToken }: QuizButtonsProps) {
-  console.log(currentExample)
+export default function SRSQuizButtons({ currentExample, studentExamples, userData, answerShowing, updateExampleDifficulty, incrementExampleNumber, getAccessToken }: QuizButtonsProps) {
   async function sendUpdate(exampleId: number, newInterval: number) {
     if (userData.isAdmin) {
       return await updateStudentExample(
@@ -64,40 +58,44 @@ export default function SRSQuizButtons({ currentExample, studentExamples, userDa
   }
 
   async function increaseDifficulty() {
-    const exampleId = getStudentExampleFromExample(currentExample)?.recordId
+    const exampleId = currentExample?.recordId
+    const studentExampleId = getStudentExampleFromExample(currentExample)?.recordId
     const currentInterval = getIntervalFromExample(currentExample)
-    if (exampleId === undefined) {
+    if (exampleId === undefined || studentExampleId === undefined) {
       return
     }
     updateExampleDifficulty(exampleId, 'hard')
-    updateExampleDifficultySettable(exampleId, false)
     incrementExampleNumber()
     const newInterval = (currentInterval > 0) ? currentInterval - 1 : 0
-    const updateStatus = sendUpdate(exampleId, newInterval)
+    const updateStatus = sendUpdate(studentExampleId, newInterval)
     updateStatus.then((response) => {
-      console.log(response)
+      if (response !== studentExampleId) {
+        updateExampleDifficulty(exampleId, '')
+      }
     })
   }
 
   async function decreaseDifficulty() {
-    const exampleId = getStudentExampleFromExample(currentExample)?.recordId
+    const exampleId = currentExample?.recordId
+    const studentExampleId = getStudentExampleFromExample(currentExample)?.recordId
     const currentInterval = getIntervalFromExample(currentExample)
-    if (exampleId === undefined) {
+    if (exampleId === undefined || studentExampleId === undefined) {
       return
     }
     updateExampleDifficulty(exampleId, 'easy')
-    updateExampleDifficultySettable(exampleId, false)
     incrementExampleNumber()
     const newInterval = currentInterval + 1
-    const updateStatus = sendUpdate(exampleId, newInterval)
+    const updateStatus = sendUpdate(studentExampleId, newInterval)
     updateStatus.then((response) => {
-      console.log(response)
+      if (response !== studentExampleId) {
+        updateExampleDifficulty(exampleId, '')
+      }
     })
   }
 
   return (
     <div className="buttonBox">
-      {answerShowing && currentExample.difficultySettable && (
+      {answerShowing && !currentExample.difficulty && (
         <>
           <button
             type="button"
@@ -115,12 +113,13 @@ export default function SRSQuizButtons({ currentExample, studentExamples, userDa
           </button>
         </>
       )}
-      {!currentExample.difficultySettable && (
+      {currentExample.difficulty && (
         currentExample.difficulty === 'hard'
           ? (
               <button
                 type="button"
                 className="hardBanner"
+                onClick={increaseDifficulty}
               >
                 Labeled: Hard
               </button>
@@ -128,7 +127,8 @@ export default function SRSQuizButtons({ currentExample, studentExamples, userDa
           : (
               <button
                 type="button"
-                className="hardBanner"
+                className="easyBanner"
+                onClick={decreaseDifficulty}
               >
                 Labeled: Easy
               </button>
