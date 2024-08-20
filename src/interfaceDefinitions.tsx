@@ -20,10 +20,11 @@ export interface Program {
 
 export interface UserData {
   recordId: number
-  username: string
+  name: string
   emailAddress: string
   cohort: string
   role: string
+  relatedProgram: number
   isAdmin: boolean
 }
 // selectedProgram is a program, or null
@@ -39,12 +40,12 @@ export interface Flashcard {
   englishTranslation: string
   spanglish: string
   vocabIncluded: Array<string>
-  allStudents: Array<string>
+  allStudents?: Array<string>
   englishAudio: string
   spanishAudioLa: string
   vocabComplete: boolean
-  isCollected: boolean
-  difficulty: string
+  isCollected?: boolean
+  difficulty?: string
 
 }
 
