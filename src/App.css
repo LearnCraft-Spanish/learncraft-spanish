@@ -882,12 +882,19 @@ will remove from .css when all instances are removed */
 }
 
 /* formatFlashcardText function classes */
-.englishFlashcardText, p.englishFlashcardText {
+
+.englishFlashcardText {
+  font-weight: 600;
+  font-style: italic;
+}
+.spanishFlashcardText {
   font-weight: 400;
   font-style: normal;
 }
 
-.spanishFlashcardText, p.spanishFlashcardText {
-  font-weight: 600;
-  font-style: italic;
+.englishTranslation .englishFlashcardText{
+  font-size: 18px;
+}
+.spanishExample .spanishFlashcardText{
+  font-size: 18px;
 }
