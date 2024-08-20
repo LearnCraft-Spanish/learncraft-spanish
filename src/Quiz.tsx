@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import { c } from 'vite/dist/node/types.d-aGj9QkWt'
 import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
 import FlashcardDisplay from './components/Flashcard'
 import QuizButtons from './components/QuizButtons'
