@@ -11,7 +11,7 @@ interface QuizButtonsProps {
   answerShowing: boolean
   updateExampleDifficulty: (recordId: number, difficulty: string) => void
   incrementExampleNumber: () => void
-  getAccessToken: () => string
+  getAccessToken: () => Promise<string>
 }
 
 export default function SRSQuizButtons({ currentExample, studentExamples, userData, answerShowing, updateExampleDifficulty, incrementExampleNumber, getAccessToken }: QuizButtonsProps) {

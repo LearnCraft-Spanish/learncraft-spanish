@@ -19,30 +19,15 @@ export default function Menu({
   studentExamplesTable,
   activeStudent,
   flashcardDataComplete,
-  queueCount,
 }: MenuProps) {
-  // console.log(examplesTable.length)
-  // console.log(examplesTable)
-  // console.log(userData)
-  // console.log(examplesTable)
-
-  const rendered = useRef(false)
-
   useEffect(() => {
-    if (!rendered.current) {
-      rendered.current = true
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!rendered.current && (activeStudent?.role === 'student')) {
+    if (activeStudent?.recordId && !flashcardDataComplete) {
       updateExamplesTable()
     }
-  }, [activeStudent, updateExamplesTable])
+  }, [activeStudent, flashcardDataComplete, updateExamplesTable])
 
   return (
-    rendered
-    && flashcardDataComplete && queueCount === 0 && (
+    flashcardDataComplete && (
       <div className="menu">
         <div className="menuBox">
           {activeStudent?.role === 'student' && studentExamplesTable.length > 0 && (

@@ -6,10 +6,10 @@ import MenuButton from './components/MenuButton'
 function CallbackPage() {
   const navigate = useNavigate()
   const searchParams = new URLSearchParams(window.location.search)
-  const stateSent = searchParams.get('state')
+  const stateSent = searchParams.get('state') || ''
   const destinationUrl = useRef('/')
 
-  const storedJson = localStorage.getItem(stateSent)
+  const storedJson = localStorage.getItem(stateSent) || ''
   const decodedJson = JSON.parse(storedJson) || {
     navigateToUrl: '/',
     expiresAt: 0,
@@ -20,7 +20,7 @@ function CallbackPage() {
 
   useEffect(() => {
     navigate(destinationUrl.current)
-  }, [])
+  }, [navigate])
 
   return (
     <div className="redirectMessage">
