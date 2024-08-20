@@ -4,6 +4,9 @@ import React from 'react'
 import { Auth0Provider } from '@auth0/auth0-react'
 import { BrowserRouter } from 'react-router-dom'
 
+import { ActiveStudentProvider } from './contexts/ActiveStudentContext'
+import { UserDataProvider } from './contexts/UserDataContext'
+
 interface ProvidersProps {
   children: ReactNode
 }
@@ -26,7 +29,11 @@ function Providers({ children }: ProvidersProps) {
             'openid profile email read:current-student update:current-student read:all-students update:all-students',
         }}
       >
-        {children}
+        <UserDataProvider>
+          <ActiveStudentProvider>
+            {children}
+          </ActiveStudentProvider>
+        </UserDataProvider>
       </Auth0Provider>
     </BrowserRouter>
   )
