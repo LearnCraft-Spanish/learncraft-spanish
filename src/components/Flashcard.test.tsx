@@ -14,7 +14,7 @@ const example = {
   englishAudio: '',
   spanishAudioLa: '',
   vocabComplete: false,
-  isKnown: true,
+  isCollected: true,
 }
 
 // create a vi.fn that takes in a number and returns void
@@ -89,7 +89,7 @@ describe('component Flashcard', () => {
     })
 
     describe('isStudent is true', () => {
-      describe('isKnown is true', () => {
+      describe('isCollected is true', () => {
         it('remove flashcard button is rendered', () => {
           render(<Flashcard example={example} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
           expect(screen.getByText('Remove from my flashcards')).toBeTruthy()
@@ -100,13 +100,13 @@ describe('component Flashcard', () => {
           expect(removeFlashcardAndUpdate).toHaveBeenCalled()
         })
       })
-      describe('isKnown is false', () => {
+      describe('isCollected is false', () => {
         it('add flashcard button is rendered', () => {
-          render(<Flashcard example={{ ...example, isKnown: false }} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
+          render(<Flashcard example={{ ...example, isCollected: false }} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
           expect(screen.getByText('Add to my flashcards')).toBeTruthy()
         })
         it('on click, calls addFlashcardAndUpdate function', () => {
-          render(<Flashcard example={{ ...example, isKnown: false }} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
+          render(<Flashcard example={{ ...example, isCollected: false }} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
           screen.getByText('Add to my flashcards').click()
           expect(addFlashcardAndUpdate).toHaveBeenCalled()
         })

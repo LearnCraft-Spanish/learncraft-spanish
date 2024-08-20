@@ -22,7 +22,7 @@ interface QuizProps {
   removeFlashcard: (recordId: number) => Promise<number>
   cleanupFunction?: () => void
   // Fix Function Def!!!
-  getAccessToken: () => string
+  getAccessToken: () => Promise<string>
 }
 
 function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
