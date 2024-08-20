@@ -5,7 +5,7 @@ import LessonSelector from './LessonSelector'
 import {
   getSpellingsFromBackend,
   getVocabFromBackend,
-} from './BackendFetchFunctions'
+} from './functions/BackendFetchFunctions'
 
 export default function FrequenSay({
   programTable,

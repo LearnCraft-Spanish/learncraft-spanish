@@ -8,7 +8,7 @@ import {
   getCourseList,
   getLastThreeWeeks,
   getLessonList,
-} from './BackendFetchFunctions'
+} from './functions/BackendFetchFunctions'
 
 const Coaching = forwardRef((
   { userData, contextual, openContextual, closeContextual },

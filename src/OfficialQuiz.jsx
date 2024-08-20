@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import './App.css'
-import { getQuizExamplesFromBackend } from './BackendFetchFunctions'
+import { getQuizExamplesFromBackend } from './functions/BackendFetchFunctions'
 
 import Quiz from './Quiz'
 

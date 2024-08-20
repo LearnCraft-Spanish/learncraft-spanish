@@ -4,7 +4,7 @@ import { Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import {
   getLcspQuizzesFromBackend,
-} from './BackendFetchFunctions'
+} from './functions/BackendFetchFunctions'
 import CourseQuizzes from './CourseQuizzes.jsx'
 import MenuButton from './components/MenuButton'
 import OfficialQuiz from './OfficialQuiz'
