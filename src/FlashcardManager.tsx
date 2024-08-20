@@ -1,23 +1,11 @@
 import React, { useEffect } from 'react'
 
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
-
-interface Flashcard {
-  recordId: number
-  spanishExample: string
-  englishTranslation: string
-  spanglish: string
-}
-
-interface StudentExample {
-  recordId: number
-  dateCreated: string
-  relatedExample: number
-}
+import type { Flashcard } from './interfaceDefinitions'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 interface FlashcardManagerProps {
   examplesTable: Flashcard[]
-  studentExamplesTable: StudentExample[]
   flashcardDataComplete: boolean
   removeFlashcard: (recordId: number) => Promise<number>
   updateExamplesTable: () => void
@@ -25,11 +13,11 @@ interface FlashcardManagerProps {
 
 function FlashcardManager({
   examplesTable,
-  studentExamplesTable,
   flashcardDataComplete,
   removeFlashcard,
   updateExamplesTable,
 }: FlashcardManagerProps) {
+  const { studentExamplesTable } = useActiveStudent()
   const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([])
 
   async function removeAndUpdate(recordId: number) {

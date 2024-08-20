@@ -3,8 +3,8 @@ import type { ReactNode } from 'react'
 import type { UserData } from '../interfaceDefinitions'
 
 interface UserDataContextProps {
-  qbUserData: UserData | null
-  setQbUserData: (data: UserData | null) => void
+  userData: UserData | null
+  setUserData: (data: UserData | null) => void
 }
 
 const UserDataContext = createContext<UserDataContextProps | undefined>(undefined)
@@ -14,11 +14,11 @@ interface UserDataProviderProps {
 }
 
 export function UserDataProvider({ children }: UserDataProviderProps) {
-  const [qbUserData, setQbUserData] = useState<UserData | null>(null)
+  const [userData, setUserData] = useState<UserData | null>(null)
 
   const value = useMemo(
-    () => ({ qbUserData, setQbUserData }),
-    [qbUserData],
+    () => ({ userData, setUserData }),
+    [userData],
   )
 
   return (

@@ -4,26 +4,30 @@ import {
   updateStudentExample,
 } from '../functions/BackendFetchFunctions'
 
+import { useUserData } from '../hooks/useUserData'
+import { useActiveStudent } from '../hooks/useActiveStudent'
+
 interface QuizButtonsProps {
   currentExample: Flashcard
-  studentExamples: StudentExample[]
-  userData: UserData
   answerShowing: boolean
   updateExampleDifficulty: (recordId: number, difficulty: string) => void
   incrementExampleNumber: () => void
   getAccessToken: () => Promise<string>
 }
 
-export default function SRSQuizButtons({ currentExample, studentExamples, userData, answerShowing, updateExampleDifficulty, incrementExampleNumber, getAccessToken }: QuizButtonsProps) {
+export default function SRSQuizButtons({ currentExample, answerShowing, updateExampleDifficulty, incrementExampleNumber, getAccessToken }: QuizButtonsProps) {
+  const { userData } = useUserData()
+  const { studentExamplesTable } = useActiveStudent()
+
   async function sendUpdate(exampleId: number, newInterval: number) {
-    if (userData.isAdmin) {
+    if (userData?.isAdmin) {
       return await updateStudentExample(
         getAccessToken(),
         exampleId,
         newInterval,
       )
     }
-    else if (userData.role === 'student') {
+    else if (userData?.role === 'student') {
       return await updateMyStudentExample(
         getAccessToken(),
         exampleId,
@@ -36,7 +40,7 @@ export default function SRSQuizButtons({ currentExample, studentExamples, userDa
   }
 
   const getStudentExampleFromExample = (example: Flashcard) => {
-    const relatedStudentExample = studentExamples.find(
+    const relatedStudentExample = studentExamplesTable?.find(
       element => element.relatedExample === example.recordId,
     )
     if (!relatedStudentExample?.recordId) {

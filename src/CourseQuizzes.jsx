@@ -12,7 +12,6 @@ import OfficialQuiz from './OfficialQuiz'
 import MenuButton from './components/MenuButton'
 
 export default function CourseQuizzes({
-  activeStudent,
   addFlashcard,
   chosenQuiz,
   courses,
@@ -30,7 +29,6 @@ export default function CourseQuizzes({
   quizReady,
   quizTable,
   removeFlashcard,
-  studentExamples,
   studentHasDefaultQuiz,
   thisCourse,
   updateChosenQuiz,
@@ -98,7 +96,6 @@ export default function CourseQuizzes({
             path=":number"
             element={(
               <OfficialQuiz
-                activeStudent={activeStudent}
                 addFlashcard={addFlashcard}
                 chosenQuiz={chosenQuiz}
                 courses={courses}
@@ -115,7 +112,6 @@ export default function CourseQuizzes({
                 quizReady={quizReady}
                 quizTable={quizTable}
                 removeFlashcard={removeFlashcard}
-                studentExamples={studentExamples}
                 studentHasDefaultQuiz={studentHasDefaultQuiz}
                 thisCourse={thisCourse}
                 updateChosenQuiz={updateChosenQuiz}

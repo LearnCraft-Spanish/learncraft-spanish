@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import './App.css'
 
 import type { ActiveStudent, ExamplesTable, StudentExamplesTable, UserData } from './interfaceDefinitions'
+import { useUserData } from './hooks/useUserData'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 interface MenuProps {
   userData: UserData
@@ -14,12 +16,11 @@ interface MenuProps {
   queueCount: number
 }
 export default function Menu({
-  userData,
   updateExamplesTable,
-  studentExamplesTable,
-  activeStudent,
   flashcardDataComplete,
 }: MenuProps) {
+  const { userData } = useUserData()
+  const { activeStudent, studentExamplesTable } = useActiveStudent()
   useEffect(() => {
     if (activeStudent?.recordId && !flashcardDataComplete) {
       updateExamplesTable()
@@ -30,7 +31,7 @@ export default function Menu({
     flashcardDataComplete && (
       <div className="menu">
         <div className="menuBox">
-          {activeStudent?.role === 'student' && studentExamplesTable.length > 0 && (
+          {activeStudent?.role === 'student' && studentExamplesTable?.length > 0 && (
             <div>
               <h3>My Flashcards:</h3>
               <div className="buttonBox">
@@ -54,8 +55,8 @@ export default function Menu({
               Official Quizzes
             </Link>
           </div>
-          {(userData.role === ('student' || 'limited')
-          || userData.isAdmin) && (
+          {(userData?.role === ('student' || 'limited')
+          || userData?.isAdmin) && (
             <div className="buttonBox">
               <Link className="linkButton" to="/audioquiz">
                 Audio Quiz
@@ -65,7 +66,7 @@ export default function Menu({
               </Link>
             </div>
           )}
-          {(userData.role === 'student' || userData.isAdmin) && (
+          {(userData?.role === 'student' || userData?.isAdmin) && (
             <div className="buttonBox">
               <Link className="linkButton" to="/flashcardfinder">
                 Find Flashcards
@@ -73,7 +74,7 @@ export default function Menu({
             </div>
           )}
         </div>
-        {userData.isAdmin && (
+        {userData?.isAdmin && (
           <div className="menuBox">
             <h3>Staff Tools</h3>
             <div className="buttonBox">

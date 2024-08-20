@@ -7,16 +7,15 @@ import QuizButtons from './components/QuizButtons'
 import QuizProgress from './components/QuizProgress'
 import MenuButton from './components/MenuButton'
 import SRSQuizButtons from './components/SRSButtons'
+import { useUserData } from './hooks/useUserData'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 interface QuizProps {
   quizTitle: string
   examplesToParse: Flashcard[]
-  activeStudent: UserData
   startWithSpanish?: boolean
-  studentExamples: StudentExample[]
   quizOnlyCollectedExamples?: boolean
   isSrsQuiz?: boolean
-  userData: UserData
   addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
   cleanupFunction?: () => void
@@ -83,14 +82,11 @@ function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: Stude
 // removeFlashcardAndUpdate
 // addFlashcardAndUpdate
 export default function Quiz({
-  activeStudent,
   examplesToParse,
   quizTitle,
   startWithSpanish = false,
-  studentExamples,
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
-  userData,
   addFlashcard,
   removeFlashcard,
   cleanupFunction = () => {},
@@ -98,8 +94,9 @@ export default function Quiz({
 
 }: QuizProps) {
   const location = useLocation()
+  const { activeStudent, studentExamplesTable } = useActiveStudent()
 
-  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentExamples, quizOnlyCollectedExamples, isSrsQuiz))
+  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentExamplesTable, quizOnlyCollectedExamples, isSrsQuiz))
   const [answerShowing, setAnswerShowing] = useState(false)
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
   const currentAudio = useRef<HTMLAudioElement | null>(null)
@@ -287,7 +284,7 @@ export default function Quiz({
         {answerShowing && answerAudio()}
         <FlashcardDisplay
           example={currentExample}
-          isStudent={activeStudent.role === ('student')}
+          isStudent={activeStudent?.role === ('student')}
           answerShowing={answerShowing}
           addFlashcardAndUpdate={addFlashcardAndUpdate}
           removeFlashcardAndUpdate={removeFlashcardAndUpdate}
@@ -297,8 +294,6 @@ export default function Quiz({
         {isSrsQuiz && (
           <SRSQuizButtons
             currentExample={currentExample}
-            studentExamples={studentExamples}
-            userData={userData}
             answerShowing={answerShowing}
             updateExampleDifficulty={updateExampleDifficulty}
             incrementExampleNumber={incrementExampleNumber}

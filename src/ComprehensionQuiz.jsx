@@ -3,11 +3,10 @@ import React, { useEffect, useRef } from 'react'
 import './App.css'
 
 import AudioBasedReview from './AudioBasedReview'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function ComprehensionQuiz({
   programTable,
-  activeStudent,
-  studentExamplesTable,
   updateBannerMessage,
   audioExamplesTable,
   filterExamplesByAllowedVocab,
@@ -16,6 +15,7 @@ export default function ComprehensionQuiz({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
+  const { activeStudent, studentExamplesTable } = useActiveStudent()
   const rendered = useRef(false)
 
   useEffect(() => {

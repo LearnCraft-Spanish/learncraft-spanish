@@ -883,11 +883,11 @@ will remove from .css when all instances are removed */
 
 /* formatFlashcardText function classes */
 
-.englishFlashcardText {
+.spanishFlashcardText {
   font-weight: 600;
   font-style: italic;
 }
-.spanishFlashcardText {
+.englishFlashcardText {
   font-weight: 400;
   font-style: normal;
 }

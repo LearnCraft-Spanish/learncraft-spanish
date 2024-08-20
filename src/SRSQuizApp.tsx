@@ -5,13 +5,12 @@ import MenuButton from './components/MenuButton'
 import Quiz from './Quiz'
 
 import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
+import { useActiveStudent } from './hooks/useActiveStudent'
+import { useUserData } from './hooks/useUserData'
 
 interface SRSQuizAppProps {
-  userData: UserData
   flashcardDataComplete: boolean
-  activeStudent: UserData
   examplesTable: Flashcard[]
-  studentExamplesTable: StudentExample[]
   addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
   makeMenuShow: () => void
@@ -22,17 +21,16 @@ interface SRSQuizAppProps {
 // - Refactor SRSQuizApp to use the new .isCollected prop instead of .isKnown
 //      - this is implemented in Quiz.tsx, just need to modify this file to match Quiz.tsx
 export default function SRSQuizApp({
-  userData,
   flashcardDataComplete,
-  activeStudent,
   examplesTable,
-  studentExamplesTable,
   addFlashcard,
   removeFlashcard,
   makeMenuShow,
   getAccessToken,
 }: SRSQuizAppProps) {
   // const quizLength = 20 //will be used to determine how many examples to review
+
+  const { activeStudent, studentExamplesTable } = useActiveStudent()
   const [quizReady, setQuizReady] = useState(false)
   const [examplesToReview, setExamplesToReview] = useState<Flashcard[]>([])
 
@@ -81,7 +79,7 @@ export default function SRSQuizApp({
   }
 
   return (
-    activeStudent.recordId && (
+    activeStudent?.recordId && (
       <div className="quizInterface">
         {!quizReady && flashcardDataComplete && (
           <div className="readyButton">
@@ -104,13 +102,10 @@ export default function SRSQuizApp({
         {(quizReady && examplesToReview.length > 0) && (
           <Quiz
             quizTitle="SRS Quiz"
-            activeStudent={activeStudent}
             examplesToParse={examplesToReview}
-            studentExamples={studentExamplesTable}
             quizOnlyCollectedExamples
             isSrsQuiz
             addFlashcard={addFlashcard}
-            userData={userData}
             removeFlashcard={removeFlashcard}
             cleanupFunction={makeMenuShow}
             getAccessToken={getAccessToken}

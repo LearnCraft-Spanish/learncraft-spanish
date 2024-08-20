@@ -3,10 +3,10 @@ import './App.css'
 
 import MenuButton from './components/MenuButton'
 import LessonSelector from './LessonSelector'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function AudioBasedReview({
   programTable,
-  activeStudent,
   audioExamplesTable,
   filterExamplesByAllowedVocab,
   willAutoplay,
@@ -23,6 +23,7 @@ export default function AudioBasedReview({
   const [guessing, setGuessing] = useState(false)
   const [examplesToPlay, setExamplesToPlay] = useState([])
   const [quizReady, setQuizReady] = useState(false)
+  const { activeStudent } = useActiveStudent()
   /* Will use this as a settable state that inherits a default from props
   const [startWithSpanish, setStartWithSpanish] = useState(
     willStartWithSpanish || false,

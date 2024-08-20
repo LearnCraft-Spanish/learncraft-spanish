@@ -6,6 +6,7 @@ import {
 } from './functions/BackendFetchFunctions'
 
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 import './App.css'
 
@@ -15,10 +16,8 @@ import LessonSelector from './LessonSelector'
 const FlashcardFinder = forwardRef(
   (
     {
-      activeStudent,
       programTable,
       getAccessToken,
-      studentExamplesTable,
       flashcardDataComplete,
       selectedProgram,
       selectedLesson,
@@ -30,6 +29,7 @@ const FlashcardFinder = forwardRef(
     },
     currentContextual,
   ) => {
+    const { activeStudent, studentExamplesTable } = useActiveStudent()
     const isMounted = useRef(false)
     const [isLoaded, setIsLoaded] = useState(false)
     const [tagSearchTerm, setTagSearchTerm] = useState('')

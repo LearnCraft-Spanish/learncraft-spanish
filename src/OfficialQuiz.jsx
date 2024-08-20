@@ -7,7 +7,6 @@ import { getQuizExamplesFromBackend } from './functions/BackendFetchFunctions'
 import Quiz from './Quiz'
 
 export default function OfficialQuiz({
-  activeStudent,
   addFlashcard,
   chosenQuiz,
   courses,
@@ -18,7 +17,6 @@ export default function OfficialQuiz({
   quizCourse,
   quizTable,
   removeFlashcard,
-  studentExamples,
   updateChosenQuiz,
 }) {
   const thisQuiz = Number.parseInt(useParams().number)
@@ -109,12 +107,9 @@ export default function OfficialQuiz({
       {!(dataLoaded && quizReady) && (<div>Loading...</div>)}
       {dataLoaded && quizReady && (
         <Quiz
-          activeStudent={activeStudent}
           examplesToParse={examplesToReview}
           quizTitle={makeQuizTitle()}
-          studentExamples={studentExamples}
           addFlashcard={addFlashcard}
-          // makeMenuShow={makeMenuShow}
           removeFlashcard={removeFlashcard}
           cleanupFunction={makeMenuShow}
         />

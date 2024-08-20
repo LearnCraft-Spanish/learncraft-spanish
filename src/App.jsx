@@ -16,6 +16,8 @@ import {
   getProgramsFromBackend,
   getUserDataFromBackend,
 } from './functions/BackendFetchFunctions'
+import { useUserData } from './hooks/useUserData'
+import { useActiveStudent } from './hooks/useActiveStudent'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
 import AudioQuiz from './AudioQuiz'
@@ -40,16 +42,14 @@ function App({ SentryRoutes }) {
   // React Router hooks
   const location = useLocation()
   const navigate = useNavigate()
+  const { userData, setUserData } = useUserData()
+  const { activeStudent, setActiveStudent, studentExamplesTable, setStudentExamplesTable } = useActiveStudent()
 
   // Flags and state for user data and menu readiness
   const rendered = useRef(false) // Flag to make useEffect run only once
   const [appsLoadable, setAppsloadable] = useState(false) // Flag to indicate that the user data has been loaded and the menu can be displayed
   const [flashcardDataComplete, setFlashcardDataComplete] = useState(false) // Flag to indicate that the flashcard data has been loaded and the flashcard apps can be displayed
   const flashcardDataCompleteQueue = useRef(0) // Queue to hold functions that need to run after the flashcard data has been loaded
-
-  // User data and active student
-  const [qbUserData, setQbUserData] = useState({}) // The user data for the person using the app (if a student)
-  const [activeStudent, setActiveStudent] = useState({}) // The user data for the selected user (same as the user if a student, or possibly another student if user is an admin)
 
   // Reference to the active student's program and lesson
   const activeProgram = useRef({})
@@ -68,7 +68,6 @@ function App({ SentryRoutes }) {
   const [choosingStudent, setChoosingStudent] = useState(false)
 
   // States for Students to see their flashcards
-  const [studentExamplesTable, setStudentExamplesTable] = useState([])
   const examplesTable = useRef([])
 
   // States for banner message
@@ -201,12 +200,12 @@ function App({ SentryRoutes }) {
   const userSetup = useCallback(async () => {
     try {
       const userData = await getUserData()
-      setQbUserData(await userData)
+      setUserData(userData)
     }
     catch (e) {
       console.error(e.message)
     }
-  }, [getUserData])
+  }, [getUserData, setUserData])
 
   const updateBannerMessage = useCallback((message) => {
     setBannerMessage(message)
@@ -326,7 +325,7 @@ function App({ SentryRoutes }) {
   const updateExamplesTableQuietly = useCallback(async () => {
     let studentTableData
     flashcardDataCompleteQueue.current++
-    if (qbUserData?.isAdmin) {
+    if (userData?.isAdmin) {
       try {
         studentTableData = await getActiveExamplesFromBackend(
           getAccessToken(),
@@ -347,7 +346,7 @@ function App({ SentryRoutes }) {
         }
       }
     }
-    else if (qbUserData?.role === 'student') {
+    else if (userData?.role === 'student') {
       // Pulls examples and student examples ONLY for the current user
       try {
         studentTableData = await getMyExamplesFromBackend(
@@ -373,7 +372,7 @@ function App({ SentryRoutes }) {
         }
       }
     }
-  }, [getAccessToken, activeStudent, qbUserData])
+  }, [getAccessToken, activeStudent, userData])
 
   const updateExamplesTable = useCallback(async () => {
     setFlashcardDataComplete(false)
@@ -381,7 +380,7 @@ function App({ SentryRoutes }) {
   }, [updateExamplesTableQuietly])
 
   const makeStudentSelector = useCallback(() => {
-    if (qbUserData.isAdmin) {
+    if (userData.isAdmin) {
       const studentSelector = [
         <option key={0} name="">
           {' '}
@@ -419,11 +418,11 @@ function App({ SentryRoutes }) {
       studentSelector.sort(studentSelectorSortFunction)
       return studentSelector
     }
-  }, [qbUserData, studentList])
+  }, [userData, studentList])
 
   const addToActiveStudentFlashcards = useCallback(async (recordId, updateTable = true) => {
     updateBannerMessage('Adding Flashcard...')
-    if (activeStudent.recordId && qbUserData.isAdmin) {
+    if (activeStudent.recordId && userData.isAdmin) {
       try {
         const data = await createStudentExample(
           getAccessToken(),
@@ -445,7 +444,7 @@ function App({ SentryRoutes }) {
         console.error(e.message)
       }
     }
-    else if (activeStudent.recordId && qbUserData.role === 'student') {
+    else if (activeStudent.recordId && userData.role === 'student') {
       try {
         const data = await createMyStudentExample(getAccessToken(), recordId).then(
           (result) => {
@@ -466,7 +465,7 @@ function App({ SentryRoutes }) {
         return false
       }
     }
-  }, [activeStudent, qbUserData, getAccessToken, updateBannerMessage, updateExamplesTableQuietly])
+  }, [activeStudent, userData, getAccessToken, updateBannerMessage, updateExamplesTableQuietly])
 
   const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId, updateTable = true) => {
     setBannerMessage('Removing Flashcard')
@@ -478,7 +477,7 @@ function App({ SentryRoutes }) {
       return relatedStudentExample?.recordId
     }
     const studentExampleRecordId = getStudentExampleRecordId()
-    if (studentExampleRecordId && qbUserData.isAdmin) {
+    if (studentExampleRecordId && userData.isAdmin) {
       try {
         const data = await deleteStudentExample(
           getAccessToken(),
@@ -499,7 +498,7 @@ function App({ SentryRoutes }) {
         console.error(e.message)
       }
     }
-    else if (studentExampleRecordId && qbUserData.role === 'student') {
+    else if (studentExampleRecordId && userData.role === 'student') {
       try {
         const data = await deleteMyStudentExample(
           getAccessToken(),
@@ -524,7 +523,7 @@ function App({ SentryRoutes }) {
       setBannerMessage('Flashcard not found')
       return 0
     }
-  }, [qbUserData, studentExamplesTable, getAccessToken, updateExamplesTableQuietly])
+  }, [userData, studentExamplesTable, getAccessToken, updateExamplesTableQuietly])
 
   const filterExamplesByAllowedVocab = useCallback((examples, lessonId) => {
     let allowedVocabulary = []
@@ -584,19 +583,19 @@ function App({ SentryRoutes }) {
   }, [isAuthenticated, userSetup, parseCourseLessons])
 
   useEffect(() => {
-    if (rendered.current && qbUserData?.isAdmin !== undefined) {
-      if (qbUserData?.isAdmin || qbUserData?.role === ('student' || 'limited')) {
+    if (rendered.current && userData?.isAdmin !== undefined) {
+      if (userData?.isAdmin || userData?.role === ('student' || 'limited')) {
         setupAudioExamplesTable()
       }
-      if (qbUserData?.role === 'student' || qbUserData?.role === 'limited') {
-        setActiveStudent(qbUserData)
+      if (userData?.role === 'student' || userData?.role === 'limited') {
+        setActiveStudent(userData)
       }
       else {
         if (flashcardDataCompleteQueue.current === 0) {
           setFlashcardDataComplete(true)
         }
       }
-      if (qbUserData?.isAdmin) {
+      if (userData?.isAdmin) {
         async function setupStudentList() {
           const studentListPromise = await getStudentList()
           setStudentList(studentListPromise)
@@ -604,7 +603,7 @@ function App({ SentryRoutes }) {
         setupStudentList()
       }
     }
-  }, [qbUserData, getStudentList, setupAudioExamplesTable])
+  }, [userData, getStudentList, setupAudioExamplesTable])
 
   useEffect(() => {
     if (rendered.current && programTable.length > 0) {
@@ -644,29 +643,29 @@ function App({ SentryRoutes }) {
           )}
           {isAuthenticated && !appsLoadable && <p>Loading user data...</p>}
           {appsLoadable
-          && (qbUserData.role === 'student' || qbUserData.role === 'limited')
-          && !qbUserData.isAdmin && (
+          && (userData.role === 'student' || userData.role === 'limited')
+          && !userData.isAdmin && (
             <p>
               Welcome back,
-              {` ${qbUserData.name}`}
+              {` ${userData.name}`}
               !
             </p>
           )}
 
           {isAuthenticated
           && appsLoadable
-          && qbUserData.role !== 'student'
-          && qbUserData.role !== 'limited'
-          && !qbUserData.isAdmin && <p>Welcome back!</p>}
+          && userData.role !== 'student'
+          && userData.role !== 'limited'
+          && !userData.isAdmin && <p>Welcome back!</p>}
 
-          {appsLoadable && qbUserData.isAdmin && !choosingStudent && (
+          {appsLoadable && userData.isAdmin && !choosingStudent && (
             <div className="studentList">
               {activeStudent.recordId && (
                 <p>
                   Using as
                   {' '}
                   {activeStudent.name}
-                  {activeStudent.recordId === qbUserData.recordId
+                  {activeStudent.recordId === userData.recordId
                   && ' (yourself)'}
                 </p>
               )}
@@ -674,7 +673,7 @@ function App({ SentryRoutes }) {
               <button type="button" onClick={chooseStudent}>Change</button>
             </div>
           )}
-          {appsLoadable && qbUserData.isAdmin && choosingStudent && (
+          {appsLoadable && userData.isAdmin && choosingStudent && (
             <form className="studentList" onSubmit={e => e.preventDefault}>
               <select
                 value={activeStudent ? activeStudent.recordId : {}}
@@ -701,11 +700,8 @@ function App({ SentryRoutes }) {
             path="/"
             element={(
               <Menu
-                userData={qbUserData}
                 updateExamplesTable={updateExamplesTable}
                 examplesTable={examplesTable.current}
-                studentExamplesTable={studentExamplesTable}
-                activeStudent={activeStudent}
                 flashcardDataComplete={flashcardDataComplete}
                 audioExamplesTable={audioExamplesTable}
                 filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
@@ -721,10 +717,8 @@ function App({ SentryRoutes }) {
               (activeStudent?.role === 'student' && studentExamplesTable.length > 0)
                 ? (
                     <Quiz
-                      activeStudent={activeStudent}
                       examplesToParse={examplesTable.current}
                       quizTitle="My Flashcards"
-                      studentExamples={studentExamplesTable}
                       quizOnlyCollectedExamples
                       addFlashcard={addToActiveStudentFlashcards}
                       makeMenuShow={() => navigate('..')}
@@ -742,12 +736,9 @@ function App({ SentryRoutes }) {
               (activeStudent?.role === 'student' && studentExamplesTable.length > 0)
                 ? (
                     <SRSQuizApp
-                      userData={qbUserData}
                       flashcardDataComplete={flashcardDataComplete}
                       updateExamplesTable={updateExamplesTable}
-                      activeStudent={activeStudent}
                       examplesTable={examplesTable.current}
-                      studentExamplesTable={studentExamplesTable}
                       removeFlashcard={removeFlashcardFromActiveStudent}
                       getAccessToken={getAccessToken}
                     />
@@ -763,8 +754,6 @@ function App({ SentryRoutes }) {
                 ? (
                     <FlashcardManager
                       examplesTable={examplesTable.current}
-                      studentExamplesTable={studentExamplesTable}
-                      activeStudent={qbUserData}
                       flashcardDataComplete={flashcardDataComplete}
                       removeFlashcard={removeFlashcardFromActiveStudent}
                       updateExamplesTable={updateExamplesTable}
@@ -779,8 +768,6 @@ function App({ SentryRoutes }) {
               <LCSPQuizApp
                 getAccessToken={getAccessToken}
                 updateExamplesTable={updateExamplesTableQuietly}
-                studentExamples={studentExamplesTable}
-                activeStudent={activeStudent}
                 selectedProgram={selectedProgram}
                 selectedLesson={selectedLesson}
                 addFlashcard={addToActiveStudentFlashcards}
@@ -792,12 +779,11 @@ function App({ SentryRoutes }) {
             exact
             path="/flashcardfinder"
             element={
-              (qbUserData.role === 'student'
-              || qbUserData.role === 'limited'
-              || qbUserData.isAdmin) && (
+              (userData.role === 'student'
+              || userData.role === 'limited'
+              || userData.isAdmin) && (
                 <FlashcardFinder
-                  user={qbUserData || {}}
-                  activeStudent={activeStudent}
+                  user={userData || {}}
                   programTable={programTable}
                   getAccessToken={getAccessToken}
                   studentList={studentList}
@@ -823,13 +809,11 @@ function App({ SentryRoutes }) {
             exact
             path="/audioquiz"
             element={
-              (qbUserData.role === 'student'
-              || qbUserData.role === 'limited'
-              || qbUserData.isAdmin) && (
+              (userData.role === 'student'
+              || userData.role === 'limited'
+              || userData.isAdmin) && (
                 <AudioQuiz
-                  activeStudent={activeStudent}
                   programTable={programTable}
-                  studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
                   audioExamplesTable={audioExamplesTable}
                   filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
@@ -845,13 +829,11 @@ function App({ SentryRoutes }) {
             exact
             path="/comprehensionquiz"
             element={
-              (qbUserData.role === 'student'
-              || qbUserData.role === 'limited'
-              || qbUserData.isAdmin) && (
+              (userData.role === 'student'
+              || userData.role === 'limited'
+              || userData.isAdmin) && (
                 <ComprehensionQuiz
-                  activeStudent={activeStudent}
                   programTable={programTable}
-                  studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
                   audioExamplesTable={audioExamplesTable}
                   filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
@@ -867,9 +849,8 @@ function App({ SentryRoutes }) {
             exact
             path="/frequensay"
             element={
-              qbUserData.isAdmin && (
+              userData.isAdmin && (
                 <FrequenSay
-                  activeStudent={activeStudent}
                   programTable={programTable}
                   selectedLesson={selectedLesson}
                   selectedProgram={selectedProgram}
@@ -883,9 +864,8 @@ function App({ SentryRoutes }) {
             exact
             path="/coaching"
             element={
-              qbUserData.isAdmin && (
+              userData.isAdmin && (
                 <Coaching
-                  userData={qbUserData}
                   contextual={contextual}
                   openContextual={openContextual}
                   closeContextual={closeContextual}

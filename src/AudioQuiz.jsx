@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react'
 import './App.css'
 
 import AudioBasedReview from './AudioBasedReview'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function AudioQuiz({
   programTable,
-  activeStudent,
-  studentExamplesTable,
   updateBannerMessage,
   audioExamplesTable,
   filterExamplesByAllowedVocab,
@@ -15,6 +14,7 @@ export default function AudioQuiz({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
+  const { activeStudent, studentExamplesTable } = useActiveStudent()
   const [audioQuizExamples, setAudioQuizExamples] = useState([])
   const [audioQuizReady, setAudioQuizReady] = useState(false)
   function filterExamplesByEnglishAudio(examples) {

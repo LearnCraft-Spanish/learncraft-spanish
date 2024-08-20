@@ -5,14 +5,14 @@ import './App.css'
 import {
   getLcspQuizzesFromBackend,
 } from './functions/BackendFetchFunctions'
+
+import { useActiveStudent } from './hooks/useActiveStudent'
 import CourseQuizzes from './CourseQuizzes.jsx'
 import MenuButton from './components/MenuButton'
 import OfficialQuiz from './OfficialQuiz'
 
 export default function LCSPQuizApp({
   getAccessToken,
-  studentExamples,
-  activeStudent,
   selectedProgram,
   selectedLesson,
   addFlashcard,
@@ -20,6 +20,7 @@ export default function LCSPQuizApp({
   updateExamplesTable,
 }) {
   const navigate = useNavigate()
+  const { activeStudent } = useActiveStudent()
   const [quizCourse, setQuizCourse] = useState('lcsp')
   const [dataLoaded, setDataLoaded] = useState(false)
   const [chosenQuiz, setChosenQuiz] = useState('2')
@@ -248,7 +249,6 @@ export default function LCSPQuizApp({
           path={`${course.url}/*`}
           element={(
             <CourseQuizzes
-              activeStudent={activeStudent}
               addFlashcard={addFlashcard}
               chosenQuiz={chosenQuiz}
               courses={courses.current}
@@ -266,7 +266,6 @@ export default function LCSPQuizApp({
               quizTable={quizTable}
               removeFlashcard={removeFlashcard}
               setChosenQuiz={setChosenQuiz}
-              studentExamples={studentExamples}
               studentHasDefaultQuiz={studentHasDefaultQuiz}
               thisCourse={course.code}
               updateChosenQuiz={updateChosenQuiz}
@@ -324,7 +323,7 @@ export default function LCSPQuizApp({
 
   useEffect(() => {
     if (
-      activeStudent.recordId
+      activeStudent?.recordId
       && selectedProgram.recordId
       && selectedLesson.recordId
       && quizTable?.length > 0
@@ -332,7 +331,7 @@ export default function LCSPQuizApp({
     ) {
       findDefaultQuiz()
     }
-    else if (!activeStudent.recordId) {
+    else if (!activeStudent?.recordId) {
       studentHasDefaultQuiz.current = false
     }
   }, [activeStudent?.recordId, selectedProgram?.recordId, selectedLesson?.recordId, findDefaultQuiz, getCourseUrlFromCode, quizCourse, quizTable?.length])
@@ -373,7 +372,6 @@ export default function LCSPQuizApp({
             path=":number"
             element={(
               <OfficialQuiz
-                activeStudent={activeStudent}
                 addFlashcard={addFlashcard}
                 chosenQuiz={chosenQuiz}
                 courses={courses.current}
@@ -388,7 +386,6 @@ export default function LCSPQuizApp({
                 quizCourse={quizCourse}
                 quizTable={quizTable}
                 removeFlashcard={removeFlashcard}
-                studentExamples={studentExamples}
                 updateChosenQuiz={updateChosenQuiz}
                 updateExamplesTable={updateExamplesTable}
               />
