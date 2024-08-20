@@ -180,12 +180,7 @@ function App({ SentryRoutes }) {
 
   const getUserData = useCallback(async () => {
     try {
-      const userData = await getUserDataFromBackend(getAccessToken()).then(
-        (result) => {
-          const usefulData = result[0]
-          return usefulData
-        },
-      )
+      const userData = await getUserDataFromBackend(getAccessToken())
       return userData
     }
     catch (e) {
@@ -195,13 +190,8 @@ function App({ SentryRoutes }) {
 
   const getStudentList = useCallback(async () => {
     try {
-      const allStudentData = await getAllUsersFromBackend(getAccessToken()).then(
-        (result) => {
-          const usefulData = result
-          return usefulData
-        },
-      )
-      return allStudentData[0]
+      const allStudentData = await getAllUsersFromBackend(getAccessToken())
+      return allStudentData
     }
     catch (e) {
       console.error(e.message)
@@ -342,7 +332,6 @@ function App({ SentryRoutes }) {
         studentTableData = await getActiveExamplesFromBackend(
           getAccessToken(),
           activeStudent.recordId,
-          activeStudent.emailAddress,
         )
       }
       catch (e) {
