@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 
-import { formatSpanishText } from './functions/formatFlashcardText'
+import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 
 interface Flashcard {
   recordId: number
@@ -93,10 +93,10 @@ function FlashcardManager({
     const finalTable = sortedExamples.map(item => (
       <div className="exampleCard" key={item.recordId}>
         <div className="exampleCardSpanishText">
-          <h3>{formatSpanishText(item.spanglish, item.spanishExample)}</h3>
+          {formatSpanishText(item.spanglish, item.spanishExample)}
         </div>
         <div className="exampleCardEnglishText">
-          <h4>{item.englishTranslation}</h4>
+          {formatEnglishText(item.englishTranslation)}
         </div>
         {item.spanglish === 'spanglish' && (
           <div className="spanglishLabel">

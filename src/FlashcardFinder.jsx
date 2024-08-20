@@ -5,7 +5,7 @@ import {
   getVocabFromBackend,
 } from './BackendFetchFunctions'
 
-import { formatSpanishText } from './functions/formatFlashcardText'
+import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 
 import './App.css'
 
@@ -238,10 +238,10 @@ const FlashcardFinder = forwardRef(
       const tableToDisplay = displayExamples.map(item => (
         <div className="exampleCard" key={item.recordId}>
           <div className="exampleCardSpanishText">
-            <h3>{formatSpanishText(item.spanglish, item.spanishExample)}</h3>
+            {formatSpanishText(item.spanglish, item.spanishExample)}
           </div>
           <div className="exampleCardEnglishText">
-            <h4>{item.englishTranslation}</h4>
+            {formatEnglishText(item.englishTranslation)}
           </div>
           {activeStudent.role === 'student' && !item.isAssigned && (
             <button

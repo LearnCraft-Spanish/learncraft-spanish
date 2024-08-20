@@ -246,17 +246,6 @@ button:hover, .linkButton:hover {
   cursor: pointer;
 }
 
-.englishFlashcardText {
-  font-size: 18px;
-  font-weight: 400;
-  font-style: normal;
-}
-
-.spanishFlashcardText {
-  font-size: 18px;
-  font-weight: 600;
-  font-style: italic;
-}
 
 .readyButton {
   display: flex;
@@ -674,14 +663,6 @@ will remove from .css when all instances are removed */
   margin: 5px 30px;
 }
 
-.exampleCardSpanishText, .exampleCardEnglishText {
-  flex-grow: 1;
-  width: 70px;
-  background-color: var(--light);
-  align-content: center;
-  margin: 2px;
-  padding: 5px 15px;
-}
 
 .addButton, .ownedButton {
   width: 10%;
@@ -692,19 +673,9 @@ will remove from .css when all instances are removed */
   background-color: var(--dark);
 }
 
-.exampleCardSpanishText h3 {
-  text-align: left;
-  font-size: 16px;
-  font-style: italic;
-  margin: 0;
-}
 
-.exampleCardEnglishText h4 {
-  text-align: left;
-  font-size: 16px;
-  font-weight: 400;
-  margin: 0;
-}
+
+
 
 /*Styles for the coaching section*/
 
@@ -894,4 +865,29 @@ will remove from .css when all instances are removed */
     width: 95%;
     min-width: 0;
   }
+}
+
+/*      FLashcardManager and FlashcardFinder shared styles      */
+
+.exampleCardSpanishText, .exampleCardEnglishText {
+  color: var(--dark);
+  background-color: var(--light);
+  text-align: left;
+  font-size: 16px;
+  flex-grow: 1;
+  width: 70px;
+  margin: 2px;
+  padding: 4px 16px;
+
+}
+
+/* formatFlashcardText function classes */
+.englishFlashcardText, p.englishFlashcardText {
+  font-weight: 400;
+  font-style: normal;
+}
+
+.spanishFlashcardText, p.spanishFlashcardText {
+  font-weight: 600;
+  font-style: italic;
 }
