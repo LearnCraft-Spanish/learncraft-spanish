@@ -1,4 +1,4 @@
-import type * as types from './interfaceDefinitions'
+import type * as types from '../interfaceDefinitions'
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL
 

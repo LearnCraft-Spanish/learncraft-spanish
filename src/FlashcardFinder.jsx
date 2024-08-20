@@ -3,7 +3,7 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import {
   getVerifiedExamplesFromBackend,
   getVocabFromBackend,
-} from './BackendFetchFunctions'
+} from './functions/BackendFetchFunctions'
 
 import { formatSpanishText } from './functions/formatFlashcardText'
 

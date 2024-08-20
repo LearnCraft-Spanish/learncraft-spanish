@@ -15,7 +15,7 @@ import {
   getMyExamplesFromBackend,
   getProgramsFromBackend,
   getUserDataFromBackend,
-} from './BackendFetchFunctions'
+} from './functions/BackendFetchFunctions'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
 import AudioQuiz from './AudioQuiz'

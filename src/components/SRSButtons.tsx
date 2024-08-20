@@ -2,7 +2,7 @@ import type { Flashcard, StudentExample, UserData } from '../interfaceDefinition
 import {
   updateMyStudentExample,
   updateStudentExample,
-} from '../BackendFetchFunctions'
+} from '../functions/BackendFetchFunctions'
 
 interface QuizButtonsProps {
   currentExample: Flashcard
