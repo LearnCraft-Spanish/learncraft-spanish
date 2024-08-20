@@ -15,7 +15,7 @@ interface SRSQuizAppProps {
   addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
   makeMenuShow: () => void
-  getAccessToken: () => string
+  getAccessToken: () => Promise<string>
 }
 
 // TODO:

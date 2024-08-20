@@ -326,7 +326,6 @@ function App({ SentryRoutes }) {
   const updateExamplesTableQuietly = useCallback(async () => {
     let studentTableData
     flashcardDataCompleteQueue.current++
-    console.log(flashcardDataCompleteQueue.current)
     if (qbUserData?.isAdmin) {
       try {
         studentTableData = await getActiveExamplesFromBackend(
@@ -339,7 +338,6 @@ function App({ SentryRoutes }) {
       }
       finally {
         flashcardDataCompleteQueue.current--
-        console.log(flashcardDataCompleteQueue.current)
         if (flashcardDataCompleteQueue.current === 0) {
           if (studentTableData?.examples && studentTableData?.studentExamples) {
             examplesTable.current = studentTableData.examples
@@ -357,7 +355,6 @@ function App({ SentryRoutes }) {
           activeStudent.recordId,
           activeStudent.emailAddress,
         ).then((result) => {
-          console.log(result)
           examplesTable.current = result.examples
           setStudentExamplesTable(result.studentExamples)
         })
@@ -367,7 +364,6 @@ function App({ SentryRoutes }) {
       }
       finally {
         flashcardDataCompleteQueue.current--
-        console.log(flashcardDataCompleteQueue.current)
         if (flashcardDataCompleteQueue.current === 0) {
           if (studentTableData?.examples && studentTableData?.studentExamples) {
             examplesTable.current = studentTableData.examples
