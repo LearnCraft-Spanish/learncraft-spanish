@@ -2,52 +2,51 @@ import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { sampleMyExamples, sampleStudent } from '../tests/mockData'
-
+import { sampleMyExamples, sampleStudent } from '../../tests/mockData'
+import { ActiveStudentProvider } from '../contexts/ActiveStudentContext'
+import { useActiveStudent } from '../hooks/useActiveStudent'
 import Quiz from './Quiz'
 
 const addFlashcard = vi.fn()
 const removeFlashcard = vi.fn()
 const cleanupFunction = vi.fn()
-const getAccessToken = vi.fn()
 
 function renderQuizNoSrs() {
   render(
     <MemoryRouter>
-      <Quiz
-        quizTitle="Test Quiz"
-        examplesToParse={sampleMyExamples.examples}
-        activeStudent={sampleStudent}
-        // startWithSpanish={false}
-        studentExamples={sampleMyExamples.studentExamples}
-        // quizOnlyCollectedExamples={false}
-        // isSrsQuiz={false}
-        userData={sampleStudent}
-        addFlashcard={addFlashcard}
-        removeFlashcard={removeFlashcard}
-        cleanupFunction={cleanupFunction}
-        getAccessToken={getAccessToken}
-      />
+      <ActiveStudentProvider>
+        <Quiz
+          quizTitle="Test Quiz"
+          examplesToParse={sampleMyExamples.examples}
+          // startWithSpanish={false}
+          // quizOnlyCollectedExamples={false}
+          // isSrsQuiz={false}
+          // userData={sampleStudent}
+          addFlashcard={addFlashcard}
+          removeFlashcard={removeFlashcard}
+
+          cleanupFunction={cleanupFunction}
+        />
+      </ActiveStudentProvider>
     </MemoryRouter>,
   )
 }
 function renderQuizYesSrs() {
   render(
     <MemoryRouter>
-      <Quiz
-        quizTitle="Test Quiz"
-        examplesToParse={sampleMyExamples.examples}
-        activeStudent={sampleStudent}
-        // startWithSpanish={false}
-        studentExamples={sampleMyExamples.studentExamples}
-        // quizOnlyCollectedExamples={false}
-        isSrsQuiz
-        userData={sampleStudent}
-        addFlashcard={addFlashcard}
-        removeFlashcard={removeFlashcard}
-        cleanupFunction={cleanupFunction}
-        getAccessToken={getAccessToken}
-      />
+      <ActiveStudentProvider>
+        <Quiz
+          quizTitle="Test Quiz"
+          examplesToParse={sampleMyExamples.examples}
+          // startWithSpanish={false}
+          // quizOnlyCollectedExamples={false}
+          isSrsQuiz
+          // userData={sampleStudent}
+          addFlashcard={addFlashcard}
+          removeFlashcard={removeFlashcard}
+          cleanupFunction={cleanupFunction}
+        />
+      </ActiveStudentProvider>
     </MemoryRouter>,
   )
 }
@@ -237,22 +236,29 @@ describe('component Quiz', () => {
     }
     render(
       <MemoryRouter>
-        <Quiz
-          quizTitle="Test Quiz"
-          examplesToParse={[unknownExample]}
-          activeStudent={sampleStudent}
-          // startWithSpanish={false}
-          studentExamples={sampleMyExamples.studentExamples}
-          // quizOnlyCollectedExamples={false}
-          // isSrsQuiz={false}
-          userData={sampleStudent}
-          addFlashcard={addFlashcard}
-          removeFlashcard={removeFlashcard}
-          cleanupFunction={cleanupFunction}
-          getAccessToken={getAccessToken}
-        />
+        <ActiveStudentProvider>
+          <Quiz
+            quizTitle="Test Quiz"
+            examplesToParse={[unknownExample]}
+            // startWithSpanish={false}
+            // quizOnlyCollectedExamples={false}
+            // isSrsQuiz={false}
+            // userData={sampleStudent}
+            addFlashcard={addFlashcard}
+            removeFlashcard={removeFlashcard}
+
+            cleanupFunction={cleanupFunction}
+          />
+        </ActiveStudentProvider>
       </MemoryRouter>,
     )
+    const { setActiveStudent, setStudentExamplesTable } = useActiveStudent()
+    if (setActiveStudent) {
+      setActiveStudent(sampleStudent)
+    }
+    if (setStudentExamplesTable) {
+      setStudentExamplesTable(sampleMyExamples.studentExamples)
+    }
     const flashcard = screen.getByRole('button', { name: 'flashcard' })
     act(() => {
       fireEvent.click(flashcard)
@@ -266,20 +272,20 @@ describe('component Quiz', () => {
   it('calls togglePlaying on audio button click', () => {
     render(
       <MemoryRouter>
-        <Quiz
-          quizTitle="Test Quiz"
-          examplesToParse={[sampleMyExamples.examples[2]]}
-          activeStudent={sampleStudent}
-          // startWithSpanish={false}
-          studentExamples={sampleMyExamples.studentExamples}
-          // quizOnlyCollectedExamples={false}
-          // isSrsQuiz={false}
-          userData={sampleStudent}
-          addFlashcard={addFlashcard}
-          removeFlashcard={removeFlashcard}
-          cleanupFunction={cleanupFunction}
-          getAccessToken={getAccessToken}
-        />
+        <ActiveStudentProvider>
+          <Quiz
+            quizTitle="Test Quiz"
+            examplesToParse={[sampleMyExamples.examples[2]]}
+            // startWithSpanish={false}
+            // quizOnlyCollectedExamples={false}
+            // isSrsQuiz={false}
+            // userData={sampleStudent}
+            addFlashcard={addFlashcard}
+            removeFlashcard={removeFlashcard}
+
+            cleanupFunction={cleanupFunction}
+          />
+        </ActiveStudentProvider>
       </MemoryRouter>,
     )
     const flashcard = screen.getByRole('button', { name: 'flashcard' })

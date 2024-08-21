@@ -1,13 +1,13 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import type { Flashcard, StudentExample } from './interfaceDefinitions'
-import FlashcardDisplay from './components/Flashcard'
-import QuizButtons from './components/QuizButtons'
-import QuizProgress from './components/QuizProgress'
-import MenuButton from './components/MenuButton'
-import SRSQuizButtons from './components/SRSButtons'
-import { useActiveStudent } from './hooks/useActiveStudent'
+import type { Flashcard, StudentExample } from '../interfaceDefinitions'
+import FlashcardDisplay from '../components/Flashcard'
+import QuizButtons from '../components/QuizButtons'
+import QuizProgress from '../components/QuizProgress'
+import MenuButton from '../components/MenuButton'
+import SRSQuizButtons from '../components/SRSButtons'
+import { useActiveStudent } from '../hooks/useActiveStudent'
 
 interface QuizProps {
   quizTitle: string

@@ -2,13 +2,13 @@ import { lessonData } from './mockLessonData'
 
 export const sampleStudent
   = {
-    cohort: 'A',
-    emailAddress: 'classicalmoser@gmail.com',
-    isAdmin: false,
-    name: 'Student B',
     recordId: 2,
-    relatedProgram: 3,
+    name: 'Student B',
+    emailAddress: 'classicalmoser@gmail.com',
+    cohort: 'A',
     role: 'student',
+    relatedProgram: 3,
+    isAdmin: false,
   }
 
 export const sampleLessons = lessonData
