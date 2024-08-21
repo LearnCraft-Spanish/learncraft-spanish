@@ -3,21 +3,9 @@ import React, { isValidElement, useCallback, useEffect, useRef, useState } from 
 import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 
-import {
-  createMyStudentExample,
-  createStudentExample,
-  deleteMyStudentExample,
-  deleteStudentExample,
-  getActiveExamplesFromBackend,
-  getAllUsersFromBackend,
-  getAudioExamplesFromBackend,
-  getLessonsFromBackend,
-  getMyExamplesFromBackend,
-  getProgramsFromBackend,
-  getUserDataFromBackend,
-} from './functions/BackendFetchFunctions'
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
+import { useBackend } from './hooks/BackendFetchFunctions'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
 import AudioQuiz from './AudioQuiz'
@@ -36,8 +24,20 @@ import Quiz from './Quiz'
 
 function App({ SentryRoutes }) {
   // initialize and destructure Auth0 hook and define audience
-  const { isAuthenticated, getAccessTokenSilently, isLoading } = useAuth0()
-  const audience = useRef(import.meta.env.VITE_API_AUDIENCE)
+  const { isAuthenticated, isLoading } = useAuth0()
+  const {
+    createMyStudentExample,
+    createStudentExample,
+    deleteMyStudentExample,
+    deleteStudentExample,
+    getActiveExamplesFromBackend,
+    getAllUsersFromBackend,
+    getAudioExamplesFromBackend,
+    getLessonsFromBackend,
+    getMyExamplesFromBackend,
+    getProgramsFromBackend,
+    getUserDataFromBackend,
+  } = useBackend()
 
   // React Router hooks
   const location = useLocation()
@@ -77,19 +77,6 @@ function App({ SentryRoutes }) {
   // Reference to the current contextual menu element
   const currentContextual = useRef(null)
   const [contextual, setContextual] = useState('') // String to indicate which contextual menu is open
-
-  // global function returns promise for access token
-  const getAccessToken = useCallback(async () => {
-    const accessToken = await getAccessTokenSilently({
-      authorizationParams: {
-        audience: audience.current,
-        scope:
-          'openid profile email read:current-student update:current-student read:all-students update:all-students',
-      },
-      cacheMode: 'off',
-    })
-    return accessToken
-  }, [getAccessTokenSilently])
 
   // global functions to open and close any contextual menus – hard limit to one at a time
   const openContextual = useCallback((elementClass) => {
@@ -177,35 +164,15 @@ function App({ SentryRoutes }) {
     setActiveStudent(newStudent)
   }, [studentList, setActiveStudent])
 
-  const getUserData = useCallback(async () => {
-    try {
-      const userData = await getUserDataFromBackend(getAccessToken())
-      return userData
-    }
-    catch (e) {
-      console.error(e?.message)
-    }
-  }, [getAccessToken])
-
-  const getStudentList = useCallback(async () => {
-    try {
-      const allStudentData = await getAllUsersFromBackend(getAccessToken())
-      return allStudentData
-    }
-    catch (e) {
-      console.error(e.message)
-    }
-  }, [getAccessToken])
-
   const userSetup = useCallback(async () => {
     try {
-      const userData = await getUserData()
-      setUserData(userData)
+      const dataResponse = await getUserDataFromBackend()
+      setUserData(dataResponse)
     }
     catch (e) {
       console.error(e.message)
     }
-  }, [getUserData, setUserData])
+  }, [getUserDataFromBackend, setUserData])
 
   const updateBannerMessage = useCallback((message) => {
     setBannerMessage(message)
@@ -216,36 +183,8 @@ function App({ SentryRoutes }) {
   }, [])
 
   const parseCourseLessons = useCallback(async () => {
-    async function getLessons() {
-      try {
-        const lessons = await getLessonsFromBackend(getAccessToken()).then(
-          (result) => {
-            const usefulData = result
-            return usefulData
-          },
-        )
-        return lessons
-      }
-      catch (e) {
-        console.error(e.message)
-      }
-    }
-    async function getPrograms() {
-      try {
-        const programs = await getProgramsFromBackend(getAccessToken()).then(
-          (result) => {
-            const usefulData = result
-            return usefulData
-          },
-        )
-        return programs
-      }
-      catch (e) {
-        console.error(e.message)
-      }
-    }
-    const lessonTable = await getLessons()
-    const courses = await getPrograms()
+    const lessonTable = await getLessonsFromBackend()
+    const courses = await getProgramsFromBackend()
     function parseLessonsByVocab() {
       courses.forEach((course) => {
         const combinedVocabulary = []
@@ -283,7 +222,7 @@ function App({ SentryRoutes }) {
       setProgramTable(parsedLessons)
       return parsedLessons
     })
-  }, [getAccessToken])
+  }, [getLessonsFromBackend, getProgramsFromBackend])
 
   const getStudentLevel = useCallback(() => {
     let studentProgram
@@ -328,7 +267,6 @@ function App({ SentryRoutes }) {
     if (userData?.isAdmin) {
       try {
         studentTableData = await getActiveExamplesFromBackend(
-          getAccessToken(),
           activeStudent.recordId,
         )
       }
@@ -349,14 +287,11 @@ function App({ SentryRoutes }) {
     else if (userData?.role === 'student') {
       // Pulls examples and student examples ONLY for the current user
       try {
-        studentTableData = await getMyExamplesFromBackend(
-          getAccessToken(),
-          activeStudent.recordId,
-          activeStudent.emailAddress,
-        ).then((result) => {
-          examplesTable.current = result.examples
-          setStudentExamplesTable(result.studentExamples)
-        })
+        studentTableData = await getMyExamplesFromBackend()
+          .then((result) => {
+            examplesTable.current = result.examples
+            setStudentExamplesTable(result.studentExamples)
+          })
       }
       catch (e) {
         console.error(e.message)
@@ -372,7 +307,7 @@ function App({ SentryRoutes }) {
         }
       }
     }
-  }, [getAccessToken, activeStudent, userData, setStudentExamplesTable])
+  }, [activeStudent, userData, getActiveExamplesFromBackend, getMyExamplesFromBackend, setStudentExamplesTable])
 
   const updateExamplesTable = useCallback(async () => {
     setFlashcardDataComplete(false)
@@ -425,7 +360,6 @@ function App({ SentryRoutes }) {
     if (activeStudent.recordId && userData.isAdmin) {
       try {
         const data = await createStudentExample(
-          getAccessToken(),
           activeStudent.recordId,
           recordId,
         ).then((result) => {
@@ -446,7 +380,7 @@ function App({ SentryRoutes }) {
     }
     else if (activeStudent.recordId && userData.role === 'student') {
       try {
-        const data = await createMyStudentExample(getAccessToken(), recordId).then(
+        const data = await createMyStudentExample(recordId).then(
           (result) => {
             if (result === 1) {
               updateBannerMessage('Flashcard Added!')
@@ -465,7 +399,7 @@ function App({ SentryRoutes }) {
         return false
       }
     }
-  }, [activeStudent, userData, getAccessToken, updateBannerMessage, updateExamplesTableQuietly])
+  }, [activeStudent, userData, createMyStudentExample, createStudentExample, updateBannerMessage, updateExamplesTableQuietly])
 
   const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId, updateTable = true) => {
     setBannerMessage('Removing Flashcard')
@@ -480,7 +414,6 @@ function App({ SentryRoutes }) {
     if (studentExampleRecordId && userData.isAdmin) {
       try {
         const data = await deleteStudentExample(
-          getAccessToken(),
           studentExampleRecordId,
         ).then((result) => {
           if (result === 1) {
@@ -501,7 +434,6 @@ function App({ SentryRoutes }) {
     else if (studentExampleRecordId && userData.role === 'student') {
       try {
         const data = await deleteMyStudentExample(
-          getAccessToken(),
           studentExampleRecordId,
         ).then((result) => {
           if (result === 1) {
@@ -523,7 +455,7 @@ function App({ SentryRoutes }) {
       setBannerMessage('Flashcard not found')
       return 0
     }
-  }, [userData, studentExamplesTable, getAccessToken, updateExamplesTableQuietly])
+  }, [userData, studentExamplesTable, deleteMyStudentExample, deleteStudentExample, updateExamplesTableQuietly])
 
   const filterExamplesByAllowedVocab = useCallback((examples, lessonId) => {
     let allowedVocabulary = []
@@ -557,7 +489,7 @@ function App({ SentryRoutes }) {
 
   const setupAudioExamplesTable = useCallback(async () => {
     try {
-      const data = await getAudioExamplesFromBackend(getAccessToken()).then(
+      const data = await getAudioExamplesFromBackend().then(
         (result) => {
           setAudioExamplesTable(result)
         },
@@ -567,7 +499,7 @@ function App({ SentryRoutes }) {
     catch (e) {
       console.error(e.message)
     }
-  }, [getAccessToken])
+  }, [getAudioExamplesFromBackend])
 
   useEffect(() => {
     if (!rendered.current) {
@@ -597,13 +529,13 @@ function App({ SentryRoutes }) {
       }
       if (userData?.isAdmin) {
         async function setupStudentList() {
-          const studentListPromise = await getStudentList()
+          const studentListPromise = await getAllUsersFromBackend()
           setStudentList(studentListPromise)
         }
         setupStudentList()
       }
     }
-  }, [userData, getStudentList, setupAudioExamplesTable, setActiveStudent])
+  }, [userData, getAllUsersFromBackend, setupAudioExamplesTable, setActiveStudent])
 
   useEffect(() => {
     if (rendered.current && programTable.length > 0) {
@@ -740,7 +672,6 @@ function App({ SentryRoutes }) {
                       updateExamplesTable={updateExamplesTable}
                       examplesTable={examplesTable.current}
                       removeFlashcard={removeFlashcardFromActiveStudent}
-                      getAccessToken={getAccessToken}
                     />
                   )
                 : (<Navigate to="/" />)
@@ -766,7 +697,6 @@ function App({ SentryRoutes }) {
             path="/officialquizzes/*"
             element={(
               <LCSPQuizApp
-                getAccessToken={getAccessToken}
                 updateExamplesTable={updateExamplesTableQuietly}
                 selectedProgram={selectedProgram}
                 selectedLesson={selectedLesson}
@@ -785,7 +715,6 @@ function App({ SentryRoutes }) {
                 <FlashcardFinder
                   user={userData || {}}
                   programTable={programTable}
-                  getAccessToken={getAccessToken}
                   studentList={studentList}
                   studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}

@@ -1,11 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 
 import LessonSelector from './LessonSelector'
-import {
-  getSpellingsFromBackend,
-  getVocabFromBackend,
-} from './functions/BackendFetchFunctions'
+import { useBackend } from './hooks/BackendFetchFunctions'
 
 export default function FrequenSay({
   programTable,
@@ -14,9 +10,7 @@ export default function FrequenSay({
   selectedProgram,
   updateSelectedProgram,
 }) {
-  const {
-    getAccessTokenSilently,
-  } = useAuth0()
+  const { getVocabFromBackend, getSpellingsFromBackend } = useBackend()
   const [userInput, setUserInput] = useState('')
   const [userAddedVocabulary, setUserAddedVocabulary] = useState('')
   const [addManualVocabulary, setAddManualVocabulary] = useState(false)
@@ -28,7 +22,6 @@ export default function FrequenSay({
   const wordCount = useRef([])
   const extraAcceptableWords = useRef([])
   const rendered = useRef(false)
-  const audience = import.meta.env.VITE_API_AUDIENCE
 
   function additionalVocab() {
     setAddManualVocabulary(true)
@@ -53,37 +46,10 @@ export default function FrequenSay({
     }
   }
 
-  async function getSpellings() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope: 'openID email profile',
-        },
-      })
-      const spellings = await getSpellingsFromBackend(accessToken).then(
-        (result) => {
-          const usefulData = result
-          return usefulData
-        },
-      )
-      return spellings
-    }
-    catch (e) {
-      console.error(e.message)
-    }
-  }
-
   async function getVocab() {
     try {
-      const spellings = getSpellings()
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope: 'openID email profile',
-        },
-      })
-      const vocab = await getVocabFromBackend(accessToken).then(
+      const spellings = getSpellingsFromBackend()
+      const vocab = await getVocabFromBackend().then(
         async (result) => {
           const usefulData = result
           await spellings.then((result) => {

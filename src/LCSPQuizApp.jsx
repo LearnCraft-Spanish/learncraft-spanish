@@ -2,9 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 
 import './App.css'
-import {
-  getLcspQuizzesFromBackend,
-} from './functions/BackendFetchFunctions'
+import { useBackend } from './hooks/BackendFetchFunctions'
 
 import { useActiveStudent } from './hooks/useActiveStudent'
 import CourseQuizzes from './CourseQuizzes.jsx'
@@ -12,7 +10,6 @@ import MenuButton from './components/MenuButton'
 import OfficialQuiz from './OfficialQuiz'
 
 export default function LCSPQuizApp({
-  getAccessToken,
   selectedProgram,
   selectedLesson,
   addFlashcard,
@@ -21,6 +18,7 @@ export default function LCSPQuizApp({
 }) {
   const navigate = useNavigate()
   const { activeStudent } = useActiveStudent()
+  const { getLcspQuizzesFromBackend } = useBackend()
   const [quizCourse, setQuizCourse] = useState('lcsp')
   const [dataLoaded, setDataLoaded] = useState(false)
   const [chosenQuiz, setChosenQuiz] = useState('2')
@@ -65,7 +63,7 @@ export default function LCSPQuizApp({
 
   const getLCSPQuizzes = useCallback(async () => {
     try {
-      const lessons = await getLcspQuizzesFromBackend(getAccessToken()).then(
+      const lessons = await getLcspQuizzesFromBackend().then(
         (result) => {
           // console.log(result)
           const usefulData = result
@@ -78,7 +76,7 @@ export default function LCSPQuizApp({
     catch (e) {
       console.error(e.message)
     }
-  }, [getAccessToken])
+  }, [getLcspQuizzesFromBackend])
 
   const updateQuizCourseWithNavigate = useCallback((courseCode) => {
     studentHasDefaultQuiz.current = false
@@ -254,7 +252,6 @@ export default function LCSPQuizApp({
               courses={courses.current}
               createRoutesFromCourses={createRoutesFromCourses}
               dataLoaded={dataLoaded}
-              getAccessToken={getAccessToken}
               hideMenu={hideMenu}
               makeCourseList={makeCourseList}
               makeMenuHidden={makeMenuHidden}
@@ -376,7 +373,6 @@ export default function LCSPQuizApp({
                 chosenQuiz={chosenQuiz}
                 courses={courses.current}
                 dataLoaded={dataLoaded}
-                getAccessToken={getAccessToken}
                 hideMenu={hideMenu}
                 makeCourseList={makeCourseList}
                 makeMenuHidden={makeMenuHidden}

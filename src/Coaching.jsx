@@ -1,24 +1,22 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
 
-import {
-  getActiveMemberships,
-  getActiveStudents,
-  getCoachList,
-  getCourseList,
-  getLastThreeWeeks,
-  getLessonList,
-} from './functions/BackendFetchFunctions'
+import { useBackend } from './hooks/BackendFetchFunctions'
 
 const Coaching = forwardRef((
   { contextual, openContextual, closeContextual },
   currentContextual,
 ) => {
-  const { getAccessTokenSilently } = useAuth0()
   const { userData } = useUserData()
-  const audience = import.meta.env.VITE_API_AUDIENCE
+  const {
+    getActiveMemberships,
+    getActiveStudents,
+    getCoachList,
+    getCourseList,
+    getLastThreeWeeks,
+    getLessonList,
+  } = useBackend()
   const [weeksToDisplay, setWeeksToDisplay] = useState([])
   const [startupDataLoaded, setStartupDataLoaded] = useState(false)
   const [filterByCoach, setFilterByCoach] = useState({})
@@ -105,116 +103,44 @@ const Coaching = forwardRef((
   }
 
   async function makeCoachList() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope:
-            'openid profile email read:current-student update:current-student read:all-students update:all-students',
-        },
+    const coachList = await getCoachList().then((result) => {
+      result.sort((a, b) => {
+        if (a.user && b.user) {
+          return a.user.name > b.user.name ? 1 : -1
+        }
+        return 0
       })
-      const coachList = await getCoachList(accessToken).then((result) => {
-        result.sort((a, b) => {
-          if (a.user && b.user) {
-            return a.user.name > b.user.name ? 1 : -1
-          }
-          return 0
-        })
-        return result
-      })
-      return coachList
-    }
-    catch (e) {
-      console.error(e.message)
-    }
+      return result
+    })
+    return coachList
   }
 
   async function makeCourseList() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope:
-            'openid profile email read:current-student update:current-student read:all-students update:all-students',
-        },
-      })
-      const courseList = await getCourseList(accessToken).then((result) => {
-        result.sort((a, b) => (a.name > b.name ? 1 : -1))
-        return result
-      })
-      return courseList
-    }
-    catch (e) {
-      console.error(e.message)
-    }
+    const courseList = await getCourseList().then((result) => {
+      result.sort((a, b) => (a.name > b.name ? 1 : -1))
+      return result
+    })
+    return courseList
   }
 
   async function makeLessonList() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope:
-            'openid profile email read:current-student update:current-student read:all-students update:all-students',
-        },
-      })
-      const lessonList = await getLessonList(accessToken)
-      return lessonList
-    }
-    catch (e) {
-      console.error(e.message)
-    }
+    const lessonList = await getLessonList()
+    return lessonList
   }
 
   async function getThreeWeeksOfRecords() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope:
-            'openid profile email read:current-student update:current-student read:all-students update:all-students',
-        },
-      })
-      const studentRecords = await getLastThreeWeeks(accessToken)
-      return studentRecords
-    }
-    catch (e) {
-      console.error(e.message)
-    }
+    const studentRecords = await getLastThreeWeeks()
+    return studentRecords
   }
 
   async function makeStudentList() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope:
-            'openid profile email read:current-student update:current-student read:all-students update:all-students',
-        },
-      })
-      const studentRecords = await getActiveStudents(accessToken)
-      return studentRecords
-    }
-    catch (e) {
-      console.error(e.message)
-    }
+    const studentRecords = await getActiveStudents()
+    return studentRecords
   }
 
   async function makeMembershipList() {
-    try {
-      const accessToken = await getAccessTokenSilently({
-        authorizationParams: {
-          audience,
-          scope:
-            'openid profile email read:current-student update:current-student read:all-students update:all-students',
-        },
-      })
-      const studentRecords = await getActiveMemberships(accessToken)
-      return studentRecords
-    }
-    catch (e) {
-      console.error(e.message)
-    }
+    const studentRecords = await getActiveMemberships()
+    return studentRecords
   }
 
   async function loadStartupData() {

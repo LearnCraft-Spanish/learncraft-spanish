@@ -14,7 +14,6 @@ interface SRSQuizAppProps {
   addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
   makeMenuShow: () => void
-  getAccessToken: () => Promise<string>
 }
 
 // TODO:
@@ -26,7 +25,6 @@ export default function SRSQuizApp({
   addFlashcard,
   removeFlashcard,
   makeMenuShow,
-  getAccessToken,
 }: SRSQuizAppProps) {
   // const quizLength = 20 //will be used to determine how many examples to review
 
@@ -108,7 +106,6 @@ export default function SRSQuizApp({
             addFlashcard={addFlashcard}
             removeFlashcard={removeFlashcard}
             cleanupFunction={makeMenuShow}
-            getAccessToken={getAccessToken}
           />
         )}
       </div>

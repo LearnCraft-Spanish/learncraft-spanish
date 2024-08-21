@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
+import type { Flashcard, StudentExample } from './interfaceDefinitions'
 import FlashcardDisplay from './components/Flashcard'
 import QuizButtons from './components/QuizButtons'
 import QuizProgress from './components/QuizProgress'
@@ -18,8 +18,6 @@ interface QuizProps {
   addFlashcard: (recordId: number) => Promise<number>
   removeFlashcard: (recordId: number) => Promise<number>
   cleanupFunction?: () => void
-  // Fix Function Def!!!
-  getAccessToken: () => Promise<string>
 }
 
 function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
@@ -89,7 +87,6 @@ export default function Quiz({
   addFlashcard,
   removeFlashcard,
   cleanupFunction = () => {},
-  getAccessToken,
 
 }: QuizProps) {
   const location = useLocation()
@@ -296,7 +293,6 @@ export default function Quiz({
             answerShowing={answerShowing}
             updateExampleDifficulty={updateExampleDifficulty}
             incrementExampleNumber={incrementExampleNumber}
-            getAccessToken={getAccessToken}
 
           />
         )}

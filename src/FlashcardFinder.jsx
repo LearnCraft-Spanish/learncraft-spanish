@@ -1,9 +1,6 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
-import {
-  getVerifiedExamplesFromBackend,
-  getVocabFromBackend,
-} from './functions/BackendFetchFunctions'
+import { useBackend } from './hooks/BackendFetchFunctions'
 
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import { useActiveStudent } from './hooks/useActiveStudent'
@@ -30,6 +27,10 @@ const FlashcardFinder = forwardRef(
     currentContextual,
   ) => {
     const { activeStudent, studentExamplesTable } = useActiveStudent()
+    const {
+      getVerifiedExamplesFromBackend,
+      getVocabFromBackend,
+    } = useBackend()
     const isMounted = useRef(false)
     const [isLoaded, setIsLoaded] = useState(false)
     const [tagSearchTerm, setTagSearchTerm] = useState('')

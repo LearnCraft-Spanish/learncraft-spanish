@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import './App.css'
-import { getQuizExamplesFromBackend } from './functions/BackendFetchFunctions'
+import { useBackend } from './hooks/BackendFetchFunctions'
 
 import Quiz from './Quiz'
 
@@ -11,7 +11,6 @@ export default function OfficialQuiz({
   chosenQuiz,
   courses,
   dataLoaded,
-  getAccessToken,
   makeMenuHidden,
   makeMenuShow,
   quizCourse,
@@ -21,6 +20,7 @@ export default function OfficialQuiz({
 }) {
   const thisQuiz = Number.parseInt(useParams().number)
   const navigate = useNavigate()
+  const { getQuizExamplesFromBackend } = useBackend()
 
   const rendered = useRef(false)
 
@@ -35,7 +35,6 @@ export default function OfficialQuiz({
     if (quizToSearch.recordId) {
       try {
         const quizExamples = await getQuizExamplesFromBackend(
-          getAccessToken(),
           quizToSearch.recordId,
         )
         return quizExamples
@@ -44,7 +43,7 @@ export default function OfficialQuiz({
         console.error(e)
       }
     }
-  }, [thisQuiz, quizCourse, quizTable, getAccessToken])
+  }, [thisQuiz, quizCourse, quizTable, getQuizExamplesFromBackend])
 
   function makeQuizTitle() {
     const thisCourse = courses.find(course => course.code === quizCourse)

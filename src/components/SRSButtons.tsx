@@ -1,8 +1,5 @@
 import type { Flashcard, StudentExample, UserData } from '../interfaceDefinitions'
-import {
-  updateMyStudentExample,
-  updateStudentExample,
-} from '../functions/BackendFetchFunctions'
+import { useBackend } from '../hooks/BackendFetchFunctions'
 
 import { useUserData } from '../hooks/useUserData'
 import { useActiveStudent } from '../hooks/useActiveStudent'
@@ -12,24 +9,25 @@ interface QuizButtonsProps {
   answerShowing: boolean
   updateExampleDifficulty: (recordId: number, difficulty: string) => void
   incrementExampleNumber: () => void
-  getAccessToken: () => Promise<string>
 }
 
-export default function SRSQuizButtons({ currentExample, answerShowing, updateExampleDifficulty, incrementExampleNumber, getAccessToken }: QuizButtonsProps) {
+export default function SRSQuizButtons({ currentExample, answerShowing, updateExampleDifficulty, incrementExampleNumber }: QuizButtonsProps) {
   const { userData } = useUserData()
   const { studentExamplesTable } = useActiveStudent()
+  const {
+    updateMyStudentExample,
+    updateStudentExample,
+  } = useBackend()
 
   async function sendUpdate(exampleId: number, newInterval: number) {
     if (userData?.isAdmin) {
       return await updateStudentExample(
-        getAccessToken(),
         exampleId,
         newInterval,
       )
     }
     else if (userData?.role === 'student') {
       return await updateMyStudentExample(
-        getAccessToken(),
         exampleId,
         newInterval,
       )
