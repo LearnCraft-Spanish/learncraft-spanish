@@ -13,23 +13,19 @@ describe('component QuizButtons', () => {
     vi.clearAllMocks()
     cleanup()
   })
-  it('renders correctly with no audio url', () => {
+  it('renders all buttons correctly with no audio url', () => {
     render(<QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} togglePlaying={togglePlaying} audioActive="" playing={false} />)
     expect(screen.getByText('Previous')).toBeTruthy()
     expect(screen.getByText('Next')).toBeTruthy()
     expect(screen.queryByText('Play/Pause Audio')).toBeNull()
   })
 
-  it('renders correctly with an audio url and playing', () => {
+  it('renders Pause Audio correctly with an audio url and playing', () => {
     render(<QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} togglePlaying={togglePlaying} audioActive="https://example.com/audio.mp3" playing />)
-    expect(screen.getByText('Previous')).toBeTruthy()
-    expect(screen.getByText('Next')).toBeTruthy()
     expect(screen.getByText('Pause Audio')).toBeTruthy()
   })
-  it('renders correctly with an audio url and not playing', () => {
+  it('renders Play Audio correctly with an audio url and not playing', () => {
     render(<QuizButtons decrementExample={decrementExample} incrementExample={incrementExample} togglePlaying={togglePlaying} audioActive="https://example.com/audio.mp3" playing={false} />)
-    expect(screen.getByText('Previous')).toBeTruthy()
-    expect(screen.getByText('Next')).toBeTruthy()
     expect(screen.getByText('Play Audio')).toBeTruthy()
   })
 

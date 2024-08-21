@@ -1,6 +1,6 @@
 import React from 'react'
-import { describe, it } from 'vitest'
-import { render } from '@testing-library/react'
+import { describe, expect, it } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import MenuButton from './MenuButton'
@@ -12,5 +12,6 @@ describe('menu button', () => {
         <MenuButton />
       </MemoryRouter>,
     )
+    expect(screen.getByText('Back to Menu')).toBeTruthy()
   })
 })
