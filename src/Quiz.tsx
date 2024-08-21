@@ -7,7 +7,6 @@ import QuizButtons from './components/QuizButtons'
 import QuizProgress from './components/QuizProgress'
 import MenuButton from './components/MenuButton'
 import SRSQuizButtons from './components/SRSButtons'
-import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 interface QuizProps {

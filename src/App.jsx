@@ -175,7 +175,7 @@ function App({ SentryRoutes }) {
       = studentList.find(student => student.recordId === studentIDNumber) || {}
     setChoosingStudent(false)
     setActiveStudent(newStudent)
-  }, [studentList])
+  }, [studentList, setActiveStudent])
 
   const getUserData = useCallback(async () => {
     try {
@@ -372,7 +372,7 @@ function App({ SentryRoutes }) {
         }
       }
     }
-  }, [getAccessToken, activeStudent, userData])
+  }, [getAccessToken, activeStudent, userData, setStudentExamplesTable])
 
   const updateExamplesTable = useCallback(async () => {
     setFlashcardDataComplete(false)
@@ -603,7 +603,7 @@ function App({ SentryRoutes }) {
         setupStudentList()
       }
     }
-  }, [userData, getStudentList, setupAudioExamplesTable])
+  }, [userData, getStudentList, setupAudioExamplesTable, setActiveStudent])
 
   useEffect(() => {
     if (rendered.current && programTable.length > 0) {

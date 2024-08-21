@@ -1,6 +1,8 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 
+import { useUserData } from './hooks/useUserData'
+
 import {
   getActiveMemberships,
   getActiveStudents,
@@ -11,11 +13,11 @@ import {
 } from './functions/BackendFetchFunctions'
 
 const Coaching = forwardRef((
-  { userData, contextual, openContextual, closeContextual },
+  { contextual, openContextual, closeContextual },
   currentContextual,
 ) => {
-  const { getAccessTokenSilently }
-    = useAuth0()
+  const { getAccessTokenSilently } = useAuth0()
+  const { userData } = useUserData()
   const audience = import.meta.env.VITE_API_AUDIENCE
   const [weeksToDisplay, setWeeksToDisplay] = useState([])
   const [startupDataLoaded, setStartupDataLoaded] = useState(false)

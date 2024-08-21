@@ -1,258 +1,262 @@
+import { useCallback } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import type * as types from '../interfaceDefinitions'
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL
+export function useBackendFetch() {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
+  const audience = import.meta.env.VITE_API_AUDIENCE
+  const { getAccessTokenSilently } = useAuth0()
 
-async function getFactory<T>(path: string, tokenPromise: Promise<string>, headers?: any): Promise<T> {
-  const fetchUrl = `${backendUrl}${path}`
-  const response = await fetch(fetchUrl, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${await tokenPromise}`,
-      ...headers,
-    },
-  })
-    .then((res) => {
-      if (res.ok) {
-        return res.json().then((res) => {
-          const data = res
-          return data
+  const getAccessToken = useCallback(async () => {
+    const accessToken = await getAccessTokenSilently({
+      authorizationParams: {
+        audience,
+        scope:
+          'openid profile email read:current-student update:current-student read:all-students update:all-students',
+      },
+      cacheMode: 'off',
+    })
+    return accessToken
+  }, [getAccessTokenSilently, audience])
+
+  const getFactory = useCallback(
+    async <T>(path: string, headers?: any): Promise<T | undefined> => {
+      try {
+        const fetchUrl = `${backendUrl}${path}`
+        const response = await fetch(fetchUrl, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${await getAccessToken()}`,
+            ...headers,
+          },
         })
+
+        if (response.ok) {
+          return await response.json()
+        }
+        else {
+          console.error(`Failed to fetch ${path}: ${response.statusText}`)
+        }
       }
-    })
-    .catch(e => console.error(e))
-  return response
-}
+      catch (error) {
+        console.error(`Error fetching ${path}:`, error)
+      }
+      return undefined // Explicitly return undefined on failure
+    },
+    [getAccessToken, backendUrl],
+  )
 
-export async function getProgramsFromBackend(tokenPromise: Promise<string>): Promise<types.Program[]> {
-  return getFactory('public/programs', tokenPromise)
-}
+  /*      GET Requests      */
 
-export async function getLessonsFromBackend(tokenPromise: Promise<string>): Promise<types.Lesson[]> {
-  return getFactory('public/lessons', tokenPromise)
-}
+  const getProgramsFromBackend = useCallback((): Promise<types.Program[] | undefined> => {
+    return getFactory<types.Program[]>('public/programs')
+  }, [getFactory])
 
-export async function getVocabFromBackend(tokenPromise: Promise<string>): Promise<types.Flashcard[]> {
-  return getFactory('public/vocabulary', tokenPromise)
-}
+  const getLessonsFromBackend = useCallback((): Promise<types.Lesson[] | undefined> => {
+    return getFactory<types.Lesson[]>('public/lessons')
+  }, [getFactory])
 
-export async function getSpellingsFromBackend(tokenPromise: Promise<string>): Promise<types.Spelling[]> {
-  return getFactory('public/spellings', tokenPromise)
-}
+  const getVocabFromBackend = useCallback((): Promise<types.Flashcard[] | undefined> => {
+    return getFactory<types.Flashcard[]>('public/vocabulary')
+  }, [getFactory])
 
-export async function getExamplesFromBackend(tokenPromise: Promise<string>): Promise<types.Flashcard[]> {
-  return getFactory('public/examples', tokenPromise)
-}
+  const getSpellingsFromBackend = useCallback((): Promise<types.Spelling[] | undefined> => {
+    return getFactory<types.Spelling[]>('public/spellings')
+  }, [getFactory])
 
-export async function getVerifiedExamplesFromBackend(tokenPromise: Promise<string>): Promise<types.Flashcard[]> {
-  return getFactory('public/verified-examples', tokenPromise)
-}
+  const getExamplesFromBackend = useCallback((): Promise<types.Flashcard[] | undefined> => {
+    return getFactory<types.Flashcard[]>('public/examples')
+  }, [getFactory])
 
-export async function getAudioExamplesFromBackend(tokenPromise: Promise<string>): Promise<types.Flashcard[]> {
-  return getFactory('public/audio-examples', tokenPromise)
-}
+  const getVerifiedExamplesFromBackend = useCallback((): Promise<types.Flashcard[] | undefined> => {
+    return getFactory<types.Flashcard[]>('public/verified-examples')
+  }, [getFactory])
 
-export async function getLcspQuizzesFromBackend(tokenPromise: Promise<string>): Promise<types.Quiz[]> {
-  return getFactory('public/quizzes', tokenPromise)
-}
+  const getAudioExamplesFromBackend = useCallback((): Promise<types.Flashcard[] | undefined> => {
+    return getFactory<types.Flashcard[]>('public/audio-examples')
+  }, [getFactory])
 
-export async function getMyExamplesFromBackend(tokenPromise: Promise<string>): Promise<types.Flashcard[]> {
-  return getFactory('my-examples', tokenPromise)
-}
-export async function getQuizExamplesFromBackend(tokenPromise: Promise<string>, quizId: number) {
-  const path = `public/quizExamples/${quizId}`
-  return getFactory(path, tokenPromise)
-}
-export async function getAllUsersFromBackend(tokenPromise: Promise<string>): Promise<types.UserData[]> {
-  return getFactory('all-students', tokenPromise)
-}
-// export async function getAllUsersFromBackend(tokenPromise: Promise<string>) {
-//   const fetchUrl = `${backendUrl}all-students`
-//   // console.log(`Fetching ${fetchUrl}`)
-//   const tableFromBackend = await fetch(fetchUrl, {
-//     method: 'GET',
-//     headers: { Authorization: `Bearer ${await tokenPromise}` },
-//   })
-//     .then((res) => {
-//       if (res.ok) {
-//         return res.json().then((res) => {
-//           function sortFunction(a: any, b: any) {
-//             if (a.sortReference > b.sortReference) {
-//               return 1
-//             }
-//             if (a.sortReference < b.sortReference) {
-//               return -1
-//             }
-//             return 0
-//           }
-//           const data = [res]
-//           data.sort(sortFunction)
-//           // console.log(data);
-//           return data
-//         })
-//       }
-//       else if (res.status === 403) {
-//         // console.log('unauthorized')
-//       }
-//     })
-//     .catch(e => console.error(e))
+  const getLcspQuizzesFromBackend = useCallback((): Promise<types.Quiz[] | undefined> => {
+    return getFactory<types.Quiz[]>('public/quizzes')
+  }, [getFactory])
 
-//   return tableFromBackend
-// }
+  const getMyExamplesFromBackend = useCallback((): Promise<types.Flashcard[] | undefined> => {
+    return getFactory<types.Flashcard[]>('my-examples')
+  }, [getFactory])
 
-export async function getUserDataFromBackend(tokenPromise: Promise<string>): Promise<types.UserData> {
-  return getFactory('my-data', tokenPromise)
-}
+  const getQuizExamplesFromBackend = useCallback((quizId: number): Promise<types.Flashcard[] | undefined> => {
+    return getFactory<types.Flashcard[]>(`public/quizExamples/${quizId}`)
+  }, [getFactory])
 
-// I dont think sort function is needed
-// export async function getUserDataFromBackend(tokenPromise: Promise<string>) {
-//   const fetchUrl = `${backendUrl}my-data`
-//   // console.log(`Fetching ${fetchUrl}`)
+  const getAllUsersFromBackend = useCallback((): Promise<types.UserData[] | undefined> => {
+    return getFactory<types.UserData[]>('all-students')
+  }, [getFactory])
 
-//   const tableFromBackend = await fetch(fetchUrl, {
-//     method: 'GET',
-//     headers: { Authorization: `Bearer ${await tokenPromise}` },
-//   })
-//     .then((res) => {
-//       if (res.ok) {
-//         return res.json().then((res) => {
-//           function sortFunction(a: any, b: any) {
-//             if (a.sortReference > b.sortReference) {
-//               return 1
-//             }
-//             if (a.sortReference < b.sortReference) {
-//               return -1
-//             }
-//             return 0
-//           }
-//           const data = [res]
-//           data.sort(sortFunction)
-//           // console.log(data);
-//           return data
-//         })
-//       }
-//       else if (res.status === 403) {
-//         // console.log('unauthorized')
-//       }
-//     })
-//     .catch(e => console.error(e))
+  const getUserDataFromBackend = useCallback((): Promise<types.UserData | undefined> => {
+    return getFactory<types.UserData>('my-data')
+  }, [getFactory])
 
-//   return tableFromBackend
-// }
+  const getActiveExamplesFromBackend = useCallback(
+    (studentId: number): Promise<types.StudentExample[] | undefined> => {
+      return getFactory<types.StudentExample[]>(`${studentId}/examples`)
+    },
+    [getFactory],
+  )
 
-// This can be cleaned up, i dont think studentEmail is needed
-export async function getActiveExamplesFromBackend(
-  tokenPromise: Promise<string>,
-  studentId: number,
-): Promise<types.StudentExample[]> {
-  const fetchUrl = `${backendUrl}${studentId}/examples`
-  //  return getFactory(`${studentId}/examples`, tokenPromise, { EmailAddress: studentEmail })
+  /*      Coaching API      */
 
-  const tableFromBackend = await fetch(fetchUrl, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${await tokenPromise}` },
-  })
-    .then((res) => {
-      if (res.ok) {
-        return res.json().then((res) => {
-          const data = res
-          return data
+  const getCoachList = useCallback((): Promise<types.Coach[] | undefined> => {
+    return getFactory<types.Coach[]>('coaching/coaches')
+  }, [getFactory])
+
+  const getCourseList = useCallback((): Promise<string[] | undefined> => {
+    return getFactory<string[]>('coaching/courses')
+  }, [getFactory])
+
+  const getLessonList = useCallback((): Promise<string[] | undefined> => {
+    return getFactory<string[]>('coaching/lessons')
+  }, [getFactory])
+
+  const getActiveStudents = useCallback((): Promise<string[] | undefined> => {
+    return getFactory<string[]>('coaching/active-students')
+  }, [getFactory])
+
+  const getActiveMemberships = useCallback((): Promise<string[] | undefined> => {
+    return getFactory<string[]>('coaching/active-memberships')
+  }, [getFactory])
+
+  const getLastThreeWeeks = useCallback((): Promise<string[] | undefined> => {
+    return getFactory<string[]>('coaching/last-three-weeks')
+  }, [getFactory])
+
+  /*      POST Requests      */
+
+  const postFactory = useCallback(
+    async <T>(path: string, body: any, headers?: any): Promise<T | undefined> => {
+      try {
+        const fetchUrl = `${backendUrl}${path}`
+        const response = await fetch(fetchUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${await getAccessToken()}`,
+            'Content-Type': 'application/json',
+            ...headers,
+          },
+          body: JSON.stringify(body),
         })
+
+        if (response.ok) {
+          return await response.json()
+        }
+        else {
+          console.error(`Failed to post to ${path}: ${response.statusText}`)
+        }
       }
-      else if (res.status === 403) {
-        console.error('unauthorized')
+      catch (error) {
+        console.error(`Error posting to ${path}:`, error)
       }
-    })
-    .catch(e => console.error(e))
-
-  return tableFromBackend
-}
-
-/*      Coaching API      */
-
-export async function getCoachList(tokenPromise: Promise<string>) {
-  return getFactory('coaching/coaches', tokenPromise)
-}
-
-export async function getCourseList(tokenPromise: Promise<string>) {
-  return getFactory('coaching/courses', tokenPromise)
-}
-
-export async function getLessonList(tokenPromise: Promise<string>) {
-  return getFactory('coaching/lessons', tokenPromise)
-}
-
-export async function getActiveStudents(tokenPromise: Promise<string>) {
-  return getFactory('coaching/active-students', tokenPromise)
-}
-
-export async function getActiveMemberships(tokenPromise: Promise<string>) {
-  return getFactory('coaching/active-memberships', tokenPromise)
-}
-
-export async function getLastThreeWeeks(tokenPromise: Promise<string>) {
-  return getFactory('coaching/last-three-weeks', tokenPromise)
-}
-
-/*      Post Requests      */
-
-async function postFactory(path: string, tokenPromise: Promise<string>, headers?: any) {
-  const fetchUrl = `${backendUrl}${path}`
-  const response = await fetch(fetchUrl, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${await tokenPromise}`,
-      ...headers,
+      return undefined // Explicitly return undefined on failure
     },
-  })
-    .then((res) => {
-      if (res.ok) {
-        return res.json()
-      }
-    })
-    .catch(e => console.error(e))
-  return response
-}
+    [getAccessToken, backendUrl],
+  )
 
-export async function createMyStudentExample(tokenPromise: Promise<string>, exampleId: number): Promise<number> {
-  return postFactory(`create-my-student-example`, tokenPromise, { exampleid: exampleId })
-}
-
-export async function createStudentExample(tokenPromise: Promise<string>, studentId: number, exampleId: number): Promise<number> {
-  return postFactory(`create-student-example`, tokenPromise, { studentid: studentId, exampleid: exampleId })
-}
-
-export async function updateMyStudentExample(tokenPromise: Promise<string>, updateId: number, newInterval: number): Promise<number> {
-  return postFactory(`update-my-student-example`, tokenPromise, { updateid: updateId, newinterval: newInterval })
-}
-
-export async function updateStudentExample(tokenPromise: Promise<string>, updateId: number, newInterval: number): Promise<number> {
-  return postFactory(`update-student-example`, tokenPromise, { updateid: updateId, newinterval: newInterval })
-}
-
-/*     Delete Requests      */
-
-async function deleteFactory(path: string, tokenPromise: Promise<string>, headers?: any) {
-  const fetchUrl = `${backendUrl}${path}`
-  const response = await fetch(fetchUrl, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${await tokenPromise}`,
-      ...headers,
+  const createMyStudentExample = useCallback(
+    (exampleId: number): Promise<number | undefined> => {
+      return postFactory<number>('create-my-student-example', { exampleid: exampleId })
     },
-  })
-    .then((res) => {
-      if (res.ok) {
-        return res.json()
+    [postFactory],
+  )
+
+  const createStudentExample = useCallback(
+    (studentId: number, exampleId: number): Promise<number | undefined> => {
+      return postFactory<number>('create-student-example', { studentid: studentId, exampleid: exampleId })
+    },
+    [postFactory],
+  )
+
+  const updateMyStudentExample = useCallback(
+    (updateId: number, newInterval: number): Promise<number | undefined> => {
+      return postFactory<number>('update-my-student-example', { updateid: updateId, newinterval: newInterval })
+    },
+    [postFactory],
+  )
+
+  const updateStudentExample = useCallback(
+    (updateId: number, newInterval: number): Promise<number | undefined> => {
+      return postFactory<number>('update-student-example', { updateid: updateId, newinterval: newInterval })
+    },
+    [postFactory],
+  )
+
+  /*      DELETE Requests      */
+
+  const deleteFactory = useCallback(
+    async (path: string, headers?: any): Promise<number | undefined> => {
+      try {
+        const fetchUrl = `${backendUrl}${path}`
+        const response = await fetch(fetchUrl, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${await getAccessToken()}`,
+            ...headers,
+          },
+        })
+
+        if (response.ok) {
+          return await response.json()
+        }
+        else {
+          console.error(`Failed to delete ${path}: ${response.statusText}`)
+        }
       }
-    })
-    .catch(e => console.error(e))
-  return response
-}
+      catch (error) {
+        console.error(`Error deleting ${path}:`, error)
+      }
+      return undefined // Explicitly return undefined on failure
+    },
+    [getAccessToken, backendUrl],
+  )
 
-export async function deleteMyStudentExample(tokenPromise: Promise<string>, recordId: number): Promise<number> {
-  return deleteFactory(`delete-my-student-example`, tokenPromise, { deleteid: recordId })
-}
+  const deleteMyStudentExample = useCallback(
+    (recordId: number): Promise<number | undefined> => {
+      return deleteFactory('delete-my-student-example', { deleteid: recordId })
+    },
+    [deleteFactory],
+  )
 
-export async function deleteStudentExample(tokenPromise: Promise<string>, recordId: number): Promise<number> {
-  return deleteFactory(`delete-student-example`, tokenPromise, { deleteid: recordId })
+  const deleteStudentExample = useCallback(
+    (recordId: number): Promise<number | undefined> => {
+      return deleteFactory('delete-student-example', { deleteid: recordId })
+    },
+    [deleteFactory],
+  )
+
+  return {
+    getAccessToken,
+    getProgramsFromBackend,
+    getLessonsFromBackend,
+    getVocabFromBackend,
+    getSpellingsFromBackend,
+    getExamplesFromBackend,
+    getVerifiedExamplesFromBackend,
+    getAudioExamplesFromBackend,
+    getLcspQuizzesFromBackend,
+    getMyExamplesFromBackend,
+    getQuizExamplesFromBackend,
+    getAllUsersFromBackend,
+    getUserDataFromBackend,
+    getActiveExamplesFromBackend,
+    getCoachList,
+    getCourseList,
+    getLessonList,
+    getActiveStudents,
+    getActiveMemberships,
+    getLastThreeWeeks,
+    createMyStudentExample,
+    createStudentExample,
+    updateMyStudentExample,
+    updateStudentExample,
+    deleteMyStudentExample,
+    deleteStudentExample,
+  }
 }
