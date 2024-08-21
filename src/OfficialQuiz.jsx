@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import './App.css'
 import { useBackend } from './hooks/useBackend'
 
-import Quiz from './Quiz'
+import Quiz from './components/Quiz'
 
 export default function OfficialQuiz({
   addFlashcard,
