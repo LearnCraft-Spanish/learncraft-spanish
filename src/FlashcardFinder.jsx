@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
-import { useBackend } from './hooks/BackendFetchFunctions'
+import { useBackend } from './hooks/useBackend'
 
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import { useActiveStudent } from './hooks/useActiveStudent'

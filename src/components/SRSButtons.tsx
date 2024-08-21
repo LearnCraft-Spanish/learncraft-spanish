@@ -1,5 +1,5 @@
 import type { Flashcard, StudentExample, UserData } from '../interfaceDefinitions'
-import { useBackend } from '../hooks/BackendFetchFunctions'
+import { useBackend } from '../hooks/useBackend'
 
 import { useUserData } from '../hooks/useUserData'
 import { useActiveStudent } from '../hooks/useActiveStudent'

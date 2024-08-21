@@ -80,8 +80,8 @@ export function useBackend() {
     return getFactory<types.Quiz[]>('public/quizzes')
   }, [getFactory])
 
-  const getMyExamplesFromBackend = useCallback((): Promise<types.Flashcard[] | undefined> => {
-    return getFactory<types.Flashcard[]>('my-examples')
+  const getMyExamplesFromBackend = useCallback((): Promise<types.StudentFlashcardData | undefined> => {
+    return getFactory<types.StudentFlashcardData>('my-examples')
   }, [getFactory])
 
   const getQuizExamplesFromBackend = useCallback((quizId: number): Promise<types.Flashcard[] | undefined> => {
@@ -97,8 +97,8 @@ export function useBackend() {
   }, [getFactory])
 
   const getActiveExamplesFromBackend = useCallback(
-    (studentId: number): Promise<types.StudentExample[] | undefined> => {
-      return getFactory<types.StudentExample[]>(`${studentId}/examples`)
+    (studentId: number): Promise<types.StudentFlashcardData | undefined> => {
+      return getFactory<types.StudentFlashcardData>(`${studentId}/examples`)
     },
     [getFactory],
   )

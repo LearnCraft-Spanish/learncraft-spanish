@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import LessonSelector from './LessonSelector'
-import { useBackend } from './hooks/BackendFetchFunctions'
+import { useBackend } from './hooks/useBackend'
 
 export default function FrequenSay({
   programTable,

@@ -60,6 +60,11 @@ export interface StudentExample {
   studentEmailAddress: string
 }
 
+export interface StudentFlashcardData {
+  examples: Flashcard[]
+  studentExamples: StudentExample[]
+}
+
 // StudentExamplesTable is an array of StudentExamples
 export type StudentExamplesTable = Array<StudentExample>
 // ExamplesTable is an array of Flashcards

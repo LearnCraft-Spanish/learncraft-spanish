@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import './App.css'
-import { useBackend } from './hooks/BackendFetchFunctions'
+import { useBackend } from './hooks/useBackend'
 
 import Quiz from './Quiz'
 

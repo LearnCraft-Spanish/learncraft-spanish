@@ -2,7 +2,7 @@ import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { useUserData } from './hooks/useUserData'
 
-import { useBackend } from './hooks/BackendFetchFunctions'
+import { useBackend } from './hooks/useBackend'
 
 const Coaching = forwardRef((
   { contextual, openContextual, closeContextual },

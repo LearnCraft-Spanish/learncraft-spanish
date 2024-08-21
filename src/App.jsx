@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
-import { useBackend } from './hooks/BackendFetchFunctions'
+import { useBackend } from './hooks/useBackend'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
 import AudioQuiz from './AudioQuiz'
@@ -30,20 +30,17 @@ function App({ SentryRoutes }) {
     createStudentExample,
     deleteMyStudentExample,
     deleteStudentExample,
-    getActiveExamplesFromBackend,
     getAllUsersFromBackend,
     getAudioExamplesFromBackend,
     getLessonsFromBackend,
-    getMyExamplesFromBackend,
     getProgramsFromBackend,
-    getUserDataFromBackend,
   } = useBackend()
 
   // React Router hooks
   const location = useLocation()
   const navigate = useNavigate()
-  const { userData, setUserData } = useUserData()
-  const { activeStudent, setActiveStudent, studentExamplesTable, setStudentExamplesTable } = useActiveStudent()
+  const { userData } = useUserData()
+  const { activeStudent, studentExamplesTable, choosingStudent } = useActiveStudent()
 
   // Flags and state for user data and menu readiness
   const rendered = useRef(false) // Flag to make useEffect run only once
@@ -51,24 +48,13 @@ function App({ SentryRoutes }) {
   const [flashcardDataComplete, setFlashcardDataComplete] = useState(false) // Flag to indicate that the flashcard data has been loaded and the flashcard apps can be displayed
   const flashcardDataCompleteQueue = useRef(0) // Queue to hold functions that need to run after the flashcard data has been loaded
 
-  // Reference to the active student's program and lesson
-  const activeProgram = useRef({})
-  const activeLesson = useRef({})
-
   // States for initial data load independent of user access level
   const [programTable, setProgramTable] = useState([]) // Array of course objects. Each has a property of 'lessons': an array of lesson objects
   const [audioExamplesTable, setAudioExamplesTable] = useState([]) // Array of all audio examples, used to determin whether audio quiz is available
 
   // States for Lesson Selector
-  const [selectedLesson, setSelectedLesson] = useState(activeLesson.current)
-  const [selectedProgram, setSelectedProgram] = useState(activeProgram.current)
-
-  // States for Admins to choose a student
-  const [studentList, setStudentList] = useState([])
-  const [choosingStudent, setChoosingStudent] = useState(false)
-
-  // States for Students to see their flashcards
-  const examplesTable = useRef([])
+  const [selectedLesson, setSelectedLesson] = useState()
+  const [selectedProgram, setSelectedProgram] = useState()
 
   // States for banner message
   const [bannerMessage, setBannerMessage] = useState('')
@@ -113,13 +99,6 @@ function App({ SentryRoutes }) {
   }
 
   // local functions for admins to choose or keep a student from the menu
-  function chooseStudent() {
-    setChoosingStudent(true)
-  }
-
-  function keepStudent() {
-    setChoosingStudent(false)
-  }
 
   const updateSelectedLesson = useCallback((lessonId) => {
     let newLesson = {}
@@ -155,24 +134,6 @@ function App({ SentryRoutes }) {
       updateSelectedLesson(lessonToSelect)
     }
   }, [programTable, activeProgram, activeLesson, updateSelectedLesson])
-
-  const updateActiveStudent = useCallback((studentID) => {
-    const studentIDNumber = Number.parseInt(studentID)
-    const newStudent
-      = studentList.find(student => student.recordId === studentIDNumber) || {}
-    setChoosingStudent(false)
-    setActiveStudent(newStudent)
-  }, [studentList, setActiveStudent])
-
-  const userSetup = useCallback(async () => {
-    try {
-      const dataResponse = await getUserDataFromBackend()
-      setUserData(dataResponse)
-    }
-    catch (e) {
-      console.error(e.message)
-    }
-  }, [getUserDataFromBackend, setUserData])
 
   const updateBannerMessage = useCallback((message) => {
     setBannerMessage(message)
@@ -261,59 +222,6 @@ function App({ SentryRoutes }) {
     }
   }, [activeStudent, programTable, updateSelectedProgram, updateSelectedLesson])
 
-  const updateExamplesTableQuietly = useCallback(async () => {
-    let studentTableData
-    flashcardDataCompleteQueue.current++
-    if (userData?.isAdmin) {
-      try {
-        studentTableData = await getActiveExamplesFromBackend(
-          activeStudent.recordId,
-        )
-      }
-      catch (e) {
-        console.error(e.message)
-      }
-      finally {
-        flashcardDataCompleteQueue.current--
-        if (flashcardDataCompleteQueue.current === 0) {
-          if (studentTableData?.examples && studentTableData?.studentExamples) {
-            examplesTable.current = studentTableData.examples
-            setStudentExamplesTable(studentTableData.studentExamples)
-          }
-          setFlashcardDataComplete(true)
-        }
-      }
-    }
-    else if (userData?.role === 'student') {
-      // Pulls examples and student examples ONLY for the current user
-      try {
-        studentTableData = await getMyExamplesFromBackend()
-          .then((result) => {
-            examplesTable.current = result.examples
-            setStudentExamplesTable(result.studentExamples)
-          })
-      }
-      catch (e) {
-        console.error(e.message)
-      }
-      finally {
-        flashcardDataCompleteQueue.current--
-        if (flashcardDataCompleteQueue.current === 0) {
-          if (studentTableData?.examples && studentTableData?.studentExamples) {
-            examplesTable.current = studentTableData.examples
-            setStudentExamplesTable(studentTableData.studentExamples)
-          }
-          setFlashcardDataComplete(true)
-        }
-      }
-    }
-  }, [activeStudent, userData, getActiveExamplesFromBackend, getMyExamplesFromBackend, setStudentExamplesTable])
-
-  const updateExamplesTable = useCallback(async () => {
-    setFlashcardDataComplete(false)
-    updateExamplesTableQuietly()
-  }, [updateExamplesTableQuietly])
-
   const makeStudentSelector = useCallback(() => {
     if (userData.isAdmin) {
       const studentSelector = [
@@ -354,108 +262,6 @@ function App({ SentryRoutes }) {
       return studentSelector
     }
   }, [userData, studentList])
-
-  const addToActiveStudentFlashcards = useCallback(async (recordId, updateTable = true) => {
-    updateBannerMessage('Adding Flashcard...')
-    if (activeStudent.recordId && userData.isAdmin) {
-      try {
-        const data = await createStudentExample(
-          activeStudent.recordId,
-          recordId,
-        ).then((result) => {
-          if (result === 1) {
-            updateBannerMessage('Flashcard Added!')
-            updateTable && updateExamplesTableQuietly()
-          }
-          else {
-            updateBannerMessage('Failed to add Flashcard')
-          }
-          return result
-        })
-        return data
-      }
-      catch (e) {
-        console.error(e.message)
-      }
-    }
-    else if (activeStudent.recordId && userData.role === 'student') {
-      try {
-        const data = await createMyStudentExample(recordId).then(
-          (result) => {
-            if (result === 1) {
-              updateBannerMessage('Flashcard Added!')
-              updateTable && updateExamplesTableQuietly()
-            }
-            else {
-              updateBannerMessage('Failed to add Flashcard')
-            }
-            return result
-          },
-        )
-        return data
-      }
-      catch (e) {
-        console.error(e.message)
-        return false
-      }
-    }
-  }, [activeStudent, userData, createMyStudentExample, createStudentExample, updateBannerMessage, updateExamplesTableQuietly])
-
-  const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId, updateTable = true) => {
-    setBannerMessage('Removing Flashcard')
-    const exampleRecordIdInt = Number.parseInt(exampleRecordId)
-    const getStudentExampleRecordId = () => {
-      const relatedStudentExample = studentExamplesTable.find(
-        element => element.relatedExample === exampleRecordIdInt,
-      )
-      return relatedStudentExample?.recordId
-    }
-    const studentExampleRecordId = getStudentExampleRecordId()
-    if (studentExampleRecordId && userData.isAdmin) {
-      try {
-        const data = await deleteStudentExample(
-          studentExampleRecordId,
-        ).then((result) => {
-          if (result === 1) {
-            setBannerMessage('Flashcard removed!')
-            updateTable && updateExamplesTableQuietly()
-          }
-          else {
-            setBannerMessage('Failed to remove flashcard')
-          }
-          return result
-        })
-        return data
-      }
-      catch (e) {
-        console.error(e.message)
-      }
-    }
-    else if (studentExampleRecordId && userData.role === 'student') {
-      try {
-        const data = await deleteMyStudentExample(
-          studentExampleRecordId,
-        ).then((result) => {
-          if (result === 1) {
-            setBannerMessage('Flashcard removed!')
-            updateTable && updateExamplesTableQuietly()
-          }
-          else {
-            setBannerMessage('Failed to remove flashcard')
-          }
-          return result
-        })
-        return data
-      }
-      catch (e) {
-        console.error(e.message)
-      }
-    }
-    else {
-      setBannerMessage('Flashcard not found')
-      return 0
-    }
-  }, [userData, studentExamplesTable, deleteMyStudentExample, deleteStudentExample, updateExamplesTableQuietly])
 
   const filterExamplesByAllowedVocab = useCallback((examples, lessonId) => {
     let allowedVocabulary = []
@@ -509,10 +315,9 @@ function App({ SentryRoutes }) {
 
   useEffect(() => {
     if (rendered.current && isAuthenticated) {
-      userSetup()
       parseCourseLessons()
     }
-  }, [isAuthenticated, userSetup, parseCourseLessons])
+  }, [isAuthenticated, parseCourseLessons])
 
   useEffect(() => {
     if (rendered.current && userData?.isAdmin !== undefined) {
@@ -526,13 +331,6 @@ function App({ SentryRoutes }) {
         if (flashcardDataCompleteQueue.current === 0) {
           setFlashcardDataComplete(true)
         }
-      }
-      if (userData?.isAdmin) {
-        async function setupStudentList() {
-          const studentListPromise = await getAllUsersFromBackend()
-          setStudentList(studentListPromise)
-        }
-        setupStudentList()
       }
     }
   }, [userData, getAllUsersFromBackend, setupAudioExamplesTable, setActiveStudent])
@@ -632,7 +430,6 @@ function App({ SentryRoutes }) {
             path="/"
             element={(
               <Menu
-                updateExamplesTable={updateExamplesTable}
                 examplesTable={examplesTable.current}
                 flashcardDataComplete={flashcardDataComplete}
                 audioExamplesTable={audioExamplesTable}
@@ -669,7 +466,6 @@ function App({ SentryRoutes }) {
                 ? (
                     <SRSQuizApp
                       flashcardDataComplete={flashcardDataComplete}
-                      updateExamplesTable={updateExamplesTable}
                       examplesTable={examplesTable.current}
                       removeFlashcard={removeFlashcardFromActiveStudent}
                     />
@@ -687,7 +483,6 @@ function App({ SentryRoutes }) {
                       examplesTable={examplesTable.current}
                       flashcardDataComplete={flashcardDataComplete}
                       removeFlashcard={removeFlashcardFromActiveStudent}
-                      updateExamplesTable={updateExamplesTable}
                     />
                   )
                 : (<Navigate to="/" />)
@@ -697,7 +492,6 @@ function App({ SentryRoutes }) {
             path="/officialquizzes/*"
             element={(
               <LCSPQuizApp
-                updateExamplesTable={updateExamplesTableQuietly}
                 selectedProgram={selectedProgram}
                 selectedLesson={selectedLesson}
                 addFlashcard={addToActiveStudentFlashcards}
@@ -715,11 +509,9 @@ function App({ SentryRoutes }) {
                 <FlashcardFinder
                   user={userData || {}}
                   programTable={programTable}
-                  studentList={studentList}
                   studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
                   addFlashcard={addToActiveStudentFlashcards} // PROBLEM: Duplicate Reference
-                  updateExamplesTable={updateExamplesTable}
                   flashcardDataComplete={flashcardDataComplete}
                   addToActiveStudentFlashcards={addToActiveStudentFlashcards} // PROBLEM: Duplicate Reference
                   selectedLesson={selectedLesson}
