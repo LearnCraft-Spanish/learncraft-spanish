@@ -22,12 +22,12 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, st
   return (
     <div className="exampleBox">
       {!answerShowing && (
-        <div className="englishTranslation" onClick={toggleAnswer}>
+        <div className="englishTranslation" onClick={toggleAnswer} role="button" aria-label="flashcard">
           {questionText()}
         </div>
       )}
       {answerShowing && (
-        <div className="spanishExample" onClick={toggleAnswer}>
+        <div className="spanishExample" onClick={toggleAnswer} role="button" aria-label="flashcard">
           {answerText()}
 
           {isStudent && (!example.isCollected
