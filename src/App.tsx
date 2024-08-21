@@ -34,8 +34,6 @@ export const App: React.FC<AppProps> = ({ SentryRoutes }) => {
   const {
     getAllUsersFromBackend,
     getAudioExamplesFromBackend,
-    getLessonsFromBackend,
-    getProgramsFromBackend,
   } = useBackend()
 
   // React Router hooks
@@ -43,10 +41,6 @@ export const App: React.FC<AppProps> = ({ SentryRoutes }) => {
   const navigate = useNavigate()
   const { userData } = useUserData()
   const { activeStudent, studentFlashcardData, choosingStudent, flashcardDataSynced } = useActiveStudent()
-
-  // States for initial data load independent of user access level
-  const [programTable, setProgramTable] = useState<Program[]>([]) // Array of course objects. Each has a property of 'lessons': an array of lesson objects
-  const [audioExamplesTable, setAudioExamplesTable] = useState<Flashcard[]>([]) // Array of all audio examples, used to determin whether audio quiz is available
 
   // States for Lesson Selector
   const [selectedLesson, setSelectedLesson] = useState<Lesson>()
@@ -139,86 +133,6 @@ export const App: React.FC<AppProps> = ({ SentryRoutes }) => {
   const blankBanner = useCallback(() => {
     setBannerMessage('')
   }, [])
-
-  function parseLessonsByVocab(courses: Program[], lessonTable: Lesson[]) {
-    const newCourseArray = [...courses].forEach((course) => {
-      const combinedVocabulary: string[] = []
-      const lessonSortFunction = (a: Lesson, b: Lesson) => {
-        function findNumber(stringLesson: string) {
-          const lessonArray = stringLesson.split(' ')
-          const lessonNumber = lessonArray.slice(-1)[0]
-          const lessonNumberInt = Number.parseInt(lessonNumber)
-          return lessonNumberInt
-        }
-        return findNumber(a.lesson) - findNumber(b.lesson)
-      }
-      const parsedLessonArray: Lesson[] = []
-      lessonTable.forEach((lesson) => {
-        if (lesson.relatedProgram === course.recordId) {
-          parsedLessonArray.push({ ...lesson })
-        }
-      })
-      parsedLessonArray.sort(lessonSortFunction)
-      course.lessons = parsedLessonArray
-      course.lessons.forEach((lesson) => {
-        lesson.vocabIncluded.forEach((word) => {
-          if (!combinedVocabulary.includes(word)) {
-            combinedVocabulary.push(word)
-          }
-        })
-        lesson.vocabKnown = [...combinedVocabulary]
-      })
-      return course
-    })
-  }
-
-  const parseCourseLessons = useCallback(async () => {
-    const lessonTable = getLessonsFromBackend()
-    const courses = getProgramsFromBackend()
-    Promise.all([courses, lessonTable]).then((result) => {
-      if (result[0] && result[1]) {
-        const parsedLessons = parseLessonsByVocab(result[0], result[1])
-        setProgramTable(parsedLessons)
-      }
-    })
-  }, [getLessonsFromBackend, getProgramsFromBackend])
-
-  const getStudentLevel = useCallback(() => {
-    let studentProgram
-      = programTable.find(
-        program => program.recordId === activeStudent.relatedProgram,
-      ) || {}
-    const studentCohort = activeStudent.cohort
-    const cohortFieldName = `cohort${studentCohort}CurrentLesson`
-    const cohortLesson = Number.parseInt(studentProgram[cohortFieldName])
-    const maxLesson = typeof cohortLesson === 'number' ? cohortLesson : 9999
-    let lastKnownLesson = {}
-    if (studentProgram.recordId) {
-      const programWithLessonList = { ...studentProgram }
-      const lessonList = []
-      studentProgram.lessons.forEach((lesson) => {
-        const lessonArray = lesson.lesson.split(' ')
-        const lessonString = lessonArray.slice(-1)[0]
-        const lessonNumber = Number.parseInt(lessonString)
-        if (lessonNumber <= maxLesson) {
-          lessonList.push(lesson)
-        }
-      })
-      programWithLessonList.lessons = lessonList
-      studentProgram = programWithLessonList
-      lastKnownLesson = programWithLessonList.lessons.slice(-1)[0] || {}
-    }
-    activeProgram.current = studentProgram
-    activeLesson.current = lastKnownLesson
-    if (activeProgram.current.recordId && activeLesson.current.recordId) {
-      updateSelectedProgram(activeProgram.current.recordId)
-      updateSelectedLesson(activeLesson.current.recordId)
-    }
-    else {
-      updateSelectedProgram(2)
-      updateSelectedLesson(2)
-    }
-  }, [activeStudent, programTable, updateSelectedProgram, updateSelectedLesson])
 
   const makeStudentSelector = useCallback(() => {
     if (userData.isAdmin) {
@@ -369,26 +283,26 @@ export const App: React.FC<AppProps> = ({ SentryRoutes }) => {
           {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>
           )}
-          {isAuthenticated && !appsLoadable && <p>Loading user data...</p>}
-          {appsLoadable
-          && (userData.role === 'student' || userData.role === 'limited')
-          && !userData.isAdmin && (
-            <p>
-              Welcome back,
-              {` ${userData.name}`}
-              !
-            </p>
-          )}
+          {isAuthenticated && <p>Loading user data...</p>}
+          {
+            (userData?.role === 'student' || userData?.role === 'limited')
+            && !userData.isAdmin && (
+              <p>
+                Welcome back,
+                {` ${userData.name}`}
+                !
+              </p>
+            )
+          }
 
           {isAuthenticated
-          && appsLoadable
-          && userData.role !== 'student'
-          && userData.role !== 'limited'
-          && !userData.isAdmin && <p>Welcome back!</p>}
+          && userData?.role !== 'student'
+          && userData?.role !== 'limited'
+          && !userData?.isAdmin && <p>Welcome back!</p>}
 
-          {appsLoadable && userData.isAdmin && !choosingStudent && (
+          {userData?.isAdmin && !choosingStudent && (
             <div className="studentList">
-              {activeStudent.recordId && (
+              {activeStudent?.recordId && (
                 <p>
                   Using as
                   {' '}
@@ -397,14 +311,14 @@ export const App: React.FC<AppProps> = ({ SentryRoutes }) => {
                   && ' (yourself)'}
                 </p>
               )}
-              {!activeStudent.recordId && <p>No student Selected</p>}
+              {!activeStudent?.recordId && <p>No student Selected</p>}
               <button type="button" onClick={chooseStudent}>Change</button>
             </div>
           )}
-          {appsLoadable && userData.isAdmin && choosingStudent && (
+          {userData?.isAdmin && choosingStudent && (
             <form className="studentList" onSubmit={e => e.preventDefault}>
               <select
-                value={activeStudent ? activeStudent.recordId : {}}
+                value={activeStudent ? activeStudent.recordId : undefined}
                 onChange={e => updateActiveStudent(e.target.value)}
               >
                 {makeStudentSelector()}
@@ -421,7 +335,7 @@ export const App: React.FC<AppProps> = ({ SentryRoutes }) => {
         </div>
       )}
 
-      {appsLoadable && (
+      {(
         <SentryRoutes>
           <Route
             exact
@@ -510,7 +424,6 @@ export const App: React.FC<AppProps> = ({ SentryRoutes }) => {
                   studentExamplesTable={studentExamplesTable}
                   updateBannerMessage={updateBannerMessage}
                   addFlashcard={addToActiveStudentFlashcards} // PROBLEM: Duplicate Reference
-                  flashcardDataComplete={flashcardDataComplete}
                   addToActiveStudentFlashcards={addToActiveStudentFlashcards} // PROBLEM: Duplicate Reference
                   selectedLesson={selectedLesson}
                   selectedProgram={selectedProgram}
