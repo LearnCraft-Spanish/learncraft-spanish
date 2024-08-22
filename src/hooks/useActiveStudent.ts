@@ -1,7 +1,6 @@
 import { useCallback, useContext } from 'react'
 import ActiveStudentContext from '../contexts/ActiveStudentContext'
 
-import UserDataContext from '../contexts/UserDataContext'
 import { useBackend } from './useBackend'
 import { useUserData } from './useUserData'
 

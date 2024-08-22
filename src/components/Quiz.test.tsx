@@ -2,9 +2,8 @@ import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { sampleMyExamples, sampleStudent } from '../../tests/mockData'
+import { sampleMyExamples } from '../../tests/mockData'
 import { ActiveStudentProvider } from '../contexts/ActiveStudentContext'
-import { useActiveStudent } from '../hooks/useActiveStudent'
 import Quiz from './Quiz'
 
 const addFlashcard = vi.fn()
@@ -161,7 +160,7 @@ describe('component Quiz', () => {
       })
       const hardBtn = screen.getByRole('button', { name: 'This was hard' })
       const easyBtn = screen.getByRole('button', { name: 'This was easy' })
-  
+
       expect(hardBtn).toBeTruthy()
       expect(easyBtn).toBeTruthy()
     })

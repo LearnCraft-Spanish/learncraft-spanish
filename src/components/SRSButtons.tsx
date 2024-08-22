@@ -1,4 +1,4 @@
-import type { Flashcard, StudentExample, UserData } from '../interfaceDefinitions'
+import type { Flashcard } from '../interfaceDefinitions'
 import { useBackend } from '../hooks/useBackend'
 
 import { useUserData } from '../hooks/useUserData'

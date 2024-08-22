@@ -1,10 +1,7 @@
 import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import debounce from 'lodash/debounce'
-import { ac } from 'vitest/dist/chunks/reporters.C_zwCd4j'
-import { c } from 'vite/dist/node/types.d-aGj9QkWt'
-import { set } from 'lodash'
-import type { Flashcard, Lesson, Program, StudentExample, StudentFlashcardData, UserData } from '../interfaceDefinitions' // Adjust the import based on your project structure
+import type { Flashcard, Lesson, Program, StudentFlashcardData, UserData } from '../interfaceDefinitions' // Adjust the import based on your project structure
 import { useBackend } from '../hooks/useBackend'
 import { useUserData } from '../hooks/useUserData'
 

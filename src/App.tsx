@@ -5,7 +5,7 @@ import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
-import type { Flashcard, Lesson, Program, UserData } from './interfaceDefinitions'
+import type { Flashcard, Lesson, Program } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'

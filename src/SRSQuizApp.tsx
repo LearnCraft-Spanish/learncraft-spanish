@@ -4,9 +4,8 @@ import './App.css'
 import MenuButton from './components/MenuButton'
 import Quiz from './components/Quiz'
 
-import type { Flashcard, StudentExample, UserData } from './interfaceDefinitions'
+import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
-import { useUserData } from './hooks/useUserData'
 
 interface SRSQuizAppProps {
   flashcardDataComplete: boolean
