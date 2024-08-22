@@ -1,4 +1,4 @@
-import type { Flashcard } from '../interfaceDefinitions'
+import type { Flashcard, StudentExample } from '../interfaceDefinitions'
 import { useBackend } from '../hooks/useBackend'
 
 import { useUserData } from '../hooks/useUserData'
@@ -13,7 +13,7 @@ interface QuizButtonsProps {
 
 export default function SRSQuizButtons({ currentExample, answerShowing, updateExampleDifficulty, incrementExampleNumber }: QuizButtonsProps) {
   const { userData } = useUserData()
-  const { studentExamplesTable } = useActiveStudent()
+  const { studentFlashcardData } = useActiveStudent()
   const {
     updateMyStudentExample,
     updateStudentExample,
@@ -38,8 +38,8 @@ export default function SRSQuizButtons({ currentExample, answerShowing, updateEx
   }
 
   const getStudentExampleFromExample = (example: Flashcard) => {
-    const relatedStudentExample = studentExamplesTable?.find(
-      element => element.relatedExample === example.recordId,
+    const relatedStudentExample = studentFlashcardData?.studentExamples?.find(
+      item => item.relatedExample === example.recordId,
     )
     if (!relatedStudentExample?.recordId) {
       return undefined

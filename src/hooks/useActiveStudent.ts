@@ -1,4 +1,5 @@
-import { useCallback, useContext } from 'react'
+import { ErrorInfo, useCallback, useContext } from 'react'
+import debounce from 'lodash/debounce'
 import ActiveStudentContext from '../contexts/ActiveStudentContext'
 
 import { useBackend } from './useBackend'
@@ -22,7 +23,8 @@ export function useActiveStudent() {
     throw new Error('useActiveStudent must be used within an ActiveStudentProvider')
   }
 
-  const addToActiveStudentFlashcards = useCallback(async (recordId: number, updateTable = true) => {
+  const addToActiveStudentFlashcards = useCallback(async (recordId: number) => {
+    context.setFlashcardDataSynced(false)
     // updateBannerMessage('Adding Flashcard...')
     if (context.activeStudent?.recordId && userData.userData?.isAdmin) {
       try {
@@ -32,9 +34,7 @@ export function useActiveStudent() {
         ).then((result: number | undefined) => {
           if (result === 1) {
             // updateBannerMessage('Flashcard Added!')
-            if (updateTable) {
-              context.syncFlashcards()
-            }
+            debounce(context.syncFlashcards, 500)
           }
           else {
             console.error('Failed to add Flashcard')
@@ -44,8 +44,14 @@ export function useActiveStudent() {
         })
         return data
       }
-      catch (e: any) {
-        console.error(e.message)
+      catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message)
+        }
+        else {
+          console.error('An unexpected error occurred:', e)
+        }
+        return false
       }
     }
     else if (context.activeStudent?.recordId && userData.userData?.role === 'student') {
@@ -54,9 +60,7 @@ export function useActiveStudent() {
           .then((result) => {
             if (result === 1) {
               // updateBannerMessage('Flashcard Added!')
-              if (updateTable) {
-                context.syncFlashcards()
-              }
+              context.syncFlashcards()
             }
             else {
               // updateBannerMessage('Failed to add Flashcard')
@@ -66,16 +70,22 @@ export function useActiveStudent() {
           })
         return data
       }
-      catch (e: any) {
-        console.error(e.message)
+      catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message)
+        }
+        else {
+          console.error('An unexpected error occurred:', e)
+        }
         return false
       }
     }
   }, [context, userData.userData?.isAdmin, userData.userData?.role, createStudentExample, createMyStudentExample])
 
-  const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId: any, updateTable = true) => {
+  const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId: number) => {
+    context.setFlashcardDataSynced(false)
     // setBannerMessage('Removing Flashcard')
-    const exampleRecordIdInt = Number.parseInt(exampleRecordId)
+    const exampleRecordIdInt = exampleRecordId
     const getStudentExampleRecordId = () => {
       const relatedStudentExample = context.studentFlashcardData?.studentExamples?.find(
         element => element.relatedExample === exampleRecordIdInt,
@@ -89,9 +99,7 @@ export function useActiveStudent() {
           .then((result) => {
             if (result === 1) {
               // setBannerMessage('Flashcard removed!')
-              if (updateTable) {
-                context.syncFlashcards()
-              }
+              context.syncFlashcards()
             }
             else {
               // setBannerMessage('Failed to remove flashcard')
@@ -101,8 +109,13 @@ export function useActiveStudent() {
           })
         return data
       }
-      catch (e: any) {
-        console.error(e.message)
+      catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message)
+        }
+        else {
+          console.error('An unexpected error occurred:', e)
+        }
       }
     }
     else if (studentExampleRecordId && userData.userData?.role === 'student') {
@@ -111,9 +124,7 @@ export function useActiveStudent() {
           .then((result) => {
             if (result === 1) {
               // setBannerMessage('Flashcard removed!')
-              if (updateTable) {
-                context.syncFlashcards()
-              }
+              context.syncFlashcards()
             }
             else {
               // setBannerMessage('Failed to remove flashcard')
@@ -123,8 +134,13 @@ export function useActiveStudent() {
           })
         return data
       }
-      catch (e: any) {
-        console.error(e.message)
+      catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message)
+        }
+        else {
+          console.error('An unexpected error occurred:', e)
+        }
       }
     }
     else {
@@ -135,6 +151,7 @@ export function useActiveStudent() {
   }, [userData.userData?.isAdmin, userData.userData?.role, context, deleteStudentExample, deleteMyStudentExample])
 
   const updateActiveStudentFlashcard = useCallback(async (studentExampleRecordId: number, newInterval: number) => {
+    context.setFlashcardDataSynced(false)
     // updateBannerMessage('Updating Flashcard...')
     if (context.activeStudent?.recordId && userData.userData?.isAdmin) {
       try {
@@ -152,8 +169,13 @@ export function useActiveStudent() {
           })
         return data
       }
-      catch (e: any) {
-        console.error(e.message)
+      catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message)
+        }
+        else {
+          console.error('An unexpected error occurred:', e)
+        }
       }
     }
     else if (context.activeStudent?.recordId && userData.userData?.role === 'student') {
@@ -172,8 +194,13 @@ export function useActiveStudent() {
           })
         return data
       }
-      catch (e: any) {
-        console.error(e.message)
+      catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message)
+        }
+        else {
+          console.error('An unexpected error occurred:', e)
+        }
       }
     }
   }, [context, userData.userData?.isAdmin, userData.userData?.role, updateStudentExample, updateMyStudentExample])

@@ -15,6 +15,7 @@ interface ActiveStudentContextProps {
   studentList: UserData[]
   updateActiveStudent: (studentID: number) => void
   flashcardDataSynced: boolean
+  setFlashcardDataSynced: (synced: boolean) => void
   syncFlashcards: () => void
   programTable: Program[]
   audioExamplesTable: Flashcard[]
@@ -49,7 +50,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   // Whether the state is up to date with the actual database
   const [flashcardDataSynced, setFlashcardDataSynced] = useState(false)
 
-  // Increments to reject stale data
+  // Tracks syncs to prevent stale data
   const syncNumber = useRef(0)
 
   const setupStudentList = useCallback(async () => {
@@ -169,26 +170,54 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
     }
   }, [activeStudent, programTable])
 
+  const matchAndTrimArrays = useCallback((flashcardData: StudentFlashcardData) => {
+    const exampleArray = flashcardData.examples
+    const studentExampleArray = flashcardData.studentExamples
+    const filteredExamples = exampleArray.sort((a, b) => a.recordId - b.recordId)
+    studentExampleArray.sort((a, b) => a.relatedExample - b.relatedExample)
+    const filteredStudentExamples = studentExampleArray.filter((example) => {
+      const match = studentExampleArray.find(studentExample => studentExample.relatedExample === example.recordId)
+      return match
+    })
+    studentExampleArray.filter((studentExample) => {
+      const match = exampleArray.find(example => example.recordId === studentExample.relatedExample)
+      return match
+    })
+    if (filteredExamples.length === filteredStudentExamples.length) {
+      return { examples: filteredExamples, studentExamples: filteredStudentExamples }
+    }
+    return null
+  }, [])
+
   const syncFlashcards = useCallback(async () => {
+    console.log('Syncing flashcards')
     syncNumber.current++
     const thisSyncNumber = syncNumber.current
+
     if (activeStudent?.recordId) {
-      const dataPromise = userData?.isAdmin ? getActiveExamplesFromBackend(activeStudent?.recordId) : getMyExamplesFromBackend()
-      dataPromise
-        .then((response) => {
-          if (thisSyncNumber === syncNumber.current) {
-            if (response?.examples && response?.studentExamples) {
-              setStudentFlashcardData(response)
-            }
-            setFlashcardDataSynced(true)
-            syncNumber.current = 0
+      try {
+        const dataPromise = userData?.isAdmin
+          ? getActiveExamplesFromBackend(activeStudent?.recordId)
+          : getMyExamplesFromBackend()
+
+        const response = await dataPromise
+        console.log(response)
+
+        if (thisSyncNumber === syncNumber.current) {
+          if (response?.examples && response?.studentExamples) {
+            const newData = matchAndTrimArrays(response)
+            console.log(newData)
+            setStudentFlashcardData(newData)
           }
-        })
-        .catch((error) => {
-          console.error(error)
-        })
+          setFlashcardDataSynced(true)
+          syncNumber.current = 0
+        }
+      }
+      catch (error) {
+        console.error(error)
+      }
     }
-  }, [activeStudent, userData?.isAdmin, getActiveExamplesFromBackend, getMyExamplesFromBackend])
+  }, [activeStudent, getActiveExamplesFromBackend, getMyExamplesFromBackend, matchAndTrimArrays, userData?.isAdmin])
 
   const value = useMemo<ActiveStudentContextProps>(
     () => ({
@@ -201,6 +230,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       studentList,
       updateActiveStudent,
       flashcardDataSynced,
+      setFlashcardDataSynced,
       syncFlashcards,
       programTable,
       audioExamplesTable,
@@ -221,6 +251,13 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
     ],
   )
 
+  // If the user has a record in QB, set as Active Student
+  useEffect(() => {
+    if (userData?.recordId) {
+      setActiveStudent(userData)
+    }
+  }, [userData, setActiveStudent])
+
   // If the user is admin, create list of students
   useEffect(() => {
     if (userData?.isAdmin) {
@@ -235,6 +272,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
     }
   }, [programTable.length, parseCourseLessons])
 
+  // Get the audio examples on load
   useEffect(() => {
     if (!audioExamplesTable.length) {
       setupAudioExamplesTable()
@@ -246,13 +284,15 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
     getStudentLevel()
   }, [activeStudent, programTable, getStudentLevel])
 
-  // If the state of the flashcard data changes, sync it with the database
+  // If the state of the flashcard data changes between updates, sync it with the database
   useEffect(() => {
+    console.log('activeStudent changed')
     if (activeStudent?.recordId) {
-      setFlashcardDataSynced(false)
-      debounce(syncFlashcards, 500)
+      console.log('activeStudent has recordId. Syncing flashcards')
+      syncFlashcards()
     }
-  }, [studentFlashcardData?.examples, studentFlashcardData?.studentExamples, activeStudent, syncFlashcards])
+    // Make sure we consider non-student users as well
+  }, [activeStudent, syncFlashcards])
 
   return (
     <ActiveStudentContext.Provider value={value}>

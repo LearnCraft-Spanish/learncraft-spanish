@@ -270,9 +270,7 @@ export const App: React.FC = () => {
         <Route
           path="/"
           element={(
-            <Menu
-              filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-            />
+            <Menu />
           )}
         />
         <Route path="/callback" element={<CallbackPage />} />
@@ -377,7 +375,6 @@ export const App: React.FC = () => {
           element={
             userData?.isAdmin && (
               <FrequenSay
-                programTable={programTable}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}

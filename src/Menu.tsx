@@ -2,36 +2,24 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import './App.css'
 
-import type { ActiveStudent, ExamplesTable, StudentExamplesTable, UserData } from './interfaceDefinitions'
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
-interface MenuProps {
-  userData: UserData
-  updateExamplesTable: () => void
-  examplesTable: ExamplesTable
-  studentExamplesTable: StudentExamplesTable
-  activeStudent: ActiveStudent
-  flashcardDataComplete: boolean
-  queueCount: number
-}
-export default function Menu({
-  updateExamplesTable,
-  flashcardDataComplete,
-}: MenuProps) {
+export default function Menu() {
   const { userData } = useUserData()
-  const { activeStudent, studentExamplesTable } = useActiveStudent()
+  const { activeStudent, studentFlashcardData, flashcardDataSynced, syncFlashcards } = useActiveStudent()
+
   useEffect(() => {
-    if (activeStudent?.recordId && !flashcardDataComplete) {
-      updateExamplesTable()
+    if (!flashcardDataSynced) {
+      syncFlashcards()
     }
-  }, [activeStudent, flashcardDataComplete, updateExamplesTable])
+  }, [flashcardDataSynced, syncFlashcards])
 
   return (
-    flashcardDataComplete && (
+    flashcardDataSynced && (
       <div className="menu">
         <div className="menuBox">
-          {activeStudent?.role === 'student' && studentExamplesTable?.length > 0 && (
+          {activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length && (
             <div>
               <h3>My Flashcards:</h3>
               <div className="buttonBox">
@@ -55,8 +43,7 @@ export default function Menu({
               Official Quizzes
             </Link>
           </div>
-          {(userData?.role === ('student' || 'limited')
-          || userData?.isAdmin) && (
+          {(userData?.role === 'student' || userData?.role === 'limited' || userData?.isAdmin) && (
             <div className="buttonBox">
               <Link className="linkButton" to="/audioquiz">
                 Audio Quiz
