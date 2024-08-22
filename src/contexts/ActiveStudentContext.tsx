@@ -71,13 +71,13 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       })
   }, [getAudioExamplesFromBackend])
 
-  function chooseStudent() {
+  const chooseStudent = useCallback(() => {
     setChoosingStudent(true)
-  }
+  }, [])
 
-  function keepStudent() {
+  const keepStudent = useCallback(() => {
     setChoosingStudent(false)
-  }
+  }, [])
 
   const updateActiveStudent = useCallback((studentID: number) => {
     const newStudent = studentList.find(student => student.recordId === studentID)

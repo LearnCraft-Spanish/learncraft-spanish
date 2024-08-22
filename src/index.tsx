@@ -5,7 +5,6 @@ import './index.css'
 import * as Sentry from '@sentry/react'
 import App from './App'
 import Providers from './Providers'
-import SentryRoutes from './functions/SentryRoutes'
 
 const rootElement = document.getElementById('root')
 if (!rootElement) {
@@ -17,7 +16,7 @@ root.render(
   <React.StrictMode>
     <Sentry.ErrorBoundary fallback={<p>Something went wrong</p>}>
       <Providers>
-        <App SentryRoutes={SentryRoutes} />
+        <App />
       </Providers>
     </Sentry.ErrorBoundary>
   </React.StrictMode>,

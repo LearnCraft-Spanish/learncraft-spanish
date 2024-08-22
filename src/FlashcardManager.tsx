@@ -4,20 +4,8 @@ import { formatEnglishText, formatSpanishText } from './functions/formatFlashcar
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
-interface FlashcardManagerProps {
-  examplesTable: Flashcard[]
-  flashcardDataComplete: boolean
-  removeFlashcard: (recordId: number) => Promise<number>
-  updateExamplesTable: () => void
-}
-
-function FlashcardManager({
-  examplesTable,
-  flashcardDataComplete,
-  removeFlashcard,
-  updateExamplesTable,
-}: FlashcardManagerProps) {
-  const { studentExamplesTable } = useActiveStudent()
+function FlashcardManager() {
+  const { studentFlashcardData, removeFlashcardFromActiveStudent, addToActiveStudentFlashcards, flashcardDataSynced } = useActiveStudent()
   const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([])
 
   async function removeAndUpdate(recordId: number) {
@@ -96,7 +84,7 @@ function FlashcardManager({
             <h4>Spanish</h4>
           </div>
         )}
-        {flashcardDataComplete
+        {syncedWithBackend
           ? (
               <button
                 type="button"

@@ -10,7 +10,7 @@ describe.skip('app', () => {
   it('renders without crashing', () => {
     render(
       <MemoryRouter>
-        <App SentryRoutes />
+        <App />
       </MemoryRouter>,
     )
   })
