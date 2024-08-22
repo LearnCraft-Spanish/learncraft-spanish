@@ -15,16 +15,14 @@ interface QuizProps {
   startWithSpanish?: boolean
   quizOnlyCollectedExamples?: boolean
   isSrsQuiz?: boolean
-  addFlashcard: (recordId: number) => Promise<number>
-  removeFlashcard: (recordId: number) => Promise<number>
   cleanupFunction?: () => void
 }
 
-function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[], quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
+function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[] | undefined, quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
   function tagAssignedExamples() {
     exampleArray.forEach((example) => {
       const getStudentExampleRecordId = () => {
-        const relatedStudentExample = studentExampleArray.find(
+        const relatedStudentExample = studentExampleArray?.find(
           element => element.relatedExample === example.recordId,
         )
         return relatedStudentExample
@@ -76,23 +74,19 @@ function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: Stude
   return randomizedQuizExamples
 }
 
-// removeFlashcardAndUpdate
-// addFlashcardAndUpdate
 export default function Quiz({
   examplesToParse,
   quizTitle,
   startWithSpanish = false,
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
-  addFlashcard,
-  removeFlashcard,
   cleanupFunction = () => {},
 
 }: QuizProps) {
   const location = useLocation()
-  const { activeStudent, studentExamplesTable } = useActiveStudent()
+  const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards, removeFlashcardFromActiveStudent } = useActiveStudent()
 
-  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentExamplesTable, quizOnlyCollectedExamples, isSrsQuiz))
+  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentFlashcardData?.studentExamples, quizOnlyCollectedExamples, isSrsQuiz))
   const [answerShowing, setAnswerShowing] = useState(false)
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
   const currentAudio = useRef<HTMLAudioElement | null>(null)
@@ -200,7 +194,7 @@ export default function Quiz({
   }
 
   async function removeFlashcardAndUpdate(recordId: number) {
-    const flashcardRemovedPromise = removeFlashcard(recordId)
+    const flashcardRemovedPromise = removeFlashcardFromActiveStudent(recordId)
     const exampleToRemove = examplesToReview.find(
       (example: Flashcard) => example.recordId === recordId,
     )
@@ -240,7 +234,7 @@ export default function Quiz({
 
   async function addFlashcardAndUpdate(recordId: number) {
     if (!quizOnlyCollectedExamples && !isSrsQuiz) {
-      const flashcardAddedPromise = addFlashcard(recordId)
+      const flashcardAddedPromise = addToActiveStudentFlashcards(recordId)
       const exampleToAdd = examplesToReview.find(
         (example: Flashcard) => example.recordId === recordId,
       )

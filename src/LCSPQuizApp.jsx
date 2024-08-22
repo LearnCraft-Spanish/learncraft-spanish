@@ -12,9 +12,6 @@ import OfficialQuiz from './OfficialQuiz'
 export default function LCSPQuizApp({
   selectedProgram,
   selectedLesson,
-  addFlashcard,
-  removeFlashcard,
-  updateExamplesTable,
 }) {
   const navigate = useNavigate()
   const { activeStudent } = useActiveStudent()
@@ -247,7 +244,6 @@ export default function LCSPQuizApp({
           path={`${course.url}/*`}
           element={(
             <CourseQuizzes
-              addFlashcard={addFlashcard}
               chosenQuiz={chosenQuiz}
               courses={courses.current}
               createRoutesFromCourses={createRoutesFromCourses}
@@ -261,12 +257,10 @@ export default function LCSPQuizApp({
               quizCourse={quizCourse}
               quizReady={quizReady}
               quizTable={quizTable}
-              removeFlashcard={removeFlashcard}
               setChosenQuiz={setChosenQuiz}
               studentHasDefaultQuiz={studentHasDefaultQuiz}
               thisCourse={course.code}
               updateChosenQuiz={updateChosenQuiz}
-              updateExamplesTable={updateExamplesTable}
               updateQuizCourseWithNavigate={updateQuizCourseWithNavigate}
               updateQuizCourseWithoutNavigate={updateQuizCourseWithoutNavigate}
             />
@@ -369,21 +363,14 @@ export default function LCSPQuizApp({
             path=":number"
             element={(
               <OfficialQuiz
-                addFlashcard={addFlashcard}
                 chosenQuiz={chosenQuiz}
                 courses={courses.current}
                 dataLoaded={dataLoaded}
-                hideMenu={hideMenu}
-                makeCourseList={makeCourseList}
                 makeMenuHidden={makeMenuHidden}
                 makeMenuShow={makeMenuShow}
-                makeQuizReady={makeQuizReady}
-                makeQuizSelections={makeQuizSelections}
                 quizCourse={quizCourse}
                 quizTable={quizTable}
-                removeFlashcard={removeFlashcard}
                 updateChosenQuiz={updateChosenQuiz}
-                updateExamplesTable={updateExamplesTable}
               />
             )}
           >

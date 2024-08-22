@@ -7,7 +7,6 @@ import { useBackend } from './hooks/useBackend'
 import Quiz from './components/Quiz'
 
 export default function OfficialQuiz({
-  addFlashcard,
   chosenQuiz,
   courses,
   dataLoaded,
@@ -15,7 +14,6 @@ export default function OfficialQuiz({
   makeMenuShow,
   quizCourse,
   quizTable,
-  removeFlashcard,
   updateChosenQuiz,
 }) {
   const thisQuiz = Number.parseInt(useParams().number)
@@ -108,8 +106,6 @@ export default function OfficialQuiz({
         <Quiz
           examplesToParse={examplesToReview}
           quizTitle={makeQuizTitle()}
-          addFlashcard={addFlashcard}
-          removeFlashcard={removeFlashcard}
           cleanupFunction={makeMenuShow}
         />
       )}

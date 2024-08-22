@@ -12,12 +12,9 @@ import OfficialQuiz from './OfficialQuiz'
 import MenuButton from './components/MenuButton'
 
 export default function CourseQuizzes({
-  addFlashcard,
   chosenQuiz,
   courses,
   dataLoaded,
-  examplesTable,
-  getAccessToken,
   hideMenu,
   makeCourseList,
   makeMenuHidden,
@@ -28,11 +25,9 @@ export default function CourseQuizzes({
   quizCourse,
   quizReady,
   quizTable,
-  removeFlashcard,
   studentHasDefaultQuiz,
   thisCourse,
   updateChosenQuiz,
-  updateExamplesTable,
   updateQuizCourseWithNavigate,
   updateQuizCourseWithoutNavigate,
 }) {
@@ -96,28 +91,14 @@ export default function CourseQuizzes({
             path=":number"
             element={(
               <OfficialQuiz
-                addFlashcard={addFlashcard}
                 chosenQuiz={chosenQuiz}
                 courses={courses}
                 dataLoaded={dataLoaded}
-                examplesTable={examplesTable}
-                getAccessToken={getAccessToken}
-                hideMenu={hideMenu}
-                makeCourseList={makeCourseList}
                 makeMenuHidden={makeMenuHidden}
                 makeMenuShow={makeMenuShow}
-                makeQuizReady={makeQuizReady}
-                makeQuizSelections={makeQuizSelections}
                 quizCourse={quizCourse}
-                quizReady={quizReady}
                 quizTable={quizTable}
-                removeFlashcard={removeFlashcard}
-                studentHasDefaultQuiz={studentHasDefaultQuiz}
-                thisCourse={thisCourse}
                 updateChosenQuiz={updateChosenQuiz}
-                updateExamplesTable={updateExamplesTable}
-                updateQuizCourseWithNavigate={updateQuizCourseWithNavigate}
-                updateQuizCourseWithoutNavigate={updateQuizCourseWithoutNavigate}
               />
             )}
           >

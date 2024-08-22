@@ -4,7 +4,10 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { sampleMyExamples } from '../../tests/mockData'
 import { ActiveStudentProvider } from '../contexts/ActiveStudentContext'
+import { UserDataProvider } from '../contexts/UserDataContext'
+// import activeStudentProvider
 import Quiz from './Quiz'
+import { User } from '@auth0/auth0-react'
 
 const addFlashcard = vi.fn()
 const removeFlashcard = vi.fn()
@@ -13,20 +16,21 @@ const cleanupFunction = vi.fn()
 function renderQuizNoSrs() {
   render(
     <MemoryRouter>
-      <ActiveStudentProvider>
-        <Quiz
-          quizTitle="Test Quiz"
-          examplesToParse={sampleMyExamples.examples}
-          // startWithSpanish={false}
-          // quizOnlyCollectedExamples={false}
-          // isSrsQuiz={false}
-          // userData={sampleStudent}
-          addFlashcard={addFlashcard}
-          removeFlashcard={removeFlashcard}
-
-          cleanupFunction={cleanupFunction}
-        />
-      </ActiveStudentProvider>
+      <UserDataProvider>
+        <ActiveStudentProvider>
+          <Quiz
+            quizTitle="Test Quiz"
+            examplesToParse={sampleMyExamples.examples}
+            // startWithSpanish={false}
+            // quizOnlyCollectedExamples={false}
+            // isSrsQuiz={false}
+            // userData={sampleStudent}
+            addFlashcard={addFlashcard}
+            removeFlashcard={removeFlashcard}
+            cleanupFunction={cleanupFunction}
+          />
+        </ActiveStudentProvider>
+      </UserDataProvider>
     </MemoryRouter>,
   )
 }
