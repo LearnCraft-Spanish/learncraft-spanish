@@ -37,19 +37,22 @@ function renderQuizNoSrs() {
 function renderQuizYesSrs() {
   render(
     <MemoryRouter>
-      <ActiveStudentProvider>
-        <Quiz
-          quizTitle="Test Quiz"
-          examplesToParse={sampleMyExamples.examples}
-          // startWithSpanish={false}
-          // quizOnlyCollectedExamples={false}
-          isSrsQuiz
-          // userData={sampleStudent}
-          addFlashcard={addFlashcard}
-          removeFlashcard={removeFlashcard}
-          cleanupFunction={cleanupFunction}
-        />
-      </ActiveStudentProvider>
+      <UserDataProvider>
+        <ActiveStudentProvider>
+          <Quiz
+            quizTitle="Test Quiz"
+            examplesToParse={sampleMyExamples.examples}
+            // startWithSpanish={false}
+            // quizOnlyCollectedExamples={false}
+            isSrsQuiz
+            // userData={sampleStudent}
+            addFlashcard={addFlashcard}
+            removeFlashcard={removeFlashcard}
+            cleanupFunction={cleanupFunction}
+          />
+        </ActiveStudentProvider>
+      </UserDataProvider>
+
     </MemoryRouter>,
   )
 }
@@ -276,20 +279,21 @@ describe('component Quiz', () => {
   it('calls togglePlaying on audio button click', () => {
     render(
       <MemoryRouter>
-        <ActiveStudentProvider>
-          <Quiz
-            quizTitle="Test Quiz"
-            examplesToParse={[sampleMyExamples.examples[2]]}
-            // startWithSpanish={false}
-            // quizOnlyCollectedExamples={false}
-            // isSrsQuiz={false}
-            // userData={sampleStudent}
-            addFlashcard={addFlashcard}
-            removeFlashcard={removeFlashcard}
-
-            cleanupFunction={cleanupFunction}
-          />
-        </ActiveStudentProvider>
+        <UserDataProvider>
+          <ActiveStudentProvider>
+            <Quiz
+              quizTitle="Test Quiz"
+              examplesToParse={[sampleMyExamples.examples[2]]}
+              // startWithSpanish={false}
+              // quizOnlyCollectedExamples={false}
+              // isSrsQuiz={false}
+              // userData={sampleStudent}
+              addFlashcard={addFlashcard}
+              removeFlashcard={removeFlashcard}
+              cleanupFunction={cleanupFunction}
+            />
+          </ActiveStudentProvider>
+        </UserDataProvider>
       </MemoryRouter>,
     )
     const flashcard = screen.getByRole('button', { name: 'flashcard' })
