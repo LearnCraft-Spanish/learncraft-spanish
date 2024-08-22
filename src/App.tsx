@@ -280,6 +280,7 @@ export const App: React.FC = () => {
             (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
               ? (
                   <Quiz
+                    examplesToParse={studentFlashcardData?.examples}
                     quizTitle="My Flashcards"
                     quizOnlyCollectedExamples
                     cleanupFunction={() => navigate('..')}
@@ -293,12 +294,8 @@ export const App: React.FC = () => {
           path="/todaysflashcards"
           element={
             (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples.length)
-              ? (
-                  <SRSQuizApp
-                    examplesTable={studentFlashcardData?.examples}
-                  />
-                )
-              : (<Navigate to="/" />)
+              ? <SRSQuizApp />
+              : <Navigate to="/" />
           }
         />
         <Route

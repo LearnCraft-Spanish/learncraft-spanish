@@ -7,34 +7,20 @@ import Quiz from './components/Quiz'
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
-interface SRSQuizAppProps {
-  flashcardDataComplete: boolean
-  examplesTable: Flashcard[]
-  addFlashcard: (recordId: number) => Promise<number>
-  removeFlashcard: (recordId: number) => Promise<number>
-  makeMenuShow: () => void
-}
-
 // TODO:
 // - Refactor SRSQuizApp to use the new .isCollected prop instead of .isKnown
 //      - this is implemented in Quiz.tsx, just need to modify this file to match Quiz.tsx
-export default function SRSQuizApp({
-  flashcardDataComplete,
-  examplesTable,
-  addFlashcard,
-  removeFlashcard,
-  makeMenuShow,
-}: SRSQuizAppProps) {
+export default function SRSQuizApp() {
   // const quizLength = 20 //will be used to determine how many examples to review
 
-  const { activeStudent, studentExamplesTable } = useActiveStudent()
+  const { activeStudent, studentFlashcardData } = useActiveStudent()
   const [quizReady, setQuizReady] = useState(false)
   const [examplesToReview, setExamplesToReview] = useState<Flashcard[]>([])
 
   /*        Setup Quiz Functions        */
 
   const getStudentExampleFromExample = (example: Flashcard) => {
-    const relatedStudentExample = studentExamplesTable.find(
+    const relatedStudentExample = studentFlashcardData?.studentExamples.find(
       element => element.relatedExample === example.recordId,
     )
     return relatedStudentExample
