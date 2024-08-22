@@ -7,13 +7,10 @@ import Quiz from './components/Quiz'
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
-// TODO:
-// - Refactor SRSQuizApp to use the new .isCollected prop instead of .isKnown
-//      - this is implemented in Quiz.tsx, just need to modify this file to match Quiz.tsx
 export default function SRSQuizApp() {
   // const quizLength = 20 //will be used to determine how many examples to review
 
-  const { activeStudent, studentFlashcardData } = useActiveStudent()
+  const { activeStudent, studentFlashcardData, flashcardDataSynced } = useActiveStudent()
   const [quizReady, setQuizReady] = useState(false)
   const [examplesToReview, setExamplesToReview] = useState<Flashcard[]>([])
 
@@ -36,6 +33,9 @@ export default function SRSQuizApp() {
   }
 
   function getDueExamples() {
+    if (!studentFlashcardData) {
+      return []
+    }
     const isBeforeToday = (dateArg: string) => {
       const today = new Date()
       const reviewDate = new Date(dateArg)
@@ -44,14 +44,13 @@ export default function SRSQuizApp() {
       }
       return true
     }
-    const allExamples = [...examplesTable]
+    const allExamples = [...studentFlashcardData.examples]
     const dueExamples = allExamples.filter(
       example =>
         isBeforeToday(
           getDueDateFromExample(example),
         ),
     )
-    // console.log(dueExamples)
     return dueExamples
   }
 
@@ -61,10 +60,14 @@ export default function SRSQuizApp() {
     setQuizReady(true)
   }
 
+  function makeMenuShow() {
+    setQuizReady(false)
+  }
+
   return (
     activeStudent?.recordId && (
       <div className="quizInterface">
-        {!quizReady && flashcardDataComplete && (
+        {!quizReady && flashcardDataSynced && (
           <div className="readyButton">
             <button type="button" onClick={handleSetupQuiz}>Begin Review</button>
           </div>
@@ -82,14 +85,12 @@ export default function SRSQuizApp() {
           </div>
         )}
 
-        {(quizReady && examplesToReview.length > 0) && (
+        {(quizReady && examplesToReview.length) && (
           <Quiz
             quizTitle="SRS Quiz"
             examplesToParse={examplesToReview}
             quizOnlyCollectedExamples
             isSrsQuiz
-            addFlashcard={addFlashcard}
-            removeFlashcard={removeFlashcard}
             cleanupFunction={makeMenuShow}
           />
         )}

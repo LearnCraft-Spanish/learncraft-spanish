@@ -110,7 +110,13 @@ export interface Examples {
 
 export interface Quiz {
   recordId: number
-  quizName: string
+  quizNickname: string
+  quizType: string
+  quizSubtype: string
+  quizNumber: number
+  quizLetter: string
+  lessonNumber: number
+  subtitle: string
 }
 
 export interface Spelling {

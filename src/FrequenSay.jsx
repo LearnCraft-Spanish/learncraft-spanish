@@ -2,14 +2,15 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import LessonSelector from './LessonSelector'
 import { useBackend } from './hooks/useBackend'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function FrequenSay({
-  programTable,
   selectedLesson,
   updateSelectedLesson,
   selectedProgram,
   updateSelectedProgram,
 }) {
+  const { programTable } = useActiveStudent()
   const { getVocabFromBackend, getSpellingsFromBackend } = useBackend()
   const [userInput, setUserInput] = useState('')
   const [userAddedVocabulary, setUserAddedVocabulary] = useState('')

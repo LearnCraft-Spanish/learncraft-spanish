@@ -8,6 +8,8 @@ import { useUserData } from '../hooks/useUserData'
 interface ActiveStudentContextProps {
   activeStudent: UserData | null
   setActiveStudent: (student: UserData | null) => void
+  activeLesson: React.MutableRefObject<Lesson>
+  activeProgram: React.MutableRefObject<Program>
   studentFlashcardData: StudentFlashcardData | null
   choosingStudent: boolean
   chooseStudent: () => void
@@ -190,7 +192,6 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   }, [])
 
   const syncFlashcards = useCallback(async () => {
-    console.log('Syncing flashcards')
     syncNumber.current++
     const thisSyncNumber = syncNumber.current
 
@@ -201,12 +202,10 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
           : getMyExamplesFromBackend()
 
         const response = await dataPromise
-        console.log(response)
 
         if (thisSyncNumber === syncNumber.current) {
           if (response?.examples && response?.studentExamples) {
             const newData = matchAndTrimArrays(response)
-            console.log(newData)
             setStudentFlashcardData(newData)
           }
           setFlashcardDataSynced(true)
@@ -222,6 +221,8 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   const value = useMemo<ActiveStudentContextProps>(
     () => ({
       activeStudent,
+      activeLesson,
+      activeProgram,
       setActiveStudent,
       studentFlashcardData,
       choosingStudent,
@@ -237,6 +238,8 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
     }),
     [
       activeStudent,
+      activeLesson,
+      activeProgram,
       setActiveStudent,
       studentFlashcardData,
       choosingStudent,
@@ -286,9 +289,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
 
   // If the state of the flashcard data changes between updates, sync it with the database
   useEffect(() => {
-    console.log('activeStudent changed')
     if (activeStudent?.recordId) {
-      console.log('activeStudent has recordId. Syncing flashcards')
       syncFlashcards()
     }
     // Make sure we consider non-student users as well

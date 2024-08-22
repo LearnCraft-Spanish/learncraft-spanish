@@ -28,7 +28,7 @@ export const App: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { userData } = useUserData()
-  const { activeStudent, studentFlashcardData, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const { activeStudent, activeLesson, activeProgram, studentFlashcardData, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
 
   // States for Lesson Selector
   const [selectedLesson, setSelectedLesson] = useState<Lesson>()
@@ -194,6 +194,18 @@ export const App: React.FC = () => {
   }, [programTable])
 
   useEffect(() => {
+    if (activeLesson) {
+      updateSelectedLesson(activeLesson.current?.recordId)
+    }
+  }, [activeLesson, activeStudent, programTable, updateSelectedLesson])
+
+  useEffect(() => {
+    if (activeProgram) {
+      updateSelectedProgram(activeProgram.current?.recordId)
+    }
+  }, [activeProgram, activeStudent, programTable, updateSelectedProgram])
+
+  useEffect(() => {
     clearTimeout(messageNumber.current)
     messageNumber.current = 0
     if (bannerMessage !== '') {
@@ -306,15 +318,19 @@ export const App: React.FC = () => {
               : <Navigate to="/" />
           }
         />
+        (
         <Route
           path="/officialquizzes/*"
-          element={(
-            <LCSPQuizApp
-              selectedProgram={selectedProgram}
-              selectedLesson={selectedLesson}
-            />
-          )}
+          element={selectedLesson?.recordId && selectedProgram?.recordId
+            ? (
+                <LCSPQuizApp
+                  selectedProgram={selectedProgram}
+                  selectedLesson={selectedLesson}
+                />
+              )
+            : <Navigate to="/" />}
         />
+        )
         <Route
           path="/flashcardfinder"
           element={
