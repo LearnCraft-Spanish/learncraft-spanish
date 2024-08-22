@@ -44,7 +44,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
 
   // States for initial data load independent of user access level
   const [programTable, setProgramTable] = useState<Program[]>([]) // Array of course objects. Each has a property of 'lessons': an array of lesson objects
-  const [audioExamplesTable, setAudioExamplesTable] = useState<Flashcard[]>([]) // Array of all audio examples, used to determin whether audio quiz is available
+  const [audioExamplesTable, setAudioExamplesTable] = useState<Flashcard[]>([]) // Array of all audio examples, used to determine whether audio quiz is available
 
   // Flashcard data, recently restructured as an object with two arrays as traits
   const [studentFlashcardData, setStudentFlashcardData] = useState<StudentFlashcardData | null>(null)

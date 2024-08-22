@@ -22,6 +22,7 @@ import CallbackPage from './CallbackPage'
 import Coaching from './Coaching'
 import FlashcardManager from './FlashcardManager'
 import Quiz from './components/Quiz'
+import { useBackend } from './hooks/useBackend'
 
 export const App: React.FC = () => {
   // React Router hooks

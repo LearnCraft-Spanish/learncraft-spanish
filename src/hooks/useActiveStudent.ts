@@ -31,7 +31,7 @@ export function useActiveStudent() {
         const data = await createStudentExample(
           context.activeStudent?.recordId,
           recordId,
-        ).then((result: number | undefined) => {
+        ).then((result: number) => {
           if (result === 1) {
             // updateBannerMessage('Flashcard Added!')
             debounce(context.syncFlashcards, 500)
@@ -205,7 +205,20 @@ export function useActiveStudent() {
     }
   }, [context, userData.userData?.isAdmin, userData.userData?.role, updateStudentExample, updateMyStudentExample])
   return {
-    ...context,
+    activeStudent: context.activeStudent,
+    activeLesson: context.activeLesson,
+    activeProgram: context.activeProgram,
+    updateActiveStudent: context.updateActiveStudent,
+    studentFlashcardData: context.studentFlashcardData,
+    programTable: context.programTable,
+    audioExamplesTable: context.audioExamplesTable,
+    studentList: context.studentList,
+    chooseStudent: context.chooseStudent,
+    keepStudent: context.keepStudent,
+    choosingStudent: context.choosingStudent,
+    flashcardDataSynced: context.flashcardDataSynced,
+    syncFlashcards: context.syncFlashcards,
+
     addToActiveStudentFlashcards,
     removeFlashcardFromActiveStudent,
     updateActiveStudentFlashcard,
