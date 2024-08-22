@@ -188,7 +188,7 @@ export default function LCSPQuizApp({
 
   const makeQuizSelections = useCallback(() => {
     const quizList = quizTable.filter(item => item.quizType === quizCourse)
-    const quizSelections: Quiz[] = []
+    const quizSelections: React.JSX.Element[] = []
     const courseObj = courses.current.find(
       course => course.code === quizCourse,
     )
@@ -256,18 +256,16 @@ export default function LCSPQuizApp({
   }, [selectedLesson, selectedProgram, quizCourse, quizTable, navigate])
 
   function createRoutesFromCourses() {
-    const routes = []
+    const routes: React.JSX.Element[] = []
     courses.current.forEach((course) => {
       routes.push(
         <Route
           key={course.code}
-          exact
           path={`${course.url}/*`}
           element={(
             <CourseQuizzes
               chosenQuiz={chosenQuiz}
               courses={courses.current}
-              createRoutesFromCourses={createRoutesFromCourses}
               dataLoaded={dataLoaded}
               hideMenu={hideMenu}
               makeCourseList={makeCourseList}
@@ -278,7 +276,6 @@ export default function LCSPQuizApp({
               quizCourse={quizCourse}
               quizReady={quizReady}
               quizTable={quizTable}
-              setChosenQuiz={setChosenQuiz}
               studentHasDefaultQuiz={studentHasDefaultQuiz}
               thisCourse={course.code}
               updateChosenQuiz={updateChosenQuiz}
@@ -296,10 +293,12 @@ export default function LCSPQuizApp({
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true
-      async function startUp() {
+      const startUp = async () => {
         getLCSPQuizzes().then((quizzes) => {
-          const parsedQuizTable = parseQuizzes(quizzes)
-          setQuizTable(parsedQuizTable)
+          if (quizzes) {
+            const parsedQuizTable = parseQuizzes(quizzes)
+            setQuizTable(parsedQuizTable)
+          }
         })
       }
       startUp()
@@ -365,7 +364,7 @@ export default function LCSPQuizApp({
           <select
             className="quizMenu"
             value={chosenQuiz}
-            onChange={e => updateChosenQuiz(e.target.value)}
+            onChange={e => updateChosenQuiz(Number.parseInt(e.target.value) || 0)}
           >
             {makeQuizSelections()}
           </select>

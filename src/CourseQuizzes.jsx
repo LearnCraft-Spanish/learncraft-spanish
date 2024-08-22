@@ -19,7 +19,6 @@ export default function CourseQuizzes({
   makeCourseList,
   makeMenuHidden,
   makeMenuShow,
-  makeQuizList,
   makeQuizReady,
   makeQuizSelections,
   quizCourse,
@@ -46,10 +45,10 @@ export default function CourseQuizzes({
 
   useEffect(() => {
     if (dataLoaded && !studentHasDefaultQuiz) {
-      const firstQuiz = makeQuizList(quizCourse)[0]
+      const firstQuiz = makeQuizSelections(quizCourse)[0]
       updateChosenQuiz(firstQuiz)
     }
-  }, [dataLoaded, studentHasDefaultQuiz, quizCourse, makeQuizList, updateChosenQuiz])
+  }, [dataLoaded, studentHasDefaultQuiz, quizCourse, makeQuizSelections, updateChosenQuiz])
 
   useEffect(() => {
     if (quizReady && chosenQuiz) {

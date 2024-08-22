@@ -246,11 +246,14 @@ export default function Quiz({
         const updatedArray = [...examplesToReview]
         updatedArray[exampleIndex].isCollected = true
         setExamplesToReview(updatedArray)
-        if (await flashcardAddedPromise !== 1) {
-          const updatedArray = [...examplesToReview]
-          updatedArray[exampleIndex].isCollected = false
-          setExamplesToReview(updatedArray)
-        }
+        flashcardAddedPromise
+          .then ((result) => {
+            if (result !== 1) {
+              const updatedArray = [...examplesToReview]
+              updatedArray[exampleIndex].isCollected = false
+              setExamplesToReview(updatedArray)
+            }
+          })
       }
     }
   }

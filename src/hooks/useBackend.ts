@@ -132,7 +132,7 @@ export function useBackend() {
   /*      POST Requests      */
 
   const postFactory = useCallback(
-    async <T>(path: string, body: any, headers?: any): Promise<T | undefined> => {
+    async <T>(path: string, headers?: any): Promise<T | undefined> => {
       try {
         const fetchUrl = `${backendUrl}${path}`
         const response = await fetch(fetchUrl, {
@@ -142,9 +142,7 @@ export function useBackend() {
             'Content-Type': 'application/json',
             ...headers,
           },
-          body: JSON.stringify(body),
         })
-
         if (response.ok) {
           return await response.json()
         }

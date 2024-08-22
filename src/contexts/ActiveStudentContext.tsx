@@ -173,21 +173,23 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   }, [activeStudent, programTable])
 
   const matchAndTrimArrays = useCallback((flashcardData: StudentFlashcardData) => {
+    console.log(flashcardData)
     const exampleArray = flashcardData.examples
     const studentExampleArray = flashcardData.studentExamples
-    const filteredExamples = exampleArray.sort((a, b) => a.recordId - b.recordId)
-    studentExampleArray.sort((a, b) => a.relatedExample - b.relatedExample)
-    const filteredStudentExamples = studentExampleArray.filter((example) => {
+    const sortedExamples = exampleArray.sort((a, b) => a.recordId - b.recordId)
+    const sortedStudentExamples = studentExampleArray.sort((a, b) => a.relatedExample - b.relatedExample)
+    const filteredExamples = sortedExamples.filter((example) => {
       const match = studentExampleArray.find(studentExample => studentExample.relatedExample === example.recordId)
       return match
     })
-    studentExampleArray.filter((studentExample) => {
+    const filteredStudentExamples = sortedStudentExamples.filter((studentExample) => {
       const match = exampleArray.find(example => example.recordId === studentExample.relatedExample)
       return match
     })
     if (filteredExamples.length === filteredStudentExamples.length) {
       return { examples: filteredExamples, studentExamples: filteredStudentExamples }
     }
+    console.log(filteredExamples, filteredStudentExamples)
     return null
   }, [])
 
