@@ -2,6 +2,7 @@ import './App.css'
 import type { ReactElement } from 'react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
@@ -30,6 +31,7 @@ export const App: React.FC = () => {
   const navigate = useNavigate()
   const { userData } = useUserData()
   const { activeStudent, activeLesson, activeProgram, studentFlashcardData, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const { isAuthenticated, isLoading } = useAuth0()
 
   // States for Lesson Selector
   const [selectedLesson, setSelectedLesson] = useState<Lesson>()
@@ -195,14 +197,14 @@ export const App: React.FC = () => {
   }, [programTable])
 
   useEffect(() => {
-    if (activeLesson) {
-      updateSelectedLesson(activeLesson.current?.recordId)
+    if (activeLesson?.current) {
+      updateSelectedLesson(activeLesson.current.recordId)
     }
   }, [activeLesson, activeStudent, programTable, updateSelectedLesson])
 
   useEffect(() => {
-    if (activeProgram) {
-      updateSelectedProgram(activeProgram.current?.recordId)
+    if (activeProgram?.current) {
+      updateSelectedProgram(activeProgram.current.recordId)
     }
   }, [activeProgram, activeStudent, programTable, updateSelectedProgram])
 
@@ -226,22 +228,22 @@ export const App: React.FC = () => {
       </div>
       {location.pathname !== '/coaching' && (
         <div className="div-user-subheader">
-          {!userData && (
+          {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>
           )}
-          {!userData && <p>Loading user data...</p>}
-          {
-            (userData?.role === 'student' || userData?.role === 'limited')
-            && !userData.isAdmin && (
-              <p>
-                Welcome back,
-                {` ${userData.name}`}
-                !
-              </p>
-            )
-          }
+          {isLoading && <p>Logging In...</p>}
+          {!isLoading && isAuthenticated && !userData && <p>Loading user data...</p>}
+          {!isLoading && isAuthenticated && userData
+          && (userData?.role === 'student' || userData?.role === 'limited')
+          && !userData.isAdmin && (
+            <p>
+              Welcome back,
+              {` ${userData.name}`}
+              !
+            </p>
+          )}
 
-          {userData?.role !== 'student'
+          {!isLoading && isAuthenticated && userData && userData?.role !== 'student'
           && userData?.role !== 'limited'
           && !userData?.isAdmin && <p>Welcome back!</p>}
 
