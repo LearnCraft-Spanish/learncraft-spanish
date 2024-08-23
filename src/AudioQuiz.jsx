@@ -3,18 +3,24 @@ import './App.css'
 
 import AudioBasedReview from './AudioBasedReview'
 import { useActiveStudent } from './hooks/useActiveStudent'
+/*
+    updateBannerMessage={updateBannerMessage}
+                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
 
+                selectedLesson={selectedLesson}
+                selectedProgram={selectedProgram}
+                updateSelectedLesson={updateSelectedLesson}
+                updateSelectedProgram={updateSelectedProgram}
+                */
 export default function AudioQuiz({
-  programTable,
   updateBannerMessage,
-  audioExamplesTable,
   filterExamplesByAllowedVocab,
   selectedLesson,
   selectedProgram,
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const { activeStudent, studentExamplesTable } = useActiveStudent()
+  const { activeStudent, audioExamplesTable, studentFlashcardData } = useActiveStudent()
   const [audioQuizExamples, setAudioQuizExamples] = useState([])
   const [audioQuizReady, setAudioQuizReady] = useState(false)
   function filterExamplesByEnglishAudio(examples) {
@@ -49,8 +55,7 @@ export default function AudioQuiz({
       {audioQuizReady && (
         <AudioBasedReview
           activeStudent={activeStudent}
-          programTable={programTable}
-          studentExamplesTable={studentExamplesTable}
+          studentExamplesTable={studentFlashcardData.studentExamples}
           updateBannerMessage={updateBannerMessage}
           audioExamplesTable={audioQuizExamples}
           filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}

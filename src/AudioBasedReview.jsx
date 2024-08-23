@@ -6,7 +6,6 @@ import LessonSelector from './LessonSelector'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function AudioBasedReview({
-  programTable,
   audioExamplesTable,
   filterExamplesByAllowedVocab,
   willAutoplay,
@@ -426,7 +425,6 @@ export default function AudioBasedReview({
       {!quizReady && (selectedLesson.recordId || !activeStudent.recordId) && (
         <div className="audioBox">
           <LessonSelector
-            programTable={programTable}
             selectedLesson={selectedLesson}
             updateSelectedLesson={updateSelectedLesson}
             selectedProgram={selectedProgram}

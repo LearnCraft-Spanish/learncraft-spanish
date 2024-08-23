@@ -78,12 +78,13 @@ export const App: React.FC = () => {
   }
 
   // local functions for admins to choose or keep a student from the menu
-  const updateSelectedLesson = useCallback((lessonId: number) => {
+  const updateSelectedLesson = useCallback((lessonId: string | number) => {
+    if (typeof lessonId === 'string') {
+      lessonId = Number.parseInt(lessonId)
+    }
     let newLesson
     programTable.forEach((program) => {
-      const foundLesson = program.lessons.find(
-        item => item.recordId === lessonId,
-      )
+      const foundLesson = program.lessons.find(item => item.recordId === lessonId)
       if (foundLesson) {
         newLesson = foundLesson
       }
@@ -91,10 +92,12 @@ export const App: React.FC = () => {
     setSelectedLesson(newLesson)
   }, [programTable])
 
-  const updateSelectedProgram = useCallback((programId: number) => {
-    const programIdNumber = programId
+  const updateSelectedProgram = useCallback((programId: string | number) => {
+    if (typeof programId === 'string') {
+      programId = Number.parseInt(programId)
+    }
     const newProgram
-      = programTable.find(program => program.recordId === programIdNumber)
+      = programTable.find(program => program.recordId === programId)
       || (/* activeProgram.current.recordId
         ? activeProgram.current
         : */programTable.find(program => program.recordId === 2)) // Active program not currently defined
@@ -173,6 +176,7 @@ export const App: React.FC = () => {
       if (foundLesson) {
         allowedVocabulary = foundLesson.vocabKnown || []
       }
+      console.log(foundLesson)
       return allowedVocabulary
     })
     const filteredByAllowed = examples.filter((item) => {

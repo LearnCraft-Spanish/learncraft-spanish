@@ -1,6 +1,7 @@
 import React from 'react'
 
 import type { Lesson, Program } from './interfaceDefinitions'
+import { useActiveStudent } from './hooks/useActiveStudent'
 
 interface LessonSelectorProps {
   programTable: Array<Program>
@@ -10,12 +11,12 @@ interface LessonSelectorProps {
   updateSelectedProgram: (programId: string) => void
 }
 export default function LessonSelector({
-  programTable,
   selectedLesson,
   updateSelectedLesson,
   selectedProgram,
   updateSelectedProgram,
 }: LessonSelectorProps) {
+  const { programTable } = useActiveStudent()
   function makeCourseSelector() {
     const courseSelector = [
       <option key={0} value={0}>

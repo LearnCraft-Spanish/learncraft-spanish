@@ -5,34 +5,37 @@ import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 function FlashcardManager() {
-  const { studentFlashcardData, removeFlashcardFromActiveStudent, addToActiveStudentFlashcards, flashcardDataSynced } = useActiveStudent()
   const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([])
 
-  async function removeAndUpdate(recordId: number) {
+  const { studentFlashcardData, flashcardDataSynced, removeFlashcardFromActiveStudent, addToActiveStudentFlashcards } = useActiveStudent()
+  // examplesTable, studentExamplesTable,
+  async function removeAndUpdate(recordId: number | string) {
+    if (typeof recordId === 'string') {
+      recordId = Number.parseInt(recordId)
+    }
     const filteredTable = displayExamplesTable.filter(
       item =>
         item.recordId !== getExamplefromStudentExampleId(recordId).recordId,
     )
     setDisplayExamplesTable(filteredTable)
-    removeFlashcard(recordId).then((numberRemoved: number) => {
-      if (numberRemoved === 1) {
+    const result = await removeFlashcardFromActiveStudent(recordId)
+    if (result) {
+      if (result === 1) {
         return []
       }
-      else {
-        updateExamplesTable()
-      }
-    })
+    }
   }
 
   function getStudentExampleFromExampleId(exampleId: number) {
-    const studentExample = studentExamplesTable.find(
+    const studentExample = studentFlashcardData?.studentExamples.find(
       item => item.relatedExample === exampleId,
     )
+
     return studentExample || { recordId: -1, dateCreated: '', relatedExample: -1 }
   }
 
   function getExamplefromStudentExampleId(studentExampleId: number) {
-    const example = examplesTable.find(
+    const example = studentFlashcardData?.examples.find(
       item => item.recordId === studentExampleId,
     )
     return example || {
@@ -84,7 +87,7 @@ function FlashcardManager() {
             <h4>Spanish</h4>
           </div>
         )}
-        {syncedWithBackend
+        {flashcardDataSynced
           ? (
               <button
                 type="button"
@@ -112,8 +115,8 @@ function FlashcardManager() {
   }
 
   useEffect(() => {
-    setDisplayExamplesTable(examplesTable)
-  }, [examplesTable])
+    setDisplayExamplesTable(studentFlashcardData?.examples || [])
+  }, [studentFlashcardData?.examples])
 
   return (
     <div>

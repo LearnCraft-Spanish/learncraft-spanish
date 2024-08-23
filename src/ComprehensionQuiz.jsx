@@ -8,14 +8,13 @@ import { useActiveStudent } from './hooks/useActiveStudent'
 export default function ComprehensionQuiz({
   programTable,
   updateBannerMessage,
-  audioExamplesTable,
   filterExamplesByAllowedVocab,
   selectedLesson,
   selectedProgram,
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const { activeStudent, studentExamplesTable } = useActiveStudent()
+  const { activeStudent, studentFlashcardData, audioExamplesTable } = useActiveStudent()
   const rendered = useRef(false)
 
   useEffect(() => {
@@ -30,7 +29,7 @@ export default function ComprehensionQuiz({
       <AudioBasedReview
         activeStudent={activeStudent}
         programTable={programTable}
-        studentExamplesTable={studentExamplesTable}
+        studentExamplesTable={studentFlashcardData.studentExamples}
         updateBannerMessage={updateBannerMessage}
         audioExamplesTable={audioExamplesTable}
         filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
