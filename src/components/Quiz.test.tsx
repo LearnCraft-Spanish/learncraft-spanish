@@ -7,7 +7,6 @@ import { ActiveStudentProvider } from '../contexts/ActiveStudentContext'
 import { UserDataProvider } from '../contexts/UserDataContext'
 // import activeStudentProvider
 import Quiz from './Quiz'
-import { User } from '@auth0/auth0-react'
 
 const addFlashcard = vi.fn()
 const removeFlashcard = vi.fn()

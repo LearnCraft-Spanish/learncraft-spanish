@@ -23,7 +23,6 @@ import CallbackPage from './CallbackPage'
 import Coaching from './Coaching'
 import FlashcardManager from './FlashcardManager'
 import Quiz from './components/Quiz'
-import { useBackend } from './hooks/useBackend'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -80,7 +79,10 @@ export const App: React.FC = () => {
   }
 
   // local functions for admins to choose or keep a student from the menu
-  const updateSelectedLesson = useCallback((lessonId: number) => {
+  const updateSelectedLesson = useCallback((lessonId: number | string) => {
+    if (typeof lessonId === 'string') {
+      lessonId = Number.parseInt(lessonId)
+    }
     let newLesson
     programTable.forEach((program) => {
       const foundLesson = program.lessons.find(
@@ -93,7 +95,10 @@ export const App: React.FC = () => {
     setSelectedLesson(newLesson)
   }, [programTable])
 
-  const updateSelectedProgram = useCallback((programId: number) => {
+  const updateSelectedProgram = useCallback((programId: number | string) => {
+    if (typeof programId === 'string') {
+      programId = Number.parseInt(programId)
+    }
     const programIdNumber = programId
     const newProgram
       = programTable.find(program => program.recordId === programIdNumber)
@@ -339,14 +344,12 @@ export const App: React.FC = () => {
           element={
             (userData?.role === 'student' || userData?.isAdmin) && (
               <FlashcardFinder
-                updateBannerMessage={updateBannerMessage}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
                 contextual={contextual}
                 openContextual={openContextual}
-                closeContextual={closeContextual}
                 ref={currentContextual}
               />
             )

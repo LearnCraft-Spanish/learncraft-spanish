@@ -1,4 +1,4 @@
-import React, { MutableRefObject, forwardRef, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { useBackend } from './hooks/useBackend'
 
@@ -20,7 +20,7 @@ interface FlashcardFinderProps {
 }
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-const FlashcardFinder = forwardRef(
+const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
   (
     {
       selectedProgram,
@@ -69,9 +69,9 @@ const FlashcardFinder = forwardRef(
       }
     }
 
-    function updateTagSearchTerm(target: React.MouseEvent<HTMLSelectElement>) {
+    function updateTagSearchTerm(target: EventTarget & HTMLInputElement) {
       openContextual('tagSuggestionBox')
-      setTagSearchTerm(target.currentTarget.value)
+      setTagSearchTerm(target.value)
     }
 
     function addTagToRequiredTags(id: number) {
@@ -343,12 +343,12 @@ const FlashcardFinder = forwardRef(
       else {
         return a.frequencyRank - b.frequencyRank
       }
+      return 0
     }
 
     async function setupVocabTable() {
       try {
         const vocab = await getVocabFromBackend()
-        console.log(vocab)
         const tags: VocabTag[] = []
         vocab?.forEach((term) => {
           if (term.vocabularySubcategorySubcategoryName) {
@@ -436,33 +436,41 @@ const FlashcardFinder = forwardRef(
             }
           }
         })
-        console.log(tags)
         setTagTable(tags)
-        return vocab.sort(sortVocab)
+        return vocab?.sort(sortVocab)
       }
-      catch (e) {
-        console.error(e.message)
-      }
-    }
-
-    async function getExamples() {
-      try {
-        const examples = await getVerifiedExamplesFromBackend()
-        return examples
-      }
-      catch (e) {
-        console.error(e.message)
+      catch (e: unknown) {
+        if (e instanceof Error) {
+          console.error(e.message)
+        }
+        else {
+          console.error('An unexpected error occurred:', e)
+        }
       }
     }
 
-    async function addFlashcard(exampleId) {
+    async function addFlashcard(exampleId: string) {
+      const exampleIdNumber = Number.parseInt(exampleId)
       const exampleToUpdate = exampleTable.find(
-        example => example.recordId === Number.parseInt(exampleId),
+        example => example.recordId === exampleIdNumber,
       )
-      exampleToUpdate.isCollected = true
-      addToActiveStudentFlashcards(exampleId, false).then((addResponse) => {
+      if (!exampleToUpdate) {
+        return
+      }
+      const newExampleTable = [...exampleTable]
+      const exampleIndex = newExampleTable.findIndex(example => example.recordId === exampleIdNumber)
+      const newFlashcardObject = { ...exampleToUpdate }
+      newFlashcardObject.isCollected = true
+      newExampleTable[exampleIndex] = newFlashcardObject
+      setExampleTable(newExampleTable)
+      addToActiveStudentFlashcards(exampleIdNumber).then((addResponse) => {
         if (addResponse !== 1) {
-          exampleToUpdate.isCollected = false
+          const revertedExampleTable = [...exampleTable]
+          const exampleIndex = revertedExampleTable.findIndex(example => example.recordId === exampleIdNumber)
+          const newFlashcardObject = { ...exampleToUpdate }
+          newFlashcardObject.isCollected = false
+          revertedExampleTable[exampleIndex] = newFlashcardObject
+          setExampleTable(revertedExampleTable)
         }
       })
     }
@@ -498,12 +506,6 @@ const FlashcardFinder = forwardRef(
           && programTable[0]
         ) {
           setIsLoaded(true)
-          if (activeStudent.recordId) {
-            const activeCourse = programTable.find(
-              item => activeStudent.relatedProgram === item.recordId,
-            )
-            updateSelectedProgram(activeCourse.recordId)
-          }
           makeExamplesTable()
           // console.log(programTable)
         }
@@ -526,7 +528,7 @@ const FlashcardFinder = forwardRef(
       selectedLesson,
       requiredTags,
       noSpanglish,
-      studentFlashcardData?.examples,
+      makeExamplesTable,
     ])
 
     return (
@@ -579,21 +581,21 @@ const FlashcardFinder = forwardRef(
                       <div className="searchTermBox">
                         <input
                           type="text"
-                          onChange={e => updateTagSearchTerm(e.target)}
+                          onChange={e => updateTagSearchTerm(e.currentTarget)}
                           onClick={() => openContextual('tagSuggestionBox')}
                         />
                         <br></br>
                       </div>
                     </div>
                     {tagSearchTerm.length > 0
-                    && contextual === 'tagSuggestionBox'
+                    && contextual.current === 'tagSuggestionBox'
                     && suggestedTags.length > 0 && (
-                      <div
+                      <select
                         className="tagSuggestionBox"
                         ref={currentContextual}
                       >
                         {suggestedTags.map(item => (
-                          <div
+                          <option
                             key={item.tag}
                             value={item.id}
                             className="vocabCard"
@@ -601,24 +603,24 @@ const FlashcardFinder = forwardRef(
                           >
                             <h4 className="vocabName">{item.tag}</h4>
                             <p className="vocabUse">{item.type}</p>
-                          </div>
+                          </option>
                         ))}
-                      </div>
+                      </select>
                     )}
                     {requiredTags.length > 0 && (
-                      <div className="selectedVocab">
+                      <select className="selectedVocab">
                         <h5>Search Terms:</h5>
                         {requiredTags.map(item => (
-                          <div
+                          <option
                             key={item.tag}
                             value={item.id}
                             className="vocabSmallCard"
                             onClick={() => removeTagFromRequiredTags(item.id)}
                           >
                             <h4 className="vocabName">{item.tag}</h4>
-                          </div>
+                          </option>
                         ))}
-                      </div>
+                      </select>
                     )}
                   </div>
                 </div>
