@@ -212,6 +212,12 @@ button:hover, .linkButton:hover {
 
 /*General Quiz Styles*/
 
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .quiz {
   display: flex;
   flex-direction: column;
