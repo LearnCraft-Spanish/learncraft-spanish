@@ -35,6 +35,7 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
   )
 
   useEffect(() => {
+    console.log(isAuthenticated)
     if (isAuthenticated && !isLoading) {
       setupUserData()
     }

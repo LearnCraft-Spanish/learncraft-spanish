@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 
 import './App.css'
-import { Q } from 'vitest/dist/chunks/reporters.C_zwCd4j'
 import { useBackend } from './hooks/useBackend'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import CourseQuizzes from './CourseQuizzes.jsx'

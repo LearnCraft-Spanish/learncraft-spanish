@@ -19,24 +19,26 @@ export default function Menu() {
   return flashcardDataSynced && (
     <div className="menu">
       <div className="menuBox">
-        {activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length && (
-          <div>
-            <h3>My Flashcards:</h3>
-            <div className="buttonBox">
-              <Link className="linkButton" to="/allflashcards">
-                All My Flashcards
-              </Link>
-              <Link className="linkButton" to="/todaysflashcards">
-                My Flashcards for Today
-              </Link>
-            </div>
-            <div className="buttonBox">
-              <Link className="linkButton" to="/manage-flashcards">
-                Manage My Flashcards
-              </Link>
-            </div>
-          </div>
-        )}
+        {activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length
+          ? (
+              <div>
+                <h3>My Flashcards:</h3>
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/allflashcards">
+                    All My Flashcards
+                  </Link>
+                  <Link className="linkButton" to="/todaysflashcards">
+                    My Flashcards for Today
+                  </Link>
+                </div>
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/manage-flashcards">
+                    Manage My Flashcards
+                  </Link>
+                </div>
+              </div>
+            )
+          : null}
         <h3>Quizzing Tools:</h3>
         <div className="buttonBox">
           <Link className="linkButton" to="/officialquizzes">

@@ -2,6 +2,7 @@ import './App.css'
 import type { ReactElement } from 'react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
@@ -22,7 +23,6 @@ import CallbackPage from './CallbackPage'
 import Coaching from './Coaching'
 import FlashcardManager from './FlashcardManager'
 import Quiz from './components/Quiz'
-import { useBackend } from './hooks/useBackend'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -30,6 +30,7 @@ export const App: React.FC = () => {
   const navigate = useNavigate()
   const { userData } = useUserData()
   const { activeStudent, activeLesson, activeProgram, studentFlashcardData, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const { isAuthenticated, isLoading } = useAuth0()
 
   // States for Lesson Selector
   const [selectedLesson, setSelectedLesson] = useState<Lesson>()
@@ -78,7 +79,7 @@ export const App: React.FC = () => {
   }
 
   // local functions for admins to choose or keep a student from the menu
-  const updateSelectedLesson = useCallback((lessonId: string | number) => {
+  const updateSelectedLesson = useCallback((lessonId: number | string) => {
     if (typeof lessonId === 'string') {
       lessonId = Number.parseInt(lessonId)
     }
@@ -92,10 +93,11 @@ export const App: React.FC = () => {
     setSelectedLesson(newLesson)
   }, [programTable])
 
-  const updateSelectedProgram = useCallback((programId: string | number) => {
+  const updateSelectedProgram = useCallback((programId: number | string) => {
     if (typeof programId === 'string') {
       programId = Number.parseInt(programId)
     }
+    const programIdNumber = programId
     const newProgram
       = programTable.find(program => program.recordId === programId)
       || (/* activeProgram.current.recordId
@@ -199,14 +201,14 @@ export const App: React.FC = () => {
   }, [programTable])
 
   useEffect(() => {
-    if (activeLesson) {
-      updateSelectedLesson(activeLesson.current?.recordId)
+    if (activeLesson?.current) {
+      updateSelectedLesson(activeLesson.current.recordId)
     }
   }, [activeLesson, activeStudent, programTable, updateSelectedLesson])
 
   useEffect(() => {
-    if (activeProgram) {
-      updateSelectedProgram(activeProgram.current?.recordId)
+    if (activeProgram?.current) {
+      updateSelectedProgram(activeProgram.current.recordId)
     }
   }, [activeProgram, activeStudent, programTable, updateSelectedProgram])
 
@@ -230,22 +232,22 @@ export const App: React.FC = () => {
       </div>
       {location.pathname !== '/coaching' && (
         <div className="div-user-subheader">
-          {!userData && (
+          {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>
           )}
-          {!userData && <p>Loading user data...</p>}
-          {
-            (userData?.role === 'student' || userData?.role === 'limited')
-            && !userData.isAdmin && (
-              <p>
-                Welcome back,
-                {` ${userData.name}`}
-                !
-              </p>
-            )
-          }
+          {isLoading && <p>Logging In...</p>}
+          {!isLoading && isAuthenticated && !userData && <p>Loading user data...</p>}
+          {!isLoading && isAuthenticated && userData
+          && (userData?.role === 'student' || userData?.role === 'limited')
+          && !userData.isAdmin && (
+            <p>
+              Welcome back,
+              {` ${userData.name}`}
+              !
+            </p>
+          )}
 
-          {userData?.role !== 'student'
+          {!isLoading && isAuthenticated && userData && userData?.role !== 'student'
           && userData?.role !== 'limited'
           && !userData?.isAdmin && <p>Welcome back!</p>}
 
@@ -341,14 +343,12 @@ export const App: React.FC = () => {
           element={
             (userData?.role === 'student' || userData?.isAdmin) && (
               <FlashcardFinder
-                updateBannerMessage={updateBannerMessage}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
                 contextual={contextual}
                 openContextual={openContextual}
-                closeContextual={closeContextual}
                 ref={currentContextual}
               />
             )

@@ -8,8 +8,8 @@ import { useUserData } from '../hooks/useUserData'
 interface ActiveStudentContextProps {
   activeStudent: UserData | null
   setActiveStudent: (student: UserData | null) => void
-  activeLesson: React.MutableRefObject<Lesson>
-  activeProgram: React.MutableRefObject<Program>
+  activeLesson: React.MutableRefObject<Lesson | undefined>
+  activeProgram: React.MutableRefObject<Program | undefined>
   studentFlashcardData: StudentFlashcardData | null
   choosingStudent: boolean
   chooseStudent: () => void
@@ -173,7 +173,6 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   }, [activeStudent, programTable])
 
   const matchAndTrimArrays = useCallback((flashcardData: StudentFlashcardData) => {
-    console.log(flashcardData)
     const exampleArray = flashcardData.examples
     const studentExampleArray = flashcardData.studentExamples
     const sortedExamples = exampleArray.sort((a, b) => a.recordId - b.recordId)
@@ -189,7 +188,6 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
     if (filteredExamples.length === filteredStudentExamples.length) {
       return { examples: filteredExamples, studentExamples: filteredStudentExamples }
     }
-    console.log(filteredExamples, filteredStudentExamples)
     return null
   }, [])
 

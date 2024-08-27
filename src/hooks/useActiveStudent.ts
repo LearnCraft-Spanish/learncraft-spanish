@@ -1,4 +1,4 @@
-import { ErrorInfo, useCallback, useContext } from 'react'
+import { useCallback, useContext } from 'react'
 import debounce from 'lodash/debounce'
 import ActiveStudentContext from '../contexts/ActiveStudentContext'
 
@@ -31,7 +31,7 @@ export function useActiveStudent() {
         const data = await createStudentExample(
           context.activeStudent?.recordId,
           recordId,
-        ).then((result: number) => {
+        ).then((result: number | undefined) => {
           if (result === 1) {
             // updateBannerMessage('Flashcard Added!')
             debounce(context.syncFlashcards, 500)

@@ -88,7 +88,7 @@ export interface Vocabulary {
   wordIdiom: string
   use: string
   frequencyRank: number
-  vocabSubcategorySubcategoryName: string
+  vocabularySubcategorySubcategoryName: string
   vocabName: string
   verbInfinitive: string
   conjugationTags: Array<string>
@@ -122,6 +122,14 @@ export interface Quiz {
 export interface Spelling {
   relatedWordidion: number
   spellingOption: string
+}
+
+/*      Flashcard Finder      */
+
+export interface VocabTag {
+  id: number
+  type: string
+  tag: string
 }
 
 /*      Coaching Interfaces      */

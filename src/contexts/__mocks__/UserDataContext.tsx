@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
-import { createContext, useMemo } from 'react';
-import type { UserData } from '../../interfaceDefinitions';
+import type { ReactNode } from 'react'
+import { createContext, useMemo } from 'react'
+import type { UserData } from '../../interfaceDefinitions'
 
 interface UserDataContextProps {
   userData: UserData | null

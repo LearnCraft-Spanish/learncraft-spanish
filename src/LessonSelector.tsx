@@ -6,7 +6,7 @@ import { useActiveStudent } from './hooks/useActiveStudent'
 interface LessonSelectorProps {
   programTable: Array<Program>
   selectedLesson: Lesson | null
-  updateSelectedLesson: (lessonId: string | null) => void
+  updateSelectedLesson: (lessonId: string) => void
   selectedProgram: Program
   updateSelectedProgram: (programId: string) => void
 }
@@ -26,7 +26,6 @@ export default function LessonSelector({
     programTable.forEach((item: Program) => {
       courseSelector.push(
         <option key={item.recordId} value={item.recordId}>
-          {' '}
           {item.name}
         </option>,
       )
@@ -41,10 +40,7 @@ export default function LessonSelector({
       const lessonNumber = lessonArray.slice(-1)[0]
       lessonSelector.push(
         <option key={lesson.lesson} value={lesson.recordId}>
-          {' '}
-          Lesson
-          {' '}
-          {lessonNumber}
+          {`Lesson ${lessonNumber}`}
         </option>,
       )
     })

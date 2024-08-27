@@ -56,8 +56,8 @@ export function useBackend() {
     return getFactory<types.Lesson[]>('public/lessons')
   }, [getFactory])
 
-  const getVocabFromBackend = useCallback((): Promise<types.Flashcard[] | undefined> => {
-    return getFactory<types.Flashcard[]>('public/vocabulary')
+  const getVocabFromBackend = useCallback((): Promise<types.Vocabulary[] | undefined> => {
+    return getFactory<types.Vocabulary[]>('public/vocabulary')
   }, [getFactory])
 
   const getSpellingsFromBackend = useCallback((): Promise<types.Spelling[] | undefined> => {
