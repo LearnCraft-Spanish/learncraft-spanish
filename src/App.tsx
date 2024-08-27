@@ -23,6 +23,7 @@ import CallbackPage from './CallbackPage'
 import Coaching from './Coaching'
 import FlashcardManager from './FlashcardManager'
 import Quiz from './components/Quiz'
+import MyFlashcardsQuiz from './MyFlashcardsQuiz'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -294,6 +295,18 @@ export const App: React.FC = () => {
         />
         <Route path="/callback" element={<CallbackPage />} />
         <Route
+          path="/myflashcards"
+          element={
+            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
+              ? (
+                  <MyFlashcardsQuiz
+                    examplesToParse={studentFlashcardData?.examples}
+                  />
+                )
+              : (<Navigate to="/" />)
+          }
+        />
+        {/* <Route
           path="/allflashcards"
           element={
             (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
@@ -308,7 +321,6 @@ export const App: React.FC = () => {
               : (<Navigate to="/" />)
           }
         />
-
         <Route
           path="/todaysflashcards"
           element={
@@ -316,7 +328,7 @@ export const App: React.FC = () => {
               ? <SRSQuizApp />
               : <Navigate to="/" />
           }
-        />
+        /> */}
         <Route
           path="/manage-flashcards"
           element={

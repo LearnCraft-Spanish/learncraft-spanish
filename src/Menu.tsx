@@ -24,12 +24,12 @@ export default function Menu() {
               <div>
                 <h3>My Flashcards:</h3>
                 <div className="buttonBox">
-                  <Link className="linkButton" to="/allflashcards">
-                    All My Flashcards
+                  <Link className="linkButton" to="/myflashcards">
+                    My Flashcards
                   </Link>
-                  <Link className="linkButton" to="/todaysflashcards">
+                  {/* <Link className="linkButton" to="/todaysflashcards">
                     My Flashcards for Today
-                  </Link>
+                  </Link> */}
                 </div>
                 <div className="buttonBox">
                   <Link className="linkButton" to="/manage-flashcards">

@@ -7,7 +7,13 @@ import Quiz from './components/Quiz'
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
-export default function SRSQuizApp() {
+interface SRSQuizAppProps {
+  startWithSpanish?: boolean
+}
+
+export default function SRSQuizApp({
+  startWithSpanish = false,
+}: SRSQuizAppProps) {
   // const quizLength = 20 //will be used to determine how many examples to review
 
   const { activeStudent, studentFlashcardData, flashcardDataSynced } = useActiveStudent()
@@ -91,6 +97,7 @@ export default function SRSQuizApp() {
             examplesToParse={examplesToReview}
             quizOnlyCollectedExamples
             isSrsQuiz
+            startWithSpanish={startWithSpanish}
             cleanupFunction={makeMenuShow}
           />
         )}

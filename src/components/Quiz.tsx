@@ -75,7 +75,7 @@ function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: Stude
 }
 
 export default function Quiz({
-  examplesToParse,
+  examplesToParse = [],
   quizTitle,
   startWithSpanish = false,
   quizOnlyCollectedExamples = false,
@@ -99,7 +99,6 @@ export default function Quiz({
   const spanishShowing = (startWithSpanish !== answerShowing)
 
   const isMainLocation = location.pathname.split('/').length < 2
-
   function hideAnswer() {
     setAnswerShowing(false)
   }
@@ -282,6 +281,7 @@ export default function Quiz({
           addFlashcardAndUpdate={addFlashcardAndUpdate}
           removeFlashcardAndUpdate={removeFlashcardAndUpdate}
           toggleAnswer={toggleAnswer}
+          startWithSpanish={startWithSpanish}
         />
 
         {isSrsQuiz && (
