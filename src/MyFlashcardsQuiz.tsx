@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, Route, Routes, useNavigate } from 'react-router-dom'
 
 import type { FormEvent } from 'react'
 
@@ -8,7 +8,6 @@ import MenuButton from './components/MenuButton'
 import Quiz from './components/Quiz'
 import SRSQuizApp from './SRSQuizApp'
 import { useActiveStudent } from './hooks/useActiveStudent'
-import { set } from 'lodash'
 
 interface MyFlashcardsQuizProps {
   examplesToParse: Flashcard[]
@@ -35,6 +34,13 @@ export default function MyFlashcardsQuiz({
     setSpanishFirst(spanishFirstValue)
     setQuizLength(Number.parseInt(quizLength))
     setQuizReady(true)
+
+    if (isSrsValue) {
+      navigate('srsquiz')
+    }
+    else {
+      navigate('quiz')
+    }
   }
   function calculateQuizLengthOptions() {
     const quizLengthOptions = []
@@ -50,63 +56,70 @@ export default function MyFlashcardsQuiz({
   }
   return (
     <div>
-      {!quizReady
-        ? (
-            <form className="myFlashcardsForm" onSubmit={e => handleSumbit(e)}>
-              <div className="myFlashcardsFormContentWrapper">
-                <h3>My Flashcards Quiz</h3>
-                <div>
-                  <p>
-                    SRS Quiz:
-                  </p>
-                  <label htmlFor="isSrs" className="switch">
-                    <input type="checkbox" name="Srs" id="isSrs" />
-                    <span className="slider round"></span>
-                  </label>
-                </div>
-                <div>
-                  <p>Start with Spanish:</p>
-                  <label htmlFor="spanishFirst" className="switch">
-                    <input type="checkbox" name="Spanish First" id="spanishFirst" />
-                    <span className="slider round"></span>
-                  </label>
-                </div>
-                <label htmlFor="quizLength">
-                  <p>Number of Flashcards:</p>
-                  <select name="length" id="quizLength">
-                    {calculateQuizLengthOptions().map(option => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <div className="buttonBox">
-                <MenuButton />
-                <button type="submit">Start Quiz</button>
-              </div>
-            </form>
-          )
-        : (
-            isSrs
-              ? (
-                  <SRSQuizApp
-                    startWithSpanish={spanishFirst}
-                    quizLength={quizLength}
-                  />
-                )
-              : (
-                  <Quiz
-                    examplesToParse={examplesToParse}
-                    quizTitle="My Flashcards"
-                    quizOnlyCollectedExamples
-                    cleanupFunction={() => updateQuizReady()}
-                    startWithSpanish={spanishFirst}
-                    quizLength={quizLength}
-                  />
-                )
+      {!quizReady && (
+        <form className="myFlashcardsForm" onSubmit={e => handleSumbit(e)}>
+          <div className="myFlashcardsFormContentWrapper">
+            <h3>My Flashcards Quiz</h3>
+            <div>
+              <p>
+                SRS Quiz:
+              </p>
+              <label htmlFor="isSrs" className="switch">
+                <input type="checkbox" name="Srs" id="isSrs" />
+                <span className="slider round"></span>
+              </label>
+            </div>
+            <div>
+              <p>Start with Spanish:</p>
+              <label htmlFor="spanishFirst" className="switch">
+                <input type="checkbox" name="Spanish First" id="spanishFirst" />
+                <span className="slider round"></span>
+              </label>
+            </div>
+            <label htmlFor="quizLength">
+              <p>Number of Flashcards:</p>
+              <select name="length" id="quizLength">
+                {calculateQuizLengthOptions().map(option => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="buttonBox">
+            <button type="submit">Start Quiz</button>
+          </div>
+          <div className="buttonBox">
+            <MenuButton />
+          </div>
+        </form>
+      )}
+      <Routes>
+        <Route
+          path="quiz"
+          element={(
+            <Quiz
+              examplesToParse={examplesToParse}
+              quizTitle="My Flashcards"
+              quizOnlyCollectedExamples
+              cleanupFunction={() => updateQuizReady()}
+              startWithSpanish={spanishFirst}
+              quizLength={quizLength}
+            />
           )}
+        />
+        <Route
+          path="srsquiz"
+          element={(
+            <SRSQuizApp
+              startWithSpanish={spanishFirst}
+              quizLength={quizLength}
+              cleanupFunction={() => updateQuizReady()}
+            />
+          )}
+        />
+      </Routes>
     </div>
   )
 }

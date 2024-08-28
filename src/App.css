@@ -920,8 +920,11 @@ will remove from .css when all instances are removed */
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  margin: 0 auto;
+}
+
+.myFlashcardsForm {
   width: 30vw;
+  margin: 0 auto;
 }
 
 .myFlashcardsFormContentWrapper > label, .myFlashcardsFormContentWrapper > div {

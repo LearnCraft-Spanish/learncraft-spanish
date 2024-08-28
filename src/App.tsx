@@ -294,15 +294,14 @@ export const App: React.FC = () => {
           />
           <Route path="/callback" element={<CallbackPage />} />
           <Route
-            path="/myflashcards"
+            path="/myflashcards/*"
             element={
               (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
-                ? (
-                    <MyFlashcardsQuiz
-                      examplesToParse={studentFlashcardData?.examples}
-                    />
-                  )
-                : (<Navigate to="/" />)
+              && (
+                <MyFlashcardsQuiz
+                  examplesToParse={studentFlashcardData?.examples}
+                />
+              )
             }
           />
           {/* <Route

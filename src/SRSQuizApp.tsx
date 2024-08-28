@@ -10,11 +10,13 @@ import { useActiveStudent } from './hooks/useActiveStudent'
 interface SRSQuizAppProps {
   startWithSpanish?: boolean
   quizLength?: number
+  cleanupFunction: () => void
 }
 
 export default function SRSQuizApp({
   startWithSpanish = false,
   quizLength,
+  cleanupFunction,
 }: SRSQuizAppProps) {
   // const quizLength = 20 //will be used to determine how many examples to review
 
@@ -68,8 +70,9 @@ export default function SRSQuizApp({
     setQuizReady(true)
   }, [getDueExamples])
 
-  function makeMenuShow() {
+  function cleanup() {
     setQuizReady(false)
+    cleanupFunction()
   }
 
   useEffect(() => {
@@ -100,7 +103,7 @@ export default function SRSQuizApp({
             quizOnlyCollectedExamples
             isSrsQuiz
             startWithSpanish={startWithSpanish}
-            cleanupFunction={makeMenuShow}
+            cleanupFunction={cleanup}
             quizLength={quizLength}
           />
         )}
