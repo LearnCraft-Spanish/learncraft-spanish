@@ -6,7 +6,6 @@ import AudioBasedReview from './AudioBasedReview'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function ComprehensionQuiz({
-  programTable,
   updateBannerMessage,
   filterExamplesByAllowedVocab,
   selectedLesson,
@@ -14,7 +13,7 @@ export default function ComprehensionQuiz({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
-  const { activeStudent, studentFlashcardData, audioExamplesTable } = useActiveStudent()
+  const { activeStudent, studentFlashcardData, audioExamplesTable, programTable } = useActiveStudent()
   const rendered = useRef(false)
 
   useEffect(() => {

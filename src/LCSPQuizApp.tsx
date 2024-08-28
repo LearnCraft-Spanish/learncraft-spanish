@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { act, useCallback, useEffect, useRef, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
+import { useAuth0 } from '@auth0/auth0-react'
 
 import './App.css'
 import { useBackend } from './hooks/useBackend'
@@ -10,8 +11,8 @@ import OfficialQuiz from './OfficialQuiz'
 import type { Quiz } from './interfaceDefinitions'
 
 interface LCSPQuizAppProps {
-  selectedProgram: { recordId: number, name: string }
-  selectedLesson: { recordId: number, lesson: string }
+  selectedProgram: { recordId: number, name: string } | null
+  selectedLesson: { recordId: number, lesson: string } | null
 }
 
 interface QuizCourse {
@@ -27,6 +28,8 @@ export default function LCSPQuizApp({
   const navigate = useNavigate()
   const { activeStudent } = useActiveStudent()
   const { getLcspQuizzesFromBackend } = useBackend()
+  const { isAuthenticated, isLoading } = useAuth0()
+
   const [quizCourse, setQuizCourse] = useState('lcsp')
   const [dataLoaded, setDataLoaded] = useState(false)
   const [chosenQuiz, setChosenQuiz] = useState(2)
@@ -225,7 +228,7 @@ export default function LCSPQuizApp({
   const findDefaultQuiz = useCallback(() => {
     studentHasDefaultQuiz.current = true
     const activeCourse = courses.current.find(
-      course => course.name === selectedProgram.name,
+      course => course.name === selectedProgram?.name,
     )
     if (activeCourse) {
       if (activeCourse.code !== 'lcsp' && quizCourse === 'lcsp') {
@@ -234,23 +237,25 @@ export default function LCSPQuizApp({
         navigate(urlToNavigate)
       }
     }
-    const activeLessonArray = selectedLesson.lesson.split(' ')
-    const activeLessonString = activeLessonArray.slice(-1)[0]
-    const activeLessonNumber = Number.parseInt(activeLessonString)
-    let lastQuizBeforeCurrentLesson = 0
-    const activeQuizzes = quizTable.filter(
-      item => item.quizType === quizCourse,
-    )
-    activeQuizzes.forEach((item) => {
-      if (item.quizNumber <= activeLessonNumber) {
-        lastQuizBeforeCurrentLesson = item.quizNumber
+    const activeLessonArray = selectedLesson?.lesson.split(' ')
+    if (activeLessonArray) {
+      const activeLessonString = activeLessonArray.slice(-1)[0]
+      const activeLessonNumber = Number.parseInt(activeLessonString)
+      let lastQuizBeforeCurrentLesson = 0
+      const activeQuizzes = quizTable.filter(
+        item => item.quizType === quizCourse,
+      )
+      activeQuizzes.forEach((item) => {
+        if (item.quizNumber <= activeLessonNumber) {
+          lastQuizBeforeCurrentLesson = item.quizNumber
+        }
+      })
+      if (lastQuizBeforeCurrentLesson > 0) {
+        setChosenQuiz(lastQuizBeforeCurrentLesson)
       }
-    })
-    if (lastQuizBeforeCurrentLesson > 0) {
-      setChosenQuiz(lastQuizBeforeCurrentLesson)
-    }
-    else {
-      studentHasDefaultQuiz.current = false
+      else {
+        studentHasDefaultQuiz.current = false
+      }
     }
   }, [selectedLesson, selectedProgram, quizCourse, quizTable, navigate])
 
@@ -334,8 +339,8 @@ export default function LCSPQuizApp({
   useEffect(() => {
     if (
       activeStudent?.recordId
-      && selectedProgram.recordId
-      && selectedLesson.recordId
+      && selectedProgram?.recordId
+      && selectedLesson?.recordId
       && quizTable?.length > 0
       && window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
@@ -346,7 +351,7 @@ export default function LCSPQuizApp({
     }
   }, [activeStudent?.recordId, selectedProgram?.recordId, selectedLesson?.recordId, findDefaultQuiz, getCourseUrlFromCode, quizCourse, quizTable?.length])
 
-  return (
+  return (isAuthenticated && !isLoading) && (
     <div className="quizInterface">
       {/* Quiz Selector */}
       {!dataLoaded && <h2>Loading Quizzes...</h2>}

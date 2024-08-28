@@ -13,7 +13,6 @@ import Menu from './Menu'
 import AudioQuiz from './AudioQuiz'
 import LoginButton from './components/LoginButton'
 import LogoutButton from './components/LogoutButton'
-import SRSQuizApp from './SRSQuizApp'
 import LCSPQuizApp from './LCSPQuizApp'
 import FrequenSay from './FrequenSay'
 import NotFoundPage from './NotFoundPage'
@@ -22,7 +21,6 @@ import FlashcardFinder from './FlashcardFinder'
 import CallbackPage from './CallbackPage'
 import Coaching from './Coaching'
 import FlashcardManager from './FlashcardManager'
-import Quiz from './components/Quiz'
 import MyFlashcardsQuiz from './MyFlashcardsQuiz'
 
 export const App: React.FC = () => {
@@ -284,27 +282,27 @@ export const App: React.FC = () => {
           <p>{bannerMessage}</p>
         </div>
       )}
-      {!isLoading && isAuthenticated && (
-        <SentryRoutes>
-          <Route
-            path="/"
-            element={(
-              <Menu />
-            )}
-          />
-          <Route path="/callback" element={<CallbackPage />} />
-          <Route
-            path="/myflashcards/*"
-            element={
-              (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
-              && (
-                <MyFlashcardsQuiz
-                  examplesToParse={studentFlashcardData?.examples}
-                />
-              )
-            }
-          />
-          {/* <Route
+      <SentryRoutes>
+        <Route
+          path="/"
+          element={(
+            <Menu />
+          )}
+        />
+        <Route path="/callback" element={<CallbackPage />} />
+        <Route
+          path="/myflashcards"
+          element={
+            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
+              ? (
+                  <MyFlashcardsQuiz
+                    examplesToParse={studentFlashcardData?.examples}
+                  />
+                )
+              : (<Navigate to="/" />)
+          }
+        />
+        {/* <Route
           path="/allflashcards"
           element={
             (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
@@ -327,106 +325,103 @@ export const App: React.FC = () => {
               : <Navigate to="/" />
           }
         /> */}
-          <Route
-            path="/manage-flashcards"
-            element={
-              (activeStudent?.role === 'student' && studentFlashcardData?.examples.length)
-                ? <FlashcardManager />
-                : <Navigate to="/" />
-            }
-          />
-          (
-          <Route
-            path="/officialquizzes/*"
-            element={selectedLesson?.recordId && selectedProgram?.recordId
-              ? (
-                  <LCSPQuizApp
-                    selectedProgram={selectedProgram}
-                    selectedLesson={selectedLesson}
-                  />
-                )
-              : <Navigate to="/" />}
-          />
-          )
-          <Route
-            path="/flashcardfinder"
-            element={
-              (userData?.role === 'student' || userData?.isAdmin) && (
-                <FlashcardFinder
-                  selectedLesson={selectedLesson}
-                  selectedProgram={selectedProgram}
-                  updateSelectedLesson={updateSelectedLesson}
-                  updateSelectedProgram={updateSelectedProgram}
-                  contextual={contextual}
-                  openContextual={openContextual}
-                  ref={currentContextual}
-                />
-              )
-            }
-          />
-          <Route
-            path="/audioquiz"
-            element={
-              (userData?.role === 'student'
-              || userData?.role === 'limited'
-              || userData?.isAdmin) && (
-                <AudioQuiz
-                  updateBannerMessage={updateBannerMessage}
-                  filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-                  selectedLesson={selectedLesson}
-                  selectedProgram={selectedProgram}
-                  updateSelectedLesson={updateSelectedLesson}
-                  updateSelectedProgram={updateSelectedProgram}
-                />
-              )
-            }
-          />
-          <Route
-            path="/comprehensionquiz"
-            element={
-              (userData?.role === 'student'
-              || userData?.role === 'limited'
-              || userData?.isAdmin) && (
-                <ComprehensionQuiz
-                  updateBannerMessage={updateBannerMessage}
-                  filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-                  selectedLesson={selectedLesson}
-                  selectedProgram={selectedProgram}
-                  updateSelectedLesson={updateSelectedLesson}
-                  updateSelectedProgram={updateSelectedProgram}
-                />
-              )
-            }
-          />
-          <Route
-            path="/frequensay"
-            element={
-              userData?.isAdmin && (
-                <FrequenSay
-                  selectedLesson={selectedLesson}
-                  selectedProgram={selectedProgram}
-                  updateSelectedLesson={updateSelectedLesson}
-                  updateSelectedProgram={updateSelectedProgram}
-                />
-              )
-            }
-          />
-          <Route
-            path="/coaching"
-            element={
-              userData?.isAdmin && (
-                <Coaching
-                  contextual={contextual}
-                  openContextual={openContextual}
-                  closeContextual={closeContextual}
-                  ref={currentContextual}
-                />
-              )
-            }
-          />
-          <Route path="/*" element={<NotFoundPage />} />
-        </SentryRoutes>
-      )}
+        <Route
+          path="/manage-flashcards"
+          element={
+            (activeStudent?.role === 'student' && studentFlashcardData?.examples.length)
+              ? <FlashcardManager />
+              : <Navigate to="/" />
+          }
+        />
+        (
+        <Route
+          path="/officialquizzes/*"
+          element={(
+            <LCSPQuizApp
+              selectedProgram={selectedProgram}
+              selectedLesson={selectedLesson}
+            />
+          )}
+        />
+        )
+        <Route
+          path="/flashcardfinder"
+          element={
+            (userData?.role === 'student' || userData?.isAdmin) && (
+              <FlashcardFinder
+                selectedLesson={selectedLesson}
+                selectedProgram={selectedProgram}
+                updateSelectedLesson={updateSelectedLesson}
+                updateSelectedProgram={updateSelectedProgram}
+                contextual={contextual}
+                openContextual={openContextual}
+                ref={currentContextual}
+              />
+            )
+          }
+        />
+        <Route
+          path="/audioquiz"
+          element={
+            (userData?.role === 'student'
+            || userData?.role === 'limited'
+            || userData?.isAdmin) && (
+              <AudioQuiz
+                updateBannerMessage={updateBannerMessage}
+                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
+                selectedLesson={selectedLesson}
+                selectedProgram={selectedProgram}
+                updateSelectedLesson={updateSelectedLesson}
+                updateSelectedProgram={updateSelectedProgram}
+              />
+            )
+          }
+        />
+        <Route
+          path="/comprehensionquiz"
+          element={
+            (userData?.role === 'student'
+            || userData?.role === 'limited'
+            || userData?.isAdmin) && (
+              <ComprehensionQuiz
+                updateBannerMessage={updateBannerMessage}
+                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
+                selectedLesson={selectedLesson}
+                selectedProgram={selectedProgram}
+                updateSelectedLesson={updateSelectedLesson}
+                updateSelectedProgram={updateSelectedProgram}
+              />
+            )
+          }
+        />
+        <Route
+          path="/frequensay"
+          element={
+            userData?.isAdmin && (
+              <FrequenSay
+                selectedLesson={selectedLesson}
+                selectedProgram={selectedProgram}
+                updateSelectedLesson={updateSelectedLesson}
+                updateSelectedProgram={updateSelectedProgram}
+              />
+            )
+          }
+        />
+        <Route
+          path="/coaching"
+          element={
+            userData?.isAdmin && (
+              <Coaching
+                contextual={contextual}
+                openContextual={openContextual}
+                closeContextual={closeContextual}
+                ref={currentContextual}
+              />
+            )
+          }
+        />
+        <Route path="/*" element={<NotFoundPage />} />
+      </SentryRoutes>
     </div>
   )
 }
