@@ -19,9 +19,8 @@ import NotFoundPage from './NotFoundPage'
 import ComprehensionQuiz from './ComprehensionQuiz'
 import FlashcardFinder from './FlashcardFinder'
 import CallbackPage from './CallbackPage'
-import Coaching from './Coaching'
 import FlashcardManager from './FlashcardManager'
-import MyFlashcardsQuiz from './MyFlashcardsQuiz'
+import ReviewMyFlashcards from './ReviewMyFlashcards'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -291,15 +290,11 @@ export const App: React.FC = () => {
         />
         <Route path="/callback" element={<CallbackPage />} />
         <Route
-          path="/myflashcards"
+          path="/myflashcards/*"
           element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
-              ? (
-                  <MyFlashcardsQuiz
-                    examplesToParse={studentFlashcardData?.examples}
-                  />
-                )
-              : (<Navigate to="/" />)
+            (activeStudent?.role === 'student'
+            && studentFlashcardData?.studentExamples?.length)
+            && <ReviewMyFlashcards />
           }
         />
         {/* <Route
@@ -407,6 +402,8 @@ export const App: React.FC = () => {
             )
           }
         />
+        {// Coaching Section still under construction
+        /*
         <Route
           path="/coaching"
           element={
@@ -420,6 +417,7 @@ export const App: React.FC = () => {
             )
           }
         />
+        */}
         <Route path="/*" element={<NotFoundPage />} />
       </SentryRoutes>
     </div>
