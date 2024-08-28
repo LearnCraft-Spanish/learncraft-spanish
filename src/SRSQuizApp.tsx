@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import './App.css'
 import MenuButton from './components/MenuButton'
@@ -9,10 +9,12 @@ import { useActiveStudent } from './hooks/useActiveStudent'
 
 interface SRSQuizAppProps {
   startWithSpanish?: boolean
+  quizLength?: number
 }
 
 export default function SRSQuizApp({
   startWithSpanish = false,
+  quizLength,
 }: SRSQuizAppProps) {
   // const quizLength = 20 //will be used to determine how many examples to review
 
@@ -22,23 +24,23 @@ export default function SRSQuizApp({
 
   /*        Setup Quiz Functions        */
 
-  const getStudentExampleFromExample = (example: Flashcard) => {
+  const getStudentExampleFromExample = useCallback((example: Flashcard) => {
     const relatedStudentExample = studentFlashcardData?.studentExamples.find(
       element => element.relatedExample === example.recordId,
     )
     return relatedStudentExample
-  }
+  }, [studentFlashcardData])
 
-  const getDueDateFromExample = (example: Flashcard) => {
+  const getDueDateFromExample = useCallback((example: Flashcard) => {
     const relatedStudentExample = getStudentExampleFromExample(example)
     if (!relatedStudentExample) {
       return ''
     }
     const dueDate = relatedStudentExample.nextReviewDate
     return dueDate
-  }
+  }, [getStudentExampleFromExample])
 
-  function getDueExamples() {
+  const getDueExamples = useCallback(() => {
     if (!studentFlashcardData) {
       return []
     }
@@ -58,27 +60,27 @@ export default function SRSQuizApp({
         ),
     )
     return dueExamples
-  }
+  }, [getDueDateFromExample, studentFlashcardData])
 
-  function handleSetupQuiz() {
+  const handleSetupQuiz = useCallback(() => {
     const dueExamples = getDueExamples()
     setExamplesToReview(dueExamples)
     setQuizReady(true)
-  }
+  }, [getDueExamples])
 
   function makeMenuShow() {
     setQuizReady(false)
   }
 
+  useEffect(() => {
+    if (!quizReady && flashcardDataSynced) {
+      handleSetupQuiz()
+    }
+  }, [flashcardDataSynced, quizReady, handleSetupQuiz])
+
   return (
     activeStudent?.recordId && (
       <div className="quizInterface">
-        {!quizReady && flashcardDataSynced && (
-          <div className="readyButton">
-            <button type="button" onClick={handleSetupQuiz}>Begin Review</button>
-          </div>
-        )}
-
         {(quizReady && !(examplesToReview.length > 0)) && (
           <div className="finishedMessage">
             <p>
@@ -99,6 +101,7 @@ export default function SRSQuizApp({
             isSrsQuiz
             startWithSpanish={startWithSpanish}
             cleanupFunction={makeMenuShow}
+            quizLength={quizLength}
           />
         )}
       </div>

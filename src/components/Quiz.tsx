@@ -16,9 +16,10 @@ interface QuizProps {
   quizOnlyCollectedExamples?: boolean
   isSrsQuiz?: boolean
   cleanupFunction?: () => void
+  quizLength?: number
 }
 
-function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[] | undefined, quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean): Flashcard[] {
+function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[] | undefined, quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean, quizLength: number): Flashcard[] {
   function tagAssignedExamples() {
     exampleArray.forEach((example) => {
       const getStudentExampleRecordId = () => {
@@ -71,7 +72,8 @@ function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: Stude
   }
 
   const randomizedQuizExamples = randomize(completeListBeforeRandomization)
-  return randomizedQuizExamples
+  const quizLengthSafe = Math.min(quizLength, randomizedQuizExamples.length)
+  return randomizedQuizExamples.slice(0, quizLengthSafe)
 }
 
 export default function Quiz({
@@ -81,12 +83,13 @@ export default function Quiz({
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
   cleanupFunction = () => {},
+  quizLength = 1000,
 
 }: QuizProps) {
   const location = useLocation()
   const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards, removeFlashcardFromActiveStudent } = useActiveStudent()
 
-  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentFlashcardData?.studentExamples, quizOnlyCollectedExamples, isSrsQuiz))
+  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentFlashcardData?.studentExamples, quizOnlyCollectedExamples, isSrsQuiz, quizLength))
   const [answerShowing, setAnswerShowing] = useState(false)
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
   const currentAudio = useRef<HTMLAudioElement | null>(null)

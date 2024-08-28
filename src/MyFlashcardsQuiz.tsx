@@ -30,17 +30,22 @@ export default function MyFlashcardsQuiz({
     const isSrsValue = (document.getElementById('isSrs') as HTMLInputElement).checked
     const spanishFirstValue = (document.getElementById('spanishFirst') as HTMLInputElement).checked
     const quizLength = (document.getElementById('quizLength') as HTMLSelectElement).value
-    
-    console.log('isSrsValue:', isSrsValue)
-    console.log('spanishFirstValue:', spanishFirstValue)
-    console.log('typeof spanishFirstValue:', typeof spanishFirstValue)
+
     setIsSrs(isSrsValue)
     setSpanishFirst(spanishFirstValue)
     setQuizLength(Number.parseInt(quizLength))
     setQuizReady(true)
   }
+  function calculateQuizLengthOptions() {
+    const quizLengthOptions = []
+    for (let i = 10; i <= examplesToParse.length; i += 10) {
+      quizLengthOptions.push(i)
+    }
+    quizLengthOptions.push(examplesToParse.length)
+    return quizLengthOptions
+  }
+
   function updateQuizReady() {
-    console.log('updateQuizReady')
     setQuizReady(false)
   }
   return (
@@ -50,23 +55,30 @@ export default function MyFlashcardsQuiz({
             <form className="myFlashcardsForm" onSubmit={e => handleSumbit(e)}>
               <div className="myFlashcardsFormContentWrapper">
                 <h3>My Flashcards Quiz</h3>
-                <label htmlFor="isSrs">
-                  SRS Quiz:
-                  <input type="checkbox" name="Srs" id="isSrs" />
-                </label>
-                <label htmlFor="spanishFirst">
-                  Start with Spanish:
-                  <input type="checkbox" name="Spanish First" id="spanishFirst" />
-                </label>
+                <div>
+                  <p>
+                    SRS Quiz:
+                  </p>
+                  <label htmlFor="isSrs" className="switch">
+                    <input type="checkbox" name="Srs" id="isSrs" />
+                    <span className="slider round"></span>
+                  </label>
+                </div>
+                <div>
+                  <p>Start with Spanish:</p>
+                  <label htmlFor="spanishFirst" className="switch">
+                    <input type="checkbox" name="Spanish First" id="spanishFirst" />
+                    <span className="slider round"></span>
+                  </label>
+                </div>
                 <label htmlFor="quizLength">
-                  Quiz Length:
+                  <p>Number of Flashcards:</p>
                   <select name="length" id="quizLength">
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="40">40</option>
-                    <option value="50">50</option>
-                    <option value="1000">All</option>
+                    {calculateQuizLengthOptions().map(option => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </select>
                 </label>
               </div>
@@ -81,6 +93,7 @@ export default function MyFlashcardsQuiz({
               ? (
                   <SRSQuizApp
                     startWithSpanish={spanishFirst}
+                    quizLength={quizLength}
                   />
                 )
               : (
@@ -90,6 +103,7 @@ export default function MyFlashcardsQuiz({
                     quizOnlyCollectedExamples
                     cleanupFunction={() => updateQuizReady()}
                     startWithSpanish={spanishFirst}
+                    quizLength={quizLength}
                   />
                 )
           )}
