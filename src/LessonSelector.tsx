@@ -7,7 +7,7 @@ interface LessonSelectorProps {
   programTable: Array<Program>
   selectedLesson: Lesson | null
   updateSelectedLesson: (lessonId: string) => void
-  selectedProgram: Program
+  selectedProgram: Program | null
   updateSelectedProgram: (programId: string) => void
 }
 export default function LessonSelector({
@@ -35,7 +35,7 @@ export default function LessonSelector({
 
   function makeLessonSelector() {
     const lessonSelector: Array<JSX.Element> = []
-    selectedProgram.lessons.forEach((lesson: Lesson) => {
+    selectedProgram?.lessons.forEach((lesson: Lesson) => {
       const lessonArray = lesson.lesson.split(' ')
       const lessonNumber = lessonArray.slice(-1)[0]
       lessonSelector.push(
@@ -59,7 +59,7 @@ export default function LessonSelector({
           >
             {makeCourseSelector()}
           </select>
-          {selectedLesson && selectedProgram.lessons && (
+          {selectedLesson && selectedProgram?.lessons && (
             <select
               className="lessonList"
               value={selectedLesson.recordId}

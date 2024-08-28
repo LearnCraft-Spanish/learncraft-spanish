@@ -35,9 +35,11 @@ export function UserDataProvider({ children }: UserDataProviderProps) {
   )
 
   useEffect(() => {
-    console.log(isAuthenticated)
     if (isAuthenticated && !isLoading) {
       setupUserData()
+    }
+    if (!isAuthenticated && !isLoading) {
+      setUserData(null)
     }
   }, [isAuthenticated, isLoading, setupUserData])
 

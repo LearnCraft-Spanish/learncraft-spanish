@@ -9,11 +9,13 @@ function CallbackPage() {
   const stateSent = searchParams.get('state') || ''
   const destinationUrl = useRef('/')
 
-  const storedJson = localStorage.getItem(stateSent) || ''
-  const decodedJson = JSON.parse(storedJson) || {
+  const defaultRedirectState = JSON.stringify({
     navigateToUrl: '/',
     expiresAt: 0,
-  }
+  })
+
+  const storedJson = localStorage.getItem(stateSent) || defaultRedirectState
+  const decodedJson = JSON.parse(storedJson)
   if (decodedJson.expiresAt > Date.now()) {
     destinationUrl.current = decodedJson.navigateToUrl
   }

@@ -34,8 +34,8 @@ export const App: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth0()
 
   // States for Lesson Selector
-  const [selectedLesson, setSelectedLesson] = useState<Lesson>()
-  const [selectedProgram, setSelectedProgram] = useState<Program>()
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null)
+  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   // States for banner message
   const [bannerMessage, setBannerMessage] = useState('')
@@ -84,7 +84,7 @@ export const App: React.FC = () => {
     if (typeof lessonId === 'string') {
       lessonId = Number.parseInt(lessonId)
     }
-    let newLesson
+    let newLesson = null
     programTable.forEach((program) => {
       const foundLesson = program.lessons.find(item => item.recordId === lessonId)
       if (foundLesson) {
@@ -98,13 +98,11 @@ export const App: React.FC = () => {
     if (typeof programId === 'string') {
       programId = Number.parseInt(programId)
     }
-    const programIdNumber = programId
-    const newProgram
-      = programTable.find(program => program.recordId === programId)
-      || (/* activeProgram.current.recordId
+    let newProgram = null
+    newProgram = programTable.find(program => program.recordId === programId)
+    || (/* activeProgram.current.recordId
         ? activeProgram.current
         : */programTable.find(program => program.recordId === 2)) // Active program not currently defined
-    setSelectedProgram(newProgram)
     if (newProgram) {
     /* if (
       activeLesson.current.recordId
@@ -114,6 +112,7 @@ export const App: React.FC = () => {
       updateSelectedLesson(lessonToSelect)
     }
     else { */
+      setSelectedProgram(newProgram)
       const firstLesson = newProgram.lessons[0]
       const lessonToSelect = firstLesson.recordId
       updateSelectedLesson(lessonToSelect)
@@ -179,7 +178,6 @@ export const App: React.FC = () => {
       if (foundLesson) {
         allowedVocabulary = foundLesson.vocabKnown || []
       }
-      console.log(foundLesson)
       return allowedVocabulary
     })
     const filteredByAllowed = examples.filter((item) => {
@@ -286,27 +284,28 @@ export const App: React.FC = () => {
           <p>{bannerMessage}</p>
         </div>
       )}
-      <SentryRoutes>
-        <Route
-          path="/"
-          element={(
-            <Menu />
-          )}
-        />
-        <Route path="/callback" element={<CallbackPage />} />
-        <Route
-          path="/myflashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
-              ? (
-                  <MyFlashcardsQuiz
-                    examplesToParse={studentFlashcardData?.examples}
-                  />
-                )
-              : (<Navigate to="/" />)
-          }
-        />
-        {/* <Route
+      {!isLoading && isAuthenticated && (
+        <SentryRoutes>
+          <Route
+            path="/"
+            element={(
+              <Menu />
+            )}
+          />
+          <Route path="/callback" element={<CallbackPage />} />
+          <Route
+            path="/myflashcards"
+            element={
+              (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
+                ? (
+                    <MyFlashcardsQuiz
+                      examplesToParse={studentFlashcardData?.examples}
+                    />
+                  )
+                : (<Navigate to="/" />)
+            }
+          />
+          {/* <Route
           path="/allflashcards"
           element={
             (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
@@ -329,105 +328,106 @@ export const App: React.FC = () => {
               : <Navigate to="/" />
           }
         /> */}
-        <Route
-          path="/manage-flashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.examples.length)
-              ? <FlashcardManager />
-              : <Navigate to="/" />
-          }
-        />
-        (
-        <Route
-          path="/officialquizzes/*"
-          element={selectedLesson?.recordId && selectedProgram?.recordId
-            ? (
-                <LCSPQuizApp
-                  selectedProgram={selectedProgram}
+          <Route
+            path="/manage-flashcards"
+            element={
+              (activeStudent?.role === 'student' && studentFlashcardData?.examples.length)
+                ? <FlashcardManager />
+                : <Navigate to="/" />
+            }
+          />
+          (
+          <Route
+            path="/officialquizzes/*"
+            element={selectedLesson?.recordId && selectedProgram?.recordId
+              ? (
+                  <LCSPQuizApp
+                    selectedProgram={selectedProgram}
+                    selectedLesson={selectedLesson}
+                  />
+                )
+              : <Navigate to="/" />}
+          />
+          )
+          <Route
+            path="/flashcardfinder"
+            element={
+              (userData?.role === 'student' || userData?.isAdmin) && (
+                <FlashcardFinder
                   selectedLesson={selectedLesson}
+                  selectedProgram={selectedProgram}
+                  updateSelectedLesson={updateSelectedLesson}
+                  updateSelectedProgram={updateSelectedProgram}
+                  contextual={contextual}
+                  openContextual={openContextual}
+                  ref={currentContextual}
                 />
               )
-            : <Navigate to="/" />}
-        />
-        )
-        <Route
-          path="/flashcardfinder"
-          element={
-            (userData?.role === 'student' || userData?.isAdmin) && (
-              <FlashcardFinder
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-                contextual={contextual}
-                openContextual={openContextual}
-                ref={currentContextual}
-              />
-            )
-          }
-        />
-        <Route
-          path="/audioquiz"
-          element={
-            (userData?.role === 'student'
-            || userData?.role === 'limited'
-            || userData?.isAdmin) && (
-              <AudioQuiz
-                updateBannerMessage={updateBannerMessage}
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-              />
-            )
-          }
-        />
-        <Route
-          path="/comprehensionquiz"
-          element={
-            (userData?.role === 'student'
-            || userData?.role === 'limited'
-            || userData?.isAdmin) && (
-              <ComprehensionQuiz
-                updateBannerMessage={updateBannerMessage}
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-              />
-            )
-          }
-        />
-        <Route
-          path="/frequensay"
-          element={
-            userData?.isAdmin && (
-              <FrequenSay
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-              />
-            )
-          }
-        />
-        <Route
-          path="/coaching"
-          element={
-            userData?.isAdmin && (
-              <Coaching
-                contextual={contextual}
-                openContextual={openContextual}
-                closeContextual={closeContextual}
-                ref={currentContextual}
-              />
-            )
-          }
-        />
-        <Route path="/*" element={<NotFoundPage />} />
-      </SentryRoutes>
+            }
+          />
+          <Route
+            path="/audioquiz"
+            element={
+              (userData?.role === 'student'
+              || userData?.role === 'limited'
+              || userData?.isAdmin) && (
+                <AudioQuiz
+                  updateBannerMessage={updateBannerMessage}
+                  filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
+                  selectedLesson={selectedLesson}
+                  selectedProgram={selectedProgram}
+                  updateSelectedLesson={updateSelectedLesson}
+                  updateSelectedProgram={updateSelectedProgram}
+                />
+              )
+            }
+          />
+          <Route
+            path="/comprehensionquiz"
+            element={
+              (userData?.role === 'student'
+              || userData?.role === 'limited'
+              || userData?.isAdmin) && (
+                <ComprehensionQuiz
+                  updateBannerMessage={updateBannerMessage}
+                  filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
+                  selectedLesson={selectedLesson}
+                  selectedProgram={selectedProgram}
+                  updateSelectedLesson={updateSelectedLesson}
+                  updateSelectedProgram={updateSelectedProgram}
+                />
+              )
+            }
+          />
+          <Route
+            path="/frequensay"
+            element={
+              userData?.isAdmin && (
+                <FrequenSay
+                  selectedLesson={selectedLesson}
+                  selectedProgram={selectedProgram}
+                  updateSelectedLesson={updateSelectedLesson}
+                  updateSelectedProgram={updateSelectedProgram}
+                />
+              )
+            }
+          />
+          <Route
+            path="/coaching"
+            element={
+              userData?.isAdmin && (
+                <Coaching
+                  contextual={contextual}
+                  openContextual={openContextual}
+                  closeContextual={closeContextual}
+                  ref={currentContextual}
+                />
+              )
+            }
+          />
+          <Route path="/*" element={<NotFoundPage />} />
+        </SentryRoutes>
+      )}
     </div>
   )
 }

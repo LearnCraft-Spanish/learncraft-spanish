@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import debounce from 'lodash/debounce'
 import type { Flashcard, Lesson, Program, StudentFlashcardData, UserData } from '../interfaceDefinitions' // Adjust the import based on your project structure
 import { useBackend } from '../hooks/useBackend'
 import { useUserData } from '../hooks/useUserData'
@@ -270,17 +269,17 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
 
   // Parse the courses and lessons on load
   useEffect(() => {
-    if (!programTable.length) {
+    if (userData?.isAdmin !== undefined && !programTable.length) {
       parseCourseLessons()
     }
-  }, [programTable.length, parseCourseLessons])
+  }, [userData, programTable.length, parseCourseLessons])
 
   // Get the audio examples on load
   useEffect(() => {
-    if (!audioExamplesTable.length) {
+    if (userData?.isAdmin !== undefined && !audioExamplesTable.length) {
       setupAudioExamplesTable()
     }
-  }, [audioExamplesTable.length, setupAudioExamplesTable])
+  }, [userData, audioExamplesTable.length, setupAudioExamplesTable])
 
   // If the active student changes, get their level
   useEffect(() => {

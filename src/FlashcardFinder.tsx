@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 
 import { useBackend } from './hooks/useBackend'
 
@@ -11,11 +11,11 @@ import LessonSelector from './LessonSelector'
 import type { Flashcard, Lesson, Program, VocabTag, Vocabulary } from './interfaceDefinitions'
 
 interface FlashcardFinderProps {
-  selectedProgram: Program | undefined
-  selectedLesson: Lesson | undefined
-  updateSelectedProgram: () => void
-  updateSelectedLesson: () => void
-  contextual: React.MutableRefObject<string>
+  selectedProgram: Program | null
+  selectedLesson: Lesson | null
+  updateSelectedProgram: (programId: number | string) => void
+  updateSelectedLesson: (lessonId: number | string) => void
+  contextual: string
   openContextual: (currentContextual: string) => void
 }
 
@@ -88,7 +88,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       setRequiredTags(newRequiredTags)
     }
 
-    function filterExamplesByAllowedVocab(examples: Flashcard[]) {
+    const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[]) => {
       if (selectedLesson?.vocabKnown) {
         const allowedVocab = selectedLesson.vocabKnown
         // console.log(allowedVocab)
@@ -110,9 +110,9 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       else {
         return examples
       }
-    }
+    }, [selectedLesson])
 
-    function labelAssignedExamples(examples: Flashcard[]) {
+    const labelAssignedExamples = useCallback((examples: Flashcard[]) => {
       examples.forEach((example) => {
         const assignedExample = studentFlashcardData?.studentExamples.find(
           item => item.relatedExample === example.recordId,
@@ -125,9 +125,9 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         }
       })
       return examples
-    }
+    }, [studentFlashcardData])
 
-    function filterExamplesBySelectedTags(examples: Flashcard[]) {
+    const filterExamplesBySelectedTags = useCallback((examples: Flashcard[]) => {
       if (requiredTags.length > 0) {
         const filteredExamples = examples.filter((example) => {
           if (
@@ -204,9 +204,9 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       else {
         return examples
       }
-    }
+    }, [requiredTags, vocabularyTable])
 
-    function filterBySpanglish(examples: Flashcard[]) {
+    const filterBySpanglish = useCallback((examples: Flashcard[]) => {
       if (noSpanglish) {
         const filteredBySpanglish = examples.filter((item) => {
           if (item.spanglish === 'esp') {
@@ -219,17 +219,17 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       else {
         return examples
       }
-    }
+    }, [noSpanglish])
 
-    function shuffleExamples(examples: Flashcard[]) {
+    const shuffleExamples = useCallback((examples: Flashcard[]) => {
       const shuffled = examples
         .map(value => ({ value, sort: Math.random() }))
         .sort((a, b) => a.sort - b.sort)
         .map(({ value }) => value)
       return shuffled
-    }
+    }, [])
 
-    function makeExamplesTable() {
+    const makeExamplesTable = useCallback(() => {
       const allExamples = [...exampleTable]
       const filteredBySpanglish = filterBySpanglish(allExamples)
       const filteredByAllowed
@@ -239,7 +239,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       const shuffledSentences = shuffleExamples(labeledByAssigned)
       // console.log(shuffledSentences)
       setDisplayExamples(shuffledSentences)
-    }
+    }, [exampleTable, filterBySpanglish, filterExamplesByAllowedVocab, filterExamplesBySelectedTags, labelAssignedExamples, shuffleExamples])
 
     function displayExamplesTable() {
       const tableToDisplay = displayExamples.map(item => (
@@ -301,7 +301,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       navigator.clipboard.writeText(copiedText)
     }
 
-    function filterTagsByInput(tagInput: string) {
+    const filterTagsByInput = useCallback((tagInput: string) => {
       function filterBySearch(tag: VocabTag) {
         const lowerTerm = tag.tag.toLowerCase()
         const lowerTagInput = tagInput.toLowerCase()
@@ -327,7 +327,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         }
       }
       setSuggestedTags(suggestTen)
-    }
+    }, [requiredTags, tagTable])
 
     // function filterTagsByInput
 
@@ -346,7 +346,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       return 0
     }
 
-    async function setupVocabTable() {
+    const setupVocabTable = useCallback(async () => {
       try {
         const vocab = await getVocabFromBackend()
         const tags: VocabTag[] = []
@@ -447,7 +447,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
           console.error('An unexpected error occurred:', e)
         }
       }
-    }
+    }, [getVocabFromBackend])
 
     async function addFlashcard(exampleId: string) {
       const exampleIdNumber = Number.parseInt(exampleId)
@@ -495,7 +495,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       if (!isMounted.current) {
         startUp()
       }
-    }, [])
+    }, [getVerifiedExamplesFromBackend, setupVocabTable])
 
     useEffect(() => {
       if (!isLoaded) {
@@ -513,11 +513,11 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
           setIsLoaded(false)
         }
       }
-    }, [vocabularyTable, tagTable, exampleTable, programTable])
+    }, [vocabularyTable, tagTable, exampleTable, programTable, makeExamplesTable, isLoaded])
 
     useEffect(() => {
       filterTagsByInput(tagSearchTerm)
-    }, [tagSearchTerm, requiredTags, contextual])
+    }, [tagSearchTerm, requiredTags, contextual, filterTagsByInput])
 
     useEffect(() => {
       if (selectedProgram && selectedLesson) {
@@ -588,24 +588,26 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                       </div>
                     </div>
                     {tagSearchTerm.length > 0
-                    && contextual.current === 'tagSuggestionBox'
+                    && contextual === 'tagSuggestionBox'
                     && suggestedTags.length > 0 && (
-                      <select
+                      <div
                         className="tagSuggestionBox"
                         ref={currentContextual}
                       >
-                        {suggestedTags.map(item => (
-                          <option
-                            key={item.tag}
-                            value={item.id}
-                            className="vocabCard"
-                            onClick={() => addTagToRequiredTags(item.id)}
-                          >
-                            <h4 className="vocabName">{item.tag}</h4>
-                            <p className="vocabUse">{item.type}</p>
-                          </option>
-                        ))}
-                      </select>
+                        <select>
+                          {suggestedTags.map(item => (
+                            <option
+                              key={item.tag}
+                              value={item.id}
+                              className="vocabCard"
+                              onClick={() => addTagToRequiredTags(item.id)}
+                            >
+                              <h4 className="vocabName">{item.tag}</h4>
+                              <p className="vocabUse">{item.type}</p>
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     )}
                     {requiredTags.length > 0 && (
                       <select className="selectedVocab">
