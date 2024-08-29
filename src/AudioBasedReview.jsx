@@ -6,7 +6,7 @@ import LessonSelector from './LessonSelector'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function AudioBasedReview({
-  audioExamplesTable,
+  // audioExamplesTable,
   filterExamplesByAllowedVocab,
   willAutoplay,
   willStartWithSpanish,
@@ -22,7 +22,7 @@ export default function AudioBasedReview({
   const [guessing, setGuessing] = useState(false)
   const [examplesToPlay, setExamplesToPlay] = useState([])
   const [quizReady, setQuizReady] = useState(false)
-  const { activeStudent } = useActiveStudent()
+  const { activeStudent, audioExamplesTable } = useActiveStudent()
   /* Will use this as a settable state that inherits a default from props
   const [startWithSpanish, setStartWithSpanish] = useState(
     willStartWithSpanish || false,
@@ -357,7 +357,7 @@ export default function AudioBasedReview({
   // functions labeled for callback
   useEffect(() => {
     unReadyQuiz()
-    if (selectedLesson && selectedProgram) {
+    if (selectedLesson?.recordId && selectedProgram?.recordId && audioExamplesTable.length > 0) {
       makeComprehensionQuiz()
     }
   }, [selectedProgram, selectedLesson])
@@ -422,7 +422,7 @@ export default function AudioBasedReview({
 
   return (
     <div className="quiz">
-      {!quizReady && (selectedLesson.recordId || !activeStudent.recordId) && (
+      {!quizReady && (selectedLesson?.recordId || !activeStudent?.recordId) && (
         <div className="audioBox">
           <LessonSelector
             selectedLesson={selectedLesson}
@@ -465,7 +465,7 @@ export default function AudioBasedReview({
               {' '}
               Lesson
               {' '}
-              {selectedLesson.lesson.split(' ')[2]}
+              {selectedLesson?.lesson.split(' ')[2]}
             </p>
             <button type="button" onClick={unReadyQuiz}>Change Level</button>
             {!autoplay && (

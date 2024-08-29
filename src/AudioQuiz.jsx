@@ -55,7 +55,7 @@ export default function AudioQuiz({
       {audioQuizReady && (
         <AudioBasedReview
           activeStudent={activeStudent}
-          studentExamplesTable={studentFlashcardData.studentExamples}
+          // studentExamplesTable={studentFlashcardData.studentExamples}
           updateBannerMessage={updateBannerMessage}
           audioExamplesTable={audioQuizExamples}
           filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}

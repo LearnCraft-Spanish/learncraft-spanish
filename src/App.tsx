@@ -206,7 +206,11 @@ export const App: React.FC = () => {
     if (activeProgram?.current) {
       updateSelectedProgram(activeProgram.current.recordId)
     }
-  }, [activeProgram, activeStudent, programTable, updateSelectedProgram])
+    // Setting Default Vaules for selectedProgram and selectedLesson
+    else if (!selectedProgram && programTable.length) {
+      updateSelectedProgram(programTable[0].recordId)
+    }
+  }, [activeProgram, activeStudent, programTable, selectedProgram, updateSelectedProgram])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)
