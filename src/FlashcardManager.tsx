@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react'
 
 import { result } from 'lodash'
+import { Navigate } from 'react-router-dom'
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 function FlashcardManager() {
-  const { studentFlashcardData, removeFlashcardFromActiveStudent } = useActiveStudent()
+  const { studentFlashcardData, flashcardDataSynced, removeFlashcardFromActiveStudent } = useActiveStudent()
 
   const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([])
 
@@ -19,19 +20,24 @@ function FlashcardManager() {
       const itemPosition = displayExamplesTable.findIndex(
         item => item.recordId === recordId,
       )
-      const filteredTable = displayExamplesTable.splice(itemPosition, 1)
-      setDisplayExamplesTable(filteredTable)
+      const newTable = [...displayExamplesTable]
+      newTable.splice(itemPosition, 1)
+      setDisplayExamplesTable(newTable)
       await removeFlashcardFromActiveStudent(recordId)
         .then((result) => {
           if (result !== 1) {
-            filteredTable.splice(itemPosition, 0, itemToRemove)
+            const itemDisplays = displayExamplesTable.find(item => item.recordId === recordId)
+            if (!itemDisplays) {
+              const addBackTable = [...displayExamplesTable]
+              addBackTable.splice(itemPosition, 0, itemToRemove)
+              setDisplayExamplesTable(addBackTable)
+            }
           }
         })
         .catch((e: unknown) => {
           if (e instanceof Error) {
             console.error(e)
           }
-          displayExamplesTable.splice(itemPosition, 0, itemToRemove)
         })
     }
   }
@@ -104,18 +110,21 @@ function FlashcardManager() {
     setDisplayExamplesTable(studentFlashcardData?.examples || [])
   }, [studentFlashcardData?.examples])
 
-  return (
-    <div>
-      <h2>Flashcard Manager</h2>
-      <h4>
-        Total flashcards:
-        {displayExamplesTable.length}
-      </h4>
-      <div className="exampleCardContainer">
-        {createDisplayExamplesTable(displayExamplesTable)}
-      </div>
-    </div>
-  )
+  return studentFlashcardData?.examples?.length
+    ? (
+        <div>
+          <h2>Flashcard Manager</h2>
+          <h4>
+            {`Total flashcards: ${displayExamplesTable.length}`}
+          </h4>
+          <div className="exampleCardContainer">
+            {createDisplayExamplesTable(displayExamplesTable)}
+          </div>
+        </div>
+      )
+    : (
+        flashcardDataSynced && <Navigate to="/" />
+      )
 }
 
 export default FlashcardManager

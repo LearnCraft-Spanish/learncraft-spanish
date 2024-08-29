@@ -292,8 +292,7 @@ export const App: React.FC = () => {
         <Route
           path="/myflashcards/*"
           element={
-            (activeStudent?.role === 'student'
-            && studentFlashcardData?.studentExamples?.length)
+            (activeStudent?.role === 'student')
             && <ReviewMyFlashcards />
           }
         />
@@ -322,11 +321,7 @@ export const App: React.FC = () => {
         /> */}
         <Route
           path="/manage-flashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.examples.length)
-              ? <FlashcardManager />
-              : <Navigate to="/" />
-          }
+          element={<FlashcardManager />}
         />
         (
         <Route

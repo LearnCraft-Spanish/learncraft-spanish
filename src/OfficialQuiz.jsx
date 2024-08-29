@@ -101,7 +101,7 @@ export default function OfficialQuiz({
 
   return (
     <>
-      {!(dataLoaded && quizReady) && (<div className="loading">Loading...</div>)}
+      {dataLoaded && !quizReady && (<h2 className="loading">Loading Quiz...</h2>)}
       {dataLoaded && quizReady && (
         <Quiz
           examplesToParse={examplesToReview}

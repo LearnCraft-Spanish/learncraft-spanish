@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
 import type { FormEvent } from 'react'
 
@@ -12,7 +12,7 @@ import Quiz from './components/Quiz'
 import SRSQuizApp from './SRSQuizApp'
 
 export default function MyFlashcardsQuiz() {
-  const { studentFlashcardData } = useActiveStudent()
+  const { studentFlashcardData, flashcardDataSynced } = useActiveStudent()
   const [quizExamples, setQuizExamples] = useState<Flashcard[]>(studentFlashcardData?.examples || [])
   const [isSrs, setIsSrs] = useState<boolean>(false)
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false)
@@ -74,7 +74,7 @@ export default function MyFlashcardsQuiz() {
 
   function calculateQuizLengthOptions() {
     const quizLengthOptions = []
-    for (let i = 10; i <= quizExamples.length; i = 5 * Math.floor(i * 0.315)) {
+    for (let i = 10; i < quizExamples.length; i = 5 * Math.floor(i * 0.315)) {
       quizLengthOptions.push(i)
     }
     quizLengthOptions.push(quizExamples.length)
@@ -167,6 +167,8 @@ export default function MyFlashcardsQuiz() {
           )}
         />
       </Routes>
+      {flashcardDataSynced && !studentFlashcardData?.studentExamples?.length
+      && <Navigate to="/" />}
     </div>
   )
 }
