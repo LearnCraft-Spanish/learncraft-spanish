@@ -18,7 +18,7 @@ export default function Menu() {
   // may be the wrong variable to use, but check for initial data render before showing Menu
   return (
     <div className="menu">
-      {!flashcardDataSynced && (
+      {userData?.recordId && !flashcardDataSynced && (
         <div className="menuBox">
           <h3>Syncing Data...</h3>
         </div>

@@ -27,7 +27,7 @@ export const App: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { userData } = useUserData()
-  const { activeStudent, activeLesson, activeProgram, studentFlashcardData, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const { activeStudent, activeLesson, activeProgram, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
   const { isAuthenticated, isLoading } = useAuth0()
 
   // States for Lesson Selector
