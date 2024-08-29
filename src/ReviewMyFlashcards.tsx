@@ -93,7 +93,7 @@ export default function MyFlashcardsQuiz() {
     else {
       setQuizExamples(studentFlashcardData?.examples || [])
     }
-  }, [isSrs, studentFlashcardData, getDueExamples])
+  }, [isSrs, studentFlashcardData?.examples, getDueExamples])
 
   useEffect(() => {
     if (location.pathname !== '/myflashcards') {
