@@ -30,4 +30,15 @@ describe('login button', () => {
     render(<LoginButton />)
     expect(screen.queryByText('Log in/Register')).toBeNull()
   })
+  it('calls loginWithRedirect when clicked', () => {
+    const loginWithRedirect = vi.fn()
+    ;(auth0 as any).useAuth0 = vi.fn().mockReturnValue({
+      isAuthenticated: false,
+      isLoading: false,
+      loginWithRedirect,
+    })
+    render(<LoginButton />)
+    screen.getByText('Log in/Register').click()
+    expect(loginWithRedirect).toHaveBeenCalled()
+  })
 })
