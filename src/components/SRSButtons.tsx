@@ -1,7 +1,4 @@
 import type { Flashcard } from '../interfaceDefinitions'
-import { useBackend } from '../hooks/useBackend'
-
-import { useUserData } from '../hooks/useUserData'
 import { useActiveStudent } from '../hooks/useActiveStudent'
 
 interface QuizButtonsProps {
@@ -12,30 +9,7 @@ interface QuizButtonsProps {
 }
 
 export default function SRSQuizButtons({ currentExample, answerShowing, updateExampleDifficulty, incrementExampleNumber }: QuizButtonsProps) {
-  const { userData } = useUserData()
-  const { studentFlashcardData } = useActiveStudent()
-  const {
-    updateMyStudentExample,
-    updateStudentExample,
-  } = useBackend()
-
-  async function sendUpdate(exampleId: number, newInterval: number) {
-    if (userData?.isAdmin) {
-      return await updateStudentExample(
-        exampleId,
-        newInterval,
-      )
-    }
-    else if (userData?.role === 'student') {
-      return await updateMyStudentExample(
-        exampleId,
-        newInterval,
-      )
-    }
-    else {
-      return null
-    }
-  }
+  const { studentFlashcardData, updateActiveStudentFlashcard } = useActiveStudent()
 
   const getStudentExampleFromExample = (example: Flashcard) => {
     const relatedStudentExample = studentFlashcardData?.studentExamples?.find(
@@ -69,7 +43,7 @@ export default function SRSQuizButtons({ currentExample, answerShowing, updateEx
     updateExampleDifficulty(exampleId, 'hard')
     incrementExampleNumber()
     const newInterval = (currentInterval > 0) ? currentInterval - 1 : 0
-    const updateStatus = sendUpdate(studentExampleId, newInterval)
+    const updateStatus = updateActiveStudentFlashcard(studentExampleId, newInterval)
     updateStatus.then((response) => {
       if (response !== studentExampleId) {
         updateExampleDifficulty(exampleId, '')
@@ -87,7 +61,7 @@ export default function SRSQuizButtons({ currentExample, answerShowing, updateEx
     updateExampleDifficulty(exampleId, 'easy')
     incrementExampleNumber()
     const newInterval = currentInterval + 1
-    const updateStatus = sendUpdate(studentExampleId, newInterval)
+    const updateStatus = updateActiveStudentFlashcard(studentExampleId, newInterval)
     updateStatus.then((response) => {
       if (response !== studentExampleId) {
         updateExampleDifficulty(exampleId, '')

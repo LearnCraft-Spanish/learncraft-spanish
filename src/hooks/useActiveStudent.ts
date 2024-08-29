@@ -157,7 +157,7 @@ export function useActiveStudent() {
       try {
         const data = await updateStudentExample(studentExampleRecordId, newInterval)
           .then((result: number | undefined) => {
-            if (result === 1) {
+            if (result === studentExampleRecordId) {
               // updateBannerMessage('Flashcard Updated!')
               context.syncFlashcards()
             }
@@ -182,7 +182,7 @@ export function useActiveStudent() {
       try {
         const data = await updateMyStudentExample(studentExampleRecordId, newInterval)
           .then((result) => {
-            if (result === 1) {
+            if (result === studentExampleRecordId) {
               // updateBannerMessage('Flashcard Updated!')
               context.syncFlashcards()
             }
