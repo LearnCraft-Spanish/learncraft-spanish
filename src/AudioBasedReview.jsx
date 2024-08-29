@@ -15,6 +15,8 @@ export default function AudioBasedReview({
   updateSelectedLesson,
   updateSelectedProgram,
 }) {
+  const { activeStudent, audioExamplesTable } = useActiveStudent()
+
   const [currentExample, setCurrentExample] = useState(0)
   const [showingAnswer, setShowingAnswer] = useState(false)
   const [spanishHidden, setSpanishHidden] = useState(true)
@@ -22,7 +24,6 @@ export default function AudioBasedReview({
   const [guessing, setGuessing] = useState(false)
   const [examplesToPlay, setExamplesToPlay] = useState([])
   const [quizReady, setQuizReady] = useState(false)
-  const { activeStudent, audioExamplesTable } = useActiveStudent()
   /* Will use this as a settable state that inherits a default from props
   const [startWithSpanish, setStartWithSpanish] = useState(
     willStartWithSpanish || false,
