@@ -1,28 +1,38 @@
 import React, { useEffect } from 'react'
 
+import { result } from 'lodash'
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 function FlashcardManager() {
+  const { studentFlashcardData, removeFlashcardFromActiveStudent } = useActiveStudent()
+
   const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([])
 
-  const { studentFlashcardData, flashcardDataSynced, removeFlashcardFromActiveStudent, addToActiveStudentFlashcards } = useActiveStudent()
-  // examplesTable, studentExamplesTable,
   async function removeAndUpdate(recordId: number | string) {
     if (typeof recordId === 'string') {
       recordId = Number.parseInt(recordId)
     }
-    const filteredTable = displayExamplesTable.filter(
-      item =>
-        item.recordId !== getExamplefromStudentExampleId(recordId).recordId,
-    )
-    setDisplayExamplesTable(filteredTable)
-    const result = await removeFlashcardFromActiveStudent(recordId)
-    if (result) {
-      if (result === 1) {
-        return []
-      }
+    const itemToRemove = displayExamplesTable.find(item => item.recordId === recordId)
+    if (itemToRemove?.recordId) {
+      const itemPosition = displayExamplesTable.findIndex(
+        item => item.recordId === recordId,
+      )
+      const filteredTable = displayExamplesTable.splice(itemPosition, 1)
+      setDisplayExamplesTable(filteredTable)
+      await removeFlashcardFromActiveStudent(recordId)
+        .then((result) => {
+          if (result !== 1) {
+            filteredTable.splice(itemPosition, 0, itemToRemove)
+          }
+        })
+        .catch((e: unknown) => {
+          if (e instanceof Error) {
+            console.error(e)
+          }
+          displayExamplesTable.splice(itemPosition, 0, itemToRemove)
+        })
     }
   }
 
@@ -32,18 +42,6 @@ function FlashcardManager() {
     )
 
     return studentExample || { recordId: -1, dateCreated: '', relatedExample: -1 }
-  }
-
-  function getExamplefromStudentExampleId(studentExampleId: number) {
-    const example = studentFlashcardData?.examples.find(
-      item => item.recordId === studentExampleId,
-    )
-    return example || {
-      recordId: -1,
-      spanishExample: '',
-      englishTranslation: '',
-      spanglish: '',
-    }
   }
 
   function createDisplayExamplesTable(tableToDisplay: Flashcard[]) {
@@ -87,27 +85,15 @@ function FlashcardManager() {
             <h4>Spanish</h4>
           </div>
         )}
-        {flashcardDataSynced
-          ? (
-              <button
-                type="button"
-                className="redButton"
-                value={item.recordId}
-                onClick={e =>
-                  removeAndUpdate(Number.parseInt((e.target as HTMLButtonElement).value))}
-              >
-                Remove
-              </button>
-            )
-          : (
-              <button
-                type="button"
-                className="redButton"
-                value={item.recordId}
-              >
-                Syncing...
-              </button>
-            )}
+        <button
+          type="button"
+          className="redButton"
+          value={item.recordId}
+          onClick={e =>
+            removeAndUpdate(Number.parseInt((e.target as HTMLButtonElement).value))}
+        >
+          Remove
+        </button>
 
       </div>
     ))
