@@ -494,11 +494,11 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
 
     useEffect(() => {
       if (loadStep === 1) {
-        setLoadStep(2)
-        const newExampleTable = getFilteredExamples(exampleTable.current)
-        const labeledExamples = labelAssignedExamples(newExampleTable)
-        const shuffledExamples = shuffleExamples(labeledExamples)
+        const labeledExamples = labelAssignedExamples(exampleTable.current)
+        const filteredExamples = getFilteredExamples(labeledExamples)
+        const shuffledExamples = shuffleExamples(filteredExamples)
         setDisplayExamples(shuffledExamples)
+        setLoadStep(2)
       }
     }, [loadStep, getFilteredExamples, shuffleExamples, labelAssignedExamples])
 
