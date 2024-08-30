@@ -95,7 +95,6 @@ export default function SRSQuizButtons({ currentExample, answerShowing, updateEx
               <button
                 type="button"
                 className="hardBanner"
-                onClick={increaseDifficulty}
               >
                 Labeled: Hard
               </button>
@@ -104,7 +103,6 @@ export default function SRSQuizButtons({ currentExample, answerShowing, updateEx
               <button
                 type="button"
                 className="easyBanner"
-                onClick={decreaseDifficulty}
               >
                 Labeled: Easy
               </button>
