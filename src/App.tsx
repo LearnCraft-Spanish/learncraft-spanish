@@ -203,6 +203,7 @@ export const App: React.FC = () => {
   }, [activeLesson, activeStudent, programTable, updateSelectedLesson])
 
   useEffect(() => {
+    // renders twice if student has an active program
     if (activeProgram?.current) {
       updateSelectedProgram(activeProgram.current.recordId)
     }

@@ -23,68 +23,81 @@ export default function Menu() {
           <h3>Syncing Data...</h3>
         </div>
       )}
-      {flashcardDataSynced && (
-        <div className="menuBox">
-          {activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length
-            ? (
-                <div>
-                  <h3>My Flashcards:</h3>
-                  <div className="buttonBox">
-                    <Link className="linkButton" to="/myflashcards">
-                      My Flashcards
-                    </Link>
-                    {/* <Link className="linkButton" to="/todaysflashcards">
+      {flashcardDataSynced
+        ? (
+            <div className="menuBox">
+              {activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length
+                ? (
+                    <div>
+                      <h3>My Flashcards:</h3>
+                      <div className="buttonBox">
+                        <Link className="linkButton" to="/myflashcards">
+                          My Flashcards
+                        </Link>
+                        {/* <Link className="linkButton" to="/todaysflashcards">
                     My Flashcards for Today
                   </Link> */}
-                  </div>
+                      </div>
+                      <div className="buttonBox">
+                        <Link className="linkButton" to="/manage-flashcards">
+                          Manage My Flashcards
+                        </Link>
+                      </div>
+                    </div>
+                  )
+                : null}
+              <h3>Quizzing Tools:</h3>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/officialquizzes">
+                  Official Quizzes
+                </Link>
+              </div>
+              {(userData?.role === 'student' || userData?.role === 'limited' || userData?.isAdmin) && (
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/audioquiz">
+                    Audio Quiz
+                  </Link>
+                  <Link className="linkButton" to="/comprehensionquiz">
+                    Comprehension Quiz
+                  </Link>
+                </div>
+              )}
+              {(userData?.role === 'student' || userData?.isAdmin) && (
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/flashcardfinder">
+                    Find Flashcards
+                  </Link>
+                </div>
+              )}
+              {userData?.isAdmin && (
+                <div>
+                  <h3>Staff Tools</h3>
                   <div className="buttonBox">
-                    <Link className="linkButton" to="/manage-flashcards">
-                      Manage My Flashcards
+                    <Link className="linkButton" to="/frequensay">
+                      FrequenSay
                     </Link>
                   </div>
+                  {/* <div className="buttonBox">
+                    <Link className="linkButton" to="/coaching">
+                      Coaching
+                    </Link>
+                  </div> */}
                 </div>
-              )
-            : null}
-          <h3>Quizzing Tools:</h3>
-          <div className="buttonBox">
-            <Link className="linkButton" to="/officialquizzes">
-              Official Quizzes
-            </Link>
-          </div>
-          {(userData?.role === 'student' || userData?.role === 'limited' || userData?.isAdmin) && (
-            <div className="buttonBox">
-              <Link className="linkButton" to="/audioquiz">
-                Audio Quiz
-              </Link>
-              <Link className="linkButton" to="/comprehensionquiz">
-                Comprehension Quiz
-              </Link>
+              )}
             </div>
-          )}
-          {(userData?.role === 'student' || userData?.isAdmin) && (
-            <div className="buttonBox">
-              <Link className="linkButton" to="/flashcardfinder">
-                Find Flashcards
-              </Link>
-            </div>
-          )}
-          {userData?.isAdmin && (
-            <div>
-              <h3>Staff Tools</h3>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/frequensay">
-                  FrequenSay
-                </Link>
+          )
+        : (
+            userData?.isAdmin !== undefined && !userData?.recordId && (
+              <div className="menuBox">
+                <h3>Quizzing Tools:</h3>
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/officialquizzes">
+                    Official Quizzes
+                  </Link>
+                </div>
               </div>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/coaching">
-                  Coaching
-                </Link>
-              </div>
-            </div>
+            )
           )}
-        </div>
-      )}
     </div>
   )
 }
