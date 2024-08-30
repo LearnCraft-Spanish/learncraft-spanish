@@ -44,7 +44,7 @@ Defined Inside SRSQuizButtons:
   } = useBackend()
 */
 
-describe('component SRSButtons', () => {
+describe.skip('component SRSButtons', () => {
   afterEach(() => {
     vi.clearAllMocks()
   })

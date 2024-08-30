@@ -4,13 +4,16 @@ import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import App from './App'
+import Providers from './Providers'
 
 // Waiting for userData context to be finished
-describe.skip('app', () => {
+describe('app', () => {
   it('renders without crashing', () => {
     render(
       <MemoryRouter>
-        <App />
+        <Providers>
+          <App />
+        </Providers>
       </MemoryRouter>,
     )
   })
