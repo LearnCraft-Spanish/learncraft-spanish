@@ -59,7 +59,7 @@ export default function LessonSelector({
           >
             {makeCourseSelector()}
           </select>
-          {selectedLesson && selectedProgram?.lessons && (
+          {selectedLesson?.recordId && selectedProgram?.lessons && (
             <select
               className="lessonList"
               value={selectedLesson.recordId}
