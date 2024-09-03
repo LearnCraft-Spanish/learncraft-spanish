@@ -97,25 +97,13 @@ export const App: React.FC = () => {
     }
     let newProgram = null
     newProgram = programTable.find(program => program.recordId === programId)
-    || (/* activeProgram.current.recordId
-        ? activeProgram.current
-        : */programTable.find(program => program.recordId === 2)) // Active program not currently defined
     if (newProgram) {
-    /* if (
-      activeLesson.current.recordId
-      && newProgram?.recordId === activeProgram.current.recordId
-    ) {
-      const lessonToSelect = activeLesson.current.recordId
-      updateSelectedLesson(lessonToSelect)
-    }
-    else { */
       setSelectedProgram(newProgram)
-      const firstLesson = newProgram.lessons[0]
-      const lessonToSelect = firstLesson.recordId
-      updateSelectedLesson(lessonToSelect)
-    // }
     }
-  }, [programTable, updateSelectedLesson])// Add activeProgram, activeLesson when defined
+    else {
+      setSelectedProgram(null)
+    }
+  }, [programTable])// Add activeProgram, activeLesson when defined
 
   const updateBannerMessage = useCallback((message: string) => {
     setBannerMessage(message)
@@ -197,10 +185,18 @@ export const App: React.FC = () => {
   }, [programTable])
 
   useEffect(() => {
-    if (activeLesson?.current) {
-      updateSelectedLesson(activeLesson.current.recordId)
+    // change the selected lesson when the selected program changes
+    const hasActiveLesson = activeLesson?.current?.recordId
+    const activeProgramSelected = selectedProgram?.recordId === activeProgram?.current?.recordId
+
+    // default to active lesson if present, otherwise first lesson
+    if (hasActiveLesson && activeProgramSelected) {
+      updateSelectedLesson(activeLesson.current!.recordId)
     }
-  }, [activeLesson, activeStudent, programTable, updateSelectedLesson])
+    else if (selectedProgram?.lessons?.length) {
+      updateSelectedLesson(selectedProgram.lessons[0].recordId)
+    }
+  }, [activeStudent, activeLesson, activeProgram, selectedProgram, programTable, updateSelectedLesson])
 
   useEffect(() => {
     // renders twice if student has an active program
@@ -208,10 +204,10 @@ export const App: React.FC = () => {
       updateSelectedProgram(activeProgram.current.recordId)
     }
     // Setting Default Vaules for selectedProgram and selectedLesson
-    else if (!selectedProgram && programTable.length) {
+    else if (programTable.length) {
       updateSelectedProgram(programTable[0].recordId)
     }
-  }, [activeProgram, activeStudent, programTable, selectedProgram, updateSelectedProgram])
+  }, [activeProgram, activeStudent, programTable, updateSelectedProgram])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)

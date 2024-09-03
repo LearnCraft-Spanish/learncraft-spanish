@@ -47,7 +47,6 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const [requiredTags, setRequiredTags] = useState<VocabTag[]>([])
     const [noSpanglish, setNoSpanglish] = useState(false)
     const [displayExamples, setDisplayExamples] = useState<Flashcard[]>([])
-    const displayExamplesWithAudio = useRef<Flashcard[]>(displayExamples.filter(filterByHasAudio))
 
     function filterByHasAudio(example: Flashcard) {
       if (example.spanishAudioLa) {
@@ -58,6 +57,8 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       }
       return false
     }
+
+    const displayExamplesWithAudio = displayExamples.filter(filterByHasAudio)
 
     function toggleSpanglish() {
       if (noSpanglish) {
@@ -621,7 +622,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                 <div className="displayExamplesDescription">
                   <h4>
                     {`${displayExamples.length} flashcards showing (
-                    ${displayExamplesWithAudio.current?.length} with audio)`}
+                    ${displayExamplesWithAudio?.length} with audio)`}
                   </h4>
                 </div>
               </div>

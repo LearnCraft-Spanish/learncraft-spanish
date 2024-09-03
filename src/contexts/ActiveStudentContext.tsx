@@ -215,6 +215,11 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
         console.error(error)
       }
     }
+    else {
+      if (userData?.isAdmin) {
+        setFlashcardDataSynced(true)
+      }
+    }
   }, [activeStudent, getActiveExamplesFromBackend, getMyExamplesFromBackend, matchAndTrimArrays, userData?.isAdmin])
 
   const value = useMemo<ActiveStudentContextProps>(
