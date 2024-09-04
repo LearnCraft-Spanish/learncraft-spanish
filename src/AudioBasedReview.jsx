@@ -1,10 +1,51 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import './App.css'
 
 import MenuButton from './components/MenuButton'
 import LessonSelector from './LessonSelector'
 import QuizProgress from './components/QuizProgress'
 import { useActiveStudent } from './hooks/useActiveStudent'
+
+// new components to break up the logic
+function audioComponent(audioUrl) {
+  // May need to add a ref pass through from parent for controlling audio
+  <audio>
+    <source src={audioUrl} type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+}
+function audioFlashcardComponent(currentExampleContent) {
+  return (
+    <div className="audioTextBox">
+      <div className="audioExample" onClick={cycle}>
+        {/* Only shows when autoplay is off, ComprehensionQuiz */}
+        {/* {!showingAnswer && spanishHidden && (
+            <h3>
+              <em>Listen to audio</em>
+            </h3>
+          )} */}
+        {/* {!showingAnswer && !spanishHidden && (
+            <h3>{currentQuestionText}</h3>
+          )}
+          {showingAnswer && <h3>{example.englishTranslation}</h3>} */}
+        <h3>{currentExampleContent.text}</h3>
+        {/* Nav Buttons, these never change */}
+        <div className="navigateButtons">
+          {currentExample > 0 && (
+            <a className="previousButton" onClick={decrementExample}>
+              {'<'}
+            </a>
+          )}
+          {currentExample < examplesToPlay.length && (
+            <a className="nextButton" onClick={incrementExample}>
+              {'>'}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function AudioBasedReview({
   // audioExamplesTable,
@@ -55,28 +96,35 @@ export default function AudioBasedReview({
   const answerPause = useRef(0)
   const rendered = useRef(false)
 
-
   // New Changes:
   const [currentStep, setCurrentStep] = useState('question')
-  const [currentStateValues, setCurrentStateValues] = useState({
-    audio: '',
-    text: '',
-  })
   // Define the steps of the quiz, based on quiz
-  const steps = ['question', 'guess', 'hint', 'answer']
+  const [questionValues, setQuestionValues] = useState({ audio: '', text: '' })
+  const [hintValues, setHintValues] = useState({ audio: '', text: '' })
+  const [answerValues, setAnswerValues] = useState({ audio: '', text: '' })
+  const guessValues = { audio: '', text: 'Make a guess!' }
+
+  const [currentStepValues, setCurrentStepValues] = useState(questionValues)
+
+  // const steps = ['question', 'guess', 'hint', 'answer']
+
   if (audioOrComprehension === 'audio') {
     // Question -> Guess -> Hint -> Answer
     // English Audio -> Guess -> Spanish Audio -> Spanish Audio + text
+    setQuestionValues({ audio: example.englishAudio, text: 'Playing English!' })
+    setHintValues({ audio: example.spanishAudioLa, text: 'Playing Spanish!' })
+    setAnswerValues({ audio: example.spanishAudioLa, text: example.spanishExample })
   }
   else if (audioOrComprehension === 'comprehension') {
     // Question -> Guess -> Hint -> Answer
     // Spanish Audio -> Guess -> Spanish Audio + Text -> English Text (possibly with audio if decided in the future)
+    setQuestionValues({ audio: example.spanishAudioLa, text: 'Playing English!' })
+    setHintValues({ audio: example.spanishAudioLa, text: example.spanishExample })
+    setAnswerValues({ audio: '', text: example.englishTranslation })
   }
   else {
     console.error('Invalid audioOrComprehension value')
   }
-
-
 
   function updateAutoplay(string) {
     if (string === 'on') {
@@ -289,6 +337,7 @@ export default function AudioBasedReview({
     setAnswerPlayNumber(1)
   }
 
+  // Replacing with audioComponent
   function questionAudio() {
     let audioUrl
     if (startWithSpanish) {
@@ -306,7 +355,6 @@ export default function AudioBasedReview({
     )
     return audioElement
   }
-
   function answerAudio() {
     let audioUrl
     if (!startWithSpanish) {
@@ -356,12 +404,35 @@ export default function AudioBasedReview({
     }
   }
 
-  // New Audio Quiz cycle function (not Comprehension Quiz)
-  function newCycle() {
-    /*
-    order:
-    Question -> Guess -> Hint -> Answer
-    */
+  // called when currentStep changes
+  const newCycle = useCallback(() => {
+    // order: Question -> Guess -> Hint -> Answer
+
+    switch (currentStep) {
+      case 'question':
+        setCurrentStepValues(questionValues)
+        // setCurrentStep('guess')
+        break
+      case 'guess':
+        setCurrentStepValues(guessValues)
+        // setCurrentStep('hint')
+        break
+      case 'hint':
+        setCurrentStepValues(hintValues)
+        // setCurrentStep('answer')
+        break
+      case 'answer':
+        setCurrentStepValues(answerValues)
+        // Procede to next question
+        // setCurrentStep('question')
+        break
+      default:
+        // setCurrentStep('question')
+    }
+  }, [answerValues, currentStep, guessValues, hintValues, questionValues])
+
+  // call to increase current step
+  function incrementCurrentStep() {
     switch (currentStep) {
       case 'question':
         setCurrentStep('guess')
@@ -373,13 +444,16 @@ export default function AudioBasedReview({
         setCurrentStep('answer')
         break
       case 'answer':
-        // Procede to next question
         setCurrentStep('question')
         break
       default:
         setCurrentStep('question')
     }
   }
+
+  useEffect(() => {
+    newCycle()
+  }, [currentStep, newCycle])
 
   function startCountdown(length) {
     currentCountdownLength.current = length
