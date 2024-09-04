@@ -3,6 +3,7 @@ import './App.css'
 
 import MenuButton from './components/MenuButton'
 import LessonSelector from './LessonSelector'
+import QuizProgress from './components/QuizProgress'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function AudioBasedReview({
@@ -14,6 +15,8 @@ export default function AudioBasedReview({
   selectedProgram,
   updateSelectedLesson,
   updateSelectedProgram,
+  // will be 'audio' or 'comprehension'
+  audioOrComprehension,
 }) {
   const { activeStudent, audioExamplesTable } = useActiveStudent()
 
@@ -22,6 +25,7 @@ export default function AudioBasedReview({
   const [spanishHidden, setSpanishHidden] = useState(true)
   const [autoplay, setAutoplay] = useState(willAutoplay || false)
   const [guessing, setGuessing] = useState(false)
+  // Examples Table after: filtedBylessonId, shuffled
   const [examplesToPlay, setExamplesToPlay] = useState([])
   const [quizReady, setQuizReady] = useState(false)
   /* Will use this as a settable state that inherits a default from props
@@ -29,8 +33,6 @@ export default function AudioBasedReview({
     willStartWithSpanish || false,
   ) */
   const startWithSpanish = willStartWithSpanish || false
-  const [countdown, setCountdown] = useState(0)
-  const [progressStatus, setProgressStatus] = useState(0)
   const [answerPlayNumber, setAnswerPlayNumber] = useState(1)
   const [paused, setPaused] = useState(false)
   const example = examplesToPlay[currentExample] || {}
@@ -42,10 +44,39 @@ export default function AudioBasedReview({
     : example.spanishExample
   const currentQuestionAudio = useRef()
   const currentAnswerAudio = useRef()
+  // Countdown for visual progress bar during autoplay
+  const [countdown, setCountdown] = useState(0)
   const currentCountdownLength = useRef()
   const currentCountdown = useRef(0)
+  // Percentage for visual progress bar during autoplay
+  const [progressStatus, setProgressStatus] = useState(0)
+
+  // possible artifact, always 0, used in 1 clearTimeout
   const answerPause = useRef(0)
   const rendered = useRef(false)
+
+
+  // New Changes:
+  const [currentStep, setCurrentStep] = useState('question')
+  const [currentStateValues, setCurrentStateValues] = useState({
+    audio: '',
+    text: '',
+  })
+  // Define the steps of the quiz, based on quiz
+  const steps = ['question', 'guess', 'hint', 'answer']
+  if (audioOrComprehension === 'audio') {
+    // Question -> Guess -> Hint -> Answer
+    // English Audio -> Guess -> Spanish Audio -> Spanish Audio + text
+  }
+  else if (audioOrComprehension === 'comprehension') {
+    // Question -> Guess -> Hint -> Answer
+    // Spanish Audio -> Guess -> Spanish Audio + Text -> English Text (possibly with audio if decided in the future)
+  }
+  else {
+    console.error('Invalid audioOrComprehension value')
+  }
+
+
 
   function updateAutoplay(string) {
     if (string === 'on') {
@@ -325,6 +356,31 @@ export default function AudioBasedReview({
     }
   }
 
+  // New Audio Quiz cycle function (not Comprehension Quiz)
+  function newCycle() {
+    /*
+    order:
+    Question -> Guess -> Hint -> Answer
+    */
+    switch (currentStep) {
+      case 'question':
+        setCurrentStep('guess')
+        break
+      case 'guess':
+        setCurrentStep('hint')
+        break
+      case 'hint':
+        setCurrentStep('answer')
+        break
+      case 'answer':
+        // Procede to next question
+        setCurrentStep('question')
+        break
+      default:
+        setCurrentStep('question')
+    }
+  }
+
   function startCountdown(length) {
     currentCountdownLength.current = length
     setCountdown(length)
@@ -460,15 +516,13 @@ export default function AudioBasedReview({
         <div>
           <div className="audioBox">
             <p>
-              Comprehension Level:
-              {' '}
-              {selectedProgram.name}
-              {' '}
-              Lesson
-              {' '}
-              {selectedLesson?.lesson.split(' ')[2]}
+              {`Comprehension Level: ${selectedProgram.name} Lesson ${selectedLesson?.lesson.split(' ').at(-1)}`}
             </p>
             <button type="button" onClick={unReadyQuiz}>Change Level</button>
+            {/*
+            We could break this into its own component, or keep it here
+            (autoplay and audioQuizFlashcard functions)
+             */}
             {!autoplay && (
               <div className="audioTextBox">
                 <div className="audioExample" onClick={cycle}>
@@ -496,11 +550,18 @@ export default function AudioBasedReview({
                 </div>
               </div>
             )}
+            {/* AudioQuizFlashcard functions */}
             {autoplay && progressBar()}
             {questionAudio()}
             {answerAudio()}
           </div>
+          {/*
+          I believe Cycle should be rebuilt into two seprate functions:
+          one for AudioQuiz flow
+          one for Comprehension flow
+          */}
           <div className="buttonBox">
+            {/* increate 1 step in cycle */}
             {startWithSpanish
             && !showingAnswer
             && spanishHidden
@@ -553,7 +614,8 @@ export default function AudioBasedReview({
             )}
           </div>
           <div className="buttonBox">
-            {showingAnswer === 2 && (
+            {/* was wrong variable, still unsure when this gets rendered when updated with correct variable (was answerPlaying === 2) */}
+            {answerPlayNumber === 2 && (
               <button type="button" onClick={resetExample}>Hear English</button>
             )}
             {autoplay && !paused && (
@@ -583,6 +645,11 @@ export default function AudioBasedReview({
               <button type="button" onClick={playCurrentAnswer}>Play Again</button>
             )}
           </div>
+          {/*
+          We could add the QuizButtons component here, but I decided not to
+          because QuizButtons has its own play/pause logic, and in our Audio Quiz
+          we have that logic handled by this file.
+          */}
           <div className="buttonBox">
             <button type="button" onClick={decrementExample}>Previous</button>
             <button type="button" onClick={incrementExample}>Next</button>
@@ -590,17 +657,10 @@ export default function AudioBasedReview({
           <div className="buttonBox">
             <MenuButton />
           </div>
-          <div className="progressBar2">
-            <div className="progressBarDescription">
-              Example
-              {' '}
-              {currentExample + 1}
-              {' '}
-              of
-              {' '}
-              {examplesToPlay.length}
-            </div>
-          </div>
+          <QuizProgress
+            currentExampleNumber={currentExample + 1}
+            totalExamplesNumber={examplesToPlay.length}
+          />
         </div>
       )}
     </div>
