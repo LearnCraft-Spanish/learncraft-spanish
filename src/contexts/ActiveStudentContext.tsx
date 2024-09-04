@@ -4,7 +4,7 @@ import type { Flashcard, Lesson, Program, StudentFlashcardData, UserData } from 
 import { useBackend } from '../hooks/useBackend'
 import { useUserData } from '../hooks/useUserData'
 
-interface ActiveStudentContextProps {
+export interface ActiveStudentContextProps {
   activeStudent: UserData | null
   setActiveStudent: (student: UserData | null) => void
   activeLesson: React.MutableRefObject<Lesson | undefined>

@@ -1,52 +1,34 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import '@testing-library/jest-dom'
+import { act, cleanup, render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
-import type { Flashcard } from '../interfaceDefinitions'
-import { sampleMyExamples, sampleStudent } from '../../tests/mockData.js'
+// import '@testing-library/jest-dom'
+
 import { UserDataProvider } from '../contexts/UserDataContext.jsx'
 import { ActiveStudentProvider } from '../contexts/ActiveStudentContext.jsx'
-import { useUserData } from '../hooks/useUserData.js'
+import { sampleStudentFlashcardData } from '../../tests/mockData.js'
+import type { Flashcard } from '../interfaceDefinitions'
+
 import SRSQuizButtons from './SRSButtons'
 
-// const sampleStudentExample = { ...sampleMyExamples.studentExamples }
-
-const currentExample: Flashcard = { ...sampleMyExamples.examples[0] }
-// currentExample.difficulty = 'easy'
+// These examples could be defined in a better way
+const currentExample: Flashcard = { ...sampleStudentFlashcardData.examples[0] }
 currentExample.isCollected = true
 
-const currentExampleEasy: Flashcard = { ...sampleMyExamples.examples[0] }
+const currentExampleEasy: Flashcard = { ...sampleStudentFlashcardData.examples[0] }
 currentExampleEasy.difficulty = 'easy'
 currentExample.isCollected = true
 
-const currentExampleHard: Flashcard = { ...sampleMyExamples.examples[0] }
+const currentExampleHard: Flashcard = { ...sampleStudentFlashcardData.examples[0] }
 currentExampleHard.difficulty = 'hard'
 currentExample.isCollected = true
 
 const updateExampleDifficulty = vi.fn(() => {})
 const incrementExampleNumber = vi.fn(() => {})
 
-/*
-SRSQuizButtons Props:
-
-  currentExample: Flashcard
-  answerShowing: boolean
-  updateExampleDifficulty: (recordId: number, difficulty: string) => void
-  incrementExampleNumber: () => void
-
-Defined Inside SRSQuizButtons:
-
-  const { userData } = useUserData()
-  const { studentFlashcardData } = useActiveStudent()
-  const {
-    updateMyStudentExample,
-    updateStudentExample,
-  } = useBackend()
-*/
-
-describe.skip('component SRSButtons', () => {
+describe('component SRSButtons', () => {
   afterEach(() => {
     vi.clearAllMocks()
+    cleanup()
   })
 
   it('example difficulty is labeled hard, displays Labeled: Easy', () => {
@@ -96,40 +78,9 @@ describe.skip('component SRSButtons', () => {
     expect(screen.getByText('This was easy')).toBeTruthy()
     expect(screen.getByText('This was hard')).toBeTruthy()
   })
-  it('click easy button, calls updateExampleDifficulty with easy', () => {
-    render(
-      <UserDataProvider>
-        <ActiveStudentProvider>
-          <SRSQuizButtons
-            currentExample={currentExample}
-            answerShowing
-            updateExampleDifficulty={updateExampleDifficulty}
-            incrementExampleNumber={incrementExampleNumber}
-          />
-        </ActiveStudentProvider>
-      </UserDataProvider>,
-    )
-    const easyButton = screen.getByText('This was easy')
-    easyButton.click()
-    expect(updateExampleDifficulty).toHaveBeenCalledOnce()
-  })
-})
 
-/*      Need userData context working to test this Component      */
-// describe.skip('component SRSButtons', () => {
-//   it('should render correctly', () => {
-//     const props = {
-//       currentExample: sampleFlashcard,
-//       studentExamples: sampleStudentExample,
-//       userData: sampleStudent,
-//       answerShowing: false,
-//       examples: [...sampleMyExamples.examples],
-//       onExampleSelect: () => {},
-//       onAnswerSubmit: () => {},
-//       updateExampleDifficulty: () => {},
-//       incrementExampleNumber: () => {},
-//       getAccessToken: () => new Promise<string>(() => {}),
-//     }
-//     render(<SRSQuizButtons {...props} />)
-//   })
-// })
+  /*
+  Future Testing:
+  - Test the onClick events for the buttons (unsure how to do it currently, as the functions passed in are called withen the component's own functions)
+  */
+})

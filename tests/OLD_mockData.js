@@ -1,4 +1,5 @@
 import { lessonData } from './mockLessonData'
+// import mockDbData from './mockDbData'
 
 export const sampleStudent
   = {
@@ -50,7 +51,7 @@ export const samplePrograms = [
   },
 ]
 
-export const sampleMyExamples = {
+export const sampleStudentFlashcardData = {
   studentExamples: [
     {
       recordId: 112374,
@@ -265,6 +266,6 @@ export const sampleMyExamples = {
   ],
 }
 
-export const sampleAudioExamples = sampleMyExamples.examples.filter(
+export const sampleAudioExamples = sampleStudentFlashcardData.examples.filter(
   item => item.spanishAudioLa.length > 0,
 )

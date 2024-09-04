@@ -1,16 +1,20 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+
 import { MemoryRouter } from 'react-router-dom'
-import { sampleMyExamples } from '../../tests/mockData'
 import { ActiveStudentProvider } from '../contexts/ActiveStudentContext'
 import { UserDataProvider } from '../contexts/UserDataContext'
-// import activeStudentProvider
+import { sampleStudentFlashcardData } from '../../tests/mockData'
+
 import Quiz from './Quiz'
 
 const addFlashcard = vi.fn()
 const removeFlashcard = vi.fn()
 const cleanupFunction = vi.fn()
+
+vi.mock('../contexts/UserDataContext')
+vi.mock('../contexts/ActiveStudentContext')
 
 function renderQuizNoSrs() {
   render(
@@ -19,13 +23,13 @@ function renderQuizNoSrs() {
         <ActiveStudentProvider>
           <Quiz
             quizTitle="Test Quiz"
-            examplesToParse={sampleMyExamples.examples}
+            examplesToParse={sampleStudentFlashcardData.examples}
             // startWithSpanish={false}
             // quizOnlyCollectedExamples={false}
             // isSrsQuiz={false}
             // userData={sampleStudent}
-            addFlashcard={addFlashcard}
-            removeFlashcard={removeFlashcard}
+            // addFlashcard={addFlashcard}
+            // removeFlashcard={removeFlashcard}
             cleanupFunction={cleanupFunction}
           />
         </ActiveStudentProvider>
@@ -40,18 +44,17 @@ function renderQuizYesSrs() {
         <ActiveStudentProvider>
           <Quiz
             quizTitle="Test Quiz"
-            examplesToParse={sampleMyExamples.examples}
+            examplesToParse={sampleStudentFlashcardData.examples}
             // startWithSpanish={false}
-            // quizOnlyCollectedExamples={false}
+            quizOnlyCollectedExamples
             isSrsQuiz
             // userData={sampleStudent}
-            addFlashcard={addFlashcard}
-            removeFlashcard={removeFlashcard}
+            // addFlashcard={addFlashcard}
+            // removeFlashcard={removeFlashcard}
             cleanupFunction={cleanupFunction}
           />
         </ActiveStudentProvider>
       </UserDataProvider>
-
     </MemoryRouter>,
   )
 }
@@ -157,7 +160,7 @@ describe('component Quiz', () => {
 
   // These cannot be tested until userDataContext is finished
   // may even be moved to SRSButtons file
-  describe.skip('isSrsQuiz is true', () => {
+  describe('isSrsQuiz is true', () => {
     it('renders SrsButtons when isSrsQuiz is true', () => {
       renderQuizYesSrs()
       const flashcard = screen.getByRole('button', { name: 'flashcard' })
@@ -216,7 +219,7 @@ describe('component Quiz', () => {
     act(() => {
       fireEvent.click(nextButton)
     })
-    const totalExamplesNumber = sampleMyExamples.examples.length
+    const totalExamplesNumber = sampleStudentFlashcardData.examples.length
     const quizProgress = screen.getByText(`Flashcard 2 of ${totalExamplesNumber}`)
     expect(quizProgress).toBeTruthy()
   })
@@ -248,20 +251,21 @@ describe('component Quiz', () => {
     }
     render(
       <MemoryRouter>
-        <ActiveStudentProvider>
-          <Quiz
-            quizTitle="Test Quiz"
-            examplesToParse={[unknownExample]}
-            // startWithSpanish={false}
-            // quizOnlyCollectedExamples={false}
-            // isSrsQuiz={false}
-            // userData={sampleStudent}
-            addFlashcard={addFlashcard}
-            removeFlashcard={removeFlashcard}
-
-            cleanupFunction={cleanupFunction}
-          />
-        </ActiveStudentProvider>
+        <UserDataProvider>
+          <ActiveStudentProvider>
+            <Quiz
+              quizTitle="Test Quiz"
+              examplesToParse={[unknownExample]}
+              // startWithSpanish={false}
+              // quizOnlyCollectedExamples={false}
+              // isSrsQuiz={false}
+              // userData={sampleStudent}
+              addFlashcard={addFlashcard}
+              removeFlashcard={removeFlashcard}
+              cleanupFunction={cleanupFunction}
+            />
+          </ActiveStudentProvider>
+        </UserDataProvider>
       </MemoryRouter>,
     )
     const flashcard = screen.getByRole('button', { name: 'flashcard' })
@@ -276,14 +280,14 @@ describe('component Quiz', () => {
   })
 
   // Skipped, throwing error and needs to be updated
-  it.skip('calls togglePlaying on audio button click', () => {
+  it('calls togglePlaying on audio button click', () => {
     render(
       <MemoryRouter>
         <UserDataProvider>
           <ActiveStudentProvider>
             <Quiz
               quizTitle="Test Quiz"
-              examplesToParse={[sampleMyExamples.examples[2]]}
+              examplesToParse={[sampleStudentFlashcardData.examples[2]]}
               // startWithSpanish={false}
               // quizOnlyCollectedExamples={false}
               // isSrsQuiz={false}

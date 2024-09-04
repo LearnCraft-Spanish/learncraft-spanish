@@ -1,24 +1,12 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
+import { sampleStudentFlashcardData } from '../../tests/mockData'
 
 import Flashcard from './Flashcard'
 
-const example = {
-  recordId: 1,
-  spanishExample: 'Hola',
-  englishTranslation: 'Hello',
-  spanglish: 'esp',
-  vocabIncluded: [],
-  allStudents: [],
-  englishAudio: '',
-  spanishAudioLa: '',
-  vocabComplete: false,
-  isCollected: true,
-}
+const example = { ...sampleStudentFlashcardData.examples[0], isCollected: true }
 
-// create a vi.fn that takes in a number and returns void
-//
 const addFlashcardAndUpdate = vi.fn(() => {})
 const removeFlashcardAndUpdate = vi.fn(() => {})
 const toggleAnswer = vi.fn()
@@ -44,18 +32,18 @@ describe('component Flashcard', () => {
   describe('answer showing is false', () => {
     it('renders correctly, spanish shown first', () => {
       render(<FlashcardSpanishFirst />)
-      expect(screen.getByText('Hola')).toBeTruthy()
-      expect(screen.queryByText('Hello')).toBeNull()
+      expect(screen.getByText(example.spanishExample)).toBeTruthy()
+      expect(screen.queryByText(example.englishTranslation)).toBeNull()
     })
     it('renders correctly, english shown first', () => {
       render(<FlashcardEnglishFirst />)
-      expect(screen.getByText('Hello')).toBeTruthy()
-      expect(screen.queryByText('Hola')).toBeNull()
+      expect(screen.getByText(example.englishTranslation)).toBeTruthy()
+      expect(screen.queryByText(example.spanishExample)).toBeNull()
     })
     // on click, answer showing is true
     it('on click, calls toggleAnswer function', () => {
       render(<FlashcardSpanishFirst />)
-      screen.getByText('Hola').click()
+      screen.getByText(example.spanishExample).click()
       expect(toggleAnswer).toHaveBeenCalled()
     })
   })
@@ -63,20 +51,20 @@ describe('component Flashcard', () => {
   describe('answer showing is true', () => {
     it('renders correctly, spanish first', () => {
       render(<FlashcardSpanishFirstAnswerShowing />)
-      expect(screen.getByText('Hello')).toBeTruthy()
-      expect(screen.queryByText('Hola')).toBeNull()
+      expect(screen.getByText(example.englishTranslation)).toBeTruthy()
+      expect(screen.queryByText(example.spanishExample)).toBeNull()
     })
     it('renders correctly, english first', () => {
       render(<FlashcardEnglishFirstAnswerShowing />)
       toggleAnswer()
-      expect(screen.getByText('Hola')).toBeTruthy()
-      expect(screen.queryByText('Hello')).toBeNull()
+      expect(screen.getByText(example.spanishExample)).toBeTruthy()
+      expect(screen.queryByText(example.englishTranslation)).toBeNull()
     })
     // on click, answer showing is false
     it('on click, calls toggleAnswer function', () => {
       render(<FlashcardSpanishFirstAnswerShowing />)
       toggleAnswer()
-      screen.getByText('Hello').click()
+      screen.getByText(example.englishTranslation).click()
       expect(toggleAnswer).toHaveBeenCalled()
     })
 
