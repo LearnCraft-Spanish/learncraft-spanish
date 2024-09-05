@@ -16,7 +16,7 @@ export default function MyFlashcardsQuiz() {
   const [quizExamples, setQuizExamples] = useState<Flashcard[]>(studentFlashcardData?.examples || [])
   const [isSrs, setIsSrs] = useState<boolean>(false)
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false)
-  const [quizLength, setQuizLength] = useState<number>(quizExamples.length)
+  const [quizLength, setQuizLength] = useState<number>(10)
   const [quizReady, setQuizReady] = useState<boolean>(false)
 
   const navigate = useNavigate()
@@ -127,7 +127,7 @@ export default function MyFlashcardsQuiz() {
               <p>Number of Flashcards:</p>
               <select name="length" id="quizLength" onChange={e => setQuizLength(Number.parseInt(e.target.value))}>
                 {calculateQuizLengthOptions().map(option => (
-                  <option key={option} value={option}>
+                  <option key={option} value={option} selected={option === quizLength}>
                     {option}
                   </option>
                 ))}
