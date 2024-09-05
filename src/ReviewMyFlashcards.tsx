@@ -16,7 +16,7 @@ export default function MyFlashcardsQuiz() {
   const [quizExamples, setQuizExamples] = useState<Flashcard[]>(studentFlashcardData?.examples || [])
   const [isSrs, setIsSrs] = useState<boolean>(false)
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false)
-  const [quizLength, setQuizLength] = useState<number>(quizExamples.length)
+  const [quizLength, setQuizLength] = useState<number>(10)
   const [quizReady, setQuizReady] = useState<boolean>(false)
 
   const navigate = useNavigate()
