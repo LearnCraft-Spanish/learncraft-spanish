@@ -926,6 +926,11 @@ will remove from .css when all instances are removed */
   width: 30vw;
   margin: 0 auto;
 }
+@media screen and (max-width: 800px) {
+  .myFlashcardsForm {
+    width: 70vw;
+  }
+}
 
 .myFlashcardsFormContentWrapper > label, .myFlashcardsFormContentWrapper > div {
   /* align on right side of parent */
