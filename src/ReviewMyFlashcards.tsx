@@ -127,7 +127,7 @@ export default function MyFlashcardsQuiz() {
               <p>Number of Flashcards:</p>
               <select name="length" id="quizLength" onChange={e => setQuizLength(Number.parseInt(e.target.value))}>
                 {calculateQuizLengthOptions().map(option => (
-                  <option key={option} value={option}>
+                  <option key={option} value={option} selected={option === quizLength}>
                     {option}
                   </option>
                 ))}
