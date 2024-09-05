@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 import MenuButton from './components/MenuButton'
@@ -7,31 +7,19 @@ import QuizProgress from './components/QuizProgress'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 // new components to break up the logic
-function audioComponent(audioUrl) {
+
+function AudioComponent({ audioUrl, audioRef }) {
   // May need to add a ref pass through from parent for controlling audio
-  <audio>
-    <source src={audioUrl} type="audio/mpeg" />
-    Your browser does not support the audio element.
-  </audio>
+  return <audio ref={audioRef} src={audioUrl} />
 }
-function audioFlashcardComponent(currentExampleContent) {
+function AudioFlashcardComponent({ currentExampleText, incrementCurrentStep }) {
   return (
     <div className="audioTextBox">
-      <div className="audioExample" onClick={cycle}>
-        {/* Only shows when autoplay is off, ComprehensionQuiz */}
-        {/* {!showingAnswer && spanishHidden && (
-            <h3>
-              <em>Listen to audio</em>
-            </h3>
-          )} */}
-        {/* {!showingAnswer && !spanishHidden && (
-            <h3>{currentQuestionText}</h3>
-          )}
-          {showingAnswer && <h3>{example.englishTranslation}</h3>} */}
-        <h3>{currentExampleContent.text}</h3>
+      <div className="audioExample" onClick={() => incrementCurrentStep()}>
+        <h3>{currentExampleText}</h3>
         {/* Nav Buttons, these never change */}
         <div className="navigateButtons">
-          {currentExample > 0 && (
+          {/* {currentExample > 0 && (
             <a className="previousButton" onClick={decrementExample}>
               {'<'}
             </a>
@@ -40,7 +28,7 @@ function audioFlashcardComponent(currentExampleContent) {
             <a className="nextButton" onClick={incrementExample}>
               {'>'}
             </a>
-          )}
+          )} */}
         </div>
       </div>
     </div>
@@ -57,7 +45,7 @@ export default function AudioBasedReview({
   updateSelectedLesson,
   updateSelectedProgram,
   // will be 'audio' or 'comprehension'
-  audioOrComprehension,
+  audioOrComprehension = 'comprehension',
 }) {
   const { activeStudent, audioExamplesTable } = useActiveStudent()
 
@@ -75,7 +63,7 @@ export default function AudioBasedReview({
   ) */
   const startWithSpanish = willStartWithSpanish || false
   const [answerPlayNumber, setAnswerPlayNumber] = useState(1)
-  const [paused, setPaused] = useState(false)
+  // example may need to be updated to be a state/ref, currently causing many rerenders
   const example = examplesToPlay[currentExample] || {}
   const currentQuestionText = startWithSpanish
     ? example.spanishExample
@@ -83,8 +71,15 @@ export default function AudioBasedReview({
   const currentAnswerText = startWithSpanish
     ? example.englishTranslation
     : example.spanishExample
-  const currentQuestionAudio = useRef()
-  const currentAnswerAudio = useRef()
+
+  // New Audio Handling
+  const audioRef = useRef()
+  const [isPlaying, setIsPlaying] = useState(false)
+  // Old audio Handling
+  // const currentQuestionAudio = useRef()
+  // const currentAnswerAudio = useRef()
+  // const [paused, setPaused] = useState(false)
+
   // Countdown for visual progress bar during autoplay
   const [countdown, setCountdown] = useState(0)
   const currentCountdownLength = useRef()
@@ -93,7 +88,7 @@ export default function AudioBasedReview({
   const [progressStatus, setProgressStatus] = useState(0)
 
   // possible artifact, always 0, used in 1 clearTimeout
-  const answerPause = useRef(0)
+  // const answerPause = useRef(0)
   const rendered = useRef(false)
 
   // New Changes:
@@ -102,29 +97,11 @@ export default function AudioBasedReview({
   const [questionValues, setQuestionValues] = useState({ audio: '', text: '' })
   const [hintValues, setHintValues] = useState({ audio: '', text: '' })
   const [answerValues, setAnswerValues] = useState({ audio: '', text: '' })
-  const guessValues = { audio: '', text: 'Make a guess!' }
+  const guessValues = useMemo(() => ({ audio: '', text: 'Make a guess!' }), [])
 
-  const [currentStepValues, setCurrentStepValues] = useState(questionValues)
+  const [currentStepValues, setCurrentStepValues] = useState()
 
   // const steps = ['question', 'guess', 'hint', 'answer']
-
-  if (audioOrComprehension === 'audio') {
-    // Question -> Guess -> Hint -> Answer
-    // English Audio -> Guess -> Spanish Audio -> Spanish Audio + text
-    setQuestionValues({ audio: example.englishAudio, text: 'Playing English!' })
-    setHintValues({ audio: example.spanishAudioLa, text: 'Playing Spanish!' })
-    setAnswerValues({ audio: example.spanishAudioLa, text: example.spanishExample })
-  }
-  else if (audioOrComprehension === 'comprehension') {
-    // Question -> Guess -> Hint -> Answer
-    // Spanish Audio -> Guess -> Spanish Audio + Text -> English Text (possibly with audio if decided in the future)
-    setQuestionValues({ audio: example.spanishAudioLa, text: 'Playing English!' })
-    setHintValues({ audio: example.spanishAudioLa, text: example.spanishExample })
-    setAnswerValues({ audio: '', text: example.englishTranslation })
-  }
-  else {
-    console.error('Invalid audioOrComprehension value')
-  }
 
   function updateAutoplay(string) {
     if (string === 'on') {
@@ -135,104 +112,140 @@ export default function AudioBasedReview({
     }
   }
 
-  function readyQuiz() {
-    setQuizReady(true)
-  }
+  const defineStepValues = useCallback(() => {
+    if (audioOrComprehension === 'audio') {
+      // Question -> Guess -> Hint -> Answer
+      // English Audio -> Guess -> Spanish Audio -> Spanish Audio + text
+      setQuestionValues({ audio: examplesToPlay[currentExample].englishAudio, text: 'Playing English!' })
+      setHintValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: 'Playing Spanish!' })
+      setAnswerValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample })
+
+      setCurrentStepValues(questionValues)
+    }
+    else if (audioOrComprehension === 'comprehension') {
+      // Question -> Guess -> Hint -> Answer
+      // Spanish Audio -> Guess -> Spanish Audio + Text -> English Text (possibly with audio if decided in the future)
+      setQuestionValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: <em>Listen to Audio</em> })
+      setHintValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample })
+      setAnswerValues({ audio: '', text: examplesToPlay[currentExample].englishTranslation })
+
+      setCurrentStepValues(questionValues)
+    }
+    else {
+      console.error('Invalid audioOrComprehension value')
+    }
+  }, [audioOrComprehension, currentExample, examplesToPlay])
 
   function unReadyQuiz() {
     setCurrentExample(0)
     setQuizReady(false)
   }
 
-  async function playCurrentQuestion() {
-    if (guessing) {
-      endGuess()
+  // These 4 functions are the old audio handling
+  // async function playCurrentQuestion() {
+  //   if (guessing) {
+  //     endGuess()
+  //   }
+  //   if (currentAnswerAudio.current) {
+  //     currentAnswerAudio.current.pause()
+  //     currentAnswerAudio.current.currentTime = 0
+  //   }
+  //   if (currentQuestionAudio.current) {
+  //     currentQuestionAudio.current.currentTime = 0
+  //     if (autoplay) {
+  //       const currentDuration = currentQuestionAudio.current.duration
+  //       startCountdown(currentDuration + 1.5)
+  //     }
+  //     try {
+  //       currentQuestionAudio.current.play()
+  //     }
+  //     catch (e) {
+  //       // Handle error
+  //       console.error(e?.message)
+  //     }
+  //   }
+  // }
+
+  // async function playCurrentAnswer() {
+  //   if (currentQuestionAudio.current) {
+  //     currentQuestionAudio.current.pause()
+  //     currentQuestionAudio.current.currentTime = 0
+  //   }
+  //   if (currentAnswerAudio.current) {
+  //     currentAnswerAudio.current.currentTime = 0
+  //     if (
+  //       autoplay
+  //       && currentAnswerAudio.current.duration
+  //       && !startWithSpanish
+  //     ) {
+  //       startCountdown(currentAnswerAudio.current.duration + 3)
+  //     }
+  //     try {
+  //       currentAnswerAudio.current.play()
+  //     }
+  //     catch (e) {
+  //       // Handle error
+  //       console.error(e?.message)
+  //     }
+  //   }
+  // }
+  // function pausePlayback() {
+  //   setPaused(true)
+  //   if (currentAnswerAudio.current) {
+  //     currentAnswerAudio.current.pause()
+  //   }
+  //   if (currentQuestionAudio.current) {
+  //     currentQuestionAudio.current.pause()
+  //   }
+  //   clearTimeout(currentCountdown.current)
+  //   clearTimeout(answerPause.current)
+  // }
+  // function resumePlayback() {
+  //   if (paused) {
+  //     setPaused(false)
+  //   }
+  //   if (showingAnswer === false && !guessing && currentQuestionAudio.current) {
+  //     currentQuestionAudio.current.play()
+  //   }
+  //   else if (showingAnswer === true && currentAnswerAudio.current) {
+  //     currentAnswerAudio.current.play()
+  //   }
+  //   updateCountdown()
+  // }
+
+  // New Audio Handling
+  function playAudio() {
+    if (audioRef.current) {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(err => console.error(err))
     }
-    if (currentAnswerAudio.current) {
-      currentAnswerAudio.current.pause()
-      currentAnswerAudio.current.currentTime = 0
-    }
-    if (currentQuestionAudio.current) {
-      currentQuestionAudio.current.currentTime = 0
-      if (autoplay) {
-        const currentDuration = currentQuestionAudio.current.duration
-        startCountdown(currentDuration + 1.5)
-      }
-      try {
-        currentQuestionAudio.current.play()
-      }
-      catch (e) {
-        // Handle error
-        console.error(e?.message)
-      }
+  }
+  function pauseAudio() {
+    if (audioRef.current) {
+      audioRef.current.pause()
+      setIsPlaying(false)
     }
   }
 
-  async function playCurrentAnswer() {
-    if (currentQuestionAudio.current) {
-      currentQuestionAudio.current.pause()
-      currentQuestionAudio.current.currentTime = 0
-    }
-    if (currentAnswerAudio.current) {
-      currentAnswerAudio.current.currentTime = 0
-      if (
-        autoplay
-        && currentAnswerAudio.current.duration
-        && !startWithSpanish
-      ) {
-        startCountdown(currentAnswerAudio.current.duration + 3)
-      }
-      try {
-        currentAnswerAudio.current.play()
-      }
-      catch (e) {
-        // Handle error
-        console.error(e?.message)
-      }
-    }
-  }
+  // const playAudio
 
-  function pausePlayback() {
-    setPaused(true)
-    if (currentAnswerAudio.current) {
-      currentAnswerAudio.current.pause()
-    }
-    if (currentQuestionAudio.current) {
-      currentQuestionAudio.current.pause()
-    }
-    clearTimeout(currentCountdown.current)
-    clearTimeout(answerPause.current)
-  }
-
-  function updateCountdown() {
-    if (countdown > 0 && currentCountdownLength.current > 0) {
-      const newNumber = Math.floor((countdown - 0.05) * 100) / 100
-      setCountdown(newNumber)
-      const progressPercent
-        = (currentCountdownLength.current - newNumber)
-        / currentCountdownLength.current
-      setProgressStatus(progressPercent)
-    }
-    else if (currentCountdownLength.current > 0) {
-      setCountdown(0)
-    }
-    else {
-      setCountdown(undefined)
-    }
-  }
-
-  function resumePlayback() {
-    if (paused) {
-      setPaused(false)
-    }
-    if (showingAnswer === false && !guessing && currentQuestionAudio.current) {
-      currentQuestionAudio.current.play()
-    }
-    else if (showingAnswer === true && currentAnswerAudio.current) {
-      currentAnswerAudio.current.play()
-    }
-    updateCountdown()
-  }
+  // function updateCountdown() {
+  //   if (countdown > 0 && currentCountdownLength.current > 0) {
+  //     const newNumber = Math.floor((countdown - 0.05) * 100) / 100
+  //     setCountdown(newNumber)
+  //     const progressPercent
+  //       = (currentCountdownLength.current - newNumber)
+  //       / currentCountdownLength.current
+  //     setProgressStatus(progressPercent)
+  //   }
+  //   else if (currentCountdownLength.current > 0) {
+  //     setCountdown(0)
+  //   }
+  //   else {
+  //     setCountdown(undefined)
+  //   }
+  // }
 
   function clearCountDown() {
     clearTimeout(currentCountdown.current)
@@ -240,29 +253,30 @@ export default function AudioBasedReview({
     setCountdown(undefined)
   }
 
-  function hideAnswer() {
-    setAnswerPlayNumber(1)
-    setSpanishHidden(false)
-    setGuessing(false)
-    setShowingAnswer(false)
-  }
+  // function hideAnswer() {
+  //   setAnswerPlayNumber(1)
+  //   setSpanishHidden(false)
+  //   setGuessing(false)
+  //   setShowingAnswer(false)
+  // }
 
-  function hideSpanish() {
-    setSpanishHidden(true)
-  }
+  // function hideSpanish() {
+  //   setSpanishHidden(true)
+  // }
 
-  function showSpanish() {
-    setSpanishHidden(false)
-  }
+  // function showSpanish() {
+  //   setSpanishHidden(false)
+  // }
 
-  function guess() {
-    setGuessing(true)
-  }
+  // function guess() {
+  //   setGuessing(true)
+  // }
 
-  function endGuess() {
-    setGuessing(false)
-  }
+  // function endGuess() {
+  //   setGuessing(false)
+  // }
 
+  // old flashcard, autoplay
   function progressBar() {
     return (
       <div className="progressBarHolder">
@@ -316,10 +330,9 @@ export default function AudioBasedReview({
   }
 
   function incrementExample() {
-    setAnswerPlayNumber(1)
     if (currentExample < examplesToPlay.length - 1) {
-      const nextExample = currentExample + 1
-      setCurrentExample(nextExample)
+      setCurrentExample(currentExample + 1)
+      // defineStepValues()
     }
     else {
       setCurrentExample(examplesToPlay.length - 1)
@@ -338,71 +351,71 @@ export default function AudioBasedReview({
   }
 
   // Replacing with audioComponent
-  function questionAudio() {
-    let audioUrl
-    if (startWithSpanish) {
-      audioUrl = example.spanishAudioLa
-    }
-    else {
-      audioUrl = example.englishAudio
-    }
-    const audioElement = (
-      <audio
-        ref={currentQuestionAudio}
-        src={audioUrl}
-        onLoadedMetadata={playCurrentQuestion}
-      />
-    )
-    return audioElement
-  }
-  function answerAudio() {
-    let audioUrl
-    if (!startWithSpanish) {
-      audioUrl = example.spanishAudioLa
-    }
-    else {
-      audioUrl = example.englishAudio
-    }
-    const audioElement = <audio ref={currentAnswerAudio} src={audioUrl} />
-    return audioElement
-  }
+  // function questionAudio() {
+  //   let audioUrl
+  //   if (startWithSpanish) {
+  //     audioUrl = example.spanishAudioLa
+  //   }
+  //   else {
+  //     audioUrl = example.englishAudio
+  //   }
+  //   const audioElement = (
+  //     <audio
+  //       ref={currentQuestionAudio}
+  //       src={audioUrl}
+  //       onLoadedMetadata={playCurrentQuestion}
+  //     />
+  //   )
+  //   return audioElement
+  // }
+  // function answerAudio() {
+  //   let audioUrl
+  //   if (!startWithSpanish) {
+  //     audioUrl = example.spanishAudioLa
+  //   }
+  //   else {
+  //     audioUrl = example.englishAudio
+  //   }
+  //   const audioElement = <audio ref={currentAnswerAudio} src={audioUrl} />
+  //   return audioElement
+  // }
 
   function resetExample() {
     setAnswerPlayNumber(1)
     setShowingAnswer(false)
   }
 
-  function cycle() {
-    if (quizReady) {
-      switch (showingAnswer) {
-        case false:
-          if (startWithSpanish && !guessing && spanishHidden && autoplay) {
-            guess()
-          }
-          else if (startWithSpanish && spanishHidden) {
-            endGuess()
-            showSpanish()
-          }
-          else if (!startWithSpanish && !guessing && autoplay) {
-            guess()
-          }
-          else {
-            setShowingAnswer(true)
-          }
-          break
-        case true:
-          if (!startWithSpanish && answerPlayNumber < 2) {
-            setAnswerPlayNumber(2)
-          }
-          else {
-            incrementExample()
-          }
-          break
-        default:
-          setShowingAnswer(false)
-      }
-    }
-  }
+  // function cycle() {
+  //   if (quizReady) {
+  //     switch (showingAnswer) {
+  //       case false:
+  //         if (startWithSpanish && !guessing && spanishHidden && autoplay) {
+  //           guess()
+  //         }
+  //         else if (startWithSpanish && spanishHidden) {
+  //           endGuess()
+  //           showSpanish()
+  //         }
+  //         else if (!startWithSpanish && !guessing && autoplay) {
+  //           guess()
+  //         }
+  //         else {
+  //           setShowingAnswer(true)
+  //         }
+  //         break
+  //       case true:
+  //         if (!startWithSpanish && answerPlayNumber < 2) {
+  //           setAnswerPlayNumber(2)
+  //         }
+  //         else {
+  //           incrementExample()
+  //         }
+  //         break
+  //       default:
+  //         setShowingAnswer(false)
+  //     }
+  //   }
+  // }
 
   // called when currentStep changes
   const newCycle = useCallback(() => {
@@ -411,64 +424,85 @@ export default function AudioBasedReview({
     switch (currentStep) {
       case 'question':
         setCurrentStepValues(questionValues)
-        // setCurrentStep('guess')
         break
       case 'guess':
         setCurrentStepValues(guessValues)
-        // setCurrentStep('hint')
         break
       case 'hint':
         setCurrentStepValues(hintValues)
-        // setCurrentStep('answer')
         break
       case 'answer':
         setCurrentStepValues(answerValues)
         // Procede to next question
-        // setCurrentStep('question')
         break
       default:
-        // setCurrentStep('question')
+        break
     }
   }, [answerValues, currentStep, guessValues, hintValues, questionValues])
 
   // call to increase current step
   function incrementCurrentStep() {
+    audioRef.current.currentTime = 0
+    pauseAudio()
     switch (currentStep) {
       case 'question':
-        setCurrentStep('guess')
+        if (autoplay) {
+          setCurrentStep('guess')
+        }
+        else {
+          setCurrentStep('hint')
+        }
         break
       case 'guess':
         setCurrentStep('hint')
+
         break
       case 'hint':
         setCurrentStep('answer')
+
         break
       case 'answer':
+        console.log('just finished first example, incrementing. currentQuizValues,', questionValues)
+        incrementExample()
+        console.log('just incremnted, about to set step to question, ', questionValues)
         setCurrentStep('question')
+
+        // Procede to next question
         break
       default:
-        setCurrentStep('question')
+        console.error('Invalid currentStep value: ', currentStep)
     }
   }
 
+  // when step taken, set currentStepValues accordingly
   useEffect(() => {
     newCycle()
   }, [currentStep, newCycle])
+  // Play Audio when step is taken
+  useEffect(() => {
+    playAudio()
+  }, [currentStepValues])
+  // Set step values when currentExample changes
+  useEffect(() => {
+    if (currentExample > 0) {
+      defineStepValues()
+    }
+  }, [currentExample, defineStepValues])
 
-  function startCountdown(length) {
-    currentCountdownLength.current = length
-    setCountdown(length)
-  }
+  // function startCountdown(length) {
+  //   currentCountdownLength.current = length
+  //   setCountdown(length)
+  // }
 
   // make a useCallback
-  function makeComprehensionQuiz() {
+  const makeComprehensionQuiz = useCallback(() => {
     const allowedAudioExamples = filterExamplesByAllowedVocab(
       audioExamplesTable,
       selectedLesson.recordId,
     )
     const shuffledExamples = shuffleExamples(allowedAudioExamples)
     setExamplesToPlay(shuffledExamples)
-  }
+  }, [audioExamplesTable, filterExamplesByAllowedVocab, selectedLesson.recordId])
 
   useEffect(() => {
     if (!rendered.current) {
@@ -477,13 +511,13 @@ export default function AudioBasedReview({
     return clearCountDown()
   }, [])
 
-  useEffect(() => {
-    if (startWithSpanish) {
-      hideSpanish()
-    }
-    endGuess()
-    setShowingAnswer(false)
-  }, [currentExample, startWithSpanish])
+  // useEffect(() => {
+  //   if (startWithSpanish) {
+  //     hideSpanish()
+  //   }
+  //   endGuess()
+  //   setShowingAnswer(false)
+  // }, [currentExample, startWithSpanish])
 
   // functions labeled for callback
   useEffect(() => {
@@ -491,65 +525,137 @@ export default function AudioBasedReview({
     if (selectedLesson?.recordId && selectedProgram?.recordId && audioExamplesTable.length > 0) {
       makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson])
+  }, [selectedProgram, selectedLesson, audioExamplesTable.length, makeComprehensionQuiz])
 
-  useEffect(() => {
-    clearCountDown()
-    endGuess()
-    if (quizReady) {
-      switch (showingAnswer) {
-        case false:
-          if (currentQuestionAudio.current.duration) {
-            playCurrentQuestion()
-          }
-          break
-        case true:
-          if (!startWithSpanish && currentQuestionAudio.current.duration) {
-            playCurrentAnswer()
-          }
-          if (autoplay) {
-            if (startWithSpanish) {
-              const countdownLength = currentQuestionAudio.current.duration + 3
-              startCountdown(countdownLength)
+  // useEffect(() => {
+  //   clearCountDown()
+  //   endGuess()
+  //   if (quizReady) {
+  //     switch (showingAnswer) {
+  //       case false:
+  //         if (currentQuestionAudio.current.duration) {
+  //           playCurrentQuestion()
+  //         }
+  //         break
+  //       case true:
+  //         if (!startWithSpanish && currentQuestionAudio.current.duration) {
+  //           playCurrentAnswer()
+  //         }
+  //         if (autoplay) {
+  //           if (startWithSpanish) {
+  //             const countdownLength = currentQuestionAudio.current.duration + 3
+  //             startCountdown(countdownLength)
+  //           }
+  //         }
+  //         break
+  //       default:
+  //     }
+  //   }
+  // }, [showingAnswer, quizReady])
+
+  // useEffect(() => {
+  //   if (quizReady && startWithSpanish) {
+  //     // playCurrentQuestion()
+  //   }
+  // }, [spanishHidden])
+
+  // useEffect(() => {
+  //   if (quizReady && answerPlayNumber > 1) {
+  //     // playCurrentAnswer()
+  //   }
+  // }, [answerPlayNumber])
+
+  // useEffect(() => {
+  //   if (quizReady && autoplay) {
+  //     if (!showingAnswer && guessing && currentAnswerAudio.current) {
+  //       // pausePlayback()
+  //       startCountdown(Math.floor(currentAnswerAudio.current.duration + 3))
+  //     }
+  //   }
+  // }, [guessing])
+
+  // useEffect(() => {
+  //   clearTimeout(currentCountdown.current)
+  //   // setPaused(false)
+  //   if (countdown !== 0 && currentCountdownLength.current !== 0) {
+  //     currentCountdown.current = setTimeout(updateCountdown, 50)
+  //   }
+  //   if (countdown === 0) {
+  //     cycle()
+  //   }
+  // }, [countdown])
+
+  function nextStepButtonText() {
+    switch (audioOrComprehension) {
+      case 'audio':
+        switch (currentStep) {
+          case 'question':
+            return 'Skip to Guess'
+          case 'guess':
+            return 'Play Spanish'
+          case 'hint':
+            return 'Play Again'
+          case 'answer':
+            return 'Next'
+        }
+        break
+      case 'comprehension':
+        switch (currentStep) {
+          case 'question':
+            if (autoplay) {
+              return 'Skip to Guess'
             }
-          }
-          break
-        default:
-      }
+            else {
+              return 'Show Spanish'
+            }
+          case 'guess':
+            return 'Show Spanish'
+          case 'hint':
+            return 'Show English'
+          case 'answer':
+            return 'Next'
+        }
+        break
     }
-  }, [showingAnswer, quizReady])
+  }
+  function previousStepButton() {
+    switch (audioOrComprehension) {
+      case 'audio':
+        switch (currentStep) {
+          case 'question':
+            return 'Skip to Guess'
+          case 'guess':
+            return 'Play Spanish'
+          case 'hint':
+            return 'Play Again'
+          case 'answer':
+            return 'Next'
+        }
+        break
+      case 'comprehension':
+        switch (currentStep) {
+          case 'question':
+            if (autoplay) {
+              return 'Skip to Guess'
+            }
+            else {
+              return 'Show Spanish'
+            }
+          case 'guess':
+            return 'Show Spanish'
+          case 'hint':
+            return 'Show English'
+          case 'answer':
+            return 'Next'
+        }
+        break
+  }
 
-  useEffect(() => {
-    if (quizReady && startWithSpanish) {
-      playCurrentQuestion()
-    }
-  }, [spanishHidden])
-
-  useEffect(() => {
-    if (quizReady && answerPlayNumber > 1) {
-      playCurrentAnswer()
-    }
-  }, [answerPlayNumber])
-
-  useEffect(() => {
-    if (quizReady && autoplay) {
-      if (!showingAnswer && guessing && currentAnswerAudio.current) {
-        pausePlayback()
-        startCountdown(Math.floor(currentAnswerAudio.current.duration + 3))
-      }
-    }
-  }, [guessing])
-
-  useEffect(() => {
-    clearTimeout(currentCountdown.current)
-    setPaused(false)
-    if (countdown !== 0 && currentCountdownLength.current !== 0) {
-      currentCountdown.current = setTimeout(updateCountdown, 50)
-    }
-    if (countdown === 0) {
-      cycle()
-    }
-  }, [countdown])
+  function readyQuiz() {
+    defineStepValues()
+    setQuizReady(true)
+    // playAudio()
+  }
 
   return (
     <div className="quiz">
@@ -597,9 +703,9 @@ export default function AudioBasedReview({
             We could break this into its own component, or keep it here
             (autoplay and audioQuizFlashcard functions)
              */}
-            {!autoplay && (
+            {/* {!autoplay && (
               <div className="audioTextBox">
-                <div className="audioExample" onClick={cycle}>
+                <div className="audioExample" onClick={incrementCurrentStep}>
                   {!showingAnswer && spanishHidden && (
                     <h3>
                       <em>Listen to audio</em>
@@ -623,11 +729,16 @@ export default function AudioBasedReview({
                   </div>
                 </div>
               </div>
-            )}
+            )} */}
+            <AudioFlashcardComponent
+              currentExampleText={currentStepValues.text}
+              incrementCurrentStep={incrementCurrentStep}
+            />
+            <AudioComponent audioUrl={currentStepValues.audio} audioRef={audioRef} />
             {/* AudioQuizFlashcard functions */}
             {autoplay && progressBar()}
-            {questionAudio()}
-            {answerAudio()}
+            {/* {questionAudio()}
+            {answerAudio()} */}
           </div>
           {/*
           I believe Cycle should be rebuilt into two seprate functions:
@@ -635,8 +746,11 @@ export default function AudioBasedReview({
           one for Comprehension flow
           */}
           <div className="buttonBox">
+            <button type="button" className="greenButton" onClick={() => incrementCurrentStep()}>
+              {nextStepButtonText()}
+            </button>
             {/* increate 1 step in cycle */}
-            {startWithSpanish
+            {/* {startWithSpanish
             && !showingAnswer
             && spanishHidden
             && !guessing
@@ -684,12 +798,16 @@ export default function AudioBasedReview({
             {showingAnswer && (startWithSpanish || answerPlayNumber > 1) && (
               <button type="button" className="greenButton" onClick={cycle}>
                 Next
-              </button>
-            )}
+              </button> */}
           </div>
           <div className="buttonBox">
+            {autoplay && (
+              isPlaying
+                ? <button type="button" onClick={pauseAudio}>Pause</button>
+                : <button type="button" onClick={playAudio}>Play</button>
+            )}
             {/* was wrong variable, still unsure when this gets rendered when updated with correct variable (was answerPlaying === 2) */}
-            {answerPlayNumber === 2 && (
+            {/* {answerPlayNumber === 2 && (
               <button type="button" onClick={resetExample}>Hear English</button>
             )}
             {autoplay && !paused && (
@@ -697,10 +815,11 @@ export default function AudioBasedReview({
             )}
             {autoplay && paused && (
               <button type="button" onClick={resumePlayback}>Play</button>
-            )}
+            )} */}
           </div>
           <div className="buttonBox">
-            {startWithSpanish && !showingAnswer && (
+            {/* These will need to be Brought Back and Fixed */}
+            {/* {startWithSpanish && !showingAnswer && (
               <button type="button" onClick={playCurrentQuestion}>Replay Spanish</button>
             )}
             {startWithSpanish && showingAnswer && (
@@ -717,7 +836,7 @@ export default function AudioBasedReview({
             )}
             {!startWithSpanish && !autoplay && showingAnswer && (
               <button type="button" onClick={playCurrentAnswer}>Play Again</button>
-            )}
+            )} */}
           </div>
           {/*
           We could add the QuizButtons component here, but I decided not to
