@@ -8,15 +8,21 @@ import { useActiveStudent } from './hooks/useActiveStudent'
 
 // new components to break up the logic
 
-function AudioComponent({ audioUrl, audioRef }) {
-  // May need to add a ref pass through from parent for controlling audio
-  return <audio ref={audioRef} src={audioUrl} />
-}
-function AudioFlashcardComponent({ currentExampleText, incrementCurrentStep }) {
+// function AudioComponent({ audioUrl, audioRef }) {
+//   // May need to add a ref pass through from parent for controlling audio
+//   return <audio ref={audioRef} src={audioUrl} />
+// }
+function AudioFlashcardComponent({ currentExampleText, incrementCurrentStep, autoplay, progress }) {
   return (
     <div className="audioTextBox">
       <div className="audioExample" onClick={() => incrementCurrentStep()}>
         <h3>{currentExampleText}</h3>
+        {autoplay && (
+          <div
+            className="progressStatus"
+            style={{ width: `${progress * 100}%` }}
+          />
+        )}
         {/* Nav Buttons, these never change */}
         <div className="navigateButtons">
           {/* {currentExample > 0 && (
@@ -73,7 +79,8 @@ export default function AudioBasedReview({
     : example.spanishExample
 
   // New Audio Handling
-  const audioRef = useRef()
+  const audioRef = useRef(null)
+
   const [isPlaying, setIsPlaying] = useState(false)
   // Old audio Handling
   // const currentQuestionAudio = useRef()
@@ -85,7 +92,8 @@ export default function AudioBasedReview({
   const currentCountdownLength = useRef()
   const currentCountdown = useRef(0)
   // Percentage for visual progress bar during autoplay
-  const [progressStatus, setProgressStatus] = useState(0)
+  // const [progressStatus, setProgressStatus] = useState(0)
+  const [progress, setProgress] = useState(0) // visual progress bar percentage (0-100)
 
   // possible artifact, always 0, used in 1 clearTimeout
   // const answerPause = useRef(0)
@@ -119,8 +127,6 @@ export default function AudioBasedReview({
       setQuestionValues({ audio: examplesToPlay[currentExample].englishAudio, text: 'Playing English!' })
       setHintValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: 'Playing Spanish!' })
       setAnswerValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample })
-
-      setCurrentStepValues(questionValues)
     }
     else if (audioOrComprehension === 'comprehension') {
       // Question -> Guess -> Hint -> Answer
@@ -129,7 +135,8 @@ export default function AudioBasedReview({
       setHintValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample })
       setAnswerValues({ audio: '', text: examplesToPlay[currentExample].englishTranslation })
 
-      setCurrentStepValues(questionValues)
+      // this causes infinite loop, find better place
+      // setCurrentStepValues(questionValues)
     }
     else {
       console.error('Invalid audioOrComprehension value')
@@ -275,51 +282,6 @@ export default function AudioBasedReview({
   // function endGuess() {
   //   setGuessing(false)
   // }
-
-  // old flashcard, autoplay
-  function progressBar() {
-    return (
-      <div className="progressBarHolder">
-        {!showingAnswer && !guessing && (
-          <h4>
-            {startWithSpanish
-              ? spanishHidden
-                ? 'Playing Spanish'
-                : currentQuestionText
-              : 'Playing English'}
-          </h4>
-        )}
-        {!showingAnswer && guessing && <h4>Make a guess!</h4>}
-        {showingAnswer && (
-          <h4>
-            {startWithSpanish
-              ? currentAnswerText
-              : answerPlayNumber < 2
-                ? 'Playing Spanish'
-                : example.spanishExample}
-          </h4>
-        )}
-        <div
-          className="progressStatus"
-          style={{ width: `${progressStatus * 100}%` }}
-        >
-        </div>
-        <div className="navigateButtons">
-          {currentExample > 0 && (
-            <a className="previousButton" onClick={decrementExample}>
-              {'<'}
-            </a>
-          )}
-          {currentExample < examplesToPlay.length && (
-            <a className="nextButton" onClick={incrementExample}>
-              {'>'}
-            </a>
-          )}
-        </div>
-      </div>
-    )
-  }
-
   // make a useCallback
   function shuffleExamples(examples) {
     const shuffled = examples
@@ -350,72 +312,23 @@ export default function AudioBasedReview({
     setAnswerPlayNumber(1)
   }
 
-  // Replacing with audioComponent
-  // function questionAudio() {
-  //   let audioUrl
-  //   if (startWithSpanish) {
-  //     audioUrl = example.spanishAudioLa
-  //   }
-  //   else {
-  //     audioUrl = example.englishAudio
-  //   }
-  //   const audioElement = (
-  //     <audio
-  //       ref={currentQuestionAudio}
-  //       src={audioUrl}
-  //       onLoadedMetadata={playCurrentQuestion}
-  //     />
-  //   )
-  //   return audioElement
-  // }
-  // function answerAudio() {
-  //   let audioUrl
-  //   if (!startWithSpanish) {
-  //     audioUrl = example.spanishAudioLa
-  //   }
-  //   else {
-  //     audioUrl = example.englishAudio
-  //   }
-  //   const audioElement = <audio ref={currentAnswerAudio} src={audioUrl} />
-  //   return audioElement
-  // }
-
   function resetExample() {
     setAnswerPlayNumber(1)
     setShowingAnswer(false)
   }
 
-  // function cycle() {
-  //   if (quizReady) {
-  //     switch (showingAnswer) {
-  //       case false:
-  //         if (startWithSpanish && !guessing && spanishHidden && autoplay) {
-  //           guess()
-  //         }
-  //         else if (startWithSpanish && spanishHidden) {
-  //           endGuess()
-  //           showSpanish()
-  //         }
-  //         else if (!startWithSpanish && !guessing && autoplay) {
-  //           guess()
-  //         }
-  //         else {
-  //           setShowingAnswer(true)
-  //         }
-  //         break
-  //       case true:
-  //         if (!startWithSpanish && answerPlayNumber < 2) {
-  //           setAnswerPlayNumber(2)
-  //         }
-  //         else {
-  //           incrementExample()
-  //         }
-  //         break
-  //       default:
-  //         setShowingAnswer(false)
-  //     }
+  // const setupAudio = useCallback(() =>{
+  //   console.log('setting up the audio')
+  //   if (examplesToPlay.length > 0 && currentExample < examplesToPlay.length && questionValues.audio.length > 0) {
+  //     console.log('did i make it in?')
+  //     console.log('currentStepValues', currentStepValues)
+  //     console.log(audioRef.current)
+  //     console.log(new Audio(questionValues.audio))
+  //     audioRef.current = new Audio(currentStepValues.audio)
+  //     audioRef.current.addEventListener('timeupdate', handleProgressUpdate)
+  //     audioRef.current.addEventListener('ended', handleAudioEnded)
   //   }
-  // }
+  // }, [currentExample, currentStepValues, examplesToPlay])
 
   // called when currentStep changes
   const newCycle = useCallback(() => {
@@ -433,17 +346,19 @@ export default function AudioBasedReview({
         break
       case 'answer':
         setCurrentStepValues(answerValues)
-        // Procede to next question
         break
       default:
+        console.error('Invalid currentStep value: ', currentStep)
         break
     }
+    // setupAudio()
   }, [answerValues, currentStep, guessValues, hintValues, questionValues])
 
   // call to increase current step
   function incrementCurrentStep() {
-    audioRef.current.currentTime = 0
-    pauseAudio()
+    // audioRef.current.currentTime = 0
+    // pauseAudio()
+    handleAudioEndedOrSkipped()
     switch (currentStep) {
       case 'question':
         if (autoplay) {
@@ -462,9 +377,8 @@ export default function AudioBasedReview({
 
         break
       case 'answer':
-        console.log('just finished first example, incrementing. currentQuizValues,', questionValues)
+        // This may cause a race condition later
         incrementExample()
-        console.log('just incremnted, about to set step to question, ', questionValues)
         setCurrentStep('question')
 
         // Procede to next question
@@ -480,11 +394,16 @@ export default function AudioBasedReview({
   }, [currentStep, newCycle])
   // Play Audio when step is taken
   useEffect(() => {
-    playAudio()
+    // setupAudio()
+    // check if audio ref has event listener ended then play audio
+    if (audioRef.current) {
+      playAudio()
+    }
   }, [currentStepValues])
   // Set step values when currentExample changes
   useEffect(() => {
     if (currentExample > 0) {
+      console.log('currentExample changed')
       defineStepValues()
     }
   }, [currentExample, defineStepValues])
@@ -618,37 +537,37 @@ export default function AudioBasedReview({
         break
     }
   }
+
+  // Currently only used by previousStepButton
+  function customIncrementCurrentStep(step) {
+    audioRef.current.currentTime = 0
+    pauseAudio()
+    if (step === currentStep) {
+      playAudio()
+    }
+    else {
+      setCurrentStep(step)
+    }
+  }
+
   function previousStepButton() {
     switch (audioOrComprehension) {
       case 'audio':
-        switch (currentStep) {
-          case 'question':
-            return 'Skip to Guess'
-          case 'guess':
-            return 'Play Spanish'
-          case 'hint':
-            return 'Play Again'
-          case 'answer':
-            return 'Next'
-        }
-        break
+        // I think in the original code there was supposted to be a case Play again, but I could not reproduce it.
+        return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay English</button>
       case 'comprehension':
         switch (currentStep) {
           case 'question':
-            if (autoplay) {
-              return 'Skip to Guess'
-            }
-            else {
-              return 'Show Spanish'
-            }
+            return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay Spanish</button>
           case 'guess':
-            return 'Show Spanish'
+            return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay Spanish</button>
           case 'hint':
-            return 'Show English'
+            return <button type="button" onClick={() => customIncrementCurrentStep('hint')}>Replay Spanish</button>
           case 'answer':
-            return 'Next'
+            return <button type="button" onClick={() => customIncrementCurrentStep('hint')}>Replay Spanish</button>
         }
         break
+    }
   }
 
   function readyQuiz() {
@@ -656,6 +575,37 @@ export default function AudioBasedReview({
     setQuizReady(true)
     // playAudio()
   }
+  const handleProgressUpdate = () => {
+    if (audioRef.current) {
+      const currentProgress = (audioRef.current.currentTime / audioRef.current.duration) * 100
+      setProgress(currentProgress)
+    }
+  }
+  const handleAudioEndedOrSkipped = () => {
+    // need to 
+    if (audioRef.current) {
+      audioRef.current.removeEventListener('timeupdate', handleProgressUpdate)
+      audioRef.current.removeEventListener('ended', handleAudioEndedOrSkipped)
+      audioRef.current.pause()
+      // need to remove Audio html element from DOM
+      audioRef.current = null
+    }
+  }
+  useEffect(() => {
+    console.log('setting up the audio')
+    if (examplesToPlay.length > 0 && currentExample < examplesToPlay.length && questionValues.audio.length > 0) {
+      console.log('did i make it in?')
+      console.log('currentStepValues', currentStepValues)
+      console.log(audioRef.current)
+      console.log(new Audio(questionValues.audio))
+      audioRef.current = new Audio(currentStepValues.audio)
+      audioRef.current.addEventListener('timeupdate', handleProgressUpdate)
+      audioRef.current.addEventListener('ended', () => handleAudioEndedOrSkipped)
+      if (audioRef.current) {
+        audioRef.current.play()
+      }
+    }
+  }, [currentExample, currentStepValues, examplesToPlay, questionValues.audio])
 
   return (
     <div className="quiz">
@@ -702,41 +652,16 @@ export default function AudioBasedReview({
             {/*
             We could break this into its own component, or keep it here
             (autoplay and audioQuizFlashcard functions)
-             */}
-            {/* {!autoplay && (
-              <div className="audioTextBox">
-                <div className="audioExample" onClick={incrementCurrentStep}>
-                  {!showingAnswer && spanishHidden && (
-                    <h3>
-                      <em>Listen to audio</em>
-                    </h3>
-                  )}
-                  {!showingAnswer && !spanishHidden && (
-                    <h3>{currentQuestionText}</h3>
-                  )}
-                  {showingAnswer && <h3>{example.englishTranslation}</h3>}
-                  <div className="navigateButtons">
-                    {currentExample > 0 && (
-                      <a className="previousButton" onClick={decrementExample}>
-                        {'<'}
-                      </a>
-                    )}
-                    {currentExample < examplesToPlay.length && (
-                      <a className="nextButton" onClick={incrementExample}>
-                        {'>'}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )} */}
+            */}
             <AudioFlashcardComponent
               currentExampleText={currentStepValues.text}
               incrementCurrentStep={incrementCurrentStep}
+              autoplay={autoplay}
+              progress={progress}
             />
-            <AudioComponent audioUrl={currentStepValues.audio} audioRef={audioRef} />
+            {/* <AudioComponent audioUrl={currentStepValues.audio} audioRef={audioRef} /> */}
             {/* AudioQuizFlashcard functions */}
-            {autoplay && progressBar()}
+            {/* {autoplay && progressBar()} */}
             {/* {questionAudio()}
             {answerAudio()} */}
           </div>
@@ -749,56 +674,6 @@ export default function AudioBasedReview({
             <button type="button" className="greenButton" onClick={() => incrementCurrentStep()}>
               {nextStepButtonText()}
             </button>
-            {/* increate 1 step in cycle */}
-            {/* {startWithSpanish
-            && !showingAnswer
-            && spanishHidden
-            && !guessing
-            && autoplay && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Skip to Guess
-              </button>
-            )}
-            {startWithSpanish
-            && !showingAnswer
-            && spanishHidden
-            && !autoplay && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Show Spanish
-              </button>
-            )}
-            {startWithSpanish
-            && !showingAnswer
-            && spanishHidden
-            && guessing && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Show Spanish
-              </button>
-            )}
-            {startWithSpanish && !showingAnswer && !spanishHidden && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Show English
-              </button>
-            )}
-            {!startWithSpanish && !showingAnswer && !guessing && autoplay && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Skip to Guess
-              </button>
-            )}
-            {!startWithSpanish && !showingAnswer && (!autoplay || guessing) && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Play Spanish
-              </button>
-            )}
-            {showingAnswer && !startWithSpanish && answerPlayNumber < 2 && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Play Again
-              </button>
-            )}
-            {showingAnswer && (startWithSpanish || answerPlayNumber > 1) && (
-              <button type="button" className="greenButton" onClick={cycle}>
-                Next
-              </button> */}
           </div>
           <div className="buttonBox">
             {autoplay && (
@@ -806,37 +681,9 @@ export default function AudioBasedReview({
                 ? <button type="button" onClick={pauseAudio}>Pause</button>
                 : <button type="button" onClick={playAudio}>Play</button>
             )}
-            {/* was wrong variable, still unsure when this gets rendered when updated with correct variable (was answerPlaying === 2) */}
-            {/* {answerPlayNumber === 2 && (
-              <button type="button" onClick={resetExample}>Hear English</button>
-            )}
-            {autoplay && !paused && (
-              <button type="button" onClick={pausePlayback}>Pause</button>
-            )}
-            {autoplay && paused && (
-              <button type="button" onClick={resumePlayback}>Play</button>
-            )} */}
           </div>
           <div className="buttonBox">
-            {/* These will need to be Brought Back and Fixed */}
-            {/* {startWithSpanish && !showingAnswer && (
-              <button type="button" onClick={playCurrentQuestion}>Replay Spanish</button>
-            )}
-            {startWithSpanish && showingAnswer && (
-              <button type="button" onClick={hideAnswer}>Replay Spanish</button>
-            )}
-            {!startWithSpanish && !showingAnswer && (
-              <button type="button" onClick={playCurrentQuestion}>Replay English</button>
-            )}
-            {!startWithSpanish && showingAnswer && (
-              <button type="button" onClick={hideAnswer}>Replay English</button>
-            )}
-            {!startWithSpanish && !autoplay && !showingAnswer && (
-              <button type="button" onClick={playCurrentQuestion}>Play Again</button>
-            )}
-            {!startWithSpanish && !autoplay && showingAnswer && (
-              <button type="button" onClick={playCurrentAnswer}>Play Again</button>
-            )} */}
+            {previousStepButton()}
           </div>
           {/*
           We could add the QuizButtons component here, but I decided not to
