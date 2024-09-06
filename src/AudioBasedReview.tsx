@@ -1,21 +1,50 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import './App.css'
 
 import MenuButton from './components/MenuButton'
 import LessonSelector from './LessonSelector'
 import QuizProgress from './components/QuizProgress'
 import { useActiveStudent } from './hooks/useActiveStudent'
+import type { Flashcard } from './interfaceDefinitions'
 
 // new components to break up the logic
 
-function AudioComponent({ audioUrl, audioRef }) {
+function AudioComponent({ audioUrl, audioRef, playAudio }: { audioUrl: string, audioRef: any, playAudio: () => void }) {
   // May need to add a ref pass through from parent for controlling audio
-  return <audio ref={audioRef} src={audioUrl} />
+  return (
+    <audio
+      ref={audioRef}
+      src={audioUrl}
+      // May change this to a new function that incorporates autoplay
+      onLoadedMetadata={() => { playAudio() }}
+    />
+  )
 }
-function AudioFlashcardComponent({ currentExampleText, incrementCurrentStep, autoplay, progress }) {
+function AudioFlashcardComponent({
+  currentExampleText,
+  incrementCurrentStep,
+  autoplay,
+  progress,
+  currentExample,
+  incrementExample,
+  decrementExample,
+  examplesToPlay,
+}: {
+  currentExampleText: string
+  incrementCurrentStep: () => void
+  autoplay: boolean
+  progress: number
+  currentExample: number
+  incrementExample: () => void
+  decrementExample: () => void
+  examplesToPlay: any[]
+}) {
   return (
     <div className="audioTextBox">
-      <div className="audioExample" onClick={() => incrementCurrentStep()}>
+      <div
+        className="audioExample"
+        onClick={() => incrementCurrentStep()}
+      >
         <h3>{currentExampleText}</h3>
         {autoplay && (
           <div
@@ -23,22 +52,46 @@ function AudioFlashcardComponent({ currentExampleText, incrementCurrentStep, aut
             style={{ width: `${progress * 100}%` }}
           />
         )}
-        {/* Nav Buttons, these never change */}
+        {/* added event.stopPropagation to prevent the click propgating down to parent, and triggering incrementCurrentStep */}
         <div className="navigateButtons">
-          {/* {currentExample > 0 && (
-            <a className="previousButton" onClick={decrementExample}>
+          {currentExample > 0 && (
+            <a
+              className="previousButton"
+              onClick={(event) => {
+                event.stopPropagation()
+                decrementExample()
+              }}
+            >
               {'<'}
             </a>
           )}
-          {currentExample < examplesToPlay.length && (
-            <a className="nextButton" onClick={incrementExample}>
+          {currentExample < examplesToPlay.length - 1 && (
+            <a
+              className="nextButton"
+              onClick={(event) => {
+                event.stopPropagation()
+                incrementExample()
+              }}
+            >
               {'>'}
             </a>
-          )} */}
+          )}
         </div>
       </div>
     </div>
   )
+}
+
+// THIS IS NOT COMPLETE, PLEASE PLEASE PLEASE UPDATE TYPES
+interface AudioBasedReviewProps {
+  filterExamplesByAllowedVocab: (examples: Flashcard[], lessonId: string) => Flashcard[]
+  willAutoplay: boolean
+  willStartWithSpanish: boolean
+  selectedLesson: any
+  selectedProgram: any
+  updateSelectedLesson: (lesson: any) => void
+  updateSelectedProgram: (program: any) => void
+  audioOrComprehension?: 'audio' | 'comprehension'
 }
 
 export default function AudioBasedReview({
@@ -52,7 +105,7 @@ export default function AudioBasedReview({
   updateSelectedProgram,
   // will be 'audio' or 'comprehension'
   audioOrComprehension = 'comprehension',
-}) {
+}: AudioBasedReviewProps) {
   const { activeStudent, audioExamplesTable } = useActiveStudent()
 
   const [currentExample, setCurrentExample] = useState(0)
@@ -61,7 +114,7 @@ export default function AudioBasedReview({
   const [autoplay, setAutoplay] = useState(willAutoplay || false)
   // const [guessing, setGuessing] = useState(false)
   // Examples Table after: filtedBylessonId, shuffled
-  const [examplesToPlay, setExamplesToPlay] = useState([])
+  const [examplesToPlay, setExamplesToPlay] = useState<Flashcard[] | []>([])
   const [quizReady, setQuizReady] = useState(false)
   /* Will use this as a settable state that inherits a default from props
   const [startWithSpanish, setStartWithSpanish] = useState(
@@ -79,7 +132,7 @@ export default function AudioBasedReview({
   //   : example.spanishExample
 
   // New Audio Handling
-  const audioRef = useRef(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const [isPlaying, setIsPlaying] = useState(false)
   // Old audio Handling
@@ -102,12 +155,14 @@ export default function AudioBasedReview({
   // New Changes:
   const [currentStep, setCurrentStep] = useState('question')
   // Define the steps of the quiz, based on quiz
-  const [questionValues, setQuestionValues] = useState({ audio: '', text: '' })
-  const [hintValues, setHintValues] = useState({ audio: '', text: '' })
-  const [answerValues, setAnswerValues] = useState({ audio: '', text: '' })
-  const guessValues = useMemo(() => ({ audio: '', text: 'Make a guess!' }), [])
+  // These should be refs, and singular not plural *******************************************************
+  const questionValue = useRef({ audio: '', text: '' })
+  const hintValue = useRef({ audio: '', text: '' })
+  const answerValue = useRef({ audio: '', text: '' })
+  const guessValue = useRef({ audio: '', text: 'Make a guess!' })
 
-  const [currentStepValues, setCurrentStepValues] = useState()
+  // const [currentStepValue, setCurrentStepValue] = useState()
+  const [currentStepValue, setCurrentStepValue] = useState({ audio: '', text: '' })
 
   // const steps = ['question', 'guess', 'hint', 'answer']
 
@@ -116,16 +171,20 @@ export default function AudioBasedReview({
     if (audioOrComprehension === 'audio') {
       // Question -> Guess -> Hint -> Answer
       // English Audio -> Guess -> Spanish Audio -> Spanish Audio + text
-      setQuestionValues({ audio: examplesToPlay[currentExample].englishAudio, text: 'Playing English!' })
-      setHintValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: 'Playing Spanish!' })
-      setAnswerValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample })
+      questionValue.current = { audio: examplesToPlay[currentExample].englishAudio, text: 'Playing English!' }
+      hintValue.current = { audio: examplesToPlay[currentExample].spanishAudioLa, text: 'Playing Spanish!' }
+      answerValue.current = { audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample }
+
+      setCurrentStepValue(questionValue.current)
     }
     else if (audioOrComprehension === 'comprehension') {
       // Question -> Guess -> Hint -> Answer
       // Spanish Audio -> Guess -> Spanish Audio + Text -> English Text (possibly with audio if decided in the future)
-      setQuestionValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: <em>Listen to Audio</em> })
-      setHintValues({ audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample })
-      setAnswerValues({ audio: '', text: examplesToPlay[currentExample].englishTranslation })
+      questionValue.current = { audio: examplesToPlay[currentExample].spanishAudioLa, text: <em>Listen to Audio</em> }
+      hintValue.current = { audio: examplesToPlay[currentExample].spanishAudioLa, text: examplesToPlay[currentExample].spanishExample }
+      answerValue.current = { audio: '', text: examplesToPlay[currentExample].englishTranslation }
+
+      setCurrentStepValue(questionValue.current)
     }
     else {
       console.error('Invalid audioOrComprehension value')
@@ -134,6 +193,7 @@ export default function AudioBasedReview({
 
   /*       New Audio Handling     */
   function playAudio() {
+    // add catch for when audio not supported (url is empty)
     if (audioRef.current) {
       audioRef.current.play()
         .then(() => setIsPlaying(true))
@@ -143,11 +203,12 @@ export default function AudioBasedReview({
   function pauseAudio() {
     if (audioRef.current) {
       audioRef.current.pause()
+      audioRef.current.currentTime = 0
       setIsPlaying(false)
     }
   }
 
-  function shuffleExamples(examples) {
+  function shuffleExamples(examples: Flashcard[]) {
     const shuffled = examples
       .map(value => ({ value, sort: Math.random() }))
       .sort((a, b) => a.sort - b.sort)
@@ -163,6 +224,7 @@ export default function AudioBasedReview({
     else {
       setCurrentExample(examplesToPlay.length - 1)
     }
+    setCurrentStep('question')
   }
 
   function decrementExample() {
@@ -173,34 +235,32 @@ export default function AudioBasedReview({
     else {
       setCurrentExample(0)
     }
-    // setAnswerPlayNumber(1)
+    setCurrentStep('question')
   }
 
   const newCycle = useCallback(() => {
     // order: Question -> Guess -> Hint -> Answer
-
     switch (currentStep) {
       case 'question':
-        setCurrentStepValues(questionValues)
+        setCurrentStepValue(questionValue.current)
         break
       case 'guess':
-        setCurrentStepValues(guessValues)
+        setCurrentStepValue(guessValue.current)
         break
       case 'hint':
-        setCurrentStepValues(hintValues)
+        setCurrentStepValue(hintValue.current)
         break
       case 'answer':
-        setCurrentStepValues(answerValues)
+        setCurrentStepValue(answerValue.current)
         break
       default:
         console.error('Invalid currentStep value: ', currentStep)
         break
     }
-  }, [answerValues, currentStep, guessValues, hintValues, questionValues])
+  }, [currentStep])
 
   // call to increase current step
   function incrementCurrentStep() {
-    audioRef.current.currentTime = 0
     pauseAudio()
     // handleAudioEndedOrSkipped()
     switch (currentStep) {
@@ -223,7 +283,6 @@ export default function AudioBasedReview({
       case 'answer':
         // This may cause a race condition later
         incrementExample()
-        setCurrentStep('question')
 
         // Procede to next question
         break
@@ -257,15 +316,10 @@ export default function AudioBasedReview({
   }, [selectedProgram, selectedLesson, audioExamplesTable.length, makeComprehensionQuiz])
 
   /*       New Use Effects      */
-  // when step taken, set currentStepValues accordingly
-  useEffect(() => {
-    newCycle()
-  }, [currentStep, newCycle])
-
   // Play Audio when step is taken
   useEffect(() => {
     playAudio()
-  }, [currentStepValues])
+  }, [currentStepValue])
 
   // Set step values when currentExample changes
   useEffect(() => {
@@ -273,6 +327,10 @@ export default function AudioBasedReview({
       defineStepValues()
     }
   }, [currentExample, defineStepValues])
+  // when step taken, set currentStepValue accordingly
+  useEffect(() => {
+    newCycle()
+  }, [currentStep, newCycle])
 
   function nextStepButtonText() {
     switch (audioOrComprehension) {
@@ -327,8 +385,7 @@ export default function AudioBasedReview({
     }
   }
   // Currently only used by previousStepButton
-  function customIncrementCurrentStep(step) {
-    audioRef.current.currentTime = 0
+  function customIncrementCurrentStep(step: string) {
     pauseAudio()
     if (step === currentStep) {
       playAudio()
@@ -342,13 +399,17 @@ export default function AudioBasedReview({
   function readyQuiz() {
     defineStepValues()
     setQuizReady(true)
+    if (questionValue.current.audio.length > 0) {
+      newCycle()
+    }
     // playAudio()
   }
   function unReadyQuiz() {
-    setCurrentExample(0)
     setQuizReady(false)
+    setCurrentExample(0)
+    setCurrentStep('question')
   }
-  function updateAutoplay(string) {
+  function updateAutoplay(string: string) {
     if (string === 'on') {
       setAutoplay(true)
     }
@@ -357,22 +418,23 @@ export default function AudioBasedReview({
     }
   }
   /*      attempt at autoplay, not working      */
-  // const handleProgressUpdate = () => {
-  //   if (audioRef.current) {
-  //     const currentProgress = (audioRef.current.currentTime / audioRef.current.duration) * 100
-  //     setProgress(currentProgress)
-  //   }
-  // }
-  // const handleAudioEndedOrSkipped = () => {
-  //   // need to
-  //   if (audioRef.current) {
-  //     audioRef.current.removeEventListener('timeupdate', handleProgressUpdate)
-  //     audioRef.current.removeEventListener('ended', handleAudioEndedOrSkipped)
-  //     audioRef.current.pause()
-  //     // need to remove Audio html element from DOM
-  //     audioRef.current = null
-  //   }
-  // }
+
+  const handleProgressUpdate = useCallback(() => {
+    if (audioRef.current) {
+      // const currentProgress = (audioRef.current.currentTime / audioRef.current.duration) * 100
+      // setProgress(currentProgress)
+      console.log('progress')
+    }
+  }, [])
+  const handleAudioEndedOrSkipped = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.removeEventListener('timeupdate', handleProgressUpdate)
+      audioRef.current.removeEventListener('ended', handleAudioEndedOrSkipped)
+      audioRef.current.pause()
+      // need to remove Audio html element from DOM
+      incrementCurrentStep()
+    }
+  }, [handleProgressUpdate])
   // useEffect(() => {
   //   console.log('setting up the audio')
   //   if (examplesToPlay.length > 0 && currentExample < examplesToPlay.length && questionValues.audio.length > 0) {
@@ -436,12 +498,16 @@ export default function AudioBasedReview({
             (autoplay and audioQuizFlashcard functions)
             */}
             <AudioFlashcardComponent
-              currentExampleText={currentStepValues.text}
+              currentExampleText={currentStepValue.text}
               incrementCurrentStep={incrementCurrentStep}
               autoplay={autoplay}
               progress={progress}
+              currentExample={currentExample}
+              incrementExample={incrementExample}
+              decrementExample={decrementExample}
+              examplesToPlay={examplesToPlay}
             />
-            <AudioComponent audioUrl={currentStepValues.audio} audioRef={audioRef} />
+            <AudioComponent audioUrl={currentStepValue.audio} audioRef={audioRef} playAudio={playAudio} />
             {/* AudioQuizFlashcard functions */}
             {/* {autoplay && progressBar()} */}
             {/* {questionAudio()}
