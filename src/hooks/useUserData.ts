@@ -1,10 +1,8 @@
-import { useContext } from 'react'
-import UserDataContext from '../contexts/UserDataContext'
+import { useQuery } from '@tanstack/react-query'
+import { useBackend } from './useBackend'
 
 export function useUserData() {
-  const context = useContext(UserDataContext)
-  if (!context) {
-    throw new Error('useUserData must be used within a UserDataProvider')
-  }
-  return context
+  const { getUserDataFromBackend } = useBackend()
+  const userDataQuery = useQuery({ queryKey: ['userData'], queryFn: getUserDataFromBackend })
+  return userDataQuery
 }

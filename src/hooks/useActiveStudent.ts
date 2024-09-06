@@ -9,7 +9,7 @@ export function useActiveStudent() {
   const context = useContext(ActiveStudentContext)
 
   // Should this be using the Context, or the useUserData hook?
-  const userData = useUserData()
+  const userDataQuery = useUserData()
 
   const {
     createStudentExample,
@@ -26,7 +26,7 @@ export function useActiveStudent() {
   const addToActiveStudentFlashcards = useCallback(async (recordId: number) => {
     context.setFlashcardDataSynced(false)
     // updateBannerMessage('Adding Flashcard...')
-    if (context.activeStudent?.recordId && userData.userData?.isAdmin) {
+    if (context.activeStudent?.recordId && userDataQuery.data?.isAdmin) {
       try {
         const data = await createStudentExample(
           context.activeStudent?.recordId,
@@ -54,7 +54,7 @@ export function useActiveStudent() {
         return false
       }
     }
-    else if (context.activeStudent?.recordId && userData.userData?.role === 'student') {
+    else if (context.activeStudent?.recordId && userDataQuery.data?.role === 'student') {
       try {
         const data = await createMyStudentExample(recordId)
           .then((result) => {
@@ -80,7 +80,7 @@ export function useActiveStudent() {
         return false
       }
     }
-  }, [context, userData.userData?.isAdmin, userData.userData?.role, createStudentExample, createMyStudentExample])
+  }, [context, userDataQuery.data?.isAdmin, userDataQuery.data?.role, createStudentExample, createMyStudentExample])
 
   const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId: number) => {
     context.setFlashcardDataSynced(false)
@@ -93,7 +93,7 @@ export function useActiveStudent() {
       return relatedStudentExample?.recordId
     }
     const studentExampleRecordId = getStudentExampleRecordId()
-    if (studentExampleRecordId && userData.userData?.isAdmin) {
+    if (studentExampleRecordId && userDataQuery.data?.isAdmin) {
       try {
         const data = await deleteStudentExample(studentExampleRecordId)
           .then((result) => {
@@ -118,7 +118,7 @@ export function useActiveStudent() {
         }
       }
     }
-    else if (studentExampleRecordId && userData.userData?.role === 'student') {
+    else if (studentExampleRecordId && userDataQuery.data?.role === 'student') {
       try {
         const data = await deleteMyStudentExample(studentExampleRecordId)
           .then((result) => {
@@ -148,12 +148,12 @@ export function useActiveStudent() {
       console.error('Flashcard not found')
       return 0
     }
-  }, [userData.userData?.isAdmin, userData.userData?.role, context, deleteStudentExample, deleteMyStudentExample])
+  }, [userDataQuery.data?.isAdmin, userDataQuery.data?.role, context, deleteStudentExample, deleteMyStudentExample])
 
   const updateActiveStudentFlashcard = useCallback(async (studentExampleRecordId: number, newInterval: number) => {
     context.setFlashcardDataSynced(false)
     // updateBannerMessage('Updating Flashcard...')
-    if (context.activeStudent?.recordId && userData.userData?.isAdmin) {
+    if (context.activeStudent?.recordId && userDataQuery.data?.isAdmin) {
       try {
         const data = await updateStudentExample(studentExampleRecordId, newInterval)
           .then((result: number | undefined) => {
@@ -178,7 +178,7 @@ export function useActiveStudent() {
         }
       }
     }
-    else if (context.activeStudent?.recordId && userData.userData?.role === 'student') {
+    else if (context.activeStudent?.recordId && userDataQuery.data?.role === 'student') {
       try {
         const data = await updateMyStudentExample(studentExampleRecordId, newInterval)
           .then((result) => {
@@ -203,7 +203,7 @@ export function useActiveStudent() {
         }
       }
     }
-  }, [context, userData.userData?.isAdmin, userData.userData?.role, updateStudentExample, updateMyStudentExample])
+  }, [context, userDataQuery.data?.isAdmin, userDataQuery.data?.role, updateStudentExample, updateMyStudentExample])
   return {
     activeStudent: context.activeStudent,
     activeLesson: context.activeLesson,

@@ -29,7 +29,7 @@ interface ActiveStudentProviderProps {
 }
 
 export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) {
-  const { userData } = useUserData()
+  const userDataQuery = useUserData()
   const { getAllUsersFromBackend, getActiveExamplesFromBackend, getMyExamplesFromBackend, getProgramsFromBackend, getLessonsFromBackend, getAudioExamplesFromBackend } = useBackend()
 
   // UserData object of the active student
@@ -196,7 +196,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
 
     if (activeStudent?.recordId) {
       try {
-        const dataPromise = userData?.isAdmin
+        const dataPromise = userDataQuery.data?.isAdmin
           ? getActiveExamplesFromBackend(activeStudent?.recordId)
           : getMyExamplesFromBackend()
 
@@ -216,11 +216,11 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       }
     }
     else {
-      if (userData?.isAdmin) {
+      if (userDataQuery.data?.isAdmin) {
         setFlashcardDataSynced(true)
       }
     }
-  }, [activeStudent, getActiveExamplesFromBackend, getMyExamplesFromBackend, matchAndTrimArrays, userData?.isAdmin])
+  }, [activeStudent, getActiveExamplesFromBackend, getMyExamplesFromBackend, matchAndTrimArrays, userDataQuery.data?.isAdmin])
 
   const value = useMemo<ActiveStudentContextProps>(
     () => ({
@@ -260,31 +260,31 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
 
   // If the user has a record in QB, set as Active Student
   useEffect(() => {
-    if (userData?.recordId) {
-      setActiveStudent(userData)
+    if (userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited') {
+      setActiveStudent(userDataQuery.data)
     }
-  }, [userData, setActiveStudent])
+  }, [userDataQuery.data, setActiveStudent])
 
   // If the user is admin, create list of students
   useEffect(() => {
-    if (userData?.isAdmin) {
+    if (userDataQuery.data?.isAdmin) {
       setupStudentList()
     }
-  }, [userData?.isAdmin, setupStudentList])
+  }, [userDataQuery.data, setupStudentList])
 
   // Parse the courses and lessons on load
   useEffect(() => {
-    if (userData?.isAdmin !== undefined && !programTable.length) {
+    if (userDataQuery.isSuccess && !programTable.length) {
       parseCourseLessons()
     }
-  }, [userData, programTable.length, parseCourseLessons])
+  }, [userDataQuery.isSuccess, programTable.length, parseCourseLessons])
 
   // Get the audio examples on load
   useEffect(() => {
-    if (userData?.isAdmin !== undefined && !audioExamplesTable.length) {
+    if (userDataQuery.isSuccess && !audioExamplesTable.length) {
       setupAudioExamplesTable()
     }
-  }, [userData, audioExamplesTable.length, setupAudioExamplesTable])
+  }, [userDataQuery.isSuccess, audioExamplesTable.length, setupAudioExamplesTable])
 
   // If the active student changes, get their level
   useEffect(() => {

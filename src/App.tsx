@@ -26,7 +26,7 @@ export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation()
   const navigate = useNavigate()
-  const { userData } = useUserData()
+  const userDataQuery = useUserData()
   const { activeStudent, activeLesson, activeProgram, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
   const { isAuthenticated, isLoading } = useAuth0()
 
@@ -114,7 +114,7 @@ export const App: React.FC = () => {
   }, [])
 
   const makeStudentSelector = useCallback(() => {
-    if (userData?.isAdmin) {
+    if (userDataQuery.data?.isAdmin) {
       const studentSelector = [
         <option key={0} label="">
           {' '}
@@ -152,7 +152,7 @@ export const App: React.FC = () => {
       studentSelector.sort(studentSelectorSortFunction)
       return studentSelector
     }
-  }, [userData, studentList])
+  }, [userDataQuery.data?.isAdmin, studentList])
 
   const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
     let allowedVocabulary: string[] = []
@@ -233,29 +233,30 @@ export const App: React.FC = () => {
             <p>You must be logged in to use this app.</p>
           )}
           {isLoading && <p>Logging In...</p>}
-          {!isLoading && isAuthenticated && !userData && <p>Loading user data...</p>}
-          {!isLoading && isAuthenticated && userData
-          && (userData?.role === 'student' || userData?.role === 'limited')
-          && !userData.isAdmin && (
+          {!isLoading && isAuthenticated && userDataQuery.isLoading && <p>Loading user data...</p>}
+          {!isLoading && isAuthenticated && userDataQuery.isError && <p>Error loading user data.</p>}
+          {!isLoading && isAuthenticated && userDataQuery.isSuccess
+          && (userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited')
+          && !userDataQuery.data?.isAdmin && (
             <p>
               Welcome back,
-              {` ${userData.name}`}
+              {` ${userDataQuery.data.name}`}
               !
             </p>
           )}
 
-          {!isLoading && isAuthenticated && userData && userData?.role !== 'student'
-          && userData?.role !== 'limited'
-          && !userData?.isAdmin && <p>Welcome back!</p>}
+          {!isLoading && isAuthenticated && userDataQuery.isSuccess && userDataQuery.data?.role !== 'student'
+          && userDataQuery.data?.role !== 'limited'
+          && !userDataQuery.data?.isAdmin && <p>Welcome back!</p>}
 
-          {userData?.isAdmin && !choosingStudent && (
+          {userDataQuery.data?.isAdmin && !choosingStudent && (
             <div className="studentList">
               {activeStudent?.recordId && (
                 <p>
                   Using as
                   {' '}
                   {activeStudent.name}
-                  {activeStudent.recordId === userData.recordId
+                  {activeStudent.recordId === userDataQuery.data?.recordId
                   && ' (yourself)'}
                 </p>
               )}
@@ -263,7 +264,7 @@ export const App: React.FC = () => {
               <button type="button" onClick={chooseStudent}>Change</button>
             </div>
           )}
-          {userData?.isAdmin && choosingStudent && (
+          {userDataQuery.data?.isAdmin && choosingStudent && (
             <form className="studentList" onSubmit={e => e.preventDefault}>
               <select
                 value={activeStudent ? activeStudent.recordId : undefined}
@@ -338,7 +339,7 @@ export const App: React.FC = () => {
         <Route
           path="/flashcardfinder"
           element={
-            (userData?.role === 'student' || userData?.isAdmin) && (
+            (userDataQuery.data?.role === 'student' || userDataQuery.data?.isAdmin) && (
               <FlashcardFinder
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
@@ -354,9 +355,9 @@ export const App: React.FC = () => {
         <Route
           path="/audioquiz"
           element={
-            (userData?.role === 'student'
-            || userData?.role === 'limited'
-            || userData?.isAdmin) && (
+            (userDataQuery.data?.role === 'student'
+            || userDataQuery.data?.role === 'limited'
+            || userDataQuery.data?.isAdmin) && (
               <AudioQuiz
                 updateBannerMessage={updateBannerMessage}
                 filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
@@ -371,9 +372,9 @@ export const App: React.FC = () => {
         <Route
           path="/comprehensionquiz"
           element={
-            (userData?.role === 'student'
-            || userData?.role === 'limited'
-            || userData?.isAdmin) && (
+            (userDataQuery.data?.role === 'student'
+            || userDataQuery.data?.role === 'limited'
+            || userDataQuery.data?.isAdmin) && (
               <ComprehensionQuiz
                 updateBannerMessage={updateBannerMessage}
                 filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
@@ -388,7 +389,7 @@ export const App: React.FC = () => {
         <Route
           path="/frequensay"
           element={
-            userData?.isAdmin && (
+            userDataQuery.data?.isAdmin && (
               <FrequenSay
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}

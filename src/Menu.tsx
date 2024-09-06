@@ -6,7 +6,7 @@ import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 export default function Menu() {
-  const { userData } = useUserData()
+  const userDataQuery = useUserData()
   const { activeStudent, studentFlashcardData, flashcardDataSynced, syncFlashcards } = useActiveStudent()
 
   useEffect(() => {
@@ -18,12 +18,12 @@ export default function Menu() {
   // may be the wrong variable to use, but check for initial data render before showing Menu
   return (
     <div className="menu">
-      {userData?.recordId && !flashcardDataSynced && (
+      {userDataQuery.isSuccess && !flashcardDataSynced && (
         <div className="menuBox">
           <h3>Syncing Data...</h3>
         </div>
       )}
-      {flashcardDataSynced
+      {userDataQuery.isSuccess && flashcardDataSynced
         ? (
             <div className="menuBox">
               {activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length
@@ -52,7 +52,7 @@ export default function Menu() {
                   Official Quizzes
                 </Link>
               </div>
-              {(userData?.role === 'student' || userData?.role === 'limited' || userData?.isAdmin) && (
+              {(userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited' || userDataQuery.data?.isAdmin) && (
                 <div className="buttonBox">
                   <Link className="linkButton" to="/audioquiz">
                     Audio Quiz
@@ -62,14 +62,14 @@ export default function Menu() {
                   </Link>
                 </div>
               )}
-              {(userData?.role === 'student' || userData?.isAdmin) && (
+              {(userDataQuery.data?.role === 'student' || userDataQuery.data?.isAdmin) && (
                 <div className="buttonBox">
                   <Link className="linkButton" to="/flashcardfinder">
                     Find Flashcards
                   </Link>
                 </div>
               )}
-              {userData?.isAdmin && (
+              {userDataQuery.data?.isAdmin && (
                 <div>
                   <h3>Staff Tools</h3>
                   <div className="buttonBox">
@@ -87,7 +87,7 @@ export default function Menu() {
             </div>
           )
         : (
-            userData?.isAdmin !== undefined && !userData?.recordId && (
+            userDataQuery.isSuccess && !userDataQuery.data?.recordId && (
               <div className="menuBox">
                 <h3>Quizzing Tools:</h3>
                 <div className="buttonBox">
