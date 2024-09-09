@@ -15,12 +15,12 @@ export interface ActiveStudentContextProps {
   choosingStudent: boolean
   chooseStudent: () => void
   keepStudent: () => void
-  studentList: UserData[]
   updateActiveStudent: (studentID: number) => void
   flashcardDataSynced: boolean
   setFlashcardDataSynced: (synced: boolean) => void
   syncFlashcards: () => void
-  programsQuery: UseQueryResult <Program[]>
+  programsQuery: UseQueryResult <Program[] | undefined>
+  studentListQuery: UseQueryResult <UserData[] | undefined>
   audioExamplesTable: Flashcard[]
 }
 
@@ -40,7 +40,6 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   const activeLesson = useRef<Lesson>()
 
   // If admin, can change the active student from list
-  const [studentList, setStudentList] = useState<UserData[]>([])
   const [choosingStudent, setChoosingStudent] = useState(false)
 
   // States for initial data load independent of user access level
@@ -55,13 +54,13 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   // Tracks syncs to prevent stale data
   const syncNumber = useRef(0)
 
-  const setupStudentList = useCallback(async () => {
-    getAllUsersFromBackend()
-      .then((response) => {
-        if (response)
-          setStudentList(response)
-      })
-  }, [getAllUsersFromBackend])
+  const studentListQuery = useQuery({
+    queryKey: ['students'],
+    queryFn: getAllUsersFromBackend,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    enabled: !!userDataQuery.data?.isAdmin,
+  })
 
   const setupAudioExamplesTable = useCallback(async () => {
     getAudioExamplesFromBackend()
@@ -80,12 +79,14 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   }, [])
 
   const updateActiveStudent = useCallback((studentID: number) => {
-    const newStudent = studentList.find(student => student.recordId === studentID)
-    if (newStudent) {
-      setActiveStudent(newStudent)
-      setChoosingStudent(false)
+    if (studentListQuery.isSuccess) {
+      const newStudent = studentListQuery.data?.find(student => student.recordId === studentID)
+      if (newStudent) {
+        setActiveStudent(newStudent)
+        setChoosingStudent(false)
+      }
     }
-  }, [studentList, setActiveStudent])
+  }, [studentListQuery.isSuccess, studentListQuery.data, setActiveStudent])
 
   function parseLessonsByVocab(courses: Program[], lessonTable: Lesson[]) {
     const newCourseArray: Program[] = [...courses]
@@ -253,12 +254,12 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       choosingStudent,
       chooseStudent,
       keepStudent,
-      studentList,
       updateActiveStudent,
       flashcardDataSynced,
       setFlashcardDataSynced,
       syncFlashcards,
       programsQuery,
+      studentListQuery,
       audioExamplesTable,
     }),
     [
@@ -270,11 +271,11 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       choosingStudent,
       chooseStudent,
       keepStudent,
-      studentList,
       updateActiveStudent,
       flashcardDataSynced,
       syncFlashcards,
       programsQuery,
+      studentListQuery,
       audioExamplesTable,
     ],
   )
@@ -285,13 +286,6 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       setActiveStudent(userDataQuery.data)
     }
   }, [userDataQuery.data, setActiveStudent])
-
-  // If the user is admin, create list of students
-  useEffect(() => {
-    if (userDataQuery.data?.isAdmin) {
-      setupStudentList()
-    }
-  }, [userDataQuery.data, setupStudentList])
 
   // Parse the courses and lessons on load
   useEffect(() => {

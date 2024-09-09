@@ -23,7 +23,7 @@ export default function LessonSelector({
       </option>,
     ]
     if (programsQuery.isSuccess) {
-      programsQuery.data.forEach((item: Program) => {
+      programsQuery.data?.forEach((item: Program) => {
         courseSelector.push(
           <option key={item.recordId} value={item.recordId}>
             {item.name}

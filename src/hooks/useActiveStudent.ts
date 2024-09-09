@@ -212,7 +212,7 @@ export function useActiveStudent() {
     studentFlashcardData: context.studentFlashcardData,
     programsQuery: context.programsQuery,
     audioExamplesTable: context.audioExamplesTable,
-    studentList: context.studentList,
+    studentListQuery: context.studentListQuery,
     chooseStudent: context.chooseStudent,
     keepStudent: context.keepStudent,
     choosingStudent: context.choosingStudent,

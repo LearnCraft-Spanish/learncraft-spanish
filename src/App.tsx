@@ -6,7 +6,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
-import type { Flashcard, Lesson, Program } from './interfaceDefinitions'
+import type { Flashcard, Lesson, Program, UserData } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
@@ -27,7 +27,7 @@ export const App: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const userDataQuery = useUserData()
-  const { activeStudent, activeLesson, activeProgram, choosingStudent, programsQuery, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const { activeStudent, activeLesson, activeProgram, choosingStudent, programsQuery, studentListQuery, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
   const { isAuthenticated, isLoading } = useAuth0()
 
   // States for Lesson Selector
@@ -121,7 +121,7 @@ export const App: React.FC = () => {
           -- None Selected --
         </option>,
       ]
-      studentList.forEach((student) => {
+      studentListQuery.data?.forEach((student: UserData) => {
         const studentEmail = student.emailAddress
         if (!studentEmail.includes('(')) {
           studentSelector.push(
@@ -152,7 +152,7 @@ export const App: React.FC = () => {
       studentSelector.sort(studentSelectorSortFunction)
       return studentSelector
     }
-  }, [userDataQuery.data?.isAdmin, studentList])
+  }, [userDataQuery.data?.isAdmin, studentListQuery.data])
 
   const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
     let allowedVocabulary: string[] = []
