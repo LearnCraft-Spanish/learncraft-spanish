@@ -427,6 +427,7 @@ will remove from .css when all instances are removed */
 
 .audioExample h3 {
   color: var(--light);
+  z-index: 5;
 }
 
 .progressBarHolder {

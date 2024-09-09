@@ -10,17 +10,16 @@ import type { Flashcard, Lesson, Program, UserData } from './interfaceDefinition
 import SentryRoutes from './functions/SentryRoutes'
 import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
-import AudioQuiz from './AudioQuiz'
 import LoginButton from './components/LoginButton'
 import LogoutButton from './components/LogoutButton'
 import LCSPQuizApp from './LCSPQuizApp'
 import FrequenSay from './FrequenSay'
 import NotFoundPage from './NotFoundPage'
-import ComprehensionQuiz from './ComprehensionQuiz'
 import FlashcardFinder from './FlashcardFinder'
 import CallbackPage from './CallbackPage'
 import FlashcardManager from './FlashcardManager'
 import ReviewMyFlashcards from './ReviewMyFlashcards'
+import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -358,13 +357,15 @@ export const App: React.FC = () => {
             (userDataQuery.data?.role === 'student'
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
-              <AudioQuiz
-                updateBannerMessage={updateBannerMessage}
+              <AudioBasedReview
                 filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
+                willAutoplay
+                willStartWithSpanish={false}
+                audioOrComprehension="audio"
               />
             )
           }
@@ -375,13 +376,14 @@ export const App: React.FC = () => {
             (userDataQuery.data?.role === 'student'
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
-              <ComprehensionQuiz
-                updateBannerMessage={updateBannerMessage}
+              <AudioBasedReview
                 filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
+                willAutoplay={false}
+                willStartWithSpanish
               />
             )
           }
