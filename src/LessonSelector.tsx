@@ -4,7 +4,6 @@ import type { Lesson, Program } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
 
 interface LessonSelectorProps {
-  programTable: Array<Program>
   selectedLesson: Lesson | null
   updateSelectedLesson: (lessonId: string) => void
   selectedProgram: Program | null
@@ -16,20 +15,22 @@ export default function LessonSelector({
   selectedProgram,
   updateSelectedProgram,
 }: LessonSelectorProps) {
-  const { programTable } = useActiveStudent()
+  const { programsQuery } = useActiveStudent()
   function makeCourseSelector() {
     const courseSelector = [
       <option key={0} value={0}>
         –Choose Course–
       </option>,
     ]
-    programTable.forEach((item: Program) => {
-      courseSelector.push(
-        <option key={item.recordId} value={item.recordId}>
-          {item.name}
-        </option>,
-      )
-    })
+    if (programsQuery.isSuccess) {
+      programsQuery.data.forEach((item: Program) => {
+        courseSelector.push(
+          <option key={item.recordId} value={item.recordId}>
+            {item.name}
+          </option>,
+        )
+      })
+    }
     return courseSelector
   }
 

@@ -34,10 +34,6 @@ export default function ComprehensionQuiz({
     <div className="quiz">
       <h2 className="comprehensionHeader">Comprehension Quiz</h2>
       <AudioBasedReview
-        // activeStudent={activeStudent}
-        // programTable={programTable}
-        // studentExamplesTable={studentFlashcardData.studentExamples}
-        // audioExamplesTable={audioExamplesTable}
         filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
         willAutoplay={false}
         willStartWithSpanish

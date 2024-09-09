@@ -27,7 +27,7 @@ export const App: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const userDataQuery = useUserData()
-  const { activeStudent, activeLesson, activeProgram, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const { activeStudent, activeLesson, activeProgram, choosingStudent, programsQuery, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
   const { isAuthenticated, isLoading } = useAuth0()
 
   // States for Lesson Selector
@@ -82,28 +82,28 @@ export const App: React.FC = () => {
       lessonId = Number.parseInt(lessonId)
     }
     let newLesson = null
-    programTable.forEach((program) => {
+    programsQuery.data?.forEach((program) => {
       const foundLesson = program.lessons.find(item => item.recordId === lessonId)
       if (foundLesson) {
         newLesson = foundLesson
       }
     })
     setSelectedLesson(newLesson)
-  }, [programTable])
+  }, [programsQuery?.data])
 
   const updateSelectedProgram = useCallback((programId: number | string) => {
     if (typeof programId === 'string') {
       programId = Number.parseInt(programId)
     }
     let newProgram = null
-    newProgram = programTable.find(program => program.recordId === programId)
+    newProgram = programsQuery.data?.find(program => program.recordId === programId)
     if (newProgram) {
       setSelectedProgram(newProgram)
     }
     else {
       setSelectedProgram(null)
     }
-  }, [programTable])// Add activeProgram, activeLesson when defined
+  }, [programsQuery?.data])// Add activeProgram, activeLesson when defined
 
   const updateBannerMessage = useCallback((message: string) => {
     setBannerMessage(message)
@@ -156,7 +156,7 @@ export const App: React.FC = () => {
 
   const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
     let allowedVocabulary: string[] = []
-    programTable.forEach((program) => {
+    programsQuery.data?.forEach((program) => {
       const foundLesson = program.lessons.find(
         item => item.recordId === lessonId,
       )
@@ -182,7 +182,7 @@ export const App: React.FC = () => {
       return isAllowed
     })
     return filteredByAllowed
-  }, [programTable])
+  }, [programsQuery?.data])
 
   useEffect(() => {
     // change the selected lesson when the selected program changes
@@ -196,7 +196,7 @@ export const App: React.FC = () => {
     else if (selectedProgram?.lessons?.length) {
       updateSelectedLesson(selectedProgram.lessons[0].recordId)
     }
-  }, [activeStudent, activeLesson, activeProgram, selectedProgram, programTable, updateSelectedLesson])
+  }, [activeStudent, activeLesson, activeProgram, selectedProgram, programsQuery?.data, updateSelectedLesson])
 
   useEffect(() => {
     // renders twice if student has an active program
@@ -204,10 +204,10 @@ export const App: React.FC = () => {
       updateSelectedProgram(activeProgram.current.recordId)
     }
     // Setting Default Vaules for selectedProgram and selectedLesson
-    else if (programTable.length) {
-      updateSelectedProgram(programTable[0].recordId)
+    else if (programsQuery?.data?.length) {
+      updateSelectedProgram(programsQuery.data[0].recordId)
     }
-  }, [activeProgram, activeStudent, programTable, updateSelectedProgram])
+  }, [activeProgram, activeStudent, programsQuery?.data, updateSelectedProgram])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)

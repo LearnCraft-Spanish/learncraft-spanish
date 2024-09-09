@@ -1,5 +1,7 @@
 import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import type { UseQueryResult } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import type { Flashcard, Lesson, Program, StudentFlashcardData, UserData } from '../interfaceDefinitions' // Adjust the import based on your project structure
 import { useBackend } from '../hooks/useBackend'
 import { useUserData } from '../hooks/useUserData'
@@ -18,7 +20,7 @@ export interface ActiveStudentContextProps {
   flashcardDataSynced: boolean
   setFlashcardDataSynced: (synced: boolean) => void
   syncFlashcards: () => void
-  programTable: Program[]
+  programsQuery: UseQueryResult <Program[]>
   audioExamplesTable: Flashcard[]
 }
 
@@ -42,7 +44,6 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   const [choosingStudent, setChoosingStudent] = useState(false)
 
   // States for initial data load independent of user access level
-  const [programTable, setProgramTable] = useState<Program[]>([]) // Array of course objects. Each has a property of 'lessons': an array of lesson objects
   const [audioExamplesTable, setAudioExamplesTable] = useState<Flashcard[]>([]) // Array of all audio examples, used to determine whether audio quiz is available
 
   // Flashcard data, recently restructured as an object with two arrays as traits
@@ -120,20 +121,40 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
     return newCourseArray
   }
 
-  const parseCourseLessons = useCallback(async () => {
-    const lessonTable = getLessonsFromBackend()
-    const courses = getProgramsFromBackend()
-    Promise.all([courses, lessonTable]).then((result) => {
-      if (result[0] && result[1]) {
-        const parsedLessons = parseLessonsByVocab(result[0], result[1])
-        setProgramTable(parsedLessons)
+  const parseCourseLessons = useCallback(async (): Promise<Program[]> => {
+    try {
+      const lessonTablePromise = getLessonsFromBackend()
+      const coursesPromise = getProgramsFromBackend()
+
+      // Using Promise.all to wait for both promises to resolve
+      const [courses, lessonTable] = await Promise.all([coursesPromise, lessonTablePromise])
+
+      if (courses && lessonTable) {
+        // Parse lessons based on vocab and return result
+        const parsedLessons: Program[] = parseLessonsByVocab(courses, lessonTable)
+        return parsedLessons
       }
-    })
+      else {
+        throw new Error('Failed to get programs or lessons')
+      }
+    }
+    catch (error) {
+      console.error(error)
+      throw error // Re-throw to propagate the error
+    }
   }, [getLessonsFromBackend, getProgramsFromBackend])
 
+  const programsQuery = useQuery({
+    queryKey: ['programs'],
+    queryFn: parseCourseLessons,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    enabled: !!userDataQuery.isSuccess,
+  })
+
   const getStudentLevel = useCallback(() => {
-    if (activeStudent?.recordId && programTable.length) {
-      let studentProgram = programTable.find(
+    if (activeStudent?.recordId && programsQuery.data?.length) {
+      let studentProgram = programsQuery.data.find(
         program => program.recordId === activeStudent.relatedProgram,
       )
       if (studentProgram?.recordId) {
@@ -169,7 +190,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
         activeLesson.current = lastKnownLesson
       }
     }
-  }, [activeStudent, programTable])
+  }, [activeStudent, programsQuery.data])
 
   const matchAndTrimArrays = useCallback((flashcardData: StudentFlashcardData) => {
     const exampleArray = flashcardData.examples
@@ -237,7 +258,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       flashcardDataSynced,
       setFlashcardDataSynced,
       syncFlashcards,
-      programTable,
+      programsQuery,
       audioExamplesTable,
     }),
     [
@@ -253,7 +274,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
       updateActiveStudent,
       flashcardDataSynced,
       syncFlashcards,
-      programTable,
+      programsQuery,
       audioExamplesTable,
     ],
   )
@@ -274,10 +295,10 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
 
   // Parse the courses and lessons on load
   useEffect(() => {
-    if (userDataQuery.isSuccess && !programTable.length) {
+    if (userDataQuery.isSuccess && !programsQuery.data?.length) {
       parseCourseLessons()
     }
-  }, [userDataQuery.isSuccess, programTable.length, parseCourseLessons])
+  }, [userDataQuery.isSuccess, programsQuery.data?.length, parseCourseLessons])
 
   // Get the audio examples on load
   useEffect(() => {
@@ -289,7 +310,7 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
   // If the active student changes, get their level
   useEffect(() => {
     getStudentLevel()
-  }, [activeStudent, programTable, getStudentLevel])
+  }, [activeStudent, programsQuery.data, getStudentLevel])
 
   // If the state of the flashcard data changes between updates, sync it with the database
   useEffect(() => {

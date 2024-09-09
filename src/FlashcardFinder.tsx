@@ -32,7 +32,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     }: FlashcardFinderProps,
     currentContextual,
   ) => {
-    const { activeStudent, studentFlashcardData, programTable, addToActiveStudentFlashcards } = useActiveStudent()
+    const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards } = useActiveStudent()
     const {
       getVerifiedExamplesFromBackend,
       getVocabFromBackend,
@@ -558,7 +558,6 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                     )}
                   </div>
                   <LessonSelector
-                    programTable={programTable}
                     selectedLesson={selectedLesson}
                     updateSelectedLesson={updateSelectedLesson}
                     selectedProgram={selectedProgram}
