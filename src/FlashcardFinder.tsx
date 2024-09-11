@@ -4,6 +4,7 @@ import { useBackend } from './hooks/useBackend'
 
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import { useActiveStudent } from './hooks/useActiveStudent'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 
 import './App.css'
 
@@ -32,7 +33,8 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     }: FlashcardFinderProps,
     currentContextual,
   ) => {
-    const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards } = useActiveStudent()
+    const { activeStudent } = useActiveStudent()
+    const { flashcardDataQuery, addFlashcardMutation } = useStudentFlashcards()
     const {
       getVerifiedExamplesFromBackend,
       getVocabFromBackend,
@@ -115,7 +117,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const labelAssignedExamples = useCallback((examples: Flashcard[]) => {
       const newArray = [...examples]
       newArray.forEach((example) => {
-        const assignedExample = studentFlashcardData?.studentExamples.find(
+        const assignedExample = flashcardDataQuery.data?.studentExamples.find(
           item => item.relatedExample === example.recordId,
         )
         if (assignedExample) {
@@ -126,7 +128,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         }
       })
       return newArray
-    }, [studentFlashcardData])
+    }, [flashcardDataQuery.data?.studentExamples])
 
     const filterExamplesBySelectedTags = useCallback((examples: Flashcard[]) => {
       if (requiredTags.length > 0) {
@@ -424,19 +426,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       newFlashcardObject.isCollected = true
       newDisplayExampleTable[exampleIndex] = newFlashcardObject
       setDisplayExamples(newDisplayExampleTable)
-      addToActiveStudentFlashcards(exampleIdNumber).then((addResponse) => {
-        if (addResponse !== 1) {
-          if (tableExample) {
-            tableExample.isCollected = false
-          }
-          const revertedExampleTable = [...displayExamples]
-          const exampleIndex = revertedExampleTable.findIndex(example => example.recordId === exampleIdNumber)
-          const newFlashcardObject = { ...exampleToUpdate }
-          newFlashcardObject.isCollected = false
-          revertedExampleTable[exampleIndex] = newFlashcardObject
-          setDisplayExamples(revertedExampleTable)
-        }
-      })
+      addFlashcardMutation.mutate(newFlashcardObject)
     }
 
     function displayExamplesTable() {

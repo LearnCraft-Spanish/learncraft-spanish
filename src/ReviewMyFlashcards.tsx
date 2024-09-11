@@ -6,14 +6,14 @@ import type { FormEvent } from 'react'
 import { set } from 'lodash'
 import type { Flashcard } from './interfaceDefinitions'
 
-import { useActiveStudent } from './hooks/useActiveStudent'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import MenuButton from './components/MenuButton'
 import Quiz from './components/Quiz'
 import SRSQuizApp from './SRSQuizApp'
 
 export default function MyFlashcardsQuiz() {
-  const { studentFlashcardData, flashcardDataSynced } = useActiveStudent()
-  const [quizExamples, setQuizExamples] = useState<Flashcard[]>(studentFlashcardData?.examples || [])
+  const { flashcardDataQuery } = useStudentFlashcards()
+  const [quizExamples, setQuizExamples] = useState<Flashcard[]>(flashcardDataQuery.data?.examples || [])
   const [isSrs, setIsSrs] = useState<boolean>(false)
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false)
   const [quizLength, setQuizLength] = useState<number>(10)
@@ -35,11 +35,11 @@ export default function MyFlashcardsQuiz() {
   }
 
   const getStudentExampleFromExample = useCallback((example: Flashcard) => {
-    const relatedStudentExample = studentFlashcardData?.studentExamples.find(
+    const relatedStudentExample = flashcardDataQuery.data?.studentExamples.find(
       element => element.relatedExample === example.recordId,
     )
     return relatedStudentExample
-  }, [studentFlashcardData])
+  }, [flashcardDataQuery.data?.studentExamples])
 
   const getDueDateFromExample = useCallback((example: Flashcard) => {
     const relatedStudentExample = getStudentExampleFromExample(example)
@@ -51,7 +51,7 @@ export default function MyFlashcardsQuiz() {
   }, [getStudentExampleFromExample])
 
   const getDueExamples = useCallback(() => {
-    if (!studentFlashcardData) {
+    if (!flashcardDataQuery.data) {
       return []
     }
     const isBeforeToday = (dateArg: string) => {
@@ -62,7 +62,7 @@ export default function MyFlashcardsQuiz() {
       }
       return true
     }
-    const allExamples = [...studentFlashcardData.examples]
+    const allExamples = [...flashcardDataQuery.data.examples]
     const dueExamples = allExamples.filter(
       example =>
         isBeforeToday(
@@ -70,7 +70,7 @@ export default function MyFlashcardsQuiz() {
         ),
     )
     return dueExamples
-  }, [getDueDateFromExample, studentFlashcardData])
+  }, [getDueDateFromExample, flashcardDataQuery.data])
 
   function calculateQuizLengthOptions() {
     const quizLengthOptions = []
@@ -91,9 +91,9 @@ export default function MyFlashcardsQuiz() {
       setQuizExamples(dueExamples)
     }
     else {
-      setQuizExamples(studentFlashcardData?.examples || [])
+      setQuizExamples(flashcardDataQuery.data?.examples || [])
     }
-  }, [isSrs, studentFlashcardData?.examples, getDueExamples])
+  }, [isSrs, flashcardDataQuery.data?.examples, getDueExamples])
 
   useEffect(() => {
     if (location.pathname !== '/myflashcards') {
@@ -167,7 +167,7 @@ export default function MyFlashcardsQuiz() {
           )}
         />
       </Routes>
-      {flashcardDataSynced && !studentFlashcardData?.studentExamples?.length
+      {flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.studentExamples?.length
       && <Navigate to="/" />}
     </div>
   )

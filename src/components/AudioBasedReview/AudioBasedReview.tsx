@@ -4,6 +4,8 @@ import '../../App.css'
 
 import LessonSelector from '../../LessonSelector'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
+import { useAudioExamplesTable } from '../../hooks/useAudioExamplesTable'
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
 import type { Flashcard } from '../../interfaceDefinitions'
 import AudioQuizButtons from './AudioQuizButtons'
 

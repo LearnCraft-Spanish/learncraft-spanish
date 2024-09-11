@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react'
 
 import './App.css'
 
-import AudioBasedReview from './AudioBasedReview'
+import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
 import type { Flashcard, Lesson, Program } from './interfaceDefinitions'
 
 interface ComprehensionQuizProps {
@@ -29,6 +29,8 @@ export default function ComprehensionQuiz({
       rendered.current = true
     }
   }, [])
+
+  const _unused = updateBannerMessage
 
   return (
     <div className="quiz">

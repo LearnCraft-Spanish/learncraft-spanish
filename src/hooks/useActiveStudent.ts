@@ -1,226 +1,108 @@
-import { useCallback, useContext } from 'react'
-import debounce from 'lodash/debounce'
-import ActiveStudentContext from '../contexts/ActiveStudentContext'
-
+import { useCallback, useEffect, useRef } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import type { Lesson, Program, UserData } from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
 import { useUserData } from './useUserData'
+import { useProgramTable } from './useProgramTable'
 
 export function useActiveStudent() {
-  const context = useContext(ActiveStudentContext)
-
-  // Should this be using the Context, or the useUserData hook?
+  const { getAllUsersFromBackend } = useBackend()
+  const { programTableQuery } = useProgramTable()
   const userDataQuery = useUserData()
+  const queryClient = useQueryClient()
 
-  const {
-    createStudentExample,
-    createMyStudentExample,
-    deleteStudentExample,
-    deleteMyStudentExample,
-    updateMyStudentExample,
-    updateStudentExample,
-  } = useBackend()
-  if (!context) {
-    throw new Error('useActiveStudent must be used within an ActiveStudentProvider')
+  // Lookup of the active student's default program and lesson when the program table is ready.
+  const activeProgram = useRef<Program | null>(null)
+  const activeLesson = useRef<Lesson | null>(null)
+
+  const studentListQuery = useQuery({
+    queryKey: ['studentList'],
+    queryFn: getAllUsersFromBackend,
+    staleTime: Infinity,
+    enabled: !!userDataQuery.data?.isAdmin, // Only fetch if the user is an admin
+  })
+
+  async function getActiveStudent(): Promise<UserData | null> {
+    if (userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited') {
+      return userDataQuery.data // Students are their own activeStudent
+    }
+    else if (userDataQuery.data?.isAdmin) {
+      return queryClient.getQueryData(['activeStudentSelection']) || null// Admin-selected activeStudent
+    }
+    else {
+      return null
+    }
   }
 
-  const addToActiveStudentFlashcards = useCallback(async (recordId: number) => {
-    context.setFlashcardDataSynced(false)
-    // updateBannerMessage('Adding Flashcard...')
-    if (context.activeStudent?.recordId && userDataQuery.data?.isAdmin) {
-      try {
-        const data = await createStudentExample(
-          context.activeStudent?.recordId,
-          recordId,
-        ).then((result: number | undefined) => {
-          if (result === 1) {
-            // updateBannerMessage('Flashcard Added!')
-            debounce(context.syncFlashcards, 500)
-          }
-          else {
-            console.error('Failed to add Flashcard')
-            // updateBannerMessage('Failed to add Flashcard')
-          }
-          return result
-        })
-        return data
-      }
-      catch (e: unknown) {
-        if (e instanceof Error) {
-          console.error(e.message)
-        }
-        else {
-          console.error('An unexpected error occurred:', e)
-        }
-        return false
-      }
-    }
-    else if (context.activeStudent?.recordId && userDataQuery.data?.role === 'student') {
-      try {
-        const data = await createMyStudentExample(recordId)
-          .then((result) => {
-            if (result === 1) {
-              // updateBannerMessage('Flashcard Added!')
-              context.syncFlashcards()
-            }
-            else {
-              // updateBannerMessage('Failed to add Flashcard')
-              console.error('Failed to add Flashcard')
-            }
-            return result
-          })
-        return data
-      }
-      catch (e: unknown) {
-        if (e instanceof Error) {
-          console.error(e.message)
-        }
-        else {
-          console.error('An unexpected error occurred:', e)
-        }
-        return false
-      }
-    }
-  }, [context, userDataQuery.data?.isAdmin, userDataQuery.data?.role, createStudentExample, createMyStudentExample])
+  const activeStudentQuery = useQuery<UserData | null>({
+    queryKey: ['activeStudent'],
+    queryFn: getActiveStudent,
+    staleTime: Infinity,
+    enabled: !!userDataQuery.data, // Only run once userData is available
+  })
 
-  const removeFlashcardFromActiveStudent = useCallback(async (exampleRecordId: number) => {
-    context.setFlashcardDataSynced(false)
-    // setBannerMessage('Removing Flashcard')
-    const exampleRecordIdInt = exampleRecordId
-    const getStudentExampleRecordId = () => {
-      const relatedStudentExample = context.studentFlashcardData?.studentExamples?.find(
-        element => element.relatedExample === exampleRecordIdInt,
+  const chooseStudent = (studentId: number | null) => {
+    if (userDataQuery.data?.isAdmin) {
+      const student = studentListQuery.data?.find(student => student.recordId === studentId) || null
+      queryClient.setQueryData(['activeStudentSelection'], student)
+    }
+  }
+
+  const getStudentLevel = useCallback(() => {
+    if (activeStudentQuery.data?.recordId && programTableQuery.data?.length) {
+      let studentProgram = programTableQuery.data.find(
+        program => program.recordId === activeStudentQuery.data?.relatedProgram,
       )
-      return relatedStudentExample?.recordId
-    }
-    const studentExampleRecordId = getStudentExampleRecordId()
-    if (studentExampleRecordId && userDataQuery.data?.isAdmin) {
-      try {
-        const data = await deleteStudentExample(studentExampleRecordId)
-          .then((result) => {
-            if (result === 1) {
-              // setBannerMessage('Flashcard removed!')
-              context.syncFlashcards()
-            }
-            else {
-              // setBannerMessage('Failed to remove flashcard')
-              console.error('Failed to remove flashcard')
-            }
-            return result
-          })
-        return data
-      }
-      catch (e: unknown) {
-        if (e instanceof Error) {
-          console.error(e.message)
+      if (studentProgram?.recordId) {
+        const studentCohort = activeStudentQuery.data.cohort
+        const getCohortLesson = (cohort: string) => {
+          switch (cohort) {
+            case 'A': return studentProgram?.cohortACurrentLesson
+            case 'B': return studentProgram?.cohortBCurrentLesson
+            case 'C': return studentProgram?.cohortCCurrentLesson
+            case 'D': return studentProgram?.cohortDCurrentLesson
+            case 'E': return studentProgram?.cohortECurrentLesson
+            // case 'F': return studentProgram?.cohortFCurrentLesson
+            // case 'G': return studentProgram?.cohortGCurrentLesson
+            // etc for futureproofing
+          }
         }
-        else {
-          console.error('An unexpected error occurred:', e)
-        }
-      }
-    }
-    else if (studentExampleRecordId && userDataQuery.data?.role === 'student') {
-      try {
-        const data = await deleteMyStudentExample(studentExampleRecordId)
-          .then((result) => {
-            if (result === 1) {
-              // setBannerMessage('Flashcard removed!')
-              context.syncFlashcards()
-            }
-            else {
-              // setBannerMessage('Failed to remove flashcard')
-              console.error('Failed to remove flashcard')
-            }
-            return result
-          })
-        return data
-      }
-      catch (e: unknown) {
-        if (e instanceof Error) {
-          console.error(e.message)
-        }
-        else {
-          console.error('An unexpected error occurred:', e)
-        }
+        const cohortLesson = getCohortLesson(studentCohort)
+        const maxLesson = cohortLesson || 9999
+        const lessonList: Lesson[] = []
+        const programWithLessonList: Program = { ...studentProgram }
+        programWithLessonList.lessons?.forEach((lesson) => {
+          const lessonArray = lesson.lesson.split(' ')
+          const lessonString = lessonArray.slice(-1)[0]
+          const lessonNumber = Number.parseInt(lessonString)
+          if (lessonNumber <= maxLesson) {
+            lessonList.push({ ...lesson })
+          }
+        })
+        programWithLessonList.lessons = lessonList
+        studentProgram = programWithLessonList
+        const lastKnownLesson: Lesson = programWithLessonList.lessons.slice(-1)[0] || {}
+        activeProgram.current = studentProgram
+        activeLesson.current = lastKnownLesson
       }
     }
     else {
-      // setBannerMessage('Flashcard not found')
-      console.error('Flashcard not found')
-      return 0
+      activeProgram.current = null
+      activeLesson.current = null
     }
-  }, [userDataQuery.data?.isAdmin, userDataQuery.data?.role, context, deleteStudentExample, deleteMyStudentExample])
+  }, [activeStudentQuery.data, programTableQuery.data])
 
-  const updateActiveStudentFlashcard = useCallback(async (studentExampleRecordId: number, newInterval: number) => {
-    context.setFlashcardDataSynced(false)
-    // updateBannerMessage('Updating Flashcard...')
-    if (context.activeStudent?.recordId && userDataQuery.data?.isAdmin) {
-      try {
-        const data = await updateStudentExample(studentExampleRecordId, newInterval)
-          .then((result: number | undefined) => {
-            if (result === studentExampleRecordId) {
-              // updateBannerMessage('Flashcard Updated!')
-              context.syncFlashcards()
-            }
-            else {
-              console.error('Failed to update Flashcard')
-              // updateBannerMessage('Failed to update Flashcard')
-            }
-            return result
-          })
-        return data
-      }
-      catch (e: unknown) {
-        if (e instanceof Error) {
-          console.error(e.message)
-        }
-        else {
-          console.error('An unexpected error occurred:', e)
-        }
-      }
-    }
-    else if (context.activeStudent?.recordId && userDataQuery.data?.role === 'student') {
-      try {
-        const data = await updateMyStudentExample(studentExampleRecordId, newInterval)
-          .then((result) => {
-            if (result === studentExampleRecordId) {
-              // updateBannerMessage('Flashcard Updated!')
-              context.syncFlashcards()
-            }
-            else {
-              console.error('Failed to update Flashcard')
-              // updateBannerMessage('Failed to update Flashcard')
-            }
-            return result
-          })
-        return data
-      }
-      catch (e: unknown) {
-        if (e instanceof Error) {
-          console.error(e.message)
-        }
-        else {
-          console.error('An unexpected error occurred:', e)
-        }
-      }
-    }
-  }, [context, userDataQuery.data?.isAdmin, userDataQuery.data?.role, updateStudentExample, updateMyStudentExample])
+  useEffect(() => {
+    getStudentLevel()
+  }, [getStudentLevel])
+
   return {
-    activeStudent: context.activeStudent,
-    activeLesson: context.activeLesson,
-    activeProgram: context.activeProgram,
-    updateActiveStudent: context.updateActiveStudent,
-    studentFlashcardData: context.studentFlashcardData,
-    programsQuery: context.programsQuery,
-    audioExamplesTable: context.audioExamplesTable,
-    studentListQuery: context.studentListQuery,
-    chooseStudent: context.chooseStudent,
-    keepStudent: context.keepStudent,
-    choosingStudent: context.choosingStudent,
-    flashcardDataSynced: context.flashcardDataSynced,
-    syncFlashcards: context.syncFlashcards,
-
-    addToActiveStudentFlashcards,
-    removeFlashcardFromActiveStudent,
-    updateActiveStudentFlashcard,
+    activeStudent: activeStudentQuery.data,
+    activeProgram: activeProgram.current,
+    activeLesson: activeLesson.current,
+    studentList: studentListQuery.data,
+    chooseStudent,
+    isLoading: activeStudentQuery.isLoading || studentListQuery.isLoading,
+    isError: activeStudentQuery.isError || studentListQuery.isError,
   }
 }

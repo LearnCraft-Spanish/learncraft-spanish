@@ -7,7 +7,7 @@ import QuizButtons from '../components/QuizButtons'
 import QuizProgress from '../components/QuizProgress'
 import MenuButton from '../components/MenuButton'
 import SRSQuizButtons from '../components/SRSButtons'
-import { useActiveStudent } from '../hooks/useActiveStudent'
+import { useActiveStudent } from '../hooks/useStudentFlashcardMutations'
 
 interface QuizProps {
   quizTitle: string

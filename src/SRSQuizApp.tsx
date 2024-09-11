@@ -6,6 +6,7 @@ import Quiz from './components/Quiz'
 
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 
 interface SRSQuizAppProps {
   startWithSpanish?: boolean
@@ -20,18 +21,19 @@ export default function SRSQuizApp({
 }: SRSQuizAppProps) {
   // const quizLength = 20 //will be used to determine how many examples to review
 
-  const { activeStudent, studentFlashcardData, flashcardDataSynced } = useActiveStudent()
+  const { flashcardDataQuery } = useStudentFlashcards()
+  const { activeStudent } = useActiveStudent()
   const [quizReady, setQuizReady] = useState(false)
   const [examplesToReview, setExamplesToReview] = useState<Flashcard[]>([])
 
   /*        Setup Quiz Functions        */
 
   const getStudentExampleFromExample = useCallback((example: Flashcard) => {
-    const relatedStudentExample = studentFlashcardData?.studentExamples.find(
+    const relatedStudentExample = flashcardDataQuery.data?.studentExamples.find(
       element => element.relatedExample === example.recordId,
     )
     return relatedStudentExample
-  }, [studentFlashcardData])
+  }, [flashcardDataQuery.data?.studentExamples])
 
   const getDueDateFromExample = useCallback((example: Flashcard) => {
     const relatedStudentExample = getStudentExampleFromExample(example)
@@ -43,7 +45,7 @@ export default function SRSQuizApp({
   }, [getStudentExampleFromExample])
 
   const getDueExamples = useCallback(() => {
-    if (!studentFlashcardData) {
+    if (!flashcardDataQuery.data) {
       return []
     }
     const isBeforeToday = (dateArg: string) => {
@@ -54,7 +56,7 @@ export default function SRSQuizApp({
       }
       return true
     }
-    const allExamples = [...studentFlashcardData.examples]
+    const allExamples = [...flashcardDataQuery.data.examples]
     const dueExamples = allExamples.filter(
       example =>
         isBeforeToday(
@@ -62,7 +64,7 @@ export default function SRSQuizApp({
         ),
     )
     return dueExamples
-  }, [getDueDateFromExample, studentFlashcardData])
+  }, [getDueDateFromExample, flashcardDataQuery.data])
 
   const handleSetupQuiz = useCallback(() => {
     const dueExamples = getDueExamples()
@@ -76,10 +78,10 @@ export default function SRSQuizApp({
   }
 
   useEffect(() => {
-    if (!quizReady && flashcardDataSynced) {
+    if (!quizReady && flashcardDataQuery.isSuccess) {
       handleSetupQuiz()
     }
-  }, [flashcardDataSynced, quizReady, handleSetupQuiz])
+  }, [flashcardDataQuery.isSuccess, quizReady, handleSetupQuiz])
 
   return (
     activeStudent?.recordId && (

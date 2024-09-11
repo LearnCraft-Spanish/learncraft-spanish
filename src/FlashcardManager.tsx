@@ -1,45 +1,20 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 
-import { result } from 'lodash'
 import { Navigate } from 'react-router-dom'
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import type { Flashcard } from './interfaceDefinitions'
-import { useActiveStudent } from './hooks/useActiveStudent'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 
 function FlashcardManager() {
-  const { studentFlashcardData, flashcardDataSynced, removeFlashcardFromActiveStudent } = useActiveStudent()
-
-  const [displayExamplesTable, setDisplayExamplesTable] = React.useState<Flashcard[]>([])
+  const { flashcardDataQuery, removeFlashcardMutation } = useStudentFlashcards()
+  const studentFlashcardData = flashcardDataQuery.data
+  const removeFlashcard = removeFlashcardMutation.mutate
 
   async function removeAndUpdate(recordId: number | string) {
     if (typeof recordId === 'string') {
       recordId = Number.parseInt(recordId)
     }
-    const itemToRemove = displayExamplesTable.find(item => item.recordId === recordId)
-    if (itemToRemove?.recordId) {
-      const itemPosition = displayExamplesTable.findIndex(
-        item => item.recordId === recordId,
-      )
-      const newTable = [...displayExamplesTable]
-      newTable.splice(itemPosition, 1)
-      setDisplayExamplesTable(newTable)
-      await removeFlashcardFromActiveStudent(recordId)
-        .then((result) => {
-          if (result !== 1) {
-            const itemDisplays = displayExamplesTable.find(item => item.recordId === recordId)
-            if (!itemDisplays) {
-              const addBackTable = [...displayExamplesTable]
-              addBackTable.splice(itemPosition, 0, itemToRemove)
-              setDisplayExamplesTable(addBackTable)
-            }
-          }
-        })
-        .catch((e: unknown) => {
-          if (e instanceof Error) {
-            console.error(e)
-          }
-        })
-    }
+    removeFlashcard(recordId)
   }
 
   function getStudentExampleFromExampleId(exampleId: number) {
@@ -106,24 +81,20 @@ function FlashcardManager() {
     return finalTable
   }
 
-  useEffect(() => {
-    setDisplayExamplesTable(studentFlashcardData?.examples || [])
-  }, [studentFlashcardData?.examples])
-
   return studentFlashcardData?.examples?.length
     ? (
         <div>
           <h2>Flashcard Manager</h2>
           <h4>
-            {`Total flashcards: ${displayExamplesTable.length}`}
+            {`Total flashcards: ${studentFlashcardData?.examples.length}`}
           </h4>
           <div className="exampleCardContainer">
-            {createDisplayExamplesTable(displayExamplesTable)}
+            {createDisplayExamplesTable(studentFlashcardData?.examples)}
           </div>
         </div>
       )
     : (
-        flashcardDataSynced && <Navigate to="/" />
+        !flashcardDataQuery.isSuccess && <Navigate to="/" />
       )
 }
 

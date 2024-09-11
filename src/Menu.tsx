@@ -4,29 +4,30 @@ import './App.css'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 
 export default function Menu() {
   const userDataQuery = useUserData()
-  const { activeStudent, studentFlashcardData, flashcardDataSynced, syncFlashcards } = useActiveStudent()
-
-  useEffect(() => {
-    if (!flashcardDataSynced) {
-      syncFlashcards()
-    }
-  }, [flashcardDataSynced, syncFlashcards])
+  const { activeStudent } = useActiveStudent()
+  const { flashcardDataQuery } = useStudentFlashcards()
 
   // may be the wrong variable to use, but check for initial data render before showing Menu
   return (
     <div className="menu">
-      {userDataQuery.isSuccess && !flashcardDataSynced && (
+      {flashcardDataQuery.isError && (
+        <div className="menuBox">
+          <h3>Error Loading Data</h3>
+        </div>
+      )}
+      {userDataQuery.isSuccess && flashcardDataQuery.isLoading && (
         <div className="menuBox">
           <h3>Syncing Data...</h3>
         </div>
       )}
-      {userDataQuery.isSuccess && flashcardDataSynced
+      {userDataQuery.isSuccess && flashcardDataQuery.isSuccess
         ? (
             <div className="menuBox">
-              {activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length
+              {activeStudent?.role === 'student' && flashcardDataQuery.data?.studentExamples?.length
                 ? (
                     <div>
                       <h3>My Flashcards:</h3>
