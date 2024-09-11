@@ -462,6 +462,12 @@ will remove from .css when all instances are removed */
   z-index: 1;
 }
 
+.audioAutoplayFlashcardWrapper {
+  width: 100%;
+}
+.audioAutoplayFlashcardWrapper .audioExample {
+  border: none;
+}
 
 /* For Flashcard Finder */
 
