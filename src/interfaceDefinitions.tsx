@@ -108,6 +108,17 @@ export interface Examples {
   vocabComplete: boolean
 }
 
+export interface QuizCourse {
+  name: string
+  url: string
+  code: string
+}
+
+export interface DisplayOrder {
+  recordId: number
+  displayOrder: number
+}
+
 export interface Quiz {
   recordId: number
   quizNickname: string

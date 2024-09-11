@@ -1,18 +1,19 @@
 import React, { useCallback, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import type { Flashcard, StudentExample } from '../interfaceDefinitions'
-import FlashcardDisplay from '../components/Flashcard'
-import QuizButtons from '../components/QuizButtons'
-import QuizProgress from '../components/QuizProgress'
-import MenuButton from '../components/MenuButton'
-import SRSQuizButtons from '../components/SRSButtons'
+import type { DisplayOrder, Flashcard, StudentExample } from '../interfaceDefinitions'
 import { useActiveStudent } from '../hooks/useActiveStudent'
 import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
+import FlashcardDisplay from './Flashcard'
+import QuizButtons from './QuizButtons'
+import QuizProgress from './QuizProgress'
+import MenuButton from './MenuButton'
+import SRSQuizButtons from './SRSButtons'
 
-interface QuizProps {
+interface QuizComponentProps {
   quizTitle: string
   examplesToParse: Flashcard[]
+  displayOrder: DisplayOrder[]
   startWithSpanish?: boolean
   quizOnlyCollectedExamples?: boolean
   isSrsQuiz?: boolean
@@ -77,7 +78,7 @@ function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: Stude
   return randomizedQuizExamples.slice(0, quizLengthSafe)
 }
 
-export default function Quiz({
+export default function QuizComponent({
   examplesToParse = [],
   quizTitle,
   startWithSpanish = false,
@@ -86,7 +87,7 @@ export default function Quiz({
   cleanupFunction = () => {},
   quizLength = 1000,
 
-}: QuizProps) {
+}: QuizComponentProps) {
   const location = useLocation()
   const { activeStudent } = useActiveStudent()
   const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation } = useStudentFlashcards()

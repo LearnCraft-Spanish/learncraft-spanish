@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import './App.css'
 import MenuButton from './components/MenuButton'
-import Quiz from './components/Quiz'
+import Quiz from './components/QuizComponent'
 
 import type { Flashcard } from './interfaceDefinitions'
 import { useActiveStudent } from './hooks/useActiveStudent'

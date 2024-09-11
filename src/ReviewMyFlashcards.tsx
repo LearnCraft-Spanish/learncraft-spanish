@@ -8,7 +8,7 @@ import type { Flashcard } from './interfaceDefinitions'
 
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import MenuButton from './components/MenuButton'
-import Quiz from './components/Quiz'
+import QuizComponent from './components/QuizComponent'
 import SRSQuizApp from './SRSQuizApp'
 
 export default function MyFlashcardsQuiz() {
@@ -146,7 +146,7 @@ export default function MyFlashcardsQuiz() {
         <Route
           path="quiz"
           element={(
-            <Quiz
+            <QuizComponent
               examplesToParse={quizExamples}
               quizTitle="My Flashcards"
               quizOnlyCollectedExamples

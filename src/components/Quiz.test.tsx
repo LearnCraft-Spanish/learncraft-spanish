@@ -7,7 +7,7 @@ import { ActiveStudentProvider } from '../contexts/ActiveStudentContext'
 import { UserDataProvider } from '../contexts/UserDataContext'
 import { sampleStudentFlashcardData } from '../../tests/mockData'
 
-import Quiz from './Quiz'
+import Quiz from './QuizComponent'
 
 const addFlashcard = vi.fn()
 const removeFlashcard = vi.fn()

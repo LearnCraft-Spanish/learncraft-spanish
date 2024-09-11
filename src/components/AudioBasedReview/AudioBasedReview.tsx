@@ -5,7 +5,6 @@ import '../../App.css'
 import LessonSelector from '../../LessonSelector'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
 import { useAudioExamples } from '../../hooks/useAudioExamples'
-import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
 import type { Flashcard } from '../../interfaceDefinitions'
 import AudioQuizButtons from './AudioQuizButtons'
 
@@ -111,12 +110,19 @@ export default function AudioBasedReview({
   // will be 'audio' or 'comprehension'
   audioOrComprehension = 'comprehension',
 }: AudioBasedReviewProps) {
-  const { activeStudent } = useActiveStudent()
+  const { activeStudent, isError, isLoading } = useActiveStudent()
   const { audioExamplesQuery } = useAudioExamples()
+
+  // Name Explicit Variables for Query States
+  const _studentLoading = isLoading
+  const _studentError = isError
+  const _audioExamplesLoading = audioExamplesQuery.isLoading
+  const _audioExamplesError = audioExamplesQuery.isError
+  const audioExamplesTable = audioExamplesQuery.data
 
   const [currentExample, setCurrentExample] = useState(0)
   // Examples Table after: filtedBylessonId, shuffled
-  const [examplesToPlay, setExamplesToPlay] = useState<Flashcard[] | []>([])
+  const [examplesToPlay, setExamplesToPlay] = useState<Flashcard[]>([])
   const [quizReady, setQuizReady] = useState(false)
   const [autoplay, setAutoplay] = useState(willAutoplay || false)
   const startWithSpanish = willStartWithSpanish || false
@@ -349,14 +355,18 @@ export default function AudioBasedReview({
       .map(({ value }) => value)
     return shuffled
   }
+
+  // Callback function to make quiz
   const makeComprehensionQuiz = useCallback(() => {
-    const allowedAudioExamples = filterExamplesByAllowedVocab(
-      audioExamplesQuery.data || [],
-      selectedLesson.recordId,
-    )
-    const shuffledExamples = shuffleExamples(allowedAudioExamples)
-    setExamplesToPlay(shuffledExamples)
-  }, [audioExamplesQuery.data, filterExamplesByAllowedVocab, selectedLesson])
+    if (audioExamplesTable) {
+      const allowedAudioExamples = filterExamplesByAllowedVocab(
+        audioExamplesTable,
+        selectedLesson.recordId,
+      )
+      const shuffledExamples = shuffleExamples(allowedAudioExamples)
+      setExamplesToPlay(shuffledExamples)
+    }
+  }, [audioExamplesTable, filterExamplesByAllowedVocab, selectedLesson])
 
   useEffect(() => {
     clearTimeout(currentCountdown.current)
@@ -379,10 +389,10 @@ export default function AudioBasedReview({
 
   useEffect(() => {
     unReadyQuiz()
-    if (selectedLesson?.recordId && selectedProgram?.recordId && !!audioExamplesQuery.data?.length) {
+    if (selectedLesson?.recordId && selectedProgram?.recordId && !!audioExamplesTable?.length) {
       makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson, audioExamplesQuery.data?.length, makeComprehensionQuiz])
+  }, [selectedProgram, selectedLesson, audioExamplesTable?.length, makeComprehensionQuiz])
 
   /*       New Use Effects      */
   // Play Audio when step is taken
