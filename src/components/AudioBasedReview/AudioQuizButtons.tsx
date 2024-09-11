@@ -16,6 +16,7 @@ interface AudioQuizButtonsProps {
   currentExample: number
   pausePlayback: () => void
   resumePlayback: () => void
+  unReadyQuiz: () => void
 }
 export default function AudioQuizButtons({
   audioOrComprehension,
@@ -30,6 +31,7 @@ export default function AudioQuizButtons({
   currentExample,
   pausePlayback,
   resumePlayback,
+  unReadyQuiz,
 }: AudioQuizButtonsProps): JSX.Element {
   function nextStepButtonText(): string {
     switch (audioOrComprehension) {
@@ -87,25 +89,22 @@ export default function AudioQuizButtons({
   return (
     <div>
       <div className="buttonBox">
-        <button type="button" className="greenButton" onClick={() => incrementCurrentStep()}>
-          {nextStepButtonText()}
-        </button>
-      </div>
-      <div className="buttonBox">
+        {previousStepButton()}
         {autoplay && (
           isPlaying
             ? <button type="button" onClick={pausePlayback}>Pause</button>
             : <button type="button" onClick={resumePlayback}>Play</button>
         )}
-      </div>
-      <div className="buttonBox">
-        {previousStepButton()}
+        <button type="button" className="greenButton" onClick={() => incrementCurrentStep()}>
+          {nextStepButtonText()}
+        </button>
       </div>
       <div className="buttonBox">
         <button type="button" onClick={decrementExample}>Previous</button>
         <button type="button" onClick={incrementExample}>Next</button>
       </div>
       <div className="buttonBox">
+        <button type="button" onClick={() => unReadyQuiz()}>Back</button>
         <MenuButton />
       </div>
       <QuizProgress

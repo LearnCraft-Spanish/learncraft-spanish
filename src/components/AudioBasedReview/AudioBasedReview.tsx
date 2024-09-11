@@ -1,11 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import '../../App.css'
 // import './AudioBasedReview.css'
-
+import type { Flashcard } from '../../interfaceDefinitions'
 import LessonSelector from '../../LessonSelector'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
-import type { Flashcard } from '../../interfaceDefinitions'
 import AudioQuizButtons from './AudioQuizButtons'
+import AudioFlashcard from './AudioFlashcard'
+import AudioQuizSetupMenu from './AudioQuizSetupMenu'
+import StepProgressBar from './StepProgressBar'
 
 interface StepValue {
   audio: string
@@ -13,75 +15,12 @@ interface StepValue {
 }
 // new components to break up the logic
 function AudioComponent({ audioUrl, audioRef, playAudio }: { audioUrl: string, audioRef: any, playAudio: () => void }) {
-  // May need to add a ref pass through from parent for controlling audio
   return (
     <audio
       ref={audioRef}
       src={audioUrl}
-      // May change this to a new function that incorporates autoplay
       onLoadedMetadata={() => { playAudio() }}
     />
-  )
-}
-function AudioFlashcardComponent({
-  currentExampleText,
-  incrementCurrentStep,
-  autoplay,
-  progressStatus,
-  currentExample,
-  incrementExample,
-  decrementExample,
-  examplesToPlay,
-}: {
-  currentExampleText: string | JSX.Element
-  incrementCurrentStep: () => void
-  autoplay: boolean
-  progressStatus: number
-  currentExample: number
-  incrementExample: () => void
-  decrementExample: () => void
-  examplesToPlay: any[]
-}) {
-  return (
-    <div className={!autoplay ? 'audioTextBox' : 'audioAutoplayFlashcardWrapper'}>
-      <div
-        className="audioExample"
-        onClick={!autoplay ? () => incrementCurrentStep() : () => {}}
-      >
-        <h3>{currentExampleText}</h3>
-        {/* added event.stopPropagation to prevent the click propgating down to parent, and triggering incrementCurrentStep */}
-        <div className="navigateButtons">
-          {currentExample > 0 && (
-            <a
-              className="previousButton"
-              onClick={(event) => {
-                event.stopPropagation()
-                decrementExample()
-              }}
-            >
-              {'<'}
-            </a>
-          )}
-          {currentExample < examplesToPlay.length - 1 && (
-            <a
-              className="nextButton"
-              onClick={(event) => {
-                event.stopPropagation()
-                incrementExample()
-              }}
-            >
-              {'>'}
-            </a>
-          )}
-        </div>
-        {autoplay && (
-          <div
-            className="progressStatus"
-            style={{ width: `${progressStatus * 100}%` }}
-          />
-        )}
-      </div>
-    </div>
   )
 }
 
@@ -331,7 +270,6 @@ export default function AudioBasedReview({
       case 'answer':
         // This may cause a race condition later
         incrementExample()
-
         // Procede to next question
         break
       default:
@@ -439,50 +377,26 @@ export default function AudioBasedReview({
     <div className="quiz">
       <h2>{audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}</h2>
       {!quizReady && (selectedLesson?.recordId || !activeStudent?.recordId) && (
-        <div className="audioBox">
-          <LessonSelector
-            selectedLesson={selectedLesson}
-            updateSelectedLesson={updateSelectedLesson}
-            selectedProgram={selectedProgram}
-            updateSelectedProgram={updateSelectedProgram}
-          />
-          {startWithSpanish && (
-            <div className="audioBox">
-              <h3>Autoplay:</h3>
-              <select
-                value={autoplay ? 'on' : 'off'}
-                onChange={(e) => {
-                  updateAutoplay(e.target.value)
-                }}
-              >
-                <option value="off">Off</option>
-                <option value="on">On</option>
-              </select>
-            </div>
-          )}
-          <div className="buttonBox">
-            {examplesToPlay.length > 0 && (
-              <button type="button" onClick={readyQuiz}>Start</button>
-            )}
-            {examplesToPlay.length < 1 && (
-              <h4>There are no audio examples for this comprehension level</h4>
-            )}
-          </div>
-        </div>
+        <AudioQuizSetupMenu
+          selectedLesson={selectedLesson}
+          updateSelectedLesson={updateSelectedLesson}
+          selectedProgram={selectedProgram}
+          updateSelectedProgram={updateSelectedProgram}
+          autoplay={autoplay}
+          updateAutoplay={updateAutoplay}
+          examplesToPlayLength={examplesToPlay.length}
+          readyQuiz={readyQuiz}
+          audioOrComprehension={audioOrComprehension}
+        />
       )}
 
       {quizReady && examplesToPlay.length > 0 && (
         <>
           <div className="audioBox">
-            <p>
+            {/* <p>
               {`Comprehension Level: ${selectedProgram.name} Lesson ${selectedLesson?.lesson.split(' ').at(-1)}`}
-            </p>
-            <button type="button" onClick={unReadyQuiz}>Change Level</button>
-            {/*
-            We could break this into its own component, or keep it here
-            (autoplay and audioQuizFlashcard functions)
-            */}
-            <AudioFlashcardComponent
+            </p> */}
+            <AudioFlashcard
               currentExampleText={currentStepValue.text}
               incrementCurrentStep={incrementCurrentStep}
               autoplay={autoplay}
@@ -493,10 +407,6 @@ export default function AudioBasedReview({
               examplesToPlay={examplesToPlay}
             />
             <AudioComponent audioUrl={currentStepValue.audio} audioRef={audioRef} playAudio={playAudio} />
-            {/* AudioQuizFlashcard functions */}
-            {/* {autoplay && progressBar()} */}
-            {/* {questionAudio()}
-            {answerAudio()} */}
           </div>
           <AudioQuizButtons
             incrementCurrentStep={incrementCurrentStep}
@@ -511,6 +421,7 @@ export default function AudioBasedReview({
             currentStep={currentStep}
             examplesToPlay={examplesToPlay}
             currentExample={currentExample}
+            unReadyQuiz={unReadyQuiz}
           />
         </>
       )}
