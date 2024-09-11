@@ -7,7 +7,8 @@ import QuizButtons from '../components/QuizButtons'
 import QuizProgress from '../components/QuizProgress'
 import MenuButton from '../components/MenuButton'
 import SRSQuizButtons from '../components/SRSButtons'
-import { useActiveStudent } from '../hooks/useStudentFlashcardMutations'
+import { useActiveStudent } from '../hooks/useActiveStudent'
+import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
 
 interface QuizProps {
   quizTitle: string
@@ -87,7 +88,11 @@ export default function Quiz({
 
 }: QuizProps) {
   const location = useLocation()
-  const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards, removeFlashcardFromActiveStudent } = useActiveStudent()
+  const { activeStudent } = useActiveStudent()
+  const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation } = useStudentFlashcards()
+  const studentFlashcardData = flashcardDataQuery.data
+  const addFlashcard = addFlashcardMutation.mutate
+  const removeFlashcard = removeFlashcardMutation.mutate
 
   const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentFlashcardData?.studentExamples, quizOnlyCollectedExamples, isSrsQuiz, quizLength))
   const [answerShowing, setAnswerShowing] = useState(false)
@@ -196,7 +201,7 @@ export default function Quiz({
   }
 
   async function removeFlashcardAndUpdate(recordId: number) {
-    const flashcardRemovedPromise = removeFlashcardFromActiveStudent(recordId)
+    const flashcardRemovedPromise = removeFlashcard(recordId)
     const exampleToRemove = examplesToReview.find(
       (example: Flashcard) => example.recordId === recordId,
     )
@@ -210,37 +215,24 @@ export default function Quiz({
           example => example.recordId !== recordId,
         )
         setExamplesToReview(filteredArray)
-        flashcardRemovedPromise.then((result) => {
-          if (result !== 1) {
-            const updatedArray = [...examplesToReview]
-            updatedArray.splice(exampleIndex, 0, exampleToRemove)
-            setExamplesToReview(updatedArray)
-          }
-        })
+        return flashcardRemovedPromise
       }
       else {
         const updatedArray = [...examplesToReview]
         updatedArray[exampleIndex].isCollected = false
         setExamplesToReview(updatedArray)
-        flashcardRemovedPromise
-          .then((result) => {
-            if (result !== 1) {
-              const updatedArray = [...examplesToReview]
-              updatedArray[exampleIndex].isCollected = true
-              setExamplesToReview(updatedArray)
-            }
-          })
+        return flashcardRemovedPromise
       }
     }
   }
 
   async function addFlashcardAndUpdate(recordId: number) {
     if (!quizOnlyCollectedExamples && !isSrsQuiz) {
-      const flashcardAddedPromise = addToActiveStudentFlashcards(recordId)
       const exampleToAdd = examplesToReview.find(
         (example: Flashcard) => example.recordId === recordId,
       )
       if (exampleToAdd) {
+        const flashcardAddedPromise = addFlashcard(exampleToAdd)
         const exampleIndex = examplesToReview.indexOf(exampleToAdd)
         if (exampleIndex < examplesToReview.length - 1) {
           incrementExampleNumber()
@@ -248,14 +240,7 @@ export default function Quiz({
         const updatedArray = [...examplesToReview]
         updatedArray[exampleIndex].isCollected = true
         setExamplesToReview(updatedArray)
-        flashcardAddedPromise
-          .then ((result) => {
-            if (result !== 1) {
-              const updatedArray = [...examplesToReview]
-              updatedArray[exampleIndex].isCollected = false
-              setExamplesToReview(updatedArray)
-            }
-          })
+        return flashcardAddedPromise
       }
     }
   }

@@ -4,7 +4,7 @@ import '../../App.css'
 
 import LessonSelector from '../../LessonSelector'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
-import { useAudioExamplesTable } from '../../hooks/useAudioExamplesTable'
+import { useAudioExamples } from '../../hooks/useAudioExamples'
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
 import type { Flashcard } from '../../interfaceDefinitions'
 import AudioQuizButtons from './AudioQuizButtons'
@@ -111,7 +111,8 @@ export default function AudioBasedReview({
   // will be 'audio' or 'comprehension'
   audioOrComprehension = 'comprehension',
 }: AudioBasedReviewProps) {
-  const { activeStudent, audioExamplesTable } = useActiveStudent()
+  const { activeStudent } = useActiveStudent()
+  const { audioExamplesQuery } = useAudioExamples()
 
   const [currentExample, setCurrentExample] = useState(0)
   // Examples Table after: filtedBylessonId, shuffled
@@ -350,12 +351,12 @@ export default function AudioBasedReview({
   }
   const makeComprehensionQuiz = useCallback(() => {
     const allowedAudioExamples = filterExamplesByAllowedVocab(
-      audioExamplesTable,
+      audioExamplesQuery.data || [],
       selectedLesson.recordId,
     )
     const shuffledExamples = shuffleExamples(allowedAudioExamples)
     setExamplesToPlay(shuffledExamples)
-  }, [audioExamplesTable, filterExamplesByAllowedVocab, selectedLesson])
+  }, [audioExamplesQuery.data, filterExamplesByAllowedVocab, selectedLesson])
 
   useEffect(() => {
     clearTimeout(currentCountdown.current)
@@ -378,10 +379,10 @@ export default function AudioBasedReview({
 
   useEffect(() => {
     unReadyQuiz()
-    if (selectedLesson?.recordId && selectedProgram?.recordId && audioExamplesTable.length > 0) {
+    if (selectedLesson?.recordId && selectedProgram?.recordId && !!audioExamplesQuery.data?.length) {
       makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson, audioExamplesTable.length, makeComprehensionQuiz])
+  }, [selectedProgram, selectedLesson, audioExamplesQuery.data?.length, makeComprehensionQuiz])
 
   /*       New Use Effects      */
   // Play Audio when step is taken
