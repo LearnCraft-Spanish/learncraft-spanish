@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Route, Routes, useNavigate, Navigate } from 'react-router-dom'
 import '../../App.css'
 // import './AudioBasedReview.css'
 import type { Flashcard } from '../../interfaceDefinitions'
@@ -8,6 +9,7 @@ import AudioQuizButtons from './AudioQuizButtons'
 import AudioFlashcard from './AudioFlashcard'
 import AudioQuizSetupMenu from './AudioQuizSetupMenu'
 import StepProgressBar from './StepProgressBar'
+import NewQuizProgress from './NewQuizProgress'
 
 interface StepValue {
   audio: string
@@ -40,7 +42,6 @@ export default function AudioBasedReview({
   // audioExamplesTable,
   filterExamplesByAllowedVocab,
   willAutoplay,
-  willStartWithSpanish,
   selectedLesson,
   selectedProgram,
   updateSelectedLesson,
@@ -49,13 +50,14 @@ export default function AudioBasedReview({
   audioOrComprehension = 'comprehension',
 }: AudioBasedReviewProps) {
   const { activeStudent, audioExamplesTable } = useActiveStudent()
+  const navigate = useNavigate()
 
   const [currentExample, setCurrentExample] = useState(0)
   // Examples Table after: filtedBylessonId, shuffled
   const [examplesToPlay, setExamplesToPlay] = useState<Flashcard[] | []>([])
   const [quizReady, setQuizReady] = useState(false)
   const [autoplay, setAutoplay] = useState(willAutoplay || false)
-  const startWithSpanish = willStartWithSpanish || false
+  // const startWithSpanish = willStartWithSpanish || false
   // example may need to be updated to be a state/ref, currently causing many rerenders
   // const example = examplesToPlay[currentExample] || {}
 
@@ -182,7 +184,7 @@ export default function AudioBasedReview({
     if (!isPlaying) {
       setIsPlaying(true)
     }
-    if (audioRef.current) {
+    if (audioRef.current?.duration) {
       audioRef.current.play()
     }
     updateCountdown()
@@ -375,24 +377,32 @@ export default function AudioBasedReview({
   }
   return (
     <div className="quiz">
-      <h2>{audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}</h2>
       {!quizReady && (selectedLesson?.recordId || !activeStudent?.recordId) && (
-        <AudioQuizSetupMenu
-          selectedLesson={selectedLesson}
-          updateSelectedLesson={updateSelectedLesson}
-          selectedProgram={selectedProgram}
-          updateSelectedProgram={updateSelectedProgram}
-          autoplay={autoplay}
-          updateAutoplay={updateAutoplay}
-          examplesToPlayLength={examplesToPlay.length}
-          readyQuiz={readyQuiz}
-          audioOrComprehension={audioOrComprehension}
-        />
+        <>
+          <h2>{audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}</h2>
+          <AudioQuizSetupMenu
+            selectedLesson={selectedLesson}
+            updateSelectedLesson={updateSelectedLesson}
+            selectedProgram={selectedProgram}
+            updateSelectedProgram={updateSelectedProgram}
+            autoplay={autoplay}
+            updateAutoplay={updateAutoplay}
+            examplesToPlayLength={examplesToPlay.length}
+            readyQuiz={readyQuiz}
+            audioOrComprehension={audioOrComprehension}
+          />
+        </>
       )}
 
       {quizReady && examplesToPlay.length > 0 && (
         <>
           <div className="audioBox">
+            <NewQuizProgress
+              currentExampleNumber={currentExample + 1}
+              totalExamplesNumber={examplesToPlay.length}
+              quizTitle={audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}
+              unReadyQuiz={unReadyQuiz}
+            />
             {/* <p>
               {`Comprehension Level: ${selectedProgram.name} Lesson ${selectedLesson?.lesson.split(' ').at(-1)}`}
             </p> */}
@@ -401,30 +411,64 @@ export default function AudioBasedReview({
               incrementCurrentStep={incrementCurrentStep}
               autoplay={autoplay}
               progressStatus={progressStatus}
-              currentExample={currentExample}
-              incrementExample={incrementExample}
-              decrementExample={decrementExample}
-              examplesToPlay={examplesToPlay}
+              pausePlayback={pausePlayback}
+              resumePlayback={resumePlayback}
+              audioRef={audioRef}
+              isPlaying={isPlaying}
             />
             <AudioComponent audioUrl={currentStepValue.audio} audioRef={audioRef} playAudio={playAudio} />
           </div>
           <AudioQuizButtons
             incrementCurrentStep={incrementCurrentStep}
             autoplay={autoplay}
-            isPlaying={isPlaying}
-            pausePlayback={pausePlayback}
-            resumePlayback={resumePlayback}
             decrementExample={decrementExample}
             incrementExample={incrementExample}
             customIncrementCurrentStep={customIncrementCurrentStep}
             audioOrComprehension={audioOrComprehension}
             currentStep={currentStep}
-            examplesToPlay={examplesToPlay}
-            currentExample={currentExample}
             unReadyQuiz={unReadyQuiz}
           />
         </>
       )}
+      {/* <Routes>
+        <Route
+          path="quiz"
+          element={quizReady && (
+            <>
+              <div className="audioBox">
+                <NewQuizProgress
+                  currentExampleNumber={currentExample + 1}
+                  totalExamplesNumber={examplesToPlay.length}
+                  quizTitle={audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}
+                />
+                <AudioFlashcard
+                  currentExampleText={currentStepValue.text}
+                  incrementCurrentStep={incrementCurrentStep}
+                  autoplay={autoplay}
+                  progressStatus={progressStatus}
+                  pausePlayback={pausePlayback}
+                  resumePlayback={resumePlayback}
+                  audioRef={audioRef}
+                  isPlaying={isPlaying}
+                />
+                <AudioComponent audioUrl={currentStepValue.audio} audioRef={audioRef} playAudio={playAudio} />
+              </div>
+              <AudioQuizButtons
+                incrementCurrentStep={incrementCurrentStep}
+                autoplay={autoplay}
+                decrementExample={decrementExample}
+                incrementExample={incrementExample}
+                customIncrementCurrentStep={customIncrementCurrentStep}
+                audioOrComprehension={audioOrComprehension}
+                currentStep={currentStep}
+                unReadyQuiz={unReadyQuiz}
+              />
+              {!activeStudent?.recordId
+              && <Navigate to=".." />}
+            </>
+          )}
+        />
+      </Routes> */}
     </div>
   )
 }

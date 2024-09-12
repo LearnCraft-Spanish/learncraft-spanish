@@ -1,61 +1,54 @@
+interface AudioFlashcardProps {
+  currentExampleText: string | JSX.Element
+  incrementCurrentStep: () => void
+  autoplay: boolean
+  progressStatus: number
+  pausePlayback: () => void
+  resumePlayback: () => void
+  audioRef: any
+  isPlaying: boolean
+}
+
 export default function AudioFlashcardComponent({
   currentExampleText,
   incrementCurrentStep,
   autoplay,
   progressStatus,
-  currentExample,
-  incrementExample,
-  decrementExample,
-  examplesToPlay,
-}: {
-  currentExampleText: string | JSX.Element
-  incrementCurrentStep: () => void
-  autoplay: boolean
-  progressStatus: number
-  currentExample: number
-  incrementExample: () => void
-  decrementExample: () => void
-  examplesToPlay: any[]
-}) {
+  pausePlayback,
+  resumePlayback,
+  audioRef,
+  isPlaying,
+}: AudioFlashcardProps): JSX.Element {
+  function handlePlayPauseClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    e.stopPropagation()
+    if (isPlaying) {
+      pausePlayback()
+    }
+    else {
+      resumePlayback()
+    }
+  }
   return (
-    <div className={!autoplay ? 'audioTextBox' : 'audioAutoplayFlashcardWrapper'}>
-      <div
-        className="audioExample"
-        onClick={!autoplay ? () => incrementCurrentStep() : () => {}}
-      >
-        <h3>{currentExampleText}</h3>
-        {/* added event.stopPropagation to prevent the click propgating down to parent, and triggering incrementCurrentStep */}
-        <div className="navigateButtons">
-          {currentExample > 0 && (
-            <a
-              className="previousButton"
-              onClick={(event) => {
-                event.stopPropagation()
-                decrementExample()
-              }}
-            >
-              {'<'}
-            </a>
-          )}
-          {currentExample < examplesToPlay.length - 1 && (
-            <a
-              className="nextButton"
-              onClick={(event) => {
-                event.stopPropagation()
-                incrementExample()
-              }}
-            >
-              {'>'}
-            </a>
-          )}
-        </div>
-        {autoplay && (
-          <div
-            className="progressStatus"
-            style={{ width: `${progressStatus * 100}%` }}
-          />
-        )}
-      </div>
+    <div
+      className="audioFlashcard"
+      onClick={!autoplay ? () => incrementCurrentStep() : () => {}}
+    >
+      <p>{currentExampleText}</p>
+      {(autoplay || audioRef.current) && (
+        <button
+          type="button"
+          className="audioPlayPauseButton"
+          onClick={e => handlePlayPauseClick(e)}
+        >
+          <i className={isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play'} />
+        </button>
+      )}
+      {autoplay && (
+        <div
+          className="progressStatus"
+          style={{ width: `${progressStatus * 100}%` }}
+        />
+      )}
     </div>
   )
 }

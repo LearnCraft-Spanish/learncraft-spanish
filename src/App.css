@@ -44,23 +44,6 @@ h2, h3, h4, h5, h6 {
   text-align: center;
 }
 
-.homeButton {
-  display: flex;
-  height: 70px;
-  text-align: center;
-  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 5px 0px 0px;
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.homeButton img {
-  object-fit: contain;
-}
-
 .bannerMessage {
   position: fixed;
   top: 50px;
@@ -124,7 +107,8 @@ button:hover, .linkButton:hover {
 }
 
 /*Main Menu Styles*/
-
+/* MOVED TO NAV */
+/* 
 .div-header{
   padding: calc(5px + 1.5%) 5%;
   background-color: var(--theme);
@@ -137,7 +121,7 @@ button:hover, .linkButton:hover {
 .div-header button {
   background-color: var(--light);
   color: var(--dark);
-}
+} */
 
 .div-user-subheader {
   padding: 10px 5%;
@@ -398,7 +382,7 @@ will remove from .css when all instances are removed */
 }
 
 .audioBox {
-  width: 100%;
+  width: 80vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -1023,3 +1007,94 @@ input:checked + .slider:before {
   padding: 5px;
   text-align: center;
 }
+
+/* Icons */
+i {
+  font-size: 24px;
+}
+/* Nav */
+
+.div-header {
+  display: flex;
+  justify-content: space-between;
+  padding: calc(5px + 1.5%) 5%;
+  background-color: var(--theme);
+  color: var(--light);
+  margin: 0;
+  align-items: center;
+   
+}
+
+.div-header button {
+  background-color: var(--light);
+  color: var(--dark);
+}
+.homeButton {
+  display: flex;
+  height: 70px;
+  width: 125px;
+}
+#homeIcon {
+  display: none;
+}
+@media screen and (max-width: 480px) {
+  .homeButton {
+    height: 24px;
+    width: 24px;
+  }
+  #logo {
+    display: none;
+  }
+  #homeIcon {
+    display: block;
+    z-index: 2;
+  }
+  div.notRoot {
+    flex-direction: row-reverse;
+  }
+  #logout.notRoot {
+    display: none;
+  }
+  
+}
+
+
+/* .homeButton {
+  display: flex;
+  height: 70px;
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 5px 0px 0px;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+} */
+
+/* @media screen and (max-width: 480px) {
+  /* currently conditionally applied to LogoutButton for when route is not / */
+  /* .pastHome {
+    display: none;
+  }
+  .div-header {
+    align-items: center;
+  }
+  #login, #logout {
+    padding: 6px;
+    height: auto;
+  }
+  #home {
+    display: block;
+    width: 24px;
+  }
+  #logo {
+    display: none;
+  }
+  .div-user-subheader {
+    display: none;
+  }
+
+  .div-header.homeButton {
+    background-image: url('./resources/icons8-home-24.png');
+  } */

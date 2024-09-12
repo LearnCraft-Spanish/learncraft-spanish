@@ -7,15 +7,10 @@ interface AudioQuizButtonsProps {
   currentStep: string
   incrementCurrentStep: () => void
   autoplay: boolean
-  isPlaying: boolean
   // customIncrementCurrentStep: (step: 'question' | 'guess' | 'hint' | 'answer') => void
   customIncrementCurrentStep: (step: string) => void
   decrementExample: () => void
   incrementExample: () => void
-  examplesToPlay: any[]
-  currentExample: number
-  pausePlayback: () => void
-  resumePlayback: () => void
   unReadyQuiz: () => void
 }
 export default function AudioQuizButtons({
@@ -23,14 +18,9 @@ export default function AudioQuizButtons({
   currentStep,
   incrementCurrentStep,
   autoplay,
-  isPlaying,
   customIncrementCurrentStep,
   decrementExample,
   incrementExample,
-  examplesToPlay,
-  currentExample,
-  pausePlayback,
-  resumePlayback,
   unReadyQuiz,
 }: AudioQuizButtonsProps): JSX.Element {
   function nextStepButtonText(): string {
@@ -87,14 +77,9 @@ export default function AudioQuizButtons({
     }
   }
   return (
-    <div>
-      <div className="buttonBox">
+    <div className="audioQuizButtons">
+      <div className="buttonBox switchOnMobile">
         {previousStepButton()}
-        {autoplay && (
-          isPlaying
-            ? <button type="button" onClick={pausePlayback}>Pause</button>
-            : <button type="button" onClick={resumePlayback}>Play</button>
-        )}
         <button type="button" className="greenButton" onClick={() => incrementCurrentStep()}>
           {nextStepButtonText()}
         </button>
@@ -105,12 +90,7 @@ export default function AudioQuizButtons({
       </div>
       <div className="buttonBox">
         <button type="button" onClick={() => unReadyQuiz()}>Back</button>
-        <MenuButton />
       </div>
-      <QuizProgress
-        currentExampleNumber={currentExample + 1}
-        totalExamplesNumber={examplesToPlay.length}
-      />
     </div>
   )
 }
