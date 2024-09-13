@@ -28,7 +28,12 @@ export default function AudioQuizButtons({
       case 'audio':
         switch (currentStep) {
           case 'question':
-            return 'Skip to Guess'
+            if (autoplay) {
+              return 'Skip to Guess'
+            }
+            else {
+              return 'Play Spanish'
+            }
           case 'guess':
             return 'Play Spanish'
           case 'hint':
