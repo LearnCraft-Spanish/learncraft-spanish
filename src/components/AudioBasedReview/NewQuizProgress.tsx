@@ -4,14 +4,12 @@ interface QuizProgressProps {
   currentExampleNumber: number
   totalExamplesNumber: number
   quizTitle: string
-  unReadyQuiz: () => void
 }
 
 export default function NewQuizProgress({
   currentExampleNumber,
   totalExamplesNumber,
   quizTitle,
-  unReadyQuiz,
 }: QuizProgressProps): JSX.Element {
   return (
     <div className="quizProgress">

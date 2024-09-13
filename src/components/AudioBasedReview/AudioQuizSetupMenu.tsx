@@ -14,7 +14,6 @@ interface AudioQuizSetupMenuProps {
   updateAutoplay: (autoplay: string) => void
   examplesToPlayLength: number
   readyQuiz: () => void
-  audioOrComprehension: string
   fromLesson: Lesson | null
   updatefromLesson: (lesson: string | number) => void
 }
@@ -27,7 +26,6 @@ export default function AudioQuizSetupMenu({
   updateAutoplay,
   examplesToPlayLength,
   readyQuiz,
-  audioOrComprehension,
   fromLesson,
   updatefromLesson,
 }: AudioQuizSetupMenuProps): JSX.Element {

@@ -5,7 +5,6 @@ interface AudioFlashcardProps {
   progressStatus: number
   pausePlayback: () => void
   resumePlayback: () => void
-  audioRef: any
   isPlaying: boolean
 }
 
@@ -16,7 +15,6 @@ export default function AudioFlashcardComponent({
   progressStatus,
   pausePlayback,
   resumePlayback,
-  audioRef,
   isPlaying,
 }: AudioFlashcardProps): JSX.Element {
   function handlePlayPauseClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {

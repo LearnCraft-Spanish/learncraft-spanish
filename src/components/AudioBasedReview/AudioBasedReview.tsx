@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import '../../App.css'
-// import './AudioBasedReview.css'
+import './AudioBasedReview.css'
 import type { Flashcard, Lesson } from '../../interfaceDefinitions'
-import LessonSelector from '../../LessonSelector'
+// import LessonSelector from '../../LessonSelector'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
 import AudioQuizButtons from './AudioQuizButtons'
 import AudioFlashcard from './AudioFlashcard'
@@ -30,7 +30,7 @@ function AudioComponent({ audioUrl, audioRef, playAudio }: { audioUrl: string, a
 
 // THIS IS NOT COMPLETE, PLEASE PLEASE PLEASE UPDATE TYPES
 interface AudioBasedReviewProps {
-  filterExamplesByAllowedVocab: (examples: Flashcard[], lessonId: number) => Flashcard[]
+  // filterExamplesByAllowedVocab: (examples: Flashcard[], lessonId: number) => Flashcard[]
   willAutoplay: boolean
   willStartWithSpanish: boolean
   selectedLesson: any
@@ -47,7 +47,6 @@ CURRENT BUGS:
 */
 export default function AudioBasedReview({
   // audioExamplesTable,
-  filterExamplesByAllowedVocab,
   willAutoplay,
   selectedLesson,
   selectedProgram,
@@ -58,7 +57,6 @@ export default function AudioBasedReview({
   toFromlessonSelectorExamplesParser,
 }: AudioBasedReviewProps) {
   const { activeStudent, audioExamplesTable } = useActiveStudent()
-  const navigate = useNavigate()
   // const [toLessonId, setToLessonId] = useState<number>(0)
 
   const [currentExample, setCurrentExample] = useState(0)
@@ -307,7 +305,8 @@ export default function AudioBasedReview({
   }
   const makeComprehensionQuiz = useCallback(() => {
     if ((!selectedLesson || !fromLesson)) {
-      console.error('No lesson selected')
+      // eslint-disable-next-line no-console
+      console.warn('No lesson selected')
       return
     }
     const allowedAudioExamples = toFromlessonSelectorExamplesParser(
@@ -318,7 +317,33 @@ export default function AudioBasedReview({
     const shuffledExamples = shuffleExamples(allowedAudioExamples)
     setExamplesToPlay(shuffledExamples)
   }, [audioExamplesTable, selectedLesson, toFromlessonSelectorExamplesParser, fromLesson])
+  /*      Old Functions, used in return value, and one old use effect      */
+  function readyQuiz() {
+    defineStepValues()
+    if (questionValue.current.audio.length > 0) {
+      newCycle()
+      setQuizReady(true)
+    }
+    // playAudio()
+  }
+  const unReadyQuiz = useCallback(() => {
+    setQuizReady(false)
+    setCurrentExample(0)
+    setCurrentStep('question')
+    if (autoplay) {
+      currentCountdownLength.current = 0
 
+      clearCountDown()
+    }
+  }, [autoplay])
+  function updateAutoplay(string: string) {
+    if (string === 'on') {
+      setAutoplay(true)
+    }
+    else {
+      setAutoplay(false)
+    }
+  }
   useEffect(() => {
     if (autoplay && quizReady) {
       clearTimeout(currentCountdown.current)
@@ -345,7 +370,7 @@ export default function AudioBasedReview({
     if (selectedLesson?.recordId && selectedProgram?.recordId && audioExamplesTable.length > 0) {
       makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson, audioExamplesTable.length, makeComprehensionQuiz])
+  }, [selectedProgram, selectedLesson, audioExamplesTable.length, makeComprehensionQuiz, unReadyQuiz])
 
   /*       New Use Effects      */
   // Play Audio when step is taken
@@ -378,34 +403,6 @@ export default function AudioBasedReview({
       setCurrentStep(step)
     }
   }
-
-  /*      Old Functions, used in return value, and one old use effect      */
-  function readyQuiz() {
-    defineStepValues()
-    if (questionValue.current.audio.length > 0) {
-      newCycle()
-      setQuizReady(true)
-    }
-    // playAudio()
-  }
-  function unReadyQuiz() {
-    setQuizReady(false)
-    setCurrentExample(0)
-    setCurrentStep('question')
-    if (autoplay) {
-      currentCountdownLength.current = 0
-
-      clearCountDown()
-    }
-  }
-  function updateAutoplay(string: string) {
-    if (string === 'on') {
-      setAutoplay(true)
-    }
-    else {
-      setAutoplay(false)
-    }
-  }
   return (
     <div className="quiz">
       {!quizReady && (selectedLesson?.recordId || !activeStudent?.recordId) && (
@@ -420,7 +417,6 @@ export default function AudioBasedReview({
             updateAutoplay={updateAutoplay}
             examplesToPlayLength={examplesToPlay.length}
             readyQuiz={readyQuiz}
-            audioOrComprehension={audioOrComprehension}
             fromLesson={fromLesson}
             updatefromLesson={updatefromLesson}
           />
@@ -434,11 +430,7 @@ export default function AudioBasedReview({
               currentExampleNumber={currentExample + 1}
               totalExamplesNumber={examplesToPlay.length}
               quizTitle={audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}
-              unReadyQuiz={unReadyQuiz}
             />
-            {/* <p>
-              {`Comprehension Level: ${selectedProgram.name} Lesson ${selectedLesson?.lesson.split(' ').at(-1)}`}
-            </p> */}
             <AudioFlashcard
               currentExampleText={currentStepValue.text}
               incrementCurrentStep={incrementCurrentStep}
@@ -446,7 +438,6 @@ export default function AudioBasedReview({
               progressStatus={progressStatus}
               pausePlayback={pausePlayback}
               resumePlayback={resumePlayback}
-              audioRef={audioRef}
               isPlaying={isPlaying}
             />
             <AudioComponent audioUrl={currentStepValue.audio} audioRef={audioRef} playAudio={playAudio} />
