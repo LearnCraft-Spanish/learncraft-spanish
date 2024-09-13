@@ -34,7 +34,7 @@ export default function AudioFlashcardComponent({
       onClick={!autoplay ? () => incrementCurrentStep() : () => {}}
     >
       <p>{currentExampleText}</p>
-      {(autoplay || audioRef.current) && (
+      {(autoplay) && (
         <button
           type="button"
           className="audioPlayPauseButton"

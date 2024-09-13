@@ -15,15 +15,10 @@ export default function NewQuizProgress({
 }: QuizProgressProps): JSX.Element {
   return (
     <div className="quizProgress">
-      <div
-        className={`backButton ${window.location.pathname === '/' ? ' ' : 'notRoot'}`}
-        onClick={() => unReadyQuiz()}
-      >
-        <i className="fa-solid fa-reply"></i>
-      </div>
       <h3>{quizTitle}</h3>
       <p>{`${currentExampleNumber}/${totalExamplesNumber}`}</p>
-      <div className="progressBar">
+      {/* Temporary className newProgressBar until old progressBar phazed out */}
+      <div className="newProgressBar">
         <div
           className="progressBarFill"
           style={{

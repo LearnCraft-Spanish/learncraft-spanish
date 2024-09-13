@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Route, Routes, useNavigate, Navigate } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import '../../App.css'
 // import './AudioBasedReview.css'
 import type { Flashcard } from '../../interfaceDefinitions'
@@ -8,7 +8,6 @@ import { useActiveStudent } from '../../hooks/useActiveStudent'
 import AudioQuizButtons from './AudioQuizButtons'
 import AudioFlashcard from './AudioFlashcard'
 import AudioQuizSetupMenu from './AudioQuizSetupMenu'
-import StepProgressBar from './StepProgressBar'
 import NewQuizProgress from './NewQuizProgress'
 
 interface StepValue {
@@ -17,6 +16,9 @@ interface StepValue {
 }
 // new components to break up the logic
 function AudioComponent({ audioUrl, audioRef, playAudio }: { audioUrl: string, audioRef: any, playAudio: () => void }) {
+  if (!audioUrl) {
+    return
+  }
   return (
     <audio
       ref={audioRef}
@@ -112,43 +114,39 @@ export default function AudioBasedReview({
   /*       New Audio Handling     */
   const playAudio = useCallback(() => {
     // add catch for when audio not supported (url is empty)
-    if (audioRef.current) {
-      if (autoplay) {
-        if (audioRef.current.duration) {
-          const currentDuration = audioRef.current.duration
-          // console.log('in here?')
-          startCountdown(currentDuration + 1.5)
+    if (autoplay) {
+      if (audioRef.current?.duration) {
+        const currentDuration = audioRef.current.duration
+        startCountdown(currentDuration + 1.5)
+      }
+      else {
+        if (prevAudioRefDuration.current) {
+          startCountdown(prevAudioRefDuration.current + 1.5)
         }
         else {
-          if (prevAudioRefDuration.current) {
-            // console.log('we dont have an audio file, playing prev audio file length')
-            startCountdown(prevAudioRefDuration.current + 1.5)
-          }
-          else {
-            // console.log('no duration found')
-            // startCountdown(5)
-          }
+          // console.log('no duration found')
+          // startCountdown(5)
         }
       }
-      if (audioRef.current.duration) {
-        audioRef.current.play()
-          .then(() => setIsPlaying(true))
-          .catch((e: unknown) => {
-            if (e instanceof Error) {
-              console.error(e.message)
-            }
-            else {
-              console.error('Error playing audio. Error: ', e)
-            }
-          })
-      }
+    }
+    if (audioRef.current?.duration) {
+      audioRef.current.play()
+        // .then(() => setIsPlaying(true))
+        .catch((e: unknown) => {
+          if (e instanceof Error) {
+            console.error(e.message)
+          }
+          else {
+            console.error('Error playing audio. Error: ', e)
+          }
+        })
     }
   }, [autoplay])
   const pauseAudio = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause()
       audioRef.current.currentTime = 0
-      setIsPlaying(false)
+      // setIsPlaying(false)
       // clearTimeout(currentCountdown.current)
       // clearTimeout(answerPause.current)
     }
@@ -196,7 +194,6 @@ export default function AudioBasedReview({
   }
   function startCountdown(length: number) {
     currentCountdownLength.current = length
-    // console.log('currentCountdownLength: ', currentCountdownLength.current)
     setCountdown(length)
   }
   const incrementExample = useCallback(() => {
@@ -244,9 +241,7 @@ export default function AudioBasedReview({
   // call to increase current step
   const incrementCurrentStep = useCallback(() => {
     prevAudioRefDuration.current = audioRef.current?.duration || 0
-    // console.log('step incremented! setting prev audio duration')
     if (prevAudioRefDuration.current === 0) {
-      // console.log('either something went wrong, or its the first step')
       // console.log('currentStep: ', currentStep)
     }
     clearCountDown()
@@ -356,9 +351,9 @@ export default function AudioBasedReview({
   /*      Old Functions, used in return value, and one old use effect      */
   function readyQuiz() {
     defineStepValues()
-    setQuizReady(true)
     if (questionValue.current.audio.length > 0) {
       newCycle()
+      setQuizReady(true)
     }
     // playAudio()
   }

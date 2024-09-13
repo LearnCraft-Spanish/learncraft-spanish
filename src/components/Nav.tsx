@@ -1,8 +1,6 @@
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import logo from '../resources/typelogosmall.png'
-import home from '../resources/icons8-home-24.png'
-import x from '../resources/icons8-x-24.png'
 
 import LoginButton from './LoginButton'
 import LogoutButton from './LogoutButton'
@@ -20,6 +18,12 @@ export default function Nav(): JSX.Element {
       </div>
       <LogoutButton />
       <LoginButton />
+      {/* <div
+        className={`backButton ${window.location.pathname === '/' ? ' ' : 'notRoot'}`}
+        onClick={() => navigate('..')}
+      >
+        <i className="fa-solid fa-reply"></i>
+      </div> */}
     </div>
   )
 }

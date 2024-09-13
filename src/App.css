@@ -320,13 +320,6 @@ button:hover, .linkButton:hover {
   text-align: center;
 
 }
-/* .progressBar2 is a legacy className
-will remove from .css when all instances are removed */
-.progressBar, .progressBar2 {
-  display:block;
-  text-align: center;
-  justify-self: center;
-}
 
 .addFlashcardButton {
   position: absolute;
@@ -414,7 +407,7 @@ will remove from .css when all instances are removed */
   z-index: 5;
 }
 
-.progressBarHolder {
+/* .progressBarHolder {
   position: relative;
   height: 150px;
   margin: 10px 0;
@@ -434,6 +427,13 @@ will remove from .css when all instances are removed */
   padding: 60px;
   color: var(--light);
   z-index: 5;
+} */
+/* progressBar & progressBar2 are almost legacy */
+/* Remove once all instances of QuizProgress are replaced with NewQuizProgress */
+.progressBar, .progressBar2 {
+  display:block;
+  text-align: center;
+  justify-self: center;
 }
 
 .progressStatus {
@@ -1049,12 +1049,27 @@ i {
     display: block;
     z-index: 2;
   }
-  div.notRoot {
+  /* div.notRoot {
     flex-direction: row-reverse;
-  }
+  } */
   #logout.notRoot {
     display: none;
   }
+  
+}
+/* BackButton */
+.backButton {
+  display: none;
+  position: absolute;
+  left: 0;
+  color: white;
+  padding: 12px;
+}
+@media screen and (max-width: 480px) {
+  .backButton.notRoot {
+      display: block;
+      z-index: 2;
+    }
   
 }
 
