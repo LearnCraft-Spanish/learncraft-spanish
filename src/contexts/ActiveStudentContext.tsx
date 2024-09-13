@@ -88,8 +88,16 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
 
   function parseLessonsByVocab(courses: Program[], lessonTable: Lesson[]) {
     const newCourseArray: Program[] = [...courses]
+    newCourseArray.sort((a, b) => a.recordId - b.recordId)
+
+    // Memo for combined 1MC vocabularies
+    let combined1mcVocabulary: string[] = []
+
     newCourseArray.forEach((course) => {
-      const combinedVocabulary: string[] = []
+      let combinedVocabulary: string[] = []
+      if (course.recordId === 5) {
+        combinedVocabulary = [...combined1mcVocabulary]
+      }
       const lessonSortFunction = (a: Lesson, b: Lesson) => {
         function findNumber(stringLesson: string) {
           const lessonArray = stringLesson.split(' ')
@@ -114,6 +122,9 @@ export function ActiveStudentProvider({ children }: ActiveStudentProviderProps) 
           }
         })
         lesson.vocabKnown = [...combinedVocabulary]
+        if (course.recordId === 3) {
+          combined1mcVocabulary = [...combinedVocabulary]
+        }
       })
       return course
     })
