@@ -52,14 +52,16 @@ export default function LessonSelector({
     <div>
       <div className="lessonFilter">
         <form onSubmit={e => e.preventDefault}>
-          <h3>Set Level</h3>
-          <select
-            className="courseList"
-            value={selectedProgram?.recordId}
-            onChange={e => updateSelectedProgram(e.target.value)}
-          >
-            {makeCourseSelector()}
-          </select>
+          <div className="menuRow">
+            <h3>Set Level</h3>
+            <select
+              className="courseList"
+              value={selectedProgram?.recordId}
+              onChange={e => updateSelectedProgram(e.target.value)}
+            >
+              {makeCourseSelector()}
+            </select>
+          </div>
           {selectedLesson?.recordId && selectedProgram?.lessons && (
             <select
               className="lessonList"

@@ -1,6 +1,9 @@
-import LessonSelector from '../../LessonSelector'
-import type { Lesson, Program } from '../../interfaceDefinitions'
+import { useEffect } from 'react'
 import './AudioBasedReview.css'
+
+import type { Lesson, Program } from '../../interfaceDefinitions'
+import FromToLessonSelector from '../FromToLessonSelector'
+import MenuButton from '../MenuButton'
 
 interface AudioQuizSetupMenuProps {
   selectedLesson: Lesson
@@ -12,6 +15,8 @@ interface AudioQuizSetupMenuProps {
   examplesToPlayLength: number
   readyQuiz: () => void
   audioOrComprehension: string
+  fromLesson: Lesson | null
+  updatefromLesson: (lesson: string | number) => void
 }
 export default function AudioQuizSetupMenu({
   selectedLesson,
@@ -23,6 +28,8 @@ export default function AudioQuizSetupMenu({
   examplesToPlayLength,
   readyQuiz,
   audioOrComprehension,
+  fromLesson,
+  updatefromLesson,
 }: AudioQuizSetupMenuProps): JSX.Element {
   function updateAutoplayWorkaround(autoplay: boolean) {
     if (autoplay) {
@@ -32,15 +39,29 @@ export default function AudioQuizSetupMenu({
       updateAutoplay('off')
     }
   }
+
+  useEffect(() => {
+    if (selectedProgram && !fromLesson) {
+      updatefromLesson(selectedProgram.lessons[0].recordId)
+    }
+  }, [fromLesson, updatefromLesson, selectedProgram])
   return (
-    <div className="audioBox">
-      <LessonSelector
-        selectedLesson={selectedLesson}
-        updateSelectedLesson={updateSelectedLesson}
-        selectedProgram={selectedProgram}
-        updateSelectedProgram={updateSelectedProgram}
-      />
-      {audioOrComprehension === 'comprehension' && (
+    <div className="audioQuizSetupMenu">
+      <div className="form">
+        {/* <LessonSelector
+          selectedLesson={selectedLesson}
+          updateSelectedLesson={updateSelectedLesson}
+          selectedProgram={selectedProgram}
+          updateSelectedProgram={updateSelectedProgram}
+        /> */}
+        <FromToLessonSelector
+          selectedProgram={selectedProgram}
+          updateSelectedProgram={updateSelectedProgram}
+          toLesson={selectedLesson}
+          updateToLesson={updateSelectedLesson}
+          fromLesson={fromLesson}
+          updateFromLesson={updatefromLesson}
+        />
         <div className="menuRow">
           <p>Autoplay:</p>
           <label htmlFor="isAutoplay" className="switch">
@@ -48,14 +69,17 @@ export default function AudioQuizSetupMenu({
             <span className="slider round"></span>
           </label>
         </div>
-      )}
+      </div>
       <div className="buttonBox">
+        <MenuButton />
         <button type="button" onClick={readyQuiz} disabled={!(examplesToPlayLength > 0)}>Start</button>
       </div>
       <div className="buttonBox">
         {examplesToPlayLength < 1 && (
-          <p>There are no audio examples for this comprehension level</p>
+          <p>There are no audio examples for this lesson range</p>
         )}
+      </div>
+      <div className="buttonBox">
       </div>
     </div>
   )

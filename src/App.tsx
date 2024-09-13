@@ -155,6 +155,7 @@ export const App: React.FC = () => {
     }
   }, [userDataQuery.data?.isAdmin, studentListQuery.data])
 
+  // Original Lesson Selector
   const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
     let allowedVocabulary: string[] = []
     programsQuery.data?.forEach((program) => {
@@ -166,6 +167,7 @@ export const App: React.FC = () => {
       }
       return allowedVocabulary
     })
+
     const filteredByAllowed = examples.filter((item) => {
       let isAllowed = true
       if (
@@ -184,6 +186,54 @@ export const App: React.FC = () => {
     })
     return filteredByAllowed
   }, [programsQuery?.data])
+
+  // New Lesson Selector
+  const toFromlessonSelectorExamplesParser = useCallback((examples: Flashcard[], lessonId: number, fromLessonId: number | null) => {
+    if (!fromLessonId) {
+      console.error('fromLessonId is null')
+      return examples
+    }
+    // vocab in first lesson selected
+    let allowedVocabulary: string[] = []
+    programsQuery.data?.forEach((program) => {
+      const foundLesson = program.lessons.find(
+        item => item.recordId === lessonId,
+      )
+      if (foundLesson) {
+        allowedVocabulary = foundLesson.vocabKnown || []
+      }
+      return allowedVocabulary
+    })
+    // vocab in first lesson + second lesson
+    let toAllowedVocabulary: string[] = []
+    if (fromLessonId) {
+      programsQuery.data?.forEach((program) => {
+        const foundLesson = program.lessons.find(
+          item => item.recordId === fromLessonId,
+        )
+        if (foundLesson) {
+          toAllowedVocabulary = foundLesson.vocabKnown || []
+        }
+        return toAllowedVocabulary
+      })
+    }
+    // vocab introduced between first lesson and second lesson
+    let finalAllowedVocabulary: string[] = []
+    finalAllowedVocabulary = toAllowedVocabulary.filter(word => !(allowedVocabulary.includes(word)))
+    // first, filter by allowed vocab in second lesson
+    const filteredByAllowed = filterExamplesByAllowedVocab(examples, fromLessonId)
+    // only return examples that have vocab introduced between first and second lesson
+    const finalExamples = filteredByAllowed.filter((example) => {
+      let hasAllowedVocab = false
+      example.vocabIncluded.forEach((word) => {
+        if (finalAllowedVocabulary.includes(word)) {
+          hasAllowedVocab = true
+        }
+      })
+      return hasAllowedVocab
+    })
+    return finalExamples
+  }, [filterExamplesByAllowedVocab, programsQuery.data])
 
   useEffect(() => {
     // change the selected lesson when the selected program changes
@@ -364,6 +414,7 @@ export const App: React.FC = () => {
                 willAutoplay
                 willStartWithSpanish={false}
                 audioOrComprehension="audio"
+                toFromlessonSelectorExamplesParser={toFromlessonSelectorExamplesParser}
               />
             )
           }
@@ -382,6 +433,7 @@ export const App: React.FC = () => {
                 updateSelectedProgram={updateSelectedProgram}
                 willAutoplay={false}
                 willStartWithSpanish
+                toFromlessonSelectorExamplesParser={toFromlessonSelectorExamplesParser}
               />
             )
           }

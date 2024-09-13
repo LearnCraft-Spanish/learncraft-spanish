@@ -44,6 +44,8 @@ button:disabled {
     margin: 0 auto;
     margin-top: 12px;
     border-radius: 10px;
+
+    cursor: pointer;
 }
 .audioPlayPauseButton {
     background-color: transparent;
@@ -122,5 +124,45 @@ button:disabled {
     .quizProgress h3, .quizProgress p {
         color: var(--light);
         margin: 0;
+    }
+}
+
+
+/* FromToLessonSelector */
+.FTLS {
+    width: 100%;
+}
+/* AudioQuizSetupMenu */
+.menuRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.audioQuizSetupMenu {
+    max-width: 400px;
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.audioQuizSetupMenu .form {
+    max-width: 320px;
+    width: 90%;
+}
+.audioQuizSetupMenu .buttonBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+@media (max-width: 480px) {
+    .audioQuizSetupMenu {
+        width: 98vw;
     }
 }

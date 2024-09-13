@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import '../../App.css'
 // import './AudioBasedReview.css'
-import type { Flashcard } from '../../interfaceDefinitions'
+import type { Flashcard, Lesson } from '../../interfaceDefinitions'
 import LessonSelector from '../../LessonSelector'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
 import AudioQuizButtons from './AudioQuizButtons'
@@ -38,8 +38,13 @@ interface AudioBasedReviewProps {
   updateSelectedLesson: (lesson: any) => void
   updateSelectedProgram: (program: any) => void
   audioOrComprehension?: 'audio' | 'comprehension'
+  toFromlessonSelectorExamplesParser: (examples: Flashcard[], lessonId: number, fromLessonId: number) => Flashcard[]
 }
 
+/*
+CURRENT BUGS:
+- on Mobile: triggering incrementNextStep twice quickly causes a step to be skipped
+*/
 export default function AudioBasedReview({
   // audioExamplesTable,
   filterExamplesByAllowedVocab,
@@ -50,9 +55,11 @@ export default function AudioBasedReview({
   updateSelectedProgram,
   // will be 'audio' or 'comprehension'
   audioOrComprehension = 'comprehension',
+  toFromlessonSelectorExamplesParser,
 }: AudioBasedReviewProps) {
   const { activeStudent, audioExamplesTable } = useActiveStudent()
   const navigate = useNavigate()
+  // const [toLessonId, setToLessonId] = useState<number>(0)
 
   const [currentExample, setCurrentExample] = useState(0)
   // Examples Table after: filtedBylessonId, shuffled
@@ -85,6 +92,23 @@ export default function AudioBasedReview({
   const [currentStepValue, setCurrentStepValue] = useState<StepValue>({ audio: '', text: '' })
   // const steps = ['question', 'guess', 'hint', 'answer']
   const [currentStep, setCurrentStep] = useState('question')
+
+  // FromTo lesson selector code:
+  const programsQuery = useActiveStudent().programsQuery
+  const [fromLesson, setfromLesson] = useState<Lesson | null>(null)
+  const updatefromLesson = useCallback((lessonId: number | string) => {
+    if (typeof lessonId === 'string') {
+      lessonId = Number.parseInt(lessonId)
+    }
+    let newLesson = null
+    programsQuery.data?.forEach((program) => {
+      const foundLesson = program.lessons.find(item => item.recordId === lessonId)
+      if (foundLesson) {
+        newLesson = foundLesson
+      }
+    })
+    setfromLesson(newLesson)
+  }, [programsQuery?.data])
 
   /*      Every Time currentExample changes, set the stepValues for that example      */
   const defineStepValues = useCallback(() => {
@@ -282,24 +306,31 @@ export default function AudioBasedReview({
     return shuffled
   }
   const makeComprehensionQuiz = useCallback(() => {
-    const allowedAudioExamples = filterExamplesByAllowedVocab(
+    if ((!selectedLesson || !fromLesson)) {
+      console.error('No lesson selected')
+      return
+    }
+    const allowedAudioExamples = toFromlessonSelectorExamplesParser(
       audioExamplesTable,
+      fromLesson.recordId,
       selectedLesson.recordId,
     )
     const shuffledExamples = shuffleExamples(allowedAudioExamples)
     setExamplesToPlay(shuffledExamples)
-  }, [audioExamplesTable, filterExamplesByAllowedVocab, selectedLesson])
+  }, [audioExamplesTable, selectedLesson, toFromlessonSelectorExamplesParser, fromLesson])
 
   useEffect(() => {
-    clearTimeout(currentCountdown.current)
-    setIsPlaying(true)
-    if (countdown !== 0 && currentCountdownLength.current !== 0) {
-      currentCountdown.current = setTimeout(updateCountdown, 50)
+    if (autoplay && quizReady) {
+      clearTimeout(currentCountdown.current)
+      setIsPlaying(true)
+      if (countdown !== 0 && currentCountdownLength.current !== 0) {
+        currentCountdown.current = setTimeout(updateCountdown, 50)
+      }
+      if (countdown === 0) {
+        incrementCurrentStep()
+      }
     }
-    if (countdown === 0) {
-      incrementCurrentStep()
-    }
-  }, [countdown, incrementCurrentStep, updateCountdown])
+  }, [autoplay, countdown, incrementCurrentStep, quizReady, updateCountdown])
 
   /*       Old Use Effects      */
   useEffect(() => {
@@ -361,6 +392,11 @@ export default function AudioBasedReview({
     setQuizReady(false)
     setCurrentExample(0)
     setCurrentStep('question')
+    if (autoplay) {
+      currentCountdownLength.current = 0
+
+      clearCountDown()
+    }
   }
   function updateAutoplay(string: string) {
     if (string === 'on') {
@@ -385,6 +421,8 @@ export default function AudioBasedReview({
             examplesToPlayLength={examplesToPlay.length}
             readyQuiz={readyQuiz}
             audioOrComprehension={audioOrComprehension}
+            fromLesson={fromLesson}
+            updatefromLesson={updatefromLesson}
           />
         </>
       )}
@@ -425,45 +463,6 @@ export default function AudioBasedReview({
           />
         </>
       )}
-      {/* <Routes>
-        <Route
-          path="quiz"
-          element={quizReady && (
-            <>
-              <div className="audioBox">
-                <NewQuizProgress
-                  currentExampleNumber={currentExample + 1}
-                  totalExamplesNumber={examplesToPlay.length}
-                  quizTitle={audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}
-                />
-                <AudioFlashcard
-                  currentExampleText={currentStepValue.text}
-                  incrementCurrentStep={incrementCurrentStep}
-                  autoplay={autoplay}
-                  progressStatus={progressStatus}
-                  pausePlayback={pausePlayback}
-                  resumePlayback={resumePlayback}
-                  audioRef={audioRef}
-                  isPlaying={isPlaying}
-                />
-                <AudioComponent audioUrl={currentStepValue.audio} audioRef={audioRef} playAudio={playAudio} />
-              </div>
-              <AudioQuizButtons
-                incrementCurrentStep={incrementCurrentStep}
-                autoplay={autoplay}
-                decrementExample={decrementExample}
-                incrementExample={incrementExample}
-                customIncrementCurrentStep={customIncrementCurrentStep}
-                audioOrComprehension={audioOrComprehension}
-                currentStep={currentStep}
-                unReadyQuiz={unReadyQuiz}
-              />
-              {!activeStudent?.recordId
-              && <Navigate to=".." />}
-            </>
-          )}
-        />
-      </Routes> */}
     </div>
   )
 }
