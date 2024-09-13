@@ -141,7 +141,7 @@ export function useBackend() {
         },
       })
       if (response.ok) {
-        return await response.json()
+        return response.json()
           .catch((error) => {
             console.error(`Error parsing JSON from ${path}:`, error)
             throw new Error(`Failed to parse JSON from ${path}`)

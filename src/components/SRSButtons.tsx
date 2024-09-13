@@ -4,11 +4,10 @@ import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
 interface QuizButtonsProps {
   currentExample: Flashcard
   answerShowing: boolean
-  updateExampleDifficulty: (recordId: number, difficulty: string) => void
   incrementExampleNumber: () => void
 }
 
-export default function SRSQuizButtons({ currentExample, answerShowing, updateExampleDifficulty, incrementExampleNumber }: QuizButtonsProps) {
+export default function SRSQuizButtons({ currentExample, answerShowing, incrementExampleNumber }: QuizButtonsProps) {
   const { flashcardDataQuery, updateFlashcardMutation } = useStudentFlashcards()
 
   const flashcardData = flashcardDataQuery.data
@@ -43,10 +42,9 @@ export default function SRSQuizButtons({ currentExample, answerShowing, updateEx
     if (exampleId === undefined || studentExampleId === undefined) {
       return
     }
-    updateExampleDifficulty(exampleId, 'hard')
     incrementExampleNumber()
     const newInterval = (currentInterval > 0) ? currentInterval - 1 : 0
-    const updateStatus = updateFlashcard({ studentExampleId, newInterval })
+    const updateStatus = updateFlashcard({ studentExampleId, newInterval, difficulty: 'hard' })
     return updateStatus
   }
 
@@ -57,10 +55,9 @@ export default function SRSQuizButtons({ currentExample, answerShowing, updateEx
     if (exampleId === undefined || studentExampleId === undefined) {
       return
     }
-    updateExampleDifficulty(exampleId, 'easy')
     incrementExampleNumber()
     const newInterval = currentInterval + 1
-    const updateStatus = updateFlashcard({ studentExampleId, newInterval })
+    const updateStatus = updateFlashcard({ studentExampleId, newInterval, difficulty: 'easy' })
     return updateStatus
   }
 

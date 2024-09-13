@@ -1,10 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import type { DisplayOrder, Flashcard, StudentExample } from '../interfaceDefinitions'
+import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
 import { useActiveStudent } from '../hooks/useActiveStudent'
 import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
-import FlashcardDisplay from './Flashcard'
+import FlashcardDisplay from './FlashcardDisplay'
 import QuizButtons from './QuizButtons'
 import QuizProgress from './QuizProgress'
 import MenuButton from './MenuButton'
@@ -12,8 +12,7 @@ import SRSQuizButtons from './SRSButtons'
 
 interface QuizComponentProps {
   quizTitle: string
-  examplesToParse: Flashcard[]
-  displayOrder: DisplayOrder[]
+  examplesToParse: readonly Flashcard[]
   startWithSpanish?: boolean
   quizOnlyCollectedExamples?: boolean
   isSrsQuiz?: boolean
@@ -21,66 +20,9 @@ interface QuizComponentProps {
   quizLength?: number
 }
 
-function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[] | undefined, quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean, quizLength: number): Flashcard[] {
-  function tagAssignedExamples() {
-    exampleArray.forEach((example) => {
-      const getStudentExampleRecordId = () => {
-        const relatedStudentExample = studentExampleArray?.find(
-          element => element.relatedExample === example.recordId,
-        )
-        return relatedStudentExample
-      }
-      if (getStudentExampleRecordId() !== undefined) {
-        example.isCollected = true
-      }
-      else {
-        example.isCollected = false
-      }
-    })
-    return exampleArray
-  }
-
-  const taggedByCollected = tagAssignedExamples()
-
-  function filterIfCollectedOnly() {
-    if (quizOnlyCollectedExamples || isSrsQuiz) {
-      const filteredList = taggedByCollected.filter(
-        example => example.isCollected,
-      )
-      if (isSrsQuiz) {
-        filteredList.forEach((example) => {
-          example.difficulty = ''
-        })
-      }
-      return filteredList
-    }
-    else {
-      return taggedByCollected
-    }
-  }
-
-  const completeListBeforeRandomization = filterIfCollectedOnly()
-
-  function randomize(array: Flashcard[]) {
-    const randomizedArray = []
-    const vanishingArray = [...array]
-    for (let i = 0; i < array.length; i++) {
-      const randIndex = Math.floor(Math.random() * vanishingArray.length)
-      const randomArrayItem = vanishingArray[randIndex]
-      vanishingArray.splice(randIndex, 1)
-      randomizedArray[i] = randomArrayItem
-    }
-    return randomizedArray
-  }
-
-  const randomizedQuizExamples = randomize(completeListBeforeRandomization)
-  const quizLengthSafe = Math.min(quizLength, randomizedQuizExamples.length)
-  return randomizedQuizExamples.slice(0, quizLengthSafe)
-}
-
 export default function QuizComponent({
-  examplesToParse = [],
   quizTitle,
+  examplesToParse = [],
   startWithSpanish = false,
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
@@ -90,24 +32,29 @@ export default function QuizComponent({
 }: QuizComponentProps) {
   const location = useLocation()
   const { activeStudent } = useActiveStudent()
-  const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation } = useStudentFlashcards()
-  const studentFlashcardData = flashcardDataQuery.data
-  const addFlashcard = addFlashcardMutation.mutate
-  const removeFlashcard = removeFlashcardMutation.mutate
 
-  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentFlashcardData?.studentExamples, quizOnlyCollectedExamples, isSrsQuiz, quizLength))
+  // Orders the examples from the quiz-examples set, examples refer to the data itself.
+  const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([])
+  const [displayOrderReady, setDisplayOrderReady] = useState(false)
+
+  // Interactive states within the Quiz
   const [answerShowing, setAnswerShowing] = useState(false)
   const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
   const currentAudio = useRef<HTMLAudioElement | null>(null)
   const [playing, setPlaying] = useState(false)
 
-  // This is copied from OfficialQuiz, I think it might be causing excessive rerenders
-  const currentExample = examplesToReview[currentExampleNumber - 1]
+  // currentExample should never be undefined... how to prevent?
+  const currentExample = examplesToParse.find((example) => {
+    const currentRecordId = displayOrder[currentExampleNumber - 1]?.recordId
+    const exampleRecordId = example.recordId
+    return currentRecordId === exampleRecordId
+  })
 
   // will need to second pass these variables:
   const spanishShowing = (startWithSpanish !== answerShowing)
 
   const isMainLocation = location.pathname.split('/').length < 2
+
   function hideAnswer() {
     setAnswerShowing(false)
   }
@@ -177,14 +124,14 @@ export default function QuizComponent({
     }
   }, [playing, pauseCurrentAudio, playCurrentAudio])
 
-  /*     Add/Remove Flashcard Section       */
+  /*     Increment/Decrement Through Examples       */
   function incrementExampleNumber() {
-    if (currentExampleNumber < examplesToReview.length) {
+    if (currentExampleNumber < displayOrder.length) {
       const newExampleNumber = currentExampleNumber + 1
       setCurrentExampleNumber(newExampleNumber)
     }
     else {
-      setCurrentExampleNumber(examplesToReview.length)
+      setCurrentExampleNumber(displayOrder.length)
     }
     hideAnswer()
     setPlaying(false)
@@ -201,64 +148,60 @@ export default function QuizComponent({
     setPlaying(false)
   }
 
-  async function removeFlashcardAndUpdate(recordId: number) {
-    const flashcardRemovedPromise = removeFlashcard(recordId)
-    const exampleToRemove = examplesToReview.find(
-      (example: Flashcard) => example.recordId === recordId,
-    )
-    if (exampleToRemove) {
-      const exampleIndex = examplesToReview.indexOf(exampleToRemove)
-      if (quizOnlyCollectedExamples || isSrsQuiz) {
-        if (exampleIndex === examplesToReview.length - 1) {
-          decrementExampleNumber()
-        }
-        const filteredArray = [...examplesToReview].filter(
-          example => example.recordId !== recordId,
-        )
-        setExamplesToReview(filteredArray)
-        return flashcardRemovedPromise
-      }
-      else {
-        const updatedArray = [...examplesToReview]
-        updatedArray[exampleIndex].isCollected = false
-        setExamplesToReview(updatedArray)
-        return flashcardRemovedPromise
-      }
+  function fisherYatesShuffle(array: DisplayOrder[]) {
+    const shuffled = [...array] // Shallow copy to avoid mutating original array
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]] // Swap elements
     }
+    return shuffled
   }
 
-  async function addFlashcardAndUpdate(recordId: number) {
-    if (!quizOnlyCollectedExamples && !isSrsQuiz) {
-      const exampleToAdd = examplesToReview.find(
-        (example: Flashcard) => example.recordId === recordId,
+  const filterIfCollectedOnly = useCallback((displayOrderArray: DisplayOrder[]) => {
+    if (quizOnlyCollectedExamples || isSrsQuiz) {
+      const filteredList = displayOrderArray.filter(
+        item => item.isCollected,
       )
-      if (exampleToAdd) {
-        const flashcardAddedPromise = addFlashcard(exampleToAdd)
-        const exampleIndex = examplesToReview.indexOf(exampleToAdd)
-        if (exampleIndex < examplesToReview.length - 1) {
-          incrementExampleNumber()
-        }
-        const updatedArray = [...examplesToReview]
-        updatedArray[exampleIndex].isCollected = true
-        setExamplesToReview(updatedArray)
-        return flashcardAddedPromise
+      return filteredList
+    }
+    else {
+      return displayOrderArray
+    }
+  }, [quizOnlyCollectedExamples, isSrsQuiz])
+
+  // Randomizes the order of the quiz examples for display
+  // Runs only once to prevent re-scrambling while in use. Mutations handled elsewhere.
+  useEffect(() => {
+    if (examplesToParse.length > 0 && !displayOrderReady && quizLength > 0) {
+      // Create a basic map of the flashcard objects with recordId and isCollected properties
+      const exampleOrder: DisplayOrder[] = examplesToParse.map(
+        (example) => {
+          return {
+            recordId: example.recordId,
+            isCollected: example.isCollected,
+          }
+        },
+      )
+
+      // Randomize the order of the examples
+      const shuffledOrder = fisherYatesShuffle(exampleOrder)
+
+      // If collectedOnly or SRS, filter out uncollected examples
+      const filteredOrder = filterIfCollectedOnly(shuffledOrder)
+
+      // Limit the number of examples to the quizLength
+      const limitedOrder = filteredOrder.slice(0, quizLength)
+
+      // Display the limited order if any are left
+      if (limitedOrder.length > 0) {
+        setDisplayOrder(limitedOrder)
+        setDisplayOrderReady(true)
       }
     }
-  }
-
-  /*    SRS Update Section       */
-
-  function updateExampleDifficulty(recordId: number, difficulty: string) {
-    const newArray = examplesToReview.map(example =>
-      example.recordId === recordId
-        ? { ...example, difficulty }
-        : example,
-    )
-    setExamplesToReview(newArray)
-  }
+  }, [examplesToParse, displayOrderReady, quizLength, filterIfCollectedOnly])
 
   return (
-    examplesToReview.length > 0 && (
+    displayOrder.length > 0 && (
       <div className="quiz">
         <h3>{quizTitle}</h3>
         {!answerShowing && questionAudio()}
@@ -267,8 +210,6 @@ export default function QuizComponent({
           example={currentExample}
           isStudent={activeStudent?.role === ('student')}
           answerShowing={answerShowing}
-          addFlashcardAndUpdate={addFlashcardAndUpdate}
-          removeFlashcardAndUpdate={removeFlashcardAndUpdate}
           toggleAnswer={toggleAnswer}
           startWithSpanish={startWithSpanish}
         />
@@ -277,9 +218,7 @@ export default function QuizComponent({
           <SRSQuizButtons
             currentExample={currentExample}
             answerShowing={answerShowing}
-            updateExampleDifficulty={updateExampleDifficulty}
             incrementExampleNumber={incrementExampleNumber}
-
           />
         )}
         <QuizButtons
@@ -295,7 +234,7 @@ export default function QuizComponent({
         </div>
         <QuizProgress
           currentExampleNumber={currentExampleNumber}
-          totalExamplesNumber={examplesToReview.length}
+          totalExamplesNumber={displayOrder.length}
         />
       </div>
     )

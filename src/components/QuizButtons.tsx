@@ -3,7 +3,7 @@ import React from 'react'
 interface QuizButtonsProps {
   decrementExample: () => void
   incrementExample: () => void
-  audioActive: string
+  audioActive: string | undefined
   togglePlaying: () => void
   playing: boolean
 }

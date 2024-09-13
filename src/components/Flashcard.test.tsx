@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import { sampleStudentFlashcardData } from '../../tests/mockData'
 
-import Flashcard from './Flashcard'
+import Flashcard from './FlashcardDisplay'
 
 const example = { ...sampleStudentFlashcardData.examples[0], isCollected: true }
 

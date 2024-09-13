@@ -1,18 +1,20 @@
 import React from 'react'
 import type { Flashcard } from '../interfaceDefinitions'
 import { formatEnglishText, formatSpanishText } from '../functions/formatFlashcardText'
+import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
 
 interface FlashcardProps {
   example: Flashcard
   isStudent: boolean
   answerShowing: boolean
   startWithSpanish?: boolean
-  addFlashcardAndUpdate: (recordId: number) => void
-  removeFlashcardAndUpdate: (recordId: number) => void
   toggleAnswer: () => void
 }
 
-export default function FlashcardDisplay({ example, isStudent, answerShowing, startWithSpanish = false, addFlashcardAndUpdate, removeFlashcardAndUpdate, toggleAnswer }: FlashcardProps): JSX.Element {
+export default function FlashcardDisplay({ example, isStudent, answerShowing, startWithSpanish = false, toggleAnswer }: FlashcardProps): JSX.Element {
+  const { addFlashcardMutation, removeFlashcardMutation } = useStudentFlashcards()
+  const addFlashcard = addFlashcardMutation.mutate
+  const removeFlashcard = removeFlashcardMutation.mutate
   const spanishText = example.spanishExample
   const englishText = example.englishTranslation
 
@@ -35,10 +37,7 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, st
                 <button
                   type="button"
                   className="addFlashcardButton"
-                  onClick={() =>
-                    addFlashcardAndUpdate(
-                      example.recordId,
-                    )}
+                  onClick={() => addFlashcard(example)}
                 >
                   Add to my flashcards
                 </button>
@@ -47,7 +46,7 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, st
                 <button
                   type="button"
                   className="removeFlashcardButton"
-                  onClick={() => removeFlashcardAndUpdate(example.recordId)}
+                  onClick={() => removeFlashcard(example.recordId)}
                 >
                   Remove from my flashcards
                 </button>

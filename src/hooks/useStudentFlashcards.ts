@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback, useRef } from 'react'
-import { debounce } from 'lodash'
+import { useCallback, useRef, useState } from 'react'
+import { debounce, update } from 'lodash'
 import type { Flashcard, StudentExample, StudentFlashcardData } from '../interfaceDefinitions'
+import { labelCollectedExamples } from '../functions/labelCollectedExamples'
 import { useUserData } from './useUserData'
 import { useActiveStudent } from './useActiveStudent'
 import { useBackend } from './useBackend'
@@ -20,6 +21,8 @@ export function useStudentFlashcards() {
     updateStudentExample,
     updateMyStudentExample,
   } = useBackend()
+
+  const [localUpdates, setLocalUpdates] = useState<Record<number, Partial<Flashcard>>>({})
 
   const tempIdNum = useRef(-1)
 
@@ -47,21 +50,30 @@ export function useStudentFlashcards() {
   }, [])
 
   const getFlashcardData = async () => {
+    let backendResponse
     if (userDataQuery.data?.isAdmin && activeStudentId) {
-      const backendResponse = await getActiveExamplesFromBackend(activeStudentId)
-      if (backendResponse) {
-        return matchAndTrimArrays(backendResponse)
-      }
-      throw new Error('bad response')
+      backendResponse = await getActiveExamplesFromBackend(activeStudentId)
     }
     else if (userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited') {
-      const backendResponse = await getMyExamplesFromBackend()
-      if (backendResponse) {
-        return matchAndTrimArrays(backendResponse)
-      }
-      throw new Error('bad response')
+      backendResponse = await getMyExamplesFromBackend()
     }
-    throw new Error('no active student')
+    if (backendResponse === undefined) {
+      throw new Error('No active student')
+    }
+    if (backendResponse) {
+      const mergedData = backendResponse.examples.map(flashcard => ({
+        ...flashcard,
+        // Apply any local updates for this flashcard
+        ...localUpdates[flashcard.recordId],
+      }))
+
+      const updatedFlashcardData = {
+        examples: labelCollectedExamples(mergedData, backendResponse.studentExamples), // Label collected examples
+        studentExamples: backendResponse.studentExamples, // Keep other student data as is
+      }
+      return matchAndTrimArrays(updatedFlashcardData)
+    }
+    throw new Error('bad response')
   }
 
   const flashcardDataQuery = useQuery({
@@ -132,7 +144,7 @@ export function useStudentFlashcards() {
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
         const oldFlashcardsCopy = [...oldFlashcards.examples]
         const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples]
-        const newExampleArray = [...oldFlashcardsCopy, flashcard]
+        const newExampleArray = [...oldFlashcardsCopy, { ...flashcard, isCollected: true }]
         const newStudentExampleArray = [...oldStudentFlashcardsCopy, newStudentExample]
         const newFlashcardData = { examples: newExampleArray, studentExamples: newStudentExampleArray }
         const trimmedNewFlashcardData = matchAndTrimArrays(newFlashcardData)
@@ -212,6 +224,17 @@ export function useStudentFlashcards() {
       // Return the memoized objects for rollback
       return { studentFlashcardObject, flashcardObject }
     },
+    onSuccess: (_data, _variables, context) => {
+      const { flashcardObject } = context
+      if (flashcardObject?.recordId) {
+      // Remove the local update for the deleted flashcard
+        setLocalUpdates((prevUpdates) => {
+          const { [flashcardObject.recordId]: _, ...rest } = prevUpdates
+          return rest
+        })
+      }
+    },
+
     onError: (error, _variables, context) => {
       console.error(error)
       // Roll back the cache for just the affected flashcard
@@ -254,10 +277,19 @@ export function useStudentFlashcards() {
   }, [userDataQuery.data?.isAdmin, userDataQuery.data?.role, activeStudentId, updateStudentExample, updateMyStudentExample])
 
   const updateFlashcardMutation = useMutation({
-    mutationFn: ({ studentExampleId, newInterval }: { studentExampleId: number, newInterval: number }) => updateActiveStudentFlashcards(studentExampleId, newInterval),
-    onMutate: async ({ studentExampleId, newInterval }) => {
+    mutationFn: ({ studentExampleId, newInterval }: { studentExampleId: number, newInterval: number, difficulty: 'easy' | 'hard' }) => updateActiveStudentFlashcards(studentExampleId, newInterval),
+    onMutate: async ({ studentExampleId, newInterval, difficulty }) => {
       // Cancel any in-flight queries
       await queryClient.cancelQueries({ queryKey: ['flashcardData', activeStudentId] })
+
+      // Update the local state for the flashcard
+      setLocalUpdates(prevUpdates => ({
+        ...prevUpdates,
+        [studentExampleId]: {
+          ...(prevUpdates[studentExampleId] || {}), // Keep other properties intact
+          difficulty, // Overwrite the difficulty with the new value
+        },
+      }))
 
       // Memoize the old interval for rollback
       let oldInterval: number | undefined
@@ -265,17 +297,21 @@ export function useStudentFlashcards() {
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
         const oldFlashcardsCopy = [...oldFlashcards.studentExamples]
         const studentFlashcard = oldFlashcardsCopy.find(studentFlashcard => studentFlashcard.recordId === studentExampleId)
-        if (studentFlashcard) {
+        const flashcard = oldFlashcards.examples.find(flashcard => flashcard.recordId === studentFlashcard?.relatedExample)
+        if (studentFlashcard && flashcard) {
           oldInterval = studentFlashcard.reviewInterval ? studentFlashcard.reviewInterval : undefined
-          const newStudentFLashcard = { ...studentFlashcard, reviewInterval: newInterval }
-          const newStudentFlashcardsArray = oldFlashcardsCopy.map(studentFlashcard => studentFlashcard.recordId === studentExampleId ? newStudentFLashcard : studentFlashcard)
-          const trimmedNewFlashcardData = matchAndTrimArrays({ examples: oldFlashcards.examples, studentExamples: newStudentFlashcardsArray })
+          const newStudentFlashcard = { ...studentFlashcard, reviewInterval: newInterval }
+          const newFlashcard = { ...flashcard, difficulty }
+          const newStudentFlashcardsArray = oldFlashcardsCopy.map(studentFlashcard => studentFlashcard.recordId === studentExampleId ? newStudentFlashcard : studentFlashcard)
+          const newFlashcardsArray = oldFlashcards.examples.map(flashcard => flashcard.recordId === studentFlashcard.relatedExample ? newFlashcard : flashcard)
+          const trimmedNewFlashcardData = matchAndTrimArrays({ examples: newFlashcardsArray, studentExamples: newStudentFlashcardsArray })
           return trimmedNewFlashcardData
         }
       })
       // Return the studentExampleId and the previous interval for rollback context
       return { studentExampleId, newInterval: oldInterval }
     },
+
     onError: (error, _variables, context) => {
       console.error(error)
       // Make sure both necessary values are defined
@@ -284,14 +320,23 @@ export function useStudentFlashcards() {
       }
       // Destructure the context
       const { studentExampleId, newInterval } = context
+      // Remove the local update for this flashcard
+      setLocalUpdates((prevUpdates) => {
+        const { [studentExampleId]: _, ...rest } = prevUpdates // Remove the failed update
+        return rest
+      })
+
       // Roll back the cache for just the affected flashcard
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
         const oldFlashcardsCopy = [...oldFlashcards.studentExamples]
         const studentFlashcard = oldFlashcardsCopy.find(studentFlashcard => studentFlashcard.recordId === studentExampleId)
-        if (studentFlashcard) {
+        const flashcard = oldFlashcards.examples.find(flashcard => flashcard.recordId === studentFlashcard?.relatedExample)
+        if (studentFlashcard && flashcard) {
           const newStudentFlashcard = { ...studentFlashcard, reviewInterval: newInterval }
+          const newFlashcard = { ...flashcard, difficulty: undefined }
           const newStudentFlashcardsArray = oldFlashcardsCopy.map(studentFlashcard => studentFlashcard.recordId === studentExampleId ? newStudentFlashcard : studentFlashcard)
-          const trimmedNewFlashcardData = matchAndTrimArrays({ examples: oldFlashcards.examples, studentExamples: newStudentFlashcardsArray })
+          const newFlashcardsArray = oldFlashcards.examples.map(flashcard => flashcard.recordId === studentFlashcard.relatedExample ? newFlashcard : flashcard)
+          const trimmedNewFlashcardData = matchAndTrimArrays({ examples: newFlashcardsArray, studentExamples: newStudentFlashcardsArray })
           return trimmedNewFlashcardData
         }
         return oldFlashcards

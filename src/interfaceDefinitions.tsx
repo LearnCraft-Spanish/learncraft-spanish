@@ -44,9 +44,8 @@ export interface Flashcard {
   englishAudio: string
   spanishAudioLa: string
   vocabComplete: boolean
-  isCollected?: boolean
+  isCollected: boolean
   difficulty?: string
-
 }
 
 export interface StudentExample {
@@ -93,20 +92,6 @@ export interface Vocabulary {
   verbInfinitive: string
   conjugationTags: Array<string>
 }
-// ['Record ID#', 'spanish example', 'english translation',
-//  'vocab included', 'spanglish?', 'All Students', 'English Audio',
-//  'Spanish Audio LA', 'Vocab Complete?']
-export interface Examples {
-  recordId: number
-  spanishExample: string
-  englishTranslation: string
-  vocabIncluded: Array<string>
-  spanglish: 'spanglish' | 'esp'
-  allStudents: Array<string>
-  englishAudio: string
-  spanishAudioLa: string
-  vocabComplete: boolean
-}
 
 export interface QuizCourse {
   name: string
@@ -116,7 +101,7 @@ export interface QuizCourse {
 
 export interface DisplayOrder {
   recordId: number
-  displayOrder: number
+  isCollected: boolean
 }
 
 export interface Quiz {
@@ -131,7 +116,7 @@ export interface Quiz {
 }
 
 export interface Spelling {
-  relatedWordidion: number
+  relatedWordidiom: number
   spellingOption: string
 }
 

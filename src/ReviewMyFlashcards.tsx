@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
 import type { FormEvent } from 'react'
-
-import { set } from 'lodash'
 import type { Flashcard } from './interfaceDefinitions'
 
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
@@ -103,7 +101,11 @@ export default function MyFlashcardsQuiz() {
 
   return (
     <div>
-      {!quizReady && (
+      {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
+      {flashcardDataQuery.isLoading && <h2>Loading Flashcard Data...</h2>}
+      {(flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.studentExamples?.length)
+      && <Navigate to="/" />}
+      {!quizReady && flashcardDataQuery.isSuccess && (
         <form className="myFlashcardsForm" onSubmit={e => handleSumbit(e)}>
           <div className="myFlashcardsFormContentWrapper">
             <h3>Review My Flashcards</h3>
@@ -145,7 +147,7 @@ export default function MyFlashcardsQuiz() {
       <Routes>
         <Route
           path="quiz"
-          element={(
+          element={flashcardDataQuery.isSuccess && (
             <QuizComponent
               examplesToParse={quizExamples}
               quizTitle="My Flashcards"
@@ -158,7 +160,7 @@ export default function MyFlashcardsQuiz() {
         />
         <Route
           path="srsquiz"
-          element={(
+          element={flashcardDataQuery.isSuccess && (
             <SRSQuizApp
               startWithSpanish={spanishFirst}
               quizLength={quizLength}
@@ -167,8 +169,6 @@ export default function MyFlashcardsQuiz() {
           )}
         />
       </Routes>
-      {flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.studentExamples?.length
-      && <Navigate to="/" />}
     </div>
   )
 }

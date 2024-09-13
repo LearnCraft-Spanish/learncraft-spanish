@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import './App.css'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
-import type { DisplayOrder, Program, Quiz, QuizCourse } from './interfaceDefinitions'
+import type { Program, Quiz, QuizCourse } from './interfaceDefinitions'
 
 import QuizComponent from './components/QuizComponent'
 
@@ -32,9 +32,6 @@ export default function OfficialQuiz({
   const thisQuiz = Number.parseInt(useParams().number?.toString() || '0')
   const [thisQuizID, setThisQuizID] = useState<number | undefined>(undefined)
   const { officialQuizzesQuery, quizExamplesQuery } = useOfficialQuizzes(thisQuizID)
-
-  // Orders the examples from the quiz-examples set
-  const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([])
 
   function makeQuizTitle() {
     const thisCourse = courses.find(course => course.code === quizCourse)
@@ -79,39 +76,22 @@ export default function OfficialQuiz({
     }
   }, [officialQuizzesQuery.data, thisQuiz, quizCourse])
 
-  // Randomizes the order of the quiz examples for display
   useEffect(() => {
-    if (thisQuizID && quizExamplesQuery.data) {
-      const exampleOrder: DisplayOrder[] = quizExamplesQuery.data.map(
-        (example) => {
-          return {
-            recordId: example.recordId,
-            displayOrder: Math.random() * 0.5,
-          }
-        },
-      )
-      exampleOrder.sort((a, b) => a.displayOrder - b.displayOrder)
-      setDisplayOrder(exampleOrder)
-    }
-  }, [thisQuizID, quizExamplesQuery.data])
-
-  useEffect(() => {
-    if (quizExamplesQuery.isSuccess && displayOrder.length < 1) {
+    if (quizExamplesQuery.isSuccess && !quizExamplesQuery.data?.length) {
       makeMenuShow()
       navigate('..')
     }
-  }, [quizExamplesQuery.isSuccess, displayOrder, makeMenuShow, navigate])
+  }, [quizExamplesQuery.isSuccess, quizExamplesQuery.data, makeMenuShow, navigate])
 
   return (
     <>
       {officialQuizzesQuery.data && (
         <>
-          {(quizExamplesQuery.isLoading || !displayOrder) && (<h2 className="loading">Loading Quiz...</h2>)}
+          {(quizExamplesQuery.isLoading) && (<h2 className="loading">Loading Quiz...</h2>)}
           {quizExamplesQuery.isError && (<h2 className="error">Error Loading Quiz</h2>)}
-          {quizExamplesQuery.data && displayOrder && (
+          {quizExamplesQuery.data && (
             <QuizComponent
               examplesToParse={quizExamplesQuery.data}
-              displayOrder={displayOrder}
               quizTitle={makeQuizTitle()}
               cleanupFunction={makeMenuShow}
             />
