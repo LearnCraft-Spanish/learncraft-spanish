@@ -274,7 +274,10 @@ export const App: React.FC = () => {
       <Nav />
       {(location.pathname !== '/coaching'
       && location.pathname !== '/comprehensionquiz'
-      && location.pathname !== '/audioquiz') && (
+      && location.pathname !== '/audioquiz'
+      && location.pathname !== '/myflashcards/quiz'
+      && location.pathname !== '/myflashcards/srsquiz'
+      && location.pathname.split('/')[1] !== 'officialquizzes') && (
         <div className="div-user-subheader">
           {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>

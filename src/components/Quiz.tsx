@@ -8,6 +8,7 @@ import QuizProgress from '../components/QuizProgress'
 import MenuButton from '../components/MenuButton'
 import SRSQuizButtons from '../components/SRSButtons'
 import { useActiveStudent } from '../hooks/useActiveStudent'
+import NewQuizProgress from './AudioBasedReview/NewQuizProgress'
 
 interface QuizProps {
   quizTitle: string
@@ -119,6 +120,42 @@ export default function Quiz({
   const spanishAudioUrl = currentExample?.spanishAudioLa
   const englishAudioUrl = currentExample?.englishAudio
 
+  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
+
+  const questionAudio = startWithSpanish ? spanishAudio : englishAudio
+  const answerAudio = startWithSpanish ? englishAudio : spanishAudio
+
+  const playCurrentAudio = useCallback(() => {
+    setPlaying(true)
+    if (currentAudio.current) {
+      currentAudio.current.play()
+        .catch((e: unknown) => {
+          if (e instanceof Error) {
+            console.error(e.message)
+          }
+          else {
+            console.error('Error playing audio. Error: ', e)
+          }
+        })
+    }
+  }, [currentAudio])
+
+  const pauseCurrentAudio = useCallback(() => {
+    setPlaying(false)
+    if (currentAudio.current) {
+      currentAudio.current.pause()
+    }
+  }, [currentAudio])
+
+  const togglePlaying = useCallback(() => {
+    if (playing) {
+      pauseCurrentAudio()
+    }
+    else {
+      playCurrentAudio()
+    }
+  }, [playing, pauseCurrentAudio, playCurrentAudio])
+
   function spanishAudio() {
     const audioElement
           = (
@@ -142,35 +179,6 @@ export default function Quiz({
           )
     return audioElement
   }
-
-  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
-
-  const questionAudio = startWithSpanish ? spanishAudio : englishAudio
-  const answerAudio = startWithSpanish ? englishAudio : spanishAudio
-
-  const playCurrentAudio = useCallback(() => {
-    setPlaying(true)
-    if (currentAudio.current) {
-      currentAudio.current.play()
-    }
-  }, [currentAudio])
-
-  const pauseCurrentAudio = useCallback(() => {
-    setPlaying(false)
-    if (currentAudio.current) {
-      currentAudio.current.pause()
-    }
-  }, [currentAudio])
-
-  const togglePlaying = useCallback(() => {
-    if (playing) {
-      pauseCurrentAudio()
-    }
-    else {
-      playCurrentAudio()
-    }
-  }, [playing, pauseCurrentAudio, playCurrentAudio])
-
   /*     Add/Remove Flashcard Section       */
   function incrementExampleNumber() {
     if (currentExampleNumber < examplesToReview.length) {
@@ -274,9 +282,13 @@ export default function Quiz({
   return (
     examplesToReview.length > 0 && (
       <div className="quiz">
-        <h3>{quizTitle}</h3>
         {!answerShowing && questionAudio()}
         {answerShowing && answerAudio()}
+        <NewQuizProgress
+          quizTitle={quizTitle}
+          currentExampleNumber={currentExampleNumber}
+          totalExamplesNumber={examplesToReview.length}
+        />
         <FlashcardDisplay
           example={currentExample}
           isStudent={activeStudent?.role === ('student')}
@@ -285,32 +297,26 @@ export default function Quiz({
           removeFlashcardAndUpdate={removeFlashcardAndUpdate}
           toggleAnswer={toggleAnswer}
           startWithSpanish={startWithSpanish}
-        />
+          audioActive={audioActive}
+          togglePlaying={togglePlaying}
+          playing={playing}
 
+        />
         {isSrsQuiz && (
           <SRSQuizButtons
             currentExample={currentExample}
             answerShowing={answerShowing}
             updateExampleDifficulty={updateExampleDifficulty}
             incrementExampleNumber={incrementExampleNumber}
-
           />
         )}
         <QuizButtons
           decrementExample={decrementExampleNumber}
           incrementExample={incrementExampleNumber}
-          audioActive={audioActive}
-          togglePlaying={togglePlaying}
-          playing={playing}
         />
         <div className="buttonBox">
           {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
-          <MenuButton />
         </div>
-        <QuizProgress
-          currentExampleNumber={currentExampleNumber}
-          totalExamplesNumber={examplesToReview.length}
-        />
       </div>
     )
   )

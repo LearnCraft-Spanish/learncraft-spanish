@@ -219,7 +219,7 @@ button:hover, .linkButton:hover {
   flex-wrap: wrap;
 }
 
-.spanishExample, .englishTranslation {
+/* .spanishExample, .englishTranslation {
   position: relative;
   width: 65%;
   min-width: 300px;
@@ -234,16 +234,12 @@ button:hover, .linkButton:hover {
   padding: 25px 50px;
   border: 4px solid var(--accent);
   cursor: pointer;
-}
+} */
 
 
 .readyButton {
   display: flex;
   justify-content: space-around;
-}
-
-.quizInterface {
-  margin-top: 40px;
 }
 
 .quizControls {

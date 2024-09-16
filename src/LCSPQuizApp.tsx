@@ -355,6 +355,7 @@ export default function LCSPQuizApp({
     <div className="quizInterface">
       {/* Quiz Selector */}
       {!dataLoaded && <h2>Loading Quizzes...</h2>}
+      {!hideMenu && <h3>Offical Quiz</h3>}
 
       {dataLoaded && chosenQuiz && quizCourse === 'lcsp' && !hideMenu && (
         <div className="quizSelector">
