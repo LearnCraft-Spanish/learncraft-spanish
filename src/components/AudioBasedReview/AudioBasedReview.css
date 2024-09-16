@@ -31,7 +31,6 @@ button:disabled {
     position: relative;
     display: flex;
     flex-direction: column;
-    vertical-align: center;
     justify-content: center;
     overflow: hidden;
     text-align: center;
@@ -160,6 +159,9 @@ button:disabled {
     margin: 0;
     padding: 0;
     width: 100%;
+}
+.audioQuizSetupMenu .buttonBox p {
+    margin: 16px auto;
 }
 @media (max-width: 480px) {
     .audioQuizSetupMenu {

@@ -556,14 +556,16 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                       </button>
                     )}
                   </div>
-                  <FromToLessonSelector
-                    toLesson={selectedLesson}
-                    updateToLesson={updateSelectedLesson}
-                    fromLesson={fromLesson}
-                    updateFromLesson={updateFromLesson}
-                    selectedProgram={selectedProgram}
-                    updateSelectedProgram={updateSelectedProgram}
-                  />
+                  <div className="FromToLessonSelectorWrapper">
+                    <FromToLessonSelector
+                      toLesson={selectedLesson}
+                      updateToLesson={updateSelectedLesson}
+                      fromLesson={fromLesson}
+                      updateFromLesson={updateFromLesson}
+                      selectedProgram={selectedProgram}
+                      updateSelectedProgram={updateSelectedProgram}
+                    />
+                  </div>
                 </div>
                 <div className="filterBox">
                   <div className="searchFilter">

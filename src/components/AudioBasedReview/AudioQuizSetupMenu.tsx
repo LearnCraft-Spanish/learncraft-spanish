@@ -73,9 +73,9 @@ export default function AudioQuizSetupMenu({
         <button type="button" onClick={readyQuiz} disabled={!(examplesToPlayLength > 0)}>Start</button>
       </div>
       <div className="buttonBox">
-        {examplesToPlayLength < 1 && (
-          <p>There are no audio examples for this lesson range</p>
-        )}
+        {examplesToPlayLength < 1
+          ? <p>There are no audio examples for this lesson range</p>
+          : <p>{`${examplesToPlayLength} examples found`}</p>}
       </div>
       <div className="buttonBox">
       </div>

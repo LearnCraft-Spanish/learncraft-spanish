@@ -54,7 +54,7 @@ export default function FromToLessonSelector({
 
   return (
     <div className="FTLS">
-      <label htmlFor="courseList" className="menuRow">
+      <label htmlFor="courseList" className="menuRow" id="courseRow">
         <p>Course:</p>
         <select
           name="courseList"
@@ -65,32 +65,34 @@ export default function FromToLessonSelector({
           {makeCourseSelector()}
         </select>
       </label>
-      <label htmlFor="fromLesson" className="menuRow">
-        <p>From Lesson:</p>
-        {fromLesson?.recordId && selectedProgram?.lessons && (
-          <select
-            name="fromLesson"
-            className="lessonList"
-            value={fromLesson.recordId}
-            onChange={e => updateFromLesson(e.target.value)}
-          >
-            {makeLessonSelector()}
-          </select>
-        )}
-      </label>
-      <label htmlFor="toLesson" className="menuRow">
-        <p>To Lesson:</p>
-        {toLesson?.recordId && selectedProgram?.lessons && (
-          <select
-            name="toLesson"
-            className="lessonList"
-            value={toLesson.recordId}
-            onChange={e => updateToLesson(e.target.value)}
-          >
-            {makeLessonSelector()}
-          </select>
-        )}
-      </label>
+      <div id="flashcardFinderStyling">
+        <label htmlFor="fromLesson" className="menuRow" id="fromRow">
+          <p>From:</p>
+          {fromLesson?.recordId && selectedProgram?.lessons && (
+            <select
+              name="fromLesson"
+              className="lessonList"
+              value={fromLesson.recordId}
+              onChange={e => updateFromLesson(e.target.value)}
+            >
+              {makeLessonSelector()}
+            </select>
+          )}
+        </label>
+        <label htmlFor="toLesson" className="menuRow" id="toRow">
+          <p>To:</p>
+          {toLesson?.recordId && selectedProgram?.lessons && (
+            <select
+              name="toLesson"
+              className="lessonList"
+              value={toLesson.recordId}
+              onChange={e => updateToLesson(e.target.value)}
+            >
+              {makeLessonSelector()}
+            </select>
+          )}
+        </label>
+      </div>
     </div>
   )
 }
