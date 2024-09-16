@@ -101,7 +101,6 @@ export interface QuizCourse {
 
 export interface DisplayOrder {
   recordId: number
-  isCollected: boolean
 }
 
 export interface Quiz {

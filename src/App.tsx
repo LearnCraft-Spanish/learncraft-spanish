@@ -1,7 +1,7 @@
 import './App.css'
 import type { ReactElement } from 'react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
+import { Route, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
@@ -311,29 +311,6 @@ export const App: React.FC = () => {
             && <ReviewMyFlashcards />
           }
         />
-        {/* <Route
-          path="/allflashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
-              ? (
-                  <Quiz
-                    examplesToParse={studentFlashcardData?.examples}
-                    quizTitle="My Flashcards"
-                    quizOnlyCollectedExamples
-                    cleanupFunction={() => navigate('..')}
-                  />
-                )
-              : (<Navigate to="/" />)
-          }
-        />
-        <Route
-          path="/todaysflashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples.length)
-              ? <SRSQuizApp />
-              : <Navigate to="/" />
-          }
-        /> */}
         <Route
           path="/manage-flashcards"
           element={<FlashcardManager />}

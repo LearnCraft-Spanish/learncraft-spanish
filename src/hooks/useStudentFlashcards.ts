@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useRef, useState } from 'react'
-import { debounce, update } from 'lodash'
+import { debounce } from 'lodash'
 import type { Flashcard, StudentExample, StudentFlashcardData } from '../interfaceDefinitions'
-import { labelCollectedExamples } from '../functions/labelCollectedExamples'
 import { useUserData } from './useUserData'
 import { useActiveStudent } from './useActiveStudent'
 import { useBackend } from './useBackend'
@@ -22,6 +21,7 @@ export function useStudentFlashcards() {
     updateMyStudentExample,
   } = useBackend()
 
+  // Local state to store session updates. Current use is ONLY for difficulty labels on SRS quiz.
   const [localUpdates, setLocalUpdates] = useState<Record<number, Partial<Flashcard>>>({})
 
   const tempIdNum = useRef(-1)
@@ -68,7 +68,7 @@ export function useStudentFlashcards() {
       }))
 
       const updatedFlashcardData = {
-        examples: labelCollectedExamples(mergedData, backendResponse.studentExamples), // Label collected examples
+        examples: mergedData,
         studentExamples: backendResponse.studentExamples, // Keep other student data as is
       }
       return matchAndTrimArrays(updatedFlashcardData)
@@ -83,10 +83,20 @@ export function useStudentFlashcards() {
     enabled: studentFlashcardDependenciesLoaded,
   })
 
-  // Debounce the refetch to wait until the last mutation is done
-  const debouncedRefetch = useCallback(() => debounce(() => {
-    queryClient.invalidateQueries({ queryKey: ['flashcardData', activeStudentId] })
-  }, 500), [queryClient, activeStudentId]) // 500ms delay
+  // Exported helper function to check if an example is collected by ID
+  const exampleIsCollected = useCallback((exampleId: number) => {
+    const studentFlashcardData = flashcardDataQuery.data?.studentExamples
+    const foundStudentExample = studentFlashcardData?.find(studentExample => studentExample.relatedExample === exampleId)
+    return foundStudentExample !== undefined
+  }, [flashcardDataQuery.data?.studentExamples])
+
+  // Create a ref to store the debounced function
+  const debouncedRefetch = useRef(
+    debounce(() => {
+      console.log('Refetching flashcard data')
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] })
+    }, 500),
+  ).current
 
   // Function to return promise that will either give success data or throw an error.
   const addToActiveStudentFlashcards = useCallback(async (flashcard: Flashcard) => {
@@ -142,6 +152,11 @@ export function useStudentFlashcards() {
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
+        if (!oldFlashcards) {
+          const newItem = { examples: [flashcard], studentExamples: [newStudentExample] }
+          const trimmedNewFlashcardData = matchAndTrimArrays(newItem)
+          return trimmedNewFlashcardData
+        }
         const oldFlashcardsCopy = [...oldFlashcards.examples]
         const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples]
         const newExampleArray = [...oldFlashcardsCopy, { ...flashcard, isCollected: true }]
@@ -167,11 +182,15 @@ export function useStudentFlashcards() {
       })
     },
     // Always refetch after success or error:
-    onSettled: debouncedRefetch,
+    onSettled: () => debouncedRefetch(),
   })
 
   // Function to return promise that will either give success data or throw an error.
-  const removeFromActiveStudentFlashcards = useCallback(async (studentFlashcardId: number) => {
+  const removeFromActiveStudentFlashcards = useCallback(async (flashcardId: number) => {
+    const studentFlashcardId = flashcardDataQuery.data?.studentExamples.find(studentFlashcard => studentFlashcard.relatedExample === flashcardId)?.recordId
+    if (!studentFlashcardId) {
+      throw new Error('Flashcard Not Found')
+    }
     let removePromise
     if (userDataQuery.data?.isAdmin && activeStudentId) {
       removePromise = deleteStudentExample(studentFlashcardId)
@@ -190,11 +209,11 @@ export function useStudentFlashcards() {
         return result
       })
     return removeResponse
-  }, [userDataQuery.data?.isAdmin, userDataQuery.data?.role, activeStudentId, deleteStudentExample, deleteMyStudentExample])
+  }, [userDataQuery.data?.isAdmin, userDataQuery.data?.role, flashcardDataQuery.data, activeStudentId, deleteStudentExample, deleteMyStudentExample])
 
   const removeFlashcardMutation = useMutation({
-    mutationFn: (studentFlashcardId: number) => removeFromActiveStudentFlashcards(studentFlashcardId),
-    onMutate: async (studentFlashcardId: number) => {
+    mutationFn: (flashcardId: number) => removeFromActiveStudentFlashcards(flashcardId),
+    onMutate: async (flashcardId: number) => {
       // Cancel any in-flight queries
       await queryClient.cancelQueries({ queryKey: ['flashcardData', activeStudentId] })
 
@@ -205,8 +224,8 @@ export function useStudentFlashcards() {
       // Optimistically update the flashcards cache
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
         // Find the studentFlashcard and related flashcard objects
-        const studentFlashcardObjectOriginal = oldFlashcards.studentExamples.find(studentFlashcard => studentFlashcard.recordId === studentFlashcardId)
-        const flashcardObjectOriginal = oldFlashcards.examples.find(flashcard => flashcard.recordId === studentFlashcardObject?.relatedExample)
+        const flashcardObjectOriginal = oldFlashcards.examples.find(flashcard => flashcard.recordId === flashcardId)
+        const studentFlashcardObjectOriginal = oldFlashcards.studentExamples.find(studentFlashcard => studentFlashcard.relatedExample === flashcardId)
 
         // Make a copy if they exist, save to memoized objects
         studentFlashcardObject = studentFlashcardObjectOriginal ? { ...studentFlashcardObjectOriginal } : undefined
@@ -215,8 +234,8 @@ export function useStudentFlashcards() {
         // Remove the studentFlashcard and related flashcard object from the cache
         const oldFlashcardsCopy = [...oldFlashcards.examples]
         const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples]
-        const newStudentFlashcardsArray = oldStudentFlashcardsCopy.filter(studentFlashcard => studentFlashcard.recordId !== studentFlashcardId)
-        const newFlashcardsArray = oldFlashcardsCopy.filter(flashcard => flashcard.recordId !== studentFlashcardObject?.relatedExample)
+        const newStudentFlashcardsArray = oldStudentFlashcardsCopy.filter(studentFlashcard => studentFlashcard.relatedExample !== flashcardId)
+        const newFlashcardsArray = oldFlashcardsCopy.filter(flashcard => flashcard.recordId !== flashcardId)
         const newFlashcardData = { examples: newFlashcardsArray, studentExamples: newStudentFlashcardsArray }
         const trimmedNewFlashcardData = matchAndTrimArrays(newFlashcardData)
         return trimmedNewFlashcardData
@@ -252,7 +271,7 @@ export function useStudentFlashcards() {
         })
       }
     },
-    onSettled: debouncedRefetch,
+    onSettled: () => debouncedRefetch(),
   })
 
   const updateActiveStudentFlashcards = useCallback(async (studentExampleId: number, newInterval: number) => {
@@ -342,8 +361,8 @@ export function useStudentFlashcards() {
         return oldFlashcards
       })
     },
-    onSettled: debouncedRefetch,
+    onSettled: () => debouncedRefetch(),
   })
 
-  return { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation, updateFlashcardMutation }
+  return { flashcardDataQuery, exampleIsCollected, addFlashcardMutation, removeFlashcardMutation, updateFlashcardMutation }
 }

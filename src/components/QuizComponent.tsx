@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import { init } from '@sentry/react'
 import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
 import { useActiveStudent } from '../hooks/useActiveStudent'
 import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
@@ -32,8 +33,10 @@ export default function QuizComponent({
 }: QuizComponentProps) {
   const location = useLocation()
   const { activeStudent } = useActiveStudent()
+  const { exampleIsCollected } = useStudentFlashcards()
 
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
+  const initialDisplayOrder = useRef<DisplayOrder[]>([])
   const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([])
   const [displayOrderReady, setDisplayOrderReady] = useState(false)
 
@@ -148,6 +151,15 @@ export default function QuizComponent({
     setPlaying(false)
   }
 
+  function onRemove() {
+    if (quizOnlyCollectedExamples || isSrsQuiz) {
+      const quizLength = displayOrder.length
+      if (currentExampleNumber >= quizLength) {
+        setCurrentExampleNumber(quizLength - 1)
+      }
+    }
+  }
+
   function fisherYatesShuffle(array: DisplayOrder[]) {
     const shuffled = [...array] // Shallow copy to avoid mutating original array
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -160,25 +172,27 @@ export default function QuizComponent({
   const filterIfCollectedOnly = useCallback((displayOrderArray: DisplayOrder[]) => {
     if (quizOnlyCollectedExamples || isSrsQuiz) {
       const filteredList = displayOrderArray.filter(
-        item => item.isCollected,
+        item => exampleIsCollected(item.recordId),
       )
       return filteredList
     }
     else {
       return displayOrderArray
     }
-  }, [quizOnlyCollectedExamples, isSrsQuiz])
+  }, [quizOnlyCollectedExamples, isSrsQuiz, exampleIsCollected])
+
+  const currentFlashcardIsValid = currentExample !== undefined
 
   // Randomizes the order of the quiz examples for display
   // Runs only once to prevent re-scrambling while in use. Mutations handled elsewhere.
   useEffect(() => {
     if (examplesToParse.length > 0 && !displayOrderReady && quizLength > 0) {
       // Create a basic map of the flashcard objects with recordId and isCollected properties
+
       const exampleOrder: DisplayOrder[] = examplesToParse.map(
         (example) => {
           return {
             recordId: example.recordId,
-            isCollected: example.isCollected,
           }
         },
       )
@@ -194,27 +208,36 @@ export default function QuizComponent({
 
       // Display the limited order if any are left
       if (limitedOrder.length > 0) {
-        setDisplayOrder(limitedOrder)
+        initialDisplayOrder.current = limitedOrder
         setDisplayOrderReady(true)
       }
     }
   }, [examplesToParse, displayOrderReady, quizLength, filterIfCollectedOnly])
 
+  // Defines the actual list of items displayed as a mutable subset of the previous
+  useEffect(() => {
+    const filteredByCollected = filterIfCollectedOnly(initialDisplayOrder.current)
+    setDisplayOrder(filteredByCollected)
+  }, [filterIfCollectedOnly])
+
   return (
     displayOrder.length > 0 && (
       <div className="quiz">
         <h3>{quizTitle}</h3>
-        {!answerShowing && questionAudio()}
-        {answerShowing && answerAudio()}
-        <FlashcardDisplay
-          example={currentExample}
-          isStudent={activeStudent?.role === ('student')}
-          answerShowing={answerShowing}
-          toggleAnswer={toggleAnswer}
-          startWithSpanish={startWithSpanish}
-        />
+        {answerShowing ? answerAudio() : questionAudio()}
+        {currentFlashcardIsValid && (
+          <FlashcardDisplay
+            example={currentExample}
+            isStudent={activeStudent?.role === ('student')}
+            incrementExampleNumber={incrementExampleNumber}
+            onRemove={onRemove}
+            answerShowing={answerShowing}
+            toggleAnswer={toggleAnswer}
+            startWithSpanish={startWithSpanish}
+          />
+        )}
 
-        {isSrsQuiz && (
+        {isSrsQuiz && currentFlashcardIsValid && (
           <SRSQuizButtons
             currentExample={currentExample}
             answerShowing={answerShowing}

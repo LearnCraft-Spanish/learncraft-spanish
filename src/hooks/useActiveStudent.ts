@@ -48,7 +48,8 @@ export function useActiveStudent() {
     }
   }
 
-  const getStudentLevel = useCallback(() => {
+  // Update the student level if the student changes.
+  useEffect(() => {
     if (activeStudentQuery.data?.recordId && programTableQuery.data?.length) {
       let studentProgram = programTableQuery.data.find(
         program => program.recordId === activeStudentQuery.data?.relatedProgram,
@@ -68,7 +69,7 @@ export function useActiveStudent() {
           }
         }
         const cohortLesson = getCohortLesson(studentCohort)
-        const maxLesson = cohortLesson || 9999
+        const maxLesson = cohortLesson || 999
         const lessonList: Lesson[] = []
         const programWithLessonList: Program = { ...studentProgram }
         programWithLessonList.lessons?.forEach((lesson) => {
@@ -85,16 +86,16 @@ export function useActiveStudent() {
         activeProgram.current = studentProgram
         activeLesson.current = lastKnownLesson
       }
+      else {
+        activeProgram.current = null
+        activeLesson.current = null
+      }
     }
     else {
       activeProgram.current = null
       activeLesson.current = null
     }
   }, [activeStudentQuery.data, programTableQuery.data])
-
-  useEffect(() => {
-    getStudentLevel()
-  }, [getStudentLevel])
 
   return {
     activeStudent: activeStudentQuery.data,

@@ -7,16 +7,28 @@ interface FlashcardProps {
   example: Flashcard
   isStudent: boolean
   answerShowing: boolean
+  incrementExampleNumber: () => void
   startWithSpanish?: boolean
+  onRemove: () => void
   toggleAnswer: () => void
 }
 
-export default function FlashcardDisplay({ example, isStudent, answerShowing, startWithSpanish = false, toggleAnswer }: FlashcardProps): JSX.Element {
-  const { addFlashcardMutation, removeFlashcardMutation } = useStudentFlashcards()
+export default function FlashcardDisplay({ example, isStudent, answerShowing, incrementExampleNumber, onRemove, startWithSpanish = false, toggleAnswer }: FlashcardProps): JSX.Element {
+  const { addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
   const addFlashcard = addFlashcardMutation.mutate
   const removeFlashcard = removeFlashcardMutation.mutate
   const spanishText = example.spanishExample
   const englishText = example.englishTranslation
+
+  function addAndAdvance(example: Flashcard) {
+    addFlashcard(example)
+    incrementExampleNumber()
+  }
+
+  function removeAndAdvance(recordId: number) {
+    removeFlashcard(recordId)
+    onRemove()
+  }
 
   const questionText = startWithSpanish ? () => formatSpanishText(example.spanglish, spanishText) : () => formatEnglishText(englishText)
   const answerText = startWithSpanish ? () => formatEnglishText(englishText) : () => formatSpanishText(example.spanglish, spanishText)
@@ -32,12 +44,12 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, st
         <div className="spanishExample" onClick={toggleAnswer} role="button" aria-label="flashcard">
           {answerText()}
 
-          {isStudent && (!example.isCollected
+          {isStudent && (!exampleIsCollected(example.recordId)
             ? (
                 <button
                   type="button"
                   className="addFlashcardButton"
-                  onClick={() => addFlashcard(example)}
+                  onClick={() => addAndAdvance(example)}
                 >
                   Add to my flashcards
                 </button>
@@ -46,7 +58,7 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, st
                 <button
                   type="button"
                   className="removeFlashcardButton"
-                  onClick={() => removeFlashcard(example.recordId)}
+                  onClick={() => removeAndAdvance(example.recordId)}
                 >
                   Remove from my flashcards
                 </button>

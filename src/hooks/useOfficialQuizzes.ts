@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import type { Quiz } from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
 
 export function useOfficialQuizzes(quizNumber: number | undefined) {
+  const { isAuthenticated } = useAuth0()
   const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } = useBackend()
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
@@ -76,6 +78,7 @@ export function useOfficialQuizzes(quizNumber: number | undefined) {
     queryFn: getAndParseQuizzes,
     staleTime: Infinity, // Never stale unless manually updated
     gcTime: Infinity, // Never garbage collect unless manually updated
+    enabled: isAuthenticated,
   })
 
   const quizExamplesQuery = useQuery({

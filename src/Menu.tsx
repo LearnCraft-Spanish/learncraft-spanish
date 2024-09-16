@@ -11,10 +11,9 @@ export default function Menu() {
   const { activeStudent } = useActiveStudent()
   const { flashcardDataQuery } = useStudentFlashcards()
 
-  // may be the wrong variable to use, but check for initial data render before showing Menu
   return (
     <div className="menu">
-      {flashcardDataQuery.isError && (
+      {(userDataQuery.isError || flashcardDataQuery.isError) && (
         <div className="menuBox">
           <h3>Error Loading Data</h3>
         </div>

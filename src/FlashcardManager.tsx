@@ -81,21 +81,28 @@ function FlashcardManager() {
     return finalTable
   }
 
-  return studentFlashcardData?.examples?.length
-    ? (
+  return (
+    <>
+      {flashcardDataQuery.isLoading && <h2>Loading Flashcards...</h2>}
+      {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
+      {flashcardDataQuery.isSuccess && !studentFlashcardData?.examples && (
+        <h2>No flashcards found</h2>
+      )}
+      {flashcardDataQuery.isSuccess && (
         <div>
           <h2>Flashcard Manager</h2>
           <h4>
             {`Total flashcards: ${studentFlashcardData?.examples.length}`}
           </h4>
-          <div className="exampleCardContainer">
-            {createDisplayExamplesTable(studentFlashcardData?.examples)}
-          </div>
+          {studentFlashcardData?.examples && (
+            <div className="exampleCardContainer">
+              {createDisplayExamplesTable(studentFlashcardData?.examples)}
+            </div>
+          )}
         </div>
-      )
-    : (
-        !flashcardDataQuery.isSuccess && <Navigate to="/" />
-      )
+      )}
+    </>
+  )
 }
 
 export default FlashcardManager
