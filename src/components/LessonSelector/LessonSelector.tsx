@@ -1,7 +1,7 @@
 import React from 'react'
 
-import type { Lesson, Program } from './interfaceDefinitions'
-import { useActiveStudent } from './hooks/useActiveStudent'
+import type { Lesson, Program } from '../../interfaceDefinitions'
+import { useActiveStudent } from '../../hooks/useActiveStudent'
 
 interface LessonSelectorProps {
   selectedLesson: Lesson | null

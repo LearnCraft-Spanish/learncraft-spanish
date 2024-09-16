@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import './AudioBasedReview.css'
 
 import type { Lesson, Program } from '../../interfaceDefinitions'
-import FromToLessonSelector from '../FromToLessonSelector'
+import { FromToLessonSelector } from '../LessonSelector'
 import MenuButton from '../MenuButton'
 
 interface AudioQuizSetupMenuProps {

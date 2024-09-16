@@ -4,6 +4,8 @@ import '../../App.css'
 import './AudioBasedReview.css'
 import type { Flashcard, Lesson } from '../../interfaceDefinitions'
 // import LessonSelector from '../../LessonSelector'
+import { toFromlessonSelectorExamplesParser } from '../LessonSelector'
+
 import { useActiveStudent } from '../../hooks/useActiveStudent'
 import AudioQuizButtons from './AudioQuizButtons'
 import AudioFlashcard from './AudioFlashcard'
@@ -38,7 +40,7 @@ interface AudioBasedReviewProps {
   updateSelectedLesson: (lesson: any) => void
   updateSelectedProgram: (program: any) => void
   audioOrComprehension?: 'audio' | 'comprehension'
-  toFromlessonSelectorExamplesParser: (examples: Flashcard[], lessonId: number, fromLessonId: number) => Flashcard[]
+  // toFromlessonSelectorExamplesParser: (examples: Flashcard[], lessonId: number, fromLessonId: number) => Flashcard[]
 }
 
 /*
@@ -54,7 +56,7 @@ export default function AudioBasedReview({
   updateSelectedProgram,
   // will be 'audio' or 'comprehension'
   audioOrComprehension = 'comprehension',
-  toFromlessonSelectorExamplesParser,
+  // toFromlessonSelectorExamplesParser,
 }: AudioBasedReviewProps) {
   const { activeStudent, audioExamplesTable } = useActiveStudent()
   // const [toLessonId, setToLessonId] = useState<number>(0)
@@ -309,14 +311,21 @@ export default function AudioBasedReview({
       console.warn('No lesson selected')
       return
     }
+    if (!programsQuery.data) {
+      // eslint-disable-next-line no-console
+      console.warn('No programsQuery data')
+      return
+    }
     const allowedAudioExamples = toFromlessonSelectorExamplesParser(
       audioExamplesTable,
       fromLesson.recordId,
       selectedLesson.recordId,
+      programsQuery.data,
     )
     const shuffledExamples = shuffleExamples(allowedAudioExamples)
     setExamplesToPlay(shuffledExamples)
-  }, [audioExamplesTable, selectedLesson, toFromlessonSelectorExamplesParser, fromLesson])
+  }, [selectedLesson, fromLesson, programsQuery.data, audioExamplesTable])
+
   /*      Old Functions, used in return value, and one old use effect      */
   function readyQuiz() {
     defineStepValues()

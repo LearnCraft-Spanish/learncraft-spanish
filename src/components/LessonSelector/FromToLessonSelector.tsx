@@ -1,5 +1,5 @@
-import type { Lesson, Program } from '../interfaceDefinitions'
-import { useActiveStudent } from '../hooks/useActiveStudent'
+import type { Lesson, Program } from '../../interfaceDefinitions'
+import { useActiveStudent } from '../../hooks/useActiveStudent'
 
 interface LessonSelectorProps {
   selectedProgram: Program | null

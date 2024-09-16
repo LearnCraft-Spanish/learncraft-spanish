@@ -7,7 +7,9 @@ import { useActiveStudent } from './hooks/useActiveStudent'
 
 import './App.css'
 
-import LessonSelector from './LessonSelector'
+// import { LessonSelector } from './components/LessonSelector'
+import { FromToLessonSelector, toFromlessonSelectorExamplesParser } from './components/LessonSelector'
+
 import type { Flashcard, Lesson, Program, VocabTag, Vocabulary } from './interfaceDefinitions'
 
 interface FlashcardFinderProps {
@@ -32,7 +34,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     }: FlashcardFinderProps,
     currentContextual,
   ) => {
-    const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards } = useActiveStudent()
+    const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards, programsQuery } = useActiveStudent()
     const {
       getVerifiedExamplesFromBackend,
       getVocabFromBackend,
@@ -47,6 +49,26 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const [requiredTags, setRequiredTags] = useState<VocabTag[]>([])
     const [noSpanglish, setNoSpanglish] = useState(false)
     const [displayExamples, setDisplayExamples] = useState<Flashcard[]>([])
+    // FromToLessonSelector
+    const [fromLesson, setFromLesson] = useState<Lesson | null>(null)
+    const updateFromLesson = useCallback((lessonId: number | string) => {
+      if (typeof lessonId === 'string') {
+        lessonId = Number.parseInt(lessonId)
+      }
+      let newLesson = null
+      programsQuery.data?.forEach((program) => {
+        const foundLesson = program.lessons.find(item => item.recordId === lessonId)
+        if (foundLesson) {
+          newLesson = foundLesson
+        }
+      })
+      setFromLesson(newLesson)
+    }, [programsQuery?.data])
+    useEffect(() => {
+      if (selectedProgram && !fromLesson) {
+        updateFromLesson(selectedProgram.lessons[0].recordId)
+      }
+    }, [fromLesson, updateFromLesson, selectedProgram])
 
     function filterByHasAudio(example: Flashcard) {
       if (example.spanishAudioLa) {
@@ -87,30 +109,6 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       const newRequiredTags = [...requiredTags].filter(item => item.id !== id)
       setRequiredTags(newRequiredTags)
     }
-
-    const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[]) => {
-      if (selectedLesson?.vocabKnown) {
-        const allowedVocab = selectedLesson.vocabKnown
-        // console.log(allowedVocab)
-        const filteredByAllowed = examples.filter((item) => {
-          let isAllowed = true
-          if (item.vocabIncluded.length === 0 || item.vocabComplete === false) {
-            isAllowed = false
-          }
-          item.vocabIncluded.forEach((word) => {
-            if (!allowedVocab.includes(word)) {
-              isAllowed = false
-            }
-          })
-          // console.log(`Item: ${item.vocabIncluded} Status: ${isAllowed}`)
-          return isAllowed
-        })
-        return filteredByAllowed
-      }
-      else {
-        return examples
-      }
-    }, [selectedLesson])
 
     const labelAssignedExamples = useCallback((examples: Flashcard[]) => {
       const newArray = [...examples]
@@ -234,12 +232,12 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const getFilteredExamples = useCallback((table: Flashcard[]) => {
       const allExamples = [...table]
       const filteredBySpanglish = filterBySpanglish(allExamples)
-      const filteredByAllowed
-        = filterExamplesByAllowedVocab(filteredBySpanglish)
+      const filteredByAllowed = toFromlessonSelectorExamplesParser(filteredBySpanglish, fromLesson?.recordId, selectedLesson?.recordId, programsQuery.data)
+      // = filterExamplesByAllowedVocab(filteredBySpanglish)
       const filteredByTags = filterExamplesBySelectedTags(filteredByAllowed)
       // console.log(shuffledSentences)
       return filteredByTags
-    }, [filterBySpanglish, filterExamplesByAllowedVocab, filterExamplesBySelectedTags])
+    }, [filterBySpanglish, filterExamplesBySelectedTags, fromLesson?.recordId, programsQuery.data, selectedLesson?.recordId])
 
     // called when user clicks 'Copy as Table' button
     // copies sentences in a table format to be pasted into a google doc or excel sheet
@@ -508,13 +506,14 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     }, [tagSearchTerm, requiredTags, contextual, filterTagsByInput])
 
     useEffect(() => {
-      if (loadStep === 2 && selectedLesson?.recordId) {
+      if (loadStep === 2 && selectedLesson?.recordId && fromLesson?.recordId) {
         const newExampleTable = getFilteredExamples(exampleTable.current)
         const randomizedExamples = shuffleExamples(newExampleTable)
         setDisplayExamples(randomizedExamples)
       }
     }, [
       selectedLesson?.recordId,
+      fromLesson?.recordId,
       requiredTags,
       noSpanglish,
       loadStep,
@@ -557,9 +556,11 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                       </button>
                     )}
                   </div>
-                  <LessonSelector
-                    selectedLesson={selectedLesson}
-                    updateSelectedLesson={updateSelectedLesson}
+                  <FromToLessonSelector
+                    toLesson={selectedLesson}
+                    updateToLesson={updateSelectedLesson}
+                    fromLesson={fromLesson}
+                    updateFromLesson={updateFromLesson}
                     selectedProgram={selectedProgram}
                     updateSelectedProgram={updateSelectedProgram}
                   />
