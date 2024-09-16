@@ -1,5 +1,6 @@
 import React from 'react'
 
+import './LessonSelector.css'
 import type { Lesson, Program } from '../../interfaceDefinitions'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
 
@@ -51,9 +52,9 @@ export default function LessonSelector({
   return (
     <div>
       <div className="lessonFilter">
+        <h3>Set Level</h3>
         <form onSubmit={e => e.preventDefault}>
-          <div className="menuRow">
-            <h3>Set Level</h3>
+          <div className="">
             <select
               className="courseList"
               value={selectedProgram?.recordId}

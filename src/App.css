@@ -483,11 +483,6 @@ button:hover, .linkButton:hover {
 
 }
 
-.lessonFilter {
-  margin: 0 10px;
-  flex-grow: 1;
-}
-
 .searchFilter{
   text-align: center;
   margin: 0 10px;

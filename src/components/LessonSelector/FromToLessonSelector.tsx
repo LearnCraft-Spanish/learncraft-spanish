@@ -1,5 +1,6 @@
 import type { Lesson, Program } from '../../interfaceDefinitions'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
+import './LessonSelector.css'
 
 interface LessonSelectorProps {
   selectedProgram: Program | null

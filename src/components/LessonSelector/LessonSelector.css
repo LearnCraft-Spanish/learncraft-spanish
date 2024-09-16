@@ -1,0 +1,22 @@
+/* LessonSelector Styles */
+.lessonFilter {
+  margin: 0 10px;
+  flex-grow: 1;
+}
+.lessonFilter form {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+
+/* FromToLessonSelector Styles */
+.FTLS {
+  width: 100%;
+}
+/* uses .menuRow from AudioBasedReview.css */
+/*
+has styling specific to FlashcardFinder implementation
+located in App.css
+*/

@@ -126,11 +126,6 @@ button:disabled {
     }
 }
 
-
-/* FromToLessonSelector */
-.FTLS {
-    width: 100%;
-}
 /* AudioQuizSetupMenu */
 .menuRow {
     display: flex;
@@ -148,7 +143,7 @@ button:disabled {
     flex-direction: column;
     align-items: center;
 }
-.audioQuizSetupMenu .form {
+.audioQuizSetupMenu div.form {
     max-width: 320px;
     width: 90%;
 }
