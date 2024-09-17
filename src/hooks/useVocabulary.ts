@@ -10,14 +10,18 @@ export function useVocabulary() {
   const hasAccess = userDataQuery.data?.isAdmin || userDataQuery.data?.role === 'student'
 
   const tagTableRef = useRef<VocabTag[]>([])
-  const tagTable = tagTableRef.current
 
   const nextTagId = useRef(1)
 
   // Helper function to add tags without duplicates
-  const addTag = (type: string, tag: string) => {
-    if (!tagTable.find(item => item.type === type && item.tag === tag)) {
-      tagTable.push({ type, tag, id: nextTagId.current })
+  const addTag = (type: string, tag: string, vocabDescriptor?: string | undefined) => {
+    if (!tagTableRef.current.find(item => item.type === type && item.tag === tag && !(item.vocabDescriptor && item.vocabDescriptor === vocabDescriptor))) {
+      if (type === 'vocabulary') {
+        tagTableRef.current.push({ type, tag, id: nextTagId.current, vocabDescriptor })
+      }
+      else {
+        tagTableRef.current.push({ type, tag, id: nextTagId.current })
+      }
       nextTagId.current++
     }
   }
@@ -53,7 +57,7 @@ export function useVocabulary() {
 
         if (term.wordIdiom) {
           const isIdiom = term.vocabularySubcategorySubcategoryName?.toLowerCase().includes('idiom')
-          addTag(isIdiom ? 'idiom' : 'vocabulary', term.wordIdiom)
+          addTag(isIdiom ? 'idiom' : 'vocabulary', term.wordIdiom, term.descriptionOfVocabularySkill)
         }
       })
       if (!vocab) {
@@ -80,6 +84,8 @@ export function useVocabulary() {
     gcTime: Infinity,
     enabled: hasAccess,
   })
+
+  const tagTable = tagTableRef.current
 
   return { vocabularyQuery, tagTable }
 }

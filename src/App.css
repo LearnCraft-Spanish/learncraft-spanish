@@ -564,35 +564,66 @@ will remove from .css when all instances are removed */
   background-color: var(--brand);
 }
 
-.vocabCard {
+.tagCard{
   cursor: pointer;
   text-align: left;
-  background-color: #fff;
-  color: #3c3c3c;
   font-size: 12px;
-  padding: 5px 20px;
+  padding: 0px;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
   margin: 0 auto;
-  border: 2px solid var(--theme);
 }
 
-.vocabCard h4 {
-  font-size: 14px;
-  color: var(--brand);
-  text-align: left;
-  margin-bottom: 0;
-  margin: 5px;
+.tagCard:hover {
+  cursor: pointer;
+  filter: brightness(0.9); /* Slight darken */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+  transform: scale(1.03);  /* Slight zoom */
+  transition: all 0.2s ease-in-out; /* Smooth transition */
 }
 
-.vocabCard p {
-  font-size: 14px;
-  color: var(--theme);
+.tagCard h4, .tagCard h5, .tagCard p {
+  color: currentColor;
+}
+
+.subcategoryCard, .vocabularyCard, .idiomCard, .conjugationCard, .verbCard {
+  width: 100%;
   text-align: left;
-  margin: 0;
+  border: 3px solid var(--dark);
+  margin: 0px;
+}
+
+.subcategoryCard {
+  padding: 5px 20px;
+  color: var(--light);
+  background-color: var(--theme);
+}
+
+.vocabularyCard {
+  padding: 5px 20px;
+  color: var(--light);
+  background-color: var(--brand);
+}
+
+.idiomCard {
+  padding: 5px 20px;
+  color: var(--dark);
+  background-color: var(--accent);
+}
+
+.conjugationCard {
+  padding: 5px 20px;
+  color: var(--dark);
+  background-color: var(--light);
+}
+
+.verbCard {
+  padding: 5px 20px;
+  color: var(--accent);
+  background-color: var(--dark);
 }
 
 .vocabSmallCard{
@@ -617,38 +648,6 @@ will remove from .css when all instances are removed */
   text-align: left;
   margin-bottom: 0;
   margin: 5px;
-}
-
-
-.tagCard {
-  cursor: pointer;
-  text-align: left;
-  background-color: #fff;
-  color: #3c3c3c;
-  font-size: 12px;
-  padding: 5px 20px;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 0 auto;
-  border: 2px solid var(--theme);
-}
-
-.tagCard h4 {
-  font-size: 14px;
-  color: var(--brand);
-  text-align: left;
-  margin-bottom: 0;
-  margin: 5px;
-}
-
-.tagCard p {
-  font-size: 14px;
-  color: var(--theme);
-  text-align: left;
-  margin: 0;
 }
 
 .displayExamplesDescription {

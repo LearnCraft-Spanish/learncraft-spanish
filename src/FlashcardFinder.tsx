@@ -425,9 +425,9 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                         <br></br>
                       </div>
                     </div>
-                    {tagSearchTerm.length > 0
+                    {!!tagSearchTerm.length
                     && contextual === 'tagSuggestionBox'
-                    && suggestedTags.length > 0 && (
+                    && !!suggestedTags.length && (
                       <div
                         className="tagSuggestionBox"
                         ref={currentContextual}
@@ -436,16 +436,19 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                         {suggestedTags.map(item => (
                           <div
                             key={item.id}
-                            className="vocabCard"
+                            className="tagCard"
                             onClick={() => addTagToRequiredTags(item.id)}
                           >
-                            <h4 className="vocabName">{item.tag}</h4>
-                            <p className="vocabUse">{item.type}</p>
+                            <div className={`${item.type}Card`}>
+                              <h4 className="vocabName">{item.tag}</h4>
+                              {item.vocabDescriptor && <h5 className="vocabDescriptor">{item.vocabDescriptor}</h5>}
+                              <p className="vocabUse">{item.type}</p>
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
-                    {requiredTags.length > 0 && (
+                    {!!requiredTags.length && (
                       <div className="selectedVocab">
                         <h5>Search Terms:</h5>
                         {requiredTags.map(item => (

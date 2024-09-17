@@ -87,6 +87,7 @@ export interface Vocabulary {
   use: string
   frequencyRank: number
   vocabularySubcategorySubcategoryName: string
+  descriptionOfVocabularySkill?: string
   vocabName: string
   verbInfinitive: string
   conjugationTags: Array<string>
@@ -120,11 +121,23 @@ export interface Spelling {
 
 /*      Flashcard Finder      */
 
-export interface VocabTag {
+// Highly Tentative for now, will be updated as needed
+export interface VocabTagWithVocabDescriptor {
   id: number
-  type: string
+  type: 'vocabulary'
   tag: string
+  vocabDescriptor: string // required when type is "vocab"
 }
+
+export interface VocabTagWithoutVocabDescriptor {
+  id: number
+  type: string // any other type
+  tag: string
+  vocabDescriptor?: undefined // explicitly undefined when type is not "vocab"
+}
+
+// Combines the two types above
+export type VocabTag = VocabTagWithVocabDescriptor | VocabTagWithoutVocabDescriptor
 
 /*      Coaching Interfaces      */
 export interface Coach {
