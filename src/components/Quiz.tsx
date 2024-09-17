@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
 import type { Flashcard, StudentExample } from '../interfaceDefinitions'
@@ -107,13 +107,13 @@ export default function Quiz({
     setAnswerShowing(false)
   }
 
-  function toggleAnswer() {
+  const toggleAnswer = useCallback(() => {
     if (currentAudio.current) {
       currentAudio.current.currentTime = 0
     }
     setPlaying(false)
     setAnswerShowing(!answerShowing)
-  }
+  }, [answerShowing])
 
   /*      Audio Component Section       */
 
@@ -151,36 +151,40 @@ export default function Quiz({
     if (playing) {
       pauseCurrentAudio()
     }
-    else {
+    else if (audioActive) {
       playCurrentAudio()
     }
-  }, [playing, pauseCurrentAudio, playCurrentAudio])
+  }, [playing, audioActive, pauseCurrentAudio, playCurrentAudio])
 
   function spanishAudio() {
-    const audioElement
-          = (
-            <audio
-              ref={currentAudio}
-              src={spanishAudioUrl}
-              onEnded={() => setPlaying(false)}
-            />
-          )
-    return audioElement
+    if (spanishAudioUrl) {
+      const audioElement
+            = (
+              <audio
+                ref={currentAudio}
+                src={spanishAudioUrl}
+                onEnded={() => setPlaying(false)}
+              />
+            )
+      return audioElement
+    }
   }
 
   function englishAudio() {
-    const audioElement
-          = (
-            <audio
-              ref={currentAudio}
-              src={englishAudioUrl}
-              onEnded={() => setPlaying(false)}
-            />
-          )
-    return audioElement
+    if (englishAudioUrl) {
+      const audioElement
+            = (
+              <audio
+                ref={currentAudio}
+                src={englishAudioUrl}
+                onEnded={() => setPlaying(false)}
+              />
+            )
+      return audioElement
+    }
   }
   /*     Add/Remove Flashcard Section       */
-  function incrementExampleNumber() {
+  const incrementExampleNumber = useCallback(() => {
     if (currentExampleNumber < examplesToReview.length) {
       const newExampleNumber = currentExampleNumber + 1
       setCurrentExampleNumber(newExampleNumber)
@@ -190,9 +194,9 @@ export default function Quiz({
     }
     hideAnswer()
     setPlaying(false)
-  }
+  }, [currentExampleNumber, examplesToReview])
 
-  function decrementExampleNumber() {
+  const decrementExampleNumber = useCallback(() => {
     if (currentExampleNumber > 1) {
       setCurrentExampleNumber(currentExampleNumber - 1)
     }
@@ -201,7 +205,7 @@ export default function Quiz({
     }
     hideAnswer()
     setPlaying(false)
-  }
+  }, [currentExampleNumber])
 
   async function removeFlashcardAndUpdate(recordId: number) {
     const flashcardRemovedPromise = removeFlashcardFromActiveStudent(recordId)
@@ -278,6 +282,29 @@ export default function Quiz({
     )
     setExamplesToReview(newArray)
   }
+
+  /*    Keyboard Controls       */
+  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight') {
+      incrementExampleNumber()
+    }
+    else if (event.key === 'ArrowLeft') {
+      decrementExampleNumber()
+    }
+    else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      toggleAnswer()
+    }
+    else if (event.key === ' ') {
+      togglePlaying()
+    }
+  }, [incrementExampleNumber, decrementExampleNumber, toggleAnswer, togglePlaying])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress)
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [handleKeyPress])
 
   return (
     examplesToReview.length > 0 && (

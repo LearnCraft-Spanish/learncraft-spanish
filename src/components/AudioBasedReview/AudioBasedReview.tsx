@@ -166,7 +166,7 @@ export default function AudioBasedReview({
       audioRef.current.currentTime = 0
     }
   }, [])
-  function resumePlayback() {
+  const resumePlayback = useCallback(() => {
     if (!isPlaying) {
       setIsPlaying(true)
     }
@@ -174,7 +174,7 @@ export default function AudioBasedReview({
       audioRef.current.play()
     }
     updateCountdown()
-  }
+  }, [isPlaying, updateCountdown])
   function pausePlayback() {
     setIsPlaying(false)
     if (audioRef.current) {
@@ -194,16 +194,21 @@ export default function AudioBasedReview({
     setCurrentStep('question')
   }, [currentExample, examplesToPlay])
 
-  function decrementExample() {
+  const decrementExample = useCallback((customDecrement: undefined | string = undefined) => {
     if (currentExample > 0) {
-      const prevExample = currentExample - 1
-      setCurrentExample(prevExample)
+      setCurrentExample(currentExample - 1)
     }
     else {
       setCurrentExample(0)
     }
-    setCurrentStep('question')
-  }
+    // This is a custom decrement for using arrows causes decrementCurrentStep to go back one example
+    if (customDecrement) {
+      setCurrentStep(customDecrement)
+    }
+    else {
+      setCurrentStep('question')
+    }
+  }, [currentExample])
 
   const cycle = useCallback(() => {
     switch (currentStep) {
@@ -257,6 +262,34 @@ export default function AudioBasedReview({
         console.error('Invalid currentStep value: ', currentStep)
     }
   }, [autoplay, currentStep, incrementExample, pauseAudio])
+  const decrementCurrentStep = useCallback(() => {
+    prevAudioRefDuration.current = audioRef.current?.duration || 0
+
+    clearCountDown()
+    pauseAudio()
+
+    switch (currentStep) {
+      case 'question':
+        decrementExample('answer')
+        break
+      case 'guess':
+        setCurrentStep('question')
+        break
+      case 'hint':
+        if (autoplay) {
+          setCurrentStep('guess')
+        }
+        else {
+          setCurrentStep('question')
+        }
+        break
+      case 'answer':
+        setCurrentStep('hint')
+        break
+      default:
+        console.error('Invalid currentStep value: ', currentStep)
+    }
+  }, [autoplay, currentStep, decrementExample, pauseAudio])
   // Currently only used by previousStepButton
   function customIncrementCurrentStep(step: string) {
     pauseAudio()
@@ -355,10 +388,10 @@ export default function AudioBasedReview({
 
   // Set step values when currentExample changes
   useEffect(() => {
-    if (currentExample > 0) {
+    if (examplesToPlay.length > 0) {
       defineStepValues()
     }
-  }, [currentExample, defineStepValues])
+  }, [currentExample, defineStepValues, examplesToPlay.length])
   // when step taken, set currentStepValue accordingly
   useEffect(() => {
     if (autoplay) {
@@ -367,6 +400,39 @@ export default function AudioBasedReview({
     }
     cycle()
   }, [autoplay, currentStep, cycle])
+
+  /*    Keyboard Controls       */
+  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight') {
+      incrementExample()
+    }
+    else if (event.key === 'ArrowLeft') {
+      decrementExample()
+    }
+    else if (event.key === 'ArrowUp') {
+      incrementCurrentStep()
+    }
+    else if (event.key === 'ArrowDown') {
+      decrementCurrentStep()
+    }
+    else if (event.key === ' ') {
+      if (autoplay) {
+        if (isPlaying) {
+          pausePlayback()
+        }
+        else {
+          resumePlayback()
+        }
+      }
+    }
+  }, [incrementExample, decrementExample, incrementCurrentStep, decrementCurrentStep, autoplay, isPlaying, resumePlayback])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress)
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [handleKeyPress])
 
   return (
     <div className="quiz">
