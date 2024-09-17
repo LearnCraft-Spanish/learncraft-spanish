@@ -5,6 +5,7 @@ import { init } from '@sentry/react'
 import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
 import { useActiveStudent } from '../hooks/useActiveStudent'
 import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
+import { fisherYatesShuffle } from '../functions/fisherYatesShuffle'
 import FlashcardDisplay from './FlashcardDisplay'
 import QuizButtons from './QuizButtons'
 import QuizProgress from './QuizProgress'
@@ -158,15 +159,6 @@ export default function QuizComponent({
         setCurrentExampleNumber(quizLength - 1)
       }
     }
-  }
-
-  function fisherYatesShuffle(array: DisplayOrder[]) {
-    const shuffled = [...array] // Shallow copy to avoid mutating original array
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const randomIndex = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]] // Swap elements
-    }
-    return shuffled
   }
 
   const filterIfCollectedOnly = useCallback((displayOrderArray: DisplayOrder[]) => {

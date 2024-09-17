@@ -241,9 +241,8 @@ export default function LCSPQuizApp({
   return (isAuthenticated && !isLoading) && (
     <div className="quizInterface">
       {/* Quiz Selector */}
-      {officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
       {officialQuizzesQuery.isLoading && <h2>Loading Quizzes...</h2>}
-
+      {officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
       {officialQuizzesQuery.isSuccess && chosenQuiz && quizCourse === 'lcsp' && !hideMenu && (
         <div className="quizSelector">
           <select

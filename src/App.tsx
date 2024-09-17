@@ -119,28 +119,22 @@ export const App: React.FC = () => {
   }, [])
 
   const makeStudentSelector = useCallback(() => {
-    if (userDataQuery.data?.isAdmin) {
+    if (userDataQuery.data?.isAdmin && !!studentList) {
       const studentSelector = [
         <option key={0} label="">
-          {' '}
           -- None Selected --
         </option>,
       ]
       studentList?.forEach((student: UserData) => {
         const studentEmail = student.emailAddress
-        if (!studentEmail.includes('(')) {
+        const studentRole = student.role
+        if (!studentEmail.includes('(') && (studentRole === 'student' || studentRole === 'limited')) {
           studentSelector.push(
             <option
               key={student.recordId}
               value={student.recordId}
-              label={student.name}
-            >
-              {student.name}
-              {' '}
-              (
-              {student.emailAddress}
-              )
-            </option>,
+              label={`${student.name} -- ${student.emailAddress}`}
+            />,
           )
         }
       })

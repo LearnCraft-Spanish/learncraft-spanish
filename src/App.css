@@ -671,13 +671,18 @@ will remove from .css when all instances are removed */
 }
 
 
-.addButton, .ownedButton {
+.addButton, .removeButton {
   width: 10%;
   min-width: 120px;
+  cursor: pointer;
 }
 
-.ownedButton, .ownedButton:hover, .ownedButton:active {
-  background-color: var(--dark);
+.addButton {
+  background-color: darkgreen;
+}
+
+.removeButton {
+  background-color: darkred;
 }
 
 

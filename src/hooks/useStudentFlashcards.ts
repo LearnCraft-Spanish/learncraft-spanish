@@ -93,7 +93,6 @@ export function useStudentFlashcards() {
   // Create a ref to store the debounced function
   const debouncedRefetch = useRef(
     debounce(() => {
-      console.log('Refetching flashcard data')
       queryClient.invalidateQueries({ queryKey: ['flashcardData'] })
     }, 500),
   ).current

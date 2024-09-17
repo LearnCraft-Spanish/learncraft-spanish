@@ -45,6 +45,7 @@ export function useActiveStudent() {
     if (userDataQuery.data?.isAdmin) {
       const student = studentListQuery.data?.find(student => student.recordId === studentId) || null
       queryClient.setQueryData(['activeStudentSelection'], student)
+      queryClient.invalidateQueries({ queryKey: ['activeStudent'] })
     }
   }
 

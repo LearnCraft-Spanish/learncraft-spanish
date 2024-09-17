@@ -85,10 +85,8 @@ function FlashcardManager() {
     <>
       {flashcardDataQuery.isLoading && <h2>Loading Flashcards...</h2>}
       {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
-      {flashcardDataQuery.isSuccess && !studentFlashcardData?.examples && (
-        <h2>No flashcards found</h2>
-      )}
-      {flashcardDataQuery.isSuccess && (
+      {(flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.studentExamples?.length) && <Navigate to="/" />}
+      {flashcardDataQuery.isSuccess && !!flashcardDataQuery.data?.examples?.length && (
         <div>
           <h2>Flashcard Manager</h2>
           <h4>

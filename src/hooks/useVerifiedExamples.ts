@@ -5,7 +5,7 @@ import { useUserData } from './useUserData'
 export function useVerifiedExamples() {
   const userDataQuery = useUserData()
   const { getVerifiedExamplesFromBackend } = useBackend()
-  const hasAccess = (userDataQuery.data?.role === 'admin' || userDataQuery.data?.role === 'student')
+  const hasAccess = (userDataQuery.data?.isAdmin || userDataQuery.data?.role === 'student')
 
   const verifiedExamplesQuery = useQuery({
     queryKey: ['verifiedExamples'],
