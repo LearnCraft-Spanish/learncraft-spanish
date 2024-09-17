@@ -71,6 +71,10 @@ button, .linkButton {
   background-color: var(--brand);
   border: none;
   cursor: pointer;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button:hover, .linkButton:hover {
@@ -264,7 +268,7 @@ button:hover, .linkButton:hover {
 
 .buttonBox button, .buttonBox .linkButton {
   margin: 0px 10px;
-  display: block;
+  /* display: block; */
   flex-basis: 0;
   flex-grow: 1;
 }
