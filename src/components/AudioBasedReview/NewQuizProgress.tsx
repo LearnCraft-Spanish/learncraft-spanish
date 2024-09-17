@@ -15,7 +15,6 @@ export default function NewQuizProgress({
     <div className="quizProgress">
       <h3>{quizTitle}</h3>
       <p>{`${currentExampleNumber}/${totalExamplesNumber}`}</p>
-      {/* Temporary className newProgressBar until old progressBar phazed out */}
       <div className="newProgressBar">
         <div
           className="progressBarFill"

@@ -29,6 +29,7 @@ export default function AudioFlashcardComponent({
   return (
     <div
       className="audioFlashcard"
+      // Clicking flashcard for next step only works if autoplay is off
       onClick={!autoplay ? () => incrementCurrentStep() : () => {}}
     >
       <p>{currentExampleText}</p>

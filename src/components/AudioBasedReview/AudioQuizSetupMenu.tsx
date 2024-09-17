@@ -10,12 +10,13 @@ interface AudioQuizSetupMenuProps {
   updateSelectedLesson: (lesson: string) => void
   selectedProgram: Program
   updateSelectedProgram: (program: string) => void
+  // update logic so this is never null
+  fromLesson: Lesson | null
+  updatefromLesson: (lesson: string | number) => void
   autoplay: boolean
   updateAutoplay: (autoplay: string) => void
   examplesToPlayLength: number
   readyQuiz: () => void
-  fromLesson: Lesson | null
-  updatefromLesson: (lesson: string | number) => void
 }
 export default function AudioQuizSetupMenu({
   selectedLesson,
@@ -37,7 +38,6 @@ export default function AudioQuizSetupMenu({
       updateAutoplay('off')
     }
   }
-
   useEffect(() => {
     if (selectedProgram && !fromLesson) {
       updatefromLesson(selectedProgram.lessons[0].recordId)
@@ -45,20 +45,15 @@ export default function AudioQuizSetupMenu({
   }, [fromLesson, updatefromLesson, selectedProgram])
   return (
     <div className="audioQuizSetupMenu">
+      {/* Change className? currently confusing */}
       <div className="form">
-        {/* <LessonSelector
-          selectedLesson={selectedLesson}
-          updateSelectedLesson={updateSelectedLesson}
-          selectedProgram={selectedProgram}
-          updateSelectedProgram={updateSelectedProgram}
-        /> */}
         <FromToLessonSelector
           selectedProgram={selectedProgram}
           updateSelectedProgram={updateSelectedProgram}
-          toLesson={selectedLesson}
-          updateToLesson={updateSelectedLesson}
           fromLesson={fromLesson}
           updateFromLesson={updatefromLesson}
+          toLesson={selectedLesson}
+          updateToLesson={updateSelectedLesson}
         />
         <div className="menuRow">
           <p>Autoplay:</p>
@@ -76,8 +71,6 @@ export default function AudioQuizSetupMenu({
         {examplesToPlayLength < 1
           ? <p>There are no audio examples for this lesson range</p>
           : <p>{`${examplesToPlayLength} examples found`}</p>}
-      </div>
-      <div className="buttonBox">
       </div>
     </div>
   )
