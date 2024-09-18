@@ -947,11 +947,13 @@ button:hover, .linkButton:hover {
 
 .myFlashcardsForm {
   width: 30vw;
+  min-width: 360px;
   margin: 0 auto;
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 480px) {
   .myFlashcardsForm {
-    width: 70vw;
+    width: 90vw;
+    min-width: 280px;
   }
 }
 
