@@ -423,13 +423,16 @@ export default function AudioBasedReview({
       decrementExample()
     }
     else if (event.key === 'ArrowUp') {
+      event.preventDefault()
       incrementCurrentStep()
     }
     else if (event.key === 'ArrowDown') {
+      event.preventDefault()
       decrementCurrentStep()
     }
     else if (event.key === ' ') {
       if (autoplay) {
+        event.preventDefault()
         if (isPlaying) {
           pausePlayback()
         }

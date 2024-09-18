@@ -265,9 +265,11 @@ export default function QuizComponent({
       decrementExampleNumber()
     }
     else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      event.preventDefault()
       toggleAnswer()
     }
     else if (event.key === ' ') {
+      event.preventDefault()
       togglePlaying()
     }
   }, [incrementExampleNumber, decrementExampleNumber, toggleAnswer, togglePlaying])
