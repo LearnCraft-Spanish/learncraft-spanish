@@ -342,6 +342,18 @@ button:hover, .linkButton:hover {
   margin: 0 auto;
 }
 
+.pendingFlashcardButton {
+  cursor: default;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: fit-content;
+  background-color: var(--dark);
+  font-size: 10px;
+  padding: 5px 10px;
+  margin: 0 auto;
+}
+
 .removeFlashcardButton {
   position: absolute;
   top: 0px;

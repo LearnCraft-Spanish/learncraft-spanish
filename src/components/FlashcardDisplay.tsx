@@ -82,7 +82,7 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, in
           && (
             <button
               type="button"
-              className="addFlashcardButton"
+              className="pendingFlashcardButton"
             >
               Adding to Flashcards...
             </button>

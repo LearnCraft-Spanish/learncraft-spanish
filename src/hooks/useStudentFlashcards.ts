@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef } from 'react'
 import { debounce } from 'lodash'
 import type { Flashcard, StudentExample, StudentFlashcardData } from '../interfaceDefinitions'
 import { useUserData } from './useUserData'
@@ -21,14 +21,21 @@ export function useStudentFlashcards() {
     updateMyStudentExample,
   } = useBackend()
 
-  // Local state to store session updates. Current use is ONLY for difficulty labels on SRS quiz.
-  const [localExamples, setLocalExamples] = useState<Record<number, Partial<Flashcard>>>({})
-  const [localStudentExamples, setLocalStudentExamples] = useState<Record<number, StudentExample>>({})
+  // Local ref to store session updates.
+  // This is necessary to preserve local changes on re-fetch.
+  // localExamples stores difficulty from SRS Quiz
+  const localExamples = useRef<Record<number, Partial<Flashcard>>>({})
+  // localStudentExamples stores pending studentExample records that are not in the backend
+  // This is used to prevent race conditions from erasing negative recordIds
+  const localStudentExamples = useRef<Record<number, StudentExample>>({})
 
+  // Temp ID number for new studentExamples created optimistically
   const tempIdNum = useRef(-1)
 
+  // Abbreviated access since it's used frequently
   const activeStudentId = activeStudentQuery.data?.recordId
 
+  // Dependency array for flashcardDataQuery
   const flashcardDataDependencies = userDataQuery.isSuccess && activeStudentQuery.isSuccess && !!activeStudentId
 
   const matchAndTrimArrays = useCallback((flashcardData: StudentFlashcardData) => {
@@ -66,20 +73,22 @@ export function useStudentFlashcards() {
     }
 
     const mergedExampleData = backendResponse.examples.map(flashcard => ({
+      // Add the difficulty from localExamples if it exists
+      ...localExamples.current[flashcard.recordId],
       ...flashcard,
-      // Apply any local updates for this flashcard
-      ...localExamples[flashcard.recordId],
     }))
 
-    const preservedLocalExamples = Object.values(localStudentExamples).filter(
-      localStudentExample => !backendResponse.studentExamples.some((beStudentExample: StudentExample) => beStudentExample.relatedExample === localStudentExample.relatedExample),
+    // Preserve local studentExamples that are not in the backend response
+    const preservedLocalExamples = Object.values(localStudentExamples.current).filter(
+      localStudentExample => !backendResponse.studentExamples.some((backendStudentExample: StudentExample) => backendStudentExample.relatedExample === localStudentExample.relatedExample),
     )
 
     const mergedStudentExampleData = [
-      ...backendResponse.studentExamples,
+      ...backendResponse.studentExamples, // Overwrite any local examples that are in the backend
       ...preservedLocalExamples, // Add local examples that aren't overwritten
     ]
 
+    // Merge the two arrays and trim any that don't match
     const updatedFlashcardData = {
       examples: mergedExampleData,
       studentExamples: mergedStudentExampleData,
@@ -88,7 +97,7 @@ export function useStudentFlashcards() {
   }
 
   const flashcardDataQuery = useQuery({
-    queryKey: ['flashcardData', activeStudentId],
+    queryKey: ['flashcardData', activeStudentId], // Data changes based on active student
     queryFn: getFlashcardData,
     staleTime: Infinity, // Never stale unless manually updated
     enabled: flashcardDataDependencies,
@@ -108,7 +117,7 @@ export function useStudentFlashcards() {
     return studentExampleId < 0
   }, [flashcardDataQuery.data?.studentExamples])
 
-  // Create a ref to store the debounced function
+  // Create a ref to ensure refetch debounces properly
   const debouncedRefetch = useRef(
     debounce(() => {
       queryClient.invalidateQueries({ queryKey: ['flashcardData'] })
@@ -164,11 +173,11 @@ export function useStudentFlashcards() {
         reviewInterval: 1,
       }
 
-      // Update the local state with the new student-example to preserve state on re-fetch
-      setLocalStudentExamples(prev => ({
-        ...prev,
+      // Update the local ref with the new student-example to preserve state on re-fetch
+      localStudentExamples.current = {
+        ...localStudentExamples.current,
         [newStudentExample.relatedExample]: newStudentExample,
-      }))
+      }
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
@@ -267,10 +276,7 @@ export function useStudentFlashcards() {
       const { flashcardObject } = context
       if (flashcardObject?.recordId) {
       // Remove the local update for the deleted flashcard
-        setLocalExamples((prevUpdates) => {
-          const { [flashcardObject.recordId]: _, ...rest } = prevUpdates
-          return rest
-        })
+        delete localExamples.current[flashcardObject.recordId]
       }
     },
 
@@ -321,28 +327,37 @@ export function useStudentFlashcards() {
       // Cancel any in-flight queries
       await queryClient.cancelQueries({ queryKey: ['flashcardData', activeStudentId] })
 
-      // Update the local state for the flashcard
-      setLocalExamples(prevUpdates => ({
-        ...prevUpdates,
-        [studentExampleId]: {
-          ...(prevUpdates[studentExampleId] || {}), // Keep other properties intact
-          difficulty, // Overwrite the difficulty with the new value
-        },
-      }))
-
       // Memoize the old interval for rollback
       let oldInterval: number | undefined
+
       // Optimistically update the flashcards cache
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
         const oldFlashcardsCopy = [...oldFlashcards.studentExamples]
         const studentFlashcard = oldFlashcardsCopy.find(studentFlashcard => studentFlashcard.recordId === studentExampleId)
         const flashcard = oldFlashcards.examples.find(flashcard => flashcard.recordId === studentFlashcard?.relatedExample)
+
+        // Only update the cache if both are found
         if (studentFlashcard && flashcard) {
           oldInterval = studentFlashcard.reviewInterval ? studentFlashcard.reviewInterval : undefined
+
+          // Define new flashcard and studentFlashcard objects
           const newStudentFlashcard = { ...studentFlashcard, reviewInterval: newInterval }
           const newFlashcard = { ...flashcard, difficulty }
+
+          // Save flashcard in local ref to preserve on refetch
+          localExamples.current = {
+            ...localExamples.current,
+            [flashcard.recordId]: {
+              ...(localExamples.current[flashcard.recordId] || {}), // Keep other properties intact
+              difficulty, // Overwrite the difficulty with the new value
+            },
+          }
+
+          // Replace the flashcards in copy of array
           const newStudentFlashcardsArray = oldFlashcardsCopy.map(studentFlashcard => studentFlashcard.recordId === studentExampleId ? newStudentFlashcard : studentFlashcard)
           const newFlashcardsArray = oldFlashcards.examples.map(flashcard => flashcard.recordId === studentFlashcard.relatedExample ? newFlashcard : flashcard)
+
+          // Trim the arrays to match
           const trimmedNewFlashcardData = matchAndTrimArrays({ examples: newFlashcardsArray, studentExamples: newStudentFlashcardsArray })
           return trimmedNewFlashcardData
         }
@@ -359,11 +374,9 @@ export function useStudentFlashcards() {
       }
       // Destructure the context
       const { studentExampleId, newInterval } = context
+
       // Remove the local update for this flashcard
-      setLocalExamples((prevUpdates) => {
-        const { [studentExampleId]: _, ...rest } = prevUpdates // Remove the failed update
-        return rest
-      })
+      delete localExamples.current[studentExampleId]
 
       // Roll back the cache for just the affected flashcard
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {

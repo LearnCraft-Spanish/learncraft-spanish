@@ -335,7 +335,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
             && (
               <button
                 type="button"
-                className="addButton"
+                className="pendingButton"
                 value={item.recordId}
               >
                 Adding...

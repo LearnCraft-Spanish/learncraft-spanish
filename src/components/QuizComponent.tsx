@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 
 import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
 import { useActiveStudent } from '../hooks/useActiveStudent'
@@ -23,11 +23,11 @@ interface QuizComponentProps {
 
 export default function QuizComponent({
   quizTitle,
-  examplesToParse = [],
+  examplesToParse,
   startWithSpanish = false,
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
-  cleanupFunction = () => {},
+  cleanupFunction,
   quizLength = 1000,
 
 }: QuizComponentProps) {
@@ -281,46 +281,48 @@ export default function QuizComponent({
   }, [handleKeyPress])
 
   return (
+    <>
+      {(displayOrderReady && !!initialDisplayOrder.current.length && !displayOrder.length) && <Navigate to=".." />}
+      {!!displayOrder.length && (
+        <div className="quiz">
+          <h3>{quizTitle}</h3>
+          {answerShowing ? answerAudio() : questionAudio()}
+          {currentFlashcardIsValid && (
+            <FlashcardDisplay
+              example={currentExample}
+              isStudent={activeStudentQuery.data?.role === ('student')}
+              incrementExampleNumber={incrementExampleNumber}
+              onRemove={onRemove}
+              answerShowing={answerShowing}
+              toggleAnswer={toggleAnswer}
+              togglePlaying={togglePlaying}
+              playing={playing}
+              audioActive={audioActive}
+              startWithSpanish={startWithSpanish}
+            />
+          )}
 
-    (!!displayOrder.length) && (
-      <div className="quiz">
-        <h3>{quizTitle}</h3>
-        {answerShowing ? answerAudio() : questionAudio()}
-        {currentFlashcardIsValid && (
-          <FlashcardDisplay
-            example={currentExample}
-            isStudent={activeStudentQuery.data?.role === ('student')}
-            incrementExampleNumber={incrementExampleNumber}
-            onRemove={onRemove}
-            answerShowing={answerShowing}
-            toggleAnswer={toggleAnswer}
-            togglePlaying={togglePlaying}
-            playing={playing}
-            audioActive={audioActive}
-            startWithSpanish={startWithSpanish}
+          {isSrsQuiz && currentFlashcardIsValid && (
+            <SRSQuizButtons
+              currentExample={currentExample}
+              answerShowing={answerShowing}
+              incrementExampleNumber={incrementExampleNumber}
+            />
+          )}
+          <QuizButtons
+            decrementExample={decrementExampleNumber}
+            incrementExample={incrementExampleNumber}
           />
-        )}
-
-        {isSrsQuiz && currentFlashcardIsValid && (
-          <SRSQuizButtons
-            currentExample={currentExample}
-            answerShowing={answerShowing}
-            incrementExampleNumber={incrementExampleNumber}
+          <div className="buttonBox">
+            {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
+            <MenuButton />
+          </div>
+          <QuizProgress
+            currentExampleNumber={currentExampleNumber}
+            totalExamplesNumber={displayOrder.length}
           />
-        )}
-        <QuizButtons
-          decrementExample={decrementExampleNumber}
-          incrementExample={incrementExampleNumber}
-        />
-        <div className="buttonBox">
-          {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
-          <MenuButton />
         </div>
-        <QuizProgress
-          currentExampleNumber={currentExampleNumber}
-          totalExamplesNumber={displayOrder.length}
-        />
-      </div>
-    )
+      )}
+    </>
   )
 }
