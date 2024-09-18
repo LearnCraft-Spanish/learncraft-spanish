@@ -44,7 +44,7 @@ function LoginButton(): JSX.Element | false {
 
   return (
     !isAuthenticated
-    && !isLoading && <button type="button" onClick={loginFunction}>Log in/Register</button>
+    && !isLoading && <button type="button" id="login" onClick={loginFunction}>Log in/Register</button>
   )
 }
 

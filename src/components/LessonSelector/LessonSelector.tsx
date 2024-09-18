@@ -1,7 +1,8 @@
 import React from 'react'
 
-import type { Lesson, Program } from './interfaceDefinitions'
-import { useProgramTable } from './hooks/useProgramTable'
+import './LessonSelector.css'
+import type { Lesson, Program } from '../../interfaceDefinitions'
+import { useProgramTable } from '../../hooks/useProgramTable'
 
 interface LessonSelectorProps {
   selectedLesson: Lesson | null
@@ -51,15 +52,17 @@ export default function LessonSelector({
   return (
     <div>
       <div className="lessonFilter">
+        <h3>Set Level</h3>
         <form onSubmit={e => e.preventDefault}>
-          <h3>Set Level</h3>
-          <select
-            className="courseList"
-            value={selectedProgram?.recordId}
-            onChange={e => updateSelectedProgram(e.target.value)}
-          >
-            {makeCourseSelector()}
-          </select>
+          <div className="">
+            <select
+              className="courseList"
+              value={selectedProgram?.recordId}
+              onChange={e => updateSelectedProgram(e.target.value)}
+            >
+              {makeCourseSelector()}
+            </select>
+          </div>
           {selectedLesson?.recordId && selectedProgram?.lessons && (
             <select
               className="lessonList"

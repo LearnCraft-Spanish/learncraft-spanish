@@ -10,10 +10,7 @@ import { useProgramTable } from './hooks/useProgramTable'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import type { Flashcard, Lesson, Program, UserData } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
-import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
-import LoginButton from './components/LoginButton'
-import LogoutButton from './components/LogoutButton'
 import LCSPQuizApp from './LCSPQuizApp'
 import FrequenSay from './FrequenSay'
 import NotFoundPage from './NotFoundPage'
@@ -22,6 +19,7 @@ import CallbackPage from './CallbackPage'
 import FlashcardManager from './FlashcardManager'
 import ReviewMyFlashcards from './ReviewMyFlashcards'
 import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
+import Nav from './components/Nav'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -227,14 +225,13 @@ export const App: React.FC = () => {
 
   return (
     <div className="App" onClick={closeContextualIfClickOut}>
-      <div className="div-header">
-        <div className="homeButton" onClick={() => navigate('/')}>
-          <img src={logo} alt="Learncraft Spanish Logo" />
-        </div>
-        <LogoutButton />
-        <LoginButton />
-      </div>
-      {location.pathname !== '/coaching' && (
+      <Nav />
+      {(location.pathname !== '/coaching'
+      && location.pathname !== '/comprehensionquiz'
+      && location.pathname !== '/audioquiz'
+      && location.pathname !== '/myflashcards/quiz'
+      && location.pathname !== '/myflashcards/srsquiz'
+      && location.pathname.split('/')[1] !== 'officialquizzes') && (
         <div className="div-user-subheader">
           {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>
@@ -337,38 +334,35 @@ export const App: React.FC = () => {
           }
         />
         <Route
-          path="/audioquiz"
+          path="/audioquiz/*"
           element={
             (userDataQuery.data?.role === 'student'
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
               <AudioBasedReview
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
-                willAutoplay
-                willStartWithSpanish={false}
                 audioOrComprehension="audio"
+                willAutoplay
               />
             )
           }
         />
         <Route
-          path="/comprehensionquiz"
+          path="/comprehensionquiz/*"
           element={
             (userDataQuery.data?.role === 'student'
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
               <AudioBasedReview
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
+                audioOrComprehension="comprehension"
                 willAutoplay={false}
-                willStartWithSpanish
               />
             )
           }

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
-import LessonSelector from './LessonSelector'
+import { LessonSelector } from './components/LessonSelector'
 import { useBackend } from './hooks/useBackend'
 
 export default function FrequenSay({

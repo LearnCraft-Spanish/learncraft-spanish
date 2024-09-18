@@ -7,36 +7,33 @@ interface AudioQuizButtonsProps {
   currentStep: string
   incrementCurrentStep: () => void
   autoplay: boolean
-  isPlaying: boolean
   // customIncrementCurrentStep: (step: 'question' | 'guess' | 'hint' | 'answer') => void
   customIncrementCurrentStep: (step: string) => void
   decrementExample: () => void
   incrementExample: () => void
-  examplesToPlay: any[]
-  currentExample: number
-  pausePlayback: () => void
-  resumePlayback: () => void
+  unReadyQuiz: () => void
 }
 export default function AudioQuizButtons({
   audioOrComprehension,
   currentStep,
   incrementCurrentStep,
   autoplay,
-  isPlaying,
   customIncrementCurrentStep,
   decrementExample,
   incrementExample,
-  examplesToPlay,
-  currentExample,
-  pausePlayback,
-  resumePlayback,
+  unReadyQuiz,
 }: AudioQuizButtonsProps): JSX.Element {
   function nextStepButtonText(): string {
     switch (audioOrComprehension) {
       case 'audio':
         switch (currentStep) {
           case 'question':
-            return 'Skip to Guess'
+            if (autoplay) {
+              return 'Skip to Guess'
+            }
+            else {
+              return 'Play Spanish'
+            }
           case 'guess':
             return 'Play Spanish'
           case 'hint':
@@ -65,53 +62,42 @@ export default function AudioQuizButtons({
     }
     return 'Next'
   }
-  function previousStepButton() {
-    switch (audioOrComprehension) {
-      case 'audio':
-        // I think in the original code there was supposted to be a case Play again, but I could not reproduce it.
-        return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay English</button>
-      case 'comprehension':
-        switch (currentStep) {
-          case 'question':
-            return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay Spanish</button>
-          case 'guess':
-            return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay Spanish</button>
-          case 'hint':
-            return <button type="button" onClick={() => customIncrementCurrentStep('hint')}>Replay Spanish</button>
-          case 'answer':
-            return <button type="button" onClick={() => customIncrementCurrentStep('hint')}>Replay Spanish</button>
-        }
-        break
+  function previousStepButton(): JSX.Element {
+    if (audioOrComprehension === 'audio') {
+      // I think in the original code there was supposted to be a case Play again, but I could not reproduce it.
+      return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay English</button>
+    }
+    else {
+      switch (currentStep) {
+        case 'question':
+          return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay Spanish</button>
+        case 'guess':
+          return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay Spanish</button>
+        case 'hint':
+          return <button type="button" onClick={() => customIncrementCurrentStep('hint')}>Replay Spanish</button>
+        case 'answer':
+          return <button type="button" onClick={() => customIncrementCurrentStep('hint')}>Replay Spanish</button>
+        default:
+          // This will never be reached. change currentStep to be a union type of 'question' | 'guess' | 'hint' | 'answer'
+          return <button type="button" onClick={() => customIncrementCurrentStep('question')}>Replay Audio</button>
+      }
     }
   }
   return (
-    <div>
-      <div className="buttonBox">
+    <div className="audioQuizButtons">
+      <div className="buttonBox switchOnMobile">
+        {previousStepButton()}
         <button type="button" className="greenButton" onClick={() => incrementCurrentStep()}>
           {nextStepButtonText()}
         </button>
       </div>
       <div className="buttonBox">
-        {autoplay && (
-          isPlaying
-            ? <button type="button" onClick={pausePlayback}>Pause</button>
-            : <button type="button" onClick={resumePlayback}>Play</button>
-        )}
+        <button type="button" onClick={() => decrementExample()}>Previous</button>
+        <button type="button" onClick={() => incrementExample()}>Next</button>
       </div>
       <div className="buttonBox">
-        {previousStepButton()}
+        <button type="button" onClick={() => unReadyQuiz()}>Back</button>
       </div>
-      <div className="buttonBox">
-        <button type="button" onClick={decrementExample}>Previous</button>
-        <button type="button" onClick={incrementExample}>Next</button>
-      </div>
-      <div className="buttonBox">
-        <MenuButton />
-      </div>
-      <QuizProgress
-        currentExampleNumber={currentExample + 1}
-        totalExamplesNumber={examplesToPlay.length}
-      />
     </div>
   )
 }

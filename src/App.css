@@ -44,23 +44,6 @@ h2, h3, h4, h5, h6 {
   text-align: center;
 }
 
-.homeButton {
-  display: flex;
-  height: 70px;
-  text-align: center;
-  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 5px 0px 0px;
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.homeButton img {
-  object-fit: contain;
-}
-
 .bannerMessage {
   position: fixed;
   top: 50px;
@@ -88,6 +71,10 @@ button, .linkButton {
   background-color: var(--brand);
   border: none;
   cursor: pointer;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button:hover, .linkButton:hover {
@@ -124,7 +111,8 @@ button:hover, .linkButton:hover {
 }
 
 /*Main Menu Styles*/
-
+/* MOVED TO NAV */
+/* 
 .div-header{
   padding: calc(5px + 1.5%) 5%;
   background-color: var(--theme);
@@ -137,7 +125,7 @@ button:hover, .linkButton:hover {
 .div-header button {
   background-color: var(--light);
   color: var(--dark);
-}
+} */
 
 .div-user-subheader {
   padding: 10px 5%;
@@ -235,7 +223,7 @@ button:hover, .linkButton:hover {
   flex-wrap: wrap;
 }
 
-.spanishExample, .englishTranslation {
+/* .spanishExample, .englishTranslation {
   position: relative;
   width: 65%;
   min-width: 300px;
@@ -245,21 +233,17 @@ button:hover, .linkButton:hover {
   text-align: center;
   display: flex;
   flex-direction: column;
-  vertical-align: center;
   justify-content: center;
+  align-items: center;
   padding: 25px 50px;
   border: 4px solid var(--accent);
   cursor: pointer;
-}
+} */
 
 
 .readyButton {
   display: flex;
   justify-content: space-around;
-}
-
-.quizInterface {
-  margin-top: 40px;
 }
 
 .quizControls {
@@ -284,7 +268,7 @@ button:hover, .linkButton:hover {
 
 .buttonBox button, .buttonBox .linkButton {
   margin: 0px 10px;
-  display: block;
+  /* display: block; */
   flex-basis: 0;
   flex-grow: 1;
 }
@@ -335,13 +319,6 @@ button:hover, .linkButton:hover {
   height: 65px;
   text-align: center;
 
-}
-/* .progressBar2 is a legacy className
-will remove from .css when all instances are removed */
-.progressBar, .progressBar2 {
-  display:block;
-  text-align: center;
-  justify-self: center;
 }
 
 .addFlashcardButton {
@@ -398,7 +375,7 @@ will remove from .css when all instances are removed */
 }
 
 .audioBox {
-  width: 100%;
+  width: 80vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -430,7 +407,7 @@ will remove from .css when all instances are removed */
   z-index: 5;
 }
 
-.progressBarHolder {
+/* .progressBarHolder {
   position: relative;
   height: 150px;
   margin: 10px 0;
@@ -450,6 +427,13 @@ will remove from .css when all instances are removed */
   padding: 60px;
   color: var(--light);
   z-index: 5;
+} */
+/* progressBar & progressBar2 are almost legacy */
+/* Remove once all instances of QuizProgress are replaced with NewQuizProgress */
+.progressBar, .progressBar2 {
+  display:block;
+  text-align: center;
+  justify-self: center;
 }
 
 .progressStatus {
@@ -462,6 +446,12 @@ will remove from .css when all instances are removed */
   z-index: 1;
 }
 
+.audioAutoplayFlashcardWrapper {
+  width: 100%;
+}
+.audioAutoplayFlashcardWrapper .audioExample {
+  border: none;
+}
 
 /* For Flashcard Finder */
 
@@ -491,11 +481,6 @@ will remove from .css when all instances are removed */
   text-align: center;
   margin: 0 10px;
 
-}
-
-.lessonFilter {
-  margin: 0 10px;
-  flex-grow: 1;
 }
 
 .searchFilter{
@@ -682,6 +667,29 @@ will remove from .css when all instances are removed */
 
 .removeButton {
   background-color: darkred;
+}
+
+/* ToFromLessonSelector styling for Flashcard Finder */
+
+.FromToLessonSelectorWrapper #courseRow {
+  display: flex;
+  flex-direction: column;
+  margin: 4px;
+}
+#courseRow p {
+  margin: 4px;
+}
+
+.FromToLessonSelectorWrapper #flashcardFinderStyling {
+  display: flex;
+  flex-direction: row;
+}
+.FromToLessonSelectorWrapper #fromRow, .FromToLessonSelectorWrapper #toRow {
+  margin: 8px;
+}
+.FromToLessonSelectorWrapper #flashcardFinderStyling p {
+  margin: 0;
+  margin-right: 6px;
 }
 
 
@@ -1021,3 +1029,109 @@ input:checked + .slider:before {
   padding: 5px;
   text-align: center;
 }
+
+/* Icons */
+i {
+  font-size: 24px;
+}
+/* Nav */
+
+.div-header {
+  display: flex;
+  justify-content: space-between;
+  padding: calc(5px + 1.5%) 5%;
+  background-color: var(--theme);
+  color: var(--light);
+  margin: 0;
+  align-items: center;
+   
+}
+
+.div-header button {
+  background-color: var(--light);
+  color: var(--dark);
+}
+.homeButton {
+  display: flex;
+  height: 70px;
+  width: 125px;
+}
+#homeIcon {
+  display: none;
+}
+@media screen and (max-width: 480px) {
+  .homeButton {
+    height: 24px;
+    width: 24px;
+  }
+  #logo {
+    display: none;
+  }
+  #homeIcon {
+    display: block;
+    z-index: 2;
+  }
+  /* div.notRoot {
+    flex-direction: row-reverse;
+  } */
+  #logout.notRoot {
+    display: none;
+  }
+  
+}
+/* BackButton */
+.backButton {
+  display: none;
+  position: absolute;
+  left: 0;
+  color: white;
+  padding: 12px;
+}
+@media screen and (max-width: 480px) {
+  .backButton.notRoot {
+      display: block;
+      z-index: 2;
+    }
+  
+}
+
+
+/* .homeButton {
+  display: flex;
+  height: 70px;
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 5px 0px 0px;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+} */
+
+/* @media screen and (max-width: 480px) {
+  /* currently conditionally applied to LogoutButton for when route is not / */
+  /* .pastHome {
+    display: none;
+  }
+  .div-header {
+    align-items: center;
+  }
+  #login, #logout {
+    padding: 6px;
+    height: auto;
+  }
+  #home {
+    display: block;
+    width: 24px;
+  }
+  #logo {
+    display: none;
+  }
+  .div-user-subheader {
+    display: none;
+  }
+
+  .div-header.homeButton {
+    background-image: url('./resources/icons8-home-24.png');
+  } */

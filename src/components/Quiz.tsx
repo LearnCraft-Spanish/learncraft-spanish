@@ -1,0 +1,350 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+
+import type { Flashcard, StudentExample } from '../interfaceDefinitions'
+import FlashcardDisplay from '../components/Flashcard'
+import QuizButtons from '../components/QuizButtons'
+import QuizProgress from '../components/QuizProgress'
+import MenuButton from '../components/MenuButton'
+import SRSQuizButtons from '../components/SRSButtons'
+import { useActiveStudent } from '../hooks/useActiveStudent'
+import NewQuizProgress from './AudioBasedReview/NewQuizProgress'
+
+interface QuizProps {
+  quizTitle: string
+  examplesToParse: Flashcard[]
+  startWithSpanish?: boolean
+  quizOnlyCollectedExamples?: boolean
+  isSrsQuiz?: boolean
+  cleanupFunction?: () => void
+  quizLength?: number
+}
+
+function parseExampleTable(exampleArray: Flashcard[], studentExampleArray: StudentExample[] | undefined, quizOnlyCollectedExamples: boolean, isSrsQuiz: boolean, quizLength: number): Flashcard[] {
+  function tagAssignedExamples() {
+    exampleArray.forEach((example) => {
+      const getStudentExampleRecordId = () => {
+        const relatedStudentExample = studentExampleArray?.find(
+          element => element.relatedExample === example.recordId,
+        )
+        return relatedStudentExample
+      }
+      if (getStudentExampleRecordId() !== undefined) {
+        example.isCollected = true
+      }
+      else {
+        example.isCollected = false
+      }
+    })
+    return exampleArray
+  }
+
+  const taggedByCollected = tagAssignedExamples()
+
+  function filterIfCollectedOnly() {
+    if (quizOnlyCollectedExamples || isSrsQuiz) {
+      const filteredList = taggedByCollected.filter(
+        example => example.isCollected,
+      )
+      if (isSrsQuiz) {
+        filteredList.forEach((example) => {
+          example.difficulty = ''
+        })
+      }
+      return filteredList
+    }
+    else {
+      return taggedByCollected
+    }
+  }
+
+  const completeListBeforeRandomization = filterIfCollectedOnly()
+
+  function randomize(array: Flashcard[]) {
+    const randomizedArray = []
+    const vanishingArray = [...array]
+    for (let i = 0; i < array.length; i++) {
+      const randIndex = Math.floor(Math.random() * vanishingArray.length)
+      const randomArrayItem = vanishingArray[randIndex]
+      vanishingArray.splice(randIndex, 1)
+      randomizedArray[i] = randomArrayItem
+    }
+    return randomizedArray
+  }
+
+  const randomizedQuizExamples = randomize(completeListBeforeRandomization)
+  const quizLengthSafe = Math.min(quizLength, randomizedQuizExamples.length)
+  return randomizedQuizExamples.slice(0, quizLengthSafe)
+}
+
+export default function Quiz({
+  examplesToParse = [],
+  quizTitle,
+  startWithSpanish = false,
+  quizOnlyCollectedExamples = false,
+  isSrsQuiz = false,
+  cleanupFunction = () => {},
+  quizLength = 1000,
+
+}: QuizProps) {
+  const location = useLocation()
+  const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards, removeFlashcardFromActiveStudent } = useActiveStudent()
+
+  const [examplesToReview, setExamplesToReview] = useState(parseExampleTable(examplesToParse, studentFlashcardData?.studentExamples, quizOnlyCollectedExamples, isSrsQuiz, quizLength))
+  const [answerShowing, setAnswerShowing] = useState(false)
+  const [currentExampleNumber, setCurrentExampleNumber] = useState(1)
+  const currentAudio = useRef<HTMLAudioElement | null>(null)
+  const [playing, setPlaying] = useState(false)
+
+  // This is copied from OfficialQuiz, I think it might be causing excessive rerenders
+  const currentExample = examplesToReview[currentExampleNumber - 1]
+
+  // will need to second pass these variables:
+  const spanishShowing = (startWithSpanish !== answerShowing)
+
+  const isMainLocation = location.pathname.split('/').length < 2
+  function hideAnswer() {
+    setAnswerShowing(false)
+  }
+
+  const toggleAnswer = useCallback(() => {
+    if (currentAudio.current) {
+      currentAudio.current.currentTime = 0
+    }
+    setPlaying(false)
+    setAnswerShowing(!answerShowing)
+  }, [answerShowing])
+
+  /*      Audio Component Section       */
+
+  const spanishAudioUrl = currentExample?.spanishAudioLa
+  const englishAudioUrl = currentExample?.englishAudio
+
+  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
+
+  const questionAudio = startWithSpanish ? spanishAudio : englishAudio
+  const answerAudio = startWithSpanish ? englishAudio : spanishAudio
+
+  const playCurrentAudio = useCallback(() => {
+    setPlaying(true)
+    if (currentAudio.current) {
+      currentAudio.current.play()
+        .catch((e: unknown) => {
+          if (e instanceof Error) {
+            console.error(e.message)
+          }
+          else {
+            console.error('Error playing audio. Error: ', e)
+          }
+        })
+    }
+  }, [currentAudio])
+
+  const pauseCurrentAudio = useCallback(() => {
+    setPlaying(false)
+    if (currentAudio.current) {
+      currentAudio.current.pause()
+    }
+  }, [currentAudio])
+
+  const togglePlaying = useCallback(() => {
+    if (playing) {
+      pauseCurrentAudio()
+    }
+    else if (audioActive) {
+      playCurrentAudio()
+    }
+  }, [playing, audioActive, pauseCurrentAudio, playCurrentAudio])
+
+  function spanishAudio() {
+    if (spanishAudioUrl) {
+      const audioElement
+            = (
+              <audio
+                ref={currentAudio}
+                src={spanishAudioUrl}
+                onEnded={() => setPlaying(false)}
+              />
+            )
+      return audioElement
+    }
+  }
+
+  function englishAudio() {
+    if (englishAudioUrl) {
+      const audioElement
+            = (
+              <audio
+                ref={currentAudio}
+                src={englishAudioUrl}
+                onEnded={() => setPlaying(false)}
+              />
+            )
+      return audioElement
+    }
+  }
+  /*     Add/Remove Flashcard Section       */
+  const incrementExampleNumber = useCallback(() => {
+    if (currentExampleNumber < examplesToReview.length) {
+      const newExampleNumber = currentExampleNumber + 1
+      setCurrentExampleNumber(newExampleNumber)
+    }
+    else {
+      setCurrentExampleNumber(examplesToReview.length)
+    }
+    hideAnswer()
+    setPlaying(false)
+  }, [currentExampleNumber, examplesToReview])
+
+  const decrementExampleNumber = useCallback(() => {
+    if (currentExampleNumber > 1) {
+      setCurrentExampleNumber(currentExampleNumber - 1)
+    }
+    else {
+      setCurrentExampleNumber(1)
+    }
+    hideAnswer()
+    setPlaying(false)
+  }, [currentExampleNumber])
+
+  async function removeFlashcardAndUpdate(recordId: number) {
+    const flashcardRemovedPromise = removeFlashcardFromActiveStudent(recordId)
+    const exampleToRemove = examplesToReview.find(
+      (example: Flashcard) => example.recordId === recordId,
+    )
+    if (exampleToRemove) {
+      const exampleIndex = examplesToReview.indexOf(exampleToRemove)
+      if (quizOnlyCollectedExamples || isSrsQuiz) {
+        if (exampleIndex === examplesToReview.length - 1) {
+          decrementExampleNumber()
+        }
+        const filteredArray = [...examplesToReview].filter(
+          example => example.recordId !== recordId,
+        )
+        setExamplesToReview(filteredArray)
+        flashcardRemovedPromise.then((result) => {
+          if (result !== 1) {
+            const updatedArray = [...examplesToReview]
+            updatedArray.splice(exampleIndex, 0, exampleToRemove)
+            setExamplesToReview(updatedArray)
+          }
+        })
+      }
+      else {
+        const updatedArray = [...examplesToReview]
+        updatedArray[exampleIndex].isCollected = false
+        setExamplesToReview(updatedArray)
+        flashcardRemovedPromise
+          .then((result) => {
+            if (result !== 1) {
+              const updatedArray = [...examplesToReview]
+              updatedArray[exampleIndex].isCollected = true
+              setExamplesToReview(updatedArray)
+            }
+          })
+      }
+    }
+  }
+
+  async function addFlashcardAndUpdate(recordId: number) {
+    if (!quizOnlyCollectedExamples && !isSrsQuiz) {
+      const flashcardAddedPromise = addToActiveStudentFlashcards(recordId)
+      const exampleToAdd = examplesToReview.find(
+        (example: Flashcard) => example.recordId === recordId,
+      )
+      if (exampleToAdd) {
+        const exampleIndex = examplesToReview.indexOf(exampleToAdd)
+        if (exampleIndex < examplesToReview.length - 1) {
+          incrementExampleNumber()
+        }
+        const updatedArray = [...examplesToReview]
+        updatedArray[exampleIndex].isCollected = true
+        setExamplesToReview(updatedArray)
+        flashcardAddedPromise
+          .then ((result) => {
+            if (result !== 1) {
+              const updatedArray = [...examplesToReview]
+              updatedArray[exampleIndex].isCollected = false
+              setExamplesToReview(updatedArray)
+            }
+          })
+      }
+    }
+  }
+
+  /*    SRS Update Section       */
+
+  function updateExampleDifficulty(recordId: number, difficulty: string) {
+    const newArray = examplesToReview.map(example =>
+      example.recordId === recordId
+        ? { ...example, difficulty }
+        : example,
+    )
+    setExamplesToReview(newArray)
+  }
+
+  /*    Keyboard Controls       */
+  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight') {
+      incrementExampleNumber()
+    }
+    else if (event.key === 'ArrowLeft') {
+      decrementExampleNumber()
+    }
+    else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      toggleAnswer()
+    }
+    else if (event.key === ' ') {
+      togglePlaying()
+    }
+  }, [incrementExampleNumber, decrementExampleNumber, toggleAnswer, togglePlaying])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress)
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [handleKeyPress])
+
+  return (
+    examplesToReview.length > 0 && (
+      <div className="quiz">
+        {!answerShowing && questionAudio()}
+        {answerShowing && answerAudio()}
+        <NewQuizProgress
+          quizTitle={quizTitle}
+          currentExampleNumber={currentExampleNumber}
+          totalExamplesNumber={examplesToReview.length}
+        />
+        <FlashcardDisplay
+          example={currentExample}
+          isStudent={activeStudent?.role === ('student')}
+          answerShowing={answerShowing}
+          addFlashcardAndUpdate={addFlashcardAndUpdate}
+          removeFlashcardAndUpdate={removeFlashcardAndUpdate}
+          toggleAnswer={toggleAnswer}
+          startWithSpanish={startWithSpanish}
+          audioActive={audioActive}
+          togglePlaying={togglePlaying}
+          playing={playing}
+
+        />
+        {isSrsQuiz && (
+          <SRSQuizButtons
+            currentExample={currentExample}
+            answerShowing={answerShowing}
+            updateExampleDifficulty={updateExampleDifficulty}
+            incrementExampleNumber={incrementExampleNumber}
+          />
+        )}
+        <QuizButtons
+          decrementExample={decrementExampleNumber}
+          incrementExample={incrementExampleNumber}
+        />
+        <div className="buttonBox">
+          {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
+        </div>
+      </div>
+    )
+  )
+}

@@ -62,7 +62,7 @@ export default function SRSQuizButtons({ currentExample, answerShowing, incremen
   }
 
   return (
-    <div className="buttonBox">
+    <div className="buttonBox srsButtons">
       {answerShowing && !currentExample.difficulty && (
         <>
           <button

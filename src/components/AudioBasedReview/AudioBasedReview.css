@@ -1,0 +1,188 @@
+button:disabled {
+    background-color: grey;
+    color: var(--light);
+    cursor: not-allowed;
+}
+
+
+
+/* AudioQuizButtons */
+.audioQuizButtons {
+    min-width: 320px;
+    width: 50vw;
+}
+@media (max-width: 480px) {
+    .audioQuizButtons {
+        min-width: 0;
+        width: 90vw;
+    }
+    .switchOnMobile {
+        flex-direction: column-reverse;
+    }
+    .switchOnMobile button {
+        margin-top: 12px;
+    }
+}
+
+
+
+/* AudioFlashcardComponent */
+.audioFlashcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+    color: var(--light) !important;
+    background-color: var(--dark);
+
+    max-width: 640px;
+    width: 80vw;
+    height: 320px;
+    margin: 0 auto;
+    margin-top: 12px;
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+.audioPlayPauseButton {
+    background-color: transparent;
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    padding: 12px;
+    cursor: pointer;
+    z-index: 5;
+}
+
+  .audioFlashcard p {
+    font-weight: bold;
+    font-size: 1.25rem;
+    margin: 0;
+    padding: 5vw;
+    z-index: 5;
+}
+
+.progressStatus {
+    z-index: 1;
+}
+
+@media screen and (max-width: 480px) {
+    .audioFlashcard {
+    min-height: 200px;
+    max-height: 320px;
+    height: 80vw;
+    margin-top: 10vw;
+
+    }
+    .audioFlashcard p {
+        font-size: 1.125rem;
+    }
+}
+/* New Quiz Progress */
+.quizProgress {
+    margin: 0 auto;
+    text-align: center;
+    max-width: 640px;
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    /* color: black; */
+
+}
+/* @media screen and (max-width: 480px) {
+    .quizProgress {
+        position: absolute;
+        top: 0;
+        width: 100vw;
+        background-color: var(--theme);
+    }
+} */
+
+.quizProgress h3 {
+    margin-top: 12px;
+    margin-bottom: 0px;
+}
+.quizProgress p {
+    margin-bottom: 6px;
+    margin-top: 0;
+}
+.newProgressBar {
+    background-color: #d9d9d9;
+    width: 100%;
+    height: 4px;
+}
+.progressBarFill {
+    background-color: var(--brand);
+    display: block;
+    content: '';
+    width: 0;
+    height: 100%;
+    transition: width 0.5s;
+}
+
+/* Will be adding more when nav is set up (progres bar will 'take over' nav) */
+@media screen and (max-width: 480px) {
+    .quizProgress {
+        position: absolute;
+        top: 0;
+        width: 100vw;
+        background-color: var(--theme);
+
+    }
+    .quizProgress h3, .quizProgress p {
+        /* padding-left: 48px; */
+        /* padding: 0 15vw; */
+        width: 70vw;
+        color: var(--light);
+        /* margin: 0; */
+    }
+    .quizProgress h3 {
+        font-size: 1rem;
+    }
+    .quizProgress p {
+        font-size: 0.75rem;
+    }
+}
+
+/* AudioQuizSetupMenu */
+.menuRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.audioQuizSetupMenu {
+    max-width: 400px;
+    width: 80vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.audioQuizSetupMenu div.form {
+    max-width: 320px;
+    width: 90%;
+}
+.audioQuizSetupMenu .buttonBox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+.audioQuizSetupMenu .buttonBox p {
+    margin: 16px auto;
+}
+@media (max-width: 480px) {
+    .audioQuizSetupMenu {
+        width: 98vw;
+    }
+}

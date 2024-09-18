@@ -7,7 +7,9 @@ import { useVerifiedExamples } from './hooks/useVerifiedExamples'
 
 import './App.css'
 
-import LessonSelector from './LessonSelector'
+// import { LessonSelector } from './components/LessonSelector'
+import { FromToLessonSelector, toFromlessonSelectorExamplesParser } from './components/LessonSelector'
+
 import type { DisplayOrder, Flashcard, Lesson, Program, VocabTag } from './interfaceDefinitions'
 import { useVocabulary } from './hooks/useVocabulary'
 import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
@@ -50,6 +52,26 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const [requiredTags, setRequiredTags] = useState<VocabTag[]>([])
     const [noSpanglish, setNoSpanglish] = useState(false)
     const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([])
+    // FromToLessonSelector
+    const [fromLesson, setFromLesson] = useState<Lesson | null>(null)
+    const updateFromLesson = useCallback((lessonId: number | string) => {
+      if (typeof lessonId === 'string') {
+        lessonId = Number.parseInt(lessonId)
+      }
+      let newLesson = null
+      programsQuery.data?.forEach((program) => {
+        const foundLesson = program.lessons.find(item => item.recordId === lessonId)
+        if (foundLesson) {
+          newLesson = foundLesson
+        }
+      })
+      setFromLesson(newLesson)
+    }, [programsQuery?.data])
+    useEffect(() => {
+      if (selectedProgram && !fromLesson) {
+        updateFromLesson(selectedProgram.lessons[0].recordId)
+      }
+    }, [fromLesson, updateFromLesson, selectedProgram])
 
     function getExampleById(recordId: number) {
       if (!verifiedExamplesQuery.isSuccess) {
@@ -101,30 +123,6 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       const newRequiredTags = [...requiredTags].filter(item => item.id !== id)
       setRequiredTags(newRequiredTags)
     }
-
-    const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[]) => {
-      if (selectedLesson?.vocabKnown) {
-        const allowedVocab = selectedLesson.vocabKnown
-        // console.log(allowedVocab)
-        const filteredByAllowed = examples.filter((item) => {
-          let isAllowed = true
-          if (item.vocabIncluded.length === 0 || item.vocabComplete === false) {
-            isAllowed = false
-          }
-          item.vocabIncluded.forEach((word) => {
-            if (!allowedVocab.includes(word)) {
-              isAllowed = false
-            }
-          })
-          // console.log(`Item: ${item.vocabIncluded} Status: ${isAllowed}`)
-          return isAllowed
-        })
-        return filteredByAllowed
-      }
-      else {
-        return examples
-      }
-    }, [selectedLesson])
 
     const filterExamplesBySelectedTags = useCallback((examples: Flashcard[]) => {
       if (requiredTags.length > 0 && vocabularyQuery.isSuccess) {
@@ -224,10 +222,11 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const getFilteredExamples = useCallback((table: Flashcard[]) => {
       const allExamples = [...table]
       const filteredBySpanglish = filterBySpanglish(allExamples)
-      const filteredByAllowed = filterExamplesByAllowedVocab(filteredBySpanglish)
+      const filteredByAllowed = toFromlessonSelectorExamplesParser(filteredBySpanglish, fromLesson?.recordId, selectedLesson?.recordId, programsQuery.data)
+      // = filterExamplesByAllowedVocab(filteredBySpanglish)
       const filteredByTags = filterExamplesBySelectedTags(filteredByAllowed)
       return filteredByTags
-    }, [filterBySpanglish, filterExamplesByAllowedVocab, filterExamplesBySelectedTags])
+    }, [filterBySpanglish, filterExamplesBySelectedTags, fromLesson?.recordId, programsQuery.data, selectedLesson?.recordId])
 
     // called when user clicks 'Copy as Table' button
     // copies sentences in a table format to be pasted into a google doc or excel sheet
@@ -405,12 +404,16 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                       </button>
                     )}
                   </div>
-                  <LessonSelector
-                    selectedLesson={selectedLesson}
-                    updateSelectedLesson={updateSelectedLesson}
-                    selectedProgram={selectedProgram}
-                    updateSelectedProgram={updateSelectedProgram}
-                  />
+                  <div className="FromToLessonSelectorWrapper">
+                    <FromToLessonSelector
+                      toLesson={selectedLesson}
+                      updateToLesson={updateSelectedLesson}
+                      fromLesson={fromLesson}
+                      updateFromLesson={updateFromLesson}
+                      selectedProgram={selectedProgram}
+                      updateSelectedProgram={updateSelectedProgram}
+                    />
+                  </div>
                 </div>
                 <div className="filterBox">
                   <div className="searchFilter">
