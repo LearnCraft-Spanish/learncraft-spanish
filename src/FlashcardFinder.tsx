@@ -1,16 +1,19 @@
-import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
-
-import { useBackend } from './hooks/useBackend'
+import React, { forwardRef, useCallback, useEffect, useState } from 'react'
 
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import { useActiveStudent } from './hooks/useActiveStudent'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
+import { useVerifiedExamples } from './hooks/useVerifiedExamples'
 
 import './App.css'
 
 // import { LessonSelector } from './components/LessonSelector'
 import { FromToLessonSelector, toFromlessonSelectorExamplesParser } from './components/LessonSelector'
 
-import type { Flashcard, Lesson, Program, VocabTag, Vocabulary } from './interfaceDefinitions'
+import type { DisplayOrder, Flashcard, Lesson, Program, VocabTag } from './interfaceDefinitions'
+import { useVocabulary } from './hooks/useVocabulary'
+import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
+import { useUserData } from './hooks/useUserData'
 
 interface FlashcardFinderProps {
   selectedProgram: Program | null
@@ -34,21 +37,21 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     }: FlashcardFinderProps,
     currentContextual,
   ) => {
-    const { activeStudent, studentFlashcardData, addToActiveStudentFlashcards, programsQuery } = useActiveStudent()
-    const {
-      getVerifiedExamplesFromBackend,
-      getVocabFromBackend,
-    } = useBackend()
-    const isMounted = useRef(false)
-    const [loadStep, setLoadStep] = useState(0)
+    const userDataQuery = useUserData()
+    const { activeStudent, isLoading: activeStudentLoading, isError: activeStudentError } = useActiveStudent()
+    const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
+    const verifiedExamplesQuery = useVerifiedExamples()
+    const { vocabularyQuery, tagTable } = useVocabulary()
+
+    const isError = userDataQuery.isError || activeStudentError || flashcardDataQuery.isError || verifiedExamplesQuery.isError || vocabularyQuery.isError
+    const dataLoaded = (userDataQuery.data?.isAdmin || (!!activeStudent && flashcardDataQuery.isSuccess)) && verifiedExamplesQuery.isSuccess && vocabularyQuery.isSuccess
+    const isLoading = (userDataQuery.isLoading || activeStudentLoading || flashcardDataQuery.isLoading || verifiedExamplesQuery.isLoading || vocabularyQuery.isLoading) && !isError && !dataLoaded
+
     const [tagSearchTerm, setTagSearchTerm] = useState('')
-    const vocabularyTable = useRef<Vocabulary[]>([])
-    const tagTable = useRef<VocabTag[]>([])
-    const exampleTable = useRef<Flashcard[]>([])
     const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([])
     const [requiredTags, setRequiredTags] = useState<VocabTag[]>([])
     const [noSpanglish, setNoSpanglish] = useState(false)
-    const [displayExamples, setDisplayExamples] = useState<Flashcard[]>([])
+    const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([])
     // FromToLessonSelector
     const [fromLesson, setFromLesson] = useState<Lesson | null>(null)
     const updateFromLesson = useCallback((lessonId: number | string) => {
@@ -70,8 +73,19 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       }
     }, [fromLesson, updateFromLesson, selectedProgram])
 
-    function filterByHasAudio(example: Flashcard) {
-      if (example.spanishAudioLa) {
+    function getExampleById(recordId: number) {
+      if (!verifiedExamplesQuery.isSuccess) {
+        return null
+      }
+      const foundExample = verifiedExamplesQuery.data.find(
+        example => example.recordId === recordId,
+      )
+      return foundExample
+    }
+
+    function filterByHasAudio(displayOrderItem: DisplayOrder) {
+      const example = getExampleById(displayOrderItem.recordId)
+      if (example?.spanishAudioLa) {
         if (example.spanishAudioLa.length > 0) {
           return true
         }
@@ -80,7 +94,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       return false
     }
 
-    const displayExamplesWithAudio = displayExamples.filter(filterByHasAudio)
+    const displayExamplesWithAudio = displayOrder.filter(filterByHasAudio)
 
     function toggleSpanglish() {
       if (noSpanglish) {
@@ -97,7 +111,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     }
 
     function addTagToRequiredTags(id: number) {
-      const tagObject = tagTable.current.find(object => object.id === id)
+      const tagObject = tagTable.find(object => object.id === id)
       if (tagObject && !requiredTags.find(tag => tag.id === id)) {
         const newRequiredTags = [...requiredTags]
         newRequiredTags.push(tagObject)
@@ -110,24 +124,8 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       setRequiredTags(newRequiredTags)
     }
 
-    const labelAssignedExamples = useCallback((examples: Flashcard[]) => {
-      const newArray = [...examples]
-      newArray.forEach((example) => {
-        const assignedExample = studentFlashcardData?.studentExamples.find(
-          item => item.relatedExample === example.recordId,
-        )
-        if (assignedExample) {
-          example.isCollected = true
-        }
-        else {
-          example.isCollected = false
-        }
-      })
-      return newArray
-    }, [studentFlashcardData])
-
     const filterExamplesBySelectedTags = useCallback((examples: Flashcard[]) => {
-      if (requiredTags.length > 0) {
+      if (requiredTags.length > 0 && vocabularyQuery.isSuccess) {
         const filteredExamples = examples.filter((example) => {
           if (
             example.vocabIncluded.length === 0
@@ -143,7 +141,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
               switch (tag.type) {
                 case 'subcategory':
                   example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyTable.current.find(
+                    const word = vocabularyQuery.data.find(
                       element => element.vocabName === item,
                     )
                     if (word?.vocabularySubcategorySubcategoryName === tag.tag) {
@@ -153,7 +151,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                   break
                 case 'verb':
                   example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyTable.current.find(
+                    const word = vocabularyQuery.data.find(
                       element => element.vocabName === item,
                     )
                     if (word?.verbInfinitive === tag.tag) {
@@ -163,7 +161,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                   break
                 case 'conjugation':
                   example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyTable.current.find(
+                    const word = vocabularyQuery.data.find(
                       element => element.vocabName === item,
                     )
                     word?.conjugationTags.forEach((conjugationTag) => {
@@ -175,7 +173,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                   break
                 case 'vocabulary':
                   example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyTable.current.find(
+                    const word = vocabularyQuery.data.find(
                       element => element.vocabName === item,
                     )
                     if (word?.wordIdiom === tag.tag) {
@@ -185,7 +183,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                   break
                 case 'idiom':
                   example.vocabIncluded.forEach((item: string) => {
-                    const word = vocabularyTable.current.find(
+                    const word = vocabularyQuery.data.find(
                       element => element.vocabName === item,
                     )
                     if (word?.wordIdiom === tag.tag) {
@@ -203,7 +201,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       else {
         return examples
       }
-    }, [requiredTags])
+    }, [requiredTags, vocabularyQuery.isSuccess, vocabularyQuery.data])
 
     const filterBySpanglish = useCallback((examples: Flashcard[]) => {
       if (noSpanglish) {
@@ -220,37 +218,38 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
       }
     }, [noSpanglish])
 
-    const shuffleExamples = useCallback((examples: Flashcard[]) => {
-      const array = [...examples]
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]]
-      }
-      return array
-    }, [])
-
+    // cause of circular dependency?
     const getFilteredExamples = useCallback((table: Flashcard[]) => {
       const allExamples = [...table]
       const filteredBySpanglish = filterBySpanglish(allExamples)
       const filteredByAllowed = toFromlessonSelectorExamplesParser(filteredBySpanglish, fromLesson?.recordId, selectedLesson?.recordId, programsQuery.data)
       // = filterExamplesByAllowedVocab(filteredBySpanglish)
       const filteredByTags = filterExamplesBySelectedTags(filteredByAllowed)
-      // console.log(shuffledSentences)
       return filteredByTags
     }, [filterBySpanglish, filterExamplesBySelectedTags, fromLesson?.recordId, programsQuery.data, selectedLesson?.recordId])
 
     // called when user clicks 'Copy as Table' button
     // copies sentences in a table format to be pasted into a google doc or excel sheet
     function copyTable() {
+      if (!verifiedExamplesQuery.isSuccess) {
+        return null
+      }
       const headers = 'ID\tSpanish\tEnglish\tAudio_Link\n'
-      const table = displayExamples
+      const table = displayOrder
         .map(
-          example =>
-            `${example.recordId}\t${example.spanishExample}\t${
-              example.englishTranslation
-            }\t${example.spanishAudioLa}`,
+          (displayOrderObject) => {
+            const foundExample = getExampleById(displayOrderObject.recordId)
+            if (!foundExample) {
+              return ''
+            }
+            return `${foundExample.recordId}\t
+            ${foundExample.spanishExample}\t
+            ${foundExample.englishTranslation}\t
+            ${foundExample.spanishAudioLa}\n`
+          },
+
         )
-        .join('\n')
+        .join()
 
       const copiedText = headers + table
       navigator.clipboard.writeText(copiedText)
@@ -273,7 +272,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         }
         return true
       }
-      const filteredBySearch = tagTable.current.filter(filterBySearch)
+      const filteredBySearch = tagTable.filter(filterBySearch)
       const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags)
       const suggestTen = []
       for (let i = 0; i < 10; i++) {
@@ -282,254 +281,103 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         }
       }
       setSuggestedTags(suggestTen)
-    }, [requiredTags])
+    }, [tagTable, requiredTags])
 
-    // function filterTagsByInput
-
-    function sortVocab(a: Vocabulary, b: Vocabulary) {
-      if (a.frequencyRank === b.frequencyRank) {
-        if (!a.wordIdiom.includes(' ') && b.wordIdiom.includes(' ')) {
-          return 1
-        }
-        else if (a.wordIdiom.includes(' ') && !b.wordIdiom.includes(' ')) {
-          return -1
-        }
-      }
-      else {
-        return a.frequencyRank - b.frequencyRank
-      }
-      return 0
-    }
-
-    const setupVocabTable = useCallback(async () => {
-      try {
-        const vocab = await getVocabFromBackend()
-        const tags: VocabTag[] = []
-        vocab?.forEach((term) => {
-          if (term.vocabularySubcategorySubcategoryName) {
-            const subcatTag = {
-              type: 'subcategory',
-              tag: term.vocabularySubcategorySubcategoryName,
-              id: tags.length,
-            }
-            if (
-              !tags.find(
-                item =>
-                  item.type === 'subcategory'
-                  && item.tag === term.vocabularySubcategorySubcategoryName,
-              )
-            ) {
-              tags.push(subcatTag)
-            }
-          }
-          if (term.verbInfinitive) {
-            const infinitiveTag = {
-              type: 'verb',
-              tag: term.verbInfinitive,
-              id: tags.length,
-            }
-            if (
-              !tags.find(
-                item =>
-                  item.type === 'verb' && item.tag === term.verbInfinitive,
-              )
-            ) {
-              tags.push(infinitiveTag)
-            }
-          }
-          if (term.conjugationTags.length > 0) {
-            term.conjugationTags.forEach((conjugation) => {
-              const conjugationTag = {
-                type: 'conjugation',
-                tag: conjugation,
-                id: tags.length,
-              }
-              if (
-                !tags.find(
-                  item =>
-                    item.type === 'conjugation' && item.tag === conjugation,
-                )
-              ) {
-                tags.push(conjugationTag)
-              }
-            })
-          }
-          if (term.wordIdiom) {
-            if (
-              term.vocabularySubcategorySubcategoryName
-                .toLowerCase()
-                .includes('idiom')
-            ) {
-              const idiomTag = {
-                type: 'idiom',
-                tag: term.wordIdiom,
-                id: tags.length,
-              }
-              if (
-                !tags.find(
-                  item =>
-                    item.type === 'idiom' && item.tag === term.wordIdiom,
-                )
-              ) {
-                tags.push(idiomTag)
-              }
-            }
-            else {
-              const vocabTag = {
-                type: 'vocabulary',
-                tag: term.wordIdiom,
-                id: tags.length,
-              }
-              if (
-                !tags.find(
-                  item =>
-                    item.type === 'vocabulary' && item.tag === term.wordIdiom,
-                )
-              ) {
-                tags.push(vocabTag)
-              }
-            }
-          }
-        })
-        tagTable.current = tags
-        return vocab?.sort(sortVocab)
-      }
-      catch (e: unknown) {
-        if (e instanceof Error) {
-          console.error(e.message)
-        }
-        else {
-          console.error('An unexpected error occurred:', e)
-        }
-      }
-    }, [getVocabFromBackend])
-
-    async function addFlashcard(exampleId: string) {
+    function addFlashcard(exampleId: string) {
       const exampleIdNumber = Number.parseInt(exampleId)
-      const exampleToUpdate = displayExamples.find(
-        example => example.recordId === exampleIdNumber,
-      )
+      const exampleToUpdate = getExampleById(exampleIdNumber)
       if (!exampleToUpdate) {
         return
       }
-      const tableExample = exampleTable.current.find(example => example.recordId === exampleIdNumber)
-      if (tableExample) {
-        tableExample.isCollected = true
-      }
-      const newDisplayExampleTable = [...displayExamples]
-      const exampleIndex = newDisplayExampleTable.findIndex(example => example.recordId === exampleIdNumber)
-      const newFlashcardObject = { ...exampleToUpdate }
-      newFlashcardObject.isCollected = true
-      newDisplayExampleTable[exampleIndex] = newFlashcardObject
-      setDisplayExamples(newDisplayExampleTable)
-      addToActiveStudentFlashcards(exampleIdNumber).then((addResponse) => {
-        if (addResponse !== 1) {
-          if (tableExample) {
-            tableExample.isCollected = false
-          }
-          const revertedExampleTable = [...displayExamples]
-          const exampleIndex = revertedExampleTable.findIndex(example => example.recordId === exampleIdNumber)
-          const newFlashcardObject = { ...exampleToUpdate }
-          newFlashcardObject.isCollected = false
-          revertedExampleTable[exampleIndex] = newFlashcardObject
-          setDisplayExamples(revertedExampleTable)
-        }
-      })
+      addFlashcardMutation.mutate(exampleToUpdate)
+    }
+
+    function removeFlashcard(exampleId: string) {
+      const exampleIdNumber = Number.parseInt(exampleId)
+      removeFlashcardMutation.mutate(exampleIdNumber)
     }
 
     function displayExamplesTable() {
-      const tableToDisplay = displayExamples.map(item => (
-        <div className="exampleCard" key={item.recordId}>
-          <div className="exampleCardSpanishText">
-            {formatSpanishText(item.spanglish, item.spanishExample)}
+      if (!verifiedExamplesQuery.isSuccess) {
+        return null
+      }
+      const tableToDisplay = displayOrder.map((displayOrderObject) => {
+        const item = verifiedExamplesQuery.data.find(
+          example => example.recordId === displayOrderObject.recordId,
+        )
+        if (!item) {
+          return null
+        }
+        return (
+          <div className="exampleCard" key={item.recordId}>
+            <div className="exampleCardSpanishText">
+              {formatSpanishText(item.spanglish, item.spanishExample)}
+            </div>
+            <div className="exampleCardEnglishText">
+              {formatEnglishText(item.englishTranslation)}
+            </div>
+            {activeStudent?.role === 'student' && !!flashcardDataQuery.data && !exampleIsCollected(item.recordId) && (
+              <button
+                type="button"
+                className="addButton"
+                value={item.recordId}
+                onClick={e => addFlashcard(e.currentTarget.value)}
+              >
+                Add
+              </button>
+            )}
+            {activeStudent?.role === 'student' && !!flashcardDataQuery.data && exampleIsCollected(item.recordId) && (
+              <button
+                type="button"
+                className="removeButton"
+                value={item.recordId}
+                onClick={e => removeFlashcard(e.currentTarget.value)}
+              >
+                Remove
+              </button>
+            )}
           </div>
-          <div className="exampleCardEnglishText">
-            {formatEnglishText(item.englishTranslation)}
-          </div>
-          {activeStudent?.role === 'student' && !item.isCollected && (
-            <button
-              type="button"
-              className="addButton"
-              value={item.recordId}
-              onClick={e => addFlashcard(e.currentTarget.value)}
-            >
-              Add
-            </button>
-          )}
-          {activeStudent?.role === 'student' && item.isCollected && (
-            <button type="button" className="ownedButton" value={item.recordId}>
-              Owned
-            </button>
-          )}
-        </div>
-      ))
-      return tableToDisplay
+        )
+      })
+      const truthyTable = tableToDisplay.filter(item => !!item)
+      return truthyTable
     }
 
-    // called onced at the beginning
-    useEffect(() => {
-      async function startUp() {
-        if (loadStep === 0) {
-          isMounted.current = true
-          const getData = async () => {
-            Promise.all([setupVocabTable(), getVerifiedExamplesFromBackend()])
-              .then((result) => {
-                const vocabResult = result[0]
-                const exampleResult = result[1]
-                if (vocabResult && exampleResult) {
-                  vocabularyTable.current = vocabResult
-                  exampleTable.current = exampleResult
-                  setLoadStep(1)
-                }
-              })
-          }
-          getData()
+    function makeDisplayOrderFromExamples(examples: Flashcard[]) {
+      const newDisplayOrder = examples.map((example) => {
+        return {
+          recordId: example.recordId,
         }
-      }
-      if (!isMounted.current) {
-        startUp()
-      }
-    }, [loadStep, getVerifiedExamplesFromBackend, setupVocabTable])
-
-    useEffect(() => {
-      if (loadStep === 1) {
-        const labeledExamples = labelAssignedExamples(exampleTable.current)
-        const filteredExamples = getFilteredExamples(labeledExamples)
-        const shuffledExamples = shuffleExamples(filteredExamples)
-        setDisplayExamples(shuffledExamples)
-        setLoadStep(2)
-      }
-    }, [loadStep, getFilteredExamples, shuffleExamples, labelAssignedExamples])
+      })
+      return newDisplayOrder
+    }
 
     useEffect(() => {
       filterTagsByInput(tagSearchTerm)
     }, [tagSearchTerm, requiredTags, contextual, filterTagsByInput])
 
     useEffect(() => {
-      if (loadStep === 2 && selectedLesson?.recordId && fromLesson?.recordId) {
-        const newExampleTable = getFilteredExamples(exampleTable.current)
-        const randomizedExamples = shuffleExamples(newExampleTable)
-        setDisplayExamples(randomizedExamples)
+      if (verifiedExamplesQuery.isSuccess) {
+        const newExampleTable = getFilteredExamples(verifiedExamplesQuery.data)
+        const randomizedExamples = fisherYatesShuffle(newExampleTable)
+        const newDisplayOrder = makeDisplayOrderFromExamples(randomizedExamples)
+        setDisplayOrder(newDisplayOrder)
       }
-    }, [
-      selectedLesson?.recordId,
-      fromLesson?.recordId,
-      requiredTags,
-      noSpanglish,
-      loadStep,
-      shuffleExamples,
-      getFilteredExamples,
-    ])
+    }, [verifiedExamplesQuery.isSuccess, verifiedExamplesQuery.data, requiredTags, noSpanglish, getFilteredExamples])
 
     return (
       <div className="flashcardFinder">
-        {loadStep < 2 && (
+        {isError && (
+          <div>
+            <h2>Error Loading Flashcards</h2>
+          </div>
+        )}
+        {isLoading && (
           <div>
             <h2>Loading Flashcard Data...</h2>
           </div>
         )}
-
-        {loadStep === 2 && (
+        {dataLoaded && (
           <div>
             <div className="flashcardFinderHeader">
               <h2>Flashcard Finder</h2>
@@ -580,9 +428,9 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                         <br></br>
                       </div>
                     </div>
-                    {tagSearchTerm.length > 0
+                    {!!tagSearchTerm.length
                     && contextual === 'tagSuggestionBox'
-                    && suggestedTags.length > 0 && (
+                    && !!suggestedTags.length && (
                       <div
                         className="tagSuggestionBox"
                         ref={currentContextual}
@@ -591,16 +439,19 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                         {suggestedTags.map(item => (
                           <div
                             key={item.id}
-                            className="vocabCard"
+                            className="tagCard"
                             onClick={() => addTagToRequiredTags(item.id)}
                           >
-                            <h4 className="vocabName">{item.tag}</h4>
-                            <p className="vocabUse">{item.type}</p>
+                            <div className={`${item.type}Card`}>
+                              <h4 className="vocabName">{item.tag}</h4>
+                              {item.vocabDescriptor && <h5 className="vocabDescriptor">{item.vocabDescriptor}</h5>}
+                              <p className="vocabUse">{item.type}</p>
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
-                    {requiredTags.length > 0 && (
+                    {!!requiredTags.length && (
                       <div className="selectedVocab">
                         <h5>Search Terms:</h5>
                         {requiredTags.map(item => (
@@ -623,7 +474,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                 <button type="button" onClick={copyTable}>Copy Table</button>
                 <div className="displayExamplesDescription">
                   <h4>
-                    {`${displayExamples.length} flashcards showing (
+                    {`${displayOrder.length} flashcards showing (
                     ${displayExamplesWithAudio?.length} with audio)`}
                   </h4>
                 </div>

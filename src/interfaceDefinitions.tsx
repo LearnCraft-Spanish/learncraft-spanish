@@ -44,9 +44,7 @@ export interface Flashcard {
   englishAudio: string
   spanishAudioLa: string
   vocabComplete: boolean
-  isCollected?: boolean
   difficulty?: string
-
 }
 
 export interface StudentExample {
@@ -89,23 +87,20 @@ export interface Vocabulary {
   use: string
   frequencyRank: number
   vocabularySubcategorySubcategoryName: string
+  descriptionOfVocabularySkill?: string
   vocabName: string
   verbInfinitive: string
   conjugationTags: Array<string>
 }
-// ['Record ID#', 'spanish example', 'english translation',
-//  'vocab included', 'spanglish?', 'All Students', 'English Audio',
-//  'Spanish Audio LA', 'Vocab Complete?']
-export interface Examples {
+
+export interface QuizCourse {
+  name: string
+  url: string
+  code: string
+}
+
+export interface DisplayOrder {
   recordId: number
-  spanishExample: string
-  englishTranslation: string
-  vocabIncluded: Array<string>
-  spanglish: 'spanglish' | 'esp'
-  allStudents: Array<string>
-  englishAudio: string
-  spanishAudioLa: string
-  vocabComplete: boolean
 }
 
 export interface Quiz {
@@ -120,17 +115,29 @@ export interface Quiz {
 }
 
 export interface Spelling {
-  relatedWordidion: number
+  relatedWordidiom: number
   spellingOption: string
 }
 
 /*      Flashcard Finder      */
 
-export interface VocabTag {
+// Highly Tentative for now, will be updated as needed
+export interface VocabTagWithVocabDescriptor {
   id: number
-  type: string
+  type: 'vocabulary'
   tag: string
+  vocabDescriptor: string // required when type is "vocab"
 }
+
+export interface VocabTagWithoutVocabDescriptor {
+  id: number
+  type: string // any other type
+  tag: string
+  vocabDescriptor?: undefined // explicitly undefined when type is not "vocab"
+}
+
+// Combines the two types above
+export type VocabTag = VocabTagWithVocabDescriptor | VocabTagWithoutVocabDescriptor
 
 /*      Coaching Interfaces      */
 export interface Coach {

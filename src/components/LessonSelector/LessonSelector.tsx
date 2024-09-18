@@ -2,7 +2,7 @@ import React from 'react'
 
 import './LessonSelector.css'
 import type { Lesson, Program } from '../../interfaceDefinitions'
-import { useActiveStudent } from '../../hooks/useActiveStudent'
+import { useProgramTable } from '../../hooks/useProgramTable'
 
 interface LessonSelectorProps {
   selectedLesson: Lesson | null
@@ -16,15 +16,15 @@ export default function LessonSelector({
   selectedProgram,
   updateSelectedProgram,
 }: LessonSelectorProps) {
-  const { programsQuery } = useActiveStudent()
+  const { programTableQuery } = useProgramTable()
   function makeCourseSelector() {
     const courseSelector = [
       <option key={0} value={0}>
         –Choose Course–
       </option>,
     ]
-    if (programsQuery.isSuccess) {
-      programsQuery.data?.forEach((item: Program) => {
+    if (programTableQuery.isSuccess) {
+      programTableQuery.data?.forEach((item: Program) => {
         courseSelector.push(
           <option key={item.recordId} value={item.recordId}>
             {item.name}

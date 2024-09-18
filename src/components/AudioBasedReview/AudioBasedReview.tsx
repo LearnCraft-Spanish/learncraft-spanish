@@ -5,6 +5,7 @@ import './AudioBasedReview.css'
 import type { Flashcard, Lesson } from '../../interfaceDefinitions'
 
 import { useActiveStudent } from '../../hooks/useActiveStudent'
+import { useAudioExamples } from '../../hooks/useAudioExamples'
 import { toFromlessonSelectorExamplesParser } from '../LessonSelector'
 import AudioQuizButtons from './AudioQuizButtons'
 import AudioFlashcard from './AudioFlashcard'
@@ -40,13 +41,21 @@ export default function AudioBasedReview({
   audioOrComprehension = 'comprehension',
   willAutoplay,
 }: AudioBasedReviewProps) {
-  const { activeStudent, audioExamplesTable } = useActiveStudent()
+  const { activeStudent, isError, isLoading } = useActiveStudent()
   const programsQuery = useActiveStudent().programsQuery // may be able to remove this line, add to useActiveStudent line
   // this is a pattern used in the codebase, not sure if it's necessary
   const rendered = useRef(false)
+  const { audioExamplesQuery } = useAudioExamples()
+
+  // Name Explicit Variables for Query States
+  const _studentLoading = isLoading
+  const _studentError = isError
+  const _audioExamplesLoading = audioExamplesQuery.isLoading
+  const _audioExamplesError = audioExamplesQuery.isError
+  const audioExamplesTable = audioExamplesQuery.data
 
   // Examples Table after: filtedBylessonId, shuffled
-  const [examplesToPlay, setExamplesToPlay] = useState<Flashcard[] | []>([])
+  const [examplesToPlay, setExamplesToPlay] = useState<Flashcard[]>([])
   const [currentExample, setCurrentExample] = useState(0)
   const [autoplay, setAutoplay] = useState(willAutoplay || false)
   const [quizReady, setQuizReady] = useState(false)
@@ -307,6 +316,8 @@ export default function AudioBasedReview({
       .map(({ value }) => value)
     return shuffled
   }
+
+  // Callback function to make quiz
   const makeComprehensionQuiz = useCallback(() => {
     if ((!selectedLesson || !fromLesson)) {
       // eslint-disable-next-line no-console
@@ -318,14 +329,16 @@ export default function AudioBasedReview({
       console.warn('No programsQuery data')
       return
     }
-    const allowedAudioExamples = toFromlessonSelectorExamplesParser(
-      audioExamplesTable,
+    if (audioExamplesTable) {
+      const allowedAudioExamples = toFromlessonSelectorExamplesParser(
+        audioExamplesTable,
       fromLesson.recordId,
-      selectedLesson.recordId,
+        selectedLesson.recordId,
       programsQuery.data,
-    )
-    const shuffledExamples = shuffleExamples(allowedAudioExamples)
-    setExamplesToPlay(shuffledExamples)
+      )
+      const shuffledExamples = shuffleExamples(allowedAudioExamples)
+      setExamplesToPlay(shuffledExamples)
+    }
   }, [selectedLesson, fromLesson, programsQuery.data, audioExamplesTable])
 
   function readyQuiz() {
@@ -375,7 +388,7 @@ export default function AudioBasedReview({
 
   useEffect(() => {
     unReadyQuiz()
-    if (selectedLesson?.recordId && selectedProgram?.recordId && audioExamplesTable.length > 0) {
+    if (selectedLesson?.recordId && selectedProgram?.recordId && !!audioExamplesTable?.length) {
       makeComprehensionQuiz()
     }
   }, [selectedProgram, selectedLesson, audioExamplesTable.length, makeComprehensionQuiz, unReadyQuiz])

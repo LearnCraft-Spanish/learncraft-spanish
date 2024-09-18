@@ -1,63 +1,55 @@
 import React from 'react'
 import type { Flashcard } from '../interfaceDefinitions'
 import { formatEnglishText, formatSpanishText } from '../functions/formatFlashcardText'
-import './Quiz.css'
+import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
 
 interface FlashcardProps {
   example: Flashcard
   isStudent: boolean
   answerShowing: boolean
+  incrementExampleNumber: () => void
   startWithSpanish?: boolean
-  addFlashcardAndUpdate: (recordId: number) => void
-  removeFlashcardAndUpdate: (recordId: number) => void
+  onRemove: () => void
   toggleAnswer: () => void
-  audioActive: string
-  togglePlaying: () => void
-  playing: boolean
 }
 
-export default function FlashcardDisplay({
-  example,
-  isStudent,
-  answerShowing,
-  startWithSpanish = false,
-  addFlashcardAndUpdate,
-  removeFlashcardAndUpdate,
-  toggleAnswer,
-  audioActive,
-  togglePlaying,
-  playing,
-}: FlashcardProps): JSX.Element {
+export default function FlashcardDisplay({ example, isStudent, answerShowing, incrementExampleNumber, onRemove, startWithSpanish = false, toggleAnswer }: FlashcardProps): JSX.Element {
+  const { addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
+  const addFlashcard = addFlashcardMutation.mutate
+  const removeFlashcard = removeFlashcardMutation.mutate
   const spanishText = example.spanishExample
   const englishText = example.englishTranslation
+
+  function addAndAdvance(example: Flashcard) {
+    addFlashcard(example)
+    incrementExampleNumber()
+  }
+
+  function removeAndAdvance(recordId: number) {
+    removeFlashcard(recordId)
+    onRemove()
+  }
 
   const questionText = startWithSpanish ? () => formatSpanishText(example.spanglish, spanishText) : () => formatEnglishText(englishText)
   const answerText = startWithSpanish ? () => formatEnglishText(englishText) : () => formatSpanishText(example.spanglish, spanishText)
 
-  function handlePlayPause(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    e.stopPropagation()
-    togglePlaying()
-  }
   return (
-    <div className="flashcard" onClick={toggleAnswer} aria-label="flashcard">
+    <div className="exampleBox">
       {!answerShowing && (
-        <div className="englishTranslation">
+        <div className="englishTranslation" onClick={toggleAnswer} role="button" aria-label="flashcard">
           {questionText()}
         </div>
       )}
       {answerShowing && (
-        <div className="spanishExample">
+        <div className="spanishExample" onClick={toggleAnswer} role="button" aria-label="flashcard">
           {answerText()}
 
-          {isStudent && (!example.isCollected
+          {isStudent && (!exampleIsCollected(example.recordId)
             ? (
                 <button
                   type="button"
                   className="addFlashcardButton"
-                  onClick={() =>
-                    addFlashcardAndUpdate(
-                      example.recordId,
-                    )}
+                  onClick={() => addAndAdvance(example)}
                 >
                   Add to my flashcards
                 </button>
@@ -66,23 +58,12 @@ export default function FlashcardDisplay({
                 <button
                   type="button"
                   className="removeFlashcardButton"
-                  onClick={() => removeFlashcardAndUpdate(example.recordId)}
+                  onClick={() => removeAndAdvance(example.recordId)}
                 >
                   Remove from my flashcards
                 </button>
               ))}
         </div>
-      )}
-
-      {/* Play/Pause */}
-      {(audioActive) && (
-        <button
-          type="button"
-          className="audioPlayPauseButton"
-          onClick={e => handlePlayPause(e)}
-        >
-          <i className={playing ? 'fa-solid fa-pause' : 'fa-solid fa-play'} />
-        </button>
       )}
     </div>
   )

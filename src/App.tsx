@@ -1,11 +1,13 @@
 import './App.css'
 import type { ReactElement } from 'react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
+import { Route, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
+import { useProgramTable } from './hooks/useProgramTable'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import type { Flashcard, Lesson, Program, UserData } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
 import Menu from './Menu'
@@ -24,7 +26,8 @@ export const App: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const userDataQuery = useUserData()
-  const { activeStudent, activeLesson, activeProgram, choosingStudent, programsQuery, studentListQuery, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const { activeStudent, activeLesson, studentList, activeProgram, chooseStudent } = useActiveStudent()
+  const { programTableQuery } = useProgramTable()
   const { isAuthenticated, isLoading } = useAuth0()
 
   // States for Lesson Selector
@@ -38,6 +41,9 @@ export const App: React.FC = () => {
   // Reference to the current contextual menu element
   const currentContextual = useRef<HTMLDivElement | null >(null)
   const [contextual, setContextual] = useState('') // String to indicate which contextual menu is open
+
+  // Boolean state to determine whether to show the student selector menu
+  const [studentSelectorOpen, setStudentSelectorOpen] = useState(false)
 
   // global functions to open and close any contextual menus – hard limit to one at a time
   const openContextual = useCallback((elementClass: string) => {
@@ -79,30 +85,30 @@ export const App: React.FC = () => {
       lessonId = Number.parseInt(lessonId)
     }
     let newLesson = null
-    programsQuery.data?.forEach((program) => {
+    programTableQuery.data?.forEach((program) => {
       const foundLesson = program.lessons.find(item => item.recordId === lessonId)
       if (foundLesson) {
         newLesson = foundLesson
       }
     })
     setSelectedLesson(newLesson)
-  }, [programsQuery?.data])
+  }, [programTableQuery?.data])
 
   const updateSelectedProgram = useCallback((programId: number | string) => {
     if (typeof programId === 'string') {
       programId = Number.parseInt(programId)
     }
     let newProgram = null
-    newProgram = programsQuery.data?.find(program => program.recordId === programId)
+    newProgram = programTableQuery.data?.find(program => program.recordId === programId)
     if (newProgram) {
       setSelectedProgram(newProgram)
     }
     else {
       setSelectedProgram(null)
     }
-  }, [programsQuery?.data])// Add activeProgram, activeLesson when defined
+  }, [programTableQuery?.data])// Add activeProgram, activeLesson when defined
 
-  const updateBannerMessage = useCallback((message: string) => {
+  const _updateBannerMessage = useCallback((message: string) => {
     setBannerMessage(message)
   }, [])
 
@@ -111,28 +117,22 @@ export const App: React.FC = () => {
   }, [])
 
   const makeStudentSelector = useCallback(() => {
-    if (userDataQuery.data?.isAdmin) {
+    if (userDataQuery.data?.isAdmin && !!studentList) {
       const studentSelector = [
         <option key={0} label="">
-          {' '}
           -- None Selected --
         </option>,
       ]
-      studentListQuery.data?.forEach((student: UserData) => {
+      studentList?.forEach((student: UserData) => {
         const studentEmail = student.emailAddress
-        if (!studentEmail.includes('(')) {
+        const studentRole = student.role
+        if (!studentEmail.includes('(') && (studentRole === 'student' || studentRole === 'limited')) {
           studentSelector.push(
             <option
               key={student.recordId}
               value={student.recordId}
-              label={student.name}
-            >
-              {student.name}
-              {' '}
-              (
-              {student.emailAddress}
-              )
-            </option>,
+              label={`${student.name} -- ${student.emailAddress}`}
+            />,
           )
         }
       })
@@ -149,32 +149,70 @@ export const App: React.FC = () => {
       studentSelector.sort(studentSelectorSortFunction)
       return studentSelector
     }
-  }, [userDataQuery.data?.isAdmin, studentListQuery.data])
+  }, [userDataQuery.data?.isAdmin, studentList])
+
+  const openStudentSelector = useCallback(() => {
+    setStudentSelectorOpen(true)
+  }, [])
+
+  const closeStudentSelector = useCallback(() => {
+    setStudentSelectorOpen(false)
+  }, [])
+
+  const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
+    let allowedVocabulary: string[] = []
+    programTableQuery.data?.forEach((program) => {
+      const foundLesson = program.lessons.find(
+        item => item.recordId === lessonId,
+      )
+      if (foundLesson) {
+        allowedVocabulary = foundLesson.vocabKnown || []
+      }
+      return allowedVocabulary
+    })
+    const filteredByAllowed = examples.filter((item) => {
+      let isAllowed = true
+      if (
+        item.vocabIncluded.length === 0
+        || item.vocabComplete === false
+        || item.spanglish === 'spanglish'
+      ) {
+        isAllowed = false
+      }
+      item.vocabIncluded.forEach((word) => {
+        if (!allowedVocabulary.includes(word)) {
+          isAllowed = false
+        }
+      })
+      return isAllowed
+    })
+    return filteredByAllowed
+  }, [programTableQuery?.data])
 
   useEffect(() => {
     // change the selected lesson when the selected program changes
-    const hasActiveLesson = activeLesson?.current?.recordId
-    const activeProgramSelected = selectedProgram?.recordId === activeProgram?.current?.recordId
+    const hasActiveLesson = activeLesson?.recordId
+    const activeProgramSelected = selectedProgram?.recordId === activeProgram?.recordId
 
     // default to active lesson if present, otherwise first lesson
     if (hasActiveLesson && activeProgramSelected) {
-      updateSelectedLesson(activeLesson.current!.recordId)
+      updateSelectedLesson(activeLesson.recordId)
     }
     else if (selectedProgram?.lessons?.length) {
       updateSelectedLesson(selectedProgram.lessons[0].recordId)
     }
-  }, [activeStudent, activeLesson, activeProgram, selectedProgram, programsQuery?.data, updateSelectedLesson])
+  }, [activeStudent, activeLesson, activeProgram, selectedProgram, programTableQuery?.data, updateSelectedLesson])
 
   useEffect(() => {
     // renders twice if student has an active program
-    if (activeProgram?.current) {
-      updateSelectedProgram(activeProgram.current.recordId)
+    if (activeProgram?.recordId) {
+      updateSelectedProgram(activeProgram.recordId)
     }
     // Setting Default Vaules for selectedProgram and selectedLesson
-    else if (programsQuery?.data?.length) {
-      updateSelectedProgram(programsQuery.data[0].recordId)
+    else if (programTableQuery.data?.length) {
+      updateSelectedProgram(programTableQuery.data[0].recordId)
     }
-  }, [activeProgram, activeStudent, programsQuery?.data, updateSelectedProgram])
+  }, [activeProgram, activeStudent, programTableQuery.data, updateSelectedProgram])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)
@@ -215,30 +253,30 @@ export const App: React.FC = () => {
           && userDataQuery.data?.role !== 'limited'
           && !userDataQuery.data?.isAdmin && <p>Welcome back!</p>}
 
-          {userDataQuery.data?.isAdmin && !choosingStudent && (
+          {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
             <div className="studentList">
               {activeStudent?.recordId && (
                 <p>
                   Using as
                   {' '}
-                  {activeStudent.name}
-                  {activeStudent.recordId === userDataQuery.data?.recordId
+                  {activeStudent?.name}
+                  {activeStudent?.recordId === userDataQuery.data?.recordId
                   && ' (yourself)'}
                 </p>
               )}
               {!activeStudent?.recordId && <p>No student Selected</p>}
-              <button type="button" onClick={chooseStudent}>Change</button>
+              <button type="button" onClick={openStudentSelector}>Change</button>
             </div>
           )}
-          {userDataQuery.data?.isAdmin && choosingStudent && (
+          {userDataQuery.data?.isAdmin && studentSelectorOpen && (
             <form className="studentList" onSubmit={e => e.preventDefault}>
               <select
-                value={activeStudent ? activeStudent.recordId : undefined}
-                onChange={e => updateActiveStudent(Number.parseInt(e.target.value))}
+                value={activeStudent ? activeStudent?.recordId : undefined}
+                onChange={e => chooseStudent(Number.parseInt(e.target.value))}
               >
                 {makeStudentSelector()}
               </select>
-              <button type="button" onClick={keepStudent}>Cancel</button>
+              <button type="button" onClick={closeStudentSelector}>Cancel</button>
             </form>
           )}
         </div>
@@ -264,29 +302,6 @@ export const App: React.FC = () => {
             && <ReviewMyFlashcards />
           }
         />
-        {/* <Route
-          path="/allflashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
-              ? (
-                  <Quiz
-                    examplesToParse={studentFlashcardData?.examples}
-                    quizTitle="My Flashcards"
-                    quizOnlyCollectedExamples
-                    cleanupFunction={() => navigate('..')}
-                  />
-                )
-              : (<Navigate to="/" />)
-          }
-        />
-        <Route
-          path="/todaysflashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples.length)
-              ? <SRSQuizApp />
-              : <Navigate to="/" />
-          }
-        /> */}
         <Route
           path="/manage-flashcards"
           element={<FlashcardManager />}

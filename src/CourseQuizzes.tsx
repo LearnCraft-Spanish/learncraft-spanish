@@ -1,3 +1,4 @@
+import type { MutableRefObject } from 'react'
 import React, { useEffect, useRef } from 'react'
 import {
   Route,
@@ -6,15 +7,32 @@ import {
 } from 'react-router-dom'
 
 import './App.css'
-
+import type { QuizCourse } from './interfaceDefinitions'
+import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
 import OfficialQuiz from './OfficialQuiz'
-
 import MenuButton from './components/MenuButton'
+
+interface CourseQuizzesProps {
+  chosenQuiz: number
+  courses: QuizCourse[]
+  hideMenu: boolean
+  makeCourseList: () => JSX.Element[]
+  makeMenuHidden: () => void
+  makeMenuShow: () => void
+  makeQuizReady: () => void
+  makeQuizSelections: () => JSX.Element[] | undefined
+  quizCourse: string
+  quizReady: boolean
+  studentHasDefaultQuiz: MutableRefObject<boolean>
+  thisCourse: string
+  updateChosenQuiz: (quizNumber: number) => void
+  updateQuizCourseWithNavigate: (course: string) => void
+  updateQuizCourseWithoutNavigate: (course: string) => void
+}
 
 export default function CourseQuizzes({
   chosenQuiz,
   courses,
-  dataLoaded,
   hideMenu,
   makeCourseList,
   makeMenuHidden,
@@ -23,15 +41,15 @@ export default function CourseQuizzes({
   makeQuizSelections,
   quizCourse,
   quizReady,
-  quizTable,
   studentHasDefaultQuiz,
   thisCourse,
   updateChosenQuiz,
   updateQuizCourseWithNavigate,
   updateQuizCourseWithoutNavigate,
-}) {
+}: CourseQuizzesProps) {
   const navigate = useNavigate()
   const rendered = useRef(false)
+  const { officialQuizzesQuery } = useOfficialQuizzes(undefined)
 
   useEffect(() => {
     if (!rendered.current) {
@@ -44,11 +62,11 @@ export default function CourseQuizzes({
   }, [quizCourse, thisCourse, updateQuizCourseWithoutNavigate])
 
   useEffect(() => {
-    if (dataLoaded && !studentHasDefaultQuiz) {
-      const firstQuiz = makeQuizSelections(quizCourse)[0]
-      updateChosenQuiz(firstQuiz)
+    if (officialQuizzesQuery.data && !studentHasDefaultQuiz) {
+      const firstQuiz = makeQuizSelections()?.[0]
+      updateChosenQuiz(firstQuiz?.props.value)
     }
-  }, [dataLoaded, studentHasDefaultQuiz, quizCourse, makeQuizSelections, updateChosenQuiz])
+  }, [officialQuizzesQuery.data, studentHasDefaultQuiz, quizCourse, makeQuizSelections, updateChosenQuiz])
 
   useEffect(() => {
     if (quizReady && chosenQuiz) {
@@ -59,8 +77,7 @@ export default function CourseQuizzes({
   return (
     <div className="quizInterface">
       {/* Quiz Selector */}
-
-      {dataLoaded && chosenQuiz && quizCourse !== 'lcsp' && !hideMenu && (
+      {officialQuizzesQuery.data && chosenQuiz && quizCourse !== 'lcsp' && !hideMenu && (
         <div className="quizSelector">
           <select
             className="quizMenu"
@@ -72,7 +89,7 @@ export default function CourseQuizzes({
           <select
             className="quizMenu"
             value={chosenQuiz}
-            onChange={e => updateChosenQuiz(e.target.value)}
+            onChange={e => updateChosenQuiz(Number.parseInt(e.target.value))}
           >
             {makeQuizSelections()}
           </select>
@@ -84,7 +101,7 @@ export default function CourseQuizzes({
           </div>
         </div>
       )}
-      {dataLoaded && quizCourse !== 'lcsp' && (
+      {officialQuizzesQuery.data && quizCourse !== 'lcsp' && (
         <Routes>
           <Route
             path=":number"
@@ -92,11 +109,9 @@ export default function CourseQuizzes({
               <OfficialQuiz
                 chosenQuiz={chosenQuiz}
                 courses={courses}
-                dataLoaded={dataLoaded}
                 makeMenuHidden={makeMenuHidden}
                 makeMenuShow={makeMenuShow}
                 quizCourse={quizCourse}
-                quizTable={quizTable}
                 updateChosenQuiz={updateChosenQuiz}
               />
             )}
