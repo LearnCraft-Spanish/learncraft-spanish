@@ -7,13 +7,16 @@ interface FlashcardProps {
   example: Flashcard
   isStudent: boolean
   answerShowing: boolean
-  incrementExampleNumber: () => void
   startWithSpanish?: boolean
+  incrementExampleNumber: () => void
   onRemove: () => void
   toggleAnswer: () => void
+  audioActive: string
+  togglePlaying: () => void
+  playing: boolean
 }
 
-export default function FlashcardDisplay({ example, isStudent, answerShowing, incrementExampleNumber, onRemove, startWithSpanish = false, toggleAnswer }: FlashcardProps): JSX.Element {
+export default function FlashcardDisplay({ example, isStudent, answerShowing, incrementExampleNumber, audioActive, onRemove, playing, togglePlaying, startWithSpanish = false, toggleAnswer }: FlashcardProps): JSX.Element {
   const { addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
   const addFlashcard = addFlashcardMutation.mutate
   const removeFlashcard = removeFlashcardMutation.mutate
@@ -64,6 +67,17 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, in
                 </button>
               ))}
         </div>
+
+      )}
+      {/* Play/Pause */}
+      {(audioActive) && (
+        <button
+          type="button"
+          className="audioPlayPauseButton"
+          onClick={togglePlaying}
+        >
+          <i className={playing ? 'fa-solid fa-pause' : 'fa-solid fa-play'} />
+        </button>
       )}
     </div>
   )

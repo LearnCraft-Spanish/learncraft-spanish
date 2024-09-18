@@ -63,18 +63,20 @@ export default function QuizComponent({
     setAnswerShowing(false)
   }
 
-  function toggleAnswer() {
+  const toggleAnswer = useCallback(() => {
     if (currentAudio.current) {
       currentAudio.current.currentTime = 0
     }
     setPlaying(false)
     setAnswerShowing(!answerShowing)
-  }
+  }, [answerShowing])
 
   /*      Audio Component Section       */
 
-  const spanishAudioUrl = currentExample?.spanishAudioLa
-  const englishAudioUrl = currentExample?.englishAudio
+  const spanishAudioUrl = currentExample?.spanishAudioLa || ''
+  const englishAudioUrl = currentExample?.englishAudio || ''
+
+  const audioActive: string = spanishShowing ? spanishAudioUrl : englishAudioUrl
 
   function spanishAudio() {
     const audioElement
@@ -99,8 +101,6 @@ export default function QuizComponent({
           )
     return audioElement
   }
-
-  const audioActive = spanishShowing ? currentExample?.spanishAudioLa : currentExample?.englishAudio
 
   const questionAudio = startWithSpanish ? spanishAudio : englishAudio
   const answerAudio = startWithSpanish ? englishAudio : spanishAudio
@@ -129,7 +129,7 @@ export default function QuizComponent({
   }, [playing, pauseCurrentAudio, playCurrentAudio])
 
   /*     Increment/Decrement Through Examples       */
-  function incrementExampleNumber() {
+  const incrementExampleNumber = useCallback(() => {
     if (currentExampleNumber < displayOrder.length) {
       const newExampleNumber = currentExampleNumber + 1
       setCurrentExampleNumber(newExampleNumber)
@@ -139,9 +139,9 @@ export default function QuizComponent({
     }
     hideAnswer()
     setPlaying(false)
-  }
+  }, [currentExampleNumber, displayOrder])
 
-  function decrementExampleNumber() {
+  const decrementExampleNumber = useCallback(() => {
     if (currentExampleNumber > 1) {
       setCurrentExampleNumber(currentExampleNumber - 1)
     }
@@ -150,7 +150,7 @@ export default function QuizComponent({
     }
     hideAnswer()
     setPlaying(false)
-  }
+  }, [currentExampleNumber])
 
   function onRemove() {
     if (quizOnlyCollectedExamples || isSrsQuiz) {
@@ -212,6 +212,29 @@ export default function QuizComponent({
     setDisplayOrder(filteredByCollected)
   }, [filterIfCollectedOnly])
 
+  /*    Keyboard Controls       */
+  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'ArrowRight') {
+      incrementExampleNumber()
+    }
+    else if (event.key === 'ArrowLeft') {
+      decrementExampleNumber()
+    }
+    else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+      toggleAnswer()
+    }
+    else if (event.key === ' ') {
+      togglePlaying()
+    }
+  }, [incrementExampleNumber, decrementExampleNumber, toggleAnswer, togglePlaying])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress)
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [handleKeyPress])
+
   return (
     displayOrder.length > 0 && (
       <div className="quiz">
@@ -225,6 +248,9 @@ export default function QuizComponent({
             onRemove={onRemove}
             answerShowing={answerShowing}
             toggleAnswer={toggleAnswer}
+            togglePlaying={togglePlaying}
+            playing={playing}
+            audioActive={audioActive}
             startWithSpanish={startWithSpanish}
           />
         )}
@@ -239,9 +265,6 @@ export default function QuizComponent({
         <QuizButtons
           decrementExample={decrementExampleNumber}
           incrementExample={incrementExampleNumber}
-          audioActive={audioActive}
-          togglePlaying={togglePlaying}
-          playing={playing}
         />
         <div className="buttonBox">
           {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}

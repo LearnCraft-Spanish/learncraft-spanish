@@ -1,5 +1,6 @@
 import type { Lesson, Program } from '../../interfaceDefinitions'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
+import { useProgramTable } from '../../hooks/useProgramTable'
 import './LessonSelector.css'
 
 interface LessonSelectorProps {
@@ -20,7 +21,7 @@ export default function FromToLessonSelector({
   updateToLesson,
 
 }: LessonSelectorProps): JSX.Element {
-  const { programsQuery } = useActiveStudent()
+  const { programTableQuery } = useProgramTable()
   // This is the same code as in LessonSelector.tsx
   function makeCourseSelector() {
     const courseSelector = [
@@ -28,8 +29,8 @@ export default function FromToLessonSelector({
         –Choose Course–
       </option>,
     ]
-    if (programsQuery.isSuccess) {
-      programsQuery.data?.forEach((item: Program) => {
+    if (programTableQuery.isSuccess) {
+      programTableQuery.data?.forEach((item: Program) => {
         courseSelector.push(
           <option key={item.recordId} value={item.recordId}>
             {item.name}

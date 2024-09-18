@@ -14,6 +14,7 @@ import type { DisplayOrder, Flashcard, Lesson, Program, VocabTag } from './inter
 import { useVocabulary } from './hooks/useVocabulary'
 import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
 import { useUserData } from './hooks/useUserData'
+import { useProgramTable } from './hooks/useProgramTable'
 
 interface FlashcardFinderProps {
   selectedProgram: Program | null
@@ -42,6 +43,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
     const verifiedExamplesQuery = useVerifiedExamples()
     const { vocabularyQuery, tagTable } = useVocabulary()
+    const { programTableQuery } = useProgramTable()
 
     const isError = userDataQuery.isError || activeStudentError || flashcardDataQuery.isError || verifiedExamplesQuery.isError || vocabularyQuery.isError
     const dataLoaded = (userDataQuery.data?.isAdmin || (!!activeStudent && flashcardDataQuery.isSuccess)) && verifiedExamplesQuery.isSuccess && vocabularyQuery.isSuccess
@@ -59,14 +61,14 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         lessonId = Number.parseInt(lessonId)
       }
       let newLesson = null
-      programsQuery.data?.forEach((program) => {
+      programTableQuery.data?.forEach((program) => {
         const foundLesson = program.lessons.find(item => item.recordId === lessonId)
         if (foundLesson) {
           newLesson = foundLesson
         }
       })
       setFromLesson(newLesson)
-    }, [programsQuery?.data])
+    }, [programTableQuery?.data])
     useEffect(() => {
       if (selectedProgram && !fromLesson) {
         updateFromLesson(selectedProgram.lessons[0].recordId)
@@ -222,11 +224,11 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const getFilteredExamples = useCallback((table: Flashcard[]) => {
       const allExamples = [...table]
       const filteredBySpanglish = filterBySpanglish(allExamples)
-      const filteredByAllowed = toFromlessonSelectorExamplesParser(filteredBySpanglish, fromLesson?.recordId, selectedLesson?.recordId, programsQuery.data)
+      const filteredByAllowed = toFromlessonSelectorExamplesParser(filteredBySpanglish, fromLesson?.recordId, selectedLesson?.recordId, programTableQuery.data)
       // = filterExamplesByAllowedVocab(filteredBySpanglish)
       const filteredByTags = filterExamplesBySelectedTags(filteredByAllowed)
       return filteredByTags
-    }, [filterBySpanglish, filterExamplesBySelectedTags, fromLesson?.recordId, programsQuery.data, selectedLesson?.recordId])
+    }, [filterBySpanglish, filterExamplesBySelectedTags, fromLesson?.recordId, programTableQuery.data, selectedLesson?.recordId])
 
     // called when user clicks 'Copy as Table' button
     // copies sentences in a table format to be pasted into a google doc or excel sheet
