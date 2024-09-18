@@ -245,6 +245,7 @@ export default function LCSPQuizApp({
       {officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
       {officialQuizzesQuery.isSuccess && chosenQuiz && quizCourse === 'lcsp' && !hideMenu && (
         <div className="quizSelector">
+          <h3> Official Quizzes</h3>
           <select
             className="quizMenu"
             value={quizCourse}

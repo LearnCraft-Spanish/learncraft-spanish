@@ -78,28 +78,31 @@ export default function CourseQuizzes({
     <div className="quizInterface">
       {/* Quiz Selector */}
       {officialQuizzesQuery.data && chosenQuiz && quizCourse !== 'lcsp' && !hideMenu && (
-        <div className="quizSelector">
-          <select
-            className="quizMenu"
-            value={quizCourse}
-            onChange={e => updateQuizCourseWithNavigate(e.target.value)}
-          >
-            {makeCourseList()}
-          </select>
-          <select
-            className="quizMenu"
-            value={chosenQuiz}
-            onChange={e => updateChosenQuiz(Number.parseInt(e.target.value))}
-          >
-            {makeQuizSelections()}
-          </select>
-          <div className="buttonBox">
-            <button type="button" onClick={makeQuizReady}>Begin Review</button>
+        <>
+          <h3>Official Quizzes</h3>
+          <div className="quizSelector">
+            <select
+              className="quizMenu"
+              value={quizCourse}
+              onChange={e => updateQuizCourseWithNavigate(e.target.value)}
+            >
+              {makeCourseList()}
+            </select>
+            <select
+              className="quizMenu"
+              value={chosenQuiz}
+              onChange={e => updateChosenQuiz(Number.parseInt(e.target.value))}
+            >
+              {makeQuizSelections()}
+            </select>
+            <div className="buttonBox">
+              <button type="button" onClick={makeQuizReady}>Begin Review</button>
+            </div>
+            <div className="buttonBox">
+              <MenuButton />
+            </div>
           </div>
-          <div className="buttonBox">
-            <MenuButton />
-          </div>
-        </div>
+        </>
       )}
       {officialQuizzesQuery.data && quizCourse !== 'lcsp' && (
         <Routes>
