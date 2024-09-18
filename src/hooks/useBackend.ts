@@ -94,12 +94,9 @@ export function useBackend() {
     return getFactory<types.UserData>('my-data')
   }, [getFactory])
 
-  const getActiveExamplesFromBackend = useCallback(
-    (studentId: number): Promise<types.StudentFlashcardData > => {
-      return getFactory<types.StudentFlashcardData>(`${studentId}/examples`)
-    },
-    [getFactory],
-  )
+  const getActiveExamplesFromBackend = useCallback((studentId: number): Promise<types.StudentFlashcardData > => {
+    return getFactory<types.StudentFlashcardData>(`${studentId}/examples`)
+  }, [getFactory])
 
   /*      Coaching API      */
 

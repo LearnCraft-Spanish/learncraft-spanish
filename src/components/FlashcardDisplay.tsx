@@ -18,7 +18,7 @@ interface FlashcardProps {
 }
 
 export default function FlashcardDisplay({ example, isStudent, answerShowing, incrementExampleNumber, audioActive, onRemove, playing, togglePlaying, startWithSpanish = false, toggleAnswer }: FlashcardProps): JSX.Element {
-  const { addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
+  const { addFlashcardMutation, removeFlashcardMutation, exampleIsCollected, exampleIsPending } = useStudentFlashcards()
   const addFlashcard = addFlashcardMutation.mutate
   const removeFlashcard = removeFlashcardMutation.mutate
   const spanishText = example.spanishExample
@@ -52,28 +52,41 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, in
       {answerShowing && (
         <div className="spanishExample">
           {answerText()}
-          {isStudent && (!exampleIsCollected(example.recordId)
-            ? (
-                <button
-                  type="button"
-                  className="addFlashcardButton"
-                  onClick={() =>
-                    addAndAdvance(
-                      example,
-                    )}
-                >
-                  Add to my flashcards
-                </button>
-              )
-            : (
-                <button
-                  type="button"
-                  className="removeFlashcardButton"
-                  onClick={() => removeAndAdvance(example.recordId)}
-                >
-                  Remove from my flashcards
-                </button>
-              ))}
+          {isStudent && !exampleIsCollected(example.recordId) && (
+            <button
+              type="button"
+              className="addFlashcardButton"
+              onClick={() =>
+                addAndAdvance(
+                  example,
+                )}
+            >
+              Add to my flashcards
+            </button>
+          )}
+          {isStudent
+          && exampleIsCollected(example.recordId)
+          && !exampleIsPending(example.recordId)
+          && (
+            <button
+              type="button"
+              className="removeFlashcardButton"
+              onClick={() => removeAndAdvance(example.recordId)}
+            >
+              Remove from my flashcards
+            </button>
+          )}
+          {isStudent
+          && exampleIsCollected(example.recordId)
+          && exampleIsPending(example.recordId)
+          && (
+            <button
+              type="button"
+              className="addFlashcardButton"
+            >
+              Adding to Flashcards...
+            </button>
+          )}
         </div>
       )}
       {/* Play/Pause */}

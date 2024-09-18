@@ -22,7 +22,8 @@ export function useStudentFlashcards() {
   } = useBackend()
 
   // Local state to store session updates. Current use is ONLY for difficulty labels on SRS quiz.
-  const [localUpdates, setLocalUpdates] = useState<Record<number, Partial<Flashcard>>>({})
+  const [localExamples, setLocalExamples] = useState<Record<number, Partial<Flashcard>>>({})
+  const [localStudentExamples, setLocalStudentExamples] = useState<Record<number, StudentExample>>({})
 
   const tempIdNum = useRef(-1)
 
@@ -50,7 +51,7 @@ export function useStudentFlashcards() {
   }, [])
 
   const getFlashcardData = async () => {
-    let backendResponse
+    let backendResponse: StudentFlashcardData | undefined
     if (userDataQuery.data?.isAdmin && activeStudentId) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId)
     }
@@ -60,20 +61,30 @@ export function useStudentFlashcards() {
     if (backendResponse === undefined) {
       throw new Error('No active student')
     }
-    if (backendResponse) {
-      const mergedData = backendResponse.examples.map(flashcard => ({
-        ...flashcard,
-        // Apply any local updates for this flashcard
-        ...localUpdates[flashcard.recordId],
-      }))
-
-      const updatedFlashcardData = {
-        examples: mergedData,
-        studentExamples: backendResponse.studentExamples, // Keep other student data as is
-      }
-      return matchAndTrimArrays(updatedFlashcardData)
+    if (!backendResponse) {
+      throw new Error('bad response')
     }
-    throw new Error('bad response')
+
+    const mergedExampleData = backendResponse.examples.map(flashcard => ({
+      ...flashcard,
+      // Apply any local updates for this flashcard
+      ...localExamples[flashcard.recordId],
+    }))
+
+    const preservedLocalExamples = Object.values(localStudentExamples).filter(
+      localStudentExample => !backendResponse.studentExamples.some((beStudentExample: StudentExample) => beStudentExample.relatedExample === localStudentExample.relatedExample),
+    )
+
+    const mergedStudentExampleData = [
+      ...backendResponse.studentExamples,
+      ...preservedLocalExamples, // Add local examples that aren't overwritten
+    ]
+
+    const updatedFlashcardData = {
+      examples: mergedExampleData,
+      studentExamples: mergedStudentExampleData,
+    }
+    return matchAndTrimArrays(updatedFlashcardData)
   }
 
   const flashcardDataQuery = useQuery({
@@ -88,6 +99,13 @@ export function useStudentFlashcards() {
     const studentFlashcardData = flashcardDataQuery.data?.studentExamples
     const foundStudentExample = studentFlashcardData?.find(studentExample => studentExample.relatedExample === exampleId)
     return foundStudentExample !== undefined
+  }, [flashcardDataQuery.data?.studentExamples])
+
+  const exampleIsPending = useCallback((exampleId: number) => {
+    const studentFlashcardData = flashcardDataQuery.data?.studentExamples
+    const foundStudentExample = studentFlashcardData?.find(studentExample => studentExample.relatedExample === exampleId)
+    const studentExampleId = foundStudentExample?.recordId || -1
+    return studentExampleId < 0
   }, [flashcardDataQuery.data?.studentExamples])
 
   // Create a ref to store the debounced function
@@ -126,11 +144,8 @@ export function useStudentFlashcards() {
       // Cancel any in-flight queries to prevent race conditions
       await queryClient.cancelQueries({ queryKey: ['flashcardData', activeStudentId] })
 
-      // Memoize ID number for rollback
-      const thisIdNum = tempIdNum.current
-
-      // Decrement the tempIdNum for the next flashcard
-      tempIdNum.current--
+      // Memoize ID number for rollback, then decrement the tempIdNum for the next flashcard
+      const thisIdNum = tempIdNum.current--
 
       // Make placeholder record for student-example until backend responds
       const today = new Date()
@@ -148,6 +163,12 @@ export function useStudentFlashcards() {
         nextReviewDate: formattedTomorrow,
         reviewInterval: 1,
       }
+
+      // Update the local state with the new student-example to preserve state on re-fetch
+      setLocalStudentExamples(prev => ({
+        ...prev,
+        [newStudentExample.relatedExample]: newStudentExample,
+      }))
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(['flashcardData', activeStudentId], (oldFlashcards: StudentFlashcardData) => {
@@ -246,7 +267,7 @@ export function useStudentFlashcards() {
       const { flashcardObject } = context
       if (flashcardObject?.recordId) {
       // Remove the local update for the deleted flashcard
-        setLocalUpdates((prevUpdates) => {
+        setLocalExamples((prevUpdates) => {
           const { [flashcardObject.recordId]: _, ...rest } = prevUpdates
           return rest
         })
@@ -286,7 +307,7 @@ export function useStudentFlashcards() {
     }
     const updateResponse = updatePromise
       .then((result: number | undefined) => {
-        if (result !== 1) {
+        if (result !== studentExampleId) {
           throw new Error('Failed to update Flashcard')
         }
         return result
@@ -301,7 +322,7 @@ export function useStudentFlashcards() {
       await queryClient.cancelQueries({ queryKey: ['flashcardData', activeStudentId] })
 
       // Update the local state for the flashcard
-      setLocalUpdates(prevUpdates => ({
+      setLocalExamples(prevUpdates => ({
         ...prevUpdates,
         [studentExampleId]: {
           ...(prevUpdates[studentExampleId] || {}), // Keep other properties intact
@@ -339,7 +360,7 @@ export function useStudentFlashcards() {
       // Destructure the context
       const { studentExampleId, newInterval } = context
       // Remove the local update for this flashcard
-      setLocalUpdates((prevUpdates) => {
+      setLocalExamples((prevUpdates) => {
         const { [studentExampleId]: _, ...rest } = prevUpdates // Remove the failed update
         return rest
       })
@@ -363,5 +384,5 @@ export function useStudentFlashcards() {
     onSettled: () => debouncedRefetch(),
   })
 
-  return { flashcardDataQuery, exampleIsCollected, addFlashcardMutation, removeFlashcardMutation, updateFlashcardMutation }
+  return { flashcardDataQuery, exampleIsCollected, exampleIsPending, addFlashcardMutation, removeFlashcardMutation, updateFlashcardMutation }
 }

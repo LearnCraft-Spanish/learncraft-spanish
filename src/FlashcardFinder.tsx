@@ -40,7 +40,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
   ) => {
     const userDataQuery = useUserData()
     const { activeStudentQuery } = useActiveStudent()
-    const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
+    const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation, exampleIsCollected, exampleIsPending } = useStudentFlashcards()
     const verifiedExamplesQuery = useVerifiedExamples()
     const { vocabularyQuery, tagTable } = useVocabulary()
     const { programTableQuery } = useProgramTable()
@@ -328,7 +328,24 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                 Add
               </button>
             )}
-            {activeStudentQuery.data?.role === 'student' && !!flashcardDataQuery.data && exampleIsCollected(item.recordId) && (
+            {activeStudentQuery.data?.role === 'student'
+            && !!flashcardDataQuery.data
+            && exampleIsCollected(item.recordId)
+            && exampleIsPending(item.recordId)
+            && (
+              <button
+                type="button"
+                className="addButton"
+                value={item.recordId}
+              >
+                Adding...
+              </button>
+            )}
+            {activeStudentQuery.data?.role === 'student'
+            && !!flashcardDataQuery.data
+            && exampleIsCollected(item.recordId)
+            && !exampleIsPending(item.recordId)
+            && (
               <button
                 type="button"
                 className="removeButton"

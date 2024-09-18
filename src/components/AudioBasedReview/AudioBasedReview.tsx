@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import '../../App.css'
 import './AudioBasedReview.css'
 import type { Flashcard, Lesson } from '../../interfaceDefinitions'
@@ -43,16 +43,17 @@ export default function AudioBasedReview({
   audioOrComprehension = 'comprehension',
   willAutoplay,
 }: AudioBasedReviewProps) {
-  const { activeStudent, isError: activeStudentError, isLoading: activeStudentLoading } = useActiveStudent()
+  const { activeStudentQuery } = useActiveStudent()
   const userDataQuery = useUserData()
   // this is a pattern used in the codebase, not sure if it's necessary
   const rendered = useRef(false)
   const { audioExamplesQuery } = useAudioExamples()
   const { programTableQuery } = useProgramTable()
 
-  const dataReady = userDataQuery.isSuccess && programTableQuery.isSuccess && audioExamplesQuery.isSuccess && (userDataQuery.data?.isAdmin || (activeStudent?.role === 'student' || activeStudent?.role === 'limited'))
-  const isError = !dataReady && (userDataQuery.isError || programTableQuery.isError || audioExamplesQuery.isError || activeStudentError)
-  const isLoading = !dataReady && (activeStudentLoading || userDataQuery.isLoading || programTableQuery.isLoading || audioExamplesQuery.isLoading)
+  const dataReady = userDataQuery.isSuccess && activeStudentQuery.isSuccess && programTableQuery.isSuccess && audioExamplesQuery.isSuccess && (userDataQuery.data?.isAdmin || (activeStudentQuery.data?.role === 'student' || activeStudentQuery.data?.role === 'limited'))
+  const isError = !dataReady && (userDataQuery.isError || programTableQuery.isError || audioExamplesQuery.isError || activeStudentQuery.isError)
+  const isLoading = !dataReady && (activeStudentQuery.isLoading || userDataQuery.isLoading || programTableQuery.isLoading || audioExamplesQuery.isLoading)
+  const unavailable = !dataReady && !isLoading && !isError
 
   // Examples Table after: filtedBylessonId, shuffled
   const [examplesToPlay, setExamplesToPlay] = useState<Flashcard[]>([])
@@ -454,6 +455,7 @@ export default function AudioBasedReview({
     <div className="quiz">
       {isLoading && <h2>Loading Audio...</h2>}
       {isError && <h2>Error Loading Audio</h2>}
+      {unavailable && <Navigate to="/" />}
       {!quizReady && dataReady && (
         <>
           <h2>{audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}</h2>
