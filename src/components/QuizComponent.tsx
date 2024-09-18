@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import { init } from '@sentry/react'
+import { filter } from 'lodash'
 import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
 import { useActiveStudent } from '../hooks/useActiveStudent'
 import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
@@ -34,7 +34,7 @@ export default function QuizComponent({
 }: QuizComponentProps) {
   const location = useLocation()
   const { activeStudent } = useActiveStudent()
-  const { exampleIsCollected } = useStudentFlashcards()
+  const { flashcardDataQuery, exampleIsCollected } = useStudentFlashcards()
 
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
   const initialDisplayOrder = useRef<DisplayOrder[]>([])
@@ -159,8 +159,12 @@ export default function QuizComponent({
         setCurrentExampleNumber(quizLength - 1)
       }
     }
+    else {
+      incrementExampleNumber()
+    }
   }
 
+  // Filter for reviewing only "My Flashcards"
   const filterIfCollectedOnly = useCallback((displayOrderArray: DisplayOrder[]) => {
     if (quizOnlyCollectedExamples || isSrsQuiz) {
       const filteredList = displayOrderArray.filter(
@@ -173,12 +177,49 @@ export default function QuizComponent({
     }
   }, [quizOnlyCollectedExamples, isSrsQuiz, exampleIsCollected])
 
+  // Further filter for only SRS examples
+  const getStudentExampleFromExampleId = useCallback((exampleId: number) => {
+    const relatedStudentExample = flashcardDataQuery.data?.studentExamples.find(
+      element => element.relatedExample === exampleId,
+    )
+    return relatedStudentExample
+  }, [flashcardDataQuery.data?.studentExamples])
+
+  const getDueDateFromExampleId = useCallback((exampleId: number) => {
+    const relatedStudentExample = getStudentExampleFromExampleId(exampleId)
+    if (!relatedStudentExample) {
+      return ''
+    }
+    const dueDate = relatedStudentExample.nextReviewDate
+    return dueDate
+  }, [getStudentExampleFromExampleId])
+
+  const filterByDueExamples = useCallback((displayOrder: DisplayOrder[]) => {
+    if (!isSrsQuiz) {
+      return displayOrder
+    }
+    if (!flashcardDataQuery.data) {
+      return []
+    }
+    const isBeforeToday = (dateArg: string) => {
+      const today = new Date()
+      const reviewDate = new Date(dateArg)
+      if (reviewDate >= today) {
+        return false
+      }
+      return true
+    }
+
+    const newDisplayOrder = displayOrder.filter(displayOrder => isBeforeToday(getDueDateFromExampleId(displayOrder.recordId)))
+    return newDisplayOrder
+  }, [getDueDateFromExampleId, isSrsQuiz, flashcardDataQuery.data])
+
   const currentFlashcardIsValid = currentExample !== undefined
 
   // Randomizes the order of the quiz examples for display
   // Runs only once to prevent re-scrambling while in use. Mutations handled elsewhere.
   useEffect(() => {
-    if (examplesToParse.length > 0 && !displayOrderReady && quizLength > 0) {
+    if (examplesToParse.length > 0 && !displayOrderReady && quizLength) {
       // Create a basic map of the flashcard objects with recordId and isCollected properties
 
       const exampleOrder: DisplayOrder[] = examplesToParse.map(
@@ -193,10 +234,13 @@ export default function QuizComponent({
       const shuffledOrder = fisherYatesShuffle(exampleOrder)
 
       // If collectedOnly or SRS, filter out uncollected examples
-      const filteredOrder = filterIfCollectedOnly(shuffledOrder)
+      const filteredByCollected = filterIfCollectedOnly(shuffledOrder)
+
+      // If SRS, filter out examples not due for review
+      const filteredByDueDate = filterByDueExamples(filteredByCollected)
 
       // Limit the number of examples to the quizLength
-      const limitedOrder = filteredOrder.slice(0, quizLength)
+      const limitedOrder = filteredByDueDate.slice(0, quizLength)
 
       // Display the limited order if any are left
       if (limitedOrder.length > 0) {
@@ -204,7 +248,7 @@ export default function QuizComponent({
         setDisplayOrderReady(true)
       }
     }
-  }, [examplesToParse, displayOrderReady, quizLength, filterIfCollectedOnly])
+  }, [examplesToParse, displayOrderReady, quizLength, filterIfCollectedOnly, filterByDueExamples])
 
   // Defines the actual list of items displayed as a mutable subset of the previous
   useEffect(() => {
@@ -236,7 +280,8 @@ export default function QuizComponent({
   }, [handleKeyPress])
 
   return (
-    displayOrder.length > 0 && (
+
+    (!!displayOrder.length) && (
       <div className="quiz">
         <h3>{quizTitle}</h3>
         {answerShowing ? answerAudio() : questionAudio()}

@@ -2,6 +2,7 @@ import React from 'react'
 import type { Flashcard } from '../interfaceDefinitions'
 import { formatEnglishText, formatSpanishText } from '../functions/formatFlashcardText'
 import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
+import './Quiz.css'
 
 interface FlashcardProps {
   example: Flashcard
@@ -33,26 +34,33 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, in
     onRemove()
   }
 
+  function handlePlayPause(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    e.stopPropagation()
+    togglePlaying()
+  }
+
   const questionText = startWithSpanish ? () => formatSpanishText(example.spanglish, spanishText) : () => formatEnglishText(englishText)
   const answerText = startWithSpanish ? () => formatEnglishText(englishText) : () => formatSpanishText(example.spanglish, spanishText)
 
   return (
-    <div className="exampleBox">
+    <div className="flashcard" onClick={toggleAnswer} aria-label="flashcard">
       {!answerShowing && (
-        <div className="englishTranslation" onClick={toggleAnswer} role="button" aria-label="flashcard">
+        <div className="englishTranslation">
           {questionText()}
         </div>
       )}
       {answerShowing && (
-        <div className="spanishExample" onClick={toggleAnswer} role="button" aria-label="flashcard">
+        <div className="spanishExample">
           {answerText()}
-
           {isStudent && (!exampleIsCollected(example.recordId)
             ? (
                 <button
                   type="button"
                   className="addFlashcardButton"
-                  onClick={() => addAndAdvance(example)}
+                  onClick={() =>
+                    addAndAdvance(
+                      example,
+                    )}
                 >
                   Add to my flashcards
                 </button>
@@ -67,14 +75,13 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, in
                 </button>
               ))}
         </div>
-
       )}
       {/* Play/Pause */}
       {(audioActive) && (
         <button
           type="button"
           className="audioPlayPauseButton"
-          onClick={togglePlaying}
+          onClick={e => handlePlayPause(e)}
         >
           <i className={playing ? 'fa-solid fa-pause' : 'fa-solid fa-play'} />
         </button>

@@ -7,11 +7,9 @@ import type { Flashcard } from './interfaceDefinitions'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import MenuButton from './components/MenuButton'
 import QuizComponent from './components/QuizComponent'
-import SRSQuizApp from './SRSQuizApp'
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards()
-  const [quizExamples, setQuizExamples] = useState<Flashcard[]>(flashcardDataQuery.data?.examples || [])
   const [isSrs, setIsSrs] = useState<boolean>(false)
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false)
   const [quizLength, setQuizLength] = useState<number>(10)
@@ -32,66 +30,21 @@ export default function MyFlashcardsQuiz() {
     }
   }
 
-  const getStudentExampleFromExample = useCallback((example: Flashcard) => {
-    const relatedStudentExample = flashcardDataQuery.data?.studentExamples.find(
-      element => element.relatedExample === example.recordId,
-    )
-    return relatedStudentExample
-  }, [flashcardDataQuery.data?.studentExamples])
-
-  const getDueDateFromExample = useCallback((example: Flashcard) => {
-    const relatedStudentExample = getStudentExampleFromExample(example)
-    if (!relatedStudentExample) {
-      return ''
-    }
-    const dueDate = relatedStudentExample.nextReviewDate
-    return dueDate
-  }, [getStudentExampleFromExample])
-
-  const getDueExamples = useCallback(() => {
-    if (!flashcardDataQuery.data) {
-      return []
-    }
-    const isBeforeToday = (dateArg: string) => {
-      const today = new Date()
-      const reviewDate = new Date(dateArg)
-      if (reviewDate >= today) {
-        return false
-      }
-      return true
-    }
-    const allExamples = [...flashcardDataQuery.data.examples]
-    const dueExamples = allExamples.filter(
-      example =>
-        isBeforeToday(
-          getDueDateFromExample(example),
-        ),
-    )
-    return dueExamples
-  }, [getDueDateFromExample, flashcardDataQuery.data])
-
   function calculateQuizLengthOptions() {
+    if (!flashcardDataQuery.data?.examples) {
+      return [0]
+    }
     const quizLengthOptions = []
-    for (let i = 10; i < quizExamples.length; i = 5 * Math.floor(i * 0.315)) {
+    for (let i = 10; i < flashcardDataQuery.data?.examples.length; i = 5 * Math.floor(i * 0.315)) {
       quizLengthOptions.push(i)
     }
-    quizLengthOptions.push(quizExamples.length)
+    quizLengthOptions.push(flashcardDataQuery.data?.examples.length)
     return quizLengthOptions
   }
 
   function makeQuizUnready() {
     setQuizReady(false)
   }
-
-  useEffect(() => {
-    if (isSrs) {
-      const dueExamples = getDueExamples()
-      setQuizExamples(dueExamples)
-    }
-    else {
-      setQuizExamples(flashcardDataQuery.data?.examples || [])
-    }
-  }, [isSrs, flashcardDataQuery.data?.examples, getDueExamples])
 
   useEffect(() => {
     if (location.pathname !== '/myflashcards') {
@@ -147,9 +100,9 @@ export default function MyFlashcardsQuiz() {
       <Routes>
         <Route
           path="quiz"
-          element={flashcardDataQuery.isSuccess && (
+          element={flashcardDataQuery.data?.examples && (
             <QuizComponent
-              examplesToParse={quizExamples}
+              examplesToParse={flashcardDataQuery.data?.examples}
               quizTitle="My Flashcards"
               quizOnlyCollectedExamples
               cleanupFunction={() => makeQuizUnready()}
@@ -160,11 +113,15 @@ export default function MyFlashcardsQuiz() {
         />
         <Route
           path="srsquiz"
-          element={flashcardDataQuery.isSuccess && (
-            <SRSQuizApp
+          element={flashcardDataQuery.data?.examples && (
+            <QuizComponent
+              examplesToParse={flashcardDataQuery.data?.examples}
+              quizTitle="My Flashcards for Today"
+              quizOnlyCollectedExamples
+              cleanupFunction={() => makeQuizUnready()}
               startWithSpanish={spanishFirst}
               quizLength={quizLength}
-              cleanupFunction={() => makeQuizUnready()}
+              isSrsQuiz
             />
           )}
         />

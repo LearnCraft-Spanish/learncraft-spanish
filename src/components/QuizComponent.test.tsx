@@ -8,6 +8,7 @@ import { UserDataProvider } from '../contexts/UserDataContext'
 import { sampleStudentFlashcardData } from '../../tests/mockData'
 
 import Quiz from './QuizComponent'
+import 'Quiz.css'
 
 const addFlashcard = vi.fn()
 const removeFlashcard = vi.fn()

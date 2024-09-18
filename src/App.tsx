@@ -24,7 +24,6 @@ import Nav from './components/Nav'
 export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation()
-  const navigate = useNavigate()
   const userDataQuery = useUserData()
   const { activeStudent, activeLesson, studentList, activeProgram, chooseStudent } = useActiveStudent()
   const { programTableQuery } = useProgramTable()
@@ -159,36 +158,6 @@ export const App: React.FC = () => {
     setStudentSelectorOpen(false)
   }, [])
 
-  const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
-    let allowedVocabulary: string[] = []
-    programTableQuery.data?.forEach((program) => {
-      const foundLesson = program.lessons.find(
-        item => item.recordId === lessonId,
-      )
-      if (foundLesson) {
-        allowedVocabulary = foundLesson.vocabKnown || []
-      }
-      return allowedVocabulary
-    })
-    const filteredByAllowed = examples.filter((item) => {
-      let isAllowed = true
-      if (
-        item.vocabIncluded.length === 0
-        || item.vocabComplete === false
-        || item.spanglish === 'spanglish'
-      ) {
-        isAllowed = false
-      }
-      item.vocabIncluded.forEach((word) => {
-        if (!allowedVocabulary.includes(word)) {
-          isAllowed = false
-        }
-      })
-      return isAllowed
-    })
-    return filteredByAllowed
-  }, [programTableQuery?.data])
-
   useEffect(() => {
     // change the selected lesson when the selected program changes
     const hasActiveLesson = activeLesson?.recordId
@@ -281,6 +250,9 @@ export const App: React.FC = () => {
           )}
         </div>
       )}
+
+      {userDataQuery.isLoading && <h2>Loading user data...</h2>}
+      {userDataQuery.isError && <h2>Error loading user data.</h2>}
 
       {bannerMessage && (
         <div className="bannerMessage">
