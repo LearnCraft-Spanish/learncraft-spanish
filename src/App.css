@@ -1059,6 +1059,9 @@ i {
 #homeIcon {
   display: none;
 }
+#logo {
+  cursor: pointer;
+}
 @media screen and (max-width: 480px) {
   .homeButton {
     height: 24px;

@@ -13,7 +13,7 @@ export default function Nav(): JSX.Element {
       className={`div-header ${window.location.pathname === '/' ? ' ' : 'notRoot'}`}
     >
       <div className="homeButton" onClick={() => navigate('/')}>
-        <img id="logo"src={logo} alt="Learncraft Spanish Logo" />
+        <img id="logo" src={logo} alt="Learncraft Spanish Logo" />
         <i id="homeIcon" className="fa-solid fa-home"></i>
       </div>
       <LogoutButton />
