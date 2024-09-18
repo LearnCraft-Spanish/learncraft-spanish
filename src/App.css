@@ -313,7 +313,17 @@ button:hover, .linkButton:hover {
   justify-content: space-between;
   width: 50%;
 }
-
+@media screen and (max-width: 800px) {
+  .quizSelector {
+    width: 70vw;
+  }
+  
+}
+@media screen and (max-width: 480px) {
+  .quizSelector {
+    width: 90vw;
+  }
+}
 .quizMenu {
   margin-bottom: 20px;
   height: 65px;
