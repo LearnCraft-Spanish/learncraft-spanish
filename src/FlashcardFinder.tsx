@@ -39,15 +39,15 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     currentContextual,
   ) => {
     const userDataQuery = useUserData()
-    const { activeStudent, isLoading: activeStudentLoading, isError: activeStudentError } = useActiveStudent()
+    const { activeStudentQuery } = useActiveStudent()
     const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation, exampleIsCollected } = useStudentFlashcards()
     const verifiedExamplesQuery = useVerifiedExamples()
     const { vocabularyQuery, tagTable } = useVocabulary()
     const { programTableQuery } = useProgramTable()
 
-    const isError = userDataQuery.isError || activeStudentError || flashcardDataQuery.isError || verifiedExamplesQuery.isError || vocabularyQuery.isError
-    const dataLoaded = (userDataQuery.data?.isAdmin || (!!activeStudent && flashcardDataQuery.isSuccess)) && verifiedExamplesQuery.isSuccess && vocabularyQuery.isSuccess
-    const isLoading = (userDataQuery.isLoading || activeStudentLoading || flashcardDataQuery.isLoading || verifiedExamplesQuery.isLoading || vocabularyQuery.isLoading) && !isError && !dataLoaded
+    const isError = userDataQuery.isError || activeStudentQuery.isError || flashcardDataQuery.isError || verifiedExamplesQuery.isError || vocabularyQuery.isError
+    const dataLoaded = (userDataQuery.data?.isAdmin || (activeStudentQuery.isSuccess && flashcardDataQuery.isSuccess)) && verifiedExamplesQuery.isSuccess && vocabularyQuery.isSuccess
+    const isLoading = (userDataQuery.isLoading || activeStudentQuery.isLoading || flashcardDataQuery.isLoading || verifiedExamplesQuery.isLoading || vocabularyQuery.isLoading) && !isError && !dataLoaded
 
     const [tagSearchTerm, setTagSearchTerm] = useState('')
     const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([])
@@ -318,7 +318,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
             <div className="exampleCardEnglishText">
               {formatEnglishText(item.englishTranslation)}
             </div>
-            {activeStudent?.role === 'student' && !!flashcardDataQuery.data && !exampleIsCollected(item.recordId) && (
+            {activeStudentQuery.data?.role === 'student' && !!flashcardDataQuery.data && !exampleIsCollected(item.recordId) && (
               <button
                 type="button"
                 className="addButton"
@@ -328,7 +328,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                 Add
               </button>
             )}
-            {activeStudent?.role === 'student' && !!flashcardDataQuery.data && exampleIsCollected(item.recordId) && (
+            {activeStudentQuery.data?.role === 'student' && !!flashcardDataQuery.data && exampleIsCollected(item.recordId) && (
               <button
                 type="button"
                 className="removeButton"

@@ -20,7 +20,7 @@ export default function LCSPQuizApp({
   selectedLesson,
 }: LCSPQuizAppProps) {
   const navigate = useNavigate()
-  const { activeStudent } = useActiveStudent()
+  const { activeStudentQuery } = useActiveStudent()
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined)
   const { isAuthenticated, isLoading } = useAuth0()
 
@@ -225,7 +225,7 @@ export default function LCSPQuizApp({
 
   useEffect(() => {
     if (
-      activeStudent?.recordId
+      activeStudentQuery.data?.recordId
       && officialQuizzesQuery.data
       && selectedProgram?.recordId
       && selectedLesson?.recordId
@@ -233,10 +233,10 @@ export default function LCSPQuizApp({
     ) {
       findDefaultQuiz()
     }
-    else if (!activeStudent?.recordId) {
+    else if (!activeStudentQuery.data?.recordId) {
       studentHasDefaultQuiz.current = false
     }
-  }, [activeStudent?.recordId, selectedProgram?.recordId, selectedLesson?.recordId, officialQuizzesQuery.data, findDefaultQuiz, getCourseUrlFromCode, quizCourse])
+  }, [activeStudentQuery.data?.recordId, selectedProgram?.recordId, selectedLesson?.recordId, officialQuizzesQuery.data, findDefaultQuiz, getCourseUrlFromCode, quizCourse])
 
   return (isAuthenticated && !isLoading) && (
     <div className="quizInterface">

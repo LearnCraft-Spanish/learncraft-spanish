@@ -99,12 +99,10 @@ export function useActiveStudent() {
   }, [activeStudentQuery.data, programTableQuery.data])
 
   return {
-    activeStudent: activeStudentQuery.data,
+    activeStudentQuery,
     activeProgram: activeProgram.current,
     activeLesson: activeLesson.current,
-    studentList: studentListQuery.data,
+    studentListQuery,
     chooseStudent,
-    isLoading: activeStudentQuery.isLoading || studentListQuery.isLoading,
-    isError: activeStudentQuery.isError || studentListQuery.isError,
   }
 }

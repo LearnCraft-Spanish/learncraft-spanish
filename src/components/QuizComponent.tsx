@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import { filter } from 'lodash'
 import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
 import { useActiveStudent } from '../hooks/useActiveStudent'
 import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
@@ -33,7 +32,7 @@ export default function QuizComponent({
 
 }: QuizComponentProps) {
   const location = useLocation()
-  const { activeStudent } = useActiveStudent()
+  const { activeStudentQuery } = useActiveStudent()
   const { flashcardDataQuery, exampleIsCollected } = useStudentFlashcards()
 
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
@@ -290,7 +289,7 @@ export default function QuizComponent({
         {currentFlashcardIsValid && (
           <FlashcardDisplay
             example={currentExample}
-            isStudent={activeStudent?.role === ('student')}
+            isStudent={activeStudentQuery.data?.role === ('student')}
             incrementExampleNumber={incrementExampleNumber}
             onRemove={onRemove}
             answerShowing={answerShowing}

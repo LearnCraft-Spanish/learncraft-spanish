@@ -1,15 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
 import type { FormEvent } from 'react'
-import type { Flashcard } from './interfaceDefinitions'
 
+import { useActiveStudent } from './hooks/useActiveStudent'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import MenuButton from './components/MenuButton'
 import QuizComponent from './components/QuizComponent'
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards()
+  const { activeStudentQuery } = useActiveStudent()
   const [isSrs, setIsSrs] = useState<boolean>(false)
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false)
   const [quizLength, setQuizLength] = useState<number>(10)
@@ -17,6 +18,11 @@ export default function MyFlashcardsQuiz() {
 
   const navigate = useNavigate()
   const location = useLocation()
+
+  const dataReady = activeStudentQuery.isSuccess && flashcardDataQuery.isSuccess
+  const dataError = !dataReady && (activeStudentQuery.isError || flashcardDataQuery.isError)
+  const dataLoading = !dataReady && !dataError && (activeStudentQuery.isLoading || flashcardDataQuery.isLoading)
+  const unavailable = (activeStudentQuery.isSuccess && !(activeStudentQuery.data?.role === 'student')) || (flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.examples?.length)
 
   function handleSumbit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -31,14 +37,17 @@ export default function MyFlashcardsQuiz() {
   }
 
   function calculateQuizLengthOptions() {
-    if (!flashcardDataQuery.data?.examples) {
+    const exampleCount = flashcardDataQuery.data?.examples?.length
+    if (!exampleCount) {
       return [0]
     }
     const quizLengthOptions = []
-    for (let i = 10; i < flashcardDataQuery.data?.examples.length; i = 5 * Math.floor(i * 0.315)) {
-      quizLengthOptions.push(i)
+    if (exampleCount > 10) {
+      for (let i = 10; i < exampleCount; i = 5 * Math.floor(i * 0.315)) {
+        quizLengthOptions.push(i)
+      }
     }
-    quizLengthOptions.push(flashcardDataQuery.data?.examples.length)
+    quizLengthOptions.push(exampleCount)
     return quizLengthOptions
   }
 
@@ -54,11 +63,10 @@ export default function MyFlashcardsQuiz() {
 
   return (
     <div>
-      {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
-      {flashcardDataQuery.isLoading && <h2>Loading Flashcard Data...</h2>}
-      {(flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.studentExamples?.length)
-      && <Navigate to="/" />}
-      {!quizReady && flashcardDataQuery.isSuccess && (
+      {dataError && <h2>Error Loading Flashcards</h2>}
+      {dataLoading && <h2>Loading Flashcard Data...</h2>}
+      {unavailable && <Navigate to="/" />}
+      {!quizReady && dataReady && (
         <form className="myFlashcardsForm" onSubmit={e => handleSumbit(e)}>
           <div className="myFlashcardsFormContentWrapper">
             <h3>Review My Flashcards</h3>

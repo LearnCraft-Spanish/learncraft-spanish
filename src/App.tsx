@@ -1,14 +1,14 @@
 import './App.css'
 import type { ReactElement } from 'react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
-import { Route, useLocation, useNavigate } from 'react-router-dom'
+import { Navigate, Route, useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 
+import { ac } from 'vitest/dist/chunks/reporters.C_zwCd4j'
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import { useProgramTable } from './hooks/useProgramTable'
-import { useStudentFlashcards } from './hooks/useStudentFlashcards'
-import type { Flashcard, Lesson, Program, UserData } from './interfaceDefinitions'
+import type { Lesson, Program, UserData } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
 import Menu from './Menu'
 import LCSPQuizApp from './LCSPQuizApp'
@@ -25,7 +25,7 @@ export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation()
   const userDataQuery = useUserData()
-  const { activeStudent, activeLesson, studentList, activeProgram, chooseStudent } = useActiveStudent()
+  const { activeStudentQuery, activeLesson, studentListQuery, activeProgram, chooseStudent } = useActiveStudent()
   const { programTableQuery } = useProgramTable()
   const { isAuthenticated, isLoading } = useAuth0()
 
@@ -116,13 +116,13 @@ export const App: React.FC = () => {
   }, [])
 
   const makeStudentSelector = useCallback(() => {
-    if (userDataQuery.data?.isAdmin && !!studentList) {
+    if (userDataQuery.data?.isAdmin && studentListQuery.isSuccess) {
       const studentSelector = [
         <option key={0} label="">
           -- None Selected --
         </option>,
       ]
-      studentList?.forEach((student: UserData) => {
+      studentListQuery.data.forEach((student: UserData) => {
         const studentEmail = student.emailAddress
         const studentRole = student.role
         if (!studentEmail.includes('(') && (studentRole === 'student' || studentRole === 'limited')) {
@@ -148,7 +148,7 @@ export const App: React.FC = () => {
       studentSelector.sort(studentSelectorSortFunction)
       return studentSelector
     }
-  }, [userDataQuery.data?.isAdmin, studentList])
+  }, [userDataQuery.data?.isAdmin, studentListQuery.isSuccess, studentListQuery.data])
 
   const openStudentSelector = useCallback(() => {
     setStudentSelectorOpen(true)
@@ -170,7 +170,7 @@ export const App: React.FC = () => {
     else if (selectedProgram?.lessons?.length) {
       updateSelectedLesson(selectedProgram.lessons[0].recordId)
     }
-  }, [activeStudent, activeLesson, activeProgram, selectedProgram, programTableQuery?.data, updateSelectedLesson])
+  }, [activeStudentQuery.data, activeLesson, activeProgram, selectedProgram, programTableQuery?.data, updateSelectedLesson])
 
   useEffect(() => {
     // renders twice if student has an active program
@@ -181,7 +181,7 @@ export const App: React.FC = () => {
     else if (programTableQuery.data?.length) {
       updateSelectedProgram(programTableQuery.data[0].recordId)
     }
-  }, [activeProgram, activeStudent, programTableQuery.data, updateSelectedProgram])
+  }, [activeProgram, activeStudentQuery.data, programTableQuery.data, updateSelectedProgram])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)
@@ -224,23 +224,23 @@ export const App: React.FC = () => {
 
           {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
             <div className="studentList">
-              {activeStudent?.recordId && (
+              {activeStudentQuery.data?.recordId && (
                 <p>
                   Using as
                   {' '}
-                  {activeStudent?.name}
-                  {activeStudent?.recordId === userDataQuery.data?.recordId
+                  {activeStudentQuery.data?.name}
+                  {activeStudentQuery.data?.recordId === userDataQuery.data?.recordId
                   && ' (yourself)'}
                 </p>
               )}
-              {!activeStudent?.recordId && <p>No student Selected</p>}
+              {!activeStudentQuery.data?.recordId && <p>No student Selected</p>}
               <button type="button" onClick={openStudentSelector}>Change</button>
             </div>
           )}
           {userDataQuery.data?.isAdmin && studentSelectorOpen && (
             <form className="studentList" onSubmit={e => e.preventDefault}>
               <select
-                value={activeStudent ? activeStudent?.recordId : undefined}
+                value={activeStudentQuery.data ? activeStudentQuery.data?.recordId : undefined}
                 onChange={e => chooseStudent(Number.parseInt(e.target.value))}
               >
                 {makeStudentSelector()}
@@ -250,9 +250,6 @@ export const App: React.FC = () => {
           )}
         </div>
       )}
-
-      {userDataQuery.isLoading && <h2>Loading user data...</h2>}
-      {userDataQuery.isError && <h2>Error loading user data.</h2>}
 
       {bannerMessage && (
         <div className="bannerMessage">
@@ -269,10 +266,7 @@ export const App: React.FC = () => {
         <Route path="/callback" element={<CallbackPage />} />
         <Route
           path="/myflashcards/*"
-          element={
-            (activeStudent?.role === 'student')
-            && <ReviewMyFlashcards />
-          }
+          element={<ReviewMyFlashcards />}
         />
         <Route
           path="/manage-flashcards"

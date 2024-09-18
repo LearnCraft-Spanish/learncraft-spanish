@@ -9,7 +9,7 @@ import { useBackend } from './useBackend'
 export function useStudentFlashcards() {
   const queryClient = useQueryClient()
   const userDataQuery = useUserData()
-  const { activeStudent } = useActiveStudent()
+  const { activeStudentQuery } = useActiveStudent()
   const {
     getMyExamplesFromBackend,
     getActiveExamplesFromBackend,
@@ -26,9 +26,9 @@ export function useStudentFlashcards() {
 
   const tempIdNum = useRef(-1)
 
-  const activeStudentId = activeStudent?.recordId
+  const activeStudentId = activeStudentQuery.data?.recordId
 
-  const studentFlashcardDependenciesLoaded = !!activeStudentId && userDataQuery.isSuccess
+  const flashcardDataDependencies = userDataQuery.isSuccess && activeStudentQuery.isSuccess && !!activeStudentId
 
   const matchAndTrimArrays = useCallback((flashcardData: StudentFlashcardData) => {
     const exampleArray = flashcardData.examples
@@ -80,7 +80,7 @@ export function useStudentFlashcards() {
     queryKey: ['flashcardData', activeStudentId],
     queryFn: getFlashcardData,
     staleTime: Infinity, // Never stale unless manually updated
-    enabled: studentFlashcardDependenciesLoaded,
+    enabled: flashcardDataDependencies,
   })
 
   // Exported helper function to check if an example is collected by ID
