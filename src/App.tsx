@@ -8,11 +8,7 @@ import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import type { Flashcard, Lesson, Program, UserData } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
-import logo from './resources/typelogosmall.png'
-import home from './resources/icons8-home-24.png'
 import Menu from './Menu'
-import LoginButton from './components/LoginButton'
-import LogoutButton from './components/LogoutButton'
 import LCSPQuizApp from './LCSPQuizApp'
 import FrequenSay from './FrequenSay'
 import NotFoundPage from './NotFoundPage'
@@ -154,86 +150,6 @@ export const App: React.FC = () => {
       return studentSelector
     }
   }, [userDataQuery.data?.isAdmin, studentListQuery.data])
-
-  // Original Lesson Selector
-  const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
-    let allowedVocabulary: string[] = []
-    programsQuery.data?.forEach((program) => {
-      const foundLesson = program.lessons.find(
-        item => item.recordId === lessonId,
-      )
-      if (foundLesson) {
-        allowedVocabulary = foundLesson.vocabKnown || []
-      }
-      return allowedVocabulary
-    })
-
-    const filteredByAllowed = examples.filter((item) => {
-      let isAllowed = true
-      if (
-        item.vocabIncluded.length === 0
-        || item.vocabComplete === false
-        || item.spanglish === 'spanglish'
-      ) {
-        isAllowed = false
-      }
-      item.vocabIncluded.forEach((word) => {
-        if (!allowedVocabulary.includes(word)) {
-          isAllowed = false
-        }
-      })
-      return isAllowed
-    })
-    return filteredByAllowed
-  }, [programsQuery?.data])
-
-  // New Lesson Selector
-  const toFromlessonSelectorExamplesParser = useCallback((examples: Flashcard[], lessonId: number, fromLessonId: number | null) => {
-    if (!fromLessonId) {
-      console.error('fromLessonId is null')
-      return examples
-    }
-    // vocab in first lesson selected
-    let allowedVocabulary: string[] = []
-    programsQuery.data?.forEach((program) => {
-      const foundLesson = program.lessons.find(
-        item => item.recordId === lessonId,
-      )
-      if (foundLesson) {
-        allowedVocabulary = foundLesson.vocabKnown || []
-      }
-      return allowedVocabulary
-    })
-    // vocab in first lesson + second lesson
-    let toAllowedVocabulary: string[] = []
-    if (fromLessonId) {
-      programsQuery.data?.forEach((program) => {
-        const foundLesson = program.lessons.find(
-          item => item.recordId === fromLessonId,
-        )
-        if (foundLesson) {
-          toAllowedVocabulary = foundLesson.vocabKnown || []
-        }
-        return toAllowedVocabulary
-      })
-    }
-    // vocab introduced between first lesson and second lesson
-    let finalAllowedVocabulary: string[] = []
-    finalAllowedVocabulary = toAllowedVocabulary.filter(word => !(allowedVocabulary.includes(word)))
-    // first, filter by allowed vocab in second lesson
-    const filteredByAllowed = filterExamplesByAllowedVocab(examples, fromLessonId)
-    // only return examples that have vocab introduced between first and second lesson
-    const finalExamples = filteredByAllowed.filter((example) => {
-      let hasAllowedVocab = false
-      example.vocabIncluded.forEach((word) => {
-        if (finalAllowedVocabulary.includes(word)) {
-          hasAllowedVocab = true
-        }
-      })
-      return hasAllowedVocab
-    })
-    return finalExamples
-  }, [filterExamplesByAllowedVocab, programsQuery.data])
 
   useEffect(() => {
     // change the selected lesson when the selected program changes
@@ -409,15 +325,12 @@ export const App: React.FC = () => {
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
               <AudioBasedReview
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
-                willAutoplay
-                willStartWithSpanish={false}
                 audioOrComprehension="audio"
-                toFromlessonSelectorExamplesParser={toFromlessonSelectorExamplesParser}
+                willAutoplay
               />
             )
           }
@@ -429,14 +342,12 @@ export const App: React.FC = () => {
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
               <AudioBasedReview
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
                 selectedLesson={selectedLesson}
                 selectedProgram={selectedProgram}
                 updateSelectedLesson={updateSelectedLesson}
                 updateSelectedProgram={updateSelectedProgram}
+                audioOrComprehension="comprehension"
                 willAutoplay={false}
-                willStartWithSpanish
-                toFromlessonSelectorExamplesParser={toFromlessonSelectorExamplesParser}
               />
             )
           }
