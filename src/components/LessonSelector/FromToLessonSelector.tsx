@@ -59,6 +59,7 @@ export default function FromToLessonSelector({
       <label htmlFor="courseList" className="menuRow" id="courseRow">
         <p>Course:</p>
         <select
+          id="courseList"
           name="courseList"
           className="courseList"
           value={selectedProgram?.recordId}
@@ -72,6 +73,7 @@ export default function FromToLessonSelector({
           <p>From:</p>
           {fromLesson?.recordId && selectedProgram?.lessons && (
             <select
+              id="fromLesson"
               name="fromLesson"
               className="lessonList"
               value={fromLesson.recordId}
@@ -85,6 +87,7 @@ export default function FromToLessonSelector({
           <p>To:</p>
           {toLesson?.recordId && selectedProgram?.lessons && (
             <select
+              id="toLesson"
               name="toLesson"
               className="lessonList"
               value={toLesson.recordId}
