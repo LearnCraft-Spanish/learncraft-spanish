@@ -1,27 +1,77 @@
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, renderHook, screen, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { sampleStudentFlashcardData } from '../../tests/mockData'
 
 import Flashcard from './FlashcardDisplay'
 
 const example = { ...sampleStudentFlashcardData.examples[0], isCollected: true }
+const audioExample = sampleStudentFlashcardData.examples.filter(example => example.spanishAudioLa.length)[0]
 
-const addFlashcardAndUpdate = vi.fn(() => {})
-const removeFlashcardAndUpdate = vi.fn(() => {})
+const incrementExampleNumber = vi.fn(() => {})
+const onRemove = vi.fn(() => {})
 const toggleAnswer = vi.fn()
+const togglePlaying = vi.fn()
+
+const queryClient = new QueryClient()
+
+/*
+  example: Flashcard
+  isStudent: boolean
+  answerShowing: boolean
+  startWithSpanish?: boolean
+  incrementExampleNumber: () => void
+  onRemove: () => void
+  toggleAnswer: () => void
+  audioActive: string
+  togglePlaying: () => void
+  playing: boolean
+*/
 
 function FlashcardSpanishFirst() {
-  return <Flashcard example={example} isStudent answerShowing={false} startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Flashcard example={example} isStudent answerShowing={false} startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
+    </QueryClientProvider>
+  )
 }
 function FlashcardEnglishFirst() {
-  return <Flashcard example={example} isStudent answerShowing={false} startWithSpanish={false} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Flashcard example={example} isStudent answerShowing={false} startWithSpanish={false} incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
+    </QueryClientProvider>
+  )
 }
 function FlashcardSpanishFirstAnswerShowing() {
-  return <Flashcard example={example} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Flashcard example={example} isStudent answerShowing startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
+    </QueryClientProvider>
+  )
 }
 function FlashcardEnglishFirstAnswerShowing() {
-  return <Flashcard example={example} isStudent answerShowing startWithSpanish={false} addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Flashcard example={example} isStudent answerShowing startWithSpanish={false} incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
+    </QueryClientProvider>
+  )
+}
+
+function FlashcardSpanishFirstNotStudent() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Flashcard example={example} isStudent={false} answerShowing={false} startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
+    </QueryClientProvider>
+  )
+}
+
+function FlashcardWithAudio() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Flashcard example={audioExample} isStudent answerShowing={false} startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="active" togglePlaying={togglePlaying} playing={false} />
+    </QueryClientProvider>
+  )
 }
 
 describe('component Flashcard', () => {
@@ -29,6 +79,30 @@ describe('component Flashcard', () => {
     vi.clearAllMocks()
     cleanup()
   })
+
+  it('on click, calls toggle answer', () => {
+    render(<FlashcardSpanishFirst />)
+    // toggleAnswer()
+    screen.getByText(example.spanishExample).click()
+    expect(toggleAnswer).toHaveBeenCalled()
+  })
+  describe('audio is active', () => {
+    it('renders correctly', () => {
+      render(<FlashcardWithAudio />)
+      expect(screen.getAllByLabelText('Play/Pause')).toBeTruthy()
+    })
+    it('on click, calls togglePlaying', () => {
+      render(<FlashcardWithAudio />)
+      screen.getAllByLabelText('Play/Pause')[0].click()
+      expect(togglePlaying).toHaveBeenCalled()
+    })
+    it('on click, does NOT propagate to also call toggleAnswer', () => {
+      render(<FlashcardWithAudio />)
+      screen.getAllByLabelText('Play/Pause')[0].click()
+      expect(toggleAnswer).not.toHaveBeenCalled()
+    })
+  })
+
   describe('answer showing is false', () => {
     it('renders correctly, spanish shown first', () => {
       render(<FlashcardSpanishFirst />)
@@ -56,47 +130,27 @@ describe('component Flashcard', () => {
     })
     it('renders correctly, english first', () => {
       render(<FlashcardEnglishFirstAnswerShowing />)
-      toggleAnswer()
       expect(screen.getByText(example.spanishExample)).toBeTruthy()
       expect(screen.queryByText(example.englishTranslation)).toBeNull()
     })
-    // on click, answer showing is false
-    it('on click, calls toggleAnswer function', () => {
-      render(<FlashcardSpanishFirstAnswerShowing />)
-      toggleAnswer()
-      screen.getByText(example.englishTranslation).click()
-      expect(toggleAnswer).toHaveBeenCalled()
-    })
-
     describe('isStudent is false', () => {
       it('add and remove flashcard buttons are not rendered', () => {
-        render(<Flashcard example={example} isStudent={false} answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
+        render(<FlashcardSpanishFirstNotStudent />)
         expect(screen.queryByText('Add to my flashcards')).toBeNull()
         expect(screen.queryByText('Remove from my flashcards')).toBeNull()
       })
     })
 
     describe('isStudent is true', () => {
+      // The way we check isCollected is now different. We need to mock the function that checks if the flashcard is collected. (exampleIsCollected in useStudentFlashcards)
       describe('isCollected is true', () => {
         it('remove flashcard button is rendered', () => {
-          render(<Flashcard example={example} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
           expect(screen.getByText('Remove from my flashcards')).toBeTruthy()
-        })
-        it('on click, calls removeFlashcardAndUpdate function', () => {
-          render(<Flashcard example={example} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
-          screen.getByText('Remove from my flashcards').click()
-          expect(removeFlashcardAndUpdate).toHaveBeenCalled()
         })
       })
       describe('isCollected is false', () => {
         it('add flashcard button is rendered', () => {
-          render(<Flashcard example={{ ...example, isCollected: false }} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
           expect(screen.getByText('Add to my flashcards')).toBeTruthy()
-        })
-        it('on click, calls addFlashcardAndUpdate function', () => {
-          render(<Flashcard example={{ ...example, isCollected: false }} isStudent answerShowing startWithSpanish addFlashcardAndUpdate={addFlashcardAndUpdate} removeFlashcardAndUpdate={removeFlashcardAndUpdate} toggleAnswer={toggleAnswer} />)
-          screen.getByText('Add to my flashcards').click()
-          expect(addFlashcardAndUpdate).toHaveBeenCalled()
         })
       })
     })

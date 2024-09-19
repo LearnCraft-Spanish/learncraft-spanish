@@ -34,6 +34,7 @@
   width: 50%;
   margin-top: 10px;
 }
+/* at 767px, button boxes switch from width 50% to 95% */
 @media screen and (max-width: 767px) {
   .quizButtons {
       min-width: 0;

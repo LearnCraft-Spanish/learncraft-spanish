@@ -95,6 +95,7 @@ export default function FlashcardDisplay({ example, isStudent, answerShowing, in
           type="button"
           className="audioPlayPauseButton"
           onClick={e => handlePlayPause(e)}
+          aria-label="Play/Pause"
         >
           <i className={playing ? 'fa-solid fa-pause' : 'fa-solid fa-play'} />
         </button>

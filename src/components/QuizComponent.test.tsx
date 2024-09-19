@@ -3,8 +3,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 
 import { MemoryRouter } from 'react-router-dom'
-import { ActiveStudentProvider } from '../contexts/ActiveStudentContext'
-import { UserDataProvider } from '../contexts/UserDataContext'
 import { sampleStudentFlashcardData } from '../../tests/mockData'
 
 import Quiz from './QuizComponent'
@@ -20,21 +18,17 @@ vi.mock('../contexts/ActiveStudentContext')
 function renderQuizNoSrs() {
   render(
     <MemoryRouter>
-      <UserDataProvider>
-        <ActiveStudentProvider>
-          <Quiz
-            quizTitle="Test Quiz"
-            examplesToParse={sampleStudentFlashcardData.examples}
-            // startWithSpanish={false}
-            // quizOnlyCollectedExamples={false}
-            // isSrsQuiz={false}
-            // userData={sampleStudent}
-            // addFlashcard={addFlashcard}
-            // removeFlashcard={removeFlashcard}
-            cleanupFunction={cleanupFunction}
-          />
-        </ActiveStudentProvider>
-      </UserDataProvider>
+      <Quiz
+        quizTitle="Test Quiz"
+        examplesToParse={sampleStudentFlashcardData.examples}
+        // startWithSpanish={false}
+        // quizOnlyCollectedExamples={false}
+        // isSrsQuiz={false}
+        // userData={sampleStudent}
+        // addFlashcard={addFlashcard}
+        // removeFlashcard={removeFlashcard}
+        cleanupFunction={cleanupFunction}
+      />
     </MemoryRouter>,
   )
 }
