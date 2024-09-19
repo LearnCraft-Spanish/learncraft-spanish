@@ -86,6 +86,7 @@ describe('component Flashcard', () => {
     screen.getByText(example.spanishExample).click()
     expect(toggleAnswer).toHaveBeenCalled()
   })
+
   describe('audio is active', () => {
     it('renders correctly', () => {
       render(<FlashcardWithAudio />)
@@ -114,7 +115,6 @@ describe('component Flashcard', () => {
       expect(screen.getByText(example.englishTranslation)).toBeTruthy()
       expect(screen.queryByText(example.spanishExample)).toBeNull()
     })
-    // on click, answer showing is true
     it('on click, calls toggleAnswer function', () => {
       render(<FlashcardSpanishFirst />)
       screen.getByText(example.spanishExample).click()
