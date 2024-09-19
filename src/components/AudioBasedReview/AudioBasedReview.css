@@ -56,11 +56,11 @@ button:disabled {
     z-index: 5;
 }
 
-  .audioFlashcard p {
+.audioFlashcard p {
     font-weight: bold;
     font-size: 1.25rem;
     margin: 0;
-    padding: 5vw;
+    padding: 10%;
     z-index: 5;
 }
 
