@@ -38,6 +38,7 @@ export default function AudioFlashcardComponent({
           type="button"
           className="audioPlayPauseButton"
           onClick={e => handlePlayPauseClick(e)}
+          aria-label="Play/Pause"
         >
           <i className={isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play'} />
         </button>
