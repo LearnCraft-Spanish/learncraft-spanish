@@ -9,6 +9,7 @@ import { useUserData } from '../../hooks/useUserData'
 import { useAudioExamples } from '../../hooks/useAudioExamples'
 import { useProgramTable } from '../../hooks/useProgramTable'
 import { toFromlessonSelectorExamplesParser } from '../LessonSelector'
+import Loading from '../Loading'
 import AudioQuizButtons from './AudioQuizButtons'
 import AudioFlashcard from './AudioFlashcard'
 import AudioQuizSetupMenu from './AudioQuizSetupMenu'
@@ -453,7 +454,7 @@ export default function AudioBasedReview({
 
   return (
     <div className="quiz">
-      {isLoading && <h2>Loading Audio...</h2>}
+      {isLoading && <Loading message="Loading Audio..." />}
       {isError && <h2>Error Loading Audio</h2>}
       {unavailable && <Navigate to="/" />}
       {!quizReady && dataReady && (

@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom'
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import type { Flashcard } from './interfaceDefinitions'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
+import Loading from './components/Loading'
 
 function FlashcardManager() {
   const { flashcardDataQuery, removeFlashcardMutation } = useStudentFlashcards()
@@ -83,7 +84,7 @@ function FlashcardManager() {
 
   return (
     <>
-      {flashcardDataQuery.isLoading && <h2>Loading Flashcards...</h2>}
+      {flashcardDataQuery.isLoading && <Loading message="Loading Flashcards..." />}
       {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
       {(flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.studentExamples?.length) && <Navigate to="/" />}
       {flashcardDataQuery.isSuccess && !!flashcardDataQuery.data?.examples?.length && (

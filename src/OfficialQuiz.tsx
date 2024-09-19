@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import './App.css'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
 import type { Program, Quiz, QuizCourse } from './interfaceDefinitions'
-
+import Loading from './components/Loading'
 import QuizComponent from './components/QuizComponent'
 
 interface officialQuizProps {
@@ -87,7 +87,7 @@ export default function OfficialQuiz({
     <>
       {officialQuizzesQuery.data && (
         <>
-          {(quizExamplesQuery.isLoading) && (<h2 className="loading">Loading Quiz...</h2>)}
+          {(quizExamplesQuery.isLoading) && (<Loading message="Loading Quiz..." />)}
           {quizExamplesQuery.isError && (<h2 className="error">Error Loading Quiz</h2>)}
           {quizExamplesQuery.data && (
             <QuizComponent

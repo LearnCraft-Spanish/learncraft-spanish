@@ -15,6 +15,7 @@ import { useVocabulary } from './hooks/useVocabulary'
 import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
 import { useUserData } from './hooks/useUserData'
 import { useProgramTable } from './hooks/useProgramTable'
+import Loading from './components/Loading'
 
 interface FlashcardFinderProps {
   selectedProgram: Program | null
@@ -393,7 +394,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         )}
         {isLoading && (
           <div>
-            <h2>Loading Flashcard Data...</h2>
+            <Loading message="Loading Flashcard Data..." />
           </div>
         )}
         {dataLoaded && (

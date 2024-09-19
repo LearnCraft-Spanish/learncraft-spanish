@@ -4,6 +4,7 @@ import './App.css'
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
+import Loading from './components/Loading'
 
 export default function Menu() {
   const userDataQuery = useUserData()
@@ -13,7 +14,7 @@ export default function Menu() {
   // Make sure user data is loaded before showing the menu.
   // Require activeStudent data unless user is Admin.
   // If activeStudent is student, also make sure flashcard data is loaded.
-  const menuDataReady = userDataQuery.isSuccess && (userDataQuery?.data.isAdmin || activeStudentQuery.isSuccess) && (activeStudentQuery.data?.role !== 'student' || flashcardDataQuery.isSuccess)
+  const menuDataReady = userDataQuery.isSuccess && ((userDataQuery?.data.isAdmin && userDataQuery?.data.role !== 'student' && userDataQuery?.data.role !== 'limited') || activeStudentQuery.isSuccess) && (activeStudentQuery.data?.role !== 'student' || flashcardDataQuery.isSuccess)
 
   // Display loading or error messages if necessary
   const menuDataError = !menuDataReady && (userDataQuery.isError || activeStudentQuery.isError || flashcardDataQuery.isError)
@@ -28,7 +29,7 @@ export default function Menu() {
       )}
       {menuDataLoading && !menuDataReady && (
         <div className="menuBox">
-          <h3>Loading Menu...</h3>
+          <Loading message="Loading Menu..." />
         </div>
       )}
       {menuDataReady && (

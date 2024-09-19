@@ -32,7 +32,7 @@ textarea {
   border-radius: 0%;
 }
 
-/*ExampleRetriever*/
+/* Global Styles */
 h1 {
   color: var(--light);
   text-align: center;
@@ -109,6 +109,54 @@ button:hover, .linkButton:hover {
   left: 20px;
   transform: translate(0, -50%);
 }
+
+/* Load Screen Styles */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;  /* Take full width of parent */
+  height: 100%; /* Take full height of parent */
+  padding: 5% 20%;
+  box-sizing: border-box;
+}
+
+.loadingIcon {
+  position: relative;
+  width: 50%; /* Width relative to parent container */
+  padding-top: 50%; /* Height relative to width to maintain square shape */
+  max-width: 400px; /* Maximum size for larger containers */
+  max-height: 400px; /* Same as max-width to keep square */
+  min-width: 150px; /* Minimum size */
+  min-height: 150px; /* Minimum size */
+}
+
+#headIcon {
+  position: absolute;
+  top: 10%; /* Positioning relative to .loadingIcon */
+  left: 10%;
+  width: 80%; /* Resize the head within its parent */
+}
+
+#wheelIcon {
+  position: absolute;
+  top: 18%; /* Adjust to align correctly with the head */
+  left: 18%;
+  width: 40%;
+  animation: spin 1.4s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
 
 /*Main Menu Styles*/
 /* MOVED TO NAV */
