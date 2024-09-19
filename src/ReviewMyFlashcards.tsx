@@ -37,7 +37,13 @@ export default function MyFlashcardsQuiz() {
   }
 
   function calculateQuizLengthOptions() {
-    const exampleCount = flashcardDataQuery.data?.examples?.length
+    let exampleCount
+    if (isSrs) {
+      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(studentExample => studentExample.nextReviewDate ? new Date(studentExample.nextReviewDate) <= new Date() : true).length
+    }
+    else {
+      exampleCount = flashcardDataQuery.data?.examples?.length
+    }
     if (!exampleCount) {
       return [0]
     }
@@ -98,7 +104,7 @@ export default function MyFlashcardsQuiz() {
             </label>
           </div>
           <div className="buttonBox">
-            <button type="submit">Start Quiz</button>
+            <button type="submit" disabled={calculateQuizLengthOptions()[0] === 0}>Start Quiz</button>
           </div>
           <div className="buttonBox">
             <MenuButton />

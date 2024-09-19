@@ -317,6 +317,8 @@ export default function QuizComponent({
             <QuizButtons
               decrementExample={decrementExampleNumber}
               incrementExample={incrementExampleNumber}
+              firstExample={currentExampleNumber === 1}
+              lastExample={currentExampleNumber === displayOrder.length}
             />
             <div className="buttonBox">
               {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
