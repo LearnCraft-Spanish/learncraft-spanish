@@ -1107,7 +1107,7 @@ i {
   
 }
 /* BackButton */
-.backButton {
+/* .backButton {
   display: none;
   position: absolute;
   left: 0;
@@ -1120,7 +1120,7 @@ i {
       z-index: 2;
     }
   
-}
+} */
 
 
 /* .homeButton {

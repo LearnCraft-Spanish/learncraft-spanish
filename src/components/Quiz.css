@@ -29,8 +29,19 @@
   min-height: 41.8px;
 }
 /* Buttons */
+.quizButtons {
+  min-width: 640px;
+  width: 50%;
+  margin-top: 10px;
+}
+@media screen and (max-width: 767px) {
+  .quizButtons {
+      min-width: 0;
+      width: 70vw;
+  }
+}
 @media (max-width: 480px) {
-  .audioQuizButtons {
+  .audioQuizButtons, .quizButtons {
       min-width: 0;
       width: 90vw;
   }

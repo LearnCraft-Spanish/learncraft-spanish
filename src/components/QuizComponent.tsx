@@ -10,6 +10,7 @@ import QuizButtons from './QuizButtons'
 import QuizProgress from './QuizProgress'
 import MenuButton from './MenuButton'
 import SRSQuizButtons from './SRSButtons'
+import NewQuizProgress from './AudioBasedReview/NewQuizProgress'
 
 interface QuizComponentProps {
   quizTitle: string
@@ -285,7 +286,11 @@ export default function QuizComponent({
       {(displayOrderReady && !!initialDisplayOrder.current.length && !displayOrder.length) && <Navigate to=".." />}
       {!!displayOrder.length && (
         <div className="quiz">
-          <h3>{quizTitle}</h3>
+          <NewQuizProgress
+            currentExampleNumber={currentExampleNumber}
+            totalExamplesNumber={displayOrder.length}
+            quizTitle={quizTitle}
+          />
           {answerShowing ? answerAudio() : questionAudio()}
           {currentFlashcardIsValid && (
             <FlashcardDisplay
@@ -301,26 +306,23 @@ export default function QuizComponent({
               startWithSpanish={startWithSpanish}
             />
           )}
-
-          {isSrsQuiz && currentFlashcardIsValid && (
-            <SRSQuizButtons
-              currentExample={currentExample}
-              answerShowing={answerShowing}
-              incrementExampleNumber={incrementExampleNumber}
+          <div className="quizButtons">
+            {isSrsQuiz && currentFlashcardIsValid && (
+              <SRSQuizButtons
+                currentExample={currentExample}
+                answerShowing={answerShowing}
+                incrementExampleNumber={incrementExampleNumber}
+              />
+            )}
+            <QuizButtons
+              decrementExample={decrementExampleNumber}
+              incrementExample={incrementExampleNumber}
             />
-          )}
-          <QuizButtons
-            decrementExample={decrementExampleNumber}
-            incrementExample={incrementExampleNumber}
-          />
-          <div className="buttonBox">
-            {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
-            <MenuButton />
+            <div className="buttonBox">
+              {!isMainLocation && <Link className="linkButton" to=".." onClick={cleanupFunction}>Back</Link>}
+              <MenuButton />
+            </div>
           </div>
-          <QuizProgress
-            currentExampleNumber={currentExampleNumber}
-            totalExamplesNumber={displayOrder.length}
-          />
         </div>
       )}
     </>
