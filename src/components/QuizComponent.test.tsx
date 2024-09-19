@@ -3,10 +3,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { sampleStudentFlashcardData } from '../../tests/mockData'
 
 import Quiz from './QuizComponent'
-import 'Quiz.css'
+
+const queryClient = new QueryClient()
 
 const addFlashcard = vi.fn()
 const removeFlashcard = vi.fn()
@@ -14,42 +16,46 @@ const cleanupFunction = vi.fn()
 
 vi.mock('../contexts/UserDataContext')
 vi.mock('../contexts/ActiveStudentContext')
-
+/*
+  quizTitle,
+  examplesToParse,
+  startWithSpanish = false,
+  quizOnlyCollectedExamples = false,
+  isSrsQuiz = false,
+  cleanupFunction,
+  quizLength = 1000,
+  */
 function renderQuizNoSrs() {
   render(
     <MemoryRouter>
-      <Quiz
-        quizTitle="Test Quiz"
-        examplesToParse={sampleStudentFlashcardData.examples}
-        // startWithSpanish={false}
-        // quizOnlyCollectedExamples={false}
-        // isSrsQuiz={false}
-        // userData={sampleStudent}
-        // addFlashcard={addFlashcard}
-        // removeFlashcard={removeFlashcard}
-        cleanupFunction={cleanupFunction}
-      />
+      <QueryClientProvider client={queryClient}>
+        <Quiz
+          quizTitle="Test Quiz"
+          examplesToParse={sampleStudentFlashcardData.examples}
+          // startWithSpanish={false}
+          // quizOnlyCollectedExamples={false}
+          // isSrsQuiz={false}
+          cleanupFunction={cleanupFunction}
+          // quizLength={1000}
+        />
+      </QueryClientProvider>
     </MemoryRouter>,
   )
 }
 function renderQuizYesSrs() {
   render(
     <MemoryRouter>
-      <UserDataProvider>
-        <ActiveStudentProvider>
-          <Quiz
-            quizTitle="Test Quiz"
-            examplesToParse={sampleStudentFlashcardData.examples}
-            // startWithSpanish={false}
-            quizOnlyCollectedExamples
-            isSrsQuiz
-            // userData={sampleStudent}
-            // addFlashcard={addFlashcard}
-            // removeFlashcard={removeFlashcard}
-            cleanupFunction={cleanupFunction}
-          />
-        </ActiveStudentProvider>
-      </UserDataProvider>
+      <QueryClientProvider client={queryClient}>
+        <Quiz
+          quizTitle="Test Quiz"
+          examplesToParse={sampleStudentFlashcardData.examples}
+          // startWithSpanish={false}
+          quizOnlyCollectedExamples
+          isSrsQuiz
+          cleanupFunction={cleanupFunction}
+          // quizLength={1000}
+        />
+      </QueryClientProvider>
     </MemoryRouter>,
   )
 }
@@ -246,21 +252,17 @@ describe('component Quiz', () => {
     }
     render(
       <MemoryRouter>
-        <UserDataProvider>
-          <ActiveStudentProvider>
-            <Quiz
-              quizTitle="Test Quiz"
-              examplesToParse={[unknownExample]}
-              // startWithSpanish={false}
-              // quizOnlyCollectedExamples={false}
-              // isSrsQuiz={false}
-              // userData={sampleStudent}
-              addFlashcard={addFlashcard}
-              removeFlashcard={removeFlashcard}
-              cleanupFunction={cleanupFunction}
-            />
-          </ActiveStudentProvider>
-        </UserDataProvider>
+        <QueryClientProvider client={queryClient}>
+          <Quiz
+            quizTitle="Test Quiz"
+            examplesToParse={[unknownExample]}
+            // startWithSpanish={false}
+            // quizOnlyCollectedExamples={false}
+            // isSrsQuiz={false}
+            // quizLength={1000}
+            cleanupFunction={cleanupFunction}
+          />
+        </QueryClientProvider>
       </MemoryRouter>,
     )
     const flashcard = screen.getByRole('button', { name: 'flashcard' })
@@ -278,21 +280,18 @@ describe('component Quiz', () => {
   it('calls togglePlaying on audio button click', () => {
     render(
       <MemoryRouter>
-        <UserDataProvider>
-          <ActiveStudentProvider>
-            <Quiz
-              quizTitle="Test Quiz"
-              examplesToParse={[sampleStudentFlashcardData.examples[2]]}
-              // startWithSpanish={false}
-              // quizOnlyCollectedExamples={false}
-              // isSrsQuiz={false}
-              // userData={sampleStudent}
-              addFlashcard={addFlashcard}
-              removeFlashcard={removeFlashcard}
-              cleanupFunction={cleanupFunction}
-            />
-          </ActiveStudentProvider>
-        </UserDataProvider>
+        <QueryClientProvider client={queryClient}>
+          <Quiz
+            quizTitle="Test Quiz"
+            examplesToParse={[sampleStudentFlashcardData.examples[2]]}
+            // startWithSpanish={false}
+            // quizOnlyCollectedExamples={false}
+            // isSrsQuiz={false}
+            // userData={sampleStudent}
+            // quizLength={1000}
+            cleanupFunction={cleanupFunction}
+          />
+        </QueryClientProvider>
       </MemoryRouter>,
     )
     const flashcard = screen.getByRole('button', { name: 'flashcard' })
