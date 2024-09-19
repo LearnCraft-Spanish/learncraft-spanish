@@ -20,6 +20,7 @@ import FlashcardManager from './FlashcardManager'
 import ReviewMyFlashcards from './ReviewMyFlashcards'
 import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
 import Nav from './components/Nav'
+import Loading from './components/Loading'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -256,6 +257,9 @@ export const App: React.FC = () => {
           <p>{bannerMessage}</p>
         </div>
       )}
+      {isLoading && !isAuthenticated && <Loading message="Logging in..." />}
+      {!isLoading && isAuthenticated && userDataQuery.isLoading && <Loading message="Loading User Data..." />}
+      {!isLoading && isAuthenticated && userDataQuery.isError && <h2>Error loading user data.</h2>}
       <SentryRoutes>
         <Route
           path="/"

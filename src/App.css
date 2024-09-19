@@ -118,6 +118,7 @@ button:hover, .linkButton:hover {
   justify-content: center;
   width: 100%;  /* Take full width of parent */
   height: 100%; /* Take full height of parent */
+  max-height: 70vh;
   padding: 5% 20%;
   box-sizing: border-box;
 }
