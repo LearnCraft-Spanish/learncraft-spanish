@@ -18,12 +18,6 @@ export default function Nav(): JSX.Element {
       </div>
       <LogoutButton />
       <LoginButton />
-      {/* <div
-        className={`backButton ${window.location.pathname === '/' ? ' ' : 'notRoot'}`}
-        onClick={() => navigate('..')}
-      >
-        <i className="fa-solid fa-reply"></i>
-      </div> */}
     </div>
   )
 }
