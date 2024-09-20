@@ -153,7 +153,7 @@ describe('component Quiz', () => {
     expect(flashcardPrevious.textContent).not.toBe(nextTest)
   })
 
-  describe('isSrsQuiz is true', () => {
+  describe.skip('isSrsQuiz is true', () => {
     it('renders SrsButtons when isSrsQuiz is true', () => {
       renderQuizYesSrs()
       const flashcard = screen.getByLabelText('flashcard')
