@@ -6,29 +6,16 @@ import { FromToLessonSelector } from '../LessonSelector'
 import MenuButton from '../MenuButton'
 
 interface AudioQuizSetupMenuProps {
-  selectedLesson: Lesson
-  updateSelectedLesson: (lesson: string) => void
-  selectedProgram: Program
-  updateSelectedProgram: (program: string) => void
-  // update logic so this is never null
-  fromLesson: Lesson | null
-  updatefromLesson: (lesson: string | number) => void
   autoplay: boolean
   updateAutoplay: (autoplay: string) => void
   examplesToPlayLength: number
   readyQuiz: () => void
 }
 export default function AudioQuizSetupMenu({
-  selectedLesson,
-  updateSelectedLesson,
-  selectedProgram,
-  updateSelectedProgram,
   autoplay,
   updateAutoplay,
   examplesToPlayLength,
   readyQuiz,
-  fromLesson,
-  updatefromLesson,
 }: AudioQuizSetupMenuProps): JSX.Element {
   function updateAutoplayWorkaround(autoplay: boolean) {
     if (autoplay) {
@@ -38,23 +25,12 @@ export default function AudioQuizSetupMenu({
       updateAutoplay('off')
     }
   }
-  useEffect(() => {
-    if (selectedProgram && !fromLesson) {
-      updatefromLesson(selectedProgram.lessons[0].recordId)
-    }
-  }, [fromLesson, updatefromLesson, selectedProgram])
+
   return (
     <div className="audioQuizSetupMenu">
       {/* Change className? currently confusing */}
       <div className="form">
-        <FromToLessonSelector
-          selectedProgram={selectedProgram}
-          updateSelectedProgram={updateSelectedProgram}
-          fromLesson={fromLesson}
-          updateFromLesson={updatefromLesson}
-          toLesson={selectedLesson}
-          updateToLesson={updateSelectedLesson}
-        />
+        <FromToLessonSelector />
         <div className="menuRow">
           <p>Autoplay:</p>
           <label htmlFor="isAutoplay" className="switch">

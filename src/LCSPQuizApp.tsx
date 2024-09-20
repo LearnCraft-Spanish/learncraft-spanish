@@ -9,19 +9,13 @@ import MenuButton from './components/MenuButton'
 import OfficialQuiz from './OfficialQuiz'
 import type { Quiz, QuizCourse } from './interfaceDefinitions'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
+import { useSelectedLesson } from './hooks/useSelectedLesson'
 import Loading from './components/Loading'
 
-interface LCSPQuizAppProps {
-  selectedProgram: { recordId: number, name: string } | null
-  selectedLesson: { recordId: number, lesson: string } | null
-}
-
-export default function LCSPQuizApp({
-  selectedProgram,
-  selectedLesson,
-}: LCSPQuizAppProps) {
+export default function LCSPQuizApp(): JSX.Element {
   const navigate = useNavigate()
   const { activeStudentQuery } = useActiveStudent()
+  const { selectedProgram, selectedToLesson } = useSelectedLesson()
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined)
   const { isAuthenticated, isLoading } = useAuth0()
 
@@ -149,7 +143,7 @@ export default function LCSPQuizApp({
         navigate(urlToNavigate)
       }
     }
-    const activeLessonArray = selectedLesson?.lesson.split(' ')
+    const activeLessonArray = selectedToLesson?.lesson.split(' ')
     if (activeLessonArray && officialQuizzesQuery.data) {
       const activeLessonString = activeLessonArray.slice(-1)[0]
       const activeLessonNumber = Number.parseInt(activeLessonString)
@@ -169,7 +163,7 @@ export default function LCSPQuizApp({
         studentHasDefaultQuiz.current = false
       }
     }
-  }, [selectedLesson, selectedProgram, quizCourse, officialQuizzesQuery.data, navigate])
+  }, [selectedToLesson, selectedProgram, quizCourse, officialQuizzesQuery.data, navigate])
 
   function createRoutesFromCourses() {
     const routes: React.JSX.Element[] = []
@@ -229,7 +223,7 @@ export default function LCSPQuizApp({
       activeStudentQuery.data?.recordId
       && officialQuizzesQuery.data
       && selectedProgram?.recordId
-      && selectedLesson?.recordId
+      && selectedToLesson?.recordId
       && window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
       findDefaultQuiz()
@@ -237,57 +231,61 @@ export default function LCSPQuizApp({
     else if (!activeStudentQuery.data?.recordId) {
       studentHasDefaultQuiz.current = false
     }
-  }, [activeStudentQuery.data?.recordId, selectedProgram?.recordId, selectedLesson?.recordId, officialQuizzesQuery.data, findDefaultQuiz, getCourseUrlFromCode, quizCourse])
+  }, [activeStudentQuery.data?.recordId, selectedProgram?.recordId, selectedToLesson?.recordId, officialQuizzesQuery.data, findDefaultQuiz, getCourseUrlFromCode, quizCourse])
 
-  return (isAuthenticated && !isLoading) && (
-    <div className="quizInterface">
-      {/* Quiz Selector */}
-      {officialQuizzesQuery.isLoading && <Loading message="Loading Quizzes..." />}
-      {officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
-      {officialQuizzesQuery.isSuccess && chosenQuiz && quizCourse === 'lcsp' && !hideMenu && (
-        <div className="quizSelector">
-          <h3> Official Quizzes</h3>
-          <select
-            className="quizMenu"
-            value={quizCourse}
-            onChange={e => updateQuizCourseWithNavigate(e.target.value)}
-          >
-            {makeCourseList()}
-          </select>
-          <select
-            className="quizMenu"
-            value={chosenQuiz}
-            onChange={e => updateChosenQuiz(Number.parseInt(e.target.value) || 0)}
-          >
-            {makeQuizSelections()}
-          </select>
-          <div className="buttonBox">
-            <button type="button" onClick={makeQuizReady}>Begin Review</button>
-          </div>
-          <div className="buttonBox">
-            <MenuButton />
-          </div>
+  return (
+    <>
+      {isAuthenticated && !isLoading && (
+        <div className="quizInterface">
+          {/* Quiz Selector */}
+          {officialQuizzesQuery.isLoading && <Loading message="Loading Quizzes..." />}
+          {officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
+          {officialQuizzesQuery.isSuccess && chosenQuiz && quizCourse === 'lcsp' && !hideMenu && (
+            <div className="quizSelector">
+              <h3> Official Quizzes</h3>
+              <select
+                className="quizMenu"
+                value={quizCourse}
+                onChange={e => updateQuizCourseWithNavigate(e.target.value)}
+              >
+                {makeCourseList()}
+              </select>
+              <select
+                className="quizMenu"
+                value={chosenQuiz}
+                onChange={e => updateChosenQuiz(Number.parseInt(e.target.value) || 0)}
+              >
+                {makeQuizSelections()}
+              </select>
+              <div className="buttonBox">
+                <button type="button" onClick={makeQuizReady}>Begin Review</button>
+              </div>
+              <div className="buttonBox">
+                <MenuButton />
+              </div>
+            </div>
+          )}
+          <Routes>
+            {createRoutesFromCourses()}
+            {quizCourse === 'lcsp' && (
+              <Route
+                path=":number"
+                element={(
+                  <OfficialQuiz
+                    chosenQuiz={chosenQuiz}
+                    courses={courses.current}
+                    makeMenuHidden={makeMenuHidden}
+                    makeMenuShow={makeMenuShow}
+                    quizCourse={quizCourse}
+                    updateChosenQuiz={updateChosenQuiz}
+                  />
+                )}
+              >
+              </Route>
+            )}
+          </Routes>
         </div>
       )}
-      <Routes>
-        {createRoutesFromCourses()}
-        {quizCourse === 'lcsp' && (
-          <Route
-            path=":number"
-            element={(
-              <OfficialQuiz
-                chosenQuiz={chosenQuiz}
-                courses={courses.current}
-                makeMenuHidden={makeMenuHidden}
-                makeMenuShow={makeMenuShow}
-                quizCourse={quizCourse}
-                updateChosenQuiz={updateChosenQuiz}
-              />
-            )}
-          >
-          </Route>
-        )}
-      </Routes>
-    </div>
+    </>
   )
 }

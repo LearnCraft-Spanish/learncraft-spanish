@@ -8,20 +8,17 @@ import { useVerifiedExamples } from './hooks/useVerifiedExamples'
 import './App.css'
 
 // import { LessonSelector } from './components/LessonSelector'
-import { FromToLessonSelector, toFromlessonSelectorExamplesParser } from './components/LessonSelector'
+import { FromToLessonSelector } from './components/LessonSelector'
 
 import type { DisplayOrder, Flashcard, Lesson, Program, VocabTag } from './interfaceDefinitions'
 import { useVocabulary } from './hooks/useVocabulary'
 import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
 import { useUserData } from './hooks/useUserData'
 import { useProgramTable } from './hooks/useProgramTable'
+import { useSelectedLesson } from './hooks/useSelectedLesson'
 import Loading from './components/Loading'
 
 interface FlashcardFinderProps {
-  selectedProgram: Program | null
-  selectedLesson: Lesson | null
-  updateSelectedProgram: (programId: number | string) => void
-  updateSelectedLesson: (lessonId: number | string) => void
   contextual: string
   openContextual: (currentContextual: string) => void
 }
@@ -30,10 +27,6 @@ interface FlashcardFinderProps {
 const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
   (
     {
-      selectedProgram,
-      selectedLesson,
-      updateSelectedProgram,
-      updateSelectedLesson,
       contextual,
       openContextual,
     }: FlashcardFinderProps,
@@ -44,7 +37,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const { flashcardDataQuery, addFlashcardMutation, removeFlashcardMutation, exampleIsCollected, exampleIsPending } = useStudentFlashcards()
     const verifiedExamplesQuery = useVerifiedExamples()
     const { vocabularyQuery, tagTable } = useVocabulary()
-    const { programTableQuery } = useProgramTable()
+    const { filterExamplesBySelectedLesson } = useSelectedLesson()
 
     const isError = userDataQuery.isError || activeStudentQuery.isError || flashcardDataQuery.isError || verifiedExamplesQuery.isError || vocabularyQuery.isError
     const dataLoaded = (userDataQuery.data?.isAdmin || (activeStudentQuery.isSuccess && flashcardDataQuery.isSuccess)) && verifiedExamplesQuery.isSuccess && vocabularyQuery.isSuccess
@@ -56,25 +49,6 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const [noSpanglish, setNoSpanglish] = useState(false)
     const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([])
     // FromToLessonSelector
-    const [fromLesson, setFromLesson] = useState<Lesson | null>(null)
-    const updateFromLesson = useCallback((lessonId: number | string) => {
-      if (typeof lessonId === 'string') {
-        lessonId = Number.parseInt(lessonId)
-      }
-      let newLesson = null
-      programTableQuery.data?.forEach((program) => {
-        const foundLesson = program.lessons.find(item => item.recordId === lessonId)
-        if (foundLesson) {
-          newLesson = foundLesson
-        }
-      })
-      setFromLesson(newLesson)
-    }, [programTableQuery?.data])
-    useEffect(() => {
-      if (selectedProgram && !fromLesson) {
-        updateFromLesson(selectedProgram.lessons[0].recordId)
-      }
-    }, [fromLesson, updateFromLesson, selectedProgram])
 
     function getExampleById(recordId: number) {
       if (!verifiedExamplesQuery.isSuccess) {
@@ -225,11 +199,11 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
     const getFilteredExamples = useCallback((table: Flashcard[]) => {
       const allExamples = [...table]
       const filteredBySpanglish = filterBySpanglish(allExamples)
-      const filteredByAllowed = toFromlessonSelectorExamplesParser(filteredBySpanglish, fromLesson?.recordId, selectedLesson?.recordId, programTableQuery.data)
+      const filteredByAllowed = filterExamplesBySelectedLesson(filteredBySpanglish)
       // = filterExamplesByAllowedVocab(filteredBySpanglish)
       const filteredByTags = filterExamplesBySelectedTags(filteredByAllowed)
       return filteredByTags
-    }, [filterBySpanglish, filterExamplesBySelectedTags, fromLesson?.recordId, programTableQuery.data, selectedLesson?.recordId])
+    }, [filterBySpanglish, filterExamplesBySelectedTags, filterExamplesBySelectedLesson])
 
     // called when user clicks 'Copy as Table' button
     // copies sentences in a table format to be pasted into a google doc or excel sheet
@@ -425,14 +399,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                     )}
                   </div>
                   <div className="FromToLessonSelectorWrapper">
-                    <FromToLessonSelector
-                      toLesson={selectedLesson}
-                      updateToLesson={updateSelectedLesson}
-                      fromLesson={fromLesson}
-                      updateFromLesson={updateFromLesson}
-                      selectedProgram={selectedProgram}
-                      updateSelectedProgram={updateSelectedProgram}
-                    />
+                    <FromToLessonSelector />
                   </div>
                 </div>
                 <div className="filterBox">

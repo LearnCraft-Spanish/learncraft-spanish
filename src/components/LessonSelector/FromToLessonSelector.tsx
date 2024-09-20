@@ -1,26 +1,10 @@
 import type { Lesson, Program } from '../../interfaceDefinitions'
-import { useActiveStudent } from '../../hooks/useActiveStudent'
 import { useProgramTable } from '../../hooks/useProgramTable'
+import { useSelectedLesson } from '../../hooks/useSelectedLesson'
 import './LessonSelector.css'
 
-interface LessonSelectorProps {
-  selectedProgram: Program | null
-  updateSelectedProgram: (programId: string) => void
-  fromLesson: Lesson | null
-  updateFromLesson: (lessonId: string) => void
-  toLesson: Lesson | null
-  updateToLesson: (lessonId: string) => void
-}
-
-export default function FromToLessonSelector({
-  selectedProgram,
-  updateSelectedProgram,
-  fromLesson,
-  updateFromLesson,
-  toLesson,
-  updateToLesson,
-
-}: LessonSelectorProps): JSX.Element {
+export default function FromToLessonSelector(): JSX.Element {
+  const { selectedProgram, selectedFromLesson, selectedToLesson, setProgram, setFromLesson, setToLesson } = useSelectedLesson()
   const { programTableQuery } = useProgramTable()
   // This is the same code as in LessonSelector.tsx
   function makeCourseSelector() {
@@ -40,16 +24,45 @@ export default function FromToLessonSelector({
     }
     return courseSelector
   }
-  function makeLessonSelector() {
+
+  function getLessonNumber(lesson: Lesson | null) {
+    if (!lesson?.lesson) {
+      return null
+    }
+    const lessonArray = lesson.lesson.split(' ')
+    const lessonNumberString = lessonArray.slice(-1)[0]
+    const lessonNumber = Number.parseInt(lessonNumberString, 10)
+    return lessonNumber
+  }
+
+  function makeFromLessonSelector() {
     const lessonSelector: Array<JSX.Element> = []
+    const toLessonNumber = getLessonNumber(selectedToLesson)
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
-      const lessonArray = lesson.lesson.split(' ')
-      const lessonNumber = lessonArray.slice(-1)[0]
-      lessonSelector.push(
-        <option key={lesson.lesson} value={lesson.recordId}>
-          {`Lesson ${lessonNumber}`}
-        </option>,
-      )
+      const lessonNumber = getLessonNumber(lesson)
+      if (lessonNumber && (!toLessonNumber || lessonNumber <= toLessonNumber)) {
+        lessonSelector.push(
+          <option key={lesson.lesson} value={lesson.recordId}>
+            {`Lesson ${lessonNumber}`}
+          </option>,
+        )
+      }
+    })
+    return lessonSelector
+  }
+
+  function makeToLessonSelector() {
+    const lessonSelector: Array<JSX.Element> = []
+    const fromLessonNumber = getLessonNumber(selectedFromLesson)
+    selectedProgram?.lessons.forEach((lesson: Lesson) => {
+      const lessonNumber = getLessonNumber(lesson)
+      if (lessonNumber && (!fromLessonNumber || lessonNumber >= fromLessonNumber)) {
+        lessonSelector.push(
+          <option key={lesson.lesson} value={lesson.recordId}>
+            {`Lesson ${lessonNumber}`}
+          </option>,
+        )
+      }
     })
     return lessonSelector
   }
@@ -63,40 +76,43 @@ export default function FromToLessonSelector({
           name="courseList"
           className="courseList"
           value={selectedProgram?.recordId}
-          onChange={e => updateSelectedProgram(e.target.value)}
+          onChange={e => setProgram(e.target.value)}
         >
           {makeCourseSelector()}
         </select>
       </label>
       <div id="flashcardFinderStyling">
-        <label htmlFor="fromLesson" className="menuRow" id="fromRow">
-          <p>From:</p>
-          {fromLesson?.recordId && selectedProgram?.lessons && (
+        {selectedProgram?.lessons && (
+          <label htmlFor="fromLesson" className="menuRow" id="fromRow">
+            <p>From:</p>
+
             <select
               id="fromLesson"
               name="fromLesson"
               className="lessonList"
-              value={fromLesson.recordId}
-              onChange={e => updateFromLesson(e.target.value)}
+              value={selectedFromLesson?.recordId}
+              onChange={e => setFromLesson(e.target.value)}
             >
-              {makeLessonSelector()}
+              {makeFromLessonSelector()}
             </select>
-          )}
-        </label>
-        <label htmlFor="toLesson" className="menuRow" id="toRow">
-          <p>To:</p>
-          {toLesson?.recordId && selectedProgram?.lessons && (
+          </label>
+        )}
+        {selectedProgram?.lessons && (
+          <label htmlFor="toLesson" className="menuRow" id="toRow">
+            <p>To:</p>
+
             <select
               id="toLesson"
               name="toLesson"
               className="lessonList"
-              value={toLesson.recordId}
-              onChange={e => updateToLesson(e.target.value)}
+              value={selectedToLesson?.recordId}
+              onChange={e => setToLesson(e.target.value)}
             >
-              {makeLessonSelector()}
+              {makeToLessonSelector()}
             </select>
-          )}
-        </label>
+
+          </label>
+        )}
       </div>
     </div>
   )

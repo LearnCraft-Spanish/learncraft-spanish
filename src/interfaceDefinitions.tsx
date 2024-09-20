@@ -91,6 +91,7 @@ export interface Vocabulary {
   vocabName: string
   verbInfinitive: string
   conjugationTags: Array<string>
+  spellings?: Array<string>
 }
 
 export interface QuizCourse {

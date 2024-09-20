@@ -1,10 +1,9 @@
 import React from 'react'
+import Loading from './components/Loading'
 
 function CallbackPage() {
   return (
-    <div className="redirectMessage">
-      <p> please wait to be redirected... </p>
-    </div>
+    <Loading message="Redirecting..." />
   )
 }
 

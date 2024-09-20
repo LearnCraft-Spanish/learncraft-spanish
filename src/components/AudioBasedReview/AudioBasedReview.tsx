@@ -8,7 +8,7 @@ import { useActiveStudent } from '../../hooks/useActiveStudent'
 import { useUserData } from '../../hooks/useUserData'
 import { useAudioExamples } from '../../hooks/useAudioExamples'
 import { useProgramTable } from '../../hooks/useProgramTable'
-import { toFromlessonSelectorExamplesParser } from '../LessonSelector'
+import { useSelectedLesson } from '../../hooks/useSelectedLesson'
 import Loading from '../Loading'
 import AudioQuizButtons from './AudioQuizButtons'
 import AudioFlashcard from './AudioFlashcard'
@@ -22,10 +22,6 @@ interface StepValue {
 
 // THIS IS NOT COMPLETE, PLEASE PLEASE PLEASE UPDATE TYPES
 interface AudioBasedReviewProps {
-  selectedLesson: any
-  updateSelectedLesson: (lesson: any) => void
-  selectedProgram: any
-  updateSelectedProgram: (program: any) => void
   audioOrComprehension?: 'audio' | 'comprehension'
   willAutoplay: boolean
 }
@@ -37,14 +33,11 @@ CURRENT BUGS:
     investigate asap
 */
 export default function AudioBasedReview({
-  selectedLesson,
-  updateSelectedLesson,
-  selectedProgram,
-  updateSelectedProgram,
   audioOrComprehension = 'comprehension',
   willAutoplay,
 }: AudioBasedReviewProps) {
   const { activeStudentQuery } = useActiveStudent()
+  const { filterExamplesBySelectedLesson } = useSelectedLesson()
   const userDataQuery = useUserData()
   // this is a pattern used in the codebase, not sure if it's necessary
   const rendered = useRef(false)
@@ -79,22 +72,6 @@ export default function AudioBasedReview({
   const hintValue = useRef<StepValue>({ audio: '', text: '' })
   const answerValue = useRef<StepValue>({ audio: '', text: '' })
   const guessValue = useRef<StepValue>({ audio: '', text: 'Make a guess!' })
-
-  // FromTo lesson selector code:
-  const [fromLesson, setfromLesson] = useState<Lesson | null>(null)
-  const updatefromLesson = useCallback((lessonId: number | string) => {
-    if (typeof lessonId === 'string') {
-      lessonId = Number.parseInt(lessonId)
-    }
-    let newLesson = null
-    programTableQuery.data?.forEach((program) => {
-      const foundLesson = program.lessons.find(item => item.recordId === lessonId)
-      if (foundLesson) {
-        newLesson = foundLesson
-      }
-    })
-    setfromLesson(newLesson)
-  }, [programTableQuery?.data])
 
   /*      Every Time currentExample changes, set the stepValues for that example      */
   const defineStepValues = useCallback(() => {
@@ -321,27 +298,12 @@ export default function AudioBasedReview({
 
   // Callback function to make quiz
   const makeComprehensionQuiz = useCallback(() => {
-    if ((!selectedLesson || !fromLesson)) {
-      // eslint-disable-next-line no-console
-      console.warn('No lesson selected')
-      return
-    }
-    if (!programTableQuery.data) {
-      // eslint-disable-next-line no-console
-      console.warn('No programsQuery data')
-      return
-    }
     if (audioExamplesQuery.isSuccess) {
-      const allowedAudioExamples = toFromlessonSelectorExamplesParser(
-        audioExamplesQuery.data,
-        fromLesson.recordId,
-        selectedLesson.recordId,
-        programTableQuery.data,
-      )
+      const allowedAudioExamples = filterExamplesBySelectedLesson(audioExamplesQuery.data)
       const shuffledExamples = shuffleExamples(allowedAudioExamples)
       setExamplesToPlay(shuffledExamples)
     }
-  }, [selectedLesson, fromLesson, programTableQuery.data, audioExamplesQuery.data, audioExamplesQuery.isSuccess])
+  }, [audioExamplesQuery.data, audioExamplesQuery.isSuccess, filterExamplesBySelectedLesson])
 
   function readyQuiz() {
     defineStepValues()
@@ -390,10 +352,10 @@ export default function AudioBasedReview({
 
   useEffect(() => {
     unReadyQuiz()
-    if (selectedLesson?.recordId && selectedProgram?.recordId && !!audioExamplesQuery.data?.length) {
+    if (audioExamplesQuery.data?.length) {
       makeComprehensionQuiz()
     }
-  }, [selectedProgram, selectedLesson, audioExamplesQuery.data?.length, makeComprehensionQuiz, unReadyQuiz])
+  }, [audioExamplesQuery.data?.length, makeComprehensionQuiz, unReadyQuiz])
 
   /*       New Use Effects      */
   // Play Audio when step is taken
@@ -461,16 +423,10 @@ export default function AudioBasedReview({
         <>
           <h2>{audioOrComprehension === 'audio' ? 'Audio Quiz' : 'Comprehension Quiz'}</h2>
           <AudioQuizSetupMenu
-            selectedLesson={selectedLesson}
-            updateSelectedLesson={updateSelectedLesson}
-            selectedProgram={selectedProgram}
-            updateSelectedProgram={updateSelectedProgram}
             autoplay={autoplay}
             updateAutoplay={updateAutoplay}
             examplesToPlayLength={examplesToPlay.length}
             readyQuiz={readyQuiz}
-            fromLesson={fromLesson}
-            updatefromLesson={updatefromLesson}
           />
         </>
       )}

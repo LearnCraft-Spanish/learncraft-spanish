@@ -4,10 +4,10 @@ import React, { isValidElement, useCallback, useEffect, useRef, useState } from 
 import { Navigate, Route, useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 
-import { ac } from 'vitest/dist/chunks/reporters.C_zwCd4j'
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import { useProgramTable } from './hooks/useProgramTable'
+import { useSelectedLesson } from './hooks/useSelectedLesson'
 import type { Lesson, Program, UserData } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
 import Menu from './Menu'
@@ -26,13 +26,8 @@ export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation()
   const userDataQuery = useUserData()
-  const { activeStudentQuery, activeLesson, studentListQuery, activeProgram, chooseStudent } = useActiveStudent()
-  const { programTableQuery } = useProgramTable()
+  const { activeStudentQuery, studentListQuery, chooseStudent } = useActiveStudent()
   const { isAuthenticated, isLoading } = useAuth0()
-
-  // States for Lesson Selector
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null)
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   // States for banner message
   const [bannerMessage, setBannerMessage] = useState('')
@@ -78,35 +73,6 @@ export const App: React.FC = () => {
       }
     }
   }
-
-  // local functions for admins to choose or keep a student from the menu
-  const updateSelectedLesson = useCallback((lessonId: number | string) => {
-    if (typeof lessonId === 'string') {
-      lessonId = Number.parseInt(lessonId)
-    }
-    let newLesson = null
-    programTableQuery.data?.forEach((program) => {
-      const foundLesson = program.lessons.find(item => item.recordId === lessonId)
-      if (foundLesson) {
-        newLesson = foundLesson
-      }
-    })
-    setSelectedLesson(newLesson)
-  }, [programTableQuery?.data])
-
-  const updateSelectedProgram = useCallback((programId: number | string) => {
-    if (typeof programId === 'string') {
-      programId = Number.parseInt(programId)
-    }
-    let newProgram = null
-    newProgram = programTableQuery.data?.find(program => program.recordId === programId)
-    if (newProgram) {
-      setSelectedProgram(newProgram)
-    }
-    else {
-      setSelectedProgram(null)
-    }
-  }, [programTableQuery?.data])// Add activeProgram, activeLesson when defined
 
   const _updateBannerMessage = useCallback((message: string) => {
     setBannerMessage(message)
@@ -158,31 +124,6 @@ export const App: React.FC = () => {
   const closeStudentSelector = useCallback(() => {
     setStudentSelectorOpen(false)
   }, [])
-
-  useEffect(() => {
-    // change the selected lesson when the selected program changes
-    const hasActiveLesson = activeLesson?.recordId
-    const activeProgramSelected = selectedProgram?.recordId === activeProgram?.recordId
-
-    // default to active lesson if present, otherwise first lesson
-    if (hasActiveLesson && activeProgramSelected) {
-      updateSelectedLesson(activeLesson.recordId)
-    }
-    else if (selectedProgram?.lessons?.length) {
-      updateSelectedLesson(selectedProgram.lessons[0].recordId)
-    }
-  }, [activeStudentQuery.data, activeLesson, activeProgram, selectedProgram, programTableQuery?.data, updateSelectedLesson])
-
-  useEffect(() => {
-    // renders twice if student has an active program
-    if (activeProgram?.recordId) {
-      updateSelectedProgram(activeProgram.recordId)
-    }
-    // Setting Default Vaules for selectedProgram and selectedLesson
-    else if (programTableQuery.data?.length) {
-      updateSelectedProgram(programTableQuery.data[0].recordId)
-    }
-  }, [activeProgram, activeStudentQuery.data, programTableQuery.data, updateSelectedProgram])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)
@@ -280,10 +221,7 @@ export const App: React.FC = () => {
         <Route
           path="/officialquizzes/*"
           element={(
-            <LCSPQuizApp
-              selectedProgram={selectedProgram}
-              selectedLesson={selectedLesson}
-            />
+            <LCSPQuizApp />
           )}
         />
         )
@@ -292,10 +230,6 @@ export const App: React.FC = () => {
           element={
             (userDataQuery.data?.role === 'student' || userDataQuery.data?.isAdmin) && (
               <FlashcardFinder
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
                 contextual={contextual}
                 openContextual={openContextual}
                 ref={currentContextual}
@@ -309,14 +243,7 @@ export const App: React.FC = () => {
             (userDataQuery.data?.role === 'student'
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
-              <AudioBasedReview
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-                audioOrComprehension="audio"
-                willAutoplay
-              />
+              <AudioBasedReview audioOrComprehension="audio" willAutoplay />
             )
           }
         />
@@ -326,14 +253,7 @@ export const App: React.FC = () => {
             (userDataQuery.data?.role === 'student'
             || userDataQuery.data?.role === 'limited'
             || userDataQuery.data?.isAdmin) && (
-              <AudioBasedReview
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-                audioOrComprehension="comprehension"
-                willAutoplay={false}
-              />
+              <AudioBasedReview audioOrComprehension="comprehension" willAutoplay={false} />
             )
           }
         />
@@ -341,12 +261,7 @@ export const App: React.FC = () => {
           path="/frequensay"
           element={
             userDataQuery.data?.isAdmin && (
-              <FrequenSay
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-              />
+              <FrequenSay />
             )
           }
         />
