@@ -8,7 +8,7 @@
   "license": "ISC",
   "homepage": "https://app.learncraftspanish.com",
   "keywords": [],
-  "main": "index.jsx",
+  "main": "index.tsx",
   "scripts": {
     "start": "vite",
     "build": "vite build",

@@ -22,12 +22,12 @@ export default function Menu() {
 
   return (
     <div className="menu">
-      {menuDataError && !menuDataReady && (
+      {menuDataError && !menuDataReady && userDataQuery.isSuccess && (
         <div className="menuBox">
-          <h3>Error Loading Data</h3>
+          <h3>Error Loading Menu</h3>
         </div>
       )}
-      {menuDataLoading && !menuDataReady && (
+      {menuDataLoading && !menuDataReady && userDataQuery.isSuccess && (
         <div className="menuBox">
           <Loading message="Loading Menu..." />
         </div>
@@ -41,9 +41,6 @@ export default function Menu() {
                 <Link className="linkButton" to="/myflashcards">
                   Quiz My Flashcards
                 </Link>
-                {/* <Link className="linkButton" to="/todaysflashcards">
-                    My Flashcards for Today
-                  </Link> */}
               </div>
               <div className="buttonBox">
                 <Link className="linkButton" to="/manage-flashcards">

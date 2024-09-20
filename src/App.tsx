@@ -97,7 +97,7 @@ export const App: React.FC = () => {
             <option
               key={student.recordId}
               value={student.recordId}
-              label={`${student.name} -- ${student.emailAddress}`}
+              label={`${student.name} -- ${studentEmail}`}
             />,
           )
         }
@@ -124,6 +124,11 @@ export const App: React.FC = () => {
   const closeStudentSelector = useCallback(() => {
     setStudentSelectorOpen(false)
   }, [])
+
+  // Close Student Selector on selection
+  useEffect(() => {
+    closeStudentSelector()
+  }, [activeStudentQuery?.data, closeStudentSelector])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)
@@ -152,27 +157,30 @@ export const App: React.FC = () => {
           {!isLoading && isAuthenticated && userDataQuery.isError && <p>Error loading user data.</p>}
           {!isLoading && isAuthenticated && userDataQuery.isSuccess
           && (userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited')
-          && !userDataQuery.data?.isAdmin && (
-            <p>
-              Welcome back,
-              {` ${userDataQuery.data.name}`}
-              !
-            </p>
+          && !userDataQuery.data?.isAdmin
+          && (
+            userDataQuery.data.name
+              ? (<p>{`Welcome back, ${userDataQuery.data.name}!`}</p>)
+              : (<p>Welcome back!</p>)
           )}
 
-          {!isLoading && isAuthenticated && userDataQuery.isSuccess && userDataQuery.data?.role !== 'student'
+          {!isLoading && isAuthenticated
+          && userDataQuery.isSuccess
+          && userDataQuery.data?.role !== 'student'
           && userDataQuery.data?.role !== 'limited'
-          && !userDataQuery.data?.isAdmin && <p>Welcome back!</p>}
+          && !userDataQuery.data?.isAdmin
+          && <p>Welcome back!</p>}
 
           {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
             <div className="studentList">
               {activeStudentQuery.data?.recordId && (
                 <p>
-                  Using as
-                  {' '}
-                  {activeStudentQuery.data?.name}
-                  {activeStudentQuery.data?.recordId === userDataQuery.data?.recordId
-                  && ' (yourself)'}
+                  {`Using as ${activeStudentQuery.data?.name}
+                  ${
+                    (activeStudentQuery.data?.recordId === userDataQuery.data?.recordId)
+                    ? ' (yourself)'
+                    : ''
+                  }`}
                 </p>
               )}
               {!activeStudentQuery.data?.recordId && <p>No student Selected</p>}

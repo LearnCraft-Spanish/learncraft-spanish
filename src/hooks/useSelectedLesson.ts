@@ -126,13 +126,12 @@ export function useSelectedLesson() {
 
   // Update program when activeStudent changes
   useEffect(() => {
-    if (activeStudentQuery.data && activeProgram?.recordId && !selectionState.program?.recordId) {
-      setProgram(activeProgram.recordId) // Only update if the program isn't already set
+    if (activeStudentQuery.data && activeProgram?.recordId) {
+      setProgram(activeProgram.recordId)
     }
   }, [
     activeStudentQuery.data,
     activeProgram?.recordId,
-    selectionState?.program?.recordId,
     setProgram,
   ])
 
