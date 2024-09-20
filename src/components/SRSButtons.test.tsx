@@ -1,28 +1,30 @@
 import React from 'react'
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
-// import '@testing-library/jest-dom'
 
-import { UserDataProvider } from '../contexts/UserDataContext.jsx'
-import { ActiveStudentProvider } from '../contexts/ActiveStudentContext.jsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { sampleStudentFlashcardData } from '../../tests/mockData.js'
 import type { Flashcard } from '../interfaceDefinitions'
 
 import SRSQuizButtons from './SRSButtons'
 
+const queryClient = new QueryClient()
+
+vi.mock('../hooks/useStudentFlashcards', () => {
+  return {
+    useStudentFlashcards: () => ({
+      flashcardDataQuery: { data: sampleStudentFlashcardData },
+      updateFlashcardMutation: { mutate: vi.fn() },
+    }),
+  }
+})
 // These examples could be defined in a better way
 const currentExample: Flashcard = { ...sampleStudentFlashcardData.examples[0] }
-currentExample.isCollected = true
 
-const currentExampleEasy: Flashcard = { ...sampleStudentFlashcardData.examples[0] }
-currentExampleEasy.difficulty = 'easy'
-currentExample.isCollected = true
+const currentExampleEasy: Flashcard = { ...currentExample, difficulty: 'easy' }
 
-const currentExampleHard: Flashcard = { ...sampleStudentFlashcardData.examples[0] }
-currentExampleHard.difficulty = 'hard'
-currentExample.isCollected = true
+const currentExampleHard: Flashcard = { ...currentExample, difficulty: 'hard' }
 
-const updateExampleDifficulty = vi.fn(() => {})
 const incrementExampleNumber = vi.fn(() => {})
 
 describe('component SRSButtons', () => {
@@ -33,47 +35,38 @@ describe('component SRSButtons', () => {
 
   it('example difficulty is labeled hard, displays Labeled: Easy', () => {
     render(
-      <UserDataProvider>
-        <ActiveStudentProvider>
-          <SRSQuizButtons
-            currentExample={currentExampleEasy}
-            answerShowing={false}
-            updateExampleDifficulty={updateExampleDifficulty}
-            incrementExampleNumber={incrementExampleNumber}
-          />
-        </ActiveStudentProvider>
-      </UserDataProvider>,
+      <QueryClientProvider client={queryClient}>
+        <SRSQuizButtons
+          currentExample={currentExampleEasy}
+          answerShowing={false}
+          incrementExampleNumber={incrementExampleNumber}
+        />
+      </QueryClientProvider>,
     )
     expect(screen.getByText('Labeled: Easy')).toBeTruthy()
   })
   it('example difficulty is labeled hard, displays Labeled: Hard', () => {
     render(
-      <UserDataProvider>
-        <ActiveStudentProvider>
-          <SRSQuizButtons
-            currentExample={currentExampleHard}
-            answerShowing={false}
-            updateExampleDifficulty={updateExampleDifficulty}
-            incrementExampleNumber={incrementExampleNumber}
-          />
-        </ActiveStudentProvider>
-      </UserDataProvider>,
+      <QueryClientProvider client={queryClient}>
+        <SRSQuizButtons
+          currentExample={currentExampleHard}
+          answerShowing={false}
+          incrementExampleNumber={incrementExampleNumber}
+        />
+      </QueryClientProvider>,
     )
     expect(screen.getByText('Labeled: Hard')).toBeTruthy()
   })
 
   it('answer showing and no difficulty set, shows setting buttons', () => {
     render(
-      <UserDataProvider>
-        <ActiveStudentProvider>
-          <SRSQuizButtons
-            currentExample={currentExample}
-            answerShowing
-            updateExampleDifficulty={updateExampleDifficulty}
-            incrementExampleNumber={incrementExampleNumber}
-          />
-        </ActiveStudentProvider>
-      </UserDataProvider>,
+      <QueryClientProvider client={queryClient}>
+        <SRSQuizButtons
+          currentExample={currentExample}
+          answerShowing
+          incrementExampleNumber={incrementExampleNumber}
+        />
+      </QueryClientProvider>,
     )
     expect(screen.getByText('This was easy')).toBeTruthy()
     expect(screen.getByText('This was hard')).toBeTruthy()
