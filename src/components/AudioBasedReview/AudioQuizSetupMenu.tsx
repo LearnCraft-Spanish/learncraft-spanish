@@ -33,7 +33,7 @@ export default function AudioQuizSetupMenu({
         <FromToLessonSelector />
         <div className="menuRow">
           <p>Autoplay:</p>
-          <label htmlFor="isAutoplay" className="switch">
+          <label htmlFor="isAutoplay" className="switch" aria-label="toggleAutoplay">
             <input type="checkbox" name="isAutoplay" id="isAutoplay" checked={autoplay} onChange={e => updateAutoplayWorkaround(e.target.checked)} />
             <span className="slider round"></span>
           </label>
