@@ -16,6 +16,17 @@ const togglePlaying = vi.fn()
 
 const queryClient = new QueryClient()
 
+vi.mock('../hooks/useStudentFlashcards', () => {
+  return {
+    useStudentFlashcards: () => ({
+      addFlashcardMutation: { mutate: vi.fn() },
+      removeFlashcardMutation: { mutate: vi.fn() },
+      exampleIsCollected: vi.fn((x: number) => Boolean(x)),
+      exampleIsPending: vi.fn(() => false),
+    }),
+  }
+})
+
 /*
   example: Flashcard
   isStudent: boolean
@@ -70,6 +81,15 @@ function FlashcardWithAudio() {
   return (
     <QueryClientProvider client={queryClient}>
       <Flashcard example={audioExample} isStudent answerShowing={false} startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="active" togglePlaying={togglePlaying} playing={false} />
+    </QueryClientProvider>
+  )
+}
+
+function FlashcardSpanishFirstAnswerShowingNotCollected() {
+  // In our mock, isCollected takes a number and returns a boolean, so recordId:0 is not collected
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Flashcard example={{ ...example, recordId: 0 }} isStudent answerShowing startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
     </QueryClientProvider>
   )
 }
@@ -145,11 +165,13 @@ describe('component Flashcard', () => {
       // The way we check isCollected is now different. We need to mock the function that checks if the flashcard is collected. (exampleIsCollected in useStudentFlashcards)
       describe('isCollected is true', () => {
         it('remove flashcard button is rendered', () => {
+          render(<FlashcardSpanishFirstAnswerShowing />)
           expect(screen.getByText('Remove from my flashcards')).toBeTruthy()
         })
       })
       describe('isCollected is false', () => {
         it('add flashcard button is rendered', () => {
+          render(<FlashcardSpanishFirstAnswerShowingNotCollected />)
           expect(screen.getByText('Add to my flashcards')).toBeTruthy()
         })
       })
