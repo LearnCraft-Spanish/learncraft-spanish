@@ -444,10 +444,14 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                         {requiredTags.map(item => (
                           <div
                             key={item.id}
-                            className="vocabSmallCard"
+                            className="tagCard"
                             onClick={() => removeTagFromRequiredTags(item.id)}
                           >
-                            <h4 className="vocabName">{item.tag}</h4>
+                            <div className={`${item.type}Card`}>
+                              <h4 className="vocabName">{item.tag}</h4>
+                              {item.vocabDescriptor && <h5 className="vocabDescriptor">{item.vocabDescriptor}</h5>}
+                              <p className="vocabUse">{item.type}</p>
+                            </div>
                           </div>
                         ))}
                       </div>

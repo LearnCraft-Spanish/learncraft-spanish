@@ -15,7 +15,7 @@ export function useVocabulary() {
 
   // Helper function to add tags without duplicates
   const addTag = (type: string, tag: string, vocabDescriptor?: string | undefined) => {
-    if (!tagTableRef.current.find(item => item.type === type && item.tag === tag && !(item.vocabDescriptor && item.vocabDescriptor === vocabDescriptor))) {
+    if (!tagTableRef.current.find(item => item.type === type && item.tag === tag && (item.vocabDescriptor === vocabDescriptor || !vocabDescriptor))) {
       if (type === 'vocabulary') {
         tagTableRef.current.push({ type, tag, id: nextTagId.current, vocabDescriptor })
       }
