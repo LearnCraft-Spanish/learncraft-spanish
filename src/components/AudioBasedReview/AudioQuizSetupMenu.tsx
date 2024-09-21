@@ -7,7 +7,7 @@ import MenuButton from '../MenuButton'
 
 interface AudioQuizSetupMenuProps {
   autoplay: boolean
-  updateAutoplay: (autoplay: string) => void
+  updateAutoplay: (autoplay: boolean) => void
   examplesToPlayLength: number
   readyQuiz: () => void
 }
@@ -17,15 +17,6 @@ export default function AudioQuizSetupMenu({
   examplesToPlayLength,
   readyQuiz,
 }: AudioQuizSetupMenuProps): JSX.Element {
-  function updateAutoplayWorkaround(autoplay: boolean) {
-    if (autoplay) {
-      updateAutoplay('on')
-    }
-    else {
-      updateAutoplay('off')
-    }
-  }
-
   return (
     <div className="audioQuizSetupMenu">
       {/* Change className? currently confusing */}
@@ -34,7 +25,7 @@ export default function AudioQuizSetupMenu({
         <div className="menuRow">
           <p>Autoplay:</p>
           <label htmlFor="isAutoplay" className="switch" aria-label="toggleAutoplay">
-            <input type="checkbox" name="isAutoplay" id="isAutoplay" checked={autoplay} onChange={e => updateAutoplayWorkaround(e.target.checked)} />
+            <input type="checkbox" name="isAutoplay" id="isAutoplay" checked={autoplay} onChange={e => updateAutoplay(e.target.checked)} />
             <span className="slider round"></span>
           </label>
         </div>
