@@ -1,6 +1,3 @@
-import MenuButton from '../MenuButton'
-import QuizProgress from '../QuizProgress'
-
 interface AudioQuizButtonsProps {
   audioOrComprehension: 'audio' | 'comprehension'
   // currentStep: 'question' | 'guess' | 'hint' | 'answer'

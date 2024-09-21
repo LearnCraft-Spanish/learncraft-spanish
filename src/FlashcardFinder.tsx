@@ -10,11 +10,10 @@ import './App.css'
 // import { LessonSelector } from './components/LessonSelector'
 import { FromToLessonSelector } from './components/LessonSelector'
 
-import type { DisplayOrder, Flashcard, Lesson, Program, VocabTag } from './interfaceDefinitions'
+import type { DisplayOrder, Flashcard, VocabTag } from './interfaceDefinitions'
 import { useVocabulary } from './hooks/useVocabulary'
 import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
 import { useUserData } from './hooks/useUserData'
-import { useProgramTable } from './hooks/useProgramTable'
 import { useSelectedLesson } from './hooks/useSelectedLesson'
 import Loading from './components/Loading'
 

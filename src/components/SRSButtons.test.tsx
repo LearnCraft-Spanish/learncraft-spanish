@@ -1,5 +1,5 @@
 import React from 'react'
-import { act, cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'

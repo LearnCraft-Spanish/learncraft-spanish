@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import './App.css'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
-import type { Program, Quiz, QuizCourse } from './interfaceDefinitions'
+import type { QuizCourse } from './interfaceDefinitions'
 import Loading from './components/Loading'
 import QuizComponent from './components/QuizComponent'
 

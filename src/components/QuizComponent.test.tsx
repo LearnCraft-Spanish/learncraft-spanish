@@ -93,7 +93,7 @@ describe('component Quiz', () => {
   it('changes flashcard on next button click', () => {
     renderQuizNoSrs()
     // Find the flashcard element
-    // Get the initial text content of the flashcard 
+    // Get the initial text content of the flashcard
     const flashcard = screen.getByLabelText('flashcard')
     const initialText = flashcard.textContent
 
