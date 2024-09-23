@@ -238,8 +238,8 @@ export default function LCSPQuizApp(): JSX.Element {
       {isAuthenticated && !isLoading && (
         <div className="quizInterface">
           {/* Quiz Selector */}
-          {officialQuizzesQuery.isLoading && <Loading message="Loading Quizzes..." />}
-          {officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
+          {activeStudentQuery.isSuccess && officialQuizzesQuery.isLoading && <Loading message="Loading Quizzes..." />}
+          {activeStudentQuery.isSuccess && officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
           {officialQuizzesQuery.isSuccess && chosenQuiz && quizCourse === 'lcsp' && !hideMenu && (
             <div className="quizSelector">
               <h3> Official Quizzes</h3>

@@ -744,6 +744,13 @@ button:hover, .linkButton:hover {
   background-color: darkred;
 }
 
+.pendingButton {
+  width: 10%;
+  min-width: 120px;
+  background-color: var(--dark);
+  cursor: default;
+}
+
 /* ToFromLessonSelector styling for Flashcard Finder */
 
 .FromToLessonSelectorWrapper #courseRow {

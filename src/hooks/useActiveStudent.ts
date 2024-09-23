@@ -24,7 +24,7 @@ export function useActiveStudent() {
 
   async function getActiveStudent(): Promise<UserData | null> {
     if (
-      !userDataQuery.data?.isAdmin
+      (!userDataQuery.data?.isAdmin || !queryClient.getQueryData(['activeStudentSelection']))
       && (userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited')
     ) {
       return userDataQuery.data // Students are their own activeStudent
