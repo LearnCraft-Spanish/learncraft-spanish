@@ -3,7 +3,7 @@ import Loading from './components/Loading'
 
 function CallbackPage() {
   return (
-    <Loading message="Redirecting..." />
+    <div></div>
   )
 }
 
