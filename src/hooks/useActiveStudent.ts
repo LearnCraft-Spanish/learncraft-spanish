@@ -68,7 +68,7 @@ export function useActiveStudent() {
           case 'C': return activeProgram?.cohortCCurrentLesson
           case 'D': return activeProgram?.cohortDCurrentLesson
           case 'E': return activeProgram?.cohortECurrentLesson
-          // case 'F': return activeProgram?.cohortFCurrentLesson
+          case 'F': return activeProgram?.cohortFCurrentLesson
           // case 'G': return activeProgram?.cohortGCurrentLesson
           // etc for futureproofing
         }

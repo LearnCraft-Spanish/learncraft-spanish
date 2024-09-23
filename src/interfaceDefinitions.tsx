@@ -16,6 +16,7 @@ export interface Program {
   cohortCCurrentLesson: number
   cohortDCurrentLesson: number
   cohortECurrentLesson: number
+  cohortFCurrentLesson: number
 }
 
 export interface UserData {

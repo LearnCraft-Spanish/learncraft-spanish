@@ -16,7 +16,7 @@ const qb = { grammar: // quickbaseTablesInfo
     programs: {
       name: 'programs',
       id: 'btgeqa5um',
-      fields: ['Record ID#', 'Name', 'Lessons', 'Cohort A Current Lesson', 'Cohort B Current Lesson', 'Cohort C Current Lesson', 'Cohort D Current Lesson', 'Cohort E Current Lesson'],
+      fields: ['Record ID#', 'Name', 'Lessons', 'Cohort A Current Lesson', 'Cohort B Current Lesson', 'Cohort C Current Lesson', 'Cohort D Current Lesson', 'Cohort E Current Lesson', 'Cohort F Current Lesson'],
     },
 
     vocabulary: {
