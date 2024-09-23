@@ -556,7 +556,8 @@ button:hover, .linkButton:hover {
 .filterBox.options {
   flex-direction: column;
   max-width: 320px;
-  margin-bottom: 8px;
+  margin: 0px 16px;
+  margin-bottom: 16px;
 }
 .filterBox.search {
   flex-direction: column;
@@ -581,6 +582,9 @@ button:hover, .linkButton:hover {
   padding: 12px;
 
 } */
+.removeSpanglishBox label {
+  margin: auto 0px;
+}
 
 .searchFilter{
   display: inline-block;
@@ -1286,3 +1290,11 @@ i {
   .div-header.homeButton {
     background-image: url('./resources/icons8-home-24.png');
   } */
+
+
+
+  /*  FrequenSay */
+  .frequensay .tempBox {
+    max-width: 640px;
+    margin: auto;
+  }

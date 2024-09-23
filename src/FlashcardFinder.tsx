@@ -381,26 +381,18 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                     <FromToLessonSelector />
                   </div>
                   <div className="removeSpanglishBox">
-                    <h3>Spanglish</h3>
-                    {!noSpanglish && (
-                      <button
-                        type="button"
-                        className="removeSpanglishButton"
-                        style={{ backgroundColor: 'darkgreen' }}
-                        onClick={toggleSpanglish}
-                      >
-                        Included
-                      </button>
-                    )}
-                    {noSpanglish && (
-                      <button
-                        type="button"
-                        style={{ backgroundColor: 'darkred' }}
-                        onClick={toggleSpanglish}
-                      >
-                        Excluded
-                      </button>
-                    )}
+                    <p>Include Spanglish: </p>
+                    <label htmlFor="removeSpanglish" className="switch" aria-label="noSpanglish">
+                      <input
+                        type="checkbox"
+                        name="removeSpanglish"
+                        id="removeSpanglish"
+                        checked={!noSpanglish}
+                        style={!noSpanglish ? { backgroundColor: 'darkgreen' } : { backgroundColor: 'darkred' }}
+                        onChange={toggleSpanglish}
+                      />
+                      <span className="slider round"></span>
+                    </label>
                   </div>
                 </div>
                 <div className="filterBox search">

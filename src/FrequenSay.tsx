@@ -236,7 +236,9 @@ export default function FrequenSay() {
   return (
     <div className="frequensay">
       <h2>FrequenSay</h2>
-      <FromToLessonSelector />
+      <div className="tempBox">
+        <FromToLessonSelector />
+      </div>
       <div className="buttonBox">
         {!addManualVocabulary && (
           <button type="button" className="greenButton" onClick={() => additionalVocab()}>
