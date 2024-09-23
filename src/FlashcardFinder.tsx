@@ -248,6 +248,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
         }
         return true
       }
+
       const filteredBySearch = tagTable.filter(filterBySearch)
       const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags)
       const suggestTen = []

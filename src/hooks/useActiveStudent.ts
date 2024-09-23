@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Lesson, Program, UserData } from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
@@ -10,10 +10,6 @@ export function useActiveStudent() {
   const { programTableQuery } = useProgramTable()
   const userDataQuery = useUserData()
   const queryClient = useQueryClient()
-
-  // Lookup of the active student's default program and lesson when the program table is ready.
-  const activeProgram = useRef<Program | null>(null)
-  const activeLesson = useRef<Lesson | null>(null)
 
   const studentListQuery = useQuery({
     queryKey: ['studentList'],
@@ -52,59 +48,55 @@ export function useActiveStudent() {
     }
   }
 
-  // Update the student level if the student changes.
-  useEffect(() => {
-    if (activeStudentQuery.data?.recordId && programTableQuery.data?.length) {
-      let studentProgram = programTableQuery.data.find(
+  // Lookup of the active student's default program and lesson when the program table is ready.
+  const activeProgram = useMemo<Program | null>(() => {
+    if (programTableQuery.data?.length && activeStudentQuery.data?.relatedProgram) {
+      return programTableQuery.data.find(
         program => program.recordId === activeStudentQuery.data?.relatedProgram,
-      )
-      if (studentProgram?.recordId) {
-        const studentCohort = activeStudentQuery.data.cohort
-        const getCohortLesson = (cohort: string) => {
-          switch (cohort) {
-            case 'A': return studentProgram?.cohortACurrentLesson
-            case 'B': return studentProgram?.cohortBCurrentLesson
-            case 'C': return studentProgram?.cohortCCurrentLesson
-            case 'D': return studentProgram?.cohortDCurrentLesson
-            case 'E': return studentProgram?.cohortECurrentLesson
-            // case 'F': return studentProgram?.cohortFCurrentLesson
-            // case 'G': return studentProgram?.cohortGCurrentLesson
-            // etc for futureproofing
-          }
+      ) || null
+    }
+    return null
+  }, [programTableQuery.data, activeStudentQuery.data])
+
+  const activeLesson = useMemo<Lesson | null>(() => {
+    if (activeProgram && activeStudentQuery.data?.cohort) {
+      const studentCohort = activeStudentQuery.data.cohort
+      const getCohortLesson = (cohort: string) => {
+        switch (cohort) {
+          case 'A': return activeProgram?.cohortACurrentLesson
+          case 'B': return activeProgram?.cohortBCurrentLesson
+          case 'C': return activeProgram?.cohortCCurrentLesson
+          case 'D': return activeProgram?.cohortDCurrentLesson
+          case 'E': return activeProgram?.cohortECurrentLesson
+          // case 'F': return activeProgram?.cohortFCurrentLesson
+          // case 'G': return activeProgram?.cohortGCurrentLesson
+          // etc for futureproofing
         }
-        const cohortLesson = getCohortLesson(studentCohort)
-        const maxLesson = cohortLesson || 999
-        const lessonList: Lesson[] = []
-        const programWithLessonList: Program = { ...studentProgram }
-        programWithLessonList.lessons?.forEach((lesson) => {
-          const lessonArray = lesson.lesson.split(' ')
-          const lessonString = lessonArray.slice(-1)[0]
-          const lessonNumber = Number.parseInt(lessonString)
-          if (lessonNumber <= maxLesson) {
-            lessonList.push({ ...lesson })
-          }
-        })
-        programWithLessonList.lessons = lessonList
-        studentProgram = programWithLessonList
-        const lastKnownLesson: Lesson = programWithLessonList.lessons.slice(-1)[0] || {}
-        activeProgram.current = studentProgram
-        activeLesson.current = lastKnownLesson
       }
-      else {
-        activeProgram.current = null
-        activeLesson.current = null
+      const cohortLesson = getCohortLesson(studentCohort)
+      const maxLesson = cohortLesson || 999
+      const lessonList: Lesson[] = []
+      activeProgram.lessons?.forEach((lesson) => {
+        const lessonArray = lesson.lesson.split(' ')
+        const lessonString = lessonArray.slice(-1)[0]
+        const lessonNumber = Number.parseInt(lessonString)
+        if (lessonNumber <= maxLesson) {
+          lessonList.push({ ...lesson })
+        }
+      })
+      const lastKnownLesson: Lesson = lessonList.slice(-1)[0]
+      if (lastKnownLesson) {
+        return lastKnownLesson
       }
+      return null
     }
-    else {
-      activeProgram.current = null
-      activeLesson.current = null
-    }
-  }, [activeStudentQuery.data, programTableQuery.data])
+    return null
+  }, [activeProgram, activeStudentQuery.data])
 
   return {
     activeStudentQuery,
-    activeProgram: activeProgram.current,
-    activeLesson: activeLesson.current,
+    activeProgram,
+    activeLesson,
     studentListQuery,
     chooseStudent,
   }
