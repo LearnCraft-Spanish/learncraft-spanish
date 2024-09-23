@@ -8,6 +8,8 @@ function LogoutButton(): JSX.Element | false {
     isAuthenticated && (
       <button
         type="button"
+        id="logout"
+        className={window.location.pathname === '/' ? ' ' : 'notRoot'}
         onClick={() =>
           logout({ logoutParams: { returnTo: window.location.origin } })}
       >

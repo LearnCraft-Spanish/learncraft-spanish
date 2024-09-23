@@ -1,10 +1,16 @@
-import { useContext } from 'react'
-import UserDataContext from '../contexts/UserDataContext'
+import { useQuery } from '@tanstack/react-query'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useBackend } from './useBackend'
 
 export function useUserData() {
-  const context = useContext(UserDataContext)
-  if (!context) {
-    throw new Error('useUserData must be used within a UserDataProvider')
-  }
-  return context
+  const { isAuthenticated } = useAuth0()
+  const { getUserDataFromBackend } = useBackend()
+  const userDataQuery = useQuery({
+    queryKey: ['userData'],
+    queryFn: getUserDataFromBackend,
+    staleTime: Infinity, // Never stale unless manually updated
+    gcTime: Infinity, // Never garbage collect unless manually updated
+    enabled: isAuthenticated,
+  })
+  return userDataQuery
 }

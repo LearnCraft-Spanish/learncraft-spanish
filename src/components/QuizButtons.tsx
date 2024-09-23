@@ -3,33 +3,23 @@ import React from 'react'
 interface QuizButtonsProps {
   decrementExample: () => void
   incrementExample: () => void
-  audioActive: string
-  togglePlaying: () => void
-  playing: boolean
+  firstExample: boolean
+  lastExample: boolean
 }
 
 export default function QuizButtons({
   decrementExample,
   incrementExample,
-  audioActive,
-  togglePlaying,
-  playing,
+  firstExample,
+  lastExample,
 }: QuizButtonsProps): JSX.Element {
   return (
     <div className="buttonBox">
 
-      <button type="button" onClick={decrementExample}>
+      <button type="button" onClick={decrementExample} disabled={firstExample}>
         Previous
       </button>
-      {audioActive && (
-        <button
-          type="button"
-          onClick={togglePlaying}
-        >
-          {playing ? 'Pause Audio' : 'Play Audio'}
-        </button>
-      )}
-      <button type="button" onClick={incrementExample}>
+      <button type="button" onClick={incrementExample} disabled={lastExample}>
         Next
       </button>
 

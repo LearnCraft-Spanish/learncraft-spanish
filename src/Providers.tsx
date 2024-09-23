@@ -3,8 +3,6 @@ import type { ReactNode } from 'react'
 import React from 'react'
 import { Auth0Provider } from '@auth0/auth0-react'
 import { useNavigate } from 'react-router-dom'
-import { ActiveStudentProvider } from './contexts/ActiveStudentContext'
-import { UserDataProvider } from './contexts/UserDataContext'
 
 interface ProvidersProps {
   children: ReactNode
@@ -32,11 +30,7 @@ function Providers({ children }: ProvidersProps) {
         navigate(appState?.targetUrl || '/', { replace: true })
       }}
     >
-      <UserDataProvider>
-        <ActiveStudentProvider>
-          {children}
-        </ActiveStudentProvider>
-      </UserDataProvider>
+      {children}
     </Auth0Provider>
   )
 }
