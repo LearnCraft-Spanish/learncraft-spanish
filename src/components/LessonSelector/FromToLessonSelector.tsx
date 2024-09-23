@@ -75,7 +75,7 @@ export default function FromToLessonSelector(): JSX.Element {
           id="courseList"
           name="courseList"
           className="courseList"
-          value={selectedProgram?.recordId}
+          value={selectedProgram?.recordId ? selectedProgram?.recordId : 0}
           onChange={e => setProgram(e.target.value)}
         >
           {makeCourseSelector()}
