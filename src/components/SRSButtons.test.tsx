@@ -76,4 +76,49 @@ describe('component SRSButtons', () => {
   Future Testing:
   - Test the onClick events for the buttons (unsure how to do it currently, as the functions passed in are called withen the component's own functions)
   */
+  describe('onClick functions', () => {
+    it('increaseDifficulty', () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <SRSQuizButtons
+            currentExample={currentExample}
+            answerShowing
+            incrementExampleNumber={incrementExampleNumber}
+          />
+        </QueryClientProvider>,
+      )
+      screen.getByText('This was hard').click()
+      expect(incrementExampleNumber).toHaveBeenCalled()
+    })
+    it('decreaseDifficulty', () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <SRSQuizButtons
+            currentExample={currentExample}
+            answerShowing
+            incrementExampleNumber={incrementExampleNumber}
+          />
+        </QueryClientProvider>,
+      )
+      screen.getByText('This was easy').click()
+      expect(incrementExampleNumber).toHaveBeenCalled()
+    })
+  })
+  describe('handing of undefined values', () => {
+    it('doesnt call incrementExample when error finding relatedExample', () => {
+      render(
+        <QueryClientProvider client={queryClient}>
+          <SRSQuizButtons
+            currentExample={{ ...currentExample, recordId: 999 }}
+            answerShowing
+            incrementExampleNumber={incrementExampleNumber}
+          />
+        </QueryClientProvider>,
+      )
+      screen.getByText('This was easy').click()
+      expect(incrementExampleNumber).not.toHaveBeenCalled()
+      screen.getByText('This was hard').click()
+      expect(incrementExampleNumber).not.toHaveBeenCalled()
+    })
+  })
 })
