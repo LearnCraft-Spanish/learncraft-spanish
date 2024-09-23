@@ -538,7 +538,7 @@ button:hover, .linkButton:hover {
 .filterSection {
   padding: 0px 20px;
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
@@ -549,50 +549,90 @@ button:hover, .linkButton:hover {
   flex-direction: row;
   flex-wrap: wrap;
   flex-grow: 1;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  /* align-items: center; */
+
+}
+.filterBox.options {
+  flex-direction: column;
+  max-width: 320px;
+  margin-bottom: 8px;
+}
+.filterBox.search {
+  flex-direction: column;
+  justify-self: left;
+  flex-grow: 3;
+
 }
 
 .removeSpanglishBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
   text-align: center;
-  margin: 0 10px;
-
+  
+  margin-top: 24px;
 }
+.removeSpanglishBox button {
+  cursor: pointer;
+}
+/* .removeSpanglishButton {
+  padding: 12px;
+
+} */
 
 .searchFilter{
-  text-align: center;
-  margin: 0 10px;
+  display: inline-block;
   position: relative;
   flex-grow: 2;
-  max-width: 45%;
+  max-width: 100%;
 }
 
 .wordSearchBox .tagSearchBox{
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  max-width: 450px;
+  /* max-width: 450px; */
   margin: auto;
 }
-
-.searchTermBox {
+.tagSearchBox {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  text-align: right;
-  justify-content: center;
-  align-content: center;
+  justify-content: flex-start;
+  max-width: 640px;
+}
+.searchTermBox {
+  width: 100%;
+}
+.searchTermBox input {
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: 100%;
 }
 
 .searchTermBox p, .searchTermBox input {
   margin: 0 5px;
 }
 
+.selectedTagsBox {
+  width: 100%;
+  margin: 0px 12px;
+}
+.selectedTagsBox p {
+  text-align: left;
+}
+
+
 .vocabSuggestionBox, .tagSuggestionBox {
   position: absolute;
-  top: 105px;
-  right: 0px;
+  max-width: 640px;
+  width: 100%;
+  top: 35px;
+  left: 0px;
   z-index: 999;
 }
+
 
 .examplesTable {
   min-height: 1200px;
@@ -624,18 +664,32 @@ button:hover, .linkButton:hover {
   background-color: var(--brand);
 }
 
+.selectedVocab {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 60vw;
+}
+
 .tagCard{
   cursor: pointer;
   text-align: left;
   font-size: 12px;
-  padding: 0px;
+  padding: auto;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  margin: 0 auto;
+  margin: 0 6px;
+  height: 90px;
 }
+.selectedVocab .tagCard {
+  margin: 2px 4px;
+}
+
 
 .tagCard:hover {
   cursor: pointer;
@@ -647,10 +701,17 @@ button:hover, .linkButton:hover {
 
 .tagCard h4, .tagCard h5, .tagCard p {
   color: currentColor;
+  margin: 0;
 }
-
+.tagCard div {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  justify-content: space-between;
+}
 .subcategoryCard, .vocabularyCard, .idiomCard, .conjugationCard, .verbCard {
   width: 100%;
+  height: 100%;
   text-align: left;
   border: 3px solid var(--dark);
   margin: 0px;
@@ -752,10 +813,13 @@ button:hover, .linkButton:hover {
 }
 
 /* ToFromLessonSelector styling for Flashcard Finder */
-
+/* 
+.FromToLessonSelectorWrapper {
+  margin: 6px;
+}
 .FromToLessonSelectorWrapper #courseRow {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   margin: 4px;
 }
 #courseRow p {
@@ -772,7 +836,7 @@ button:hover, .linkButton:hover {
 .FromToLessonSelectorWrapper #flashcardFinderStyling p {
   margin: 0;
   margin-right: 6px;
-}
+} */
 
 
 

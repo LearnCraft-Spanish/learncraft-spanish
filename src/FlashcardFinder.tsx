@@ -375,12 +375,16 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
             <div className="flashcardFinderHeader">
               <h2>Flashcard Finder</h2>
               <div className="filterSection">
-                <div className="filterBox">
+                <div className="filterBox options">
+                  <div className="FromToLessonSelectorWrapper">
+                    <FromToLessonSelector />
+                  </div>
                   <div className="removeSpanglishBox">
                     <h3>Spanglish</h3>
                     {!noSpanglish && (
                       <button
                         type="button"
+                        className="removeSpanglishButton"
                         style={{ backgroundColor: 'darkgreen' }}
                         onClick={toggleSpanglish}
                       >
@@ -397,64 +401,66 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                       </button>
                     )}
                   </div>
-                  <div className="FromToLessonSelectorWrapper">
-                    <FromToLessonSelector />
-                  </div>
                 </div>
-                <div className="filterBox">
+                <div className="filterBox search">
                   <div className="searchFilter">
-                    <h3>Search</h3>
                     <div className="tagSearchBox">
                       <div className="searchTermBox">
+                        {/* Search Icon consider adding at some point */}
+                        {/* <i className="fa-solid fa-search"></i> */}
                         <input
                           type="text"
                           onChange={e => updateTagSearchTerm(e.currentTarget)}
                           onClick={() => openContextual('tagSuggestionBox')}
+                          placeholder="Search tags"
                         />
                         <br></br>
                       </div>
+                      {!!tagSearchTerm.length
+                      && contextual === 'tagSuggestionBox'
+                      && !!suggestedTags.length && (
+                        <div
+                          className="tagSuggestionBox"
+                          ref={currentContextual}
+                        >
+                          {suggestedTags.map(item => (
+                            <div
+                              key={item.id}
+                              className="tagCard"
+                              onClick={() => addTagToRequiredTags(item.id)}
+                            >
+                              <div className={`${item.type}Card`}>
+                                <h4 className="vocabName">{item.tag}</h4>
+                                {item.vocabDescriptor && <h5 className="vocabDescriptor">{item.vocabDescriptor}</h5>}
+                                <p className="vocabUse">{item.type}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {!!tagSearchTerm.length
-                    && contextual === 'tagSuggestionBox'
-                    && !!suggestedTags.length && (
-                      <div
-                        className="tagSuggestionBox"
-                        ref={currentContextual}
-                      >
+                    <div className="selectedTagsBox">
+                      <p>Selected Tags:</p>
+                      {!!requiredTags.length && (
+                        <div className="selectedVocab">
+                          {/* <h5>Search Terms:</h5> */}
+                          {requiredTags.map(item => (
+                            <div
+                              key={item.id}
+                              className="tagCard"
+                              onClick={() => removeTagFromRequiredTags(item.id)}
+                            >
+                              <div className={`${item.type}Card`}>
+                                <h4 className="vocabName">{item.tag}</h4>
+                                {item.vocabDescriptor && <h5 className="vocabDescriptor">{item.vocabDescriptor}</h5>}
+                                <p className="vocabUse">{item.type}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
-                        {suggestedTags.map(item => (
-                          <div
-                            key={item.id}
-                            className="tagCard"
-                            onClick={() => addTagToRequiredTags(item.id)}
-                          >
-                            <div className={`${item.type}Card`}>
-                              <h4 className="vocabName">{item.tag}</h4>
-                              {item.vocabDescriptor && <h5 className="vocabDescriptor">{item.vocabDescriptor}</h5>}
-                              <p className="vocabUse">{item.type}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {!!requiredTags.length && (
-                      <div className="selectedVocab">
-                        <h5>Search Terms:</h5>
-                        {requiredTags.map(item => (
-                          <div
-                            key={item.id}
-                            className="tagCard"
-                            onClick={() => removeTagFromRequiredTags(item.id)}
-                          >
-                            <div className={`${item.type}Card`}>
-                              <h4 className="vocabName">{item.tag}</h4>
-                              {item.vocabDescriptor && <h5 className="vocabDescriptor">{item.vocabDescriptor}</h5>}
-                              <p className="vocabUse">{item.type}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
