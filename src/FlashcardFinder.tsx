@@ -218,9 +218,9 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
             if (!foundExample) {
               return ''
             }
-            return `${foundExample.recordId}\t
-            ${foundExample.spanishExample}\t
-            ${foundExample.englishTranslation}\t
+            return `${foundExample.recordId}\t\
+            ${foundExample.spanishExample}\t\
+            ${foundExample.englishTranslation}\t\
             ${foundExample.spanishAudioLa}\n`
           },
 
