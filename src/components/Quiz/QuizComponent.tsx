@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 
-import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
-import { useActiveStudent } from '../hooks/useActiveStudent'
-import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
-import { fisherYatesShuffle } from '../functions/fisherYatesShuffle'
+import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions'
+import { useActiveStudent } from '../../hooks/useActiveStudent'
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
+import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle'
+import MenuButton from '../Buttons/MenuButton'
 import FlashcardDisplay from './FlashcardDisplay'
 import QuizButtons from './QuizButtons'
-import MenuButton from './MenuButton'
 import SRSQuizButtons from './SRSButtons'
-import NewQuizProgress from './AudioBasedReview/NewQuizProgress'
+import NewQuizProgress from './../AudioBasedReview/NewQuizProgress'
 
 interface QuizComponentProps {
   quizTitle: string

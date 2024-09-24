@@ -4,14 +4,12 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { sampleStudentFlashcardData } from '../../tests/mockData'
+import { sampleStudentFlashcardData } from '../../../tests/mockData'
 
 import Quiz from './QuizComponent'
 
 const queryClient = new QueryClient()
 
-const addFlashcard = vi.fn()
-const removeFlashcard = vi.fn()
 const cleanupFunction = vi.fn()
 
 vi.mock('../contexts/UserDataContext')

@@ -1,7 +1,7 @@
 import React from 'react'
-import type { Flashcard } from '../interfaceDefinitions'
-import { formatEnglishText, formatSpanishText } from '../functions/formatFlashcardText'
-import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
+import type { Flashcard } from '../../interfaceDefinitions'
+import { formatEnglishText, formatSpanishText } from '../../functions/formatFlashcardText'
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
 import './Quiz.css'
 
 interface FlashcardProps {

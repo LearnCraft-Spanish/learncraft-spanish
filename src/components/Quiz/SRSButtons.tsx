@@ -1,5 +1,5 @@
-import type { Flashcard } from '../interfaceDefinitions'
-import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
+import type { Flashcard } from '../../interfaceDefinitions'
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
 
 interface QuizButtonsProps {
   currentExample: Flashcard

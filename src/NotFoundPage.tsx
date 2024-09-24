@@ -1,6 +1,6 @@
 import React from 'react'
 
-import MenuButton from './components/MenuButton'
+import MenuButton from './components/Buttons/MenuButton'
 
 function NotFoundPage(): JSX.Element {
   return (

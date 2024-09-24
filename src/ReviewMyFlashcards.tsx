@@ -5,9 +5,9 @@ import type { FormEvent } from 'react'
 
 import { useActiveStudent } from './hooks/useActiveStudent'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
-import MenuButton from './components/MenuButton'
+import MenuButton from './components/Buttons/MenuButton'
 import Loading from './components/Loading'
-import QuizComponent from './components/QuizComponent'
+import QuizComponent from './components/Quiz/QuizComponent'
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards()

@@ -3,8 +3,8 @@ import { cleanup, render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { sampleStudentFlashcardData } from '../../tests/mockData.js'
-import type { Flashcard } from '../interfaceDefinitions'
+import { sampleStudentFlashcardData } from '../../../tests/mockData.js'
+import type { Flashcard } from '../../interfaceDefinitions'
 
 import SRSQuizButtons from './SRSButtons'
 

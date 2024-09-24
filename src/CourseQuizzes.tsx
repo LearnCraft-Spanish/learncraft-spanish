@@ -10,7 +10,7 @@ import './App.css'
 import type { QuizCourse } from './interfaceDefinitions'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
 import OfficialQuiz from './OfficialQuiz'
-import MenuButton from './components/MenuButton'
+import MenuButton from './components/Buttons/MenuButton'
 
 interface CourseQuizzesProps {
   chosenQuiz: number
