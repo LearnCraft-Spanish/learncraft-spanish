@@ -1,5 +1,5 @@
 export function formatSpanishText(isSpanglish: string, spanishText: string): JSX.Element {
-  if (isSpanglish !== 'spanglish') {
+  if (isSpanglish === 'esp') {
     return <p className="spanishFlashcardText">{spanishText}</p>
   }
   else {

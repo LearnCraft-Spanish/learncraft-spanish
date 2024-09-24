@@ -1,26 +1,29 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
 import type { FormEvent } from 'react'
 
-import { set } from 'lodash'
-import type { Flashcard } from './interfaceDefinitions'
-
 import { useActiveStudent } from './hooks/useActiveStudent'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import MenuButton from './components/MenuButton'
-import Quiz from './components/Quiz'
-import SRSQuizApp from './SRSQuizApp'
+import Loading from './components/Loading'
+import QuizComponent from './components/QuizComponent'
 
 export default function MyFlashcardsQuiz() {
-  const { studentFlashcardData, flashcardDataSynced } = useActiveStudent()
-  const [quizExamples, setQuizExamples] = useState<Flashcard[]>(studentFlashcardData?.examples || [])
+  const { flashcardDataQuery } = useStudentFlashcards()
+  const { activeStudentQuery } = useActiveStudent()
   const [isSrs, setIsSrs] = useState<boolean>(false)
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false)
-  const [quizLength, setQuizLength] = useState<number>(quizExamples.length)
+  const [quizLength, setQuizLength] = useState<number>(10)
   const [quizReady, setQuizReady] = useState<boolean>(false)
 
   const navigate = useNavigate()
   const location = useLocation()
+
+  const dataReady = activeStudentQuery.isSuccess && flashcardDataQuery.isSuccess
+  const dataError = !dataReady && (activeStudentQuery.isError || flashcardDataQuery.isError)
+  const dataLoading = !dataReady && !dataError && (activeStudentQuery.isLoading || flashcardDataQuery.isLoading)
+  const unavailable = (activeStudentQuery.isSuccess && !(activeStudentQuery.data?.role === 'student')) || (flashcardDataQuery.isSuccess && !flashcardDataQuery.data?.examples?.length)
 
   function handleSumbit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -34,66 +37,30 @@ export default function MyFlashcardsQuiz() {
     }
   }
 
-  const getStudentExampleFromExample = useCallback((example: Flashcard) => {
-    const relatedStudentExample = studentFlashcardData?.studentExamples.find(
-      element => element.relatedExample === example.recordId,
-    )
-    return relatedStudentExample
-  }, [studentFlashcardData])
-
-  const getDueDateFromExample = useCallback((example: Flashcard) => {
-    const relatedStudentExample = getStudentExampleFromExample(example)
-    if (!relatedStudentExample) {
-      return ''
-    }
-    const dueDate = relatedStudentExample.nextReviewDate
-    return dueDate
-  }, [getStudentExampleFromExample])
-
-  const getDueExamples = useCallback(() => {
-    if (!studentFlashcardData) {
-      return []
-    }
-    const isBeforeToday = (dateArg: string) => {
-      const today = new Date()
-      const reviewDate = new Date(dateArg)
-      if (reviewDate >= today) {
-        return false
-      }
-      return true
-    }
-    const allExamples = [...studentFlashcardData.examples]
-    const dueExamples = allExamples.filter(
-      example =>
-        isBeforeToday(
-          getDueDateFromExample(example),
-        ),
-    )
-    return dueExamples
-  }, [getDueDateFromExample, studentFlashcardData])
-
   function calculateQuizLengthOptions() {
-    const quizLengthOptions = []
-    for (let i = 10; i < quizExamples.length; i = 5 * Math.floor(i * 0.315)) {
-      quizLengthOptions.push(i)
+    let exampleCount
+    if (isSrs) {
+      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(studentExample => studentExample.nextReviewDate ? new Date(studentExample.nextReviewDate) <= new Date() : true).length
     }
-    quizLengthOptions.push(quizExamples.length)
+    else {
+      exampleCount = flashcardDataQuery.data?.examples?.length
+    }
+    if (!exampleCount) {
+      return [0]
+    }
+    const quizLengthOptions = []
+    if (exampleCount > 10) {
+      for (let i = 10; i < exampleCount; i = 5 * Math.floor(i * 0.315)) {
+        quizLengthOptions.push(i)
+      }
+    }
+    quizLengthOptions.push(exampleCount)
     return quizLengthOptions
   }
 
   function makeQuizUnready() {
     setQuizReady(false)
   }
-
-  useEffect(() => {
-    if (isSrs) {
-      const dueExamples = getDueExamples()
-      setQuizExamples(dueExamples)
-    }
-    else {
-      setQuizExamples(studentFlashcardData?.examples || [])
-    }
-  }, [isSrs, studentFlashcardData?.examples, getDueExamples])
 
   useEffect(() => {
     if (location.pathname !== '/myflashcards') {
@@ -103,7 +70,10 @@ export default function MyFlashcardsQuiz() {
 
   return (
     <div>
-      {!quizReady && (
+      {dataError && <h2>Error Loading Flashcards</h2>}
+      {dataLoading && <Loading message="Loading Flashcard Data..." />}
+      {unavailable && <Navigate to="/" />}
+      {!quizReady && dataReady && (
         <form className="myFlashcardsForm" onSubmit={e => handleSumbit(e)}>
           <div className="myFlashcardsFormContentWrapper">
             <h3>Review My Flashcards</h3>
@@ -125,7 +95,7 @@ export default function MyFlashcardsQuiz() {
             </div>
             <label htmlFor="quizLength">
               <p>Number of Flashcards:</p>
-              <select name="length" id="quizLength" onChange={e => setQuizLength(Number.parseInt(e.target.value))}>
+              <select name="length" id="quizLength" onChange={e => setQuizLength(Number.parseInt(e.target.value))} defaultValue={quizLength}>
                 {calculateQuizLengthOptions().map(option => (
                   <option key={option} value={option}>
                     {option}
@@ -135,7 +105,7 @@ export default function MyFlashcardsQuiz() {
             </label>
           </div>
           <div className="buttonBox">
-            <button type="submit">Start Quiz</button>
+            <button type="submit" disabled={calculateQuizLengthOptions()[0] === 0}>Start Quiz</button>
           </div>
           <div className="buttonBox">
             <MenuButton />
@@ -145,9 +115,9 @@ export default function MyFlashcardsQuiz() {
       <Routes>
         <Route
           path="quiz"
-          element={(
-            <Quiz
-              examplesToParse={quizExamples}
+          element={flashcardDataQuery.data?.examples && (
+            <QuizComponent
+              examplesToParse={flashcardDataQuery.data?.examples}
               quizTitle="My Flashcards"
               quizOnlyCollectedExamples
               cleanupFunction={() => makeQuizUnready()}
@@ -158,17 +128,19 @@ export default function MyFlashcardsQuiz() {
         />
         <Route
           path="srsquiz"
-          element={(
-            <SRSQuizApp
+          element={flashcardDataQuery.data?.examples && (
+            <QuizComponent
+              examplesToParse={flashcardDataQuery.data?.examples}
+              quizTitle="My Flashcards for Today"
+              quizOnlyCollectedExamples
+              cleanupFunction={() => makeQuizUnready()}
               startWithSpanish={spanishFirst}
               quizLength={quizLength}
-              cleanupFunction={() => makeQuizUnready()}
+              isSrsQuiz
             />
           )}
         />
       </Routes>
-      {flashcardDataSynced && !studentFlashcardData?.studentExamples?.length
-      && <Navigate to="/" />}
     </div>
   )
 }

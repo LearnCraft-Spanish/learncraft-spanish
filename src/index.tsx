@@ -1,9 +1,10 @@
-// index.tsx
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import * as Sentry from '@sentry/react'
 import { BrowserRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import App from './App'
 import Providers from './Providers'
 
@@ -13,14 +14,21 @@ if (!rootElement) {
 }
 const root = ReactDOM.createRoot(rootElement)
 
+// Move QueryClient outside BrowserRouter and Providers
+const queryClient = new QueryClient()
+
 root.render(
   <React.StrictMode>
     <Sentry.ErrorBoundary fallback={<p>Something went wrong</p>}>
-      <BrowserRouter>
-        <Providers>
-          <App />
-        </Providers>
-      </BrowserRouter>
+      {/* Provide the QueryClient at the highest level */}
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <Providers>
+            <App />
+          </Providers>
+        </BrowserRouter>
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </Sentry.ErrorBoundary>
   </React.StrictMode>,
 )

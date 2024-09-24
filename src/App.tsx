@@ -1,38 +1,31 @@
 import './App.css'
 import type { ReactElement } from 'react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
-import { Navigate, Route, useLocation, useNavigate } from 'react-router-dom'
+import { Route, useLocation } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
 
 import { useUserData } from './hooks/useUserData'
 import { useActiveStudent } from './hooks/useActiveStudent'
-import type { Flashcard, Lesson, Program } from './interfaceDefinitions'
+import type { UserData } from './interfaceDefinitions'
 import SentryRoutes from './functions/SentryRoutes'
-import logo from './resources/typelogosmall.png'
 import Menu from './Menu'
-import AudioQuiz from './AudioQuiz'
-import LoginButton from './components/LoginButton'
-import LogoutButton from './components/LogoutButton'
 import LCSPQuizApp from './LCSPQuizApp'
 import FrequenSay from './FrequenSay'
 import NotFoundPage from './NotFoundPage'
-import ComprehensionQuiz from './ComprehensionQuiz'
 import FlashcardFinder from './FlashcardFinder'
 import CallbackPage from './CallbackPage'
 import FlashcardManager from './FlashcardManager'
 import ReviewMyFlashcards from './ReviewMyFlashcards'
+import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
+import Nav from './components/Nav'
+import Loading from './components/Loading'
 
 export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation()
-  const navigate = useNavigate()
-  const { userData } = useUserData()
-  const { activeStudent, activeLesson, activeProgram, choosingStudent, programTable, studentList, chooseStudent, keepStudent, updateActiveStudent } = useActiveStudent()
+  const userDataQuery = useUserData()
+  const { activeStudentQuery, studentListQuery, chooseStudent } = useActiveStudent()
   const { isAuthenticated, isLoading } = useAuth0()
-
-  // States for Lesson Selector
-  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null)
-  const [selectedProgram, setSelectedProgram] = useState<Program | null>(null)
 
   // States for banner message
   const [bannerMessage, setBannerMessage] = useState('')
@@ -41,6 +34,9 @@ export const App: React.FC = () => {
   // Reference to the current contextual menu element
   const currentContextual = useRef<HTMLDivElement | null >(null)
   const [contextual, setContextual] = useState('') // String to indicate which contextual menu is open
+
+  // Boolean state to determine whether to show the student selector menu
+  const [studentSelectorOpen, setStudentSelectorOpen] = useState(false)
 
   // global functions to open and close any contextual menus – hard limit to one at a time
   const openContextual = useCallback((elementClass: string) => {
@@ -76,48 +72,7 @@ export const App: React.FC = () => {
     }
   }
 
-  // local functions for admins to choose or keep a student from the menu
-  const updateSelectedLesson = useCallback((lessonId: number | string) => {
-    if (typeof lessonId === 'string') {
-      lessonId = Number.parseInt(lessonId)
-    }
-    let newLesson = null
-    programTable.forEach((program) => {
-      const foundLesson = program.lessons.find(item => item.recordId === lessonId)
-      if (foundLesson) {
-        newLesson = foundLesson
-      }
-    })
-    setSelectedLesson(newLesson)
-  }, [programTable])
-
-  const updateSelectedProgram = useCallback((programId: number | string) => {
-    if (typeof programId === 'string') {
-      programId = Number.parseInt(programId)
-    }
-    let newProgram = null
-    newProgram = programTable.find(program => program.recordId === programId)
-    || (/* activeProgram.current.recordId
-        ? activeProgram.current
-        : */programTable.find(program => program.recordId === 2)) // Active program not currently defined
-    if (newProgram) {
-    /* if (
-      activeLesson.current.recordId
-      && newProgram?.recordId === activeProgram.current.recordId
-    ) {
-      const lessonToSelect = activeLesson.current.recordId
-      updateSelectedLesson(lessonToSelect)
-    }
-    else { */
-      setSelectedProgram(newProgram)
-      const firstLesson = newProgram.lessons[0]
-      const lessonToSelect = firstLesson.recordId
-      updateSelectedLesson(lessonToSelect)
-    // }
-    }
-  }, [programTable, updateSelectedLesson])// Add activeProgram, activeLesson when defined
-
-  const updateBannerMessage = useCallback((message: string) => {
+  const _updateBannerMessage = useCallback((message: string) => {
     setBannerMessage(message)
   }, [])
 
@@ -126,28 +81,22 @@ export const App: React.FC = () => {
   }, [])
 
   const makeStudentSelector = useCallback(() => {
-    if (userData?.isAdmin) {
+    if (userDataQuery.data?.isAdmin && studentListQuery.isSuccess) {
       const studentSelector = [
         <option key={0} label="">
-          {' '}
           -- None Selected --
         </option>,
       ]
-      studentList.forEach((student) => {
+      studentListQuery.data.forEach((student: UserData) => {
         const studentEmail = student.emailAddress
-        if (!studentEmail.includes('(')) {
+        const studentRole = student.role
+        if (!studentEmail.includes('(') && (studentRole === 'student' || studentRole === 'limited')) {
           studentSelector.push(
             <option
               key={student.recordId}
               value={student.recordId}
-              label={student.name}
-            >
-              {student.name}
-              {' '}
-              (
-              {student.emailAddress}
-              )
-            </option>,
+              label={`${student.name} -- ${studentEmail}`}
+            />,
           )
         }
       })
@@ -164,54 +113,20 @@ export const App: React.FC = () => {
       studentSelector.sort(studentSelectorSortFunction)
       return studentSelector
     }
-  }, [userData, studentList])
+  }, [userDataQuery.data?.isAdmin, studentListQuery.isSuccess, studentListQuery.data])
 
-  const filterExamplesByAllowedVocab = useCallback((examples: Flashcard[], lessonId: number) => {
-    let allowedVocabulary: string[] = []
-    programTable.forEach((program) => {
-      const foundLesson = program.lessons.find(
-        item => item.recordId === lessonId,
-      )
-      if (foundLesson) {
-        allowedVocabulary = foundLesson.vocabKnown || []
-      }
-      return allowedVocabulary
-    })
-    const filteredByAllowed = examples.filter((item) => {
-      let isAllowed = true
-      if (
-        item.vocabIncluded.length === 0
-        || item.vocabComplete === false
-        || item.spanglish === 'spanglish'
-      ) {
-        isAllowed = false
-      }
-      item.vocabIncluded.forEach((word) => {
-        if (!allowedVocabulary.includes(word)) {
-          isAllowed = false
-        }
-      })
-      return isAllowed
-    })
-    return filteredByAllowed
-  }, [programTable])
+  const openStudentSelector = useCallback(() => {
+    setStudentSelectorOpen(true)
+  }, [])
 
+  const closeStudentSelector = useCallback(() => {
+    setStudentSelectorOpen(false)
+  }, [])
+
+  // Close Student Selector on selection
   useEffect(() => {
-    if (activeLesson?.current) {
-      updateSelectedLesson(activeLesson.current.recordId)
-    }
-  }, [activeLesson, activeStudent, programTable, updateSelectedLesson])
-
-  useEffect(() => {
-    // renders twice if student has an active program
-    if (activeProgram?.current) {
-      updateSelectedProgram(activeProgram.current.recordId)
-    }
-    // Setting Default Vaules for selectedProgram and selectedLesson
-    else if (!selectedProgram && programTable.length) {
-      updateSelectedProgram(programTable[0].recordId)
-    }
-  }, [activeProgram, activeStudent, programTable, selectedProgram, updateSelectedProgram])
+    closeStudentSelector()
+  }, [activeStudentQuery?.data, closeStudentSelector])
 
   useEffect(() => {
     clearTimeout(messageNumber.current)
@@ -224,58 +139,61 @@ export const App: React.FC = () => {
 
   return (
     <div className="App" onClick={closeContextualIfClickOut}>
-      <div className="div-header">
-        <div className="homeButton" onClick={() => navigate('/')}>
-          <img src={logo} alt="Learncraft Spanish Logo" />
-        </div>
-        <LogoutButton />
-        <LoginButton />
-      </div>
-      {location.pathname !== '/coaching' && (
+      <Nav />
+      {(location.pathname !== '/coaching'
+      && location.pathname !== '/comprehensionquiz'
+      && location.pathname !== '/audioquiz'
+      && location.pathname !== '/myflashcards/quiz'
+      && location.pathname !== '/myflashcards/srsquiz'
+      && location.pathname.split('/')[1] !== 'officialquizzes') && (
         <div className="div-user-subheader">
           {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>
           )}
           {isLoading && <p>Logging In...</p>}
-          {!isLoading && isAuthenticated && !userData && <p>Loading user data...</p>}
-          {!isLoading && isAuthenticated && userData
-          && (userData?.role === 'student' || userData?.role === 'limited')
-          && !userData.isAdmin && (
-            <p>
-              Welcome back,
-              {` ${userData.name}`}
-              !
-            </p>
+          {!isLoading && isAuthenticated && userDataQuery.isLoading && <p>Loading user data...</p>}
+          {!isLoading && isAuthenticated && userDataQuery.isError && <p>Error loading user data.</p>}
+          {!isLoading && isAuthenticated && userDataQuery.isSuccess
+          && (userDataQuery.data?.role === 'student' || userDataQuery.data?.role === 'limited')
+          && !userDataQuery.data?.isAdmin
+          && (
+            userDataQuery.data.name
+              ? (<p>{`Welcome back, ${userDataQuery.data.name}!`}</p>)
+              : (<p>Welcome back!</p>)
           )}
 
-          {!isLoading && isAuthenticated && userData && userData?.role !== 'student'
-          && userData?.role !== 'limited'
-          && !userData?.isAdmin && <p>Welcome back!</p>}
+          {!isLoading && isAuthenticated
+          && userDataQuery.isSuccess
+          && userDataQuery.data?.role !== 'student'
+          && userDataQuery.data?.role !== 'limited'
+          && !userDataQuery.data?.isAdmin
+          && <p>Welcome back!</p>}
 
-          {userData?.isAdmin && !choosingStudent && (
+          {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
             <div className="studentList">
-              {activeStudent?.recordId && (
+              {activeStudentQuery.data?.recordId && (
                 <p>
-                  Using as
-                  {' '}
-                  {activeStudent.name}
-                  {activeStudent.recordId === userData.recordId
-                  && ' (yourself)'}
+                  {`Using as ${activeStudentQuery.data?.name}
+                  ${
+                    (activeStudentQuery.data?.recordId === userDataQuery.data?.recordId)
+                    ? ' (yourself)'
+                    : ''
+                  }`}
                 </p>
               )}
-              {!activeStudent?.recordId && <p>No student Selected</p>}
-              <button type="button" onClick={chooseStudent}>Change</button>
+              {!activeStudentQuery.data?.recordId && <p>No student Selected</p>}
+              <button type="button" onClick={openStudentSelector}>Change</button>
             </div>
           )}
-          {userData?.isAdmin && choosingStudent && (
+          {userDataQuery.data?.isAdmin && studentSelectorOpen && (
             <form className="studentList" onSubmit={e => e.preventDefault}>
               <select
-                value={activeStudent ? activeStudent.recordId : undefined}
-                onChange={e => updateActiveStudent(Number.parseInt(e.target.value))}
+                value={activeStudentQuery.data ? activeStudentQuery.data?.recordId : undefined}
+                onChange={e => chooseStudent(Number.parseInt(e.target.value))}
               >
                 {makeStudentSelector()}
               </select>
-              <button type="button" onClick={keepStudent}>Cancel</button>
+              <button type="button" onClick={closeStudentSelector}>Cancel</button>
             </form>
           )}
         </div>
@@ -286,6 +204,9 @@ export const App: React.FC = () => {
           <p>{bannerMessage}</p>
         </div>
       )}
+      {isLoading && !isAuthenticated && <Loading message="Logging in..." />}
+      {!isLoading && isAuthenticated && userDataQuery.isLoading && <Loading message="Loading User Data..." />}
+      {!isLoading && isAuthenticated && userDataQuery.isError && <h2>Error loading user data.</h2>}
       <SentryRoutes>
         <Route
           path="/"
@@ -296,34 +217,8 @@ export const App: React.FC = () => {
         <Route path="/callback" element={<CallbackPage />} />
         <Route
           path="/myflashcards/*"
-          element={
-            (activeStudent?.role === 'student')
-            && <ReviewMyFlashcards />
-          }
+          element={<ReviewMyFlashcards />}
         />
-        {/* <Route
-          path="/allflashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples?.length)
-              ? (
-                  <Quiz
-                    examplesToParse={studentFlashcardData?.examples}
-                    quizTitle="My Flashcards"
-                    quizOnlyCollectedExamples
-                    cleanupFunction={() => navigate('..')}
-                  />
-                )
-              : (<Navigate to="/" />)
-          }
-        />
-        <Route
-          path="/todaysflashcards"
-          element={
-            (activeStudent?.role === 'student' && studentFlashcardData?.studentExamples.length)
-              ? <SRSQuizApp />
-              : <Navigate to="/" />
-          }
-        /> */}
         <Route
           path="/manage-flashcards"
           element={<FlashcardManager />}
@@ -332,22 +227,15 @@ export const App: React.FC = () => {
         <Route
           path="/officialquizzes/*"
           element={(
-            <LCSPQuizApp
-              selectedProgram={selectedProgram}
-              selectedLesson={selectedLesson}
-            />
+            <LCSPQuizApp />
           )}
         />
         )
         <Route
           path="/flashcardfinder"
           element={
-            (userData?.role === 'student' || userData?.isAdmin) && (
+            (userDataQuery.data?.role === 'student' || userDataQuery.data?.isAdmin) && (
               <FlashcardFinder
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
                 contextual={contextual}
                 openContextual={openContextual}
                 ref={currentContextual}
@@ -356,49 +244,30 @@ export const App: React.FC = () => {
           }
         />
         <Route
-          path="/audioquiz"
+          path="/audioquiz/*"
           element={
-            (userData?.role === 'student'
-            || userData?.role === 'limited'
-            || userData?.isAdmin) && (
-              <AudioQuiz
-                updateBannerMessage={updateBannerMessage}
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-              />
+            (userDataQuery.data?.role === 'student'
+            || userDataQuery.data?.role === 'limited'
+            || userDataQuery.data?.isAdmin) && (
+              <AudioBasedReview audioOrComprehension="audio" willAutoplay />
             )
           }
         />
         <Route
-          path="/comprehensionquiz"
+          path="/comprehensionquiz/*"
           element={
-            (userData?.role === 'student'
-            || userData?.role === 'limited'
-            || userData?.isAdmin) && (
-              <ComprehensionQuiz
-                updateBannerMessage={updateBannerMessage}
-                filterExamplesByAllowedVocab={filterExamplesByAllowedVocab}
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-              />
+            (userDataQuery.data?.role === 'student'
+            || userDataQuery.data?.role === 'limited'
+            || userDataQuery.data?.isAdmin) && (
+              <AudioBasedReview audioOrComprehension="comprehension" willAutoplay={false} />
             )
           }
         />
         <Route
           path="/frequensay"
           element={
-            userData?.isAdmin && (
-              <FrequenSay
-                selectedLesson={selectedLesson}
-                selectedProgram={selectedProgram}
-                updateSelectedLesson={updateSelectedLesson}
-                updateSelectedProgram={updateSelectedProgram}
-              />
+            userDataQuery.data?.isAdmin && (
+              <FrequenSay />
             )
           }
         />

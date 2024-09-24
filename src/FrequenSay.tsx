@@ -1,27 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-import LessonSelector from './LessonSelector'
+import { FromToLessonSelector } from './components/LessonSelector'
 import { useBackend } from './hooks/useBackend'
-import { useActiveStudent } from './hooks/useActiveStudent'
+import { useSelectedLesson } from './hooks/useSelectedLesson'
+import type { Vocabulary } from './interfaceDefinitions'
 
-export default function FrequenSay({
-  selectedLesson,
-  updateSelectedLesson,
-  selectedProgram,
-  updateSelectedProgram,
-}) {
-  const { programTable } = useActiveStudent()
+interface WordCount {
+  word: string
+  count: number
+}
+
+export default function FrequenSay() {
   const { getVocabFromBackend, getSpellingsFromBackend } = useBackend()
+  const { selectedToLesson } = useSelectedLesson()
   const [userInput, setUserInput] = useState('')
   const [userAddedVocabulary, setUserAddedVocabulary] = useState('')
   const [addManualVocabulary, setAddManualVocabulary] = useState(false)
-  const [vocabularyTable, setVocabularyTable] = useState([])
-  const [unknownWordCount, setUnknownWordCount] = useState([])
-  const [acceptableWordSpellings, setAcceptableWordSpellings] = useState([])
+  const [vocabularyTable, setVocabularyTable] = useState<Vocabulary[]>([])
+  const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([])
+  const [acceptableWordSpellings, setAcceptableWordSpellings] = useState<string[]>([])
   const passageLength = useRef(0)
   const comprehensionPercentage = useRef(0)
-  const wordCount = useRef([])
-  const extraAcceptableWords = useRef([])
+  const wordCount = useRef<WordCount[]>([])
+  const extraAcceptableWords = useRef<WordCount[]>([])
   const rendered = useRef(false)
 
   function additionalVocab() {
@@ -33,7 +34,7 @@ export default function FrequenSay({
     setAddManualVocabulary(false)
   }
 
-  function sortVocab(a, b) {
+  function sortVocab(a: Vocabulary, b: Vocabulary): number {
     if (a.frequencyRank === b.frequencyRank) {
       if (!a.wordIdiom.includes(' ') && b.wordIdiom.includes(' ')) {
         return 1
@@ -45,9 +46,10 @@ export default function FrequenSay({
     else {
       return a.frequencyRank - b.frequencyRank
     }
+    return 0
   }
 
-  async function getVocab() {
+  const getVocab = useCallback(async () => {
     try {
       const spellings = getSpellingsFromBackend()
       const vocab = await getVocabFromBackend().then(
@@ -72,12 +74,17 @@ export default function FrequenSay({
       vocab.sort(sortVocab)
       return vocab
     }
-    catch (e) {
-      console.error(e.message)
+    catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error(e.message)
+      }
+      else {
+        console.error('Error playing audio. Error: ', e)
+      }
     }
-  }
+  }, [getVocabFromBackend, getSpellingsFromBackend])
 
-  function updateUserInput(newInput) {
+  function updateUserInput(newInput: string) {
     const vocabWordCount = countVocabularyWords(newInput)
     const uniqueWordsWithCounts = vocabWordCount[0]
     const totalWordCount = vocabWordCount[1]
@@ -87,7 +94,7 @@ export default function FrequenSay({
     return vocabWordCount
   }
 
-  function updateUserAddedVocabulary(newInput) {
+  function updateUserAddedVocabulary(newInput: string) {
     const vocabWordCount = countVocabularyWords(newInput)
     const uniqueWordsWithCounts = vocabWordCount[0]
     setUserAddedVocabulary(newInput)
@@ -95,7 +102,7 @@ export default function FrequenSay({
     return uniqueWordsWithCounts
   }
 
-  function countVocabularyWords(string) {
+  function countVocabularyWords(string: string): [WordCount[], number] {
     const segmenter = new Intl.Segmenter([], { granularity: 'word' })
     const segmentedText = segmenter.segment(string)
     /*
@@ -114,24 +121,24 @@ export default function FrequenSay({
       .filter(s => s.isWordLike)
       .map(s => s.segment.toLowerCase())
     let u = 0
-    const wordCount = []
+    const localWordCount: WordCount[] = []
     while (u < sanitizedArray.length) {
       const thisWord = sanitizedArray[u]
-      const wordFound = wordCount.find(word => word.word === thisWord)
+      const wordFound = localWordCount.find(word => word.word === thisWord)
       if (wordFound) {
         wordFound.count++
       }
       else if (Number.isNaN(Number.parseFloat(thisWord))) {
-        wordCount.push({ word: thisWord, count: 1 })
+        localWordCount.push({ word: thisWord, count: 1 })
       }
       u++
     }
-    wordCount.sort((a, b) => b.count - a.count)
-    return [wordCount, sanitizedArray.length]
+    localWordCount.sort((a, b) => b.count - a.count)
+    return [localWordCount, sanitizedArray.length]
   }
 
-  function filterWordCountByUnknown() {
-    function filterWordsByUnknown(word) {
+  const filterWordCountByUnknown = useCallback(async () => {
+    function filterWordsByUnknown(word: WordCount): boolean {
       if (acceptableWordSpellings.includes(word.word)) {
         return false
       }
@@ -149,12 +156,12 @@ export default function FrequenSay({
         ? 100 - Math.floor((totalWordsUnknown / passageLength.current) * 100)
         : 100
     setUnknownWordCount(unknownWordCount)
-  }
+  }, [acceptableWordSpellings])
 
-  function getAcceptableWordSpellingsFromSelectedLesson() {
-    const acceptableSpellings = []
-    if (selectedLesson.recordId) {
-      selectedLesson.vocabKnown.forEach((vocabName) => {
+  const getAcceptableWordSpellingsFromSelectedLesson = useCallback(() => {
+    const acceptableSpellings: string[] = []
+    if (selectedToLesson?.recordId) {
+      selectedToLesson.vocabKnown.forEach((vocabName) => {
         const vocabularyItem = vocabularyTable.find(
           item => item.vocabName === vocabName,
         )
@@ -166,7 +173,7 @@ export default function FrequenSay({
       })
     }
     return acceptableSpellings
-  }
+  }, [selectedToLesson, vocabularyTable])
 
   function makeUnknownWordList() {
     const tableToDisplay = unknownWordCount.map(item => (
@@ -195,17 +202,17 @@ export default function FrequenSay({
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true
-      async function setupVocabTable() {
-        const vocab = getVocab()
-        setVocabularyTable(await vocab)
+      function setupVocabTable() {
+        getVocab()
+          .then((vocab) => {
+            if (vocab) {
+              setVocabularyTable(vocab)
+            }
+          })
       }
       setupVocabTable()
     }
-  }, [])
-
-  useEffect(() => {
-    // console.log(vocabularyTable)
-  }, [vocabularyTable])
+  }, [getVocab])
 
   useEffect(() => {
     if (vocabularyTable.length > 0) {
@@ -216,26 +223,22 @@ export default function FrequenSay({
       })
       setAcceptableWordSpellings(acceptableSpellings)
     }
-  }, [selectedLesson, vocabularyTable, userAddedVocabulary])
+  }, [selectedToLesson, vocabularyTable, userAddedVocabulary, getAcceptableWordSpellingsFromSelectedLesson])
 
   useEffect(() => {
-    if (selectedLesson) {
-      if (selectedLesson.recordId) {
+    if (selectedToLesson) {
+      if (selectedToLesson?.recordId) {
         filterWordCountByUnknown()
       }
     }
-  }, [selectedLesson, vocabularyTable, userInput, acceptableWordSpellings])
+  }, [selectedToLesson, vocabularyTable, userInput, acceptableWordSpellings, filterWordCountByUnknown])
 
   return (
     <div className="frequensay">
       <h2>FrequenSay</h2>
-      <LessonSelector
-        programTable={programTable}
-        selectedLesson={selectedLesson}
-        updateSelectedLesson={updateSelectedLesson}
-        selectedProgram={selectedProgram}
-        updateSelectedProgram={updateSelectedProgram}
-      />
+      <div className="tempBox">
+        <FromToLessonSelector />
+      </div>
       <div className="buttonBox">
         {!addManualVocabulary && (
           <button type="button" className="greenButton" onClick={() => additionalVocab()}>

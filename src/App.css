@@ -22,6 +22,10 @@ a {
   text-decoration: none;
 }
 
+img, image {
+  user-select: none;
+}
+
 input,
 select,
 textarea {
@@ -32,7 +36,7 @@ textarea {
   border-radius: 0%;
 }
 
-/*ExampleRetriever*/
+/* Global Styles */
 h1 {
   color: var(--light);
   text-align: center;
@@ -42,23 +46,6 @@ h1 {
 h2, h3, h4, h5, h6 {
   color: var(--dark);
   text-align: center;
-}
-
-.homeButton {
-  display: flex;
-  height: 70px;
-  text-align: center;
-  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 5px 0px 0px;
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.homeButton img {
-  object-fit: contain;
 }
 
 .bannerMessage {
@@ -88,6 +75,10 @@ button, .linkButton {
   background-color: var(--brand);
   border: none;
   cursor: pointer;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button:hover, .linkButton:hover {
@@ -123,8 +114,58 @@ button:hover, .linkButton:hover {
   transform: translate(0, -50%);
 }
 
-/*Main Menu Styles*/
+/* Load Screen Styles */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;  /* Take full width of parent */
+  height: 100%; /* Take full height of parent */
+  max-height: 70vh;
+  padding: 5% 20%;
+  box-sizing: border-box;
+}
 
+.loadingIcon {
+  position: relative;
+  width: 50%; /* Width relative to parent container */
+  padding-top: 50%; /* Height relative to width to maintain square shape */
+  max-width: 400px; /* Maximum size for larger containers */
+  max-height: 400px; /* Same as max-width to keep square */
+  min-width: 150px; /* Minimum size */
+  min-height: 150px; /* Minimum size */
+}
+
+#headIcon {
+  position: absolute;
+  top: 10%; /* Positioning relative to .loadingIcon */
+  left: 10%;
+  width: 80%; /* Resize the head within its parent */
+}
+
+#wheelIcon {
+  position: absolute;
+  top: 18%; /* Adjust to align correctly with the head */
+  left: 18%;
+  width: 40%;
+  animation: spin 1.4s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+/*Main Menu Styles*/
+/* MOVED TO NAV */
+/* 
 .div-header{
   padding: calc(5px + 1.5%) 5%;
   background-color: var(--theme);
@@ -137,7 +178,7 @@ button:hover, .linkButton:hover {
 .div-header button {
   background-color: var(--light);
   color: var(--dark);
-}
+} */
 
 .div-user-subheader {
   padding: 10px 5%;
@@ -235,7 +276,7 @@ button:hover, .linkButton:hover {
   flex-wrap: wrap;
 }
 
-.spanishExample, .englishTranslation {
+/* .spanishExample, .englishTranslation {
   position: relative;
   width: 65%;
   min-width: 300px;
@@ -245,21 +286,17 @@ button:hover, .linkButton:hover {
   text-align: center;
   display: flex;
   flex-direction: column;
-  vertical-align: center;
   justify-content: center;
+  align-items: center;
   padding: 25px 50px;
   border: 4px solid var(--accent);
   cursor: pointer;
-}
+} */
 
 
 .readyButton {
   display: flex;
   justify-content: space-around;
-}
-
-.quizInterface {
-  margin-top: 40px;
 }
 
 .quizControls {
@@ -284,7 +321,7 @@ button:hover, .linkButton:hover {
 
 .buttonBox button, .buttonBox .linkButton {
   margin: 0px 10px;
-  display: block;
+  /* display: block; */
   flex-basis: 0;
   flex-grow: 1;
 }
@@ -329,19 +366,22 @@ button:hover, .linkButton:hover {
   justify-content: space-between;
   width: 50%;
 }
-
+@media screen and (max-width: 800px) {
+  .quizSelector {
+    width: 70vw;
+  }
+  
+}
+@media screen and (max-width: 480px) {
+  .quizSelector {
+    width: 90vw;
+  }
+}
 .quizMenu {
   margin-bottom: 20px;
   height: 65px;
   text-align: center;
 
-}
-/* .progressBar2 is a legacy className
-will remove from .css when all instances are removed */
-.progressBar, .progressBar2 {
-  display:block;
-  text-align: center;
-  justify-self: center;
 }
 
 .addFlashcardButton {
@@ -350,6 +390,18 @@ will remove from .css when all instances are removed */
   right: 0px;
   width: fit-content;
   background-color: darkgreen;
+  font-size: 10px;
+  padding: 5px 10px;
+  margin: 0 auto;
+}
+
+.pendingFlashcardButton {
+  cursor: default;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: fit-content;
+  background-color: var(--dark);
   font-size: 10px;
   padding: 5px 10px;
   margin: 0 auto;
@@ -398,7 +450,7 @@ will remove from .css when all instances are removed */
 }
 
 .audioBox {
-  width: 100%;
+  width: 80vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -427,9 +479,10 @@ will remove from .css when all instances are removed */
 
 .audioExample h3 {
   color: var(--light);
+  z-index: 5;
 }
 
-.progressBarHolder {
+/* .progressBarHolder {
   position: relative;
   height: 150px;
   margin: 10px 0;
@@ -449,6 +502,13 @@ will remove from .css when all instances are removed */
   padding: 60px;
   color: var(--light);
   z-index: 5;
+} */
+/* progressBar & progressBar2 are almost legacy */
+/* Remove once all instances of QuizProgress are replaced with NewQuizProgress */
+.progressBar, .progressBar2 {
+  display:block;
+  text-align: center;
+  justify-self: center;
 }
 
 .progressStatus {
@@ -461,6 +521,12 @@ will remove from .css when all instances are removed */
   z-index: 1;
 }
 
+.audioAutoplayFlashcardWrapper {
+  width: 100%;
+}
+.audioAutoplayFlashcardWrapper .audioExample {
+  border: none;
+}
 
 /* For Flashcard Finder */
 
@@ -472,7 +538,7 @@ will remove from .css when all instances are removed */
 .filterSection {
   padding: 0px 20px;
   display: flex;
-  flex-direction: row;
+  flex-direction: row-reverse;
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
@@ -483,55 +549,94 @@ will remove from .css when all instances are removed */
   flex-direction: row;
   flex-wrap: wrap;
   flex-grow: 1;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  /* align-items: center; */
+
+}
+.filterBox.options {
+  flex-direction: column;
+  max-width: 320px;
+  margin: 0px 16px;
+  margin-bottom: 16px;
+}
+.filterBox.search {
+  flex-direction: column;
+  justify-self: left;
+  flex-grow: 3;
+
 }
 
 .removeSpanglishBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
   text-align: center;
-  margin: 0 10px;
-
+  
+  margin-top: 24px;
 }
+.removeSpanglishBox button {
+  cursor: pointer;
+}
+/* .removeSpanglishButton {
+  padding: 12px;
 
-.lessonFilter {
-  margin: 0 10px;
-  flex-grow: 1;
+} */
+.removeSpanglishBox label {
+  margin: auto 0px;
 }
 
 .searchFilter{
-  text-align: center;
-  margin: 0 10px;
+  display: inline-block;
   position: relative;
   flex-grow: 2;
-  max-width: 45%;
+  max-width: 100%;
 }
 
 .wordSearchBox .tagSearchBox{
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  max-width: 450px;
+  /* max-width: 450px; */
   margin: auto;
 }
-
-.searchTermBox {
+.tagSearchBox {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  text-align: right;
-  justify-content: center;
-  align-content: center;
+  justify-content: flex-start;
+  max-width: 640px;
+}
+.searchTermBox {
+  width: 100%;
+}
+.searchTermBox input {
+  padding: 4px 8px;
+  border-radius: 4px;
+  width: 100%;
 }
 
 .searchTermBox p, .searchTermBox input {
   margin: 0 5px;
 }
 
+.selectedTagsBox {
+  width: 100%;
+  margin: 0px 12px;
+}
+.selectedTagsBox p {
+  text-align: left;
+}
+
+
 .vocabSuggestionBox, .tagSuggestionBox {
   position: absolute;
-  top: 105px;
-  right: 0px;
+  max-width: 640px;
+  width: 100%;
+  top: 35px;
+  left: 0px;
   z-index: 999;
 }
+
 
 .examplesTable {
   min-height: 1200px;
@@ -563,35 +668,87 @@ will remove from .css when all instances are removed */
   background-color: var(--brand);
 }
 
-.vocabCard {
+.selectedVocab {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 60vw;
+}
+
+.tagCard{
   cursor: pointer;
   text-align: left;
-  background-color: #fff;
-  color: #3c3c3c;
   font-size: 12px;
-  padding: 5px 20px;
+  padding: auto;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  margin: 0 auto;
-  border: 2px solid var(--theme);
+  margin: 0 6px;
+  height: 90px;
+}
+.selectedVocab .tagCard {
+  margin: 2px 4px;
 }
 
-.vocabCard h4 {
-  font-size: 14px;
-  color: var(--brand);
-  text-align: left;
-  margin-bottom: 0;
-  margin: 5px;
+
+.tagCard:hover {
+  cursor: pointer;
+  filter: brightness(0.9); /* Slight darken */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow */
+  transform: scale(1.03);  /* Slight zoom */
+  transition: all 0.2s ease-in-out; /* Smooth transition */
 }
 
-.vocabCard p {
-  font-size: 14px;
-  color: var(--theme);
-  text-align: left;
+.tagCard h4, .tagCard h5, .tagCard p {
+  color: currentColor;
   margin: 0;
+}
+.tagCard div {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  justify-content: space-between;
+}
+.subcategoryCard, .vocabularyCard, .idiomCard, .conjugationCard, .verbCard {
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  border: 3px solid var(--dark);
+  margin: 0px;
+}
+
+.subcategoryCard {
+  padding: 5px 20px;
+  color: var(--light);
+  background-color: var(--theme);
+}
+
+.vocabularyCard {
+  padding: 5px 20px;
+  color: var(--light);
+  background-color: var(--brand);
+}
+
+.idiomCard {
+  padding: 5px 20px;
+  color: var(--dark);
+  background-color: var(--accent);
+}
+
+.conjugationCard {
+  padding: 5px 20px;
+  color: var(--dark);
+  background-color: var(--light);
+}
+
+.verbCard {
+  padding: 5px 20px;
+  color: var(--accent);
+  background-color: var(--dark);
 }
 
 .vocabSmallCard{
@@ -618,38 +775,6 @@ will remove from .css when all instances are removed */
   margin: 5px;
 }
 
-
-.tagCard {
-  cursor: pointer;
-  text-align: left;
-  background-color: #fff;
-  color: #3c3c3c;
-  font-size: 12px;
-  padding: 5px 20px;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 0 auto;
-  border: 2px solid var(--theme);
-}
-
-.tagCard h4 {
-  font-size: 14px;
-  color: var(--brand);
-  text-align: left;
-  margin-bottom: 0;
-  margin: 5px;
-}
-
-.tagCard p {
-  font-size: 14px;
-  color: var(--theme);
-  text-align: left;
-  margin: 0;
-}
-
 .displayExamplesDescription {
   width: 50%;
   background-color: var(--light);
@@ -670,14 +795,52 @@ will remove from .css when all instances are removed */
 }
 
 
-.addButton, .ownedButton {
+.addButton, .removeButton {
   width: 10%;
   min-width: 120px;
+  cursor: pointer;
 }
 
-.ownedButton, .ownedButton:hover, .ownedButton:active {
-  background-color: var(--dark);
+.addButton {
+  background-color: darkgreen;
 }
+
+.removeButton {
+  background-color: darkred;
+}
+
+.pendingButton {
+  width: 10%;
+  min-width: 120px;
+  background-color: var(--dark);
+  cursor: default;
+}
+
+/* ToFromLessonSelector styling for Flashcard Finder */
+/* 
+.FromToLessonSelectorWrapper {
+  margin: 6px;
+}
+.FromToLessonSelectorWrapper #courseRow {
+  display: flex;
+  flex-direction: row;
+  margin: 4px;
+}
+#courseRow p {
+  margin: 4px;
+}
+
+.FromToLessonSelectorWrapper #flashcardFinderStyling {
+  display: flex;
+  flex-direction: row;
+}
+.FromToLessonSelectorWrapper #fromRow, .FromToLessonSelectorWrapper #toRow {
+  margin: 8px;
+}
+.FromToLessonSelectorWrapper #flashcardFinderStyling p {
+  margin: 0;
+  margin-right: 6px;
+} */
 
 
 
@@ -924,7 +1087,14 @@ will remove from .css when all instances are removed */
 
 .myFlashcardsForm {
   width: 30vw;
+  min-width: 360px;
   margin: 0 auto;
+}
+@media screen and (max-width: 480px) {
+  .myFlashcardsForm {
+    width: 90vw;
+    min-width: 280px;
+  }
 }
 
 .myFlashcardsFormContentWrapper > label, .myFlashcardsFormContentWrapper > div {
@@ -1011,3 +1181,120 @@ input:checked + .slider:before {
   padding: 5px;
   text-align: center;
 }
+
+/* Icons */
+i {
+  font-size: 24px;
+}
+/* Nav */
+
+.div-header {
+  display: flex;
+  justify-content: space-between;
+  padding: calc(5px + 1.5%) 5%;
+  background-color: var(--theme);
+  color: var(--light);
+  margin: 0;
+  align-items: center;
+   
+}
+
+.div-header button {
+  background-color: var(--light);
+  color: var(--dark);
+}
+.homeButton {
+  display: flex;
+  height: 70px;
+  width: 125px;
+}
+#homeIcon {
+  display: none;
+}
+#logo {
+  cursor: pointer;
+}
+@media screen and (max-width: 480px) {
+  .homeButton {
+    height: 24px;
+    width: 24px;
+  }
+  #logo {
+    display: none;
+  }
+  #homeIcon {
+    display: block;
+    z-index: 2;
+  }
+  /* div.notRoot {
+    flex-direction: row-reverse;
+  } */
+  #logout.notRoot {
+    display: none;
+  }
+  
+}
+/* BackButton */
+/* .backButton {
+  display: none;
+  position: absolute;
+  left: 0;
+  color: white;
+  padding: 12px;
+}
+@media screen and (max-width: 480px) {
+  .backButton.notRoot {
+      display: block;
+      z-index: 2;
+    }
+  
+} */
+
+
+/* .homeButton {
+  display: flex;
+  height: 70px;
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 5px 0px 0px;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+} */
+
+/* @media screen and (max-width: 480px) {
+  /* currently conditionally applied to LogoutButton for when route is not / */
+  /* .pastHome {
+    display: none;
+  }
+  .div-header {
+    align-items: center;
+  }
+  #login, #logout {
+    padding: 6px;
+    height: auto;
+  }
+  #home {
+    display: block;
+    width: 24px;
+  }
+  #logo {
+    display: none;
+  }
+  .div-user-subheader {
+    display: none;
+  }
+
+  .div-header.homeButton {
+    background-image: url('./resources/icons8-home-24.png');
+  } */
+
+
+
+  /*  FrequenSay */
+  .frequensay .tempBox {
+    max-width: 640px;
+    margin: auto;
+  }

@@ -27,4 +27,14 @@ describe('logout button', () => {
     render(<LogoutButton />)
     expect(screen.queryByText('Log Out')).toBeNull()
   })
+  it('calls logout when clicked', () => {
+    const logout = vi.fn()
+    ;(auth0 as any).useAuth0 = vi.fn().mockReturnValue({
+      isAuthenticated: true,
+      logout,
+    })
+    render(<LogoutButton />)
+    screen.getByText('Log Out').click()
+    expect(logout).toHaveBeenCalled()
+  })
 })

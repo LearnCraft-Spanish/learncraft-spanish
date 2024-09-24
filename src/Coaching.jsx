@@ -8,7 +8,7 @@ const Coaching = forwardRef((
   { contextual, openContextual, closeContextual },
   currentContextual,
 ) => {
-  const { userData } = useUserData()
+  const { userDataQuery } = useUserData()
   const {
     getActiveMemberships,
     getActiveStudents,
@@ -928,13 +928,13 @@ const Coaching = forwardRef((
     if (startupDataLoaded) {
       coachUser.current
         = coaches.current.find(
-          coach => coach.user.email === userData.emailAddress,
+          coach => coach.user.email === userDataQuery.data.emailAddress,
         ) || null
       if (coachUser.current ? coachUser.current.recordId : false) {
         updateCoachFilter(coachUser.current.recordId)
       }
     }
-  }, [startupDataLoaded, userData])
+  }, [startupDataLoaded, userDataQuery.data])
 
   useEffect(() => {
     if (startupDataLoaded) {
