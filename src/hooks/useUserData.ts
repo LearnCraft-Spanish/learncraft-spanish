@@ -5,6 +5,7 @@ import { useBackend } from './useBackend'
 export function useUserData() {
   const { isAuthenticated } = useAuth0()
   const { getUserDataFromBackend } = useBackend()
+
   const userDataQuery = useQuery({
     queryKey: ['userData'],
     queryFn: getUserDataFromBackend,
@@ -12,5 +13,6 @@ export function useUserData() {
     gcTime: Infinity, // Never garbage collect unless manually updated
     enabled: isAuthenticated,
   })
+
   return userDataQuery
 }

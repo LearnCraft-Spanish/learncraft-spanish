@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { Flashcard, Lesson, Program } from '../interfaceDefinitions'
 import { useActiveStudent } from './useActiveStudent'
@@ -85,19 +85,31 @@ export function useSelectedLesson() {
     })
   }, [allowedVocabulary, requiredVocabulary])
 
+  const newToLesson = useCallback((program: Program | null) => {
+    const firstLesson = program?.lessons[0] || null
+    if (activeLesson?.recordId) {
+      const foundLesson = program?.lessons.find(lesson => lesson.recordId === activeLesson.recordId)
+      if (foundLesson) {
+        return foundLesson
+      }
+      return firstLesson
+    }
+    return firstLesson
+  }, [activeLesson])
+
   // Set selected program
   const setProgram = useCallback ((program: number | string | null) => {
     if (typeof (program) === 'string') {
       program = Number.parseInt(program)
     }
-    const newProgram = programsQueryData?.find(item => item.recordId === program)
+    const newProgram = programsQueryData?.find(item => item.recordId === program) || null
     queryClient.setQueryData(['programSelection'], (oldState: typeof initialSelectionState) => ({
       ...oldState,
       program: newProgram,
       fromLesson: null, // Reset lessons when program changes
-      toLesson: null,
+      toLesson: newToLesson(newProgram),
     }))
-  }, [programsQueryData, queryClient])
+  }, [programsQueryData, newToLesson, queryClient])
 
   // Set 'from' lesson
   const setFromLesson = useCallback ((newId: number | string | null) => {
@@ -132,21 +144,6 @@ export function useSelectedLesson() {
     activeStudentQuery.data,
     activeProgram?.recordId,
     setProgram,
-  ])
-
-  // Update default 'to' lesson when the student's course is selected
-  useEffect(() => {
-    if (activeLesson?.recordId && !selectionState?.toLesson?.recordId
-      && activeProgram?.recordId === selectionState.program?.recordId) {
-      setToLesson(activeLesson.recordId) // Only update if the lesson is different
-    }
-  }, [
-    activeStudentQuery.data,
-    activeProgram?.recordId,
-    activeLesson?.recordId,
-    selectionState?.program?.recordId,
-    selectionState?.toLesson?.recordId,
-    setToLesson,
   ])
 
   // Expose current state, vocab, and filtering function

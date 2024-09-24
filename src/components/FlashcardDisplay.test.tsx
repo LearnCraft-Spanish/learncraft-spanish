@@ -175,6 +175,12 @@ describe('component Flashcard', () => {
           expect(screen.getByText('Add to my flashcards')).toBeTruthy()
         })
       })
+      describe.skip('isCollected is true and isPending is true', () => {
+        it('pending flashcard button is rendered', () => {
+          // We need to mock the function that checks if the flashcard is pending. (exampleIsPending in useStudentFlashcards)
+          // Problem: I think we can only mock userStudentFlashcards 1 time, so we cant set multiple return values for exampleIsCollected and exampleIsPending
+        })
+      })
     })
   })
 })

@@ -55,7 +55,7 @@ describe('component AudioQuizSetupMenu', () => {
       </MemoryRouter>,
     )
     screen.getByLabelText('toggleAutoplay').click()
-    expect(updateAutoplay).toHaveBeenCalledWith('off')
+    expect(updateAutoplay).toHaveBeenCalledWith(false)
   })
   it ('toggle autoplay on', () => {
     render(
@@ -69,6 +69,6 @@ describe('component AudioQuizSetupMenu', () => {
       </MemoryRouter>,
     )
     screen.getByLabelText('toggleAutoplay').click()
-    expect(updateAutoplay).toHaveBeenCalledWith('on')
+    expect(updateAutoplay).toHaveBeenCalledWith(true)
   })
 })
