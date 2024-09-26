@@ -16,16 +16,14 @@ const togglePlaying = vi.fn()
 
 const queryClient = new QueryClient()
 
-vi.mock('../hooks/useStudentFlashcards', () => {
-  return {
-    useStudentFlashcards: () => ({
-      addFlashcardMutation: { mutate: vi.fn() },
-      removeFlashcardMutation: { mutate: vi.fn() },
-      exampleIsCollected: vi.fn((x: number) => Boolean(x)),
-      exampleIsPending: vi.fn(() => false),
-    }),
-  }
-})
+vi.mock('../../hooks/useStudentFlashcards', () => ({
+  useStudentFlashcards: () => ({
+    addFlashcardMutation: { mutate: vi.fn() },
+    removeFlashcardMutation: { mutate: vi.fn() },
+    exampleIsCollected: vi.fn((x: number) => x === example.recordId),
+    exampleIsPending: vi.fn((x: number) => false),
+  }),
+}))
 
 /*
   example: Flashcard
@@ -164,21 +162,30 @@ describe('component Flashcard', () => {
     describe('isStudent is true', () => {
       // The way we check isCollected is now different. We need to mock the function that checks if the flashcard is collected. (exampleIsCollected in useStudentFlashcards)
       describe('isCollected is true', () => {
-        it('remove flashcard button is rendered', () => {
+        it('remove flashcard button is rendered', async () => {
+          const { exampleIsCollected, exampleIsPending } = (await import('../../hooks/useStudentFlashcards')).useStudentFlashcards()
+          exampleIsCollected.mockReturnValue(true)
+          exampleIsPending.mockReturnValue(false)
+          // Expect exampleIsCollected to return true
           render(<FlashcardSpanishFirstAnswerShowing />)
           expect(screen.getByText('Remove from my flashcards')).toBeTruthy()
         })
       })
-      describe('isCollected is false', () => {
+      describe('isCollected is false', async () => {
+        const { exampleIsCollected } = (await import('../../hooks/useStudentFlashcards')).useStudentFlashcards()
+        exampleIsCollected.mockReturnValue(false)
         it('add flashcard button is rendered', () => {
           render(<FlashcardSpanishFirstAnswerShowingNotCollected />)
           expect(screen.getByText('Add to my flashcards')).toBeTruthy()
         })
       })
-      describe.skip('isCollected is true and isPending is true', () => {
-        it('pending flashcard button is rendered', () => {
-          // We need to mock the function that checks if the flashcard is pending. (exampleIsPending in useStudentFlashcards)
-          // Problem: I think we can only mock userStudentFlashcards 1 time, so we cant set multiple return values for exampleIsCollected and exampleIsPending
+      describe('isCollected is true and isPending is true', () => {
+        it('pending flashcard button is rendered', async () => {
+          const { exampleIsCollected, exampleIsPending } = (await import('../../hooks/useStudentFlashcards')).useStudentFlashcards()
+          exampleIsCollected.mockReturnValue(true)
+          exampleIsPending.mockReturnValue(true)
+          render(<FlashcardSpanishFirstAnswerShowing />)
+          expect(screen.getByText('Adding to Flashcards...')).toBeTruthy()
         })
       })
     })
