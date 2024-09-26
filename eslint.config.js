@@ -1,6 +1,5 @@
 // eslint.config.js
 import antfu from '@antfu/eslint-config'
-import vitestPlugin from 'eslint-plugin-vitest'
 
 export default antfu(
   {
@@ -10,7 +9,6 @@ export default antfu(
   // Testing Customization
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    plugins: { vitest: vitestPlugin },
     languageOptions: {
       globals: {
         // Add Vitest globals
