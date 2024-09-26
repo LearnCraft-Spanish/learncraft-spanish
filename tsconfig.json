@@ -10,7 +10,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "types": ["vitest", "node"],
+    "types": ["vitest", "node", "msw"],
     "allowJs": true,
     "strict": true,
     "noEmit": true,
