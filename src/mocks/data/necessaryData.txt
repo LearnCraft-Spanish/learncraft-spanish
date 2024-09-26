@@ -1,0 +1,20 @@
+Tables required for effective testing:
+
+apiProgramsTable: Unparsed table of programs with lesson list of recordIDs (not full lesson objects)
+apiLessonsTable: Unparsed table of lessons, with vocabLearned specified and vocabKnown undefined
+
+apiVocabularyTable: Unparsed table of vocabulary, tags Unparsed
+apiSpellingsTable: Raw Spellings data
+
+apiExamplesTable: Not needed
+apiVerifiedExamplesTable: All examples where verified is true
+apiAudioExamplesTable: All examples where spanish audio is not empty string
+
+apiQuizzesTable: Table of all quizzes – quizExamples is related examples as array of ids, not objects
+apiQuizExamplesTable: Table of all examples for a quiz – how many do we need?
+
+apiMyData: userData for a student
+apiAllStudentsTable: Table of userData – Surely don't need more than 5-10 for testing
+
+apiMyExamples: studentFlashcardData for the user
+apiStudentExamples: studentFlashcardData for the active student – does it need to differ from user?
