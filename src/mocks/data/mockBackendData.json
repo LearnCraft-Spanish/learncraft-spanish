@@ -1,6 +1,6 @@
 {
-  "mockBackendData": {
-    "getProgramsFromBackend": [
+  "api": {
+    "programsTable": [
       {
         "recordId": 2,
         "name": "LearnCraft Spanish",
@@ -106,7 +106,7 @@
         "cohortFCurrentLesson": 1
       }
     ],
-    "getLessonsFromBackend": [
+    "lessonsTable": [
       {
         "recordId": 1,
         "lesson": "SI1M Lesson 1",
