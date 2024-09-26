@@ -1,10 +1,13 @@
 import { http, HttpResponse } from 'msw';
 import data from '../data/mockBackendData.json';
 
-const backendData = data.mockBackendData;
+const api = data.api;
 
 export const handlers = [
   http.get('/api/public/programs', () => {
-    return HttpResponse.json(backendData);
+    return HttpResponse.json(api.programsTable);
   }),
+    http.get('/api/public/lessons', () => {
+        return HttpResponse.json(api.lessonsTable);
+    }),
 ];
