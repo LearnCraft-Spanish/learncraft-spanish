@@ -1,5 +1,4 @@
 import data from '../../mocks/data/mockBackendData.json'
-import type { Program } from '../../interfaceDefinitions'
 
 export function useBackend() {
   const getProgramsFromBackend = () => {

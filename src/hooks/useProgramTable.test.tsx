@@ -1,9 +1,6 @@
-import * as auth0 from '@auth0/auth0-react'
 import { renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useAuth0 } from '@auth0/auth0-react'
-import type { Program } from '../interfaceDefinitions'
 import data from '../mocks/data/mockBackendData.json'
 
 import { useProgramTable } from './useProgramTable'
