@@ -1,5 +1,4 @@
-import { vi } from 'vitest'
-import 'vitest/globals'
+import { vi, beforeAll, afterEach, afterAll } from 'vitest'
 import { server } from '../src/mocks/api/server'
 import '@testing-library/jest-dom'
 

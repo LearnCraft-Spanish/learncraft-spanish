@@ -2,10 +2,10 @@ import data from '../../mocks/data/mockBackendData.json'
 
 export function useBackend() {
   const getProgramsFromBackend = () => {
-    return data.mockBackendData.getProgramsFromBackend
+    return data.api.programsTable
   }
   const getLessonsFromBackend = () => {
-    return data.mockBackendData.getLessonsFromBackend
+    return data.api.lessonsTable
   }
 
   return {
