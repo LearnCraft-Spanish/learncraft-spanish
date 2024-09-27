@@ -185,7 +185,7 @@ describe('component Flashcard', () => {
           vi.mocked(useStudentFlashcards).mockReturnValue({
             exampleIsCollected: vi.fn(() => true),
             exampleIsPending: vi.fn(() => true),
-            })
+          })
           vi.mocked('../../hooks/useStudentFlashcards').mockImplementation(() => ({
             useStudentFlashcards: () => ({
               exampleIsCollected: vi.fn(() => true),
