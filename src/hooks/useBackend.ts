@@ -62,6 +62,7 @@ export function useBackend() {
     return getFactory<types.Spelling[]>('public/spellings')
   }, [getFactory])
 
+  // UNUSED -- CONSIDER DELETING
   const getExamplesFromBackend = useCallback((): Promise<types.Flashcard[] > => {
     return getFactory<types.Flashcard[]>('public/examples')
   }, [getFactory])

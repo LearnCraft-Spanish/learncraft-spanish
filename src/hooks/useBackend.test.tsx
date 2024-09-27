@@ -31,16 +31,20 @@ describe('useBackend Hook', () => {
     describe(`${String(functionName)} function`, () => {
       let data: any[]
 
-      beforeAll(async () => {
+      it('resolves the fetch function and returns truthy data', async () => {
         const fetchFunction = hookResult[functionName] as () => Promise<any[]>
 
-        await act(async () => {
-          data = await fetchFunction() // Call the function from hookResult
-        })
-      })
-
-      it('returns something truthy', () => {
-        expect(data).toBeDefined()
+        // Explicitly handle the async call inside the test case
+        try {
+          await act(async () => {
+            data = await fetchFunction()
+          })
+          expect(data).toBeDefined()
+        }
+        catch (error) {
+          // Fail the test if the promise rejects
+          throw new Error(`Failed to fetch data in ${String(functionName)}: ${error}`)
+        }
       })
 
       if (expectedLength !== undefined) {
@@ -70,16 +74,20 @@ describe('useBackend Hook', () => {
     describe(`${String(functionName)} function`, () => {
       let data: any
 
-      beforeAll(async () => {
-        const fetchFunction = hookResult[functionName] as () => Promise<any[]>
+      it('resolves the fetch function and returns truthy data', async () => {
+        const fetchFunction = hookResult[functionName] as () => Promise<any>
 
-        await act(async () => {
-          data = await fetchFunction() // Call the function from hookResult
-        })
-      })
-
-      it('returns something truthy', () => {
-        expect(data).toBeDefined()
+        // Explicitly handle the async call inside the test case
+        try {
+          await act(async () => {
+            data = await fetchFunction()
+          })
+          expect(data).toBeDefined()
+        }
+        catch (error) {
+          // Fail the test if the promise rejects
+          throw new Error(`Failed to fetch data in ${String(functionName)}: ${error}`)
+        }
       })
 
       requiredFields.forEach((field) => {
@@ -121,7 +129,7 @@ describe('useBackend Hook', () => {
     requiredFields: ['recordId', 'quizNickname'],
   })
 
-  testArrayFetchFunction({
+  testObjectFetchFunction({
     functionName: 'getMyExamplesFromBackend',
     requiredFields: ['examples', 'studentExamples'],
   })

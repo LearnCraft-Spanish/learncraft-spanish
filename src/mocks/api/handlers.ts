@@ -36,4 +36,8 @@ export const handlers = [
   http.get(`${backendUrl}public/quizzes`, () => {
     return HttpResponse.json(api.quizzesTable)
   }),
+
+  http.get(`${backendUrl}public/my-examples`, () => {
+    return HttpResponse.json('my-examples')
+  }),
 ]
