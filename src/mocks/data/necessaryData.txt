@@ -4,7 +4,6 @@ Tables required for effective testing:
 
 
 apiExamplesTable: Not needed
-apiVerifiedExamplesTable: All examples where verified is true
 apiAudioExamplesTable: All examples where spanish audio is not empty string
 
 apiQuizExamplesTable: Table of all examples for a quiz – how many do we need?
@@ -27,3 +26,4 @@ apiAllStudentsTable: Table of userData – Surely don't need more than 5-10 for
 
 apiMyData: userData for a student
 
+apiVerifiedExamplesTable: All examples where verified is true

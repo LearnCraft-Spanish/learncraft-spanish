@@ -1,0 +1,317 @@
+{
+  "studentFlashcardData": {
+    "examples": [
+      {
+        "recordId": 2475,
+        "spanishExample": "(Él) es un amigo.",
+        "englishTranslation": "He is a friend.",
+        "vocabIncluded": [
+          "amigo/Noun, Noun/",
+          "es/Verb, Verb/it/he/she is//3rd person singular \"él/ella/eso\" ; Present indicative",
+          "un/Article, Indefinite/article/",
+          "él/Pronoun, Subject/subject pronoun/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2474,
+        "spanishExample": "Eras la chica.",
+        "englishTranslation": "You were the girl.",
+        "vocabIncluded": [
+          "chica/Noun, Noun/(singular or plural)/",
+          "eras/Verb, Verb/you were//2nd person singular \"tú\" ; 2nd person singular \"vos\" ; Imperfect",
+          "la/Article, Definite/article/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2474en.mp3",
+        "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2474la.mp3",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2418,
+        "spanishExample": "No eres el chico.",
+        "englishTranslation": "You aren’t the guy.",
+        "vocabIncluded": [
+          "chico/Noun, Noun/(singular or plural)/",
+          "el/Article, Definite/article/",
+          "eres/Verb, Verb/you are//2nd person singular \"tú\" ; Present indicative",
+          "no/Adverb, Whether (formerly \"boolean\")/not/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2460,
+        "spanishExample": "¿Eres la amiga de la chica?",
+        "englishTranslation": "Are you the girl’s friend(f)?",
+        "vocabIncluded": [
+          "amiga/Noun, Noun/",
+          "chica/Noun, Noun/(singular or plural)/",
+          "de/Preposition, Preposition/\"of\", possession/",
+          "eres/Verb, Verb/you are//2nd person singular \"tú\" ; Present indicative",
+          "la/Article, Definite/article/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2350,
+        "spanishExample": "Es el amigo de la chica.",
+        "englishTranslation": "It’s the girl’s friend(m).",
+        "vocabIncluded": [
+          "amigo/Noun, Noun/",
+          "chica/Noun, Noun/(singular or plural)/",
+          "de/Preposition, Preposition/\"of\", possession/",
+          "el/Article, Definite/article/",
+          "es/Verb, Verb/it/he/she is//3rd person singular \"él/ella/eso\" ; Present indicative",
+          "la/Article, Definite/article/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2337,
+        "spanishExample": "¿En qué is your cup de paper?",
+        "englishTranslation": "What is your paper cup on?",
+        "vocabIncluded": [
+          "de/Preposition, Preposition/\"of\", material/components/",
+          "en/Preposition, Preposition/\"on\"/",
+          "qué/Pronoun, Interrogative/what? (specifically in a question)/"
+        ],
+        "spanglish": "spanglish",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 257,
+        "spanishExample": "I want ser de Colombia.",
+        "englishTranslation": "I want to be from Colombia.",
+        "vocabIncluded": [
+          "de/Preposition, Preposition/\"of\"/\"from\", origin/",
+          "ser/Verb, Verb/ser infinitive/"
+        ],
+        "spanglish": "spanglish",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 3497,
+        "spanishExample": "Se va, como she wants hacer.",
+        "englishTranslation": "She is leaving, as she wants to do.",
+        "vocabIncluded": [
+          "como/Conjunction, Comparative/as in \"como yo\"/",
+          "hacer/Verb, Verb/",
+          "irse/Other structure, Pronominal structure/any pronominal use/",
+          "se/Pronoun, Reflexive/reflexive/",
+          "va/Verb, Verb//3rd person singular \"él/ella/eso\" ; Present indicative"
+        ],
+        "spanglish": "spanglish",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 823,
+        "spanishExample": "Eso went a its home.",
+        "englishTranslation": "That went to its home.",
+        "vocabIncluded": [
+          "a/Preposition, Preposition/\"to\", indicating direction/movement/",
+          "eso/Pronoun, Demonstrative/"
+        ],
+        "spanglish": "spanglish",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2727,
+        "spanishExample": "El que está en ese lugar sería un buen amigo.",
+        "englishTranslation": "The one(m) that is in that place would be a good friend.",
+        "vocabIncluded": [
+          "amigo/Noun, Noun/",
+          "buen/Adjective, Ser, positive/negative/",
+          "el que/Cluster, Idiom/\"the one that\"/",
+          "en/Preposition, Preposition/\"in\"/",
+          "ese/Pronoun, Demonstrative/adjectival demonstrative/",
+          "está/Verb, Verb/he/she/it is//3rd person singular \"él/ella/eso\" ; Present indicative",
+          "lugar/Noun, Noun/",
+          "sería/Verb, Verb/he/she/it would be//3rd person singular \"él/ella/eso\" ; Conditional",
+          "un/Article, Indefinite/article/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2292,
+        "spanishExample": "Ella y yo somos amigas.",
+        "englishTranslation": "She and I(f) are friends.",
+        "vocabIncluded": [
+          "amiga/Noun, Noun/",
+          "ella/Pronoun, Subject/subject pronoun/",
+          "somos/Verb, Verb/we are/",
+          "y/Conjunction, List/and between items in a list/",
+          "yo/Pronoun, Subject/subject pronoun/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "",
+        "spanishAudioLa": "",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 8509,
+        "spanishExample": "Como sabes, este chico va a ir a casa.",
+        "englishTranslation": "As you know, this boy is going to go home.",
+        "vocabIncluded": [
+          "a/Preposition, Preposition/\"to\", indicating direction/movement/",
+          "a/Preposition, Preposition/ir + a + infinitive (particle)/",
+          "casa/Noun, Noun/feminine noun/",
+          "chico/Noun, Noun/(singular or plural)/",
+          "como/Conjunction, Comparative/as in \"como yo\"/",
+          "este/Pronoun, Demonstrative/adjectival demonstrative/",
+          "ir/Verb, Verb//Infinitive",
+          "sabes/Verb, Verb//2nd person singular \"tú\" ; Present indicative",
+          "va/Verb, Verb//3rd person singular \"él/ella/eso\" ; Present indicative"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8509en.mp3",
+        "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8509la.mp3",
+        "vocabComplete": true
+      }
+    ],
+    "studentExamples": [
+      {
+        "recordId": 41573,
+        "lastReviewedDate": "2024-09-27T20:09:08.207Z",
+        "nextReviewDate": "",
+        "reviewInterval": null,
+        "relatedStudent": 3481,
+        "relatedExample": 2475,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 67907,
+        "lastReviewedDate": "2024-09-27T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": 1,
+        "relatedStudent": 3481,
+        "relatedExample": 2474,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 78580,
+        "lastReviewedDate": "2024-09-27T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": 2,
+        "relatedStudent": 3481,
+        "relatedExample": 2418,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 45345,
+        "lastReviewedDate": "2024-09-26T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": null,
+        "relatedStudent": 3481,
+        "relatedExample": 2460,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 74119,
+        "lastReviewedDate": "2024-09-26T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": 1,
+        "relatedStudent": 3481,
+        "relatedExample": 2350,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 35050,
+        "lastReviewedDate": "2024-09-26T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": 2,
+        "relatedStudent": 3481,
+        "relatedExample": 2337,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 22656,
+        "lastReviewedDate": "2024-09-25T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": null,
+        "relatedStudent": 3481,
+        "relatedExample": 257,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 37438,
+        "lastReviewedDate": "2024-09-25T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": 1,
+        "relatedStudent": 3481,
+        "relatedExample": 3497,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 9449,
+        "lastReviewedDate": "2024-09-25T20:09:08.208Z",
+        "nextReviewDate": "",
+        "reviewInterval": 2,
+        "relatedStudent": 3481,
+        "relatedExample": 823,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 62407,
+        "lastReviewedDate": "",
+        "nextReviewDate": "",
+        "reviewInterval": null,
+        "relatedStudent": 3481,
+        "relatedExample": 2727,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 87867,
+        "lastReviewedDate": "",
+        "nextReviewDate": "",
+        "reviewInterval": null,
+        "relatedStudent": 3481,
+        "relatedExample": 2292,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      },
+      {
+        "recordId": 73463,
+        "lastReviewedDate": "",
+        "nextReviewDate": "",
+        "reviewInterval": null,
+        "relatedStudent": 3481,
+        "relatedExample": 8509,
+        "dateCreated": "2024-09-23T20:09:08.208Z"
+      }
+    ]
+  }
+}
