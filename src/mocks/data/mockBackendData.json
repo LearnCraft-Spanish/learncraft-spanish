@@ -43919,10 +43919,6 @@
       { "recordId": 210, "quizNickname": "lcspx quiz 60" },
       { "recordId": 211, "quizNickname": "lcspx quiz 61" },
       { "recordId": 480, "quizNickname": "ser estar quiz 1" },
-      { "recordId": 481, "quizNickname": "ser estar quiz 2" },
-      { "recordId": 482, "quizNickname": "ser estar quiz 3" },
-      { "recordId": 483, "quizNickname": "ser estar quiz 4" },
-      { "recordId": 484, "quizNickname": "ser estar quiz 5" },
       { "recordId": 485, "quizNickname": "ser-estar quiz 100" },
       { "recordId": 486, "quizNickname": "ser-estar quiz 108" },
       { "recordId": 490, "quizNickname": "ser-estar quiz 301" },
@@ -44549,6 +44545,62 @@
         "allStudents": [],
         "englishAudio": "",
         "spanishAudioLa": "",
+        "vocabComplete": true
+      }
+    ],
+    "audioExamplesTable": [
+      {
+        "recordId": 8509,
+        "spanishExample": "Como sabes, este chico va a ir a casa.",
+        "englishTranslation": "As you know, this boy is going to go home.",
+        "vocabIncluded": [
+          "a/Preposition, Preposition/\"to\", indicating direction/movement/",
+          "a/Preposition, Preposition/ir + a + infinitive (particle)/",
+          "casa/Noun, Noun/feminine noun/",
+          "chico/Noun, Noun/(singular or plural)/",
+          "como/Conjunction, Comparative/as in \"como yo\"/",
+          "este/Pronoun, Demonstrative/adjectival demonstrative/",
+          "ir/Verb, Verb//Infinitive",
+          "sabes/Verb, Verb//2nd person singular \"tú\" ; Present indicative",
+          "va/Verb, Verb//3rd person singular \"él/ella/eso\" ; Present indicative"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8509en.mp3",
+        "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8509la.mp3",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2336,
+        "spanishExample": "¿Ellos son amigos? Nosotros lo somos.",
+        "englishTranslation": "Are they friends? We are.",
+        "vocabIncluded": [
+          "amigo/Noun, Noun/",
+          "ellos/Pronoun, Subject/subject pronoun/",
+          "lo/Pronoun, Attribute/attribute to mean \"that way\", as in lo es, lo estoy/",
+          "nosotros/Pronoun, Subject/subject pronoun/",
+          "somos/Verb, Verb/we are/",
+          "son/Verb, Verb/they are/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2336en.mp3",
+        "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2336la.mp3",
+        "vocabComplete": true
+      },
+      {
+        "recordId": 2474,
+        "spanishExample": "Eras la chica.",
+        "englishTranslation": "You were the girl.",
+        "vocabIncluded": [
+          "chica/Noun, Noun/(singular or plural)/",
+          "eras/Verb, Verb/you were//2nd person singular \"tú\" ; 2nd person singular \"vos\" ; Imperfect",
+          "la/Article, Definite/article/"
+        ],
+        "spanglish": "esp",
+        "allStudents": [],
+        "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2474en.mp3",
+        "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2474la.mp3",
         "vocabComplete": true
       }
     ]

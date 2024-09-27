@@ -1,0 +1,32 @@
+{
+  "courses": [
+    {
+      "code": "si1m",
+      "quizzes": [
+        { "recordId": 126, "quizNickname": "si1m quiz 17" },
+        { "recordId": 127, "quizNickname": "si1m quiz 18" }
+      ]
+    },
+    {
+      "code": "lcsp",
+      "quizzes": [
+        { "recordId": 21, "quizNickname": "lcsp quiz 19" },
+        { "recordId": 14, "quizNickname": "lcsp quiz 12" }
+      ]
+    },
+    {
+      "code": "lcspx",
+      "quizzes": [
+        { "recordId": 205, "quizNickname": "lcspx quiz 55" },
+        { "recordId": 211, "quizNickname": "lcspx quiz 61" }
+      ]
+    },
+    {
+      "code": "ser-estar",
+      "quizzes": [
+        { "recordId": 493, "quizNickname": "ser-estar quiz 309" },
+        { "recordId": 491, "quizNickname": "ser-estar quiz 302" }
+      ]
+    }
+  ]
+}

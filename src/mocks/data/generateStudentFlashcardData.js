@@ -1,17 +1,6 @@
 import data from './mockBackendData.json' with { type: 'json' }
-
-function getDate4DaysAgo() {
-  const date = new Date(Date.now() - 345600000)
-  return date.toISOString()
-}
-export function fisherYatesShuffle(array) {
-  const shuffled = [...array] // Shallow copy to avoid mutating original array
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const randomIndex = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]] // Swap elements
-  }
-  return shuffled
-}
+import fisherYatesShuffle from './fisherYatesShuffle'
+// This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample
 // we need this to test SRS quizzing functionality

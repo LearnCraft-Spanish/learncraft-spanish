@@ -2,17 +2,7 @@ Tables required for effective testing:
 
 *** TODO ***
 
-
 apiExamplesTable: Not needed
-apiAudioExamplesTable: All examples where spanish audio is not empty string
-
-apiQuizExamplesTable: Table of all examples for a quiz – how many do we need?
-
-
-apiMyExamples: studentFlashcardData for the user
-apiStudentExamples: studentFlashcardData for the active student – does it need to differ from user?
-
-
 *** COMPLETED ***
 apiProgramsTable: Unparsed table of programs with lesson list of recordIDs (not full lesson objects)
 apiLessonsTable: Unparsed table of lessons, with vocabLearned specified and vocabKnown undefined
@@ -27,3 +17,11 @@ apiAllStudentsTable: Table of userData – Surely don't need more than 5-10 for
 apiMyData: userData for a student
 
 apiVerifiedExamplesTable: All examples where verified is true
+
+
+apiMyExamples: studentFlashcardData for the user
+apiStudentExamples: studentFlashcardData for the active student – does it need to differ from user?
+
+apiAudioExamplesTable: All examples where spanish audio is not empty string
+
+apiQuizExamplesTable: Table of all examples for a quiz – how many do we need?
