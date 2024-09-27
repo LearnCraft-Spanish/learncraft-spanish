@@ -22,7 +22,7 @@ courses.forEach((course) => {
     courseQuizzes[1],
   ]
 })
-
+// eslint-disable-next-line no-console
 console.log(JSON.stringify(quizExamples))
 
 // structure json data
