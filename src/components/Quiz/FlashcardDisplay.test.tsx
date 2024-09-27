@@ -26,19 +26,6 @@ vi.mock('../../hooks/useStudentFlashcards', () => ({
   }),
 }))
 
-/*
-  example: Flashcard
-  isStudent: boolean
-  answerShowing: boolean
-  startWithSpanish?: boolean
-  incrementExampleNumber: () => void
-  onRemove: () => void
-  toggleAnswer: () => void
-  audioActive: string
-  togglePlaying: () => void
-  playing: boolean
-*/
-
 function FlashcardSpanishFirst() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -92,7 +79,7 @@ function FlashcardSpanishFirstAnswerShowingNotCollected() {
     </QueryClientProvider>
   )
 }
-/*
+
 describe('component Flashcard', () => {
   afterEach(() => {
     vi.clearAllMocks()
@@ -199,4 +186,3 @@ describe('component Flashcard', () => {
     })
   })
 })
-*/
