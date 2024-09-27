@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
+import { c } from 'vite/dist/node/types.d-aGj9QkWt'
 import type * as types from '../interfaceDefinitions'
 
 export function useBackend() {
@@ -22,6 +23,7 @@ export function useBackend() {
   const getFactory = useCallback(
     async <T>(path: string, headers?: any): Promise<T> => {
       const fetchUrl = `${backendUrl}${path}`
+      console.log('fetchUrl:', fetchUrl)
       const response = await fetch(fetchUrl, {
         method: 'GET',
         headers: {

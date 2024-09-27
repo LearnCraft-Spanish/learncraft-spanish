@@ -1,11 +1,17 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import data from '../mocks/data/mockBackendData.json'
 
 import { useProgramTable } from './useProgramTable'
 
 // Override the default project-wide mock
+
+const api = data.api
+
+interface WrapperProps {
+  children: React.ReactNode
+}
 
 describe('useProgramTable', () => {
   beforeAll(() => {
@@ -17,14 +23,14 @@ describe('useProgramTable', () => {
     }))
     vi.mock('../hooks/useBackend', () => ({
       useBackend: vi.fn(() => ({
-        getLessonsFromBackend: vi.fn(() => data.mockBackendData.getProgramsFromBackend),
-        getProgramsFromBackend: vi.fn(() => data.mockBackendData.getLessonsFromBackend),
+        getLessonsFromBackend: vi.fn(() => api.programsTable),
+        getProgramsFromBackend: vi.fn(() => api.lessonsTable),
       })),
     }))
   })
   it('runs without crashing', async () => {
     const queryClient = new QueryClient()
-    const wrapper = ({ children }) => (
+    const wrapper = ({ children }: WrapperProps) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     )
     const { result } = renderHook(() => useProgramTable(), { wrapper })
