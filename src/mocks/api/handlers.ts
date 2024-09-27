@@ -1,17 +1,12 @@
 import { HttpResponse, http } from 'msw'
 import data from '../data/mockBackendData.json'
+import flashcardData from '../data/mockStudentFlashcardData.json'
 
 const api = data.api
+const studentFlashcardData = flashcardData.studentFlashcardData
 const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 export const handlers = [
-  http.get(`${backendUrl}public/my-data`, () => {
-    return HttpResponse.json(api.myData)
-  }),
-
-  http.get(`${backendUrl}public/all-students`, () => {
-    return HttpResponse.json(api.allStudentsTable)
-  }),
 
   http.get(`${backendUrl}public/programs`, () => {
     return HttpResponse.json(api.programsTable)
@@ -37,7 +32,15 @@ export const handlers = [
     return HttpResponse.json(api.quizzesTable)
   }),
 
-  http.get(`${backendUrl}public/my-examples`, () => {
-    return HttpResponse.json('my-examples')
+  http.get(`${backendUrl}my-data`, () => {
+    return HttpResponse.json(api.myData)
+  }),
+
+  http.get(`${backendUrl}all-students`, () => {
+    return HttpResponse.json(api.allStudentsTable)
+  }),
+
+  http.get(`${backendUrl}my-examples`, () => {
+    return HttpResponse.json(studentFlashcardData)
   }),
 ]
