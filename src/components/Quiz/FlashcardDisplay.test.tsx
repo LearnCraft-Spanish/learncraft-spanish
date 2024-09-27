@@ -3,6 +3,7 @@ import { vi } from 'vitest'
 import { cleanup, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { sampleStudentFlashcardData } from '../../../tests/mockData'
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
 
 import Flashcard from './FlashcardDisplay'
 
@@ -181,9 +182,16 @@ describe('component Flashcard', () => {
       })
       describe('isCollected is true and isPending is true', () => {
         it('pending flashcard button is rendered', async () => {
-          const { exampleIsCollected, exampleIsPending } = (await import('../../hooks/useStudentFlashcards')).useStudentFlashcards()
-          exampleIsCollected.mockReturnValue(true)
-          exampleIsPending.mockReturnValue(true)
+          vi.mocked(useStudentFlashcards).mockReturnValue({
+            exampleIsCollected: vi.fn(() => true),
+            exampleIsPending: vi.fn(() => true),
+            })
+          vi.mocked('../../hooks/useStudentFlashcards').mockImplementation(() => ({
+            useStudentFlashcards: () => ({
+              exampleIsCollected: vi.fn(() => true),
+              exampleIsPending: vi.fn(() => true),
+            }),
+          }))
           render(<FlashcardSpanishFirstAnswerShowing />)
           expect(screen.getByText('Adding to Flashcards...')).toBeTruthy()
         })
