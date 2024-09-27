@@ -86,4 +86,6 @@ studentAdmin.relatedProgram = 3 // Spanish In 1 Month
 
 export const studentFlashcardData = generateStudentFlashcardData(student, 12)
 export const studentAdminFlashcardData = generateStudentFlashcardData(studentAdmin, 12)
+
+// eslint-disable-next-line no-console
 console.log(JSON.stringify(studentFlashcardData))
