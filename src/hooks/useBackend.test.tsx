@@ -189,4 +189,26 @@ describe('useBackend Hook', () => {
       expect(response).toBe('0')
     })
   })
+
+  describe('deleteMyStudentExample function', () => {
+    it('deletes a student example', async () => {
+      const response = await hookResult.deleteMyStudentExample(1)
+      expect(response).toBe('1')
+    })
+    it('returns 0 when deleting a student example with bad recordId', async () => {
+      const response = await hookResult.deleteMyStudentExample(-1)
+      expect(response).toBe('0')
+    })
+  })
+
+  describe('deleteStudentExample function', () => {
+    it('deletes a student example', async () => {
+      const response = await hookResult.deleteStudentExample(1)
+      expect(response).toBe('1')
+    })
+    it('returns 0 when deleting a student example with bad recordId', async () => {
+      const response = await hookResult.deleteStudentExample(-1)
+      expect(response).toBe('0')
+    })
+  })
 })

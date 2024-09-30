@@ -76,4 +76,21 @@ export const handlers = [
     }
     return HttpResponse.json(updateId)
   }),
+
+  // Delete Requests
+  http.delete(`${backendUrl}delete-my-student-example`, async ({ request }) => {
+    const exampleId = request.headers.get('deleteid')
+    if (exampleId === '-1') {
+      return HttpResponse.json('0')
+    }
+    return HttpResponse.json('1')
+  }),
+
+  http.delete(`${backendUrl}delete-student-example`, async ({ request }) => {
+    const exampleId = request.headers.get('deleteid')
+    if (exampleId === '-1') {
+      return HttpResponse.json('0')
+    }
+    return HttpResponse.json('1')
+  }),
 ]
