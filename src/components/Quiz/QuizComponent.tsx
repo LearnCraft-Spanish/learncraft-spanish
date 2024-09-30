@@ -119,13 +119,16 @@ export default function QuizComponent({
   }, [currentAudio])
 
   const togglePlaying = useCallback(() => {
+    if (!(spanishAudioUrl || englishAudioUrl)) {
+      return
+    }
     if (playing) {
       pauseCurrentAudio()
     }
     else {
       playCurrentAudio()
     }
-  }, [playing, pauseCurrentAudio, playCurrentAudio])
+  }, [spanishAudioUrl, englishAudioUrl, playing, pauseCurrentAudio, playCurrentAudio])
 
   /*     Increment/Decrement Through Examples       */
   const incrementExampleNumber = useCallback(() => {
