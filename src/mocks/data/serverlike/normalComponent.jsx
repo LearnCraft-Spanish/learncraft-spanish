@@ -1,4 +1,4 @@
-import { useBackend } from '../../hooks/useBackend'
+import { useBackend } from '../../../hooks/useBackend'
 import data from './quizExamplesTable.json'
 
 // This is a helper component, only used to generate data for mockData
