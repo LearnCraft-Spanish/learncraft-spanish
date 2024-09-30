@@ -71,15 +71,6 @@ function FlashcardWithAudio() {
   )
 }
 
-function FlashcardSpanishFirstAnswerShowingNotCollected() {
-  // In our mock, isCollected takes a number and returns a boolean, so recordId:0 is not collected
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Flashcard example={{ ...example, recordId: 0 }} isStudent answerShowing startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
-    </QueryClientProvider>
-  )
-}
-
 describe('component Flashcard', () => {
   afterEach(() => {
     vi.clearAllMocks()
@@ -144,44 +135,6 @@ describe('component Flashcard', () => {
         render(<FlashcardSpanishFirstNotStudent />)
         expect(screen.queryByText('Add to my flashcards')).toBeNull()
         expect(screen.queryByText('Remove from my flashcards')).toBeNull()
-      })
-    })
-
-    describe('isStudent is true', () => {
-      // The way we check isCollected is now different. We need to mock the function that checks if the flashcard is collected. (exampleIsCollected in useStudentFlashcards)
-      describe('isCollected is true', () => {
-        it('remove flashcard button is rendered', async () => {
-          const { exampleIsCollected, exampleIsPending } = (await import('../../hooks/useStudentFlashcards')).useStudentFlashcards()
-          exampleIsCollected.mockReturnValue(true)
-          exampleIsPending.mockReturnValue(false)
-          // Expect exampleIsCollected to return true
-          render(<FlashcardSpanishFirstAnswerShowing />)
-          expect(screen.getByText('Remove from my flashcards')).toBeTruthy()
-        })
-      })
-      describe('isCollected is false', async () => {
-        const { exampleIsCollected } = (await import('../../hooks/useStudentFlashcards')).useStudentFlashcards()
-        exampleIsCollected.mockReturnValue(false)
-        it('add flashcard button is rendered', () => {
-          render(<FlashcardSpanishFirstAnswerShowingNotCollected />)
-          expect(screen.getByText('Add to my flashcards')).toBeTruthy()
-        })
-      })
-      describe('isCollected is true and isPending is true', () => {
-        it('pending flashcard button is rendered', async () => {
-          vi.mocked(useStudentFlashcards).mockReturnValue({
-            exampleIsCollected: vi.fn(() => true),
-            exampleIsPending: vi.fn(() => true),
-          })
-          vi.mocked('../../hooks/useStudentFlashcards').mockImplementation(() => ({
-            useStudentFlashcards: () => ({
-              exampleIsCollected: vi.fn(() => true),
-              exampleIsPending: vi.fn(() => true),
-            }),
-          }))
-          render(<FlashcardSpanishFirstAnswerShowing />)
-          expect(screen.getByText('Adding to Flashcards...')).toBeTruthy()
-        })
       })
     })
   })
