@@ -143,4 +143,50 @@ describe('useBackend Hook', () => {
     functionName: 'getMyExamplesFromBackend',
     requiredFields: ['examples', 'studentExamples'],
   })
+
+  describe('createMyStudentExample function', () => {
+    it('creates a student example', async () => {
+      const response = await hookResult.createMyStudentExample(1)
+      expect(response).toBe('1')
+    })
+    it('returns 0 when creating a student example with bad exampleId', async () => {
+      const response = await hookResult.createMyStudentExample(-1)
+      expect(response).toBe('0')
+    })
+  })
+  describe('createStudentExample function', () => {
+    it('creates a student example', async () => {
+      const response = await hookResult.createStudentExample(1, 1)
+      expect(response).toBe('1')
+    })
+
+    it('returns 0 when creating a student example with bad exampleId', async () => {
+      const response = await hookResult.createStudentExample(-1, 1)
+      expect(response).toBe('0')
+    })
+    it ('returns 0 when creating a student example with bad studentId', async () => {
+      const response = await hookResult.createStudentExample(1, -1)
+      expect(response).toBe('0')
+    })
+  })
+  describe('updateMyStudentExample function', () => {
+    it('updates a student example', async () => {
+      const response = await hookResult.updateMyStudentExample(1, 2)
+      expect(response).toBe('1')
+    })
+    it('returns 0 when updating a student example with bad updateId', async () => {
+      const response = await hookResult.updateMyStudentExample(-1, 2)
+      expect(response).toBe('0')
+    })
+  })
+  describe('updateStudentExample function', () => {
+    it('updates a student example', async () => {
+      const response = await hookResult.updateStudentExample(1, 2)
+      expect(response).toBe('1')
+    })
+    it('returns 0 when updating a student example with bad updateId', async () => {
+      const response = await hookResult.updateStudentExample(-1, 2)
+      expect(response).toBe('0')
+    })
+  })
 })
