@@ -456,7 +456,7 @@ export default function AudioBasedReview({
               <audio
                 ref={audioRef}
                 src={currentStepValue.audio}
-                onLoadedMetadata={() => { playAudio() }}
+                onLoadedMetadata={playAudio}
               />
             )}
           </div>
