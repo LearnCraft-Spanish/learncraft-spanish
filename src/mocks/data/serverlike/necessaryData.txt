@@ -2,9 +2,6 @@ Tables required for effective testing:
 
 *** TODO ***
 
-apiQuizzesTable: Table of all quizzes – quizExamples is related examples as array of ids, not objects
-apiQuizExamplesTable: Table of all examples for a quiz – how many do we need?
-
 apiExamplesTable: Not needed
 *** COMPLETED ***
 apiProgramsTable: Unparsed table of programs with lesson list of recordIDs (not full lesson objects)
@@ -24,5 +21,8 @@ apiMyExamples: studentFlashcardData for the user
 apiStudentExamples: studentFlashcardData for the active student – does it need to differ from user?
 
 apiAudioExamplesTable: All examples where spanish audio is not empty string
+
+apiQuizzesTable: Table of all quizzes – quizExamples is related examples as array of ids, not objects
+apiQuizExamplesTable: Table of all examples for a quiz – how many do we need?
 
 
