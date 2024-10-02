@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import data from '../mocks/data/mockBackendData.json'
+import data from '../mocks/data/serverlike/mockBackendData.json'
 
 import { useProgramTable } from './useProgramTable'
 
