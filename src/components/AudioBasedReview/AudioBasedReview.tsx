@@ -226,8 +226,9 @@ export default function AudioBasedReview({
       <audio
         ref={audioRef}
         src={currentStepValue.audio}
-        onEnded={incrementCurrentStep}
-      />
+        onLoadedMetadata={() => { playAudio() }}
+      >
+      </audio>
     )
   }
 
