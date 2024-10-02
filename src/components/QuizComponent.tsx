@@ -257,13 +257,13 @@ export default function QuizComponent({
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
-    if (event.key === 'ArrowRight') {
+    if (event.key === 'ArrowRight' || event.key === 'd') {
       incrementExampleNumber()
     }
-    else if (event.key === 'ArrowLeft') {
+    else if (event.key === 'ArrowLeft' || event.key === 'a') {
       decrementExampleNumber()
     }
-    else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+    else if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'w' || event.key === 's') {
       event.preventDefault()
       toggleAnswer()
     }
