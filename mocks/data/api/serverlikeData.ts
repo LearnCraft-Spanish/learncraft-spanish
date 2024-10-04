@@ -3,7 +3,9 @@
 // Instructions will be included for how to update the manual data.
 
 // Import types:
-import type { Flashcard, Lesson, Program, Quiz, Spelling, StudentFlashcardData, UserData, Vocabulary } from '../../../interfaceDefinitions'
+import type { Flashcard, Lesson, Program, Quiz, Spelling, StudentFlashcardData, UserData, Vocabulary } from '../../../src/interfaceDefinitions'
+
+const getApiMockData = import('./actualServerData.json')
 
 interface MultipleQuizExamplesTables {
   [key: string]: Flashcard[]
@@ -22,9 +24,8 @@ interface mockApiData {
 // Final export:
 export default async function serverlikeData() {
   // Import functions:
-  const getApiMockData = await import('./getApiMockData')
 
-  const mockApiData: mockApiData = await getApiMockData()
+  const mockApiData: mockApiData = getApiMockData
 
   const programsTable: Program[] = mockApiData.programsTable
   const lessonsTable: Lesson[] = mockApiData.lessonsTable

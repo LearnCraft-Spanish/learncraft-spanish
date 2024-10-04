@@ -1,4 +1,4 @@
-import data from '../../mocks/data/mockBackendData.json'
+import data from '../../../mocks/data/mockBackendData.json'
 
 export function useBackend() {
   const getProgramsFromBackend = () => {
