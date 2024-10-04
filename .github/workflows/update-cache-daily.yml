@@ -25,7 +25,7 @@ jobs:
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       # Step 4: Run the update-cache.js script
       - name: Update Cache

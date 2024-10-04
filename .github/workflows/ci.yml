@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies (only if cache miss)
         if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install
+        run: npm install
 
       - name: Fetch mock data if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
