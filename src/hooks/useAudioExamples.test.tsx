@@ -26,7 +26,6 @@ describe('useAudioExamples', () => {
   const wrapper = ({ children }: WrapperProps) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
-
   it('runs without crashing', async () => {
     const { result } = renderHook(() => useAudioExamples(), { wrapper })
     await waitFor(() => expect(result.current.audioExamplesQuery.isSuccess).toBe(true))
