@@ -1,0 +1,39 @@
+name: Update Mock Data Cache Daily
+
+on:
+  #Runs daily at 8am UTC
+  schedule:
+    - cron: '0 8 * * *'
+
+  # Allows you to trigger the workflow manually
+  workflow_dispatch:
+
+jobs:
+  update-cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up Node.js environment with the latest LTS version
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Step 4: Run the update-cache.js script
+      - name: Update Cache
+        run: node update-cache.js
+
+      # Step 5: Save the updated mock data to cache
+      - name: Cache mock data
+        uses: actions/cache@v2
+        with:
+          path: ../../src/mocks/data/serverlike/actualServerData.json
+          key: mockdata-${{ hashFiles('../../src/mocks/data/serverlike/actualServerData.json') }}

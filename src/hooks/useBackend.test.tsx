@@ -1,8 +1,7 @@
 import { act } from 'react'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { RenderHookResult, renderHook } from '@testing-library/react'
+import { renderHook } from '@testing-library/react'
 import MockAuth0Provider from '../mocks/MockAuth0Provider'
-import type * as types from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
 
 describe('useBackend Hook', () => {

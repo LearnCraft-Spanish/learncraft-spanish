@@ -36,3 +36,6 @@ yarn-error.log*
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Huge Data File
+src/mocks/data/serverlike/actualServerData.json
