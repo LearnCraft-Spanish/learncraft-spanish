@@ -28,6 +28,10 @@ export const handlers = [
     return HttpResponse.json(api.verifiedExamplesTable)
   }),
 
+  http.get(`${backendUrl}public/audio-examples`, () => {
+    return HttpResponse.json(api.audioExamplesTable)
+  }),
+
   http.get(`${backendUrl}public/quizzes`, () => {
     return HttpResponse.json(api.quizzesTable)
   }),
