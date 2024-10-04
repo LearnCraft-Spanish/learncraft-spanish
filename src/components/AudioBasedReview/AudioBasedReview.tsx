@@ -221,6 +221,18 @@ export default function AudioBasedReview({
     clearTimeout(currentCountdown.current)
   }
 
+  function audioElement() {
+    return (
+      <audio
+        ref={audioRef}
+        src={currentStepValue.audio}
+        onLoadedMetadata={() => { playAudio() }}
+      >
+        {/* <source src={currentStepValue.audio} type="audio/mpeg" /> */}
+      </audio>
+    )
+  }
+
   // Skips to the next whole example
   const incrementExample = useCallback(() => {
     if (currentExampleNumber + 1 < audioQuizExamples?.length) {
@@ -452,13 +464,7 @@ export default function AudioBasedReview({
               resumePlayback={resumePlayback}
               isPlaying={isPlaying}
             />
-            {currentStepValue.audio && (
-              <audio
-                ref={audioRef}
-                src={currentStepValue.audio}
-                onLoadedMetadata={() => { playAudio() }}
-              />
-            )}
+            {audioElement()}
           </div>
           <AudioQuizButtons
             incrementCurrentStep={incrementCurrentStep}
