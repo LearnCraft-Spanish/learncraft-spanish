@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // Load environment variables from .env file if running locally
-if (env.NODE_ENV !== 'production' && env.CI !== 'true') {
+if (env.CI !== 'true') {
   dotenv.config({ path: path.resolve(__dirname, '../../.env') })
 }
 

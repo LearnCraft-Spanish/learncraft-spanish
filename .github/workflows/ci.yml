@@ -36,10 +36,6 @@ jobs:
       - name: Install dependencies (only if cache miss)
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm install
-        
-      - name: Print environment variables
-        run: printenv | grep 'AUTH0' || true
-
 
       - name: Fetch mock data if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
