@@ -20,6 +20,7 @@ export default antfu(
     },
     rules: {
       'no-console': ['error', { allow: ['error'] }],
+      'max-len': ['warn', { code: 80, ignoreStrings: true }],
     },
   },
   // Customization for different files and overrides
@@ -43,6 +44,8 @@ export default antfu(
       'node_modules/',
       'src/mocks/data/serverlike/actualServerData.json',
       'src/Coaching.jsx',
+      '*/data/serverlike/*.json',
+      '*.yml',
     ],
   },
 )

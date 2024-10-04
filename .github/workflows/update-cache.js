@@ -22,7 +22,9 @@ const BACKEND_URL = env.BACKEND_URL
 const MOCKDATA_PATH = path.resolve(__dirname, '../../src/mocks/data/serverlike/actualServerData.json')
 
 // Ensure required environment variables are available
-if (!AUTH0_DOMAIN || !AUTH0_CLIENT_ID || !AUTH0_CLIENT_SECRET || !AUTH0_AUDIENCE) {
+if (
+  !AUTH0_DOMAIN || !AUTH0_CLIENT_ID || !AUTH0_CLIENT_SECRET || !AUTH0_AUDIENCE
+) {
   console.error('Missing required environment variables. Please check your .env file or environment settings.')
   exit(1)
 }
