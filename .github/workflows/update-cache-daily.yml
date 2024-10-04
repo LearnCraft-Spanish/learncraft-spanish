@@ -1,7 +1,7 @@
 name: Update Mock Data Cache Daily
 
 on:
-  #Runs daily at 8am UTC
+  # Runs daily at 8am UTC
   schedule:
     - cron: '0 8 * * *'
 

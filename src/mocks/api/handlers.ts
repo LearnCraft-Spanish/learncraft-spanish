@@ -1,4 +1,4 @@
-import { HttpResponse, http } from 'msw'
+import { http, HttpResponse } from 'msw'
 import data from '../data/serverlike/mockBackendData.json'
 import flashcardData from '../data/serverlike/mockStudentFlashcardData.json'
 

@@ -1,7 +1,7 @@
 // Providers.tsx
 import type { ReactNode } from 'react'
-import React from 'react'
 import { Auth0Provider } from '@auth0/auth0-react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 interface ProvidersProps {

@@ -1,5 +1,5 @@
-import data from './mockBackendData.json' with { type: 'json' }
 import { fisherYatesShuffle } from './fisherYatesShuffle.js'
+import data from './mockBackendData.json' with { type: 'json' }
 // This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 const courses = [

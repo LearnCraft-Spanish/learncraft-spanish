@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
 import { useAuth0 } from '@auth0/auth0-react'
+import { useQuery } from '@tanstack/react-query'
 import { useBackend } from './useBackend'
 
 export function useUserData() {

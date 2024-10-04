@@ -5,6 +5,8 @@ on:
     branches:
       - dev
       - master
+  # Allows manual deploy with CI
+  workflow_dispatch:
 
 jobs:
   test:

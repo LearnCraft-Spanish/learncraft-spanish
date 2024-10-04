@@ -54,7 +54,6 @@ async function fetchAuthToken() {
 // Step 2: Fetch mock data
 async function fetchMockData(token) {
   try {
-    console.log(`${BACKEND_URL}/serve-mock-data`)
     const response = await axios.get(`${BACKEND_URL}/serve-mock-data`, {
       headers: {
         Authorization: `Bearer ${token}`,

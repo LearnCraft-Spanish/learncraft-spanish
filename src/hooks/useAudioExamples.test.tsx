@@ -1,6 +1,6 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import data from '../mocks/data/serverlike/mockBackendData.json'
 import { useAudioExamples } from './useAudioExamples'

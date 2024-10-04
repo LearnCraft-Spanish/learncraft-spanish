@@ -1,6 +1,6 @@
-import { useCallback } from 'react'
-import { useAuth0 } from '@auth0/auth0-react'
 import type * as types from '../interfaceDefinitions'
+import { useAuth0 } from '@auth0/auth0-react'
+import { useCallback } from 'react'
 
 export function useBackend() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL

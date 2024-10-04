@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, vi } from 'vitest'
-import '@testing-library/jest-dom'
-
 import { server } from '../src/mocks/api/server'
+
+import '@testing-library/jest-dom'
 
 // Mock useAuth0 for getAccessTokenSilently
 vi.mock('@auth0/auth0-react', async () => {

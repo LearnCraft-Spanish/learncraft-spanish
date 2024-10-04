@@ -1,5 +1,5 @@
-import React from 'react'
 import type { Flashcard } from '../../interfaceDefinitions'
+import React from 'react'
 import { formatEnglishText, formatSpanishText } from '../../functions/formatFlashcardText'
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
 import './Quiz.css'

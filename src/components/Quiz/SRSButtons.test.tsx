@@ -1,10 +1,10 @@
-import React from 'react'
-import { cleanup, render, screen } from '@testing-library/react'
-import { vi } from 'vitest'
-
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { sampleStudentFlashcardData } from '../../../tests/mockData'
 import type { Flashcard } from '../../interfaceDefinitions'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { cleanup, render, screen } from '@testing-library/react'
+
+import React from 'react'
+import { vi } from 'vitest'
+import { sampleStudentFlashcardData } from '../../../tests/mockData'
 
 import SRSQuizButtons from './SRSButtons'
 

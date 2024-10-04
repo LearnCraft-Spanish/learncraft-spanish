@@ -1,6 +1,4 @@
 // src/Coaching.jsx
-/* eslint-disable react-hooks/exhaustive-deps  */
-/* eslint-disable react/no-nested-components  */
 
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
