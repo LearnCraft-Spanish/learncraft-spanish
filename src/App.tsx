@@ -4,7 +4,6 @@ import { useAuth0 } from '@auth0/auth0-react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Route, useLocation } from 'react-router-dom'
 
-import CallbackPage from './CallbackPage'
 import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
 import Loading from './components/Loading'
 import Nav from './components/Nav'
@@ -214,7 +213,7 @@ export const App: React.FC = () => {
             <Menu />
           )}
         />
-        <Route path="/callback" element={<CallbackPage />} />
+        {/* <Route path="/callback" element={<CallbackPage />} /> */}
         <Route
           path="/myflashcards/*"
           element={<ReviewMyFlashcards />}
