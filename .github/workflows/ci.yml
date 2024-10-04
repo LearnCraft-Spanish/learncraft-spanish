@@ -40,6 +40,12 @@ jobs:
       - name: Fetch mock data if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
         run: node .github/workflows/update-cache.js
+        env:
+          AUTH0_CLIENT_ID: 'hardcoded_client_id'
+          AUTH0_CLIENT_SECRET: 'hardcoded_client_secret'
+          AUTH0_AUDIENCE: 'hardcoded_audience'
+          AUTH0_DOMAIN: 'hardcoded_domain'
+          BACKEND_URL: 'hardcoded_backend_url'
 
       # Step 4: Run the test suite (this runs regardless of cache hit or miss)
       - name: Run tests
