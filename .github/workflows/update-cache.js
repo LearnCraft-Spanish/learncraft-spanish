@@ -28,6 +28,13 @@ const MOCKDATA_PATH = path.resolve(
   `${rootPath}mocks/data/api/actualServerData.json`,
 )
 
+console.log(AUTH0_DOMAIN)
+console.log(AUTH0_AUDIENCE)
+console.log(AUTH0_CLIENT_ID)
+console.log(AUTH0_CLIENT_SECRET)
+console.log(BACKEND_URL)
+console.log(MOCKDATA_PATH)
+
 // Ensure required environment variables are available
 if (
   !AUTH0_DOMAIN || !AUTH0_CLIENT_ID || !AUTH0_CLIENT_SECRET || !AUTH0_AUDIENCE
@@ -35,13 +42,6 @@ if (
   console.error('Missing required environment variables. Please check your .env file or environment settings.')
   exit(1)
 }
-
-console.log(AUTH0_DOMAIN)
-console.log(AUTH0_AUDIENCE)
-console.log(AUTH0_CLIENT_ID)
-console.log(AUTH0_CLIENT_SECRET)
-console.log(BACKEND_URL)
-console.log(MOCKDATA_PATH)
 
 // Step 1: Fetch Auth0 token
 async function fetchAuthToken() {
