@@ -124,6 +124,11 @@ describe('useBackend Hook', () => {
   })
 
   testArrayFetchFunction({
+    functionName: 'getAudioExamplesFromBackend',
+    requiredFields: ['recordId', 'spanishAudioLa', 'englishAudio'],
+  })
+
+  testArrayFetchFunction({
     functionName: 'getLcspQuizzesFromBackend',
     requiredFields: ['recordId', 'quizNickname'],
   })
