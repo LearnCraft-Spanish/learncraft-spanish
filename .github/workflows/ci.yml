@@ -5,7 +5,6 @@ on:
     branches:
       - development
       - master
-  # Allows manual deploy with CI
   workflow_dispatch:
 
 jobs:
@@ -13,20 +12,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Try to restore the cached mock data
       - name: Restore mock data cache
+        id: cache  # Assign an ID to use it in conditions
         uses: actions/cache@v2
         with:
-          path: ./mocks/data/api/actualServerData.json
+          path: ./mocks/data/api  # Cache the whole directory
           key: mockdata-${{ hashFiles('./mocks/data/api/actualServerData.json') }}
           restore-keys: |
             mockdata-
 
-      # Step 3: Conditionally install Node.js and fetch mock data if cache miss
       - name: Set up Node.js environment (only if cache miss)
         if: steps.cache.outputs.cache-hit != 'true'
         uses: actions/setup-node@v2
@@ -40,7 +37,12 @@ jobs:
       - name: Fetch mock data if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
         run: node .github/workflows/update-cache.js
+        env:  # Pass secrets to the script if they are needed
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+          AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
-      # Step 4: Run the test suite (this runs regardless of cache hit or miss)
       - name: Run tests
         run: npm test
