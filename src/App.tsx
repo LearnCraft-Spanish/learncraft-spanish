@@ -4,7 +4,6 @@ import React, { isValidElement, useCallback, useEffect, useRef, useState } from 
 import { Route, useLocation } from 'react-router-dom'
 import type { UserData } from './interfaceDefinitions'
 
-import CallbackPage from './CallbackPage'
 import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
 import Loading from './components/Loading'
 import Nav from './components/Nav'
@@ -214,7 +213,7 @@ export const App: React.FC = () => {
             <Menu />
           )}
         />
-        <Route path="/callback" element={<CallbackPage />} />
+        {/* <Route path="/callback" element={<CallbackPage />} /> */}
         <Route
           path="/myflashcards/*"
           element={<ReviewMyFlashcards />}
