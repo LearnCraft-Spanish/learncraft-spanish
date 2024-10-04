@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import data from '../../mocks/data/api/mockBackendData.json'
+import data from '../../mocks/data/serverlike/mockBackendData.json'
 import { useVerifiedExamples } from './useVerifiedExamples'
 
 interface WrapperProps {

@@ -16,13 +16,17 @@ export default function DummyComponent() {
       quizExamplesTable[course.code] = []
       course.quizzes.forEach(async (quiz) => {
         const quizNicknameArray = quiz.quizNickname.split(' ')
-        const examples = await getQuizExamplesFromBackend(quizNicknameArray[quizNicknameArray.length - 1])
+        const examples = await getQuizExamplesFromBackend(
+          quizNicknameArray[quizNicknameArray.length - 1],
+        )
         const finalExamples = []
         examples.forEach((example) => {
           const temp = { ...example, allStudents: [] }
           finalExamples.push(temp)
         })
-        p.innerHTML += `"${course.code}, ${quizNicknameArray[quizNicknameArray.length - 1]}": ${JSON.stringify(finalExamples)},`
+        p.innerHTML
+        += `"${course.code}, ${quizNicknameArray[quizNicknameArray.length - 1]}"
+        : ${JSON.stringify(finalExamples)},`
         quizExamplesTable[course.code].push(finalExamples)
       })
     })

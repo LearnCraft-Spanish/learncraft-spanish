@@ -33,6 +33,7 @@ yarn-error.log*
 .sentryclirc
 .env.sentry-build-plugin
 
-# Huge Data File
+# Huge Data Files
 mocks/data/api/actualServerData.json
+mocks/data/serverlike/actualServerData.json
 src/mocks/data/serverlike/actualServerData.json

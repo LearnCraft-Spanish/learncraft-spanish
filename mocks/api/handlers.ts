@@ -1,6 +1,6 @@
 import { HttpResponse, http } from 'msw'
-import data from '../data/api/mockBackendData.json'
-import flashcardData from '../data/api/mockStudentFlashcardData.json'
+import data from '../data/serverlike/mockBackendData.json'
+import flashcardData from '../data/serverlike/mockStudentFlashcardData.json'
 
 const api = data.api
 const studentFlashcardData = flashcardData.studentFlashcardData

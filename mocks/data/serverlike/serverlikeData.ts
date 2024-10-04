@@ -1,17 +1,27 @@
-// In progress: Overall module for importing, parsing, and exporting mock data for the MSW api.
+// Overall module for importing, parsing, and exporting mock data
+// Intended for the MSW api.
 // Some of this is generated programmatically, and some is manually created.
 // Instructions will be included for how to update the manual data.
 
 // Import types:
-import type { Flashcard, Lesson, Program, Quiz, Spelling, StudentFlashcardData, UserData, Vocabulary } from '../../../src/interfaceDefinitions'
+import type {
+  Flashcard,
+  Lesson,
+  Program,
+  Quiz,
+  Spelling,
+  StudentFlashcardData,
+  UserData,
+  Vocabulary,
+} from '../../../src/interfaceDefinitions'
 
-const getApiMockData = import('./actualServerData.json')
+import apiMockData from './actualServerData.json'
 
 interface MultipleQuizExamplesTables {
   [key: string]: Flashcard[]
 }
 
-interface mockApiData {
+interface MockApiData {
   programsTable: Program[]
   lessonsTable: Lesson[]
   vocabularyTable: Vocabulary[]
@@ -25,7 +35,7 @@ interface mockApiData {
 export default async function serverlikeData() {
   // Import functions:
 
-  const mockApiData: mockApiData = getApiMockData
+  const mockApiData: MockApiData = apiMockData
 
   const programsTable: Program[] = mockApiData.programsTable
   const lessonsTable: Lesson[] = mockApiData.lessonsTable
@@ -33,7 +43,8 @@ export default async function serverlikeData() {
   const spellingsTable: Spelling[] = mockApiData.spellingsTable
   const quizzesTable: Quiz[] = mockApiData.quizzesTable
   const verifiedExamplesTable: Flashcard[] = mockApiData.verifiedExamplesTable
-  const quizExamplesTable: MultipleQuizExamplesTables = mockApiData.quizExamplesTable
+  const quizExamplesTable: MultipleQuizExamplesTables
+  = mockApiData.quizExamplesTable
 
   // Locally defined data so no student information is exposed:
   const allStudentsTable: UserData[] = [
@@ -46,8 +57,13 @@ export default async function serverlikeData() {
     { recordId: 7, name: 'studentG', emailAddress: 'studentG@fake.not', role: 'student', isAdmin: false, relatedProgram: 5, cohort: 'E' },
   ]
 
-  // Generated data -- audio examples as the subset of verified examples that have both Spanish and English audio:
-  const audioExamplesTable: Flashcard[] = verifiedExamplesTable.filter(example => !!example.spanishAudioLa && !!example.englishAudio)
+  // Generated data
+  // Audio examples as the subset of verified examples
+  // that have both Spanish and English audio links:
+  const audioExamplesTable: Flashcard[]
+  = verifiedExamplesTable.filter(
+    example => !!example.spanishAudioLa && !!example.englishAudio,
+  )
 
   // Generated Data -- student examples for some sample students:
   const studentFlashcardData: StudentFlashcardData[] = []

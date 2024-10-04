@@ -37,12 +37,6 @@ jobs:
       - name: Fetch mock data if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
         run: node .github/workflows/update-cache.js
-        env:  # Pass secrets to the script if they are needed
-          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
-          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
-          AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
-          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
-          BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
       - name: Run tests
         run: npm test
