@@ -60,8 +60,7 @@ export default async function serverlikeData() {
   // Generated data
   // Audio examples as the subset of verified examples
   // that have both Spanish and English audio links:
-  const audioExamplesTable: Flashcard[]
-  = verifiedExamplesTable.filter(
+  const audioExamplesTable: Flashcard[] = verifiedExamplesTable.filter(
     example => !!example.spanishAudioLa && !!example.englishAudio,
   )
 
