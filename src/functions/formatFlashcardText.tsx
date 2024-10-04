@@ -1,4 +1,5 @@
-export function formatSpanishText(isSpanglish: string, spanishText: string): JSX.Element {
+export function formatSpanishText(isSpanglish: string, spanishText: string):
+JSX.Element {
   if (isSpanglish === 'esp') {
     return <p className="spanishFlashcardText">{spanishText}</p>
   }
@@ -8,7 +9,7 @@ export function formatSpanishText(isSpanglish: string, spanishText: string): JSX
     return (
       <p>
         {textParts.map((part, index) => {
-          // Create a more stable key by combining the index with part of the content
+          // Combines the index with part of the content for stable key.
           const key = `${index}-${part}`
 
           return index % 2 === 1
