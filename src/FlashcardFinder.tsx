@@ -1,6 +1,6 @@
+import React, { forwardRef, useCallback, useEffect, useState } from 'react'
 import type { DisplayOrder, Flashcard, VocabTag } from './interfaceDefinitions'
 
-import React, { forwardRef, useCallback, useEffect, useState } from 'react'
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'

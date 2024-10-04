@@ -1,8 +1,8 @@
 import type { ReactElement } from 'react'
-import type { UserData } from './interfaceDefinitions'
 import { useAuth0 } from '@auth0/auth0-react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Route, useLocation } from 'react-router-dom'
+import type { UserData } from './interfaceDefinitions'
 
 import CallbackPage from './CallbackPage'
 import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'

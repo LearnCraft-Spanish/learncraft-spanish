@@ -1,7 +1,7 @@
-import type { QuizCourse } from './interfaceDefinitions'
 import React, { useEffect, useRef, useState } from 'react'
 
 import { useNavigate, useParams } from 'react-router-dom'
+import type { QuizCourse } from './interfaceDefinitions'
 import Loading from './components/Loading'
 import QuizComponent from './components/Quiz/QuizComponent'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'

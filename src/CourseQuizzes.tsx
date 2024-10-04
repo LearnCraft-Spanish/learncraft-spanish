@@ -1,5 +1,4 @@
 import type { MutableRefObject } from 'react'
-import type { QuizCourse } from './interfaceDefinitions'
 import React, { useEffect, useRef } from 'react'
 
 import {
@@ -7,6 +6,7 @@ import {
   Routes,
   useNavigate,
 } from 'react-router-dom'
+import type { QuizCourse } from './interfaceDefinitions'
 import MenuButton from './components/Buttons/MenuButton'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
 import OfficialQuiz from './OfficialQuiz'

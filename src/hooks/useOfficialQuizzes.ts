@@ -1,7 +1,7 @@
-import type { Quiz } from '../interfaceDefinitions'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
+import type { Quiz } from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
 
 export function useOfficialQuizzes(quizNumber: number | undefined) {

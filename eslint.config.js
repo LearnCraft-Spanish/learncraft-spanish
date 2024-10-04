@@ -21,11 +21,6 @@ export default antfu(
     rules: {
       'no-console': ['error', { allow: ['error'] }],
     },
-    ignores: [
-      'node_modules/',
-      'src/mocks/data/serverlike/actualServerData.json',
-      'src/Coaching.jsx',
-    ],
   },
   // Customization for different files and overrides
   {
@@ -42,5 +37,12 @@ export default antfu(
         vi: true,
       },
     },
+  },
+  {
+    ignores: [
+      'node_modules/',
+      'src/mocks/data/serverlike/actualServerData.json',
+      'src/Coaching.jsx',
+    ],
   },
 )

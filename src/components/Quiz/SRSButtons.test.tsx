@@ -1,9 +1,9 @@
-import type { Flashcard } from '../../interfaceDefinitions'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { cleanup, render, screen } from '@testing-library/react'
 
 import React from 'react'
 import { vi } from 'vitest'
+import type { Flashcard } from '../../interfaceDefinitions'
 import { sampleStudentFlashcardData } from '../../../tests/mockData'
 
 import SRSQuizButtons from './SRSButtons'
