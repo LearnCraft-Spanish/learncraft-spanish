@@ -105,16 +105,16 @@ export default function QuizComponent({
   const answerAudio = startWithSpanish ? englishAudio : spanishAudio
 
   const playCurrentAudio = useCallback(() => {
-    setPlaying(true)
-    if (currentAudio.current) {
+    if (currentAudio.current?.duration) {
       currentAudio.current.play()
+      setPlaying(true)
     }
   }, [currentAudio])
 
   const pauseCurrentAudio = useCallback(() => {
-    setPlaying(false)
-    if (currentAudio.current) {
+    if (currentAudio.current?.duration) {
       currentAudio.current.pause()
+      setPlaying(false)
     }
   }, [currentAudio])
 
