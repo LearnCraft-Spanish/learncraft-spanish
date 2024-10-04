@@ -20,7 +20,7 @@ function Providers({ children }: ProvidersProps) {
       domain={domain}
       clientId={clientId}
       authorizationParams={{
-        redirect_uri: window.location.pathname,
+        redirect_uri: window.location.origin,
         audience,
         scope:
           'openid profile email read:current-student update:current-student read:all-students update:all-students',
