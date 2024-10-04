@@ -28,7 +28,7 @@ vi.unmock('./useUserData')
 vi.mock('./useUserData', () => ({
   useUserData: vi.fn(() => ({
     isSuccess: true,
-    data: { ...data.api.myData, role: 'limited' },
+    data: data.api.myData,
   })),
 }))
 
