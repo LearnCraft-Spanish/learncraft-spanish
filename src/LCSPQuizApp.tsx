@@ -1,8 +1,8 @@
-import type { QuizCourse } from './interfaceDefinitions'
 import { useAuth0 } from '@auth0/auth0-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Route, Routes, useNavigate } from 'react-router-dom'
+import type { QuizCourse } from './interfaceDefinitions'
 import MenuButton from './components/Buttons/MenuButton'
 import Loading from './components/Loading'
 import CourseQuizzes from './CourseQuizzes.jsx'

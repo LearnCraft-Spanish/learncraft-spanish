@@ -1,7 +1,7 @@
-import type { Lesson, Program } from '../interfaceDefinitions'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react' // Adjust the import based on your project structure
+import type { Lesson, Program } from '../interfaceDefinitions'
 import { useBackend } from '../hooks/useBackend'
 
 export function useProgramTable() {

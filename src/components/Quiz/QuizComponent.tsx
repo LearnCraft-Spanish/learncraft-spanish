@@ -1,7 +1,7 @@
-import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Link, Navigate, useLocation } from 'react-router-dom'
+import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions'
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle'
 import { useActiveStudent } from '../../hooks/useActiveStudent'
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'

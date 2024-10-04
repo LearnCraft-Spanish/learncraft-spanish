@@ -1,6 +1,6 @@
-import type { Lesson, Program, UserData } from '../interfaceDefinitions'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo } from 'react'
+import type { Lesson, Program, UserData } from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
 import { useProgramTable } from './useProgramTable'
 import { useUserData } from './useUserData'
