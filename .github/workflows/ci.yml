@@ -3,7 +3,7 @@ name: Continuous Integration
 on:
   push:
     branches:
-      - dev
+      - development
       - master
   # Allows manual deploy with CI
   workflow_dispatch:
