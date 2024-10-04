@@ -12,6 +12,7 @@ const __dirname = path.dirname(__filename)
 
 // Load environment variables from .env file if running locally
 dotenv.config({ path: path.resolve(__dirname, '../../.env') })
+const rootPath = (env.ACTION === 'true') ? './' : '../../'
 
 // Define environment variables
 const AUTH0_DOMAIN = env.AUTH0_DOMAIN
@@ -19,7 +20,10 @@ const AUTH0_CLIENT_ID = env.AUTH0_CLIENT_ID
 const AUTH0_CLIENT_SECRET = env.AUTH0_CLIENT_SECRET
 const AUTH0_AUDIENCE = env.AUTH0_AUDIENCE
 const BACKEND_URL = env.BACKEND_URL
-const MOCKDATA_PATH = path.resolve(__dirname, '../../src/mocks/data/serverlike/actualServerData.json')
+const MOCKDATA_PATH = path.resolve(
+  __dirname,
+  `${rootPath}mocks/data/api/actualServerData.json`,
+)
 
 // Ensure required environment variables are available
 if (

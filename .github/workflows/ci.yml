@@ -21,8 +21,8 @@ jobs:
       - name: Restore mock data cache
         uses: actions/cache@v2
         with:
-          path: ../../src/mocks/data/serverlike/actualServerData.json
-          key: mockdata-${{ hashFiles('../../src/mocks/data/serverlike/actualServerData.json') }}
+          path: ./mocks/data/api/actualServerData.json
+          key: mockdata-${{ hashFiles('./mocks/data/api/actualServerData.json') }}
           restore-keys: |
             mockdata-
 

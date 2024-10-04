@@ -35,5 +35,5 @@ jobs:
       - name: Cache mock data
         uses: actions/cache@v2
         with:
-          path: ../../src/mocks/data/serverlike/actualServerData.json
-          key: mockdata-${{ hashFiles('../../src/mocks/data/serverlike/actualServerData.json') }}
+          path: ./mocks/data/api/actualServerData.json
+          key: mockdata-${{ hashFiles('./mocks/data/api/actualServerData.json') }}

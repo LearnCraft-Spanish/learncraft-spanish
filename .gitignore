@@ -33,9 +33,6 @@ yarn-error.log*
 .sentryclirc
 .env.sentry-build-plugin
 
-# Package Files
-pnpm-lock.yaml
-
 # Huge Data File
 mocks/data/api/actualServerData.json
 src/mocks/data/serverlike/actualServerData.json
