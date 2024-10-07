@@ -3,9 +3,11 @@ import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import data from '../../mocks/data/serverlike/mockBackendData.json'
+import serverlikeData from '../../mocks/data/serverlike/serverlikeData'
 import { useVerifiedExamples } from './useVerifiedExamples'
 
+const api = serverlikeData().api
+const studentAdmin = api.allStudentsTable.find(student => student.role === 'student' && student.isAdmin === true)
 interface WrapperProps {
   children: React.ReactNode
 }
@@ -14,11 +16,11 @@ vi.unmock('./useUserData')
 vi.mock('./useUserData', () => ({
   useUserData: vi.fn(() => ({
     isSuccess: true,
-    data: data.api.myData,
+    data: studentAdmin,
   })),
 }))
 
-describe.skip('useVerifiedExamples', () => {
+describe('useVerifiedExamples', () => {
   const queryClient = new QueryClient()
   const wrapper = ({ children }: WrapperProps) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -30,7 +32,7 @@ describe.skip('useVerifiedExamples', () => {
     expect(result.current.data).toBeDefined()
   })
 
-  it('data length is mockDataLength', async () => {
+  it('data has length', async () => {
     const { result } = renderHook(() => useVerifiedExamples(), { wrapper })
     await waitFor(() => expect(result.current.data?.length).toBeGreaterThan(0))
   })
