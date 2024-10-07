@@ -228,7 +228,6 @@ export default function AudioBasedReview({
         src={currentStepValue.audio}
         onLoadedMetadata={() => { playAudio() }}
       >
-        {/* <source src={currentStepValue.audio} type="audio/mpeg" /> */}
       </audio>
     )
   }
@@ -396,17 +395,17 @@ export default function AudioBasedReview({
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback((event: KeyboardEvent) => {
-    if (event.key === 'ArrowRight') {
+    if (event.key === 'ArrowRight' || event.key === 'd') {
       incrementExample()
     }
-    else if (event.key === 'ArrowLeft') {
+    else if (event.key === 'ArrowLeft' || event.key === 'a') {
       decrementExample()
     }
-    else if (event.key === 'ArrowUp') {
+    else if (event.key === 'ArrowUp' || event.key === 'w') {
       event.preventDefault()
       incrementCurrentStep()
     }
-    else if (event.key === 'ArrowDown') {
+    else if (event.key === 'ArrowDown' || event.key === 's') {
       event.preventDefault()
       decrementCurrentStep()
     }

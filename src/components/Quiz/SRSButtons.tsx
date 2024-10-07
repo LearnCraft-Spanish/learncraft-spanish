@@ -1,5 +1,7 @@
-import type { Flashcard } from '../../interfaceDefinitions'
-import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
+import React, { useCallback } from 'react'
+
+import type { Flashcard } from '../interfaceDefinitions'
+import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
 
 interface QuizButtonsProps {
   currentExample: Flashcard
@@ -13,7 +15,7 @@ export default function SRSQuizButtons({ currentExample, answerShowing, incremen
   const flashcardData = flashcardDataQuery.data
   const updateFlashcard = updateFlashcardMutation.mutate
 
-  const getStudentExampleFromExample = (example: Flashcard) => {
+  const getStudentExampleFromExample = useCallback((example: Flashcard) => {
     const relatedStudentExample = flashcardData?.studentExamples?.find(
       item => item.relatedExample === example.recordId,
     )
@@ -21,9 +23,9 @@ export default function SRSQuizButtons({ currentExample, answerShowing, incremen
       return undefined
     }
     return relatedStudentExample
-  }
+  }, [flashcardData])
 
-  const getIntervalFromExample = (example: Flashcard) => {
+  const getIntervalFromExample = useCallback((example: Flashcard) => {
     const relatedStudentExample = getStudentExampleFromExample(example)
     if (relatedStudentExample === undefined) {
       return 0
@@ -33,9 +35,9 @@ export default function SRSQuizButtons({ currentExample, answerShowing, incremen
     }
     const interval = relatedStudentExample.reviewInterval
     return interval
-  }
+  }, [getStudentExampleFromExample])
 
-  async function increaseDifficulty() {
+  const increaseDifficulty = useCallback(async () => {
     const exampleId = currentExample?.recordId
     const studentExampleId = getStudentExampleFromExample(currentExample)?.recordId
     const currentInterval = getIntervalFromExample(currentExample)
@@ -46,9 +48,9 @@ export default function SRSQuizButtons({ currentExample, answerShowing, incremen
     const newInterval = (currentInterval > 0) ? currentInterval - 1 : 0
     const updateStatus = updateFlashcard({ studentExampleId, newInterval, difficulty: 'hard' })
     return updateStatus
-  }
+  }, [currentExample, getIntervalFromExample, getStudentExampleFromExample, incrementExampleNumber, updateFlashcard])
 
-  async function decreaseDifficulty() {
+  const decreaseDifficulty = useCallback(async () => {
     const exampleId = currentExample?.recordId
     const studentExampleId = getStudentExampleFromExample(currentExample)?.recordId
     const currentInterval = getIntervalFromExample(currentExample)
@@ -59,7 +61,24 @@ export default function SRSQuizButtons({ currentExample, answerShowing, incremen
     const newInterval = currentInterval + 1
     const updateStatus = updateFlashcard({ studentExampleId, newInterval, difficulty: 'easy' })
     return updateStatus
-  }
+  }, [currentExample, getIntervalFromExample, getStudentExampleFromExample, incrementExampleNumber, updateFlashcard])
+
+  /* keyboard controlls */
+  const handleKeyPress = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'q' || event.key === 'Q' || event.key === ',' || event.key === '<') {
+      increaseDifficulty()
+    }
+    if (event.key === 'e' || event.key === 'E' || event.key === '.' || event.key === '>') {
+      decreaseDifficulty()
+    }
+  }, [increaseDifficulty, decreaseDifficulty])
+
+  React.useEffect(() => {
+    document.addEventListener('keydown', handleKeyPress)
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress)
+    }
+  }, [handleKeyPress])
 
   return (
     <div className="buttonBox srsButtons">
