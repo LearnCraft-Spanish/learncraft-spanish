@@ -25,15 +25,8 @@ const AUTH0_AUDIENCE = env.AUTH0_AUDIENCE
 const BACKEND_URL = env.BACKEND_URL
 const MOCKDATA_PATH = path.resolve(
   __dirname,
-  `${rootPath}mocks/data/api/actualServerData.json`,
+  `${rootPath}mocks/data/serverlike/actualServerData.json`,
 )
-
-console.log(AUTH0_DOMAIN)
-console.log(AUTH0_AUDIENCE)
-console.log(AUTH0_CLIENT_ID)
-console.log(AUTH0_CLIENT_SECRET)
-console.log(BACKEND_URL)
-console.log(MOCKDATA_PATH)
 
 // Ensure required environment variables are available
 if (

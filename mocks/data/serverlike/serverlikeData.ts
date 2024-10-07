@@ -15,7 +15,7 @@ import type {
   Vocabulary,
 } from '../../../src/interfaceDefinitions'
 
-import apiMockData from './actualServerData.json'
+import * as dataJson from './actualServerData.json'
 
 interface MultipleQuizExamplesTables {
   [key: string]: Flashcard[]
@@ -35,7 +35,7 @@ interface MockApiData {
 export default async function serverlikeData() {
   // Import functions:
 
-  const mockApiData: MockApiData = apiMockData
+  const mockApiData: MockApiData = dataJson as MockApiData
 
   const programsTable: Program[] = mockApiData.programsTable
   const lessonsTable: Lesson[] = mockApiData.lessonsTable

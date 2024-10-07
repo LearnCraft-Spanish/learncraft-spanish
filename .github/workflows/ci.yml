@@ -15,25 +15,27 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      # Restore the mock data cache (this only caches your mock data, not dependencies)
       - name: Restore mock data cache
         id: cache  # Assign an ID to use it in conditions
         uses: actions/cache@v2
         with:
-          path: ./mocks/data/api  # Cache the whole directory
-          key: mockdata-${{ hashFiles('./mocks/data/api/actualServerData.json') }}
+          path: ./mocks/serverlike/api  # Cache the whole directory
+          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
           restore-keys: |
             mockdata-
 
-      - name: Set up Node.js environment (only if cache miss)
-        if: steps.cache.outputs.cache-hit != 'true'
+      # Set up Node.js environment (always run this step)
+      - name: Set up Node.js environment
         uses: actions/setup-node@v2
         with:
           node-version: 'lts/*'
 
-      - name: Install dependencies (only if cache miss)
-        if: steps.cache.outputs.cache-hit != 'true'
+      # Install dependencies (always run this step)
+      - name: Install dependencies
         run: npm install
 
+      # Fetch mock data if cache miss
       - name: Fetch mock data if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
         run: node .github/workflows/update-cache.js
@@ -44,5 +46,6 @@ jobs:
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
+      # Run the test suite (always run this step)
       - name: Run tests
         run: npm test
