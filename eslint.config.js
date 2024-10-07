@@ -1,9 +1,11 @@
 import antfu from "@antfu/eslint-config";
+import prettierConfig from "eslint-config-prettier";
 
 export default antfu(
   {
     react: true,
     typescript: true,
+    stylistic: false,
     languageOptions: {
       globals: {
         describe: true,
@@ -37,16 +39,12 @@ export default antfu(
   },
   {
     ignores: [
+      "src/Coaching.jsx",
       "node_modules/",
       "src/mocks/data/serverlike/actualServerData.json",
       "*.yml",
     ],
   },
-  {
-    // Add Prettier last to disable conflicting ESLint formatting rules
-    extends: [
-      "@antfu",
-      "plugin:prettier/recommended", // Ensures Prettier takes over formatting
-    ],
-  },
+  // Add Prettier config at the end to disable ESLint rules that conflict with Prettier
+  prettierConfig,
 );

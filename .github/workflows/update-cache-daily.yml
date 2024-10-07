@@ -29,7 +29,7 @@ jobs:
 
       # Step 4: Run the update-cache.js script
       - name: Update Cache
-        run: node update-cache.js
+        run: node .github/workflows/update-cache.js
         env:
           AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
           AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
@@ -42,4 +42,4 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./mocks/data/serverlike/actualServerData.json
-          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
+          key: mockdata-${{ hashFiles('./src/functions/DataModel.ts, ./mocks/data/serverlike/serverlikeData.ts') }}

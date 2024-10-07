@@ -2,13 +2,13 @@
   "prettier.enable": true, // Re-enable Prettier for formatting
   "editor.formatOnSave": true, // Use Prettier to format on save
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always" // Let ESLint fix non-formatting issues on save
+    "source.fixAll.eslint": "explicit" // Let ESLint fix non-formatting issues on save
   },
   // Ensures that the ESLint extension is enabled
   "eslint.enable": true,
-  "eslint.run": "onType", // or "onSave" depending on your preference
-  "eslint.nodePath": "node_modules", // Ensure ESLint finds the correct path
-  // Silent the stylistic rules in you IDE, but still auto fix them
+  "eslint.run": "onType",
+  "eslint.nodePath": "node_modules",
+
   "eslint.rules.customizations": [
     {
       "rule": "style/*",
