@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Route, Routes, useNavigate } from 'react-router-dom'
 import { useAuth0 } from '@auth0/auth0-react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-import './App.css'
-import { useActiveStudent } from './hooks/useActiveStudent'
-import CourseQuizzes from './CourseQuizzes.jsx'
-import MenuButton from './components/MenuButton'
-import OfficialQuiz from './OfficialQuiz'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import type { QuizCourse } from './interfaceDefinitions'
+import MenuButton from './components/Buttons/MenuButton'
+import Loading from './components/Loading'
+import CourseQuizzes from './CourseQuizzes.jsx'
+import { useActiveStudent } from './hooks/useActiveStudent'
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
 import { useSelectedLesson } from './hooks/useSelectedLesson'
-import Loading from './components/Loading'
+import OfficialQuiz from './OfficialQuiz'
+import './App.css'
 
 export default function LCSPQuizApp(): JSX.Element {
   const navigate = useNavigate()

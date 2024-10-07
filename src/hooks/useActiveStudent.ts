@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import type { Lesson, Program, UserData } from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
-import { useUserData } from './useUserData'
 import { useProgramTable } from './useProgramTable'
+import { useUserData } from './useUserData'
 
 export function useActiveStudent() {
   const { getAllUsersFromBackend } = useBackend()

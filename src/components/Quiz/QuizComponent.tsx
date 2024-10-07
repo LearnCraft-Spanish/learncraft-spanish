@@ -1,15 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Link, Navigate, useLocation } from 'react-router-dom'
 
-import type { DisplayOrder, Flashcard } from '../interfaceDefinitions'
-import { useActiveStudent } from '../hooks/useActiveStudent'
-import { useStudentFlashcards } from '../hooks/useStudentFlashcards'
-import { fisherYatesShuffle } from '../functions/fisherYatesShuffle'
+import { Link, Navigate, useLocation } from 'react-router-dom'
+import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions'
+import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle'
+import { useActiveStudent } from '../../hooks/useActiveStudent'
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards'
+import MenuButton from '../Buttons/MenuButton'
+import NewQuizProgress from './../AudioBasedReview/NewQuizProgress'
 import FlashcardDisplay from './FlashcardDisplay'
 import QuizButtons from './QuizButtons'
-import MenuButton from './MenuButton'
 import SRSQuizButtons from './SRSButtons'
-import NewQuizProgress from './AudioBasedReview/NewQuizProgress'
 
 interface QuizComponentProps {
   quizTitle: string
@@ -105,27 +105,30 @@ export default function QuizComponent({
   const answerAudio = startWithSpanish ? englishAudio : spanishAudio
 
   const playCurrentAudio = useCallback(() => {
-    setPlaying(true)
-    if (currentAudio.current) {
+    if (currentAudio.current?.duration) {
       currentAudio.current.play()
+      setPlaying(true)
     }
   }, [currentAudio])
 
   const pauseCurrentAudio = useCallback(() => {
-    setPlaying(false)
-    if (currentAudio.current) {
+    if (currentAudio.current?.duration) {
       currentAudio.current.pause()
+      setPlaying(false)
     }
   }, [currentAudio])
 
   const togglePlaying = useCallback(() => {
+    if (!(spanishAudioUrl || englishAudioUrl)) {
+      return
+    }
     if (playing) {
       pauseCurrentAudio()
     }
     else {
       playCurrentAudio()
     }
-  }, [playing, pauseCurrentAudio, playCurrentAudio])
+  }, [spanishAudioUrl, englishAudioUrl, playing, pauseCurrentAudio, playCurrentAudio])
 
   /*     Increment/Decrement Through Examples       */
   const incrementExampleNumber = useCallback(() => {

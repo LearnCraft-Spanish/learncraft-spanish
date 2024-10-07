@@ -1,3 +1,5 @@
+// src/Coaching.jsx
+
 import React, { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { useUserData } from './hooks/useUserData'
@@ -783,10 +785,10 @@ const Coaching = forwardRef((
           )}
           {contextual
           === `attendee${
-              currentAttendee.current
-                ? currentAttendee.current.recordId
-                : undefined
-            }-${groupSession.recordId}` && (
+            currentAttendee.current
+              ? currentAttendee.current.recordId
+              : undefined
+          }-${groupSession.recordId}` && (
             <div className="studentPopup" ref={currentContextual}>
               <h4>{currentAttendee.current.fullName}</h4>
               <p>{currentAttendee.current.email}</p>

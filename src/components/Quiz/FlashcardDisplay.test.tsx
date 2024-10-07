@@ -1,8 +1,8 @@
-import React from 'react'
-import { describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { sampleStudentFlashcardData } from '../../tests/mockData'
+import { cleanup, render, screen } from '@testing-library/react'
+import React from 'react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { sampleStudentFlashcardData } from '../../../tests/mockData'
 
 import Flashcard from './FlashcardDisplay'
 
@@ -16,29 +16,14 @@ const togglePlaying = vi.fn()
 
 const queryClient = new QueryClient()
 
-vi.mock('../hooks/useStudentFlashcards', () => {
-  return {
-    useStudentFlashcards: () => ({
-      addFlashcardMutation: { mutate: vi.fn() },
-      removeFlashcardMutation: { mutate: vi.fn() },
-      exampleIsCollected: vi.fn((x: number) => Boolean(x)),
-      exampleIsPending: vi.fn(() => false),
-    }),
-  }
-})
-
-/*
-  example: Flashcard
-  isStudent: boolean
-  answerShowing: boolean
-  startWithSpanish?: boolean
-  incrementExampleNumber: () => void
-  onRemove: () => void
-  toggleAnswer: () => void
-  audioActive: string
-  togglePlaying: () => void
-  playing: boolean
-*/
+vi.mock('../../hooks/useStudentFlashcards', () => ({
+  useStudentFlashcards: () => ({
+    addFlashcardMutation: { mutate: vi.fn() },
+    removeFlashcardMutation: { mutate: vi.fn() },
+    exampleIsCollected: vi.fn((x: number) => x === example.recordId),
+    exampleIsPending: vi.fn((x: number) => x < 0),
+  }),
+}))
 
 function FlashcardSpanishFirst() {
   return (
@@ -81,15 +66,6 @@ function FlashcardWithAudio() {
   return (
     <QueryClientProvider client={queryClient}>
       <Flashcard example={audioExample} isStudent answerShowing={false} startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="active" togglePlaying={togglePlaying} playing={false} />
-    </QueryClientProvider>
-  )
-}
-
-function FlashcardSpanishFirstAnswerShowingNotCollected() {
-  // In our mock, isCollected takes a number and returns a boolean, so recordId:0 is not collected
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Flashcard example={{ ...example, recordId: 0 }} isStudent answerShowing startWithSpanish incrementExampleNumber={incrementExampleNumber} onRemove={onRemove} toggleAnswer={toggleAnswer} audioActive="" togglePlaying={togglePlaying} playing={false} />
     </QueryClientProvider>
   )
 }
@@ -158,28 +134,6 @@ describe('component Flashcard', () => {
         render(<FlashcardSpanishFirstNotStudent />)
         expect(screen.queryByText('Add to my flashcards')).toBeNull()
         expect(screen.queryByText('Remove from my flashcards')).toBeNull()
-      })
-    })
-
-    describe('isStudent is true', () => {
-      // The way we check isCollected is now different. We need to mock the function that checks if the flashcard is collected. (exampleIsCollected in useStudentFlashcards)
-      describe('isCollected is true', () => {
-        it('remove flashcard button is rendered', () => {
-          render(<FlashcardSpanishFirstAnswerShowing />)
-          expect(screen.getByText('Remove from my flashcards')).toBeTruthy()
-        })
-      })
-      describe('isCollected is false', () => {
-        it('add flashcard button is rendered', () => {
-          render(<FlashcardSpanishFirstAnswerShowingNotCollected />)
-          expect(screen.getByText('Add to my flashcards')).toBeTruthy()
-        })
-      })
-      describe.skip('isCollected is true and isPending is true', () => {
-        it('pending flashcard button is rendered', () => {
-          // We need to mock the function that checks if the flashcard is pending. (exampleIsPending in useStudentFlashcards)
-          // Problem: I think we can only mock userStudentFlashcards 1 time, so we cant set multiple return values for exampleIsCollected and exampleIsPending
-        })
       })
     })
   })

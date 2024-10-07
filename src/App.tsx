@@ -1,24 +1,23 @@
-import './App.css'
 import type { ReactElement } from 'react'
+import { useAuth0 } from '@auth0/auth0-react'
 import React, { isValidElement, useCallback, useEffect, useRef, useState } from 'react'
 import { Route, useLocation } from 'react-router-dom'
-import { useAuth0 } from '@auth0/auth0-react'
-
-import { useUserData } from './hooks/useUserData'
-import { useActiveStudent } from './hooks/useActiveStudent'
 import type { UserData } from './interfaceDefinitions'
-import SentryRoutes from './functions/SentryRoutes'
-import Menu from './Menu'
-import LCSPQuizApp from './LCSPQuizApp'
-import FrequenSay from './FrequenSay'
-import NotFoundPage from './NotFoundPage'
-import FlashcardFinder from './FlashcardFinder'
-import CallbackPage from './CallbackPage'
-import FlashcardManager from './FlashcardManager'
-import ReviewMyFlashcards from './ReviewMyFlashcards'
+
 import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview'
-import Nav from './components/Nav'
 import Loading from './components/Loading'
+import Nav from './components/Nav'
+import FlashcardFinder from './FlashcardFinder'
+import FlashcardManager from './FlashcardManager'
+import FrequenSay from './FrequenSay'
+import SentryRoutes from './functions/SentryRoutes'
+import { useActiveStudent } from './hooks/useActiveStudent'
+import { useUserData } from './hooks/useUserData'
+import LCSPQuizApp from './LCSPQuizApp'
+import Menu from './Menu'
+import NotFoundPage from './NotFoundPage'
+import ReviewMyFlashcards from './ReviewMyFlashcards'
+import './App.css'
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -141,11 +140,11 @@ export const App: React.FC = () => {
     <div className="App" onClick={closeContextualIfClickOut}>
       <Nav />
       {(location.pathname !== '/coaching'
-      && location.pathname !== '/comprehensionquiz'
-      && location.pathname !== '/audioquiz'
-      && location.pathname !== '/myflashcards/quiz'
-      && location.pathname !== '/myflashcards/srsquiz'
-      && location.pathname.split('/')[1] !== 'officialquizzes') && (
+        && location.pathname !== '/comprehensionquiz'
+        && location.pathname !== '/audioquiz'
+        && location.pathname !== '/myflashcards/quiz'
+        && location.pathname !== '/myflashcards/srsquiz'
+        && location.pathname.split('/')[1] !== 'officialquizzes') && (
         <div className="div-user-subheader">
           {!isLoading && !isAuthenticated && (
             <p>You must be logged in to use this app.</p>
@@ -175,10 +174,10 @@ export const App: React.FC = () => {
                 <p>
                   {`Using as ${activeStudentQuery.data?.name}
                   ${
-                    (activeStudentQuery.data?.recordId === userDataQuery.data?.recordId)
-                    ? ' (yourself)'
-                    : ''
-                  }`}
+                (activeStudentQuery.data?.recordId === userDataQuery.data?.recordId)
+                  ? ' (yourself)'
+                  : ''
+                }`}
                 </p>
               )}
               {!activeStudentQuery.data?.recordId && <p>No student Selected</p>}
@@ -214,7 +213,7 @@ export const App: React.FC = () => {
             <Menu />
           )}
         />
-        <Route path="/callback" element={<CallbackPage />} />
+        {/* <Route path="/callback" element={<CallbackPage />} /> */}
         <Route
           path="/myflashcards/*"
           element={<ReviewMyFlashcards />}
@@ -247,8 +246,8 @@ export const App: React.FC = () => {
           path="/audioquiz/*"
           element={
             (userDataQuery.data?.role === 'student'
-            || userDataQuery.data?.role === 'limited'
-            || userDataQuery.data?.isAdmin) && (
+              || userDataQuery.data?.role === 'limited'
+              || userDataQuery.data?.isAdmin) && (
               <AudioBasedReview audioOrComprehension="audio" willAutoplay />
             )
           }
@@ -257,8 +256,8 @@ export const App: React.FC = () => {
           path="/comprehensionquiz/*"
           element={
             (userDataQuery.data?.role === 'student'
-            || userDataQuery.data?.role === 'limited'
-            || userDataQuery.data?.isAdmin) && (
+              || userDataQuery.data?.role === 'limited'
+              || userDataQuery.data?.isAdmin) && (
               <AudioBasedReview audioOrComprehension="comprehension" willAutoplay={false} />
             )
           }

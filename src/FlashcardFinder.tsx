@@ -1,21 +1,21 @@
 import React, { forwardRef, useCallback, useEffect, useState } from 'react'
+import type { DisplayOrder, Flashcard, VocabTag } from './interfaceDefinitions'
 
 import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
+
 import { useVerifiedExamples } from './hooks/useVerifiedExamples'
 
 import './App.css'
 
 // import { LessonSelector } from './components/LessonSelector'
 import { FromToLessonSelector } from './components/LessonSelector'
-
-import type { DisplayOrder, Flashcard, VocabTag } from './interfaceDefinitions'
-import { useVocabulary } from './hooks/useVocabulary'
-import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
-import { useUserData } from './hooks/useUserData'
-import { useSelectedLesson } from './hooks/useSelectedLesson'
 import Loading from './components/Loading'
+import { fisherYatesShuffle } from './functions/fisherYatesShuffle'
+import { useSelectedLesson } from './hooks/useSelectedLesson'
+import { useUserData } from './hooks/useUserData'
+import { useVocabulary } from './hooks/useVocabulary'
 
 interface FlashcardFinderProps {
   contextual: string

@@ -1,13 +1,13 @@
+import type { FormEvent } from 'react'
 import React, { useEffect, useState } from 'react'
+
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
-import type { FormEvent } from 'react'
-
+import MenuButton from './components/Buttons/MenuButton'
+import Loading from './components/Loading'
+import QuizComponent from './components/Quiz/QuizComponent'
 import { useActiveStudent } from './hooks/useActiveStudent'
 import { useStudentFlashcards } from './hooks/useStudentFlashcards'
-import MenuButton from './components/MenuButton'
-import Loading from './components/Loading'
-import QuizComponent from './components/QuizComponent'
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards()

@@ -1,16 +1,16 @@
-import React from 'react'
-import { cleanup, render, screen } from '@testing-library/react'
-import { vi } from 'vitest'
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { sampleStudentFlashcardData } from '../../tests/mockData.js'
-import type { Flashcard } from '../interfaceDefinitions'
+import { cleanup, render, screen } from '@testing-library/react'
+
+import React from 'react'
+import { vi } from 'vitest'
+import type { Flashcard } from '../../interfaceDefinitions'
+import { sampleStudentFlashcardData } from '../../../tests/mockData'
 
 import SRSQuizButtons from './SRSButtons'
 
 const queryClient = new QueryClient()
 
-vi.mock('../hooks/useStudentFlashcards', () => {
+vi.mock('../../hooks/useStudentFlashcards', () => {
   return {
     useStudentFlashcards: () => ({
       flashcardDataQuery: { data: sampleStudentFlashcardData },
@@ -25,9 +25,14 @@ const currentExampleEasy: Flashcard = { ...currentExample, difficulty: 'easy' }
 
 const currentExampleHard: Flashcard = { ...currentExample, difficulty: 'hard' }
 
-const incrementExampleNumber = vi.fn(() => {})
+// const incrementExampleNumber = vi.fn(() => {})
+let incrementExampleNumber = vi.fn()
 
 describe('component SRSButtons', () => {
+  beforeAll(() => {
+    incrementExampleNumber = vi.fn(() => {})
+  })
+
   afterEach(() => {
     vi.clearAllMocks()
     cleanup()

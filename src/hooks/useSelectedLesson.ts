@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo } from 'react'
 import type { Flashcard, Lesson, Program } from '../interfaceDefinitions'
 import { useActiveStudent } from './useActiveStudent'
 import { useProgramTable } from './useProgramTable' // Assuming this fetches the programs data

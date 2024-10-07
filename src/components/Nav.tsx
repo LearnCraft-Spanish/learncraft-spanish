@@ -2,8 +2,8 @@ import { useNavigate } from 'react-router-dom'
 
 import logo from '../resources/typelogosmall.png'
 
-import LoginButton from './LoginButton'
-import LogoutButton from './LogoutButton'
+import LoginButton from './Buttons/LoginButton'
+import LogoutButton from './Buttons/LogoutButton'
 
 export default function Nav(): JSX.Element {
   const navigate = useNavigate()

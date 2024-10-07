@@ -1,10 +1,9 @@
 import React from 'react'
-
 import { Navigate } from 'react-router-dom'
-import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
 import type { Flashcard } from './interfaceDefinitions'
-import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 import Loading from './components/Loading'
+import { formatEnglishText, formatSpanishText } from './functions/formatFlashcardText'
+import { useStudentFlashcards } from './hooks/useStudentFlashcards'
 
 function FlashcardManager() {
   const { flashcardDataQuery, removeFlashcardMutation } = useStudentFlashcards()

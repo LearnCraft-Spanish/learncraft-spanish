@@ -1,0 +1,51 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - development
+      - master
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Restore the mock data cache (this only caches your mock data, not dependencies)
+      - name: Restore mock data cache
+        id: cache  # Assign an ID to use it in conditions
+        uses: actions/cache@v2
+        with:
+          path: ./mocks/serverlike/api  # Cache the whole directory
+          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
+          restore-keys: |
+            mockdata-
+
+      # Set up Node.js environment (always run this step)
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/*'
+
+      # Install dependencies (always run this step)
+      - name: Install dependencies
+        run: npm install
+
+      # Fetch mock data if cache miss
+      - name: Fetch mock data if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: node .github/workflows/update-cache.js
+        env:
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+          AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
+      # Run the test suite (always run this step)
+      - name: Run tests
+        run: npm test

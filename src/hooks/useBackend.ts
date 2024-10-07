@@ -1,5 +1,5 @@
-import { useCallback } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
+import { useCallback } from 'react'
 import type * as types from '../interfaceDefinitions'
 
 export function useBackend() {
@@ -58,33 +58,55 @@ export function useBackend() {
     return getFactory<types.Vocabulary[]>('public/vocabulary')
   }, [getFactory])
 
-  const getSpellingsFromBackend = useCallback((): Promise<types.Spelling[] > => {
-    return getFactory<types.Spelling[]>('public/spellings')
-  }, [getFactory])
+  const getSpellingsFromBackend = useCallback(
+    (): Promise<types.Spelling[] > => {
+      return getFactory<types.Spelling[]>('public/spellings')
+    },
+    [getFactory],
+  )
 
-  const getExamplesFromBackend = useCallback((): Promise<types.Flashcard[] > => {
-    return getFactory<types.Flashcard[]>('public/examples')
-  }, [getFactory])
+  // UNUSED -- CONSIDER DELETING
+  const getExamplesFromBackend = useCallback(
+    (): Promise<types.Flashcard[] > => {
+      return getFactory<types.Flashcard[]>('public/examples')
+    },
+    [getFactory],
+  )
 
-  const getVerifiedExamplesFromBackend = useCallback((): Promise<types.Flashcard[] > => {
-    return getFactory<types.Flashcard[]>('public/verified-examples')
-  }, [getFactory])
+  const getVerifiedExamplesFromBackend = useCallback(
+    (): Promise<types.Flashcard[] > => {
+      return getFactory<types.Flashcard[]>('public/verified-examples')
+    },
+    [getFactory],
+  )
 
-  const getAudioExamplesFromBackend = useCallback((): Promise<types.Flashcard[] > => {
-    return getFactory<types.Flashcard[]>('public/audio-examples')
-  }, [getFactory])
+  const getAudioExamplesFromBackend = useCallback(
+    (): Promise<types.Flashcard[] > => {
+      return getFactory<types.Flashcard[]>('public/audio-examples')
+    },
+    [getFactory],
+  )
 
-  const getLcspQuizzesFromBackend = useCallback((): Promise<types.Quiz[] > => {
-    return getFactory<types.Quiz[]>('public/quizzes')
-  }, [getFactory])
+  const getLcspQuizzesFromBackend = useCallback(
+    (): Promise<types.Quiz[] > => {
+      return getFactory<types.Quiz[]>('public/quizzes')
+    },
+    [getFactory],
+  )
 
-  const getMyExamplesFromBackend = useCallback((): Promise<types.StudentFlashcardData > => {
-    return getFactory<types.StudentFlashcardData>('my-examples')
-  }, [getFactory])
+  const getMyExamplesFromBackend = useCallback(
+    (): Promise<types.StudentFlashcardData > => {
+      return getFactory<types.StudentFlashcardData>('my-examples')
+    },
+    [getFactory],
+  )
 
-  const getQuizExamplesFromBackend = useCallback((quizId: number): Promise<types.Flashcard[] > => {
-    return getFactory<types.Flashcard[]>(`public/quizExamples/${quizId}`)
-  }, [getFactory])
+  const getQuizExamplesFromBackend = useCallback(
+    (quizId: number): Promise<types.Flashcard[] > => {
+      return getFactory<types.Flashcard[]>(`public/quizExamples/${quizId}`)
+    },
+    [getFactory],
+  )
 
   const getAllUsersFromBackend = useCallback((): Promise<types.UserData[] > => {
     return getFactory<types.UserData[]>('all-students')
@@ -94,9 +116,12 @@ export function useBackend() {
     return getFactory<types.UserData>('my-data')
   }, [getFactory])
 
-  const getActiveExamplesFromBackend = useCallback((studentId: number): Promise<types.StudentFlashcardData > => {
-    return getFactory<types.StudentFlashcardData>(`${studentId}/examples`)
-  }, [getFactory])
+  const getActiveExamplesFromBackend = useCallback(
+    (studentId: number): Promise<types.StudentFlashcardData > => {
+      return getFactory<types.StudentFlashcardData>(`${studentId}/examples`)
+    },
+    [getFactory],
+  )
 
   /*      Coaching API      */
 

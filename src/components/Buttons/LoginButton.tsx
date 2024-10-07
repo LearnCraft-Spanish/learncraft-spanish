@@ -1,5 +1,5 @@
-import React from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
+import React from 'react'
 
 function LoginButton(): JSX.Element | false {
   const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0()

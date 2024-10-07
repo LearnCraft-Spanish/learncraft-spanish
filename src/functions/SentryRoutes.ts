@@ -1,7 +1,7 @@
+import * as Sentry from '@sentry/react'
 // SentryRoutes.js
 import React from 'react'
 import { Routes, createRoutesFromChildren, matchRoutes, useLocation, useNavigationType } from 'react-router-dom'
-import * as Sentry from '@sentry/react'
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes)
 

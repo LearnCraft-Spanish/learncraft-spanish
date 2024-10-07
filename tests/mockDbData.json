@@ -15,6 +15,7 @@
       "cohortCCurrentLesson": 250,
       "cohortDCurrentLesson": 39,
       "cohortECurrentLesson": 7,
+      "cohortFCurrentLesson": 3,
       "name": "LearnCraft Spanish",
       "recordId": 2,
       "lessons": []
@@ -25,6 +26,7 @@
       "cohortCCurrentLesson": 1,
       "cohortDCurrentLesson": 1,
       "cohortECurrentLesson": null,
+      "cohortFCurrentLesson": null,
       "name": "SI1M",
       "recordId": 3,
       "lessons": []
@@ -35,6 +37,7 @@
       "cohortCCurrentLesson": 1,
       "cohortDCurrentLesson": 1,
       "cohortECurrentLesson": null,
+      "cohortFCurrentLesson": null,
       "name": "Ser Estar Mini Course",
       "recordId": 4,
       "lessons": []
