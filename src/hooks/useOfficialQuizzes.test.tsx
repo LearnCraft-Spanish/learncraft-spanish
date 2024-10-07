@@ -10,13 +10,6 @@ interface WrapperProps {
   children: React.ReactNode
 }
 
-// vi.unmock('@auth0/auth0-react')
-vi.mock('@auth0/auth0-react', () => ({
-  useAuth0: vi.fn(() => ({
-    isAuthenticated: true,
-  })),
-}))
-
 vi.mock('./useBackend', () => ({
   useBackend: vi.fn(() => ({
     getLcspQuizzesFromBackend: vi.fn(() => data.api.quizzesTable),

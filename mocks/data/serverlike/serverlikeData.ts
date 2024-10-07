@@ -32,7 +32,7 @@ interface MockApiData {
 }
 
 // Final export:
-export default async function serverlikeData() {
+export default function serverlikeData() {
   // Import functions:
 
   const mockApiData: MockApiData = apiMockData
@@ -67,18 +67,18 @@ export default async function serverlikeData() {
   // Generated Data -- student examples for some sample students:
   const studentFlashcardData: StudentFlashcardData[] = []
 
-  return JSON.stringify({
+  return {
     api: {
       programsTable,
       lessonsTable,
       vocabularyTable,
       spellingsTable,
       quizzesTable,
-      quizExamplesTable,
+      // quizExamplesTable,
       allStudentsTable,
       verifiedExamplesTable,
       audioExamplesTable,
       studentFlashcardData,
     },
-  })
+  }
 }

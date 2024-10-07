@@ -1,51 +1,54 @@
 import { HttpResponse, http } from 'msw'
 import data from '../data/serverlike/mockBackendData.json'
 import flashcardData from '../data/serverlike/mockStudentFlashcardData.json'
+import newData from '../data/serverlike/serverlikeData'
 
 const api = data.api
 const studentFlashcardData = flashcardData.studentFlashcardData
 const backendUrl = import.meta.env.VITE_BACKEND_URL
 
+const apiData = newData().api
+
 export const handlers = [
 
   http.get(`${backendUrl}public/programs`, () => {
-    return HttpResponse.json(api.programsTable)
+    return HttpResponse.json(apiData.programsTable)
   }),
 
   http.get(`${backendUrl}public/lessons`, () => {
-    return HttpResponse.json(api.lessonsTable)
+    return HttpResponse.json(apiData.lessonsTable)
   }),
 
   http.get(`${backendUrl}public/vocabulary`, () => {
-    return HttpResponse.json(api.vocabularyTable)
+    return HttpResponse.json(apiData.vocabularyTable)
   }),
 
   http.get(`${backendUrl}public/spellings`, () => {
-    return HttpResponse.json(api.spellingsTable)
+    return HttpResponse.json(apiData.spellingsTable)
   }),
 
   http.get(`${backendUrl}public/verified-examples`, () => {
-    return HttpResponse.json(api.verifiedExamplesTable)
-  }),
-
-  http.get(`${backendUrl}public/audio-examples`, () => {
-    return HttpResponse.json(api.audioExamplesTable)
+    return HttpResponse.json(apiData.verifiedExamplesTable)
   }),
 
   http.get(`${backendUrl}public/quizzes`, () => {
-    return HttpResponse.json(api.quizzesTable)
+    return HttpResponse.json(apiData.quizzesTable)
   }),
 
   http.get(`${backendUrl}my-data`, () => {
-    return HttpResponse.json(api.myData)
+    return HttpResponse.json(apiData.allStudentsTable[0])
   }),
 
   http.get(`${backendUrl}all-students`, () => {
-    return HttpResponse.json(api.allStudentsTable)
+    return HttpResponse.json(apiData.allStudentsTable)
   }),
 
   http.get(`${backendUrl}my-examples`, () => {
     return HttpResponse.json(studentFlashcardData)
+  }),
+
+  http.get(`${backendUrl}public/audio-examples`, () => {
+    return HttpResponse.json(apiData.audioExamplesTable)
   }),
 
   // Post Requests
