@@ -3,25 +3,15 @@ import { renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import data from '../../mocks/data/serverlike/mockBackendData.json'
+// import serverL from '../../mocks/data/serverlike/mockBackendData.json'
+import serverLikeData from '../../mocks/data/serverlike/serverlikeData'
 import { useUserData } from './useUserData'
+
+const api = serverLikeData().api
 
 interface WrapperProps {
   children: React.ReactNode
 }
-
-vi.unmock('@auth0/auth0-react')
-vi.mock('@auth0/auth0-react', () => ({
-  useAuth0: vi.fn(() => ({
-    isAuthenticated: true,
-  })),
-}))
-
-vi.mock('./useBackend', () => ({
-  useBackend: vi.fn(() => ({
-    getUserDataFromBackend: vi.fn(() => data.api.myData),
-  })),
-}))
 
 describe('useUserData', () => {
   const queryClient = new QueryClient()
@@ -36,6 +26,6 @@ describe('useUserData', () => {
 
   it('data is mockData', async () => {
     const { result } = renderHook(() => useUserData(), { wrapper })
-    await waitFor(() => expect(result.current.data).toEqual(data.api.myData))
+    await waitFor(() => expect(result.current.data).toEqual(api.allStudentsTable[0]))
   })
 })
