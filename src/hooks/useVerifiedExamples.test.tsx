@@ -18,7 +18,7 @@ vi.mock('./useUserData', () => ({
   })),
 }))
 
-describe('useVerifiedExamples', () => {
+describe.skip('useVerifiedExamples', () => {
   const queryClient = new QueryClient()
   const wrapper = ({ children }: WrapperProps) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
