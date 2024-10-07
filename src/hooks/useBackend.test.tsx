@@ -21,6 +21,7 @@ describe('useBackend Hook', () => {
   })
 
   it('renders without crashing', async () => {
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
     expect(hookResult).toBeDefined()
   })
 
@@ -163,13 +164,18 @@ describe('useBackend Hook', () => {
     requiredFields: ['examples', 'studentExamples'],
   })
 
-  const quizTableArray = api.quizExamplesTableArray
-  console.log('quizTableArray', quizTableArray)
-  quizTableArray.forEach((quizExamplesTable: QuizExamplesTable) => {
-    const quizNickname = Object.keys(quizExamplesTable)[0]
+  const quizExamplesTableArray = api.quizExamplesTableArray
+  console.log('quizTableArray', quizExamplesTableArray)
+  quizExamplesTableArray.forEach((quizExamplesObject: QuizExamplesTable) => {
+    const quizNickname = quizExamplesObject.quizNickname
+    console.log('quizNickname', quizNickname)
     const quizId = api.quizzesTable.find(
       (quiz: Quiz) => quiz.quizNickname === quizNickname,
     )?.recordId
+    if (!quizId) {
+      throw new Error('Quiz ID not found')
+    }
+    // console.log('quiz record id: ', quizId)
     testArrayFetchFunction({
       functionName: 'getQuizExamplesFromBackend',
       functionParams: quizId,

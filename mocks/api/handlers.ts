@@ -34,6 +34,7 @@ export const handlers = [
   }),
 
   http.get(`${backendUrl}public/quizExamples/:quizId`, ({ params }) => {
+    console.log('params', params)
     const paramString = params.quizId
     const quizObject = apiData.quizzesTable.find((quiz) => {
       return quiz.recordId === Number(paramString)
@@ -43,13 +44,13 @@ export const handlers = [
     }
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
-        return Object.keys(quizExamples)[0] === quizObject.quizNickname
+        return quizExamples.quizNickname === quizObject.quizNickname
       },
     )
     if (!quizExamplesObject) {
       throw new Error('Quiz examples not found')
     }
-    const quizExamples = quizExamplesObject[Object.keys(quizExamplesObject)[0]]
+    const quizExamples = quizExamplesObject.quizExamplesTable
     if (!quizExamples) {
       throw new Error('Quiz examples not found')
     }

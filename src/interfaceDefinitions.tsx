@@ -117,7 +117,8 @@ export interface Quiz {
 }
 
 export interface QuizExamplesTable {
-  [key: string]: Flashcard[]
+  quizNickname: string
+  quizExamplesTable: Flashcard[]
 }
 
 export interface Spelling {
