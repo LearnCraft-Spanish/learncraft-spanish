@@ -34,7 +34,6 @@ export const handlers = [
   }),
 
   http.get(`${backendUrl}public/quizExamples/:quizId`, ({ params }) => {
-    console.log('params', params)
     const paramString = params.quizId
     const quizObject = apiData.quizzesTable.find((quiz) => {
       return quiz.recordId === Number(paramString)

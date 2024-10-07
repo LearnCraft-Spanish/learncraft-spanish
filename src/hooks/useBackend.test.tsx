@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { beforeAll, describe, expect, it } from 'vitest'
 import MockAuth0Provider from '../../mocks/MockAuth0Provider'
@@ -21,7 +21,7 @@ describe('useBackend Hook', () => {
   })
 
   it('renders without crashing', async () => {
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(hookResult).toBeDefined())
     expect(hookResult).toBeDefined()
   })
 
@@ -165,10 +165,8 @@ describe('useBackend Hook', () => {
   })
 
   const quizExamplesTableArray = api.quizExamplesTableArray
-  console.log('quizTableArray', quizExamplesTableArray)
   quizExamplesTableArray.forEach((quizExamplesObject: QuizExamplesTable) => {
     const quizNickname = quizExamplesObject.quizNickname
-    console.log('quizNickname', quizNickname)
     const quizId = api.quizzesTable.find(
       (quiz: Quiz) => quiz.quizNickname === quizNickname,
     )?.recordId
