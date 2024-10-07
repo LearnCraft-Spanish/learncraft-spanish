@@ -164,6 +164,7 @@ describe('useBackend Hook', () => {
   })
 
   const quizTableArray = api.quizExamplesTableArray
+  console.log('quizTableArray', quizTableArray)
   quizTableArray.forEach((quizExamplesTable: QuizExamplesTable) => {
     const quizNickname = Object.keys(quizExamplesTable)[0]
     const quizId = api.quizzesTable.find(
