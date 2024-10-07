@@ -41,7 +41,15 @@ export const handlers = [
     if (!quizObject) {
       throw new Error('Quiz not found')
     }
-    const quizExamples = apiData.quizExamplesTableArray[quizObject.quizNickname]
+    const quizExamplesObject = apiData.quizExamplesTableArray.find(
+      (quizExamples) => {
+        return Object.keys(quizExamples)[0] === quizObject.quizNickname
+      },
+    )
+    if (!quizExamplesObject) {
+      throw new Error('Quiz examples not found')
+    }
+    const quizExamples = quizExamplesObject[Object.keys(quizExamplesObject)[0]]
     if (!quizExamples) {
       throw new Error('Quiz examples not found')
     }
