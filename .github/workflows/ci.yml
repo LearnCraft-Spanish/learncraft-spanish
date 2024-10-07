@@ -1,6 +1,10 @@
 name: Continuous Integration
 
 on:
+  pull_request:
+    branches:
+      - development
+      - master
   push:
     branches:
       - development
@@ -17,10 +21,10 @@ jobs:
 
       # Restore the mock data cache (this only caches your mock data, not dependencies)
       - name: Restore mock data cache
-        id: cache  # Assign an ID to use it in conditions
+        id: cache # Assign an ID to use it in conditions
         uses: actions/cache@v2
         with:
-          path: ./mocks/serverlike/api  # Cache the whole directory
+          path: ./mocks/serverlike/api # Cache the whole directory
           key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
           restore-keys: |
             mockdata-

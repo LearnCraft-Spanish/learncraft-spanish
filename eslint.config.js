@@ -1,13 +1,11 @@
-import antfu from '@antfu/eslint-config'
+import antfu from '@antfu/eslint-config';
 
 export default antfu(
   {
     react: true,
     typescript: true,
-    // Global settings here
     languageOptions: {
       globals: {
-        // Add Vitest globals
         describe: true,
         it: true,
         expect: true,
@@ -20,14 +18,12 @@ export default antfu(
     },
     rules: {
       'no-console': ['error', { allow: ['error'] }],
-      'max-len': ['warn', { code: 80, ignoreStrings: true }],
+      'max-len': ['warn', { code: 100, ignoreStrings: true }],
     },
   },
-  // Customization for different files and overrides
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'], // Move files here
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
   },
-  // Specific configuration for test files
   {
     files: ['**/*.test.{ts,tsx,js,jsx}'],
     languageOptions: {
@@ -43,9 +39,14 @@ export default antfu(
     ignores: [
       'node_modules/',
       'src/mocks/data/serverlike/actualServerData.json',
-      'src/Coaching.jsx',
-      '*/data/serverlike/*.json',
       '*.yml',
     ],
   },
-)
+  {
+    // Add Prettier last to disable conflicting ESLint formatting rules
+    "extends": [
+      "@antfu",
+      "plugin:prettier/recommended" // Ensures Prettier takes over formatting
+    ]
+  }
+);

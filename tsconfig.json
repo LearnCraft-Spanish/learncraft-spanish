@@ -23,6 +23,7 @@
   "include": [
     "src",
     "tests",
-    "vite-env.d.ts"
-, "mocks"  ]
+    "vite-env.d.ts",
+    "mocks"
+  ]
 }

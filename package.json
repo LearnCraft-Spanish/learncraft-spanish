@@ -15,7 +15,8 @@
     "test": "vitest run --coverage",
     "predeploy": "npm run build",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
