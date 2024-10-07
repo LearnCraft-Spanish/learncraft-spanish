@@ -116,6 +116,10 @@ export interface Quiz {
   subtitle: string
 }
 
+export interface QuizExamplesTable {
+  [key: string]: Flashcard[]
+}
+
 export interface Spelling {
   relatedWordidiom: number
   spellingOption: string

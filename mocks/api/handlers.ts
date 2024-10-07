@@ -1,9 +1,7 @@
 import { HttpResponse, http } from 'msw'
-import data from '../data/serverlike/mockBackendData.json'
 import flashcardData from '../data/serverlike/mockStudentFlashcardData.json'
 import newData from '../data/serverlike/serverlikeData'
 
-const api = data.api
 const studentFlashcardData = flashcardData.studentFlashcardData
 const backendUrl = import.meta.env.VITE_BACKEND_URL
 
@@ -33,6 +31,21 @@ export const handlers = [
 
   http.get(`${backendUrl}public/quizzes`, () => {
     return HttpResponse.json(apiData.quizzesTable)
+  }),
+
+  http.get(`${backendUrl}public/quizExamples/:quizId`, ({ params }) => {
+    const paramString = params.quizId
+    const quizObject = apiData.quizzesTable.find((quiz) => {
+      return quiz.recordId === Number(paramString)
+    })
+    if (!quizObject) {
+      throw new Error('Quiz not found')
+    }
+    const quizExamples = apiData.quizExamplesTableArray[quizObject.quizNickname]
+    if (!quizExamples) {
+      throw new Error('Quiz examples not found')
+    }
+    return HttpResponse.json(quizExamples)
   }),
 
   http.get(`${backendUrl}my-data`, () => {

@@ -9,6 +9,7 @@ import type {
   Lesson,
   Program,
   Quiz,
+  QuizExamplesTable,
   Spelling,
   StudentFlashcardData,
   UserData,
@@ -17,10 +18,6 @@ import type {
 
 import * as dataJson from './actualServerData.json'
 
-interface MultipleQuizExamplesTables {
-  [key: string]: Flashcard[]
-}
-
 interface MockApiData {
   programsTable: Program[]
   lessonsTable: Lesson[]
@@ -28,7 +25,7 @@ interface MockApiData {
   spellingsTable: Spelling[]
   quizzesTable: Quiz[]
   verifiedExamplesTable: Flashcard[]
-  quizExamplesTable: MultipleQuizExamplesTables
+  quizExamplesTableArray: QuizExamplesTable[]
 }
 
 // Final export:
@@ -43,8 +40,8 @@ export default function serverlikeData() {
   const spellingsTable: Spelling[] = mockApiData.spellingsTable
   const quizzesTable: Quiz[] = mockApiData.quizzesTable
   const verifiedExamplesTable: Flashcard[] = mockApiData.verifiedExamplesTable
-  const quizExamplesTable: MultipleQuizExamplesTables
-  = mockApiData.quizExamplesTable
+  const quizExamplesTableArray: QuizExamplesTable[]
+  = mockApiData.quizExamplesTableArray
 
   // Locally defined data so no student information is exposed:
   const allStudentsTable: UserData[] = [
@@ -74,7 +71,7 @@ export default function serverlikeData() {
       vocabularyTable,
       spellingsTable,
       quizzesTable,
-      // quizExamplesTable,
+      quizExamplesTableArray,
       allStudentsTable,
       verifiedExamplesTable,
       audioExamplesTable,

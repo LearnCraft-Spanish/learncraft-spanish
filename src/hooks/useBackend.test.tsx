@@ -2,14 +2,21 @@ import { renderHook } from '@testing-library/react'
 import { act } from 'react'
 import { beforeAll, describe, expect, it } from 'vitest'
 import MockAuth0Provider from '../../mocks/MockAuth0Provider'
+import serverlikeData from '../../mocks/data/serverlike/serverlikeData'
+import type { Quiz, QuizExamplesTable } from '../interfaceDefinitions'
 import { useBackend } from './useBackend'
+
+const { api } = serverlikeData()
 
 describe('useBackend Hook', () => {
   let hookResult: ReturnType<typeof useBackend>
 
   // Initialize the hook before all tests
   beforeAll(() => {
-    const { result } = renderHook(() => useBackend(), { wrapper: MockAuth0Provider })
+    const { result } = renderHook(
+      () => useBackend(),
+      { wrapper: MockAuth0Provider },
+    )
     hookResult = result.current // Store the current hook result once
   })
 
@@ -22,27 +29,33 @@ describe('useBackend Hook', () => {
     functionName,
     expectedLength,
     requiredFields,
+    functionParams,
   }: {
     functionName: keyof ReturnType<typeof useBackend>
     expectedLength?: number
     requiredFields: string[]
+    functionParams?: number
   }) {
     describe(`${String(functionName)} function`, () => {
       let data: any[]
 
       it('resolves the fetch function and returns truthy data', async () => {
-        const fetchFunction = hookResult[functionName] as () => Promise<any[]>
+        const fetchFunction
+        = hookResult[functionName] as
+        (functionParams?: number) => Promise<any[]>
 
         // Explicitly handle the async call inside the test case
         try {
           await act(async () => {
-            data = await fetchFunction()
+            data = await fetchFunction(functionParams)
           })
           expect(data).toBeDefined()
         }
         catch (error) {
           // Fail the test if the promise rejects
-          throw new Error(`Failed to fetch data in ${String(functionName)}: ${error}`)
+          throw new Error(
+            `Failed to fetch data in ${String(functionName)}: ${error}`,
+          )
         }
       })
 
@@ -85,7 +98,9 @@ describe('useBackend Hook', () => {
         }
         catch (error) {
           // Fail the test if the promise rejects
-          throw new Error(`Failed to fetch data in ${String(functionName)}: ${error}`)
+          throw new Error(
+            `Failed to fetch data in ${String(functionName)}: ${error}`,
+          )
         }
       })
 
@@ -146,6 +161,19 @@ describe('useBackend Hook', () => {
   testObjectFetchFunction({
     functionName: 'getMyExamplesFromBackend',
     requiredFields: ['examples', 'studentExamples'],
+  })
+
+  const quizTableArray = api.quizExamplesTableArray
+  quizTableArray.forEach((quizExamplesTable: QuizExamplesTable) => {
+    const quizNickname = Object.keys(quizExamplesTable)[0]
+    const quizId = api.quizzesTable.find(
+      (quiz: Quiz) => quiz.quizNickname === quizNickname,
+    )?.recordId
+    testArrayFetchFunction({
+      functionName: 'getQuizExamplesFromBackend',
+      functionParams: quizId,
+      requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
+    })
   })
 
   describe('createMyStudentExample function', () => {
