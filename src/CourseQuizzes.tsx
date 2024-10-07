@@ -1,33 +1,29 @@
-import type { MutableRefObject } from 'react'
-import React, { useEffect, useRef } from 'react'
+import type { MutableRefObject } from "react";
+import React, { useEffect, useRef } from "react";
 
-import {
-  Route,
-  Routes,
-  useNavigate,
-} from 'react-router-dom'
-import type { QuizCourse } from './interfaceDefinitions'
-import MenuButton from './components/Buttons/MenuButton'
-import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
-import OfficialQuiz from './OfficialQuiz'
-import './App.css'
+import { Route, Routes, useNavigate } from "react-router-dom";
+import type { QuizCourse } from "./interfaceDefinitions";
+import MenuButton from "./components/Buttons/MenuButton";
+import { useOfficialQuizzes } from "./hooks/useOfficialQuizzes";
+import OfficialQuiz from "./OfficialQuiz";
+import "./App.css";
 
 interface CourseQuizzesProps {
-  chosenQuiz: number
-  courses: QuizCourse[]
-  hideMenu: boolean
-  makeCourseList: () => JSX.Element[]
-  makeMenuHidden: () => void
-  makeMenuShow: () => void
-  makeQuizReady: () => void
-  makeQuizSelections: () => JSX.Element[] | undefined
-  quizCourse: string
-  quizReady: boolean
-  studentHasDefaultQuiz: MutableRefObject<boolean>
-  thisCourse: string
-  updateChosenQuiz: (quizNumber: number) => void
-  updateQuizCourseWithNavigate: (course: string) => void
-  updateQuizCourseWithoutNavigate: (course: string) => void
+  chosenQuiz: number;
+  courses: QuizCourse[];
+  hideMenu: boolean;
+  makeCourseList: () => JSX.Element[];
+  makeMenuHidden: () => void;
+  makeMenuShow: () => void;
+  makeQuizReady: () => void;
+  makeQuizSelections: () => JSX.Element[] | undefined;
+  quizCourse: string;
+  quizReady: boolean;
+  studentHasDefaultQuiz: MutableRefObject<boolean>;
+  thisCourse: string;
+  updateChosenQuiz: (quizNumber: number) => void;
+  updateQuizCourseWithNavigate: (course: string) => void;
+  updateQuizCourseWithoutNavigate: (course: string) => void;
 }
 
 export default function CourseQuizzes({
@@ -47,68 +43,81 @@ export default function CourseQuizzes({
   updateQuizCourseWithNavigate,
   updateQuizCourseWithoutNavigate,
 }: CourseQuizzesProps) {
-  const navigate = useNavigate()
-  const rendered = useRef(false)
-  const { officialQuizzesQuery } = useOfficialQuizzes(undefined)
+  const navigate = useNavigate();
+  const rendered = useRef(false);
+  const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
 
   useEffect(() => {
     if (!rendered.current) {
-      rendered.current = true
+      rendered.current = true;
 
       if (quizCourse !== thisCourse) {
-        updateQuizCourseWithoutNavigate(thisCourse)
+        updateQuizCourseWithoutNavigate(thisCourse);
       }
     }
-  }, [quizCourse, thisCourse, updateQuizCourseWithoutNavigate])
+  }, [quizCourse, thisCourse, updateQuizCourseWithoutNavigate]);
 
   useEffect(() => {
     if (officialQuizzesQuery.data && !studentHasDefaultQuiz) {
-      const firstQuiz = makeQuizSelections()?.[0]
-      updateChosenQuiz(firstQuiz?.props.value)
+      const firstQuiz = makeQuizSelections()?.[0];
+      updateChosenQuiz(firstQuiz?.props.value);
     }
-  }, [officialQuizzesQuery.data, studentHasDefaultQuiz, quizCourse, makeQuizSelections, updateChosenQuiz])
+  }, [
+    officialQuizzesQuery.data,
+    studentHasDefaultQuiz,
+    quizCourse,
+    makeQuizSelections,
+    updateChosenQuiz,
+  ]);
 
   useEffect(() => {
     if (quizReady && chosenQuiz) {
-      navigate(chosenQuiz.toString())
+      navigate(chosenQuiz.toString());
     }
-  }, [quizReady, chosenQuiz, navigate])
+  }, [quizReady, chosenQuiz, navigate]);
 
   return (
     <div className="quizInterface">
       {/* Quiz Selector */}
-      {officialQuizzesQuery.data && chosenQuiz && quizCourse !== 'lcsp' && !hideMenu && (
-        <>
-          <h3>Official Quizzes</h3>
-          <div className="quizSelector">
-            <select
-              className="quizMenu"
-              value={quizCourse}
-              onChange={e => updateQuizCourseWithNavigate(e.target.value)}
-            >
-              {makeCourseList()}
-            </select>
-            <select
-              className="quizMenu"
-              value={chosenQuiz}
-              onChange={e => updateChosenQuiz(Number.parseInt(e.target.value))}
-            >
-              {makeQuizSelections()}
-            </select>
-            <div className="buttonBox">
-              <button type="button" onClick={makeQuizReady}>Begin Review</button>
+      {officialQuizzesQuery.data &&
+        chosenQuiz &&
+        quizCourse !== "lcsp" &&
+        !hideMenu && (
+          <>
+            <h3>Official Quizzes</h3>
+            <div className="quizSelector">
+              <select
+                className="quizMenu"
+                value={quizCourse}
+                onChange={(e) => updateQuizCourseWithNavigate(e.target.value)}
+              >
+                {makeCourseList()}
+              </select>
+              <select
+                className="quizMenu"
+                value={chosenQuiz}
+                onChange={(e) =>
+                  updateChosenQuiz(Number.parseInt(e.target.value))
+                }
+              >
+                {makeQuizSelections()}
+              </select>
+              <div className="buttonBox">
+                <button type="button" onClick={makeQuizReady}>
+                  Begin Review
+                </button>
+              </div>
+              <div className="buttonBox">
+                <MenuButton />
+              </div>
             </div>
-            <div className="buttonBox">
-              <MenuButton />
-            </div>
-          </div>
-        </>
-      )}
-      {officialQuizzesQuery.data && quizCourse !== 'lcsp' && (
+          </>
+        )}
+      {officialQuizzesQuery.data && quizCourse !== "lcsp" && (
         <Routes>
           <Route
             path=":number"
-            element={(
+            element={
               <OfficialQuiz
                 chosenQuiz={chosenQuiz}
                 courses={courses}
@@ -117,11 +126,10 @@ export default function CourseQuizzes({
                 quizCourse={quizCourse}
                 updateChosenQuiz={updateChosenQuiz}
               />
-            )}
-          >
-          </Route>
+            }
+          ></Route>
         </Routes>
       )}
     </div>
-  )
+  );
 }

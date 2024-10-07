@@ -1,20 +1,20 @@
-import { cleanup, render, screen } from '@testing-library/react'
-import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { cleanup, render, screen } from "@testing-library/react";
+import React from "react";
+import { MemoryRouter } from "react-router-dom";
+import { describe, expect, it } from "vitest";
 
-import MenuButton from './MenuButton'
+import MenuButton from "./MenuButton";
 
-describe('menu button', () => {
+describe("menu button", () => {
   afterEach(() => {
-    cleanup()
-  })
-  it('renders without crashing', () => {
+    cleanup();
+  });
+  it("renders without crashing", () => {
     render(
       <MemoryRouter>
         <MenuButton />
       </MemoryRouter>,
-    )
-    expect(screen.getByText('Back to Menu')).toBeTruthy()
-  })
-})
+    );
+    expect(screen.getByText("Back to Menu")).toBeTruthy();
+  });
+});

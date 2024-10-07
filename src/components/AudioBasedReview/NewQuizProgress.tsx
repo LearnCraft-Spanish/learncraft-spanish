@@ -1,9 +1,9 @@
-import React from 'react'
+import React from "react";
 
 interface QuizProgressProps {
-  currentExampleNumber: number
-  totalExamplesNumber: number
-  quizTitle: string
+  currentExampleNumber: number;
+  totalExamplesNumber: number;
+  quizTitle: string;
 }
 
 export default function NewQuizProgress({
@@ -24,5 +24,5 @@ export default function NewQuizProgress({
         />
       </div>
     </div>
-  )
+  );
 }

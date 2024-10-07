@@ -204,10 +204,8 @@
           "468",
           "530"
         ],
-        "englishAudio":
-          "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8508en.mp3",
-        "spanishAudioLa":
-          "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8508la.mp3",
+        "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8508en.mp3",
+        "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex8508la.mp3",
         "vocabComplete": true
       },
       {

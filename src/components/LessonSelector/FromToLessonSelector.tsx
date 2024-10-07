@@ -1,70 +1,80 @@
-import type { Lesson, Program } from '../../interfaceDefinitions'
-import { useProgramTable } from '../../hooks/useProgramTable'
-import { useSelectedLesson } from '../../hooks/useSelectedLesson'
-import './LessonSelector.css'
+import type { Lesson, Program } from "../../interfaceDefinitions";
+import { useProgramTable } from "../../hooks/useProgramTable";
+import { useSelectedLesson } from "../../hooks/useSelectedLesson";
+import "./LessonSelector.css";
 
 export default function FromToLessonSelector(): JSX.Element {
-  const { selectedProgram, selectedFromLesson, selectedToLesson, setProgram, setFromLesson, setToLesson } = useSelectedLesson()
-  const { programTableQuery } = useProgramTable()
+  const {
+    selectedProgram,
+    selectedFromLesson,
+    selectedToLesson,
+    setProgram,
+    setFromLesson,
+    setToLesson,
+  } = useSelectedLesson();
+  const { programTableQuery } = useProgramTable();
   // This is the same code as in LessonSelector.tsx
   function makeCourseSelector() {
     const courseSelector = [
       <option key={0} value={0}>
         –Choose Course–
       </option>,
-    ]
+    ];
     if (programTableQuery.isSuccess) {
       programTableQuery.data?.forEach((item: Program) => {
         courseSelector.push(
           <option key={item.recordId} value={item.recordId}>
             {item.name}
           </option>,
-        )
-      })
+        );
+      });
     }
-    return courseSelector
+    return courseSelector;
   }
 
   function getLessonNumber(lesson: Lesson | null) {
     if (!lesson?.lesson) {
-      return null
+      return null;
     }
-    const lessonArray = lesson.lesson.split(' ')
-    const lessonNumberString = lessonArray.slice(-1)[0]
-    const lessonNumber = Number.parseInt(lessonNumberString, 10)
-    return lessonNumber
+    const lessonArray = lesson.lesson.split(" ");
+    const lessonNumberString = lessonArray.slice(-1)[0];
+    const lessonNumber = Number.parseInt(lessonNumberString, 10);
+    return lessonNumber;
   }
 
   function makeFromLessonSelector() {
-    const lessonSelector: Array<JSX.Element> = []
-    const toLessonNumber = getLessonNumber(selectedToLesson)
+    const lessonSelector: Array<JSX.Element> = [];
+    const toLessonNumber = getLessonNumber(selectedToLesson);
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
-      const lessonNumber = getLessonNumber(lesson)
+      const lessonNumber = getLessonNumber(lesson);
       if (lessonNumber && (!toLessonNumber || lessonNumber <= toLessonNumber)) {
         lessonSelector.push(
           <option key={lesson.lesson} value={lesson.recordId}>
             {`Lesson ${lessonNumber}`}
           </option>,
-        )
+        );
       }
-    })
-    return lessonSelector
+    });
+    return lessonSelector;
   }
 
   function makeToLessonSelector() {
-    const lessonSelector: Array<JSX.Element> = []
-    const fromLessonNumber = getLessonNumber(selectedFromLesson)
+    const lessonSelector: Array<JSX.Element> = [];
+    const fromLessonNumber = getLessonNumber(selectedFromLesson);
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
-      const lessonNumber = getLessonNumber(lesson)
-      if (lessonNumber && (!fromLessonNumber || lessonNumber >= fromLessonNumber)) {
+      const lessonNumber = getLessonNumber(lesson);
+      if (
+        lessonNumber &&
+        (!fromLessonNumber || lessonNumber >= fromLessonNumber)
+      ) {
         lessonSelector.push(
           <option key={lesson.lesson} value={lesson.recordId}>
             {`Lesson ${lessonNumber}`}
           </option>,
-        )
+        );
       }
-    })
-    return lessonSelector
+    });
+    return lessonSelector;
   }
 
   return (
@@ -76,7 +86,7 @@ export default function FromToLessonSelector(): JSX.Element {
           name="courseList"
           className="courseList"
           value={selectedProgram?.recordId ? selectedProgram?.recordId : 0}
-          onChange={e => setProgram(e.target.value)}
+          onChange={(e) => setProgram(e.target.value)}
         >
           {makeCourseSelector()}
         </select>
@@ -91,7 +101,7 @@ export default function FromToLessonSelector(): JSX.Element {
               name="fromLesson"
               className="lessonList"
               value={selectedFromLesson?.recordId}
-              onChange={e => setFromLesson(e.target.value)}
+              onChange={(e) => setFromLesson(e.target.value)}
             >
               {makeFromLessonSelector()}
             </select>
@@ -106,14 +116,13 @@ export default function FromToLessonSelector(): JSX.Element {
               name="toLesson"
               className="lessonList"
               value={selectedToLesson?.recordId}
-              onChange={e => setToLesson(e.target.value)}
+              onChange={(e) => setToLesson(e.target.value)}
             >
               {makeToLessonSelector()}
             </select>
-
           </label>
         )}
       </div>
     </div>
-  )
+  );
 }

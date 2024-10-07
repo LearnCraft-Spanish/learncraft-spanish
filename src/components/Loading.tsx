@@ -1,6 +1,6 @@
-import React from 'react'
-import wheelIcon from '../resources/Icon_Blue.svg'
-import headIcon from '../resources/LearnCraft_Wheelless_Head_Blue.svg'
+import React from "react";
+import wheelIcon from "../resources/Icon_Blue.svg";
+import headIcon from "../resources/LearnCraft_Wheelless_Head_Blue.svg";
 
 export default function LoadingMessage({ message }: { message: string }) {
   return (
@@ -13,5 +13,5 @@ export default function LoadingMessage({ message }: { message: string }) {
         <h2>{message}</h2>
       </div>
     </div>
-  )
+  );
 }

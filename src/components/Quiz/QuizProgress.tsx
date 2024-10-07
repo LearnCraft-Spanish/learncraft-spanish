@@ -1,8 +1,8 @@
-import React from 'react'
+import React from "react";
 
 interface QuizProgressProps {
-  currentExampleNumber: number
-  totalExamplesNumber: number
+  currentExampleNumber: number;
+  totalExamplesNumber: number;
 }
 
 export default function QuizProgress({
@@ -13,5 +13,5 @@ export default function QuizProgress({
     <div className="progressBar">
       {`Flashcard ${currentExampleNumber} of ${totalExamplesNumber}`}
     </div>
-  )
+  );
 }
