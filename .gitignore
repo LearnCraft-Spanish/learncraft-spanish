@@ -33,6 +33,9 @@ yarn-error.log*
 .sentryclirc
 .env.sentry-build-plugin
 
+# Don't commit NPM since this project is using PNPM
+package-lock.json
+
 # Huge Data Files
 mocks/data/api/actualServerData.json
 mocks/data/serverlike/actualServerData.json
