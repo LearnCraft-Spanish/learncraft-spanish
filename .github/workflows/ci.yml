@@ -1,6 +1,9 @@
+# Full CI flow for the project
 name: Continuous Integration
 
 on:
+  # master branch will not accept if any failed
+  # development branch will accept regardless of the status of the jobs
   pull_request:
     branches:
       - development
