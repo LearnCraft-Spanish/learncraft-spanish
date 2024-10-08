@@ -47,6 +47,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Debug Action
+        run: ls -la .github/actions/setup-pnpm # Check if the directory and file exist
+
       - name: Setup Node.js and pnpm
         uses: ./.github/actions/setup-pnpm/action.yml
         with:
