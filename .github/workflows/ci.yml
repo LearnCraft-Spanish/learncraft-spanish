@@ -1,6 +1,10 @@
 name: Continuous Integration
 
 on:
+  pull_request:
+    branches:
+      - development
+      - master
   push:
     branches:
       - development
@@ -8,32 +12,111 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  format:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Restore the mock data cache (this only caches your mock data, not dependencies)
-      - name: Restore mock data cache
-        id: cache  # Assign an ID to use it in conditions
-        uses: actions/cache@v2
-        with:
-          path: ./mocks/serverlike/api  # Cache the whole directory
-          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
-          restore-keys: |
-            mockdata-
-
-      # Set up Node.js environment (always run this step)
+      # Set up Node.js environment
       - name: Set up Node.js environment
         uses: actions/setup-node@v2
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
 
-      # Install dependencies (always run this step)
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cache-node-modules-
+
+      # Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
+
+      # Run Prettier
+      - name: Run Prettier
+        run: pnpm run format:check
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up Node.js environment
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: "lts/*"
+
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cache-node-modules-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Run ESLint
+      - name: Run ESLint
+        run: pnpm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [format, lint]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up Node.js environment
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: "lts/*"
+
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cache-node-modules-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Restore the mock data cache
+      - name: Restore mock data cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./mocks/data/serverlike/actualServerData.json
+          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
+          restore-keys: |
+            mockdata-
 
       # Fetch mock data if cache miss
       - name: Fetch mock data if cache miss
@@ -46,6 +129,6 @@ jobs:
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
-      # Run the test suite (always run this step)
+        # Run the test suite
       - name: Run tests
-        run: npm test
+        run: pnpm run test

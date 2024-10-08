@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ES6",
     "jsx": "preserve",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
@@ -20,9 +16,5 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src",
-    "tests",
-    "vite-env.d.ts"
-, "mocks"  ]
+  "include": ["src", "tests", "vite-env.d.ts", "mocks"]
 }

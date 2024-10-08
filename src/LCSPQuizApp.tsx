@@ -1,178 +1,191 @@
-import { useAuth0 } from '@auth0/auth0-react'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useAuth0 } from "@auth0/auth0-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { Route, Routes, useNavigate } from 'react-router-dom'
-import type { QuizCourse } from './interfaceDefinitions'
-import MenuButton from './components/Buttons/MenuButton'
-import Loading from './components/Loading'
-import CourseQuizzes from './CourseQuizzes.jsx'
-import { useActiveStudent } from './hooks/useActiveStudent'
-import { useOfficialQuizzes } from './hooks/useOfficialQuizzes'
-import { useSelectedLesson } from './hooks/useSelectedLesson'
-import OfficialQuiz from './OfficialQuiz'
-import './App.css'
+import { Route, Routes, useNavigate } from "react-router-dom";
+import type { QuizCourse } from "./interfaceDefinitions";
+import MenuButton from "./components/Buttons/MenuButton";
+import Loading from "./components/Loading";
+import CourseQuizzes from "./CourseQuizzes.jsx";
+import { useActiveStudent } from "./hooks/useActiveStudent";
+import { useOfficialQuizzes } from "./hooks/useOfficialQuizzes";
+import { useSelectedLesson } from "./hooks/useSelectedLesson";
+import OfficialQuiz from "./OfficialQuiz";
+import "./App.css";
 
 export default function LCSPQuizApp(): JSX.Element {
-  const navigate = useNavigate()
-  const { activeStudentQuery } = useActiveStudent()
-  const { selectedProgram, selectedToLesson } = useSelectedLesson()
-  const { officialQuizzesQuery } = useOfficialQuizzes(undefined)
-  const { isAuthenticated, isLoading } = useAuth0()
+  const navigate = useNavigate();
+  const { activeStudentQuery } = useActiveStudent();
+  const { selectedProgram, selectedToLesson } = useSelectedLesson();
+  const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
+  const { isAuthenticated, isLoading } = useAuth0();
 
-  const [quizCourse, setQuizCourse] = useState('lcsp')
-  const [chosenQuiz, setChosenQuiz] = useState(2)
-  const [hideMenu, setHideMenu] = useState(false)
-  const [quizReady, setQuizReady] = useState(false)
-  const studentHasDefaultQuiz = useRef(false)
-  const courses = useRef <QuizCourse[]> ([
-    { name: 'Spanish in One Month', url: 'si1m', code: 'si1m' },
-    { name: 'LearnCraft Spanish', url: '', code: 'lcsp' },
-    { name: 'LearnCraft Spanish Extended', url: 'lcspx', code: 'lcspx' },
-    { name: 'Master Ser vs Estar', url: 'ser-estar', code: 'ser-estar' },
-  ])
+  const [quizCourse, setQuizCourse] = useState("lcsp");
+  const [chosenQuiz, setChosenQuiz] = useState(2);
+  const [hideMenu, setHideMenu] = useState(false);
+  const [quizReady, setQuizReady] = useState(false);
+  const studentHasDefaultQuiz = useRef(false);
+  const courses = useRef<QuizCourse[]>([
+    { name: "Spanish in One Month", url: "si1m", code: "si1m" },
+    { name: "LearnCraft Spanish", url: "", code: "lcsp" },
+    { name: "LearnCraft Spanish Extended", url: "lcspx", code: "lcspx" },
+    { name: "Master Ser vs Estar", url: "ser-estar", code: "ser-estar" },
+  ]);
 
   const getCourseUrlFromCode = useCallback((code: string) => {
-    const selectedCourse = courses.current.find(course => course.code === code)
-    const url = `/officialquizzes${selectedCourse?.url ? '/' : ''}${selectedCourse?.url}`
-    return url
-  }, [])
+    const selectedCourse = courses.current.find(
+      (course) => course.code === code,
+    );
+    const url = `/officialquizzes${selectedCourse?.url ? "/" : ""}${selectedCourse?.url}`;
+    return url;
+  }, []);
 
   function makeQuizReady() {
-    setQuizReady(true)
+    setQuizReady(true);
   }
 
   const makeQuizUnready = useCallback(() => {
-    setQuizReady(false)
-  }, [])
+    setQuizReady(false);
+  }, []);
 
   const makeMenuHidden = useCallback(() => {
     if (!hideMenu) {
-      setHideMenu(true)
+      setHideMenu(true);
     }
-  }, [hideMenu])
+  }, [hideMenu]);
 
   const makeMenuShow = useCallback(() => {
     if (hideMenu) {
-      setHideMenu(false)
-      makeQuizUnready()
+      setHideMenu(false);
+      makeQuizUnready();
     }
-  }, [hideMenu, makeQuizUnready])
+  }, [hideMenu, makeQuizUnready]);
 
-  const updateQuizCourseWithNavigate = useCallback((courseCode: string) => {
-    studentHasDefaultQuiz.current = false
-    const newCourse = courses.current.find(course => course.code === courseCode)
-    setQuizCourse(courseCode)
-    const urlToNavigate = newCourse?.url || ''
-    navigate(urlToNavigate)
-  }, [navigate])
+  const updateQuizCourseWithNavigate = useCallback(
+    (courseCode: string) => {
+      studentHasDefaultQuiz.current = false;
+      const newCourse = courses.current.find(
+        (course) => course.code === courseCode,
+      );
+      setQuizCourse(courseCode);
+      const urlToNavigate = newCourse?.url || "";
+      navigate(urlToNavigate);
+    },
+    [navigate],
+  );
 
   const updateQuizCourseWithoutNavigate = useCallback((courseCode: string) => {
     // const newCourse = courses.current.find(course => course.code === courseCode)
-    setQuizCourse(courseCode)
-  }, [])
+    setQuizCourse(courseCode);
+  }, []);
 
   const updateChosenQuiz = useCallback((quizNumber: number) => {
     // console.log(`chosen quiz now ${quizCourse} ${quizNumber}`)
-    studentHasDefaultQuiz.current = false
-    setChosenQuiz(quizNumber)
-  }, [])
+    studentHasDefaultQuiz.current = false;
+    setChosenQuiz(quizNumber);
+  }, []);
 
   const makeCourseList = useCallback(() => {
-    const courseList: React.JSX.Element[] = []
-    let i = 1
+    const courseList: React.JSX.Element[] = [];
+    let i = 1;
     courses.current.forEach((course) => {
       const courseOption = (
         <option key={i} value={course.code}>
           {course.name}
         </option>
-      )
-      courseList.push(courseOption)
-      i++
-    })
-    return courseList
-  }, [courses])
+      );
+      courseList.push(courseOption);
+      i++;
+    });
+    return courseList;
+  }, [courses]);
 
   const makeQuizSelections = useCallback(() => {
     if (officialQuizzesQuery.data) {
-      const quizList = officialQuizzesQuery.data.filter(item => item.quizType === quizCourse)
-      const quizSelections: React.JSX.Element[] = []
+      const quizList = officialQuizzesQuery.data.filter(
+        (item) => item.quizType === quizCourse,
+      );
+      const quizSelections: React.JSX.Element[] = [];
       const courseObj = courses.current.find(
-        course => course.code === quizCourse,
-      )
-      const courseName = courseObj?.name || ''
-      let i = 1
-      if (quizCourse === 'ser-estar') {
+        (course) => course.code === quizCourse,
+      );
+      const courseName = courseObj?.name || "";
+      let i = 1;
+      if (quizCourse === "ser-estar") {
         quizList.forEach((item) => {
           quizSelections.push(
             <option key={i} value={item.quizNumber}>
-              {'Ser/Estar Lesson '}
+              {"Ser/Estar Lesson "}
               {item.lessonNumber}
-              {', '}
+              {", "}
               {item.subtitle}
             </option>,
-          )
-          i++
-        })
-      }
-      else {
+          );
+          i++;
+        });
+      } else {
         quizList.forEach((item) => {
-        // console.log(item)
+          // console.log(item)
           quizSelections.push(
             <option key={i} value={item.quizNumber}>
               {courseName}
-              {' Quiz '}
+              {" Quiz "}
               {item.quizNumber}
             </option>,
-          )
-          i++
-        })
+          );
+          i++;
+        });
       }
-      return quizSelections
+      return quizSelections;
     }
-  }, [courses, quizCourse, officialQuizzesQuery.data])
+  }, [courses, quizCourse, officialQuizzesQuery.data]);
 
   const findDefaultQuiz = useCallback(() => {
-    studentHasDefaultQuiz.current = true
+    studentHasDefaultQuiz.current = true;
     const activeCourse = courses.current.find(
-      course => course.name === selectedProgram?.name,
-    )
+      (course) => course.name === selectedProgram?.name,
+    );
     if (activeCourse) {
-      if (activeCourse.code !== 'lcsp' && quizCourse === 'lcsp') {
-        setQuizCourse(activeCourse.code)
-        const urlToNavigate = activeCourse.url
-        navigate(urlToNavigate)
+      if (activeCourse.code !== "lcsp" && quizCourse === "lcsp") {
+        setQuizCourse(activeCourse.code);
+        const urlToNavigate = activeCourse.url;
+        navigate(urlToNavigate);
       }
     }
-    const activeLessonArray = selectedToLesson?.lesson.split(' ')
+    const activeLessonArray = selectedToLesson?.lesson.split(" ");
     if (activeLessonArray && officialQuizzesQuery.data) {
-      const activeLessonString = activeLessonArray.slice(-1)[0]
-      const activeLessonNumber = Number.parseInt(activeLessonString)
-      let lastQuizBeforeCurrentLesson = 0
+      const activeLessonString = activeLessonArray.slice(-1)[0];
+      const activeLessonNumber = Number.parseInt(activeLessonString);
+      let lastQuizBeforeCurrentLesson = 0;
       const activeQuizzes = officialQuizzesQuery.data.filter(
-        item => item.quizType === quizCourse,
-      )
+        (item) => item.quizType === quizCourse,
+      );
       activeQuizzes.forEach((item) => {
         if (item.quizNumber <= activeLessonNumber) {
-          lastQuizBeforeCurrentLesson = item.quizNumber
+          lastQuizBeforeCurrentLesson = item.quizNumber;
         }
-      })
+      });
       if (lastQuizBeforeCurrentLesson > 0) {
-        setChosenQuiz(lastQuizBeforeCurrentLesson)
-      }
-      else {
-        studentHasDefaultQuiz.current = false
+        setChosenQuiz(lastQuizBeforeCurrentLesson);
+      } else {
+        studentHasDefaultQuiz.current = false;
       }
     }
-  }, [selectedToLesson, selectedProgram, quizCourse, officialQuizzesQuery.data, navigate])
+  }, [
+    selectedToLesson,
+    selectedProgram,
+    quizCourse,
+    officialQuizzesQuery.data,
+    navigate,
+  ]);
 
   function createRoutesFromCourses() {
-    const routes: React.JSX.Element[] = []
+    const routes: React.JSX.Element[] = [];
     courses.current.forEach((course) => {
       routes.push(
         <Route
           key={course.code}
           path={`${course.url}/*`}
-          element={(
+          element={
             <CourseQuizzes
               chosenQuiz={chosenQuiz}
               courses={courses.current}
@@ -190,87 +203,105 @@ export default function LCSPQuizApp(): JSX.Element {
               updateQuizCourseWithNavigate={updateQuizCourseWithNavigate}
               updateQuizCourseWithoutNavigate={updateQuizCourseWithoutNavigate}
             />
-          )}
+          }
         />,
-      )
-    })
-    return routes
+      );
+    });
+    return routes;
   }
 
   useEffect(() => {
-    if (quizReady && chosenQuiz && quizCourse === 'lcsp') {
-      navigate(chosenQuiz.toString())
+    if (quizReady && chosenQuiz && quizCourse === "lcsp") {
+      navigate(chosenQuiz.toString());
     }
-  }, [quizReady, chosenQuiz, navigate, quizCourse])
+  }, [quizReady, chosenQuiz, navigate, quizCourse]);
 
   useEffect(() => {
     if (
-      !studentHasDefaultQuiz.current
-      && quizCourse
-      && officialQuizzesQuery.data
-      && !quizReady
-      && window.location.pathname === getCourseUrlFromCode(quizCourse)
+      !studentHasDefaultQuiz.current &&
+      quizCourse &&
+      officialQuizzesQuery.data &&
+      !quizReady &&
+      window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
       const firstQuiz = officialQuizzesQuery.data.filter(
-        item => item.quizType === quizCourse,
-      )[0].quizNumber
-      setChosenQuiz(firstQuiz)
+        (item) => item.quizType === quizCourse,
+      )[0].quizNumber;
+      setChosenQuiz(firstQuiz);
     }
-  }, [quizCourse, quizReady, officialQuizzesQuery.data, getCourseUrlFromCode])
+  }, [quizCourse, quizReady, officialQuizzesQuery.data, getCourseUrlFromCode]);
 
   useEffect(() => {
     if (
-      activeStudentQuery.data?.recordId
-      && officialQuizzesQuery.data
-      && selectedProgram?.recordId
-      && selectedToLesson?.recordId
-      && window.location.pathname === getCourseUrlFromCode(quizCourse)
+      activeStudentQuery.data?.recordId &&
+      officialQuizzesQuery.data &&
+      selectedProgram?.recordId &&
+      selectedToLesson?.recordId &&
+      window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
-      findDefaultQuiz()
+      findDefaultQuiz();
+    } else if (!activeStudentQuery.data?.recordId) {
+      studentHasDefaultQuiz.current = false;
     }
-    else if (!activeStudentQuery.data?.recordId) {
-      studentHasDefaultQuiz.current = false
-    }
-  }, [activeStudentQuery.data?.recordId, selectedProgram?.recordId, selectedToLesson?.recordId, officialQuizzesQuery.data, findDefaultQuiz, getCourseUrlFromCode, quizCourse])
+  }, [
+    activeStudentQuery.data?.recordId,
+    selectedProgram?.recordId,
+    selectedToLesson?.recordId,
+    officialQuizzesQuery.data,
+    findDefaultQuiz,
+    getCourseUrlFromCode,
+    quizCourse,
+  ]);
 
   return (
     <>
       {isAuthenticated && !isLoading && (
         <div className="quizInterface">
           {/* Quiz Selector */}
-          {activeStudentQuery.isSuccess && officialQuizzesQuery.isLoading && <Loading message="Loading Quizzes..." />}
-          {activeStudentQuery.isSuccess && officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
-          {officialQuizzesQuery.isSuccess && chosenQuiz && quizCourse === 'lcsp' && !hideMenu && (
-            <div className="quizSelector">
-              <h3> Official Quizzes</h3>
-              <select
-                className="quizMenu"
-                value={quizCourse}
-                onChange={e => updateQuizCourseWithNavigate(e.target.value)}
-              >
-                {makeCourseList()}
-              </select>
-              <select
-                className="quizMenu"
-                value={chosenQuiz}
-                onChange={e => updateChosenQuiz(Number.parseInt(e.target.value) || 0)}
-              >
-                {makeQuizSelections()}
-              </select>
-              <div className="buttonBox">
-                <button type="button" onClick={makeQuizReady}>Begin Review</button>
-              </div>
-              <div className="buttonBox">
-                <MenuButton />
-              </div>
-            </div>
+          {activeStudentQuery.isSuccess && officialQuizzesQuery.isLoading && (
+            <Loading message="Loading Quizzes..." />
           )}
+          {activeStudentQuery.isSuccess && officialQuizzesQuery.isError && (
+            <h2>Error Loading Quizzes</h2>
+          )}
+          {officialQuizzesQuery.isSuccess &&
+            chosenQuiz &&
+            quizCourse === "lcsp" &&
+            !hideMenu && (
+              <div className="quizSelector">
+                <h3> Official Quizzes</h3>
+                <select
+                  className="quizMenu"
+                  value={quizCourse}
+                  onChange={(e) => updateQuizCourseWithNavigate(e.target.value)}
+                >
+                  {makeCourseList()}
+                </select>
+                <select
+                  className="quizMenu"
+                  value={chosenQuiz}
+                  onChange={(e) =>
+                    updateChosenQuiz(Number.parseInt(e.target.value) || 0)
+                  }
+                >
+                  {makeQuizSelections()}
+                </select>
+                <div className="buttonBox">
+                  <button type="button" onClick={makeQuizReady}>
+                    Begin Review
+                  </button>
+                </div>
+                <div className="buttonBox">
+                  <MenuButton />
+                </div>
+              </div>
+            )}
           <Routes>
             {createRoutesFromCourses()}
-            {quizCourse === 'lcsp' && (
+            {quizCourse === "lcsp" && (
               <Route
                 path=":number"
-                element={(
+                element={
                   <OfficialQuiz
                     chosenQuiz={chosenQuiz}
                     courses={courses.current}
@@ -279,13 +310,12 @@ export default function LCSPQuizApp(): JSX.Element {
                     quizCourse={quizCourse}
                     updateChosenQuiz={updateChosenQuiz}
                   />
-                )}
-              >
-              </Route>
+                }
+              ></Route>
             )}
           </Routes>
         </div>
       )}
     </>
-  )
+  );
 }

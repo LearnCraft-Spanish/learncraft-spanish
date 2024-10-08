@@ -1,7 +1,7 @@
 /* AudioQuizButtons */
 .audioQuizButtons {
-    min-width: 320px;
-    width: 50vw;
+  min-width: 320px;
+  width: 50vw;
 }
 button:disabled {
   background-color: grey;
@@ -20,8 +20,6 @@ button:disabled {
     margin-top: 12px;
   }
 }
-
-
 
 /* AudioFlashcardComponent */
 .audioFlashcard {
@@ -65,17 +63,15 @@ button:disabled {
 
 @media screen and (max-width: 480px) {
   .audioFlashcard {
-  min-height: 200px;
-  max-height: 320px;
-  height: 80vw;
-  margin-top: 10vw;
+    min-height: 200px;
+    max-height: 320px;
+    height: 80vw;
+    margin-top: 10vw;
   }
   .audioFlashcard p {
     font-size: 1.125rem;
   }
 }
-
-
 
 /* New Quiz Progress */
 .quizProgress {
@@ -105,7 +101,7 @@ button:disabled {
 .progressBarFill {
   background-color: var(--brand);
   display: block;
-  content: '';
+  content: "";
   width: 0;
   height: 100%;
   transition: width 0.5s;
@@ -118,7 +114,8 @@ button:disabled {
     width: 100vw;
     background-color: var(--theme);
   }
-  .quizProgress h3, .quizProgress p {
+  .quizProgress h3,
+  .quizProgress p {
     width: 70vw;
     color: var(--light);
   }
@@ -129,8 +126,6 @@ button:disabled {
     font-size: 0.75rem;
   }
 }
-
-
 
 /* AudioQuizSetupMenu */
 .menuRow {

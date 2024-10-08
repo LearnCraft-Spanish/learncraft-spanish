@@ -37,34 +37,34 @@
 /* at 767px, button boxes switch from width 50% to 95% */
 @media screen and (max-width: 767px) {
   .quizButtons {
-      min-width: 0;
-      width: 70vw;
+    min-width: 0;
+    width: 70vw;
   }
 }
 @media (max-width: 480px) {
-  .audioQuizButtons, .quizButtons {
-      min-width: 0;
-      width: 90vw;
+  .audioQuizButtons,
+  .quizButtons {
+    min-width: 0;
+    width: 90vw;
   }
   .switchOnMobile {
-      flex-direction: column-reverse;
+    flex-direction: column-reverse;
   }
   .switchOnMobile button {
-      margin-top: 12px;
+    margin-top: 12px;
   }
 }
 
 @media screen and (max-width: 480px) {
   .flashcard {
-  min-height: 200px;
-  max-height: 320px;
-  height: 80vw;
-  margin-top: 10vw;
-  width: 90vw;
-
+    min-height: 200px;
+    max-height: 320px;
+    height: 80vw;
+    margin-top: 10vw;
+    width: 90vw;
   }
   .flashcard p {
-      font-size: 1.125rem;
+    font-size: 1.125rem;
   }
 
   /* srsButtons */

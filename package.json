@@ -13,9 +13,11 @@
     "start": "vite",
     "build": "vite build",
     "test": "vitest run --coverage",
-    "predeploy": "npm run build",
+    "predeploy": "pnpm run build",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",

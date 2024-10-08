@@ -4,7 +4,7 @@
 :root {
   --brand: #449ac2;
   --theme: #6f6259;
-  --accent: #B0a96f;
+  --accent: #b0a96f;
   --light: #ffffff;
   --dark: #3c3c3c;
 }
@@ -13,16 +13,16 @@
   box-sizing: border-box;
 }
 
-
 body {
-  background-image: url('./resources/paper-small.jpeg');
+  background-image: url("./resources/paper-small.jpeg");
 }
 
 a {
   text-decoration: none;
 }
 
-img, image {
+img,
+image {
   user-select: none;
 }
 
@@ -43,7 +43,11 @@ h1 {
   margin: 0;
 }
 
-h2, h3, h4, h5, h6 {
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: var(--dark);
   text-align: center;
 }
@@ -65,9 +69,10 @@ h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
-button, .linkButton {
+button,
+.linkButton {
   text-align: center;
-  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-family: "Poppins", "Avenir", "Helvetica", sans-serif;
   font-weight: 600;
   font-size: 14px;
   padding: 10px 30px;
@@ -81,8 +86,9 @@ button, .linkButton {
   align-items: center;
 }
 
-button:hover, .linkButton:hover {
-  background-color: #B0a96f;
+button:hover,
+.linkButton:hover {
+  background-color: #b0a96f;
   color: #ffffff;
 }
 
@@ -96,7 +102,7 @@ button:hover, .linkButton:hover {
   z-index: 10;
 }
 
- .nextButton {
+.nextButton {
   cursor: pointer;
   font-size: 48px;
   position: absolute;
@@ -105,7 +111,7 @@ button:hover, .linkButton:hover {
   transform: translate(0, -50%);
 }
 
- .previousButton {
+.previousButton {
   cursor: pointer;
   font-size: 48px;
   position: absolute;
@@ -120,7 +126,7 @@ button:hover, .linkButton:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;  /* Take full width of parent */
+  width: 100%; /* Take full width of parent */
   height: 100%; /* Take full height of parent */
   max-height: 70vh;
   padding: 5% 20%;
@@ -161,8 +167,6 @@ button:hover, .linkButton:hover {
   }
 }
 
-
-
 /*Main Menu Styles*/
 /* MOVED TO NAV */
 /* 
@@ -189,7 +193,7 @@ button:hover, .linkButton:hover {
   justify-content: center;
 }
 
-.div-user-subheader button{
+.div-user-subheader button {
   background-color: var(--light);
   color: var(--dark);
   font-size: 12px;
@@ -223,7 +227,6 @@ button:hover, .linkButton:hover {
 }
 
 /*Callback page Styles */
-
 
 .redirectMessage {
   display: block;
@@ -293,7 +296,6 @@ button:hover, .linkButton:hover {
   cursor: pointer;
 } */
 
-
 .readyButton {
   display: flex;
   justify-content: space-around;
@@ -301,7 +303,7 @@ button:hover, .linkButton:hover {
 
 .quizControls {
   height: 240px;
-  width:100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -319,7 +321,8 @@ button:hover, .linkButton:hover {
   margin: 10px auto;
 }
 
-.buttonBox button, .buttonBox .linkButton {
+.buttonBox button,
+.buttonBox .linkButton {
   margin: 0px 10px;
   /* display: block; */
   flex-basis: 0;
@@ -336,25 +339,26 @@ button:hover, .linkButton:hover {
   align-content: center;
 }
 
-.greenButton{
+.greenButton {
   background-color: darkgreen;
 }
 
-.redButton{
+.redButton {
   background-color: darkred;
 }
 
-.hardButton:hover, .easyButton:hover {
+.hardButton:hover,
+.easyButton:hover {
   background-color: var(--dark);
 }
 
-.easyBanner{
+.easyBanner {
   background-color: darkgreen !important;
   cursor: default !important;
 }
 
-.hardBanner{
-  background-color: darkred !important; 
+.hardBanner {
+  background-color: darkred !important;
   cursor: default !important;
 }
 
@@ -370,7 +374,6 @@ button:hover, .linkButton:hover {
   .quizSelector {
     width: 70vw;
   }
-  
 }
 @media screen and (max-width: 480px) {
   .quizSelector {
@@ -381,7 +384,6 @@ button:hover, .linkButton:hover {
   margin-bottom: 20px;
   height: 65px;
   text-align: center;
-
 }
 
 .addFlashcardButton {
@@ -418,7 +420,8 @@ button:hover, .linkButton:hover {
   margin: 0 auto;
 }
 
-.addFlashcardButton:hover, .removeFlashcardButton:hover {
+.addFlashcardButton:hover,
+.removeFlashcardButton:hover {
   background-color: var(--dark);
 }
 
@@ -436,16 +439,16 @@ button:hover, .linkButton:hover {
   width: 8%;
   min-width: 100px;
   background-color: var(--brand);
-  
 }
 
-.spanglishLabel h4, .spanishLabel h4 {
-  color: var(--light)
+.spanglishLabel h4,
+.spanishLabel h4 {
+  color: var(--light);
 }
 
 /* For Audio Quiz */
 
-.comprehensionHeader{
+.comprehensionHeader {
   margin-bottom: 0px;
 }
 
@@ -463,7 +466,7 @@ button:hover, .linkButton:hover {
   position: relative;
   width: 65%;
   min-width: 300px;
-  min-height:200px;
+  min-height: 200px;
   margin: 20px auto;
   background-color: var(--dark);
   color: var(--light);
@@ -505,8 +508,9 @@ button:hover, .linkButton:hover {
 } */
 /* progressBar & progressBar2 are almost legacy */
 /* Remove once all instances of QuizProgress are replaced with NewQuizProgress */
-.progressBar, .progressBar2 {
-  display:block;
+.progressBar,
+.progressBar2 {
+  display: block;
   text-align: center;
   justify-self: center;
 }
@@ -551,7 +555,6 @@ button:hover, .linkButton:hover {
   flex-grow: 1;
   justify-content: flex-start;
   /* align-items: center; */
-
 }
 .filterBox.options {
   flex-direction: column;
@@ -563,7 +566,6 @@ button:hover, .linkButton:hover {
   flex-direction: column;
   justify-self: left;
   flex-grow: 3;
-
 }
 
 .removeSpanglishBox {
@@ -572,7 +574,7 @@ button:hover, .linkButton:hover {
   justify-content: space-between;
   align-content: center;
   text-align: center;
-  
+
   margin-top: 24px;
 }
 .removeSpanglishBox button {
@@ -586,14 +588,14 @@ button:hover, .linkButton:hover {
   margin: auto 0px;
 }
 
-.searchFilter{
+.searchFilter {
   display: inline-block;
   position: relative;
   flex-grow: 2;
   max-width: 100%;
 }
 
-.wordSearchBox .tagSearchBox{
+.wordSearchBox .tagSearchBox {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -615,7 +617,8 @@ button:hover, .linkButton:hover {
   width: 100%;
 }
 
-.searchTermBox p, .searchTermBox input {
+.searchTermBox p,
+.searchTermBox input {
   margin: 0 5px;
 }
 
@@ -627,8 +630,8 @@ button:hover, .linkButton:hover {
   text-align: left;
 }
 
-
-.vocabSuggestionBox, .tagSuggestionBox {
+.vocabSuggestionBox,
+.tagSuggestionBox {
   position: absolute;
   max-width: 640px;
   width: 100%;
@@ -637,13 +640,12 @@ button:hover, .linkButton:hover {
   z-index: 999;
 }
 
-
 .examplesTable {
   min-height: 1200px;
   padding: 0px;
 }
 
-.examplesTable .buttonBox{
+.examplesTable .buttonBox {
   text-align: center;
   color: var(--light);
   font-size: 12px;
@@ -677,7 +679,7 @@ button:hover, .linkButton:hover {
   max-width: 60vw;
 }
 
-.tagCard{
+.tagCard {
   cursor: pointer;
   text-align: left;
   font-size: 12px;
@@ -694,16 +696,17 @@ button:hover, .linkButton:hover {
   margin: 2px 4px;
 }
 
-
 .tagCard:hover {
   cursor: pointer;
   filter: brightness(0.9); /* Slight darken */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow */
-  transform: scale(1.03);  /* Slight zoom */
+  transform: scale(1.03); /* Slight zoom */
   transition: all 0.2s ease-in-out; /* Smooth transition */
 }
 
-.tagCard h4, .tagCard h5, .tagCard p {
+.tagCard h4,
+.tagCard h5,
+.tagCard p {
   color: currentColor;
   margin: 0;
 }
@@ -713,7 +716,11 @@ button:hover, .linkButton:hover {
   padding: 12px;
   justify-content: space-between;
 }
-.subcategoryCard, .vocabularyCard, .idiomCard, .conjugationCard, .verbCard {
+.subcategoryCard,
+.vocabularyCard,
+.idiomCard,
+.conjugationCard,
+.verbCard {
   width: 100%;
   height: 100%;
   text-align: left;
@@ -751,7 +758,7 @@ button:hover, .linkButton:hover {
   background-color: var(--dark);
 }
 
-.vocabSmallCard{
+.vocabSmallCard {
   cursor: pointer;
   text-align: left;
   background-color: #fff;
@@ -794,8 +801,8 @@ button:hover, .linkButton:hover {
   margin: 5px 30px;
 }
 
-
-.addButton, .removeButton {
+.addButton,
+.removeButton {
   width: 10%;
   min-width: 120px;
   cursor: pointer;
@@ -842,10 +849,6 @@ button:hover, .linkButton:hover {
   margin-right: 6px;
 } */
 
-
-
-
-
 /*Styles for the coaching section*/
 
 .coachingFilterSection {
@@ -863,16 +866,15 @@ button:hover, .linkButton:hover {
   align-content: center;
 }
 
-.coachingFilterSection div h4{
+.coachingFilterSection div h4 {
   margin: 0px;
 }
-
 
 .moreFilters {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow:scroll;
+  overflow: scroll;
   padding: 5%;
   background-color: var(--brand);
   border: 5px solid var(--dark);
@@ -891,7 +893,7 @@ button:hover, .linkButton:hover {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow:scroll;
+  overflow: scroll;
   padding: 5%;
   background-color: var(--light);
   border: 5px solid var(--dark);
@@ -913,7 +915,7 @@ button:hover, .linkButton:hover {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow:scroll;
+  overflow: scroll;
   padding: 5%;
   background-color: var(--light);
   border: 5px solid var(--dark);
@@ -924,17 +926,15 @@ button:hover, .linkButton:hover {
   right: 10%;
 }
 
-
-.callPopup input{
+.callPopup input {
   min-height: 30px;
 }
-
 
 .groupSessionPopup {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow:scroll;
+  overflow: scroll;
   padding: 5%;
   background-color: var(--light);
   border: 5px solid var(--dark);
@@ -963,7 +963,7 @@ button:hover, .linkButton:hover {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow:scroll;
+  overflow: scroll;
   padding: 5%;
   background-color: var(--light);
   border: 5px solid var(--dark);
@@ -1019,12 +1019,12 @@ button:hover, .linkButton:hover {
 }
 
 @media screen and (max-width: 767px) {
-
   .div-header h1 {
     margin-bottom: 20px;
   }
 
-  .spanishExample, .englishTranslation {
+  .spanishExample,
+  .englishTranslation {
     box-sizing: border-box;
     width: 95%;
     min-width: 0;
@@ -1038,7 +1038,8 @@ button:hover, .linkButton:hover {
 
 /*      FLashcardManager and FlashcardFinder shared styles      */
 
-.exampleCardSpanishText, .exampleCardEnglishText {
+.exampleCardSpanishText,
+.exampleCardEnglishText {
   color: var(--dark);
   background-color: var(--light);
   text-align: left;
@@ -1047,7 +1048,6 @@ button:hover, .linkButton:hover {
   width: 70px;
   margin: 2px;
   padding: 4px 16px;
-
 }
 
 /* formatFlashcardText function classes */
@@ -1061,10 +1061,10 @@ button:hover, .linkButton:hover {
   font-style: normal;
 }
 
-.englishTranslation .englishFlashcardText{
+.englishTranslation .englishFlashcardText {
   font-size: 18px;
 }
-.spanishExample .spanishFlashcardText{
+.spanishExample .spanishFlashcardText {
   font-size: 18px;
 }
 
@@ -1097,9 +1097,10 @@ button:hover, .linkButton:hover {
   }
 }
 
-.myFlashcardsFormContentWrapper > label, .myFlashcardsFormContentWrapper > div {
+.myFlashcardsFormContentWrapper > label,
+.myFlashcardsFormContentWrapper > div {
   /* align on right side of parent */
-  
+
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -1109,8 +1110,8 @@ button:hover, .linkButton:hover {
 
 /*      Toggle Switch Styling */
 
- /* The switch - the box around the slider */
- .switch {
+/* The switch - the box around the slider */
+.switch {
   position: relative;
   display: inline-block;
   width: 60px;
@@ -1136,8 +1137,8 @@ button:hover, .linkButton:hover {
   right: 0;
   bottom: 0;
   background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
 
 .slider:before {
@@ -1148,10 +1149,9 @@ button:hover, .linkButton:hover {
   left: 4px;
   bottom: 4px;
   background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
 }
-
 
 input:checked + .slider {
   background-color: var(--brand);
@@ -1174,7 +1174,7 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-} 
+}
 
 #quizLength {
   width: 60px;
@@ -1196,7 +1196,6 @@ i {
   color: var(--light);
   margin: 0;
   align-items: center;
-   
 }
 
 .div-header button {
@@ -1232,7 +1231,6 @@ i {
   #logout.notRoot {
     display: none;
   }
-  
 }
 /* BackButton */
 /* .backButton {
@@ -1250,7 +1248,6 @@ i {
   
 } */
 
-
 /* .homeButton {
   display: flex;
   height: 70px;
@@ -1266,7 +1263,7 @@ i {
 
 /* @media screen and (max-width: 480px) {
   /* currently conditionally applied to LogoutButton for when route is not / */
-  /* .pastHome {
+/* .pastHome {
     display: none;
   }
   .div-header {
@@ -1291,10 +1288,8 @@ i {
     background-image: url('./resources/icons8-home-24.png');
   } */
 
-
-
-  /*  FrequenSay */
-  .frequensay .tempBox {
-    max-width: 640px;
-    margin: auto;
-  }
+/*  FrequenSay */
+.frequensay .tempBox {
+  max-width: 640px;
+  margin: auto;
+}

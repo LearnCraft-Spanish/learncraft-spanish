@@ -3645,14 +3645,10 @@
     {
       "recordId": 71,
       "lesson": "lcsp 2",
-      "vocabIncluded": [
-        "eso/Pronoun, Demonstrative/"
-      ],
+      "vocabIncluded": ["eso/Pronoun, Demonstrative/"],
       "sortReference": null,
       "relatedProgram": 2,
-      "vocabKnown": [
-        "eso/Pronoun, Demonstrative/"
-      ]
+      "vocabKnown": ["eso/Pronoun, Demonstrative/"]
     },
     {
       "recordId": 72,

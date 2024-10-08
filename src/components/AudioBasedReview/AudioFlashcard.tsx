@@ -1,11 +1,11 @@
 interface AudioFlashcardProps {
-  currentExampleText: string | JSX.Element
-  incrementCurrentStep: () => void
-  autoplay: boolean
-  progressStatus: number
-  pausePlayback: () => void
-  resumePlayback: () => void
-  isPlaying: boolean
+  currentExampleText: string | JSX.Element;
+  incrementCurrentStep: () => void;
+  autoplay: boolean;
+  progressStatus: number;
+  pausePlayback: () => void;
+  resumePlayback: () => void;
+  isPlaying: boolean;
 }
 
 export default function AudioFlashcardComponent({
@@ -17,13 +17,14 @@ export default function AudioFlashcardComponent({
   resumePlayback,
   isPlaying,
 }: AudioFlashcardProps): JSX.Element {
-  function handlePlayPauseClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    e.stopPropagation()
+  function handlePlayPauseClick(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ): void {
+    e.stopPropagation();
     if (isPlaying) {
-      pausePlayback()
-    }
-    else {
-      resumePlayback()
+      pausePlayback();
+    } else {
+      resumePlayback();
     }
   }
   return (
@@ -33,14 +34,14 @@ export default function AudioFlashcardComponent({
       onClick={!autoplay ? () => incrementCurrentStep() : () => {}}
     >
       <p>{currentExampleText}</p>
-      {(autoplay) && (
+      {autoplay && (
         <button
           type="button"
           className="audioPlayPauseButton"
-          onClick={e => handlePlayPauseClick(e)}
+          onClick={(e) => handlePlayPauseClick(e)}
           aria-label="Play/Pause"
         >
-          <i className={isPlaying ? 'fa-solid fa-pause' : 'fa-solid fa-play'} />
+          <i className={isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play"} />
         </button>
       )}
       {autoplay && (
@@ -50,5 +51,5 @@ export default function AudioFlashcardComponent({
         />
       )}
     </div>
-  )
+  );
 }

@@ -1,13 +1,13 @@
-import antfu from '@antfu/eslint-config'
+import antfu from "@antfu/eslint-config";
+import prettierConfig from "eslint-config-prettier";
 
 export default antfu(
   {
     react: true,
     typescript: true,
-    // Global settings here
+    stylistic: false,
     languageOptions: {
       globals: {
-        // Add Vitest globals
         describe: true,
         it: true,
         expect: true,
@@ -19,17 +19,15 @@ export default antfu(
       },
     },
     rules: {
-      'no-console': ['error', { allow: ['error'] }],
-      'max-len': ['warn', { code: 80, ignoreStrings: true }],
+      "no-console": ["error", { allow: ["error"] }],
+      "max-len": ["warn", { code: 100, ignoreStrings: true }],
     },
   },
-  // Customization for different files and overrides
   {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'], // Move files here
+    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   },
-  // Specific configuration for test files
   {
-    files: ['**/*.test.{ts,tsx,js,jsx}'],
+    files: ["**/*.test.{ts,tsx,js,jsx}"],
     languageOptions: {
       globals: {
         describe: true,
@@ -41,11 +39,12 @@ export default antfu(
   },
   {
     ignores: [
-      'node_modules/',
-      'src/mocks/data/serverlike/actualServerData.json',
-      'src/Coaching.jsx',
-      '*/data/serverlike/*.json',
-      '*.yml',
+      "src/Coaching.jsx",
+      "node_modules/",
+      "src/mocks/data/serverlike/actualServerData.json",
+      "*.yml",
     ],
   },
-)
+  // Add Prettier config at the end to disable ESLint rules that conflict with Prettier
+  prettierConfig,
+);

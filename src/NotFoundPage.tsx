@@ -1,6 +1,6 @@
-import React from 'react'
+import React from "react";
 
-import MenuButton from './components/Buttons/MenuButton'
+import MenuButton from "./components/Buttons/MenuButton";
 
 function NotFoundPage(): JSX.Element {
   return (
@@ -10,7 +10,7 @@ function NotFoundPage(): JSX.Element {
         <MenuButton />
       </div>
     </div>
-  )
+  );
 }
 
-export default NotFoundPage
+export default NotFoundPage;

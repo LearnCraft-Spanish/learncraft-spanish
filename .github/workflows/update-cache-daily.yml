@@ -3,7 +3,7 @@ name: Update Mock Data Cache Daily
 on:
   # Runs daily at 8am UTC/2am CST
   schedule:
-    - cron: '0 8 * * *'
+    - cron: "0 8 * * *"
 
   # Allows you to trigger the workflow manually
   workflow_dispatch:
@@ -17,19 +17,32 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js environment with the latest LTS version
-      - name: Set up Node.js
+      # Set up Node.js environment
+      - name: Set up Node.js environment
         uses: actions/setup-node@v2
         with:
-          node-version: 'lts/*'
+          node-version: "lts/*"
 
-      # Step 3: Install dependencies
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cache-node-modules-
+
+      # Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
-      # Step 4: Run the update-cache.js script
+      # Run the update-cache.js script
       - name: Update Cache
-        run: node update-cache.js
+        run: node .github/workflows/update-cache.js
         env:
           AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
           AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
@@ -37,9 +50,9 @@ jobs:
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
-      # Step 5: Save the updated mock data to cache
+      # Save the updated mock data to cache
       - name: Cache mock data
         uses: actions/cache@v2
         with:
           path: ./mocks/data/serverlike/actualServerData.json
-          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
+          key: mockdata-${{ hashFiles('./src/functions/DataModel.ts, ./mocks/data/serverlike/serverlikeData.ts') }}
