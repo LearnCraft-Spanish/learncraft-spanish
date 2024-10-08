@@ -1,4 +1,4 @@
-export function fisherYatesShuffle(array) {
+export default function fisherYatesShuffle <T>(array: T[]): T[] {
   const shuffled = [...array]; // Shallow copy to avoid mutating original array
   for (let i = shuffled.length - 1; i > 0; i--) {
     const randomIndex = Math.floor(Math.random() * (i + 1));

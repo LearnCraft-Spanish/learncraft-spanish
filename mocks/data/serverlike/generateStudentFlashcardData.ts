@@ -1,5 +1,4 @@
 import fisherYatesShuffle from "./fisherYatesShuffle";
-import data from "./mockBackendData.json" with { type: "json" };
 // This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample
