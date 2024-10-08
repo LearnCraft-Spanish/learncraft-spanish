@@ -17,11 +17,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js and all dependencies
-      - name: Setup pnpm
-        uses: ./.github/actions/setup-pnpm
+      # Set up Node.js environment
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: "lts/*"
 
-      # Step 4: Run the update-cache.js script
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cache-node-modules-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+
+      # Run the update-cache.js script
       - name: Update Cache
         run: node .github/workflows/update-cache.js
         env:
@@ -31,7 +50,7 @@ jobs:
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
-      # Step 5: Save the updated mock data to cache
+      # Save the updated mock data to cache
       - name: Cache mock data
         uses: actions/cache@v2
         with:
