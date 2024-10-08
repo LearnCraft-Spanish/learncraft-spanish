@@ -12,50 +12,47 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
+  format:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js environment
-        uses: actions/setup-node@v2
+      - name: Setup Node.js and pnpm
+        uses: ./github/actions/setup-pnpm/action.yml
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'  # Or specify a different Node.js version
 
-      # Install pnpm since you're using pnpm-lock.yaml
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Cache Node.js dependencies
-        uses: actions/cache@v2
-        with:
-          path: node_modules
-          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            cache-node-modules-
-
-      - name: Install dependencies
-        run: pnpm install
-
-  format:
-    runs-on: ubuntu-latest
-    needs: setup  # Reuse the setup job
-    steps:
       - name: Run Prettier
-        run: pnpm run format:check  # Use pnpm to run Prettier
+        run: pnpm run format:check
 
   lint:
     runs-on: ubuntu-latest
-    needs: setup  # Reuse the setup job
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js and pnpm
+        uses: ./github/actions/setup-pnpm/action.yml
+        with:
+          node-version: 'lts/*'
+
       - name: Run ESLint
-        run: pnpm run lint  # Use pnpm to run ESLint
+        run: pnpm run lint
+
 
   test:
     runs-on: ubuntu-latest
-    needs: [setup, format, lint]  # Reuse the setup, format, and lint jobs
+    needs: [format, lint]  # Reuse the setup, format, and lint jobs
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js and pnpm
+        uses: ./github/actions/setup-pnpm/action.yml
+        with:
+          node-version: 'lts/*'
+          
       # Restore the mock data cache
       - name: Restore mock data cache
         id: cache

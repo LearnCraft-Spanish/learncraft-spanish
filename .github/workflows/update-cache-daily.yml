@@ -17,15 +17,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js environment with the latest LTS version
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "lts/*"
-
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: npm install
+      # Step 2: Set up Node.js and all dependencies
+      - name: Setup pnpm
+        uses: ./github/actions/setup-pnpm
 
       # Step 4: Run the update-cache.js script
       - name: Update Cache
