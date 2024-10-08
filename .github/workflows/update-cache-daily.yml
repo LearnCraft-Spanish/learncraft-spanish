@@ -19,7 +19,7 @@ jobs:
 
       # Step 2: Set up Node.js and all dependencies
       - name: Setup pnpm
-        uses: ./github/actions/setup-pnpm
+        uses: ./.github/actions/setup-pnpm
 
       # Step 4: Run the update-cache.js script
       - name: Update Cache
