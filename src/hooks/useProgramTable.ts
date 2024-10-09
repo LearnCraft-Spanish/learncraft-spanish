@@ -1,21 +1,24 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react"; // Adjust the import based on your project structure
-import type { Lesson, Program } from "../interfaceDefinitions";
+import type { Lesson, Program, ProgramUnparsed } from "../interfaceDefinitions";
 import { useBackend } from "../hooks/useBackend";
 
 export function useProgramTable() {
   const { getLessonsFromBackend, getProgramsFromBackend } = useBackend();
   const { isAuthenticated } = useAuth0();
 
-  function parseLessonsByVocab(courses: Program[], lessonTable: Lesson[]) {
-    const newCourseArray: Program[] = [...courses];
-    newCourseArray.sort((a, b) => a.recordId - b.recordId);
+  function parseLessonsByVocab(
+    courses: ProgramUnparsed[],
+    lessonTable: Lesson[],
+  ): Program[] {
+    const oldCourseArray: ProgramUnparsed[] = [...courses];
+    oldCourseArray.sort((a, b) => a.recordId - b.recordId);
 
     // Memo for combined 1MC vocabularies
     let combined1mcVocabulary: string[] = [];
 
-    newCourseArray.forEach((course) => {
+    const newCourseArray: Program[] = oldCourseArray.map((course) => {
       let combinedVocabulary: string[] = [];
       if (course.recordId === 5) {
         combinedVocabulary = [...combined1mcVocabulary];
@@ -36,8 +39,9 @@ export function useProgramTable() {
         }
       });
       parsedLessonArray.sort(lessonSortFunction);
-      course.lessons = parsedLessonArray;
-      course.lessons.forEach((lesson) => {
+      const newCourse: Program = { ...course, lessons: [] };
+      newCourse.lessons = parsedLessonArray;
+      newCourse.lessons.forEach((lesson) => {
         lesson.vocabIncluded.forEach((word) => {
           if (!combinedVocabulary.includes(word)) {
             combinedVocabulary.push(word);
@@ -48,7 +52,7 @@ export function useProgramTable() {
           combined1mcVocabulary = [...combinedVocabulary];
         }
       });
-      return course;
+      return newCourse;
     });
     return newCourseArray;
   }

@@ -19,6 +19,18 @@ export interface Program {
   cohortFCurrentLesson: number;
 }
 
+export interface ProgramUnparsed {
+  recordId: number;
+  name: string;
+  lessons: Array<string>;
+  cohortACurrentLesson: number;
+  cohortBCurrentLesson: number;
+  cohortCCurrentLesson: number;
+  cohortDCurrentLesson: number;
+  cohortECurrentLesson: number;
+  cohortFCurrentLesson: number;
+}
+
 export interface UserData {
   recordId: number;
   name: string;

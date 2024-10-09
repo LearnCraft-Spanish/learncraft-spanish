@@ -1,7 +1,7 @@
 import * as auth0 from "@auth0/auth0-react";
 import { cleanup, render, screen } from "@testing-library/react";
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import LogoutButton from "./LogoutButton";
 

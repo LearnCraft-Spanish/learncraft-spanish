@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { beforeAll, describe, expect, it } from "vitest";
-import MockAuth0Provider from "../../mocks/MockAuth0Provider";
+import MockAuth0Provider from "../../mocks/Providers/MockAuth0Provider";
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
 import type { Quiz, QuizExamplesTable } from "../interfaceDefinitions";
 import { useBackend } from "./useBackend";

@@ -7,7 +7,7 @@
 import type {
   Flashcard,
   Lesson,
-  Program,
+  ProgramUnparsed,
   Quiz,
   QuizExamplesTable,
   Spelling,
@@ -17,9 +17,10 @@ import type {
 } from "../../../src/interfaceDefinitions";
 
 import * as dataJson from "./actualServerData.json";
+import generateStudentFlashcardData from "./generateStudentFlashcardData";
 
 interface MockApiData {
-  programsTable: Program[];
+  programsTable: ProgramUnparsed[];
   lessonsTable: Lesson[];
   vocabularyTable: Vocabulary[];
   spellingsTable: Spelling[];
@@ -34,7 +35,7 @@ export default function serverlikeData() {
 
   const mockApiData: MockApiData = dataJson as MockApiData;
 
-  const programsTable: Program[] = mockApiData.programsTable;
+  const programsTable: ProgramUnparsed[] = mockApiData.programsTable;
   const lessonsTable: Lesson[] = mockApiData.lessonsTable;
   const vocabularyTable: Vocabulary[] = mockApiData.vocabularyTable;
   const spellingsTable: Spelling[] = mockApiData.spellingsTable;
@@ -118,7 +119,12 @@ export default function serverlikeData() {
   );
 
   // Generated Data -- student examples for some sample students:
-  const studentFlashcardData: StudentFlashcardData[] = [];
+  const studentFlashcardData: StudentFlashcardData =
+    generateStudentFlashcardData(
+      allStudentsTable[4],
+      10,
+      verifiedExamplesTable,
+    );
 
   return {
     api: {

@@ -44,8 +44,10 @@ export function useBackend() {
 
   /*      GET Requests      */
 
-  const getProgramsFromBackend = useCallback((): Promise<types.Program[]> => {
-    return getFactory<types.Program[]>("public/programs");
+  const getProgramsFromBackend = useCallback((): Promise<
+    types.ProgramUnparsed[]
+  > => {
+    return getFactory<types.ProgramUnparsed[]>("public/programs");
   }, [getFactory]);
 
   const getLessonsFromBackend = useCallback((): Promise<types.Lesson[]> => {

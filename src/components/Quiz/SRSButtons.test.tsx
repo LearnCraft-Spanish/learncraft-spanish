@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen } from "@testing-library/react";
 
 import React from "react";
-import { vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { Flashcard } from "../../interfaceDefinitions";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
 
