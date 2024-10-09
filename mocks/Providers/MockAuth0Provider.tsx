@@ -5,6 +5,7 @@ import React from "react";
 // Create a custom renderHook with context wrapper
 interface contextProps {
   children: ReactNode;
+  studentEmail?: string;
 }
 
 export default function MockAuth0Provider({ children }: contextProps) {
