@@ -52,7 +52,7 @@ function renderQuizNoSrs() {
           // quizLength={1000}
         />
       </QueryClientProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 function renderQuizYesSrs() {
@@ -69,7 +69,7 @@ function renderQuizYesSrs() {
           // quizLength={1000}
         />
       </QueryClientProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 

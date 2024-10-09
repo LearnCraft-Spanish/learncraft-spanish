@@ -14,7 +14,7 @@ function renderQuizButtons() {
       incrementExample={incrementExample}
       firstExample={false}
       lastExample={false}
-    />
+    />,
   );
 }
 describe("component QuizButtons", () => {
@@ -47,7 +47,7 @@ describe("component QuizButtons", () => {
         incrementExample={incrementExample}
         firstExample
         lastExample={false}
-      />
+      />,
     );
     expect(screen.getByText("Previous").attributes).toHaveProperty("disabled");
   });
@@ -58,7 +58,7 @@ describe("component QuizButtons", () => {
         incrementExample={incrementExample}
         firstExample={false}
         lastExample
-      />
+      />,
     );
     expect(screen.getByText("Next").attributes).toHaveProperty("disabled");
   });

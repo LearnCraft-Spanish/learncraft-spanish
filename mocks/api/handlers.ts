@@ -41,7 +41,7 @@ export const handlers = [
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
         return quizExamples.quizNickname === quizObject.quizNickname;
-      }
+      },
     );
     if (!quizExamplesObject) {
       throw new Error("Quiz examples not found");
@@ -58,8 +58,8 @@ export const handlers = [
       apiData.allStudentsTable.find(
         (student) =>
           student.recordId ===
-          apiData.studentFlashcardData.studentExamples[0].relatedStudent
-      ) || apiData.allStudentsTable[0]
+          apiData.studentFlashcardData.studentExamples[0].relatedStudent,
+      ) || apiData.allStudentsTable[0],
     );
   }),
 

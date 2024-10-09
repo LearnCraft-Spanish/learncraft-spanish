@@ -13,7 +13,7 @@ describe("menu button", () => {
     render(
       <MemoryRouter>
         <MenuButton />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Back to Menu")).toBeTruthy();
   });

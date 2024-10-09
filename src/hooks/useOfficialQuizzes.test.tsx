@@ -25,7 +25,7 @@ describe("useOfficialQuizzes", () => {
         wrapper,
       });
       await waitFor(() =>
-        expect(result.current.officialQuizzesQuery.isSuccess).toBe(true)
+        expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
       );
       expect(result.current.officialQuizzesQuery.data).toBeDefined();
     });
@@ -36,8 +36,8 @@ describe("useOfficialQuizzes", () => {
       });
       await waitFor(() =>
         expect(result.current.officialQuizzesQuery.data?.length).toBe(
-          quizzesTable.length
-        )
+          quizzesTable.length,
+        ),
       );
     });
   });
@@ -49,14 +49,14 @@ describe("useOfficialQuizzes", () => {
       ];
     const randomQuizNickname = randomQuizTable.quizNickname;
     const randomQuizId = quizzesTable.find(
-      (quiz) => quiz.quizNickname === randomQuizNickname
+      (quiz) => quiz.quizNickname === randomQuizNickname,
     )?.recordId;
     it("runs without crashing", async () => {
       const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
         wrapper,
       });
       await waitFor(() =>
-        expect(result.current.quizExamplesQuery.isSuccess).toBe(true)
+        expect(result.current.quizExamplesQuery.isSuccess).toBe(true),
       );
       expect(result.current.quizExamplesQuery.data).toBeDefined();
     });
@@ -67,8 +67,8 @@ describe("useOfficialQuizzes", () => {
       });
       await waitFor(() =>
         expect(result.current.quizExamplesQuery.data).toEqual(
-          randomQuizTable.quizExamplesTable
-        )
+          randomQuizTable.quizExamplesTable,
+        ),
       );
     });
   });

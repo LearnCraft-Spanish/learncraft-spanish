@@ -20,7 +20,7 @@ describe("useSelectedLesson", () => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
       expect(result.current.selectedProgram?.recordId).toBe(
-        studentAdmin?.relatedProgram
+        studentAdmin?.relatedProgram,
       );
       expect(result.current.selectedFromLesson).toBeNull();
       // This is calculated by activeLesson, in useActiveStudent
@@ -104,7 +104,7 @@ describe("useSelectedLesson", () => {
         expect(res.result.current.selectedProgram).not.toBeNull();
       });
       res.result.current.setFromLesson(
-        api.programsTable[0].lessons[1].recordId
+        api.programsTable[0].lessons[1].recordId,
       );
       await waitFor(() => {
         expect(res.result.current.selectedFromLesson).not.toBeNull();
@@ -120,8 +120,8 @@ describe("useSelectedLesson", () => {
     it("allowedVocabulary is a subset of requiredVocabulary", () => {
       expect(
         res.result.current.allowedVocabulary.every((word: any) =>
-          res.result.current.requiredVocabulary.includes(word)
-        )
+          res.result.current.requiredVocabulary.includes(word),
+        ),
       );
     });
   });

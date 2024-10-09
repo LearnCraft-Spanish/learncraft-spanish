@@ -26,7 +26,7 @@ describe("useUserData", () => {
   it("data is mockData", async () => {
     const { result } = renderHook(() => useUserData(), { wrapper });
     await waitFor(() =>
-      expect(result.current.data).toEqual(api.allStudentsTable[0])
+      expect(result.current.data).toEqual(api.allStudentsTable[0]),
     );
   });
 });

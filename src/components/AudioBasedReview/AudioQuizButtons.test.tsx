@@ -36,7 +36,7 @@ describe("component AudioQuizButtons", () => {
         decrementExample={decrementExample}
         incrementExample={incrementExample}
         unReadyQuiz={unReadyQuiz}
-      />
+      />,
     );
     expect(screen.getByText("Previous")).toBeTruthy();
     expect(screen.getByText("Next")).toBeTruthy();

@@ -46,7 +46,7 @@ describe("component SRSButtons", () => {
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
         />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
     expect(screen.getByText("Labeled: Easy")).toBeTruthy();
   });
@@ -58,7 +58,7 @@ describe("component SRSButtons", () => {
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
         />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
     expect(screen.getByText("Labeled: Hard")).toBeTruthy();
   });
@@ -71,7 +71,7 @@ describe("component SRSButtons", () => {
           answerShowing
           incrementExampleNumber={incrementExampleNumber}
         />
-      </QueryClientProvider>
+      </QueryClientProvider>,
     );
     expect(screen.getByText("This was easy")).toBeTruthy();
     expect(screen.getByText("This was hard")).toBeTruthy();
@@ -90,7 +90,7 @@ describe("component SRSButtons", () => {
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
-        </QueryClientProvider>
+        </QueryClientProvider>,
       );
       screen.getByText("This was hard").click();
       expect(incrementExampleNumber).toHaveBeenCalled();
@@ -103,7 +103,7 @@ describe("component SRSButtons", () => {
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
-        </QueryClientProvider>
+        </QueryClientProvider>,
       );
       screen.getByText("This was easy").click();
       expect(incrementExampleNumber).toHaveBeenCalled();
@@ -118,7 +118,7 @@ describe("component SRSButtons", () => {
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
-        </QueryClientProvider>
+        </QueryClientProvider>,
       );
       screen.getByText("This was easy").click();
       expect(incrementExampleNumber).not.toHaveBeenCalled();
