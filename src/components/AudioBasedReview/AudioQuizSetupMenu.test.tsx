@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import AudioQuizSetupMenu from "./AudioQuizSetupMenu";
 
 const readyQuiz = vi.fn();
@@ -26,7 +26,7 @@ describe("component AudioQuizSetupMenu", () => {
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText("Start")).toBeTruthy();
   });
@@ -39,10 +39,10 @@ describe("component AudioQuizSetupMenu", () => {
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(
-      screen.getByText("There are no audio examples for this lesson range"),
+      screen.getByText("There are no audio examples for this lesson range")
     ).toBeTruthy();
   });
   it("toggle autoplay off", () => {
@@ -54,7 +54,7 @@ describe("component AudioQuizSetupMenu", () => {
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     screen.getByLabelText("toggleAutoplay").click();
     expect(updateAutoplay).toHaveBeenCalledWith(false);
@@ -68,7 +68,7 @@ describe("component AudioQuizSetupMenu", () => {
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     screen.getByLabelText("toggleAutoplay").click();
     expect(updateAutoplay).toHaveBeenCalledWith(true);

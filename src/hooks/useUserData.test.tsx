@@ -3,7 +3,6 @@ import { renderHook, waitFor } from "@testing-library/react";
 import React from "react";
 import { describe, expect, it } from "vitest";
 
-// import serverL from '../../mocks/data/serverlike/mockBackendData.json'
 import serverLikeData from "../../mocks/data/serverlike/serverlikeData";
 import { useUserData } from "./useUserData";
 
@@ -27,7 +26,7 @@ describe("useUserData", () => {
   it("data is mockData", async () => {
     const { result } = renderHook(() => useUserData(), { wrapper });
     await waitFor(() =>
-      expect(result.current.data).toEqual(api.allStudentsTable[0]),
+      expect(result.current.data).toEqual(api.allStudentsTable[0])
     );
   });
 });

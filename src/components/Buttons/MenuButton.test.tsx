@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import MenuButton from "./MenuButton";
 
@@ -13,7 +13,7 @@ describe("menu button", () => {
     render(
       <MemoryRouter>
         <MenuButton />
-      </MemoryRouter>,
+      </MemoryRouter>
     );
     expect(screen.getByText("Back to Menu")).toBeTruthy();
   });

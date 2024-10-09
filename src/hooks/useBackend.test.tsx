@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { beforeAll, describe, expect, it } from "vitest";
-import MockAuth0Provider from "../../mocks/MockAuth0Provider";
+import MockAuth0Provider from "../../mocks/Providers/MockAuth0Provider";
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
 import type { Quiz, QuizExamplesTable } from "../interfaceDefinitions";
 import { useBackend } from "./useBackend";
@@ -41,7 +41,7 @@ describe("useBackend Hook", () => {
 
       it("resolves the fetch function and returns truthy data", async () => {
         const fetchFunction = hookResult[functionName] as (
-          functionParams?: number,
+          functionParams?: number
         ) => Promise<any[]>;
 
         // Explicitly handle the async call inside the test case
@@ -53,7 +53,7 @@ describe("useBackend Hook", () => {
         } catch (error) {
           // Fail the test if the promise rejects
           throw new Error(
-            `Failed to fetch data in ${String(functionName)}: ${error}`,
+            `Failed to fetch data in ${String(functionName)}: ${error}`
           );
         }
       });
@@ -97,7 +97,7 @@ describe("useBackend Hook", () => {
         } catch (error) {
           // Fail the test if the promise rejects
           throw new Error(
-            `Failed to fetch data in ${String(functionName)}: ${error}`,
+            `Failed to fetch data in ${String(functionName)}: ${error}`
           );
         }
       });
@@ -165,7 +165,7 @@ describe("useBackend Hook", () => {
   quizExamplesTableArray.forEach((quizExamplesObject: QuizExamplesTable) => {
     const quizNickname = quizExamplesObject.quizNickname;
     const quizId = api.quizzesTable.find(
-      (quiz: Quiz) => quiz.quizNickname === quizNickname,
+      (quiz: Quiz) => quiz.quizNickname === quizNickname
     )?.recordId;
     if (!quizId) {
       throw new Error("Quiz ID not found");

@@ -9,7 +9,7 @@ import {
 import React from "react";
 
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
 
 import Quiz from "./QuizComponent";
@@ -52,7 +52,7 @@ function renderQuizNoSrs() {
           // quizLength={1000}
         />
       </QueryClientProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 function renderQuizYesSrs() {
@@ -69,7 +69,7 @@ function renderQuizYesSrs() {
           // quizLength={1000}
         />
       </QueryClientProvider>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 

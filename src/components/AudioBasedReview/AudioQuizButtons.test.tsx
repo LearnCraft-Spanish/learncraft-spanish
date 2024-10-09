@@ -1,5 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import AudioQuizButtons from "./AudioQuizButtons";
 /*
@@ -36,7 +36,7 @@ describe("component AudioQuizButtons", () => {
         decrementExample={decrementExample}
         incrementExample={incrementExample}
         unReadyQuiz={unReadyQuiz}
-      />,
+      />
     );
     expect(screen.getByText("Previous")).toBeTruthy();
     expect(screen.getByText("Next")).toBeTruthy();

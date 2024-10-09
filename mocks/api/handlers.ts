@@ -1,8 +1,6 @@
 import { HttpResponse, http } from "msw";
-import flashcardData from "../data/serverlike/mockStudentFlashcardData.json";
 import newData from "../data/serverlike/serverlikeData";
 
-const studentFlashcardData = flashcardData.studentFlashcardData;
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
@@ -43,7 +41,7 @@ export const handlers = [
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
         return quizExamples.quizNickname === quizObject.quizNickname;
-      },
+      }
     );
     if (!quizExamplesObject) {
       throw new Error("Quiz examples not found");
@@ -56,7 +54,13 @@ export const handlers = [
   }),
 
   http.get(`${backendUrl}my-data`, () => {
-    return HttpResponse.json(apiData.allStudentsTable[0]);
+    return HttpResponse.json(
+      apiData.allStudentsTable.find(
+        (student) =>
+          student.recordId ===
+          apiData.studentFlashcardData.studentExamples[0].relatedStudent
+      ) || apiData.allStudentsTable[0]
+    );
   }),
 
   http.get(`${backendUrl}all-students`, () => {
@@ -64,7 +68,7 @@ export const handlers = [
   }),
 
   http.get(`${backendUrl}my-examples`, () => {
-    return HttpResponse.json(studentFlashcardData);
+    return HttpResponse.json(apiData.studentFlashcardData);
   }),
 
   http.get(`${backendUrl}public/audio-examples`, () => {
