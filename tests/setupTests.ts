@@ -1,6 +1,5 @@
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { server } from "../mocks/api/server";
-import { getUserDataFromName } from "../mocks/data/serverlike/studentTable";
 
 import "@testing-library/jest-dom";
 
@@ -9,10 +8,12 @@ import { createMockAuth } from "../mocks/hooks/useMockAuth";
 // Create a shared mockAuth instance
 const mockAuth = createMockAuth();
 
-// Mock the useAuth hook globally
-vi.mock("./useAuth", () => ({
-  useAuth: () => mockAuth,
-}));
+// Mock the default export of the useAuth hook
+vi.mock("../src/hooks/useAuth", () => {
+  return {
+    default: () => mockAuth, // Mocking the default export
+  };
+});
 
 /* For Specific Auth convigs use the following instead: */
 
