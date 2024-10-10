@@ -1,16 +1,16 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react"; // Adjust the import based on your project structure
 import type { Lesson, Program, ProgramUnparsed } from "../interfaceDefinitions";
 import { useBackend } from "../hooks/useBackend";
+import useAuth from "../hooks/useAuth";
 
 export function useProgramTable() {
   const { getLessonsFromBackend, getProgramsFromBackend } = useBackend();
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth();
 
   function parseLessonsByVocab(
     courses: ProgramUnparsed[],
-    lessonTable: Lesson[],
+    lessonTable: Lesson[]
   ): Program[] {
     const oldCourseArray: ProgramUnparsed[] = [...courses];
     oldCourseArray.sort((a, b) => a.recordId - b.recordId);
@@ -72,7 +72,7 @@ export function useProgramTable() {
         // Parse lessons based on vocab and return result
         const parsedLessons: Program[] = parseLessonsByVocab(
           courses,
-          lessonTable,
+          lessonTable
         );
         return parsedLessons;
       } else {

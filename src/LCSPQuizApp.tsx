@@ -1,7 +1,7 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { Route, Routes, useNavigate } from "react-router-dom";
+import useAuth from "./hooks/useAuth";
 import type { QuizCourse } from "./interfaceDefinitions";
 import MenuButton from "./components/Buttons/MenuButton";
 import Loading from "./components/Loading";
@@ -17,7 +17,7 @@ export default function LCSPQuizApp(): JSX.Element {
   const { activeStudentQuery } = useActiveStudent();
   const { selectedProgram, selectedToLesson } = useSelectedLesson();
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth();
 
   const [quizCourse, setQuizCourse] = useState("lcsp");
   const [chosenQuiz, setChosenQuiz] = useState(2);

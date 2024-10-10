@@ -1,9 +1,20 @@
+import type { DefaultBodyType, StrictRequest } from "msw";
 import { HttpResponse, http } from "msw";
 import newData from "../data/serverlike/serverlikeData";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
+
+function getEmailFromRequest(request: StrictRequest<DefaultBodyType>) {
+  const fakeToken = request.headers.get("Authorization");
+  const tokenParts = fakeToken?.split(" ");
+  const emailAddress = tokenParts?.[1];
+  if (!emailAddress) {
+    throw new Error("Email address not found in token");
+  }
+  return emailAddress;
+}
 
 export const handlers = [
   http.get(`${backendUrl}public/programs`, () => {
@@ -53,21 +64,21 @@ export const handlers = [
     return HttpResponse.json(quizExamples);
   }),
 
-  http.get(`${backendUrl}my-data`, () => {
-    return HttpResponse.json(
-      apiData.allStudentsTable.find(
-        (student) =>
-          student.recordId ===
-          apiData.studentFlashcardData.studentExamples[0].relatedStudent,
-      ) || apiData.allStudentsTable[0],
+  http.get(`${backendUrl}my-data`, ({ request }) => {
+    const email = getEmailFromRequest(request);
+    const student = apiData.allStudentsTable.find(
+      (student) => student.emailAddress === email,
     );
+    return HttpResponse.json(student);
   }),
 
   http.get(`${backendUrl}all-students`, () => {
     return HttpResponse.json(apiData.allStudentsTable);
   }),
 
-  http.get(`${backendUrl}my-examples`, () => {
+  http.get(`${backendUrl}my-examples`, ({ request }) => {
+    //Placeholder: We will fetch for different students soon
+    const _email = getEmailFromRequest(request);
     return HttpResponse.json(apiData.studentFlashcardData);
   }),
 

@@ -12,7 +12,6 @@ import type {
   QuizExamplesTable,
   Spelling,
   StudentFlashcardData,
-  UserData,
   Vocabulary,
 } from "../../../src/interfaceDefinitions";
 

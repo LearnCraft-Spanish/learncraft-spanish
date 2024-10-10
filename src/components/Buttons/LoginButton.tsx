@@ -1,8 +1,8 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
+import useAuth from "../../hooks/useAuth";
 
 function LoginButton(): JSX.Element | false {
-  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth();
 
   function loginFunction() {
     function generateRandomString(length: number) {

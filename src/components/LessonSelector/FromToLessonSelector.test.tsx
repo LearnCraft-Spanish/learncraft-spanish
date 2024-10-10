@@ -1,10 +1,19 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi, } from "vitest";
-import { cleanup, render, screen, waitFor, fireEvent } from "@testing-library/react";
+import {
+  beforeAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import {
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import serverlikeData from "../../../mocks/data/serverlike/serverlikeData";
 import FromToLessonSelector from "./FromToLessonSelector";
-import { act } from "react";
 
 interface WrapperProps {
   children: React.ReactNode;
@@ -24,7 +33,7 @@ vi.mock("./useUserData", () => ({
   })),
 }));
 
-vi.mock('../../hooks/useActiveStudent', () => ({
+vi.mock("../../hooks/useActiveStudent", () => ({
   useActiveStudent: () => ({
     activeStudentQuery: { data: studentAdmin },
     activeProgram: { recordId: studentAdmin.relatedProgram },
@@ -38,38 +47,39 @@ describe("component FromToLessonSelector", () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 
-  describe('initial state', () => {
-    beforeAll(async () => {
-    });
-      /*
+  describe("initial state", () => {
+    beforeAll(async () => {});
+    /*
       We must wait for From to be in the document, becuase
       we need to wait for the data to be loaded from useActiveStudent hook
       */
     it("label text for course, from, and to", async () => {
       render(<FromToLessonSelector />, { wrapper });
-      await waitFor(() => expect(screen.getByText('From:')).toBeTruthy());
+      await waitFor(() => expect(screen.getByText("From:")).toBeTruthy());
       // Tests
-      expect(screen.getByText('Course:')).toBeTruthy();
-      expect(screen.getByText('From:')).toBeTruthy();
-      expect(screen.getByText('To:')).toBeTruthy();
+      expect(screen.getByText("Course:")).toBeTruthy();
+      expect(screen.getByText("From:")).toBeTruthy();
+      expect(screen.getByText("To:")).toBeTruthy();
     });
     it.skip("course dropdown has all programs", async () => {
       render(<FromToLessonSelector />, { wrapper });
-      await waitFor(() => expect(screen.getByText('From:')).toBeTruthy());
+      await waitFor(() => expect(screen.getByText("From:")).toBeTruthy());
 
-      const programsNames = api.programsTable.map(program => program.name);
+      const programsNames = api.programsTable.map((program) => program.name);
       // Tests
       for (const programName of programsNames) {
         expect(screen.getByText(programName)).toBeTruthy();
       }
-    })
+    });
     it.skip("selected course is the related program of current user", async () => {
       render(<FromToLessonSelector />, { wrapper });
-      await waitFor(() => expect(screen.getByText('From:')).toBeTruthy());
+      await waitFor(() => expect(screen.getByText("From:")).toBeTruthy());
 
-      const courseSelect = screen.getByLabelText('Course:');
+      const courseSelect = screen.getByLabelText("Course:");
       // Tests
-      expect((courseSelect as HTMLSelectElement).value).toBe(studentAdmin.relatedProgram.toString());
-    })
-  })
+      expect((courseSelect as HTMLSelectElement).value).toBe(
+        studentAdmin.relatedProgram.toString(),
+      );
+    });
+  });
 });

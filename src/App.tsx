@@ -1,5 +1,4 @@
 import type { ReactElement } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import React, {
   isValidElement,
   useCallback,
@@ -18,6 +17,7 @@ import FlashcardManager from "./FlashcardManager";
 import FrequenSay from "./FrequenSay";
 import SentryRoutes from "./functions/SentryRoutes";
 import { useActiveStudent } from "./hooks/useActiveStudent";
+import useAuth from "./hooks/useAuth";
 import { useUserData } from "./hooks/useUserData";
 import LCSPQuizApp from "./LCSPQuizApp";
 import Menu from "./Menu";
@@ -31,7 +31,7 @@ export const App: React.FC = () => {
   const userDataQuery = useUserData();
   const { activeStudentQuery, studentListQuery, chooseStudent } =
     useActiveStudent();
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth();
 
   // States for banner message
   const [bannerMessage, setBannerMessage] = useState("");

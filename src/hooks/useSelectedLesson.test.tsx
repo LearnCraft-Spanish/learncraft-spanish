@@ -1,7 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-
-import wrapper from "../../mocks/Providers/wrapper";
 import { useSelectedLesson } from "./useSelectedLesson";
 
 /*
@@ -15,12 +13,12 @@ This hook uses:
 describe("useSelectedLesson", () => {
   describe("initial state", () => {
     it("selectedProgram is userData's related program, selecteFromLesson null, selectedToLesson NOT null", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson());
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
       expect(result.current.selectedProgram?.recordId).toBe(
-        studentAdmin?.relatedProgram,
+        studentAdmin?.relatedProgram
       );
       expect(result.current.selectedFromLesson).toBeNull();
       // This is calculated by activeLesson, in useActiveStudent
@@ -30,7 +28,7 @@ describe("useSelectedLesson", () => {
 
   describe("setProgram", () => {
     it("sets the selected program", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson());
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -50,7 +48,7 @@ describe("useSelectedLesson", () => {
 
   describe("setFromLesson", () => {
     it("sets the selected from lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson());
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -67,7 +65,7 @@ describe("useSelectedLesson", () => {
 
   describe("setToLesson", () => {
     it("sets the selected to lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson());
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -84,7 +82,7 @@ describe("useSelectedLesson", () => {
 
   describe("filterExamplesBySelectedLesson", () => {
     it("filters the examples by the selected lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson());
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -99,12 +97,12 @@ describe("useSelectedLesson", () => {
     // set up the the tests
     let res: any;
     beforeAll(async () => {
-      res = renderHook(() => useSelectedLesson(), { wrapper });
+      res = renderHook(() => useSelectedLesson());
       await waitFor(() => {
         expect(res.result.current.selectedProgram).not.toBeNull();
       });
       res.result.current.setFromLesson(
-        api.programsTable[0].lessons[1].recordId,
+        api.programsTable[0].lessons[1].recordId
       );
       await waitFor(() => {
         expect(res.result.current.selectedFromLesson).not.toBeNull();
@@ -120,8 +118,8 @@ describe("useSelectedLesson", () => {
     it("allowedVocabulary is a subset of requiredVocabulary", () => {
       expect(
         res.result.current.allowedVocabulary.every((word: any) =>
-          res.result.current.requiredVocabulary.includes(word),
-        ),
+          res.result.current.requiredVocabulary.includes(word)
+        )
       );
     });
   });

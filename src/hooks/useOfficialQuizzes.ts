@@ -1,11 +1,11 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 import type { Quiz } from "../interfaceDefinitions";
+import useAuth from "./useAuth";
 import { useBackend } from "./useBackend";
 
 export function useOfficialQuizzes(quizNumber: number | undefined) {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth();
   const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } =
     useBackend();
 

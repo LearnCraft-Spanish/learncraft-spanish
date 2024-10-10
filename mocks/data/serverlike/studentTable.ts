@@ -3,8 +3,8 @@ import type { UserData } from "../../../src/interfaceDefinitions";
 export const allStudentsTable: UserData[] = [
   {
     recordId: 1,
-    name: "studentA",
-    emailAddress: "studentA@fake.not",
+    name: "admin-empty-role",
+    emailAddress: "admin-empty-role@fake.not",
     role: "",
     isAdmin: true,
     relatedProgram: 2,
@@ -12,8 +12,8 @@ export const allStudentsTable: UserData[] = [
   },
   {
     recordId: 2,
-    name: "studentB",
-    emailAddress: "studentB@fake.not",
+    name: "empty-role",
+    emailAddress: "empty-role@fake.not",
     role: "",
     isAdmin: false,
     relatedProgram: 2,
@@ -21,8 +21,8 @@ export const allStudentsTable: UserData[] = [
   },
   {
     recordId: 3,
-    name: "studentC",
-    emailAddress: "studentC@fake.not",
+    name: "none-role",
+    emailAddress: "none-role@fake.not",
     role: "none",
     isAdmin: false,
     relatedProgram: 2,
@@ -30,8 +30,8 @@ export const allStudentsTable: UserData[] = [
   },
   {
     recordId: 4,
-    name: "studentD",
-    emailAddress: "studentD@fake.not",
+    name: "limited",
+    emailAddress: "limited@fake.not",
     role: "limited",
     isAdmin: false,
     relatedProgram: 3,
@@ -39,8 +39,8 @@ export const allStudentsTable: UserData[] = [
   },
   {
     recordId: 5,
-    name: "studentE",
-    emailAddress: "studentE@fake.not",
+    name: "student-admin",
+    emailAddress: "student-admin@fake.not",
     role: "student",
     isAdmin: true,
     relatedProgram: 2,
@@ -48,8 +48,8 @@ export const allStudentsTable: UserData[] = [
   },
   {
     recordId: 6,
-    name: "studentF",
-    emailAddress: "studentF@fake.not",
+    name: "student-lcsp",
+    emailAddress: "student-lcsp@fake.not",
     role: "student",
     isAdmin: false,
     relatedProgram: 3,
@@ -57,8 +57,8 @@ export const allStudentsTable: UserData[] = [
   },
   {
     recordId: 7,
-    name: "studentG",
-    emailAddress: "studentG@fake.not",
+    name: "student-ser-estar",
+    emailAddress: "student-ser-estar@fake.not",
     role: "student",
     isAdmin: false,
     relatedProgram: 5,
@@ -66,6 +66,15 @@ export const allStudentsTable: UserData[] = [
   },
 ];
 
-export function getUserDataFromName(name: string): UserData {
-  return allStudentsTable.find((student) => student.name === name)!;
+export function getUserDataFromName(
+  name:
+    | "admin-empty-role"
+    | "empty-role"
+    | "none-role"
+    | "limited"
+    | "student-admin"
+    | "student-lcsp"
+    | "student-ser-estar",
+): UserData | undefined {
+  return allStudentsTable.find((student) => student.name === name);
 }

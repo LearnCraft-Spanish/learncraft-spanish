@@ -1,8 +1,8 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import React from "react";
+import useAuth from "../../hooks/useAuth";
 
 function LogoutButton(): JSX.Element | false {
-  const { isAuthenticated, logout } = useAuth0();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     isAuthenticated && (

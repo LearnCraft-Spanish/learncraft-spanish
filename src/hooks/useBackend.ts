@@ -1,11 +1,11 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useCallback } from "react";
 import type * as types from "../interfaceDefinitions";
+import useAuth from "./useAuth";
 
 export function useBackend() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const audience = import.meta.env.VITE_API_AUDIENCE;
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently } = useAuth();
 
   const getAccessToken = useCallback(async () => {
     const accessToken = await getAccessTokenSilently({
