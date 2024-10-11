@@ -1,5 +1,8 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
+import MockQueryClientProvider from "../../mocks/Providers/MockQueryClient";
+import { getUserDataFromName } from "../../mocks/data/serverlike/studentTable";
+import useActiveStudentStub from "../../mocks/hooks/useActiveStudentStub";
 import { useSelectedLesson } from "./useSelectedLesson";
 
 /*
@@ -10,10 +13,16 @@ This hook uses:
 
 // for useActive Student, need useUserData with adminStudent
 
+vi.mock("./useActiveStudent", useActiveStudent: () => useActiveStudentStub());
+
+const studentAdmin = getUserDataFromName("student-admin");
+
 describe("useSelectedLesson", () => {
   describe("initial state", () => {
     it("selectedProgram is userData's related program, selecteFromLesson null, selectedToLesson NOT null", async () => {
-      const { result } = renderHook(() => useSelectedLesson());
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -28,7 +37,9 @@ describe("useSelectedLesson", () => {
 
   describe("setProgram", () => {
     it("sets the selected program", async () => {
-      const { result } = renderHook(() => useSelectedLesson());
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -48,7 +59,9 @@ describe("useSelectedLesson", () => {
 
   describe("setFromLesson", () => {
     it("sets the selected from lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson());
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -65,7 +78,9 @@ describe("useSelectedLesson", () => {
 
   describe("setToLesson", () => {
     it("sets the selected to lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson());
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -82,7 +97,9 @@ describe("useSelectedLesson", () => {
 
   describe("filterExamplesBySelectedLesson", () => {
     it("filters the examples by the selected lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson());
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -97,7 +114,9 @@ describe("useSelectedLesson", () => {
     // set up the the tests
     let res: any;
     beforeAll(async () => {
-      res = renderHook(() => useSelectedLesson());
+      res = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(res.result.current.selectedProgram).not.toBeNull();
       });

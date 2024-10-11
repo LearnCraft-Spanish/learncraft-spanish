@@ -1,5 +1,11 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it, vi, } from "vitest";
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  afterEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 
@@ -31,26 +37,28 @@ describe("component AudioBasedReview", () => {
     vi.clearAllMocks();
     cleanup();
   });
-  describe('initial state', () => {
+  describe("initial state", () => {
     it("while waiting for data, shows loading", async () => {
       render(
         <MemoryRouter>
           <AudioBasedReview willAutoplay={false} />
         </MemoryRouter>,
-        { wrapper }
+        { wrapper },
       );
-      expect(screen.getByText('Loading Audio...')).toBeInTheDocument();
+      expect(screen.getByText("Loading Audio...")).toBeInTheDocument();
     });
-    it("await data load, component renders", async() => {
+    it("await data load, component renders", async () => {
       render(
         <MemoryRouter>
           <AudioBasedReview willAutoplay={false} />
         </MemoryRouter>,
-        { wrapper }
+        { wrapper },
       );
-      await waitFor(() => expect(screen.getByText('From:')).toBeInTheDocument());
+      await waitFor(() =>
+        expect(screen.getByText("From:")).toBeInTheDocument(),
+      );
 
       expect(screen.getByText("Comprehension Quiz")).toBeInTheDocument();
     });
-  })
+  });
 });

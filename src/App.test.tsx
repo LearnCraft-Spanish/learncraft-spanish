@@ -1,20 +1,46 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import React from "react";
-import { MemoryRouter } from "react-router-dom";
-import { describe, it } from "vitest";
-
+import { describe, expect, it } from "vitest";
+import MockAllProviders from "../mocks/Providers/MockAllProviders";
 import App from "./App";
 
 // Waiting for userData context to be finished
-describe("app", () => {
-  it("renders without crashing", () => {
+describe("app", async () => {
+  it("renders without crashing", async () => {
     render(
-      <MemoryRouter>
-        <QueryClientProvider client={new QueryClient()}>
-          <App />
-        </QueryClientProvider>
-      </MemoryRouter>,
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>
     );
+  });
+  it("shows a log out button when logged in", async () => {
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>
+    );
+    await waitFor(() => {
+      expect(getByText(/log out/i)).toBeInTheDocument();
+    });
+  });
+  it("shows welcome message", async () => {
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>
+    );
+    await waitFor(() => {
+      expect(getByText(/log in/i)).toBeInTheDocument();
+    });
+  });
+  it("shows official quizzes button", async () => {
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>
+    );
+    await waitFor(() => {
+      expect(getByText(/official quizzes/i)).toBeInTheDocument();
+    });
   });
 });

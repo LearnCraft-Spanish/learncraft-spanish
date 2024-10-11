@@ -1,6 +1,4 @@
 import {
-  afterEach,
-  beforeAll,
   beforeEach,
   describe,
   expect,
@@ -8,9 +6,6 @@ import {
   vi,
 } from "vitest";
 import {
-  act,
-  cleanup,
-  fireEvent,
   render,
   renderHook,
   screen,
@@ -30,7 +25,7 @@ interface WrapperProps {
 
 const api = serverlikeData().api;
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true
+  (student) => student.role === "student" && student.isAdmin === true,
 );
 if (!studentAdmin) throw new Error("No student admin found");
 
@@ -84,7 +79,7 @@ describe("component FromToLessonSelector", () => {
         expect(result.current.programTableQuery.isSuccess).toBe(true);
       });
       const programsNames = result.current.programTableQuery.data?.map(
-        (program) => program.name
+        (program) => program.name,
       );
       if (!programsNames) throw new Error("No programs found");
       // Tests
@@ -96,7 +91,7 @@ describe("component FromToLessonSelector", () => {
       const courseSelect = screen.getByLabelText("Course:");
       // Tests
       expect((courseSelect as HTMLSelectElement).value).toBe(
-        studentAdmin.relatedProgram.toString()
+        studentAdmin.relatedProgram.toString(),
       );
     });
   });
@@ -111,7 +106,7 @@ describe("component FromToLessonSelector", () => {
     const courseSelect = screen.getByLabelText("Course:");
     // fireEvent.change(courseSelect, { target: { value: '0' } });
     await waitFor(() =>
-      expect((courseSelect as HTMLSelectElement).value).toBe("0")
+      expect((courseSelect as HTMLSelectElement).value).toBe("0"),
     );
 
     // Tests

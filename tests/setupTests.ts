@@ -11,21 +11,9 @@ const mockAuth = createMockAuth();
 // Mock the default export of the useAuth hook
 vi.mock("../src/hooks/useAuth", () => {
   return {
-    default: () => mockAuth, // Mocking the default export
+    default: () => mockAuth,
   };
 });
-
-/* For Specific Auth convigs use the following instead: */
-
-/*
-  import { createMockAuth } from './mockAuth';
-  let mockAuth;
-
-  beforeEach(() => {
-    mockAuth = createMockAuth();
-    vi.mocked(useAuth).mockReturnValue(mockAuth);
-  });
-*/
 
 // Open the MSW server before all tests
 beforeAll(() => {
