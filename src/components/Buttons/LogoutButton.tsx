@@ -10,9 +10,7 @@ function LogoutButton(): JSX.Element | false {
         type="button"
         id="logout"
         className={window.location.pathname === "/" ? " " : "notRoot"}
-        onClick={() =>
-          logout({ logoutParams: { returnTo: window.location.origin } })
-        }
+        onClick={logout}
       >
         Log Out
       </button>

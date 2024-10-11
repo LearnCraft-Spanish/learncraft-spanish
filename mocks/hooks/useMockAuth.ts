@@ -1,28 +1,87 @@
+import { mock } from "node:test";
 import { vi } from "vitest";
+import { getUserDataFromName } from "../data/serverlike/studentTable";
 
-const createMockAuth = () => {
+export interface MockAuth {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  getAccessToken: () => Promise<string>;
+  login: () => void;
+  logout: () => Promise<void>;
+  setAuthState: (authStatus: boolean) => void;
+  setLoadingState: (loadingStatus: boolean) => void;
+  setStudent: (
+    student:
+      | "admin-empty-role"
+      | "empty-role"
+      | "none-role"
+      | "limited"
+      | "student-admin"
+      | "student-lcsp"
+      | "student-ser-estar"
+  ) => void;
+  resetMocks: () => void;
+}
+
+const createMockAuth = (): MockAuth => {
   let isAuthenticated = true;
+  console.log("isAuthenticated", isAuthenticated);
   let isLoading = false;
-  let token: string | undefined;
+  let userName:
+    | "admin-empty-role"
+    | "empty-role"
+    | "none-role"
+    | "limited"
+    | "student-admin"
+    | "student-lcsp"
+    | "student-ser-estar" = "student-admin";
 
-  const loginWithRedirect = vi.fn(); // Mock to track interactions
-  const logout = vi.fn(); // Mock to track interactions
+  function getStudentEmail() {
+    const studentEmail = getUserDataFromName(userName)?.emailAddress;
+    if (!studentEmail) {
+      throw new Error("No student email found");
+    }
+    return studentEmail;
+  }
+
+  const login = vi.fn();
+  const logout = vi.fn();
 
   const mockAuth = {
     isAuthenticated,
     isLoading,
-    getAccessTokenSilently: async () => token,
-
-    loginWithRedirect, // Now we can track and assert on interactions
+    getAccessToken: async () => {
+      const token = getStudentEmail();
+      return token;
+    },
+    login,
     logout,
-
-    setAuthState: (authStatus: boolean) => (isAuthenticated = authStatus),
-    setLoadingState: (loadingStatus: boolean) => (isLoading = loadingStatus),
-    setToken: (mockToken: string | undefined) => (token = mockToken),
+    setAuthState: (authStatus: boolean) => {
+      console.log("Setting auth status to", authStatus);
+      isAuthenticated = authStatus;
+      mockAuth.isAuthenticated = authStatus;
+      console.log("isAuthenticated", isAuthenticated);
+      console.log("mockAuth.isAuthenticated", mockAuth.isAuthenticated);
+    },
+    setLoadingState: (loadingStatus: boolean) => {
+      isLoading = loadingStatus;
+      mockAuth.isLoading = loadingStatus;
+    },
+    setStudent: (
+      student:
+        | "admin-empty-role"
+        | "empty-role"
+        | "none-role"
+        | "limited"
+        | "student-admin"
+        | "student-lcsp"
+        | "student-ser-estar"
+    ) => (userName = student),
     resetMocks: () => {
       isAuthenticated = false;
-      token = undefined;
-      loginWithRedirect.mockReset(); // Reset the mocks
+      isLoading = false;
+      userName = "student-admin"; // Reset userName
+      login.mockReset();
       logout.mockReset();
     },
   };

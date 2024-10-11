@@ -4,20 +4,7 @@ import useAuth from "./useAuth";
 
 export function useBackend() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const audience = import.meta.env.VITE_API_AUDIENCE;
-  const { getAccessTokenSilently } = useAuth();
-
-  const getAccessToken = useCallback(async () => {
-    const accessToken = await getAccessTokenSilently({
-      authorizationParams: {
-        audience,
-        scope:
-          "openid profile email read:current-student update:current-student read:all-students update:all-students",
-      },
-      cacheMode: "off",
-    });
-    return accessToken;
-  }, [getAccessTokenSilently, audience]);
+  const { getAccessToken } = useAuth();
 
   const getFactory = useCallback(
     async <T>(path: string, headers?: any): Promise<T> => {
@@ -39,7 +26,7 @@ export function useBackend() {
         throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
       }
     },
-    [getAccessToken, backendUrl],
+    [getAccessToken, backendUrl]
   );
 
   /*      GET Requests      */
@@ -92,7 +79,7 @@ export function useBackend() {
     (quizId: number): Promise<types.Flashcard[]> => {
       return getFactory<types.Flashcard[]>(`public/quizExamples/${quizId}`);
     },
-    [getFactory],
+    [getFactory]
   );
 
   const getAllUsersFromBackend = useCallback((): Promise<types.UserData[]> => {
@@ -107,7 +94,7 @@ export function useBackend() {
     (studentId: number): Promise<types.StudentFlashcardData> => {
       return getFactory<types.StudentFlashcardData>(`${studentId}/examples`);
     },
-    [getFactory],
+    [getFactory]
   );
 
   /*      Coaching API      */
@@ -159,7 +146,7 @@ export function useBackend() {
         throw new Error(`Failed to post to ${path}`);
       }
     },
-    [getAccessToken, backendUrl],
+    [getAccessToken, backendUrl]
   );
 
   const createMyStudentExample = useCallback(
@@ -168,7 +155,7 @@ export function useBackend() {
         exampleid: exampleId,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   const createStudentExample = useCallback(
@@ -178,7 +165,7 @@ export function useBackend() {
         exampleid: exampleId,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   const updateMyStudentExample = useCallback(
@@ -188,7 +175,7 @@ export function useBackend() {
         newinterval: newInterval,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   const updateStudentExample = useCallback(
@@ -198,7 +185,7 @@ export function useBackend() {
         newinterval: newInterval,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   /*      DELETE Requests      */
@@ -224,21 +211,21 @@ export function useBackend() {
         throw new Error(`Failed to delete ${path}`);
       }
     },
-    [getAccessToken, backendUrl],
+    [getAccessToken, backendUrl]
   );
 
   const deleteMyStudentExample = useCallback(
     (recordId: number): Promise<number> => {
       return deleteFactory("delete-my-student-example", { deleteid: recordId });
     },
-    [deleteFactory],
+    [deleteFactory]
   );
 
   const deleteStudentExample = useCallback(
     (recordId: number): Promise<number> => {
       return deleteFactory("delete-student-example", { deleteid: recordId });
     },
-    [deleteFactory],
+    [deleteFactory]
   );
 
   return {
