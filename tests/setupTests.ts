@@ -1,13 +1,13 @@
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { server } from "../mocks/api/server";
-import useAuth from "../src/hooks/useAuth";
 
 import "@testing-library/jest-dom";
 
 import createMockAuth from "../mocks/hooks/useMockAuth";
+import useAuth from "../src/hooks/useAuth";
 
 // Create a shared mockAuth instance
-const globalMockAuth = createMockAuth();
+export const globalMockAuth = createMockAuth();
 
 // Mock the default export of the useAuth hook
 vi.mock("../src/hooks/useAuth", () => {
@@ -21,14 +21,13 @@ beforeAll(() => {
   server.listen();
 });
 
-// Reset the mockAuth state before each test
 beforeEach(() => {
-  globalMockAuth.resetMocks(); // Ensure the mock is in default state
+  // Reset the mockAuth instance before each test
+  vi.mocked(useAuth).mockReturnValue(globalMockAuth);
 });
 
 // Reset the server handlers after each test
 afterEach(() => {
-  console.log("auth status after test:", globalMockAuth.isAuthenticated);
   server.resetHandlers();
   vi.clearAllMocks();
 });

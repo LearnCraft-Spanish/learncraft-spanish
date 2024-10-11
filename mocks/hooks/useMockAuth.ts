@@ -8,34 +8,26 @@ export interface MockAuth {
   getAccessToken: () => Promise<string>;
   login: () => void;
   logout: () => Promise<void>;
-  setAuthState: (authStatus: boolean) => void;
-  setLoadingState: (loadingStatus: boolean) => void;
-  setStudent: (
-    student:
-      | "admin-empty-role"
-      | "empty-role"
-      | "none-role"
-      | "limited"
-      | "student-admin"
-      | "student-lcsp"
-      | "student-ser-estar"
-  ) => void;
-  resetMocks: () => void;
 }
 
-const createMockAuth = (): MockAuth => {
-  let isAuthenticated = true;
-  console.log("isAuthenticated", isAuthenticated);
-  let isLoading = false;
-  let userName:
+interface MockAuthOptions {
+  isAuthenticated?: boolean;
+  isLoading?: boolean;
+  userName?:
     | "admin-empty-role"
     | "empty-role"
     | "none-role"
     | "limited"
     | "student-admin"
     | "student-lcsp"
-    | "student-ser-estar" = "student-admin";
+    | "student-ser-estar";
+}
 
+const createMockAuth = ({
+  isAuthenticated = true,
+  isLoading = false,
+  userName = "student-admin",
+}: MockAuthOptions = {}): MockAuth => {
   function getStudentEmail() {
     const studentEmail = getUserDataFromName(userName)?.emailAddress;
     if (!studentEmail) {
@@ -56,34 +48,6 @@ const createMockAuth = (): MockAuth => {
     },
     login,
     logout,
-    setAuthState: (authStatus: boolean) => {
-      console.log("Setting auth status to", authStatus);
-      isAuthenticated = authStatus;
-      mockAuth.isAuthenticated = authStatus;
-      console.log("isAuthenticated", isAuthenticated);
-      console.log("mockAuth.isAuthenticated", mockAuth.isAuthenticated);
-    },
-    setLoadingState: (loadingStatus: boolean) => {
-      isLoading = loadingStatus;
-      mockAuth.isLoading = loadingStatus;
-    },
-    setStudent: (
-      student:
-        | "admin-empty-role"
-        | "empty-role"
-        | "none-role"
-        | "limited"
-        | "student-admin"
-        | "student-lcsp"
-        | "student-ser-estar"
-    ) => (userName = student),
-    resetMocks: () => {
-      isAuthenticated = false;
-      isLoading = false;
-      userName = "student-admin"; // Reset userName
-      login.mockReset();
-      logout.mockReset();
-    },
   };
 
   return mockAuth;

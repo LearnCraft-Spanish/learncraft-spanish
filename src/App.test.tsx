@@ -1,8 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import React from "react";
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import type { MockAuth } from "../mocks/hooks/useMockAuth";
 import createMockAuth from "../mocks/hooks/useMockAuth";
 import useAuth from "./hooks/useAuth";
 import App from "./App";
@@ -29,7 +28,8 @@ describe("app", async () => {
   });
 
   it("shows a log in button when logged out", async () => {
-    //vi.mocked(useAuth).mockReturnValue({ ...mockAuth, isAuthenticated: false });
+    const mockAuth = createMockAuth({ isAuthenticated: false });
+    vi.mocked(useAuth).mockReturnValue(mockAuth);
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -40,7 +40,22 @@ describe("app", async () => {
     });
   });
 
+  it("says it won't do anything if not logged in", async () => {
+    const mockAuth = createMockAuth({ isAuthenticated: false });
+    vi.mocked(useAuth).mockReturnValue(mockAuth);
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>
+    );
+    await waitFor(() => {
+      expect(getByText(/you must be logged in/i)).toBeInTheDocument();
+    });
+  });
+
   it("shows welcome message", async () => {
+    const mockAuth = createMockAuth({ userName: "limited" });
+    vi.mocked(useAuth).mockReturnValue(mockAuth);
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -52,6 +67,8 @@ describe("app", async () => {
   });
 
   it("shows official quizzes button", async () => {
+    const mockAuth = createMockAuth({ userName: "limited" });
+    vi.mocked(useAuth).mockReturnValue(mockAuth);
     const { getByText } = render(
       <MockAllProviders>
         <App />
