@@ -3,7 +3,7 @@ import { server } from "../mocks/api/server";
 
 import "@testing-library/jest-dom";
 
-import { createMockAuth } from "../mocks/hooks/useMockAuth";
+import createMockAuth from "../mocks/hooks/useMockAuth";
 
 // Create a shared mockAuth instance
 const mockAuth = createMockAuth();

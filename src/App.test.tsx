@@ -1,8 +1,15 @@
+import { beforeEach, describe, expect, it } from "vitest";
 import { render, waitFor } from "@testing-library/react";
 import React from "react";
-import { describe, expect, it } from "vitest";
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
+import createMockAuth from "../mocks/hooks/useMockAuth";
 import App from "./App";
+
+let mockAuth;
+
+beforeEach(() => {
+  mockAuth = createMockAuth();
+});
 
 // Waiting for userData context to be finished
 describe("app", async () => {
