@@ -49,6 +49,11 @@ button:disabled {
   z-index: 5;
 }
 
+.audioPlayPauseButton img {
+  width: 24px;
+  height: 24px;
+}
+
 .audioFlashcard p {
   font-weight: bold;
   font-size: 1.25rem;
