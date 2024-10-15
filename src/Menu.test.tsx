@@ -174,6 +174,6 @@ describe("component Menu", () => {
       });
       expect(screen.queryByText("Audio Quiz")).toBeNull();
       expect(screen.queryByText("Comprehension Quiz")).toBeNull();
-    })
+    });
   });
 });

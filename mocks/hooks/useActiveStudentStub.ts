@@ -6,7 +6,7 @@ export default function useActiveStudentStub({
   isError = false,
 }) {
   const student = allStudentsTable.find(
-    (student) => student.name === studentName
+    (student) => student.name === studentName,
   );
   if (!student) {
     throw new Error(`Student ${studentName} not found in allStudentsTable`);
