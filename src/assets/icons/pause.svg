@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8.56 10.56">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g id="Ebene_1">
+    <g>
+      <path class="cls-1" d="M2.75,0H.81c-.45,0-.81.36-.81.81v8.94c0,.45.36.81.81.81h1.94c.45,0,.81-.36.81-.81V.81c0-.45-.36-.81-.81-.81Z"/>
+      <path class="cls-1" d="M7.76,0h-1.94c-.45,0-.81.36-.81.81v8.94c0,.45.36.81.81.81h1.94c.45,0,.81-.36.81-.81V.81c0-.45-.36-.81-.81-.81Z"/>
+    </g>
+  </g>
+</svg>
