@@ -18,7 +18,7 @@ export default function Nav(): JSX.Element {
         onClick={() => navigate("/")}
         aria-description="home navigation"
       >
-        <img id="logo" src={logo} alt="" />
+        <img id="logo" src={logo} alt="Learncraft Spanish Logo" />
         <img src={home} alt="" id="homeIcon" />
       </div>
       <LogoutButton />
