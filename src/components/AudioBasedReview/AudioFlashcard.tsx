@@ -1,5 +1,5 @@
-import play from '../../assets/icons/play.svg';
-import pause from '../../assets/icons/pause.svg';
+import play from "../../assets/icons/play.svg";
+import pause from "../../assets/icons/pause.svg";
 
 interface AudioFlashcardProps {
   currentExampleText: string | JSX.Element;

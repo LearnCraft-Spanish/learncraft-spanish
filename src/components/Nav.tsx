@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import logo from "../resources/typelogosmall.png";
-import home from "../assets/icons/home.svg"
+import home from "../assets/icons/home.svg";
 
 import LoginButton from "./Buttons/LoginButton";
 import LogoutButton from "./Buttons/LogoutButton";
@@ -13,7 +13,11 @@ export default function Nav(): JSX.Element {
     <div
       className={`div-header ${window.location.pathname === "/" ? " " : "notRoot"}`}
     >
-      <div className="homeButton" onClick={() => navigate("/")} aria-description="home navigation">
+      <div
+        className="homeButton"
+        onClick={() => navigate("/")}
+        aria-description="home navigation"
+      >
         <img id="logo" src={logo} alt="" />
         <img src={home} alt="" id="homeIcon" />
       </div>

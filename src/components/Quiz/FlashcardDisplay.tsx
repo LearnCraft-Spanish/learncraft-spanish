@@ -115,7 +115,7 @@ export default function FlashcardDisplay({
           onClick={(e) => handlePlayPause(e)}
           aria-label="Play/Pause"
         >
-        <img src={playing ? pause : play} alt="play/pause" />
+          <img src={playing ? pause : play} alt="play/pause" />
         </button>
       )}
     </div>
