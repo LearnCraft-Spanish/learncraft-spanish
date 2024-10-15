@@ -87,6 +87,23 @@ export const handlers = [
     return HttpResponse.json(apiData.audioExamplesTable);
   }),
 
+  // Get Active Examples of a student
+  http.get(":studentId/examples", ({ params }) => {
+    // current temporary implementation, gets student-admin flashcard data, only flashcard data defined
+    const studentId = params.studentId;
+    const student = apiData.allStudentsTable.find(
+      (student) => student.recordId === Number(studentId)
+    );
+    if (!student) {
+      throw new Error("Student not found");
+    }
+    const studentExamples = apiData.studentFlashcardData
+    if (!studentExamples) {
+      throw new Error("Student examples not found");
+    }
+    return HttpResponse.json(studentExamples);
+  }),
+
   // Post Requests
   http.post(`${backendUrl}create-my-student-example`, async ({ request }) => {
     const exampleId = request.headers.get("exampleid");
