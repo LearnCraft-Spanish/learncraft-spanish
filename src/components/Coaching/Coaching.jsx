@@ -2,13 +2,13 @@
 
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 
-import { useUserData } from "./hooks/useUserData";
+import { useUserData } from "../../hooks/useUserData";
 
-import { useBackend } from "./hooks/useBackend";
+import { useBackend } from "../../hooks/useBackend";
 
 const Coaching = forwardRef(
   ({ contextual, openContextual, closeContextual }, currentContextual) => {
-    const { userDataQuery } = useUserData();
+    const userDataQuery = useUserData();
     const {
       getActiveMemberships,
       getActiveStudents,
@@ -942,7 +942,7 @@ const Coaching = forwardRef(
       if (startupDataLoaded) {
         coachUser.current =
           coaches.current.find(
-            (coach) => coach.user.email === userDataQuery.data.emailAddress,
+            (coach) => coach.user.email === userDataQuery.data?.emailAddress,
           ) || null;
         if (coachUser.current ? coachUser.current.recordId : false) {
           updateCoachFilter(coachUser.current.recordId);
