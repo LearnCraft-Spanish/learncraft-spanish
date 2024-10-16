@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, waitFor } from "@testing-library/react";
 import React from "react";
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
 import createMockAuth from "../mocks/hooks/useMockAuth";
@@ -9,9 +9,12 @@ import App from "./App";
 // Waiting for userData context to be finished
 describe("app", () => {
   let mockAuth = null;
+
   afterEach(() => {
+    vi.resetModules();
     cleanup();
   });
+
   it("renders without crashing", () => {
     render(
       <MockAllProviders>
@@ -59,35 +62,17 @@ describe("app", () => {
     });
   });
 
-  describe("limited student", () => {
-    beforeEach(() => {
-      const mockLimitedStudent = createMockAuth({ userName: "limited" });
-      // vi.mocked(useAuth).mockReturnValue(mockLimitedStudent);
-      // re import app to get the new useAuth
-      vi.resetModules();
-      vi.doUnmock("./hooks/useAuth");
-      vi.doMock("./hooks/useAuth", () => {
-        return {
-          default: vi.fn(() => mockLimitedStudent),
-        };
-      });
-    });
-    afterEach(() => {
-      vi.clearAllMocks();
-    });
-
-    it("shows welcome message", async () => {
-      // const mockLimitedStudent = createMockAuth({ userName: "limited" });
-      // mockAuth = createMockAuth({ userName: "limited" });
-      // vi.mocked(useAuth).mockReturnValue(mockLimitedStudent);
-      const { getByText } = render(
-        <MockAllProviders>
-          <App />
-        </MockAllProviders>
-      );
-      await waitFor(() => {
-        expect(getByText(/welcome/i)).toBeInTheDocument();
-      });
+  it("shows welcome message", async () => {
+    // const mockLimitedStudent = createMockAuth({ userName: "limited" });
+    mockAuth = createMockAuth({ userName: "limited" });
+    vi.mocked(useAuth).mockReturnValue(mockAuth);
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>
+    );
+    await waitFor(() => {
+      expect(getByText(/welcome/i)).toBeInTheDocument();
     });
   });
 
@@ -97,7 +82,7 @@ describe("app", () => {
       isAuthenticated: true,
       isLoading: false,
     });
-    vi.mocked(useAuth).mockRejectedValue(new Error("error"));
+    vi.mocked(useAuth).mockReturnValue(mockAuth);
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -108,14 +93,14 @@ describe("app", () => {
     });
   });
 
-  it("displays an error", async () => {
+  it("displays my flashcards", async () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
       </MockAllProviders>
     );
     await waitFor(() => {
-      expect(getByText(/error/i)).toBeInTheDocument();
+      expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();
     });
   });
 });

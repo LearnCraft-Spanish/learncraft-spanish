@@ -10,7 +10,7 @@ export function useProgramTable() {
 
   function parseLessonsByVocab(
     courses: ProgramUnparsed[],
-    lessonTable: Lesson[],
+    lessonTable: Lesson[]
   ): Program[] {
     const oldCourseArray: ProgramUnparsed[] = [...courses];
     oldCourseArray.sort((a, b) => a.recordId - b.recordId);
@@ -72,7 +72,7 @@ export function useProgramTable() {
         // Parse lessons based on vocab and return result
         const parsedLessons: Program[] = parseLessonsByVocab(
           courses,
-          lessonTable,
+          lessonTable
         );
         return parsedLessons;
       } else {

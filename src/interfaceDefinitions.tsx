@@ -2,7 +2,7 @@ export interface Lesson {
   recordId: number;
   lesson: string;
   vocabIncluded: Array<string>;
-  sortReference: number;
+  sortReference: number | null;
   relatedProgram: number;
   vocabKnown: Array<string>;
 }

@@ -1,4 +1,7 @@
-import { allStudentsTable, getUserDataFromName } from "../data/serverlike/studentTable";
+import {
+  allStudentsTable,
+  getUserDataFromName,
+} from "../data/serverlike/studentTable";
 
 import programsTable from "../data/hooklike/programsTable";
 
@@ -36,12 +39,45 @@ export default function mockActiveStudentStub({
     isError,
   };
 
-  const activeProgram = programsTable.find(
+  function getActiveProgram() {
+    const foundProgram = programsTable.find(
       (program) => program.recordId === activeStudentQuery.data?.relatedProgram
     );
-  if (!activeProgram) { throw new Error("Active program not found"); }
+    return foundProgram || null;
+  }
 
-  const activeLesson = activeProgram.lessons[0];
+  function getActiveLesson() {
+    const activeProgram = getActiveProgram();
+    if (!activeProgram) {
+      return null;
+    }
+    const cohort = activeStudentQuery.data?.cohort;
+    const getCohortLesson = (cohort: string) => {
+      switch (cohort) {
+        case "A":
+          return activeProgram?.cohortACurrentLesson;
+        case "B":
+          return activeProgram?.cohortBCurrentLesson;
+        case "C":
+          return activeProgram?.cohortCCurrentLesson;
+        case "D":
+          return activeProgram?.cohortDCurrentLesson;
+        case "E":
+          return activeProgram?.cohortECurrentLesson;
+        case "F":
+          return activeProgram?.cohortFCurrentLesson;
+        // case 'G': return activeProgram?.cohortGCurrentLesson
+        // if added, add to interface and real hook
+        // etc for futureproofing
+      }
+    };
+    const activeLesson = getCohortLesson(cohort);
+    return activeLesson || null;
+  }
+
+  const activeProgram = getActiveProgram();
+
+  const activeLesson = getActiveLesson();
 
   return {
     activeStudentQuery,

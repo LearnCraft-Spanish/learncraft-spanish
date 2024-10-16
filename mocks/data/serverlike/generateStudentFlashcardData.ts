@@ -3,7 +3,7 @@ import type {
   StudentFlashcardData,
   UserData,
 } from "../../../src/interfaceDefinitions";
-import fisherYatesShuffle from "./fisherYatesShuffle";
+import { fisherYatesShuffle } from "../../../src/functions/fisherYatesShuffle";
 // This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample
@@ -11,7 +11,7 @@ import fisherYatesShuffle from "./fisherYatesShuffle";
 export default function generateStudentFlashcardData(
   student: UserData,
   numberOfExamples: number,
-  examplesTable: Flashcard[],
+  examplesTable: Flashcard[]
 ) {
   const reviewDatesAndIntervals = [
     {
@@ -90,7 +90,7 @@ export default function generateStudentFlashcardData(
   // match examples with studentExamples
   studentFlashcardData.studentExamples.forEach((studentExample) => {
     const example = verifiedExamples.find(
-      (example) => example.recordId === studentExample.relatedExample,
+      (example) => example.recordId === studentExample.relatedExample
     );
     if (!example) {
       throw new Error("Example mismatch!");

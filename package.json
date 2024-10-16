@@ -16,7 +16,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "test": "vitest run --coverage",
+    "test": "vitest run --coverage --no-cache",
     "predeploy": "pnpm run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

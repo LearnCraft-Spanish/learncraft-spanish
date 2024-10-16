@@ -16,9 +16,9 @@ const createTestQueryClient = () =>
     },
   });
 
-const queryClient = createTestQueryClient();
-
 export default function MockQueryClientProvider({ children }: contextProps) {
+  const queryClient = createTestQueryClient(); // Create a new instance per render
+
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );

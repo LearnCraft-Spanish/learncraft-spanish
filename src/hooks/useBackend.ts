@@ -17,6 +17,7 @@ export function useBackend() {
         },
       });
 
+      console.log(await getAccessToken());
       if (response.ok) {
         return await response.json().catch((error) => {
           console.error(`Error parsing JSON from ${path}:`, error);
@@ -26,7 +27,7 @@ export function useBackend() {
         throw new Error(`Failed to fetch ${path}: ${response.statusText}`);
       }
     },
-    [getAccessToken, backendUrl],
+    [getAccessToken, backendUrl]
   );
 
   /*      GET Requests      */
@@ -79,7 +80,7 @@ export function useBackend() {
     (quizId: number): Promise<types.Flashcard[]> => {
       return getFactory<types.Flashcard[]>(`public/quizExamples/${quizId}`);
     },
-    [getFactory],
+    [getFactory]
   );
 
   const getAllUsersFromBackend = useCallback((): Promise<types.UserData[]> => {
@@ -94,7 +95,7 @@ export function useBackend() {
     (studentId: number): Promise<types.StudentFlashcardData> => {
       return getFactory<types.StudentFlashcardData>(`${studentId}/examples`);
     },
-    [getFactory],
+    [getFactory]
   );
 
   /*      Coaching API      */
@@ -146,7 +147,7 @@ export function useBackend() {
         throw new Error(`Failed to post to ${path}`);
       }
     },
-    [getAccessToken, backendUrl],
+    [getAccessToken, backendUrl]
   );
 
   const createMyStudentExample = useCallback(
@@ -155,7 +156,7 @@ export function useBackend() {
         exampleid: exampleId,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   const createStudentExample = useCallback(
@@ -165,7 +166,7 @@ export function useBackend() {
         exampleid: exampleId,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   const updateMyStudentExample = useCallback(
@@ -175,7 +176,7 @@ export function useBackend() {
         newinterval: newInterval,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   const updateStudentExample = useCallback(
@@ -185,7 +186,7 @@ export function useBackend() {
         newinterval: newInterval,
       });
     },
-    [postFactory],
+    [postFactory]
   );
 
   /*      DELETE Requests      */
@@ -211,21 +212,21 @@ export function useBackend() {
         throw new Error(`Failed to delete ${path}`);
       }
     },
-    [getAccessToken, backendUrl],
+    [getAccessToken, backendUrl]
   );
 
   const deleteMyStudentExample = useCallback(
     (recordId: number): Promise<number> => {
       return deleteFactory("delete-my-student-example", { deleteid: recordId });
     },
-    [deleteFactory],
+    [deleteFactory]
   );
 
   const deleteStudentExample = useCallback(
     (recordId: number): Promise<number> => {
       return deleteFactory("delete-student-example", { deleteid: recordId });
     },
-    [deleteFactory],
+    [deleteFactory]
   );
 
   return {
