@@ -1,3 +1,6 @@
+import play from "../../resources/icons/play.svg";
+import pause from "../../resources/icons/pause.svg";
+
 interface AudioFlashcardProps {
   currentExampleText: string | JSX.Element;
   incrementCurrentStep: () => void;
@@ -41,7 +44,7 @@ export default function AudioFlashcardComponent({
           onClick={(e) => handlePlayPauseClick(e)}
           aria-label="Play/Pause"
         >
-          <i className={isPlaying ? "fa-solid fa-pause" : "fa-solid fa-play"} />
+          <img src={isPlaying ? pause : play} alt="play/pause" />
         </button>
       )}
       {autoplay && (

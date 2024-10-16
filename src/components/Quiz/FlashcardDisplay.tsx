@@ -4,6 +4,9 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from "../../functions/formatFlashcardText";
+import play from "../../resources/icons/play_dark.svg";
+import pause from "../../resources/icons/pause_dark.svg";
+
 import { useStudentFlashcards } from "../../hooks/useStudentFlashcards";
 import "./Quiz.css";
 
@@ -112,7 +115,7 @@ export default function FlashcardDisplay({
           onClick={(e) => handlePlayPause(e)}
           aria-label="Play/Pause"
         >
-          <i className={playing ? "fa-solid fa-pause" : "fa-solid fa-play"} />
+          <img src={playing ? pause : play} alt="play/pause" />
         </button>
       )}
     </div>

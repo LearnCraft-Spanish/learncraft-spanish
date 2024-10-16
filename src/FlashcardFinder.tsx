@@ -449,8 +449,7 @@ const FlashcardFinder = forwardRef<HTMLDivElement, FlashcardFinderProps>(
                   <div className="searchFilter">
                     <div className="tagSearchBox">
                       <div className="searchTermBox">
-                        {/* Search Icon consider adding at some point */}
-                        {/* <i className="fa-solid fa-search"></i> */}
+                        {/*consider adding a Search Icon at some point */}
                         <input
                           type="text"
                           onChange={(e) => updateTagSearchTerm(e.currentTarget)}

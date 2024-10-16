@@ -13,7 +13,17 @@ export default function FromToLessonSelector(): JSX.Element {
     setToLesson,
   } = useSelectedLesson();
   const { programTableQuery } = useProgramTable();
-  // This is the same code as in LessonSelector.tsx
+  // Helper Function
+  function getLessonNumber(lesson: Lesson | null): number | null {
+    if (!lesson?.lesson) {
+      return null;
+    }
+    const lessonArray = lesson.lesson.split(" ");
+    const lessonNumberString = lessonArray.slice(-1)[0];
+    const lessonNumber = Number.parseInt(lessonNumberString, 10);
+    return lessonNumber;
+  }
+
   function makeCourseSelector() {
     const courseSelector = [
       <option key={0} value={0}>
@@ -30,16 +40,6 @@ export default function FromToLessonSelector(): JSX.Element {
       });
     }
     return courseSelector;
-  }
-
-  function getLessonNumber(lesson: Lesson | null) {
-    if (!lesson?.lesson) {
-      return null;
-    }
-    const lessonArray = lesson.lesson.split(" ");
-    const lessonNumberString = lessonArray.slice(-1)[0];
-    const lessonNumber = Number.parseInt(lessonNumberString, 10);
-    return lessonNumber;
   }
 
   function makeFromLessonSelector() {

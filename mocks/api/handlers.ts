@@ -10,7 +10,6 @@ function getEmailFromRequest(request: StrictRequest<DefaultBodyType>) {
   const fakeToken = request.headers.get("Authorization");
   const tokenParts = fakeToken?.split(" ");
   const emailAddress = tokenParts?.[1];
-  console.log("emailAddress", emailAddress);
   if (!emailAddress) {
     throw new Error("Email address not found in token");
   }
@@ -53,7 +52,7 @@ export const handlers = [
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
         return quizExamples.quizNickname === quizObject.quizNickname;
-      }
+      },
     );
     if (!quizExamplesObject) {
       throw new Error("Quiz examples not found");
@@ -68,7 +67,7 @@ export const handlers = [
   http.get(`${backendUrl}my-data`, ({ request }) => {
     const email = getEmailFromRequest(request);
     const student = apiData.allStudentsTable.find(
-      (student) => student.emailAddress === email
+      (student) => student.emailAddress === email,
     );
     return HttpResponse.json(student);
   }),
@@ -85,6 +84,23 @@ export const handlers = [
 
   http.get(`${backendUrl}public/audio-examples`, () => {
     return HttpResponse.json(apiData.audioExamplesTable);
+  }),
+
+  // Get Active Examples of a student
+  http.get(":studentId/examples", ({ params }) => {
+    // current temporary implementation, gets student-admin flashcard data, only flashcard data defined
+    const studentId = params.studentId;
+    const student = apiData.allStudentsTable.find(
+      (student) => student.recordId === Number(studentId),
+    );
+    if (!student) {
+      throw new Error("Student not found");
+    }
+    const studentExamples = apiData.studentFlashcardData;
+    if (!studentExamples) {
+      throw new Error("Student examples not found");
+    }
+    return HttpResponse.json(studentExamples);
   }),
 
   // Post Requests
