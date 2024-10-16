@@ -21,11 +21,6 @@ beforeAll(() => {
   server.listen();
 });
 
-beforeEach(() => {
-  // Reset the mockAuth instance before each test
-  vi.mocked(useAuth).mockReturnValue(globalMockAuth);
-});
-
 // Reset the server handlers after each test
 afterEach(() => {
   server.resetHandlers();

@@ -30,6 +30,12 @@ describe("app", async () => {
   it("shows a log in button when logged out", async () => {
     const mockAuth = createMockAuth({ isAuthenticated: false });
     vi.mocked(useAuth).mockReturnValue(mockAuth);
+    console.log(
+      "mockAuth not logged in",
+      mockAuth.isAuthenticated,
+      mockAuth.isLoading,
+      mockAuth.getAccessToken()
+    );
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -43,6 +49,12 @@ describe("app", async () => {
   it("says it won't do anything if not logged in", async () => {
     const mockAuth = createMockAuth({ isAuthenticated: false });
     vi.mocked(useAuth).mockReturnValue(mockAuth);
+    console.log(
+      "mockAuth not logged in",
+      mockAuth.isAuthenticated,
+      mockAuth.isLoading,
+      mockAuth.getAccessToken()
+    );
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -56,6 +68,12 @@ describe("app", async () => {
   it("shows welcome message", async () => {
     const mockAuth = createMockAuth({ userName: "limited" });
     vi.mocked(useAuth).mockReturnValue(mockAuth);
+    console.log(
+      "mockAuth limited",
+      mockAuth.isAuthenticated,
+      mockAuth.isLoading,
+      mockAuth.getAccessToken()
+    );
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -67,6 +85,7 @@ describe("app", async () => {
   });
 
   it("shows official quizzes button", async () => {
+    vi.spyOn(useAuth, "default"); // Spy on the useAuth hook
     const mockAuth = createMockAuth({ userName: "limited" });
     vi.mocked(useAuth).mockReturnValue(mockAuth);
     const { getByText } = render(

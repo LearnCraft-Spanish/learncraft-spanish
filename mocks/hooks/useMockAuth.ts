@@ -1,4 +1,3 @@
-import { mock } from "node:test";
 import { vi } from "vitest";
 import { getUserDataFromName } from "../data/serverlike/studentTable";
 
