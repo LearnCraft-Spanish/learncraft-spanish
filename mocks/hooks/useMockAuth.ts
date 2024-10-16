@@ -9,7 +9,7 @@ export interface MockAuth {
   logout: () => Promise<void>;
 }
 
-interface MockAuthOptions {
+export interface MockAuthOptions {
   isAuthenticated?: boolean;
   isLoading?: boolean;
   userName?:
@@ -25,7 +25,7 @@ interface MockAuthOptions {
 const createMockAuth = ({
   isAuthenticated = true,
   isLoading = false,
-  userName = "student-admin",
+  userName = "student-admin", // Default userName is "student-admin"
 }: MockAuthOptions = {}): MockAuth => {
   function getStudentEmail() {
     const studentEmail = getUserDataFromName(userName)?.emailAddress;
@@ -38,7 +38,7 @@ const createMockAuth = ({
   const login = vi.fn();
   const logout = vi.fn();
 
-  const mockAuth = {
+  return {
     isAuthenticated,
     isLoading,
     getAccessToken: async () => {
@@ -48,8 +48,6 @@ const createMockAuth = ({
     login,
     logout,
   };
-
-  return mockAuth;
 };
 
 export default createMockAuth;

@@ -52,7 +52,7 @@ export const handlers = [
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
         return quizExamples.quizNickname === quizObject.quizNickname;
-      },
+      }
     );
     if (!quizExamplesObject) {
       throw new Error("Quiz examples not found");
@@ -67,7 +67,7 @@ export const handlers = [
   http.get(`${backendUrl}my-data`, ({ request }) => {
     const email = getEmailFromRequest(request);
     const student = apiData.allStudentsTable.find(
-      (student) => student.emailAddress === email,
+      (student) => student.emailAddress === email
     );
     return HttpResponse.json(student);
   }),
@@ -87,18 +87,20 @@ export const handlers = [
   }),
 
   // Get Active Examples of a student
-  http.get(":studentId/examples", ({ params }) => {
+  http.get(`${backendUrl}:studentId/examples`, ({ params }) => {
     // current temporary implementation, gets student-admin flashcard data, only flashcard data defined
     const studentId = params.studentId;
-    const student = apiData.allStudentsTable.find(
-      (student) => student.recordId === Number(studentId),
-    );
-    if (!student) {
+    const studentIdNumber = Number(studentId);
+    if (!studentIdNumber) {
       throw new Error("Student not found");
     }
     const studentExamples = apiData.studentFlashcardData;
     if (!studentExamples) {
       throw new Error("Student examples not found");
+    }
+
+    if (studentExamples.studentExamples[0].relatedStudent !== studentIdNumber) {
+      return HttpResponse.json({ studentExamples: [], examples: [] });
     }
     return HttpResponse.json(studentExamples);
   }),
