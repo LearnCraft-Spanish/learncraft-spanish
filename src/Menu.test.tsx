@@ -1,16 +1,9 @@
 import React from "react";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import type { Mock } from "vitest";
-import serverlikeData from "../mocks/data/serverlike/serverlikeData";
 
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
 import createMockAuth from "../mocks/hooks/useMockAuth";
-
-import { useUserData } from "./hooks/useUserData";
-import { useActiveStudent } from "./hooks/useActiveStudent";
-import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
-
 import useAuth from "./hooks/useAuth";
 
 import Menu from "./Menu";

@@ -10,7 +10,6 @@ function getEmailFromRequest(request: StrictRequest<DefaultBodyType>) {
   const fakeToken = request.headers.get("Authorization");
   const tokenParts = fakeToken?.split(" ");
   const emailAddress = tokenParts?.[1];
-  console.log("emailAddress", emailAddress);
   if (!emailAddress) {
     throw new Error("Email address not found in token");
   }
