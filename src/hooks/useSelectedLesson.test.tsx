@@ -2,12 +2,12 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 import { renderHook, waitFor } from "@testing-library/react";
 
 import MockQueryClientProvider from "../../mocks/Providers/MockQueryClient";
-import { getUserDataFromName } from "../../mocks/data/serverlike/studentTable";
-import mockActiveStudentStub from "../../mocks/hooks/useActiveStudentStub";
-import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
-import programsTable from "../../mocks/data/hooklike/programsTable";
-import * as useActiveStudent from "./useActiveStudent";
 
+import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
+import { getUserDataFromName } from "../../mocks/data/serverlike/studentTable";
+import programsTable from "../../mocks/data/hooklike/programsTable";
+
+import mockActiveStudentStub from "../../mocks/hooks/useActiveStudentStub";
 import { useProgramTable } from "./useProgramTable";
 
 import { useSelectedLesson } from "./useSelectedLesson";
@@ -23,6 +23,15 @@ This hook uses:
 vi.mock("./useActiveStudent", vi.fn(() => {
   return {useActiveStudent: mockActiveStudentStub}
 }));
+vi.mock("./useProgramTable", vi.fn(() => {
+  return {useProgramTable: () => ({
+    programTableQuery: {
+      data: programsTable,
+      isSuccess: true
+    }
+  })}
+}));
+
 
 const studentAdmin = getUserDataFromName("student-admin");
 
