@@ -1,46 +1,19 @@
-import type { Program } from "../../../src/interfaceDefinitions";
+import type { Lesson, Program, ProgramUnparsed } from "../../../src/interfaceDefinitions";
+import programData from "./programsTable.json"
+const programsUnparsed: ProgramUnparsed[] = programData.programsUnparsed
+const lessons: Lesson[] = programData.lessonTable
 
-const programsTable: Program[] = [
-  {
-    recordId: 2,
-    name: "Program 2",
-    cohortACurrentLesson: 1,
-    cohortBCurrentLesson: 2,
-    cohortCCurrentLesson: 3,
-    cohortDCurrentLesson: 4,
-    cohortECurrentLesson: 5,
-    cohortFCurrentLesson: 6,
-    lessons: [
-      {
-        recordId: 3,
-        lesson: "Lesson 3",
-        vocabIncluded: ["es"],
-        vocabKnown: ["en"],
-        sortReference: 3,
-        relatedProgram: 2,
-      },
-    ],
-  },
-  {
-    recordId: 3,
-    name: "Program 3",
-    cohortACurrentLesson: 1,
-    cohortBCurrentLesson: 2,
-    cohortCCurrentLesson: 3,
-    cohortDCurrentLesson: 4,
-    cohortECurrentLesson: 5,
-    cohortFCurrentLesson: 6,
-    lessons: [
-      {
-        recordId: 4,
-        lesson: "Lesson 4",
-        vocabIncluded: ["es"],
-        vocabKnown: ["en"],
-        sortReference: 4,
-        relatedProgram: 3,
-      },
-    ],
-  },
-];
+const programsTable: Program[] = programsUnparsed.map((program) => {
+  const parsedProgram: Program = {
+    ...program,
+    lessons: [],
+  }
+  lessons.forEach((lesson) => {
+    if (lesson.relatedProgram === program.recordId) {
+      parsedProgram.lessons.push(lesson)
+    }
+  })
+  return parsedProgram
+});
 
-export default programsTable;
+export default programsTable

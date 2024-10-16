@@ -1,15 +1,28 @@
-import { allStudentsTable } from "../data/serverlike/studentTable";
+import { allStudentsTable, getUserDataFromName } from "../data/serverlike/studentTable";
 
-export default function useActiveStudentStub({
-  studentName = "student-admin",
+import programsTable from "../data/hooklike/programsTable";
+
+interface mockActiveStudentStubOptions {
+  isLoading?: boolean;
+  isError?: boolean;
+  studentName?:
+    | "admin-empty-role"
+    | "empty-role"
+    | "none-role"
+    | "limited"
+    | "student-admin"
+    | "student-lcsp"
+    | "student-ser-estar";
+}
+
+export default function mockActiveStudentStub({
   isLoading = false,
   isError = false,
-}) {
-  const student = allStudentsTable.find(
-    (student) => student.name === studentName,
-  );
+  studentName = "student-admin",
+}: mockActiveStudentStubOptions = {}) {
+  const student = getUserDataFromName(studentName);
   if (!student) {
-    throw new Error(`Student ${studentName} not found in allStudentsTable`);
+    throw new Error(`Student not found in allStudentsTable: ${studentName}`);
   }
   const activeStudentQuery = {
     data: student,
@@ -23,8 +36,12 @@ export default function useActiveStudentStub({
     isError,
   };
 
-  const activeProgram = activeStudentQuery.data?.relatedProgram;
-  const activeLesson = activeStudentQuery.data?.cohort;
+  const activeProgram = programsTable.find(
+      (program) => program.recordId === activeStudentQuery.data?.relatedProgram
+    );
+  if (!activeProgram) { throw new Error("Active program not found"); }
+
+  const activeLesson = activeProgram.lessons[0];
 
   return {
     activeStudentQuery,
