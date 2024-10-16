@@ -1,23 +1,30 @@
-import { afterAll, afterEach, beforeAll, vi } from "vitest";
-import { cleanup } from "@testing-library/react";
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { server } from "../mocks/api/server";
+
 import "@testing-library/jest-dom";
 
-// Mock the useAuth hook, but leave the mock return configurable per test
-vi.mock("../src/hooks/useAuth");
+import createMockAuth from "../mocks/hooks/useMockAuth";
+import useAuth from "../src/hooks/useAuth";
 
-// Open MSW server before all tests
+// Create a shared mockAuth instance
+export const globalMockAuth = createMockAuth();
+
+// Mock the default export of the useAuth hook
+vi.mock("../src/hooks/useAuth", () => {
+  return {
+    default: vi.fn(() => globalMockAuth),
+  };
+});
+
+// Open the MSW server before all tests
 beforeAll(() => {
   server.listen();
 });
 
-// Reset the server handlers and clear mocks after each test
+// Reset the server handlers after each test
 afterEach(() => {
   server.resetHandlers();
-  vi.clearAllMocks(); // Clears mock state after each test
-  vi.restoreAllMocks(); // Restores all mocks to their initial state
-  cleanup(); // Ensures test DOM is cleaned up
+  vi.clearAllMocks();
 });
 
-// Close the MSW server after all tests
 afterAll(() => server.close());
