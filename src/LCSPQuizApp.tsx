@@ -33,7 +33,7 @@ export default function LCSPQuizApp(): JSX.Element {
 
   const getCourseUrlFromCode = useCallback((code: string) => {
     const selectedCourse = courses.current.find(
-      (course) => course.code === code,
+      (course) => course.code === code
     );
     const url = `/officialquizzes${selectedCourse?.url ? "/" : ""}${selectedCourse?.url}`;
     return url;
@@ -64,13 +64,13 @@ export default function LCSPQuizApp(): JSX.Element {
     (courseCode: string) => {
       studentHasDefaultQuiz.current = false;
       const newCourse = courses.current.find(
-        (course) => course.code === courseCode,
+        (course) => course.code === courseCode
       );
       setQuizCourse(courseCode);
       const urlToNavigate = newCourse?.url || "";
       navigate(urlToNavigate);
     },
-    [navigate],
+    [navigate]
   );
 
   const updateQuizCourseWithoutNavigate = useCallback((courseCode: string) => {
@@ -102,11 +102,11 @@ export default function LCSPQuizApp(): JSX.Element {
   const makeQuizSelections = useCallback(() => {
     if (officialQuizzesQuery.data) {
       const quizList = officialQuizzesQuery.data.filter(
-        (item) => item.quizType === quizCourse,
+        (item) => item.quizType === quizCourse
       );
       const quizSelections: React.JSX.Element[] = [];
       const courseObj = courses.current.find(
-        (course) => course.code === quizCourse,
+        (course) => course.code === quizCourse
       );
       const courseName = courseObj?.name || "";
       let i = 1;
@@ -118,7 +118,7 @@ export default function LCSPQuizApp(): JSX.Element {
               {item.lessonNumber}
               {", "}
               {item.subtitle}
-            </option>,
+            </option>
           );
           i++;
         });
@@ -130,7 +130,7 @@ export default function LCSPQuizApp(): JSX.Element {
               {courseName}
               {" Quiz "}
               {item.quizNumber}
-            </option>,
+            </option>
           );
           i++;
         });
@@ -142,7 +142,7 @@ export default function LCSPQuizApp(): JSX.Element {
   const findDefaultQuiz = useCallback(() => {
     studentHasDefaultQuiz.current = true;
     const activeCourse = courses.current.find(
-      (course) => course.name === selectedProgram?.name,
+      (course) => course.name === selectedProgram?.name
     );
     if (activeCourse) {
       if (activeCourse.code !== "lcsp" && quizCourse === "lcsp") {
@@ -157,7 +157,7 @@ export default function LCSPQuizApp(): JSX.Element {
       const activeLessonNumber = Number.parseInt(activeLessonString);
       let lastQuizBeforeCurrentLesson = 0;
       const activeQuizzes = officialQuizzesQuery.data.filter(
-        (item) => item.quizType === quizCourse,
+        (item) => item.quizType === quizCourse
       );
       activeQuizzes.forEach((item) => {
         if (item.quizNumber <= activeLessonNumber) {
@@ -204,7 +204,7 @@ export default function LCSPQuizApp(): JSX.Element {
               updateQuizCourseWithoutNavigate={updateQuizCourseWithoutNavigate}
             />
           }
-        />,
+        />
       );
     });
     return routes;
@@ -225,7 +225,7 @@ export default function LCSPQuizApp(): JSX.Element {
       window.location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
       const firstQuiz = officialQuizzesQuery.data.filter(
-        (item) => item.quizType === quizCourse,
+        (item) => item.quizType === quizCourse
       )[0].quizNumber;
       setChosenQuiz(firstQuiz);
     }
@@ -272,6 +272,7 @@ export default function LCSPQuizApp(): JSX.Element {
                 <h3> Official Quizzes</h3>
                 <select
                   className="quizMenu"
+                  role="select"
                   value={quizCourse}
                   onChange={(e) => updateQuizCourseWithNavigate(e.target.value)}
                 >
@@ -279,6 +280,7 @@ export default function LCSPQuizApp(): JSX.Element {
                 </select>
                 <select
                   className="quizMenu"
+                  role="select"
                   value={chosenQuiz}
                   onChange={(e) =>
                     updateChosenQuiz(Number.parseInt(e.target.value) || 0)
