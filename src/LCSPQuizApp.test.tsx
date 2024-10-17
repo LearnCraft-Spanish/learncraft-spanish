@@ -1,9 +1,7 @@
 import React from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { aw } from "vitest/dist/chunks/reporters.DAfKSDh5";
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import { setupMockAuth } from "../tests/setupMockAuth";
 import LCSPQuizApp from "./LCSPQuizApp";
 
 describe("official quiz component", () => {
@@ -11,7 +9,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -23,7 +21,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -35,7 +33,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -47,7 +45,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -60,17 +58,17 @@ describe("official quiz component", () => {
       render(
         <MockAllProviders>
           <LCSPQuizApp />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
 
       const startButton = await waitFor(() =>
-        screen.getByText(/begin review/i)
+        screen.getByText(/begin review/i),
       );
       await act(async () => {
         startButton.click();
       });
       const flashcard = await waitFor(() =>
-        screen.getByLabelText(/flashcard/i)
+        screen.getByLabelText(/flashcard/i),
       );
       await waitFor(() => {
         expect(flashcard).toBeInTheDocument();

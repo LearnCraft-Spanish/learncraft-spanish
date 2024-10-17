@@ -10,7 +10,7 @@ describe("not found page", () => {
     render(
       <MockAllProviders route="/anythingrandom">
         <NotFoundPage />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(screen.getByText(/404: Page Not Found/i)).toBeInTheDocument();
@@ -20,7 +20,7 @@ describe("not found page", () => {
     render(
       <MockAllProviders route="/anythingRandom">
         <NotFoundPage />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(screen.getByText(/back to menu/i)).toBeInTheDocument();
