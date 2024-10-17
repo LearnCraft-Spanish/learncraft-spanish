@@ -1,39 +1,37 @@
 import { describe, expect, it } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import type { WrapperProps } from "../../src/interfaceDefinitions";
 
-import mockData from "../../mocks/data/serverlike/serverlikeData";
 import MockAllProviders from "../../mocks/Providers/MockAllProviders";
+import mockData from "../../mocks/data/serverlike/serverlikeData";
+
 import { useOfficialQuizzes } from "./useOfficialQuizzes";
 
 const { api } = mockData();
 const quizzesTable = api.quizzesTable;
 const quizExamplesTableArray = api.quizExamplesTableArray;
 
-describe("useOfficialQuizzes", () => {
-  const wrapper = ({ children }: WrapperProps) => (
-    <MockAllProviders>{children}</MockAllProviders>
+async function renderHookLoaded() {
+  const { result } = renderHook(() => useOfficialQuizzes(undefined), {
+    wrapper: MockAllProviders,
+  });
+  await waitFor(() =>
+    expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
   );
 
+  return result;
+}
+
+describe("useOfficialQuizzes", () => {
   describe("officialQuizzesQuery", () => {
     it("runs without crashing", async () => {
-      const { result } = renderHook(() => useOfficialQuizzes(undefined), {
-        wrapper,
-      });
-      await waitFor(() =>
-        expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
-      );
+      const result = await renderHookLoaded();
       expect(result.current.officialQuizzesQuery.data).toBeDefined();
     });
 
     it("data length is mockDataLength", async () => {
-      const { result } = renderHook(() => useOfficialQuizzes(undefined), {
-        wrapper,
-      });
-      await waitFor(() =>
-        expect(result.current.officialQuizzesQuery.data?.length).toBe(
-          quizzesTable.length,
-        ),
+      const result = await renderHookLoaded();
+      expect(result.current.officialQuizzesQuery.data?.length).toBe(
+        quizzesTable.length,
       );
     });
   });
@@ -49,7 +47,7 @@ describe("useOfficialQuizzes", () => {
     )?.recordId;
     it("runs without crashing", async () => {
       const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
-        wrapper,
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.quizExamplesQuery.isSuccess).toBe(true),
@@ -59,7 +57,7 @@ describe("useOfficialQuizzes", () => {
 
     it("data is mockData", async () => {
       const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
-        wrapper,
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.quizExamplesQuery.data).toEqual(

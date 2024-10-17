@@ -21,9 +21,9 @@ async function renderMenuLoaded() {
 }
 
 describe("component Menu", () => {
-  describe('isLoading', () => {
+  describe("isLoading", () => {
     beforeEach(() => {
-      setupMockAuth({isLoading: true});
+      setupMockAuth({ isLoading: true });
     });
     it('render "Loading Menu..."', async () => {
       render(
@@ -35,13 +35,12 @@ describe("component Menu", () => {
         expect(screen.getByText("Loading Menu...")).toBeInTheDocument();
       });
       expect(screen.getByText("Loading Menu...")).toBeInTheDocument();
-
     });
   });
 
   describe("case: Student non Admin", () => {
     beforeEach(async () => {
-      setupMockAuth({userName: "student-lcsp"});
+      setupMockAuth({ userName: "student-lcsp" });
     });
 
     it('render "My Flashcards" section', async () => {
@@ -50,14 +49,14 @@ describe("component Menu", () => {
     });
 
     it('does NOT render "Staff Tools" section', async () => {
-      await renderMenuLoaded()
+      await renderMenuLoaded();
       expect(screen.queryByText("Staff Tools")).toBeNull();
     });
   });
 
   describe("case: Limited Student", () => {
     beforeEach(() => {
-      setupMockAuth({userName: "limited",});
+      setupMockAuth({ userName: "limited" });
     });
 
     it("render Audio Quiz and Comprehension Quiz", async () => {
@@ -74,7 +73,7 @@ describe("component Menu", () => {
 
   describe("case: none role", () => {
     beforeEach(() => {
-      setupMockAuth({userName: "none-role",});
+      setupMockAuth({ userName: "none-role" });
     });
 
     it("render Official Quizzes", async () => {
@@ -101,7 +100,7 @@ describe("component Menu", () => {
 
   describe("case: empty role", () => {
     beforeEach(() => {
-      setupMockAuth({userName: "empty-role",});
+      setupMockAuth({ userName: "empty-role" });
     });
 
     it("render Official Quizzes", async () => {
@@ -128,14 +127,14 @@ describe("component Menu", () => {
 
   describe("case: Admin student", () => {
     beforeEach(() => {
-      setupMockAuth({userName: "student-admin",});
+      setupMockAuth({ userName: "student-admin" });
     });
 
     it("does render My Flashcards", async () => {
       await renderMenuLoaded();
       expect(screen.getByText("My Flashcards:")).toBeInTheDocument();
     });
-    
+
     it("doees render manage my flashcards", async () => {
       await renderMenuLoaded();
       expect(screen.getByText("Manage My Flashcards")).toBeInTheDocument();
@@ -154,7 +153,7 @@ describe("component Menu", () => {
 
   describe("case: Admin empty role", () => {
     beforeEach(() => {
-      setupMockAuth({userName: "admin-empty-role",});
+      setupMockAuth({ userName: "admin-empty-role" });
     });
 
     it("does render Find Flashcards", async () => {

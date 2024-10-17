@@ -1,29 +1,24 @@
-import { renderHook, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { beforeAll, describe, expect, it } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
-import type {
-  Quiz,
-  QuizExamplesTable,
-  WrapperProps,
-} from "../interfaceDefinitions";
+import type { Quiz, QuizExamplesTable } from "../interfaceDefinitions";
 import MockAllProviders from "../../mocks/Providers/MockAllProviders";
 import { setupMockAuth } from "../../tests/setupMockAuth";
+
 import { useBackend } from "./useBackend";
 
 const { api } = serverlikeData();
 
 describe("useBackend Hook", () => {
-  const wrapper = ({ children }: WrapperProps) => (
-    <MockAllProviders>{children}</MockAllProviders>
-  );
   let hookResult: ReturnType<typeof useBackend>;
 
   // Initialize the hook before all tests
   beforeAll(() => {
     setupMockAuth();
     const { result } = renderHook(() => useBackend(), {
-      wrapper,
+      wrapper: MockAllProviders,
     });
     hookResult = result.current; // Store the current hook result once
   });
@@ -44,8 +39,9 @@ describe("useBackend Hook", () => {
         isLoading: false,
         userName: null,
       });
-      const unauthHookResult = renderHook(() => useBackend(), { wrapper })
-        .result.current;
+      const unauthHookResult = renderHook(() => useBackend(), {
+        wrapper: MockAllProviders,
+      }).result.current;
       const token = await unauthHookResult.getAccessToken();
       expect(token).toBeUndefined();
     });
