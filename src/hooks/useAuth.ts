@@ -20,7 +20,7 @@ export default function useAuth() {
       },
       cacheMode: "off",
     });
-    return accessToken;
+    return accessToken as string | undefined;
   };
 
   const login = () => {

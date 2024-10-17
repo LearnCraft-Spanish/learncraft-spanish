@@ -3,8 +3,7 @@ import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import createMockAuth from "../mocks/hooks/useMockAuth";
-import useAuth from "./hooks/useAuth";
+import { setupMockAuth } from "../tests/setupMockAuth";
 
 import Menu from "./Menu";
 
@@ -38,26 +37,20 @@ userDataQuery.data.isAdmin
 // ------------------------------------------------------------------------------------------------------------------
 
 describe("component Menu", () => {
-  afterEach(async () => {
-    vi.resetAllMocks();
-    cleanup();
-  });
-
   describe("case: Student non Admin", () => {
     beforeEach(async () => {
-      const mockAuthRegularStudent = createMockAuth({
+      setupMockAuth({
         isAuthenticated: true,
         isLoading: false,
         userName: "student-lcsp",
       });
-      vi.mocked(useAuth).mockImplementation(() => mockAuthRegularStudent);
     });
 
     it('render "My Flashcards" section', async () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>,
+        </MockAllProviders>
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -71,7 +64,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>,
+        </MockAllProviders>
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -84,19 +77,18 @@ describe("component Menu", () => {
 
   describe("case: Limited Student", () => {
     beforeEach(() => {
-      const mockAuthLimitedStudent = createMockAuth({
+      setupMockAuth({
         isAuthenticated: true,
         isLoading: false,
         userName: "limited",
       });
-      vi.mocked(useAuth).mockImplementation(() => mockAuthLimitedStudent);
     });
 
     it("render Audio Quiz and Comprehension Quiz", async () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>,
+        </MockAllProviders>
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -111,7 +103,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>,
+        </MockAllProviders>
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -124,19 +116,18 @@ describe("component Menu", () => {
 
   describe("case: none role", () => {
     beforeEach(() => {
-      const mockAuthNoneRole = createMockAuth({
+      setupMockAuth({
         userName: "none-role",
         isAuthenticated: true,
         isLoading: false,
       });
-      vi.mocked(useAuth).mockImplementation(() => mockAuthNoneRole);
     });
 
     it("render Official Quizzes", async () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>,
+        </MockAllProviders>
       );
       await waitFor(() => {
         expect(screen.getByText("Official Quizzes")).toBeInTheDocument();
@@ -148,7 +139,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>,
+        </MockAllProviders>
       );
       await waitFor(() => {
         expect(screen.getByText("Official Quizzes")).toBeInTheDocument();
@@ -160,13 +151,25 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>,
+        </MockAllProviders>
       );
       await waitFor(() => {
         expect(screen.getByText("Official Quizzes")).toBeInTheDocument();
       });
       expect(screen.queryByText("Audio Quiz")).toBeNull();
       expect(screen.queryByText("Comprehension Quiz")).toBeNull();
+    });
+
+    it('does NOT render "Staff Tools" section', async () => {
+      render(
+        <MockAllProviders>
+          <Menu />
+        </MockAllProviders>
+      );
+      await waitFor(() => {
+        expect(screen.getByText("Official Quizzes")).toBeInTheDocument();
+      });
+      expect(screen.queryByText("Staff Tools")).toBeNull();
     });
   });
 });

@@ -16,8 +16,6 @@ export function useBackend() {
           ...headers,
         },
       });
-
-      console.log(await getAccessToken());
       if (response.ok) {
         return await response.json().catch((error) => {
           console.error(`Error parsing JSON from ${path}:`, error);

@@ -4,7 +4,7 @@ import { getUserDataFromName } from "../data/serverlike/studentTable";
 export interface MockAuth {
   isAuthenticated: boolean;
   isLoading: boolean;
-  getAccessToken: () => Promise<string>;
+  getAccessToken: () => Promise<string | undefined>;
   login: () => void;
   logout: () => Promise<void>;
 }
@@ -19,7 +19,8 @@ export interface MockAuthOptions {
     | "limited"
     | "student-admin"
     | "student-lcsp"
-    | "student-ser-estar";
+    | "student-ser-estar"
+    | null;
 }
 
 const createMockAuth = ({
@@ -30,7 +31,7 @@ const createMockAuth = ({
   function getStudentEmail() {
     const studentEmail = getUserDataFromName(userName)?.emailAddress;
     if (!studentEmail) {
-      throw new Error("No student email found");
+      return undefined;
     }
     return studentEmail;
   }

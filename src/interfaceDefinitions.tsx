@@ -181,3 +181,7 @@ export interface CoachingLessons {
   weekRef: number;
   type: string;
 }
+
+export interface WrapperProps {
+  children: React.ReactNode;
+}

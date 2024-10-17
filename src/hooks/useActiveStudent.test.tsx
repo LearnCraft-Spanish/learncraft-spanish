@@ -1,14 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
 import { useActiveStudent } from "./useActiveStudent";
 
 const api = serverlikeData().api;
 
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true,
+  (student) => student.role === "student" && student.isAdmin === true
 );
 
 interface WrapperProps {
@@ -24,9 +24,8 @@ vi.mock("./useUserData", () => ({
 }));
 
 describe("useActiveStudent", () => {
-  const queryClient = new QueryClient();
   const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <MockAllProviders>{children}</MockAllProviders>
   );
 
   it("runs without crashing", async () => {
@@ -64,7 +63,7 @@ describe("useActiveStudent", () => {
       });
 
       expect(result.current.activeProgram?.recordId).toBe(
-        studentAdmin?.relatedProgram,
+        studentAdmin?.relatedProgram
       );
     });
   });

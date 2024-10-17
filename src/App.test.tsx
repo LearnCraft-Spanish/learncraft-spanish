@@ -2,14 +2,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, waitFor } from "@testing-library/react";
 import React from "react";
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import createMockAuth from "../mocks/hooks/useMockAuth";
-import useAuth from "./hooks/useAuth";
+import { setupMockAuth } from "../tests/setupMockAuth";
 import App from "./App";
 
 // Waiting for userData context to be finished
 describe("app", () => {
-  let mockAuth = null;
-
   afterEach(() => {
     vi.resetModules();
     cleanup();
@@ -35,8 +32,7 @@ describe("app", () => {
   });
 
   it("shows a log in button when logged out", async () => {
-    mockAuth = createMockAuth({ isAuthenticated: false });
-    vi.mocked(useAuth).mockReturnValue(mockAuth);
+    setupMockAuth({ isAuthenticated: false });
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -48,8 +44,7 @@ describe("app", () => {
   });
 
   it("says it won't do anything if not logged in", async () => {
-    mockAuth = createMockAuth({ isAuthenticated: false });
-    vi.mocked(useAuth).mockReturnValue(mockAuth);
+    setupMockAuth({ isAuthenticated: false });
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -64,8 +59,7 @@ describe("app", () => {
 
   it("shows welcome message", async () => {
     // const mockLimitedStudent = createMockAuth({ userName: "limited" });
-    mockAuth = createMockAuth({ userName: "limited" });
-    vi.mocked(useAuth).mockReturnValue(mockAuth);
+    setupMockAuth({ userName: "limited" });
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -76,13 +70,24 @@ describe("app", () => {
     });
   });
 
+  it("shows a loading spinner when logging in", async () => {
+    setupMockAuth({ isLoading: true });
+    const { getByAltText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>
+    );
+    await waitFor(() => {
+      expect(getByAltText("loading-spinner")).toBeInTheDocument();
+    });
+  });
+
   it("shows official quizzes button", async () => {
-    mockAuth = createMockAuth({
+    setupMockAuth({
       userName: "limited",
       isAuthenticated: true,
       isLoading: false,
     });
-    vi.mocked(useAuth).mockReturnValue(mockAuth);
     const { getByText } = render(
       <MockAllProviders>
         <App />

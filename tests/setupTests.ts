@@ -2,18 +2,13 @@ import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { server } from "../mocks/api/server";
 
 import "@testing-library/jest-dom";
+import { setupMockAuth } from "./setupMockAuth";
 
-import createMockAuth from "../mocks/hooks/useMockAuth";
-import useAuth from "../src/hooks/useAuth";
+// Mock the useAuth hook, but leave the mock return configurable per test
+vi.mock("../src/hooks/useAuth");
 
-// Create a shared mockAuth instance
-export const globalMockAuth = createMockAuth();
-
-// Mock the default export of the useAuth hook
-vi.mock("../src/hooks/useAuth", () => {
-  return {
-    default: vi.fn(() => globalMockAuth),
-  };
+beforeEach(() => {
+  setupMockAuth();
 });
 
 // Open the MSW server before all tests

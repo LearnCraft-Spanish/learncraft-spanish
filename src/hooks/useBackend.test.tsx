@@ -1,18 +1,31 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { beforeAll, describe, expect, it } from "vitest";
+import { c } from "vite/dist/node/types.d-aGj9QkWt";
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
-import type { Quiz, QuizExamplesTable } from "../interfaceDefinitions";
+import type {
+  Quiz,
+  QuizExamplesTable,
+  WrapperProps,
+} from "../interfaceDefinitions";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
+import { setupMockAuth } from "../../tests/setupMockAuth";
 import { useBackend } from "./useBackend";
 
 const { api } = serverlikeData();
 
 describe("useBackend Hook", () => {
+  const wrapper = ({ children }: WrapperProps) => (
+    <MockAllProviders>{children}</MockAllProviders>
+  );
   let hookResult: ReturnType<typeof useBackend>;
 
   // Initialize the hook before all tests
   beforeAll(() => {
-    const { result } = renderHook(() => useBackend());
+    setupMockAuth();
+    const { result } = renderHook(() => useBackend(), {
+      wrapper,
+    });
     hookResult = result.current; // Store the current hook result once
   });
 
@@ -27,7 +40,14 @@ describe("useBackend Hook", () => {
       expect(token).toBeDefined();
     });
     it("does not return a string when not logged in", async () => {
-      const token = await hookResult.getAccessToken();
+      setupMockAuth({
+        isAuthenticated: false,
+        isLoading: false,
+        userName: null,
+      });
+      const unauthHookResult = renderHook(() => useBackend(), { wrapper })
+        .result.current;
+      const token = await unauthHookResult.getAccessToken();
       expect(token).toBeUndefined();
     });
   });
@@ -49,7 +69,7 @@ describe("useBackend Hook", () => {
 
       it("resolves the fetch function and returns truthy data", async () => {
         const fetchFunction = hookResult[functionName] as (
-          functionParams?: number,
+          functionParams?: number
         ) => Promise<any[]>;
 
         // Explicitly handle the async call inside the test case
@@ -61,7 +81,7 @@ describe("useBackend Hook", () => {
         } catch (error) {
           // Fail the test if the promise rejects
           throw new Error(
-            `Failed to fetch data in ${String(functionName)}: ${error}`,
+            `Failed to fetch data in ${String(functionName)}: ${error}`
           );
         }
       });
@@ -105,7 +125,7 @@ describe("useBackend Hook", () => {
         } catch (error) {
           // Fail the test if the promise rejects
           throw new Error(
-            `Failed to fetch data in ${String(functionName)}: ${error}`,
+            `Failed to fetch data in ${String(functionName)}: ${error}`
           );
         }
       });
@@ -173,7 +193,7 @@ describe("useBackend Hook", () => {
   quizExamplesTableArray.forEach((quizExamplesObject: QuizExamplesTable) => {
     const quizNickname = quizExamplesObject.quizNickname;
     const quizId = api.quizzesTable.find(
-      (quiz: Quiz) => quiz.quizNickname === quizNickname,
+      (quiz: Quiz) => quiz.quizNickname === quizNickname
     )?.recordId;
     if (!quizId) {
       throw new Error("Quiz ID not found");
