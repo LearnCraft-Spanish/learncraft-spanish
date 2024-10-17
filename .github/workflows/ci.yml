@@ -194,4 +194,4 @@ jobs:
       - name: Run tests
         run: pnpm run test
         env:
-          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+          VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
