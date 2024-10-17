@@ -1,6 +1,6 @@
 import React from "react";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
 import { setupMockAuth } from "../tests/setupMockAuth";
@@ -50,7 +50,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -64,7 +64,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -88,7 +88,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -103,7 +103,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       // wait for the menu to load
       await waitFor(() => {
@@ -127,7 +127,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       await waitFor(() => {
         expect(screen.getByText("Official Quizzes")).toBeInTheDocument();
@@ -139,7 +139,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       await waitFor(() => {
         expect(screen.getByText("Official Quizzes")).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       await waitFor(() => {
         expect(screen.getByText("Official Quizzes")).toBeInTheDocument();
@@ -164,7 +164,7 @@ describe("component Menu", () => {
       render(
         <MockAllProviders>
           <Menu />
-        </MockAllProviders>
+        </MockAllProviders>,
       );
       await waitFor(() => {
         expect(screen.getByText("Official Quizzes")).toBeInTheDocument();

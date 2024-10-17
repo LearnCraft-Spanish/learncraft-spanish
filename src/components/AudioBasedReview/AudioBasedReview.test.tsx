@@ -13,7 +13,7 @@ const wrapper = ({ children }: WrapperProps) => (
 );
 const api = serverlikeData().api;
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true
+  (student) => student.role === "student" && student.isAdmin === true,
 );
 
 vi.unmock("./useUserData");
@@ -35,7 +35,7 @@ describe("component AudioBasedReview", () => {
         <MemoryRouter>
           <AudioBasedReview willAutoplay={false} />
         </MemoryRouter>,
-        { wrapper }
+        { wrapper },
       );
       expect(screen.getByText("Loading Audio...")).toBeInTheDocument();
     });
@@ -44,10 +44,10 @@ describe("component AudioBasedReview", () => {
         <MemoryRouter>
           <AudioBasedReview willAutoplay={false} />
         </MemoryRouter>,
-        { wrapper }
+        { wrapper },
       );
       await waitFor(() =>
-        expect(screen.getByText("From:")).toBeInTheDocument()
+        expect(screen.getByText("From:")).toBeInTheDocument(),
       );
 
       expect(screen.getByText("Comprehension Quiz")).toBeInTheDocument();

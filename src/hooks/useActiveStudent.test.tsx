@@ -8,7 +8,7 @@ import { useActiveStudent } from "./useActiveStudent";
 const api = serverlikeData().api;
 
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true
+  (student) => student.role === "student" && student.isAdmin === true,
 );
 
 interface WrapperProps {
@@ -63,7 +63,7 @@ describe("useActiveStudent", () => {
       });
 
       expect(result.current.activeProgram?.recordId).toBe(
-        studentAdmin?.relatedProgram
+        studentAdmin?.relatedProgram,
       );
     });
   });

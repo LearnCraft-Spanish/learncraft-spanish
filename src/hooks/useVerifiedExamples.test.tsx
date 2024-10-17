@@ -9,7 +9,7 @@ import { useVerifiedExamples } from "./useVerifiedExamples";
 
 const api = serverlikeData().api;
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true
+  (student) => student.role === "student" && student.isAdmin === true,
 );
 
 vi.unmock("./useUserData");

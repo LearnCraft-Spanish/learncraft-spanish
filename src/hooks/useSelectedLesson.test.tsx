@@ -24,7 +24,7 @@ vi.mock(
   "./useActiveStudent",
   vi.fn(() => {
     return { useActiveStudent: mockActiveStudentStub };
-  })
+  }),
 );
 vi.mock(
   "./useProgramTable",
@@ -37,7 +37,7 @@ vi.mock(
         },
       }),
     };
-  })
+  }),
 );
 
 const studentAdmin = getUserDataFromName("student-admin");
@@ -50,7 +50,7 @@ describe("useSelectedLesson", () => {
       wrapper: MockQueryClientProvider,
     });
     waitFor(() =>
-      expect(result.current.programTableQuery.isSuccess).toBe(true)
+      expect(result.current.programTableQuery.isSuccess).toBe(true),
     );
     programTableQuery = result.current.programTableQuery;
   });
@@ -64,7 +64,7 @@ describe("useSelectedLesson", () => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
       expect(result.current.selectedProgram?.recordId).toBe(
-        studentAdmin?.relatedProgram
+        studentAdmin?.relatedProgram,
       );
       expect(result.current.selectedFromLesson).toBeNull();
       // This is calculated by activeLesson, in useActiveStudent
@@ -161,7 +161,7 @@ describe("useSelectedLesson", () => {
         throw new Error("selectedProgram is null");
       }
       result.current.setFromLesson(
-        result.current.selectedProgram.lessons[0].recordId
+        result.current.selectedProgram.lessons[0].recordId,
       );
       await waitFor(() => {
         expect(result.current.selectedFromLesson).not.toBeNull();
@@ -177,8 +177,8 @@ describe("useSelectedLesson", () => {
     it("allowedVocabulary is a subset of requiredVocabulary", () => {
       expect(
         res.current.allowedVocabulary.every((word: any) =>
-          res.current.requiredVocabulary.includes(word)
-        )
+          res.current.requiredVocabulary.includes(word),
+        ),
       );
     });
   });

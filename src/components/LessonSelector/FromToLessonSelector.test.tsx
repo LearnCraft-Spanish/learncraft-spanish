@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   render,
   renderHook,
@@ -8,7 +8,6 @@ import {
 } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-import serverlikeData from "../../../mocks/data/serverlike/serverlikeData";
 import { useProgramTable } from "../../hooks/useProgramTable";
 import { useSelectedLesson } from "../../hooks/useSelectedLesson";
 import { getUserDataFromName } from "../../../mocks/data/serverlike/studentTable";

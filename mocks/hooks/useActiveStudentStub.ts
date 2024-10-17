@@ -41,7 +41,7 @@ export default function mockActiveStudentStub({
 
   function getActiveProgram() {
     const foundProgram = programsTable.find(
-      (program) => program.recordId === activeStudentQuery.data?.relatedProgram
+      (program) => program.recordId === activeStudentQuery.data?.relatedProgram,
     );
     return foundProgram || null;
   }

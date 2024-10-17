@@ -16,7 +16,7 @@ describe("app", () => {
     render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
   });
 
@@ -24,7 +24,7 @@ describe("app", () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(getByText(/log out/i)).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe("app", () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(getByText(/log in/i)).toBeInTheDocument();
@@ -48,11 +48,11 @@ describe("app", () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(
-        getByText("You must be logged in to use this app.")
+        getByText("You must be logged in to use this app."),
       ).toBeInTheDocument();
     });
   });
@@ -63,7 +63,7 @@ describe("app", () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(getByText(/welcome/i)).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe("app", () => {
     const { getByAltText } = render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(getByAltText("loading-spinner")).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe("app", () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(getByText(/official quizzes/i)).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe("app", () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();

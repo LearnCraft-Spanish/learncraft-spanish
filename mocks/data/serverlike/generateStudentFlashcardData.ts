@@ -11,7 +11,7 @@ import { fisherYatesShuffle } from "../../../src/functions/fisherYatesShuffle";
 export default function generateStudentFlashcardData(
   student: UserData,
   numberOfExamples: number,
-  examplesTable: Flashcard[]
+  examplesTable: Flashcard[],
 ) {
   const reviewDatesAndIntervals = [
     {
@@ -90,7 +90,7 @@ export default function generateStudentFlashcardData(
   // match examples with studentExamples
   studentFlashcardData.studentExamples.forEach((studentExample) => {
     const example = verifiedExamples.find(
-      (example) => example.recordId === studentExample.relatedExample
+      (example) => example.recordId === studentExample.relatedExample,
     );
     if (!example) {
       throw new Error("Example mismatch!");

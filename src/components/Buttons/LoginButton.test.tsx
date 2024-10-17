@@ -7,7 +7,6 @@ import useAuth from "../../hooks/useAuth";
 
 import LoginButton from "./LoginButton";
 
-
 describe("login button", () => {
   afterEach(() => {
     vi.clearAllMocks();
