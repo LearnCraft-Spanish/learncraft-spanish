@@ -6,13 +6,13 @@ import {
   waitFor,
   within,
 } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { useProgramTable } from "../../hooks/useProgramTable";
 import { useSelectedLesson } from "../../hooks/useSelectedLesson";
 import { getUserDataFromName } from "../../../mocks/data/serverlike/studentTable";
 
 import type { Lesson } from "../../interfaceDefinitions";
+import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
 import FromToLessonSelector from "./FromToLessonSelector";
 
 interface WrapperProps {
@@ -35,9 +35,8 @@ function getLessonNumber(lesson: Lesson | null): number | null {
 }
 
 describe("component FromToLessonSelector", () => {
-  const queryClient = new QueryClient();
   const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <MockAllProviders>{children}</MockAllProviders>
   );
 
   beforeEach(async () => {
@@ -72,7 +71,7 @@ describe("component FromToLessonSelector", () => {
       const courseSelect = screen.getByLabelText("Course:");
       // Tests
       expect((courseSelect as HTMLSelectElement).value).toBe(
-        student.relatedProgram.toString(),
+        student.relatedProgram.toString()
       );
     });
   });
@@ -86,7 +85,7 @@ describe("component FromToLessonSelector", () => {
     result.result.current.setProgram(0);
     const courseSelect = screen.getByLabelText("Course:");
     await waitFor(() =>
-      expect((courseSelect as HTMLSelectElement).value).toBe("0"),
+      expect((courseSelect as HTMLSelectElement).value).toBe("0")
     );
     // Tests
     expect(screen.queryByText("From:")).not.toBeInTheDocument();
@@ -101,7 +100,7 @@ describe("component FromToLessonSelector", () => {
     // Setup
     const toSelectorContainer = screen.getByLabelText("To:").closest("label");
     const toSelect = within(toSelectorContainer as HTMLElement).getByRole(
-      "combobox",
+      "combobox"
     );
     const lessons = result.result.current.selectedProgram?.lessons;
     if (!lessons) throw new Error("No lessons found");
@@ -123,18 +122,18 @@ describe("component FromToLessonSelector", () => {
       .getByLabelText("From:")
       .closest("label");
     const fromSelect = within(fromSelectorContainer as HTMLElement).getByRole(
-      "combobox",
+      "combobox"
     );
     // get selected lesson from toSelector
     const toSelectorContainer = screen.getByLabelText("To:").closest("label");
     const toSelect = within(toSelectorContainer as HTMLElement).getByRole(
-      "combobox",
+      "combobox"
     );
     const toSelectValue = (toSelect as HTMLSelectElement).value;
     const toLessonRecordId = Number.parseInt(toSelectValue);
     const toSelectedLesson =
       result.result.current.selectedProgram?.lessons.find(
-        (lesson) => lesson.recordId === toLessonRecordId,
+        (lesson) => lesson.recordId === toLessonRecordId
       );
     if (!toSelectedLesson) throw new Error("No lesson found");
     const toLessonNumber = getLessonNumber(toSelectedLesson);

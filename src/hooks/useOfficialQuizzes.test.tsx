@@ -1,22 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
+import type { WrapperProps } from "../../src/interfaceDefinitions";
 
 import mockData from "../../mocks/data/serverlike/serverlikeData";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
 import { useOfficialQuizzes } from "./useOfficialQuizzes";
-
-interface WrapperProps {
-  children: React.ReactNode;
-}
 
 const { api } = mockData();
 const quizzesTable = api.quizzesTable;
 const quizExamplesTableArray = api.quizExamplesTableArray;
 
 describe("useOfficialQuizzes", () => {
-  const queryClient = new QueryClient();
   const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <MockAllProviders>{children}</MockAllProviders>
   );
 
   describe("officialQuizzesQuery", () => {
@@ -25,7 +21,7 @@ describe("useOfficialQuizzes", () => {
         wrapper,
       });
       await waitFor(() =>
-        expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
+        expect(result.current.officialQuizzesQuery.isSuccess).toBe(true)
       );
       expect(result.current.officialQuizzesQuery.data).toBeDefined();
     });
@@ -36,8 +32,8 @@ describe("useOfficialQuizzes", () => {
       });
       await waitFor(() =>
         expect(result.current.officialQuizzesQuery.data?.length).toBe(
-          quizzesTable.length,
-        ),
+          quizzesTable.length
+        )
       );
     });
   });
@@ -49,14 +45,14 @@ describe("useOfficialQuizzes", () => {
       ];
     const randomQuizNickname = randomQuizTable.quizNickname;
     const randomQuizId = quizzesTable.find(
-      (quiz) => quiz.quizNickname === randomQuizNickname,
+      (quiz) => quiz.quizNickname === randomQuizNickname
     )?.recordId;
     it("runs without crashing", async () => {
       const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
         wrapper,
       });
       await waitFor(() =>
-        expect(result.current.quizExamplesQuery.isSuccess).toBe(true),
+        expect(result.current.quizExamplesQuery.isSuccess).toBe(true)
       );
       expect(result.current.quizExamplesQuery.data).toBeDefined();
     });
@@ -67,8 +63,8 @@ describe("useOfficialQuizzes", () => {
       });
       await waitFor(() =>
         expect(result.current.quizExamplesQuery.data).toEqual(
-          randomQuizTable.quizExamplesTable,
-        ),
+          randomQuizTable.quizExamplesTable
+        )
       );
     });
   });

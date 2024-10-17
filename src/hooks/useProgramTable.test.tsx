@@ -2,17 +2,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
+import type { WrapperProps } from "../../src/interfaceDefinitions";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
 import { useProgramTable } from "./useProgramTable";
-
-interface WrapperProps {
-  children: React.ReactNode;
-}
 
 describe("useProgramTable", async () => {
   // Setup for tests
-  const queryClient = new QueryClient();
   const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <MockAllProviders>{children}</MockAllProviders>
   );
 
   it("isSuccess is true", async () => {
@@ -52,7 +49,7 @@ describe("useProgramTable", async () => {
           return;
         }
         expect(randomLesson.vocabKnown.length).toBeGreaterThan(
-          program.lessons[0].vocabKnown.length,
+          program.lessons[0].vocabKnown.length
         );
       });
     });

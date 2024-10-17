@@ -1,19 +1,18 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import type { WrapperProps } from "../../../src/interfaceDefinitions";
 
 import serverlikeData from "../../../mocks/data/serverlike/serverlikeData";
+import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
 import AudioBasedReview from "./AudioBasedReview";
 
-const queryClient = new QueryClient();
 const wrapper = ({ children }: WrapperProps) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  <MockAllProviders>{children}</MockAllProviders>
 );
 const api = serverlikeData().api;
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true,
+  (student) => student.role === "student" && student.isAdmin === true
 );
 
 vi.unmock("./useUserData");
@@ -35,7 +34,7 @@ describe("component AudioBasedReview", () => {
         <MemoryRouter>
           <AudioBasedReview willAutoplay={false} />
         </MemoryRouter>,
-        { wrapper },
+        { wrapper }
       );
       expect(screen.getByText("Loading Audio...")).toBeInTheDocument();
     });
@@ -44,10 +43,10 @@ describe("component AudioBasedReview", () => {
         <MemoryRouter>
           <AudioBasedReview willAutoplay={false} />
         </MemoryRouter>,
-        { wrapper },
+        { wrapper }
       );
       await waitFor(() =>
-        expect(screen.getByText("From:")).toBeInTheDocument(),
+        expect(screen.getByText("From:")).toBeInTheDocument()
       );
 
       expect(screen.getByText("Comprehension Quiz")).toBeInTheDocument();

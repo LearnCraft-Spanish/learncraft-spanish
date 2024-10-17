@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,
   cleanup,
@@ -12,9 +11,8 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
 
+import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
 import Quiz from "./QuizComponent";
-
-const queryClient = new QueryClient();
 
 const cleanupFunction = vi.fn();
 
@@ -40,36 +38,32 @@ vi.mock("../contexts/ActiveStudentContext");
   */
 function renderQuizNoSrs() {
   render(
-    <MemoryRouter>
-      <QueryClientProvider client={queryClient}>
-        <Quiz
-          quizTitle="Test Quiz"
-          examplesToParse={sampleStudentFlashcardData.examples}
-          // startWithSpanish={false}
-          // quizOnlyCollectedExamples={false}
-          // isSrsQuiz={false}
-          cleanupFunction={cleanupFunction}
-          // quizLength={1000}
-        />
-      </QueryClientProvider>
-    </MemoryRouter>,
+    <MockAllProviders>
+      <Quiz
+        quizTitle="Test Quiz"
+        examplesToParse={sampleStudentFlashcardData.examples}
+        // startWithSpanish={false}
+        // quizOnlyCollectedExamples={false}
+        // isSrsQuiz={false}
+        cleanupFunction={cleanupFunction}
+        // quizLength={1000}
+      />
+    </MockAllProviders>
   );
 }
 function renderQuizYesSrs() {
   render(
-    <MemoryRouter>
-      <QueryClientProvider client={queryClient}>
-        <Quiz
-          quizTitle="Test Quiz"
-          examplesToParse={sampleStudentFlashcardData.examples}
-          // startWithSpanish={false}
-          quizOnlyCollectedExamples
-          isSrsQuiz
-          cleanupFunction={cleanupFunction}
-          // quizLength={1000}
-        />
-      </QueryClientProvider>
-    </MemoryRouter>,
+    <MockAllProviders>
+      <Quiz
+        quizTitle="Test Quiz"
+        examplesToParse={sampleStudentFlashcardData.examples}
+        // startWithSpanish={false}
+        quizOnlyCollectedExamples
+        isSrsQuiz
+        cleanupFunction={cleanupFunction}
+        // quizLength={1000}
+      />
+    </MockAllProviders>
   );
 }
 

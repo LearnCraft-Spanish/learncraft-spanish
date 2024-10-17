@@ -3,16 +3,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
+import type { WrapperProps } from "../../src/interfaceDefinitions";
 import { useVocabulary } from "./useVocabulary";
 
 const api = serverlikeData().api;
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true,
+  (student) => student.role === "student" && student.isAdmin === true
 );
-
-interface WrapperProps {
-  children: React.ReactNode;
-}
 
 vi.unmock("./useUserData");
 vi.mock("./useUserData", () => ({
@@ -23,9 +21,8 @@ vi.mock("./useUserData", () => ({
 }));
 
 describe("useVocabulary", () => {
-  const queryClient = new QueryClient();
   const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <MockAllProviders>{children}</MockAllProviders>
   );
 
   it("runs without crashing", async () => {
