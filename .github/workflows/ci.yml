@@ -193,3 +193,5 @@ jobs:
         # Run the test suite
       - name: Run tests
         run: pnpm run test
+        env:
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
