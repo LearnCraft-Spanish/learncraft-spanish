@@ -4,10 +4,10 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
 } from "@testing-library/react";
 import React from "react";
 
-import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
 
@@ -15,9 +15,6 @@ import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
 import Quiz from "./QuizComponent";
 
 const cleanupFunction = vi.fn();
-
-vi.mock("../contexts/UserDataContext");
-vi.mock("../contexts/ActiveStudentContext");
 
 // vi.mock('../hooks/useStudentFlashcards', () => {
 //   return {
@@ -48,7 +45,7 @@ function renderQuizNoSrs() {
         cleanupFunction={cleanupFunction}
         // quizLength={1000}
       />
-    </MockAllProviders>
+    </MockAllProviders>,
   );
 }
 function renderQuizYesSrs() {
@@ -57,13 +54,11 @@ function renderQuizYesSrs() {
       <Quiz
         quizTitle="Test Quiz"
         examplesToParse={sampleStudentFlashcardData.examples}
-        // startWithSpanish={false}
         quizOnlyCollectedExamples
         isSrsQuiz
         cleanupFunction={cleanupFunction}
-        // quizLength={1000}
       />
-    </MockAllProviders>
+    </MockAllProviders>,
   );
 }
 
@@ -114,7 +109,7 @@ describe("component Quiz", () => {
     // Assert that the flashcard text content has changed
     expect(flashcard2.textContent).not.toBe(initialText);
   });
-  it("changes flashcard to previous on previous button click", () => {
+  it("changes flashcard to previous on previous button click", async () => {
     renderQuizNoSrs();
     // Find the flashcard element
     const flashcard = screen.getByLabelText("flashcard");
@@ -142,27 +137,31 @@ describe("component Quiz", () => {
     act(() => {
       fireEvent.click(previousButton);
     });
+    await waitFor(() => {
+      // Find the flashcard element again
+      const flashcardPrevious = screen.getByLabelText("flashcard");
 
-    // Find the flashcard element again
-    const flashcardPrevious = screen.getByLabelText("flashcard");
-
-    // Assert that the flashcard text content has changed
-    expect(flashcardPrevious.textContent).toBe(initialText);
-    expect(flashcardPrevious.textContent).not.toBe(nextTest);
+      // Assert that the flashcard text content has changed
+      expect(flashcardPrevious.textContent).toBe(initialText);
+      expect(flashcardPrevious.textContent).not.toBe(nextTest);
+    });
   });
 
   describe.skip("isSrsQuiz is true", () => {
-    it("renders SrsButtons when isSrsQuiz is true", () => {
+    it("renders SrsButtons when isSrsQuiz is true", async () => {
       renderQuizYesSrs();
       const flashcard = screen.getByLabelText("flashcard");
       act(() => {
         fireEvent.click(flashcard);
       });
-      const hardBtn = screen.getByRole("button", { name: "This was hard" });
-      const easyBtn = screen.getByRole("button", { name: "This was easy" });
 
-      expect(hardBtn).toBeTruthy();
-      expect(easyBtn).toBeTruthy();
+      await waitFor(() => {
+        const hardBtn = screen.getByText(/"this was hard"/i);
+        const easyBtn = screen.getByText(/this was easy/i);
+
+        expect(hardBtn).toBeInTheDocument();
+        expect(easyBtn).toBeInTheDocument();
+      });
     });
   });
 });

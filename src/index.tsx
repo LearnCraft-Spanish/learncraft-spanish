@@ -30,5 +30,5 @@ root.render(
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </Sentry.ErrorBoundary>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
@@ -9,7 +8,7 @@ import { useVocabulary } from "./useVocabulary";
 
 const api = serverlikeData().api;
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true
+  (student) => student.role === "student" && student.isAdmin === true,
 );
 
 vi.unmock("./useUserData");

@@ -1,4 +1,3 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
@@ -49,7 +48,7 @@ describe("useProgramTable", async () => {
           return;
         }
         expect(randomLesson.vocabKnown.length).toBeGreaterThan(
-          program.lessons[0].vocabKnown.length
+          program.lessons[0].vocabKnown.length,
         );
       });
     });

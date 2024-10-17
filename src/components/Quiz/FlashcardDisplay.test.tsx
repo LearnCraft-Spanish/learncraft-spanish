@@ -11,7 +11,7 @@ const example = {
   isCollected: true,
 };
 const audioExample = sampleStudentFlashcardData.examples.filter(
-  (example) => example.spanishAudioLa.length
+  (example) => example.spanishAudioLa.length,
 )[0];
 
 const incrementExampleNumber = vi.fn(() => {});
