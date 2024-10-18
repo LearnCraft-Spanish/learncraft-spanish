@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import React from "react";
 import {
   act,
-  cleanup,
   fireEvent,
   render,
   screen,
@@ -100,21 +99,29 @@ describe("official quiz component", () => {
           () => screen.getByLabelText(/select course/i) as HTMLSelectElement
         );
 
-        await act(async () => {
-          fireEvent.change(courseMenu, { target: { value: courseCode } });
-        });
+        if (courseMenu.value !== courseCode) {
+          await act(async () => {
+            fireEvent.change(courseMenu, { target: { value: courseCode } });
+          });
+        }
 
         await waitFor(() => {
           expect(courseMenu.value).toBe(courseCode);
+          expect(screen.getAllByRole("select")).toHaveLength(2);
         });
+
+        console.log(courseMenu.value);
 
         const lessonMenu: HTMLSelectElement = await waitFor(
           () => screen.getByLabelText(/select quiz/i) as HTMLSelectElement
         );
 
         await act(async () => {
-          console.log(document.body.innerHTML.length);
           fireEvent.change(lessonMenu, { target: { value: quizNumber } });
+        });
+
+        await waitFor(() => {
+          expect(screen.getAllByRole("select")).toHaveLength(2);
         });
 
         console.log("lesson Selected:", lessonMenu.value);

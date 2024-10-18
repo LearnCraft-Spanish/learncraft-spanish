@@ -9,7 +9,10 @@ describe("useVerifiedExamples", () => {
     const { result } = renderHook(() => useVerifiedExamples(), {
       wrapper: MockAllProviders,
     });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true), { timeout: 10000, interval: 200 });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true), {
+      timeout: 3000,
+      interval: 200,
+    });
     expect(result.current.data).toBeDefined();
   });
 
@@ -17,6 +20,9 @@ describe("useVerifiedExamples", () => {
     const { result } = renderHook(() => useVerifiedExamples(), {
       wrapper: MockAllProviders,
     });
-    await waitFor(() => expect(result.current.data?.length).toBeGreaterThan(0), { timeout: 10000, interval: 200 });
+    await waitFor(
+      () => expect(result.current.data?.length).toBeGreaterThan(0),
+      { timeout: 3000, interval: 200 }
+    );
   });
 });

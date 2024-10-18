@@ -80,7 +80,7 @@ export default function CourseQuizzes({
     <div className="quizInterface">
       {/* Quiz Selector */}
       {officialQuizzesQuery.data &&
-        !!chosenQuiz &&
+        chosenQuiz &&
         quizCourse !== "lcsp" &&
         !hideMenu && (
           <>
