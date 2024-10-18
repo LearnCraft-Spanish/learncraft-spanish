@@ -14,7 +14,7 @@ describe("component Nav", () => {
     render(
       <MockAllProviders>
         <Nav />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     expect(screen.getByAltText("Learncraft Spanish Logo")).toBeInTheDocument();
   });
@@ -24,7 +24,7 @@ describe("component Nav", () => {
     render(
       <MockAllProviders>
         <Nav />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     expect(screen.getByText(/log in\/register/i)).toBeInTheDocument();
   });
@@ -33,7 +33,7 @@ describe("component Nav", () => {
     render(
       <MockAllProviders>
         <Nav />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     expect(screen.getByText(/log out/i)).toBeInTheDocument();
   });

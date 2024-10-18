@@ -10,7 +10,7 @@ describe("menu for student flashcards", () => {
     render(
       <MockAllProviders route="/myflashcards">
         <MyFlashcardsQuiz />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     // wait for the menu to load
     await waitFor(() => {
@@ -23,7 +23,7 @@ describe("menu for student flashcards", () => {
     render(
       <MockAllProviders route="/myflashcards">
         <MyFlashcardsQuiz />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(screen.getByText(/start quiz/i)).toBeInTheDocument();
@@ -33,7 +33,7 @@ describe("menu for student flashcards", () => {
     render(
       <MockAllProviders route="/myflashcards">
         <MyFlashcardsQuiz />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
     await waitFor(() => {
       expect(screen.getByText(/back to menu/i)).toBeInTheDocument();
