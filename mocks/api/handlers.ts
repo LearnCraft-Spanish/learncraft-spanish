@@ -1,11 +1,20 @@
+import type { DefaultBodyType, StrictRequest } from "msw";
 import { HttpResponse, http } from "msw";
-import flashcardData from "../data/serverlike/mockStudentFlashcardData.json";
 import newData from "../data/serverlike/serverlikeData";
 
-const studentFlashcardData = flashcardData.studentFlashcardData;
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
+
+function getEmailFromRequest(request: StrictRequest<DefaultBodyType>) {
+  const fakeToken = request.headers.get("Authorization");
+  const tokenParts = fakeToken?.split(" ");
+  const emailAddress = tokenParts?.[1];
+  if (!emailAddress) {
+    throw new Error("Email address not found in token");
+  }
+  return emailAddress;
+}
 
 export const handlers = [
   http.get(`${backendUrl}public/programs`, () => {
@@ -33,6 +42,7 @@ export const handlers = [
   }),
 
   http.get(`${backendUrl}public/quizExamples/:quizId`, ({ params }) => {
+    console.log("quiz id requested:", params.quizId);
     const paramString = params.quizId;
     const quizObject = apiData.quizzesTable.find((quiz) => {
       return quiz.recordId === Number(paramString);
@@ -43,7 +53,7 @@ export const handlers = [
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
         return quizExamples.quizNickname === quizObject.quizNickname;
-      },
+      }
     );
     if (!quizExamplesObject) {
       throw new Error("Quiz examples not found");
@@ -55,20 +65,45 @@ export const handlers = [
     return HttpResponse.json(quizExamples);
   }),
 
-  http.get(`${backendUrl}my-data`, () => {
-    return HttpResponse.json(apiData.allStudentsTable[0]);
+  http.get(`${backendUrl}my-data`, ({ request }) => {
+    const email = getEmailFromRequest(request);
+    const student = apiData.allStudentsTable.find(
+      (student) => student.emailAddress === email
+    );
+    return HttpResponse.json(student);
   }),
 
   http.get(`${backendUrl}all-students`, () => {
     return HttpResponse.json(apiData.allStudentsTable);
   }),
 
-  http.get(`${backendUrl}my-examples`, () => {
-    return HttpResponse.json(studentFlashcardData);
+  http.get(`${backendUrl}my-examples`, ({ request }) => {
+    //Placeholder: We will fetch for different students soon
+    const _email = getEmailFromRequest(request);
+    return HttpResponse.json(apiData.studentFlashcardData);
   }),
 
   http.get(`${backendUrl}public/audio-examples`, () => {
     return HttpResponse.json(apiData.audioExamplesTable);
+  }),
+
+  // Get Active Examples of a student
+  http.get(`${backendUrl}:studentId/examples`, ({ params }) => {
+    // current temporary implementation, gets student-admin flashcard data, only flashcard data defined
+    const studentId = params.studentId;
+    const studentIdNumber = Number(studentId);
+    if (!studentIdNumber) {
+      throw new Error("Student not found");
+    }
+    const studentExamples = apiData.studentFlashcardData;
+    if (!studentExamples) {
+      throw new Error("Student examples not found");
+    }
+
+    if (studentExamples.studentExamples[0].relatedStudent !== studentIdNumber) {
+      return HttpResponse.json({ studentExamples: [], examples: [] });
+    }
+    return HttpResponse.json(studentExamples);
   }),
 
   // Post Requests

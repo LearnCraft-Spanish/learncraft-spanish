@@ -1,0 +1,383 @@
+{
+  "examples": [
+    {
+      "recordId": 203,
+      "spanishExample": "You estabas here when he lo estaba.",
+      "englishTranslation": "You were here when he was.",
+      "vocabIncluded": [
+        "estaba/Verb, Verb/he/she/it was//3rd person singular \"él/ella/eso\" ; Imperfect",
+        "estabas/Verb, Verb/verb//2nd person singular \"tú\" ; 2nd person singular \"vos\" ; Imperfect",
+        "lo/Pronoun, Attribute/attribute to mean \"that way\", as in lo es, lo estoy/"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 512,
+      "spanishExample": "Nosotras éramos las chicas.",
+      "englishTranslation": "We were the girls.",
+      "vocabIncluded": [
+        "chica/Noun, Noun/(singular or plural)/",
+        "las/Article, Definite/article/",
+        "nosotros/Pronoun, Subject/subject pronoun/",
+        "éramos/Verb, Verb/we were//1st person plural \"nosotros\" ; Imperfect"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex512en.mp3",
+      "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex512la.mp3",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 712,
+      "spanishExample": "That es all.",
+      "englishTranslation": "That is all.",
+      "vocabIncluded": [
+        "es/Verb, Verb/it/he/she is//3rd person singular \"él/ella/eso\" ; Present indicative"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 713,
+      "spanishExample": "Valentina es that way.",
+      "englishTranslation": "Valentina is that way.",
+      "vocabIncluded": [
+        "es/Verb, Verb/it/he/she is//3rd person singular \"él/ella/eso\" ; Present indicative"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 843,
+      "spanishExample": "*She's* de *Europe* y el *man is* de *Australia.*",
+      "englishTranslation": "She's from Europe and the man is from Australia.",
+      "vocabIncluded": [
+        "de/Preposition, Preposition/\"of\"/\"from\", origin/",
+        "el/Article, Definite/article/",
+        "y/Conjunction, Coordinating/coordinating conjunction/"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 850,
+      "spanishExample": "¿Por qué *would you do this?*",
+      "englishTranslation": "Why would you do this?",
+      "vocabIncluded": [
+        "por qué/Cluster, Idiom/why? (either by itself or followed by a phrase/clause)/"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2007,
+      "spanishExample": "*I hope* que eso *is OK.*",
+      "englishTranslation": "I hope that that is OK.",
+      "vocabIncluded": [
+        "eso/Pronoun, Demonstrative/",
+        "que/Conjunction, Subordinating, potential subjunctive/conjunction for subordinated clause/"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2027,
+      "spanishExample": "*We* no *can do* eso.",
+      "englishTranslation": "We can’t do that.",
+      "vocabIncluded": [
+        "eso/Pronoun, Demonstrative/",
+        "no/Adverb, Whether (formerly \"boolean\")/not/"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2278,
+      "spanishExample": "No, ellos no son los winners.",
+      "englishTranslation": "No, they(m) aren’t the winners.",
+      "vocabIncluded": [
+        "ellos/Pronoun, Subject/subject pronoun/",
+        "los/Article, Definite/article/",
+        "no/Adverb, Whether (formerly \"boolean\")/not/",
+        "no/Interjection, Informational/\"no\"/",
+        "son/Verb, Verb/they are/"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2334,
+      "spanishExample": "El chico era de Argentina.",
+      "englishTranslation": "The guy was from Argentina.",
+      "vocabIncluded": [
+        "chico/Noun, Noun/(singular or plural)/",
+        "de/Preposition, Preposition/\"of\"/\"from\", origin/",
+        "el/Article, Definite/article/",
+        "era/Verb, Verb/he/she/it was//3rd person singular \"él/ella/eso\" ; Imperfect"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2349,
+      "spanishExample": "Es de Chile.",
+      "englishTranslation": "He’s from Chile.",
+      "vocabIncluded": [
+        "de/Preposition, Preposition/\"of\"/\"from\", origin/",
+        "es/Verb, Verb/it/he/she is//3rd person singular \"él/ella/eso\" ; Present indicative"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2358,
+      "spanishExample": "Soy una chica.",
+      "englishTranslation": "I’m a girl.",
+      "vocabIncluded": [
+        "chica/Noun, Noun/(singular or plural)/",
+        "soy/Verb, Verb/I am/",
+        "una/Article, Indefinite/article/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2364,
+      "spanishExample": "Yo no era their amiga, but ella lo era.",
+      "englishTranslation": "I wasn’t their friend(f), but she was.",
+      "vocabIncluded": [
+        "amiga/Noun, Noun/",
+        "ella/Pronoun, Subject/subject pronoun/",
+        "era/Verb, Verb/I was//1st person singular \"yo\" ; Imperfect",
+        "era/Verb, Verb/he/she/it was//3rd person singular \"él/ella/eso\" ; Imperfect",
+        "lo/Pronoun, Attribute/attribute to mean \"that way\", as in lo es, lo estoy/",
+        "no/Adverb, Whether (formerly \"boolean\")/not/",
+        "yo/Pronoun, Subject/subject pronoun/"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2488,
+      "spanishExample": "Son de Perú.",
+      "englishTranslation": "They are from Peru.",
+      "vocabIncluded": [
+        "de/Preposition, Preposition/\"of\"/\"from\", origin/",
+        "son/Verb, Verb/they are/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2613,
+      "spanishExample": "O es por ser amigos, o es por estar aquí.",
+      "englishTranslation": "Either it’s because of being friends, or it’s because of being here.",
+      "vocabIncluded": [
+        "amigo/Noun, Noun/",
+        "aquí/Adverb, Place, here/there/",
+        "es/Verb, Verb/it/he/she is//3rd person singular \"él/ella/eso\" ; Present indicative",
+        "estar/Verb, Verb/infinitive//Infinitive",
+        "o/Conjunction, Coordinating/o between clauses/",
+        "o/Conjunction, List/or between items in a list/",
+        "por/Preposition, Preposition/\"because of\"/",
+        "ser/Verb, Verb/ser infinitive/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 2676,
+      "spanishExample": "Estábamos en las buenas casas.",
+      "englishTranslation": "We were at the good houses.",
+      "vocabIncluded": [
+        "buena/Adjective, Ser, positive/negative/",
+        "casas/Noun, Noun/feminine noun/",
+        "en/Preposition, Preposition/\"at\"/",
+        "estábamos/Verb, Verb/we were//1st person plural \"nosotros\" ; Imperfect",
+        "las/Article, Definite/article/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2676en.mp3",
+      "spanishAudioLa": "https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples/ex2676la.mp3",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 3298,
+      "spanishExample": "La señora fue al lugar con el señor.",
+      "englishTranslation": "The lady went to the place with the gentleman.",
+      "vocabIncluded": [
+        "al/Preposition, Preposition/",
+        "con/Preposition, Preposition/with/",
+        "el/Article, Definite/article/",
+        "fue/Verb, Verb/ir preterite (he/she/it went)//3rd person singular \"él/ella/eso\" ; Preterite",
+        "la/Article, Definite/article/",
+        "lugar/Noun, Noun/",
+        "señor/Noun, Noun/",
+        "señora/Noun, Noun/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 3344,
+      "spanishExample": "¡Buenas noches, señor! ¿Cómo está la señora?",
+      "englishTranslation": "Good evening, sir! How is the Mrs.?",
+      "vocabIncluded": [
+        "buenas noches/Cluster, Idiom/Greeting/",
+        "cómo/Adverb, Manner, other/only in question, not exclamation/",
+        "está/Verb, Verb/he/she/it is//3rd person singular \"él/ella/eso\" ; Present indicative",
+        "la/Article, Definite/article/",
+        "señor/Noun, Noun/",
+        "señora/Noun, Noun/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 3479,
+      "spanishExample": "Buenas tardes, señor, tengo sus *keys*por si las *you need.*",
+      "englishTranslation": "Good afternoon, sir, I have your(formal) keys in case you need them(f).",
+      "vocabIncluded": [
+        "buenas tardes/Cluster, Idiom/Greeting/",
+        "las/Pronoun, Direct Object/direct object/",
+        "por si/Cluster, Conjunction cluster/\"in case\"/",
+        "señor/Noun, Noun/",
+        "sus/Pronoun, Possessive/possessive/",
+        "tengo/Verb, Verb//1st person singular \"yo\" ; Present indicative"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 3497,
+      "spanishExample": "Se va, como *she wants* hacer.",
+      "englishTranslation": "She is leaving, as she wants to do.",
+      "vocabIncluded": [
+        "como/Conjunction, Comparative/as in \"como yo\"/",
+        "hacer/Verb, Verb/",
+        "irse/Other structure, Pronominal structure/any pronominal use/",
+        "se/Pronoun, Reflexive/reflexive/",
+        "va/Verb, Verb//3rd person singular \"él/ella/eso\" ; Present indicative"
+      ],
+      "spanglish": "spanglish",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 24067,
+      "spanishExample": "Señor, vamos a estar aquí por si tiene tiempo.",
+      "englishTranslation": "Sir, we're going to be here in case you(formal) have time.",
+      "vocabIncluded": [
+        "a/Preposition, Preposition/ir + a + infinitive (particle)/",
+        "aquí/Adverb, Place, here/there/",
+        "estar/Verb, Verb/infinitive//Infinitive",
+        "por si/Cluster, Conjunction cluster/\"in case\"/",
+        "señor/Noun, Noun/",
+        "tiempo/Noun, Noun/time (the passing of time)/",
+        "tiene/Verb, Verb//3rd person singular \"él/ella/eso\" ; Present indicative",
+        "vamos/Verb, Verb//1st person plural \"nosotros\" ; Present indicative"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 24103,
+      "spanishExample": "Había ido con la mujer, pero ahora estamos en su casa.",
+      "englishTranslation": "I had gone with the woman, but now we are at her house.",
+      "vocabIncluded": [
+        "ahora/Adverb, Time, days/",
+        "casa/Noun, Noun/feminine noun/",
+        "con/Preposition, Preposition/with/",
+        "en/Preposition, Preposition/\"at\"/",
+        "estamos/Verb, Verb/we are//1st person plural \"nosotros\" ; Present indicative",
+        "había/Verb, Verb/I had (for participles)//1st person singular \"yo\" ; Imperfect",
+        "ido/Verb, Verb//Participle",
+        "la/Article, Definite/article/",
+        "mujer/Noun, Noun/fem noun /",
+        "pero/Conjunction, Coordinating/",
+        "su/Pronoun, Possessive/possessive/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    },
+    {
+      "recordId": 24150,
+      "spanishExample": "Quiero que sean amigos por mí.",
+      "englishTranslation": "I want them to be friends(m) on my behalf.",
+      "vocabIncluded": [
+        "amigo/Noun, Noun/",
+        "mí/Pronoun, Prepositional/prepositional pronoun/",
+        "por/Preposition, Preposition/on behalf of/",
+        "que/Conjunction, Subordinating, potential subjunctive/conjunction for subordinated clause/",
+        "quiero/Verb, Verb/I want/",
+        "sean/Verb, Verb/they be/"
+      ],
+      "spanglish": "esp",
+      "allStudents": [],
+      "englishAudio": "",
+      "spanishAudioLa": "",
+      "vocabComplete": true
+    }
+  ]
+}

@@ -1,23 +1,10 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useCallback } from "react";
 import type * as types from "../interfaceDefinitions";
+import useAuth from "./useAuth";
 
 export function useBackend() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const audience = import.meta.env.VITE_API_AUDIENCE;
-  const { getAccessTokenSilently } = useAuth0();
-
-  const getAccessToken = useCallback(async () => {
-    const accessToken = await getAccessTokenSilently({
-      authorizationParams: {
-        audience,
-        scope:
-          "openid profile email read:current-student update:current-student read:all-students update:all-students",
-      },
-      cacheMode: "off",
-    });
-    return accessToken;
-  }, [getAccessTokenSilently, audience]);
+  const { getAccessToken } = useAuth();
 
   const getFactory = useCallback(
     async <T>(path: string, headers?: any): Promise<T> => {
@@ -29,7 +16,6 @@ export function useBackend() {
           ...headers,
         },
       });
-
       if (response.ok) {
         return await response.json().catch((error) => {
           console.error(`Error parsing JSON from ${path}:`, error);
@@ -44,8 +30,10 @@ export function useBackend() {
 
   /*      GET Requests      */
 
-  const getProgramsFromBackend = useCallback((): Promise<types.Program[]> => {
-    return getFactory<types.Program[]>("public/programs");
+  const getProgramsFromBackend = useCallback((): Promise<
+    types.ProgramUnparsed[]
+  > => {
+    return getFactory<types.ProgramUnparsed[]>("public/programs");
   }, [getFactory]);
 
   const getLessonsFromBackend = useCallback((): Promise<types.Lesson[]> => {
