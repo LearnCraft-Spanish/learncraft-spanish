@@ -1,59 +1,53 @@
-import { describe, expect, it, vi } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { describe, expect, it } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
-import data from "../../mocks/data/serverlike/mockBackendData.json";
-import quizExamples from "../../mocks/data/serverlike/mockQuizExamplesTable.json";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
+import mockData from "../../mocks/data/serverlike/serverlikeData";
+
 import { useOfficialQuizzes } from "./useOfficialQuizzes";
 
-interface WrapperProps {
-  children: React.ReactNode;
-}
+const { api } = mockData();
+const quizzesTable = api.quizzesTable;
+const quizExamplesTableArray = api.quizExamplesTableArray;
 
-vi.mock("./useBackend", () => ({
-  useBackend: vi.fn(() => ({
-    getLcspQuizzesFromBackend: vi.fn(() => data.api.quizzesTable),
-    getQuizExamplesFromBackend: vi.fn(
-      (recordId: number) => quizExamples[recordId.toString()],
-    ),
-  })),
-}));
-
-describe("useOfficialQuizzes", () => {
-  const queryClient = new QueryClient();
-  const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+async function renderHookLoaded() {
+  const { result } = renderHook(() => useOfficialQuizzes(undefined), {
+    wrapper: MockAllProviders,
+  });
+  await waitFor(() =>
+    expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
   );
 
+  return result;
+}
+
+describe("useOfficialQuizzes", () => {
   describe("officialQuizzesQuery", () => {
     it("runs without crashing", async () => {
-      const { result } = renderHook(() => useOfficialQuizzes(undefined), {
-        wrapper,
-      });
-      await waitFor(() =>
-        expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
-      );
+      const result = await renderHookLoaded();
       expect(result.current.officialQuizzesQuery.data).toBeDefined();
     });
 
     it("data length is mockDataLength", async () => {
-      const { result } = renderHook(() => useOfficialQuizzes(undefined), {
-        wrapper,
-      });
-      await waitFor(() =>
-        expect(result.current.officialQuizzesQuery.data?.length).toBe(
-          data.api.quizzesTable.length,
-        ),
+      const result = await renderHookLoaded();
+      expect(result.current.officialQuizzesQuery.data?.length).toBe(
+        quizzesTable.length,
       );
     });
   });
 
   describe("quizExamplesQuery", () => {
-    // 127 becuase I know recordId 127 is in our quizExamples mock data
-    const recordId = 127;
+    const randomQuizTable =
+      quizExamplesTableArray[
+        Math.floor(Math.random() * quizExamplesTableArray.length)
+      ];
+    const randomQuizNickname = randomQuizTable.quizNickname;
+    const randomQuizId = quizzesTable.find(
+      (quiz) => quiz.quizNickname === randomQuizNickname,
+    )?.recordId;
     it("runs without crashing", async () => {
-      const { result } = renderHook(() => useOfficialQuizzes(recordId), {
-        wrapper,
+      const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.quizExamplesQuery.isSuccess).toBe(true),
@@ -62,12 +56,12 @@ describe("useOfficialQuizzes", () => {
     });
 
     it("data is mockData", async () => {
-      const { result } = renderHook(() => useOfficialQuizzes(recordId), {
-        wrapper,
+      const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.quizExamplesQuery.data).toEqual(
-          quizExamples[recordId.toString()],
+          randomQuizTable.quizExamplesTable,
         ),
       );
     });

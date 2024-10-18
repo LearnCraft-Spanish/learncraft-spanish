@@ -2,7 +2,7 @@ export interface Lesson {
   recordId: number;
   lesson: string;
   vocabIncluded: Array<string>;
-  sortReference: number;
+  sortReference: number | null;
   relatedProgram: number;
   vocabKnown: Array<string>;
 }
@@ -11,6 +11,18 @@ export interface Program {
   recordId: number;
   name: string;
   lessons: Array<Lesson>;
+  cohortACurrentLesson: number;
+  cohortBCurrentLesson: number;
+  cohortCCurrentLesson: number;
+  cohortDCurrentLesson: number;
+  cohortECurrentLesson: number;
+  cohortFCurrentLesson: number;
+}
+
+export interface ProgramUnparsed {
+  recordId: number;
+  name: string;
+  lessons: Array<string>;
   cohortACurrentLesson: number;
   cohortBCurrentLesson: number;
   cohortCCurrentLesson: number;
@@ -168,4 +180,8 @@ export interface CoachingLessons {
   lessonName: string;
   weekRef: number;
   type: string;
+}
+
+export interface WrapperProps {
+  children: React.ReactNode;
 }

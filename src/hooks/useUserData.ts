@@ -1,9 +1,9 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@tanstack/react-query";
+import useAuth from "./useAuth";
 import { useBackend } from "./useBackend";
 
 export function useUserData() {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useAuth();
   const { getUserDataFromBackend } = useBackend();
 
   const userDataQuery = useQuery({

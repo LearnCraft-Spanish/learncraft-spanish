@@ -1,9 +1,12 @@
-import { renderHook, waitFor } from "@testing-library/react";
 import { act } from "react";
 import { beforeAll, describe, expect, it } from "vitest";
-import MockAuth0Provider from "../../mocks/MockAuth0Provider";
+import { renderHook, waitFor } from "@testing-library/react";
+
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
 import type { Quiz, QuizExamplesTable } from "../interfaceDefinitions";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
+import { setupMockAuth } from "../../tests/setupMockAuth";
+
 import { useBackend } from "./useBackend";
 
 const { api } = serverlikeData();
@@ -13,8 +16,9 @@ describe("useBackend Hook", () => {
 
   // Initialize the hook before all tests
   beforeAll(() => {
+    setupMockAuth();
     const { result } = renderHook(() => useBackend(), {
-      wrapper: MockAuth0Provider,
+      wrapper: MockAllProviders,
     });
     hookResult = result.current; // Store the current hook result once
   });
@@ -22,6 +26,25 @@ describe("useBackend Hook", () => {
   it("renders without crashing", async () => {
     await waitFor(() => expect(hookResult).toBeDefined());
     expect(hookResult).toBeDefined();
+  });
+
+  describe("getAccessToken function", () => {
+    it("returns a string when logged in", async () => {
+      const token = await hookResult.getAccessToken();
+      expect(token).toBeDefined();
+    });
+    it("does not return a string when not logged in", async () => {
+      setupMockAuth({
+        isAuthenticated: false,
+        isLoading: false,
+        userName: null,
+      });
+      const unauthHookResult = renderHook(() => useBackend(), {
+        wrapper: MockAllProviders,
+      }).result.current;
+      const token = await unauthHookResult.getAccessToken();
+      expect(token).toBeUndefined();
+    });
   });
 
   // Reusable test function for array-returning functions

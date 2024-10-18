@@ -1,7 +1,7 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import useAuth from "./hooks/useAuth";
 import type { QuizCourse } from "./interfaceDefinitions";
 import MenuButton from "./components/Buttons/MenuButton";
 import Loading from "./components/Loading";
@@ -13,11 +13,12 @@ import OfficialQuiz from "./OfficialQuiz";
 import "./App.css";
 
 export default function LCSPQuizApp(): JSX.Element {
+  const location = useLocation();
   const navigate = useNavigate();
   const { activeStudentQuery } = useActiveStudent();
   const { selectedProgram, selectedToLesson } = useSelectedLesson();
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth();
 
   const [quizCourse, setQuizCourse] = useState("lcsp");
   const [chosenQuiz, setChosenQuiz] = useState(2);
@@ -222,14 +223,20 @@ export default function LCSPQuizApp(): JSX.Element {
       quizCourse &&
       officialQuizzesQuery.data &&
       !quizReady &&
-      window.location.pathname === getCourseUrlFromCode(quizCourse)
+      location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
       const firstQuiz = officialQuizzesQuery.data.filter(
         (item) => item.quizType === quizCourse,
       )[0].quizNumber;
       setChosenQuiz(firstQuiz);
     }
-  }, [quizCourse, quizReady, officialQuizzesQuery.data, getCourseUrlFromCode]);
+  }, [
+    quizCourse,
+    quizReady,
+    officialQuizzesQuery.data,
+    location,
+    getCourseUrlFromCode,
+  ]);
 
   useEffect(() => {
     if (
@@ -237,7 +244,7 @@ export default function LCSPQuizApp(): JSX.Element {
       officialQuizzesQuery.data &&
       selectedProgram?.recordId &&
       selectedToLesson?.recordId &&
-      window.location.pathname === getCourseUrlFromCode(quizCourse)
+      location.pathname === getCourseUrlFromCode(quizCourse)
     ) {
       findDefaultQuiz();
     } else if (!activeStudentQuery.data?.recordId) {
@@ -248,6 +255,7 @@ export default function LCSPQuizApp(): JSX.Element {
     selectedProgram?.recordId,
     selectedToLesson?.recordId,
     officialQuizzesQuery.data,
+    location,
     findDefaultQuiz,
     getCourseUrlFromCode,
     quizCourse,
@@ -265,13 +273,15 @@ export default function LCSPQuizApp(): JSX.Element {
             <h2>Error Loading Quizzes</h2>
           )}
           {officialQuizzesQuery.isSuccess &&
-            chosenQuiz &&
+            !!chosenQuiz &&
             quizCourse === "lcsp" &&
             !hideMenu && (
               <div className="quizSelector">
                 <h3> Official Quizzes</h3>
                 <select
                   className="quizMenu"
+                  role="select"
+                  aria-label="Select Course"
                   value={quizCourse}
                   onChange={(e) => updateQuizCourseWithNavigate(e.target.value)}
                 >
@@ -279,6 +289,8 @@ export default function LCSPQuizApp(): JSX.Element {
                 </select>
                 <select
                   className="quizMenu"
+                  role="select"
+                  aria-label="Select Quiz"
                   value={chosenQuiz}
                   onChange={(e) =>
                     updateChosenQuiz(Number.parseInt(e.target.value) || 0)

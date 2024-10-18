@@ -1,14 +1,12 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { cleanup, render, screen } from "@testing-library/react";
 
 import React from "react";
-import { vi } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { Flashcard } from "../../interfaceDefinitions";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
 
+import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
 import SRSQuizButtons from "./SRSButtons";
-
-const queryClient = new QueryClient();
 
 vi.mock("../../hooks/useStudentFlashcards", () => {
   return {
@@ -40,38 +38,38 @@ describe("component SRSButtons", () => {
 
   it("example difficulty is labeled hard, displays Labeled: Easy", () => {
     render(
-      <QueryClientProvider client={queryClient}>
+      <MockAllProviders>
         <SRSQuizButtons
           currentExample={currentExampleEasy}
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
         />
-      </QueryClientProvider>,
+      </MockAllProviders>,
     );
     expect(screen.getByText("Labeled: Easy")).toBeTruthy();
   });
   it("example difficulty is labeled hard, displays Labeled: Hard", () => {
     render(
-      <QueryClientProvider client={queryClient}>
+      <MockAllProviders>
         <SRSQuizButtons
           currentExample={currentExampleHard}
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
         />
-      </QueryClientProvider>,
+      </MockAllProviders>,
     );
     expect(screen.getByText("Labeled: Hard")).toBeTruthy();
   });
 
   it("answer showing and no difficulty set, shows setting buttons", () => {
     render(
-      <QueryClientProvider client={queryClient}>
+      <MockAllProviders>
         <SRSQuizButtons
           currentExample={currentExample}
           answerShowing
           incrementExampleNumber={incrementExampleNumber}
         />
-      </QueryClientProvider>,
+      </MockAllProviders>,
     );
     expect(screen.getByText("This was easy")).toBeTruthy();
     expect(screen.getByText("This was hard")).toBeTruthy();
@@ -84,26 +82,26 @@ describe("component SRSButtons", () => {
   describe("onClick functions", () => {
     it("increaseDifficulty", () => {
       render(
-        <QueryClientProvider client={queryClient}>
+        <MockAllProviders>
           <SRSQuizButtons
             currentExample={currentExample}
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
-        </QueryClientProvider>,
+        </MockAllProviders>,
       );
       screen.getByText("This was hard").click();
       expect(incrementExampleNumber).toHaveBeenCalled();
     });
     it("decreaseDifficulty", () => {
       render(
-        <QueryClientProvider client={queryClient}>
+        <MockAllProviders>
           <SRSQuizButtons
             currentExample={currentExample}
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
-        </QueryClientProvider>,
+        </MockAllProviders>,
       );
       screen.getByText("This was easy").click();
       expect(incrementExampleNumber).toHaveBeenCalled();
@@ -112,13 +110,13 @@ describe("component SRSButtons", () => {
   describe("handing of undefined values", () => {
     it("doesnt call incrementExample when error finding relatedExample", () => {
       render(
-        <QueryClientProvider client={queryClient}>
+        <MockAllProviders>
           <SRSQuizButtons
             currentExample={{ ...currentExample, recordId: 999 }}
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
-        </QueryClientProvider>,
+        </MockAllProviders>,
       );
       screen.getByText("This was easy").click();
       expect(incrementExampleNumber).not.toHaveBeenCalled();

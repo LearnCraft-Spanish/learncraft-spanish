@@ -1,11 +1,11 @@
-import * as auth0 from "@auth0/auth0-react";
-import { cleanup, render, screen } from "@testing-library/react";
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+
+import createMockAuth from "../../../mocks/hooks/useMockAuth";
+import useAuth from "../../hooks/useAuth";
 
 import LoginButton from "./LoginButton";
-
-vi.mock("@auth0/auth0-react");
 
 describe("login button", () => {
   afterEach(() => {
@@ -14,31 +14,23 @@ describe("login button", () => {
   });
 
   it("renders without crashing", () => {
-    (auth0 as any).useAuth0 = vi.fn().mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      loginWithRedirect: vi.fn(),
-    });
+    const loggedOutAuth = createMockAuth({ isAuthenticated: false });
+    vi.mocked(useAuth).mockReturnValue(loggedOutAuth);
     render(<LoginButton />);
-    expect(screen.getByText("Log in/Register")).toBeTruthy();
+    expect(screen.getByText("Log in/Register")).toBeInTheDocument();
   });
   it("does not render when authenticated", () => {
-    (auth0 as any).useAuth0 = vi.fn().mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-    });
+    const loggedInAuth = createMockAuth({ isAuthenticated: true });
+    vi.mocked(useAuth).mockReturnValue(loggedInAuth);
     render(<LoginButton />);
-    expect(screen.queryByText("Log in/Register")).toBeNull();
+    expect(screen.queryByText("Log in/Register")).not.toBeInTheDocument();
   });
   it("calls loginWithRedirect when clicked", () => {
-    const loginWithRedirect = vi.fn();
-    (auth0 as any).useAuth0 = vi.fn().mockReturnValue({
-      isAuthenticated: false,
-      isLoading: false,
-      loginWithRedirect,
-    });
+    const loggedOutAuth = createMockAuth({ isAuthenticated: false });
+    vi.mocked(useAuth).mockReturnValue(loggedOutAuth);
     render(<LoginButton />);
+    expect(screen.getByText("Log in/Register")).toBeInTheDocument();
     screen.getByText("Log in/Register").click();
-    expect(loginWithRedirect).toHaveBeenCalled();
+    expect(loggedOutAuth.login).toHaveBeenCalled();
   });
 });

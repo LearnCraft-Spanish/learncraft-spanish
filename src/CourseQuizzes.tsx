@@ -80,7 +80,7 @@ export default function CourseQuizzes({
     <div className="quizInterface">
       {/* Quiz Selector */}
       {officialQuizzesQuery.data &&
-        chosenQuiz &&
+        !!chosenQuiz &&
         quizCourse !== "lcsp" &&
         !hideMenu && (
           <>
@@ -88,6 +88,8 @@ export default function CourseQuizzes({
             <div className="quizSelector">
               <select
                 className="quizMenu"
+                role="select"
+                aria-label="Select Course"
                 value={quizCourse}
                 onChange={(e) => updateQuizCourseWithNavigate(e.target.value)}
               >
@@ -95,6 +97,8 @@ export default function CourseQuizzes({
               </select>
               <select
                 className="quizMenu"
+                role="select"
+                aria-label="Select Quiz"
                 value={chosenQuiz}
                 onChange={(e) =>
                   updateChosenQuiz(Number.parseInt(e.target.value))

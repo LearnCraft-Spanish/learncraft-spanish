@@ -4,8 +4,8 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from "../../functions/formatFlashcardText";
-import play from "../../assets/icons/play_dark.svg";
-import pause from "../../assets/icons/pause_dark.svg";
+import play from "../../resources/icons/play_dark.svg";
+import pause from "../../resources/icons/pause_dark.svg";
 
 import { useStudentFlashcards } from "../../hooks/useStudentFlashcards";
 import "./Quiz.css";

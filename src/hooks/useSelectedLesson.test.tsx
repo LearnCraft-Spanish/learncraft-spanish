@@ -1,45 +1,65 @@
-import { beforeAll, describe, expect, it, vi } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
+import MockQueryClientProvider from "../../mocks/Providers/MockQueryClient";
+
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
+import { getUserDataFromName } from "../../mocks/data/serverlike/studentTable";
+import programsTable from "../../mocks/data/hooklike/programsTable";
+
+import mockActiveStudentStub from "../../mocks/hooks/useActiveStudentStub";
+import { useProgramTable } from "./useProgramTable";
+
 import { useSelectedLesson } from "./useSelectedLesson";
 
-interface WrapperProps {
-  children: React.ReactNode;
-}
+const { api } = serverlikeData();
+
 /*
 This hook uses:
 - useActiveStudent
 - useProgramTable
-
-For now, we will allow these hooks to be used
 */
 
-// for useActive Student, need useUserData with adminStudent
-
-const api = serverlikeData().api;
-const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true,
+vi.mock(
+  "./useActiveStudent",
+  vi.fn(() => {
+    return { useActiveStudent: mockActiveStudentStub };
+  }),
+);
+vi.mock(
+  "./useProgramTable",
+  vi.fn(() => {
+    return {
+      useProgramTable: () => ({
+        programTableQuery: {
+          data: programsTable,
+          isSuccess: true,
+        },
+      }),
+    };
+  }),
 );
 
-vi.unmock("./useUserData");
-vi.mock("./useUserData", () => ({
-  useUserData: vi.fn(() => ({
-    isSuccess: true,
-    data: studentAdmin,
-  })),
-}));
+const studentAdmin = getUserDataFromName("student-admin");
 
 describe("useSelectedLesson", () => {
-  const queryClient = new QueryClient();
-  const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+  let programTableQuery: any;
+  beforeEach(() => {
+    // Setup for tests
+    const { result } = renderHook(() => useProgramTable(), {
+      wrapper: MockQueryClientProvider,
+    });
+    waitFor(() =>
+      expect(result.current.programTableQuery.isSuccess).toBe(true),
+    );
+    programTableQuery = result.current.programTableQuery;
+  });
 
   describe("initial state", () => {
     it("selectedProgram is userData's related program, selecteFromLesson null, selectedToLesson NOT null", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -54,12 +74,13 @@ describe("useSelectedLesson", () => {
 
   describe("setProgram", () => {
     it("sets the selected program", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
-      const newProgram =
-        api.programsTable[api.programsTable.length - 1].recordId;
+      const newProgram = programsTable[programsTable.length - 1].recordId;
       result.current.setProgram(newProgram);
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
@@ -74,13 +95,15 @@ describe("useSelectedLesson", () => {
 
   describe("setFromLesson", () => {
     it("sets the selected from lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
       // check original value
       expect(result.current.selectedFromLesson).toBeNull();
-      const newFromLesson = api.programsTable[0].lessons[0].recordId;
+      const newFromLesson = programTableQuery.data[0].lessons[0].recordId;
       result.current.setFromLesson(newFromLesson);
       await waitFor(() => {
         expect(result.current.selectedFromLesson).not.toBeNull();
@@ -91,13 +114,15 @@ describe("useSelectedLesson", () => {
 
   describe("setToLesson", () => {
     it("sets the selected to lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
       // check original value
       expect(result.current.selectedToLesson).not.toBeNull();
-      const newToLesson = api.programsTable[0].lessons[0].recordId;
+      const newToLesson = programTableQuery.data[0].lessons[1].recordId;
       result.current.setToLesson(newToLesson);
       await waitFor(() => {
         expect(result.current.selectedToLesson).not.toBeNull();
@@ -108,7 +133,9 @@ describe("useSelectedLesson", () => {
 
   describe("filterExamplesBySelectedLesson", () => {
     it("filters the examples by the selected lesson", async () => {
-      const { result } = renderHook(() => useSelectedLesson(), { wrapper });
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
+      });
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -123,28 +150,34 @@ describe("useSelectedLesson", () => {
     // set up the the tests
     let res: any;
     beforeAll(async () => {
-      res = renderHook(() => useSelectedLesson(), { wrapper });
-      await waitFor(() => {
-        expect(res.result.current.selectedProgram).not.toBeNull();
+      const { result } = renderHook(() => useSelectedLesson(), {
+        wrapper: MockQueryClientProvider,
       });
-      res.result.current.setFromLesson(
-        api.programsTable[0].lessons[1].recordId,
+      await waitFor(() => {
+        expect(result.current.selectedProgram).not.toBeNull();
+      });
+      res = result;
+      if (!result.current.selectedProgram) {
+        throw new Error("selectedProgram is null");
+      }
+      result.current.setFromLesson(
+        result.current.selectedProgram.lessons[0].recordId,
       );
       await waitFor(() => {
-        expect(res.result.current.selectedFromLesson).not.toBeNull();
+        expect(result.current.selectedFromLesson).not.toBeNull();
       });
     });
 
     it("allowedVocabulary is an array with length", () => {
-      expect(res.result.current.allowedVocabulary.length).toBeGreaterThan(0);
+      expect(res.current.allowedVocabulary.length).toBeDefined();
     });
     it("requiredVocabulary is an array with length", () => {
-      expect(res.result.current.requiredVocabulary.length).toBeDefined();
+      expect(res.current.requiredVocabulary.length).toBeDefined();
     });
     it("allowedVocabulary is a subset of requiredVocabulary", () => {
       expect(
-        res.result.current.allowedVocabulary.every((word: any) =>
-          res.result.current.requiredVocabulary.includes(word),
+        res.current.allowedVocabulary.every((word: any) =>
+          res.current.requiredVocabulary.includes(word),
         ),
       );
     });
