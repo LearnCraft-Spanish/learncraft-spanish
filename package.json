@@ -16,6 +16,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "refresh-mockdata": "tsx .github/workflows/update-cache.ts",
     "test": "vitest run --coverage",
     "predeploy": "pnpm run build",
     "lint": "eslint .",
@@ -87,7 +88,7 @@
     "jsdom": "^25.0.1",
     "msw": "^2.4.9",
     "prettier": "^3.3.3",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.19.1",
     "vite": "^5.4.8",
     "vitest": "^2.1.2"
   },

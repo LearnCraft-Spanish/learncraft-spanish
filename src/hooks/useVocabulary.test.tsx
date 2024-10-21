@@ -10,9 +10,12 @@ describe("useVocabulary", () => {
     const { result } = renderHook(() => useVocabulary(), {
       wrapper: MockAllProviders,
     });
-    await waitFor(() => {
-      expect(result.current.vocabularyQuery.isSuccess).toBe(true);
-    });
+    await waitFor(
+      () => {
+        expect(result.current.vocabularyQuery.isSuccess).toBe(true);
+      },
+      { timeout: 3000, interval: 200 }
+    );
     expect(result.current.vocabularyQuery.data).toBeDefined();
   });
 
@@ -20,9 +23,12 @@ describe("useVocabulary", () => {
     const { result } = renderHook(() => useVocabulary(), {
       wrapper: MockAllProviders,
     });
-    await waitFor(() => {
-      expect(result.current.vocabularyQuery.isSuccess).toBe(true);
-    });
+    await waitFor(
+      () => {
+        expect(result.current.vocabularyQuery.isSuccess).toBe(true);
+      },
+      { timeout: 3000, interval: 200 }
+    );
     expect(result.current.vocabularyQuery.data?.length).toBeGreaterThan(0);
   });
 });

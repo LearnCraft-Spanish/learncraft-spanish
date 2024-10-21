@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { Route, useLocation } from "react-router-dom";
 import type { UserData } from "./interfaceDefinitions";
+import Coaching from "./components/Coaching/Coaching";
 
 import AudioBasedReview from "./components/AudioBasedReview/AudioBasedReview";
 import Loading from "./components/Loading";
@@ -105,13 +106,13 @@ export const App: React.FC = () => {
               key={student.recordId}
               value={student.recordId}
               label={`${student.name} -- ${studentEmail}`}
-            />,
+            />
           );
         }
       });
       const studentSelectorSortFunction = (
         a: ReactElement,
-        b: ReactElement,
+        b: ReactElement
       ) => {
         const aName = a.props.label;
         const bName = b.props.label;
@@ -296,21 +297,19 @@ export const App: React.FC = () => {
         />
         {
           // Coaching Section still under construction
-          /*
-        <Route
-          path="/coaching"
-          element={
-            userData?.isAdmin && (
-              <Coaching
-                contextual={contextual}
-                openContextual={openContextual}
-                closeContextual={closeContextual}
-                ref={currentContextual}
-              />
-            )
-          }
-        />
-        */
+          <Route
+            path="/coaching"
+            element={
+              userDataQuery.data?.isAdmin && (
+                <Coaching
+                  contextual={contextual}
+                  openContextual={openContextual}
+                  closeContextual={closeContextual}
+                  ref={currentContextual}
+                />
+              )
+            }
+          />
         }
         <Route path="/*" element={<NotFoundPage />} />
       </SentryRoutes>
