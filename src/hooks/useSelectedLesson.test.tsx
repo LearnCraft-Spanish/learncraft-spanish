@@ -20,6 +20,7 @@ import { setupMockAuth } from "../../tests/setupMockAuth";
 // Types
 import type { UserData } from "../interfaceDefinitions";
 
+import { useActiveStudent } from "./useActiveStudent";
 import { useSelectedLesson } from "./useSelectedLesson";
 
 const { api } = serverlikeData();
@@ -29,7 +30,7 @@ vi.mock(
   vi.fn(() => {
     return {
       useActiveStudent: () =>
-        mockActiveStudentStub({ studentName: "student-admin" }),
+        mockActiveStudentStub({ studentName: "student-lcsp" }),
     };
   }),
 );
@@ -59,8 +60,8 @@ describe("useSelectedLesson", () => {
   let student: UserData | null;
 
   beforeEach(() => {
-    setupMockAuth({ userName: "student-admin" });
-    student = getUserDataFromName("student-admin");
+    setupMockAuth({ userName: "student-lcsp" });
+    student = getUserDataFromName("student-lcsp");
   });
 
   afterEach(() => {
@@ -93,7 +94,7 @@ describe("useSelectedLesson", () => {
       // newProgram is not the current program
       expect(result.current.selectedProgram?.recordId).not.toBe(newProgram);
       // Set new program
-      act(() => result.current.setProgram(newProgram));
+      act(() => result.current.setProgram(newProgram.toString()));
       await waitFor(() => {
         expect(result.current.selectedProgram).not.toBeNull();
       });
@@ -117,7 +118,7 @@ describe("useSelectedLesson", () => {
         throw new Error("currentProgram is null");
       }
       const newFromLesson = currentProgram?.lessons[1].recordId;
-      result.current.setFromLesson(newFromLesson);
+      result.current.setFromLesson(newFromLesson.toString());
       await waitFor(() => {
         expect(result.current.selectedFromLesson).not.toBeNull();
       });
@@ -140,7 +141,9 @@ describe("useSelectedLesson", () => {
         throw new Error("currentProgram is null");
       }
       const newToLesson = currentProgram.lessons[1].recordId;
-      result.current.setToLesson(newToLesson);
+      act(() => {
+        result.current.setToLesson(newToLesson.toString());
+      });
       await waitFor(() => {
         expect(result.current.selectedToLesson).not.toBeNull();
       });

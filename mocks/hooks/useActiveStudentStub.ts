@@ -71,8 +71,14 @@ export default function mockActiveStudentStub({
         // etc for futureproofing
       }
     };
+    // Below is a TEMPORY fix for the active lesson
+    // activeLesson should be anm object of type Lesson, but at least one test required just a recordId
+    // so this is the current bandaid. forgive me for my sins
     const activeLesson = getCohortLesson(cohort);
-    return activeLesson || null;
+    if (!activeLesson) {
+      return null;
+    }
+    return { recordId: activeLesson };
   }
 
   const activeProgram = getActiveProgram();
