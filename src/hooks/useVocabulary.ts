@@ -88,18 +88,9 @@ export function useVocabulary() {
           );
         }
       });
-      if (!vocab) {
-        throw new Error("Failed to fetch vocabulary data");
-      }
       return vocab.sort(sortVocab);
     } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.error(e.message);
-        throw new Error("Failed to fetch vocabulary");
-      } else {
-        console.error("An unexpected error occurred:", e);
-        throw new Error("Failed to fetch vocabulary");
-      }
+      throw new Error(`Error: Failed to fetch vocabulary: ${e}`);
     }
   };
 

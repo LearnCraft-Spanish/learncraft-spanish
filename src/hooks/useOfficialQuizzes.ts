@@ -53,26 +53,7 @@ export function useOfficialQuizzes(quizNumber: number | undefined) {
       }
     });
 
-    function sortQuizzes(a: Quiz, b: Quiz) {
-      const aNumber = a.quizNumber;
-      const bNumber = b.quizNumber;
-      const aLetter = a.quizLetter;
-      const bLetter = b.quizLetter;
-      if (aNumber === bNumber) {
-        if (aLetter && bLetter) {
-          if (aLetter < bLetter) {
-            return -1;
-          } else {
-            return 1;
-          }
-        } else {
-          return 0;
-        }
-      } else {
-        return aNumber - bNumber;
-      }
-    }
-    quizzes.sort(sortQuizzes);
+    quizzes.sort();
     return quizzes;
   }, []);
 
