@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
 import { HttpResponse, http } from "msw";
@@ -33,13 +33,10 @@ describe("useVocabulary", () => {
   describe("failing", () => {
     it("vocabularyQuery data is undefined", async () => {
       server.use(
-        http.get(
-          `${backendUrl}public/vocabulary`,
-          () => {
+        http.get(`${backendUrl}public/vocabulary`, () => {
           return HttpResponse.json(undefined);
-          }, 
-        )
-      )
+        }),
+      );
       const { result } = renderHook(() => useVocabulary(), {
         wrapper: MockAllProviders,
       });
@@ -49,7 +46,7 @@ describe("useVocabulary", () => {
       expect(result.current.vocabularyQuery.data).not.toBeDefined();
     });
 
-    it('vocabularyQuery data is undefined when user is not an admin or student', async () => {
+    it("vocabularyQuery data is undefined when user is not an admin or student", async () => {
       setupMockAuth({ userName: "limited" });
       const { result } = renderHook(() => useVocabulary(), {
         wrapper: MockAllProviders,

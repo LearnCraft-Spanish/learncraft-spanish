@@ -27,7 +27,7 @@ describe("useVerifiedExamples", () => {
     });
     await waitFor(
       () => expect(result.current.data?.length).toBeGreaterThan(0),
-      { timeout: 3000, interval: 200 }
+      { timeout: 3000, interval: 200 },
     );
   });
   describe("when user is not an admin or student", () => {
@@ -38,9 +38,12 @@ describe("useVerifiedExamples", () => {
       const { result } = renderHook(() => useVerifiedExamples(), {
         wrapper: MockAllProviders,
       });
-      await waitFor(() => {
+      await waitFor(
+        () => {
           expect(result.current.isSuccess).toBe(false);
-      }, { timeout: 10000, interval: 200 });
+        },
+        { timeout: 10000, interval: 200 },
+      );
       expect(result.current.isSuccess).toBe(false);
       expect(result.current.data).toEqual(undefined);
     });

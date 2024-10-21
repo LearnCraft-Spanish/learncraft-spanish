@@ -71,7 +71,11 @@ export function useSelectedLesson() {
       }
     }
     return requiredVocabulary;
-  }, [selectionState.fromLesson?.recordId, selectionState.program, selectionState.toLesson?.recordId]);
+  }, [
+    selectionState.fromLesson?.recordId,
+    selectionState.program,
+    selectionState.toLesson?.recordId,
+  ]);
 
   // Function to filter flashcards by allowed vocabulary
   const filterExamplesBySelectedLesson = useCallback(

@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
+// import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
 import FlashcardManager from "./FlashcardManager";
 
 describe("component FlashcardManager", () => {
@@ -14,9 +14,9 @@ describe("component FlashcardManager", () => {
   // });
   it("renders", async () => {
     render(<FlashcardManager />, { wrapper: MockAllProviders });
-    await waitFor(() => expect(screen.getByText("Flashcard Manager")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Flashcard Manager")).toBeInTheDocument(),
+    );
     expect(screen.getByText("Flashcard Manager")).toBeInTheDocument();
   });
 });
-
-
