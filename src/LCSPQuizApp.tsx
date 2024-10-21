@@ -7,11 +7,11 @@ import React, {
 } from "react";
 
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { c } from "vite/dist/node/types.d-aGj9QkWt";
 import useAuth from "./hooks/useAuth";
 import quizCourses from "./functions/QuizCourseList";
 import MenuButton from "./components/Buttons/MenuButton";
 import Loading from "./components/Loading";
-import { useActiveStudent } from "./hooks/useActiveStudent";
 import { useOfficialQuizzes } from "./hooks/useOfficialQuizzes";
 import { useSelectedLesson } from "./hooks/useSelectedLesson";
 import OfficialQuiz from "./OfficialQuiz";
@@ -20,7 +20,6 @@ import "./App.css";
 export default function LCSPQuizApp(): JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
-  const { activeStudentQuery } = useActiveStudent();
   const { selectedProgram, selectedToLesson } = useSelectedLesson();
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
   const { isAuthenticated, isLoading } = useAuth();
@@ -38,6 +37,7 @@ export default function LCSPQuizApp(): JSX.Element {
     const foundCourse = courseCodes.find(
       (code: string) => code === splitPath[2]
     );
+    console.log("Current Course:", foundCourse || "lcsp");
     return foundCourse || "lcsp";
   }, [location.pathname]);
 
@@ -70,6 +70,7 @@ export default function LCSPQuizApp(): JSX.Element {
 
   const updateQuizCourse = useCallback(
     (courseCode: string) => {
+      console.log("New Course:", courseCode);
       const newCourse = quizCourses.find(
         (course) => course.code === courseCode
       );
@@ -83,7 +84,7 @@ export default function LCSPQuizApp(): JSX.Element {
     setChosenQuiz(quizNumber);
   }, []);
 
-  const makeCourseList = useCallback(() => {
+  const makeCourseList = () => {
     const courseList: React.JSX.Element[] = [];
     let i = 1;
     quizCourses.forEach((course) => {
@@ -95,8 +96,11 @@ export default function LCSPQuizApp(): JSX.Element {
       courseList.push(courseOption);
       i++;
     });
+    if (!courseList) {
+      return null;
+    }
     return courseList;
-  }, []);
+  };
 
   const makeQuizSelections = useCallback(() => {
     if (officialQuizzesQuery.data) {
@@ -134,51 +138,12 @@ export default function LCSPQuizApp(): JSX.Element {
           i++;
         });
       }
+      if (!quizSelections) {
+        return null;
+      }
       return quizSelections;
     }
   }, [currentCourseCode, officialQuizzesQuery.data]);
-
-  const findDefaultCourse = useCallback(() => {
-    const activeCourse = quizCourses.find(
-      (course) => course.name === selectedProgram?.name
-    );
-    if (
-      location.pathname === "/officialquizzes" &&
-      activeCourse &&
-      defaultUnselected.current
-    ) {
-      defaultUnselected.current = false;
-      const urlToNavigate = activeCourse.url;
-      navigate(urlToNavigate);
-    }
-  }, [location.pathname, selectedProgram, navigate]);
-
-  const findDefaultQuiz = useCallback(() => {
-    if (currentCourseCode === selectedCourseCode && selectedToLesson) {
-      const selectedLessonArray = selectedToLesson?.lesson.split(" ");
-      if (selectedLessonArray && officialQuizzesQuery.data) {
-        const selectedLessonString = selectedLessonArray.slice(-1)[0];
-        const selectedLessonNumber = Number.parseInt(selectedLessonString);
-        let lastQuizBeforeCurrentLesson = 0;
-        const activeQuizzes = officialQuizzesQuery.data.filter(
-          (item) => item.quizType === currentCourseCode
-        );
-        activeQuizzes.forEach((item) => {
-          if (item.quizNumber <= selectedLessonNumber) {
-            lastQuizBeforeCurrentLesson = item.quizNumber;
-          }
-        });
-        if (lastQuizBeforeCurrentLesson > 0) {
-          setChosenQuiz(lastQuizBeforeCurrentLesson);
-        }
-      }
-    }
-  }, [
-    selectedCourseCode,
-    currentCourseCode,
-    selectedToLesson,
-    officialQuizzesQuery.data,
-  ]);
 
   const startQuiz = useCallback(() => {
     if (chosenQuiz) {
@@ -214,15 +179,33 @@ export default function LCSPQuizApp(): JSX.Element {
         />
       );
     });
+    if (!routes) {
+      return null;
+    }
     return routes;
   }
 
+  // Ensures the default course is selected, but only when the quiz opens
+  // Finds the student's course and navigates to it
   useEffect(() => {
     if (defaultUnselected.current) {
-      defaultUnselected.current = false;
-      findDefaultCourse();
+      if (selectedProgram?.name) {
+        const activeCourse = quizCourses.find(
+          (course) => course.name === selectedProgram.name
+        );
+        if (
+          location.pathname === "/officialquizzes" &&
+          activeCourse &&
+          defaultUnselected.current
+        ) {
+          defaultUnselected.current = false;
+          const urlToNavigate = activeCourse.url;
+          defaultUnselected.current = false;
+          navigate(urlToNavigate);
+        }
+      }
     }
-  }, [findDefaultCourse]);
+  }, [selectedProgram?.name, location.pathname, navigate]);
 
   // Ensures the quiz menu shows when quiz is not active.
   useEffect(() => {
@@ -231,32 +214,50 @@ export default function LCSPQuizApp(): JSX.Element {
     }
   }, [quizPath, hideMenu, makeMenuShow]);
 
+  // Update chosen quiz when selected course changes
   useEffect(() => {
-    if (officialQuizzesQuery.data && !quizPath) {
-      const firstQuiz = officialQuizzesQuery.data.filter(
-        (item) => item.quizType === currentCourseCode
-      )[0].quizNumber;
-      setChosenQuiz(firstQuiz);
+    if (officialQuizzesQuery.data) {
+      if (currentCourseCode === selectedCourseCode && selectedToLesson) {
+        const selectedLessonArray = selectedToLesson?.lesson.split(" ");
+        if (selectedLessonArray) {
+          const selectedLessonString = selectedLessonArray.slice(-1)[0];
+          const selectedLessonNumber = Number.parseInt(selectedLessonString);
+          let lastQuizBeforeCurrentLesson = 0;
+          const activeQuizzes = officialQuizzesQuery.data.filter(
+            (item) => item.quizType === currentCourseCode
+          );
+          activeQuizzes.forEach((item) => {
+            if (item.quizNumber <= selectedLessonNumber) {
+              lastQuizBeforeCurrentLesson = item.quizNumber;
+            }
+          });
+          if (lastQuizBeforeCurrentLesson > 0) {
+            setChosenQuiz(lastQuizBeforeCurrentLesson);
+          }
+        }
+      } else {
+        const firstQuiz = officialQuizzesQuery.data.filter(
+          (item) => item.quizType === currentCourseCode
+        )[0].quizNumber;
+        setChosenQuiz(firstQuiz);
+      }
     }
-  }, [quizPath, currentCourseCode, officialQuizzesQuery.data]);
-
-  useEffect(() => {
-    if (selectedToLesson) {
-      findDefaultQuiz();
-    }
-  }, [currentCourseCode, selectedToLesson, findDefaultQuiz]);
+  }, [
+    selectedCourseCode,
+    selectedToLesson,
+    currentCourseCode,
+    officialQuizzesQuery.data,
+  ]);
 
   return (
     <>
       {isAuthenticated && !isLoading && (
         <div className="quizInterface">
           {/* Quiz Selector */}
-          {activeStudentQuery.isSuccess && officialQuizzesQuery.isLoading && (
+          {officialQuizzesQuery.isLoading && (
             <Loading message="Loading Quizzes..." />
           )}
-          {activeStudentQuery.isSuccess && officialQuizzesQuery.isError && (
-            <h2>Error Loading Quizzes</h2>
-          )}
+          {officialQuizzesQuery.isError && <h2>Error Loading Quizzes</h2>}
           {officialQuizzesQuery.isSuccess && chosenQuiz && !hideMenu && (
             <div className="quizSelector">
               <h3> Official Quizzes</h3>

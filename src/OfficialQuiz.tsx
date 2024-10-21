@@ -76,15 +76,9 @@ export default function OfficialQuiz({
 
   useEffect(() => {
     if (quizExamplesQuery.isSuccess && !quizExamplesQuery.data?.length) {
-      makeMenuShow();
       navigate("..");
     }
-  }, [
-    quizExamplesQuery.isSuccess,
-    quizExamplesQuery.data,
-    makeMenuShow,
-    navigate,
-  ]);
+  }, [quizExamplesQuery.isSuccess, quizExamplesQuery.data, navigate]);
 
   return (
     <>
