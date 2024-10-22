@@ -39,7 +39,7 @@ export default function OfficialQuiz({
       const quizNumberAsString = thisQuiz.toString();
       const lessonNumber = quizNumberAsString[0];
       const thisQuizObject = officialQuizzesQuery.data.find(
-        (quiz) => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse
+        (quiz) => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
       );
       const subtitle = thisQuizObject
         ? thisQuizObject.subtitle
@@ -66,7 +66,7 @@ export default function OfficialQuiz({
   useEffect(() => {
     if (officialQuizzesQuery.data && thisQuiz) {
       const quizToSearch = officialQuizzesQuery.data.find(
-        (quiz) => quiz.quizNumber === thisQuiz
+        (quiz) => quiz.quizNumber === thisQuiz,
       );
       if (quizToSearch?.recordId) {
         setThisQuizID(quizToSearch.recordId);

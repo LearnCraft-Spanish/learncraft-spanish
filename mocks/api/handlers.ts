@@ -53,7 +53,7 @@ export const handlers = [
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
         return quizExamples.quizNickname === quizObject.quizNickname;
-      }
+      },
     );
     if (!quizExamplesObject) {
       throw new Error("Quiz examples not found");
@@ -68,7 +68,7 @@ export const handlers = [
   http.get(`${backendUrl}my-data`, ({ request }) => {
     const email = getEmailFromRequest(request);
     const student = apiData.allStudentsTable.find(
-      (student) => student.emailAddress === email
+      (student) => student.emailAddress === email,
     );
     return HttpResponse.json(student);
   }),

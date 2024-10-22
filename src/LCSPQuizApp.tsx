@@ -7,7 +7,6 @@ import React, {
 } from "react";
 
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import { c } from "vite/dist/node/types.d-aGj9QkWt";
 import useAuth from "./hooks/useAuth";
 import quizCourses from "./functions/QuizCourseList";
 import MenuButton from "./components/Buttons/MenuButton";
@@ -28,14 +27,14 @@ export default function LCSPQuizApp(): JSX.Element {
   const defaultUnselected = useRef(true);
 
   const selectedCourseCode = quizCourses.find(
-    (course) => course.name === selectedProgram?.name
+    (course) => course.name === selectedProgram?.name,
   )?.code;
 
   const currentCourseCode = useMemo(() => {
     const splitPath = location.pathname.split("/");
     const courseCodes = quizCourses.map((course) => course.code);
     const foundCourse = courseCodes.find(
-      (code: string) => code === splitPath[2]
+      (code: string) => code === splitPath[2],
     );
     console.log("Current Course:", foundCourse || "lcsp");
     return foundCourse || "lcsp";
@@ -72,12 +71,12 @@ export default function LCSPQuizApp(): JSX.Element {
     (courseCode: string) => {
       console.log("New Course:", courseCode);
       const newCourse = quizCourses.find(
-        (course) => course.code === courseCode
+        (course) => course.code === courseCode,
       );
       const urlToNavigate = newCourse?.url || "";
       navigate(urlToNavigate);
     },
-    [navigate]
+    [navigate],
   );
 
   const updateChosenQuiz = useCallback((quizNumber: number) => {
@@ -105,11 +104,11 @@ export default function LCSPQuizApp(): JSX.Element {
   const makeQuizSelections = useCallback(() => {
     if (officialQuizzesQuery.data) {
       const quizList = officialQuizzesQuery.data.filter(
-        (item) => item.quizType === currentCourseCode
+        (item) => item.quizType === currentCourseCode,
       );
       const quizSelections: React.JSX.Element[] = [];
       const courseObj = quizCourses.find(
-        (course) => course.code === currentCourseCode
+        (course) => course.code === currentCourseCode,
       );
       const courseName = courseObj?.name || "";
       let i = 1;
@@ -121,7 +120,7 @@ export default function LCSPQuizApp(): JSX.Element {
               {item.lessonNumber}
               {", "}
               {item.subtitle}
-            </option>
+            </option>,
           );
           i++;
         });
@@ -133,7 +132,7 @@ export default function LCSPQuizApp(): JSX.Element {
               {courseName}
               {" Quiz "}
               {item.quizNumber}
-            </option>
+            </option>,
           );
           i++;
         });
@@ -176,7 +175,7 @@ export default function LCSPQuizApp(): JSX.Element {
               ></Route>
             </Routes>
           }
-        />
+        />,
       );
     });
     if (!routes) {
@@ -191,7 +190,7 @@ export default function LCSPQuizApp(): JSX.Element {
     if (defaultUnselected.current) {
       if (selectedProgram?.name) {
         const activeCourse = quizCourses.find(
-          (course) => course.name === selectedProgram.name
+          (course) => course.name === selectedProgram.name,
         );
         if (
           location.pathname === "/officialquizzes" &&
@@ -224,7 +223,7 @@ export default function LCSPQuizApp(): JSX.Element {
           const selectedLessonNumber = Number.parseInt(selectedLessonString);
           let lastQuizBeforeCurrentLesson = 0;
           const activeQuizzes = officialQuizzesQuery.data.filter(
-            (item) => item.quizType === currentCourseCode
+            (item) => item.quizType === currentCourseCode,
           );
           activeQuizzes.forEach((item) => {
             if (item.quizNumber <= selectedLessonNumber) {
@@ -237,7 +236,7 @@ export default function LCSPQuizApp(): JSX.Element {
         }
       } else {
         const firstQuiz = officialQuizzesQuery.data.filter(
-          (item) => item.quizType === currentCourseCode
+          (item) => item.quizType === currentCourseCode,
         )[0].quizNumber;
         setChosenQuiz(firstQuiz);
       }
