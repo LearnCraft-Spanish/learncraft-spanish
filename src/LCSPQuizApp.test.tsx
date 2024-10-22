@@ -21,7 +21,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -33,7 +33,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -45,7 +45,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -57,7 +57,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>
+      </MockAllProviders>,
     );
 
     await waitFor(() => {
@@ -92,11 +92,11 @@ describe("official quiz component", () => {
         render(
           <MockAllProviders route="/officialquizzes" childRoutes>
             <LCSPQuizApp />
-          </MockAllProviders>
+          </MockAllProviders>,
         );
 
         const courseMenu: HTMLSelectElement = await waitFor(
-          () => screen.getByLabelText(/select course/i) as HTMLSelectElement
+          () => screen.getByLabelText(/select course/i) as HTMLSelectElement,
         );
 
         if (courseMenu.value !== courseCode) {
@@ -113,7 +113,7 @@ describe("official quiz component", () => {
         console.log(courseMenu.value);
 
         const lessonMenu: HTMLSelectElement = await waitFor(
-          () => screen.getByLabelText(/select quiz/i) as HTMLSelectElement
+          () => screen.getByLabelText(/select quiz/i) as HTMLSelectElement,
         );
 
         await act(async () => {
@@ -126,13 +126,13 @@ describe("official quiz component", () => {
 
         console.log("lesson Selected:", lessonMenu.value);
         const startButton = await waitFor(() =>
-          screen.getByText(/begin review/i)
+          screen.getByText(/begin review/i),
         );
         await act(async () => {
           startButton.click();
         });
         const flashcard = await waitFor(() =>
-          screen.getByLabelText(/flashcard/i)
+          screen.getByLabelText(/flashcard/i),
         );
         await waitFor(() => {
           expect(flashcard).toBeInTheDocument();

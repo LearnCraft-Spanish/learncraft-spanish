@@ -106,13 +106,13 @@ export const App: React.FC = () => {
               key={student.recordId}
               value={student.recordId}
               label={`${student.name} -- ${studentEmail}`}
-            />
+            />,
           );
         }
       });
       const studentSelectorSortFunction = (
         a: ReactElement,
-        b: ReactElement
+        b: ReactElement,
       ) => {
         const aName = a.props.label;
         const bName = b.props.label;

@@ -20,7 +20,6 @@ import { setupMockAuth } from "../../tests/setupMockAuth";
 // Types
 import type { UserData } from "../interfaceDefinitions";
 
-import { useActiveStudent } from "./useActiveStudent";
 import { useSelectedLesson } from "./useSelectedLesson";
 
 const { api } = serverlikeData();

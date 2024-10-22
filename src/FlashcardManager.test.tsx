@@ -10,7 +10,6 @@ import FlashcardManager from "./FlashcardManager";
 */
 
 describe("component FlashcardManager", () => {
-
   it("renders without crashing, student has flashcards", async () => {
     render(<FlashcardManager />, { wrapper: MockAllProviders });
     await waitFor(() =>
@@ -19,5 +18,4 @@ describe("component FlashcardManager", () => {
     expect(screen.getByText("Flashcard Manager")).toBeInTheDocument();
     expect(screen.getByText(/Total flashcards:/)).toBeInTheDocument();
   });
-
 });
