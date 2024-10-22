@@ -2,21 +2,22 @@ import { describe, expect, it } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
-// import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
 import FlashcardManager from "./FlashcardManager";
 
+/*
+  Add test to check if removeAndUpdate is called on click
+  once useStudentFlashcardStub is created
+*/
+
 describe("component FlashcardManager", () => {
-  // let flashcardDataQuery;
-  // beforeEach(async () => {
-  //   const { result } = renderHook(useStudentFlashcards, { wrapper: MockAllProviders });
-  //   await waitFor(() => {expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();})
-  //   flashcardDataQuery = result.current.flashcardDataQuery;
-  // });
-  it("renders", async () => {
+
+  it("renders without crashing, student has flashcards", async () => {
     render(<FlashcardManager />, { wrapper: MockAllProviders });
     await waitFor(() =>
       expect(screen.getByText("Flashcard Manager")).toBeInTheDocument(),
     );
     expect(screen.getByText("Flashcard Manager")).toBeInTheDocument();
+    expect(screen.getByText(/Total flashcards:/)).toBeInTheDocument();
   });
+
 });
