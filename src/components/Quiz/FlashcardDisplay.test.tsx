@@ -1,5 +1,5 @@
+import { act } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
-import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
 
@@ -148,7 +148,10 @@ describe("component Flashcard", () => {
   it("on click, calls toggle answer", () => {
     render(<FlashcardSpanishFirst />);
     // toggleAnswer()
-    screen.getByText(example.spanishExample).click();
+    const flashcard = screen.getByText(example.spanishExample);
+    act(() => {
+      flashcard.click();
+    })
     expect(toggleAnswer).toHaveBeenCalled();
   });
 
@@ -159,12 +162,18 @@ describe("component Flashcard", () => {
     });
     it("on click, calls togglePlaying", () => {
       render(<FlashcardWithAudio />);
-      screen.getAllByLabelText("Play/Pause")[0].click();
+      const playPause = screen.getAllByLabelText("Play/Pause")[0];
+      act(() => {
+        playPause.click();
+      });
       expect(togglePlaying).toHaveBeenCalled();
     });
     it("on click, does NOT propagate to also call toggleAnswer", () => {
       render(<FlashcardWithAudio />);
-      screen.getAllByLabelText("Play/Pause")[0].click();
+      const playPause = screen.getAllByLabelText("Play/Pause")[0];
+      act(() => {
+        playPause.click();
+      });
       expect(toggleAnswer).not.toHaveBeenCalled();
     });
   });
@@ -182,7 +191,10 @@ describe("component Flashcard", () => {
     });
     it("on click, calls toggleAnswer function", () => {
       render(<FlashcardSpanishFirst />);
-      screen.getByText(example.spanishExample).click();
+      const flashcard = screen.getByText(example.spanishExample);
+      act(() => {
+        flashcard.click();
+      });
       expect(toggleAnswer).toHaveBeenCalled();
     });
   });
