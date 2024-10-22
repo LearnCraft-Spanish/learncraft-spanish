@@ -2,6 +2,8 @@ import type { DefaultBodyType, StrictRequest } from "msw";
 import { HttpResponse, http } from "msw";
 import newData from "../data/serverlike/serverlikeData";
 
+import allStudentFlashcards from "../data/hooklike/studentFlashcardData";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
@@ -53,7 +55,7 @@ export const handlers = [
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
         return quizExamples.quizNickname === quizObject.quizNickname;
-      }
+      },
     );
     if (!quizExamplesObject) {
       throw new Error("Quiz examples not found");
@@ -68,7 +70,7 @@ export const handlers = [
   http.get(`${backendUrl}my-data`, ({ request }) => {
     const email = getEmailFromRequest(request);
     const student = apiData.allStudentsTable.find(
-      (student) => student.emailAddress === email
+      (student) => student.emailAddress === email,
     );
     return HttpResponse.json(student);
   }),
@@ -79,8 +81,14 @@ export const handlers = [
 
   http.get(`${backendUrl}my-examples`, ({ request }) => {
     //Placeholder: We will fetch for different students soon
-    const _email = getEmailFromRequest(request);
-    return HttpResponse.json(apiData.studentFlashcardData);
+    const email = getEmailFromRequest(request);
+    const studentFlashcards = allStudentFlashcards.find((student) => {
+      return student.emailAddress === email;
+    });
+    if (!studentFlashcards) {
+      throw new Error("Student not found");
+    }
+    return HttpResponse.json(studentFlashcards.studentFlashcardData);
   }),
 
   http.get(`${backendUrl}public/audio-examples`, () => {
@@ -88,22 +96,21 @@ export const handlers = [
   }),
 
   // Get Active Examples of a student
-  http.get(`${backendUrl}:studentId/examples`, ({ params }) => {
+  http.get(`${backendUrl}:studentId/examples`, ({ params, request }) => {
     // current temporary implementation, gets student-admin flashcard data, only flashcard data defined
     const studentId = params.studentId;
     const studentIdNumber = Number(studentId);
     if (!studentIdNumber) {
       throw new Error("Student not found");
     }
-    const studentExamples = apiData.studentFlashcardData;
-    if (!studentExamples) {
-      throw new Error("Student examples not found");
+    const _email = getEmailFromRequest(request);
+    const studentFlashcards = allStudentFlashcards.find((student) => {
+      return student.emailAddress === _email;
+    });
+    if (!studentFlashcards) {
+      throw new Error("Student not found");
     }
-
-    if (studentExamples.studentExamples[0].relatedStudent !== studentIdNumber) {
-      return HttpResponse.json({ studentExamples: [], examples: [] });
-    }
-    return HttpResponse.json(studentExamples);
+    return HttpResponse.json(studentFlashcards.studentFlashcardData);
   }),
 
   // Post Requests

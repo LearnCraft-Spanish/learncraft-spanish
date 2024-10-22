@@ -10,11 +10,24 @@ import React from "react";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
+import { getUserDataFromName } from "../../../mocks/data/serverlike/studentTable";
+import allStudentFlashcards from "../../../mocks/data/hooklike/studentFlashcardData";
 
 import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
 import Quiz from "./QuizComponent";
 
 const cleanupFunction = vi.fn();
+
+const user = getUserDataFromName("student-admin");
+if (!user) {
+  throw new Error(`Student not found in allStudentsTable: student-admin`);
+}
+const userFlashcardData = allStudentFlashcards.find(
+  (student) => student.userName === user.name,
+)?.studentFlashcardData;
+if (!userFlashcardData) {
+  throw new Error(`Student flashcard data not found: student-admin`);
+}
 
 // vi.mock('../hooks/useStudentFlashcards', () => {
 //   return {
@@ -34,11 +47,15 @@ const cleanupFunction = vi.fn();
   quizLength = 1000,
   */
 function renderQuizNoSrs() {
+  if (!userFlashcardData) {
+    throw new Error(`Student flashcard data not found in test setup function`);
+  }
+
   render(
     <MockAllProviders>
       <Quiz
         quizTitle="Test Quiz"
-        examplesToParse={sampleStudentFlashcardData.examples}
+        examplesToParse={userFlashcardData.examples}
         // startWithSpanish={false}
         // quizOnlyCollectedExamples={false}
         // isSrsQuiz={false}
@@ -49,11 +66,15 @@ function renderQuizNoSrs() {
   );
 }
 function renderQuizYesSrs({ params }: any = {}) {
+  if (!userFlashcardData) {
+    throw new Error(`Student flashcard data not found in test setup function`);
+  }
+
   render(
     <MockAllProviders>
       <Quiz
         quizTitle="Test Quiz"
-        examplesToParse={sampleStudentFlashcardData.examples}
+        examplesToParse={userFlashcardData.examples}
         quizOnlyCollectedExamples
         isSrsQuiz
         cleanupFunction={cleanupFunction}
@@ -88,13 +109,13 @@ describe("component Quiz", () => {
       renderQuizNoSrs();
       // Find the flashcard element
       // Get the initial text content of the flashcard
-      const flashcard = screen.getByLabelText("flashcard");
-      const initialText = flashcard.textContent;
-
-      // Simulate a click on the flashcard
-      act(() => {
-        fireEvent.click(flashcard);
-      });
+      // const flashcard = screen.getByLabelText("flashcard");
+      // const initialText = flashcard.textContent;
+      // // Simulate a click on the flashcard
+      // act(() => {
+      //   fireEvent.click(flashcard);
+      // });
+      const initialFlashcardText = screen.getByLabelText("flashcard").textContent;
 
       // Find the next button
       const nextButton = screen.getByRole("button", { name: "Next" });
@@ -105,10 +126,12 @@ describe("component Quiz", () => {
       });
 
       // Find the flashcard element again
-      const flashcard2 = screen.getByLabelText("flashcard");
+      // const flashcard2 = screen.getByLabelText("flashcard");
+      const nextFlashcardText =  screen.getByLabelText("flashcard").textContent;
 
       // Assert that the flashcard text content has changed
-      expect(flashcard2.textContent).not.toBe(initialText);
+      // expect(flashcard2.textContent).not.toBe(initialText);
+      expect(nextFlashcardText).not.toBe(initialFlashcardText);
     });
     it("changes flashcard to previous on previous button click", async () => {
       renderQuizNoSrs();
@@ -149,7 +172,7 @@ describe("component Quiz", () => {
     });
   });
 
-  describe.skip("isSrsQuiz is true", () => {
+  describe("isSrsQuiz is true", () => {
     it("renders SrsButtons when isSrsQuiz is true", async () => {
       renderQuizYesSrs();
       await waitFor(() => {
@@ -162,11 +185,8 @@ describe("component Quiz", () => {
       });
 
       await waitFor(() => {
-        const hardBtn = screen.getByText(/"this was hard"/i);
-        const easyBtn = screen.getByText(/this was easy/i);
-
-        expect(hardBtn).toBeInTheDocument();
-        expect(easyBtn).toBeInTheDocument();
+        expect(screen.getByText(/this was hard/i)).toBeInTheDocument();
+        expect(screen.queryByText(/this was easy/i)).toBeInTheDocument();
       });
     });
   });
