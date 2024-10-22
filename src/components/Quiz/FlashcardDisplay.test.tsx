@@ -151,7 +151,7 @@ describe("component Flashcard", () => {
     const flashcard = screen.getByText(example.spanishExample);
     act(() => {
       flashcard.click();
-    })
+    });
     expect(toggleAnswer).toHaveBeenCalled();
   });
 

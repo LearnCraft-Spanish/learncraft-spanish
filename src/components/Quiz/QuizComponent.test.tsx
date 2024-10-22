@@ -48,7 +48,7 @@ function renderQuizNoSrs() {
     </MockAllProviders>,
   );
 }
-function renderQuizYesSrs() {
+function renderQuizYesSrs({ params }: any = {}) {
   render(
     <MockAllProviders>
       <Quiz
@@ -57,6 +57,7 @@ function renderQuizYesSrs() {
         quizOnlyCollectedExamples
         isSrsQuiz
         cleanupFunction={cleanupFunction}
+        {...params}
       />
     </MockAllProviders>,
   );
@@ -67,89 +68,94 @@ describe("component Quiz", () => {
     vi.clearAllMocks();
     cleanup();
   });
-
-  it("renders", () => {
-    const quizTitle = "Test Quiz";
-    renderQuizNoSrs();
-    // expect a div with class="quiz"
-    expect(screen.getByText(quizTitle)).toBeTruthy();
-  });
-
-  it("calls cleanupFunction on unmount", () => {
-    renderQuizNoSrs();
-    act(() => {
-      screen.getByText("Back").click();
-    });
-    expect(cleanupFunction).toHaveBeenCalledOnce();
-  });
-
-  it("changes flashcard on next button click", () => {
-    renderQuizNoSrs();
-    // Find the flashcard element
-    // Get the initial text content of the flashcard
-    const flashcard = screen.getByLabelText("flashcard");
-    const initialText = flashcard.textContent;
-
-    // Simulate a click on the flashcard
-    act(() => {
-      fireEvent.click(flashcard);
+  describe("isSrsQuiz is false", () => {
+    it("renders", () => {
+      const quizTitle = "Test Quiz";
+      renderQuizNoSrs();
+      // expect a div with class="quiz"
+      expect(screen.getByText(quizTitle)).toBeTruthy();
     });
 
-    // Find the next button
-    const nextButton = screen.getByRole("button", { name: "Next" });
-
-    // Simulate a click on the next button
-    act(() => {
-      fireEvent.click(nextButton);
+    it("calls cleanupFunction on unmount", () => {
+      renderQuizNoSrs();
+      act(() => {
+        screen.getByText("Back").click();
+      });
+      expect(cleanupFunction).toHaveBeenCalledOnce();
     });
 
-    // Find the flashcard element again
-    const flashcard2 = screen.getByLabelText("flashcard");
+    it("changes flashcard on next button click", () => {
+      renderQuizNoSrs();
+      // Find the flashcard element
+      // Get the initial text content of the flashcard
+      const flashcard = screen.getByLabelText("flashcard");
+      const initialText = flashcard.textContent;
 
-    // Assert that the flashcard text content has changed
-    expect(flashcard2.textContent).not.toBe(initialText);
-  });
-  it("changes flashcard to previous on previous button click", async () => {
-    renderQuizNoSrs();
-    // Find the flashcard element
-    const flashcard = screen.getByLabelText("flashcard");
-    // Get the initial text content of the flashcard
-    const initialText = flashcard.textContent;
+      // Simulate a click on the flashcard
+      act(() => {
+        fireEvent.click(flashcard);
+      });
 
-    // Simulate a click on the flashcard
-    act(() => {
-      fireEvent.click(flashcard);
-    });
+      // Find the next button
+      const nextButton = screen.getByRole("button", { name: "Next" });
 
-    // Find the next button
-    const nextButton = screen.getByRole("button", { name: "Next" });
+      // Simulate a click on the next button
+      act(() => {
+        fireEvent.click(nextButton);
+      });
 
-    // Simulate a click on the next button
-    act(() => {
-      fireEvent.click(nextButton);
-    });
-    const flashcardNext = screen.getByLabelText("flashcard");
-    const nextTest = flashcardNext.textContent;
-    // Find the previous button
-    const previousButton = screen.getByRole("button", { name: "Previous" });
-
-    // Simulate a click on the previous button
-    act(() => {
-      fireEvent.click(previousButton);
-    });
-    await waitFor(() => {
       // Find the flashcard element again
-      const flashcardPrevious = screen.getByLabelText("flashcard");
+      const flashcard2 = screen.getByLabelText("flashcard");
 
       // Assert that the flashcard text content has changed
-      expect(flashcardPrevious.textContent).toBe(initialText);
-      expect(flashcardPrevious.textContent).not.toBe(nextTest);
+      expect(flashcard2.textContent).not.toBe(initialText);
+    });
+    it("changes flashcard to previous on previous button click", async () => {
+      renderQuizNoSrs();
+      // Find the flashcard element
+      const flashcard = screen.getByLabelText("flashcard");
+      // Get the initial text content of the flashcard
+      const initialText = flashcard.textContent;
+
+      // Simulate a click on the flashcard
+      act(() => {
+        fireEvent.click(flashcard);
+      });
+
+      // Find the next button
+      const nextButton = screen.getByRole("button", { name: "Next" });
+
+      // Simulate a click on the next button
+      act(() => {
+        fireEvent.click(nextButton);
+      });
+      const flashcardNext = screen.getByLabelText("flashcard");
+      const nextTest = flashcardNext.textContent;
+      // Find the previous button
+      const previousButton = screen.getByRole("button", { name: "Previous" });
+
+      // Simulate a click on the previous button
+      act(() => {
+        fireEvent.click(previousButton);
+      });
+      await waitFor(() => {
+        // Find the flashcard element again
+        const flashcardPrevious = screen.getByLabelText("flashcard");
+
+        // Assert that the flashcard text content has changed
+        expect(flashcardPrevious.textContent).toBe(initialText);
+        expect(flashcardPrevious.textContent).not.toBe(nextTest);
+      });
     });
   });
 
   describe.skip("isSrsQuiz is true", () => {
     it("renders SrsButtons when isSrsQuiz is true", async () => {
       renderQuizYesSrs();
+      await waitFor(() => {
+        expect(screen.getByLabelText("flashcard")).toBeInTheDocument();
+      });
+
       const flashcard = screen.getByLabelText("flashcard");
       act(() => {
         fireEvent.click(flashcard);
