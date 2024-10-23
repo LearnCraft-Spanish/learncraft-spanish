@@ -4,7 +4,7 @@ import type { Quiz } from "../interfaceDefinitions";
 import useAuth from "./useAuth";
 import { useBackend } from "./useBackend";
 
-export function useOfficialQuizzes(quizNumber: number | undefined) {
+export function useOfficialQuizzes(quizId: number | undefined) {
   const { isAuthenticated } = useAuth();
   const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } =
     useBackend();
@@ -70,12 +70,15 @@ export function useOfficialQuizzes(quizNumber: number | undefined) {
     enabled: isAuthenticated,
   });
 
+  const quizExamplesQueryReady = () =>
+    officialQuizzesQuery.isSuccess && !!quizId;
+
   const quizExamplesQuery = useQuery({
-    queryKey: ["quizExamples", quizNumber],
-    queryFn: () => getQuizExamplesFromBackend(quizNumber!),
+    queryKey: ["quizExamples", quizId],
+    queryFn: () => getQuizExamplesFromBackend(quizId!),
     staleTime: Infinity, // Never stale unless manually updated
     gcTime: Infinity, // Never garbage collect unless manually updated
-    enabled: officialQuizzesQuery.isSuccess && !!quizNumber,
+    enabled: quizExamplesQueryReady(),
   });
 
   return { officialQuizzesQuery, quizExamplesQuery };

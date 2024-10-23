@@ -10,16 +10,16 @@ import quizCourses from "./functions/QuizCourseList";
 interface officialQuizProps {
   chosenQuiz: number;
   quizCourse: string;
-  makeMenuHidden: () => void;
-  makeMenuShow: () => void;
+  hideMenu: () => void;
+  showMenu: () => void;
   updateChosenQuiz: (quizNumber: number) => void;
 }
 
 export default function OfficialQuiz({
   chosenQuiz,
   quizCourse,
-  makeMenuHidden,
-  makeMenuShow,
+  hideMenu,
+  showMenu,
   updateChosenQuiz,
 }: officialQuizProps) {
   // Import Statements
@@ -39,7 +39,7 @@ export default function OfficialQuiz({
       const quizNumberAsString = thisQuiz.toString();
       const lessonNumber = quizNumberAsString[0];
       const thisQuizObject = officialQuizzesQuery.data.find(
-        (quiz) => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
+        (quiz) => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse
       );
       const subtitle = thisQuizObject
         ? thisQuizObject.subtitle
@@ -55,24 +55,24 @@ export default function OfficialQuiz({
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true;
-      makeMenuHidden();
+      hideMenu();
       if (chosenQuiz !== thisQuiz) {
         updateChosenQuiz(thisQuiz);
       }
     }
-  }, [thisQuiz, chosenQuiz, updateChosenQuiz, makeMenuHidden]);
+  }, [thisQuiz, chosenQuiz, updateChosenQuiz, hideMenu]);
 
   // Finds the current quiz object and sets the quiz example query state to the quiz id
   useEffect(() => {
     if (officialQuizzesQuery.data && thisQuiz) {
       const quizToSearch = officialQuizzesQuery.data.find(
-        (quiz) => quiz.quizNumber === thisQuiz,
+        (quiz) => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse
       );
       if (quizToSearch?.recordId) {
         setThisQuizID(quizToSearch.recordId);
       }
     }
-  }, [officialQuizzesQuery.data, thisQuiz]);
+  }, [officialQuizzesQuery.data, thisQuiz, quizCourse]);
 
   useEffect(() => {
     if (quizExamplesQuery.isSuccess && !quizExamplesQuery.data?.length) {
@@ -92,7 +92,7 @@ export default function OfficialQuiz({
             <QuizComponent
               examplesToParse={quizExamplesQuery.data}
               quizTitle={makeQuizTitle()}
-              cleanupFunction={makeMenuShow}
+              cleanupFunction={showMenu}
             />
           )}
         </>

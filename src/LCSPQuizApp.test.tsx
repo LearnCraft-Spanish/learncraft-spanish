@@ -21,7 +21,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>,
+      </MockAllProviders>
     );
 
     await waitFor(() => {
@@ -33,7 +33,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>,
+      </MockAllProviders>
     );
 
     await waitFor(() => {
@@ -45,7 +45,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>,
+      </MockAllProviders>
     );
 
     await waitFor(() => {
@@ -57,7 +57,7 @@ describe("official quiz component", () => {
     render(
       <MockAllProviders>
         <LCSPQuizApp />
-      </MockAllProviders>,
+      </MockAllProviders>
     );
 
     await waitFor(() => {
@@ -65,7 +65,7 @@ describe("official quiz component", () => {
     });
   });
 
-  describe("official quiz", () => {
+  describe("test by role", () => {
     beforeEach(() => {
       vi.clearAllMocks();
     });
@@ -77,7 +77,6 @@ describe("official quiz component", () => {
       const sampledQuizDetails = sampledQuizNickname.split(" ");
       const courseCode = sampledQuizDetails[0];
       const quizNumber = sampledQuizDetails.slice(-1)[0];
-      console.log(courseCode, quizNumber);
       it(`${user.name} can click through to a flashcard`, async () => {
         setupMockAuth({
           userName: user.name as
@@ -92,15 +91,15 @@ describe("official quiz component", () => {
         render(
           <MockAllProviders route="/officialquizzes" childRoutes>
             <LCSPQuizApp />
-          </MockAllProviders>,
+          </MockAllProviders>
         );
 
         const courseMenu: HTMLSelectElement = await waitFor(
-          () => screen.getByLabelText(/select course/i) as HTMLSelectElement,
+          () => screen.getByLabelText(/select course/i) as HTMLSelectElement
         );
 
         if (courseMenu.value !== courseCode) {
-          await act(async () => {
+          act(() => {
             fireEvent.change(courseMenu, { target: { value: courseCode } });
           });
         }
@@ -110,10 +109,8 @@ describe("official quiz component", () => {
           expect(screen.getAllByRole("select")).toHaveLength(2);
         });
 
-        console.log(courseMenu.value);
-
         const lessonMenu: HTMLSelectElement = await waitFor(
-          () => screen.getByLabelText(/select quiz/i) as HTMLSelectElement,
+          () => screen.getByLabelText(/select quiz/i) as HTMLSelectElement
         );
 
         await act(async () => {
@@ -124,15 +121,78 @@ describe("official quiz component", () => {
           expect(screen.getAllByRole("select")).toHaveLength(2);
         });
 
-        console.log("lesson Selected:", lessonMenu.value);
         const startButton = await waitFor(() =>
-          screen.getByText(/begin review/i),
+          screen.getByText(/begin review/i)
         );
         await act(async () => {
           startButton.click();
         });
         const flashcard = await waitFor(() =>
-          screen.getByLabelText(/flashcard/i),
+          screen.getByLabelText(/flashcard/i)
+        );
+        await waitFor(() => {
+          expect(flashcard).toBeInTheDocument();
+        });
+      });
+    });
+  });
+
+  describe("test by quiz type", () => {
+    const testQuizzes = quizExamplesTableArray;
+
+    testQuizzes.forEach((quiz) => {
+      const sampledQuizDetails = quiz.quizNickname.split(" ");
+      const courseCode = sampledQuizDetails[0];
+      const quizNumber = sampledQuizDetails.slice(-1)[0];
+      it(`${quiz.quizNickname} lets user click through to a flashcard`, async () => {
+        setupMockAuth({
+          userName: "limited",
+        });
+        render(
+          <MockAllProviders route="/officialquizzes" childRoutes>
+            <LCSPQuizApp />
+          </MockAllProviders>
+        );
+        await waitFor(() => {
+          expect(screen.getByText(/official quizzes/i)).toBeInTheDocument();
+        });
+
+        const courseMenu: HTMLSelectElement = await waitFor(
+          () => screen.getByLabelText(/select course/i) as HTMLSelectElement
+        );
+
+        if (courseMenu.value !== courseCode) {
+          act(() => {
+            fireEvent.change(courseMenu, { target: { value: courseCode } });
+          });
+        }
+
+        await waitFor(() => {
+          expect(courseMenu.value).toBe(courseCode);
+          expect(screen.getAllByRole("select")).toHaveLength(2);
+        });
+
+        const lessonMenu: HTMLSelectElement = await waitFor(
+          () => screen.getByLabelText(/select quiz/i) as HTMLSelectElement
+        );
+
+        await act(async () => {
+          fireEvent.change(lessonMenu, { target: { value: quizNumber } });
+        });
+
+        await waitFor(() => {
+          expect(screen.getAllByRole("select")).toHaveLength(2);
+        });
+
+        const startButton = await waitFor(() =>
+          screen.getByText(/begin review/i)
+        );
+        await act(async () => {
+          startButton.click();
+        });
+
+        const flashcard = await waitFor(() =>
+          screen.getByLabelText(/flashcard/i)
         );
         await waitFor(() => {
           expect(flashcard).toBeInTheDocument();
