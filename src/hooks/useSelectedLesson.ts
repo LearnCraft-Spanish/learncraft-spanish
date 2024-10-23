@@ -35,21 +35,23 @@ export function useSelectedLesson() {
   // Function to get the allowed vocabulary from the 'to' lesson
   const allowedVocabulary = useMemo((): string[] => {
     let allowedVocabulary: string[] = [];
-    programsQueryData?.forEach((program) => {
+    const program = selectionState.program;
+    if (program) {
       const foundLesson = program.lessons.find(
         (item) => item.recordId === selectionState.toLesson?.recordId,
       );
       if (foundLesson) {
         allowedVocabulary = foundLesson.vocabKnown || [];
       }
-    });
+    }
     return allowedVocabulary;
-  }, [programsQueryData, selectionState?.toLesson?.recordId]);
+  }, [selectionState.program, selectionState.toLesson?.recordId]);
 
   // Function to get the required vocabulary from the 'from' lesson
   const requiredVocabulary = useMemo((): string[] => {
     let requiredVocabulary: string[] = [];
-    programsQueryData?.forEach((program) => {
+    const program = selectionState.program;
+    if (program) {
       const foundFromLesson = program.lessons.find(
         (item) => item.recordId === selectionState.fromLesson?.recordId,
       );
@@ -67,12 +69,12 @@ export function useSelectedLesson() {
           (word) => !oldVocab.includes(word),
         );
       }
-    });
+    }
     return requiredVocabulary;
   }, [
-    programsQueryData,
-    selectionState?.fromLesson?.recordId,
-    selectionState?.toLesson?.recordId,
+    selectionState.fromLesson?.recordId,
+    selectionState.program,
+    selectionState.toLesson?.recordId,
   ]);
 
   // Function to filter flashcards by allowed vocabulary
@@ -89,7 +91,7 @@ export function useSelectedLesson() {
         return isAllowed;
       });
       if (!requiredVocabulary.length) {
-        return filteredByAllowedVocab;
+        return [];
       }
       return filteredByAllowedVocab.filter((item) => {
         let isRequired = false;
@@ -134,7 +136,7 @@ export function useSelectedLesson() {
         (oldState: typeof initialSelectionState) => ({
           ...oldState,
           program: newProgram,
-          fromLesson: null, // Reset lessons when program changes
+          fromLesson: newProgram?.lessons ? newProgram.lessons[0] : null,
           toLesson: newToLesson(newProgram),
         }),
       );

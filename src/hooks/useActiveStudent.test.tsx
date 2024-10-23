@@ -1,8 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { describe, expect, it } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 
 import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
 import { useActiveStudent } from "./useActiveStudent";
 
 const api = serverlikeData().api;
@@ -11,26 +11,11 @@ const studentAdmin = api.allStudentsTable.find(
   (student) => student.role === "student" && student.isAdmin === true,
 );
 
-interface WrapperProps {
-  children: React.ReactNode;
-}
-
-vi.unmock("./useUserData");
-vi.mock("./useUserData", () => ({
-  useUserData: vi.fn(() => ({
-    isSuccess: true,
-    data: studentAdmin,
-  })),
-}));
-
 describe("useActiveStudent", () => {
-  const queryClient = new QueryClient();
-  const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-
   it("runs without crashing", async () => {
-    const { result } = renderHook(() => useActiveStudent(), { wrapper });
+    const { result } = renderHook(() => useActiveStudent(), {
+      wrapper: MockAllProviders,
+    });
     await waitFor(() => {
       expect(result.current.activeStudentQuery.isSuccess).toBe(true);
     });
@@ -38,7 +23,9 @@ describe("useActiveStudent", () => {
   });
   describe("activeStudentQuery", () => {
     it("data is mocked useUserData", async () => {
-      const { result } = renderHook(() => useActiveStudent(), { wrapper });
+      const { result } = renderHook(() => useActiveStudent(), {
+        wrapper: MockAllProviders,
+      });
       await waitFor(() => {
         expect(result.current.activeStudentQuery.isSuccess).toBe(true);
       });
@@ -48,7 +35,9 @@ describe("useActiveStudent", () => {
 
   describe("studentListQuery", () => {
     it("studentListQuery succeeds, data has length", async () => {
-      const { result } = renderHook(() => useActiveStudent(), { wrapper });
+      const { result } = renderHook(() => useActiveStudent(), {
+        wrapper: MockAllProviders,
+      });
       await waitFor(() => {
         expect(result.current.activeStudentQuery.isSuccess).toBe(true);
       });
@@ -58,7 +47,9 @@ describe("useActiveStudent", () => {
 
   describe("activeProgram", () => {
     it("activeProgram is same as userData realtedProgram", async () => {
-      const { result } = renderHook(() => useActiveStudent(), { wrapper });
+      const { result } = renderHook(() => useActiveStudent(), {
+        wrapper: MockAllProviders,
+      });
       await waitFor(() => {
         expect(result.current.activeStudentQuery.isSuccess).toBe(true);
       });
@@ -71,7 +62,9 @@ describe("useActiveStudent", () => {
 
   describe("activeLesson", () => {
     it("activeLesson is not null", async () => {
-      const { result } = renderHook(() => useActiveStudent(), { wrapper });
+      const { result } = renderHook(() => useActiveStudent(), {
+        wrapper: MockAllProviders,
+      });
       await waitFor(() => {
         expect(result.current.activeStudentQuery.isSuccess).toBe(true);
       });
@@ -81,7 +74,9 @@ describe("useActiveStudent", () => {
 
   describe("chooseStudent function", () => {
     it("chooseStudent sets activeStudent", async () => {
-      const { result } = renderHook(() => useActiveStudent(), { wrapper });
+      const { result } = renderHook(() => useActiveStudent(), {
+        wrapper: MockAllProviders,
+      });
       await waitFor(() => {
         expect(result.current.studentListQuery.isSuccess).toBe(true);
       });

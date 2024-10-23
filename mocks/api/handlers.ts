@@ -1,11 +1,22 @@
+import type { DefaultBodyType, StrictRequest } from "msw";
 import { HttpResponse, http } from "msw";
-import flashcardData from "../data/serverlike/mockStudentFlashcardData.json";
 import newData from "../data/serverlike/serverlikeData";
 
-const studentFlashcardData = flashcardData.studentFlashcardData;
+import allStudentFlashcards from "../data/hooklike/studentFlashcardData";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
+
+function getEmailFromRequest(request: StrictRequest<DefaultBodyType>) {
+  const fakeToken = request.headers.get("Authorization");
+  const tokenParts = fakeToken?.split(" ");
+  const emailAddress = tokenParts?.[1];
+  if (!emailAddress) {
+    throw new Error("Email address not found in token");
+  }
+  return emailAddress;
+}
 
 export const handlers = [
   http.get(`${backendUrl}public/programs`, () => {
@@ -55,20 +66,50 @@ export const handlers = [
     return HttpResponse.json(quizExamples);
   }),
 
-  http.get(`${backendUrl}my-data`, () => {
-    return HttpResponse.json(apiData.allStudentsTable[0]);
+  http.get(`${backendUrl}my-data`, ({ request }) => {
+    const email = getEmailFromRequest(request);
+    const student = apiData.allStudentsTable.find(
+      (student) => student.emailAddress === email,
+    );
+    return HttpResponse.json(student);
   }),
 
   http.get(`${backendUrl}all-students`, () => {
     return HttpResponse.json(apiData.allStudentsTable);
   }),
 
-  http.get(`${backendUrl}my-examples`, () => {
-    return HttpResponse.json(studentFlashcardData);
+  http.get(`${backendUrl}my-examples`, ({ request }) => {
+    //Placeholder: We will fetch for different students soon
+    const email = getEmailFromRequest(request);
+    const studentFlashcards = allStudentFlashcards.find((student) => {
+      return student.emailAddress === email;
+    });
+    if (!studentFlashcards) {
+      throw new Error("Student not found");
+    }
+    return HttpResponse.json(studentFlashcards.studentFlashcardData);
   }),
 
   http.get(`${backendUrl}public/audio-examples`, () => {
     return HttpResponse.json(apiData.audioExamplesTable);
+  }),
+
+  // Get Active Examples of a student
+  http.get(`${backendUrl}:studentId/examples`, ({ params, request }) => {
+    // current temporary implementation, gets student-admin flashcard data, only flashcard data defined
+    const studentId = params.studentId;
+    const studentIdNumber = Number(studentId);
+    if (!studentIdNumber) {
+      throw new Error("Student not found");
+    }
+    const _email = getEmailFromRequest(request);
+    const studentFlashcards = allStudentFlashcards.find((student) => {
+      return student.emailAddress === _email;
+    });
+    if (!studentFlashcards) {
+      throw new Error("Student not found");
+    }
+    return HttpResponse.json(studentFlashcards.studentFlashcardData);
   }),
 
   // Post Requests

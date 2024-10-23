@@ -1,11 +1,11 @@
-import { useAuth0 } from "@auth0/auth0-react";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback } from "react";
 import type { Quiz } from "../interfaceDefinitions";
+import useAuth from "./useAuth";
 import { useBackend } from "./useBackend";
 
-export function useOfficialQuizzes(quizNumber: number | undefined) {
-  const { isAuthenticated } = useAuth0();
+export function useOfficialQuizzes(quizId: number | undefined) {
+  const { isAuthenticated } = useAuth();
   const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } =
     useBackend();
 
@@ -53,26 +53,7 @@ export function useOfficialQuizzes(quizNumber: number | undefined) {
       }
     });
 
-    function sortQuizzes(a: Quiz, b: Quiz) {
-      const aNumber = a.quizNumber;
-      const bNumber = b.quizNumber;
-      const aLetter = a.quizLetter;
-      const bLetter = b.quizLetter;
-      if (aNumber === bNumber) {
-        if (aLetter && bLetter) {
-          if (aLetter < bLetter) {
-            return -1;
-          } else {
-            return 1;
-          }
-        } else {
-          return 0;
-        }
-      } else {
-        return aNumber - bNumber;
-      }
-    }
-    quizzes.sort(sortQuizzes);
+    quizzes.sort();
     return quizzes;
   }, []);
 
@@ -89,12 +70,15 @@ export function useOfficialQuizzes(quizNumber: number | undefined) {
     enabled: isAuthenticated,
   });
 
+  const quizExamplesQueryReady = () =>
+    officialQuizzesQuery.isSuccess && !!quizId;
+
   const quizExamplesQuery = useQuery({
-    queryKey: ["quizExamples", quizNumber],
-    queryFn: () => getQuizExamplesFromBackend(quizNumber!),
+    queryKey: ["quizExamples", quizId],
+    queryFn: () => getQuizExamplesFromBackend(quizId!),
     staleTime: Infinity, // Never stale unless manually updated
     gcTime: Infinity, // Never garbage collect unless manually updated
-    enabled: officialQuizzesQuery.isSuccess && !!quizNumber,
+    enabled: quizExamplesQueryReady(),
   });
 
   return { officialQuizzesQuery, quizExamplesQuery };

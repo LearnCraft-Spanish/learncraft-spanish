@@ -1,27 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
-import type { QuizCourse } from "./interfaceDefinitions";
 import Loading from "./components/Loading";
 import QuizComponent from "./components/Quiz/QuizComponent";
 import { useOfficialQuizzes } from "./hooks/useOfficialQuizzes";
 import "./App.css";
+import quizCourses from "./functions/QuizCourseList";
 
 interface officialQuizProps {
   chosenQuiz: number;
-  courses: QuizCourse[];
-  makeMenuHidden: () => void;
-  makeMenuShow: () => void;
   quizCourse: string;
+  hideMenu: () => void;
+  showMenu: () => void;
   updateChosenQuiz: (quizNumber: number) => void;
 }
 
 export default function OfficialQuiz({
   chosenQuiz,
-  courses,
-  makeMenuHidden,
-  makeMenuShow,
   quizCourse,
+  hideMenu,
+  showMenu,
   updateChosenQuiz,
 }: officialQuizProps) {
   // Import Statements
@@ -35,7 +33,7 @@ export default function OfficialQuiz({
     useOfficialQuizzes(thisQuizID);
 
   function makeQuizTitle() {
-    const thisCourse = courses.find((course) => course.code === quizCourse);
+    const thisCourse = quizCourses.find((course) => course.code === quizCourse);
     const courseName = thisCourse ? thisCourse.name : quizCourse;
     if (officialQuizzesQuery.data && quizCourse === "ser-estar") {
       const quizNumberAsString = thisQuiz.toString();
@@ -57,16 +55,16 @@ export default function OfficialQuiz({
   useEffect(() => {
     if (!rendered.current) {
       rendered.current = true;
-      makeMenuHidden();
+      hideMenu();
       if (chosenQuiz !== thisQuiz) {
         updateChosenQuiz(thisQuiz);
       }
     }
-  }, [thisQuiz, chosenQuiz, updateChosenQuiz, makeMenuHidden]);
+  }, [thisQuiz, chosenQuiz, updateChosenQuiz, hideMenu]);
 
   // Finds the current quiz object and sets the quiz example query state to the quiz id
   useEffect(() => {
-    if (officialQuizzesQuery.data && thisQuiz && quizCourse) {
+    if (officialQuizzesQuery.data && thisQuiz) {
       const quizToSearch = officialQuizzesQuery.data.find(
         (quiz) => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
       );
@@ -78,15 +76,9 @@ export default function OfficialQuiz({
 
   useEffect(() => {
     if (quizExamplesQuery.isSuccess && !quizExamplesQuery.data?.length) {
-      makeMenuShow();
       navigate("..");
     }
-  }, [
-    quizExamplesQuery.isSuccess,
-    quizExamplesQuery.data,
-    makeMenuShow,
-    navigate,
-  ]);
+  }, [quizExamplesQuery.isSuccess, quizExamplesQuery.data, navigate]);
 
   return (
     <>
@@ -100,7 +92,7 @@ export default function OfficialQuiz({
             <QuizComponent
               examplesToParse={quizExamplesQuery.data}
               quizTitle={makeQuizTitle()}
-              cleanupFunction={makeMenuShow}
+              cleanupFunction={showMenu}
             />
           )}
         </>

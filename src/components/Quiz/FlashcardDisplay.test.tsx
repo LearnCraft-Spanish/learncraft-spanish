@@ -1,9 +1,9 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
-import React from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { sampleStudentFlashcardData } from "../../../tests/mockData";
 
+import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
 import Flashcard from "./FlashcardDisplay";
 
 const example = {
@@ -19,8 +19,6 @@ const onRemove = vi.fn(() => {});
 const toggleAnswer = vi.fn();
 const togglePlaying = vi.fn();
 
-const queryClient = new QueryClient();
-
 vi.mock("../../hooks/useStudentFlashcards", () => ({
   useStudentFlashcards: () => ({
     addFlashcardMutation: { mutate: vi.fn() },
@@ -32,7 +30,7 @@ vi.mock("../../hooks/useStudentFlashcards", () => ({
 
 function FlashcardSpanishFirst() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <MockAllProviders>
       <Flashcard
         example={example}
         isStudent
@@ -45,12 +43,12 @@ function FlashcardSpanishFirst() {
         togglePlaying={togglePlaying}
         playing={false}
       />
-    </QueryClientProvider>
+    </MockAllProviders>
   );
 }
 function FlashcardEnglishFirst() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <MockAllProviders>
       <Flashcard
         example={example}
         isStudent
@@ -63,12 +61,12 @@ function FlashcardEnglishFirst() {
         togglePlaying={togglePlaying}
         playing={false}
       />
-    </QueryClientProvider>
+    </MockAllProviders>
   );
 }
 function FlashcardSpanishFirstAnswerShowing() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <MockAllProviders>
       <Flashcard
         example={example}
         isStudent
@@ -81,12 +79,12 @@ function FlashcardSpanishFirstAnswerShowing() {
         togglePlaying={togglePlaying}
         playing={false}
       />
-    </QueryClientProvider>
+    </MockAllProviders>
   );
 }
 function FlashcardEnglishFirstAnswerShowing() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <MockAllProviders>
       <Flashcard
         example={example}
         isStudent
@@ -99,13 +97,13 @@ function FlashcardEnglishFirstAnswerShowing() {
         togglePlaying={togglePlaying}
         playing={false}
       />
-    </QueryClientProvider>
+    </MockAllProviders>
   );
 }
 
 function FlashcardSpanishFirstNotStudent() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <MockAllProviders>
       <Flashcard
         example={example}
         isStudent={false}
@@ -118,13 +116,13 @@ function FlashcardSpanishFirstNotStudent() {
         togglePlaying={togglePlaying}
         playing={false}
       />
-    </QueryClientProvider>
+    </MockAllProviders>
   );
 }
 
 function FlashcardWithAudio() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <MockAllProviders>
       <Flashcard
         example={audioExample}
         isStudent
@@ -137,7 +135,7 @@ function FlashcardWithAudio() {
         togglePlaying={togglePlaying}
         playing={false}
       />
-    </QueryClientProvider>
+    </MockAllProviders>
   );
 }
 
@@ -150,7 +148,10 @@ describe("component Flashcard", () => {
   it("on click, calls toggle answer", () => {
     render(<FlashcardSpanishFirst />);
     // toggleAnswer()
-    screen.getByText(example.spanishExample).click();
+    const flashcard = screen.getByText(example.spanishExample);
+    act(() => {
+      flashcard.click();
+    });
     expect(toggleAnswer).toHaveBeenCalled();
   });
 
@@ -161,12 +162,18 @@ describe("component Flashcard", () => {
     });
     it("on click, calls togglePlaying", () => {
       render(<FlashcardWithAudio />);
-      screen.getAllByLabelText("Play/Pause")[0].click();
+      const playPause = screen.getAllByLabelText("Play/Pause")[0];
+      act(() => {
+        playPause.click();
+      });
       expect(togglePlaying).toHaveBeenCalled();
     });
     it("on click, does NOT propagate to also call toggleAnswer", () => {
       render(<FlashcardWithAudio />);
-      screen.getAllByLabelText("Play/Pause")[0].click();
+      const playPause = screen.getAllByLabelText("Play/Pause")[0];
+      act(() => {
+        playPause.click();
+      });
       expect(toggleAnswer).not.toHaveBeenCalled();
     });
   });
@@ -184,7 +191,10 @@ describe("component Flashcard", () => {
     });
     it("on click, calls toggleAnswer function", () => {
       render(<FlashcardSpanishFirst />);
-      screen.getByText(example.spanishExample).click();
+      const flashcard = screen.getByText(example.spanishExample);
+      act(() => {
+        flashcard.click();
+      });
       expect(toggleAnswer).toHaveBeenCalled();
     });
   });

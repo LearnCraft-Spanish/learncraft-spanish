@@ -1,5 +1,6 @@
 {
   "prettier.enable": true, // Re-enable Prettier for formatting
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true, // Use Prettier to format on save
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit" // Let ESLint fix non-formatting issues on save

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import logo from "../resources/typelogosmall.png";
-import home from "../assets/icons/home.svg";
+import home from "../resources/icons/home.svg";
 
 import LoginButton from "./Buttons/LoginButton";
 import LogoutButton from "./Buttons/LogoutButton";

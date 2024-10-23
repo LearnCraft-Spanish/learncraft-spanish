@@ -1,29 +1,22 @@
-import { afterAll, afterEach, beforeAll, vi } from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from "vitest";
 import { server } from "../mocks/api/server";
 
 import "@testing-library/jest-dom";
+import { setupMockAuth } from "./setupMockAuth";
 
-// Mock useAuth0 for getAccessTokenSilently
-vi.mock("@auth0/auth0-react", async () => {
-  const actualAuth0 =
-    await vi.importActual<typeof import("@auth0/auth0-react")>(
-      "@auth0/auth0-react",
-    );
+// Mock the useAuth hook, but leave the mock return configurable per test
+vi.mock("../src/hooks/useAuth");
 
-  return {
-    ...actualAuth0, // Use the actual Auth0Provider
-    useAuth0: () => ({
-      getAccessTokenSilently: vi.fn().mockResolvedValue("test-token"),
-      isAuthenticated: true,
-      user: { name: "Test User" },
-    }),
-  };
+beforeEach(() => {
+  setupMockAuth();
 });
 
+// Open the MSW server before all tests
 beforeAll(() => {
   server.listen();
 });
 
+// Reset the server handlers after each test
 afterEach(() => {
   server.resetHandlers();
   vi.clearAllMocks();

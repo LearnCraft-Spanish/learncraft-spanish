@@ -1,22 +1,15 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { renderHook, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+
+import MockAllProviders from "../../mocks/Providers/MockAllProviders";
 
 import { useProgramTable } from "./useProgramTable";
 
-interface WrapperProps {
-  children: React.ReactNode;
-}
-
 describe("useProgramTable", async () => {
-  // Setup for tests
-  const queryClient = new QueryClient();
-  const wrapper = ({ children }: WrapperProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-
   it("isSuccess is true", async () => {
-    const { result } = renderHook(() => useProgramTable(), { wrapper });
+    const { result } = renderHook(() => useProgramTable(), {
+      wrapper: MockAllProviders,
+    });
     await waitFor(() => {
       expect(result.current.programTableQuery.isSuccess).toBe(true);
     });
@@ -24,7 +17,9 @@ describe("useProgramTable", async () => {
   });
 
   it("renders with data, length greater than 0", async () => {
-    const { result } = renderHook(() => useProgramTable(), { wrapper });
+    const { result } = renderHook(() => useProgramTable(), {
+      wrapper: MockAllProviders,
+    });
     await waitFor(() => {
       expect(result.current.programTableQuery.isSuccess).toBe(true);
     });
@@ -33,7 +28,9 @@ describe("useProgramTable", async () => {
 
   describe("data structure", () => {
     it("each program has lessons array with length greater than 0", async () => {
-      const { result } = renderHook(() => useProgramTable(), { wrapper });
+      const { result } = renderHook(() => useProgramTable(), {
+        wrapper: MockAllProviders,
+      });
       await waitFor(() => {
         expect(result.current.programTableQuery.isSuccess).toBe(true);
       });
@@ -42,7 +39,9 @@ describe("useProgramTable", async () => {
       });
     });
     it("for each course, last lesson's vocabKnown array length greater than first lesson, excluding: Ser Estar Mini Course", async () => {
-      const { result } = renderHook(() => useProgramTable(), { wrapper });
+      const { result } = renderHook(() => useProgramTable(), {
+        wrapper: MockAllProviders,
+      });
       await waitFor(() => {
         expect(result.current.programTableQuery.isSuccess).toBe(true);
       });
