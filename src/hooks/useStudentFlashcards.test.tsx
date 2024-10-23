@@ -1,7 +1,4 @@
-import {
-  renderHook,
-  waitFor,
-} from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
 
 import { describe, expect, it } from "vitest";
 import MockAllProviders from "../../mocks/Providers/MockAllProviders";

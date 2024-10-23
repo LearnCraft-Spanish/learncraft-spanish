@@ -8,7 +8,6 @@ import React, {
 } from "react";
 import { Route, useLocation } from "react-router-dom";
 import type { UserData } from "./interfaceDefinitions";
-import Coaching from "./components/Coaching/Coaching";
 
 import AudioBasedReview from "./components/AudioBasedReview/AudioBasedReview";
 import Loading from "./components/Loading";
@@ -297,6 +296,7 @@ export const App: React.FC = () => {
         />
         {
           // Coaching Section still under construction
+          /*
           <Route
             path="/coaching"
             element={
@@ -310,6 +310,7 @@ export const App: React.FC = () => {
               )
             }
           />
+          */
         }
         <Route path="/*" element={<NotFoundPage />} />
       </SentryRoutes>
