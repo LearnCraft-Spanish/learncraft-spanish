@@ -9,7 +9,6 @@ import {
 import React from "react";
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { sampleStudentFlashcardData } from "../../../tests/mockData";
 import { getUserDataFromName } from "../../../mocks/data/serverlike/studentTable";
 import allStudentFlashcards from "../../../mocks/data/hooklike/studentFlashcardData";
 
@@ -115,7 +114,8 @@ describe("component Quiz", () => {
       // act(() => {
       //   fireEvent.click(flashcard);
       // });
-      const initialFlashcardText = screen.getByLabelText("flashcard").textContent;
+      const initialFlashcardText =
+        screen.getByLabelText("flashcard").textContent;
 
       // Find the next button
       const nextButton = screen.getByRole("button", { name: "Next" });
@@ -127,7 +127,7 @@ describe("component Quiz", () => {
 
       // Find the flashcard element again
       // const flashcard2 = screen.getByLabelText("flashcard");
-      const nextFlashcardText =  screen.getByLabelText("flashcard").textContent;
+      const nextFlashcardText = screen.getByLabelText("flashcard").textContent;
 
       // Assert that the flashcard text content has changed
       // expect(flashcard2.textContent).not.toBe(initialText);

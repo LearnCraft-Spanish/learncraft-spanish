@@ -1,15 +1,9 @@
 import {
-  act,
-  cleanup,
-  fireEvent,
-  render,
   renderHook,
   waitFor,
-  screen,
 } from "@testing-library/react";
-import React from "react";
 
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import MockAllProviders from "../../mocks/Providers/MockAllProviders";
 import { useStudentFlashcards } from "./useStudentFlashcards";
 

@@ -1,7 +1,5 @@
 import { examples } from "../examples.json";
 import type {
-  Flashcard,
-  StudentExample,
   StudentFlashcardData,
 } from "../../../src/interfaceDefinitions";
 
@@ -9,7 +7,6 @@ import generateStudentFlashcardData from "../serverlike/generateStudentFlashcard
 
 import {
   allStudentsTable,
-  getUserDataFromName,
 } from "../serverlike/studentTable";
 
 // We will generate student flashcard data for each student.

@@ -27,14 +27,14 @@ export default function LCSPQuizApp(): JSX.Element {
     (officialQuizzesQuery.isLoading || activeStudentQuery.isLoading);
 
   const activeCourseCode = quizCourses.find(
-    (course) => course.name === activeProgram?.name
+    (course) => course.name === activeProgram?.name,
   )?.code;
 
   const currentCourseCode = useMemo(() => {
     const splitPath = location.pathname.split("/");
     const courseCodes = quizCourses.map((course) => course.code);
     const foundCourse = courseCodes.find(
-      (code: string) => code === splitPath[2]
+      (code: string) => code === splitPath[2],
     );
     return foundCourse || "lcsp";
   }, [location.pathname]);
@@ -69,12 +69,12 @@ export default function LCSPQuizApp(): JSX.Element {
   const updateQuizCourse = useCallback(
     (courseCode: string) => {
       const newCourse = quizCourses.find(
-        (course) => course.code === courseCode
+        (course) => course.code === courseCode,
       );
       const urlToNavigate = newCourse?.url || "";
       navigate(urlToNavigate);
     },
-    [navigate]
+    [navigate],
   );
 
   const updateChosenQuiz = useCallback((quizNumber: number) => {
@@ -102,11 +102,11 @@ export default function LCSPQuizApp(): JSX.Element {
   const makeQuizSelections = useCallback(() => {
     if (officialQuizzesQuery.data) {
       const quizList = officialQuizzesQuery.data.filter(
-        (item) => item.quizType === currentCourseCode
+        (item) => item.quizType === currentCourseCode,
       );
       const quizSelections: React.JSX.Element[] = [];
       const courseObj = quizCourses.find(
-        (course) => course.code === currentCourseCode
+        (course) => course.code === currentCourseCode,
       );
       const courseName = courseObj?.name || "";
       let i = 1;
@@ -118,7 +118,7 @@ export default function LCSPQuizApp(): JSX.Element {
               {item.lessonNumber}
               {", "}
               {item.subtitle}
-            </option>
+            </option>,
           );
           i++;
         });
@@ -130,7 +130,7 @@ export default function LCSPQuizApp(): JSX.Element {
               {courseName}
               {" Quiz "}
               {item.quizNumber}
-            </option>
+            </option>,
           );
           i++;
         });
@@ -173,7 +173,7 @@ export default function LCSPQuizApp(): JSX.Element {
               ></Route>
             </Routes>
           }
-        />
+        />,
       );
     });
     if (!routes) {
@@ -189,7 +189,7 @@ export default function LCSPQuizApp(): JSX.Element {
       // Don't run after first successful run
       // Only run if a course is selected
       const activeCourse = quizCourses.find(
-        (course) => course.name === activeProgram.name
+        (course) => course.name === activeProgram.name,
       );
       if (!quizPath && !!activeCourse) {
         // Only run on root path and only if quiz course is found
@@ -200,9 +200,7 @@ export default function LCSPQuizApp(): JSX.Element {
     }
   }, [activeProgram?.name, defaultCourseFound, quizPath, navigate]);
 
-  useEffect(() => {
-    console.log("defaultCourseFound", defaultCourseFound);
-  }, [defaultCourseFound]);
+  useEffect(() => {}, [defaultCourseFound]);
 
   // Ensures the quiz menu shows when quiz is not active.
   useEffect(() => {
@@ -223,7 +221,7 @@ export default function LCSPQuizApp(): JSX.Element {
           const activeLessonNumber = Number.parseInt(activeLessonString);
           let lastQuizBeforeCurrentLesson = 0;
           const activeQuizzes = officialQuizzesQuery.data.filter(
-            (item) => item.quizType === currentCourseCode
+            (item) => item.quizType === currentCourseCode,
           );
           activeQuizzes.forEach((item) => {
             if (item.quizNumber <= activeLessonNumber) {
@@ -237,7 +235,7 @@ export default function LCSPQuizApp(): JSX.Element {
       } else {
         // Otherwise set to first quiz of selected course
         const firstQuiz = officialQuizzesQuery.data.filter(
-          (item) => item.quizType === currentCourseCode
+          (item) => item.quizType === currentCourseCode,
         )[0].quizNumber;
         setChosenQuiz(firstQuiz);
       }

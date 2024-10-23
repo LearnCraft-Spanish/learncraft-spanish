@@ -75,7 +75,7 @@ export function getUserDataFromName(
     | "student-admin"
     | "student-lcsp"
     | "student-ser-estar"
-    | null
+    | null,
 ): UserData | null {
   return allStudentsTable.find((student) => student.name === name) || null;
 }
