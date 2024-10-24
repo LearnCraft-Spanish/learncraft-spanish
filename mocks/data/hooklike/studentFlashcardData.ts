@@ -17,6 +17,7 @@ interface allStudentFlashcardsArray {
 const allStudentFlashcards: allStudentFlashcardsArray[] = [];
 // filter for only students that are allowed to have flashcards
 allStudentsTable.forEach((student) => {
+  if (student.role !== "student") return;
   allStudentFlashcards.push({
     userName: student.name,
     emailAddress: student.emailAddress,

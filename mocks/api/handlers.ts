@@ -102,9 +102,9 @@ export const handlers = [
     if (!studentIdNumber) {
       throw new Error("Student not found");
     }
-    const _email = getEmailFromRequest(request);
+    const email = getEmailFromRequest(request);
     const studentFlashcards = allStudentFlashcards.find((student) => {
-      return student.emailAddress === _email;
+      return student.emailAddress === email;
     });
     if (!studentFlashcards) {
       throw new Error("Student not found");
