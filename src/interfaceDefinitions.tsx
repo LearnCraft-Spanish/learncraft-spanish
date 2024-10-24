@@ -185,3 +185,14 @@ export interface CoachingLessons {
 export interface WrapperProps {
   children: React.ReactNode;
 }
+
+export type mockUserNames =
+  | "admin-empty-role"
+  | "empty-role"
+  | "none-role"
+  | "limited"
+  | "student-admin"
+  | "student-lcsp"
+  | "student-ser-estar"
+  | null
+  | undefined;
