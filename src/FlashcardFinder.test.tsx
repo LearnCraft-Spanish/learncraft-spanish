@@ -4,13 +4,16 @@ import React from "react";
 import MockAllProviders from "../mocks/Providers/MockAllProviders";
 
 import FlashcardFinder from "./FlashcardFinder";
+import { ContextualMenuProvider } from "./providers/ContextualMenuProvider";
 
 describe("flashcard finder", () => {
   it("renders without crashing", () => {
     render(
       <MockAllProviders>
-        <FlashcardFinder contextual="" openContextual={() => vi.fn()} />
-      </MockAllProviders>,
+        <ContextualMenuProvider>
+          <FlashcardFinder />
+        </ContextualMenuProvider>
+      </MockAllProviders>
     );
   });
 });

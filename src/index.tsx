@@ -5,7 +5,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
-import Providers from "./Providers";
+import Providers from "./providers/Providers";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
@@ -30,5 +30,5 @@ root.render(
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </Sentry.ErrorBoundary>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

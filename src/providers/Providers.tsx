@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Auth0Provider } from "@auth0/auth0-react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { ContextualMenuProvider } from "./ContextualMenuProvider";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -29,7 +30,7 @@ function Providers({ children }: ProvidersProps) {
         navigate(appState?.targetUrl || "/", { replace: true });
       }}
     >
-      {children}
+      <ContextualMenuProvider>{children}</ContextualMenuProvider>
     </Auth0Provider>
   );
 }

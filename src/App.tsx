@@ -37,46 +37,8 @@ export const App: React.FC = () => {
   const [bannerMessage, setBannerMessage] = useState("");
   const messageNumber = useRef<number | NodeJS.Timeout>(0);
 
-  // Reference to the current contextual menu element
-  const currentContextual = useRef<HTMLDivElement | null>(null);
-  const [contextual, setContextual] = useState(""); // String to indicate which contextual menu is open
-
   // Boolean state to determine whether to show the student selector menu
   const [studentSelectorOpen, setStudentSelectorOpen] = useState(false);
-
-  // global functions to open and close any contextual menus – hard limit to one at a time
-  const openContextual = useCallback((elementClass: string) => {
-    setContextual(elementClass);
-  }, []);
-
-  const closeContextual = useCallback(() => {
-    setContextual("");
-  }, []);
-
-  // local function to close contextual menu if click is outside of it
-  function closeContextualIfClickOut(e: React.MouseEvent) {
-    if (
-      isValidElement(currentContextual.current) ||
-      currentContextual.current instanceof Element
-    ) {
-      const contextualItemBounds =
-        currentContextual.current.getBoundingClientRect();
-      const eventX = e.clientX;
-      const eventY = e.clientY;
-      const leftOfLeftBound = eventX <= contextualItemBounds.left;
-      const rightOfRightBound = eventX >= contextualItemBounds.right;
-      const aboveTopBound = eventY >= contextualItemBounds.bottom;
-      const belowBottomBound = eventY <= contextualItemBounds.top;
-      const outOfBounds =
-        leftOfLeftBound ||
-        rightOfRightBound ||
-        aboveTopBound ||
-        belowBottomBound;
-      if (outOfBounds) {
-        closeContextual();
-      }
-    }
-  }
 
   const _updateBannerMessage = useCallback((message: string) => {
     setBannerMessage(message);
@@ -105,13 +67,13 @@ export const App: React.FC = () => {
               key={student.recordId}
               value={student.recordId}
               label={`${student.name} -- ${studentEmail}`}
-            />,
+            />
           );
         }
       });
       const studentSelectorSortFunction = (
         a: ReactElement,
-        b: ReactElement,
+        b: ReactElement
       ) => {
         const aName = a.props.label;
         const bName = b.props.label;
@@ -153,7 +115,7 @@ export const App: React.FC = () => {
   }, [bannerMessage, messageNumber, blankBanner]);
 
   return (
-    <div className="App" onClick={closeContextualIfClickOut}>
+    <div className="App">
       <Nav />
       {location.pathname !== "/coaching" &&
         location.pathname !== "/comprehensionquiz" &&
@@ -258,13 +220,7 @@ export const App: React.FC = () => {
           path="/flashcardfinder"
           element={
             (userDataQuery.data?.role === "student" ||
-              userDataQuery.data?.isAdmin) && (
-              <FlashcardFinder
-                contextual={contextual}
-                openContextual={openContextual}
-                ref={currentContextual}
-              />
-            )
+              userDataQuery.data?.isAdmin) && <FlashcardFinder />
           }
         />
         <Route
@@ -301,12 +257,7 @@ export const App: React.FC = () => {
             path="/coaching"
             element={
               userDataQuery.data?.isAdmin && (
-                <Coaching
-                  contextual={contextual}
-                  openContextual={openContextual}
-                  closeContextual={closeContextual}
-                  ref={currentContextual}
-                />
+                <Coaching />
               )
             }
           />
