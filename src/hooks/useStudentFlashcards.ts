@@ -446,7 +446,10 @@ export function useStudentFlashcards() {
         throw new Error("No active student");
       }
       const updateResponse = updatePromise.then(
-        (result: number | undefined) => {
+        (result: number | undefined | string) => {
+          if (typeof result === "string") {
+            result = Number.parseInt(result);
+          }
           if (result !== studentExampleId) {
             throw new Error("Failed to update Flashcard");
           }

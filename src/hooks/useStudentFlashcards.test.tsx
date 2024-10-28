@@ -200,3 +200,72 @@ describe("addFlashcardMutation", () => {
     });
   });
 });
+
+describe("updateFlashcardMutation", () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: "student-lcsp" });
+  });
+  it("updates a flashcard's review interval successfully", async () => {
+    // Initial Render
+    const { result } = renderHook(useStudentFlashcards, {
+      wrapper: MockAllProviders,
+    });
+    await waitFor(() => {
+      expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
+      expect(result.current.updateFlashcardMutation).toBeDefined();
+    });
+    // Setup
+    const flashcardDataQuery = result.current.flashcardDataQuery;
+
+    const initalLength = flashcardDataQuery.data?.studentExamples.length;
+    if (!initalLength) throw new Error("No flashcards to update");
+
+    const flashcardToUpdate = flashcardDataQuery.data?.studentExamples.find(
+      (example) => example.reviewInterval === 2,
+    );
+    if (!flashcardToUpdate) throw new Error("No flashcard to update");
+    // Update a flashcard
+    result.current.updateFlashcardMutation.mutate({
+      studentExampleId: flashcardToUpdate.recordId,
+      newInterval: 1,
+      difficulty: "easy",
+    });
+    // Assertions
+    await waitFor(() => {
+      const updatedFlashcard =
+        result.current.flashcardDataQuery.data?.studentExamples.find(
+          (example) => example.recordId === flashcardToUpdate.recordId,
+        );
+      expect(updatedFlashcard?.reviewInterval).toBe(1);
+    });
+  });
+
+  it("throws error when updating a flashcard that does not exist", async () => {
+    // Initial Render
+    const { result } = renderHook(useStudentFlashcards, {
+      wrapper: MockAllProviders,
+    });
+    await waitFor(() => {
+      expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
+      expect(result.current.updateFlashcardMutation).toBeDefined();
+    });
+    // Setup
+    const flashcardDataQuery = result.current.flashcardDataQuery;
+
+    const initalLength = flashcardDataQuery.data?.studentExamples.length;
+    if (!initalLength) throw new Error("No flashcards to update");
+
+    // const flashcardToUpdate = flashcardDataQuery.data?.studentExamples.find((example) => example.reviewInterval === null);
+    // if (!flashcardToUpdate) throw new Error("No flashcard to update");
+    // Update a flashcard
+    result.current.updateFlashcardMutation.mutate({
+      studentExampleId: -1,
+      newInterval: 1,
+      difficulty: "easy",
+    });
+    // Assertions
+    await waitFor(() => {
+      expect(result.current.updateFlashcardMutation.isError).toBeTruthy();
+    });
+  });
+});
