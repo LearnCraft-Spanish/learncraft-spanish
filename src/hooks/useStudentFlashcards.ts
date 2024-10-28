@@ -86,6 +86,7 @@ export function useStudentFlashcards() {
     if (userDataQuery.data?.isAdmin && activeStudentId) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
     } else if (
+      // Limited users should not have flashcards, is this a mistake?
       userDataQuery.data?.role === "student" ||
       userDataQuery.data?.role === "limited"
     ) {
@@ -309,7 +310,10 @@ export function useStudentFlashcards() {
         throw new Error("No active student");
       }
       const removeResponse = removePromise.then(
-        (result: number | undefined) => {
+        (result: number | undefined | string) => {
+          if (typeof result === "string") {
+            result = Number.parseInt(result);
+          }
           if (result !== 1) {
             throw new Error("Failed to remove Flashcard");
           }

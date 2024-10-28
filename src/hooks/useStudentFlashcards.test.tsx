@@ -79,4 +79,58 @@ describe("test by role", () => {
       });
     }
   });
+  describe("removeFlashcardMutation", () => {
+    beforeEach(() => {
+      setupMockAuth({ userName: "student-lcsp" });
+    });
+    it("removes a flashcard successfully", async () => {
+      const { result } = renderHook(useStudentFlashcards, {
+        wrapper: MockAllProviders,
+      });
+      await waitFor(() => {
+        expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
+      });
+      const flashcardDataQuery = result.current.flashcardDataQuery;
+      const removeFlashcardMutation = result.current.removeFlashcardMutation;
+
+      const initalLength = flashcardDataQuery.data?.studentExamples.length;
+      if (!initalLength) throw new Error("No flashcards to remove");
+      // assertions
+      expect(flashcardDataQuery.isSuccess).toBeTruthy();
+      expect(removeFlashcardMutation).toBeDefined();
+      // Remove a flashcard
+      const flashcardToRemove = flashcardDataQuery.data?.examples[0];
+      if (!flashcardToRemove) throw new Error("No flashcard to remove");
+
+      removeFlashcardMutation.mutate(flashcardToRemove.recordId);
+      await waitFor(() => {
+        // must reference result directly, as the hook is re-rendered
+        expect(
+          result.current.flashcardDataQuery.data?.examples.length,
+        ).toBeLessThan(initalLength);
+      });
+    });
+    it("throws error when removing a flashcard that does not exist", async () => {
+      const { result } = renderHook(useStudentFlashcards, {
+        wrapper: MockAllProviders,
+      });
+      await waitFor(() => {
+        expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
+        expect(result.current.removeFlashcardMutation).toBeDefined();
+      });
+      const initalLength =
+        result.current.flashcardDataQuery.data?.studentExamples.length;
+      if (!initalLength) throw new Error("No flashcards to remove");
+
+      // attempt to remove a fake flashcard
+      result.current.removeFlashcardMutation.mutate(-1);
+
+      await waitFor(() => {
+        expect(result.current.removeFlashcardMutation.isError).toBeTruthy();
+        expect(result.current.flashcardDataQuery.data?.examples.length).toBe(
+          initalLength,
+        );
+      });
+    });
+  });
 });
