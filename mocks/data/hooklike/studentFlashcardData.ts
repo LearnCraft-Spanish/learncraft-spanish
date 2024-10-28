@@ -21,11 +21,7 @@ allStudentsTable.forEach((student) => {
   allStudentFlashcards.push({
     userName: student.name,
     emailAddress: student.emailAddress,
-    studentFlashcardData: generateStudentFlashcardData(
-      student,
-      examples.length,
-      examples,
-    ),
+    studentFlashcardData: generateStudentFlashcardData(student, 20, examples),
   });
 });
 
