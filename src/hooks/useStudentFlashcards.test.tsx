@@ -9,29 +9,29 @@ import { examples } from "../../mocks/data/examples.json";
 import type { mockUserNames } from "../interfaceDefinitions";
 
 import { useStudentFlashcards } from "./useStudentFlashcards";
+async function renderHookSuccessfully() {
+  const { result } = renderHook(useStudentFlashcards, {
+    wrapper: MockAllProviders,
+  });
+  await setTimeout(async () => {
+    await waitFor(() => {
+      expect(result.current.flashcardDataQuery.isSuccess).toBeFalsy();
+    });
+  }, 3000);
+  await waitFor(() => {
+    expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
+  });
+  return {
+    flashcardDataQuery: result.current.flashcardDataQuery,
+    exampleIsCollected: result.current.exampleIsCollected,
+    exampleIsPending: result.current.exampleIsPending,
+    addFlashcardMutation: result.current.addFlashcardMutation,
+    removeFlashcardMutation: result.current.removeFlashcardMutation,
+    updateFlashcardMutation: result.current.updateFlashcardMutation,
+  };
+}
 
 describe("test by role", () => {
-  async function renderHookSuccessfully() {
-    const { result } = renderHook(useStudentFlashcards, {
-      wrapper: MockAllProviders,
-    });
-    await setTimeout(async () => {
-      await waitFor(() => {
-        expect(result.current.flashcardDataQuery.isSuccess).toBeFalsy();
-      });
-    }, 3000);
-    await waitFor(() => {
-      expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
-    });
-    return {
-      flashcardDataQuery: result.current.flashcardDataQuery,
-      exampleIsCollected: result.current.exampleIsCollected,
-      exampleIsPending: result.current.exampleIsPending,
-      addFlashcardMutation: result.current.addFlashcardMutation,
-      removeFlashcardMutation: result.current.removeFlashcardMutation,
-      updateFlashcardMutation: result.current.updateFlashcardMutation,
-    };
-  }
   describe("user is student", () => {
     const studentUsers = allStudentsTable.filter(
       (student) => student.role === "student",
@@ -267,5 +267,77 @@ describe("updateFlashcardMutation", () => {
     await waitFor(() => {
       expect(result.current.updateFlashcardMutation.isError).toBeTruthy();
     });
+  });
+});
+describe("exampleIsCollected", () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: "student-lcsp" });
+  });
+  it("returns true if example is collected", async () => {
+    // Initial Render
+    const { flashcardDataQuery, exampleIsCollected } =
+      await renderHookSuccessfully();
+
+    const example = flashcardDataQuery.data?.examples[0];
+    if (!example) throw new Error("No example to check");
+    // Assertions
+    expect(exampleIsCollected(example.recordId)).toBeTruthy();
+  });
+  it("returns false if example is not collected", async () => {
+    // Initial Render
+    const { exampleIsCollected } = await renderHookSuccessfully();
+
+    // Assertions
+    expect(exampleIsCollected(-1)).toBeFalsy();
+  });
+});
+
+describe("exampleIsPending", () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: "student-lcsp" });
+  });
+  it("returns true if example is pending", async () => {
+    // Initial Render
+    const { result } = renderHook(useStudentFlashcards, {
+      wrapper: MockAllProviders,
+    });
+    await waitFor(() => {
+      expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
+      expect(result.current.addFlashcardMutation).toBeDefined();
+      expect(result.current.exampleIsPending).toBeDefined();
+    });
+    // Setup
+    const flashcardDataQuery = result.current.flashcardDataQuery;
+
+    const unknownExample = examples.find(
+      (example) =>
+        !flashcardDataQuery.data?.examples.some(
+          (flashcard) => flashcard.recordId === example.recordId,
+        ),
+    );
+    if (!unknownExample) throw new Error("No unknown examples to add");
+    // Add a flashcard
+    result.current.addFlashcardMutation.mutate(unknownExample);
+    // Assertions
+    await waitFor(() => {
+      expect(
+        result.current.exampleIsPending(unknownExample.recordId),
+      ).toBeTruthy();
+    });
+    await waitFor(() => {
+      expect(
+        result.current.exampleIsCollected(unknownExample.recordId),
+      ).toBeTruthy();
+    });
+  });
+  it("returns false if example is not pending", async () => {
+    // Initial Render
+    const { flashcardDataQuery, exampleIsPending } =
+      await renderHookSuccessfully();
+
+    const example = flashcardDataQuery.data?.examples[0];
+    if (!example) throw new Error("No example to check");
+    // Assertions
+    expect(exampleIsPending(example.recordId)).toBeFalsy();
   });
 });
