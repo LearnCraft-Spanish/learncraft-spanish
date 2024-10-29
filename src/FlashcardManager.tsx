@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import type { Flashcard } from "./interfaceDefinitions";
+import type { Flashcard, StudentExample } from "./interfaceDefinitions";
 import Loading from "./components/Loading";
 import {
   formatEnglishText,
@@ -23,11 +23,12 @@ function FlashcardManager() {
 
   function getStudentExampleFromExampleId(exampleId: number) {
     const studentExample = studentFlashcardData?.studentExamples.find(
-      (item) => item.relatedExample === exampleId,
+      (item) => item.relatedExample === exampleId
     );
 
     return (
-      studentExample || { recordId: -1, dateCreated: "", relatedExample: -1 }
+      studentExample ||
+      ({ recordId: -1, dateCreated: "", relatedExample: -1 } as StudentExample)
     );
   }
 
@@ -68,18 +69,24 @@ function FlashcardManager() {
             <h4>Spanish</h4>
           </div>
         )}
-        <button
-          type="button"
-          className="redButton"
-          value={item.recordId}
-          onClick={(e) =>
-            removeAndUpdate(
-              Number.parseInt((e.target as HTMLButtonElement).value),
-            )
-          }
-        >
-          Remove
-        </button>
+        {getStudentExampleFromExampleId(item.recordId)?.coachAdded ? (
+          <div className="label customLabel">
+            <h4>Custom</h4>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="redButton"
+            value={item.recordId}
+            onClick={(e) =>
+              removeAndUpdate(
+                Number.parseInt((e.target as HTMLButtonElement).value)
+              )
+            }
+          >
+            Remove
+          </button>
+        )}
       </div>
     ));
     return finalTable;

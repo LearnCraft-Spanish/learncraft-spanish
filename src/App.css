@@ -92,6 +92,22 @@ button:hover,
   color: #ffffff;
 }
 
+.label {
+  text-align: center;
+  font-family: "Poppins", "Avenir", "Helvetica", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 30px;
+  color: var(--light);
+  background-color: var(--brand);
+  border: none;
+  cursor: default;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .navigateButtons {
   position: absolute;
   right: 0px;
@@ -426,6 +442,26 @@ button:hover,
 }
 
 /*For Flashcard Manager */
+
+.customLabel {
+  text-align: center;
+  font-family: "Poppins", "Avenir", "Helvetica", sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 30px;
+  border: none;
+  cursor: default;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--light);
+  background-color: var(--theme);
+}
+
+.customLabel h4 {
+  color: var(--light);
+}
 
 .spanglishLabel {
   align-content: center;

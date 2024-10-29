@@ -11,7 +11,7 @@ import { fisherYatesShuffle } from "../../../src/functions/fisherYatesShuffle";
 export default function generateStudentFlashcardData(
   student: UserData,
   numberOfExamples: number,
-  examplesTable: Flashcard[],
+  examplesTable: Flashcard[]
 ) {
   const reviewDatesAndIntervals = [
     {
@@ -41,6 +41,7 @@ export default function generateStudentFlashcardData(
     {
       lastReviewedDate: new Date(Date.now() - 172800000).toISOString(),
       reviewInterval: 0,
+      coachAdded: true,
     },
     {
       lastReviewedDate: new Date(Date.now() - 172800000).toISOString(),
@@ -53,6 +54,7 @@ export default function generateStudentFlashcardData(
     {
       lastReviewedDate: "",
       reviewInterval: null,
+      coachAdded: true,
     },
   ];
 
@@ -75,6 +77,8 @@ export default function generateStudentFlashcardData(
       ? reviewDatesAndIntervals[i].reviewInterval
       : null;
 
+    const coachAdded = reviewDatesAndIntervals[i]?.coachAdded ?? null;
+
     // create studentExample
     studentFlashcardData.studentExamples.push({
       recordId: Math.floor(Math.random() * 100000),
@@ -84,13 +88,14 @@ export default function generateStudentFlashcardData(
       studentEmailAddress: student.emailAddress,
       relatedStudent: student.recordId,
       relatedExample: example.recordId,
-      dateCreated: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
+      dateCreated: new Date(Date.now() - 345600000).toISOString(),
+      coachAdded,
     });
   }
   // match examples with studentExamples
   studentFlashcardData.studentExamples.forEach((studentExample) => {
     const example = verifiedExamples.find(
-      (example) => example.recordId === studentExample.relatedExample,
+      (example) => example.recordId === studentExample.relatedExample
     );
     if (!example) {
       throw new Error("Example mismatch!");
