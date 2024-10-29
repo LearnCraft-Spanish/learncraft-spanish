@@ -86,6 +86,7 @@ export function useStudentFlashcards() {
     if (userDataQuery.data?.isAdmin && activeStudentId) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
     } else if (
+      // Limited users should not have flashcards, is this a mistake?
       userDataQuery.data?.role === "student" ||
       userDataQuery.data?.role === "limited"
     ) {
@@ -180,12 +181,17 @@ export function useStudentFlashcards() {
       if (!addPromise) {
         throw new Error("No active student");
       }
-      const addResponse = addPromise.then((result: number | undefined) => {
-        if (result !== 1) {
-          throw new Error("Failed to add Flashcard");
-        }
-        return result;
-      });
+      const addResponse = addPromise.then(
+        (result: number | undefined | string) => {
+          if (typeof result === "string") {
+            result = Number.parseInt(result);
+          }
+          if (result !== 1) {
+            throw new Error("Failed to add Flashcard");
+          }
+          return result;
+        },
+      );
       return addResponse;
     },
     [
@@ -309,7 +315,10 @@ export function useStudentFlashcards() {
         throw new Error("No active student");
       }
       const removeResponse = removePromise.then(
-        (result: number | undefined) => {
+        (result: number | undefined | string) => {
+          if (typeof result === "string") {
+            result = Number.parseInt(result);
+          }
           if (result !== 1) {
             throw new Error("Failed to remove Flashcard");
           }
@@ -437,7 +446,10 @@ export function useStudentFlashcards() {
         throw new Error("No active student");
       }
       const updateResponse = updatePromise.then(
-        (result: number | undefined) => {
+        (result: number | undefined | string) => {
+          if (typeof result === "string") {
+            result = Number.parseInt(result);
+          }
           if (result !== studentExampleId) {
             throw new Error("Failed to update Flashcard");
           }
