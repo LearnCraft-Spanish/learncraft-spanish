@@ -27,6 +27,8 @@ interface StepValue {
   text: string | JSX.Element;
 }
 
+type stepValues = "question" | "guess" | "hint" | "answer";
+
 interface AudioBasedReviewProps {
   audioOrComprehension?: "audio" | "comprehension";
   willAutoplay: boolean;
@@ -113,7 +115,7 @@ export default function AudioBasedReview({
 
   // New Step Handling Variables
   // Using a state to control the current step so the UI can update
-  const [currentStep, setCurrentStep] = useState<string>("question");
+  const [currentStep, setCurrentStep] = useState<stepValues>("question");
   // const steps = ['question', 'guess', 'hint', 'answer']
 
   // Step Values for each: Will be derived from the current example
@@ -279,7 +281,7 @@ export default function AudioBasedReview({
 
   // Skips to the previous whole example
   const decrementExample = useCallback(
-    (customDecrement: undefined | string = undefined) => {
+    (customDecrement: undefined | stepValues = undefined) => {
       if (currentExampleNumber > 0) {
         setCurrentExampleNumber(currentExampleNumber - 1);
       } else {
@@ -358,7 +360,7 @@ export default function AudioBasedReview({
   }, [autoplay, currentStep, decrementExample, pauseAudio]);
 
   // Currently only used by previousStepButton
-  function customIncrementCurrentStep(step: string) {
+  function customIncrementCurrentStep(step: stepValues) {
     pauseAudio();
     if (step === currentStep) {
       playAudio();
