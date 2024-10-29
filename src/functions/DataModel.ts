@@ -16,6 +16,7 @@ const qb = {
           "Related example",
           "Date Created",
           "Student - Email address",
+          "Coach Added",
         ],
       },
       students: {

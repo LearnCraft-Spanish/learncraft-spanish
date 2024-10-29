@@ -65,6 +65,7 @@ export interface StudentExample {
   lastReviewedDate: string;
   nextReviewDate: string;
   reviewInterval: number | null;
+  coachAdded: boolean | null;
   relatedStudent: number;
   relatedExample: number;
   dateCreated: string;

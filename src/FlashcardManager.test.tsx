@@ -13,9 +13,9 @@ describe("component FlashcardManager", () => {
   it("renders without crashing, student has flashcards", async () => {
     render(<FlashcardManager />, { wrapper: MockAllProviders });
     await waitFor(() =>
-      expect(screen.getByText("Flashcard Manager")).toBeInTheDocument(),
+      expect(screen.getByText("Flashcard Manager")).toBeInTheDocument()
     );
     expect(screen.getByText("Flashcard Manager")).toBeInTheDocument();
-    expect(screen.getByText(/Total flashcards:/)).toBeInTheDocument();
+    expect(screen.getByText(/total flashcards:/i)).toBeInTheDocument();
   });
 });
