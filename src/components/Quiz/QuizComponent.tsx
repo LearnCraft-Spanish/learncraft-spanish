@@ -16,6 +16,7 @@ interface QuizComponentProps {
   examplesToParse: readonly Flashcard[];
   startWithSpanish?: boolean;
   quizOnlyCollectedExamples?: boolean;
+  quizOnlyCustomExamples?: boolean;
   isSrsQuiz?: boolean;
   cleanupFunction?: () => void;
   quizLength?: number;
@@ -27,12 +28,14 @@ export default function QuizComponent({
   startWithSpanish = false,
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
+  quizOnlyCustomExamples = false,
   cleanupFunction,
   quizLength = 1000,
 }: QuizComponentProps) {
   const location = useLocation();
   const { activeStudentQuery } = useActiveStudent();
-  const { flashcardDataQuery, exampleIsCollected } = useStudentFlashcards();
+  const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
+    useStudentFlashcards();
 
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
   const initialDisplayOrder = useRef<DisplayOrder[]>([]);
@@ -182,6 +185,20 @@ export default function QuizComponent({
     [quizOnlyCollectedExamples, isSrsQuiz, exampleIsCollected],
   );
 
+  const filterIfCustomOnly = useCallback(
+    (displayOrderArray: DisplayOrder[]) => {
+      if (quizOnlyCustomExamples) {
+        const filteredList = displayOrderArray.filter((item) =>
+          exampleIsCustom(item.recordId),
+        );
+        return filteredList;
+      } else {
+        return displayOrderArray;
+      }
+    },
+    [quizOnlyCustomExamples, exampleIsCustom],
+  );
+
   // Further filter for only SRS examples
   const getStudentExampleFromExampleId = useCallback(
     (exampleId: number) => {
@@ -254,8 +271,11 @@ export default function QuizComponent({
       // If SRS, filter out examples not due for review
       const filteredByDueDate = filterByDueExamples(filteredByCollected);
 
+      // If customOnly, filter out non-custom examples
+      const filteredByCustom = filterIfCustomOnly(filteredByDueDate);
+
       // Limit the number of examples to the quizLength
-      const limitedOrder = filteredByDueDate.slice(0, quizLength);
+      const limitedOrder = filteredByCustom.slice(0, quizLength);
 
       // Display the limited order if any are left
       if (limitedOrder.length > 0) {
@@ -268,6 +288,7 @@ export default function QuizComponent({
     displayOrderReady,
     quizLength,
     filterIfCollectedOnly,
+    filterIfCustomOnly,
     filterByDueExamples,
   ]);
 

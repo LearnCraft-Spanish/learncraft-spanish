@@ -9,7 +9,7 @@ import {
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 
 function FlashcardManager() {
-  const { flashcardDataQuery, removeFlashcardMutation } =
+  const { flashcardDataQuery, removeFlashcardMutation, exampleIsCustom } =
     useStudentFlashcards();
   const studentFlashcardData = flashcardDataQuery.data;
   const removeFlashcard = removeFlashcardMutation.mutate;
@@ -38,7 +38,11 @@ function FlashcardManager() {
       const bStudentExample = getStudentExampleFromExampleId(b?.recordId);
       const aDate = new Date(aStudentExample.dateCreated);
       const bDate = new Date(bStudentExample.dateCreated);
-      if (a.spanglish === 'spanglish' && b.spanglish !== 'spanglish') {
+      if (exampleIsCustom(a.recordId) && !exampleIsCustom(b.recordId)) {
+        return -1;
+      } else if (!exampleIsCustom(a.recordId) && exampleIsCustom(b.recordId)) {
+        return 1;
+      } else if (a.spanglish === 'spanglish' && b.spanglish !== 'spanglish') {
         return -1;
       } else if (a.spanglish !== 'spanglish' && b.spanglish === 'spanglish') {
         return 1;
@@ -52,7 +56,11 @@ function FlashcardManager() {
     });
 
     const finalTable = sortedExamples.map((item) => (
-      <div className="exampleCard" key={item.recordId}>
+      <div
+        className="exampleCard"
+        aria-label="flashcard-list-item"
+        key={item.recordId}
+      >
         <div className="exampleCardSpanishText">
           {formatSpanishText(item.spanglish, item.spanishExample)}
         </div>

@@ -195,6 +195,7 @@ export default function MyFlashcardsQuiz() {
                 examplesToParse={flashcardDataQuery.data?.examples}
                 quizTitle="My Flashcards"
                 quizOnlyCollectedExamples
+                quizOnlyCustomExamples={customOnly}
                 cleanupFunction={() => makeQuizUnready()}
                 startWithSpanish={spanishFirst}
                 quizLength={quizLength}
@@ -210,6 +211,7 @@ export default function MyFlashcardsQuiz() {
                 examplesToParse={flashcardDataQuery.data?.examples}
                 quizTitle="My Flashcards for Today"
                 quizOnlyCollectedExamples
+                quizOnlyCustomExamples={customOnly}
                 cleanupFunction={() => makeQuizUnready()}
                 startWithSpanish={spanishFirst}
                 quizLength={quizLength}

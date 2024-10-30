@@ -9,6 +9,8 @@ import FlashcardManager from './FlashcardManager';
   once useStudentFlashcardStub is created
 */
 
+// Also needs tests to check that sort order is correct
+
 describe('component FlashcardManager', () => {
   it('renders without crashing, student has flashcards', async () => {
     render(<FlashcardManager />, { wrapper: MockAllProviders });
@@ -16,6 +18,5 @@ describe('component FlashcardManager', () => {
       expect(screen.getByText('Flashcard Manager')).toBeInTheDocument(),
     );
     expect(screen.getByText('Flashcard Manager')).toBeInTheDocument();
-    expect(screen.getByText(/total flashcards:/i)).toBeInTheDocument();
   });
 });

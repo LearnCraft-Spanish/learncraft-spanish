@@ -149,6 +149,17 @@ export function useStudentFlashcards() {
     [flashcardDataQuery.data?.studentExamples],
   );
 
+  const exampleIsCustom = useCallback(
+    (exampleId: number) => {
+      const studentFlashcardData = flashcardDataQuery.data?.studentExamples;
+      const foundStudentExample = studentFlashcardData?.find(
+        (studentExample) => studentExample.relatedExample === exampleId,
+      );
+      return foundStudentExample?.coachAdded || false;
+    },
+    [flashcardDataQuery.data?.studentExamples],
+  );
+
   const exampleIsPending = useCallback(
     (exampleId: number) => {
       const studentFlashcardData = flashcardDataQuery.data?.studentExamples;
@@ -230,6 +241,7 @@ export function useStudentFlashcards() {
         lastReviewedDate: formattedToday,
         nextReviewDate: formattedTomorrow,
         reviewInterval: 1,
+        coachAdded: null,
       };
 
       // Update the local ref with the new student-example to preserve state on re-fetch
@@ -610,6 +622,7 @@ export function useStudentFlashcards() {
   return {
     flashcardDataQuery,
     exampleIsCollected,
+    exampleIsCustom,
     exampleIsPending,
     addFlashcardMutation,
     removeFlashcardMutation,

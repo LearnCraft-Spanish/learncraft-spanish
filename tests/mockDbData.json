@@ -53,7 +53,8 @@
         "relatedStudent": 2,
         "relatedExample": 8508,
         "dateCreated": "2024-01-15T19:45:49Z",
-        "studentEmailAddress": "classicalmoser@gmail.com"
+        "studentEmailAddress": "classicalmoser@gmail.com",
+        "coachAdded": null
       },
       {
         "recordId": 112375,
@@ -63,7 +64,8 @@
         "relatedStudent": 2,
         "relatedExample": 8534,
         "dateCreated": "2024-01-15T19:45:50Z",
-        "studentEmailAddress": "classicalmoser@gmail.com"
+        "studentEmailAddress": "classicalmoser@gmail.com",
+        "coachAdded": null
       },
       {
         "recordId": 112380,
@@ -73,7 +75,8 @@
         "relatedStudent": 2,
         "relatedExample": 3962,
         "dateCreated": "2024-01-15T19:45:54Z",
-        "studentEmailAddress": "classicalmoser@gmail.com"
+        "studentEmailAddress": "classicalmoser@gmail.com",
+        "coachAdded": null
       },
       {
         "recordId": 112381,
@@ -83,7 +86,8 @@
         "relatedStudent": 2,
         "relatedExample": 2877,
         "dateCreated": "2024-01-15T19:45:54Z",
-        "studentEmailAddress": "classicalmoser@gmail.com"
+        "studentEmailAddress": "classicalmoser@gmail.com",
+        "coachAdded": null
       }
     ],
     "examples": [
