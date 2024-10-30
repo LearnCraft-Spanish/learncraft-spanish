@@ -1,11 +1,12 @@
+type stepValues = "question" | "guess" | "hint" | "answer";
 interface AudioQuizButtonsProps {
   audioOrComprehension: "audio" | "comprehension";
   // currentStep: 'question' | 'guess' | 'hint' | 'answer'
-  currentStep: string;
+  currentStep: "question" | "guess" | "hint" | "answer";
   incrementCurrentStep: () => void;
   autoplay: boolean;
   // customIncrementCurrentStep: (step: 'question' | 'guess' | 'hint' | 'answer') => void
-  customIncrementCurrentStep: (step: string) => void;
+  customIncrementCurrentStep: (step: stepValues) => void;
   decrementExample: () => void;
   incrementExample: () => void;
   unReadyQuiz: () => void;
@@ -55,7 +56,6 @@ export default function AudioQuizButtons({
         }
         break;
     }
-    return "Next";
   }
   function previousStepButton(): JSX.Element {
     if (audioOrComprehension === "audio") {
@@ -104,16 +104,6 @@ export default function AudioQuizButtons({
               onClick={() => customIncrementCurrentStep("hint")}
             >
               Replay Spanish
-            </button>
-          );
-        default:
-          // This will never be reached. change currentStep to be a union type of 'question' | 'guess' | 'hint' | 'answer'
-          return (
-            <button
-              type="button"
-              onClick={() => customIncrementCurrentStep("question")}
-            >
-              Replay Audio
             </button>
           );
       }

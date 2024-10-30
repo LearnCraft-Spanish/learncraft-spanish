@@ -1,44 +1,52 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import type { WrapperProps } from "../../../src/interfaceDefinitions";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 
-import serverlikeData from "../../../mocks/data/serverlike/serverlikeData";
+import { setupMockAuth } from "../../../tests/setupMockAuth";
 import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
+
 import AudioBasedReview from "./AudioBasedReview";
 
-const wrapper = ({ children }: WrapperProps) => (
-  <MockAllProviders>{children}</MockAllProviders>
-);
-const api = serverlikeData().api;
-const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true,
-);
-
-vi.unmock("./useUserData");
-vi.mock("./useUserData", () => ({
-  useUserData: vi.fn(() => ({
-    isSuccess: true,
-    data: studentAdmin,
-  })),
-}));
-
-describe("component AudioBasedReview", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-    cleanup();
+describe("initial state", () => {
+  beforeEach(() => {
+    setupMockAuth();
   });
-  describe("initial state", () => {
-    it("while waiting for data, shows loading", async () => {
-      render(<AudioBasedReview willAutoplay={false} />, { wrapper });
-      expect(screen.getByText("Loading Audio...")).toBeInTheDocument();
+  it("while waiting for data, shows loading", async () => {
+    render(<AudioBasedReview willAutoplay={false} />, {
+      wrapper: MockAllProviders,
     });
-    it("await data load, component renders", async () => {
-      render(<AudioBasedReview willAutoplay={false} />, { wrapper });
-      await waitFor(() =>
-        expect(screen.getByText("From:")).toBeInTheDocument(),
-      );
+    expect(screen.getByText("Loading Audio...")).toBeInTheDocument();
+  });
+  it("await data load, component renders", async () => {
+    render(<AudioBasedReview willAutoplay={false} />, {
+      wrapper: MockAllProviders,
+    });
+    await waitFor(() => expect(screen.getByText("From:")).toBeInTheDocument());
+    expect(screen.getByText("Comprehension Quiz")).toBeInTheDocument();
+    expect(screen.queryByText("Loading Audio...")).not.toBeInTheDocument();
+  });
+});
 
-      expect(screen.getByText("Comprehension Quiz")).toBeInTheDocument();
+describe("begin a quiz", () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: "student-lcsp" });
+  });
+  it("clicking begin quiz, shows quiz", async () => {
+    render(<AudioBasedReview willAutoplay={false} />, {
+      wrapper: MockAllProviders,
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Start")).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText("Start"));
+    await waitFor(() => {
+      expect(screen.getByText("Next")).toBeInTheDocument();
+      expect(screen.getByText("Previous")).toBeInTheDocument();
     });
   });
 });
