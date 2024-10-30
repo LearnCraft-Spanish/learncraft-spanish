@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
-import type { Quiz } from "../interfaceDefinitions";
-import useAuth from "./useAuth";
-import { useBackend } from "./useBackend";
+import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
+import type { Quiz } from '../interfaceDefinitions';
+import useAuth from './useAuth';
+import { useBackend } from './useBackend';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
   const { isAuthenticated } = useAuth();
@@ -11,10 +11,10 @@ export function useOfficialQuizzes(quizId: number | undefined) {
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
     quizzes.forEach((item) => {
-      const itemArray = item.quizNickname.split(" ");
+      const itemArray = item.quizNickname.split(' ');
       const quizType = itemArray[0];
       item.quizType = quizType;
-      if (quizType === "ser-estar") {
+      if (quizType === 'ser-estar') {
         const quizBigNumber = Number.parseInt(itemArray.slice(-1)[0]);
         item.quizNumber = quizBigNumber;
         item.lessonNumber = Number.parseInt(itemArray.slice(-1)[0][0]);
@@ -22,27 +22,27 @@ export function useOfficialQuizzes(quizId: number | undefined) {
         const getSubtitleFromNumber = (number: number) => {
           switch (number) {
             case 0:
-              return "Short Quiz";
+              return 'Short Quiz';
             case 1:
-              return "Good/Well";
+              return 'Good/Well';
             case 2:
-              return "Adjectives";
+              return 'Adjectives';
             case 3:
-              return "Prepositions";
+              return 'Prepositions';
             case 4:
-              return "Adverbs";
+              return 'Adverbs';
             case 5:
-              return "Actions";
+              return 'Actions';
             case 6:
-              return "Right and Wrong";
+              return 'Right and Wrong';
             case 7:
-              return "Events";
+              return 'Events';
             case 8:
-              return "Long Quiz";
+              return 'Long Quiz';
             case 9:
-              return "Long Quiz (Everything)";
+              return 'Long Quiz (Everything)';
             default:
-              return "Quiz";
+              return 'Quiz';
           }
         };
         const subtitle: string = getSubtitleFromNumber(quizSubNumber);
@@ -63,7 +63,7 @@ export function useOfficialQuizzes(quizId: number | undefined) {
   }, [getLcspQuizzesFromBackend, parseQuizzes]);
 
   const officialQuizzesQuery = useQuery({
-    queryKey: ["officialQuizzes"],
+    queryKey: ['officialQuizzes'],
     queryFn: getAndParseQuizzes,
     staleTime: Infinity, // Never stale unless manually updated
     gcTime: Infinity, // Never garbage collect unless manually updated
@@ -74,7 +74,7 @@ export function useOfficialQuizzes(quizId: number | undefined) {
     officialQuizzesQuery.isSuccess && !!quizId;
 
   const quizExamplesQuery = useQuery({
-    queryKey: ["quizExamples", quizId],
+    queryKey: ['quizExamples', quizId],
     queryFn: () => getQuizExamplesFromBackend(quizId!),
     staleTime: Infinity, // Never stale unless manually updated
     gcTime: Infinity, // Never garbage collect unless manually updated

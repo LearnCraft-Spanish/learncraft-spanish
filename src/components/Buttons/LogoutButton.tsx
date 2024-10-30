@@ -1,5 +1,5 @@
-import React from "react";
-import useAuth from "../../hooks/useAuth";
+import React from 'react';
+import useAuth from '../../hooks/useAuth';
 
 function LogoutButton(): JSX.Element | false {
   const { isAuthenticated, logout } = useAuth();
@@ -9,7 +9,7 @@ function LogoutButton(): JSX.Element | false {
       <button
         type="button"
         id="logout"
-        className={window.location.pathname === "/" ? " " : "notRoot"}
+        className={window.location.pathname === '/' ? ' ' : 'notRoot'}
         onClick={logout}
       >
         Log Out

@@ -1,9 +1,9 @@
 // Providers.tsx
-import type { ReactNode } from "react";
-import { Auth0Provider } from "@auth0/auth0-react";
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { ContextualMenuProvider } from "./ContextualMenuProvider";
+import type { ReactNode } from 'react';
+import { Auth0Provider } from '@auth0/auth0-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ContextualMenuProvider } from './ContextualMenuProvider';
 
 interface ProvidersProps {
   children: ReactNode;
@@ -24,10 +24,10 @@ function Providers({ children }: ProvidersProps) {
         redirect_uri: window.location.origin,
         audience,
         scope:
-          "openid profile email read:current-student update:current-student read:all-students update:all-students",
+          'openid profile email read:current-student update:current-student read:all-students update:all-students',
       }}
       onRedirectCallback={(appState) => {
-        navigate(appState?.targetUrl || "/", { replace: true });
+        navigate(appState?.targetUrl || '/', { replace: true });
       }}
     >
       <ContextualMenuProvider>{children}</ContextualMenuProvider>

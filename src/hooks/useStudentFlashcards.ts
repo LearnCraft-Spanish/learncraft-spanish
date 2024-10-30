@@ -1,14 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { debounce } from "lodash";
-import { useCallback, useRef } from "react";
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { debounce } from 'lodash';
+import { useCallback, useRef } from 'react';
 import type {
   Flashcard,
   StudentExample,
   StudentFlashcardData,
-} from "../interfaceDefinitions";
-import { useActiveStudent } from "./useActiveStudent";
-import { useBackend } from "./useBackend";
-import { useUserData } from "./useUserData";
+} from '../interfaceDefinitions';
+import { useActiveStudent } from './useActiveStudent';
+import { useBackend } from './useBackend';
+import { useUserData } from './useUserData';
 
 export function useStudentFlashcards() {
   const queryClient = useQueryClient();
@@ -87,16 +87,16 @@ export function useStudentFlashcards() {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
     } else if (
       // Limited users should not have flashcards, is this a mistake?
-      userDataQuery.data?.role === "student" ||
-      userDataQuery.data?.role === "limited"
+      userDataQuery.data?.role === 'student' ||
+      userDataQuery.data?.role === 'limited'
     ) {
       backendResponse = await getMyExamplesFromBackend();
     }
     if (backendResponse === undefined) {
-      throw new Error("No active student");
+      throw new Error('No active student');
     }
     if (!backendResponse) {
-      throw new Error("bad response");
+      throw new Error('bad response');
     }
 
     const mergedExampleData = backendResponse.examples.map((flashcard) => ({
@@ -131,7 +131,7 @@ export function useStudentFlashcards() {
   };
 
   const flashcardDataQuery = useQuery({
-    queryKey: ["flashcardData", activeStudentId], // Data changes based on active student
+    queryKey: ['flashcardData', activeStudentId], // Data changes based on active student
     queryFn: getFlashcardData,
     staleTime: Infinity, // Never stale unless manually updated
     enabled: flashcardDataDependencies,
@@ -164,7 +164,7 @@ export function useStudentFlashcards() {
   // Create a ref to ensure refetch debounces properly
   const debouncedRefetch = useRef(
     debounce(() => {
-      queryClient.invalidateQueries({ queryKey: ["flashcardData"] });
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
     }, 500),
   ).current;
 
@@ -175,19 +175,19 @@ export function useStudentFlashcards() {
       let addPromise;
       if (userDataQuery.data?.isAdmin && activeStudentId) {
         addPromise = createStudentExample(activeStudentId, recordId);
-      } else if (userDataQuery.data?.role === "student") {
+      } else if (userDataQuery.data?.role === 'student') {
         addPromise = createMyStudentExample(recordId);
       }
       if (!addPromise) {
-        throw new Error("No active student");
+        throw new Error('No active student');
       }
       const addResponse = addPromise.then(
         (result: number | undefined | string) => {
-          if (typeof result === "string") {
+          if (typeof result === 'string') {
             result = Number.parseInt(result);
           }
           if (result !== 1) {
-            throw new Error("Failed to add Flashcard");
+            throw new Error('Failed to add Flashcard');
           }
           return result;
         },
@@ -209,7 +209,7 @@ export function useStudentFlashcards() {
     onMutate: async (flashcard: Flashcard) => {
       // Cancel any in-flight queries to prevent race conditions
       await queryClient.cancelQueries({
-        queryKey: ["flashcardData", activeStudentId],
+        queryKey: ['flashcardData', activeStudentId],
       });
 
       // Memoize ID number for rollback, then decrement the tempIdNum for the next flashcard
@@ -222,7 +222,7 @@ export function useStudentFlashcards() {
 
       // This needs checking. Types and date formats probably inaccurate.
       const newStudentExample: StudentExample = {
-        studentEmailAddress: userDataQuery.data?.emailAddress || "",
+        studentEmailAddress: userDataQuery.data?.emailAddress || '',
         recordId: thisIdNum,
         relatedExample: flashcard.recordId,
         relatedStudent: activeStudentId!,
@@ -240,7 +240,7 @@ export function useStudentFlashcards() {
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(
-        ["flashcardData", activeStudentId],
+        ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           if (!oldFlashcards) {
             const newItem = {
@@ -276,7 +276,7 @@ export function useStudentFlashcards() {
       // Use the memoized ID number to rollback the cache
       const thisIdNum = context;
       queryClient.setQueryData(
-        ["flashcardData", activeStudentId],
+        ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.examples];
           const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
@@ -303,24 +303,24 @@ export function useStudentFlashcards() {
         (studentFlashcard) => studentFlashcard.relatedExample === flashcardId,
       )?.recordId;
       if (!studentFlashcardId) {
-        throw new Error("Flashcard Not Found");
+        throw new Error('Flashcard Not Found');
       }
       let removePromise;
       if (userDataQuery.data?.isAdmin && activeStudentId) {
         removePromise = deleteStudentExample(studentFlashcardId);
-      } else if (userDataQuery.data?.role === "student") {
+      } else if (userDataQuery.data?.role === 'student') {
         removePromise = deleteMyStudentExample(studentFlashcardId);
       }
       if (!removePromise) {
-        throw new Error("No active student");
+        throw new Error('No active student');
       }
       const removeResponse = removePromise.then(
         (result: number | undefined | string) => {
-          if (typeof result === "string") {
+          if (typeof result === 'string') {
             result = Number.parseInt(result);
           }
           if (result !== 1) {
-            throw new Error("Failed to remove Flashcard");
+            throw new Error('Failed to remove Flashcard');
           }
           return result;
         },
@@ -343,7 +343,7 @@ export function useStudentFlashcards() {
     onMutate: async (flashcardId: number) => {
       // Cancel any in-flight queries
       await queryClient.cancelQueries({
-        queryKey: ["flashcardData", activeStudentId],
+        queryKey: ['flashcardData', activeStudentId],
       });
 
       // Memoize the studentFlashcard and flashcard objects for rollback
@@ -352,7 +352,7 @@ export function useStudentFlashcards() {
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(
-        ["flashcardData", activeStudentId],
+        ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           // Find the studentFlashcard and related flashcard objects
           const flashcardObjectOriginal = oldFlashcards.examples.find(
@@ -410,7 +410,7 @@ export function useStudentFlashcards() {
       if (studentFlashcardObject?.recordId && flashcardObject?.recordId) {
         // Only run if the memoized objects exist
         queryClient.setQueryData(
-          ["flashcardData", activeStudentId],
+          ['flashcardData', activeStudentId],
           (oldFlashcards: StudentFlashcardData) => {
             const flashcardsArray: Flashcard[] = [
               ...oldFlashcards?.examples,
@@ -439,19 +439,19 @@ export function useStudentFlashcards() {
       let updatePromise;
       if (userDataQuery.data?.isAdmin && activeStudentId) {
         updatePromise = updateStudentExample(studentExampleId, newInterval);
-      } else if (userDataQuery.data?.role === "student") {
+      } else if (userDataQuery.data?.role === 'student') {
         updatePromise = updateMyStudentExample(studentExampleId, newInterval);
       }
       if (!updatePromise) {
-        throw new Error("No active student");
+        throw new Error('No active student');
       }
       const updateResponse = updatePromise.then(
         (result: number | undefined | string) => {
-          if (typeof result === "string") {
+          if (typeof result === 'string') {
             result = Number.parseInt(result);
           }
           if (result !== studentExampleId) {
-            throw new Error("Failed to update Flashcard");
+            throw new Error('Failed to update Flashcard');
           }
           return result;
         },
@@ -474,12 +474,12 @@ export function useStudentFlashcards() {
     }: {
       studentExampleId: number;
       newInterval: number;
-      difficulty: "easy" | "hard";
+      difficulty: 'easy' | 'hard';
     }) => updateActiveStudentFlashcards(studentExampleId, newInterval),
     onMutate: async ({ studentExampleId, newInterval, difficulty }) => {
       // Cancel any in-flight queries
       await queryClient.cancelQueries({
-        queryKey: ["flashcardData", activeStudentId],
+        queryKey: ['flashcardData', activeStudentId],
       });
 
       // Memoize the old interval for rollback
@@ -487,7 +487,7 @@ export function useStudentFlashcards() {
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(
-        ["flashcardData", activeStudentId],
+        ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
           const studentFlashcard = oldFlashcardsCopy.find(
@@ -565,7 +565,7 @@ export function useStudentFlashcards() {
 
       // Roll back the cache for just the affected flashcard
       queryClient.setQueryData(
-        ["flashcardData", activeStudentId],
+        ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
           const studentFlashcard = oldFlashcardsCopy.find(

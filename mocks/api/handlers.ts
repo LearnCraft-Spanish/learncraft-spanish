@@ -1,19 +1,19 @@
-import type { DefaultBodyType, StrictRequest } from "msw";
-import { HttpResponse, http } from "msw";
-import newData from "../data/serverlike/serverlikeData";
+import type { DefaultBodyType, StrictRequest } from 'msw';
+import { HttpResponse, http } from 'msw';
+import newData from '../data/serverlike/serverlikeData';
 
-import allStudentFlashcards from "../data/hooklike/studentFlashcardData";
+import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
 
 function getEmailFromRequest(request: StrictRequest<DefaultBodyType>) {
-  const fakeToken = request.headers.get("Authorization");
-  const tokenParts = fakeToken?.split(" ");
+  const fakeToken = request.headers.get('Authorization');
+  const tokenParts = fakeToken?.split(' ');
   const emailAddress = tokenParts?.[1];
   if (!emailAddress) {
-    throw new Error("Email address not found in token");
+    throw new Error('Email address not found in token');
   }
   return emailAddress;
 }
@@ -49,7 +49,7 @@ export const handlers = [
       return quiz.recordId === Number(paramString);
     });
     if (!quizObject) {
-      throw new Error("Quiz not found");
+      throw new Error('Quiz not found');
     }
     const quizExamplesObject = apiData.quizExamplesTableArray.find(
       (quizExamples) => {
@@ -57,11 +57,11 @@ export const handlers = [
       },
     );
     if (!quizExamplesObject) {
-      throw new Error("Quiz examples not found");
+      throw new Error('Quiz examples not found');
     }
     const quizExamples = quizExamplesObject.quizExamplesTable;
     if (!quizExamples) {
-      throw new Error("Quiz examples not found");
+      throw new Error('Quiz examples not found');
     }
     return HttpResponse.json(quizExamples);
   }),
@@ -85,7 +85,7 @@ export const handlers = [
       return student.emailAddress === email;
     });
     if (!studentFlashcards) {
-      throw new Error("Student not found");
+      throw new Error('Student not found');
     }
     return HttpResponse.json(studentFlashcards.studentFlashcardData);
   }),
@@ -100,65 +100,65 @@ export const handlers = [
     const studentId = params.studentId;
     const studentIdNumber = Number(studentId);
     if (!studentIdNumber) {
-      throw new Error("Student not found");
+      throw new Error('Student not found');
     }
     const email = getEmailFromRequest(request);
     const studentFlashcards = allStudentFlashcards.find((student) => {
       return student.emailAddress === email;
     });
     if (!studentFlashcards) {
-      throw new Error("Student not found");
+      throw new Error('Student not found');
     }
     return HttpResponse.json(studentFlashcards.studentFlashcardData);
   }),
 
   // Post Requests
   http.post(`${backendUrl}create-my-student-example`, async ({ request }) => {
-    const exampleId = request.headers.get("exampleid");
-    if (exampleId === "-1") {
-      return HttpResponse.json("0");
+    const exampleId = request.headers.get('exampleid');
+    if (exampleId === '-1') {
+      return HttpResponse.json('0');
     }
-    return HttpResponse.json("1");
+    return HttpResponse.json('1');
   }),
 
   http.post(`${backendUrl}create-student-example`, async ({ request }) => {
-    const exampleId = request.headers.get("exampleid");
-    const studentId = request.headers.get("studentid");
-    if (exampleId === "-1" || studentId === "-1") {
-      return HttpResponse.json("0");
+    const exampleId = request.headers.get('exampleid');
+    const studentId = request.headers.get('studentid');
+    if (exampleId === '-1' || studentId === '-1') {
+      return HttpResponse.json('0');
     }
-    return HttpResponse.json("1");
+    return HttpResponse.json('1');
   }),
 
   http.post(`${backendUrl}update-my-student-example`, async ({ request }) => {
-    const updateId = request.headers.get("updateid");
-    if (updateId === "-1") {
-      return HttpResponse.json("0");
+    const updateId = request.headers.get('updateid');
+    if (updateId === '-1') {
+      return HttpResponse.json('0');
     }
     return HttpResponse.json(updateId);
   }),
   http.post(`${backendUrl}update-student-example`, async ({ request }) => {
-    const updateId = request.headers.get("updateid");
-    if (updateId === "-1") {
-      return HttpResponse.json("0");
+    const updateId = request.headers.get('updateid');
+    if (updateId === '-1') {
+      return HttpResponse.json('0');
     }
     return HttpResponse.json(updateId);
   }),
 
   // Delete Requests
   http.delete(`${backendUrl}delete-my-student-example`, async ({ request }) => {
-    const exampleId = request.headers.get("deleteid");
-    if (exampleId === "-1") {
-      return HttpResponse.json("0");
+    const exampleId = request.headers.get('deleteid');
+    if (exampleId === '-1') {
+      return HttpResponse.json('0');
     }
-    return HttpResponse.json("1");
+    return HttpResponse.json('1');
   }),
 
   http.delete(`${backendUrl}delete-student-example`, async ({ request }) => {
-    const exampleId = request.headers.get("deleteid");
-    if (exampleId === "-1") {
-      return HttpResponse.json("0");
+    const exampleId = request.headers.get('deleteid');
+    if (exampleId === '-1') {
+      return HttpResponse.json('0');
     }
-    return HttpResponse.json("1");
+    return HttpResponse.json('1');
   }),
 ];

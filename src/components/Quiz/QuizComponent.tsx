@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Link, Navigate, useLocation } from "react-router-dom";
-import type { DisplayOrder, Flashcard } from "../../interfaceDefinitions";
-import { fisherYatesShuffle } from "../../functions/fisherYatesShuffle";
-import { useActiveStudent } from "../../hooks/useActiveStudent";
-import { useStudentFlashcards } from "../../hooks/useStudentFlashcards";
-import MenuButton from "../Buttons/MenuButton";
-import NewQuizProgress from "./../AudioBasedReview/NewQuizProgress";
-import FlashcardDisplay from "./FlashcardDisplay";
-import QuizButtons from "./QuizButtons";
-import SRSQuizButtons from "./SRSButtons";
+import { Link, Navigate, useLocation } from 'react-router-dom';
+import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
+import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import MenuButton from '../Buttons/MenuButton';
+import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
+import FlashcardDisplay from './FlashcardDisplay';
+import QuizButtons from './QuizButtons';
+import SRSQuizButtons from './SRSButtons';
 
 interface QuizComponentProps {
   quizTitle: string;
@@ -55,7 +55,7 @@ export default function QuizComponent({
   // will need to second pass these variables:
   const spanishShowing = startWithSpanish !== answerShowing;
 
-  const isMainLocation = location.pathname.split("/").length < 2;
+  const isMainLocation = location.pathname.split('/').length < 2;
 
   function hideAnswer() {
     setAnswerShowing(false);
@@ -71,8 +71,8 @@ export default function QuizComponent({
 
   /*      Audio Component Section       */
 
-  const spanishAudioUrl = currentExample?.spanishAudioLa || "";
-  const englishAudioUrl = currentExample?.englishAudio || "";
+  const spanishAudioUrl = currentExample?.spanishAudioLa || '';
+  const englishAudioUrl = currentExample?.englishAudio || '';
 
   const audioActive: string = spanishShowing
     ? spanishAudioUrl
@@ -198,7 +198,7 @@ export default function QuizComponent({
     (exampleId: number) => {
       const relatedStudentExample = getStudentExampleFromExampleId(exampleId);
       if (!relatedStudentExample) {
-        return "";
+        return '';
       }
       const dueDate = relatedStudentExample.nextReviewDate;
       return dueDate;
@@ -282,19 +282,19 @@ export default function QuizComponent({
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight" || event.key === "d") {
+      if (event.key === 'ArrowRight' || event.key === 'd') {
         incrementExampleNumber();
-      } else if (event.key === "ArrowLeft" || event.key === "a") {
+      } else if (event.key === 'ArrowLeft' || event.key === 'a') {
         decrementExampleNumber();
       } else if (
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown" ||
-        event.key === "w" ||
-        event.key === "s"
+        event.key === 'ArrowUp' ||
+        event.key === 'ArrowDown' ||
+        event.key === 'w' ||
+        event.key === 's'
       ) {
         event.preventDefault();
         toggleAnswer();
-      } else if (event.key === " ") {
+      } else if (event.key === ' ') {
         event.preventDefault();
         togglePlaying();
       }
@@ -308,9 +308,9 @@ export default function QuizComponent({
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener('keydown', handleKeyPress);
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
 
@@ -330,7 +330,7 @@ export default function QuizComponent({
           {currentFlashcardIsValid && (
             <FlashcardDisplay
               example={currentExample}
-              isStudent={activeStudentQuery.data?.role === "student"}
+              isStudent={activeStudentQuery.data?.role === 'student'}
               incrementExampleNumber={incrementExampleNumber}
               onRemove={onRemove}
               answerShowing={answerShowing}

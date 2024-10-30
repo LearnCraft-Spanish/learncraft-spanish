@@ -1,5 +1,5 @@
-import { vi } from "vitest";
-import { getUserDataFromName } from "../data/serverlike/studentTable";
+import { vi } from 'vitest';
+import { getUserDataFromName } from '../data/serverlike/studentTable';
 
 export interface MockAuth {
   isAuthenticated: boolean;
@@ -13,20 +13,20 @@ export interface MockAuthOptions {
   isAuthenticated?: boolean;
   isLoading?: boolean;
   userName?:
-    | "admin-empty-role"
-    | "empty-role"
-    | "none-role"
-    | "limited"
-    | "student-admin"
-    | "student-lcsp"
-    | "student-ser-estar"
+    | 'admin-empty-role'
+    | 'empty-role'
+    | 'none-role'
+    | 'limited'
+    | 'student-admin'
+    | 'student-lcsp'
+    | 'student-ser-estar'
     | null;
 }
 
 const createMockAuth = ({
   isAuthenticated = true,
   isLoading = false,
-  userName = "student-admin", // Default userName is "student-admin"
+  userName = 'student-admin', // Default userName is "student-admin"
 }: MockAuthOptions = {}): MockAuth => {
   function getStudentEmail() {
     const studentEmail = getUserDataFromName(userName)?.emailAddress;

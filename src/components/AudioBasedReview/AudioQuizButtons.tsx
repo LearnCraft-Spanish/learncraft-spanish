@@ -1,8 +1,8 @@
-type stepValues = "question" | "guess" | "hint" | "answer";
+type stepValues = 'question' | 'guess' | 'hint' | 'answer';
 interface AudioQuizButtonsProps {
-  audioOrComprehension: "audio" | "comprehension";
+  audioOrComprehension: 'audio' | 'comprehension';
   // currentStep: 'question' | 'guess' | 'hint' | 'answer'
-  currentStep: "question" | "guess" | "hint" | "answer";
+  currentStep: 'question' | 'guess' | 'hint' | 'answer';
   incrementCurrentStep: () => void;
   autoplay: boolean;
   // customIncrementCurrentStep: (step: 'question' | 'guess' | 'hint' | 'answer') => void
@@ -23,85 +23,85 @@ export default function AudioQuizButtons({
 }: AudioQuizButtonsProps): JSX.Element {
   function nextStepButtonText(): string {
     switch (audioOrComprehension) {
-      case "audio":
+      case 'audio':
         switch (currentStep) {
-          case "question":
+          case 'question':
             if (autoplay) {
-              return "Skip to Guess";
+              return 'Skip to Guess';
             } else {
-              return "Play Spanish";
+              return 'Play Spanish';
             }
-          case "guess":
-            return "Play Spanish";
-          case "hint":
-            return "Play Again";
-          case "answer":
-            return "Next";
+          case 'guess':
+            return 'Play Spanish';
+          case 'hint':
+            return 'Play Again';
+          case 'answer':
+            return 'Next';
         }
         break;
-      case "comprehension":
+      case 'comprehension':
         switch (currentStep) {
-          case "question":
+          case 'question':
             if (autoplay) {
-              return "Skip to Guess";
+              return 'Skip to Guess';
             } else {
-              return "Show Spanish";
+              return 'Show Spanish';
             }
-          case "guess":
-            return "Show Spanish";
-          case "hint":
-            return "Show English";
-          case "answer":
-            return "Next";
+          case 'guess':
+            return 'Show Spanish';
+          case 'hint':
+            return 'Show English';
+          case 'answer':
+            return 'Next';
         }
         break;
     }
   }
   function previousStepButton(): JSX.Element {
-    if (audioOrComprehension === "audio") {
+    if (audioOrComprehension === 'audio') {
       // I think in the original code there was supposted to be a case Play again, but I could not reproduce it.
       return (
         <button
           type="button"
-          onClick={() => customIncrementCurrentStep("question")}
+          onClick={() => customIncrementCurrentStep('question')}
         >
           Replay English
         </button>
       );
     } else {
       switch (currentStep) {
-        case "question":
+        case 'question':
           return (
             <button
               type="button"
-              onClick={() => customIncrementCurrentStep("question")}
+              onClick={() => customIncrementCurrentStep('question')}
             >
               Replay Spanish
             </button>
           );
-        case "guess":
+        case 'guess':
           return (
             <button
               type="button"
-              onClick={() => customIncrementCurrentStep("question")}
+              onClick={() => customIncrementCurrentStep('question')}
             >
               Replay Spanish
             </button>
           );
-        case "hint":
+        case 'hint':
           return (
             <button
               type="button"
-              onClick={() => customIncrementCurrentStep("hint")}
+              onClick={() => customIncrementCurrentStep('hint')}
             >
               Replay Spanish
             </button>
           );
-        case "answer":
+        case 'answer':
           return (
             <button
               type="button"
-              onClick={() => customIncrementCurrentStep("hint")}
+              onClick={() => customIncrementCurrentStep('hint')}
             >
               Replay Spanish
             </button>

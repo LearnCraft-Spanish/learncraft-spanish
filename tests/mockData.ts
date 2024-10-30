@@ -3,9 +3,9 @@ import type {
   Program,
   StudentFlashcardData,
   UserData,
-} from "../src/interfaceDefinitions";
-import mockDbData from "./mockDbData.json";
-import mockLessonData from "./mockLessonData.json";
+} from '../src/interfaceDefinitions';
+import mockDbData from './mockDbData.json';
+import mockLessonData from './mockLessonData.json';
 
 export const sampleStudent: UserData = mockDbData.sampleStudent;
 

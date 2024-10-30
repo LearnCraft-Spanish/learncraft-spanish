@@ -1,3 +1,3 @@
-import FromToLessonSelector from "./FromToLessonSelector";
+import FromToLessonSelector from './FromToLessonSelector';
 
 export { FromToLessonSelector };

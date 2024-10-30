@@ -14,7 +14,7 @@
 }
 
 body {
-  background-image: url("./resources/paper-small.jpeg");
+  background-image: url('./resources/paper-small.jpeg');
 }
 
 a {
@@ -72,7 +72,7 @@ h6 {
 button,
 .linkButton {
   text-align: center;
-  font-family: "Poppins", "Avenir", "Helvetica", sans-serif;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
   font-weight: 600;
   font-size: 14px;
   padding: 10px 30px;
@@ -94,7 +94,7 @@ button:hover,
 
 .label {
   text-align: center;
-  font-family: "Poppins", "Avenir", "Helvetica", sans-serif;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
   font-weight: 600;
   font-size: 14px;
   padding: 10px 30px;
@@ -445,7 +445,7 @@ button:hover,
 
 .customLabel {
   text-align: center;
-  font-family: "Poppins", "Avenir", "Helvetica", sans-serif;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
   font-weight: 600;
   font-size: 14px;
   padding: 10px 30px;
@@ -1179,7 +1179,7 @@ button:hover,
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 26px;
   width: 26px;
   left: 4px;

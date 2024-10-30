@@ -1,11 +1,11 @@
 // src/Coaching.jsx
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-import { useUserData } from "../../hooks/useUserData";
+import { useUserData } from '../../hooks/useUserData';
 
-import { useBackend } from "../../hooks/useBackend";
-import { useContextualMenu } from "../../hooks/useContextualMenu";
+import { useBackend } from '../../hooks/useBackend';
+import { useContextualMenu } from '../../hooks/useContextualMenu';
 
 const Coaching = () => {
   const { contextual, openContextual, closeContextual, currentContextual } =
@@ -27,7 +27,7 @@ const Coaching = () => {
   const [filterCoachless, setFilterCoachless] = useState(1);
   const [filterHoldWeeks, setFilterHoldWeeks] = useState(1);
   const [filterIncomplete, setFilterIncomplete] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const rendered = useRef(false);
   const students = useRef([]);
   const memberships = useRef([]);
@@ -76,7 +76,7 @@ const Coaching = () => {
   }
 
   function openMoreFilters() {
-    openContextual("moreFilters");
+    openContextual('moreFilters');
   }
 
   function openStudentPopup(recordId) {
@@ -232,7 +232,7 @@ const Coaching = () => {
   function getGroupSessionsFromWeekId(weekId) {
     const groupAttendeeList =
       groupAttendees.current.filter(
-        (attendee) => attendee.student === weekId
+        (attendee) => attendee.student === weekId,
       ) || [];
     // if (typeof groupAttendeeList !== 'object') {
     //   console.log(typeof groupAttendeeList)
@@ -241,8 +241,8 @@ const Coaching = () => {
       const groupSessionList =
         groupAttendeeList.map((attendee) =>
           groupCalls.current.find(
-            (call) => call.recordId === attendee.groupSession
-          )
+            (call) => call.recordId === attendee.groupSession,
+          ),
         ) || [];
       return groupSessionList.filter((item) => item);
     } else {
@@ -253,21 +253,21 @@ const Coaching = () => {
   function getAttendeeWeeksFromGroupSessionId(sessionId) {
     const attendeeList =
       groupAttendees.current.filter(
-        (attendee) => attendee.groupSession === sessionId
+        (attendee) => attendee.groupSession === sessionId,
       ) || [];
     const weekList =
       attendeeList.map(
         (attendee) =>
           weekRecords.current.find(
-            (week) => week.recordId === attendee.student
-          ) || {}
+            (week) => week.recordId === attendee.student,
+          ) || {},
       ) || [];
     return weekList;
   }
 
   function getAssignmentsFromWeekId(weekId) {
     return assignments.current.filter(
-      (assignment) => assignment.relatedWeek === weekId
+      (assignment) => assignment.relatedWeek === weekId,
     );
   }
 
@@ -276,7 +276,7 @@ const Coaching = () => {
       weekRecords.current.find((week) => week.recordId === weekId) || {};
     const membershipId = week.relatedMembership;
     return memberships.current.find(
-      (membership) => membership.recordId === membershipId
+      (membership) => membership.recordId === membershipId,
     );
   }
 
@@ -303,13 +303,13 @@ const Coaching = () => {
         students.current.filter(
           (student) =>
             (student.primaryCoach ? student.primaryCoach.id : undefined) ===
-            (coach.user ? coach.user.id : 0)
+            (coach.user ? coach.user.id : 0),
         ).length > 0;
       if (coachHasActiveStudent) {
         coachSelector.push(
           <option key={coach.recordId} value={coach.recordId}>
             {coach.user.name}
-          </option>
+          </option>,
         );
       }
     });
@@ -325,13 +325,13 @@ const Coaching = () => {
     courses.current.forEach((course) => {
       const courseHasActiveMembership =
         memberships.current.filter(
-          (item) => item.relatedCourse === course.recordId
+          (item) => item.relatedCourse === course.recordId,
         ).length > 0;
       if (courseHasActiveMembership) {
         courseSelector.push(
           <option key={course.recordId} value={course.recordId}>
             {course.name}
-          </option>
+          </option>,
         );
       }
     });
@@ -385,7 +385,7 @@ const Coaching = () => {
         (week) =>
           (getCoachFromMembershipId(week.relatedMembership).recordId
             ? getCoachFromMembershipId(week.relatedMembership).user.email
-            : "") === coachEmail
+            : '') === coachEmail,
       );
     } else {
       return weeks;
@@ -398,7 +398,7 @@ const Coaching = () => {
       return weeks.filter(
         (week) =>
           getCourseFromMembershipId(week.relatedMembership).recordId ===
-          courseRecordId
+          courseRecordId,
       );
     } else {
       return weeks;
@@ -440,15 +440,15 @@ const Coaching = () => {
     const filteredByCoachless = filterWeeksByCoachless(filteredBySearchTerm);
     const filteredByWeeksAgo = filterWeeksByWeeksAgo(
       filteredByCoachless,
-      filterByWeeksAgo
+      filterByWeeksAgo,
     );
     const filteredByCoach = filterWeeksByCoach(
       filteredByWeeksAgo,
-      filterByCoach
+      filterByCoach,
     );
     const filteredByCourse = filterWeeksByCourse(
       filteredByCoach,
-      filterByCourse
+      filterByCourse,
     );
     const filteredByIncomplete = filterWeeksByIncomplete(filteredByCourse);
     const filteredByOnHold = filterWeeksByOnHold(filteredByIncomplete);
@@ -497,7 +497,7 @@ const Coaching = () => {
   const Student = ({ week }) => {
     const student = getStudentFromMembershipId(week.relatedMembership);
     const currentMemberships = memberships.current.filter(
-      (membership) => membership.relatedStudent === student.recordId
+      (membership) => membership.relatedStudent === student.recordId,
     );
     return (
       <div>
@@ -512,12 +512,12 @@ const Coaching = () => {
           {student.email}
           <br />
           {!filterByCoach.recordId &&
-            (student.primaryCoach ? student.primaryCoach.name : "No Coach")}
+            (student.primaryCoach ? student.primaryCoach.name : 'No Coach')}
           {!filterByCoach.recordId && <br />}
           {!filterByCourse.recordId &&
             (getCourseFromMembershipId(week.relatedMembership)
               ? getCourseFromMembershipId(week.relatedMembership).name
-              : "No Course")}
+              : 'No Course')}
           {!filterByCourse.recordId && <br />}
           {filterByWeeksAgo < 0 && week.weekStarts}
         </div>
@@ -530,7 +530,7 @@ const Coaching = () => {
             </p>
             {student.primaryCoach.id && (
               <p>
-                {" "}
+                {' '}
                 Primary Coach:
                 {student.primaryCoach.name}
               </p>
@@ -538,9 +538,9 @@ const Coaching = () => {
             <h5>Active Memberships:</h5>
             {currentMemberships.map((membership) => (
               <p key={membership.recordId}>
-                {getCourseFromMembershipId(membership.recordId).name} since{" "}
+                {getCourseFromMembershipId(membership.recordId).name} since{' '}
                 {membership.startDate}
-                {membership.onHold ? ", currently on Hold." : "."}
+                {membership.onHold ? ', currently on Hold.' : '.'}
               </p>
             ))}
             {student.fluencyGoal.length > 1 && <h5>Fluency Goal:</h5>}
@@ -578,9 +578,9 @@ const Coaching = () => {
                 <h4>
                   {
                     getStudentFromMembershipId(
-                      getMembershipFromWeekId(call.relatedWeek).recordId
+                      getMembershipFromWeekId(call.relatedWeek).recordId,
                     ).fullName
-                  }{" "}
+                  }{' '}
                   on {call.date}
                 </h4>
                 <p>
@@ -632,14 +632,14 @@ const Coaching = () => {
             <h4>
               {
                 getStudentFromMembershipId(
-                  getMembershipFromWeekId(data.recordId).recordId
+                  getMembershipFromWeekId(data.recordId).recordId,
                 ).fullName
-              }{" "}
+              }{' '}
               {
                 getCourseFromMembershipId(
-                  getMembershipFromWeekId(data.recordId).recordId
+                  getMembershipFromWeekId(data.recordId).recordId,
                 ).name
-              }{" "}
+              }{' '}
               call on {dateObjectToText(new Date(Date.now()))}
             </h4>
             <label htmlFor="start">Start date:</label>
@@ -718,7 +718,7 @@ const Coaching = () => {
               </h4>
               <p>
                 Coach:
-                {groupSession.coach ? groupSession.coach.name : ""}
+                {groupSession.coach ? groupSession.coach.name : ''}
               </p>
               <p>
                 Topic:
@@ -742,7 +742,7 @@ const Coaching = () => {
                         changeAttendee(
                           getStudentFromMembershipId(attendee.relatedMembership)
                             .recordId,
-                          groupSession.recordId
+                          groupSession.recordId,
                         )
                       }
                     >
@@ -751,7 +751,7 @@ const Coaching = () => {
                           .fullName
                       }
                     </button>
-                  )
+                  ),
                 )}
               </div>
               {(groupSession.callDocument
@@ -793,7 +793,7 @@ const Coaching = () => {
               <h4>{currentAttendee.current.fullName}</h4>
               <p>{currentAttendee.current.email}</p>
               <p>
-                {" "}
+                {' '}
                 Primary Coach:
                 {currentAttendee.current.primaryCoach.name}
               </p>
@@ -832,10 +832,10 @@ const Coaching = () => {
           {contextual === `assignment${assignment.recordId}` && (
             <div className="assignmentPopup" ref={currentContextual}>
               <h4>
-                {assignment.assignmentType} by{" "}
+                {assignment.assignmentType} by{' '}
                 {
                   getStudentFromMembershipId(
-                    getMembershipFromWeekId(assignment.relatedWeek).recordId
+                    getMembershipFromWeekId(assignment.relatedWeek).recordId,
                   ).fullName
                 }
               </h4>
@@ -931,7 +931,7 @@ const Coaching = () => {
     if (startupDataLoaded) {
       coachUser.current =
         coaches.current.find(
-          (coach) => coach.user.email === userDataQuery.data?.emailAddress
+          (coach) => coach.user.email === userDataQuery.data?.emailAddress,
         ) || null;
       if (coachUser.current ? coachUser.current.recordId : false) {
         updateCoachFilter(coachUser.current.recordId);
@@ -986,7 +986,7 @@ const Coaching = () => {
                 {weeksToDisplay.length} records
               </h4>
             </div>
-            {contextual === "moreFilters" && (
+            {contextual === 'moreFilters' && (
               <div className="moreFilters" ref={currentContextual}>
                 <div className="coachingFilterSection">
                   <select

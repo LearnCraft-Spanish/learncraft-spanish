@@ -1,25 +1,25 @@
-import React, { forwardRef, useCallback, useEffect, useState } from "react";
-import type { DisplayOrder, Flashcard, VocabTag } from "./interfaceDefinitions";
+import React, { useCallback, useEffect, useState } from 'react';
+import type { DisplayOrder, Flashcard, VocabTag } from './interfaceDefinitions';
 
 import {
   formatEnglishText,
   formatSpanishText,
-} from "./functions/formatFlashcardText";
-import { useActiveStudent } from "./hooks/useActiveStudent";
-import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
+} from './functions/formatFlashcardText';
+import { useActiveStudent } from './hooks/useActiveStudent';
+import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 
-import { useVerifiedExamples } from "./hooks/useVerifiedExamples";
+import { useVerifiedExamples } from './hooks/useVerifiedExamples';
 
-import "./App.css";
+import './App.css';
 
 // import { LessonSelector } from './components/LessonSelector'
-import { FromToLessonSelector } from "./components/LessonSelector";
-import Loading from "./components/Loading";
-import { useContextualMenu } from "./hooks/useContextualMenu";
-import { fisherYatesShuffle } from "./functions/fisherYatesShuffle";
-import { useSelectedLesson } from "./hooks/useSelectedLesson";
-import { useUserData } from "./hooks/useUserData";
-import { useVocabulary } from "./hooks/useVocabulary";
+import { FromToLessonSelector } from './components/LessonSelector';
+import Loading from './components/Loading';
+import { useContextualMenu } from './hooks/useContextualMenu';
+import { fisherYatesShuffle } from './functions/fisherYatesShuffle';
+import { useSelectedLesson } from './hooks/useSelectedLesson';
+import { useUserData } from './hooks/useUserData';
+import { useVocabulary } from './hooks/useVocabulary';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = () => {
@@ -57,7 +57,7 @@ const FlashcardFinder = () => {
     !isError &&
     !dataLoaded;
 
-  const [tagSearchTerm, setTagSearchTerm] = useState("");
+  const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([]);
   const [requiredTags, setRequiredTags] = useState<VocabTag[]>([]);
   const [noSpanglish, setNoSpanglish] = useState(false);
@@ -69,7 +69,7 @@ const FlashcardFinder = () => {
       return null;
     }
     const foundExample = verifiedExamplesQuery.data.find(
-      (example) => example.recordId === recordId
+      (example) => example.recordId === recordId,
     );
     return foundExample;
   }
@@ -96,7 +96,7 @@ const FlashcardFinder = () => {
   }
 
   function updateTagSearchTerm(target: EventTarget & HTMLInputElement) {
-    openContextual("tagSuggestionBox");
+    openContextual('tagSuggestionBox');
     setTagSearchTerm(target.value);
   }
 
@@ -130,10 +130,10 @@ const FlashcardFinder = () => {
             // console.log(word.vocabName)
             if (!isGood) {
               switch (tag.type) {
-                case "subcategory":
+                case 'subcategory':
                   example.vocabIncluded.forEach((item) => {
                     const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item
+                      (element) => element.vocabName === item,
                     );
                     if (
                       word?.vocabularySubcategorySubcategoryName === tag.tag
@@ -142,20 +142,20 @@ const FlashcardFinder = () => {
                     }
                   });
                   break;
-                case "verb":
+                case 'verb':
                   example.vocabIncluded.forEach((item) => {
                     const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item
+                      (element) => element.vocabName === item,
                     );
                     if (word?.verbInfinitive === tag.tag) {
                       isGood = true;
                     }
                   });
                   break;
-                case "conjugation":
+                case 'conjugation':
                   example.vocabIncluded.forEach((item) => {
                     const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item
+                      (element) => element.vocabName === item,
                     );
                     word?.conjugationTags.forEach((conjugationTag) => {
                       if (conjugationTag === tag.tag) {
@@ -164,20 +164,20 @@ const FlashcardFinder = () => {
                     });
                   });
                   break;
-                case "vocabulary":
+                case 'vocabulary':
                   example.vocabIncluded.forEach((item) => {
                     const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item
+                      (element) => element.vocabName === item,
                     );
                     if (word?.wordIdiom === tag.tag) {
                       isGood = true;
                     }
                   });
                   break;
-                case "idiom":
+                case 'idiom':
                   example.vocabIncluded.forEach((item: string) => {
                     const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item
+                      (element) => element.vocabName === item,
                     );
                     if (word?.wordIdiom === tag.tag) {
                       isGood = true;
@@ -194,14 +194,14 @@ const FlashcardFinder = () => {
         return examples;
       }
     },
-    [requiredTags, vocabularyQuery.isSuccess, vocabularyQuery.data]
+    [requiredTags, vocabularyQuery.isSuccess, vocabularyQuery.data],
   );
 
   const filterBySpanglish = useCallback(
     (examples: Flashcard[]) => {
       if (noSpanglish) {
         const filteredBySpanglish = examples.filter((item) => {
-          if (item.spanglish === "esp") {
+          if (item.spanglish === 'esp') {
             return true;
           }
           return false;
@@ -211,7 +211,7 @@ const FlashcardFinder = () => {
         return examples;
       }
     },
-    [noSpanglish]
+    [noSpanglish],
   );
 
   // cause of circular dependency?
@@ -229,7 +229,7 @@ const FlashcardFinder = () => {
       filterBySpanglish,
       filterExamplesBySelectedTags,
       filterExamplesBySelectedLesson,
-    ]
+    ],
   );
 
   // called when user clicks 'Copy as Table' button
@@ -238,12 +238,12 @@ const FlashcardFinder = () => {
     if (!verifiedExamplesQuery.isSuccess) {
       return null;
     }
-    const headers = "ID\tSpanish\tEnglish\tAudio_Link\n";
+    const headers = 'ID\tSpanish\tEnglish\tAudio_Link\n';
     const table = displayOrder
       .map((displayOrderObject) => {
         const foundExample = getExampleById(displayOrderObject.recordId);
         if (!foundExample) {
-          return "";
+          return '';
         }
         return `${foundExample.recordId}\t\
             ${foundExample.spanishExample}\t\
@@ -285,7 +285,7 @@ const FlashcardFinder = () => {
       }
       setSuggestedTags(suggestTen);
     },
-    [tagTable, requiredTags]
+    [tagTable, requiredTags],
   );
 
   function addFlashcard(exampleId: string) {
@@ -308,7 +308,7 @@ const FlashcardFinder = () => {
     }
     const tableToDisplay = displayOrder.map((displayOrderObject) => {
       const item = verifiedExamplesQuery.data.find(
-        (example) => example.recordId === displayOrderObject.recordId
+        (example) => example.recordId === displayOrderObject.recordId,
       );
       if (!item) {
         return null;
@@ -321,7 +321,7 @@ const FlashcardFinder = () => {
           <div className="exampleCardEnglishText">
             {formatEnglishText(item.englishTranslation)}
           </div>
-          {activeStudentQuery.data?.role === "student" &&
+          {activeStudentQuery.data?.role === 'student' &&
             !!flashcardDataQuery.data &&
             !exampleIsCollected(item.recordId) && (
               <button
@@ -333,7 +333,7 @@ const FlashcardFinder = () => {
                 Add
               </button>
             )}
-          {activeStudentQuery.data?.role === "student" &&
+          {activeStudentQuery.data?.role === 'student' &&
             !!flashcardDataQuery.data &&
             exampleIsCollected(item.recordId) &&
             exampleIsPending(item.recordId) && (
@@ -345,7 +345,7 @@ const FlashcardFinder = () => {
                 Adding...
               </button>
             )}
-          {activeStudentQuery.data?.role === "student" &&
+          {activeStudentQuery.data?.role === 'student' &&
             !!flashcardDataQuery.data &&
             exampleIsCollected(item.recordId) &&
             !exampleIsPending(item.recordId) && (
@@ -428,8 +428,8 @@ const FlashcardFinder = () => {
                       checked={!noSpanglish}
                       style={
                         !noSpanglish
-                          ? { backgroundColor: "darkgreen" }
-                          : { backgroundColor: "darkred" }
+                          ? { backgroundColor: 'darkgreen' }
+                          : { backgroundColor: 'darkred' }
                       }
                       onChange={toggleSpanglish}
                     />
@@ -445,13 +445,13 @@ const FlashcardFinder = () => {
                       <input
                         type="text"
                         onChange={(e) => updateTagSearchTerm(e.currentTarget)}
-                        onClick={() => openContextual("tagSuggestionBox")}
+                        onClick={() => openContextual('tagSuggestionBox')}
                         placeholder="Search tags"
                       />
                       <br></br>
                     </div>
                     {!!tagSearchTerm.length &&
-                      contextual === "tagSuggestionBox" &&
+                      contextual === 'tagSuggestionBox' &&
                       !!suggestedTags.length && (
                         <div className="tagSuggestionBox">
                           {suggestedTags.map((item) => (

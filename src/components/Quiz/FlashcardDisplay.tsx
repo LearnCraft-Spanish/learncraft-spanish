@@ -1,14 +1,14 @@
-import React from "react";
-import type { Flashcard } from "../../interfaceDefinitions";
+import React from 'react';
+import type { Flashcard } from '../../interfaceDefinitions';
 import {
   formatEnglishText,
   formatSpanishText,
-} from "../../functions/formatFlashcardText";
-import play from "../../resources/icons/play_dark.svg";
-import pause from "../../resources/icons/pause_dark.svg";
+} from '../../functions/formatFlashcardText';
+import play from '../../resources/icons/play_dark.svg';
+import pause from '../../resources/icons/pause_dark.svg';
 
-import { useStudentFlashcards } from "../../hooks/useStudentFlashcards";
-import "./Quiz.css";
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import './Quiz.css';
 
 interface FlashcardProps {
   example: Flashcard;

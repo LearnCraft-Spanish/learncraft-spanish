@@ -3,7 +3,7 @@ name: Update Mock Data Cache Daily
 on:
   # Runs daily at 8am UTC/2am CST
   schedule:
-    - cron: "0 8 * * *"
+    - cron: '0 8 * * *'
 
   # Allows you to trigger the workflow manually
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js environment
         uses: actions/setup-node@v2
         with:
-          node-version: "lts/*"
+          node-version: 'lts/*'
 
       # Install pnpm
       - name: Install pnpm

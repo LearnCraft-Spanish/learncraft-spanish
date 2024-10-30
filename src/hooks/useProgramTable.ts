@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { useCallback } from "react"; // Adjust the import based on your project structure
-import type { Lesson, Program, ProgramUnparsed } from "../interfaceDefinitions";
-import { useBackend } from "../hooks/useBackend";
-import useAuth from "../hooks/useAuth";
+import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react'; // Adjust the import based on your project structure
+import type { Lesson, Program, ProgramUnparsed } from '../interfaceDefinitions';
+import { useBackend } from '../hooks/useBackend';
+import useAuth from '../hooks/useAuth';
 
 export function useProgramTable() {
   const { getLessonsFromBackend, getProgramsFromBackend } = useBackend();
@@ -25,7 +25,7 @@ export function useProgramTable() {
       }
       const lessonSortFunction = (a: Lesson, b: Lesson) => {
         function findNumber(stringLesson: string) {
-          const lessonArray = stringLesson.split(" ");
+          const lessonArray = stringLesson.split(' ');
           const lessonNumber = lessonArray.slice(-1)[0];
           const lessonNumberInt = Number.parseInt(lessonNumber);
           return lessonNumberInt;
@@ -76,7 +76,7 @@ export function useProgramTable() {
         );
         return parsedLessons;
       } else {
-        throw new Error("Failed to get programs or lessons");
+        throw new Error('Failed to get programs or lessons');
       }
     } catch (error) {
       console.error(error);
@@ -85,7 +85,7 @@ export function useProgramTable() {
   }, [getLessonsFromBackend, getProgramsFromBackend]);
 
   const programTableQuery = useQuery({
-    queryKey: ["programs"],
+    queryKey: ['programs'],
     queryFn: parseCourseLessons,
     staleTime: Infinity,
     gcTime: Infinity,

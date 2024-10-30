@@ -1,12 +1,12 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import type { Flashcard, StudentExample } from "./interfaceDefinitions";
-import Loading from "./components/Loading";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import type { Flashcard, StudentExample } from './interfaceDefinitions';
+import Loading from './components/Loading';
 import {
   formatEnglishText,
   formatSpanishText,
-} from "./functions/formatFlashcardText";
-import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
+} from './functions/formatFlashcardText';
+import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 
 function FlashcardManager() {
   const { flashcardDataQuery, removeFlashcardMutation } =
@@ -15,7 +15,7 @@ function FlashcardManager() {
   const removeFlashcard = removeFlashcardMutation.mutate;
 
   async function removeAndUpdate(recordId: number | string) {
-    if (typeof recordId === "string") {
+    if (typeof recordId === 'string') {
       recordId = Number.parseInt(recordId);
     }
     removeFlashcard(recordId);
@@ -23,12 +23,12 @@ function FlashcardManager() {
 
   function getStudentExampleFromExampleId(exampleId: number) {
     const studentExample = studentFlashcardData?.studentExamples.find(
-      (item) => item.relatedExample === exampleId
+      (item) => item.relatedExample === exampleId,
     );
 
     return (
       studentExample ||
-      ({ recordId: -1, dateCreated: "", relatedExample: -1 } as StudentExample)
+      ({ recordId: -1, dateCreated: '', relatedExample: -1 } as StudentExample)
     );
   }
 
@@ -38,9 +38,9 @@ function FlashcardManager() {
       const bStudentExample = getStudentExampleFromExampleId(b?.recordId);
       const aDate = new Date(aStudentExample.dateCreated);
       const bDate = new Date(bStudentExample.dateCreated);
-      if (a.spanglish === "spanglish" && b.spanglish !== "spanglish") {
+      if (a.spanglish === 'spanglish' && b.spanglish !== 'spanglish') {
         return -1;
-      } else if (a.spanglish !== "spanglish" && b.spanglish === "spanglish") {
+      } else if (a.spanglish !== 'spanglish' && b.spanglish === 'spanglish') {
         return 1;
       } else if (aDate > bDate) {
         return -1;
@@ -59,12 +59,12 @@ function FlashcardManager() {
         <div className="exampleCardEnglishText">
           {formatEnglishText(item.englishTranslation)}
         </div>
-        {item.spanglish === "spanglish" && (
+        {item.spanglish === 'spanglish' && (
           <div className="spanglishLabel">
             <h4>Spanglish</h4>
           </div>
         )}
-        {item.spanglish !== "spanglish" && (
+        {item.spanglish !== 'spanglish' && (
           <div className="spanishLabel">
             <h4>Spanish</h4>
           </div>
@@ -80,7 +80,7 @@ function FlashcardManager() {
             value={item.recordId}
             onClick={(e) =>
               removeAndUpdate(
-                Number.parseInt((e.target as HTMLButtonElement).value)
+                Number.parseInt((e.target as HTMLButtonElement).value),
               )
             }
           >

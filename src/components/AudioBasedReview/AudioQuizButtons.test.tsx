@@ -1,7 +1,7 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import AudioQuizButtons from "./AudioQuizButtons";
+import AudioQuizButtons from './AudioQuizButtons';
 
 const incrementCurrentStep = vi.fn();
 const customIncrementCurrentStep = vi.fn();
@@ -15,12 +15,12 @@ const unReadyQuiz = vi.fn();
   passed to it.
   It would be testing implementation instead of behavior.
 */
-describe("component AudioQuizButtons", () => {
+describe('component AudioQuizButtons', () => {
   afterEach(() => {
     vi.clearAllMocks();
     cleanup();
   });
-  it("renders without crashing", () => {
+  it('renders without crashing', () => {
     render(
       <AudioQuizButtons
         audioOrComprehension="audio"
@@ -33,13 +33,13 @@ describe("component AudioQuizButtons", () => {
         unReadyQuiz={unReadyQuiz}
       />,
     );
-    expect(screen.getByText("Previous")).toBeTruthy();
-    expect(screen.getByText("Next")).toBeTruthy();
-    expect(screen.getByText("Back")).toBeTruthy();
+    expect(screen.getByText('Previous')).toBeTruthy();
+    expect(screen.getByText('Next')).toBeTruthy();
+    expect(screen.getByText('Back')).toBeTruthy();
   });
 
-  describe("audioOrComprehension is audio", () => {
-    it("displays correct text when currentStep is question & autoplay is true", () => {
+  describe('audioOrComprehension is audio', () => {
+    it('displays correct text when currentStep is question & autoplay is true', () => {
       render(
         <AudioQuizButtons
           audioOrComprehension="audio"
@@ -52,12 +52,12 @@ describe("component AudioQuizButtons", () => {
           unReadyQuiz={unReadyQuiz}
         />,
       );
-      expect(screen.getByText("Skip to Guess")).toBeTruthy();
-      expect(screen.getByText("Replay English")).toBeTruthy();
+      expect(screen.getByText('Skip to Guess')).toBeTruthy();
+      expect(screen.getByText('Replay English')).toBeTruthy();
     });
   });
-  describe("audioOrComprehension is comprehension", () => {
-    it("displays correct text when currentStep is question & autoplay is true", () => {
+  describe('audioOrComprehension is comprehension', () => {
+    it('displays correct text when currentStep is question & autoplay is true', () => {
       render(
         <AudioQuizButtons
           audioOrComprehension="comprehension"
@@ -70,8 +70,8 @@ describe("component AudioQuizButtons", () => {
           unReadyQuiz={unReadyQuiz}
         />,
       );
-      expect(screen.getByText("Skip to Guess")).toBeTruthy();
-      expect(screen.getByText("Replay Spanish")).toBeTruthy();
+      expect(screen.getByText('Skip to Guess')).toBeTruthy();
+      expect(screen.getByText('Replay Spanish')).toBeTruthy();
     });
   });
 });

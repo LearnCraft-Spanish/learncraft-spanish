@@ -1,23 +1,23 @@
-import { cleanup, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { cleanup, render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
-import { afterEach, describe, expect, it, vi } from "vitest";
-import AudioQuizSetupMenu from "./AudioQuizSetupMenu";
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import AudioQuizSetupMenu from './AudioQuizSetupMenu';
 
 const readyQuiz = vi.fn();
 const updateAutoplay = vi.fn();
 
-vi.mock("../LessonSelector", () => ({
+vi.mock('../LessonSelector', () => ({
   FromToLessonSelector: () => <div>FromToLessonSelector</div>,
 }));
 
-describe("component AudioQuizSetupMenu", () => {
+describe('component AudioQuizSetupMenu', () => {
   afterEach(() => {
     vi.clearAllMocks();
     cleanup();
   });
 
-  it("renders without crashing", () => {
+  it('renders without crashing', () => {
     render(
       <MemoryRouter>
         <AudioQuizSetupMenu
@@ -28,9 +28,9 @@ describe("component AudioQuizSetupMenu", () => {
         />
       </MemoryRouter>,
     );
-    expect(screen.getByText("Start")).toBeTruthy();
+    expect(screen.getByText('Start')).toBeTruthy();
   });
-  it("shows no examples found message", () => {
+  it('shows no examples found message', () => {
     render(
       <MemoryRouter>
         <AudioQuizSetupMenu
@@ -42,10 +42,10 @@ describe("component AudioQuizSetupMenu", () => {
       </MemoryRouter>,
     );
     expect(
-      screen.getByText("There are no audio examples for this lesson range"),
+      screen.getByText('There are no audio examples for this lesson range'),
     ).toBeTruthy();
   });
-  it("toggle autoplay off", () => {
+  it('toggle autoplay off', () => {
     render(
       <MemoryRouter>
         <AudioQuizSetupMenu
@@ -56,10 +56,10 @@ describe("component AudioQuizSetupMenu", () => {
         />
       </MemoryRouter>,
     );
-    screen.getByLabelText("toggleAutoplay").click();
+    screen.getByLabelText('toggleAutoplay').click();
     expect(updateAutoplay).toHaveBeenCalledWith(false);
   });
-  it("toggle autoplay on", () => {
+  it('toggle autoplay on', () => {
     render(
       <MemoryRouter>
         <AudioQuizSetupMenu
@@ -70,7 +70,7 @@ describe("component AudioQuizSetupMenu", () => {
         />
       </MemoryRouter>,
     );
-    screen.getByLabelText("toggleAutoplay").click();
+    screen.getByLabelText('toggleAutoplay').click();
     expect(updateAutoplay).toHaveBeenCalledWith(true);
   });
 });

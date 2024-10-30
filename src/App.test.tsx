@@ -1,13 +1,13 @@
-import { describe, expect, it } from "vitest";
-import { render, waitFor } from "@testing-library/react";
-import React from "react";
-import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import { setupMockAuth } from "../tests/setupMockAuth";
-import App from "./App";
+import { describe, expect, it } from 'vitest';
+import { render, waitFor } from '@testing-library/react';
+import React from 'react';
+import MockAllProviders from '../mocks/Providers/MockAllProviders';
+import { setupMockAuth } from '../tests/setupMockAuth';
+import App from './App';
 
 // Waiting for userData context to be finished
-describe("app", () => {
-  it("renders without crashing", () => {
+describe('app', () => {
+  it('renders without crashing', () => {
     render(
       <MockAllProviders>
         <App />
@@ -15,7 +15,7 @@ describe("app", () => {
     );
   });
 
-  it("shows a log out button when logged in", async () => {
+  it('shows a log out button when logged in', async () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -26,7 +26,7 @@ describe("app", () => {
     });
   });
 
-  it("shows a log in button when logged out", async () => {
+  it('shows a log in button when logged out', async () => {
     setupMockAuth({ isAuthenticated: false });
     const { getByText } = render(
       <MockAllProviders>
@@ -47,14 +47,14 @@ describe("app", () => {
     );
     await waitFor(() => {
       expect(
-        getByText("You must be logged in to use this app."),
+        getByText('You must be logged in to use this app.'),
       ).toBeInTheDocument();
     });
   });
 
-  it("shows welcome message", async () => {
+  it('shows welcome message', async () => {
     // const mockLimitedStudent = createMockAuth({ userName: "limited" });
-    setupMockAuth({ userName: "limited" });
+    setupMockAuth({ userName: 'limited' });
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -65,7 +65,7 @@ describe("app", () => {
     });
   });
 
-  it("shows a loading spinner when logging in", async () => {
+  it('shows a loading spinner when logging in', async () => {
     setupMockAuth({ isLoading: true });
     const { getByAltText } = render(
       <MockAllProviders>
@@ -73,13 +73,13 @@ describe("app", () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByAltText("loading-spinner")).toBeInTheDocument();
+      expect(getByAltText('loading-spinner')).toBeInTheDocument();
     });
   });
 
-  it("shows official quizzes button", async () => {
+  it('shows official quizzes button', async () => {
     setupMockAuth({
-      userName: "limited",
+      userName: 'limited',
       isAuthenticated: true,
       isLoading: false,
     });
@@ -93,7 +93,7 @@ describe("app", () => {
     });
   });
 
-  it("displays my flashcards", async () => {
+  it('displays my flashcards', async () => {
     const { getByText } = render(
       <MockAllProviders>
         <App />

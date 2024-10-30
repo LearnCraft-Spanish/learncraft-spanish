@@ -2,8 +2,8 @@ import type {
   Flashcard,
   StudentFlashcardData,
   UserData,
-} from "../../../src/interfaceDefinitions";
-import { fisherYatesShuffle } from "../../../src/functions/fisherYatesShuffle";
+} from '../../../src/interfaceDefinitions';
+import { fisherYatesShuffle } from '../../../src/functions/fisherYatesShuffle';
 // This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample
@@ -11,7 +11,7 @@ import { fisherYatesShuffle } from "../../../src/functions/fisherYatesShuffle";
 export default function generateStudentFlashcardData(
   student: UserData,
   numberOfExamples: number,
-  examplesTable: Flashcard[]
+  examplesTable: Flashcard[],
 ) {
   const reviewDatesAndIntervals = [
     {
@@ -52,14 +52,14 @@ export default function generateStudentFlashcardData(
       reviewInterval: 2,
     },
     {
-      lastReviewedDate: "",
+      lastReviewedDate: '',
       reviewInterval: null,
       coachAdded: true,
     },
   ];
 
   if (numberOfExamples < 10) {
-    throw new Error("Minimum number of examples is 10");
+    throw new Error('Minimum number of examples is 10');
   }
   const studentFlashcardData: StudentFlashcardData = {
     examples: [],
@@ -72,7 +72,7 @@ export default function generateStudentFlashcardData(
     const example = verifiedExamples[i];
     const lastReviewedDate = reviewDatesAndIntervals[i]?.lastReviewedDate
       ? reviewDatesAndIntervals[i].lastReviewedDate
-      : "";
+      : '';
     const reviewInterval = reviewDatesAndIntervals[i]?.reviewInterval
       ? reviewDatesAndIntervals[i].reviewInterval
       : null;
@@ -83,7 +83,7 @@ export default function generateStudentFlashcardData(
     studentFlashcardData.studentExamples.push({
       recordId: Math.floor(Math.random() * 100000),
       lastReviewedDate,
-      nextReviewDate: "",
+      nextReviewDate: '',
       reviewInterval,
       studentEmailAddress: student.emailAddress,
       relatedStudent: student.recordId,
@@ -95,10 +95,10 @@ export default function generateStudentFlashcardData(
   // match examples with studentExamples
   studentFlashcardData.studentExamples.forEach((studentExample) => {
     const example = verifiedExamples.find(
-      (example) => example.recordId === studentExample.relatedExample
+      (example) => example.recordId === studentExample.relatedExample,
     );
     if (!example) {
-      throw new Error("Example mismatch!");
+      throw new Error('Example mismatch!');
     }
     studentFlashcardData.examples.push(example);
   });

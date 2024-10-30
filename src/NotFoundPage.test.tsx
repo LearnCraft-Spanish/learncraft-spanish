@@ -1,12 +1,12 @@
-import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 
-import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import NotFoundPage from "./NotFoundPage";
+import MockAllProviders from '../mocks/Providers/MockAllProviders';
+import NotFoundPage from './NotFoundPage';
 
-describe("not found page", () => {
-  it("shows 404 message", async () => {
+describe('not found page', () => {
+  it('shows 404 message', async () => {
     render(
       <MockAllProviders route="/anythingrandom">
         <NotFoundPage />
@@ -16,7 +16,7 @@ describe("not found page", () => {
       expect(screen.getByText(/404: Page Not Found/i)).toBeInTheDocument();
     });
   });
-  it("shows menu button", async () => {
+  it('shows menu button', async () => {
     render(
       <MockAllProviders route="/anythingRandom">
         <NotFoundPage />

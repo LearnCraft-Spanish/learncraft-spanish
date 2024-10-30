@@ -1,5 +1,5 @@
-import type { FormEvent } from "react";
-import React, { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   Navigate,
@@ -7,13 +7,13 @@ import {
   Routes,
   useLocation,
   useNavigate,
-} from "react-router-dom";
+} from 'react-router-dom';
 
-import MenuButton from "./components/Buttons/MenuButton";
-import Loading from "./components/Loading";
-import QuizComponent from "./components/Quiz/QuizComponent";
-import { useActiveStudent } from "./hooks/useActiveStudent";
-import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
+import MenuButton from './components/Buttons/MenuButton';
+import Loading from './components/Loading';
+import QuizComponent from './components/Quiz/QuizComponent';
+import { useActiveStudent } from './hooks/useActiveStudent';
+import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
@@ -37,7 +37,7 @@ export default function MyFlashcardsQuiz() {
     (activeStudentQuery.isLoading || flashcardDataQuery.isLoading);
   const unavailable =
     (activeStudentQuery.isSuccess &&
-      !(activeStudentQuery.data?.role === "student")) ||
+      !(activeStudentQuery.data?.role === 'student')) ||
     (flashcardDataQuery.isSuccess &&
       !flashcardDataQuery.data?.examples?.length);
 
@@ -46,9 +46,9 @@ export default function MyFlashcardsQuiz() {
     setQuizReady(true);
 
     if (isSrs) {
-      navigate("srsquiz");
+      navigate('srsquiz');
     } else {
-      navigate("quiz");
+      navigate('quiz');
     }
   }
 
@@ -59,14 +59,14 @@ export default function MyFlashcardsQuiz() {
         (studentExample) =>
           studentExample.nextReviewDate
             ? new Date(studentExample.nextReviewDate) <= new Date()
-            : true
+            : true,
       ).length;
     } else {
       exampleCount = flashcardDataQuery.data?.examples?.length;
     }
     if (customOnly && !isSrs) {
       exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
-        (studentExample) => studentExample.coachAdded
+        (studentExample) => studentExample.coachAdded,
       ).length;
     }
     if (customOnly && isSrs) {
@@ -75,7 +75,7 @@ export default function MyFlashcardsQuiz() {
           studentExample.coachAdded &&
           (studentExample.nextReviewDate
             ? new Date(studentExample.nextReviewDate) <= new Date()
-            : true)
+            : true),
       ).length;
     }
     if (!exampleCount) {
@@ -93,7 +93,7 @@ export default function MyFlashcardsQuiz() {
 
   const hasCustomExamples = useMemo(() => {
     return flashcardDataQuery.data?.studentExamples?.some(
-      (studentExample) => studentExample?.coachAdded
+      (studentExample) => studentExample?.coachAdded,
     );
   }, [flashcardDataQuery.data?.studentExamples]);
 
@@ -102,7 +102,7 @@ export default function MyFlashcardsQuiz() {
   }
 
   useEffect(() => {
-    if (location.pathname !== "/myflashcards") {
+    if (location.pathname !== '/myflashcards') {
       setQuizReady(true);
     }
   }, [location.pathname]);

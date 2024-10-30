@@ -6,35 +6,35 @@ import {
   expect,
   it,
   vi,
-} from "vitest";
-import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
+} from 'vitest';
+import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 
-import { getUserDataFromName } from "../../mocks/data/serverlike/studentTable";
-import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
-import programsTable from "../../mocks/data/hooklike/programsTable";
-import mockActiveStudentStub from "../../mocks/hooks/useActiveStudentStub";
+import { getUserDataFromName } from '../../mocks/data/serverlike/studentTable';
+import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
+import programsTable from '../../mocks/data/hooklike/programsTable';
+import mockActiveStudentStub from '../../mocks/hooks/useActiveStudentStub';
 
-import MockQueryClientProvider from "../../mocks/Providers/MockQueryClient";
-import { setupMockAuth } from "../../tests/setupMockAuth";
+import MockQueryClientProvider from '../../mocks/Providers/MockQueryClient';
+import { setupMockAuth } from '../../tests/setupMockAuth';
 
 // Types
-import type { UserData } from "../interfaceDefinitions";
+import type { UserData } from '../interfaceDefinitions';
 
-import { useSelectedLesson } from "./useSelectedLesson";
+import { useSelectedLesson } from './useSelectedLesson';
 
 const { api } = serverlikeData();
 
 vi.mock(
-  "./useActiveStudent",
+  './useActiveStudent',
   vi.fn(() => {
     return {
       useActiveStudent: () =>
-        mockActiveStudentStub({ studentName: "student-lcsp" }),
+        mockActiveStudentStub({ studentName: 'student-lcsp' }),
     };
   }),
 );
 vi.mock(
-  "./useProgramTable",
+  './useProgramTable',
   vi.fn(() => {
     return {
       useProgramTable: () => ({
@@ -55,39 +55,39 @@ async function renderSelectedLesson() {
   return result;
 }
 
-describe("useSelectedLesson", () => {
+describe('useSelectedLesson', () => {
   let student: UserData | null;
 
   beforeEach(() => {
-    setupMockAuth({ userName: "student-lcsp" });
-    student = getUserDataFromName("student-lcsp");
+    setupMockAuth({ userName: 'student-lcsp' });
+    student = getUserDataFromName('student-lcsp');
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  describe("initial state", () => {
+  describe('initial state', () => {
     it("selectedProgram is userData's related program", async () => {
       const result = await renderSelectedLesson();
       expect(result.current.selectedProgram?.recordId).toBe(
         student?.relatedProgram,
       );
     });
-    it("selectedFromLesson is first lesson in selectedProgram", async () => {
+    it('selectedFromLesson is first lesson in selectedProgram', async () => {
       const result = await renderSelectedLesson();
       expect(result.current.selectedFromLesson).toBe(
         result.current.selectedProgram?.lessons[0],
       );
     });
-    it("selectedToLesson is NOT null", async () => {
+    it('selectedToLesson is NOT null', async () => {
       const result = await renderSelectedLesson();
       expect(result.current.selectedToLesson).not.toBeNull();
     });
   });
 
-  describe("setProgram", () => {
-    it("sets the selected program", async () => {
+  describe('setProgram', () => {
+    it('sets the selected program', async () => {
       const result = await renderSelectedLesson();
       const newProgram = programsTable[programsTable.length - 1].recordId;
       // newProgram is not the current program
@@ -107,14 +107,14 @@ describe("useSelectedLesson", () => {
     });
   });
 
-  describe("setFromLesson", () => {
-    it("sets the selected from lesson", async () => {
+  describe('setFromLesson', () => {
+    it('sets the selected from lesson', async () => {
       const result = await renderSelectedLesson();
       // check original value
       expect(result.current.selectedFromLesson).toBeDefined();
       const currentProgram = result.current.selectedProgram;
       if (!currentProgram) {
-        throw new Error("currentProgram is null");
+        throw new Error('currentProgram is null');
       }
       const newFromLesson = currentProgram?.lessons[1].recordId;
       result.current.setFromLesson(newFromLesson.toString());
@@ -125,8 +125,8 @@ describe("useSelectedLesson", () => {
     });
   });
 
-  describe("setToLesson", () => {
-    it("sets the selected to lesson", async () => {
+  describe('setToLesson', () => {
+    it('sets the selected to lesson', async () => {
       const { result } = renderHook(() => useSelectedLesson(), {
         wrapper: MockQueryClientProvider,
       });
@@ -137,7 +137,7 @@ describe("useSelectedLesson", () => {
       expect(result.current.selectedToLesson).not.toBeNull();
       const currentProgram = result.current.selectedProgram;
       if (!currentProgram) {
-        throw new Error("currentProgram is null");
+        throw new Error('currentProgram is null');
       }
       const newToLesson = currentProgram.lessons[1].recordId;
       act(() => {
@@ -150,14 +150,14 @@ describe("useSelectedLesson", () => {
     });
   });
 
-  describe("filterExamplesBySelectedLesson", () => {
-    it("filters the examples by the selected lesson", async () => {
+  describe('filterExamplesBySelectedLesson', () => {
+    it('filters the examples by the selected lesson', async () => {
       const result = await renderSelectedLesson();
       // set to lesson
       const program = result.current.selectedProgram;
       const newToLesson = program?.lessons[4].recordId;
       if (!newToLesson) {
-        throw new Error("newFromLesson is null");
+        throw new Error('newFromLesson is null');
       }
       act(() => {
         result.current.setToLesson(newToLesson);
@@ -172,7 +172,7 @@ describe("useSelectedLesson", () => {
       expect(filteredExamples.length).toBeLessThan(examples.length);
       expect(filteredExamples.length).toBeGreaterThan(0);
     });
-    it("returns an empty array if no vocabulary is learned between fromLesson & toLesson, inclusive", async () => {
+    it('returns an empty array if no vocabulary is learned between fromLesson & toLesson, inclusive', async () => {
       const result = await renderSelectedLesson();
       // set to & from lesson to the same lesson, with no vocabIncluded
       const program = result.current.selectedProgram;
@@ -180,7 +180,7 @@ describe("useSelectedLesson", () => {
         (lesson) => lesson.vocabIncluded.length === 0,
       );
       if (!lessonWithoutVocab) {
-        throw new Error("lessonWithoutVocab is null");
+        throw new Error('lessonWithoutVocab is null');
       }
       act(() => {
         result.current.setToLesson(lessonWithoutVocab.recordId);
@@ -195,7 +195,7 @@ describe("useSelectedLesson", () => {
         result.current.selectedToLesson?.vocabIncluded.length ||
         result.current.selectedFromLesson?.vocabIncluded.length
       ) {
-        throw new Error("Bad data provided: VocabIncluded is not null");
+        throw new Error('Bad data provided: VocabIncluded is not null');
       }
       const examples = api.verifiedExamplesTable;
       const filteredExamples =
@@ -204,7 +204,7 @@ describe("useSelectedLesson", () => {
     });
   });
 
-  describe("allowed & required Vocabulary", async () => {
+  describe('allowed & required Vocabulary', async () => {
     // set up the the tests
     let res: any;
     beforeAll(async () => {
@@ -216,7 +216,7 @@ describe("useSelectedLesson", () => {
       });
       res = result;
       if (!result.current.selectedProgram) {
-        throw new Error("selectedProgram is null");
+        throw new Error('selectedProgram is null');
       }
       result.current.setFromLesson(
         result.current.selectedProgram.lessons[0].recordId,
@@ -226,13 +226,13 @@ describe("useSelectedLesson", () => {
       });
     });
 
-    it("allowedVocabulary is an array with length", () => {
+    it('allowedVocabulary is an array with length', () => {
       expect(res.current.allowedVocabulary.length).toBeDefined();
     });
-    it("requiredVocabulary is an array with length", () => {
+    it('requiredVocabulary is an array with length', () => {
       expect(res.current.requiredVocabulary.length).toBeDefined();
     });
-    it("allowedVocabulary is a subset of requiredVocabulary", () => {
+    it('allowedVocabulary is a subset of requiredVocabulary', () => {
       expect(
         res.current.allowedVocabulary.every((word: any) =>
           res.current.requiredVocabulary.includes(word),

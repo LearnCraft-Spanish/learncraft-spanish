@@ -1,9 +1,9 @@
-import { examples } from "../examples.json";
-import type { StudentFlashcardData } from "../../../src/interfaceDefinitions";
+import { examples } from '../examples.json';
+import type { StudentFlashcardData } from '../../../src/interfaceDefinitions';
 
-import generateStudentFlashcardData from "../serverlike/generateStudentFlashcardData";
+import generateStudentFlashcardData from '../serverlike/generateStudentFlashcardData';
 
-import { allStudentsTable } from "../serverlike/studentTable";
+import { allStudentsTable } from '../serverlike/studentTable';
 
 // We will generate student flashcard data for each student.
 // Becuase it uses fisher-yates shuffle, the order of the flashcards will be different for each test?
@@ -17,7 +17,7 @@ interface allStudentFlashcardsArray {
 const allStudentFlashcards: allStudentFlashcardsArray[] = [];
 // filter for only students that are allowed to have flashcards
 allStudentsTable.forEach((student) => {
-  if (student.role !== "student") return;
+  if (student.role !== 'student') return;
   allStudentFlashcards.push({
     userName: student.name,
     emailAddress: student.emailAddress,

@@ -13,11 +13,11 @@ import type {
   Spelling,
   StudentFlashcardData,
   Vocabulary,
-} from "../../../src/interfaceDefinitions";
+} from '../../../src/interfaceDefinitions';
 
-import * as dataJson from "./actualServerData.json";
-import { allStudentsTable } from "./studentTable";
-import generateStudentFlashcardData from "./generateStudentFlashcardData";
+import * as dataJson from './actualServerData.json';
+import { allStudentsTable } from './studentTable';
+import generateStudentFlashcardData from './generateStudentFlashcardData';
 
 interface MockApiData {
   programsTable: ProgramUnparsed[];

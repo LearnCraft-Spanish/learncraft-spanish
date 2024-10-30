@@ -1,29 +1,23 @@
-import type { ReactElement } from "react";
-import React, {
-  isValidElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Route, useLocation } from "react-router-dom";
-import type { UserData } from "./interfaceDefinitions";
+import type { ReactElement } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Route, useLocation } from 'react-router-dom';
+import type { UserData } from './interfaceDefinitions';
 
-import AudioBasedReview from "./components/AudioBasedReview/AudioBasedReview";
-import Loading from "./components/Loading";
-import Nav from "./components/Nav";
-import FlashcardFinder from "./FlashcardFinder";
-import FlashcardManager from "./FlashcardManager";
-import FrequenSay from "./FrequenSay";
-import SentryRoutes from "./functions/SentryRoutes";
-import { useActiveStudent } from "./hooks/useActiveStudent";
-import useAuth from "./hooks/useAuth";
-import { useUserData } from "./hooks/useUserData";
-import LCSPQuizApp from "./LCSPQuizApp";
-import Menu from "./Menu";
-import NotFoundPage from "./NotFoundPage";
-import ReviewMyFlashcards from "./ReviewMyFlashcards";
-import "./App.css";
+import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview';
+import Loading from './components/Loading';
+import Nav from './components/Nav';
+import FlashcardFinder from './FlashcardFinder';
+import FlashcardManager from './FlashcardManager';
+import FrequenSay from './FrequenSay';
+import SentryRoutes from './functions/SentryRoutes';
+import { useActiveStudent } from './hooks/useActiveStudent';
+import useAuth from './hooks/useAuth';
+import { useUserData } from './hooks/useUserData';
+import LCSPQuizApp from './LCSPQuizApp';
+import Menu from './Menu';
+import NotFoundPage from './NotFoundPage';
+import ReviewMyFlashcards from './ReviewMyFlashcards';
+import './App.css';
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -34,7 +28,7 @@ export const App: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   // States for banner message
-  const [bannerMessage, setBannerMessage] = useState("");
+  const [bannerMessage, setBannerMessage] = useState('');
   const messageNumber = useRef<number | NodeJS.Timeout>(0);
 
   // Boolean state to determine whether to show the student selector menu
@@ -45,7 +39,7 @@ export const App: React.FC = () => {
   }, []);
 
   const blankBanner = useCallback(() => {
-    setBannerMessage("");
+    setBannerMessage('');
   }, []);
 
   const makeStudentSelector = useCallback(() => {
@@ -59,21 +53,21 @@ export const App: React.FC = () => {
         const studentEmail = student.emailAddress;
         const studentRole = student.role;
         if (
-          !studentEmail.includes("(") &&
-          (studentRole === "student" || studentRole === "limited")
+          !studentEmail.includes('(') &&
+          (studentRole === 'student' || studentRole === 'limited')
         ) {
           studentSelector.push(
             <option
               key={student.recordId}
               value={student.recordId}
               label={`${student.name} -- ${studentEmail}`}
-            />
+            />,
           );
         }
       });
       const studentSelectorSortFunction = (
         a: ReactElement,
-        b: ReactElement
+        b: ReactElement,
       ) => {
         const aName = a.props.label;
         const bName = b.props.label;
@@ -108,7 +102,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     clearTimeout(messageNumber.current);
     messageNumber.current = 0;
-    if (bannerMessage !== "") {
+    if (bannerMessage !== '') {
       const timeoutNumber = setTimeout(blankBanner, 1000);
       messageNumber.current = timeoutNumber;
     }
@@ -117,12 +111,12 @@ export const App: React.FC = () => {
   return (
     <div className="App">
       <Nav />
-      {location.pathname !== "/coaching" &&
-        location.pathname !== "/comprehensionquiz" &&
-        location.pathname !== "/audioquiz" &&
-        location.pathname !== "/myflashcards/quiz" &&
-        location.pathname !== "/myflashcards/srsquiz" &&
-        location.pathname.split("/")[1] !== "officialquizzes" && (
+      {location.pathname !== '/coaching' &&
+        location.pathname !== '/comprehensionquiz' &&
+        location.pathname !== '/audioquiz' &&
+        location.pathname !== '/myflashcards/quiz' &&
+        location.pathname !== '/myflashcards/srsquiz' &&
+        location.pathname.split('/')[1] !== 'officialquizzes' && (
           <div className="div-user-subheader">
             {!isLoading && !isAuthenticated && (
               <p>You must be logged in to use this app.</p>
@@ -137,8 +131,8 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              (userDataQuery.data?.role === "student" ||
-                userDataQuery.data?.role === "limited") &&
+              (userDataQuery.data?.role === 'student' ||
+                userDataQuery.data?.role === 'limited') &&
               !userDataQuery.data?.isAdmin &&
               (userDataQuery.data.name ? (
                 <p>{`Welcome back, ${userDataQuery.data.name}!`}</p>
@@ -149,8 +143,8 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              userDataQuery.data?.role !== "student" &&
-              userDataQuery.data?.role !== "limited" &&
+              userDataQuery.data?.role !== 'student' &&
+              userDataQuery.data?.role !== 'limited' &&
               !userDataQuery.data?.isAdmin && <p>Welcome back!</p>}
 
             {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
@@ -161,8 +155,8 @@ export const App: React.FC = () => {
                   ${
                     activeStudentQuery.data?.recordId ===
                     userDataQuery.data?.recordId
-                      ? " (yourself)"
-                      : ""
+                      ? ' (yourself)'
+                      : ''
                   }`}
                   </p>
                 )}
@@ -219,15 +213,15 @@ export const App: React.FC = () => {
         <Route
           path="/flashcardfinder"
           element={
-            (userDataQuery.data?.role === "student" ||
+            (userDataQuery.data?.role === 'student' ||
               userDataQuery.data?.isAdmin) && <FlashcardFinder />
           }
         />
         <Route
           path="/audioquiz/*"
           element={
-            (userDataQuery.data?.role === "student" ||
-              userDataQuery.data?.role === "limited" ||
+            (userDataQuery.data?.role === 'student' ||
+              userDataQuery.data?.role === 'limited' ||
               userDataQuery.data?.isAdmin) && (
               <AudioBasedReview audioOrComprehension="audio" willAutoplay />
             )
@@ -236,8 +230,8 @@ export const App: React.FC = () => {
         <Route
           path="/comprehensionquiz/*"
           element={
-            (userDataQuery.data?.role === "student" ||
-              userDataQuery.data?.role === "limited" ||
+            (userDataQuery.data?.role === 'student' ||
+              userDataQuery.data?.role === 'limited' ||
               userDataQuery.data?.isAdmin) && (
               <AudioBasedReview
                 audioOrComprehension="comprehension"

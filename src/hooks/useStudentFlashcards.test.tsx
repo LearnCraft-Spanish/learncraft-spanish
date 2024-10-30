@@ -1,14 +1,14 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor } from '@testing-library/react';
 
-import { beforeEach, describe, expect, it } from "vitest";
-import MockAllProviders from "../../mocks/Providers/MockAllProviders";
-import { allStudentsTable } from "../../mocks/data/serverlike/studentTable";
-import { setupMockAuth } from "../../tests/setupMockAuth";
-import { examples } from "../../mocks/data/examples.json";
+import { beforeEach, describe, expect, it } from 'vitest';
+import MockAllProviders from '../../mocks/Providers/MockAllProviders';
+import { allStudentsTable } from '../../mocks/data/serverlike/studentTable';
+import { setupMockAuth } from '../../tests/setupMockAuth';
+import { examples } from '../../mocks/data/examples.json';
 
-import type { mockUserNames } from "../interfaceDefinitions";
+import type { mockUserNames } from '../interfaceDefinitions';
 
-import { useStudentFlashcards } from "./useStudentFlashcards";
+import { useStudentFlashcards } from './useStudentFlashcards';
 async function renderHookSuccessfully() {
   const { result } = renderHook(useStudentFlashcards, {
     wrapper: MockAllProviders,
@@ -31,10 +31,10 @@ async function renderHookSuccessfully() {
   };
 }
 
-describe("test by role", () => {
-  describe("user is student", () => {
+describe('test by role', () => {
+  describe('user is student', () => {
     const studentUsers = allStudentsTable.filter(
-      (student) => student.role === "student",
+      (student) => student.role === 'student',
     );
     for (const student of studentUsers) {
       beforeEach(() => {
@@ -61,9 +61,9 @@ describe("test by role", () => {
       });
     }
   });
-  describe("user is not student", () => {
+  describe('user is not student', () => {
     const nonStudentUsers = allStudentsTable.filter(
-      (student) => student.role !== "student",
+      (student) => student.role !== 'student',
     );
     for (const student of nonStudentUsers) {
       beforeEach(() => {
@@ -81,11 +81,11 @@ describe("test by role", () => {
   });
 });
 
-describe("removeFlashcardMutation", () => {
+describe('removeFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: "student-lcsp" });
+    setupMockAuth({ userName: 'student-lcsp' });
   });
-  it("removes a flashcard successfully", async () => {
+  it('removes a flashcard successfully', async () => {
     // Initial Render
     const { result } = renderHook(useStudentFlashcards, {
       wrapper: MockAllProviders,
@@ -99,10 +99,10 @@ describe("removeFlashcardMutation", () => {
     const removeFlashcardMutation = result.current.removeFlashcardMutation;
 
     const initalLength = flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error("No flashcards to remove");
+    if (!initalLength) throw new Error('No flashcards to remove');
 
     const flashcardToRemove = flashcardDataQuery.data?.examples[0];
-    if (!flashcardToRemove) throw new Error("No flashcard to remove");
+    if (!flashcardToRemove) throw new Error('No flashcard to remove');
     // Remove a flashcard
     removeFlashcardMutation.mutate(flashcardToRemove.recordId);
     // Assertions
@@ -112,7 +112,7 @@ describe("removeFlashcardMutation", () => {
       ).toBeLessThan(initalLength);
     });
   });
-  it("throws error when removing a flashcard that does not exist", async () => {
+  it('throws error when removing a flashcard that does not exist', async () => {
     // Initial Render
     const { result } = renderHook(useStudentFlashcards, {
       wrapper: MockAllProviders,
@@ -124,7 +124,7 @@ describe("removeFlashcardMutation", () => {
     // Setup
     const initalLength =
       result.current.flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error("No flashcards to remove");
+    if (!initalLength) throw new Error('No flashcards to remove');
 
     // attempt to remove a fake flashcard
     result.current.removeFlashcardMutation.mutate(-1);
@@ -137,11 +137,11 @@ describe("removeFlashcardMutation", () => {
     });
   });
 });
-describe("addFlashcardMutation", () => {
+describe('addFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: "student-lcsp" });
+    setupMockAuth({ userName: 'student-lcsp' });
   });
-  it("adds a flashcard successfully", async () => {
+  it('adds a flashcard successfully', async () => {
     // Initial Render
     const { result } = renderHook(useStudentFlashcards, {
       wrapper: MockAllProviders,
@@ -155,7 +155,7 @@ describe("addFlashcardMutation", () => {
 
     const initalLength =
       result.current.flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error("No flashcards to add");
+    if (!initalLength) throw new Error('No flashcards to add');
 
     const unknownExample = examples.find(
       (example) =>
@@ -163,7 +163,7 @@ describe("addFlashcardMutation", () => {
           (flashcard) => flashcard.recordId === example.recordId,
         ),
     );
-    if (!unknownExample) throw new Error("No unknown examples to add");
+    if (!unknownExample) throw new Error('No unknown examples to add');
     // Add a flashcard
     result.current.addFlashcardMutation.mutate(unknownExample);
     // Assertions
@@ -173,7 +173,7 @@ describe("addFlashcardMutation", () => {
       ).toBeGreaterThan(initalLength);
     });
   });
-  it("throws error when adding a flashcard that already exists", async () => {
+  it('throws error when adding a flashcard that already exists', async () => {
     // Initial Render
     const { result } = renderHook(useStudentFlashcards, {
       wrapper: MockAllProviders,
@@ -185,10 +185,10 @@ describe("addFlashcardMutation", () => {
     // Setup
     const initalLength =
       result.current.flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error("No flashcards to add");
+    if (!initalLength) throw new Error('No flashcards to add');
 
     const knownExample = result.current.flashcardDataQuery.data?.examples[0];
-    if (!knownExample) throw new Error("No known examples to add");
+    if (!knownExample) throw new Error('No known examples to add');
 
     // attempt to add an existing flashcard
     result.current.addFlashcardMutation.mutate(knownExample);
@@ -201,9 +201,9 @@ describe("addFlashcardMutation", () => {
   });
 });
 
-describe("updateFlashcardMutation", () => {
+describe('updateFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: "student-lcsp" });
+    setupMockAuth({ userName: 'student-lcsp' });
   });
   it("updates a flashcard's review interval successfully", async () => {
     // Initial Render
@@ -218,17 +218,17 @@ describe("updateFlashcardMutation", () => {
     const flashcardDataQuery = result.current.flashcardDataQuery;
 
     const initalLength = flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error("No flashcards to update");
+    if (!initalLength) throw new Error('No flashcards to update');
 
     const flashcardToUpdate = flashcardDataQuery.data?.studentExamples.find(
       (example) => example.reviewInterval === 2,
     );
-    if (!flashcardToUpdate) throw new Error("No flashcard to update");
+    if (!flashcardToUpdate) throw new Error('No flashcard to update');
     // Update a flashcard
     result.current.updateFlashcardMutation.mutate({
       studentExampleId: flashcardToUpdate.recordId,
       newInterval: 1,
-      difficulty: "easy",
+      difficulty: 'easy',
     });
     // Assertions
     await waitFor(() => {
@@ -240,7 +240,7 @@ describe("updateFlashcardMutation", () => {
     });
   });
 
-  it("throws error when updating a flashcard that does not exist", async () => {
+  it('throws error when updating a flashcard that does not exist', async () => {
     // Initial Render
     const { result } = renderHook(useStudentFlashcards, {
       wrapper: MockAllProviders,
@@ -253,7 +253,7 @@ describe("updateFlashcardMutation", () => {
     const flashcardDataQuery = result.current.flashcardDataQuery;
 
     const initalLength = flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error("No flashcards to update");
+    if (!initalLength) throw new Error('No flashcards to update');
 
     // const flashcardToUpdate = flashcardDataQuery.data?.studentExamples.find((example) => example.reviewInterval === null);
     // if (!flashcardToUpdate) throw new Error("No flashcard to update");
@@ -261,7 +261,7 @@ describe("updateFlashcardMutation", () => {
     result.current.updateFlashcardMutation.mutate({
       studentExampleId: -1,
       newInterval: 1,
-      difficulty: "easy",
+      difficulty: 'easy',
     });
     // Assertions
     await waitFor(() => {
@@ -269,21 +269,21 @@ describe("updateFlashcardMutation", () => {
     });
   });
 });
-describe("exampleIsCollected", () => {
+describe('exampleIsCollected', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: "student-lcsp" });
+    setupMockAuth({ userName: 'student-lcsp' });
   });
-  it("returns true if example is collected", async () => {
+  it('returns true if example is collected', async () => {
     // Initial Render
     const { flashcardDataQuery, exampleIsCollected } =
       await renderHookSuccessfully();
 
     const example = flashcardDataQuery.data?.examples[0];
-    if (!example) throw new Error("No example to check");
+    if (!example) throw new Error('No example to check');
     // Assertions
     expect(exampleIsCollected(example.recordId)).toBeTruthy();
   });
-  it("returns false if example is not collected", async () => {
+  it('returns false if example is not collected', async () => {
     // Initial Render
     const { exampleIsCollected } = await renderHookSuccessfully();
 
@@ -292,11 +292,11 @@ describe("exampleIsCollected", () => {
   });
 });
 
-describe("exampleIsPending", () => {
+describe('exampleIsPending', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: "student-lcsp" });
+    setupMockAuth({ userName: 'student-lcsp' });
   });
-  it("returns true if example is pending", async () => {
+  it('returns true if example is pending', async () => {
     // Initial Render
     const { result } = renderHook(useStudentFlashcards, {
       wrapper: MockAllProviders,
@@ -315,7 +315,7 @@ describe("exampleIsPending", () => {
           (flashcard) => flashcard.recordId === example.recordId,
         ),
     );
-    if (!unknownExample) throw new Error("No unknown examples to add");
+    if (!unknownExample) throw new Error('No unknown examples to add');
     // Add a flashcard
     result.current.addFlashcardMutation.mutate(unknownExample);
     // Assertions
@@ -330,13 +330,13 @@ describe("exampleIsPending", () => {
       ).toBeTruthy();
     });
   });
-  it("returns false if example is not pending", async () => {
+  it('returns false if example is not pending', async () => {
     // Initial Render
     const { flashcardDataQuery, exampleIsPending } =
       await renderHookSuccessfully();
 
     const example = flashcardDataQuery.data?.examples[0];
-    if (!example) throw new Error("No example to check");
+    if (!example) throw new Error('No example to check');
     // Assertions
     expect(exampleIsPending(example.recordId)).toBeFalsy();
   });

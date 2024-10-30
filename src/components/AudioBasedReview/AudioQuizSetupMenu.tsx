@@ -1,7 +1,7 @@
-import MenuButton from "../Buttons/MenuButton";
+import MenuButton from '../Buttons/MenuButton';
 
-import { FromToLessonSelector } from "../LessonSelector";
-import "./AudioBasedReview.css";
+import { FromToLessonSelector } from '../LessonSelector';
+import './AudioBasedReview.css';
 
 interface AudioQuizSetupMenuProps {
   autoplay: boolean;

@@ -1,8 +1,8 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
-import type { Flashcard, Lesson, Program } from "../interfaceDefinitions";
-import { useActiveStudent } from "./useActiveStudent";
-import { useProgramTable } from "./useProgramTable"; // Assuming this fetches the programs data
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo } from 'react';
+import type { Flashcard, Lesson, Program } from '../interfaceDefinitions';
+import { useActiveStudent } from './useActiveStudent';
+import { useProgramTable } from './useProgramTable'; // Assuming this fetches the programs data
 
 export function useSelectedLesson() {
   const queryClient = useQueryClient();
@@ -24,7 +24,7 @@ export function useSelectedLesson() {
 
   // Fetch the current selected program and lessons
   const { data: selectionState } = useQuery({
-    queryKey: ["programSelection"],
+    queryKey: ['programSelection'],
     queryFn: getSelectionState,
     staleTime: Infinity,
     gcTime: Infinity,
@@ -126,13 +126,13 @@ export function useSelectedLesson() {
   // Set selected program
   const setProgram = useCallback(
     (program: number | string | null) => {
-      if (typeof program === "string") {
+      if (typeof program === 'string') {
         program = Number.parseInt(program);
       }
       const newProgram =
         programsQueryData?.find((item) => item.recordId === program) || null;
       queryClient.setQueryData(
-        ["programSelection"],
+        ['programSelection'],
         (oldState: typeof initialSelectionState) => ({
           ...oldState,
           program: newProgram,
@@ -147,14 +147,14 @@ export function useSelectedLesson() {
   // Set 'from' lesson
   const setFromLesson = useCallback(
     (newId: number | string | null) => {
-      if (typeof newId === "string") {
+      if (typeof newId === 'string') {
         newId = Number.parseInt(newId);
       }
       const newFromLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === newId,
       );
       queryClient.setQueryData(
-        ["programSelection"],
+        ['programSelection'],
         (oldState: typeof initialSelectionState) => ({
           ...oldState,
           fromLesson: newFromLesson,
@@ -167,14 +167,14 @@ export function useSelectedLesson() {
   // Set 'to' lesson
   const setToLesson = useCallback(
     (toLesson: number | string | null) => {
-      if (typeof toLesson === "string") {
+      if (typeof toLesson === 'string') {
         toLesson = Number.parseInt(toLesson);
       }
       const newToLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === toLesson,
       );
       queryClient.setQueryData(
-        ["programSelection"],
+        ['programSelection'],
         (oldState: typeof initialSelectionState) => ({
           ...oldState,
           toLesson: newToLesson,

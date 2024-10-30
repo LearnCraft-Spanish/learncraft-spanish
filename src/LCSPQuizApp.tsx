@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
-import useAuth from "./hooks/useAuth";
-import quizCourses from "./functions/QuizCourseList";
-import MenuButton from "./components/Buttons/MenuButton";
-import Loading from "./components/Loading";
-import { useOfficialQuizzes } from "./hooks/useOfficialQuizzes";
-import OfficialQuiz from "./OfficialQuiz";
-import "./App.css";
-import { useActiveStudent } from "./hooks/useActiveStudent";
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import useAuth from './hooks/useAuth';
+import quizCourses from './functions/QuizCourseList';
+import MenuButton from './components/Buttons/MenuButton';
+import Loading from './components/Loading';
+import { useOfficialQuizzes } from './hooks/useOfficialQuizzes';
+import OfficialQuiz from './OfficialQuiz';
+import './App.css';
+import { useActiveStudent } from './hooks/useActiveStudent';
 
 export default function LCSPQuizApp(): JSX.Element {
   const location = useLocation();
@@ -31,17 +31,17 @@ export default function LCSPQuizApp(): JSX.Element {
   )?.code;
 
   const currentCourseCode = useMemo(() => {
-    const splitPath = location.pathname.split("/");
+    const splitPath = location.pathname.split('/');
     const courseCodes = quizCourses.map((course) => course.code);
     const foundCourse = courseCodes.find(
       (code: string) => code === splitPath[2],
     );
-    return foundCourse || "lcsp";
+    return foundCourse || 'lcsp';
   }, [location.pathname]);
 
   const quizPath = useMemo(() => {
-    const splitPath = location.pathname.split("/");
-    if (currentCourseCode === "lcsp") {
+    const splitPath = location.pathname.split('/');
+    if (currentCourseCode === 'lcsp') {
       return !!Number(splitPath[2]);
     } else {
       return !!Number(splitPath[3]);
@@ -50,7 +50,7 @@ export default function LCSPQuizApp(): JSX.Element {
 
   const getCourseUrlFromCode = useCallback((code: string) => {
     const foundCourse = quizCourses.find((course) => course.code === code);
-    const url = `/officialquizzes/${foundCourse?.url ? `${foundCourse.url}/` : ""}`;
+    const url = `/officialquizzes/${foundCourse?.url ? `${foundCourse.url}/` : ''}`;
     return url;
   }, []);
 
@@ -71,7 +71,7 @@ export default function LCSPQuizApp(): JSX.Element {
       const newCourse = quizCourses.find(
         (course) => course.code === courseCode,
       );
-      const urlToNavigate = newCourse?.url || "";
+      const urlToNavigate = newCourse?.url || '';
       navigate(urlToNavigate);
     },
     [navigate],
@@ -108,15 +108,15 @@ export default function LCSPQuizApp(): JSX.Element {
       const courseObj = quizCourses.find(
         (course) => course.code === currentCourseCode,
       );
-      const courseName = courseObj?.name || "";
+      const courseName = courseObj?.name || '';
       let i = 1;
-      if (currentCourseCode === "ser-estar") {
+      if (currentCourseCode === 'ser-estar') {
         quizList.forEach((item) => {
           quizSelections.push(
             <option key={i} value={item.quizNumber}>
-              {"Ser/Estar Lesson "}
+              {'Ser/Estar Lesson '}
               {item.lessonNumber}
-              {", "}
+              {', '}
               {item.subtitle}
             </option>,
           );
@@ -128,7 +128,7 @@ export default function LCSPQuizApp(): JSX.Element {
           quizSelections.push(
             <option key={i} value={item.quizNumber}>
               {courseName}
-              {" Quiz "}
+              {' Quiz '}
               {item.quizNumber}
             </option>,
           );
@@ -215,7 +215,7 @@ export default function LCSPQuizApp(): JSX.Element {
     if (!dataError && !dataLoading && officialQuizzesQuery.data?.length) {
       if (currentCourseCode === activeCourseCode && activeLesson) {
         // Find Default Quiz if selected course is the same as the current course
-        const activeLessonArray = activeLesson?.lesson.split(" ");
+        const activeLessonArray = activeLesson?.lesson.split(' ');
         if (activeLessonArray.length) {
           const activeLessonString = activeLessonArray.slice(-1)[0];
           const activeLessonNumber = Number.parseInt(activeLessonString);
