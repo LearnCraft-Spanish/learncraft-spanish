@@ -17,7 +17,7 @@ export default function LCSPQuizApp(): JSX.Element {
     useActiveStudent();
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
   const { isAuthenticated, isLoading } = useAuth();
-  const [chosenQuiz, setChosenQuiz] = useState(2);
+  const [chosenQuiz, setChosenQuiz] = useState(0);
   const [menuHidden, setMenuHidden] = useState(false);
   const [defaultCourseFound, setDefaultCourseFound] = useState(false);
 
@@ -229,7 +229,13 @@ export default function LCSPQuizApp(): JSX.Element {
             }
           });
           if (lastQuizBeforeCurrentLesson > 0) {
-            setChosenQuiz(lastQuizBeforeCurrentLesson);
+            updateChosenQuiz(lastQuizBeforeCurrentLesson);
+          } else {
+            // Otherwise set to first quiz of selected course
+            const firstQuiz = officialQuizzesQuery.data.filter(
+              (item) => item.quizType === currentCourseCode,
+            )[0].quizNumber;
+            updateChosenQuiz(firstQuiz);
           }
         }
       } else {
@@ -237,7 +243,7 @@ export default function LCSPQuizApp(): JSX.Element {
         const firstQuiz = officialQuizzesQuery.data.filter(
           (item) => item.quizType === currentCourseCode,
         )[0].quizNumber;
-        setChosenQuiz(firstQuiz);
+        updateChosenQuiz(firstQuiz);
       }
     }
   }, [
@@ -247,6 +253,7 @@ export default function LCSPQuizApp(): JSX.Element {
     activeLesson,
     currentCourseCode,
     officialQuizzesQuery.data,
+    updateChosenQuiz,
   ]);
 
   return (
