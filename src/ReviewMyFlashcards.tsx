@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
   Navigate,
@@ -20,6 +20,7 @@ export default function MyFlashcardsQuiz() {
   const { activeStudentQuery } = useActiveStudent();
   const [isSrs, setIsSrs] = useState<boolean>(false);
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false);
+  const [customOnly, setCustomOnly] = useState<boolean>(false);
   const [quizLength, setQuizLength] = useState<number>(10);
   const [quizReady, setQuizReady] = useState<boolean>(false);
 
@@ -53,15 +54,29 @@ export default function MyFlashcardsQuiz() {
 
   function calculateQuizLengthOptions() {
     let exampleCount;
-    if (isSrs) {
+    if (isSrs && !customOnly) {
       exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
         (studentExample) =>
           studentExample.nextReviewDate
             ? new Date(studentExample.nextReviewDate) <= new Date()
-            : true,
+            : true
       ).length;
     } else {
       exampleCount = flashcardDataQuery.data?.examples?.length;
+    }
+    if (customOnly && !isSrs) {
+      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
+        (studentExample) => studentExample.coachAdded
+      ).length;
+    }
+    if (customOnly && isSrs) {
+      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
+        (studentExample) =>
+          studentExample.coachAdded &&
+          (studentExample.nextReviewDate
+            ? new Date(studentExample.nextReviewDate) <= new Date()
+            : true)
+      ).length;
     }
     if (!exampleCount) {
       return [0];
@@ -75,6 +90,12 @@ export default function MyFlashcardsQuiz() {
     quizLengthOptions.push(exampleCount);
     return quizLengthOptions;
   }
+
+  const hasCustomExamples = useMemo(() => {
+    return flashcardDataQuery.data?.studentExamples?.some(
+      (studentExample) => studentExample?.coachAdded
+    );
+  }, [flashcardDataQuery.data?.studentExamples]);
 
   function makeQuizUnready() {
     setQuizReady(false);
@@ -121,6 +142,21 @@ export default function MyFlashcardsQuiz() {
                 <span className="slider round"></span>
               </label>
             </div>
+            {hasCustomExamples && (
+              <div>
+                <p>Custom Only:</p>
+                <label htmlFor="customOnly" className="switch">
+                  <input
+                    type="checkbox"
+                    name="Custom Only"
+                    id="customOnly"
+                    checked={customOnly}
+                    onChange={(e) => setCustomOnly(e.target.checked)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+            )}
             <label htmlFor="quizLength">
               <p>Number of Flashcards:</p>
               <select
