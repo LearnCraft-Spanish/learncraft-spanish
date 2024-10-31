@@ -6,7 +6,7 @@ import type { UserData } from './interfaceDefinitions';
 import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview';
 import Loading from './components/Loading';
 import Nav from './components/Nav';
-import FlashcardFinder from './FlashcardFinder';
+import FlashcardFinder from './components/FlashcardFinder';
 import FlashcardManager from './FlashcardManager';
 import FrequenSay from './FrequenSay';
 import SentryRoutes from './functions/SentryRoutes';

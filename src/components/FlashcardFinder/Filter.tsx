@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { VocabTag } from '../../interfaceDefinitions';
 
-import { useVocabulary } from '../../hooks/useVocabulary';
 import { FromToLessonSelector } from '../LessonSelector';
 
 interface FilterProps {

@@ -1,43 +1,32 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import type { DisplayOrder, Flashcard, VocabTag } from './interfaceDefinitions';
+import type {
+  DisplayOrder,
+  Flashcard,
+  VocabTag,
+} from '../../interfaceDefinitions';
 
-import {
-  formatEnglishText,
-  formatSpanishText,
-} from './functions/formatFlashcardText';
-import { useActiveStudent } from './hooks/useActiveStudent';
-import { useStudentFlashcards } from './hooks/useStudentFlashcards';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
 
-import { useVerifiedExamples } from './hooks/useVerifiedExamples';
+import { useVerifiedExamples } from '../../hooks/useVerifiedExamples';
 
-import './App.css';
+import '../../App.css';
 
-// import { LessonSelector } from './components/LessonSelector'
-import { FromToLessonSelector } from './components/LessonSelector';
-import Loading from './components/Loading';
-import { useContextualMenu } from './hooks/useContextualMenu';
-import { fisherYatesShuffle } from './functions/fisherYatesShuffle';
-import { useSelectedLesson } from './hooks/useSelectedLesson';
-import { useUserData } from './hooks/useUserData';
-import { useVocabulary } from './hooks/useVocabulary';
+import Loading from '../../components/Loading';
+import { useContextualMenu } from '../../hooks/useContextualMenu';
+import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
+import { useSelectedLesson } from '../../hooks/useSelectedLesson';
+import { useUserData } from '../../hooks/useUserData';
+import { useVocabulary } from '../../hooks/useVocabulary';
 
-import Filter from './components/FlashcardFinder/Filter';
-import useFlashcardFilter from './hooks/useFlashcardFilter';
-import formatExampleForTable from './components/FlashcardFinder/DisplayExamplesTable';
-import ExamplesTable from './components/FlashcardFinder/ExamplesTable';
+import Filter from '../../components/FlashcardFinder/Filter';
+import useFlashcardFilter from '../../hooks/useFlashcardFilter';
+import ExamplesTable from '../../components/FlashcardFinder/ExamplesTable';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = () => {
   const { openContextual, contextual } = useContextualMenu();
   const userDataQuery = useUserData();
   const { activeStudentQuery } = useActiveStudent();
-  const {
-    flashcardDataQuery,
-    addFlashcardMutation,
-    removeFlashcardMutation,
-    exampleIsCollected,
-    exampleIsPending,
-  } = useStudentFlashcards();
   const verifiedExamplesQuery = useVerifiedExamples();
   const { vocabularyQuery, tagTable } = useVocabulary();
   const { filterExamplesBySelectedLesson } = useSelectedLesson();
@@ -46,18 +35,15 @@ const FlashcardFinder = () => {
   const isError =
     userDataQuery.isError ||
     activeStudentQuery.isError ||
-    flashcardDataQuery.isError ||
     verifiedExamplesQuery.isError ||
     vocabularyQuery.isError;
   const dataLoaded =
-    (userDataQuery.data?.isAdmin ||
-      (activeStudentQuery.isSuccess && flashcardDataQuery.isSuccess)) &&
+    (userDataQuery.data?.isAdmin || activeStudentQuery.isSuccess) &&
     verifiedExamplesQuery.isSuccess &&
     vocabularyQuery.isSuccess;
   const isLoading =
     (userDataQuery.isLoading ||
       activeStudentQuery.isLoading ||
-      flashcardDataQuery.isLoading ||
       verifiedExamplesQuery.isLoading ||
       vocabularyQuery.isLoading) &&
     !isError &&
@@ -174,32 +160,12 @@ const FlashcardFinder = () => {
     navigator.clipboard.writeText(copiedText);
   }
 
-  const addFlashcard = useCallback(
-    (exampleId: string) => {
-      const exampleIdNumber = Number.parseInt(exampleId);
-      const exampleToUpdate = getExampleById(exampleIdNumber);
-      if (!exampleToUpdate) {
-        return;
-      }
-      addFlashcardMutation.mutate(exampleToUpdate);
-    },
-    [addFlashcardMutation, getExampleById],
-  );
-
-  const removeFlashcard = useCallback(
-    (exampleId: string) => {
-      const exampleIdNumber = Number.parseInt(exampleId);
-      removeFlashcardMutation.mutate(exampleIdNumber);
-    },
-    [removeFlashcardMutation],
-  );
-
   const displayExamplesTable = useCallback(() => {
     if (!verifiedExamplesQuery.isSuccess) {
       return null;
     }
-    const paginatedDisplayOrder = displayOrder.slice(0, 100);
-    const examplesArray = getExamplesFromDisplayOrder(paginatedDisplayOrder);
+    // const paginatedDisplayOrder = displayOrder.slice(0, 100);
+    const examplesArray = getExamplesFromDisplayOrder(displayOrder);
     const truthyTable = examplesArray.filter((item) => !!item);
 
     setExamplesToDisplay(truthyTable);
@@ -278,14 +244,11 @@ const FlashcardFinder = () => {
 
             <ExamplesTable
               examplesToDisplay={examplesToDisplay}
-              exampleIsCollected={exampleIsCollected}
-              exampleIsPending={exampleIsPending}
-              addFlashcard={addFlashcard}
-              removeFlashcard={removeFlashcard}
               studentRole={
                 userDataQuery.data?.role ? userDataQuery.data.role : ''
               }
               dataReady={dataLoaded}
+              getExampleById={getExampleById}
             />
           </div>
         </div>
