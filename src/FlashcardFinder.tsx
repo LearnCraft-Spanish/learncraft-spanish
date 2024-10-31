@@ -21,6 +21,11 @@ import { useSelectedLesson } from './hooks/useSelectedLesson';
 import { useUserData } from './hooks/useUserData';
 import { useVocabulary } from './hooks/useVocabulary';
 
+import Filter from './components/FlashcardFinder/Filter';
+import useFlashcardFilter from './hooks/useFlashcardFilter';
+import formatExampleForTable from './components/FlashcardFinder/DisplayExamplesTable';
+import ExamplesTable from './components/FlashcardFinder/ExamplesTable';
+
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = () => {
   const { openContextual, contextual } = useContextualMenu();
@@ -36,6 +41,7 @@ const FlashcardFinder = () => {
   const verifiedExamplesQuery = useVerifiedExamples();
   const { vocabularyQuery, tagTable } = useVocabulary();
   const { filterExamplesBySelectedLesson } = useSelectedLesson();
+  const { filterFlashcards } = useFlashcardFilter();
 
   const isError =
     userDataQuery.isError ||
@@ -57,22 +63,42 @@ const FlashcardFinder = () => {
     !isError &&
     !dataLoaded;
 
-  const [tagSearchTerm, setTagSearchTerm] = useState('');
-  const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([]);
   const [requiredTags, setRequiredTags] = useState<VocabTag[]>([]);
-  const [noSpanglish, setNoSpanglish] = useState(false);
+  const [includeSpanglish, setIncludeSpanglish] = useState(true);
   const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]);
   // FromToLessonSelector
 
-  function getExampleById(recordId: number) {
-    if (!verifiedExamplesQuery.isSuccess) {
-      return null;
-    }
-    const foundExample = verifiedExamplesQuery.data.find(
-      (example) => example.recordId === recordId,
-    );
-    return foundExample;
-  }
+  const [examplesToDisplay, setExamplesToDisplay] = useState<Flashcard[]>([]);
+
+  const getExampleById = useCallback(
+    (recordId: number) => {
+      if (!verifiedExamplesQuery.isSuccess) {
+        return null;
+      }
+      const foundExample = verifiedExamplesQuery.data.find(
+        (example) => example.recordId === recordId,
+      );
+      return foundExample;
+    },
+    [verifiedExamplesQuery.isSuccess, verifiedExamplesQuery.data],
+  );
+  const getExamplesFromDisplayOrder = useCallback(
+    (displayOrder: DisplayOrder[]) => {
+      const examples = displayOrder.map((displayOrderObject) => {
+        const foundExample = getExampleById(displayOrderObject.recordId);
+        if (!foundExample) {
+          console.error(
+            'unable to find example with recordId:',
+            displayOrderObject.recordId,
+          );
+          return null;
+        }
+        return foundExample;
+      });
+      return examples;
+    },
+    [getExampleById],
+  );
 
   function filterByHasAudio(displayOrderItem: DisplayOrder) {
     const example = getExampleById(displayOrderItem.recordId);
@@ -87,18 +113,9 @@ const FlashcardFinder = () => {
 
   const displayExamplesWithAudio = displayOrder.filter(filterByHasAudio);
 
-  function toggleSpanglish() {
-    if (noSpanglish) {
-      setNoSpanglish(false);
-    } else {
-      setNoSpanglish(true);
-    }
-  }
-
-  function updateTagSearchTerm(target: EventTarget & HTMLInputElement) {
-    openContextual('tagSuggestionBox');
-    setTagSearchTerm(target.value);
-  }
+  const toggleIncludeSpanglish = useCallback(() => {
+    setIncludeSpanglish(!includeSpanglish);
+  }, [includeSpanglish]);
 
   function addTagToRequiredTags(id: number) {
     const tagObject = tagTable.find((object) => object.id === id);
@@ -110,125 +127,26 @@ const FlashcardFinder = () => {
   }
 
   function removeTagFromRequiredTags(id: number) {
-    const newRequiredTags = [...requiredTags].filter((item) => item.id !== id);
+    const newRequiredTags = requiredTags.filter((item) => item.id !== id);
     setRequiredTags(newRequiredTags);
   }
 
-  const filterExamplesBySelectedTags = useCallback(
-    (examples: Flashcard[]) => {
-      if (requiredTags.length > 0 && vocabularyQuery.isSuccess) {
-        const filteredExamples = examples.filter((example) => {
-          if (
-            example.vocabIncluded.length === 0 ||
-            example.vocabComplete === false
-          ) {
-            return false;
-          }
-          // console.log(example.vocabIncluded)
-          let isGood = false;
-          requiredTags.forEach((tag) => {
-            // console.log(word.vocabName)
-            if (!isGood) {
-              switch (tag.type) {
-                case 'subcategory':
-                  example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item,
-                    );
-                    if (
-                      word?.vocabularySubcategorySubcategoryName === tag.tag
-                    ) {
-                      isGood = true;
-                    }
-                  });
-                  break;
-                case 'verb':
-                  example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item,
-                    );
-                    if (word?.verbInfinitive === tag.tag) {
-                      isGood = true;
-                    }
-                  });
-                  break;
-                case 'conjugation':
-                  example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item,
-                    );
-                    word?.conjugationTags.forEach((conjugationTag) => {
-                      if (conjugationTag === tag.tag) {
-                        isGood = true;
-                      }
-                    });
-                  });
-                  break;
-                case 'vocabulary':
-                  example.vocabIncluded.forEach((item) => {
-                    const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item,
-                    );
-                    if (word?.wordIdiom === tag.tag) {
-                      isGood = true;
-                    }
-                  });
-                  break;
-                case 'idiom':
-                  example.vocabIncluded.forEach((item: string) => {
-                    const word = vocabularyQuery.data.find(
-                      (element) => element.vocabName === item,
-                    );
-                    if (word?.wordIdiom === tag.tag) {
-                      isGood = true;
-                    }
-                  });
-                  break;
-              }
-            }
-          });
-          return isGood;
-        });
-        return filteredExamples;
-      } else {
-        return examples;
-      }
-    },
-    [requiredTags, vocabularyQuery.isSuccess, vocabularyQuery.data],
-  );
-
-  const filterBySpanglish = useCallback(
-    (examples: Flashcard[]) => {
-      if (noSpanglish) {
-        const filteredBySpanglish = examples.filter((item) => {
-          if (item.spanglish === 'esp') {
-            return true;
-          }
-          return false;
-        });
-        return filteredBySpanglish;
-      } else {
-        return examples;
-      }
-    },
-    [noSpanglish],
-  );
-
   // cause of circular dependency?
   const getFilteredExamples = useCallback(
-    (table: Flashcard[]) => {
-      const allExamples = [...table];
-      const filteredBySpanglish = filterBySpanglish(allExamples);
-      const filteredByAllowed =
-        filterExamplesBySelectedLesson(filteredBySpanglish);
-      // = filterExamplesByAllowedVocab(filteredBySpanglish)
-      const filteredByTags = filterExamplesBySelectedTags(filteredByAllowed);
-      return filteredByTags;
+    (table: Flashcard[]): Flashcard[] => {
+      const filteredBySelectedLesson = filterExamplesBySelectedLesson(table);
+      const filteredBySearchCriteria = filterFlashcards({
+        examples: filteredBySelectedLesson,
+        includeSpanglish,
+        orTags: requiredTags,
+      });
+      return filteredBySearchCriteria;
     },
     [
-      filterBySpanglish,
-      filterExamplesBySelectedTags,
       filterExamplesBySelectedLesson,
+      filterFlashcards,
+      includeSpanglish,
+      requiredTags,
     ],
   );
 
@@ -256,114 +174,40 @@ const FlashcardFinder = () => {
     navigator.clipboard.writeText(copiedText);
   }
 
-  const filterTagsByInput = useCallback(
-    (tagInput: string) => {
-      function filterBySearch(tag: VocabTag) {
-        const lowerTerm = tag.tag.toLowerCase();
-        const lowerTagInput = tagInput.toLowerCase();
-        if (lowerTerm.includes(lowerTagInput)) {
-          return true;
-        }
-        return false;
+  const addFlashcard = useCallback(
+    (exampleId: string) => {
+      const exampleIdNumber = Number.parseInt(exampleId);
+      const exampleToUpdate = getExampleById(exampleIdNumber);
+      if (!exampleToUpdate) {
+        return;
       }
-
-      function filterByActiveTags(tag: VocabTag) {
-        const matchFound = requiredTags.find((item) => item.id === tag.id);
-        if (matchFound) {
-          return false;
-        }
-        return true;
-      }
-
-      const filteredBySearch = tagTable.filter(filterBySearch);
-      const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags);
-      const suggestTen = [];
-      for (let i = 0; i < 10; i++) {
-        if (filteredByActiveTags[i]) {
-          suggestTen.push(filteredByActiveTags[i]);
-        }
-      }
-      setSuggestedTags(suggestTen);
+      addFlashcardMutation.mutate(exampleToUpdate);
     },
-    [tagTable, requiredTags],
+    [addFlashcardMutation, getExampleById],
   );
 
-  function addFlashcard(exampleId: string) {
-    const exampleIdNumber = Number.parseInt(exampleId);
-    const exampleToUpdate = getExampleById(exampleIdNumber);
-    if (!exampleToUpdate) {
-      return;
-    }
-    addFlashcardMutation.mutate(exampleToUpdate);
-  }
+  const removeFlashcard = useCallback(
+    (exampleId: string) => {
+      const exampleIdNumber = Number.parseInt(exampleId);
+      removeFlashcardMutation.mutate(exampleIdNumber);
+    },
+    [removeFlashcardMutation],
+  );
 
-  function removeFlashcard(exampleId: string) {
-    const exampleIdNumber = Number.parseInt(exampleId);
-    removeFlashcardMutation.mutate(exampleIdNumber);
-  }
-
-  function displayExamplesTable() {
+  const displayExamplesTable = useCallback(() => {
     if (!verifiedExamplesQuery.isSuccess) {
       return null;
     }
-    const tableToDisplay = displayOrder.map((displayOrderObject) => {
-      const item = verifiedExamplesQuery.data.find(
-        (example) => example.recordId === displayOrderObject.recordId,
-      );
-      if (!item) {
-        return null;
-      }
-      return (
-        <div className="exampleCard" key={item.recordId}>
-          <div className="exampleCardSpanishText">
-            {formatSpanishText(item.spanglish, item.spanishExample)}
-          </div>
-          <div className="exampleCardEnglishText">
-            {formatEnglishText(item.englishTranslation)}
-          </div>
-          {activeStudentQuery.data?.role === 'student' &&
-            !!flashcardDataQuery.data &&
-            !exampleIsCollected(item.recordId) && (
-              <button
-                type="button"
-                className="addButton"
-                value={item.recordId}
-                onClick={(e) => addFlashcard(e.currentTarget.value)}
-              >
-                Add
-              </button>
-            )}
-          {activeStudentQuery.data?.role === 'student' &&
-            !!flashcardDataQuery.data &&
-            exampleIsCollected(item.recordId) &&
-            exampleIsPending(item.recordId) && (
-              <button
-                type="button"
-                className="pendingButton"
-                value={item.recordId}
-              >
-                Adding...
-              </button>
-            )}
-          {activeStudentQuery.data?.role === 'student' &&
-            !!flashcardDataQuery.data &&
-            exampleIsCollected(item.recordId) &&
-            !exampleIsPending(item.recordId) && (
-              <button
-                type="button"
-                className="removeButton"
-                value={item.recordId}
-                onClick={(e) => removeFlashcard(e.currentTarget.value)}
-              >
-                Remove
-              </button>
-            )}
-        </div>
-      );
-    });
-    const truthyTable = tableToDisplay.filter((item) => !!item);
-    return truthyTable;
-  }
+    const paginatedDisplayOrder = displayOrder.slice(0, 100);
+    const examplesArray = getExamplesFromDisplayOrder(paginatedDisplayOrder);
+    const truthyTable = examplesArray.filter((item) => !!item);
+
+    setExamplesToDisplay(truthyTable);
+  }, [
+    verifiedExamplesQuery.isSuccess,
+    getExamplesFromDisplayOrder,
+    displayOrder,
+  ]);
 
   function makeDisplayOrderFromExamples(examples: Flashcard[]) {
     const newDisplayOrder = examples.map((example) => {
@@ -373,10 +217,6 @@ const FlashcardFinder = () => {
     });
     return newDisplayOrder;
   }
-
-  useEffect(() => {
-    filterTagsByInput(tagSearchTerm);
-  }, [tagSearchTerm, requiredTags, contextual, filterTagsByInput]);
 
   useEffect(() => {
     if (verifiedExamplesQuery.isSuccess) {
@@ -389,9 +229,12 @@ const FlashcardFinder = () => {
     verifiedExamplesQuery.isSuccess,
     verifiedExamplesQuery.data,
     requiredTags,
-    noSpanglish,
     getFilteredExamples,
   ]);
+
+  useEffect(() => {
+    displayExamplesTable();
+  }, [displayOrder, verifiedExamplesQuery.isSuccess, displayExamplesTable]);
 
   return (
     <div className="flashcardFinder">
@@ -409,99 +252,16 @@ const FlashcardFinder = () => {
         <div>
           <div className="flashcardFinderHeader">
             <h2>Flashcard Finder</h2>
-            <div className="filterSection">
-              <div className="filterBox options">
-                <div className="FromToLessonSelectorWrapper">
-                  <FromToLessonSelector />
-                </div>
-                <div className="removeSpanglishBox">
-                  <p>Include Spanglish: </p>
-                  <label
-                    htmlFor="removeSpanglish"
-                    className="switch"
-                    aria-label="noSpanglish"
-                  >
-                    <input
-                      type="checkbox"
-                      name="removeSpanglish"
-                      id="removeSpanglish"
-                      checked={!noSpanglish}
-                      style={
-                        !noSpanglish
-                          ? { backgroundColor: 'darkgreen' }
-                          : { backgroundColor: 'darkred' }
-                      }
-                      onChange={toggleSpanglish}
-                    />
-                    <span className="slider round"></span>
-                  </label>
-                </div>
-              </div>
-              <div className="filterBox search">
-                <div className="searchFilter">
-                  <div className="tagSearchBox">
-                    <div className="searchTermBox">
-                      {/*consider adding a Search Icon at some point */}
-                      <input
-                        type="text"
-                        onChange={(e) => updateTagSearchTerm(e.currentTarget)}
-                        onClick={() => openContextual('tagSuggestionBox')}
-                        placeholder="Search tags"
-                      />
-                      <br></br>
-                    </div>
-                    {!!tagSearchTerm.length &&
-                      contextual === 'tagSuggestionBox' &&
-                      !!suggestedTags.length && (
-                        <div className="tagSuggestionBox">
-                          {suggestedTags.map((item) => (
-                            <div
-                              key={item.id}
-                              className="tagCard"
-                              onClick={() => addTagToRequiredTags(item.id)}
-                            >
-                              <div className={`${item.type}Card`}>
-                                <h4 className="vocabName">{item.tag}</h4>
-                                {item.vocabDescriptor && (
-                                  <h5 className="vocabDescriptor">
-                                    {item.vocabDescriptor}
-                                  </h5>
-                                )}
-                                <p className="vocabUse">{item.type}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                  </div>
-                  <div className="selectedTagsBox">
-                    <p>Selected Tags:</p>
-                    {!!requiredTags.length && (
-                      <div className="selectedVocab">
-                        {/* <h5>Search Terms:</h5> */}
-                        {requiredTags.map((item) => (
-                          <div
-                            key={item.id}
-                            className="tagCard"
-                            onClick={() => removeTagFromRequiredTags(item.id)}
-                          >
-                            <div className={`${item.type}Card`}>
-                              <h4 className="vocabName">{item.tag}</h4>
-                              {item.vocabDescriptor && (
-                                <h5 className="vocabDescriptor">
-                                  {item.vocabDescriptor}
-                                </h5>
-                              )}
-                              <p className="vocabUse">{item.type}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Filter
+              addTagToRequiredTags={addTagToRequiredTags}
+              removeTagFromRequiredTags={removeTagFromRequiredTags}
+              requiredTags={requiredTags}
+              toggleIncludeSpanglish={toggleIncludeSpanglish}
+              includeSpanglish={includeSpanglish}
+              openContextual={openContextual}
+              contextual={contextual}
+              tagTable={tagTable}
+            />
           </div>
           <div className="examplesTable">
             <div className="buttonBox">
@@ -515,7 +275,18 @@ const FlashcardFinder = () => {
                 </h4>
               </div>
             </div>
-            {displayExamplesTable()}
+
+            <ExamplesTable
+              examplesToDisplay={examplesToDisplay}
+              exampleIsCollected={exampleIsCollected}
+              exampleIsPending={exampleIsPending}
+              addFlashcard={addFlashcard}
+              removeFlashcard={removeFlashcard}
+              studentRole={
+                userDataQuery.data?.role ? userDataQuery.data.role : ''
+              }
+              dataReady={dataLoaded}
+            />
           </div>
         </div>
       )}
