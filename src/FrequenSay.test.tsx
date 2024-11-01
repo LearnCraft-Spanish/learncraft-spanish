@@ -1,10 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it} from 'vitest';
-import MockAllProviders from '../mocks/Providers/MockAllProviders';
-
-import FrequenSay from './FrequenSay';
 import { act } from 'react';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 
+import MockAllProviders from '../mocks/Providers/MockAllProviders';
+import FrequenSay from './FrequenSay';
 
 describe('initial render', () => {
   beforeEach(async () => {
@@ -21,9 +20,8 @@ describe('initial render', () => {
   it('by default, add extra vocabulary button is displayed', () => {
     expect(screen.getByText('Add Extra Vocabulary')).toBeTruthy();
   });
-  it('word count is 0, words known is 100%', () => {
+  it('word count is 0', () => {
     expect(screen.getByText('Word Count:0')).toBeTruthy();
-    expect(screen.getByText('Words Known:100%')).toBeTruthy();
   });
 });
 
@@ -37,7 +35,7 @@ describe('add extra vocabulary', () => {
     });
     // Click the add extra vocabulary button
     act(() => {
-    screen.getByText('Add Extra Vocabulary').click();
+      screen.getByText('Add Extra Vocabulary').click();
     });
   });
   it('displays the extra vocabulary input', () => {

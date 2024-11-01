@@ -11,6 +11,8 @@ interface FilterFlashcardsOptions {
 
 export default function useFlashcardFilter() {
   const { vocabularyQuery } = useVocabulary();
+
+  // Helper Functions
   const filterBySpanglish = useCallback((examples: Flashcard[]) => {
     return examples.filter((item) => {
       if (item.spanglish === 'esp') {
@@ -34,10 +36,8 @@ export default function useFlashcardFilter() {
         ) {
           return false;
         }
-        // console.log(example.vocabIncluded)
         let isGood = false;
         orTags.forEach((tag) => {
-          // console.log(word.vocabName)
           if (!isGood) {
             switch (tag.type) {
               case 'subcategory':
@@ -102,6 +102,7 @@ export default function useFlashcardFilter() {
     [vocabularyQuery.data],
   );
 
+  // Main Function
   const filterFlashcards = useCallback(
     ({
       examples,
