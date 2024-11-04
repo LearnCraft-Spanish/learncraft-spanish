@@ -97,13 +97,6 @@ export default function MyFlashcardsQuiz() {
     }
   }, [location.pathname]);
 
-  useEffect(() => {
-    console.log(customOnly);
-    console.log(isSrs);
-    const quizLength = calculateQuizLengthOptions();
-    console.log(quizLength);
-  }, [customOnly, isSrs]);
-
   return (
     <div>
       {dataError && <h2>Error Loading Flashcards</h2>}
