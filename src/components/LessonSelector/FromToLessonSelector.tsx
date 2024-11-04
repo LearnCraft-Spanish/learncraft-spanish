@@ -1,7 +1,7 @@
-import type { Lesson, Program } from "../../interfaceDefinitions";
-import { useProgramTable } from "../../hooks/useProgramTable";
-import { useSelectedLesson } from "../../hooks/useSelectedLesson";
-import "./LessonSelector.css";
+import type { Lesson, Program } from '../../interfaceDefinitions';
+import { useProgramTable } from '../../hooks/useProgramTable';
+import { useSelectedLesson } from '../../hooks/useSelectedLesson';
+import './LessonSelector.css';
 
 export default function FromToLessonSelector(): JSX.Element {
   const {
@@ -18,7 +18,7 @@ export default function FromToLessonSelector(): JSX.Element {
     if (!lesson?.lesson) {
       return null;
     }
-    const lessonArray = lesson.lesson.split(" ");
+    const lessonArray = lesson.lesson.split(' ');
     const lessonNumberString = lessonArray.slice(-1)[0];
     const lessonNumber = Number.parseInt(lessonNumberString, 10);
     return lessonNumber;

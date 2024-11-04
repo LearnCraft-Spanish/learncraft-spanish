@@ -65,6 +65,7 @@ export interface StudentExample {
   lastReviewedDate: string;
   nextReviewDate: string;
   reviewInterval: number | null;
+  coachAdded: boolean | null;
   relatedStudent: number;
   relatedExample: number;
   dateCreated: string;
@@ -143,7 +144,7 @@ export interface Spelling {
 // Highly Tentative for now, will be updated as needed
 export interface VocabTagWithVocabDescriptor {
   id: number;
-  type: "vocabulary";
+  type: 'vocabulary';
   tag: string;
   vocabDescriptor: string; // required when type is "vocab"
 }
@@ -185,3 +186,14 @@ export interface CoachingLessons {
 export interface WrapperProps {
   children: React.ReactNode;
 }
+
+export type mockUserNames =
+  | 'admin-empty-role'
+  | 'empty-role'
+  | 'none-role'
+  | 'limited'
+  | 'student-admin'
+  | 'student-lcsp'
+  | 'student-ser-estar'
+  | null
+  | undefined;

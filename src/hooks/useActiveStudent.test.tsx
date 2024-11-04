@@ -1,18 +1,18 @@
-import { describe, expect, it } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { describe, expect, it } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
 
-import serverlikeData from "../../mocks/data/serverlike/serverlikeData";
-import MockAllProviders from "../../mocks/Providers/MockAllProviders";
-import { useActiveStudent } from "./useActiveStudent";
+import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
+import MockAllProviders from '../../mocks/Providers/MockAllProviders';
+import { useActiveStudent } from './useActiveStudent';
 
 const api = serverlikeData().api;
 
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true,
+  (student) => student.role === 'student' && student.isAdmin === true,
 );
 
-describe("useActiveStudent", () => {
-  it("runs without crashing", async () => {
+describe('useActiveStudent', () => {
+  it('runs without crashing', async () => {
     const { result } = renderHook(() => useActiveStudent(), {
       wrapper: MockAllProviders,
     });
@@ -21,8 +21,8 @@ describe("useActiveStudent", () => {
     });
     expect(result.current.activeStudentQuery.data).toBeDefined();
   });
-  describe("activeStudentQuery", () => {
-    it("data is mocked useUserData", async () => {
+  describe('activeStudentQuery', () => {
+    it('data is mocked useUserData', async () => {
       const { result } = renderHook(() => useActiveStudent(), {
         wrapper: MockAllProviders,
       });
@@ -33,8 +33,8 @@ describe("useActiveStudent", () => {
     });
   });
 
-  describe("studentListQuery", () => {
-    it("studentListQuery succeeds, data has length", async () => {
+  describe('studentListQuery', () => {
+    it('studentListQuery succeeds, data has length', async () => {
       const { result } = renderHook(() => useActiveStudent(), {
         wrapper: MockAllProviders,
       });
@@ -45,8 +45,8 @@ describe("useActiveStudent", () => {
     });
   });
 
-  describe("activeProgram", () => {
-    it("activeProgram is same as userData realtedProgram", async () => {
+  describe('activeProgram', () => {
+    it('activeProgram is same as userData realtedProgram', async () => {
       const { result } = renderHook(() => useActiveStudent(), {
         wrapper: MockAllProviders,
       });
@@ -60,8 +60,8 @@ describe("useActiveStudent", () => {
     });
   });
 
-  describe("activeLesson", () => {
-    it("activeLesson is not null", async () => {
+  describe('activeLesson', () => {
+    it('activeLesson is not null', async () => {
       const { result } = renderHook(() => useActiveStudent(), {
         wrapper: MockAllProviders,
       });
@@ -72,8 +72,8 @@ describe("useActiveStudent", () => {
     });
   });
 
-  describe("chooseStudent function", () => {
-    it("chooseStudent sets activeStudent", async () => {
+  describe('chooseStudent function', () => {
+    it('chooseStudent sets activeStudent', async () => {
       const { result } = renderHook(() => useActiveStudent(), {
         wrapper: MockAllProviders,
       });

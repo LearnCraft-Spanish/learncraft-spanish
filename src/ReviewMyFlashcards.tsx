@@ -1,5 +1,5 @@
-import type { FormEvent } from "react";
-import React, { useEffect, useState } from "react";
+import type { FormEvent } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   Navigate,
@@ -7,19 +7,20 @@ import {
   Routes,
   useLocation,
   useNavigate,
-} from "react-router-dom";
+} from 'react-router-dom';
 
-import MenuButton from "./components/Buttons/MenuButton";
-import Loading from "./components/Loading";
-import QuizComponent from "./components/Quiz/QuizComponent";
-import { useActiveStudent } from "./hooks/useActiveStudent";
-import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
+import MenuButton from './components/Buttons/MenuButton';
+import Loading from './components/Loading';
+import QuizComponent from './components/Quiz/QuizComponent';
+import { useActiveStudent } from './hooks/useActiveStudent';
+import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
   const { activeStudentQuery } = useActiveStudent();
   const [isSrs, setIsSrs] = useState<boolean>(false);
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false);
+  const [customOnly, setCustomOnly] = useState<boolean>(false);
   const [quizLength, setQuizLength] = useState<number>(10);
   const [quizReady, setQuizReady] = useState<boolean>(false);
 
@@ -36,7 +37,7 @@ export default function MyFlashcardsQuiz() {
     (activeStudentQuery.isLoading || flashcardDataQuery.isLoading);
   const unavailable =
     (activeStudentQuery.isSuccess &&
-      !(activeStudentQuery.data?.role === "student")) ||
+      !(activeStudentQuery.data?.role === 'student')) ||
     (flashcardDataQuery.isSuccess &&
       !flashcardDataQuery.data?.examples?.length);
 
@@ -45,29 +46,33 @@ export default function MyFlashcardsQuiz() {
     setQuizReady(true);
 
     if (isSrs) {
-      navigate("srsquiz");
+      navigate('srsquiz');
     } else {
-      navigate("quiz");
+      navigate('quiz');
     }
   }
 
   function calculateQuizLengthOptions() {
-    let exampleCount;
+    let currentAllowedExamples = flashcardDataQuery.data?.studentExamples;
     if (isSrs) {
-      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
+      currentAllowedExamples = currentAllowedExamples?.filter(
         (studentExample) =>
           studentExample.nextReviewDate
             ? new Date(studentExample.nextReviewDate) <= new Date()
             : true,
-      ).length;
-    } else {
-      exampleCount = flashcardDataQuery.data?.examples?.length;
+      );
     }
-    if (!exampleCount) {
+    if (customOnly) {
+      currentAllowedExamples = flashcardDataQuery.data?.studentExamples?.filter(
+        (studentExample) => studentExample.coachAdded,
+      );
+    }
+    if (!currentAllowedExamples?.length) {
       return [0];
     }
+    const exampleCount = currentAllowedExamples.length;
     const quizLengthOptions = [];
-    if (exampleCount > 10) {
+    if (currentAllowedExamples?.length > 10) {
       for (let i = 10; i < exampleCount; i = 5 * Math.floor(i * 0.315)) {
         quizLengthOptions.push(i);
       }
@@ -76,12 +81,18 @@ export default function MyFlashcardsQuiz() {
     return quizLengthOptions;
   }
 
+  const hasCustomExamples = useMemo(() => {
+    return flashcardDataQuery.data?.studentExamples?.some(
+      (studentExample) => studentExample?.coachAdded,
+    );
+  }, [flashcardDataQuery.data?.studentExamples]);
+
   function makeQuizUnready() {
     setQuizReady(false);
   }
 
   useEffect(() => {
-    if (location.pathname !== "/myflashcards") {
+    if (location.pathname !== '/myflashcards') {
       setQuizReady(true);
     }
   }, [location.pathname]);
@@ -121,6 +132,21 @@ export default function MyFlashcardsQuiz() {
                 <span className="slider round"></span>
               </label>
             </div>
+            {hasCustomExamples && (
+              <div>
+                <p>Custom Only:</p>
+                <label htmlFor="customOnly" className="switch">
+                  <input
+                    type="checkbox"
+                    name="Custom Only"
+                    id="customOnly"
+                    checked={customOnly}
+                    onChange={(e) => setCustomOnly(e.target.checked)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+            )}
             <label htmlFor="quizLength">
               <p>Number of Flashcards:</p>
               <select
@@ -159,6 +185,7 @@ export default function MyFlashcardsQuiz() {
                 examplesToParse={flashcardDataQuery.data?.examples}
                 quizTitle="My Flashcards"
                 quizOnlyCollectedExamples
+                quizOnlyCustomExamples={customOnly}
                 cleanupFunction={() => makeQuizUnready()}
                 startWithSpanish={spanishFirst}
                 quizLength={quizLength}
@@ -174,6 +201,7 @@ export default function MyFlashcardsQuiz() {
                 examplesToParse={flashcardDataQuery.data?.examples}
                 quizTitle="My Flashcards for Today"
                 quizOnlyCollectedExamples
+                quizOnlyCustomExamples={customOnly}
                 cleanupFunction={() => makeQuizUnready()}
                 startWithSpanish={spanishFirst}
                 quizLength={quizLength}

@@ -14,7 +14,7 @@
 }
 
 body {
-  background-image: url("./resources/paper-small.jpeg");
+  background-image: url('./resources/paper-small.jpeg');
 }
 
 a {
@@ -72,7 +72,7 @@ h6 {
 button,
 .linkButton {
   text-align: center;
-  font-family: "Poppins", "Avenir", "Helvetica", sans-serif;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
   font-weight: 600;
   font-size: 14px;
   padding: 10px 30px;
@@ -90,6 +90,22 @@ button:hover,
 .linkButton:hover {
   background-color: #b0a96f;
   color: #ffffff;
+}
+
+.label {
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 30px;
+  color: var(--light);
+  background-color: var(--brand);
+  border: none;
+  cursor: default;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .navigateButtons {
@@ -426,6 +442,26 @@ button:hover,
 }
 
 /*For Flashcard Manager */
+
+.customLabel {
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 30px;
+  border: none;
+  cursor: default;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--light);
+  background-color: var(--theme);
+}
+
+.customLabel h4 {
+  color: var(--light);
+}
 
 .spanglishLabel {
   align-content: center;
@@ -1143,7 +1179,7 @@ button:hover,
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 26px;
   width: 26px;
   left: 4px;

@@ -2,8 +2,8 @@ import type {
   Flashcard,
   StudentFlashcardData,
   UserData,
-} from "../../../src/interfaceDefinitions";
-import { fisherYatesShuffle } from "../../../src/functions/fisherYatesShuffle";
+} from '../../../src/interfaceDefinitions';
+import { fisherYatesShuffle } from '../../../src/functions/fisherYatesShuffle';
 // This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample
@@ -41,6 +41,7 @@ export default function generateStudentFlashcardData(
     {
       lastReviewedDate: new Date(Date.now() - 172800000).toISOString(),
       reviewInterval: 0,
+      coachAdded: true,
     },
     {
       lastReviewedDate: new Date(Date.now() - 172800000).toISOString(),
@@ -51,13 +52,14 @@ export default function generateStudentFlashcardData(
       reviewInterval: 2,
     },
     {
-      lastReviewedDate: "",
+      lastReviewedDate: '',
       reviewInterval: null,
+      coachAdded: true,
     },
   ];
 
   if (numberOfExamples < 10) {
-    throw new Error("Minimum number of examples is 10");
+    throw new Error('Minimum number of examples is 10');
   }
   const studentFlashcardData: StudentFlashcardData = {
     examples: [],
@@ -70,21 +72,24 @@ export default function generateStudentFlashcardData(
     const example = verifiedExamples[i];
     const lastReviewedDate = reviewDatesAndIntervals[i]?.lastReviewedDate
       ? reviewDatesAndIntervals[i].lastReviewedDate
-      : "";
+      : '';
     const reviewInterval = reviewDatesAndIntervals[i]?.reviewInterval
       ? reviewDatesAndIntervals[i].reviewInterval
       : null;
+
+    const coachAdded = reviewDatesAndIntervals[i]?.coachAdded ?? null;
 
     // create studentExample
     studentFlashcardData.studentExamples.push({
       recordId: Math.floor(Math.random() * 100000),
       lastReviewedDate,
-      nextReviewDate: "",
+      nextReviewDate: '',
       reviewInterval,
       studentEmailAddress: student.emailAddress,
       relatedStudent: student.recordId,
       relatedExample: example.recordId,
-      dateCreated: new Date(Date.now() - 345600000).toISOString(), // 4 days ago
+      dateCreated: new Date(Date.now() - 345600000).toISOString(),
+      coachAdded,
     });
   }
   // match examples with studentExamples
@@ -93,7 +98,7 @@ export default function generateStudentFlashcardData(
       (example) => example.recordId === studentExample.relatedExample,
     );
     if (!example) {
-      throw new Error("Example mismatch!");
+      throw new Error('Example mismatch!');
     }
     studentFlashcardData.examples.push(example);
   });

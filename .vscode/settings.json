@@ -1,67 +1,14 @@
 {
-  "prettier.enable": true, // Re-enable Prettier for formatting
+  "prettier.enable": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true, // Use Prettier to format on save
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit" // Let ESLint fix non-formatting issues on save
+    "source.fixAll.eslint": "explicit"
   },
-  // Ensures that the ESLint extension is enabled
+  "editor.formatOnSave": true,
   "eslint.enable": true,
   "eslint.run": "onType",
   "eslint.nodePath": "node_modules",
 
-  "eslint.rules.customizations": [
-    {
-      "rule": "style/*",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "format/*",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*-indent",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*-spacing",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*-spaces",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*-order",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*-dangle",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*-newline",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*quotes",
-      "severity": "off",
-      "fixable": true
-    },
-    {
-      "rule": "*semi",
-      "severity": "off",
-      "fixable": true
-    }
-  ],
   // Enable eslint for all supported languages
   "eslint.validate": [
     "javascript",

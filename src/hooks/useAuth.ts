@@ -1,5 +1,5 @@
 // src/hooks/useAuthAdapter.ts (your Auth0 adapter)
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuth0 } from '@auth0/auth0-react';
 const audience = import.meta.env.VITE_API_AUDIENCE;
 
 export default function useAuth() {
@@ -16,9 +16,9 @@ export default function useAuth() {
       authorizationParams: {
         audience,
         scope:
-          "openid profile email read:current-student update:current-student read:all-students update:all-students",
+          'openid profile email read:current-student update:current-student read:all-students update:all-students',
       },
-      cacheMode: "off",
+      cacheMode: 'off',
     });
     return accessToken as string | undefined;
   };
@@ -26,8 +26,8 @@ export default function useAuth() {
   const login = () => {
     function generateRandomString(length: number) {
       const charset =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz+/";
-      let result = "";
+        '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz+/';
+      let result = '';
 
       while (length > 0) {
         const bytes = new Uint8Array(16);

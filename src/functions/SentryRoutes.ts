@@ -1,18 +1,18 @@
-import * as Sentry from "@sentry/react";
+import * as Sentry from '@sentry/react';
 // SentryRoutes.js
-import React from "react";
+import React from 'react';
 import {
   Routes,
   createRoutesFromChildren,
   matchRoutes,
   useLocation,
   useNavigationType,
-} from "react-router-dom";
+} from 'react-router-dom';
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
 Sentry.init({
-  dsn: "https://e42f3e1acdc86e3e3119dbd586514255@o4507097747423232.ingest.us.sentry.io/4507097897500672",
+  dsn: 'https://e42f3e1acdc86e3e3119dbd586514255@o4507097747423232.ingest.us.sentry.io/4507097897500672',
   environment: import.meta.env.MODE,
   integrations: [
     Sentry.replayIntegration(),

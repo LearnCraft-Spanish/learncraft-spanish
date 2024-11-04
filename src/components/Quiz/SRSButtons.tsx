@@ -1,7 +1,7 @@
-import React, { useCallback } from "react";
+import React, { useCallback } from 'react';
 
-import type { Flashcard } from "../../interfaceDefinitions";
-import { useStudentFlashcards } from "../../hooks/useStudentFlashcards";
+import type { Flashcard } from '../../interfaceDefinitions';
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 
 interface QuizButtonsProps {
   currentExample: Flashcard;
@@ -60,7 +60,7 @@ export default function SRSQuizButtons({
     const updateStatus = updateFlashcard({
       studentExampleId,
       newInterval,
-      difficulty: "hard",
+      difficulty: 'hard',
     });
     return updateStatus;
   }, [
@@ -84,7 +84,7 @@ export default function SRSQuizButtons({
     const updateStatus = updateFlashcard({
       studentExampleId,
       newInterval,
-      difficulty: "easy",
+      difficulty: 'easy',
     });
     return updateStatus;
   }, [
@@ -99,18 +99,18 @@ export default function SRSQuizButtons({
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (
-        event.key === "q" ||
-        event.key === "Q" ||
-        event.key === "," ||
-        event.key === "<"
+        event.key === 'q' ||
+        event.key === 'Q' ||
+        event.key === ',' ||
+        event.key === '<'
       ) {
         increaseDifficulty();
       }
       if (
-        event.key === "e" ||
-        event.key === "E" ||
-        event.key === "." ||
-        event.key === ">"
+        event.key === 'e' ||
+        event.key === 'E' ||
+        event.key === '.' ||
+        event.key === '>'
       ) {
         decreaseDifficulty();
       }
@@ -119,9 +119,9 @@ export default function SRSQuizButtons({
   );
 
   React.useEffect(() => {
-    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener('keydown', handleKeyPress);
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
 
@@ -146,7 +146,7 @@ export default function SRSQuizButtons({
         </>
       )}
       {currentExample.difficulty &&
-        (currentExample.difficulty === "hard" ? (
+        (currentExample.difficulty === 'hard' ? (
           <button type="button" className="hardBanner">
             Labeled: Hard
           </button>

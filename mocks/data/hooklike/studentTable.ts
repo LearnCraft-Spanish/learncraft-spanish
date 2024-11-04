@@ -1,3 +1,3 @@
-import { allStudentsTable } from "../serverlike/studentTable";
+import { allStudentsTable } from '../serverlike/studentTable';
 
 export default allStudentsTable;

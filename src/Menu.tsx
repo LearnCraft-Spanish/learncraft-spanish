@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import Loading from "./components/Loading";
+import { Link } from 'react-router-dom';
+import Loading from './components/Loading';
 
-import { useActiveStudent } from "./hooks/useActiveStudent";
-import { useStudentFlashcards } from "./hooks/useStudentFlashcards";
-import { useUserData } from "./hooks/useUserData";
-import "./App.css";
+import { useActiveStudent } from './hooks/useActiveStudent';
+import { useStudentFlashcards } from './hooks/useStudentFlashcards';
+import { useUserData } from './hooks/useUserData';
+import './App.css';
 
 export default function Menu() {
   const userDataQuery = useUserData();
@@ -17,10 +17,10 @@ export default function Menu() {
   const menuDataReady =
     userDataQuery.isSuccess &&
     ((userDataQuery?.data.isAdmin &&
-      userDataQuery?.data.role !== "student" &&
-      userDataQuery?.data.role !== "limited") ||
+      userDataQuery?.data.role !== 'student' &&
+      userDataQuery?.data.role !== 'limited') ||
       activeStudentQuery.isSuccess) &&
-    (activeStudentQuery.data?.role !== "student" ||
+    (activeStudentQuery.data?.role !== 'student' ||
       flashcardDataQuery.isSuccess);
 
   // Display loading or error messages if necessary
@@ -50,7 +50,7 @@ export default function Menu() {
       )}
       {menuDataReady && (
         <div className="menuBox">
-          {activeStudentQuery.data?.role === "student" &&
+          {activeStudentQuery.data?.role === 'student' &&
             !!flashcardDataQuery.data?.studentExamples?.length && (
               <div>
                 <h3>My Flashcards:</h3>
@@ -73,8 +73,8 @@ export default function Menu() {
             </Link>
           </div>
           {(userDataQuery.data.isAdmin ||
-            activeStudentQuery.data?.role === "student" ||
-            activeStudentQuery.data?.role === "limited") && (
+            activeStudentQuery.data?.role === 'student' ||
+            activeStudentQuery.data?.role === 'limited') && (
             <div className="buttonBox">
               <Link className="linkButton" to="/audioquiz">
                 Audio Quiz
@@ -85,7 +85,7 @@ export default function Menu() {
             </div>
           )}
           {(userDataQuery.data.isAdmin ||
-            activeStudentQuery.data?.role === "student") && (
+            activeStudentQuery.data?.role === 'student') && (
             <div className="buttonBox">
               <Link className="linkButton" to="/flashcardfinder">
                 Find Flashcards

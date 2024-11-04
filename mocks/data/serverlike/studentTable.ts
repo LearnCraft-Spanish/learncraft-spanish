@@ -1,80 +1,80 @@
-import type { UserData } from "../../../src/interfaceDefinitions";
+import type { UserData } from '../../../src/interfaceDefinitions';
 
 export const allStudentsTable: UserData[] = [
   {
     recordId: 1,
-    name: "admin-empty-role",
-    emailAddress: "admin-empty-role@fake.not",
-    role: "",
+    name: 'admin-empty-role',
+    emailAddress: 'admin-empty-role@fake.not',
+    role: '',
     isAdmin: true,
     relatedProgram: 2,
-    cohort: "B",
+    cohort: 'B',
   },
   {
     recordId: 2,
-    name: "empty-role",
-    emailAddress: "empty-role@fake.not",
-    role: "",
+    name: 'empty-role',
+    emailAddress: 'empty-role@fake.not',
+    role: '',
     isAdmin: false,
     relatedProgram: 2,
-    cohort: "A",
+    cohort: 'A',
   },
   {
     recordId: 3,
-    name: "none-role",
-    emailAddress: "none-role@fake.not",
-    role: "none",
+    name: 'none-role',
+    emailAddress: 'none-role@fake.not',
+    role: 'none',
     isAdmin: false,
     relatedProgram: 2,
-    cohort: "C",
+    cohort: 'C',
   },
   {
     recordId: 4,
-    name: "limited",
-    emailAddress: "limited@fake.not",
-    role: "limited",
+    name: 'limited',
+    emailAddress: 'limited@fake.not',
+    role: 'limited',
     isAdmin: false,
     relatedProgram: 3,
-    cohort: "A",
+    cohort: 'A',
   },
   {
     recordId: 5,
-    name: "student-admin",
-    emailAddress: "student-admin@fake.not",
-    role: "student",
+    name: 'student-admin',
+    emailAddress: 'student-admin@fake.not',
+    role: 'student',
     isAdmin: true,
     relatedProgram: 3,
-    cohort: "F",
+    cohort: 'F',
   },
   {
     recordId: 6,
-    name: "student-lcsp",
-    emailAddress: "student-lcsp@fake.not",
-    role: "student",
+    name: 'student-lcsp',
+    emailAddress: 'student-lcsp@fake.not',
+    role: 'student',
     isAdmin: false,
     relatedProgram: 2,
-    cohort: "D",
+    cohort: 'D',
   },
   {
     recordId: 7,
-    name: "student-ser-estar",
-    emailAddress: "student-ser-estar@fake.not",
-    role: "student",
+    name: 'student-ser-estar',
+    emailAddress: 'student-ser-estar@fake.not',
+    role: 'student',
     isAdmin: false,
     relatedProgram: 5,
-    cohort: "E",
+    cohort: 'E',
   },
 ];
 
 export function getUserDataFromName(
   name:
-    | "admin-empty-role"
-    | "empty-role"
-    | "none-role"
-    | "limited"
-    | "student-admin"
-    | "student-lcsp"
-    | "student-ser-estar"
+    | 'admin-empty-role'
+    | 'empty-role'
+    | 'none-role'
+    | 'limited'
+    | 'student-admin'
+    | 'student-lcsp'
+    | 'student-ser-estar'
     | null,
 ): UserData | null {
   return allStudentsTable.find((student) => student.name === name) || null;

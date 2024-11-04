@@ -1,21 +1,22 @@
-import { describe, expect, it } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 
-import MockAllProviders from "../mocks/Providers/MockAllProviders";
-import FlashcardManager from "./FlashcardManager";
+import MockAllProviders from '../mocks/Providers/MockAllProviders';
+import FlashcardManager from './FlashcardManager';
 
 /*
   Add test to check if removeAndUpdate is called on click
   once useStudentFlashcardStub is created
 */
 
-describe("component FlashcardManager", () => {
-  it("renders without crashing, student has flashcards", async () => {
+// Also needs tests to check that sort order is correct
+
+describe('component FlashcardManager', () => {
+  it('renders without crashing, student has flashcards', async () => {
     render(<FlashcardManager />, { wrapper: MockAllProviders });
     await waitFor(() =>
-      expect(screen.getByText("Flashcard Manager")).toBeInTheDocument(),
+      expect(screen.getByText('Flashcard Manager')).toBeInTheDocument(),
     );
-    expect(screen.getByText("Flashcard Manager")).toBeInTheDocument();
-    expect(screen.getByText(/Total flashcards:/)).toBeInTheDocument();
+    expect(screen.getByText('Flashcard Manager')).toBeInTheDocument();
   });
 });

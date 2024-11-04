@@ -1,5 +1,5 @@
-import antfu from "@antfu/eslint-config";
-import prettierConfig from "eslint-config-prettier";
+import antfu from '@antfu/eslint-config';
+import prettierConfig from 'eslint-config-prettier';
 
 export default antfu(
   {
@@ -19,15 +19,15 @@ export default antfu(
       },
     },
     rules: {
-      "no-console": ["error", { allow: ["error"] }],
-      "max-len": ["warn", { code: 100, ignoreStrings: true }],
+      'no-console': ['error', { allow: ['error'] }],
     },
+    extends: ['eslint-config-prettier'],
   },
   {
-    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
   },
   {
-    files: ["**/*.test.{ts,tsx,js,jsx}"],
+    files: ['**/*.test.{ts,tsx,js,jsx}'],
     languageOptions: {
       globals: {
         describe: true,
@@ -39,12 +39,11 @@ export default antfu(
   },
   {
     ignores: [
-      "src/components/Coaching",
-      "node_modules/",
-      "src/mocks/data/serverlike/actualServerData.json",
-      "*.yml",
+      'src/components/Coaching',
+      'node_modules/',
+      'src/mocks/data/serverlike/actualServerData.json',
+      '*.yml',
     ],
   },
-  // Add Prettier config at the end to disable ESLint rules that conflict with Prettier
   prettierConfig,
 );

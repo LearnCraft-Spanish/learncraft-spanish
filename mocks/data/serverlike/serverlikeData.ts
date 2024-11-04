@@ -11,13 +11,11 @@ import type {
   Quiz,
   QuizExamplesTable,
   Spelling,
-  StudentFlashcardData,
   Vocabulary,
-} from "../../../src/interfaceDefinitions";
+} from '../../../src/interfaceDefinitions';
 
-import * as dataJson from "./actualServerData.json";
-import { allStudentsTable } from "./studentTable";
-import generateStudentFlashcardData from "./generateStudentFlashcardData";
+import * as dataJson from './actualServerData.json';
+import { allStudentsTable } from './studentTable';
 
 interface MockApiData {
   programsTable: ProgramUnparsed[];
@@ -53,14 +51,6 @@ export default function serverlikeData() {
     (example) => !!example.spanishAudioLa && !!example.englishAudio,
   );
 
-  // Generated Data -- student examples for some sample students:
-  const studentFlashcardData: StudentFlashcardData =
-    generateStudentFlashcardData(
-      allStudentsTable[4],
-      10,
-      verifiedExamplesTable,
-    );
-
   return {
     api: {
       programsTable,
@@ -72,7 +62,6 @@ export default function serverlikeData() {
       allStudentsTable,
       verifiedExamplesTable,
       audioExamplesTable,
-      studentFlashcardData,
     },
   };
 }

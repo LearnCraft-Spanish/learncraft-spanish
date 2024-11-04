@@ -1,14 +1,14 @@
-import React from "react";
-import type { Flashcard } from "../../interfaceDefinitions";
+import React from 'react';
+import type { Flashcard } from '../../interfaceDefinitions';
 import {
   formatEnglishText,
   formatSpanishText,
-} from "../../functions/formatFlashcardText";
-import play from "../../resources/icons/play_dark.svg";
-import pause from "../../resources/icons/pause_dark.svg";
+} from '../../functions/formatFlashcardText';
+import play from '../../resources/icons/play_dark.svg';
+import pause from '../../resources/icons/pause_dark.svg';
 
-import { useStudentFlashcards } from "../../hooks/useStudentFlashcards";
-import "./Quiz.css";
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import './Quiz.css';
 
 interface FlashcardProps {
   example: Flashcard;
@@ -39,6 +39,7 @@ export default function FlashcardDisplay({
     addFlashcardMutation,
     removeFlashcardMutation,
     exampleIsCollected,
+    exampleIsCustom,
     exampleIsPending,
   } = useStudentFlashcards();
   const addFlashcard = addFlashcardMutation.mutate;
@@ -89,6 +90,7 @@ export default function FlashcardDisplay({
           )}
           {isStudent &&
             exampleIsCollected(example.recordId) &&
+            !exampleIsCustom(example.recordId) &&
             !exampleIsPending(example.recordId) && (
               <button
                 type="button"

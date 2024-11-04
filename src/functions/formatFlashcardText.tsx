@@ -2,10 +2,10 @@ export function formatSpanishText(
   isSpanglish: string,
   spanishText: string,
 ): JSX.Element {
-  if (isSpanglish === "esp") {
+  if (isSpanglish === 'esp') {
     return <p className="spanishFlashcardText">{spanishText}</p>;
   } else {
-    const textParts = spanishText.split("*");
+    const textParts = spanishText.split('*');
 
     return (
       <p>

@@ -1,21 +1,21 @@
 // Load environment variables from .env file if running locally
-import fs from "node:fs";
-import path from "node:path";
-import { env, exit } from "node:process";
-import { fileURLToPath } from "node:url"; // New import to handle __dirname in ES modules
-import axios from "axios";
-import dotenv from "dotenv";
+import fs from 'node:fs';
+import path from 'node:path';
+import { env, exit } from 'node:process';
+import { fileURLToPath } from 'node:url'; // New import to handle __dirname in ES modules
+import axios from 'axios';
+import dotenv from 'dotenv';
 
 // Simulate __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from .env file if running locally
-if (env.CI !== "true") {
-  dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+if (env.CI !== 'true') {
+  dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 }
 
-const rootPath = env.ACTION === "true" ? "./" : "../../";
+const rootPath = env.ACTION === 'true' ? './' : '../../';
 
 // Define environment variables
 const AUTH0_DOMAIN = env.AUTH0_DOMAIN;
@@ -36,7 +36,7 @@ if (
   !AUTH0_AUDIENCE
 ) {
   console.error(
-    "Missing required environment variables. Please check your .env file or environment settings.",
+    'Missing required environment variables. Please check your .env file or environment settings.',
   );
   exit(1);
 }
@@ -48,18 +48,18 @@ async function fetchAuthToken() {
       client_id: AUTH0_CLIENT_ID,
       client_secret: AUTH0_CLIENT_SECRET,
       audience: AUTH0_AUDIENCE,
-      grant_type: "client_credentials",
+      grant_type: 'client_credentials',
     });
 
     const token = response.data.access_token;
     if (!token) {
-      throw new Error("Failed to fetch Auth0 token.");
+      throw new Error('Failed to fetch Auth0 token.');
     }
     /* eslint-disable-next-line no-console */
-    console.log("Auth0 token fetched successfully.");
+    console.log('Auth0 token fetched successfully.');
     return token;
   } catch (error) {
-    console.error("Error fetching Auth0 token:", error.message);
+    console.error('Error fetching Auth0 token:', error.message);
     exit(1);
   }
 }
@@ -71,7 +71,7 @@ async function fetchMockData(token) {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      responseType: "stream",
+      responseType: 'stream',
     });
 
     // Ensure the mockdata directory exists
@@ -81,17 +81,17 @@ async function fetchMockData(token) {
     const writer = fs.createWriteStream(MOCKDATA_PATH);
     response.data.pipe(writer);
 
-    writer.on("finish", () => {
+    writer.on('finish', () => {
       /* eslint-disable-next-line no-console */
-      console.log("Mock data fetched and saved to target directory.");
+      console.log('Mock data fetched and saved to target directory.');
     });
 
-    writer.on("error", (error) => {
-      console.error("Error writing mock data:", error.message);
+    writer.on('error', (error) => {
+      console.error('Error writing mock data:', error.message);
       exit(1);
     });
   } catch (error) {
-    console.error("Error fetching mock data:", error.message);
+    console.error('Error fetching mock data:', error.message);
     exit(1);
   }
 }

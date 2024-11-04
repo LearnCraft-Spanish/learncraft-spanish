@@ -1,10 +1,10 @@
-import { describe, expect, it } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { describe, expect, it } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
 
-import MockAllProviders from "../../mocks/Providers/MockAllProviders";
-import mockData from "../../mocks/data/serverlike/serverlikeData";
+import MockAllProviders from '../../mocks/Providers/MockAllProviders';
+import mockData from '../../mocks/data/serverlike/serverlikeData';
 
-import { useOfficialQuizzes } from "./useOfficialQuizzes";
+import { useOfficialQuizzes } from './useOfficialQuizzes';
 
 const { api } = mockData();
 const quizzesTable = api.quizzesTable;
@@ -21,14 +21,14 @@ async function renderHookLoaded() {
   return result;
 }
 
-describe("useOfficialQuizzes", () => {
-  describe("officialQuizzesQuery", () => {
-    it("runs without crashing", async () => {
+describe('useOfficialQuizzes', () => {
+  describe('officialQuizzesQuery', () => {
+    it('runs without crashing', async () => {
       const result = await renderHookLoaded();
       expect(result.current.officialQuizzesQuery.data).toBeDefined();
     });
 
-    it("data length is mockDataLength", async () => {
+    it('data length is mockDataLength', async () => {
       const result = await renderHookLoaded();
       expect(result.current.officialQuizzesQuery.data?.length).toBe(
         quizzesTable.length,
@@ -36,7 +36,7 @@ describe("useOfficialQuizzes", () => {
     });
   });
 
-  describe("quizExamplesQuery", () => {
+  describe('quizExamplesQuery', () => {
     const randomQuizTable =
       quizExamplesTableArray[
         Math.floor(Math.random() * quizExamplesTableArray.length)
@@ -45,7 +45,7 @@ describe("useOfficialQuizzes", () => {
     const randomQuizId = quizzesTable.find(
       (quiz) => quiz.quizNickname === randomQuizNickname,
     )?.recordId;
-    it("runs without crashing", async () => {
+    it('runs without crashing', async () => {
       const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
         wrapper: MockAllProviders,
       });
@@ -55,7 +55,7 @@ describe("useOfficialQuizzes", () => {
       expect(result.current.quizExamplesQuery.data).toBeDefined();
     });
 
-    it("data is mockData", async () => {
+    it('data is mockData', async () => {
       const { result } = renderHook(() => useOfficialQuizzes(randomQuizId), {
         wrapper: MockAllProviders,
       });

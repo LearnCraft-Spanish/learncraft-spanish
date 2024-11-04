@@ -1,14 +1,14 @@
-import { useQuery } from "@tanstack/react-query";
-import { useRef } from "react";
-import type { VocabTag, Vocabulary } from "../interfaceDefinitions";
-import { useBackend } from "./useBackend";
-import { useUserData } from "./useUserData";
+import { useQuery } from '@tanstack/react-query';
+import { useRef } from 'react';
+import type { VocabTag, Vocabulary } from '../interfaceDefinitions';
+import { useBackend } from './useBackend';
+import { useUserData } from './useUserData';
 
 export function useVocabulary() {
   const userDataQuery = useUserData();
   const { getVocabFromBackend } = useBackend();
   const hasAccess =
-    userDataQuery.data?.isAdmin || userDataQuery.data?.role === "student";
+    userDataQuery.data?.isAdmin || userDataQuery.data?.role === 'student';
 
   const tagTableRef = useRef<VocabTag[]>([]);
 
@@ -28,7 +28,7 @@ export function useVocabulary() {
           (item.vocabDescriptor === vocabDescriptor || !vocabDescriptor),
       )
     ) {
-      if (type === "vocabulary") {
+      if (type === 'vocabulary') {
         tagTableRef.current.push({
           type,
           tag,
@@ -45,9 +45,9 @@ export function useVocabulary() {
   // Helper function to sort vocabulary by frequencyRank, then space-separated words
   const sortVocab = (a: Vocabulary, b: Vocabulary) => {
     if (a.frequencyRank === b.frequencyRank) {
-      return a.wordIdiom.includes(" ") === b.wordIdiom.includes(" ")
+      return a.wordIdiom.includes(' ') === b.wordIdiom.includes(' ')
         ? 0
-        : a.wordIdiom.includes(" ")
+        : a.wordIdiom.includes(' ')
           ? 1
           : -1;
     }
@@ -64,25 +64,25 @@ export function useVocabulary() {
 
       vocab?.forEach((term) => {
         if (term.vocabularySubcategorySubcategoryName) {
-          addTag("subcategory", term.vocabularySubcategorySubcategoryName);
+          addTag('subcategory', term.vocabularySubcategorySubcategoryName);
         }
 
         if (term.verbInfinitive) {
-          addTag("verb", term.verbInfinitive);
+          addTag('verb', term.verbInfinitive);
         }
 
         if (term.conjugationTags.length > 0) {
           term.conjugationTags.forEach((conjugation) =>
-            addTag("conjugation", conjugation),
+            addTag('conjugation', conjugation),
           );
         }
 
         if (term.wordIdiom) {
           const isIdiom = term.vocabularySubcategorySubcategoryName
             ?.toLowerCase()
-            .includes("idiom");
+            .includes('idiom');
           addTag(
-            isIdiom ? "idiom" : "vocabulary",
+            isIdiom ? 'idiom' : 'vocabulary',
             term.wordIdiom,
             term.descriptionOfVocabularySkill,
           );
@@ -95,7 +95,7 @@ export function useVocabulary() {
   };
 
   const vocabularyQuery = useQuery({
-    queryKey: ["vocabulary"],
+    queryKey: ['vocabulary'],
     queryFn: setupVocabTable,
     staleTime: Infinity,
     gcTime: Infinity,

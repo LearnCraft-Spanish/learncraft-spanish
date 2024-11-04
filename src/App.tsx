@@ -1,29 +1,23 @@
-import type { ReactElement } from "react";
-import React, {
-  isValidElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Route, useLocation } from "react-router-dom";
-import type { UserData } from "./interfaceDefinitions";
+import type { ReactElement } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Route, useLocation } from 'react-router-dom';
+import type { UserData } from './interfaceDefinitions';
 
-import AudioBasedReview from "./components/AudioBasedReview/AudioBasedReview";
-import Loading from "./components/Loading";
-import Nav from "./components/Nav";
-import FlashcardFinder from "./FlashcardFinder";
-import FlashcardManager from "./FlashcardManager";
-import FrequenSay from "./FrequenSay";
-import SentryRoutes from "./functions/SentryRoutes";
-import { useActiveStudent } from "./hooks/useActiveStudent";
-import useAuth from "./hooks/useAuth";
-import { useUserData } from "./hooks/useUserData";
-import LCSPQuizApp from "./LCSPQuizApp";
-import Menu from "./Menu";
-import NotFoundPage from "./NotFoundPage";
-import ReviewMyFlashcards from "./ReviewMyFlashcards";
-import "./App.css";
+import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview';
+import Loading from './components/Loading';
+import Nav from './components/Nav';
+import FlashcardFinder from './components/FlashcardFinder';
+import FlashcardManager from './FlashcardManager';
+import FrequenSay from './FrequenSay';
+import SentryRoutes from './functions/SentryRoutes';
+import { useActiveStudent } from './hooks/useActiveStudent';
+import useAuth from './hooks/useAuth';
+import { useUserData } from './hooks/useUserData';
+import LCSPQuizApp from './LCSPQuizApp';
+import Menu from './Menu';
+import NotFoundPage from './NotFoundPage';
+import ReviewMyFlashcards from './ReviewMyFlashcards';
+import './App.css';
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -34,56 +28,18 @@ export const App: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   // States for banner message
-  const [bannerMessage, setBannerMessage] = useState("");
+  const [bannerMessage, setBannerMessage] = useState('');
   const messageNumber = useRef<number | NodeJS.Timeout>(0);
-
-  // Reference to the current contextual menu element
-  const currentContextual = useRef<HTMLDivElement | null>(null);
-  const [contextual, setContextual] = useState(""); // String to indicate which contextual menu is open
 
   // Boolean state to determine whether to show the student selector menu
   const [studentSelectorOpen, setStudentSelectorOpen] = useState(false);
-
-  // global functions to open and close any contextual menus – hard limit to one at a time
-  const openContextual = useCallback((elementClass: string) => {
-    setContextual(elementClass);
-  }, []);
-
-  const closeContextual = useCallback(() => {
-    setContextual("");
-  }, []);
-
-  // local function to close contextual menu if click is outside of it
-  function closeContextualIfClickOut(e: React.MouseEvent) {
-    if (
-      isValidElement(currentContextual.current) ||
-      currentContextual.current instanceof Element
-    ) {
-      const contextualItemBounds =
-        currentContextual.current.getBoundingClientRect();
-      const eventX = e.clientX;
-      const eventY = e.clientY;
-      const leftOfLeftBound = eventX <= contextualItemBounds.left;
-      const rightOfRightBound = eventX >= contextualItemBounds.right;
-      const aboveTopBound = eventY >= contextualItemBounds.bottom;
-      const belowBottomBound = eventY <= contextualItemBounds.top;
-      const outOfBounds =
-        leftOfLeftBound ||
-        rightOfRightBound ||
-        aboveTopBound ||
-        belowBottomBound;
-      if (outOfBounds) {
-        closeContextual();
-      }
-    }
-  }
 
   const _updateBannerMessage = useCallback((message: string) => {
     setBannerMessage(message);
   }, []);
 
   const blankBanner = useCallback(() => {
-    setBannerMessage("");
+    setBannerMessage('');
   }, []);
 
   const makeStudentSelector = useCallback(() => {
@@ -97,8 +53,8 @@ export const App: React.FC = () => {
         const studentEmail = student.emailAddress;
         const studentRole = student.role;
         if (
-          !studentEmail.includes("(") &&
-          (studentRole === "student" || studentRole === "limited")
+          !studentEmail.includes('(') &&
+          (studentRole === 'student' || studentRole === 'limited')
         ) {
           studentSelector.push(
             <option
@@ -146,21 +102,21 @@ export const App: React.FC = () => {
   useEffect(() => {
     clearTimeout(messageNumber.current);
     messageNumber.current = 0;
-    if (bannerMessage !== "") {
+    if (bannerMessage !== '') {
       const timeoutNumber = setTimeout(blankBanner, 1000);
       messageNumber.current = timeoutNumber;
     }
   }, [bannerMessage, messageNumber, blankBanner]);
 
   return (
-    <div className="App" onClick={closeContextualIfClickOut}>
+    <div className="App">
       <Nav />
-      {location.pathname !== "/coaching" &&
-        location.pathname !== "/comprehensionquiz" &&
-        location.pathname !== "/audioquiz" &&
-        location.pathname !== "/myflashcards/quiz" &&
-        location.pathname !== "/myflashcards/srsquiz" &&
-        location.pathname.split("/")[1] !== "officialquizzes" && (
+      {location.pathname !== '/coaching' &&
+        location.pathname !== '/comprehensionquiz' &&
+        location.pathname !== '/audioquiz' &&
+        location.pathname !== '/myflashcards/quiz' &&
+        location.pathname !== '/myflashcards/srsquiz' &&
+        location.pathname.split('/')[1] !== 'officialquizzes' && (
           <div className="div-user-subheader">
             {!isLoading && !isAuthenticated && (
               <p>You must be logged in to use this app.</p>
@@ -175,8 +131,8 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              (userDataQuery.data?.role === "student" ||
-                userDataQuery.data?.role === "limited") &&
+              (userDataQuery.data?.role === 'student' ||
+                userDataQuery.data?.role === 'limited') &&
               !userDataQuery.data?.isAdmin &&
               (userDataQuery.data.name ? (
                 <p>{`Welcome back, ${userDataQuery.data.name}!`}</p>
@@ -187,8 +143,8 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              userDataQuery.data?.role !== "student" &&
-              userDataQuery.data?.role !== "limited" &&
+              userDataQuery.data?.role !== 'student' &&
+              userDataQuery.data?.role !== 'limited' &&
               !userDataQuery.data?.isAdmin && <p>Welcome back!</p>}
 
             {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
@@ -199,8 +155,8 @@ export const App: React.FC = () => {
                   ${
                     activeStudentQuery.data?.recordId ===
                     userDataQuery.data?.recordId
-                      ? " (yourself)"
-                      : ""
+                      ? ' (yourself)'
+                      : ''
                   }`}
                   </p>
                 )}
@@ -257,21 +213,15 @@ export const App: React.FC = () => {
         <Route
           path="/flashcardfinder"
           element={
-            (userDataQuery.data?.role === "student" ||
-              userDataQuery.data?.isAdmin) && (
-              <FlashcardFinder
-                contextual={contextual}
-                openContextual={openContextual}
-                ref={currentContextual}
-              />
-            )
+            (userDataQuery.data?.role === 'student' ||
+              userDataQuery.data?.isAdmin) && <FlashcardFinder />
           }
         />
         <Route
           path="/audioquiz/*"
           element={
-            (userDataQuery.data?.role === "student" ||
-              userDataQuery.data?.role === "limited" ||
+            (userDataQuery.data?.role === 'student' ||
+              userDataQuery.data?.role === 'limited' ||
               userDataQuery.data?.isAdmin) && (
               <AudioBasedReview audioOrComprehension="audio" willAutoplay />
             )
@@ -280,8 +230,8 @@ export const App: React.FC = () => {
         <Route
           path="/comprehensionquiz/*"
           element={
-            (userDataQuery.data?.role === "student" ||
-              userDataQuery.data?.role === "limited" ||
+            (userDataQuery.data?.role === 'student' ||
+              userDataQuery.data?.role === 'limited' ||
               userDataQuery.data?.isAdmin) && (
               <AudioBasedReview
                 audioOrComprehension="comprehension"
@@ -301,12 +251,7 @@ export const App: React.FC = () => {
             path="/coaching"
             element={
               userDataQuery.data?.isAdmin && (
-                <Coaching
-                  contextual={contextual}
-                  openContextual={openContextual}
-                  closeContextual={closeContextual}
-                  ref={currentContextual}
-                />
+                <Coaching />
               )
             }
           />

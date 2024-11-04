@@ -1,9 +1,9 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
-import type { Lesson, Program, UserData } from "../interfaceDefinitions";
-import { useBackend } from "./useBackend";
-import { useProgramTable } from "./useProgramTable";
-import { useUserData } from "./useUserData";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import type { Lesson, Program, UserData } from '../interfaceDefinitions';
+import { useBackend } from './useBackend';
+import { useProgramTable } from './useProgramTable';
+import { useUserData } from './useUserData';
 
 export function useActiveStudent() {
   const { getAllUsersFromBackend } = useBackend();
@@ -12,7 +12,7 @@ export function useActiveStudent() {
   const queryClient = useQueryClient();
 
   const studentListQuery = useQuery({
-    queryKey: ["studentList"],
+    queryKey: ['studentList'],
     queryFn: getAllUsersFromBackend,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin, // Only fetch if the user is an admin
@@ -21,20 +21,20 @@ export function useActiveStudent() {
   async function getActiveStudent(): Promise<UserData | null> {
     if (
       (!userDataQuery.data?.isAdmin ||
-        !queryClient.getQueryData(["activeStudentSelection"])) &&
-      (userDataQuery.data?.role === "student" ||
-        userDataQuery.data?.role === "limited")
+        !queryClient.getQueryData(['activeStudentSelection'])) &&
+      (userDataQuery.data?.role === 'student' ||
+        userDataQuery.data?.role === 'limited')
     ) {
       return userDataQuery.data; // Students are their own activeStudent
     } else if (userDataQuery.data?.isAdmin) {
-      return queryClient.getQueryData(["activeStudentSelection"]) || null; // Admin-selected activeStudent
+      return queryClient.getQueryData(['activeStudentSelection']) || null; // Admin-selected activeStudent
     } else {
       return null;
     }
   }
 
   const activeStudentQuery = useQuery<UserData | null>({
-    queryKey: ["activeStudent"],
+    queryKey: ['activeStudent'],
     queryFn: getActiveStudent,
     staleTime: Infinity,
     enabled: !!userDataQuery.data, // Only run once userData is available
@@ -46,8 +46,8 @@ export function useActiveStudent() {
         studentListQuery.data.find(
           (student) => student.recordId === studentId,
         ) || null;
-      queryClient.setQueryData(["activeStudentSelection"], student);
-      queryClient.invalidateQueries({ queryKey: ["activeStudent"] });
+      queryClient.setQueryData(['activeStudentSelection'], student);
+      queryClient.invalidateQueries({ queryKey: ['activeStudent'] });
     }
   };
 
@@ -72,17 +72,17 @@ export function useActiveStudent() {
       const studentCohort = activeStudentQuery.data.cohort;
       const getCohortLesson = (cohort: string) => {
         switch (cohort) {
-          case "A":
+          case 'A':
             return activeProgram?.cohortACurrentLesson;
-          case "B":
+          case 'B':
             return activeProgram?.cohortBCurrentLesson;
-          case "C":
+          case 'C':
             return activeProgram?.cohortCCurrentLesson;
-          case "D":
+          case 'D':
             return activeProgram?.cohortDCurrentLesson;
-          case "E":
+          case 'E':
             return activeProgram?.cohortECurrentLesson;
-          case "F":
+          case 'F':
             return activeProgram?.cohortFCurrentLesson;
           // case 'G': return activeProgram?.cohortGCurrentLesson
           // etc for futureproofing
@@ -92,7 +92,7 @@ export function useActiveStudent() {
       const maxLesson = cohortLesson || 999;
       const lessonList: Lesson[] = [];
       activeProgram.lessons?.forEach((lesson) => {
-        const lessonArray = lesson.lesson.split(" ");
+        const lessonArray = lesson.lesson.split(' ');
         const lessonString = lessonArray.slice(-1)[0];
         const lessonNumber = Number.parseInt(lessonString);
         if (lessonNumber <= maxLesson) {

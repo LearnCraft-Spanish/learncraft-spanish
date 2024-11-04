@@ -4,36 +4,38 @@ import React, {
   useMemo,
   useRef,
   useState,
-} from "react";
-import { Navigate } from "react-router-dom";
-import type { Flashcard } from "../../interfaceDefinitions";
-import { fisherYatesShuffle } from "../../functions/fisherYatesShuffle";
-import { useActiveStudent } from "../../hooks/useActiveStudent";
+} from 'react';
+import { Navigate } from 'react-router-dom';
+import type { Flashcard } from '../../interfaceDefinitions';
+import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
 
-import { useAudioExamples } from "../../hooks/useAudioExamples";
-import { useProgramTable } from "../../hooks/useProgramTable";
-import { useSelectedLesson } from "../../hooks/useSelectedLesson";
-import { useUserData } from "../../hooks/useUserData";
-import Loading from "../Loading";
-import AudioFlashcard from "./AudioFlashcard";
-import AudioQuizButtons from "./AudioQuizButtons";
-import AudioQuizSetupMenu from "./AudioQuizSetupMenu";
-import NewQuizProgress from "./NewQuizProgress";
-import "../../App.css";
-import "./AudioBasedReview.css";
+import { useAudioExamples } from '../../hooks/useAudioExamples';
+import { useProgramTable } from '../../hooks/useProgramTable';
+import { useSelectedLesson } from '../../hooks/useSelectedLesson';
+import { useUserData } from '../../hooks/useUserData';
+import Loading from '../Loading';
+import AudioFlashcard from './AudioFlashcard';
+import AudioQuizButtons from './AudioQuizButtons';
+import AudioQuizSetupMenu from './AudioQuizSetupMenu';
+import NewQuizProgress from './NewQuizProgress';
+import '../../App.css';
+import './AudioBasedReview.css';
 
 interface StepValue {
   audio: string;
   text: string | JSX.Element;
 }
 
+type stepValues = 'question' | 'guess' | 'hint' | 'answer';
+
 interface AudioBasedReviewProps {
-  audioOrComprehension?: "audio" | "comprehension";
+  audioOrComprehension?: 'audio' | 'comprehension';
   willAutoplay: boolean;
 }
 
 export default function AudioBasedReview({
-  audioOrComprehension = "comprehension",
+  audioOrComprehension = 'comprehension',
   willAutoplay,
 }: AudioBasedReviewProps) {
   const userDataQuery = useUserData();
@@ -49,8 +51,8 @@ export default function AudioBasedReview({
     programTableQuery.isSuccess &&
     audioExamplesQuery.isSuccess &&
     (userDataQuery.data?.isAdmin ||
-      activeStudentQuery.data?.role === "student" ||
-      activeStudentQuery.data?.role === "limited");
+      activeStudentQuery.data?.role === 'student' ||
+      activeStudentQuery.data?.role === 'limited');
   const isError =
     !dataReady &&
     (userDataQuery.isError ||
@@ -113,66 +115,66 @@ export default function AudioBasedReview({
 
   // New Step Handling Variables
   // Using a state to control the current step so the UI can update
-  const [currentStep, setCurrentStep] = useState<string>("question");
+  const [currentStep, setCurrentStep] = useState<stepValues>('question');
   // const steps = ['question', 'guess', 'hint', 'answer']
 
   // Step Values for each: Will be derived from the current example
   const questionValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return audioOrComprehension === "audio"
-        ? { audio: currentExample?.englishAudio, text: "Playing English!" }
+      return audioOrComprehension === 'audio'
+        ? { audio: currentExample?.englishAudio, text: 'Playing English!' }
         : {
             audio: currentExample?.spanishAudioLa,
             text: <em>Listen to Audio</em>,
           };
     }
-    return { audio: "", text: "" };
+    return { audio: '', text: '' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const guessValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return { audio: "", text: "Make a guess!" };
+      return { audio: '', text: 'Make a guess!' };
     }
-    return { audio: "", text: "" };
+    return { audio: '', text: '' };
   }, [currentExample, currentStep]);
 
   const hintValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return audioOrComprehension === "audio"
-        ? { audio: currentExample?.spanishAudioLa, text: "Playing Spanish!" }
+      return audioOrComprehension === 'audio'
+        ? { audio: currentExample?.spanishAudioLa, text: 'Playing Spanish!' }
         : {
             audio: currentExample?.spanishAudioLa,
             text: currentExample?.spanishExample,
           };
     }
-    return { audio: "", text: "" };
+    return { audio: '', text: '' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const answerValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return audioOrComprehension === "audio"
+      return audioOrComprehension === 'audio'
         ? {
             audio: currentExample?.spanishAudioLa,
             text: currentExample.spanishExample,
           }
-        : { audio: "", text: currentExample?.englishTranslation };
+        : { audio: '', text: currentExample?.englishTranslation };
     }
-    return { audio: "", text: "" };
+    return { audio: '', text: '' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   // Get the value of the current step programmatically
   const currentStepValue = useMemo(() => {
     switch (currentStep) {
-      case "question":
+      case 'question':
         return questionValue;
-      case "guess":
+      case 'guess':
         return guessValue;
-      case "hint":
+      case 'hint':
         return hintValue;
-      case "answer":
+      case 'answer':
         return answerValue;
       default:
-        console.error("Invalid currentStep value: ", currentStep);
+        console.error('Invalid currentStep value: ', currentStep);
         return questionValue;
     }
   }, [currentStep, questionValue, guessValue, hintValue, answerValue]);
@@ -224,7 +226,7 @@ export default function AudioBasedReview({
         if (e instanceof Error) {
           console.error(e.message);
         } else {
-          console.error("Error playing audio. Error: ", e);
+          console.error('Error playing audio. Error: ', e);
         }
       });
     }
@@ -274,12 +276,12 @@ export default function AudioBasedReview({
     } else {
       setCurrentExampleNumber(audioQuizExamples?.length - 1 || 0);
     }
-    setCurrentStep("question");
+    setCurrentStep('question');
   }, [currentExampleNumber, audioQuizExamples]);
 
   // Skips to the previous whole example
   const decrementExample = useCallback(
-    (customDecrement: undefined | string = undefined) => {
+    (customDecrement: undefined | stepValues = undefined) => {
       if (currentExampleNumber > 0) {
         setCurrentExampleNumber(currentExampleNumber - 1);
       } else {
@@ -289,7 +291,7 @@ export default function AudioBasedReview({
       if (customDecrement) {
         setCurrentStep(customDecrement);
       } else {
-        setCurrentStep("question");
+        setCurrentStep('question');
       }
     },
     [currentExampleNumber],
@@ -303,28 +305,28 @@ export default function AudioBasedReview({
     pauseAudio();
 
     switch (currentStep) {
-      case "question":
+      case 'question':
         if (autoplay) {
-          setCurrentStep("guess");
+          setCurrentStep('guess');
         } else {
-          setCurrentStep("hint");
+          setCurrentStep('hint');
         }
         break;
-      case "guess":
-        setCurrentStep("hint");
+      case 'guess':
+        setCurrentStep('hint');
 
         break;
-      case "hint":
-        setCurrentStep("answer");
+      case 'hint':
+        setCurrentStep('answer');
 
         break;
-      case "answer":
+      case 'answer':
         // This may cause a race condition later
         incrementExample();
         // Proceed to next question
         break;
       default:
-        console.error("Invalid currentStep value: ", currentStep);
+        console.error('Invalid currentStep value: ', currentStep);
     }
   }, [autoplay, currentStep, incrementExample, pauseAudio]);
 
@@ -336,29 +338,29 @@ export default function AudioBasedReview({
     pauseAudio();
 
     switch (currentStep) {
-      case "question":
-        decrementExample("answer");
+      case 'question':
+        decrementExample('answer');
         break;
-      case "guess":
-        setCurrentStep("question");
+      case 'guess':
+        setCurrentStep('question');
         break;
-      case "hint":
+      case 'hint':
         if (autoplay) {
-          setCurrentStep("guess");
+          setCurrentStep('guess');
         } else {
-          setCurrentStep("question");
+          setCurrentStep('question');
         }
         break;
-      case "answer":
-        setCurrentStep("hint");
+      case 'answer':
+        setCurrentStep('hint');
         break;
       default:
-        console.error("Invalid currentStep value: ", currentStep);
+        console.error('Invalid currentStep value: ', currentStep);
     }
   }, [autoplay, currentStep, decrementExample, pauseAudio]);
 
   // Currently only used by previousStepButton
-  function customIncrementCurrentStep(step: string) {
+  function customIncrementCurrentStep(step: stepValues) {
     pauseAudio();
     if (step === currentStep) {
       playAudio();
@@ -376,7 +378,7 @@ export default function AudioBasedReview({
   const unReadyQuiz = useCallback(() => {
     setQuizReady(false);
     setCurrentExampleNumber(0);
-    setCurrentStep("question");
+    setCurrentStep('question');
     if (autoplay) {
       clearCountDown();
     }
@@ -426,17 +428,17 @@ export default function AudioBasedReview({
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight" || event.key === "d") {
+      if (event.key === 'ArrowRight' || event.key === 'd') {
         incrementExample();
-      } else if (event.key === "ArrowLeft" || event.key === "a") {
+      } else if (event.key === 'ArrowLeft' || event.key === 'a') {
         decrementExample();
-      } else if (event.key === "ArrowUp" || event.key === "w") {
+      } else if (event.key === 'ArrowUp' || event.key === 'w') {
         event.preventDefault();
         incrementCurrentStep();
-      } else if (event.key === "ArrowDown" || event.key === "s") {
+      } else if (event.key === 'ArrowDown' || event.key === 's') {
         event.preventDefault();
         decrementCurrentStep();
-      } else if (event.key === " ") {
+      } else if (event.key === ' ') {
         if (autoplay) {
           event.preventDefault();
           if (isPlaying) {
@@ -459,9 +461,9 @@ export default function AudioBasedReview({
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener('keydown', handleKeyPress);
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
 
@@ -473,9 +475,9 @@ export default function AudioBasedReview({
       {!quizReady && dataReady && (
         <>
           <h2>
-            {audioOrComprehension === "audio"
-              ? "Audio Quiz"
-              : "Comprehension Quiz"}
+            {audioOrComprehension === 'audio'
+              ? 'Audio Quiz'
+              : 'Comprehension Quiz'}
           </h2>
           <AudioQuizSetupMenu
             autoplay={autoplay}
@@ -493,9 +495,9 @@ export default function AudioBasedReview({
               currentExampleNumber={currentExampleNumber + 1}
               totalExamplesNumber={audioQuizExamples.length}
               quizTitle={
-                audioOrComprehension === "audio"
-                  ? "Audio Quiz"
-                  : "Comprehension Quiz"
+                audioOrComprehension === 'audio'
+                  ? 'Audio Quiz'
+                  : 'Comprehension Quiz'
               }
             />
             <AudioFlashcard

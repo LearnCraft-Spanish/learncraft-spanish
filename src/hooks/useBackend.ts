@@ -1,6 +1,6 @@
-import { useCallback } from "react";
-import type * as types from "../interfaceDefinitions";
-import useAuth from "./useAuth";
+import { useCallback } from 'react';
+import type * as types from '../interfaceDefinitions';
+import useAuth from './useAuth';
 
 export function useBackend() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -10,7 +10,7 @@ export function useBackend() {
     async <T>(path: string, headers?: any): Promise<T> => {
       const fetchUrl = `${backendUrl}${path}`;
       const response = await fetch(fetchUrl, {
-        method: "GET",
+        method: 'GET',
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
           ...headers,
@@ -33,45 +33,45 @@ export function useBackend() {
   const getProgramsFromBackend = useCallback((): Promise<
     types.ProgramUnparsed[]
   > => {
-    return getFactory<types.ProgramUnparsed[]>("public/programs");
+    return getFactory<types.ProgramUnparsed[]>('public/programs');
   }, [getFactory]);
 
   const getLessonsFromBackend = useCallback((): Promise<types.Lesson[]> => {
-    return getFactory<types.Lesson[]>("public/lessons");
+    return getFactory<types.Lesson[]>('public/lessons');
   }, [getFactory]);
 
   const getVocabFromBackend = useCallback((): Promise<types.Vocabulary[]> => {
-    return getFactory<types.Vocabulary[]>("public/vocabulary");
+    return getFactory<types.Vocabulary[]>('public/vocabulary');
   }, [getFactory]);
 
   const getSpellingsFromBackend = useCallback((): Promise<types.Spelling[]> => {
-    return getFactory<types.Spelling[]>("public/spellings");
+    return getFactory<types.Spelling[]>('public/spellings');
   }, [getFactory]);
 
   // UNUSED -- CONSIDER DELETING
   const getExamplesFromBackend = useCallback((): Promise<types.Flashcard[]> => {
-    return getFactory<types.Flashcard[]>("public/examples");
+    return getFactory<types.Flashcard[]>('public/examples');
   }, [getFactory]);
 
   const getVerifiedExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
-    return getFactory<types.Flashcard[]>("public/verified-examples");
+    return getFactory<types.Flashcard[]>('public/verified-examples');
   }, [getFactory]);
 
   const getAudioExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
-    return getFactory<types.Flashcard[]>("public/audio-examples");
+    return getFactory<types.Flashcard[]>('public/audio-examples');
   }, [getFactory]);
 
   const getLcspQuizzesFromBackend = useCallback((): Promise<types.Quiz[]> => {
-    return getFactory<types.Quiz[]>("public/quizzes");
+    return getFactory<types.Quiz[]>('public/quizzes');
   }, [getFactory]);
 
   const getMyExamplesFromBackend =
     useCallback((): Promise<types.StudentFlashcardData> => {
-      return getFactory<types.StudentFlashcardData>("my-examples");
+      return getFactory<types.StudentFlashcardData>('my-examples');
     }, [getFactory]);
 
   const getQuizExamplesFromBackend = useCallback(
@@ -82,11 +82,11 @@ export function useBackend() {
   );
 
   const getAllUsersFromBackend = useCallback((): Promise<types.UserData[]> => {
-    return getFactory<types.UserData[]>("all-students");
+    return getFactory<types.UserData[]>('all-students');
   }, [getFactory]);
 
   const getUserDataFromBackend = useCallback((): Promise<types.UserData> => {
-    return getFactory<types.UserData>("my-data");
+    return getFactory<types.UserData>('my-data');
   }, [getFactory]);
 
   const getActiveExamplesFromBackend = useCallback(
@@ -99,27 +99,27 @@ export function useBackend() {
   /*      Coaching API      */
 
   const getCoachList = useCallback((): Promise<types.Coach[]> => {
-    return getFactory<types.Coach[]>("coaching/coaches");
+    return getFactory<types.Coach[]>('coaching/coaches');
   }, [getFactory]);
 
   const getCourseList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>("coaching/courses");
+    return getFactory<string[]>('coaching/courses');
   }, [getFactory]);
 
   const getLessonList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>("coaching/lessons");
+    return getFactory<string[]>('coaching/lessons');
   }, [getFactory]);
 
   const getActiveStudents = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>("coaching/active-students");
+    return getFactory<string[]>('coaching/active-students');
   }, [getFactory]);
 
   const getActiveMemberships = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>("coaching/active-memberships");
+    return getFactory<string[]>('coaching/active-memberships');
   }, [getFactory]);
 
   const getLastThreeWeeks = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>("coaching/last-three-weeks");
+    return getFactory<string[]>('coaching/last-three-weeks');
   }, [getFactory]);
 
   /*      POST Requests      */
@@ -128,15 +128,15 @@ export function useBackend() {
     async <T>(path: string, headers?: any): Promise<T> => {
       const fetchUrl = `${backendUrl}${path}`;
       const response = await fetch(fetchUrl, {
-        method: "POST",
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...headers,
         },
       });
       if (response.ok) {
-        return response.json().catch((error) => {
+        return await response.json().catch((error) => {
           console.error(`Error parsing JSON from ${path}:`, error);
           throw new Error(`Failed to parse JSON from ${path}`);
         });
@@ -150,7 +150,7 @@ export function useBackend() {
 
   const createMyStudentExample = useCallback(
     (exampleId: number): Promise<number> => {
-      return postFactory<number>("create-my-student-example", {
+      return postFactory<number>('create-my-student-example', {
         exampleid: exampleId,
       });
     },
@@ -159,7 +159,7 @@ export function useBackend() {
 
   const createStudentExample = useCallback(
     (studentId: number, exampleId: number): Promise<number> => {
-      return postFactory<number>("create-student-example", {
+      return postFactory<number>('create-student-example', {
         studentid: studentId,
         exampleid: exampleId,
       });
@@ -169,7 +169,7 @@ export function useBackend() {
 
   const updateMyStudentExample = useCallback(
     (updateId: number, newInterval: number): Promise<number> => {
-      return postFactory<number>("update-my-student-example", {
+      return postFactory<number>('update-my-student-example', {
         updateid: updateId,
         newinterval: newInterval,
       });
@@ -179,7 +179,7 @@ export function useBackend() {
 
   const updateStudentExample = useCallback(
     (updateId: number, newInterval: number): Promise<number> => {
-      return postFactory<number>("update-student-example", {
+      return postFactory<number>('update-student-example', {
         updateid: updateId,
         newinterval: newInterval,
       });
@@ -193,7 +193,7 @@ export function useBackend() {
     async (path: string, headers?: any): Promise<number> => {
       const fetchUrl = `${backendUrl}${path}`;
       const response = await fetch(fetchUrl, {
-        method: "DELETE",
+        method: 'DELETE',
         headers: {
           Authorization: `Bearer ${await getAccessToken()}`,
           ...headers,
@@ -215,14 +215,14 @@ export function useBackend() {
 
   const deleteMyStudentExample = useCallback(
     (recordId: number): Promise<number> => {
-      return deleteFactory("delete-my-student-example", { deleteid: recordId });
+      return deleteFactory('delete-my-student-example', { deleteid: recordId });
     },
     [deleteFactory],
   );
 
   const deleteStudentExample = useCallback(
     (recordId: number): Promise<number> => {
-      return deleteFactory("delete-student-example", { deleteid: recordId });
+      return deleteFactory('delete-student-example', { deleteid: recordId });
     },
     [deleteFactory],
   );

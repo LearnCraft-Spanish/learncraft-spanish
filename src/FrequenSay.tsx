@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import type { Vocabulary } from "./interfaceDefinitions";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type { Vocabulary } from './interfaceDefinitions';
 
-import { FromToLessonSelector } from "./components/LessonSelector";
-import { useBackend } from "./hooks/useBackend";
-import { useSelectedLesson } from "./hooks/useSelectedLesson";
+import { FromToLessonSelector } from './components/LessonSelector';
+import { useBackend } from './hooks/useBackend';
+import { useSelectedLesson } from './hooks/useSelectedLesson';
 
 interface WordCount {
   word: string;
@@ -13,8 +13,8 @@ interface WordCount {
 export default function FrequenSay() {
   const { getVocabFromBackend, getSpellingsFromBackend } = useBackend();
   const { selectedToLesson } = useSelectedLesson();
-  const [userInput, setUserInput] = useState("");
-  const [userAddedVocabulary, setUserAddedVocabulary] = useState("");
+  const [userInput, setUserInput] = useState('');
+  const [userAddedVocabulary, setUserAddedVocabulary] = useState('');
   const [addManualVocabulary, setAddManualVocabulary] = useState(false);
   const [vocabularyTable, setVocabularyTable] = useState<Vocabulary[]>([]);
   const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([]);
@@ -32,15 +32,15 @@ export default function FrequenSay() {
   }
 
   function noAdditionalVocab() {
-    updateUserAddedVocabulary("");
+    updateUserAddedVocabulary('');
     setAddManualVocabulary(false);
   }
 
   function sortVocab(a: Vocabulary, b: Vocabulary): number {
     if (a.frequencyRank === b.frequencyRank) {
-      if (!a.wordIdiom.includes(" ") && b.wordIdiom.includes(" ")) {
+      if (!a.wordIdiom.includes(' ') && b.wordIdiom.includes(' ')) {
         return 1;
-      } else if (a.wordIdiom.includes(" ") && !b.wordIdiom.includes(" ")) {
+      } else if (a.wordIdiom.includes(' ') && !b.wordIdiom.includes(' ')) {
         return -1;
       }
     } else {
@@ -74,7 +74,7 @@ export default function FrequenSay() {
       if (e instanceof Error) {
         console.error(e.message);
       } else {
-        console.error("Error playing audio. Error: ", e);
+        console.error('Error playing audio. Error: ', e);
       }
     }
   }, [getVocabFromBackend, getSpellingsFromBackend]);
@@ -98,7 +98,7 @@ export default function FrequenSay() {
   }
 
   function countVocabularyWords(string: string): [WordCount[], number] {
-    const segmenter = new Intl.Segmenter([], { granularity: "word" });
+    const segmenter = new Intl.Segmenter([], { granularity: 'word' });
     const segmentedText = segmenter.segment(string);
     /*
     const allowedCharacters = 'abcdefghijklmnopqrstuvwxyzáéíóúüñ '
@@ -183,10 +183,10 @@ export default function FrequenSay() {
   }
 
   function copyTable() {
-    const headers = "Word\tCount\n";
+    const headers = 'Word\tCount\n';
     const table = unknownWordCount
       .map((word) => `${word.word}\t${word.count}`)
-      .join("\n");
+      .join('\n');
 
     const copiedText = headers + table;
     navigator.clipboard.writeText(copiedText);

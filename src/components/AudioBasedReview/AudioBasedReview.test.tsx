@@ -1,44 +1,80 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import type { WrapperProps } from "../../../src/interfaceDefinitions";
+import { act } from 'react';
 
-import serverlikeData from "../../../mocks/data/serverlike/serverlikeData";
-import MockAllProviders from "../../../mocks/Providers/MockAllProviders";
-import AudioBasedReview from "./AudioBasedReview";
+import { beforeEach, describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-const wrapper = ({ children }: WrapperProps) => (
-  <MockAllProviders>{children}</MockAllProviders>
-);
-const api = serverlikeData().api;
-const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === "student" && student.isAdmin === true,
-);
+import { setupMockAuth } from '../../../tests/setupMockAuth';
+import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 
-vi.unmock("./useUserData");
-vi.mock("./useUserData", () => ({
-  useUserData: vi.fn(() => ({
-    isSuccess: true,
-    data: studentAdmin,
-  })),
-}));
+import AudioBasedReview from './AudioBasedReview';
 
-describe("component AudioBasedReview", () => {
-  afterEach(() => {
-    vi.clearAllMocks();
-    cleanup();
+describe('initial state', () => {
+  beforeEach(() => {
+    setupMockAuth();
   });
-  describe("initial state", () => {
-    it("while waiting for data, shows loading", async () => {
-      render(<AudioBasedReview willAutoplay={false} />, { wrapper });
-      expect(screen.getByText("Loading Audio...")).toBeInTheDocument();
+  it('while waiting for data, shows loading', async () => {
+    render(<AudioBasedReview willAutoplay={false} />, {
+      wrapper: MockAllProviders,
     });
-    it("await data load, component renders", async () => {
-      render(<AudioBasedReview willAutoplay={false} />, { wrapper });
-      await waitFor(() =>
-        expect(screen.getByText("From:")).toBeInTheDocument(),
-      );
+    expect(screen.getByText('Loading Audio...')).toBeInTheDocument();
+  });
+  it('await data load, component renders', async () => {
+    render(<AudioBasedReview willAutoplay={false} />, {
+      wrapper: MockAllProviders,
+    });
+    await waitFor(() => expect(screen.getByText('From:')).toBeInTheDocument());
+    expect(screen.getByText('Comprehension Quiz')).toBeInTheDocument();
+    expect(screen.queryByText('Loading Audio...')).not.toBeInTheDocument();
+  });
+});
 
-      expect(screen.getByText("Comprehension Quiz")).toBeInTheDocument();
+describe('begin a quiz', () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: 'student-lcsp' });
+  });
+  it('clicking begin quiz, shows quiz', async () => {
+    render(<AudioBasedReview willAutoplay={false} />, {
+      wrapper: MockAllProviders,
     });
+    await waitFor(() => {
+      expect(screen.getByText('Start')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Start'));
+    await waitFor(() => {
+      expect(screen.getByText('Next')).toBeInTheDocument();
+      expect(screen.getByText('Previous')).toBeInTheDocument();
+    });
+  });
+});
+
+async function startQuiz() {
+  render(<AudioBasedReview willAutoplay={false} />, {
+    wrapper: MockAllProviders,
+  });
+  await waitFor(() => {
+    expect(screen.getByText('Start')).toBeInTheDocument();
+  });
+  act(() => {
+    fireEvent.click(screen.getByText('Start'));
+  });
+  await waitFor(() => {
+    expect(screen.getByText('Next')).toBeInTheDocument();
+    expect(screen.getByText('Previous')).toBeInTheDocument();
+  });
+}
+describe('navigating steps in flashcard', () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: 'student-lcsp' });
+  });
+  it('incrementCurrentStep, shows next step', async () => {
+    await startQuiz();
+    act(() => {
+      fireEvent.click(screen.getByText('Show Spanish'));
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Show Spanish')).not.toBeInTheDocument();
+    });
+    // expect flashcard number to still be 1
+    expect(screen.getByText(/1/)).toBeInTheDocument();
   });
 });

@@ -1,21 +1,22 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Link, Navigate, useLocation } from "react-router-dom";
-import type { DisplayOrder, Flashcard } from "../../interfaceDefinitions";
-import { fisherYatesShuffle } from "../../functions/fisherYatesShuffle";
-import { useActiveStudent } from "../../hooks/useActiveStudent";
-import { useStudentFlashcards } from "../../hooks/useStudentFlashcards";
-import MenuButton from "../Buttons/MenuButton";
-import NewQuizProgress from "./../AudioBasedReview/NewQuizProgress";
-import FlashcardDisplay from "./FlashcardDisplay";
-import QuizButtons from "./QuizButtons";
-import SRSQuizButtons from "./SRSButtons";
+import { Link, Navigate, useLocation } from 'react-router-dom';
+import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
+import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import MenuButton from '../Buttons/MenuButton';
+import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
+import FlashcardDisplay from './FlashcardDisplay';
+import QuizButtons from './QuizButtons';
+import SRSQuizButtons from './SRSButtons';
 
 interface QuizComponentProps {
   quizTitle: string;
   examplesToParse: readonly Flashcard[];
   startWithSpanish?: boolean;
   quizOnlyCollectedExamples?: boolean;
+  quizOnlyCustomExamples?: boolean;
   isSrsQuiz?: boolean;
   cleanupFunction?: () => void;
   quizLength?: number;
@@ -27,12 +28,14 @@ export default function QuizComponent({
   startWithSpanish = false,
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
+  quizOnlyCustomExamples = false,
   cleanupFunction,
   quizLength = 1000,
 }: QuizComponentProps) {
   const location = useLocation();
   const { activeStudentQuery } = useActiveStudent();
-  const { flashcardDataQuery, exampleIsCollected } = useStudentFlashcards();
+  const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
+    useStudentFlashcards();
 
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
   const initialDisplayOrder = useRef<DisplayOrder[]>([]);
@@ -55,7 +58,7 @@ export default function QuizComponent({
   // will need to second pass these variables:
   const spanishShowing = startWithSpanish !== answerShowing;
 
-  const isMainLocation = location.pathname.split("/").length < 2;
+  const isMainLocation = location.pathname.split('/').length < 2;
 
   function hideAnswer() {
     setAnswerShowing(false);
@@ -71,8 +74,8 @@ export default function QuizComponent({
 
   /*      Audio Component Section       */
 
-  const spanishAudioUrl = currentExample?.spanishAudioLa || "";
-  const englishAudioUrl = currentExample?.englishAudio || "";
+  const spanishAudioUrl = currentExample?.spanishAudioLa || '';
+  const englishAudioUrl = currentExample?.englishAudio || '';
 
   const audioActive: string = spanishShowing
     ? spanishAudioUrl
@@ -182,6 +185,20 @@ export default function QuizComponent({
     [quizOnlyCollectedExamples, isSrsQuiz, exampleIsCollected],
   );
 
+  const filterIfCustomOnly = useCallback(
+    (displayOrderArray: DisplayOrder[]) => {
+      if (quizOnlyCustomExamples) {
+        const filteredList = displayOrderArray.filter((item) =>
+          exampleIsCustom(item.recordId),
+        );
+        return filteredList;
+      } else {
+        return displayOrderArray;
+      }
+    },
+    [quizOnlyCustomExamples, exampleIsCustom],
+  );
+
   // Further filter for only SRS examples
   const getStudentExampleFromExampleId = useCallback(
     (exampleId: number) => {
@@ -198,7 +215,7 @@ export default function QuizComponent({
     (exampleId: number) => {
       const relatedStudentExample = getStudentExampleFromExampleId(exampleId);
       if (!relatedStudentExample) {
-        return "";
+        return '';
       }
       const dueDate = relatedStudentExample.nextReviewDate;
       return dueDate;
@@ -254,8 +271,11 @@ export default function QuizComponent({
       // If SRS, filter out examples not due for review
       const filteredByDueDate = filterByDueExamples(filteredByCollected);
 
+      // If customOnly, filter out non-custom examples
+      const filteredByCustom = filterIfCustomOnly(filteredByDueDate);
+
       // Limit the number of examples to the quizLength
-      const limitedOrder = filteredByDueDate.slice(0, quizLength);
+      const limitedOrder = filteredByCustom.slice(0, quizLength);
 
       // Display the limited order if any are left
       if (limitedOrder.length > 0) {
@@ -268,6 +288,7 @@ export default function QuizComponent({
     displayOrderReady,
     quizLength,
     filterIfCollectedOnly,
+    filterIfCustomOnly,
     filterByDueExamples,
   ]);
 
@@ -282,19 +303,19 @@ export default function QuizComponent({
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight" || event.key === "d") {
+      if (event.key === 'ArrowRight' || event.key === 'd') {
         incrementExampleNumber();
-      } else if (event.key === "ArrowLeft" || event.key === "a") {
+      } else if (event.key === 'ArrowLeft' || event.key === 'a') {
         decrementExampleNumber();
       } else if (
-        event.key === "ArrowUp" ||
-        event.key === "ArrowDown" ||
-        event.key === "w" ||
-        event.key === "s"
+        event.key === 'ArrowUp' ||
+        event.key === 'ArrowDown' ||
+        event.key === 'w' ||
+        event.key === 's'
       ) {
         event.preventDefault();
         toggleAnswer();
-      } else if (event.key === " ") {
+      } else if (event.key === ' ') {
         event.preventDefault();
         togglePlaying();
       }
@@ -308,9 +329,9 @@ export default function QuizComponent({
   );
 
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyPress);
+    document.addEventListener('keydown', handleKeyPress);
     return () => {
-      document.removeEventListener("keydown", handleKeyPress);
+      document.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
 
@@ -330,7 +351,7 @@ export default function QuizComponent({
           {currentFlashcardIsValid && (
             <FlashcardDisplay
               example={currentExample}
-              isStudent={activeStudentQuery.data?.role === "student"}
+              isStudent={activeStudentQuery.data?.role === 'student'}
               incrementExampleNumber={incrementExampleNumber}
               onRemove={onRemove}
               answerShowing={answerShowing}
