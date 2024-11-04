@@ -42,7 +42,7 @@ jobs:
 
       # Run the update-cache.js script
       - name: Update Cache
-        run: node --loader ts-node/esm .github/workflows/update-cache.ts
+        run: tsx .github/workflows/update-cache.ts
         env:
           AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
           AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
