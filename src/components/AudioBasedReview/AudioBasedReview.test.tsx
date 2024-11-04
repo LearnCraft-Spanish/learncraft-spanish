@@ -1,3 +1,5 @@
+import { act } from 'react';
+
 import { beforeEach, describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
@@ -42,5 +44,37 @@ describe('begin a quiz', () => {
       expect(screen.getByText('Next')).toBeInTheDocument();
       expect(screen.getByText('Previous')).toBeInTheDocument();
     });
+  });
+});
+
+async function startQuiz() {
+  render(<AudioBasedReview willAutoplay={false} />, {
+    wrapper: MockAllProviders,
+  });
+  await waitFor(() => {
+    expect(screen.getByText('Start')).toBeInTheDocument();
+  });
+  act(() => {
+    fireEvent.click(screen.getByText('Start'));
+  });
+  await waitFor(() => {
+    expect(screen.getByText('Next')).toBeInTheDocument();
+    expect(screen.getByText('Previous')).toBeInTheDocument();
+  });
+}
+describe('navigating steps in flashcard', () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: 'student-lcsp' });
+  });
+  it('incrementCurrentStep, shows next step', async () => {
+    await startQuiz();
+    act(() => {
+      fireEvent.click(screen.getByText('Show Spanish'));
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Show Spanish')).not.toBeInTheDocument();
+    });
+    // expect flashcard number to still be 1
+    expect(screen.getByText(/1/)).toBeInTheDocument();
   });
 });
