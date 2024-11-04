@@ -3,10 +3,12 @@ import type { VocabTag } from '../../interfaceDefinitions';
 
 import { FromToLessonSelector } from '../LessonSelector';
 
+import { filterBySearch } from './functions';
+
 interface FilterProps {
   includeSpanglish: boolean;
   toggleIncludeSpanglish: () => void;
-  requiredTags: any[];
+  requiredTags: VocabTag[];
   addTagToRequiredTags: (any: any) => void;
   removeTagFromRequiredTags: (any: any) => void;
   contextual: string;
@@ -38,13 +40,22 @@ export default function Filter({
 
   const filterTagsByInput = useCallback(
     (tagInput: string) => {
-      function filterBySearch(tag: VocabTag) {
-        const lowerTerm = tag.tag.toLowerCase();
-        const lowerTagInput = tagInput.toLowerCase();
-        if (lowerTerm.includes(lowerTagInput)) {
-          return true;
+      function filterBySearch(tagTable: VocabTag[]) {
+        const filteredTags = [];
+        const searchTerm = tagInput.toLowerCase();
+
+        for (let i = 0; i < tagTable.length; i++) {
+          const tagLowercase = tagTable[i].tag.toLowerCase();
+          if (tagLowercase.includes(searchTerm)) {
+            if (tagLowercase === searchTerm) {
+              filteredTags.unshift(tagTable[i]);
+            } else {
+              filteredTags.push(tagTable[i]);
+            }
+          }
         }
-        return false;
+
+        return filteredTags;
       }
 
       function filterByActiveTags(tag: VocabTag) {
@@ -54,8 +65,7 @@ export default function Filter({
         }
         return true;
       }
-
-      const filteredBySearch = tagTable.filter(filterBySearch);
+      const filteredBySearch = filterBySearch(tagTable);
       const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags);
       const suggestTen = [];
       for (let i = 0; i < 10; i++) {
