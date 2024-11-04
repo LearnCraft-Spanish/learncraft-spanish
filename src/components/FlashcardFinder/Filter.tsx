@@ -3,8 +3,6 @@ import type { VocabTag } from '../../interfaceDefinitions';
 
 import { FromToLessonSelector } from '../LessonSelector';
 
-import { filterBySearch } from './functions';
-
 interface FilterProps {
   includeSpanglish: boolean;
   toggleIncludeSpanglish: () => void;
