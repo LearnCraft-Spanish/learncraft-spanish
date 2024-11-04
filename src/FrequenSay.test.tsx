@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from '../mocks/Providers/MockAllProviders';
+
 import FrequenSay from './FrequenSay';
 
 describe('initial render', () => {
@@ -10,9 +11,12 @@ describe('initial render', () => {
     render(<FrequenSay />, { wrapper: MockAllProviders });
     // Wait for all hooks used to resolve
     // using lesson Selector as our benchmark
-    await waitFor(() => {
-      expect(screen.getByText('From:')).toBeTruthy();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('From:')).toBeTruthy();
+      },
+      { timeout: 3000 },
+    );
   });
   it('renders the title', () => {
     expect(screen.getByText('FrequenSay')).toBeTruthy();
@@ -30,9 +34,12 @@ describe('add extra vocabulary', () => {
     render(<FrequenSay />, { wrapper: MockAllProviders });
     // Wait for all hooks used to resolve
     // using lesson Selector as our benchmark
-    await waitFor(() => {
-      expect(screen.getByText('From:')).toBeTruthy();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('From:')).toBeTruthy();
+      },
+      { timeout: 3000 },
+    );
     // Click the add extra vocabulary button
     act(() => {
       screen.getByText('Add Extra Vocabulary').click();

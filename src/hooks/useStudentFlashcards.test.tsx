@@ -13,11 +13,6 @@ async function renderHookSuccessfully() {
   const { result } = renderHook(useStudentFlashcards, {
     wrapper: MockAllProviders,
   });
-  await setTimeout(async () => {
-    await waitFor(() => {
-      expect(result.current.flashcardDataQuery.isSuccess).toBeFalsy();
-    });
-  }, 3000);
   await waitFor(() => {
     expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
   });

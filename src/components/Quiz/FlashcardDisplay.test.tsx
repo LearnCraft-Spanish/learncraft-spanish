@@ -19,14 +19,15 @@ const onRemove = vi.fn(() => {});
 const toggleAnswer = vi.fn();
 const togglePlaying = vi.fn();
 
-vi.mock('../../hooks/useStudentFlashcards', () => ({
-  useStudentFlashcards: () => ({
-    addFlashcardMutation: { mutate: vi.fn() },
-    removeFlashcardMutation: { mutate: vi.fn() },
-    exampleIsCollected: vi.fn((x: number) => x === example.recordId),
-    exampleIsPending: vi.fn((x: number) => x < 0),
-  }),
-}));
+// vi.mock('../../hooks/useStudentFlashcards', () => ({
+//   useStudentFlashcards: () => ({
+//     addFlashcardMutation: { mutate: vi.fn() },
+//     removeFlashcardMutation: { mutate: vi.fn() },
+//     exampleIsCollected: vi.fn((x: number) => x === example.recordId),
+//     exampleIsPending: vi.fn((x: number) => x < 0),
+//     exampleIsCustom: vi.fn((x: number) => x < 0),
+//   }),
+// }));
 
 function FlashcardSpanishFirst() {
   return (
