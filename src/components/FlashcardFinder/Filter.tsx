@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { VocabTag } from '../../interfaceDefinitions';
 
+import { useContextualMenu } from '../../hooks/useContextualMenu';
+import { useVocabulary } from '../../hooks/useVocabulary';
 import { FromToLessonSelector } from '../LessonSelector';
 
 interface FilterProps {
@@ -9,9 +11,6 @@ interface FilterProps {
   requiredTags: VocabTag[];
   addTagToRequiredTags: (any: any) => void;
   removeTagFromRequiredTags: (any: any) => void;
-  contextual: string;
-  openContextual: (any: any) => void;
-  tagTable: VocabTag[];
 }
 
 export default function Filter({
@@ -20,11 +19,9 @@ export default function Filter({
   requiredTags,
   addTagToRequiredTags,
   removeTagFromRequiredTags,
-  contextual,
-  openContextual,
-  tagTable,
 }: FilterProps) {
-  // const { tagTable } = useVocabulary();
+  const { openContextual, contextual } = useContextualMenu();
+  const { tagTable } = useVocabulary();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([]);
 

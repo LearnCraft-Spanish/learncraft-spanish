@@ -12,7 +12,6 @@ import { useVerifiedExamples } from '../../hooks/useVerifiedExamples';
 import '../../App.css';
 
 import Loading from '../../components/Loading';
-import { useContextualMenu } from '../../hooks/useContextualMenu';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { useUserData } from '../../hooks/useUserData';
@@ -24,7 +23,6 @@ import ExamplesTable from '../../components/FlashcardFinder/ExamplesTable';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = () => {
-  const { openContextual, contextual } = useContextualMenu();
   const userDataQuery = useUserData();
   const { activeStudentQuery } = useActiveStudent();
   const verifiedExamplesQuery = useVerifiedExamples();
@@ -224,9 +222,6 @@ const FlashcardFinder = () => {
               requiredTags={requiredTags}
               toggleIncludeSpanglish={toggleIncludeSpanglish}
               includeSpanglish={includeSpanglish}
-              openContextual={openContextual}
-              contextual={contextual}
-              tagTable={tagTable}
             />
           </div>
           <ExamplesTable
