@@ -9,8 +9,8 @@ interface FilterProps {
   includeSpanglish: boolean;
   toggleIncludeSpanglish: () => void;
   requiredTags: VocabTag[];
-  addTagToRequiredTags: (any: any) => void;
-  removeTagFromRequiredTags: (any: any) => void;
+  addTagToRequiredTags: (tagId: number) => void;
+  removeTagFromRequiredTags: (tagId: number) => void;
 }
 
 export default function Filter({

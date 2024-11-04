@@ -158,7 +158,7 @@ const FlashcardFinder = () => {
     navigator.clipboard.writeText(copiedText);
   }
 
-  const displayExamplesTable = useCallback(() => {
+  const updateExamplesToDisplay = useCallback(() => {
     if (!verifiedExamplesQuery.isSuccess) {
       return null;
     }
@@ -189,16 +189,12 @@ const FlashcardFinder = () => {
       const newDisplayOrder = makeDisplayOrderFromExamples(randomizedExamples);
       setDisplayOrder(newDisplayOrder);
     }
-  }, [
-    verifiedExamplesQuery.isSuccess,
-    verifiedExamplesQuery.data,
-    requiredTags,
-    getFilteredExamples,
-  ]);
+  }, [requiredTags, verifiedExamplesQuery, getFilteredExamples]);
 
   useEffect(() => {
-    displayExamplesTable();
-  }, [displayOrder, verifiedExamplesQuery.isSuccess, displayExamplesTable]);
+    // When displayOrder changes, update the examples to display array
+    updateExamplesToDisplay();
+  }, [displayOrder, verifiedExamplesQuery.isSuccess, updateExamplesToDisplay]);
 
   return (
     <div className="flashcardFinder">
