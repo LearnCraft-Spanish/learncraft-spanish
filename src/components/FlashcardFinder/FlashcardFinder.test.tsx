@@ -1,12 +1,12 @@
-import { describe, it } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { render, waitFor, screen  } from '@testing-library/react';
 import React from 'react';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import { ContextualMenuProvider } from '../../providers/ContextualMenuProvider';
 
 import FlashcardFinder from './FlashcardFinder';
 describe('flashcard finder', () => {
-  it('renders without crashing', () => {
+  it('renders without crashing', async () => {
     render(
       <MockAllProviders>
         <ContextualMenuProvider>
@@ -14,5 +14,8 @@ describe('flashcard finder', () => {
         </ContextualMenuProvider>
       </MockAllProviders>,
     );
+    await waitFor(() => {
+      expect(screen.getByText('From:')).toBeInTheDocument();
+    });
   });
 });
