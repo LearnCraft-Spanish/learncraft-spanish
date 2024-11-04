@@ -229,28 +229,17 @@ const FlashcardFinder = () => {
               tagTable={tagTable}
             />
           </div>
-          <div className="examplesTable">
-            <div className="buttonBox">
-              <button type="button" onClick={copyTable}>
-                Copy Table
-              </button>
-              <div className="displayExamplesDescription">
-                <h4>
-                  {`${displayOrder.length} flashcards showing (
-                    ${displayExamplesWithAudio?.length} with audio)`}
-                </h4>
-              </div>
-            </div>
-
-            <ExamplesTable
-              examplesToDisplay={examplesToDisplay}
-              studentRole={
-                userDataQuery.data?.role ? userDataQuery.data.role : ''
-              }
-              dataReady={dataLoaded}
-              getExampleById={getExampleById}
-            />
-          </div>
+          <ExamplesTable
+            examplesToDisplay={examplesToDisplay}
+            studentRole={
+              userDataQuery.data?.role ? userDataQuery.data.role : ''
+            }
+            dataReady={dataLoaded}
+            getExampleById={getExampleById}
+            flashcardsFound={displayOrder.length}
+            flashcardsFoundWithAudio={displayExamplesWithAudio.length}
+            copyTable={copyTable}
+          />
         </div>
       )}
     </div>

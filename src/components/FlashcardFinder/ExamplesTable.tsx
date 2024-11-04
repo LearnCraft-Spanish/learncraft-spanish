@@ -12,6 +12,9 @@ interface ExamplesTableProps {
   studentRole: string;
   dataReady: boolean;
   getExampleById: (recordId: number) => Flashcard | null | undefined;
+  flashcardsFound: number;
+  flashcardsFoundWithAudio: number;
+  copyTable: () => void;
 }
 interface formatExampleForTableProps {
   example: Flashcard;
@@ -23,6 +26,9 @@ export default function ExamplesTable({
   studentRole,
   dataReady,
   getExampleById,
+  flashcardsFound,
+  flashcardsFoundWithAudio,
+  copyTable,
 }: ExamplesTableProps) {
   const {
     flashcardDataQuery,
@@ -103,6 +109,18 @@ export default function ExamplesTable({
     [addFlashcard, dataReady, removeFlashcard, studentRole],
   );
   return (
+    <div className="examplesTable">
+    <div className="buttonBox">
+      <button type="button" onClick={copyTable}>
+        Copy Table
+      </button>
+      <div className="displayExamplesDescription">
+        <h4>
+          {`${flashcardsFound} flashcards showing (
+            ${flashcardsFoundWithAudio} with audio)`}
+        </h4>
+      </div>
+    </div>
     <div id="examplesTableBody">
       {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
       {flashcardDataQuery.isSuccess &&
@@ -113,6 +131,7 @@ export default function ExamplesTable({
             exampleIsPending: exampleIsPending(example.recordId),
           }),
         )}
+    </div>
     </div>
   );
 }
