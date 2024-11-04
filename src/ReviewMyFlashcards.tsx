@@ -53,36 +53,26 @@ export default function MyFlashcardsQuiz() {
   }
 
   function calculateQuizLengthOptions() {
-    let exampleCount;
-    if (isSrs && !customOnly) {
-      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
+    let currentAllowedExamples = flashcardDataQuery.data?.studentExamples;
+    if (isSrs) {
+      currentAllowedExamples = currentAllowedExamples?.filter(
         (studentExample) =>
           studentExample.nextReviewDate
             ? new Date(studentExample.nextReviewDate) <= new Date()
             : true,
-      ).length;
-    } else {
-      exampleCount = flashcardDataQuery.data?.examples?.length;
+      );
     }
-    if (customOnly && !isSrs) {
-      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
+    if (customOnly) {
+      currentAllowedExamples = flashcardDataQuery.data?.studentExamples?.filter(
         (studentExample) => studentExample.coachAdded,
-      ).length;
+      );
     }
-    if (customOnly && isSrs) {
-      exampleCount = flashcardDataQuery.data?.studentExamples?.filter(
-        (studentExample) =>
-          studentExample.coachAdded &&
-          (studentExample.nextReviewDate
-            ? new Date(studentExample.nextReviewDate) <= new Date()
-            : true),
-      ).length;
-    }
-    if (!exampleCount) {
+    if (!currentAllowedExamples?.length) {
       return [0];
     }
+    const exampleCount = currentAllowedExamples.length;
     const quizLengthOptions = [];
-    if (exampleCount > 10) {
+    if (currentAllowedExamples?.length > 10) {
       for (let i = 10; i < exampleCount; i = 5 * Math.floor(i * 0.315)) {
         quizLengthOptions.push(i);
       }
@@ -106,6 +96,13 @@ export default function MyFlashcardsQuiz() {
       setQuizReady(true);
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    console.log(customOnly);
+    console.log(isSrs);
+    const quizLength = calculateQuizLengthOptions();
+    console.log(quizLength);
+  }, [customOnly, isSrs]);
 
   return (
     <div>
