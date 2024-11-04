@@ -39,6 +39,7 @@ export default function FlashcardDisplay({
     addFlashcardMutation,
     removeFlashcardMutation,
     exampleIsCollected,
+    exampleIsCustom,
     exampleIsPending,
   } = useStudentFlashcards();
   const addFlashcard = addFlashcardMutation.mutate;
@@ -89,6 +90,7 @@ export default function FlashcardDisplay({
           )}
           {isStudent &&
             exampleIsCollected(example.recordId) &&
+            !exampleIsCustom(example.recordId) &&
             !exampleIsPending(example.recordId) && (
               <button
                 type="button"
