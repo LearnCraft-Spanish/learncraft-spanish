@@ -180,7 +180,7 @@ jobs:
       # Fetch mock data if cache miss
       - name: Fetch mock data if cache miss
         if: steps.cache.outputs.cache-hit != 'true'
-        run: node .github/workflows/update-cache.ts
+        run: node --loader ts-node/esm .github/workflows/update-cache.ts
         env:
           # Suppress context access warning
           # Context access is safe in this case
