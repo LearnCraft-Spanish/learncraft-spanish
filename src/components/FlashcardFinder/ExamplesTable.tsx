@@ -110,28 +110,28 @@ export default function ExamplesTable({
   );
   return (
     <div className="examplesTable">
-    <div className="buttonBox">
-      <button type="button" onClick={copyTable}>
-        Copy Table
-      </button>
-      <div className="displayExamplesDescription">
-        <h4>
-          {`${flashcardsFound} flashcards showing (
+      <div className="buttonBox">
+        <button type="button" onClick={copyTable}>
+          Copy Table
+        </button>
+        <div className="displayExamplesDescription">
+          <h4>
+            {`${flashcardsFound} flashcards showing (
             ${flashcardsFoundWithAudio} with audio)`}
-        </h4>
+          </h4>
+        </div>
       </div>
-    </div>
-    <div id="examplesTableBody">
-      {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
-      {flashcardDataQuery.isSuccess &&
-        examplesToDisplay.map((example) =>
-          formatExampleForTable({
-            example,
-            exampleIsCollected: exampleIsCollected(example.recordId),
-            exampleIsPending: exampleIsPending(example.recordId),
-          }),
-        )}
-    </div>
+      <div id="examplesTableBody">
+        {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
+        {flashcardDataQuery.isSuccess &&
+          examplesToDisplay.map((example) =>
+            formatExampleForTable({
+              example,
+              exampleIsCollected: exampleIsCollected(example.recordId),
+              exampleIsPending: exampleIsPending(example.recordId),
+            }),
+          )}
+      </div>
     </div>
   );
 }

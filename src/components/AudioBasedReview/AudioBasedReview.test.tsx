@@ -55,7 +55,7 @@ async function startQuiz() {
     expect(screen.getByText('Start')).toBeInTheDocument();
   });
   act(() => {
-  fireEvent.click(screen.getByText('Start'));
+    fireEvent.click(screen.getByText('Start'));
   });
   await waitFor(() => {
     expect(screen.getByText('Next')).toBeInTheDocument();
@@ -77,4 +77,4 @@ describe('navigating steps in flashcard', () => {
     // expect flashcard number to still be 1
     expect(screen.getByText(/1/)).toBeInTheDocument();
   });
-  });
+});
