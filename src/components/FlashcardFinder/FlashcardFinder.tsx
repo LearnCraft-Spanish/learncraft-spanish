@@ -84,16 +84,19 @@ const FlashcardFinder = () => {
     [getExampleById],
   );
 
-  function filterByHasAudio(displayOrderItem: DisplayOrder) {
-    const example = getExampleById(displayOrderItem.recordId);
-    if (example?.spanishAudioLa) {
-      if (example.spanishAudioLa.length > 0) {
-        return true;
+  const filterByHasAudio = useCallback(
+    (displayOrderItem: DisplayOrder) => {
+      const example = getExampleById(displayOrderItem.recordId);
+      if (example?.spanishAudioLa) {
+        if (example.spanishAudioLa.length > 0) {
+          return true;
+        }
+        return false;
       }
       return false;
-    }
-    return false;
-  }
+    },
+    [getExampleById],
+  );
 
   const displayExamplesWithAudio = displayOrder.filter(filterByHasAudio);
 
@@ -159,19 +162,16 @@ const FlashcardFinder = () => {
   }
 
   const updateExamplesToDisplay = useCallback(() => {
-    if (!verifiedExamplesQuery.isSuccess) {
-      return null;
-    }
-    // const paginatedDisplayOrder = displayOrder.slice(0, 100);
+    // const paginatedDisplayOrder = displayOrder.slice(0, 30);
     const examplesArray = getExamplesFromDisplayOrder(displayOrder);
     const truthyTable = examplesArray.filter((item) => !!item);
 
     setExamplesToDisplay(truthyTable);
-  }, [
-    verifiedExamplesQuery.isSuccess,
-    getExamplesFromDisplayOrder,
-    displayOrder,
-  ]);
+  }, [getExamplesFromDisplayOrder, displayOrder]);
+
+  const updateDisplayOrder = useCallback((newDisplayOrder: DisplayOrder[]) => {
+    setDisplayOrder(newDisplayOrder);
+  }, []);
 
   function makeDisplayOrderFromExamples(examples: Flashcard[]) {
     const newDisplayOrder = examples.map((example) => {
@@ -187,13 +187,21 @@ const FlashcardFinder = () => {
       const newExampleTable = getFilteredExamples(verifiedExamplesQuery.data);
       const randomizedExamples = fisherYatesShuffle(newExampleTable);
       const newDisplayOrder = makeDisplayOrderFromExamples(randomizedExamples);
-      setDisplayOrder(newDisplayOrder);
+      updateDisplayOrder(newDisplayOrder);
     }
-  }, [requiredTags, verifiedExamplesQuery, getFilteredExamples]);
+  }, [
+    requiredTags,
+    verifiedExamplesQuery.isSuccess,
+    verifiedExamplesQuery.data,
+    getFilteredExamples,
+    updateDisplayOrder,
+  ]);
 
   useEffect(() => {
     // When displayOrder changes, update the examples to display array
-    updateExamplesToDisplay();
+    if (verifiedExamplesQuery.isSuccess && displayOrder.length > 0) {
+      updateExamplesToDisplay();
+    }
   }, [displayOrder, verifiedExamplesQuery.isSuccess, updateExamplesToDisplay]);
 
   return (
