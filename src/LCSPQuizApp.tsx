@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import useAuth from './hooks/useAuth';
 import quizCourses from './functions/QuizCourseList';
 import MenuButton from './components/Buttons/MenuButton';
@@ -9,10 +9,11 @@ import { useOfficialQuizzes } from './hooks/useOfficialQuizzes';
 import OfficialQuiz from './OfficialQuiz';
 import './App.css';
 import { useActiveStudent } from './hooks/useActiveStudent';
+import useNavigatePreserveQuery from './hooks/useNavigatePreserveQuery';
 
 export default function LCSPQuizApp(): JSX.Element {
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useNavigatePreserveQuery();
   const { activeStudentQuery, activeProgram, activeLesson } =
     useActiveStudent();
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined);

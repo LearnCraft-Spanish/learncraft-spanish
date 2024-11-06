@@ -14,6 +14,7 @@ import Loading from './components/Loading';
 import QuizComponent from './components/Quiz/QuizComponent';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
+import useNavigatePreserveQuery from './hooks/useNavigatePreserveQuery';
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
@@ -24,7 +25,7 @@ export default function MyFlashcardsQuiz() {
   const [quizLength, setQuizLength] = useState<number>(10);
   const [quizReady, setQuizReady] = useState<boolean>(false);
 
-  const navigate = useNavigate();
+  const navigate = useNavigatePreserveQuery();
   const location = useLocation();
 
   const dataReady =

@@ -1,13 +1,12 @@
-import { useNavigate } from 'react-router-dom';
-
 import logo from '../resources/typelogosmall.png';
 import home from '../resources/icons/home.svg';
 
+import useNavigatePreserveQuery from '../hooks/useNavigatePreserveQuery';
 import LoginButton from './Buttons/LoginButton';
 import LogoutButton from './Buttons/LogoutButton';
 
 export default function Nav(): JSX.Element {
-  const navigate = useNavigate();
+  const navigate = useNavigatePreserveQuery();
   return (
     // Correct html tag is <nav> not <div>
     <div

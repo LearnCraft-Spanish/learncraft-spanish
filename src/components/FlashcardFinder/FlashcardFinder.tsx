@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type {
   DisplayOrder,
   Flashcard,
@@ -21,6 +22,7 @@ import ExamplesTable from '../../components/FlashcardFinder/ExamplesTable';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const userDataQuery = useUserData();
   const { activeStudentQuery } = useActiveStudent();
   const verifiedExamplesQuery = useVerifiedExamples();
@@ -46,11 +48,26 @@ const FlashcardFinder = () => {
     !dataLoaded;
 
   const [requiredTags, setRequiredTags] = useState<VocabTag[]>([]);
-  const [includeSpanglish, setIncludeSpanglish] = useState(true);
   const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]);
   // FromToLessonSelector
 
   const [examplesToDisplay, setExamplesToDisplay] = useState<Flashcard[]>([]);
+
+  const excludeSpanglish = searchParams.get('excludeSpanglish') === 'true';
+
+  function toggleSpanglishFilter() {
+    const newSearchParams = new URLSearchParams(searchParams);
+    const spanglishExcluded =
+      newSearchParams.get('excludeSpanglish') === 'true';
+
+    if (spanglishExcluded) {
+      newSearchParams.delete('excludeSpanglish');
+    } else {
+      newSearchParams.set('excludeSpanglish', 'true');
+    }
+
+    setSearchParams(newSearchParams); // Type-safe
+  }
 
   const getExampleById = useCallback(
     (recordId: number) => {
@@ -98,10 +115,6 @@ const FlashcardFinder = () => {
 
   const displayExamplesWithAudio = displayOrder.filter(filterByHasAudio);
 
-  const toggleIncludeSpanglish = useCallback(() => {
-    setIncludeSpanglish(!includeSpanglish);
-  }, [includeSpanglish]);
-
   function addTagToRequiredTags(id: number) {
     const tagObject = tagTable.find((object) => object.id === id);
     if (tagObject && !requiredTags.find((tag) => tag.id === id)) {
@@ -122,7 +135,7 @@ const FlashcardFinder = () => {
       const filteredBySelectedLesson = filterExamplesBySelectedLesson(table);
       const filteredBySearchCriteria = filterFlashcards({
         examples: filteredBySelectedLesson,
-        includeSpanglish,
+        includeSpanglish: !excludeSpanglish,
         orTags: requiredTags,
       });
       return filteredBySearchCriteria;
@@ -130,7 +143,7 @@ const FlashcardFinder = () => {
     [
       filterExamplesBySelectedLesson,
       filterFlashcards,
-      includeSpanglish,
+      excludeSpanglish,
       requiredTags,
     ],
   );
@@ -222,8 +235,8 @@ const FlashcardFinder = () => {
               addTagToRequiredTags={addTagToRequiredTags}
               removeTagFromRequiredTags={removeTagFromRequiredTags}
               requiredTags={requiredTags}
-              toggleIncludeSpanglish={toggleIncludeSpanglish}
-              includeSpanglish={includeSpanglish}
+              toggleIncludeSpanglish={toggleSpanglishFilter}
+              includeSpanglish={!excludeSpanglish}
             />
           </div>
           <ExamplesTable

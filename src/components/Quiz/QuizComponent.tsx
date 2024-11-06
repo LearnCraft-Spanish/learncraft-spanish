@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
+import LinkWithQuery from '../LinkWithQuery';
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -378,9 +379,13 @@ export default function QuizComponent({
             />
             <div className="buttonBox">
               {!isMainLocation && (
-                <Link className="linkButton" to=".." onClick={cleanupFunction}>
+                <LinkWithQuery
+                  className="linkButton"
+                  to=".."
+                  onClick={cleanupFunction}
+                >
                   Back
-                </Link>
+                </LinkWithQuery>
               )}
               <MenuButton />
             </div>

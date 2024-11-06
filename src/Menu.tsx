@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
 import Loading from './components/Loading';
 
+import LinkWithQuery from './components/LinkWithQuery';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 import { useUserData } from './hooks/useUserData';
@@ -55,55 +55,55 @@ export default function Menu() {
               <div>
                 <h3>My Flashcards:</h3>
                 <div className="buttonBox">
-                  <Link className="linkButton" to="/myflashcards">
+                  <LinkWithQuery className="linkButton" to="/myflashcards">
                     Quiz My Flashcards
-                  </Link>
+                  </LinkWithQuery>
                 </div>
                 <div className="buttonBox">
-                  <Link className="linkButton" to="/manage-flashcards">
+                  <LinkWithQuery className="linkButton" to="/manage-flashcards">
                     Manage My Flashcards
-                  </Link>
+                  </LinkWithQuery>
                 </div>
               </div>
             )}
           <h3>Quizzing Tools:</h3>
           <div className="buttonBox">
-            <Link className="linkButton" to="/officialquizzes">
+            <LinkWithQuery className="linkButton" to="/officialquizzes">
               Official Quizzes
-            </Link>
+            </LinkWithQuery>
           </div>
           {(userDataQuery.data.isAdmin ||
             activeStudentQuery.data?.role === 'student' ||
             activeStudentQuery.data?.role === 'limited') && (
             <div className="buttonBox">
-              <Link className="linkButton" to="/audioquiz">
+              <LinkWithQuery className="linkButton" to="/audioquiz">
                 Audio Quiz
-              </Link>
-              <Link className="linkButton" to="/comprehensionquiz">
+              </LinkWithQuery>
+              <LinkWithQuery className="linkButton" to="/comprehensionquiz">
                 Comprehension Quiz
-              </Link>
+              </LinkWithQuery>
             </div>
           )}
           {(userDataQuery.data.isAdmin ||
             activeStudentQuery.data?.role === 'student') && (
             <div className="buttonBox">
-              <Link className="linkButton" to="/flashcardfinder">
+              <LinkWithQuery className="linkButton" to="/flashcardfinder">
                 Find Flashcards
-              </Link>
+              </LinkWithQuery>
             </div>
           )}
           {userDataQuery.data?.isAdmin && (
             <div>
               <h3>Staff Tools</h3>
               <div className="buttonBox">
-                <Link className="linkButton" to="/frequensay">
+                <LinkWithQuery className="linkButton" to="/frequensay">
                   FrequenSay
-                </Link>
+                </LinkWithQuery>
               </div>
               {/* <div className="buttonBox">
-                    <Link className="linkButton" to="/coaching">
+                    <LinkWithQuery className="linkButton" to="/coaching">
                       Coaching
-                    </Link>
+                    </LinkWithQuery>
                   </div> */}
             </div>
           )}

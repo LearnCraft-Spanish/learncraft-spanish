@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { Auth0Provider } from '@auth0/auth0-react';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import useNavigatePreserveQuery from '../hooks/useNavigatePreserveQuery';
 import { ContextualMenuProvider } from './ContextualMenuProvider';
 
 interface ProvidersProps {
@@ -14,7 +14,7 @@ function Providers({ children }: ProvidersProps) {
   const clientId = import.meta.env.VITE_AUTH0_CLIENTID;
   const audience = import.meta.env.VITE_API_AUDIENCE;
 
-  const navigate = useNavigate();
+  const navigate = useNavigatePreserveQuery();
 
   return (
     <Auth0Provider

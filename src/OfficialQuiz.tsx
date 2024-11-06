@@ -6,6 +6,7 @@ import QuizComponent from './components/Quiz/QuizComponent';
 import { useOfficialQuizzes } from './hooks/useOfficialQuizzes';
 import './App.css';
 import quizCourses from './functions/QuizCourseList';
+import useNavigatePreserveQuery from './hooks/useNavigatePreserveQuery';
 
 interface officialQuizProps {
   chosenQuiz: number;
@@ -23,7 +24,7 @@ export default function OfficialQuiz({
   updateChosenQuiz,
 }: officialQuizProps) {
   // Import Statements
-  const navigate = useNavigate();
+  const navigate = useNavigatePreserveQuery();
   const rendered = useRef(false);
 
   // Defining the current quiz from url
