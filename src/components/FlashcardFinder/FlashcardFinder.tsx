@@ -5,14 +5,12 @@ import type {
   VocabTag,
 } from '../../interfaceDefinitions';
 
-import { useActiveStudent } from '../../hooks/useActiveStudent';
-
-import { useVerifiedExamples } from '../../hooks/useVerifiedExamples';
-
 import '../../App.css';
 
 import Loading from '../../components/Loading';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
+import { useVerifiedExamples } from '../../hooks/useVerifiedExamples';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { useUserData } from '../../hooks/useUserData';
 import { useVocabulary } from '../../hooks/useVocabulary';
