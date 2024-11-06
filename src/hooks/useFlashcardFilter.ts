@@ -21,6 +21,7 @@ export default function useFlashcardFilter() {
       return false;
     });
   }, []);
+
   const filterByOrTags = useCallback(
     (examples: Flashcard[], orTags: VocabTag[]) => {
       if (!vocabularyQuery.data) {

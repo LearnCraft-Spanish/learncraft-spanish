@@ -155,7 +155,7 @@ const FlashcardFinder = () => {
             ${foundExample.englishTranslation}\t\
             ${foundExample.spanishAudioLa}\n`;
       })
-      .join();
+      .join('');
 
     const copiedText = headers + table;
     navigator.clipboard.writeText(copiedText);
@@ -199,7 +199,7 @@ const FlashcardFinder = () => {
 
   useEffect(() => {
     // When displayOrder changes, update the examples to display array
-    if (verifiedExamplesQuery.isSuccess && displayOrder.length > 0) {
+    if (verifiedExamplesQuery.isSuccess) {
       updateExamplesToDisplay();
     }
   }, [displayOrder, verifiedExamplesQuery.isSuccess, updateExamplesToDisplay]);
