@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import type { Flashcard } from '../../interfaceDefinitions';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import { useUserData } from '../../hooks/useUserData';
 import {
   formatEnglishText,
   formatSpanishText,
@@ -9,27 +10,23 @@ import {
 
 interface ExamplesTableProps {
   examplesToDisplay: Flashcard[];
-  studentRole: string;
-  dataReady: boolean;
   getExampleById: (recordId: number) => Flashcard | null | undefined;
   flashcardsFound: number;
   flashcardsFoundWithAudio: number;
   copyTable: () => void;
 }
-interface formatExampleForTableProps {
-  example: Flashcard;
-  exampleIsCollected: boolean;
-  exampleIsPending: boolean;
-}
 export default function ExamplesTable({
   examplesToDisplay,
-  studentRole,
-  dataReady,
   getExampleById,
   flashcardsFound,
   flashcardsFoundWithAudio,
   copyTable,
 }: ExamplesTableProps) {
+  const userDataQuery = useUserData();
+  const studentRole = userDataQuery.data?.role ? userDataQuery.data.role : '';
+  const isAdmin = userDataQuery.data?.isAdmin
+    ? userDataQuery.data.isAdmin
+    : false;
   const {
     flashcardDataQuery,
     exampleIsCollected,
@@ -38,6 +35,7 @@ export default function ExamplesTable({
     removeFlashcardMutation,
   } = useStudentFlashcards();
 
+  // This can be refactored down! its an artifact of displayOrder I believe.
   const addFlashcard = useCallback(
     (exampleId: string) => {
       const exampleToUpdate = getExampleById(Number.parseInt(exampleId));
@@ -57,56 +55,67 @@ export default function ExamplesTable({
     [removeFlashcardMutation],
   );
   const formatExampleForTable = useCallback(
-    ({
-      example,
+    (example: Flashcard) => {
+      if (
+        (studentRole === 'student' && flashcardDataQuery.isSuccess) ||
+        isAdmin
+      ) {
+        const isCollected = exampleIsCollected(example.recordId);
+        const isPending = exampleIsPending(example.recordId);
+        return (
+          <div className="exampleCard" key={example.recordId}>
+            <div className="exampleCardSpanishText">
+              {formatSpanishText(example.spanglish, example.spanishExample)}
+            </div>
+            <div className="exampleCardEnglishText">
+              {formatEnglishText(example.englishTranslation)}
+            </div>
+            {studentRole === 'student' && flashcardDataQuery.isSuccess && (
+              <>
+                {!isCollected && (
+                  <button
+                    type="button"
+                    className="addButton"
+                    value={example.recordId}
+                    onClick={(e) => addFlashcard(e.currentTarget.value)}
+                  >
+                    Add
+                  </button>
+                )}
+                {isCollected && isPending && (
+                  <button
+                    type="button"
+                    className="pendingButton"
+                    value={example.recordId}
+                  >
+                    Adding...
+                  </button>
+                )}
+                {isCollected && !isPending && (
+                  <button
+                    type="button"
+                    className="removeButton"
+                    value={example.recordId}
+                    onClick={(e) => removeFlashcard(e.currentTarget.value)}
+                  >
+                    Remove
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        );
+      }
+    },
+    [
+      addFlashcard,
       exampleIsCollected,
       exampleIsPending,
-    }: formatExampleForTableProps) => {
-      return (
-        <div className="exampleCard" key={example.recordId}>
-          <div className="exampleCardSpanishText">
-            {formatSpanishText(example.spanglish, example.spanishExample)}
-          </div>
-          <div className="exampleCardEnglishText">
-            {formatEnglishText(example.englishTranslation)}
-          </div>
-          {studentRole === 'student' && dataReady && (
-            <>
-              {!exampleIsCollected && (
-                <button
-                  type="button"
-                  className="addButton"
-                  value={example.recordId}
-                  onClick={(e) => addFlashcard(e.currentTarget.value)}
-                >
-                  Add
-                </button>
-              )}
-              {exampleIsCollected && exampleIsPending && (
-                <button
-                  type="button"
-                  className="pendingButton"
-                  value={example.recordId}
-                >
-                  Adding...
-                </button>
-              )}
-              {exampleIsCollected && !exampleIsPending && (
-                <button
-                  type="button"
-                  className="removeButton"
-                  value={example.recordId}
-                  onClick={(e) => removeFlashcard(e.currentTarget.value)}
-                >
-                  Remove
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      );
-    },
-    [addFlashcard, dataReady, removeFlashcard, studentRole],
+      flashcardDataQuery.isSuccess,
+      isAdmin,
+      removeFlashcard,
+      studentRole,
+    ],
   );
   return (
     <div className="examplesTable">
@@ -123,14 +132,8 @@ export default function ExamplesTable({
       </div>
       <div id="examplesTableBody">
         {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
-        {flashcardDataQuery.isSuccess &&
-          examplesToDisplay.map((example) =>
-            formatExampleForTable({
-              example,
-              exampleIsCollected: exampleIsCollected(example.recordId),
-              exampleIsPending: exampleIsPending(example.recordId),
-            }),
-          )}
+        {examplesToDisplay.length > 0 &&
+          examplesToDisplay.map((example) => formatExampleForTable(example))}
       </div>
     </div>
   );

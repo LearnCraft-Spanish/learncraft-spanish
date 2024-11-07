@@ -231,10 +231,6 @@ const FlashcardFinder = () => {
           </div>
           <ExamplesTable
             examplesToDisplay={examplesToDisplay}
-            studentRole={
-              userDataQuery.data?.role ? userDataQuery.data.role : ''
-            }
-            dataReady={dataLoaded}
             getExampleById={getExampleById}
             flashcardsFound={displayOrder.length}
             flashcardsFoundWithAudio={displayExamplesWithAudio.length}

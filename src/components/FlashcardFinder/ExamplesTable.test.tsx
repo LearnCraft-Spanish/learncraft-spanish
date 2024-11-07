@@ -5,6 +5,7 @@ import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 
 import serverlikeData from '../../../mocks/data/serverlike/serverlikeData';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+
 import ExamplesTable from './ExamplesTable';
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;
 
@@ -13,8 +14,6 @@ describe('renders without crashing', () => {
     render(
       <ExamplesTable
         examplesToDisplay={[verifiedExamplesTable[0]]}
-        studentRole="student"
-        dataReady
         getExampleById={() => verifiedExamplesTable[0]}
         flashcardsFound={1}
         flashcardsFoundWithAudio={1}
@@ -38,8 +37,6 @@ describe('user is not a student', () => {
     render(
       <ExamplesTable
         examplesToDisplay={[verifiedExamplesTable[0]]}
-        studentRole="limited"
-        dataReady
         getExampleById={() => verifiedExamplesTable[0]}
         flashcardsFound={1}
         flashcardsFoundWithAudio={1}
@@ -93,8 +90,6 @@ describe('user is a student', () => {
       render(
         <ExamplesTable
           examplesToDisplay={[unknownExample]}
-          studentRole="student"
-          dataReady
           getExampleById={() => unknownExample}
           flashcardsFound={1}
           flashcardsFoundWithAudio={1}
@@ -110,11 +105,16 @@ describe('user is a student', () => {
     });
 
     it('"Add" button is displayed', async () => {
-      expect(screen.getByText('Add')).toBeInTheDocument();
-      expect(screen.queryByText('Adding...')).not.toBeInTheDocument();
-      expect(screen.queryByText('Remove')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Add')).toBeInTheDocument();
+        expect(screen.queryByText('Adding...')).not.toBeInTheDocument();
+        expect(screen.queryByText('Remove')).not.toBeInTheDocument();
+      });
     });
     it('on click, "Adding..." is displayed', async () => {
+      await waitFor(() => {
+        expect(screen.getByText('Add')).toBeInTheDocument();
+      });
       act(() => {
         screen.getByText('Add').click();
       });
@@ -134,8 +134,6 @@ describe('user is a student', () => {
       render(
         <ExamplesTable
           examplesToDisplay={[knownExample]}
-          studentRole="student"
-          dataReady
           getExampleById={() => knownExample}
           flashcardsFound={1}
           flashcardsFoundWithAudio={1}
@@ -151,11 +149,16 @@ describe('user is a student', () => {
     });
 
     it('example is known, Remove button is displayed', async () => {
-      expect(screen.getByText('Remove')).toBeInTheDocument();
-      expect(screen.queryByText('Add')).not.toBeInTheDocument();
-      expect(screen.queryByText('Adding...')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Remove')).toBeInTheDocument();
+        expect(screen.queryByText('Add')).not.toBeInTheDocument();
+        expect(screen.queryByText('Adding...')).not.toBeInTheDocument();
+      });
     });
     it('on click, "Add" is displayed (optomistic inteface update', async () => {
+      await waitFor(() => {
+        expect(screen.getByText('Remove')).toBeInTheDocument();
+      });
       act(() => {
         screen.getByText('Remove').click();
       });
