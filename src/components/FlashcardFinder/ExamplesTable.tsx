@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import type { Flashcard } from '../../interfaceDefinitions';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import { useUserData } from '../../hooks/useUserData';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
 import {
   formatEnglishText,
   formatSpanishText,
@@ -23,7 +24,10 @@ export default function ExamplesTable({
   copyTable,
 }: ExamplesTableProps) {
   const userDataQuery = useUserData();
-  const studentRole = userDataQuery.data?.role ? userDataQuery.data.role : '';
+  const { activeStudentQuery } = useActiveStudent();
+  const studentRole = activeStudentQuery.data?.role
+    ? activeStudentQuery.data.role
+    : '';
   const isAdmin = userDataQuery.data?.isAdmin
     ? userDataQuery.data.isAdmin
     : false;
