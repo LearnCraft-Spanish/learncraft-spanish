@@ -24,7 +24,7 @@ export default function useFlashcardFilter() {
 
   const filterByOrTags = useCallback(
     (examples: Flashcard[], orTags: VocabTag[]) => {
-      if (!vocabularyQuery.data) {
+      if (!vocabularyQuery.data?.length) {
         console.error(
           'No vocabulary data, unable to filter flashcards by tags',
         );
