@@ -9,52 +9,7 @@ import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import ExamplesTable from './ExamplesTable';
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;
 
-describe('renders without crashing', () => {
-  it('renders without crashing', async () => {
-    render(
-      <ExamplesTable
-        examplesToDisplay={[verifiedExamplesTable[0]]}
-        getExampleById={() => verifiedExamplesTable[0]}
-        flashcardsFound={1}
-        flashcardsFoundWithAudio={1}
-        copyTable={() => {}}
-      />,
-      { wrapper: MockAllProviders },
-    );
-    await waitFor(
-      () => {
-        expect(
-          screen.getByText(verifiedExamplesTable[0].englishTranslation),
-        ).toBeInTheDocument();
-      },
-      { timeout: 3000 },
-    );
-  });
-});
-
-describe('user is not a student', () => {
-  it('student buttons: Add/Adding.../Remove are not displayed', async () => {
-    render(
-      <ExamplesTable
-        examplesToDisplay={[verifiedExamplesTable[0]]}
-        getExampleById={() => verifiedExamplesTable[0]}
-        flashcardsFound={1}
-        flashcardsFoundWithAudio={1}
-        copyTable={() => {}}
-      />,
-      { wrapper: MockAllProviders },
-    );
-    await waitFor(() => {
-      expect(
-        screen.getByText(verifiedExamplesTable[0].englishTranslation),
-      ).toBeInTheDocument();
-    });
-
-    expect(screen.queryByText('Add')).not.toBeInTheDocument();
-    expect(screen.queryByText('Adding...')).not.toBeInTheDocument();
-    expect(screen.queryByText('Remove')).not.toBeInTheDocument();
-  });
-});
+// Helper Functions
 async function getUnknownExample() {
   const { result } = renderHook(() => useStudentFlashcards(), {
     wrapper: MockAllProviders,
@@ -65,6 +20,9 @@ async function getUnknownExample() {
   const unknownExample = verifiedExamplesTable.find(
     (example) => result.current.exampleIsCollected(example.recordId) === false,
   );
+  if (!unknownExample) {
+    throw new Error('No unknown examples found');
+  }
   return unknownExample;
 }
 async function getKnownExample() {
@@ -77,16 +35,72 @@ async function getKnownExample() {
   const knownExample = verifiedExamplesTable.find(
     (example) => result.current.exampleIsCollected(example.recordId) === true,
   );
+  if (!knownExample) {
+    throw new Error('No known examples found');
+  }
   return knownExample;
 }
+describe('renders without crashing', () => {
+  it('renders without crashing', async () => {
+    const examplesToDisplay = verifiedExamplesTable.slice(0, 1);
+    render(
+      <ExamplesTable
+        examplesToDisplay={[verifiedExamplesTable[0]]}
+        getExampleById={() => verifiedExamplesTable[0]}
+        examplesToDisplay={examplesToDisplay}
+        studentRole="student"
+        dataReady
+        getExampleById={() => examplesToDisplay[0]}
+        flashcardsFound={1}
+        flashcardsFoundWithAudio={1}
+        copyTable={() => {}}
+      />,
+      { wrapper: MockAllProviders },
+    );
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText(examplesToDisplay[0].englishTranslation),
+        ).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
+});
+
+describe('user is not a student', () => {
+  it('student buttons: Add/Adding.../Remove are not displayed', async () => {
+    const examplesToDisplay = verifiedExamplesTable.slice(0, 1);
+    render(
+      <ExamplesTable
+        examplesToDisplay={[verifiedExamplesTable[0]]}
+        getExampleById={() => verifiedExamplesTable[0]}
+        examplesToDisplay={[examplesToDisplay[0]]}
+        studentRole="limited"
+        dataReady
+        getExampleById={() => examplesToDisplay[0]}
+        flashcardsFound={1}
+        flashcardsFoundWithAudio={1}
+        copyTable={() => {}}
+      />,
+      { wrapper: MockAllProviders },
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByText(examplesToDisplay[0].englishTranslation),
+      ).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Add')).not.toBeInTheDocument();
+    expect(screen.queryByText('Adding...')).not.toBeInTheDocument();
+    expect(screen.queryByText('Remove')).not.toBeInTheDocument();
+  });
+});
 
 describe('user is a student', () => {
   describe('example is unknown', () => {
     beforeEach(async () => {
       const unknownExample = await getUnknownExample();
-      if (!unknownExample) {
-        throw new Error('No unknown examples found');
-      }
       render(
         <ExamplesTable
           examplesToDisplay={[unknownExample]}
@@ -128,9 +142,6 @@ describe('user is a student', () => {
   describe('example is known', () => {
     beforeEach(async () => {
       const knownExample = await getKnownExample();
-      if (!knownExample) {
-        throw new Error('No known examples found');
-      }
       render(
         <ExamplesTable
           examplesToDisplay={[knownExample]}
