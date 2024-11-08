@@ -7,7 +7,6 @@ import type {
 
 import '../../App.css';
 
-import Loading from '../../components/Loading';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useVerifiedExamples } from '../../hooks/useVerifiedExamples';
@@ -15,6 +14,7 @@ import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { useUserData } from '../../hooks/useUserData';
 import { useVocabulary } from '../../hooks/useVocabulary';
 
+import Loading from '../../components/Loading';
 import Filter from '../../components/FlashcardFinder/Filter';
 import useFlashcardFilter from '../../hooks/useFlashcardFilter';
 import ExamplesTable from '../../components/FlashcardFinder/ExamplesTable';

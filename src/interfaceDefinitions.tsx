@@ -153,7 +153,7 @@ export interface VocabTagWithoutVocabDescriptor {
   id: number;
   type: string; // any other type
   tag: string;
-  vocabDescriptor?: undefined; // explicitly undefined when type is not "vocab"
+  vocabDescriptor?: undefined; // explicitly undefined when type is not "vocabulary"
 }
 
 // Combines the two types above
