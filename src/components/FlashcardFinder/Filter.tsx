@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { VocabTag } from '../../interfaceDefinitions';
 
 import { useContextualMenu } from '../../hooks/useContextualMenu';
