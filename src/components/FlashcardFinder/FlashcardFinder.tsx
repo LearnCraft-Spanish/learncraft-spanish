@@ -128,16 +128,8 @@ const FlashcardFinder = () => {
             />
           </div>
           <ExamplesTable
-<<<<<<< HEAD
-            examplesToDisplay={examplesToDisplay}
-            getExampleById={getExampleById}
-            flashcardsFound={displayOrder.length}
-            flashcardsFoundWithAudio={displayExamplesWithAudio.length}
-            copyTable={copyTable}
-=======
             dataSource={verifiedExamplesQuery.data}
             displayOrder={displayOrder}
->>>>>>> origin/development
           />
         </div>
       )}
