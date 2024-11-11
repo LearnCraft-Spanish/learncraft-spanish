@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { VocabTag, Vocabulary } from '../interfaceDefinitions';
 import { useBackend } from './useBackend';
 import { useUserData } from './useUserData';
@@ -10,39 +10,8 @@ export function useVocabulary() {
   const hasAccess =
     userDataQuery.data?.isAdmin || userDataQuery.data?.role === 'student';
 
-  const tagTableRef = useRef<VocabTag[]>([]);
-
   const nextTagId = useRef(1);
 
-  // Helper function to add tags without duplicates
-  const addTag = (
-    type: string,
-    tag: string,
-    vocabDescriptor?: string | undefined,
-  ) => {
-    if (
-      !tagTableRef.current.find(
-        (item) =>
-          item.type === type &&
-          item.tag === tag &&
-          (item.vocabDescriptor === vocabDescriptor || !vocabDescriptor),
-      )
-    ) {
-      if (type === 'vocabulary') {
-        tagTableRef.current.push({
-          type,
-          tag,
-          id: nextTagId.current,
-          vocabDescriptor,
-        });
-      } else {
-        tagTableRef.current.push({ type, tag, id: nextTagId.current });
-      }
-      nextTagId.current++;
-    }
-  };
-
-  // Helper function to sort vocabulary by frequencyRank, then space-separated words
   const sortVocab = (a: Vocabulary, b: Vocabulary) => {
     if (a.frequencyRank === b.frequencyRank) {
       return a.wordIdiom.includes(' ') === b.wordIdiom.includes(' ')
@@ -54,42 +23,11 @@ export function useVocabulary() {
     return a.frequencyRank - b.frequencyRank;
   };
 
-  // Fetch vocabulary from backend and set up tag table
   const setupVocabTable = async () => {
     try {
       const vocab = await getVocabFromBackend();
-
-      tagTableRef.current = []; // Reset the tag table
-      nextTagId.current = 1; // Reset tag ID counter
-
-      vocab?.forEach((term) => {
-        if (term.vocabularySubcategorySubcategoryName) {
-          addTag('subcategory', term.vocabularySubcategorySubcategoryName);
-        }
-
-        if (term.verbInfinitive) {
-          addTag('verb', term.verbInfinitive);
-        }
-
-        if (term.conjugationTags.length > 0) {
-          term.conjugationTags.forEach((conjugation) =>
-            addTag('conjugation', conjugation),
-          );
-        }
-
-        if (term.wordIdiom) {
-          const isIdiom = term.vocabularySubcategorySubcategoryName
-            ?.toLowerCase()
-            .includes('idiom');
-          addTag(
-            isIdiom ? 'idiom' : 'vocabulary',
-            term.wordIdiom,
-            term.descriptionOfVocabularySkill,
-          );
-        }
-      });
       return vocab.sort(sortVocab);
-    } catch (e: unknown) {
+    } catch (e) {
       throw new Error(`Error: Failed to fetch vocabulary: ${e}`);
     }
   };
@@ -102,7 +40,69 @@ export function useVocabulary() {
     enabled: hasAccess,
   });
 
-  const tagTable = tagTableRef.current;
+  // Memoized tagTable based on vocabularyQuery.data
+  // This should update synchronously with vocabularyQuery.data when called
+  const tagTable: VocabTag[] = useMemo(() => {
+    const newTagTable: VocabTag[] = [];
+    nextTagId.current = 1; // Reset ID counter with each re-computation
+
+    const addTag = (type: string, tag: string, vocabDescriptor?: string) => {
+      // Check that tag does not already exist in the tagTable
+      const tagExists = newTagTable.some(
+        (item) =>
+          item.type === type &&
+          item.tag === tag &&
+          (item.vocabDescriptor === vocabDescriptor || !vocabDescriptor),
+      );
+
+      // If not, add it
+      if (!tagExists) {
+        const newTag: VocabTag =
+          // Create new tag object based on type
+          // Types are separated to ensure that vocabDescriptor is only allowed for 'vocabulary' type
+          type === 'vocabulary'
+            ? {
+                id: nextTagId.current++,
+                type: 'vocabulary',
+                tag,
+                vocabDescriptor: vocabDescriptor as string, // Required when type is "vocabulary"
+              }
+            : {
+                id: nextTagId.current++,
+                type,
+                tag,
+                vocabDescriptor: undefined, // Explicitly undefined for non-"vocabulary" types
+              };
+
+        newTagTable.push(newTag);
+      }
+    };
+
+    // Populate `tagTable` with tags from vocabulary data
+    vocabularyQuery.data?.forEach((term) => {
+      if (term.vocabularySubcategorySubcategoryName) {
+        addTag('subcategory', term.vocabularySubcategorySubcategoryName);
+      }
+      if (term.verbInfinitive) {
+        addTag('verb', term.verbInfinitive);
+      }
+      term.conjugationTags.forEach((conjugation) =>
+        addTag('conjugation', conjugation),
+      );
+      if (term.wordIdiom) {
+        const isIdiom = term.vocabularySubcategorySubcategoryName
+          ?.toLowerCase()
+          .includes('idiom');
+        addTag(
+          isIdiom ? 'idiom' : 'vocabulary',
+          term.wordIdiom,
+          term.descriptionOfVocabularySkill,
+        );
+      }
+    });
+
+    return newTagTable;
+  }, [vocabularyQuery.data]); // Re-compute only if vocabulary data changes
 
   return { vocabularyQuery, tagTable };
 }

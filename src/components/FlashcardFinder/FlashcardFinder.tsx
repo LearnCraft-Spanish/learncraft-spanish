@@ -8,7 +8,6 @@ import type {
 
 import '../../App.css';
 
-import Loading from '../../components/Loading';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useVerifiedExamples } from '../../hooks/useVerifiedExamples';
@@ -16,9 +15,10 @@ import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { useUserData } from '../../hooks/useUserData';
 import { useVocabulary } from '../../hooks/useVocabulary';
 
+import Loading from '../../components/Loading';
 import Filter from '../../components/FlashcardFinder/Filter';
 import useFlashcardFilter from '../../hooks/useFlashcardFilter';
-import ExamplesTable from '../../components/FlashcardFinder/ExamplesTable';
+import ExamplesTable from './ExamplesTable';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = () => {
@@ -129,7 +129,6 @@ const FlashcardFinder = () => {
     setRequiredTags(newRequiredTags);
   }
 
-  // cause of circular dependency?
   const getFilteredExamples = useCallback(
     (table: Flashcard[]): Flashcard[] => {
       const filteredBySelectedLesson = filterExamplesBySelectedLesson(table);
@@ -148,44 +147,8 @@ const FlashcardFinder = () => {
     ],
   );
 
-  // called when user clicks 'Copy as Table' button
-  // copies sentences in a table format to be pasted into a google doc or excel sheet
-  function copyTable() {
-    if (!verifiedExamplesQuery.isSuccess) {
-      return null;
-    }
-    const headers = 'ID\tSpanish\tEnglish\tAudio_Link\n';
-    const table = displayOrder
-      .map((displayOrderObject) => {
-        const foundExample = getExampleById(displayOrderObject.recordId);
-        if (!foundExample) {
-          return '';
-        }
-        return `${foundExample.recordId}\t\
-            ${foundExample.spanishExample}\t\
-            ${foundExample.englishTranslation}\t\
-            ${foundExample.spanishAudioLa}\n`;
-      })
-      .join('');
-
-    const copiedText = headers + table;
-    navigator.clipboard.writeText(copiedText);
-  }
-
-  const updateExamplesToDisplay = useCallback(() => {
-    // const paginatedDisplayOrder = displayOrder.slice(0, 30);
-    const examplesArray = getExamplesFromDisplayOrder(displayOrder);
-    const truthyTable = examplesArray.filter((item) => !!item);
-
-    setExamplesToDisplay(truthyTable);
-  }, [getExamplesFromDisplayOrder, displayOrder]);
-
-  const updateDisplayOrder = useCallback((newDisplayOrder: DisplayOrder[]) => {
-    setDisplayOrder(newDisplayOrder);
-  }, []);
-
   function makeDisplayOrderFromExamples(examples: Flashcard[]) {
-    const newDisplayOrder = examples.map((example) => {
+    const newDisplayOrder: DisplayOrder[] = examples.map((example) => {
       return {
         recordId: example.recordId,
       };
@@ -194,26 +157,13 @@ const FlashcardFinder = () => {
   }
 
   useEffect(() => {
-    if (verifiedExamplesQuery.isSuccess) {
+    if (verifiedExamplesQuery.data?.length) {
       const newExampleTable = getFilteredExamples(verifiedExamplesQuery.data);
       const randomizedExamples = fisherYatesShuffle(newExampleTable);
       const newDisplayOrder = makeDisplayOrderFromExamples(randomizedExamples);
-      updateDisplayOrder(newDisplayOrder);
+      setDisplayOrder(newDisplayOrder);
     }
-  }, [
-    requiredTags,
-    verifiedExamplesQuery.isSuccess,
-    verifiedExamplesQuery.data,
-    getFilteredExamples,
-    updateDisplayOrder,
-  ]);
-
-  useEffect(() => {
-    // When displayOrder changes, update the examples to display array
-    if (verifiedExamplesQuery.isSuccess) {
-      updateExamplesToDisplay();
-    }
-  }, [displayOrder, verifiedExamplesQuery.isSuccess, updateExamplesToDisplay]);
+  }, [requiredTags, verifiedExamplesQuery.data, getFilteredExamples]);
 
   return (
     <div className="flashcardFinder">
@@ -240,15 +190,8 @@ const FlashcardFinder = () => {
             />
           </div>
           <ExamplesTable
-            examplesToDisplay={examplesToDisplay}
-            studentRole={
-              userDataQuery.data?.role ? userDataQuery.data.role : ''
-            }
-            dataReady={dataLoaded}
-            getExampleById={getExampleById}
-            flashcardsFound={displayOrder.length}
-            flashcardsFoundWithAudio={displayExamplesWithAudio.length}
-            copyTable={copyTable}
+            dataSource={verifiedExamplesQuery.data}
+            displayOrder={displayOrder}
           />
         </div>
       )}

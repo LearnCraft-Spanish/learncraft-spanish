@@ -1,7 +1,8 @@
 import { useContext } from 'react';
-import { ContextualMenuContext } from '../providers/ContextualMenuProvider';
+import type { ContextualMenuContextType } from '../context/ContextualMenuContext';
+import ContextualMenuContext from '../context/ContextualMenuContext';
 
-export const useContextualMenu = () => {
+export const useContextualMenu = (): ContextualMenuContextType => {
   const context = useContext(ContextualMenuContext);
   if (!context) {
     throw new Error(

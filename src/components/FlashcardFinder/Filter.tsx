@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import type { VocabTag } from '../../interfaceDefinitions';
 
 import { useContextualMenu } from '../../hooks/useContextualMenu';
@@ -20,7 +20,7 @@ export default function Filter({
   addTagToRequiredTags,
   removeTagFromRequiredTags,
 }: FilterProps) {
-  const { openContextual, contextual } = useContextualMenu();
+  const { contextual, openContextual, setContextualRef } = useContextualMenu();
   const { tagTable } = useVocabulary();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([]);
@@ -122,7 +122,7 @@ export default function Filter({
             {!!tagSearchTerm.length &&
               contextual === 'tagSuggestionBox' &&
               !!suggestedTags.length && (
-                <div className="tagSuggestionBox">
+                <div className="tagSuggestionBox" ref={setContextualRef}>
                   {suggestedTags.map((item) => (
                     <div
                       key={item.id}
