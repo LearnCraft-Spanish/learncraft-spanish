@@ -3,25 +3,19 @@ import type { VocabTag } from '../../interfaceDefinitions';
 
 import { useContextualMenu } from '../../hooks/useContextualMenu';
 import { useVocabulary } from '../../hooks/useVocabulary';
+import { useFlashcardFilter } from '../../hooks/useFlashcardFilter';
 import { FromToLessonSelector } from '../LessonSelector';
 
-interface FilterProps {
-  includeSpanglish: boolean;
-  toggleIncludeSpanglish: () => void;
-  requiredTags: VocabTag[];
-  addTagToRequiredTags: (tagId: number) => void;
-  removeTagFromRequiredTags: (tagId: number) => void;
-}
-
-export default function Filter({
-  includeSpanglish,
-  toggleIncludeSpanglish,
-  requiredTags,
-  addTagToRequiredTags,
-  removeTagFromRequiredTags,
-}: FilterProps) {
+export default function Filter() {
   const { contextual, openContextual, setContextualRef } = useContextualMenu();
   const { tagTable } = useVocabulary();
+  const {
+    excludeSpanglish,
+    requiredTags,
+    toggleSpanglishFilter,
+    addTagToRequiredTags,
+    removeTagFromRequiredTags,
+  } = useFlashcardFilter();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([]);
 
@@ -84,7 +78,7 @@ export default function Filter({
           <FromToLessonSelector />
         </div>
         <div className="removeSpanglishBox">
-          <p>Include Spanglish: </p>
+          <p>Exclude Spanglish: </p>
           <label
             htmlFor="removeSpanglish"
             className="switch"
@@ -94,13 +88,8 @@ export default function Filter({
               type="checkbox"
               name="removeSpanglish"
               id="removeSpanglish"
-              checked={includeSpanglish}
-              style={
-                includeSpanglish
-                  ? { backgroundColor: 'darkgreen' }
-                  : { backgroundColor: 'darkred' }
-              }
-              onChange={toggleIncludeSpanglish}
+              checked={excludeSpanglish}
+              onChange={toggleSpanglishFilter}
             />
             <span className="slider round"></span>
           </label>

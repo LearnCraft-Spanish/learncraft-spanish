@@ -1,16 +1,110 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { Flashcard, VocabTag } from '../interfaceDefinitions';
 
 import { useVocabulary } from './useVocabulary';
 
-interface FilterFlashcardsOptions {
-  examples: Flashcard[];
-  includeSpanglish?: boolean;
-  orTags?: VocabTag[];
-}
+export function useFlashcardFilter() {
+  const { vocabularyQuery, tagTable } = useVocabulary();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-export default function useFlashcardFilter() {
-  const { vocabularyQuery } = useVocabulary();
+  const excludeSpanglish = searchParams.get('excludeSpanglish') === 'true';
+  const requiredTagsString = searchParams.get('requiredTags');
+
+  function toggleSpanglishFilter() {
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (excludeSpanglish) {
+      newSearchParams.delete('excludeSpanglish');
+    } else {
+      newSearchParams.set('excludeSpanglish', 'true');
+    }
+
+    setSearchParams(newSearchParams); // Type-safe
+  }
+
+  function serializeTags(tags: VocabTag[]): string {
+    return tags
+      .map((tag) => {
+        const parts = [
+          tag.type,
+          tag.tag,
+          tag.vocabDescriptor || '', // Leave empty if vocabDescriptor is absent
+        ];
+        return parts.filter(Boolean).join('|'); // Join fields with colons, omitting empty vocabDescriptor
+      })
+      .join('||'); // Separate tags with pipes
+  }
+
+  const deserializeTags = useCallback(
+    (queryString: string | null): VocabTag[] => {
+      if (!queryString) {
+        return [];
+      }
+      const tagPartialArray = queryString.split('||').map((tagString) => {
+        const [type, tag, vocabDescriptor] = tagString.split('|');
+        return vocabDescriptor
+          ? { id: 0, type, tag, vocabDescriptor }
+          : { id: 0, type, tag };
+      });
+      const tagArray = tagPartialArray.map((tagPartial) => {
+        const tag = tagTable.find((tagObject) => {
+          if (!tagPartial.vocabDescriptor) {
+            return (
+              tagObject.type === tagPartial.type &&
+              tagObject.tag === tagPartial.tag
+            );
+          } else {
+            return (
+              tagObject.type === tagPartial.type &&
+              tagObject.tag === tagPartial.tag &&
+              tagObject.vocabDescriptor === tagPartial.vocabDescriptor
+            );
+          }
+        });
+        if (!tag) {
+          return null;
+        }
+        return tag;
+      });
+      const filteredTagArray = tagArray.filter((tag) => !!tag);
+      return filteredTagArray;
+    },
+    [tagTable],
+  );
+
+  const requiredTags = useMemo(() => {
+    const deserializedTags = deserializeTags(requiredTagsString);
+    return deserializedTags;
+  }, [requiredTagsString, deserializeTags]);
+
+  function updateRequiredTags(newTags: VocabTag[]) {
+    const newSearchParams = new URLSearchParams(searchParams);
+    const serializedTags = serializeTags(newTags);
+    if (newTags.length === 0) {
+      newSearchParams.delete('requiredTags');
+    } else {
+      newSearchParams.set('requiredTags', serializedTags);
+    }
+    setSearchParams(newSearchParams);
+  }
+
+  function addTagToRequiredTags(id: number) {
+    const tagObject = tagTable.find((object) => object.id === id);
+    if (!tagObject) {
+      console.error('Tag not found in tagTable');
+      return;
+    }
+    if (tagObject && !requiredTags.find((tag) => tag.id === id)) {
+      const newRequiredTags = [...requiredTags];
+      newRequiredTags.push(tagObject);
+      updateRequiredTags(newRequiredTags);
+    }
+  }
+
+  function removeTagFromRequiredTags(id: number) {
+    const newRequiredTags = requiredTags.filter((item) => item.id !== id);
+    updateRequiredTags(newRequiredTags);
+  }
 
   // Helper Functions
   const filterBySpanglish = useCallback((examples: Flashcard[]) => {
@@ -22,8 +116,8 @@ export default function useFlashcardFilter() {
     });
   }, []);
 
-  const filterByOrTags = useCallback(
-    (examples: Flashcard[], orTags: VocabTag[]) => {
+  const filterByRequiredTags = useCallback(
+    (examples: Flashcard[]) => {
       if (!vocabularyQuery.data?.length) {
         console.error(
           'No vocabulary data, unable to filter flashcards by tags',
@@ -38,7 +132,7 @@ export default function useFlashcardFilter() {
           return false;
         }
         let isGood = false;
-        orTags.forEach((tag) => {
+        requiredTags.forEach((tag) => {
           if (!isGood) {
             switch (tag.type) {
               case 'subcategory':
@@ -100,28 +194,31 @@ export default function useFlashcardFilter() {
       });
       return filteredExamples;
     },
-    [vocabularyQuery.data],
+    [vocabularyQuery.data, requiredTags],
   );
 
   // Main Function
   const filterFlashcards = useCallback(
-    ({
-      examples,
-      includeSpanglish,
-      orTags = [],
-    }: FilterFlashcardsOptions): Flashcard[] => {
+    (examples: Flashcard[]): Flashcard[] => {
       let filteredExamples = examples;
-      if (!includeSpanglish) {
+      if (excludeSpanglish) {
         filteredExamples = filterBySpanglish(filteredExamples);
       }
-      if (orTags.length > 0) {
-        filteredExamples = filterByOrTags(filteredExamples, orTags);
+      if (requiredTags.length > 0) {
+        filteredExamples = filterByRequiredTags(filteredExamples);
       }
 
       return filteredExamples;
     },
-    [filterByOrTags, filterBySpanglish],
+    [filterByRequiredTags, filterBySpanglish, excludeSpanglish, requiredTags],
   );
 
-  return { filterFlashcards };
+  return {
+    filterFlashcards,
+    excludeSpanglish,
+    toggleSpanglishFilter,
+    requiredTags,
+    addTagToRequiredTags,
+    removeTagFromRequiredTags,
+  };
 }

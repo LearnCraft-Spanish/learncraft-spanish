@@ -7,6 +7,7 @@ import {
   formatSpanishText,
 } from './functions/formatFlashcardText';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
+import NavigateWithQuery from './components/NavigateWithQuery';
 
 function FlashcardManager() {
   const { flashcardDataQuery, removeFlashcardMutation, exampleIsCustom } =
@@ -108,7 +109,7 @@ function FlashcardManager() {
       {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
       {flashcardDataQuery.isSuccess &&
         !flashcardDataQuery.data?.studentExamples?.length && (
-          <Navigate to="/" />
+          <NavigateWithQuery to="/" />
         )}
       {flashcardDataQuery.isSuccess &&
         !!flashcardDataQuery.data?.examples?.length && (

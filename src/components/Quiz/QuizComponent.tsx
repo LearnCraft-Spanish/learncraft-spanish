@@ -7,6 +7,7 @@ import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
 import LinkWithQuery from '../LinkWithQuery';
+import NavigateWithQuery from '../NavigateWithQuery';
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -340,7 +341,7 @@ export default function QuizComponent({
     <>
       {displayOrderReady &&
         !!initialDisplayOrder.current.length &&
-        !displayOrder.length && <Navigate to=".." />}
+        !displayOrder.length && <NavigateWithQuery to=".." />}
       {!!displayOrder.length && (
         <div className="quiz">
           <NewQuizProgress

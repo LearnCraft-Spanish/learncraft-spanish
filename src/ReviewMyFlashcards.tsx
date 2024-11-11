@@ -15,6 +15,7 @@ import QuizComponent from './components/Quiz/QuizComponent';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 import useNavigatePreserveQuery from './hooks/useNavigatePreserveQuery';
+import NavigateWithQuery from './components/NavigateWithQuery';
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
@@ -102,7 +103,7 @@ export default function MyFlashcardsQuiz() {
     <div>
       {dataError && <h2>Error Loading Flashcards</h2>}
       {dataLoading && <Loading message="Loading Flashcard Data..." />}
-      {unavailable && <Navigate to="/" />}
+      {unavailable && <NavigateWithQuery to="/" />}
       {!quizReady && dataReady && (
         <form className="myFlashcardsForm" onSubmit={(e) => handleSumbit(e)}>
           <div className="myFlashcardsFormContentWrapper">

@@ -14,6 +14,8 @@ function Providers({ children }: ProvidersProps) {
   const clientId = import.meta.env.VITE_AUTH0_CLIENTID;
   const audience = import.meta.env.VITE_API_AUDIENCE;
 
+  const redirectUriWithQuery = `${window.location.origin}${location.search}`;
+
   const navigate = useNavigatePreserveQuery();
 
   return (
@@ -21,7 +23,7 @@ function Providers({ children }: ProvidersProps) {
       domain={domain}
       clientId={clientId}
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: redirectUriWithQuery,
         audience,
         scope:
           'openid profile email read:current-student update:current-student read:all-students update:all-students',

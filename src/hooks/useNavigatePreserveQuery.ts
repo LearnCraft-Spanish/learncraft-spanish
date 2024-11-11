@@ -1,12 +1,21 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 function useNavigatePreserveQuery() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const searchParams = location.search; // current query params
+  const [searchParams] = useSearchParams();
 
   function navigatePreservingQuery(to: string, options?: object) {
-    navigate(`${to}${searchParams}`, options); // Append query params to new route
+    const newSearchParams = new URLSearchParams(searchParams);
+
+    // Remove Auth0 query params
+    newSearchParams.delete('code');
+    newSearchParams.delete('state');
+
+    // Convert object to string
+    const newSearchParamString = newSearchParams.toString();
+
+    // Append query params to new route
+    navigate(`${to}?${newSearchParamString}`, options);
   }
 
   return navigatePreservingQuery;

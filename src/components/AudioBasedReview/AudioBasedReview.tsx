@@ -5,7 +5,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Navigate } from 'react-router-dom';
 import type { Flashcard } from '../../interfaceDefinitions';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
@@ -15,6 +14,7 @@ import { useProgramTable } from '../../hooks/useProgramTable';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { useUserData } from '../../hooks/useUserData';
 import Loading from '../Loading';
+import NavigateWithQuery from '../NavigateWithQuery';
 import AudioFlashcard from './AudioFlashcard';
 import AudioQuizButtons from './AudioQuizButtons';
 import AudioQuizSetupMenu from './AudioQuizSetupMenu';
@@ -471,7 +471,7 @@ export default function AudioBasedReview({
     <div className="quiz">
       {isLoading && <Loading message="Loading Audio..." />}
       {isError && <h2>Error Loading Audio</h2>}
-      {unavailable && <Navigate to="/" />}
+      {unavailable && <NavigateWithQuery to="/" />}
       {!quizReady && dataReady && (
         <>
           <h2>
