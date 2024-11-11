@@ -1,8 +1,8 @@
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, renderHook, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
 import MockAllProviders from '../../mocks/Providers/MockAllProviders';
 import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
-import useFlashcardFilter from './useFlashcardFilter';
+import { useFlashcardFilter } from './useFlashcardFilter';
 // import type { Flashcard, VocabTag, Vocabulary } from '../interfaceDefinitions';
 // import { useVocabulary } from './useVocabulary';
 
@@ -16,11 +16,9 @@ describe('useFlashcardFilter', () => {
     await waitFor(() =>
       expect(result.current.filterFlashcards).toBeInstanceOf(Function),
     );
-    const filteredExamples = result.current.filterFlashcards({
-      examples: verifiedExamplesTable,
-      includeSpanglish: false,
-      orTags: [],
-    });
+    const filteredExamples = result.current.filterFlashcards(
+      verifiedExamplesTable,
+    );
     await waitFor(() => expect(filteredExamples.length).toBeGreaterThan(0));
     expect(filteredExamples.length).toBeLessThan(verifiedExamplesTable.length);
     expect(filteredExamples.length).toBeGreaterThan(0);
@@ -34,11 +32,9 @@ describe('useFlashcardFilter', () => {
     await waitFor(() =>
       expect(result.current.filterFlashcards).toBeInstanceOf(Function),
     );
-    const filteredExamples = result.current.filterFlashcards({
-      examples: verifiedExamplesTable,
-      includeSpanglish: true,
-      orTags: [],
-    });
+    const filteredExamples = result.current.filterFlashcards(
+      verifiedExamplesTable,
+    );
     await waitFor(() => expect(filteredExamples.length).toBeGreaterThan(0));
     expect(filteredExamples.length).toBe(verifiedExamplesTable.length);
   });

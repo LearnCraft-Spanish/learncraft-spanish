@@ -30,7 +30,6 @@ const FlashcardFinder = () => {
     !dataLoaded;
 
   const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]);
-  // FromToLessonSelector
 
   const getFilteredExamples = useCallback(
     (table: Flashcard[]): Flashcard[] => {

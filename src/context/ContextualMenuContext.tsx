@@ -1,4 +1,3 @@
-import type { RefObject } from 'react';
 import { createContext } from 'react';
 
 // Define the type for the context without optional or undefined properties

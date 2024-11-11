@@ -1,5 +1,4 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import type { Flashcard, StudentExample } from './interfaceDefinitions';
 import Loading from './components/Loading';
 import {

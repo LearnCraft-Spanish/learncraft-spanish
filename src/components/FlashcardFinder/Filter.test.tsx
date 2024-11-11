@@ -16,32 +16,14 @@ const addTagToRequiredTags = vi.fn();
 const removeTagFromRequiredTags = vi.fn();
 describe('component Filter', () => {
   it('renders without crashing', async () => {
-    render(
-      <Filter
-        includeSpanglish={false}
-        toggleIncludeSpanglish={toggleIncludeSpanglish}
-        requiredTags={[]}
-        addTagToRequiredTags={addTagToRequiredTags}
-        removeTagFromRequiredTags={removeTagFromRequiredTags}
-      />,
-      { wrapper: MockAllProviders },
-    );
+    render(<Filter />, { wrapper: MockAllProviders });
     await waitFor(() => {
       expect(screen.getByText('Selected Tags:')).toBeInTheDocument();
     });
   });
 
   it('on input change, calls filters suggestedTags and displays', async () => {
-    render(
-      <Filter
-        includeSpanglish={false}
-        toggleIncludeSpanglish={toggleIncludeSpanglish}
-        requiredTags={[]}
-        addTagToRequiredTags={addTagToRequiredTags}
-        removeTagFromRequiredTags={removeTagFromRequiredTags}
-      />,
-      { wrapper: MockAllProviders },
-    );
+    render(<Filter />, { wrapper: MockAllProviders });
     await waitFor(() => {
       const input = screen.getByPlaceholderText('Search tags');
       fireEvent.change(input, { target: { value: 'a' } });
@@ -55,16 +37,7 @@ describe('component Filter', () => {
     });
   });
   it('clicking a tag from suggestedTags, calls addTagToRequiredTags', async () => {
-    render(
-      <Filter
-        includeSpanglish={false}
-        toggleIncludeSpanglish={toggleIncludeSpanglish}
-        requiredTags={[]}
-        addTagToRequiredTags={addTagToRequiredTags}
-        removeTagFromRequiredTags={removeTagFromRequiredTags}
-      />,
-      { wrapper: MockAllProviders },
-    );
+    render(<Filter />, { wrapper: MockAllProviders });
     await waitFor(() => {
       const input = screen.getByPlaceholderText('Search tags');
       fireEvent.change(input, { target: { value: 'Hablar' } });
@@ -86,16 +59,7 @@ describe('component Filter', () => {
       expect(result.result.current.tagTable.length).toBeGreaterThan(0);
     });
     const requiredTags = result.result.current.tagTable.slice(0, 1);
-    render(
-      <Filter
-        includeSpanglish={false}
-        toggleIncludeSpanglish={toggleIncludeSpanglish}
-        requiredTags={requiredTags}
-        addTagToRequiredTags={addTagToRequiredTags}
-        removeTagFromRequiredTags={removeTagFromRequiredTags}
-      />,
-      { wrapper: MockAllProviders },
-    );
+    render(<Filter />, { wrapper: MockAllProviders });
     await waitFor(() => {
       expect(screen.getByText(requiredTags[0].tag)).toBeInTheDocument();
     });
@@ -108,16 +72,7 @@ describe('component Filter', () => {
       expect(result.result.current.tagTable.length).toBeGreaterThan(0);
     });
     const requiredTags = result.result.current.tagTable.slice(0, 1);
-    render(
-      <Filter
-        includeSpanglish={false}
-        toggleIncludeSpanglish={toggleIncludeSpanglish}
-        requiredTags={requiredTags}
-        addTagToRequiredTags={addTagToRequiredTags}
-        removeTagFromRequiredTags={removeTagFromRequiredTags}
-      />,
-      { wrapper: MockAllProviders },
-    );
+    render(<Filter />, { wrapper: MockAllProviders });
     await waitFor(() => {
       const tag = screen.getByText(requiredTags[0].tag);
       fireEvent.click(tag);
@@ -127,16 +82,7 @@ describe('component Filter', () => {
     });
   });
   it('clicking includeSpanglish, calls toggleIncludeSpanglish', async () => {
-    render(
-      <Filter
-        includeSpanglish={false}
-        toggleIncludeSpanglish={toggleIncludeSpanglish}
-        requiredTags={[]}
-        addTagToRequiredTags={addTagToRequiredTags}
-        removeTagFromRequiredTags={removeTagFromRequiredTags}
-      />,
-      { wrapper: MockAllProviders },
-    );
+    render(<Filter />, { wrapper: MockAllProviders });
     await waitFor(() => {
       const checkbox = screen.getByLabelText('noSpanglish');
       fireEvent.click(checkbox);
