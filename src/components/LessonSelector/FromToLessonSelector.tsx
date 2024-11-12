@@ -43,7 +43,11 @@ export default function FromToLessonSelector(): JSX.Element {
   }
 
   function makeFromLessonSelector() {
-    const lessonSelector: Array<JSX.Element> = [];
+    const lessonSelector: Array<JSX.Element> = [
+      <option key={0} value={0}>
+        –Choose Lesson–
+      </option>,
+    ];
     const toLessonNumber = getLessonNumber(selectedToLesson);
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
       const lessonNumber = getLessonNumber(lesson);
@@ -59,7 +63,11 @@ export default function FromToLessonSelector(): JSX.Element {
   }
 
   function makeToLessonSelector() {
-    const lessonSelector: Array<JSX.Element> = [];
+    const lessonSelector: Array<JSX.Element> = [
+      <option key={0} value={0}>
+        –Choose Lesson–
+      </option>,
+    ];
     const fromLessonNumber = getLessonNumber(selectedFromLesson);
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
       const lessonNumber = getLessonNumber(lesson);
@@ -85,14 +93,14 @@ export default function FromToLessonSelector(): JSX.Element {
           id="courseList"
           name="courseList"
           className="courseList"
-          value={selectedProgram?.recordId ? selectedProgram?.recordId : 0}
+          value={selectedProgram?.recordId ?? 0}
           onChange={(e) => setProgram(e.target.value)}
         >
           {makeCourseSelector()}
         </select>
       </label>
       <div id="flashcardFinderStyling">
-        {selectedProgram?.lessons && (
+        {selectedProgram?.lessons && selectedToLesson?.recordId && (
           <label htmlFor="fromLesson" className="menuRow" id="fromRow">
             <p>From:</p>
 
@@ -100,7 +108,7 @@ export default function FromToLessonSelector(): JSX.Element {
               id="fromLesson"
               name="fromLesson"
               className="lessonList"
-              value={selectedFromLesson?.recordId}
+              value={selectedFromLesson?.recordId ?? 0}
               onChange={(e) => setFromLesson(e.target.value)}
             >
               {makeFromLessonSelector()}
@@ -115,7 +123,7 @@ export default function FromToLessonSelector(): JSX.Element {
               id="toLesson"
               name="toLesson"
               className="lessonList"
-              value={selectedToLesson?.recordId}
+              value={selectedToLesson?.recordId ?? 0}
               onChange={(e) => setToLesson(e.target.value)}
             >
               {makeToLessonSelector()}

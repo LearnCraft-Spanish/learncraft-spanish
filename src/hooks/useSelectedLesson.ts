@@ -1,62 +1,189 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
 import type { Flashcard, Lesson, Program } from '../interfaceDefinitions';
 import { useActiveStudent } from './useActiveStudent';
 import { useProgramTable } from './useProgramTable'; // Assuming this fetches the programs data
 
+interface SelectionState {
+  program: Program | null;
+  fromLesson: Lesson | null;
+  toLesson: Lesson | null;
+}
+
+function getLessonNumber(lesson: Lesson | null) {
+  const lessonName = lesson?.lesson;
+  if (!lessonName) {
+    return null;
+  }
+  const lessonArray = lessonName.split(' ');
+  const lastElement = lessonArray[lessonArray.length - 1];
+  return Number.parseInt(lastElement);
+}
+
+function deserializeSelection(
+  lessonSelectionString: string | null,
+  programs: Program[] | undefined,
+): SelectionState {
+  const splitString = lessonSelectionString?.split('-') ?? [];
+  const programId = splitString[0];
+  const toLessonNumber =
+    splitString.length > 1 ? splitString[splitString.length - 1] : null;
+  const fromLessonNumber = splitString.length > 2 ? splitString[1] : null;
+  const program =
+    programs?.find((item) => item.recordId === Number(programId)) || null;
+  const fromLesson =
+    program?.lessons.find(
+      (item) => getLessonNumber(item) === Number(fromLessonNumber),
+    ) || null;
+  const toLesson =
+    program?.lessons.find(
+      (item) => getLessonNumber(item) === Number(toLessonNumber),
+    ) || null;
+  return { program, fromLesson, toLesson };
+}
+
+function serializeNewSelection(newSelection: SelectionState): string {
+  const program = newSelection.program?.recordId || null;
+  const fromLesson = getLessonNumber(newSelection?.fromLesson);
+  const toLesson = getLessonNumber(newSelection?.toLesson);
+  const numberArray = [program, fromLesson, toLesson];
+  const filteredArray = numberArray.filter((item) => !!item);
+  const stringified = filteredArray.join('-');
+  return stringified;
+}
+
 export function useSelectedLesson() {
-  const queryClient = useQueryClient();
-  const { activeStudentQuery, activeProgram, activeLesson } =
-    useActiveStudent(); // Fetch the active student
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { activeProgram, activeLesson } = useActiveStudent(); // Fetch the active student
   const { programTableQuery } = useProgramTable(); // Fetch the programs data internally
 
   const programsQueryData = programTableQuery.data;
 
-  // Default initial state for selected program and lessons
-  const initialSelectionState = {
-    program: null as Program | null,
-    fromLesson: null as Lesson | null,
-    toLesson: null as Lesson | null,
-  };
+  const defaultSelection: SelectionState = useMemo(() => {
+    return { program: activeProgram, fromLesson: null, toLesson: activeLesson };
+  }, [activeProgram, activeLesson]);
 
-  // Function to get the initial selection state
-  const getSelectionState = () => initialSelectionState;
+  const lessonSelection = useMemo(() => {
+    const selectionString = searchParams.get('lessonSelection');
+    const deserialized = deserializeSelection(
+      selectionString,
+      programsQueryData,
+    );
+    const activeOverride =
+      deserialized.program?.recordId === defaultSelection.program?.recordId &&
+      !deserialized.toLesson;
+    if (!deserialized.program || activeOverride) {
+      return defaultSelection;
+    }
+    return deserialized;
+  }, [searchParams, programsQueryData, defaultSelection]);
 
-  // Fetch the current selected program and lessons
-  const { data: selectionState } = useQuery({
-    queryKey: ['programSelection'],
-    queryFn: getSelectionState,
-    staleTime: Infinity,
-    gcTime: Infinity,
-    initialData: initialSelectionState,
-    enabled: !!programTableQuery.data,
-  });
+  const updateSearchParams = useCallback(
+    (newSelection: SelectionState) => {
+      const currentSelection = searchParams.get('lessonSelection');
+      const serializedSelection = serializeNewSelection(newSelection);
+      if (serializedSelection !== currentSelection) {
+        const newSearchParams = new URLSearchParams(searchParams);
+        if (serializedSelection) {
+          newSearchParams.set('lessonSelection', serializedSelection);
+        } else {
+          newSearchParams.delete('lessonSelection');
+        }
+        setSearchParams(newSearchParams);
+      }
+    },
+    [searchParams, setSearchParams],
+  );
+
+  // Set selected program
+  const setProgram = useCallback(
+    (programId: number | string | null) => {
+      if (typeof programId === 'string') {
+        programId = Number.parseInt(programId) || null;
+      }
+      const newProgram =
+        programsQueryData?.find((item) => item.recordId === programId) || null;
+      if (newProgram !== lessonSelection.program) {
+        const newSelection = {
+          program: newProgram,
+          fromLesson: null,
+          toLesson: null,
+        };
+        updateSearchParams(newSelection);
+      }
+    },
+    [programsQueryData, lessonSelection, updateSearchParams],
+  );
+
+  // Set 'from' lesson
+  const setFromLesson = useCallback(
+    (newId: number | string | null) => {
+      if (typeof newId === 'string') {
+        newId = Number.parseInt(newId) || null;
+      }
+      const newFromLesson =
+        lessonSelection.program?.lessons.find(
+          (item) => item.recordId === newId,
+        ) || null;
+      if (lessonSelection.toLesson) {
+        updateSearchParams({ ...lessonSelection, fromLesson: newFromLesson });
+      }
+    },
+    [lessonSelection, updateSearchParams],
+  );
+
+  // Set 'to' lesson
+  const setToLesson = useCallback(
+    (newId: number | string | null) => {
+      if (typeof newId === 'string') {
+        newId = Number.parseInt(newId) || null;
+      }
+      const newToLesson =
+        lessonSelection.program?.lessons.find(
+          (item) => item.recordId === newId,
+        ) || null;
+      if (!newToLesson) {
+        updateSearchParams({
+          ...lessonSelection,
+          fromLesson: null,
+          toLesson: null,
+        });
+      } else {
+        updateSearchParams({ ...lessonSelection, toLesson: newToLesson });
+      }
+    },
+    [lessonSelection, updateSearchParams],
+  );
 
   // Function to get the allowed vocabulary from the 'to' lesson
   const allowedVocabulary = useMemo((): string[] => {
     let allowedVocabulary: string[] = [];
-    const program = selectionState.program;
+    const program = lessonSelection.program;
     if (program) {
       const foundLesson = program.lessons.find(
-        (item) => item.recordId === selectionState.toLesson?.recordId,
+        (item) => item.recordId === lessonSelection.toLesson?.recordId,
       );
       if (foundLesson) {
         allowedVocabulary = foundLesson.vocabKnown || [];
+      } else {
+        allowedVocabulary =
+          program.lessons[program.lessons.length - 1]?.vocabKnown || [];
       }
     }
     return allowedVocabulary;
-  }, [selectionState.program, selectionState.toLesson?.recordId]);
+  }, [lessonSelection.program, lessonSelection.toLesson?.recordId]);
 
   // Function to get the required vocabulary from the 'from' lesson
   const requiredVocabulary = useMemo((): string[] => {
     let requiredVocabulary: string[] = [];
-    const program = selectionState.program;
+    const program = lessonSelection.program;
     if (program) {
       const foundFromLesson = program.lessons.find(
-        (item) => item.recordId === selectionState.fromLesson?.recordId,
+        (item) => item.recordId === lessonSelection.fromLesson?.recordId,
       );
       const foundToLesson = program.lessons.find(
-        (item) => item.recordId === selectionState.toLesson?.recordId,
+        (item) => item.recordId === lessonSelection.toLesson?.recordId,
       );
       if (foundFromLesson && foundToLesson) {
         const allToVocab = foundToLesson.vocabKnown || [];
@@ -72,14 +199,17 @@ export function useSelectedLesson() {
     }
     return requiredVocabulary;
   }, [
-    selectionState.fromLesson?.recordId,
-    selectionState.program,
-    selectionState.toLesson?.recordId,
+    lessonSelection.fromLesson?.recordId,
+    lessonSelection.program,
+    lessonSelection.toLesson?.recordId,
   ]);
 
   // Function to filter flashcards by allowed vocabulary
   const filterExamplesBySelectedLesson = useCallback(
     (examples: Flashcard[]): Flashcard[] => {
+      if (!lessonSelection.program || !lessonSelection.toLesson) {
+        return examples;
+      }
       const filteredByAllowedVocab = examples.filter((item) => {
         let isAllowed =
           item.vocabIncluded.length > 0 && item.vocabComplete !== false;
@@ -90,112 +220,28 @@ export function useSelectedLesson() {
         });
         return isAllowed;
       });
-      if (!requiredVocabulary.length) {
-        return [];
-      }
-      return filteredByAllowedVocab.filter((item) => {
-        let isRequired = false;
-        item.vocabIncluded.forEach((word) => {
-          if (requiredVocabulary.includes(word)) {
-            isRequired = true;
-          }
+      let filteredByRequired = filteredByAllowedVocab;
+      if (requiredVocabulary.length > 0) {
+        filteredByRequired = filteredByAllowedVocab.filter((item) => {
+          let isRequired = false;
+          item.vocabIncluded.forEach((word) => {
+            if (requiredVocabulary.includes(word)) {
+              isRequired = true;
+            }
+          });
+          return isRequired;
         });
-        return isRequired;
-      });
-    },
-    [allowedVocabulary, requiredVocabulary],
-  );
-
-  const newToLesson = useCallback(
-    (program: Program | null) => {
-      const firstLesson = program?.lessons[0] || null;
-      if (activeLesson?.recordId) {
-        const foundLesson = program?.lessons.find(
-          (lesson) => lesson.recordId === activeLesson.recordId,
-        );
-        if (foundLesson) {
-          return foundLesson;
-        }
-        return firstLesson;
       }
-      return firstLesson;
+      return filteredByRequired;
     },
-    [activeLesson],
+    [allowedVocabulary, lessonSelection, requiredVocabulary],
   );
-
-  // Set selected program
-  const setProgram = useCallback(
-    (program: number | string | null) => {
-      if (typeof program === 'string') {
-        program = Number.parseInt(program);
-      }
-      const newProgram =
-        programsQueryData?.find((item) => item.recordId === program) || null;
-      queryClient.setQueryData(
-        ['programSelection'],
-        (oldState: typeof initialSelectionState) => ({
-          ...oldState,
-          program: newProgram,
-          fromLesson: newProgram?.lessons ? newProgram.lessons[0] : null,
-          toLesson: newToLesson(newProgram),
-        }),
-      );
-    },
-    [programsQueryData, newToLesson, queryClient],
-  );
-
-  // Set 'from' lesson
-  const setFromLesson = useCallback(
-    (newId: number | string | null) => {
-      if (typeof newId === 'string') {
-        newId = Number.parseInt(newId);
-      }
-      const newFromLesson = selectionState.program?.lessons.find(
-        (item) => item.recordId === newId,
-      );
-      queryClient.setQueryData(
-        ['programSelection'],
-        (oldState: typeof initialSelectionState) => ({
-          ...oldState,
-          fromLesson: newFromLesson,
-        }),
-      );
-    },
-    [selectionState.program, queryClient],
-  );
-
-  // Set 'to' lesson
-  const setToLesson = useCallback(
-    (toLesson: number | string | null) => {
-      if (typeof toLesson === 'string') {
-        toLesson = Number.parseInt(toLesson);
-      }
-      const newToLesson = selectionState.program?.lessons.find(
-        (item) => item.recordId === toLesson,
-      );
-      queryClient.setQueryData(
-        ['programSelection'],
-        (oldState: typeof initialSelectionState) => ({
-          ...oldState,
-          toLesson: newToLesson,
-        }),
-      );
-    },
-    [selectionState.program, queryClient],
-  );
-
-  // Update program when activeStudent changes
-  useEffect(() => {
-    if (activeStudentQuery.data && activeProgram?.recordId) {
-      setProgram(activeProgram.recordId);
-    }
-  }, [activeStudentQuery.data, activeProgram?.recordId, setProgram]);
 
   // Expose current state, vocab, and filtering function
   return {
-    selectedProgram: selectionState?.program,
-    selectedFromLesson: selectionState?.fromLesson,
-    selectedToLesson: selectionState?.toLesson,
+    selectedProgram: lessonSelection?.program,
+    selectedFromLesson: lessonSelection?.fromLesson,
+    selectedToLesson: lessonSelection?.toLesson,
     allowedVocabulary,
     requiredVocabulary,
     setProgram,
