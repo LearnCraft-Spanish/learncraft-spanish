@@ -18,6 +18,7 @@ import Menu from './Menu';
 import NotFoundPage from './NotFoundPage';
 import ReviewMyFlashcards from './ReviewMyFlashcards';
 import './App.css';
+import CustomQuiz from './CustomQuiz';
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -225,6 +226,14 @@ export const App: React.FC = () => {
               userDataQuery.data?.isAdmin) && (
               <AudioBasedReview audioOrComprehension="audio" willAutoplay />
             )
+          }
+        />
+        <Route
+          path="/customquiz/*"
+          element={
+            (userDataQuery.data?.role === 'student' ||
+              userDataQuery.data?.role === 'limited' ||
+              userDataQuery.data?.isAdmin) && <CustomQuiz />
           }
         />
         <Route

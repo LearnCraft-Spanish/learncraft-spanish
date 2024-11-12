@@ -3,9 +3,12 @@ import { useSearchParams } from 'react-router-dom';
 import type { Flashcard, VocabTag } from '../interfaceDefinitions';
 
 import { useVocabulary } from './useVocabulary';
+import { useSelectedLesson } from './useSelectedLesson';
 
 export function useFlashcardFilter() {
   const { vocabularyQuery, tagTable } = useVocabulary();
+  const { filterExamplesBySelectedLesson, selectedProgram } =
+    useSelectedLesson();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const excludeSpanglish = searchParams.get('excludeSpanglish') === 'true';
@@ -207,10 +210,20 @@ export function useFlashcardFilter() {
       if (requiredTags.length > 0) {
         filteredExamples = filterByRequiredTags(filteredExamples);
       }
+      if (selectedProgram) {
+        filteredExamples = filterExamplesBySelectedLesson(filteredExamples);
+      }
 
       return filteredExamples;
     },
-    [filterByRequiredTags, filterBySpanglish, excludeSpanglish, requiredTags],
+    [
+      filterByRequiredTags,
+      filterBySpanglish,
+      filterExamplesBySelectedLesson,
+      excludeSpanglish,
+      requiredTags,
+      selectedProgram,
+    ],
   );
 
   return {

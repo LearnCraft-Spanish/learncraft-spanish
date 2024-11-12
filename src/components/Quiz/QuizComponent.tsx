@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useLocation } from 'react-router-dom';
+import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import { useFlashcardFilter } from '../../hooks/useFlashcardFilter';
 import MenuButton from '../Buttons/MenuButton';
 import LinkWithQuery from '../LinkWithQuery';
 import NavigateWithQuery from '../NavigateWithQuery';
@@ -20,6 +22,7 @@ interface QuizComponentProps {
   quizOnlyCollectedExamples?: boolean;
   quizOnlyCustomExamples?: boolean;
   isSrsQuiz?: boolean;
+  respectFilters?: boolean;
   cleanupFunction?: () => void;
   quizLength?: number;
 }
@@ -31,13 +34,15 @@ export default function QuizComponent({
   quizOnlyCollectedExamples = false,
   isSrsQuiz = false,
   quizOnlyCustomExamples = false,
+  respectFilters = false,
   cleanupFunction,
-  quizLength = 1000,
+  quizLength = 50,
 }: QuizComponentProps) {
   const location = useLocation();
   const { activeStudentQuery } = useActiveStudent();
   const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
     useStudentFlashcards();
+  const { filterFlashcards } = useFlashcardFilter();
 
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
   const initialDisplayOrder = useRef<DisplayOrder[]>([]);
@@ -201,6 +206,25 @@ export default function QuizComponent({
     [quizOnlyCustomExamples, exampleIsCustom],
   );
 
+  const filterDynamicIfRespected = useCallback(
+    (displayOrderArray: DisplayOrder[]) => {
+      if (!respectFilters) {
+        return displayOrderArray;
+      }
+      const examplesToFilter = displayOrderArray
+        .map((item) =>
+          examplesToParse.find((example) => example.recordId === item.recordId),
+        )
+        .filter(Boolean) as Flashcard[];
+      const filteredDynamically = filterFlashcards(examplesToFilter);
+      const filteredDisplayOrder: DisplayOrder[] = filteredDynamically.map(
+        (example) => ({ recordId: example.recordId }),
+      );
+      return filteredDisplayOrder;
+    },
+    [filterFlashcards, examplesToParse, respectFilters],
+  );
+
   // Further filter for only SRS examples
   const getStudentExampleFromExampleId = useCallback(
     (exampleId: number) => {
@@ -257,7 +281,6 @@ export default function QuizComponent({
   useEffect(() => {
     if (examplesToParse.length > 0 && !displayOrderReady && quizLength) {
       // Create a basic map of the flashcard objects with recordId and isCollected properties
-
       const exampleOrder: DisplayOrder[] = examplesToParse.map((example) => {
         return {
           recordId: example.recordId,
@@ -276,8 +299,11 @@ export default function QuizComponent({
       // If customOnly, filter out non-custom examples
       const filteredByCustom = filterIfCustomOnly(filteredByDueDate);
 
+      // If filters are respected, filter the examples dynamically
+      const filteredDynamically = filterDynamicIfRespected(filteredByCustom);
+
       // Limit the number of examples to the quizLength
-      const limitedOrder = filteredByCustom.slice(0, quizLength);
+      const limitedOrder = filteredDynamically.slice(0, quizLength);
 
       // Display the limited order if any are left
       if (limitedOrder.length > 0) {
@@ -290,6 +316,7 @@ export default function QuizComponent({
     displayOrderReady,
     quizLength,
     filterIfCollectedOnly,
+    filterDynamicIfRespected,
     filterIfCustomOnly,
     filterByDueExamples,
   ]);

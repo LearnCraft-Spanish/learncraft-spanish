@@ -86,11 +86,18 @@ export default function Menu() {
           )}
           {(userDataQuery.data.isAdmin ||
             activeStudentQuery.data?.role === 'student') && (
-            <div className="buttonBox">
-              <LinkWithQuery className="linkButton" to="/flashcardfinder">
-                Find Flashcards
-              </LinkWithQuery>
-            </div>
+            <>
+              <div className="buttonBox">
+                <LinkWithQuery className="linkButton" to="/customquiz">
+                  Custom Quiz
+                </LinkWithQuery>
+              </div>
+              <div className="buttonBox">
+                <LinkWithQuery className="linkButton" to="/flashcardfinder">
+                  Find Flashcards
+                </LinkWithQuery>
+              </div>
+            </>
           )}
           {userDataQuery.data?.isAdmin && (
             <div>
