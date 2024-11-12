@@ -108,9 +108,19 @@ button:hover,
   align-items: center;
 }
 
+.label:hover {
+  cursor: default;
+  background-color: var(--brand);
+}
+
 .disabledButton {
   background-color: var(--dark);
   cursor: default;
+}
+
+.disabledButton:hover {
+  cursor: default;
+  background-color: var(--dark);
 }
 
 .navigateButtons {
@@ -464,6 +474,11 @@ button:hover,
   background-color: var(--theme);
 }
 
+.customLabel:hover {
+  cursor: default;
+  background-color: var(--theme);
+}
+
 .customLabel h4 {
   color: var(--light);
 }
@@ -717,10 +732,6 @@ button:hover,
 
 .examplesTable .buttonBox button:hover {
   background-color: var(--accent);
-}
-
-.examplesTable .buttonBox button:active {
-  background-color: var(--brand);
 }
 
 .selectedVocab {
