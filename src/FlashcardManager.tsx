@@ -1,39 +1,38 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
-import type { Flashcard, StudentExample } from './interfaceDefinitions';
+import type {
+  DisplayOrder,
+  Flashcard,
+  StudentExample,
+} from './interfaceDefinitions';
 import Loading from './components/Loading';
-import {
-  formatEnglishText,
-  formatSpanishText,
-} from './functions/formatFlashcardText';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
+import ExamplesTable from './components/FlashcardFinder/ExamplesTable';
 
 function FlashcardManager() {
-  const { flashcardDataQuery, removeFlashcardMutation, exampleIsCustom } =
-    useStudentFlashcards();
+  const { flashcardDataQuery, exampleIsCustom } = useStudentFlashcards();
   const studentFlashcardData = flashcardDataQuery.data;
-  const removeFlashcard = removeFlashcardMutation.mutate;
 
-  async function removeAndUpdate(recordId: number | string) {
-    if (typeof recordId === 'string') {
-      recordId = Number.parseInt(recordId);
-    }
-    removeFlashcard(recordId);
-  }
+  const getStudentExampleFromExampleId = useCallback(
+    (exampleId: number) => {
+      const studentExample = studentFlashcardData?.studentExamples.find(
+        (item) => item.relatedExample === exampleId,
+      );
 
-  function getStudentExampleFromExampleId(exampleId: number) {
-    const studentExample = studentFlashcardData?.studentExamples.find(
-      (item) => item.relatedExample === exampleId,
-    );
+      return (
+        studentExample ||
+        ({
+          recordId: -1,
+          dateCreated: '',
+          relatedExample: -1,
+        } as StudentExample)
+      );
+    },
+    [studentFlashcardData?.studentExamples],
+  );
 
-    return (
-      studentExample ||
-      ({ recordId: -1, dateCreated: '', relatedExample: -1 } as StudentExample)
-    );
-  }
-
-  function createDisplayExamplesTable(tableToDisplay: Flashcard[]) {
-    const sortedExamples = tableToDisplay.sort((a, b) => {
+  const sortedExamples = useMemo(() => {
+    const sortFunction = (a: Flashcard, b: Flashcard) => {
       const aStudentExample = getStudentExampleFromExampleId(a?.recordId);
       const bStudentExample = getStudentExampleFromExampleId(b?.recordId);
       const aDate = new Date(aStudentExample.dateCreated);
@@ -53,52 +52,25 @@ function FlashcardManager() {
       } else {
         return 0;
       }
-    });
+    };
+    return studentFlashcardData?.examples.sort(sortFunction);
+  }, [
+    studentFlashcardData?.examples,
+    exampleIsCustom,
+    getStudentExampleFromExampleId,
+  ]);
 
-    const finalTable = sortedExamples.map((item) => (
-      <div
-        className="exampleCard"
-        aria-label="flashcard-list-item"
-        key={item.recordId}
-      >
-        <div className="exampleCardSpanishText">
-          {formatSpanishText(item.spanglish, item.spanishExample)}
-        </div>
-        <div className="exampleCardEnglishText">
-          {formatEnglishText(item.englishTranslation)}
-        </div>
-        {item.spanglish === 'spanglish' && (
-          <div className="spanglishLabel">
-            <h4>Spanglish</h4>
-          </div>
-        )}
-        {item.spanglish !== 'spanglish' && (
-          <div className="spanishLabel">
-            <h4>Spanish</h4>
-          </div>
-        )}
-        {getStudentExampleFromExampleId(item.recordId)?.coachAdded ? (
-          <div className="label customLabel">
-            <h4>Custom</h4>
-          </div>
-        ) : (
-          <button
-            type="button"
-            className="redButton"
-            value={item.recordId}
-            onClick={(e) =>
-              removeAndUpdate(
-                Number.parseInt((e.target as HTMLButtonElement).value),
-              )
-            }
-          >
-            Remove
-          </button>
-        )}
-      </div>
-    ));
-    return finalTable;
-  }
+  const displayOrder = useMemo(() => {
+    if (!sortedExamples) {
+      return [];
+    }
+    const newDisplayOrder: DisplayOrder[] = sortedExamples.map((example) => {
+      return {
+        recordId: example.recordId,
+      };
+    });
+    return newDisplayOrder;
+  }, [sortedExamples]);
 
   return (
     <>
@@ -114,13 +86,13 @@ function FlashcardManager() {
         !!flashcardDataQuery.data?.examples?.length && (
           <div>
             <h2>Flashcard Manager</h2>
-            <h4>
-              {`Total flashcards: ${studentFlashcardData?.examples.length}`}
-            </h4>
             {studentFlashcardData?.examples && (
-              <div className="exampleCardContainer">
-                {createDisplayExamplesTable(studentFlashcardData?.examples)}
-              </div>
+              <ExamplesTable
+                dataSource={studentFlashcardData.examples}
+                displayOrder={displayOrder}
+                showSpanglishLabel
+                sorted
+              />
             )}
           </div>
         )}

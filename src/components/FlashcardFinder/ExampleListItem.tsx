@@ -4,26 +4,35 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
+import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
 
 interface FormatExampleForTableProps {
   data: Flashcard;
-  addFlashcard: (recordId: string) => void;
-  removeFlashcard: (recordId: string) => void;
-  isStudent: boolean;
-  isCollected: boolean;
-  isPending: boolean;
-  isCustom: boolean;
+  showSpanglishLabel?: boolean;
 }
 
 const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
   data,
-  addFlashcard,
-  removeFlashcard,
-  isStudent,
-  isCollected,
-  isPending,
-  isCustom,
+  showSpanglishLabel = false,
 }: FormatExampleForTableProps) => {
+  const { activeStudentQuery } = useActiveStudent();
+  const {
+    flashcardDataQuery,
+    addFlashcardMutation,
+    removeFlashcardMutation,
+    exampleIsCollected,
+    exampleIsPending,
+    exampleIsCustom,
+  } = useStudentFlashcards();
+
+  const dataReady =
+    flashcardDataQuery.isSuccess && activeStudentQuery.isSuccess;
+
+  const isStudent = activeStudentQuery.data?.role === 'student';
+  const isCollected = exampleIsCollected(data.recordId);
+  const isPending = exampleIsPending(data.recordId);
+  const isCustom = exampleIsCustom(data.recordId);
   return (
     <div className="exampleCard" key={data.recordId}>
       <div className="exampleCardSpanishText">
@@ -32,14 +41,24 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
       <div className="exampleCardEnglishText">
         {formatEnglishText(data.englishTranslation)}
       </div>
-      {isStudent && (
+      {showSpanglishLabel && data.spanglish === 'spanglish' && (
+        <div className="spanglishLabel">
+          <h4>Spanglish</h4>
+        </div>
+      )}
+      {showSpanglishLabel && data.spanglish !== 'spanglish' && (
+        <div className="spanishLabel">
+          <h4>Spanish</h4>
+        </div>
+      )}
+      {dataReady && isStudent && (
         <>
           {!isCollected && (
             <button
               type="button"
               className="addButton"
               value={data.recordId}
-              onClick={(e) => addFlashcard(e.currentTarget.value)}
+              onClick={() => addFlashcardMutation.mutate(data)}
             >
               Add
             </button>
@@ -47,7 +66,7 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
           {isCollected && isPending && (
             <button
               type="button"
-              className="pendingButton"
+              className="disabledButton"
               value={data.recordId}
             >
               Adding...
@@ -58,7 +77,7 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
               type="button"
               className="removeButton"
               value={data.recordId}
-              onClick={(e) => removeFlashcard(e.currentTarget.value)}
+              onClick={() => removeFlashcardMutation.mutate(data.recordId)}
             >
               Remove
             </button>
