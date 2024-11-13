@@ -41,8 +41,15 @@ export default function Filter({
 
         for (let i = 0; i < tagTable.length; i++) {
           const tagLowercase = tagTable[i].tag.toLowerCase();
-          if (tagLowercase.includes(searchTerm)) {
-            if (tagLowercase === searchTerm) {
+          const descriptorLowercase = tagTable[i].vocabDescriptor;
+          if (
+            tagLowercase.includes(searchTerm) ||
+            descriptorLowercase?.includes(searchTerm)
+          ) {
+            if (
+              tagLowercase === searchTerm ||
+              descriptorLowercase === searchTerm
+            ) {
               filteredTags.unshift(tagTable[i]);
             } else {
               filteredTags.push(tagTable[i]);
