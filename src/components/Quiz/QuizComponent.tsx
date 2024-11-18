@@ -6,6 +6,7 @@ import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
+import PMFPopup from '../PMFPopup/PMFPopup';
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -59,6 +60,8 @@ export default function QuizComponent({
   const spanishShowing = startWithSpanish !== answerShowing;
 
   const isMainLocation = location.pathname.split('/').length < 2;
+
+  const [displayPopup, setDisplayPopup] = useState(true);
 
   function hideAnswer() {
     setAnswerShowing(false);
@@ -337,6 +340,7 @@ export default function QuizComponent({
 
   return (
     <>
+      {displayPopup && <PMFPopup closePopup={() => setDisplayPopup(false)} />}
       {displayOrderReady &&
         !!initialDisplayOrder.current.length &&
         !displayOrder.length && <Navigate to=".." />}
