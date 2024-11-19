@@ -227,6 +227,28 @@ export function useBackend() {
     [deleteFactory],
   );
 
+  const getPMFDataForUser = useCallback(
+    (userId: number): Promise<string> => {
+      return getFactory<string>(`pmf/${userId}`);
+    },
+    [getFactory],
+  );
+  const createPMFDataForUser = useCallback(
+    (userId: number): Promise<string> => {
+      return postFactory<string>('pmf/create', { userid: userId });
+    },
+    [postFactory],
+  );
+  const updatePMFDataForUser = useCallback(
+    (userId: number, recordId: number): Promise<string> => {
+      return postFactory<string>('pmf/update', {
+        userid: userId,
+        recordid: recordId,
+      });
+    },
+    [postFactory],
+  );
+
   return {
     getAccessToken,
     getProgramsFromBackend,
@@ -254,5 +276,8 @@ export function useBackend() {
     updateStudentExample,
     deleteMyStudentExample,
     deleteStudentExample,
+    getPMFDataForUser,
+    createPMFDataForUser,
+    updatePMFDataForUser,
   };
 }

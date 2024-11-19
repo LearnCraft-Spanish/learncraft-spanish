@@ -7,6 +7,7 @@ import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
 import PMFPopup from '../PMFPopup/PMFPopup';
+import { usePMFData } from '../../hooks/usePMFData'; // PMFPopup
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -37,6 +38,8 @@ export default function QuizComponent({
   const { activeStudentQuery } = useActiveStudent();
   const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
     useStudentFlashcards();
+
+  const { canShowPMF } = usePMFData();
 
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
   const initialDisplayOrder = useRef<DisplayOrder[]>([]);
@@ -340,7 +343,13 @@ export default function QuizComponent({
 
   return (
     <>
-      {displayPopup && <PMFPopup closePopup={() => setDisplayPopup(false)} />}
+      {canShowPMF && (
+        <PMFPopup
+          showPopup={
+            Math.floor(displayOrder.length / 2) === currentExampleNumber
+          }
+        />
+      )}
       {displayOrderReady &&
         !!initialDisplayOrder.current.length &&
         !displayOrder.length && <Navigate to=".." />}
