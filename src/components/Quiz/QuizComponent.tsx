@@ -6,6 +6,7 @@ import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
+import PMFPopup from '../PMFPopup/PMFPopup';
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -337,6 +338,11 @@ export default function QuizComponent({
 
   return (
     <>
+      <PMFPopup
+        timeToShowPopup={
+          Math.floor(displayOrder.length / 2) === currentExampleNumber
+        }
+      />
       {displayOrderReady &&
         !!initialDisplayOrder.current.length &&
         !displayOrder.length && <Navigate to=".." />}
