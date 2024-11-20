@@ -16,14 +16,13 @@ export default function PMFPopup({
   const [closePopup, setClosePopup] = React.useState(false);
 
   function handlePopupClose() {
-    setClosePopup(true);
     createOrUpdatePMFData();
+    setClosePopup(true);
   }
   function handleSubmit() {
-    setClosePopup(true);
-    // open google in a new tab
-    window.open('https://google.com', '_blank');
     createOrUpdatePMFData();
+    setClosePopup(true);
+    window.open('https://learncraft.typeform.com/to/kaI5Wwlx', '_blank');
   }
 
   return (

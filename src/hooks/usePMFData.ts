@@ -51,17 +51,18 @@ export function usePMFData() {
 
       const date = new Date().toISOString();
       const storedDate = pmfDataQuery.data.lastContactDate; // Stored date will be in ISOString format
-      // const exampleDate = '2024-11-01T00:00:00.000Z';
       const storedDateInDays = Math.floor(Date.parse(storedDate) / 86400000);
       const currentDateInDays = Math.floor(Date.parse(date) / 86400000);
 
       const diff = currentDateInDays - storedDateInDays;
       if (diff <= intervalInDays) {
+        // Too soon to show the PMF
         return false;
       }
     }
     // calcualte if we should show the PMF via random number
     const randomNumber = Math.floor(Math.random() * 200) + 1;
+    // const randomNumber = 1; // for testing
     if (randomNumber === 1) {
       return true;
     }
