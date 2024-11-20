@@ -29,9 +29,7 @@ export function usePMFData() {
     if (userData) {
       if (!pmfDataQuery.data) {
         const result = await createPMFDataForUser(userData.recordId);
-        console.log(result);
         if (result === 1) {
-          console.log('PMF data created');
           pmfDataQuery.refetch();
         }
       } else {
@@ -40,12 +38,11 @@ export function usePMFData() {
           recordId: pmfDataQuery.data.recordId,
         });
         if (result === 1) {
-          console.log('PMF data updated');
           pmfDataQuery.refetch();
         }
       }
     }
-  }, [userData, pmfDataQuery.data, createPMFDataForUser, updatePMFDataForUser]);
+  }, [userData, pmfDataQuery, createPMFDataForUser, updatePMFDataForUser]);
 
   const canShowPMF = useMemo(() => {
     // Check if the last contact date is within 60 days
@@ -64,8 +61,8 @@ export function usePMFData() {
       }
     }
     // calcualte if we should show the PMF via random number
-    // const randomNumber = Math.floor(Math.random() * 200) + 1;
-    if (1 === 1) {
+    const randomNumber = Math.floor(Math.random() * 200) + 1;
+    if (randomNumber === 1) {
       return true;
     }
     return false;

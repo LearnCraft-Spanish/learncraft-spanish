@@ -16,14 +16,14 @@ export default function PMFPopup({
   const [closePopup, setClosePopup] = React.useState(false);
 
   function handlePopupClose() {
-    createOrUpdatePMFData();
-    console.log('Popup closed');
     setClosePopup(true);
+    createOrUpdatePMFData();
   }
   function handleSubmit() {
-    createOrUpdatePMFData();
-    console.log('Survey submitted!, data created');
     setClosePopup(true);
+    // open google in a new tab
+    window.open('https://google.com', '_blank');
+    createOrUpdatePMFData();
   }
 
   return (

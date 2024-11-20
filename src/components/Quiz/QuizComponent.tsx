@@ -7,7 +7,6 @@ import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
 import PMFPopup from '../PMFPopup/PMFPopup';
-import { usePMFData } from '../../hooks/usePMFData'; // PMFPopup
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';

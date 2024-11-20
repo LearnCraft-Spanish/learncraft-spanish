@@ -161,4 +161,17 @@ export const handlers = [
     }
     return HttpResponse.json('1');
   }),
+
+  // TEMPORARY routes to silence warnings in console.
+  // I will update these to be proper routes for testing
+  // As I add testing to PMF data
+  http.get(`${backendUrl}pmf/:studentId`, async () => {
+    return HttpResponse.json('');
+  }),
+  http.post(`${backendUrl}pmf/create/`, async () => {
+    return HttpResponse.json(1);
+  }),
+  http.post(`${backendUrl}pmf/update/`, async () => {
+    return HttpResponse.json(1);
+  }),
 ];
