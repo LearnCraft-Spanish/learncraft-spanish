@@ -228,25 +228,72 @@ export function useBackend() {
   );
 
   const getPMFDataForUser = useCallback(
-    (userId: number): Promise<string> => {
-      return getFactory<string>(`pmf/${userId}`);
+    (userId: number): Promise<types.PMFData> => {
+      return getFactory(`pmf/${userId}`);
     },
     [getFactory],
   );
-  const createPMFDataForUser = useCallback(
-    (userId: number): Promise<string> => {
-      return postFactory<string>('pmf/create', { userid: userId });
+
+  // We are going to want to update THIS FILE to send data via body of requests instead of headers
+  // (see current post factory)
+  // I have created an updated post factory just for these new routes so that this merge only concerns itself
+  // with the PMFData changes
+  interface PostFactoryOptions {
+    path: string;
+    headers?: Record<string, any>;
+    body?: Record<string, any>;
+  }
+  const newPostFactory = useCallback(
+    async <T>({
+      path,
+      headers = [],
+      body = [],
+    }: PostFactoryOptions): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(`Error parsing JSON from ${path}:`, error);
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to post to ${path}: ${response.statusText}`);
+        throw new Error(`Failed to post to ${path}`);
+      }
     },
-    [postFactory],
+    [getAccessToken, backendUrl],
+  );
+  const createPMFDataForUser = useCallback(
+    (studentId: number): Promise<number> => {
+      return newPostFactory({ path: 'pmf/create', body: { studentId } });
+    },
+    [newPostFactory],
   );
   const updatePMFDataForUser = useCallback(
-    (userId: number, recordId: number): Promise<string> => {
-      return postFactory<string>('pmf/update', {
-        userid: userId,
-        recordid: recordId,
+    ({
+      studentId,
+      recordId,
+    }: {
+      studentId: number;
+      recordId: number;
+    }): Promise<number> => {
+      return newPostFactory({
+        path: 'pmf/update',
+        body: {
+          studentId,
+          recordId,
+        },
       });
     },
-    [postFactory],
+    [newPostFactory],
   );
 
   return {

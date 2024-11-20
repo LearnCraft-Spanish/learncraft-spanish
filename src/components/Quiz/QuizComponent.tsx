@@ -39,8 +39,6 @@ export default function QuizComponent({
   const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
     useStudentFlashcards();
 
-  const { canShowPMF } = usePMFData();
-
   // Orders the examples from the quiz-examples set, examples refer to the data itself.
   const initialDisplayOrder = useRef<DisplayOrder[]>([]);
   const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]);
@@ -63,8 +61,6 @@ export default function QuizComponent({
   const spanishShowing = startWithSpanish !== answerShowing;
 
   const isMainLocation = location.pathname.split('/').length < 2;
-
-  const [displayPopup, setDisplayPopup] = useState(true);
 
   function hideAnswer() {
     setAnswerShowing(false);
@@ -343,13 +339,11 @@ export default function QuizComponent({
 
   return (
     <>
-      {canShowPMF && (
-        <PMFPopup
-          showPopup={
-            Math.floor(displayOrder.length / 2) === currentExampleNumber
-          }
-        />
-      )}
+      <PMFPopup
+        timeToShowPopup={
+          Math.floor(displayOrder.length / 2) === currentExampleNumber
+        }
+      />
       {displayOrderReady &&
         !!initialDisplayOrder.current.length &&
         !displayOrder.length && <Navigate to=".." />}

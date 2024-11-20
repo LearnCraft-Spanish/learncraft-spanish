@@ -3,27 +3,33 @@ import './PMFPopup.css';
 import closeIcon from '../../resources/icons/x.svg';
 
 import { usePMFData } from '../../hooks/usePMFData';
+import { useBackend } from '../../hooks/useBackend';
 
 interface PMFPopupProps {
-  showPopup: boolean;
+  timeToShowPopup: boolean;
 }
 
 export default function PMFPopup({
-  showPopup,
+  timeToShowPopup,
 }: PMFPopupProps): JSX.Element | false {
-  const { canShowPMF, createPMFData } = usePMFData();
+  const { canShowPMF, createOrUpdatePMFData } = usePMFData();
+  const [closePopup, setClosePopup] = React.useState(false);
 
   function handlePopupClose() {
-    createPMFData();
+    createOrUpdatePMFData();
     console.log('Popup closed');
+    setClosePopup(true);
   }
   function handleSubmit() {
-    createPMFData();
+    createOrUpdatePMFData();
     console.log('Survey submitted!, data created');
+    setClosePopup(true);
   }
+
   return (
+    !closePopup &&
     canShowPMF &&
-    showPopup && (
+    timeToShowPopup && (
       <div className="popup">
         <div className="inner">
           <div className="iconWrapper">

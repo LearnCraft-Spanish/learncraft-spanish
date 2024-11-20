@@ -197,3 +197,9 @@ export type mockUserNames =
   | 'student-ser-estar'
   | null
   | undefined;
+
+export interface PMFData {
+  recordId: number;
+  relatedStudent: number;
+  lastContactDate: string;
+}
