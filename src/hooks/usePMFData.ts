@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react'; // Adjust the import based on your project structure
 import { useBackend } from '../hooks/useBackend';
-import type { PMFData } from '../interfaceDefinitions';
 import { useUserData } from './useUserData';
 // import useAuth from '../hooks/useAuth';
 

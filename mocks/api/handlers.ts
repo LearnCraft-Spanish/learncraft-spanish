@@ -3,7 +3,7 @@ import { HttpResponse, http } from 'msw';
 import newData from '../data/serverlike/serverlikeData';
 
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
-
+import { getUserDataFromName } from '../data/serverlike/studentTable';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
@@ -165,13 +165,26 @@ export const handlers = [
   // TEMPORARY routes to silence warnings in console.
   // I will update these to be proper routes for testing
   // As I add testing to PMF data
-  http.get(`${backendUrl}pmf/:studentId`, async () => {
+  http.get(`${backendUrl}pmf/:studentId`, async ({ params }) => {
+    const param = params.studentId as string;
+    const studentId = Number.parseInt(param);
+    if (getUserDataFromName('student-lcsp')?.recordId === studentId) {
+      return HttpResponse.json({
+        lastContactDate: new Date().toISOString(),
+      });
+    } else if (
+      getUserDataFromName('student-ser-estar')?.recordId === studentId
+    ) {
+      return HttpResponse.json({
+        lastContactDate: new Date(Date.now() - 7776000000).toISOString(),
+      });
+    }
     return HttpResponse.json('');
   }),
-  http.post(`${backendUrl}pmf/create/`, async () => {
+  http.post(`${backendUrl}pmf/create`, async () => {
     return HttpResponse.json(1);
   }),
-  http.post(`${backendUrl}pmf/update/`, async () => {
+  http.post(`${backendUrl}pmf/update`, async () => {
     return HttpResponse.json(1);
   }),
 ];
