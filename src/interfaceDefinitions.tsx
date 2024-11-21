@@ -53,11 +53,16 @@ export interface Flashcard {
   englishTranslation: string;
   spanglish: string;
   vocabIncluded: Array<string>;
-  allStudents?: Array<string>;
   englishAudio: string;
   spanishAudioLa: string;
   vocabComplete: boolean;
   difficulty?: string;
+}
+
+export interface NewFlashcard
+  extends Omit<Flashcard, 'recordId' | 'vocabIncluded'> {
+  recordId?: never;
+  vocabIncluded?: never;
 }
 
 export interface StudentExample {
