@@ -16,11 +16,11 @@ export default function PMFPopup({
   const [closePopup, setClosePopup] = React.useState(false);
 
   function handlePopupClose() {
-    createOrUpdatePMFData();
+    createOrUpdatePMFData({ hasTakenSurvey: false });
     setClosePopup(true);
   }
   function handleSubmit() {
-    createOrUpdatePMFData();
+    createOrUpdatePMFData({ hasTakenSurvey: true });
     setClosePopup(true);
     window.open('https://learncraft.typeform.com/to/kaI5Wwlx', '_blank');
   }

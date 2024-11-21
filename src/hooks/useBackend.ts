@@ -272,8 +272,11 @@ export function useBackend() {
     [getAccessToken, backendUrl],
   );
   const createPMFDataForUser = useCallback(
-    (studentId: number): Promise<number> => {
-      return newPostFactory({ path: 'pmf/create', body: { studentId } });
+    (studentId: number, hasTakenSurvey: boolean): Promise<number> => {
+      return newPostFactory({
+        path: 'pmf/create',
+        body: { studentId, hasTakenSurvey },
+      });
     },
     [newPostFactory],
   );
@@ -281,15 +284,18 @@ export function useBackend() {
     ({
       studentId,
       recordId,
+      hasTakenSurvey,
     }: {
       studentId: number;
       recordId: number;
+      hasTakenSurvey: boolean;
     }): Promise<number> => {
       return newPostFactory({
         path: 'pmf/update',
         body: {
           studentId,
           recordId,
+          hasTakenSurvey,
         },
       });
     },

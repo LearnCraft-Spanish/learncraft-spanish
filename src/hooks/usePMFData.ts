@@ -25,24 +25,34 @@ export function usePMFData() {
     enabled: !!userData,
   });
 
-  const createOrUpdatePMFData = useCallback(async () => {
-    if (userData) {
-      if (!pmfDataQuery.data) {
-        const result = await createPMFDataForUser(userData.recordId);
-        if (result === 1) {
-          pmfDataQuery.refetch();
-        }
-      } else {
-        const result = await updatePMFDataForUser({
-          studentId: userData.recordId,
-          recordId: pmfDataQuery.data.recordId,
-        });
-        if (result === 1) {
-          pmfDataQuery.refetch();
+  interface CreateOrUpdatePMFData {
+    hasTakenSurvey: boolean;
+  }
+  const createOrUpdatePMFData = useCallback(
+    async ({ hasTakenSurvey }: CreateOrUpdatePMFData) => {
+      if (userData) {
+        if (!pmfDataQuery.data) {
+          const result = await createPMFDataForUser(
+            userData.recordId,
+            hasTakenSurvey,
+          );
+          if (result === 1) {
+            pmfDataQuery.refetch();
+          }
+        } else {
+          const result = await updatePMFDataForUser({
+            studentId: userData.recordId,
+            recordId: pmfDataQuery.data.recordId,
+            hasTakenSurvey,
+          });
+          if (result === 1) {
+            pmfDataQuery.refetch();
+          }
         }
       }
-    }
-  }, [userData, pmfDataQuery, createPMFDataForUser, updatePMFDataForUser]);
+    },
+    [userData, pmfDataQuery, createPMFDataForUser, updatePMFDataForUser],
+  );
 
   const canShowPMF = useMemo(() => {
     // Check if the last contact date is within 60 days
@@ -61,7 +71,7 @@ export function usePMFData() {
       }
     }
     // calcualte if we should show the PMF via random number
-    const randomNumber = Math.floor(Math.random() * 200) + 1;
+    const randomNumber = Math.floor(Math.random() * 30) + 1;
     // const randomNumber = 1; // for testing
     if (randomNumber === 1) {
       return true;
