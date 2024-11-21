@@ -310,7 +310,6 @@ export function useBackend() {
 
   const createUnverifiedExample = useCallback(
     (example: types.NewFlashcard): Promise<number> => {
-      console.log('backend request:', example);
       return newPostFactory<number>({
         path: 'add-unverified-example',
         body: {
