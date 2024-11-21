@@ -3,7 +3,6 @@ import './PMFPopup.css';
 import closeIcon from '../../resources/icons/x.svg';
 
 import { usePMFData } from '../../hooks/usePMFData';
-import { useBackend } from '../../hooks/useBackend';
 
 interface PMFPopupProps {
   timeToShowPopup: boolean;
@@ -40,7 +39,7 @@ export default function PMFPopup({
             />
           </div>
           <h1>Enjoying our software?</h1>
-          <p>Answering our one question survey will help us improve!</p>
+          <p>Answering a quick survey will help us improve!</p>
           <p>Go take the survey now?</p>
           <div className="buttonBox">
             <button type="button" id="closeButton" onClick={handlePopupClose}>
