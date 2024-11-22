@@ -10,6 +10,7 @@ import { useFlashcardFilter } from '../../hooks/useFlashcardFilter';
 import MenuButton from '../Buttons/MenuButton';
 import LinkWithQuery from '../LinkWithQuery';
 import NavigateWithQuery from '../NavigateWithQuery';
+import PMFPopup from '../PMFPopup/PMFPopup';
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -366,6 +367,11 @@ export default function QuizComponent({
 
   return (
     <>
+      <PMFPopup
+        timeToShowPopup={
+          Math.floor(displayOrder.length / 2) === currentExampleNumber
+        }
+      />
       {displayOrderReady &&
         !!initialDisplayOrder.current.length &&
         !displayOrder.length && <NavigateWithQuery to=".." />}

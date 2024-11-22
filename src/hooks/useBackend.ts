@@ -227,6 +227,81 @@ export function useBackend() {
     [deleteFactory],
   );
 
+  const getPMFDataForUser = useCallback(
+    (userId: number): Promise<types.PMFData> => {
+      return getFactory(`pmf/${userId}`);
+    },
+    [getFactory],
+  );
+
+  // We are going to want to update THIS FILE to send data via body of requests instead of headers
+  // (see current post factory)
+  // I have created an updated post factory just for these new routes so that this merge only concerns itself
+  // with the PMFData changes
+  interface PostFactoryOptions {
+    path: string;
+    headers?: Record<string, any>;
+    body?: Record<string, any>;
+  }
+  const newPostFactory = useCallback(
+    async <T>({
+      path,
+      headers = [],
+      body = [],
+    }: PostFactoryOptions): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(`Error parsing JSON from ${path}:`, error);
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to post to ${path}: ${response.statusText}`);
+        throw new Error(`Failed to post to ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+  const createPMFDataForUser = useCallback(
+    (studentId: number, hasTakenSurvey: boolean): Promise<number> => {
+      return newPostFactory({
+        path: 'pmf/create',
+        body: { studentId, hasTakenSurvey },
+      });
+    },
+    [newPostFactory],
+  );
+  const updatePMFDataForUser = useCallback(
+    ({
+      studentId,
+      recordId,
+      hasTakenSurvey,
+    }: {
+      studentId: number;
+      recordId: number;
+      hasTakenSurvey: boolean;
+    }): Promise<number> => {
+      return newPostFactory({
+        path: 'pmf/update',
+        body: {
+          studentId,
+          recordId,
+          hasTakenSurvey,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   return {
     getAccessToken,
     getProgramsFromBackend,
@@ -254,5 +329,8 @@ export function useBackend() {
     updateStudentExample,
     deleteMyStudentExample,
     deleteStudentExample,
+    getPMFDataForUser,
+    createPMFDataForUser,
+    updatePMFDataForUser,
   };
 }

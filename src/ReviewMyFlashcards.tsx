@@ -10,10 +10,12 @@ import { useActiveStudent } from './hooks/useActiveStudent';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 import useNavigatePreserveQuery from './hooks/useNavigatePreserveQuery';
 import NavigateWithQuery from './components/NavigateWithQuery';
+import { usePMFData } from './hooks/usePMFData';
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
   const { activeStudentQuery } = useActiveStudent();
+  const { pmfDataQuery } = usePMFData();
   const [isSrs, setIsSrs] = useState<boolean>(false);
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false);
   const [customOnly, setCustomOnly] = useState<boolean>(false);
@@ -30,7 +32,9 @@ export default function MyFlashcardsQuiz() {
   const dataLoading =
     !dataReady &&
     !dataError &&
-    (activeStudentQuery.isLoading || flashcardDataQuery.isLoading);
+    (activeStudentQuery.isLoading ||
+      flashcardDataQuery.isLoading ||
+      pmfDataQuery.isLoading);
   const unavailable =
     (activeStudentQuery.isSuccess &&
       !(activeStudentQuery.data?.role === 'student')) ||

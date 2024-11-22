@@ -48,7 +48,9 @@ async function getKnownExample() {
     expect(result.current.flashcardDataQuery.isSuccess).toBe(true),
   );
   const knownExample = verifiedExamplesTable.find(
-    (example) => result.current.exampleIsCollected(example.recordId) === true,
+    (example) =>
+      result.current.exampleIsCollected(example.recordId) === true &&
+      !result.current.exampleIsCustom(example.recordId),
   );
   if (!knownExample) {
     throw new Error('No known examples found');
