@@ -1357,13 +1357,3 @@ i {
   max-width: 640px;
   margin: auto;
 }
-
-.exampleCardWrapper {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-}
-
-.exampleCardWrapper .audioPlayPauseButton {
-  position: relative;
-}
