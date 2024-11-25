@@ -91,7 +91,7 @@ export default function FromToLessonSelector(): JSX.Element {
           {makeCourseSelector()}
         </select>
       </label>
-      <div id="flashcardFinderStyling">
+      <div>
         {selectedProgram?.lessons && (
           <label htmlFor="fromLesson" className="menuRow" id="fromRow">
             <p>From:</p>
@@ -99,7 +99,6 @@ export default function FromToLessonSelector(): JSX.Element {
             <select
               id="fromLesson"
               name="fromLesson"
-              className="lessonList"
               value={selectedFromLesson?.recordId}
               onChange={(e) => setFromLesson(e.target.value)}
             >

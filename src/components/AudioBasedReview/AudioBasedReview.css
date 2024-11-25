@@ -133,15 +133,6 @@ button:disabled {
 }
 
 /* AudioQuizSetupMenu */
-.menuRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
 .audioQuizSetupMenu {
   max-width: 400px;
   width: 80vw;
@@ -152,6 +143,15 @@ button:disabled {
 .audioQuizSetupMenu div.form {
   max-width: 320px;
   width: 90%;
+}
+
+.menuRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  width: 100%;
 }
 .audioQuizSetupMenu .buttonBox {
   display: flex;
