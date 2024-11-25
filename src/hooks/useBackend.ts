@@ -102,6 +102,13 @@ export function useBackend() {
     return getFactory<types.Flashcard[]>('unverified-examples');
   }, [getFactory]);
 
+  const getSingleExample = useCallback(
+    (exampleId: number): Promise<types.Flashcard> => {
+      return getFactory<types.Flashcard>(`single-example/${exampleId}`);
+    },
+    [getFactory],
+  );
+
   /*      Coaching API      */
 
   const getCoachList = useCallback((): Promise<types.Coach[]> => {
@@ -334,6 +341,7 @@ export function useBackend() {
     getQuizExamplesFromBackend,
     getAllUsersFromBackend,
     getUnverifiedExamplesFromBackend,
+    getSingleExample,
     getUserDataFromBackend,
     getActiveExamplesFromBackend,
     getCoachList,
