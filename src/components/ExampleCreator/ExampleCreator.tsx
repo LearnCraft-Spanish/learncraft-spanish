@@ -67,20 +67,6 @@ export default function ExampleCreator() {
     <div>
       <h2>Example Creator</h2>
       <div id="exampleCreator">
-        <div id="examplePreview">
-          <h3>Example Preview</h3>
-          <div className="exampleCard">
-            <div className="exampleCardSpanishText">
-              {formatSpanishText(spanglish, spanishExample)}
-              <AudioControl audioLink={spanishAudioLa} />
-            </div>
-            {/* {spanglish === 'spanglish' && <p>Spanglish Detected</p>} */}
-            <div className="exampleCardEnglishText">
-              {formatEnglishText(englishTranslation)}
-              <AudioControl audioLink={englishAudio} />
-            </div>
-          </div>
-        </div>
         <form id="exampleForm" onSubmit={(e) => handleAddExample(e)}>
           <h3>Create Example</h3>
           <div>
@@ -135,6 +121,23 @@ export default function ExampleCreator() {
           </div>
           <button type="submit">Save Example</button>
         </form>
+        <div id="examplePreview">
+          <h3>Example Preview</h3>
+          <div>
+            <h4>Spanish Example:</h4>
+            <div className="previewCard">
+              {formatSpanishText(spanglish, spanishExample)}
+              <AudioControl audioLink={spanishAudioLa} />
+            </div>
+          </div>
+          <div>
+            <h4>English Example:</h4>
+            <div className="previewCard">
+              {formatEnglishText(englishTranslation)}
+              <AudioControl audioLink={englishAudio} />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="newExamples">

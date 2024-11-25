@@ -1,8 +1,8 @@
 #exampleCreator {
   display: flex;
-  flex-direction: row-reverse;
-  /* justify-content: space-around; */
+  flex-direction: row;
 }
+
 #examplePreview,
 #exampleForm {
   width: 50%;
@@ -11,47 +11,50 @@
   margin: 10px 0;
 }
 
-/* ********* Example Creation Preview ********* */
-#examplePreview .exampleCard {
-  display: flex;
-  flex-direction: column;
-  /* margin: 10px; */
-}
-#examplePreview .exampleCard > div {
+/* ********* Example Preview ********* */
+
+.previewCard {
   position: relative;
   display: flex;
   width: auto;
   flex-direction: row;
   justify-content: space-between;
-  /* margin: 4px; */
+  border: 2px solid var(--accent);
+  background: var(--light);
+  padding: 4px 16px;
+  margin: 5px 30px;
 }
-#examplePreview .exampleCard > div .audioPlayPauseButton {
-  /* Needed to center audio play/pause button */
+/* Needed to center audio play/pause button */
+.previewCard .audioPlayPauseButton {
   position: relative;
+}
+/* Example Labels */
+#examplePreview h4 {
+  text-align: left;
+}
+
+@media screen and (max-width: 834px) {
+  #exampleCreator {
+    flex-direction: column;
+  }
+  #examplePreview,
+  #exampleForm {
+    width: 100%;
+  }
 }
 
 /* ********* Example Creation Form ********* */
 
-#exampleForm {
-  /* width: 50%; */
-  /* display: flex;
-  flex-direction: column; */
-  /* margin: 0 auto; */
-  /* justify-content: space-between; */
-}
+/* Form inputs separated into 2 parent divs
+so we can do col/row later on smaller screens */
 #exampleForm > div {
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
-  /* margin: 10px 10%; */
-  /* justify-content: space-around; */
-  /* margin: auto; */
   margin: 10px 10%;
 }
 .inputWrapper {
   display: flex;
   flex-direction: column;
-  /* margin: 0 10px; */
 }
 
 .styledInput {
@@ -59,13 +62,13 @@
   border-radius: 3px;
   font-size: 14px;
   padding: 4px 8px;
-  /* width: 80%; */
 }
 .required::after {
   content: ' *';
   color: red;
 }
 
+/* Temporary button styling, should be updated later */
 #exampleForm button {
   width: 33%;
   margin: 10px auto;
