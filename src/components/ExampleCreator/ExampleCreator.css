@@ -1,0 +1,66 @@
+.required::after {
+  content: ' *';
+  color: red;
+}
+
+.formWrapper {
+  /* width: 50%; */
+  display: flex;
+  flex-direction: column;
+  /* margin: 0 auto; */
+  /* justify-content: space-between; */
+}
+.formWrapper div {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  /* margin: 10px 10%; */
+  /* justify-content: space-around; */
+  margin: auto;
+}
+.formWrapper div div {
+  display: flex;
+  flex-direction: column;
+  /* margin: 0 10px; */
+}
+.styledInput {
+  border-color: rgb(181, 183, 185);
+  border-radius: 3px;
+  font-size: 14px;
+  /* color: rgb(51, 51, 51); */
+  padding: 4px 8px;
+  /* margin: 0px 10px; */
+}
+
+#exampleCreator {
+  display: flex;
+  flex-direction: row-reverse;
+  /* justify-content: space-around; */
+}
+#exampleCreator > div {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0;
+}
+
+/* ********* Example Creation Preview ********* */
+.exampleCard {
+  display: flex;
+  flex-direction: column;
+  /* margin: 10px; */
+}
+.exampleCard > div {
+  position: relative;
+  display: flex;
+  width: auto;
+  flex-direction: row;
+  justify-content: space-between;
+  /* margin: 4px; */
+}
+.exampleCard > div .audioPlayPauseButton {
+  /* Needed to center audio play/pause button */
+  position: relative;
+}
+
+/* ********* Example Creation Form ********* */
