@@ -186,32 +186,6 @@
 
 }
 
-.addFlashcardButton {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: fit-content;
-  background-color: darkgreen;
-  font-size: 10px;
-  padding: 5px 10px;
-  margin: 0 auto;
-}
-
-.removeFlashcardButton {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: fit-content;
-  background-color: darkred;
-  font-size: 10px;
-  padding: 5px 10px;
-  margin: 0 auto;
-}
-
-.addFlashcardButton:hover, .removeFlashcardButton:hover {
-  background-color: var(--dark);
-}
-
 .buttons {
   max-width: 640px;
   width: 50%;
