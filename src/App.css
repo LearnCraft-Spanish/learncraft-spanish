@@ -1162,7 +1162,7 @@ button:hover,
 }
 
 .myFlashcardsFormContentWrapper > label,
-.myFlashcardsFormContentWrapper > div {
+.myFlashcardsFormContentWrapper > div > div {
   /* align on right side of parent */
 
   display: flex;
