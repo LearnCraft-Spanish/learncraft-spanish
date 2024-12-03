@@ -508,6 +508,10 @@ export default function AudioBasedReview({
               pausePlayback={pausePlayback}
               resumePlayback={resumePlayback}
               isPlaying={isPlaying}
+              currentExample={currentExample}
+              incrementExample={incrementExample}
+              isStudent={activeStudentQuery.data?.role === 'student'}
+              currentStep={currentStep}
             />
             {audioElement()}
           </div>

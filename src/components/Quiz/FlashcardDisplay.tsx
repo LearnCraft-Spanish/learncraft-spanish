@@ -6,8 +6,7 @@ import {
 } from '../../functions/formatFlashcardText';
 import play from '../../resources/icons/play_dark.svg';
 import pause from '../../resources/icons/pause_dark.svg';
-
-import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import AddToMyFlashcardsButtons from './AddToMyFlashcardsButtons';
 import './Quiz.css';
 
 interface FlashcardProps {
@@ -35,27 +34,8 @@ export default function FlashcardDisplay({
   startWithSpanish = false,
   toggleAnswer,
 }: FlashcardProps): JSX.Element {
-  const {
-    addFlashcardMutation,
-    removeFlashcardMutation,
-    exampleIsCollected,
-    exampleIsCustom,
-    exampleIsPending,
-  } = useStudentFlashcards();
-  const addFlashcard = addFlashcardMutation.mutate;
-  const removeFlashcard = removeFlashcardMutation.mutate;
   const spanishText = example.spanishExample;
   const englishText = example.englishTranslation;
-
-  function addAndAdvance(example: Flashcard) {
-    addFlashcard(example);
-    incrementExampleNumber();
-  }
-
-  function removeAndAdvance(recordId: number) {
-    removeFlashcard(recordId);
-    onRemove();
-  }
 
   function handlePlayPause(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -79,34 +59,13 @@ export default function FlashcardDisplay({
       {answerShowing && (
         <div className="spanishExample">
           {answerText()}
-          {isStudent && !exampleIsCollected(example.recordId) && (
-            <button
-              type="button"
-              className="addFlashcardButton"
-              onClick={() => addAndAdvance(example)}
-            >
-              Add to my flashcards
-            </button>
+          {isStudent && (
+            <AddToMyFlashcardsButtons
+              example={example}
+              incrementExampleNumber={incrementExampleNumber}
+              onRemove={onRemove}
+            />
           )}
-          {isStudent &&
-            exampleIsCollected(example.recordId) &&
-            !exampleIsCustom(example.recordId) &&
-            !exampleIsPending(example.recordId) && (
-              <button
-                type="button"
-                className="removeFlashcardButton"
-                onClick={() => removeAndAdvance(example.recordId)}
-              >
-                Remove from my flashcards
-              </button>
-            )}
-          {isStudent &&
-            exampleIsCollected(example.recordId) &&
-            exampleIsPending(example.recordId) && (
-              <button type="button" className="pendingFlashcardButton">
-                Adding to Flashcards...
-              </button>
-            )}
         </div>
       )}
       {/* Play/Pause */}
