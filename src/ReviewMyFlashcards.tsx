@@ -12,6 +12,7 @@ import {
 import MenuButton from './components/Buttons/MenuButton';
 import Loading from './components/Loading';
 import QuizComponent from './components/Quiz/QuizComponent';
+import AudioBasedReviewCopy from './components/Quiz/AudioBasedReviewCopy';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 import { usePMFData } from './hooks/usePMFData';
@@ -26,6 +27,12 @@ export default function MyFlashcardsQuiz() {
   const [customOnly, setCustomOnly] = useState<boolean>(false);
   const [quizLength, setQuizLength] = useState<number>(10);
   const [quizReady, setQuizReady] = useState<boolean>(false);
+
+  const [quizType, setQuizType] = useState<'standard' | 'audio'>('standard');
+  const [audioOrComprehension, setAudioOrComprehension] = useState<
+    'audio' | 'comprehension'
+  >('audio');
+  const [autoplay, setAutoplay] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,12 +53,18 @@ export default function MyFlashcardsQuiz() {
     (flashcardDataQuery.isSuccess &&
       !flashcardDataQuery.data?.examples?.length);
 
+  const [examplesToParse, setExamplesToParse] = useState(
+    flashcardDataQuery.data?.studentExamples,
+  );
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setQuizReady(true);
 
     if (isSrs) {
       navigate('srsquiz');
+    } else if (quizType === 'audio') {
+      navigate('audio');
     } else {
       navigate('quiz');
     }
@@ -74,6 +87,8 @@ export default function MyFlashcardsQuiz() {
       {unavailable && <Navigate to="/" />}
       {!quizReady && dataReady && (
         <QuizSetupMenu
+          examplesToParse={examplesToParse}
+          setExamplesToParse={setExamplesToParse}
           isSrs={isSrs}
           setIsSrs={setIsSrs}
           spanishFirst={spanishFirst}
@@ -83,6 +98,12 @@ export default function MyFlashcardsQuiz() {
           quizLength={quizLength}
           setQuizLength={setQuizLength}
           handleSubmit={handleSubmit}
+          quizType={quizType}
+          setQuizType={setQuizType}
+          autoplay={autoplay}
+          setAutoplay={setAutoplay}
+          audioOrComprehension={audioOrComprehension}
+          setAudioOrComprehension={setAudioOrComprehension}
         />
         // setup menu component goes here
       )}
@@ -116,6 +137,22 @@ export default function MyFlashcardsQuiz() {
                 startWithSpanish={spanishFirst}
                 quizLength={quizLength}
                 isSrsQuiz
+              />
+            )
+          }
+        />
+        <Route
+          path="audio"
+          element={
+            flashcardDataQuery.data?.examples && (
+              <AudioBasedReviewCopy
+                examplesToParse={flashcardDataQuery.data?.examples.filter(
+                  (example) => example.englishAudio?.length,
+                )}
+                autoplay={autoplay}
+                audioOrComprehension={audioOrComprehension}
+                cleanupFunction={() => makeQuizUnready()}
+                quizLength={quizLength}
               />
             )
           }

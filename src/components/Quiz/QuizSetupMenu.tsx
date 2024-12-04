@@ -1,8 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
+import type { StudentExample } from '../../interfaceDefinitions';
 
 interface QuizSetupMenuProps {
+  examplesToParse: StudentExample[] | undefined;
+  setExamplesToParse: (examples: StudentExample[] | undefined) => void;
   isSrs: boolean;
   setIsSrs: (isSrs: boolean) => void;
   spanishFirst: boolean;
@@ -12,8 +15,17 @@ interface QuizSetupMenuProps {
   quizLength: number;
   setQuizLength: (quizLength: number) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  quizType: 'standard' | 'audio';
+  setQuizType: (quizType: 'standard' | 'audio') => void;
+  audioOrComprehension: 'audio' | 'comprehension';
+  setAudioOrComprehension: (
+    audioOrComprehension: 'audio' | 'comprehension',
+  ) => void;
+  autoplay: boolean;
+  setAutoplay: (autoplay: boolean) => void;
 }
 export default function QuizSetupMenu({
+  examplesToParse,
   isSrs,
   setIsSrs,
   spanishFirst,
@@ -22,12 +34,15 @@ export default function QuizSetupMenu({
   setCustomOnly,
   quizLength,
   setQuizLength,
+  quizType,
+  setQuizType,
+  audioOrComprehension,
+  setAudioOrComprehension,
   handleSubmit,
+  autoplay,
+  setAutoplay,
 }: QuizSetupMenuProps) {
   const { flashcardDataQuery } = useStudentFlashcards();
-
-  const [quizType, setQuizType] = useState<'standard' | 'audio'>('standard');
-  const [isComprehension, setIsComprehension] = useState(false);
   const hasCustomExamples = useMemo(() => {
     return flashcardDataQuery.data?.studentExamples?.some(
       (studentExample) => studentExample?.coachAdded,
@@ -35,7 +50,7 @@ export default function QuizSetupMenu({
   }, [flashcardDataQuery.data?.studentExamples]);
 
   function calculateQuizLengthOptions() {
-    let currentAllowedExamples = flashcardDataQuery.data?.studentExamples;
+    let currentAllowedExamples = examplesToParse;
     if (isSrs) {
       currentAllowedExamples = currentAllowedExamples?.filter(
         (studentExample) =>
@@ -49,6 +64,27 @@ export default function QuizSetupMenu({
         (studentExample) => studentExample.coachAdded,
       );
     }
+    if (quizType === 'audio') {
+      // Get Examples from current allowed studentExamples
+      const currentExamples = currentAllowedExamples?.map((studentExample) => {
+        return flashcardDataQuery.data?.examples.find(
+          (example) => example.recordId === studentExample.relatedExample,
+        );
+      });
+      // Filter out examples without audio
+      const allowedCurrentExamples = currentExamples?.filter(
+        (example) =>
+          example?.englishAudio?.length && example?.englishAudio?.length > 0,
+      );
+      // Filter out studentExamples that don't have an example (with audio)
+      currentAllowedExamples = currentAllowedExamples?.filter(
+        (studentExample) =>
+          allowedCurrentExamples?.find(
+            (example) => example?.recordId === studentExample?.relatedExample,
+          ),
+      );
+    }
+
     if (!currentAllowedExamples?.length) {
       return [0];
     }
@@ -127,8 +163,25 @@ export default function QuizSetupMenu({
                   type="checkbox"
                   name="comprehension"
                   id="isComprehension"
-                  checked={isComprehension}
-                  onChange={(e) => setIsComprehension(e.target.checked)}
+                  checked={audioOrComprehension === 'comprehension'}
+                  onChange={(e) =>
+                    setAudioOrComprehension(
+                      e.target.checked ? 'comprehension' : 'audio',
+                    )
+                  }
+                />
+                <span className="slider round"></span>
+              </label>
+            </div>
+            <div>
+              <p>Autoplay:</p>
+              <label htmlFor="autoplay" className="switch">
+                <input
+                  type="checkbox"
+                  name="autoplay"
+                  id="autoplay"
+                  checked={autoplay}
+                  onChange={(e) => setAutoplay(e.target.checked)}
                 />
                 <span className="slider round"></span>
               </label>

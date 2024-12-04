@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import type { Flashcard } from '../../interfaceDefinitions';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
@@ -15,12 +15,12 @@ import { useProgramTable } from '../../hooks/useProgramTable';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { useUserData } from '../../hooks/useUserData';
 import Loading from '../Loading';
-import AudioFlashcard from './AudioFlashcard';
-import AudioQuizButtons from './AudioQuizButtons';
-import AudioQuizSetupMenu from './AudioQuizSetupMenu';
-import NewQuizProgress from './NewQuizProgress';
+import AudioFlashcard from '../AudioBasedReview/AudioFlashcard';
+import AudioQuizButtons from '../AudioBasedReview/AudioQuizButtons';
+import AudioQuizSetupMenu from '../AudioBasedReview/AudioQuizSetupMenu';
+import NewQuizProgress from '../AudioBasedReview/NewQuizProgress';
 import '../../App.css';
-import './AudioBasedReview.css';
+import '../AudioBasedReview/AudioBasedReview.css';
 
 interface StepValue {
   audio: string;
@@ -30,48 +30,51 @@ interface StepValue {
 type stepValues = 'question' | 'guess' | 'hint' | 'answer';
 
 interface AudioBasedReviewProps {
+  examplesToParse: Flashcard[];
+  quizLength: number;
   audioOrComprehension?: 'audio' | 'comprehension';
-  willAutoplay: boolean;
+  autoplay: boolean;
+  cleanupFunction: () => void;
 }
 
-export default function AudioBasedReview({
+export default function AudioBasedReviewCopy({
+  examplesToParse,
   audioOrComprehension = 'comprehension',
-  willAutoplay,
+  autoplay,
+  cleanupFunction,
+  quizLength,
 }: AudioBasedReviewProps) {
-  const userDataQuery = useUserData();
   const { activeStudentQuery } = useActiveStudent();
-  const { filterExamplesBySelectedLesson } = useSelectedLesson();
-  const { audioExamplesQuery } = useAudioExamples();
-  const { programTableQuery } = useProgramTable();
+
+  const navigate = useNavigate();
+  const isMainLocation = location.pathname.split('/').length < 2;
 
   // Define data readiness for UI updates
-  const dataReady =
-    userDataQuery.isSuccess &&
-    activeStudentQuery.isSuccess &&
-    programTableQuery.isSuccess &&
-    audioExamplesQuery.isSuccess &&
-    (userDataQuery.data?.isAdmin ||
-      activeStudentQuery.data?.role === 'student' ||
-      activeStudentQuery.data?.role === 'limited');
-  const isError =
-    !dataReady &&
-    (userDataQuery.isError ||
-      programTableQuery.isError ||
-      audioExamplesQuery.isError ||
-      activeStudentQuery.isError);
-  const isLoading =
-    !dataReady &&
-    (activeStudentQuery.isLoading ||
-      userDataQuery.isLoading ||
-      programTableQuery.isLoading ||
-      audioExamplesQuery.isLoading);
-  const unavailable = !dataReady && !isLoading && !isError;
+  // const dataReady =
+  //   userDataQuery.isSuccess &&
+  //   activeStudentQuery.isSuccess &&
+  //   programTableQuery.isSuccess &&
+  //   audioExamplesQuery.isSuccess &&
+  //   (userDataQuery.data?.isAdmin ||
+  //     activeStudentQuery.data?.role === 'student' ||
+  //     activeStudentQuery.data?.role === 'limited');
+  // const isError =
+  //   !dataReady &&
+  //   (userDataQuery.isError ||
+  //     programTableQuery.isError ||
+  //     audioExamplesQuery.isError ||
+  //     activeStudentQuery.isError);
+  // const isLoading =
+  //   !dataReady &&
+  //   (activeStudentQuery.isLoading ||
+  //     userDataQuery.isLoading ||
+  //     programTableQuery.isLoading ||
+  //     audioExamplesQuery.isLoading);
+  // const unavailable = !dataReady && !isLoading && !isError;
 
   // Examples Table after: filtedBylessonId, shuffled
   // const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]) // This is the proper pattern for flat state
   const [currentExampleNumber, setCurrentExampleNumber] = useState<number>(0); // Array Index of displayed example
-  const [autoplay, setAutoplay] = useState(willAutoplay || false);
-  const [quizReady, setQuizReady] = useState(false); // What single responsibility is this handling?
 
   // New Audio Handling
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -88,30 +91,23 @@ export default function AudioBasedReview({
   */
 
   // Memo to parse quiz examples
-  const audioQuizExamples = useMemo((): Flashcard[] => {
-    if (audioExamplesQuery.isSuccess) {
-      const allowedAudioExamples = filterExamplesBySelectedLesson(
-        audioExamplesQuery.data,
-      );
-      const shuffledExamples = fisherYatesShuffle(allowedAudioExamples);
-      // This should be display orders rather than examples.
-      // Can be fixed later, probably not the source of existing bugs.
-      return shuffledExamples;
-    }
-    return [];
-  }, [
-    audioExamplesQuery.isSuccess,
-    audioExamplesQuery.data,
-    filterExamplesBySelectedLesson,
-  ]);
-
+  const displayOrder = useMemo((): Flashcard[] => {
+    const shuffledExamples = fisherYatesShuffle(examplesToParse);
+    // This should be display orders rather than examples.
+    // Can be fixed later, probably not the source of existing bugs.
+    return shuffledExamples.slice(0, quizLength - 1);
+  }, [examplesToParse, quizLength]);
+  const quizReady = useMemo(
+    () => displayOrder.length > 0 && activeStudentQuery.isSuccess,
+    [activeStudentQuery.isSuccess, displayOrder.length],
+  );
   // Memo the current example
   // This will update whenever the currentExampleNumber changes
   const currentExample = useMemo((): Flashcard | undefined => {
-    if (audioQuizExamples) {
-      return audioQuizExamples[currentExampleNumber];
+    if (displayOrder.length > 0) {
+      return displayOrder[currentExampleNumber];
     }
-  }, [audioQuizExamples, currentExampleNumber]);
+  }, [displayOrder, currentExampleNumber]);
 
   // New Step Handling Variables
   // Using a state to control the current step so the UI can update
@@ -192,7 +188,6 @@ export default function AudioBasedReview({
     } else if (currentCountdownLength.current > 0) {
       setCountdown(0);
     } else {
-      // console.log('countdown length is 0, used to set to undefined here')
       setCountdown(undefined);
     }
   }, [countdown, currentCountdownLength]);
@@ -248,6 +243,7 @@ export default function AudioBasedReview({
     }
     updateCountdown();
   }, [isPlaying, updateCountdown]);
+
   function pausePlayback() {
     setIsPlaying(false);
     if (audioRef.current) {
@@ -270,14 +266,13 @@ export default function AudioBasedReview({
 
   // Skips to the next whole example
   const incrementExample = useCallback(() => {
-    if (currentExampleNumber + 1 < audioQuizExamples?.length) {
+    if (currentExampleNumber + 1 < displayOrder?.length) {
       setCurrentExampleNumber(currentExampleNumber + 1);
-      // defineStepValues()
     } else {
-      setCurrentExampleNumber(audioQuizExamples?.length - 1 || 0);
+      setCurrentExampleNumber(displayOrder?.length - 1 || 0);
     }
     setCurrentStep('question');
-  }, [currentExampleNumber, audioQuizExamples]);
+  }, [currentExampleNumber, displayOrder]);
 
   // Skips to the previous whole example
   const decrementExample = useCallback(
@@ -300,7 +295,6 @@ export default function AudioBasedReview({
   // Steps the quiz forward
   const incrementCurrentStep = useCallback(() => {
     prevAudioRefDuration.current = audioRef.current?.duration || 0;
-
     clearCountDown();
     pauseAudio();
 
@@ -321,7 +315,6 @@ export default function AudioBasedReview({
 
         break;
       case 'answer':
-        // This may cause a race condition later
         incrementExample();
         // Proceed to next question
         break;
@@ -333,7 +326,6 @@ export default function AudioBasedReview({
   // Steps the quiz backwards
   const decrementCurrentStep = useCallback(() => {
     prevAudioRefDuration.current = audioRef.current?.duration || 0;
-
     clearCountDown();
     pauseAudio();
 
@@ -369,60 +361,52 @@ export default function AudioBasedReview({
     }
   }
 
-  function readyQuiz() {
-    if (questionValue?.audio?.length > 0) {
-      setQuizReady(true);
-    }
-  }
-
   const unReadyQuiz = useCallback(() => {
-    setQuizReady(false);
     setCurrentExampleNumber(0);
     setCurrentStep('question');
     if (autoplay) {
       clearCountDown();
     }
-  }, [autoplay]);
-
-  function updateAutoplay(boolean: boolean) {
-    if (boolean) {
-      setAutoplay(true);
-    } else {
-      setAutoplay(false);
+    navigate('..');
+    cleanupFunction();
+    if (isMainLocation) {
+      navigate('..');
     }
-  }
+  }, [autoplay, cleanupFunction, isMainLocation, navigate]);
 
-  /*       Stop Countdown on Dismount      */
-  useEffect(() => {
-    return clearCountDown();
-  }, []);
+  // Stop Countdown on Dismount
+  // useEffect(() => clearCountDown(), []);
 
   // in charge of controlling progress bar updating
   useEffect(() => {
     if (autoplay && quizReady) {
       clearTimeout(currentCountdown.current);
-      setIsPlaying(true);
       if (countdown !== 0 && currentCountdownLength.current !== 0) {
         currentCountdown.current = setTimeout(updateCountdown, 50);
       }
-      if (countdown === 0) {
-        console.log('i should not be called');
+      if (countdown === 0 && isPlaying === true) {
+        console.log('incrementing step');
         incrementCurrentStep();
       }
+      setIsPlaying(true);
     }
-  }, [autoplay, countdown, incrementCurrentStep, quizReady, updateCountdown]);
+  }, [
+    autoplay,
+    countdown,
+    displayOrder,
+    incrementCurrentStep,
+    isPlaying,
+    quizReady,
+    updateCountdown,
+  ]);
 
-  /*       New Use Effects      */
   // Play Audio when step is taken
-  useEffect(() => {
-    playAudio();
-  }, [currentStepValue, playAudio]);
+  useEffect(() => playAudio(), [currentStepValue, playAudio]);
 
   // when step taken, set currentStepValue accordingly
   useEffect(() => {
     if (autoplay) {
-      // reset progress bar
-      setProgressStatus(0);
+      setProgressStatus(0); // reset progress bar
     }
   }, [autoplay, currentStep]);
 
@@ -470,36 +454,13 @@ export default function AudioBasedReview({
 
   return (
     <div className="quiz">
-      {isLoading && <Loading message="Loading Audio..." />}
-      {isError && <h2>Error Loading Audio</h2>}
-      {unavailable && <Navigate to="/" />}
-      {!quizReady && dataReady && (
-        <>
-          <h2>
-            {audioOrComprehension === 'audio'
-              ? 'Audio Quiz'
-              : 'Comprehension Quiz'}
-          </h2>
-          <AudioQuizSetupMenu
-            autoplay={autoplay}
-            updateAutoplay={updateAutoplay}
-            examplesToPlayLength={audioQuizExamples?.length}
-            readyQuiz={readyQuiz}
-          />
-        </>
-      )}
-
-      {quizReady && dataReady && audioQuizExamples.length > 0 && (
+      {quizReady && (
         <>
           <div className="audioBox">
             <NewQuizProgress
               currentExampleNumber={currentExampleNumber + 1}
-              totalExamplesNumber={audioQuizExamples.length}
-              quizTitle={
-                audioOrComprehension === 'audio'
-                  ? 'Audio Quiz'
-                  : 'Comprehension Quiz'
-              }
+              totalExamplesNumber={displayOrder.length}
+              quizTitle={'My Audio Flashcards'}
             />
             <AudioFlashcard
               currentExampleText={currentStepValue.text}
