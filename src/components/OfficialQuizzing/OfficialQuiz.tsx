@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import Loading from './components/Loading';
-import QuizComponent from './components/Quiz/QuizComponent';
-import { useOfficialQuizzes } from './hooks/useOfficialQuizzes';
-import './App.css';
-import quizCourses from './functions/QuizCourseList';
+import Loading from '../Loading';
+import QuizComponent from '../Quiz/QuizComponent';
+import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
+import '../../App.css';
+import quizCourses from '../../functions/QuizCourseList';
 
 interface officialQuizProps {
   chosenQuiz: number;

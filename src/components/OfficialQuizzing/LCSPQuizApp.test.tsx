@@ -7,12 +7,12 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import serverlikeData from '../mocks/data/serverlike/serverlikeData';
-import MockAllProviders from '../mocks/Providers/MockAllProviders';
-import { allStudentsTable } from '../mocks/data/serverlike/studentTable';
-import { setupMockAuth } from '../tests/setupMockAuth';
+import serverlikeData from '../../../mocks/data/serverlike/serverlikeData';
+import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
+import { allStudentsTable } from '../../../mocks/data/serverlike/studentTable';
+import { setupMockAuth } from '../../../tests/setupMockAuth';
 import LCSPQuizApp from './LCSPQuizApp';
-import { fisherYatesShuffle } from './functions/fisherYatesShuffle';
+import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 
 const { quizExamplesTableArray } = serverlikeData().api;
 

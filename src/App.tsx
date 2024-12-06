@@ -13,7 +13,7 @@ import SentryRoutes from './functions/SentryRoutes';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import useAuth from './hooks/useAuth';
 import { useUserData } from './hooks/useUserData';
-import LCSPQuizApp from './LCSPQuizApp';
+import LCSPQuizApp from './components/OfficialQuizzing/LCSPQuizApp';
 import Menu from './Menu';
 import NotFoundPage from './NotFoundPage';
 import ReviewMyFlashcards from './ReviewMyFlashcards';

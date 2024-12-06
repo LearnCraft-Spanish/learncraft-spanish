@@ -5,23 +5,48 @@ import {
 } from '../../functions/formatFlashcardText';
 import type { NewFlashcard } from '../../interfaceDefinitions';
 import { useUnverifiedExamples } from '../../hooks/useUnverifiedExamples';
-import FlashcardDisplay from '../Quiz/FlashcardDisplay';
+import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
+import quizCourses from '../../functions/QuizCourseList';
 
 export default function ExampleEditor() {
   const [spanishExample, setSpanishExample] = useState('');
   const [englishTranslation, setEnglishTranslation] = useState('');
   const [spanishAudioLa, setSpanishAudioLa] = useState('');
   const [englishAudio, setEnglishAudio] = useState('');
+  const [quizCourse, setQuizCourse] = useState('');
+  const [quizNumber, setquizNumber] = useState(undefined as number | undefined);
 
-  const { unverifiedExamplesQuery, addUnverifiedExample } =
-    useUnverifiedExamples();
+  const { addUnverifiedExample } = useUnverifiedExamples();
+  const { officialQuizzesQuery, quizExamplesQuery } =
+    useOfficialQuizzes(quizNumber);
 
-  const tableData = unverifiedExamplesQuery.data ?? [];
+  const quizList = officialQuizzesQuery.data;
+  const tableData = quizExamplesQuery.data;
 
-  const displayOrder = tableData.map((example) => {
-    return { recordId: example.recordId };
+  const quizCourseOptions = quizCourses.map((course) => {
+    return (
+      <option key={course.code} value={course.code}>
+        {course.name}
+      </option>
+    );
   });
+
+  const quizOptions = useMemo(() => {
+    return quizList?.map((quiz) => {
+      return (
+        <option key={quiz.quizNumber} value={quiz.quizNumber}>
+          {quiz.quizNumber}
+        </option>
+      );
+    });
+  }, [quizList]);
+
+  const displayOrder = useMemo(() => {
+    return tableData?.flatMap((example) =>
+      !example.vocabComplete ? { recordId: example.recordId } : [],
+    );
+  }, [tableData]);
 
   const spanglish = useMemo(() => {
     const hasAsterisk = spanishExample.includes('*');
@@ -86,6 +111,21 @@ export default function ExampleEditor() {
             )}
           </div>
         </div>
+        <div>
+          <h3>Choose Quiz</h3>
+          <select
+            value={quizCourse}
+            onChange={(e) => setQuizCourse(e.target.value)}
+          >
+            {quizCourseOptions}
+          </select>
+          <select
+            value={quizNumber}
+            onChange={(e) => setquizNumber(Number.parseInt(e.target.value))}
+          >
+            {quizOptions}
+          </select>
+        </div>
         <form onSubmit={(e) => handleAddExample(e)}>
           <h3>Create Example</h3>
           <div>
@@ -126,8 +166,13 @@ export default function ExampleEditor() {
           </div>
           <button type="submit">Save Example</button>
         </form>
-        <h3>New Examples</h3>
-        <ExamplesTable dataSource={tableData} displayOrder={displayOrder} />
+        <h3>
+          {quizCourse} Quiz {quizNumber} Examples
+        </h3>
+        <ExamplesTable
+          dataSource={tableData ?? []}
+          displayOrder={displayOrder ?? []}
+        />
       </div>
     </div>
   );
