@@ -19,6 +19,7 @@ import NotFoundPage from './NotFoundPage';
 import ReviewMyFlashcards from './ReviewMyFlashcards';
 import './App.css';
 import ExampleCreator from './components/ExampleCreator/ExampleCreator';
+import ExampleEditor from './components/ExampleEditor/ExampleEditor';
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -248,6 +249,10 @@ export const App: React.FC = () => {
         <Route
           path="/examplecreator"
           element={userDataQuery.data?.isAdmin && <ExampleCreator />}
+        />
+        <Route
+          path="/exampleeditor"
+          element={userDataQuery.data?.isAdmin && <ExampleEditor />}
         />
         {
           // Coaching Section still under construction

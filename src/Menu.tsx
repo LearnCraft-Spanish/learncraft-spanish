@@ -105,6 +105,11 @@ export default function Menu() {
                   Example Creator
                 </Link>
               </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/exampleeditor">
+                  Example Editor
+                </Link>
+              </div>
               {/* <div className="buttonBox">
                     <Link className="linkButton" to="/coaching">
                       Coaching
