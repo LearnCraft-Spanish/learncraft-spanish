@@ -5,19 +5,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import type { Flashcard } from '../../interfaceDefinitions';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
-
-import { useAudioExamples } from '../../hooks/useAudioExamples';
-import { useProgramTable } from '../../hooks/useProgramTable';
-import { useSelectedLesson } from '../../hooks/useSelectedLesson';
-import { useUserData } from '../../hooks/useUserData';
-import Loading from '../Loading';
 import AudioFlashcard from '../AudioBasedReview/AudioFlashcard';
 import AudioQuizButtons from '../AudioBasedReview/AudioQuizButtons';
-import AudioQuizSetupMenu from '../AudioBasedReview/AudioQuizSetupMenu';
 import NewQuizProgress from '../AudioBasedReview/NewQuizProgress';
 import '../../App.css';
 import '../AudioBasedReview/AudioBasedReview.css';
@@ -29,21 +22,21 @@ interface StepValue {
 
 type stepValues = 'question' | 'guess' | 'hint' | 'answer';
 
-interface AudioBasedReviewProps {
+interface AudioQuizProps {
   examplesToParse: Flashcard[];
-  quizLength: number;
+  quizLength?: number;
   audioOrComprehension?: 'audio' | 'comprehension';
   autoplay: boolean;
   cleanupFunction: () => void;
 }
 
-export default function AudioBasedReviewCopy({
+export default function AudioQuiz({
   examplesToParse,
   audioOrComprehension = 'comprehension',
   autoplay,
   cleanupFunction,
   quizLength,
-}: AudioBasedReviewProps) {
+}: AudioQuizProps) {
   const { activeStudentQuery } = useActiveStudent();
 
   const navigate = useNavigate();
@@ -85,18 +78,17 @@ export default function AudioBasedReviewCopy({
   const currentCountdown = useRef<any>(0);
   const [progressStatus, setProgressStatus] = useState<number>(0); // visual progress bar percentage (0-100)
 
-  /* KNOWN BUGS:
-    - When the user returns to the menu, the first change to autoplay causes
-    the lesson filter to reset without displaying.
-  */
-
+  const [initialQuizStart, setInitialQuizStart] = useState<boolean>(false); // Makes sure the first quiz audio is loaded and playing before countdown starts
   // Memo to parse quiz examples
-  const displayOrder = useMemo((): Flashcard[] => {
+  const [displayOrder, setDisplayOrder] = useState(() => {
     const shuffledExamples = fisherYatesShuffle(examplesToParse);
     // This should be display orders rather than examples.
     // Can be fixed later, probably not the source of existing bugs.
-    return shuffledExamples.slice(0, quizLength - 1);
-  }, [examplesToParse, quizLength]);
+    if (quizLength) {
+      return shuffledExamples.slice(0, quizLength);
+    }
+    return shuffledExamples;
+  });
   const quizReady = useMemo(
     () => displayOrder.length > 0 && activeStudentQuery.isSuccess,
     [activeStudentQuery.isSuccess, displayOrder.length],
@@ -158,7 +150,7 @@ export default function AudioBasedReviewCopy({
     return { audio: '', text: '' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
-  // Get the value of the current step programmatically
+  // Get the values related to the current step
   const currentStepValue = useMemo(() => {
     switch (currentStep) {
       case 'question':
@@ -210,6 +202,9 @@ export default function AudioBasedReviewCopy({
       if (audioRef.current?.duration) {
         const currentDuration = audioRef.current.duration;
         startCountdown(currentDuration + 1.5);
+        if (!initialQuizStart) {
+          setInitialQuizStart(true);
+        }
       } else {
         if (prevAudioRefDuration.current) {
           startCountdown(prevAudioRefDuration.current + 1.5);
@@ -225,7 +220,7 @@ export default function AudioBasedReviewCopy({
         }
       });
     }
-  }, [autoplay]);
+  }, [autoplay, initialQuizStart]);
 
   const pauseAudio = useCallback(() => {
     if (audioRef.current) {
@@ -282,7 +277,7 @@ export default function AudioBasedReviewCopy({
       } else {
         setCurrentExampleNumber(0);
       }
-      // This is a custom decrement for using arrows causes decrementCurrentStep to go back one example
+      // This is a custom decrement for when using arrows causes decrementCurrentStep to go back one example
       if (customDecrement) {
         setCurrentStep(customDecrement);
       } else {
@@ -374,28 +369,32 @@ export default function AudioBasedReviewCopy({
     }
   }, [autoplay, cleanupFunction, isMainLocation, navigate]);
 
-  // Stop Countdown on Dismount
-  // useEffect(() => clearCountDown(), []);
+  function onRemove() {
+    // this is to update the total example numbers, remove the removed example from displayOrder, and reset the currentExampleNumber
+    // setTotalExamplesNumber(totalExamplesNumber - 1);
+    const deletedExample = displayOrder.splice(currentExampleNumber - 1, 1);
+    setDisplayOrder(
+      displayOrder.filter((example) => example !== deletedExample[0]),
+    );
+  }
 
-  // in charge of controlling progress bar updating
+  // in charge of Autoplay loop & updating visual progress bar
   useEffect(() => {
-    if (autoplay && quizReady) {
+    if (autoplay && initialQuizStart) {
       clearTimeout(currentCountdown.current);
+      setIsPlaying(true);
       if (countdown !== 0 && currentCountdownLength.current !== 0) {
         currentCountdown.current = setTimeout(updateCountdown, 50);
       }
-      if (countdown === 0 && isPlaying === true) {
-        console.log('incrementing step');
+      if (countdown === 0) {
         incrementCurrentStep();
       }
-      setIsPlaying(true);
     }
   }, [
     autoplay,
     countdown,
-    displayOrder,
     incrementCurrentStep,
-    isPlaying,
+    initialQuizStart,
     quizReady,
     updateCountdown,
   ]);
@@ -474,6 +473,7 @@ export default function AudioBasedReviewCopy({
               incrementExample={incrementExample}
               isStudent={activeStudentQuery.data?.role === 'student'}
               currentStep={currentStep}
+              onRemove={onRemove}
             />
             {audioElement()}
           </div>

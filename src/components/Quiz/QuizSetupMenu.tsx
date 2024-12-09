@@ -1,46 +1,46 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
 import type { StudentExample } from '../../interfaceDefinitions';
 
 interface QuizSetupMenuProps {
   examplesToParse: StudentExample[] | undefined;
-  setExamplesToParse: (examples: StudentExample[] | undefined) => void;
+  // setExamplesToParse: (examples: StudentExample[] | undefined) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  quizType: 'text' | 'audio';
+  setQuizType: (quizType: 'text' | 'audio') => void;
+  quizLength: number;
+  setQuizLength: (quizLength: number) => void;
+  customOnly: boolean;
+  setCustomOnly: (customOnly: boolean) => void;
   isSrs: boolean;
   setIsSrs: (isSrs: boolean) => void;
   spanishFirst: boolean;
   setSpanishFirst: (spanishFirst: boolean) => void;
-  customOnly: boolean;
-  setCustomOnly: (customOnly: boolean) => void;
-  quizLength: number;
-  setQuizLength: (quizLength: number) => void;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  quizType: 'standard' | 'audio';
-  setQuizType: (quizType: 'standard' | 'audio') => void;
+  autoplay: boolean;
+  setAutoplay: (autoplay: boolean) => void;
   audioOrComprehension: 'audio' | 'comprehension';
   setAudioOrComprehension: (
     audioOrComprehension: 'audio' | 'comprehension',
   ) => void;
-  autoplay: boolean;
-  setAutoplay: (autoplay: boolean) => void;
 }
 export default function QuizSetupMenu({
   examplesToParse,
-  isSrs,
-  setIsSrs,
-  spanishFirst,
-  setSpanishFirst,
-  customOnly,
-  setCustomOnly,
+  handleSubmit,
   quizLength,
   setQuizLength,
   quizType,
   setQuizType,
-  audioOrComprehension,
-  setAudioOrComprehension,
-  handleSubmit,
+  customOnly,
+  setCustomOnly,
+  isSrs,
+  setIsSrs,
+  spanishFirst,
+  setSpanishFirst,
   autoplay,
   setAutoplay,
+  audioOrComprehension,
+  setAudioOrComprehension,
 }: QuizSetupMenuProps) {
   const { flashcardDataQuery } = useStudentFlashcards();
   const hasCustomExamples = useMemo(() => {
@@ -49,7 +49,9 @@ export default function QuizSetupMenu({
     );
   }, [flashcardDataQuery.data?.studentExamples]);
 
-  function calculateQuizLengthOptions() {
+  // const [quizLength, setQuizLength] = useState(10);
+
+  const calculateQuizLengthOptions = useMemo(() => {
     let currentAllowedExamples = examplesToParse;
     if (isSrs) {
       currentAllowedExamples = currentAllowedExamples?.filter(
@@ -84,10 +86,10 @@ export default function QuizSetupMenu({
           ),
       );
     }
-
     if (!currentAllowedExamples?.length) {
       return [0];
     }
+    // Calculate quiz length options
     const exampleCount = currentAllowedExamples.length;
     const quizLengthOptions = [];
     if (currentAllowedExamples?.length > 10) {
@@ -97,7 +99,7 @@ export default function QuizSetupMenu({
     }
     quizLengthOptions.push(exampleCount);
     return quizLengthOptions;
-  }
+  }, [customOnly, examplesToParse, flashcardDataQuery, isSrs, quizType]);
 
   return (
     <form className="myFlashcardsForm" onSubmit={(e) => handleSubmit(e)}>
@@ -105,13 +107,13 @@ export default function QuizSetupMenu({
         <h3>Review My Flashcards</h3>
         <h4>Quiz Type:</h4>
         <div className="buttonBox header">
-          <input type="radio" id="standard" value="standard" name="quizType" />
+          <input type="radio" id="quizType" value="text" name="quizType" />
           <label
-            htmlFor="standard"
-            className={quizType === 'standard' ? 'selected' : ''}
-            onClick={() => setQuizType('standard')}
+            htmlFor="quizType"
+            className={quizType === 'text' ? 'selected' : ''}
+            onClick={() => setQuizType('text')}
           >
-            Standard
+            Text
           </label>
           <input type="radio" id="audio" value="audio" name="quizType" />
           <label
@@ -121,10 +123,8 @@ export default function QuizSetupMenu({
           >
             Audio
           </label>
-          {/* <button type="button">Standard</button> */}
-          {/* <button type="button">Audio</button> */}
         </div>
-        {quizType === 'standard' && (
+        {quizType === 'text' && (
           <div className="quizTypeSettingsWrapper">
             <div>
               <p>Start with Spanish:</p>
@@ -211,7 +211,7 @@ export default function QuizSetupMenu({
             onChange={(e) => setQuizLength(Number.parseInt(e.target.value))}
             defaultValue={quizLength}
           >
-            {calculateQuizLengthOptions().map((option) => (
+            {calculateQuizLengthOptions.map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>
@@ -220,7 +220,7 @@ export default function QuizSetupMenu({
         </label>
       </div>
       <div className="buttonBox">
-        <button type="submit" disabled={calculateQuizLengthOptions()[0] === 0}>
+        <button type="submit" disabled={calculateQuizLengthOptions[0] === 0}>
           Start Quiz
         </button>
       </div>

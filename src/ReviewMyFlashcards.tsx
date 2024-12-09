@@ -1,5 +1,4 @@
-import type { FormEvent } from 'react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Navigate,
@@ -9,10 +8,9 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
-import MenuButton from './components/Buttons/MenuButton';
 import Loading from './components/Loading';
 import QuizComponent from './components/Quiz/QuizComponent';
-import AudioBasedReviewCopy from './components/Quiz/AudioBasedReviewCopy';
+import AudioQuiz from './components/Quiz/AudioQuiz';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import { useStudentFlashcards } from './hooks/useStudentFlashcards';
 import { usePMFData } from './hooks/usePMFData';
@@ -22,13 +20,15 @@ export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
   const { activeStudentQuery } = useActiveStudent();
   const { pmfDataQuery } = usePMFData();
+
+  const examplesToParse = flashcardDataQuery.data?.studentExamples;
+  // Quiz Setup
+  const [quizReady, setQuizReady] = useState<boolean>(false);
+  const [quizType, setQuizType] = useState<'text' | 'audio'>('text');
+  const [quizLength, setQuizLength] = useState<number>(10);
+  const [customOnly, setCustomOnly] = useState<boolean>(false);
   const [isSrs, setIsSrs] = useState<boolean>(false);
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false);
-  const [customOnly, setCustomOnly] = useState<boolean>(false);
-  const [quizLength, setQuizLength] = useState<number>(10);
-  const [quizReady, setQuizReady] = useState<boolean>(false);
-
-  const [quizType, setQuizType] = useState<'standard' | 'audio'>('standard');
   const [audioOrComprehension, setAudioOrComprehension] = useState<
     'audio' | 'comprehension'
   >('audio');
@@ -53,25 +53,18 @@ export default function MyFlashcardsQuiz() {
     (flashcardDataQuery.isSuccess &&
       !flashcardDataQuery.data?.examples?.length);
 
-  const [examplesToParse, setExamplesToParse] = useState(
-    flashcardDataQuery.data?.studentExamples,
-  );
-
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setQuizReady(true);
-
-    if (isSrs) {
-      navigate('srsquiz');
-    } else if (quizType === 'audio') {
+    if (quizType === 'audio') {
       navigate('audio');
     } else {
-      navigate('quiz');
+      if (isSrs) {
+        navigate('srsquiz');
+      } else {
+        navigate('quiz');
+      }
     }
-  }
-
-  function makeQuizUnready() {
-    setQuizReady(false);
   }
 
   useEffect(() => {
@@ -88,24 +81,22 @@ export default function MyFlashcardsQuiz() {
       {!quizReady && dataReady && (
         <QuizSetupMenu
           examplesToParse={examplesToParse}
-          setExamplesToParse={setExamplesToParse}
+          handleSubmit={handleSubmit}
+          quizType={quizType}
+          setQuizType={setQuizType}
+          quizLength={quizLength}
+          setQuizLength={setQuizLength}
+          customOnly={customOnly}
+          setCustomOnly={setCustomOnly}
           isSrs={isSrs}
           setIsSrs={setIsSrs}
           spanishFirst={spanishFirst}
           setSpanishFirst={setSpanishFirst}
-          customOnly={customOnly}
-          setCustomOnly={setCustomOnly}
-          quizLength={quizLength}
-          setQuizLength={setQuizLength}
-          handleSubmit={handleSubmit}
-          quizType={quizType}
-          setQuizType={setQuizType}
           autoplay={autoplay}
           setAutoplay={setAutoplay}
           audioOrComprehension={audioOrComprehension}
           setAudioOrComprehension={setAudioOrComprehension}
         />
-        // setup menu component goes here
       )}
       <Routes>
         <Route
@@ -117,7 +108,7 @@ export default function MyFlashcardsQuiz() {
                 quizTitle="My Flashcards"
                 quizOnlyCollectedExamples
                 quizOnlyCustomExamples={customOnly}
-                cleanupFunction={() => makeQuizUnready()}
+                cleanupFunction={() => setQuizReady(false)}
                 startWithSpanish={spanishFirst}
                 quizLength={quizLength}
               />
@@ -133,10 +124,10 @@ export default function MyFlashcardsQuiz() {
                 quizTitle="My Flashcards for Today"
                 quizOnlyCollectedExamples
                 quizOnlyCustomExamples={customOnly}
-                cleanupFunction={() => makeQuizUnready()}
+                cleanupFunction={() => setQuizReady(false)}
                 startWithSpanish={spanishFirst}
                 quizLength={quizLength}
-                isSrsQuiz
+                isSrsQuiz={isSrs}
               />
             )
           }
@@ -145,13 +136,13 @@ export default function MyFlashcardsQuiz() {
           path="audio"
           element={
             flashcardDataQuery.data?.examples && (
-              <AudioBasedReviewCopy
+              <AudioQuiz
                 examplesToParse={flashcardDataQuery.data?.examples.filter(
                   (example) => example.englishAudio?.length,
                 )}
                 autoplay={autoplay}
                 audioOrComprehension={audioOrComprehension}
-                cleanupFunction={() => makeQuizUnready()}
+                cleanupFunction={() => setQuizReady(false)}
                 quizLength={quizLength}
               />
             )

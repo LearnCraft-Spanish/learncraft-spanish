@@ -14,6 +14,7 @@ interface AudioFlashcardProps {
   incrementExample: () => void;
   isStudent: boolean;
   currentStep: string;
+  onRemove?: () => void;
 }
 
 export default function AudioFlashcardComponent({
@@ -28,6 +29,7 @@ export default function AudioFlashcardComponent({
   incrementExample,
   isStudent,
   currentStep,
+  onRemove,
 }: AudioFlashcardProps): JSX.Element {
   function handlePlayPauseClick(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -37,6 +39,13 @@ export default function AudioFlashcardComponent({
       pausePlayback();
     } else {
       resumePlayback();
+    }
+  }
+  function onRemoveOfOwnedFlashcard(): void {
+    if (onRemove) {
+      onRemove();
+    } else {
+      incrementExample();
     }
   }
   return (
@@ -66,7 +75,7 @@ export default function AudioFlashcardComponent({
         <AddToMyFlashcardsButtons
           example={currentExample}
           incrementExampleNumber={incrementExample}
-          onRemove={incrementExample}
+          onRemove={onRemoveOfOwnedFlashcard}
         />
       )}
     </div>
