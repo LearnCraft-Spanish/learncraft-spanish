@@ -140,10 +140,16 @@ export default function MyFlashcardsQuiz() {
                 examplesToParse={flashcardDataQuery.data?.examples.filter(
                   (example) => example.englishAudio?.length,
                 )}
+                quizTitle={
+                  audioOrComprehension === 'audio'
+                    ? 'My Audio Quiz'
+                    : 'My Comprehension Quiz'
+                }
                 autoplay={autoplay}
                 audioOrComprehension={audioOrComprehension}
                 cleanupFunction={() => setQuizReady(false)}
                 quizLength={quizLength}
+                myFlashcardsQuiz
               />
             )
           }

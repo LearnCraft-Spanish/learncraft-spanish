@@ -17,6 +17,7 @@ import './AudioBasedReview.css';
 interface AudioBasedReviewProps {
   audioOrComprehension?: 'audio' | 'comprehension';
   willAutoplay: boolean;
+  quizTitle: string;
 }
 
 export default function AudioBasedReview({
@@ -108,10 +109,16 @@ export default function AudioBasedReview({
 
       {quizReady && dataReady && audioQuizExamples.length > 0 && (
         <AudioQuiz
+          quizTitle={
+            audioOrComprehension === 'audio'
+              ? 'Audio Quiz'
+              : 'Comprehension Quiz'
+          }
           examplesToParse={audioQuizExamples}
           audioOrComprehension={audioOrComprehension}
           autoplay={autoplay}
           cleanupFunction={unReadyQuiz}
+          incrementOnAdd={false}
         />
       )}
     </div>

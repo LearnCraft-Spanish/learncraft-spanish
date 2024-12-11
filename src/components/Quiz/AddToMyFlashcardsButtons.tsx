@@ -5,13 +5,15 @@ import type { Flashcard } from '../../interfaceDefinitions';
 
 interface AddToMyFlashcardsButtonsProps {
   example: Flashcard | undefined;
-  // incrementExampleNumber: () => void;
+  incrementExampleNumber: () => void;
   onRemove: () => void;
+  incrementOnAdd?: boolean;
 }
 export default function AddToMyFlashcardsButtons({
   example,
-  // incrementExampleNumber,
+  incrementExampleNumber,
   onRemove,
+  incrementOnAdd = true,
 }: AddToMyFlashcardsButtonsProps): JSX.Element {
   const {
     addFlashcardMutation,
@@ -28,14 +30,14 @@ export default function AddToMyFlashcardsButtons({
       return;
     }
     addFlashcardMutation.mutate(example);
-    // incrementExampleNumber();
+    if (incrementOnAdd) incrementExampleNumber();
   }
   function remove() {
+    onRemove();
     if (!example) {
       return;
     }
     removeFlashcardMutation.mutate(example.recordId);
-    onRemove();
   }
   const isCollected = exampleIsCollected(example.recordId);
   const isCustom = exampleIsCustom(example.recordId);

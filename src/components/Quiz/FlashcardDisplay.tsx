@@ -18,8 +18,8 @@ interface FlashcardProps {
   audioActive: string;
   togglePlaying: () => void;
   playing: boolean;
-  // incrementExampleNumber: () => void;
-  // onRemove: () => void;
+  incrementExampleNumber: () => void;
+  onRemove: () => void;
 }
 
 export default function FlashcardDisplay({
@@ -31,8 +31,8 @@ export default function FlashcardDisplay({
   togglePlaying,
   startWithSpanish = false,
   toggleAnswer,
-  // incrementExampleNumber,
-  // onRemove,
+  incrementExampleNumber,
+  onRemove,
 }: FlashcardProps): JSX.Element {
   const spanishText = example.spanishExample;
   const englishText = example.englishTranslation;
@@ -62,8 +62,8 @@ export default function FlashcardDisplay({
           {isStudent && (
             <AddToMyFlashcardsButtons
               example={example}
-              // incrementExampleNumber={incrementExampleNumber}
-              // onRemove={onRemove}
+              incrementExampleNumber={incrementExampleNumber}
+              onRemove={onRemove}
             />
           )}
         </div>

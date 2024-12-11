@@ -28,6 +28,9 @@ interface AudioQuizProps {
   audioOrComprehension?: 'audio' | 'comprehension';
   autoplay: boolean;
   cleanupFunction: () => void;
+  incrementOnAdd?: boolean;
+  quizTitle: string;
+  myFlashcardsQuiz?: boolean;
 }
 
 export default function AudioQuiz({
@@ -36,6 +39,9 @@ export default function AudioQuiz({
   autoplay,
   cleanupFunction,
   quizLength,
+  incrementOnAdd,
+  quizTitle,
+  myFlashcardsQuiz = false,
 }: AudioQuizProps) {
   const { activeStudentQuery } = useActiveStudent();
 
@@ -44,7 +50,7 @@ export default function AudioQuiz({
 
   // Examples Table after: filtedBylessonId, shuffled
   // const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]) // This is the proper pattern for flat state
-  const [currentExampleIndex, setcurrentExampleIndex] = useState<number>(0); // Array Index of displayed example
+  const [currentExampleIndex, setCurrentExampleIndex] = useState<number>(0); // Array Index of displayed example
 
   // Audio Handling
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -238,9 +244,9 @@ export default function AudioQuiz({
   // Skips to the next whole example
   const incrementExample = useCallback(() => {
     if (currentExampleIndex + 1 < displayOrder?.length) {
-      setcurrentExampleIndex(currentExampleIndex + 1);
+      setCurrentExampleIndex(currentExampleIndex + 1);
     } else {
-      setcurrentExampleIndex(displayOrder?.length - 1 || 0);
+      setCurrentExampleIndex(displayOrder?.length - 1 || 0);
     }
     setCurrentStep('question');
   }, [currentExampleIndex, displayOrder]);
@@ -249,9 +255,9 @@ export default function AudioQuiz({
   const decrementExample = useCallback(
     (customDecrement: undefined | stepValues = undefined) => {
       if (currentExampleIndex > 0) {
-        setcurrentExampleIndex(currentExampleIndex - 1);
+        setCurrentExampleIndex(currentExampleIndex - 1);
       } else {
-        setcurrentExampleIndex(0);
+        setCurrentExampleIndex(0);
       }
       // This is a custom decrement for when using arrows causes decrementCurrentStep to go back one example
       if (customDecrement) {
@@ -333,7 +339,7 @@ export default function AudioQuiz({
   }
 
   const unReadyQuiz = useCallback(() => {
-    setcurrentExampleIndex(0);
+    setCurrentExampleIndex(0);
     setCurrentStep('question');
     if (autoplay) {
       clearCountDown();
@@ -348,12 +354,20 @@ export default function AudioQuiz({
   function onRemove() {
     // this is to update the total example numbers, remove the removed example from displayOrder, and reset the currentExampleIndex
     // setTotalExamplesNumber(totalExamplesNumber - 1);
-    const deletedExample = displayOrder.splice(currentExampleIndex, 1);
-    const newDisplayOrder = displayOrder.filter(
-      (example) => example !== deletedExample[0],
-    );
-    decrementExample();
-    setDisplayOrder(newDisplayOrder);
+    if (myFlashcardsQuiz) {
+      const deletedExample = displayOrder.splice(currentExampleIndex, 1);
+      const newDisplayOrder = displayOrder.filter(
+        (example) => example !== deletedExample[0],
+      );
+      // decrementExample();
+      setDisplayOrder(newDisplayOrder);
+      console.log(`displayLength: ${displayOrder.length}`);
+      console.log(`currentExampleIndex: ${currentExampleIndex}`);
+      if (currentExampleIndex === displayOrder.length) {
+        console.log('decrementing');
+        decrementExample();
+      }
+    }
   }
 
   // in charge of Autoplay loop & updating visual progress bar
@@ -429,15 +443,21 @@ export default function AudioQuiz({
     };
   }, [handleKeyPress]);
 
+  useEffect(() => {
+    if (displayOrder.length === 0) {
+      unReadyQuiz();
+    }
+  });
+
   return (
     <div className="quiz">
       {quizReady && (
         <>
           <div className="audioBox">
             <NewQuizProgress
-              currentExampleIndex={currentExampleIndex + 1}
+              currentExampleNumber={currentExampleIndex + 1}
               totalExamplesNumber={displayOrder.length}
-              quizTitle={'My Audio Flashcards'}
+              quizTitle={quizTitle}
             />
             <AudioFlashcard
               currentExampleText={currentStepValue.text}
@@ -450,7 +470,8 @@ export default function AudioQuiz({
               currentExample={currentExample}
               isStudent={activeStudentQuery.data?.role === 'student'}
               currentStep={currentStep}
-              // incrementExample={incrementExample}
+              incrementExample={incrementExample}
+              incrementOnAdd={incrementOnAdd}
               onRemove={onRemove}
             />
             {audioElement()}
