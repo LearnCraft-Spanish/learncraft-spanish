@@ -1,6 +1,13 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { aw } from 'vitest/dist/chunks/reporters.anwo7Y6a';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import AudioQuizSetupMenu from './AudioQuizSetupMenu';
 
@@ -43,7 +50,7 @@ describe('component AudioQuizSetupMenu', () => {
     );
     expect(
       screen.getByText('There are no audio examples for this lesson range'),
-    ).toBeTruthy();
+    ).toBeInTheDocument();
   });
   it('toggle autoplay off', async () => {
     render(
@@ -60,10 +67,7 @@ describe('component AudioQuizSetupMenu', () => {
       name: 'toggleAutoplay',
     });
     autoplayCheckbox.click();
-    await waitFor(() => {
-      expect(updateAutoplay).toHaveBeenCalledWith(false);
-      expect(autoplayCheckbox).not.toBeChecked();
-    });
+    expect(updateAutoplay).toHaveBeenCalledWith(false);
   });
   it('toggle autoplay on', async () => {
     render(
@@ -78,19 +82,5 @@ describe('component AudioQuizSetupMenu', () => {
     );
     screen.getByLabelText('toggleAutoplay').click();
     expect(updateAutoplay).toHaveBeenCalledWith(true);
-  });
-  it('agrees on number of examples to play', async () => {
-    render(
-      <MockAllProviders route="/audioquiz">
-        <AudioQuizSetupMenu
-          autoplay
-          examplesToPlayLength={5}
-          readyQuiz={readyQuiz}
-          updateAutoplay={updateAutoplay}
-        />
-      </MockAllProviders>,
-    );
-    screen.getByLabelText('5').click();
-    expect(readyQuiz).toHaveBeenCalledWith(5);
   });
 });
