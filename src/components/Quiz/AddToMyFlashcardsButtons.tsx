@@ -14,7 +14,7 @@ export default function AddToMyFlashcardsButtons({
   incrementExampleNumber,
   onRemove,
   incrementOnAdd = true,
-}: AddToMyFlashcardsButtonsProps): JSX.Element {
+}: AddToMyFlashcardsButtonsProps): JSX.Element | null {
   const {
     addFlashcardMutation,
     removeFlashcardMutation,
@@ -70,6 +70,7 @@ export default function AddToMyFlashcardsButtons({
       </button>
     );
   } else {
-    return <div>Error Parsing Flashcard Status</div>;
+    console.error('Failed to parse flashcard status');
+    return null;
   }
 }
