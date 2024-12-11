@@ -361,10 +361,8 @@ export default function AudioQuiz({
       );
       // decrementExample();
       setDisplayOrder(newDisplayOrder);
-      console.log(`displayLength: ${displayOrder.length}`);
-      console.log(`currentExampleIndex: ${currentExampleIndex}`);
+      setCurrentStep('question');
       if (currentExampleIndex === displayOrder.length) {
-        console.log('decrementing');
         decrementExample();
       }
     }
