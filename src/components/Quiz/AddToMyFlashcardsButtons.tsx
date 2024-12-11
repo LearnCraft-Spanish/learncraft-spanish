@@ -7,12 +7,14 @@ interface AddToMyFlashcardsButtonsProps {
   example: Flashcard | undefined;
   incrementExampleNumber: () => void;
   onRemove: () => void;
+  incrementOnAdd?: boolean;
 }
 export default function AddToMyFlashcardsButtons({
   example,
   incrementExampleNumber,
   onRemove,
-}: AddToMyFlashcardsButtonsProps): JSX.Element {
+  incrementOnAdd = true,
+}: AddToMyFlashcardsButtonsProps): JSX.Element | null {
   const {
     addFlashcardMutation,
     removeFlashcardMutation,
@@ -23,19 +25,19 @@ export default function AddToMyFlashcardsButtons({
   if (!example) {
     return <div>Error Parsing Flashcard</div>;
   }
-  function addAndAdvance() {
+  function add() {
     if (!example) {
       return;
     }
     addFlashcardMutation.mutate(example);
-    incrementExampleNumber();
+    if (incrementOnAdd) incrementExampleNumber();
   }
-  function removeAndAdvance() {
+  function remove() {
+    onRemove();
     if (!example) {
       return;
     }
     removeFlashcardMutation.mutate(example.recordId);
-    onRemove();
   }
   const isCollected = exampleIsCollected(example.recordId);
   const isCustom = exampleIsCustom(example.recordId);
@@ -46,7 +48,7 @@ export default function AddToMyFlashcardsButtons({
       <button
         type="button"
         className="addFlashcardButton"
-        onClick={() => addAndAdvance()}
+        onClick={() => add()}
       >
         Add to my flashcards
       </button>
@@ -56,7 +58,7 @@ export default function AddToMyFlashcardsButtons({
       <button
         type="button"
         className="removeFlashcardButton"
-        onClick={() => removeAndAdvance()}
+        onClick={() => remove()}
       >
         Remove from my flashcards
       </button>
@@ -68,6 +70,7 @@ export default function AddToMyFlashcardsButtons({
       </button>
     );
   } else {
-    return <div>Error Parsing Flashcard Status</div>;
+    console.error('Failed to parse flashcard status');
+    return null;
   }
 }

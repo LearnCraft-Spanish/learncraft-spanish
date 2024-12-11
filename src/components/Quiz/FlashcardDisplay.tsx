@@ -14,25 +14,25 @@ interface FlashcardProps {
   isStudent: boolean;
   answerShowing: boolean;
   startWithSpanish?: boolean;
-  incrementExampleNumber: () => void;
-  onRemove: () => void;
   toggleAnswer: () => void;
   audioActive: string;
   togglePlaying: () => void;
   playing: boolean;
+  incrementExampleNumber: () => void;
+  onRemove: () => void;
 }
 
 export default function FlashcardDisplay({
   example,
   isStudent,
   answerShowing,
-  incrementExampleNumber,
   audioActive,
-  onRemove,
   playing,
   togglePlaying,
   startWithSpanish = false,
   toggleAnswer,
+  incrementExampleNumber,
+  onRemove,
 }: FlashcardProps): JSX.Element {
   const spanishText = example.spanishExample;
   const englishText = example.englishTranslation;

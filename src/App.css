@@ -871,6 +871,10 @@ button:hover,
   min-width: 120px;
   cursor: pointer;
 }
+.disabledButton {
+  width: 10%;
+  min-width: 120px;
+}
 
 .addButton {
   background-color: darkgreen;
@@ -1162,7 +1166,7 @@ button:hover,
 }
 
 .myFlashcardsFormContentWrapper > label,
-.myFlashcardsFormContentWrapper > div {
+.myFlashcardsFormContentWrapper > div > div {
   /* align on right side of parent */
 
   display: flex;

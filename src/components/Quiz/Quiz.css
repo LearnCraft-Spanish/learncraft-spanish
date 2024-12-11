@@ -210,3 +210,47 @@
   
 }
   */
+
+.buttonBox.header input {
+  display: none;
+}
+.buttonBox.header label {
+  width: 50%;
+  display: block;
+  text-align: center;
+  /* background-color: var(--brand); */
+  padding: 10px 30px;
+  /* font-size: 14px; */
+  font-weight: 600;
+  color: var(--dark);
+  border: 1px solid var(--dark);
+  cursor: pointer;
+  border-bottom: 0px;
+}
+.buttonBox.header {
+  width: 100%;
+  margin: 0px;
+}
+.buttonBox.header label.selected {
+  background-color: var(--brand);
+  color: var(--light);
+  /* border: 1px solid var(--brand); */
+}
+.buttonBox.header label:hover {
+  background-color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.quizTypeSettingsWrapper {
+  padding: 10px;
+  border: 1px solid var(--dark);
+}
+
+.quizTypeSettingsWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto;
+  margin-bottom: 8px;
+}
