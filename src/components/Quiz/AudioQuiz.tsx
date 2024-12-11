@@ -42,34 +42,11 @@ export default function AudioQuiz({
   const navigate = useNavigate();
   const isMainLocation = location.pathname.split('/').length < 2;
 
-  // Define data readiness for UI updates
-  // const dataReady =
-  //   userDataQuery.isSuccess &&
-  //   activeStudentQuery.isSuccess &&
-  //   programTableQuery.isSuccess &&
-  //   audioExamplesQuery.isSuccess &&
-  //   (userDataQuery.data?.isAdmin ||
-  //     activeStudentQuery.data?.role === 'student' ||
-  //     activeStudentQuery.data?.role === 'limited');
-  // const isError =
-  //   !dataReady &&
-  //   (userDataQuery.isError ||
-  //     programTableQuery.isError ||
-  //     audioExamplesQuery.isError ||
-  //     activeStudentQuery.isError);
-  // const isLoading =
-  //   !dataReady &&
-  //   (activeStudentQuery.isLoading ||
-  //     userDataQuery.isLoading ||
-  //     programTableQuery.isLoading ||
-  //     audioExamplesQuery.isLoading);
-  // const unavailable = !dataReady && !isLoading && !isError;
-
   // Examples Table after: filtedBylessonId, shuffled
   // const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]) // This is the proper pattern for flat state
-  const [currentExampleNumber, setCurrentExampleNumber] = useState<number>(0); // Array Index of displayed example
+  const [currentExampleIndex, setcurrentExampleIndex] = useState<number>(0); // Array Index of displayed example
 
-  // New Audio Handling
+  // Audio Handling
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const prevAudioRefDuration = useRef<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -82,8 +59,7 @@ export default function AudioQuiz({
   // Memo to parse quiz examples
   const [displayOrder, setDisplayOrder] = useState(() => {
     const shuffledExamples = fisherYatesShuffle(examplesToParse);
-    // This should be display orders rather than examples.
-    // Can be fixed later, probably not the source of existing bugs.
+    // This should be display orders (array of id's) rather than examples.
     if (quizLength) {
       return shuffledExamples.slice(0, quizLength);
     }
@@ -94,17 +70,17 @@ export default function AudioQuiz({
     [activeStudentQuery.isSuccess, displayOrder.length],
   );
   // Memo the current example
-  // This will update whenever the currentExampleNumber changes
+  // This will update whenever the currentExampleIndex changes
   const currentExample = useMemo((): Flashcard | undefined => {
     if (displayOrder.length > 0) {
-      return displayOrder[currentExampleNumber];
+      return displayOrder[currentExampleIndex];
     }
-  }, [displayOrder, currentExampleNumber]);
+  }, [displayOrder, currentExampleIndex]);
 
   // New Step Handling Variables
   // Using a state to control the current step so the UI can update
   const [currentStep, setCurrentStep] = useState<stepValues>('question');
-  // const steps = ['question', 'guess', 'hint', 'answer']
+  // steps = ['question', 'guess', 'hint', 'answer']
 
   // Step Values for each: Will be derived from the current example
   const questionValue = useMemo((): StepValue => {
@@ -195,7 +171,7 @@ export default function AudioQuiz({
     setCountdown(length);
   }
 
-  /*       New Audio Handling     */
+  /*       Audio Handling     */
   const playAudio = useCallback(() => {
     // add catch for when audio not supported (url is empty)
     if (autoplay) {
@@ -261,21 +237,21 @@ export default function AudioQuiz({
 
   // Skips to the next whole example
   const incrementExample = useCallback(() => {
-    if (currentExampleNumber + 1 < displayOrder?.length) {
-      setCurrentExampleNumber(currentExampleNumber + 1);
+    if (currentExampleIndex + 1 < displayOrder?.length) {
+      setcurrentExampleIndex(currentExampleIndex + 1);
     } else {
-      setCurrentExampleNumber(displayOrder?.length - 1 || 0);
+      setcurrentExampleIndex(displayOrder?.length - 1 || 0);
     }
     setCurrentStep('question');
-  }, [currentExampleNumber, displayOrder]);
+  }, [currentExampleIndex, displayOrder]);
 
   // Skips to the previous whole example
   const decrementExample = useCallback(
     (customDecrement: undefined | stepValues = undefined) => {
-      if (currentExampleNumber > 0) {
-        setCurrentExampleNumber(currentExampleNumber - 1);
+      if (currentExampleIndex > 0) {
+        setcurrentExampleIndex(currentExampleIndex - 1);
       } else {
-        setCurrentExampleNumber(0);
+        setcurrentExampleIndex(0);
       }
       // This is a custom decrement for when using arrows causes decrementCurrentStep to go back one example
       if (customDecrement) {
@@ -284,7 +260,7 @@ export default function AudioQuiz({
         setCurrentStep('question');
       }
     },
-    [currentExampleNumber],
+    [currentExampleIndex],
   );
 
   // Steps the quiz forward
@@ -357,7 +333,7 @@ export default function AudioQuiz({
   }
 
   const unReadyQuiz = useCallback(() => {
-    setCurrentExampleNumber(0);
+    setcurrentExampleIndex(0);
     setCurrentStep('question');
     if (autoplay) {
       clearCountDown();
@@ -370,12 +346,14 @@ export default function AudioQuiz({
   }, [autoplay, cleanupFunction, isMainLocation, navigate]);
 
   function onRemove() {
-    // this is to update the total example numbers, remove the removed example from displayOrder, and reset the currentExampleNumber
+    // this is to update the total example numbers, remove the removed example from displayOrder, and reset the currentExampleIndex
     // setTotalExamplesNumber(totalExamplesNumber - 1);
-    const deletedExample = displayOrder.splice(currentExampleNumber - 1, 1);
-    setDisplayOrder(
-      displayOrder.filter((example) => example !== deletedExample[0]),
+    const deletedExample = displayOrder.splice(currentExampleIndex, 1);
+    const newDisplayOrder = displayOrder.filter(
+      (example) => example !== deletedExample[0],
     );
+    decrementExample();
+    setDisplayOrder(newDisplayOrder);
   }
 
   // in charge of Autoplay loop & updating visual progress bar
@@ -457,7 +435,7 @@ export default function AudioQuiz({
         <>
           <div className="audioBox">
             <NewQuizProgress
-              currentExampleNumber={currentExampleNumber + 1}
+              currentExampleIndex={currentExampleIndex + 1}
               totalExamplesNumber={displayOrder.length}
               quizTitle={'My Audio Flashcards'}
             />
@@ -470,9 +448,9 @@ export default function AudioQuiz({
               resumePlayback={resumePlayback}
               isPlaying={isPlaying}
               currentExample={currentExample}
-              incrementExample={incrementExample}
               isStudent={activeStudentQuery.data?.role === 'student'}
               currentStep={currentStep}
+              // incrementExample={incrementExample}
               onRemove={onRemove}
             />
             {audioElement()}

@@ -167,7 +167,7 @@ export default function QuizComponent({
         setCurrentExampleNumber(quizLength - 1);
       }
     } else {
-      incrementExampleNumber();
+      // incrementExampleNumber();
     }
   }
 
@@ -358,14 +358,14 @@ export default function QuizComponent({
             <FlashcardDisplay
               example={currentExample}
               isStudent={activeStudentQuery.data?.role === 'student'}
-              incrementExampleNumber={incrementExampleNumber}
-              onRemove={onRemove}
               answerShowing={answerShowing}
               toggleAnswer={toggleAnswer}
               togglePlaying={togglePlaying}
               playing={playing}
               audioActive={audioActive}
               startWithSpanish={startWithSpanish}
+              // incrementExampleNumber={incrementExampleNumber}
+              // onRemove={onRemove}
             />
           )}
           <div className="quizButtons">

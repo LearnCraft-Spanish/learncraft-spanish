@@ -5,12 +5,12 @@ import type { Flashcard } from '../../interfaceDefinitions';
 
 interface AddToMyFlashcardsButtonsProps {
   example: Flashcard | undefined;
-  incrementExampleNumber: () => void;
+  // incrementExampleNumber: () => void;
   onRemove: () => void;
 }
 export default function AddToMyFlashcardsButtons({
   example,
-  incrementExampleNumber,
+  // incrementExampleNumber,
   onRemove,
 }: AddToMyFlashcardsButtonsProps): JSX.Element {
   const {
@@ -23,14 +23,14 @@ export default function AddToMyFlashcardsButtons({
   if (!example) {
     return <div>Error Parsing Flashcard</div>;
   }
-  function addAndAdvance() {
+  function add() {
     if (!example) {
       return;
     }
     addFlashcardMutation.mutate(example);
-    incrementExampleNumber();
+    // incrementExampleNumber();
   }
-  function removeAndAdvance() {
+  function remove() {
     if (!example) {
       return;
     }
@@ -46,7 +46,7 @@ export default function AddToMyFlashcardsButtons({
       <button
         type="button"
         className="addFlashcardButton"
-        onClick={() => addAndAdvance()}
+        onClick={() => add()}
       >
         Add to my flashcards
       </button>
@@ -56,7 +56,7 @@ export default function AddToMyFlashcardsButtons({
       <button
         type="button"
         className="removeFlashcardButton"
-        onClick={() => removeAndAdvance()}
+        onClick={() => remove()}
       >
         Remove from my flashcards
       </button>
