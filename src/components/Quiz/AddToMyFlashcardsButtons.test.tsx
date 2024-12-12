@@ -5,7 +5,6 @@ import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import allStudentFlashcards from '../../../mocks/data/hooklike/studentFlashcardData';
 import serverlikeData from '../../../mocks/data/serverlike/serverlikeData';
 import { setupMockAuth } from '../../../tests/setupMockAuth';
-import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import { useUserData } from '../../hooks/useUserData';
 import AddToMyFlashcardsButtons from './AddToMyFlashcardsButtons';
 
@@ -23,7 +22,6 @@ const notCollectedFlashcard = verifiedExamplesTable.find(
 
 /**
  * NEXT STEPS: For Blake 12/12
- *  - refactor addToMyFlashcardsButtons to use useStudentFlashcards
  *  - refactor any parents that use addToMyFlashcardsButtons to allow the child to handle conditionally rendering itself if it makes sense?
  */
 describe('component AddToMyFlashcardsButtons', () => {
