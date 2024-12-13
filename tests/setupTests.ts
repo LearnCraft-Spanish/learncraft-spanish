@@ -16,11 +16,11 @@ beforeAll(() => {
   server.listen();
   Object.defineProperty(HTMLMediaElement.prototype, 'pause', {
     configurable: true,
-    value: vi.fn(), // Use vi.fn() if you're using Vitest
+    value: vi.fn(),
   });
   Object.defineProperty(HTMLMediaElement.prototype, 'play', {
     configurable: true,
-    value: vi.fn(), // Use vi.fn() if you're using Vitest
+    value: vi.fn(),
   });
 });
 
