@@ -51,7 +51,7 @@ describe('component AudioQuiz', () => {
     vi.clearAllMocks();
   });
 
-  describe('initial states', () => {
+  describe('initial state', () => {
     it('renders without crashing', async () => {
       render(
         <AudioQuiz
@@ -130,7 +130,8 @@ describe('component AudioQuiz', () => {
       });
     });
     it.skip('cleanupFunction is called when all flashcards are removed from quiz', async () => {
-      // This will happen when: (LOOK AT KNOWN ISSUES COMMENT AT TOP OF FILE, MOVE THIS TO A PARENT COMPONENT TEST)
+      // LOOK AT KNOWN ISSUES COMMENT AT TOP OF FILE, MOVE THIS TO A PARENT COMPONENT TEST
+      // This will happen when:
       // 1. ReviewMyFlashcards Audio Quiz, all flashcards are removed
       render(
         <AudioQuiz
@@ -185,6 +186,28 @@ describe('component AudioQuiz', () => {
       });
       await waitFor(() => {
         expect(screen.queryByText(/make a guess/i)).toBeInTheDocument();
+      });
+    });
+    it('autoplay is false, 2nd step is NOT guess', async () => {
+      render(
+        <AudioQuiz
+          quizTitle={'Test Quiz'}
+          examplesToParse={unknownAudioExamples}
+          cleanupFunction={cleanupFunction}
+          autoplay={false}
+        />,
+        {
+          wrapper: MockAllProviders,
+        },
+      );
+      await waitFor(() => {
+        expect(screen.queryByText(/listen to audio/i)).toBeInTheDocument();
+      });
+      act(() => {
+        fireEvent.click(screen.getByText(/show spanish/i));
+      });
+      await waitFor(() => {
+        expect(screen.queryByText(/guess/i)).not.toBeInTheDocument();
       });
     });
   });

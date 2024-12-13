@@ -28,9 +28,9 @@ interface AudioQuizProps {
   audioOrComprehension?: 'audio' | 'comprehension';
   autoplay: boolean;
   cleanupFunction: () => void;
-  incrementOnAdd?: boolean;
   quizTitle: string;
   myFlashcardsQuiz?: boolean;
+  incrementOnAdd?: boolean;
 }
 
 export default function AudioQuiz({
@@ -39,7 +39,7 @@ export default function AudioQuiz({
   autoplay,
   cleanupFunction,
   quizLength,
-  incrementOnAdd,
+  incrementOnAdd, // serves same perpose as myflashcardsquiz + autoplay? investigate and hopefully remove
   quizTitle,
   myFlashcardsQuiz = false,
 }: AudioQuizProps) {
