@@ -1,6 +1,12 @@
 import { act } from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  fireEvent,
+  getByText,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 
 import { setupMockAuth } from '../../../tests/setupMockAuth';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
@@ -50,61 +56,62 @@ async function startAudioQuiz(
   audioOrComprehension: 'audio' | 'comprehension' = 'audio',
   willAutoplay: boolean = false,
 ) {
-  describe(`${audioOrComprehension} quiz will begin with autoplay ${willAutoplay}`, async () => {
-    render(
-      <AudioBasedReview
-        audioOrComprehension={audioOrComprehension}
-        willAutoplay={willAutoplay}
-        quizTitle={'Test Quiz'}
-      />,
-      {
-        wrapper: MockAllProviders,
-      },
-    );
-    let courseSelector: HTMLSelectElement;
-    await waitFor(() => {
-      courseSelector = screen.getByText('LearnCraft Spanish');
-      expect(courseSelector).toBeInTheDocument();
-    });
-    act(() => {
-      fireEvent.change(courseSelector, { target: { value: '2' } });
-    });
-
-    await waitFor(() => {
-      const lessonSelectors = screen.getAllByText('Lesson 1');
-      expect(lessonSelectors).toHaveLength(2);
-      const toLessonSelector = lessonSelectors[1] as HTMLSelectElement;
-      expect(toLessonSelector).toBeInTheDocument();
-      expect(
-        screen.getByText('There are no audio examples for this lesson range'),
-      ).toBeInTheDocument();
-    });
-    act(() => {
-      fireEvent.change(toLessonSelector, { target: { value: '150' } });
-    });
-    await waitFor(() => {
-      expect(screen.getByText('Lesson 150')).toBeInTheDocument();
-      expect(
-        screen.queryByText('There are no audio examples for this lesson range'),
-      ).not.toBeInTheDocument();
-      expect(screen.getByText('Start')).toBeInTheDocument();
-    });
-    act(() => {
-      fireEvent.click(screen.getByText('Start'));
-    });
-    await waitFor(() => {
-      expect(screen.getByText('Next')).toBeInTheDocument();
-      expect(screen.getByText('Previous')).toBeInTheDocument();
-    });
+  render(
+    <AudioBasedReview
+      audioOrComprehension={audioOrComprehension}
+      willAutoplay={willAutoplay}
+      quizTitle={'Test Quiz'}
+    />,
+    {
+      wrapper: MockAllProviders,
+    },
+  );
+  let courseSelector: HTMLSelectElement;
+  await waitFor(() => {
+    courseSelector = screen.getByLabelText('Course:') as HTMLSelectElement;
+    expect(courseSelector).toBeInTheDocument();
+  });
+  act(() => {
+    fireEvent.change(courseSelector, { target: { value: '2' } });
+  });
+  let toLessonSelector: HTMLSelectElement;
+  await waitFor(() => {
+    expect(courseSelector.value).toBe('2');
+    toLessonSelector = screen.getByLabelText('To:') as HTMLSelectElement;
+    expect(toLessonSelector).toBeInTheDocument();
+    expect(screen.getByText('Lesson 70')).toBeInTheDocument();
+    expect(
+      screen.queryByText('There are no audio examples for this lesson range'),
+    ).toBeInTheDocument();
+  });
+  act(() => {
+    fireEvent.change(toLessonSelector, { target: { value: '131' } });
+  });
+  await waitFor(() => {
+    expect(toLessonSelector.value).toBe('131');
+    expect(
+      screen.queryByText('There are no audio examples for this lesson range'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Start')).toBeInTheDocument();
+  });
+  act(() => {
+    fireEvent.click(screen.getByText('Start'));
+  });
+  await waitFor(() => {
+    expect(screen.queryByText('Next')).toBeInTheDocument();
+    expect(screen.queryByText('Previous')).toBeInTheDocument();
   });
 }
 
 describe('all steps work', () => {
-  beforeEach(() => {
-    setupMockAuth({ userName: 'limited' });
+  beforeEach(async () => {
+    setupMockAuth({ userName: 'student-admin' });
   });
   it('in audio quiz on autoplay', async () => {
     await startAudioQuiz('audio', true);
+    await waitFor(() => {
+      expect(screen.queryByText('Skip to Guess')).toBeInTheDocument();
+    });
     await waitFor(() => {
       expect(screen.queryByText('Skip to Guess')).toBeInTheDocument();
     });
