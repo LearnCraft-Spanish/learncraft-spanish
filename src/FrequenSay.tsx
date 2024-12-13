@@ -57,7 +57,7 @@ export default function FrequenSay() {
         await spellings.then((result) => {
           result.forEach((element) => {
             const relatedVocab = usefulData.find(
-              (record) => record.recordId === element.relatedWordIdiom,
+              (record) => record.recordId === element.relatedWordidiom,
             );
             if (relatedVocab && relatedVocab.spellings) {
               relatedVocab.spellings.push(element.spellingOption);

@@ -27,7 +27,8 @@ function AudioFlashcardAutoplayOn() {
       currentExample={undefined}
       incrementExample={incrementCurrentStep}
       isStudent={false}
-      currentStep="currentStep"
+      onRemove={incrementCurrentStep}
+      currentStep="question"
     />
   );
 }
@@ -44,7 +45,8 @@ function AudioFlashcardAutoplayOff() {
       currentExample={undefined}
       incrementExample={incrementCurrentStep}
       isStudent={false}
-      currentStep="currentStep"
+      onRemove={incrementCurrentStep}
+      currentStep="question"
     />
   );
 }
@@ -62,7 +64,8 @@ function AudioFlashcardPlaying() {
       currentExample={undefined}
       incrementExample={incrementCurrentStep}
       isStudent={false}
-      currentStep="currentStep"
+      onRemove={incrementCurrentStep}
+      currentStep="question"
     />
   );
 }
@@ -79,7 +82,8 @@ function AudioFlashcardPaused() {
       currentExample={undefined}
       incrementExample={incrementCurrentStep}
       isStudent={false}
-      currentStep="currentStep"
+      onRemove={incrementCurrentStep}
+      currentStep="question"
     />
   );
 }

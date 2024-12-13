@@ -7,6 +7,14 @@ export interface Lesson {
   vocabKnown: Array<string>;
 }
 
+export interface LessonUnparsed {
+  recordId: number;
+  lesson: string;
+  vocabIncluded: Array<string>;
+  sortReference: number | null;
+  relatedProgram: number;
+}
+
 export interface Program {
   recordId: number;
   name: string;
@@ -90,11 +98,6 @@ export type ActiveStudent = UserData | null;
 // export type AudioExamplesTable = Array<AudioExample>;
 export type AudioExamplesTable = Array<Flashcard>;
 
-export interface Spelling {
-  relatedWordIdiom: number;
-  spellingOption: string;
-}
-
 export interface Vocabulary {
   recordId: number;
   wordIdiom: string;
@@ -134,10 +137,17 @@ export interface QuizExamplesTable {
   quizExamplesTable: Flashcard[];
 }
 
-export interface Spelling {
+interface OldSpelling {
   relatedWordidiom: number;
   spellingOption: string;
 }
+
+interface NewSpelling {
+  relatedWordIdiom: number;
+  spellingOption: string;
+}
+
+export type Spelling = OldSpelling | NewSpelling;
 
 /*      Flashcard Finder      */
 

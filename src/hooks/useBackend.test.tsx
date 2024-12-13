@@ -151,7 +151,7 @@ describe('useBackend Hook', () => {
 
   testArrayFetchFunction({
     functionName: 'getSpellingsFromBackend',
-    requiredFields: ['relatedWordIdiom', 'spellingOption'],
+    requiredFields: ['relatedWordidiom', 'spellingOption'],
   });
 
   testArrayFetchFunction({
