@@ -1,13 +1,6 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { aw } from 'vitest/dist/chunks/reporters.anwo7Y6a';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import AudioQuizSetupMenu from './AudioQuizSetupMenu';
 

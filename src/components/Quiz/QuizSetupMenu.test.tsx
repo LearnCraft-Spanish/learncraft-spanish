@@ -1,8 +1,7 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React, { act } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-import serverlikeData from '../../../mocks/data/serverlike/serverlikeData';
 import { getUserDataFromName } from '../../../mocks/data/serverlike/studentTable';
 import allStudentFlashcards from '../../../mocks/data/hooklike/studentFlashcardData';
 

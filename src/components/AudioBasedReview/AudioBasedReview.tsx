@@ -17,7 +17,6 @@ import './AudioBasedReview.css';
 interface AudioBasedReviewProps {
   audioOrComprehension?: 'audio' | 'comprehension';
   willAutoplay: boolean;
-  quizTitle: string;
 }
 
 export default function AudioBasedReview({

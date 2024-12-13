@@ -1,12 +1,6 @@
 import { act } from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
-import {
-  fireEvent,
-  getByText,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { setupMockAuth } from '../../../tests/setupMockAuth';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
@@ -18,13 +12,13 @@ describe('initial state', () => {
     setupMockAuth();
   });
   it('while waiting for data, shows loading', async () => {
-    render(<AudioBasedReview willAutoplay={false} quizTitle={'Test Quiz'} />, {
+    render(<AudioBasedReview willAutoplay={false} />, {
       wrapper: MockAllProviders,
     });
     expect(screen.getByText('Loading Audio...')).toBeInTheDocument();
   });
   it('await data load, component renders', async () => {
-    render(<AudioBasedReview willAutoplay={false} quizTitle={'Test Quiz'} />, {
+    render(<AudioBasedReview willAutoplay={false} />, {
       wrapper: MockAllProviders,
     });
     await waitFor(() => expect(screen.getByText('From:')).toBeInTheDocument());
@@ -38,7 +32,7 @@ describe('begin a quiz', () => {
     setupMockAuth({ userName: 'student-lcsp' });
   });
   it('clicking begin quiz, shows quiz', async () => {
-    render(<AudioBasedReview willAutoplay={false} quizTitle={'Test Quiz'} />, {
+    render(<AudioBasedReview willAutoplay={false} />, {
       wrapper: MockAllProviders,
     });
     await waitFor(() => {
@@ -60,7 +54,6 @@ async function startAudioQuiz(
     <AudioBasedReview
       audioOrComprehension={audioOrComprehension}
       willAutoplay={willAutoplay}
-      quizTitle={'Test Quiz'}
     />,
     {
       wrapper: MockAllProviders,
