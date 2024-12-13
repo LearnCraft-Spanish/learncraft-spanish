@@ -14,35 +14,6 @@ const studentFlashcards = allStudentFlashcards.find(
   (x) => x.userName === student?.name,
 );
 
-/*
-Before Testing Notes:
-- In order to test all aspects of the filtering function,
-  we need to pass in a variety of examples to the component.
-- This component is only used by an activeUser of type 'student'.
-*/
-/*
-props: 
-
-  examplesToParse: StudentExample[] | undefined;
-  // setExamplesToParse: (examples: StudentExample[] | undefined) => void;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  quizType: 'text' | 'audio';
-  setQuizType: (quizType: 'text' | 'audio') => void;
-  quizLength: number;
-  setQuizLength: (quizLength: number) => void;
-  customOnly: boolean;
-  setCustomOnly: (customOnly: boolean) => void;
-  isSrs: boolean;
-  setIsSrs: (isSrs: boolean) => void;
-  spanishFirst: boolean;
-  setSpanishFirst: (spanishFirst: boolean) => void;
-  autoplay: boolean;
-  setAutoplay: (autoplay: boolean) => void;
-  audioOrComprehension: 'audio' | 'comprehension';
-  setAudioOrComprehension: (
-    audioOrComprehension: 'audio' | 'comprehension',
-    */
-
 describe('component QuizSetupMenu', () => {
   beforeEach(() => {
     setupMockAuth({ userName: 'student-lcsp' });
@@ -203,6 +174,188 @@ describe('component QuizSetupMenu', () => {
         expect(
           screen.getByText('Custom Only', { exact: false }),
         ).toBeInTheDocument();
+      });
+    });
+  });
+  describe('filtering functionality', () => {
+    const examplesToParse =
+      studentFlashcards?.studentFlashcardData.studentExamples;
+    if (!examplesToParse) {
+      throw new Error('No examples to parse');
+    }
+    const initialLength = examplesToParse.length;
+    it('filters examples by SRS', async () => {
+      render(
+        <QuizSetupMenu
+          examplesToParse={examplesToParse}
+          handleSubmit={() => {}}
+          quizLength={10}
+          setQuizLength={() => {}}
+          quizType="text"
+          setQuizType={() => {}}
+          customOnly={false}
+          setCustomOnly={() => {}}
+          isSrs // true
+          setIsSrs={() => {}}
+          spanishFirst={false}
+          setSpanishFirst={() => {}}
+          autoplay={false}
+          setAutoplay={() => {}}
+          audioOrComprehension="audio"
+          setAudioOrComprehension={() => {}}
+        />,
+        { wrapper: MockAllProviders },
+      );
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+
+        expect(select).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+        const options = select.querySelectorAll('option');
+        const optionValues = Array.from(options).map((option) => option.value);
+        // @ts-expect-error - I am confident optionValues will have at least one element
+        expect(Number.parseInt(optionValues.at(-1))).toBeLessThan(
+          initialLength,
+        );
+      });
+    });
+    it('filters examples by customOnly', async () => {
+      const verifyCustomIsPresent = examplesToParse.some((example) => {
+        return example.coachAdded;
+      });
+      if (!verifyCustomIsPresent) {
+        throw new Error('No custom flashcards found');
+      }
+      render(
+        <QuizSetupMenu
+          examplesToParse={examplesToParse}
+          handleSubmit={() => {}}
+          quizLength={10}
+          setQuizLength={() => {}}
+          quizType="text"
+          setQuizType={() => {}}
+          customOnly // true
+          setCustomOnly={() => {}}
+          isSrs={false}
+          setIsSrs={() => {}}
+          spanishFirst={false}
+          setSpanishFirst={() => {}}
+          autoplay={false}
+          setAutoplay={() => {}}
+          audioOrComprehension="audio"
+          setAudioOrComprehension={() => {}}
+        />,
+        { wrapper: MockAllProviders },
+      );
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+
+        expect(select).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+        const options = select.querySelectorAll('option');
+        const optionValues = Array.from(options).map((option) => option.value);
+        // @ts-expect-error - I am confident optionValues will have at least one element
+        expect(Number.parseInt(optionValues.at(-1))).toBeLessThan(
+          initialLength,
+        );
+      });
+    });
+    it('filteres examples by audio only ', async () => {
+      render(
+        <QuizSetupMenu
+          examplesToParse={examplesToParse}
+          handleSubmit={() => {}}
+          quizLength={10}
+          setQuizLength={() => {}}
+          quizType="audio"
+          setQuizType={() => {}}
+          customOnly={false}
+          setCustomOnly={() => {}}
+          isSrs={false}
+          setIsSrs={() => {}}
+          spanishFirst={false}
+          setSpanishFirst={() => {}}
+          autoplay={false}
+          setAutoplay={() => {}}
+          audioOrComprehension="audio"
+          setAudioOrComprehension={() => {}}
+        />,
+        { wrapper: MockAllProviders },
+      );
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+
+        expect(select).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+        const options = select.querySelectorAll('option');
+        const optionValues = Array.from(options).map((option) => option.value);
+        // @ts-expect-error - I am confident optionValues will have at least one element
+        expect(Number.parseInt(optionValues.at(-1))).toBeLessThan(
+          initialLength,
+        );
+      });
+    });
+    it('when filtered examples === 0, start button is disabled', async () => {
+      // Becase we cant just pass in no examples (breaks component), we are passing in only examples without audio
+      // then filtering by audio only, making total # of examples 0
+      const examplesWithoutAudio =
+        studentFlashcards?.studentFlashcardData.examples.filter((example) => {
+          return example.englishAudio.length === 0;
+        });
+      const studentExamplesWithoutAudio = examplesToParse.filter(
+        (studentExample) => {
+          return examplesWithoutAudio.some(
+            (example) => example.recordId === studentExample.relatedExample,
+          );
+        },
+      );
+      if (studentExamplesWithoutAudio.length === 0) {
+        throw new Error('No examples without audio found');
+      }
+      render(
+        <QuizSetupMenu
+          examplesToParse={studentExamplesWithoutAudio}
+          handleSubmit={() => {}}
+          quizLength={10}
+          setQuizLength={() => {}}
+          quizType="audio"
+          setQuizType={() => {}}
+          customOnly={false}
+          setCustomOnly={() => {}}
+          isSrs={false}
+          setIsSrs={() => {}}
+          spanishFirst={false}
+          setSpanishFirst={() => {}}
+          autoplay={false}
+          setAutoplay={() => {}}
+          audioOrComprehension="audio"
+          setAudioOrComprehension={() => {}}
+        />,
+        { wrapper: MockAllProviders },
+      );
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+
+        expect(select).toBeInTheDocument();
+      });
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+        const options = select.querySelectorAll('option');
+        const optionValues = Array.from(options).map((option) => option.value);
+        // @ts-expect-error - I am confident optionValues will have at least one element
+        expect(Number.parseInt(optionValues.at(-1))).toBeLessThan(
+          initialLength,
+        );
+      });
+      await waitFor(() => {
+        const button = screen.getByRole('button', { name: /start/i });
+        expect(button).toBeDisabled();
       });
     });
   });
