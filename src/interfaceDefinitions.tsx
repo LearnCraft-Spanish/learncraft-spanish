@@ -137,17 +137,17 @@ export interface QuizExamplesTable {
   quizExamplesTable: Flashcard[];
 }
 
-interface OldSpelling {
-  relatedWordidiom: number;
-  spellingOption: string;
-}
+// interface OldSpelling {
+//   relatedWordidiom: number;
+//   spellingOption: string;
+// }
 
 interface NewSpelling {
   relatedWordIdiom: number;
   spellingOption: string;
 }
 
-export type Spelling = OldSpelling | NewSpelling;
+export type Spelling = NewSpelling;
 
 /*      Flashcard Finder      */
 
