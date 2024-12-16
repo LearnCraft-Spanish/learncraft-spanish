@@ -160,6 +160,7 @@ const Coaching = () => {
       coursesPromise,
       lessonsPromise,
     ]).then((results) => {
+      console.log(results[2]);
       students.current = results[0];
       memberships.current = results[1];
       weekRecords.current = results[2][0];
@@ -956,7 +957,7 @@ const Coaching = () => {
 
   return (
     <div className="coaching">
-      {!startupDataLoaded && <p>This section is still under construction</p>}
+      {!startupDataLoaded && <p>data is loading</p>}
       {startupDataLoaded && (
         <div>
           <div className="coachingFilterSection">

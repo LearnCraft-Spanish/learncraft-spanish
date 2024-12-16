@@ -100,11 +100,11 @@ export default function Menu() {
                   FrequenSay
                 </Link>
               </div>
-              {/* <div className="buttonBox">
-                    <Link className="linkButton" to="/coaching">
-                      Coaching
-                    </Link>
-                  </div> */}
+              <div className="buttonBox">
+                <Link className="linkButton" to="/coaching">
+                  Coaching
+                </Link>
+              </div>
             </div>
           )}
         </div>
