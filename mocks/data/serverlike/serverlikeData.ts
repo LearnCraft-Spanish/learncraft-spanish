@@ -6,10 +6,8 @@
 // Import types:
 import type {
   Flashcard,
-  Lesson,
   LessonUnparsed,
   ProgramUnparsed,
-  Quiz,
   QuizExamplesTable,
   QuizUnparsed,
   Spelling,
@@ -24,7 +22,7 @@ interface MockApiData {
   lessonsTable: LessonUnparsed[];
   vocabularyTable: Vocabulary[];
   spellingsTable: Spelling[];
-  quizzesTable: Quiz[];
+  quizzesTable: QuizUnparsed[];
   verifiedExamplesTable: Flashcard[];
   quizExamplesTableArray: QuizExamplesTable[];
 }

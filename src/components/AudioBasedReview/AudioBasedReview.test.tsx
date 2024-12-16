@@ -8,12 +8,9 @@ import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import AudioBasedReview from './AudioBasedReview';
 
 function renderAudioBasedReview(props = {}) {
-  render(
-    <AudioBasedReview willAutoplay={false} quizTitle="Test Quiz" {...props} />,
-    {
-      wrapper: MockAllProviders,
-    },
-  );
+  render(<AudioBasedReview willAutoplay={false} {...props} />, {
+    wrapper: MockAllProviders,
+  });
 }
 
 async function selectLessons() {

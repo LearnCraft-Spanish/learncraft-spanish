@@ -223,11 +223,7 @@ export const App: React.FC = () => {
             (userDataQuery.data?.role === 'student' ||
               userDataQuery.data?.role === 'limited' ||
               userDataQuery.data?.isAdmin) && (
-              <AudioBasedReview
-                quizTitle="Audio Quiz"
-                audioOrComprehension="audio"
-                willAutoplay
-              />
+              <AudioBasedReview audioOrComprehension="audio" willAutoplay />
             )
           }
         />
@@ -238,7 +234,6 @@ export const App: React.FC = () => {
               userDataQuery.data?.role === 'limited' ||
               userDataQuery.data?.isAdmin) && (
               <AudioBasedReview
-                quizTitle="Comprehension Quiz"
                 audioOrComprehension="comprehension"
                 willAutoplay={false}
               />

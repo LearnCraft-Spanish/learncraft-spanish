@@ -131,6 +131,10 @@ export interface Quiz {
   lessonNumber: number;
   subtitle: string;
 }
+export interface QuizUnparsed {
+  quizNickname: string;
+  recordId: number;
+}
 
 export interface QuizExamplesTable {
   quizNickname: string;
