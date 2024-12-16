@@ -417,43 +417,43 @@ button:hover,
   text-align: center;
 }
 
-.addFlashcardButton {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: fit-content;
-  background-color: darkgreen;
-  font-size: 10px;
-  padding: 5px 10px;
-  margin: 0 auto;
-}
-
-.pendingFlashcardButton {
-  cursor: default;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: fit-content;
-  background-color: var(--dark);
-  font-size: 10px;
-  padding: 5px 10px;
-  margin: 0 auto;
-}
-
+.addFlashcardButton,
+.pendingFlashcardButton,
 .removeFlashcardButton {
   position: absolute;
   top: 0px;
   right: 0px;
   width: fit-content;
-  background-color: darkred;
   font-size: 10px;
   padding: 5px 10px;
   margin: 0 auto;
+  z-index: 5;
+}
+
+.addFlashcardButton {
+  background-color: darkgreen;
+}
+.removeFlashcardButton {
+  background-color: darkred;
+}
+
+.pendingFlashcardButton {
+  cursor: default;
+  background-color: var(--dark);
 }
 
 .addFlashcardButton:hover,
-.removeFlashcardButton:hover {
+.removeFlashcardButton:hover,
+.pendingFlashcardButton:hover {
   background-color: var(--dark);
+}
+
+.audioFlashcard .addFlashcardButton:hover,
+.audioFlashcard .removeFlashcardButton:hover {
+  background-color: var(--accent);
+}
+.audioFlashcard .pendingFlashcardButton {
+  background-color: var(--accent);
 }
 
 /*For Flashcard Manager */
@@ -871,6 +871,10 @@ button:hover,
   min-width: 120px;
   cursor: pointer;
 }
+.disabledButton {
+  width: 10%;
+  min-width: 120px;
+}
 
 .addButton {
   background-color: darkgreen;
@@ -1162,7 +1166,7 @@ button:hover,
 }
 
 .myFlashcardsFormContentWrapper > label,
-.myFlashcardsFormContentWrapper > div {
+.myFlashcardsFormContentWrapper > div > div {
   /* align on right side of parent */
 
   display: flex;

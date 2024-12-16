@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import AudioQuizSetupMenu from './AudioQuizSetupMenu';
 
 const readyQuiz = vi.fn();
@@ -19,56 +19,59 @@ describe('component AudioQuizSetupMenu', () => {
 
   it('renders without crashing', () => {
     render(
-      <MemoryRouter>
+      <MockAllProviders route="/audioquiz">
         <AudioQuizSetupMenu
           autoplay
           examplesToPlayLength={5}
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MockAllProviders>,
     );
     expect(screen.getByText('Start')).toBeTruthy();
   });
   it('shows no examples found message', () => {
     render(
-      <MemoryRouter>
+      <MockAllProviders route="/audioquiz">
         <AudioQuizSetupMenu
           autoplay
           examplesToPlayLength={0}
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MockAllProviders>,
     );
     expect(
       screen.getByText('There are no audio examples for this lesson range'),
-    ).toBeTruthy();
+    ).toBeInTheDocument();
   });
-  it('toggle autoplay off', () => {
+  it('toggle autoplay off', async () => {
     render(
-      <MemoryRouter>
+      <MockAllProviders route="/audioquiz">
         <AudioQuizSetupMenu
           autoplay
           examplesToPlayLength={5}
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MockAllProviders>,
     );
-    screen.getByLabelText('toggleAutoplay').click();
+    const autoplayCheckbox = screen.getByRole('checkbox', {
+      name: 'toggleAutoplay',
+    });
+    autoplayCheckbox.click();
     expect(updateAutoplay).toHaveBeenCalledWith(false);
   });
-  it('toggle autoplay on', () => {
+  it('toggle autoplay on', async () => {
     render(
-      <MemoryRouter>
+      <MockAllProviders route="/audioquiz">
         <AudioQuizSetupMenu
           autoplay={false}
           examplesToPlayLength={5}
           readyQuiz={readyQuiz}
           updateAutoplay={updateAutoplay}
         />
-      </MemoryRouter>,
+      </MockAllProviders>,
     );
     screen.getByLabelText('toggleAutoplay').click();
     expect(updateAutoplay).toHaveBeenCalledWith(true);

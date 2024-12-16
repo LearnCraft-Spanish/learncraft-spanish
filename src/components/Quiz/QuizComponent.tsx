@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-import { Link, Navigate, useLocation } from 'react-router-dom';
 import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
 import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import MenuButton from '../Buttons/MenuButton';
+import PMFPopup from '../PMFPopup/PMFPopup';
 import NewQuizProgress from './../AudioBasedReview/NewQuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -33,6 +34,7 @@ export default function QuizComponent({
   quizLength = 1000,
 }: QuizComponentProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const { activeStudentQuery } = useActiveStudent();
   const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
     useStudentFlashcards();
@@ -335,11 +337,21 @@ export default function QuizComponent({
     };
   }, [handleKeyPress]);
 
+  useEffect(() => {
+    if (!displayOrder.length && displayOrderReady) {
+      navigate('..');
+      if (cleanupFunction) {
+        cleanupFunction();
+      }
+    }
+  }, [displayOrder, displayOrderReady, navigate, cleanupFunction]);
   return (
     <>
-      {displayOrderReady &&
-        !!initialDisplayOrder.current.length &&
-        !displayOrder.length && <Navigate to=".." />}
+      <PMFPopup
+        timeToShowPopup={
+          Math.floor(displayOrder.length / 2) === currentExampleNumber
+        }
+      />
       {!!displayOrder.length && (
         <div className="quiz">
           <NewQuizProgress
@@ -352,14 +364,14 @@ export default function QuizComponent({
             <FlashcardDisplay
               example={currentExample}
               isStudent={activeStudentQuery.data?.role === 'student'}
-              incrementExampleNumber={incrementExampleNumber}
-              onRemove={onRemove}
               answerShowing={answerShowing}
               toggleAnswer={toggleAnswer}
               togglePlaying={togglePlaying}
               playing={playing}
               audioActive={audioActive}
               startWithSpanish={startWithSpanish}
+              incrementExampleNumber={incrementExampleNumber}
+              onRemove={onRemove}
             />
           )}
           <div className="quizButtons">

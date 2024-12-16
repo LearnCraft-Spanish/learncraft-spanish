@@ -6,10 +6,10 @@
 // Import types:
 import type {
   Flashcard,
-  Lesson,
+  LessonUnparsed,
   ProgramUnparsed,
-  Quiz,
   QuizExamplesTable,
+  QuizUnparsed,
   Spelling,
   Vocabulary,
 } from '../../../src/interfaceDefinitions';
@@ -19,10 +19,10 @@ import { allStudentsTable } from './studentTable';
 
 interface MockApiData {
   programsTable: ProgramUnparsed[];
-  lessonsTable: Lesson[];
+  lessonsTable: LessonUnparsed[];
   vocabularyTable: Vocabulary[];
   spellingsTable: Spelling[];
-  quizzesTable: Quiz[];
+  quizzesTable: QuizUnparsed[];
   verifiedExamplesTable: Flashcard[];
   quizExamplesTableArray: QuizExamplesTable[];
 }
@@ -34,10 +34,10 @@ export default function serverlikeData() {
   const mockApiData: MockApiData = dataJson as MockApiData;
 
   const programsTable: ProgramUnparsed[] = mockApiData.programsTable;
-  const lessonsTable: Lesson[] = mockApiData.lessonsTable;
+  const lessonsTable: LessonUnparsed[] = mockApiData.lessonsTable;
   const vocabularyTable: Vocabulary[] = mockApiData.vocabularyTable;
   const spellingsTable: Spelling[] = mockApiData.spellingsTable;
-  const quizzesTable: Quiz[] = mockApiData.quizzesTable;
+  const quizzesTable: QuizUnparsed[] = mockApiData.quizzesTable;
   const verifiedExamplesTable: Flashcard[] = mockApiData.verifiedExamplesTable;
   const quizExamplesTableArray: QuizExamplesTable[] =
     mockApiData.quizExamplesTableArray;

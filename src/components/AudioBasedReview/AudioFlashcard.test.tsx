@@ -8,6 +8,12 @@ const incrementCurrentStep = vi.fn(() => {});
 const pausePlayback = vi.fn(() => {});
 const resumePlayback = vi.fn(() => {});
 
+/*
+  currentExample: Flashcard | undefined;
+  incrementExample: () => void;
+  isStudent: boolean;
+  currentStep: string;
+*/
 function AudioFlashcardAutoplayOn() {
   return (
     <AudioFlashcardComponent
@@ -18,6 +24,11 @@ function AudioFlashcardAutoplayOn() {
       pausePlayback={pausePlayback}
       resumePlayback={resumePlayback}
       isPlaying
+      currentExample={undefined}
+      incrementExample={incrementCurrentStep}
+      isStudent={false}
+      currentStep="question"
+      onRemove={() => {}}
     />
   );
 }
@@ -31,6 +42,11 @@ function AudioFlashcardAutoplayOff() {
       pausePlayback={pausePlayback}
       resumePlayback={resumePlayback}
       isPlaying
+      currentExample={undefined}
+      incrementExample={incrementCurrentStep}
+      isStudent={false}
+      currentStep="question"
+      onRemove={() => {}}
     />
   );
 }
@@ -45,6 +61,11 @@ function AudioFlashcardPlaying() {
       pausePlayback={pausePlayback}
       resumePlayback={resumePlayback}
       isPlaying
+      currentExample={undefined}
+      incrementExample={incrementCurrentStep}
+      isStudent={false}
+      currentStep="question"
+      onRemove={() => {}}
     />
   );
 }
@@ -58,6 +79,11 @@ function AudioFlashcardPaused() {
       pausePlayback={pausePlayback}
       resumePlayback={resumePlayback}
       isPlaying={false}
+      currentExample={undefined}
+      incrementExample={incrementCurrentStep}
+      isStudent={false}
+      currentStep="question"
+      onRemove={() => {}}
     />
   );
 }

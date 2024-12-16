@@ -218,7 +218,7 @@ export const App: React.FC = () => {
           }
         />
         <Route
-          path="/audioquiz/*"
+          path="/audioquiz"
           element={
             (userDataQuery.data?.role === 'student' ||
               userDataQuery.data?.role === 'limited' ||
@@ -228,7 +228,7 @@ export const App: React.FC = () => {
           }
         />
         <Route
-          path="/comprehensionquiz/*"
+          path="/comprehensionquiz"
           element={
             (userDataQuery.data?.role === 'student' ||
               userDataQuery.data?.role === 'limited' ||

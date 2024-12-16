@@ -14,6 +14,14 @@ beforeEach(() => {
 // Open the MSW server before all tests
 beforeAll(() => {
   server.listen();
+  Object.defineProperty(HTMLMediaElement.prototype, 'pause', {
+    configurable: true,
+    value: vi.fn(),
+  });
+  Object.defineProperty(HTMLMediaElement.prototype, 'play', {
+    configurable: true,
+    value: vi.fn(),
+  });
 });
 
 // Reset the server handlers after each test
