@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { over } from 'lodash';
 import { getUserDataFromName } from '../../../mocks/data/serverlike/studentTable';
 import allStudentFlashcards from '../../../mocks/data/hooklike/studentFlashcardData';
 
