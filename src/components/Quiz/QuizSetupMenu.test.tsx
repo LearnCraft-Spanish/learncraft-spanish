@@ -13,6 +13,32 @@ const student = getUserDataFromName('student-lcsp');
 const studentFlashcards = allStudentFlashcards.find(
   (x) => x.userName === student?.name,
 );
+const defaultProps = {
+  examplesToParse: studentFlashcards?.studentFlashcardData.studentExamples,
+  handleSubmit: () => {},
+  quizLength: 5,
+  setQuizLength: () => {},
+  quizType: 'text',
+  setQuizType: () => {},
+  customOnly: false,
+  setCustomOnly: () => {},
+  isSrs: false,
+  setIsSrs: () => {},
+  spanishFirst: false,
+  setSpanishFirst: () => {},
+  autoplay: false,
+  setAutoplay: () => {},
+  audioOrComprehension: 'audio',
+  setAudioOrComprehension: () => {},
+};
+async function successfulRender(overrides: any = {}) {
+  const props = { ...defaultProps, ...overrides };
+  render(<QuizSetupMenu {...props} />, { wrapper: MockAllProviders });
+  await waitFor(() => {
+    expect(screen.queryByRole('radio', { name: /text/i })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: /audio/i })).toBeInTheDocument();
+  });
+}
 
 describe('component QuizSetupMenu', () => {
   beforeEach(() => {
@@ -22,73 +48,13 @@ describe('component QuizSetupMenu', () => {
     const TextQuizOptions = ['Start with Spanish', 'Srs Quiz'];
     const AudioQuizOptions = ['Comprehension Quiz', 'Autoplay'];
     it('shows correct options when quizType = text', async () => {
-      render(
-        <QuizSetupMenu
-          examplesToParse={
-            studentFlashcards?.studentFlashcardData.studentExamples
-          }
-          handleSubmit={() => {}}
-          quizLength={5}
-          setQuizLength={() => {}}
-          quizType="text"
-          setQuizType={() => {}}
-          customOnly={false}
-          setCustomOnly={() => {}}
-          isSrs={false}
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        expect(
-          screen.getByRole('radio', { name: /text/i }),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole('radio', { name: /audio/i }),
-        ).toBeInTheDocument();
-      });
+      await successfulRender({ quizType: 'text' });
       TextQuizOptions.forEach((option) => {
         expect(screen.getByText(option, { exact: false })).toBeInTheDocument();
       });
     });
     it('shows correct options when quizType = audio', async () => {
-      render(
-        <QuizSetupMenu
-          examplesToParse={
-            studentFlashcards?.studentFlashcardData.studentExamples
-          }
-          handleSubmit={() => {}}
-          quizLength={5}
-          setQuizLength={() => {}}
-          quizType="audio"
-          setQuizType={() => {}}
-          customOnly={false}
-          setCustomOnly={() => {}}
-          isSrs={false}
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        expect(
-          screen.getByRole('radio', { name: /text/i }),
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole('radio', { name: /audio/i }),
-        ).toBeInTheDocument();
-      });
+      await successfulRender({ quizType: 'audio' });
       AudioQuizOptions.forEach((option) => {
         expect(screen.getByText(option, { exact: false })).toBeInTheDocument();
       });
@@ -102,32 +68,7 @@ describe('component QuizSetupMenu', () => {
             return example.coachAdded;
           },
         );
-      render(
-        <QuizSetupMenu
-          examplesToParse={examplesToParse}
-          handleSubmit={() => {}}
-          quizLength={5}
-          setQuizLength={() => {}}
-          quizType="text"
-          setQuizType={() => {}}
-          customOnly={false}
-          setCustomOnly={() => {}}
-          isSrs={false}
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        expect(
-          screen.queryByRole('radio', { name: /text/i }),
-        ).toBeInTheDocument();
-      });
+      await successfulRender({ examplesToParse });
       await waitFor(() => {
         expect(screen.queryByText('Custom Only', { exact: false })).toBeNull();
       });
@@ -142,34 +83,7 @@ describe('component QuizSetupMenu', () => {
       if (!verifyCustomIsPresent) {
         throw new Error('No custom flashcards found');
       }
-      render(
-        <QuizSetupMenu
-          examplesToParse={
-            studentFlashcards?.studentFlashcardData.studentExamples
-          }
-          handleSubmit={() => {}}
-          quizLength={5}
-          setQuizLength={() => {}}
-          quizType="text"
-          setQuizType={() => {}}
-          customOnly={false}
-          setCustomOnly={() => {}}
-          isSrs={false}
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        expect(
-          screen.queryByRole('radio', { name: /text/i }),
-        ).toBeInTheDocument();
-      });
+      await successfulRender();
       await waitFor(() => {
         expect(
           screen.getByText('Custom Only', { exact: false }),
@@ -185,32 +99,7 @@ describe('component QuizSetupMenu', () => {
     }
     const initialLength = examplesToParse.length;
     it('filters examples by SRS', async () => {
-      render(
-        <QuizSetupMenu
-          examplesToParse={examplesToParse}
-          handleSubmit={() => {}}
-          quizLength={10}
-          setQuizLength={() => {}}
-          quizType="text"
-          setQuizType={() => {}}
-          customOnly={false}
-          setCustomOnly={() => {}}
-          isSrs // true
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        const select = screen.getByLabelText(/number of flashcards:/i);
-
-        expect(select).toBeInTheDocument();
-      });
+      await successfulRender({ isSrs: true });
       await waitFor(() => {
         const select = screen.getByLabelText(/number of flashcards:/i);
         const options = select.querySelectorAll('option');
@@ -228,32 +117,7 @@ describe('component QuizSetupMenu', () => {
       if (!verifyCustomIsPresent) {
         throw new Error('No custom flashcards found');
       }
-      render(
-        <QuizSetupMenu
-          examplesToParse={examplesToParse}
-          handleSubmit={() => {}}
-          quizLength={10}
-          setQuizLength={() => {}}
-          quizType="text"
-          setQuizType={() => {}}
-          customOnly // true
-          setCustomOnly={() => {}}
-          isSrs={false}
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        const select = screen.getByLabelText(/number of flashcards:/i);
-
-        expect(select).toBeInTheDocument();
-      });
+      await successfulRender({ customOnly: true });
       await waitFor(() => {
         const select = screen.getByLabelText(/number of flashcards:/i);
         const options = select.querySelectorAll('option');
@@ -265,32 +129,7 @@ describe('component QuizSetupMenu', () => {
       });
     });
     it('filteres examples by audio only ', async () => {
-      render(
-        <QuizSetupMenu
-          examplesToParse={examplesToParse}
-          handleSubmit={() => {}}
-          quizLength={10}
-          setQuizLength={() => {}}
-          quizType="audio"
-          setQuizType={() => {}}
-          customOnly={false}
-          setCustomOnly={() => {}}
-          isSrs={false}
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        const select = screen.getByLabelText(/number of flashcards:/i);
-
-        expect(select).toBeInTheDocument();
-      });
+      await successfulRender({ quizType: 'audio' });
       await waitFor(() => {
         const select = screen.getByLabelText(/number of flashcards:/i);
         const options = select.querySelectorAll('option');
@@ -318,31 +157,9 @@ describe('component QuizSetupMenu', () => {
       if (studentExamplesWithoutAudio.length === 0) {
         throw new Error('No examples without audio found');
       }
-      render(
-        <QuizSetupMenu
-          examplesToParse={studentExamplesWithoutAudio}
-          handleSubmit={() => {}}
-          quizLength={10}
-          setQuizLength={() => {}}
-          quizType="audio"
-          setQuizType={() => {}}
-          customOnly={false}
-          setCustomOnly={() => {}}
-          isSrs={false}
-          setIsSrs={() => {}}
-          spanishFirst={false}
-          setSpanishFirst={() => {}}
-          autoplay={false}
-          setAutoplay={() => {}}
-          audioOrComprehension="audio"
-          setAudioOrComprehension={() => {}}
-        />,
-        { wrapper: MockAllProviders },
-      );
-      await waitFor(() => {
-        const select = screen.getByLabelText(/number of flashcards:/i);
-
-        expect(select).toBeInTheDocument();
+      await successfulRender({
+        examplesToParse: studentExamplesWithoutAudio,
+        quizType: 'audio',
       });
       await waitFor(() => {
         const select = screen.getByLabelText(/number of flashcards:/i);
