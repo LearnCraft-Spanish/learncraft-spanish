@@ -53,14 +53,6 @@ export default function QuizSetupMenu({
 
   const calculateQuizLengthOptions = useMemo(() => {
     let currentAllowedExamples = examplesToParse;
-    if (isSrs) {
-      currentAllowedExamples = currentAllowedExamples?.filter(
-        (studentExample) =>
-          studentExample.nextReviewDate
-            ? new Date(studentExample.nextReviewDate) <= new Date()
-            : true,
-      );
-    }
     if (customOnly) {
       currentAllowedExamples = flashcardDataQuery.data?.studentExamples?.filter(
         (studentExample) => studentExample.coachAdded,
@@ -85,6 +77,15 @@ export default function QuizSetupMenu({
             (example) => example?.recordId === studentExample?.relatedExample,
           ),
       );
+    } else {
+      if (isSrs) {
+        currentAllowedExamples = currentAllowedExamples?.filter(
+          (studentExample) =>
+            studentExample.nextReviewDate
+              ? new Date(studentExample.nextReviewDate) <= new Date()
+              : true,
+        );
+      }
     }
     if (!currentAllowedExamples?.length) {
       return [0];
