@@ -16,13 +16,16 @@ export default function Coaching() {
     getLastThreeWeeks,
     getLessonList,
   } = useBackend();
+
+  const [startupDataLoaded, setStartupDataLoaded] = useState(false);
+  const [weeksToDisplay, setWeeksToDisplay] = useState([]);
   const [filterByCoach, setFilterByCoach] = useState({});
   const coaches = useRef<Coach[]>([]);
-  const weekRecords = useRef([]);
-  const privateCalls = useRef([]);
-  const groupCalls = useRef([]);
-  const groupAttendees = useRef([]);
-  const assignments = useRef([]);
+  const weekRecords = useRef<any[]>([]);
+  const privateCalls = useRef<any[]>([]);
+  const groupCalls = useRef<any[]>([]);
+  const groupAttendees = useRef<any[]>([]);
+  const assignments = useRef<any[]>([]);
 
   const coachUser = useRef(null);
   function updateCoachFilter(coachId: string) {
@@ -67,7 +70,7 @@ export default function Coaching() {
     });
     return coachSelector;
   }
-  function filterWeeksByCoach(weeks, coach) {
+  function filterWeeksByCoach(weeks: any, coach: any) {
     if (coach.user) {
       const coachEmail = coach.user.email;
       return weeks.filter(
@@ -93,28 +96,59 @@ export default function Coaching() {
     const coachesPromise = makeCoachList();
     // const coursesPromise = makeCourseList();
     // const lessonsPromise = makeLessonList();
-    Promise.all([
+    const results = await Promise.all([
       // studentsPromise,
       // membershipsPromise,
       weekRecordsPromise,
       coachesPromise,
       // coursesPromise,
       // lessonsPromise,
-    ]).then((results) => {
-      // console.log(results[2]);
-      // students.current = results[0];
-      // memberships.current = results[1];
-      weekRecords.current = results[0][0];
-      privateCalls.current = results[0][1];
-      groupCalls.current = results[0][2];
-      groupAttendees.current = results[0][3];
-      assignments.current = results[0][4];
-      coaches.current = results[1];
-      // courses.current = results[4];
-      // lessons.current = results[5];
-      setStartupDataLoaded(true);
-    }, console.error("couldn't load data"));
+    ]);
+
+    // console.log(results[2]);
+    // students.current = results[0];
+    // memberships.current = results[1];
+    weekRecords.current = results[0][0];
+    privateCalls.current = results[0][1];
+    groupCalls.current = results[0][2];
+    groupAttendees.current = results[0][3];
+    assignments.current = results[0][4];
+    coaches.current = results[1];
+    // courses.current = results[4];
+    // lessons.current = results[5];
+    setStartupDataLoaded(true);
   }
+
+  function combinedFilterWeeks(weeks: any) {
+    const filteredByCoach = filterWeeksByCoach(weeks, filterByCoach);
+    return filteredByCoach;
+  }
+
+  // Load Startup Data
+  useEffect(() => {
+    if (!startupDataLoaded) {
+      loadStartupData();
+    }
+  }, []);
+  // Set Coach Filter
+  useEffect(() => {
+    if (startupDataLoaded) {
+      coachUser.current =
+        coaches.current.find(
+          (coach) => coach.user.email === userDataQuery.data?.emailAddress,
+        ) || null;
+      if (coachUser.current) {
+        updateCoachFilter(coachUser.current.recordId);
+      }
+    }
+  }, [startupDataLoaded, userDataQuery.data]);
+
+  // set data
+  useEffect(() => {
+    if (startupDataLoaded) {
+      setWeeksToDisplay(combinedFilterWeeks(weekRecords.current));
+    }
+  }, [startupDataLoaded, filterByCoach]);
 
   return <div></div>;
 }

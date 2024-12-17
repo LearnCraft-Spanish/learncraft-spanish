@@ -6,7 +6,7 @@ import { useUserData } from '../../hooks/useUserData';
 
 import { useBackend } from '../../hooks/useBackend';
 import { useContextualMenu } from '../../hooks/useContextualMenu';
-
+import './stylesOld.css';
 const Coaching = () => {
   const { contextual, openContextual, closeContextual, currentContextual } =
     useContextualMenu;
@@ -934,7 +934,7 @@ const Coaching = () => {
         coaches.current.find(
           (coach) => coach.user.email === userDataQuery.data?.emailAddress,
         ) || null;
-      if (coachUser.current ? coachUser.current.recordId : false) {
+      if (coachUser.current) {
         updateCoachFilter(coachUser.current.recordId);
       }
     }
