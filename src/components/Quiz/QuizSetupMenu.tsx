@@ -190,7 +190,7 @@ export default function QuizSetupMenu({
           </div>
         )}
         {hasCustomExamples && (
-          <div>
+          <div className="QuizMenuCustomOnly">
             <p>Custom Only:</p>
             <label htmlFor="customOnly" className="switch">
               <input
