@@ -1,8 +1,15 @@
+import type { Course, Membership } from '../CoachingTypes';
+
+interface CourseSelectorProps {
+  courses: { current: Course[] };
+  memberships: { current: Membership[] };
+  updateCourseFilter: (value: string) => void;
+}
 export default function CourseSelector({
   courses,
   memberships,
   updateCourseFilter,
-}) {
+}: CourseSelectorProps) {
   const courseSelector = [
     <option key={0} value={0}>
       All Courses

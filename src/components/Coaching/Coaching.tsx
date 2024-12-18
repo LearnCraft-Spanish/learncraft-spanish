@@ -8,6 +8,18 @@ import { useBackend } from '../../hooks/useBackend';
 import { useContextualMenu } from '../../hooks/useContextualMenu';
 import CoachingFilter from './CoachingFilter/CoachingFilter';
 import StudentRecordsTable from './StudentRecordsTable/StudentRecordsTable';
+import {
+  type Membership,
+  type Week,
+  type Student,
+  type Coach,
+  type Course,
+  type Assignment,
+  type Lesson,
+  GroupSession,
+  GroupAttendees,
+  Call,
+} from './CoachingTypes';
 import './stylesOld.css';
 
 export default function Coaching() {
@@ -24,41 +36,42 @@ export default function Coaching() {
   } = useBackend();
   const [weeksToDisplay, setWeeksToDisplay] = useState([]);
   const [startupDataLoaded, setStartupDataLoaded] = useState(false);
-  const [filterByCoach, setFilterByCoach] = useState({});
-  const [filterByCourse, setFilterByCourse] = useState({});
+  const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
+  const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(0);
   const [filterCoachless, setFilterCoachless] = useState(1);
   const [filterHoldWeeks, setFilterHoldWeeks] = useState(1);
   const [filterIncomplete, setFilterIncomplete] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const rendered = useRef(false);
-  const students = useRef([]);
-  const memberships = useRef([]);
-  const weekRecords = useRef([]);
-  const coaches = useRef([]);
-  const courses = useRef([]);
-  const lessons = useRef([]);
-  const privateCalls = useRef([]);
-  const groupCalls = useRef([]);
-  const groupAttendees = useRef([]);
-  const assignments = useRef([]);
+  const students = useRef<Student[]>([]);
+  const memberships = useRef<Membership[]>([]);
+  const weekRecords = useRef<Week[]>([]);
+  const coaches = useRef<Coach[]>([]);
+  const courses = useRef<Course[]>([]);
+  const lessons = useRef<Lesson[]>([]);
+  const privateCalls = useRef<Call[]>([]);
+  const groupCalls = useRef<GroupSession[]>([]);
+  const groupAttendees = useRef<GroupAttendees[]>([]);
+  const assignments = useRef<Assignment[]>([]);
   const currentAttendee = useRef(null);
-  const coachUser = useRef(null);
+  const coachUser = useRef<Coach | null>(null);
 
   function updateSearchTerm(term: string) {
     setSearchTerm(term.toLowerCase());
   }
 
   function updateCoachFilter(coachId: string | number) {
-    const coachToSet =
-      coaches.current.find((coach) => coach.recordId === Number(coachId)) || {};
+    const coachToSet = coaches.current.find(
+      (coach) => coach.recordId === Number(coachId),
+    );
     setFilterByCoach(coachToSet);
   }
 
   function updateCourseFilter(courseId: string | number) {
-    const courseToSet =
-      courses.current.find((course) => course.recordId === Number(courseId)) ||
-      {};
+    const courseToSet = courses.current.find(
+      (course) => course.recordId === Number(courseId),
+    );
     setFilterByCourse(courseToSet);
   }
 
@@ -159,7 +172,6 @@ export default function Coaching() {
       coursesPromise,
       lessonsPromise,
     ]).then((results) => {
-      console.log(results[2]);
       students.current = results[0];
       memberships.current = results[1];
       weekRecords.current = results[2][0];
@@ -196,33 +208,49 @@ export default function Coaching() {
   }
 
   function getStudentFromMembershipId(membershipId: number) {
-    const membership =
-      memberships.current.find((item) => item.recordId === membershipId) || {};
-    const studentId = membership.relatedStudent;
-    return students.current.find((item) => item.recordId === studentId) || {};
+    const membership = memberships.current.find(
+      (item) => item.recordId === membershipId,
+    );
+    if (membership) {
+      const studentId = membership.relatedStudent;
+      return students.current.find((item) => item.recordId === studentId);
+    } else {
+      // throw Error("Membership not found");
+      return {};
+    }
   }
 
   function getCoachFromMembershipId(membershipId: number) {
-    const membership =
-      memberships.current.find((item) => item.recordId === membershipId) || {};
-    const studentId = membership.relatedStudent;
-    const student =
-      students.current.find((item) => item.recordId === studentId) || {};
-    const userObject = student.primaryCoach || {};
-    return (
-      coaches.current.find((coach) => coach.user.id === userObject.id) || {}
+    const membership = memberships.current.find(
+      (item) => item.recordId === membershipId,
     );
+    if (membership) {
+      const studentId = membership.relatedStudent;
+      const student = students.current.find(
+        (item) => item.recordId === studentId,
+      );
+      if (student) {
+        const userObject = student.primaryCoach;
+        return (
+          coaches.current.find((coach) => coach.user.id === userObject.id) || {}
+        );
+      }
+    } else {
+      // throw Error("Membership not found");
+      return {};
+    }
   }
 
   function getCourseFromMembershipId(membershipId: number) {
-    const membership =
-      memberships.current.find((item) => item.recordId === membershipId) || {};
-    const courseId = membership.relatedCourse;
-    return courses.current.find((item) => item.recordId === courseId) || {};
+    const membership = memberships.current.find(
+      (item) => item.recordId === membershipId,
+    );
+    const courseId = membership && membership.relatedCourse;
+    return courses.current.find((item) => item.recordId === courseId);
   }
 
   function getLessonFromRecordId(lessonId: number) {
-    return lessons.current.find((item) => item.recordId === lessonId) || {};
+    return lessons.current.find((item) => item.recordId === lessonId);
   }
 
   function getPrivateCallsFromWeekId(weekId: number) {
@@ -272,9 +300,8 @@ export default function Coaching() {
   }
 
   function getMembershipFromWeekId(weekId: number) {
-    const week =
-      weekRecords.current.find((week) => week.recordId === weekId) || {};
-    const membershipId = week.relatedMembership;
+    const week = weekRecords.current.find((week) => week.recordId === weekId);
+    const membershipId = week && week.relatedMembership;
     return memberships.current.find(
       (membership) => membership.recordId === membershipId,
     );
@@ -282,19 +309,26 @@ export default function Coaching() {
 
   function weekGetsPrivateCalls(weekId: number) {
     const membership = getMembershipFromWeekId(weekId);
-    const course = getCourseFromMembershipId(membership.recordId);
-    return course.weeklyPrivateCalls > 0;
+    const membershipId = membership && membership.recordId;
+    const course = getCourseFromMembershipId(membershipId);
+    if (course) {
+      return course.weeklyPrivateCalls > 0;
+    }
+    return false;
   }
 
   function weekGetsGroupCalls(weekId: number) {
     const membership = getMembershipFromWeekId(weekId);
     const course = getCourseFromMembershipId(membership.recordId);
-    return course.hasGroupCalls;
+    if (course) {
+      return course.hasGroupCalls;
+    }
+    return false;
   }
 
-  function filterWeeksBySearchTerm(array: any[], searchTerm: string) {
+  function filterWeeksBySearchTerm(array: Week[], searchTerm: string) {
     if (searchTerm.length > 0) {
-      function filterFunction(week) {
+      function filterFunction(week: Week) {
         const student = getStudentFromMembershipId(week.relatedMembership);
         const nameMatches = student.fullName
           ? student.fullName.toLowerCase().includes(searchTerm)
@@ -313,19 +347,19 @@ export default function Coaching() {
     }
   }
 
-  function filterWeeksByWeeksAgo(array: any[], numberOfWeeksAgo: number) {
+  function filterWeeksByWeeksAgo(array: Week[], numberOfWeeksAgo: number) {
     if (numberOfWeeksAgo >= 0) {
       const nowTimestamp = Date.now();
       const now = new Date(nowTimestamp);
       const dayOfWeek = now.getDay();
-      const thisSundayTimestamp = now - dayOfWeek * 86400000;
+      const thisSundayTimestamp = now - dayOfWeek * 86400000; //????
       const chosenSundayTimestamp =
         thisSundayTimestamp - numberOfWeeksAgo * 604800000;
       const sunday = new Date(chosenSundayTimestamp);
       console.log('type of sunday: ', typeof sunday);
       console.log('sunday: ', sunday);
       const sundayText = dateObjectToText(sunday);
-      function filterFunction(weekRecord) {
+      function filterFunction(weekRecord: Week) {
         return weekRecord.weekStarts === sundayText;
       }
       return array.filter(filterFunction);
@@ -334,7 +368,7 @@ export default function Coaching() {
     }
   }
 
-  function filterWeeksByCoach(weeks: any[], coach) {
+  function filterWeeksByCoach(weeks: Week[], coach: Coach) {
     if (coach.user) {
       const coachEmail = coach.user.email;
       return weeks.filter(
@@ -348,7 +382,7 @@ export default function Coaching() {
     }
   }
 
-  function filterWeeksByCourse(weeks: any[], course) {
+  function filterWeeksByCourse(weeks: Week[], course: Course) {
     if (course.recordId) {
       const courseRecordId = Number(course.recordId);
       return weeks.filter(
@@ -361,7 +395,7 @@ export default function Coaching() {
     }
   }
 
-  function filterWeeksByOnHold(weeks: any[]) {
+  function filterWeeksByOnHold(weeks: Week[]) {
     if (filterHoldWeeks > 0) {
       return weeks.filter((week) => !week.holdWeek);
     } else {
@@ -369,9 +403,9 @@ export default function Coaching() {
     }
   }
 
-  function filterWeeksByCoachless(weeks: any[]) {
+  function filterWeeksByCoachless(weeks: Week[]) {
     if (filterCoachless > 0 && !filterByCoach.recordId) {
-      function filterFunction(week) {
+      function filterFunction(week: Week) {
         const coach = getCoachFromMembershipId(week.relatedMembership);
         return coach.recordId;
       }
@@ -381,7 +415,7 @@ export default function Coaching() {
     }
   }
 
-  function filterWeeksByIncomplete(weeks: any[]) {
+  function filterWeeksByIncomplete(weeks: Week[]) {
     if (filterIncomplete === 1) {
       return weeks.filter((week) => !week.recordsComplete);
     } else if (filterIncomplete === 2) {
@@ -391,7 +425,7 @@ export default function Coaching() {
     }
   }
 
-  function combinedFilterWeeks(weeks) {
+  function combinedFilterWeeks(weeks: Week[]) {
     const filteredBySearchTerm = filterWeeksBySearchTerm(weeks, searchTerm);
     const filteredByCoachless = filterWeeksByCoachless(filteredBySearchTerm);
     const filteredByWeeksAgo = filterWeeksByWeeksAgo(
@@ -408,7 +442,7 @@ export default function Coaching() {
     );
     const filteredByIncomplete = filterWeeksByIncomplete(filteredByCourse);
     const filteredByOnHold = filterWeeksByOnHold(filteredByIncomplete);
-    function weekSorter(a, b) {
+    function weekSorter(a: Week, b: Week) {
       const courseA = getCourseFromMembershipId(a.relatedMembership).name;
       const courseB = getCourseFromMembershipId(b.relatedMembership).name;
       if (courseA !== courseB) {
@@ -501,6 +535,10 @@ export default function Coaching() {
                 weeksToDisplay={weeksToDisplay}
                 weekGetsPrivateCalls={weekGetsPrivateCalls}
                 weekGetsGroupCalls={weekGetsGroupCalls}
+                //Table Row Speccific
+                getGroupSessionsFromWeekId={getGroupSessionsFromWeekId}
+                getAssignmentsFromWeekId={getAssignmentsFromWeekId}
+                getLessonFromRecordId={getLessonFromRecordId}
               />
             )}
           </div>

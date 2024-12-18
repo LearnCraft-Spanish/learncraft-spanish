@@ -1,8 +1,15 @@
+import type { Week } from '../CoachingTypes';
+
+interface TableHeaderRowProps {
+  weeksToDisplay: Week[];
+  weekGetsPrivateCalls: (weekId: number) => boolean;
+  weekGetsGroupCalls: (weekId: number) => boolean;
+}
 export default function TableHeaderRow({
   weeksToDisplay,
   weekGetsPrivateCalls,
   weekGetsGroupCalls,
-}) {
+}: TableHeaderRowProps) {
   return (
     <tr className="tableHeader">
       <th>Student</th>

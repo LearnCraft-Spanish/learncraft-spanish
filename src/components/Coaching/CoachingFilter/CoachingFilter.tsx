@@ -1,6 +1,32 @@
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
-import CoachSelect from '../CoachSelector';
-import CourseSelector from '../CourseSelector';
+import CoachSelect from './CoachSelector';
+import CourseSelector from './CourseSelector';
+import type {
+  Week,
+  Coach,
+  Student,
+  Course,
+  Membership,
+} from '../CoachingTypes';
+
+interface CoachingFilterProps {
+  searchTerm: string;
+  updateSearchTerm: (value: string) => void;
+  weeksToDisplay: Week[];
+  filterCoachless: number;
+  updateCoachlessFilter: (value: string) => void;
+  filterHoldWeeks: number;
+  updateHoldFilter: (value: string) => void;
+  filterIncomplete: number;
+  updateFilterIncomplete: (value: string) => void;
+  coaches: { current: Coach[] };
+  students: { current: Student[] };
+  courses: { current: Course[] };
+  memberships: { current: Membership[] };
+  updateCoachFilter: (value: string) => void;
+  updateCourseFilter: (value: string) => void;
+  updateWeeksAgoFilter: (value: string) => void;
+}
 export default function CoachingFilter({
   searchTerm,
   updateSearchTerm,
@@ -18,7 +44,7 @@ export default function CoachingFilter({
   updateCoachFilter,
   updateCourseFilter,
   updateWeeksAgoFilter,
-}) {
+}: CoachingFilterProps) {
   const { contextual, closeContextual, setContextualRef, openContextual } =
     useContextualMenu();
   function openMoreFilters() {

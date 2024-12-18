@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import type * as types from '../interfaceDefinitions';
+import type * as StudentRecordsTypes from '../components/Coaching/CoachingTypes';
 import useAuth from './useAuth';
 
 export function useBackend() {
@@ -98,29 +99,38 @@ export function useBackend() {
 
   /*      Coaching API      */
 
-  const getCoachList = useCallback((): Promise<types.Coach[]> => {
-    return getFactory<types.Coach[]>('coaching/coaches');
+  const getCoachList = useCallback((): Promise<StudentRecordsTypes.Coach[]> => {
+    return getFactory<StudentRecordsTypes.Coach[]>('coaching/coaches');
   }, [getFactory]);
 
-  const getCourseList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/courses');
+  const getCourseList = useCallback((): Promise<
+    StudentRecordsTypes.Course[]
+  > => {
+    return getFactory('coaching/courses');
   }, [getFactory]);
 
-  const getLessonList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/lessons');
+  const getLessonList = useCallback((): Promise<
+    StudentRecordsTypes.Lesson[]
+  > => {
+    return getFactory('coaching/lessons');
   }, [getFactory]);
 
-  const getActiveStudents = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/active-students');
+  const getActiveStudents = useCallback((): Promise<
+    StudentRecordsTypes.Student[]
+  > => {
+    return getFactory('coaching/active-students');
   }, [getFactory]);
 
-  const getActiveMemberships = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/active-memberships');
+  const getActiveMemberships = useCallback((): Promise<
+    StudentRecordsTypes.Membership[]
+  > => {
+    return getFactory('coaching/active-memberships');
   }, [getFactory]);
 
-  const getLastThreeWeeks = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/last-three-weeks');
-  }, [getFactory]);
+  const getLastThreeWeeks =
+    useCallback((): Promise<StudentRecordsTypes.getLastThreeWeeksResponse> => {
+      return getFactory('coaching/last-three-weeks');
+    }, [getFactory]);
 
   /*      POST Requests      */
 

@@ -2,8 +2,20 @@ import StudentCell from './StudentCell';
 import CallsCell from './CallsCell';
 import GroupSessionsCell from './GroupSessionsCell';
 import AssignmentsCell from './AssignmentsCell';
+import type { Week } from '../CoachingTypes';
 
-export default function TableRow({ data }: { data: any[] }) {
+interface TableRowProps {
+  data: Week[];
+}
+
+export default function TableRow({
+  data,
+  weekGetsGroupCalls,
+  weekGetsPrivateCalls,
+  getGroupSessionsFromWeekId,
+  getAssignmentsFromWeekId,
+  getLessonFromRecordId,
+}: TableRowProps) {
   return data.map((item) => (
     <tr key={item.recordId} className="studentWeek">
       <td className="studentHeader">

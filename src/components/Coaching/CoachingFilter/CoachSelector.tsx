@@ -1,4 +1,15 @@
-export default function CoachSelect({ coaches, students, updateCoachFilter }) {
+import type { Coach, Student } from '../CoachingTypes';
+
+interface CoachSelectProps {
+  coaches: { current: Coach[] };
+  students: { current: Student[] };
+  updateCoachFilter: (value: string) => void;
+}
+export default function CoachSelect({
+  coaches,
+  students,
+  updateCoachFilter,
+}: CoachSelectProps) {
   const coachSelector = [
     <option key={0} value={0}>
       All Coaches
