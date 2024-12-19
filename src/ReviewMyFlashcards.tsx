@@ -27,12 +27,12 @@ export default function MyFlashcardsQuiz() {
   const [quizType, setQuizType] = useState<'text' | 'audio'>('text');
   const [quizLength, setQuizLength] = useState<number>(10);
   const [customOnly, setCustomOnly] = useState<boolean>(false);
-  const [isSrs, setIsSrs] = useState<boolean>(false);
+  const [isSrs, setIsSrs] = useState<boolean>(true);
   const [spanishFirst, setSpanishFirst] = useState<boolean>(false);
   const [audioOrComprehension, setAudioOrComprehension] = useState<
     'audio' | 'comprehension'
   >('audio');
-  const [autoplay, setAutoplay] = useState(false);
+  const [autoplay, setAutoplay] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();

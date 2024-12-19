@@ -23,7 +23,7 @@ describe('not found page', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(screen.getByText(/back to menu/i)).toBeInTheDocument();
+      expect(screen.getByText(/back to Home/i)).toBeInTheDocument();
     });
   });
 });

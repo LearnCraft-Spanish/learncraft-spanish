@@ -53,14 +53,6 @@ export default function QuizSetupMenu({
 
   const calculateQuizLengthOptions = useMemo(() => {
     let currentAllowedExamples = examplesToParse;
-    if (isSrs) {
-      currentAllowedExamples = currentAllowedExamples?.filter(
-        (studentExample) =>
-          studentExample.nextReviewDate
-            ? new Date(studentExample.nextReviewDate) <= new Date()
-            : true,
-      );
-    }
     if (customOnly) {
       currentAllowedExamples = flashcardDataQuery.data?.studentExamples?.filter(
         (studentExample) => studentExample.coachAdded,
@@ -85,6 +77,15 @@ export default function QuizSetupMenu({
             (example) => example?.recordId === studentExample?.relatedExample,
           ),
       );
+    } else {
+      if (isSrs) {
+        currentAllowedExamples = currentAllowedExamples?.filter(
+          (studentExample) =>
+            studentExample.nextReviewDate
+              ? new Date(studentExample.nextReviewDate) <= new Date()
+              : true,
+        );
+      }
     }
     if (!currentAllowedExamples?.length) {
       return [0];
@@ -92,14 +93,21 @@ export default function QuizSetupMenu({
     // Calculate quiz length options
     const exampleCount = currentAllowedExamples.length;
     const quizLengthOptions = [];
-    if (currentAllowedExamples?.length > 10) {
-      for (let i = 10; i < exampleCount; i = 5 * Math.floor(i * 0.315)) {
+    if (currentAllowedExamples?.length > 5) {
+      for (let i = 5; i < exampleCount; i = i * 2) {
         quizLengthOptions.push(i);
       }
     }
     quizLengthOptions.push(exampleCount);
     return quizLengthOptions;
-  }, [customOnly, examplesToParse, flashcardDataQuery, isSrs, quizType]);
+  }, [
+    customOnly,
+    examplesToParse,
+    flashcardDataQuery.data?.examples,
+    flashcardDataQuery.data?.studentExamples,
+    isSrs,
+    quizType,
+  ]);
 
   return (
     <form className="myFlashcardsForm" onSubmit={(e) => handleSubmit(e)}>
@@ -189,7 +197,7 @@ export default function QuizSetupMenu({
           </div>
         )}
         {hasCustomExamples && (
-          <div>
+          <div className="QuizMenuCustomOnly">
             <p>Custom Only:</p>
             <label htmlFor="customOnly" className="switch">
               <input

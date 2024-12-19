@@ -344,9 +344,9 @@ export default function AudioQuiz({
     if (autoplay) {
       clearCountDown();
     }
-    navigate('..');
+    // navigate('..');
     cleanupFunction();
-    if (isMainLocation) {
+    if (!isMainLocation) {
       navigate('..');
     }
   }, [autoplay, cleanupFunction, isMainLocation, navigate]);

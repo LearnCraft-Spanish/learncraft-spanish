@@ -37,7 +37,7 @@ describe('menu for student flashcards', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(screen.getByText(/back to menu/i)).toBeInTheDocument();
+      expect(screen.getByText(/back to home/i)).toBeInTheDocument();
     });
   });
 });
