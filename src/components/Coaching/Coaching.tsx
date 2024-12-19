@@ -34,7 +34,7 @@ export default function Coaching() {
     getLastThreeWeeks,
     getLessonList,
   } = useBackend();
-  const [weeksToDisplay, setWeeksToDisplay] = useState([]);
+  const [weeksToDisplay, setWeeksToDisplay] = useState<Week[]>([]);
   const [startupDataLoaded, setStartupDataLoaded] = useState(false);
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
@@ -108,7 +108,7 @@ export default function Coaching() {
     openContextual(`groupSession${recordId}`);
   }
 
-  function openAttendeePopup(recordId: number) {
+  function openAttendeePopup(recordId: string) {
     openContextual(`attendee${recordId}`);
   }
 
@@ -171,19 +171,23 @@ export default function Coaching() {
       coachesPromise,
       coursesPromise,
       lessonsPromise,
-    ]).then((results) => {
-      students.current = results[0];
-      memberships.current = results[1];
-      weekRecords.current = results[2][0];
-      privateCalls.current = results[2][1];
-      groupCalls.current = results[2][2];
-      groupAttendees.current = results[2][3];
-      assignments.current = results[2][4];
-      coaches.current = results[3];
-      courses.current = results[4];
-      lessons.current = results[5];
-      setStartupDataLoaded(true);
-    }, console.error("couldn't load data"));
+    ])
+      .then((results) => {
+        students.current = results[0];
+        memberships.current = results[1];
+        weekRecords.current = results[2][0];
+        privateCalls.current = results[2][1];
+        groupCalls.current = results[2][2];
+        groupAttendees.current = results[2][3];
+        assignments.current = results[2][4];
+        coaches.current = results[3];
+        courses.current = results[4];
+        lessons.current = results[5];
+        setStartupDataLoaded(true);
+      })
+      .catch((error) => {
+        console.error('Error loading startup data: ', error);
+      });
   }
 
   function dateObjectToText(dateObject: Date) {
@@ -216,11 +220,11 @@ export default function Coaching() {
       return students.current.find((item) => item.recordId === studentId);
     } else {
       // throw Error("Membership not found");
-      return {};
+      return undefined;
     }
   }
 
-  function getCoachFromMembershipId(membershipId: number) {
+  function getCoachFromMembershipId(membershipId: number): Coach | undefined {
     const membership = memberships.current.find(
       (item) => item.recordId === membershipId,
     );
@@ -231,14 +235,15 @@ export default function Coaching() {
       );
       if (student) {
         const userObject = student.primaryCoach;
-        return (
-          coaches.current.find((coach) => coach.user.id === userObject.id) || {}
-        );
+        if (userObject) {
+          return coaches.current.find(
+            (coach) => coach.user.id === userObject.id,
+          );
+        }
       }
-    } else {
-      // throw Error("Membership not found");
-      return {};
     }
+    // throw Error("Membership not found");
+    return undefined;
   }
 
   function getCourseFromMembershipId(membershipId: number) {
@@ -279,18 +284,15 @@ export default function Coaching() {
   }
 
   function getAttendeeWeeksFromGroupSessionId(sessionId: number) {
-    const attendeeList =
-      groupAttendees.current.filter(
-        (attendee) => attendee.groupSession === sessionId,
-      ) || [];
-    const weekList =
-      attendeeList.map(
-        (attendee) =>
-          weekRecords.current.find(
-            (week) => week.recordId === attendee.student,
-          ) || {},
-      ) || [];
-    return weekList;
+    const attendeeList = groupAttendees.current.filter(
+      (attendee) => attendee.groupSession === sessionId,
+    );
+    if (attendeeList.length > 0) {
+      const weekList = attendeeList.map((attendee) =>
+        weekRecords.current.find((week) => week.recordId === attendee.student),
+      );
+      return weekList;
+    }
   }
 
   function getAssignmentsFromWeekId(weekId: number) {
@@ -310,6 +312,9 @@ export default function Coaching() {
   function weekGetsPrivateCalls(weekId: number) {
     const membership = getMembershipFromWeekId(weekId);
     const membershipId = membership && membership.recordId;
+    if (!membershipId) {
+      return false;
+    }
     const course = getCourseFromMembershipId(membershipId);
     if (course) {
       return course.weeklyPrivateCalls > 0;
@@ -319,6 +324,9 @@ export default function Coaching() {
 
   function weekGetsGroupCalls(weekId: number) {
     const membership = getMembershipFromWeekId(weekId);
+    if (!membership) {
+      return false;
+    }
     const course = getCourseFromMembershipId(membership.recordId);
     if (course) {
       return course.hasGroupCalls;
@@ -330,6 +338,9 @@ export default function Coaching() {
     if (searchTerm.length > 0) {
       function filterFunction(week: Week) {
         const student = getStudentFromMembershipId(week.relatedMembership);
+        if (!student) {
+          return false;
+        }
         const nameMatches = student.fullName
           ? student.fullName.toLowerCase().includes(searchTerm)
           : false;
@@ -368,28 +379,35 @@ export default function Coaching() {
     }
   }
 
-  function filterWeeksByCoach(weeks: Week[], coach: Coach) {
+  function filterWeeksByCoach(weeks: Week[], coach: Coach | undefined) {
+    if (!coach) {
+      return weeks;
+    }
     if (coach.user) {
       const coachEmail = coach.user.email;
-      return weeks.filter(
-        (week) =>
-          (getCoachFromMembershipId(week.relatedMembership).recordId
-            ? getCoachFromMembershipId(week.relatedMembership).user.email
-            : '') === coachEmail,
-      );
+      return weeks.filter((week) => {
+        const coach = getCoachFromMembershipId(week.relatedMembership);
+        if (coach) {
+          return coach.user.email === coachEmail;
+        }
+      });
     } else {
       return weeks;
     }
   }
 
-  function filterWeeksByCourse(weeks: Week[], course: Course) {
+  function filterWeeksByCourse(weeks: Week[], course: Course | undefined) {
+    if (!course) {
+      return weeks;
+    }
     if (course.recordId) {
       const courseRecordId = Number(course.recordId);
-      return weeks.filter(
-        (week) =>
-          getCourseFromMembershipId(week.relatedMembership).recordId ===
-          courseRecordId,
-      );
+      return weeks.filter((week) => {
+        const course = getCourseFromMembershipId(week.relatedMembership);
+        if (course) {
+          return course.recordId === courseRecordId;
+        }
+      });
     } else {
       return weeks;
     }
@@ -404,15 +422,17 @@ export default function Coaching() {
   }
 
   function filterWeeksByCoachless(weeks: Week[]) {
-    if (filterCoachless > 0 && !filterByCoach.recordId) {
-      function filterFunction(week: Week) {
-        const coach = getCoachFromMembershipId(week.relatedMembership);
-        return coach.recordId;
-      }
-      return weeks.filter(filterFunction);
-    } else {
-      return weeks;
-    }
+    // Honestly, it does not look like this filter function works. Leaving it commented out for now.
+
+    // if (filterCoachless > 0 && !filterByCoach.recordId) {
+    //   function filterFunction(week: Week) {
+    //     const coach = getCoachFromMembershipId(week.relatedMembership);
+    //     return coach.recordId;
+    //   }
+    //   return weeks.filter(filterFunction);
+    // } else {
+    return weeks;
+    // }
   }
 
   function filterWeeksByIncomplete(weeks: Week[]) {
@@ -443,27 +463,28 @@ export default function Coaching() {
     const filteredByIncomplete = filterWeeksByIncomplete(filteredByCourse);
     const filteredByOnHold = filterWeeksByOnHold(filteredByIncomplete);
     function weekSorter(a: Week, b: Week) {
-      const courseA = getCourseFromMembershipId(a.relatedMembership).name;
-      const courseB = getCourseFromMembershipId(b.relatedMembership).name;
-      if (courseA !== courseB) {
-        return courseA > courseB ? 1 : -1;
+      const courseA = getCourseFromMembershipId(a.relatedMembership);
+      const courseB = getCourseFromMembershipId(b.relatedMembership);
+      if (courseA && courseB) {
+        if (courseA.name !== courseB.name) {
+          return courseA.name > courseB.name ? 1 : -1;
+        }
       }
-      if (
-        getCoachFromMembershipId(a.relatedMembership).user &&
-        getCoachFromMembershipId(b.relatedMembership).user
-      ) {
-        const coachA = getCoachFromMembershipId(a.relatedMembership).user.name;
-        const coachB = getCoachFromMembershipId(b.relatedMembership).user.name;
-        if (coachA !== coachB) {
-          return coachA > coachB ? 1 : -1;
+      const coachA = getCoachFromMembershipId(a.relatedMembership);
+      const coachB = getCoachFromMembershipId(b.relatedMembership);
+      if (coachA && coachB) {
+        if (coachA.user.name !== coachB.user.name) {
+          return coachA.user.name > coachB.user.name ? 1 : -1;
         }
       }
       const lessonA = getLessonFromRecordId(a.currentLesson);
       const lessonB = getLessonFromRecordId(b.currentLesson);
-      if (lessonA.weekRef !== lessonB.weekRef) {
-        return lessonA.weekRef - lessonB.weekRef;
-      } else if (lessonA.lessonName !== lessonB.lessonName) {
-        return lessonA.lessonName > lessonB.lessonName ? 1 : -1;
+      if (lessonA && lessonB) {
+        if (lessonA.weekRef !== lessonB.weekRef) {
+          return lessonA.weekRef - lessonB.weekRef;
+        } else if (lessonA.lessonName !== lessonB.lessonName) {
+          return lessonA.lessonName > lessonB.lessonName ? 1 : -1;
+        }
       }
       return 0;
     }
@@ -493,6 +514,7 @@ export default function Coaching() {
   useEffect(() => {
     if (startupDataLoaded) {
       setWeeksToDisplay(combinedFilterWeeks(weekRecords.current));
+      console.log(combinedFilterWeeks(weekRecords.current));
     }
   }, [
     startupDataLoaded,
@@ -508,7 +530,7 @@ export default function Coaching() {
   return (
     <div className="coaching">
       {!startupDataLoaded && <p>data is loading</p>}
-      {startupDataLoaded && (
+      {startupDataLoaded && weeksToDisplay.length > 0 && (
         <div>
           <CoachingFilter
             searchTerm={searchTerm}
@@ -520,10 +542,10 @@ export default function Coaching() {
             updateHoldFilter={updateHoldFilter}
             filterIncomplete={filterIncomplete}
             updateFilterIncomplete={updateFilterIncomplete}
-            coaches={coaches.current}
-            students={students.current}
-            courses={courses.current}
-            memberships={memberships.current}
+            coaches={coaches}
+            students={students}
+            courses={courses}
+            memberships={memberships}
             updateCoachFilter={updateCoachFilter}
             updateCourseFilter={updateCourseFilter}
             updateWeeksAgoFilter={updateWeeksAgoFilter}
@@ -539,6 +561,22 @@ export default function Coaching() {
                 getGroupSessionsFromWeekId={getGroupSessionsFromWeekId}
                 getAssignmentsFromWeekId={getAssignmentsFromWeekId}
                 getLessonFromRecordId={getLessonFromRecordId}
+                memberships={memberships}
+                openStudentPopup={openStudentPopup}
+                getStudentFromMembershipId={getStudentFromMembershipId}
+                getCourseFromMembershipId={getCourseFromMembershipId}
+                filterByCoach={filterByCoach}
+                filterByCourse={filterByCourse}
+                filterByWeeksAgo={filterByWeeksAgo}
+                currentAttendee={currentAttendee}
+                openGroupSessionPopup={openGroupSessionPopup}
+                getAttendeeWeeksFromGroupSessionId={
+                  getAttendeeWeeksFromGroupSessionId
+                }
+                students={students}
+                openAttendeePopup={openAttendeePopup}
+                openAssignmentPopup={openAssignmentPopup}
+                getMembershipFromWeekId={getMembershipFromWeekId}
               />
             )}
           </div>

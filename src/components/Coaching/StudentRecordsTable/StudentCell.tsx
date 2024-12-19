@@ -1,5 +1,32 @@
-export default function StudentCell({ week }: { week: any }) {
+import { useContextualMenu } from '../../../hooks/useContextualMenu';
+import type { Week, Membership, Coach, Course } from '../CoachingTypes';
+
+interface StudentCellProps {
+  week: Week;
+  memberships: { current: Membership[] };
+  openStudentPopup: (recordId: number) => void;
+  getStudentFromMembershipId: (membershipId: number) => any;
+  getCourseFromMembershipId: (membershipId: number) => any;
+  filterByCoach: Coach | undefined;
+  filterByCourse: Course | undefined;
+  filterByWeeksAgo: number;
+}
+export default function StudentCell({
+  week,
+  memberships,
+  openStudentPopup,
+  getStudentFromMembershipId,
+  getCourseFromMembershipId,
+  filterByCoach,
+  filterByCourse,
+  filterByWeeksAgo,
+}: StudentCellProps) {
+  const { contextual, closeContextual, setContextualRef } = useContextualMenu();
   const student = getStudentFromMembershipId(week.relatedMembership);
+  console.log('student: ', student);
+  if (!student) {
+    return <div>no student found</div>;
+  }
   const currentMemberships = memberships.current.filter(
     (membership) => membership.relatedStudent === student.recordId,
   );
@@ -8,21 +35,21 @@ export default function StudentCell({ week }: { week: any }) {
       <div
         className="studentBox"
         onClick={
-          student.recordId ? () => openStudentPopup(student.recordId) : null
+          student.recordId ? () => openStudentPopup(student.recordId) : () => {}
         }
       >
         <strong>{student.fullName}</strong>
         <br />
         {student.email}
         <br />
-        {!filterByCoach.recordId &&
+        {filterByCoach &&
           (student.primaryCoach ? student.primaryCoach.name : 'No Coach')}
-        {!filterByCoach.recordId && <br />}
-        {!filterByCourse.recordId &&
+        {filterByCoach && <br />}
+        {filterByCourse &&
           (getCourseFromMembershipId(week.relatedMembership)
             ? getCourseFromMembershipId(week.relatedMembership).name
             : 'No Course')}
-        {!filterByCourse.recordId && <br />}
+        {!filterByCourse && <br />}
         {filterByWeeksAgo < 0 && week.weekStarts}
       </div>
       {contextual === `student${student.recordId}` && student.recordId && (

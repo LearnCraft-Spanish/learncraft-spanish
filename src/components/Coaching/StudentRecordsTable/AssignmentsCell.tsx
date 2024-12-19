@@ -1,4 +1,18 @@
-export default function AssignmentsCell({ data }: { data: any[] }) {
+import { useContextualMenu } from '../../../hooks/useContextualMenu';
+import type { Assignment } from '../CoachingTypes';
+interface AssignmentsCellProps {
+  data: Assignment[];
+  getStudentFromMembershipId: (membershipId: number) => any;
+  getMembershipFromWeekId: (weekId: number) => any;
+  openAssignmentPopup: (recordId: number) => void;
+}
+export default function AssignmentsCell({
+  data,
+  getStudentFromMembershipId,
+  getMembershipFromWeekId,
+  openAssignmentPopup,
+}: AssignmentsCellProps) {
+  const { contextual, closeContextual, setContextualRef } = useContextualMenu();
   //recives assignments from getAssignmentsFromWeekId
   if (data.length === 0) {
     return null;
@@ -21,7 +35,8 @@ export default function AssignmentsCell({ data }: { data: any[] }) {
                 ).fullName
               }
             </h4>
-            <p>{assignment.date}</p>
+            {/* Currently, .date does not exist on assignment */}
+            {/* <p>{assignment.date}</p> */}
             {assignment.homeworkCorrector && (
               <p>
                 Corrected by
