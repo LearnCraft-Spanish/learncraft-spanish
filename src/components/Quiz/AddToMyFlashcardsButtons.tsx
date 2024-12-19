@@ -74,6 +74,12 @@ export default function AddToMyFlashcardsButtons({
           Adding to Flashcards...
         </button>
       );
+    } else if (isCollected && isCustom) {
+      return (
+        <button type="button" className="customFlashcardButton">
+          Custom Flashcard
+        </button>
+      );
     } else {
       throw new Error('Failed to parse flashcard status');
     }
