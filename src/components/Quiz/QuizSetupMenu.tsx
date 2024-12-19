@@ -93,14 +93,21 @@ export default function QuizSetupMenu({
     // Calculate quiz length options
     const exampleCount = currentAllowedExamples.length;
     const quizLengthOptions = [];
-    if (currentAllowedExamples?.length > 10) {
-      for (let i = 10; i < exampleCount; i = 5 * Math.floor(i * 0.315)) {
+    if (currentAllowedExamples?.length > 5) {
+      for (let i = 5; i < exampleCount; i = i * 2) {
         quizLengthOptions.push(i);
       }
     }
     quizLengthOptions.push(exampleCount);
     return quizLengthOptions;
-  }, [customOnly, examplesToParse, flashcardDataQuery, isSrs, quizType]);
+  }, [
+    customOnly,
+    examplesToParse,
+    flashcardDataQuery.data?.examples,
+    flashcardDataQuery.data?.studentExamples,
+    isSrs,
+    quizType,
+  ]);
 
   return (
     <form className="myFlashcardsForm" onSubmit={(e) => handleSubmit(e)}>
