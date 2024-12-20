@@ -21,6 +21,9 @@ export default function ExampleEditor() {
   const [englishAudio, setEnglishAudio] = useState('');
   const [vocabIncluded, setVocabIncluded] = useState([] as Vocabulary[]);
   const [vocabComplete, setVocabComplete] = useState(false);
+  const [selectedVocabTerm, setSelectedVocabTerm] = useState(
+    null as Vocabulary | null,
+  );
 
   const { addUnverifiedExample } = useUnverifiedExamples();
   const { officialQuizzesQuery, quizExamplesQuery } =
@@ -91,13 +94,14 @@ export default function ExampleEditor() {
     spanglish,
   ]);
 
-  function handleAddExample(e: React.FormEvent) {
-    e.preventDefault();
-    addUnverifiedExample(newFlashcard);
-    setSpanishExample('');
-    setEnglishTranslation('');
-    setSpanishAudioLa('');
-    setEnglishAudio('');
+  function addToVocabIncluded(vocab: Vocabulary) {
+    setVocabIncluded([...vocabIncluded, vocab]);
+  }
+
+  function removeFromVocabIncluded(recordId: number) {
+    setVocabIncluded(
+      vocabIncluded.filter((vocab) => vocab.recordId !== recordId),
+    );
   }
 
   useEffect(() => {
@@ -191,6 +195,16 @@ export default function ExampleEditor() {
               value={englishAudio}
               onChange={(e) => setEnglishAudio(e.target.value)}
             />
+          </div>
+          <div>
+            <label id="vocabIncluded">Vocab Included</label>
+            <select onChange={(e) => setVocabIncluded(e.target.value)}>
+              {vocabIncluded.map((vocab) => (
+                <option key={vocab.recordId} value={vocab.recordId}>
+                  {vocab.vocabName}
+                </option>
+              ))}
+            </select>
           </div>
           <button type="submit">Save Example</button>
         </form>
