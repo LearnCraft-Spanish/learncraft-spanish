@@ -1,14 +1,10 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   render,
-  renderHook,
   screen,
   waitFor,
-  within,
 } from '@testing-library/react';
 
-import { act } from 'react';
-import { get } from 'lodash';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import ExampleEditor from './ExampleEditor';
 

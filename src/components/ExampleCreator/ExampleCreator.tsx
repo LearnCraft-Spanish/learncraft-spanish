@@ -1,14 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
 import type { NewFlashcard } from '../../interfaceDefinitions';
 import { useUnverifiedExamples } from '../../hooks/useUnverifiedExamples';
-import FlashcardDisplay from '../Quiz/FlashcardDisplay';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
-import play from '../../resources/icons/play.svg';
-import pause from '../../resources/icons/pause.svg';
 import { AudioControl } from './AudioControl';
 import '../../App.css';
 import './ExampleCreator.css';
