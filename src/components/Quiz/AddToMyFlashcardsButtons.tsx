@@ -40,34 +40,41 @@ export default function AddToMyFlashcardsButtons({
   const isCollected = exampleIsCollected(example.recordId);
   const isCustom = exampleIsCustom(example.recordId);
   const isPending = exampleIsPending(example.recordId);
-
-  if (!isCollected) {
-    return (
-      <button
-        type="button"
-        className="addFlashcardButton"
-        onClick={() => addAndAdvance()}
-      >
-        Add to my flashcards
-      </button>
-    );
-  } else if (isCollected && !isCustom && !isPending) {
-    return (
-      <button
-        type="button"
-        className="removeFlashcardButton"
-        onClick={() => removeAndAdvance()}
-      >
-        Remove from my flashcards
-      </button>
-    );
-  } else if (isCollected && isPending) {
-    return (
-      <button type="button" className="pendingFlashcardButton">
-        Adding to Flashcards...
-      </button>
-    );
-  } else {
-    return <div>Error Parsing Flashcard Status</div>;
+  if (dataSuccess) {
+    if (!isCollected) {
+      return (
+        <button
+          type="button"
+          className="addFlashcardButton"
+          onClick={() => add()}
+        >
+          Add to my flashcards
+        </button>
+      );
+    } else if (isCollected && !isCustom && !isPending) {
+      return (
+        <button
+          type="button"
+          className="removeFlashcardButton"
+          onClick={() => remove()}
+        >
+          Remove from my flashcards
+        </button>
+      );
+    } else if (isCollected && isPending) {
+      return (
+        <button type="button" className="pendingFlashcardButton">
+          Adding to Flashcards...
+        </button>
+      );
+    } else if (isCollected && isCustom) {
+      return (
+        <button type="button" className="customFlashcardButton">
+          Custom Flashcard
+        </button>
+      );
+    } else {
+      throw new Error('Failed to parse flashcard status');
+    }
   }
 }

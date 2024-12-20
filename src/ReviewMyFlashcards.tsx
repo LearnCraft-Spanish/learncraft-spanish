@@ -20,11 +20,19 @@ export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
   const { activeStudentQuery } = useActiveStudent();
   const { pmfDataQuery } = usePMFData();
-  const [isSrs, setIsSrs] = useState<boolean>(false);
-  const [spanishFirst, setSpanishFirst] = useState<boolean>(false);
-  const [customOnly, setCustomOnly] = useState<boolean>(false);
-  const [quizLength, setQuizLength] = useState<number>(10);
+
+  const examplesToParse = flashcardDataQuery.data?.studentExamples;
+  // Quiz Setup
   const [quizReady, setQuizReady] = useState<boolean>(false);
+  const [quizType, setQuizType] = useState<'text' | 'audio'>('text');
+  const [quizLength, setQuizLength] = useState<number>(10);
+  const [customOnly, setCustomOnly] = useState<boolean>(false);
+  const [isSrs, setIsSrs] = useState<boolean>(true);
+  const [spanishFirst, setSpanishFirst] = useState<boolean>(false);
+  const [audioOrComprehension, setAudioOrComprehension] = useState<
+    'audio' | 'comprehension'
+  >('audio');
+  const [autoplay, setAutoplay] = useState(true);
 
   const navigate = useNavigate();
   const location = useLocation();

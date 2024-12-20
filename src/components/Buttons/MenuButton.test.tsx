@@ -15,6 +15,6 @@ describe('menu button', () => {
         <MenuButton />
       </MemoryRouter>,
     );
-    expect(screen.getByText('Back to Menu')).toBeTruthy();
+    expect(screen.getByText('Back to Home')).toBeTruthy();
   });
 });
