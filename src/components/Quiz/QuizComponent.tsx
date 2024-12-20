@@ -347,11 +347,6 @@ export default function QuizComponent({
   }, [displayOrder, displayOrderReady, navigate, cleanupFunction]);
   return (
     <>
-      <PMFPopup
-        timeToShowPopup={
-          Math.floor(displayOrder.length / 2) === currentExampleNumber
-        }
-      />
       {!!displayOrder.length && (
         <div className="quiz">
           <NewQuizProgress
@@ -396,6 +391,13 @@ export default function QuizComponent({
               )}
               <MenuButton />
             </div>
+            {isSrsQuiz && (
+              <PMFPopup
+                timeToShowPopup={
+                  Math.floor(displayOrder.length / 2) === currentExampleNumber
+                }
+              />
+            )}
           </div>
         </div>
       )}

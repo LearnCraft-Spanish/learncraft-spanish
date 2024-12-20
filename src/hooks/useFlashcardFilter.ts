@@ -78,7 +78,10 @@ export default function useFlashcardFilter() {
                   const word = vocabularyQuery.data.find(
                     (element) => element.vocabName === item,
                   );
-                  if (word?.wordIdiom === tag.tag) {
+                  if (
+                    word?.wordIdiom === tag.tag &&
+                    word?.descriptionOfVocabularySkill === tag.vocabDescriptor
+                  ) {
                     isGood = true;
                   }
                 });

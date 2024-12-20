@@ -419,7 +419,8 @@ button:hover,
 
 .addFlashcardButton,
 .pendingFlashcardButton,
-.removeFlashcardButton {
+.removeFlashcardButton,
+.customFlashcardButton {
   position: absolute;
   top: 0px;
   right: 0px;
@@ -437,14 +438,19 @@ button:hover,
   background-color: darkred;
 }
 
-.pendingFlashcardButton {
+.pendingFlashcardButton,
+.customFlashcardButton {
   cursor: default;
   background-color: var(--dark);
 }
+/* .customFlashcardButton {
+  background-color: var(--theme);
+} */
 
 .addFlashcardButton:hover,
 .removeFlashcardButton:hover,
-.pendingFlashcardButton:hover {
+.pendingFlashcardButton:hover,
+.customFlashcardButton:hover {
   background-color: var(--dark);
 }
 
@@ -997,7 +1003,8 @@ button:hover,
 }
 
 .myFlashcardsFormContentWrapper > label,
-.myFlashcardsFormContentWrapper > div > div {
+.myFlashcardsFormContentWrapper > div > div,
+.QuizMenuCustomOnly {
   /* align on right side of parent */
 
   display: flex;
