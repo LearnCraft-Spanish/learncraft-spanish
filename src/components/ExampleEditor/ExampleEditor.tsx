@@ -4,6 +4,7 @@ import {
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
 import type { NewFlashcard, Vocabulary } from '../../interfaceDefinitions';
+import { useVocabulary } from '../../hooks/useVocabulary';
 import { useUnverifiedExamples } from '../../hooks/useUnverifiedExamples';
 import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
@@ -28,6 +29,7 @@ export default function ExampleEditor() {
   const { addUnverifiedExample } = useUnverifiedExamples();
   const { officialQuizzesQuery, quizExamplesQuery } =
     useOfficialQuizzes(quizId);
+  const { vocabularyQuery } = useVocabulary();
 
   const quizList = useMemo(() => {
     return officialQuizzesQuery.data?.filter((quiz) => {
@@ -77,23 +79,6 @@ export default function ExampleEditor() {
     }
   }, [spanishExample]);
 
-  const newFlashcard: NewFlashcard = useMemo(() => {
-    return {
-      spanishExample,
-      englishTranslation,
-      spanglish,
-      englishAudio,
-      spanishAudioLa,
-      vocabComplete: false,
-    };
-  }, [
-    spanishExample,
-    englishTranslation,
-    spanishAudioLa,
-    englishAudio,
-    spanglish,
-  ]);
-
   function addToVocabIncluded(vocab: Vocabulary) {
     setVocabIncluded([...vocabIncluded, vocab]);
   }
@@ -104,6 +89,48 @@ export default function ExampleEditor() {
     );
   }
 
+  function handleEditExample(e: React.FormEvent) {
+    e.preventDefault();
+    if (selectedExampleId !== null) {
+      updateExample({
+        recordId: selectedExampleId,
+        spanishExample,
+        englishTranslation,
+        spanishAudioLa,
+        englishAudio,
+        vocabIncluded: vocabIncluded.map((vocab) => vocab.vocabName),
+        vocabComplete,
+      });
+    }
+  }
+
+  // Reset Properties when active example changes
+  useEffect(() => {
+    if (selectedExampleId !== null) {
+      const example = tableData?.find(
+        (example) => example.recordId === selectedExampleId,
+      );
+      if (example) {
+        const includedVocabStrings = example.vocabIncluded;
+        const includedVocabObjects = includedVocabStrings
+          .map((vocab) => {
+            return vocabularyQuery.data?.find(
+              (word) => word.vocabName === vocab,
+            );
+          })
+          .filter((vocab) => vocab !== undefined) as Vocabulary[];
+
+        setSpanishExample(example.spanishExample);
+        setEnglishTranslation(example.englishTranslation);
+        setSpanishAudioLa(example.spanishAudioLa);
+        setEnglishAudio(example.englishAudio);
+        setVocabIncluded(includedVocabObjects);
+        setVocabComplete(example.vocabComplete);
+      }
+    }
+  }, [vocabularyQuery, selectedExampleId, tableData]);
+
+  // Update default quiz when quizCourse changes
   useEffect(() => {
     if (!firstQuiz) {
       setQuizId(undefined);
@@ -158,7 +185,7 @@ export default function ExampleEditor() {
             </select>
           )}
         </div>
-        <form onSubmit={(e) => handleAddExample(e)}>
+        <form onSubmit={(e) => handleEditExample(e)}>
           <h3>Edit Example</h3>
           <div>
             <label id="spanishExample">Spanish Example</label>
