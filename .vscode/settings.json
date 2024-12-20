@@ -33,5 +33,11 @@
     "pcss",
     "postcss"
   ],
-  "testing.coverageToolbarEnabled": true
+  "testing.coverageToolbarEnabled": true,
+
+  "typescript.suggest.autoImports": true,
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "**/node_modules/**/lodash", // Exclude lodash from auto-import suggestions
+    "**/node_modules/**/moment"
+  ]
 }

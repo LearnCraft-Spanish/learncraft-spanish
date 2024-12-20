@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import type { Quiz } from '../interfaceDefinitions';
+import type { Flashcard, Quiz } from '../interfaceDefinitions';
 import useAuth from './useAuth';
 import { useBackend } from './useBackend';
 
@@ -80,6 +80,18 @@ export function useOfficialQuizzes(quizId: number | undefined) {
     gcTime: Infinity, // Never garbage collect unless manually updated
     enabled: quizExamplesQueryReady(),
   });
+
+  const updateQuizExample = useCallback(
+    async (newExampleData: Partial<Flashcard>) => {
+      const isInActiveQuiz = quizExamplesQuery.data?.some(
+        (example) => example.recordId === newExampleData.recordId,
+      );
+      if (isInActiveQuiz) {
+        console.log('Updating example in active quiz');
+      }
+    },
+    [quizExamplesQuery],
+  );
 
   return { officialQuizzesQuery, quizExamplesQuery };
 }
