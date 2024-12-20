@@ -8,6 +8,7 @@ import { useVocabulary } from '../../hooks/useVocabulary';
 import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import quizCourses from '../../functions/QuizCourseList';
+import { VocabCard } from './VocabCard';
 
 export default function ExampleEditor() {
   const [quizCourse, setQuizCourse] = useState('');
@@ -224,12 +225,14 @@ export default function ExampleEditor() {
           </div>
           <div>
             <label id="vocabIncluded">Vocab Included</label>
-            <select onChange={(e) => setVocabIncluded(e.target.value)}>
-              {vocabIncluded.map((vocab) => (
-                <option key={vocab.recordId} value={vocab.recordId}>
-                  {vocab.vocabName}
-                </option>
-              ))}
+            <div>{vocabIncluded.map((vocab) => VocabCard({ vocab }))}</div>
+            <select onChange={(e) => addToVocabIncluded(e.target.value)}>
+              {vocabularyQuery.isSuccess &&
+                vocabularyQuery.data.map((vocab) => (
+                  <option key={vocab.recordId} value={vocab.recordId}>
+                    {vocab.vocabName}
+                  </option>
+                ))}
             </select>
           </div>
           <button type="submit">Save Example</button>
