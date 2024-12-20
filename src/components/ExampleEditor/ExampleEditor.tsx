@@ -1,27 +1,40 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
-import type { NewFlashcard } from '../../interfaceDefinitions';
+import type { NewFlashcard, Vocabulary } from '../../interfaceDefinitions';
 import { useUnverifiedExamples } from '../../hooks/useUnverifiedExamples';
 import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import quizCourses from '../../functions/QuizCourseList';
 
 export default function ExampleEditor() {
+  const [quizCourse, setQuizCourse] = useState('');
+  const [quizId, setQuizId] = useState(undefined as number | undefined);
+  const [selectedExampleId, setSelectedExampleId] = useState(
+    null as number | null,
+  );
   const [spanishExample, setSpanishExample] = useState('');
   const [englishTranslation, setEnglishTranslation] = useState('');
   const [spanishAudioLa, setSpanishAudioLa] = useState('');
   const [englishAudio, setEnglishAudio] = useState('');
-  const [quizCourse, setQuizCourse] = useState('');
-  const [quizNumber, setquizNumber] = useState(undefined as number | undefined);
+  const [vocabIncluded, setVocabIncluded] = useState([] as Vocabulary[]);
+  const [vocabComplete, setVocabComplete] = useState(false);
 
   const { addUnverifiedExample } = useUnverifiedExamples();
   const { officialQuizzesQuery, quizExamplesQuery } =
-    useOfficialQuizzes(quizNumber);
+    useOfficialQuizzes(quizId);
 
-  const quizList = officialQuizzesQuery.data;
+  const quizList = useMemo(() => {
+    return officialQuizzesQuery.data?.filter((quiz) => {
+      const courseCode = quiz.quizNickname.split(' ')[0];
+      return courseCode === quizCourse;
+    });
+  }, [officialQuizzesQuery.data, quizCourse]);
+
+  const firstQuiz = quizList?.[0];
+
   const tableData = quizExamplesQuery.data;
 
   const quizCourseOptions = quizCourses.map((course) => {
@@ -35,7 +48,7 @@ export default function ExampleEditor() {
   const quizOptions = useMemo(() => {
     return quizList?.map((quiz) => {
       return (
-        <option key={quiz.quizNumber} value={quiz.quizNumber}>
+        <option key={quiz.recordId} value={quiz.recordId}>
           {quiz.quizNumber}
         </option>
       );
@@ -47,6 +60,10 @@ export default function ExampleEditor() {
       !example.vocabComplete ? { recordId: example.recordId } : [],
     );
   }, [tableData]);
+
+  const activeQuiz = useMemo(() => {
+    return quizList?.find((quiz) => quiz.recordId === quizId);
+  }, [quizId, quizList]);
 
   const spanglish = useMemo(() => {
     const hasAsterisk = spanishExample.includes('*');
@@ -83,6 +100,14 @@ export default function ExampleEditor() {
     setEnglishAudio('');
   }
 
+  useEffect(() => {
+    if (!firstQuiz) {
+      setQuizId(undefined);
+    } else {
+      setQuizId(firstQuiz.recordId);
+    }
+  }, [firstQuiz]);
+
   return (
     <div>
       <div>
@@ -117,17 +142,20 @@ export default function ExampleEditor() {
             value={quizCourse}
             onChange={(e) => setQuizCourse(e.target.value)}
           >
+            <option value="">Select Course</option>
             {quizCourseOptions}
           </select>
-          <select
-            value={quizNumber}
-            onChange={(e) => setquizNumber(Number.parseInt(e.target.value))}
-          >
-            {quizOptions}
-          </select>
+          {!!quizCourse && (
+            <select
+              value={quizId}
+              onChange={(e) => setQuizId(Number.parseInt(e.target.value))}
+            >
+              {quizOptions}
+            </select>
+          )}
         </div>
         <form onSubmit={(e) => handleAddExample(e)}>
-          <h3>Create Example</h3>
+          <h3>Edit Example</h3>
           <div>
             <label id="spanishExample">Spanish Example</label>
             <input
@@ -167,7 +195,7 @@ export default function ExampleEditor() {
           <button type="submit">Save Example</button>
         </form>
         <h3>
-          {quizCourse} Quiz {quizNumber} Examples
+          {quizCourse} Quiz {activeQuiz?.quizNumber}, Unverified Examples
         </h3>
         <ExamplesTable
           dataSource={tableData ?? []}
