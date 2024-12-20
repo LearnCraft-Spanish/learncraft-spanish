@@ -3,9 +3,8 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
-import type { NewFlashcard, Vocabulary } from '../../interfaceDefinitions';
+import type { Vocabulary } from '../../interfaceDefinitions';
 import { useVocabulary } from '../../hooks/useVocabulary';
-import { useUnverifiedExamples } from '../../hooks/useUnverifiedExamples';
 import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import quizCourses from '../../functions/QuizCourseList';
@@ -26,8 +25,7 @@ export default function ExampleEditor() {
     null as Vocabulary | null,
   );
 
-  const { addUnverifiedExample } = useUnverifiedExamples();
-  const { officialQuizzesQuery, quizExamplesQuery } =
+  const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
   const { vocabularyQuery } = useVocabulary();
 
@@ -92,11 +90,12 @@ export default function ExampleEditor() {
   function handleEditExample(e: React.FormEvent) {
     e.preventDefault();
     if (selectedExampleId !== null) {
-      updateExample({
+      updateQuizExample({
         recordId: selectedExampleId,
         spanishExample,
         englishTranslation,
         spanishAudioLa,
+        spanglish,
         englishAudio,
         vocabIncluded: vocabIncluded.map((vocab) => vocab.vocabName),
         vocabComplete,

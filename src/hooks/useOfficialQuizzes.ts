@@ -6,8 +6,11 @@ import { useBackend } from './useBackend';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
   const { isAuthenticated } = useAuth();
-  const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } =
-    useBackend();
+  const {
+    getLcspQuizzesFromBackend,
+    getQuizExamplesFromBackend,
+    updateExample,
+  } = useBackend();
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
     quizzes.forEach((item) => {
@@ -82,16 +85,20 @@ export function useOfficialQuizzes(quizId: number | undefined) {
   });
 
   const updateQuizExample = useCallback(
-    async (newExampleData: Partial<Flashcard>) => {
+    async (newExampleData: Flashcard) => {
       const isInActiveQuiz = quizExamplesQuery.data?.some(
         (example) => example.recordId === newExampleData.recordId,
       );
       if (isInActiveQuiz) {
-        console.log('Updating example in active quiz');
+        updateExample(newExampleData);
+      } else {
+        console.error(
+          `Attempted to update example ${newExampleData.recordId} which is not in the active quiz`,
+        );
       }
     },
-    [quizExamplesQuery],
+    [updateExample, quizExamplesQuery.data],
   );
 
-  return { officialQuizzesQuery, quizExamplesQuery };
+  return { officialQuizzesQuery, quizExamplesQuery, updateQuizExample };
 }

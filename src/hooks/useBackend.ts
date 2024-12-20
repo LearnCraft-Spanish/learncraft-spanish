@@ -327,6 +327,18 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const updateExample = useCallback(
+    (example: Partial<types.Flashcard>): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'update-example',
+        body: {
+          example,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   return {
     getAccessToken,
     getProgramsFromBackend,
@@ -355,6 +367,7 @@ export function useBackend() {
     createUnverifiedExample,
     updateMyStudentExample,
     updateStudentExample,
+    updateExample,
     deleteMyStudentExample,
     deleteStudentExample,
     getPMFDataForUser,
