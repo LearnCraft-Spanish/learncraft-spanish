@@ -1,0 +1,38 @@
+table,
+th,
+td {
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.newCoachingWrapper {
+  margin: 1rem;
+}
+
+table {
+  scroll-behavior: auto;
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+}
+
+th,
+td {
+  border: 1px solid black;
+  padding: 0.25rem;
+  text-align: left;
+  min-width: 100px;
+}
+
+th {
+  font-weight: 600;
+  color: white;
+  background-color: grey;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/*# sourceMappingURL=styles.css.map */

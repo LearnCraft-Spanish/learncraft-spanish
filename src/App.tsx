@@ -18,6 +18,7 @@ import Menu from './Menu';
 import NotFoundPage from './NotFoundPage';
 import ReviewMyFlashcards from './ReviewMyFlashcards';
 import Coaching from './components/Coaching/Coaching';
+import NewCoaching from './components/Coaching/NewCoaching';
 import './App.css';
 
 export const App: React.FC = () => {
@@ -252,6 +253,10 @@ export const App: React.FC = () => {
             element={userDataQuery.data?.isAdmin && <Coaching />}
           />
         }
+        <Route
+          path="/newcoaching"
+          element={userDataQuery.data?.isAdmin && <NewCoaching />}
+        />
         <Route path="/*" element={<NotFoundPage />} />
       </SentryRoutes>
     </div>

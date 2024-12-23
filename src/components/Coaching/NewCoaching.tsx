@@ -1,154 +1,139 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 import { useUserData } from '../../hooks/useUserData';
 import { useBackend } from '../../hooks/useBackend';
 import { useContextualMenu } from '../../hooks/useContextualMenu';
-
-import type { Coach } from '../../interfaceDefinitions';
-
+// import { useLastThreeWeeks } from '../../hooks/useLastThreeWeeks';
+import useCoaching from '../../hooks/useCoaching';
+import type { Week, Coach, Course } from './CoachingTypes';
+import NewTable from './NewTable';
+import CoachingFilter from './CoachingFilter/CoachingFilter';
 export default function Coaching() {
   const userDataQuery = useUserData();
   const {
-    getActiveMemberships,
-    getActiveStudents,
-    getCoachList,
-    getCourseList,
-    getLastThreeWeeks,
-    getLessonList,
-  } = useBackend();
+    lastThreeWeeksQuery,
+    coachListQuery,
+    courseListQuery,
+    getCoachFromMembershipId,
+    getCourseFromMembershipId,
+  } = useCoaching();
+  // const { getNewWeeks } = useBackend();
+  const [weeks, setWeeks] = useState<Week[] | undefined>();
+  const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
+  const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
+  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(0);
+  const rendered = useRef(false);
 
-  const [startupDataLoaded, setStartupDataLoaded] = useState(false);
-  const [weeksToDisplay, setWeeksToDisplay] = useState([]);
-  const [filterByCoach, setFilterByCoach] = useState({});
-  const coaches = useRef<Coach[]>([]);
-  const weekRecords = useRef<any[]>([]);
-  const privateCalls = useRef<any[]>([]);
-  const groupCalls = useRef<any[]>([]);
-  const groupAttendees = useRef<any[]>([]);
-  const assignments = useRef<any[]>([]);
+  const dataReady =
+    userDataQuery.isSuccess &&
+    lastThreeWeeksQuery.isSuccess &&
+    coachListQuery.isSuccess &&
+    courseListQuery.isSuccess;
 
-  const coachUser = useRef(null);
-  function updateCoachFilter(coachId: string) {
-    const coachToSet =
-      coaches.current.find((coach) => coach.recordId === Number(coachId)) || {};
+  function updateCoachFilter(coachId: string | number) {
+    if (!coachListQuery.data) throw new Error('Unable to find coach list');
+    const coachToSet = coachListQuery.data.find(
+      (coach) => coach.recordId === Number(coachId),
+    );
     setFilterByCoach(coachToSet);
   }
+  function updateCourseFilter(courseId: string | number) {
+    if (!courseListQuery.data) throw new Error('Unable to find course list');
+    const courseToSet = courseListQuery.data.find(
+      (course) => course.recordId === Number(courseId),
+    );
+    setFilterByCourse(courseToSet);
+  }
+  function updateWeeksAgoFilter(weeksAgo: string) {
+    setFilterByWeeksAgo(Number.parseInt(weeksAgo));
+  }
 
-  async function makeCoachList() {
-    const coachList = await getCoachList().then((result) => {
-      result.sort((a, b) => {
-        if (a.user && b.user) {
-          return a.user.name > b.user.name ? 1 : -1;
+  function filterByCoachFunction(weeks: Week[]) {
+    if (!filterByCoach) return weeks;
+    return weeks.filter((week) => {
+      const weekCoach = getCoachFromMembershipId(week.relatedMembership);
+      return weekCoach === filterByCoach;
+    });
+  }
+  function filterByCourseFunction(weeks: Week[]) {
+    if (!filterByCourse) return weeks;
+    return weeks.filter((week) => {
+      const weekCourse = getCourseFromMembershipId(week.relatedMembership);
+      return weekCourse === filterByCourse;
+    });
+  }
+
+  function filterWeeksByWeeksAgoFunction(weeks: Week[]) {
+    if (filterByWeeksAgo < 0) return weeks;
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+    const daysSinceSunday = dayOfWeek; // Number of days since the most recent Sunday
+    const millisecondsInADay = 86400000; // Number of milliseconds in a day
+    const thisSundayTimestamp =
+      now.getTime() - daysSinceSunday * millisecondsInADay;
+
+    const chosenSundayTimestamp =
+      thisSundayTimestamp - filterByWeeksAgo * millisecondsInADay * 7;
+    const sunday = new Date(chosenSundayTimestamp);
+
+    const sundayText = sunday.toISOString().split('T')[0];
+
+    return weeks.filter((week) => week.weekStarts === sundayText);
+  }
+
+  const filterWeeks = useCallback(
+    (weeks: Week[]) => {
+      let filteredWeeks = weeks;
+      if (filterByCoach) {
+        console.log('filtering by coach');
+        console.log('intiial len', filteredWeeks.length);
+        filteredWeeks = filterByCoachFunction(filteredWeeks);
+        console.log('final len', filteredWeeks.length);
+      }
+      if (filterByCourse) {
+        filteredWeeks = filterByCourseFunction(filteredWeeks);
+      }
+      // I dont like the logic with filterByWeeksAgo < 0, it will change it later
+      filteredWeeks = filterWeeksByWeeksAgoFunction(filteredWeeks);
+      console.log('big final len, ', filteredWeeks.length);
+      return filteredWeeks;
+    },
+    [filterByCoach, filterByCourse, filterByWeeksAgo],
+  );
+
+  useEffect(() => {
+    if (!rendered.current && lastThreeWeeksQuery.isSuccess) {
+      for (const week of lastThreeWeeksQuery.data) {
+        if (week.membershipRelatedStudentRecordIdRelatedCoach) {
+          console.log(week.membershipRelatedStudentRecordIdRelatedCoach);
         }
-        return 0;
-      });
-      return result;
-    });
-    return coachList;
-  }
-
-  function makeCoachSelector() {
-    const coachSelector = [
-      <option key={0} value={0}>
-        All Coaches
-      </option>,
-    ];
-    coaches.current.forEach((coach) => {
-      const coachHasActiveStudent =
-        students.current.filter(
-          (student) =>
-            (student.primaryCoach ? student.primaryCoach.id : undefined) ===
-            (coach.user ? coach.user.id : 0),
-        ).length > 0;
-      if (coachHasActiveStudent) {
-        coachSelector.push(
-          <option key={coach.recordId} value={coach.recordId}>
-            {coach.user.name}
-          </option>,
-        );
       }
-    });
-    return coachSelector;
-  }
-  function filterWeeksByCoach(weeks: any, coach: any) {
-    if (coach.user) {
-      const coachEmail = coach.user.email;
-      return weeks.filter(
-        (week) =>
-          (getCoachFromMembershipId(week.relatedMembership).recordId
-            ? getCoachFromMembershipId(week.relatedMembership).user.email
-            : '') === coachEmail,
-      );
-    } else {
-      return weeks;
+      // console.log('weeks', lastThreeWeeksQuery.data);
+      rendered.current = true;
     }
-  }
+  }, [userDataQuery.isSuccess, lastThreeWeeksQuery]);
 
-  async function getThreeWeeksOfRecords() {
-    const studentRecords = await getLastThreeWeeks();
-    return studentRecords;
-  }
-
-  async function loadStartupData() {
-    // const studentsPromise = makeStudentList();
-    // const membershipsPromise = makeMembershipList();
-    const weekRecordsPromise = getThreeWeeksOfRecords();
-    const coachesPromise = makeCoachList();
-    // const coursesPromise = makeCourseList();
-    // const lessonsPromise = makeLessonList();
-    const results = await Promise.all([
-      // studentsPromise,
-      // membershipsPromise,
-      weekRecordsPromise,
-      coachesPromise,
-      // coursesPromise,
-      // lessonsPromise,
-    ]);
-
-    // console.log(results[2]);
-    // students.current = results[0];
-    // memberships.current = results[1];
-    weekRecords.current = results[0][0];
-    privateCalls.current = results[0][1];
-    groupCalls.current = results[0][2];
-    groupAttendees.current = results[0][3];
-    assignments.current = results[0][4];
-    coaches.current = results[1];
-    // courses.current = results[4];
-    // lessons.current = results[5];
-    setStartupDataLoaded(true);
-  }
-
-  function combinedFilterWeeks(weeks: any) {
-    const filteredByCoach = filterWeeksByCoach(weeks, filterByCoach);
-    return filteredByCoach;
-  }
-
-  // Load Startup Data
   useEffect(() => {
-    if (!startupDataLoaded) {
-      loadStartupData();
+    if (dataReady) {
+      console.log('filtering weeks!');
+      const filteredWeeks = filterWeeks(lastThreeWeeksQuery.data);
+      setWeeks(filteredWeeks);
     }
-  }, []);
-  // Set Coach Filter
-  useEffect(() => {
-    if (startupDataLoaded) {
-      coachUser.current =
-        coaches.current.find(
-          (coach) => coach.user.email === userDataQuery.data?.emailAddress,
-        ) || null;
-      if (coachUser.current) {
-        updateCoachFilter(coachUser.current.recordId);
-      }
-    }
-  }, [startupDataLoaded, userDataQuery.data]);
-
-  // set data
-  useEffect(() => {
-    if (startupDataLoaded) {
-      setWeeksToDisplay(combinedFilterWeeks(weekRecords.current));
-    }
-  }, [startupDataLoaded, filterByCoach]);
-
-  return <div></div>;
+  }, [dataReady, filterWeeks, filterByCoach]);
+  return (
+    lastThreeWeeksQuery.isSuccess && (
+      <div className="newCoaching">
+        <div className="filterWrapper">
+          <CoachingFilter
+            updateCoachFilter={updateCoachFilter}
+            updateCourseFilter={updateCourseFilter}
+            updateWeeksAgoFilter={updateWeeksAgoFilter}
+          />
+        </div>
+        <div className="tableWrapper">
+          <NewTable weeks={weeks} />
+        </div>
+      </div>
+    )
+  );
 }

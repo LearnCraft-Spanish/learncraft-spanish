@@ -1,41 +1,43 @@
-import type { Coach, Student } from '../CoachingTypes';
+import useCoaching from '../../../hooks/useCoaching';
 
 interface CoachSelectProps {
-  coaches: { current: Coach[] };
-  students: { current: Student[] };
-  updateCoachFilter: (value: string) => void;
+  updateCoachFilter: (recordId: string) => void;
 }
-export default function CoachSelect({
-  coaches,
-  students,
-  updateCoachFilter,
-}: CoachSelectProps) {
-  const coachSelector = [
-    <option key={0} value={0}>
-      All Coaches
-    </option>,
-  ];
-  coaches.current.forEach((coach) => {
-    const coachHasActiveStudent =
-      students.current.filter(
-        (student) =>
-          (student.primaryCoach ? student.primaryCoach.id : undefined) ===
-          (coach.user ? coach.user.id : 0),
-      ).length > 0;
-    if (coachHasActiveStudent) {
-      coachSelector.push(
-        <option key={coach.recordId} value={coach.recordId}>
-          {coach.user.name}
-        </option>,
-      );
-    }
-  });
-  return (
-    <select onChange={(e) => updateCoachFilter(e.target.value)}>
-      {/* <option key={0} value={0}>
-        All Coaches
-      </option> */}
-      {coachSelector}
-    </select>
+
+export default function CoachSelect({ updateCoachFilter }: CoachSelectProps) {
+  const { coachListQuery, activeStudentsQuery } = useCoaching();
+
+  const dataReady = coachListQuery.isSuccess && activeStudentsQuery.isSuccess;
+
+  return dataReady ? (
+    <div>
+      <label htmlFor="coachSelector"> Coach: </label>
+      <select
+        name="coachSelector"
+        id="coachSelector"
+        onChange={(e) => updateCoachFilter(e.target.value)}
+      >
+        <option key={0} value={0}>
+          All Coaches
+        </option>
+        {coachListQuery.data.map((coach) => {
+          const coachHasActiveStudent =
+            activeStudentsQuery.data.filter(
+              (student) =>
+                (student.primaryCoach ? student.primaryCoach.id : undefined) ===
+                (coach.user ? coach.user.id : 0),
+            ).length > 0;
+          if (coachHasActiveStudent) {
+            return (
+              <option key={coach.recordId} value={coach.recordId}>
+                {coach.user.name}
+              </option>
+            );
+          }
+        })}
+      </select>
+    </div>
+  ) : (
+    <div>Error Loading Data!</div>
   );
 }

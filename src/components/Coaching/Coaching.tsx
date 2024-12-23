@@ -20,7 +20,8 @@ import {
   GroupAttendees,
   Call,
 } from './CoachingTypes';
-import './stylesOld.css';
+// import './stylesOld.css';
+import './styles.css';
 
 export default function Coaching() {
   const { contextual, openContextual, closeContextual, setContextualRef } =
@@ -514,7 +515,6 @@ export default function Coaching() {
   useEffect(() => {
     if (startupDataLoaded) {
       setWeeksToDisplay(combinedFilterWeeks(weekRecords.current));
-      console.log(combinedFilterWeeks(weekRecords.current));
     }
   }, [
     startupDataLoaded,

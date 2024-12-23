@@ -7,21 +7,97 @@ export interface QbUser {
   userName?: string;
 }
 
+// export interface Week {
+//   weekStarts: Date | string;
+//   assignmentRatings: string;
+//   privateCallRatings: string;
+//   groupCallComments: string;
+//   notes: string;
+//   holdWeek: boolean;
+//   recordsComplete: boolean;
+//   currentLesson: number;
+//   primaryCoachWhenCreated: string;
+//   recordCompletable: boolean;
+//   recordId: number;
+//   relatedMembership: number;
+//   week: number;
+//   weekEnds: Date | string;
+// }
 export interface Week {
+  student: string;
+  level: string;
+  primaryCoach: QbUser;
   weekStarts: Date | string;
-  assignmentRatings: string;
-  privateCallRatings: string;
-  groupCallComments: string;
+  assignmentRatings: string[];
+  privateCallRatings: string[];
+  addPrivateCall: string;
+  numberOfGroupCalls: number;
+  groupCallComments: string[];
+  currentLessonName: string;
   notes: string;
   holdWeek: boolean;
   recordsComplete: boolean;
+  membershipStudentCallCreditsRemaining: number;
+  OfCallsPrivateGroup: number; //NumberOfCallsPrivateGroup
+  addAssignment: string;
+  addAttendee: string;
+  assignmentPerformance: number | null;
+  assignments: unknown;
+  assignmentsCompleted: number;
+  attendees: unknown;
+  badRecord: boolean;
+  baseDate: Date | string;
+  blankUser: QbUser | null;
+  bundleCreditsUsed: number;
+  callPerformance: number | null;
+  calls: unknown;
+  checklistComplete: boolean;
+  combinedKeyForUniques: string;
   currentLesson: number;
+  dateCreated: Date | string;
+  dateModified: Date | string;
+  endingThisWeek: boolean;
+  lastModifiedBy: QbUser;
+  membershipActive: boolean;
+  membershipCourseHasGroupCalls: boolean;
+  membershipCourseWeeklyPrivateCalls: number;
+  membershipEndDate: Date | string;
+  membershipOnHold: boolean;
+  membershipRelatedStudentHasGroupCalls: boolean;
+  membershipRelatedStudentRecordIdPurchasedBundle: string;
+  membershipRelatedStudentRecordIdRelatedCoach: number;
+  membershipRelatedStudentWeeklyPrivateCalls: number;
+  membershipStartDate: Date | string;
+  membershipStudentMemberUntil: Date | string;
+  membershipName: string;
+  offTrack: boolean;
   primaryCoachWhenCreated: string;
+  privateCallsCompleted: number;
   recordCompletable: boolean;
   recordId: number;
+  recordOwner: QbUser;
+  recordsCompleteRef: number;
   relatedMembership: number;
-  week: number;
+  relatedMembershipRecordIdActive: boolean;
+  week: number; //WeekNumber
   weekEnds: Date | string;
+  weekName: string;
+}
+
+export interface NewWeek {
+  student: string;
+  level: string;
+  primaryCoachWhenCreated: string;
+  weekStarts: string | Date;
+  assignmentRatings: string;
+  numberOfGroupCalls: number;
+  groupCallComments: string;
+  currentLessonName: string;
+  notes: string;
+  holdWeek: boolean;
+  recordsComplete: boolean;
+  membershipStudentCallCreditsRemaining: number;
+  recordId: number;
 }
 export interface Student {
   recordId: number;

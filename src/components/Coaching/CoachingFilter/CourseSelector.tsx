@@ -1,37 +1,44 @@
-import type { Course, Membership } from '../CoachingTypes';
+import useCoaching from '../../../hooks/useCoaching';
 
 interface CourseSelectorProps {
-  courses: { current: Course[] };
-  memberships: { current: Membership[] };
   updateCourseFilter: (value: string) => void;
 }
+
 export default function CourseSelector({
-  courses,
-  memberships,
   updateCourseFilter,
 }: CourseSelectorProps) {
-  const courseSelector = [
-    <option key={0} value={0}>
-      All Courses
-    </option>,
-  ];
-  courses.current.forEach((course) => {
-    const courseHasActiveMembership =
-      memberships.current.filter(
-        (item) => item.relatedCourse === course.recordId,
-      ).length > 0;
-    if (courseHasActiveMembership) {
-      courseSelector.push(
-        <option key={course.recordId} value={course.recordId}>
-          {course.name}
-        </option>,
-      );
-    }
-  });
-  // return courseSelector;
+  const { courseListQuery, activeMembershipsQuery } = useCoaching();
+
+  const dataReady =
+    courseListQuery.isSuccess && activeMembershipsQuery.isSuccess;
+
   return (
-    <select onChange={(e) => updateCourseFilter(e.target.value)}>
-      {courseSelector}
-    </select>
+    dataReady && (
+      <div>
+        <label htmlFor="courseSelector">Course: </label>
+        <select
+          name="courseSelector"
+          id="course"
+          onChange={(e) => updateCourseFilter(e.target.value)}
+        >
+          <option key={0} value={0}>
+            All Courses
+          </option>
+          {courseListQuery.data.map((course) => {
+            const courseHasActiveMembership =
+              activeMembershipsQuery.data.filter(
+                (membership) => membership.relatedCourse === course.recordId,
+              ).length > 0;
+            if (courseHasActiveMembership) {
+              return (
+                <option key={course.recordId} value={course.recordId}>
+                  {course.name}
+                </option>
+              );
+            }
+          })}
+        </select>
+      </div>
+    )
   );
 }

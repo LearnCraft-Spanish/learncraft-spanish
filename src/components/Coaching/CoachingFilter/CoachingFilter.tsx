@@ -9,49 +9,60 @@ import type {
   Membership,
 } from '../CoachingTypes';
 
+import useCoaching from '../../../hooks/useCoaching';
+
 interface CoachingFilterProps {
-  searchTerm: string;
-  updateSearchTerm: (value: string) => void;
-  weeksToDisplay: Week[];
-  filterCoachless: number;
-  updateCoachlessFilter: (value: string) => void;
-  filterHoldWeeks: number;
-  updateHoldFilter: (value: string) => void;
-  filterIncomplete: number;
-  updateFilterIncomplete: (value: string) => void;
-  coaches: { current: Coach[] };
-  students: { current: Student[] };
-  courses: { current: Course[] };
-  memberships: { current: Membership[] };
+  // searchTerm: string;
+  // updateSearchTerm: (value: string) => void;
+  // weeksToDisplay: Week[];
+  // filterCoachless: number;
+  // updateCoachlessFilter: (value: string) => void;
+  // filterHoldWeeks: number;
+  // updateHoldFilter: (value: string) => void;
+  // filterIncomplete: number;
+  // updateFilterIncomplete: (value: string) => void;
+  // coaches: { current: Coach[] };
+  // students: { current: Student[] };
+  // courses: { current: Course[] };
+  // memberships: { current: Membership[] };
   updateCoachFilter: (value: string) => void;
   updateCourseFilter: (value: string) => void;
   updateWeeksAgoFilter: (value: string) => void;
 }
 export default function CoachingFilter({
-  searchTerm,
-  updateSearchTerm,
-  weeksToDisplay,
-  filterCoachless,
-  updateCoachlessFilter,
-  filterHoldWeeks,
-  updateHoldFilter,
-  filterIncomplete,
-  updateFilterIncomplete,
-  coaches,
-  students,
-  courses,
-  memberships,
+  // searchTerm,
+  // updateSearchTerm,
+  // weeksToDisplay,
+  // filterCoachless,
+  // updateCoachlessFilter,
+  // filterHoldWeeks,
+  // updateHoldFilter,
+  // filterIncomplete,
+  // updateFilterIncomplete,
+  // coaches,
+  // students,
+  // courses,
+  // memberships,
   updateCoachFilter,
   updateCourseFilter,
   updateWeeksAgoFilter,
 }: CoachingFilterProps) {
   const { contextual, closeContextual, setContextualRef, openContextual } =
     useContextualMenu();
+
+  const {
+    lastThreeWeeksQuery,
+    coachListQuery,
+    courseListQuery,
+    activeStudentsQuery,
+    activeMembershipsQuery,
+  } = useCoaching();
   function openMoreFilters() {
     openContextual('moreFilters');
   }
   return (
     <>
+      {/*
       <div className="coachingFilterSection">
         <div className="numberShowing">
           <h4>Search:</h4>
@@ -121,23 +132,24 @@ export default function CoachingFilter({
           </div>
         )}
       </div>
+      */}
       <div className="coachingFilterSection">
-        <CoachSelect
-          coaches={coaches}
-          students={students}
-          updateCoachFilter={updateCoachFilter}
-        />
-        <CourseSelector
-          courses={courses}
-          memberships={memberships}
-          updateCourseFilter={updateCourseFilter}
-        />
-        <select onChange={(e) => updateWeeksAgoFilter(e.target.value)}>
-          <option value={0}>This Week</option>
-          <option value={1}>Last Week</option>
-          <option value={2}>Two Weeks Ago</option>
-          <option value={-1}>Last Three Weeks (All)</option>
-        </select>
+        <h2>Records Filter</h2>
+        <CoachSelect updateCoachFilter={updateCoachFilter} />
+        <CourseSelector updateCourseFilter={updateCourseFilter} />
+        <div>
+          <label htmlFor="weekRangeFilter">Week:</label>
+          <select
+            name="weekRangeFilter"
+            id="weekRangeFilter"
+            onChange={(e) => updateWeeksAgoFilter(e.target.value)}
+          >
+            <option value={0}>This Week</option>
+            <option value={1}>Last Week</option>
+            <option value={2}>Two Weeks Ago</option>
+            <option value={-1}>Last Three Weeks (All)</option>
+          </select>
+        </div>
       </div>
     </>
   );

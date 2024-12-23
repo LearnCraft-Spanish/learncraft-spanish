@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { get } from 'lodash';
 import type * as types from '../interfaceDefinitions';
 import type * as StudentRecordsTypes from '../components/Coaching/CoachingTypes';
 import useAuth from './useAuth';
@@ -132,6 +133,9 @@ export function useBackend() {
       return getFactory('coaching/last-three-weeks');
     }, [getFactory]);
 
+  const getNewWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
+    return getFactory('coaching/weeks-new-format');
+  }, [getFactory]);
   /*      POST Requests      */
 
   const postFactory = useCallback(
@@ -342,5 +346,6 @@ export function useBackend() {
     getPMFDataForUser,
     createPMFDataForUser,
     updatePMFDataForUser,
+    getNewWeeks,
   };
 }
