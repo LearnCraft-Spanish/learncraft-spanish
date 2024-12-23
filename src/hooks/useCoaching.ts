@@ -97,5 +97,6 @@ export default function useCoaching() {
     activeMembershipsQuery,
     activeStudentsQuery,
     getCoachFromMembershipId,
+    getCourseFromMembershipId,
   };
 }
