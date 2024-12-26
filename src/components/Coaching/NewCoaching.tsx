@@ -122,7 +122,7 @@ export default function Coaching() {
   }, [dataReady, filterWeeks, filterByCoach]);
   return (
     lastThreeWeeksQuery.isSuccess && (
-      <div className="newCoaching">
+      <div className="newCoachingWrapper">
         <div className="filterWrapper">
           <CoachingFilter
             updateCoachFilter={updateCoachFilter}

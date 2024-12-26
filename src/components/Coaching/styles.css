@@ -1,38 +1,52 @@
-table,
-th,
-td {
-  border-collapse: collapse;
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
-
 .newCoachingWrapper {
   margin: 1rem;
 }
-
-table {
-  scroll-behavior: auto;
-  width: 100%;
+.tableWrapper {
+  width: auto;
+  max-height: 80vh;
   overflow-x: auto;
-  display: block;
+  margin-top: 1rem;
 }
-
-th,
-td {
+.tableWrapper table {
+  width: 100%;
+  scroll-behavior: auto;
+  border-collapse: separate; /* Don't collapse */
+  border-spacing: 0; /* Spacing between cells */
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+.tableWrapper table th,
+.tableWrapper table td {
+  min-width: 100px;
   border: 1px solid black;
   padding: 0.25rem;
-  text-align: left;
-  min-width: 100px;
+  text-align: start;
+  vertical-align: top;
 }
-
-th {
-  font-weight: 600;
+.tableWrapper table thead th {
+  position: sticky;
+  top: 0px;
+  z-index: 1;
   color: white;
   background-color: grey;
+  font-weight: 600;
 }
-
-tr:nth-child(even) {
+.tableWrapper table thead th:first-child {
+  position: sticky;
+  left: 0px;
+  z-index: 2;
+}
+.tableWrapper table tbody td {
   background-color: #f2f2f2;
+}
+.tableWrapper table tbody td:first-child {
+  position: sticky;
+  left: 0px;
+  z-index: 1;
+  background-color: var(--accent);
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.5rem;
 }
 
 /*# sourceMappingURL=styles.css.map */

@@ -1,42 +1,66 @@
-table,
-th,
-td {
-  border-collapse: collapse;
-  font-size: 0.75rem;
-  //reduce line geight
-  line-height: 1rem;
-}
 .newCoachingWrapper {
   margin: 1rem;
+
+  .filterWrapper {
+  }
+  .tableWrapper {
+  }
 }
-table {
-  // margin: 1rem;
-  scroll-behavior: auto;
-  width: 100%;
+
+.tableWrapper {
+  width: auto;
+  max-height: 80vh;
   overflow-x: auto;
-  display: block;
-}
+  margin-top: 1rem;
 
-th,
-td {
-  border: 1px solid black;
+  table {
+    width: 100%;
+    scroll-behavior: auto;
+    border-collapse: separate; /* Don't collapse */
+    border-spacing: 0; /* Spacing between cells */
+    font-size: 0.75rem;
+    line-height: 1rem;
 
-  padding: 0.25rem;
-  text-align: left;
-  min-width: 100px;
-}
-th {
-  font-weight: 600;
-  color: white;
-  background-color: grey;
-  // text-align: left;
-  // padding: 0.25rem;
-}
+    th,
+    td {
+      min-width: 100px;
+      border: 1px solid black;
+      padding: 0.25rem;
+      text-align: start;
+      vertical-align: top;
+    }
+    thead {
+      th {
+        position: sticky;
+        top: 0px;
+        z-index: 1;
+        color: white;
+        background-color: grey;
+        font-weight: 600;
+      }
 
-td {
-  // padding: 0px;
-  // text-align: left;
-}
-tr:nth-child(even) {
-  background-color: #f2f2f2;
+      // first cell in thead is sticky
+      th:first-child {
+        position: sticky;
+        left: 0px;
+        z-index: 2;
+      }
+    }
+    tbody {
+      td {
+        background-color: #f2f2f2;
+      }
+
+      // first cell in each row is sticky
+      td:first-child {
+        position: sticky;
+        left: 0px;
+        z-index: 1;
+        background-color: var(--accent);
+        font-weight: 600;
+        font-size: 0.9rem;
+        line-height: 1.5rem;
+      }
+    }
+  }
 }

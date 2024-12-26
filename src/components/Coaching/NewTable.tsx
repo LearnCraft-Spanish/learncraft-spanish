@@ -29,9 +29,9 @@ export default function NewTable({ weeks }: NewTableProps) {
               <td>{week.student}</td>
               <td>{week.level}</td>
               <td>
-                {week.primaryCoachWhenCreated
-                  ? week.primaryCoachWhenCreated
-                  : 'No Coach Found'}
+                {week.primaryCoach.name
+                  ? week.primaryCoach.name
+                  : 'No Primary Coach Found'}
               </td>
               <td>{week.weekStarts.toString()}</td>
               <td>{week.assignmentRatings}</td>
