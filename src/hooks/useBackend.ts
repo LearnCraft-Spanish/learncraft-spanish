@@ -96,6 +96,19 @@ export function useBackend() {
     [getFactory],
   );
 
+  const getUnverifiedExamplesFromBackend = useCallback((): Promise<
+    types.Flashcard[]
+  > => {
+    return getFactory<types.Flashcard[]>('unverified-examples');
+  }, [getFactory]);
+
+  const getSingleExample = useCallback(
+    (exampleId: number): Promise<types.Flashcard> => {
+      return getFactory<types.Flashcard>(`single-example/${exampleId}`);
+    },
+    [getFactory],
+  );
+
   /*      Coaching API      */
 
   const getCoachList = useCallback((): Promise<types.Coach[]> => {
@@ -302,6 +315,30 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const createUnverifiedExample = useCallback(
+    (example: types.NewFlashcard): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'add-unverified-example',
+        body: {
+          example,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const updateExample = useCallback(
+    (example: Partial<types.Flashcard>): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'update-example',
+        body: {
+          example,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   return {
     getAccessToken,
     getProgramsFromBackend,
@@ -315,6 +352,8 @@ export function useBackend() {
     getMyExamplesFromBackend,
     getQuizExamplesFromBackend,
     getAllUsersFromBackend,
+    getUnverifiedExamplesFromBackend,
+    getSingleExample,
     getUserDataFromBackend,
     getActiveExamplesFromBackend,
     getCoachList,
@@ -325,8 +364,10 @@ export function useBackend() {
     getLastThreeWeeks,
     createMyStudentExample,
     createStudentExample,
+    createUnverifiedExample,
     updateMyStudentExample,
     updateStudentExample,
+    updateExample,
     deleteMyStudentExample,
     deleteStudentExample,
     getPMFDataForUser,

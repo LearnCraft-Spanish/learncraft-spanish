@@ -17,52 +17,42 @@ export default function generateStudentFlashcardData(
     {
       lastReviewedDate: new Date().toISOString(),
       reviewInterval: 0,
-      nextReviewDate: '',
     },
     {
       lastReviewedDate: new Date().toISOString(),
       reviewInterval: 1,
-      nextReviewDate: '',
     },
     {
       lastReviewedDate: new Date().toISOString(),
       reviewInterval: 2,
-      nextReviewDate: '',
     },
     {
       lastReviewedDate: new Date(Date.now() - 86400000).toISOString(),
       reviewInterval: 0,
-      nextReviewDate: '',
     },
     {
       lastReviewedDate: new Date(Date.now() - 86400000).toISOString(),
       reviewInterval: 1,
-      nextReviewDate: '',
     },
     {
       lastReviewedDate: new Date(Date.now() - 86400000).toISOString(),
       reviewInterval: 2,
-      nextReviewDate: '',
     },
     {
       lastReviewedDate: new Date(Date.now() - 172800000).toISOString(),
       reviewInterval: 0,
       coachAdded: true,
-      nextReviewDate: new Date(Date.now() + 86400000).toISOString(),
     },
     {
       lastReviewedDate: new Date(Date.now() - 172800000).toISOString(),
       reviewInterval: 1,
-      nextReviewDate: new Date(Date.now() + 86400000).toISOString(),
     },
     {
       lastReviewedDate: new Date(Date.now() - 172800000).toISOString(),
       reviewInterval: 2,
-      nextReviewDate: new Date(Date.now() + 86400000).toISOString(),
     },
     {
       lastReviewedDate: '',
-      nextReviewDate: '',
       reviewInterval: null,
       coachAdded: true,
     },
@@ -87,17 +77,13 @@ export default function generateStudentFlashcardData(
       ? reviewDatesAndIntervals[i].reviewInterval
       : null;
 
-    const nextReviewDate = reviewDatesAndIntervals[i]?.nextReviewDate
-      ? reviewDatesAndIntervals[i].nextReviewDate
-      : '';
-
     const coachAdded = reviewDatesAndIntervals[i]?.coachAdded ?? null;
 
     // create studentExample
     studentFlashcardData.studentExamples.push({
       recordId: Math.floor(Math.random() * 100000),
       lastReviewedDate,
-      nextReviewDate,
+      nextReviewDate: '',
       reviewInterval,
       studentEmailAddress: student.emailAddress,
       relatedStudent: student.recordId,

@@ -7,14 +7,6 @@ export interface Lesson {
   vocabKnown: Array<string>;
 }
 
-export interface LessonUnparsed {
-  recordId: number;
-  lesson: string;
-  vocabIncluded: Array<string>;
-  sortReference: number | null;
-  relatedProgram: number;
-}
-
 export interface Program {
   recordId: number;
   name: string;
@@ -61,11 +53,16 @@ export interface Flashcard {
   englishTranslation: string;
   spanglish: string;
   vocabIncluded: Array<string>;
-  allStudents?: Array<string>;
   englishAudio: string;
   spanishAudioLa: string;
   vocabComplete: boolean;
   difficulty?: string;
+}
+
+export interface NewFlashcard
+  extends Omit<Flashcard, 'recordId' | 'vocabIncluded'> {
+  recordId?: never;
+  vocabIncluded?: never;
 }
 
 export interface StudentExample {
@@ -97,6 +94,11 @@ export type ActiveStudent = UserData | null;
 // export type AudioExample = Flashcard;
 // export type AudioExamplesTable = Array<AudioExample>;
 export type AudioExamplesTable = Array<Flashcard>;
+
+export interface Spelling {
+  relatedWordIdiom: number;
+  spellingOption: string;
+}
 
 export interface Vocabulary {
   recordId: number;
@@ -131,27 +133,16 @@ export interface Quiz {
   lessonNumber: number;
   subtitle: string;
 }
-export interface QuizUnparsed {
-  quizNickname: string;
-  recordId: number;
-}
 
 export interface QuizExamplesTable {
   quizNickname: string;
   quizExamplesTable: Flashcard[];
 }
 
-// interface OldSpelling {
-//   relatedWordidiom: number;
-//   spellingOption: string;
-// }
-
-interface NewSpelling {
-  relatedWordIdiom: number;
+export interface Spelling {
+  relatedWordidiom: number;
   spellingOption: string;
 }
-
-export type Spelling = NewSpelling;
 
 /*      Flashcard Finder      */
 

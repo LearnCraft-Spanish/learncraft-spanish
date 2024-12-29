@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
-import type { QuizExamplesTable, QuizUnparsed } from '../interfaceDefinitions';
+import type { Quiz, QuizExamplesTable } from '../interfaceDefinitions';
 import MockAllProviders from '../../mocks/Providers/MockAllProviders';
 import { setupMockAuth } from '../../tests/setupMockAuth';
 
@@ -188,7 +188,7 @@ describe('useBackend Hook', () => {
   quizExamplesTableArray.forEach((quizExamplesObject: QuizExamplesTable) => {
     const quizNickname = quizExamplesObject.quizNickname;
     const quizId = api.quizzesTable.find(
-      (quiz: QuizUnparsed) => quiz.quizNickname === quizNickname,
+      (quiz: Quiz) => quiz.quizNickname === quizNickname,
     )?.recordId;
     if (!quizId) {
       throw new Error('Quiz ID not found');

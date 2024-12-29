@@ -11,11 +11,9 @@ interface AudioFlashcardProps {
   resumePlayback: () => void;
   isPlaying: boolean;
   currentExample: Flashcard | undefined;
-  isStudent: boolean;
-  currentStep: 'question' | 'answer' | 'guess' | 'hint';
   incrementExample: () => void;
-  onRemove: () => void;
-  incrementOnAdd?: boolean;
+  isStudent: boolean;
+  currentStep: string;
 }
 
 export default function AudioFlashcardComponent({
@@ -27,11 +25,9 @@ export default function AudioFlashcardComponent({
   resumePlayback,
   isPlaying,
   currentExample,
+  incrementExample,
   isStudent,
   currentStep,
-  incrementExample,
-  incrementOnAdd = true,
-  onRemove,
 }: AudioFlashcardProps): JSX.Element {
   function handlePlayPauseClick(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -43,13 +39,6 @@ export default function AudioFlashcardComponent({
       resumePlayback();
     }
   }
-  // function onRemoveOfOwnedFlashcard(): void {
-  //   if (onRemove) {
-  //     onRemove();
-  //   } else {
-  //     incrementExample();
-  //   }
-  // }
   return (
     <div
       className="audioFlashcard"
@@ -73,12 +62,11 @@ export default function AudioFlashcardComponent({
           style={{ width: `${progressStatus * 100}%` }}
         />
       )}
-      {isStudent && currentStep !== 'question' && currentStep !== 'guess' && (
+      {isStudent && currentStep === 'answer' && (
         <AddToMyFlashcardsButtons
           example={currentExample}
           incrementExampleNumber={incrementExample}
-          incrementOnAdd={incrementOnAdd}
-          onRemove={onRemove}
+          onRemove={incrementExample}
         />
       )}
     </div>

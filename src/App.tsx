@@ -13,11 +13,13 @@ import SentryRoutes from './functions/SentryRoutes';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import useAuth from './hooks/useAuth';
 import { useUserData } from './hooks/useUserData';
-import LCSPQuizApp from './LCSPQuizApp';
+import LCSPQuizApp from './components/OfficialQuizzing/LCSPQuizApp';
 import Menu from './Menu';
 import NotFoundPage from './NotFoundPage';
 import ReviewMyFlashcards from './ReviewMyFlashcards';
 import './App.css';
+import ExampleCreator from './components/ExampleCreator/ExampleCreator';
+import ExampleEditor from './components/ExampleEditor/ExampleEditor';
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -218,7 +220,7 @@ export const App: React.FC = () => {
           }
         />
         <Route
-          path="/audioquiz"
+          path="/audioquiz/*"
           element={
             (userDataQuery.data?.role === 'student' ||
               userDataQuery.data?.role === 'limited' ||
@@ -228,7 +230,7 @@ export const App: React.FC = () => {
           }
         />
         <Route
-          path="/comprehensionquiz"
+          path="/comprehensionquiz/*"
           element={
             (userDataQuery.data?.role === 'student' ||
               userDataQuery.data?.role === 'limited' ||
@@ -243,6 +245,14 @@ export const App: React.FC = () => {
         <Route
           path="/frequensay"
           element={userDataQuery.data?.isAdmin && <FrequenSay />}
+        />
+        <Route
+          path="/examplecreator"
+          element={userDataQuery.data?.isAdmin && <ExampleCreator />}
+        />
+        <Route
+          path="/exampleeditor"
+          element={userDataQuery.data?.isAdmin && <ExampleEditor />}
         />
         {
           // Coaching Section still under construction

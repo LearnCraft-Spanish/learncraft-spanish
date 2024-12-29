@@ -1,5 +1,5 @@
 import React from 'react';
-import { useUserData } from '../../hooks/useUserData';
+
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import type { Flashcard } from '../../interfaceDefinitions';
 
@@ -7,42 +7,35 @@ interface AddToMyFlashcardsButtonsProps {
   example: Flashcard | undefined;
   incrementExampleNumber: () => void;
   onRemove: () => void;
-  incrementOnAdd?: boolean;
 }
 export default function AddToMyFlashcardsButtons({
   example,
   incrementExampleNumber,
   onRemove,
-  incrementOnAdd = true,
-}: AddToMyFlashcardsButtonsProps): JSX.Element | undefined {
+}: AddToMyFlashcardsButtonsProps): JSX.Element {
   const {
-    flashcardDataQuery,
     addFlashcardMutation,
     removeFlashcardMutation,
     exampleIsCollected,
     exampleIsCustom,
     exampleIsPending,
   } = useStudentFlashcards();
-  const userData = useUserData();
-
-  const dataSuccess = userData.isSuccess && flashcardDataQuery.isSuccess;
   if (!example) {
-    throw new Error('No Flashcard passed to AddToMyFlashcardsButtons');
+    return <div>Error Parsing Flashcard</div>;
   }
-
-  function add() {
+  function addAndAdvance() {
     if (!example) {
-      throw new Error('No Flashcard passed to AddToMyFlashcardsButtons');
+      return;
     }
     addFlashcardMutation.mutate(example);
-    if (incrementOnAdd) incrementExampleNumber();
+    incrementExampleNumber();
   }
-  function remove() {
-    onRemove();
+  function removeAndAdvance() {
     if (!example) {
-      throw new Error('No Flashcard passed to AddToMyFlashcardsButtons');
+      return;
     }
     removeFlashcardMutation.mutate(example.recordId);
+    onRemove();
   }
   const isCollected = exampleIsCollected(example.recordId);
   const isCustom = exampleIsCustom(example.recordId);
