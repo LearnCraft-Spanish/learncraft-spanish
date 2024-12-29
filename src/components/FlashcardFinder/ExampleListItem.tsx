@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Flashcard } from '../../interfaceDefinitions';
 import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
+import x from '../../resources/icons/x.svg';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 
@@ -25,6 +26,7 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
     exampleIsPending,
     exampleIsCustom,
   } = useStudentFlashcards();
+  const [showTags, setShowTags] = useState(false);
 
   const dataReady =
     flashcardDataQuery.isSuccess && activeStudentQuery.isSuccess;
@@ -51,6 +53,31 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
           <h4>Spanish</h4>
         </div>
       )}
+      <div className="exampleCardTags">
+        {showTags && (
+          <div className="exampleCardTagsList">
+            {data.vocabIncluded.map((tag) => (
+              <p key={tag}>{tag}</p>
+            ))}
+            <button
+              type="button"
+              className="hideTagsButton"
+              onClick={() => setShowTags(false)}
+            >
+              <img src={x} alt="Hide" />
+            </button>
+          </div>
+        )}
+        {!showTags && (
+          <button
+            type="button"
+            className="showTagsButton"
+            onClick={() => setShowTags(true)}
+          >
+            Vocabulary
+          </button>
+        )}
+      </div>
       {dataReady && isStudent && (
         <>
           {!isCollected && (

@@ -8,12 +8,13 @@ import { useVocabulary } from '../../hooks/useVocabulary';
 import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import quizCourses from '../../functions/QuizCourseList';
-import { VocabCard } from './VocabCard';
+import { VocabTag } from './VocabTag';
+import './ExampleEditor.css';
 
 export default function ExampleEditor() {
   const [quizCourse, setQuizCourse] = useState('');
   const [quizId, setQuizId] = useState(undefined as number | undefined);
-  const [selectedExampleId, setSelectedExampleId] = useState(
+  const [selectedExampleId, _setSelectedExampleId] = useState(
     null as number | null,
   );
   const [spanishExample, setSpanishExample] = useState('');
@@ -22,7 +23,7 @@ export default function ExampleEditor() {
   const [englishAudio, setEnglishAudio] = useState('');
   const [vocabIncluded, setVocabIncluded] = useState([] as Vocabulary[]);
   const [vocabComplete, setVocabComplete] = useState(false);
-  const [selectedVocabTerm, setSelectedVocabTerm] = useState(
+  const [_selectedVocabTerm, _setSelectedVocabTerm] = useState(
     null as Vocabulary | null,
   );
 
@@ -79,10 +80,24 @@ export default function ExampleEditor() {
   }, [spanishExample]);
 
   function addToVocabIncluded(vocab: Vocabulary) {
-    setVocabIncluded([...vocabIncluded, vocab]);
+    if (!vocabIncluded.some((word) => word.recordId === vocab.recordId)) {
+      setVocabIncluded([...vocabIncluded, vocab]);
+    }
   }
 
-  function removeFromVocabIncluded(recordId: number) {
+  function addToVocabByRecordId(recordId: string | number) {
+    if (typeof recordId === 'string') {
+      recordId = Number.parseInt(recordId);
+    }
+    const vocab = vocabularyQuery.data?.find(
+      (vocab) => vocab.recordId === recordId,
+    );
+    if (vocab) {
+      addToVocabIncluded(vocab);
+    }
+  }
+
+  function removeFromVocabIncluded(recordId: number | string) {
     setVocabIncluded(
       vocabIncluded.filter((vocab) => vocab.recordId !== recordId),
     );
@@ -98,7 +113,9 @@ export default function ExampleEditor() {
         spanishAudioLa,
         spanglish,
         englishAudio,
-        vocabIncluded: vocabIncluded.map((vocab) => vocab.vocabName),
+        vocabIncluded: vocabIncluded
+          .map((vocab) => vocab.descriptionOfVocabularySkill)
+          .filter((vocab) => vocab !== undefined) as string[],
         vocabComplete,
       });
     }
@@ -115,7 +132,7 @@ export default function ExampleEditor() {
         const includedVocabObjects = includedVocabStrings
           .map((vocab) => {
             return vocabularyQuery.data?.find(
-              (word) => word.vocabName === vocab,
+              (word) => word.descriptionOfVocabularySkill === vocab,
             );
           })
           .filter((vocab) => vocab !== undefined) as Vocabulary[];
@@ -225,12 +242,20 @@ export default function ExampleEditor() {
           </div>
           <div>
             <label id="vocabIncluded">Vocab Included</label>
-            <div>{vocabIncluded.map((vocab) => VocabCard({ vocab }))}</div>
-            <select onChange={(e) => addToVocabIncluded(e.target.value)}>
+            <div className="vocabTagBox">
+              {vocabIncluded.map((vocab) => (
+                <VocabTag
+                  key={vocab.recordId}
+                  vocab={vocab}
+                  removeFromVocabByRecordId={removeFromVocabIncluded}
+                />
+              ))}
+            </div>
+            <select onChange={(e) => addToVocabByRecordId(e.target.value)}>
               {vocabularyQuery.isSuccess &&
                 vocabularyQuery.data.map((vocab) => (
                   <option key={vocab.recordId} value={vocab.recordId}>
-                    {vocab.vocabName}
+                    {vocab.descriptionOfVocabularySkill}
                   </option>
                 ))}
             </select>

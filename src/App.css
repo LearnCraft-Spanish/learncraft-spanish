@@ -869,6 +869,41 @@ button:hover,
   margin: 5px 30px;
 }
 
+.exampleCardTags {
+  position: relative;
+  background-color: var(--theme);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0px;
+  padding: 0px;
+}
+
+.showTagsButton {
+  height: 100%;
+  background-color: var(--theme);
+  color: var(--light);
+  margin: 0px;
+  padding: 0px 10px;
+}
+
+.hideTagsButton {
+  background-color: transparent;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.hideTagsButton img {
+  width: 12px;
+  height: 12px;
+  color: var(--light);
+}
+
 .addButton,
 .removeButton {
   width: 10%;
