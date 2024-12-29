@@ -85,19 +85,22 @@ export function useOfficialQuizzes(quizId: number | undefined) {
   });
 
   const updateQuizExample = useCallback(
-    async (newExampleData: Flashcard) => {
+    async (newExampleData: Partial<Flashcard>) => {
       const isInActiveQuiz = quizExamplesQuery.data?.some(
         (example) => example.recordId === newExampleData.recordId,
       );
       if (isInActiveQuiz) {
-        updateExample(newExampleData);
+        const response = await updateExample(newExampleData);
+        if (response) {
+          quizExamplesQuery.refetch();
+        }
       } else {
         console.error(
           `Attempted to update example ${newExampleData.recordId} which is not in the active quiz`,
         );
       }
     },
-    [updateExample, quizExamplesQuery.data],
+    [updateExample, quizExamplesQuery],
   );
 
   return { officialQuizzesQuery, quizExamplesQuery, updateQuizExample };

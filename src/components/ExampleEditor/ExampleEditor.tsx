@@ -115,9 +115,6 @@ export default function ExampleEditor() {
         spanishAudioLa,
         spanglish,
         englishAudio,
-        vocabIncluded: vocabIncluded
-          .map((vocab) => vocab.descriptionOfVocabularySkill)
-          .filter((vocab) => vocab !== undefined) as string[],
         vocabComplete,
       });
     }
