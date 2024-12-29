@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   formatEnglishText,
   formatSpanishText,
@@ -79,29 +79,31 @@ export default function ExampleEditor() {
     }
   }, [spanishExample]);
 
-  function addToVocabIncluded(vocab: Vocabulary) {
-    if (!vocabIncluded.some((word) => word.recordId === vocab.recordId)) {
-      setVocabIncluded([...vocabIncluded, vocab]);
-    }
-  }
+  const addToVocabByRecordId = useCallback(
+    (recordId: string | number) => {
+      if (typeof recordId === 'string') {
+        recordId = Number.parseInt(recordId);
+      }
+      const vocab = vocabularyQuery.data?.find(
+        (vocab) => vocab.recordId === recordId,
+      );
+      if (vocab) {
+        if (!vocabIncluded.some((word) => word.recordId === vocab.recordId)) {
+          setVocabIncluded([...vocabIncluded, vocab]);
+        }
+      }
+    },
+    [vocabularyQuery.data, vocabIncluded],
+  );
 
-  function addToVocabByRecordId(recordId: string | number) {
-    if (typeof recordId === 'string') {
-      recordId = Number.parseInt(recordId);
-    }
-    const vocab = vocabularyQuery.data?.find(
-      (vocab) => vocab.recordId === recordId,
-    );
-    if (vocab) {
-      addToVocabIncluded(vocab);
-    }
-  }
-
-  function removeFromVocabIncluded(recordId: number | string) {
-    setVocabIncluded(
-      vocabIncluded.filter((vocab) => vocab.recordId !== recordId),
-    );
-  }
+  const removeFromVocabIncluded = useCallback(
+    (recordId: number | string) => {
+      setVocabIncluded(
+        vocabIncluded.filter((vocab) => vocab.recordId !== recordId),
+      );
+    },
+    [vocabIncluded],
+  );
 
   function handleEditExample(e: React.FormEvent) {
     e.preventDefault();
@@ -145,7 +147,7 @@ export default function ExampleEditor() {
         setVocabComplete(example.vocabComplete);
       }
     }
-  }, [vocabularyQuery, selectedExampleId, tableData]);
+  }, [vocabularyQuery.data, selectedExampleId, tableData]);
 
   // Update default quiz when quizCourse changes
   useEffect(() => {

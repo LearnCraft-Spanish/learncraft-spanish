@@ -1,5 +1,5 @@
 import type { Vocabulary } from '../../interfaceDefinitions';
-import x from '../../resources/icons/x.svg';
+import x from '../../resources/icons/x_dark.svg';
 
 interface VocabTagProps {
   vocab: Vocabulary;
