@@ -14,7 +14,7 @@ import './ExampleEditor.css';
 export default function ExampleEditor() {
   const [quizCourse, setQuizCourse] = useState('');
   const [quizId, setQuizId] = useState(undefined as number | undefined);
-  const [selectedExampleId, _setSelectedExampleId] = useState(
+  const [selectedExampleId, setSelectedExampleId] = useState(
     null as number | null,
   );
   const [spanishExample, setSpanishExample] = useState('');
@@ -268,6 +268,8 @@ export default function ExampleEditor() {
         <ExamplesTable
           dataSource={tableData ?? []}
           displayOrder={displayOrder ?? []}
+          forceShowVocab
+          selectFunction={(recordId) => setSelectedExampleId(recordId)}
         />
       </div>
     </div>

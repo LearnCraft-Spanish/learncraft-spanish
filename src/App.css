@@ -870,7 +870,6 @@ button:hover,
 }
 
 .exampleCardTags {
-  position: relative;
   background-color: var(--theme);
   display: flex;
   flex-direction: column;
@@ -878,6 +877,17 @@ button:hover,
   align-items: center;
   margin: 0px;
   padding: 0px;
+}
+
+.exampleCardTagsList {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 0px;
+  padding: 36px 10px 10px;
 }
 
 .showTagsButton {
@@ -891,7 +901,7 @@ button:hover,
 .hideTagsButton {
   background-color: transparent;
   position: absolute;
-  bottom: 0px;
+  top: 0px;
   right: 0px;
   padding: 12px;
   cursor: pointer;
