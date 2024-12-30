@@ -141,7 +141,9 @@ export interface GroupSession {
 export interface GroupAttendees {
   recordId: number;
   groupSession: number;
-  student: number;
+  student: number; // is actually the recordId of the associated Week record
+  weekStudent: string;
+  groupSessionDate: Date | string;
 }
 export interface Course {
   recordId: number;

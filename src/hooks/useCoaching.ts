@@ -10,6 +10,8 @@ export default function useCoaching() {
     getCourseList,
     getActiveMemberships,
     getActiveStudents,
+    getGroupSessions,
+    getGroupAttendees,
   } = useBackend();
 
   const lastThreeWeeksQuery = useQuery({
@@ -43,6 +45,20 @@ export default function useCoaching() {
   const activeStudentsQuery = useQuery({
     queryKey: ['activeStudents'],
     queryFn: getActiveStudents,
+    staleTime: Infinity,
+    enabled: !!userDataQuery.data?.isAdmin,
+  });
+
+  const groupSessionsQuery = useQuery({
+    queryKey: ['groupSessions'],
+    queryFn: getGroupSessions,
+    staleTime: Infinity,
+    enabled: !!userDataQuery.data?.isAdmin,
+  });
+
+  const groupAttendeesQuery = useQuery({
+    queryKey: ['groupAttendees'],
+    queryFn: getGroupAttendees,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
@@ -90,6 +106,48 @@ export default function useCoaching() {
     return courseListQuery.data.find((item) => item.recordId === courseId);
   }
 
+  /* may not use */
+  // function getAttendeesFromGroupSessionId(sessionId: number) {
+  //   if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+  //     return null;
+  //   }
+  //   return groupAttendeesQuery.data.filter(
+  //     (attendee) => attendee.groupSession === sessionId,
+  //   );
+  // }
+  function getAttendeeWeeksFromGroupSessionId(sessionId: number) {
+    if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      return null;
+    }
+    const attendeeList = groupAttendeesQuery.data.filter(
+      (attendee) => attendee.groupSession === sessionId,
+    );
+    if (attendeeList.length > 0) {
+      const weekList = attendeeList.map((attendee) =>
+        lastThreeWeeksQuery.data.find(
+          (week) => week.recordId === attendee.student,
+        ),
+      );
+      if (weekList.length > 0) {
+        return weekList;
+      }
+    }
+  }
+  function getGroupSessionFromWeekRecordId(weekRecordId: number) {
+    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+      return null;
+    }
+    const attendeeList = groupAttendeesQuery.data.filter(
+      (attendee) => attendee.student === weekRecordId,
+    );
+    const groupSessionList = groupSessionsQuery.data.filter((groupSession) =>
+      attendeeList.find(
+        (attendee) => attendee.groupSession === groupSession.recordId,
+      ),
+    );
+    return groupSessionList;
+  }
+
   return {
     lastThreeWeeksQuery,
     coachListQuery,
@@ -98,5 +156,10 @@ export default function useCoaching() {
     activeStudentsQuery,
     getCoachFromMembershipId,
     getCourseFromMembershipId,
+    groupSessionsQuery,
+    groupAttendeesQuery,
+    // getAttendeesFromGroupSessionId,
+    getAttendeeWeeksFromGroupSessionId,
+    getGroupSessionFromWeekRecordId,
   };
 }

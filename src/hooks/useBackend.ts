@@ -136,6 +136,18 @@ export function useBackend() {
   const getNewWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
     return getFactory('coaching/weeks-new-format');
   }, [getFactory]);
+
+  const getGroupAttendees = useCallback((): Promise<
+    StudentRecordsTypes.GroupAttendees[]
+  > => {
+    return getFactory('coaching/group-attendees');
+  }, [getFactory]);
+
+  const getGroupSessions = useCallback((): Promise<
+    StudentRecordsTypes.GroupSession[]
+  > => {
+    return getFactory('coaching/group-sessions');
+  }, [getFactory]);
   /*      POST Requests      */
 
   const postFactory = useCallback(
@@ -347,5 +359,7 @@ export function useBackend() {
     createPMFDataForUser,
     updatePMFDataForUser,
     getNewWeeks,
+    getGroupAttendees,
+    getGroupSessions,
   };
 }

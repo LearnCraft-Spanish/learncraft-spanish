@@ -1,4 +1,7 @@
 import type { Week } from './CoachingTypes';
+import NewGroupSessionsCell from './NewGroupSessionCell';
+import useCoaching from '../../hooks/useCoaching';
+import { useEffect } from 'react';
 
 interface NewTableProps {
   weeks: Week[] | undefined;
@@ -35,7 +38,13 @@ export default function NewTable({ weeks }: NewTableProps) {
               </td>
               <td>{week.weekStarts.toString()}</td>
               <td>{week.assignmentRatings}</td>
-              <td>{week.numberOfGroupCalls}</td>
+              <td>
+                {week.numberOfGroupCalls > 0 ? (
+                  <NewGroupSessionsCell week={week} />
+                ) : (
+                  'No Group Calls'
+                )}
+              </td>
               <td>{week.groupCallComments}</td>
               <td>{week.currentLessonName}</td>
               <td>{week.notes}</td>
