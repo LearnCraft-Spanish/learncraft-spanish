@@ -148,6 +148,12 @@ export function useBackend() {
   > => {
     return getFactory('coaching/group-sessions');
   }, [getFactory]);
+
+  const getAssignments = useCallback((): Promise<
+    StudentRecordsTypes.Assignment[]
+  > => {
+    return getFactory('coaching/assignments');
+  }, [getFactory]);
   /*      POST Requests      */
 
   const postFactory = useCallback(
@@ -361,5 +367,6 @@ export function useBackend() {
     getNewWeeks,
     getGroupAttendees,
     getGroupSessions,
+    getAssignments,
   };
 }

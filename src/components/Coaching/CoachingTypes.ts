@@ -175,6 +175,7 @@ export interface Assignment {
   areasOfDifficulty: string;
   notes: string;
   homeworkCorrector: QbUser;
+  weekStarts: Date | string;
 }
 
 /* wild backend call with 5 arrays */

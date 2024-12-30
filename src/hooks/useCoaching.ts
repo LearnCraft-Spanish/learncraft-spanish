@@ -12,6 +12,7 @@ export default function useCoaching() {
     getActiveStudents,
     getGroupSessions,
     getGroupAttendees,
+    getAssignments,
   } = useBackend();
 
   const lastThreeWeeksQuery = useQuery({
@@ -59,6 +60,13 @@ export default function useCoaching() {
   const groupAttendeesQuery = useQuery({
     queryKey: ['groupAttendees'],
     queryFn: getGroupAttendees,
+    staleTime: Infinity,
+    enabled: !!userDataQuery.data?.isAdmin,
+  });
+
+  const assignmentsQuery = useQuery({
+    queryKey: ['assignments'],
+    queryFn: getAssignments,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
@@ -148,6 +156,48 @@ export default function useCoaching() {
     return groupSessionList;
   }
 
+  function getAssignmentsFromWeekRecordId(weekRecordId: number) {
+    if (!assignmentsQuery.isSuccess) {
+      return null;
+    }
+    return assignmentsQuery.data.filter(
+      (assignment) => assignment.relatedWeek === weekRecordId,
+    );
+  }
+  function getStudentFromMembershipId(membershipId: number | undefined) {
+    if (
+      !activeMembershipsQuery.isSuccess ||
+      !activeStudentsQuery.isSuccess ||
+      !membershipId
+    ) {
+      return null;
+    }
+    const membership = activeMembershipsQuery.data.find(
+      (item) => item.recordId === membershipId,
+    );
+    if (!membership) {
+      return null;
+    }
+    const studentId = membership.relatedStudent;
+    return activeStudentsQuery.data.find((item) => item.recordId === studentId);
+  }
+
+  function getMembershipFromWeekId(weekId: number) {
+    if (!activeMembershipsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      return null;
+    }
+    const week = lastThreeWeeksQuery.data.find(
+      (week) => week.recordId === weekId,
+    );
+    if (!week) {
+      return null;
+    }
+    const membershipId = week.relatedMembership;
+    return activeMembershipsQuery.data.find(
+      (membership) => membership.recordId === membershipId,
+    );
+  }
+
   return {
     lastThreeWeeksQuery,
     coachListQuery,
@@ -161,5 +211,9 @@ export default function useCoaching() {
     // getAttendeesFromGroupSessionId,
     getAttendeeWeeksFromGroupSessionId,
     getGroupSessionFromWeekRecordId,
+    assignmentsQuery,
+    getAssignmentsFromWeekRecordId,
+    getStudentFromMembershipId,
+    getMembershipFromWeekId,
   };
 }

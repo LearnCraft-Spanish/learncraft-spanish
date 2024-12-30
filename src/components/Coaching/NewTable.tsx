@@ -2,11 +2,14 @@ import type { Week } from './CoachingTypes';
 import NewGroupSessionsCell from './NewGroupSessionCell';
 import useCoaching from '../../hooks/useCoaching';
 import { useEffect } from 'react';
+import NewAssignmentCell from './NewAssignmentCell';
+import { p } from 'msw/lib/core/GraphQLHandler-udzgBRPf';
 
 interface NewTableProps {
   weeks: Week[] | undefined;
 }
 export default function NewTable({ weeks }: NewTableProps) {
+  const { getAssignmentsFromWeekRecordId } = useCoaching();
   return (
     weeks && (
       <table>
@@ -16,9 +19,9 @@ export default function NewTable({ weeks }: NewTableProps) {
             <th>Level</th>
             <th>Primary Coach</th>
             <th>Week Starts</th>
-            <th>Assignment Ratings</th>
-            <th>Number of Group Calls</th>
-            <th>Group Call Comments</th>
+            <th>Assignments</th>
+            <th>Group Calls</th>
+            {/* <th>Group Call Comments</th> */}
             <th>Current Lesson Name </th>
             <th>Notes</th>
             <th>Hold Week</th>
@@ -37,15 +40,21 @@ export default function NewTable({ weeks }: NewTableProps) {
                   : 'No Primary Coach Found'}
               </td>
               <td>{week.weekStarts.toString()}</td>
-              <td>{week.assignmentRatings}</td>
               <td>
-                {week.numberOfGroupCalls > 0 ? (
+                {week.assignmentRatings.length > 0 &&
+                  getAssignmentsFromWeekRecordId(week.recordId)?.map(
+                    (assignment) => (
+                      // <p>{assignment.rating}</p>
+                      <NewAssignmentCell assignment={assignment} />
+                    ),
+                  )}
+              </td>
+              <td>
+                {week.numberOfGroupCalls > 0 && (
                   <NewGroupSessionsCell week={week} />
-                ) : (
-                  'No Group Calls'
                 )}
               </td>
-              <td>{week.groupCallComments}</td>
+              {/* <td>{week.groupCallComments}</td> */}
               <td>{week.currentLessonName}</td>
               <td>{week.notes}</td>
               <td>{week.holdWeek}</td>

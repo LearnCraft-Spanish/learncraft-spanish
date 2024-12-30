@@ -4,7 +4,6 @@ import useCoaching from '../../hooks/useCoaching';
 import { useEffect, useState } from 'react';
 
 export default function NewGroupSessionsCell({ week }: { week: Week }) {
-  console.log('in new group sessions cell!');
   const { contextual, openContextual, closeContextual, setContextualRef } =
     useContextualMenu();
   const {
@@ -47,11 +46,9 @@ export default function NewGroupSessionsCell({ week }: { week: Week }) {
   }
 
   useEffect(() => {
-    console.log('dataReady: ', dataReady);
     if (dataReady && !groupSessions) {
       const groupSessions = getGroupSessionFromWeekRecordId(week.recordId);
       if (groupSessions && groupSessions.length > 0) {
-        console.log('# of groupSessions found: ', groupSessions.length);
         setGroupSessions(groupSessions);
       } else {
         console.error(
