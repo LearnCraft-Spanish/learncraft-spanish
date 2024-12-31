@@ -17,8 +17,8 @@ import LCSPQuizApp from './LCSPQuizApp';
 import Menu from './Menu';
 import NotFoundPage from './NotFoundPage';
 import ReviewMyFlashcards from './ReviewMyFlashcards';
-import Coaching from './components/Coaching/Coaching';
-import NewCoaching from './components/Coaching/NewCoaching';
+import Coaching from './components/Coaching/old/_Coaching';
+import WeeksRecordsSection from './components/Coaching/WeeksRecords/WeeksRecords';
 import './App.css';
 
 export const App: React.FC = () => {
@@ -249,13 +249,13 @@ export const App: React.FC = () => {
         {
           // Coaching Section still under construction
           <Route
-            path="/coaching"
+            path="/coaching-depricated"
             element={userDataQuery.data?.isAdmin && <Coaching />}
           />
         }
         <Route
           path="/newcoaching"
-          element={userDataQuery.data?.isAdmin && <NewCoaching />}
+          element={userDataQuery.data?.isAdmin && <WeeksRecordsSection />}
         />
         <Route path="/*" element={<NotFoundPage />} />
       </SentryRoutes>

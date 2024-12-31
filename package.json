@@ -24,7 +24,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "scss": "sass --watch src/components/Coaching/sass:src/components/Coaching/"
+    "scss": "sass --watch src/components/Coaching/styles:src/components/Coaching/styles"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",

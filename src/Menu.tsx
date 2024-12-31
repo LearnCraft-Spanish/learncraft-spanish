@@ -101,8 +101,8 @@ export default function Menu() {
                 </Link>
               </div>
               <div className="buttonBox">
-                <Link className="linkButton" to="/coaching">
-                  Coaching
+                <Link className="linkButton" to="/coaching-depricated">
+                  Coaching Depricated
                 </Link>
               </div>
               <div className="buttonBox">
