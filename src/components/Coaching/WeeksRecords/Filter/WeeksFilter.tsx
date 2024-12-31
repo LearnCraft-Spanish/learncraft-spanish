@@ -1,4 +1,4 @@
-import { useContextualMenu } from '../../../hooks/useContextualMenu';
+import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
 import type {
@@ -7,9 +7,9 @@ import type {
   Student,
   Course,
   Membership,
-} from '../CoachingTypes';
+} from '../../CoachingTypes';
 
-import useCoaching from '../../../hooks/useCoaching';
+import useCoaching from '../../../../hooks/useCoaching';
 
 interface CoachingFilterProps {
   // searchTerm: string;
@@ -29,7 +29,7 @@ interface CoachingFilterProps {
   updateCourseFilter: (value: string) => void;
   updateWeeksAgoFilter: (value: string) => void;
 }
-export default function CoachingFilter({
+export default function WeeksFilter({
   // searchTerm,
   // updateSearchTerm,
   // weeksToDisplay,

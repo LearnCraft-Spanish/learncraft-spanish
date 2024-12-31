@@ -6,7 +6,7 @@ import { useUserData } from '../../hooks/useUserData';
 
 import { useBackend } from '../../hooks/useBackend';
 import { useContextualMenu } from '../../hooks/useContextualMenu';
-import CoachingFilter from './CoachingFilter/CoachingFilter';
+// import CoachingFilter from './CoachingFilter/CoachingFilter';
 import StudentRecordsTable from './StudentRecordsTable/StudentRecordsTable';
 import {
   type Membership,
@@ -532,7 +532,7 @@ export default function Coaching() {
       {!startupDataLoaded && <p>data is loading</p>}
       {startupDataLoaded && weeksToDisplay.length > 0 && (
         <div>
-          <CoachingFilter
+          {/* <CoachingFilter
             searchTerm={searchTerm}
             updateSearchTerm={updateSearchTerm}
             weeksToDisplay={weeksToDisplay}
@@ -549,7 +549,7 @@ export default function Coaching() {
             updateCoachFilter={updateCoachFilter}
             updateCourseFilter={updateCourseFilter}
             updateWeeksAgoFilter={updateWeeksAgoFilter}
-          />
+          /> */}
           <div>
             {/* Table */}
             {weeksToDisplay.length > 0 && (

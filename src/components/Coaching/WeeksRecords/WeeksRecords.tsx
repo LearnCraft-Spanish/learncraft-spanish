@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
-import { useUserData } from '../../hooks/useUserData';
-import useCoaching from '../../hooks/useCoaching';
+import { useUserData } from '../../../hooks/useUserData';
+import useCoaching from '../../../hooks/useCoaching';
 
-import type { Week, Coach, Course } from './CoachingTypes';
+import type { Week, Coach, Course } from './../CoachingTypes';
 
-import LoadingMessage from '../Loading';
-import WeeksTable from './WeeksTable';
-import CoachingFilter from './CoachingFilter/CoachingFilter';
+import LoadingMessage from '../../Loading';
+import WeeksTable from './Table/WeeksTable';
+import CoachingFilter from './Filter/WeeksFilter';
 
-export default function Coaching() {
+import '../styles/coaching.css';
+
+export default function WeeksRecordsSection() {
   const userDataQuery = useUserData();
   const {
     lastThreeWeeksQuery,

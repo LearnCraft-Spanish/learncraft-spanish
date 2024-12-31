@@ -1,9 +1,8 @@
-import type { Assignment, Week } from './CoachingTypes';
-import { useContextualMenu } from '../../hooks/useContextualMenu';
-import useCoaching from '../../hooks/useCoaching';
-import { useEffect, useState } from 'react';
+import type { Assignment, Week } from './../../CoachingTypes';
+import { useContextualMenu } from '../../../../hooks/useContextualMenu';
+import useCoaching from '../../../../hooks/useCoaching';
 
-export default function NewAssignmentCell({
+export default function AssignmentsCell({
   assignment,
 }: {
   assignment: Assignment;

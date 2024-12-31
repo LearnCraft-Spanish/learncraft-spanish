@@ -1,4 +1,4 @@
-import useCoaching from '../../../hooks/useCoaching';
+import useCoaching from '../../../../hooks/useCoaching';
 
 interface CoachSelectProps {
   updateCoachFilter: (recordId: string) => void;

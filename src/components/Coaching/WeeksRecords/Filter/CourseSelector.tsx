@@ -1,4 +1,4 @@
-import useCoaching from '../../../hooks/useCoaching';
+import useCoaching from '../../../../hooks/useCoaching';
 
 interface CourseSelectorProps {
   updateCourseFilter: (value: string) => void;

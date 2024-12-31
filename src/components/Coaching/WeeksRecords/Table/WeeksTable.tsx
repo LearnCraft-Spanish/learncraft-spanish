@@ -1,7 +1,7 @@
-import type { Week } from './CoachingTypes';
-import NewGroupSessionsCell from './NewGroupSessionCell';
-import useCoaching from '../../hooks/useCoaching';
-import NewAssignmentCell from './NewAssignmentCell';
+import type { Week } from './../../CoachingTypes';
+import GroupSessionsCell from './GroupSessionsCell';
+import useCoaching from '../../../../hooks/useCoaching';
+import AssignmentsCell from './AssignmentsCell';
 
 interface NewTableProps {
   weeks: Week[] | undefined;
@@ -43,13 +43,13 @@ export default function WeelsTable({ weeks }: NewTableProps) {
                   getAssignmentsFromWeekRecordId(week.recordId)?.map(
                     (assignment) => (
                       // <p>{assignment.rating}</p>
-                      <NewAssignmentCell assignment={assignment} />
+                      <AssignmentsCell assignment={assignment} />
                     ),
                   )}
               </td>
               <td>
                 {week.numberOfGroupCalls > 0 && (
-                  <NewGroupSessionsCell week={week} />
+                  <GroupSessionsCell week={week} />
                 )}
               </td>
               {/* <td>{week.groupCallComments}</td> */}
