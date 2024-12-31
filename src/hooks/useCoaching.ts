@@ -4,72 +4,71 @@ import { useUserData } from './useUserData';
 
 export default function useCoaching() {
   const userDataQuery = useUserData();
-  const {
-    getNewWeeks,
-    getCoachList,
-    getCourseList,
-    getActiveMemberships,
-    getActiveStudents,
-    getGroupSessions,
-    getGroupAttendees,
-    getAssignments,
-  } = useBackend();
+  const backend = useBackend();
 
+  /* --------- Queries --------- */
   const lastThreeWeeksQuery = useQuery({
     queryKey: ['lastThreeWeeks'],
-    queryFn: getNewWeeks,
+    queryFn: backend.getNewWeeks,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
   const coachListQuery = useQuery({
     queryKey: ['coachList'],
-    queryFn: getCoachList,
+    queryFn: backend.getCoachList,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
   const courseListQuery = useQuery({
     queryKey: ['courseList'],
-    queryFn: getCourseList,
+    queryFn: backend.getCourseList,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
   const activeMembershipsQuery = useQuery({
     queryKey: ['activeMemberships'],
-    queryFn: getActiveMemberships,
+    queryFn: backend.getActiveMemberships,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
   const activeStudentsQuery = useQuery({
     queryKey: ['activeStudents'],
-    queryFn: getActiveStudents,
+    queryFn: backend.getActiveStudents,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
   const groupSessionsQuery = useQuery({
     queryKey: ['groupSessions'],
-    queryFn: getGroupSessions,
+    queryFn: backend.getGroupSessions,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
   const groupAttendeesQuery = useQuery({
     queryKey: ['groupAttendees'],
-    queryFn: getGroupAttendees,
+    queryFn: backend.getGroupAttendees,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
   const assignmentsQuery = useQuery({
     queryKey: ['assignments'],
-    queryFn: getAssignments,
+    queryFn: backend.getAssignments,
     staleTime: Infinity,
     enabled: !!userDataQuery.data?.isAdmin,
   });
+
+  /*--------- Helper Functions ---------
+  / These functions are used to get data from the queries above.
+  / Error Return values for these functions
+  / null: query holding desired data was not successful / is not ready
+  / undefined: desired data does not exist
+  */
 
   function getCoachFromMembershipId(membershipId: number) {
     if (
@@ -82,25 +81,22 @@ export default function useCoaching() {
     const membership = activeMembershipsQuery.data.find(
       (membership) => membership.recordId === membershipId,
     );
-    if (!membership) {
-      return null;
-    }
+    if (!membership) return undefined;
+
     const studentId = membership.relatedStudent;
     const student = activeStudentsQuery.data.find(
       (student) => student.recordId === studentId,
     );
-    if (!student) {
-      return null;
-    }
+    if (!student) return undefined;
+
     const coachObject = student.primaryCoach;
-    if (!coachObject) {
-      return null;
-    }
-    const validCoach = coachListQuery.data.find(
+    const coach = coachListQuery.data.find(
       (coach) => coach.user.id === coachObject.id,
     );
-    return validCoach;
+    if (!coach) return undefined;
+    return coach;
   }
+
   function getCourseFromMembershipId(membershipId: number) {
     if (!activeMembershipsQuery.isSuccess || !courseListQuery.isSuccess) {
       return null;
@@ -108,62 +104,16 @@ export default function useCoaching() {
     const membership = activeMembershipsQuery.data.find(
       (membership) => membership.recordId === membershipId,
     );
-    if (!membership) return null;
+    if (!membership) return undefined;
 
     const courseId = membership.relatedCourse;
-    return courseListQuery.data.find((item) => item.recordId === courseId);
+    const course = courseListQuery.data.find(
+      (course) => course.recordId === courseId,
+    );
+    if (!course) return undefined;
+    return course;
   }
 
-  /* may not use */
-  // function getAttendeesFromGroupSessionId(sessionId: number) {
-  //   if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
-  //     return null;
-  //   }
-  //   return groupAttendeesQuery.data.filter(
-  //     (attendee) => attendee.groupSession === sessionId,
-  //   );
-  // }
-  function getAttendeeWeeksFromGroupSessionId(sessionId: number) {
-    if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
-      return null;
-    }
-    const attendeeList = groupAttendeesQuery.data.filter(
-      (attendee) => attendee.groupSession === sessionId,
-    );
-    if (attendeeList.length > 0) {
-      const weekList = attendeeList.map((attendee) =>
-        lastThreeWeeksQuery.data.find(
-          (week) => week.recordId === attendee.student,
-        ),
-      );
-      if (weekList.length > 0) {
-        return weekList;
-      }
-    }
-  }
-  function getGroupSessionFromWeekRecordId(weekRecordId: number) {
-    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-      return null;
-    }
-    const attendeeList = groupAttendeesQuery.data.filter(
-      (attendee) => attendee.student === weekRecordId,
-    );
-    const groupSessionList = groupSessionsQuery.data.filter((groupSession) =>
-      attendeeList.find(
-        (attendee) => attendee.groupSession === groupSession.recordId,
-      ),
-    );
-    return groupSessionList;
-  }
-
-  function getAssignmentsFromWeekRecordId(weekRecordId: number) {
-    if (!assignmentsQuery.isSuccess) {
-      return null;
-    }
-    return assignmentsQuery.data.filter(
-      (assignment) => assignment.relatedWeek === weekRecordId,
-    );
-  }
   function getStudentFromMembershipId(membershipId: number | undefined) {
     if (
       !activeMembershipsQuery.isSuccess ||
@@ -175,27 +125,78 @@ export default function useCoaching() {
     const membership = activeMembershipsQuery.data.find(
       (item) => item.recordId === membershipId,
     );
-    if (!membership) {
-      return null;
-    }
+    if (!membership) return undefined;
+
     const studentId = membership.relatedStudent;
-    return activeStudentsQuery.data.find((item) => item.recordId === studentId);
+    const student = activeStudentsQuery.data.find(
+      (item) => item.recordId === studentId,
+    );
+    if (!student) return undefined;
+    return student;
   }
 
-  function getMembershipFromWeekId(weekId: number) {
+  function getAttendeeWeeksFromGroupSessionId(sessionId: number) {
+    if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      return null;
+    }
+    const attendeeList = groupAttendeesQuery.data.filter(
+      (attendee) => attendee.groupSession === sessionId,
+    );
+    if (attendeeList.length === 0) return undefined;
+
+    const weekRecordsList = attendeeList.map((attendee) =>
+      lastThreeWeeksQuery.data.find(
+        (week) => week.recordId === attendee.student,
+      ),
+    );
+    if (weekRecordsList.length === 0) return undefined;
+    return weekRecordsList;
+  }
+
+  function getGroupSessionFromWeekRecordId(weekRecordId: number) {
+    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+      return null;
+    }
+    const attendeeList = groupAttendeesQuery.data.filter(
+      (attendee) => attendee.student === weekRecordId,
+    );
+    if (attendeeList.length === 0) return undefined;
+
+    const groupSession = groupSessionsQuery.data.find((groupSession) =>
+      attendeeList.find(
+        (attendee) => attendee.groupSession === groupSession.recordId,
+      ),
+    );
+    if (!groupSession) return undefined;
+    return groupSession;
+  }
+
+  function getAssignmentsFromWeekRecordId(weekRecordId: number) {
+    if (!assignmentsQuery.isSuccess) {
+      return null;
+    }
+    const assignments = assignmentsQuery.data.filter(
+      (assignment) => assignment.relatedWeek === weekRecordId,
+    );
+    if (assignments.length === 0) return undefined;
+    return assignments;
+  }
+
+  function getMembershipFromWeekRecordId(weekId: number) {
     if (!activeMembershipsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
       return null;
     }
     const week = lastThreeWeeksQuery.data.find(
       (week) => week.recordId === weekId,
     );
-    if (!week) {
-      return null;
-    }
+    if (!week) return undefined;
+
     const membershipId = week.relatedMembership;
-    return activeMembershipsQuery.data.find(
+    const membership = activeMembershipsQuery.data.find(
       (membership) => membership.recordId === membershipId,
     );
+    if (!membership) return undefined;
+    return membership;
   }
 
   return {
@@ -204,16 +205,16 @@ export default function useCoaching() {
     courseListQuery,
     activeMembershipsQuery,
     activeStudentsQuery,
-    getCoachFromMembershipId,
-    getCourseFromMembershipId,
     groupSessionsQuery,
     groupAttendeesQuery,
-    // getAttendeesFromGroupSessionId,
+    assignmentsQuery,
+
+    getCoachFromMembershipId,
+    getCourseFromMembershipId,
+    getStudentFromMembershipId,
     getAttendeeWeeksFromGroupSessionId,
     getGroupSessionFromWeekRecordId,
-    assignmentsQuery,
     getAssignmentsFromWeekRecordId,
-    getStudentFromMembershipId,
-    getMembershipFromWeekId,
+    getMembershipFromWeekRecordId,
   };
 }

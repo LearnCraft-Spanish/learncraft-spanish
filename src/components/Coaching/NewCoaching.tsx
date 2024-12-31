@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 import { useUserData } from '../../hooks/useUserData';
-import { useBackend } from '../../hooks/useBackend';
-import { useContextualMenu } from '../../hooks/useContextualMenu';
-// import { useLastThreeWeeks } from '../../hooks/useLastThreeWeeks';
 import useCoaching from '../../hooks/useCoaching';
+
 import type { Week, Coach, Course } from './CoachingTypes';
-import NewTable from './NewTable';
+
+import LoadingMessage from '../Loading';
+import WeeksTable from './WeeksTable';
 import CoachingFilter from './CoachingFilter/CoachingFilter';
+
 export default function Coaching() {
   const userDataQuery = useUserData();
   const {
@@ -17,11 +18,13 @@ export default function Coaching() {
     getCoachFromMembershipId,
     getCourseFromMembershipId,
   } = useCoaching();
-  // const { getNewWeeks } = useBackend();
-  const [weeks, setWeeks] = useState<Week[] | undefined>();
+  // Filtering state
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(0);
+
+  // State for the weeks to display
+  const [weeks, setWeeks] = useState<Week[] | undefined>();
   const rendered = useRef(false);
 
   const dataReady =
@@ -29,6 +32,20 @@ export default function Coaching() {
     lastThreeWeeksQuery.isSuccess &&
     coachListQuery.isSuccess &&
     courseListQuery.isSuccess;
+
+  const dataLoading =
+    !dataReady &&
+    (userDataQuery.isLoading ||
+      lastThreeWeeksQuery.isLoading ||
+      coachListQuery.isLoading ||
+      courseListQuery.isLoading);
+
+  const dataError =
+    !dataReady &&
+    (userDataQuery.isError ||
+      lastThreeWeeksQuery.isError ||
+      coachListQuery.isError ||
+      courseListQuery.isError);
 
   function updateCoachFilter(coachId: string | number) {
     if (!coachListQuery.data) throw new Error('Unable to find coach list');
@@ -85,17 +102,13 @@ export default function Coaching() {
     (weeks: Week[]) => {
       let filteredWeeks = weeks;
       if (filterByCoach) {
-        console.log('filtering by coach');
-        console.log('intiial len', filteredWeeks.length);
         filteredWeeks = filterByCoachFunction(filteredWeeks);
-        console.log('final len', filteredWeeks.length);
       }
       if (filterByCourse) {
         filteredWeeks = filterByCourseFunction(filteredWeeks);
       }
-      // I dont like the logic with filterByWeeksAgo < 0, it will change it later
-      filteredWeeks = filterWeeksByWeeksAgoFunction(filteredWeeks);
-      console.log('big final len, ', filteredWeeks.length);
+      // I dont like the logic with filterByWeeksAgo < 0, i will change it later
+      filteredWeeks = filterWeeksByWeeksAgoFunction(filteredWeeks); //FOLLOW SAME PATTERN AS ABOVE, PLEASE
       return filteredWeeks;
     },
     [filterByCoach, filterByCourse, filterByWeeksAgo],
@@ -103,12 +116,6 @@ export default function Coaching() {
 
   useEffect(() => {
     if (!rendered.current && lastThreeWeeksQuery.isSuccess) {
-      for (const week of lastThreeWeeksQuery.data) {
-        if (week.membershipRelatedStudentRecordIdRelatedCoach) {
-          console.log(week.membershipRelatedStudentRecordIdRelatedCoach);
-        }
-      }
-      // console.log('weeks', lastThreeWeeksQuery.data);
       rendered.current = true;
     }
   }, [userDataQuery.isSuccess, lastThreeWeeksQuery]);
@@ -119,21 +126,26 @@ export default function Coaching() {
       const filteredWeeks = filterWeeks(lastThreeWeeksQuery.data);
       setWeeks(filteredWeeks);
     }
-  }, [dataReady, filterWeeks, filterByCoach]);
+  }, [dataReady, filterWeeks]);
+
   return (
-    lastThreeWeeksQuery.isSuccess && (
-      <div className="newCoachingWrapper">
-        <div className="filterWrapper">
-          <CoachingFilter
-            updateCoachFilter={updateCoachFilter}
-            updateCourseFilter={updateCourseFilter}
-            updateWeeksAgoFilter={updateWeeksAgoFilter}
-          />
-        </div>
-        <div className="tableWrapper">
-          <NewTable weeks={weeks} />
-        </div>
-      </div>
-    )
+    <div className="newCoachingWrapper">
+      {dataLoading && <LoadingMessage message={'Loading Coaching Data'} />}
+      {dataError && <p>Error loading data</p>}
+      {dataReady && (
+        <>
+          <div className="filterWrapper">
+            <CoachingFilter
+              updateCoachFilter={updateCoachFilter}
+              updateCourseFilter={updateCourseFilter}
+              updateWeeksAgoFilter={updateWeeksAgoFilter}
+            />
+          </div>
+          <div className="tableWrapper">
+            <WeeksTable weeks={weeks} />
+          </div>
+        </>
+      )}
+    </div>
   );
 }

@@ -1,14 +1,12 @@
 import type { Week } from './CoachingTypes';
 import NewGroupSessionsCell from './NewGroupSessionCell';
 import useCoaching from '../../hooks/useCoaching';
-import { useEffect } from 'react';
 import NewAssignmentCell from './NewAssignmentCell';
-import { p } from 'msw/lib/core/GraphQLHandler-udzgBRPf';
 
 interface NewTableProps {
   weeks: Week[] | undefined;
 }
-export default function NewTable({ weeks }: NewTableProps) {
+export default function WeelsTable({ weeks }: NewTableProps) {
   const { getAssignmentsFromWeekRecordId } = useCoaching();
   return (
     weeks && (

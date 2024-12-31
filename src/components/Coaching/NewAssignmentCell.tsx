@@ -9,7 +9,8 @@ export default function NewAssignmentCell({
   assignment: Assignment;
 }) {
   console.log('in new assignment cell!');
-  const { getStudentFromMembershipId, getMembershipFromWeekId } = useCoaching();
+  const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
+    useCoaching();
   const { contextual, closeContextual, openContextual, setContextualRef } =
     useContextualMenu();
   return (
@@ -27,7 +28,8 @@ export default function NewAssignmentCell({
               {assignment.assignmentType} by{' '}
               {
                 getStudentFromMembershipId(
-                  getMembershipFromWeekId(assignment.relatedWeek)?.recordId,
+                  getMembershipFromWeekRecordId(assignment.relatedWeek)
+                    ?.recordId,
                 )?.fullName
               }
             </h4>
