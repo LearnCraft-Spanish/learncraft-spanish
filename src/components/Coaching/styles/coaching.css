@@ -101,4 +101,10 @@
   margin: 0.5rem 0;
 }
 
+.advancedFilters {
+  background-color: white;
+  border: 1px solid black;
+  padding: 2rem;
+}
+
 /*# sourceMappingURL=coaching.css.map */

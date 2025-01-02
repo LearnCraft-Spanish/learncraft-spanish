@@ -21,9 +21,22 @@ export default function WeeksRecordsSection() {
     getCourseFromMembershipId,
   } = useCoaching();
   // Filtering state
+  const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(false);
+  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(0);
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
-  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(0);
+  const [filterByIncomplete, setFilterByIncomplete] = useState<
+    number | undefined
+  >();
+  const [filterByHoldWeeks, setFilterByHoldWeeks] = useState<
+    boolean | undefined
+  >(); // True, filter out hold weeks.
+  const [filterByCoachless, setFilterByCoachless] = useState<
+    number | undefined
+  >();
+  const [filterBySearchTerm, setFilterBySearchTerm] = useState<
+    string | undefined
+  >();
 
   // State for the weeks to display
   const [weeks, setWeeks] = useState<Week[] | undefined>();
@@ -65,6 +78,9 @@ export default function WeeksRecordsSection() {
   }
   function updateWeeksAgoFilter(weeksAgo: string) {
     setFilterByWeeksAgo(Number.parseInt(weeksAgo));
+  }
+  function updateFilterHoldWeeks(value: boolean) {
+    setFilterByHoldWeeks(value);
   }
 
   function filterByCoachFunction(weeks: Week[]) {
@@ -138,9 +154,22 @@ export default function WeeksRecordsSection() {
         <>
           <div className="filterWrapper">
             <CoachingFilter
+              weeks={weeks}
+              searchTerm={filterBySearchTerm || ''}
+              updateSearchTerm={setFilterBySearchTerm}
+              filterCoachless={filterByCoachless || 0}
+              updateCoachlessFilter={setFilterByCoachless}
+              filterHoldWeeks={filterByHoldWeeks || 0}
+              updateFilterHoldWeeks={updateFilterHoldWeeks}
+              filterIncomplete={filterByIncomplete || 0}
+              updateFilterIncomplete={setFilterByIncomplete}
               updateCoachFilter={updateCoachFilter}
               updateCourseFilter={updateCourseFilter}
               updateWeeksAgoFilter={updateWeeksAgoFilter}
+              advancedFilteringMenu={advancedFilteringMenu}
+              toggleAdvancedFilteringMenu={() =>
+                setAdvancedFilteringMenu(!advancedFilteringMenu)
+              }
             />
           </div>
           <div className="tableWrapper">

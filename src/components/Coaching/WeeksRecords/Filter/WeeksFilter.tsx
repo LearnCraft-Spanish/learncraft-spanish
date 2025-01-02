@@ -12,15 +12,15 @@ import type {
 import useCoaching from '../../../../hooks/useCoaching';
 
 interface CoachingFilterProps {
-  // searchTerm: string;
-  // updateSearchTerm: (value: string) => void;
-  // weeksToDisplay: Week[];
-  // filterCoachless: number;
-  // updateCoachlessFilter: (value: string) => void;
-  // filterHoldWeeks: number;
-  // updateHoldFilter: (value: string) => void;
-  // filterIncomplete: number;
-  // updateFilterIncomplete: (value: string) => void;
+  searchTerm: string | undefined;
+  updateSearchTerm: (value: string) => void;
+  weeks: Week[] | undefined;
+  filterCoachless: boolean | undefined;
+  updateCoachlessFilter: (value: boolean) => void;
+  filterHoldWeeks: boolean | undefined;
+  updateFilterHoldWeeks: (value: boolean) => void;
+  filterIncomplete: string | undefined;
+  updateFilterIncomplete: (value: string) => void;
   // coaches: { current: Coach[] };
   // students: { current: Student[] };
   // courses: { current: Course[] };
@@ -28,17 +28,20 @@ interface CoachingFilterProps {
   updateCoachFilter: (value: string) => void;
   updateCourseFilter: (value: string) => void;
   updateWeeksAgoFilter: (value: string) => void;
+
+  advancedFilteringMenu: boolean;
+  toggleAdvancedFilteringMenu: () => void;
 }
 export default function WeeksFilter({
-  // searchTerm,
-  // updateSearchTerm,
-  // weeksToDisplay,
-  // filterCoachless,
-  // updateCoachlessFilter,
-  // filterHoldWeeks,
-  // updateHoldFilter,
-  // filterIncomplete,
-  // updateFilterIncomplete,
+  searchTerm,
+  updateSearchTerm,
+  weeks,
+  filterCoachless,
+  updateCoachlessFilter,
+  filterHoldWeeks,
+  updateFilterHoldWeeks,
+  filterIncomplete,
+  updateFilterIncomplete,
   // coaches,
   // students,
   // courses,
@@ -46,10 +49,10 @@ export default function WeeksFilter({
   updateCoachFilter,
   updateCourseFilter,
   updateWeeksAgoFilter,
-}: CoachingFilterProps) {
-  const { contextual, closeContextual, setContextualRef, openContextual } =
-    useContextualMenu();
 
+  advancedFilteringMenu,
+  toggleAdvancedFilteringMenu,
+}: CoachingFilterProps) {
   const {
     lastThreeWeeksQuery,
     coachListQuery,
@@ -57,98 +60,128 @@ export default function WeeksFilter({
     activeStudentsQuery,
     activeMembershipsQuery,
   } = useCoaching();
-  function openMoreFilters() {
-    openContextual('moreFilters');
-  }
   return (
-    <>
-      <div className="coachingFilterSection">
-        <div className="numberShowing">
-          <h4>Search:</h4>
-        </div>
-        <div className="searchOrButton">
-          <input
-            className="weekSearch"
-            type="text"
-            value={searchTerm}
-            onChange={(e) => updateSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="searchOrButton">
-          <button
-            type="button"
-            className="moreFiltersButton"
-            onClick={openMoreFilters}
-          >
-            More Filters
-          </button>
-        </div>
-        <div className="numberShowing">
-          <h4>
-            Showing:
-            {weeksToDisplay.length} records
-          </h4>
-        </div>
-        {contextual === 'moreFilters' && (
-          <div className="moreFilters" ref={setContextualRef}>
-            <div className="coachingFilterSection">
+    weeks && (
+      <>
+        <div className="coachingFilterSection">
+          <div className="simpleFiltering">
+            {/* I think this will Replaced with pagination when implemented in the Table Component */}
+            {/* <div className="numberShowing">
+              <h4>
+                Showing:
+                {weeks.length} records
+              </h4>
+            </div> */}
+            <CoachSelect updateCoachFilter={updateCoachFilter} />
+            <CourseSelector updateCourseFilter={updateCourseFilter} />
+            <div>
+              <label htmlFor="weekRangeFilter">Week:</label>
               <select
-                value={filterCoachless}
-                onChange={(e) => updateCoachlessFilter(e.target.value)}
+                name="weekRangeFilter"
+                id="weekRangeFilter"
+                onChange={(e) => updateWeeksAgoFilter(e.target.value)}
               >
-                <option value={1}>Don't show students without coaches</option>
-                <option value={0}>Show students without coaches</option>
+                <option value={0}>This Week</option>
+                <option value={1}>Last Week</option>
+                <option value={2}>Two Weeks Ago</option>
+                <option value={-1}>Last Three Weeks (All)</option>
               </select>
             </div>
-            <div className="coachingFilterSection">
-              <select
-                value={filterHoldWeeks}
-                onChange={(e) => updateHoldFilter(e.target.value)}
-              >
-                <option value={1}>Don't show weeks on hold</option>
-                <option value={0}>Show weeks on hold</option>
-              </select>
-            </div>
-            <div className="coachingFilterSection">
-              <select
-                value={filterIncomplete}
-                onChange={(e) => updateFilterIncomplete(e.target.value)}
-              >
-                <option value={0}>All records</option>
-                <option value={1}>Incomplete only</option>
-                <option value={2}>Complete only</option>
-              </select>
-            </div>
-            <div className="buttonBox">
+            <div>
               <button
                 type="button"
-                className="redButton"
-                onClick={closeContextual}
+                className="moreFiltersButton"
+                onClick={toggleAdvancedFilteringMenu}
               >
-                Close
+                More Filters
               </button>
             </div>
           </div>
-        )}
-      </div>
-      <div className="coachingFilterSection">
-        <h2>Records Filter</h2>
-        <CoachSelect updateCoachFilter={updateCoachFilter} />
-        <CourseSelector updateCourseFilter={updateCourseFilter} />
-        <div>
-          <label htmlFor="weekRangeFilter">Week:</label>
-          <select
-            name="weekRangeFilter"
-            id="weekRangeFilter"
-            onChange={(e) => updateWeeksAgoFilter(e.target.value)}
-          >
-            <option value={0}>This Week</option>
-            <option value={1}>Last Week</option>
-            <option value={2}>Two Weeks Ago</option>
-            <option value={-1}>Last Three Weeks (All)</option>
-          </select>
+
+          {advancedFilteringMenu && (
+            <div className="advancedFilters">
+              <div>
+                <label htmlFor="search">Search:</label>
+                <input
+                  type="text"
+                  name="search"
+                  id="search"
+                  value={searchTerm}
+                  onChange={(e) => updateSearchTerm(e.target.value)}
+                />
+              </div>
+              <div>
+                <p>Exclude Students Without Coaches:</p>
+                <label htmlFor="filterCoachless" className="switch">
+                  <input
+                    type="checkbox"
+                    name="Exclude Students Without Coaches"
+                    id="filterCoachless"
+                    checked={filterCoachless}
+                    onChange={(e) => updateCoachlessFilter(e.target.checked)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+              <div>
+                <p>Exclude Weeks on Hold:</p>
+                <label htmlFor="filterHoldWeeks" className="switch">
+                  <input
+                    type="checkbox"
+                    name="Exclude Weeks On Hold"
+                    id="filterHoldWeeks"
+                    checked={filterHoldWeeks}
+                    onChange={(e) => updateFilterHoldWeeks(e.target.checked)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+              <div>
+                <p>Filter Records By Completion:</p>
+                <label htmlFor="filterIncomplete">
+                  <input
+                    type="radio"
+                    name=""
+                    id="filterIncomplete"
+                    value="0"
+                    checked={filterIncomplete === '0'}
+                    onClick={() => updateFilterIncomplete('0')}
+                  />
+                  All Records
+                  <input
+                    type="radio"
+                    name=""
+                    id="filterIncomplete"
+                    value="1"
+                    checked={filterIncomplete === '1'}
+                    onClick={() => updateFilterIncomplete('1')}
+                  />
+                  Incomplete Only
+                  <input
+                    type="radio"
+                    name=""
+                    id="filterIncomplete"
+                    value="2"
+                    checked={filterIncomplete === '2'}
+                    onClick={() => updateFilterIncomplete('2')}
+                  />
+                  Complete Only
+                </label>
+              </div>
+              <div className="buttonBox">
+                <button
+                  type="button"
+                  className="redButton"
+                  onClick={toggleAdvancedFilteringMenu}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
-    </>
+        <div className="coachingFilterSection"></div>
+      </>
+    )
   );
 }
