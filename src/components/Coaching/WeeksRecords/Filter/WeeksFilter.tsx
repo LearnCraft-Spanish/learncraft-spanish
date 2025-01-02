@@ -62,7 +62,6 @@ export default function WeeksFilter({
   }
   return (
     <>
-      {/*
       <div className="coachingFilterSection">
         <div className="numberShowing">
           <h4>Search:</h4>
@@ -132,7 +131,6 @@ export default function WeeksFilter({
           </div>
         )}
       </div>
-      */}
       <div className="coachingFilterSection">
         <h2>Records Filter</h2>
         <CoachSelect updateCoachFilter={updateCoachFilter} />

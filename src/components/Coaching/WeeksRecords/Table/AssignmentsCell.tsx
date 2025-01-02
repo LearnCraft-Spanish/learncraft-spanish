@@ -22,7 +22,7 @@ export default function AssignmentsCell({
       </button>
       {contextual === `assignment${assignment.recordId}` && (
         <div className="contextualWrapper">
-          <div className="contextual assignmentPopup" ref={setContextualRef}>
+          <div className="contextual" ref={setContextualRef}>
             <h4>
               {assignment.assignmentType} by{' '}
               {

@@ -69,10 +69,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
         </button>
         {contextual === `groupSession${groupSession.recordId}` && (
           <div className="contextualWrapper">
-            <div
-              className="contextual groupSessionPopup"
-              ref={setContextualRef}
-            >
+            <div className="contextual" ref={setContextualRef}>
               <h3>
                 {`Session: ${groupSession.sessionType} on 
                 ${
@@ -103,7 +100,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                   {getAttendeesFromGroupSessionId(groupSession.recordId)?.map(
                     (attendee) =>
                       attendee.weekStudent ? (
-                        <p>{attendee.weekStudent}</p>
+                        <p>{attendee.weekStudent},</p>
                       ) : (
                         'no student found'
                       ),

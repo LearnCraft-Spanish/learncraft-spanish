@@ -63,6 +63,13 @@ export default function useCoaching() {
     enabled: !!userDataQuery.data?.isAdmin,
   });
 
+  const callsQuery = useQuery({
+    queryKey: ['calls'],
+    queryFn: backend.getCalls,
+    staleTime: Infinity,
+    enabled: !!userDataQuery.data?.isAdmin,
+  });
+
   /*--------- Helper Functions ---------
   / These functions are used to get data from the queries above.
   / Error Return values for these functions
@@ -97,10 +104,12 @@ export default function useCoaching() {
     return coach;
   }
 
-  function getCourseFromMembershipId(membershipId: number) {
+  function getCourseFromMembershipId(membershipId: number | undefined) {
     if (!activeMembershipsQuery.isSuccess || !courseListQuery.isSuccess) {
       return null;
     }
+    if (!membershipId) return undefined;
+
     const membership = activeMembershipsQuery.data.find(
       (membership) => membership.recordId === membershipId,
     );
@@ -182,10 +191,12 @@ export default function useCoaching() {
     return assignments;
   }
 
-  function getMembershipFromWeekRecordId(weekId: number) {
+  function getMembershipFromWeekRecordId(weekId: number | undefined) {
     if (!activeMembershipsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
       return null;
     }
+    if (!weekId) return undefined;
+
     const week = lastThreeWeeksQuery.data.find(
       (week) => week.recordId === weekId,
     );
@@ -199,6 +210,38 @@ export default function useCoaching() {
     return membership;
   }
 
+  function getPrivateCallsFromWeekRecordId(weekId: number) {
+    if (!callsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      return null;
+    }
+    const privateCalls = callsQuery.data.filter(
+      (call) => call.relatedWeek === weekId,
+    );
+    return privateCalls;
+  }
+
+  /* --------- Other Helper Functions --------- */
+  function dateObjectToText(dateObject: Date) {
+    function formatMonth(date: Date) {
+      const unformattedMonth = date.getMonth() + 1;
+      return unformattedMonth < 10
+        ? `0${unformattedMonth}`
+        : `${unformattedMonth}`;
+    }
+    function formatDate(date: Date) {
+      let dateString = date.getDate().toString();
+      if (Number(dateString) < 10) {
+        dateString = `0${dateString}`;
+      }
+      return dateString;
+    }
+
+    function formatYear(date: Date) {
+      return date.getFullYear().toString();
+    }
+    return `${formatYear(dateObject)}-${formatMonth(dateObject)}-${formatDate(dateObject)}`;
+  }
+
   return {
     lastThreeWeeksQuery,
     coachListQuery,
@@ -208,6 +251,7 @@ export default function useCoaching() {
     groupSessionsQuery,
     groupAttendeesQuery,
     assignmentsQuery,
+    callsQuery,
 
     getCoachFromMembershipId,
     getCourseFromMembershipId,
@@ -216,5 +260,8 @@ export default function useCoaching() {
     getGroupSessionFromWeekRecordId,
     getAssignmentsFromWeekRecordId,
     getMembershipFromWeekRecordId,
+    getPrivateCallsFromWeekRecordId,
+
+    dateObjectToText,
   };
 }

@@ -1,9 +1,40 @@
+@mixin centered() {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .newCoachingWrapper {
   margin: 1rem;
 
   .filterWrapper {
   }
   .tableWrapper {
+  }
+
+  .contextualWrapper {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba($color: #000000, $alpha: 0.2);
+    z-index: 100;
+    .contextual {
+      max-width: 80%;
+      max-height: 80%;
+      overflow-x: scroll;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 1rem rgba($color: #000000, $alpha: 0.5);
+      // z-index: 100;
+    }
   }
 }
 
@@ -18,16 +49,17 @@
     scroll-behavior: auto;
     border-collapse: separate; /* Don't collapse */
     border-spacing: 0; /* Spacing between cells */
-    font-size: 0.75rem;
-    line-height: 1rem;
+    font-size: 1rem;
+    line-height: 1.25rem;
 
     th,
     td {
       min-width: 100px;
       border: 1px solid black;
-      padding: 0.25rem;
+      padding: 0.5rem;
       text-align: start;
       vertical-align: top;
+      position: relative;
     }
     thead {
       th {
@@ -58,30 +90,39 @@
         z-index: 1;
         background-color: var(--accent);
         font-weight: 600;
-        font-size: 0.9rem;
-        line-height: 1.5rem;
+        // font-size: 1.25rem;
+        // line-height: 1.5rem;
+
+        h4 {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: black;
+          text-align: start;
+        }
       }
     }
   }
 }
 
-.contextualWrapper {
-  position: fixed;
-  width: 100%;
-  height: 100vh;
-  top: 0;
-  left: 0;
-  background-color: rgba($color: #000000, $alpha: 0.2);
-  z-index: 100;
-  .contextual {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 0 1rem rgba($color: #000000, $alpha: 0.5);
-    // z-index: 100;
+.checkmark {
+  @include centered;
+  width: 3rem;
+  height: 3rem;
+}
+
+.studentCell {
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: black;
+    text-align: start;
+    margin: 1rem 0;
+  }
+  p {
+    font-size: 1rem;
+    font-weight: 400;
+    color: black;
+    text-align: start;
+    margin: 0.5rem 0;
   }
 }
