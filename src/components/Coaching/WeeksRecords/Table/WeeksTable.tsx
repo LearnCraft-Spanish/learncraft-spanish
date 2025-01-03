@@ -11,7 +11,7 @@ import checkmark from '../../../../resources/icons/checkmark_green.svg';
 interface NewTableProps {
   weeks: Week[] | undefined;
 }
-export default function WeelsTable({ weeks }: NewTableProps) {
+export default function WeeksTable({ weeks }: NewTableProps) {
   const { getAssignmentsFromWeekRecordId, getPrivateCallsFromWeekRecordId } =
     useCoaching();
 

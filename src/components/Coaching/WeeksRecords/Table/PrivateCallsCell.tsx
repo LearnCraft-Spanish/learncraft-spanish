@@ -50,7 +50,7 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
                   </div>
                   <div className="lineWrapper">
                     <p className="label">Notes: </p>
-                    <p className="content">{call.rating}</p>
+                    <p className="content">{call.notes}</p>
                   </div>
                   <div className="lineWrapper">
                     <p className="label">Difficulties: </p>
@@ -78,6 +78,7 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
           </div>
         ))}
       {/* {weekGetsPrivateCalls(data.recordId) && ( */}
+      {/*
       {week.membershipCourseWeeklyPrivateCalls > 0 && (
         <>
           <button
@@ -87,7 +88,7 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
           >
             New
           </button>
-          {/* New Call Popup */}
+          {/* New Call Popup 
           {contextual === `newCallForWeek${week.recordId}` && (
             <div className="contextualWrapper callPopup" ref={setContextualRef}>
               <div className="contextual">
@@ -153,6 +154,7 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
           )}
         </>
       )}
+      */}
     </div>
   );
 }

@@ -56,9 +56,8 @@ export default function ViewWeekRecord({ week }: { week: Week }) {
           <input type="checkbox" checked={week.recordCompletable} />
         </div>
         <div className="lineWrapper">
-          <p className="label">Membership - Student - Member Until: </p>
+          <label className="label">Membership - Student - Member Until: </label>
           <p className="content">
-            {' '}
             {week.membershipStudentMemberUntil.toString()}
           </p>
         </div>

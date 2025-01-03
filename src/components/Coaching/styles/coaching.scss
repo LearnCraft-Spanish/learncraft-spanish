@@ -180,22 +180,53 @@ td button {
   margin: auto;
 }
 /* --------- contextual --------- */
-
-.lineWrapper,
-.checkboxWrapper {
+.checkboxWrapper,
+.lineWrapper {
   display: flex;
-  // justify-content: space-between;
   align-items: center;
   margin: 0;
 
+  .label {
+    background: none;
+    padding: 0;
+    color: black;
+    font-size: 1rem;
+    font-weight: 600;
+    // padding-top: 8px;
+  }
+  .label,
+  .content {
+    margin: 16px 0;
+  }
+}
+.lineWrapper {
+  align-items: flex-start;
   .label {
     font-size: 1rem;
     font-weight: 600;
     color: black;
     text-align: start;
     white-space: pre;
-    // Overriding styles from .label from main css files
-    background: none;
-    padding: 0;
+    width: 30%;
+    min-width: 100px;
+    // align text
+    display: flex;
+    justify-content: flex-start;
+    // allow wrap
+    text-wrap: wrap;
+    padding-top: 8px;
   }
+  .content {
+    background: rgb(245, 245, 245);
+    padding: 8px;
+    min-height: 2.25rem;
+    min-width: 150px;
+    max-width: 60%;
+  }
+}
+
+.checkboxWrapper {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin-left: 30%;
 }

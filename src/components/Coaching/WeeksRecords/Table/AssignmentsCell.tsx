@@ -7,7 +7,6 @@ export default function AssignmentsCell({
 }: {
   assignment: Assignment;
 }) {
-  console.log('in new assignment cell!');
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
     useCoaching();
   const { contextual, closeContextual, openContextual, setContextualRef } =

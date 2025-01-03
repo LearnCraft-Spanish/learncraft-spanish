@@ -201,7 +201,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                   </>
                 )}
               </div>
-              <div className="buttonBox">
+              {/* <div className="buttonBox">
                 <button
                   type="button"
                   className="redButton"
@@ -209,7 +209,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                 >
                   Close
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         )}

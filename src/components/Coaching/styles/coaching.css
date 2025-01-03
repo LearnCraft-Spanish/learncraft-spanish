@@ -154,21 +154,55 @@ td button {
 }
 
 /* --------- contextual --------- */
-.lineWrapper,
-.checkboxWrapper {
+.checkboxWrapper,
+.lineWrapper {
   display: flex;
   align-items: center;
   margin: 0;
 }
+.checkboxWrapper .label,
+.lineWrapper .label {
+  background: none;
+  padding: 0;
+  color: black;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.checkboxWrapper .label,
+.checkboxWrapper .content,
 .lineWrapper .label,
-.checkboxWrapper .label {
+.lineWrapper .content {
+  margin: 16px 0;
+}
+
+.lineWrapper {
+  align-items: flex-start;
+}
+.lineWrapper .label {
   font-size: 1rem;
   font-weight: 600;
   color: black;
   text-align: start;
   white-space: pre;
-  background: none;
-  padding: 0;
+  width: 30%;
+  min-width: 100px;
+  display: flex;
+  justify-content: flex-start;
+  text-wrap: wrap;
+  padding-top: 8px;
+}
+.lineWrapper .content {
+  background: rgb(245, 245, 245);
+  padding: 8px;
+  min-height: 2.25rem;
+  min-width: 150px;
+  max-width: 60%;
+}
+
+.checkboxWrapper {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin-left: 30%;
 }
 
 /*# sourceMappingURL=coaching.css.map */
