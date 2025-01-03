@@ -7,10 +7,11 @@
   height: 100%;
   top: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.3);
   z-index: 100;
 }
 .newCoachingWrapper .contextualWrapper .contextual {
+  min-width: 40%;
   max-width: 80%;
   max-height: 80%;
   overflow-x: scroll;
@@ -21,7 +22,25 @@
   background-color: white;
   padding: 2rem;
   border-radius: 0.5rem;
-  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.7);
+  z-index: 100;
+}
+
+.controlls {
+  position: relative;
+  width: 100%;
+}
+.controlls .icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(50%, -50%);
+  cursor: pointer;
+  padding: 8px;
+  width: 32px;
+}
+.controlls .icon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .tableWrapper {
@@ -86,6 +105,22 @@
   height: 3rem;
 }
 
+.studentCell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.studentCell .controlls {
+  position: relative;
+}
+.studentCell .controlls .icon {
+  color: black;
+  position: relative;
+  transform: none;
+  cursor: pointer;
+  padding: 12px;
+  width: 48px;
+}
 .studentCell h4 {
   font-size: 1.25rem;
   font-weight: 800;
@@ -105,6 +140,35 @@
   background-color: white;
   border: 1px solid black;
   padding: 2rem;
+}
+
+.cellWithContextual {
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+}
+
+td button {
+  display: flex;
+  margin: auto;
+}
+
+/* --------- contextual --------- */
+.lineWrapper,
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+.lineWrapper .label,
+.checkboxWrapper .label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: black;
+  text-align: start;
+  white-space: pre;
+  background: none;
+  padding: 0;
 }
 
 /*# sourceMappingURL=coaching.css.map */

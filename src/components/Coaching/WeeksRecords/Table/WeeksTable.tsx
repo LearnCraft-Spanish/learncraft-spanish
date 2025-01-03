@@ -1,10 +1,11 @@
 import type { Week } from './../../CoachingTypes';
 import GroupSessionsCell from './GroupSessionsCell';
 import useCoaching from '../../../../hooks/useCoaching';
+import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import AssignmentsCell from './AssignmentsCell';
 import PrivateCallsCell from './PrivateCallsCell';
 import StudentCell from './StudentCell';
-
+import ViewWeekRecord from '../ViewWeekRecord';
 import checkmark from '../../../../resources/icons/checkmark_green.svg';
 
 interface NewTableProps {
@@ -13,6 +14,8 @@ interface NewTableProps {
 export default function WeelsTable({ weeks }: NewTableProps) {
   const { getAssignmentsFromWeekRecordId, getPrivateCallsFromWeekRecordId } =
     useCoaching();
+
+  const { contextual } = useContextualMenu();
   return (
     weeks && (
       <table>
@@ -76,6 +79,9 @@ export default function WeelsTable({ weeks }: NewTableProps) {
                 )}
               </td>
               <td>{week.membershipStudentCallCreditsRemaining}</td>
+              {contextual === `week${week.recordId}` && (
+                <ViewWeekRecord week={week} />
+              )}
             </tr>
           ))}
         </tbody>

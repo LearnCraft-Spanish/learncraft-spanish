@@ -2,7 +2,7 @@ import React from 'react';
 import type { Call, Week } from '../../CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
-
+import ContextualControlls from '../../../contextualControlls';
 export default function PrivateCallsCell({ week }: { week: Week }) {
   const {
     getPrivateCallsFromWeekRecordId,
@@ -22,7 +22,7 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
       {/* View Call Popup */}
       {calls &&
         calls.map((call) => (
-          <div className="assignmentBox" key={call.recordId}>
+          <div className="cellWithContextual" key={call.recordId}>
             <button
               type="button"
               onClick={() => openContextual(`call${call.recordId}`)}
@@ -30,11 +30,9 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
               {call.rating}
             </button>
             {contextual === `call${call.recordId}` && (
-              <div
-                className="contextualWrapper callPopup"
-                ref={setContextualRef}
-              >
-                <div className="contextual">
+              <div className="contextualWrapper">
+                <div className="contextual" ref={setContextualRef}>
+                  <ContextualControlls />
                   <h4>
                     {
                       getStudentFromMembershipId(
@@ -46,24 +44,26 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
                       ? call.date
                       : call.date.toString()}
                   </h4>
-                  <p>
-                    Rating:
-                    {call.rating}
-                  </p>
-                  <p>
-                    Notes:
-                    {call.notes}
-                  </p>
-                  <p>
-                    Difficulties:
-                    {call.areasOfDifficulty}
-                  </p>
+                  <div className="lineWrapper">
+                    <p className="label">Rating: </p>
+                    <p className="content">{call.rating}</p>
+                  </div>
+                  <div className="lineWrapper">
+                    <p className="label">Notes: </p>
+                    <p className="content">{call.rating}</p>
+                  </div>
+                  <div className="lineWrapper">
+                    <p className="label">Difficulties: </p>
+                    <p className="content"> {call.areasOfDifficulty}</p>
+                  </div>
                   {call.recording.length > 0 && (
-                    <a target="_blank" href={call.recording}>
-                      Recording Link
-                    </a>
+                    <div className="lineWrapper">
+                      <a target="_blank" href={call.recording}>
+                        Recording Link
+                      </a>
+                    </div>
                   )}
-                  <div className="buttonBox">
+                  {/* <div className="buttonBox">
                     <button
                       type="button"
                       className="redButton"
@@ -71,7 +71,7 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
                     >
                       Close
                     </button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}

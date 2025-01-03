@@ -2,7 +2,7 @@ import type { GroupSession, GroupAttendees, Week } from './../../CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
 import { useEffect, useState } from 'react';
-
+import ContextualControlls from '../../../contextualControlls';
 export default function GroupSessionsCell({ week }: { week: Week }) {
   const { contextual, openContextual, closeContextual, setContextualRef } =
     useContextualMenu();
@@ -60,16 +60,22 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
   return (
     dataReady &&
     groupSessions?.map((groupSession) => (
-      <div className="assignmentBox" key={groupSession.recordId}>
+      <div className="cellWithContextual" key={groupSession.recordId}>
         <button
           type="button"
-          onClick={() => openContextual(`groupSession${groupSession.recordId}`)}
+          onClick={() =>
+            openContextual(
+              `groupSession${groupSession.recordId}week${week.recordId}`,
+            )
+          }
         >
           {groupSession.sessionType}
         </button>
-        {contextual === `groupSession${groupSession.recordId}` && (
+        {contextual ===
+          `groupSession${groupSession.recordId}week${week.recordId}` && (
           <div className="contextualWrapper">
             <div className="contextual" ref={setContextualRef}>
+              <ContextualControlls />
               <h3>
                 {`Session: ${groupSession.sessionType} on 
                 ${
@@ -79,20 +85,60 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                 }`}
               </h3>
               <div>
-                <h4>Coach: </h4>
-                <p>
-                  {groupSession.coach
-                    ? groupSession.coach.name
-                    : 'No Coach Found'}
+                <div className="lineWrapper">
+                  <p className="label">Coach: </p>
+                  <p className="content">
+                    {groupSession.coach
+                      ? groupSession.coach.name
+                      : 'No Coach Found'}
+                  </p>{' '}
+                </div>
+              </div>
+              <div className="lineWrapper">
+                <p className="label">Topic: </p>
+                <p className="content">{groupSession.topic}</p>
+              </div>
+              <div className="lineWrapper">
+                <p className="label">Comments: </p>
+                <p className="content">{groupSession.comments}</p>
+              </div>
+              <div className="lineWrapper">
+                <p className="label">Attendees: </p>
+                <p className="content groupAttendeeList">
+                  {getAttendeesFromGroupSessionId(groupSession.recordId)?.map(
+                    (attendee) =>
+                      attendee.weekStudent ? (
+                        <p className="groupAttendee">{attendee.weekStudent}</p>
+                      ) : (
+                        'no student found'
+                      ),
+                  )}
+                  {/*
+                {attendeesWeekRecords &&
+                  attendeesWeekRecords.map(
+                    (attendee: Week | undefined) =>
+                      // <button
+                      //   type="button"
+                      //   key={attendee.recordId}
+                      //   className="groupAttendee"
+                      //   onClick={() =>
+                      //     changeAttendee(
+                      //       getStudentFromMembershipId(attendee.relatedMembership)
+                      //         .recordId,
+                      //       groupSession.recordId,
+                      //     )
+                      //   }
+                      // >
+                      attendee ? attendee.student : 'No Student Found',
+
+                    // getStudentFromMembershipId(attendee.relatedMembership)
+                    //   ? getStudentFromMembershipId(attendee.relatedMembership)
+                    //       .fullName
+                    //   : 'No Student Found',
+                    // </button>
+                  )}
+                  */}
                 </p>
-              </div>
-              <div>
-                <h4>Topic: </h4>
-                <p>{groupSession.topic}</p>
-              </div>
-              <div>
-                <h4>Comments: </h4>
-                <p>{groupSession.comments}</p>
               </div>
               <div>
                 <h4>Attendees:</h4>

@@ -1,7 +1,7 @@
 import type { Assignment, Week } from './../../CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
-
+import ContextualControlls from '../../../contextualControlls';
 export default function AssignmentsCell({
   assignment,
 }: {
@@ -13,7 +13,7 @@ export default function AssignmentsCell({
   const { contextual, closeContextual, openContextual, setContextualRef } =
     useContextualMenu();
   return (
-    <div className="assignmentBox" key={assignment.recordId}>
+    <div className="cellWithContextual" key={assignment.recordId}>
       <button
         type="button"
         onClick={() => openContextual(`assignment${assignment.recordId}`)}
@@ -23,6 +23,7 @@ export default function AssignmentsCell({
       {contextual === `assignment${assignment.recordId}` && (
         <div className="contextualWrapper">
           <div className="contextual" ref={setContextualRef}>
+            <ContextualControlls />
             <h4>
               {assignment.assignmentType} by{' '}
               {
@@ -35,31 +36,32 @@ export default function AssignmentsCell({
             {/* Currently, .date does not exist on assignment */}
             {/* <p>{assignment.date}</p> */}
             {assignment.homeworkCorrector && (
-              <p>
-                Corrected by
-                {assignment.homeworkCorrector.name}
-              </p>
+              <div className="lineWrapper">
+                <p className="label">Corrected by: </p>
+                <p className="content">{assignment.homeworkCorrector.name}</p>
+              </div>
             )}
-            <p>
-              Rating:
-              {assignment.rating}
-            </p>
-            <p>
-              Notes:
-              {assignment.notes}
-            </p>
-            <p>
-              Areas of Difficulty:
-              {assignment.areasOfDifficulty}
-            </p>
-            {(assignment.assignmentLink
-              ? assignment.assignmentLink.length > 0
-              : false) && (
-              <a target="_blank" href={assignment.assignmentLink}>
-                Assignment Link
-              </a>
+            <div className="lineWrapper">
+              <p className="label">Rating: </p>
+              <p className="content">{assignment.rating}</p>
+            </div>
+            <div className="lineWrapper">
+              <p className="label">Notes: </p>
+              <p className="content">{assignment.notes}</p>
+            </div>
+            <div className="lineWrapper">
+              <p className="label">Areas of Difficulty: </p>
+              <p className="content"> {assignment.areasOfDifficulty}</p>
+            </div>
+            {assignment.assignmentLink.length > 0 && (
+              <div className="lineWrapper">
+                {/* <p className="label">Assignment Link: </p> */}
+                <a target="_blank" href={assignment.assignmentLink}>
+                  Assignment Link
+                </a>
+              </div>
             )}
-            <div className="buttonBox">
+            {/* <div className="buttonBox">
               <button
                 type="button"
                 className="redButton"
@@ -67,7 +69,7 @@ export default function AssignmentsCell({
               >
                 Close
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       )}
