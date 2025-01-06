@@ -187,4 +187,33 @@ export const handlers = [
   http.post(`${backendUrl}pmf/update`, async () => {
     return HttpResponse.json(1);
   }),
+
+  // Coaching
+  http.get(`${backendUrl}coaching/weeks-new-format`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/coaches`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/courses`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/active-memberships`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/active-students`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/group-sessions`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/group-attendees`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/assignments`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(`${backendUrl}coaching/calls`, async () => {
+    return HttpResponse.json([]);
+  }),
 ];

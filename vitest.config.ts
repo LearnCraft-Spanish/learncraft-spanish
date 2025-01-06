@@ -34,6 +34,7 @@ export default defineConfig({
         '**/interfaceDefinitions.tsx',
         '**/vite-env.d.ts',
         '**/react-app-env.d.ts',
+        '**/Coaching/old/**',
       ],
     },
   },

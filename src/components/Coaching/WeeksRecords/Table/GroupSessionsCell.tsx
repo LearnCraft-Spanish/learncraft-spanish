@@ -2,7 +2,7 @@ import type { GroupSession, GroupAttendees, Week } from './../../CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
 import { useEffect, useState } from 'react';
-import ContextualControlls from '../../../contextualControlls';
+import ContextualControlls from '../../../ContextualControlls';
 export default function GroupSessionsCell({ week }: { week: Week }) {
   const { contextual, openContextual, closeContextual, setContextualRef } =
     useContextualMenu();

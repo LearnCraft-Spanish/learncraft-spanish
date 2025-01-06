@@ -12,19 +12,15 @@ import type {
 import useCoaching from '../../../../hooks/useCoaching';
 
 interface CoachingFilterProps {
-  searchTerm: string | undefined;
-  updateSearchTerm: (value: string) => void;
+  // searchTerm: string | undefined;
+  // updateSearchTerm: (value: string) => void;
   weeks: Week[] | undefined;
-  filterCoachless: boolean | undefined;
-  updateCoachlessFilter: (value: boolean) => void;
-  filterHoldWeeks: boolean | undefined;
-  updateFilterHoldWeeks: (value: boolean) => void;
-  filterIncomplete: string | undefined;
-  updateFilterIncomplete: (value: string) => void;
-  // coaches: { current: Coach[] };
-  // students: { current: Student[] };
-  // courses: { current: Course[] };
-  // memberships: { current: Membership[] };
+  // filterCoachless: boolean | undefined;
+  // updateCoachlessFilter: (value: boolean) => void;
+  // filterHoldWeeks: boolean | undefined;
+  // updateFilterHoldWeeks: (value: boolean) => void;
+  // filterIncomplete: string | undefined;
+  // updateFilterIncomplete: (value: string) => void;
   updateCoachFilter: (value: string) => void;
   updateCourseFilter: (value: string) => void;
   updateWeeksAgoFilter: (value: string) => void;
@@ -33,19 +29,15 @@ interface CoachingFilterProps {
   toggleAdvancedFilteringMenu: () => void;
 }
 export default function WeeksFilter({
-  searchTerm,
-  updateSearchTerm,
+  // searchTerm,
+  // updateSearchTerm,
   weeks,
-  filterCoachless,
-  updateCoachlessFilter,
-  filterHoldWeeks,
-  updateFilterHoldWeeks,
-  filterIncomplete,
-  updateFilterIncomplete,
-  // coaches,
-  // students,
-  // courses,
-  // memberships,
+  // filterCoachless,
+  // updateCoachlessFilter,
+  // filterHoldWeeks,
+  // updateFilterHoldWeeks,
+  // filterIncomplete,
+  // updateFilterIncomplete,
   updateCoachFilter,
   updateCourseFilter,
   updateWeeksAgoFilter,
@@ -97,7 +89,7 @@ export default function WeeksFilter({
               </button>
             </div>
           </div>
-
+          {/*
           {advancedFilteringMenu && (
             <div className="advancedFilters">
               <div>
@@ -179,6 +171,7 @@ export default function WeeksFilter({
               </div>
             </div>
           )}
+            */}
         </div>
         <div className="coachingFilterSection"></div>
       </>

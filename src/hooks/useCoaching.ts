@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import { useCallback, useMemo } from 'react';
 import { useBackend } from './useBackend';
 import { useUserData } from './useUserData';
-
 export default function useCoaching() {
   const userDataQuery = useUserData();
   const backend = useBackend();
@@ -123,26 +123,29 @@ export default function useCoaching() {
     return course;
   }
 
-  function getStudentFromMembershipId(membershipId: number | undefined) {
-    if (
-      !activeMembershipsQuery.isSuccess ||
-      !activeStudentsQuery.isSuccess ||
-      !membershipId
-    ) {
-      return null;
-    }
-    const membership = activeMembershipsQuery.data.find(
-      (item) => item.recordId === membershipId,
-    );
-    if (!membership) return undefined;
+  const getStudentFromMembershipId = useCallback(
+    (membershipId: number | undefined) => {
+      if (
+        !activeMembershipsQuery.isSuccess ||
+        !activeStudentsQuery.isSuccess ||
+        !membershipId
+      ) {
+        return null;
+      }
+      const membership = activeMembershipsQuery.data.find(
+        (item) => item.recordId === membershipId,
+      );
+      if (!membership) return undefined;
 
-    const studentId = membership.relatedStudent;
-    const student = activeStudentsQuery.data.find(
-      (item) => item.recordId === studentId,
-    );
-    if (!student) return undefined;
-    return student;
-  }
+      const studentId = membership.relatedStudent;
+      const student = activeStudentsQuery.data.find(
+        (item) => item.recordId === studentId,
+      );
+      if (!student) return undefined;
+      return student;
+    },
+    [activeMembershipsQuery, activeStudentsQuery],
+  );
 
   function getAttendeeWeeksFromGroupSessionId(sessionId: number) {
     if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {

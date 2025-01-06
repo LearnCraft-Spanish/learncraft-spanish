@@ -2,7 +2,7 @@ import React from 'react';
 import type { Call, Week } from '../../CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
-import ContextualControlls from '../../../contextualControlls';
+import ContextualControlls from '../../../ContextualControlls';
 export default function PrivateCallsCell({ week }: { week: Week }) {
   const {
     getPrivateCallsFromWeekRecordId,

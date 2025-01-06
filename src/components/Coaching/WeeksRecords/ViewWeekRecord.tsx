@@ -1,5 +1,5 @@
 import type { Week } from '../CoachingTypes';
-import ContextualControlls from '../../contextualControlls';
+import ContextualControlls from '../../ContextualControlls';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
 export default function ViewWeekRecord({ week }: { week: Week }) {
   const { setContextualRef } = useContextualMenu();

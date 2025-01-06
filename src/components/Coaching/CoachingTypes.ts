@@ -7,23 +7,37 @@ export interface QbUser {
   userName?: string;
 }
 
-// export interface Week {
-//   weekStarts: Date | string;
-//   assignmentRatings: string;
-//   privateCallRatings: string;
-//   groupCallComments: string;
-//   notes: string;
-//   holdWeek: boolean;
-//   recordsComplete: boolean;
-//   currentLesson: number;
-//   primaryCoachWhenCreated: string;
-//   recordCompletable: boolean;
-//   recordId: number;
-//   relatedMembership: number;
-//   week: number;
-//   weekEnds: Date | string;
-// }
 export interface Week {
+  weekStarts: Date | string;
+  assignmentRatings: string[];
+  privateCallRatings: string[];
+  groupCallComments: string[];
+  notes: string;
+  holdWeek: boolean;
+  recordsComplete: boolean;
+  currentLesson: number | null;
+  primaryCoachWhenCreated: string;
+  recordCompletable: boolean;
+  recordId: number;
+  relatedMembership: number;
+  week: number;
+  weekEnds: string;
+  level: string;
+  membershipStudentMemberUntil: Date | string;
+  endingThisWeek: boolean;
+  membershipOnHold: boolean;
+  membershipEndDate: Date | string;
+  checklistComplete: boolean;
+  offTrack: boolean;
+  recordsCompleteRef: number;
+  combinedKeyForUniques: string;
+  currentLessonName: string;
+  membershipStudentCallCreditsRemaining: number;
+  numberOfGroupCalls: number;
+  privateCallsCompleted: number;
+}
+/*
+  export interface Week {
   student: string;
   level: string;
   primaryCoach: QbUser;
@@ -83,7 +97,9 @@ export interface Week {
   weekEnds: Date | string;
   weekName: string;
 }
-
+*/
+/*
+-- UNUSED, probably deleting soon
 export interface NewWeek {
   student: string;
   level: string;
@@ -99,6 +115,7 @@ export interface NewWeek {
   membershipStudentCallCreditsRemaining: number;
   recordId: number;
 }
+*/
 export interface Student {
   recordId: number;
   firstName: string;

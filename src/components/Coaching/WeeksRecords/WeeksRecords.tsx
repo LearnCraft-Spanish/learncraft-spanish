@@ -11,6 +11,17 @@ import CoachingFilter from './Filter/WeeksFilter';
 
 import '../styles/coaching.css';
 
+/*
+Notes for Test Cases to write:
+
+- Loads & displays data
+- Filters by all filtering options (coach, weeks ago, course) (and others when adding advanced filtering)
+- if coach logged in, defaults to that coach is selected
+- Pagination works (When implemented)
+- Advanced filtering works
+
+
+*/
 export default function WeeksRecordsSection() {
   const userDataQuery = useUserData();
   const {
@@ -133,7 +144,19 @@ export default function WeeksRecordsSection() {
   );
 
   useEffect(() => {
-    if (!rendered.current && lastThreeWeeksQuery.isSuccess) {
+    if (
+      !rendered.current &&
+      lastThreeWeeksQuery.isSuccess &&
+      coachListQuery.isSuccess
+    ) {
+      // set filterByCoach to current user
+      const currentUser = userDataQuery.data;
+      const currentUserCoach = coachListQuery.data.find(
+        (coach) => coach.user.email === currentUser?.emailAddress,
+      );
+      if (currentUserCoach) {
+        setFilterByCoach(currentUserCoach);
+      }
       rendered.current = true;
     }
   }, [userDataQuery.isSuccess, lastThreeWeeksQuery]);
@@ -155,14 +178,14 @@ export default function WeeksRecordsSection() {
           <div className="filterWrapper">
             <CoachingFilter
               weeks={weeks}
-              searchTerm={filterBySearchTerm || ''}
-              updateSearchTerm={setFilterBySearchTerm}
-              filterCoachless={filterByCoachless || 0}
-              updateCoachlessFilter={setFilterByCoachless}
-              filterHoldWeeks={filterByHoldWeeks || 0}
-              updateFilterHoldWeeks={updateFilterHoldWeeks}
-              filterIncomplete={filterByIncomplete || 0}
-              updateFilterIncomplete={setFilterByIncomplete}
+              // searchTerm={filterBySearchTerm || ''}
+              // updateSearchTerm={setFilterBySearchTerm}
+              // filterCoachless={filterByCoachless || 0}
+              // updateCoachlessFilter={setFilterByCoachless}
+              // filterHoldWeeks={filterByHoldWeeks || 0}
+              // updateFilterHoldWeeks={updateFilterHoldWeeks}
+              // filterIncomplete={filterByIncomplete || 0}
+              // updateFilterIncomplete={setFilterByIncomplete}
               updateCoachFilter={updateCoachFilter}
               updateCourseFilter={updateCourseFilter}
               updateWeeksAgoFilter={updateWeeksAgoFilter}

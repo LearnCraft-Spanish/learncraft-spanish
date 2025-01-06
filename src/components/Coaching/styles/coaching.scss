@@ -131,10 +131,11 @@
 .studentCell {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  .controlls {
+  justify-content: flex-start;
+  .studentCellControlls {
     position: relative;
-    // width: 100%;
+    margin-right: 10px;
+    // width: 110px;
     .icon {
       color: black;
       position: relative;
