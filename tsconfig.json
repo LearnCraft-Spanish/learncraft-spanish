@@ -16,5 +16,6 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "include": ["src", "tests", "vite-env.d.ts", "mocks"]
+  "include": ["src", "tests", "vite-env.d.ts", "mocks"],
+  "exclude": ["node_modules", "src/components/Coaching/old/**/*"]
 }

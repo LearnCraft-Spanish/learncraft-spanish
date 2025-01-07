@@ -7,6 +7,14 @@ export interface Lesson {
   vocabKnown: Array<string>;
 }
 
+export interface LessonUnparsed {
+  recordId: number;
+  lesson: string;
+  vocabIncluded: Array<string>;
+  sortReference: number | null;
+  relatedProgram: number;
+}
+
 export interface Program {
   recordId: number;
   name: string;

@@ -105,7 +105,7 @@ export default function Menu() {
                   New Coaching
                 </Link>
               </div>
-=======
+              <div className="buttonBox">
                 <Link className="linkButton" to="/examplecreator">
                   Example Creator
                 </Link>
@@ -115,7 +115,6 @@ export default function Menu() {
                   Example Editor
                 </Link>
               </div>
->>>>>>> origin/development
             </div>
           )}
         </div>
