@@ -2,11 +2,11 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import { useUserData } from '../../hooks/useUserData';
+import { useUserData } from '../../../hooks/useUserData';
 
-import { useBackend } from '../../hooks/useBackend';
-import { useContextualMenu } from '../../hooks/useContextualMenu';
-
+import { useBackend } from '../../../hooks/useBackend';
+import { useContextualMenu } from '../../../hooks/useContextualMenu';
+// import './_styles.css';
 const Coaching = () => {
   const { contextual, openContextual, closeContextual, currentContextual } =
     useContextualMenu;
@@ -160,6 +160,7 @@ const Coaching = () => {
       coursesPromise,
       lessonsPromise,
     ]).then((results) => {
+      console.log(results[2]);
       students.current = results[0];
       memberships.current = results[1];
       weekRecords.current = results[2][0];
@@ -933,7 +934,7 @@ const Coaching = () => {
         coaches.current.find(
           (coach) => coach.user.email === userDataQuery.data?.emailAddress,
         ) || null;
-      if (coachUser.current ? coachUser.current.recordId : false) {
+      if (coachUser.current) {
         updateCoachFilter(coachUser.current.recordId);
       }
     }
@@ -956,7 +957,7 @@ const Coaching = () => {
 
   return (
     <div className="coaching">
-      {!startupDataLoaded && <p>This section is still under construction</p>}
+      {!startupDataLoaded && <p>data is loading</p>}
       {startupDataLoaded && (
         <div>
           <div className="coachingFilterSection">

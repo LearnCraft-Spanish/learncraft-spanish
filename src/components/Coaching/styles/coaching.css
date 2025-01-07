@@ -1,0 +1,209 @@
+.newCoachingWrapper {
+  margin: 1rem;
+}
+.newCoachingWrapper .contextualWrapper {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+.newCoachingWrapper .contextualWrapper .contextual {
+  min-width: 40%;
+  max-width: 80%;
+  max-height: 80%;
+  overflow-x: scroll;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.7);
+  z-index: 100;
+}
+
+.controlls {
+  position: relative;
+  width: 100%;
+}
+.controlls .icon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(50%, -50%);
+  cursor: pointer;
+  padding: 8px;
+  width: 32px;
+}
+.controlls .icon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tableWrapper {
+  width: auto;
+  max-height: 80vh;
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+.tableWrapper table {
+  width: 100%;
+  scroll-behavior: auto;
+  border-collapse: separate; /* Don't collapse */
+  border-spacing: 0; /* Spacing between cells */
+  font-size: 1rem;
+  line-height: 1.25rem;
+}
+.tableWrapper table th,
+.tableWrapper table td {
+  min-width: 100px;
+  border: 1px solid black;
+  padding: 0.5rem;
+  text-align: start;
+  vertical-align: top;
+  position: relative;
+}
+.tableWrapper table thead th {
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+  color: white;
+  background-color: grey;
+  font-weight: 600;
+}
+.tableWrapper table thead th:first-child {
+  position: sticky;
+  left: 0px;
+  z-index: 2;
+}
+.tableWrapper table tbody td {
+  background-color: #f2f2f2;
+}
+.tableWrapper table tbody td:first-child {
+  position: sticky;
+  left: 0px;
+  z-index: 1;
+  background-color: var(--accent);
+  font-weight: 600;
+}
+.tableWrapper table tbody td:first-child h4 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: black;
+  text-align: start;
+}
+
+.checkmark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 3rem;
+  height: 3rem;
+}
+
+.studentCell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.studentCell .studentCellControlls {
+  position: relative;
+  margin-right: 10px;
+}
+.studentCell .studentCellControlls .icon {
+  color: black;
+  position: relative;
+  transform: none;
+  cursor: pointer;
+  padding: 12px;
+  width: 48px;
+}
+.studentCell h4 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: black;
+  text-align: start;
+  margin: 1rem 0;
+}
+.studentCell p {
+  font-size: 1rem;
+  font-weight: 400;
+  color: black;
+  text-align: start;
+  margin: 0.5rem 0;
+}
+
+.advancedFilters {
+  background-color: white;
+  border: 1px solid black;
+  padding: 2rem;
+}
+
+.cellWithContextual {
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+}
+
+td button {
+  display: flex;
+  margin: auto;
+}
+
+/* --------- contextual --------- */
+.checkboxWrapper,
+.lineWrapper {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+.checkboxWrapper .label,
+.lineWrapper .label {
+  background: none;
+  padding: 0;
+  color: black;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.checkboxWrapper .label,
+.checkboxWrapper .content,
+.lineWrapper .label,
+.lineWrapper .content {
+  margin: 16px 0;
+}
+
+.lineWrapper {
+  align-items: flex-start;
+}
+.lineWrapper .label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: black;
+  text-align: start;
+  white-space: pre;
+  width: 30%;
+  min-width: 100px;
+  display: flex;
+  justify-content: flex-start;
+  text-wrap: wrap;
+  padding-top: 8px;
+}
+.lineWrapper .content {
+  background: rgb(245, 245, 245);
+  padding: 8px;
+  min-height: 2.25rem;
+  min-width: 150px;
+  max-width: 60%;
+}
+
+.checkboxWrapper {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin-left: 30%;
+}
+
+/*# sourceMappingURL=coaching.css.map */

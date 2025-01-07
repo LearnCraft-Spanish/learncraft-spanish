@@ -101,6 +101,11 @@ export default function Menu() {
                 </Link>
               </div>
               <div className="buttonBox">
+                <Link className="linkButton" to="/newcoaching">
+                  New Coaching
+                </Link>
+              </div>
+=======
                 <Link className="linkButton" to="/examplecreator">
                   Example Creator
                 </Link>
@@ -110,11 +115,7 @@ export default function Menu() {
                   Example Editor
                 </Link>
               </div>
-              {/* <div className="buttonBox">
-                    <Link className="linkButton" to="/coaching">
-                      Coaching
-                    </Link>
-                  </div> */}
+>>>>>>> origin/development
             </div>
           )}
         </div>

@@ -1,0 +1,233 @@
+@mixin centered() {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.newCoachingWrapper {
+  margin: 1rem;
+
+  .filterWrapper {
+  }
+  .tableWrapper {
+  }
+
+  .contextualWrapper {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba($color: #000000, $alpha: 0.3);
+    z-index: 100;
+    .contextual {
+      min-width: 40%;
+      max-width: 80%;
+      max-height: 80%;
+      overflow-x: scroll;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 0 1rem rgba($color: #000000, $alpha: 0.7);
+      z-index: 100;
+    }
+  }
+}
+.controlls {
+  position: relative;
+  width: 100%;
+
+  .icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+    cursor: pointer;
+    padding: 8px;
+    width: 32px;
+  }
+  .icon:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.tableWrapper {
+  width: auto;
+  max-height: 80vh;
+  overflow-x: auto;
+  margin-top: 1rem;
+
+  table {
+    width: 100%;
+    scroll-behavior: auto;
+    border-collapse: separate; /* Don't collapse */
+    border-spacing: 0; /* Spacing between cells */
+    font-size: 1rem;
+    line-height: 1.25rem;
+
+    th,
+    td {
+      min-width: 100px;
+      border: 1px solid black;
+      padding: 0.5rem;
+      text-align: start;
+      vertical-align: top;
+      position: relative;
+    }
+    thead {
+      th {
+        position: sticky;
+        top: 0px;
+        z-index: 1;
+        color: white;
+        background-color: grey;
+        font-weight: 600;
+      }
+
+      // first cell in thead is sticky
+      th:first-child {
+        position: sticky;
+        left: 0px;
+        z-index: 2;
+      }
+    }
+    tbody {
+      td {
+        background-color: #f2f2f2;
+      }
+
+      // first cell in each row is sticky
+      td:first-child {
+        position: sticky;
+        left: 0px;
+        z-index: 1;
+        background-color: var(--accent);
+        font-weight: 600;
+        // font-size: 1.25rem;
+        // line-height: 1.5rem;
+
+        h4 {
+          font-size: 1.25rem;
+          font-weight: 800;
+          color: black;
+          text-align: start;
+        }
+      }
+    }
+  }
+}
+
+.checkmark {
+  @include centered;
+  width: 3rem;
+  height: 3rem;
+}
+
+.studentCell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  .studentCellControlls {
+    position: relative;
+    margin-right: 10px;
+    // width: 110px;
+    .icon {
+      color: black;
+      position: relative;
+      // right: 0;
+      // top: 0;
+      transform: none;
+      cursor: pointer;
+      padding: 12px;
+      width: 48px;
+    }
+  }
+  h4 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: black;
+    text-align: start;
+    margin: 1rem 0;
+  }
+  p {
+    font-size: 1rem;
+    font-weight: 400;
+    color: black;
+    text-align: start;
+    margin: 0.5rem 0;
+  }
+}
+
+.advancedFilters {
+  background-color: white;
+  border: 1px solid black;
+  padding: 2rem;
+}
+
+.cellWithContextual {
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+}
+
+td button {
+  // center
+  display: flex;
+  margin: auto;
+}
+/* --------- contextual --------- */
+.checkboxWrapper,
+.lineWrapper {
+  display: flex;
+  align-items: center;
+  margin: 0;
+
+  .label {
+    background: none;
+    padding: 0;
+    color: black;
+    font-size: 1rem;
+    font-weight: 600;
+    // padding-top: 8px;
+  }
+  .label,
+  .content {
+    margin: 16px 0;
+  }
+}
+.lineWrapper {
+  align-items: flex-start;
+  .label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: black;
+    text-align: start;
+    white-space: pre;
+    width: 30%;
+    min-width: 100px;
+    // align text
+    display: flex;
+    justify-content: flex-start;
+    // allow wrap
+    text-wrap: wrap;
+    padding-top: 8px;
+  }
+  .content {
+    background: rgb(245, 245, 245);
+    padding: 8px;
+    min-height: 2.25rem;
+    min-width: 150px;
+    max-width: 60%;
+  }
+}
+
+.checkboxWrapper {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  margin-left: 30%;
+}
