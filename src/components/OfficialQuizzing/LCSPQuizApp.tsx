@@ -1,14 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import useAuth from './hooks/useAuth';
-import quizCourses from './functions/QuizCourseList';
-import MenuButton from './components/Buttons/MenuButton';
-import Loading from './components/Loading';
-import { useOfficialQuizzes } from './hooks/useOfficialQuizzes';
+import useAuth from '../../hooks/useAuth';
+import quizCourses from '../../functions/QuizCourseList';
+import MenuButton from '../Buttons/MenuButton';
+import Loading from '../Loading';
+import { useActiveStudent } from '../../hooks/useActiveStudent';
+import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import OfficialQuiz from './OfficialQuiz';
-import './App.css';
-import { useActiveStudent } from './hooks/useActiveStudent';
+import '../../App.css';
 
 export default function LCSPQuizApp(): JSX.Element {
   const location = useLocation();

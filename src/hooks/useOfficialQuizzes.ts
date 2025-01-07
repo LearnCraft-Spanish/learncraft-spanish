@@ -1,13 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import type { Quiz } from '../interfaceDefinitions';
+import type { Flashcard, Quiz } from '../interfaceDefinitions';
 import useAuth from './useAuth';
 import { useBackend } from './useBackend';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
   const { isAuthenticated } = useAuth();
-  const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } =
-    useBackend();
+  const {
+    getLcspQuizzesFromBackend,
+    getQuizExamplesFromBackend,
+    updateExample,
+  } = useBackend();
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
     quizzes.forEach((item) => {
@@ -81,5 +84,24 @@ export function useOfficialQuizzes(quizId: number | undefined) {
     enabled: quizExamplesQueryReady(),
   });
 
-  return { officialQuizzesQuery, quizExamplesQuery };
+  const updateQuizExample = useCallback(
+    async (newExampleData: Partial<Flashcard>) => {
+      const isInActiveQuiz = quizExamplesQuery.data?.some(
+        (example) => example.recordId === newExampleData.recordId,
+      );
+      if (isInActiveQuiz) {
+        const response = await updateExample(newExampleData);
+        if (response) {
+          quizExamplesQuery.refetch();
+        }
+      } else {
+        console.error(
+          `Attempted to update example ${newExampleData.recordId} which is not in the active quiz`,
+        );
+      }
+    },
+    [updateExample, quizExamplesQuery],
+  );
+
+  return { officialQuizzesQuery, quizExamplesQuery, updateQuizExample };
 }

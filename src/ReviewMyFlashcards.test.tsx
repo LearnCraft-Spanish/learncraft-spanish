@@ -8,7 +8,7 @@ import MyFlashcardsQuiz from './ReviewMyFlashcards';
 describe('menu for student flashcards', () => {
   it('shows three setting options', async () => {
     render(
-      <MockAllProviders route="/myflashcards" childRoutes>
+      <MockAllProviders route="/myflashcards">
         <MyFlashcardsQuiz />
       </MockAllProviders>,
     );
@@ -22,7 +22,7 @@ describe('menu for student flashcards', () => {
   });
   it('shows start quiz button', async () => {
     render(
-      <MockAllProviders route="/myflashcards" childRoutes>
+      <MockAllProviders route="/myflashcards">
         <MyFlashcardsQuiz />
       </MockAllProviders>,
     );
@@ -32,7 +32,7 @@ describe('menu for student flashcards', () => {
   });
   it('shows menu button', async () => {
     render(
-      <MockAllProviders route="/myflashcards" childRoutes>
+      <MockAllProviders route="/myflashcards">
         <MyFlashcardsQuiz />
       </MockAllProviders>,
     );

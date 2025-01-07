@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './AudioBasedReview.css';
 interface QuizProgressProps {
   currentExampleNumber: number;
   totalExamplesNumber: number;

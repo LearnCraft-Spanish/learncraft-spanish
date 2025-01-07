@@ -166,6 +166,11 @@ describe('component Menu', () => {
       expect(screen.queryByText('Staff Tools')).toBeInTheDocument();
     });
 
+    it('shows example editor', async () => {
+      await renderMenuLoaded();
+      expect(screen.queryByText('Example Creator')).toBeInTheDocument();
+    });
+
     it('does NOT render My Flashcards', async () => {
       await renderMenuLoaded();
       expect(screen.queryByText('My Flashcards')).toBeNull();

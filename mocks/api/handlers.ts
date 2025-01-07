@@ -80,6 +80,10 @@ export const handlers = [
     return HttpResponse.json(apiData.allStudentsTable);
   }),
 
+  http.get(`${backendUrl}unverified-examples`, () => {
+    return HttpResponse.json(apiData.verifiedExamplesTable);
+  }),
+
   http.get(`${backendUrl}my-examples`, ({ request }) => {
     //Placeholder: We will fetch for different students soon
     const email = getEmailFromRequest(request);

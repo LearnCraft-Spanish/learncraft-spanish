@@ -103,4 +103,16 @@ describe('app', () => {
       expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();
     });
   });
+
+  it('displays example editor if admin', async () => {
+    setupMockAuth({ userName: 'admin-empty-role' });
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByText(/example creator/i)).toBeInTheDocument();
+    });
+  });
 });

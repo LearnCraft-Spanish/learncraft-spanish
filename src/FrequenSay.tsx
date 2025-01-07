@@ -156,7 +156,7 @@ export default function FrequenSay() {
     if (selectedToLesson?.recordId) {
       selectedToLesson.vocabKnown.forEach((vocabName) => {
         const vocabularyItem = vocabularyTable.find(
-          (item) => item.vocabName === vocabName,
+          (item) => item.descriptionOfVocabularySkill === vocabName,
         );
         if (vocabularyItem?.spellings) {
           vocabularyItem.spellings.forEach((word) => {
