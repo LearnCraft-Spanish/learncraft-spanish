@@ -12,9 +12,9 @@ interface NewTableProps {
   weeks: Week[] | undefined;
 }
 export default function WeeksTable({ weeks }: NewTableProps) {
+  const { contextual } = useContextualMenu();
   const { getAssignmentsFromWeekRecordId, getPrivateCallsFromWeekRecordId } =
     useCoaching();
-  const { contextual } = useContextualMenu();
 
   return (
     weeks && (
@@ -38,55 +38,54 @@ export default function WeeksTable({ weeks }: NewTableProps) {
         </thead>
         <tbody>
           {weeks.map((week) => (
-            <>
-              <tr key={week.recordId}>
-                <td>{/* <StudentCell week={week} /> */}</td>
-                {/* <td>{week.level}</td> */}
-                {/* <td>
+            <tr key={week.recordId}>
+              <td>
+                <StudentCell week={week} />
+              </td>
+              {/* <td>{week.level}</td> */}
+              {/* <td>
                 {week.primaryCoach.name
                   ? week.primaryCoach.name
                   : 'No Primary Coach Found'}
               </td> */}
-                <td>{week.weekStarts.toString()}</td>
-                <td>
-                  {week.assignmentRatings.length > 0 &&
-                    getAssignmentsFromWeekRecordId(week.recordId)?.map(
-                      (assignment) => (
-                        // <p>{assignment.rating}</p>
-                        <AssignmentsCell assignment={assignment} />
-                      ),
-                    )}
-                </td>
-                <td>
-                  {week.numberOfGroupCalls > 0 && (
-                    <GroupSessionsCell week={week} />
+              <td>{week.weekStarts.toString()}</td>
+              <td>
+                {week.assignmentRatings.length > 0 &&
+                  getAssignmentsFromWeekRecordId(week.recordId)?.map(
+                    (assignment) => (
+                      // <p>{assignment.rating}</p>
+                      <AssignmentsCell
+                        assignment={assignment}
+                        key={`assignment${assignment.recordId}`}
+                      />
+                    ),
                   )}
-                </td>
-                {/* <td>{week.groupCallComments}</td> */}
-                <td>
-                  {week.privateCallsCompleted > 0 && (
-                    // getPrivateCallsFromWeekRecordId(week.recordId)?.map(
-                    <PrivateCallsCell week={week} />
-                  )}
-                </td>
-                <td>{week.notes}</td>
-                <td>{week.currentLessonName}</td>
-                <td>{week.holdWeek}</td>
-                <td>
-                  {week.recordsComplete && (
-                    <img
-                      className="checkmark"
-                      src={checkmark}
-                      alt="Checkmark"
-                    />
-                  )}
-                </td>
-                <td>{week.membershipStudentCallCreditsRemaining}</td>
-                {contextual === `week${week.recordId}` && (
-                  <ViewWeekRecord week={week} />
+              </td>
+              <td>
+                {week.numberOfGroupCalls > 0 && (
+                  <GroupSessionsCell week={week} />
                 )}
-              </tr>
-            </>
+              </td>
+              {/* <td>{week.groupCallComments}</td> */}
+              <td>
+                {week.privateCallsCompleted > 0 && (
+                  // getPrivateCallsFromWeekRecordId(week.recordId)?.map(
+                  <PrivateCallsCell week={week} />
+                )}
+              </td>
+              <td>{week.notes}</td>
+              <td>{week.currentLessonName}</td>
+              <td>{week.holdWeek}</td>
+              <td>
+                {week.recordsComplete && (
+                  <img className="checkmark" src={checkmark} alt="Checkmark" />
+                )}
+              </td>
+              <td>{week.membershipStudentCallCreditsRemaining}</td>
+              {/* {contextual === `week${week.recordId}` && (
+                  <ViewWeekRecord week={week} />
+                )} */}
+            </tr>
           ))}
         </tbody>
       </table>

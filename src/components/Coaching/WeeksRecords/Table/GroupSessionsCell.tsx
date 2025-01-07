@@ -1,53 +1,30 @@
-import type { GroupSession, GroupAttendees, Week } from './../../CoachingTypes';
+import { useEffect, useState } from 'react';
+import type { GroupSession, Week } from './../../CoachingTypes';
+
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
-import { useEffect, useState } from 'react';
+
 import ContextualControlls from '../../../ContextualControlls';
+
 export default function GroupSessionsCell({ week }: { week: Week }) {
-  const { contextual, openContextual, closeContextual, setContextualRef } =
-    useContextualMenu();
+  const { contextual, openContextual, setContextualRef } = useContextualMenu();
   const {
-    getAttendeeWeeksFromGroupSessionId,
     groupAttendeesQuery,
     groupSessionsQuery,
+    getGroupSessionsFromWeekRecordId,
+    getAttendeesFromGroupSessionId,
   } = useCoaching();
 
   const [groupSessions, setGroupSessions] = useState<
     GroupSession[] | undefined
   >();
 
-  const groupSessionTitle = `Session: `;
   const dataReady =
     groupAttendeesQuery.isSuccess && groupSessionsQuery.isSuccess;
 
-  // There should only be one group session per week record?
-  function getGroupSessionFromWeekRecordId(weekRecordId: number) {
-    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-      return null;
-    }
-    const attendeeList = groupAttendeesQuery.data.filter(
-      (attendee) => attendee.student === weekRecordId,
-    );
-    const groupSessionList = groupSessionsQuery.data.filter((groupSession) =>
-      attendeeList.find(
-        (attendee) => attendee.groupSession === groupSession.recordId,
-      ),
-    );
-    return groupSessionList;
-  }
-
-  function getAttendeesFromGroupSessionId(sessionId: number) {
-    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-      return null;
-    }
-    return groupAttendeesQuery.data.filter(
-      (attendee) => attendee.groupSession === sessionId,
-    );
-  }
-
   useEffect(() => {
     if (dataReady && !groupSessions) {
-      const groupSessions = getGroupSessionFromWeekRecordId(week.recordId);
+      const groupSessions = getGroupSessionsFromWeekRecordId(week.recordId);
       if (groupSessions && groupSessions.length > 0) {
         setGroupSessions(groupSessions);
       } else {
@@ -91,7 +68,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                     {groupSession.coach
                       ? groupSession.coach.name
                       : 'No Coach Found'}
-                  </p>{' '}
+                  </p>
                 </div>
               </div>
               <div className="lineWrapper">
@@ -104,15 +81,22 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
               </div>
               <div className="lineWrapper">
                 <p className="label">Attendees: </p>
-                <p className="content groupAttendeeList">
+                <div className="groupAttendeeList">
                   {getAttendeesFromGroupSessionId(groupSession.recordId)?.map(
                     (attendee) =>
-                      attendee.weekStudent ? (
-                        <p className="groupAttendee">{attendee.weekStudent}</p>
-                      ) : (
-                        'no student found'
+                      attendee.weekStudent && (
+                        <p
+                          className="groupAttendee content"
+                          key={`groupAttendee${attendee.weekStudent}`}
+                        >
+                          {attendee.weekStudent}
+                        </p>
                       ),
                   )}
+                  {/*
+                  Popup button trigger for the student profile popup commented out at EOF
+                  CURRENT STATUS: Replaced with studentName text above
+                   */}
                   {/*
                 {attendeesWeekRecords &&
                   attendeesWeekRecords.map(
@@ -138,81 +122,35 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                     // </button>
                   )}
                   */}
-                </p>
+                </div>
               </div>
               <div>
-                {/* <h4>Attendees:</h4>
-                <div className="groupAttendeeList">
-                  {getAttendeesFromGroupSessionId(groupSession.recordId)?.map(
-                    (attendee) =>
-                      attendee.weekStudent ? (
-                        <p>{attendee.weekStudent},</p>
-                      ) : (
-                        'no student found'
-                      ),
-                  )} */}
-                {/*
-                {attendeesWeekRecords &&
-                  attendeesWeekRecords.map(
-                    (attendee: Week | undefined) =>
-                      // <button
-                      //   type="button"
-                      //   key={attendee.recordId}
-                      //   className="groupAttendee"
-                      //   onClick={() =>
-                      //     changeAttendee(
-                      //       getStudentFromMembershipId(attendee.relatedMembership)
-                      //         .recordId,
-                      //       groupSession.recordId,
-                      //     )
-                      //   }
-                      // >
-                      attendee ? attendee.student : 'No Student Found',
-
-                    // getStudentFromMembershipId(attendee.relatedMembership)
-                    //   ? getStudentFromMembershipId(attendee.relatedMembership)
-                    //       .fullName
-                    //   : 'No Student Found',
-                    // </button>
-                  )}
-                  */}
+                {(groupSession.callDocument || groupSession.zoomLink) && (
+                  <>
+                    <h4>Session Resources:</h4>
+                    {groupSession.callDocument &&
+                      groupSession.callDocument.length > 0 && (
+                        <p>
+                          <a target="_blank" href={groupSession.callDocument}>
+                            Call Document
+                          </a>
+                        </p>
+                      )}
+                    {groupSession.zoomLink &&
+                      groupSession.zoomLink.length > 0 && (
+                        <p>
+                          <a target="_blank" href={groupSession.zoomLink}>
+                            Recording Link
+                          </a>
+                        </p>
+                      )}
+                  </>
+                )}
               </div>
             </div>
-            <div>
-              {(groupSession.callDocument || groupSession.zoomLink) && (
-                <>
-                  <h4>Session Resources:</h4>
-                  {groupSession.callDocument &&
-                    groupSession.callDocument.length > 0 && (
-                      <p>
-                        <a target="_blank" href={groupSession.callDocument}>
-                          Call Document
-                        </a>
-                      </p>
-                    )}
-                  {groupSession.zoomLink &&
-                    groupSession.zoomLink.length > 0 && (
-                      <p>
-                        <a target="_blank" href={groupSession.zoomLink}>
-                          Recording Link
-                        </a>
-                      </p>
-                    )}
-                </>
-              )}
-            </div>
-            {/* <div className="buttonBox">
-                <button
-                  type="button"
-                  className="redButton"
-                  onClick={closeContextual}
-                >
-                  Close
-                </button>
-              </div> */}
-            {/* </div> */}
           </div>
         )}
+        {/* Popup for viewing a student, maybe put somewhere else? make component, then let it be activated from here? */}
         {/* {contextual ===
         `attendee${
           currentAttendee.current ? currentAttendee.current.recordId : undefined

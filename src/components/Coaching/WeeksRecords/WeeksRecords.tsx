@@ -28,6 +28,13 @@ export default function WeeksRecordsSection() {
     lastThreeWeeksQuery,
     coachListQuery,
     courseListQuery,
+    activeMembershipsQuery,
+    activeStudentsQuery,
+    groupSessionsQuery,
+    groupAttendeesQuery,
+    assignmentsQuery,
+    callsQuery,
+
     getCoachFromMembershipId,
     getCourseFromMembershipId,
   } = useCoaching();
@@ -57,8 +64,13 @@ export default function WeeksRecordsSection() {
     userDataQuery.isSuccess &&
     lastThreeWeeksQuery.isSuccess &&
     coachListQuery.isSuccess &&
-    courseListQuery.isSuccess;
-
+    courseListQuery.isSuccess &&
+    activeMembershipsQuery.isSuccess &&
+    activeStudentsQuery.isSuccess &&
+    groupSessionsQuery.isSuccess &&
+    groupAttendeesQuery.isSuccess &&
+    assignmentsQuery.isSuccess &&
+    callsQuery.isSuccess;
   const dataLoading =
     !dataReady &&
     (userDataQuery.isLoading ||
@@ -166,6 +178,7 @@ export default function WeeksRecordsSection() {
     if (dataReady) {
       console.log('filtering weeks!');
       const filteredWeeks = filterWeeks(lastThreeWeeksQuery.data);
+      // const truncatedWeeks = filteredWeeks.slice(0, 25);
       setWeeks(filteredWeeks);
     }
   }, [dataReady, filterWeeks]);

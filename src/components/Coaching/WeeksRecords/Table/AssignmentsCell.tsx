@@ -12,7 +12,7 @@ export default function AssignmentsCell({
   const { contextual, closeContextual, openContextual, setContextualRef } =
     useContextualMenu();
   return (
-    <div className="cellWithContextual" key={assignment.recordId}>
+    <div className="cellWithContextual">
       <button
         type="button"
         onClick={() => openContextual(`assignment${assignment.recordId}`)}

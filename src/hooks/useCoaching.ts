@@ -179,6 +179,22 @@ export default function useCoaching() {
     if (!groupSession) return undefined;
     return groupSession;
   }
+  // should There only be one group session per week record?
+  // Answer: theoretically possible, if the group reschedules the session
+  function getGroupSessionsFromWeekRecordId(weekRecordId: number) {
+    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+      return null;
+    }
+    const attendeeList = groupAttendeesQuery.data.filter(
+      (attendee) => attendee.student === weekRecordId,
+    );
+    const groupSessionList = groupSessionsQuery.data.filter((groupSession) =>
+      attendeeList.find(
+        (attendee) => attendee.groupSession === groupSession.recordId,
+      ),
+    );
+    return groupSessionList;
+  }
 
   function getAssignmentsFromWeekRecordId(weekRecordId: number) {
     if (!assignmentsQuery.isSuccess) {
@@ -220,8 +236,17 @@ export default function useCoaching() {
     return privateCalls;
   }
 
+  function getAttendeesFromGroupSessionId(sessionId: number) {
+    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+      return null;
+    }
+    return groupAttendeesQuery.data.filter(
+      (attendee) => attendee.groupSession === sessionId,
+    );
+  }
   /* --------- Other Helper Functions --------- */
   function dateObjectToText(dateObject: Date) {
+    // This will be depricated soon, use built in date functions instead
     function formatMonth(date: Date) {
       // const unformattedMonth = date.getMonth() + 1; // Found it like this, ask Josiash if intentional?
       const unformattedMonth = date.getMonth();
@@ -258,7 +283,10 @@ export default function useCoaching() {
     getCourseFromMembershipId,
     getStudentFromMembershipId,
     getAttendeeWeeksFromGroupSessionId,
+    getAttendeesFromGroupSessionId,
     getGroupSessionFromWeekRecordId,
+    getGroupSessionsFromWeekRecordId,
+
     getAssignmentsFromWeekRecordId,
     getMembershipFromWeekRecordId,
     getPrivateCallsFromWeekRecordId,
