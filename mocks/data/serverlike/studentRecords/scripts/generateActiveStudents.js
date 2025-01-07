@@ -1,5 +1,5 @@
-// import fakePeopleList from './fakePeople.json' assert { type: 'json' };
-// import mockData from './mockData.json' assert { type: 'json' };
+import fakePeopleList from './fakePeople.json' assert { type: 'json' };
+import mockData from './mockData.json' assert { type: 'json' };
 const activeStudentTemplate = {
   recordId: 0,
   firstName: '',
@@ -91,7 +91,7 @@ function generateActiveStudentsData({ coachList, numberOfRecords }) {
 
 // console.log(JSON.stringify(getFullNamesFromEmails()));
 
-// const coachList = mockData.coachList.slice(0, 2);
+const coachList = mockData.coachList.slice(0, 2);
 
-// const results = generateActiveStudentsData({ coachList, numberOfRecords: 10 });
-// console.log(results);
+const results = generateActiveStudentsData({ coachList, numberOfRecords: 10 });
+console.log(results);

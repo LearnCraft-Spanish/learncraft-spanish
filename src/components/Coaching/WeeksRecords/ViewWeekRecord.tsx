@@ -4,7 +4,7 @@ import { useContextualMenu } from '../../../hooks/useContextualMenu';
 export default function ViewWeekRecord({ week }: { week: Week }) {
   const { setContextualRef } = useContextualMenu();
   return (
-    <div className="contextualWrapper">
+    <div className="contextualWrapper" key={`week${week.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
         <ContextualControlls />
         <div className="lineWrapper">

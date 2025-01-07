@@ -4,6 +4,8 @@ import { act } from '@testing-library/react';
 import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
 import AssignmentsCell from './AssignmentsCell';
 
+import mockData from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
+
 /*
 export interface Assignment {
   recordId: number;
@@ -17,21 +19,7 @@ export interface Assignment {
   weekStarts: Date | string;
 }
 */
-const assignment = {
-  assignmentType: 'Pronunciation',
-  homeworkCorrector: {
-    email: 'josiah@learncraftspanish.com',
-    id: '',
-    name: 'Josiah Moser',
-  },
-  assignmentLink: '',
-  rating: 'Excellent',
-  areasOfDifficulty: '',
-  notes: '',
-  recordId: 0,
-  relatedWeek: 0,
-  weekStarts: '2019-07-21',
-};
+const assignment = mockData.assignments[0];
 // Needs membership table & activeStudents table to be mocked
 describe('component StudentCell', () => {
   it('default view renders without crashing', () => {

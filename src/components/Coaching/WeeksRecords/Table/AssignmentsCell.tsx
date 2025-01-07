@@ -20,7 +20,10 @@ export default function AssignmentsCell({
         {assignment.assignmentType}:{assignment.rating}
       </button>
       {contextual === `assignment${assignment.recordId}` && (
-        <div className="contextualWrapper">
+        <div
+          className="contextualWrapper"
+          key={`assignment${assignment.recordId}`}
+        >
           <div className="contextual" ref={setContextualRef}>
             <ContextualControlls />
             <h4>

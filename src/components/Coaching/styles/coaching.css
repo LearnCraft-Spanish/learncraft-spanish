@@ -108,12 +108,13 @@
 .studentCell {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
-.studentCell .controlls {
+.studentCell .studentCellControlls {
   position: relative;
+  margin-right: 10px;
 }
-.studentCell .controlls .icon {
+.studentCell .studentCellControlls .icon {
   color: black;
   position: relative;
   transform: none;

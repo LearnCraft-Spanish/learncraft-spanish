@@ -4,6 +4,8 @@ import newData from '../data/serverlike/serverlikeData';
 
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import { getUserDataFromName } from '../data/serverlike/studentTable';
+
+import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
@@ -190,30 +192,30 @@ export const handlers = [
 
   // Coaching
   http.get(`${backendUrl}coaching/weeks-new-format`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.lastThreeWeeks);
   }),
   http.get(`${backendUrl}coaching/coaches`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.coachList);
   }),
   http.get(`${backendUrl}coaching/courses`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.courseList);
   }),
   http.get(`${backendUrl}coaching/active-memberships`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.activeMemberships);
   }),
   http.get(`${backendUrl}coaching/active-students`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.activeStudents);
   }),
   http.get(`${backendUrl}coaching/group-sessions`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.groupSessions);
   }),
   http.get(`${backendUrl}coaching/group-attendees`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.groupAttendees);
   }),
   http.get(`${backendUrl}coaching/assignments`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.assignments);
   }),
   http.get(`${backendUrl}coaching/calls`, async () => {
-    return HttpResponse.json([]);
+    return HttpResponse.json(mockDataHardCoded.calls);
   }),
 ];

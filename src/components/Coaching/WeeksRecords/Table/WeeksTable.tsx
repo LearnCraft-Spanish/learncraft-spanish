@@ -14,8 +14,8 @@ interface NewTableProps {
 export default function WeeksTable({ weeks }: NewTableProps) {
   const { getAssignmentsFromWeekRecordId, getPrivateCallsFromWeekRecordId } =
     useCoaching();
-
   const { contextual } = useContextualMenu();
+
   return (
     weeks && (
       <table>
@@ -40,9 +40,7 @@ export default function WeeksTable({ weeks }: NewTableProps) {
           {weeks.map((week) => (
             <>
               <tr key={week.recordId}>
-                <td>
-                  <StudentCell week={week} />
-                </td>
+                <td>{/* <StudentCell week={week} /> */}</td>
                 {/* <td>{week.level}</td> */}
                 {/* <td>
                 {week.primaryCoach.name

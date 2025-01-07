@@ -1,0 +1,137 @@
+{
+  "assignments": [
+    {
+      "assignmentType": "Pronunciation",
+      "homeworkCorrector": {
+        "email": "josiah@learncraftspanish.com",
+        "id": "",
+        "name": "Josiah Moser"
+      },
+      "assignmentLink": "",
+      "rating": "Excellent",
+      "areasOfDifficulty": "",
+      "notes": "",
+      "recordId": 999,
+      "relatedWeek": 148457,
+      "weekStarts": "2019-07-21"
+    }
+  ],
+  "calls": [
+    {
+      "rating": "Good",
+      "areasOfDifficulty": "",
+      "notes": "",
+      "recording": "https://thisIsMyLink.com",
+      "date": "2025-01-03",
+      "recordId": 40462,
+      "relatedWeek": 148457
+    }
+  ],
+  "groupAttendees": [
+    {
+      "weekStudent": "Love Corine",
+      "groupSessionDate": "2025-01-04",
+      "groupSession": 8653,
+      "recordId": 22983,
+      "student": 148457
+    }
+  ],
+  "groupSessions": [
+    {
+      "date": "2025-01-04",
+      "coach": {
+        "email": "minor_corinne53@mail.com",
+        "id": "76007814.dcwh",
+        "name": "Minor Corinne"
+      },
+      "zoomLink": "",
+      "topic": "Week 1 - Set B (I)",
+      "comments": "We caught up about new years",
+      "sessionType": "Level 4",
+      "recordId": 8653,
+      "relatedCoach": null,
+      "callDocument": "https://IAmALink.com"
+    }
+  ],
+  "activeMemberships": [
+    {
+      "recordId": 569,
+      "startDate": "2024-12-30",
+      "endDate": "2026-01-16",
+      "active": true,
+      "relatedCourse": 22,
+      "relatedStudent": 19,
+      "onHold": false,
+      "lastRecordedWeekStarts": "2025-01-05"
+    }
+  ],
+  "activeStudents": [
+    {
+      "recordId": 19,
+      "firstName": "Love",
+      "lastName": "Corine",
+      "fullName": "Love Corine",
+      "email": "love-corine69@hotmail.com",
+      "timeZone": "Pacific - US",
+      "usPhone": "",
+      "fluencyGoal": "I would like to fluent in one year.",
+      "startingLevel": "",
+      "primaryCoach": {
+        "email": "minor_corinne53@mail.com",
+        "id": "76007814.dcwh",
+        "name": "Minor Corinne"
+      }
+    }
+  ],
+  "courseList": [
+    {
+      "recordId": 22,
+      "name": "LCS Cohort",
+      "membershipType": "LCS Cohort",
+      "weeklyPrivateCalls": 1,
+      "hasGroupCalls": true
+    }
+  ],
+  "coachList": [
+    {
+      "recordId": 1,
+      "coach": "Minor",
+      "user": {
+        "email": "minor_corinne53@mail.com",
+        "id": "76007814.dcwh",
+        "name": "Minor Corinne"
+      }
+    }
+  ],
+  "lastThreeWeeks": [
+    {
+      "level": "LCS Cohort",
+      "weekStarts": "2025-01-05",
+      "assignmentRatings": ["Excellent"],
+      "privateCallRatings": ["Good"],
+      "numberOfGroupCalls": 0,
+      "groupCallComments": ["We caught up about new years"],
+      "currentLessonName": "",
+      "notes": "",
+      "holdWeek": false,
+      "recordsComplete": false,
+      "membershipStudentCallCreditsRemaining": 0,
+      "checklistComplete": false,
+      "combinedKeyForUniques": "569-0",
+      "currentLesson": null,
+      "endingThisWeek": false,
+      "membershipEndDate": "2026-01-16",
+      "membershipOnHold": false,
+      "membershipStudentMemberUntil": "2026-01-16",
+      "offTrack": false,
+      "primaryCoachWhenCreated": "",
+      "privateCallsCompleted": 1,
+      "recordCompletable": true,
+      "recordId": 148457,
+      "recordsCompleteRef": 0,
+      "relatedMembership": 569,
+      "week": 0,
+      "weekEnds": "2025-01-11"
+    }
+  ]
+}

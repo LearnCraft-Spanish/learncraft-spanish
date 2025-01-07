@@ -3,6 +3,7 @@ import { render, waitFor, screen } from '@testing-library/react';
 
 import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
 import StudentCell from './StudentCell';
+import mockDataHardCoded from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
 const exampleStudent = {
   recordId: 6746,
   firstName: 'Hunter',
@@ -21,13 +22,17 @@ const exampleStudent = {
 };
 // Needs membership table & activeStudents table to be mocked
 describe('component StudentCell', () => {
-  it('renders without crashing', () => {
+  it('renders without crashing', async () => {
     render(
       <MockAllProviders>
-        <StudentCell week={} />
+        <StudentCell week={mockDataHardCoded.lastThreeWeeks[0]} />
       </MockAllProviders>,
     );
     // Student Name related to the week record
-    expect(screen.getByText()).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText(mockDataHardCoded.activeStudents[0].fullName),
+      ).toBeInTheDocument();
+    });
   });
 });

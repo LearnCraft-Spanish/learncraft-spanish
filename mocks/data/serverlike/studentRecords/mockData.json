@@ -1,0 +1,427 @@
+{
+  "courseList": [
+    {
+      "recordId": 1,
+      "name": "Membership Program",
+      "membershipType": "Basic Membership Program",
+      "weeklyPrivateCalls": 0,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 14,
+      "name": "Standard",
+      "membershipType": "Private Coaching",
+      "weeklyPrivateCalls": 1,
+      "hasGroupCalls": true
+    },
+    {
+      "recordId": 15,
+      "name": "Premier",
+      "membershipType": "Private Coaching",
+      "weeklyPrivateCalls": 2,
+      "hasGroupCalls": true
+    },
+    {
+      "recordId": 16,
+      "name": "1-Month Challenge",
+      "membershipType": "1MC",
+      "weeklyPrivateCalls": 0,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 21,
+      "name": "Listening Comprehension",
+      "membershipType": "Listening Comprehension",
+      "weeklyPrivateCalls": 0,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 22,
+      "name": "LCS Cohort",
+      "membershipType": "LCS Cohort",
+      "weeklyPrivateCalls": 1,
+      "hasGroupCalls": true
+    },
+    {
+      "recordId": 23,
+      "name": "Standard: Private-Only",
+      "membershipType": "Weekly 1:1 Coaching ",
+      "weeklyPrivateCalls": 1,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 24,
+      "name": "Premier: Private-Only",
+      "membershipType": "",
+      "weeklyPrivateCalls": 2,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 25,
+      "name": "1-Month Challenge Deluxe",
+      "membershipType": "1MC Conversation",
+      "weeklyPrivateCalls": 0,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 26,
+      "name": "Ser/Estar Mini Course",
+      "membershipType": "",
+      "weeklyPrivateCalls": 0,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 27,
+      "name": "1MC With Coaching",
+      "membershipType": "",
+      "weeklyPrivateCalls": 1,
+      "hasGroupCalls": false
+    },
+    {
+      "recordId": 28,
+      "name": "Listening Comprehension with Coaching",
+      "membershipType": "Listening Comprehension",
+      "weeklyPrivateCalls": 0,
+      "hasGroupCalls": false
+    }
+  ],
+  "coachList": [
+    {
+      "recordId": 1,
+      "coach": "Minor",
+      "user": {
+        "email": "minor_corinne53@mail.com",
+        "id": "76007814.dcwh",
+        "name": "Minor Corinne"
+      }
+    },
+    {
+      "recordId": 2,
+      "coach": "Woodward",
+      "user": {
+        "email": "woodward-dorris81@aol.com",
+        "id": "76457430.uhgh",
+        "name": "Woodward Dorris"
+      }
+    },
+    {
+      "recordId": 4,
+      "coach": "Dayne",
+      "user": {
+        "email": "dayne_turner24@yahoo.com",
+        "id": "56515886.j0ep",
+        "name": "Dayne Turner"
+      }
+    },
+    {
+      "recordId": 5,
+      "coach": "Deontae",
+      "user": {
+        "email": "deontae-prescott90@aol.com",
+        "id": "68920283.ef8n",
+        "name": "Deontae Prescott"
+      }
+    },
+    {
+      "recordId": 6,
+      "coach": "Goins",
+      "user": {
+        "email": "goins-derik96@yahoo.com",
+        "id": "68187537.b7pb",
+        "name": "Goins Derik"
+      }
+    },
+    {
+      "recordId": 7,
+      "coach": "Caudill",
+      "user": {
+        "email": "caudill-theadore31@mail.com",
+        "id": "72217495.b7w3",
+        "name": "Caudill Theadore"
+      }
+    },
+    {
+      "recordId": 9,
+      "coach": "Jonah",
+      "user": {
+        "email": "jonah-herbert6@aol.com",
+        "id": "70640957.9dbt",
+        "name": "Jonah Herbert"
+      }
+    },
+    {
+      "recordId": 10,
+      "coach": "Selene",
+      "user": {
+        "email": "selene-cummings98@mail.com",
+        "id": "85389926.5q7p",
+        "name": "Selene Cummings"
+      }
+    },
+    {
+      "recordId": 11,
+      "coach": "Lacey",
+      "user": {
+        "email": "lacey_pate68@aol.com",
+        "id": "48668784.jimy",
+        "name": "Lacey Pate"
+      }
+    },
+    {
+      "recordId": 12,
+      "coach": "Sandoval",
+      "user": {
+        "email": "sandoval_dahlia86@outlook.com",
+        "id": "78410737.t9lx",
+        "name": "Sandoval Dahlia"
+      }
+    },
+    {
+      "recordId": 13,
+      "coach": "Mccord",
+      "user": {
+        "email": "mccord-pierce54@mail.com",
+        "id": "10560696.w04u",
+        "name": "Mccord Pierce"
+      }
+    },
+    {
+      "recordId": 14,
+      "coach": "Hayden",
+      "user": {
+        "email": "hayden_esteban95@outlook.com",
+        "id": "43256145.xyia",
+        "name": "Hayden Esteban"
+      }
+    },
+    {
+      "recordId": 15,
+      "coach": "Winfred",
+      "user": {
+        "email": "winfred-shannon8@gmail.com",
+        "id": "47378555.g41q",
+        "name": "Winfred Shannon"
+      }
+    },
+    {
+      "recordId": 16,
+      "coach": "Alek",
+      "user": {
+        "email": "alek_reed9@hotmail.com",
+        "id": "91632681.x6i0",
+        "name": "Alek Reed"
+      }
+    },
+    {
+      "recordId": 17,
+      "coach": "Luz",
+      "user": {
+        "email": "luz-swanson37@hotmail.com",
+        "id": "70732617.0lza",
+        "name": "Luz Swanson"
+      }
+    },
+    {
+      "recordId": 21,
+      "coach": "Fabiola",
+      "user": {
+        "email": "fabiola_parra3@outlook.com",
+        "id": "31191902.9c15",
+        "name": "Fabiola Parra"
+      }
+    },
+    {
+      "recordId": 23,
+      "coach": "Woody",
+      "user": {
+        "email": "woody-libby72@outlook.com",
+        "id": "66653060.v7os",
+        "name": "Woody Libby"
+      }
+    },
+    {
+      "recordId": 24,
+      "coach": "Georgianna",
+      "user": {
+        "email": "georgianna_stahl75@aol.com",
+        "id": "34637944.guim",
+        "name": "Georgianna Stahl"
+      }
+    },
+    {
+      "recordId": 25,
+      "coach": "Fowler",
+      "user": {
+        "email": "fowler_goldie29@gmail.com",
+        "id": "80677385.w5ns",
+        "name": "Fowler Goldie"
+      }
+    },
+    {
+      "recordId": 26,
+      "coach": "Brett",
+      "user": {
+        "email": "brett-rhodes37@outlook.com",
+        "id": "79014650.kq89",
+        "name": "Brett Rhodes"
+      }
+    },
+    {
+      "recordId": 27,
+      "coach": "Ryan",
+      "user": {
+        "email": "ryan-fair44@gmail.com",
+        "id": "62176229.nu2g",
+        "name": "Ryan Fair"
+      }
+    },
+    {
+      "recordId": 28,
+      "coach": "Obrien",
+      "user": {
+        "email": "obrien-eugene94@outlook.com",
+        "id": "11885730.4ky1",
+        "name": "Obrien Eugene"
+      }
+    },
+    {
+      "recordId": 29,
+      "coach": "Kari",
+      "user": {
+        "email": "kari-hoyt30@gmail.com",
+        "id": "98063826.u40g",
+        "name": "Kari Hoyt"
+      }
+    },
+    {
+      "recordId": 30,
+      "coach": "Maya",
+      "user": {
+        "email": "maya-scott2@hotmail.com",
+        "id": "28608635.boq0",
+        "name": "Maya Scott"
+      }
+    },
+    {
+      "recordId": 31,
+      "coach": "Marin",
+      "user": {
+        "email": "marin_barney48@aol.com",
+        "id": "61227760.aj0c",
+        "name": "Marin Barney"
+      }
+    },
+    {
+      "recordId": 32,
+      "coach": "Arthur",
+      "user": {
+        "email": "arthur_rodney22@aol.com",
+        "id": "49005336.6wg4",
+        "name": "Arthur Rodney"
+      }
+    },
+    {
+      "recordId": 33,
+      "coach": "Walter",
+      "user": {
+        "email": "walter-odin32@outlook.com",
+        "id": "37991060.je2n",
+        "name": "Walter Odin"
+      }
+    },
+    {
+      "recordId": 34,
+      "coach": "Deidra",
+      "user": {
+        "email": "deidra_ramos45@gmail.com",
+        "id": "34759996.b6d3",
+        "name": "Deidra Ramos"
+      }
+    },
+    {
+      "recordId": 35,
+      "coach": "Cassidy",
+      "user": {
+        "email": "cassidy-nicolas96@yahoo.com",
+        "id": "28863885.9l5t",
+        "name": "Cassidy Nicolas"
+      }
+    },
+    {
+      "recordId": 36,
+      "coach": "Kurtz",
+      "user": {
+        "email": "kurtz-tucker94@gmail.com",
+        "id": "28751390.npn3",
+        "name": "Kurtz Tucker"
+      }
+    },
+    {
+      "recordId": 37,
+      "coach": "Luella",
+      "user": {
+        "email": "luella-mathews4@hotmail.com",
+        "id": "55130622.l87x",
+        "name": "Luella Mathews"
+      }
+    },
+    {
+      "recordId": 38,
+      "coach": "Antony",
+      "user": {
+        "email": "antony-stephenson82@outlook.com",
+        "id": "47881575.c4wy",
+        "name": "Antony Stephenson"
+      }
+    }
+  ],
+  "weeksList": [
+    {
+      "level": "LCS Cohort",
+      "weekStarts": "2025-01-05",
+      "assignmentRatings": [],
+      "privateCallRatings": [],
+      "numberOfGroupCalls": 0,
+      "groupCallComments": [],
+      "currentLessonName": "",
+      "notes": "",
+      "holdWeek": false,
+      "recordsComplete": false,
+      "membershipStudentCallCreditsRemaining": 0,
+      "checklistComplete": false,
+      "combinedKeyForUniques": "13559-0",
+      "currentLesson": null,
+      "endingThisWeek": false,
+      "membershipEndDate": "2026-01-16",
+      "membershipOnHold": false,
+      "membershipStudentMemberUntil": "2026-01-16",
+      "offTrack": false,
+      "primaryCoachWhenCreated": "",
+      "privateCallsCompleted": 0,
+      "recordCompletable": true,
+      "recordId": 148457,
+      "recordsCompleteRef": 0,
+      "relatedMembership": 13559,
+      "week": 0,
+      "weekEnds": "2025-01-11"
+    }
+  ],
+  "activeStudents": [
+    {
+      "recordId": 21,
+      "firstName": "Gary",
+      "lastName": "Yeatts",
+      "fullName": "Gary Yeatts",
+      "email": "gyeatts@gmail.com",
+      "timeZone": "Pacific - US",
+      "usPhone": "(916) 797-1377",
+      "fluencyGoal": "I would like to fluent in one year.",
+      "startingLevel": "",
+      "primaryCoach": {
+        "email": "caro@learncraftspanish.com",
+        "id": "62219456.ifk2",
+        "name": "Carolina Vega"
+      }
+    }
+  ]
+}
