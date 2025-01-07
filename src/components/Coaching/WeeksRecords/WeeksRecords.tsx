@@ -93,6 +93,9 @@ export default function WeeksRecordsSection() {
   function updateFilterHoldWeeks(value: boolean) {
     setFilterByHoldWeeks(value);
   }
+  function toggleAdvancedFilteringMenu() {
+    setAdvancedFilteringMenu(!advancedFilteringMenu);
+  }
 
   function filterByCoachFunction(weeks: Week[]) {
     if (!filterByCoach) return weeks;
@@ -154,9 +157,7 @@ export default function WeeksRecordsSection() {
       const currentUserCoach = coachListQuery.data.find(
         (coach) => coach.user.email === currentUser?.emailAddress,
       );
-      if (currentUserCoach) {
-        setFilterByCoach(currentUserCoach);
-      }
+      if (currentUserCoach) setFilterByCoach(currentUserCoach);
       rendered.current = true;
     }
   }, [userDataQuery.isSuccess, lastThreeWeeksQuery]);
@@ -190,9 +191,7 @@ export default function WeeksRecordsSection() {
               updateCourseFilter={updateCourseFilter}
               updateWeeksAgoFilter={updateWeeksAgoFilter}
               advancedFilteringMenu={advancedFilteringMenu}
-              toggleAdvancedFilteringMenu={() =>
-                setAdvancedFilteringMenu(!advancedFilteringMenu)
-              }
+              toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
             />
           </div>
           <div className="tableWrapper">

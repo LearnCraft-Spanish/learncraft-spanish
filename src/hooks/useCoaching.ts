@@ -123,29 +123,26 @@ export default function useCoaching() {
     return course;
   }
 
-  const getStudentFromMembershipId = useCallback(
-    (membershipId: number | undefined) => {
-      if (
-        !activeMembershipsQuery.isSuccess ||
-        !activeStudentsQuery.isSuccess ||
-        !membershipId
-      ) {
-        return null;
-      }
-      const membership = activeMembershipsQuery.data.find(
-        (item) => item.recordId === membershipId,
-      );
-      if (!membership) return undefined;
+  function getStudentFromMembershipId(membershipId: number | undefined) {
+    if (
+      !activeMembershipsQuery.isSuccess ||
+      !activeStudentsQuery.isSuccess ||
+      !membershipId
+    ) {
+      return null;
+    }
+    const membership = activeMembershipsQuery.data.find(
+      (item) => item.recordId === membershipId,
+    );
+    if (!membership) return undefined;
 
-      const studentId = membership.relatedStudent;
-      const student = activeStudentsQuery.data.find(
-        (item) => item.recordId === studentId,
-      );
-      if (!student) return undefined;
-      return student;
-    },
-    [activeMembershipsQuery, activeStudentsQuery],
-  );
+    const studentId = membership.relatedStudent;
+    const student = activeStudentsQuery.data.find(
+      (item) => item.recordId === studentId,
+    );
+    if (!student) return undefined;
+    return student;
+  }
 
   function getAttendeeWeeksFromGroupSessionId(sessionId: number) {
     if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
@@ -226,7 +223,8 @@ export default function useCoaching() {
   /* --------- Other Helper Functions --------- */
   function dateObjectToText(dateObject: Date) {
     function formatMonth(date: Date) {
-      const unformattedMonth = date.getMonth() + 1;
+      // const unformattedMonth = date.getMonth() + 1; // Found it like this, ask Josiash if intentional?
+      const unformattedMonth = date.getMonth();
       return unformattedMonth < 10
         ? `0${unformattedMonth}`
         : `${unformattedMonth}`;

@@ -141,7 +141,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                 </p>
               </div>
               <div>
-                <h4>Attendees:</h4>
+                {/* <h4>Attendees:</h4>
                 <div className="groupAttendeeList">
                   {getAttendeesFromGroupSessionId(groupSession.recordId)?.map(
                     (attendee) =>
@@ -150,8 +150,8 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                       ) : (
                         'no student found'
                       ),
-                  )}
-                  {/*
+                  )} */}
+                {/*
                 {attendeesWeekRecords &&
                   attendeesWeekRecords.map(
                     (attendee: Week | undefined) =>
@@ -176,32 +176,32 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                     // </button>
                   )}
                   */}
-                </div>
               </div>
-              <div>
-                {(groupSession.callDocument || groupSession.zoomLink) && (
-                  <>
-                    <h4>Session Resources:</h4>
-                    {groupSession.callDocument &&
-                      groupSession.callDocument.length > 0 && (
-                        <p>
-                          <a target="_blank" href={groupSession.callDocument}>
-                            Call Document
-                          </a>
-                        </p>
-                      )}
-                    {groupSession.zoomLink &&
-                      groupSession.zoomLink.length > 0 && (
-                        <p>
-                          <a target="_blank" href={groupSession.zoomLink}>
-                            Recording Link
-                          </a>
-                        </p>
-                      )}
-                  </>
-                )}
-              </div>
-              {/* <div className="buttonBox">
+            </div>
+            <div>
+              {(groupSession.callDocument || groupSession.zoomLink) && (
+                <>
+                  <h4>Session Resources:</h4>
+                  {groupSession.callDocument &&
+                    groupSession.callDocument.length > 0 && (
+                      <p>
+                        <a target="_blank" href={groupSession.callDocument}>
+                          Call Document
+                        </a>
+                      </p>
+                    )}
+                  {groupSession.zoomLink &&
+                    groupSession.zoomLink.length > 0 && (
+                      <p>
+                        <a target="_blank" href={groupSession.zoomLink}>
+                          Recording Link
+                        </a>
+                      </p>
+                    )}
+                </>
+              )}
+            </div>
+            {/* <div className="buttonBox">
                 <button
                   type="button"
                   className="redButton"
@@ -210,7 +210,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
                   Close
                 </button>
               </div> */}
-            </div>
+            {/* </div> */}
           </div>
         )}
         {/* {contextual ===
