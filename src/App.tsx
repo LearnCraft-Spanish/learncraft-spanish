@@ -3,21 +3,20 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Route, useLocation } from 'react-router-dom';
 import type { UserData } from './interfaceDefinitions';
 
-import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview';
+import AudioBasedReview from './sections/AudioBasedReview';
 import Loading from './components/Loading';
 import Nav from './components/Nav';
 import FlashcardFinder from './components/FlashcardFinder';
-import FlashcardManager from './FlashcardManager';
-import FrequenSay from './FrequenSay';
+import FlashcardManager from './sections/FlashcardManager';
+import FrequenSay from './sections/FrequenSay';
 import SentryRoutes from './functions/SentryRoutes';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import useAuth from './hooks/useAuth';
 import { useUserData } from './hooks/useUserData';
-import LCSPQuizApp from './components/OfficialQuizzing/LCSPQuizApp';
-import Menu from './Menu';
+import LCSPQuizApp from './sections/LCSPQuizApp';
+import Menu from './sections/Menu';
 import NotFoundPage from './NotFoundPage';
-import ReviewMyFlashcards from './ReviewMyFlashcards';
-import Coaching from './components/Coaching/old/_Coaching';
+import ReviewMyFlashcards from './sections/ReviewMyFlashcards';
 import WeeksRecordsSection from './components/Coaching/WeeksRecords/WeeksRecords';
 import './App.css';
 import ExampleCreator from './components/ExampleCreator/ExampleCreator';
@@ -256,13 +255,6 @@ export const App: React.FC = () => {
           path="/exampleeditor"
           element={userDataQuery.data?.isAdmin && <ExampleEditor />}
         />
-        {
-          // Coaching Section still under construction
-          <Route
-            path="/coaching-depricated"
-            element={userDataQuery.data?.isAdmin && <Coaching />}
-          />
-        }
         <Route
           path="/newcoaching"
           element={userDataQuery.data?.isAdmin && <WeeksRecordsSection />}

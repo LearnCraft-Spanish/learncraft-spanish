@@ -569,14 +569,8 @@ button:hover,
   z-index: 5;
 } */
 /* progressBar & progressBar2 are almost legacy */
-/* Remove once all instances of QuizProgress are replaced with NewQuizProgress */
-.progressBar,
-.progressBar2 {
-  display: block;
-  text-align: center;
-  justify-self: center;
-}
 
+/* This is for the visual overlay for AudioFlashcard */
 .progressStatus {
   position: absolute;
   top: 0px;

@@ -1,0 +1,117 @@
+/* AudioQuizButtons */
+.audioQuizButtons {
+  min-width: 320px;
+  width: 50vw;
+}
+button:disabled {
+  background-color: grey;
+  color: var(--light);
+  cursor: not-allowed;
+}
+@media (max-width: 480px) {
+  .audioQuizButtons {
+    min-width: 0;
+    width: 90vw;
+  }
+  .switchOnMobile {
+    flex-direction: column-reverse;
+  }
+  .switchOnMobile button {
+    margin-top: 12px;
+  }
+}
+
+/* AudioFlashcardComponent */
+.audioFlashcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  text-align: center;
+  color: var(--light) !important;
+  background-color: var(--dark);
+  max-width: 640px;
+  width: 80vw;
+  height: 320px;
+  margin: 0 auto;
+  margin-top: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.audioPlayPauseButton {
+  background-color: transparent;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.audioPlayPauseButton img {
+  width: 24px;
+  height: 24px;
+}
+
+.audioFlashcard p {
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin: 0;
+  padding: 10%;
+  z-index: 5;
+}
+
+.progressStatus {
+  z-index: 1;
+}
+
+@media screen and (max-width: 480px) {
+  .audioFlashcard {
+    min-height: 200px;
+    max-height: 320px;
+    height: 80vw;
+    margin-top: 10vw;
+  }
+  .audioFlashcard p {
+    font-size: 1.125rem;
+  }
+}
+
+/* AudioQuizSetupMenu */
+.audioQuizSetupMenu {
+  max-width: 400px;
+  width: 80vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.audioQuizSetupMenu div.form {
+  max-width: 320px;
+  width: 90%;
+}
+
+.menuRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.audioQuizSetupMenu .buttonBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+.audioQuizSetupMenu .buttonBox p {
+  margin: 16px auto;
+}
+@media (max-width: 480px) {
+  .audioQuizSetupMenu {
+    width: 98vw;
+  }
+}
