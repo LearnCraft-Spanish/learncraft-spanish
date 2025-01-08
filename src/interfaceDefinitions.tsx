@@ -103,11 +103,6 @@ export type ActiveStudent = UserData | null;
 // export type AudioExamplesTable = Array<AudioExample>;
 export type AudioExamplesTable = Array<Flashcard>;
 
-export interface Spelling {
-  relatedWordIdiom: number;
-  spellingOption: string;
-}
-
 export interface Vocabulary {
   recordId: number;
   wordIdiom: string;
@@ -142,13 +137,24 @@ export interface Quiz {
   subtitle: string;
 }
 
+export interface QuizUnparsed {
+  quizNickname: string;
+  recordId: number;
+}
+
 export interface QuizExamplesTable {
   quizNickname: string;
   quizExamplesTable: Flashcard[];
 }
 
+// Old Spelling
+// export interface Spelling {
+//   relatedWordidiom: number;
+//   spellingOption: string;
+// }
+// New Spelling
 export interface Spelling {
-  relatedWordidiom: number;
+  relatedWordIdiom: number;
   spellingOption: string;
 }
 
