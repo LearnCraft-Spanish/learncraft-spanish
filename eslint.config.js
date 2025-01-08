@@ -42,7 +42,7 @@ export default antfu(
       'pnpm-lock.yaml',
       'src/components/Coaching',
       'node_modules/',
-      'src/mocks/data/serverlike/actualServerData.json',
+      '**/mocks/data/**/*.js',
       '*.yml',
     ],
   },

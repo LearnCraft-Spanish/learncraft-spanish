@@ -59,6 +59,19 @@ describe('component QuizSetupMenu', () => {
         expect(screen.getByText(option, { exact: false })).toBeInTheDocument();
       });
     });
+
+    it('default quiz menu shows options going up to length of examples', async () => {
+      await successfulRender();
+      await waitFor(() => {
+        const select = screen.getByLabelText(/number of flashcards:/i);
+        const options = select.querySelectorAll('option');
+        const optionValues = Array.from(options).map((option) => option.value);
+        // @ts-expect-error - I am confident optionValues will have at least one element
+        expect(Number.parseInt(optionValues.at(-1))).toBe(
+          defaultProps.examplesToParse?.length,
+        );
+      });
+    });
   });
   describe('custom flashcards', () => {
     it('has no custom flashcards, so customOnly is not rendered', async () => {
@@ -122,6 +135,7 @@ describe('component QuizSetupMenu', () => {
         const select = screen.getByLabelText(/number of flashcards:/i);
         const options = select.querySelectorAll('option');
         const optionValues = Array.from(options).map((option) => option.value);
+
         // @ts-expect-error - I am confident optionValues will have at least one element
         expect(Number.parseInt(optionValues.at(-1))).toBeLessThan(
           initialLength,

@@ -97,7 +97,7 @@ function generateLastThreeWeeksDates() {
     /* upcoming week                            | most recent sunday (this week) | 1/05
     */
   }
-  console.log(makeDateRange());
+  // console.log(makeDateRange());
 }
 
 generateLastThreeWeeksDates();
