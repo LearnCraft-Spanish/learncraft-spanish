@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { get } from 'lodash';
 import type * as types from '../interfaceDefinitions';
 import type * as StudentRecordsTypes from '../components/Coaching/CoachingTypes';
 import useAuth from './useAuth';

@@ -37,7 +37,7 @@ const exampleStartingLevels = [
 ];
 function generateActiveStudentsData({ coachList, numberOfRecords }) {
   if (numberOfRecords > fakePeopleList.length) {
-    throw Error(
+    throw new Error(
       'numberOfRecords requested is larger than the number of fakePeople we have prepared!',
     );
   }
