@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import type { Flashcard } from '../interfaceDefinitions';
+import type { Flashcard } from '../types/interfaceDefinitions';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../hooks/useActiveStudent';
 

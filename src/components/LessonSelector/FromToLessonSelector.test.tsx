@@ -12,7 +12,7 @@ import { useProgramTable } from '../../hooks/useProgramTable';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { getUserDataFromName } from '../../../mocks/data/serverlike/studentTable';
 
-import type { Lesson } from '../../interfaceDefinitions';
+import type { Lesson } from '../../types/interfaceDefinitions';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import FromToLessonSelector from './FromToLessonSelector';
 

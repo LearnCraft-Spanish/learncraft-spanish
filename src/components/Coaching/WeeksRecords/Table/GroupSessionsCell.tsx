@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { GroupSession, Week } from './../../CoachingTypes';
+import type { GroupSession, Week } from '../../../../types/CoachingTypes';
 
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
@@ -127,7 +127,7 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
               <div>
                 {(groupSession.callDocument || groupSession.zoomLink) && (
                   <>
-                    <h4>Session Resources:</h4>
+                    <h4>Session assets:</h4>
                     {groupSession.callDocument &&
                       groupSession.callDocument.length > 0 && (
                         <p>

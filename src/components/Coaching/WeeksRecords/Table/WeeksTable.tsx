@@ -1,4 +1,4 @@
-import type { Week } from './../../CoachingTypes';
+import type { Week } from '../../../../types/CoachingTypes';
 import GroupSessionsCell from './GroupSessionsCell';
 import useCoaching from '../../../../hooks/useCoaching';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
@@ -6,7 +6,7 @@ import AssignmentsCell from './AssignmentsCell';
 import PrivateCallsCell from './PrivateCallsCell';
 import StudentCell from './StudentCell';
 import ViewWeekRecord from '../ViewWeekRecord';
-import checkmark from '../../../../resources/icons/checkmark_green.svg';
+import checkmark from '../../../../assets/icons/checkmark_green.svg';
 
 interface NewTableProps {
   weeks: Week[] | undefined;

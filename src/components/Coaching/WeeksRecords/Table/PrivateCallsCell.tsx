@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Call, Week } from '../../CoachingTypes';
+import type { Call, Week } from '../../../../types/CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
 import ContextualControlls from '../../../ContextualControlls';

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 
-import type { Flashcard } from '../../../interfaceDefinitions';
+import type { Flashcard } from '../../../types/interfaceDefinitions';
 import { useStudentFlashcards } from '../../../hooks/useStudentFlashcards';
 
 interface QuizButtonsProps {
@@ -132,14 +132,14 @@ export default function SRSQuizButtons({
           <button
             type="button"
             className="redButton"
-            onClick={increaseDifficulty}
+            onClick={decreaseDifficulty}
           >
             This was hard
           </button>
           <button
             type="button"
             className="greenButton"
-            onClick={decreaseDifficulty}
+            onClick={increaseDifficulty}
           >
             This was easy
           </button>

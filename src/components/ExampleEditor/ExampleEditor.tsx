@@ -3,7 +3,7 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
-import type { Vocabulary } from '../../interfaceDefinitions';
+import type { Vocabulary } from '../../types/interfaceDefinitions';
 import { useVocabulary } from '../../hooks/useVocabulary';
 import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';

@@ -1,6 +1,6 @@
-import play from '../../../resources/icons/play.svg';
-import pause from '../../../resources/icons/pause.svg';
-import type { Flashcard } from '../../../interfaceDefinitions';
+import play from '../../../assets/icons/play.svg';
+import pause from '../../../assets/icons/pause.svg';
+import type { Flashcard } from '../../../types/interfaceDefinitions';
 import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 interface AudioFlashcardProps {
   currentExampleText: string | JSX.Element;

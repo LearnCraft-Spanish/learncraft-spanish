@@ -1,6 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react'; // Adjust the import based on your project structure
-import type { Lesson, Program, ProgramUnparsed } from '../interfaceDefinitions';
+import type {
+  Lesson,
+  Program,
+  ProgramUnparsed,
+} from '../types/interfaceDefinitions';
 import { useBackend } from '../hooks/useBackend';
 import useAuth from '../hooks/useAuth';
 

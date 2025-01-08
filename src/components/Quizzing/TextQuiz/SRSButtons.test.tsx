@@ -1,8 +1,8 @@
 import { cleanup, render, screen } from '@testing-library/react';
 
-import React from 'react';
+import React, { act } from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import type { Flashcard } from '../../../interfaceDefinitions';
+import type { Flashcard } from '../../../types/interfaceDefinitions';
 import { sampleStudentFlashcardData } from '../../../../tests/mockData';
 
 import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
@@ -90,7 +90,7 @@ describe('component SRSButtons', () => {
           />
         </MockAllProviders>,
       );
-      screen.getByText('This was hard').click();
+      screen.getByText('This was easy').click();
       expect(incrementExampleNumber).toHaveBeenCalled();
     });
     it('decreaseDifficulty', () => {
@@ -103,7 +103,9 @@ describe('component SRSButtons', () => {
           />
         </MockAllProviders>,
       );
-      screen.getByText('This was easy').click();
+      act(() => {
+        screen.getByText('This was hard').click();
+      });
       expect(incrementExampleNumber).toHaveBeenCalled();
     });
   });

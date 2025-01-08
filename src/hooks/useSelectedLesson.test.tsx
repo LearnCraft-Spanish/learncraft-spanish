@@ -18,7 +18,7 @@ import MockQueryClientProvider from '../../mocks/Providers/MockQueryClient';
 import { setupMockAuth } from '../../tests/setupMockAuth';
 
 // Types
-import type { UserData } from '../interfaceDefinitions';
+import type { UserData } from '../types/interfaceDefinitions';
 
 import { useSelectedLesson } from './useSelectedLesson';
 

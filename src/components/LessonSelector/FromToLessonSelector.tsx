@@ -1,4 +1,4 @@
-import type { Lesson, Program } from '../../interfaceDefinitions';
+import type { Lesson, Program } from '../../types/interfaceDefinitions';
 import { useProgramTable } from '../../hooks/useProgramTable';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import './LessonSelector.css';

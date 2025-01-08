@@ -14,7 +14,7 @@
 }
 
 body {
-  background-image: url('./resources/paper-small.jpeg');
+  background-image: url('./assets/paper-small.jpeg');
 }
 
 a {
@@ -1224,7 +1224,7 @@ i {
   }
 
   .div-header.homeButton {
-    background-image: url('./resources/icons8-home-24.png');
+    background-image: url('./assets/icons8-home-24.png');
   } */
 
 /*  FrequenSay */

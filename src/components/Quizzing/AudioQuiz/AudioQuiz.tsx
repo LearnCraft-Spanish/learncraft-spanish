@@ -6,7 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Flashcard } from '../../../interfaceDefinitions';
+import type { Flashcard } from '../../../types/interfaceDefinitions';
 import { fisherYatesShuffle } from '../../../functions/fisherYatesShuffle';
 import { useActiveStudent } from '../../../hooks/useActiveStudent';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';

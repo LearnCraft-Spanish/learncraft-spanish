@@ -1,11 +1,9 @@
 type stepValues = 'question' | 'guess' | 'hint' | 'answer';
 interface AudioQuizButtonsProps {
   audioOrComprehension: 'audio' | 'comprehension';
-  // currentStep: 'question' | 'guess' | 'hint' | 'answer'
-  currentStep: 'question' | 'guess' | 'hint' | 'answer';
+  currentStep: stepValues;
   incrementCurrentStep: () => void;
   autoplay: boolean;
-  // customIncrementCurrentStep: (step: 'question' | 'guess' | 'hint' | 'answer') => void
   customIncrementCurrentStep: (step: stepValues) => void;
   decrementExample: () => void;
   incrementExample: () => void;

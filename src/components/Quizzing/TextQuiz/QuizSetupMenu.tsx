@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useStudentFlashcards } from '../../../hooks/useStudentFlashcards';
 import MenuButton from '../../Buttons/MenuButton';
-import type { StudentExample } from '../../../interfaceDefinitions';
+import type { StudentExample } from '../../../types/interfaceDefinitions';
 
 interface QuizSetupMenuProps {
   examplesToParse: StudentExample[] | undefined;

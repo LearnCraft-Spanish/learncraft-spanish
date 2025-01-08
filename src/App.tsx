@@ -1,26 +1,15 @@
 import type { ReactElement } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Route, useLocation } from 'react-router-dom';
-import type { UserData } from './interfaceDefinitions';
+import { useLocation } from 'react-router-dom';
+import type { UserData } from './types/interfaceDefinitions';
 
-import AudioBasedReview from './sections/AudioBasedReview';
 import Loading from './components/Loading';
 import Nav from './components/Nav';
-import FlashcardFinder from './components/FlashcardFinder';
-import FlashcardManager from './sections/FlashcardManager';
-import FrequenSay from './sections/FrequenSay';
-import SentryRoutes from './functions/SentryRoutes';
 import { useActiveStudent } from './hooks/useActiveStudent';
 import useAuth from './hooks/useAuth';
 import { useUserData } from './hooks/useUserData';
-import LCSPQuizApp from './sections/LCSPQuizApp';
-import Menu from './sections/Menu';
-import NotFoundPage from './NotFoundPage';
-import ReviewMyFlashcards from './sections/ReviewMyFlashcards';
-import WeeksRecordsSection from './components/Coaching/WeeksRecords/WeeksRecords';
+import AppRoutes from './routes/AppRoutes';
 import './App.css';
-import ExampleCreator from './components/ExampleCreator/ExampleCreator';
-import ExampleEditor from './components/ExampleEditor/ExampleEditor';
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -205,62 +194,7 @@ export const App: React.FC = () => {
       {!isLoading && isAuthenticated && userDataQuery.isError && (
         <h2>Error loading user data.</h2>
       )}
-      <SentryRoutes>
-        <Route path="/" element={<Menu />} />
-        {/* <Route path="/callback" element={<CallbackPage />} /> */}
-        <Route path="/myflashcards/*" element={<ReviewMyFlashcards />} />
-        <Route path="/manage-flashcards" element={<FlashcardManager />} />
-        (
-        <Route path="/officialquizzes/*" element={<LCSPQuizApp />} />
-        )
-        <Route
-          path="/flashcardfinder"
-          element={
-            (userDataQuery.data?.role === 'student' ||
-              userDataQuery.data?.isAdmin) && <FlashcardFinder />
-          }
-        />
-        <Route
-          path="/audioquiz/*"
-          element={
-            (userDataQuery.data?.role === 'student' ||
-              userDataQuery.data?.role === 'limited' ||
-              userDataQuery.data?.isAdmin) && (
-              <AudioBasedReview audioOrComprehension="audio" willAutoplay />
-            )
-          }
-        />
-        <Route
-          path="/comprehensionquiz/*"
-          element={
-            (userDataQuery.data?.role === 'student' ||
-              userDataQuery.data?.role === 'limited' ||
-              userDataQuery.data?.isAdmin) && (
-              <AudioBasedReview
-                audioOrComprehension="comprehension"
-                willAutoplay={false}
-              />
-            )
-          }
-        />
-        <Route
-          path="/frequensay"
-          element={userDataQuery.data?.isAdmin && <FrequenSay />}
-        />
-        <Route
-          path="/examplecreator"
-          element={userDataQuery.data?.isAdmin && <ExampleCreator />}
-        />
-        <Route
-          path="/exampleeditor"
-          element={userDataQuery.data?.isAdmin && <ExampleEditor />}
-        />
-        <Route
-          path="/newcoaching"
-          element={userDataQuery.data?.isAdmin && <WeeksRecordsSection />}
-        />
-        <Route path="/*" element={<NotFoundPage />} />
-      </SentryRoutes>
+      <AppRoutes />
     </div>
   );
 };

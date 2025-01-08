@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import type { Flashcard, Quiz } from '../interfaceDefinitions';
+import type { Flashcard, Quiz } from '../types/interfaceDefinitions';
 import useAuth from './useAuth';
 import { useBackend } from './useBackend';
 

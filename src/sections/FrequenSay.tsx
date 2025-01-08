@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import type { Vocabulary } from '../interfaceDefinitions';
+import type { Vocabulary } from '../types/interfaceDefinitions';
 
 import { FromToLessonSelector } from '../components/LessonSelector';
 import { useBackend } from '../hooks/useBackend';

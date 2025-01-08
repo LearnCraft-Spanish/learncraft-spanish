@@ -6,7 +6,7 @@ import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import serverlikeData from '../../../mocks/data/serverlike/serverlikeData';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 
-import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
+import type { DisplayOrder, Flashcard } from '../../types/interfaceDefinitions';
 import { setupMockAuth } from '../../../tests/setupMockAuth';
 import ExamplesTable from './ExamplesTable';
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;

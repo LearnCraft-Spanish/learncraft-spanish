@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useUserData } from '../../../hooks/useUserData';
 import useCoaching from '../../../hooks/useCoaching';
 
-import type { Week, Coach, Course } from './../CoachingTypes';
+import type { Week, Coach, Course } from '../../../types/CoachingTypes';
 
 import LoadingMessage from '../../Loading';
 import WeeksTable from './Table/WeeksTable';

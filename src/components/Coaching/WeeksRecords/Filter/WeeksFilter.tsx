@@ -7,7 +7,7 @@ import type {
   Student,
   Course,
   Membership,
-} from '../../CoachingTypes';
+} from '../../../../types/CoachingTypes';
 
 import useCoaching from '../../../../hooks/useCoaching';
 

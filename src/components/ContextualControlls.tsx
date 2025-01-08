@@ -1,5 +1,5 @@
 import { useContextualMenu } from '../hooks/useContextualMenu';
-import x from '../resources/icons/x.svg';
+import x from '../assets/icons/x.svg';
 export default function ContextualControlls() {
   const { closeContextual } = useContextualMenu();
   return (

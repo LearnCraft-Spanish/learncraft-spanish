@@ -3,7 +3,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
-import type { QuizExamplesTable, QuizUnparsed } from '../interfaceDefinitions';
+import type {
+  QuizExamplesTable,
+  QuizUnparsed,
+} from '../types/interfaceDefinitions';
 import MockAllProviders from '../../mocks/Providers/MockAllProviders';
 import { setupMockAuth } from '../../tests/setupMockAuth';
 

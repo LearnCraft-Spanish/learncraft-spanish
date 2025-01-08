@@ -1,4 +1,4 @@
-import type { Week } from '../CoachingTypes';
+import type { Week } from '../../../types/CoachingTypes';
 import ContextualControlls from '../../ContextualControlls';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
 export default function ViewWeekRecord({ week }: { week: Week }) {

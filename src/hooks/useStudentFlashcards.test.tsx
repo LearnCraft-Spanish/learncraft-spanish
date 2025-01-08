@@ -6,7 +6,7 @@ import { allStudentsTable } from '../../mocks/data/serverlike/studentTable';
 import { setupMockAuth } from '../../tests/setupMockAuth';
 import { examples } from '../../mocks/data/examples.json';
 
-import type { mockUserNames } from '../interfaceDefinitions';
+import type { mockUserNames } from '../types/interfaceDefinitions';
 
 import { useStudentFlashcards } from './useStudentFlashcards';
 async function renderHookSuccessfully() {
