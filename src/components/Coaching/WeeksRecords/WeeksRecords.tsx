@@ -9,7 +9,7 @@ import LoadingMessage from '../../Loading';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
 
-import '../styles/coaching.css';
+import '../styles/coaching.scss';
 
 /*
 Notes for Test Cases to write:
@@ -207,9 +207,7 @@ export default function WeeksRecordsSection() {
               toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
             />
           </div>
-          <div className="tableWrapper">
-            <WeeksTable weeks={weeks} />
-          </div>
+          <WeeksTable weeks={weeks} />
         </>
       )}
     </div>

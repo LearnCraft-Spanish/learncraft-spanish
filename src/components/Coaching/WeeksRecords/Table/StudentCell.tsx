@@ -3,7 +3,7 @@ import useCoaching from '../../../../hooks/useCoaching';
 import eye from '../../../../assets/icons/eye.svg';
 // import pencil from '../../../../assets/icons/pencil.svg';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
-
+import ViewWeekRecord from '../ViewWeekRecord';
 export default function StudentCell({ week }: { week: Week }) {
   const { getStudentFromMembershipId } = useCoaching();
   const { contextual, openContextual } = useContextualMenu();
@@ -12,7 +12,7 @@ export default function StudentCell({ week }: { week: Week }) {
 
   return (
     student && (
-      <div className="studentCell">
+      <div className="studentCell cellWithContextual">
         <div className="studentCellControlls">
           <img
             src={eye}
@@ -28,6 +28,9 @@ export default function StudentCell({ week }: { week: Week }) {
           <p>{student.primaryCoach.name}</p>
           <p>{week.level}</p>
         </div>
+        {contextual === `week${week.recordId}` && (
+          <ViewWeekRecord week={week} />
+        )}
       </div>
     )
   );

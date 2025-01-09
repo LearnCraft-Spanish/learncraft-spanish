@@ -1,5 +1,5 @@
 import { examples } from '../examples.json';
-import type { StudentFlashcardData } from '../../../src/interfaceDefinitions';
+import type { StudentFlashcardData } from '../../../src/types/interfaceDefinitions';
 
 import generateStudentFlashcardData from '../serverlike/generateStudentFlashcardData';
 
