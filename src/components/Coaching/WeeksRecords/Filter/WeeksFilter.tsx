@@ -155,10 +155,7 @@ export default function WeeksFilter({
           {/* I think this will Replaced with pagination when implemented in the Table Component */}
         </div>
         <div className="numberShowing">
-          <h4>
-            Showing:
-            {weeks.length} records
-          </h4>
+          <h4>{`Showing ${weeks.length} records`}</h4>
         </div>
       </>
     )

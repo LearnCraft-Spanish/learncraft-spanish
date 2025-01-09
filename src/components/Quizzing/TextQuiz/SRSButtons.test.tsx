@@ -1,21 +1,27 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 
-import React, { act } from 'react';
+import React from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { Flashcard } from '../../../types/interfaceDefinitions';
 import { sampleStudentFlashcardData } from '../../../../tests/mockData';
-
+import { useStudentFlashcards } from '../../../hooks/useStudentFlashcards';
 import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
 import SRSQuizButtons from './SRSButtons';
 
-vi.mock('../../hooks/useStudentFlashcards', () => {
-  return {
-    useStudentFlashcards: () => ({
-      flashcardDataQuery: { data: sampleStudentFlashcardData },
-      updateFlashcardMutation: { mutate: vi.fn() },
-    }),
-  };
-});
+// vi.mock('../../hooks/useStudentFlashcards', () => {
+//   return {
+//     useStudentFlashcards: () => ({
+//       flashcardDataQuery: { data: sampleStudentFlashcardData },
+//       updateFlashcardMutation: { mutate: vi.fn() },
+//     }),
+//   };
+// });
 // These examples could be defined in a better way
 const currentExample: Flashcard = { ...sampleStudentFlashcardData.examples[0] };
 
@@ -48,7 +54,7 @@ describe('component SRSButtons', () => {
     );
     expect(screen.getByText('Labeled: Easy')).toBeTruthy();
   });
-  it('example difficulty is labeled hard, displays Labeled: Hard', () => {
+  it('example difficulty is labeled hard, displays Labeled: Hard', async () => {
     render(
       <MockAllProviders>
         <SRSQuizButtons
@@ -58,10 +64,12 @@ describe('component SRSButtons', () => {
         />
       </MockAllProviders>,
     );
-    expect(screen.getByText('Labeled: Hard')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText('Labeled: Hard')).toBeTruthy();
+    });
   });
 
-  it('answer showing and no difficulty set, shows setting buttons', () => {
+  it('answer showing and no difficulty set, shows setting buttons', async () => {
     render(
       <MockAllProviders>
         <SRSQuizButtons
@@ -71,8 +79,10 @@ describe('component SRSButtons', () => {
         />
       </MockAllProviders>,
     );
-    expect(screen.getByText('This was easy')).toBeTruthy();
-    expect(screen.getByText('This was hard')).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByText('This was easy')).toBeTruthy();
+      expect(screen.getByText('This was hard')).toBeTruthy();
+    });
   });
 
   /*
@@ -80,37 +90,61 @@ describe('component SRSButtons', () => {
   - Test the onClick events for the buttons (unsure how to do it currently, as the functions passed in are called withen the component's own functions)
   */
   describe('onClick functions', () => {
-    it('increaseDifficulty', () => {
+    it('increaseDifficulty', async () => {
+      const { result } = renderHook(() => useStudentFlashcards(), {
+        wrapper: MockAllProviders,
+      });
+      await waitFor(() =>
+        expect(result.current.flashcardDataQuery.isSuccess).toBe(true),
+      );
+      const example = result.current.flashcardDataQuery.data?.examples[0];
+      if (!example) {
+        throw new Error('example not found for test setup');
+      }
       render(
         <MockAllProviders>
           <SRSQuizButtons
-            currentExample={currentExample}
+            currentExample={example}
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
         </MockAllProviders>,
       );
+      await waitFor(() => {
+        expect(screen.getByText('This was easy')).toBeTruthy();
+      });
       screen.getByText('This was easy').click();
       expect(incrementExampleNumber).toHaveBeenCalled();
     });
-    it('decreaseDifficulty', () => {
+    it('decreaseDifficulty', async () => {
+      const { result } = renderHook(() => useStudentFlashcards(), {
+        wrapper: MockAllProviders,
+      });
+      await waitFor(() =>
+        expect(result.current.flashcardDataQuery.isSuccess).toBe(true),
+      );
+      const example = result.current.flashcardDataQuery.data?.examples[0];
+      if (!example) {
+        throw new Error('example not found for test setup');
+      }
       render(
         <MockAllProviders>
           <SRSQuizButtons
-            currentExample={currentExample}
+            currentExample={example}
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
           />
         </MockAllProviders>,
       );
-      act(() => {
-        screen.getByText('This was hard').click();
+      await waitFor(() => {
+        expect(screen.getByText('This was hard')).toBeTruthy();
       });
+      screen.getByText('This was hard').click();
       expect(incrementExampleNumber).toHaveBeenCalled();
     });
   });
   describe('handing of undefined values', () => {
-    it('doesnt call incrementExample when error finding relatedExample', () => {
+    it('doesnt call incrementExample when error finding relatedExample', async () => {
       render(
         <MockAllProviders>
           <SRSQuizButtons
@@ -120,6 +154,9 @@ describe('component SRSButtons', () => {
           />
         </MockAllProviders>,
       );
+      await waitFor(() => {
+        expect(screen.getByText('This was easy')).toBeTruthy();
+      });
       screen.getByText('This was easy').click();
       expect(incrementExampleNumber).not.toHaveBeenCalled();
       screen.getByText('This was hard').click();

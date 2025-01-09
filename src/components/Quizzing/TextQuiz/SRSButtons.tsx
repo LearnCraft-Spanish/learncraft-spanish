@@ -17,20 +17,20 @@ export default function SRSQuizButtons({
   const { flashcardDataQuery, updateFlashcardMutation } =
     useStudentFlashcards();
 
-  const flashcardData = flashcardDataQuery.data;
   const updateFlashcard = updateFlashcardMutation.mutate;
 
   const getStudentExampleFromExample = useCallback(
     (example: Flashcard) => {
-      const relatedStudentExample = flashcardData?.studentExamples?.find(
-        (item) => item.relatedExample === example.recordId,
-      );
+      const relatedStudentExample =
+        flashcardDataQuery.data?.studentExamples?.find(
+          (item) => item.relatedExample === example.recordId,
+        );
       if (!relatedStudentExample?.recordId) {
         return undefined;
       }
       return relatedStudentExample;
     },
-    [flashcardData],
+    [flashcardDataQuery],
   );
 
   const getIntervalFromExample = useCallback(
@@ -127,24 +127,26 @@ export default function SRSQuizButtons({
 
   return (
     <div className="buttonBox srsButtons">
-      {answerShowing && !currentExample.difficulty && (
-        <>
-          <button
-            type="button"
-            className="redButton"
-            onClick={decreaseDifficulty}
-          >
-            This was hard
-          </button>
-          <button
-            type="button"
-            className="greenButton"
-            onClick={increaseDifficulty}
-          >
-            This was easy
-          </button>
-        </>
-      )}
+      {flashcardDataQuery.isSuccess &&
+        answerShowing &&
+        !currentExample.difficulty && (
+          <>
+            <button
+              type="button"
+              className="redButton"
+              onClick={decreaseDifficulty}
+            >
+              This was hard
+            </button>
+            <button
+              type="button"
+              className="greenButton"
+              onClick={increaseDifficulty}
+            >
+              This was easy
+            </button>
+          </>
+        )}
       {currentExample.difficulty &&
         (currentExample.difficulty === 'hard' ? (
           <button type="button" className="hardBanner">
