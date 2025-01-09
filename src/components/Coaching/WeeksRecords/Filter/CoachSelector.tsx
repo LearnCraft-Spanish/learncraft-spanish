@@ -12,7 +12,7 @@ export default function CoachSelect({ updateCoachFilter }: CoachSelectProps) {
   return (
     dataReady && (
       <div>
-        <label htmlFor="coachSelector"> Coach: </label>
+        <label htmlFor="coachSelector">Coach:</label>
         <select
           name="coachSelector"
           id="coachSelector"

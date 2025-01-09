@@ -8,7 +8,7 @@ import StudentCell from './StudentCell';
 import ViewWeekRecord from '../ViewWeekRecord';
 import checkmark from '../../../../assets/icons/checkmark_green.svg';
 import Pagination from '../../../FlashcardFinder/Pagination';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 interface NewTableProps {
   weeks: Week[] | undefined;
 }
@@ -22,9 +22,11 @@ export default function WeeksTable({ weeks }: NewTableProps) {
 
   const maxPage = Math.ceil(weeks ? weeks.length / itemsPerPage : 0);
 
-  const displayOrderSegment = weeks
-    ? weeks.slice((page - 1) * itemsPerPage, page * itemsPerPage)
-    : [];
+  const displayOrderSegment = useMemo(() => {
+    return weeks
+      ? weeks.slice((page - 1) * itemsPerPage, page * itemsPerPage)
+      : [];
+  }, [weeks, page]);
 
   const nextPage = useCallback(() => {
     if (page >= maxPage) {
@@ -107,7 +109,15 @@ export default function WeeksTable({ weeks }: NewTableProps) {
                   </td>
                   <td>{week.notes}</td>
                   <td>{week.currentLessonName}</td>
-                  <td>{week.holdWeek}</td>
+                  <td>
+                    {week.recordsComplete && (
+                      <img
+                        className="checkmark"
+                        src={checkmark}
+                        alt="Checkmark"
+                      />
+                    )}
+                  </td>
                   <td>
                     {week.recordsComplete && (
                       <img

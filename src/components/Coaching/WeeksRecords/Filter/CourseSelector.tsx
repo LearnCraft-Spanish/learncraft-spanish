@@ -15,7 +15,7 @@ export default function CourseSelector({
   return (
     dataReady && (
       <div>
-        <label htmlFor="courseSelector">Course: </label>
+        <label htmlFor="courseSelector">Course:</label>
         <select
           name="courseSelector"
           id="course"

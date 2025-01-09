@@ -10,40 +10,43 @@ import type {
 } from '../../../../types/CoachingTypes';
 
 import useCoaching from '../../../../hooks/useCoaching';
-
+import '../../styles/coaching.scss';
 interface CoachingFilterProps {
-  // searchTerm: string | undefined;
-  // updateSearchTerm: (value: string) => void;
   weeks: Week[] | undefined;
-  // filterCoachless: boolean | undefined;
-  // updateCoachlessFilter: (value: boolean) => void;
-  // filterHoldWeeks: boolean | undefined;
-  // updateFilterHoldWeeks: (value: boolean) => void;
-  // filterIncomplete: string | undefined;
-  // updateFilterIncomplete: (value: string) => void;
+
   updateCoachFilter: (value: string) => void;
   updateCourseFilter: (value: string) => void;
   updateWeeksAgoFilter: (value: string) => void;
 
   advancedFilteringMenu: boolean;
   toggleAdvancedFilteringMenu: () => void;
+
+  filterCoachless: boolean | undefined;
+  updateCoachlessFilter: (value: boolean) => void;
+  filterHoldWeeks: boolean | undefined;
+  updateFilterHoldWeeks: (value: boolean) => void;
+  filterByCompletion: string;
+  updateFilterByCompletion: (value: string) => void;
+  searchTerm: string | undefined;
+  updateSearchTerm: (value: string) => void;
 }
 export default function WeeksFilter({
-  // searchTerm,
-  // updateSearchTerm,
   weeks,
-  // filterCoachless,
-  // updateCoachlessFilter,
-  // filterHoldWeeks,
-  // updateFilterHoldWeeks,
-  // filterIncomplete,
-  // updateFilterIncomplete,
   updateCoachFilter,
   updateCourseFilter,
   updateWeeksAgoFilter,
 
   advancedFilteringMenu,
   toggleAdvancedFilteringMenu,
+
+  filterCoachless,
+  updateCoachlessFilter,
+  filterHoldWeeks,
+  updateFilterHoldWeeks,
+  filterByCompletion,
+  updateFilterByCompletion,
+  searchTerm,
+  updateSearchTerm,
 }: CoachingFilterProps) {
   const {
     lastThreeWeeksQuery,
@@ -57,13 +60,6 @@ export default function WeeksFilter({
       <>
         <div className="coachingFilterSection">
           <div className="simpleFiltering">
-            {/* I think this will Replaced with pagination when implemented in the Table Component */}
-            {/* <div className="numberShowing">
-              <h4>
-                Showing:
-                {weeks.length} records
-              </h4>
-            </div> */}
             <CoachSelect updateCoachFilter={updateCoachFilter} />
             <CourseSelector updateCourseFilter={updateCourseFilter} />
             <div>
@@ -79,30 +75,39 @@ export default function WeeksFilter({
                 <option value={-1}>Last Three Weeks (All)</option>
               </select>
             </div>
-            <div>
-              <button
-                type="button"
-                className="moreFiltersButton"
-                onClick={toggleAdvancedFilteringMenu}
-              >
-                More Filters
-              </button>
-            </div>
           </div>
-          {/*
-          {advancedFilteringMenu && (
-            <div className="advancedFilters">
+          <div className="advancedFilters">
+            <button
+              type="button"
+              className={`moreFilterButton ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
+              onClick={toggleAdvancedFilteringMenu}
+            >
+              More Filters
+            </button>
+            <button
+              type="button"
+              className={`hideFilterButton ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
+              onClick={toggleAdvancedFilteringMenu}
+            >
+              Hide
+            </button>
+
+            <div
+              className={`advancedFiltersWrapper ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
+            >
               <div>
-                <label htmlFor="search">Search:</label>
+                {/* <label htmlFor="search">Search:</label> */}
                 <input
                   type="text"
                   name="search"
                   id="search"
                   value={searchTerm}
+                  placeholder="Search names, emails, or notes"
+                  className="searchBox"
                   onChange={(e) => updateSearchTerm(e.target.value)}
                 />
               </div>
-              <div>
+              <div className="menuRow">
                 <p>Exclude Students Without Coaches:</p>
                 <label htmlFor="filterCoachless" className="switch">
                   <input
@@ -115,7 +120,7 @@ export default function WeeksFilter({
                   <span className="slider round"></span>
                 </label>
               </div>
-              <div>
+              <div className="menuRow">
                 <p>Exclude Weeks on Hold:</p>
                 <label htmlFor="filterHoldWeeks" className="switch">
                   <input
@@ -129,51 +134,32 @@ export default function WeeksFilter({
                 </label>
               </div>
               <div>
-                <p>Filter Records By Completion:</p>
-                <label htmlFor="filterIncomplete">
-                  <input
-                    type="radio"
-                    name=""
-                    id="filterIncomplete"
-                    value="0"
-                    checked={filterIncomplete === '0'}
-                    onClick={() => updateFilterIncomplete('0')}
-                  />
-                  All Records
-                  <input
-                    type="radio"
-                    name=""
-                    id="filterIncomplete"
-                    value="1"
-                    checked={filterIncomplete === '1'}
-                    onClick={() => updateFilterIncomplete('1')}
-                  />
-                  Incomplete Only
-                  <input
-                    type="radio"
-                    name=""
-                    id="filterIncomplete"
-                    value="2"
-                    checked={filterIncomplete === '2'}
-                    onClick={() => updateFilterIncomplete('2')}
-                  />
-                  Complete Only
-                </label>
-              </div>
-              <div className="buttonBox">
-                <button
-                  type="button"
-                  className="redButton"
-                  onClick={toggleAdvancedFilteringMenu}
+                <label
+                  htmlFor="filterByCompletion"
+                  className="filterByCompletion"
                 >
-                  Close
-                </button>
+                  Filter Records By Completion:
+                </label>
+                <select
+                  name=""
+                  id="filterByCompletion"
+                  onChange={(e) => updateFilterByCompletion(e.target.value)}
+                >
+                  <option value="allRecords">All Records</option>
+                  <option value="incompleteOnly">Incomplete Only</option>
+                  <option value="completeOnly">Complete Only</option>
+                </select>
               </div>
             </div>
-          )}
-            */}
+          </div>
+          {/* I think this will Replaced with pagination when implemented in the Table Component */}
         </div>
-        <div className="coachingFilterSection"></div>
+        <div className="numberShowing">
+          <h4>
+            Showing:
+            {weeks.length} records
+          </h4>
+        </div>
       </>
     )
   );

@@ -1,8 +1,12 @@
 import type { Week } from '../../../types/CoachingTypes';
 import ContextualControlls from '../../ContextualControlls';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
-export default function ViewWeekRecord({ week }: { week: Week }) {
+export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
   const { setContextualRef } = useContextualMenu();
+
+  if (!week) {
+    return <div>No week data</div>;
+  }
   return (
     <div className="contextualWrapper" key={`week${week.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
@@ -25,7 +29,7 @@ export default function ViewWeekRecord({ week }: { week: Week }) {
         </div>
         <div className="checkboxWrapper">
           <p className="label">Checklist complete? </p>
-          <input type="checkbox" checked={week.checklistComplete} />
+          <input type="checkbox" readOnly checked={week.checklistComplete} />
         </div>
         <div className="lineWrapper">
           <p className="label">Notes: </p>
@@ -33,7 +37,7 @@ export default function ViewWeekRecord({ week }: { week: Week }) {
         </div>
         <div className="checkboxWrapper">
           <p className="label">Off Track? </p>
-          <input type="checkbox" checked={week.offTrack} />
+          <input type="checkbox" readOnly checked={week.offTrack} />
         </div>
         <div className="lineWrapper">
           <p className="label">Membership - End Date: </p>
@@ -41,11 +45,11 @@ export default function ViewWeekRecord({ week }: { week: Week }) {
         </div>
         <div className="checkboxWrapper">
           <p className="label">Membership - on Hold </p>
-          <input type="checkbox" checked={week.membershipOnHold} />
+          <input type="checkbox" readOnly checked={week.membershipOnHold} />
         </div>
         <div className="checkboxWrapper">
           <p className="label">Records Complete? </p>
-          <input type="checkbox" checked={week.recordsComplete} />
+          <input type="checkbox" readOnly checked={week.recordsComplete} />
         </div>
         <div className="lineWrapper">
           <p className="label">Records Complete Ref: </p>
@@ -53,7 +57,7 @@ export default function ViewWeekRecord({ week }: { week: Week }) {
         </div>
         <div className="checkboxWrapper">
           <p className="label">Record Completeable? </p>
-          <input type="checkbox" checked={week.recordCompletable} />
+          <input type="checkbox" readOnly checked={week.recordCompletable} />
         </div>
         <div className="lineWrapper">
           <label className="label">Membership - Student - Member Until: </label>
@@ -63,7 +67,7 @@ export default function ViewWeekRecord({ week }: { week: Week }) {
         </div>
         <div className="checkboxWrapper">
           <p className="label">Ending this Week? </p>
-          <input type="checkbox" checked={week.endingThisWeek} />
+          <input type="checkbox" readOnly checked={week.endingThisWeek} />
         </div>
         <div className="lineWrapper">
           <p className="label">Combined Key for Uniques: </p>
