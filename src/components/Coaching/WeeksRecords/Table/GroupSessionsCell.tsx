@@ -127,7 +127,9 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
               <div>
                 {(groupSession.callDocument || groupSession.zoomLink) && (
                   <>
-                    <h4>Session assets:</h4>
+                    <div className="lineWrapper">
+                      <h4>Session Documents:</h4>
+                    </div>
                     {groupSession.callDocument &&
                       groupSession.callDocument.length > 0 && (
                         <p>

@@ -1,8 +1,11 @@
 import type { Week } from '../../../types/CoachingTypes';
 import ContextualControlls from '../../ContextualControlls';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
+import useCoaching from '../../../hooks/useCoaching';
+import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
   const { setContextualRef } = useContextualMenu();
+  const { getStudentFromMembershipId } = useCoaching();
 
   if (!week) {
     return <div>No week data</div>;
@@ -11,6 +14,9 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
     <div className="contextualWrapper" key={`week${week.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
         <ContextualControlls />
+        <h3>
+          {`${getStudentFromMembershipId(week.relatedMembership)?.fullName} ${week.level} Week ${week.week}`}
+        </h3>
         <div className="lineWrapper">
           <p className="label">Related Membership: </p>
           <p className="content"> {week.relatedMembership}</p>

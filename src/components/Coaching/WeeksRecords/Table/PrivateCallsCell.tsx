@@ -57,11 +57,16 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
                     <p className="content"> {call.areasOfDifficulty}</p>
                   </div>
                   {call.recording.length > 0 && (
-                    <div className="lineWrapper">
-                      <a target="_blank" href={call.recording}>
-                        Recording Link
-                      </a>
-                    </div>
+                    <>
+                      <div className="lineWrapper">
+                        <h4>Session Documents:</h4>
+                      </div>
+                      <div className="lineWrapper">
+                        <a target="_blank" href={call.recording}>
+                          Recording Link
+                        </a>
+                      </div>
+                    </>
                   )}
                   {/* <div className="buttonBox">
                     <button

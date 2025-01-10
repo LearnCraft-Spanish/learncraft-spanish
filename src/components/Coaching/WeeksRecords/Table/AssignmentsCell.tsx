@@ -56,12 +56,17 @@ export default function AssignmentsCell({
               <p className="content"> {assignment.areasOfDifficulty}</p>
             </div>
             {assignment.assignmentLink.length > 0 && (
-              <div className="lineWrapper">
-                {/* <p className="label">Assignment Link: </p> */}
-                <a target="_blank" href={assignment.assignmentLink}>
-                  Assignment Link
-                </a>
-              </div>
+              <>
+                <div className="lineWrapper">
+                  <h4>Session Documents:</h4>
+                </div>
+                <div className="lineWrapper">
+                  {/* <p className="label">Assignment Link: </p> */}
+                  <a target="_blank" href={assignment.assignmentLink}>
+                    Assignment Link
+                  </a>
+                </div>
+              </>
             )}
             {/* <div className="buttonBox">
               <button
