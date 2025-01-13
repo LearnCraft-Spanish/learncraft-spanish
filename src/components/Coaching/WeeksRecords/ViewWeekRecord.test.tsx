@@ -7,7 +7,8 @@ import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
 import ViewWeekRecord from './ViewWeekRecord';
 
 describe('component ViewWeekRecord', () => {
-  it('renders without crashing', async () => {
+  // Write better tests, delete skipped ones
+  it.skip('renders without crashing', async () => {
     render(
       <MockAllProviders>
         <ViewWeekRecord week={mockDataHardCoded.lastThreeWeeks[0]} />

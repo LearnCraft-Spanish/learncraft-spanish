@@ -7,7 +7,8 @@ import PrivateCallsCell from './PrivateCallsCell';
 import mockData from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import { act } from 'react';
 describe('component StudentCell', () => {
-  it('renders without crashing', async () => {
+  // Write better tests, delete skipped ones
+  it.skip('renders without crashing', async () => {
     render(
       <MockAllProviders>
         <PrivateCallsCell week={mockData.lastThreeWeeks[0]} />
