@@ -84,18 +84,92 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
         {/* list attendees (i think its all group attendees records associated with week) */}
         {/* add attendee (seems to be creating a group attendee record, connecting an existing group session record with an existing student week record. in QB in both dropdown inputs it has the option to add a new group session/student) */}
         {/* Number of Group Calls */}
+        <div className="lineWrapper">
+          <p className="label">Number of Group Calls: </p>
+          <p className="content"> {week.numberOfGroupCalls}</p>
+        </div>
         {/* Group Call Comments */}
+        <div className="lineWrapper">
+          <p className="label">Group Call Comments: </p>
+          <p className="content"> {week.groupCallComments}</p>
+        </div>
         {/* Private Call Ratings */}
+        <div className="lineWrapper">
+          <p className="label">Private Call Ratings: </p>
+          <p className="content"> {week.privateCallRatings}</p>
+        </div>
         {/* Assignment Ratings */}
+        <div className="lineWrapper">
+          <p className="label">Assignment Ratings: </p>
+          <p className="content"> {week.assignmentRatings}</p>
+        </div>
         {/* # of calls (private & group) */}
+        <div className="lineWrapper">
+          <p className="label">Number of Calls (private & group): </p>
+          <p className="content">
+            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
+            yet?). COMPUTE OR REMOVE?
+          </p>
+        </div>
         {/* bad record? *chexkbox* */}
+        <div className="checkboxWrapper">
+          <p className="label">Bad Record? </p>
+          <p className="content">
+            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
+            yet?). COMPUTE OR REMOVE?
+          </p>
+        </div>
         {/* primary coach (when created) */}
+        <div className="lineWrapper">
+          <p className="label">Primary Coach (when created): </p>
+          <p className="content"> {week.primaryCoachWhenCreated}</p>
+        </div>
         {/* Hold Week *checkbox* */}
+        <div className="checkboxWrapper">
+          <p className="label">Hold Week</p>
+          <input type="checkbox" readOnly checked={week.holdWeek} />
+        </div>
         {/* membership - course - has group calls *check or x, not an input* */}
+        <div className="checkboxWrapper">
+          <p className="label">Membership - Course - has group calls? </p>
+          <p className="content">
+            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
+            yet?). COMPUTE OR REMOVE?
+          </p>
+        </div>
         {/* membership - course - weekly private calls */}
+        <div className="lineWrapper">
+          <p className="label">Membership - Course - Weekly Private Calls: </p>
+          <p className="content">
+            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
+            yet?). COMPUTE OR REMOVE?
+          </p>
+        </div>
         {/* bundle credits used */}
+        <div className="lineWrapper">
+          <p className="label">Bundle Credits Used: </p>
+          <p className="content">
+            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
+            yet?). COMPUTE OR REMOVE?
+          </p>
+        </div>
         {/* membership - student - call credits remaining */}
+        <div className="lineWrapper">
+          <p className="label">
+            Membership - Student - Call Credits Remaining:
+          </p>
+          <p className="content">
+            {week.membershipStudentCallCreditsRemaining}
+          </p>
+        </div>
         {/* blank user */}
+        <div className="lineWrapper">
+          <p className="label">Blank User: </p>
+          <p className="content">
+            DATA DOES NOT currently EXIST AS AN ATTRIBUTE ON week RECORD (not
+            passed in yet?). COMPUTE OR REMOVE?
+          </p>
+        </div>
       </div>
     </div>
   );
