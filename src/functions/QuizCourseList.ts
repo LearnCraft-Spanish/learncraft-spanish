@@ -8,6 +8,7 @@ const quizCourses: QuizCourse[] = [
   { name: 'LearnCraft Spanish', url: '', code: 'lcsp' },
   { name: 'LearnCraft Spanish Extended', url: 'lcspx', code: 'lcspx' },
   { name: 'Master Ser vs Estar', url: 'ser-estar', code: 'ser-estar' },
+  { name: 'Post-1MC Cohort', url: 'post-1mc', code: 'post-1mc' },
 ];
 
 export default quizCourses;
