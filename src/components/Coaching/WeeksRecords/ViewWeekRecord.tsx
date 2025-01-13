@@ -81,6 +81,21 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
         </div>
         {/* Attendees SECTION goes here */}
         <div>------ Attendees Section Goes Here ------</div>
+        {/* list attendees (i think its all group attendees records associated with week) */}
+        {/* add attendee (seems to be creating a group attendee record, connecting an existing group session record with an existing student week record. in QB in both dropdown inputs it has the option to add a new group session/student) */}
+        {/* Number of Group Calls */}
+        {/* Group Call Comments */}
+        {/* Private Call Ratings */}
+        {/* Assignment Ratings */}
+        {/* # of calls (private & group) */}
+        {/* bad record? *chexkbox* */}
+        {/* primary coach (when created) */}
+        {/* Hold Week *checkbox* */}
+        {/* membership - course - has group calls *check or x, not an input* */}
+        {/* membership - course - weekly private calls */}
+        {/* bundle credits used */}
+        {/* membership - student - call credits remaining */}
+        {/* blank user */}
       </div>
     </div>
   );
