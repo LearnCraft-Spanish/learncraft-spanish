@@ -35,6 +35,12 @@ export interface Week {
   membershipStudentCallCreditsRemaining: number;
   numberOfGroupCalls: number;
   privateCallsCompleted: number;
+  OfCallsPrivateGroup: number; //NumberOfCallsPrivateGroup
+  badRecord: boolean;
+  membershipCourseHasGroupCalls: boolean;
+  membershipCourseWeeklyPrivateCalls: number;
+  bundleCreditsUsed: number;
+  // blankUser: QbUser | undefined;
 }
 /*
   export interface Week {

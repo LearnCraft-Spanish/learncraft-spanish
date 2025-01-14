@@ -6,16 +6,86 @@ import mockDataHardCoded from '../../../../mocks/data/serverlike/studentRecords/
 import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
 import ViewWeekRecord from './ViewWeekRecord';
 
+const week = mockDataHardCoded.lastThreeWeeks[0];
 describe('component ViewWeekRecord', () => {
   // Write better tests, delete skipped ones
-  it.skip('renders without crashing', async () => {
+  it('renders with valid data', async () => {
     render(
       <MockAllProviders>
-        <ViewWeekRecord week={mockDataHardCoded.lastThreeWeeks[0]} />
+        <ViewWeekRecord week={week} />
       </MockAllProviders>,
     );
     await waitFor(() => {
       expect(screen.getByText('Related Membership:')).toBeInTheDocument();
+    });
+  });
+  it('throws an error with invalid data', async () => {
+    const consoleError = vi.spyOn(console, 'error');
+    render(
+      <MockAllProviders>
+        <ViewWeekRecord week={undefined} />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(consoleError).toBeCalled();
+    });
+  });
+
+  it('renders with the correct data', async () => {
+    const requiredFields = [
+      'Related Membership:',
+      'Week #:',
+      'Current Lesson Name:',
+      'Current Lesson:',
+      'Checklist complete?',
+      'Notes:',
+      'Off Track?',
+      'Membership - End Date:',
+      'Membership - on Hold',
+      'Records Complete?',
+      'Records Complete Ref:',
+      'Record Completeable?',
+      'Membership - Student - Member Until:',
+      'Ending this Week?',
+      'Combined Key for Uniques:',
+      'Number of Group Calls:',
+      'Group Call Comments:',
+      'Private Call Ratings:',
+      'Assignment Ratings:',
+      'Number of Calls (private & group):',
+      'Bad Record?',
+      'Primary Coach (when created):',
+      'Hold Week',
+      'Membership - Course - has group calls?',
+      'Membership - Course - Weekly Private Calls:',
+      'Bundle Credits Used:',
+      'Membership - Student - Call Credits Remaining:',
+    ];
+    render(
+      <MockAllProviders>
+        <ViewWeekRecord week={week} />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      requiredFields.forEach((field) => {
+        expect(screen.getByText(field)).toBeInTheDocument();
+      });
+    });
+  });
+
+  it('make sure all data is passed in', async () => {
+    // This is a test build doing TDD, will be removed once feature is complete?
+    // - will serve no benefit once feature is complete
+    render(
+      <MockAllProviders>
+        <ViewWeekRecord week={week} />
+      </MockAllProviders>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('DATA DOES NOT EXIST', { exact: false }),
+      ).not.toBeInTheDocument();
     });
   });
 });

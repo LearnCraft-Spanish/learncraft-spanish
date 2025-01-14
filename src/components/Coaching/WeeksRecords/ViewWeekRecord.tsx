@@ -2,14 +2,21 @@ import type { Week } from '../../../types/CoachingTypes';
 import ContextualControlls from '../../ContextualControlls';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
 import useCoaching from '../../../hooks/useCoaching';
-import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
   const { setContextualRef } = useContextualMenu();
   const { getStudentFromMembershipId } = useCoaching();
 
   if (!week) {
-    return <div>No week data</div>;
+    console.error('Week record is undefined');
+    return (
+      <div className="contextualWrapper">
+        <div className="contextual">
+          <h3>Week record is undefined, please try again</h3>
+        </div>
+      </div>
+    );
   }
+
   return (
     <div className="contextualWrapper" key={`week${week.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
@@ -106,18 +113,12 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
         {/* # of calls (private & group) */}
         <div className="lineWrapper">
           <p className="label">Number of Calls (private & group): </p>
-          <p className="content">
-            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
-            yet?). COMPUTE OR REMOVE?
-          </p>
+          <p className="content">{week.OfCallsPrivateGroup}</p>
         </div>
         {/* bad record? *chexkbox* */}
         <div className="checkboxWrapper">
           <p className="label">Bad Record? </p>
-          <p className="content">
-            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
-            yet?). COMPUTE OR REMOVE?
-          </p>
+          <input type="checkbox" readOnly checked={week.badRecord} />
         </div>
         {/* primary coach (when created) */}
         <div className="lineWrapper">
@@ -133,25 +134,18 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
         <div className="checkboxWrapper">
           <p className="label">Membership - Course - has group calls? </p>
           <p className="content">
-            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
-            yet?). COMPUTE OR REMOVE?
+            {week.membershipCourseHasGroupCalls ? '✅' : '❌'}
           </p>
         </div>
         {/* membership - course - weekly private calls */}
         <div className="lineWrapper">
           <p className="label">Membership - Course - Weekly Private Calls: </p>
-          <p className="content">
-            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
-            yet?). COMPUTE OR REMOVE?
-          </p>
+          <p className="content">{week.membershipCourseWeeklyPrivateCalls}</p>
         </div>
         {/* bundle credits used */}
         <div className="lineWrapper">
           <p className="label">Bundle Credits Used: </p>
-          <p className="content">
-            DATA DOES NOT EXIST AS AN ATTRIBUTE ON week RECORD(not passed in
-            yet?). COMPUTE OR REMOVE?
-          </p>
+          <p className="content">{week.bundleCreditsUsed}</p>
         </div>
         {/* membership - student - call credits remaining */}
         <div className="lineWrapper">
@@ -163,13 +157,10 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
           </p>
         </div>
         {/* blank user */}
-        <div className="lineWrapper">
+        {/* <div className="lineWrapper">
           <p className="label">Blank User: </p>
-          <p className="content">
-            DATA DOES NOT currently EXIST AS AN ATTRIBUTE ON week RECORD (not
-            passed in yet?). COMPUTE OR REMOVE?
-          </p>
-        </div>
+          <p className="content">{week.blankUser ? week.blankUser.name : ''}</p>
+        </div> */}
       </div>
     </div>
   );
