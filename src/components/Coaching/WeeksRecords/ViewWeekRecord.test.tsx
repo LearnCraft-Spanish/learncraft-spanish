@@ -72,20 +72,4 @@ describe('component ViewWeekRecord', () => {
       });
     });
   });
-
-  it('make sure all data is passed in', async () => {
-    // This is a test build doing TDD, will be removed once feature is complete?
-    // - will serve no benefit once feature is complete
-    render(
-      <MockAllProviders>
-        <ViewWeekRecord week={week} />
-      </MockAllProviders>,
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.queryByText('DATA DOES NOT EXIST', { exact: false }),
-      ).not.toBeInTheDocument();
-    });
-  });
 });

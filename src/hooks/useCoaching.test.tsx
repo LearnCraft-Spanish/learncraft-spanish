@@ -6,8 +6,7 @@ import mockDataHardCoded from '../../mocks/data/serverlike/studentRecords/studen
 import useCoaching from './useCoaching';
 
 // This would benefit from improved testing. currently only testing existence
-// CURRENTLY SKIPPING, NEEDS IMPROVEMENT
-describe.skip('hook useCoaching', () => {
+describe('hook useCoaching', () => {
   it('renders without crashing', async () => {
     const { result } = renderHook(() => useCoaching(), {
       wrapper: MockAllProviders,

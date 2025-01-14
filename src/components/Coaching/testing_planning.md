@@ -21,9 +21,8 @@ Table/WeeksTable:
 
 Table/StudentCell:
 
-- Displays data
-- Contextual button for ViewStudentRecord works
-- when coach/course is selected, hides correct data
+- ~~Displays correct data~~
+- ~~Contextual button for ViewStudentRecord works~~
 
 Table/AssignmentsCell:
 
@@ -41,8 +40,8 @@ Table/GroupSessionsCell:
 
 Table/PrivateCell:
 
-- Displays data
-- Contextual button for ViewPrivateRecord works
+- ~~Displays data~~
+- ~~Contextual button for ViewPrivateRecord works~~
 - New Private Call button works
 - New Private Call form works
 
