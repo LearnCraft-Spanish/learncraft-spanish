@@ -34,8 +34,8 @@ Table/AssignmentsCell:
 
 Table/GroupSessionsCell:
 
-- Displays data
-- Contextual button for ViewGroupRecord works
+- ~~Displays correct data~~
+- ~~Contextual button for ViewGroupRecord works~~
 - New Group Session Call button works
 - New Group Session form works
 
