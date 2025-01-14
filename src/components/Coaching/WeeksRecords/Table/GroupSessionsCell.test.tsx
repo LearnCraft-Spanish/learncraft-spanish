@@ -24,7 +24,7 @@ if (groupSessionList.length === 0) {
   throw new Error('No group session related to week record');
 }
 const relatedGroupSession = groupSessionList[0];
-if (!relatedGroupSession.callDocument || !relatedGroupSession.zoomLink) {
+if (!(relatedGroupSession.callDocument || relatedGroupSession.zoomLink)) {
   throw new Error('mock Group Session is missing required fields');
 }
 
