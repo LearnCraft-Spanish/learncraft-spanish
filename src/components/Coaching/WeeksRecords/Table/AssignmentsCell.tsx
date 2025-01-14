@@ -9,8 +9,7 @@ export default function AssignmentsCell({
 }) {
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
     useCoaching();
-  const { contextual, closeContextual, openContextual, setContextualRef } =
-    useContextualMenu();
+  const { contextual, openContextual, setContextualRef } = useContextualMenu();
   return (
     <div className="cellWithContextual">
       <button
@@ -37,12 +36,12 @@ export default function AssignmentsCell({
             </h4>
             {/* Currently, .date does not exist on assignment */}
             {/* <p>{assignment.date}</p> */}
-            {assignment.homeworkCorrector && (
-              <div className="lineWrapper">
-                <p className="label">Corrected by: </p>
-                <p className="content">{assignment.homeworkCorrector.name}</p>
-              </div>
-            )}
+
+            <div className="lineWrapper">
+              <p className="label">Corrected by: </p>
+              <p className="content">{assignment.homeworkCorrector.name}</p>
+            </div>
+
             <div className="lineWrapper">
               <p className="label">Rating: </p>
               <p className="content">{assignment.rating}</p>
