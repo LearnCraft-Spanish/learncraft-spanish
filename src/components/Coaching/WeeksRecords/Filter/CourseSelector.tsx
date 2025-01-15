@@ -1,11 +1,13 @@
 import useCoaching from '../../../../hooks/useCoaching';
-
+import type { Course } from '../../../../types/CoachingTypes';
 interface CourseSelectorProps {
   updateCourseFilter: (value: string) => void;
+  filterByCourse: Course | undefined;
 }
 
 export default function CourseSelector({
   updateCourseFilter,
+  filterByCourse,
 }: CourseSelectorProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
 
@@ -20,6 +22,7 @@ export default function CourseSelector({
           name="courseSelector"
           id="course"
           onChange={(e) => updateCourseFilter(e.target.value)}
+          value={filterByCourse ? filterByCourse.recordId : -1}
         >
           <option key={0} value={0}>
             All Courses

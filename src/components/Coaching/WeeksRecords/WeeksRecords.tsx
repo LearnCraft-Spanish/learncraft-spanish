@@ -102,6 +102,9 @@ export default function WeeksRecordsSection() {
   function updateFilterHoldWeeks(value: boolean) {
     setFilterByHoldWeeks(value);
   }
+  function updateFilterBySearchTerm(value: string) {
+    setFilterBySearchTerm(value.toLowerCase());
+  }
   function toggleAdvancedFilteringMenu() {
     setAdvancedFilteringMenu(!advancedFilteringMenu);
   }
@@ -119,6 +122,10 @@ export default function WeeksRecordsSection() {
       const weekCourse = getCourseFromMembershipId(week.relatedMembership);
       return weekCourse === filterByCourse;
     });
+  }
+  function filterByHoldWeeksFunction(weeks: Week[]) {
+    if (!filterByHoldWeeks) return weeks;
+    return weeks.filter((week) => !week.holdWeek);
   }
 
   function filterWeeksByWeeksAgoFunction(weeks: Week[]) {
@@ -184,7 +191,7 @@ export default function WeeksRecordsSection() {
       }
 
       if (filterByHoldWeeks) {
-        filteredWeeks = filteredWeeks.filter((week) => !week.holdWeek);
+        filteredWeeks = filterByHoldWeeksFunction(filteredWeeks);
       }
 
       if (filterByCompletion === 'incompleteOnly') {
@@ -247,13 +254,16 @@ export default function WeeksRecordsSection() {
           <div className="filterWrapper">
             <CoachingFilter
               weeks={weeks}
+              filterByCoach={filterByCoach}
               updateCoachFilter={updateCoachFilter}
+              filterByCourse={filterByCourse}
               updateCourseFilter={updateCourseFilter}
+              filterByWeeksAgo={filterByWeeksAgo}
               updateWeeksAgoFilter={updateWeeksAgoFilter}
               advancedFilteringMenu={advancedFilteringMenu}
               toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
               searchTerm={filterBySearchTerm || ''}
-              updateSearchTerm={setFilterBySearchTerm}
+              updateSearchTerm={updateFilterBySearchTerm}
               filterCoachless={filterByCoachless}
               updateCoachlessFilter={setFilterByCoachless}
               filterHoldWeeks={filterByHoldWeeks}

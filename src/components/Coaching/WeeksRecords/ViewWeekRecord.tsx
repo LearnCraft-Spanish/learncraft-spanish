@@ -87,7 +87,7 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
           <p className="content"> {week.combinedKeyForUniques}</p>
         </div>
         {/* Attendees SECTION goes here */}
-        <div>------ Attendees Section Goes Here ------</div>
+        {/* <div>------ Attendees Section Goes Here ------</div> */}
         {/* list attendees (i think its all group attendees records associated with week) */}
         {/* add attendee (seems to be creating a group attendee record, connecting an existing group session record with an existing student week record. in QB in both dropdown inputs it has the option to add a new group session/student) */}
         {/* Number of Group Calls */}

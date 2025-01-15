@@ -45,6 +45,13 @@ export default function WeeksTable({ weeks }: NewTableProps) {
   return (
     weeks && (
       <>
+        <div className="numberShowing">
+          <h5>
+            {/* THIS NEEDS TO HAVE A CASE FOR 0 EXAMPLES */}
+            Showing Records {page === 1 ? 1 : (page - 1) * 50} -{' '}
+            {page * 50 <= weeks.length ? page * 50 : weeks.length}
+          </h5>
+        </div>
         <Pagination
           page={page}
           maxPage={maxPage}
@@ -110,7 +117,7 @@ export default function WeeksTable({ weeks }: NewTableProps) {
                   <td>{week.notes}</td>
                   <td>{week.currentLessonName}</td>
                   <td>
-                    {week.recordsComplete && (
+                    {week.holdWeek && (
                       <img
                         className="checkmark"
                         src={checkmark}

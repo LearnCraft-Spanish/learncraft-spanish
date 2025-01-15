@@ -1,10 +1,15 @@
+import type { Coach } from '../../../../types/CoachingTypes';
 import useCoaching from '../../../../hooks/useCoaching';
 
 interface CoachSelectProps {
   updateCoachFilter: (recordId: string) => void;
+  filterByCoach: Coach | undefined;
 }
 
-export default function CoachSelect({ updateCoachFilter }: CoachSelectProps) {
+export default function CoachSelect({
+  updateCoachFilter,
+  filterByCoach,
+}: CoachSelectProps) {
   const { coachListQuery, activeStudentsQuery } = useCoaching();
 
   const dataReady = coachListQuery.isSuccess && activeStudentsQuery.isSuccess;
@@ -17,6 +22,7 @@ export default function CoachSelect({ updateCoachFilter }: CoachSelectProps) {
           name="coachSelector"
           id="coachSelector"
           onChange={(e) => updateCoachFilter(e.target.value)}
+          value={filterByCoach ? filterByCoach.recordId : -1}
         >
           <option key={0} value={0}>
             All Coaches

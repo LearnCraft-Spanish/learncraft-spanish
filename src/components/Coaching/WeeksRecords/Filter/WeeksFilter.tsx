@@ -13,9 +13,11 @@ import useCoaching from '../../../../hooks/useCoaching';
 import '../../styles/coaching.scss';
 interface CoachingFilterProps {
   weeks: Week[] | undefined;
-
+  filterByCoach: Coach | undefined;
   updateCoachFilter: (value: string) => void;
+  filterByCourse: Course | undefined;
   updateCourseFilter: (value: string) => void;
+  filterByWeeksAgo: number;
   updateWeeksAgoFilter: (value: string) => void;
 
   advancedFilteringMenu: boolean;
@@ -32,8 +34,11 @@ interface CoachingFilterProps {
 }
 export default function WeeksFilter({
   weeks,
+  filterByCoach,
   updateCoachFilter,
+  filterByCourse,
   updateCourseFilter,
+  filterByWeeksAgo,
   updateWeeksAgoFilter,
 
   advancedFilteringMenu,
@@ -60,14 +65,21 @@ export default function WeeksFilter({
       <>
         <div className="coachingFilterSection">
           <div className="simpleFiltering">
-            <CoachSelect updateCoachFilter={updateCoachFilter} />
-            <CourseSelector updateCourseFilter={updateCourseFilter} />
+            <CoachSelect
+              updateCoachFilter={updateCoachFilter}
+              filterByCoach={filterByCoach}
+            />
+            <CourseSelector
+              updateCourseFilter={updateCourseFilter}
+              filterByCourse={filterByCourse}
+            />
             <div>
               <label htmlFor="weekRangeFilter">Week:</label>
               <select
                 name="weekRangeFilter"
                 id="weekRangeFilter"
                 onChange={(e) => updateWeeksAgoFilter(e.target.value)}
+                value={filterByWeeksAgo}
               >
                 <option value={0}>This Week</option>
                 <option value={1}>Last Week</option>
@@ -144,6 +156,7 @@ export default function WeeksFilter({
                   name=""
                   id="filterByCompletion"
                   onChange={(e) => updateFilterByCompletion(e.target.value)}
+                  value={filterByCompletion}
                 >
                   <option value="allRecords">All Records</option>
                   <option value="incompleteOnly">Incomplete Only</option>
@@ -155,7 +168,7 @@ export default function WeeksFilter({
           {/* I think this will Replaced with pagination when implemented in the Table Component */}
         </div>
         <div className="numberShowing">
-          <h4>{`Showing ${weeks.length} records`}</h4>
+          <h4>{`${weeks.length} Records Found`}</h4>
         </div>
       </>
     )
