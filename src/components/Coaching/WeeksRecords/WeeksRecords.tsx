@@ -49,8 +49,8 @@ export default function WeeksRecordsSection() {
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
     useState<string>('allRecords');
-  const [filterByHoldWeeks, setFilterByHoldWeeks] = useState<boolean>(); // True, filter out hold weeks.
-  const [filterByCoachless, setFilterByCoachless] = useState<boolean>();
+  const [filterByHoldWeeks, setFilterByHoldWeeks] = useState<boolean>(true); // True, filter out hold weeks.
+  const [filterByCoachless, setFilterByCoachless] = useState<boolean>(true);
   const [filterBySearchTerm, setFilterBySearchTerm] = useState<string>();
 
   // State for the weeks to display

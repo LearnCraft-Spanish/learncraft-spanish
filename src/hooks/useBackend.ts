@@ -312,10 +312,9 @@ export function useBackend() {
 
   const removeVocabFromExample = useCallback(
     (exampleId: number, vocabIdList: number[]): Promise<number> => {
-      console.log('DELETE REQUEST!');
       return newDeleteFactory({
         path: 'remove-vocab-from-example',
-        body: { exampleid: exampleId, vocabid: vocabIdList },
+        body: { exampleId, vocabIdList },
       });
     },
     [newDeleteFactory],
@@ -410,7 +409,6 @@ export function useBackend() {
 
   const updateExample = useCallback(
     (example: Partial<types.Flashcard>): Promise<number> => {
-      console.log('UPDATE REQUEST!');
       return newPostFactory<number>({
         path: 'update-example',
         body: {
@@ -423,7 +421,6 @@ export function useBackend() {
 
   const addVocabularyToExample = useCallback(
     (exampleId: number, vocabIdList: number[]): Promise<number> => {
-      console.log('ADD REQUEST!');
       return newPostFactory<number>({
         path: 'add-vocab-to-example',
         body: {

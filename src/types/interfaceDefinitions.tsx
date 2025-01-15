@@ -65,6 +65,8 @@ export interface Flashcard {
   spanishAudioLa: string;
   vocabComplete: boolean;
   difficulty?: string;
+  dateCreated?: string;
+  dateModified?: string;
 }
 
 export interface NewFlashcard

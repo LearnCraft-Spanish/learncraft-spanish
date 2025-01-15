@@ -111,13 +111,20 @@ export function useOfficialQuizzes(quizId: number | undefined) {
       function checkChange() {
         const oldExampleCopy: Flashcard = { ...oldExampleData! };
         const newExampleCopy: Flashcard = { ...newExampleData };
-        oldExampleCopy.vocabIncluded = [];
-        newExampleCopy.vocabIncluded = [];
+        const emptySet: string[] = [];
+        oldExampleCopy.vocabIncluded = emptySet;
+        newExampleCopy.vocabIncluded = emptySet;
+        oldExampleCopy.dateCreated = undefined;
+        oldExampleCopy.dateModified = undefined;
+        newExampleCopy.dateCreated = undefined;
+        newExampleCopy.dateModified = undefined;
         const keys = Object.keys(oldExampleCopy) as (keyof Flashcard)[];
         for (const key of keys) {
-          if (oldExampleCopy[key] !== newExampleCopy[key]) return false;
+          if (oldExampleCopy[key] !== newExampleCopy[key]) {
+            return true;
+          }
         }
-        return true;
+        return false;
       }
 
       const hasChanged = checkChange();
@@ -152,14 +159,12 @@ export function useOfficialQuizzes(quizId: number | undefined) {
       }
 
       const updateExampleData = async () => {
-        console.log('hasChanged', hasChanged);
         if (hasChanged) {
           return updateExample(newExampleData);
         }
       };
 
       const addVocab = async () => {
-        console.log('vocabIdsToAdd', vocabIdsToAdd);
         if (!vocabIdsToAdd.length) {
           return;
         }
@@ -167,7 +172,6 @@ export function useOfficialQuizzes(quizId: number | undefined) {
       };
 
       const removeVocab = async () => {
-        console.log('vocabIdsToRemove', vocabIdsToRemove);
         if (!vocabIdsToRemove.length) {
           return;
         }
@@ -176,10 +180,10 @@ export function useOfficialQuizzes(quizId: number | undefined) {
 
       try {
         await Promise.all([updateExampleData(), addVocab(), removeVocab()]);
-        quizExamplesQuery.refetch();
       } catch (error) {
         console.error('Failed to update quiz example:', error);
       }
+      quizExamplesQuery.refetch();
     },
     [
       updateExample,
