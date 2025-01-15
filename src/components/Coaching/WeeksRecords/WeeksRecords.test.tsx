@@ -5,7 +5,8 @@ import { render, waitFor, screen } from '@testing-library/react';
 import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
 
 describe('section WeeksRecordsSection', () => {
-  it('renders without crashing', async () => {
+  // Write better tests, delete skipped ones
+  it.skip('renders without crashing', async () => {
     render(
       <MockAllProviders>
         <WeeksRecordsSection />

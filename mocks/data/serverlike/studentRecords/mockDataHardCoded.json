@@ -3,11 +3,11 @@
     {
       "assignmentType": "Pronunciation",
       "homeworkCorrector": {
-        "email": "josiah@learncraftspanish.com",
-        "id": "",
-        "name": "Josiah Moser"
+        "email": "minor_corinne53@mail.com",
+        "id": "76007814.dcwh",
+        "name": "Minor Corinne"
       },
-      "assignmentLink": "",
+      "assignmentLink": "https://thisIsMyLink.com",
       "rating": "Excellent",
       "areasOfDifficulty": "",
       "notes": "",
@@ -131,7 +131,12 @@
       "recordsCompleteRef": 0,
       "relatedMembership": 569,
       "week": 0,
-      "weekEnds": "2025-01-11"
+      "weekEnds": "2025-01-11",
+      "OfCallsPrivateGroup": 1,
+      "badRecord": false,
+      "membershipCourseHasGroupCalls": true,
+      "membershipCourseWeeklyPrivateCalls": 1,
+      "bundleCreditsUsed": 0
     }
   ]
 }

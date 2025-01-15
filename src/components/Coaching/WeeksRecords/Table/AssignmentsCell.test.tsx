@@ -1,4 +1,4 @@
-import { describe, it, vi, expect } from 'vitest';
+import { beforeAll, describe, it, vi, expect } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
 import { act } from '@testing-library/react';
 import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
@@ -6,21 +6,14 @@ import AssignmentsCell from './AssignmentsCell';
 
 import mockData from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
-/*
-export interface Assignment {
-  recordId: number;
-  assignmentLink: string;
-  relatedWeek: number;
-  rating: string;
-  assignmentType: string;
-  areasOfDifficulty: string;
-  notes: string;
-  homeworkCorrector: QbUser;
-  weekStarts: Date | string;
+const assignment = mockData.assignments.find(
+  (assignment) => assignment.assignmentLink.length > 0,
+);
+
+// We need two validations. the first one
+if (!assignment) {
+  throw new Error('No assignment with assignmentLink found in mock data');
 }
-*/
-const assignment = mockData.assignments[0];
-// Needs membership table & activeStudents table to be mocked
 describe('component StudentCell', () => {
   it('default view renders without crashing', () => {
     render(
@@ -28,24 +21,62 @@ describe('component StudentCell', () => {
         <AssignmentsCell assignment={assignment} />
       </MockAllProviders>,
     );
-    // {assignment.assignmentType}:{assignment.rating} of assignment passed in
     expect(
       screen.getByText(`${assignment.assignmentType}:${assignment.rating}`),
     ).toBeInTheDocument();
   });
-  it('contextual menu view renders without crashing', async () => {
-    render(
-      <MockAllProviders>
-        <AssignmentsCell assignment={assignment} />
-      </MockAllProviders>,
-    );
-    // Click on the button that opens the contextual menu
-    act(() => {
-      screen.getByRole('button').click();
+  describe('contextual menu view', () => {
+    it('contextual menu view renders without crashing', async () => {
+      render(
+        <MockAllProviders>
+          <AssignmentsCell assignment={assignment} />
+        </MockAllProviders>,
+      );
+      // Click on the button that opens the contextual menu
+      act(() => {
+        screen.getByRole('button').click();
+      });
+      await waitFor(() => {
+        expect(screen.getByText('Notes:')).toBeInTheDocument();
+      });
     });
-    await waitFor(() => {
-      // Contextual menu should be open
-      expect(screen.getByText('Notes:')).toBeInTheDocument();
+
+    it('contextual menu view renders the correct data', async () => {
+      const requiredFields = [
+        'Corrected by:',
+        'Rating:',
+        'Notes:',
+        'Areas of Difficulty:',
+      ];
+      render(
+        <MockAllProviders>
+          <AssignmentsCell assignment={assignment} />
+        </MockAllProviders>,
+      );
+      // Click on the button that opens the contextual menu
+      act(() => {
+        screen.getByRole('button').click();
+      });
+      await waitFor(() => {
+        requiredFields.forEach((field) => {
+          expect(screen.getByText(field)).toBeInTheDocument();
+        });
+      });
+    });
+
+    it('contextual menu view renders the session documents if they exist on the assignment', async () => {
+      render(
+        <MockAllProviders>
+          <AssignmentsCell assignment={assignment} />
+        </MockAllProviders>,
+      );
+      // Click on the button that opens the contextual menu
+      act(() => {
+        screen.getByRole('button').click();
+      });
+      await waitFor(() => {
+        expect(screen.getByText('Session Documents:')).toBeInTheDocument();
+      });
     });
   });
 });

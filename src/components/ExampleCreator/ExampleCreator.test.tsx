@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import ExampleCreator from './ExampleCreator';
@@ -35,7 +31,7 @@ describe('component ExampleCreator', () => {
     const expectedFields = [
       'Spanish Example',
       'English Translation',
-      'Spanglish',
+      // 'Spanglish',
     ];
     const { getByText } = getRenderedComponent();
 

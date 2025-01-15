@@ -5,7 +5,7 @@ import type {
   Flashcard,
   StudentExample,
   StudentFlashcardData,
-} from '../interfaceDefinitions';
+} from '../types/interfaceDefinitions';
 import { useActiveStudent } from './useActiveStudent';
 import { useBackend } from './useBackend';
 import { useUserData } from './useUserData';

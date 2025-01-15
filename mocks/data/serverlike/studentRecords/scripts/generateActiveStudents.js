@@ -1,17 +1,17 @@
 import fakePeopleList from './fakePeople.json' assert { type: 'json' };
 import mockData from './mockData.json' assert { type: 'json' };
-const activeStudentTemplate = {
-  recordId: 0,
-  firstName: '',
-  lastName: '',
-  fullName: '',
-  email: '',
-  timeZone: 'Pacific - US', // examples: 'Pacific/Central/Eastern - US', 'GMT-0', 'UK', 'CET', ''
-  usPhone: '', // often not provided, ex: '(000) 000-0000'
-  fluencyGoal: '',
-  startingLevel: '',
-  primaryCoach: {}, // 'user' attribute of a coach from coachListQuery
-};
+// const activeStudentTemplate = {
+//   recordId: 0,
+//   firstName: '',
+//   lastName: '',
+//   fullName: '',
+//   email: '',
+//   timeZone: 'Pacific - US', // examples: 'Pacific/Central/Eastern - US', 'GMT-0', 'UK', 'CET', ''
+//   usPhone: '', // often not provided, ex: '(000) 000-0000'
+//   fluencyGoal: '',
+//   startingLevel: '',
+//   primaryCoach: {}, // 'user' attribute of a coach from coachListQuery
+// };
 
 const exampleFluencyGoals = [
   'Introduce myself and share basic personal details in Spanish.',
@@ -37,7 +37,7 @@ const exampleStartingLevels = [
 ];
 function generateActiveStudentsData({ coachList, numberOfRecords }) {
   if (numberOfRecords > fakePeopleList.length) {
-    throw Error(
+    throw new Error(
       'numberOfRecords requested is larger than the number of fakePeople we have prepared!',
     );
   }
@@ -91,7 +91,6 @@ function generateActiveStudentsData({ coachList, numberOfRecords }) {
 
 // console.log(JSON.stringify(getFullNamesFromEmails()));
 
-const coachList = mockData.coachList.slice(0, 2);
-
-const results = generateActiveStudentsData({ coachList, numberOfRecords: 10 });
-console.log(results);
+// const coachList = mockData.coachList.slice(0, 2);
+// const results = generateActiveStudentsData({ coachList, numberOfRecords: 10 });
+// console.log(results);

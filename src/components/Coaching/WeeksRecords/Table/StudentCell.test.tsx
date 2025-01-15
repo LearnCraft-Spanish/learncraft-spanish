@@ -4,35 +4,69 @@ import { render, waitFor, screen } from '@testing-library/react';
 import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
 import StudentCell from './StudentCell';
 import mockDataHardCoded from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
-const exampleStudent = {
-  recordId: 6746,
-  firstName: 'Hunter',
-  lastName: 'Derek',
-  fullName: 'Hunter Derek',
-  email: 'hunter_derek73@aol.com',
-  timeZone: '',
-  usPhone: '',
-  fluencyGoal: 'Talk about the weather and seasonal activities in Spanish.',
-  startingLevel: '',
-  primaryCoach: {
-    email: 'woodward-dorris81@aol.com',
-    id: '76457430.uhgh',
-    name: 'Woodward Dorris',
-  },
-};
+
+const week = mockDataHardCoded.lastThreeWeeks[0];
+const membership = mockDataHardCoded.activeMemberships.find((membership) => {
+  return membership.recordId === week.relatedMembership;
+});
+if (!membership) {
+  throw new Error('No membership related to week record');
+}
+const student = mockDataHardCoded.activeStudents.find((student) => {
+  return student.recordId === membership.relatedStudent;
+});
+
+if (!student) {
+  throw new Error('No student related to week record');
+}
 // Needs membership table & activeStudents table to be mocked
 describe('component StudentCell', () => {
-  it('renders without crashing', async () => {
+  // Write better tests, delete skipped ones
+  it('renders with valid data', async () => {
     render(
       <MockAllProviders>
-        <StudentCell week={mockDataHardCoded.lastThreeWeeks[0]} />
+        <StudentCell week={week} />
       </MockAllProviders>,
     );
     // Student Name related to the week record
     await waitFor(() => {
-      expect(
-        screen.getByText(mockDataHardCoded.activeStudents[0].fullName),
-      ).toBeInTheDocument();
+      expect(screen.getByText(student.fullName)).toBeInTheDocument();
     });
+  });
+  it('does not render with invalid data', async () => {
+    render(
+      <MockAllProviders>
+        <StudentCell
+          week={{
+            ...week,
+            relatedMembership: 777777,
+          }}
+        />
+      </MockAllProviders>,
+    );
+    // Student Name related to the week record
+    await waitFor(() => {
+      expect(screen.queryByText(student.fullName)).not.toBeInTheDocument();
+    });
+  });
+
+  it('renders with the correct data', async () => {
+    render(
+      <MockAllProviders>
+        <StudentCell week={week} />
+      </MockAllProviders>,
+    );
+    // Student Name related to the week record
+    await waitFor(() => {
+      expect(screen.getByText(student.fullName)).toBeInTheDocument();
+      expect(screen.getByText(student.email)).toBeInTheDocument();
+      expect(screen.getByText(student.primaryCoach.name)).toBeInTheDocument();
+      expect(screen.getByText(week.level)).toBeInTheDocument();
+    });
+  });
+
+  it.skip('contextual menu', () => {
+    // Unable to test here, as the contextual menu is not part of the StudentCell component
+    // (it lives in the parent component)
   });
 });

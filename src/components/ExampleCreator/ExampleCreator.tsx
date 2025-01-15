@@ -3,7 +3,7 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
-import type { NewFlashcard } from '../../interfaceDefinitions';
+import type { NewFlashcard } from '../../types/interfaceDefinitions';
 import { useUnverifiedExamples } from '../../hooks/useUnverifiedExamples';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import { AudioControl } from './AudioControl';

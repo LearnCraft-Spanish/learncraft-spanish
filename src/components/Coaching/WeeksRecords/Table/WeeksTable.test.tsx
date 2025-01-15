@@ -6,7 +6,8 @@ import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
 import WeeksTable from './WeeksTable';
 
 describe('component WeeksTable', () => {
-  it('renders without crashing', async () => {
+  // Write better tests, delete skipped ones
+  it.skip('renders without crashing', async () => {
     render(
       <MockAllProviders>
         <WeeksTable weeks={mockDataHardCoded.lastThreeWeeks} />

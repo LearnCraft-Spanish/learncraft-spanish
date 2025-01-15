@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import type { Flashcard } from '../../interfaceDefinitions';
+import type { Flashcard } from '../../types/interfaceDefinitions';
 import {
   formatEnglishText,
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
-import x from '../../resources/icons/x.svg';
+import x from '../../assets/icons/x.svg';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
 

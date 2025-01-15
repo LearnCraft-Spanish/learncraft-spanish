@@ -8,11 +8,11 @@ import type {
   Flashcard,
   LessonUnparsed,
   ProgramUnparsed,
-  Quiz,
   QuizExamplesTable,
+  QuizUnparsed,
   Spelling,
   Vocabulary,
-} from '../../../src/interfaceDefinitions';
+} from '../../../src/types/interfaceDefinitions';
 
 import * as dataJson from './actualServerData.json';
 import { allStudentsTable } from './studentTable';
@@ -22,7 +22,7 @@ interface MockApiData {
   lessonsTable: LessonUnparsed[];
   vocabularyTable: Vocabulary[];
   spellingsTable: Spelling[];
-  quizzesTable: Quiz[];
+  quizzesTable: QuizUnparsed[];
   verifiedExamplesTable: Flashcard[];
   quizExamplesTableArray: QuizExamplesTable[];
 }
@@ -37,7 +37,7 @@ export default function serverlikeData() {
   const lessonsTable: LessonUnparsed[] = mockApiData.lessonsTable;
   const vocabularyTable: Vocabulary[] = mockApiData.vocabularyTable;
   const spellingsTable: Spelling[] = mockApiData.spellingsTable;
-  const quizzesTable: Quiz[] = mockApiData.quizzesTable;
+  const quizzesTable: QuizUnparsed[] = mockApiData.quizzesTable;
   const verifiedExamplesTable: Flashcard[] = mockApiData.verifiedExamplesTable;
   const quizExamplesTableArray: QuizExamplesTable[] =
     mockApiData.quizExamplesTableArray;

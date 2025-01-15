@@ -3,7 +3,7 @@ import type {
   DisplayOrder,
   Flashcard,
   VocabTag,
-} from '../../interfaceDefinitions';
+} from '../../types/interfaceDefinitions';
 
 import '../../App.css';
 

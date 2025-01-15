@@ -1,6 +1,6 @@
-import type { Week } from './../../CoachingTypes';
+import type { Week } from '../../../../types/CoachingTypes';
 import useCoaching from '../../../../hooks/useCoaching';
-import eye from '../../../../resources/icons/eye.svg';
+import eye from '../../../../assets/icons/eye.svg';
 // import pencil from '../../../../resources/icons/pencil.svg';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 

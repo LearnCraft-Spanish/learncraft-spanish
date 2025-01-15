@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { NewFlashcard } from '../interfaceDefinitions';
+import type { NewFlashcard } from '../types/interfaceDefinitions';
 import { useBackend } from './useBackend';
 import { useUserData } from './useUserData';
 

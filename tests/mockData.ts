@@ -3,7 +3,7 @@ import type {
   Program,
   StudentFlashcardData,
   UserData,
-} from '../src/interfaceDefinitions';
+} from '../src/types/interfaceDefinitions';
 import mockDbData from './mockDbData.json';
 import mockLessonData from './mockLessonData.json';
 

@@ -1,7 +1,4 @@
 {
   "singleQuote": true,
-  "trailingComma": "all",
-  "ignores": [
-    "pnpm-lock.yaml"
-  ]
+  "trailingComma": "all"
 }

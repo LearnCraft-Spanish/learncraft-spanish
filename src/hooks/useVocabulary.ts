@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
-import type { VocabTag, Vocabulary } from '../interfaceDefinitions';
+import type { VocabTag, Vocabulary } from '../types/interfaceDefinitions';
 import { useBackend } from './useBackend';
 import { useUserData } from './useUserData';
 

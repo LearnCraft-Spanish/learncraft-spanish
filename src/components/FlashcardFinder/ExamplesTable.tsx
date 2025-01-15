@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
+import type { DisplayOrder, Flashcard } from '../../types/interfaceDefinitions';
 import ExampleListItem from './ExampleListItem';
 import Pagination from './Pagination';
 

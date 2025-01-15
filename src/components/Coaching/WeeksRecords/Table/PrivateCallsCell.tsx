@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Call, Week } from '../../CoachingTypes';
+import type { Call, Week } from '../../../../types/CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import useCoaching from '../../../../hooks/useCoaching';
 import ContextualControlls from '../../../ContextualControlls';
@@ -57,11 +57,16 @@ export default function PrivateCallsCell({ week }: { week: Week }) {
                     <p className="content"> {call.areasOfDifficulty}</p>
                   </div>
                   {call.recording.length > 0 && (
-                    <div className="lineWrapper">
-                      <a target="_blank" href={call.recording}>
-                        Recording Link
-                      </a>
-                    </div>
+                    <>
+                      <div className="lineWrapper">
+                        <h4>Session Documents:</h4>
+                      </div>
+                      <div className="lineWrapper">
+                        <a target="_blank" href={call.recording}>
+                          Recording Link
+                        </a>
+                      </div>
+                    </>
                   )}
                   {/* <div className="buttonBox">
                     <button
