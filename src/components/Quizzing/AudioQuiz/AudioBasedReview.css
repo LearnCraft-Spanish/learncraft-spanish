@@ -4,7 +4,7 @@
   width: 50vw;
 }
 button:disabled {
-  background-color: grey;
+  background-color: var(--dark);
   color: var(--light);
   cursor: not-allowed;
 }

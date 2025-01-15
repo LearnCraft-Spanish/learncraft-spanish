@@ -20,9 +20,10 @@ export default function ExampleEditor() {
   const [englishAudio, setEnglishAudio] = useState('');
   const [vocabIncluded, setVocabIncluded] = useState([] as string[]);
   const [vocabComplete, setVocabComplete] = useState(false);
-  const [_selectedVocabTerm, _setSelectedVocabTerm] = useState(
-    null as Vocabulary | null,
+  const [selectedVocabTerm, setSelectedVocabTerm] = useState(
+    undefined as string | undefined,
   );
+  const [vocabSearchTerm, setVocabSearchTerm] = useState('');
 
   const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
@@ -86,14 +87,33 @@ export default function ExampleEditor() {
     }
   }, [spanishExample]);
 
-  const addToVocab = useCallback(
-    (vocab: string) => {
-      if (!vocabIncluded.includes(vocab)) {
-        setVocabIncluded([...vocabIncluded, vocab]);
-      }
-    },
-    [vocabIncluded],
-  );
+  const vocabOptions = useMemo(() => {
+    const filteredVocab =
+      vocabularyQuery.data?.filter((term) =>
+        term.vocabName.includes(vocabSearchTerm),
+      ) ?? [];
+    const filteredVocabOptions = filteredVocab.map((vocab) => {
+      return (
+        <option key={vocab.recordId} value={vocab.descriptionOfVocabularySkill}>
+          {vocab.descriptionOfVocabularySkill}
+        </option>
+      );
+    });
+    return [
+      <option key={0} value={undefined}>
+        Choose
+      </option>,
+      ...filteredVocabOptions,
+    ];
+  }, [vocabularyQuery.data, vocabSearchTerm]);
+
+  const addSelectedVocab = useCallback(() => {
+    const vocab = selectedVocabTerm;
+    if (vocab && !vocabIncluded.includes(vocab)) {
+      setVocabIncluded([...vocabIncluded, vocab]);
+      setVocabSearchTerm('');
+    }
+  }, [vocabIncluded, selectedVocabTerm]);
 
   const removeFromVocabIncluded = useCallback(
     (vocabName: string) => {
@@ -204,7 +224,7 @@ export default function ExampleEditor() {
             value={quizCourse}
             onChange={(e) => setQuizCourse(e.target.value)}
           >
-            <option value="">Select Course</option>
+            <option value="">Select Example List</option>
             {quizCourseOptions}
           </select>
           {!!quizCourse && (
@@ -265,14 +285,26 @@ export default function ExampleEditor() {
                 />
               ))}
             </div>
-            <select onChange={(e) => addToVocab(e.target.value)}>
-              {vocabularyQuery.isSuccess &&
-                vocabularyQuery.data.map((vocab) => (
-                  <option key={vocab.recordId} value={vocab.recordId}>
-                    {vocab.descriptionOfVocabularySkill}
-                  </option>
-                ))}
+            <input
+              type="text"
+              value={vocabSearchTerm}
+              onChange={(e) => setVocabSearchTerm(e.target.value)}
+            />
+            <select
+              value={selectedVocabTerm}
+              onChange={(e) => setSelectedVocabTerm(e.target.value)}
+            >
+              {vocabOptions}
             </select>
+            {selectedVocabTerm ? (
+              <button type="button" onClick={addSelectedVocab}>
+                Add Vocab
+              </button>
+            ) : (
+              <button type="button" className="disabledButton" disabled>
+                Add Vocab
+              </button>
+            )}
           </div>
           <button type="submit">Save Example</button>
         </form>
