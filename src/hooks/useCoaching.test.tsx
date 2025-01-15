@@ -28,20 +28,20 @@ describe('hook useCoaching', () => {
       'callsQuery',
     ];
     for (const query of listOfQueries) {
-      it(`query ${query} exists and has data`, async () => {
+      it(`query ${query}: exists and has data`, async () => {
         const { result } = renderHook(() => useCoaching(), {
           wrapper: MockAllProviders,
         });
         await waitFor(() => {
-          // @ts-expect-error - I dont want to add type safety to this bandaid of a test
+          // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists
           expect(result.current[query].isSuccess).toBeTruthy();
-          // @ts-expect-error - I dont want to add type safety to this bandaid of a test
+          // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists
           expect(result.current[query].data.length).toBeGreaterThan(0);
         });
       });
     }
   });
-  describe.skip('helper functions exist & work', () => {
+  describe('helper functions exist & work', () => {
     const listOfFunctions = [
       {
         func: 'getCoachFromMembershipId',
@@ -101,14 +101,14 @@ describe('hook useCoaching', () => {
       },
     ];
     for (const func of listOfFunctions) {
-      it(`function ${func.func} exists and works`, async () => {
+      it(`function ${func.func}: exists and works as expected`, async () => {
         const { result } = renderHook(() => useCoaching(), {
           wrapper: MockAllProviders,
         });
         await waitFor(() => {
-          // @ts-expect-error - I dont want to add type safety to this bandaid of a test
+          // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists
           expect(result.current[func.func]).toBeDefined();
-          // @ts-expect-error - I dont want to add type safety to this bandaid of a test
+          // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists
           expect(result.current[func.func](func.arg)).toStrictEqual(
             func.expected,
           );
