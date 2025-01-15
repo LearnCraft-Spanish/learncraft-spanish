@@ -10,6 +10,8 @@ export function useOfficialQuizzes(quizId: number | undefined) {
     getLcspQuizzesFromBackend,
     getQuizExamplesFromBackend,
     updateExample,
+    addVocabularyToExample,
+    removeVocabFromExample,
   } = useBackend();
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
@@ -85,7 +87,7 @@ export function useOfficialQuizzes(quizId: number | undefined) {
   });
 
   const updateQuizExample = useCallback(
-    async (newExampleData: Partial<Flashcard>) => {
+    async (newExampleData: Flashcard) => {
       const isInActiveQuiz = quizExamplesQuery.data?.some(
         (example) => example.recordId === newExampleData.recordId,
       );

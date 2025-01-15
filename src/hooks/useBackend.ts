@@ -276,6 +276,16 @@ export function useBackend() {
     [deleteFactory],
   );
 
+  const removeVocabFromExample = useCallback(
+    (exampleId: number, vocabIdList: number[]): Promise<number> => {
+      return deleteFactory('remove-vocab-from-example', {
+        exampleid: exampleId,
+        vocabid: vocabIdList,
+      });
+    },
+    [deleteFactory],
+  );
+
   const getPMFDataForUser = useCallback(
     (userId: number): Promise<types.PMFData> => {
       return getFactory(`pmf/${userId}`);
@@ -375,44 +385,64 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const addVocabularyToExample = useCallback(
+    (exampleId: number, vocabIdList: number[]): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'add-vocab-to-example',
+        body: {
+          exampleId,
+          vocabIdList,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   return {
+    // GET Requests
     getAccessToken,
-    getProgramsFromBackend,
-    getLessonsFromBackend,
-    getVocabFromBackend,
-    getSpellingsFromBackend,
-    getExamplesFromBackend,
-    getVerifiedExamplesFromBackend,
-    getAudioExamplesFromBackend,
-    getLcspQuizzesFromBackend,
-    getMyExamplesFromBackend,
-    getQuizExamplesFromBackend,
-    getAllUsersFromBackend,
-    getUnverifiedExamplesFromBackend,
-    getSingleExample,
-    getUserDataFromBackend,
     getActiveExamplesFromBackend,
+    getActiveMemberships,
+    getActiveStudents,
+    getAllUsersFromBackend,
+    getAssignments,
+    getAudioExamplesFromBackend,
+    getCalls,
     getCoachList,
     getCourseList,
-    getLessonList,
-    getActiveStudents,
-    getActiveMemberships,
-    getLastThreeWeeks,
-    createMyStudentExample,
-    createStudentExample,
-    createUnverifiedExample,
-    updateMyStudentExample,
-    updateStudentExample,
-    updateExample,
-    deleteMyStudentExample,
-    deleteStudentExample,
-    getPMFDataForUser,
-    createPMFDataForUser,
-    updatePMFDataForUser,
-    getNewWeeks,
+    getExamplesFromBackend,
     getGroupAttendees,
     getGroupSessions,
-    getAssignments,
-    getCalls,
+    getLastThreeWeeks,
+    getLcspQuizzesFromBackend,
+    getLessonList,
+    getLessonsFromBackend,
+    getMyExamplesFromBackend,
+    getNewWeeks,
+    getPMFDataForUser,
+    getProgramsFromBackend,
+    getQuizExamplesFromBackend,
+    getSingleExample,
+    getSpellingsFromBackend,
+    getUnverifiedExamplesFromBackend,
+    getUserDataFromBackend,
+    getVerifiedExamplesFromBackend,
+    getVocabFromBackend,
+
+    // POST Requests
+    addVocabularyToExample,
+    createMyStudentExample,
+    createPMFDataForUser,
+    createStudentExample,
+    createUnverifiedExample,
+    updateExample,
+    updateMyStudentExample,
+    updatePMFDataForUser,
+    updateStudentExample,
+
+    // DELETE Requests
+    deleteMyStudentExample,
+    deleteStudentExample,
+    removeVocabFromExample,
   };
 }
