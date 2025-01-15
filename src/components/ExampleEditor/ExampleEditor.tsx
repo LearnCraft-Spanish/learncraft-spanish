@@ -179,8 +179,12 @@ export default function ExampleEditor() {
         setVocabComplete(example.vocabComplete);
       }
     }
-  }, [vocabularyQuery.data, selectedExampleId, tableData]);
-
+  }, [
+    quizExamplesQuery.data,
+    vocabularyQuery.data,
+    selectedExampleId,
+    tableData,
+  ]);
   // Update default quiz when quizCourse changes
   useEffect(() => {
     if (!firstQuiz) {

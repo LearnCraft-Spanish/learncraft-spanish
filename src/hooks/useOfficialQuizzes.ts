@@ -108,6 +108,20 @@ export function useOfficialQuizzes(quizId: number | undefined) {
         return;
       }
 
+      function checkChange() {
+        const oldExampleCopy: Flashcard = { ...oldExampleData! };
+        const newExampleCopy: Flashcard = { ...newExampleData };
+        oldExampleCopy.vocabIncluded = [];
+        newExampleCopy.vocabIncluded = [];
+        const keys = Object.keys(oldExampleCopy) as (keyof Flashcard)[];
+        for (const key of keys) {
+          if (oldExampleCopy[key] !== newExampleCopy[key]) return false;
+        }
+        return true;
+      }
+
+      const hasChanged = checkChange();
+
       const oldVocab = oldExampleData.vocabIncluded;
       const newVocab = newExampleData.vocabIncluded;
 
@@ -128,28 +142,40 @@ export function useOfficialQuizzes(quizId: number | undefined) {
         .map((vocab) => vocabMap.get(vocab))
         .filter((id) => id !== undefined) as number[];
 
-      const addVocab = () => {
-        if (vocabIdsToRemove.length > 0) {
-          return addVocabularyToExample(newExampleData.recordId, vocabIdsToAdd);
+      if (
+        !hasChanged &&
+        vocabIdsToAdd.length === 0 &&
+        vocabIdsToRemove.length === 0
+      ) {
+        console.error('No changes detected.');
+        return;
+      }
+
+      const updateExampleData = async () => {
+        console.log('hasChanged', hasChanged);
+        if (hasChanged) {
+          return updateExample(newExampleData);
         }
       };
 
-      const removeVocab = () => {
-        if (vocabIdsToRemove.length > 0) {
-          return removeVocabFromExample(
-            newExampleData.recordId,
-            vocabIdsToRemove,
-          );
+      const addVocab = async () => {
+        console.log('vocabIdsToAdd', vocabIdsToAdd);
+        if (!vocabIdsToAdd.length) {
+          return;
         }
+        addVocabularyToExample(newExampleData.recordId, vocabIdsToAdd);
+      };
+
+      const removeVocab = async () => {
+        console.log('vocabIdsToRemove', vocabIdsToRemove);
+        if (!vocabIdsToRemove.length) {
+          return;
+        }
+        removeVocabFromExample(newExampleData.recordId, vocabIdsToRemove);
       };
 
       try {
-        await Promise.all([
-          updateExample(newExampleData),
-          addVocab,
-          removeVocab,
-        ]);
-
+        await Promise.all([updateExampleData(), addVocab(), removeVocab()]);
         quizExamplesQuery.refetch();
       } catch (error) {
         console.error('Failed to update quiz example:', error);
