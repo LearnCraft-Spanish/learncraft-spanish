@@ -44,11 +44,11 @@ export default function WeeksRecordsSection() {
   } = useCoaching();
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(false);
-  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(0);
+  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(1);
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
-    useState<string>('allRecords');
+    useState<string>('incompleteOnly');
   const [filterByHoldWeeks, setFilterByHoldWeeks] = useState<boolean>(true); // True, filter out hold weeks.
   const [filterByCoachless, setFilterByCoachless] = useState<boolean>(true);
   const [filterBySearchTerm, setFilterBySearchTerm] = useState<string>();
@@ -176,6 +176,10 @@ export default function WeeksRecordsSection() {
 
   const filterWeeks = useCallback(
     (weeks: Week[]) => {
+      if (!dataReady) {
+        console.error('Data not ready, cannot filter weeks');
+        return weeks;
+      }
       let filteredWeeks = weeks;
       if (filterByCoach) {
         filteredWeeks = filterByCoachFunction(filteredWeeks);
@@ -185,7 +189,6 @@ export default function WeeksRecordsSection() {
       }
       // I dont like the logic with filterByWeeksAgo < 0, i will change it later
       filteredWeeks = filterWeeksByWeeksAgoFunction(filteredWeeks); //FOLLOW SAME PATTERN AS ABOVE, PLEASE
-
       if (filterByCoachless) {
         filteredWeeks = filterWeeksByCoachlessFunction(filteredWeeks);
       }
@@ -193,7 +196,6 @@ export default function WeeksRecordsSection() {
       if (filterByHoldWeeks) {
         filteredWeeks = filterByHoldWeeksFunction(filteredWeeks);
       }
-
       if (filterByCompletion === 'incompleteOnly') {
         filteredWeeks = filteredWeeks.filter((week) => !week.recordsComplete);
       } else if (filterByCompletion === 'completeOnly') {
@@ -216,6 +218,7 @@ export default function WeeksRecordsSection() {
       filterByHoldWeeks,
       filterByCompletion,
       filterBySearchTerm,
+      dataReady,
     ],
   );
 
@@ -236,10 +239,8 @@ export default function WeeksRecordsSection() {
   }, [userDataQuery.isSuccess, lastThreeWeeksQuery]);
 
   useEffect(() => {
-    if (dataReady) {
-      console.log('filtering weeks!');
+    if (dataReady && rendered.current) {
       const filteredWeeks = filterWeeks(lastThreeWeeksQuery.data);
-      // const truncatedWeeks = filteredWeeks.slice(0, 25);
       setWeeks(filteredWeeks);
     }
   }, [dataReady, filterWeeks]);
