@@ -275,14 +275,50 @@ export function useBackend() {
     [deleteFactory],
   );
 
+  interface DeleteFactoryOptions {
+    path: string;
+    headers?: Record<string, any>;
+    body?: Record<string, any>;
+  }
+
+  const newDeleteFactory = useCallback(
+    async <T>({
+      path,
+      headers = [],
+      body = [],
+    }: DeleteFactoryOptions): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(`Error parsing JSON from ${path}:`, error);
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to delete ${path}: ${response.statusText}`);
+        throw new Error(`Failed to delete ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+
   const removeVocabFromExample = useCallback(
     (exampleId: number, vocabIdList: number[]): Promise<number> => {
-      return deleteFactory('remove-vocab-from-example', {
-        exampleid: exampleId,
-        vocabid: vocabIdList,
+      console.log('DELETE REQUEST!');
+      return newDeleteFactory({
+        path: 'remove-vocab-from-example',
+        body: { exampleid: exampleId, vocabid: vocabIdList },
       });
     },
-    [deleteFactory],
+    [newDeleteFactory],
   );
 
   const getPMFDataForUser = useCallback(
@@ -374,6 +410,7 @@ export function useBackend() {
 
   const updateExample = useCallback(
     (example: Partial<types.Flashcard>): Promise<number> => {
+      console.log('UPDATE REQUEST!');
       return newPostFactory<number>({
         path: 'update-example',
         body: {
@@ -386,6 +423,7 @@ export function useBackend() {
 
   const addVocabularyToExample = useCallback(
     (exampleId: number, vocabIdList: number[]): Promise<number> => {
+      console.log('ADD REQUEST!');
       return newPostFactory<number>({
         path: 'add-vocab-to-example',
         body: {
