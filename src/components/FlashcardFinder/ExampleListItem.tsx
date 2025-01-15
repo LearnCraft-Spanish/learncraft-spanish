@@ -12,7 +12,7 @@ interface FormatExampleForTableProps {
   data: Flashcard;
   showSpanglishLabel?: boolean;
   forceShowVocab?: boolean;
-  selectExample: ((recordId: number) => void) | undefined;
+  selectExample?: (recordId: number) => void;
   selectedExampleId?: number | null;
 }
 
