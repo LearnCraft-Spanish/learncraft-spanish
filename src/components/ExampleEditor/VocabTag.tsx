@@ -3,23 +3,23 @@ import x from '../../assets/icons/x_dark.svg';
 
 interface VocabTagProps {
   vocab: Vocabulary;
-  removeFromVocabByRecordId?: (recordId: string | number) => void;
+  removeFromVocabList?: (vocabName: string) => void;
 }
 
 export const VocabTag: React.FC<VocabTagProps> = ({
   vocab,
-  removeFromVocabByRecordId,
+  removeFromVocabList,
 }) => {
-  const { descriptionOfVocabularySkill, recordId } = vocab;
+  const { descriptionOfVocabularySkill, vocabName, recordId } = vocab;
 
   return (
     <div key={recordId} className="vocabTag">
       <p>{descriptionOfVocabularySkill}</p>
-      {removeFromVocabByRecordId !== undefined && (
+      {removeFromVocabList !== undefined && (
         <button
           className="removeTagButton"
           type="button"
-          onClick={() => removeFromVocabByRecordId(recordId)}
+          onClick={() => removeFromVocabList(vocabName)}
         >
           <img src={x} alt="Remove from Vocab" />
         </button>

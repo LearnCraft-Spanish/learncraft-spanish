@@ -1,12 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  formatEnglishText,
-  formatSpanishText,
-} from '../../functions/formatFlashcardText';
-import type { Vocabulary } from '../../types/interfaceDefinitions';
+import type { Flashcard, Vocabulary } from '../../types/interfaceDefinitions';
 import { useVocabulary } from '../../hooks/useVocabulary';
 import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
+import ExampleListItem from '../FlashcardFinder/ExampleListItem';
 import quizCourses from '../../functions/QuizCourseList';
 import { VocabTag } from './VocabTag';
 import './ExampleEditor.css';
@@ -21,7 +18,7 @@ export default function ExampleEditor() {
   const [englishTranslation, setEnglishTranslation] = useState('');
   const [spanishAudioLa, setSpanishAudioLa] = useState('');
   const [englishAudio, setEnglishAudio] = useState('');
-  const [vocabIncluded, setVocabIncluded] = useState([] as Vocabulary[]);
+  const [vocabIncluded, setVocabIncluded] = useState([] as string[]);
   const [vocabComplete, setVocabComplete] = useState(false);
   const [_selectedVocabTerm, _setSelectedVocabTerm] = useState(
     null as Vocabulary | null,
@@ -30,6 +27,16 @@ export default function ExampleEditor() {
   const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
   const { vocabularyQuery } = useVocabulary();
+
+  const includedVocabObjects = useMemo(() => {
+    return vocabIncluded
+      .map((vocab) => {
+        return vocabularyQuery.data?.find(
+          (word) => word.descriptionOfVocabularySkill === vocab,
+        );
+      })
+      .filter((vocab) => vocab !== undefined) as Vocabulary[];
+  }, [vocabIncluded, vocabularyQuery.data]);
 
   const quizList = useMemo(() => {
     return officialQuizzesQuery.data?.filter((quiz) => {
@@ -79,31 +86,47 @@ export default function ExampleEditor() {
     }
   }, [spanishExample]);
 
-  const addToVocabByRecordId = useCallback(
-    (recordId: string | number) => {
-      if (typeof recordId === 'string') {
-        recordId = Number.parseInt(recordId);
+  const addToVocab = useCallback(
+    (vocab: string) => {
+      if (!vocabIncluded.includes(vocab)) {
+        setVocabIncluded([...vocabIncluded, vocab]);
       }
-      const vocab = vocabularyQuery.data?.find(
-        (vocab) => vocab.recordId === recordId,
-      );
-      if (vocab) {
-        if (!vocabIncluded.some((word) => word.recordId === vocab.recordId)) {
-          setVocabIncluded([...vocabIncluded, vocab]);
-        }
-      }
-    },
-    [vocabularyQuery.data, vocabIncluded],
-  );
-
-  const removeFromVocabIncluded = useCallback(
-    (recordId: number | string) => {
-      setVocabIncluded(
-        vocabIncluded.filter((vocab) => vocab.recordId !== recordId),
-      );
     },
     [vocabIncluded],
   );
+
+  const removeFromVocabIncluded = useCallback(
+    (vocabName: string) => {
+      setVocabIncluded(vocabIncluded.filter((vocab) => vocab !== vocabName));
+    },
+    [vocabIncluded],
+  );
+
+  const currentFlashcard: Flashcard | null = useMemo(() => {
+    if (selectedExampleId === null) {
+      return null;
+    } else {
+      return {
+        recordId: selectedExampleId ?? 0,
+        spanglish,
+        spanishExample,
+        englishTranslation,
+        spanishAudioLa,
+        englishAudio,
+        vocabIncluded,
+        vocabComplete,
+      };
+    }
+  }, [
+    selectedExampleId,
+    spanglish,
+    vocabIncluded,
+    englishAudio,
+    englishTranslation,
+    spanishAudioLa,
+    spanishExample,
+    vocabComplete,
+  ]);
 
   function handleEditExample(e: React.FormEvent) {
     e.preventDefault();
@@ -116,6 +139,7 @@ export default function ExampleEditor() {
         spanglish,
         englishAudio,
         vocabComplete,
+        vocabIncluded,
       });
     }
   }
@@ -127,20 +151,11 @@ export default function ExampleEditor() {
         (example) => example.recordId === selectedExampleId,
       );
       if (example) {
-        const includedVocabStrings = example.vocabIncluded;
-        const includedVocabObjects = includedVocabStrings
-          .map((vocab) => {
-            return vocabularyQuery.data?.find(
-              (word) => word.descriptionOfVocabularySkill === vocab,
-            );
-          })
-          .filter((vocab) => vocab !== undefined) as Vocabulary[];
-
         setSpanishExample(example.spanishExample);
         setEnglishTranslation(example.englishTranslation);
         setSpanishAudioLa(example.spanishAudioLa);
         setEnglishAudio(example.englishAudio);
-        setVocabIncluded(includedVocabObjects);
+        setVocabIncluded(example.vocabIncluded);
         setVocabComplete(example.vocabComplete);
       }
     }
@@ -162,12 +177,12 @@ export default function ExampleEditor() {
       </div>
       <div>
         <div>
-          <h3>Example Preview</h3>
-          <div>
-            {formatSpanishText(spanglish, spanishExample)}
-            {spanglish === 'spanglish' && <p>Spanglish Detected</p>}
-            {formatEnglishText(englishTranslation)}
-          </div>
+          {selectedExampleId && (
+            <div>
+              <h3>Example Preview</h3>
+              <ExampleListItem data={currentFlashcard!} forceShowVocab />
+            </div>
+          )}
           <div>
             {spanishAudioLa.length > 0 && (
               <>
@@ -242,15 +257,15 @@ export default function ExampleEditor() {
           <div>
             <label id="vocabIncluded">Vocab Included</label>
             <div className="vocabTagBox">
-              {vocabIncluded.map((vocab) => (
+              {includedVocabObjects.map((vocab) => (
                 <VocabTag
                   key={vocab.recordId}
                   vocab={vocab}
-                  removeFromVocabByRecordId={removeFromVocabIncluded}
+                  removeFromVocabList={removeFromVocabIncluded}
                 />
               ))}
             </div>
-            <select onChange={(e) => addToVocabByRecordId(e.target.value)}>
+            <select onChange={(e) => addToVocab(e.target.value)}>
               {vocabularyQuery.isSuccess &&
                 vocabularyQuery.data.map((vocab) => (
                   <option key={vocab.recordId} value={vocab.recordId}>

@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import type { Flashcard, Quiz } from '../types/interfaceDefinitions';
 import useAuth from './useAuth';
 import { useBackend } from './useBackend';
+import { useVocabulary } from './useVocabulary';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
   const { isAuthenticated } = useAuth();
@@ -13,6 +14,7 @@ export function useOfficialQuizzes(quizId: number | undefined) {
     addVocabularyToExample,
     removeVocabFromExample,
   } = useBackend();
+  const { vocabularyQuery } = useVocabulary();
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
     quizzes.forEach((item) => {
@@ -88,21 +90,78 @@ export function useOfficialQuizzes(quizId: number | undefined) {
 
   const updateQuizExample = useCallback(
     async (newExampleData: Flashcard) => {
-      const isInActiveQuiz = quizExamplesQuery.data?.some(
+      if (!vocabularyQuery.data) {
+        throw new Error('Vocabulary data is not ready.');
+      }
+
+      // Precompute vocabName -> recordId map
+      const vocabMap = new Map(
+        vocabularyQuery.data.map((vocab) => [vocab.vocabName, vocab.recordId]),
+      );
+
+      const oldExampleData = quizExamplesQuery.data?.find(
         (example) => example.recordId === newExampleData.recordId,
       );
-      if (isInActiveQuiz) {
-        const response = await updateExample(newExampleData);
-        if (response) {
-          quizExamplesQuery.refetch();
+
+      if (!oldExampleData) {
+        console.error(`Example ${newExampleData.recordId} not found.`);
+        return;
+      }
+
+      const oldVocab = oldExampleData.vocabIncluded;
+      const newVocab = newExampleData.vocabIncluded;
+
+      const vocabToAdd = newVocab.filter((vocab) => !oldVocab.includes(vocab));
+      const vocabToRemove = oldVocab.filter(
+        (vocab) => !newVocab.includes(vocab),
+      );
+
+      const vocabIdsToAdd = vocabToAdd
+        .map((vocab) => {
+          const recordId = vocabMap.get(vocab);
+          if (!recordId) console.error(`Vocab "${vocab}" not found.`);
+          return recordId;
+        })
+        .filter((id) => id !== undefined) as number[];
+
+      const vocabIdsToRemove = vocabToRemove
+        .map((vocab) => vocabMap.get(vocab))
+        .filter((id) => id !== undefined) as number[];
+
+      const addVocab = () => {
+        if (vocabIdsToRemove.length > 0) {
+          return addVocabularyToExample(newExampleData.recordId, vocabIdsToAdd);
         }
-      } else {
-        console.error(
-          `Attempted to update example ${newExampleData.recordId} which is not in the active quiz`,
-        );
+      };
+
+      const removeVocab = () => {
+        if (vocabIdsToRemove.length > 0) {
+          return removeVocabFromExample(
+            newExampleData.recordId,
+            vocabIdsToRemove,
+          );
+        }
+      };
+
+      try {
+        await Promise.all([
+          updateExample(newExampleData),
+          addVocab,
+          removeVocab,
+        ]);
+
+        quizExamplesQuery.refetch();
+      } catch (error) {
+        console.error('Failed to update quiz example:', error);
       }
     },
-    [updateExample, quizExamplesQuery],
+    [
+      updateExample,
+      addVocabularyToExample,
+      removeVocabFromExample,
+      quizExamplesQuery,
+      vocabularyQuery.data,
+    ],
   );
 
   return { officialQuizzesQuery, quizExamplesQuery, updateQuizExample };
