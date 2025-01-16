@@ -129,7 +129,6 @@ export interface Student {
   fullName: string;
   email: string;
   timeZone: string;
-  usPhone: number;
   fluencyGoal: string;
   startingLevel: string;
   primaryCoach: QbUser;
@@ -199,6 +198,9 @@ export interface Assignment {
   notes: string;
   homeworkCorrector: QbUser;
   weekStarts: Date | string;
+  // Missing:
+  // Assignment Name // This is a formula - text
+  // Week - Primary Coach // This is a lookup field in qb, from the Week table, not needed on the front end
 }
 
 /* wild backend call with 5 arrays */
