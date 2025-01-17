@@ -21,14 +21,13 @@ function generateCall({
   callDate: string;
 }): Call {
   return {
-    recordId: 1,
+    recordId: Math.floor(Math.random() * 10000),
     relatedWeek: week.recordId,
     recording: 'https://www.google.com/',
     notes: '',
     areasOfDifficulty: '',
     rating: ratings[Math.floor(Math.random() * ratings.length)],
     date: callDate,
-    // callType: 'Monthly Call',
   };
 }
 
