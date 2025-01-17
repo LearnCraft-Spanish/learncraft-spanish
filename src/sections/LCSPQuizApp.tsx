@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
-import quizCourses from '../functions/QuizCourseList';
-import MenuButton from '../components/Buttons/MenuButton';
-import Loading from '../components/Loading';
-import { useActiveStudent } from '../hooks/useActiveStudent';
-import { useOfficialQuizzes } from '../hooks/useOfficialQuizzes';
+import useAuth from 'src/hooks/useAuth';
+import quizCourses from 'src/functions/QuizCourseList';
+import MenuButton from 'src/components/Buttons/MenuButton';
+import Loading from 'src/components/Loading';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import OfficialQuiz from '../components/Quizzing/OfficialQuizzing/OfficialQuiz';
 import '../App.css';
 

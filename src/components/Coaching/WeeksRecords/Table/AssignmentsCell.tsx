@@ -1,6 +1,6 @@
 import type { Assignment, Week } from '../../../../types/CoachingTypes';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
-import useCoaching from '../../../../hooks/useCoaching';
+import useCoaching from '../../../../hooks/CoachingData/useCoaching';
 import ContextualControlls from '../../../ContextualControlls';
 export default function AssignmentsCell({
   assignment,

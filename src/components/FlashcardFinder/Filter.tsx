@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { VocabTag } from '../../types/interfaceDefinitions';
 
 import { useContextualMenu } from '../../hooks/useContextualMenu';
-import { useVocabulary } from '../../hooks/useVocabulary';
+import { useVocabulary } from '../../hooks/CourseData/useVocabulary';
 import { FromToLessonSelector } from '../LessonSelector';
 
 interface FilterProps {

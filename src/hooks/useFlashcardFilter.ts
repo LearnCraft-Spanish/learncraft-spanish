@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import type { Flashcard, VocabTag } from '../types/interfaceDefinitions';
 
-import { useVocabulary } from './useVocabulary';
+import { useVocabulary } from './CourseData/useVocabulary';
 
 interface FilterFlashcardsOptions {
   examples: Flashcard[];

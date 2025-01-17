@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
+import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 
 import { useProgramTable } from './useProgramTable';
 

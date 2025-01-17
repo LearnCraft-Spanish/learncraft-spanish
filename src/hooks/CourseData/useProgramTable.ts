@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react'; // Adjust the import based on your project structure
+import useAuth from 'src/hooks/useAuth';
 import type {
   Lesson,
   Program,
   ProgramUnparsed,
-} from '../types/interfaceDefinitions';
-import { useBackend } from '../hooks/useBackend';
-import useAuth from '../hooks/useAuth';
+} from 'src/types/interfaceDefinitions';
+import { useBackend } from 'src/hooks/useBackend';
 
 export function useProgramTable() {
   const { getLessonsFromBackend, getProgramsFromBackend } = useBackend();

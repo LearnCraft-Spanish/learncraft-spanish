@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
-import { useAudioExamples } from './useAudioExamples';
+import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 describe('useAudioExamples', () => {
   it('runs without crashing', async () => {

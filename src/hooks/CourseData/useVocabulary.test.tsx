@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import { HttpResponse, http } from 'msw';
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
-import { server } from '../../mocks/api/server';
-import { setupMockAuth } from '../../tests/setupMockAuth';
+import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
+import { server } from '../../../mocks/api/server';
+import { setupMockAuth } from '../../../tests/setupMockAuth';
 
 import { useVocabulary } from './useVocabulary';
 

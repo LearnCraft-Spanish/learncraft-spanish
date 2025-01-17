@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
-import mockData from '../../mocks/data/serverlike/serverlikeData';
-
-import { useOfficialQuizzes } from './useOfficialQuizzes';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
+import mockData from 'mocks/data/serverlike/serverlikeData';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 const { api } = mockData();
 const quizzesTable = api.quizzesTable;

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
+import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { useActiveStudent } from './useActiveStudent';
 
 const api = serverlikeData().api;

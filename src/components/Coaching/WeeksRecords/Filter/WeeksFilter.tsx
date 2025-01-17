@@ -9,7 +9,7 @@ import type {
   Membership,
 } from '../../../../types/CoachingTypes';
 
-import useCoaching from '../../../../hooks/useCoaching';
+import useCoaching from '../../../../hooks/CoachingData/useCoaching';
 import '../../styles/coaching.scss';
 interface CoachingFilterProps {
   weeks: Week[] | undefined;

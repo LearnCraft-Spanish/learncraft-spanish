@@ -6,8 +6,8 @@ import type {
   Flashcard,
 } from '../../../types/interfaceDefinitions';
 import { fisherYatesShuffle } from '../../../functions/fisherYatesShuffle';
-import { useActiveStudent } from '../../../hooks/useActiveStudent';
-import { useStudentFlashcards } from '../../../hooks/useStudentFlashcards';
+import { useActiveStudent } from '../../../hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from '../../../hooks/UserData/useStudentFlashcards';
 import MenuButton from '../../Buttons/MenuButton';
 import PMFPopup from '../../PMFPopup/PMFPopup';
 import QuizProgress from '../QuizProgress';

@@ -10,7 +10,7 @@ import React from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { Flashcard } from '../../../types/interfaceDefinitions';
 import { sampleStudentFlashcardData } from '../../../../tests/mockData';
-import { useStudentFlashcards } from '../../../hooks/useStudentFlashcards';
+import { useStudentFlashcards } from '../../../hooks/UserData/useStudentFlashcards';
 import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
 import SRSQuizButtons from './SRSButtons';
 

@@ -1,5 +1,5 @@
 import type { Lesson, Program } from '../../types/interfaceDefinitions';
-import { useProgramTable } from '../../hooks/useProgramTable';
+import { useProgramTable } from '../../hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import './LessonSelector.css';
 

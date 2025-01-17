@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import Loading from '../../Loading';
 import QuizComponent from '../TextQuiz/QuizComponent';
-import { useOfficialQuizzes } from '../../../hooks/useOfficialQuizzes';
 import '../../../App.css';
 import quizCourses from '../../../functions/QuizCourseList';
 

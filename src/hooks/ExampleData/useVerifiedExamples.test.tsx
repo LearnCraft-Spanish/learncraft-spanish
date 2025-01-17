@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
-import { setupMockAuth } from '../../tests/setupMockAuth';
+import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
+import { setupMockAuth } from '../../../tests/setupMockAuth';
 
-import { useVerifiedExamples } from './useVerifiedExamples';
+import { useVerifiedExamples } from '../useVerifiedExamples';
 
 describe('useVerifiedExamples', () => {
   beforeEach(() => {

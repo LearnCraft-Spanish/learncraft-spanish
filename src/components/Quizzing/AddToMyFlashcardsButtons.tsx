@@ -1,6 +1,6 @@
 import React from 'react';
-import { useUserData } from '../../hooks/useUserData';
-import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
+import { useUserData } from '../../hooks/UserData/useUserData';
+import { useStudentFlashcards } from '../../hooks/UserData/useStudentFlashcards';
 import type { Flashcard } from '../../types/interfaceDefinitions';
 
 interface AddToMyFlashcardsButtonsProps {

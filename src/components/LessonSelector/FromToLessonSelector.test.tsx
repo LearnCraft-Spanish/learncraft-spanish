@@ -8,7 +8,7 @@ import {
 } from '@testing-library/react';
 
 import { act } from 'react';
-import { useProgramTable } from '../../hooks/useProgramTable';
+import { useProgramTable } from '../../hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import { getUserDataFromName } from '../../../mocks/data/serverlike/studentTable';
 

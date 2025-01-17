@@ -5,7 +5,7 @@ import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
 import allStudentFlashcards from '../../../mocks/data/hooklike/studentFlashcardData';
 import serverlikeData from '../../../mocks/data/serverlike/serverlikeData';
 import { setupMockAuth } from '../../../tests/setupMockAuth';
-import { useUserData } from '../../hooks/useUserData';
+import { useUserData } from '../../hooks/UserData/useUserData';
 import AddToMyFlashcardsButtons from './AddToMyFlashcardsButtons';
 
 /*      Testing Setup       */

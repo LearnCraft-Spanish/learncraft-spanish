@@ -4,7 +4,7 @@ import {
   formatSpanishText,
 } from '../../functions/formatFlashcardText';
 import type { NewFlashcard } from '../../types/interfaceDefinitions';
-import { useUnverifiedExamples } from '../../hooks/useUnverifiedExamples';
+import { useUnverifiedExamples } from '../../hooks/ExampleData/useUnverifiedExamples';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import { AudioControl } from './AudioControl';
 import '../../App.css';

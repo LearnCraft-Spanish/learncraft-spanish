@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
-import { useUserData } from '../../../hooks/useUserData';
-import useCoaching from '../../../hooks/useCoaching';
+import { useUserData } from '../../../hooks/UserData/useUserData';
+import useCoaching from '../../../hooks/CoachingData/useCoaching';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
 
 import type { Week, Coach, Course } from '../../../types/CoachingTypes';

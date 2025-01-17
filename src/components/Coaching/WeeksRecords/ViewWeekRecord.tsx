@@ -1,7 +1,7 @@
 import type { Week } from '../../../types/CoachingTypes';
 import ContextualControlls from '../../ContextualControlls';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';
-import useCoaching from '../../../hooks/useCoaching';
+import useCoaching from '../../../hooks/CoachingData/useCoaching';
 export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
   const { setContextualRef } = useContextualMenu();
   const { getStudentFromMembershipId } = useCoaching();

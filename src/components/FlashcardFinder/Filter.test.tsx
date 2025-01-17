@@ -8,7 +8,7 @@ import {
 } from '@testing-library/react';
 import React, { act } from 'react';
 import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
-import { useVocabulary } from '../../hooks/useVocabulary';
+import { useVocabulary } from '../../hooks/CourseData/useVocabulary';
 import Filter from './Filter';
 
 const toggleIncludeSpanglish = vi.fn();

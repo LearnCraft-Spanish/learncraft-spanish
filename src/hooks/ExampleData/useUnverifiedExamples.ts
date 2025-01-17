@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import type { NewFlashcard } from '../types/interfaceDefinitions';
-import { useBackend } from './useBackend';
-import { useUserData } from './useUserData';
+import type { NewFlashcard } from 'src/types/interfaceDefinitions';
+import { useBackend } from 'src/hooks/useBackend';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export function useUnverifiedExamples() {
   const userDataQuery = useUserData();

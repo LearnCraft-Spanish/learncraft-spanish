@@ -5,9 +5,9 @@ import type { UserData } from './types/interfaceDefinitions';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
-import { useActiveStudent } from './hooks/useActiveStudent';
+import { useActiveStudent } from './hooks/UserData/useActiveStudent';
 import useAuth from './hooks/useAuth';
-import { useUserData } from './hooks/useUserData';
+import { useUserData } from './hooks/UserData/useUserData';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
 

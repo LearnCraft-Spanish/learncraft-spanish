@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { useCallback, useRef } from 'react';
+import { useBackend } from 'src/hooks/useBackend';
 import type {
   Flashcard,
   StudentExample,
   StudentFlashcardData,
-} from '../types/interfaceDefinitions';
+} from '../../types/interfaceDefinitions';
 import { useActiveStudent } from './useActiveStudent';
-import { useBackend } from './useBackend';
 import { useUserData } from './useUserData';
 
 export function useStudentFlashcards() {

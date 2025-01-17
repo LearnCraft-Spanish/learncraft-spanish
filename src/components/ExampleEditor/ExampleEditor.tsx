@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import type { Flashcard, Vocabulary } from '../../types/interfaceDefinitions';
-import { useVocabulary } from '../../hooks/useVocabulary';
-import { useOfficialQuizzes } from '../../hooks/useOfficialQuizzes';
+import { useVocabulary } from '../../hooks/CourseData/useVocabulary';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import ExampleListItem from '../FlashcardFinder/ExampleListItem';
 import quizCourses from '../../functions/QuizCourseList';
@@ -69,7 +69,7 @@ export default function ExampleEditor() {
   }, [quizList]);
 
   const displayOrder = useMemo(() => {
-    return tableData?.flatMap((example) =>
+    return tableData?.flatMap((example: Flashcard) =>
       !example.vocabComplete ? { recordId: example.recordId } : [],
     );
   }, [tableData]);
@@ -168,7 +168,7 @@ export default function ExampleEditor() {
   useEffect(() => {
     if (selectedExampleId !== null) {
       const example = tableData?.find(
-        (example) => example.recordId === selectedExampleId,
+        (example: Flashcard) => example.recordId === selectedExampleId,
       );
       if (example) {
         setSpanishExample(example.spanishExample);

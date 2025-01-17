@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import type { Lesson, Program, UserData } from '../types/interfaceDefinitions';
-import { useBackend } from './useBackend';
-import { useProgramTable } from './useProgramTable';
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
+import type { Lesson, Program, UserData } from 'src/types/interfaceDefinitions';
+import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from './useUserData';
 
 export function useActiveStudent() {

@@ -11,9 +11,9 @@ import {
 import Loading from '../components/Loading';
 import QuizComponent from '../components/Quizzing/TextQuiz/QuizComponent';
 import AudioQuiz from '../components/Quizzing/AudioQuiz/AudioQuiz';
-import { useActiveStudent } from '../hooks/useActiveStudent';
-import { useStudentFlashcards } from '../hooks/useStudentFlashcards';
-import { usePMFData } from '../hooks/usePMFData';
+import { useActiveStudent } from '../hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from '../hooks/UserData/useStudentFlashcards';
+import { usePMFData } from '../hooks/UserData/usePMFData';
 import QuizSetupMenu from '../components/Quizzing/TextQuiz/QuizSetupMenu';
 
 export default function MyFlashcardsQuiz() {

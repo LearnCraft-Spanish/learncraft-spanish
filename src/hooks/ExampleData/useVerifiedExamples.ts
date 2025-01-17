@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { useBackend } from './useBackend';
-import { useUserData } from './useUserData';
+import { useBackend } from 'src/hooks/useBackend';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export function useVerifiedExamples() {
   const userDataQuery = useUserData();

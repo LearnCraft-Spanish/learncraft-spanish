@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import { useUserData } from '../../../hooks/useUserData';
+import { useUserData } from '../../../hooks/UserData/useUserData';
 
 import { useBackend } from '../../../hooks/useBackend';
 import { useContextualMenu } from '../../../hooks/useContextualMenu';

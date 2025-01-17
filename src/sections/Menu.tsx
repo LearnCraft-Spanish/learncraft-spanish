@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import Loading from '../components/Loading';
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import Loading from 'src/components/Loading';
 
-import { useActiveStudent } from '../hooks/useActiveStudent';
-import { useStudentFlashcards } from '../hooks/useStudentFlashcards';
-import { useUserData } from '../hooks/useUserData';
-import '../App.css';
+import 'src/App.css';
 
 export default function Menu() {
   const userDataQuery = useUserData();

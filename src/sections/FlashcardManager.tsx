@@ -6,7 +6,7 @@ import type {
   StudentExample,
 } from '../types/interfaceDefinitions';
 import Loading from '../components/Loading';
-import { useStudentFlashcards } from '../hooks/useStudentFlashcards';
+import { useStudentFlashcards } from '../hooks/UserData/useStudentFlashcards';
 import ExamplesTable from '../components/FlashcardFinder/ExamplesTable';
 
 function FlashcardManager() {

@@ -3,20 +3,20 @@ import type {
   DisplayOrder,
   Flashcard,
   VocabTag,
-} from '../../types/interfaceDefinitions';
+} from 'src/types/interfaceDefinitions';
 
-import '../../App.css';
+import 'src/App.css';
 
-import { fisherYatesShuffle } from '../../functions/fisherYatesShuffle';
-import { useActiveStudent } from '../../hooks/useActiveStudent';
-import { useVerifiedExamples } from '../../hooks/useVerifiedExamples';
-import { useSelectedLesson } from '../../hooks/useSelectedLesson';
-import { useUserData } from '../../hooks/useUserData';
-import { useVocabulary } from '../../hooks/useVocabulary';
+import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 
-import Loading from '../../components/Loading';
-import Filter from '../../components/FlashcardFinder/Filter';
-import useFlashcardFilter from '../../hooks/useFlashcardFilter';
+import Loading from 'src/components/Loading';
+import Filter from 'src/components/FlashcardFinder/Filter';
+import useFlashcardFilter from 'src/hooks/useFlashcardFilter';
 import ExamplesTable from './ExamplesTable';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word

@@ -2,12 +2,12 @@ import React, { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import type { Flashcard } from '../types/interfaceDefinitions';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
-import { useActiveStudent } from '../hooks/useActiveStudent';
+import { useActiveStudent } from '../hooks/UserData/useActiveStudent';
 
-import { useAudioExamples } from '../hooks/useAudioExamples';
-import { useProgramTable } from '../hooks/useProgramTable';
+import { useAudioExamples } from '../hooks/ExampleData/useAudioExamples';
+import { useProgramTable } from '../hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from '../hooks/useSelectedLesson';
-import { useUserData } from '../hooks/useUserData';
+import { useUserData } from '../hooks/UserData/useUserData';
 import Loading from '../components/Loading';
 import AudioQuiz from '../components/Quizzing/AudioQuiz/AudioQuiz';
 import AudioQuizSetupMenu from '../components/Quizzing/AudioQuiz/AudioQuizSetupMenu';

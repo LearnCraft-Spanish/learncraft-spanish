@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import useAuth from './useAuth';
-import { useBackend } from './useBackend';
+import useAuth from 'src/hooks/useAuth';
+import { useBackend } from 'src/hooks/useBackend';
 
 export function useUserData() {
   const { isAuthenticated } = useAuth();

@@ -1,5 +1,5 @@
 import { Route } from 'react-router-dom';
-import { useUserData } from '../hooks/useUserData';
+import { useUserData } from '../hooks/UserData/useUserData';
 
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';

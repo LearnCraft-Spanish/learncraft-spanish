@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import type { Flashcard, Quiz } from '../types/interfaceDefinitions';
-import useAuth from './useAuth';
-import { useBackend } from './useBackend';
-import { useVocabulary } from './useVocabulary';
+import type { Flashcard, Quiz } from 'src/types/interfaceDefinitions';
+import useAuth from 'src/hooks/useAuth';
+import { useBackend } from 'src/hooks/useBackend';
+import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
   const { isAuthenticated } = useAuth();

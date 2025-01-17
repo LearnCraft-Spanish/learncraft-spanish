@@ -1,6 +1,6 @@
 import type { Week } from '../../../../types/CoachingTypes';
 import GroupSessionsCell from './GroupSessionsCell';
-import useCoaching from '../../../../hooks/useCoaching';
+import useCoaching from '../../../../hooks/CoachingData/useCoaching';
 import { useContextualMenu } from '../../../../hooks/useContextualMenu';
 import AssignmentsCell from './AssignmentsCell';
 import PrivateCallsCell from './PrivateCallsCell';
