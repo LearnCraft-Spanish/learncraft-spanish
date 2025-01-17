@@ -101,8 +101,8 @@ export default function Menu() {
                 </Link>
               </div>
               <div className="buttonBox">
-                <Link className="linkButton" to="/newcoaching">
-                  New Coaching
+                <Link className="linkButton" to="/weeklyrecords">
+                  Weekly Records Interface
                 </Link>
               </div>
               <div className="buttonBox">

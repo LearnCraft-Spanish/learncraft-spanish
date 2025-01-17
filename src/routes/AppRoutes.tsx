@@ -70,7 +70,7 @@ export default function AppRoutes() {
         element={userDataQuery.data?.isAdmin && <ExampleEditor />}
       />
       <Route
-        path="/newcoaching"
+        path="/weeklyrecords"
         element={userDataQuery.data?.isAdmin && <WeeksRecordsSection />}
       />
       <Route path="/*" element={<NotFoundPage />} />

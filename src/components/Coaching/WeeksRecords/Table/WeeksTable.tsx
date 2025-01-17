@@ -8,6 +8,7 @@ import StudentCell from './StudentCell';
 import ViewWeekRecord from '../ViewWeekRecord';
 import checkmark from '../../../../assets/icons/checkmark_green.svg';
 import Pagination from '../../../FlashcardFinder/Pagination';
+import QuantifiedRecords from '../quantifyingRecords';
 import { useState, useCallback, useMemo } from 'react';
 interface NewTableProps {
   weeks: Week[] | undefined;
@@ -46,11 +47,12 @@ export default function WeeksTable({ weeks }: NewTableProps) {
     weeks && (
       <>
         <div className="numberShowing">
-          <h5>
-            {/* THIS NEEDS TO HAVE A CASE FOR 0 EXAMPLES */}
-            Showing Records {page === 1 ? 1 : (page - 1) * 50} -{' '}
-            {page * 50 <= weeks.length ? page * 50 : weeks.length}
-          </h5>
+          {/* THIS NEEDS TO HAVE A CASE FOR 0 EXAMPLES */}
+          <QuantifiedRecords
+            currentPage={page}
+            totalRecords={weeks.length}
+            recordsPerPage={itemsPerPage}
+          />
         </div>
         <Pagination
           page={page}
