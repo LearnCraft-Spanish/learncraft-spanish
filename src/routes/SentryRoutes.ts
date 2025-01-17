@@ -25,6 +25,10 @@ Sentry.init({
     }),
   ],
   tracesSampleRate: 1.0,
+  denyUrls: [
+    // Add URLs that shouldn't trigger Sentry
+    /localhost/,
+  ],
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 });

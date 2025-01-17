@@ -3,8 +3,14 @@
     "target": "ESNext",
     "jsx": "preserve",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "node",
+    "paths": {
+      "src/*": ["./src/*"],
+      "mocks/*": ["./mocks/*"],
+      "tests/*": ["./tests/*"]
+    },
     "resolveJsonModule": true,
     "types": ["vitest", "node", "msw"],
     "allowJs": true,
