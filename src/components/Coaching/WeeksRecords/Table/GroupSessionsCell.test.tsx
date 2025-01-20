@@ -3,22 +3,25 @@ import { render, waitFor, screen } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import GroupSessionsCell from './GroupSessionsCell';
-import mockData from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import { act } from 'react';
 
-const week = mockData.lastThreeWeeks[0];
+const week = generatedMockData.weeks.find(
+  (week) => week.groupCallComments.length > 0,
+)!;
 // const relatedGroupSession = mockData.groupSessions.find((groupSession) => {
 //   return groupSession.related === week.relatedGroupSession;
 // });
 
 // Same flow useCoaching helper function uses to get related group session(s) to week
-const attendeeList = mockData.groupAttendees.filter(
+const attendeeList = generatedMockData.groupAttendees.filter(
   (attendee) => attendee.student === week.recordId,
 );
-const groupSessionList = mockData.groupSessions.filter((groupSession) =>
-  attendeeList.find(
-    (attendee) => attendee.groupSession === groupSession.recordId,
-  ),
+const groupSessionList = generatedMockData.groupSessions.filter(
+  (groupSession) =>
+    attendeeList.find(
+      (attendee) => attendee.groupSession === groupSession.recordId,
+    ),
 );
 if (groupSessionList.length === 0) {
   throw new Error('No group session related to week record');

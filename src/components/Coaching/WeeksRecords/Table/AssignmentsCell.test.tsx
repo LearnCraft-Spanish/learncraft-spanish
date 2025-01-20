@@ -4,9 +4,9 @@ import { act } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import AssignmentsCell from './AssignmentsCell';
 
-import mockData from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
-const assignment = mockData.assignments.find(
+const assignment = generatedMockData.assignments.find(
   (assignment) => assignment.assignmentLink.length > 0,
 );
 

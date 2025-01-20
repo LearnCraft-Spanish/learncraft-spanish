@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import mockDataHardCoded from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import { hardCodedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 // This would benefit from improved testing. currently only testing existence
@@ -45,53 +45,53 @@ describe('hook useCoaching', () => {
     const listOfFunctions = [
       {
         func: 'getCoachFromMembershipId',
-        arg: mockDataHardCoded.lastThreeWeeks[0].relatedMembership,
-        expected: mockDataHardCoded.coachList[0],
+        arg: hardCodedMockData.lastThreeWeeks[0].relatedMembership,
+        expected: hardCodedMockData.coachList[0],
       },
       {
         func: 'getCourseFromMembershipId',
-        arg: mockDataHardCoded.lastThreeWeeks[0].relatedMembership,
-        expected: mockDataHardCoded.courseList[0],
+        arg: hardCodedMockData.lastThreeWeeks[0].relatedMembership,
+        expected: hardCodedMockData.courseList[0],
       },
       {
         func: 'getStudentFromMembershipId',
-        arg: mockDataHardCoded.lastThreeWeeks[0].relatedMembership,
-        expected: mockDataHardCoded.activeStudents[0],
+        arg: hardCodedMockData.lastThreeWeeks[0].relatedMembership,
+        expected: hardCodedMockData.activeStudents[0],
       },
       {
         func: 'getAttendeeWeeksFromGroupSessionId',
-        arg: mockDataHardCoded.groupSessions[0].recordId,
-        expected: [mockDataHardCoded.lastThreeWeeks[0]],
+        arg: hardCodedMockData.groupSessions[0].recordId,
+        expected: [hardCodedMockData.lastThreeWeeks[0]],
       },
       {
         func: 'getGroupSessionFromWeekRecordId',
-        arg: mockDataHardCoded.lastThreeWeeks[0].recordId,
-        expected: mockDataHardCoded.groupSessions[0],
+        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
+        expected: hardCodedMockData.groupSessions[0],
       },
       {
         func: 'getAssignmentsFromWeekRecordId',
-        arg: mockDataHardCoded.lastThreeWeeks[0].recordId,
-        expected: mockDataHardCoded.assignments.filter(
+        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
+        expected: hardCodedMockData.assignments.filter(
           (assignment) =>
             assignment.relatedWeek ===
-            mockDataHardCoded.lastThreeWeeks[0].recordId,
+            hardCodedMockData.lastThreeWeeks[0].recordId,
         ),
       },
       {
         func: 'getMembershipFromWeekRecordId',
-        arg: mockDataHardCoded.lastThreeWeeks[0].recordId,
-        expected: mockDataHardCoded.activeMemberships.find(
+        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
+        expected: hardCodedMockData.activeMemberships.find(
           (membership) =>
             membership.recordId ===
-            mockDataHardCoded.lastThreeWeeks[0].relatedMembership,
+            hardCodedMockData.lastThreeWeeks[0].relatedMembership,
         ),
       },
       {
         func: 'getPrivateCallsFromWeekRecordId',
-        arg: mockDataHardCoded.lastThreeWeeks[0].recordId,
-        expected: mockDataHardCoded.calls.filter(
+        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
+        expected: hardCodedMockData.calls.filter(
           (call) =>
-            call.relatedWeek === mockDataHardCoded.lastThreeWeeks[0].recordId,
+            call.relatedWeek === hardCodedMockData.lastThreeWeeks[0].recordId,
         ),
       },
       {

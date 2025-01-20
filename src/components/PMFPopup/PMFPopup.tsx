@@ -3,7 +3,6 @@ import './PMFPopup.css';
 import { usePMFData } from 'src/hooks/UserData/usePMFData';
 import closeIcon from '../../assets/icons/x_dark.svg';
 
-
 interface PMFPopupProps {
   timeToShowPopup: boolean;
 }

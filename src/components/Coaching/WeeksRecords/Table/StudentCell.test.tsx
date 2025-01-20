@@ -3,16 +3,16 @@ import { render, waitFor, screen } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import StudentCell from './StudentCell';
-import mockDataHardCoded from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
-const week = mockDataHardCoded.lastThreeWeeks[0];
-const membership = mockDataHardCoded.activeMemberships.find((membership) => {
+const week = generatedMockData.weeks[0];
+const membership = generatedMockData.memberships.find((membership) => {
   return membership.recordId === week.relatedMembership;
 });
 if (!membership) {
   throw new Error('No membership related to week record');
 }
-const student = mockDataHardCoded.activeStudents.find((student) => {
+const student = generatedMockData.studentList.find((student) => {
   return student.recordId === membership.relatedStudent;
 });
 

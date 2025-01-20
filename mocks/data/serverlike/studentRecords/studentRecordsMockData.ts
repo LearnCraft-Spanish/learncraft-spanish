@@ -1,9 +1,7 @@
-// import mockDataHardCoded from './mockDataHardCoded.json' assert { type: 'json' };
-
-// export default mockDataHardCoded;
+import hardCodedMockData from './mockDataHardCoded.json' assert { type: 'json' };
 
 import generateStudentRecordsMockData from './scripts/index';
 
-const studentRecordsMockData = generateStudentRecordsMockData();
+const generatedMockData = generateStudentRecordsMockData();
 
-export default studentRecordsMockData;
+export { generatedMockData, hardCodedMockData };

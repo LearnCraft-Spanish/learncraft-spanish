@@ -1,3 +1,4 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import type {
   Assignment,
   Call,
@@ -193,7 +194,7 @@ weeks
 - no assignments,calls, or group sessions, hold week false, (record complete true) ('this week')
 */
 
-function generateStudentRecordsMockData({}) {
+function _generateStudentRecordsMockData() {
   // Steps:
   // generate Courses
   // generate Coaches,
@@ -212,7 +213,7 @@ function main() {
   });
   const studentList = generateStudentList({
     coachList,
-    mockUserData: fakePeople,
+    mockUserData: fakePeople.slice(coachList.length),
     length: 3,
   });
 
@@ -223,6 +224,7 @@ function main() {
   const groupSessions: GroupSession[] = [];
   const groupAttendees: GroupAttendees[] = [];
 
+  //
   const { thisWeek, lastWeek, twoWeeksAgo, upcomingWeek } = generateDates();
 
   for (let i = 0; i < studentList.length; i++) {

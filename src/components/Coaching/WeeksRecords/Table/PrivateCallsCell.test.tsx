@@ -3,12 +3,16 @@ import { render, waitFor, screen } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import PrivateCallsCell from './PrivateCallsCell';
-import mockData from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import { act } from 'react';
 
 // const week = mockData.calls.find((call) => call.rating > 0);
-const week = mockData.lastThreeWeeks[0];
-const call = mockData.calls.find((call) => call.relatedWeek === week.recordId);
+const week = generatedMockData.weeks.find(
+  (week) => week.privateCallRatings.length > 0,
+)!;
+const call = generatedMockData.calls.find(
+  (call) => call.relatedWeek === week.recordId,
+);
 
 if (!call) {
   throw new Error('No call with relatedWeek found in mock data');
