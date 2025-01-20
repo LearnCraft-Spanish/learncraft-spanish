@@ -1,18 +1,9 @@
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 
 import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import programsTable from 'mocks/data/hooklike/programsTable';
-import mockActiveStudentStub from 'mocks/hooks/useActiveStudentStub';
 
 import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
 import { setupMockAuth } from 'tests/setupMockAuth';
@@ -23,29 +14,6 @@ import type { UserData } from 'src/types/interfaceDefinitions';
 import { useSelectedLesson } from './useSelectedLesson';
 
 const { api } = serverlikeData();
-
-vi.mock(
-  './UserData/useActiveStudent',
-  vi.fn(() => {
-    return {
-      useActiveStudent: () =>
-        mockActiveStudentStub({ studentName: 'student-lcsp' }),
-    };
-  }),
-);
-vi.mock(
-  './useProgramTable',
-  vi.fn(() => {
-    return {
-      useProgramTable: () => ({
-        programTableQuery: {
-          data: programsTable,
-          isSuccess: true,
-        },
-      }),
-    };
-  }),
-);
 
 async function renderSelectedLesson() {
   const { result } = renderHook(() => useSelectedLesson(), {
@@ -186,11 +154,14 @@ describe('useSelectedLesson', () => {
         result.current.setToLesson(lessonWithoutVocab.recordId);
         result.current.setFromLesson(lessonWithoutVocab.recordId);
       });
-      await waitFor(() => {
-        expect(result.current.selectedToLesson?.recordId).toBe(
-          lessonWithoutVocab.recordId,
-        );
-      });
+      await waitFor(
+        () => {
+          expect(result.current.selectedToLesson?.recordId).toBe(
+            lessonWithoutVocab.recordId,
+          );
+        },
+        { timeout: 1000 },
+      );
       if (
         result.current.selectedToLesson?.vocabIncluded.length ||
         result.current.selectedFromLesson?.vocabIncluded.length
