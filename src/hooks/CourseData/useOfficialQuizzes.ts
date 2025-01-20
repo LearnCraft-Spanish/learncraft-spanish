@@ -3,18 +3,13 @@ import { useCallback } from 'react';
 import type { Flashcard, Quiz } from 'src/types/interfaceDefinitions';
 import useAuth from 'src/hooks/useAuth';
 import { useBackend } from 'src/hooks/useBackend';
-import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import { useExampleUpdate } from '../ExampleData/useExampleUpdate';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
   const { isAuthenticated } = useAuth();
-  const {
-    getLcspQuizzesFromBackend,
-    getQuizExamplesFromBackend,
-    updateExample,
-    addVocabularyToExample,
-    removeVocabFromExample,
-  } = useBackend();
-  const { vocabularyQuery } = useVocabulary();
+  const { updateExampleFromQuery } = useExampleUpdate();
+  const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } =
+    useBackend();
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
     quizzes.forEach((item) => {
@@ -89,109 +84,14 @@ export function useOfficialQuizzes(quizId: number | undefined) {
   });
 
   const updateQuizExample = useCallback(
-    async (newExampleData: Flashcard) => {
-      if (!vocabularyQuery.data) {
-        throw new Error('Vocabulary data is not ready.');
-      }
-
-      // Precompute vocabName -> recordId map
-      const vocabMap = new Map(
-        vocabularyQuery.data.map((vocab) => [vocab.vocabName, vocab.recordId]),
-      );
-
-      const oldExampleData = quizExamplesQuery.data?.find(
-        (example) => example.recordId === newExampleData.recordId,
-      );
-
-      if (!oldExampleData) {
-        console.error(`Example ${newExampleData.recordId} not found.`);
-        return;
-      }
-
-      function checkChange() {
-        const oldExampleCopy: Flashcard = { ...oldExampleData! };
-        const newExampleCopy: Flashcard = { ...newExampleData };
-        const emptySet: string[] = [];
-        oldExampleCopy.vocabIncluded = emptySet;
-        newExampleCopy.vocabIncluded = emptySet;
-        oldExampleCopy.dateCreated = undefined;
-        oldExampleCopy.dateModified = undefined;
-        newExampleCopy.dateCreated = undefined;
-        newExampleCopy.dateModified = undefined;
-        const keys = Object.keys(oldExampleCopy) as (keyof Flashcard)[];
-        for (const key of keys) {
-          if (oldExampleCopy[key] !== newExampleCopy[key]) {
-            return true;
-          }
-        }
-        return false;
-      }
-
-      const hasChanged = checkChange();
-
-      const oldVocab = oldExampleData.vocabIncluded;
-      const newVocab = newExampleData.vocabIncluded;
-
-      const vocabToAdd = newVocab.filter((vocab) => !oldVocab.includes(vocab));
-      const vocabToRemove = oldVocab.filter(
-        (vocab) => !newVocab.includes(vocab),
-      );
-
-      const vocabIdsToAdd = vocabToAdd
-        .map((vocab) => {
-          const recordId = vocabMap.get(vocab);
-          if (!recordId) console.error(`Vocab "${vocab}" not found.`);
-          return recordId;
-        })
-        .filter((id) => id !== undefined) as number[];
-
-      const vocabIdsToRemove = vocabToRemove
-        .map((vocab) => vocabMap.get(vocab))
-        .filter((id) => id !== undefined) as number[];
-
-      if (
-        !hasChanged &&
-        vocabIdsToAdd.length === 0 &&
-        vocabIdsToRemove.length === 0
-      ) {
-        console.error('No changes detected.');
-        return;
-      }
-
-      const updateExampleData = async () => {
-        if (hasChanged) {
-          return updateExample(newExampleData);
-        }
-      };
-
-      const addVocab = async () => {
-        if (!vocabIdsToAdd.length) {
-          return;
-        }
-        addVocabularyToExample(newExampleData.recordId, vocabIdsToAdd);
-      };
-
-      const removeVocab = async () => {
-        if (!vocabIdsToRemove.length) {
-          return;
-        }
-        removeVocabFromExample(newExampleData.recordId, vocabIdsToRemove);
-      };
-
+    (newExampleData: Flashcard) => {
       try {
-        await Promise.all([updateExampleData(), addVocab(), removeVocab()]);
+        updateExampleFromQuery(newExampleData, quizExamplesQuery);
       } catch (error) {
-        console.error('Failed to update quiz example:', error);
+        console.error('Error updating quiz example:', error);
       }
-      quizExamplesQuery.refetch();
     },
-    [
-      updateExample,
-      addVocabularyToExample,
-      removeVocabFromExample,
-      quizExamplesQuery,
-      vocabularyQuery.data,
-    ],
+    [updateExampleFromQuery, quizExamplesQuery],
   );
 
   return { officialQuizzesQuery, quizExamplesQuery, updateQuizExample };

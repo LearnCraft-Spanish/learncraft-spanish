@@ -1,9 +1,12 @@
+import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import type { NewFlashcard } from 'src/types/interfaceDefinitions';
+import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useExampleUpdate } from './useExampleUpdate';
 
 export function useUnverifiedExamples() {
+  const { updateExampleFromQuery } = useExampleUpdate();
   const userDataQuery = useUserData();
   const { getUnverifiedExamplesFromBackend, createUnverifiedExample } =
     useBackend();
@@ -25,5 +28,20 @@ export function useUnverifiedExamples() {
     await unverifiedExamplesQuery.refetch();
   };
 
-  return { unverifiedExamplesQuery, addUnverifiedExample };
+  const updateUnverifiedExample = useCallback(
+    (newExampleData: Flashcard) => {
+      try {
+        updateExampleFromQuery(newExampleData, unverifiedExamplesQuery);
+      } catch (error) {
+        console.error('Error updating quiz example:', error);
+      }
+    },
+    [updateExampleFromQuery, unverifiedExamplesQuery],
+  );
+
+  return {
+    unverifiedExamplesQuery,
+    addUnverifiedExample,
+    updateUnverifiedExample,
+  };
 }

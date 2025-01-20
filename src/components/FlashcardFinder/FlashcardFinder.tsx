@@ -23,7 +23,7 @@ import ExamplesTable from './ExamplesTable';
 const FlashcardFinder = () => {
   const userDataQuery = useUserData();
   const { activeStudentQuery } = useActiveStudent();
-  const verifiedExamplesQuery = useVerifiedExamples();
+  const { verifiedExamplesQuery } = useVerifiedExamples();
   const { vocabularyQuery, tagTable } = useVocabulary();
   const { filterExamplesBySelectedLesson } = useSelectedLesson();
   const { filterFlashcards } = useFlashcardFilter();
