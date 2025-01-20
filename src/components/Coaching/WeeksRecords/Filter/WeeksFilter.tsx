@@ -129,6 +129,7 @@ export default function WeeksFilter({
               <p>Exclude Students Without Coaches:</p>
               <label htmlFor="filterCoachless" className="switch">
                 <input
+                  alt="Exclude Students Without Coaches"
                   type="checkbox"
                   name="Exclude Students Without Coaches"
                   id="filterCoachless"
@@ -142,6 +143,7 @@ export default function WeeksFilter({
               <p>Exclude Weeks on Hold:</p>
               <label htmlFor="filterHoldWeeks" className="switch">
                 <input
+                  alt="Exclude Weeks on Hold"
                   type="checkbox"
                   name="Exclude Weeks On Hold"
                   id="filterHoldWeeks"

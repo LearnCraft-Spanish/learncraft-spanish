@@ -5,7 +5,7 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 import type { Week, Coach, Course } from '../../../types/CoachingTypes';
-
+import formatDateLikeQB from 'src/functions/formatDateLikeQB';
 import LoadingMessage from '../../Loading';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
@@ -50,7 +50,7 @@ export default function WeeksRecordsSection() {
   const [filterByCompletion, updateFilterByCompletion] =
     useState<string>('incompleteOnly');
   const [filterByHoldWeeks, setFilterByHoldWeeks] = useState<boolean>(true); // True, filter out hold weeks.
-  const [filterByCoachless, setFilterByCoachless] = useState<boolean>(true);
+  const [filterByCoachless, setFilterByCoachless] = useState<boolean>(true); // True, exclude students without a coach
   const [filterBySearchTerm, setFilterBySearchTerm] = useState<string>();
 
   // State for the weeks to display
@@ -141,9 +141,9 @@ export default function WeeksRecordsSection() {
       thisSundayTimestamp - filterByWeeksAgo * millisecondsInADay * 7;
     const sunday = new Date(chosenSundayTimestamp);
 
-    const sundayText = sunday.toISOString().split('T')[0];
+    const sundayQBFormat = formatDateLikeQB(sunday);
 
-    return weeks.filter((week) => week.weekStarts === sundayText);
+    return weeks.filter((week) => week.weekStarts === sundayQBFormat);
   }
 
   function filterWeeksByCoachlessFunction(weeks: Week[]) {
