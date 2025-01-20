@@ -1,9 +1,7 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
 
 /* ------------------ Helper Functions ------------------ */
-
 /* ------------------ Mock Data ------------------ */
-
 const exampleFluencyGoals = [
   'Introduce myself and share basic personal details in Spanish.',
   'Order food and drinks confidently at a restaurant in Spanish.',

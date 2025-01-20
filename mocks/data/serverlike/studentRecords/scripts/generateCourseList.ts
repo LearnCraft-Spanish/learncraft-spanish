@@ -1,11 +1,11 @@
 const courseList = [
-  {
-    recordId: 1,
-    name: 'Membership Program',
-    membershipType: 'Basic Membership Program',
-    weeklyPrivateCalls: 0,
-    hasGroupCalls: false,
-  },
+  // {
+  //   recordId: 1,
+  //   name: 'Membership Program',
+  //   membershipType: 'Basic Membership Program',
+  //   weeklyPrivateCalls: 0,
+  //   hasGroupCalls: false,
+  // },
   {
     recordId: 2,
     name: 'Group Coaching (formerly Alumni)',
@@ -20,20 +20,20 @@ const courseList = [
     weeklyPrivateCalls: 1,
     hasGroupCalls: true,
   },
-  {
-    recordId: 15,
-    name: 'Premier',
-    membershipType: 'Private Coaching',
-    weeklyPrivateCalls: 2,
-    hasGroupCalls: true,
-  },
-  {
-    recordId: 16,
-    name: '1-Month Challenge',
-    membershipType: '1MC',
-    weeklyPrivateCalls: 0,
-    hasGroupCalls: false,
-  },
+  // {
+  //   recordId: 15,
+  //   name: 'Premier',
+  //   membershipType: 'Private Coaching',
+  //   weeklyPrivateCalls: 2,
+  //   hasGroupCalls: true,
+  // },
+  // {
+  //   recordId: 16,
+  //   name: '1-Month Challenge',
+  //   membershipType: '1MC',
+  //   weeklyPrivateCalls: 0,
+  //   hasGroupCalls: false,
+  // },
   // {
   //   recordId: 21,
   //   name: 'Listening Comprehension',
@@ -41,13 +41,13 @@ const courseList = [
   //   weeklyPrivateCalls: 0,
   //   hasGroupCalls: false,
   // },
-  {
-    recordId: 22,
-    name: 'LCS Cohort',
-    membershipType: 'LCS Cohort',
-    weeklyPrivateCalls: 1,
-    hasGroupCalls: true,
-  },
+  // {
+  //   recordId: 22,
+  //   name: 'LCS Cohort',
+  //   membershipType: 'LCS Cohort',
+  //   weeklyPrivateCalls: 1,
+  //   hasGroupCalls: true,
+  // },
   {
     recordId: 23,
     name: 'Standard: Private-Only',
@@ -55,13 +55,13 @@ const courseList = [
     weeklyPrivateCalls: 1,
     hasGroupCalls: false,
   },
-  {
-    recordId: 24,
-    name: 'Premier: Private-Only',
-    membershipType: '',
-    weeklyPrivateCalls: 2,
-    hasGroupCalls: false,
-  },
+  // {
+  //   recordId: 24,
+  //   name: 'Premier: Private-Only',
+  //   membershipType: '',
+  //   weeklyPrivateCalls: 2,
+  //   hasGroupCalls: false,
+  // },
   // {
   //   recordId: 25,
   //   name: '1-Month Challenge Deluxe',
@@ -76,13 +76,13 @@ const courseList = [
   //   weeklyPrivateCalls: 0,
   //   hasGroupCalls: false,
   // },
-  {
-    recordId: 27,
-    name: '1MC With Coaching',
-    membershipType: '',
-    weeklyPrivateCalls: 1,
-    hasGroupCalls: false,
-  },
+  // {
+  //   recordId: 27,
+  //   name: '1MC With Coaching',
+  //   membershipType: '',
+  //   weeklyPrivateCalls: 1,
+  //   hasGroupCalls: false,
+  // },
   // {
   //   recordId: 28,
   //   name: 'Listening Comprehension with Coaching',

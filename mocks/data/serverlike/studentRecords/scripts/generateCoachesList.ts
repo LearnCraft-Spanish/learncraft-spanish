@@ -29,7 +29,7 @@ function generateCoachList({
   for (let i = 0; i < length; i++) {
     const data = mockUserData[i];
     const coach = {
-      recordId: i + 3, // probably not nessessary, but adding +3 to avoid any potential conflicts with the first 3 coaches
+      recordId: i,
       coach: data.fullName.split(' ')[0],
       user: {
         email: data.email,
