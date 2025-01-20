@@ -13,21 +13,23 @@ describe('useVerifiedExamples', () => {
     const { result } = renderHook(() => useVerifiedExamples(), {
       wrapper: MockAllProviders,
     });
-    await waitFor(() => expect(result.current.isSuccess).toBe(true), {
+    const query = result.current.verifiedExamplesQuery;
+    await waitFor(() => expect(query.isSuccess).toBe(true), {
       timeout: 3000,
       interval: 200,
     });
-    expect(result.current.data).toBeDefined();
+    expect(query.data).toBeDefined();
   });
 
   it('data has length', async () => {
     const { result } = renderHook(() => useVerifiedExamples(), {
       wrapper: MockAllProviders,
     });
-    await waitFor(
-      () => expect(result.current.data?.length).toBeGreaterThan(0),
-      { timeout: 3000, interval: 200 },
-    );
+    const query = result.current.verifiedExamplesQuery;
+    await waitFor(() => expect(query.data?.length).toBeGreaterThan(0), {
+      timeout: 3000,
+      interval: 200,
+    });
   });
   describe('when user is not an admin or student', () => {
     beforeEach(() => {
@@ -37,14 +39,15 @@ describe('useVerifiedExamples', () => {
       const { result } = renderHook(() => useVerifiedExamples(), {
         wrapper: MockAllProviders,
       });
+      const query = result.current.verifiedExamplesQuery;
       await waitFor(
         () => {
-          expect(result.current.isSuccess).toBe(false);
+          expect(query.isSuccess).toBe(false);
         },
         { timeout: 10000, interval: 200 },
       );
-      expect(result.current.isSuccess).toBe(false);
-      expect(result.current.data).toEqual(undefined);
+      expect(query.isSuccess).toBe(false);
+      expect(query.data).toEqual(undefined);
     });
   });
 });
