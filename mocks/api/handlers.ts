@@ -1,11 +1,11 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
 import { HttpResponse, http } from 'msw';
 import newData from '../data/serverlike/serverlikeData';
-
+import StudentRecordsMockData from '../data/serverlike/studentRecords/studentRecordsMockData';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import { getUserDataFromName } from '../data/serverlike/studentTable';
 
-import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
+// import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
@@ -196,30 +196,30 @@ export const handlers = [
 
   // Coaching
   http.get(`${backendUrl}coaching/weeks-new-format`, async () => {
-    return HttpResponse.json(mockDataHardCoded.lastThreeWeeks);
+    return HttpResponse.json(StudentRecordsMockData.weeks);
   }),
   http.get(`${backendUrl}coaching/coaches`, async () => {
-    return HttpResponse.json(mockDataHardCoded.coachList);
+    return HttpResponse.json(StudentRecordsMockData.coachList);
   }),
   http.get(`${backendUrl}coaching/courses`, async () => {
-    return HttpResponse.json(mockDataHardCoded.courseList);
+    return HttpResponse.json(StudentRecordsMockData.courseList);
   }),
   http.get(`${backendUrl}coaching/active-memberships`, async () => {
-    return HttpResponse.json(mockDataHardCoded.activeMemberships);
+    return HttpResponse.json(StudentRecordsMockData.memberships);
   }),
   http.get(`${backendUrl}coaching/active-students`, async () => {
-    return HttpResponse.json(mockDataHardCoded.activeStudents);
+    return HttpResponse.json(StudentRecordsMockData.studentList);
   }),
   http.get(`${backendUrl}coaching/group-sessions`, async () => {
-    return HttpResponse.json(mockDataHardCoded.groupSessions);
+    return HttpResponse.json(StudentRecordsMockData.groupSessions);
   }),
   http.get(`${backendUrl}coaching/group-attendees`, async () => {
-    return HttpResponse.json(mockDataHardCoded.groupAttendees);
+    return HttpResponse.json(StudentRecordsMockData.groupAttendees);
   }),
   http.get(`${backendUrl}coaching/assignments`, async () => {
-    return HttpResponse.json(mockDataHardCoded.assignments);
+    return HttpResponse.json(StudentRecordsMockData.assignments);
   }),
   http.get(`${backendUrl}coaching/calls`, async () => {
-    return HttpResponse.json(mockDataHardCoded.calls);
+    return HttpResponse.json(StudentRecordsMockData.calls);
   }),
 ];
