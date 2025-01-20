@@ -9,17 +9,36 @@ import type {
   Student,
   Week,
 } from '../../../../../src/types/CoachingTypes';
+
+import fakePeople from '../fakePeople.json' assert { type: 'json' };
+
+import generateCourseList from './generateCourseList';
+import generateCoachList from './generateCoachesList';
+import generateStudentList from './generateActiveStudentsList';
 import generateAssignment from './generateAssignment';
 import generateCall from './generateCall';
 import generateGroupSession from './generateGroupSession';
 import generateGroupAttendee from './generateAttendee';
 import generateWeek from './generateWeek';
-import { formatDateLikeQB } from './functions';
+import generateMembership from './generateMembership';
+import { formatDateLikeQB, makeDateRange } from './functions';
+
 /* ------------------ Helper Functions ------------------ */
 function getDateTwoDaysAfter(date: Date) {
   const twoDaysAfter = new Date(date);
   twoDaysAfter.setDate(twoDaysAfter.getDate() + 2);
   return formatDateLikeQB(twoDaysAfter);
+}
+
+function getDateOneMonthAgo(date: Date) {
+  const oneMonthAgo = new Date(date);
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  return formatDateLikeQB(oneMonthAgo);
+}
+function getDateOneMonthAfter(date: Date) {
+  const oneMonthAfter = new Date(date);
+  oneMonthAfter.setMonth(oneMonthAfter.getMonth() + 1);
+  return formatDateLikeQB(oneMonthAfter);
 }
 /* ------------------ Mock Data ------------------ */
 
@@ -158,6 +177,7 @@ weeks
 - no assignments,calls, or group sessions, hold week false, (record complete true) ('two weeks ago')
 - no assignments,calls, or group sessions, hold week false, (record complete true) ('this week')
 */
+
 function generateStudentRecordsMockData({}) {
   // Steps:
   // generate Courses
@@ -168,3 +188,71 @@ function generateStudentRecordsMockData({}) {
   // validate
   // return
 }
+
+function main() {
+  const courseList = generateCourseList();
+  const coachList = generateCoachList({
+    mockUserData: fakePeople,
+    length: 2,
+  });
+  const studentList = generateStudentList({
+    coachList,
+    mockUserData: fakePeople,
+    length: 3,
+  });
+
+  const memberships: Membership[] = [];
+  const weeks: Week[] = [];
+  const assignments: Assignment[] = [];
+  const calls: Call[] = [];
+  const groupSessions: GroupSession[] = [];
+  const groupAttendees: GroupAttendees[] = [];
+
+  for (let i = 0; i < studentList.length; i++) {
+    /*
+      IMPORTANT
+      - missing from this generate function, is the attribute: 'lastRecordedWeekStarts'. will need to be added after the week is generated
+    */
+    memberships.push(
+      generateMembership({
+        startDate: getDateOneMonthAgo(new Date()),
+        endDate: getDateOneMonthAfter(new Date()),
+        relatedCourseId: courseList[i % studentList.length].recordId,
+        relatedStudentId: studentList[i].recordId,
+      }),
+    );
+  }
+
+  /*
+  params for generateWeekAndRelatedRecords:
+  {
+    coach: Coach;
+    membership: Membership;
+    student: Student;
+    course: Course;
+    weekStarts: string;
+    holdWeek: boolean;
+    recordComplete: boolean;
+  
+    numberOfAssignments: number;
+    numberOfCalls: number;
+    numberOfGroupSessions: number;
+  }
+  */
+}
+
+function bigOlTest() {
+  const dates = makeDateRange();
+
+  const thisWeek = formatDateLikeQB(new Date(dates.thisWeek));
+  const lastWeek = formatDateLikeQB(new Date(dates.lastWeek));
+  const twoWeeksAgo = formatDateLikeQB(new Date(dates.twoWeeksAgo));
+  const upcomingWeek = formatDateLikeQB(new Date(dates.upcomingWeek));
+
+  console.log('thisWeek', thisWeek);
+  console.log('lastWeek', lastWeek);
+  console.log('twoWeeksAgo', twoWeeksAgo);
+  console.log('upcomingWeek', upcomingWeek);
+}
+
+bigOlTest();

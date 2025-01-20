@@ -156,7 +156,7 @@ export interface GroupSession {
   zoomLink: string;
   topic: string;
   comments: string;
-  relatedCoach: number;
+  // relatedCoach: number;
   sessionType: string;
   callDocument: string;
 }

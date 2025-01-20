@@ -5,13 +5,13 @@ import type { Membership, Week } from '../../../../../src/types/CoachingTypes';
 
 /* ------------------ Main Function ------------------ */
 function generateMembership({
-  week,
+  // week,
   startDate,
   endDate,
   relatedCourseId,
   relatedStudentId,
 }: {
-  week: Week;
+  // week: Week;
   startDate: string;
   endDate: string;
   relatedCourseId: number;
@@ -23,7 +23,7 @@ function generateMembership({
     onHold: false,
     startDate,
     endDate,
-    lastRecordedWeekStarts: week.weekStarts,
+    lastRecordedWeekStarts: '',
     relatedCourse: relatedCourseId,
     relatedStudent: relatedStudentId,
   };
