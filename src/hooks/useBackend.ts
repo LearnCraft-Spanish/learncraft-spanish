@@ -103,6 +103,12 @@ export function useBackend() {
     return getFactory<types.Flashcard[]>('unverified-examples');
   }, [getFactory]);
 
+  const getRecentlyEditedExamples = useCallback((): Promise<
+    types.Flashcard[]
+  > => {
+    return getFactory<types.Flashcard[]>('recently-edited-examples');
+  }, [getFactory]);
+
   const getSingleExample = useCallback(
     (exampleId: number): Promise<types.Flashcard> => {
       return getFactory<types.Flashcard>(`single-example/${exampleId}`);
@@ -459,6 +465,7 @@ export function useBackend() {
     getSingleExample,
     getSpellingsFromBackend,
     getUnverifiedExamplesFromBackend,
+    getRecentlyEditedExamples,
     getUserDataFromBackend,
     getVerifiedExamplesFromBackend,
     getVocabFromBackend,
