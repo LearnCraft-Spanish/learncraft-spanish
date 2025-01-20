@@ -1,4 +1,4 @@
-import type { UserData } from '../../../src/types/interfaceDefinitions';
+import type { UserData } from 'src/types/interfaceDefinitions';
 
 export const allStudentsTable: UserData[] = [
   {

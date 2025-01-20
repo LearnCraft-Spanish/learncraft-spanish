@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
+import type { NewFlashcard } from 'src/types/interfaceDefinitions';
+import { useUnverifiedExamples } from 'src/hooks/ExampleData/useUnverifiedExamples';
 import {
   formatEnglishText,
   formatSpanishText,
-} from '../../functions/formatFlashcardText';
-import type { NewFlashcard } from '../../types/interfaceDefinitions';
-import { useUnverifiedExamples } from '../../hooks/ExampleData/useUnverifiedExamples';
+} from 'src/functions/formatFlashcardText';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import { AudioControl } from './AudioControl';
-import '../../App.css';
+import 'src/App.css';
 import './ExampleCreator.css';
 
 export default function ExampleCreator() {

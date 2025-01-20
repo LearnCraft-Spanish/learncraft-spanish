@@ -8,12 +8,12 @@ import {
 } from '@testing-library/react';
 
 import { act } from 'react';
-import { useProgramTable } from '../../hooks/CourseData/useProgramTable';
-import { useSelectedLesson } from '../../hooks/useSelectedLesson';
-import { getUserDataFromName } from '../../../mocks/data/serverlike/studentTable';
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
 
-import type { Lesson } from '../../types/interfaceDefinitions';
-import MockAllProviders from '../../../mocks/Providers/MockAllProviders';
+import type { Lesson } from 'src/types/interfaceDefinitions';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import FromToLessonSelector from './FromToLessonSelector';
 
 interface WrapperProps {

@@ -1,8 +1,8 @@
 import { describe, it, vi, expect } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
 
-import mockDataHardCoded from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
-import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
+import mockDataHardCoded from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import WeeksTable from './WeeksTable';
 
 /*

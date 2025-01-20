@@ -2,10 +2,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import { useUserData } from '../../hooks/UserData/useUserData';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
-import { useBackend } from '../../hooks/useBackend';
-import { useContextualMenu } from '../../hooks/useContextualMenu';
+import { useBackend } from 'src/hooks/useBackend';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 // import CoachingFilter from './CoachingFilter/CoachingFilter';
 import StudentRecordsTable from './StudentRecordsTable/StudentRecordsTable';
 import {

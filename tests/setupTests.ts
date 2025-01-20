@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
-import { server } from '../mocks/api/server';
+import { server } from 'mocks/api/server';
 
 import '@testing-library/jest-dom';
 import { setupMockAuth } from './setupMockAuth';

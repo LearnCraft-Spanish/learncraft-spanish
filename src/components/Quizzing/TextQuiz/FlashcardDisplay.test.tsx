@@ -1,9 +1,9 @@
 import { act } from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { sampleStudentFlashcardData } from '../../../../tests/mockData';
 
-import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
 import Flashcard from './FlashcardDisplay';
 
 const example = {
@@ -19,7 +19,7 @@ const onRemove = vi.fn(() => {});
 const toggleAnswer = vi.fn();
 const togglePlaying = vi.fn();
 
-// vi.mock('../../hooks/useStudentFlashcards', () => ({
+// vi.mock('src/hooks/useStudentFlashcards', () => ({
 //   useStudentFlashcards: () => ({
 //     addFlashcardMutation: { mutate: vi.fn() },
 //     removeFlashcardMutation: { mutate: vi.fn() },

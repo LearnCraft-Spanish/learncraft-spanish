@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { useStudentFlashcards } from '../../../hooks/UserData/useStudentFlashcards';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import MenuButton from '../../Buttons/MenuButton';
 import type { StudentExample } from '../../../types/interfaceDefinitions';
 

@@ -2,10 +2,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-import { useUserData } from '../../../hooks/UserData/useUserData';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
-import { useBackend } from '../../../hooks/useBackend';
-import { useContextualMenu } from '../../../hooks/useContextualMenu';
+import { useBackend } from 'src/hooks/useBackend';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 // import './_styles.css';
 const Coaching = () => {
   const { contextual, openContextual, closeContextual, currentContextual } =

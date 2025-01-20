@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
-import { setupMockAuth } from '../../tests/setupMockAuth';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
 
 import Menu from './Menu';
 

@@ -1,4 +1,4 @@
-import { useContextualMenu } from '../../../../hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
 import type {
@@ -9,7 +9,7 @@ import type {
   Membership,
 } from '../../../../types/CoachingTypes';
 
-import useCoaching from '../../../../hooks/CoachingData/useCoaching';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import '../../styles/coaching.scss';
 interface CoachingFilterProps {
   weeks: Week[] | undefined;

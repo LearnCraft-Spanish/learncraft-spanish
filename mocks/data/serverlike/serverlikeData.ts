@@ -12,7 +12,7 @@ import type {
   QuizUnparsed,
   Spelling,
   Vocabulary,
-} from '../../../src/types/interfaceDefinitions';
+} from 'src/types/interfaceDefinitions';
 
 import * as dataJson from './actualServerData.json';
 import { allStudentsTable } from './studentTable';

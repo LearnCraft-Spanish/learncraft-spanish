@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import MyFlashcardsQuiz from './ReviewMyFlashcards';
 
 describe('menu for student flashcards', () => {

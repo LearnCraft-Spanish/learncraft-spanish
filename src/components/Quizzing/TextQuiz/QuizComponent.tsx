@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Link, Navigate, useLocation } from 'react-router-dom';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import type {
   DisplayOrder,
   Flashcard,
 } from '../../../types/interfaceDefinitions';
 import { fisherYatesShuffle } from '../../../functions/fisherYatesShuffle';
-import { useActiveStudent } from '../../../hooks/UserData/useActiveStudent';
-import { useStudentFlashcards } from '../../../hooks/UserData/useStudentFlashcards';
 import MenuButton from '../../Buttons/MenuButton';
 import PMFPopup from '../../PMFPopup/PMFPopup';
 import QuizProgress from '../QuizProgress';

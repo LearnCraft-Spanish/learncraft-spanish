@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
 import { Navigate } from 'react-router-dom';
+import Loading from 'src/components/Loading';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
 import type {
   DisplayOrder,
   Flashcard,
   StudentExample,
 } from '../types/interfaceDefinitions';
-import Loading from '../components/Loading';
-import { useStudentFlashcards } from '../hooks/UserData/useStudentFlashcards';
-import ExamplesTable from '../components/FlashcardFinder/ExamplesTable';
 
 function FlashcardManager() {
   const { flashcardDataQuery, exampleIsCustom } = useStudentFlashcards();

@@ -6,9 +6,9 @@ import React, {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import type { Flashcard } from '../../../types/interfaceDefinitions';
 import { fisherYatesShuffle } from '../../../functions/fisherYatesShuffle';
-import { useActiveStudent } from '../../../hooks/UserData/useActiveStudent';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
 import QuizProgress from '../QuizProgress';

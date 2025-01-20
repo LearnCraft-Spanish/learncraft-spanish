@@ -1,15 +1,15 @@
 import { Route } from 'react-router-dom';
-import { useUserData } from '../hooks/UserData/useUserData';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
+import FlashcardFinder from 'src/components/FlashcardFinder';
+import ExampleCreator from 'src/components/ExampleCreator/ExampleCreator';
+import ExampleEditor from 'src/components/ExampleEditor/ExampleEditor';
+import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import FlashcardManager from '../sections/FlashcardManager';
 import AudioBasedReview from '../sections/AudioBasedReview';
-import FlashcardFinder from '../components/FlashcardFinder';
 import FrequenSay from '../sections/FrequenSay';
-import ExampleCreator from '../components/ExampleCreator/ExampleCreator';
-import ExampleEditor from '../components/ExampleEditor/ExampleEditor';
-import WeeksRecordsSection from '../components/Coaching/WeeksRecords/WeeksRecords';
 import NotFoundPage from '../NotFoundPage';
 import LCSPQuizApp from '../sections/LCSPQuizApp';
 

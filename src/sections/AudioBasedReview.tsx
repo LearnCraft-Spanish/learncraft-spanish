@@ -1,18 +1,18 @@
 import React, { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import type { Flashcard } from '../types/interfaceDefinitions';
-import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
-import { useActiveStudent } from '../hooks/UserData/useActiveStudent';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 
-import { useAudioExamples } from '../hooks/ExampleData/useAudioExamples';
-import { useProgramTable } from '../hooks/CourseData/useProgramTable';
-import { useSelectedLesson } from '../hooks/useSelectedLesson';
-import { useUserData } from '../hooks/UserData/useUserData';
-import Loading from '../components/Loading';
-import AudioQuiz from '../components/Quizzing/AudioQuiz/AudioQuiz';
-import AudioQuizSetupMenu from '../components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
-import '../App.css';
-import '../components/Quizzing/AudioQuiz/AudioBasedReview.css';
+import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import Loading from 'src/components/Loading';
+import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
+import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
+import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
+import type { Flashcard } from '../types/interfaceDefinitions';
+import 'src/App.css';
+import 'src/components/Quizzing/AudioQuiz/AudioBasedReview.css';
 
 interface AudioBasedReviewProps {
   audioOrComprehension?: 'audio' | 'comprehension';

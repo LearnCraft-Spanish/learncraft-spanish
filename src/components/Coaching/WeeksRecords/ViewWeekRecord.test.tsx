@@ -1,9 +1,9 @@
 import { describe, it, vi, expect } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
 
-import mockDataHardCoded from '../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import mockDataHardCoded from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
-import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import ViewWeekRecord from './ViewWeekRecord';
 
 const week = mockDataHardCoded.lastThreeWeeks[0];

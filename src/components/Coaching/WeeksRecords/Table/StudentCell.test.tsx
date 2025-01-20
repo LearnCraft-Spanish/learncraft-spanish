@@ -1,9 +1,9 @@
 import { describe, it, vi, expect } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
 
-import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import StudentCell from './StudentCell';
-import mockDataHardCoded from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import mockDataHardCoded from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
 const week = mockDataHardCoded.lastThreeWeeks[0];
 const membership = mockDataHardCoded.activeMemberships.find((membership) => {

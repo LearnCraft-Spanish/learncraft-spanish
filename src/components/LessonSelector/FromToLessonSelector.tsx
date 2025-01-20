@@ -1,6 +1,6 @@
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import type { Lesson, Program } from '../../types/interfaceDefinitions';
-import { useProgramTable } from '../../hooks/CourseData/useProgramTable';
-import { useSelectedLesson } from '../../hooks/useSelectedLesson';
 import './LessonSelector.css';
 
 export default function FromToLessonSelector(): JSX.Element {

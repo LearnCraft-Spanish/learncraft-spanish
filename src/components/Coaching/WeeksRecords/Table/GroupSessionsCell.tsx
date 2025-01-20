@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { GroupSession, Week } from '../../../../types/CoachingTypes';
 
-import { useContextualMenu } from '../../../../hooks/useContextualMenu';
-import useCoaching from '../../../../hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 import ContextualControlls from '../../../ContextualControlls';
 

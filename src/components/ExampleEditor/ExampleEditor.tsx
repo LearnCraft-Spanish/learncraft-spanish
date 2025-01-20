@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
-import type { Flashcard, Vocabulary } from '../../types/interfaceDefinitions';
-import { useVocabulary } from '../../hooks/CourseData/useVocabulary';
-import ExamplesTable from '../FlashcardFinder/ExamplesTable';
+import type { Flashcard, Vocabulary } from 'src/types/interfaceDefinitions';
+import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import quizCourses from 'src/functions/QuizCourseList';
+import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
 import ExampleListItem from '../FlashcardFinder/ExampleListItem';
-import quizCourses from '../../functions/QuizCourseList';
 import { VocabTag } from './VocabTag';
 import './ExampleEditor.css';
 

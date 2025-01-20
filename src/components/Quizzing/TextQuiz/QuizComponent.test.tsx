@@ -9,10 +9,10 @@ import {
 import React from 'react';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getUserDataFromName } from '../../../../mocks/data/serverlike/studentTable';
-import allStudentFlashcards from '../../../../mocks/data/hooklike/studentFlashcardData';
+import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
+import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 
-import MockAllProviders from '../../../../mocks/Providers/MockAllProviders';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import Quiz from './QuizComponent';
 
 const cleanupFunction = vi.fn();
@@ -28,7 +28,7 @@ if (!userFlashcardData) {
   throw new Error(`Student flashcard data not found: student-admin`);
 }
 
-// vi.mock('../hooks/useStudentFlashcards', () => {
+// vi.mock('src/hooks/useStudentFlashcards', () => {
 //   return {
 //     useStudentFlashcards: () => ({
 //       flashcardDataQuery: { data: sampleStudentFlashcardData },

@@ -1,5 +1,5 @@
 import type { Coach } from '../../../../types/CoachingTypes';
-import useCoaching from '../../../../hooks/CoachingData/useCoaching';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 interface CoachSelectProps {
   updateCoachFilter: (recordId: string) => void;

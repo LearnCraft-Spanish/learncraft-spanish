@@ -2,8 +2,8 @@ import { act } from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { setupMockAuth } from '../../tests/setupMockAuth';
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 import AudioBasedReview from './AudioBasedReview';
 

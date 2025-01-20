@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
-import MockAllProviders from '../mocks/Providers/MockAllProviders';
-import { setupMockAuth } from '../tests/setupMockAuth';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
 import App from './App';
 
 // Waiting for userData context to be finished

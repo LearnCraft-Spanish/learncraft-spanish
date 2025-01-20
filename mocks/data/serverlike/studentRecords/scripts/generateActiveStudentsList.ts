@@ -1,4 +1,4 @@
-import type { Coach, Student } from '../../../../../src/types/CoachingTypes';
+import type { Coach, Student } from 'src/types/CoachingTypes';
 
 /* ------------------ Helper Functions ------------------ */
 

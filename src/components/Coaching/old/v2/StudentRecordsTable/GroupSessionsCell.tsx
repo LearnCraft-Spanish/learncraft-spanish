@@ -1,4 +1,4 @@
-import { useContextualMenu } from '../../../hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import type {
   GroupSession,
   Student,

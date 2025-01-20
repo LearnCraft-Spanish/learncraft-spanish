@@ -6,8 +6,8 @@ import MenuButton from 'src/components/Buttons/MenuButton';
 import Loading from 'src/components/Loading';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
-import OfficialQuiz from '../components/Quizzing/OfficialQuizzing/OfficialQuiz';
-import '../App.css';
+import OfficialQuiz from 'src/components/Quizzing/OfficialQuizzing/OfficialQuiz';
+import 'src/App.css';
 
 export default function LCSPQuizApp(): JSX.Element {
   const location = useLocation();

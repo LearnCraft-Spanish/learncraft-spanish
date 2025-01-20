@@ -8,13 +8,13 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
-import Loading from '../components/Loading';
-import QuizComponent from '../components/Quizzing/TextQuiz/QuizComponent';
-import AudioQuiz from '../components/Quizzing/AudioQuiz/AudioQuiz';
-import { useActiveStudent } from '../hooks/UserData/useActiveStudent';
-import { useStudentFlashcards } from '../hooks/UserData/useStudentFlashcards';
-import { usePMFData } from '../hooks/UserData/usePMFData';
-import QuizSetupMenu from '../components/Quizzing/TextQuiz/QuizSetupMenu';
+import Loading from 'src/components/Loading';
+import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';
+import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import { usePMFData } from 'src/hooks/UserData/usePMFData';
+import QuizSetupMenu from 'src/components/Quizzing/TextQuiz/QuizSetupMenu';
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();

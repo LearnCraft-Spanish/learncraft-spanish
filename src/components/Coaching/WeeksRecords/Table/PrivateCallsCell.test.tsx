@@ -1,9 +1,9 @@
 import { describe, it, vi, expect } from 'vitest';
 import { render, waitFor, screen } from '@testing-library/react';
 
-import MockAllProviders from '../../../../../mocks/Providers/MockAllProviders';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import PrivateCallsCell from './PrivateCallsCell';
-import mockData from '../../../../../mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import mockData from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import { act } from 'react';
 
 // const week = mockData.calls.find((call) => call.rating > 0);
