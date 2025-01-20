@@ -1,5 +1,6 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
 import { HttpResponse, http } from 'msw';
+import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 import newData from '../data/serverlike/serverlikeData';
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
@@ -82,6 +83,21 @@ export const handlers = [
 
   http.get(`${backendUrl}unverified-examples`, () => {
     return HttpResponse.json(apiData.verifiedExamplesTable);
+  }),
+
+  http.get(`${backendUrl}recently-edited-examples`, () => {
+    return HttpResponse.json(apiData.verifiedExamplesTable);
+  }),
+
+  http.get(`${backendUrl}single-example/:exampleId`, ({ params }) => {
+    const exampleId = params.exampleId;
+    const foundExample = apiData.verifiedExamplesTable.find((example) => {
+      return example.recordId === Number(exampleId);
+    });
+    if (!foundExample) {
+      throw new Error('Example not found');
+    }
+    return HttpResponse.json(foundExample);
   }),
 
   http.get(`${backendUrl}my-examples`, ({ request }) => {
