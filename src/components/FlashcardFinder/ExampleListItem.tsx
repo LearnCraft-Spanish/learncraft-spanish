@@ -73,33 +73,34 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
           <h4>Spanish</h4>
         </div>
       )}
-      {(data.vocabComplete || forceShowVocab) && (
-        <div className="exampleCardTags">
-          {showTags && (
-            <div className="exampleCardTagsList">
-              {data.vocabIncluded.map((tag) => (
-                <p key={tag}>{tag}</p>
-              ))}
+      {(data.vocabComplete || forceShowVocab) &&
+        !!data.vocabIncluded.length && (
+          <div className="exampleCardTags">
+            {showTags && (
+              <div className="exampleCardTagsList">
+                {data.vocabIncluded.map((tag) => (
+                  <p key={tag}>{tag}</p>
+                ))}
+                <button
+                  type="button"
+                  className="hideTagsButton"
+                  onClick={() => setShowTags(false)}
+                >
+                  <img src={x} alt="Hide" />
+                </button>
+              </div>
+            )}
+            {!showTags && (
               <button
                 type="button"
-                className="hideTagsButton"
-                onClick={() => setShowTags(false)}
+                className="showTagsButton"
+                onClick={() => setShowTags(true)}
               >
-                <img src={x} alt="Hide" />
+                Vocabulary
               </button>
-            </div>
-          )}
-          {!showTags && (
-            <button
-              type="button"
-              className="showTagsButton"
-              onClick={() => setShowTags(true)}
-            >
-              Vocabulary
-            </button>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
       {dataReady && isStudent && (
         <>
           {!isCollected && (

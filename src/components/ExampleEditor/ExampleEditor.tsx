@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
+import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
 import type { Flashcard, Vocabulary } from 'src/types/interfaceDefinitions';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import quizCourses from 'src/functions/QuizCourseList';
@@ -9,7 +10,7 @@ import { VocabTag } from './VocabTag';
 import './ExampleEditor.css';
 
 export default function ExampleEditor() {
-  const [quizCourse, setQuizCourse] = useState('');
+  const [tableOption, setTableOption] = useState('');
   const [quizId, setQuizId] = useState(undefined as number | undefined);
   const [selectedExampleId, setSelectedExampleId] = useState(
     null as number | null,
@@ -27,6 +28,8 @@ export default function ExampleEditor() {
 
   const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
+  const { recentlyEditedExamplesQuery, updateRecentlyEditedExample } =
+    useRecentlyEditedExamples();
   const { vocabularyQuery } = useVocabulary();
 
   const includedVocabObjects = useMemo(() => {
@@ -42,13 +45,25 @@ export default function ExampleEditor() {
   const quizList = useMemo(() => {
     return officialQuizzesQuery.data?.filter((quiz) => {
       const courseCode = quiz.quizNickname.split(' ')[0];
-      return courseCode === quizCourse;
+      return courseCode === tableOption;
     });
-  }, [officialQuizzesQuery.data, quizCourse]);
+  }, [officialQuizzesQuery.data, tableOption]);
 
   const firstQuiz = quizList?.[0];
 
-  const tableData = quizExamplesQuery.data;
+  const tableData = useMemo(() => {
+    if (tableOption === 'recently-edited') {
+      return recentlyEditedExamplesQuery.data;
+    } else {
+      return quizExamplesQuery.data;
+    }
+  }, [tableOption, quizExamplesQuery.data, recentlyEditedExamplesQuery.data]);
+
+  const recentlyEditedOption = (
+    <option key="recently-edited" value="recently-edited">
+      Recently Edited
+    </option>
+  );
 
   const quizCourseOptions = quizCourses.map((course) => {
     return (
@@ -57,6 +72,21 @@ export default function ExampleEditor() {
       </option>
     );
   });
+
+  const allTableOptions = [recentlyEditedOption, ...quizCourseOptions];
+
+  const updateTableOptions = useCallback(
+    (newCourse: string) => {
+      if (
+        tableOption !== 'recently-edited' &&
+        newCourse === 'recently-edited'
+      ) {
+        recentlyEditedExamplesQuery.refetch();
+      }
+      setTableOption(newCourse);
+    },
+    [recentlyEditedExamplesQuery, tableOption],
+  );
 
   const quizOptions = useMemo(() => {
     return quizList?.map((quiz) => {
@@ -151,16 +181,29 @@ export default function ExampleEditor() {
   function handleEditExample(e: React.FormEvent) {
     e.preventDefault();
     if (selectedExampleId !== null) {
-      updateQuizExample({
-        recordId: selectedExampleId,
-        spanishExample,
-        englishTranslation,
-        spanishAudioLa,
-        spanglish,
-        englishAudio,
-        vocabComplete,
-        vocabIncluded,
-      });
+      if (!!tableOption && tableOption !== 'recently-edited') {
+        updateQuizExample({
+          recordId: selectedExampleId,
+          spanishExample,
+          englishTranslation,
+          spanishAudioLa,
+          spanglish,
+          englishAudio,
+          vocabComplete,
+          vocabIncluded,
+        });
+      } else if (tableOption === 'recently-edited') {
+        updateRecentlyEditedExample({
+          recordId: selectedExampleId,
+          spanishExample,
+          englishTranslation,
+          spanishAudioLa,
+          spanglish,
+          englishAudio,
+          vocabComplete,
+          vocabIncluded,
+        });
+      }
     }
   }
 
@@ -180,12 +223,13 @@ export default function ExampleEditor() {
       }
     }
   }, [
+    recentlyEditedExamplesQuery.data,
     quizExamplesQuery.data,
+    tableData,
     vocabularyQuery.data,
     selectedExampleId,
-    tableData,
   ]);
-  // Update default quiz when quizCourse changes
+  // Update default quiz when tableOption changes
   useEffect(() => {
     if (!firstQuiz) {
       setQuizId(undefined);
@@ -221,24 +265,6 @@ export default function ExampleEditor() {
               </>
             )}
           </div>
-        </div>
-        <div>
-          <h3>Choose Quiz</h3>
-          <select
-            value={quizCourse}
-            onChange={(e) => setQuizCourse(e.target.value)}
-          >
-            <option value="">Select Example List</option>
-            {quizCourseOptions}
-          </select>
-          {!!quizCourse && (
-            <select
-              value={quizId}
-              onChange={(e) => setQuizId(Number.parseInt(e.target.value))}
-            >
-              {quizOptions}
-            </select>
-          )}
         </div>
         <form onSubmit={(e) => handleEditExample(e)}>
           <h3>Edit Example</h3>
@@ -312,9 +338,32 @@ export default function ExampleEditor() {
           </div>
           <button type="submit">Save Example</button>
         </form>
-        <h3>
-          {quizCourse} Quiz {activeQuiz?.quizNumber}, Unverified Examples
-        </h3>
+        <div>
+          <h3>Example List</h3>
+          <select
+            value={tableOption}
+            onChange={(e) => updateTableOptions(e.target.value)}
+          >
+            <option value="">Select Example List</option>
+            {allTableOptions}
+          </select>
+          {!!tableOption && tableOption !== 'recently-edited' && (
+            <select
+              value={quizId}
+              onChange={(e) => setQuizId(Number.parseInt(e.target.value))}
+            >
+              {quizOptions}
+            </select>
+          )}
+        </div>
+        {!!tableOption && tableOption !== 'recently-edited' && (
+          <h3>
+            {tableOption} Quiz {activeQuiz?.quizNumber}, Unverified Examples
+          </h3>
+        )}
+        {tableOption === 'recently-edited' && (
+          <h3>Recently Added or Edited Examples</h3>
+        )}
         <ExamplesTable
           dataSource={tableData ?? []}
           displayOrder={displayOrder ?? []}

@@ -106,6 +106,7 @@ export function useBackend() {
   const getRecentlyEditedExamples = useCallback((): Promise<
     types.Flashcard[]
   > => {
+    console.log('getRecentlyEditedExamples');
     return getFactory<types.Flashcard[]>('recently-edited-examples');
   }, [getFactory]);
 

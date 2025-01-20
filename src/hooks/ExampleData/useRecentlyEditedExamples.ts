@@ -14,20 +14,19 @@ export function useRecentlyEditedExamples() {
   const recentlyEditedExamplesQuery = useQuery({
     queryKey: ['recentlyEditedExamples'],
     queryFn: getRecentlyEditedExamples,
-    staleTime: Infinity, // Never stale unless manually updated
-    gcTime: Infinity, // Never garbage collect unless manually updated
+    staleTime: 15000,
+    gcTime: Infinity,
     enabled: hasAccess,
   });
 
   const addUnverifiedExample = async (example: NewFlashcard) => {
     if (hasAccess) {
       await createUnverifiedExample(example);
-      await recentlyEditedExamplesQuery.refetch();
     }
     await recentlyEditedExamplesQuery.refetch();
   };
 
-  const updateUnverifiedExample = useCallback(
+  const updateRecentlyEditedExample = useCallback(
     (newExampleData: Flashcard) => {
       try {
         updateExampleFromQuery(newExampleData, recentlyEditedExamplesQuery);
@@ -41,6 +40,6 @@ export function useRecentlyEditedExamples() {
   return {
     recentlyEditedExamplesQuery,
     addUnverifiedExample,
-    updateUnverifiedExample,
+    updateRecentlyEditedExample,
   };
 }
