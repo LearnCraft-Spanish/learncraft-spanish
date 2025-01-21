@@ -47,7 +47,9 @@ export default function WeeksRecordsSection() {
   const dateRange = useBANDAIDhelperFunction();
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
-  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(1);
+  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
+    dateRange.dayOfWeek >= 3 ? 0 : 1,
+  ); // 0 for this week, 1 for last week, 2 for two weeks ago
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
