@@ -1,9 +1,9 @@
-import { describe, it, vi, expect } from 'vitest';
-import WeeksRecordsSection from './WeeksRecords';
-import { render, waitFor, screen, renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { render, renderHook, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import WeeksRecordsSection from './WeeksRecords';
 
 describe('section WeeksRecordsSection', () => {
   // Write better tests, delete skipped ones

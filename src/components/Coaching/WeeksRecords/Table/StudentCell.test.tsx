@@ -1,9 +1,9 @@
-import { describe, it, vi, expect } from 'vitest';
-import { render, waitFor, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import StudentCell from './StudentCell';
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import StudentCell from './StudentCell';
 
 const week = generatedMockData.weeks[0];
 const membership = generatedMockData.memberships.find((membership) => {

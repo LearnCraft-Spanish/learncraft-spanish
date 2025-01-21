@@ -1,10 +1,8 @@
-import { beforeAll, describe, it, vi, expect } from 'vitest';
-import { render, waitFor, screen } from '@testing-library/react';
-import { act } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import AssignmentsCell from './AssignmentsCell';
-
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import AssignmentsCell from './AssignmentsCell';
 
 const assignment = generatedMockData.assignments.find(
   (assignment) => assignment.assignmentLink.length > 0,

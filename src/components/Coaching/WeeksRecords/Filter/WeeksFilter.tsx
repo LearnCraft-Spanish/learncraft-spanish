@@ -1,15 +1,7 @@
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import type { Coach, Course, Week } from '../../../../types/CoachingTypes';
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
-import type {
-  Week,
-  Coach,
-  Student,
-  Course,
-  Membership,
-} from '../../../../types/CoachingTypes';
 
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import '../../styles/coaching.scss';
 interface CoachingFilterProps {
   weeks: Week[] | undefined;
@@ -60,13 +52,6 @@ export default function WeeksFilter({
   searchTerm,
   updateSearchTerm,
 }: CoachingFilterProps) {
-  const {
-    lastThreeWeeksQuery,
-    coachListQuery,
-    courseListQuery,
-    activeStudentsQuery,
-    activeMembershipsQuery,
-  } = useCoaching();
   return (
     weeks && (
       <div className="coachingFilterSection">

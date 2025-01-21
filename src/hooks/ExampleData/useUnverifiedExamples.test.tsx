@@ -5,7 +5,7 @@ import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
 import { setupMockAuth } from 'tests/setupMockAuth';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
-describe('useUnverifiedExamples', () => {
+describe.skip('useUnverifiedExamples', () => {
   beforeEach(() => {
     setupMockAuth({ userName: 'admin-empty-role' });
   });

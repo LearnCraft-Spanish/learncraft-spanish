@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { useBackend } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
 export default function useCoaching() {
@@ -76,174 +77,205 @@ export default function useCoaching() {
   / undefined: desired data does not exist
   */
 
-  function getCoachFromMembershipId(membershipId: number) {
-    if (
-      !activeMembershipsQuery.isSuccess ||
-      !activeStudentsQuery.isSuccess ||
-      !coachListQuery.isSuccess
-    ) {
-      return null;
-    }
-    const membership = activeMembershipsQuery.data.find(
-      (membership) => membership.recordId === membershipId,
-    );
-    if (!membership) return undefined;
+  const getCoachFromMembershipId = useCallback(
+    (membershipId: number) => {
+      if (
+        !activeMembershipsQuery.isSuccess ||
+        !activeStudentsQuery.isSuccess ||
+        !coachListQuery.isSuccess
+      ) {
+        return null;
+      }
+      const membership = activeMembershipsQuery.data.find(
+        (membership) => membership.recordId === membershipId,
+      );
+      if (!membership) return undefined;
 
-    const studentId = membership.relatedStudent;
-    const student = activeStudentsQuery.data.find(
-      (student) => student.recordId === studentId,
-    );
-    if (!student) return undefined;
+      const studentId = membership.relatedStudent;
+      const student = activeStudentsQuery.data.find(
+        (student) => student.recordId === studentId,
+      );
+      if (!student) return undefined;
 
-    const coachObject = student.primaryCoach;
-    const coach = coachListQuery.data.find(
-      (coach) => coach.user.id === coachObject.id,
-    );
-    if (!coach) return undefined;
-    return coach;
-  }
+      const coachObject = student.primaryCoach;
+      const coach = coachListQuery.data.find(
+        (coach) => coach.user.id === coachObject.id,
+      );
+      if (!coach) return undefined;
+      return coach;
+    },
+    [activeMembershipsQuery, activeStudentsQuery, coachListQuery],
+  );
 
-  function getCourseFromMembershipId(membershipId: number | undefined) {
-    if (!activeMembershipsQuery.isSuccess || !courseListQuery.isSuccess) {
-      return null;
-    }
-    if (!membershipId) return undefined;
+  const getCourseFromMembershipId = useCallback(
+    (membershipId: number | undefined) => {
+      if (!activeMembershipsQuery.isSuccess || !courseListQuery.isSuccess) {
+        return null;
+      }
+      if (!membershipId) return undefined;
 
-    const membership = activeMembershipsQuery.data.find(
-      (membership) => membership.recordId === membershipId,
-    );
-    if (!membership) return undefined;
+      const membership = activeMembershipsQuery.data.find(
+        (membership) => membership.recordId === membershipId,
+      );
+      if (!membership) return undefined;
 
-    const courseId = membership.relatedCourse;
-    const course = courseListQuery.data.find(
-      (course) => course.recordId === courseId,
-    );
-    if (!course) return undefined;
-    return course;
-  }
+      const courseId = membership.relatedCourse;
+      const course = courseListQuery.data.find(
+        (course) => course.recordId === courseId,
+      );
+      if (!course) return undefined;
+      return course;
+    },
+    [activeMembershipsQuery, courseListQuery],
+  );
 
-  function getStudentFromMembershipId(membershipId: number | undefined) {
-    if (
-      !activeMembershipsQuery.isSuccess ||
-      !activeStudentsQuery.isSuccess ||
-      !membershipId
-    ) {
-      return null;
-    }
-    const membership = activeMembershipsQuery.data.find(
-      (item) => item.recordId === membershipId,
-    );
-    if (!membership) return undefined;
+  const getStudentFromMembershipId = useCallback(
+    (membershipId: number | undefined) => {
+      if (
+        !activeMembershipsQuery.isSuccess ||
+        !activeStudentsQuery.isSuccess ||
+        !membershipId
+      ) {
+        return null;
+      }
+      const membership = activeMembershipsQuery.data.find(
+        (item) => item.recordId === membershipId,
+      );
+      if (!membership) return undefined;
 
-    const studentId = membership.relatedStudent;
-    const student = activeStudentsQuery.data.find(
-      (item) => item.recordId === studentId,
-    );
-    if (!student) return undefined;
-    return student;
-  }
+      const studentId = membership.relatedStudent;
+      const student = activeStudentsQuery.data.find(
+        (item) => item.recordId === studentId,
+      );
+      if (!student) return undefined;
+      return student;
+    },
+    [activeMembershipsQuery, activeStudentsQuery],
+  );
 
-  function getAttendeeWeeksFromGroupSessionId(sessionId: number) {
-    if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
-      return null;
-    }
-    const attendeeList = groupAttendeesQuery.data.filter(
-      (attendee) => attendee.groupSession === sessionId,
-    );
-    if (attendeeList.length === 0) return undefined;
+  const getAttendeeWeeksFromGroupSessionId = useCallback(
+    (sessionId: number) => {
+      if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+        return null;
+      }
+      const attendeeList = groupAttendeesQuery.data.filter(
+        (attendee) => attendee.groupSession === sessionId,
+      );
+      if (attendeeList.length === 0) return undefined;
 
-    const weekRecordsList = attendeeList.map((attendee) =>
-      lastThreeWeeksQuery.data.find(
-        (week) => week.recordId === attendee.student,
-      ),
-    );
-    if (weekRecordsList.length === 0) return undefined;
-    return weekRecordsList;
-  }
+      const weekRecordsList = attendeeList.map((attendee) =>
+        lastThreeWeeksQuery.data.find(
+          (week) => week.recordId === attendee.student,
+        ),
+      );
+      if (weekRecordsList.length === 0) return undefined;
+      return weekRecordsList;
+    },
+    [groupAttendeesQuery, lastThreeWeeksQuery],
+  );
 
-  function getGroupSessionFromWeekRecordId(weekRecordId: number) {
-    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-      return null;
-    }
-    const attendeeList = groupAttendeesQuery.data.filter(
-      (attendee) => attendee.student === weekRecordId,
-    );
-    if (attendeeList.length === 0) return undefined;
+  const getGroupSessionFromWeekRecordId = useCallback(
+    (weekRecordId: number) => {
+      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+        return null;
+      }
+      const attendeeList = groupAttendeesQuery.data.filter(
+        (attendee) => attendee.student === weekRecordId,
+      );
+      if (attendeeList.length === 0) return undefined;
 
-    const groupSession = groupSessionsQuery.data.find((groupSession) =>
-      attendeeList.find(
-        (attendee) => attendee.groupSession === groupSession.recordId,
-      ),
-    );
-    if (!groupSession) return undefined;
-    return groupSession;
-  }
+      const groupSession = groupSessionsQuery.data.find((groupSession) =>
+        attendeeList.find(
+          (attendee) => attendee.groupSession === groupSession.recordId,
+        ),
+      );
+      if (!groupSession) return undefined;
+      return groupSession;
+    },
+    [groupAttendeesQuery, groupSessionsQuery],
+  );
   // should There only be one group session per week record?
   // Answer: theoretically possible, if the group reschedules the session
-  function getGroupSessionsFromWeekRecordId(weekRecordId: number) {
-    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-      return null;
-    }
-    const attendeeList = groupAttendeesQuery.data.filter(
-      (attendee) => attendee.student === weekRecordId,
-    );
-    const groupSessionList = groupSessionsQuery.data.filter((groupSession) =>
-      attendeeList.find(
-        (attendee) => attendee.groupSession === groupSession.recordId,
-      ),
-    );
-    return groupSessionList;
-  }
+  const getGroupSessionsFromWeekRecordId = useCallback(
+    (weekRecordId: number) => {
+      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+        return null;
+      }
+      const attendeeList = groupAttendeesQuery.data.filter(
+        (attendee) => attendee.student === weekRecordId,
+      );
+      const groupSessionList = groupSessionsQuery.data.filter((groupSession) =>
+        attendeeList.find(
+          (attendee) => attendee.groupSession === groupSession.recordId,
+        ),
+      );
+      return groupSessionList;
+    },
+    [groupAttendeesQuery, groupSessionsQuery],
+  );
 
-  function getAssignmentsFromWeekRecordId(weekRecordId: number) {
-    if (!assignmentsQuery.isSuccess) {
-      return null;
-    }
-    const assignments = assignmentsQuery.data.filter(
-      (assignment) => assignment.relatedWeek === weekRecordId,
-    );
-    if (assignments.length === 0) return undefined;
-    return assignments;
-  }
+  const getAssignmentsFromWeekRecordId = useCallback(
+    (weekRecordId: number) => {
+      if (!assignmentsQuery.isSuccess) {
+        return null;
+      }
+      const assignments = assignmentsQuery.data.filter(
+        (assignment) => assignment.relatedWeek === weekRecordId,
+      );
+      if (assignments.length === 0) return undefined;
+      return assignments;
+    },
+    [assignmentsQuery],
+  );
 
-  function getMembershipFromWeekRecordId(weekId: number | undefined) {
-    if (!activeMembershipsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
-      return null;
-    }
-    if (!weekId) return undefined;
+  const getMembershipFromWeekRecordId = useCallback(
+    (weekId: number | undefined) => {
+      if (!activeMembershipsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+        return null;
+      }
+      if (!weekId) return undefined;
 
-    const week = lastThreeWeeksQuery.data.find(
-      (week) => week.recordId === weekId,
-    );
-    if (!week) return undefined;
+      const week = lastThreeWeeksQuery.data.find(
+        (week) => week.recordId === weekId,
+      );
+      if (!week) return undefined;
 
-    const membershipId = week.relatedMembership;
-    const membership = activeMembershipsQuery.data.find(
-      (membership) => membership.recordId === membershipId,
-    );
-    if (!membership) return undefined;
-    return membership;
-  }
+      const membershipId = week.relatedMembership;
+      const membership = activeMembershipsQuery.data.find(
+        (membership) => membership.recordId === membershipId,
+      );
+      if (!membership) return undefined;
+      return membership;
+    },
+    [activeMembershipsQuery, lastThreeWeeksQuery],
+  );
 
-  function getPrivateCallsFromWeekRecordId(weekId: number) {
-    if (!callsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
-      return null;
-    }
-    const privateCalls = callsQuery.data.filter(
-      (call) => call.relatedWeek === weekId,
-    );
-    return privateCalls;
-  }
+  const getPrivateCallsFromWeekRecordId = useCallback(
+    (weekId: number) => {
+      if (!callsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+        return null;
+      }
+      const privateCalls = callsQuery.data.filter(
+        (call) => call.relatedWeek === weekId,
+      );
+      return privateCalls;
+    },
+    [callsQuery, lastThreeWeeksQuery],
+  );
 
-  function getAttendeesFromGroupSessionId(sessionId: number) {
-    if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-      return null;
-    }
-    return groupAttendeesQuery.data.filter(
-      (attendee) => attendee.groupSession === sessionId,
-    );
-  }
+  const getAttendeesFromGroupSessionId = useCallback(
+    (sessionId: number) => {
+      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+        return null;
+      }
+      return groupAttendeesQuery.data.filter(
+        (attendee) => attendee.groupSession === sessionId,
+      );
+    },
+    [groupAttendeesQuery, groupSessionsQuery],
+  );
   /* --------- Other Helper Functions --------- */
+  /*
   function dateObjectToText(dateObject: Date) {
     // This will be depricated soon, use built in date functions instead
     function formatMonth(date: Date) {
@@ -266,6 +298,7 @@ export default function useCoaching() {
     }
     return `${formatYear(dateObject)}-${formatMonth(dateObject)}-${formatDate(dateObject)}`;
   }
+    */
 
   return {
     lastThreeWeeksQuery,
@@ -290,6 +323,6 @@ export default function useCoaching() {
     getMembershipFromWeekRecordId,
     getPrivateCallsFromWeekRecordId,
 
-    dateObjectToText,
+    // dateObjectToText,
   };
 }

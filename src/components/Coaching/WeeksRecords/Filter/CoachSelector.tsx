@@ -1,5 +1,6 @@
-import type { Coach } from '../../../../types/CoachingTypes';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useMemo } from 'react';
+import type { Coach } from '../../../../types/CoachingTypes';
 
 interface CoachSelectProps {
   updateCoachFilter: (recordId: string) => void;
@@ -14,6 +15,19 @@ export default function CoachSelect({
 
   const dataReady = coachListQuery.isSuccess && activeStudentsQuery.isSuccess;
 
+  const coachesWithActiveStudents = useMemo(() => {
+    if (!dataReady) return [];
+    return coachListQuery.data.filter((coach) => {
+      return (
+        activeStudentsQuery.data.filter(
+          (student) =>
+            (student.primaryCoach ? student.primaryCoach.id : undefined) ===
+            (coach.user ? coach.user.id : 0),
+        ).length > 0
+      );
+    });
+  }, [dataReady, coachListQuery.data, activeStudentsQuery.data]);
+
   return (
     dataReady && (
       <div>
@@ -27,21 +41,12 @@ export default function CoachSelect({
           <option key={0} value={0}>
             All Coaches
           </option>
-          {coachListQuery.data.map((coach) => {
-            const coachHasActiveStudent =
-              activeStudentsQuery.data.filter(
-                (student) =>
-                  (student.primaryCoach
-                    ? student.primaryCoach.id
-                    : undefined) === (coach.user ? coach.user.id : 0),
-              ).length > 0;
-            if (coachHasActiveStudent) {
-              return (
-                <option key={coach.recordId} value={coach.recordId}>
-                  {coach.user.name}
-                </option>
-              );
-            }
+          {coachesWithActiveStudents.map((coach) => {
+            return (
+              <option key={coach.recordId} value={coach.recordId}>
+                {coach.user.name}
+              </option>
+            );
           })}
         </select>
       </div>

@@ -1,4 +1,5 @@
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useMemo } from 'react';
 import type { Course } from '../../../../types/CoachingTypes';
 interface CourseSelectorProps {
   updateCourseFilter: (value: string) => void;
@@ -14,6 +15,17 @@ export default function CourseSelector({
   const dataReady =
     courseListQuery.isSuccess && activeMembershipsQuery.isSuccess;
 
+  const coursesWithActiveMemberships = useMemo(() => {
+    if (!dataReady) return [];
+    return courseListQuery.data.filter((course) => {
+      return (
+        activeMembershipsQuery.data.filter(
+          (membership) => membership.relatedCourse === course.recordId,
+        ).length > 0
+      );
+    });
+  }, [dataReady, courseListQuery.data, activeMembershipsQuery.data]);
+
   return (
     dataReady && (
       <div>
@@ -27,18 +39,12 @@ export default function CourseSelector({
           <option key={0} value={0}>
             All Courses
           </option>
-          {courseListQuery.data.map((course) => {
-            const courseHasActiveMembership =
-              activeMembershipsQuery.data.filter(
-                (membership) => membership.relatedCourse === course.recordId,
-              ).length > 0;
-            if (courseHasActiveMembership) {
-              return (
-                <option key={course.recordId} value={course.recordId}>
-                  {course.name}
-                </option>
-              );
-            }
+          {coursesWithActiveMemberships.map((course) => {
+            return (
+              <option key={course.recordId} value={course.recordId}>
+                {course.name}
+              </option>
+            );
           })}
         </select>
       </div>
