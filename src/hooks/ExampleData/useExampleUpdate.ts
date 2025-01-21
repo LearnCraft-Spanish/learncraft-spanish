@@ -10,7 +10,10 @@ export const useExampleUpdate = () => {
     useBackend();
 
   const updateExampleFromQuery = useCallback(
-    (newExampleData: Flashcard, query: UseQueryResult<Flashcard[], Error>) => {
+    async (
+      newExampleData: Flashcard,
+      query: UseQueryResult<Flashcard[], Error>,
+    ) => {
       if (!vocabularyQuery.data) {
         throw new Error('Vocabulary data is not ready.');
       }
@@ -78,32 +81,30 @@ export const useExampleUpdate = () => {
         return;
       }
 
-      const updateExampleData = async () => {
-        if (hasChanged) {
-          return updateExample(newExampleData);
-        }
-      };
-
-      const addVocab = async () => {
-        if (!vocabIdsToAdd.length) {
-          return;
-        }
-        addVocabularyToExample(newExampleData.recordId, vocabIdsToAdd);
-      };
-
-      const removeVocab = async () => {
-        if (!vocabIdsToRemove.length) {
-          return;
-        }
-        removeVocabFromExample(newExampleData.recordId, vocabIdsToRemove);
-      };
-
       try {
-        Promise.all([updateExampleData(), addVocab(), removeVocab()]);
+        // Run add and remove concurrently
+        const vocabOperations = Promise.all([
+          vocabIdsToAdd.length
+            ? addVocabularyToExample(newExampleData.recordId, vocabIdsToAdd)
+            : Promise.resolve(),
+          vocabIdsToRemove.length
+            ? removeVocabFromExample(newExampleData.recordId, vocabIdsToRemove)
+            : Promise.resolve(),
+        ]);
+
+        // Wait for vocab operations to complete before updating the example
+        await vocabOperations;
+
+        // Update the example only if other properties have changed
+        if (hasChanged) {
+          await updateExample(newExampleData);
+        }
       } catch (error) {
         console.error('Failed to update quiz example:', error);
+      } finally {
+        // Ensure refetch is only called after all operations are complete
+        query.refetch();
       }
-      query.refetch();
     },
     [
       updateExample,
