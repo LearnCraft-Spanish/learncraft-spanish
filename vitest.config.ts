@@ -8,6 +8,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
     viteConfig(configEnv),
     defineConfig({
       test: {
+        silent: true,
         globals: true,
         environment: 'jsdom',
         setupFiles: './tests/setupTests',
@@ -39,6 +40,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
             '**/react-app-env.d.ts',
             '**/Coaching/old/**',
             '**/Coaching/*.js',
+            '**/assets/**',
           ],
         },
       },
