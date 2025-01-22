@@ -414,8 +414,8 @@ export function useBackend() {
   );
 
   const updateExample = useCallback(
-    (example: Partial<types.Flashcard>): Promise<types.Flashcard> => {
-      return newPostFactory<types.Flashcard>({
+    (example: Partial<types.Flashcard>): Promise<number> => {
+      return newPostFactory<number>({
         path: 'update-example',
         body: {
           example,

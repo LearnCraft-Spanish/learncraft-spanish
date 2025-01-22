@@ -1,6 +1,5 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
 import { HttpResponse, http } from 'msw';
-import { c } from 'vite/dist/node/types.d-aGj9QkWt';
 import newData from '../data/serverlike/serverlikeData';
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
