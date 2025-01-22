@@ -19,11 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
 
@@ -33,7 +33,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -52,11 +52,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
 
@@ -66,7 +66,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -80,7 +80,7 @@ jobs:
       # Restore the mock data cache
       - name: Restore mock data cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./mocks/data/serverlike/actualServerData.json
           key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
@@ -108,11 +108,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
 
@@ -122,7 +122,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -142,11 +142,11 @@ jobs:
     needs: [format, typecheck, lint]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
 
@@ -156,7 +156,7 @@ jobs:
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -170,7 +170,7 @@ jobs:
       # Restore the mock data cache
       - name: Restore mock data cache
         id: cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./mocks/data/serverlike/actualServerData.json
           key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}

@@ -1,0 +1,37 @@
+name: Mutation Testing Report
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Runs daily at 2am UTC/8pm CST
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Run Mutation Testing
+        run: pnpm stryker run
+
+      - name: Upload Mutation Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: mutation-report
+          path: reports/mutation/html # Adjust to your Stryker report directory

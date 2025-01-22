@@ -3,12 +3,12 @@
   "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
   "packageManager": "pnpm",
   "mutate": [
-    "src/**/*.{js,ts,tsx}",
-    "!src/**/*.test.{js,ts,tsx}"
+    "src/sections/**/*.tsx"
   ],
   "checkers": [
     "typescript"
   ],
+  "ignoreStatic": true,
   "vitest": {
     "configFile": "vitest.config.ts"
   },
@@ -17,6 +17,7 @@
     "clear-text",
     "progress"
   ],
+  "concurrency": 8,
   "testRunner": "vitest",
   "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/vitest-runner for information about the vitest plugin.",
   "coverageAnalysis": "perTest",
