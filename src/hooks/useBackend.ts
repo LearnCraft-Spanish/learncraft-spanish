@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import type * as types from '../types/interfaceDefinitions';
-import type * as StudentRecordsTypes from '../types/CoachingTypes';
+import type * as types from 'src/types/interfaceDefinitions';
+import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
 import useAuth from './useAuth';
 
 export function useBackend() {

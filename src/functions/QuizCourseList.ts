@@ -1,7 +1,7 @@
 // This file contains the list of courses that are available for quizzes.
 // They differ from the courses in that LCSP has two versions and post-1MC has none yet.
 
-import type { QuizCourse } from '../types/interfaceDefinitions';
+import type { QuizCourse } from 'src/types/interfaceDefinitions';
 
 const quizCourses: QuizCourse[] = [
   { name: 'Spanish in One Month', url: 'si1m', code: 'si1m' },

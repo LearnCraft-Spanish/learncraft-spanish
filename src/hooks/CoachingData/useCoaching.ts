@@ -275,7 +275,7 @@ export default function useCoaching() {
     [groupAttendeesQuery, groupSessionsQuery],
   );
   /* --------- Other Helper Functions --------- */
-  /*
+
   function dateObjectToText(dateObject: Date) {
     // This will be depricated soon, use built in date functions instead
     function formatMonth(date: Date) {
@@ -298,7 +298,6 @@ export default function useCoaching() {
     }
     return `${formatYear(dateObject)}-${formatMonth(dateObject)}-${formatDate(dateObject)}`;
   }
-    */
 
   return {
     lastThreeWeeksQuery,
@@ -323,6 +322,6 @@ export default function useCoaching() {
     getMembershipFromWeekRecordId,
     getPrivateCallsFromWeekRecordId,
 
-    // dateObjectToText,
+    dateObjectToText,
   };
 }

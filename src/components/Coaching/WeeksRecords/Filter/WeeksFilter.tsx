@@ -1,4 +1,4 @@
-import type { Coach, Course, Week } from '../../../../types/CoachingTypes';
+import type { Coach, Course, Week } from 'src/types/CoachingTypes';
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
 

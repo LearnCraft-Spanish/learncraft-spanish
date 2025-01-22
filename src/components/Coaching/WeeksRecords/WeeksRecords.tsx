@@ -4,8 +4,8 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
-import type { Coach, Course, Week } from '../../../types/CoachingTypes';
-import LoadingMessage from '../../Loading';
+import type { Coach, Course, Week } from 'src/types/CoachingTypes';
+import LoadingMessage from 'src/components/Loading';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
 

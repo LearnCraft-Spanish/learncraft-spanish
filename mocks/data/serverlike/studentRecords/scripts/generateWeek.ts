@@ -1,8 +1,4 @@
-import type {
-  Course,
-  Membership,
-  Week,
-} from '../../../../../src/types/CoachingTypes';
+import type { Course, Membership, Week } from 'src/types/CoachingTypes';
 import { getWeekEnds } from './functions';
 /* ------------------ Helper Functions ------------------ */
 function membershipEndingThisWeek(membership: Membership, week: Week) {

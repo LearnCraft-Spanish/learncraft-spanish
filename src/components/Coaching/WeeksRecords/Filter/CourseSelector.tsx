@@ -1,6 +1,6 @@
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useMemo } from 'react';
-import type { Course } from '../../../../types/CoachingTypes';
+import type { Course } from 'src/types/CoachingTypes';
 interface CourseSelectorProps {
   updateCourseFilter: (value: string) => void;
   filterByCourse: Course | undefined;

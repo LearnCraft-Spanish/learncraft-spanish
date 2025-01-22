@@ -10,8 +10,8 @@ import React from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import type { Flashcard } from '../../../types/interfaceDefinitions';
-import { sampleStudentFlashcardData } from '../../../../tests/mockData';
+import { sampleStudentFlashcardData } from 'tests/mockData';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import SRSQuizButtons from './SRSButtons';
 
 // vi.mock('src/hooks/useStudentFlashcards', () => {

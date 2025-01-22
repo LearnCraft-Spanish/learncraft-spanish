@@ -264,7 +264,7 @@ export default function LCSPQuizApp(): JSX.Element {
           {dataLoading && <Loading message="Loading Quizzes..." />}
           {!dataLoading && !dataError && !menuHidden && (
             <div className="quizSelector">
-              <h3> Official Quizzes</h3>
+              <h3>Official Quizzes</h3>
               <select
                 className="quizMenu"
                 role="select"

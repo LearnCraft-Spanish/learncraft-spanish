@@ -40,3 +40,5 @@ package-lock.json
 mocks/data/api/actualServerData.json
 mocks/data/serverlike/actualServerData.json
 src/mocks/data/serverlike/actualServerData.json
+# stryker temp files
+.stryker-tmp

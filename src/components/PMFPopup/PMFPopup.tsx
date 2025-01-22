@@ -1,7 +1,7 @@
 import React from 'react';
 import './PMFPopup.css';
 import { usePMFData } from 'src/hooks/UserData/usePMFData';
-import closeIcon from '../../assets/icons/x_dark.svg';
+import closeIcon from 'src/assets/icons/x_dark.svg';
 
 interface PMFPopupProps {
   timeToShowPopup: boolean;

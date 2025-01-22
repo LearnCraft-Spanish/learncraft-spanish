@@ -9,7 +9,7 @@ import type {
   Membership,
   Student,
   Week,
-} from '../../../../../src/types/CoachingTypes';
+} from 'src/types/CoachingTypes';
 
 import fakePeople from '../fakePeople.json' assert { type: 'json' };
 

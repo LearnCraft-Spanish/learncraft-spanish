@@ -1,6 +1,6 @@
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useMemo } from 'react';
-import type { Coach } from '../../../../types/CoachingTypes';
+import type { Coach } from 'src/types/CoachingTypes';
 
 interface CoachSelectProps {
   updateCoachFilter: (recordId: string) => void;

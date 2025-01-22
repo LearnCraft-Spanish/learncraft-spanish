@@ -1,8 +1,8 @@
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import type { Week } from '../../../../types/CoachingTypes';
-import eye from '../../../../assets/icons/eye.svg';
-// import pencil from '../../../../resources/icons/pencil.svg';
+import type { Week } from 'src/types/CoachingTypes';
+import eye from 'src/assets/icons/eye.svg';
+// import pencil from 'src/resources/icons/pencil.svg';
 
 export default function StudentCell({ week }: { week: Week }) {
   const { getStudentFromMembershipId } = useCoaching();

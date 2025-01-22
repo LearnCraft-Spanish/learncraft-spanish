@@ -1,8 +1,8 @@
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useCallback, useMemo, useState } from 'react';
-import type { Week } from '../../../../types/CoachingTypes';
-import checkmark from '../../../../assets/icons/checkmark_green.svg';
-import Pagination from '../../../FlashcardFinder/Pagination';
+import type { Week } from 'src/types/CoachingTypes';
+import checkmark from 'src/assets/icons/checkmark_green.svg';
+import Pagination from 'src/components/FlashcardFinder/Pagination';
 import QuantifiedRecords from '../quantifyingRecords';
 import GroupSessionsCell from './GroupSessionsCell';
 import AssignmentsCell from './AssignmentsCell';

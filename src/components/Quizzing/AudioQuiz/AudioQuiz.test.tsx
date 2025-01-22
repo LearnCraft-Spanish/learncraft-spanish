@@ -6,7 +6,7 @@ import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
-import { setupMockAuth } from '../../../../tests/setupMockAuth';
+import { setupMockAuth } from 'tests/setupMockAuth';
 import AudioQuiz from './AudioQuiz';
 
 /*       Testing Setup        */
