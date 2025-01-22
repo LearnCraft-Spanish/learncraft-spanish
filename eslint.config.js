@@ -40,7 +40,7 @@ export default antfu(
   {
     ignores: [
       'pnpm-lock.yaml',
-      'src/components/Coaching',
+      'src/components/Coaching/**', // handling the errors from this in a feature branch
       'node_modules/',
       '**/mocks/data/**/*.js',
       '*.yml',

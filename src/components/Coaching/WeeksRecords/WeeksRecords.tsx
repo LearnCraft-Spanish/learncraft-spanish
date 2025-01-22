@@ -1,17 +1,18 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
-import type { Week, Coach, Course } from '../../../types/CoachingTypes';
-import formatDateLikeQB from 'src/functions/formatDateLikeQB';
+import type { Coach, Course, Week } from '../../../types/CoachingTypes';
 import LoadingMessage from '../../Loading';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
 
 import '../styles/coaching.scss';
 import ViewWeekRecord from './ViewWeekRecord';
+
+import useBANDAIDhelperFunction from './useBANDAIDhelperFunction';
 
 /*
 Notes for Test Cases to write:
@@ -42,9 +43,13 @@ export default function WeeksRecordsSection() {
     getCourseFromMembershipId,
     getStudentFromMembershipId,
   } = useCoaching();
+
+  const dateRange = useBANDAIDhelperFunction();
   // Filtering state
-  const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(false);
-  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(1);
+  const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
+  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
+    dateRange.dayOfWeek >= 3 ? 0 : 1,
+  ); // 0 for this week, 1 for last week, 2 for two weeks ago
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
@@ -109,70 +114,107 @@ export default function WeeksRecordsSection() {
     setAdvancedFilteringMenu(!advancedFilteringMenu);
   }
 
-  function filterByCoachFunction(weeks: Week[]) {
-    if (!filterByCoach) return weeks;
-    return weeks.filter((week) => {
-      const weekCoach = getCoachFromMembershipId(week.relatedMembership);
-      return weekCoach === filterByCoach;
-    });
-  }
-  function filterByCourseFunction(weeks: Week[]) {
-    if (!filterByCourse) return weeks;
-    return weeks.filter((week) => {
-      const weekCourse = getCourseFromMembershipId(week.relatedMembership);
-      return weekCourse === filterByCourse;
-    });
-  }
-  function filterByHoldWeeksFunction(weeks: Week[]) {
-    if (!filterByHoldWeeks) return weeks;
-    return weeks.filter((week) => !week.holdWeek);
-  }
-
-  function filterWeeksByWeeksAgoFunction(weeks: Week[]) {
-    if (filterByWeeksAgo < 0) return weeks;
-    const now = new Date();
-    const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
-    const daysSinceSunday = dayOfWeek; // Number of days since the most recent Sunday
-    const millisecondsInADay = 86400000; // Number of milliseconds in a day
-    const thisSundayTimestamp =
-      now.getTime() - daysSinceSunday * millisecondsInADay;
-
-    const chosenSundayTimestamp =
-      thisSundayTimestamp - filterByWeeksAgo * millisecondsInADay * 7;
-    const sunday = new Date(chosenSundayTimestamp);
-
-    const sundayQBFormat = formatDateLikeQB(sunday);
-
-    return weeks.filter((week) => week.weekStarts === sundayQBFormat);
-  }
-
-  function filterWeeksByCoachlessFunction(weeks: Week[]) {
-    if (!filterByCoachless) return weeks;
-    return weeks.filter((week) => {
-      const weekCoach = getCoachFromMembershipId(week.relatedMembership);
-      return weekCoach;
-    });
-  }
-
-  function filterWeeksBySearchTerm(weeks: Week[], searchTerm: string) {
-    if (searchTerm.length > 0) {
+  const filterByCoachFunction = useCallback(
+    (weeks: Week[]) => {
+      if (!filterByCoach) return weeks;
       return weeks.filter((week) => {
-        const student = getStudentFromMembershipId(week.relatedMembership);
-        if (!student) return false;
-        const nameMatches = student.fullName
-          ? student.fullName.toLowerCase().includes(searchTerm)
-          : false;
-        const emailMatches = student.email
-          ? student.email.toLowerCase().includes(searchTerm)
-          : false;
-        const noteMatches = week.notes
-          ? week.notes.toLowerCase().includes(searchTerm)
-          : false;
-        return nameMatches || emailMatches || noteMatches;
+        const weekCoach = getCoachFromMembershipId(week.relatedMembership);
+        return weekCoach === filterByCoach;
       });
-    }
-    return weeks;
-  }
+    },
+    [filterByCoach, getCoachFromMembershipId],
+  );
+  const filterByCourseFunction = useCallback(
+    (weeks: Week[]) => {
+      if (!filterByCourse) return weeks;
+      return weeks.filter((week) => {
+        const weekCourse = getCourseFromMembershipId(week.relatedMembership);
+        return weekCourse === filterByCourse;
+      });
+    },
+    [filterByCourse, getCourseFromMembershipId],
+  );
+  const filterByHoldWeeksFunction = useCallback(
+    (weeks: Week[]) => {
+      if (!filterByHoldWeeks) return weeks;
+      return weeks.filter((week) => !week.holdWeek);
+    },
+    [filterByHoldWeeks],
+  );
+
+  // function filterWeeksByWeeksAgoFunction(weeks: Week[]) {
+  //   if (filterByWeeksAgo < 0) return weeks;
+  //   const now = new Date();
+  //   const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
+  //   const daysSinceSunday = dayOfWeek; // Number of days since the most recent Sunday
+  //   const millisecondsInADay = 86400000; // Number of milliseconds in a day
+
+  //   // URGENT: this will never qual weekStarts becuase weekStarts does not have time, just date
+  //   const thisSundayTimestamp =
+  //     now.getTime() - daysSinceSunday * millisecondsInADay;
+
+  //   const chosenSundayTimestamp =
+  //     thisSundayTimestamp - filterByWeeksAgo * millisecondsInADay * 7;
+  //   const sunday = new Date(chosenSundayTimestamp);
+
+  //   const sundayQBFormat = formatDateLikeQB(sunday);
+
+  //   return weeks.filter((week) => week.weekStarts === sundayQBFormat);
+  // }
+  const bandaidFilterWeeksByWeeksAgoFunction = useCallback(
+    (weeks: Week[]) => {
+      if (filterByWeeksAgo === 0) {
+        return weeks.filter(
+          (week) => week.weekStarts === dateRange.thisWeekDate,
+        );
+      } else if (filterByWeeksAgo === 1) {
+        return weeks.filter(
+          (week) => week.weekStarts === dateRange.lastSundayDate,
+        );
+      } else if (filterByWeeksAgo === 2) {
+        return weeks.filter(
+          (week) => week.weekStarts === dateRange.twoSundaysAgoDate,
+        );
+      } else {
+        return weeks;
+      }
+    },
+    [filterByWeeksAgo, dateRange],
+  );
+
+  const filterWeeksByCoachlessFunction = useCallback(
+    (weeks: Week[]) => {
+      if (!filterByCoachless) return weeks;
+      return weeks.filter((week) => {
+        const weekCoach = getCoachFromMembershipId(week.relatedMembership);
+        return weekCoach;
+      });
+    },
+    [filterByCoachless, getCoachFromMembershipId],
+  );
+
+  const filterWeeksBySearchTerm = useCallback(
+    (weeks: Week[], searchTerm: string) => {
+      if (searchTerm.length > 0) {
+        return weeks.filter((week) => {
+          const student = getStudentFromMembershipId(week.relatedMembership);
+          if (!student) return false;
+          const nameMatches = student.fullName
+            ? student.fullName.toLowerCase().includes(searchTerm)
+            : false;
+          const emailMatches = student.email
+            ? student.email.toLowerCase().includes(searchTerm)
+            : false;
+          const noteMatches = week.notes
+            ? week.notes.toLowerCase().includes(searchTerm)
+            : false;
+          return nameMatches || emailMatches || noteMatches;
+        });
+      }
+      return weeks;
+    },
+    [getStudentFromMembershipId],
+  );
 
   const filterWeeks = useCallback(
     (weeks: Week[]) => {
@@ -188,7 +230,7 @@ export default function WeeksRecordsSection() {
         filteredWeeks = filterByCourseFunction(filteredWeeks);
       }
       // I dont like the logic with filterByWeeksAgo < 0, i will change it later
-      filteredWeeks = filterWeeksByWeeksAgoFunction(filteredWeeks); //FOLLOW SAME PATTERN AS ABOVE, PLEASE
+      filteredWeeks = bandaidFilterWeeksByWeeksAgoFunction(filteredWeeks); //FOLLOW SAME PATTERN AS ABOVE, PLEASE
       if (filterByCoachless) {
         filteredWeeks = filterWeeksByCoachlessFunction(filteredWeeks);
       }
@@ -210,6 +252,7 @@ export default function WeeksRecordsSection() {
       }
       return filteredWeeks;
     },
+    // setting proper dependencies sets off an infinite rerender loop, this will be my next task to fix (written 1/21/25)
     [
       filterByCoach,
       filterByCourse,
