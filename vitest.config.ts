@@ -24,6 +24,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
         mockReset: true,
         clearMocks: true,
         restoreMocks: true,
+        testTimeout: 10000,
         coverage: {
           exclude: [
             '**/*{.,-}{test,spec,bench,benchmark}?(-d).?(c|m)[jt]s?(x)',

@@ -3,29 +3,37 @@ name: Mutation Testing Report
 on:
   schedule:
     - cron: '0 2 * * *' # Runs daily at 2am UTC/8pm CST
+  workflow_dispatch:
 
 jobs:
   mutation:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      # Set up Node.js environment
+      - name: Set up Node.js environment
         uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
 
-      - name: Install Dependencies
-        run: pnpm install
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
 
-      - name: Cache Dependencies
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
         uses: actions/cache@v3
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            cache-node-modules-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Run Mutation Testing
         run: pnpm stryker run
