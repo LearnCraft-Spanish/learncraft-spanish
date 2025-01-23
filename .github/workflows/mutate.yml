@@ -62,8 +62,12 @@ jobs:
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
+      - name: Debug Vitest Tests
+        run: |
+          pnpm vitest run --reporter verbose
+
       - name: Run Mutation Testing
-        run: pnpm stryker run --logLevel debug
+        run: pnpm stryker run
 
       - name: Upload Mutation Report
         uses: actions/upload-artifact@v3

@@ -8,6 +8,7 @@
     "src/components/**/*.{ts,tsx}",
     "!**/*.test.{ts,tsx}"
   ],
+  "testRunner": "vitest",
   "checkers": [
     "typescript"
   ],
@@ -18,11 +19,8 @@
   "reporters": [
     "html",
     "clear-text",
-    "progress",
-    "verbose"
+    "progress"
   ],
-  "concurrency": 8,
-  "testRunner": "vitest",
   "timeoutMS": 20000,
   "dryRunTimeoutMinutes": 15,
   "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/vitest-runner for information about the vitest plugin.",
