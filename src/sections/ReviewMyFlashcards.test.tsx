@@ -22,7 +22,7 @@ describe('menu for student flashcards', () => {
   });
   it('shows start quiz button', async () => {
     render(
-      <MockAllProviders route="/myflashcards">
+      <MockAllProviders route="/myflashcards" childRoutes>
         <MyFlashcardsQuiz />
       </MockAllProviders>,
     );
@@ -32,7 +32,7 @@ describe('menu for student flashcards', () => {
   });
   it('shows menu button', async () => {
     render(
-      <MockAllProviders route="/myflashcards">
+      <MockAllProviders route="/myflashcards" childRoutes>
         <MyFlashcardsQuiz />
       </MockAllProviders>,
     );
