@@ -37,7 +37,7 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run:
-          pnpm install
+          pnpm install --frozen-lockfile
 
           # Restore the mock data cache
       - name: Restore mock data cache
