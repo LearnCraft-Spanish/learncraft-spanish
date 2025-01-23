@@ -8,12 +8,19 @@
     "src/components/**/*.{ts,tsx}",
     "!**/*.test.{ts,tsx}"
   ],
-  "checkers": ["typescript"],
+  "checkers": [
+    "typescript"
+  ],
   "ignoreStatic": true,
   "vitest": {
     "configFile": "vitest.config.ts"
   },
-  "reporters": ["html", "clear-text", "progress"],
+  "reporters": [
+    "html",
+    "clear-text",
+    "progress",
+    "verbose"
+  ],
   "concurrency": 8,
   "testRunner": "vitest",
   "timeoutMS": 20000,
