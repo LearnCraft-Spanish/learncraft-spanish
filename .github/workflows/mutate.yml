@@ -1,9 +1,6 @@
 name: Mutation Testing Report
 
 on:
-  push:
-    branches:
-      - weeksInterface/fixinglintAndFiltering
   schedule:
     - cron: '0 2 * * *' # Runs daily at 2am UTC/8pm CST
   workflow_dispatch:
@@ -62,12 +59,6 @@ jobs:
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
-      - name: Debug Vitest Tests
-        run: |
-          pnpm vitest run --reporter verbose
-        env:
-          VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
-
       - name: Run Mutation Testing
         run: pnpm stryker run
         env:
@@ -77,4 +68,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: mutation-report
-          path: reports/mutation/html # Adjust to your Stryker report directory
+          path: reports/mutation/mutation.html # Adjust to your Stryker report directory
