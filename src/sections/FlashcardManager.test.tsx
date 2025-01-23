@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
 import FlashcardManager from './FlashcardManager';
 
 /*
@@ -18,5 +19,16 @@ describe('component FlashcardManager', () => {
       expect(screen.getByText('Flashcard Manager')).toBeInTheDocument(),
     );
     expect(screen.getByText('Flashcard Manager')).toBeInTheDocument();
+  });
+  describe('no flashcards found', () => {
+    beforeEach(() => {
+      setupMockAuth({ userName: 'student-no-flashcards' });
+    });
+    it('shows no flashcards found message', async () => {
+      render(<FlashcardManager />, { wrapper: MockAllProviders });
+      await waitFor(() => {
+        expect(screen.getByText(/no flashcards found/i)).toBeInTheDocument();
+      });
+    });
   });
 });

@@ -20,6 +20,7 @@ export interface MockAuthOptions {
     | 'student-admin'
     | 'student-lcsp'
     | 'student-ser-estar'
+    | 'student-no-flashcards'
     | null;
 }
 
