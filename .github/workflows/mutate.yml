@@ -1,6 +1,9 @@
 name: Mutation Testing Report
 
 on:
+  push:
+    branches:
+      - weeksInterface/fixinglintAndFiltering
   schedule:
     - cron: '0 2 * * *' # Runs daily at 2am UTC/8pm CST
   workflow_dispatch:
