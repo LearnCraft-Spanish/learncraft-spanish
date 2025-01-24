@@ -1,22 +1,18 @@
-import type { Week } from '../../../../types/CoachingTypes';
-import GroupSessionsCell from './GroupSessionsCell';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useCallback, useMemo, useState } from 'react';
+import type { Week } from 'src/types/CoachingTypes';
+import checkmark from 'src/assets/icons/checkmark_green.svg';
+import Pagination from 'src/components/FlashcardFinder/Pagination';
+import QuantifiedRecords from '../quantifyingRecords';
+import GroupSessionsCell from './GroupSessionsCell';
 import AssignmentsCell from './AssignmentsCell';
 import PrivateCallsCell from './PrivateCallsCell';
 import StudentCell from './StudentCell';
-import ViewWeekRecord from '../ViewWeekRecord';
-import checkmark from '../../../../assets/icons/checkmark_green.svg';
-import Pagination from '../../../FlashcardFinder/Pagination';
-import QuantifiedRecords from '../quantifyingRecords';
-import { useState, useCallback, useMemo } from 'react';
 interface NewTableProps {
   weeks: Week[] | undefined;
 }
 export default function WeeksTable({ weeks }: NewTableProps) {
-  const { contextual } = useContextualMenu();
-  const { getAssignmentsFromWeekRecordId, getPrivateCallsFromWeekRecordId } =
-    useCoaching();
+  const { getAssignmentsFromWeekRecordId } = useCoaching();
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 50;

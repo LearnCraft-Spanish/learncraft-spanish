@@ -7,7 +7,7 @@ import type {
   DisplayOrder,
   Flashcard,
   StudentExample,
-} from '../types/interfaceDefinitions';
+} from 'src/types/interfaceDefinitions';
 
 function FlashcardManager() {
   const { flashcardDataQuery, exampleIsCustom } = useStudentFlashcards();

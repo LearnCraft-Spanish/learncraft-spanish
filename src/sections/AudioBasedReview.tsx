@@ -9,8 +9,8 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import Loading from 'src/components/Loading';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
-import type { Flashcard } from '../types/interfaceDefinitions';
 import 'src/App.css';
 import 'src/components/Quizzing/AudioQuiz/AudioBasedReview.css';
 

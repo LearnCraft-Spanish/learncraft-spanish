@@ -1,0 +1,71 @@
+name: Mutation Testing Report
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Runs daily at 2am UTC/8pm CST
+  workflow_dispatch:
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js environment
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.16.0'
+
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cache-node-modules-
+
+      # Install dependencies
+      - name: Install dependencies
+        run:
+          pnpm install --frozen-lockfile
+
+          # Restore the mock data cache
+      - name: Restore mock data cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ./mocks/data/serverlike/actualServerData.json
+          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
+          restore-keys: |
+            mockdata-
+
+        # Fetch mock data if cache miss
+      - name: Fetch mock data if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pnpm exec tsx .github/workflows/update-cache.ts
+        env:
+          # Suppress context access warning
+          # Context access is safe in this case
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+          AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
+      - name: Run Mutation Testing
+        run: pnpm stryker run
+        env:
+          VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
+      - name: Upload Mutation Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: mutation-report
+          path: reports/mutation/mutation.html # Adjust to your Stryker report directory

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { GroupSession, Week } from '../../../../types/CoachingTypes';
 
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import type { GroupSession, Week } from 'src/types/CoachingTypes';
 
-import ContextualControlls from '../../../ContextualControlls';
+import ContextualControlls from 'src/components/ContextualControlls';
 
 export default function GroupSessionsCell({ week }: { week: Week }) {
   const { contextual, openContextual, setContextualRef } = useContextualMenu();
@@ -33,7 +33,12 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
         );
       }
     }
-  }, [dataReady, groupSessions, week.recordId]);
+  }, [
+    dataReady,
+    getGroupSessionsFromWeekRecordId,
+    groupSessions,
+    week.recordId,
+  ]);
   return (
     dataReady &&
     groupSessions?.map((groupSession) => (

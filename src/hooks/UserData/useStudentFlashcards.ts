@@ -6,7 +6,7 @@ import type {
   Flashcard,
   StudentExample,
   StudentFlashcardData,
-} from '../../types/interfaceDefinitions';
+} from 'src/types/interfaceDefinitions';
 import { useActiveStudent } from './useActiveStudent';
 import { useUserData } from './useUserData';
 

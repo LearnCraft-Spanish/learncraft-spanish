@@ -1,4 +1,4 @@
-import type { Membership } from '../../../../../src/types/CoachingTypes';
+import type { Membership } from 'src/types/CoachingTypes';
 /* ------------------ Helper Functions ------------------ */
 
 /* ------------------ Mock Data ------------------ */

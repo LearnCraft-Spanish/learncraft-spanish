@@ -12,14 +12,15 @@ function formatDateLikeQB(date: Date) {
     }
   }
   function formatDate(date: Date) {
-    const formattedDate = date.getDate().toString();
-    return formattedDate;
+    const formattedDate = date.getDate();
+    return formattedDate.toString();
   }
 
   function formatYear(date: Date) {
     const fullYear = date.getFullYear().toString();
-    const formattedYear = fullYear.substring(2, 4);
-    return formattedYear;
+    // const formattedYear = fullYear.substring(2, 4);
+    // return formattedYear;
+    return fullYear;
   }
   return `${formatMonth(date)}-${formatDate(date)}-${formatYear(date)}`;
 }

@@ -1,7 +1,4 @@
-import type {
-  GroupSession,
-  QbUser,
-} from '../../../../../src/types/CoachingTypes';
+import type { GroupSession, QbUser } from 'src/types/CoachingTypes';
 /* ------------------ Helper Functions ------------------ */
 
 /* ------------------ Mock Data ------------------ */

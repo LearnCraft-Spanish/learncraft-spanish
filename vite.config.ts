@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
       : undefined;
 
   return {
+    environment: 'jsdom',
     plugins: [
       react(),
       sentryVitePlugin({

@@ -1,8 +1,4 @@
-import type {
-  Assignment,
-  QbUser,
-  Week,
-} from '../../../../../src/types/CoachingTypes';
+import type { Assignment, QbUser, Week } from 'src/types/CoachingTypes';
 
 /* ------------------ Mock Data ------------------ */
 const assignmentTypes = ['Pronounciation', 'Writing', 'journal'];

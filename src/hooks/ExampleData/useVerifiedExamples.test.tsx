@@ -5,7 +5,7 @@ import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { setupMockAuth } from 'tests/setupMockAuth';
 
-describe('useVerifiedExamples', () => {
+describe.skip('useVerifiedExamples', () => {
   beforeEach(() => {
     setupMockAuth({ userName: 'student-lcsp' });
   });

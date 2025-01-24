@@ -1,4 +1,4 @@
-import type { GroupAttendees } from '../../../../../src/types/CoachingTypes';
+import type { GroupAttendees } from 'src/types/CoachingTypes';
 /* ------------------ Helper Functions ------------------ */
 
 /* ------------------ Mock Data ------------------ */

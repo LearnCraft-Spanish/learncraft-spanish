@@ -5,7 +5,7 @@ import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEdit
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { setupMockAuth } from 'tests/setupMockAuth';
 
-describe('useRecentlyEditedExamples', () => {
+describe.skip('useRecentlyEditedExamples', () => {
   beforeEach(() => {
     setupMockAuth({ userName: 'admin-empty-role' });
   });

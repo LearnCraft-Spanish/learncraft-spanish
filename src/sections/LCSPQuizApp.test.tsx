@@ -19,7 +19,7 @@ const { quizExamplesTableArray } = serverlikeData().api;
 describe('official quiz component', () => {
   it('renders the title', async () => {
     render(
-      <MockAllProviders>
+      <MockAllProviders route="/officialquizzes" childRoutes>
         <LCSPQuizApp />
       </MockAllProviders>,
     );
@@ -31,7 +31,7 @@ describe('official quiz component', () => {
 
   it('shows two menus', async () => {
     render(
-      <MockAllProviders>
+      <MockAllProviders route="/officialquizzes" childRoutes>
         <LCSPQuizApp />
       </MockAllProviders>,
     );
@@ -43,7 +43,7 @@ describe('official quiz component', () => {
 
   it('shows start button', async () => {
     render(
-      <MockAllProviders>
+      <MockAllProviders route="/officialquizzes" childRoutes>
         <LCSPQuizApp />
       </MockAllProviders>,
     );
@@ -55,7 +55,7 @@ describe('official quiz component', () => {
 
   it('shows menu button', async () => {
     render(
-      <MockAllProviders>
+      <MockAllProviders route="/officialquizzes" childRoutes>
         <LCSPQuizApp />
       </MockAllProviders>,
     );
