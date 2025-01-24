@@ -6,7 +6,7 @@ import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { setupMockAuth } from 'tests/setupMockAuth';
 import data from 'mocks/data/serverlike/serverlikeData';
 
-describe.skip('useSingleExample', () => {
+describe('useSingleExample', () => {
   let exampleId: number;
   beforeAll(async () => {
     const api = data().api;

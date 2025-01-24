@@ -50,6 +50,7 @@ export default function WeeksTable({ weeks }: NewTableProps) {
             recordsPerPage={itemsPerPage}
           />
         </div>
+        {/* WARNING: this does not update approcatly when on page 2, and we update filters to get <50 records! */}
         <Pagination
           page={page}
           maxPage={maxPage}

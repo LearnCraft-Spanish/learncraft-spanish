@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: '20.16.0'
+          node-version: 20.16.0
 
       # Install pnpm
       - name: Install pnpm
