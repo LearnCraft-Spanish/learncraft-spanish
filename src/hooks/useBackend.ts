@@ -195,7 +195,6 @@ export function useBackend() {
           throw new Error(`Failed to parse JSON from ${path}`);
         });
       } else {
-        console.log('debugging this error, full response:', response);
         console.error(`Failed to post to ${path}: ${response.statusText}`);
         throw new Error(`Failed to post to ${path}`);
       }
