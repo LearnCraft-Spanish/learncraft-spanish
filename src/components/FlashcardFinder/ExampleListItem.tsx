@@ -3,17 +3,10 @@ import type { Flashcard } from '../../interfaceDefinitions';
 import {
   formatEnglishText,
   formatSpanishText,
-<<<<<<< Updated upstream
 } from '../../functions/formatFlashcardText';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
-=======
-} from 'src/functions/formatFlashcardText';
-import x from 'src/assets/icons/x.svg';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import { useUserData } from 'src/hooks/UserData/useUserData';
->>>>>>> Stashed changes
-
+import { useUserData } from '../../hooks/useUserData';
 interface FormatExampleForTableProps {
   data: Flashcard;
   showSpanglishLabel?: boolean;
