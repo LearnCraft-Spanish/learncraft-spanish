@@ -38,7 +38,6 @@ export default function WeeksRecordsSection() {
     groupAttendeesQuery,
     assignmentsQuery,
     callsQuery,
-
     getCoachFromMembershipId,
     getCourseFromMembershipId,
     getStudentFromMembershipId,
@@ -48,7 +47,6 @@ export default function WeeksRecordsSection() {
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
-    // 1,
     dateRange.dayOfWeek >= 3 ? 0 : 1,
   ); // 0 for this week, 1 for last week, 2 for two weeks ago
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
@@ -74,6 +72,7 @@ export default function WeeksRecordsSection() {
     groupAttendeesQuery.isSuccess &&
     assignmentsQuery.isSuccess &&
     callsQuery.isSuccess;
+
   const dataLoading =
     !dataReady &&
     (userDataQuery.isLoading ||
@@ -88,6 +87,11 @@ export default function WeeksRecordsSection() {
       coachListQuery.isError ||
       courseListQuery.isError);
 
+  function toggleAdvancedFilteringMenu() {
+    setAdvancedFilteringMenu(!advancedFilteringMenu);
+  }
+
+  /* ------------------ Update Filter State ------------------ */
   function updateCoachFilter(coachId: string | number) {
     if (!coachListQuery.data) throw new Error('Unable to find coach list');
     const coachToSet = coachListQuery.data.find(
@@ -111,10 +115,8 @@ export default function WeeksRecordsSection() {
   function updateFilterBySearchTerm(value: string) {
     setFilterBySearchTerm(value.toLowerCase());
   }
-  function toggleAdvancedFilteringMenu() {
-    setAdvancedFilteringMenu(!advancedFilteringMenu);
-  }
 
+  /* ------------------ Filtering Functions ------------------ */
   const filterByCoachFunction = useCallback(
     (weeks: Week[]) => {
       if (!filterByCoach) return weeks;
@@ -142,27 +144,7 @@ export default function WeeksRecordsSection() {
     },
     [filterByHoldWeeks],
   );
-
-  // function filterWeeksByWeeksAgoFunction(weeks: Week[]) {
-  //   if (filterByWeeksAgo < 0) return weeks;
-  //   const now = new Date();
-  //   const dayOfWeek = now.getDay(); // 0 for Sunday, 1 for Monday, etc.
-  //   const daysSinceSunday = dayOfWeek; // Number of days since the most recent Sunday
-  //   const millisecondsInADay = 86400000; // Number of milliseconds in a day
-
-  //   // URGENT: this will never qual weekStarts becuase weekStarts does not have time, just date
-  //   const thisSundayTimestamp =
-  //     now.getTime() - daysSinceSunday * millisecondsInADay;
-
-  //   const chosenSundayTimestamp =
-  //     thisSundayTimestamp - filterByWeeksAgo * millisecondsInADay * 7;
-  //   const sunday = new Date(chosenSundayTimestamp);
-
-  //   const sundayQBFormat = formatDateLikeQB(sunday);
-
-  //   return weeks.filter((week) => week.weekStarts === sundayQBFormat);
-  // }
-  const bandaidFilterWeeksByWeeksAgoFunction = useCallback(
+  const filterWeeksByWeeksAgoFunction = useCallback(
     (weeks: Week[]) => {
       if (filterByWeeksAgo === 0) {
         return weeks.filter(
@@ -195,26 +177,38 @@ export default function WeeksRecordsSection() {
   );
 
   const filterWeeksBySearchTerm = useCallback(
-    (weeks: Week[], searchTerm: string) => {
-      if (searchTerm.length > 0) {
+    (weeks: Week[]) => {
+      if (filterBySearchTerm && filterBySearchTerm.length > 0) {
         return weeks.filter((week) => {
           const student = getStudentFromMembershipId(week.relatedMembership);
           if (!student) return false;
           const nameMatches = student.fullName
-            ? student.fullName.toLowerCase().includes(searchTerm)
+            ? student.fullName.toLowerCase().includes(filterBySearchTerm)
             : false;
           const emailMatches = student.email
-            ? student.email.toLowerCase().includes(searchTerm)
+            ? student.email.toLowerCase().includes(filterBySearchTerm)
             : false;
           const noteMatches = week.notes
-            ? week.notes.toLowerCase().includes(searchTerm)
+            ? week.notes.toLowerCase().includes(filterBySearchTerm)
             : false;
           return nameMatches || emailMatches || noteMatches;
         });
       }
       return weeks;
     },
-    [getStudentFromMembershipId],
+    [filterBySearchTerm, getStudentFromMembershipId],
+  );
+
+  const filterByCompletionFunction = useCallback(
+    (weeks: Week[]) => {
+      if (filterByCompletion === 'incompleteOnly') {
+        return weeks.filter((week) => !week.recordsComplete);
+      } else if (filterByCompletion === 'completeOnly') {
+        return weeks.filter((week) => week.recordsComplete);
+      }
+      return weeks;
+    },
+    [filterByCompletion],
   );
 
   const filterWeeks = useCallback(
@@ -223,56 +217,40 @@ export default function WeeksRecordsSection() {
         console.error('Data not ready, cannot filter weeks');
         return weeks;
       }
-      let filteredWeeks = weeks;
-      if (filterByCoach) {
-        filteredWeeks = filterByCoachFunction(filteredWeeks);
-      }
-      if (filterByCourse) {
-        filteredWeeks = filterByCourseFunction(filteredWeeks);
-      }
-      // I dont like the logic with filterByWeeksAgo < 0, i will change it later
-      filteredWeeks = bandaidFilterWeeksByWeeksAgoFunction(filteredWeeks); //FOLLOW SAME PATTERN AS ABOVE, PLEASE
-      if (filterByCoachless) {
-        filteredWeeks = filterWeeksByCoachlessFunction(filteredWeeks);
-      }
+      const filteredByCoach = filterByCoachFunction(weeks);
+      const filteredByCourse = filterByCourseFunction(filteredByCoach);
+      const filteredByHoldWeeks = filterByHoldWeeksFunction(filteredByCourse);
+      const filteredByWeeksAgo =
+        filterWeeksByWeeksAgoFunction(filteredByHoldWeeks);
+      const filteredByCoachless =
+        filterWeeksByCoachlessFunction(filteredByWeeksAgo);
+      const filteredByCompletion =
+        filterByCompletionFunction(filteredByCoachless);
+      const filteredBySearchTerm =
+        filterWeeksBySearchTerm(filteredByCompletion);
 
-      if (filterByHoldWeeks) {
-        filteredWeeks = filterByHoldWeeksFunction(filteredWeeks);
-      }
-      if (filterByCompletion === 'incompleteOnly') {
-        filteredWeeks = filteredWeeks.filter((week) => !week.recordsComplete);
-      } else if (filterByCompletion === 'completeOnly') {
-        filteredWeeks = filteredWeeks.filter((week) => week.recordsComplete);
-      }
-
-      if (filterBySearchTerm) {
-        filteredWeeks = filterWeeksBySearchTerm(
-          filteredWeeks,
-          filterBySearchTerm,
-        );
-      }
+      const filteredWeeks = filteredBySearchTerm;
       return filteredWeeks;
     },
-    // setting proper dependencies sets off an infinite rerender loop, this will be my next task to fix (written 1/21/25)
     [
-      filterByCoach,
-      filterByCourse,
-      filterByWeeksAgo,
-      filterByCoachless,
-      filterByHoldWeeks,
-      filterByCompletion,
-      filterBySearchTerm,
       dataReady,
+      filterByCoachFunction,
+      filterByCourseFunction,
+      filterByHoldWeeksFunction,
+      filterWeeksByWeeksAgoFunction,
+      filterWeeksByCoachlessFunction,
+      filterByCompletionFunction,
+      filterWeeksBySearchTerm,
     ],
   );
 
+  // Initial data load, set filterByCoach to current user
   useEffect(() => {
     if (
       !rendered.current &&
       lastThreeWeeksQuery.isSuccess &&
       coachListQuery.isSuccess
     ) {
-      // set filterByCoach to current user
       const currentUser = userDataQuery.data;
       const currentUserCoach = coachListQuery.data.find(
         (coach) => coach.user.email === currentUser?.emailAddress,
@@ -280,14 +258,15 @@ export default function WeeksRecordsSection() {
       if (currentUserCoach) setFilterByCoach(currentUserCoach);
       rendered.current = true;
     }
-  }, [userDataQuery.isSuccess, lastThreeWeeksQuery]);
+  }, [lastThreeWeeksQuery, coachListQuery, userDataQuery]);
 
+  // Filtering useEffect
   useEffect(() => {
     if (dataReady && rendered.current) {
       const filteredWeeks = filterWeeks(lastThreeWeeksQuery.data);
       setWeeks(filteredWeeks);
     }
-  }, [dataReady, filterWeeks]);
+  }, [dataReady, filterWeeks, lastThreeWeeksQuery.data]);
 
   return (
     <div className="newCoachingWrapper">
