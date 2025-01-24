@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import { setupMockAuth } from './setupMockAuth';
 
 // Mock the useAuth hook, but leave the mock return configurable per test
-vi.mock('../src/hooks/useAuth');
+vi.mock('src/hooks/useAuth');
 
 beforeEach(() => {
   setupMockAuth();

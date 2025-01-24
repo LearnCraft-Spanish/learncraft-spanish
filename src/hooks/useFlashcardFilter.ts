@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { Flashcard, VocabTag } from '../types/interfaceDefinitions';
+import type { Flashcard, VocabTag } from 'src/types/interfaceDefinitions';
 
 import { useVocabulary } from './CourseData/useVocabulary';
 

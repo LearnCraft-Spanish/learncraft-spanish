@@ -1,19 +1,16 @@
 import React from 'react';
-import type { Call, Week } from '../../../../types/CoachingTypes';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import ContextualControlls from '../../../ContextualControlls';
+import type { Week } from 'src/types/CoachingTypes';
+import ContextualControlls from 'src/components/ContextualControlls';
 export default function PrivateCallsCell({ week }: { week: Week }) {
   const {
     getPrivateCallsFromWeekRecordId,
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
-    getCourseFromMembershipId,
-    dateObjectToText,
   } = useCoaching();
   // const call = getPrivateCallsFromWeekRecordId(week.recordId);
-  const { contextual, setContextualRef, closeContextual, openContextual } =
-    useContextualMenu();
+  const { contextual, setContextualRef, openContextual } = useContextualMenu();
 
   const calls = getPrivateCallsFromWeekRecordId(week.recordId);
 

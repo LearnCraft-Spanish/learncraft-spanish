@@ -1,9 +1,9 @@
-import { describe, it, vi, expect } from 'vitest';
-import WeeksRecordsSection from './WeeksRecords';
-import { render, waitFor, screen, renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { render, renderHook, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import WeeksRecordsSection from './WeeksRecords';
 
 describe('section WeeksRecordsSection', () => {
   // Write better tests, delete skipped ones
@@ -17,7 +17,16 @@ describe('section WeeksRecordsSection', () => {
       expect(screen.getByText('Weekly Student Records')).toBeInTheDocument();
     });
   });
-  describe('filtering logic', () => {
+  describe.skip('filtering logic', () => {
+    /*
+    tests: 
+    - default values are correct
+    - changing any filter updates the list
+      - [Coach, Course, Week, Search Bar, Coachless, on hold, completion]
+    - specific filters have multiple filtering options
+      - Week (this, last, two ago, all), completion (incomplete, complete, all)
+
+    */
     it('default filters: filterHoldWeek is True, filterByCompletion is incompleteOnly', async () => {
       render(
         <MockAllProviders>

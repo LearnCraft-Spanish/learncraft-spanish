@@ -1,6 +1,6 @@
-import MenuButton from '../../Buttons/MenuButton';
+import MenuButton from 'src/components/Buttons/MenuButton';
+import { FromToLessonSelector } from 'src/components/LessonSelector';
 
-import { FromToLessonSelector } from '../../LessonSelector';
 import './AudioBasedReview.css';
 
 interface AudioQuizSetupMenuProps {

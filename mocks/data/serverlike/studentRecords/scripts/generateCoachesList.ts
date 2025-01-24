@@ -1,4 +1,4 @@
-import type { Coach } from '../../../../../src/types/CoachingTypes';
+import type { Coach } from 'src/types/CoachingTypes';
 
 /* ------------------ Helper Functions ------------------ */
 function generateFakeQBId() {

@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 import type { MockAuthOptions } from 'mocks/hooks/useMockAuth';
 import createMockAuth from 'mocks/hooks/useMockAuth';
-import useAuth from '../src/hooks/useAuth';
+import useAuth from 'src/hooks/useAuth';
 
 // Utility function to configure the useAuth mock per test
 export const setupMockAuth = (config: MockAuthOptions = {}) => {

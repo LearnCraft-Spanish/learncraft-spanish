@@ -5,8 +5,8 @@ const useBANDAIDhelperFunction = () => {
   const dateRange = useMemo(() => {
     const nowString = Date.now();
     const now = new Date(nowString);
-    // const dayOfWeek = now.getDay();
-    const dayOfWeek = 2;
+
+    const dayOfWeek = now.getDay();
     const nextSundayString = now.getTime() - dayOfWeek * 86400000 + 604800000;
     const thisPastSundayString = now.getTime() - dayOfWeek * 86400000;
     const lastSundayString = now.getTime() - dayOfWeek * 86400000 - 604800000;

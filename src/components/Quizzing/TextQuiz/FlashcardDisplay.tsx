@@ -1,11 +1,11 @@
 import React from 'react';
-import type { Flashcard } from '../../../types/interfaceDefinitions';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import {
   formatEnglishText,
   formatSpanishText,
-} from '../../../functions/formatFlashcardText';
-import play from '../../../assets/icons/play_dark.svg';
-import pause from '../../../assets/icons/pause_dark.svg';
+} from 'src/functions/formatFlashcardText';
+import play from 'src/assets/icons/play_dark.svg';
+import pause from 'src/assets/icons/pause_dark.svg';
 import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 import './Quiz.css';
 

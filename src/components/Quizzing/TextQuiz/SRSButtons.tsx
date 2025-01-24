@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import type { Flashcard } from '../../../types/interfaceDefinitions';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 
 interface QuizButtonsProps {
   currentExample: Flashcard;

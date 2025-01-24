@@ -1,5 +1,5 @@
-import { describe, it, vi, expect } from 'vitest';
-import { render, waitFor, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import { hardCodedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';

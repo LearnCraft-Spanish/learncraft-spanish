@@ -50,22 +50,22 @@ export default function Menu() {
       )}
       {menuDataReady && (
         <div className="menuBox">
-          {activeStudentQuery.data?.role === 'student' &&
-            !!flashcardDataQuery.data?.studentExamples?.length && (
-              <div>
-                <h3>My Flashcards:</h3>
-                <div className="buttonBox">
-                  <Link className="linkButton" to="/myflashcards">
-                    Quiz My Flashcards
-                  </Link>
-                </div>
-                <div className="buttonBox">
-                  <Link className="linkButton" to="/manage-flashcards">
-                    Manage My Flashcards
-                  </Link>
-                </div>
+          {activeStudentQuery.data?.role === 'student' && (
+            // !!flashcardDataQuery.data?.studentExamples?.length &&
+            <div>
+              <h3>My Flashcards:</h3>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/myflashcards">
+                  Quiz My Flashcards
+                </Link>
               </div>
-            )}
+              <div className="buttonBox">
+                <Link className="linkButton" to="/manage-flashcards">
+                  Manage My Flashcards
+                </Link>
+              </div>
+            </div>
+          )}
           <h3>Quizzing Tools:</h3>
           <div className="buttonBox">
             <Link className="linkButton" to="/officialquizzes">

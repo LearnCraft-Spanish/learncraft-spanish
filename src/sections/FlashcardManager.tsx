@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react';
-import { Navigate } from 'react-router-dom';
+import NoFlashcards from 'src/components/NoFlashcards';
 import Loading from 'src/components/Loading';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
@@ -7,7 +7,7 @@ import type {
   DisplayOrder,
   Flashcard,
   StudentExample,
-} from '../types/interfaceDefinitions';
+} from 'src/types/interfaceDefinitions';
 
 function FlashcardManager() {
   const { flashcardDataQuery, exampleIsCustom } = useStudentFlashcards();
@@ -79,9 +79,7 @@ function FlashcardManager() {
       )}
       {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
       {flashcardDataQuery.isSuccess &&
-        !flashcardDataQuery.data?.studentExamples?.length && (
-          <Navigate to="/" />
-        )}
+        !flashcardDataQuery.data?.studentExamples?.length && <NoFlashcards />}
       {flashcardDataQuery.isSuccess &&
         !!flashcardDataQuery.data?.examples?.length && (
           <div>

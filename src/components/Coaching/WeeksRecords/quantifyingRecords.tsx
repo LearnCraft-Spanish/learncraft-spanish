@@ -1,4 +1,3 @@
-import { useState, useMemo } from 'react';
 interface QuantifiedRecordsProps {
   currentPage: number;
   totalRecords: number;
@@ -17,15 +16,13 @@ export default function QuantifiedRecords({
     return <h5>Showing 0 records</h5>;
   }
 
-  const firstRecordShown = useMemo(() => {
-    return currentPage === 1 ? 1 : (currentPage - 1) * recordsPerPage + 1;
-  }, [currentPage, recordsPerPage]);
+  const firstRecordShown =
+    currentPage === 1 ? 1 : (currentPage - 1) * recordsPerPage + 1;
 
-  const lastRecordShown = useMemo(() => {
-    return currentPage * recordsPerPage <= totalRecords
+  const lastRecordShown =
+    currentPage * recordsPerPage <= totalRecords
       ? currentPage * recordsPerPage
       : totalRecords;
-  }, [currentPage, recordsPerPage, totalRecords]);
 
   return (
     <div className="quantifiedRecords">

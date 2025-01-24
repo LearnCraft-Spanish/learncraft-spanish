@@ -64,6 +64,15 @@ export const allStudentsTable: UserData[] = [
     relatedProgram: 5,
     cohort: 'E',
   },
+  {
+    recordId: 8,
+    name: 'student-no-flashcards',
+    emailAddress: 'student-no-flashcards@fake.not',
+    role: 'student',
+    isAdmin: false,
+    relatedProgram: 2,
+    cohort: 'A',
+  },
 ];
 
 export function getUserDataFromName(
@@ -75,6 +84,7 @@ export function getUserDataFromName(
     | 'student-admin'
     | 'student-lcsp'
     | 'student-ser-estar'
+    | 'student-no-flashcards'
     | null,
 ): UserData | null {
   return allStudentsTable.find((student) => student.name === name) || null;

@@ -7,12 +7,12 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import type { Flashcard } from '../../../types/interfaceDefinitions';
-import { fisherYatesShuffle } from '../../../functions/fisherYatesShuffle';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
 import QuizProgress from '../QuizProgress';
-import '../../../App.css';
+import 'src/App.css';
 import '../AudioQuiz/AudioBasedReview.css';
 
 interface StepValue {

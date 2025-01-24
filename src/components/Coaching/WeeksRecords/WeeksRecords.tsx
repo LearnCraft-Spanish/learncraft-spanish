@@ -48,6 +48,7 @@ export default function WeeksRecordsSection() {
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
+    // 1,
     dateRange.dayOfWeek >= 3 ? 0 : 1,
   ); // 0 for this week, 1 for last week, 2 for two weeks ago
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
