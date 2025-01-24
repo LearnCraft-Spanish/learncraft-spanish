@@ -1,8 +1,9 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
 import MyFlashcardsQuiz from './ReviewMyFlashcards';
 
 describe('menu for student flashcards', () => {
@@ -22,7 +23,7 @@ describe('menu for student flashcards', () => {
   });
   it('shows start quiz button', async () => {
     render(
-      <MockAllProviders route="/myflashcards">
+      <MockAllProviders route="/myflashcards" childRoutes>
         <MyFlashcardsQuiz />
       </MockAllProviders>,
     );
@@ -32,12 +33,28 @@ describe('menu for student flashcards', () => {
   });
   it('shows menu button', async () => {
     render(
-      <MockAllProviders route="/myflashcards">
+      <MockAllProviders route="/myflashcards" childRoutes>
         <MyFlashcardsQuiz />
       </MockAllProviders>,
     );
     await waitFor(() => {
       expect(screen.getByText(/back to home/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('no flashcards found', () => {
+    beforeEach(() => {
+      setupMockAuth({ userName: 'student-no-flashcards' });
+    });
+    it('shows no flashcards found message', async () => {
+      render(
+        <MockAllProviders route="/myflashcards" childRoutes>
+          <MyFlashcardsQuiz />
+        </MockAllProviders>,
+      );
+      await waitFor(() => {
+        expect(screen.getByText(/no flashcards found/i)).toBeInTheDocument();
+      });
     });
   });
 });

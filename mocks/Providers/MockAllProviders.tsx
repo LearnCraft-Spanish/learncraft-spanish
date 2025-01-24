@@ -24,7 +24,7 @@ export default function MockAllProviders({
           {route !== '/' && (
             <Routes>
               <Route
-                path={`/${route}${childRoutes ? '/*' : ''}`}
+                path={`${route}${childRoutes ? '/*' : ''}`}
                 element={children}
               />
             </Routes>

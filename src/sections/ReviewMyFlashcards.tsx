@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-} from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
+import NoFlashcards from 'src/components/NoFlashcards';
 import Loading from 'src/components/Loading';
 import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
@@ -47,6 +42,8 @@ export default function MyFlashcardsQuiz() {
     (activeStudentQuery.isLoading ||
       flashcardDataQuery.isLoading ||
       pmfDataQuery.isLoading);
+
+  //  is this supposted to be an OR or AND?
   const unavailable =
     (activeStudentQuery.isSuccess &&
       !(activeStudentQuery.data?.role === 'student')) ||
@@ -77,8 +74,8 @@ export default function MyFlashcardsQuiz() {
     <div>
       {dataError && <h2>Error Loading Flashcards</h2>}
       {dataLoading && <Loading message="Loading Flashcard Data..." />}
-      {unavailable && <Navigate to="/" />}
-      {!quizReady && dataReady && (
+      {unavailable && <NoFlashcards />}
+      {!quizReady && dataReady && !unavailable && (
         <QuizSetupMenu
           examplesToParse={examplesToParse}
           handleSubmit={handleSubmit}
