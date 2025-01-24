@@ -6,7 +6,7 @@ import {
 } from '../../functions/formatFlashcardText';
 import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
 import { useActiveStudent } from '../../hooks/useActiveStudent';
-
+import { useUserData } from '../../hooks/useUserData';
 interface FormatExampleForTableProps {
   data: Flashcard;
   showSpanglishLabel?: boolean;
@@ -17,6 +17,7 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
   showSpanglishLabel = false,
 }: FormatExampleForTableProps) => {
   const { activeStudentQuery } = useActiveStudent();
+  const userDataQuery = useUserData();
   const {
     flashcardDataQuery,
     addFlashcardMutation,
@@ -53,6 +54,15 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
       )}
       {dataReady && isStudent && (
         <>
+          {isCollected && !isPending && isCustom && (
+            <button
+              type="button"
+              className="label customLabel"
+              value={data.recordId}
+            >
+              Custom
+            </button>
+          )}
           {!isCollected && (
             <button
               type="button"
@@ -72,25 +82,18 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
               Adding...
             </button>
           )}
-          {isCollected && !isPending && !isCustom && (
-            <button
-              type="button"
-              className="removeButton"
-              value={data.recordId}
-              onClick={() => removeFlashcardMutation.mutate(data.recordId)}
-            >
-              Remove
-            </button>
-          )}
-          {isCollected && !isPending && isCustom && (
-            <button
-              type="button"
-              className="label customLabel"
-              value={data.recordId}
-            >
-              Custom
-            </button>
-          )}
+          {isCollected &&
+            !isPending &&
+            (!isCustom || userDataQuery.data?.isAdmin) && (
+              <button
+                type="button"
+                className="removeButton"
+                value={data.recordId}
+                onClick={() => removeFlashcardMutation.mutate(data.recordId)}
+              >
+                Remove
+              </button>
+            )}
         </>
       )}
     </div>
