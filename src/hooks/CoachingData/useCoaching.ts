@@ -104,7 +104,14 @@ export default function useCoaching() {
       if (!coach) return undefined;
       return coach;
     },
-    [activeMembershipsQuery, activeStudentsQuery, coachListQuery],
+    [
+      activeMembershipsQuery.data,
+      activeMembershipsQuery.isSuccess,
+      activeStudentsQuery.data,
+      activeStudentsQuery.isSuccess,
+      coachListQuery.data,
+      coachListQuery.isSuccess,
+    ],
   );
 
   const getCourseFromMembershipId = useCallback(
@@ -126,7 +133,12 @@ export default function useCoaching() {
       if (!course) return undefined;
       return course;
     },
-    [activeMembershipsQuery, courseListQuery],
+    [
+      activeMembershipsQuery.data,
+      activeMembershipsQuery.isSuccess,
+      courseListQuery.data,
+      courseListQuery.isSuccess,
+    ],
   );
 
   const getStudentFromMembershipId = useCallback(
@@ -150,7 +162,12 @@ export default function useCoaching() {
       if (!student) return undefined;
       return student;
     },
-    [activeMembershipsQuery, activeStudentsQuery],
+    [
+      activeMembershipsQuery.data,
+      activeMembershipsQuery.isSuccess,
+      activeStudentsQuery.data,
+      activeStudentsQuery.isSuccess,
+    ],
   );
 
   const getAttendeeWeeksFromGroupSessionId = useCallback(
@@ -276,7 +293,7 @@ export default function useCoaching() {
   );
   /* --------- Other Helper Functions --------- */
 
-  function dateObjectToText(dateObject: Date) {
+  const dateObjectToText = useCallback((dateObject: Date) => {
     // This will be depricated soon, use built in date functions instead
     function formatMonth(date: Date) {
       // const unformattedMonth = date.getMonth() + 1; // Found it like this, ask Josiash if intentional?
@@ -297,7 +314,7 @@ export default function useCoaching() {
       return date.getFullYear().toString();
     }
     return `${formatYear(dateObject)}-${formatMonth(dateObject)}-${formatDate(dateObject)}`;
-  }
+  }, []);
 
   return {
     lastThreeWeeksQuery,
