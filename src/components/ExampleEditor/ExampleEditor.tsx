@@ -99,10 +99,17 @@ export default function ExampleEditor() {
   }, [quizList]);
 
   const displayOrder = useMemo(() => {
+    // Return all records if tableOption is 'recently-edited'
+    if (tableOption === 'recently-edited') {
+      return tableData?.map((example: Flashcard) => ({
+        recordId: example.recordId,
+      }));
+    }
+    // If editing quiz examples, return only unverified examples
     return tableData?.flatMap((example: Flashcard) =>
       !example.vocabComplete ? { recordId: example.recordId } : [],
     );
-  }, [tableData]);
+  }, [tableData, tableOption]);
 
   const activeQuiz = useMemo(() => {
     return quizList?.find((quiz) => quiz.recordId === quizId);

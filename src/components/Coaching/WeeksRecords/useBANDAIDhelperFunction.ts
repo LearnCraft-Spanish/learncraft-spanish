@@ -5,8 +5,12 @@ const useBANDAIDhelperFunction = () => {
   const dateRange = useMemo(() => {
     const nowString = Date.now();
     const now = new Date(nowString);
+<<<<<<< HEAD
     // const dayOfWeek = now.getDay();
     const dayOfWeek = 2;
+=======
+    const dayOfWeek = now.getDay();
+>>>>>>> origin/development
     const nextSundayString = now.getTime() - dayOfWeek * 86400000 + 604800000;
     const thisPastSundayString = now.getTime() - dayOfWeek * 86400000;
     const lastSundayString = now.getTime() - dayOfWeek * 86400000 - 604800000;
@@ -60,6 +64,7 @@ const useBANDAIDhelperFunction = () => {
     const twoSundaysAgoDate = twoSundaysAgo.toISOString().split('T')[0];
     // const twoSundaysAgoDate = formatDateLikeQB(twoSundaysAgo);
     // const threeSundaysAgoDate = `${formatYear(threeSundaysAgo)}-${formatMonth(threeSundaysAgo)}-${formatDate(threeSundaysAgo)}`;
+<<<<<<< HEAD
     if (dayOfWeek >= 3) {
       return {
         nextWeekDate,
@@ -75,6 +80,15 @@ const useBANDAIDhelperFunction = () => {
         twoSundaysAgoDate,
       };
     }
+=======
+    return {
+      dayOfWeek,
+      nextWeekDate,
+      thisWeekDate,
+      lastSundayDate,
+      twoSundaysAgoDate,
+    };
+>>>>>>> origin/development
   }, []);
 
   return dateRange;

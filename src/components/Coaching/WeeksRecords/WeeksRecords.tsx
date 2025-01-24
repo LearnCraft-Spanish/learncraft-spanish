@@ -4,8 +4,8 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
-import type { Coach, Course, Week } from 'src/types/CoachingTypes';
-import LoadingMessage from 'src/components/Loading';
+import type { Coach, Course, Week } from '../../../types/CoachingTypes';
+import LoadingMessage from '../../Loading';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
 
@@ -47,7 +47,10 @@ export default function WeeksRecordsSection() {
   const dateRange = useBANDAIDhelperFunction();
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
-  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(1);
+  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
+    // 1,
+    dateRange.dayOfWeek >= 3 ? 0 : 1,
+  ); // 0 for this week, 1 for last week, 2 for two weeks ago
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
