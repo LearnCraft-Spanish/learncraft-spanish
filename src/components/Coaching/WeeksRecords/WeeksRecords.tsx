@@ -277,7 +277,7 @@ export default function WeeksRecordsSection() {
           <h2>Weekly Student Records</h2>
           <div className="filterWrapper">
             <CoachingFilter
-              weeks={weeks}
+              dataReady={!!weeks}
               filterByCoach={filterByCoach}
               updateCoachFilter={updateCoachFilter}
               filterByCourse={filterByCourse}

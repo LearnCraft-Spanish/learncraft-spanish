@@ -1,20 +1,20 @@
-import type { Coach, Course, Week } from 'src/types/CoachingTypes';
+import type { Coach, Course } from 'src/types/CoachingTypes';
+
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
 
 import '../../styles/coaching.scss';
+
 interface CoachingFilterProps {
-  weeks: Week[] | undefined;
+  dataReady: boolean;
+  advancedFilteringMenu: boolean;
+  toggleAdvancedFilteringMenu: () => void;
   filterByCoach: Coach | undefined;
   updateCoachFilter: (value: string) => void;
   filterByCourse: Course | undefined;
   updateCourseFilter: (value: string) => void;
   filterByWeeksAgo: number;
   updateWeeksAgoFilter: (value: string) => void;
-
-  advancedFilteringMenu: boolean;
-  toggleAdvancedFilteringMenu: () => void;
-
   filterCoachless: boolean | undefined;
   updateCoachlessFilter: (value: boolean) => void;
   filterHoldWeeks: boolean | undefined;
@@ -24,25 +24,16 @@ interface CoachingFilterProps {
   searchTerm: string | undefined;
   updateSearchTerm: (value: string) => void;
 }
-
-/*
- -------------------
-improvements to make
-
-we can probably move all of the filtering logic into this component, and just pass in weeks and function to update weeks
-*/
 export default function WeeksFilter({
-  weeks,
+  dataReady,
+  advancedFilteringMenu,
+  toggleAdvancedFilteringMenu,
   filterByCoach,
   updateCoachFilter,
   filterByCourse,
   updateCourseFilter,
   filterByWeeksAgo,
   updateWeeksAgoFilter,
-
-  advancedFilteringMenu,
-  toggleAdvancedFilteringMenu,
-
   filterCoachless,
   updateCoachlessFilter,
   filterHoldWeeks,
@@ -53,7 +44,7 @@ export default function WeeksFilter({
   updateSearchTerm,
 }: CoachingFilterProps) {
   return (
-    weeks && (
+    dataReady && (
       <div className="coachingFilterSection">
         <div className="simpleFiltering">
           <CoachSelect
@@ -98,64 +89,68 @@ export default function WeeksFilter({
           <div
             className={`advancedFiltersWrapper ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
           >
-            <div>
-              {/* <label htmlFor="search">Search:</label> */}
-              <input
-                type="text"
-                name="search"
-                id="search"
-                value={searchTerm}
-                placeholder="Search names, emails, or notes"
-                className="searchBox"
-                onChange={(e) => updateSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="menuRow">
-              <p>Exclude Students Without Coaches:</p>
-              <label htmlFor="filterCoachless" className="switch">
-                <input
-                  alt="Exclude Students Without Coaches"
-                  type="checkbox"
-                  name="Exclude Students Without Coaches"
-                  id="filterCoachless"
-                  checked={filterCoachless}
-                  onChange={(e) => updateCoachlessFilter(e.target.checked)}
-                />
-                <span className="slider round"></span>
-              </label>
-            </div>
-            <div className="menuRow">
-              <p>Exclude Weeks on Hold:</p>
-              <label htmlFor="filterHoldWeeks" className="switch">
-                <input
-                  alt="Exclude Weeks on Hold"
-                  type="checkbox"
-                  name="Exclude Weeks On Hold"
-                  id="filterHoldWeeks"
-                  checked={filterHoldWeeks}
-                  onChange={(e) => updateFilterHoldWeeks(e.target.checked)}
-                />
-                <span className="slider round"></span>
-              </label>
-            </div>
-            <div>
-              <label
-                htmlFor="filterByCompletion"
-                className="filterByCompletion"
-              >
-                Filter Records By Completion:
-              </label>
-              <select
-                name=""
-                id="filterByCompletion"
-                onChange={(e) => updateFilterByCompletion(e.target.value)}
-                value={filterByCompletion}
-              >
-                <option value="allRecords">All Records</option>
-                <option value="incompleteOnly">Incomplete Only</option>
-                <option value="completeOnly">Complete Only</option>
-              </select>
-            </div>
+            {advancedFilteringMenu && (
+              <>
+                <div>
+                  {/* <label htmlFor="search">Search:</label> */}
+                  <input
+                    type="text"
+                    name="search"
+                    id="search"
+                    value={searchTerm}
+                    placeholder="Search names, emails, or notes"
+                    className="searchBox"
+                    onChange={(e) => updateSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="menuRow">
+                  <p>Exclude Students Without Coaches:</p>
+                  <label htmlFor="filterCoachless" className="switch">
+                    <input
+                      alt="Exclude Students Without Coaches"
+                      type="checkbox"
+                      name="Exclude Students Without Coaches"
+                      id="filterCoachless"
+                      checked={filterCoachless}
+                      onChange={(e) => updateCoachlessFilter(e.target.checked)}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                </div>
+                <div className="menuRow">
+                  <p>Exclude Weeks on Hold:</p>
+                  <label htmlFor="filterHoldWeeks" className="switch">
+                    <input
+                      alt="Exclude Weeks on Hold"
+                      type="checkbox"
+                      name="Exclude Weeks On Hold"
+                      id="filterHoldWeeks"
+                      checked={filterHoldWeeks}
+                      onChange={(e) => updateFilterHoldWeeks(e.target.checked)}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                </div>
+                <div>
+                  <label
+                    htmlFor="filterByCompletion"
+                    className="filterByCompletion"
+                  >
+                    Filter Records By Completion:
+                  </label>
+                  <select
+                    name=""
+                    id="filterByCompletion"
+                    onChange={(e) => updateFilterByCompletion(e.target.value)}
+                    value={filterByCompletion}
+                  >
+                    <option value="allRecords">All Records</option>
+                    <option value="incompleteOnly">Incomplete Only</option>
+                    <option value="completeOnly">Complete Only</option>
+                  </select>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
