@@ -1,6 +1,10 @@
 name: Mutation Testing Report
 
 on:
+  push:
+    branches:
+      - development
+      - master
   schedule:
     - cron: '0 2 * * *' # Runs daily at 2am UTC/8pm CST
   workflow_dispatch:
