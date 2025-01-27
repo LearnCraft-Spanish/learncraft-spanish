@@ -6,10 +6,9 @@ import {
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
-import ExampleEditOrCreate from '../ExampleEditOrCreate';
-import { AudioControl } from './AudioControl';
 import 'src/App.css';
 import './ExampleCreator.css';
+import EditOrCreateExample from '../EditOrCreateExample';
 
 export default function ExampleCreator() {
   const [spanishExample, setSpanishExample] = useState('');
@@ -65,7 +64,7 @@ export default function ExampleCreator() {
     <div>
       <h2>Example Creator</h2>
       <div id="exampleCreator">
-        <ExampleEditOrCreate
+        <EditOrCreateExample
           editOrCreate="create"
           onSubmit={handleAddExample}
           spanishExample={spanishExample}

@@ -4,7 +4,7 @@ import {
 } from 'src/functions/formatFlashcardText';
 import { AudioControl } from './ExampleCreator/AudioControl';
 
-interface ExampleEditOrCreateProps {
+interface EditOrCreateExampleProps {
   editOrCreate: 'edit' | 'create';
   onSubmit: (e: React.FormEvent) => void;
   spanishExample: string;
@@ -17,7 +17,7 @@ interface ExampleEditOrCreateProps {
   englishAudio: string;
   setEnglishAudio: (value: string) => void;
 }
-export default function ExampleEditOrCreate({
+export default function EditOrCreateExample({
   editOrCreate,
   onSubmit,
   spanishExample,
@@ -29,7 +29,7 @@ export default function ExampleEditOrCreate({
   setSpanishAudioLa,
   englishAudio,
   setEnglishAudio,
-}: ExampleEditOrCreateProps) {
+}: EditOrCreateExampleProps) {
   return (
     <>
       {/* <form id="exampleForm" onSubmit={(e) => handleAddExample(e)}> */}

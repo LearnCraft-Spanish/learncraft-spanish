@@ -6,8 +6,10 @@ import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import quizCourses from 'src/functions/QuizCourseList';
 import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
 import ExampleListItem from '../FlashcardFinder/ExampleListItem';
+import EditOrCreateExample from '../EditOrCreateExample';
 import { VocabTag } from './VocabTag';
 import './ExampleEditor.css';
+import '../ExampleCreator/ExampleCreator.css';
 
 export default function ExampleEditor() {
   const [tableOption, setTableOption] = useState('');
@@ -251,80 +253,49 @@ export default function ExampleEditor() {
         <h2>Example Editor</h2>
       </div>
       <div>
-        <div>
-          {selectedExampleId && (
-            <div>
-              <h3>Example Preview</h3>
-              <ExampleListItem data={currentFlashcard!} forceShowVocab />
-            </div>
-          )}
+        {!selectedExampleId && (
           <div>
-            {spanishAudioLa.length > 0 && (
-              <>
-                <p>Spanish Audio</p>
-                <audio src={spanishAudioLa} controls />
-              </>
-            )}
-            {englishAudio.length > 0 && (
-              <>
-                <p>English Audio</p>
-                <audio src={englishAudio} controls />
-              </>
-            )}
+            <h3>Example Preview</h3>
+            <h4>Please select an example to preview/edit</h4>
           </div>
-        </div>
-        <form onSubmit={(e) => handleEditExample(e)}>
-          <h3>Edit Example</h3>
-          <div>
-            <label id="spanishExample">Spanish Example</label>
-            <input
-              id="spanishExample"
-              type="textarea"
-              value={spanishExample}
-              onChange={(e) => setSpanishExample(e.target.value)}
+        )}
+        {selectedExampleId && (
+          <div id="exampleEditor">
+            <EditOrCreateExample
+              editOrCreate="edit"
+              onSubmit={handleEditExample}
+              spanishExample={spanishExample}
+              setSpanishExample={setSpanishExample}
+              spanglish={spanglish}
+              englishTranslation={englishTranslation}
+              setEnglishTranslation={setEnglishTranslation}
+              spanishAudioLa={spanishAudioLa}
+              setSpanishAudioLa={setSpanishAudioLa}
+              englishAudio={englishAudio}
+              setEnglishAudio={setEnglishAudio}
+              // vocabIncluded={vocabIncluded}
+              // setVocabIncluded={setVocabIncluded}
+              // vocabComplete={vocabComplete}
+              // setVocabComplete={setVocabComplete}
             />
           </div>
-          <div>
-            <label id="englishTranslation">English Translation</label>
-            <input
-              id="englishTranslation"
-              type="textarea"
-              value={englishTranslation}
-              onChange={(e) => setEnglishTranslation(e.target.value)}
-            />
-          </div>
-          <div>
-            <label id="spanishAudioLa">Spanish Audio Link</label>
-            <input
-              id="spanishAudioLa"
-              type="textarea"
-              value={spanishAudioLa}
-              onChange={(e) => setSpanishAudioLa(e.target.value)}
-            />
-          </div>
-          <div>
-            <label id="englishAudio">English Audio Link</label>
-            <input
-              id="englishAudio"
-              type="textarea"
-              value={englishAudio}
-              onChange={(e) => setEnglishAudio(e.target.value)}
-            />
-          </div>
-          <div>
-            <label id="vocabIncluded">Vocab Included</label>
-            <div className="vocabTagBox">
-              {includedVocabObjects.map((vocab) => (
-                <VocabTag
-                  key={vocab.recordId}
-                  vocab={vocab}
-                  removeFromVocabList={removeFromVocabIncluded}
-                />
-              ))}
-            </div>
-            <input
+        )}
+        <form id="vocabTagging" onSubmit={(e) => handleEditExample(e)}>
+          {/* <div id="vocabTagging"> */}
+          <div className="halfOfScreen">
+            <h3>Search for Vocab</h3>
+            {/* <input
               type="text"
               value={vocabSearchTerm}
+              onChange={(e) => setVocabSearchTerm(e.target.value)}
+            /> */}
+            <input
+              type="text"
+              name="search"
+              id="search"
+              value={vocabSearchTerm}
+              placeholder="Search names, emails, or notes"
+              className="searchBox"
               onChange={(e) => setVocabSearchTerm(e.target.value)}
             />
             <select
@@ -343,7 +314,21 @@ export default function ExampleEditor() {
               </button>
             )}
           </div>
-          <button type="submit">Save Example</button>
+          <div className="halfOfScreen">
+            <h3>Vocab Included</h3>
+            {/* <label id="vocabIncluded">Vocab Included</label> */}
+            <div className="vocabTagBox">
+              {includedVocabObjects.map((vocab) => (
+                <VocabTag
+                  key={vocab.recordId}
+                  vocab={vocab}
+                  removeFromVocabList={removeFromVocabIncluded}
+                />
+              ))}
+            </div>
+            {/* </div> */}
+          </div>
+          {/* <button type="submit">Save Example</button> */}
         </form>
         <div>
           <h3>Example List</h3>
