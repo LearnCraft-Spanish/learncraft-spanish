@@ -9,7 +9,7 @@ import LoadingMessage from '../../Loading';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
 
-import '../styles/coaching.scss';
+import '../coaching.scss';
 import ViewWeekRecord from './ViewWeekRecord';
 
 import useBANDAIDhelperFunction from './useBANDAIDhelperFunction';
