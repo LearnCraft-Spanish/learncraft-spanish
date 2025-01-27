@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { ToastContainer, Zoom } from 'react-toastify';
 import type { UserData } from './types/interfaceDefinitions';
 
 import Loading from './components/Loading';
@@ -195,6 +196,13 @@ export const App: React.FC = () => {
         <h2>Error loading user data.</h2>
       )}
       <AppRoutes />
+      <ToastContainer
+        theme="colored"
+        transition={Zoom}
+        autoClose={3000}
+        pauseOnHover={false}
+        closeOnClick
+      />
     </div>
   );
 };
