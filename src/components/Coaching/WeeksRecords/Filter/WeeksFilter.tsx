@@ -1,5 +1,6 @@
 import type { Coach, Course } from 'src/types/CoachingTypes';
 
+import useBANDAIDhelperFunction from '../useBANDAIDhelperFunction';
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
 
@@ -43,6 +44,7 @@ export default function WeeksFilter({
   searchTerm,
   updateSearchTerm,
 }: CoachingFilterProps) {
+  const dateRange = useBANDAIDhelperFunction();
   return (
     dataReady && (
       <div className="coachingFilterSection">
@@ -63,9 +65,15 @@ export default function WeeksFilter({
               onChange={(e) => updateWeeksAgoFilter(e.target.value)}
               value={filterByWeeksAgo}
             >
-              <option value={0}>This Week</option>
-              <option value={1}>Last Week</option>
-              <option value={2}>Two Weeks Ago</option>
+              <option value={0}>
+                This Week {`(${dateRange.thisWeekDate})`}
+              </option>
+              <option value={1}>
+                Last Week {`(${dateRange.lastSundayDate})`}
+              </option>
+              <option value={2}>
+                Two Weeks Ago {`(${dateRange.twoSundaysAgoDate})`}
+              </option>
               <option value={-1}>Last Three Weeks (All)</option>
             </select>
           </div>

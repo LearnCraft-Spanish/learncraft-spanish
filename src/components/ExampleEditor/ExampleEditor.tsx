@@ -15,7 +15,8 @@ import '../../App.css';
 export default function ExampleEditor() {
   const [quizId, setQuizId] = useState(undefined as number | undefined);
 
-  const { contextual, openContextual, setContextualRef } = useContextualMenu();
+  const { contextual, openContextual, setContextualRef, closeContextual } =
+    useContextualMenu();
   const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
   const { recentlyEditedExamplesQuery, updateRecentlyEditedExample } =
@@ -31,7 +32,9 @@ export default function ExampleEditor() {
   const [spanishAudioLa, setSpanishAudioLa] = useState('');
   const [englishAudio, setEnglishAudio] = useState('');
   const [vocabIncluded, setVocabIncluded] = useState([] as string[]);
+
   const [vocabComplete, setVocabComplete] = useState(false);
+  const [confirmSubmission, setConfirmSubmission] = useState(false);
 
   const [vocabSearchTerm, setVocabSearchTerm] = useState('');
   const [suggestedTags, setSugestedTags] = useState<Vocabulary[]>([]);
@@ -181,35 +184,66 @@ export default function ExampleEditor() {
     [includedVocabObjects, vocabularyQuery.data],
   );
 
-  function handleEditExample(e: React.FormEvent) {
-    e.preventDefault();
+  const formSubmissionAfterConfirm = (
+    confirmSubmissionTwo: boolean = false,
+  ) => {
     if (selectedExampleId !== null) {
-      if (!!tableOption && tableOption !== 'recently-edited') {
-        updateQuizExample({
-          recordId: selectedExampleId,
-          spanishExample,
-          englishTranslation,
-          spanishAudioLa,
-          spanglish,
-          englishAudio,
-          vocabComplete,
-          vocabIncluded,
-        });
-      } else if (tableOption === 'recently-edited') {
-        updateRecentlyEditedExample({
-          recordId: selectedExampleId,
-          spanishExample,
-          englishTranslation,
-          spanishAudioLa,
-          spanglish,
-          englishAudio,
-          vocabComplete,
-          vocabIncluded,
-        });
+      if (
+        ((confirmSubmission || confirmSubmissionTwo) && vocabComplete) ||
+        !vocabComplete
+      ) {
+        if (!!tableOption && tableOption !== 'recently-edited') {
+          updateQuizExample({
+            recordId: selectedExampleId,
+            spanishExample,
+            englishTranslation,
+            spanishAudioLa,
+            spanglish,
+            englishAudio,
+            vocabComplete,
+            vocabIncluded,
+          });
+        } else if (tableOption === 'recently-edited') {
+          updateRecentlyEditedExample({
+            recordId: selectedExampleId,
+            spanishExample,
+            englishTranslation,
+            spanishAudioLa,
+            spanglish,
+            englishAudio,
+            vocabComplete,
+            vocabIncluded,
+          });
+        }
+      }
+      setConfirmSubmission(false);
+    }
+  };
+  function handleEditExample(e: React.FormEvent | undefined = undefined) {
+    if (e) {
+      e.preventDefault();
+    }
+    if (selectedExampleId !== null) {
+      if (vocabComplete && !confirmSubmission) {
+        openContextual('confirmSubmission');
+      } else {
+        formSubmissionAfterConfirm();
       }
     }
   }
 
+  const updateConfirmSubmission = (
+    e: React.FormEvent,
+    confirmSubmissionValue: boolean,
+  ) => {
+    e.preventDefault();
+    setConfirmSubmission(confirmSubmissionValue);
+    setVocabComplete(confirmSubmissionValue);
+    closeContextual();
+    if (confirmSubmissionValue) {
+      formSubmissionAfterConfirm(confirmSubmissionValue);
+    }
+  };
   // Reset Properties when active example changes
   useEffect(() => {
     if (selectedExampleId !== null) {
@@ -223,6 +257,7 @@ export default function ExampleEditor() {
         setEnglishAudio(example.englishAudio);
         setVocabIncluded(example.vocabIncluded);
         setVocabComplete(example.vocabComplete);
+        setConfirmSubmission(false);
       }
     }
   }, [
@@ -273,10 +308,6 @@ export default function ExampleEditor() {
                 setSpanishAudioLa={setSpanishAudioLa}
                 englishAudio={englishAudio}
                 setEnglishAudio={setEnglishAudio}
-                // vocabIncluded={vocabIncluded}
-                // setVocabIncluded={setVocabIncluded}
-                // vocabComplete={vocabComplete}
-                // setVocabComplete={setVocabComplete}
               />
             </div>
             <form onSubmit={(e) => handleEditExample(e)}>
@@ -326,9 +357,48 @@ export default function ExampleEditor() {
                 </div>
               </div>
               <div className="buttonBox">
+                <p>Vocab Complete:</p>
+                <label htmlFor="vocabComplete" className="switch">
+                  <input
+                    alt="Vocab Complete"
+                    type="checkbox"
+                    name="Vocab Complete"
+                    id="vocabComplete"
+                    checked={vocabComplete}
+                    onChange={(e) => setVocabComplete(e.target.checked)}
+                  />
+                  <span className="slider round"></span>
+                </label>
+              </div>
+              <div className="buttonBox">
                 <button type="submit">Save Example</button>
               </div>
             </form>
+            {contextual === 'confirmSubmission' && (
+              <div className="confirmSubmissionBox" ref={setContextualRef}>
+                <form onSubmit={(e) => updateConfirmSubmission(e, true)}>
+                  <h3>Are you sure?</h3>
+                  <p>
+                    <b>Warning!</b> You are about to mark this example as "Vocab
+                    Complete", making it visible to students. This action can
+                    ONLY be undone through the QuickBase app
+                  </p>
+                  <div className="buttonBox">
+                    <button
+                      className="removeButton"
+                      type="button"
+                      onClick={(e) => updateConfirmSubmission(e, false)}
+                    >
+                      Go Back
+                    </button>
+                    <div></div>
+                    <button type="submit" className="addButton">
+                      Confirm
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </>
         )}
 
