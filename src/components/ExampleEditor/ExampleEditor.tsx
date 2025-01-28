@@ -5,11 +5,12 @@ import type { Flashcard, Vocabulary } from 'src/types/interfaceDefinitions';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import quizCourses from 'src/functions/QuizCourseList';
 import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
-import ExampleListItem from '../FlashcardFinder/ExampleListItem';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import EditOrCreateExample from '../EditOrCreateExample';
 import { VocabTag } from './VocabTag';
 import './ExampleEditor.css';
 import '../ExampleCreator/ExampleCreator.css';
+import '../../App.css';
 
 export default function ExampleEditor() {
   const [tableOption, setTableOption] = useState('');
@@ -23,9 +24,9 @@ export default function ExampleEditor() {
   const [englishAudio, setEnglishAudio] = useState('');
   const [vocabIncluded, setVocabIncluded] = useState([] as string[]);
   const [vocabComplete, setVocabComplete] = useState(false);
-  const [selectedVocabTerm, setSelectedVocabTerm] = useState(
-    undefined as string | undefined,
-  );
+  // const [selectedVocabTerm, setSelectedVocabTerm] = useState(
+  //   undefined as string | undefined,
+  // );
   const [vocabSearchTerm, setVocabSearchTerm] = useState('');
 
   const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
@@ -33,6 +34,9 @@ export default function ExampleEditor() {
   const { recentlyEditedExamplesQuery, updateRecentlyEditedExample } =
     useRecentlyEditedExamples();
   const { vocabularyQuery } = useVocabulary();
+
+  const [suggestedTags, setSugestedTags] = useState<Vocabulary[]>([]);
+  const { contextual, openContextual, setContextualRef } = useContextualMenu();
 
   const includedVocabObjects = useMemo(() => {
     return vocabIncluded
@@ -61,21 +65,20 @@ export default function ExampleEditor() {
     }
   }, [tableOption, quizExamplesQuery.data, recentlyEditedExamplesQuery.data]);
 
-  const recentlyEditedOption = (
-    <option key="recently-edited" value="recently-edited">
-      Recently Edited
-    </option>
-  );
-
-  const quizCourseOptions = quizCourses.map((course) => {
-    return (
-      <option key={course.code} value={course.code}>
-        {course.name}
-      </option>
-    );
-  });
-
-  const allTableOptions = [recentlyEditedOption, ...quizCourseOptions];
+  const allTableOptions = useMemo(() => {
+    return [
+      <option key="recently-edited" value="recently-edited">
+        Recently Edited
+      </option>,
+      ...quizCourses.map((course) => {
+        return (
+          <option key={course.code} value={course.code}>
+            {course.name}
+          </option>
+        );
+      }),
+    ];
+  }, []);
 
   const updateTableOptions = useCallback(
     (newCourse: string) => {
@@ -88,6 +91,14 @@ export default function ExampleEditor() {
       setTableOption(newCourse);
     },
     [recentlyEditedExamplesQuery, tableOption],
+  );
+
+  const updateVocabSearchTerm = useCallback(
+    (target: EventTarget & HTMLInputElement) => {
+      openContextual('tagSuggestionBox');
+      setVocabSearchTerm(target.value);
+    },
+    [openContextual],
   );
 
   const quizOptions = useMemo(() => {
@@ -125,7 +136,7 @@ export default function ExampleEditor() {
       return 'esp';
     }
   }, [spanishExample]);
-
+  /*
   const vocabOptions = useMemo(() => {
     const filteredVocab =
       vocabularyQuery.data?.filter((term) =>
@@ -145,14 +156,17 @@ export default function ExampleEditor() {
       ...filteredVocabOptions,
     ];
   }, [vocabularyQuery.data, vocabSearchTerm]);
-
-  const addSelectedVocab = useCallback(() => {
-    const vocab = selectedVocabTerm;
-    if (vocab && !vocabIncluded.includes(vocab)) {
-      setVocabIncluded([...vocabIncluded, vocab]);
-      setVocabSearchTerm('');
-    }
-  }, [vocabIncluded, selectedVocabTerm]);
+*/
+  const addSelectedVocab = useCallback(
+    (vocabTerm: string) => {
+      const vocab = vocabTerm;
+      if (vocab && !vocabIncluded.includes(vocab)) {
+        setVocabIncluded([...vocabIncluded, vocab]);
+        setVocabSearchTerm('');
+      }
+    },
+    [vocabIncluded],
+  );
 
   const removeFromVocabIncluded = useCallback(
     (vocabName: string) => {
@@ -160,7 +174,7 @@ export default function ExampleEditor() {
     },
     [vocabIncluded],
   );
-
+  /*
   const currentFlashcard: Flashcard | null = useMemo(() => {
     if (selectedExampleId === null) {
       return null;
@@ -186,6 +200,63 @@ export default function ExampleEditor() {
     spanishExample,
     vocabComplete,
   ]);
+*/
+  const filterTagsByInput = useCallback(
+    (tagInput: string) => {
+      function filterBySearch(vocabularyTable: Vocabulary[] | undefined) {
+        if (!vocabularyTable) {
+          return [];
+        }
+        const filteredTags = [];
+        const searchTerm = tagInput.toLowerCase();
+
+        for (let i = 0; i < vocabularyTable.length; i++) {
+          const tagLowercase = vocabularyTable[i].vocabName.toLowerCase();
+          const descriptorLowercase =
+            vocabularyTable[i].descriptionOfVocabularySkill;
+          if (
+            tagLowercase.includes(searchTerm) ||
+            descriptorLowercase?.includes(searchTerm)
+          ) {
+            if (
+              tagLowercase === searchTerm ||
+              descriptorLowercase === searchTerm
+            ) {
+              filteredTags.unshift(vocabularyTable[i]);
+            } else {
+              filteredTags.push(vocabularyTable[i]);
+            }
+          }
+        }
+
+        return filteredTags;
+      }
+
+      function filterByActiveTags(tag: Vocabulary) {
+        const matchFound = includedVocabObjects.find(
+          (item) => item.recordId === tag.recordId,
+        );
+        if (matchFound) {
+          return false;
+        }
+        return true;
+      }
+      const filteredBySearch = filterBySearch(vocabularyQuery.data);
+      const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags);
+      const suggestTen = [];
+      for (let i = 0; i < 10; i++) {
+        if (filteredByActiveTags[i]) {
+          suggestTen.push(filteredByActiveTags[i]);
+        }
+      }
+      setSugestedTags(suggestTen);
+    },
+    [includedVocabObjects, vocabularyQuery.data],
+  );
+
+  useEffect(() => {
+    filterTagsByInput(vocabSearchTerm);
+  }, [vocabSearchTerm, filterTagsByInput]);
 
   function handleEditExample(e: React.FormEvent) {
     e.preventDefault();
@@ -280,31 +351,52 @@ export default function ExampleEditor() {
             />
           </div>
         )}
-        <form id="vocabTagging" onSubmit={(e) => handleEditExample(e)}>
-          {/* <div id="vocabTagging"> */}
-          <div className="halfOfScreen">
-            <h3>Search for Vocab</h3>
-            {/* <input
+        <form onSubmit={(e) => handleEditExample(e)}>
+          <div id="vocabTagging">
+            {/* <div id="vocabTagging"> */}
+            <div className="halfOfScreen tagSearchBox">
+              <h3>Search for Vocab</h3>
+              {/* <input
               type="text"
               value={vocabSearchTerm}
               onChange={(e) => setVocabSearchTerm(e.target.value)}
             /> */}
-            <input
-              type="text"
-              name="search"
-              id="search"
-              value={vocabSearchTerm}
-              placeholder="Search names, emails, or notes"
-              className="searchBox"
-              onChange={(e) => setVocabSearchTerm(e.target.value)}
-            />
-            <select
+              <input
+                type="text"
+                name="search"
+                id="search"
+                value={vocabSearchTerm}
+                placeholder="Search names, emails, or notes"
+                className="searchBox"
+                onChange={(e) => updateVocabSearchTerm(e.target)}
+                onFocus={(e) => updateVocabSearchTerm(e.target)}
+              />
+              {/* <select
               value={selectedVocabTerm}
               onChange={(e) => setSelectedVocabTerm(e.target.value)}
             >
               {vocabOptions}
             </select>
-            {selectedVocabTerm ? (
+            */}
+
+              {!!vocabSearchTerm.length &&
+                contextual === 'tagSuggestionBox' &&
+                !!suggestedTags.length && (
+                  <div className="tagSuggestionBox" ref={setContextualRef}>
+                    {suggestedTags.map((item) => (
+                      <div
+                        key={item.recordId}
+                        className="vocabTag tagCard"
+                        onClick={() => addSelectedVocab(item.vocabName)}
+                      >
+                        <h4 className="vocabName">
+                          {item.descriptionOfVocabularySkill}
+                        </h4>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              {/* {selectedVocabTerm ? (
               <button type="button" onClick={addSelectedVocab}>
                 Add Vocab
               </button>
@@ -312,23 +404,26 @@ export default function ExampleEditor() {
               <button type="button" className="disabledButton" disabled>
                 Add Vocab
               </button>
-            )}
-          </div>
-          <div className="halfOfScreen">
-            <h3>Vocab Included</h3>
-            {/* <label id="vocabIncluded">Vocab Included</label> */}
-            <div className="vocabTagBox">
-              {includedVocabObjects.map((vocab) => (
-                <VocabTag
-                  key={vocab.recordId}
-                  vocab={vocab}
-                  removeFromVocabList={removeFromVocabIncluded}
-                />
-              ))}
+            )} */}
             </div>
-            {/* </div> */}
+            <div className="halfOfScreen">
+              <h3>Vocab Included</h3>
+              {/* <label id="vocabIncluded">Vocab Included</label> */}
+              <div className="vocabTagBox">
+                {includedVocabObjects.map((vocab) => (
+                  <VocabTag
+                    key={vocab.recordId}
+                    vocab={vocab}
+                    removeFromVocabList={removeFromVocabIncluded}
+                  />
+                ))}
+              </div>
+              {/* </div> */}
+            </div>
           </div>
-          {/* <button type="submit">Save Example</button> */}
+          <div className="buttonBox">
+            <button type="submit">Save Example</button>
+          </div>
         </form>
         <div>
           <h3>Example List</h3>

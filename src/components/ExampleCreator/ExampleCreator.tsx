@@ -1,10 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { NewFlashcard } from 'src/types/interfaceDefinitions';
 import { useUnverifiedExamples } from 'src/hooks/ExampleData/useUnverifiedExamples';
-import {
-  formatEnglishText,
-  formatSpanishText,
-} from 'src/functions/formatFlashcardText';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import 'src/App.css';
 import './ExampleCreator.css';

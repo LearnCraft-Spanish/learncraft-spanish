@@ -8,6 +8,7 @@
 }
 
 .vocabTag {
+  font-size: 12px;
   padding: 7px 5px 0;
   position: relative;
   display: flex;
@@ -19,9 +20,10 @@
   text-align: center;
   overflow: hidden;
   margin: 0 5px;
-  margin-top: 12px;
+  margin-top: 4px;
   border-radius: 0;
   cursor: pointer;
+  min-height: 80px;
 }
 
 .removeTagButton {
@@ -45,7 +47,19 @@
   border-radius: 4px;
   border: 1px solid gray;
   border-radius: 0.2rem;
-  box-sizing: content-box;
+  /* box-sizing: content-box; */
   /* differing styles */
-  margin: 40px;
+  /* margin: 40px; */
+}
+
+.halfOfScreen.tagSearchBox {
+  position: relative;
+  margin: 0 30px;
+}
+.halfOfScreen.tagSearchBox .tagSuggestionBox {
+  margin-top: 70px;
+  height: 500px;
+  overflow-x: auto;
+  background-color: var(--brand);
+  padding: 0 20px;
 }

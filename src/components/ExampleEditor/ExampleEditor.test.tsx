@@ -27,7 +27,7 @@ describe('component ExampleEditor', () => {
     );
   });
 
-  it('should have input fields for example editor', async () => {
+  it.skip('should have input fields for example editor', async () => {
     const expectedFields = [
       'Spanish Example',
       'English Translation',

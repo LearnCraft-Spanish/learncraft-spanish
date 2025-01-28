@@ -85,7 +85,9 @@ export default function EditOrCreateExample({
             />
           </div>
         </div>
-        <button type="submit">Save Example</button>
+        {editOrCreate === 'create' && (
+          <button type="submit">Save Example</button>
+        )}
       </form>
       <div id="examplePreview">
         <h3>Example Preview</h3>
