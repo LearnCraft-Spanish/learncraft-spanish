@@ -6,15 +6,23 @@ import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import quizCourses from 'src/functions/QuizCourseList';
 import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import EditOrCreateExample from '../EditOrCreateExample';
+import EditOrCreateExample from '../editOrCreateExample';
 import { VocabTag } from './VocabTag';
 import './ExampleEditor.css';
 import '../ExampleCreator/ExampleCreator.css';
 import '../../App.css';
 
 export default function ExampleEditor() {
-  const [tableOption, setTableOption] = useState('');
   const [quizId, setQuizId] = useState(undefined as number | undefined);
+
+  const { contextual, openContextual, setContextualRef } = useContextualMenu();
+  const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
+    useOfficialQuizzes(quizId);
+  const { recentlyEditedExamplesQuery, updateRecentlyEditedExample } =
+    useRecentlyEditedExamples();
+  const { vocabularyQuery } = useVocabulary();
+
+  const [tableOption, setTableOption] = useState('');
   const [selectedExampleId, setSelectedExampleId] = useState(
     null as number | null,
   );
@@ -24,19 +32,9 @@ export default function ExampleEditor() {
   const [englishAudio, setEnglishAudio] = useState('');
   const [vocabIncluded, setVocabIncluded] = useState([] as string[]);
   const [vocabComplete, setVocabComplete] = useState(false);
-  // const [selectedVocabTerm, setSelectedVocabTerm] = useState(
-  //   undefined as string | undefined,
-  // );
+
   const [vocabSearchTerm, setVocabSearchTerm] = useState('');
-
-  const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
-    useOfficialQuizzes(quizId);
-  const { recentlyEditedExamplesQuery, updateRecentlyEditedExample } =
-    useRecentlyEditedExamples();
-  const { vocabularyQuery } = useVocabulary();
-
   const [suggestedTags, setSugestedTags] = useState<Vocabulary[]>([]);
-  const { contextual, openContextual, setContextualRef } = useContextualMenu();
 
   const includedVocabObjects = useMemo(() => {
     return vocabIncluded
@@ -65,21 +63,6 @@ export default function ExampleEditor() {
     }
   }, [tableOption, quizExamplesQuery.data, recentlyEditedExamplesQuery.data]);
 
-  const allTableOptions = useMemo(() => {
-    return [
-      <option key="recently-edited" value="recently-edited">
-        Recently Edited
-      </option>,
-      ...quizCourses.map((course) => {
-        return (
-          <option key={course.code} value={course.code}>
-            {course.name}
-          </option>
-        );
-      }),
-    ];
-  }, []);
-
   const updateTableOptions = useCallback(
     (newCourse: string) => {
       if (
@@ -100,16 +83,6 @@ export default function ExampleEditor() {
     },
     [openContextual],
   );
-
-  const quizOptions = useMemo(() => {
-    return quizList?.map((quiz) => {
-      return (
-        <option key={quiz.recordId} value={quiz.recordId}>
-          {quiz.quizNumber}
-        </option>
-      );
-    });
-  }, [quizList]);
 
   const displayOrder = useMemo(() => {
     // Return all records if tableOption is 'recently-edited'
@@ -136,28 +109,8 @@ export default function ExampleEditor() {
       return 'esp';
     }
   }, [spanishExample]);
-  /*
-  const vocabOptions = useMemo(() => {
-    const filteredVocab =
-      vocabularyQuery.data?.filter((term) =>
-        term.vocabName.includes(vocabSearchTerm),
-      ) ?? [];
-    const filteredVocabOptions = filteredVocab.map((vocab) => {
-      return (
-        <option key={vocab.recordId} value={vocab.descriptionOfVocabularySkill}>
-          {vocab.descriptionOfVocabularySkill}
-        </option>
-      );
-    });
-    return [
-      <option key={0} value={undefined}>
-        Choose
-      </option>,
-      ...filteredVocabOptions,
-    ];
-  }, [vocabularyQuery.data, vocabSearchTerm]);
-*/
-  const addSelectedVocab = useCallback(
+
+  const addToSelectedVocab = useCallback(
     (vocabTerm: string) => {
       const vocab = vocabTerm;
       if (vocab && !vocabIncluded.includes(vocab)) {
@@ -167,40 +120,14 @@ export default function ExampleEditor() {
     },
     [vocabIncluded],
   );
-
   const removeFromVocabIncluded = useCallback(
     (vocabName: string) => {
       setVocabIncluded(vocabIncluded.filter((vocab) => vocab !== vocabName));
     },
     [vocabIncluded],
   );
-  /*
-  const currentFlashcard: Flashcard | null = useMemo(() => {
-    if (selectedExampleId === null) {
-      return null;
-    } else {
-      return {
-        recordId: selectedExampleId ?? 0,
-        spanglish,
-        spanishExample,
-        englishTranslation,
-        spanishAudioLa,
-        englishAudio,
-        vocabIncluded,
-        vocabComplete,
-      };
-    }
-  }, [
-    selectedExampleId,
-    spanglish,
-    vocabIncluded,
-    englishAudio,
-    englishTranslation,
-    spanishAudioLa,
-    spanishExample,
-    vocabComplete,
-  ]);
-*/
+
+  // essentailly same filtering used in FLashcardFinder
   const filterTagsByInput = useCallback(
     (tagInput: string) => {
       function filterBySearch(vocabularyTable: Vocabulary[] | undefined) {
@@ -254,10 +181,6 @@ export default function ExampleEditor() {
     [includedVocabObjects, vocabularyQuery.data],
   );
 
-  useEffect(() => {
-    filterTagsByInput(vocabSearchTerm);
-  }, [vocabSearchTerm, filterTagsByInput]);
-
   function handleEditExample(e: React.FormEvent) {
     e.preventDefault();
     if (selectedExampleId !== null) {
@@ -309,6 +232,12 @@ export default function ExampleEditor() {
     vocabularyQuery.data,
     selectedExampleId,
   ]);
+
+  // search functionality for vocab tags
+  useEffect(() => {
+    filterTagsByInput(vocabSearchTerm);
+  }, [vocabSearchTerm, filterTagsByInput]);
+
   // Update default quiz when tableOption changes
   useEffect(() => {
     if (!firstQuiz) {
@@ -326,105 +255,83 @@ export default function ExampleEditor() {
       <div>
         {!selectedExampleId && (
           <div>
-            <h3>Example Preview</h3>
             <h4>Please select an example to preview/edit</h4>
           </div>
         )}
         {selectedExampleId && (
-          <div id="exampleEditor">
-            <EditOrCreateExample
-              editOrCreate="edit"
-              onSubmit={handleEditExample}
-              spanishExample={spanishExample}
-              setSpanishExample={setSpanishExample}
-              spanglish={spanglish}
-              englishTranslation={englishTranslation}
-              setEnglishTranslation={setEnglishTranslation}
-              spanishAudioLa={spanishAudioLa}
-              setSpanishAudioLa={setSpanishAudioLa}
-              englishAudio={englishAudio}
-              setEnglishAudio={setEnglishAudio}
-              // vocabIncluded={vocabIncluded}
-              // setVocabIncluded={setVocabIncluded}
-              // vocabComplete={vocabComplete}
-              // setVocabComplete={setVocabComplete}
-            />
-          </div>
-        )}
-        <form onSubmit={(e) => handleEditExample(e)}>
-          <div id="vocabTagging">
-            {/* <div id="vocabTagging"> */}
-            <div className="halfOfScreen tagSearchBox">
-              <h3>Search for Vocab</h3>
-              {/* <input
-              type="text"
-              value={vocabSearchTerm}
-              onChange={(e) => setVocabSearchTerm(e.target.value)}
-            /> */}
-              <input
-                type="text"
-                name="search"
-                id="search"
-                value={vocabSearchTerm}
-                placeholder="Search names, emails, or notes"
-                className="searchBox"
-                onChange={(e) => updateVocabSearchTerm(e.target)}
-                onFocus={(e) => updateVocabSearchTerm(e.target)}
+          <>
+            <div id="exampleEditor">
+              <EditOrCreateExample
+                editOrCreate="edit"
+                onSubmit={handleEditExample}
+                spanishExample={spanishExample}
+                setSpanishExample={setSpanishExample}
+                spanglish={spanglish}
+                englishTranslation={englishTranslation}
+                setEnglishTranslation={setEnglishTranslation}
+                spanishAudioLa={spanishAudioLa}
+                setSpanishAudioLa={setSpanishAudioLa}
+                englishAudio={englishAudio}
+                setEnglishAudio={setEnglishAudio}
+                // vocabIncluded={vocabIncluded}
+                // setVocabIncluded={setVocabIncluded}
+                // vocabComplete={vocabComplete}
+                // setVocabComplete={setVocabComplete}
               />
-              {/* <select
-              value={selectedVocabTerm}
-              onChange={(e) => setSelectedVocabTerm(e.target.value)}
-            >
-              {vocabOptions}
-            </select>
-            */}
-
-              {!!vocabSearchTerm.length &&
-                contextual === 'tagSuggestionBox' &&
-                !!suggestedTags.length && (
-                  <div className="tagSuggestionBox" ref={setContextualRef}>
-                    {suggestedTags.map((item) => (
-                      <div
-                        key={item.recordId}
-                        className="vocabTag tagCard"
-                        onClick={() => addSelectedVocab(item.vocabName)}
-                      >
-                        <h4 className="vocabName">
-                          {item.descriptionOfVocabularySkill}
-                        </h4>
+            </div>
+            <form onSubmit={(e) => handleEditExample(e)}>
+              <div id="vocabTagging">
+                <div className="halfOfScreen tagSearchBox">
+                  <h3>Search for Vocab</h3>
+                  <input
+                    type="text"
+                    name="search"
+                    id="search"
+                    value={vocabSearchTerm}
+                    placeholder="Search names, emails, or notes"
+                    className="searchBox"
+                    onChange={(e) => updateVocabSearchTerm(e.target)}
+                    onFocus={(e) => updateVocabSearchTerm(e.target)}
+                  />
+                  {/* Contextual with results from search bar */}
+                  {!!vocabSearchTerm.length &&
+                    contextual === 'tagSuggestionBox' &&
+                    !!suggestedTags.length && (
+                      <div className="tagSuggestionBox" ref={setContextualRef}>
+                        {suggestedTags.map((item) => (
+                          <div
+                            key={item.recordId}
+                            className="vocabTag tagCard"
+                            onClick={() => addToSelectedVocab(item.vocabName)}
+                          >
+                            <h4 className="vocabName">
+                              {item.descriptionOfVocabularySkill}
+                            </h4>
+                          </div>
+                        ))}
                       </div>
+                    )}
+                </div>
+                <div className="halfOfScreen">
+                  <h3>Vocab Included</h3>
+                  <div className="vocabTagBox">
+                    {includedVocabObjects.map((vocab) => (
+                      <VocabTag
+                        key={vocab.recordId}
+                        vocab={vocab}
+                        removeFromVocabList={removeFromVocabIncluded}
+                      />
                     ))}
                   </div>
-                )}
-              {/* {selectedVocabTerm ? (
-              <button type="button" onClick={addSelectedVocab}>
-                Add Vocab
-              </button>
-            ) : (
-              <button type="button" className="disabledButton" disabled>
-                Add Vocab
-              </button>
-            )} */}
-            </div>
-            <div className="halfOfScreen">
-              <h3>Vocab Included</h3>
-              {/* <label id="vocabIncluded">Vocab Included</label> */}
-              <div className="vocabTagBox">
-                {includedVocabObjects.map((vocab) => (
-                  <VocabTag
-                    key={vocab.recordId}
-                    vocab={vocab}
-                    removeFromVocabList={removeFromVocabIncluded}
-                  />
-                ))}
+                </div>
               </div>
-              {/* </div> */}
-            </div>
-          </div>
-          <div className="buttonBox">
-            <button type="submit">Save Example</button>
-          </div>
-        </form>
+              <div className="buttonBox">
+                <button type="submit">Save Example</button>
+              </div>
+            </form>
+          </>
+        )}
+
         <div>
           <h3>Example List</h3>
           <select
@@ -432,14 +339,29 @@ export default function ExampleEditor() {
             onChange={(e) => updateTableOptions(e.target.value)}
           >
             <option value="">Select Example List</option>
-            {allTableOptions}
+            <option key="recently-edited" value="recently-edited">
+              Recently Edited
+            </option>
+            {quizCourses.map((course) => {
+              return (
+                <option key={course.code} value={course.code}>
+                  {course.name}
+                </option>
+              );
+            })}
           </select>
           {!!tableOption && tableOption !== 'recently-edited' && (
             <select
               value={quizId}
               onChange={(e) => setQuizId(Number.parseInt(e.target.value))}
             >
-              {quizOptions}
+              {quizList?.map((quiz) => {
+                return (
+                  <option key={quiz.recordId} value={quiz.recordId}>
+                    {quiz.quizNumber}
+                  </option>
+                );
+              })}
             </select>
           )}
         </div>

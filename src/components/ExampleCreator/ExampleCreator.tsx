@@ -4,7 +4,7 @@ import { useUnverifiedExamples } from 'src/hooks/ExampleData/useUnverifiedExampl
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import 'src/App.css';
 import './ExampleCreator.css';
-import EditOrCreateExample from '../EditOrCreateExample';
+import EditOrCreateExample from '../editOrCreateExample';
 
 export default function ExampleCreator() {
   const [spanishExample, setSpanishExample] = useState('');
