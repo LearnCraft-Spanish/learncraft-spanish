@@ -174,12 +174,12 @@ describe('useBackend Hook', () => {
 
   testArrayFetchFunction({
     functionName: 'getAllUsersFromBackend',
-    requiredFields: ['isAdmin'],
+    requiredFields: ['roles'],
   });
 
   testObjectFetchFunction({
     functionName: 'getUserDataFromBackend',
-    requiredFields: ['recordId', 'emailAddress', 'role'],
+    requiredFields: ['recordId', 'emailAddress', 'roles'],
   });
 
   testObjectFetchFunction({
