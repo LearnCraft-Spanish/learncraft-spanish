@@ -2,9 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useBackend } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
+
+import useAssignments from './useAssignments';
 export default function useCoaching() {
   const userDataQuery = useUserData();
   const backend = useBackend();
+
+  const { assignmentsQuery } = useAssignments();
 
   /* --------- Queries --------- */
   const lastThreeWeeksQuery = useQuery({
@@ -64,15 +68,6 @@ export default function useCoaching() {
   const groupAttendeesQuery = useQuery({
     queryKey: ['groupAttendees'],
     queryFn: backend.getGroupAttendees,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const assignmentsQuery = useQuery({
-    queryKey: ['assignments'],
-    queryFn: backend.getAssignments,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||
