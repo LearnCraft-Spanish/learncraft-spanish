@@ -32,7 +32,7 @@ export default function useAssignments() {
 
   interface AssignmentForCreation {
     relatedWeek: number;
-    // homeworkCorrector: QbUser;
+    homeworkCorrector: string;
     assignmentType: string;
     rating: string;
     notes: string;
