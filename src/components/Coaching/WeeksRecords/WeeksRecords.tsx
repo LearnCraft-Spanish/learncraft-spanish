@@ -37,7 +37,7 @@ export default function WeeksRecordsSection() {
     groupSessionsQuery,
     groupAttendeesQuery,
     assignmentsQuery,
-    callsQuery,
+    privateCallsQuery,
     getCoachFromMembershipId,
     getCourseFromMembershipId,
     getStudentFromMembershipId,
@@ -71,7 +71,7 @@ export default function WeeksRecordsSection() {
     groupSessionsQuery.isSuccess &&
     groupAttendeesQuery.isSuccess &&
     assignmentsQuery.isSuccess &&
-    callsQuery.isSuccess;
+    privateCallsQuery.isSuccess;
 
   const dataLoading =
     !dataReady &&
