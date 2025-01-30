@@ -1243,5 +1243,6 @@ i {
   --toastify-color-success: darkgreen;
   --toastify-color-error: darkred;
   --toastify-toast-bd-radius: 0;
-  --toastify-toast-min-height: 40px;
+  /* --toastify-toast-min-height: 40px; */
+  --toastify-font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
 }
