@@ -94,6 +94,7 @@ export default function AssignmentsCell({
   const userDataQuery = useUserData();
 
   function createNewAssignment() {
+    /*
     createAssignmentMutation.mutate({
       relatedWeek: week.recordId,
       homeworkCorrector: userDataQuery.data?.emailAddress || 'no email',
@@ -103,6 +104,8 @@ export default function AssignmentsCell({
       areasOfDifficulty: '',
       assignmentLink: '',
     });
+    */
+    console.error('createNewAssignment form not yet implemented');
   }
 
   return (
@@ -119,7 +122,7 @@ export default function AssignmentsCell({
         className="greenButton"
         onClick={() => openContextual(`addAssignment${week.recordId}`)}
       >
-        Add Assignment
+        New
       </button>
       {contextual === `addAssignment${week.recordId}` && (
         <div

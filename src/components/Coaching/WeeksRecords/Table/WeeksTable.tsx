@@ -104,8 +104,7 @@ export default function WeeksTable({ weeks }: NewTableProps) {
                   </td>
                   {/* <td>{week.groupCallComments}</td> */}
                   <td>
-                    {week.privateCallsCompleted > 0 && (
-                      // getPrivateCallsFromWeekRecordId(week.recordId)?.map(
+                    {week.membershipCourseWeeklyPrivateCalls > 0 && (
                       <PrivateCallsCell week={week} />
                     )}
                   </td>

@@ -4,11 +4,14 @@ import { useBackend } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
 
 import useAssignments from './useAssignments';
+import usePrivateCalls from './usePrivateCalls';
+
 export default function useCoaching() {
   const userDataQuery = useUserData();
   const backend = useBackend();
 
   const { assignmentsQuery } = useAssignments();
+  const { privateCallsQuery } = usePrivateCalls();
 
   /* --------- Queries --------- */
   const lastThreeWeeksQuery = useQuery({
@@ -68,15 +71,6 @@ export default function useCoaching() {
   const groupAttendeesQuery = useQuery({
     queryKey: ['groupAttendees'],
     queryFn: backend.getGroupAttendees,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const callsQuery = useQuery({
-    queryKey: ['calls'],
-    queryFn: backend.getCalls,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||
@@ -282,15 +276,19 @@ export default function useCoaching() {
 
   const getPrivateCallsFromWeekRecordId = useCallback(
     (weekId: number) => {
-      if (!callsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      if (!privateCallsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
         return null;
       }
-      const privateCalls = callsQuery.data.filter(
+      const privateCalls = privateCallsQuery.data.filter(
         (call) => call.relatedWeek === weekId,
       );
       return privateCalls;
     },
-    [callsQuery, lastThreeWeeksQuery],
+    [
+      lastThreeWeeksQuery.isSuccess,
+      privateCallsQuery.data,
+      privateCallsQuery.isSuccess,
+    ],
   );
 
   const getAttendeesFromGroupSessionId = useCallback(
@@ -338,7 +336,7 @@ export default function useCoaching() {
     groupSessionsQuery,
     groupAttendeesQuery,
     assignmentsQuery,
-    callsQuery,
+    privateCallsQuery,
 
     getCoachFromMembershipId,
     getCourseFromMembershipId,

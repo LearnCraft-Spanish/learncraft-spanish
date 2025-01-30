@@ -362,8 +362,10 @@ export function useBackend() {
     return getFactory('coaching/assignments');
   }, [getFactory]);
 
-  const getCalls = useCallback((): Promise<StudentRecordsTypes.Call[]> => {
-    return getFactory('coaching/calls');
+  const getPrivateCalls = useCallback((): Promise<
+    StudentRecordsTypes.Call[]
+  > => {
+    return getFactory('coaching/private-calls');
   }, [getFactory]);
   /*      POST Requests      */
 
@@ -515,7 +517,7 @@ export function useBackend() {
     getAllUsersFromBackend,
     getAssignments,
     getAudioExamplesFromBackend,
-    getCalls,
+    getPrivateCalls,
     getCoachList,
     getCourseList,
     getExamplesFromBackend,
