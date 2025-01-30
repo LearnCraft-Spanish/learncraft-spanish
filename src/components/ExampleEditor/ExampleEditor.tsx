@@ -185,11 +185,12 @@ export default function ExampleEditor() {
   );
 
   const formSubmissionAfterConfirm = (
-    confirmSubmissionTwo: boolean = false,
+    confirmSubmissionResult: boolean = false,
   ) => {
     if (selectedExampleId !== null) {
+      // had to add a double check for confirmSubmission because of the way the state is set directly before this function is called, there must be a better way to do this
       if (
-        ((confirmSubmission || confirmSubmissionTwo) && vocabComplete) ||
+        ((confirmSubmission || confirmSubmissionResult) && vocabComplete) ||
         !vocabComplete
       ) {
         if (!!tableOption && tableOption !== 'recently-edited') {
