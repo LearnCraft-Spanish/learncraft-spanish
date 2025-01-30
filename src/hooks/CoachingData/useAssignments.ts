@@ -1,6 +1,5 @@
-import path from 'node:path';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import type { Assignment } from 'src/types/CoachingTypes';
+import type { Assignment, QbUser } from 'src/types/CoachingTypes';
 import { useBackend, useBackendHelpers } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
 
@@ -32,8 +31,18 @@ export default function useAssignments() {
       (assignment) => assignment.recordId === recordId,
     );
   };
+
+  interface AssignmentForCreation {
+    relatedWeek: number;
+    // homeworkCorrector: QbUser;
+    assignmentType: string;
+    rating: string;
+    notes: string;
+    areasOfDifficulty: string;
+    assignmentLink: string;
+  }
   const createAssignmentMutation = useMutation({
-    mutationFn: (assignment: Assignment) => {
+    mutationFn: (assignment: AssignmentForCreation) => {
       return newPostFactory({ path: 'coaching/assignments', body: assignment });
     },
   });

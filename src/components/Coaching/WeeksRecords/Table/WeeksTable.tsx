@@ -90,16 +90,12 @@ export default function WeeksTable({ weeks }: NewTableProps) {
               </td> */}
                   <td>{week.weekStarts.toString()}</td>
                   <td>
-                    {week.assignmentRatings.length > 0 &&
-                      getAssignmentsFromWeekRecordId(week.recordId)?.map(
-                        (assignment) => (
-                          // <p>{assignment.rating}</p>
-                          <AssignmentsCell
-                            assignment={assignment}
-                            key={`assignment${assignment.recordId}`}
-                          />
-                        ),
+                    <AssignmentsCell
+                      assignments={getAssignmentsFromWeekRecordId(
+                        week.recordId,
                       )}
+                      week={week}
+                    />
                   </td>
                   <td>
                     {week.numberOfGroupCalls > 0 && (

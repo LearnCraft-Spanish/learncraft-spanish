@@ -1,12 +1,10 @@
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import type { Assignment } from 'src/types/CoachingTypes';
+import useAssignments from 'src/hooks/CoachingData/useAssignments';
+import type { Assignment, Week } from 'src/types/CoachingTypes';
 import ContextualControlls from 'src/components/ContextualControlls';
-export default function AssignmentsCell({
-  assignment,
-}: {
-  assignment: Assignment;
-}) {
+import { useUserData } from 'src/hooks/UserData/useUserData';
+function AssignmentCell({ assignment }: { assignment: Assignment }) {
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
     useCoaching();
   const { contextual, openContextual, setContextualRef } = useContextualMenu();
@@ -76,6 +74,106 @@ export default function AssignmentsCell({
                 Close
               </button>
             </div> */}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function AssignmentsCell({
+  assignments,
+  week,
+}: {
+  assignments: Assignment[] | null | undefined;
+  week: Week;
+}) {
+  const { contextual, openContextual, setContextualRef, closeContextual } =
+    useContextualMenu();
+  const { createAssignmentMutation } = useAssignments();
+  const { getCoachFromMembershipId } = useCoaching();
+
+  function createNewAssignment() {
+    const homeworkCorrector = getCoachFromMembershipId(week.relatedMembership);
+    if (!homeworkCorrector) {
+      throw new Error('Could not find the current user in the coach list');
+    }
+    createAssignmentMutation.mutate({
+      relatedWeek: week.recordId,
+      // homeworkCorrector: homeworkCorrector.user,
+      assignmentType: 'Pronunciation',
+      rating: 'Excellent',
+      notes: '',
+      areasOfDifficulty: '',
+      assignmentLink: '',
+    });
+  }
+
+  return (
+    <div className="assignmentsCell">
+      {!!assignments &&
+        assignments.map((assignment) => (
+          <AssignmentCell
+            assignment={assignment}
+            key={`assignment${assignment.recordId}`}
+          />
+        ))}
+      <button
+        type="button"
+        className="greenButton"
+        onClick={() => openContextual(`addAssignment${week.recordId}`)}
+      >
+        Add Assignment
+      </button>
+      {contextual === `addAssignment${week.recordId}` && (
+        <div
+          className="contextualWrapper"
+          key={`addAssignment${week.recordId}`}
+        >
+          <div className="contextual" ref={setContextualRef}>
+            <ContextualControlls />
+            <h4>Add Assignment for (student name)</h4>
+            <div className="lineWrapper">
+              <p className="label">Corrected By: </p>
+              <p>will be active coach I assume</p>
+              {/* <input type="text" / */}
+            </div>
+            <div className="lineWrapper">
+              <p className="label">Assignment Type: </p>
+              <input type="text" />
+            </div>
+            <div className="lineWrapper">
+              <p className="label">Rating: </p>
+              <input type="text" />
+            </div>
+            <div className="lineWrapper">
+              <p className="label">Notes: </p>
+              <input type="text" />
+            </div>
+            <div className="lineWrapper">
+              <p className="label">Areas of Difficulty: </p>
+              <input type="text" />
+            </div>
+            <div className="lineWrapper">
+              <p className="label">Assignment Link: </p>
+              <input type="text" />
+            </div>
+            <div className="buttonBox">
+              <button
+                type="button"
+                className="redButton"
+                onClick={closeContextual}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="greenButton"
+                onClick={createNewAssignment}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </div>
       )}
