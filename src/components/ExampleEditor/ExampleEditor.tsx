@@ -34,7 +34,6 @@ export default function ExampleEditor() {
   const [vocabIncluded, setVocabIncluded] = useState([] as string[]);
 
   const [vocabComplete, setVocabComplete] = useState(false);
-  const [confirmSubmission, setConfirmSubmission] = useState(false);
 
   const [vocabSearchTerm, setVocabSearchTerm] = useState('');
   const [suggestedTags, setSugestedTags] = useState<Vocabulary[]>([]);
@@ -184,15 +183,10 @@ export default function ExampleEditor() {
     [includedVocabObjects, vocabularyQuery.data],
   );
 
-  const formSubmissionAfterConfirm = (
-    confirmSubmissionResult: boolean = false,
-  ) => {
+  function handleEditExample(e: React.FormEvent) {
+    e.preventDefault();
     if (selectedExampleId !== null) {
-      // had to add a double check for confirmSubmission because of the way the state is set directly before this function is called, there must be a better way to do this
-      if (
-        ((confirmSubmission || confirmSubmissionResult) && vocabComplete) ||
-        !vocabComplete
-      ) {
+      if (selectedExampleId !== null) {
         if (!!tableOption && tableOption !== 'recently-edited') {
           updateQuizExample({
             recordId: selectedExampleId,
@@ -217,33 +211,23 @@ export default function ExampleEditor() {
           });
         }
       }
-      setConfirmSubmission(false);
-    }
-  };
-  function handleEditExample(e: React.FormEvent | undefined = undefined) {
-    if (e) {
-      e.preventDefault();
-    }
-    if (selectedExampleId !== null) {
-      if (vocabComplete && !confirmSubmission) {
-        openContextual('confirmSubmission');
-      } else {
-        formSubmissionAfterConfirm();
-      }
     }
   }
 
-  const updateConfirmSubmission = (
+  const handleVerifyExampleChange = (newValue: boolean) => {
+    if (newValue) {
+      openContextual('confirmSubmission');
+    } else {
+      setVocabComplete(false);
+    }
+  };
+  const finalizeVerifyExampleChange = (
     e: React.FormEvent,
     confirmSubmissionValue: boolean,
   ) => {
     e.preventDefault();
-    setConfirmSubmission(confirmSubmissionValue);
     setVocabComplete(confirmSubmissionValue);
     closeContextual();
-    if (confirmSubmissionValue) {
-      formSubmissionAfterConfirm(confirmSubmissionValue);
-    }
   };
   // Reset Properties when active example changes
   useEffect(() => {
@@ -258,7 +242,6 @@ export default function ExampleEditor() {
         setEnglishAudio(example.englishAudio);
         setVocabIncluded(example.vocabIncluded);
         setVocabComplete(example.vocabComplete);
-        setConfirmSubmission(false);
       }
     }
   }, [
@@ -299,7 +282,9 @@ export default function ExampleEditor() {
             <div id="exampleEditor">
               <EditOrCreateExample
                 editOrCreate="edit"
-                onSubmit={handleEditExample}
+                onSubmit={() =>
+                  new Error('this should not be called in ExampleEditor')
+                }
                 spanishExample={spanishExample}
                 setSpanishExample={setSpanishExample}
                 spanglish={spanglish}
@@ -366,7 +351,9 @@ export default function ExampleEditor() {
                     name="Vocab Complete"
                     id="vocabComplete"
                     checked={vocabComplete}
-                    onChange={(e) => setVocabComplete(e.target.checked)}
+                    onChange={(e) =>
+                      handleVerifyExampleChange(e.target.checked)
+                    }
                   />
                   <span className="slider round"></span>
                 </label>
@@ -377,7 +364,7 @@ export default function ExampleEditor() {
             </form>
             {contextual === 'confirmSubmission' && (
               <div className="confirmSubmissionBox" ref={setContextualRef}>
-                <form onSubmit={(e) => updateConfirmSubmission(e, true)}>
+                <form onSubmit={(e) => finalizeVerifyExampleChange(e, true)}>
                   <h3>Are you sure?</h3>
                   <p>
                     <b>Warning!</b> You are about to mark this example as "Vocab
@@ -388,7 +375,7 @@ export default function ExampleEditor() {
                     <button
                       className="removeButton"
                       type="button"
-                      onClick={(e) => updateConfirmSubmission(e, false)}
+                      onClick={(e) => finalizeVerifyExampleChange(e, false)}
                     >
                       Go Back
                     </button>
