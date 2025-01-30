@@ -91,16 +91,12 @@ export default function AssignmentsCell({
   const { contextual, openContextual, setContextualRef, closeContextual } =
     useContextualMenu();
   const { createAssignmentMutation } = useAssignments();
-  const { getCoachFromMembershipId } = useCoaching();
+  const userDataQuery = useUserData();
 
   function createNewAssignment() {
-    const homeworkCorrector = getCoachFromMembershipId(week.relatedMembership);
-    if (!homeworkCorrector) {
-      throw new Error('Could not find the current user in the coach list');
-    }
     createAssignmentMutation.mutate({
       relatedWeek: week.recordId,
-      // homeworkCorrector: homeworkCorrector.user,
+      homeworkCorrector: userDataQuery.data?.emailAddress || 'no email',
       assignmentType: 'Pronunciation',
       rating: 'Excellent',
       notes: '',
