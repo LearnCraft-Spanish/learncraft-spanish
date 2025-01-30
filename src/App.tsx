@@ -35,7 +35,11 @@ export const App: React.FC = () => {
   }, []);
 
   const makeStudentSelector = useCallback(() => {
-    if (userDataQuery.data?.isAdmin && studentListQuery.isSuccess) {
+    if (
+      (userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin') &&
+      studentListQuery.isSuccess
+    ) {
       const studentSelector = [
         <option key={0} label="">
           -- None Selected --
@@ -43,7 +47,7 @@ export const App: React.FC = () => {
       ];
       studentListQuery.data.forEach((student: UserData) => {
         const studentEmail = student.emailAddress;
-        const studentRole = student.role;
+        const studentRole = student.roles.studentRole;
         if (
           !studentEmail.includes('(') &&
           (studentRole === 'student' || studentRole === 'limited')
@@ -73,7 +77,7 @@ export const App: React.FC = () => {
       return studentSelector;
     }
   }, [
-    userDataQuery.data?.isAdmin,
+    userDataQuery.data?.roles,
     studentListQuery.isSuccess,
     studentListQuery.data,
   ]);
@@ -123,9 +127,12 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              (userDataQuery.data?.role === 'student' ||
-                userDataQuery.data?.role === 'limited') &&
-              !userDataQuery.data?.isAdmin &&
+              (userDataQuery.data?.roles.studentRole === 'student' ||
+                userDataQuery.data?.roles.studentRole === 'limited') &&
+              !(
+                userDataQuery.data?.roles.adminRole === 'coach' ||
+                userDataQuery.data?.roles.adminRole === 'admin'
+              ) &&
               (userDataQuery.data.name ? (
                 <p>{`Welcome back, ${userDataQuery.data.name}!`}</p>
               ) : (
@@ -135,50 +142,60 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              userDataQuery.data?.role !== 'student' &&
-              userDataQuery.data?.role !== 'limited' &&
-              !userDataQuery.data?.isAdmin && <p>Welcome back!</p>}
+              userDataQuery.data?.roles.studentRole !== 'student' &&
+              userDataQuery.data?.roles.studentRole !== 'limited' &&
+              !(
+                userDataQuery.data?.roles.adminRole === 'coach' ||
+                userDataQuery.data?.roles.adminRole === 'admin'
+              ) && <p>Welcome back!</p>}
 
-            {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
-              <div className="studentList">
-                {activeStudentQuery.data?.recordId && (
-                  <p>
-                    {`Using as ${activeStudentQuery.data?.name}
+            {(userDataQuery.data?.roles.adminRole === 'coach' ||
+              userDataQuery.data?.roles.adminRole === 'admin') &&
+              !studentSelectorOpen && (
+                <div className="studentList">
+                  {activeStudentQuery.data?.recordId && (
+                    <p>
+                      {`Using as ${activeStudentQuery.data?.name}
                   ${
                     activeStudentQuery.data?.recordId ===
                     userDataQuery.data?.recordId
                       ? ' (yourself)'
                       : ''
                   }`}
-                  </p>
-                )}
-                {!activeStudentQuery.data?.recordId && (
-                  <p>No student Selected</p>
-                )}
-                <button type="button" onClick={openStudentSelector}>
-                  Change
-                </button>
-              </div>
-            )}
-            {userDataQuery.data?.isAdmin && studentSelectorOpen && (
-              <form className="studentList" onSubmit={(e) => e.preventDefault}>
-                <select
-                  value={
-                    activeStudentQuery.data
-                      ? activeStudentQuery.data?.recordId
-                      : undefined
-                  }
-                  onChange={(e) =>
-                    chooseStudent(Number.parseInt(e.target.value))
-                  }
+                    </p>
+                  )}
+                  {!activeStudentQuery.data?.recordId && (
+                    <p>No student Selected</p>
+                  )}
+                  <button type="button" onClick={openStudentSelector}>
+                    Change
+                  </button>
+                </div>
+              )}
+            {(userDataQuery.data?.roles.adminRole === 'coach' ||
+              userDataQuery.data?.roles.adminRole === 'admin') &&
+              studentSelectorOpen && (
+                <form
+                  className="studentList"
+                  onSubmit={(e) => e.preventDefault}
                 >
-                  {makeStudentSelector()}
-                </select>
-                <button type="button" onClick={closeStudentSelector}>
-                  Cancel
-                </button>
-              </form>
-            )}
+                  <select
+                    value={
+                      activeStudentQuery.data
+                        ? activeStudentQuery.data?.recordId
+                        : undefined
+                    }
+                    onChange={(e) =>
+                      chooseStudent(Number.parseInt(e.target.value))
+                    }
+                  >
+                    {makeStudentSelector()}
+                  </select>
+                  <button type="button" onClick={closeStudentSelector}>
+                    Cancel
+                  </button>
+                </form>
+              )}
           </div>
         )}
 

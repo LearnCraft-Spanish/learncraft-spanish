@@ -8,7 +8,9 @@ export function useVocabulary() {
   const userDataQuery = useUserData();
   const { getVocabFromBackend } = useBackend();
   const hasAccess =
-    userDataQuery.data?.isAdmin || userDataQuery.data?.role === 'student';
+    userDataQuery.data?.roles.adminRole === 'coach' ||
+    userDataQuery.data?.roles.adminRole === 'admin' ||
+    userDataQuery.data?.roles.studentRole === 'student';
 
   const nextTagId = useRef(1);
 

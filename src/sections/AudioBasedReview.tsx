@@ -35,9 +35,10 @@ export default function AudioBasedReview({
     activeStudentQuery.isSuccess &&
     programTableQuery.isSuccess &&
     audioExamplesQuery.isSuccess &&
-    (userDataQuery.data?.isAdmin ||
-      activeStudentQuery.data?.role === 'student' ||
-      activeStudentQuery.data?.role === 'limited');
+    (userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin' ||
+      activeStudentQuery.data?.roles.studentRole === 'student' ||
+      activeStudentQuery.data?.roles.studentRole === 'limited');
   const isError =
     !dataReady &&
     (userDataQuery.isError ||

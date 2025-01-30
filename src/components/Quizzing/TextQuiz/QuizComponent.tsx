@@ -357,7 +357,9 @@ export default function QuizComponent({
           {currentFlashcardIsValid && (
             <FlashcardDisplay
               example={currentExample}
-              isStudent={activeStudentQuery.data?.role === 'student'}
+              isStudent={
+                activeStudentQuery.data?.roles.studentRole === 'student'
+              }
               incrementExampleNumber={incrementExampleNumber}
               onRemove={onRemove}
               answerShowing={answerShowing}

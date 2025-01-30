@@ -15,18 +15,26 @@ export function useActiveStudent() {
     queryKey: ['studentList'],
     queryFn: getAllUsersFromBackend,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin, // Only fetch if the user is an admin
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   async function getActiveStudent(): Promise<UserData | null> {
     if (
-      (!userDataQuery.data?.isAdmin ||
+      (!(
+        userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin'
+      ) ||
         !queryClient.getQueryData(['activeStudentSelection'])) &&
-      (userDataQuery.data?.role === 'student' ||
-        userDataQuery.data?.role === 'limited')
+      (userDataQuery.data?.roles.studentRole === 'student' ||
+        userDataQuery.data?.roles.studentRole === 'limited')
     ) {
       return userDataQuery.data; // Students are their own activeStudent
-    } else if (userDataQuery.data?.isAdmin) {
+    } else if (
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin'
+    ) {
       return queryClient.getQueryData(['activeStudentSelection']) || null; // Admin-selected activeStudent
     } else {
       return null;
@@ -41,7 +49,11 @@ export function useActiveStudent() {
   });
 
   const chooseStudent = (studentId: number | null) => {
-    if (userDataQuery.data?.isAdmin && studentListQuery.data) {
+    if (
+      (userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin') &&
+      studentListQuery.data
+    ) {
       const student =
         studentListQuery.data.find(
           (student) => student.recordId === studentId,

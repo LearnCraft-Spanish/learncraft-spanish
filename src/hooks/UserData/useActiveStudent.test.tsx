@@ -8,7 +8,10 @@ import { useActiveStudent } from './useActiveStudent';
 const api = serverlikeData().api;
 
 const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === 'student' && student.isAdmin === true,
+  (student) =>
+    student.roles.studentRole === 'student' &&
+    (student.roles.adminRole === 'coach' ||
+      student.roles.adminRole === 'admin'),
 );
 
 describe('useActiveStudent', () => {

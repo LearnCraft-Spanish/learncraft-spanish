@@ -4,9 +4,11 @@
     "name": "Student B",
     "emailAddress": "classicalmoser@gmail.com",
     "cohort": "A",
-    "role": "student",
-    "relatedProgram": 3,
-    "isAdmin": false
+    "roles": {
+      "studentRole": "student",
+      "adminRole": ""
+    },
+    "relatedProgram": 3
   },
   "samplePrograms": [
     {

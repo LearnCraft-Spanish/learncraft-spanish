@@ -9,7 +9,9 @@ export function useRecentlyEditedExamples() {
   const { updateExampleFromQuery } = useExampleUpdate();
   const userDataQuery = useUserData();
   const { getRecentlyEditedExamples, createUnverifiedExample } = useBackend();
-  const hasAccess = userDataQuery.data?.isAdmin;
+  const hasAccess =
+    userDataQuery.data?.roles.adminRole === 'coach' ||
+    userDataQuery.data?.roles.adminRole === 'admin';
 
   const recentlyEditedExamplesQuery = useQuery({
     queryKey: ['recentlyEditedExamples'],

@@ -37,7 +37,7 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
   const dataReady =
     flashcardDataQuery.isSuccess && activeStudentQuery.isSuccess;
 
-  const isStudent = activeStudentQuery.data?.role === 'student';
+  const isStudent = activeStudentQuery.data?.roles.studentRole === 'student';
   const isCollected = exampleIsCollected(data.recordId);
   const isPending = exampleIsPending(data.recordId);
   const isCustom = exampleIsCustom(data.recordId);

@@ -44,9 +44,11 @@ export interface UserData {
   name: string;
   emailAddress: string;
   cohort: string;
-  role: string;
   relatedProgram: number;
-  isAdmin: boolean;
+  roles: {
+    studentRole: '' | 'limited' | 'student';
+    adminRole: '' | 'coach' | 'admin';
+  };
 }
 // selectedProgram is a program, or null
 export type selectedProgram = Program | null;
