@@ -45,6 +45,9 @@ export default function useAssignments() {
     mutationFn: (assignment: AssignmentForCreation) => {
       return newPostFactory({ path: 'coaching/assignments', body: assignment });
     },
+    onSettled() {
+      assignmentsQuery.refetch();
+    },
   });
 
   // i dont know if we need to send he recordId as a param, since its already in the body?
@@ -66,6 +69,9 @@ export default function useAssignments() {
         body: assignment,
       });
     },
+    onSettled() {
+      assignmentsQuery.refetch();
+    },
   });
 
   const deleteAssignmentMutation = useMutation({
@@ -73,6 +79,9 @@ export default function useAssignments() {
       return newDeleteFactory({
         path: `coaching/assignments/${assignment.recordId}`,
       });
+    },
+    onSettled() {
+      assignmentsQuery.refetch();
     },
   });
 

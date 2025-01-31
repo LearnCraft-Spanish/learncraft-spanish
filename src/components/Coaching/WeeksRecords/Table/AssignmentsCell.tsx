@@ -17,7 +17,6 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     openContextual,
     setContextualRef,
     updateDisableClickOutside,
-    closeContextual,
   } = useContextualMenu();
   const { updateAssignmentMutation } = useAssignments();
 
@@ -65,6 +64,18 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     updateDisableClickOutside(false);
   }
 
+  function cancelEdit() {
+    disableEditMode();
+
+    // reset states to assignment values
+    setHomeworkCorrector(assignment.homeworkCorrector.email);
+    setAssignmentType(assignment.assignmentType);
+    setRating(assignment.rating);
+    setNotes(assignment.notes);
+    setAreasOfDifficulty(assignment.areasOfDifficulty);
+    setAssignmentLink(assignment.assignmentLink);
+  }
+
   function submitEdit() {
     updateAssignmentMutation.mutate({
       relatedWeek: assignment.relatedWeek,
@@ -78,8 +89,23 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     });
     updateDisableClickOutside(false);
     setEditMode(false);
-    // closeContextual();
-    console.log('assignment updating!');
+  }
+
+  function captureSubmitForm() {
+    // check if any fields have changed from the original assignment
+    // if not, do nothing
+    if (
+      homeworkCorrector === assignment.homeworkCorrector.email &&
+      assignmentType === assignment.assignmentType &&
+      rating === assignment.rating &&
+      notes === assignment.notes &&
+      areasOfDifficulty === assignment.areasOfDifficulty &&
+      assignmentLink === assignment.assignmentLink
+    ) {
+      disableEditMode();
+      return;
+    }
+    submitEdit();
   }
   return (
     <div className="cellWithContextual">
@@ -266,14 +292,14 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
                 <button
                   type="button"
                   className="redButton"
-                  onClick={disableEditMode}
+                  onClick={cancelEdit}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   className="greenButton"
-                  onClick={submitEdit}
+                  onClick={captureSubmitForm}
                 >
                   Save
                 </button>
@@ -293,24 +319,51 @@ export default function AssignmentsCell({
   assignments: Assignment[] | null | undefined;
   week: Week;
 }) {
-  const { contextual, openContextual, setContextualRef, closeContextual } =
-    useContextualMenu();
+  const { contextual, openContextual, setContextualRef } = useContextualMenu();
   const { createAssignmentMutation } = useAssignments();
   const userDataQuery = useUserData();
 
+  const { coachListQuery, getStudentFromMembershipId } = useCoaching();
+  const [homeworkCorrector, setHomeworkCorrector] = useState(
+    userDataQuery.data?.emailAddress || '',
+  );
+  const [assignmentType, setAssignmentType] = useState('');
+  const [rating, setRating] = useState('');
+  const [notes, setNotes] = useState('');
+  const [areasOfDifficulty, setAreasOfDifficulty] = useState('');
+  const [assignmentLink, setAssignmentLink] = useState('');
+
+  const [errorObj, setErrorObj] = useState({ isError: false, message: '' });
+
+  const updateHomeworkCorrector = (email: string) => {
+    setHomeworkCorrector(email);
+  };
+
   function createNewAssignment() {
-    /*
     createAssignmentMutation.mutate({
       relatedWeek: week.recordId,
-      homeworkCorrector: userDataQuery.data?.emailAddress || 'no email',
-      assignmentType: 'Pronunciation',
-      rating: 'Excellent',
-      notes: '',
-      areasOfDifficulty: '',
-      assignmentLink: '',
+      homeworkCorrector,
+      assignmentType,
+      rating,
+      notes,
+      areasOfDifficulty,
+      assignmentLink,
     });
-    */
-    console.error('createNewAssignment form not yet implemented');
+  }
+  function captureSubmitForm() {
+    if (assignmentType === '') {
+      setErrorObj({ isError: true, message: 'Assignment Type is required' });
+      return;
+    }
+    if (homeworkCorrector === '') {
+      setErrorObj({ isError: true, message: 'Homework Corrector is required' });
+      return;
+    }
+    if (rating === '') {
+      setErrorObj({ isError: true, message: 'Rating is required' });
+      return;
+    }
+    createNewAssignment();
   }
 
   return (
@@ -336,48 +389,166 @@ export default function AssignmentsCell({
         >
           <div className="contextual" ref={setContextualRef}>
             <ContextualControlls />
-            <h4>Add Assignment for (student name)</h4>
+            <h4>Create Assignment Record</h4>
             <div className="lineWrapper">
-              <p className="label">Corrected By: </p>
-              <p>will be active coach I assume</p>
-              {/* <input type="text" / */}
+              <div className="label">Student: </div>
+              <div className="content">
+                {week.relatedMembership
+                  ? getStudentFromMembershipId(week.relatedMembership)?.fullName
+                  : 'No student found'}
+              </div>
+            </div>
+
+            <div className="lineWrapper">
+              <label className="label" htmlFor="assignmentType">
+                Assignment Type:{' '}
+              </label>
+              <select
+                id="assignmentType"
+                name="assignmentType"
+                className="content"
+                defaultValue={assignmentType}
+                onChange={(e) => setAssignmentType(e.target.value)}
+              >
+                <option value="">Select</option>
+                <option value="Pronunciation">Pronunciation</option>
+                <option value="Writing">Writing</option>
+                <option value="placement test">placement test</option>
+                <option value="journal">journal</option>
+                <option value="verbal tenses review">
+                  verbal tenses review
+                </option>
+                <option value="audio quiz">audio quiz</option>
+                <option value="Student Testimonial">Student Testimonial</option>
+                <option value="_other">_other</option>
+              </select>
             </div>
             <div className="lineWrapper">
-              <p className="label">Assignment Type: </p>
-              <input type="text" />
+              <label className="label" htmlFor="homeworkCorrector">
+                Corrected by:{' '}
+              </label>
+              <select
+                id="homeworkCorrector"
+                name="homeworkCorrector"
+                className="content"
+                defaultValue={homeworkCorrector}
+                onChange={(e) => updateHomeworkCorrector(e.target.value)}
+              >
+                <option value="">Select</option>
+
+                {coachListQuery.data?.map((coach) => (
+                  <option key={coach.coach} value={coach.user.email}>
+                    {coach.user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="lineWrapper">
+              <label className="label" htmlFor="rating">
+                Rating:{' '}
+              </label>
+              <select
+                id="rating"
+                name="rating"
+                className="content"
+                defaultValue={rating}
+                onChange={(e) => setRating(e.target.value)}
+              >
+                <option value="">Select</option>
+
+                <option value="Excellent">Excellent</option>
+                <option value="Very Good">Very Good</option>
+                <option value="Good">Good</option>
+                <option value="Fair">Fair</option>
+                <option value="Bad">Bad</option>
+                <option value="Poor">Poor</option>
+                <option value="Assigned to M3">Assigned to M3</option>
+                <option value="No sound">No sound</option>
+                <option value="Assigned to Level 2 (L6-9)">
+                  Assigned to Level 2 (L6-9)
+                </option>
+                <option value="Assigned to Level 3 (L10-12)">
+                  Assigned to Level 3 (L10-12)
+                </option>
+                <option value="Assigned to Level 1 (lessons 1-6)">
+                  Assigned to Level 1 (lessons 1-6)
+                </option>
+                <option value="Advanced group">Advanced group</option>
+                <option value="Assigned to Level 1 (L1-L5)">
+                  Assigned to Level 1 (L1-L5)
+                </option>
+                <option value="Assigned to 1MC">Assigned to 1MC</option>
+                <option value="Assigned to Level 4">Assigned to Level 4</option>
+                <option value="New LCS course">New LCS course</option>
+                <option value="Advanced">Advanced</option>
+              </select>
             </div>
             <div className="lineWrapper">
-              <p className="label">Rating: </p>
-              <input type="text" />
+              <label className="label" htmlFor="notes">
+                Notes:{' '}
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                className="content"
+                defaultValue={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
             </div>
             <div className="lineWrapper">
-              <p className="label">Notes: </p>
-              <input type="text" />
+              <label className="label" htmlFor="areasOfDifficulty">
+                Areas of Difficulty:{' '}
+              </label>
+              <textarea
+                id="areasOfDifficulty"
+                name="areasOfDifficulty"
+                className="content"
+                defaultValue={areasOfDifficulty}
+                onChange={(e) => setAreasOfDifficulty(e.target.value)}
+              />
             </div>
             <div className="lineWrapper">
-              <p className="label">Areas of Difficulty: </p>
-              <input type="text" />
-            </div>
-            <div className="lineWrapper">
-              <p className="label">Assignment Link: </p>
-              <input type="text" />
+              <label className="label" htmlFor="assignmentLink">
+                Assignment Link:{' '}
+              </label>
+              <input
+                id="assignmentLink"
+                name="assignmentLink"
+                type="text"
+                className="content"
+                defaultValue={assignmentLink}
+                onChange={(e) => setAssignmentLink(e.target.value)}
+              />
             </div>
             <div className="buttonBox">
               <button
                 type="button"
-                className="redButton"
-                onClick={closeContextual}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
                 className="greenButton"
-                onClick={createNewAssignment}
+                onClick={captureSubmitForm}
               >
                 Save
               </button>
             </div>
+            {errorObj.isError && (
+              <div className="errorWrapper">
+                <div className="errorBox">
+                  <h3>Error Submitting Form:</h3>
+                  <p>{errorObj.message}</p>
+                  <div className="buttonBox">
+                    <button
+                      type="button"
+                      className="redButton"
+                      onClick={() => {
+                        setErrorObj({ isError: false, message: '' });
+                      }}
+                    >
+                      Go Back
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
