@@ -4,7 +4,7 @@ import useAssignments from 'src/hooks/CoachingData/useAssignments';
 import type { Assignment, Week } from 'src/types/CoachingTypes';
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 function AssignmentCell({ assignment }: { assignment: Assignment }) {
   const {
@@ -17,11 +17,14 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     openContextual,
     setContextualRef,
     updateDisableClickOutside,
+    closeContextual,
   } = useContextualMenu();
+  const { updateAssignmentMutation } = useAssignments();
+
   const [editMode, setEditMode] = useState(false);
 
   const [homeworkCorrector, setHomeworkCorrector] = useState(
-    assignment.homeworkCorrector,
+    assignment.homeworkCorrector.email,
   );
   const [assignmentType, setAssignmentType] = useState(
     assignment.assignmentType,
@@ -35,6 +38,13 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     assignment.assignmentLink,
   );
 
+  const homeworkCorrectorName = useMemo(() => {
+    const corrector = coachListQuery.data?.find(
+      (coach) => coach.user.email === homeworkCorrector,
+    );
+    return corrector?.user.name || 'No coach found';
+  }, [homeworkCorrector, coachListQuery.data]);
+
   function updateHomeworkCorrector(email: string) {
     const corrector = coachListQuery.data?.find(
       (coach) => coach.user.email === email,
@@ -43,7 +53,7 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
       console.error('No coach found with email:', email);
       return;
     }
-    setHomeworkCorrector(corrector.user);
+    setHomeworkCorrector(corrector.user.email);
   }
 
   function enableEditMode() {
@@ -56,7 +66,20 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
   }
 
   function submitEdit() {
-    console.error('submitEdit not yet implemented');
+    updateAssignmentMutation.mutate({
+      relatedWeek: assignment.relatedWeek,
+      recordId: assignment.recordId,
+      homeworkCorrector,
+      assignmentType,
+      rating,
+      notes,
+      areasOfDifficulty,
+      assignmentLink,
+    });
+    updateDisableClickOutside(false);
+    setEditMode(false);
+    // closeContextual();
+    console.log('assignment updating!');
   }
   return (
     <div className="cellWithContextual">
@@ -73,15 +96,48 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
         >
           <div className="contextual" ref={setContextualRef}>
             <ContextualControlls editFunction={enableEditMode} />
-            <h4>
-              {assignmentType} by{' '}
-              {
-                getStudentFromMembershipId(
-                  getMembershipFromWeekRecordId(assignment.relatedWeek)
-                    ?.recordId,
-                )?.fullName
-              }
-            </h4>
+            {editMode ? (
+              <h4>Edit Assignment</h4>
+            ) : (
+              <h4>
+                {assignmentType} by{' '}
+                {
+                  getStudentFromMembershipId(
+                    getMembershipFromWeekRecordId(assignment.relatedWeek)
+                      ?.recordId,
+                  )?.fullName
+                }
+              </h4>
+            )}
+            <div className="lineWrapper">
+              <label className="label" htmlFor="assignmentType">
+                Assignment Type:{' '}
+              </label>
+              {editMode ? (
+                <select
+                  id="assignmentType"
+                  name="assignmentType"
+                  className="content"
+                  defaultValue={assignmentType}
+                  onChange={(e) => setAssignmentType(e.target.value)}
+                >
+                  <option value="Pronunciation">Pronunciation</option>
+                  <option value="Writing">Writing</option>
+                  <option value="placement test">placement test</option>
+                  <option value="journal">journal</option>
+                  <option value="verbal tenses review">
+                    verbal tenses review
+                  </option>
+                  <option value="audio quiz">audio quiz</option>
+                  <option value="Student Testimonial">
+                    Student Testimonial
+                  </option>
+                  <option value="_other">_other</option>
+                </select>
+              ) : (
+                <p className="content">{assignmentType}</p>
+              )}
+            </div>
             <div className="lineWrapper">
               <label className="label" htmlFor="homeworkCorrector">
                 Corrected by:{' '}
@@ -91,7 +147,7 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
                   id="homeworkCorrector"
                   name="homeworkCorrector"
                   className="content"
-                  defaultValue={homeworkCorrector.email}
+                  defaultValue={homeworkCorrector}
                   onChange={(e) => updateHomeworkCorrector(e.target.value)}
                 >
                   {coachListQuery.data?.map((coach) => (
@@ -101,7 +157,7 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
                   ))}
                 </select>
               ) : (
-                <p className="content">{homeworkCorrector.name}</p>
+                <p className="content">{homeworkCorrectorName}</p>
               )}
             </div>
 
