@@ -49,8 +49,18 @@ export default function useAssignments() {
 
   // i dont know if we need to send he recordId as a param, since its already in the body?
   // did it for a stupid recordId === assignment.recordId check on backend, delete this comment or backend check if needed
+  interface AssignmentForMutation {
+    recordId: number;
+    relatedWeek: number;
+    homeworkCorrector: string;
+    assignmentType: string;
+    rating: string;
+    notes: string;
+    areasOfDifficulty: string;
+    assignmentLink: string;
+  }
   const updateAssignmentMutation = useMutation({
-    mutationFn: (assignment: Assignment) => {
+    mutationFn: (assignment: AssignmentForMutation) => {
       return newPutFactory({
         path: `coaching/assignments/${assignment.recordId}`,
         body: assignment,
