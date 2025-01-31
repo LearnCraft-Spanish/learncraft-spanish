@@ -14,6 +14,12 @@ export const ContextualMenuProvider: React.FC<{
   const [contextual, setContextual] = useState<string>('');
   const currentContextual = useRef<HTMLDivElement | null>(null);
 
+  const [disableClickOutside, setDisableClickOutside] = useState(false);
+
+  const updateDisableClickOutside = useCallback((value: boolean) => {
+    setDisableClickOutside(value);
+  }, []);
+
   const openContextual = useCallback((menu: string) => {
     setContextual(menu);
   }, []);
@@ -33,13 +39,25 @@ export const ContextualMenuProvider: React.FC<{
       openContextual,
       closeContextual,
       setContextualRef,
+      disableClickOutside,
+      updateDisableClickOutside,
     }),
-    [contextual, openContextual, setContextualRef, closeContextual],
+    [
+      contextual,
+      openContextual,
+      setContextualRef,
+      closeContextual,
+      disableClickOutside,
+      updateDisableClickOutside,
+    ],
   );
 
   // Click-outside detection
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
+      if (disableClickOutside) {
+        return;
+      }
       if (
         currentContextual.current &&
         !currentContextual.current.contains(event.target as Node)
@@ -50,7 +68,7 @@ export const ContextualMenuProvider: React.FC<{
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [closeContextual]);
+  }, [closeContextual, disableClickOutside]);
 
   return (
     <ContextualMenuContext.Provider value={value}>

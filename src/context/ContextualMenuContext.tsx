@@ -6,6 +6,7 @@ interface ContextualMenuContextType {
   openContextual: (menu: string) => void;
   closeContextual: () => void;
   setContextualRef: (element: HTMLDivElement | null) => void;
+  updateDisableClickOutside: (value: boolean) => void;
 }
 
 // Create the context with a default value of `null`
