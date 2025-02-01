@@ -35,7 +35,6 @@ describe('test by role', () => {
         setupMockAuth({ userName: student.name as mockUserNames });
       });
       it(`${student.name}: has flashcard data`, async () => {
-        console.log(student.name);
         const {
           flashcardDataQuery,
           exampleIsCollected,

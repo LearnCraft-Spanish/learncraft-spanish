@@ -133,8 +133,6 @@ export function useStudentFlashcards() {
     };
     const finalObj: StudentFlashcardData | null =
       matchAndTrimArrays(updatedFlashcardData);
-    console.log(userDataQuery.data?.name);
-    console.log('finalObj', finalObj?.examples.length);
     return finalObj;
   };
 
