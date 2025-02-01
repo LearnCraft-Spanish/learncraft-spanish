@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import type { FlashcardStudent, UserData } from './types/interfaceDefinitions';
+import type { FlashcardStudent } from './types/interfaceDefinitions';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
