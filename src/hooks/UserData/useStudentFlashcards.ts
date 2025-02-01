@@ -131,7 +131,11 @@ export function useStudentFlashcards() {
       examples: mergedExampleData,
       studentExamples: mergedStudentExampleData,
     };
-    return matchAndTrimArrays(updatedFlashcardData);
+    const finalObj: StudentFlashcardData | null =
+      matchAndTrimArrays(updatedFlashcardData);
+    console.log(userDataQuery.data?.name);
+    console.log('finalObj', finalObj?.examples.length);
+    return finalObj;
   };
 
   const flashcardDataQuery = useQuery({

@@ -10,7 +10,7 @@ import {
 import { act } from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 
 import type { Lesson } from 'src/types/interfaceDefinitions';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';

@@ -28,13 +28,14 @@ async function renderHookSuccessfully() {
 describe('test by role', () => {
   describe('user is student', () => {
     const studentUsers = allStudentsTable.filter(
-      (student) => student.roles.studentRole === 'student',
+      (student) => student.role === 'student',
     );
     for (const student of studentUsers) {
       beforeEach(() => {
         setupMockAuth({ userName: student.name as mockUserNames });
       });
       it(`${student.name}: has flashcard data`, async () => {
+        console.log(student.name);
         const {
           flashcardDataQuery,
           exampleIsCollected,
@@ -50,14 +51,16 @@ describe('test by role', () => {
         expect(addFlashcardMutation).toBeDefined();
         expect(removeFlashcardMutation).toBeDefined();
         expect(updateFlashcardMutation).toBeDefined();
-        // Check for length
-        expect(flashcardDataQuery.data?.examples.length).toBeGreaterThan(0);
+        await waitFor(() => {
+          // Check for length
+          expect(flashcardDataQuery.data?.examples.length).toBeGreaterThan(0);
+        });
       });
     }
   });
   describe('user is not student', () => {
     const nonStudentUsers = allStudentsTable.filter(
-      (student) => student.roles.studentRole !== 'student',
+      (student) => student.role !== 'student',
     );
     for (const student of nonStudentUsers) {
       beforeEach(() => {
@@ -68,7 +71,9 @@ describe('test by role', () => {
           wrapper: MockAllProviders,
         });
         await waitFor(() => {
-          expect(result.current.flashcardDataQuery.isError).toBeTruthy();
+          expect(result.current.flashcardDataQuery.isError).toThrow(
+            'Flashcard Not Found',
+          );
         });
       });
     }
