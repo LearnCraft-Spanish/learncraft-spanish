@@ -21,7 +21,7 @@ export default function Menu() {
       userDataQuery?.data.roles.studentRole !== 'student' &&
       userDataQuery?.data.roles.studentRole !== 'limited') ||
       activeStudentQuery.isSuccess) &&
-    (activeStudentQuery.data?.roles.studentRole !== 'student' ||
+    (activeStudentQuery.data?.role !== 'student' ||
       flashcardDataQuery.isSuccess);
 
   // Display loading or error messages if necessary
@@ -51,7 +51,7 @@ export default function Menu() {
       )}
       {menuDataReady && (
         <div className="menuBox">
-          {activeStudentQuery.data?.roles.studentRole === 'student' && (
+          {activeStudentQuery.data?.role === 'student' && (
             // !!flashcardDataQuery.data?.studentExamples?.length &&
             <div>
               <h3>My Flashcards:</h3>
@@ -73,8 +73,8 @@ export default function Menu() {
               Official Quizzes
             </Link>
           </div>
-          {(activeStudentQuery.data?.roles.studentRole === 'student' ||
-            activeStudentQuery.data?.roles.studentRole === 'limited' ||
+          {(activeStudentQuery.data?.role === 'student' ||
+            activeStudentQuery.data?.role === 'limited' ||
             userDataQuery.data.roles.adminRole === 'coach' ||
             userDataQuery.data.roles.adminRole === 'admin') && (
             <div className="buttonBox">
@@ -88,7 +88,7 @@ export default function Menu() {
           )}
           {(userDataQuery.data.roles.adminRole === 'coach' ||
             userDataQuery.data.roles.adminRole === 'admin' ||
-            activeStudentQuery.data?.roles.studentRole === 'student') && (
+            activeStudentQuery.data?.role === 'student') && (
             <div className="buttonBox">
               <Link className="linkButton" to="/flashcardfinder">
                 Find Flashcards

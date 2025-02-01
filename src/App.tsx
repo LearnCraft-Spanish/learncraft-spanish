@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import type { UserData } from './types/interfaceDefinitions';
+import type { FlashcardStudent, UserData } from './types/interfaceDefinitions';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
@@ -45,9 +45,9 @@ export const App: React.FC = () => {
           -- None Selected --
         </option>,
       ];
-      studentListQuery.data.forEach((student: UserData) => {
+      studentListQuery.data.forEach((student: FlashcardStudent) => {
         const studentEmail = student.emailAddress;
-        const studentRole = student.roles.studentRole;
+        const studentRole = student.role;
         if (
           !studentEmail.includes('(') &&
           (studentRole === 'student' || studentRole === 'limited')

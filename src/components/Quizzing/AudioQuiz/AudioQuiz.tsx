@@ -466,9 +466,7 @@ export default function AudioQuiz({
               resumePlayback={resumePlayback}
               isPlaying={isPlaying}
               currentExample={currentExample}
-              isStudent={
-                activeStudentQuery.data?.roles.studentRole === 'student'
-              }
+              isStudent={activeStudentQuery.data?.role === 'student'}
               currentStep={currentStep}
               incrementExample={incrementExample}
               incrementOnAdd={incrementOnAdd}

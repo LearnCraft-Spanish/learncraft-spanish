@@ -1,7 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
-import type { Lesson, Program, UserData } from 'src/types/interfaceDefinitions';
+import type {
+  FlashcardStudent,
+  Lesson,
+  Program,
+  UserData,
+} from 'src/types/interfaceDefinitions';
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from './useUserData';
 
@@ -20,7 +25,7 @@ export function useActiveStudent() {
       userDataQuery.data?.roles.adminRole === 'admin',
   });
 
-  async function getActiveStudent(): Promise<UserData | null> {
+  async function getActiveStudent(): Promise<FlashcardStudent | null> {
     if (
       (!(
         userDataQuery.data?.roles.adminRole === 'coach' ||
@@ -30,7 +35,16 @@ export function useActiveStudent() {
       (userDataQuery.data?.roles.studentRole === 'student' ||
         userDataQuery.data?.roles.studentRole === 'limited')
     ) {
-      return userDataQuery.data; // Students are their own activeStudent
+      const unparsedActiveStudent = userDataQuery.data;
+      function parseStudent(unparsedStudent: UserData): FlashcardStudent {
+        const ParsedStudent: UserData & FlashcardStudent & { roles?: any } = {
+          ...unparsedStudent,
+          role: unparsedStudent.roles.studentRole,
+        };
+        delete ParsedStudent.roles;
+        return ParsedStudent as FlashcardStudent;
+      }
+      return parseStudent(unparsedActiveStudent); // Students are their own activeStudent
     } else if (
       userDataQuery.data?.roles.adminRole === 'coach' ||
       userDataQuery.data?.roles.adminRole === 'admin'
@@ -41,7 +55,7 @@ export function useActiveStudent() {
     }
   }
 
-  const activeStudentQuery = useQuery<UserData | null>({
+  const activeStudentQuery = useQuery<FlashcardStudent | null>({
     queryKey: ['activeStudent'],
     queryFn: getActiveStudent,
     staleTime: Infinity,

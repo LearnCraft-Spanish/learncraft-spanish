@@ -1,3 +1,5 @@
+import exp from 'node:constants';
+
 export interface Lesson {
   recordId: number;
   lesson: string;
@@ -49,6 +51,15 @@ export interface UserData {
     studentRole: '' | 'limited' | 'student';
     adminRole: '' | 'coach' | 'admin';
   };
+}
+
+export interface FlashcardStudent {
+  recordId: number;
+  name: string;
+  emailAddress: string;
+  cohort: string;
+  relatedProgram: number;
+  role: '' | 'limited' | 'student';
 }
 // selectedProgram is a program, or null
 export type selectedProgram = Program | null;

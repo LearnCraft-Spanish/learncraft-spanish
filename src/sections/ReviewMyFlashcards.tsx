@@ -46,7 +46,7 @@ export default function MyFlashcardsQuiz() {
   //  is this supposted to be an OR or AND?
   const unavailable =
     (activeStudentQuery.isSuccess &&
-      !(activeStudentQuery.data?.roles.studentRole === 'student')) ||
+      !(activeStudentQuery.data?.role === 'student')) ||
     (flashcardDataQuery.isSuccess &&
       !flashcardDataQuery.data?.examples?.length);
 

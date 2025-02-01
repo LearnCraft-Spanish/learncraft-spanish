@@ -37,8 +37,8 @@ export default function AudioBasedReview({
     audioExamplesQuery.isSuccess &&
     (userDataQuery.data?.roles.adminRole === 'coach' ||
       userDataQuery.data?.roles.adminRole === 'admin' ||
-      activeStudentQuery.data?.roles.studentRole === 'student' ||
-      activeStudentQuery.data?.roles.studentRole === 'limited');
+      activeStudentQuery.data?.role === 'student' ||
+      activeStudentQuery.data?.role === 'limited');
   const isError =
     !dataReady &&
     (userDataQuery.isError ||
