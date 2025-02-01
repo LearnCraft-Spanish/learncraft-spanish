@@ -44,10 +44,22 @@ export interface UserData {
   name: string;
   emailAddress: string;
   cohort: string;
-  role: string;
   relatedProgram: number;
-  isAdmin: boolean;
+  roles: {
+    studentRole: '' | 'limited' | 'student';
+    adminRole: '' | 'coach' | 'admin';
+  };
 }
+
+export interface FlashcardStudent {
+  recordId: number;
+  name: string;
+  emailAddress: string;
+  cohort: string;
+  relatedProgram: number;
+  role: '' | 'limited' | 'student';
+}
+
 // selectedProgram is a program, or null
 export type selectedProgram = Program | null;
 

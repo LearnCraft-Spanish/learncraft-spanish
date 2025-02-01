@@ -11,63 +11,81 @@ export default function useCoaching() {
     queryKey: ['lastThreeWeeks'],
     queryFn: backend.getNewWeeks,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const coachListQuery = useQuery({
     queryKey: ['coachList'],
     queryFn: backend.getCoachList,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const courseListQuery = useQuery({
     queryKey: ['courseList'],
     queryFn: backend.getCourseList,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const activeMembershipsQuery = useQuery({
     queryKey: ['activeMemberships'],
     queryFn: backend.getActiveMemberships,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const activeStudentsQuery = useQuery({
     queryKey: ['activeStudents'],
     queryFn: backend.getActiveStudents,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const groupSessionsQuery = useQuery({
     queryKey: ['groupSessions'],
     queryFn: backend.getGroupSessions,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const groupAttendeesQuery = useQuery({
     queryKey: ['groupAttendees'],
     queryFn: backend.getGroupAttendees,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const assignmentsQuery = useQuery({
     queryKey: ['assignments'],
     queryFn: backend.getAssignments,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   const callsQuery = useQuery({
     queryKey: ['calls'],
     queryFn: backend.getCalls,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
   /*--------- Helper Functions ---------

@@ -50,8 +50,10 @@ describe('test by role', () => {
         expect(addFlashcardMutation).toBeDefined();
         expect(removeFlashcardMutation).toBeDefined();
         expect(updateFlashcardMutation).toBeDefined();
-        // Check for length
-        expect(flashcardDataQuery.data?.examples.length).toBeGreaterThan(0);
+        await waitFor(() => {
+          // Check for length
+          expect(flashcardDataQuery.data?.examples.length).toBeGreaterThan(0);
+        });
       });
     }
   });
@@ -68,7 +70,9 @@ describe('test by role', () => {
           wrapper: MockAllProviders,
         });
         await waitFor(() => {
-          expect(result.current.flashcardDataQuery.isError).toBeTruthy();
+          expect(result.current.flashcardDataQuery.isError).toThrow(
+            'Flashcard Not Found',
+          );
         });
       });
     }

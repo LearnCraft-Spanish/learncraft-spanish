@@ -16,9 +16,10 @@ export default function Menu() {
   // If activeStudent is student, also make sure flashcard data is loaded.
   const menuDataReady =
     userDataQuery.isSuccess &&
-    ((userDataQuery?.data.isAdmin &&
-      userDataQuery?.data.role !== 'student' &&
-      userDataQuery?.data.role !== 'limited') ||
+    (((userDataQuery?.data.roles.adminRole === 'coach' ||
+      userDataQuery?.data.roles.adminRole === 'admin') &&
+      userDataQuery?.data.roles.studentRole !== 'student' &&
+      userDataQuery?.data.roles.studentRole !== 'limited') ||
       activeStudentQuery.isSuccess) &&
     (activeStudentQuery.data?.role !== 'student' ||
       flashcardDataQuery.isSuccess);
@@ -72,9 +73,10 @@ export default function Menu() {
               Official Quizzes
             </Link>
           </div>
-          {(userDataQuery.data.isAdmin ||
-            activeStudentQuery.data?.role === 'student' ||
-            activeStudentQuery.data?.role === 'limited') && (
+          {(activeStudentQuery.data?.role === 'student' ||
+            activeStudentQuery.data?.role === 'limited' ||
+            userDataQuery.data.roles.adminRole === 'coach' ||
+            userDataQuery.data.roles.adminRole === 'admin') && (
             <div className="buttonBox">
               <Link className="linkButton" to="/audioquiz">
                 Audio Quiz
@@ -84,7 +86,8 @@ export default function Menu() {
               </Link>
             </div>
           )}
-          {(userDataQuery.data.isAdmin ||
+          {(userDataQuery.data.roles.adminRole === 'coach' ||
+            userDataQuery.data.roles.adminRole === 'admin' ||
             activeStudentQuery.data?.role === 'student') && (
             <div className="buttonBox">
               <Link className="linkButton" to="/flashcardfinder">
@@ -92,31 +95,36 @@ export default function Menu() {
               </Link>
             </div>
           )}
-          {userDataQuery.data?.isAdmin && (
-            <div>
-              <h3>Staff Tools</h3>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/frequensay">
-                  FrequenSay
-                </Link>
+          {userDataQuery.data?.roles.adminRole === 'coach' ||
+            (userDataQuery.data?.roles.adminRole === 'admin' && (
+              <div>
+                <h3>Staff Tools</h3>
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/frequensay">
+                    FrequenSay
+                  </Link>
+                </div>
+                <div className="buttonBox">
+                  <Link className="linkButton" to="/weeklyrecords">
+                    Weekly Records Interface
+                  </Link>
+                </div>
+                {userDataQuery.data?.roles.adminRole === 'admin' && (
+                  <>
+                    <div className="buttonBox">
+                      <Link className="linkButton" to="/examplecreator">
+                        Example Creator
+                      </Link>
+                    </div>
+                    <div className="buttonBox">
+                      <Link className="linkButton" to="/exampleeditor">
+                        Example Editor
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/weeklyrecords">
-                  Weekly Records Interface
-                </Link>
-              </div>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/examplecreator">
-                  Example Creator
-                </Link>
-              </div>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/exampleeditor">
-                  Example Editor
-                </Link>
-              </div>
-            </div>
-          )}
+            ))}
         </div>
       )}
     </div>

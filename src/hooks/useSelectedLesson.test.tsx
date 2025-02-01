@@ -1,7 +1,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 
-import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import programsTable from 'mocks/data/hooklike/programsTable';
 

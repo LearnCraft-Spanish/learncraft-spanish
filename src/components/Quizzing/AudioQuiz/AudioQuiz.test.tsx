@@ -4,7 +4,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
-import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import { setupMockAuth } from 'tests/setupMockAuth';
 import AudioQuiz from './AudioQuiz';

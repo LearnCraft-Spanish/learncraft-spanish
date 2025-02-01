@@ -10,7 +10,9 @@ export function useVerifiedExamples() {
   const { updateExampleFromQuery } = useExampleUpdate();
   const { getVerifiedExamplesFromBackend } = useBackend();
   const hasAccess =
-    userDataQuery.data?.isAdmin || userDataQuery.data?.role === 'student';
+    userDataQuery.data?.roles.adminRole === 'coach' ||
+    userDataQuery.data?.roles.adminRole === 'admin' ||
+    userDataQuery.data?.roles.studentRole === 'student';
 
   const verifiedExamplesQuery = useQuery({
     queryKey: ['verifiedExamples'],

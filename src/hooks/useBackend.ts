@@ -82,8 +82,10 @@ export function useBackend() {
     [getFactory],
   );
 
-  const getAllUsersFromBackend = useCallback((): Promise<types.UserData[]> => {
-    return getFactory<types.UserData[]>('all-students');
+  const getAllUsersFromBackend = useCallback((): Promise<
+    types.FlashcardStudent[]
+  > => {
+    return getFactory<types.FlashcardStudent[]>('all-students');
   }, [getFactory]);
 
   const getUserDataFromBackend = useCallback((): Promise<types.UserData> => {
