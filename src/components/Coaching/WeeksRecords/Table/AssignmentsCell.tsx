@@ -336,8 +336,6 @@ export default function AssignmentsCell({
   const [areasOfDifficulty, setAreasOfDifficulty] = useState('');
   const [assignmentLink, setAssignmentLink] = useState('');
 
-  const [errorObj, setErrorObj] = useState({ isError: false, message: '' });
-
   const updateHomeworkCorrector = (email: string) => {
     setHomeworkCorrector(email);
   };
@@ -363,11 +361,19 @@ export default function AssignmentsCell({
       return;
     }
     if (homeworkCorrector === '') {
-      setErrorObj({ isError: true, message: 'Homework Corrector is required' });
+      openModal({
+        title: 'Error',
+        body: 'Homework Corrector is required',
+        type: 'error',
+      });
       return;
     }
     if (rating === '') {
-      setErrorObj({ isError: true, message: 'Rating is required' });
+      openModal({
+        title: 'Error',
+        body: 'Rating is required',
+        type: 'error',
+      });
       return;
     }
     createNewAssignment();
@@ -398,7 +404,7 @@ export default function AssignmentsCell({
             <ContextualControlls />
             <h4>Create Assignment Record</h4>
             <div className="lineWrapper">
-              <div className="label">Student: </div>
+              <div className="label">Student:</div>
               <div className="content">
                 {week.relatedMembership
                   ? getStudentFromMembershipId(week.relatedMembership)?.fullName
@@ -408,7 +414,7 @@ export default function AssignmentsCell({
 
             <div className="lineWrapper">
               <label className="label" htmlFor="assignmentType">
-                Assignment Type:{' '}
+                Assignment Type:
               </label>
               <select
                 id="assignmentType"
@@ -450,10 +456,9 @@ export default function AssignmentsCell({
                 ))}
               </select>
             </div>
-
             <div className="lineWrapper">
               <label className="label" htmlFor="rating">
-                Rating:{' '}
+                Rating:
               </label>
               <select
                 id="rating"
@@ -463,7 +468,6 @@ export default function AssignmentsCell({
                 onChange={(e) => setRating(e.target.value)}
               >
                 <option value="">Select</option>
-
                 <option value="Excellent">Excellent</option>
                 <option value="Very Good">Very Good</option>
                 <option value="Good">Good</option>
@@ -493,7 +497,7 @@ export default function AssignmentsCell({
             </div>
             <div className="lineWrapper">
               <label className="label" htmlFor="notes">
-                Notes:{' '}
+                Notes:
               </label>
               <textarea
                 id="notes"
@@ -505,7 +509,7 @@ export default function AssignmentsCell({
             </div>
             <div className="lineWrapper">
               <label className="label" htmlFor="areasOfDifficulty">
-                Areas of Difficulty:{' '}
+                Areas of Difficulty:
               </label>
               <textarea
                 id="areasOfDifficulty"
@@ -517,7 +521,7 @@ export default function AssignmentsCell({
             </div>
             <div className="lineWrapper">
               <label className="label" htmlFor="assignmentLink">
-                Assignment Link:{' '}
+                Assignment Link:
               </label>
               <input
                 id="assignmentLink"
@@ -537,25 +541,6 @@ export default function AssignmentsCell({
                 Save
               </button>
             </div>
-            {errorObj.isError && (
-              <div className="errorWrapper">
-                <div className="errorBox">
-                  <h3>Error Submitting Form:</h3>
-                  <p>{errorObj.message}</p>
-                  <div className="buttonBox">
-                    <button
-                      type="button"
-                      className="redButton"
-                      onClick={() => {
-                        setErrorObj({ isError: false, message: '' });
-                      }}
-                    >
-                      Go Back
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}
