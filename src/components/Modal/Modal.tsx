@@ -1,9 +1,9 @@
-/* ------------------ Types of Modals This will Replace ------------------ */
+import './modal.scss';
 
 export interface ModalProps {
   title: string;
   body: string;
-  type: 'error' | 'confirm' | 'info';
+  type: 'error' | 'confirm';
   confirmFunction?: () => void;
   cancelFunction?: () => void;
   closeModal: () => void;
@@ -48,14 +48,18 @@ export default function Modal(props: ModalProps) {
             </button>
           </>
         );
-      case 'info':
-        return null;
+      default:
+        return (
+          <button type="button" className="addButton" onClick={handleCancel}>
+            unknown modal type, please go back
+          </button>
+        );
     }
   };
   return (
     <div className="modal">
-      <h2>{title}</h2>
-      <p>{body}</p>
+      <h2 className="modal-title">{title}</h2>
+      <p className="modal-body">{body}</p>
       <div className="buttonBox">{renderButtons()}</div>
     </div>
   );
