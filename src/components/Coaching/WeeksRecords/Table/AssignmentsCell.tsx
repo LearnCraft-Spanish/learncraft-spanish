@@ -6,6 +6,8 @@ import ContextualControlls from 'src/components/ContextualControlls';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useMemo, useState } from 'react';
 
+import { useModal } from 'src/hooks/useModal';
+
 function AssignmentCell({ assignment }: { assignment: Assignment }) {
   const {
     getStudentFromMembershipId,
@@ -324,6 +326,7 @@ export default function AssignmentsCell({
   const userDataQuery = useUserData();
 
   const { coachListQuery, getStudentFromMembershipId } = useCoaching();
+  const { openModal } = useModal();
   const [homeworkCorrector, setHomeworkCorrector] = useState(
     userDataQuery.data?.emailAddress || '',
   );
@@ -352,7 +355,11 @@ export default function AssignmentsCell({
   }
   function captureSubmitForm() {
     if (assignmentType === '') {
-      setErrorObj({ isError: true, message: 'Assignment Type is required' });
+      openModal({
+        title: 'Error',
+        body: 'Assignment Type is required',
+        type: 'error',
+      });
       return;
     }
     if (homeworkCorrector === '') {
