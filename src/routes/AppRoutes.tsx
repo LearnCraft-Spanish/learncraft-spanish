@@ -40,8 +40,8 @@ export default function AppRoutes() {
       <Route
         path="/audioquiz/*"
         element={
-          (userDataQuery.data?.roles.studentRole === 'student' ||
-            userDataQuery.data?.roles.studentRole === 'limited' ||
+          (userDataQuery.data?.roles.studentRole === 'limited' ||
+            userDataQuery.data?.roles.studentRole === 'student' ||
             userDataQuery.data?.roles.adminRole === 'coach' ||
             userDataQuery.data?.roles.adminRole === 'admin') && (
             <AudioBasedReview audioOrComprehension="audio" willAutoplay />
@@ -51,8 +51,8 @@ export default function AppRoutes() {
       <Route
         path="/comprehensionquiz/*"
         element={
-          (userDataQuery.data?.roles.studentRole === 'student' ||
-            userDataQuery.data?.roles.studentRole === 'limited' ||
+          (userDataQuery.data?.roles.studentRole === 'limited' ||
+            userDataQuery.data?.roles.studentRole === 'student' ||
             userDataQuery.data?.roles.adminRole === 'coach' ||
             userDataQuery.data?.roles.adminRole === 'admin') && (
             <AudioBasedReview
@@ -65,8 +65,8 @@ export default function AppRoutes() {
       <Route
         path="/frequensay"
         element={
-          userDataQuery.data?.roles.adminRole === 'coach' ||
-          (userDataQuery.data?.roles.adminRole === 'admin' && <FrequenSay />)
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && <FrequenSay />
         }
       />
       <Route
@@ -84,10 +84,10 @@ export default function AppRoutes() {
       <Route
         path="/weeklyrecords"
         element={
-          userDataQuery.data?.roles.adminRole === 'coach' ||
-          (userDataQuery.data?.roles.adminRole === 'admin' && (
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
             <WeeksRecordsSection />
-          ))
+          )
         }
       />
       <Route path="/*" element={<NotFoundPage />} />

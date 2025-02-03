@@ -73,8 +73,8 @@ export default function Menu() {
               Official Quizzes
             </Link>
           </div>
-          {(activeStudentQuery.data?.role === 'student' ||
-            activeStudentQuery.data?.role === 'limited' ||
+          {(activeStudentQuery.data?.role === 'limited' ||
+            activeStudentQuery.data?.role === 'student' ||
             userDataQuery.data.roles.adminRole === 'coach' ||
             userDataQuery.data.roles.adminRole === 'admin') && (
             <div className="buttonBox">
@@ -86,45 +86,45 @@ export default function Menu() {
               </Link>
             </div>
           )}
-          {(userDataQuery.data.roles.adminRole === 'coach' ||
-            userDataQuery.data.roles.adminRole === 'admin' ||
-            activeStudentQuery.data?.role === 'student') && (
+          {(activeStudentQuery.data?.role === 'student' ||
+            userDataQuery.data.roles.adminRole === 'coach' ||
+            userDataQuery.data.roles.adminRole === 'admin') && (
             <div className="buttonBox">
               <Link className="linkButton" to="/flashcardfinder">
                 Find Flashcards
               </Link>
             </div>
           )}
-          {userDataQuery.data?.roles.adminRole === 'coach' ||
-            (userDataQuery.data?.roles.adminRole === 'admin' && (
-              <div>
-                <h3>Staff Tools</h3>
-                <div className="buttonBox">
-                  <Link className="linkButton" to="/frequensay">
-                    FrequenSay
-                  </Link>
-                </div>
-                <div className="buttonBox">
-                  <Link className="linkButton" to="/weeklyrecords">
-                    Weekly Records Interface
-                  </Link>
-                </div>
-                {userDataQuery.data?.roles.adminRole === 'admin' && (
-                  <>
-                    <div className="buttonBox">
-                      <Link className="linkButton" to="/examplecreator">
-                        Example Creator
-                      </Link>
-                    </div>
-                    <div className="buttonBox">
-                      <Link className="linkButton" to="/exampleeditor">
-                        Example Editor
-                      </Link>
-                    </div>
-                  </>
-                )}
+          {(userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <div>
+              <h3>Staff Tools</h3>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/frequensay">
+                  FrequenSay
+                </Link>
               </div>
-            ))}
+              <div className="buttonBox">
+                <Link className="linkButton" to="/weeklyrecords">
+                  Weekly Records Interface
+                </Link>
+              </div>
+              {userDataQuery.data?.roles.adminRole === 'admin' && (
+                <>
+                  <div className="buttonBox">
+                    <Link className="linkButton" to="/examplecreator">
+                      Example Creator
+                    </Link>
+                  </div>
+                  <div className="buttonBox">
+                    <Link className="linkButton" to="/exampleeditor">
+                      Example Editor
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
