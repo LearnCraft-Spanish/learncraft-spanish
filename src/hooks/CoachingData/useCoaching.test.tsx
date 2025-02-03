@@ -25,7 +25,7 @@ describe('hook useCoaching', () => {
       'groupSessionsQuery',
       'groupAttendeesQuery',
       'assignmentsQuery',
-      'callsQuery',
+      'privateCallsQuery',
     ];
     for (const query of listOfQueries) {
       it(`query ${query}: exists and has data`, async () => {

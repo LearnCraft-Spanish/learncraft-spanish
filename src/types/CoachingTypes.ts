@@ -187,6 +187,8 @@ export interface Call {
   areasOfDifficulty: string;
   rating: string;
   date: Date | string;
+  caller: QbUser;
+  callType: string;
 }
 export interface Assignment {
   recordId: number;

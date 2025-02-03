@@ -1,6 +1,7 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { ReactNode } from 'react';
 import { ContextualMenuProvider } from 'src/providers/ContextualMenuProvider';
+import { ModalProvider } from 'src/providers/ModalProvider';
 import MockQueryClientProvider from './MockQueryClient';
 
 interface contextProps {
@@ -17,19 +18,21 @@ export default function MockAllProviders({
   return (
     <MemoryRouter initialEntries={[route]}>
       <ContextualMenuProvider>
-        <MockQueryClientProvider>
-          {route === '/' && (
-            <MockQueryClientProvider>{children}</MockQueryClientProvider>
-          )}
-          {route !== '/' && (
-            <Routes>
-              <Route
-                path={`${route}${childRoutes ? '/*' : ''}`}
-                element={children}
-              />
-            </Routes>
-          )}
-        </MockQueryClientProvider>
+        <ModalProvider>
+          <MockQueryClientProvider>
+            {route === '/' && (
+              <MockQueryClientProvider>{children}</MockQueryClientProvider>
+            )}
+            {route !== '/' && (
+              <Routes>
+                <Route
+                  path={`${route}${childRoutes ? '/*' : ''}`}
+                  element={children}
+                />
+              </Routes>
+            )}
+          </MockQueryClientProvider>
+        </ModalProvider>
       </ContextualMenuProvider>
     </MemoryRouter>
   );
