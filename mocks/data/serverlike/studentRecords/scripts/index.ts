@@ -66,7 +66,7 @@ function generateWeekAndRelatedRecords({
   course,
   weekStarts,
   holdWeek,
-  recordComplete,
+  recordsComplete,
 
   numberOfAssignments,
   numberOfCalls,
@@ -78,7 +78,7 @@ function generateWeekAndRelatedRecords({
   course: Course;
   weekStarts: string;
   holdWeek: boolean;
-  recordComplete: boolean;
+  recordsComplete: boolean;
 
   numberOfAssignments: number;
   numberOfCalls: number;
@@ -99,7 +99,7 @@ function generateWeekAndRelatedRecords({
     course,
     membership,
     holdWeek,
-    recordComplete,
+    recordsComplete,
     weekStarts,
   });
 
@@ -251,7 +251,7 @@ function main() {
     course: Course;
     weekStarts: string;
     holdWeek: boolean;
-    recordComplete: boolean;
+    recordsComplete: boolean;
   
     numberOfAssignments: number;
     numberOfCalls: number;
@@ -296,7 +296,7 @@ function main() {
     coach: coachList[0 % coachList.length],
     weekStarts: lastWeek,
     holdWeek: false,
-    recordComplete: true,
+    recordsComplete: true,
     numberOfAssignments: 1,
     numberOfCalls: 0,
     numberOfGroupSessions: 0,
@@ -312,7 +312,7 @@ function main() {
     coach: coachList[1 % coachList.length],
     weekStarts: lastWeek,
     holdWeek: false,
-    recordComplete: true,
+    recordsComplete: true,
     numberOfAssignments: 0,
     numberOfCalls: 1,
     numberOfGroupSessions: 0,
@@ -328,7 +328,7 @@ function main() {
     coach: coachList[2 % coachList.length],
     weekStarts: lastWeek,
     holdWeek: false,
-    recordComplete: true,
+    recordsComplete: true,
     numberOfAssignments: 0,
     numberOfCalls: 0,
     numberOfGroupSessions: 1,
@@ -347,7 +347,7 @@ function main() {
     coach: coachList[3 % coachList.length],
     weekStarts: lastWeek,
     holdWeek: true,
-    recordComplete: false,
+    recordsComplete: false,
     numberOfAssignments: 0,
     numberOfCalls: 0,
     numberOfGroupSessions: 0,
@@ -366,7 +366,7 @@ function main() {
     coach: coachList[4 % coachList.length],
     weekStarts: lastWeek,
     holdWeek: false,
-    recordComplete: false,
+    recordsComplete: false,
     numberOfAssignments: 0,
     numberOfCalls: 0,
     numberOfGroupSessions: 0,
@@ -385,7 +385,7 @@ function main() {
     coach: coachList[5 % coachList.length],
     weekStarts: twoWeeksAgo,
     holdWeek: false,
-    recordComplete: false,
+    recordsComplete: false,
     numberOfAssignments: 0,
     numberOfCalls: 0,
     numberOfGroupSessions: 0,
@@ -404,7 +404,7 @@ function main() {
     coach: coachList[6 % coachList.length],
     weekStarts: thisWeek,
     holdWeek: false,
-    recordComplete: false,
+    recordsComplete: false,
     numberOfAssignments: 0,
     numberOfCalls: 0,
     numberOfGroupSessions: 0,

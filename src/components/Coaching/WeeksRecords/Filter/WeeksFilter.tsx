@@ -1,20 +1,21 @@
-import type { Coach, Course, Week } from 'src/types/CoachingTypes';
+import type { Coach, Course } from 'src/types/CoachingTypes';
+
+import useBANDAIDhelperFunction from '../useBANDAIDhelperFunction';
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
 
-import '../../styles/coaching.scss';
+import '../../coaching.scss';
+
 interface CoachingFilterProps {
-  weeks: Week[] | undefined;
+  dataReady: boolean;
+  advancedFilteringMenu: boolean;
+  toggleAdvancedFilteringMenu: () => void;
   filterByCoach: Coach | undefined;
   updateCoachFilter: (value: string) => void;
   filterByCourse: Course | undefined;
   updateCourseFilter: (value: string) => void;
   filterByWeeksAgo: number;
   updateWeeksAgoFilter: (value: string) => void;
-
-  advancedFilteringMenu: boolean;
-  toggleAdvancedFilteringMenu: () => void;
-
   filterCoachless: boolean | undefined;
   updateCoachlessFilter: (value: boolean) => void;
   filterHoldWeeks: boolean | undefined;
@@ -24,25 +25,16 @@ interface CoachingFilterProps {
   searchTerm: string | undefined;
   updateSearchTerm: (value: string) => void;
 }
-
-/*
- -------------------
-improvements to make
-
-we can probably move all of the filtering logic into this component, and just pass in weeks and function to update weeks
-*/
 export default function WeeksFilter({
-  weeks,
+  dataReady,
+  advancedFilteringMenu,
+  toggleAdvancedFilteringMenu,
   filterByCoach,
   updateCoachFilter,
   filterByCourse,
   updateCourseFilter,
   filterByWeeksAgo,
   updateWeeksAgoFilter,
-
-  advancedFilteringMenu,
-  toggleAdvancedFilteringMenu,
-
   filterCoachless,
   updateCoachlessFilter,
   filterHoldWeeks,
@@ -52,8 +44,9 @@ export default function WeeksFilter({
   searchTerm,
   updateSearchTerm,
 }: CoachingFilterProps) {
+  const dateRange = useBANDAIDhelperFunction();
   return (
-    weeks && (
+    dataReady && (
       <div className="coachingFilterSection">
         <div className="simpleFiltering">
           <CoachSelect
@@ -72,9 +65,15 @@ export default function WeeksFilter({
               onChange={(e) => updateWeeksAgoFilter(e.target.value)}
               value={filterByWeeksAgo}
             >
-              <option value={0}>This Week</option>
-              <option value={1}>Last Week</option>
-              <option value={2}>Two Weeks Ago</option>
+              <option value={0}>
+                This Week {`(${dateRange.thisWeekDate})`}
+              </option>
+              <option value={1}>
+                Last Week {`(${dateRange.lastSundayDate})`}
+              </option>
+              <option value={2}>
+                Two Weeks Ago {`(${dateRange.twoSundaysAgoDate})`}
+              </option>
               <option value={-1}>Last Three Weeks (All)</option>
             </select>
           </div>

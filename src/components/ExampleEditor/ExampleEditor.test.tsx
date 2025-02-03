@@ -27,16 +27,12 @@ describe('component ExampleEditor', () => {
     );
   });
 
-  it('should have input fields for example editor', async () => {
-    const expectedFields = [
-      'Spanish Example',
-      'English Translation',
-      // 'Spanglish',
-    ];
+  it('should have no example selected by default', async () => {
     const { getByText } = getRenderedComponent();
-
-    expectedFields.forEach((field) => {
-      expect(getByText(field)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        getByText('Please select an example to preview/edit'),
+      ).toBeInTheDocument();
     });
   });
 });
