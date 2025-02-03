@@ -321,7 +321,8 @@ export default function AssignmentsCell({
   assignments: Assignment[] | null | undefined;
   week: Week;
 }) {
-  const { contextual, openContextual, setContextualRef } = useContextualMenu();
+  const { contextual, openContextual, setContextualRef, closeContextual } =
+    useContextualMenu();
   const { createAssignmentMutation } = useAssignments();
   const userDataQuery = useUserData();
 
@@ -535,10 +536,17 @@ export default function AssignmentsCell({
             <div className="buttonBox">
               <button
                 type="button"
+                className="redButton"
+                onClick={closeContextual}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
                 className="greenButton"
                 onClick={captureSubmitForm}
               >
-                Save
+                Submit
               </button>
             </div>
           </div>

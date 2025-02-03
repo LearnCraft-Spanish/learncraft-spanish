@@ -29,6 +29,8 @@ export default function usePrivateCalls() {
     notes: string;
     areasOfDifficulty: string;
     recording: string;
+    date: Date | string;
+    caller: string;
   }
 
   const createPrivateCallMutation = useMutation({
@@ -37,8 +39,19 @@ export default function usePrivateCalls() {
     },
   });
 
+  interface CallForUpdate {
+    recordId: number;
+    relatedWeek: number;
+    callType: string;
+    rating: string;
+    notes: string;
+    areasOfDifficulty: string;
+    recording: string;
+    date: Date | string;
+    caller: string;
+  }
   const updatePrivateCallMutation = useMutation({
-    mutationFn: (call: Call) => {
+    mutationFn: (call: CallForUpdate) => {
       return newPutFactory({
         path: `coaching/private-calls/${call.recordId}`,
         body: call,
