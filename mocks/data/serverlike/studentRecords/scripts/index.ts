@@ -122,6 +122,7 @@ function generateWeekAndRelatedRecords({
         generateCall({
           week,
           callDate: getDateTwoDaysAfter(new Date(week.weekStarts)),
+          caller: coach.user,
         }),
       );
     }
