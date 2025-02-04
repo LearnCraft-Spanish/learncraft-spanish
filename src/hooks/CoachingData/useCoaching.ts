@@ -335,6 +335,7 @@ export default function useCoaching() {
     activeStudentsQuery,
     groupSessionsQuery,
     groupAttendeesQuery,
+
     assignmentsQuery,
     privateCallsQuery,
 

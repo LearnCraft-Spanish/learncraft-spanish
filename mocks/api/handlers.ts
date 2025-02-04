@@ -238,7 +238,7 @@ export const handlers = [
   http.get(`${backendUrl}coaching/assignments`, async () => {
     return HttpResponse.json(generatedMockData.assignments);
   }),
-  http.get(`${backendUrl}coaching/calls`, async () => {
+  http.get(`${backendUrl}coaching/private-calls`, async () => {
     return HttpResponse.json(generatedMockData.calls);
   }),
 ];

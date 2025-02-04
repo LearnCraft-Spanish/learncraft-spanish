@@ -10,7 +10,7 @@ export default function usePrivateCalls() {
     useBackendHelpers();
 
   const privateCallsQuery = useQuery({
-    queryKey: ['calls'],
+    queryKey: ['privateCalls'],
     queryFn: backend.getPrivateCalls,
     staleTime: Infinity,
     enabled:

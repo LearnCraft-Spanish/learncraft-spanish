@@ -217,6 +217,7 @@ export function useBackend() {
   } = useBackendHelpers();
 
   /*      GET Requests      */
+  const { getAccessToken } = useAuth();
 
   const getProgramsFromBackend = useCallback((): Promise<
     types.ProgramUnparsed[]
@@ -510,6 +511,7 @@ export function useBackend() {
   );
 
   return {
+    getAccessToken,
     // GET Requests
     getActiveExamplesFromBackend,
     getActiveMemberships,
