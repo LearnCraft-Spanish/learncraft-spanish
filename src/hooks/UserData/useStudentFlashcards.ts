@@ -7,6 +7,7 @@ import type {
   StudentExample,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
+import { toast } from 'react-toastify';
 import { useActiveStudent } from './useActiveStudent';
 import { useUserData } from './useUserData';
 
@@ -291,7 +292,11 @@ export function useStudentFlashcards() {
       );
       return thisIdNum;
     },
+    onSuccess: (_data, _variables) => {
+      toast.success('Flashcard added successfully');
+    },
     onError: (error, _variables, context) => {
+      toast.error('Failed to add Flashcard');
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized ID number to rollback the cache
@@ -423,9 +428,11 @@ export function useStudentFlashcards() {
         // Remove the local update for the deleted flashcard
         delete localExamples.current[flashcardObject.recordId];
       }
+      toast.success('Flashcard removed successfully');
     },
 
     onError: (error, _variables, context) => {
+      toast.error('Failed to remove Flashcard');
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized objects to rollback the cache

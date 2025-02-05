@@ -1232,3 +1232,17 @@ i {
   max-width: 640px;
   margin: auto;
 }
+
+/*
+ * Toast Notification Styles
+ *
+ * For more information on styling this component, visit:
+ * https://fkhadra.github.io/react-toastify/how-to-style
+ */
+.Toastify__toast-container {
+  --toastify-color-success: darkgreen;
+  --toastify-color-error: darkred;
+  --toastify-toast-bd-radius: 0;
+  /* --toastify-toast-min-height: 40px; */
+  --toastify-font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+}
