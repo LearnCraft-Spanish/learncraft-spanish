@@ -26,9 +26,10 @@ async function renderHookSuccessfully() {
 }
 
 describe('test by role', () => {
-  describe('user is student', () => {
+  describe('user is student with flashcards', () => {
     const studentUsers = allStudentsTable.filter(
-      (student) => student.role === 'student',
+      (student) =>
+        student.role === 'student' && student.name !== 'student-no-flashcards',
     );
     for (const student of studentUsers) {
       beforeEach(() => {

@@ -73,13 +73,13 @@ function generateWeek({
   course,
   membership,
   holdWeek,
-  recordComplete,
+  recordsComplete,
   weekStarts,
 }: {
   course: Course;
   membership: Membership;
   holdWeek: boolean;
-  recordComplete: boolean;
+  recordsComplete: boolean;
   weekStarts: string;
 }): Week {
   // Step one: initial record creation
@@ -103,7 +103,7 @@ function generateWeek({
     week: getCurrentWeek(weekStarts, membership.startDate),
     // combinedKeyForUniques: '0-0', // relatedMembership-week
 
-    recordComplete,
+    recordsComplete,
     holdWeek,
 
     notes:
@@ -113,7 +113,7 @@ function generateWeek({
 
     // unsure about these, setting reasonable defaults
     recordCompletable: true,
-    recordsCompleteRef: recordComplete ? 100 : 0, //percent, for reporting purposes
+    recordsCompleteRef: recordsComplete ? 100 : 0, //percent, for reporting purposes
     checklistComplete: true,
     offTrack: false,
     primaryCoachWhenCreated: 'Primary Coach Hard Coded, unsure of its use',

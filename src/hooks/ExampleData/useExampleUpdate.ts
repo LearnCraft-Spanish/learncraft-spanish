@@ -32,6 +32,7 @@ export const useExampleUpdate = () => {
       }
 
       function checkChange() {
+        // DOES NOT CHECK VOCAB CHANGING, handled separately
         const oldExampleCopy: Flashcard = { ...oldExampleData! };
         const newExampleCopy: Flashcard = { ...newExampleData };
         const emptySet: string[] = [];
@@ -49,7 +50,7 @@ export const useExampleUpdate = () => {
         }
         return false;
       }
-
+      // DOES NOT CHECK VOCAB CHANGING, handled separately
       const hasChanged = checkChange();
 
       const oldVocab = oldExampleData.vocabIncluded;
