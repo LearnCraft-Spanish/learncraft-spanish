@@ -71,9 +71,7 @@ describe('test by role', () => {
           wrapper: MockAllProviders,
         });
         await waitFor(() => {
-          expect(result.current.flashcardDataQuery.isError).toThrow(
-            'Flashcard Not Found',
-          );
+          expect(result.current.flashcardDataQuery.isError).toBeTruthy();
         });
       });
     }
