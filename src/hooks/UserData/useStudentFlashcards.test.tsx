@@ -26,9 +26,10 @@ async function renderHookSuccessfully() {
 }
 
 describe('test by role', () => {
-  describe('user is student', () => {
+  describe('user is student with flashcards', () => {
     const studentUsers = allStudentsTable.filter(
-      (student) => student.role === 'student',
+      (student) =>
+        student.role === 'student' && student.name !== 'student-no-flashcards',
     );
     for (const student of studentUsers) {
       beforeEach(() => {
@@ -50,8 +51,10 @@ describe('test by role', () => {
         expect(addFlashcardMutation).toBeDefined();
         expect(removeFlashcardMutation).toBeDefined();
         expect(updateFlashcardMutation).toBeDefined();
-        // Check for length
-        expect(flashcardDataQuery.data?.examples.length).toBeGreaterThan(0);
+        await waitFor(() => {
+          // Check for length
+          expect(flashcardDataQuery.data?.examples.length).toBeGreaterThan(0);
+        });
       });
     }
   });
@@ -68,7 +71,9 @@ describe('test by role', () => {
           wrapper: MockAllProviders,
         });
         await waitFor(() => {
-          expect(result.current.flashcardDataQuery.isError).toBeTruthy();
+          expect(result.current.flashcardDataQuery.isError).toThrow(
+            'Flashcard Not Found',
+          );
         });
       });
     }

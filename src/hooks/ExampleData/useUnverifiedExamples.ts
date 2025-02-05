@@ -10,7 +10,9 @@ export function useUnverifiedExamples() {
   const userDataQuery = useUserData();
   const { getUnverifiedExamplesFromBackend, createUnverifiedExample } =
     useBackend();
-  const hasAccess = userDataQuery.data?.isAdmin;
+  const hasAccess =
+    userDataQuery.data?.roles.adminRole === 'coach' ||
+    userDataQuery.data?.roles.adminRole === 'admin';
 
   const unverifiedExamplesQuery = useQuery({
     queryKey: ['unverifiedExamples'],

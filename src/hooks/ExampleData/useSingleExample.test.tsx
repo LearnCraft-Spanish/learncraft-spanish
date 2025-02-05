@@ -27,23 +27,27 @@ describe('useSingleExample', () => {
     const { result } = renderHook(() => useSingleExample(exampleId), {
       wrapper: MockAllProviders,
     });
-    const query = result.current.singleExampleQuery;
-    await waitFor(() => expect(query.isSuccess).toBe(true), {
-      timeout: 3000,
-      interval: 200,
-    });
-    expect(query.data).toBeDefined();
+    await waitFor(
+      () => expect(result.current.singleExampleQuery.isSuccess).toBe(true),
+      {
+        timeout: 3000,
+        interval: 200,
+      },
+    );
+    expect(result.current.singleExampleQuery.data).toBeDefined();
   });
 
   it('data exists', async () => {
     const { result } = renderHook(() => useSingleExample(exampleId), {
       wrapper: MockAllProviders,
     });
-    const query = result.current.singleExampleQuery;
-    await waitFor(() => expect(query.data).toBeDefined(), {
-      timeout: 3000,
-      interval: 200,
-    });
+    await waitFor(
+      () => expect(result.current.singleExampleQuery.data).toBeDefined(),
+      {
+        timeout: 3000,
+        interval: 200,
+      },
+    );
   });
   describe('when user is not an admin or student', () => {
     beforeEach(() => {
@@ -53,15 +57,14 @@ describe('useSingleExample', () => {
       const { result } = renderHook(() => useSingleExample(exampleId), {
         wrapper: MockAllProviders,
       });
-      const query = result.current.singleExampleQuery;
       await waitFor(
         () => {
-          expect(query.isSuccess).toBe(false);
+          expect(result.current.singleExampleQuery.isSuccess).toBe(false);
         },
         { timeout: 10000, interval: 200 },
       );
-      expect(query.isSuccess).toBe(false);
-      expect(query.data).toEqual(undefined);
+      expect(result.current.singleExampleQuery.isSuccess).toBe(false);
+      expect(result.current.singleExampleQuery.data).toEqual(undefined);
     });
   });
 });

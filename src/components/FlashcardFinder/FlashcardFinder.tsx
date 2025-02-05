@@ -34,7 +34,9 @@ const FlashcardFinder = () => {
     verifiedExamplesQuery.isError ||
     vocabularyQuery.isError;
   const dataLoaded =
-    (userDataQuery.data?.isAdmin || activeStudentQuery.isSuccess) &&
+    (userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin' ||
+      activeStudentQuery.isSuccess) &&
     verifiedExamplesQuery.isSuccess &&
     vocabularyQuery.isSuccess;
   const isLoading =

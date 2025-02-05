@@ -9,7 +9,7 @@ import {
 import React from 'react';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getUserDataFromName } from 'mocks/data/serverlike/studentTable';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
@@ -19,7 +19,7 @@ const cleanupFunction = vi.fn();
 
 const user = getUserDataFromName('student-admin');
 if (!user) {
-  throw new Error(`Student not found in allStudentsTable: student-admin`);
+  throw new Error(`Student not found in mock data set: student-admin`);
 }
 const userFlashcardData = allStudentFlashcards.find(
   (student) => student.userName === user.name,

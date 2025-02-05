@@ -84,12 +84,16 @@ export function useStudentFlashcards() {
 
   const getFlashcardData = async () => {
     let backendResponse: StudentFlashcardData | undefined;
-    if (userDataQuery.data?.isAdmin && activeStudentId) {
+    if (
+      (userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin') &&
+      activeStudentId
+    ) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
     } else if (
       // Limited users should not have flashcards, is this a mistake?
-      userDataQuery.data?.role === 'student' ||
-      userDataQuery.data?.role === 'limited'
+      userDataQuery.data?.roles.studentRole === 'student' ||
+      userDataQuery.data?.roles.studentRole === 'limited'
     ) {
       backendResponse = await getMyExamplesFromBackend();
     }
@@ -128,7 +132,9 @@ export function useStudentFlashcards() {
       examples: mergedExampleData,
       studentExamples: mergedStudentExampleData,
     };
-    return matchAndTrimArrays(updatedFlashcardData);
+    const finalObj: StudentFlashcardData | null =
+      matchAndTrimArrays(updatedFlashcardData);
+    return finalObj;
   };
 
   const flashcardDataQuery = useQuery({
@@ -185,9 +191,13 @@ export function useStudentFlashcards() {
     async (flashcard: Flashcard) => {
       const recordId = flashcard.recordId;
       let addPromise;
-      if (userDataQuery.data?.isAdmin && activeStudentId) {
+      if (
+        (userDataQuery.data?.roles.adminRole === 'coach' ||
+          userDataQuery.data?.roles.adminRole === 'admin') &&
+        activeStudentId
+      ) {
         addPromise = createStudentExample(activeStudentId, recordId);
-      } else if (userDataQuery.data?.role === 'student') {
+      } else if (userDataQuery.data?.roles.studentRole === 'student') {
         addPromise = createMyStudentExample(recordId);
       }
       if (!addPromise) {
@@ -207,8 +217,7 @@ export function useStudentFlashcards() {
       return addResponse;
     },
     [
-      userDataQuery.data?.isAdmin,
-      userDataQuery.data?.role,
+      userDataQuery.data?.roles,
       activeStudentId,
       createStudentExample,
       createMyStudentExample,
@@ -323,9 +332,13 @@ export function useStudentFlashcards() {
         throw new Error('Flashcard Not Found');
       }
       let removePromise;
-      if (userDataQuery.data?.isAdmin && activeStudentId) {
+      if (
+        (userDataQuery.data?.roles.adminRole === 'coach' ||
+          userDataQuery.data?.roles.adminRole === 'admin') &&
+        activeStudentId
+      ) {
         removePromise = deleteStudentExample(studentFlashcardId);
-      } else if (userDataQuery.data?.role === 'student') {
+      } else if (userDataQuery.data?.roles.studentRole === 'student') {
         removePromise = deleteMyStudentExample(studentFlashcardId);
       }
       if (!removePromise) {
@@ -345,8 +358,7 @@ export function useStudentFlashcards() {
       return removeResponse;
     },
     [
-      userDataQuery.data?.isAdmin,
-      userDataQuery.data?.role,
+      userDataQuery.data?.roles,
       flashcardDataQuery.data,
       activeStudentId,
       deleteStudentExample,
@@ -456,9 +468,13 @@ export function useStudentFlashcards() {
   const updateActiveStudentFlashcards = useCallback(
     async (studentExampleId: number, newInterval: number) => {
       let updatePromise;
-      if (userDataQuery.data?.isAdmin && activeStudentId) {
+      if (
+        (userDataQuery.data?.roles.adminRole === 'coach' ||
+          userDataQuery.data?.roles.adminRole === 'admin') &&
+        activeStudentId
+      ) {
         updatePromise = updateStudentExample(studentExampleId, newInterval);
-      } else if (userDataQuery.data?.role === 'student') {
+      } else if (userDataQuery.data?.roles.studentRole === 'student') {
         updatePromise = updateMyStudentExample(studentExampleId, newInterval);
       }
       if (!updatePromise) {
@@ -478,8 +494,7 @@ export function useStudentFlashcards() {
       return updateResponse;
     },
     [
-      userDataQuery.data?.isAdmin,
-      userDataQuery.data?.role,
+      userDataQuery.data?.roles,
       activeStudentId,
       updateStudentExample,
       updateMyStudentExample,

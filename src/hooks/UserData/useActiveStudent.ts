@@ -1,7 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
-import type { Lesson, Program, UserData } from 'src/types/interfaceDefinitions';
+import type {
+  FlashcardStudent,
+  Lesson,
+  Program,
+  UserData,
+} from 'src/types/interfaceDefinitions';
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from './useUserData';
 
@@ -15,25 +20,42 @@ export function useActiveStudent() {
     queryKey: ['studentList'],
     queryFn: getAllUsersFromBackend,
     staleTime: Infinity,
-    enabled: !!userDataQuery.data?.isAdmin, // Only fetch if the user is an admin
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
   });
 
-  async function getActiveStudent(): Promise<UserData | null> {
+  async function getActiveStudent(): Promise<FlashcardStudent | null> {
     if (
-      (!userDataQuery.data?.isAdmin ||
+      (!(
+        userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin'
+      ) ||
         !queryClient.getQueryData(['activeStudentSelection'])) &&
-      (userDataQuery.data?.role === 'student' ||
-        userDataQuery.data?.role === 'limited')
+      (userDataQuery.data?.roles.studentRole === 'student' ||
+        userDataQuery.data?.roles.studentRole === 'limited')
     ) {
-      return userDataQuery.data; // Students are their own activeStudent
-    } else if (userDataQuery.data?.isAdmin) {
+      const unparsedActiveStudent = userDataQuery.data;
+      function parseStudent(unparsedStudent: UserData): FlashcardStudent {
+        const ParsedStudent: UserData & FlashcardStudent & { roles?: any } = {
+          ...unparsedStudent,
+          role: unparsedStudent.roles.studentRole,
+        };
+        delete ParsedStudent.roles;
+        return ParsedStudent as FlashcardStudent;
+      }
+      return parseStudent(unparsedActiveStudent); // Students are their own activeStudent
+    } else if (
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin'
+    ) {
       return queryClient.getQueryData(['activeStudentSelection']) || null; // Admin-selected activeStudent
     } else {
       return null;
     }
   }
 
-  const activeStudentQuery = useQuery<UserData | null>({
+  const activeStudentQuery = useQuery<FlashcardStudent | null>({
     queryKey: ['activeStudent'],
     queryFn: getActiveStudent,
     staleTime: Infinity,
@@ -41,7 +63,11 @@ export function useActiveStudent() {
   });
 
   const chooseStudent = (studentId: number | null) => {
-    if (userDataQuery.data?.isAdmin && studentListQuery.data) {
+    if (
+      (userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin') &&
+      studentListQuery.data
+    ) {
       const student =
         studentListQuery.data.find(
           (student) => student.recordId === studentId,

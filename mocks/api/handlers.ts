@@ -1,9 +1,13 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
 import { HttpResponse, http } from 'msw';
+import type { UserData } from 'src/types/interfaceDefinitions';
 import newData from '../data/serverlike/serverlikeData';
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
-import { getUserDataFromName } from '../data/serverlike/studentTable';
+import {
+  allUsersTable,
+  getUserDataFromName,
+} from '../data/serverlike/userTable';
 
 // import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -70,8 +74,8 @@ export const handlers = [
 
   http.get(`${backendUrl}my-data`, ({ request }) => {
     const email = getEmailFromRequest(request);
-    const student = apiData.allStudentsTable.find(
-      (student) => student.emailAddress === email,
+    const student = allUsersTable.find(
+      (student: UserData) => student.emailAddress === email,
     );
     return HttpResponse.json(student);
   }),

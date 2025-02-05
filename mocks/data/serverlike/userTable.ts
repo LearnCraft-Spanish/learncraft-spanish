@@ -1,11 +1,14 @@
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
+import type { UserData } from 'src/types/interfaceDefinitions';
 
-export const allStudentsTable: FlashcardStudent[] = [
+export const allUsersTable: UserData[] = [
   {
     recordId: 1,
     name: 'admin-empty-role',
     emailAddress: 'admin-empty-role@fake.not',
-    role: '',
+    roles: {
+      studentRole: '',
+      adminRole: 'admin',
+    },
     relatedProgram: 2,
     cohort: 'B',
   },
@@ -13,7 +16,10 @@ export const allStudentsTable: FlashcardStudent[] = [
     recordId: 2,
     name: 'empty-role',
     emailAddress: 'empty-role@fake.not',
-    role: '',
+    roles: {
+      studentRole: '',
+      adminRole: '',
+    },
     relatedProgram: 2,
     cohort: 'A',
   },
@@ -21,7 +27,10 @@ export const allStudentsTable: FlashcardStudent[] = [
     recordId: 3,
     name: 'none-role',
     emailAddress: 'none-role@fake.not',
-    role: '',
+    roles: {
+      studentRole: '',
+      adminRole: '',
+    },
     relatedProgram: 2,
     cohort: 'C',
   },
@@ -29,7 +38,10 @@ export const allStudentsTable: FlashcardStudent[] = [
     recordId: 4,
     name: 'limited',
     emailAddress: 'limited@fake.not',
-    role: 'limited',
+    roles: {
+      studentRole: 'limited',
+      adminRole: '',
+    },
     relatedProgram: 3,
     cohort: 'A',
   },
@@ -37,7 +49,10 @@ export const allStudentsTable: FlashcardStudent[] = [
     recordId: 5,
     name: 'student-admin',
     emailAddress: 'student-admin@fake.not',
-    role: 'student',
+    roles: {
+      studentRole: 'student',
+      adminRole: 'admin',
+    },
     relatedProgram: 3,
     cohort: 'F',
   },
@@ -45,7 +60,10 @@ export const allStudentsTable: FlashcardStudent[] = [
     recordId: 6,
     name: 'student-lcsp',
     emailAddress: 'student-lcsp@fake.not',
-    role: 'student',
+    roles: {
+      studentRole: 'student',
+      adminRole: '',
+    },
     relatedProgram: 2,
     cohort: 'D',
   },
@@ -53,7 +71,10 @@ export const allStudentsTable: FlashcardStudent[] = [
     recordId: 7,
     name: 'student-ser-estar',
     emailAddress: 'student-ser-estar@fake.not',
-    role: 'student',
+    roles: {
+      studentRole: 'student',
+      adminRole: '',
+    },
     relatedProgram: 5,
     cohort: 'E',
   },
@@ -61,13 +82,16 @@ export const allStudentsTable: FlashcardStudent[] = [
     recordId: 8,
     name: 'student-no-flashcards',
     emailAddress: 'student-no-flashcards@fake.not',
-    role: 'student',
+    roles: {
+      studentRole: 'student',
+      adminRole: '',
+    },
     relatedProgram: 2,
     cohort: 'A',
   },
 ];
 
-export function getActiveStudentFromName(
+export function getUserDataFromName(
   name:
     | 'admin-empty-role'
     | 'empty-role'
@@ -78,6 +102,6 @@ export function getActiveStudentFromName(
     | 'student-ser-estar'
     | 'student-no-flashcards'
     | null,
-): FlashcardStudent | null {
-  return allStudentsTable.find((student) => student.name === name) || null;
+): UserData | null {
+  return allUsersTable.find((student) => student.name === name) || null;
 }

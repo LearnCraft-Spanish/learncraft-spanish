@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-
-import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { getActiveStudentFromName } from 'mocks/data/serverlike/studentTable';
 import { useActiveStudent } from './useActiveStudent';
 
-const api = serverlikeData().api;
-
-const studentAdmin = api.allStudentsTable.find(
-  (student) => student.role === 'student' && student.isAdmin === true,
-);
+const studentAdmin = getActiveStudentFromName('student-admin');
 
 describe('useActiveStudent', () => {
   it('runs without crashing', async () => {

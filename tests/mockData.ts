@@ -7,7 +7,7 @@ import type {
 import mockDbData from './mockDbData.json';
 import mockLessonData from './mockLessonData.json';
 
-export const sampleStudent: UserData = mockDbData.sampleStudent;
+export const sampleStudent: UserData = mockDbData.sampleStudent as UserData;
 
 export const sampleStudentFlashcardData: StudentFlashcardData =
   mockDbData.sampleStudentFlashcardData;

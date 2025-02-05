@@ -30,16 +30,20 @@ export default function AppRoutes() {
       <Route
         path="/flashcardfinder"
         element={
-          (userDataQuery.data?.role === 'student' ||
-            userDataQuery.data?.isAdmin) && <FlashcardFinder />
+          (userDataQuery.data?.roles.studentRole === 'student' ||
+            userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <FlashcardFinder />
+          )
         }
       />
       <Route
         path="/audioquiz/*"
         element={
-          (userDataQuery.data?.role === 'student' ||
-            userDataQuery.data?.role === 'limited' ||
-            userDataQuery.data?.isAdmin) && (
+          (userDataQuery.data?.roles.studentRole === 'limited' ||
+            userDataQuery.data?.roles.studentRole === 'student' ||
+            userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
             <AudioBasedReview audioOrComprehension="audio" willAutoplay />
           )
         }
@@ -47,9 +51,10 @@ export default function AppRoutes() {
       <Route
         path="/comprehensionquiz/*"
         element={
-          (userDataQuery.data?.role === 'student' ||
-            userDataQuery.data?.role === 'limited' ||
-            userDataQuery.data?.isAdmin) && (
+          (userDataQuery.data?.roles.studentRole === 'limited' ||
+            userDataQuery.data?.roles.studentRole === 'student' ||
+            userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
             <AudioBasedReview
               audioOrComprehension="comprehension"
               willAutoplay={false}
@@ -59,19 +64,31 @@ export default function AppRoutes() {
       />
       <Route
         path="/frequensay"
-        element={userDataQuery.data?.isAdmin && <FrequenSay />}
+        element={
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && <FrequenSay />
+        }
       />
       <Route
         path="/examplecreator"
-        element={userDataQuery.data?.isAdmin && <ExampleCreator />}
+        element={
+          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleCreator />
+        }
       />
       <Route
         path="/exampleeditor"
-        element={userDataQuery.data?.isAdmin && <ExampleEditor />}
+        element={
+          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleEditor />
+        }
       />
       <Route
         path="/weeklyrecords"
-        element={userDataQuery.data?.isAdmin && <WeeksRecordsSection />}
+        element={
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <WeeksRecordsSection />
+          )
+        }
       />
       <Route path="/*" element={<NotFoundPage />} />
     </SentryRoutes>

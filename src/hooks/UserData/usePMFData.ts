@@ -8,20 +8,19 @@ export function usePMFData() {
   const { getPMFDataForUser, createPMFDataForUser, updatePMFDataForUser } =
     useBackend();
   const userDataQuery = useUserData();
-  const userData = userDataQuery.data;
 
   const getPMFData = useCallback(async () => {
-    if (userData) {
-      return await getPMFDataForUser(userData.recordId);
+    if (userDataQuery.isSuccess) {
+      return await getPMFDataForUser(userDataQuery.data.recordId);
     }
-  }, [userData, getPMFDataForUser]);
+  }, [userDataQuery.isSuccess, userDataQuery.data, getPMFDataForUser]);
 
   const pmfDataQuery = useQuery({
-    queryKey: ['pmfData', userData?.recordId],
+    queryKey: ['pmfData', userDataQuery.data?.recordId],
     queryFn: getPMFData,
     staleTime: Infinity,
     gcTime: Infinity,
-    enabled: !!userData,
+    enabled: userDataQuery.data?.roles.studentRole === 'student',
   });
 
   interface CreateOrUpdatePMFData {
@@ -29,10 +28,10 @@ export function usePMFData() {
   }
   const createOrUpdatePMFData = useCallback(
     async ({ hasTakenSurvey }: CreateOrUpdatePMFData) => {
-      if (userData) {
+      if (userDataQuery.isSuccess) {
         if (!pmfDataQuery.data) {
           const result = await createPMFDataForUser(
-            userData.recordId,
+            userDataQuery.data.recordId,
             hasTakenSurvey,
           );
           if (result === 1) {
@@ -40,7 +39,7 @@ export function usePMFData() {
           }
         } else {
           const result = await updatePMFDataForUser({
-            studentId: userData.recordId,
+            studentId: userDataQuery.data.recordId,
             recordId: pmfDataQuery.data.recordId,
             hasTakenSurvey,
           });
@@ -50,7 +49,13 @@ export function usePMFData() {
         }
       }
     },
-    [userData, pmfDataQuery, createPMFDataForUser, updatePMFDataForUser],
+    [
+      userDataQuery.isSuccess,
+      userDataQuery.data,
+      pmfDataQuery,
+      createPMFDataForUser,
+      updatePMFDataForUser,
+    ],
   );
 
   const canShowPMF = useMemo(() => {
