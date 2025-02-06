@@ -102,7 +102,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "vite": "^5.4.8",
-    "vitest": "^2.1.2"
+    "vitest": "^2.1.9"
   },
   "directories": {
     "test": "tests"
