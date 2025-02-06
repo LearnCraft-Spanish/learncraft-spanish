@@ -1,4 +1,9 @@
 /* LessonSelector Styles */
+/* FromToLessonSelector Styles */
+.FTLS {
+  width: 100%;
+}
+
 .lessonFilter {
   margin: 0 10px;
   flex-grow: 1;
@@ -9,11 +14,6 @@
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
-}
-
-/* FromToLessonSelector Styles */
-.FTLS {
-  width: 100%;
 }
 /* uses .menuRow from AudioBasedReview.css */
 /*

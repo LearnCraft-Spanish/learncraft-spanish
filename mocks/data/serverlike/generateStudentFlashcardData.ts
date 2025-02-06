@@ -1,15 +1,15 @@
 import type {
   Flashcard,
+  FlashcardStudent,
   StudentFlashcardData,
-  UserData,
-} from '../../../src/interfaceDefinitions';
-import { fisherYatesShuffle } from '../../../src/functions/fisherYatesShuffle';
+} from 'src/types/interfaceDefinitions';
+import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 // This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample
 // we need this to test SRS quizzing functionality
 export default function generateStudentFlashcardData(
-  student: UserData,
+  student: FlashcardStudent,
   numberOfExamples: number,
   examplesTable: Flashcard[],
 ) {

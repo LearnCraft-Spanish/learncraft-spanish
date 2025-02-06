@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { getUserDataFromName } from '../data/serverlike/studentTable';
+import { getUserDataFromName } from '../data/serverlike/userTable';
 
 export interface MockAuth {
   isAuthenticated: boolean;
@@ -20,6 +20,7 @@ export interface MockAuthOptions {
     | 'student-admin'
     | 'student-lcsp'
     | 'student-ser-estar'
+    | 'student-no-flashcards'
     | null;
 }
 

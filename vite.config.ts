@@ -1,5 +1,6 @@
 // vite.config.ts
 import process from 'node:process';
+import path from 'node:path';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
 import dotenv from 'dotenv';
@@ -18,6 +19,7 @@ export default defineConfig(({ mode }) => {
       : undefined;
 
   return {
+    environment: 'jsdom',
     plugins: [
       react(),
       sentryVitePlugin({
@@ -30,9 +32,23 @@ export default defineConfig(({ mode }) => {
       outDir: 'build',
       sourcemap: true, // Enable source maps
     },
+    resolve: {
+      alias: {
+        src: path.resolve(__dirname, './src'),
+        mocks: path.resolve(__dirname, './mocks'),
+        tests: path.resolve(__dirname, './tests'),
+      },
+    },
     server: {
       port,
       open: true,
+    },
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+        },
+      },
     },
   };
 });

@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import type * as types from '../interfaceDefinitions';
+import type * as types from 'src/types/interfaceDefinitions';
+import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
 import useAuth from './useAuth';
 
 export function useBackend() {
@@ -81,8 +82,10 @@ export function useBackend() {
     [getFactory],
   );
 
-  const getAllUsersFromBackend = useCallback((): Promise<types.UserData[]> => {
-    return getFactory<types.UserData[]>('all-students');
+  const getAllUsersFromBackend = useCallback((): Promise<
+    types.FlashcardStudent[]
+  > => {
+    return getFactory<types.FlashcardStudent[]>('all-students');
   }, [getFactory]);
 
   const getUserDataFromBackend = useCallback((): Promise<types.UserData> => {
@@ -96,32 +99,85 @@ export function useBackend() {
     [getFactory],
   );
 
+  const getUnverifiedExamplesFromBackend = useCallback((): Promise<
+    types.Flashcard[]
+  > => {
+    return getFactory<types.Flashcard[]>('unverified-examples');
+  }, [getFactory]);
+
+  const getRecentlyEditedExamples = useCallback((): Promise<
+    types.Flashcard[]
+  > => {
+    return getFactory<types.Flashcard[]>('recently-edited-examples');
+  }, [getFactory]);
+
+  const getSingleExample = useCallback(
+    (exampleId: number): Promise<types.Flashcard> => {
+      return getFactory<types.Flashcard>(`single-example/${exampleId}`);
+    },
+    [getFactory],
+  );
+
   /*      Coaching API      */
 
-  const getCoachList = useCallback((): Promise<types.Coach[]> => {
-    return getFactory<types.Coach[]>('coaching/coaches');
+  const getCoachList = useCallback((): Promise<StudentRecordsTypes.Coach[]> => {
+    return getFactory<StudentRecordsTypes.Coach[]>('coaching/coaches');
   }, [getFactory]);
 
-  const getCourseList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/courses');
+  const getCourseList = useCallback((): Promise<
+    StudentRecordsTypes.Course[]
+  > => {
+    return getFactory('coaching/courses');
   }, [getFactory]);
 
-  const getLessonList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/lessons');
+  const getLessonList = useCallback((): Promise<
+    StudentRecordsTypes.Lesson[]
+  > => {
+    return getFactory('coaching/lessons');
   }, [getFactory]);
 
-  const getActiveStudents = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/active-students');
+  const getActiveStudents = useCallback((): Promise<
+    StudentRecordsTypes.Student[]
+  > => {
+    return getFactory('coaching/active-students');
   }, [getFactory]);
 
-  const getActiveMemberships = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/active-memberships');
+  const getActiveMemberships = useCallback((): Promise<
+    StudentRecordsTypes.Membership[]
+  > => {
+    return getFactory('coaching/active-memberships');
   }, [getFactory]);
 
-  const getLastThreeWeeks = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/last-three-weeks');
+  const getLastThreeWeeks =
+    useCallback((): Promise<StudentRecordsTypes.getLastThreeWeeksResponse> => {
+      return getFactory('coaching/last-three-weeks');
+    }, [getFactory]);
+
+  const getNewWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
+    return getFactory('coaching/weeks-new-format');
   }, [getFactory]);
 
+  const getGroupAttendees = useCallback((): Promise<
+    StudentRecordsTypes.GroupAttendees[]
+  > => {
+    return getFactory('coaching/group-attendees');
+  }, [getFactory]);
+
+  const getGroupSessions = useCallback((): Promise<
+    StudentRecordsTypes.GroupSession[]
+  > => {
+    return getFactory('coaching/group-sessions');
+  }, [getFactory]);
+
+  const getAssignments = useCallback((): Promise<
+    StudentRecordsTypes.Assignment[]
+  > => {
+    return getFactory('coaching/assignments');
+  }, [getFactory]);
+
+  const getCalls = useCallback((): Promise<StudentRecordsTypes.Call[]> => {
+    return getFactory('coaching/calls');
+  }, [getFactory]);
   /*      POST Requests      */
 
   const postFactory = useCallback(
@@ -227,6 +283,51 @@ export function useBackend() {
     [deleteFactory],
   );
 
+  interface DeleteFactoryOptions {
+    path: string;
+    headers?: Record<string, any>;
+    body?: Record<string, any>;
+  }
+
+  const newDeleteFactory = useCallback(
+    async <T>({
+      path,
+      headers = [],
+      body = [],
+    }: DeleteFactoryOptions): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(`Error parsing JSON from ${path}:`, error);
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to delete ${path}: ${response.statusText}`);
+        throw new Error(`Failed to delete ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+
+  const removeVocabFromExample = useCallback(
+    (exampleId: number, vocabIdList: number[]): Promise<number> => {
+      return newDeleteFactory({
+        path: 'remove-vocab-from-example',
+        body: { exampleId, vocabIdList },
+      });
+    },
+    [newDeleteFactory],
+  );
+
   const getPMFDataForUser = useCallback(
     (userId: number): Promise<types.PMFData> => {
       return getFactory(`pmf/${userId}`);
@@ -302,35 +403,89 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const createUnverifiedExample = useCallback(
+    (example: types.NewFlashcard): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'add-unverified-example',
+        body: {
+          example,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const updateExample = useCallback(
+    (example: Partial<types.Flashcard>): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'update-example',
+        body: {
+          example,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const addVocabularyToExample = useCallback(
+    (exampleId: number, vocabIdList: number[]): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'add-vocab-to-example',
+        body: {
+          exampleId,
+          vocabIdList,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   return {
+    // GET Requests
     getAccessToken,
-    getProgramsFromBackend,
-    getLessonsFromBackend,
-    getVocabFromBackend,
-    getSpellingsFromBackend,
-    getExamplesFromBackend,
-    getVerifiedExamplesFromBackend,
-    getAudioExamplesFromBackend,
-    getLcspQuizzesFromBackend,
-    getMyExamplesFromBackend,
-    getQuizExamplesFromBackend,
-    getAllUsersFromBackend,
-    getUserDataFromBackend,
     getActiveExamplesFromBackend,
+    getActiveMemberships,
+    getActiveStudents,
+    getAllUsersFromBackend,
+    getAssignments,
+    getAudioExamplesFromBackend,
+    getCalls,
     getCoachList,
     getCourseList,
-    getLessonList,
-    getActiveStudents,
-    getActiveMemberships,
+    getExamplesFromBackend,
+    getGroupAttendees,
+    getGroupSessions,
     getLastThreeWeeks,
+    getLcspQuizzesFromBackend,
+    getLessonList,
+    getLessonsFromBackend,
+    getMyExamplesFromBackend,
+    getNewWeeks,
+    getPMFDataForUser,
+    getProgramsFromBackend,
+    getQuizExamplesFromBackend,
+    getSingleExample,
+    getSpellingsFromBackend,
+    getUnverifiedExamplesFromBackend,
+    getRecentlyEditedExamples,
+    getUserDataFromBackend,
+    getVerifiedExamplesFromBackend,
+    getVocabFromBackend,
+
+    // POST Requests
+    addVocabularyToExample,
     createMyStudentExample,
+    createPMFDataForUser,
     createStudentExample,
+    createUnverifiedExample,
+    updateExample,
     updateMyStudentExample,
+    updatePMFDataForUser,
     updateStudentExample,
+
+    // DELETE Requests
     deleteMyStudentExample,
     deleteStudentExample,
-    getPMFDataForUser,
-    createPMFDataForUser,
-    updatePMFDataForUser,
+    removeVocabFromExample,
   };
 }

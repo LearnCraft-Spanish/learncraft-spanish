@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import type { Flashcard, VocabTag } from '../interfaceDefinitions';
+import type { Flashcard, VocabTag } from 'src/types/interfaceDefinitions';
 
-import { useVocabulary } from './useVocabulary';
+import { useVocabulary } from './CourseData/useVocabulary';
 
 interface FilterFlashcardsOptions {
   examples: Flashcard[];
@@ -44,7 +44,7 @@ export default function useFlashcardFilter() {
               case 'subcategory':
                 example.vocabIncluded.forEach((item) => {
                   const word = vocabularyQuery.data.find(
-                    (element) => element.vocabName === item,
+                    (element) => element.descriptionOfVocabularySkill === item,
                   );
                   if (word?.vocabularySubcategorySubcategoryName === tag.tag) {
                     isGood = true;
@@ -54,7 +54,7 @@ export default function useFlashcardFilter() {
               case 'verb':
                 example.vocabIncluded.forEach((item) => {
                   const word = vocabularyQuery.data.find(
-                    (element) => element.vocabName === item,
+                    (element) => element.descriptionOfVocabularySkill === item,
                   );
                   if (word?.verbInfinitive === tag.tag) {
                     isGood = true;
@@ -64,7 +64,7 @@ export default function useFlashcardFilter() {
               case 'conjugation':
                 example.vocabIncluded.forEach((item) => {
                   const word = vocabularyQuery.data.find(
-                    (element) => element.vocabName === item,
+                    (element) => element.descriptionOfVocabularySkill === item,
                   );
                   word?.conjugationTags.forEach((conjugationTag) => {
                     if (conjugationTag === tag.tag) {
@@ -76,7 +76,7 @@ export default function useFlashcardFilter() {
               case 'vocabulary':
                 example.vocabIncluded.forEach((item) => {
                   const word = vocabularyQuery.data.find(
-                    (element) => element.vocabName === item,
+                    (element) => element.descriptionOfVocabularySkill === item,
                   );
                   if (
                     word?.wordIdiom === tag.tag &&
@@ -89,7 +89,7 @@ export default function useFlashcardFilter() {
               case 'idiom':
                 example.vocabIncluded.forEach((item: string) => {
                   const word = vocabularyQuery.data.find(
-                    (element) => element.vocabName === item,
+                    (element) => element.descriptionOfVocabularySkill === item,
                   );
                   if (word?.wordIdiom === tag.tag) {
                     isGood = true;

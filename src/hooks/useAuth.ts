@@ -16,7 +16,7 @@ export default function useAuth() {
       authorizationParams: {
         audience,
         scope:
-          'openid profile email read:current-student update:current-student read:all-students update:all-students',
+          'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
       },
       cacheMode: 'off',
     });

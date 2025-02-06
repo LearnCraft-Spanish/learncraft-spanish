@@ -1,40 +1,52 @@
-import react from '@vitejs/plugin-react';
-// vitest.config.ts
+import { mergeConfig } from 'vite';
+import type { ConfigEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
+import viteConfig from './vite.config';
 
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './tests/setupTests',
-    include: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
-    exclude: [
-      '**/node_modules/**',
-      '**/mocks/**',
-      'Coaching.jsx',
-      '**/functions/**',
-      'useAuth.ts',
-    ],
-    mockReset: true,
-    clearMocks: true,
-    restoreMocks: true,
-    coverage: {
-      exclude: [
-        '**/node_modules/**',
-        '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
-        '**/[.]**',
-        'test?(s)/**',
-        'test?(-*).?(c|m)[jt]s?(x)',
-        '**/*{.,-}{test,spec,bench,benchmark}?(-d).?(c|m)[jt]s?(x)',
-        '**/mocks/**',
-        '**/Coaching.jsx',
-        '**/functions/**',
-        '**/useAuth.ts',
-        '**/interfaceDefinitions.tsx',
-        '**/vite-env.d.ts',
-        '**/react-app-env.d.ts',
-      ],
-    },
-  },
-});
+export default defineConfig((configEnv: ConfigEnv) =>
+  mergeConfig(
+    viteConfig(configEnv),
+    defineConfig({
+      test: {
+        silent: true,
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './tests/setupTests',
+        include: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
+        exclude: [
+          '**/node_modules/**',
+          '**/mocks/**',
+          '**/.stryker-tmp/**',
+          '**/functions/**',
+          'Coaching.jsx',
+          'useAuth.ts',
+        ],
+        mockReset: true,
+        clearMocks: true,
+        restoreMocks: true,
+        testTimeout: 10000,
+        coverage: {
+          exclude: [
+            '**/*{.,-}{test,spec,bench,benchmark}?(-d).?(c|m)[jt]s?(x)',
+            '**/[.]**',
+            '**/.stryker-tmp/**',
+            '**/node_modules/**',
+            '**/assets/**',
+            '**/functions/**',
+            '**/tests/**',
+            '**/mocks/**',
+            '**/providers/**',
+            '**/types/**',
+            '**/src/index.tsx',
+            '**/react-app-env.d.ts',
+            '**/test?(-*).?(c|m)[jt]s?(x)',
+            '**/test?(s)/**',
+            '**/useAuth.ts',
+            '**/vite-env.d.ts',
+            '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
+          ],
+        },
+      },
+    }),
+  ),
+);

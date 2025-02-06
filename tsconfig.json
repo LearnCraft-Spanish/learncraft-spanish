@@ -3,8 +3,14 @@
     "target": "ESNext",
     "jsx": "preserve",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "node",
+    "paths": {
+      "src/*": ["./src/*"],
+      "mocks/*": ["./mocks/*"],
+      "tests/*": ["./tests/*"]
+    },
     "resolveJsonModule": true,
     "types": ["vitest", "node", "msw"],
     "allowJs": true,
@@ -16,5 +22,6 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "include": ["src", "tests", "vite-env.d.ts", "mocks"]
+  "include": ["src", "tests", "vite-env.d.ts", "mocks"],
+  "exclude": ["node_modules", "src/components/Coaching/old/**/*"]
 }

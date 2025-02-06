@@ -1,22 +1,15 @@
 import type { ReactElement } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Route, useLocation } from 'react-router-dom';
-import type { UserData } from './interfaceDefinitions';
+import { useLocation } from 'react-router-dom';
+import { ToastContainer, Zoom } from 'react-toastify';
+import type { FlashcardStudent } from './types/interfaceDefinitions';
 
-import AudioBasedReview from './components/AudioBasedReview/AudioBasedReview';
 import Loading from './components/Loading';
 import Nav from './components/Nav';
-import FlashcardFinder from './components/FlashcardFinder';
-import FlashcardManager from './FlashcardManager';
-import FrequenSay from './FrequenSay';
-import SentryRoutes from './functions/SentryRoutes';
-import { useActiveStudent } from './hooks/useActiveStudent';
+import { useActiveStudent } from './hooks/UserData/useActiveStudent';
 import useAuth from './hooks/useAuth';
-import { useUserData } from './hooks/useUserData';
-import LCSPQuizApp from './LCSPQuizApp';
-import Menu from './Menu';
-import NotFoundPage from './NotFoundPage';
-import ReviewMyFlashcards from './ReviewMyFlashcards';
+import { useUserData } from './hooks/UserData/useUserData';
+import AppRoutes from './routes/AppRoutes';
 import './App.css';
 
 export const App: React.FC = () => {
@@ -43,13 +36,17 @@ export const App: React.FC = () => {
   }, []);
 
   const makeStudentSelector = useCallback(() => {
-    if (userDataQuery.data?.isAdmin && studentListQuery.isSuccess) {
+    if (
+      (userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin') &&
+      studentListQuery.isSuccess
+    ) {
       const studentSelector = [
         <option key={0} label="">
           -- None Selected --
         </option>,
       ];
-      studentListQuery.data.forEach((student: UserData) => {
+      studentListQuery.data.forEach((student: FlashcardStudent) => {
         const studentEmail = student.emailAddress;
         const studentRole = student.role;
         if (
@@ -81,7 +78,7 @@ export const App: React.FC = () => {
       return studentSelector;
     }
   }, [
-    userDataQuery.data?.isAdmin,
+    userDataQuery.data?.roles,
     studentListQuery.isSuccess,
     studentListQuery.data,
   ]);
@@ -131,9 +128,12 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              (userDataQuery.data?.role === 'student' ||
-                userDataQuery.data?.role === 'limited') &&
-              !userDataQuery.data?.isAdmin &&
+              (userDataQuery.data?.roles.studentRole === 'student' ||
+                userDataQuery.data?.roles.studentRole === 'limited') &&
+              !(
+                userDataQuery.data?.roles.adminRole === 'coach' ||
+                userDataQuery.data?.roles.adminRole === 'admin'
+              ) &&
               (userDataQuery.data.name ? (
                 <p>{`Welcome back, ${userDataQuery.data.name}!`}</p>
               ) : (
@@ -143,50 +143,60 @@ export const App: React.FC = () => {
             {!isLoading &&
               isAuthenticated &&
               userDataQuery.isSuccess &&
-              userDataQuery.data?.role !== 'student' &&
-              userDataQuery.data?.role !== 'limited' &&
-              !userDataQuery.data?.isAdmin && <p>Welcome back!</p>}
+              userDataQuery.data?.roles.studentRole !== 'student' &&
+              userDataQuery.data?.roles.studentRole !== 'limited' &&
+              !(
+                userDataQuery.data?.roles.adminRole === 'coach' ||
+                userDataQuery.data?.roles.adminRole === 'admin'
+              ) && <p>Welcome back!</p>}
 
-            {userDataQuery.data?.isAdmin && !studentSelectorOpen && (
-              <div className="studentList">
-                {activeStudentQuery.data?.recordId && (
-                  <p>
-                    {`Using as ${activeStudentQuery.data?.name}
+            {(userDataQuery.data?.roles.adminRole === 'coach' ||
+              userDataQuery.data?.roles.adminRole === 'admin') &&
+              !studentSelectorOpen && (
+                <div className="studentList">
+                  {activeStudentQuery.data?.recordId && (
+                    <p>
+                      {`Using as ${activeStudentQuery.data?.name}
                   ${
                     activeStudentQuery.data?.recordId ===
                     userDataQuery.data?.recordId
                       ? ' (yourself)'
                       : ''
                   }`}
-                  </p>
-                )}
-                {!activeStudentQuery.data?.recordId && (
-                  <p>No student Selected</p>
-                )}
-                <button type="button" onClick={openStudentSelector}>
-                  Change
-                </button>
-              </div>
-            )}
-            {userDataQuery.data?.isAdmin && studentSelectorOpen && (
-              <form className="studentList" onSubmit={(e) => e.preventDefault}>
-                <select
-                  value={
-                    activeStudentQuery.data
-                      ? activeStudentQuery.data?.recordId
-                      : undefined
-                  }
-                  onChange={(e) =>
-                    chooseStudent(Number.parseInt(e.target.value))
-                  }
+                    </p>
+                  )}
+                  {!activeStudentQuery.data?.recordId && (
+                    <p>No student Selected</p>
+                  )}
+                  <button type="button" onClick={openStudentSelector}>
+                    Change
+                  </button>
+                </div>
+              )}
+            {(userDataQuery.data?.roles.adminRole === 'coach' ||
+              userDataQuery.data?.roles.adminRole === 'admin') &&
+              studentSelectorOpen && (
+                <form
+                  className="studentList"
+                  onSubmit={(e) => e.preventDefault}
                 >
-                  {makeStudentSelector()}
-                </select>
-                <button type="button" onClick={closeStudentSelector}>
-                  Cancel
-                </button>
-              </form>
-            )}
+                  <select
+                    value={
+                      activeStudentQuery.data
+                        ? activeStudentQuery.data?.recordId
+                        : undefined
+                    }
+                    onChange={(e) =>
+                      chooseStudent(Number.parseInt(e.target.value))
+                    }
+                  >
+                    {makeStudentSelector()}
+                  </select>
+                  <button type="button" onClick={closeStudentSelector}>
+                    Cancel
+                  </button>
+                </form>
+              )}
           </div>
         )}
 
@@ -202,63 +212,14 @@ export const App: React.FC = () => {
       {!isLoading && isAuthenticated && userDataQuery.isError && (
         <h2>Error loading user data.</h2>
       )}
-      <SentryRoutes>
-        <Route path="/" element={<Menu />} />
-        {/* <Route path="/callback" element={<CallbackPage />} /> */}
-        <Route path="/myflashcards/*" element={<ReviewMyFlashcards />} />
-        <Route path="/manage-flashcards" element={<FlashcardManager />} />
-        (
-        <Route path="/officialquizzes/*" element={<LCSPQuizApp />} />
-        )
-        <Route
-          path="/flashcardfinder"
-          element={
-            (userDataQuery.data?.role === 'student' ||
-              userDataQuery.data?.isAdmin) && <FlashcardFinder />
-          }
-        />
-        <Route
-          path="/audioquiz"
-          element={
-            (userDataQuery.data?.role === 'student' ||
-              userDataQuery.data?.role === 'limited' ||
-              userDataQuery.data?.isAdmin) && (
-              <AudioBasedReview audioOrComprehension="audio" willAutoplay />
-            )
-          }
-        />
-        <Route
-          path="/comprehensionquiz"
-          element={
-            (userDataQuery.data?.role === 'student' ||
-              userDataQuery.data?.role === 'limited' ||
-              userDataQuery.data?.isAdmin) && (
-              <AudioBasedReview
-                audioOrComprehension="comprehension"
-                willAutoplay={false}
-              />
-            )
-          }
-        />
-        <Route
-          path="/frequensay"
-          element={userDataQuery.data?.isAdmin && <FrequenSay />}
-        />
-        {
-          // Coaching Section still under construction
-          /*
-          <Route
-            path="/coaching"
-            element={
-              userDataQuery.data?.isAdmin && (
-                <Coaching />
-              )
-            }
-          />
-          */
-        }
-        <Route path="/*" element={<NotFoundPage />} />
-      </SentryRoutes>
+      <AppRoutes />
+      <ToastContainer
+        theme="colored"
+        transition={Zoom}
+        autoClose={3000}
+        pauseOnHover={false}
+        closeOnClick
+      />
     </div>
   );
 };

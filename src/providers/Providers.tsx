@@ -24,7 +24,7 @@ function Providers({ children }: ProvidersProps) {
         redirect_uri: window.location.origin,
         audience,
         scope:
-          'openid profile email read:current-student update:current-student read:all-students update:all-students',
+          'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
       }}
       onRedirectCallback={(appState) => {
         navigate(appState?.targetUrl || '/', { replace: true });

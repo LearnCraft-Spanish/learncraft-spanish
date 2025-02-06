@@ -1,4 +1,4 @@
-import type { Program } from '../../../src/interfaceDefinitions';
+import type { Program } from 'src/types/interfaceDefinitions';
 const programsTable: Program[] = [
   {
     recordId: 2,

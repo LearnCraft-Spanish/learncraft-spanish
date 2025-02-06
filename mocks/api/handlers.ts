@@ -1,9 +1,15 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
 import { HttpResponse, http } from 'msw';
+import type { UserData } from 'src/types/interfaceDefinitions';
 import newData from '../data/serverlike/serverlikeData';
-
+import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
-import { getUserDataFromName } from '../data/serverlike/studentTable';
+import {
+  allUsersTable,
+  getUserDataFromName,
+} from '../data/serverlike/userTable';
+
+// import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const apiData = newData().api;
@@ -68,14 +74,33 @@ export const handlers = [
 
   http.get(`${backendUrl}my-data`, ({ request }) => {
     const email = getEmailFromRequest(request);
-    const student = apiData.allStudentsTable.find(
-      (student) => student.emailAddress === email,
+    const student = allUsersTable.find(
+      (student: UserData) => student.emailAddress === email,
     );
     return HttpResponse.json(student);
   }),
 
   http.get(`${backendUrl}all-students`, () => {
     return HttpResponse.json(apiData.allStudentsTable);
+  }),
+
+  http.get(`${backendUrl}unverified-examples`, () => {
+    return HttpResponse.json(apiData.verifiedExamplesTable);
+  }),
+
+  http.get(`${backendUrl}recently-edited-examples`, () => {
+    return HttpResponse.json(apiData.verifiedExamplesTable);
+  }),
+
+  http.get(`${backendUrl}single-example/:exampleId`, ({ params }) => {
+    const exampleId = params.exampleId;
+    const foundExample = apiData.verifiedExamplesTable.find((example) => {
+      return example.recordId === Number(exampleId);
+    });
+    if (!foundExample) {
+      throw new Error('Example not found');
+    }
+    return HttpResponse.json(foundExample);
   }),
 
   http.get(`${backendUrl}my-examples`, ({ request }) => {
@@ -186,5 +211,34 @@ export const handlers = [
   }),
   http.post(`${backendUrl}pmf/update`, async () => {
     return HttpResponse.json(1);
+  }),
+
+  // Coaching
+  http.get(`${backendUrl}coaching/weeks-new-format`, async () => {
+    return HttpResponse.json(generatedMockData.weeks);
+  }),
+  http.get(`${backendUrl}coaching/coaches`, async () => {
+    return HttpResponse.json(generatedMockData.coachList);
+  }),
+  http.get(`${backendUrl}coaching/courses`, async () => {
+    return HttpResponse.json(generatedMockData.courseList);
+  }),
+  http.get(`${backendUrl}coaching/active-memberships`, async () => {
+    return HttpResponse.json(generatedMockData.memberships);
+  }),
+  http.get(`${backendUrl}coaching/active-students`, async () => {
+    return HttpResponse.json(generatedMockData.studentList);
+  }),
+  http.get(`${backendUrl}coaching/group-sessions`, async () => {
+    return HttpResponse.json(generatedMockData.groupSessions);
+  }),
+  http.get(`${backendUrl}coaching/group-attendees`, async () => {
+    return HttpResponse.json(generatedMockData.groupAttendees);
+  }),
+  http.get(`${backendUrl}coaching/assignments`, async () => {
+    return HttpResponse.json(generatedMockData.assignments);
+  }),
+  http.get(`${backendUrl}coaching/calls`, async () => {
+    return HttpResponse.json(generatedMockData.calls);
   }),
 ];

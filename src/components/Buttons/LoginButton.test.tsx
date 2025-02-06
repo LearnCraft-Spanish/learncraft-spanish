@@ -2,8 +2,8 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 
-import createMockAuth from '../../../mocks/hooks/useMockAuth';
-import useAuth from '../../hooks/useAuth';
+import createMockAuth from 'mocks/hooks/useMockAuth';
+import useAuth from 'src/hooks/useAuth';
 
 import LoginButton from './LoginButton';
 

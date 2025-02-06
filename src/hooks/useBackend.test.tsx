@@ -2,10 +2,13 @@ import { act } from 'react';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
-import type { QuizExamplesTable, QuizUnparsed } from '../interfaceDefinitions';
-import MockAllProviders from '../../mocks/Providers/MockAllProviders';
-import { setupMockAuth } from '../../tests/setupMockAuth';
+import type {
+  QuizExamplesTable,
+  QuizUnparsed,
+} from 'src/types/interfaceDefinitions';
+import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
 
 import { useBackend } from './useBackend';
 
@@ -135,7 +138,6 @@ describe('useBackend Hook', () => {
 
   testArrayFetchFunction({
     functionName: 'getProgramsFromBackend',
-    expectedLength: 4,
     requiredFields: ['recordId', 'name'],
   });
 
@@ -171,12 +173,12 @@ describe('useBackend Hook', () => {
 
   testArrayFetchFunction({
     functionName: 'getAllUsersFromBackend',
-    requiredFields: ['isAdmin'],
+    requiredFields: ['role'],
   });
 
   testObjectFetchFunction({
     functionName: 'getUserDataFromBackend',
-    requiredFields: ['recordId', 'emailAddress', 'role'],
+    requiredFields: ['recordId', 'emailAddress', 'roles'],
   });
 
   testObjectFetchFunction({

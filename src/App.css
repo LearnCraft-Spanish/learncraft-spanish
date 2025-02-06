@@ -14,7 +14,7 @@
 }
 
 body {
-  background-image: url('./resources/paper-small.jpeg');
+  background-image: url('./assets/paper-small.jpeg');
 }
 
 a {
@@ -115,11 +115,11 @@ button:hover,
 
 .disabledButton {
   background-color: var(--dark);
-  cursor: default;
+  cursor: disabled;
 }
 
 .disabledButton:hover {
-  cursor: default;
+  cursor: disabled;
   background-color: var(--dark);
 }
 
@@ -157,8 +157,8 @@ button:hover,
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%; /* Take full width of parent */
-  height: 100%; /* Take full height of parent */
+  width: 100%;
+  height: 100%;
   max-height: 70vh;
   padding: 5% 20%;
   box-sizing: border-box;
@@ -166,24 +166,24 @@ button:hover,
 
 .loadingIcon {
   position: relative;
-  width: 50%; /* Width relative to parent container */
-  padding-top: 50%; /* Height relative to width to maintain square shape */
-  max-width: 400px; /* Maximum size for larger containers */
-  max-height: 400px; /* Same as max-width to keep square */
-  min-width: 150px; /* Minimum size */
-  min-height: 150px; /* Minimum size */
+  width: 50%;
+  padding-top: 50%;
+  max-width: 400px;
+  max-height: 400px;
+  min-width: 150px;
+  min-height: 150px;
 }
 
 #headIcon {
   position: absolute;
-  top: 10%; /* Positioning relative to .loadingIcon */
+  top: 10%;
   left: 10%;
-  width: 80%; /* Resize the head within its parent */
+  width: 80%;
 }
 
 #wheelIcon {
   position: absolute;
-  top: 18%; /* Adjust to align correctly with the head */
+  top: 18%;
   left: 18%;
   width: 40%;
   animation: spin 1.4s linear infinite;
@@ -535,7 +535,7 @@ button:hover,
   text-align: center;
   display: flex;
   flex-direction: column;
-  vertical-align: center;
+  /* vertical-align: center; */
   justify-content: center;
   padding: 25px 50px;
   border: 4px solid var(--brand);
@@ -569,14 +569,8 @@ button:hover,
   z-index: 5;
 } */
 /* progressBar & progressBar2 are almost legacy */
-/* Remove once all instances of QuizProgress are replaced with NewQuizProgress */
-.progressBar,
-.progressBar2 {
-  display: block;
-  text-align: center;
-  justify-self: center;
-}
 
+/* This is for the visual overlay for AudioFlashcard */
 .progressStatus {
   position: absolute;
   top: 0px;
@@ -733,7 +727,6 @@ button:hover,
   width: 100%;
   background-color: var(--theme);
   margin: 0 auto;
-  padding: auto;
 }
 
 .examplesTable .buttonBox button:hover {
@@ -753,7 +746,6 @@ button:hover,
   cursor: pointer;
   text-align: left;
   font-size: 12px;
-  padding: auto;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
@@ -871,15 +863,56 @@ button:hover,
   margin: 5px 30px;
 }
 
+.exampleCardTags {
+  background-color: var(--theme);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0px;
+  padding: 0px;
+}
+
+.exampleCardTagsList {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 0px;
+  padding: 36px 10px 10px;
+}
+
+.showTagsButton {
+  height: 100%;
+  background-color: var(--theme);
+  color: var(--light);
+  margin: 0px;
+  padding: 0px 10px;
+}
+
+.hideTagsButton {
+  background-color: transparent;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.hideTagsButton img {
+  width: 12px;
+  height: 12px;
+  color: var(--light);
+}
+
 .addButton,
 .removeButton {
   width: 10%;
   min-width: 120px;
   cursor: pointer;
-}
-.disabledButton {
-  width: 10%;
-  min-width: 120px;
 }
 
 .addButton {
@@ -922,175 +955,6 @@ button:hover,
   margin: 0;
   margin-right: 6px;
 } */
-
-/*Styles for the coaching section*/
-
-.coachingFilterSection {
-  padding: 20px 20px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-}
-
-.coachingFilterSection .searchOrButton {
-  display: flex;
-  padding: 0px 10px;
-  align-content: center;
-}
-
-.coachingFilterSection div h4 {
-  margin: 0px;
-}
-
-.moreFilters {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: scroll;
-  padding: 5%;
-  background-color: var(--brand);
-  border: 5px solid var(--dark);
-  position: fixed;
-  top: 10%;
-  bottom: 10%;
-  left: 10%;
-  right: 10%;
-}
-
-.numberShowing {
-  padding: 10px 20px;
-}
-
-.studentPopup {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: scroll;
-  padding: 5%;
-  background-color: var(--light);
-  border: 5px solid var(--dark);
-  position: fixed;
-  top: 10%;
-  bottom: 10%;
-  left: 10%;
-  right: 10%;
-}
-
-.callBox {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-bottom: 5px;
-}
-
-.callPopup {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: scroll;
-  padding: 5%;
-  background-color: var(--light);
-  border: 5px solid var(--dark);
-  position: fixed;
-  top: 10%;
-  bottom: 10%;
-  left: 10%;
-  right: 10%;
-}
-
-.callPopup input {
-  min-height: 30px;
-}
-
-.groupSessionPopup {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: scroll;
-  padding: 5%;
-  background-color: var(--light);
-  border: 5px solid var(--dark);
-  position: fixed;
-  top: 10%;
-  bottom: 10%;
-  left: 10%;
-  right: 10%;
-}
-
-.groupAttendeeList {
-  display: flex;
-  flex-direction: row;
-}
-
-.groupAttendee {
-  margin-right: 7px;
-  padding: 5px 10px;
-  display: flex;
-  flex-direction: row;
-  color: var(--light);
-  background-color: var(--dark);
-}
-
-.assignmentPopup {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: scroll;
-  padding: 5%;
-  background-color: var(--light);
-  border: 5px solid var(--dark);
-  position: fixed;
-  top: 10%;
-  bottom: 10%;
-  left: 10%;
-  right: 10%;
-}
-
-.studentRecords {
-  border-collapse: collapse;
-  margin: 15px;
-}
-
-.tableHeader {
-  background-color: var(--brand);
-  color: var(--light);
-  border: 2px solid var(--dark);
-}
-
-.tableHeader th {
-  padding: 10px;
-}
-
-.studentWeek {
-  background-color: var(--light);
-  margin: 9px;
-  border: 1px solid var(--dark);
-  padding: 5px 10px;
-}
-
-.studentWeekNotes {
-  padding: 5px;
-}
-
-.studentHeader {
-  padding: 0px;
-  border-bottom: 1px solid var(--light);
-  background-color: var(--dark);
-}
-
-.studentBox {
-  color: var(--light);
-  padding: 10px 20px;
-  cursor: pointer;
-}
-
-.assignmentBox {
-  margin: 5px;
-  display: flex;
-  justify-content: center;
-}
 
 @media screen and (max-width: 767px) {
   .div-header h1 {
@@ -1360,11 +1224,25 @@ i {
   }
 
   .div-header.homeButton {
-    background-image: url('./resources/icons8-home-24.png');
+    background-image: url('./assets/icons8-home-24.png');
   } */
 
 /*  FrequenSay */
 .frequensay .tempBox {
   max-width: 640px;
   margin: auto;
+}
+
+/*
+ * Toast Notification Styles
+ *
+ * For more information on styling this component, visit:
+ * https://fkhadra.github.io/react-toastify/how-to-style
+ */
+.Toastify__toast-container {
+  --toastify-color-success: darkgreen;
+  --toastify-color-error: darkred;
+  --toastify-toast-bd-radius: 0;
+  /* --toastify-toast-min-height: 40px; */
+  --toastify-font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
 }

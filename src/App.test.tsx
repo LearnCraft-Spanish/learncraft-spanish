@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
-import MockAllProviders from '../mocks/Providers/MockAllProviders';
-import { setupMockAuth } from '../tests/setupMockAuth';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
 import App from './App';
 
 // Waiting for userData context to be finished
@@ -101,6 +101,18 @@ describe('app', () => {
     );
     await waitFor(() => {
       expect(getByText(/quiz my flashcards/i)).toBeInTheDocument();
+    });
+  });
+
+  it('displays example editor if admin', async () => {
+    setupMockAuth({ userName: 'admin-empty-role' });
+    const { getByText } = render(
+      <MockAllProviders>
+        <App />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(getByText(/example creator/i)).toBeInTheDocument();
     });
   });
 });

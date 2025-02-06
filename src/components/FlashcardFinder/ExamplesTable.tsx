@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import type { DisplayOrder, Flashcard } from '../../interfaceDefinitions';
+import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
 import ExampleListItem from './ExampleListItem';
 import Pagination from './Pagination';
 
@@ -8,6 +8,8 @@ interface ExamplesTableProps {
   dataSource: Flashcard[];
   displayOrder: DisplayOrder[];
   showSpanglishLabel?: boolean;
+  forceShowVocab?: boolean;
+  selectFunction?: (recordId: number) => void;
   sorted?: boolean;
 }
 
@@ -16,8 +18,13 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
   displayOrder,
   showSpanglishLabel = false,
   sorted = false,
+  forceShowVocab = false,
+  selectFunction = undefined,
 }: ExamplesTableProps) => {
   const [page, setPage] = useState(1);
+  const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
+    null,
+  );
   const itemsPerPage = 50;
   const maxPage = Math.ceil(displayOrder.length / itemsPerPage);
 
@@ -39,6 +46,16 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
     }
     setPage(page - 1);
   }, [page]);
+
+  const selectExample = useMemo(() => {
+    if (selectFunction) {
+      return (recordId: number) => {
+        selectFunction(recordId);
+        setSelectedExampleId(recordId);
+      };
+    }
+    return undefined;
+  }, [selectFunction]);
 
   const getExampleById = useCallback(
     (recordId: number) => {
@@ -131,6 +148,9 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
                 key={displayOrder.recordId}
                 data={exampleData}
                 showSpanglishLabel={showSpanglishLabel}
+                forceShowVocab={forceShowVocab}
+                selectExample={selectExample}
+                selectedExampleId={selectedExampleId}
               />
             );
         })}

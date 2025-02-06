@@ -1,6 +1,6 @@
-import type { Lesson, Program } from '../../interfaceDefinitions';
-import { useProgramTable } from '../../hooks/useProgramTable';
-import { useSelectedLesson } from '../../hooks/useSelectedLesson';
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import type { Lesson, Program } from 'src/types/interfaceDefinitions';
 import './LessonSelector.css';
 
 export default function FromToLessonSelector(): JSX.Element {
@@ -91,7 +91,7 @@ export default function FromToLessonSelector(): JSX.Element {
           {makeCourseSelector()}
         </select>
       </label>
-      <div id="flashcardFinderStyling">
+      <div>
         {selectedProgram?.lessons && (
           <label htmlFor="fromLesson" className="menuRow" id="fromRow">
             <p>From:</p>
@@ -99,7 +99,6 @@ export default function FromToLessonSelector(): JSX.Element {
             <select
               id="fromLesson"
               name="fromLesson"
-              className="lessonList"
               value={selectedFromLesson?.recordId}
               onChange={(e) => setFromLesson(e.target.value)}
             >
