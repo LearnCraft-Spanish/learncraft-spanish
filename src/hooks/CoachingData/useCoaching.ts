@@ -5,6 +5,8 @@ import { useUserData } from '../UserData/useUserData';
 
 import useAssignments from './useAssignments';
 import usePrivateCalls from './usePrivateCalls';
+import useGroupSessions from './useGroupSessions';
+import useGroupAttendees from './useGroupAttendees';
 
 export default function useCoaching() {
   const userDataQuery = useUserData();
@@ -12,6 +14,8 @@ export default function useCoaching() {
 
   const { assignmentsQuery } = useAssignments();
   const { privateCallsQuery } = usePrivateCalls();
+  const { groupSessionsQuery } = useGroupSessions();
+  const { groupAttendeesQuery } = useGroupAttendees();
 
   /* --------- Queries --------- */
   const lastThreeWeeksQuery = useQuery({
@@ -53,24 +57,6 @@ export default function useCoaching() {
   const activeStudentsQuery = useQuery({
     queryKey: ['activeStudents'],
     queryFn: backend.getActiveStudents,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const groupSessionsQuery = useQuery({
-    queryKey: ['groupSessions'],
-    queryFn: backend.getGroupSessions,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const groupAttendeesQuery = useQuery({
-    queryKey: ['groupAttendees'],
-    queryFn: backend.getGroupAttendees,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||

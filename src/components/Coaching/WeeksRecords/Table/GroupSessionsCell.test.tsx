@@ -106,7 +106,8 @@ describe('component StudentCell', () => {
     it('contextual menu view renders the session documents if they exist on the Group Session', async () => {
       await renderWithPopupActive();
       await waitFor(() => {
-        expect(screen.getByText('Session Documents:')).toBeInTheDocument();
+        expect(screen.getByText('Zoom Link:')).toBeInTheDocument();
+        expect(screen.getByText('Call Document:')).toBeInTheDocument();
       });
     });
   });
