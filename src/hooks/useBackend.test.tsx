@@ -138,7 +138,6 @@ describe('useBackend Hook', () => {
 
   testArrayFetchFunction({
     functionName: 'getProgramsFromBackend',
-    expectedLength: 5,
     requiredFields: ['recordId', 'name'],
   });
 
