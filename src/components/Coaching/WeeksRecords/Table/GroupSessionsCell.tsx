@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -6,61 +6,77 @@ import type { GroupSession, Week } from 'src/types/CoachingTypes';
 import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
 
 import ContextualControlls from 'src/components/ContextualControlls';
+import { useModal } from 'src/hooks/useModal';
 
 function GroupSessionCell({
   groupSession,
+  week,
   newRecord,
 }: {
   groupSession: GroupSession;
+  week: Week;
   newRecord?: boolean;
 }) {
-  const { contextual, openContextual, setContextualRef } = useContextualMenu();
-  const { getAttendeesFromGroupSessionId, coachListQuery } = useCoaching();
-  const { groupSessionsTopicFieldOptionsQuery } = useGroupSessions();
+  const {
+    contextual,
+    openContextual,
+    setContextualRef,
+    closeContextual,
+    updateDisableClickOutside,
+  } = useContextualMenu();
+  const { openModal } = useModal();
 
-  const [sessionType, setSessionType] = useState<string>(
-    newRecord ? '' : groupSession.sessionType,
-  );
-  const [date, setDate] = useState(
-    groupSession.date
-      ? typeof groupSession.date === 'string'
-        ? groupSession.date
-        : new Date(groupSession.date).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0],
-    // : new Date(groupSession.date).toISOString().split('T')[0],
-  );
-  const [coach, setCoach] = useState<string>(
-    groupSession.coach ? groupSession.coach.email : '',
-  );
+  const {
+    getAttendeesFromGroupSessionId,
+    coachListQuery,
+    lastThreeWeeksQuery,
+    getStudentFromMembershipId,
+  } = useCoaching();
+  const {
+    groupSessionsTopicFieldOptionsQuery,
+    createGroupSessionMutation,
+    updateGroupSessionMutation,
+  } = useGroupSessions();
+
+  const dataReady =
+    coachListQuery.isSuccess && groupSessionsTopicFieldOptionsQuery.isSuccess;
+  const rendered = useRef(false);
+
+  const [sessionType, setSessionType] = useState<string>('');
+  const [date, setDate] = useState<string>('');
+  const [coach, setCoach] = useState<string>('');
+  const [topic, setTopic] = useState<string>('');
+  const [comments, setComments] = useState<string>('');
+  const [callDocument, setCallDocument] = useState<string>('');
+  const [zoomLink, setZoomLink] = useState<string>('');
+
   const coachName = useMemo(() => {
     const corrector = coachListQuery.data?.find(
       (user) => user.user.email === coach,
     );
     return corrector ? corrector.user.name : 'No Coach Found';
   }, [coach, coachListQuery.data]);
-  const [topic, setTopic] = useState<string>(
-    newRecord ? '' : groupSession.topic,
-  );
-  const [comments, setComments] = useState<string>(
-    newRecord ? '' : groupSession.comments,
-  );
-  const [callDocument, setCallDocument] = useState<string>(
-    newRecord ? '' : groupSession.callDocument,
-  );
-  const [zoomLink, setZoomLink] = useState<string>(
-    newRecord ? '' : groupSession.zoomLink,
-  );
-  const [recordId, setRecordId] = useState<number>(
-    newRecord ? -1 : groupSession.recordId,
+
+  const recordId = useMemo(
+    () => (newRecord ? -1 : groupSession.recordId),
+    [newRecord, groupSession.recordId],
   );
 
-  const [attendees, setAttendees] = useState(
-    newRecord
-      ? []
-      : getAttendeesFromGroupSessionId(recordId)?.map(
-          (attendee) => attendee.weekStudent,
-        ),
+  const attendees = useMemo(
+    () =>
+      newRecord
+        ? []
+        : getAttendeesFromGroupSessionId(recordId)?.map(
+            (attendee) => attendee.weekStudent,
+          ),
+    [newRecord, getAttendeesFromGroupSessionId, recordId],
   );
+  // interface attendeeChanges {
+  //   name: string;
+  //   relatedWeek: number;
+  //   action: 'add' | 'remove';
+  // }
+  // const [attendeeChanges, setAttendeeChanges ] = useState<attendeeChanges[]>([]);
 
   const [editMode, setEditMode] = useState<boolean>(!!newRecord);
 
@@ -74,28 +90,130 @@ function GroupSessionCell({
     }
     setCoach(corrector.user.email);
   }
+  function enableEditMode() {
+    setEditMode(true);
+    updateDisableClickOutside(true);
+  }
+  function disableEditMode() {
+    setEditMode(false);
+    updateDisableClickOutside(false);
+  }
+
+  const setInitialState = useCallback(() => {
+    setSessionType(newRecord ? '' : groupSession.sessionType);
+    setDate(
+      groupSession.date
+        ? typeof groupSession.date === 'string'
+          ? groupSession.date
+          : new Date(groupSession.date).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
+    );
+    setCoach(newRecord ? '' : groupSession.coach.email);
+    setTopic(newRecord ? '' : groupSession.topic);
+    setComments(newRecord ? '' : groupSession.comments);
+    setCallDocument(newRecord ? '' : groupSession.callDocument);
+    setZoomLink(newRecord ? '' : groupSession.zoomLink);
+  }, [groupSession, newRecord]);
+
+  function cancelEdit() {
+    if (newRecord) {
+      closeContextual();
+      return;
+    }
+    disableEditMode();
+    setInitialState();
+  }
+  function captureSubmitForm() {
+    // verify required fields
+    if (!date || !coach || !sessionType) {
+      openModal({
+        type: 'error',
+        title: 'Error',
+        body: 'Date, Coach and Session Type are required',
+      });
+      return;
+    }
+    if (newRecord) {
+      createGroupSessionMutation.mutate({
+        date,
+        coach,
+        sessionType,
+        topic,
+        comments,
+        callDocument,
+        zoomLink,
+      });
+    } else {
+      // verify if any changes were made
+      if (
+        date === groupSession.date &&
+        coach === groupSession.coach.email &&
+        sessionType === groupSession.sessionType &&
+        topic === groupSession.topic &&
+        comments === groupSession.comments &&
+        callDocument === groupSession.callDocument &&
+        zoomLink === groupSession.zoomLink
+      ) {
+        console.error('No changes detected');
+        disableEditMode();
+        return;
+      }
+      updateGroupSessionMutation.mutate({
+        recordId,
+        date,
+        coach,
+        sessionType,
+        topic,
+        comments,
+        callDocument,
+        zoomLink,
+      });
+    }
+    disableEditMode();
+    closeContextual();
+  }
+
+  function toggleEditMode() {
+    if (editMode) {
+      cancelEdit();
+    } else {
+      enableEditMode();
+    }
+  }
+
+  useEffect(() => {
+    if (dataReady && !rendered.current) {
+      setInitialState();
+      rendered.current = true;
+    }
+  }, [dataReady, sessionType, setInitialState]);
+
   return (
     <div className="cellWithContextual" key={recordId}>
       {newRecord ? (
         <button
           type="button"
           className="greenButton"
-          onClick={() => openContextual(`groupSession${recordId}`)}
+          onClick={() =>
+            openContextual(`groupSession${recordId}week${week.recordId}`)
+          }
         >
           New
         </button>
       ) : (
         <button
           type="button"
-          onClick={() => openContextual(`groupSession${recordId}`)}
+          onClick={() =>
+            openContextual(`groupSession${recordId}week${week.recordId}`)
+          }
         >
           {sessionType}
         </button>
       )}
-      {contextual === `groupSession${recordId}` && (
+      {contextual === `groupSession${recordId}week${week.recordId}` && (
         <div className="contextualWrapper">
           <div className="contextual" ref={setContextualRef}>
-            <ContextualControlls />
+            <ContextualControlls editFunction={toggleEditMode} />
             {editMode ? (
               newRecord ? (
                 <h3>New Group Session</h3>
@@ -204,15 +322,24 @@ function GroupSessionCell({
               )}
             </div>
             <div className="lineWrapper">
-              <p className="label">Attendees: </p>
-              <p className="content">
+              <label className="label">Attendees:</label>
+              <div className="content">
                 {attendees &&
                   attendees.map((attendee) => <p key={attendee}>{attendee}</p>)}
-                {/*
+                {/* <button
+                  type="button"
+                  className="addButton addAttendee"
+                  onClick={() => openContextual(`groupSession${recordId}addAttendee`)}
+                >
+                  Add Attendee
+                </button> */}
+              </div>
+            </div>
+            {/*
                   Popup button trigger for the student profile popup commented out at EOF
                   CURRENT STATUS: Replaced with studentName text above
                    */}
-                {/*
+            {/*
                 {attendeesWeekRecords &&
                   attendeesWeekRecords.map(
                     (attendee: Week | undefined) =>
@@ -237,58 +364,114 @@ function GroupSessionCell({
                     // </button>
                   )}
                   */}
-              </p>
-            </div>
-            <div>
+            <div className="lineWrapper">
+              <label className="label" htmlFor="callDocument">
+                Call Document:
+              </label>
               {editMode ? (
-                <>
-                  <div className="lineWrapper">
-                    <label className="label" htmlFor="callDocument">
-                      Call Document:
-                    </label>
-                    <input
-                      className="content"
-                      id="callDocument"
-                      name="callDocument"
-                      type="text"
-                      value={callDocument}
-                      onChange={(e) => setCallDocument(e.target.value)}
-                    />
-                  </div>
-                  <div className="lineWrapper">
-                    <label className="label" htmlFor="zoomLink">
-                      Zoom Link:
-                    </label>
-                    <input
-                      className="content"
-                      id="zoomLink"
-                      name="zoomLink"
-                      type="text"
-                      value={zoomLink}
-                      onChange={(e) => setZoomLink(e.target.value)}
-                    />
-                  </div>
-                </>
+                <input
+                  className="content"
+                  id="callDocument"
+                  name="callDocument"
+                  type="text"
+                  value={callDocument}
+                  onChange={(e) => setCallDocument(e.target.value)}
+                />
               ) : (
-                <>
-                  <div className="lineWrapper">
-                    <label className="label" htmlFor="callDocument">
-                      Call Document:
-                    </label>
-                    <p className="content">{callDocument}</p>
-                  </div>
-                  <div className="lineWrapper">
-                    <label className="label" htmlFor="zoomLink">
-                      Zoom Link:
-                    </label>
-                    <p className="content">{zoomLink}</p>
-                  </div>
-                </>
+                <p className="content">{callDocument}</p>
               )}
+            </div>
+            <div className="lineWrapper">
+              <label className="label" htmlFor="zoomLink">
+                Zoom Link:
+              </label>
+              {editMode ? (
+                <input
+                  className="content"
+                  id="zoomLink"
+                  name="zoomLink"
+                  type="text"
+                  value={zoomLink}
+                  onChange={(e) => setZoomLink(e.target.value)}
+                />
+              ) : (
+                <p className="content">{zoomLink}</p>
+              )}
+            </div>
+
+            {editMode && (
+              <div className="buttonBox">
+                <button
+                  type="button"
+                  className="redButton"
+                  onClick={cancelEdit}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="greenButton"
+                  onClick={captureSubmitForm}
+                >
+                  Save
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {contextual === `groupSession${recordId}addAttendee` && (
+        <div className="contextualWrapper">
+          <div className="contextual" ref={setContextualRef}>
+            <h3>Add Attendee</h3>
+            <div className="lineWrapper">
+              <label className="label" htmlFor="attendee">
+                Select Attendee:
+              </label>
+              <select
+                id="attendee"
+                name="attendee"
+                className="content"
+                defaultValue=""
+              >
+                <option value="">Select</option>
+                {lastThreeWeeksQuery.data
+                  ?.filter((filterWeek) => {
+                    return (
+                      week.membershipCourseHasGroupCalls &&
+                      filterWeek.weekStarts === week.weekStarts
+                    );
+                  })
+                  .map((week) => (
+                    <option key={week.recordId} value={week.recordId}>
+                      {
+                        getStudentFromMembershipId(week.relatedMembership)
+                          ?.fullName
+                      }
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div className="buttonBox">
+              <button
+                type="button"
+                className="greenButton"
+                onClick={() => openContextual(`groupSession${recordId}`)}
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                className="redButton"
+                onClick={() => openContextual(`groupSession${recordId}`)}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
       )}
+
       {/* Popup for viewing a student, maybe put somewhere else? make component, then let it be activated from here? */}
       {/* {contextual ===
         `attendee${
@@ -360,12 +543,14 @@ export default function GroupSessionsCell({ week }: { week: Week }) {
           <GroupSessionCell
             groupSession={groupSession}
             key={groupSession.recordId}
+            week={week}
           />
         ))}
         {week.membershipCourseHasGroupCalls && (
           <GroupSessionCell
             groupSession={{ recordId: -1 } as GroupSession}
             newRecord
+            week={week}
           />
         )}
       </>

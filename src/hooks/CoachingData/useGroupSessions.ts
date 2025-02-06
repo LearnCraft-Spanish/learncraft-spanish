@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useUserData } from '../UserData/useUserData';
 import { useBackend, useBackendHelpers } from '../useBackend';
-
 export default function useGroupSessions() {
   const userDataQuery = useUserData();
   const backend = useBackend();
@@ -30,8 +29,17 @@ export default function useGroupSessions() {
   // get group session by recordId
 
   // create group session
+  interface CreateGroupSessionMutation {
+    date: string;
+    coach: string;
+    sessionType: string;
+    topic: string;
+    comments: string;
+    callDocument: string;
+    zoomLink: string;
+  }
   const createGroupSessionMutation = useMutation({
-    mutationFn: (groupSession) => {
+    mutationFn: (groupSession: CreateGroupSessionMutation) => {
       return newPostFactory({
         path: 'coaching/group-sessions',
         body: groupSession,
@@ -41,9 +49,19 @@ export default function useGroupSessions() {
       groupSessionsQuery.refetch();
     },
   });
+  interface UpdateGroupSessionMutation {
+    recordId: number;
+    date: string;
+    coach: string;
+    sessionType: string;
+    topic: string;
+    comments: string;
+    callDocument: string;
+    zoomLink: string;
+  }
 
   const updateGroupSessionMutation = useMutation({
-    mutationFn: (groupSession) => {
+    mutationFn: (groupSession: UpdateGroupSessionMutation) => {
       return newPutFactory({
         path: 'coaching/group-sessions',
         body: groupSession,
