@@ -5,7 +5,11 @@ import { useBackend, useBackendHelpers } from '../useBackend';
 export default function useGroupSessions() {
   const userDataQuery = useUserData();
   const backend = useBackend();
-  const { newPostFactory, newPutFactory } = useBackendHelpers();
+  const { getFactory, newPostFactory, newPutFactory } = useBackendHelpers();
+
+  function getGroupSessionsTopicFieldOptions() {
+    return getFactory<string[]>('coaching/group-sessions/topic-field-options');
+  }
 
   const groupSessionsQuery = useQuery({
     queryKey: ['groupSessions'],
@@ -14,6 +18,13 @@ export default function useGroupSessions() {
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||
       userDataQuery.data?.roles.adminRole === 'admin',
+  });
+
+  const groupSessionsTopicFieldOptionsQuery = useQuery({
+    queryKey: ['groupSessionsTopicFieldOptions'],
+    queryFn: getGroupSessionsTopicFieldOptions,
+    staleTime: Infinity,
+    enabled: groupSessionsQuery.isSuccess,
   });
 
   // get group session by recordId
@@ -45,6 +56,7 @@ export default function useGroupSessions() {
 
   return {
     groupSessionsQuery,
+    groupSessionsTopicFieldOptionsQuery,
 
     createGroupSessionMutation,
     updateGroupSessionMutation,

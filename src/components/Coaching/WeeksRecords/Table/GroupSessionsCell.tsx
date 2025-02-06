@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import type { GroupSession, Week } from 'src/types/CoachingTypes';
+import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
 
 import ContextualControlls from 'src/components/ContextualControlls';
 
@@ -15,17 +16,28 @@ function GroupSessionCell({
 }) {
   const { contextual, openContextual, setContextualRef } = useContextualMenu();
   const { getAttendeesFromGroupSessionId, coachListQuery } = useCoaching();
+  const { groupSessionsTopicFieldOptionsQuery } = useGroupSessions();
 
   const [sessionType, setSessionType] = useState<string>(
     newRecord ? '' : groupSession.sessionType,
   );
-  const [date, setDate] = useState<Date | string>(
-    newRecord ? new Date().toISOString().split('T')[0] : groupSession.date,
+  const [date, setDate] = useState(
+    groupSession.date
+      ? typeof groupSession.date === 'string'
+        ? groupSession.date
+        : new Date(groupSession.date).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0],
     // : new Date(groupSession.date).toISOString().split('T')[0],
   );
   const [coach, setCoach] = useState<string>(
     groupSession.coach ? groupSession.coach.email : '',
   );
+  const coachName = useMemo(() => {
+    const corrector = coachListQuery.data?.find(
+      (user) => user.user.email === coach,
+    );
+    return corrector ? corrector.user.name : 'No Coach Found';
+  }, [coach, coachListQuery.data]);
   const [topic, setTopic] = useState<string>(
     newRecord ? '' : groupSession.topic,
   );
@@ -91,18 +103,9 @@ function GroupSessionCell({
                 <h3>Edit Group Session</h3>
               )
             ) : (
-              <h3>
-                {`Session: ${sessionType} on 
-                ${typeof date === 'string' ? date : date.toDateString()}`}
-              </h3>
+              <h3>{`Session: ${sessionType} on ${date}`}</h3>
             )}
             <div>
-              {/* <div className="lineWrapper">
-                <p className="label">Coach: </p>
-                <p className="content">
-                  {coach ? coach.name : 'No Coach Found'}
-                </p>
-              </div> */}
               <div className="lineWrapper">
                 <label className="label" htmlFor="coach">
                   Coach:
@@ -124,17 +127,66 @@ function GroupSessionCell({
                     ))}
                   </select>
                 ) : (
-                  <p className="content">{coach}</p>
+                  <p className="content">{coachName}</p>
                 )}
               </div>
+              {editMode && (
+                <div className="lineWrapper">
+                  <label className="label">Date: </label>
+                  <input
+                    className="content"
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                  />
+                </div>
+              )}
+              {editMode && (
+                <div className="lineWrapper">
+                  <label className="label" htmlFor="sessionType">
+                    Session Type:
+                  </label>
+                  <select
+                    id="sessionType"
+                    name="sessionType"
+                    className="content"
+                    defaultValue={sessionType}
+                    onChange={(e) => setSessionType(e.target.value)}
+                  >
+                    <option value="">Select</option>
+                    <option value="1MC">1MC</option>
+                    <option value="2MC">2MC</option>
+                    <option value="Modules 1 & 2">Modules 1 & 2</option>
+                    <option value="Level 1">Level 1</option>
+                    <option value="Level 2">Level 2</option>
+                    <option value="Level 3">Level 3</option>
+                    <option value="Level 4">Level 4</option>
+                    <option value="Level 5">Level 5</option>
+                    <option value="Level 6">Level 6</option>
+                    <option value="Module 3">Module 3</option>
+                    <option value="Module 4">Module 4</option>
+                    <option value="LCS Cohort">LCS Cohort</option>
+                    <option value="Advanced">Advanced</option>
+                    <option value="Conversation">Conversation</option>
+                  </select>
+                </div>
+              )}
             </div>
             <div className="lineWrapper">
               <label className="label">Topic: </label>
               {editMode ? (
-                <div className="content">
-                  will revisit. will be a massive select, with the option to add
-                  a topic if its missing
-                </div>
+                <select
+                  className="content"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                >
+                  <option value="">Select</option>
+                  {groupSessionsTopicFieldOptionsQuery.data?.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               ) : (
                 <p className="content">{topic}</p>
               )}
