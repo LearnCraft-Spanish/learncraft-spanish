@@ -31,6 +31,7 @@ function GroupSessionCell({
     coachListQuery,
     lastThreeWeeksQuery,
     getStudentFromMembershipId,
+    getMembershipFromWeekRecordId,
   } = useCoaching();
   const {
     groupSessionsTopicFieldOptionsQuery,
@@ -50,6 +51,8 @@ function GroupSessionCell({
   const [callDocument, setCallDocument] = useState<string>('');
   const [zoomLink, setZoomLink] = useState<string>('');
 
+  const [addingAttendee, setAddingAttendee] = useState<string>('');
+
   const coachName = useMemo(() => {
     const corrector = coachListQuery.data?.find(
       (user) => user.user.email === coach,
@@ -62,23 +65,86 @@ function GroupSessionCell({
     [newRecord, groupSession.recordId],
   );
 
-  const attendees = useMemo(
-    () =>
-      newRecord
-        ? []
-        : getAttendeesFromGroupSessionId(recordId)?.map(
-            (attendee) => attendee.weekStudent,
-          ),
-    [newRecord, getAttendeesFromGroupSessionId, recordId],
-  );
-  // interface attendeeChanges {
-  //   name: string;
-  //   relatedWeek: number;
-  //   action: 'add' | 'remove';
-  // }
-  // const [attendeeChanges, setAttendeeChanges ] = useState<attendeeChanges[]>([]);
+  interface attendeeChangesObj {
+    name: string;
+    relatedWeek: number;
+    action?: 'add' | 'remove';
+  }
+  const [attendees, setAttendees] = useState<attendeeChangesObj[]>([]);
 
   const [editMode, setEditMode] = useState<boolean>(!!newRecord);
+
+  function handleAddAttendee() {
+    if (!addingAttendee) {
+      console.error('No student selected');
+      return;
+    }
+    const addingAttendeeWeekRecordId = Number.parseInt(addingAttendee);
+    if (!addingAttendeeWeekRecordId) {
+      console.error('Invalid student selected');
+    }
+    const student = getStudentFromMembershipId(
+      getMembershipFromWeekRecordId(addingAttendeeWeekRecordId)?.recordId,
+    );
+    if (!student) {
+      console.error('No student found with week recordId:', addingAttendee);
+      return;
+    }
+    // if the student is already in the list, don't add it again
+    if (attendees.find((attendee) => attendee.name === student.fullName)) {
+      if (
+        attendees.find((attendee) => attendee.name === student.fullName)
+          ?.action === 'remove'
+      ) {
+        // if the student was previously removed, remove the 'remove' action
+        setAttendees((prev) =>
+          prev.map((attendee) =>
+            attendee.name === student.fullName
+              ? { ...attendee, action: undefined }
+              : attendee,
+          ),
+        );
+        return;
+      }
+      return;
+    }
+    setAttendees((prev) => [
+      ...prev,
+      {
+        name: student.fullName,
+        relatedWeek: addingAttendeeWeekRecordId,
+        action: 'add',
+      },
+    ]);
+    setAddingAttendee('');
+  }
+
+  function handleRemoveAttendee(relatedWeek: number | string) {
+    const recordId = Number.parseInt(relatedWeek as string);
+
+    const attendeeToRemove = attendees.find(
+      (attendee) => attendee.relatedWeek === recordId,
+    );
+    if (!attendeeToRemove) {
+      console.error('No attendee found with week recordId:', recordId);
+      return;
+    }
+    if (attendeeToRemove.action === 'add') {
+      // remove the attendee from the list, if it was added in this session
+      setAttendees((prev) =>
+        prev.filter((attendee) => attendee.relatedWeek !== recordId),
+      );
+    } else {
+      // set the action of the attendee to remove, if it was already in the session
+      setAttendees((prev) =>
+        prev.map((attendee) =>
+          attendee.relatedWeek === recordId
+            ? { ...attendee, action: 'remove' }
+            : attendee,
+        ),
+      );
+    }
+  }
 
   function updateCoach(email: string) {
     const corrector = coachListQuery.data?.find(
@@ -113,7 +179,16 @@ function GroupSessionCell({
     setComments(newRecord ? '' : groupSession.comments);
     setCallDocument(newRecord ? '' : groupSession.callDocument);
     setZoomLink(newRecord ? '' : groupSession.zoomLink);
-  }, [groupSession, newRecord]);
+
+    setAttendees(() => {
+      if (newRecord) return [];
+      const attendees = getAttendeesFromGroupSessionId(recordId);
+      return attendees?.map((attendee) => ({
+        name: attendee.weekStudent,
+        relatedWeek: attendee.student,
+      })) as attendeeChangesObj[];
+    });
+  }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
 
   function cancelEdit() {
     if (newRecord) {
@@ -322,49 +397,6 @@ function GroupSessionCell({
               )}
             </div>
             <div className="lineWrapper">
-              <label className="label">Attendees:</label>
-              <div className="content">
-                {attendees &&
-                  attendees.map((attendee) => <p key={attendee}>{attendee}</p>)}
-                {/* <button
-                  type="button"
-                  className="addButton addAttendee"
-                  onClick={() => openContextual(`groupSession${recordId}addAttendee`)}
-                >
-                  Add Attendee
-                </button> */}
-              </div>
-            </div>
-            {/*
-                  Popup button trigger for the student profile popup commented out at EOF
-                  CURRENT STATUS: Replaced with studentName text above
-                   */}
-            {/*
-                {attendeesWeekRecords &&
-                  attendeesWeekRecords.map(
-                    (attendee: Week | undefined) =>
-                      // <button
-                      //   type="button"
-                      //   key={attendee.recordId}
-                      //   className="groupAttendee"
-                      //   onClick={() =>
-                      //     changeAttendee(
-                      //       getStudentFromMembershipId(attendee.relatedMembership)
-                      //         .recordId,
-                      //       groupSession.recordId,
-                      //     )
-                      //   }
-                      // >
-                      attendee ? attendee.student : 'No Student Found',
-
-                    // getStudentFromMembershipId(attendee.relatedMembership)
-                    //   ? getStudentFromMembershipId(attendee.relatedMembership)
-                    //       .fullName
-                    //   : 'No Student Found',
-                    // </button>
-                  )}
-                  */}
-            <div className="lineWrapper">
               <label className="label" htmlFor="callDocument">
                 Call Document:
               </label>
@@ -398,7 +430,101 @@ function GroupSessionCell({
                 <p className="content">{zoomLink}</p>
               )}
             </div>
+            {editMode && (
+              <div className="lineWrapper">
+                <label className="label" htmlFor="addAttendee">
+                  Add Attendees:
+                </label>
+                <select
+                  id="attendee"
+                  name="attendee"
+                  className="content"
+                  value={addingAttendee}
+                  onChange={(e) => setAddingAttendee(e.target.value)}
+                >
+                  <option value="">Select</option>
+                  {lastThreeWeeksQuery.data
+                    ?.filter((filterWeek) => {
+                      return (
+                        week.membershipCourseHasGroupCalls &&
+                        filterWeek.weekStarts === week.weekStarts
+                      );
+                    })
+                    .map((studentWeek) => (
+                      <option
+                        key={studentWeek.recordId}
+                        value={studentWeek.recordId}
+                      >
+                        {
+                          getStudentFromMembershipId(
+                            studentWeek.relatedMembership,
+                          )?.fullName
+                        }
+                      </option>
+                    ))}
+                </select>
+                <button
+                  type="button"
+                  className="addButton addAttendee"
+                  onClick={() => handleAddAttendee()}
+                >
+                  Add Attendee
+                </button>
+              </div>
+            )}
+            <div className="lineWrapper">
+              <label className="label">Attendees:</label>
+              <div className="content">
+                {attendees &&
+                  attendees.map(
+                    (attendee) =>
+                      // if attendee is to be removed, don't display it
+                      attendee.action !== 'remove' && (
+                        <div key={attendee.relatedWeek}>
+                          <p> {attendee.name}</p>
+                          <button
+                            type="button"
+                            className="redButton"
+                            onClick={() =>
+                              handleRemoveAttendee(attendee.relatedWeek)
+                            }
+                          >
+                            Remove Attendee
+                          </button>
+                        </div>
+                      ),
+                  )}
+              </div>
+            </div>
+            {/*
+                  Popup button trigger for the student profile popup commented out at EOF
+                  CURRENT STATUS: Replaced with studentName text above
+                   */}
+            {/*
+                {attendeesWeekRecords &&
+                  attendeesWeekRecords.map(
+                    (attendee: Week | undefined) =>
+                      // <button
+                      //   type="button"
+                      //   key={attendee.recordId}
+                      //   className="groupAttendee"
+                      //   onClick={() =>
+                      //     changeAttendee(
+                      //       getStudentFromMembershipId(attendee.relatedMembership)
+                      //         .recordId,
+                      //       groupSession.recordId,
+                      //     )
+                      //   }
+                      // >
+                      attendee ? attendee.student : 'No Student Found',
 
+                    // getStudentFromMembershipId(attendee.relatedMembership)
+                    //   ? getStudentFromMembershipId(attendee.relatedMembership)
+                    //       .fullName
+                    //   : 'No Student Found',
+                    // </button>
+                  )}
+                  */}
             {editMode && (
               <div className="buttonBox">
                 <button
@@ -420,7 +546,7 @@ function GroupSessionCell({
           </div>
         </div>
       )}
-      {contextual === `groupSession${recordId}addAttendee` && (
+      {contextual === `groupSession${recordId}${week.recordId}addAttendee` && (
         <div className="contextualWrapper">
           <div className="contextual" ref={setContextualRef}>
             <h3>Add Attendee</h3>
