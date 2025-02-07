@@ -249,11 +249,14 @@ export default function WeeksRecordsSection() {
     if (
       !rendered.current &&
       lastThreeWeeksQuery.isSuccess &&
-      coachListQuery.isSuccess
+      coachListQuery.isSuccess &&
+      userDataQuery.isSuccess
     ) {
       const currentUser = userDataQuery.data;
       const currentUserCoach = coachListQuery.data.find(
-        (coach) => coach.user.email === currentUser?.emailAddress,
+        (coach) =>
+          coach.user.email.toLowerCase() ===
+          currentUser?.emailAddress.toLowerCase(),
       );
       if (currentUserCoach) setFilterByCoach(currentUserCoach);
       rendered.current = true;
