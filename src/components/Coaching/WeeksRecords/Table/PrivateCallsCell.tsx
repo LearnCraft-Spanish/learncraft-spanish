@@ -7,18 +7,21 @@ import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useModal } from 'src/hooks/useModal';
 
+import DeleteRecord from './general/DeleteRecord';
+
 function PrivateCall({ call }: { call: Call }) {
   const {
     setContextualRef,
     openContextual,
     contextual,
     updateDisableClickOutside,
+    closeContextual,
   } = useContextualMenu();
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
     useCoaching();
   const { updatePrivateCallMutation } = usePrivateCalls();
   const { coachListQuery } = useCoaching();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
 
   const [editMode, setEditMode] = useState(false);
   // inputs & defaults
@@ -91,6 +94,13 @@ function PrivateCall({ call }: { call: Call }) {
       callType,
     });
     disableEditMode();
+  }
+
+  function deleteRecordFunction() {
+    console.error('Delete Record Function, not impletemented yet');
+    closeModal();
+    cancelEdit();
+    closeContextual();
   }
 
   function captureSubmitForm() {
@@ -288,6 +298,7 @@ function PrivateCall({ call }: { call: Call }) {
                 <p className="content">{call.callType}</p>
               )}
             </div>
+            {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
 
             {editMode && (
               <div className="buttonBox">
