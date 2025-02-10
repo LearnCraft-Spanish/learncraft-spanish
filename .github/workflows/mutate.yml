@@ -2,7 +2,7 @@ name: Mutation Testing Report
 
 on:
   schedule:
-    - cron: '0 2 * * *' # Runs daily at 2am UTC/8pm CST
+    - cron: '0 2 * * *' # Run every day at 2:00 AM UTC
   workflow_dispatch:
 
 jobs:
@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: development
 
       # Set up Node.js environment
       - name: Set up Node.js environment
@@ -65,7 +67,7 @@ jobs:
           VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
       - name: Upload Mutation Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mutation-report
           path: reports/mutation/mutation.html # Adjust to your Stryker report directory
