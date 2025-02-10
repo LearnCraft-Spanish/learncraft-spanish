@@ -42,7 +42,7 @@ describe('component SRSButtons', () => {
     cleanup();
   });
 
-  it('example difficulty is labeled hard, displays Labeled: Easy', () => {
+  it('example difficulty is labeled easy, displays Labeled: easy', () => {
     render(
       <MockAllProviders>
         <SRSQuizButtons
