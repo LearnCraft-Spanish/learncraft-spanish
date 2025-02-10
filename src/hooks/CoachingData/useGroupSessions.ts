@@ -1,10 +1,15 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useUserData } from '../UserData/useUserData';
 import { useBackend, useBackendHelpers } from '../useBackend';
+
+import type { GroupAttendeeMutationObj } from './useGroupAttendees';
+import useGroupAttendees from './useGroupAttendees';
+
 export default function useGroupSessions() {
   const userDataQuery = useUserData();
   const backend = useBackend();
-  const { getFactory, newPostFactory, newPutFactory } = useBackendHelpers();
+  const { getFactory, newPostFactory, newPutFactory, newDeleteFactory } =
+    useBackendHelpers();
 
   function getGroupSessionsTopicFieldOptions() {
     return getFactory<string[]>('coaching/group-sessions/topic-field-options');
@@ -72,11 +77,23 @@ export default function useGroupSessions() {
     },
   });
 
+  const deleteGroupSessionMutation = useMutation({
+    mutationFn: (recordId: number) => {
+      return newDeleteFactory({
+        path: `coaching/group-sessions/${recordId}`,
+      });
+    },
+    onSettled() {
+      groupSessionsQuery.refetch();
+    },
+  });
+
   return {
     groupSessionsQuery,
     groupSessionsTopicFieldOptionsQuery,
 
     createGroupSessionMutation,
     updateGroupSessionMutation,
+    deleteGroupSessionMutation,
   };
 }

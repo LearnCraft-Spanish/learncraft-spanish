@@ -2,10 +2,16 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useUserData } from '../UserData/useUserData';
 import { useBackend, useBackendHelpers } from '../useBackend';
 
+export interface GroupAttendeeMutationObj {
+  groupSessionId: number;
+  groupAttendeeId: number;
+  groupAttendee: string;
+}
+
 export default function useGroupAttendees() {
   const userDataQuery = useUserData();
   const backend = useBackend();
-  const { newPostFactory, newPutFactory } = useBackendHelpers();
+  const { newPostFactory, newDeleteFactory } = useBackendHelpers();
 
   const groupAttendeesQuery = useQuery({
     queryKey: ['groupAttendees'],
@@ -16,22 +22,23 @@ export default function useGroupAttendees() {
       userDataQuery.data?.roles.adminRole === 'admin',
   });
 
-  const createGroupAttendeeMutation = useMutation({
-    mutationFn: (groupAttendee) => {
+  const createGroupAttendeesMutation = useMutation({
+    mutationFn: (groupAttendees: GroupAttendeeMutationObj[]) => {
       return newPostFactory({
         path: 'coaching/group-attendees',
-        body: groupAttendee,
+        body: groupAttendees,
       });
     },
     onSettled() {
       groupAttendeesQuery.refetch();
     },
   });
-  const updateGroupAttendeeMutation = useMutation({
-    mutationFn: (groupAttendee) => {
-      return newPutFactory({
-        path: 'coaching/group-attendees',
-        body: groupAttendee,
+
+  const deleteGroupAttendeesMutation = useMutation({
+    mutationFn: (groupAttendees: GroupAttendeeMutationObj[]) => {
+      return newDeleteFactory({
+        path: `coaching/group-attendees`,
+        body: groupAttendees,
       });
     },
     onSettled() {
@@ -42,7 +49,7 @@ export default function useGroupAttendees() {
   return {
     groupAttendeesQuery,
 
-    createGroupAttendeeMutation,
-    updateGroupAttendeeMutation,
+    createGroupAttendeesMutation,
+    deleteGroupAttendeesMutation,
   };
 }

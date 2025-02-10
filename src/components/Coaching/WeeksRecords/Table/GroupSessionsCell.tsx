@@ -4,6 +4,7 @@ import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import type { GroupSession, Week } from 'src/types/CoachingTypes';
 import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
+import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useModal } from 'src/hooks/useModal';
@@ -38,6 +39,9 @@ function GroupSessionCell({
     createGroupSessionMutation,
     updateGroupSessionMutation,
   } = useGroupSessions();
+
+  const { createGroupAttendeesMutation, deleteGroupAttendeesMutation } =
+    useGroupAttendees();
 
   const dataReady =
     coachListQuery.isSuccess && groupSessionsTopicFieldOptionsQuery.isSuccess;
@@ -108,6 +112,7 @@ function GroupSessionCell({
       }
       return;
     }
+    // Add the new attendee to the list
     setAttendees((prev) => [
       ...prev,
       {
@@ -135,7 +140,7 @@ function GroupSessionCell({
         prev.filter((attendee) => attendee.relatedWeek !== recordId),
       );
     } else {
-      // set the action of the attendee to remove, if it was already in the session
+      // set the action of the attendee to remove, since it was already in the list
       setAttendees((prev) =>
         prev.map((attendee) =>
           attendee.relatedWeek === recordId
@@ -198,6 +203,15 @@ function GroupSessionCell({
     disableEditMode();
     setInitialState();
   }
+
+  function checkAttendeeChanges() {
+    // check if any attendees were added or removed
+    return attendees.some(
+      (attendee) =>
+        attendee.action &&
+        (attendee.action === 'add' || attendee.action === 'remove'),
+    );
+  }
   function captureSubmitForm() {
     // verify required fields
     if (!date || !coach || !sessionType) {
@@ -218,6 +232,19 @@ function GroupSessionCell({
         callDocument,
         zoomLink,
       });
+      // IMPORTANT! must await the creation of the group session
+
+      // once it is created, add the attendees
+      const attendeesToAdd = attendees.filter(
+        (attendee) => attendee.action === 'add',
+      );
+      createGroupAttendeesMutation.mutate(
+        attendeesToAdd.map((attendee) => ({
+          groupSessionId: recordId,
+          groupAttendee: attendee.name,
+          groupAttendeeId: attendee.relatedWeek,
+        })),
+      );
     } else {
       // verify if any changes were made
       if (
@@ -227,7 +254,8 @@ function GroupSessionCell({
         topic === groupSession.topic &&
         comments === groupSession.comments &&
         callDocument === groupSession.callDocument &&
-        zoomLink === groupSession.zoomLink
+        zoomLink === groupSession.zoomLink &&
+        !checkAttendeeChanges()
       ) {
         console.error('No changes detected');
         disableEditMode();
@@ -243,6 +271,30 @@ function GroupSessionCell({
         callDocument,
         zoomLink,
       });
+      if (checkAttendeeChanges()) {
+        const attendeesToAdd = attendees.filter(
+          (attendee) => attendee.action === 'add',
+        );
+        const attendeesToRemove = attendees.filter(
+          (attendee) => attendee.action === 'remove',
+        );
+
+        createGroupAttendeesMutation.mutate(
+          attendeesToAdd.map((attendee) => ({
+            groupSessionId: recordId,
+            groupAttendee: attendee.name,
+            groupAttendeeId: attendee.relatedWeek,
+          })),
+        );
+
+        deleteGroupAttendeesMutation.mutate(
+          attendeesToRemove.map((attendee) => ({
+            groupSessionId: recordId,
+            groupAttendee: attendee.name,
+            groupAttendeeId: attendee.relatedWeek,
+          })),
+        );
+      }
     }
     disableEditMode();
     closeContextual();
