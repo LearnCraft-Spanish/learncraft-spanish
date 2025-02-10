@@ -9,6 +9,25 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useModal } from 'src/hooks/useModal';
 
+import { CoachDropdown, DateInput, Dropdown } from '../../general';
+
+const sessionTypeOptions = [
+  '1MC',
+  '2MC',
+  'Modules 1 & 2',
+  'Level 1',
+  'Level 2',
+  'Level 3',
+  'Level 4',
+  'Level 5',
+  'Level 6',
+  'Module 3',
+  'Module 4',
+  'LCS Cohort',
+  'Advanced',
+  'Conversation',
+];
+
 function GroupSessionCell({
   groupSession,
   week,
@@ -56,13 +75,6 @@ function GroupSessionCell({
   const [zoomLink, setZoomLink] = useState<string>('');
 
   const [addingAttendee, setAddingAttendee] = useState<string>('');
-
-  const coachName = useMemo(() => {
-    const corrector = coachListQuery.data?.find(
-      (user) => user.user.email === coach,
-    );
-    return corrector ? corrector.user.name : 'No Coach Found';
-  }, [coach, coachListQuery.data]);
 
   const recordId = useMemo(
     () => (newRecord ? -1 : groupSession.recordId),
@@ -351,70 +363,60 @@ function GroupSessionCell({
               <h3>{`Session: ${sessionType} on ${date}`}</h3>
             )}
             <div>
-              <div className="lineWrapper">
-                <label className="label" htmlFor="coach">
-                  Coach:
-                </label>
-                {editMode ? (
-                  <select
-                    id="coach"
-                    name="coach"
-                    className="content"
-                    defaultValue={coach}
-                    onChange={(e) => updateCoach(e.target.value)}
-                  >
-                    <option value="">Select</option>
-
-                    {coachListQuery.data?.map((coach) => (
-                      <option key={coach.coach} value={coach.user.email}>
-                        {coach.user.name}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <p className="content">{coachName}</p>
-                )}
-              </div>
+              <CoachDropdown
+                coachEmail={coach}
+                onChange={updateCoach}
+                editMode={editMode}
+              />
               {editMode && (
-                <div className="lineWrapper">
-                  <label className="label">Date: </label>
-                  <input
-                    className="content"
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                  />
-                </div>
+                // (
+                //   <div className="lineWrapper">
+                //     <label className="label">Date: </label>
+                //     <input
+                //       className="content"
+                //       type="date"
+                //       value={date}
+                //       onChange={(e) => setDate(e.target.value)}
+                //     />
+                //   </div>
+                // )
+                <DateInput value={date} onChange={setDate} />
               )}
               {editMode && (
-                <div className="lineWrapper">
-                  <label className="label" htmlFor="sessionType">
-                    Session Type:
-                  </label>
-                  <select
-                    id="sessionType"
-                    name="sessionType"
-                    className="content"
-                    defaultValue={sessionType}
-                    onChange={(e) => setSessionType(e.target.value)}
-                  >
-                    <option value="">Select</option>
-                    <option value="1MC">1MC</option>
-                    <option value="2MC">2MC</option>
-                    <option value="Modules 1 & 2">Modules 1 & 2</option>
-                    <option value="Level 1">Level 1</option>
-                    <option value="Level 2">Level 2</option>
-                    <option value="Level 3">Level 3</option>
-                    <option value="Level 4">Level 4</option>
-                    <option value="Level 5">Level 5</option>
-                    <option value="Level 6">Level 6</option>
-                    <option value="Module 3">Module 3</option>
-                    <option value="Module 4">Module 4</option>
-                    <option value="LCS Cohort">LCS Cohort</option>
-                    <option value="Advanced">Advanced</option>
-                    <option value="Conversation">Conversation</option>
-                  </select>
-                </div>
+                // <div className="lineWrapper">
+                //   <label className="label" htmlFor="sessionType">
+                //     Session Type:
+                //   </label>
+                //   <select
+                //     id="sessionType"
+                //     name="sessionType"
+                //     className="content"
+                //     defaultValue={sessionType}
+                //     onChange={(e) => setSessionType(e.target.value)}
+                //   >
+                //     <option value="">Select</option>
+                //     <option value="1MC">1MC</option>
+                //     <option value="2MC">2MC</option>
+                //     <option value="Modules 1 & 2">Modules 1 & 2</option>
+                //     <option value="Level 1">Level 1</option>
+                //     <option value="Level 2">Level 2</option>
+                //     <option value="Level 3">Level 3</option>
+                //     <option value="Level 4">Level 4</option>
+                //     <option value="Level 5">Level 5</option>
+                //     <option value="Level 6">Level 6</option>
+                //     <option value="Module 3">Module 3</option>
+                //     <option value="Module 4">Module 4</option>
+                //     <option value="LCS Cohort">LCS Cohort</option>
+                //     <option value="Advanced">Advanced</option>
+                //     <option value="Conversation">Conversation</option>
+                //   </select>
+                // </div>
+                <Dropdown
+                  label="Session Type"
+                  value={sessionType}
+                  onChange={setSessionType}
+                  options={sessionTypeOptions}
+                />
               )}
             </div>
             <div className="lineWrapper">
@@ -548,35 +550,7 @@ function GroupSessionCell({
                   )}
               </div>
             </div>
-            {/*
-                  Popup button trigger for the student profile popup commented out at EOF
-                  CURRENT STATUS: Replaced with studentName text above
-                   */}
-            {/*
-                {attendeesWeekRecords &&
-                  attendeesWeekRecords.map(
-                    (attendee: Week | undefined) =>
-                      // <button
-                      //   type="button"
-                      //   key={attendee.recordId}
-                      //   className="groupAttendee"
-                      //   onClick={() =>
-                      //     changeAttendee(
-                      //       getStudentFromMembershipId(attendee.relatedMembership)
-                      //         .recordId,
-                      //       groupSession.recordId,
-                      //     )
-                      //   }
-                      // >
-                      attendee ? attendee.student : 'No Student Found',
 
-                    // getStudentFromMembershipId(attendee.relatedMembership)
-                    //   ? getStudentFromMembershipId(attendee.relatedMembership)
-                    //       .fullName
-                    //   : 'No Student Found',
-                    // </button>
-                  )}
-                  */}
             {editMode && (
               <div className="buttonBox">
                 <button
@@ -598,87 +572,6 @@ function GroupSessionCell({
           </div>
         </div>
       )}
-      {contextual === `groupSession${recordId}${week.recordId}addAttendee` && (
-        <div className="contextualWrapper">
-          <div className="contextual" ref={setContextualRef}>
-            <h3>Add Attendee</h3>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="attendee">
-                Select Attendee:
-              </label>
-              <select
-                id="attendee"
-                name="attendee"
-                className="content"
-                defaultValue=""
-              >
-                <option value="">Select</option>
-                {lastThreeWeeksQuery.data
-                  ?.filter((filterWeek) => {
-                    return (
-                      week.membershipCourseHasGroupCalls &&
-                      filterWeek.weekStarts === week.weekStarts
-                    );
-                  })
-                  .map((week) => (
-                    <option key={week.recordId} value={week.recordId}>
-                      {
-                        getStudentFromMembershipId(week.relatedMembership)
-                          ?.fullName
-                      }
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="buttonBox">
-              <button
-                type="button"
-                className="greenButton"
-                onClick={() => openContextual(`groupSession${recordId}`)}
-              >
-                Add
-              </button>
-              <button
-                type="button"
-                className="redButton"
-                onClick={() => openContextual(`groupSession${recordId}`)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Popup for viewing a student, maybe put somewhere else? make component, then let it be activated from here? */}
-      {/* {contextual ===
-        `attendee${
-          currentAttendee.current ? currentAttendee.current.recordId : undefined
-        }-${groupSession.recordId}` &&
-        currentAttendee.current && (
-          <div className="studentPopup" ref={setContextualRef}>
-            <h4>{currentAttendee.current.fullName}</h4>
-            <p>{currentAttendee.current.email}</p>
-            <p>
-              {' '}
-              Primary Coach:
-              {currentAttendee.current.primaryCoach.name}
-            </p>
-            <h5>Fluency Goal:</h5>
-            <p>{currentAttendee.current.fluencyGoal}</p>
-            <h5>Starting Level:</h5>
-            <p>{currentAttendee.current.startingLevel}</p>
-            <div className="buttonBox">
-              <button
-                type="button"
-                className="redButton"
-                onClick={() => openGroupSessionPopup(groupSession.recordId)}
-              >
-                Back
-              </button>
-            </div>
-          </div>
-        )} */}
     </div>
   );
 }
