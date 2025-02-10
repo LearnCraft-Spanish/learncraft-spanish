@@ -26,17 +26,6 @@ export function useStudentFlashcards() {
     updateMyStudentExample,
   } = useBackend();
 
-  // Local ref to store session updates.
-  // This is necessary to preserve local changes on re-fetch.
-  // localExamples stores difficulty from SRS Quiz
-  const localExamples = useRef<Record<number, Partial<Flashcard>>>({});
-  // localStudentExamples stores pending studentExample records that are not in the backend
-  // This is used to prevent race conditions from erasing negative recordIds
-  const localStudentExamples = useRef<Record<number, StudentExample>>({});
-
-  // Temp ID number for new studentExamples created optimistically
-  const tempIdNum = useRef(-1);
-
   // Abbreviated access since it's used frequently
   const activeStudentId = activeStudentQuery.data?.recordId;
 
@@ -84,57 +73,40 @@ export function useStudentFlashcards() {
 
   const getFlashcardData = async () => {
     let backendResponse: StudentFlashcardData | undefined;
-    if (
-      (userDataQuery.data?.roles.adminRole === 'coach' ||
-        userDataQuery.data?.roles.adminRole === 'admin') &&
-      activeStudentId
-    ) {
+
+    if (userDataQuery.data?.roles.adminRole === 'coach' && activeStudentId) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
-    } else if (
-      // Limited users should not have flashcards, is this a mistake?
-      userDataQuery.data?.roles.studentRole === 'student' ||
-      userDataQuery.data?.roles.studentRole === 'limited'
-    ) {
+    } else if (userDataQuery.data?.roles.studentRole === 'student') {
       backendResponse = await getMyExamplesFromBackend();
     }
-    if (backendResponse === undefined) {
+
+    if (!backendResponse) {
       throw new Error('No active student');
     }
-    if (!backendResponse) {
-      throw new Error('bad response');
-    }
 
-    const mergedExampleData = backendResponse.examples.map((flashcard) => ({
-      // Add the difficulty from localExamples if it exists
-      ...localExamples.current[flashcard.recordId],
-      ...flashcard,
-    }));
+    // Get the current cached data (previous session state)
+    const previousData = queryClient.getQueryData<StudentFlashcardData>([
+      'flashcardData',
+      activeStudentId,
+    ]);
 
-    // Preserve local studentExamples that are not in the backend response
-    const preservedLocalExamples = Object.values(
-      localStudentExamples.current,
-    ).filter(
-      (localStudentExample) =>
-        !backendResponse.studentExamples.some(
-          (backendStudentExample: StudentExample) =>
-            backendStudentExample.relatedExample ===
-            localStudentExample.relatedExample,
-        ),
-    );
+    // Preserve the "reviewed" status from previousData if it exists
+    const mergedExampleData = backendResponse.examples.map((flashcard) => {
+      const previousFlashcard = previousData?.examples.find(
+        (prev) => prev.recordId === flashcard.recordId,
+      );
+      return {
+        ...flashcard,
+        reviewed: previousFlashcard?.difficulty
+          ? previousFlashcard?.difficulty // Keep reviewed state if it exists
+          : '', // Otherwise, default to empty string
+      };
+    });
 
-    const mergedStudentExampleData = [
-      ...backendResponse.studentExamples, // Overwrite any local examples that are in the backend
-      ...preservedLocalExamples, // Add local examples that aren't overwritten
-    ];
-
-    // Merge the two arrays and trim any that don't match
-    const updatedFlashcardData = {
+    return {
       examples: mergedExampleData,
-      studentExamples: mergedStudentExampleData,
+      studentExamples: backendResponse.studentExamples,
     };
-    const finalObj: StudentFlashcardData | null =
-      matchAndTrimArrays(updatedFlashcardData);
-    return finalObj;
   };
 
   const flashcardDataQuery = useQuery({
