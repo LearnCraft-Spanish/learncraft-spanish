@@ -47,53 +47,38 @@ export default function SRSQuizButtons({
     [getStudentExampleFromExample],
   );
 
-  const increaseDifficulty = useCallback(async () => {
-    const exampleId = currentExample?.recordId;
-    const studentExampleId =
-      getStudentExampleFromExample(currentExample)?.recordId;
-    const currentInterval = getIntervalFromExample(currentExample);
-    if (exampleId === undefined || studentExampleId === undefined) {
-      return;
-    }
-    incrementExampleNumber();
-    const newInterval = currentInterval > 0 ? currentInterval - 1 : 0;
-    const updateStatus = updateFlashcard({
-      studentExampleId,
-      newInterval,
-      difficulty: 'hard',
-    });
-    return updateStatus;
-  }, [
-    currentExample,
-    getIntervalFromExample,
-    getStudentExampleFromExample,
-    incrementExampleNumber,
-    updateFlashcard,
-  ]);
+  const updateFlashcardInterval = useCallback(
+    async (difficulty: 'easy' | 'hard') => {
+      const exampleId = currentExample?.recordId;
+      const studentExampleId =
+        getStudentExampleFromExample(currentExample)?.recordId;
+      const currentInterval = getIntervalFromExample(currentExample);
+      if (exampleId === undefined || studentExampleId === undefined) {
+        return;
+      }
+      incrementExampleNumber();
+      let newInterval;
 
-  const decreaseDifficulty = useCallback(async () => {
-    const exampleId = currentExample?.recordId;
-    const studentExampleId =
-      getStudentExampleFromExample(currentExample)?.recordId;
-    const currentInterval = getIntervalFromExample(currentExample);
-    if (exampleId === undefined || studentExampleId === undefined) {
-      return;
-    }
-    incrementExampleNumber();
-    const newInterval = currentInterval + 1;
-    const updateStatus = updateFlashcard({
-      studentExampleId,
-      newInterval,
-      difficulty: 'easy',
-    });
-    return updateStatus;
-  }, [
-    currentExample,
-    getIntervalFromExample,
-    getStudentExampleFromExample,
-    incrementExampleNumber,
-    updateFlashcard,
-  ]);
+      if (difficulty === 'easy') {
+        newInterval = currentInterval + 1;
+      } else {
+        newInterval = currentInterval > 0 ? currentInterval - 1 : 0;
+      }
+      const updateStatus = updateFlashcard({
+        studentExampleId,
+        newInterval,
+        difficulty,
+      });
+      return updateStatus;
+    },
+    [
+      currentExample,
+      getIntervalFromExample,
+      getStudentExampleFromExample,
+      incrementExampleNumber,
+      updateFlashcard,
+    ],
+  );
 
   /* keyboard controlls */
   const handleKeyPress = useCallback(
@@ -104,7 +89,7 @@ export default function SRSQuizButtons({
         event.key === ',' ||
         event.key === '<'
       ) {
-        increaseDifficulty();
+        updateFlashcardInterval('hard');
       }
       if (
         event.key === 'e' ||
@@ -112,10 +97,10 @@ export default function SRSQuizButtons({
         event.key === '.' ||
         event.key === '>'
       ) {
-        decreaseDifficulty();
+        updateFlashcardInterval('easy');
       }
     },
-    [increaseDifficulty, decreaseDifficulty],
+    [updateFlashcardInterval],
   );
 
   React.useEffect(() => {
@@ -134,14 +119,14 @@ export default function SRSQuizButtons({
             <button
               type="button"
               className="redButton"
-              onClick={decreaseDifficulty}
+              onClick={() => updateFlashcardInterval('hard')}
             >
               This was hard
             </button>
             <button
               type="button"
               className="greenButton"
-              onClick={increaseDifficulty}
+              onClick={() => updateFlashcardInterval('easy')}
             >
               This was easy
             </button>
