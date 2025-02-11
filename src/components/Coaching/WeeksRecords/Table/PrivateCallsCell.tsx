@@ -325,17 +325,20 @@ function PrivateCall({ call }: { call: Call }) {
   );
 }
 
-export default function PrivateCallsCell({ week }: { week: Week }) {
-  const { getPrivateCallsFromWeekRecordId, getStudentFromMembershipId } =
-    useCoaching();
+export default function PrivateCallsCell({
+  week,
+  calls,
+}: {
+  week: Week;
+  calls: Call[] | null;
+}) {
+  const { getStudentFromMembershipId } = useCoaching();
   const { contextual, setContextualRef, openContextual, closeContextual } =
     useContextualMenu();
   const userDataQuery = useUserData();
   const { createPrivateCallMutation } = usePrivateCalls();
   const { coachListQuery } = useCoaching();
   const { openModal } = useModal();
-
-  const calls = getPrivateCallsFromWeekRecordId(week.recordId);
 
   // New Record Inputs
   const [caller, setCaller] = useState(userDataQuery.data?.emailAddress || '');

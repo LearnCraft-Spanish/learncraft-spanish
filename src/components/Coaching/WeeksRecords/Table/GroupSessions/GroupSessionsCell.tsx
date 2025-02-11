@@ -17,7 +17,7 @@ import {
   FormControls,
   TextAreaInput,
   TextInput,
-} from '../../general';
+} from '../../../general';
 
 const sessionTypeOptions = [
   '1MC',
@@ -70,9 +70,17 @@ function GroupSessionCell({
   const { createGroupAttendeesMutation, deleteGroupAttendeesMutation } =
     useGroupAttendees();
 
+  // Rendering
   const dataReady =
     coachListQuery.isSuccess && groupSessionsTopicFieldOptionsQuery.isSuccess;
   const rendered = useRef(false);
+
+  // State management
+  const [editMode, setEditMode] = useState<boolean>(!!newRecord);
+  const recordId = useMemo(
+    () => (newRecord ? -1 : groupSession.recordId),
+    [newRecord, groupSession.recordId],
+  );
 
   const [sessionType, setSessionType] = useState<string>('');
   const [date, setDate] = useState<string>('');
@@ -84,11 +92,6 @@ function GroupSessionCell({
 
   const [addingAttendee, setAddingAttendee] = useState<string>('');
 
-  const recordId = useMemo(
-    () => (newRecord ? -1 : groupSession.recordId),
-    [newRecord, groupSession.recordId],
-  );
-
   interface attendeeChangesObj {
     name: string;
     relatedWeek: number;
@@ -96,7 +99,31 @@ function GroupSessionCell({
   }
   const [attendees, setAttendees] = useState<attendeeChangesObj[]>([]);
 
-  const [editMode, setEditMode] = useState<boolean>(!!newRecord);
+  // Edit or Update State
+  const setInitialState = useCallback(() => {
+    setSessionType(newRecord ? '' : groupSession.sessionType);
+    setDate(
+      groupSession.date
+        ? typeof groupSession.date === 'string'
+          ? groupSession.date
+          : new Date(groupSession.date).toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0],
+    );
+    setCoach(newRecord ? '' : groupSession.coach.email);
+    setTopic(newRecord ? '' : groupSession.topic);
+    setComments(newRecord ? '' : groupSession.comments);
+    setCallDocument(newRecord ? '' : groupSession.callDocument);
+    setZoomLink(newRecord ? '' : groupSession.zoomLink);
+
+    setAttendees(() => {
+      if (newRecord) return [];
+      const attendees = getAttendeesFromGroupSessionId(recordId);
+      return attendees?.map((attendee) => ({
+        name: attendee.weekStudent,
+        relatedWeek: attendee.student,
+      })) as attendeeChangesObj[];
+    });
+  }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
 
   function handleAddAttendee() {
     if (!addingAttendee) {
@@ -181,6 +208,18 @@ function GroupSessionCell({
     }
     setCoach(corrector.user.email);
   }
+  //Helper funcs
+  function checkAttendeeChanges() {
+    // check if any attendees were added or removed
+    return attendees.some(
+      (attendee) =>
+        attendee.action &&
+        (attendee.action === 'add' || attendee.action === 'remove'),
+    );
+  }
+
+  // Editing Functions
+
   function enableEditMode() {
     setEditMode(true);
     updateDisableClickOutside(true);
@@ -190,31 +229,6 @@ function GroupSessionCell({
     updateDisableClickOutside(false);
   }
 
-  const setInitialState = useCallback(() => {
-    setSessionType(newRecord ? '' : groupSession.sessionType);
-    setDate(
-      groupSession.date
-        ? typeof groupSession.date === 'string'
-          ? groupSession.date
-          : new Date(groupSession.date).toISOString().split('T')[0]
-        : new Date().toISOString().split('T')[0],
-    );
-    setCoach(newRecord ? '' : groupSession.coach.email);
-    setTopic(newRecord ? '' : groupSession.topic);
-    setComments(newRecord ? '' : groupSession.comments);
-    setCallDocument(newRecord ? '' : groupSession.callDocument);
-    setZoomLink(newRecord ? '' : groupSession.zoomLink);
-
-    setAttendees(() => {
-      if (newRecord) return [];
-      const attendees = getAttendeesFromGroupSessionId(recordId);
-      return attendees?.map((attendee) => ({
-        name: attendee.weekStudent,
-        relatedWeek: attendee.student,
-      })) as attendeeChangesObj[];
-    });
-  }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
-
   function cancelEdit() {
     if (newRecord) {
       closeContextual();
@@ -223,14 +237,12 @@ function GroupSessionCell({
     disableEditMode();
     setInitialState();
   }
-
-  function checkAttendeeChanges() {
-    // check if any attendees were added or removed
-    return attendees.some(
-      (attendee) =>
-        attendee.action &&
-        (attendee.action === 'add' || attendee.action === 'remove'),
-    );
+  function toggleEditMode() {
+    if (editMode) {
+      cancelEdit();
+    } else {
+      enableEditMode();
+    }
   }
   function captureSubmitForm() {
     // verify required fields
@@ -243,28 +255,52 @@ function GroupSessionCell({
       return;
     }
     if (newRecord) {
-      createGroupSessionMutation.mutate({
-        date,
-        coach,
-        sessionType,
-        topic,
-        comments,
-        callDocument,
-        zoomLink,
-      });
+      createGroupSessionMutation.mutate(
+        {
+          date,
+          coach,
+          sessionType,
+          topic,
+          comments,
+          callDocument,
+          zoomLink,
+        },
+        {
+          onSuccess: (data) => {
+            const idsCreated = data as number[];
+            // data will be an array of record ID's created
+            if (idsCreated.length !== 1) {
+              console.error('Error creating group session');
+              return;
+            }
+            const newRecordId = idsCreated[0];
+            // once it is created, add the attendees
+            const attendeesToAdd = attendees.filter(
+              (attendee) => attendee.action === 'add',
+            );
+            createGroupAttendeesMutation.mutate(
+              attendeesToAdd.map((attendee) => ({
+                groupSession: newRecordId,
+                student: attendee.relatedWeek,
+              })),
+              {
+                onSuccess: (data) => {
+                  // data will be an array of record ID's created
+                  if ((data as number[]).length !== attendeesToAdd.length) {
+                    console.error('Error creating group attendees');
+                    return;
+                  }
+                  closeContextual();
+                },
+                onError: (error) => {
+                  console.error('Error creating group attendees', error);
+                },
+              },
+            );
+          },
+        },
+      );
       // IMPORTANT! must await the creation of the group session
-
-      // once it is created, add the attendees
-      const attendeesToAdd = attendees.filter(
-        (attendee) => attendee.action === 'add',
-      );
-      createGroupAttendeesMutation.mutate(
-        attendeesToAdd.map((attendee) => ({
-          groupSessionId: recordId,
-          groupAttendee: attendee.name,
-          groupAttendeeId: attendee.relatedWeek,
-        })),
-      );
     } else {
       // verify if any changes were made
       if (
@@ -301,31 +337,21 @@ function GroupSessionCell({
 
         createGroupAttendeesMutation.mutate(
           attendeesToAdd.map((attendee) => ({
-            groupSessionId: recordId,
-            groupAttendee: attendee.name,
-            groupAttendeeId: attendee.relatedWeek,
+            groupSession: recordId,
+            student: attendee.relatedWeek,
           })),
         );
 
         deleteGroupAttendeesMutation.mutate(
           attendeesToRemove.map((attendee) => ({
-            groupSessionId: recordId,
-            groupAttendee: attendee.name,
-            groupAttendeeId: attendee.relatedWeek,
+            groupSession: recordId,
+            student: attendee.relatedWeek,
           })),
         );
       }
     }
     disableEditMode();
     closeContextual();
-  }
-
-  function toggleEditMode() {
-    if (editMode) {
-      cancelEdit();
-    } else {
-      enableEditMode();
-    }
   }
 
   useEffect(() => {
@@ -489,37 +515,17 @@ function GroupSessionCell({
   );
 }
 
-export default function GroupSessionsCell({ week }: { week: Week }) {
-  const {
-    groupAttendeesQuery,
-    groupSessionsQuery,
-    getGroupSessionsFromWeekRecordId,
-  } = useCoaching();
-
-  const [groupSessions, setGroupSessions] = useState<
-    GroupSession[] | undefined
-  >();
+export default function GroupSessionsCell({
+  week,
+  groupSessions,
+}: {
+  week: Week;
+  groupSessions: GroupSession[] | null;
+}) {
+  const { groupAttendeesQuery, groupSessionsQuery } = useCoaching();
 
   const dataReady =
     groupAttendeesQuery.isSuccess && groupSessionsQuery.isSuccess;
-
-  useEffect(() => {
-    if (dataReady && !groupSessions) {
-      const groupSessions = getGroupSessionsFromWeekRecordId(week.recordId);
-      if (groupSessions && groupSessions.length > 0) {
-        setGroupSessions(groupSessions);
-      } else {
-        console.error(
-          `Group Session related to week recordId: ${week.recordId} not found`,
-        );
-      }
-    }
-  }, [
-    dataReady,
-    getGroupSessionsFromWeekRecordId,
-    groupSessions,
-    week.recordId,
-  ]);
   return (
     dataReady && (
       <>

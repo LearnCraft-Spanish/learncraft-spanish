@@ -4,9 +4,16 @@ import useAssignments from 'src/hooks/CoachingData/useAssignments';
 import type { Assignment, Week } from 'src/types/CoachingTypes';
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { useModal } from 'src/hooks/useModal';
+import {
+  CoachDropdown,
+  DropdownWithEditToggle,
+  FormControls,
+  LinkInput,
+  TextAreaInput,
+} from '../../general';
 
 function AssignmentCell({ assignment }: { assignment: Assignment }) {
   const {
@@ -38,13 +45,6 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
   const [assignmentLink, setAssignmentLink] = useState(
     assignment.assignmentLink,
   );
-
-  const homeworkCorrectorName = useMemo(() => {
-    const corrector = coachListQuery.data?.find(
-      (coach) => coach.user.email === homeworkCorrector,
-    );
-    return corrector?.user.name || 'No coach found';
-  }, [homeworkCorrector, coachListQuery.data]);
 
   function updateHomeworkCorrector(email: string) {
     const corrector = coachListQuery.data?.find(
@@ -137,176 +137,76 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
                 }
               </h4>
             )}
-            <div className="lineWrapper">
-              <label className="label" htmlFor="assignmentType">
-                Assignment Type:{' '}
-              </label>
-              {editMode ? (
-                <select
-                  id="assignmentType"
-                  name="assignmentType"
-                  className="content"
-                  defaultValue={assignmentType}
-                  onChange={(e) => setAssignmentType(e.target.value)}
-                >
-                  <option value="Pronunciation">Pronunciation</option>
-                  <option value="Writing">Writing</option>
-                  <option value="placement test">placement test</option>
-                  <option value="journal">journal</option>
-                  <option value="verbal tenses review">
-                    verbal tenses review
-                  </option>
-                  <option value="audio quiz">audio quiz</option>
-                  <option value="Student Testimonial">
-                    Student Testimonial
-                  </option>
-                  <option value="_other">_other</option>
-                </select>
-              ) : (
-                <p className="content">{assignmentType}</p>
-              )}
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="homeworkCorrector">
-                Corrected by:{' '}
-              </label>
-              {editMode ? (
-                <select
-                  id="homeworkCorrector"
-                  name="homeworkCorrector"
-                  className="content"
-                  defaultValue={homeworkCorrector}
-                  onChange={(e) => updateHomeworkCorrector(e.target.value)}
-                >
-                  {coachListQuery.data?.map((coach) => (
-                    <option key={coach.coach} value={coach.user.email}>
-                      {coach.user.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <p className="content">{homeworkCorrectorName}</p>
-              )}
-            </div>
-
-            <div className="lineWrapper">
-              <label className="label" htmlFor="rating">
-                Rating:{' '}
-              </label>
-              {editMode ? (
-                <select
-                  id="rating"
-                  name="rating"
-                  className="content"
-                  defaultValue={rating}
-                  onChange={(e) => setRating(e.target.value)}
-                >
-                  <option value="Excellent">Excellent</option>
-                  <option value="Very Good">Very Good</option>
-                  <option value="Good">Good</option>
-                  <option value="Fair">Fair</option>
-                  <option value="Bad">Bad</option>
-                  <option value="Poor">Poor</option>
-                  <option value="Assigned to M3">Assigned to M3</option>
-                  <option value="No sound">No sound</option>
-                  <option value="Assigned to Level 2 (L6-9)">
-                    Assigned to Level 2 (L6-9)
-                  </option>
-                  <option value="Assigned to Level 3 (L10-12)">
-                    Assigned to Level 3 (L10-12)
-                  </option>
-                  <option value="Assigned to Level 1 (lessons 1-6)">
-                    Assigned to Level 1 (lessons 1-6)
-                  </option>
-                  <option value="Advanced group">Advanced group</option>
-                  <option value="Assigned to Level 1 (L1-L5)">
-                    Assigned to Level 1 (L1-L5)
-                  </option>
-                  <option value="Assigned to 1MC">Assigned to 1MC</option>
-                  <option value="Assigned to Level 4">
-                    Assigned to Level 4
-                  </option>
-                  <option value="New LCS course">New LCS course</option>
-                  <option value="Advanced">Advanced</option>
-                </select>
-              ) : (
-                <p className="content">{rating}</p>
-              )}
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="notes">
-                Notes:{' '}
-              </label>
-              {editMode ? (
-                <textarea
-                  id="notes"
-                  name="notes"
-                  className="content"
-                  defaultValue={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
-              ) : (
-                <p className="content">{notes}</p>
-              )}
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="areasOfDifficulty">
-                Areas of Difficulty:{' '}
-              </label>
-              {editMode ? (
-                <textarea
-                  id="areasOfDifficulty"
-                  name="areasOfDifficulty"
-                  className="content"
-                  defaultValue={areasOfDifficulty}
-                  onChange={(e) => setAreasOfDifficulty(e.target.value)}
-                />
-              ) : (
-                <p className="content">{areasOfDifficulty}</p>
-              )}
-            </div>
-            {editMode ? (
-              <div className="lineWrapper">
-                <label className="label" htmlFor="assignmentLink">
-                  Assignment Link:{' '}
-                </label>
-                <input
-                  id="assignmentLink"
-                  name="assignmentLink"
-                  type="text"
-                  className="content"
-                  defaultValue={assignmentLink}
-                  onChange={(e) => setAssignmentLink(e.target.value)}
-                />
-              </div>
-            ) : (
-              assignmentLink.length > 0 && (
-                <div className="lineWrapper">
-                  <label className="label">Assignment Link: </label>
-                  <a target="_blank" href={assignmentLink}>
-                    Assignment Link
-                  </a>
-                </div>
-              )
-            )}
-            {editMode && (
-              <div className="buttonBox">
-                <button
-                  type="button"
-                  className="redButton"
-                  onClick={cancelEdit}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="greenButton"
-                  onClick={captureSubmitForm}
-                >
-                  Save
-                </button>
-              </div>
-            )}
+            <DropdownWithEditToggle
+              label="Assignment Type"
+              editMode={editMode}
+              value={assignmentType}
+              onChange={setAssignmentType}
+              options={[
+                'Pronunciation',
+                'Writing',
+                'placement test',
+                'journal',
+                'verbal tenses review',
+                'audio quiz',
+                'Student Testimonial',
+                '_other',
+              ]}
+            />
+            <CoachDropdown
+              label="Corrected by"
+              editMode={editMode}
+              coachEmail={homeworkCorrector}
+              onChange={updateHomeworkCorrector}
+            />
+            <DropdownWithEditToggle
+              label="Rating"
+              editMode={editMode}
+              value={rating}
+              onChange={setRating}
+              options={[
+                'Excellent',
+                'Very Good',
+                'Good',
+                'Fair',
+                'Bad',
+                'Poor',
+                'Assigned to M3',
+                'No sound',
+                'Assigned to Level 2 (L6-9)',
+                'Assigned to Level 3 (L10-12)',
+                'Assigned to Level 1 (lessons 1-6)',
+                'Advanced group',
+                'Assigned to Level 1 (L1-L5)',
+                'Assigned to 1MC',
+                'Assigned to Level 4',
+                'New LCS course',
+                'Advanced',
+              ]}
+            />
+            <TextAreaInput
+              label="Notes"
+              editMode={editMode}
+              value={notes}
+              onChange={setNotes}
+            />
+            <TextAreaInput
+              label="Areas of Difficulty"
+              editMode={editMode}
+              value={areasOfDifficulty}
+              onChange={setAreasOfDifficulty}
+            />
+            <LinkInput
+              label="Assignment Link"
+              value={assignmentLink}
+              onChange={setAssignmentLink}
+              editMode={editMode}
+            />
+            <FormControls
+              editMode={editMode}
+              cancelEdit={cancelEdit}
+              captureSubmitForm={captureSubmitForm}
+            />
           </div>
         </div>
       )}
