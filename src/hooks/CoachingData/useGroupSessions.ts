@@ -1,9 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import { useUserData } from '../UserData/useUserData';
 import { useBackend, useBackendHelpers } from '../useBackend';
-
-import type { GroupAttendeeMutationObj } from './useGroupAttendees';
-import useGroupAttendees from './useGroupAttendees';
 
 export default function useGroupSessions() {
   const userDataQuery = useUserData();
@@ -45,10 +43,16 @@ export default function useGroupSessions() {
   }
   const createGroupSessionMutation = useMutation({
     mutationFn: (groupSession: CreateGroupSessionMutation) => {
-      return newPostFactory({
+      const promise = newPostFactory({
         path: 'coaching/group-sessions',
         body: groupSession,
       });
+      toast.promise(promise, {
+        pending: 'Creating group session...',
+        success: 'Group session created!',
+        error: 'Error creating group session',
+      });
+      return promise;
     },
     onSettled() {
       groupSessionsQuery.refetch();
