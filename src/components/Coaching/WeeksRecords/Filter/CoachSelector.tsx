@@ -1,5 +1,4 @@
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useMemo } from 'react';
 import type { Coach } from 'src/types/CoachingTypes';
 
 interface CoachSelectProps {
