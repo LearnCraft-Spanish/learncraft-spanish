@@ -87,3 +87,42 @@ export function CoachDropdown({
     )
   );
 }
+
+export function DropdownWithEditToggle({
+  value,
+  onChange,
+  editMode,
+  options,
+  label,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  editMode: boolean;
+  options: string[];
+  label: string;
+}) {
+  const camelLabel = camelize(label);
+  return (
+    <div className="lineWrapper">
+      <label className="label" htmlFor={camelLabel}>{`${label}: `}</label>
+      {editMode ? (
+        <select
+          className="content"
+          id={camelLabel}
+          name={camelLabel}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          <option value="">Select</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <p className="content">{value}</p>
+      )}
+    </div>
+  );
+}

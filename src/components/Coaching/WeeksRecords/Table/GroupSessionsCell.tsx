@@ -9,7 +9,15 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useModal } from 'src/hooks/useModal';
 
-import { CoachDropdown, DateInput, Dropdown } from '../../general';
+import {
+  CoachDropdown,
+  DateInput,
+  Dropdown,
+  DropdownWithEditToggle,
+  FormControls,
+  TextAreaInput,
+  TextInput,
+} from '../../general';
 
 const sessionTypeOptions = [
   '1MC',
@@ -368,49 +376,8 @@ function GroupSessionCell({
                 onChange={updateCoach}
                 editMode={editMode}
               />
+              {editMode && <DateInput value={date} onChange={setDate} />}
               {editMode && (
-                // (
-                //   <div className="lineWrapper">
-                //     <label className="label">Date: </label>
-                //     <input
-                //       className="content"
-                //       type="date"
-                //       value={date}
-                //       onChange={(e) => setDate(e.target.value)}
-                //     />
-                //   </div>
-                // )
-                <DateInput value={date} onChange={setDate} />
-              )}
-              {editMode && (
-                // <div className="lineWrapper">
-                //   <label className="label" htmlFor="sessionType">
-                //     Session Type:
-                //   </label>
-                //   <select
-                //     id="sessionType"
-                //     name="sessionType"
-                //     className="content"
-                //     defaultValue={sessionType}
-                //     onChange={(e) => setSessionType(e.target.value)}
-                //   >
-                //     <option value="">Select</option>
-                //     <option value="1MC">1MC</option>
-                //     <option value="2MC">2MC</option>
-                //     <option value="Modules 1 & 2">Modules 1 & 2</option>
-                //     <option value="Level 1">Level 1</option>
-                //     <option value="Level 2">Level 2</option>
-                //     <option value="Level 3">Level 3</option>
-                //     <option value="Level 4">Level 4</option>
-                //     <option value="Level 5">Level 5</option>
-                //     <option value="Level 6">Level 6</option>
-                //     <option value="Module 3">Module 3</option>
-                //     <option value="Module 4">Module 4</option>
-                //     <option value="LCS Cohort">LCS Cohort</option>
-                //     <option value="Advanced">Advanced</option>
-                //     <option value="Conversation">Conversation</option>
-                //   </select>
-                // </div>
                 <Dropdown
                   label="Session Type"
                   value={sessionType}
@@ -419,71 +386,31 @@ function GroupSessionCell({
                 />
               )}
             </div>
-            <div className="lineWrapper">
-              <label className="label">Topic: </label>
-              {editMode ? (
-                <select
-                  className="content"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                >
-                  <option value="">Select</option>
-                  {groupSessionsTopicFieldOptionsQuery.data?.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <p className="content">{topic}</p>
-              )}
-            </div>
-            <div className="lineWrapper">
-              <label className="label">Comments: </label>
-              {editMode ? (
-                <textarea
-                  className="content"
-                  value={comments}
-                  onChange={(e) => setComments(e.target.value)}
-                />
-              ) : (
-                <p className="content">{comments}</p>
-              )}
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="callDocument">
-                Call Document:
-              </label>
-              {editMode ? (
-                <input
-                  className="content"
-                  id="callDocument"
-                  name="callDocument"
-                  type="text"
-                  value={callDocument}
-                  onChange={(e) => setCallDocument(e.target.value)}
-                />
-              ) : (
-                <p className="content">{callDocument}</p>
-              )}
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="zoomLink">
-                Zoom Link:
-              </label>
-              {editMode ? (
-                <input
-                  className="content"
-                  id="zoomLink"
-                  name="zoomLink"
-                  type="text"
-                  value={zoomLink}
-                  onChange={(e) => setZoomLink(e.target.value)}
-                />
-              ) : (
-                <p className="content">{zoomLink}</p>
-              )}
-            </div>
+            <DropdownWithEditToggle
+              value={topic}
+              onChange={setTopic}
+              editMode={editMode}
+              options={groupSessionsTopicFieldOptionsQuery.data ?? []}
+              label="Topic"
+            />
+            <TextAreaInput
+              label="Comments"
+              value={comments}
+              onChange={setComments}
+              editMode={editMode}
+            />
+            <TextInput
+              label="Call Document"
+              value={callDocument}
+              onChange={setCallDocument}
+              editMode={editMode}
+            />
+            <TextInput
+              label="Zoom Link"
+              value={zoomLink}
+              onChange={setZoomLink}
+              editMode={editMode}
+            />
             {editMode && (
               <div className="lineWrapper">
                 <label className="label" htmlFor="addAttendee">
@@ -550,25 +477,11 @@ function GroupSessionCell({
                   )}
               </div>
             </div>
-
-            {editMode && (
-              <div className="buttonBox">
-                <button
-                  type="button"
-                  className="redButton"
-                  onClick={cancelEdit}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="greenButton"
-                  onClick={captureSubmitForm}
-                >
-                  Save
-                </button>
-              </div>
-            )}
+            <FormControls
+              editMode={editMode}
+              cancelEdit={cancelEdit}
+              captureSubmitForm={captureSubmitForm}
+            />
           </div>
         </div>
       )}
