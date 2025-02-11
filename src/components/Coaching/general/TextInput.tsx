@@ -59,3 +59,35 @@ export function TextInput({
     </div>
   );
 }
+
+export function LinkInput({
+  label,
+  value,
+  onChange,
+  editMode,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  editMode: boolean;
+}) {
+  const camelLabel = camelize(label);
+  return (
+    <div className="lineWrapper">
+      <label className="label" htmlFor={camelLabel}>{`${label}: `}</label>
+      {editMode ? (
+        <input
+          className="content"
+          id={camelLabel}
+          name={camelLabel}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ) : (
+        <a className="content" href={value} target="_blank" rel="noreferrer">
+          {label}
+        </a>
+      )}
+    </div>
+  );
+}

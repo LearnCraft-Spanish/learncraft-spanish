@@ -42,10 +42,12 @@ export function CoachDropdown({
   coachEmail,
   onChange,
   editMode,
+  label = 'Coach',
 }: {
   coachEmail: string;
   onChange: (value: string) => void;
   editMode: boolean;
+  label?: string;
 }) {
   const { coachListQuery } = useCoaching();
 
@@ -62,7 +64,7 @@ export function CoachDropdown({
     dataReady && (
       <div className="lineWrapper">
         <label className="label" htmlFor="coach">
-          Coach:
+          {`${label}: `}
         </label>
         {editMode ? (
           <select
