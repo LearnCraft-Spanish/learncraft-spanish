@@ -41,10 +41,10 @@ export default function useGroupAttendees() {
   });
 
   const deleteGroupAttendeesMutation = useMutation({
-    mutationFn: (groupAttendees: GroupAttendeeMutationObj[]) => {
+    mutationFn: (recordIds: number[]) => {
       const promise = newDeleteFactory({
         path: `coaching/group-attendees`,
-        body: groupAttendees,
+        body: recordIds,
       });
       toast.promise(promise, {
         pending: 'Removing designated group attendees...',

@@ -30,7 +30,8 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     updateDisableClickOutside,
   } = useContextualMenu();
   const { closeModal } = useModal();
-  const { updateAssignmentMutation } = useAssignments();
+  const { updateAssignmentMutation, deleteAssignmentMutation } =
+    useAssignments();
 
   const [editMode, setEditMode] = useState(false);
 
@@ -81,10 +82,13 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     setAssignmentLink(assignment.assignmentLink);
   }
   function deleteRecordFunction() {
-    console.error('Delete Record Function, not impletemented yet');
-    closeModal();
-    cancelEdit();
-    closeContextual();
+    deleteAssignmentMutation.mutate(assignment.recordId, {
+      onSuccess: () => {
+        closeModal();
+        cancelEdit();
+        closeContextual();
+      },
+    });
   }
 
   function submitEdit() {

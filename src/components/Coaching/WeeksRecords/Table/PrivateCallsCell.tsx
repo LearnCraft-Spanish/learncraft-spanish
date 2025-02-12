@@ -19,7 +19,8 @@ function PrivateCall({ call }: { call: Call }) {
   } = useContextualMenu();
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
     useCoaching();
-  const { updatePrivateCallMutation } = usePrivateCalls();
+  const { updatePrivateCallMutation, deletePrivateCallMutation } =
+    usePrivateCalls();
   const { coachListQuery } = useCoaching();
   const { openModal, closeModal } = useModal();
 
@@ -97,10 +98,13 @@ function PrivateCall({ call }: { call: Call }) {
   }
 
   function deleteRecordFunction() {
-    console.error('Delete Record Function, not impletemented yet');
-    closeModal();
-    cancelEdit();
-    closeContextual();
+    deletePrivateCallMutation.mutate(call.recordId, {
+      onSuccess: () => {
+        closeModal();
+        cancelEdit();
+        closeContextual();
+      },
+    });
   }
 
   function captureSubmitForm() {

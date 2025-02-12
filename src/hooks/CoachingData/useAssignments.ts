@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import type { Assignment } from 'src/types/CoachingTypes';
 import { useBackend, useBackendHelpers } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
 
@@ -85,9 +84,9 @@ export default function useAssignments() {
   });
 
   const deleteAssignmentMutation = useMutation({
-    mutationFn: (assignment: Assignment) => {
+    mutationFn: (recordId: number) => {
       const promise = newDeleteFactory({
-        path: `coaching/assignments/${assignment.recordId}`,
+        path: `coaching/assignments/${recordId}`,
       });
       toast.promise(promise, {
         pending: 'Deleting assignment...',

@@ -1,7 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import type { Call } from 'src/types/CoachingTypes';
 import { useBackend, useBackendHelpers } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
 
@@ -83,9 +82,9 @@ export default function usePrivateCalls() {
   });
 
   const deletePrivateCallMutation = useMutation({
-    mutationFn: (call: Call) => {
+    mutationFn: (recordId: number) => {
       const promise = newDeleteFactory({
-        path: `coaching/private-calls/${call.recordId}`,
+        path: `coaching/private-calls/${recordId}`,
       });
       toast.promise(promise, {
         pending: 'Deleting private call...',

@@ -66,6 +66,7 @@ function GroupSessionCell({
     groupSessionsTopicFieldOptionsQuery,
     createGroupSessionMutation,
     updateGroupSessionMutation,
+    deleteGroupSessionMutation,
   } = useGroupSessions();
 
   const { createGroupAttendeesMutation, deleteGroupAttendeesMutation } =
@@ -246,10 +247,22 @@ function GroupSessionCell({
     }
   }
   function deleteRecordFunction() {
-    console.error('Delete Record Function, not impletemented yet');
-    closeModal();
-    cancelEdit();
-    closeContextual();
+    // attendee records to delete afterwards
+    const attendeesToRemove = getAttendeesFromGroupSessionId(recordId);
+    deleteGroupSessionMutation.mutate(recordId, {
+      onSuccess: () => {
+        if (attendeesToRemove) {
+          deleteGroupAttendeesMutation.mutate(
+            attendeesToRemove?.map((attendee) => attendee.recordId),
+          );
+        }
+      },
+      onSettled: () => {
+        closeModal();
+        cancelEdit();
+        closeContextual();
+      },
+    });
   }
 
   function captureSubmitForm() {
@@ -336,11 +349,17 @@ function GroupSessionCell({
         zoomLink,
       });
       if (checkAttendeeChanges()) {
+        const currentAttendeeRecords = getAttendeesFromGroupSessionId(recordId);
         const attendeesToAdd = attendees.filter(
           (attendee) => attendee.action === 'add',
         );
-        const attendeesToRemove = attendees.filter(
+        const attendeesToRemove_StepOne = attendees.filter(
           (attendee) => attendee.action === 'remove',
+        );
+        const attendeesToRemove = currentAttendeeRecords?.filter((attendee) =>
+          attendeesToRemove_StepOne.find(
+            (remove) => remove.relatedWeek === attendee.student,
+          ),
         );
 
         createGroupAttendeesMutation.mutate(
@@ -349,13 +368,11 @@ function GroupSessionCell({
             student: attendee.relatedWeek,
           })),
         );
-
-        deleteGroupAttendeesMutation.mutate(
-          attendeesToRemove.map((attendee) => ({
-            groupSession: recordId,
-            student: attendee.relatedWeek,
-          })),
-        );
+        if (attendeesToRemove) {
+          deleteGroupAttendeesMutation.mutate(
+            attendeesToRemove.map((attendee) => attendee.recordId),
+          );
+        }
       }
     }
     disableEditMode();
