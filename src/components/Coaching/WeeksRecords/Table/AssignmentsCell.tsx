@@ -15,20 +15,32 @@ import {
   LinkInput,
   TextAreaInput,
 } from '../../general';
-
 function AssignmentCell({ assignment }: { assignment: Assignment }) {
+  const { openContextual, contextual } = useContextualMenu();
+
+  return (
+    <div className="cellWithContextual">
+      <button
+        type="button"
+        onClick={() => openContextual(`assignment${assignment.recordId}`)}
+      >
+        {assignment.assignmentType}:{assignment.rating}
+      </button>
+      {contextual === `assignment${assignment.recordId}` && (
+        <AssignmentView assignment={assignment} />
+      )}
+    </div>
+  );
+}
+
+function AssignmentView({ assignment }: { assignment: Assignment }) {
   const {
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
     coachListQuery,
   } = useCoaching();
-  const {
-    contextual,
-    openContextual,
-    setContextualRef,
-    closeContextual,
-    updateDisableClickOutside,
-  } = useContextualMenu();
+  const { setContextualRef, closeContextual, updateDisableClickOutside } =
+    useContextualMenu();
   const { closeModal } = useModal();
   const { updateAssignmentMutation, deleteAssignmentMutation } =
     useAssignments();
@@ -123,107 +135,93 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     submitEdit();
   }
   return (
-    <div className="cellWithContextual">
-      <button
-        type="button"
-        onClick={() => openContextual(`assignment${assignment.recordId}`)}
-      >
-        {assignmentType}:{rating}
-      </button>
-      {contextual === `assignment${assignment.recordId}` && (
-        <div
-          className="contextualWrapper"
-          key={`assignment${assignment.recordId}`}
-        >
-          <div className="contextual" ref={setContextualRef}>
-            <ContextualControlls editFunction={enableEditMode} />
-            {editMode ? (
-              <h4>Edit Assignment</h4>
-            ) : (
-              <h4>
-                {assignmentType} by{' '}
-                {
-                  getStudentFromMembershipId(
-                    getMembershipFromWeekRecordId(assignment.relatedWeek)
-                      ?.recordId,
-                  )?.fullName
-                }
-              </h4>
-            )}
-            <DropdownWithEditToggle
-              label="Assignment Type"
-              editMode={editMode}
-              value={assignmentType}
-              onChange={setAssignmentType}
-              options={[
-                'Pronunciation',
-                'Writing',
-                'placement test',
-                'journal',
-                'verbal tenses review',
-                'audio quiz',
-                'Student Testimonial',
-                '_other',
-              ]}
-            />
-            <CoachDropdown
-              label="Corrected by"
-              editMode={editMode}
-              coachEmail={homeworkCorrector}
-              onChange={updateHomeworkCorrector}
-            />
-            <DropdownWithEditToggle
-              label="Rating"
-              editMode={editMode}
-              value={rating}
-              onChange={setRating}
-              options={[
-                'Excellent',
-                'Very Good',
-                'Good',
-                'Fair',
-                'Bad',
-                'Poor',
-                'Assigned to M3',
-                'No sound',
-                'Assigned to Level 2 (L6-9)',
-                'Assigned to Level 3 (L10-12)',
-                'Assigned to Level 1 (lessons 1-6)',
-                'Advanced group',
-                'Assigned to Level 1 (L1-L5)',
-                'Assigned to 1MC',
-                'Assigned to Level 4',
-                'New LCS course',
-                'Advanced',
-              ]}
-            />
-            <TextAreaInput
-              label="Notes"
-              editMode={editMode}
-              value={notes}
-              onChange={setNotes}
-            />
-            <TextAreaInput
-              label="Areas of Difficulty"
-              editMode={editMode}
-              value={areasOfDifficulty}
-              onChange={setAreasOfDifficulty}
-            />
-            <LinkInput
-              label="Assignment Link"
-              value={assignmentLink}
-              onChange={setAssignmentLink}
-              editMode={editMode}
-            />
-            {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
-            <FormControls
-              editMode={editMode}
-              cancelEdit={cancelEdit}
-              captureSubmitForm={captureSubmitForm}
-            />
-          </div>
-        </div>
-      )}
+    <div className="contextualWrapper" key={`assignment${assignment.recordId}`}>
+      <div className="contextual" ref={setContextualRef}>
+        <ContextualControlls editFunction={enableEditMode} />
+        {editMode ? (
+          <h4>Edit Assignment</h4>
+        ) : (
+          <h4>
+            {assignmentType} by{' '}
+            {
+              getStudentFromMembershipId(
+                getMembershipFromWeekRecordId(assignment.relatedWeek)?.recordId,
+              )?.fullName
+            }
+          </h4>
+        )}
+        <DropdownWithEditToggle
+          label="Assignment Type"
+          editMode={editMode}
+          value={assignmentType}
+          onChange={setAssignmentType}
+          options={[
+            'Pronunciation',
+            'Writing',
+            'placement test',
+            'journal',
+            'verbal tenses review',
+            'audio quiz',
+            'Student Testimonial',
+            '_other',
+          ]}
+        />
+        <CoachDropdown
+          label="Corrected by"
+          editMode={editMode}
+          coachEmail={homeworkCorrector}
+          onChange={updateHomeworkCorrector}
+        />
+        <DropdownWithEditToggle
+          label="Rating"
+          editMode={editMode}
+          value={rating}
+          onChange={setRating}
+          options={[
+            'Excellent',
+            'Very Good',
+            'Good',
+            'Fair',
+            'Bad',
+            'Poor',
+            'Assigned to M3',
+            'No sound',
+            'Assigned to Level 2 (L6-9)',
+            'Assigned to Level 3 (L10-12)',
+            'Assigned to Level 1 (lessons 1-6)',
+            'Advanced group',
+            'Assigned to Level 1 (L1-L5)',
+            'Assigned to 1MC',
+            'Assigned to Level 4',
+            'New LCS course',
+            'Advanced',
+          ]}
+        />
+        <TextAreaInput
+          label="Notes"
+          editMode={editMode}
+          value={notes}
+          onChange={setNotes}
+        />
+        <TextAreaInput
+          label="Areas of Difficulty"
+          editMode={editMode}
+          value={areasOfDifficulty}
+          onChange={setAreasOfDifficulty}
+        />
+        <LinkInput
+          label="Assignment Link"
+          value={assignmentLink}
+          onChange={setAssignmentLink}
+          editMode={editMode}
+        />
+        {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
+        <FormControls
+          editMode={editMode}
+          cancelEdit={cancelEdit}
+          captureSubmitForm={captureSubmitForm}
+        />
+      </div>
     </div>
   );
 }

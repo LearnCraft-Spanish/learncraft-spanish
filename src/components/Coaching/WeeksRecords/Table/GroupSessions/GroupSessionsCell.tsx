@@ -46,13 +46,57 @@ function GroupSessionCell({
   week: Week;
   newRecord?: boolean;
 }) {
-  const {
-    contextual,
-    openContextual,
-    setContextualRef,
-    closeContextual,
-    updateDisableClickOutside,
-  } = useContextualMenu();
+  const { contextual, openContextual } = useContextualMenu();
+  return (
+    <div className="cellWithContextual">
+      {newRecord ? (
+        <button
+          type="button"
+          className="greenButton"
+          onClick={() =>
+            openContextual(
+              `groupSession${groupSession.recordId}week${week.recordId}`,
+            )
+          }
+        >
+          New
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() =>
+            openContextual(
+              `groupSession${groupSession.recordId}week${week.recordId}`,
+            )
+          }
+        >
+          {groupSession.sessionType}
+        </button>
+      )}
+
+      {contextual ===
+        `groupSession${groupSession.recordId}week${week.recordId}` && (
+        <GroupSessionView
+          groupSession={groupSession}
+          week={week}
+          newRecord={newRecord}
+        />
+      )}
+    </div>
+  );
+}
+
+function GroupSessionView({
+  groupSession,
+  week,
+  newRecord,
+}: {
+  groupSession: GroupSession;
+  week: Week;
+  newRecord?: boolean;
+}) {
+  const { setContextualRef, closeContextual, updateDisableClickOutside } =
+    useContextualMenu();
   const { openModal, closeModal } = useModal();
 
   const {
@@ -387,158 +431,133 @@ function GroupSessionCell({
   }, [dataReady, sessionType, setInitialState]);
 
   return (
-    <div className="cellWithContextual" key={recordId}>
-      {newRecord ? (
-        <button
-          type="button"
-          className="greenButton"
-          onClick={() =>
-            openContextual(`groupSession${recordId}week${week.recordId}`)
-          }
-        >
-          New
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() =>
-            openContextual(`groupSession${recordId}week${week.recordId}`)
-          }
-        >
-          {sessionType}
-        </button>
-      )}
-      {contextual === `groupSession${recordId}week${week.recordId}` && (
-        <div className="contextualWrapper">
-          <div className="contextual" ref={setContextualRef}>
-            <ContextualControlls editFunction={toggleEditMode} />
-            {editMode ? (
-              newRecord ? (
-                <h3>New Group Session</h3>
-              ) : (
-                <h3>Edit Group Session</h3>
-              )
-            ) : (
-              <h3>{`Session: ${sessionType} on ${date}`}</h3>
-            )}
-            <div>
-              <CoachDropdown
-                coachEmail={coach}
-                onChange={updateCoach}
-                editMode={editMode}
-              />
-              {editMode && <DateInput value={date} onChange={setDate} />}
-              {editMode && (
-                <Dropdown
-                  label="Session Type"
-                  value={sessionType}
-                  onChange={setSessionType}
-                  options={sessionTypeOptions}
-                />
-              )}
-            </div>
-            <DropdownWithEditToggle
-              value={topic}
-              onChange={setTopic}
-              editMode={editMode}
-              options={groupSessionsTopicFieldOptionsQuery.data ?? []}
-              label="Topic"
+    <div className="contextualWrapper">
+      <div className="contextual" ref={setContextualRef}>
+        <ContextualControlls editFunction={toggleEditMode} />
+        {editMode ? (
+          newRecord ? (
+            <h3>New Group Session</h3>
+          ) : (
+            <h3>Edit Group Session</h3>
+          )
+        ) : (
+          <h3>{`Session: ${sessionType} on ${date}`}</h3>
+        )}
+        <div>
+          <CoachDropdown
+            coachEmail={coach}
+            onChange={updateCoach}
+            editMode={editMode}
+          />
+          {editMode && <DateInput value={date} onChange={setDate} />}
+          {editMode && (
+            <Dropdown
+              label="Session Type"
+              value={sessionType}
+              onChange={setSessionType}
+              options={sessionTypeOptions}
             />
-            <TextAreaInput
-              label="Comments"
-              value={comments}
-              onChange={setComments}
-              editMode={editMode}
-            />
-            <TextInput
-              label="Call Document"
-              value={callDocument}
-              onChange={setCallDocument}
-              editMode={editMode}
-            />
-            <TextInput
-              label="Zoom Link"
-              value={zoomLink}
-              onChange={setZoomLink}
-              editMode={editMode}
-            />
-            {editMode && (
-              <div className="lineWrapper">
-                <label className="label" htmlFor="addAttendee">
-                  Add Attendees:
-                </label>
-                <select
-                  id="attendee"
-                  name="attendee"
-                  className="content"
-                  value={addingAttendee}
-                  onChange={(e) => setAddingAttendee(e.target.value)}
-                >
-                  <option value="">Select</option>
-                  {lastThreeWeeksQuery.data
-                    ?.filter((filterWeek) => {
-                      return (
-                        week.membershipCourseHasGroupCalls &&
-                        filterWeek.weekStarts === week.weekStarts
-                      );
-                    })
-                    .map((studentWeek) => (
-                      <option
-                        key={studentWeek.recordId}
-                        value={studentWeek.recordId}
-                      >
-                        {
-                          getStudentFromMembershipId(
-                            studentWeek.relatedMembership,
-                          )?.fullName
+          )}
+        </div>
+        <DropdownWithEditToggle
+          value={topic}
+          onChange={setTopic}
+          editMode={editMode}
+          options={groupSessionsTopicFieldOptionsQuery.data ?? []}
+          label="Topic"
+        />
+        <TextAreaInput
+          label="Comments"
+          value={comments}
+          onChange={setComments}
+          editMode={editMode}
+        />
+        <TextInput
+          label="Call Document"
+          value={callDocument}
+          onChange={setCallDocument}
+          editMode={editMode}
+        />
+        <TextInput
+          label="Zoom Link"
+          value={zoomLink}
+          onChange={setZoomLink}
+          editMode={editMode}
+        />
+        {editMode && (
+          <div className="lineWrapper">
+            <label className="label" htmlFor="addAttendee">
+              Add Attendees:
+            </label>
+            <select
+              id="attendee"
+              name="attendee"
+              className="content"
+              value={addingAttendee}
+              onChange={(e) => setAddingAttendee(e.target.value)}
+            >
+              <option value="">Select</option>
+              {lastThreeWeeksQuery.data
+                ?.filter((filterWeek) => {
+                  return (
+                    week.membershipCourseHasGroupCalls &&
+                    filterWeek.weekStarts === week.weekStarts
+                  );
+                })
+                .map((studentWeek) => (
+                  <option
+                    key={studentWeek.recordId}
+                    value={studentWeek.recordId}
+                  >
+                    {
+                      getStudentFromMembershipId(studentWeek.relatedMembership)
+                        ?.fullName
+                    }
+                  </option>
+                ))}
+            </select>
+            <button
+              type="button"
+              className="addButton addAttendee"
+              onClick={() => handleAddAttendee()}
+            >
+              Add Attendee
+            </button>
+          </div>
+        )}
+        <div className="lineWrapper">
+          <label className="label">Attendees:</label>
+          <div className="content">
+            {attendees &&
+              attendees.map(
+                (attendee) =>
+                  // if attendee is to be removed, don't display it
+                  attendee.action !== 'remove' && (
+                    <div key={attendee.relatedWeek}>
+                      <p> {attendee.name}</p>
+                      <button
+                        type="button"
+                        className="redButton"
+                        onClick={() =>
+                          handleRemoveAttendee(attendee.relatedWeek)
                         }
-                      </option>
-                    ))}
-                </select>
-                <button
-                  type="button"
-                  className="addButton addAttendee"
-                  onClick={() => handleAddAttendee()}
-                >
-                  Add Attendee
-                </button>
-              </div>
-            )}
-            <div className="lineWrapper">
-              <label className="label">Attendees:</label>
-              <div className="content">
-                {attendees &&
-                  attendees.map(
-                    (attendee) =>
-                      // if attendee is to be removed, don't display it
-                      attendee.action !== 'remove' && (
-                        <div key={attendee.relatedWeek}>
-                          <p> {attendee.name}</p>
-                          <button
-                            type="button"
-                            className="redButton"
-                            onClick={() =>
-                              handleRemoveAttendee(attendee.relatedWeek)
-                            }
-                          >
-                            Remove Attendee
-                          </button>
-                        </div>
-                      ),
-                  )}
-              </div>
-            </div>
-            {editMode && !newRecord && (
-              <DeleteRecord deleteFunction={deleteRecordFunction} />
-            )}
-            <FormControls
-              editMode={editMode}
-              cancelEdit={cancelEdit}
-              captureSubmitForm={captureSubmitForm}
-            />
+                      >
+                        Remove Attendee
+                      </button>
+                    </div>
+                  ),
+              )}
           </div>
         </div>
-      )}
+        {editMode && !newRecord && (
+          <DeleteRecord deleteFunction={deleteRecordFunction} />
+        )}
+        <FormControls
+          editMode={editMode}
+          cancelEdit={cancelEdit}
+          captureSubmitForm={captureSubmitForm}
+        />
+      </div>
     </div>
   );
 }

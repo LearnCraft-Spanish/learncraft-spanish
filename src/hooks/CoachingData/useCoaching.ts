@@ -181,31 +181,14 @@ export default function useCoaching() {
       if (weekRecordsList.length === 0) return undefined;
       return weekRecordsList;
     },
-    [groupAttendeesQuery, lastThreeWeeksQuery],
+    [
+      groupAttendeesQuery.isSuccess,
+      groupAttendeesQuery.data,
+      lastThreeWeeksQuery.isSuccess,
+      lastThreeWeeksQuery.data,
+    ],
   );
 
-  const getGroupSessionFromWeekRecordId = useCallback(
-    (weekRecordId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-        return null;
-      }
-      const attendeeList = groupAttendeesQuery.data.filter(
-        (attendee) => attendee.student === weekRecordId,
-      );
-      if (attendeeList.length === 0) return undefined;
-
-      const groupSession = groupSessionsQuery.data.find((groupSession) =>
-        attendeeList.find(
-          (attendee) => attendee.groupSession === groupSession.recordId,
-        ),
-      );
-      if (!groupSession) return undefined;
-      return groupSession;
-    },
-    [groupAttendeesQuery, groupSessionsQuery],
-  );
-  // should There only be one group session per week record?
-  // Answer: theoretically possible, if the group reschedules the session
   const getGroupSessionsFromWeekRecordId = useCallback(
     (weekRecordId: number) => {
       if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
@@ -221,7 +204,12 @@ export default function useCoaching() {
       );
       return groupSessionList;
     },
-    [groupAttendeesQuery, groupSessionsQuery],
+    [
+      groupAttendeesQuery.data,
+      groupAttendeesQuery.isSuccess,
+      groupSessionsQuery.data,
+      groupSessionsQuery.isSuccess,
+    ],
   );
 
   const getAssignmentsFromWeekRecordId = useCallback(
@@ -235,7 +223,7 @@ export default function useCoaching() {
       if (assignments.length === 0) return undefined;
       return assignments;
     },
-    [assignmentsQuery],
+    [assignmentsQuery.data, assignmentsQuery.isSuccess],
   );
 
   const getMembershipFromWeekRecordId = useCallback(
@@ -257,12 +245,17 @@ export default function useCoaching() {
       if (!membership) return undefined;
       return membership;
     },
-    [activeMembershipsQuery, lastThreeWeeksQuery],
+    [
+      activeMembershipsQuery.data,
+      activeMembershipsQuery.isSuccess,
+      lastThreeWeeksQuery.data,
+      lastThreeWeeksQuery.isSuccess,
+    ],
   );
 
   const getPrivateCallsFromWeekRecordId = useCallback(
     (weekId: number) => {
-      if (!privateCallsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      if (!privateCallsQuery.isSuccess) {
         return null;
       }
       const privateCalls = privateCallsQuery.data.filter(
@@ -270,23 +263,19 @@ export default function useCoaching() {
       );
       return privateCalls;
     },
-    [
-      lastThreeWeeksQuery.isSuccess,
-      privateCallsQuery.data,
-      privateCallsQuery.isSuccess,
-    ],
+    [privateCallsQuery.data, privateCallsQuery.isSuccess],
   );
 
   const getAttendeesFromGroupSessionId = useCallback(
     (sessionId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+      if (!groupAttendeesQuery.isSuccess) {
         return null;
       }
       return groupAttendeesQuery.data.filter(
         (attendee) => attendee.groupSession === sessionId,
       );
     },
-    [groupAttendeesQuery, groupSessionsQuery],
+    [groupAttendeesQuery.isSuccess, groupAttendeesQuery.data],
   );
   /* --------- Other Helper Functions --------- */
 
@@ -330,7 +319,6 @@ export default function useCoaching() {
     getStudentFromMembershipId,
     getAttendeeWeeksFromGroupSessionId,
     getAttendeesFromGroupSessionId,
-    getGroupSessionFromWeekRecordId,
     getGroupSessionsFromWeekRecordId,
 
     getAssignmentsFromWeekRecordId,

@@ -1,6 +1,8 @@
 import type { Week } from 'src/types/CoachingTypes';
 import checkmark from 'src/assets/icons/checkmark_green.svg';
+
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+
 import AssignmentsCell from './AssignmentsCell';
 import GroupSessionsCell from './GroupSessions/GroupSessionsCell';
 import PrivateCallsCell from './PrivateCallsCell';
@@ -11,19 +13,17 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     getAssignmentsFromWeekRecordId,
     getGroupSessionsFromWeekRecordId,
     getPrivateCallsFromWeekRecordId,
+    getStudentFromMembershipId,
   } = useCoaching();
 
   return (
     <tr>
       <td>
-        <StudentCell week={week} />
+        <StudentCell
+          week={week}
+          student={getStudentFromMembershipId(week.relatedMembership)}
+        />
       </td>
-      {/* <td>{week.level}</td> */}
-      {/* <td>
-      {week.primaryCoach.name
-        ? week.primaryCoach.name
-        : 'No Primary Coach Found'}
-    </td> */}
       <td>{week.weekStarts.toString()}</td>
       <td>
         <AssignmentsCell
@@ -59,7 +59,6 @@ export default function WeeksTableItem({ week }: { week: Week }) {
           <img className="checkmark" src={checkmark} alt="Checkmark" />
         )}
       </td>
-      <td>{week.membershipStudentCallCreditsRemaining}</td>
     </tr>
   );
 }

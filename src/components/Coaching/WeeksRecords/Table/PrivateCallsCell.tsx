@@ -8,15 +8,25 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useModal } from 'src/hooks/useModal';
 
 import { DeleteRecord } from '../../general';
-
 function PrivateCall({ call }: { call: Call }) {
-  const {
-    setContextualRef,
-    openContextual,
-    contextual,
-    updateDisableClickOutside,
-    closeContextual,
-  } = useContextualMenu();
+  const { openContextual, contextual } = useContextualMenu();
+
+  return (
+    <div className="cellWithContextual" key={call.recordId}>
+      <button
+        type="button"
+        onClick={() => openContextual(`call${call.recordId}`)}
+      >
+        {call.rating}
+      </button>
+      {contextual === `call${call.recordId}` && <PrivateCallView call={call} />}
+    </div>
+  );
+}
+
+function PrivateCallView({ call }: { call: Call }) {
+  const { setContextualRef, updateDisableClickOutside, closeContextual } =
+    useContextualMenu();
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
     useCoaching();
   const { updatePrivateCallMutation, deletePrivateCallMutation } =
@@ -126,205 +136,187 @@ function PrivateCall({ call }: { call: Call }) {
   }
 
   return (
-    <div className="cellWithContextual" key={call.recordId}>
-      <button
-        type="button"
-        onClick={() => openContextual(`call${call.recordId}`)}
-      >
-        {call.rating}
-      </button>
-      {contextual === `call${call.recordId}` && (
-        <div className="contextualWrapper">
-          <div className="contextual" ref={setContextualRef}>
-            <ContextualControlls editFunction={enableEditMode} />
-            {editMode ? (
-              <h4>Edit Call</h4>
-            ) : (
-              <h4>
-                {
-                  getStudentFromMembershipId(
-                    getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
-                  )?.fullName
-                }{' '}
-                on{' '}
-                {typeof call.date === 'string'
-                  ? call.date
-                  : call.date.toString()}
-              </h4>
-            )}
-            {editMode && (
-              <div className="lineWrapper">
-                <p className="label">Student: </p>
-                <p>
-                  {
-                    getStudentFromMembershipId(
-                      getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
-                    )?.fullName
-                  }
-                </p>
-              </div>
-            )}
-            <div className="lineWrapper">
-              <label className="label" htmlFor="caller">
-                Caller:
-              </label>
-              {editMode ? (
-                <select
-                  className="content"
-                  id="caller"
-                  name="caller"
-                  defaultValue={caller}
-                  onChange={(e) => setCaller(e.target.value)}
-                >
-                  <option value="">Select</option>
-                  {coachListQuery.data?.map((coach) => (
-                    <option key={coach.coach} value={coach.user.email}>
-                      {coach.user.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <p className="content">{call.caller.name}</p>
-              )}
-            </div>
-            {editMode && (
-              <div className="lineWrapper">
-                <label className="label">Date: </label>
-                <input
-                  className="content"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                />
-              </div>
-            )}
-            <div className="lineWrapper">
-              <label className="label" htmlFor="rating">
-                Rating:
-              </label>
-              {editMode ? (
-                <select
-                  className="content"
-                  id="rating"
-                  name="rating"
-                  defaultValue={rating}
-                  onChange={(e) => setRating(e.target.value)}
-                >
-                  <option value="">Select</option>
-                  <option value="Excellent">Excellent</option>
-                  <option value="Very Good">Very Good</option>
-                  <option value="Good">Good</option>
-                  <option value="Fair">Fair</option>
-                  <option value="Poor">Poor</option>
-                  <option value="Bad">Bad</option>
-                  <option value="Late Cancel">Late Cancel</option>
-                  <option value="No-Show">No-Show</option>
-                </select>
-              ) : (
-                <p className="content">{call.rating}</p>
-              )}
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="notes">
-                Notes:
-              </label>
-              {editMode ? (
-                <textarea
-                  className="content"
-                  id="notes"
-                  name="notes"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                />
-              ) : (
-                <p className="content">{call.notes}</p>
-              )}
-            </div>
-            {/* <div className="lineWrapper">
+    <div className="contextualWrapper">
+      <div className="contextual" ref={setContextualRef}>
+        <ContextualControlls editFunction={enableEditMode} />
+        {editMode ? (
+          <h4>Edit Call</h4>
+        ) : (
+          <h4>
+            {
+              getStudentFromMembershipId(
+                getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
+              )?.fullName
+            }{' '}
+            on{' '}
+            {typeof call.date === 'string' ? call.date : call.date.toString()}
+          </h4>
+        )}
+        {editMode && (
+          <div className="lineWrapper">
+            <p className="label">Student: </p>
+            <p>
+              {
+                getStudentFromMembershipId(
+                  getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
+                )?.fullName
+              }
+            </p>
+          </div>
+        )}
+        <div className="lineWrapper">
+          <label className="label" htmlFor="caller">
+            Caller:
+          </label>
+          {editMode ? (
+            <select
+              className="content"
+              id="caller"
+              name="caller"
+              defaultValue={caller}
+              onChange={(e) => setCaller(e.target.value)}
+            >
+              <option value="">Select</option>
+              {coachListQuery.data?.map((coach) => (
+                <option key={coach.coach} value={coach.user.email}>
+                  {coach.user.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="content">{call.caller.name}</p>
+          )}
+        </div>
+        {editMode && (
+          <div className="lineWrapper">
+            <label className="label">Date: </label>
+            <input
+              className="content"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+        )}
+        <div className="lineWrapper">
+          <label className="label" htmlFor="rating">
+            Rating:
+          </label>
+          {editMode ? (
+            <select
+              className="content"
+              id="rating"
+              name="rating"
+              defaultValue={rating}
+              onChange={(e) => setRating(e.target.value)}
+            >
+              <option value="">Select</option>
+              <option value="Excellent">Excellent</option>
+              <option value="Very Good">Very Good</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Poor">Poor</option>
+              <option value="Bad">Bad</option>
+              <option value="Late Cancel">Late Cancel</option>
+              <option value="No-Show">No-Show</option>
+            </select>
+          ) : (
+            <p className="content">{call.rating}</p>
+          )}
+        </div>
+        <div className="lineWrapper">
+          <label className="label" htmlFor="notes">
+            Notes:
+          </label>
+          {editMode ? (
+            <textarea
+              className="content"
+              id="notes"
+              name="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          ) : (
+            <p className="content">{call.notes}</p>
+          )}
+        </div>
+        {/* <div className="lineWrapper">
               <p className="label">Difficulties: </p>
               <p className="content"> {call.areasOfDifficulty}</p>
             </div> */}
-            <div className="lineWrapper">
-              <label className="label" htmlFor="areasOfDifficulty">
-                Difficulties:
-              </label>
-              {editMode ? (
-                <textarea
-                  className="content"
-                  id="areasOfDifficulty"
-                  name="areasOfDifficulty"
-                  value={areasOfDifficulty}
-                  onChange={(e) => setAreasOfDifficulty(e.target.value)}
-                />
-              ) : (
-                <p className="content">{call.areasOfDifficulty}</p>
-              )}
-            </div>
-            {editMode ? (
-              <div className="lineWrapper">
-                <label className="label" htmlFor="recording">
-                  Recording Link:
-                </label>
-                <input
-                  className="content"
-                  type="text"
-                  id="recording"
-                  name="recording"
-                  value={recording}
-                  onChange={(e) => setRecording(e.target.value)}
-                />
-              </div>
-            ) : (
-              call.recording.length > 0 && (
-                <div className="lineWrapper">
-                  <a target="_blank" href={call.recording}>
-                    Recording Link
-                  </a>
-                </div>
-              )
-            )}
-            <div className="lineWrapper">
-              <label className="label">Call Type</label>
-              {editMode ? (
-                <select
-                  className="content"
-                  name="callType"
-                  id="callType"
-                  defaultValue={callType}
-                  onChange={(e) => setCallType(e.target.value)}
-                >
-                  <option value="Monthly Call">Monthly Call</option>
-                  <option value="Uses Credit (Bundle)">
-                    Uses Credit (Bundle)
-                  </option>
-                </select>
-              ) : (
-                <p className="content">{call.callType}</p>
-              )}
-            </div>
-            {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
-
-            {editMode && (
-              <div className="buttonBox">
-                <button
-                  type="button"
-                  className="redButton"
-                  onClick={cancelEdit}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="greenButton"
-                  onClick={captureSubmitForm}
-                >
-                  Save
-                </button>
-              </div>
-            )}
-          </div>
+        <div className="lineWrapper">
+          <label className="label" htmlFor="areasOfDifficulty">
+            Difficulties:
+          </label>
+          {editMode ? (
+            <textarea
+              className="content"
+              id="areasOfDifficulty"
+              name="areasOfDifficulty"
+              value={areasOfDifficulty}
+              onChange={(e) => setAreasOfDifficulty(e.target.value)}
+            />
+          ) : (
+            <p className="content">{call.areasOfDifficulty}</p>
+          )}
         </div>
-      )}
+        {editMode ? (
+          <div className="lineWrapper">
+            <label className="label" htmlFor="recording">
+              Recording Link:
+            </label>
+            <input
+              className="content"
+              type="text"
+              id="recording"
+              name="recording"
+              value={recording}
+              onChange={(e) => setRecording(e.target.value)}
+            />
+          </div>
+        ) : (
+          call.recording.length > 0 && (
+            <div className="lineWrapper">
+              <a target="_blank" href={call.recording}>
+                Recording Link
+              </a>
+            </div>
+          )
+        )}
+        <div className="lineWrapper">
+          <label className="label">Call Type</label>
+          {editMode ? (
+            <select
+              className="content"
+              name="callType"
+              id="callType"
+              defaultValue={callType}
+              onChange={(e) => setCallType(e.target.value)}
+            >
+              <option value="Monthly Call">Monthly Call</option>
+              <option value="Uses Credit (Bundle)">Uses Credit (Bundle)</option>
+            </select>
+          ) : (
+            <p className="content">{call.callType}</p>
+          )}
+        </div>
+        {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
+
+        {editMode && (
+          <div className="buttonBox">
+            <button type="button" className="redButton" onClick={cancelEdit}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="greenButton"
+              onClick={captureSubmitForm}
+            >
+              Save
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

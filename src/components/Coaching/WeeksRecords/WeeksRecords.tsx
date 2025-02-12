@@ -218,12 +218,13 @@ export default function WeeksRecordsSection() {
         return weeks;
       }
       const filteredByCoach = filterByCoachFunction(weeks);
-      const filteredByCourse = filterByCourseFunction(filteredByCoach);
+      const filteredByWeeksAgo = filterWeeksByWeeksAgoFunction(filteredByCoach);
+
+      const filteredByCourse = filterByCourseFunction(filteredByWeeksAgo);
       const filteredByHoldWeeks = filterByHoldWeeksFunction(filteredByCourse);
-      const filteredByWeeksAgo =
-        filterWeeksByWeeksAgoFunction(filteredByHoldWeeks);
+
       const filteredByCoachless =
-        filterWeeksByCoachlessFunction(filteredByWeeksAgo);
+        filterWeeksByCoachlessFunction(filteredByHoldWeeks);
       const filteredByCompletion =
         filterByCompletionFunction(filteredByCoachless);
       const filteredBySearchTerm =

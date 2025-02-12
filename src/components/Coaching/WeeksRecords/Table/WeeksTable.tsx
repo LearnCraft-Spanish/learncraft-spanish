@@ -56,18 +56,14 @@ export default function WeeksTable({ weeks }: NewTableProps) {
             <thead>
               <tr>
                 <th>Student</th>
-                {/* <th>Level</th> */}
-                {/* <th>Primary Coach</th> */}
                 <th>Week Starts</th>
                 <th>Assignments</th>
                 <th>Group Calls</th>
-                {/* <th>Group Call Comments</th> */}
                 <th>Private Calls</th>
                 <th>Notes</th>
                 <th>Current Lesson </th>
                 <th>Hold Week</th>
                 <th>Records Complete?</th>
-                <th>Membership - Student - Call Credits Remaining</th>
               </tr>
             </thead>
             <tbody>
