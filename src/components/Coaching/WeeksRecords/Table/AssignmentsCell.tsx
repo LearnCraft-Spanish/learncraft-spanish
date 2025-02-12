@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useModal } from 'src/hooks/useModal';
 import {
   CoachDropdown,
+  DeleteRecord,
   DropdownWithEditToggle,
   FormControls,
   LinkInput,
@@ -25,8 +26,10 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     contextual,
     openContextual,
     setContextualRef,
+    closeContextual,
     updateDisableClickOutside,
   } = useContextualMenu();
+  const { closeModal } = useModal();
   const { updateAssignmentMutation } = useAssignments();
 
   const [editMode, setEditMode] = useState(false);
@@ -76,6 +79,12 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
     setNotes(assignment.notes);
     setAreasOfDifficulty(assignment.areasOfDifficulty);
     setAssignmentLink(assignment.assignmentLink);
+  }
+  function deleteRecordFunction() {
+    console.error('Delete Record Function, not impletemented yet');
+    closeModal();
+    cancelEdit();
+    closeContextual();
   }
 
   function submitEdit() {
@@ -202,6 +211,7 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
               onChange={setAssignmentLink}
               editMode={editMode}
             />
+            {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
             <FormControls
               editMode={editMode}
               cancelEdit={cancelEdit}

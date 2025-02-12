@@ -12,6 +12,7 @@ import { useModal } from 'src/hooks/useModal';
 import {
   CoachDropdown,
   DateInput,
+  DeleteRecord,
   Dropdown,
   DropdownWithEditToggle,
   FormControls,
@@ -52,7 +53,7 @@ function GroupSessionCell({
     closeContextual,
     updateDisableClickOutside,
   } = useContextualMenu();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
 
   const {
     getAttendeesFromGroupSessionId,
@@ -244,6 +245,13 @@ function GroupSessionCell({
       enableEditMode();
     }
   }
+  function deleteRecordFunction() {
+    console.error('Delete Record Function, not impletemented yet');
+    closeModal();
+    cancelEdit();
+    closeContextual();
+  }
+
   function captureSubmitForm() {
     // verify required fields
     if (!date || !coach || !sessionType) {
@@ -503,6 +511,9 @@ function GroupSessionCell({
                   )}
               </div>
             </div>
+            {editMode && !newRecord && (
+              <DeleteRecord deleteFunction={deleteRecordFunction} />
+            )}
             <FormControls
               editMode={editMode}
               cancelEdit={cancelEdit}

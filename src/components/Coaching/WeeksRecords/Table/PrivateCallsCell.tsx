@@ -7,7 +7,7 @@ import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useModal } from 'src/hooks/useModal';
 
-import DeleteRecord from './general/DeleteRecord';
+import { DeleteRecord } from '../../general';
 
 function PrivateCall({ call }: { call: Call }) {
   const {
