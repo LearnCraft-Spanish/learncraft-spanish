@@ -71,10 +71,16 @@ export default function useGroupSessions() {
 
   const updateGroupSessionMutation = useMutation({
     mutationFn: (groupSession: UpdateGroupSessionMutation) => {
-      return newPutFactory({
+      const promise = newPutFactory({
         path: 'coaching/group-sessions',
         body: groupSession,
       });
+      toast.promise(promise, {
+        pending: 'Updating group session...',
+        success: 'Group session updated!',
+        error: 'Error updating group session',
+      });
+      return promise;
     },
     onSettled() {
       groupSessionsQuery.refetch();
@@ -83,9 +89,15 @@ export default function useGroupSessions() {
 
   const deleteGroupSessionMutation = useMutation({
     mutationFn: (recordId: number) => {
-      return newDeleteFactory({
+      const promise = newDeleteFactory({
         path: `coaching/group-sessions/${recordId}`,
       });
+      toast.promise(promise, {
+        pending: 'Deleting group session...',
+        success: 'Group session deleted!',
+        error: 'Error deleting group session',
+      });
+      return promise;
     },
     onSettled() {
       groupSessionsQuery.refetch();

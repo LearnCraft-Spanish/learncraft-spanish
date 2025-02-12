@@ -1,4 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+
 import type { Assignment } from 'src/types/CoachingTypes';
 import { useBackend, useBackendHelpers } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
@@ -13,13 +15,6 @@ export default function useAssignments() {
   const assignmentsQuery = useQuery({
     queryKey: ['assignments'],
     queryFn: backend.getAssignments,
-    /*
-    const getAssignments = useCallback((): Promise<
-       StudentRecordsTypes.Assignment[]
-     > => {
-       return getFactory('coaching/assignments');
-     }, [getFactory]);
-    */
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||
@@ -43,7 +38,16 @@ export default function useAssignments() {
   }
   const createAssignmentMutation = useMutation({
     mutationFn: (assignment: AssignmentForCreation) => {
-      return newPostFactory({ path: 'coaching/assignments', body: assignment });
+      const promise = newPostFactory({
+        path: 'coaching/assignments',
+        body: assignment,
+      });
+      toast.promise(promise, {
+        pending: 'Creating assignment...',
+        success: 'Assignment created!',
+        error: 'Error creating assignment',
+      });
+      return promise;
     },
     onSettled() {
       assignmentsQuery.refetch();
@@ -64,10 +68,16 @@ export default function useAssignments() {
   }
   const updateAssignmentMutation = useMutation({
     mutationFn: (assignment: AssignmentForMutation) => {
-      return newPutFactory({
+      const promise = newPutFactory({
         path: `coaching/assignments/${assignment.recordId}`,
         body: assignment,
       });
+      toast.promise(promise, {
+        pending: 'Updating assignment...',
+        success: 'Assignment updated!',
+        error: 'Error updating assignment',
+      });
+      return promise;
     },
     onSettled() {
       assignmentsQuery.refetch();
@@ -76,9 +86,15 @@ export default function useAssignments() {
 
   const deleteAssignmentMutation = useMutation({
     mutationFn: (assignment: Assignment) => {
-      return newDeleteFactory({
+      const promise = newDeleteFactory({
         path: `coaching/assignments/${assignment.recordId}`,
       });
+      toast.promise(promise, {
+        pending: 'Deleting assignment...',
+        success: 'Assignment deleted!',
+        error: 'Error deleting assignment',
+      });
+      return promise;
     },
     onSettled() {
       assignmentsQuery.refetch();

@@ -1,4 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
+
 import type { Call } from 'src/types/CoachingTypes';
 import { useBackend, useBackendHelpers } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
@@ -35,7 +37,19 @@ export default function usePrivateCalls() {
 
   const createPrivateCallMutation = useMutation({
     mutationFn: (call: CallForCreation) => {
-      return newPostFactory({ path: 'coaching/private-calls', body: call });
+      const promise = newPostFactory({
+        path: 'coaching/private-calls',
+        body: call,
+      });
+      toast.promise(promise, {
+        pending: 'Creating private call...',
+        success: 'Private call created!',
+        error: 'Error creating private call',
+      });
+      return promise;
+    },
+    onSettled() {
+      privateCallsQuery.refetch();
     },
   });
 
@@ -52,18 +66,36 @@ export default function usePrivateCalls() {
   }
   const updatePrivateCallMutation = useMutation({
     mutationFn: (call: CallForUpdate) => {
-      return newPutFactory({
+      const promise = newPutFactory({
         path: `coaching/private-calls/${call.recordId}`,
         body: call,
       });
+      toast.promise(promise, {
+        pending: 'Updating private call...',
+        success: 'Private call updated!',
+        error: 'Error updating private call',
+      });
+      return promise;
+    },
+    onSettled() {
+      privateCallsQuery.refetch();
     },
   });
 
   const deletePrivateCallMutation = useMutation({
     mutationFn: (call: Call) => {
-      return newDeleteFactory({
+      const promise = newDeleteFactory({
         path: `coaching/private-calls/${call.recordId}`,
       });
+      toast.promise(promise, {
+        pending: 'Deleting private call...',
+        success: 'Private call deleted!',
+        error: 'Error deleting private call',
+      });
+      return promise;
+    },
+    onSettled() {
+      privateCallsQuery.refetch();
     },
   });
 
