@@ -214,7 +214,7 @@ export const handlers = [
   }),
 
   // Coaching
-  http.get(`${backendUrl}coaching/weeks-new-format`, async () => {
+  http.get(`${backendUrl}coaching/weeks`, async () => {
     return HttpResponse.json(generatedMockData.weeks);
   }),
   http.get(`${backendUrl}coaching/coaches`, async () => {
@@ -241,4 +241,14 @@ export const handlers = [
   http.get(`${backendUrl}coaching/private-calls`, async () => {
     return HttpResponse.json(generatedMockData.calls);
   }),
+  // TEMP, to get current tests to run
+  http.get(`${backendUrl}coaching/lessons`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(
+    `${backendUrl}coaching/group-sessions/topic-field-options`,
+    async () => {
+      return HttpResponse.json([]);
+    },
+  ),
 ];

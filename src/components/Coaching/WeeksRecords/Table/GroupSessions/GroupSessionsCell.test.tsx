@@ -35,7 +35,7 @@ describe('component StudentCell', () => {
   it('renders with valid data', async () => {
     render(
       <MockAllProviders>
-        <GroupSessionsCell week={week} />
+        <GroupSessionsCell week={week} groupSessions={[relatedGroupSession]} />
       </MockAllProviders>,
     );
     await waitFor(() => {
@@ -44,25 +44,15 @@ describe('component StudentCell', () => {
       ).toBeInTheDocument();
     });
   });
-  it('errors with invalid data', async () => {
-    const consoleSpy = vi.spyOn(console, 'error');
-    render(
-      <MockAllProviders>
-        <GroupSessionsCell week={{ ...week, recordId: 0 }} />
-      </MockAllProviders>,
-    );
-    await waitFor(() => {
-      expect(consoleSpy).toBeCalled();
-    });
-
-    vi.restoreAllMocks();
-  });
   describe('contextual menu view', () => {
     // Helper function for successful render
     async function renderWithPopupActive() {
       render(
         <MockAllProviders>
-          <GroupSessionsCell week={week} />
+          <GroupSessionsCell
+            week={week}
+            groupSessions={[relatedGroupSession]}
+          />
         </MockAllProviders>,
       );
       await waitFor(() => {

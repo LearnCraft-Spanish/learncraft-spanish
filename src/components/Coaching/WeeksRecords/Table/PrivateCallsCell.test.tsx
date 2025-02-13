@@ -25,7 +25,7 @@ describe('component StudentCell', () => {
   it('default view renders without crashing', async () => {
     render(
       <MockAllProviders>
-        <PrivateCallsCell week={week} />
+        <PrivateCallsCell week={week} calls={[call]} />
       </MockAllProviders>,
     );
     await waitFor(() => {
@@ -36,7 +36,7 @@ describe('component StudentCell', () => {
     it('contextual menu view renders without crashing', async () => {
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} />
+          <PrivateCallsCell week={week} calls={[call]} />
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -55,7 +55,7 @@ describe('component StudentCell', () => {
       const requiredFields = ['Rating:', 'Notes:', 'Difficulties:'];
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} />
+          <PrivateCallsCell week={week} calls={[call]} />
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -78,7 +78,7 @@ describe('component StudentCell', () => {
       }
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} />
+          <PrivateCallsCell week={week} calls={[call]} />
         </MockAllProviders>,
       );
       await waitFor(() => {

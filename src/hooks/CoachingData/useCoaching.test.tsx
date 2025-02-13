@@ -21,7 +21,7 @@ describe('hook useCoaching', () => {
       'activeStudentsQuery',
       'coachListQuery',
       'courseListQuery',
-      'lastThreeWeeksQuery',
+      'weeksQuery',
       'groupSessionsQuery',
       'groupAttendeesQuery',
       'assignmentsQuery',
@@ -64,9 +64,9 @@ describe('hook useCoaching', () => {
         expected: [hardCodedMockData.lastThreeWeeks[0]],
       },
       {
-        func: 'getGroupSessionFromWeekRecordId',
+        func: 'getGroupSessionsFromWeekRecordId',
         arg: hardCodedMockData.lastThreeWeeks[0].recordId,
-        expected: hardCodedMockData.groupSessions[0],
+        expected: hardCodedMockData.groupSessions,
       },
       {
         func: 'getAssignmentsFromWeekRecordId',
