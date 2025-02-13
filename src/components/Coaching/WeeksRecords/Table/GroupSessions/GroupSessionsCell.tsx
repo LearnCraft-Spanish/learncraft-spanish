@@ -102,7 +102,7 @@ function GroupSessionView({
   const {
     getAttendeesFromGroupSessionId,
     coachListQuery,
-    lastThreeWeeksQuery,
+    weeksQuery,
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
   } = useCoaching();
@@ -497,22 +497,32 @@ function GroupSessionView({
               onChange={(e) => setAddingAttendee(e.target.value)}
             >
               <option value="">Select</option>
-              {lastThreeWeeksQuery.data
+              {weeksQuery.data
                 ?.filter((filterWeek) => {
                   return (
                     week.membershipCourseHasGroupCalls &&
                     filterWeek.weekStarts === week.weekStarts
                   );
                 })
+                .map((studentWeek) => ({
+                  ...studentWeek,
+                  studentFullName: getStudentFromMembershipId(
+                    studentWeek.relatedMembership,
+                  )?.fullName,
+                }))
+                .sort(
+                  (a, b) =>
+                    a.studentFullName?.localeCompare(b.studentFullName || '') ||
+                    0,
+                )
                 .map((studentWeek) => (
                   <option
                     key={studentWeek.recordId}
                     value={studentWeek.recordId}
                   >
-                    {
-                      getStudentFromMembershipId(studentWeek.relatedMembership)
-                        ?.fullName
-                    }
+                    {studentWeek.studentFullName ||
+                      studentWeek.studentFullName ||
+                      'No Name Found'}
                   </option>
                 ))}
             </select>
