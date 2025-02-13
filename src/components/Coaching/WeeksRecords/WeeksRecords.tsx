@@ -29,7 +29,7 @@ export default function WeeksRecordsSection() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
   const {
-    lastThreeWeeksQuery,
+    weeksQuery,
     coachListQuery,
     courseListQuery,
     activeMembershipsQuery,
@@ -63,7 +63,7 @@ export default function WeeksRecordsSection() {
 
   const dataReady =
     userDataQuery.isSuccess &&
-    lastThreeWeeksQuery.isSuccess &&
+    weeksQuery.isSuccess &&
     coachListQuery.isSuccess &&
     courseListQuery.isSuccess &&
     activeMembershipsQuery.isSuccess &&
@@ -76,7 +76,7 @@ export default function WeeksRecordsSection() {
   const dataLoading =
     !dataReady &&
     (userDataQuery.isLoading ||
-      lastThreeWeeksQuery.isLoading ||
+      weeksQuery.isLoading ||
       coachListQuery.isLoading ||
       courseListQuery.isLoading ||
       activeMembershipsQuery.isLoading ||
@@ -89,7 +89,7 @@ export default function WeeksRecordsSection() {
   const dataError =
     !dataReady &&
     (userDataQuery.isError ||
-      lastThreeWeeksQuery.isError ||
+      weeksQuery.isError ||
       coachListQuery.isError ||
       courseListQuery.isError ||
       activeMembershipsQuery.isError ||
@@ -258,7 +258,7 @@ export default function WeeksRecordsSection() {
   useEffect(() => {
     if (
       !rendered.current &&
-      lastThreeWeeksQuery.isSuccess &&
+      weeksQuery.isSuccess &&
       coachListQuery.isSuccess &&
       userDataQuery.isSuccess
     ) {
@@ -271,15 +271,15 @@ export default function WeeksRecordsSection() {
       if (currentUserCoach) setFilterByCoach(currentUserCoach);
       rendered.current = true;
     }
-  }, [lastThreeWeeksQuery, coachListQuery, userDataQuery]);
+  }, [weeksQuery, coachListQuery, userDataQuery]);
 
   // Filtering useEffect
   useEffect(() => {
     if (dataReady && rendered.current) {
-      const filteredWeeks = filterWeeks(lastThreeWeeksQuery.data);
+      const filteredWeeks = filterWeeks(weeksQuery.data);
       setWeeks(filteredWeeks);
     }
-  }, [dataReady, filterWeeks, lastThreeWeeksQuery.data]);
+  }, [dataReady, filterWeeks, weeksQuery.data]);
 
   return (
     <div className="newCoachingWrapper">

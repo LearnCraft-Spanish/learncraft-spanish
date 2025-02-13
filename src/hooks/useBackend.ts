@@ -336,13 +336,8 @@ export function useBackend() {
     return getFactory('coaching/active-memberships');
   }, [getFactory]);
 
-  const getLastThreeWeeks =
-    useCallback((): Promise<StudentRecordsTypes.getLastThreeWeeksResponse> => {
-      return getFactory('coaching/last-three-weeks');
-    }, [getFactory]);
-
-  const getNewWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
-    return getFactory('coaching/weeks-new-format');
+  const getWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
+    return getFactory('coaching/weeks');
   }, [getFactory]);
 
   const getGroupAttendees = useCallback((): Promise<
@@ -525,12 +520,11 @@ export function useBackend() {
     getExamplesFromBackend,
     getGroupAttendees,
     getGroupSessions,
-    getLastThreeWeeks,
     getLcspQuizzesFromBackend,
     getLessonList,
     getLessonsFromBackend,
     getMyExamplesFromBackend,
-    getNewWeeks,
+    getWeeks,
     getPMFDataForUser,
     getProgramsFromBackend,
     getQuizExamplesFromBackend,

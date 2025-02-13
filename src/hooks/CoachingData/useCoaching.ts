@@ -13,7 +13,7 @@ export default function useCoaching() {
   const userDataQuery = useUserData();
   const backend = useBackend();
 
-  const { lastThreeWeeksQuery } = useWeeks();
+  const { weeksQuery } = useWeeks();
   const { assignmentsQuery } = useAssignments();
   const { privateCallsQuery } = usePrivateCalls();
   const { groupSessionsQuery } = useGroupSessions();
@@ -170,7 +170,7 @@ export default function useCoaching() {
 
   const getAttendeeWeeksFromGroupSessionId = useCallback(
     (sessionId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      if (!groupAttendeesQuery.isSuccess || !weeksQuery.isSuccess) {
         return null;
       }
       const attendeeList = groupAttendeesQuery.data.filter(
@@ -179,9 +179,7 @@ export default function useCoaching() {
       if (attendeeList.length === 0) return undefined;
 
       const weekRecordsList = attendeeList.map((attendee) =>
-        lastThreeWeeksQuery.data.find(
-          (week) => week.recordId === attendee.student,
-        ),
+        weeksQuery.data.find((week) => week.recordId === attendee.student),
       );
       if (weekRecordsList.length === 0) return undefined;
       return weekRecordsList;
@@ -189,8 +187,8 @@ export default function useCoaching() {
     [
       groupAttendeesQuery.isSuccess,
       groupAttendeesQuery.data,
-      lastThreeWeeksQuery.isSuccess,
-      lastThreeWeeksQuery.data,
+      weeksQuery.isSuccess,
+      weeksQuery.data,
     ],
   );
 
@@ -233,14 +231,12 @@ export default function useCoaching() {
 
   const getMembershipFromWeekRecordId = useCallback(
     (weekId: number | undefined) => {
-      if (!activeMembershipsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      if (!activeMembershipsQuery.isSuccess || !weeksQuery.isSuccess) {
         return null;
       }
       if (!weekId) return undefined;
 
-      const week = lastThreeWeeksQuery.data.find(
-        (week) => week.recordId === weekId,
-      );
+      const week = weeksQuery.data.find((week) => week.recordId === weekId);
       if (!week) return undefined;
 
       const membershipId = week.relatedMembership;
@@ -253,8 +249,8 @@ export default function useCoaching() {
     [
       activeMembershipsQuery.data,
       activeMembershipsQuery.isSuccess,
-      lastThreeWeeksQuery.data,
-      lastThreeWeeksQuery.isSuccess,
+      weeksQuery.data,
+      weeksQuery.isSuccess,
     ],
   );
 
@@ -308,7 +304,7 @@ export default function useCoaching() {
   }, []);
 
   return {
-    lastThreeWeeksQuery,
+    weeksQuery,
     coachListQuery,
     courseListQuery,
     activeMembershipsQuery,

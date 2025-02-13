@@ -8,9 +8,9 @@ export default function useWeeks() {
   const { newPutFactory } = useBackendHelpers();
   const userDataQuery = useUserData();
 
-  const lastThreeWeeksQuery = useQuery({
-    queryKey: ['lastThreeWeeks'],
-    queryFn: backend.getNewWeeks,
+  const weeksQuery = useQuery({
+    queryKey: ['weeksQuery'],
+    queryFn: backend.getWeeks,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||
@@ -38,12 +38,12 @@ export default function useWeeks() {
     },
 
     onSuccess: () => {
-      lastThreeWeeksQuery.refetch();
+      weeksQuery.refetch();
     },
   });
 
   return {
-    lastThreeWeeksQuery,
+    weeksQuery,
     updateWeekMutation,
   };
 }
