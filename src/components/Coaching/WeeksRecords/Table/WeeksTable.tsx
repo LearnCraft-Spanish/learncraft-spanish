@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Week } from 'src/types/CoachingTypes';
 import Pagination from 'src/components/FlashcardFinder/Pagination';
 import QuantifiedRecords from '../quantifyingRecords';
@@ -9,7 +9,7 @@ interface NewTableProps {
 }
 export default function WeeksTable({ weeks }: NewTableProps) {
   const [page, setPage] = useState(1);
-  const itemsPerPage = 50;
+  const itemsPerPage = 20;
 
   const maxPage = Math.ceil(weeks ? weeks.length / itemsPerPage : 0);
 
@@ -33,6 +33,11 @@ export default function WeeksTable({ weeks }: NewTableProps) {
     setPage(page - 1);
   }, [page]);
 
+  useEffect(() => {
+    if (weeks && weeks.length < (page - 1) * itemsPerPage) {
+      setPage(1);
+    }
+  }, [page, weeks]);
   return (
     weeks && (
       <>

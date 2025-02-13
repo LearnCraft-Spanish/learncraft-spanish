@@ -1,9 +1,10 @@
 import type { Week } from 'src/types/CoachingTypes';
 import checkmark from 'src/assets/icons/checkmark_green.svg';
 import pencil from 'src/assets/icons/pencil.svg';
+import x from 'src/assets/icons/x_dark.svg';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { toast } from 'react-toastify';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useWeeks from 'src/hooks/CoachingData/useWeeks';
 import { useModal } from 'src/hooks/useModal';
 
@@ -22,7 +23,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
   } = useCoaching();
   const { updateWeekMutation } = useWeeks();
 
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
 
   const dataReady = studentRecordsLessonsQuery.isSuccess;
 
@@ -35,6 +36,18 @@ export default function WeeksTableItem({ week }: { week: Week }) {
 
   const [editMode, setEditMode] = useState(false);
 
+  function cancelEdit() {
+    setNotes(week.notes);
+    setHoldWeek(week.holdWeek);
+    setRecordsComplete(week.recordsComplete);
+    setCurrentLesson(
+      week.currentLesson ? week.currentLesson.toString() : undefined,
+    );
+    closeModal();
+    setEditMode(false);
+  }
+
+  // This is the same logic as the formula for record Completeable in the database
   function validateRecordCompleteable() {
     if (week.week === 0) {
       return true;
@@ -57,7 +70,9 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     if (
       notes === week.notes &&
       holdWeek === week.holdWeek &&
-      recordsComplete === week.recordsComplete
+      recordsComplete === week.recordsComplete &&
+      (week.currentLesson ? week.currentLesson.toString() : undefined) ===
+        currentLesson
     ) {
       toast.info('No changes detected');
       setEditMode(false);
@@ -75,16 +90,24 @@ export default function WeeksTableItem({ week }: { week: Week }) {
       }
     }
 
-    updateWeekMutation.mutate({
-      notes,
-      holdWeek,
-      recordsComplete,
-      offTrack: week.offTrack,
-      primaryCoachWhenCreated: week.primaryCoachWhenCreated,
-      recordId: week.recordId,
-      currentLesson: currentLesson ? Number.parseInt(currentLesson) : undefined,
-    });
-    setEditMode(false);
+    updateWeekMutation.mutate(
+      {
+        notes,
+        holdWeek,
+        recordsComplete,
+        offTrack: week.offTrack,
+        primaryCoachWhenCreated: week.primaryCoachWhenCreated,
+        recordId: week.recordId,
+        currentLesson: currentLesson
+          ? Number.parseInt(currentLesson)
+          : undefined,
+      },
+      {
+        onSuccess: () => {
+          setEditMode(false);
+        },
+      },
+    );
   }
 
   return (
@@ -177,9 +200,23 @@ export default function WeeksTableItem({ week }: { week: Week }) {
         </td>
         <td>
           {editMode ? (
-            <button type="button" onClick={handleSubmit}>
-              Submit Changes
-            </button>
+            <>
+              <img
+                src={x}
+                alt="Cancel Edit"
+                onClick={() =>
+                  openModal({
+                    title: 'Cancel Edit',
+                    body: 'Are you sure you want to cancel your changes?',
+                    type: 'confirm',
+                    confirmFunction: () => cancelEdit(),
+                  })
+                }
+              />
+              <button type="button" onClick={handleSubmit}>
+                Submit Changes
+              </button>
+            </>
           ) : (
             <img
               src={pencil}
