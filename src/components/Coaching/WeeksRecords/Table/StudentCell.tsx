@@ -31,7 +31,11 @@ export default function StudentCell({
         <div className="content">
           <h4>{student.fullName}</h4>
           <p>{student.email}</p>
-          <p>{student.primaryCoach.name}</p>
+          <p>
+            {student.primaryCoach
+              ? student.primaryCoach.name
+              : 'No Coach Found'}
+          </p>
           <p>{week.level}</p>
         </div>
       </div>

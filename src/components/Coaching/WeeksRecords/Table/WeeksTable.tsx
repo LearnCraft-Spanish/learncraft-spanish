@@ -64,6 +64,7 @@ export default function WeeksTable({ weeks }: NewTableProps) {
                 <th>Current Lesson </th>
                 <th>Hold Week</th>
                 <th>Records Complete?</th>
+                <th>Edit Record</th>
               </tr>
             </thead>
             <tbody>

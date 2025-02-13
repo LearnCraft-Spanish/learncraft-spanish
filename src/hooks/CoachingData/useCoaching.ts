@@ -3,6 +3,7 @@ import { useCallback } from 'react';
 import { useBackend } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
 
+import useWeeks from './useWeeks';
 import useAssignments from './useAssignments';
 import usePrivateCalls from './usePrivateCalls';
 import useGroupSessions from './useGroupSessions';
@@ -12,20 +13,13 @@ export default function useCoaching() {
   const userDataQuery = useUserData();
   const backend = useBackend();
 
+  const { lastThreeWeeksQuery } = useWeeks();
   const { assignmentsQuery } = useAssignments();
   const { privateCallsQuery } = usePrivateCalls();
   const { groupSessionsQuery } = useGroupSessions();
   const { groupAttendeesQuery } = useGroupAttendees();
 
   /* --------- Queries --------- */
-  const lastThreeWeeksQuery = useQuery({
-    queryKey: ['lastThreeWeeks'],
-    queryFn: backend.getNewWeeks,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
 
   const coachListQuery = useQuery({
     queryKey: ['coachList'],
@@ -63,6 +57,15 @@ export default function useCoaching() {
       userDataQuery.data?.roles.adminRole === 'admin',
   });
 
+  const studentRecordsLessonsQuery = useQuery({
+    queryKey: ['studentRecordsLessons'],
+    queryFn: backend.getLessonList,
+    staleTime: Infinity,
+    enabled:
+      userDataQuery.data?.roles.adminRole === 'coach' ||
+      userDataQuery.data?.roles.adminRole === 'admin',
+  });
+
   /*--------- Helper Functions ---------
   / These functions are used to get data from the queries above.
   / Error Return values for these functions
@@ -91,6 +94,8 @@ export default function useCoaching() {
       if (!student) return undefined;
 
       const coachObject = student.primaryCoach;
+      if (!coachObject) return undefined;
+
       const coach = coachListQuery.data.find(
         (coach) => coach.user.id === coachObject.id,
       );
@@ -310,6 +315,7 @@ export default function useCoaching() {
     activeStudentsQuery,
     groupSessionsQuery,
     groupAttendeesQuery,
+    studentRecordsLessonsQuery,
 
     assignmentsQuery,
     privateCallsQuery,

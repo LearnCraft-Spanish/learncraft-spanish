@@ -78,14 +78,26 @@ export default function WeeksRecordsSection() {
     (userDataQuery.isLoading ||
       lastThreeWeeksQuery.isLoading ||
       coachListQuery.isLoading ||
-      courseListQuery.isLoading);
+      courseListQuery.isLoading ||
+      activeMembershipsQuery.isLoading ||
+      activeStudentsQuery.isLoading ||
+      groupSessionsQuery.isLoading ||
+      groupAttendeesQuery.isLoading ||
+      assignmentsQuery.isLoading ||
+      privateCallsQuery.isLoading);
 
   const dataError =
     !dataReady &&
     (userDataQuery.isError ||
       lastThreeWeeksQuery.isError ||
       coachListQuery.isError ||
-      courseListQuery.isError);
+      courseListQuery.isError ||
+      activeMembershipsQuery.isError ||
+      activeStudentsQuery.isError ||
+      groupSessionsQuery.isError ||
+      groupAttendeesQuery.isError ||
+      assignmentsQuery.isError ||
+      privateCallsQuery.isError);
 
   function toggleAdvancedFilteringMenu() {
     setAdvancedFilteringMenu(!advancedFilteringMenu);
@@ -164,7 +176,6 @@ export default function WeeksRecordsSection() {
     },
     [filterByWeeksAgo, dateRange],
   );
-
   const filterWeeksByCoachlessFunction = useCallback(
     (weeks: Week[]) => {
       if (!filterByCoachless) return weeks;
@@ -175,7 +186,6 @@ export default function WeeksRecordsSection() {
     },
     [filterByCoachless, getCoachFromMembershipId],
   );
-
   const filterWeeksBySearchTerm = useCallback(
     (weeks: Week[]) => {
       if (filterBySearchTerm && filterBySearchTerm.length > 0) {
@@ -198,7 +208,6 @@ export default function WeeksRecordsSection() {
     },
     [filterBySearchTerm, getStudentFromMembershipId],
   );
-
   const filterByCompletionFunction = useCallback(
     (weeks: Week[]) => {
       if (filterByCompletion === 'incompleteOnly') {
