@@ -28,7 +28,7 @@ export function usePMFData() {
   }
   const createOrUpdatePMFData = useCallback(
     async ({ hasTakenSurvey }: CreateOrUpdatePMFData) => {
-      if (userDataQuery.isSuccess) {
+      if (userDataQuery.isSuccess && pmfDataQuery.isSuccess) {
         if (!pmfDataQuery.data) {
           const result = await createPMFDataForUser(
             userDataQuery.data.recordId,
@@ -59,6 +59,12 @@ export function usePMFData() {
   );
 
   const canShowPMF = useMemo(() => {
+    if (
+      !userDataQuery.data ||
+      userDataQuery.data.roles.studentRole !== 'student'
+    ) {
+      return false;
+    }
     // Check if the last contact date is within 60 days
     if (pmfDataQuery.data) {
       const intervalInDays = 60; // number of days for comparison
@@ -75,13 +81,13 @@ export function usePMFData() {
       }
     }
     // calcualte if we should show the PMF via random number
-    const randomNumber = Math.floor(Math.random() * 30) + 1;
+    const randomNumber = Math.floor(Math.random() * 30);
     // const randomNumber = 1; // for testing
     if (randomNumber === 1) {
       return true;
     }
     return false;
-  }, [pmfDataQuery.data]);
+  }, [pmfDataQuery.data, userDataQuery.data]);
 
   return { pmfDataQuery, createOrUpdatePMFData, canShowPMF };
 }
