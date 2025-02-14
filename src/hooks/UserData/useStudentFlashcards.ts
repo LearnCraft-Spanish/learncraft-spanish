@@ -26,6 +26,9 @@ export function useStudentFlashcards() {
     updateMyStudentExample,
   } = useBackend();
 
+  // Temporary ID to generate unique placeholder keys for new flashcards
+  queryClient.setQueryData(['tempIdCounter'], (prevId: number) => prevId ?? -1);
+
   // Abbreviated access since it's used frequently
   const activeStudentId = activeStudentQuery.data?.recordId;
 
@@ -206,7 +209,16 @@ export function useStudentFlashcards() {
       });
 
       // Memoize ID number for rollback, then decrement the tempIdNum for the next flashcard
-      const thisIdNum = tempIdNum.current--;
+
+      const getNextTempId = () => {
+        queryClient.setQueryData(
+          ['tempIdCounter'],
+          (prevId: number = -1) => prevId - 1,
+        );
+        return queryClient.getQueryData<number>(['tempIdCounter']) ?? -1; // Ensure it never returns undefined
+      };
+
+      const thisIdNum = getNextTempId();
 
       // Make placeholder record for student-example until backend responds
       const today = new Date();
@@ -227,10 +239,12 @@ export function useStudentFlashcards() {
       };
 
       // Update the local ref with the new student-example to preserve state on re-fetch
+      /*
       localStudentExamples.current = {
         ...localStudentExamples.current,
         [newStudentExample.relatedExample]: newStudentExample,
       };
+      */
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(
@@ -398,7 +412,9 @@ export function useStudentFlashcards() {
       const { flashcardObject } = context;
       if (flashcardObject?.recordId) {
         // Remove the local update for the deleted flashcard
+        /*
         delete localExamples.current[flashcardObject.recordId];
+        */
       }
       toast.success('Flashcard removed successfully');
     },
@@ -519,6 +535,7 @@ export function useStudentFlashcards() {
             const newFlashcard = { ...flashcard, difficulty };
 
             // Save flashcard in local ref to preserve on refetch
+            /*
             localExamples.current = {
               ...localExamples.current,
               [flashcard.recordId]: {
@@ -526,6 +543,7 @@ export function useStudentFlashcards() {
                 difficulty, // Overwrite the difficulty with the new value
               },
             };
+            */
 
             // Replace the flashcards in copy of array
             const newStudentFlashcardsArray = oldFlashcardsCopy.map(
@@ -567,7 +585,9 @@ export function useStudentFlashcards() {
       const { studentExampleId, newInterval } = context;
 
       // Remove the local update for this flashcard
+      /*
       delete localExamples.current[studentExampleId];
+      */
 
       // Roll back the cache for just the affected flashcard
       queryClient.setQueryData(

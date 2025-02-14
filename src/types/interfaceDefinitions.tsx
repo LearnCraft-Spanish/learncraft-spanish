@@ -75,7 +75,7 @@ export type Flashcard = Expanded<{
   englishAudio: string;
   spanishAudioLa: string;
   vocabComplete: boolean;
-  difficulty?: string;
+  difficulty?: 'easy' | 'hard';
   dateCreated?: string;
   dateModified?: string;
 }>;
