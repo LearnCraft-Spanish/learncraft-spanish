@@ -127,7 +127,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
           />
         </td>
         <td>
-          {week.numberOfGroupCalls > 0 && (
+          {week.membershipCourseHasGroupCalls && (
             <GroupSessionsCell
               week={week}
               groupSessions={getGroupSessionsFromWeekRecordId(week.recordId)}

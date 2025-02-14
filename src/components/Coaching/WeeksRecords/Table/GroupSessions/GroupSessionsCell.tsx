@@ -9,6 +9,7 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useModal } from 'src/hooks/useModal';
 
+import verifyRequiredInputs from 'src/components/Coaching/general/formValidationFunctions';
 import {
   CoachDropdown,
   DateInput,
@@ -311,11 +312,16 @@ function GroupSessionView({
 
   function captureSubmitForm() {
     // verify required fields
-    if (!date || !coach || !sessionType) {
+    const badInput = verifyRequiredInputs([
+      { value: date, label: 'Date' },
+      { value: coach, label: 'Coach' },
+      { value: sessionType, label: 'Session Type' },
+    ]);
+    if (badInput) {
       openModal({
-        type: 'error',
         title: 'Error',
-        body: 'Date, Coach and Session Type are required',
+        body: `${badInput} is a required field`,
+        type: 'error',
       });
       return;
     }
@@ -362,6 +368,9 @@ function GroupSessionView({
                 },
               },
             );
+          },
+          onError: (error) => {
+            console.error('Error creating group session', error);
           },
         },
       );
@@ -418,9 +427,9 @@ function GroupSessionView({
           );
         }
       }
+      disableEditMode();
+      closeContextual();
     }
-    disableEditMode();
-    closeContextual();
   }
 
   useEffect(() => {

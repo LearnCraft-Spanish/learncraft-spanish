@@ -7,7 +7,30 @@ import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useModal } from 'src/hooks/useModal';
 
-import { DeleteRecord } from '../../general';
+import {
+  CoachDropdown,
+  DateInput,
+  DeleteRecord,
+  Dropdown,
+  DropdownWithEditToggle,
+  FormControls,
+  LinkInput,
+  TextAreaInput,
+} from '../../general';
+
+import verifyRequiredInputs from '../../general/formValidationFunctions';
+
+const ratingOptions = [
+  'Excellent',
+  'Very Good',
+  'Good',
+  'Fair',
+  'Poor',
+  'Bad',
+  'Late Cancel',
+  'No-Show',
+];
+const callTypeOptions = ['Monthly Call', 'Uses Credit (Bundle)'];
 function PrivateCall({ call }: { call: Call }) {
   const { openContextual, contextual } = useContextualMenu();
 
@@ -31,7 +54,6 @@ function PrivateCallView({ call }: { call: Call }) {
     useCoaching();
   const { updatePrivateCallMutation, deletePrivateCallMutation } =
     usePrivateCalls();
-  const { coachListQuery } = useCoaching();
   const { openModal, closeModal } = useModal();
 
   const [editMode, setEditMode] = useState(false);
@@ -70,26 +92,16 @@ function PrivateCallView({ call }: { call: Call }) {
   }
 
   function submitEdit() {
-    if (!caller) {
+    // Verify inputs
+    const badInput = verifyRequiredInputs([
+      { value: rating, label: 'Rating' },
+      { value: date, label: 'Date' },
+      { value: caller, label: 'Caller' },
+    ]);
+    if (badInput) {
       openModal({
         title: 'Error',
-        body: 'Caller is a required field',
-        type: 'error',
-      });
-      return;
-    }
-    if (!rating) {
-      openModal({
-        title: 'Error',
-        body: 'Rating is a required field',
-        type: 'error',
-      });
-      return;
-    }
-    if (!date) {
-      openModal({
-        title: 'Error',
-        body: 'Date is a required field',
+        body: `${badInput} is a required field`,
         type: 'error',
       });
       return;
@@ -164,158 +176,60 @@ function PrivateCallView({ call }: { call: Call }) {
             </p>
           </div>
         )}
-        <div className="lineWrapper">
-          <label className="label" htmlFor="caller">
-            Caller:
-          </label>
-          {editMode ? (
-            <select
-              className="content"
-              id="caller"
-              name="caller"
-              defaultValue={caller}
-              onChange={(e) => setCaller(e.target.value)}
-            >
-              <option value="">Select</option>
-              {coachListQuery.data?.map((coach) => (
-                <option key={coach.coach} value={coach.user.email}>
-                  {coach.user.name}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <p className="content">{call.caller.name}</p>
-          )}
-        </div>
-        {editMode && (
-          <div className="lineWrapper">
-            <label className="label">Date: </label>
-            <input
-              className="content"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-        )}
-        <div className="lineWrapper">
-          <label className="label" htmlFor="rating">
-            Rating:
-          </label>
-          {editMode ? (
-            <select
-              className="content"
-              id="rating"
-              name="rating"
-              defaultValue={rating}
-              onChange={(e) => setRating(e.target.value)}
-            >
-              <option value="">Select</option>
-              <option value="Excellent">Excellent</option>
-              <option value="Very Good">Very Good</option>
-              <option value="Good">Good</option>
-              <option value="Fair">Fair</option>
-              <option value="Poor">Poor</option>
-              <option value="Bad">Bad</option>
-              <option value="Late Cancel">Late Cancel</option>
-              <option value="No-Show">No-Show</option>
-            </select>
-          ) : (
-            <p className="content">{call.rating}</p>
-          )}
-        </div>
-        <div className="lineWrapper">
-          <label className="label" htmlFor="notes">
-            Notes:
-          </label>
-          {editMode ? (
-            <textarea
-              className="content"
-              id="notes"
-              name="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-            />
-          ) : (
-            <p className="content">{call.notes}</p>
-          )}
-        </div>
-        {/* <div className="lineWrapper">
-              <p className="label">Difficulties: </p>
-              <p className="content"> {call.areasOfDifficulty}</p>
-            </div> */}
-        <div className="lineWrapper">
-          <label className="label" htmlFor="areasOfDifficulty">
-            Difficulties:
-          </label>
-          {editMode ? (
-            <textarea
-              className="content"
-              id="areasOfDifficulty"
-              name="areasOfDifficulty"
-              value={areasOfDifficulty}
-              onChange={(e) => setAreasOfDifficulty(e.target.value)}
-            />
-          ) : (
-            <p className="content">{call.areasOfDifficulty}</p>
-          )}
-        </div>
-        {editMode ? (
-          <div className="lineWrapper">
-            <label className="label" htmlFor="recording">
-              Recording Link:
-            </label>
-            <input
-              className="content"
-              type="text"
-              id="recording"
-              name="recording"
-              value={recording}
-              onChange={(e) => setRecording(e.target.value)}
-            />
-          </div>
-        ) : (
-          call.recording.length > 0 && (
-            <div className="lineWrapper">
-              <a target="_blank" href={call.recording}>
-                Recording Link
-              </a>
-            </div>
-          )
-        )}
-        <div className="lineWrapper">
-          <label className="label">Call Type</label>
-          {editMode ? (
-            <select
-              className="content"
-              name="callType"
-              id="callType"
-              defaultValue={callType}
-              onChange={(e) => setCallType(e.target.value)}
-            >
-              <option value="Monthly Call">Monthly Call</option>
-              <option value="Uses Credit (Bundle)">Uses Credit (Bundle)</option>
-            </select>
-          ) : (
-            <p className="content">{call.callType}</p>
-          )}
-        </div>
+
+        <CoachDropdown
+          label="Caller"
+          coachEmail={caller}
+          onChange={setCaller}
+          editMode={editMode}
+        />
+
+        {editMode && <DateInput value={date} onChange={setDate} />}
+
+        <DropdownWithEditToggle
+          label="Rating"
+          value={rating}
+          onChange={setRating}
+          options={ratingOptions}
+          editMode={editMode}
+        />
+
+        <TextAreaInput
+          label="Notes"
+          value={notes}
+          onChange={setNotes}
+          editMode={editMode}
+        />
+
+        <TextAreaInput
+          label="Difficulties"
+          value={areasOfDifficulty}
+          onChange={setAreasOfDifficulty}
+          editMode={editMode}
+        />
+
+        <LinkInput
+          label="Recording Link"
+          value={recording}
+          onChange={setRecording}
+          editMode={editMode}
+        />
+
+        <DropdownWithEditToggle
+          label="Call Type"
+          value={callType}
+          onChange={setCallType}
+          options={callTypeOptions}
+          editMode={editMode}
+        />
+
         {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
 
-        {editMode && (
-          <div className="buttonBox">
-            <button type="button" className="redButton" onClick={cancelEdit}>
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="greenButton"
-              onClick={captureSubmitForm}
-            >
-              Save
-            </button>
-          </div>
-        )}
+        <FormControls
+          captureSubmitForm={captureSubmitForm}
+          cancelEdit={cancelEdit}
+          editMode={editMode}
+        />
       </div>
     </div>
   );
@@ -333,7 +247,6 @@ export default function PrivateCallsCell({
     useContextualMenu();
   const userDataQuery = useUserData();
   const { createPrivateCallMutation } = usePrivateCalls();
-  const { coachListQuery } = useCoaching();
   const { openModal } = useModal();
 
   // New Record Inputs
@@ -349,30 +262,20 @@ export default function PrivateCallsCell({
 
   function createNewPrivateCall() {
     // Verify inputs
-    if (!caller) {
+    const badInput = verifyRequiredInputs([
+      { value: rating, label: 'Rating' },
+      { value: date, label: 'Date' },
+      { value: caller, label: 'Caller' },
+    ]);
+    if (badInput) {
       openModal({
         title: 'Error',
-        body: 'Caller is a required field',
+        body: `${badInput} is a required field`,
         type: 'error',
       });
       return;
     }
-    if (!rating) {
-      openModal({
-        title: 'Error',
-        body: 'Rating is a required field',
-        type: 'error',
-      });
-      return;
-    }
-    if (!date) {
-      openModal({
-        title: 'Error',
-        body: 'Date is a required field',
-        type: 'error',
-      });
-      return;
-    }
+
     createPrivateCallMutation.mutate({
       relatedWeek: week.recordId,
       rating,
@@ -383,7 +286,6 @@ export default function PrivateCallsCell({
       date,
       caller,
     });
-    // add toasts here as well
     closeContextual();
   }
 
@@ -408,124 +310,55 @@ export default function PrivateCallsCell({
               {getStudentFromMembershipId(week.relatedMembership)?.fullName} on{' '}
               {new Date(Date.now()).toISOString().split('T')[0]}
             </h4>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="rating">
-                Rating:
-              </label>
-              <select
-                className="content"
-                id="rating"
-                name="rating"
-                defaultValue={rating}
-                onChange={(e) => setRating(e.target.value)}
-              >
-                <option value="">Select</option>
-                <option value="Excellent">Excellent</option>
-                <option value="Very Good">Very Good</option>
-                <option value="Good">Good</option>
-                <option value="Fair">Fair</option>
-                <option value="Poor">Poor</option>
-                <option value="Bad">Bad</option>
-                <option value="Late Cancel">Late Cancel</option>
-                <option value="No-Show">No-Show</option>
-              </select>
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="caller">
-                Caller:
-              </label>
-              <select
-                className="content"
-                id="caller"
-                name="caller"
-                defaultValue={caller}
-                onChange={(e) => setCaller(e.target.value)}
-              >
-                <option value="">Select</option>
-                {coachListQuery.data?.map((coach) => (
-                  <option key={coach.coach} value={coach.user.email}>
-                    {coach.user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="lineWrapper">
-              <label className="label">Date: </label>
-              <input
-                className="content"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="notes">
-                Notes:{' '}
-              </label>
-              <textarea
-                className="content"
-                id="notes"
-                name="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="areasOfDifficulty">
-                Difficulties:{' '}
-              </label>
-              <textarea
-                className="content"
-                id="areasOfDifficulty"
-                name="areasOfDifficulty"
-                value={areasOfDifficulty}
-                onChange={(e) => setAreasOfDifficulty(e.target.value)}
-              />
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="recording">
-                Recording Link:{' '}
-              </label>
-              <input
-                className="content"
-                type="text"
-                id="recording"
-                name="recording"
-                value={recording}
-                onChange={(e) => setRecording(e.target.value)}
-              />
-            </div>
-            <div className="lineWrapper">
-              <label className="label">Call Type</label>
-              <select
-                className="content"
-                name="callType"
-                id="callType"
-                defaultValue={callType}
-                onChange={(e) => setCallType(e.target.value)}
-              >
-                <option value="Monthly Call">Monthly Call</option>
-                <option value="Uses Credit (Bundle)">
-                  Uses Credit (Bundle)
-                </option>
-              </select>
-            </div>
-            <div className="buttonBox">
-              <button
-                type="button"
-                className="redButton"
-                onClick={closeContextual}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="greenButton"
-                onClick={createNewPrivateCall}
-              >
-                Submit
-              </button>
-            </div>
+            <Dropdown
+              label="Rating"
+              value={rating}
+              onChange={setRating}
+              options={ratingOptions}
+            />
+
+            <CoachDropdown
+              label="Caller"
+              coachEmail={caller}
+              onChange={setCaller}
+              editMode
+            />
+
+            <DateInput value={date} onChange={setDate} />
+
+            <TextAreaInput
+              label="Notes"
+              value={notes}
+              onChange={setNotes}
+              editMode
+            />
+
+            <TextAreaInput
+              label="Difficulties"
+              value={areasOfDifficulty}
+              onChange={setAreasOfDifficulty}
+              editMode
+            />
+
+            <LinkInput
+              label="Recording Link"
+              value={recording}
+              onChange={setRecording}
+              editMode
+            />
+
+            <Dropdown
+              label="Call Type"
+              value={callType}
+              onChange={setCallType}
+              options={callTypeOptions}
+            />
+
+            <FormControls
+              captureSubmitForm={createNewPrivateCall}
+              cancelEdit={() => closeContextual()}
+              editMode
+            />
           </div>
         </div>
       )}

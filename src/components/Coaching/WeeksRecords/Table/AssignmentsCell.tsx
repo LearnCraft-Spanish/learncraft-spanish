@@ -10,11 +10,45 @@ import { useModal } from 'src/hooks/useModal';
 import {
   CoachDropdown,
   DeleteRecord,
+  Dropdown,
   DropdownWithEditToggle,
   FormControls,
   LinkInput,
   TextAreaInput,
 } from '../../general';
+
+import verifyRequiredInputs from '../../general/formValidationFunctions';
+
+const assignmentTypes = [
+  'Pronunciation',
+  'Writing',
+  'placement test',
+  'journal',
+  'verbal tenses review',
+  'audio quiz',
+  'Student Testimonial',
+  '_other',
+];
+const ratings = [
+  'Excellent',
+  'Very Good',
+  'Good',
+  'Fair',
+  'Bad',
+  'Poor',
+  'Assigned to M3',
+  'No sound',
+  'Assigned to Level 2 (L6-9)',
+  'Assigned to Level 3 (L10-12)',
+  'Assigned to Level 1 (lessons 1-6)',
+  'Advanced group',
+  'Assigned to Level 1 (L1-L5)',
+  'Assigned to 1MC',
+  'Assigned to Level 4',
+  'New LCS course',
+  'Advanced',
+];
+
 function AssignmentCell({ assignment }: { assignment: Assignment }) {
   const { openContextual, contextual } = useContextualMenu();
 
@@ -41,7 +75,7 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
   } = useCoaching();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
     useContextualMenu();
-  const { closeModal } = useModal();
+  const { closeModal, openModal } = useModal();
   const { updateAssignmentMutation, deleteAssignmentMutation } =
     useAssignments();
 
@@ -132,6 +166,20 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
       disableEditMode();
       return;
     }
+    //Check for all required fields
+    const badInput = verifyRequiredInputs([
+      { label: 'Assignment Type', value: assignmentType },
+      { label: 'Homework Corrector', value: homeworkCorrector },
+      { label: 'Rating', value: rating },
+    ]);
+    if (badInput) {
+      openModal({
+        title: 'Error',
+        body: `${badInput} is required`,
+        type: 'error',
+      });
+      return;
+    }
     submitEdit();
   }
   return (
@@ -150,72 +198,53 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
             }
           </h4>
         )}
+
         <DropdownWithEditToggle
           label="Assignment Type"
           editMode={editMode}
           value={assignmentType}
           onChange={setAssignmentType}
-          options={[
-            'Pronunciation',
-            'Writing',
-            'placement test',
-            'journal',
-            'verbal tenses review',
-            'audio quiz',
-            'Student Testimonial',
-            '_other',
-          ]}
+          options={assignmentTypes}
         />
+
         <CoachDropdown
           label="Corrected by"
           editMode={editMode}
           coachEmail={homeworkCorrector}
           onChange={updateHomeworkCorrector}
         />
+
         <DropdownWithEditToggle
           label="Rating"
           editMode={editMode}
           value={rating}
           onChange={setRating}
-          options={[
-            'Excellent',
-            'Very Good',
-            'Good',
-            'Fair',
-            'Bad',
-            'Poor',
-            'Assigned to M3',
-            'No sound',
-            'Assigned to Level 2 (L6-9)',
-            'Assigned to Level 3 (L10-12)',
-            'Assigned to Level 1 (lessons 1-6)',
-            'Advanced group',
-            'Assigned to Level 1 (L1-L5)',
-            'Assigned to 1MC',
-            'Assigned to Level 4',
-            'New LCS course',
-            'Advanced',
-          ]}
+          options={ratings}
         />
+
         <TextAreaInput
           label="Notes"
           editMode={editMode}
           value={notes}
           onChange={setNotes}
         />
+
         <TextAreaInput
           label="Areas of Difficulty"
           editMode={editMode}
           value={areasOfDifficulty}
           onChange={setAreasOfDifficulty}
         />
+
         <LinkInput
           label="Assignment Link"
           value={assignmentLink}
           onChange={setAssignmentLink}
           editMode={editMode}
         />
+
         {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
+
         <FormControls
           editMode={editMode}
           cancelEdit={cancelEdit}
@@ -238,7 +267,7 @@ export default function AssignmentsCell({
   const { createAssignmentMutation } = useAssignments();
   const userDataQuery = useUserData();
 
-  const { coachListQuery, getStudentFromMembershipId } = useCoaching();
+  const { getStudentFromMembershipId } = useCoaching();
   const { openModal } = useModal();
   const [homeworkCorrector, setHomeworkCorrector] = useState(
     userDataQuery.data?.emailAddress || '',
@@ -265,26 +294,15 @@ export default function AssignmentsCell({
     });
   }
   function captureSubmitForm() {
-    if (assignmentType === '') {
+    const badInput = verifyRequiredInputs([
+      { label: 'Assignment Type', value: assignmentType },
+      { label: 'Homework Corrector', value: homeworkCorrector },
+      { label: 'Rating', value: rating },
+    ]);
+    if (badInput) {
       openModal({
         title: 'Error',
-        body: 'Assignment Type is required',
-        type: 'error',
-      });
-      return;
-    }
-    if (homeworkCorrector === '') {
-      openModal({
-        title: 'Error',
-        body: 'Homework Corrector is required',
-        type: 'error',
-      });
-      return;
-    }
-    if (rating === '') {
-      openModal({
-        title: 'Error',
-        body: 'Rating is required',
+        body: `${badInput} is required`,
         type: 'error',
       });
       return;
@@ -325,142 +343,53 @@ export default function AssignmentsCell({
               </div>
             </div>
 
-            <div className="lineWrapper">
-              <label className="label" htmlFor="assignmentType">
-                Assignment Type:
-              </label>
-              <select
-                id="assignmentType"
-                name="assignmentType"
-                className="content"
-                defaultValue={assignmentType}
-                onChange={(e) => setAssignmentType(e.target.value)}
-              >
-                <option value="">Select</option>
-                <option value="Pronunciation">Pronunciation</option>
-                <option value="Writing">Writing</option>
-                <option value="placement test">placement test</option>
-                <option value="journal">journal</option>
-                <option value="verbal tenses review">
-                  verbal tenses review
-                </option>
-                <option value="audio quiz">audio quiz</option>
-                <option value="Student Testimonial">Student Testimonial</option>
-                <option value="_other">_other</option>
-              </select>
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="homeworkCorrector">
-                Corrected by:{' '}
-              </label>
-              <select
-                id="homeworkCorrector"
-                name="homeworkCorrector"
-                className="content"
-                defaultValue={homeworkCorrector}
-                onChange={(e) => updateHomeworkCorrector(e.target.value)}
-              >
-                <option value="">Select</option>
+            <Dropdown
+              label="Assignment Type"
+              value={assignmentType}
+              onChange={setAssignmentType}
+              options={assignmentTypes}
+            />
 
-                {coachListQuery.data?.map((coach) => (
-                  <option key={coach.coach} value={coach.user.email}>
-                    {coach.user.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="rating">
-                Rating:
-              </label>
-              <select
-                id="rating"
-                name="rating"
-                className="content"
-                defaultValue={rating}
-                onChange={(e) => setRating(e.target.value)}
-              >
-                <option value="">Select</option>
-                <option value="Excellent">Excellent</option>
-                <option value="Very Good">Very Good</option>
-                <option value="Good">Good</option>
-                <option value="Fair">Fair</option>
-                <option value="Bad">Bad</option>
-                <option value="Poor">Poor</option>
-                <option value="Assigned to M3">Assigned to M3</option>
-                <option value="No sound">No sound</option>
-                <option value="Assigned to Level 2 (L6-9)">
-                  Assigned to Level 2 (L6-9)
-                </option>
-                <option value="Assigned to Level 3 (L10-12)">
-                  Assigned to Level 3 (L10-12)
-                </option>
-                <option value="Assigned to Level 1 (lessons 1-6)">
-                  Assigned to Level 1 (lessons 1-6)
-                </option>
-                <option value="Advanced group">Advanced group</option>
-                <option value="Assigned to Level 1 (L1-L5)">
-                  Assigned to Level 1 (L1-L5)
-                </option>
-                <option value="Assigned to 1MC">Assigned to 1MC</option>
-                <option value="Assigned to Level 4">Assigned to Level 4</option>
-                <option value="New LCS course">New LCS course</option>
-                <option value="Advanced">Advanced</option>
-              </select>
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="notes">
-                Notes:
-              </label>
-              <textarea
-                id="notes"
-                name="notes"
-                className="content"
-                defaultValue={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="areasOfDifficulty">
-                Areas of Difficulty:
-              </label>
-              <textarea
-                id="areasOfDifficulty"
-                name="areasOfDifficulty"
-                className="content"
-                defaultValue={areasOfDifficulty}
-                onChange={(e) => setAreasOfDifficulty(e.target.value)}
-              />
-            </div>
-            <div className="lineWrapper">
-              <label className="label" htmlFor="assignmentLink">
-                Assignment Link:
-              </label>
-              <input
-                id="assignmentLink"
-                name="assignmentLink"
-                type="text"
-                className="content"
-                defaultValue={assignmentLink}
-                onChange={(e) => setAssignmentLink(e.target.value)}
-              />
-            </div>
-            <div className="buttonBox">
-              <button
-                type="button"
-                className="redButton"
-                onClick={closeContextual}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="greenButton"
-                onClick={captureSubmitForm}
-              >
-                Submit
-              </button>
-            </div>
+            <CoachDropdown
+              label="Corrected by"
+              editMode
+              coachEmail={homeworkCorrector}
+              onChange={updateHomeworkCorrector}
+            />
+
+            <Dropdown
+              label="Rating"
+              value={rating}
+              onChange={setRating}
+              options={ratings}
+            />
+
+            <TextAreaInput
+              label="Notes"
+              editMode
+              value={notes}
+              onChange={setNotes}
+            />
+
+            <TextAreaInput
+              label="Areas of Difficulty"
+              editMode
+              value={areasOfDifficulty}
+              onChange={setAreasOfDifficulty}
+            />
+
+            <LinkInput
+              label="Assignment Link"
+              value={assignmentLink}
+              onChange={setAssignmentLink}
+              editMode
+            />
+
+            <FormControls
+              editMode
+              cancelEdit={closeContextual}
+              captureSubmitForm={captureSubmitForm}
+            />
           </div>
         </div>
       )}
