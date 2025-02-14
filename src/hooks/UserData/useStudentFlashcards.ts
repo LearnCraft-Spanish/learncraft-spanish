@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { useCallback, useRef } from 'react';
-import { useBackend } from 'src/hooks/useBackend';
 import type {
   Flashcard,
   StudentExample,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
+import { useBackend } from 'src/hooks/useBackend';
 import { toast } from 'react-toastify';
 import { useActiveStudent } from './useActiveStudent';
 import { useUserData } from './useUserData';
@@ -27,7 +27,10 @@ export function useStudentFlashcards() {
   } = useBackend();
 
   // Temporary ID to generate unique placeholder keys for new flashcards
-  queryClient.setQueryData(['tempIdCounter'], (prevId: number) => prevId ?? -1);
+  // Initialize only if it doesn't exist
+  if (queryClient.getQueryData(['tempIdCounter']) === undefined) {
+    queryClient.setQueryData(['tempIdCounter'], -1);
+  }
 
   // Abbreviated access since it's used frequently
   const activeStudentId = activeStudentQuery.data?.recordId;
@@ -100,16 +103,20 @@ export function useStudentFlashcards() {
       );
       return {
         ...flashcard,
-        reviewed: previousFlashcard?.difficulty
-          ? previousFlashcard?.difficulty // Keep reviewed state if it exists
-          : '', // Otherwise, default to empty string
+        difficulty: previousFlashcard?.difficulty,
       };
     });
 
-    return {
+    const mergedStudentExampleData = backendResponse.studentExamples; // Placeholder for future merge needs
+
+    const mergedFlashcardData: StudentFlashcardData = {
       examples: mergedExampleData,
-      studentExamples: backendResponse.studentExamples,
+      studentExamples: mergedStudentExampleData,
     };
+
+    const validatedMergedData = matchAndTrimArrays(mergedFlashcardData);
+
+    return validatedMergedData;
   };
 
   const flashcardDataQuery = useQuery({
@@ -211,11 +218,13 @@ export function useStudentFlashcards() {
       // Memoize ID number for rollback, then decrement the tempIdNum for the next flashcard
 
       const getNextTempId = () => {
-        queryClient.setQueryData(
-          ['tempIdCounter'],
-          (prevId: number = -1) => prevId - 1,
-        );
-        return queryClient.getQueryData<number>(['tempIdCounter']) ?? -1; // Ensure it never returns undefined
+        let newId = -1;
+        queryClient.setQueryData(['tempIdCounter'], (prevId: number = -1) => {
+          const nextId = prevId - 1;
+          newId = nextId;
+          return nextId;
+        });
+        return newId;
       };
 
       const thisIdNum = getNextTempId();
@@ -232,19 +241,11 @@ export function useStudentFlashcards() {
         relatedExample: flashcard.recordId,
         relatedStudent: activeStudentId!,
         dateCreated: formattedToday,
-        lastReviewedDate: formattedToday,
+        lastReviewedDate: '',
         nextReviewDate: formattedTomorrow,
-        reviewInterval: 1,
+        reviewInterval: null,
         coachAdded: null,
       };
-
-      // Update the local ref with the new student-example to preserve state on re-fetch
-      /*
-      localStudentExamples.current = {
-        ...localStudentExamples.current,
-        [newStudentExample.relatedExample]: newStudentExample,
-      };
-      */
 
       // Optimistically update the flashcards cache
       queryClient.setQueryData(
@@ -408,14 +409,8 @@ export function useStudentFlashcards() {
       // Return the memoized objects for rollback
       return { studentFlashcardObject, flashcardObject };
     },
-    onSuccess: (_data, _variables, context) => {
-      const { flashcardObject } = context;
-      if (flashcardObject?.recordId) {
-        // Remove the local update for the deleted flashcard
-        /*
-        delete localExamples.current[flashcardObject.recordId];
-        */
-      }
+
+    onSuccess: (_data, _variables, _context) => {
       toast.success('Flashcard removed successfully');
     },
 
@@ -534,17 +529,6 @@ export function useStudentFlashcards() {
             };
             const newFlashcard = { ...flashcard, difficulty };
 
-            // Save flashcard in local ref to preserve on refetch
-            /*
-            localExamples.current = {
-              ...localExamples.current,
-              [flashcard.recordId]: {
-                ...(localExamples.current[flashcard.recordId] || {}), // Keep other properties intact
-                difficulty, // Overwrite the difficulty with the new value
-              },
-            };
-            */
-
             // Replace the flashcards in copy of array
             const newStudentFlashcardsArray = oldFlashcardsCopy.map(
               (studentFlashcard) =>
@@ -572,7 +556,12 @@ export function useStudentFlashcards() {
       return { studentExampleId, newInterval: oldInterval };
     },
 
+    onSuccess: (_data, _variables) => {
+      toast.success('Flashcard updated successfully');
+    },
+
     onError: (error, _variables, context) => {
+      toast.error('Failed to update Flashcard');
       console.error(error);
       // Make sure both necessary values are defined
       if (
@@ -583,11 +572,6 @@ export function useStudentFlashcards() {
       }
       // Destructure the context
       const { studentExampleId, newInterval } = context;
-
-      // Remove the local update for this flashcard
-      /*
-      delete localExamples.current[studentExampleId];
-      */
 
       // Roll back the cache for just the affected flashcard
       queryClient.setQueryData(
