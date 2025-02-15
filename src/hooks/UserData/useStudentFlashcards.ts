@@ -8,6 +8,7 @@ import type {
 } from 'src/types/interfaceDefinitions';
 import { useBackend } from 'src/hooks/useBackend';
 import { toast } from 'react-toastify';
+import { toISODateTime } from 'src/functions/dateUtils';
 import { useActiveStudent } from './useActiveStudent';
 import { useUserData } from './useUserData';
 
@@ -80,14 +81,22 @@ export function useStudentFlashcards() {
   const getFlashcardData = async () => {
     let backendResponse: StudentFlashcardData | undefined;
 
-    if (userDataQuery.data?.roles.adminRole === 'coach' && activeStudentId) {
+    if (!activeStudentId) {
+      throw new Error('No active student');
+    }
+
+    if (
+      (userDataQuery.data?.roles.adminRole === 'coach' ||
+        userDataQuery.data?.roles.adminRole === 'admin') &&
+      activeStudentId
+    ) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
     } else if (userDataQuery.data?.roles.studentRole === 'student') {
       backendResponse = await getMyExamplesFromBackend();
     }
 
     if (!backendResponse) {
-      throw new Error('No active student');
+      throw new Error('Failed to get student flashcards; failed to fetch');
     }
 
     // Get the current cached data (previous session state)
@@ -96,7 +105,7 @@ export function useStudentFlashcards() {
       activeStudentId,
     ]);
 
-    // Preserve the "reviewed" status from previousData if it exists
+    // Preserve the local "difficulty" status from previousData if it exists
     const mergedExampleData = backendResponse.examples.map((flashcard) => {
       const previousFlashcard = previousData?.examples.find(
         (prev) => prev.recordId === flashcard.recordId,
@@ -185,18 +194,21 @@ export function useStudentFlashcards() {
       if (!addPromise) {
         throw new Error('No active student');
       }
-      const addResponse = addPromise.then(
-        (result: number | undefined | string) => {
-          if (typeof result === 'string') {
-            result = Number.parseInt(result);
-          }
-          if (result !== 1) {
-            throw new Error('Failed to add Flashcard');
-          }
-          return result;
-        },
-      );
-      return addResponse;
+      const addResponse = async () => {
+        const result: number | undefined | string = await addPromise;
+
+        if (typeof result === 'string') {
+          return Number.parseInt(result);
+        }
+
+        if (result !== 1) {
+          throw new Error('Failed to add Flashcard');
+        }
+
+        return result;
+      };
+      const data = await addResponse();
+      return data;
     },
     [
       userDataQuery.data?.roles,
@@ -216,7 +228,6 @@ export function useStudentFlashcards() {
       });
 
       // Memoize ID number for rollback, then decrement the tempIdNum for the next flashcard
-
       const getNextTempId = () => {
         let newId = -1;
         queryClient.setQueryData(['tempIdCounter'], (prevId: number = -1) => {
@@ -229,22 +240,17 @@ export function useStudentFlashcards() {
 
       const thisIdNum = getNextTempId();
 
-      // Make placeholder record for student-example until backend responds
-      const today = new Date();
-      const formattedToday = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-      const formattedTomorrow = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate() + 1}`;
-
-      // This needs checking. Types and date formats probably inaccurate.
+      // Format exactly matches type as returned from database except for negative recordId
       const newStudentExample: StudentExample = {
         studentEmailAddress: userDataQuery.data?.emailAddress || '',
         recordId: thisIdNum,
         relatedExample: flashcard.recordId,
         relatedStudent: activeStudentId!,
-        dateCreated: formattedToday,
+        dateCreated: toISODateTime(),
         lastReviewedDate: '',
-        nextReviewDate: formattedTomorrow,
+        nextReviewDate: '',
         reviewInterval: null,
-        coachAdded: null,
+        coachAdded: false,
       };
 
       // Optimistically update the flashcards cache
@@ -259,14 +265,12 @@ export function useStudentFlashcards() {
             const trimmedNewFlashcardData = matchAndTrimArrays(newItem);
             return trimmedNewFlashcardData;
           }
-          const oldFlashcardsCopy = [...oldFlashcards.examples];
-          const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
           const newExampleArray = [
-            ...oldFlashcardsCopy,
+            ...oldFlashcards.examples,
             { ...flashcard, isCollected: true },
           ];
           const newStudentExampleArray = [
-            ...oldStudentFlashcardsCopy,
+            ...oldFlashcards.studentExamples,
             newStudentExample,
           ];
           const newFlashcardData = {
@@ -293,11 +297,18 @@ export function useStudentFlashcards() {
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.examples];
           const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
+          const studentExampleToRemove = oldStudentFlashcardsCopy.find(
+            (studentExample) => studentExample.recordId === thisIdNum,
+          );
           const newStudentExampleArray = oldStudentFlashcardsCopy.filter(
             (studentExample) => studentExample.recordId !== thisIdNum,
           );
+          const newExampleArray = oldFlashcardsCopy.filter(
+            (example) =>
+              example.recordId !== studentExampleToRemove?.relatedExample,
+          );
           const newFlashcardData = {
-            examples: oldFlashcardsCopy,
+            examples: newExampleArray,
             studentExamples: newStudentExampleArray,
           };
           const trimmedNewFlashcardData = matchAndTrimArrays(newFlashcardData);
@@ -371,31 +382,21 @@ export function useStudentFlashcards() {
         ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           // Find the studentFlashcard and related flashcard objects
-          const flashcardObjectOriginal = oldFlashcards.examples.find(
+          studentFlashcardObject = oldFlashcards.studentExamples.find(
+            (studentFlashcard) =>
+              studentFlashcard.relatedExample === flashcardId,
+          );
+          flashcardObject = oldFlashcards.examples.find(
             (flashcard) => flashcard.recordId === flashcardId,
           );
-          const studentFlashcardObjectOriginal =
-            oldFlashcards.studentExamples.find(
-              (studentFlashcard) =>
-                studentFlashcard.relatedExample === flashcardId,
-            );
-
-          // Make a copy if they exist, save to memoized objects
-          studentFlashcardObject = studentFlashcardObjectOriginal
-            ? { ...studentFlashcardObjectOriginal }
-            : undefined;
-          flashcardObject = flashcardObjectOriginal
-            ? { ...flashcardObjectOriginal }
-            : undefined;
 
           // Remove the studentFlashcard and related flashcard object from the cache
-          const oldFlashcardsCopy = [...oldFlashcards.examples];
-          const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
-          const newStudentFlashcardsArray = oldStudentFlashcardsCopy.filter(
-            (studentFlashcard) =>
-              studentFlashcard.relatedExample !== flashcardId,
-          );
-          const newFlashcardsArray = oldFlashcardsCopy.filter(
+          const newStudentFlashcardsArray =
+            oldFlashcards.studentExamples.filter(
+              (studentFlashcard) =>
+                studentFlashcard.relatedExample !== flashcardId,
+            );
+          const newFlashcardsArray = oldFlashcards.examples.filter(
             (flashcard) => flashcard.recordId !== flashcardId,
           );
           const newFlashcardData = {
@@ -406,7 +407,8 @@ export function useStudentFlashcards() {
           return trimmedNewFlashcardData;
         },
       );
-      // Return the memoized objects for rollback
+
+      // Return the memoized objects for rollback in case of error
       return { studentFlashcardObject, flashcardObject };
     },
 
@@ -552,8 +554,10 @@ export function useStudentFlashcards() {
           }
         },
       );
-      // Return the studentExampleId and the previous interval for rollback context
-      return { studentExampleId, newInterval: oldInterval };
+
+      // Return the studentExampleId and the previous interval and difficulty
+      // These are for rollback context in the case of an error
+      return { studentExampleId, oldInterval, difficulty };
     },
 
     onSuccess: (_data, _variables) => {
@@ -566,12 +570,12 @@ export function useStudentFlashcards() {
       // Make sure both necessary values are defined
       if (
         context?.studentExampleId === undefined ||
-        context?.newInterval === undefined
+        context?.oldInterval === undefined
       ) {
         return;
       }
       // Destructure the context
-      const { studentExampleId, newInterval } = context;
+      const { studentExampleId, oldInterval, difficulty } = context;
 
       // Roll back the cache for just the affected flashcard
       queryClient.setQueryData(
@@ -587,11 +591,11 @@ export function useStudentFlashcards() {
               flashcard.recordId === studentFlashcard?.relatedExample,
           );
           if (studentFlashcard && flashcard) {
-            const newStudentFlashcard = {
+            const newStudentFlashcard: StudentExample = {
               ...studentFlashcard,
-              reviewInterval: newInterval,
+              reviewInterval: oldInterval,
             };
-            const newFlashcard = { ...flashcard, difficulty: undefined };
+            const newFlashcard: Flashcard = { ...flashcard, difficulty };
             const newStudentFlashcardsArray = oldFlashcardsCopy.map(
               (studentFlashcard) =>
                 studentFlashcard.recordId === studentExampleId
