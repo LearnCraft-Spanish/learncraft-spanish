@@ -264,6 +264,17 @@ function GroupSessionView({
         (attendee.action === 'add' || attendee.action === 'remove'),
     );
   }
+  function checkInputChanges() {
+    return !(
+      date === groupSession.date &&
+      coach === groupSession.coach.email &&
+      sessionType === groupSession.sessionType &&
+      topic === groupSession.topic &&
+      comments === groupSession.comments &&
+      callDocument === groupSession.callDocument &&
+      zoomLink === groupSession.zoomLink
+    );
+  }
 
   // Editing Functions
 
@@ -325,6 +336,14 @@ function GroupSessionView({
       });
       return;
     }
+    if (attendees.length === 0) {
+      openModal({
+        title: 'Error',
+        body: 'At least one attendee is required',
+        type: 'error',
+      });
+      return;
+    }
     if (newRecord) {
       createGroupSessionMutation.mutate(
         {
@@ -377,30 +396,23 @@ function GroupSessionView({
       // IMPORTANT! must await the creation of the group session
     } else {
       // verify if any changes were made
-      if (
-        date === groupSession.date &&
-        coach === groupSession.coach.email &&
-        sessionType === groupSession.sessionType &&
-        topic === groupSession.topic &&
-        comments === groupSession.comments &&
-        callDocument === groupSession.callDocument &&
-        zoomLink === groupSession.zoomLink &&
-        !checkAttendeeChanges()
-      ) {
+      if (!checkInputChanges() && !checkAttendeeChanges()) {
         console.error('No changes detected');
         disableEditMode();
         return;
       }
-      updateGroupSessionMutation.mutate({
-        recordId,
-        date,
-        coach,
-        sessionType,
-        topic,
-        comments,
-        callDocument,
-        zoomLink,
-      });
+      if (checkInputChanges()) {
+        updateGroupSessionMutation.mutate({
+          recordId,
+          date,
+          coach,
+          sessionType,
+          topic,
+          comments,
+          callDocument,
+          zoomLink,
+        });
+      }
       if (checkAttendeeChanges()) {
         const currentAttendeeRecords = getAttendeesFromGroupSessionId(recordId);
         const attendeesToAdd = attendees.filter(
@@ -414,21 +426,21 @@ function GroupSessionView({
             (remove) => remove.relatedWeek === attendee.student,
           ),
         );
-
-        createGroupAttendeesMutation.mutate(
-          attendeesToAdd.map((attendee) => ({
-            groupSession: recordId,
-            student: attendee.relatedWeek,
-          })),
-        );
-        if (attendeesToRemove) {
+        if (attendeesToAdd && attendeesToAdd.length > 0) {
+          createGroupAttendeesMutation.mutate(
+            attendeesToAdd.map((attendee) => ({
+              groupSession: recordId,
+              student: attendee.relatedWeek,
+            })),
+          );
+        }
+        if (attendeesToRemove && attendeesToRemove.length > 0) {
           deleteGroupAttendeesMutation.mutate(
             attendeesToRemove.map((attendee) => attendee.recordId),
           );
         }
       }
       disableEditMode();
-      closeContextual();
     }
   }
 
@@ -552,17 +564,22 @@ function GroupSessionView({
                 (attendee) =>
                   // if attendee is to be removed, don't display it
                   attendee.action !== 'remove' && (
-                    <div key={attendee.relatedWeek}>
+                    <div
+                      key={attendee.relatedWeek}
+                      className="attendee-wrapper"
+                    >
                       <p> {attendee.name}</p>
-                      <button
-                        type="button"
-                        className="redButton"
-                        onClick={() =>
-                          handleRemoveAttendee(attendee.relatedWeek)
-                        }
-                      >
-                        Remove Attendee
-                      </button>
+                      {editMode && (
+                        <button
+                          type="button"
+                          className="redButton"
+                          onClick={() =>
+                            handleRemoveAttendee(attendee.relatedWeek)
+                          }
+                        >
+                          Remove Attendee
+                        </button>
+                      )}
                     </div>
                   ),
               )}

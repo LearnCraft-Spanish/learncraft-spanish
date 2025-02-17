@@ -83,10 +83,12 @@ export function LinkInput({
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
-      ) : (
+      ) : value && value.startsWith('http') ? (
         <a className="content" href={value} target="_blank" rel="noreferrer">
           {label}
         </a>
+      ) : (
+        <p className="content">{value}</p>
       )}
     </div>
   );

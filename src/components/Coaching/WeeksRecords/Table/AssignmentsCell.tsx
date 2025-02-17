@@ -138,18 +138,24 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
   }
 
   function submitEdit() {
-    updateAssignmentMutation.mutate({
-      relatedWeek: assignment.relatedWeek,
-      recordId: assignment.recordId,
-      homeworkCorrector,
-      assignmentType,
-      rating,
-      notes,
-      areasOfDifficulty,
-      assignmentLink,
-    });
-    updateDisableClickOutside(false);
-    setEditMode(false);
+    updateAssignmentMutation.mutate(
+      {
+        relatedWeek: assignment.relatedWeek,
+        recordId: assignment.recordId,
+        homeworkCorrector,
+        assignmentType,
+        rating,
+        notes,
+        areasOfDifficulty,
+        assignmentLink,
+      },
+      {
+        onSuccess: () => {
+          disableEditMode();
+          closeContextual();
+        },
+      },
+    );
   }
 
   function captureSubmitForm() {
@@ -283,15 +289,29 @@ export default function AssignmentsCell({
   };
 
   function createNewAssignment() {
-    createAssignmentMutation.mutate({
-      relatedWeek: week.recordId,
-      homeworkCorrector,
-      assignmentType,
-      rating,
-      notes,
-      areasOfDifficulty,
-      assignmentLink,
-    });
+    createAssignmentMutation.mutate(
+      {
+        relatedWeek: week.recordId,
+        homeworkCorrector,
+        assignmentType,
+        rating,
+        notes,
+        areasOfDifficulty,
+        assignmentLink,
+      },
+      {
+        onSuccess: () => {
+          closeContextual();
+
+          setHomeworkCorrector(userDataQuery.data?.emailAddress || '');
+          setAssignmentType('');
+          setRating('');
+          setNotes('');
+          setAreasOfDifficulty('');
+          setAssignmentLink('');
+        },
+      },
+    );
   }
   function captureSubmitForm() {
     const badInput = verifyRequiredInputs([

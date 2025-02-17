@@ -72,7 +72,7 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
         </div>
         <div className="lineWrapper">
           <p className="label">Current Lesson: </p>
-          <p className="content"> {week.currentLesson}</p>
+          <p className="content"> {week.currentLessonName}</p>
         </div>
       </div>
     </div>

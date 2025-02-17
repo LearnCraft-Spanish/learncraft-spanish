@@ -106,17 +106,23 @@ function PrivateCallView({ call }: { call: Call }) {
       });
       return;
     }
-    updatePrivateCallMutation.mutate({
-      ...call,
-      rating,
-      notes,
-      areasOfDifficulty,
-      recording,
-      date,
-      caller,
-      callType,
-    });
-    disableEditMode();
+    updatePrivateCallMutation.mutate(
+      {
+        ...call,
+        rating,
+        notes,
+        areasOfDifficulty,
+        recording,
+        date,
+        caller,
+        callType,
+      },
+      {
+        onSuccess: () => {
+          disableEditMode();
+        },
+      },
+    );
   }
 
   function deleteRecordFunction() {
@@ -276,17 +282,32 @@ export default function PrivateCallsCell({
       return;
     }
 
-    createPrivateCallMutation.mutate({
-      relatedWeek: week.recordId,
-      rating,
-      notes,
-      areasOfDifficulty,
-      recording,
-      callType,
-      date,
-      caller,
-    });
-    closeContextual();
+    createPrivateCallMutation.mutate(
+      {
+        relatedWeek: week.recordId,
+        rating,
+        notes,
+        areasOfDifficulty,
+        recording,
+        callType,
+        date,
+        caller,
+      },
+      {
+        onSuccess: () => {
+          closeContextual();
+
+          // Reset State
+          setRating('');
+          setNotes('');
+          setAreasOfDifficulty('');
+          setRecording('');
+          setDate(new Date(Date.now()).toISOString().split('T')[0]);
+          setCaller(userDataQuery.data?.emailAddress || '');
+          setCallType('Monthly Call');
+        },
+      },
+    );
   }
 
   return (

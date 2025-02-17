@@ -395,3 +395,13 @@ td button {
     }
   }
 }
+
+.attendee-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .redButton {
+    margin: 0.25rem 0.5rem;
+  }
+}
