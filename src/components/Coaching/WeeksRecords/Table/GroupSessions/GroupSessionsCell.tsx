@@ -163,14 +163,37 @@ function GroupSessionView({
     setZoomLink(newRecord ? '' : groupSession.zoomLink);
 
     setAttendees(() => {
-      if (newRecord) return [];
-      const attendees = getAttendeesFromGroupSessionId(recordId);
-      return attendees?.map((attendee) => ({
-        name: attendee.weekStudent,
-        relatedWeek: attendee.student,
-      })) as attendeeChangesObj[];
+      if (newRecord) {
+        // select student associated with this week record id
+        const student = getStudentFromMembershipId(week.relatedMembership);
+        if (!student) {
+          console.error('No student found with week recordId:', week.recordId);
+          return [];
+        }
+        return [
+          {
+            name: student.fullName,
+            relatedWeek: week.recordId,
+            action: 'add',
+          },
+        ];
+      } else {
+        const attendees = getAttendeesFromGroupSessionId(recordId);
+        return attendees?.map((attendee) => ({
+          name: attendee.weekStudent,
+          relatedWeek: attendee.student,
+        })) as attendeeChangesObj[];
+      }
     });
-  }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
+  }, [
+    getAttendeesFromGroupSessionId,
+    getStudentFromMembershipId,
+    groupSession,
+    newRecord,
+    recordId,
+    week.recordId,
+    week.relatedMembership,
+  ]);
 
   function handleAddAttendee() {
     if (!addingAttendee) {
