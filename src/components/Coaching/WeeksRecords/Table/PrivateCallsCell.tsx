@@ -12,13 +12,12 @@ import {
   DateInput,
   DeleteRecord,
   Dropdown,
-  DropdownWithEditToggle,
   FormControls,
   LinkInput,
   TextAreaInput,
 } from '../../general';
 
-import verifyRequiredInputs from '../../general/formValidationFunctions';
+import verifyRequiredInputs from '../../general/functions/formValidationFunctions';
 
 const ratingOptions = [
   'Excellent',
@@ -192,7 +191,7 @@ function PrivateCallView({ call }: { call: Call }) {
 
         {editMode && <DateInput value={date} onChange={setDate} />}
 
-        <DropdownWithEditToggle
+        <Dropdown
           label="Rating"
           value={rating}
           onChange={setRating}
@@ -221,7 +220,7 @@ function PrivateCallView({ call }: { call: Call }) {
           editMode={editMode}
         />
 
-        <DropdownWithEditToggle
+        <Dropdown
           label="Call Type"
           value={callType}
           onChange={setCallType}
@@ -336,6 +335,7 @@ export default function PrivateCallsCell({
               value={rating}
               onChange={setRating}
               options={ratingOptions}
+              editMode
             />
 
             <CoachDropdown
@@ -373,6 +373,7 @@ export default function PrivateCallsCell({
               value={callType}
               onChange={setCallType}
               options={callTypeOptions}
+              editMode
             />
 
             <FormControls

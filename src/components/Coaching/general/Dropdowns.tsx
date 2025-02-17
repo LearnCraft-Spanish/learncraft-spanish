@@ -8,32 +8,37 @@ export default function Dropdown({
   value,
   onChange,
   options,
+  editMode,
 }: {
   label: string;
   value: string;
   onChange: (value: React.SetStateAction<string>) => void;
   options: string[];
+  editMode: boolean;
 }) {
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
-      <label className="label" htmlFor={camelLabel}>
+      <label className="label" htmlFor={`dropdown-${camelLabel}`}>
         {`${label}: `}
       </label>
-      <select
-        id={camelLabel}
-        name={camelLabel}
-        className="content"
-        defaultValue={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="">Select</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+      {editMode ? (
+        <select
+          id={`dropdown-${camelLabel}`}
+          className="content"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          <option value="">Select</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <p className="content">{value}</p>
+      )}
     </div>
   );
 }
@@ -63,15 +68,14 @@ export function CoachDropdown({
   return (
     dataReady && (
       <div className="lineWrapper">
-        <label className="label" htmlFor="coach">
+        <label className="label" htmlFor="coachDropdown">
           {`${label}: `}
         </label>
         {editMode ? (
           <select
-            id="coach"
-            name="coach"
+            id="coachDropdown"
             className="content"
-            defaultValue={coachEmail}
+            value={coachEmail}
             onChange={(e) => onChange(e.target.value)}
           >
             <option value="">Select</option>
@@ -87,44 +91,5 @@ export function CoachDropdown({
         )}
       </div>
     )
-  );
-}
-
-export function DropdownWithEditToggle({
-  value,
-  onChange,
-  editMode,
-  options,
-  label,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-  editMode: boolean;
-  options: string[];
-  label: string;
-}) {
-  const camelLabel = camelize(label);
-  return (
-    <div className="lineWrapper">
-      <label className="label" htmlFor={camelLabel}>{`${label}: `}</label>
-      {editMode ? (
-        <select
-          className="content"
-          id={camelLabel}
-          name={camelLabel}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          <option value="">Select</option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <p className="content">{value}</p>
-      )}
-    </div>
   );
 }

@@ -11,13 +11,12 @@ import {
   CoachDropdown,
   DeleteRecord,
   Dropdown,
-  DropdownWithEditToggle,
   FormControls,
   LinkInput,
   TextAreaInput,
 } from '../../general';
 
-import verifyRequiredInputs from '../../general/formValidationFunctions';
+import verifyRequiredInputs from '../../general/functions/formValidationFunctions';
 
 const assignmentTypes = [
   'Pronunciation',
@@ -205,7 +204,7 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
           </h4>
         )}
 
-        <DropdownWithEditToggle
+        <Dropdown
           label="Assignment Type"
           editMode={editMode}
           value={assignmentType}
@@ -220,7 +219,7 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
           onChange={updateHomeworkCorrector}
         />
 
-        <DropdownWithEditToggle
+        <Dropdown
           label="Rating"
           editMode={editMode}
           value={rating}
@@ -368,6 +367,7 @@ export default function AssignmentsCell({
               value={assignmentType}
               onChange={setAssignmentType}
               options={assignmentTypes}
+              editMode
             />
 
             <CoachDropdown
@@ -382,6 +382,7 @@ export default function AssignmentsCell({
               value={rating}
               onChange={setRating}
               options={ratings}
+              editMode
             />
 
             <TextAreaInput

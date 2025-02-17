@@ -14,12 +14,14 @@ export function TextAreaInput({
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
-      <label className="label" htmlFor={camelLabel}>{`${label}: `}</label>
+      <label
+        className="label"
+        htmlFor={`textAreaInput-${camelLabel}`}
+      >{`${label}: `}</label>
       {editMode ? (
         <textarea
           className="content"
-          id={camelLabel}
-          name={camelLabel}
+          id={`textAreaInput-${camelLabel}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -44,12 +46,14 @@ export function TextInput({
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
-      <label className="label" htmlFor={camelLabel}>{`${label}: `}</label>
+      <label
+        className="label"
+        htmlFor={`textInput-${camelLabel}`}
+      >{`${label}: `}</label>
       {editMode ? (
         <input
           className="content"
-          id={camelLabel}
-          name={camelLabel}
+          id={`textInput-${camelLabel}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -74,12 +78,14 @@ export function LinkInput({
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
-      <label className="label" htmlFor={camelLabel}>{`${label}: `}</label>
+      <label
+        className="label"
+        htmlFor={`linkInput-${camelLabel}`}
+      >{`${label}: `}</label>
       {editMode ? (
         <input
           className="content"
-          id={camelLabel}
-          name={camelLabel}
+          id={`linkInput-${camelLabel}`}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />

@@ -7,8 +7,11 @@ export default function DateInput({
 }) {
   return (
     <div className="lineWrapper">
-      <label className="label">Date: </label>
+      <label className="label" htmlFor="dateInput">
+        Date:
+      </label>
       <input
+        id="dateInput"
         className="content"
         type="date"
         value={value}

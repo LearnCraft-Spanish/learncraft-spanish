@@ -9,13 +9,12 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useModal } from 'src/hooks/useModal';
 
-import verifyRequiredInputs from 'src/components/Coaching/general/formValidationFunctions';
+import verifyRequiredInputs from 'src/components/Coaching/general/functions/formValidationFunctions';
 import {
   CoachDropdown,
   DateInput,
   DeleteRecord,
   Dropdown,
-  DropdownWithEditToggle,
   FormControls,
   TextAreaInput,
   TextInput,
@@ -500,10 +499,11 @@ function GroupSessionView({
               value={sessionType}
               onChange={setSessionType}
               options={sessionTypeOptions}
+              editMode
             />
           )}
         </div>
-        <DropdownWithEditToggle
+        <Dropdown
           value={topic}
           onChange={setTopic}
           editMode={editMode}
