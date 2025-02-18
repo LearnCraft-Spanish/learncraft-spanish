@@ -228,7 +228,7 @@ export function useStudentFlashcards() {
       });
 
       // Memoize ID number for rollback, then decrement the tempIdNum for the next flashcard
-      const getNextTempId = () => {
+      const fetchAndDecrementTempId = () => {
         let newId = -1;
         queryClient.setQueryData(['tempIdCounter'], (prevId: number = -1) => {
           const nextId = prevId - 1;
@@ -238,7 +238,7 @@ export function useStudentFlashcards() {
         return newId;
       };
 
-      const thisIdNum = getNextTempId();
+      const thisIdNum = fetchAndDecrementTempId();
 
       // Format exactly matches type as returned from database except for negative recordId
       const newStudentExample: StudentExample = {
