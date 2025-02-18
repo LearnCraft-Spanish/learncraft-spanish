@@ -30,7 +30,6 @@ export default defineConfig((configEnv: ConfigEnv) =>
             '**/.stryker-tmp/**',
             '**/node_modules/**',
             '**/assets/**',
-            '**/functions/**',
             '**/tests/**',
             '**/mocks/**',
             '**/providers/**',
