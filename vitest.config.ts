@@ -17,8 +17,6 @@ export default defineConfig((configEnv: ConfigEnv) =>
           '**/node_modules/**',
           '**/mocks/**',
           '**/.stryker-tmp/**',
-          '**/functions/**',
-          'Coaching.jsx',
           'useAuth.ts',
         ],
         mockReset: true,

@@ -9,7 +9,7 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import ContextualControlls from 'src/components/ContextualControlls';
 import { useModal } from 'src/hooks/useModal';
 
-import verifyRequiredInputs from 'src/components/Coaching/general/functions/formValidationFunctions';
+import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
 import {
   CoachDropdown,
   DateInput,

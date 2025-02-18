@@ -16,7 +16,7 @@ import {
   TextAreaInput,
 } from '../../general';
 
-import verifyRequiredInputs from '../../general/functions/formValidationFunctions';
+import verifyRequiredInputs from '../../general/functions/inputValidation';
 
 const assignmentTypes = [
   'Pronunciation',

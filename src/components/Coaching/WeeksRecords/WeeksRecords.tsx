@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -6,13 +12,12 @@ import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 import type { Coach, Course, Week } from '../../../types/CoachingTypes';
 import LoadingMessage from '../../Loading';
+import getDateRange from '../general/functions/dateRange';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
 
 import '../coaching.scss';
 import ViewWeekRecord from './ViewWeekRecord';
-
-import useBANDAIDhelperFunction from './useBANDAIDhelperFunction';
 
 /*
 Notes for Test Cases to write:
@@ -43,7 +48,7 @@ export default function WeeksRecordsSection() {
     getStudentFromMembershipId,
   } = useCoaching();
 
-  const dateRange = useBANDAIDhelperFunction();
+  const dateRange = useMemo(() => getDateRange(), []);
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
