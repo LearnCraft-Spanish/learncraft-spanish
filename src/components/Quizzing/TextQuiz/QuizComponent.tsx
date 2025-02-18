@@ -7,6 +7,7 @@ import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import MenuButton from 'src/components/Buttons/MenuButton';
+import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import QuizProgress from '../QuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -31,7 +32,7 @@ export default function QuizComponent({
   isSrsQuiz = false,
   quizOnlyCustomExamples = false,
   cleanupFunction,
-  quizLength = 1000,
+  quizLength = 100,
 }: QuizComponentProps) {
   const location = useLocation();
   const { activeStudentQuery } = useActiveStudent();
@@ -346,6 +347,9 @@ export default function QuizComponent({
       {displayOrderReady &&
         !!initialDisplayOrder.current.length &&
         !displayOrder.length && <Navigate to=".." />}
+      {!displayOrder.length && !!examplesToParse.length && isSrsQuiz && (
+        <NoDueFlashcards />
+      )}
       {!!displayOrder.length && (
         <div className="quiz">
           <QuizProgress

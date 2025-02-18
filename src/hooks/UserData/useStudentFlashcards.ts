@@ -1,13 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { useCallback, useRef } from 'react';
-import { useBackend } from 'src/hooks/useBackend';
 import type {
   Flashcard,
   StudentExample,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
+import { useBackend } from 'src/hooks/useBackend';
 import { toast } from 'react-toastify';
+import { toISODateTime } from 'src/functions/dateUtils';
 import { useActiveStudent } from './useActiveStudent';
 import { useUserData } from './useUserData';
 
@@ -26,16 +27,11 @@ export function useStudentFlashcards() {
     updateMyStudentExample,
   } = useBackend();
 
-  // Local ref to store session updates.
-  // This is necessary to preserve local changes on re-fetch.
-  // localExamples stores difficulty from SRS Quiz
-  const localExamples = useRef<Record<number, Partial<Flashcard>>>({});
-  // localStudentExamples stores pending studentExample records that are not in the backend
-  // This is used to prevent race conditions from erasing negative recordIds
-  const localStudentExamples = useRef<Record<number, StudentExample>>({});
-
-  // Temp ID number for new studentExamples created optimistically
-  const tempIdNum = useRef(-1);
+  // Temporary ID to generate unique placeholder keys for new flashcards
+  // Initialize only if it doesn't exist
+  if (queryClient.getQueryData(['tempIdCounter']) === undefined) {
+    queryClient.setQueryData(['tempIdCounter'], -1);
+  }
 
   // Abbreviated access since it's used frequently
   const activeStudentId = activeStudentQuery.data?.recordId;
@@ -84,57 +80,52 @@ export function useStudentFlashcards() {
 
   const getFlashcardData = async () => {
     let backendResponse: StudentFlashcardData | undefined;
+
+    if (!activeStudentId) {
+      throw new Error('No active student');
+    }
+
     if (
       (userDataQuery.data?.roles.adminRole === 'coach' ||
         userDataQuery.data?.roles.adminRole === 'admin') &&
       activeStudentId
     ) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
-    } else if (
-      // Limited users should not have flashcards, is this a mistake?
-      userDataQuery.data?.roles.studentRole === 'student' ||
-      userDataQuery.data?.roles.studentRole === 'limited'
-    ) {
+    } else if (userDataQuery.data?.roles.studentRole === 'student') {
       backendResponse = await getMyExamplesFromBackend();
     }
-    if (backendResponse === undefined) {
-      throw new Error('No active student');
-    }
+
     if (!backendResponse) {
-      throw new Error('bad response');
+      throw new Error('Failed to get student flashcards; failed to fetch');
     }
 
-    const mergedExampleData = backendResponse.examples.map((flashcard) => ({
-      // Add the difficulty from localExamples if it exists
-      ...localExamples.current[flashcard.recordId],
-      ...flashcard,
-    }));
+    // Get the current cached data (previous session state)
+    const previousData = queryClient.getQueryData<StudentFlashcardData>([
+      'flashcardData',
+      activeStudentId,
+    ]);
 
-    // Preserve local studentExamples that are not in the backend response
-    const preservedLocalExamples = Object.values(
-      localStudentExamples.current,
-    ).filter(
-      (localStudentExample) =>
-        !backendResponse.studentExamples.some(
-          (backendStudentExample: StudentExample) =>
-            backendStudentExample.relatedExample ===
-            localStudentExample.relatedExample,
-        ),
-    );
+    // Preserve the local "difficulty" status from previousData if it exists
+    const mergedExampleData = backendResponse.examples.map((flashcard) => {
+      const previousFlashcard = previousData?.examples.find(
+        (prev) => prev.recordId === flashcard.recordId,
+      );
+      return {
+        ...flashcard,
+        difficulty: previousFlashcard?.difficulty,
+      };
+    });
 
-    const mergedStudentExampleData = [
-      ...backendResponse.studentExamples, // Overwrite any local examples that are in the backend
-      ...preservedLocalExamples, // Add local examples that aren't overwritten
-    ];
+    const mergedStudentExampleData = backendResponse.studentExamples; // Placeholder for future merge needs
 
-    // Merge the two arrays and trim any that don't match
-    const updatedFlashcardData = {
+    const mergedFlashcardData: StudentFlashcardData = {
       examples: mergedExampleData,
       studentExamples: mergedStudentExampleData,
     };
-    const finalObj: StudentFlashcardData | null =
-      matchAndTrimArrays(updatedFlashcardData);
-    return finalObj;
+
+    const validatedMergedData = matchAndTrimArrays(mergedFlashcardData);
+
+    return validatedMergedData;
   };
 
   const flashcardDataQuery = useQuery({
@@ -203,18 +194,21 @@ export function useStudentFlashcards() {
       if (!addPromise) {
         throw new Error('No active student');
       }
-      const addResponse = addPromise.then(
-        (result: number | undefined | string) => {
-          if (typeof result === 'string') {
-            result = Number.parseInt(result);
-          }
-          if (result !== 1) {
-            throw new Error('Failed to add Flashcard');
-          }
-          return result;
-        },
-      );
-      return addResponse;
+      const addResponse = async () => {
+        const result: number | undefined | string = await addPromise;
+
+        if (typeof result === 'string') {
+          return Number.parseInt(result);
+        }
+
+        if (result !== 1) {
+          throw new Error('Failed to add Flashcard');
+        }
+
+        return result;
+      };
+      const data = await addResponse();
+      return data;
     },
     [
       userDataQuery.data?.roles,
@@ -234,30 +228,29 @@ export function useStudentFlashcards() {
       });
 
       // Memoize ID number for rollback, then decrement the tempIdNum for the next flashcard
-      const thisIdNum = tempIdNum.current--;
+      const fetchAndDecrementTempId = () => {
+        let newId = -1;
+        queryClient.setQueryData(['tempIdCounter'], (prevId: number = -1) => {
+          const nextId = prevId - 1;
+          newId = nextId;
+          return nextId;
+        });
+        return newId;
+      };
 
-      // Make placeholder record for student-example until backend responds
-      const today = new Date();
-      const formattedToday = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-      const formattedTomorrow = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate() + 1}`;
+      const thisIdNum = fetchAndDecrementTempId();
 
-      // This needs checking. Types and date formats probably inaccurate.
+      // Format exactly matches type as returned from database except for negative recordId
       const newStudentExample: StudentExample = {
         studentEmailAddress: userDataQuery.data?.emailAddress || '',
         recordId: thisIdNum,
         relatedExample: flashcard.recordId,
         relatedStudent: activeStudentId!,
-        dateCreated: formattedToday,
-        lastReviewedDate: formattedToday,
-        nextReviewDate: formattedTomorrow,
-        reviewInterval: 1,
-        coachAdded: null,
-      };
-
-      // Update the local ref with the new student-example to preserve state on re-fetch
-      localStudentExamples.current = {
-        ...localStudentExamples.current,
-        [newStudentExample.relatedExample]: newStudentExample,
+        dateCreated: toISODateTime(),
+        lastReviewedDate: '',
+        nextReviewDate: '',
+        reviewInterval: null,
+        coachAdded: false,
       };
 
       // Optimistically update the flashcards cache
@@ -272,14 +265,12 @@ export function useStudentFlashcards() {
             const trimmedNewFlashcardData = matchAndTrimArrays(newItem);
             return trimmedNewFlashcardData;
           }
-          const oldFlashcardsCopy = [...oldFlashcards.examples];
-          const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
           const newExampleArray = [
-            ...oldFlashcardsCopy,
+            ...oldFlashcards.examples,
             { ...flashcard, isCollected: true },
           ];
           const newStudentExampleArray = [
-            ...oldStudentFlashcardsCopy,
+            ...oldFlashcards.studentExamples,
             newStudentExample,
           ];
           const newFlashcardData = {
@@ -306,11 +297,18 @@ export function useStudentFlashcards() {
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.examples];
           const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
+          const studentExampleToRemove = oldStudentFlashcardsCopy.find(
+            (studentExample) => studentExample.recordId === thisIdNum,
+          );
           const newStudentExampleArray = oldStudentFlashcardsCopy.filter(
             (studentExample) => studentExample.recordId !== thisIdNum,
           );
+          const newExampleArray = oldFlashcardsCopy.filter(
+            (example) =>
+              example.recordId !== studentExampleToRemove?.relatedExample,
+          );
           const newFlashcardData = {
-            examples: oldFlashcardsCopy,
+            examples: newExampleArray,
             studentExamples: newStudentExampleArray,
           };
           const trimmedNewFlashcardData = matchAndTrimArrays(newFlashcardData);
@@ -384,31 +382,21 @@ export function useStudentFlashcards() {
         ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           // Find the studentFlashcard and related flashcard objects
-          const flashcardObjectOriginal = oldFlashcards.examples.find(
+          studentFlashcardObject = oldFlashcards.studentExamples.find(
+            (studentFlashcard) =>
+              studentFlashcard.relatedExample === flashcardId,
+          );
+          flashcardObject = oldFlashcards.examples.find(
             (flashcard) => flashcard.recordId === flashcardId,
           );
-          const studentFlashcardObjectOriginal =
-            oldFlashcards.studentExamples.find(
-              (studentFlashcard) =>
-                studentFlashcard.relatedExample === flashcardId,
-            );
-
-          // Make a copy if they exist, save to memoized objects
-          studentFlashcardObject = studentFlashcardObjectOriginal
-            ? { ...studentFlashcardObjectOriginal }
-            : undefined;
-          flashcardObject = flashcardObjectOriginal
-            ? { ...flashcardObjectOriginal }
-            : undefined;
 
           // Remove the studentFlashcard and related flashcard object from the cache
-          const oldFlashcardsCopy = [...oldFlashcards.examples];
-          const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
-          const newStudentFlashcardsArray = oldStudentFlashcardsCopy.filter(
-            (studentFlashcard) =>
-              studentFlashcard.relatedExample !== flashcardId,
-          );
-          const newFlashcardsArray = oldFlashcardsCopy.filter(
+          const newStudentFlashcardsArray =
+            oldFlashcards.studentExamples.filter(
+              (studentFlashcard) =>
+                studentFlashcard.relatedExample !== flashcardId,
+            );
+          const newFlashcardsArray = oldFlashcards.examples.filter(
             (flashcard) => flashcard.recordId !== flashcardId,
           );
           const newFlashcardData = {
@@ -419,15 +407,12 @@ export function useStudentFlashcards() {
           return trimmedNewFlashcardData;
         },
       );
-      // Return the memoized objects for rollback
+
+      // Return the memoized objects for rollback in case of error
       return { studentFlashcardObject, flashcardObject };
     },
-    onSuccess: (_data, _variables, context) => {
-      const { flashcardObject } = context;
-      if (flashcardObject?.recordId) {
-        // Remove the local update for the deleted flashcard
-        delete localExamples.current[flashcardObject.recordId];
-      }
+
+    onSuccess: (_data, _variables, _context) => {
       toast.success('Flashcard removed successfully');
     },
 
@@ -546,15 +531,6 @@ export function useStudentFlashcards() {
             };
             const newFlashcard = { ...flashcard, difficulty };
 
-            // Save flashcard in local ref to preserve on refetch
-            localExamples.current = {
-              ...localExamples.current,
-              [flashcard.recordId]: {
-                ...(localExamples.current[flashcard.recordId] || {}), // Keep other properties intact
-                difficulty, // Overwrite the difficulty with the new value
-              },
-            };
-
             // Replace the flashcards in copy of array
             const newStudentFlashcardsArray = oldFlashcardsCopy.map(
               (studentFlashcard) =>
@@ -578,24 +554,28 @@ export function useStudentFlashcards() {
           }
         },
       );
-      // Return the studentExampleId and the previous interval for rollback context
-      return { studentExampleId, newInterval: oldInterval };
+
+      // Return the studentExampleId and the previous interval and difficulty
+      // These are for rollback context in the case of an error
+      return { studentExampleId, oldInterval, difficulty };
+    },
+
+    onSuccess: (_data, _variables) => {
+      toast.success('Flashcard updated successfully');
     },
 
     onError: (error, _variables, context) => {
+      toast.error('Failed to update Flashcard');
       console.error(error);
       // Make sure both necessary values are defined
       if (
         context?.studentExampleId === undefined ||
-        context?.newInterval === undefined
+        context?.oldInterval === undefined
       ) {
         return;
       }
       // Destructure the context
-      const { studentExampleId, newInterval } = context;
-
-      // Remove the local update for this flashcard
-      delete localExamples.current[studentExampleId];
+      const { studentExampleId, oldInterval, difficulty } = context;
 
       // Roll back the cache for just the affected flashcard
       queryClient.setQueryData(
@@ -611,11 +591,11 @@ export function useStudentFlashcards() {
               flashcard.recordId === studentFlashcard?.relatedExample,
           );
           if (studentFlashcard && flashcard) {
-            const newStudentFlashcard = {
+            const newStudentFlashcard: StudentExample = {
               ...studentFlashcard,
-              reviewInterval: newInterval,
+              reviewInterval: oldInterval,
             };
-            const newFlashcard = { ...flashcard, difficulty: undefined };
+            const newFlashcard: Flashcard = { ...flashcard, difficulty };
             const newStudentFlashcardsArray = oldFlashcardsCopy.map(
               (studentFlashcard) =>
                 studentFlashcard.recordId === studentExampleId
