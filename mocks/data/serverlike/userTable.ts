@@ -91,17 +91,17 @@ export const allUsersTable: UserData[] = [
   },
 ];
 
-export function getUserDataFromName(
-  name:
-    | 'admin-empty-role'
-    | 'empty-role'
-    | 'none-role'
-    | 'limited'
-    | 'student-admin'
-    | 'student-lcsp'
-    | 'student-ser-estar'
-    | 'student-no-flashcards'
-    | null,
-): UserData | null {
+export type TestUserNames =
+  | 'admin-empty-role'
+  | 'empty-role'
+  | 'none-role'
+  | 'limited'
+  | 'student-admin'
+  | 'student-lcsp'
+  | 'student-ser-estar'
+  | 'student-no-flashcards'
+  | null;
+
+export function getUserDataFromName(name: TestUserNames): UserData | null {
   return allUsersTable.find((student) => student.name === name) || null;
 }
