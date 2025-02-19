@@ -118,7 +118,7 @@ export type Call = Expanded<{
   caller: QbUser;
   callType: string;
 }>;
-                            
+
 export type Assignment = Expanded<{
   recordId: number;
   assignmentLink: string;
