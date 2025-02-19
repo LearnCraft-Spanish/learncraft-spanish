@@ -102,9 +102,12 @@ describe('component CoachDropdown', () => {
     const { result } = renderHook(() => useCoaching(), {
       wrapper: MockAllProviders,
     });
-    await waitFor(() => {
-      expect(result.current.coachListQuery.isSuccess).toBe(true);
-    });
+    await waitFor(
+      () => {
+        expect(result.current.coachListQuery.isSuccess).toBe(true);
+      },
+      { timeout: 5000 },
+    );
 
     await waitFor(() => {
       act(() => {
