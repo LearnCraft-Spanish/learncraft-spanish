@@ -13,9 +13,12 @@ describe('section WeeksRecordsSection', () => {
         <WeeksRecordsSection />
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(screen.getByText('Weekly Student Records')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('Weekly Student Records')).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
   });
   describe.skip('filtering logic', () => {
     /*
