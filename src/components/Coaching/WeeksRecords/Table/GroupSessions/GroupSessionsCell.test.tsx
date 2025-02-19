@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
@@ -35,7 +35,7 @@ describe('component StudentCell', () => {
   it('renders with valid data', async () => {
     render(
       <MockAllProviders>
-        <GroupSessionsCell week={week} />
+        <GroupSessionsCell week={week} groupSessions={[relatedGroupSession]} />
       </MockAllProviders>,
     );
     await waitFor(() => {
@@ -44,25 +44,15 @@ describe('component StudentCell', () => {
       ).toBeInTheDocument();
     });
   });
-  it('errors with invalid data', async () => {
-    const consoleSpy = vi.spyOn(console, 'error');
-    render(
-      <MockAllProviders>
-        <GroupSessionsCell week={{ ...week, recordId: 0 }} />
-      </MockAllProviders>,
-    );
-    await waitFor(() => {
-      expect(consoleSpy).toBeCalled();
-    });
-
-    vi.restoreAllMocks();
-  });
   describe('contextual menu view', () => {
     // Helper function for successful render
     async function renderWithPopupActive() {
       render(
         <MockAllProviders>
-          <GroupSessionsCell week={week} />
+          <GroupSessionsCell
+            week={week}
+            groupSessions={[relatedGroupSession]}
+          />
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -106,7 +96,8 @@ describe('component StudentCell', () => {
     it('contextual menu view renders the session documents if they exist on the Group Session', async () => {
       await renderWithPopupActive();
       await waitFor(() => {
-        expect(screen.getByText('Session Documents:')).toBeInTheDocument();
+        expect(screen.getByText('Zoom Link:')).toBeInTheDocument();
+        expect(screen.getByText('Call Document:')).toBeInTheDocument();
       });
     });
   });

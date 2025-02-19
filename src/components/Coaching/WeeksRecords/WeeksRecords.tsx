@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -6,13 +12,12 @@ import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 import type { Coach, Course, Week } from '../../../types/CoachingTypes';
 import LoadingMessage from '../../Loading';
+import getDateRange from '../general/functions/dateRange';
 import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
 
 import '../coaching.scss';
 import ViewWeekRecord from './ViewWeekRecord';
-
-import useBANDAIDhelperFunction from './useBANDAIDhelperFunction';
 
 /*
 Notes for Test Cases to write:
@@ -29,7 +34,7 @@ export default function WeeksRecordsSection() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
   const {
-    lastThreeWeeksQuery,
+    weeksQuery,
     coachListQuery,
     courseListQuery,
     activeMembershipsQuery,
@@ -37,13 +42,13 @@ export default function WeeksRecordsSection() {
     groupSessionsQuery,
     groupAttendeesQuery,
     assignmentsQuery,
-    callsQuery,
+    privateCallsQuery,
     getCoachFromMembershipId,
     getCourseFromMembershipId,
     getStudentFromMembershipId,
   } = useCoaching();
 
-  const dateRange = useBANDAIDhelperFunction();
+  const dateRange = useMemo(() => getDateRange(), []);
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
@@ -63,7 +68,7 @@ export default function WeeksRecordsSection() {
 
   const dataReady =
     userDataQuery.isSuccess &&
-    lastThreeWeeksQuery.isSuccess &&
+    weeksQuery.isSuccess &&
     coachListQuery.isSuccess &&
     courseListQuery.isSuccess &&
     activeMembershipsQuery.isSuccess &&
@@ -71,21 +76,33 @@ export default function WeeksRecordsSection() {
     groupSessionsQuery.isSuccess &&
     groupAttendeesQuery.isSuccess &&
     assignmentsQuery.isSuccess &&
-    callsQuery.isSuccess;
+    privateCallsQuery.isSuccess;
 
   const dataLoading =
     !dataReady &&
     (userDataQuery.isLoading ||
-      lastThreeWeeksQuery.isLoading ||
+      weeksQuery.isLoading ||
       coachListQuery.isLoading ||
-      courseListQuery.isLoading);
+      courseListQuery.isLoading ||
+      activeMembershipsQuery.isLoading ||
+      activeStudentsQuery.isLoading ||
+      groupSessionsQuery.isLoading ||
+      groupAttendeesQuery.isLoading ||
+      assignmentsQuery.isLoading ||
+      privateCallsQuery.isLoading);
 
   const dataError =
     !dataReady &&
     (userDataQuery.isError ||
-      lastThreeWeeksQuery.isError ||
+      weeksQuery.isError ||
       coachListQuery.isError ||
-      courseListQuery.isError);
+      courseListQuery.isError ||
+      activeMembershipsQuery.isError ||
+      activeStudentsQuery.isError ||
+      groupSessionsQuery.isError ||
+      groupAttendeesQuery.isError ||
+      assignmentsQuery.isError ||
+      privateCallsQuery.isError);
 
   function toggleAdvancedFilteringMenu() {
     setAdvancedFilteringMenu(!advancedFilteringMenu);
@@ -164,7 +181,6 @@ export default function WeeksRecordsSection() {
     },
     [filterByWeeksAgo, dateRange],
   );
-
   const filterWeeksByCoachlessFunction = useCallback(
     (weeks: Week[]) => {
       if (!filterByCoachless) return weeks;
@@ -175,7 +191,6 @@ export default function WeeksRecordsSection() {
     },
     [filterByCoachless, getCoachFromMembershipId],
   );
-
   const filterWeeksBySearchTerm = useCallback(
     (weeks: Week[]) => {
       if (filterBySearchTerm && filterBySearchTerm.length > 0) {
@@ -198,7 +213,6 @@ export default function WeeksRecordsSection() {
     },
     [filterBySearchTerm, getStudentFromMembershipId],
   );
-
   const filterByCompletionFunction = useCallback(
     (weeks: Week[]) => {
       if (filterByCompletion === 'incompleteOnly') {
@@ -218,12 +232,13 @@ export default function WeeksRecordsSection() {
         return weeks;
       }
       const filteredByCoach = filterByCoachFunction(weeks);
-      const filteredByCourse = filterByCourseFunction(filteredByCoach);
+      const filteredByWeeksAgo = filterWeeksByWeeksAgoFunction(filteredByCoach);
+
+      const filteredByCourse = filterByCourseFunction(filteredByWeeksAgo);
       const filteredByHoldWeeks = filterByHoldWeeksFunction(filteredByCourse);
-      const filteredByWeeksAgo =
-        filterWeeksByWeeksAgoFunction(filteredByHoldWeeks);
+
       const filteredByCoachless =
-        filterWeeksByCoachlessFunction(filteredByWeeksAgo);
+        filterWeeksByCoachlessFunction(filteredByHoldWeeks);
       const filteredByCompletion =
         filterByCompletionFunction(filteredByCoachless);
       const filteredBySearchTerm =
@@ -248,25 +263,28 @@ export default function WeeksRecordsSection() {
   useEffect(() => {
     if (
       !rendered.current &&
-      lastThreeWeeksQuery.isSuccess &&
-      coachListQuery.isSuccess
+      weeksQuery.isSuccess &&
+      coachListQuery.isSuccess &&
+      userDataQuery.isSuccess
     ) {
       const currentUser = userDataQuery.data;
       const currentUserCoach = coachListQuery.data.find(
-        (coach) => coach.user.email === currentUser?.emailAddress,
+        (coach) =>
+          coach.user.email.toLowerCase() ===
+          currentUser?.emailAddress.toLowerCase(),
       );
       if (currentUserCoach) setFilterByCoach(currentUserCoach);
       rendered.current = true;
     }
-  }, [lastThreeWeeksQuery, coachListQuery, userDataQuery]);
+  }, [weeksQuery, coachListQuery, userDataQuery]);
 
   // Filtering useEffect
   useEffect(() => {
     if (dataReady && rendered.current) {
-      const filteredWeeks = filterWeeks(lastThreeWeeksQuery.data);
+      const filteredWeeks = filterWeeks(weeksQuery.data);
       setWeeks(filteredWeeks);
     }
-  }, [dataReady, filterWeeks, lastThreeWeeksQuery.data]);
+  }, [dataReady, filterWeeks, weeksQuery.data]);
 
   return (
     <div className="newCoachingWrapper">

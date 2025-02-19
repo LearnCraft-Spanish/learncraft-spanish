@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
+
 import type { Coach, Course } from 'src/types/CoachingTypes';
 
-import useBANDAIDhelperFunction from '../useBANDAIDhelperFunction';
+import getDateRange from '../../general/functions/dateRange';
 import CoachSelect from './CoachSelector';
 import CourseSelector from './CourseSelector';
 
@@ -44,7 +46,7 @@ export default function WeeksFilter({
   searchTerm,
   updateSearchTerm,
 }: CoachingFilterProps) {
-  const dateRange = useBANDAIDhelperFunction();
+  const dateRange = useMemo(() => getDateRange(), []);
   return (
     dataReady && (
       <div className="coachingFilterSection">

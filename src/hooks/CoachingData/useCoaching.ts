@@ -2,19 +2,24 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useBackend } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
+
+import useWeeks from './useWeeks';
+import useAssignments from './useAssignments';
+import usePrivateCalls from './usePrivateCalls';
+import useGroupSessions from './useGroupSessions';
+import useGroupAttendees from './useGroupAttendees';
+
 export default function useCoaching() {
   const userDataQuery = useUserData();
   const backend = useBackend();
 
+  const { weeksQuery } = useWeeks();
+  const { assignmentsQuery } = useAssignments();
+  const { privateCallsQuery } = usePrivateCalls();
+  const { groupSessionsQuery } = useGroupSessions();
+  const { groupAttendeesQuery } = useGroupAttendees();
+
   /* --------- Queries --------- */
-  const lastThreeWeeksQuery = useQuery({
-    queryKey: ['lastThreeWeeks'],
-    queryFn: backend.getNewWeeks,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
 
   const coachListQuery = useQuery({
     queryKey: ['coachList'],
@@ -52,36 +57,9 @@ export default function useCoaching() {
       userDataQuery.data?.roles.adminRole === 'admin',
   });
 
-  const groupSessionsQuery = useQuery({
-    queryKey: ['groupSessions'],
-    queryFn: backend.getGroupSessions,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const groupAttendeesQuery = useQuery({
-    queryKey: ['groupAttendees'],
-    queryFn: backend.getGroupAttendees,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const assignmentsQuery = useQuery({
-    queryKey: ['assignments'],
-    queryFn: backend.getAssignments,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const callsQuery = useQuery({
-    queryKey: ['calls'],
-    queryFn: backend.getCalls,
+  const studentRecordsLessonsQuery = useQuery({
+    queryKey: ['studentRecordsLessons'],
+    queryFn: backend.getLessonList,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||
@@ -116,6 +94,8 @@ export default function useCoaching() {
       if (!student) return undefined;
 
       const coachObject = student.primaryCoach;
+      if (!coachObject) return undefined;
+
       const coach = coachListQuery.data.find(
         (coach) => coach.user.id === coachObject.id,
       );
@@ -190,7 +170,7 @@ export default function useCoaching() {
 
   const getAttendeeWeeksFromGroupSessionId = useCallback(
     (sessionId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      if (!groupAttendeesQuery.isSuccess || !weeksQuery.isSuccess) {
         return null;
       }
       const attendeeList = groupAttendeesQuery.data.filter(
@@ -199,38 +179,19 @@ export default function useCoaching() {
       if (attendeeList.length === 0) return undefined;
 
       const weekRecordsList = attendeeList.map((attendee) =>
-        lastThreeWeeksQuery.data.find(
-          (week) => week.recordId === attendee.student,
-        ),
+        weeksQuery.data.find((week) => week.recordId === attendee.student),
       );
       if (weekRecordsList.length === 0) return undefined;
       return weekRecordsList;
     },
-    [groupAttendeesQuery, lastThreeWeeksQuery],
+    [
+      groupAttendeesQuery.isSuccess,
+      groupAttendeesQuery.data,
+      weeksQuery.isSuccess,
+      weeksQuery.data,
+    ],
   );
 
-  const getGroupSessionFromWeekRecordId = useCallback(
-    (weekRecordId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
-        return null;
-      }
-      const attendeeList = groupAttendeesQuery.data.filter(
-        (attendee) => attendee.student === weekRecordId,
-      );
-      if (attendeeList.length === 0) return undefined;
-
-      const groupSession = groupSessionsQuery.data.find((groupSession) =>
-        attendeeList.find(
-          (attendee) => attendee.groupSession === groupSession.recordId,
-        ),
-      );
-      if (!groupSession) return undefined;
-      return groupSession;
-    },
-    [groupAttendeesQuery, groupSessionsQuery],
-  );
-  // should There only be one group session per week record?
-  // Answer: theoretically possible, if the group reschedules the session
   const getGroupSessionsFromWeekRecordId = useCallback(
     (weekRecordId: number) => {
       if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
@@ -246,7 +207,12 @@ export default function useCoaching() {
       );
       return groupSessionList;
     },
-    [groupAttendeesQuery, groupSessionsQuery],
+    [
+      groupAttendeesQuery.data,
+      groupAttendeesQuery.isSuccess,
+      groupSessionsQuery.data,
+      groupSessionsQuery.isSuccess,
+    ],
   );
 
   const getAssignmentsFromWeekRecordId = useCallback(
@@ -260,19 +226,17 @@ export default function useCoaching() {
       if (assignments.length === 0) return undefined;
       return assignments;
     },
-    [assignmentsQuery],
+    [assignmentsQuery.data, assignmentsQuery.isSuccess],
   );
 
   const getMembershipFromWeekRecordId = useCallback(
     (weekId: number | undefined) => {
-      if (!activeMembershipsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      if (!activeMembershipsQuery.isSuccess || !weeksQuery.isSuccess) {
         return null;
       }
       if (!weekId) return undefined;
 
-      const week = lastThreeWeeksQuery.data.find(
-        (week) => week.recordId === weekId,
-      );
+      const week = weeksQuery.data.find((week) => week.recordId === weekId);
       if (!week) return undefined;
 
       const membershipId = week.relatedMembership;
@@ -282,32 +246,37 @@ export default function useCoaching() {
       if (!membership) return undefined;
       return membership;
     },
-    [activeMembershipsQuery, lastThreeWeeksQuery],
+    [
+      activeMembershipsQuery.data,
+      activeMembershipsQuery.isSuccess,
+      weeksQuery.data,
+      weeksQuery.isSuccess,
+    ],
   );
 
   const getPrivateCallsFromWeekRecordId = useCallback(
     (weekId: number) => {
-      if (!callsQuery.isSuccess || !lastThreeWeeksQuery.isSuccess) {
+      if (!privateCallsQuery.isSuccess) {
         return null;
       }
-      const privateCalls = callsQuery.data.filter(
+      const privateCalls = privateCallsQuery.data.filter(
         (call) => call.relatedWeek === weekId,
       );
       return privateCalls;
     },
-    [callsQuery, lastThreeWeeksQuery],
+    [privateCallsQuery.data, privateCallsQuery.isSuccess],
   );
 
   const getAttendeesFromGroupSessionId = useCallback(
     (sessionId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+      if (!groupAttendeesQuery.isSuccess) {
         return null;
       }
       return groupAttendeesQuery.data.filter(
         (attendee) => attendee.groupSession === sessionId,
       );
     },
-    [groupAttendeesQuery, groupSessionsQuery],
+    [groupAttendeesQuery.isSuccess, groupAttendeesQuery.data],
   );
   /* --------- Other Helper Functions --------- */
 
@@ -335,22 +304,23 @@ export default function useCoaching() {
   }, []);
 
   return {
-    lastThreeWeeksQuery,
+    weeksQuery,
     coachListQuery,
     courseListQuery,
     activeMembershipsQuery,
     activeStudentsQuery,
     groupSessionsQuery,
     groupAttendeesQuery,
+    studentRecordsLessonsQuery,
+
     assignmentsQuery,
-    callsQuery,
+    privateCallsQuery,
 
     getCoachFromMembershipId,
     getCourseFromMembershipId,
     getStudentFromMembershipId,
     getAttendeeWeeksFromGroupSessionId,
     getAttendeesFromGroupSessionId,
-    getGroupSessionFromWeekRecordId,
     getGroupSessionsFromWeekRecordId,
 
     getAssignmentsFromWeekRecordId,

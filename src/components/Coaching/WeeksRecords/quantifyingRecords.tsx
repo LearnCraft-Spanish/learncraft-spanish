@@ -8,10 +8,6 @@ export default function QuantifiedRecords({
   totalRecords,
   recordsPerPage,
 }: QuantifiedRecordsProps) {
-  // const [firstRecordShown, setFirstRecordShown] = useState(1);
-  // const [lastRecordShown, setLastRecordShown] = useState(50);
-  // const [recordsPerPage, setRecordsPerPage] = useState(50);
-
   if (totalRecords === 0) {
     return <h5>Showing 0 records</h5>;
   }
@@ -35,10 +31,6 @@ export default function QuantifiedRecords({
             records
           </>
         )}
-        {/* THIS NEEDS TO HAVE A CASE FOR 0 EXAMPLES
-        showing {} - {} of {} found records Showing Records{' '}
-        {page === 1 ? 1 : (page - 1) * 50} -{' '}
-        {page * 50 <= weeks.length ? page * 50 : weeks.length} */}
       </h4>
     </div>
   );
