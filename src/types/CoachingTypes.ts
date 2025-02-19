@@ -1,13 +1,15 @@
 // This is the value returned for data of type user
 // if sending a user data to quickbase, only the id is required
-export interface QbUser {
+import type { Expanded } from './interfaceDefinitions';
+
+export type QbUser = Expanded<{
   email: string;
   id: string;
   name: string;
   userName?: string;
-}
+}>;
 
-export interface Week {
+export type Week = Expanded<{
   weekStarts: Date | string;
   assignmentRatings: string[];
   privateCallRatings: string[];
@@ -40,89 +42,9 @@ export interface Week {
   membershipCourseHasGroupCalls: boolean;
   membershipCourseWeeklyPrivateCalls: number;
   bundleCreditsUsed: number;
-  // blankUser: QbUser | undefined;
-}
-/*
-  export interface Week {
-  student: string;
-  level: string;
-  primaryCoach: QbUser;
-  weekStarts: Date | string;
-  assignmentRatings: string[];
-  privateCallRatings: string[];
-  addPrivateCall: string;
-  numberOfGroupCalls: number;
-  groupCallComments: string[];
-  currentLessonName: string;
-  notes: string;
-  holdWeek: boolean;
-  recordsComplete: boolean;
-  membershipStudentCallCreditsRemaining: number;
-  OfCallsPrivateGroup: number; //NumberOfCallsPrivateGroup
-  addAssignment: string;
-  addAttendee: string;
-  assignmentPerformance: number | null;
-  assignments: unknown;
-  assignmentsCompleted: number;
-  attendees: unknown;
-  badRecord: boolean;
-  baseDate: Date | string;
-  blankUser: QbUser | null;
-  bundleCreditsUsed: number;
-  callPerformance: number | null;
-  calls: unknown;
-  checklistComplete: boolean;
-  combinedKeyForUniques: string;
-  currentLesson: number;
-  dateCreated: Date | string;
-  dateModified: Date | string;
-  endingThisWeek: boolean;
-  lastModifiedBy: QbUser;
-  membershipActive: boolean;
-  membershipCourseHasGroupCalls: boolean;
-  membershipCourseWeeklyPrivateCalls: number;
-  membershipEndDate: Date | string;
-  membershipOnHold: boolean;
-  membershipRelatedStudentHasGroupCalls: boolean;
-  membershipRelatedStudentRecordIdPurchasedBundle: string;
-  membershipRelatedStudentRecordIdRelatedCoach: number;
-  membershipRelatedStudentWeeklyPrivateCalls: number;
-  membershipStartDate: Date | string;
-  membershipStudentMemberUntil: Date | string;
-  membershipName: string;
-  offTrack: boolean;
-  primaryCoachWhenCreated: string;
-  privateCallsCompleted: number;
-  recordCompletable: boolean;
-  recordId: number;
-  recordOwner: QbUser;
-  recordsCompleteRef: number;
-  relatedMembership: number;
-  relatedMembershipRecordIdActive: boolean;
-  week: number; //WeekNumber
-  weekEnds: Date | string;
-  weekName: string;
-}
-*/
-/*
--- UNUSED, probably deleting soon
-export interface NewWeek {
-  student: string;
-  level: string;
-  primaryCoachWhenCreated: string;
-  weekStarts: string | Date;
-  assignmentRatings: string;
-  numberOfGroupCalls: number;
-  groupCallComments: string;
-  currentLessonName: string;
-  notes: string;
-  holdWeek: boolean;
-  recordsComplete: boolean;
-  membershipStudentCallCreditsRemaining: number;
-  recordId: number;
-}
-*/
-export interface Student {
+}>;
+
+export type Student = Expanded<{
   recordId: number;
   firstName: string;
   lastName: string;
@@ -132,8 +54,9 @@ export interface Student {
   fluencyGoal: string;
   startingLevel: string;
   primaryCoach: QbUser;
-}
-export interface Membership {
+}>;
+
+export type Membership = Expanded<{
   recordId: number;
   active: boolean;
   onHold: boolean;
@@ -142,44 +65,49 @@ export interface Membership {
   lastRecordedWeekStarts: Date | string;
   relatedCourse: number;
   relatedStudent: number;
-}
-export interface Lesson {
+}>;
+
+export type Lesson = Expanded<{
   recordId: number;
   lessonName: string;
   weekRef: number;
   type: string;
-}
-export interface GroupSession {
+}>;
+
+export type GroupSession = Expanded<{
   recordId: number;
   date: Date | string;
   coach: QbUser;
   zoomLink: string;
   topic: string;
   comments: string;
-  // relatedCoach: number;
   sessionType: string;
   callDocument: string;
-}
-export interface GroupAttendees {
+}>;
+
+export type GroupAttendees = Expanded<{
   recordId: number;
   groupSession: number;
   student: number; // is actually the recordId of the associated Week record
   weekStudent: string;
   groupSessionDate: Date | string;
-}
-export interface Course {
+}>;
+
+export type Course = Expanded<{
   recordId: number;
   name: string;
   membershipType: string;
   weeklyPrivateCalls: number;
   hasGroupCalls: boolean;
-}
-export interface Coach {
+}>;
+
+export type Coach = Expanded<{
   recordId: number;
   coach: string;
   user: QbUser;
-}
-export interface Call {
+}>;
+
+export type Call = Expanded<{
   recordId: number;
   relatedWeek: number;
   recording: string;
@@ -189,8 +117,9 @@ export interface Call {
   date: Date | string;
   caller: QbUser;
   callType: string;
-}
-export interface Assignment {
+}>;
+                            
+export type Assignment = Expanded<{
   recordId: number;
   assignmentLink: string;
   relatedWeek: number;
@@ -200,10 +129,7 @@ export interface Assignment {
   notes: string;
   homeworkCorrector: QbUser;
   weekStarts: Date | string;
-  // Missing:
-  // Assignment Name // This is a formula - text
-  // Week - Primary Coach // This is a lookup field in qb, from the Week table, not needed on the front end
-}
+}>;
 
 /* wild backend call with 5 arrays */
 export type getLastThreeWeeksResponse = [
