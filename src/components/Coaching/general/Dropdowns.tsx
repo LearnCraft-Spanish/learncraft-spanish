@@ -9,12 +9,14 @@ export default function Dropdown({
   onChange,
   options,
   editMode,
+  defaultOptionText,
 }: {
   label: string;
-  value: string;
-  onChange: (value: React.SetStateAction<string>) => void;
+  value: string | undefined;
+  onChange: (value: string) => void;
   options: string[];
   editMode: boolean;
+  defaultOptionText?: string;
 }) {
   const camelLabel = camelize(label);
   return (
@@ -29,7 +31,7 @@ export default function Dropdown({
           value={value}
           onChange={(e) => onChange(e.target.value)}
         >
-          <option value="">Select</option>
+          <option value={undefined}>{defaultOptionText || 'Select'}</option>
           {options.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -48,11 +50,13 @@ export function CoachDropdown({
   onChange,
   editMode,
   label = 'Coach',
+  defaultOptionText = undefined,
 }: {
   coachEmail: string;
   onChange: (value: string) => void;
   editMode: boolean;
   label?: string;
+  defaultOptionText?: string;
 }) {
   const { coachListQuery } = useCoaching();
 
@@ -78,7 +82,7 @@ export function CoachDropdown({
             value={coachEmail}
             onChange={(e) => onChange(e.target.value)}
           >
-            <option value="">Select</option>
+            <option value={undefined}>{defaultOptionText || 'Select'}</option>
 
             {coachListQuery.data?.map((coach) => (
               <option key={coach.coach} value={coach.user.email}>

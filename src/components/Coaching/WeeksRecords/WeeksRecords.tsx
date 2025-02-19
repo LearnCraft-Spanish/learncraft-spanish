@@ -109,17 +109,17 @@ export default function WeeksRecordsSection() {
   }
 
   /* ------------------ Update Filter State ------------------ */
-  function updateCoachFilter(coachId: string | number) {
-    if (!coachListQuery.data) throw new Error('Unable to find coach list');
+  function updateCoachFilter(coachEmail: string) {
+    if (!coachListQuery.data) throw new Error('Unable to load coach list');
     const coachToSet = coachListQuery.data.find(
-      (coach) => coach.recordId === Number(coachId),
+      (coach) => coach.user.email === coachEmail,
     );
     setFilterByCoach(coachToSet);
   }
-  function updateCourseFilter(courseId: string | number) {
-    if (!courseListQuery.data) throw new Error('Unable to find course list');
+  function updateCourseFilter(courseName: string | undefined) {
+    if (!courseListQuery.data) throw new Error('Unable to load course list');
     const courseToSet = courseListQuery.data.find(
-      (course) => course.recordId === Number(courseId),
+      (course) => course.name === courseName,
     );
     setFilterByCourse(courseToSet);
   }
