@@ -162,10 +162,13 @@ export default function AudioQuiz({
         (currentCountdownLength.current - newNumber) /
         currentCountdownLength.current;
       setProgressStatus(progressPercent);
-    } else if (currentCountdownLength.current > 0) {
-      setCountdown(0);
+      // } else if (currentCountdownLength.current > 0) {
+      //   setCountdown(0);
+      // } else {
+      //   setCountdown(undefined);
+      // }
     } else {
-      setCountdown(undefined);
+      setCountdown(0);
     }
   }, [countdown, currentCountdownLength]);
 
@@ -182,7 +185,7 @@ export default function AudioQuiz({
 
   /*       Audio Handling     */
   const playAudio = useCallback(() => {
-    // add catch for when audio not supported (url is empty)
+    // setting length for progress bar countdown
     if (autoplay) {
       if (audioRef.current?.duration) {
         const currentDuration = audioRef.current.duration;
@@ -196,14 +199,24 @@ export default function AudioQuiz({
         }
       }
     }
-    if (audioRef.current?.duration) {
-      audioRef.current.play().catch((e: unknown) => {
+    // Audio playing logic
+    if (!Number.isNaN(audioRef.current?.duration)) {
+      try {
+        audioRef.current?.play();
+      } catch (e) {
         if (e instanceof Error) {
           console.error(e.message);
         } else {
           console.error('Error playing audio. Error: ', e);
         }
-      });
+      }
+      // audioRef.current.play().catch((e: unknown) => {
+      //   if (e instanceof Error) {
+      //     console.error(e.message);
+      //   } else {
+      //     console.error('Error playing audio. Error: ', e);
+      //   }
+      // });
     }
   }, [autoplay, initialQuizStart]);
 
@@ -232,26 +245,25 @@ export default function AudioQuiz({
     clearTimeout(currentCountdown.current);
   }
 
-  function audioElement() {
-    return (
-      <audio
-        ref={audioRef}
-        src={currentStepValue.audio}
-        onLoadedMetadata={() => {
-          playAudio();
-        }}
-      ></audio>
-    );
-  }
-  function preloadAudioElement() {
-    return (
-      <div id="preloadingNextExampleAudio">
-        <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
-        <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
-      </div>
-    );
-  }
-
+  // function audioElement() {
+  //   return (
+  //     <audio
+  //       ref={audioRef}
+  //       src={currentStepValue.audio}
+  //       preload="auto"
+  //       onLoadedMetadata={() => playAudio()}
+  //     />
+  //   );
+  // }
+  // /*      Preloading Audio      */
+  // function preloadAudioElement() {
+  //   return (
+  //     <div id="preloadingNextExampleAudio">
+  //       <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
+  //       <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
+  //     </div>
+  //   );
+  // }
   const preloadNextExampleAudio = useCallback(
     (index: number) => {
       if (index < displayOrder.length) {
@@ -274,6 +286,7 @@ export default function AudioQuiz({
     const nextExampleIndex = currentExampleIndex + 1;
     if (nextExampleIndex < displayOrder?.length) {
       setCurrentExampleIndex(nextExampleIndex);
+
       preloadNextExampleAudio(nextExampleIndex + 1);
     } else {
       setCurrentExampleIndex(displayOrder?.length - 1 || 0);
@@ -420,7 +433,11 @@ export default function AudioQuiz({
   ]);
 
   // Play Audio when step is taken
-  useEffect(() => playAudio(), [currentStepValue, playAudio]);
+  useEffect(() => {
+    if (currentStepValue.text === 'Make a guess!') {
+      playAudio();
+    }
+  }, [currentStepValue, playAudio]);
 
   // when step taken, set currentStepValue accordingly
   useEffect(() => {
@@ -502,8 +519,17 @@ export default function AudioQuiz({
               incrementOnAdd={incrementOnAdd}
               onRemove={onRemove}
             />
-            {audioElement()}
-            {preloadAudioElement()}
+            {/* Audio elements */}
+            <audio
+              ref={audioRef}
+              src={currentStepValue.audio}
+              preload="auto"
+              onCanPlay={() => playAudio()}
+            />
+            <div id="preloadingNextExampleAudio">
+              <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
+              <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
+            </div>
           </div>
           <AudioQuizButtons
             incrementCurrentStep={incrementCurrentStep}
