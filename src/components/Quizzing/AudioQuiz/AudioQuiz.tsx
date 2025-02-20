@@ -18,6 +18,7 @@ import '../AudioQuiz/AudioBasedReview.css';
 interface StepValue {
   audio: string;
   text: string | JSX.Element;
+  step: stepValues | '';
 }
 
 type stepValues = 'question' | 'guess' | 'hint' | 'answer';
@@ -95,32 +96,42 @@ export default function AudioQuiz({
   const questionValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
       return audioOrComprehension === 'audio'
-        ? { audio: currentExample?.englishAudio, text: 'Playing English!' }
+        ? {
+            audio: currentExample?.englishAudio,
+            text: 'Playing English!',
+            step: 'question',
+          }
         : {
             audio: currentExample?.spanishAudioLa,
             text: <em>Listen to Audio</em>,
+            step: 'question',
           };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: '' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const guessValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return { audio: '', text: 'Make a guess!' };
+      return { audio: '', text: 'Make a guess!', step: 'guess' };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: 'guess' };
   }, [currentExample, currentStep]);
 
   const hintValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
       return audioOrComprehension === 'audio'
-        ? { audio: currentExample?.spanishAudioLa, text: 'Playing Spanish!' }
+        ? {
+            audio: currentExample?.spanishAudioLa,
+            text: 'Playing Spanish!',
+            step: 'hint',
+          }
         : {
             audio: currentExample?.spanishAudioLa,
             text: currentExample?.spanishExample,
+            step: 'hint',
           };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: 'hint' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const answerValue = useMemo((): StepValue => {
@@ -129,10 +140,15 @@ export default function AudioQuiz({
         ? {
             audio: currentExample?.spanishAudioLa,
             text: currentExample.spanishExample,
+            step: 'answer',
           }
-        : { audio: '', text: currentExample?.englishTranslation };
+        : {
+            audio: '',
+            text: currentExample?.englishTranslation,
+            step: 'answer',
+          };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: 'answer' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   // Get the values related to the current step
@@ -184,25 +200,11 @@ export default function AudioQuiz({
   }
 
   /*       Audio Handling     */
-  const playAudio = useCallback(() => {
-    // setting length for progress bar countdown
-    if (autoplay) {
-      if (audioRef.current?.duration) {
-        const currentDuration = audioRef.current.duration;
-        startCountdown(currentDuration + 1.5);
-        if (!initialQuizStart) {
-          setInitialQuizStart(true);
-        }
-      } else {
-        if (prevAudioRefDuration.current) {
-          startCountdown(prevAudioRefDuration.current + 1.5);
-        }
-      }
-    }
+  const playAudio = useCallback(async () => {
     // Audio playing logic
-    if (!Number.isNaN(audioRef.current?.duration)) {
+    if (currentStep !== 'guess') {
       try {
-        audioRef.current?.play();
+        await audioRef.current?.play();
       } catch (e) {
         if (e instanceof Error) {
           console.error(e.message);
@@ -218,7 +220,21 @@ export default function AudioQuiz({
       //   }
       // });
     }
-  }, [autoplay, initialQuizStart]);
+    // setting length for progress bar countdown
+    if (autoplay) {
+      if (audioRef.current?.duration) {
+        const currentDuration = audioRef.current.duration;
+        startCountdown(currentDuration + 1.5);
+        if (!initialQuizStart) {
+          setInitialQuizStart(true);
+        }
+      } else {
+        if (prevAudioRefDuration.current) {
+          startCountdown(prevAudioRefDuration.current + 1.5);
+        }
+      }
+    }
+  }, [autoplay, initialQuizStart, currentStep]);
 
   const pauseAudio = useCallback(() => {
     if (audioRef.current) {
@@ -245,16 +261,16 @@ export default function AudioQuiz({
     clearTimeout(currentCountdown.current);
   }
 
-  // function audioElement() {
-  //   return (
-  //     <audio
-  //       ref={audioRef}
-  //       src={currentStepValue.audio}
-  //       preload="auto"
-  //       onLoadedMetadata={() => playAudio()}
-  //     />
-  //   );
-  // }
+  function audioElement() {
+    return (
+      <audio
+        ref={audioRef}
+        src={currentStepValue.audio}
+        preload="auto"
+        onLoadedMetadata={() => playAudio()}
+      />
+    );
+  }
   // /*      Preloading Audio      */
   // function preloadAudioElement() {
   //   return (
@@ -434,9 +450,7 @@ export default function AudioQuiz({
 
   // Play Audio when step is taken
   useEffect(() => {
-    if (currentStepValue.text === 'Make a guess!') {
-      playAudio();
-    }
+    playAudio();
   }, [currentStepValue, playAudio]);
 
   // when step taken, set currentStepValue accordingly
@@ -444,7 +458,7 @@ export default function AudioQuiz({
     if (autoplay) {
       setProgressStatus(0); // reset progress bar
     }
-  }, [autoplay, currentStep]);
+  }, [autoplay, currentStep, currentExample]);
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
@@ -520,12 +534,7 @@ export default function AudioQuiz({
               onRemove={onRemove}
             />
             {/* Audio elements */}
-            <audio
-              ref={audioRef}
-              src={currentStepValue.audio}
-              preload="auto"
-              onCanPlay={() => playAudio()}
-            />
+            {audioElement()}
             <div id="preloadingNextExampleAudio">
               <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
               <audio ref={preloadSpanishAudioRef} preload="auto"></audio>

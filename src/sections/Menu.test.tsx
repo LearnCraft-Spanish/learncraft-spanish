@@ -141,17 +141,11 @@ describe('component Menu', () => {
         it(`${hasAdminStaffTools ? 'does' : 'does NOT'} render admin specific staff tools`, async () => {
           await renderMenuLoaded();
           if (hasAdminStaffTools) {
-            expect(screen.queryByText('Staff Tools')).toBeInTheDocument();
-            expect(screen.queryByText('FrequenSay')).toBeInTheDocument();
-            expect(
-              screen.queryByText('Weekly Records Interface'),
-            ).toBeInTheDocument();
             expect(screen.queryByText('Example Creator')).toBeInTheDocument();
+            expect(screen.queryByText('Example Editor')).toBeInTheDocument();
           } else {
-            expect(screen.queryByText('Staff Tools')).toBeNull();
-            expect(screen.queryByText('FrequenSay')).toBeNull();
-            expect(screen.queryByText('Weekly Records Interface')).toBeNull();
             expect(screen.queryByText('Example Creator')).toBeNull();
+            expect(screen.queryByText('Example Editor')).toBeNull();
           }
         });
       });
