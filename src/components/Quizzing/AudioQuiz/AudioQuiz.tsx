@@ -61,6 +61,9 @@ export default function AudioQuiz({
   const currentCountdown = useRef<any>(0);
   const [progressStatus, setProgressStatus] = useState<number>(0); // visual progress bar percentage (0-100)
 
+  const preloadEnglishAudioRef = useRef<HTMLAudioElement | null>(null);
+  const preloadSpanishAudioRef = useRef<HTMLAudioElement | null>(null);
+
   const [initialQuizStart, setInitialQuizStart] = useState<boolean>(false); // Makes sure the first quiz audio is loaded and playing before countdown starts
   // Memo to parse quiz examples
   const [displayOrder, setDisplayOrder] = useState(() => {
@@ -240,16 +243,43 @@ export default function AudioQuiz({
       ></audio>
     );
   }
+  function preloadAudioElement() {
+    return (
+      <div id="preloadingNextExampleAudio">
+        <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
+        <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
+      </div>
+    );
+  }
+
+  const preloadNextExampleAudio = useCallback(
+    (index: number) => {
+      if (index < displayOrder.length) {
+        const nextExample = displayOrder[index];
+        if (preloadEnglishAudioRef.current) {
+          preloadEnglishAudioRef.current.src = nextExample?.englishAudio;
+          preloadEnglishAudioRef.current.load();
+        }
+        if (preloadSpanishAudioRef.current) {
+          preloadSpanishAudioRef.current.src = nextExample?.spanishAudioLa;
+          preloadSpanishAudioRef.current.load();
+        }
+      }
+    },
+    [displayOrder],
+  );
 
   // Skips to the next whole example
   const incrementExample = useCallback(() => {
-    if (currentExampleIndex + 1 < displayOrder?.length) {
-      setCurrentExampleIndex(currentExampleIndex + 1);
+    const nextExampleIndex = currentExampleIndex + 1;
+    if (nextExampleIndex < displayOrder?.length) {
+      setCurrentExampleIndex(nextExampleIndex);
+      preloadNextExampleAudio(nextExampleIndex + 1);
     } else {
       setCurrentExampleIndex(displayOrder?.length - 1 || 0);
     }
     setCurrentStep('question');
-  }, [currentExampleIndex, displayOrder]);
+  }, [currentExampleIndex, displayOrder, preloadNextExampleAudio]);
 
   // Skips to the previous whole example
   const decrementExample = useCallback(
@@ -473,6 +503,7 @@ export default function AudioQuiz({
               onRemove={onRemove}
             />
             {audioElement()}
+            {preloadAudioElement()}
           </div>
           <AudioQuizButtons
             incrementCurrentStep={incrementCurrentStep}
