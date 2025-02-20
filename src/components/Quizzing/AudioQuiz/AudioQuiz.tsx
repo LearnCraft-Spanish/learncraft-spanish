@@ -299,6 +299,8 @@ export default function AudioQuiz({
 
   // Skips to the next whole example
   const incrementExample = useCallback(() => {
+    clearCountDown();
+    pauseAudio();
     const nextExampleIndex = currentExampleIndex + 1;
     if (nextExampleIndex < displayOrder?.length) {
       setCurrentExampleIndex(nextExampleIndex);
@@ -308,11 +310,18 @@ export default function AudioQuiz({
       setCurrentExampleIndex(displayOrder?.length - 1 || 0);
     }
     setCurrentStep('question');
-  }, [currentExampleIndex, displayOrder, preloadNextExampleAudio]);
+  }, [
+    currentExampleIndex,
+    displayOrder?.length,
+    pauseAudio,
+    preloadNextExampleAudio,
+  ]);
 
   // Skips to the previous whole example
   const decrementExample = useCallback(
     (customDecrement: undefined | stepValues = undefined) => {
+      clearCountDown();
+      pauseAudio();
       if (currentExampleIndex > 0) {
         setCurrentExampleIndex(currentExampleIndex - 1);
       } else {
@@ -325,7 +334,7 @@ export default function AudioQuiz({
         setCurrentStep('question');
       }
     },
-    [currentExampleIndex],
+    [currentExampleIndex, pauseAudio],
   );
 
   // Steps the quiz forward
