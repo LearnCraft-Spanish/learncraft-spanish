@@ -366,8 +366,8 @@ export function useBackend() {
   /*      POST Requests      */
 
   const createMyStudentExample = useCallback(
-    (exampleId: number): Promise<number> => {
-      return postFactory<number>('create-my-student-example', {
+    (exampleId: number): Promise<number[]> => {
+      return postFactory<number[]>('create-my-student-example', {
         exampleid: exampleId,
       });
     },
@@ -375,8 +375,8 @@ export function useBackend() {
   );
 
   const createStudentExample = useCallback(
-    (studentId: number, exampleId: number): Promise<number> => {
-      return postFactory<number>('create-student-example', {
+    (studentId: number, exampleId: number): Promise<number[]> => {
+      return postFactory<number[]>('create-student-example', {
         studentid: studentId,
         exampleid: exampleId,
       });

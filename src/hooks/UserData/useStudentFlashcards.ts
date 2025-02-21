@@ -195,17 +195,17 @@ export function useStudentFlashcards() {
         throw new Error('No active student');
       }
       const addResponse = async () => {
-        const result: number | undefined | string = await addPromise;
-
-        if (typeof result === 'string') {
-          return Number.parseInt(result);
+        const result: number[] | string[] | undefined = await addPromise;
+        let createdId = result?.[0];
+        if (typeof createdId === 'string') {
+          createdId = Number.parseInt(createdId);
         }
 
-        if (result !== 1) {
+        if (!createdId) {
           throw new Error('Failed to add Flashcard');
         }
 
-        return result;
+        return createdId;
       };
       const data = await addResponse();
       return data;
@@ -283,9 +283,11 @@ export function useStudentFlashcards() {
       );
       return thisIdNum;
     },
-    onSuccess: (_data, _variables) => {
+
+    onSuccess: (_data, _variables, _context) => {
       toast.success('Flashcard added successfully');
     },
+
     onError: (error, _variables, context) => {
       toast.error('Failed to add Flashcard');
       console.error(error);
