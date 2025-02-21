@@ -25,8 +25,7 @@ describe('useProgramTable', async () => {
     });
     expect(result.current.programTableQuery.data?.length).toBeGreaterThan(0);
   });
-
-  describe.skip('data structure', () => {
+  describe('data structure', () => {
     // These tests are failing with the new program: "Post-Podcast Lessons"
     it('each program has lessons array with length greater than 0', async () => {
       const { result } = renderHook(() => useProgramTable(), {
