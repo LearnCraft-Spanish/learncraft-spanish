@@ -154,7 +154,7 @@ export function useBackend() {
     }, [getFactory]);
 
   const getNewWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
-    return getFactory('coaching/weeks-new-format');
+    return getFactory('coaching/weeks');
   }, [getFactory]);
 
   const getGroupAttendees = useCallback((): Promise<
@@ -176,7 +176,7 @@ export function useBackend() {
   }, [getFactory]);
 
   const getCalls = useCallback((): Promise<StudentRecordsTypes.Call[]> => {
-    return getFactory('coaching/calls');
+    return getFactory('coaching/private-calls');
   }, [getFactory]);
   /*      POST Requests      */
 
@@ -205,8 +205,8 @@ export function useBackend() {
   );
 
   const createMyStudentExample = useCallback(
-    (exampleId: number): Promise<number> => {
-      return postFactory<number>('create-my-student-example', {
+    (exampleId: number): Promise<number[]> => {
+      return postFactory<number[]>('create-my-student-example', {
         exampleid: exampleId,
       });
     },
@@ -214,8 +214,8 @@ export function useBackend() {
   );
 
   const createStudentExample = useCallback(
-    (studentId: number, exampleId: number): Promise<number> => {
-      return postFactory<number>('create-student-example', {
+    (studentId: number, exampleId: number): Promise<number[]> => {
+      return postFactory<number[]>('create-student-example', {
         studentid: studentId,
         exampleid: exampleId,
       });
