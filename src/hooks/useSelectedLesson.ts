@@ -94,6 +94,9 @@ export function useSelectedLesson() {
         });
         return isAllowed;
       });
+      if (!requiredVocabulary.length && !selectionState.fromLesson) {
+        return filteredByAllowedVocab;
+      }
       if (!requiredVocabulary.length) {
         return [];
       }
@@ -107,7 +110,7 @@ export function useSelectedLesson() {
         return isRequired;
       });
     },
-    [allowedVocabulary, requiredVocabulary],
+    [allowedVocabulary, requiredVocabulary, selectionState.fromLesson],
   );
 
   const newToLesson = useCallback(
@@ -140,7 +143,7 @@ export function useSelectedLesson() {
         (oldState: typeof initialSelectionState) => ({
           ...oldState,
           program: newProgram,
-          fromLesson: newProgram?.lessons ? newProgram.lessons[0] : null,
+          fromLesson: null,
           toLesson: newToLesson(newProgram),
         }),
       );
