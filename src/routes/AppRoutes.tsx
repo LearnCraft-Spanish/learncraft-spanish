@@ -12,7 +12,6 @@ import AudioBasedReview from '../sections/AudioBasedReview';
 import FrequenSay from '../sections/FrequenSay';
 import NotFoundPage from '../NotFoundPage';
 import LCSPQuizApp from '../sections/LCSPQuizApp';
-
 import SentryRoutes from './SentryRoutes';
 
 export default function AppRoutes() {

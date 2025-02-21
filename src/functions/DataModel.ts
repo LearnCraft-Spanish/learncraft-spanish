@@ -45,6 +45,8 @@ const qb = {
           'Cohort D Current Lesson',
           'Cohort E Current Lesson',
           'Cohort F Current Lesson',
+          'Cohort G Current Lesson',
+          //'Cohort H Current Lesson',
         ],
       },
 
