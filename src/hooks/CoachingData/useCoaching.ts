@@ -116,6 +116,7 @@ export default function useCoaching() {
       if (!student) return undefined;
 
       const coachObject = student.primaryCoach;
+      if (!coachObject) return undefined;
       const coach = coachListQuery.data.find(
         (coach) => coach.user.id === coachObject.id,
       );
