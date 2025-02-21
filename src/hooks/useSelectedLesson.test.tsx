@@ -42,11 +42,9 @@ describe('useSelectedLesson', () => {
         student?.relatedProgram,
       );
     });
-    it('selectedFromLesson is first lesson in selectedProgram', async () => {
+    it('selectedFromLesson is null in selectedProgram', async () => {
       const result = await renderSelectedLesson();
-      expect(result.current.selectedFromLesson).toBe(
-        result.current.selectedProgram?.lessons[0],
-      );
+      expect(result.current.selectedFromLesson).toBe(null);
     });
     it('selectedToLesson is NOT null', async () => {
       const result = await renderSelectedLesson();
@@ -67,9 +65,7 @@ describe('useSelectedLesson', () => {
       });
       expect(result.current.selectedProgram?.recordId).toBe(newProgram);
       // Make sure fromLesson is reset
-      expect(result.current.selectedFromLesson?.recordId).toBe(
-        programsTable[programsTable.length - 1].lessons[0].recordId,
-      );
+      expect(result.current.selectedFromLesson?.recordId).toBe(undefined);
       // should be active lesson
       expect(result.current.selectedToLesson?.recordId).toBeDefined();
     });
@@ -131,7 +127,7 @@ describe('useSelectedLesson', () => {
         result.current.setToLesson(newToLesson);
       });
       await waitFor(() => {
-        expect(result.current.selectedFromLesson).not.toBeNull();
+        expect(result.current.selectedToLesson?.recordId).toBe(newToLesson);
       });
 
       const examples = api.verifiedExamplesTable;
