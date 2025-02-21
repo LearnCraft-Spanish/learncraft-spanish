@@ -284,8 +284,40 @@ export function useStudentFlashcards() {
       return thisIdNum;
     },
 
-    onSuccess: (_data, _variables, _context) => {
+    onSuccess: (data, _variables, context) => {
       toast.success('Flashcard added successfully');
+
+      queryClient.setQueryData(
+        ['flashcardData', activeStudentId],
+        (oldFlashcards: StudentFlashcardData) => {
+          const oldId = context;
+          const newId = data;
+          let newFlashcardData: StudentFlashcardData | null = null;
+          const oldStudentExamples = oldFlashcards.studentExamples;
+          const newStudentExample = oldStudentExamples.find(
+            (studentExample) => studentExample.recordId === oldId,
+          );
+          if (!newStudentExample) {
+            console.error('Error updating student example');
+            return oldFlashcards;
+          }
+          if (newStudentExample) {
+            const newStudentExampleArray = oldStudentExamples.map(
+              (studentExample) =>
+                studentExample.recordId === oldId
+                  ? { ...studentExample, recordId: newId }
+                  : studentExample,
+            );
+            const newUncheckedFlashcardData = {
+              examples: oldFlashcards.examples,
+              studentExamples: newStudentExampleArray,
+            };
+            newFlashcardData = matchAndTrimArrays(newUncheckedFlashcardData);
+            return newFlashcardData;
+          }
+          return newFlashcardData;
+        },
+      );
     },
 
     onError: (error, _variables, context) => {
