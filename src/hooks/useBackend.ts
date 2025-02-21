@@ -154,7 +154,7 @@ export function useBackend() {
     }, [getFactory]);
 
   const getNewWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
-    return getFactory('coaching/weeks-new-format');
+    return getFactory('coaching/weeks');
   }, [getFactory]);
 
   const getGroupAttendees = useCallback((): Promise<
@@ -176,7 +176,7 @@ export function useBackend() {
   }, [getFactory]);
 
   const getCalls = useCallback((): Promise<StudentRecordsTypes.Call[]> => {
-    return getFactory('coaching/calls');
+    return getFactory('coaching/private-calls');
   }, [getFactory]);
   /*      POST Requests      */
 
