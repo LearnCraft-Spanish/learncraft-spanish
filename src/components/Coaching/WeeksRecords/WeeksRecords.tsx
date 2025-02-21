@@ -268,12 +268,15 @@ export default function WeeksRecordsSection() {
       userDataQuery.isSuccess
     ) {
       const currentUser = userDataQuery.data;
-      const currentUserCoach = coachListQuery.data.find(
-        (coach) =>
-          coach.user.email.toLowerCase() ===
-          currentUser?.emailAddress.toLowerCase(),
-      );
-      if (currentUserCoach) setFilterByCoach(currentUserCoach);
+
+      if (currentUser.emailAddress) {
+        const currentUserCoach = coachListQuery.data.find(
+          (coach) =>
+            coach.user.email.toLowerCase() ===
+            currentUser?.emailAddress.toLowerCase(),
+        );
+        if (currentUserCoach) setFilterByCoach(currentUserCoach);
+      }
       rendered.current = true;
     }
   }, [weeksQuery, coachListQuery, userDataQuery]);
