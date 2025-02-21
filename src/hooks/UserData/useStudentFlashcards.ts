@@ -204,14 +204,15 @@ export function useStudentFlashcards() {
         throw new Error('No active student');
       }
       const addResponse = addPromise.then(
-        (result: number | undefined | string) => {
-          if (typeof result === 'string') {
-            result = Number.parseInt(result);
+        (result: number[] | string[] | undefined) => {
+          let addedId = result?.[0];
+          if (typeof addedId === 'string') {
+            addedId = Number.parseInt(addedId);
           }
-          if (result !== 1) {
+          if (!addedId) {
             throw new Error('Failed to add Flashcard');
           }
-          return result;
+          return addedId;
         },
       );
       return addResponse;
