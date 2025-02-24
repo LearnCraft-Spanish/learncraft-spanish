@@ -221,7 +221,6 @@ export const App: React.FC = () => {
       <ToastContainer
         theme="colored"
         transition={Zoom}
-        autoClose={3000}
         pauseOnHover={false}
         closeOnClick
       />

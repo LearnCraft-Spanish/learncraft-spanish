@@ -9,6 +9,7 @@ import type {
 import { useBackend } from 'src/hooks/useBackend';
 import { toast } from 'react-toastify';
 import { toISODateTime } from 'src/functions/dateUtils';
+import { showErrorToast, showSuccessToast } from 'src/functions/showToast';
 import { useActiveStudent } from './useActiveStudent';
 import { useUserData } from './useUserData';
 
@@ -285,7 +286,7 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (data, _variables, context) => {
-      toast.success('Flashcard added successfully');
+      showSuccessToast('Flashcard added successfully');
 
       queryClient.setQueryData(
         ['flashcardData', activeStudentId],
@@ -321,7 +322,7 @@ export function useStudentFlashcards() {
     },
 
     onError: (error, _variables, context) => {
-      toast.error('Failed to add Flashcard');
+      showErrorToast('Failed to add Flashcard');
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized ID number to rollback the cache
@@ -447,11 +448,11 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (_data, _variables, _context) => {
-      toast.success('Flashcard removed successfully');
+      showSuccessToast('Flashcard removed successfully');
     },
 
     onError: (error, _variables, context) => {
-      toast.error('Failed to remove Flashcard');
+      showErrorToast('Failed to remove Flashcard');
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized objects to rollback the cache
@@ -595,11 +596,11 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (_data, _variables) => {
-      toast.success('Flashcard updated successfully');
+      showSuccessToast('Flashcard updated successfully');
     },
 
     onError: (error, _variables, context) => {
-      toast.error('Failed to update Flashcard');
+      showErrorToast('Failed to update Flashcard');
       console.error(error);
       // Make sure both necessary values are defined
       if (
