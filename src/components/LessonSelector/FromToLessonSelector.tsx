@@ -82,7 +82,7 @@ export default function FromToLessonSelector(): JSX.Element {
           id="courseList"
           name="courseList"
           className="courseList"
-          value={selectedProgram?.recordId ? selectedProgram?.recordId : 0}
+          value={selectedProgram?.recordId ?? 0}
           onChange={(e) => setProgram(e.target.value)}
         >
           <option key={0} value={0}>
@@ -99,7 +99,7 @@ export default function FromToLessonSelector(): JSX.Element {
             <select
               id="fromLesson"
               name="fromLesson"
-              value={selectedFromLesson?.recordId}
+              value={selectedFromLesson?.recordId ?? 0}
               onChange={(e) => setFromLesson(e.target.value)}
             >
               <option key={0} value={0}>
@@ -117,9 +117,12 @@ export default function FromToLessonSelector(): JSX.Element {
               id="toLesson"
               name="toLesson"
               className="lessonList"
-              value={selectedToLesson?.recordId}
+              value={selectedToLesson?.recordId ?? 0}
               onChange={(e) => setToLesson(e.target.value)}
             >
+              <option key={0} value={0}>
+                –Choose Lesson–
+              </option>
               {makeToLessonSelector()}
             </select>
           </label>
