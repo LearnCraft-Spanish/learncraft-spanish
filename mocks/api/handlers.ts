@@ -143,7 +143,8 @@ export const handlers = [
     if (exampleId === '-1') {
       return HttpResponse.json('0');
     }
-    return HttpResponse.json('1');
+    const newRecordId = Math.floor(Math.random() * 1000);
+    return HttpResponse.json([newRecordId]);
   }),
 
   http.post(`${backendUrl}create-student-example`, async ({ request }) => {
@@ -152,7 +153,8 @@ export const handlers = [
     if (exampleId === '-1' || studentId === '-1') {
       return HttpResponse.json('0');
     }
-    return HttpResponse.json('1');
+    const newRecordId = Math.floor(Math.random() * 1000);
+    return HttpResponse.json([newRecordId]);
   }),
 
   http.post(`${backendUrl}update-my-student-example`, async ({ request }) => {
