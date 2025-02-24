@@ -1,8 +1,12 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
-import type { Flashcard, Lesson, Program } from '../interfaceDefinitions';
-import { useActiveStudent } from './useActiveStudent';
-import { useProgramTable } from './useProgramTable'; // Assuming this fetches the programs data
+import type {
+  Flashcard,
+  Lesson,
+  Program,
+} from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from './UserData/useActiveStudent';
+import { useProgramTable } from './CourseData/useProgramTable'; // Assuming this fetches the programs data
 
 export function useSelectedLesson() {
   const queryClient = useQueryClient();
@@ -90,6 +94,9 @@ export function useSelectedLesson() {
         });
         return isAllowed;
       });
+      if (!requiredVocabulary.length && !selectionState.fromLesson) {
+        return filteredByAllowedVocab;
+      }
       if (!requiredVocabulary.length) {
         return [];
       }
@@ -103,7 +110,7 @@ export function useSelectedLesson() {
         return isRequired;
       });
     },
-    [allowedVocabulary, requiredVocabulary],
+    [allowedVocabulary, requiredVocabulary, selectionState.fromLesson],
   );
 
   const newToLesson = useCallback(
@@ -136,7 +143,7 @@ export function useSelectedLesson() {
         (oldState: typeof initialSelectionState) => ({
           ...oldState,
           program: newProgram,
-          fromLesson: newProgram?.lessons ? newProgram.lessons[0] : null,
+          fromLesson: null,
           toLesson: newToLesson(newProgram),
         }),
       );

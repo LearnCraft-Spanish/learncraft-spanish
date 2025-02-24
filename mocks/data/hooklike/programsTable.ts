@@ -1,4 +1,4 @@
-import type { Program } from '../../../src/interfaceDefinitions';
+import type { Program } from 'src/types/interfaceDefinitions';
 const programsTable: Program[] = [
   {
     recordId: 2,
@@ -482,6 +482,7 @@ const programsTable: Program[] = [
     cohortDCurrentLesson: 115,
     cohortECurrentLesson: 93,
     cohortFCurrentLesson: 78,
+    cohortGCurrentLesson: 17,
   },
   {
     recordId: 3,
@@ -2882,6 +2883,7 @@ const programsTable: Program[] = [
     cohortDCurrentLesson: 1,
     cohortECurrentLesson: 1,
     cohortFCurrentLesson: 1,
+    cohortGCurrentLesson: 17,
   },
   {
     recordId: 4,
@@ -2952,6 +2954,7 @@ const programsTable: Program[] = [
     cohortDCurrentLesson: 1,
     cohortECurrentLesson: 1,
     cohortFCurrentLesson: 1,
+    cohortGCurrentLesson: 17,
   },
   {
     recordId: 5,
@@ -3686,6 +3689,7 @@ const programsTable: Program[] = [
     cohortDCurrentLesson: 1,
     cohortECurrentLesson: 1,
     cohortFCurrentLesson: 1,
+    cohortGCurrentLesson: 17,
   },
 ];
 

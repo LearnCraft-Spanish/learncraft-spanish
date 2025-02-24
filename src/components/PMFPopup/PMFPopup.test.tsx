@@ -1,16 +1,20 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { act } from 'react';
-import MockQueryClientProvider from '../../../mocks/Providers/MockQueryClient';
+import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
+import { setupMockAuth } from 'tests/setupMockAuth';
 import PMFPopup from './PMFPopup';
 
-vi.mock('../../hooks/usePMFData', () => ({
+vi.mock('src/hooks/UserData/usePMFData', () => ({
   usePMFData: vi.fn(() => ({
     canShowPMF: true,
     createOrUpdatePMFData: vi.fn(),
   })),
 }));
 describe('component PMFPopup', () => {
+  beforeEach(() => {
+    setupMockAuth({ userName: 'student-ser-estar' });
+  });
   describe('when timeToShowPopup is false', () => {
     it('does not render when timeToShowPopup is false', () => {
       render(<PMFPopup timeToShowPopup={false} />, {
@@ -20,11 +24,13 @@ describe('component PMFPopup', () => {
     });
   });
   describe('when timeToShowPopup is true', () => {
-    it('renders when timeToShowPopup is true', () => {
+    it('renders when timeToShowPopup is true', async () => {
       render(<PMFPopup timeToShowPopup />, {
         wrapper: MockQueryClientProvider,
       });
-      expect(screen.getByText('Enjoying our software?')).toBeTruthy();
+      await waitFor(() => {
+        expect(screen.getByText('Enjoying our software?')).toBeTruthy();
+      });
     });
     it('closes the popup when the close button is clicked', async () => {
       render(<PMFPopup timeToShowPopup />, {

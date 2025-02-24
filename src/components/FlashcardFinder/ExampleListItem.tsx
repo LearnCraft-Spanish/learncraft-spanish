@@ -1,22 +1,30 @@
-import React from 'react';
-import type { Flashcard } from '../../interfaceDefinitions';
+import React, { useState } from 'react';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import {
   formatEnglishText,
   formatSpanishText,
-} from '../../functions/formatFlashcardText';
-import { useStudentFlashcards } from '../../hooks/useStudentFlashcards';
-import { useActiveStudent } from '../../hooks/useActiveStudent';
-
+} from 'src/functions/formatFlashcardText';
+import x from 'src/assets/icons/x.svg';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 interface FormatExampleForTableProps {
   data: Flashcard;
   showSpanglishLabel?: boolean;
+  forceShowVocab?: boolean;
+  selectExample?: (recordId: number) => void;
+  selectedExampleId?: number | null;
 }
 
 const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
   data,
   showSpanglishLabel = false,
+  forceShowVocab = false,
+  selectExample = undefined,
+  selectedExampleId = null,
 }: FormatExampleForTableProps) => {
   const { activeStudentQuery } = useActiveStudent();
+  const userDataQuery = useUserData();
   const {
     flashcardDataQuery,
     addFlashcardMutation,
@@ -25,6 +33,7 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
     exampleIsPending,
     exampleIsCustom,
   } = useStudentFlashcards();
+  const [showTags, setShowTags] = useState(false);
 
   const dataReady =
     flashcardDataQuery.isSuccess && activeStudentQuery.isSuccess;
@@ -35,6 +44,20 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
   const isCustom = exampleIsCustom(data.recordId);
   return (
     <div className="exampleCard" key={data.recordId}>
+      {selectExample && data.recordId !== selectedExampleId && (
+        <button
+          type="button"
+          className="selectButton"
+          onClick={() => selectExample(data.recordId)}
+        >
+          Select
+        </button>
+      )}
+      {selectExample && data.recordId === selectedExampleId && (
+        <button type="button" className="greenLabel">
+          Selected
+        </button>
+      )}
       <div className="exampleCardSpanishText">
         {formatSpanishText(data.spanglish, data.spanishExample)}
       </div>
@@ -51,8 +74,45 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
           <h4>Spanish</h4>
         </div>
       )}
+      {(data.vocabComplete || forceShowVocab) &&
+        !!data.vocabIncluded.length && (
+          <div className="exampleCardTags">
+            {showTags && (
+              <div className="exampleCardTagsList">
+                {data.vocabIncluded.map((tag) => (
+                  <p key={tag}>{tag}</p>
+                ))}
+                <button
+                  type="button"
+                  className="hideTagsButton"
+                  onClick={() => setShowTags(false)}
+                >
+                  <img src={x} alt="Hide" />
+                </button>
+              </div>
+            )}
+            {!showTags && (
+              <button
+                type="button"
+                className="showTagsButton"
+                onClick={() => setShowTags(true)}
+              >
+                Vocabulary
+              </button>
+            )}
+          </div>
+        )}
       {dataReady && isStudent && (
         <>
+          {isCollected && !isPending && isCustom && (
+            <button
+              type="button"
+              className="label customLabel"
+              value={data.recordId}
+            >
+              Custom
+            </button>
+          )}
           {!isCollected && (
             <button
               type="button"
@@ -72,25 +132,20 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
               Adding...
             </button>
           )}
-          {isCollected && !isPending && !isCustom && (
-            <button
-              type="button"
-              className="removeButton"
-              value={data.recordId}
-              onClick={() => removeFlashcardMutation.mutate(data.recordId)}
-            >
-              Remove
-            </button>
-          )}
-          {isCollected && !isPending && isCustom && (
-            <button
-              type="button"
-              className="label customLabel"
-              value={data.recordId}
-            >
-              Custom
-            </button>
-          )}
+          {isCollected &&
+            !isPending &&
+            (!isCustom ||
+              userDataQuery.data?.roles.adminRole === 'coach' ||
+              userDataQuery.data?.roles.adminRole === 'admin') && (
+              <button
+                type="button"
+                className="removeButton"
+                value={data.recordId}
+                onClick={() => removeFlashcardMutation.mutate(data.recordId)}
+              >
+                Remove
+              </button>
+            )}
         </>
       )}
     </div>

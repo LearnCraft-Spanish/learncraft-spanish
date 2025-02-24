@@ -15,21 +15,21 @@ jobs:
     steps:
       # Step 1: Check out the repository
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Set up Node.js environment
       - name: Set up Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
 
       # Install pnpm
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: npm install -g pnpm@9.7
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: node_modules
           key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
@@ -52,7 +52,7 @@ jobs:
 
       # Save the updated mock data to cache
       - name: Cache mock data
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ./mocks/data/serverlike/actualServerData.json
           key: mockdata-${{ hashFiles('./src/functions/DataModel.ts, ./mocks/data/serverlike/serverlikeData.ts') }}

@@ -1,6 +1,6 @@
 import {
   allStudentsTable,
-  getUserDataFromName,
+  getActiveStudentFromName,
 } from '../data/serverlike/studentTable';
 
 import programsTable from '../data/hooklike/programsTable';
@@ -23,7 +23,7 @@ export default function mockActiveStudentStub({
   isError = false,
   studentName = 'student-admin',
 }: mockActiveStudentStubOptions = {}) {
-  const student = getUserDataFromName(studentName);
+  const student = getActiveStudentFromName(studentName);
   if (!student) {
     throw new Error(`Student not found in allStudentsTable: ${studentName}`);
   }
@@ -66,7 +66,10 @@ export default function mockActiveStudentStub({
           return activeProgram?.cohortECurrentLesson;
         case 'F':
           return activeProgram?.cohortFCurrentLesson;
-        // case 'G': return activeProgram?.cohortGCurrentLesson
+        case 'G':
+          return activeProgram?.cohortGCurrentLesson;
+        // case 'H':
+        //  return activeProgram?.cohortHCurrentLesson;
         // if added, add to interface and real hook
         // etc for futureproofing
       }

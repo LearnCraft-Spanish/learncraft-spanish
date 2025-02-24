@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
-import type * as types from '../interfaceDefinitions';
+import type * as types from 'src/types/interfaceDefinitions';
+import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
 import useAuth from './useAuth';
 
-export function useBackend() {
+export function useBackendHelpers() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const { getAccessToken } = useAuth();
 
@@ -18,7 +19,10 @@ export function useBackend() {
       });
       if (response.ok) {
         return await response.json().catch((error) => {
-          console.error(`Error parsing JSON from ${path}:`, error);
+          console.error(
+            `Error parsing JSON response from "${path}" Error:`,
+            error,
+          );
           throw new Error(`Failed to parse JSON from ${path}`);
         });
       } else {
@@ -28,7 +32,192 @@ export function useBackend() {
     [getAccessToken, backendUrl],
   );
 
+  const postFactory = useCallback(
+    async <T>(path: string, headers?: any): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(
+            `Error parsing JSON response from "${path}" Error:`,
+            error,
+          );
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to post to ${path}: ${response.statusText}`);
+        throw new Error(`Failed to post to ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+
+  const deleteFactory = useCallback(
+    async (path: string, headers?: any): Promise<number> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          ...headers,
+        },
+      });
+
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(
+            `Error parsing JSON response from "${path}" Error:`,
+            error,
+          );
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to delete ${path}: ${response.statusText}`);
+        throw new Error(`Failed to delete ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+
+  interface DeleteFactoryOptions {
+    path: string;
+    headers?: Record<string, any>;
+    body?: Record<string, any>;
+  }
+  const newDeleteFactory = useCallback(
+    async <T>({
+      path,
+      headers = [],
+      body = [],
+    }: DeleteFactoryOptions): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(
+            `Error parsing JSON response from "${path}" Error:`,
+            error,
+          );
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to delete ${path}: ${response.statusText}`);
+        throw new Error(`Failed to delete ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+
+  // We are going to want to update THIS FILE to send data via body of requests instead of headers
+  // (see current post factory)
+  // I have created an updated post factory just for these new routes so that this merge only concerns itself
+  // with the PMFData changes
+  interface PostFactoryOptions {
+    path: string;
+    headers?: Record<string, any>;
+    body?: Record<string, any>;
+  }
+  const newPostFactory = useCallback(
+    async <T>({
+      path,
+      headers = [],
+      body = [],
+    }: PostFactoryOptions): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(
+            `Error parsing JSON response from "${path}" Error:`,
+            error,
+          );
+          throw new Error(`Failed to parse JSON from ${path}`);
+        });
+      } else {
+        console.error(`Failed to post to ${path}: ${response.statusText}`);
+        throw new Error(`Failed to post to ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+
+  const newPutFactory = useCallback(
+    async <T>({
+      path,
+      headers = [],
+      body = [],
+    }: PostFactoryOptions): Promise<T> => {
+      const fetchUrl = `${backendUrl}${path}`;
+      const response = await fetch(fetchUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${await getAccessToken()}`,
+          'Content-Type': 'application/json',
+          ...headers,
+        },
+        body: JSON.stringify(body),
+      });
+      if (response.ok) {
+        return await response.json().catch((error) => {
+          console.error(
+            `Error parsing JSON response from "${path}" Error:`,
+            error,
+          );
+          throw new Error(`Failed to parse JSON response from ${path}`);
+        });
+      } else {
+        console.error(`Failed to put to ${path}: ${response.statusText}`);
+        throw new Error(`Failed to put to ${path}`);
+      }
+    },
+    [getAccessToken, backendUrl],
+  );
+
+  return {
+    getFactory,
+    postFactory,
+    deleteFactory,
+
+    newDeleteFactory,
+    newPostFactory,
+    newPutFactory,
+  };
+}
+
+export function useBackend() {
+  const {
+    getFactory,
+    postFactory,
+    deleteFactory,
+    newDeleteFactory,
+    newPostFactory,
+  } = useBackendHelpers();
+
   /*      GET Requests      */
+  const { getAccessToken } = useAuth();
 
   const getProgramsFromBackend = useCallback((): Promise<
     types.ProgramUnparsed[]
@@ -81,8 +270,10 @@ export function useBackend() {
     [getFactory],
   );
 
-  const getAllUsersFromBackend = useCallback((): Promise<types.UserData[]> => {
-    return getFactory<types.UserData[]>('all-students');
+  const getAllUsersFromBackend = useCallback((): Promise<
+    types.FlashcardStudent[]
+  > => {
+    return getFactory<types.FlashcardStudent[]>('all-students');
   }, [getFactory]);
 
   const getUserDataFromBackend = useCallback((): Promise<types.UserData> => {
@@ -96,61 +287,87 @@ export function useBackend() {
     [getFactory],
   );
 
-  /*      Coaching API      */
-
-  const getCoachList = useCallback((): Promise<types.Coach[]> => {
-    return getFactory<types.Coach[]>('coaching/coaches');
+  const getUnverifiedExamplesFromBackend = useCallback((): Promise<
+    types.Flashcard[]
+  > => {
+    return getFactory<types.Flashcard[]>('unverified-examples');
   }, [getFactory]);
 
-  const getCourseList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/courses');
+  const getRecentlyEditedExamples = useCallback((): Promise<
+    types.Flashcard[]
+  > => {
+    return getFactory<types.Flashcard[]>('recently-edited-examples');
   }, [getFactory]);
 
-  const getLessonList = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/lessons');
-  }, [getFactory]);
-
-  const getActiveStudents = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/active-students');
-  }, [getFactory]);
-
-  const getActiveMemberships = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/active-memberships');
-  }, [getFactory]);
-
-  const getLastThreeWeeks = useCallback((): Promise<string[]> => {
-    return getFactory<string[]>('coaching/last-three-weeks');
-  }, [getFactory]);
-
-  /*      POST Requests      */
-
-  const postFactory = useCallback(
-    async <T>(path: string, headers?: any): Promise<T> => {
-      const fetchUrl = `${backendUrl}${path}`;
-      const response = await fetch(fetchUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-      });
-      if (response.ok) {
-        return await response.json().catch((error) => {
-          console.error(`Error parsing JSON from ${path}:`, error);
-          throw new Error(`Failed to parse JSON from ${path}`);
-        });
-      } else {
-        console.error(`Failed to post to ${path}: ${response.statusText}`);
-        throw new Error(`Failed to post to ${path}`);
-      }
+  const getSingleExample = useCallback(
+    (exampleId: number): Promise<types.Flashcard> => {
+      return getFactory<types.Flashcard>(`single-example/${exampleId}`);
     },
-    [getAccessToken, backendUrl],
+    [getFactory],
   );
 
+  /*      Coaching API      */
+
+  const getCoachList = useCallback((): Promise<StudentRecordsTypes.Coach[]> => {
+    return getFactory<StudentRecordsTypes.Coach[]>('coaching/coaches');
+  }, [getFactory]);
+
+  const getCourseList = useCallback((): Promise<
+    StudentRecordsTypes.Course[]
+  > => {
+    return getFactory('coaching/courses');
+  }, [getFactory]);
+
+  const getLessonList = useCallback((): Promise<
+    StudentRecordsTypes.Lesson[]
+  > => {
+    return getFactory('coaching/lessons');
+  }, [getFactory]);
+
+  const getActiveStudents = useCallback((): Promise<
+    StudentRecordsTypes.Student[]
+  > => {
+    return getFactory('coaching/active-students');
+  }, [getFactory]);
+
+  const getActiveMemberships = useCallback((): Promise<
+    StudentRecordsTypes.Membership[]
+  > => {
+    return getFactory('coaching/active-memberships');
+  }, [getFactory]);
+
+  const getWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
+    return getFactory('coaching/weeks');
+  }, [getFactory]);
+
+  const getGroupAttendees = useCallback((): Promise<
+    StudentRecordsTypes.GroupAttendees[]
+  > => {
+    return getFactory('coaching/group-attendees');
+  }, [getFactory]);
+
+  const getGroupSessions = useCallback((): Promise<
+    StudentRecordsTypes.GroupSession[]
+  > => {
+    return getFactory('coaching/group-sessions');
+  }, [getFactory]);
+
+  const getAssignments = useCallback((): Promise<
+    StudentRecordsTypes.Assignment[]
+  > => {
+    return getFactory('coaching/assignments');
+  }, [getFactory]);
+
+  const getPrivateCalls = useCallback((): Promise<
+    StudentRecordsTypes.Call[]
+  > => {
+    return getFactory('coaching/private-calls');
+  }, [getFactory]);
+  /*      POST Requests      */
+
   const createMyStudentExample = useCallback(
-    (exampleId: number): Promise<number> => {
-      return postFactory<number>('create-my-student-example', {
+    (exampleId: number): Promise<number[]> => {
+      return postFactory<number[]>('create-my-student-example', {
         exampleid: exampleId,
       });
     },
@@ -158,8 +375,8 @@ export function useBackend() {
   );
 
   const createStudentExample = useCallback(
-    (studentId: number, exampleId: number): Promise<number> => {
-      return postFactory<number>('create-student-example', {
+    (studentId: number, exampleId: number): Promise<number[]> => {
+      return postFactory<number[]>('create-student-example', {
         studentid: studentId,
         exampleid: exampleId,
       });
@@ -189,30 +406,6 @@ export function useBackend() {
 
   /*      DELETE Requests      */
 
-  const deleteFactory = useCallback(
-    async (path: string, headers?: any): Promise<number> => {
-      const fetchUrl = `${backendUrl}${path}`;
-      const response = await fetch(fetchUrl, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
-          ...headers,
-        },
-      });
-
-      if (response.ok) {
-        return await response.json().catch((error) => {
-          console.error(`Error parsing JSON from ${path}:`, error);
-          throw new Error(`Failed to parse JSON from ${path}`);
-        });
-      } else {
-        console.error(`Failed to delete ${path}: ${response.statusText}`);
-        throw new Error(`Failed to delete ${path}`);
-      }
-    },
-    [getAccessToken, backendUrl],
-  );
-
   const deleteMyStudentExample = useCallback(
     (recordId: number): Promise<number> => {
       return deleteFactory('delete-my-student-example', { deleteid: recordId });
@@ -227,6 +420,16 @@ export function useBackend() {
     [deleteFactory],
   );
 
+  const removeVocabFromExample = useCallback(
+    (exampleId: number, vocabIdList: number[]): Promise<number> => {
+      return newDeleteFactory({
+        path: 'remove-vocab-from-example',
+        body: { exampleId, vocabIdList },
+      });
+    },
+    [newDeleteFactory],
+  );
+
   const getPMFDataForUser = useCallback(
     (userId: number): Promise<types.PMFData> => {
       return getFactory(`pmf/${userId}`);
@@ -234,43 +437,6 @@ export function useBackend() {
     [getFactory],
   );
 
-  // We are going to want to update THIS FILE to send data via body of requests instead of headers
-  // (see current post factory)
-  // I have created an updated post factory just for these new routes so that this merge only concerns itself
-  // with the PMFData changes
-  interface PostFactoryOptions {
-    path: string;
-    headers?: Record<string, any>;
-    body?: Record<string, any>;
-  }
-  const newPostFactory = useCallback(
-    async <T>({
-      path,
-      headers = [],
-      body = [],
-    }: PostFactoryOptions): Promise<T> => {
-      const fetchUrl = `${backendUrl}${path}`;
-      const response = await fetch(fetchUrl, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-        body: JSON.stringify(body),
-      });
-      if (response.ok) {
-        return await response.json().catch((error) => {
-          console.error(`Error parsing JSON from ${path}:`, error);
-          throw new Error(`Failed to parse JSON from ${path}`);
-        });
-      } else {
-        console.error(`Failed to post to ${path}: ${response.statusText}`);
-        throw new Error(`Failed to post to ${path}`);
-      }
-    },
-    [getAccessToken, backendUrl],
-  );
   const createPMFDataForUser = useCallback(
     (studentId: number, hasTakenSurvey: boolean): Promise<number> => {
       return newPostFactory({
@@ -302,35 +468,88 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const createUnverifiedExample = useCallback(
+    (example: types.NewFlashcard): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'add-unverified-example',
+        body: {
+          example,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const updateExample = useCallback(
+    (example: Partial<types.Flashcard>): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'update-example',
+        body: {
+          example,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const addVocabularyToExample = useCallback(
+    (exampleId: number, vocabIdList: number[]): Promise<number> => {
+      return newPostFactory<number>({
+        path: 'add-vocab-to-example',
+        body: {
+          exampleId,
+          vocabIdList,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   return {
     getAccessToken,
-    getProgramsFromBackend,
-    getLessonsFromBackend,
-    getVocabFromBackend,
-    getSpellingsFromBackend,
-    getExamplesFromBackend,
-    getVerifiedExamplesFromBackend,
-    getAudioExamplesFromBackend,
-    getLcspQuizzesFromBackend,
-    getMyExamplesFromBackend,
-    getQuizExamplesFromBackend,
-    getAllUsersFromBackend,
-    getUserDataFromBackend,
+    // GET Requests
     getActiveExamplesFromBackend,
+    getActiveMemberships,
+    getActiveStudents,
+    getAllUsersFromBackend,
+    getAssignments,
+    getAudioExamplesFromBackend,
+    getPrivateCalls,
     getCoachList,
     getCourseList,
+    getExamplesFromBackend,
+    getGroupAttendees,
+    getGroupSessions,
+    getLcspQuizzesFromBackend,
     getLessonList,
-    getActiveStudents,
-    getActiveMemberships,
-    getLastThreeWeeks,
+    getLessonsFromBackend,
+    getMyExamplesFromBackend,
+    getWeeks,
+    getPMFDataForUser,
+    getProgramsFromBackend,
+    getQuizExamplesFromBackend,
+    getSingleExample,
+    getSpellingsFromBackend,
+    getUnverifiedExamplesFromBackend,
+    getRecentlyEditedExamples,
+    getUserDataFromBackend,
+    getVerifiedExamplesFromBackend,
+    getVocabFromBackend,
+
+    // POST Requests
+    addVocabularyToExample,
     createMyStudentExample,
+    createPMFDataForUser,
     createStudentExample,
+    createUnverifiedExample,
+    updateExample,
     updateMyStudentExample,
+    updatePMFDataForUser,
     updateStudentExample,
+
+    // DELETE Requests
     deleteMyStudentExample,
     deleteStudentExample,
-    getPMFDataForUser,
-    createPMFDataForUser,
-    updatePMFDataForUser,
+    removeVocabFromExample,
   };
 }

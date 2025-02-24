@@ -1,51 +1,19 @@
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 
-import { getUserDataFromName } from '../../mocks/data/serverlike/studentTable';
-import serverlikeData from '../../mocks/data/serverlike/serverlikeData';
-import programsTable from '../../mocks/data/hooklike/programsTable';
-import mockActiveStudentStub from '../../mocks/hooks/useActiveStudentStub';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+import programsTable from 'mocks/data/hooklike/programsTable';
 
-import MockQueryClientProvider from '../../mocks/Providers/MockQueryClient';
-import { setupMockAuth } from '../../tests/setupMockAuth';
+import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
+import { setupMockAuth } from 'tests/setupMockAuth';
 
 // Types
-import type { UserData } from '../interfaceDefinitions';
+import type { UserData } from 'src/types/interfaceDefinitions';
 
 import { useSelectedLesson } from './useSelectedLesson';
 
 const { api } = serverlikeData();
-
-vi.mock(
-  './useActiveStudent',
-  vi.fn(() => {
-    return {
-      useActiveStudent: () =>
-        mockActiveStudentStub({ studentName: 'student-lcsp' }),
-    };
-  }),
-);
-vi.mock(
-  './useProgramTable',
-  vi.fn(() => {
-    return {
-      useProgramTable: () => ({
-        programTableQuery: {
-          data: programsTable,
-          isSuccess: true,
-        },
-      }),
-    };
-  }),
-);
 
 async function renderSelectedLesson() {
   const { result } = renderHook(() => useSelectedLesson(), {
@@ -74,11 +42,9 @@ describe('useSelectedLesson', () => {
         student?.relatedProgram,
       );
     });
-    it('selectedFromLesson is first lesson in selectedProgram', async () => {
+    it('selectedFromLesson is null in selectedProgram', async () => {
       const result = await renderSelectedLesson();
-      expect(result.current.selectedFromLesson).toBe(
-        result.current.selectedProgram?.lessons[0],
-      );
+      expect(result.current.selectedFromLesson).toBe(null);
     });
     it('selectedToLesson is NOT null', async () => {
       const result = await renderSelectedLesson();
@@ -99,9 +65,7 @@ describe('useSelectedLesson', () => {
       });
       expect(result.current.selectedProgram?.recordId).toBe(newProgram);
       // Make sure fromLesson is reset
-      expect(result.current.selectedFromLesson?.recordId).toBe(
-        programsTable[programsTable.length - 1].lessons[0].recordId,
-      );
+      expect(result.current.selectedFromLesson?.recordId).toBe(undefined);
       // should be active lesson
       expect(result.current.selectedToLesson?.recordId).toBeDefined();
     });
@@ -163,7 +127,7 @@ describe('useSelectedLesson', () => {
         result.current.setToLesson(newToLesson);
       });
       await waitFor(() => {
-        expect(result.current.selectedFromLesson).not.toBeNull();
+        expect(result.current.selectedToLesson?.recordId).toBe(newToLesson);
       });
 
       const examples = api.verifiedExamplesTable;
@@ -186,11 +150,14 @@ describe('useSelectedLesson', () => {
         result.current.setToLesson(lessonWithoutVocab.recordId);
         result.current.setFromLesson(lessonWithoutVocab.recordId);
       });
-      await waitFor(() => {
-        expect(result.current.selectedToLesson?.recordId).toBe(
-          lessonWithoutVocab.recordId,
-        );
-      });
+      await waitFor(
+        () => {
+          expect(result.current.selectedToLesson?.recordId).toBe(
+            lessonWithoutVocab.recordId,
+          );
+        },
+        { timeout: 1000 },
+      );
       if (
         result.current.selectedToLesson?.vocabIncluded.length ||
         result.current.selectedFromLesson?.vocabIncluded.length

@@ -4,9 +4,11 @@
     "name": "Student B",
     "emailAddress": "classicalmoser@gmail.com",
     "cohort": "A",
-    "role": "student",
-    "relatedProgram": 3,
-    "isAdmin": false
+    "roles": {
+      "studentRole": "student",
+      "adminRole": ""
+    },
+    "relatedProgram": 3
   },
   "samplePrograms": [
     {
@@ -16,6 +18,7 @@
       "cohortDCurrentLesson": 39,
       "cohortECurrentLesson": 7,
       "cohortFCurrentLesson": 3,
+      "cohortGCurrentLesson": 3,
       "name": "LearnCraft Spanish",
       "recordId": 2,
       "lessons": []
@@ -27,6 +30,7 @@
       "cohortDCurrentLesson": 1,
       "cohortECurrentLesson": null,
       "cohortFCurrentLesson": null,
+      "cohortGCurrentLesson": 3,
       "name": "SI1M",
       "recordId": 3,
       "lessons": []
@@ -38,6 +42,7 @@
       "cohortDCurrentLesson": 1,
       "cohortECurrentLesson": null,
       "cohortFCurrentLesson": null,
+      "cohortGCurrentLesson": 3,
       "name": "Ser Estar Mini Course",
       "recordId": 4,
       "lessons": []

@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
+  "packageManager": "pnpm",
+  "mutate": [
+    "src/hooks/**/*.{ts,tsx}",
+    "src/sections/**/*.{ts,tsx}",
+    "src/components/**/*.{ts,tsx}",
+    "!**/*.test.{ts,tsx}"
+  ],
+  "testRunner": "vitest",
+  "checkers": ["typescript"],
+  "ignoreStatic": true,
+  "vitest": {
+    "configFile": "vitest.config.ts"
+  },
+  "reporters": ["html", "clear-text", "progress"],
+  "timeoutMS": 20000,
+  "dryRunTimeoutMinutes": 15,
+  "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/vitest-runner for information about the vitest plugin.",
+  "coverageAnalysis": "perTest",
+  "plugins": [
+    "@stryker-mutator/vitest-runner",
+    "@stryker-mutator/typescript-checker"
+  ]
+}

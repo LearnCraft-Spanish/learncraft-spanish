@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import MockAllProviders from '../mocks/Providers/MockAllProviders';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import NotFoundPage from './NotFoundPage';
 
 describe('not found page', () => {
@@ -23,7 +23,7 @@ describe('not found page', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(screen.getByText(/back to menu/i)).toBeInTheDocument();
+      expect(screen.getByText(/back to Home/i)).toBeInTheDocument();
     });
   });
 });

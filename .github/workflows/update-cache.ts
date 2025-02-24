@@ -91,7 +91,7 @@ async function fetchMockData(token) {
       exit(1);
     });
   } catch (error) {
-    console.error('Error fetching mock data:', error.message);
+    console.error('Error fetching mock data. Full Error:', error);
     exit(1);
   }
 }

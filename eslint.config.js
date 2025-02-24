@@ -39,9 +39,10 @@ export default antfu(
   },
   {
     ignores: [
-      'src/components/Coaching',
+      'pnpm-lock.yaml',
+      'src/components/Coaching/old/**',
       'node_modules/',
-      'src/mocks/data/serverlike/actualServerData.json',
+      '**/mocks/data/**/*.js',
       '*.yml',
     ],
   },
