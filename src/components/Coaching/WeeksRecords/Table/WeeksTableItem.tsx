@@ -4,7 +4,7 @@ import pencil from 'src/assets/icons/pencil.svg';
 import x from 'src/assets/icons/x_dark.svg';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { toast } from 'react-toastify';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import useWeeks from 'src/hooks/CoachingData/useWeeks';
 import { useModal } from 'src/hooks/useModal';
 
@@ -34,6 +34,19 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     week.currentLesson ? week.currentLesson.toString() : undefined,
   );
 
+  const assignments = useMemo(
+    () => getAssignmentsFromWeekRecordId(week.recordId),
+    [getAssignmentsFromWeekRecordId, week.recordId],
+  );
+  const groupSessions = useMemo(
+    () => getGroupSessionsFromWeekRecordId(week.recordId),
+    [getGroupSessionsFromWeekRecordId, week.recordId],
+  );
+  const privateCalls = useMemo(
+    () => getPrivateCallsFromWeekRecordId(week.recordId),
+    [getPrivateCallsFromWeekRecordId, week.recordId],
+  );
+
   const [editMode, setEditMode] = useState(false);
 
   function cancelEdit() {
@@ -56,9 +69,9 @@ export default function WeeksTableItem({ week }: { week: Week }) {
       return false;
     }
     if (
-      week.privateCallsCompleted === 0 &&
+      privateCalls?.length === 0 &&
       notes === '' &&
-      week.numberOfGroupCalls === 0
+      groupSessions?.length === 0
     ) {
       return false;
     }
@@ -121,25 +134,16 @@ export default function WeeksTableItem({ week }: { week: Week }) {
         </td>
         <td>{week.weekStarts.toString()}</td>
         <td>
-          <AssignmentsCell
-            week={week}
-            assignments={getAssignmentsFromWeekRecordId(week.recordId)}
-          />
+          <AssignmentsCell week={week} assignments={assignments} />
         </td>
         <td>
           {week.membershipCourseHasGroupCalls && (
-            <GroupSessionsCell
-              week={week}
-              groupSessions={getGroupSessionsFromWeekRecordId(week.recordId)}
-            />
+            <GroupSessionsCell week={week} groupSessions={groupSessions} />
           )}
         </td>
         <td>
           {week.membershipCourseWeeklyPrivateCalls > 0 && (
-            <PrivateCallsCell
-              week={week}
-              calls={getPrivateCallsFromWeekRecordId(week.recordId)}
-            />
+            <PrivateCallsCell week={week} calls={privateCalls} />
           )}
         </td>
         <td>
