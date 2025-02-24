@@ -21,11 +21,15 @@ export function useProgramTable() {
 
     // Memo for combined 1MC vocabularies
     let combined1mcVocabulary: string[] = [];
+    let combinedLCSVoabulary: string[] = [];
 
     const newCourseArray: Program[] = oldCourseArray.map((course) => {
       let combinedVocabulary: string[] = [];
       if (course.recordId === 5) {
         combinedVocabulary = [...combined1mcVocabulary];
+      }
+      if (course.recordId === 7) {
+        combinedVocabulary = [...combinedLCSVoabulary];
       }
       const lessonSortFunction = (a: Lesson, b: Lesson) => {
         function findNumber(stringLesson: string) {
@@ -54,6 +58,9 @@ export function useProgramTable() {
         lesson.vocabKnown = [...combinedVocabulary];
         if (course.recordId === 3) {
           combined1mcVocabulary = [...combinedVocabulary];
+        }
+        if (course.recordId === 2) {
+          combinedLCSVoabulary = [...combinedVocabulary];
         }
       });
       return newCourse;
