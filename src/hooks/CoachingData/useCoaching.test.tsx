@@ -2,9 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { hardCodedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-
 // This would benefit from improved testing. currently only testing existence
 describe('hook useCoaching', () => {
   it('renders without crashing', async () => {
@@ -21,11 +20,11 @@ describe('hook useCoaching', () => {
       'activeStudentsQuery',
       'coachListQuery',
       'courseListQuery',
-      'lastThreeWeeksQuery',
+      'weeksQuery',
       'groupSessionsQuery',
       'groupAttendeesQuery',
       'assignmentsQuery',
-      'callsQuery',
+      'privateCallsQuery',
     ];
     for (const query of listOfQueries) {
       it(`query ${query}: exists and has data`, async () => {
@@ -45,53 +44,70 @@ describe('hook useCoaching', () => {
     const listOfFunctions = [
       {
         func: 'getCoachFromMembershipId',
-        arg: hardCodedMockData.lastThreeWeeks[0].relatedMembership,
-        expected: hardCodedMockData.coachList[0],
+        arg: generatedMockData.weeks[0].relatedMembership,
+        expected: generatedMockData.coachList[0],
       },
       {
         func: 'getCourseFromMembershipId',
-        arg: hardCodedMockData.lastThreeWeeks[0].relatedMembership,
-        expected: hardCodedMockData.courseList[0],
+        arg: generatedMockData.weeks[0].relatedMembership,
+        expected: generatedMockData.courseList[0],
       },
       {
         func: 'getStudentFromMembershipId',
-        arg: hardCodedMockData.lastThreeWeeks[0].relatedMembership,
-        expected: hardCodedMockData.activeStudents[0],
+        arg: generatedMockData.weeks[0].relatedMembership,
+        expected: generatedMockData.studentList[0],
       },
       {
         func: 'getAttendeeWeeksFromGroupSessionId',
-        arg: hardCodedMockData.groupSessions[0].recordId,
-        expected: [hardCodedMockData.lastThreeWeeks[0]],
+        arg: generatedMockData.groupSessions[0].recordId,
+        expected: generatedMockData.weeks.filter((week) => {
+          const attendeesRelatedToWeek = generatedMockData.groupAttendees
+            .filter(
+              (attendee) =>
+                attendee.groupSession ===
+                generatedMockData.groupSessions[0].recordId,
+            )
+            .map((attendee) => attendee.student);
+          return attendeesRelatedToWeek.includes(week.recordId);
+        }),
       },
       {
-        func: 'getGroupSessionFromWeekRecordId',
-        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
-        expected: hardCodedMockData.groupSessions[0],
+        func: 'getGroupSessionsFromWeekRecordId',
+        arg: generatedMockData.weeks[0].recordId,
+        expected: generatedMockData.groupSessions.filter((groupSession) => {
+          const attendeesRelatedToGroupSession =
+            generatedMockData.groupAttendees
+              .filter(
+                (attendee) => attendee.groupSession === groupSession.recordId,
+              )
+              .map((attendee) => attendee.student);
+          return attendeesRelatedToGroupSession.includes(
+            generatedMockData.weeks[0].recordId,
+          );
+        }),
       },
       {
         func: 'getAssignmentsFromWeekRecordId',
-        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
-        expected: hardCodedMockData.assignments.filter(
+        arg: generatedMockData.weeks[0].recordId,
+        expected: generatedMockData.assignments.filter(
           (assignment) =>
-            assignment.relatedWeek ===
-            hardCodedMockData.lastThreeWeeks[0].recordId,
+            assignment.relatedWeek === generatedMockData.weeks[0].recordId,
         ),
       },
       {
         func: 'getMembershipFromWeekRecordId',
-        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
-        expected: hardCodedMockData.activeMemberships.find(
+        arg: generatedMockData.weeks[0].recordId,
+        expected: generatedMockData.memberships.find(
           (membership) =>
             membership.recordId ===
-            hardCodedMockData.lastThreeWeeks[0].relatedMembership,
+            generatedMockData.weeks[0].relatedMembership,
         ),
       },
       {
         func: 'getPrivateCallsFromWeekRecordId',
-        arg: hardCodedMockData.lastThreeWeeks[0].recordId,
-        expected: hardCodedMockData.calls.filter(
-          (call) =>
-            call.relatedWeek === hardCodedMockData.lastThreeWeeks[0].recordId,
+        arg: generatedMockData.weeks[0].recordId,
+        expected: generatedMockData.calls.filter(
+          (call) => call.relatedWeek === generatedMockData.weeks[0].recordId,
         ),
       },
       {
@@ -108,9 +124,10 @@ describe('hook useCoaching', () => {
         await waitFor(() => {
           // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists
           expect(result.current[func.func]).toBeDefined();
-          // expect(result.current[func.func](func.arg)).toStrictEqual(
-          //   func.expected,
-          // );
+          // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists
+          expect(result.current[func.func](func.arg)).toStrictEqual(
+            func.expected,
+          );
         });
       });
     }

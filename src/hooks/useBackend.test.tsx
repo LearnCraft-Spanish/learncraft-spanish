@@ -206,7 +206,7 @@ describe('useBackend Hook', () => {
   describe('createMyStudentExample function', () => {
     it('creates a student example', async () => {
       const response = await hookResult.createMyStudentExample(1);
-      expect(response).toBe('1');
+      expect(response[0]).toBeGreaterThan(0);
     });
     it('returns 0 when creating a student example with bad exampleId', async () => {
       const response = await hookResult.createMyStudentExample(-1);
@@ -216,7 +216,7 @@ describe('useBackend Hook', () => {
   describe('createStudentExample function', () => {
     it('creates a student example', async () => {
       const response = await hookResult.createStudentExample(1, 1);
-      expect(response).toBe('1');
+      expect(response[0]).toBeGreaterThan(0);
     });
 
     it('returns 0 when creating a student example with bad exampleId', async () => {

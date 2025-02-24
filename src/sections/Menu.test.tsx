@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { setupMockAuth } from 'tests/setupMockAuth';
 
+import { allUsersTable } from 'mocks/data/serverlike/userTable';
+import type { TestUserNames } from 'mocks/data/serverlike/userTable';
 import Menu from './Menu';
 
 // Helper Functions
@@ -21,7 +23,7 @@ async function renderMenuLoaded() {
 }
 
 describe('component Menu', () => {
-  describe('isLoading', () => {
+  describe('loading', () => {
     beforeEach(() => {
       setupMockAuth({ isLoading: true });
     });
@@ -38,147 +40,115 @@ describe('component Menu', () => {
     });
   });
 
-  describe('case: Student non Admin', () => {
-    beforeEach(async () => {
-      setupMockAuth({ userName: 'student-lcsp' });
+  describe('roles', () => {
+    const userCases: {
+      name: TestUserNames;
+      roles: string[];
+    }[] = [];
+
+    allUsersTable.forEach((user) => {
+      const roles = [];
+      if (user.roles.studentRole) {
+        roles.push(user.roles.studentRole);
+      }
+      if (user.roles.adminRole) {
+        roles.push(user.roles.adminRole);
+      }
+      userCases.push({
+        name: user.name as TestUserNames,
+        roles,
+      });
     });
 
-    it('render "My Flashcards" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('Official Quizzes')).toBeInTheDocument();
-    });
+    userCases.forEach((userCase) => {
+      describe(`case: ${userCase.name}`, () => {
+        beforeEach(() => {
+          setupMockAuth({ userName: userCase.name });
+        });
 
-    it('does NOT render "Staff Tools" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Staff Tools')).toBeNull();
-    });
-  });
+        // My Flashcards
+        const hasMyFlashcards = userCase.roles.includes('student');
+        it(`${hasMyFlashcards ? 'does' : 'does NOT'} render "My Flashcards" section`, async () => {
+          await renderMenuLoaded();
+          if (hasMyFlashcards) {
+            expect(screen.getByText('My Flashcards:')).toBeInTheDocument();
+          } else {
+            expect(screen.queryByText('My Flashcards:')).toBeNull();
+          }
+        });
 
-  describe('case: Limited Student', () => {
-    beforeEach(() => {
-      setupMockAuth({ userName: 'limited' });
-    });
+        // Offficial Quizzes
+        it('renders Official Quizzes', async () => {
+          await renderMenuLoaded();
+          expect(screen.getByText('Official Quizzes')).toBeInTheDocument();
+        });
 
-    it('render Audio Quiz and Comprehension Quiz', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('Audio Quiz')).toBeInTheDocument();
-      expect(screen.getByText('Comprehension Quiz')).toBeInTheDocument();
-    });
+        // Audio Quizzing
+        const hasAudioQuizzing =
+          userCase.roles.includes('student') ||
+          userCase.roles.includes('limited') ||
+          userCase.roles.includes('admin') ||
+          userCase.roles.includes('coach');
 
-    it('does NOT render "My Flashcards:" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('My Flashcards:')).toBeNull();
-    });
-  });
+        it(`${hasAudioQuizzing ? 'does' : 'does NOT'} render "Audio Quiz"`, async () => {
+          await renderMenuLoaded();
+          if (hasAudioQuizzing) {
+            expect(screen.getByText('Audio Quiz')).toBeInTheDocument();
+            expect(screen.getByText('Comprehension Quiz')).toBeInTheDocument();
+          } else {
+            expect(screen.queryByText('Audio Quiz')).toBeNull();
+            expect(screen.queryByText('Comprehension Quiz')).toBeNull();
+          }
+        });
 
-  describe('case: none role', () => {
-    beforeEach(() => {
-      setupMockAuth({ userName: 'none-role' });
-    });
+        // Find Flashcards
+        const hasFindFlashcards =
+          userCase.roles.includes('student') ||
+          userCase.roles.includes('admin') ||
+          userCase.roles.includes('coach');
 
-    it('render Official Quizzes', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('Official Quizzes')).toBeInTheDocument();
-    });
+        it(`${hasFindFlashcards ? 'does' : 'does NOT'} render "Find Flashcards"`, async () => {
+          await renderMenuLoaded();
+          if (hasFindFlashcards) {
+            expect(screen.getByText('Find Flashcards')).toBeInTheDocument();
+          } else {
+            expect(screen.queryByText('Find Flashcards')).toBeNull();
+          }
+        });
 
-    it('does NOT render "My Flashcards:" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('My Flashcards:')).toBeNull();
-    });
+        // General Staff Tools
+        const hasGeneralStaffTools =
+          userCase.roles.includes('admin') || userCase.roles.includes('coach');
 
-    it('does NOT render "Audio Quiz" and "Comprehension Quiz"', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Audio Quiz')).toBeNull();
-      expect(screen.queryByText('Comprehension Quiz')).toBeNull();
-    });
+        it(`${hasGeneralStaffTools ? 'does' : 'does NOT'} render general staff tools`, async () => {
+          await renderMenuLoaded();
+          if (hasGeneralStaffTools) {
+            expect(screen.queryByText('Staff Tools')).toBeInTheDocument();
+            expect(screen.queryByText('FrequenSay')).toBeInTheDocument();
+            expect(
+              screen.queryByText('Weekly Records Interface'),
+            ).toBeInTheDocument();
+          } else {
+            expect(screen.queryByText('Staff Tools')).toBeNull();
+            expect(screen.queryByText('FrequenSay')).toBeNull();
+            expect(screen.queryByText('Weekly Records Interface')).toBeNull();
+          }
+        });
 
-    it('does NOT render "Staff Tools" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Staff Tools')).toBeNull();
-    });
-  });
+        // Admin Staff Tools
+        const hasAdminStaffTools = userCase.roles.includes('admin');
 
-  describe('case: empty role', () => {
-    beforeEach(() => {
-      setupMockAuth({ userName: 'empty-role' });
-    });
-
-    it('render Official Quizzes', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('Official Quizzes')).toBeInTheDocument();
-    });
-
-    it('does NOT render "My Flashcards:" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('My Flashcards:')).toBeNull();
-    });
-
-    it('does NOT render "Audio Quiz" and "Comprehension Quiz"', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Audio Quiz')).toBeNull();
-      expect(screen.queryByText('Comprehension Quiz')).toBeNull();
-    });
-
-    it('does NOT render "Staff Tools" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Staff Tools')).toBeNull();
-    });
-  });
-
-  describe('case: Admin student', () => {
-    beforeEach(() => {
-      setupMockAuth({ userName: 'student-admin' });
-    });
-
-    it('does render My Flashcards', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('My Flashcards:')).toBeInTheDocument();
-    });
-
-    it('doees render manage my flashcards', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('Manage My Flashcards')).toBeInTheDocument();
-    });
-
-    it('does render Find Flashcards', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('Find Flashcards')).toBeInTheDocument();
-    });
-
-    it('does render "Staff Tools" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Staff Tools')).toBeInTheDocument();
-    });
-  });
-
-  describe('case: Admin empty role', () => {
-    beforeEach(() => {
-      setupMockAuth({ userName: 'admin-empty-role' });
-    });
-
-    it('does render Find Flashcards', async () => {
-      await renderMenuLoaded();
-      expect(screen.getByText('Find Flashcards')).toBeInTheDocument();
-    });
-
-    it('does render "Staff Tools" section', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Staff Tools')).toBeInTheDocument();
-    });
-
-    it('shows example editor', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Example Creator')).toBeInTheDocument();
-    });
-
-    it('does NOT render My Flashcards', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('My Flashcards')).toBeNull();
-    });
-
-    it('does NOT render manage my flashcards', async () => {
-      await renderMenuLoaded();
-      expect(screen.queryByText('Manage My Flashcards')).toBeNull();
+        it(`${hasAdminStaffTools ? 'does' : 'does NOT'} render admin specific staff tools`, async () => {
+          await renderMenuLoaded();
+          if (hasAdminStaffTools) {
+            expect(screen.queryByText('Example Creator')).toBeInTheDocument();
+            expect(screen.queryByText('Example Editor')).toBeInTheDocument();
+          } else {
+            expect(screen.queryByText('Example Creator')).toBeNull();
+            expect(screen.queryByText('Example Editor')).toBeNull();
+          }
+        });
+      });
     });
   });
 });

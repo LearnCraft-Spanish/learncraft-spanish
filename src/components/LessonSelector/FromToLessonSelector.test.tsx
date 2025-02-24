@@ -54,7 +54,7 @@ describe('component FromToLessonSelector', () => {
       expect(screen.getByText('To:')).toBeInTheDocument();
     });
 
-    it('course dropdown has all programs', async () => {
+    it('course dropdown has all programs that have lessons', async () => {
       const { result } = renderHook(() => useProgramTable(), { wrapper });
       await waitFor(() => {
         expect(result.current.programTableQuery.isSuccess).toBe(true);
@@ -63,9 +63,11 @@ describe('component FromToLessonSelector', () => {
       const programs = result.current.programTableQuery.data;
       if (!programs) throw new Error('No programs found');
       // Tests
-      programs.forEach((program) => {
-        expect(screen.getByText(program.name)).toBeInTheDocument();
-      });
+      programs
+        .filter((program) => program.lessons.length > 0)
+        .forEach((program) => {
+          expect(screen.getByText(program.name)).toBeInTheDocument();
+        });
     });
 
     it('selected course is the related program of current user', async () => {

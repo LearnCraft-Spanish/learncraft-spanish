@@ -1,8 +1,10 @@
+import { useMemo } from 'react';
+
 import type { Coach, Course } from 'src/types/CoachingTypes';
 
-import useBANDAIDhelperFunction from '../useBANDAIDhelperFunction';
-import CoachSelect from './CoachSelector';
-import CourseSelector from './CourseSelector';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import getDateRange from '../../general/functions/dateRange';
+import { CoachDropdown, Dropdown } from '../../general';
 
 import '../../coaching.scss';
 
@@ -44,23 +46,47 @@ export default function WeeksFilter({
   searchTerm,
   updateSearchTerm,
 }: CoachingFilterProps) {
-  const dateRange = useBANDAIDhelperFunction();
+  const { courseListQuery, activeMembershipsQuery } = useCoaching();
+  const dateRange = useMemo(() => getDateRange(), []);
+
+  const coursesWithActiveMemberships = useMemo(() => {
+    if (!courseListQuery.isSuccess || !activeMembershipsQuery.isSuccess)
+      return [];
+    return courseListQuery.data.filter((course) => {
+      return (
+        activeMembershipsQuery.data.filter(
+          (membership) => membership.relatedCourse === course.recordId,
+        ).length > 0
+      );
+    });
+  }, [
+    courseListQuery.data,
+    courseListQuery.isSuccess,
+    activeMembershipsQuery.data,
+    activeMembershipsQuery.isSuccess,
+  ]);
+
   return (
     dataReady && (
       <div className="coachingFilterSection">
         <div className="simpleFiltering">
-          <CoachSelect
-            updateCoachFilter={updateCoachFilter}
-            filterByCoach={filterByCoach}
+          <CoachDropdown
+            coachEmail={filterByCoach?.user.email || ''}
+            onChange={updateCoachFilter}
+            editMode
+            defaultOptionText="Select Coach"
           />
-          <CourseSelector
-            updateCourseFilter={updateCourseFilter}
-            filterByCourse={filterByCourse}
+          <Dropdown
+            label="Course"
+            value={filterByCourse?.name || undefined}
+            onChange={updateCourseFilter}
+            options={coursesWithActiveMemberships.map((course) => course.name)}
+            editMode
+            defaultOptionText="All Courses"
           />
           <div>
             <label htmlFor="weekRangeFilter">Week:</label>
             <select
-              name="weekRangeFilter"
               id="weekRangeFilter"
               onChange={(e) => updateWeeksAgoFilter(e.target.value)}
               value={filterByWeeksAgo}
@@ -101,7 +127,6 @@ export default function WeeksFilter({
               {/* <label htmlFor="search">Search:</label> */}
               <input
                 type="text"
-                name="search"
                 id="search"
                 value={searchTerm}
                 placeholder="Search names, emails, or notes"
@@ -115,7 +140,6 @@ export default function WeeksFilter({
                 <input
                   alt="Exclude Students Without Coaches"
                   type="checkbox"
-                  name="Exclude Students Without Coaches"
                   id="filterCoachless"
                   checked={filterCoachless}
                   onChange={(e) => updateCoachlessFilter(e.target.checked)}
@@ -129,7 +153,6 @@ export default function WeeksFilter({
                 <input
                   alt="Exclude Weeks on Hold"
                   type="checkbox"
-                  name="Exclude Weeks On Hold"
                   id="filterHoldWeeks"
                   checked={filterHoldWeeks}
                   onChange={(e) => updateFilterHoldWeeks(e.target.checked)}
@@ -145,7 +168,6 @@ export default function WeeksFilter({
                 Filter Records By Completion:
               </label>
               <select
-                name=""
                 id="filterByCompletion"
                 onChange={(e) => updateFilterByCompletion(e.target.value)}
                 value={filterByCompletion}

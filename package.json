@@ -14,19 +14,20 @@
     "pnpm": ">=7"
   },
   "scripts": {
-    "start": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "refresh-mockdata": "tsx .github/workflows/update-cache.ts",
-    "test": "vitest run --coverage",
-    "mutate": "stryker run",
-    "predeploy": "pnpm run build",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "scss": "sass --watch src/components/Coaching/styles:src/components/Coaching/styles"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "mutate": "stryker run",
+    "predeploy": "pnpm run build",
+    "preview": "vite preview",
+    "refresh-mockdata": "tsx .github/workflows/update-cache.ts",
+    "scss": "sass --watch src/components/Coaching/styles:src/components/Coaching/styles",
+    "start": "vite",
+    "test": "vitest run --coverage",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run lint:fix && npm run format && npm run typecheck"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
@@ -102,7 +103,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "vite": "^5.4.8",
-    "vitest": "^2.1.2"
+    "vitest": "^2.1.9"
   },
   "directories": {
     "test": "tests"

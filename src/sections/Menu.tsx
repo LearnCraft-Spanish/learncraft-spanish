@@ -30,6 +30,7 @@ export default function Menu() {
     (userDataQuery.isError ||
       activeStudentQuery.isError ||
       flashcardDataQuery.isError);
+
   const menuDataLoading =
     !menuDataReady &&
     !menuDataError &&
@@ -95,8 +96,8 @@ export default function Menu() {
               </Link>
             </div>
           )}
-          {(userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
+          {(userDataQuery.data.roles.adminRole === 'coach' ||
+            userDataQuery.data.roles.adminRole === 'admin') && (
             <div>
               <h3>Staff Tools</h3>
               <div className="buttonBox">
@@ -109,7 +110,7 @@ export default function Menu() {
                   Weekly Records Interface
                 </Link>
               </div>
-              {userDataQuery.data?.roles.adminRole === 'admin' && (
+              {userDataQuery.data.roles.adminRole === 'admin' && (
                 <>
                   <div className="buttonBox">
                     <Link className="linkButton" to="/examplecreator">

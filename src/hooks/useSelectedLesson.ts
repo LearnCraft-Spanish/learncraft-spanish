@@ -94,6 +94,9 @@ export function useSelectedLesson() {
         });
         return isAllowed;
       });
+      if (!requiredVocabulary.length && !selectionState.fromLesson) {
+        return filteredByAllowedVocab;
+      }
       if (!requiredVocabulary.length) {
         return [];
       }
@@ -107,7 +110,7 @@ export function useSelectedLesson() {
         return isRequired;
       });
     },
-    [allowedVocabulary, requiredVocabulary],
+    [allowedVocabulary, requiredVocabulary, selectionState.fromLesson],
   );
 
   const newToLesson = useCallback(
@@ -135,12 +138,24 @@ export function useSelectedLesson() {
       }
       const newProgram =
         programsQueryData?.find((item) => item.recordId === program) || null;
+      if (!newProgram?.recordId) {
+        queryClient.setQueryData(
+          ['programSelection'],
+          (oldState: typeof initialSelectionState) => ({
+            ...oldState,
+            program: null,
+            fromLesson: null,
+            toLesson: null,
+          }),
+        );
+        return;
+      }
       queryClient.setQueryData(
         ['programSelection'],
         (oldState: typeof initialSelectionState) => ({
           ...oldState,
           program: newProgram,
-          fromLesson: newProgram?.lessons ? newProgram.lessons[0] : null,
+          fromLesson: null,
           toLesson: newToLesson(newProgram),
         }),
       );
@@ -157,6 +172,15 @@ export function useSelectedLesson() {
       const newFromLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === newId,
       );
+      if (!newFromLesson?.recordId) {
+        queryClient.setQueryData(
+          ['programSelection'],
+          (oldState: typeof initialSelectionState) => ({
+            ...oldState,
+            fromLesson: null,
+          }),
+        );
+      }
       queryClient.setQueryData(
         ['programSelection'],
         (oldState: typeof initialSelectionState) => ({
@@ -177,6 +201,15 @@ export function useSelectedLesson() {
       const newToLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === toLesson,
       );
+      if (!newToLesson?.recordId) {
+        queryClient.setQueryData(
+          ['programSelection'],
+          (oldState: typeof initialSelectionState) => ({
+            ...oldState,
+            toLesson: null,
+          }),
+        );
+      }
       queryClient.setQueryData(
         ['programSelection'],
         (oldState: typeof initialSelectionState) => ({

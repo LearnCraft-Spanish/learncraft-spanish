@@ -49,6 +49,11 @@ export const App: React.FC = () => {
       studentListQuery.data.forEach((student: FlashcardStudent) => {
         const studentEmail = student.emailAddress;
         const studentRole = student.role;
+        const studentName = student.name
+          .toLowerCase()
+          .split(' ')
+          .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+          .join(' ');
         if (
           !studentEmail.includes('(') &&
           (studentRole === 'student' || studentRole === 'limited')
@@ -57,7 +62,7 @@ export const App: React.FC = () => {
             <option
               key={student.recordId}
               value={student.recordId}
-              label={`${student.name} -- ${studentEmail}`}
+              label={`${studentName} -- ${studentEmail}`}
             />,
           );
         }
@@ -216,7 +221,6 @@ export const App: React.FC = () => {
       <ToastContainer
         theme="colored"
         transition={Zoom}
-        autoClose={3000}
         pauseOnHover={false}
         closeOnClick
       />

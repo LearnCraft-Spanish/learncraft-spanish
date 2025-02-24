@@ -1,14 +1,20 @@
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import type { Week } from 'src/types/CoachingTypes';
+import type { Student, Week } from 'src/types/CoachingTypes';
 import eye from 'src/assets/icons/eye.svg';
 // import pencil from 'src/resources/icons/pencil.svg';
 
-export default function StudentCell({ week }: { week: Week }) {
-  const { getStudentFromMembershipId } = useCoaching();
+export default function StudentCell({
+  week,
+  student,
+}: {
+  week: Week;
+  student: Student | null | undefined;
+}) {
   const { openContextual } = useContextualMenu();
 
-  const student = getStudentFromMembershipId(week.relatedMembership);
+  if (!student) {
+    return null;
+  }
 
   return (
     student && (
@@ -25,7 +31,11 @@ export default function StudentCell({ week }: { week: Week }) {
         <div className="content">
           <h4>{student.fullName}</h4>
           <p>{student.email}</p>
-          <p>{student.primaryCoach.name}</p>
+          <p>
+            {student.primaryCoach
+              ? student.primaryCoach.name
+              : 'No Coach Found'}
+          </p>
           <p>{week.level}</p>
         </div>
       </div>

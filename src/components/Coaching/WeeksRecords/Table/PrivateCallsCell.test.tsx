@@ -25,7 +25,7 @@ describe('component StudentCell', () => {
   it('default view renders without crashing', async () => {
     render(
       <MockAllProviders>
-        <PrivateCallsCell week={week} />
+        <PrivateCallsCell week={week} calls={[call]} />
       </MockAllProviders>,
     );
     await waitFor(() => {
@@ -36,7 +36,7 @@ describe('component StudentCell', () => {
     it('contextual menu view renders without crashing', async () => {
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} />
+          <PrivateCallsCell week={week} calls={[call]} />
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -44,7 +44,7 @@ describe('component StudentCell', () => {
       });
       // Click on the button that opens the contextual menu
       act(() => {
-        screen.getByRole('button').click();
+        screen.getByText(`${call.rating}`).click();
       });
       await waitFor(() => {
         expect(screen.getByText('Rating:')).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('component StudentCell', () => {
       const requiredFields = ['Rating:', 'Notes:', 'Difficulties:'];
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} />
+          <PrivateCallsCell week={week} calls={[call]} />
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -63,7 +63,7 @@ describe('component StudentCell', () => {
       });
       // Click on the button that opens the contextual menu
       act(() => {
-        screen.getByRole('button').click();
+        screen.getByText(`${call.rating}`).click();
       });
       await waitFor(() => {
         requiredFields.forEach((field) => {
@@ -73,9 +73,12 @@ describe('component StudentCell', () => {
     });
 
     it('contextual menu view renders the session documents if they exist on the call', async () => {
+      if (!call.recording) {
+        throw new Error('No recording found in mock data');
+      }
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} />
+          <PrivateCallsCell week={week} calls={[call]} />
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -83,10 +86,10 @@ describe('component StudentCell', () => {
       });
       // Click on the button that opens the contextual menu
       act(() => {
-        screen.getByRole('button').click();
+        screen.getByText(`${call.rating}`).click();
       });
       await waitFor(() => {
-        expect(screen.getByText('Session Documents:')).toBeInTheDocument();
+        expect(screen.getByText('Recording Link')).toBeInTheDocument();
       });
     });
   });

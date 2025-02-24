@@ -1,21 +1,23 @@
-export interface Lesson {
+export type Expanded<T> = { [K in keyof T]: T[K] };
+
+export type Lesson = Expanded<{
   recordId: number;
   lesson: string;
   vocabIncluded: Array<string>;
   sortReference: number | null;
   relatedProgram: number;
   vocabKnown: Array<string>;
-}
+}>;
 
-export interface LessonUnparsed {
+export type LessonUnparsed = Expanded<{
   recordId: number;
   lesson: string;
   vocabIncluded: Array<string>;
   sortReference: number | null;
   relatedProgram: number;
-}
+}>;
 
-export interface Program {
+export type Program = Expanded<{
   recordId: number;
   name: string;
   lessons: Array<Lesson>;
@@ -25,9 +27,11 @@ export interface Program {
   cohortDCurrentLesson: number;
   cohortECurrentLesson: number;
   cohortFCurrentLesson: number;
-}
+  cohortGCurrentLesson: number;
+  //cohortGCurrentLesson: number;
+}>;
 
-export interface ProgramUnparsed {
+export type ProgramUnparsed = Expanded<{
   recordId: number;
   name: string;
   lessons: Array<string>;
@@ -37,9 +41,11 @@ export interface ProgramUnparsed {
   cohortDCurrentLesson: number;
   cohortECurrentLesson: number;
   cohortFCurrentLesson: number;
-}
+  cohortGCurrentLesson: number;
+  //cohortHCurrentLesson: number;
+}>;
 
-export interface UserData {
+export type UserData = Expanded<{
   recordId: number;
   name: string;
   emailAddress: string;
@@ -49,25 +55,22 @@ export interface UserData {
     studentRole: '' | 'limited' | 'student';
     adminRole: '' | 'coach' | 'admin';
   };
-}
+}>;
 
-export interface FlashcardStudent {
+export type FlashcardStudent = Expanded<{
   recordId: number;
   name: string;
   emailAddress: string;
   cohort: string;
   relatedProgram: number;
   role: '' | 'limited' | 'student';
-}
+}>;
 
-// selectedProgram is a program, or null
-export type selectedProgram = Program | null;
+export type selectedProgram = Expanded<Program | null>;
 
-// selectedLesson is a lesson, or null
-export type selectedLesson = Lesson | null;
+export type selectedLesson = Expanded<Lesson | null>;
 
-// These interfaces are also defined in Flashcard Manager, but with some fields missing
-export interface Flashcard {
+export type Flashcard = Expanded<{
   recordId: number;
   spanishExample: string;
   englishTranslation: string;
@@ -76,18 +79,19 @@ export interface Flashcard {
   englishAudio: string;
   spanishAudioLa: string;
   vocabComplete: boolean;
-  difficulty?: string;
+  difficulty?: 'easy' | 'hard';
   dateCreated?: string;
   dateModified?: string;
-}
+}>;
 
-export interface NewFlashcard
-  extends Omit<Flashcard, 'recordId' | 'vocabIncluded'> {
-  recordId?: never;
-  vocabIncluded?: never;
-}
+export type NewFlashcard = Expanded<
+  Omit<Flashcard, 'recordId' | 'vocabIncluded'> & {
+    recordId?: never;
+    vocabIncluded?: never;
+  }
+>;
 
-export interface StudentExample {
+export type StudentExample = Expanded<{
   recordId: number;
   lastReviewedDate: string;
   nextReviewDate: string;
@@ -97,27 +101,22 @@ export interface StudentExample {
   relatedExample: number;
   dateCreated: string;
   studentEmailAddress: string;
-}
+}>;
 
-export interface StudentFlashcardData {
+export type StudentFlashcardData = Expanded<{
   examples: Flashcard[];
   studentExamples: StudentExample[];
-}
+}>;
 
-// StudentExamplesTable is an array of StudentExamples
-export type StudentExamplesTable = Array<StudentExample>;
-// ExamplesTable is an array of Flashcards
-export type ExamplesTable = Array<Flashcard>;
+export type StudentExamplesTable = Expanded<Array<StudentExample>>;
 
-// Active Student is  UserData, or null
-export type ActiveStudent = UserData | null;
+export type ExamplesTable = Expanded<Array<Flashcard>>;
 
-// AudioExample is a Flashcard with spanishAudioLa.length > 0
-// export type AudioExample = Flashcard;
-// export type AudioExamplesTable = Array<AudioExample>;
-export type AudioExamplesTable = Array<Flashcard>;
+export type ActiveStudent = Expanded<UserData | null>;
 
-export interface Vocabulary {
+export type AudioExamplesTable = Expanded<Array<Flashcard>>;
+
+export type Vocabulary = Expanded<{
   recordId: number;
   wordIdiom: string;
   use: string;
@@ -128,19 +127,19 @@ export interface Vocabulary {
   verbInfinitive: string;
   conjugationTags: Array<string>;
   spellings?: Array<string>;
-}
+}>;
 
-export interface QuizCourse {
+export type QuizCourse = Expanded<{
   name: string;
   url: string;
   code: string;
-}
+}>;
 
-export interface DisplayOrder {
+export type DisplayOrder = Expanded<{
   recordId: number;
-}
+}>;
 
-export interface Quiz {
+export type Quiz = Expanded<{
   recordId: number;
   quizNickname: string;
   quizType: string;
@@ -149,78 +148,67 @@ export interface Quiz {
   quizLetter: string;
   lessonNumber: number;
   subtitle: string;
-}
+}>;
 
-export interface QuizUnparsed {
+export type QuizUnparsed = Expanded<{
   quizNickname: string;
   recordId: number;
-}
+}>;
 
-export interface QuizExamplesTable {
+export type QuizExamplesTable = Expanded<{
   quizNickname: string;
   quizExamplesTable: Flashcard[];
-}
+}>;
 
-// Old Spelling
-// export interface Spelling {
-//   relatedWordidiom: number;
-//   spellingOption: string;
-// }
-// New Spelling
-export interface Spelling {
+export type Spelling = Expanded<{
   relatedWordIdiom: number;
   spellingOption: string;
-}
+}>;
 
-/*      Flashcard Finder      */
-
-// Highly Tentative for now, will be updated as needed
-export interface VocabTagWithVocabDescriptor {
+export type VocabTagWithVocabDescriptor = Expanded<{
   id: number;
   type: 'vocabulary';
   tag: string;
-  vocabDescriptor: string; // required when type is "vocab"
-}
+  vocabDescriptor: string;
+}>;
 
-export interface VocabTagWithoutVocabDescriptor {
+export type VocabTagWithoutVocabDescriptor = Expanded<{
   id: number;
-  type: string; // any other type
+  type: string;
   tag: string;
-  vocabDescriptor?: undefined; // explicitly undefined when type is not "vocabulary"
-}
+  vocabDescriptor?: undefined;
+}>;
 
-// Combines the two types above
-export type VocabTag =
-  | VocabTagWithVocabDescriptor
-  | VocabTagWithoutVocabDescriptor;
+export type VocabTag = Expanded<
+  VocabTagWithVocabDescriptor | VocabTagWithoutVocabDescriptor
+>;
 
-/*      Coaching Interfaces      */
-export interface Coach {
+export type Coach = Expanded<{
   recordId: number;
   coach: string;
   user: string;
-}
+}>;
 
-export interface CoachingCourses {
+export type CoachingCourses = Expanded<{
   recordId: number;
   name: string;
   membershipType: string;
   weeklyPrivateCalls: number;
   hasGroupCalls: boolean;
-}
+}>;
 
-export interface CoachingLessons {
+export type CoachingLessons = Expanded<{
   recordId: number;
   lessonName: string;
   weekRef: number;
   type: string;
-}
+}>;
 
-export interface WrapperProps {
+export type WrapperProps = Expanded<{
   children: React.ReactNode;
-}
+}>;
 
-export type mockUserNames =
+export type mockUserNames = Expanded<
   | 'admin-empty-role'
   | 'empty-role'
   | 'none-role'
@@ -229,10 +217,11 @@ export type mockUserNames =
   | 'student-lcsp'
   | 'student-ser-estar'
   | null
-  | undefined;
+  | undefined
+>;
 
-export interface PMFData {
+export type PMFData = Expanded<{
   recordId: number;
   relatedStudent: number;
   lastContactDate: string;
-}
+}>;

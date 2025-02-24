@@ -25,7 +25,7 @@ describe('component StudentCell', () => {
   it('renders with valid data', async () => {
     render(
       <MockAllProviders>
-        <StudentCell week={week} />
+        <StudentCell week={week} student={student} />
       </MockAllProviders>,
     );
     // Student Name related to the week record
@@ -36,12 +36,7 @@ describe('component StudentCell', () => {
   it('does not render with invalid data', async () => {
     render(
       <MockAllProviders>
-        <StudentCell
-          week={{
-            ...week,
-            relatedMembership: 777777,
-          }}
-        />
+        <StudentCell week={week} student={null} />
       </MockAllProviders>,
     );
     // Student Name related to the week record
@@ -53,7 +48,7 @@ describe('component StudentCell', () => {
   it('renders with the correct data', async () => {
     render(
       <MockAllProviders>
-        <StudentCell week={week} />
+        <StudentCell week={week} student={student} />
       </MockAllProviders>,
     );
     // Student Name related to the week record

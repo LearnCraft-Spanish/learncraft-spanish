@@ -2,6 +2,7 @@ import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import type { Lesson, Program } from 'src/types/interfaceDefinitions';
 import './LessonSelector.css';
+import type { ReactElement } from 'react';
 
 export default function FromToLessonSelector(): JSX.Element {
   const {
@@ -25,11 +26,7 @@ export default function FromToLessonSelector(): JSX.Element {
   }
 
   function makeCourseSelector() {
-    const courseSelector = [
-      <option key={0} value={0}>
-        –Choose Course–
-      </option>,
-    ];
+    const courseSelector: ReactElement[] = [];
     if (programTableQuery.isSuccess) {
       programTableQuery.data?.forEach((item: Program) => {
         courseSelector.push(
@@ -85,9 +82,12 @@ export default function FromToLessonSelector(): JSX.Element {
           id="courseList"
           name="courseList"
           className="courseList"
-          value={selectedProgram?.recordId ? selectedProgram?.recordId : 0}
+          value={selectedProgram?.recordId ?? 0}
           onChange={(e) => setProgram(e.target.value)}
         >
+          <option key={0} value={0}>
+            –Choose Course–
+          </option>
           {makeCourseSelector()}
         </select>
       </label>
@@ -99,9 +99,12 @@ export default function FromToLessonSelector(): JSX.Element {
             <select
               id="fromLesson"
               name="fromLesson"
-              value={selectedFromLesson?.recordId}
+              value={selectedFromLesson?.recordId ?? 0}
               onChange={(e) => setFromLesson(e.target.value)}
             >
+              <option key={0} value={0}>
+                –Choose Lesson–
+              </option>
               {makeFromLessonSelector()}
             </select>
           </label>
@@ -114,9 +117,12 @@ export default function FromToLessonSelector(): JSX.Element {
               id="toLesson"
               name="toLesson"
               className="lessonList"
-              value={selectedToLesson?.recordId}
+              value={selectedToLesson?.recordId ?? 0}
               onChange={(e) => setToLesson(e.target.value)}
             >
+              <option key={0} value={0}>
+                –Choose Lesson–
+              </option>
               {makeToLessonSelector()}
             </select>
           </label>

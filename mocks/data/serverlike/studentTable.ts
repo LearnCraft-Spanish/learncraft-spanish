@@ -47,7 +47,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     emailAddress: 'student-lcsp@fake.not',
     role: 'student',
     relatedProgram: 2,
-    cohort: 'D',
+    cohort: 'G',
   },
   {
     recordId: 7,
