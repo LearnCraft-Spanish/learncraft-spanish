@@ -268,13 +268,23 @@ export default function WeeksRecordsSection() {
       userDataQuery.isSuccess
     ) {
       const currentUser = userDataQuery.data;
+      const possibleEmailDomains = [
+        '@learncraftspanish.com',
+        '@masterofmemory.com',
+      ];
 
       if (currentUser.emailAddress) {
-        const currentUserCoach = coachListQuery.data.find(
-          (coach) =>
-            coach.user.email.toLowerCase() ===
-            currentUser?.emailAddress.toLowerCase(),
-        );
+        const currentUserCoach = coachListQuery.data.find((coach) => {
+          const emailPrefix = currentUser.emailAddress
+            .split('@')[0]
+            .toLowerCase();
+          for (const domain of possibleEmailDomains) {
+            if (coach.user.email.toLowerCase() === emailPrefix + domain) {
+              return true;
+            }
+          }
+          return false;
+        });
         if (currentUserCoach) setFilterByCoach(currentUserCoach);
       }
       rendered.current = true;
