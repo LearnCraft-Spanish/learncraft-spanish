@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
-import play from 'src/assets/icons/play_dark.svg';
 import pause from 'src/assets/icons/pause_dark.svg';
+import play from 'src/assets/icons/play_dark.svg';
 
 export function AudioControl({ audioLink }: { audioLink: string }) {
   const [isPlaying, setIsPlaying] = useState(false);

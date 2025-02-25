@@ -1,9 +1,9 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
-import { HttpResponse, http } from 'msw';
 import type { UserData } from 'src/types/interfaceDefinitions';
+import { http, HttpResponse } from 'msw';
+import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import newData from '../data/serverlike/serverlikeData';
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
-import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import {
   allUsersTable,
   getUserDataFromName,
@@ -143,7 +143,8 @@ export const handlers = [
     if (exampleId === '-1') {
       return HttpResponse.json('0');
     }
-    return HttpResponse.json('1');
+    const newRecordId = Math.floor(Math.random() * 1000);
+    return HttpResponse.json([newRecordId]);
   }),
 
   http.post(`${backendUrl}create-student-example`, async ({ request }) => {
@@ -152,7 +153,8 @@ export const handlers = [
     if (exampleId === '-1' || studentId === '-1') {
       return HttpResponse.json('0');
     }
-    return HttpResponse.json('1');
+    const newRecordId = Math.floor(Math.random() * 1000);
+    return HttpResponse.json([newRecordId]);
   }),
 
   http.post(`${backendUrl}update-my-student-example`, async ({ request }) => {
@@ -214,7 +216,7 @@ export const handlers = [
   }),
 
   // Coaching
-  http.get(`${backendUrl}coaching/weeks-new-format`, async () => {
+  http.get(`${backendUrl}coaching/weeks`, async () => {
     return HttpResponse.json(generatedMockData.weeks);
   }),
   http.get(`${backendUrl}coaching/coaches`, async () => {
@@ -238,7 +240,17 @@ export const handlers = [
   http.get(`${backendUrl}coaching/assignments`, async () => {
     return HttpResponse.json(generatedMockData.assignments);
   }),
-  http.get(`${backendUrl}coaching/calls`, async () => {
+  http.get(`${backendUrl}coaching/private-calls`, async () => {
     return HttpResponse.json(generatedMockData.calls);
   }),
+  // TEMP, to get current tests to run
+  http.get(`${backendUrl}coaching/lessons`, async () => {
+    return HttpResponse.json([]);
+  }),
+  http.get(
+    `${backendUrl}coaching/group-sessions/topic-field-options`,
+    async () => {
+      return HttpResponse.json([]);
+    },
+  ),
 ];

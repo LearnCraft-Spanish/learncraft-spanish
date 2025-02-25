@@ -1,3 +1,5 @@
+import type { Flashcard } from 'src/types/interfaceDefinitions';
+
 import {
   cleanup,
   render,
@@ -5,13 +7,11 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-
-import React from 'react';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { sampleStudentFlashcardData } from 'tests/mockData';
-import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import SRSQuizButtons from './SRSButtons';
 
 // vi.mock('src/hooks/useStudentFlashcards', () => {

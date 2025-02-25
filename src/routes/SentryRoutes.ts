@@ -2,9 +2,9 @@ import * as Sentry from '@sentry/react';
 // SentryRoutes.js
 import React from 'react';
 import {
-  Routes,
   createRoutesFromChildren,
   matchRoutes,
+  Routes,
   useLocation,
   useNavigationType,
 } from 'react-router-dom';

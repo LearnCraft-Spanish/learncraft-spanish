@@ -6,13 +6,13 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
+
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
-import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
-
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import Quiz from './QuizComponent';
 
 const cleanupFunction = vi.fn();

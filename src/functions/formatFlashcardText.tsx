@@ -1,7 +1,9 @@
+import React from 'react';
+
 export function formatSpanishText(
   isSpanglish: string,
   spanishText: string,
-): JSX.Element {
+): React.JSX.Element {
   if (isSpanglish === 'esp') {
     return <p className="spanishFlashcardText">{spanishText}</p>;
   } else {
@@ -28,6 +30,6 @@ export function formatSpanishText(
   }
 }
 
-export function formatEnglishText(englishText: string): JSX.Element {
+export function formatEnglishText(englishText: string): React.JSX.Element {
   return <p className="englishFlashcardText">{englishText}</p>;
 }

@@ -22,7 +22,7 @@ jobs:
 
       # Install pnpm
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: npm install -g pnpm@9.7
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies

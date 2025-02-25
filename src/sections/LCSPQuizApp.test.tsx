@@ -1,5 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import React from 'react';
+import type { TestUserNames } from 'mocks/data/serverlike/userTable';
 import {
   act,
   fireEvent,
@@ -8,9 +7,11 @@ import {
   waitFor,
 } from '@testing-library/react';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import LCSPQuizApp from './LCSPQuizApp';
 
@@ -79,14 +80,7 @@ describe('official quiz component', () => {
       const quizNumber = sampledQuizDetails.slice(-1)[0];
       it(`${user.name} can click through to a flashcard`, async () => {
         setupMockAuth({
-          userName: user.name as
-            | 'admin-empty-role'
-            | 'empty-role'
-            | 'none-role'
-            | 'limited'
-            | 'student-admin'
-            | 'student-lcsp'
-            | 'student-ser-estar',
+          userName: user.name as TestUserNames,
         });
         render(
           <MockAllProviders route="/officialquizzes" childRoutes>

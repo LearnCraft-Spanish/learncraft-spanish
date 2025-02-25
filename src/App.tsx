@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
@@ -6,8 +5,8 @@ import type { FlashcardStudent } from './types/interfaceDefinitions';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
-import { useActiveStudent } from './hooks/UserData/useActiveStudent';
 import useAuth from './hooks/useAuth';
+import { useActiveStudent } from './hooks/UserData/useActiveStudent';
 import { useUserData } from './hooks/UserData/useUserData';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
@@ -49,6 +48,11 @@ export const App: React.FC = () => {
       studentListQuery.data.forEach((student: FlashcardStudent) => {
         const studentEmail = student.emailAddress;
         const studentRole = student.role;
+        const studentName = student.name
+          .toLowerCase()
+          .split(' ')
+          .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+          .join(' ');
         if (
           !studentEmail.includes('(') &&
           (studentRole === 'student' || studentRole === 'limited')
@@ -57,17 +61,17 @@ export const App: React.FC = () => {
             <option
               key={student.recordId}
               value={student.recordId}
-              label={`${student.name} -- ${studentEmail}`}
+              label={`${studentName} -- ${studentEmail}`}
             />,
           );
         }
       });
       const studentSelectorSortFunction = (
-        a: ReactElement,
-        b: ReactElement,
+        a: React.JSX.IntrinsicElements['option'],
+        b: React.JSX.IntrinsicElements['option'],
       ) => {
-        const aName = a.props.label;
-        const bName = b.props.label;
+        const aName = a.label ?? '';
+        const bName = b.label ?? '';
         if (aName > bName) {
           return 1;
         } else {
@@ -98,11 +102,17 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     clearTimeout(messageNumber.current);
+    let timeoutNumber: number | NodeJS.Timeout;
     messageNumber.current = 0;
     if (bannerMessage !== '') {
-      const timeoutNumber = setTimeout(blankBanner, 1000);
+      timeoutNumber = setTimeout(blankBanner, 1000);
       messageNumber.current = timeoutNumber;
     }
+    return () => {
+      if (timeoutNumber) {
+        clearTimeout(timeoutNumber);
+      }
+    };
   }, [bannerMessage, messageNumber, blankBanner]);
 
   return (
@@ -216,7 +226,6 @@ export const App: React.FC = () => {
       <ToastContainer
         theme="colored"
         transition={Zoom}
-        autoClose={3000}
         pauseOnHover={false}
         closeOnClick
       />

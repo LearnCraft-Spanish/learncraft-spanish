@@ -86,4 +86,4 @@ function makeDateRange() {
   */
 }
 
-export { getWeekEnds, formatDateLikeQB, makeDateRange };
+export { formatDateLikeQB, getWeekEnds, makeDateRange };

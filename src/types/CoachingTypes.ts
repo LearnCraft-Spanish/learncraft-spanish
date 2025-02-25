@@ -115,6 +115,8 @@ export type Call = Expanded<{
   areasOfDifficulty: string;
   rating: string;
   date: Date | string;
+  caller: QbUser;
+  callType: string;
 }>;
 
 export type Assignment = Expanded<{

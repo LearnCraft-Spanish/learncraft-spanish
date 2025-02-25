@@ -1,12 +1,12 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo } from 'react';
 import type {
   Flashcard,
   Lesson,
   Program,
 } from 'src/types/interfaceDefinitions';
-import { useActiveStudent } from './UserData/useActiveStudent';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useProgramTable } from './CourseData/useProgramTable'; // Assuming this fetches the programs data
+import { useActiveStudent } from './UserData/useActiveStudent';
 
 export function useSelectedLesson() {
   const queryClient = useQueryClient();
@@ -138,6 +138,18 @@ export function useSelectedLesson() {
       }
       const newProgram =
         programsQueryData?.find((item) => item.recordId === program) || null;
+      if (!newProgram?.recordId) {
+        queryClient.setQueryData(
+          ['programSelection'],
+          (oldState: typeof initialSelectionState) => ({
+            ...oldState,
+            program: null,
+            fromLesson: null,
+            toLesson: null,
+          }),
+        );
+        return;
+      }
       queryClient.setQueryData(
         ['programSelection'],
         (oldState: typeof initialSelectionState) => ({
@@ -160,6 +172,15 @@ export function useSelectedLesson() {
       const newFromLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === newId,
       );
+      if (!newFromLesson?.recordId) {
+        queryClient.setQueryData(
+          ['programSelection'],
+          (oldState: typeof initialSelectionState) => ({
+            ...oldState,
+            fromLesson: null,
+          }),
+        );
+      }
       queryClient.setQueryData(
         ['programSelection'],
         (oldState: typeof initialSelectionState) => ({
@@ -180,6 +201,15 @@ export function useSelectedLesson() {
       const newToLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === toLesson,
       );
+      if (!newToLesson?.recordId) {
+        queryClient.setQueryData(
+          ['programSelection'],
+          (oldState: typeof initialSelectionState) => ({
+            ...oldState,
+            toLesson: null,
+          }),
+        );
+      }
       queryClient.setQueryData(
         ['programSelection'],
         (oldState: typeof initialSelectionState) => ({

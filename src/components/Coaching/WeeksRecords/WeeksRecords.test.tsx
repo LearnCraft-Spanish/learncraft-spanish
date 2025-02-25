@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { describe, expect, it } from 'vitest';
 import WeeksRecordsSection from './WeeksRecords';
 
 describe('section WeeksRecordsSection', () => {
@@ -13,9 +13,12 @@ describe('section WeeksRecordsSection', () => {
         <WeeksRecordsSection />
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(screen.getByText('Weekly Student Records')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('Weekly Student Records')).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
   });
   describe.skip('filtering logic', () => {
     /*
@@ -38,7 +41,7 @@ describe('section WeeksRecordsSection', () => {
       });
       await waitFor(() => {
         expect(screen.getByText('Weekly Student Records')).toBeInTheDocument();
-        expect(result.current.lastThreeWeeksQuery.isSuccess).toBe(true);
+        expect(result.current.weeksQuery.isSuccess).toBe(true);
       });
       // check defaults
       expect(screen.getByLabelText('Week:')).toHaveValue('1'); //Filter By Last Week

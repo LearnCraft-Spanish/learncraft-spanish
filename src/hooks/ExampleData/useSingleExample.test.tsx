@@ -1,10 +1,10 @@
-import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-
-import { useSingleExample } from 'src/hooks/ExampleData/useSingleExample';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { setupMockAuth } from 'tests/setupMockAuth';
 import data from 'mocks/data/serverlike/serverlikeData';
+
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { useSingleExample } from 'src/hooks/ExampleData/useSingleExample';
+import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 describe('useSingleExample', () => {
   let exampleId: number;

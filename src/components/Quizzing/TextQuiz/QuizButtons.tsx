@@ -12,7 +12,7 @@ export default function QuizButtons({
   incrementExample,
   firstExample,
   lastExample,
-}: QuizButtonsProps): JSX.Element {
+}: QuizButtonsProps): React.JSX.Element {
   return (
     <div className="buttonBox">
       <button type="button" onClick={decrementExample} disabled={firstExample}>

@@ -1,4 +1,3 @@
-import { describe, expect, it, vi } from 'vitest';
 import {
   fireEvent,
   render,
@@ -6,9 +5,10 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import React, { act } from 'react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React, { act } from 'react';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import { describe, expect, it, vi } from 'vitest';
 import Filter from './Filter';
 
 const toggleIncludeSpanglish = vi.fn();

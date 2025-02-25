@@ -1,14 +1,14 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { debounce } from 'lodash';
-import { useCallback, useRef } from 'react';
 import type {
   Flashcard,
   StudentExample,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
-import { useBackend } from 'src/hooks/useBackend';
-import { toast } from 'react-toastify';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { debounce } from 'lodash';
+import { useCallback, useRef } from 'react';
 import { toISODateTime } from 'src/functions/dateUtils';
+import { showErrorToast, showSuccessToast } from 'src/functions/showToast';
+import { useBackend } from 'src/hooks/useBackend';
 import { useActiveStudent } from './useActiveStudent';
 import { useUserData } from './useUserData';
 
@@ -195,17 +195,17 @@ export function useStudentFlashcards() {
         throw new Error('No active student');
       }
       const addResponse = async () => {
-        const result: number | undefined | string = await addPromise;
-
-        if (typeof result === 'string') {
-          return Number.parseInt(result);
+        const result: number[] | string[] | undefined = await addPromise;
+        let createdId = result?.[0];
+        if (typeof createdId === 'string') {
+          createdId = Number.parseInt(createdId);
         }
 
-        if (result !== 1) {
+        if (!createdId) {
           throw new Error('Failed to add Flashcard');
         }
 
-        return result;
+        return createdId;
       };
       const data = await addResponse();
       return data;
@@ -283,11 +283,45 @@ export function useStudentFlashcards() {
       );
       return thisIdNum;
     },
-    onSuccess: (_data, _variables) => {
-      toast.success('Flashcard added successfully');
+
+    onSuccess: (data, _variables, context) => {
+      showSuccessToast('Flashcard added successfully');
+
+      queryClient.setQueryData(
+        ['flashcardData', activeStudentId],
+        (oldFlashcards: StudentFlashcardData) => {
+          const oldId = context;
+          const newId = data;
+          let newFlashcardData: StudentFlashcardData | null = null;
+          const oldStudentExamples = oldFlashcards.studentExamples;
+          const newStudentExample = oldStudentExamples.find(
+            (studentExample) => studentExample.recordId === oldId,
+          );
+          if (!newStudentExample) {
+            console.error('Error updating student example');
+            return oldFlashcards;
+          }
+          if (newStudentExample) {
+            const newStudentExampleArray = oldStudentExamples.map(
+              (studentExample) =>
+                studentExample.recordId === oldId
+                  ? { ...studentExample, recordId: newId }
+                  : studentExample,
+            );
+            const newUncheckedFlashcardData = {
+              examples: oldFlashcards.examples,
+              studentExamples: newStudentExampleArray,
+            };
+            newFlashcardData = matchAndTrimArrays(newUncheckedFlashcardData);
+            return newFlashcardData;
+          }
+          return newFlashcardData;
+        },
+      );
     },
+
     onError: (error, _variables, context) => {
-      toast.error('Failed to add Flashcard');
+      showErrorToast('Failed to add Flashcard');
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized ID number to rollback the cache
@@ -413,11 +447,11 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (_data, _variables, _context) => {
-      toast.success('Flashcard removed successfully');
+      showSuccessToast('Flashcard removed successfully');
     },
 
     onError: (error, _variables, context) => {
-      toast.error('Failed to remove Flashcard');
+      showErrorToast('Failed to remove Flashcard');
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized objects to rollback the cache
@@ -561,11 +595,11 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (_data, _variables) => {
-      toast.success('Flashcard updated successfully');
+      showSuccessToast('Flashcard updated successfully');
     },
 
     onError: (error, _variables, context) => {
-      toast.error('Failed to update Flashcard');
+      showErrorToast('Failed to update Flashcard');
       console.error(error);
       // Make sure both necessary values are defined
       if (

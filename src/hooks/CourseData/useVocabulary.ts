@@ -1,8 +1,8 @@
+import type { VocabTag, Vocabulary } from 'src/types/interfaceDefinitions';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import type { VocabTag, Vocabulary } from 'src/types/interfaceDefinitions';
 
 export function useVocabulary() {
   const userDataQuery = useUserData();

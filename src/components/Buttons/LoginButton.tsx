@@ -1,7 +1,7 @@
 import React from 'react';
 import useAuth from 'src/hooks/useAuth';
 
-function LoginButton(): JSX.Element | false {
+function LoginButton(): React.JSX.Element | false {
   const { isAuthenticated, isLoading, login } = useAuth();
 
   return (

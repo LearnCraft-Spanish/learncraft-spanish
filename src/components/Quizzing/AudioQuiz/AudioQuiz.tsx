@@ -1,3 +1,4 @@
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React, {
   useCallback,
   useEffect,
@@ -6,9 +7,8 @@ import React, {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
 import QuizProgress from '../QuizProgress';
@@ -17,7 +17,8 @@ import '../AudioQuiz/AudioBasedReview.css';
 
 interface StepValue {
   audio: string;
-  text: string | JSX.Element;
+  text: string | React.JSX.Element;
+  step: stepValues | '';
 }
 
 type stepValues = 'question' | 'guess' | 'hint' | 'answer';
@@ -61,6 +62,9 @@ export default function AudioQuiz({
   const currentCountdown = useRef<any>(0);
   const [progressStatus, setProgressStatus] = useState<number>(0); // visual progress bar percentage (0-100)
 
+  const preloadEnglishAudioRef = useRef<HTMLAudioElement | null>(null);
+  const preloadSpanishAudioRef = useRef<HTMLAudioElement | null>(null);
+
   const [initialQuizStart, setInitialQuizStart] = useState<boolean>(false); // Makes sure the first quiz audio is loaded and playing before countdown starts
   // Memo to parse quiz examples
   const [displayOrder, setDisplayOrder] = useState(() => {
@@ -92,32 +96,42 @@ export default function AudioQuiz({
   const questionValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
       return audioOrComprehension === 'audio'
-        ? { audio: currentExample?.englishAudio, text: 'Playing English!' }
+        ? {
+            audio: currentExample?.englishAudio,
+            text: 'Playing English!',
+            step: 'question',
+          }
         : {
             audio: currentExample?.spanishAudioLa,
             text: <em>Listen to Audio</em>,
+            step: 'question',
           };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: '' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const guessValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return { audio: '', text: 'Make a guess!' };
+      return { audio: '', text: 'Make a guess!', step: 'guess' };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: 'guess' };
   }, [currentExample, currentStep]);
 
   const hintValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
       return audioOrComprehension === 'audio'
-        ? { audio: currentExample?.spanishAudioLa, text: 'Playing Spanish!' }
+        ? {
+            audio: currentExample?.spanishAudioLa,
+            text: 'Playing Spanish!',
+            step: 'hint',
+          }
         : {
             audio: currentExample?.spanishAudioLa,
             text: currentExample?.spanishExample,
+            step: 'hint',
           };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: 'hint' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const answerValue = useMemo((): StepValue => {
@@ -126,10 +140,15 @@ export default function AudioQuiz({
         ? {
             audio: currentExample?.spanishAudioLa,
             text: currentExample.spanishExample,
+            step: 'answer',
           }
-        : { audio: '', text: currentExample?.englishTranslation };
+        : {
+            audio: '',
+            text: currentExample?.englishTranslation,
+            step: 'answer',
+          };
     }
-    return { audio: '', text: '' };
+    return { audio: '', text: '', step: 'answer' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   // Get the values related to the current step
@@ -159,10 +178,13 @@ export default function AudioQuiz({
         (currentCountdownLength.current - newNumber) /
         currentCountdownLength.current;
       setProgressStatus(progressPercent);
-    } else if (currentCountdownLength.current > 0) {
-      setCountdown(0);
+      // } else if (currentCountdownLength.current > 0) {
+      //   setCountdown(0);
+      // } else {
+      //   setCountdown(undefined);
+      // }
     } else {
-      setCountdown(undefined);
+      setCountdown(0);
     }
   }, [countdown, currentCountdownLength]);
 
@@ -178,8 +200,27 @@ export default function AudioQuiz({
   }
 
   /*       Audio Handling     */
-  const playAudio = useCallback(() => {
-    // add catch for when audio not supported (url is empty)
+  const playAudio = useCallback(async () => {
+    // Audio playing logic
+    if (currentStep !== 'guess') {
+      try {
+        await audioRef.current?.play();
+      } catch (e) {
+        if (e instanceof Error) {
+          console.error(e.message);
+        } else {
+          console.error('Error playing audio. Error: ', e);
+        }
+      }
+      // audioRef.current.play().catch((e: unknown) => {
+      //   if (e instanceof Error) {
+      //     console.error(e.message);
+      //   } else {
+      //     console.error('Error playing audio. Error: ', e);
+      //   }
+      // });
+    }
+    // setting length for progress bar countdown
     if (autoplay) {
       if (audioRef.current?.duration) {
         const currentDuration = audioRef.current.duration;
@@ -193,16 +234,7 @@ export default function AudioQuiz({
         }
       }
     }
-    if (audioRef.current?.duration) {
-      audioRef.current.play().catch((e: unknown) => {
-        if (e instanceof Error) {
-          console.error(e.message);
-        } else {
-          console.error('Error playing audio. Error: ', e);
-        }
-      });
-    }
-  }, [autoplay, initialQuizStart]);
+  }, [autoplay, initialQuizStart, currentStep]);
 
   const pauseAudio = useCallback(() => {
     if (audioRef.current) {
@@ -234,26 +266,62 @@ export default function AudioQuiz({
       <audio
         ref={audioRef}
         src={currentStepValue.audio}
-        onLoadedMetadata={() => {
-          playAudio();
-        }}
-      ></audio>
+        preload="auto"
+        onLoadedMetadata={() => playAudio()}
+      />
     );
   }
+  // /*      Preloading Audio      */
+  // function preloadAudioElement() {
+  //   return (
+  //     <div id="preloadingNextExampleAudio">
+  //       <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
+  //       <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
+  //     </div>
+  //   );
+  // }
+  const preloadNextExampleAudio = useCallback(
+    (index: number) => {
+      if (index < displayOrder.length) {
+        const nextExample = displayOrder[index];
+        if (preloadEnglishAudioRef.current) {
+          preloadEnglishAudioRef.current.src = nextExample?.englishAudio;
+          preloadEnglishAudioRef.current.load();
+        }
+        if (preloadSpanishAudioRef.current) {
+          preloadSpanishAudioRef.current.src = nextExample?.spanishAudioLa;
+          preloadSpanishAudioRef.current.load();
+        }
+      }
+    },
+    [displayOrder],
+  );
 
   // Skips to the next whole example
   const incrementExample = useCallback(() => {
-    if (currentExampleIndex + 1 < displayOrder?.length) {
-      setCurrentExampleIndex(currentExampleIndex + 1);
+    clearCountDown();
+    pauseAudio();
+    const nextExampleIndex = currentExampleIndex + 1;
+    if (nextExampleIndex < displayOrder?.length) {
+      setCurrentExampleIndex(nextExampleIndex);
+
+      preloadNextExampleAudio(nextExampleIndex + 1);
     } else {
       setCurrentExampleIndex(displayOrder?.length - 1 || 0);
     }
     setCurrentStep('question');
-  }, [currentExampleIndex, displayOrder]);
+  }, [
+    currentExampleIndex,
+    displayOrder?.length,
+    pauseAudio,
+    preloadNextExampleAudio,
+  ]);
 
   // Skips to the previous whole example
   const decrementExample = useCallback(
     (customDecrement: undefined | stepValues = undefined) => {
+      clearCountDown();
+      pauseAudio();
       if (currentExampleIndex > 0) {
         setCurrentExampleIndex(currentExampleIndex - 1);
       } else {
@@ -266,7 +334,7 @@ export default function AudioQuiz({
         setCurrentStep('question');
       }
     },
-    [currentExampleIndex],
+    [currentExampleIndex, pauseAudio],
   );
 
   // Steps the quiz forward
@@ -390,14 +458,16 @@ export default function AudioQuiz({
   ]);
 
   // Play Audio when step is taken
-  useEffect(() => playAudio(), [currentStepValue, playAudio]);
+  useEffect(() => {
+    playAudio();
+  }, [currentStepValue, playAudio]);
 
   // when step taken, set currentStepValue accordingly
   useEffect(() => {
     if (autoplay) {
       setProgressStatus(0); // reset progress bar
     }
-  }, [autoplay, currentStep]);
+  }, [autoplay, currentStep, currentExample]);
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
@@ -472,7 +542,12 @@ export default function AudioQuiz({
               incrementOnAdd={incrementOnAdd}
               onRemove={onRemove}
             />
+            {/* Audio elements */}
             {audioElement()}
+            <div id="preloadingNextExampleAudio">
+              <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
+              <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
+            </div>
           </div>
           <AudioQuizButtons
             incrementCurrentStep={incrementCurrentStep}

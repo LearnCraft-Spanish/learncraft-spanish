@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import type { Lesson } from 'src/types/interfaceDefinitions';
 import {
   render,
   renderHook,
@@ -7,13 +7,13 @@ import {
   within,
 } from '@testing-library/react';
 
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 
-import type { Lesson } from 'src/types/interfaceDefinitions';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { beforeEach, describe, expect, it } from 'vitest';
 import FromToLessonSelector from './FromToLessonSelector';
 
 interface WrapperProps {
@@ -54,7 +54,7 @@ describe('component FromToLessonSelector', () => {
       expect(screen.getByText('To:')).toBeInTheDocument();
     });
 
-    it('course dropdown has all programs', async () => {
+    it('course dropdown has all programs that have lessons', async () => {
       const { result } = renderHook(() => useProgramTable(), { wrapper });
       await waitFor(() => {
         expect(result.current.programTableQuery.isSuccess).toBe(true);
@@ -63,9 +63,11 @@ describe('component FromToLessonSelector', () => {
       const programs = result.current.programTableQuery.data;
       if (!programs) throw new Error('No programs found');
       // Tests
-      programs.forEach((program) => {
-        expect(screen.getByText(program.name)).toBeInTheDocument();
-      });
+      programs
+        .filter((program) => program.lessons.length > 0)
+        .forEach((program) => {
+          expect(screen.getByText(program.name)).toBeInTheDocument();
+        });
     });
 
     it('selected course is the related program of current user', async () => {

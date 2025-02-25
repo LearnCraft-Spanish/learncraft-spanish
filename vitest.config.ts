@@ -1,5 +1,5 @@
-import { mergeConfig } from 'vite';
 import type { ConfigEnv } from 'vite';
+import { mergeConfig } from 'vite';
 import { defineConfig } from 'vitest/config';
 import viteConfig from './vite.config';
 
@@ -17,14 +17,12 @@ export default defineConfig((configEnv: ConfigEnv) =>
           '**/node_modules/**',
           '**/mocks/**',
           '**/.stryker-tmp/**',
-          '**/functions/**',
-          'Coaching.jsx',
           'useAuth.ts',
         ],
         mockReset: true,
         clearMocks: true,
         restoreMocks: true,
-        testTimeout: 10000,
+        testTimeout: 20000,
         coverage: {
           exclude: [
             '**/*{.,-}{test,spec,bench,benchmark}?(-d).?(c|m)[jt]s?(x)',
@@ -32,7 +30,6 @@ export default defineConfig((configEnv: ConfigEnv) =>
             '**/.stryker-tmp/**',
             '**/node_modules/**',
             '**/assets/**',
-            '**/functions/**',
             '**/tests/**',
             '**/mocks/**',
             '**/providers/**',

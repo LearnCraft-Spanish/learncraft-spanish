@@ -1,6 +1,6 @@
+import path from 'node:path';
 // vite.config.ts
 import process from 'node:process';
-import path from 'node:path';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
 import dotenv from 'dotenv';

@@ -1,11 +1,11 @@
-import { renderHook, waitFor } from '@testing-library/react';
-
-import { beforeEach, describe, expect, it } from 'vitest';
 import type { mockUserNames } from 'src/types/interfaceDefinitions';
+
+import { renderHook, waitFor } from '@testing-library/react';
 import { examples } from 'mocks/data/examples.json';
-import { setupMockAuth } from 'tests/setupMockAuth';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useStudentFlashcards } from './useStudentFlashcards';
 async function renderHookSuccessfully() {

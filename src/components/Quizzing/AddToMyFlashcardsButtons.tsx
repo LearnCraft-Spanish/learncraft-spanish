@@ -1,7 +1,7 @@
-import React from 'react';
-import { useUserData } from 'src/hooks/UserData/useUserData';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import React from 'react';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 interface AddToMyFlashcardsButtonsProps {
   example: Flashcard | undefined;
@@ -14,7 +14,7 @@ export default function AddToMyFlashcardsButtons({
   incrementExampleNumber,
   onRemove,
   incrementOnAdd = true,
-}: AddToMyFlashcardsButtonsProps): JSX.Element | undefined {
+}: AddToMyFlashcardsButtonsProps): React.JSX.Element | undefined {
   const {
     flashcardDataQuery,
     addFlashcardMutation,

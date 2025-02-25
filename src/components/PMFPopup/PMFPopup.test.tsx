@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { act } from 'react';
 import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
+import { act } from 'react';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PMFPopup from './PMFPopup';
 
 vi.mock('src/hooks/UserData/usePMFData', () => ({

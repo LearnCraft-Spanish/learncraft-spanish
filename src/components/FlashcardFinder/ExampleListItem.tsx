@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import React, { useState } from 'react';
+import x from 'src/assets/icons/x.svg';
 import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import x from 'src/assets/icons/x.svg';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 interface FormatExampleForTableProps {
   data: Flashcard;
