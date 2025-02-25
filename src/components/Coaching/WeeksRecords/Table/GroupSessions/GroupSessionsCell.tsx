@@ -8,6 +8,7 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 
 import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import { useModal } from 'src/hooks/useModal';
 import {
@@ -95,6 +96,7 @@ function GroupSessionView({
   week: Week;
   newRecord?: boolean;
 }) {
+  const userDataQuery = useUserData();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
     useContextualMenu();
   const { openModal, closeModal } = useModal();
@@ -608,9 +610,11 @@ function GroupSessionView({
               )}
           </div>
         </div>
-        {editMode && !newRecord && (
-          <DeleteRecord deleteFunction={deleteRecordFunction} />
-        )}
+        {editMode &&
+          !newRecord &&
+          userDataQuery.data?.roles.adminRole === 'admin' && (
+            <DeleteRecord deleteFunction={deleteRecordFunction} />
+          )}
         <FormControls
           editMode={editMode}
           cancelEdit={cancelEdit}
