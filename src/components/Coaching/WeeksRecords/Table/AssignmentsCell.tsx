@@ -1,12 +1,12 @@
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import useAssignments from 'src/hooks/CoachingData/useAssignments';
 import type { Assignment, Week } from 'src/types/CoachingTypes';
-import ContextualControlls from 'src/components/ContextualControlls';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useState } from 'react';
-
+import ContextualControlls from 'src/components/ContextualControlls';
+import useAssignments from 'src/hooks/CoachingData/useAssignments';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
+
+import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachDropdown,
   DeleteRecord,

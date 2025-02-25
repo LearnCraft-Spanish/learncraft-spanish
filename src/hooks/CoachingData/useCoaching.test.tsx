@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { describe, expect, it } from 'vitest';
 // This would benefit from improved testing. currently only testing existence
 describe('hook useCoaching', () => {
   it('renders without crashing', async () => {

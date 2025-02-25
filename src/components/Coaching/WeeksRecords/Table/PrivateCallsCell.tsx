@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import type { Call, Week } from 'src/types/CoachingTypes';
+import React, { useState } from 'react';
 import ContextualControlls from 'src/components/ContextualControlls';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import {
   CoachDropdown,

@@ -1,17 +1,17 @@
 import { Route } from 'react-router-dom';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 
-import FlashcardFinder from 'src/components/FlashcardFinder';
 import ExampleCreator from 'src/components/ExampleCreator/ExampleCreator';
 import ExampleEditor from 'src/components/ExampleEditor/ExampleEditor';
-import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
+import FlashcardFinder from 'src/components/FlashcardFinder';
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import NotFoundPage from '../NotFoundPage';
+import AudioBasedReview from '../sections/AudioBasedReview';
+import FlashcardManager from '../sections/FlashcardManager';
+import FrequenSay from '../sections/FrequenSay';
+import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
-import FlashcardManager from '../sections/FlashcardManager';
-import AudioBasedReview from '../sections/AudioBasedReview';
-import FrequenSay from '../sections/FrequenSay';
-import NotFoundPage from '../NotFoundPage';
-import LCSPQuizApp from '../sections/LCSPQuizApp';
 import SentryRoutes from './SentryRoutes';
 
 export default function AppRoutes() {

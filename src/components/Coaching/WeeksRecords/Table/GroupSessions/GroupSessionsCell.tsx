@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import type { GroupSession, Week } from 'src/types/CoachingTypes';
-import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
+
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
+import ContextualControlls from 'src/components/ContextualControlls';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 
-import ContextualControlls from 'src/components/ContextualControlls';
-import { useModal } from 'src/hooks/useModal';
+import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
-import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
+import { useModal } from 'src/hooks/useModal';
 import {
   CoachDropdown,
   DateInput,

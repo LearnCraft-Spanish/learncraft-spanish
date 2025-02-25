@@ -1,3 +1,5 @@
+import type { Coach, Course, Week } from '../../../types/CoachingTypes';
+
 import React, {
   useCallback,
   useEffect,
@@ -5,19 +7,17 @@ import React, {
   useRef,
   useState,
 } from 'react';
-
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
-import type { Coach, Course, Week } from '../../../types/CoachingTypes';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 import LoadingMessage from '../../Loading';
 import getDateRange from '../general/functions/dateRange';
-import WeeksTable from './Table/WeeksTable';
 import CoachingFilter from './Filter/WeeksFilter';
+import WeeksTable from './Table/WeeksTable';
 
-import '../coaching.scss';
 import ViewWeekRecord from './ViewWeekRecord';
+import '../coaching.scss';
 
 /*
 Notes for Test Cases to write:

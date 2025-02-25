@@ -1,14 +1,14 @@
-import { act } from 'react';
-import { beforeAll, describe, expect, it } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-
 import type {
   QuizExamplesTable,
   QuizUnparsed,
 } from 'src/types/interfaceDefinitions';
+import { renderHook, waitFor } from '@testing-library/react';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { act } from 'react';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { useBackend } from './useBackend';
 

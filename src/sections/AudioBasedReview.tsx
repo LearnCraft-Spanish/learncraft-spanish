@@ -1,15 +1,15 @@
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React, { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 
-import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
-import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import Loading from 'src/components/Loading';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
-import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
+import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import 'src/App.css';
 import 'src/components/Quizzing/AudioQuiz/AudioBasedReview.css';

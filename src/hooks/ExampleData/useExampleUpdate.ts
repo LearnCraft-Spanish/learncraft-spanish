@@ -1,8 +1,8 @@
-import type { Flashcard } from 'src/types/interfaceDefinitions';
 import type { UseQueryResult } from '@tanstack/react-query';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { useCallback } from 'react';
-import { useBackend } from 'src/hooks/useBackend';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import { useBackend } from 'src/hooks/useBackend';
 
 export const useExampleUpdate = () => {
   const { vocabularyQuery } = useVocabulary();

@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
@@ -6,8 +5,8 @@ import type { FlashcardStudent } from './types/interfaceDefinitions';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
-import { useActiveStudent } from './hooks/UserData/useActiveStudent';
 import useAuth from './hooks/useAuth';
+import { useActiveStudent } from './hooks/UserData/useActiveStudent';
 import { useUserData } from './hooks/UserData/useUserData';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
@@ -68,11 +67,11 @@ export const App: React.FC = () => {
         }
       });
       const studentSelectorSortFunction = (
-        a: ReactElement,
-        b: ReactElement,
+        a: React.JSX.IntrinsicElements['option'],
+        b: React.JSX.IntrinsicElements['option'],
       ) => {
-        const aName = a.props.label;
-        const bName = b.props.label;
+        const aName = a.label ?? '';
+        const bName = b.label ?? '';
         if (aName > bName) {
           return 1;
         } else {
@@ -103,11 +102,17 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     clearTimeout(messageNumber.current);
+    let timeoutNumber: number | NodeJS.Timeout;
     messageNumber.current = 0;
     if (bannerMessage !== '') {
-      const timeoutNumber = setTimeout(blankBanner, 1000);
+      timeoutNumber = setTimeout(blankBanner, 1000);
       messageNumber.current = timeoutNumber;
     }
+    return () => {
+      if (timeoutNumber) {
+        clearTimeout(timeoutNumber);
+      }
+    };
   }, [bannerMessage, messageNumber, blankBanner]);
 
   return (

@@ -1,5 +1,5 @@
-import { mergeConfig } from 'vite';
 import type { ConfigEnv } from 'vite';
+import { mergeConfig } from 'vite';
 import { defineConfig } from 'vitest/config';
 import viteConfig from './vite.config';
 

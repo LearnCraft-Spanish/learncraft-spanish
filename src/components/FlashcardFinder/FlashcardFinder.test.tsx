@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
 import { ContextualMenuProvider } from 'src/providers/ContextualMenuProvider';
+import { describe, expect, it } from 'vitest';
 
 import FlashcardFinder from './FlashcardFinder';
 describe('flashcard finder', () => {

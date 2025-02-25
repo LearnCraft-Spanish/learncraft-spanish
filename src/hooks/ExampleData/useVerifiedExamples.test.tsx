@@ -1,9 +1,9 @@
-import { beforeEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('useVerifiedExamples', () => {
   beforeEach(() => {

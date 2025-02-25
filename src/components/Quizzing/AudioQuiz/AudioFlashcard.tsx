@@ -1,9 +1,10 @@
-import play from 'src/assets/icons/play.svg';
-import pause from 'src/assets/icons/pause.svg';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import React from 'react';
+import pause from 'src/assets/icons/pause.svg';
+import play from 'src/assets/icons/play.svg';
 import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 interface AudioFlashcardProps {
-  currentExampleText: string | JSX.Element;
+  currentExampleText: string | React.JSX.Element;
   incrementCurrentStep: () => void;
   autoplay: boolean;
   progressStatus: number;
@@ -32,7 +33,7 @@ export default function AudioFlashcardComponent({
   incrementExample,
   incrementOnAdd = true,
   onRemove,
-}: AudioFlashcardProps): JSX.Element {
+}: AudioFlashcardProps): React.JSX.Element {
   function handlePlayPauseClick(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
   ): void {

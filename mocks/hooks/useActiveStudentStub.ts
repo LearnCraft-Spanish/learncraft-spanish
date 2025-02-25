@@ -1,9 +1,9 @@
+import programsTable from '../data/hooklike/programsTable';
+
 import {
   allStudentsTable,
   getActiveStudentFromName,
 } from '../data/serverlike/studentTable';
-
-import programsTable from '../data/hooklike/programsTable';
 
 interface mockActiveStudentStubOptions {
   isLoading?: boolean;

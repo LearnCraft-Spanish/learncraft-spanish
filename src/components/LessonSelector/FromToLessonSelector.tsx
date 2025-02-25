@@ -1,10 +1,11 @@
+import type { ReactElement } from 'react';
+import type { Lesson, Program } from 'src/types/interfaceDefinitions';
+import React from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import type { Lesson, Program } from 'src/types/interfaceDefinitions';
 import './LessonSelector.css';
-import type { ReactElement } from 'react';
 
-export default function FromToLessonSelector(): JSX.Element {
+export default function FromToLessonSelector(): React.JSX.Element {
   const {
     selectedProgram,
     selectedFromLesson,
@@ -40,7 +41,7 @@ export default function FromToLessonSelector(): JSX.Element {
   }
 
   function makeFromLessonSelector() {
-    const lessonSelector: Array<JSX.Element> = [];
+    const lessonSelector: Array<React.JSX.Element> = [];
     const toLessonNumber = getLessonNumber(selectedToLesson);
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
       const lessonNumber = getLessonNumber(lesson);
@@ -56,7 +57,7 @@ export default function FromToLessonSelector(): JSX.Element {
   }
 
   function makeToLessonSelector() {
-    const lessonSelector: Array<JSX.Element> = [];
+    const lessonSelector: Array<React.JSX.Element> = [];
     const fromLessonNumber = getLessonNumber(selectedFromLesson);
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
       const lessonNumber = getLessonNumber(lesson);

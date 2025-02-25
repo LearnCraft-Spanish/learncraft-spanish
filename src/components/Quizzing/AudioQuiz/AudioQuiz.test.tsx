@@ -1,12 +1,12 @@
-import { act } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import serverlikeData from 'mocks/data/serverlike/serverlikeData';
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
+import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { act } from 'react';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AudioQuiz from './AudioQuiz';
 
 /*       Testing Setup        */

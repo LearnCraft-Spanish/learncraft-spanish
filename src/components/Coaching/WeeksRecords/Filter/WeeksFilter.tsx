@@ -1,10 +1,10 @@
-import { useMemo } from 'react';
-
 import type { Coach, Course } from 'src/types/CoachingTypes';
 
+import { useMemo } from 'react';
+
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import getDateRange from '../../general/functions/dateRange';
 import { CoachDropdown, Dropdown } from '../../general';
+import getDateRange from '../../general/functions/dateRange';
 
 import '../../coaching.scss';
 

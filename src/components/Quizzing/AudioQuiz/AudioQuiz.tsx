@@ -1,3 +1,4 @@
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React, {
   useCallback,
   useEffect,
@@ -6,9 +7,8 @@ import React, {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
 import QuizProgress from '../QuizProgress';
@@ -17,7 +17,7 @@ import '../AudioQuiz/AudioBasedReview.css';
 
 interface StepValue {
   audio: string;
-  text: string | JSX.Element;
+  text: string | React.JSX.Element;
   step: stepValues | '';
 }
 

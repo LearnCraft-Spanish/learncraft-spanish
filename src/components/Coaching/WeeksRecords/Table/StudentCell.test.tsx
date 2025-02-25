@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
+import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
+import { describe, expect, it } from 'vitest';
 import StudentCell from './StudentCell';
 
 const week = generatedMockData.weeks[0];

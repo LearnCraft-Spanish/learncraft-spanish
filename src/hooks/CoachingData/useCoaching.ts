@@ -3,11 +3,11 @@ import { useCallback } from 'react';
 import { useBackend } from '../useBackend';
 import { useUserData } from '../UserData/useUserData';
 
-import useWeeks from './useWeeks';
 import useAssignments from './useAssignments';
-import usePrivateCalls from './usePrivateCalls';
-import useGroupSessions from './useGroupSessions';
 import useGroupAttendees from './useGroupAttendees';
+import useGroupSessions from './useGroupSessions';
+import usePrivateCalls from './usePrivateCalls';
+import useWeeks from './useWeeks';
 
 export default function useCoaching() {
   const userDataQuery = useUserData();

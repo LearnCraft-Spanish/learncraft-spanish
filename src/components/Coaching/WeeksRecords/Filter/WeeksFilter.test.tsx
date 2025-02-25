@@ -1,7 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+
+import { describe, expect, it, vi } from 'vitest';
 import WeeksFilter from './WeeksFilter';
 
 const defaultProps = {

@@ -10,7 +10,7 @@ export default function QuizProgress({
   currentExampleNumber,
   totalExamplesNumber,
   quizTitle,
-}: QuizProgressProps): JSX.Element {
+}: QuizProgressProps): React.JSX.Element {
   return (
     <div className="quizProgress">
       <h3>{quizTitle}</h3>

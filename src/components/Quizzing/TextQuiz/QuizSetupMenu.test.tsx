@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
-
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
+
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it } from 'vitest';
 import QuizSetupMenu from './QuizSetupMenu';
 
 const student = getUserDataFromName('student-lcsp');
