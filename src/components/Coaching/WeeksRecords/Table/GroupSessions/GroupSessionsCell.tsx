@@ -9,7 +9,7 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-
+import { toISODate } from 'src/functions/dateUtils';
 import { useModal } from 'src/hooks/useModal';
 import {
   CoachDropdown,
@@ -79,22 +79,26 @@ function GroupSessionCell({
         `groupSession${groupSession.recordId}week${week.recordId}` && (
         <GroupSessionView
           groupSession={groupSession}
-          week={week}
           newRecord={newRecord}
+          weekStarts={
+            typeof week.weekStarts === 'string'
+              ? week.weekStarts
+              : toISODate(week.weekStarts)
+          }
         />
       )}
     </div>
   );
 }
 
-function GroupSessionView({
+export function GroupSessionView({
   groupSession,
-  week,
   newRecord,
+  weekStarts,
 }: {
   groupSession: GroupSession;
-  week: Week;
   newRecord?: boolean;
+  weekStarts: string;
 }) {
   const userDataQuery = useUserData();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
@@ -165,19 +169,20 @@ function GroupSessionView({
 
     setAttendees(() => {
       if (newRecord) {
-        // select student associated with this week record id
-        const student = getStudentFromMembershipId(week.relatedMembership);
-        if (!student) {
-          console.error('No student found with week recordId:', week.recordId);
-          return [];
-        }
-        return [
-          {
-            name: student.fullName,
-            relatedWeek: week.recordId,
-            action: 'add',
-          },
-        ];
+        return [];
+        // // select student associated with this week record id
+        // const student = getStudentFromMembershipId(week.relatedMembership);
+        // if (!student) {
+        //   console.error('No student found with week recordId:', week.recordId);
+        //   return [];
+        // }
+        // return [
+        //   {
+        //     name: student.fullName,
+        //     relatedWeek: week.recordId,
+        //     action: 'add',
+        //   },
+        // ];
       } else {
         const attendees = getAttendeesFromGroupSessionId(recordId);
         return attendees?.map((attendee) => ({
@@ -186,15 +191,7 @@ function GroupSessionView({
         })) as attendeeChangesObj[];
       }
     });
-  }, [
-    getAttendeesFromGroupSessionId,
-    getStudentFromMembershipId,
-    groupSession,
-    newRecord,
-    recordId,
-    week.recordId,
-    week.relatedMembership,
-  ]);
+  }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
 
   function handleAddAttendee() {
     if (!addingAttendee) {
@@ -546,8 +543,8 @@ function GroupSessionView({
               {weeksQuery.data
                 ?.filter((filterWeek) => {
                   return (
-                    week.membershipCourseHasGroupCalls &&
-                    filterWeek.weekStarts === week.weekStarts
+                    filterWeek.membershipCourseHasGroupCalls &&
+                    filterWeek.weekStarts === weekStarts
                   );
                 })
                 .map((studentWeek) => ({
@@ -566,9 +563,8 @@ function GroupSessionView({
                     key={studentWeek.recordId}
                     value={studentWeek.recordId}
                   >
-                    {studentWeek.studentFullName ||
-                      studentWeek.studentFullName ||
-                      'No Name Found'}
+                    {studentWeek.studentFullName || 'No Name Found'}
+                    {` - ${studentWeek.weekStarts}`}
                   </option>
                 ))}
             </select>
@@ -646,13 +642,13 @@ export default function GroupSessionsCell({
             week={week}
           />
         ))}
-        {week.membershipCourseHasGroupCalls && (
+        {/* {week.membershipCourseHasGroupCalls && (
           <GroupSessionCell
             groupSession={{ recordId: -1 } as GroupSession}
             newRecord
             week={week}
           />
-        )}
+        )} */}
       </>
     )
   );
