@@ -1,4 +1,4 @@
-import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
+import type { NewFlashcard } from 'src/types/interfaceDefinitions';
 import React, { useMemo, useState } from 'react';
 import {
   formatEnglishText,
@@ -7,6 +7,7 @@ import {
 import { useUnverifiedExamples } from 'src/hooks/ExampleData/useUnverifiedExamples';
 import EditOrCreateExample from '../editOrCreateExample';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
+import { AudioControl } from './AudioControl';
 import 'src/App.css';
 import './ExampleCreator.css';
 
@@ -119,19 +120,85 @@ export default function ExampleCreator() {
       {singleOrSet === 'set' && (
         <div>
           <h3>Set Creator</h3>
-          <textarea
-            value={areaInput}
-            onChange={(e) => setAreaInput(e.target.value)}
-            placeholder={
-              'Paste table here in the following format: \nSpanish Example\tEnglish Translation\tSpanish Audio\tEnglish Audio'
-            }
-            rows={6}
-            cols={120}
-          />
-          {!!areaInput.length && (
+          {!flashcardSet.length && (
             <div>
-              <h3>Preview Set</h3>
+              <textarea
+                value={areaInput}
+                onChange={(e) => setAreaInput(e.target.value)}
+                placeholder={
+                  'Paste table here in the following format: \nSpanish Example\tEnglish Translation\tSpanish Audio\tEnglish Audio'
+                }
+                rows={6}
+                cols={120}
+              />
+              {!!areaInput.length && (
+                <div>
+                  <h3>Preview Set</h3>
 
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Spanish Example</th>
+                        <th>English Translation</th>
+                        <th>Spanish Audio</th>
+                        <th>English Audio</th>
+                        <th>Spanglish</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {parsedAreaInput.map((example) => {
+                        return (
+                          <tr key={example.spanishExample}>
+                            <td>
+                              {formatSpanishText(
+                                example.spanglish,
+                                example.spanishExample,
+                              )}
+                            </td>
+                            <td>
+                              {formatEnglishText(example.englishTranslation)}
+                            </td>
+                            <td>{example.spanishAudioLa}</td>
+                            <td>{example.englishAudio}</td>
+                            <td>{example.spanglish}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFlashcardSet(parsedAreaInput);
+                    }}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          {!!flashcardSet.length && (
+            <div>
+              <h3>Example Preview</h3>
+              {flashcardSet.map((example) => {
+                return (
+                  <div key={example.spanishExample} className="exampleCard">
+                    <div className="exampleCardSpanishText">
+                      {formatSpanishText(
+                        example.spanglish,
+                        example.spanishExample,
+                      )}
+                    </div>
+                    <AudioControl audioLink={example.spanishAudioLa} />
+                    <div className="exampleCardEnglishText">
+                      {formatEnglishText(example.englishTranslation)}
+                      <AudioControl audioLink={example.englishAudio} />
+                    </div>
+                  </div>
+                );
+              })}
+              <h3>Edit Examples</h3>
               <table>
                 <thead>
                   <tr>
@@ -143,7 +210,7 @@ export default function ExampleCreator() {
                   </tr>
                 </thead>
                 <tbody>
-                  {parsedAreaInput.map((example) => {
+                  {flashcardSet.map((example) => {
                     return (
                       <tr key={example.spanishExample}>
                         <td>
@@ -161,14 +228,6 @@ export default function ExampleCreator() {
                   })}
                 </tbody>
               </table>
-              <button
-                type="button"
-                onClick={() => {
-                  setFlashcardSet(parsedAreaInput);
-                }}
-              >
-                Next
-              </button>
             </div>
           )}
         </div>

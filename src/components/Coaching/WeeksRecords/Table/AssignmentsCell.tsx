@@ -1,6 +1,6 @@
 import type { Assignment, Week } from 'src/types/CoachingTypes';
 import { useState } from 'react';
-import ContextualControlls from 'src/components/ContextualControlls';
+import ContextualControlls from 'src/components/ContextualControls';
 import useAssignments from 'src/hooks/CoachingData/useAssignments';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';

@@ -2,7 +2,7 @@ import type { GroupSession, Week } from 'src/types/CoachingTypes';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
-import ContextualControlls from 'src/components/ContextualControlls';
+import ContextualControlls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 

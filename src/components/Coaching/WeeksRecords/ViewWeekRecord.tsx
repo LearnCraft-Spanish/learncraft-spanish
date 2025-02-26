@@ -1,6 +1,6 @@
 import type { Week } from 'src/types/CoachingTypes';
 import { useMemo } from 'react';
-import ContextualControlls from 'src/components/ContextualControlls';
+import ContextualControlls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 export default function ViewWeekRecord({ week }: { week: Week | undefined }) {

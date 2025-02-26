@@ -1,6 +1,6 @@
 import type { Call, Week } from 'src/types/CoachingTypes';
 import React, { useState } from 'react';
-import ContextualControlls from 'src/components/ContextualControlls';
+import ContextualControlls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
