@@ -4,7 +4,6 @@ import React from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import './LessonSelector.css';
-import type { ReactElement } from 'react';
 
 export default function FromToLessonSelector(): React.JSX.Element {
   const {

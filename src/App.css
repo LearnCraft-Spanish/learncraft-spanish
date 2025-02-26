@@ -43,6 +43,19 @@ h1 {
   margin: 0;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--light);
+}
+
+th,
+td {
+  border: 1px solid var(--dark);
+  padding: 8px;
+  text-align: center;
+}
+
 h2,
 h3,
 h4,
