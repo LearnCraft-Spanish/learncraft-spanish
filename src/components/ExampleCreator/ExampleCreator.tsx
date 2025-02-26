@@ -235,8 +235,9 @@ export default function ExampleCreator() {
                   {flashcardSet.map((example) => {
                     return (
                       <tr key={example.recordId}>
-                        <td>
-                          <input
+                        <td className="tdWithoutPadding">
+                          <textarea
+                            className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
                                 example.recordId,
@@ -247,8 +248,9 @@ export default function ExampleCreator() {
                             value={example.spanishExample}
                           />
                         </td>
-                        <td>
-                          <input
+                        <td className="tdWithoutPadding">
+                          <textarea
+                            className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
                                 example.recordId,
@@ -259,8 +261,9 @@ export default function ExampleCreator() {
                             value={example.englishTranslation}
                           />
                         </td>
-                        <td>
-                          <input
+                        <td className="tdWithoutPadding">
+                          <textarea
+                            className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
                                 example.recordId,
@@ -271,8 +274,9 @@ export default function ExampleCreator() {
                             value={example.spanishAudioLa}
                           />
                         </td>
-                        <td>
-                          <input
+                        <td className="tdWithoutPadding">
+                          <textarea
+                            className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
                                 example.recordId,
