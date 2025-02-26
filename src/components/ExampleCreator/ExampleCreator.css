@@ -77,6 +77,12 @@ so we can do col/row later on smaller screens */
   margin: 10px auto;
 }
 
+.setCreatorContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 3%;
+}
+
 .inputWithoutStyle {
   width: 100%;
   border: none;
