@@ -6,8 +6,6 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import getDateRange from '../../general/functions/dateRange';
-
 import {
   CoachDropdown,
   DeleteRecord,
@@ -16,6 +14,8 @@ import {
   LinkInput,
   TextAreaInput,
 } from '../../general';
+
+import getDateRange from '../../general/functions/dateRange';
 
 import verifyRequiredInputs from '../../general/functions/inputValidation';
 

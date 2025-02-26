@@ -1,10 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
-
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import type {
   ModalContentProps,
   ModalContextType,
 } from '../context/ModalContext';
+
+import React, { useCallback, useMemo, useState } from 'react';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import Modal from '../components/Modal/Modal';
 import ModalContext from '../context/ModalContext';
 
@@ -48,13 +48,13 @@ export const ModalProvider: React.FC<{
   );
 
   return (
-    <ModalContext.Provider value={value}>
+    <ModalContext value={value}>
       {children}
       {isOpen && (
         <div className="modal-container">
           {modalProps && <Modal {...modalProps} closeModal={closeModal} />}
         </div>
       )}
-    </ModalContext.Provider>
+    </ModalContext>
   );
 };

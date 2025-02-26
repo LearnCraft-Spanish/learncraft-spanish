@@ -1,16 +1,16 @@
 import type { GroupSession, Week } from 'src/types/CoachingTypes';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import getDateRange from 'src/components/Coaching/general/functions/dateRange';
 import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
 import ContextualControlls from 'src/components/ContextualControlls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 
+import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useModal } from 'src/hooks/useModal';
-import getDateRange from 'src/components/Coaching/general/functions/dateRange';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachDropdown,
   DateInput,
