@@ -1,5 +1,5 @@
-import type { NewFlashcard } from 'src/types/interfaceDefinitions';
-import React, { useMemo, useState } from 'react';
+import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   formatEnglishText,
   formatSpanishText,
@@ -17,7 +17,7 @@ export default function ExampleCreator() {
   const [englishTranslation, setEnglishTranslation] = useState('');
   const [spanishAudioLa, setSpanishAudioLa] = useState('');
   const [areaInput, setAreaInput] = useState('');
-  const [flashcardSet, setFlashcardSet] = useState<NewFlashcard[]>([]);
+  const [flashcardSet, setFlashcardSet] = useState<Flashcard[]>([]);
   const [englishAudio, setEnglishAudio] = useState('');
 
   const toggleSingleOrSet = () => {
@@ -28,7 +28,8 @@ export default function ExampleCreator() {
     }
   };
 
-  const parsedAreaInput: NewFlashcard[] = useMemo(() => {
+  const parsedAreaInput: Flashcard[] = useMemo(() => {
+    let recordId = -1;
     const lines = areaInput.split('\n').map((line) => line.split('\t'));
     return lines.map((line) => {
       return {
@@ -38,9 +39,30 @@ export default function ExampleCreator() {
         spanishAudioLa: line[2] || '',
         englishAudio: line[3] || '',
         vocabComplete: false,
+        // Temporary values; parse out before sending to backend
+        recordId: recordId--,
+        vocabIncluded: [],
       };
     });
   }, [areaInput]);
+
+  const updateFlaschardSetValues = useCallback(
+    (changedObjTempId: number, field: string, newValue: string) => {
+      let newSpanglish = '';
+      if (field === 'spanishExample') {
+        newSpanglish = newValue.includes('*') ? 'spanglish' : 'esp';
+      }
+      const newFlashcardSet = flashcardSet.map((flashcard) => {
+        if (flashcard.recordId === changedObjTempId) {
+          return { ...flashcard, [field]: newValue, spanglish: newSpanglish };
+        } else {
+          return flashcard;
+        }
+      });
+      setFlashcardSet(newFlashcardSet);
+    },
+    [flashcardSet],
+  );
 
   const { unverifiedExamplesQuery, addUnverifiedExample } =
     useUnverifiedExamples();
@@ -212,22 +234,64 @@ export default function ExampleCreator() {
                 <tbody>
                   {flashcardSet.map((example) => {
                     return (
-                      <tr key={example.spanishExample}>
+                      <tr key={example.recordId}>
                         <td>
-                          {formatSpanishText(
-                            example.spanglish,
-                            example.spanishExample,
-                          )}
+                          <input
+                            onChange={(e) =>
+                              updateFlaschardSetValues(
+                                example.recordId,
+                                'spanishExample',
+                                e.target.value,
+                              )
+                            }
+                            value={example.spanishExample}
+                          />
                         </td>
-                        <td>{formatEnglishText(example.englishTranslation)}</td>
-                        <td>{example.spanishAudioLa}</td>
-                        <td>{example.englishAudio}</td>
+                        <td>
+                          <input
+                            onChange={(e) =>
+                              updateFlaschardSetValues(
+                                example.recordId,
+                                'englishTranslation',
+                                e.target.value,
+                              )
+                            }
+                            value={example.englishTranslation}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            onChange={(e) =>
+                              updateFlaschardSetValues(
+                                example.recordId,
+                                'spanishAudioLa',
+                                e.target.value,
+                              )
+                            }
+                            value={example.spanishAudioLa}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            onChange={(e) =>
+                              updateFlaschardSetValues(
+                                example.recordId,
+                                'englishAudio',
+                                e.target.value,
+                              )
+                            }
+                            value={example.englishAudio}
+                          />
+                        </td>
                         <td>{example.spanglish}</td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
+              <button type="button" onClick={() => setFlashcardSet([])}>
+                Back to Paste
+              </button>
             </div>
           )}
         </div>
