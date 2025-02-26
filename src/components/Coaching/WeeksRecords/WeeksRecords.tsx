@@ -1,5 +1,3 @@
-import type { Coach, Course, Week } from '../../../types/CoachingTypes';
-
 import React, {
   useCallback,
   useEffect,
@@ -11,8 +9,15 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import type {
+  Coach,
+  Course,
+  GroupSession,
+  Week,
+} from '../../../types/CoachingTypes';
 import LoadingMessage from '../../Loading';
 import getDateRange from '../general/functions/dateRange';
+import { GroupSessionView } from './Table/GroupSessions/GroupSessionsCell';
 import CoachingFilter from './Filter/WeeksFilter';
 import WeeksTable from './Table/WeeksTable';
 
@@ -267,15 +272,14 @@ export default function WeeksRecordsSection() {
       coachListQuery.isSuccess &&
       userDataQuery.isSuccess
     ) {
-      const currentUser = userDataQuery.data;
       const possibleEmailDomains = [
         '@learncraftspanish.com',
         '@masterofmemory.com',
       ];
 
-      if (currentUser.emailAddress) {
+      if (userDataQuery.data.emailAddress) {
         const currentUserCoach = coachListQuery.data.find((coach) => {
-          const emailPrefix = currentUser.emailAddress
+          const emailPrefix = userDataQuery.data.emailAddress
             .split('@')[0]
             .toLowerCase();
           for (const domain of possibleEmailDomains) {
@@ -335,6 +339,22 @@ export default function WeeksRecordsSection() {
               )}
             />
           )}
+          {contextual === 'newGroupSession' && (
+            <GroupSessionView
+              groupSession={{ recordId: -1 } as GroupSession}
+              newRecord
+              weekStarts={
+                filterByWeeksAgo === 0
+                  ? dateRange.thisWeekDate
+                  : filterByWeeksAgo === 1
+                    ? dateRange.lastSundayDate
+                    : dateRange.twoSundaysAgoDate
+              }
+              // week={week}
+            />
+          )}
+          {/* {contextual === 'newAssignment' && (
+            )} */}
         </>
       )}
     </div>

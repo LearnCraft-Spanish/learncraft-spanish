@@ -1,5 +1,5 @@
-import type { ContextualMenuContextType } from '../context/ContextualMenuContext';
 import { useContext } from 'react';
+import type { ContextualMenuContextType } from '../context/ContextualMenuContext';
 import ContextualMenuContext from '../context/ContextualMenuContext';
 
 export const useContextualMenu = (): ContextualMenuContextType => {

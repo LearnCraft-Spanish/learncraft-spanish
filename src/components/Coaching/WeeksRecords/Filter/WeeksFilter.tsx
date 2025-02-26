@@ -3,6 +3,7 @@ import type { Coach, Course } from 'src/types/CoachingTypes';
 import { useMemo } from 'react';
 
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { CoachDropdown, Dropdown } from '../../general';
 import getDateRange from '../../general/functions/dateRange';
 
@@ -47,6 +48,7 @@ export default function WeeksFilter({
   updateSearchTerm,
 }: CoachingFilterProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
+  const { openContextual } = useContextualMenu();
   const dateRange = useMemo(() => getDateRange(), []);
 
   const coursesWithActiveMemberships = useMemo(() => {
@@ -105,6 +107,18 @@ export default function WeeksFilter({
           </div>
         </div>
         <div className="advancedFilters">
+          <div className="buttonBox">
+            <button type="button" className="greenButton">
+              New Assignment
+            </button>
+            <button
+              type="button"
+              className="greenButton"
+              onClick={() => openContextual('newGroupSession')}
+            >
+              New Group Call
+            </button>
+          </div>
           <button
             type="button"
             className={`moreFilterButton ${advancedFilteringMenu ? 'advFilterActive' : ''}`}

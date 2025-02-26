@@ -47,6 +47,7 @@ function PrivateCall({ call }: { call: Call }) {
 }
 
 function PrivateCallView({ call }: { call: Call }) {
+  const userDataQuery = useUserData();
   const { setContextualRef, updateDisableClickOutside, closeContextual } =
     useContextualMenu();
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
@@ -228,7 +229,9 @@ function PrivateCallView({ call }: { call: Call }) {
           editMode={editMode}
         />
 
-        {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
+        {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
+          <DeleteRecord deleteFunction={deleteRecordFunction} />
+        )}
 
         <FormControls
           captureSubmitForm={captureSubmitForm}
