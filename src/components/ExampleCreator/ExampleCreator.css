@@ -78,12 +78,14 @@ so we can do col/row later on smaller screens */
 }
 
 .inputWithoutStyle {
+  width: 100%;
   border: none;
   background: none;
-  margin: none;
+  margin: 0px;
   padding: 8px;
+  resize: none;
 }
 
 .tdWithoutPadding {
-  padding: 0;
+  padding: 0px;
 }

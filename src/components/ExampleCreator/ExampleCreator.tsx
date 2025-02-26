@@ -237,6 +237,7 @@ export default function ExampleCreator() {
                       <tr key={example.recordId}>
                         <td className="tdWithoutPadding">
                           <textarea
+                            rows={3}
                             className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
@@ -250,6 +251,7 @@ export default function ExampleCreator() {
                         </td>
                         <td className="tdWithoutPadding">
                           <textarea
+                            rows={3}
                             className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
@@ -263,6 +265,7 @@ export default function ExampleCreator() {
                         </td>
                         <td className="tdWithoutPadding">
                           <textarea
+                            rows={3}
                             className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
@@ -276,6 +279,7 @@ export default function ExampleCreator() {
                         </td>
                         <td className="tdWithoutPadding">
                           <textarea
+                            rows={3}
                             className="inputWithoutStyle"
                             onChange={(e) =>
                               updateFlaschardSetValues(
