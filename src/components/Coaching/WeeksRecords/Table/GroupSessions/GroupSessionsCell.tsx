@@ -9,8 +9,8 @@ import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import { toISODate } from 'src/functions/dateUtils';
 import { useModal } from 'src/hooks/useModal';
+import getDateRange from 'src/components/Coaching/general/functions/dateRange';
 import {
   CoachDropdown,
   DateInput,
@@ -77,15 +77,7 @@ function GroupSessionCell({
 
       {contextual ===
         `groupSession${groupSession.recordId}week${week.recordId}` && (
-        <GroupSessionView
-          groupSession={groupSession}
-          newRecord={newRecord}
-          weekStarts={
-            typeof week.weekStarts === 'string'
-              ? week.weekStarts
-              : toISODate(week.weekStarts)
-          }
-        />
+        <GroupSessionView groupSession={groupSession} newRecord={newRecord} />
       )}
     </div>
   );
@@ -94,11 +86,9 @@ function GroupSessionCell({
 export function GroupSessionView({
   groupSession,
   newRecord,
-  weekStarts,
 }: {
   groupSession: GroupSession;
   newRecord?: boolean;
-  weekStarts: string;
 }) {
   const userDataQuery = useUserData();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
@@ -122,6 +112,8 @@ export function GroupSessionView({
   const { createGroupAttendeesMutation, deleteGroupAttendeesMutation } =
     useGroupAttendees();
 
+  const dateRange = getDateRange();
+
   // Rendering
   const dataReady =
     coachListQuery.isSuccess && groupSessionsTopicFieldOptionsQuery.isSuccess;
@@ -135,7 +127,9 @@ export function GroupSessionView({
   );
 
   const [sessionType, setSessionType] = useState<string>('');
-  const [date, setDate] = useState<string>('');
+  const [date, setDate] = useState<string>(
+    new Date().toISOString().split('T')[0],
+  );
   const [coach, setCoach] = useState<string>('');
   const [topic, setTopic] = useState<string>('');
   const [comments, setComments] = useState<string>('');
@@ -150,6 +144,28 @@ export function GroupSessionView({
     action?: 'add' | 'remove';
   }
   const [attendees, setAttendees] = useState<attendeeChangesObj[]>([]);
+
+  const relatedWeekStarts = useMemo(() => {
+    const dateFormatted = new Date(date).getTime();
+    const nextSunday = new Date(dateRange.nextWeekDate).getTime();
+    const thisPastSunday = new Date(dateRange.thisWeekDate).getTime();
+    const lastSunday = new Date(dateRange.lastSundayDate).getTime();
+    const twoSundaysAgo = new Date(dateRange.twoSundaysAgoDate).getTime();
+    // get the weekStarts of the week that the date is in
+
+    if (dateFormatted >= thisPastSunday && dateFormatted < nextSunday) {
+      return dateRange.thisWeekDate;
+    } else if (dateFormatted >= lastSunday && dateFormatted < thisPastSunday) {
+      return dateRange.lastSundayDate;
+    } else if (dateFormatted >= twoSundaysAgo && dateFormatted < lastSunday) {
+      return dateRange.twoSundaysAgoDate;
+    } else if (dateFormatted >= nextSunday) {
+      return dateRange.nextWeekDate;
+    } else {
+      console.error('Invalid date:', date);
+      return '';
+    }
+  }, [date, dateRange]);
 
   // Edit or Update State
   const setInitialState = useCallback(() => {
@@ -471,7 +487,6 @@ export function GroupSessionView({
       rendered.current = true;
     }
   }, [dataReady, sessionType, setInitialState]);
-
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
@@ -544,7 +559,7 @@ export function GroupSessionView({
                 ?.filter((filterWeek) => {
                   return (
                     filterWeek.membershipCourseHasGroupCalls &&
-                    filterWeek.weekStarts === weekStarts
+                    filterWeek.weekStarts === relatedWeekStarts
                   );
                 })
                 .map((studentWeek) => ({

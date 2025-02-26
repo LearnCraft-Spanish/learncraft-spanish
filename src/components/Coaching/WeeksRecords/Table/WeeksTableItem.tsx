@@ -134,7 +134,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
         </td>
         <td>{week.weekStarts.toString()}</td>
         <td>
-          <AssignmentsCell week={week} assignments={assignments} />
+          <AssignmentsCell assignments={assignments} />
         </td>
         <td>
           {week.membershipCourseHasGroupCalls && (

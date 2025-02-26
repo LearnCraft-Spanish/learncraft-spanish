@@ -22,7 +22,7 @@ describe('component StudentCell', () => {
   it('default view renders without crashing', () => {
     render(
       <MockAllProviders>
-        <AssignmentsCell assignments={[assignment]} week={week} />
+        <AssignmentsCell assignments={[assignment]} />
       </MockAllProviders>,
     );
     expect(
@@ -33,7 +33,7 @@ describe('component StudentCell', () => {
     it('contextual menu view renders without crashing', async () => {
       render(
         <MockAllProviders>
-          <AssignmentsCell assignments={[assignment]} week={week} />
+          <AssignmentsCell assignments={[assignment]} />
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
@@ -56,7 +56,7 @@ describe('component StudentCell', () => {
       ];
       render(
         <MockAllProviders>
-          <AssignmentsCell assignments={[assignment]} week={week} />
+          <AssignmentsCell assignments={[assignment]} />
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
@@ -78,7 +78,7 @@ describe('component StudentCell', () => {
       }
       render(
         <MockAllProviders>
-          <AssignmentsCell assignments={[assignment]} week={week} />
+          <AssignmentsCell assignments={[assignment]} />
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
