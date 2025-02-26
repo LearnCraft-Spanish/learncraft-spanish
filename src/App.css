@@ -115,16 +115,16 @@ button:hover,
   background-color: var(--brand);
   border: none;
   cursor: default;
-  /* align text vertically */
+  /* align text vertically  */
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.label:hover {
+/* .label:hover {
   cursor: default;
   background-color: var(--brand);
-}
+} */
 
 .disabledButton {
   background-color: var(--dark);

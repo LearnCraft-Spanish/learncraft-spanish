@@ -108,7 +108,11 @@ export default function WeeksFilter({
         </div>
         <div className="advancedFilters">
           <div className="buttonBox">
-            <button type="button" className="greenButton">
+            <button
+              type="button"
+              className="greenButton"
+              onClick={() => openContextual('newAssignment')}
+            >
               New Assignment
             </button>
             <button

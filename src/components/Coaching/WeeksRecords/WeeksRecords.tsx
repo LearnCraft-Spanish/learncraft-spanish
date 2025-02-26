@@ -1,3 +1,9 @@
+import type {
+  Coach,
+  Course,
+  GroupSession,
+  Week,
+} from '../../../types/CoachingTypes';
 import React, {
   useCallback,
   useEffect,
@@ -6,19 +12,14 @@ import React, {
   useState,
 } from 'react';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import type {
-  Coach,
-  Course,
-  GroupSession,
-  Week,
-} from '../../../types/CoachingTypes';
 import LoadingMessage from '../../Loading';
 import getDateRange from '../general/functions/dateRange';
-import { GroupSessionView } from './Table/GroupSessions/GroupSessionsCell';
 import CoachingFilter from './Filter/WeeksFilter';
+import { NewAssignmentView } from './Table/AssignmentsCell';
+import { GroupSessionView } from './Table/GroupSessions/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 
 import ViewWeekRecord from './ViewWeekRecord';
@@ -343,18 +344,19 @@ export default function WeeksRecordsSection() {
             <GroupSessionView
               groupSession={{ recordId: -1 } as GroupSession}
               newRecord
-              weekStarts={
+            />
+          )}
+          {contextual === 'newAssignment' && (
+            <NewAssignmentView
+              weekStartsDefaultValue={
                 filterByWeeksAgo === 0
                   ? dateRange.thisWeekDate
                   : filterByWeeksAgo === 1
                     ? dateRange.lastSundayDate
                     : dateRange.twoSundaysAgoDate
               }
-              // week={week}
             />
           )}
-          {/* {contextual === 'newAssignment' && (
-            )} */}
         </>
       )}
     </div>

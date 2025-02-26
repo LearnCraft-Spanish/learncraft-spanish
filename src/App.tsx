@@ -1,7 +1,7 @@
+import type { FlashcardStudent } from './types/interfaceDefinitions';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
-import type { FlashcardStudent } from './types/interfaceDefinitions';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
