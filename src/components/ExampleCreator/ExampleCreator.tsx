@@ -111,7 +111,7 @@ export default function ExampleCreator() {
   return (
     <div>
       <h2>Example Creator</h2>
-      <div id="singleOrSet">
+      <div className="buttonBox" id="singleOrSet">
         <button type="button" onClick={toggleSingleOrSet}>
           {singleOrSet === 'single' ? 'Create Set' : 'Create Single Example'}
         </button>
@@ -143,7 +143,7 @@ export default function ExampleCreator() {
         <div>
           <h3>Set Creator</h3>
           {!flashcardSet.length && (
-            <div>
+            <div className="setCreatorContainer">
               <textarea
                 value={areaInput}
                 onChange={(e) => setAreaInput(e.target.value)}
@@ -188,14 +188,16 @@ export default function ExampleCreator() {
                       })}
                     </tbody>
                   </table>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFlashcardSet(parsedAreaInput);
-                    }}
-                  >
-                    Next
-                  </button>
+                  <div className="buttonBox">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFlashcardSet(parsedAreaInput);
+                      }}
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -297,9 +299,11 @@ export default function ExampleCreator() {
                   })}
                 </tbody>
               </table>
-              <button type="button" onClick={() => setFlashcardSet([])}>
-                Back to Paste
-              </button>
+              <div className="buttonBox">
+                <button type="button" onClick={() => setFlashcardSet([])}>
+                  Back to Paste
+                </button>
+              </div>
             </div>
           )}
         </div>
