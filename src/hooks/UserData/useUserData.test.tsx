@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 
 import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import { describe, expect, it } from 'vitest';
 
 import { useUserData } from './useUserData';
 

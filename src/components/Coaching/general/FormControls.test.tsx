@@ -1,5 +1,5 @@
-import { describe, it, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/react';
+import { describe, it, vi } from 'vitest';
 
 import FormControls from './FormControls';
 

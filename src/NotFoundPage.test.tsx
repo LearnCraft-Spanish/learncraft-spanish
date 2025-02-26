@@ -1,8 +1,8 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
+
+import { describe, expect, it } from 'vitest';
 import NotFoundPage from './NotFoundPage';
 
 describe('not found page', () => {

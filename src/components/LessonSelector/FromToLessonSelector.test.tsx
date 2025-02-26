@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import type { Lesson } from 'src/types/interfaceDefinitions';
 import {
   render,
   renderHook,
@@ -7,13 +7,13 @@ import {
   within,
 } from '@testing-library/react';
 
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 
-import type { Lesson } from 'src/types/interfaceDefinitions';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { beforeEach, describe, expect, it } from 'vitest';
 import FromToLessonSelector from './FromToLessonSelector';
 
 interface WrapperProps {

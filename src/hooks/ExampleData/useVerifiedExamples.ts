@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useExampleUpdate } from './useExampleUpdate';

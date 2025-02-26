@@ -1,5 +1,5 @@
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ContextualMenuProvider } from 'src/providers/ContextualMenuProvider';
 import { ModalProvider } from 'src/providers/ModalProvider';
 import MockQueryClientProvider from './MockQueryClient';

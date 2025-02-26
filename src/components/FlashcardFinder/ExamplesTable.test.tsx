@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { render, renderHook, screen, waitFor } from '@testing-library/react';
-import React, { act } from 'react';
-
 import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React, { act } from 'react';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it } from 'vitest';
 import ExamplesTable from './ExamplesTable';
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;
 

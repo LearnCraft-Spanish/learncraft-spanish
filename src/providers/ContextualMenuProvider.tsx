@@ -1,3 +1,4 @@
+import type { ContextualMenuContextType } from '../context/ContextualMenuContext';
 import React, {
   useCallback,
   useEffect,
@@ -5,7 +6,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import type { ContextualMenuContextType } from '../context/ContextualMenuContext';
 import ContextualMenuContext from '../context/ContextualMenuContext';
 
 export const ContextualMenuProvider: React.FC<{
@@ -71,8 +71,6 @@ export const ContextualMenuProvider: React.FC<{
   }, [closeContextual, disableClickOutside]);
 
   return (
-    <ContextualMenuContext.Provider value={value}>
-      {children}
-    </ContextualMenuContext.Provider>
+    <ContextualMenuContext value={value}>{children}</ContextualMenuContext>
   );
 };

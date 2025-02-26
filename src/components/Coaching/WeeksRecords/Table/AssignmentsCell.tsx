@@ -1,12 +1,11 @@
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import useAssignments from 'src/hooks/CoachingData/useAssignments';
 import type { Assignment, Week } from 'src/types/CoachingTypes';
-import ContextualControlls from 'src/components/ContextualControlls';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useState } from 'react';
-
+import ContextualControlls from 'src/components/ContextualControlls';
+import useAssignments from 'src/hooks/CoachingData/useAssignments';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachDropdown,
   DeleteRecord,
@@ -15,6 +14,8 @@ import {
   LinkInput,
   TextAreaInput,
 } from '../../general';
+
+import getDateRange from '../../general/functions/dateRange';
 
 import verifyRequiredInputs from '../../general/functions/inputValidation';
 
@@ -262,18 +263,42 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
 
 export default function AssignmentsCell({
   assignments,
-  week,
 }: {
   assignments: Assignment[] | null | undefined;
-  week: Week;
 }) {
-  const { contextual, openContextual, setContextualRef, closeContextual } =
-    useContextualMenu();
+  return (
+    <div className="assignmentsCell">
+      {!!assignments &&
+        assignments.map((assignment) => (
+          <AssignmentCell
+            assignment={assignment}
+            key={`assignment${assignment.recordId}`}
+          />
+        ))}
+    </div>
+  );
+}
+
+export function NewAssignmentView({
+  weekStartsDefaultValue,
+}: {
+  weekStartsDefaultValue: string;
+}) {
+  const { setContextualRef, closeContextual } = useContextualMenu();
   const { createAssignmentMutation } = useAssignments();
   const userDataQuery = useUserData();
-
-  const { getStudentFromMembershipId } = useCoaching();
+  const { getStudentFromMembershipId, weeksQuery } = useCoaching();
   const { openModal } = useModal();
+
+  const dateRange = getDateRange();
+
+  interface StudentObj {
+    studentFullname: string;
+    relatedWeek: Week;
+  }
+  const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
+  const [student, setStudent] = useState<StudentObj>();
+
   const [homeworkCorrector, setHomeworkCorrector] = useState(
     userDataQuery.data?.emailAddress || '',
   );
@@ -286,11 +311,39 @@ export default function AssignmentsCell({
   const updateHomeworkCorrector = (email: string) => {
     setHomeworkCorrector(email);
   };
+  const updateStudent = (relatedWeekId: string) => {
+    const weekId = Number.parseInt(relatedWeekId, 10);
+    if (!weeksQuery.data) {
+      console.error('No weeks found');
+      return;
+    }
+    const studentWeek = weeksQuery.data?.find(
+      (week) => week.recordId === weekId,
+    );
+    if (!studentWeek) {
+      console.error('No student found with recordId:', relatedWeekId);
+      return;
+    }
+    setStudent({
+      studentFullname:
+        getStudentFromMembershipId(studentWeek.relatedMembership)?.fullName ||
+        '',
+      relatedWeek: studentWeek,
+    });
+  };
 
   function createNewAssignment() {
+    if (!student) {
+      openModal({
+        title: 'Error',
+        body: 'Student is required',
+        type: 'error',
+      });
+      return;
+    }
     createAssignmentMutation.mutate(
       {
-        relatedWeek: week.recordId,
+        relatedWeek: student.relatedWeek.recordId,
         homeworkCorrector,
         assignmentType,
         rating,
@@ -330,90 +383,118 @@ export default function AssignmentsCell({
   }
 
   return (
-    <div className="assignmentsCell">
-      {!!assignments &&
-        assignments.map((assignment) => (
-          <AssignmentCell
-            assignment={assignment}
-            key={`assignment${assignment.recordId}`}
-          />
-        ))}
-      <button
-        type="button"
-        className="greenButton"
-        onClick={() => openContextual(`addAssignment${week.recordId}`)}
-      >
-        New
-      </button>
-      {contextual === `addAssignment${week.recordId}` && (
-        <div
-          className="contextualWrapper"
-          key={`addAssignment${week.recordId}`}
-        >
-          <div className="contextual" ref={setContextualRef}>
-            <ContextualControlls />
-            <h4>Create Assignment Record</h4>
-            <div className="lineWrapper">
-              <div className="label">Student:</div>
-              <div className="content">
-                {week.relatedMembership
-                  ? getStudentFromMembershipId(week.relatedMembership)?.fullName
-                  : 'No student found'}
-              </div>
-            </div>
-
-            <Dropdown
-              label="Assignment Type"
-              value={assignmentType}
-              onChange={setAssignmentType}
-              options={assignmentTypes}
-              editMode
-            />
-
-            <CoachDropdown
-              label="Corrected by"
-              editMode
-              coachEmail={homeworkCorrector}
-              onChange={updateHomeworkCorrector}
-            />
-
-            <Dropdown
-              label="Rating"
-              value={rating}
-              onChange={setRating}
-              options={ratings}
-              editMode
-            />
-
-            <TextAreaInput
-              label="Notes"
-              editMode
-              value={notes}
-              onChange={setNotes}
-            />
-
-            <TextAreaInput
-              label="Areas of Difficulty"
-              editMode
-              value={areasOfDifficulty}
-              onChange={setAreasOfDifficulty}
-            />
-
-            <LinkInput
-              label="Assignment Link"
-              value={assignmentLink}
-              onChange={setAssignmentLink}
-              editMode
-            />
-
-            <FormControls
-              editMode
-              cancelEdit={closeContextual}
-              captureSubmitForm={captureSubmitForm}
-            />
-          </div>
+    <div className="contextualWrapper">
+      <div className="contextual" ref={setContextualRef}>
+        <ContextualControlls />
+        <h4>Create Assignment Record</h4>
+        <div className="lineWrapper">
+          <label className="label" htmlFor="weekStarts">
+            Week Starts:
+          </label>
+          <select
+            id="weekStarts"
+            className="content"
+            value={weekStarts}
+            onChange={(e) => setWeekStarts(e.target.value)}
+          >
+            <option value={dateRange.thisWeekDate}>
+              This Week {`(${dateRange.thisWeekDate})`}
+            </option>
+            <option value={dateRange.lastSundayDate}>
+              Last Week {`(${dateRange.lastSundayDate})`}
+            </option>
+            <option value={dateRange.twoSundaysAgoDate}>
+              Two Weeks Ago {`(${dateRange.twoSundaysAgoDate})`}
+            </option>
+          </select>
         </div>
-      )}
+        <div className="lineWrapper">
+          <label className="label" htmlFor="student">
+            Student:
+          </label>
+          <select
+            id="student"
+            className="content"
+            value={student?.relatedWeek.recordId || ''}
+            onChange={(e) => updateStudent(e.target.value)}
+          >
+            <option value="">Select</option>
+            {weeksQuery.data
+              ?.filter((filterWeek) => {
+                return (
+                  filterWeek.membershipCourseHasGroupCalls &&
+                  filterWeek.weekStarts === weekStarts
+                );
+              })
+              .map((studentWeek) => ({
+                ...studentWeek,
+                studentFullName: getStudentFromMembershipId(
+                  studentWeek.relatedMembership,
+                )?.fullName,
+              }))
+              .sort(
+                (a, b) =>
+                  a.studentFullName?.localeCompare(b.studentFullName || '') ||
+                  0,
+              )
+              .map((studentWeek) => (
+                <option key={studentWeek.recordId} value={studentWeek.recordId}>
+                  {studentWeek.studentFullName || 'No Name Found'}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        <Dropdown
+          label="Assignment Type"
+          value={assignmentType}
+          onChange={setAssignmentType}
+          options={assignmentTypes}
+          editMode
+        />
+
+        <CoachDropdown
+          label="Corrected by"
+          editMode
+          coachEmail={homeworkCorrector}
+          onChange={updateHomeworkCorrector}
+        />
+
+        <Dropdown
+          label="Rating"
+          value={rating}
+          onChange={setRating}
+          options={ratings}
+          editMode
+        />
+
+        <TextAreaInput
+          label="Notes"
+          editMode
+          value={notes}
+          onChange={setNotes}
+        />
+
+        <TextAreaInput
+          label="Areas of Difficulty"
+          editMode
+          value={areasOfDifficulty}
+          onChange={setAreasOfDifficulty}
+        />
+
+        <LinkInput
+          label="Assignment Link"
+          value={assignmentLink}
+          onChange={setAssignmentLink}
+          editMode
+        />
+
+        <FormControls
+          editMode
+          cancelEdit={closeContextual}
+          captureSubmitForm={captureSubmitForm}
+        />
+      </div>
     </div>
   );
 }

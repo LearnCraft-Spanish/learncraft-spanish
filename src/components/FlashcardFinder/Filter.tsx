@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
-
 import type { VocabTag } from 'src/types/interfaceDefinitions';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+
+import { useCallback, useEffect, useState } from 'react';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { FromToLessonSelector } from '../LessonSelector';
 
 interface FilterProps {

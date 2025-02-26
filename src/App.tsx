@@ -1,10 +1,12 @@
 import React from 'react';
+
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
 import useAuth from './hooks/useAuth';
+import { useActiveStudent } from './hooks/UserData/useActiveStudent';
 import { useUserData } from './hooks/UserData/useUserData';
 import AppRoutes from './routes/AppRoutes';
 

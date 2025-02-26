@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import type { GroupSession, Week } from 'src/types/CoachingTypes';
-import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
-import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
 
-import ContextualControlls from 'src/components/ContextualControlls';
-import { useModal } from 'src/hooks/useModal';
-
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import getDateRange from 'src/components/Coaching/general/functions/dateRange';
 import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
+import ContextualControlls from 'src/components/ContextualControlls';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+
+import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
+import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachDropdown,
   DateInput,
@@ -76,25 +77,20 @@ function GroupSessionCell({
 
       {contextual ===
         `groupSession${groupSession.recordId}week${week.recordId}` && (
-        <GroupSessionView
-          groupSession={groupSession}
-          week={week}
-          newRecord={newRecord}
-        />
+        <GroupSessionView groupSession={groupSession} newRecord={newRecord} />
       )}
     </div>
   );
 }
 
-function GroupSessionView({
+export function GroupSessionView({
   groupSession,
-  week,
   newRecord,
 }: {
   groupSession: GroupSession;
-  week: Week;
   newRecord?: boolean;
 }) {
+  const userDataQuery = useUserData();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
     useContextualMenu();
   const { openModal, closeModal } = useModal();
@@ -116,6 +112,8 @@ function GroupSessionView({
   const { createGroupAttendeesMutation, deleteGroupAttendeesMutation } =
     useGroupAttendees();
 
+  const dateRange = getDateRange();
+
   // Rendering
   const dataReady =
     coachListQuery.isSuccess && groupSessionsTopicFieldOptionsQuery.isSuccess;
@@ -129,7 +127,9 @@ function GroupSessionView({
   );
 
   const [sessionType, setSessionType] = useState<string>('');
-  const [date, setDate] = useState<string>('');
+  const [date, setDate] = useState<string>(
+    new Date().toISOString().split('T')[0],
+  );
   const [coach, setCoach] = useState<string>('');
   const [topic, setTopic] = useState<string>('');
   const [comments, setComments] = useState<string>('');
@@ -144,6 +144,28 @@ function GroupSessionView({
     action?: 'add' | 'remove';
   }
   const [attendees, setAttendees] = useState<attendeeChangesObj[]>([]);
+
+  const relatedWeekStarts = useMemo(() => {
+    const dateFormatted = new Date(date).getTime();
+    const nextSunday = new Date(dateRange.nextWeekDate).getTime();
+    const thisPastSunday = new Date(dateRange.thisWeekDate).getTime();
+    const lastSunday = new Date(dateRange.lastSundayDate).getTime();
+    const twoSundaysAgo = new Date(dateRange.twoSundaysAgoDate).getTime();
+    // get the weekStarts of the week that the date is in
+
+    if (dateFormatted >= thisPastSunday && dateFormatted < nextSunday) {
+      return dateRange.thisWeekDate;
+    } else if (dateFormatted >= lastSunday && dateFormatted < thisPastSunday) {
+      return dateRange.lastSundayDate;
+    } else if (dateFormatted >= twoSundaysAgo && dateFormatted < lastSunday) {
+      return dateRange.twoSundaysAgoDate;
+    } else if (dateFormatted >= nextSunday) {
+      return dateRange.nextWeekDate;
+    } else {
+      console.error('Invalid date:', date);
+      return '';
+    }
+  }, [date, dateRange]);
 
   // Edit or Update State
   const setInitialState = useCallback(() => {
@@ -163,19 +185,20 @@ function GroupSessionView({
 
     setAttendees(() => {
       if (newRecord) {
-        // select student associated with this week record id
-        const student = getStudentFromMembershipId(week.relatedMembership);
-        if (!student) {
-          console.error('No student found with week recordId:', week.recordId);
-          return [];
-        }
-        return [
-          {
-            name: student.fullName,
-            relatedWeek: week.recordId,
-            action: 'add',
-          },
-        ];
+        return [];
+        // // select student associated with this week record id
+        // const student = getStudentFromMembershipId(week.relatedMembership);
+        // if (!student) {
+        //   console.error('No student found with week recordId:', week.recordId);
+        //   return [];
+        // }
+        // return [
+        //   {
+        //     name: student.fullName,
+        //     relatedWeek: week.recordId,
+        //     action: 'add',
+        //   },
+        // ];
       } else {
         const attendees = getAttendeesFromGroupSessionId(recordId);
         return attendees?.map((attendee) => ({
@@ -184,15 +207,7 @@ function GroupSessionView({
         })) as attendeeChangesObj[];
       }
     });
-  }, [
-    getAttendeesFromGroupSessionId,
-    getStudentFromMembershipId,
-    groupSession,
-    newRecord,
-    recordId,
-    week.recordId,
-    week.relatedMembership,
-  ]);
+  }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
 
   function handleAddAttendee() {
     if (!addingAttendee) {
@@ -472,7 +487,6 @@ function GroupSessionView({
       rendered.current = true;
     }
   }, [dataReady, sessionType, setInitialState]);
-
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
@@ -556,8 +570,8 @@ function GroupSessionView({
               {weeksQuery.data
                 ?.filter((filterWeek) => {
                   return (
-                    week.membershipCourseHasGroupCalls &&
-                    filterWeek.weekStarts === week.weekStarts
+                    filterWeek.membershipCourseHasGroupCalls &&
+                    filterWeek.weekStarts === relatedWeekStarts
                   );
                 })
                 .map((studentWeek) => ({
@@ -576,9 +590,8 @@ function GroupSessionView({
                     key={studentWeek.recordId}
                     value={studentWeek.recordId}
                   >
-                    {studentWeek.studentFullName ||
-                      studentWeek.studentFullName ||
-                      'No Name Found'}
+                    {studentWeek.studentFullName || 'No Name Found'}
+                    {` - ${studentWeek.weekStarts}`}
                   </option>
                 ))}
             </select>
@@ -620,9 +633,11 @@ function GroupSessionView({
               )}
           </div>
         </div>
-        {editMode && !newRecord && (
-          <DeleteRecord deleteFunction={deleteRecordFunction} />
-        )}
+        {editMode &&
+          !newRecord &&
+          userDataQuery.data?.roles.adminRole === 'admin' && (
+            <DeleteRecord deleteFunction={deleteRecordFunction} />
+          )}
         <FormControls
           editMode={editMode}
           cancelEdit={cancelEdit}
@@ -654,13 +669,13 @@ export default function GroupSessionsCell({
             week={week}
           />
         ))}
-        {week.membershipCourseHasGroupCalls && (
+        {/* {week.membershipCourseHasGroupCalls && (
           <GroupSessionCell
             groupSession={{ recordId: -1 } as GroupSession}
             newRecord
             week={week}
           />
-        )}
+        )} */}
       </>
     )
   );

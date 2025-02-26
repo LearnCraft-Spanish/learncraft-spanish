@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
 import type { NewFlashcard } from 'src/types/interfaceDefinitions';
+import React, { useMemo, useState } from 'react';
 import { useUnverifiedExamples } from 'src/hooks/ExampleData/useUnverifiedExamples';
+import EditOrCreateExample from '../editOrCreateExample';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import 'src/App.css';
 import './ExampleCreator.css';
-import EditOrCreateExample from '../editOrCreateExample';
 
 export default function ExampleCreator() {
   const [spanishExample, setSpanishExample] = useState('');

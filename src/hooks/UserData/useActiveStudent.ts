@@ -1,12 +1,12 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import type {
   FlashcardStudent,
   Lesson,
   Program,
   UserData,
 } from 'src/types/interfaceDefinitions';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from './useUserData';
 

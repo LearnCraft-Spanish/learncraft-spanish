@@ -1,6 +1,6 @@
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import type { Student, Week } from 'src/types/CoachingTypes';
 import eye from 'src/assets/icons/eye.svg';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 // import pencil from 'src/resources/icons/pencil.svg';
 
 export default function StudentCell({

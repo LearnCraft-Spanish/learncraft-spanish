@@ -1,12 +1,12 @@
-import React from 'react';
+import type { TestUserNames } from 'mocks/data/serverlike/userTable';
 import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { allUsersTable } from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { setupMockAuth } from 'tests/setupMockAuth';
+import React from 'react';
 
-import { allUsersTable } from 'mocks/data/serverlike/userTable';
-import type { TestUserNames } from 'mocks/data/serverlike/userTable';
+import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it } from 'vitest';
 import Menu from './Menu';
 
 // Helper Functions

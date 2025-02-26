@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { getActiveStudentFromName } from 'mocks/data/serverlike/studentTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { describe, expect, it } from 'vitest';
 import { useActiveStudent } from './useActiveStudent';
 
 const studentAdmin = getActiveStudentFromName('student-admin');

@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { describe, expect, it } from 'vitest';
 import WeeksRecordsSection from './WeeksRecords';
 
 describe('section WeeksRecordsSection', () => {
