@@ -5,13 +5,12 @@ import { ToastContainer, Zoom } from 'react-toastify';
 
 import Loading from './components/Loading';
 import Nav from './components/Nav';
-import useAuth from './hooks/useAuth';
-import { useActiveStudent } from './hooks/UserData/useActiveStudent';
-import { useUserData } from './hooks/UserData/useUserData';
-import AppRoutes from './routes/AppRoutes';
-
-import './App.css';
 import SubHeader from './components/SubHeader';
+import useAuth from './hooks/useAuth';
+import { useUserData } from './hooks/UserData/useUserData';
+
+import AppRoutes from './routes/AppRoutes';
+import './App.css';
 
 export const App: React.FC = () => {
   // React Router hooks
