@@ -1265,6 +1265,7 @@ i {
   max-height: 40vh;
   overflow: scroll;
   min-width: 500px;
+  z-index: 10;
 }
 
 .searchResultItem {
