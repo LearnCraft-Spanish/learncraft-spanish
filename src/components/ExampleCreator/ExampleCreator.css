@@ -89,3 +89,26 @@ so we can do col/row later on smaller screens */
 .tdWithoutPadding {
   padding: 0px;
 }
+
+/* exmaple card */
+
+.exampleCard {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  border: 2px solid var(--accent);
+  background: var(--light);
+  padding: 4px 16px;
+  margin: 5px 30px;
+}
+
+.exampleCard .exampleCardSpanishText,
+.exampleCard .exampleCardEnglishText {
+  position: relative;
+  height: 100%;
+  width: 50%;
+}
+
+.exampleCard .audioPlayPauseButton {
+  transform: translateY(-25%);
+}

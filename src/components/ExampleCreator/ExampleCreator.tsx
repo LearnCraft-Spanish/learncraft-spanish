@@ -6,11 +6,11 @@ import {
 } from 'src/functions/formatFlashcardText';
 import { useUnverifiedExamples } from 'src/hooks/ExampleData/useUnverifiedExamples';
 import EditOrCreateExample from '../editOrCreateExample';
+import ExampleListItem from '../FlashcardFinder/ExampleListItem';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
 import { AudioControl } from './AudioControl';
 import 'src/App.css';
 import './ExampleCreator.css';
-
 export default function ExampleCreator() {
   const [singleOrSet, setSingleOrSet] = useState<'single' | 'set'>('set');
   const [spanishExample, setSpanishExample] = useState('');
@@ -211,8 +211,9 @@ export default function ExampleCreator() {
                         example.spanglish,
                         example.spanishExample,
                       )}
+                      <AudioControl audioLink={example.spanishAudioLa} />
                     </div>
-                    <AudioControl audioLink={example.spanishAudioLa} />
+                    <div className="halfWrapper"></div>
                     <div className="exampleCardEnglishText">
                       {formatEnglishText(example.englishTranslation)}
                       <AudioControl audioLink={example.englishAudio} />
