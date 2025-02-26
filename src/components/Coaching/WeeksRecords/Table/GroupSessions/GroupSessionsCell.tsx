@@ -507,7 +507,19 @@ function GroupSessionView({
           value={topic}
           onChange={setTopic}
           editMode={editMode}
-          options={groupSessionsTopicFieldOptionsQuery.data ?? []}
+          options={
+            groupSessionsTopicFieldOptionsQuery.data
+              ? groupSessionsTopicFieldOptionsQuery.data.sort((a, b) => {
+                  if (a && b) {
+                    const aString = a.replace(/^"/g, '').toLowerCase();
+                    const bString = b.replace(/^"/g, '').toLowerCase();
+                    if (aString > bString) return 1;
+                    else return -1;
+                  }
+                  return 0;
+                })
+              : []
+          }
           label="Topic"
         />
         <TextAreaInput
