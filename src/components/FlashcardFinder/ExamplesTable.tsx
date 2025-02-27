@@ -11,6 +11,7 @@ interface ExamplesTableProps {
   forceShowVocab?: boolean;
   selectFunction?: (recordId: number) => void;
   sorted?: boolean;
+  studentContext?: boolean;
 }
 
 const ExamplesTable: React.FC<ExamplesTableProps> = ({
@@ -20,6 +21,7 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
   sorted = false,
   forceShowVocab = false,
   selectFunction = undefined,
+  studentContext = true,
 }: ExamplesTableProps) => {
   const [page, setPage] = useState(1);
   const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
@@ -151,6 +153,7 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
                 forceShowVocab={forceShowVocab}
                 selectExample={selectExample}
                 selectedExampleId={selectedExampleId}
+                studentContext={studentContext}
               />
             );
         })}

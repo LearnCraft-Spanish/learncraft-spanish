@@ -404,6 +404,20 @@ export function useBackend() {
     [postFactory],
   );
 
+  // Complex queryies have to be sent as POST since GET doesn't allow body
+  const getExampleSetBySpanishText = useCallback(
+    (spanishText: string[]): Promise<types.Flashcard[]> => {
+      return newPostFactory<types.Flashcard[]>({
+        path: 'example-set/by-spanish-text',
+        headers: [],
+        body: {
+          spanishtext: spanishText,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   /*      DELETE Requests      */
 
   const deleteMyStudentExample = useCallback(
@@ -551,6 +565,7 @@ export function useBackend() {
     getProgramsFromBackend,
     getQuizExamplesFromBackend,
     getSingleExample,
+    getExampleSetBySpanishText,
     getSpellingsFromBackend,
     getUnverifiedExamplesFromBackend,
     getRecentlyEditedExamples,

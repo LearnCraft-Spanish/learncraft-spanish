@@ -14,6 +14,7 @@ interface FormatExampleForTableProps {
   forceShowVocab?: boolean;
   selectExample?: (recordId: number) => void;
   selectedExampleId?: number | null;
+  studentContext?: boolean;
 }
 
 const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
@@ -22,6 +23,7 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
   forceShowVocab = false,
   selectExample = undefined,
   selectedExampleId = null,
+  studentContext = true,
 }: FormatExampleForTableProps) => {
   const { activeStudentQuery } = useActiveStudent();
   const userDataQuery = useUserData();
@@ -38,7 +40,8 @@ const ExampleListItem: React.FC<FormatExampleForTableProps> = ({
   const dataReady =
     flashcardDataQuery.isSuccess && activeStudentQuery.isSuccess;
 
-  const isStudent = activeStudentQuery.data?.role === 'student';
+  const isStudent =
+    studentContext && activeStudentQuery.data?.role === 'student';
   const isCollected = exampleIsCollected(data.recordId);
   const isPending = exampleIsPending(data.recordId);
   const isCustom = exampleIsCustom(data.recordId);
