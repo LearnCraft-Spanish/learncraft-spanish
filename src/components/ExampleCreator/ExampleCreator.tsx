@@ -1,6 +1,12 @@
 import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'react-toastify';
 import {
   formatEnglishText,
@@ -27,6 +33,7 @@ export default function ExampleCreator() {
     [],
   );
   const [spanishExample, setSpanishExample] = useState('');
+  const awaitingAddResolution = useRef(0);
   const [englishTranslation, setEnglishTranslation] = useState('');
   const [spanishAudioLa, setSpanishAudioLa] = useState('');
   const [areaInput, setAreaInput] = useState('');
@@ -142,30 +149,10 @@ export default function ExampleCreator() {
     },
     onSuccess: async () => {
       toast.success('Examples saved...');
-      const savedFlashcards =
-        await getExampleSetBySpanishText(flashcardSpanish);
-      const savedMatchFound = (flashcard: Flashcard) => {
-        savedFlashcards.some((savedFlashcard) => {
-          if (flashcard.spanishExample === savedFlashcard.spanishExample) {
-            return false;
-          }
-          return true;
-        });
-      };
-      const filteredUnsavedSet = unsavedFlashcardSet.filter((flashcard) =>
-        savedMatchFound(flashcard),
-      );
-      if (unsavedFlashcardSet.length === 0) {
-        toast.success('All examples saved');
-      } else {
-        toast.error(
-          'Some examples failed to save. Check these for errors and try again.',
-        );
-      }
-      setUnsavedFlashcardSet(filteredUnsavedSet);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
+      awaitingAddResolution.current++;
     },
   });
 
@@ -230,6 +217,36 @@ export default function ExampleCreator() {
     setSpanishAudioLa('');
     setEnglishAudio('');
   }
+
+  useEffect(() => {
+    if (!exampleSetQuery.data?.length) {
+      return;
+    }
+    if (exampleSetQuery.data.length) {
+      if (awaitingAddResolution.current > 1) {
+        awaitingAddResolution.current--;
+      }
+      if (awaitingAddResolution.current === 1) {
+        if (unsavedFlashcardSet.length === 0) {
+          toast.success('All examples saved');
+        } else {
+          toast.error('Some examples failed to save');
+        }
+        awaitingAddResolution.current = 0;
+      }
+      const savedFlashcards: Flashcard[] = exampleSetQuery.data;
+      const filteredUnsavedSet = unsavedFlashcardSet.filter(
+        (flashcard) =>
+          !savedFlashcards.some(
+            (savedFlashcard) =>
+              savedFlashcard.spanishExample === flashcard.spanishExample,
+          ),
+      );
+      if (filteredUnsavedSet.length !== unsavedFlashcardSet.length) {
+        setUnsavedFlashcardSet(filteredUnsavedSet);
+      }
+    }
+  }, [exampleSetQuery.data, unsavedFlashcardSet]);
 
   return (
     <div>
