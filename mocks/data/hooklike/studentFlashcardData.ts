@@ -1,5 +1,5 @@
 import type { StudentFlashcardData } from 'src/types/interfaceDefinitions';
-import { examples } from '../examples.json';
+import { examples } from '../examples.json' assert { type: 'json' };
 import generateStudentFlashcardData from '../serverlike/generateStudentFlashcardData';
 import { allStudentsTable } from '../serverlike/studentTable';
 
