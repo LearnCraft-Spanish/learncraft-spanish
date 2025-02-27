@@ -16,7 +16,7 @@ import 'src/App.css';
 import '../AudioQuiz/AudioBasedReview.css';
 
 interface StepValue {
-  audio: string;
+  audio: string | undefined;
   text: string | React.JSX.Element;
   step: stepValues | '';
 }
@@ -107,14 +107,14 @@ export default function AudioQuiz({
             step: 'question',
           };
     }
-    return { audio: '', text: '', step: '' };
+    return { audio: undefined, text: '', step: 'question' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const guessValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return { audio: '', text: 'Make a guess!', step: 'guess' };
+      return { audio: undefined, text: 'Make a guess!', step: 'guess' };
     }
-    return { audio: '', text: '', step: 'guess' };
+    return { audio: undefined, text: '', step: 'guess' };
   }, [currentExample, currentStep]);
 
   const hintValue = useMemo((): StepValue => {
@@ -131,7 +131,7 @@ export default function AudioQuiz({
             step: 'hint',
           };
     }
-    return { audio: '', text: '', step: 'hint' };
+    return { audio: undefined, text: '', step: 'hint' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const answerValue = useMemo((): StepValue => {
@@ -143,12 +143,12 @@ export default function AudioQuiz({
             step: 'answer',
           }
         : {
-            audio: '',
+            audio: undefined,
             text: currentExample?.englishTranslation,
             step: 'answer',
           };
     }
-    return { audio: '', text: '', step: 'answer' };
+    return { audio: undefined, text: '', step: 'answer' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   // Get the values related to the current step
@@ -263,12 +263,14 @@ export default function AudioQuiz({
 
   function audioElement() {
     return (
-      <audio
-        ref={audioRef}
-        src={currentStepValue.audio}
-        preload="auto"
-        onLoadedMetadata={() => playAudio()}
-      />
+      currentStepValue.audio && (
+        <audio
+          ref={audioRef}
+          src={currentStepValue.audio}
+          preload="auto"
+          onLoadedMetadata={() => playAudio()}
+        />
+      )
     );
   }
   // /*      Preloading Audio      */
