@@ -1246,3 +1246,37 @@ i {
   /* --toastify-toast-min-height: 40px; */
   --toastify-font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
 }
+
+/* Student Search */
+
+#searchStudentWrapper {
+  position: relative;
+}
+
+#searchStudentWrapper input {
+  min-width: 500px;
+}
+
+#optionsWrapper {
+  position: absolute;
+  background-color: var(--theme);
+  margin: 2px;
+  padding: 0 1rem;
+  max-height: 40vh;
+  overflow: scroll;
+  min-width: 500px;
+  z-index: 10;
+}
+
+.searchResultItem {
+  background-color: var(--light);
+  color: var(--dark);
+  margin: 4px;
+  padding: 2px;
+  cursor: pointer;
+  border: 2px solid var(--light);
+}
+
+.searchResultItem:hover {
+  border: 2px solid var(--accent);
+}
