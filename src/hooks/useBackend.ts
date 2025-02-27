@@ -480,6 +480,18 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const createMultipleUnverifiedExamples = useCallback(
+    (examples: types.NewFlashcard[]): Promise<number[]> => {
+      return newPostFactory<number[]>({
+        path: 'add-multiple-unverified-examples',
+        body: {
+          examples,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   const updateExample = useCallback(
     (example: Partial<types.Flashcard>): Promise<number> => {
       return newPostFactory<number>({
@@ -500,6 +512,16 @@ export function useBackend() {
           exampleId,
           vocabIdList,
         },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const createMultipleStudentExamples = useCallback(
+    (studentId: number, exampleIdList: number[]): Promise<number[]> => {
+      return newPostFactory<number[]>({
+        path: 'create-multiple-student-examples',
+        body: { studentId, exampleIdList },
       });
     },
     [newPostFactory],
@@ -542,6 +564,8 @@ export function useBackend() {
     createPMFDataForUser,
     createStudentExample,
     createUnverifiedExample,
+    createMultipleUnverifiedExamples,
+    createMultipleStudentExamples,
     updateExample,
     updateMyStudentExample,
     updatePMFDataForUser,

@@ -1,10 +1,12 @@
 import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
+import { useQuery } from '@tanstack/react-query';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import { useUnverifiedExamples } from 'src/hooks/ExampleData/useUnverifiedExamples';
+import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 import EditOrCreateExample from '../editOrCreateExample';
 import ExampleListItem from '../FlashcardFinder/ExampleListItem';
 import ExamplesTable from '../FlashcardFinder/ExamplesTable';
@@ -64,10 +66,65 @@ export default function ExampleCreator() {
     [flashcardSet],
   );
 
-  const { unverifiedExamplesQuery, addUnverifiedExample } =
-    useUnverifiedExamples();
+  const toggleSingleOrSet = () => {
+    if (singleOrSet === 'single') {
+      setSingleOrSet('set');
+    } else {
+      setSingleOrSet('single');
+    }
+  };
 
-  const tableData = unverifiedExamplesQuery.data ?? [];
+  const parsedAreaInput: Flashcard[] = useMemo(() => {
+    let recordId = -1;
+    const lines = areaInput.split('\n').map((line) => line.split('\t'));
+    return lines.map((line) => {
+      return {
+        spanishExample: line[0],
+        englishTranslation: line[1],
+        spanglish: line[0].includes('*') ? 'spanglish' : 'esp',
+        spanishAudioLa: line[2] || '',
+        englishAudio: line[3] || '',
+        vocabComplete: false,
+        // Temporary values; parse out before sending to backend
+        recordId: recordId--,
+        vocabIncluded: [],
+      };
+    });
+  }, [areaInput]);
+
+  const updateFlaschardSetValues = useCallback(
+    (changedObjTempId: number, field: string, newValue: string) => {
+      let newSpanglish = '';
+      if (field === 'spanishExample') {
+        newSpanglish = newValue.includes('*') ? 'spanglish' : 'esp';
+      }
+      const newFlashcardSet = flashcardSet.map((flashcard) => {
+        if (flashcard.recordId === changedObjTempId) {
+          return { ...flashcard, [field]: newValue, spanglish: newSpanglish };
+        } else {
+          return flashcard;
+        }
+      });
+      setFlashcardSet(newFlashcardSet);
+    },
+    [flashcardSet],
+  );
+
+  const userDataQuery = useUserData();
+  const adminRole = userDataQuery.data?.roles.adminRole;
+  const hasAccess = adminRole === 'admin' || adminRole === 'coach';
+  const { recentlyEditedExamplesQuery, addUnverifiedExample } =
+    useRecentlyEditedExamples();
+
+  const exampleSetQuery = useQuery({
+    queryKey: ['recentlyEditedExamples'],
+    queryFn: () => [],
+    staleTime: Infinity,
+    gcTime: Infinity,
+    enabled: hasAccess,
+  });
+
+  const tableData = recentlyEditedExamplesQuery.data ?? [];
 
   const displayOrder = tableData.map((example) => {
     return { recordId: example.recordId };
