@@ -153,8 +153,6 @@ export default function ExampleCreator() {
         [...previousFlashcardSet, ...flashcards],
       );
       const flashcardsToSave = [...unsavedFlashcardSet];
-      console.log('SAVING EXAMPLES');
-      console.log(flashcardsToSave);
       return {
         previousFlashcardSet,
         unsavedFlashcardSet: flashcardsToSave,
@@ -163,7 +161,6 @@ export default function ExampleCreator() {
     onError: (_err, _variables, context) => {
       toast.error('Failed to save examples');
       if (context?.previousFlashcardSet && context?.unsavedFlashcardSet) {
-        console.log('FAILED TO SAVE EXAMPLES');
         const unsavedFlashcardsToRestore = context.unsavedFlashcardSet.filter(
           (unsavedFlashcard) =>
             !context.previousFlashcardSet.some(
@@ -172,8 +169,6 @@ export default function ExampleCreator() {
                 unsavedFlashcard.spanishExample,
             ),
         );
-        console.log('RESTORING EXAMPLES');
-        console.log(unsavedFlashcardsToRestore);
         setUnsavedFlashcardSet(unsavedFlashcardsToRestore);
         setFlashcardSpanish(
           unsavedFlashcardsToRestore.map(
@@ -208,7 +203,6 @@ export default function ExampleCreator() {
           return flashcard;
         }
       });
-      console.log('REMOVING EXAMPLES');
       setUnsavedFlashcardSet(newFlashcardSet);
     },
     [unsavedFlashcardSet],
