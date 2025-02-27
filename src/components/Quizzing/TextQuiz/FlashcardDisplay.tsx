@@ -17,7 +17,7 @@ interface FlashcardProps {
   incrementExampleNumber: () => void;
   onRemove: () => void;
   toggleAnswer: () => void;
-  audioActive: string;
+  audioActive: string | undefined;
   togglePlaying: () => void;
   playing: boolean;
 }
