@@ -116,6 +116,14 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
     updateDisableClickOutside(false);
   }
 
+  function toggleEditMode() {
+    if (editMode) {
+      cancelEdit();
+    } else {
+      enableEditMode();
+    }
+  }
+
   function cancelEdit() {
     disableEditMode();
 
@@ -191,7 +199,7 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
   return (
     <div className="contextualWrapper" key={`assignment${assignment.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls editFunction={enableEditMode} />
+        <ContextualControlls editFunction={toggleEditMode} />
         {editMode ? (
           <h4>Edit Assignment</h4>
         ) : (
@@ -421,10 +429,7 @@ export function NewAssignmentView({
             <option value="">Select</option>
             {weeksQuery.data
               ?.filter((filterWeek) => {
-                return (
-                  filterWeek.membershipCourseHasGroupCalls &&
-                  filterWeek.weekStarts === weekStarts
-                );
+                return filterWeek.weekStarts === weekStarts;
               })
               .map((studentWeek) => ({
                 ...studentWeek,
@@ -440,6 +445,7 @@ export function NewAssignmentView({
               .map((studentWeek) => (
                 <option key={studentWeek.recordId} value={studentWeek.recordId}>
                   {studentWeek.studentFullName || 'No Name Found'}
+                  {` -- ${studentWeek.weekStarts}`}
                 </option>
               ))}
           </select>

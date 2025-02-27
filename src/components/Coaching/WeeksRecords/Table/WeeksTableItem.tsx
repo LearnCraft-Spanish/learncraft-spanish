@@ -30,8 +30,8 @@ export default function WeeksTableItem({ week }: { week: Week }) {
   const [notes, setNotes] = useState(week.notes);
   const [holdWeek, setHoldWeek] = useState(week.holdWeek);
   const [recordsComplete, setRecordsComplete] = useState(week.recordsComplete);
-  const [currentLesson, setCurrentLesson] = useState<string | undefined>(
-    week.currentLesson ? week.currentLesson.toString() : undefined,
+  const [currentLesson, setCurrentLesson] = useState<string>(
+    week.currentLesson ? week.currentLesson.toString() : '0',
   );
 
   const assignments = useMemo(
@@ -53,9 +53,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     setNotes(week.notes);
     setHoldWeek(week.holdWeek);
     setRecordsComplete(week.recordsComplete);
-    setCurrentLesson(
-      week.currentLesson ? week.currentLesson.toString() : undefined,
-    );
+    setCurrentLesson(week.currentLesson ? week.currentLesson.toString() : '0');
     closeModal();
     setEditMode(false);
   }
@@ -65,7 +63,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     if (week.week === 0) {
       return true;
     }
-    if (week.currentLesson === 0 || null) {
+    if (currentLesson === '0') {
       return false;
     }
     if (
@@ -84,7 +82,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
       notes === week.notes &&
       holdWeek === week.holdWeek &&
       recordsComplete === week.recordsComplete &&
-      (week.currentLesson ? week.currentLesson.toString() : undefined) ===
+      (week.currentLesson ? week.currentLesson.toString() : '0') ===
         currentLesson
     ) {
       toast.info('No changes detected');
@@ -111,9 +109,8 @@ export default function WeeksTableItem({ week }: { week: Week }) {
         offTrack: week.offTrack,
         primaryCoachWhenCreated: week.primaryCoachWhenCreated,
         recordId: week.recordId,
-        currentLesson: currentLesson
-          ? Number.parseInt(currentLesson)
-          : undefined,
+        currentLesson:
+          currentLesson !== '0' ? Number.parseInt(currentLesson) : undefined,
       },
       {
         onSuccess: () => {
@@ -165,7 +162,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
                 setCurrentLesson(e.target.value);
               }}
             >
-              <option value={undefined}>Select Lesson</option>
+              <option value={'0'}>Select Lesson</option>
               {studentRecordsLessonsQuery.data?.map((lesson) => (
                 <option key={lesson.recordId} value={lesson.recordId}>
                   {lesson.lessonName}

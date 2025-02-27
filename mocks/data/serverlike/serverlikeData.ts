@@ -14,7 +14,7 @@ import type {
   Vocabulary,
 } from 'src/types/interfaceDefinitions';
 
-import * as dataJson from './actualServerData.json';
+import * as dataJson from './actualServerData.json' assert { type: 'json' };
 import { allStudentsTable } from './studentTable';
 
 interface MockApiData {

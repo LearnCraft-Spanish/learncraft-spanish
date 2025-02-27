@@ -76,33 +76,35 @@ export default function QuizComponent({
 
   /*      Audio Component Section       */
 
-  const spanishAudioUrl = currentExample?.spanishAudioLa || '';
-  const englishAudioUrl = currentExample?.englishAudio || '';
+  const spanishAudioUrl = currentExample?.spanishAudioLa || undefined;
+  const englishAudioUrl = currentExample?.englishAudio || undefined;
 
-  const audioActive: string = spanishShowing
+  const activeAudio: string | undefined = spanishShowing
     ? spanishAudioUrl
     : englishAudioUrl;
 
   function spanishAudio() {
-    const audioElement = (
-      <audio
-        ref={currentAudio}
-        src={spanishAudioUrl}
-        onEnded={() => setPlaying(false)}
-      />
+    return (
+      spanishAudioUrl && (
+        <audio
+          ref={currentAudio}
+          src={spanishAudioUrl}
+          onEnded={() => setPlaying(false)}
+        />
+      )
     );
-    return audioElement;
   }
 
   function englishAudio() {
-    const audioElement = (
-      <audio
-        ref={currentAudio}
-        src={englishAudioUrl}
-        onEnded={() => setPlaying(false)}
-      />
+    return (
+      englishAudioUrl && (
+        <audio
+          ref={currentAudio}
+          src={englishAudioUrl}
+          onEnded={() => setPlaying(false)}
+        />
+      )
     );
-    return audioElement;
   }
 
   const questionAudio = startWithSpanish ? spanishAudio : englishAudio;
@@ -368,7 +370,7 @@ export default function QuizComponent({
               toggleAnswer={toggleAnswer}
               togglePlaying={togglePlaying}
               playing={playing}
-              audioActive={audioActive}
+              audioActive={activeAudio}
               startWithSpanish={startWithSpanish}
             />
           )}
