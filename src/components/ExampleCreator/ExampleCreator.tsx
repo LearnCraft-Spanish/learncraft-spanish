@@ -32,8 +32,10 @@ export default function ExampleCreator() {
   const [unsavedFlashcardSet, setUnsavedFlashcardSet] = useState<Flashcard[]>(
     [],
   );
+  const [flashcardSpanish, setFlashcardSpanish] = useState<string[]>([]);
   const [spanishExample, setSpanishExample] = useState('');
   const awaitingAddResolution = useRef(0);
+  const tempId = useRef(-1);
   const [englishTranslation, setEnglishTranslation] = useState('');
   const [spanishAudioLa, setSpanishAudioLa] = useState('');
   const [areaInput, setAreaInput] = useState('');
@@ -48,24 +50,32 @@ export default function ExampleCreator() {
   };
 
   const parsedAreaInput: Flashcard[] = useMemo(() => {
-    let recordId = -1;
     const lines = areaInput.split('\n').map((line) => line.split('\t'));
-    return lines.map((line) => {
+    const parsedRecords = lines.map((line) => {
       return {
-        spanishExample: line[0],
-        englishTranslation: line[1],
+        spanishExample: line[0] || `ERROR: ${-tempId.current}`,
+        englishTranslation: line[1] || 'ERROR',
         spanglish: line[0].includes('*') ? 'spanglish' : 'esp',
         spanishAudioLa: line[2] || '',
         englishAudio: line[3] || '',
         vocabComplete: false,
         // Temporary values; parse out before sending to backend
-        recordId: recordId--,
+        recordId: tempId.current--,
         vocabIncluded: [],
       };
     });
+    const filteredRecords = parsedRecords.filter(
+      (record) =>
+        !record.spanishExample.includes('ERROR') &&
+        !record.englishTranslation.includes('ERROR'),
+    );
+    return filteredRecords;
   }, [areaInput]);
 
   const addInputToFlashcardSet = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
+    const newSpanish = parsedAreaInput.map((example) => example.spanishExample);
+    setFlashcardSpanish((prev) => [...new Set([...prev, ...newSpanish])]);
     setUnsavedFlashcardSet((prev) => [...prev, ...parsedAreaInput]);
     setPastingOrEditing('editing');
     setAreaInput('');
@@ -77,34 +87,6 @@ export default function ExampleCreator() {
   const { recentlyEditedExamplesQuery, addUnverifiedExample } =
     useRecentlyEditedExamples();
 
-  const flashcardSet: Flashcard[] = useMemo(() => {
-    const savedFlashcards: Flashcard[] =
-      queryClient.getQueryData(['flashcardSet']) ?? [];
-    const mergedFlashcardSet = [...savedFlashcards, ...unsavedFlashcardSet];
-
-    // dedupe flashcards by spanishExample and prioritize saved flashcards
-    const dedupedFlashcardSet = Array.from(
-      mergedFlashcardSet
-        .reduce((map, flashcard) => {
-          const key = flashcard.spanishExample.trim();
-          if (!map.has(key) || map.get(key).recordId < 0) {
-            map.set(key, flashcard);
-          }
-          return map;
-        }, new Map())
-        .values(),
-    );
-    return dedupedFlashcardSet;
-  }, [queryClient, unsavedFlashcardSet]);
-
-  const flashcardSpanish = useMemo(
-    () =>
-      flashcardSet.map((flashcard) => {
-        return flashcard.spanishExample;
-      }),
-    [flashcardSet],
-  );
-
   const exampleSetQuery = useQuery({
     queryKey: ['flashcardSet'],
     queryFn: () => getExampleSetBySpanishText(flashcardSpanish),
@@ -112,6 +94,36 @@ export default function ExampleCreator() {
     gcTime: Infinity,
     enabled: hasAccess && flashcardSpanish.length > 0,
   });
+
+  const flashcardSet: Flashcard[] = useMemo(() => {
+    const savedFlashcards: Flashcard[] = exampleSetQuery.data ?? [];
+    const mappedFlashcards = flashcardSpanish.map((spanish) => {
+      const foundSaved = savedFlashcards.find(
+        (flashcard) => flashcard.spanishExample === spanish,
+      );
+      if (foundSaved) {
+        return foundSaved;
+      }
+      const foundUnsaved = unsavedFlashcardSet.find(
+        (flashcard) => flashcard.spanishExample === spanish,
+      );
+      if (foundUnsaved) {
+        return foundUnsaved;
+      }
+      const tempFlashcard: Flashcard = {
+        spanishExample: spanish,
+        englishTranslation: 'ERROR',
+        spanglish: 'esp',
+        vocabIncluded: [],
+        englishAudio: '',
+        spanishAudioLa: '',
+        vocabComplete: false,
+        recordId: tempId.current--,
+      };
+      return tempFlashcard;
+    });
+    return mappedFlashcards;
+  }, [exampleSetQuery.data, unsavedFlashcardSet, flashcardSpanish]);
 
   const sendExampleSet = useCallback(
     (flashcards: Flashcard[]) => {
@@ -134,13 +146,40 @@ export default function ExampleCreator() {
     mutationFn: sendExampleSet,
     onMutate: async (flashcards: Flashcard[]) => {
       await queryClient.cancelQueries({ queryKey: ['flashcardSet'] });
-      const previousFlashcardSet = queryClient.getQueryData(['flashcardSet']);
-      queryClient.setQueryData(['flashcardSet'], flashcards);
-      return { previousFlashcardSet };
+      const previousFlashcardSet: Flashcard[] =
+        queryClient.getQueryData(['flashcardSet']) || [];
+      queryClient.setQueryData(
+        ['flashcardSet'],
+        [...previousFlashcardSet, ...flashcards],
+      );
+      const flashcardsToSave = [...unsavedFlashcardSet];
+      console.log('SAVING EXAMPLES');
+      console.log(flashcardsToSave);
+      return {
+        previousFlashcardSet,
+        unsavedFlashcardSet: flashcardsToSave,
+      };
     },
     onError: (_err, _variables, context) => {
       toast.error('Failed to save examples');
-      if (context?.previousFlashcardSet) {
+      if (context?.previousFlashcardSet && context?.unsavedFlashcardSet) {
+        console.log('FAILED TO SAVE EXAMPLES');
+        const unsavedFlashcardsToRestore = context.unsavedFlashcardSet.filter(
+          (unsavedFlashcard) =>
+            !context.previousFlashcardSet.some(
+              (savedFlashcard) =>
+                savedFlashcard.spanishExample ===
+                unsavedFlashcard.spanishExample,
+            ),
+        );
+        console.log('RESTORING EXAMPLES');
+        console.log(unsavedFlashcardsToRestore);
+        setUnsavedFlashcardSet(unsavedFlashcardsToRestore);
+        setFlashcardSpanish(
+          unsavedFlashcardsToRestore.map(
+            (unsavedFlashcard) => unsavedFlashcard.spanishExample,
+          ),
+        );
         queryClient.setQueryData(
           ['flashcardSet'],
           context.previousFlashcardSet,
@@ -169,10 +208,18 @@ export default function ExampleCreator() {
           return flashcard;
         }
       });
+      console.log('REMOVING EXAMPLES');
       setUnsavedFlashcardSet(newFlashcardSet);
     },
     [unsavedFlashcardSet],
   );
+
+  const clearAndRestart = useCallback(() => {
+    setUnsavedFlashcardSet([]);
+    setFlashcardSpanish([]);
+    setPastingOrEditing('pasting');
+    queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
+  }, []);
 
   const tableData =
     singleOrSet === 'single'
@@ -227,23 +274,25 @@ export default function ExampleCreator() {
         awaitingAddResolution.current--;
       }
       if (awaitingAddResolution.current === 1) {
-        if (unsavedFlashcardSet.length === 0) {
+        if (unsavedFlashcardSet.length === 0 && exampleSetQuery.data.length) {
           toast.success('All examples saved');
         } else {
           toast.error('Some examples failed to save');
         }
         awaitingAddResolution.current = 0;
       }
-      const savedFlashcards: Flashcard[] = exampleSetQuery.data;
-      const filteredUnsavedSet = unsavedFlashcardSet.filter(
-        (flashcard) =>
-          !savedFlashcards.some(
-            (savedFlashcard) =>
-              savedFlashcard.spanishExample === flashcard.spanishExample,
-          ),
-      );
-      if (filteredUnsavedSet.length !== unsavedFlashcardSet.length) {
-        setUnsavedFlashcardSet(filteredUnsavedSet);
+      if (awaitingAddResolution.current === 0) {
+        const savedFlashcards: Flashcard[] = exampleSetQuery.data;
+        const filteredUnsavedSet = unsavedFlashcardSet.filter(
+          (flashcard) =>
+            !savedFlashcards.some(
+              (savedFlashcard) =>
+                savedFlashcard.spanishExample === flashcard.spanishExample,
+            ),
+        );
+        if (filteredUnsavedSet.length !== unsavedFlashcardSet.length) {
+          setUnsavedFlashcardSet(filteredUnsavedSet);
+        }
       }
     }
   }, [exampleSetQuery.data, unsavedFlashcardSet]);
@@ -310,7 +359,7 @@ export default function ExampleCreator() {
                     <tbody>
                       {parsedAreaInput.map((example) => {
                         return (
-                          <tr key={example.spanishExample}>
+                          <tr key={example.recordId}>
                             <td>
                               {formatSpanishText(
                                 example.spanglish,
@@ -349,7 +398,7 @@ export default function ExampleCreator() {
                   <h3>Example Preview</h3>
                   {unsavedFlashcardSet.map((example) => {
                     return (
-                      <div key={example.spanishExample} className="exampleCard">
+                      <div key={example.recordId} className="exampleCard">
                         <div className="exampleCardSpanishText">
                           {formatSpanishText(
                             example.spanglish,
@@ -450,6 +499,9 @@ export default function ExampleCreator() {
                   onClick={() => setPastingOrEditing('pasting')}
                 >
                   Back to Paste
+                </button>
+                <button type="button" onClick={() => clearAndRestart()}>
+                  Restart
                 </button>
                 {unsavedFlashcardSet.length > 0 && (
                   <button
