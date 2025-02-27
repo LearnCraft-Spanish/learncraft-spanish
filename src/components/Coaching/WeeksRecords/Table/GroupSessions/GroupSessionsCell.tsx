@@ -17,8 +17,8 @@ import {
   DeleteRecord,
   Dropdown,
   FormControls,
+  LinkInput,
   TextAreaInput,
-  TextInput,
 } from '../../../general';
 
 const sessionTypeOptions = [
@@ -530,13 +530,13 @@ export function GroupSessionView({
           onChange={setComments}
           editMode={editMode}
         />
-        <TextInput
+        <LinkInput
           label="Call Document"
           value={callDocument}
           onChange={setCallDocument}
           editMode={editMode}
         />
-        <TextInput
+        <LinkInput
           label="Zoom Link"
           value={zoomLink}
           onChange={setZoomLink}

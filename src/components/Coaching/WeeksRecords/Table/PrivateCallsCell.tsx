@@ -79,6 +79,14 @@ function PrivateCallView({ call }: { call: Call }) {
     updateDisableClickOutside(false);
   }
 
+  function toggleEditMode() {
+    if (editMode) {
+      cancelEdit();
+    } else {
+      enableEditMode();
+    }
+  }
+
   function cancelEdit() {
     disableEditMode();
 
@@ -156,7 +164,7 @@ function PrivateCallView({ call }: { call: Call }) {
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls editFunction={enableEditMode} />
+        <ContextualControlls editFunction={toggleEditMode} />
         {editMode ? (
           <h4>Edit Call</h4>
         ) : (
