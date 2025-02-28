@@ -79,7 +79,7 @@ export default function ExampleCreator() {
     setUnsavedFlashcardSet((prev) => [...prev, ...parsedAreaInput]);
     setPastingOrEditing('editing');
     setAreaInput('');
-  }, [parsedAreaInput]);
+  }, [queryClient, parsedAreaInput]);
 
   const userDataQuery = useUserData();
   const adminRole = userDataQuery.data?.roles.adminRole;
@@ -190,7 +190,7 @@ export default function ExampleCreator() {
       });
       setUnsavedFlashcardSet(newFlashcardSet);
     },
-    [unsavedFlashcardSet],
+    [unsavedFlashcardSet, flashcardSpanish],
   );
 
   const clearAndRestart = useCallback(() => {
@@ -198,7 +198,7 @@ export default function ExampleCreator() {
     setFlashcardSpanish([]);
     setPastingOrEditing('pasting');
     queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
-  }, []);
+  }, [queryClient]);
 
   const tableData =
     singleOrSet === 'single'
