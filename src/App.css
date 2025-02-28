@@ -229,7 +229,7 @@ button:hover,
   color: var(--dark);
   font-size: 12px;
   padding: 5px 15px;
-  margin: 0px;
+  margin: 0 4px;
 }
 
 .div-user-subheader p {
