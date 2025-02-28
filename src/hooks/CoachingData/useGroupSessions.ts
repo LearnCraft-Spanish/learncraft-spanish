@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useUserData } from '../UserData/useUserData';
 import { useBackend, useBackendHelpers } from '../useBackend';
+import { useUserData } from '../UserData/useUserData';
 
 export default function useGroupSessions() {
   const userDataQuery = useUserData();

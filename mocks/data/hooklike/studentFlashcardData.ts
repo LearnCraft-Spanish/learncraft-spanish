@@ -1,7 +1,7 @@
 import type { StudentFlashcardData } from 'src/types/interfaceDefinitions';
-import { examples } from '../examples.json';
-import { allStudentsTable } from '../serverlike/studentTable';
+import { examples } from '../examples.json' assert { type: 'json' };
 import generateStudentFlashcardData from '../serverlike/generateStudentFlashcardData';
+import { allStudentsTable } from '../serverlike/studentTable';
 
 // We will generate student flashcard data for each student.
 // Becuase it uses fisher-yates shuffle, the order of the flashcards will be different for each test?

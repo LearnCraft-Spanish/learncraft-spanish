@@ -1,9 +1,9 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it } from 'vitest';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
+
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it } from 'vitest';
 import MyFlashcardsQuiz from './ReviewMyFlashcards';
 
 describe('menu for student flashcards', () => {

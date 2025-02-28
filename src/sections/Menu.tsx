@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useUserData } from 'src/hooks/UserData/useUserData';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import Loading from 'src/components/Loading';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import 'src/App.css';
 

@@ -1,9 +1,9 @@
-import { describe, it, vi } from 'vitest';
 import { fireEvent, render, renderHook, waitFor } from '@testing-library/react';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { describe, it, vi } from 'vitest';
 
 import Dropdown, { CoachDropdown } from './Dropdowns';
 

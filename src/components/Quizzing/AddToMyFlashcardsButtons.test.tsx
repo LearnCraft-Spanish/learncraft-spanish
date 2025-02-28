@@ -1,10 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { act } from 'react';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AddToMyFlashcardsButtons from './AddToMyFlashcardsButtons';
 
 /*      Testing Setup       */

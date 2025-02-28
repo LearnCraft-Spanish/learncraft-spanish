@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import type { Call, Week } from 'src/types/CoachingTypes';
-import ContextualControlls from 'src/components/ContextualControlls';
+import React, { useState } from 'react';
+import ContextualControls from 'src/components/ContextualControls';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import {
   CoachDropdown,
@@ -47,6 +47,7 @@ function PrivateCall({ call }: { call: Call }) {
 }
 
 function PrivateCallView({ call }: { call: Call }) {
+  const userDataQuery = useUserData();
   const { setContextualRef, updateDisableClickOutside, closeContextual } =
     useContextualMenu();
   const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
@@ -76,6 +77,14 @@ function PrivateCallView({ call }: { call: Call }) {
   function disableEditMode() {
     setEditMode(false);
     updateDisableClickOutside(false);
+  }
+
+  function toggleEditMode() {
+    if (editMode) {
+      cancelEdit();
+    } else {
+      enableEditMode();
+    }
   }
 
   function cancelEdit() {
@@ -155,7 +164,7 @@ function PrivateCallView({ call }: { call: Call }) {
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls editFunction={enableEditMode} />
+        <ContextualControls editFunction={toggleEditMode} />
         {editMode ? (
           <h4>Edit Call</h4>
         ) : (
@@ -228,7 +237,9 @@ function PrivateCallView({ call }: { call: Call }) {
           editMode={editMode}
         />
 
-        {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
+        {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
+          <DeleteRecord deleteFunction={deleteRecordFunction} />
+        )}
 
         <FormControls
           captureSubmitForm={captureSubmitForm}
@@ -325,7 +336,7 @@ export default function PrivateCallsCell({
       {contextual === `addPrivateCall${week.recordId}` && (
         <div className="contextualWrapper callPopup">
           <div className="contextual" ref={setContextualRef}>
-            <ContextualControlls />
+            <ContextualControls />
             <h4>
               {getStudentFromMembershipId(week.relatedMembership)?.fullName} on{' '}
               {new Date(Date.now()).toISOString().split('T')[0]}

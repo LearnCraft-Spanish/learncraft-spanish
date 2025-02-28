@@ -1,8 +1,8 @@
 import { cleanup, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import Nav from './Nav';
 
 describe('component Nav', () => {

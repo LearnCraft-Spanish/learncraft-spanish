@@ -31,7 +31,7 @@ export default function Dropdown({
           value={value}
           onChange={(e) => onChange(e.target.value)}
         >
-          <option value={undefined}>{defaultOptionText || 'Select'}</option>
+          <option value={''}>{defaultOptionText || 'Select'}</option>
           {options.map((option) => (
             <option key={option} value={option}>
               {option}
@@ -82,7 +82,7 @@ export function CoachDropdown({
             value={coachEmail}
             onChange={(e) => onChange(e.target.value)}
           >
-            <option value={undefined}>{defaultOptionText || 'Select'}</option>
+            <option value={''}>{defaultOptionText || 'Select'}</option>
 
             {coachListQuery.data?.map((coach) => (
               <option key={coach.coach} value={coach.user.email}>

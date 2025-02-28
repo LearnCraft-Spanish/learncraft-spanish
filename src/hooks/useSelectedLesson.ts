@@ -1,12 +1,12 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useMemo } from 'react';
 import type {
   Flashcard,
   Lesson,
   Program,
 } from 'src/types/interfaceDefinitions';
-import { useActiveStudent } from './UserData/useActiveStudent';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useProgramTable } from './CourseData/useProgramTable'; // Assuming this fetches the programs data
+import { useActiveStudent } from './UserData/useActiveStudent';
 
 export function useSelectedLesson() {
   const queryClient = useQueryClient();

@@ -15,5 +15,5 @@ interface ModalContextType {
 }
 const ModalContext = createContext<ModalContextType | null>(null);
 
-export type { ModalContextType, ModalContentProps };
+export type { ModalContentProps, ModalContextType };
 export default ModalContext;

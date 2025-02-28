@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type { Vocabulary } from 'src/types/interfaceDefinitions';
 
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FromToLessonSelector } from 'src/components/LessonSelector';
 import { useBackend } from 'src/hooks/useBackend';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import type { Vocabulary } from 'src/types/interfaceDefinitions';
 
 interface WordCount {
   word: string;

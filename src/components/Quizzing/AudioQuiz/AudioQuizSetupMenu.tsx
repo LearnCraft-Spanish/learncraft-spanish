@@ -1,3 +1,4 @@
+import React from 'react';
 import MenuButton from 'src/components/Buttons/MenuButton';
 import { FromToLessonSelector } from 'src/components/LessonSelector';
 
@@ -14,7 +15,7 @@ export default function AudioQuizSetupMenu({
   updateAutoplay,
   examplesToPlayLength,
   readyQuiz,
-}: AudioQuizSetupMenuProps): JSX.Element {
+}: AudioQuizSetupMenuProps): React.JSX.Element {
   return (
     <div className="audioQuizSetupMenu">
       {/* Change className? currently confusing */}

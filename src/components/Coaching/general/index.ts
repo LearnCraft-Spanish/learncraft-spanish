@@ -1,15 +1,15 @@
 import DateInput from './DateInput';
-import Dropdown, { CoachDropdown } from './Dropdowns';
-import { LinkInput, TextAreaInput, TextInput } from './TextInput';
-import FormControls from './FormControls';
 import DeleteRecord from './DeleteRecord';
+import Dropdown, { CoachDropdown } from './Dropdowns';
+import FormControls from './FormControls';
+import { LinkInput, TextAreaInput, TextInput } from './TextInput';
 export {
-  DateInput,
-  Dropdown,
   CoachDropdown,
+  DateInput,
+  DeleteRecord,
+  Dropdown,
+  FormControls,
+  LinkInput,
   TextAreaInput,
   TextInput,
-  LinkInput,
-  FormControls,
-  DeleteRecord,
 };

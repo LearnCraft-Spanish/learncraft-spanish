@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-
-import { Link, Navigate, useLocation } from 'react-router-dom';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
-import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
-import PMFPopup from 'src/components/PMFPopup/PMFPopup';
+
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import MenuButton from 'src/components/Buttons/MenuButton';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
+import PMFPopup from 'src/components/PMFPopup/PMFPopup';
+import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import QuizProgress from '../QuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
@@ -76,33 +76,35 @@ export default function QuizComponent({
 
   /*      Audio Component Section       */
 
-  const spanishAudioUrl = currentExample?.spanishAudioLa || '';
-  const englishAudioUrl = currentExample?.englishAudio || '';
+  const spanishAudioUrl = currentExample?.spanishAudioLa || undefined;
+  const englishAudioUrl = currentExample?.englishAudio || undefined;
 
-  const audioActive: string = spanishShowing
+  const activeAudio: string | undefined = spanishShowing
     ? spanishAudioUrl
     : englishAudioUrl;
 
   function spanishAudio() {
-    const audioElement = (
-      <audio
-        ref={currentAudio}
-        src={spanishAudioUrl}
-        onEnded={() => setPlaying(false)}
-      />
+    return (
+      spanishAudioUrl && (
+        <audio
+          ref={currentAudio}
+          src={spanishAudioUrl}
+          onEnded={() => setPlaying(false)}
+        />
+      )
     );
-    return audioElement;
   }
 
   function englishAudio() {
-    const audioElement = (
-      <audio
-        ref={currentAudio}
-        src={englishAudioUrl}
-        onEnded={() => setPlaying(false)}
-      />
+    return (
+      englishAudioUrl && (
+        <audio
+          ref={currentAudio}
+          src={englishAudioUrl}
+          onEnded={() => setPlaying(false)}
+        />
+      )
     );
-    return audioElement;
   }
 
   const questionAudio = startWithSpanish ? spanishAudio : englishAudio;
@@ -368,7 +370,7 @@ export default function QuizComponent({
               toggleAnswer={toggleAnswer}
               togglePlaying={togglePlaying}
               playing={playing}
-              audioActive={audioActive}
+              audioActive={activeAudio}
               startWithSpanish={startWithSpanish}
             />
           )}

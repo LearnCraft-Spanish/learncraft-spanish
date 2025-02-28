@@ -1,23 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
 import type {
   DisplayOrder,
   Flashcard,
   VocabTag,
 } from 'src/types/interfaceDefinitions';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import 'src/App.css';
-
-import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { useUserData } from 'src/hooks/UserData/useUserData';
-import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import Filter from 'src/components/FlashcardFinder/Filter';
 
 import Loading from 'src/components/Loading';
-import Filter from 'src/components/FlashcardFinder/Filter';
+import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
 import useFlashcardFilter from 'src/hooks/useFlashcardFilter';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import ExamplesTable from './ExamplesTable';
+import 'src/App.css';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 const FlashcardFinder = () => {

@@ -1,10 +1,10 @@
-import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-
-import { HttpResponse, http } from 'msw';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { server } from 'mocks/api/server';
+
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { http, HttpResponse } from 'msw';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { describe, expect, it } from 'vitest';
 
 import { useVocabulary } from './useVocabulary';
 

@@ -1,15 +1,15 @@
-import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+// Types
+import type { UserData } from 'src/types/interfaceDefinitions';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
-import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import programsTable from 'mocks/data/hooklike/programsTable';
+import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
 
 import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
 import { setupMockAuth } from 'tests/setupMockAuth';
 
-// Types
-import type { UserData } from 'src/types/interfaceDefinitions';
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { useSelectedLesson } from './useSelectedLesson';
 

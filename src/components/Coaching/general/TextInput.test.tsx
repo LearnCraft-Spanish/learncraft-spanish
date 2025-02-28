@@ -1,6 +1,6 @@
-import { describe, it, vi } from 'vitest';
 import { fireEvent, render } from '@testing-library/react';
 import { act } from 'react';
+import { describe, it, vi } from 'vitest';
 
 import { LinkInput, TextAreaInput, TextInput } from './TextInput';
 

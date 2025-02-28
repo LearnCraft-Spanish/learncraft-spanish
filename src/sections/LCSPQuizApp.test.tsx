@@ -1,5 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import React from 'react';
+import type { TestUserNames } from 'mocks/data/serverlike/userTable';
 import {
   act,
   fireEvent,
@@ -8,10 +7,11 @@ import {
   waitFor,
 } from '@testing-library/react';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
-import type { TestUserNames } from 'mocks/data/serverlike/userTable';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import React from 'react';
 import { setupMockAuth } from 'tests/setupMockAuth';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import LCSPQuizApp from './LCSPQuizApp';
 

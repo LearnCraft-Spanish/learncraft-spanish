@@ -1,3 +1,5 @@
+import React from 'react';
+
 type stepValues = 'question' | 'guess' | 'hint' | 'answer';
 interface AudioQuizButtonsProps {
   audioOrComprehension: 'audio' | 'comprehension';
@@ -18,7 +20,7 @@ export default function AudioQuizButtons({
   decrementExample,
   incrementExample,
   unReadyQuiz,
-}: AudioQuizButtonsProps): JSX.Element {
+}: AudioQuizButtonsProps): React.JSX.Element {
   function nextStepButtonText(): string {
     switch (audioOrComprehension) {
       case 'audio':
@@ -55,7 +57,7 @@ export default function AudioQuizButtons({
         break;
     }
   }
-  function previousStepButton(): JSX.Element {
+  function previousStepButton(): React.JSX.Element {
     if (audioOrComprehension === 'audio') {
       // I think in the original code there was supposted to be a case Play again, but I could not reproduce it.
       return (

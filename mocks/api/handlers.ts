@@ -1,9 +1,9 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
-import { HttpResponse, http } from 'msw';
 import type { UserData } from 'src/types/interfaceDefinitions';
+import { http, HttpResponse } from 'msw';
+import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import newData from '../data/serverlike/serverlikeData';
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
-import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import {
   allUsersTable,
   getUserDataFromName,

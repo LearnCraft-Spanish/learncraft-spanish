@@ -1,8 +1,8 @@
-import { describe, it, vi } from 'vitest';
 import { fireEvent, render, waitFor } from '@testing-library/react';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { describe, it, vi } from 'vitest';
 import DeleteRecord from './DeleteRecord';
 
 describe('component DeleteRecord', () => {

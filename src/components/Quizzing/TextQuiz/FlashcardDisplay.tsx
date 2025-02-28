@@ -1,11 +1,11 @@
-import React from 'react';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import React from 'react';
+import pause from 'src/assets/icons/pause_dark.svg';
+import play from 'src/assets/icons/play_dark.svg';
 import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import play from 'src/assets/icons/play_dark.svg';
-import pause from 'src/assets/icons/pause_dark.svg';
 import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 import './Quiz.css';
 
@@ -17,7 +17,7 @@ interface FlashcardProps {
   incrementExampleNumber: () => void;
   onRemove: () => void;
   toggleAnswer: () => void;
-  audioActive: string;
+  audioActive: string | undefined;
   togglePlaying: () => void;
   playing: boolean;
 }
@@ -33,7 +33,7 @@ export default function FlashcardDisplay({
   togglePlaying,
   startWithSpanish = false,
   toggleAnswer,
-}: FlashcardProps): JSX.Element {
+}: FlashcardProps): React.JSX.Element {
   const spanishText = example.spanishExample;
   const englishText = example.englishTranslation;
 
