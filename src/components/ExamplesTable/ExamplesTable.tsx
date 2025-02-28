@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ExampleListItem from './ExampleListItem';
 import Pagination from './Pagination';
 
+import './ExamplesTable.scss';
+
 interface ExamplesTableProps {
   dataSource: Flashcard[];
   displayOrder: DisplayOrder[];
@@ -14,7 +16,7 @@ interface ExamplesTableProps {
   studentContext?: boolean;
 }
 
-const ExamplesTable: React.FC<ExamplesTableProps> = ({
+export default function ExamplesTable({
   dataSource,
   displayOrder,
   showSpanglishLabel = false,
@@ -22,7 +24,7 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
   forceShowVocab = false,
   selectFunction = undefined,
   studentContext = true,
-}: ExamplesTableProps) => {
+}: ExamplesTableProps) {
   const [page, setPage] = useState(1);
   const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
     null,
@@ -138,6 +140,7 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
         nextPage={nextPage}
         previousPage={previousPage}
       />
+      {/* unnessessary id? */}
       <div id="examplesTableBody">
         {displayOrderSegment.map((displayOrder) => {
           const id = displayOrder.recordId;
@@ -148,7 +151,7 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
             return (
               <ExampleListItem
                 key={displayOrder.recordId}
-                data={exampleData}
+                example={exampleData}
                 showSpanglishLabel={showSpanglishLabel}
                 forceShowVocab={forceShowVocab}
                 selectExample={selectExample}
@@ -167,6 +170,4 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
       />
     </div>
   );
-};
-
-export default ExamplesTable;
+}

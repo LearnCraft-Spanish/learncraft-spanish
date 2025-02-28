@@ -16,7 +16,7 @@ import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEdit
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import EditOrCreateExample from '../editOrCreateExample';
-import ExamplesTable from '../FlashcardFinder/ExamplesTable';
+import ExamplesTable from '../ExamplesTable/ExamplesTable';
 import LoadingMessage from '../Loading';
 import { AudioControl } from './AudioControl';
 import 'src/App.css';

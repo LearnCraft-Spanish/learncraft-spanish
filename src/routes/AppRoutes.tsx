@@ -3,7 +3,7 @@ import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecor
 
 import ExampleCreator from 'src/components/ExampleCreator/ExampleCreator';
 import ExampleEditor from 'src/components/ExampleEditor/ExampleEditor';
-import FlashcardFinder from 'src/components/FlashcardFinder';
+import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';

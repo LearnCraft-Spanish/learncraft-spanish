@@ -98,7 +98,7 @@ so we can do col/row later on smaller screens */
 
 /* exmaple card */
 
-.exampleCard {
+/* .exampleCard {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -106,14 +106,14 @@ so we can do col/row later on smaller screens */
   background: var(--light);
   padding: 4px 16px;
   margin: 5px 30px;
-}
+} */
 
-.exampleCard .exampleCardSpanishText,
+/* .exampleCard .exampleCardSpanishText,
 .exampleCard .exampleCardEnglishText {
   position: relative;
   height: 100%;
   width: 50%;
-}
+} */
 
 .exampleCard .audioPlayPauseButton {
   transform: translateY(-25%);

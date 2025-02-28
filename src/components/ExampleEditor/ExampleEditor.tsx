@@ -1,11 +1,12 @@
 import type { Flashcard, Vocabulary } from 'src/types/interfaceDefinitions';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
+import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
 import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
 import EditOrCreateExample from '../editOrCreateExample';
 import { VocabTag } from './VocabTag';
 import './ExampleEditor.css';
@@ -15,13 +16,13 @@ import '../../App.css';
 export default function ExampleEditor() {
   const [quizId, setQuizId] = useState(undefined as number | undefined);
 
-  const { contextual, openContextual, setContextualRef, closeContextual } =
-    useContextualMenu();
+  const { contextual, openContextual, setContextualRef } = useContextualMenu();
   const { officialQuizzesQuery, quizExamplesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
   const { recentlyEditedExamplesQuery, updateRecentlyEditedExample } =
     useRecentlyEditedExamples();
   const { vocabularyQuery } = useVocabulary();
+  const { openModal, closeModal } = useModal();
 
   const [tableOption, setTableOption] = useState('');
   const [selectedExampleId, setSelectedExampleId] = useState(
@@ -214,20 +215,24 @@ export default function ExampleEditor() {
     }
   }
 
+  const finalizeVerifyExampleChange = (confirmSubmissionValue: boolean) => {
+    setVocabComplete(confirmSubmissionValue);
+    closeModal();
+    // closeContextual();
+  };
   const handleVerifyExampleChange = (newValue: boolean) => {
     if (newValue) {
-      openContextual('confirmSubmission');
+      // openContextual('confirmSubmission');
+      openModal({
+        title: 'Are you sure?',
+        body: 'Warning! You are about to mark this example as "Vocab Complete", making it visible to students. This action can ONLY be undone through the QuickBase app',
+        type: 'confirm',
+        confirmFunction: () => finalizeVerifyExampleChange(true),
+        cancelFunction: () => finalizeVerifyExampleChange(false),
+      });
     } else {
       setVocabComplete(false);
     }
-  };
-  const finalizeVerifyExampleChange = (
-    e: React.FormEvent,
-    confirmSubmissionValue: boolean,
-  ) => {
-    e.preventDefault();
-    setVocabComplete(confirmSubmissionValue);
-    closeContextual();
   };
   // Reset Properties when active example changes
   useEffect(() => {
@@ -362,31 +367,6 @@ export default function ExampleEditor() {
                 <button type="submit">Save Example</button>
               </div>
             </form>
-            {contextual === 'confirmSubmission' && (
-              <div className="confirmSubmissionBox" ref={setContextualRef}>
-                <form onSubmit={(e) => finalizeVerifyExampleChange(e, true)}>
-                  <h3>Are you sure?</h3>
-                  <p>
-                    <b>Warning!</b> You are about to mark this example as "Vocab
-                    Complete", making it visible to students. This action can
-                    ONLY be undone through the QuickBase app
-                  </p>
-                  <div className="buttonBox">
-                    <button
-                      className="removeButton"
-                      type="button"
-                      onClick={(e) => finalizeVerifyExampleChange(e, false)}
-                    >
-                      Go Back
-                    </button>
-                    <div></div>
-                    <button type="submit" className="addButton">
-                      Confirm
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
           </>
         )}
 
