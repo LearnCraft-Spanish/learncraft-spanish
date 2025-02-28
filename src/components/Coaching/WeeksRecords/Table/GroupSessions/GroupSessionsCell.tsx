@@ -3,7 +3,7 @@ import type { GroupSession, Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import getDateRange from 'src/components/Coaching/general/functions/dateRange';
 import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
-import ContextualControlls from 'src/components/ContextualControlls';
+import ContextualControls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
@@ -490,7 +490,7 @@ export function GroupSessionView({
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls editFunction={toggleEditMode} />
+        <ContextualControls editFunction={toggleEditMode} />
         {editMode ? (
           newRecord ? (
             <h3>New Group Session</h3>

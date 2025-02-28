@@ -1,6 +1,6 @@
 import type { Week } from 'src/types/CoachingTypes';
 import { useMemo } from 'react';
-import ContextualControlls from 'src/components/ContextualControlls';
+import ContextualControls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
@@ -36,7 +36,7 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
   return (
     <div className="contextualWrapper" key={`week${week.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls />
+        <ContextualControls />
         <div className="lineWrapper">
           <p className="label">Student:</p>
           <p className="content">{student.fullName}</p>
