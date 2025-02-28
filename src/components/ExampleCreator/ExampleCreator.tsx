@@ -95,36 +95,6 @@ export default function ExampleCreator() {
     enabled: hasAccess && flashcardSpanish.length > 0,
   });
 
-  const flashcardSet: Flashcard[] = useMemo(() => {
-    const savedFlashcards: Flashcard[] = exampleSetQuery.data ?? [];
-    const mappedFlashcards = flashcardSpanish.map((spanish) => {
-      const foundSaved = savedFlashcards.find(
-        (flashcard) => flashcard.spanishExample === spanish,
-      );
-      if (foundSaved) {
-        return foundSaved;
-      }
-      const foundUnsaved = unsavedFlashcardSet.find(
-        (flashcard) => flashcard.spanishExample === spanish,
-      );
-      if (foundUnsaved) {
-        return foundUnsaved;
-      }
-      const tempFlashcard: Flashcard = {
-        spanishExample: spanish,
-        englishTranslation: 'ERROR',
-        spanglish: 'esp',
-        vocabIncluded: [],
-        englishAudio: '',
-        spanishAudioLa: '',
-        vocabComplete: false,
-        recordId: tempId.current--,
-      };
-      return tempFlashcard;
-    });
-    return mappedFlashcards;
-  }, [exampleSetQuery.data, unsavedFlashcardSet, flashcardSpanish]);
-
   const sendExampleSet = useCallback(
     (flashcards: Flashcard[]) => {
       const newFlashcardSet: NewFlashcard[] = flashcards.map((flashcard) => {
@@ -169,24 +139,25 @@ export default function ExampleCreator() {
                 unsavedFlashcard.spanishExample,
             ),
         );
-        setUnsavedFlashcardSet(unsavedFlashcardsToRestore);
-        setFlashcardSpanish(
-          unsavedFlashcardsToRestore.map(
-            (unsavedFlashcard) => unsavedFlashcard.spanishExample,
-          ),
+        const spanishToRestore = unsavedFlashcardsToRestore.map(
+          (unsavedFlashcard) => unsavedFlashcard.spanishExample,
         );
+        setUnsavedFlashcardSet(unsavedFlashcardsToRestore);
+        setFlashcardSpanish([...flashcardSpanish, ...spanishToRestore]);
         queryClient.setQueryData(
           ['flashcardSet'],
           context.previousFlashcardSet,
         );
+        awaitingAddResolution.current++;
       }
     },
     onSuccess: async () => {
       toast.success('Examples saved...');
+      awaitingAddResolution.current++;
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
-      awaitingAddResolution.current++;
+      //awaitingAddResolution.current++;
     },
   });
 
@@ -194,11 +165,25 @@ export default function ExampleCreator() {
     (changedObjTempId: number, field: string, newValue: string) => {
       let newSpanglish = '';
       if (field === 'spanishExample') {
+        const oldSpanish = unsavedFlashcardSet.find(
+          (flashcard) => flashcard.recordId === changedObjTempId,
+        )?.spanishExample;
+        const spanishIndex = flashcardSpanish.findIndex(
+          (spanish) => spanish === oldSpanish,
+        );
+        const newSpanishArray = [...flashcardSpanish];
+        newSpanishArray[spanishIndex] = newValue;
+        setFlashcardSpanish(newSpanishArray);
         newSpanglish = newValue.includes('*') ? 'spanglish' : 'esp';
       }
       const newFlashcardSet = unsavedFlashcardSet.map((flashcard) => {
         if (flashcard.recordId === changedObjTempId) {
-          return { ...flashcard, [field]: newValue, spanglish: newSpanglish };
+          return {
+            ...flashcard,
+            [field]: newValue,
+            spanglish:
+              field === 'spanishExample' ? newSpanglish : flashcard.spanglish,
+          };
         } else {
           return flashcard;
         }
