@@ -234,7 +234,7 @@ export default function AudioQuiz({
         }
       }
     }
-  }, [autoplay, initialQuizStart, currentStep, currentStepValue]);
+  }, [autoplay, initialQuizStart, currentStepValue]);
 
   const pauseAudio = useCallback(() => {
     if (audioRef.current) {
@@ -261,26 +261,6 @@ export default function AudioQuiz({
     clearTimeout(currentCountdown.current);
   }
 
-  const audioElement = useCallback(() => {
-    console.log('currentStepValue.audio', currentStepValue.audio);
-    return (
-      <audio
-        ref={audioRef}
-        src={currentStepValue.audio}
-        preload="auto"
-        onLoadedMetadata={() => playAudio()}
-      />
-    );
-  }, [currentStepValue.audio, playAudio]);
-  // /*      Preloading Audio      */
-  // function preloadAudioElement() {
-  //   return (
-  //     <div id="preloadingNextExampleAudio">
-  //       <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
-  //       <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
-  //     </div>
-  //   );
-  // }
   const preloadNextExampleAudio = useCallback(
     (index: number) => {
       if (index < displayOrder.length) {
