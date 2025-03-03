@@ -2,7 +2,7 @@ import type { Flashcard } from 'src/types/interfaceDefinitions';
 
 import React, { useCallback } from 'react';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-
+import './TextQuiz.scss';
 interface QuizButtonsProps {
   currentExample: Flashcard;
   answerShowing: boolean;

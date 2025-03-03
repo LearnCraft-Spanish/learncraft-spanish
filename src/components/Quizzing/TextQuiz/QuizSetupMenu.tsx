@@ -3,6 +3,8 @@ import React, { useMemo } from 'react';
 import { MenuButton } from 'src/components/Buttons';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
+import './TextQuiz.scss';
+
 interface QuizSetupMenuProps {
   examplesToParse: StudentExample[] | undefined;
   // setExamplesToParse: (examples: StudentExample[] | undefined) => void;

@@ -7,6 +7,7 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import StudentSearch from '../StudentSearch';
 
 import './SubHeader.scss';
+import '/src/App.css';
 
 export default function SubHeader() {
   const { activeStudentQuery, chooseStudent } = useActiveStudent();

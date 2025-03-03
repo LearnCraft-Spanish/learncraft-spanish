@@ -8,10 +8,12 @@ import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import QuizProgress from '../QuizProgress';
+import { QuizProgress } from '../general';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
 import SRSQuizButtons from './SRSButtons';
+
+import './TextQuiz.scss';
 
 interface QuizComponentProps {
   quizTitle: string;
@@ -374,7 +376,7 @@ export default function QuizComponent({
               startWithSpanish={startWithSpanish}
             />
           )}
-          <div className="quizButtons">
+          <div className="quizButtonsWrapper">
             {isSrsQuiz && currentFlashcardIsValid && (
               <SRSQuizButtons
                 currentExample={currentExample}

@@ -167,8 +167,7 @@ button:hover,
   color: var(--dark);
 } */
 
-/*General Quiz Styles*/
-
+/* ------------------ General Quiz Styling ------------------ */
 .quiz {
   display: flex;
   flex-direction: column;
@@ -256,43 +255,6 @@ button:hover,
   margin-bottom: 20px;
   height: 65px;
   text-align: center;
-}
-
-.addFlashcardButton,
-.pendingFlashcardButton,
-.removeFlashcardButton,
-.customFlashcardButton {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  width: fit-content;
-  font-size: 10px;
-  padding: 5px 10px;
-  margin: 0 auto;
-  z-index: 5;
-}
-
-.addFlashcardButton {
-  background-color: darkgreen;
-}
-.removeFlashcardButton {
-  background-color: darkred;
-}
-
-.pendingFlashcardButton,
-.customFlashcardButton {
-  cursor: default;
-  background-color: var(--dark);
-}
-/* .customFlashcardButton {
-  background-color: var(--theme);
-} */
-
-.addFlashcardButton:hover,
-.removeFlashcardButton:hover,
-.pendingFlashcardButton:hover,
-.customFlashcardButton:hover {
-  background-color: var(--dark);
 }
 
 .audioFlashcard .addFlashcardButton:hover,
@@ -845,47 +807,6 @@ button:hover,
 }
 .spanishExample .spanishFlashcardText {
   font-size: 18px;
-}
-
-/*      My Flashcards styles      */
-
-/* .myFlashcardsForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 auto;
-} */
-
-.myFlashcardsFormContentWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.myFlashcardsForm {
-  width: 30vw;
-  min-width: 360px;
-  margin: 0 auto;
-}
-@media screen and (max-width: 480px) {
-  .myFlashcardsForm {
-    width: 90vw;
-    min-width: 280px;
-  }
-}
-
-.myFlashcardsFormContentWrapper > label,
-.myFlashcardsFormContentWrapper > div > div,
-.QuizMenuCustomOnly {
-  /* align on right side of parent */
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
 }
 
 /*      Toggle Switch Styling */

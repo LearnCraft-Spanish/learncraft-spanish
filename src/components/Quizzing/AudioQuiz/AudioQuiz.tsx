@@ -11,7 +11,7 @@ import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
-import QuizProgress from '../QuizProgress';
+import { QuizProgress } from '../general';
 import 'src/App.css';
 import '../AudioQuiz/AudioBasedReview.css';
 

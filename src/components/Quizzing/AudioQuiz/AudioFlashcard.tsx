@@ -2,7 +2,7 @@ import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
 import pause from 'src/assets/icons/pause.svg';
 import play from 'src/assets/icons/play.svg';
-import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
+import { AddToMyFlashcardsButtons } from '../general';
 interface AudioFlashcardProps {
   currentExampleText: string | React.JSX.Element;
   incrementCurrentStep: () => void;

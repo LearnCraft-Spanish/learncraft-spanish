@@ -5,7 +5,6 @@ import Loading from 'src/components/Loading';
 import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import QuizComponent from '../TextQuiz/QuizComponent';
-import 'src/App.css';
 
 interface officialQuizProps {
   chosenQuiz: number;

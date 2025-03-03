@@ -6,8 +6,8 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
-import './Quiz.css';
+import { AddToMyFlashcardsButtons } from '../general';
+import './TextQuiz.scss';
 
 interface FlashcardProps {
   example: Flashcard;
