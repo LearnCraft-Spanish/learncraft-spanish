@@ -1049,10 +1049,7 @@ i {
   .div-header {
     align-items: center;
   }
-  #login, #logout {
-    padding: 6px;
-    height: auto;
-  }
+    
   #home {
     display: block;
     width: 24px;

@@ -8,3 +8,33 @@
     max-width: 300px;
   }
 }
+
+/* ------------------ Contextual Controlls ------------------ */
+.controlls {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  // align on right side
+
+  .icon {
+    // position: absolute;
+    position: relative;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+    cursor: pointer;
+    padding: 8px;
+    width: 32px;
+  }
+  .icon:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  #editIcon {
+    padding: 5px;
+    margin-right: 8px;
+  }
+}

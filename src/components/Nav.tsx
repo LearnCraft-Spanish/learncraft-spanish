@@ -4,8 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import home from '../assets/icons/home.svg';
 import logo from '../assets/typelogosmall.png';
 
-import LoginButton from './Buttons/LoginButton';
-import LogoutButton from './Buttons/LogoutButton';
+import { LoginButton, LogoutButton } from './Buttons';
 
 export default function Nav(): React.JSX.Element {
   const navigate = useNavigate();

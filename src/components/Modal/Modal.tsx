@@ -1,4 +1,4 @@
-import './modal.scss';
+import './Modal.scss';
 
 export interface ModalProps {
   title: string;
@@ -36,21 +36,21 @@ export default function Modal(props: ModalProps) {
       case 'confirm':
         return (
           <>
-            <button
-              className="removeButton"
-              type="button"
-              onClick={handleCancel}
-            >
+            <button className="redButton" type="button" onClick={handleCancel}>
               Go Back
             </button>
-            <button type="button" className="addButton" onClick={handleConfirm}>
+            <button
+              type="button"
+              className="greenButton"
+              onClick={handleConfirm}
+            >
               Confirm
             </button>
           </>
         );
       default:
         return (
-          <button type="button" className="addButton" onClick={handleCancel}>
+          <button type="button" className="greenButton" onClick={handleCancel}>
             unknown modal type, please go back
           </button>
         );
@@ -58,8 +58,8 @@ export default function Modal(props: ModalProps) {
   };
   return (
     <div className="modal">
-      <h2 className="modal-title">{title}</h2>
-      <p className="modal-body">{body}</p>
+      <h2>{title}</h2>
+      <p>{body}</p>
       <div className="buttonBox">{renderButtons()}</div>
     </div>
   );

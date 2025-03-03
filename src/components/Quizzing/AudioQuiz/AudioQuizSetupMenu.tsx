@@ -1,5 +1,5 @@
 import React from 'react';
-import MenuButton from 'src/components/Buttons/MenuButton';
+import { MenuButton } from 'src/components/Buttons';
 import { FromToLessonSelector } from 'src/components/LessonSelector';
 
 import './AudioBasedReview.css';
