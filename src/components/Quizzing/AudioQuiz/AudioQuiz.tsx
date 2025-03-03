@@ -263,14 +263,12 @@ export default function AudioQuiz({
 
   function audioElement() {
     return (
-      currentStepValue.audio && (
-        <audio
-          ref={audioRef}
-          src={currentStepValue.audio}
-          preload="auto"
-          onLoadedMetadata={() => playAudio()}
-        />
-      )
+      <audio
+        ref={audioRef}
+        src={currentStepValue.audio}
+        preload="auto"
+        onLoadedMetadata={() => playAudio()}
+      />
     );
   }
   // /*      Preloading Audio      */
