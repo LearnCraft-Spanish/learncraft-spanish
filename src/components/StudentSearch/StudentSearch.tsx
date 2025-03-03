@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import './StudentSearch.scss';
+
 export default function StudentSearch() {
   const { studentListQuery, chooseStudent } = useActiveStudent();
 

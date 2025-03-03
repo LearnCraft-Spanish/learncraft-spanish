@@ -4,7 +4,9 @@ import useAuth from 'src/hooks/useAuth';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
-import StudentSearch from './StudentSearch';
+import StudentSearch from '../StudentSearch';
+
+import './SubHeader.scss';
 
 export default function SubHeader() {
   const { activeStudentQuery, chooseStudent } = useActiveStudent();

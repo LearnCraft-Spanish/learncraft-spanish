@@ -254,3 +254,19 @@
   margin: 0 auto;
   margin-bottom: 8px;
 }
+
+/* ------------------ SRSButtons ------------------ */
+.hardButton:hover,
+.easyButton:hover {
+  background-color: var(--dark);
+}
+
+.easyBanner {
+  background-color: darkgreen !important;
+  cursor: default !important;
+}
+
+.hardBanner {
+  background-color: darkred !important;
+  cursor: default !important;
+}

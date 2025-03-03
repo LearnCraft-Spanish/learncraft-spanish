@@ -51,7 +51,7 @@ h6 {
   color: var(--dark);
   text-align: center;
 }
-
+/* 
 .bannerMessage {
   position: fixed;
   top: 50px;
@@ -67,7 +67,7 @@ h6 {
 
 .bannerMessage p {
   margin: 0;
-}
+} */
 
 button,
 .linkButton {
@@ -150,54 +150,6 @@ button:hover,
   left: 20px;
   transform: translate(0, -50%);
 }
-
-/* Load Screen Styles */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  max-height: 70vh;
-  padding: 5% 20%;
-  box-sizing: border-box;
-}
-
-.loadingIcon {
-  position: relative;
-  width: 50%;
-  padding-top: 50%;
-  max-width: 400px;
-  max-height: 400px;
-  min-width: 150px;
-  min-height: 150px;
-}
-
-#headIcon {
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 80%;
-}
-
-#wheelIcon {
-  position: absolute;
-  top: 18%;
-  left: 18%;
-  width: 40%;
-  animation: spin 1.4s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 /*Main Menu Styles*/
 /* MOVED TO NAV */
 /* 
@@ -215,99 +167,13 @@ button:hover,
   color: var(--dark);
 } */
 
-.div-user-subheader {
-  padding: 10px 5%;
-  background-color: var(--accent);
-  color: var(--light);
-  margin: 0;
-  display: flex;
-  justify-content: center;
-}
-
-.div-user-subheader button {
-  background-color: var(--light);
-  color: var(--dark);
-  font-size: 12px;
-  padding: 5px 15px;
-  margin: 0 4px;
-}
-
-.div-user-subheader p {
-  margin: 0px 15px;
-}
-
-.studentList input {
-  max-width: 70%;
-}
-
-.studentList {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  margin: 0;
-  justify-content: space-between;
-  padding: 0px;
-}
-
-.menu-buttons {
-  display: flex;
-  justify-content: center;
-  align-content: center;
-  flex-direction: row;
-  min-height: 250px;
-}
-
-/*Callback page Styles */
-
-.redirectMessage {
-  display: block;
-  text-align: center;
-  width: 50%;
-  margin: 10% 25%;
-}
-
-/*Sentence Retreiver Styles*/
-
-.div-vocab {
-  margin-top: 10px;
-  display: flex;
-}
-
-.finishedMessage {
-  margin: auto;
-  text-align: center;
-  width: 50%;
-  min-width: 400px;
-}
-
-.finishedMessage p {
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
-
 /*General Quiz Styles*/
-
-.loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
 .quiz {
   display: flex;
   flex-direction: column;
   justify-items: center;
   align-items: center;
-}
-
-.exampleBox {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  align-content: center;
-  flex-wrap: wrap;
 }
 
 /* .spanishExample, .englishTranslation {
@@ -359,16 +225,6 @@ button:hover,
   flex-basis: 0;
   flex-grow: 1;
 }
-.menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.menuBox {
-  width: 100%;
-  align-content: center;
-}
 
 .greenButton {
   background-color: darkgreen;
@@ -376,21 +232,6 @@ button:hover,
 
 .redButton {
   background-color: darkred;
-}
-
-.hardButton:hover,
-.easyButton:hover {
-  background-color: var(--dark);
-}
-
-.easyBanner {
-  background-color: darkgreen !important;
-  cursor: default !important;
-}
-
-.hardBanner {
-  background-color: darkred !important;
-  cursor: default !important;
 }
 
 .quizSelector {
@@ -1245,38 +1086,4 @@ i {
   --toastify-toast-bd-radius: 0;
   /* --toastify-toast-min-height: 40px; */
   --toastify-font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
-}
-
-/* Student Search */
-
-#searchStudentWrapper {
-  position: relative;
-}
-
-#searchStudentWrapper input {
-  min-width: 500px;
-}
-
-#optionsWrapper {
-  position: absolute;
-  background-color: var(--theme);
-  margin: 2px;
-  padding: 0 1rem;
-  max-height: 40vh;
-  overflow: scroll;
-  min-width: 500px;
-  z-index: 10;
-}
-
-.searchResultItem {
-  background-color: var(--light);
-  color: var(--dark);
-  margin: 4px;
-  padding: 2px;
-  cursor: pointer;
-  border: 2px solid var(--light);
-}
-
-.searchResultItem:hover {
-  border: 2px solid var(--accent);
 }

@@ -3,8 +3,7 @@ import Loading from 'src/components/Loading';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-
-import 'src/App.css';
+import './Menu.scss';
 
 export default function Menu() {
   const userDataQuery = useUserData();

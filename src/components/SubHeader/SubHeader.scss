@@ -1,0 +1,33 @@
+.div-user-subheader {
+  padding: 10px 5%;
+  background-color: var(--accent);
+  color: var(--light);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.div-user-subheader button {
+  background-color: var(--light);
+  color: var(--dark);
+  font-size: 12px;
+  padding: 5px 15px;
+  margin: 0 4px;
+}
+
+.div-user-subheader p {
+  margin: 0px 15px;
+}
+
+.studentList input {
+  max-width: 70%;
+}
+
+.studentList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  margin: 0;
+  justify-content: space-between;
+  padding: 0px;
+}
