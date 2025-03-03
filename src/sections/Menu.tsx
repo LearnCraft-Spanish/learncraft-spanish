@@ -96,6 +96,22 @@ export default function Menu() {
               </Link>
             </div>
           )}
+          {activeStudentQuery.data?.role === 'student' &&
+            userDataQuery.data.roles.adminRole !== 'coach' &&
+            userDataQuery.data.roles.adminRole !== 'admin' && (
+              <div>
+                <h3>Need Help?</h3>
+                <div className="buttonBox">
+                  <Link
+                    className="linkButton"
+                    to="https://learncraft.co/how-to-use-the-app"
+                    target="_blank"
+                  >
+                    How to Use This App
+                  </Link>
+                </div>
+              </div>
+            )}
           {(userDataQuery.data.roles.adminRole === 'coach' ||
             userDataQuery.data.roles.adminRole === 'admin') && (
             <div>
