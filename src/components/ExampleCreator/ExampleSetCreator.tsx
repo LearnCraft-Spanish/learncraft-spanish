@@ -8,20 +8,23 @@ import React, {
   useState,
 } from 'react';
 import { toast } from 'react-toastify';
+import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
+import LoadingMessage from 'src/components/Loading';
+import StudentSearch from 'src/components/StudentSearch';
 import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
 import { useBackend } from 'src/hooks/useBackend';
-import ExamplesTable from '../ExamplesTable/ExamplesTable';
-import LoadingMessage from '../Loading';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { AudioControl } from './AudioControl';
 
 interface SetExampleCreatorProps {
   hasAccess: boolean;
 }
 
-export default function SetExampleCreator({
+export default function ExampleSetCreator({
   hasAccess,
 }: SetExampleCreatorProps) {
   const queryClient = useQueryClient();
@@ -29,7 +32,7 @@ export default function SetExampleCreator({
     useBackend();
 
   const [pastingOrEditing, setPastingOrEditing] = useState<
-    'pasting' | 'editing'
+    'pasting' | 'editing' | 'assigning'
   >('pasting');
   const [unsavedFlashcardSet, setUnsavedFlashcardSet] = useState<Flashcard[]>(
     [],
@@ -38,6 +41,19 @@ export default function SetExampleCreator({
   const [areaInput, setAreaInput] = useState('');
   const awaitingAddResolution = useRef(0);
   const tempId = useRef(-1);
+
+  const { activeStudentQuery } = useActiveStudent();
+  const { addFlashcardMutation } = useStudentFlashcards();
+
+  // Clear all state and restart
+  const clearAndRestart = useCallback(() => {
+    setPastingOrEditing('pasting');
+    setUnsavedFlashcardSet([]);
+    setFlashcardSpanish([]);
+    setAreaInput('');
+    awaitingAddResolution.current = 0;
+    tempId.current = -1;
+  }, []);
 
   // Parse the pasted input into flashcard objects
   const parsedAreaInput = useMemo(() => {
@@ -207,19 +223,42 @@ export default function SetExampleCreator({
     onSuccess: async () => {
       toast.success('Examples saved...');
       awaitingAddResolution.current++;
+      setPastingOrEditing('assigning');
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
     },
   });
 
-  // Clear all state and restart
-  const clearAndRestart = useCallback(() => {
-    setUnsavedFlashcardSet([]);
-    setFlashcardSpanish([]);
-    setPastingOrEditing('pasting');
-    queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
-  }, [queryClient]);
+  // Handle resolution of saved examples
+  useEffect(() => {
+    if (!exampleSetQuery.data?.length) return;
+
+    if (awaitingAddResolution.current > 1) {
+      awaitingAddResolution.current--;
+    }
+    if (awaitingAddResolution.current === 1) {
+      if (unsavedFlashcardSet.length === 0 && exampleSetQuery.data.length) {
+        toast.success('All examples saved');
+      } else {
+        toast.error('Some examples failed to save');
+      }
+      awaitingAddResolution.current = 0;
+    }
+    if (awaitingAddResolution.current === 0) {
+      const savedFlashcards: Flashcard[] = exampleSetQuery.data;
+      const filteredUnsavedSet = unsavedFlashcardSet.filter(
+        (flashcard) =>
+          !savedFlashcards.some(
+            (savedFlashcard) =>
+              savedFlashcard.spanishExample === flashcard.spanishExample,
+          ),
+      );
+      if (filteredUnsavedSet.length !== unsavedFlashcardSet.length) {
+        setUnsavedFlashcardSet(filteredUnsavedSet);
+      }
+    }
+  }, [exampleSetQuery.data, unsavedFlashcardSet]);
 
   // Update flashcard values
   const updateFlashcardSetValues = useCallback(
@@ -253,35 +292,26 @@ export default function SetExampleCreator({
     [unsavedFlashcardSet, flashcardSpanish],
   );
 
-  // Handle resolution of saved examples
+  // Handle student selection
   useEffect(() => {
-    if (!exampleSetQuery.data?.length) return;
-
-    if (awaitingAddResolution.current > 1) {
-      awaitingAddResolution.current--;
+    if (activeStudentQuery.data && pastingOrEditing === 'assigning') {
+      // Add each flashcard to the student
+      const addFlashcards = async () => {
+        for (const flashcard of unsavedFlashcardSet) {
+          await addFlashcardMutation.mutateAsync(flashcard);
+        }
+        // Clear state and return to initial view
+        clearAndRestart();
+      };
+      addFlashcards();
     }
-    if (awaitingAddResolution.current === 1) {
-      if (unsavedFlashcardSet.length === 0 && exampleSetQuery.data.length) {
-        toast.success('All examples saved');
-      } else {
-        toast.error('Some examples failed to save');
-      }
-      awaitingAddResolution.current = 0;
-    }
-    if (awaitingAddResolution.current === 0) {
-      const savedFlashcards: Flashcard[] = exampleSetQuery.data;
-      const filteredUnsavedSet = unsavedFlashcardSet.filter(
-        (flashcard) =>
-          !savedFlashcards.some(
-            (savedFlashcard) =>
-              savedFlashcard.spanishExample === flashcard.spanishExample,
-          ),
-      );
-      if (filteredUnsavedSet.length !== unsavedFlashcardSet.length) {
-        setUnsavedFlashcardSet(filteredUnsavedSet);
-      }
-    }
-  }, [exampleSetQuery.data, unsavedFlashcardSet]);
+  }, [
+    activeStudentQuery.data,
+    pastingOrEditing,
+    unsavedFlashcardSet,
+    addFlashcardMutation,
+    clearAndRestart,
+  ]);
 
   if (!hasAccess) {
     return <div>You do not have access to create example sets.</div>;
@@ -570,6 +600,25 @@ export default function SetExampleCreator({
               studentContext={false}
             />
           )}
+        </div>
+      )}
+      {pastingOrEditing === 'assigning' && (
+        <div>
+          <h3>Assign Examples to Student</h3>
+          <div className="student-selector">
+            <StudentSearch />
+          </div>
+          <div className="buttonBox">
+            <button
+              type="button"
+              onClick={() => setPastingOrEditing('pasting')}
+            >
+              Back to Paste
+            </button>
+            <button type="button" onClick={clearAndRestart}>
+              Restart
+            </button>
+          </div>
         </div>
       )}
     </div>
