@@ -1,5 +1,7 @@
 import React from 'react';
 
+import './AudioQuiz.scss';
+
 type stepValues = 'question' | 'guess' | 'hint' | 'answer';
 interface AudioQuizButtonsProps {
   audioOrComprehension: 'audio' | 'comprehension';

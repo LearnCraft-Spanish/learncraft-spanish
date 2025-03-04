@@ -2,7 +2,7 @@ import React from 'react';
 import { MenuButton } from 'src/components/Buttons';
 import { FromToLessonSelector } from 'src/components/LessonSelector';
 
-import './AudioBasedReview.css';
+import './AudioQuiz.scss';
 
 interface AudioQuizSetupMenuProps {
   autoplay: boolean;

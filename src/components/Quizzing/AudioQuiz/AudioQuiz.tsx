@@ -12,8 +12,7 @@ import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
 import { QuizProgress } from '../general';
-import 'src/App.css';
-import '../AudioQuiz/AudioBasedReview.css';
+import './AudioQuiz.scss';
 
 interface StepValue {
   audio: string;

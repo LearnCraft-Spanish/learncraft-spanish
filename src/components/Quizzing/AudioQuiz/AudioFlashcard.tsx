@@ -3,6 +3,8 @@ import React from 'react';
 import pause from 'src/assets/icons/pause.svg';
 import play from 'src/assets/icons/play.svg';
 import { AddToMyFlashcardsButtons } from '../general';
+import './AudioQuiz.scss';
+
 interface AudioFlashcardProps {
   currentExampleText: string | React.JSX.Element;
   incrementCurrentStep: () => void;

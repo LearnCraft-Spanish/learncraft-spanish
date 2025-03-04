@@ -12,7 +12,6 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import 'src/App.css';
-import 'src/components/Quizzing/AudioQuiz/AudioBasedReview.css';
 
 interface AudioBasedReviewProps {
   audioOrComprehension?: 'audio' | 'comprehension';
