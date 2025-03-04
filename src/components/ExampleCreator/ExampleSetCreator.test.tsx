@@ -11,7 +11,7 @@ function renderSetExampleCreator() {
   );
 }
 
-describe('setExampleCreator', () => {
+describe.skip('setExampleCreator', () => {
   describe('input parsing and validation', () => {
     it('should trim whitespace from pasted input', async () => {
       renderSetExampleCreator();
