@@ -69,6 +69,15 @@ export function CoachDropdown({
     return corrector ? corrector.user.name : 'No Coach Found';
   }, [coachEmail, coachListQuery.data]);
 
+  const sortedCoaches = useMemo(() => {
+    if (!coachListQuery.data) {
+      return [];
+    }
+    return coachListQuery.data?.sort((a, b) =>
+      a.user.name.localeCompare(b.user.name),
+    );
+  }, [coachListQuery.data]);
+
   return (
     dataReady && (
       <div className="lineWrapper">
@@ -84,7 +93,7 @@ export function CoachDropdown({
           >
             <option value={''}>{defaultOptionText || 'Select'}</option>
 
-            {coachListQuery.data?.map((coach) => (
+            {sortedCoaches.map((coach) => (
               <option key={coach.coach} value={coach.user.email}>
                 {coach.user.name}
               </option>
