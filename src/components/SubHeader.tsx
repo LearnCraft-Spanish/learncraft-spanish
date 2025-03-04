@@ -7,13 +7,20 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import StudentSearch from './StudentSearch';
 
 export default function SubHeader() {
-  const { activeStudentQuery } = useActiveStudent();
+  const { activeStudentQuery, chooseStudent } = useActiveStudent();
   const userDataQuery = useUserData();
 
   const isLoading = activeStudentQuery.isLoading || userDataQuery.isLoading;
   const { isAuthenticated } = useAuth();
 
   const [studentSelectorOpen, setStudentSelectorOpen] = useState(false);
+
+  function clearSelection() {
+    // Clear active student selection
+    chooseStudent(null);
+    setStudentSelectorOpen(false);
+  }
+
   // Close Student Selector on selection
   useEffect(() => {
     setStudentSelectorOpen(false);
@@ -83,6 +90,9 @@ export default function SubHeader() {
             <StudentSearch />
             <button type="button" onClick={() => setStudentSelectorOpen(false)}>
               Cancel
+            </button>
+            <button type="button" onClick={() => clearSelection()}>
+              Clear Selection
             </button>
           </div>
         )}

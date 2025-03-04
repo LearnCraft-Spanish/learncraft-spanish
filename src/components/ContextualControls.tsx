@@ -3,7 +3,7 @@ import pencil from '../assets/icons/pencil-50.svg';
 import x_dark from '../assets/icons/x_dark.svg';
 
 // edit function is an optional prop
-export default function ContextualControlls({
+export default function ContextualControls({
   editFunction,
 }: {
   editFunction?: () => void;

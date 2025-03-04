@@ -1,6 +1,6 @@
 import type { Assignment, Week } from 'src/types/CoachingTypes';
 import { useState } from 'react';
-import ContextualControlls from 'src/components/ContextualControls';
+import ContextualControls from 'src/components/ContextualControls';
 import useAssignments from 'src/hooks/CoachingData/useAssignments';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
@@ -199,7 +199,7 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
   return (
     <div className="contextualWrapper" key={`assignment${assignment.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls editFunction={toggleEditMode} />
+        <ContextualControls editFunction={toggleEditMode} />
         {editMode ? (
           <h4>Edit Assignment</h4>
         ) : (
@@ -393,7 +393,7 @@ export function NewAssignmentView({
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls />
+        <ContextualControls />
         <h4>Create Assignment Record</h4>
         <div className="lineWrapper">
           <label className="label" htmlFor="weekStarts">

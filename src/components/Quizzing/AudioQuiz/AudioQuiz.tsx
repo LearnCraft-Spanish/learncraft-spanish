@@ -16,7 +16,7 @@ import 'src/App.css';
 import '../AudioQuiz/AudioBasedReview.css';
 
 interface StepValue {
-  audio: string | undefined;
+  audio: string;
   text: string | React.JSX.Element;
   step: stepValues | '';
 }
@@ -107,14 +107,14 @@ export default function AudioQuiz({
             step: 'question',
           };
     }
-    return { audio: undefined, text: '', step: 'question' };
+    return { audio: '', text: '', step: 'question' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const guessValue = useMemo((): StepValue => {
     if (currentExample && currentStep) {
-      return { audio: undefined, text: 'Make a guess!', step: 'guess' };
+      return { audio: '', text: 'Make a guess!', step: 'guess' };
     }
-    return { audio: undefined, text: '', step: 'guess' };
+    return { audio: '', text: '', step: 'guess' };
   }, [currentExample, currentStep]);
 
   const hintValue = useMemo((): StepValue => {
@@ -131,7 +131,7 @@ export default function AudioQuiz({
             step: 'hint',
           };
     }
-    return { audio: undefined, text: '', step: 'hint' };
+    return { audio: '', text: '', step: 'hint' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   const answerValue = useMemo((): StepValue => {
@@ -143,12 +143,12 @@ export default function AudioQuiz({
             step: 'answer',
           }
         : {
-            audio: undefined,
+            audio: '',
             text: currentExample?.englishTranslation,
             step: 'answer',
           };
     }
-    return { audio: undefined, text: '', step: 'answer' };
+    return { audio: '', text: '', step: 'answer' };
   }, [currentExample, currentStep, audioOrComprehension]);
 
   // Get the values related to the current step
@@ -202,7 +202,7 @@ export default function AudioQuiz({
   /*       Audio Handling     */
   const playAudio = useCallback(async () => {
     // Audio playing logic
-    if (currentStep !== 'guess') {
+    if (currentStepValue.audio) {
       try {
         await audioRef.current?.play();
       } catch (e) {
@@ -234,7 +234,7 @@ export default function AudioQuiz({
         }
       }
     }
-  }, [autoplay, initialQuizStart, currentStep]);
+  }, [autoplay, initialQuizStart, currentStepValue]);
 
   const pauseAudio = useCallback(() => {
     if (audioRef.current) {
@@ -261,27 +261,6 @@ export default function AudioQuiz({
     clearTimeout(currentCountdown.current);
   }
 
-  function audioElement() {
-    return (
-      currentStepValue.audio && (
-        <audio
-          ref={audioRef}
-          src={currentStepValue.audio}
-          preload="auto"
-          onLoadedMetadata={() => playAudio()}
-        />
-      )
-    );
-  }
-  // /*      Preloading Audio      */
-  // function preloadAudioElement() {
-  //   return (
-  //     <div id="preloadingNextExampleAudio">
-  //       <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
-  //       <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
-  //     </div>
-  //   );
-  // }
   const preloadNextExampleAudio = useCallback(
     (index: number) => {
       if (index < displayOrder.length) {
@@ -545,9 +524,18 @@ export default function AudioQuiz({
               onRemove={onRemove}
             />
             {/* Audio elements */}
-            {audioElement()}
+            {/* {audioElement()} */}
+            <audio
+              ref={audioRef}
+              src={currentStepValue.audio}
+              preload="auto"
+              onLoadedMetadata={playAudio}
+            />
             <div id="preloadingNextExampleAudio">
-              <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
+              {/* comprehension just uses spanish audio atm */}
+              {audioOrComprehension !== 'comprehension' && (
+                <audio ref={preloadEnglishAudioRef} preload="auto"></audio>
+              )}
               <audio ref={preloadSpanishAudioRef} preload="auto"></audio>
             </div>
           </div>

@@ -3,7 +3,7 @@ import type { GroupSession, Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import getDateRange from 'src/components/Coaching/general/functions/dateRange';
 import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
-import ContextualControlls from 'src/components/ContextualControls';
+import ContextualControls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
@@ -214,6 +214,11 @@ export function GroupSessionView({
       console.error('No student selected');
       return;
     }
+    if (addingAttendee === 'noAttendees') {
+      setAttendees([{ name: 'No Attendees', relatedWeek: -1, action: 'add' }]);
+      setAddingAttendee('');
+      return;
+    }
     const addingAttendeeWeekRecordId = Number.parseInt(addingAttendee);
     if (!addingAttendeeWeekRecordId) {
       console.error('Invalid student selected');
@@ -381,6 +386,23 @@ export function GroupSessionView({
       });
       return;
     }
+    if (attendees.some((attendee) => attendee.name === 'No Attendees')) {
+      openModal({
+        title: 'Warning',
+        body: 'You have marked that there are no attendees for this group session. Once you submit, you will not be able to add attendees.',
+        type: 'confirm',
+        confirmFunction: () => {
+          submitCreationOrUpdate();
+          closeModal();
+        },
+      });
+      return;
+    }
+
+    submitCreationOrUpdate();
+  }
+
+  function submitCreationOrUpdate() {
     if (newRecord) {
       createGroupSessionMutation.mutate(
         {
@@ -401,6 +423,12 @@ export function GroupSessionView({
               return;
             }
             const newRecordId = idsCreated[0];
+            if (
+              attendees.some((attendee) => attendee.name === 'No Attendees')
+            ) {
+              closeContextual();
+              return;
+            }
             // once it is created, add the attendees
             const attendeesToAdd = attendees.filter(
               (attendee) => attendee.action === 'add',
@@ -490,7 +518,7 @@ export function GroupSessionView({
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls editFunction={toggleEditMode} />
+        <ContextualControls editFunction={toggleEditMode} />
         {editMode ? (
           newRecord ? (
             <h3>New Group Session</h3>
@@ -567,6 +595,7 @@ export function GroupSessionView({
               onChange={(e) => setAddingAttendee(e.target.value)}
             >
               <option value="">Select</option>
+              {newRecord && <option value="noAttendees">No Attendees</option>}
               {weeksQuery.data
                 ?.filter((filterWeek) => {
                   return (

@@ -1,6 +1,6 @@
 import type { Call, Week } from 'src/types/CoachingTypes';
 import React, { useState } from 'react';
-import ContextualControlls from 'src/components/ContextualControls';
+import ContextualControls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
@@ -164,7 +164,7 @@ function PrivateCallView({ call }: { call: Call }) {
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControlls editFunction={toggleEditMode} />
+        <ContextualControls editFunction={toggleEditMode} />
         {editMode ? (
           <h4>Edit Call</h4>
         ) : (
@@ -336,7 +336,7 @@ export default function PrivateCallsCell({
       {contextual === `addPrivateCall${week.recordId}` && (
         <div className="contextualWrapper callPopup">
           <div className="contextual" ref={setContextualRef}>
-            <ContextualControlls />
+            <ContextualControls />
             <h4>
               {getStudentFromMembershipId(week.relatedMembership)?.fullName} on{' '}
               {new Date(Date.now()).toISOString().split('T')[0]}

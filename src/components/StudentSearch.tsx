@@ -37,7 +37,7 @@ export default function StudentSearch() {
             return 0;
           })
       : [];
-  }, [studentListQuery]);
+  }, [studentListQuery.isSuccess, studentListQuery.data]);
 
   const searchStudentOptions = useMemo(() => {
     if (searchString === '') return [];
