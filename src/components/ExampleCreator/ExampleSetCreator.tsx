@@ -39,11 +39,13 @@ export default function ExampleSetCreator({
   );
   const [flashcardSpanish, setFlashcardSpanish] = useState<string[]>([]);
   const [areaInput, setAreaInput] = useState('');
+  const [showAssignmentConfirmation, setShowAssignmentConfirmation] =
+    useState(false);
   const awaitingAddResolution = useRef(0);
   const tempId = useRef(-1);
 
   const { activeStudentQuery } = useActiveStudent();
-  const { addFlashcardMutation } = useStudentFlashcards();
+  const { addMultipleFlashcardsMutation } = useStudentFlashcards();
 
   // Clear all state and restart
   const clearAndRestart = useCallback(() => {
@@ -118,11 +120,10 @@ export default function ExampleSetCreator({
     const seenSpanishExamples = new Set<string>();
 
     const validRows = parsedAreaInput.filter((ex) => {
-      // Check for errors and existing examples
+      // Check for errors only
       if (
         ex.spanishExample.includes('ERROR') ||
-        ex.englishTranslation.includes('ERROR') ||
-        existingExamples.has(ex.spanishExample)
+        ex.englishTranslation.includes('ERROR')
       ) {
         return false;
       }
@@ -141,7 +142,7 @@ export default function ExampleSetCreator({
       valid: validRows,
       invalid: totalRows - validRows,
     };
-  }, [areaInput, parsedAreaInput, existingExamples]);
+  }, [areaInput, parsedAreaInput]);
 
   // Add parsed input to the flashcard set
   const addInputToFlashcardSet = useCallback(() => {
@@ -221,12 +222,14 @@ export default function ExampleSetCreator({
       }
     },
     onSuccess: async () => {
-      toast.success('Examples saved...');
+      toast.success('Examples saved successfully');
       awaitingAddResolution.current++;
-      setPastingOrEditing('assigning');
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
+      // Don't invalidate the query immediately to keep the success state
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['flashcardSet'] });
+      }, 1000);
     },
   });
 
@@ -292,27 +295,6 @@ export default function ExampleSetCreator({
     [unsavedFlashcardSet, flashcardSpanish],
   );
 
-  // Handle student selection
-  useEffect(() => {
-    if (activeStudentQuery.data && pastingOrEditing === 'assigning') {
-      // Add each flashcard to the student
-      const addFlashcards = async () => {
-        for (const flashcard of unsavedFlashcardSet) {
-          await addFlashcardMutation.mutateAsync(flashcard);
-        }
-        // Clear state and return to initial view
-        clearAndRestart();
-      };
-      addFlashcards();
-    }
-  }, [
-    activeStudentQuery.data,
-    pastingOrEditing,
-    unsavedFlashcardSet,
-    addFlashcardMutation,
-    clearAndRestart,
-  ]);
-
   if (!hasAccess) {
     return <div>You do not have access to create example sets.</div>;
   }
@@ -354,6 +336,7 @@ export default function ExampleSetCreator({
                   {parsedAreaInput.map((example) => {
                     // Build validation state for this row
                     const validationMessages: string[] = [];
+                    const errorMessages: string[] = [];
 
                     // Check for missing required fields
                     const hasSpanish =
@@ -363,9 +346,9 @@ export default function ExampleSetCreator({
                       example.englishTranslation &&
                       !example.englishTranslation.includes('ERROR');
                     if (!hasSpanish || !hasEnglish) {
-                      validationMessages.push(
-                        `Missing ${!hasSpanish ? 'Spanish' : ''}${!hasSpanish && !hasEnglish ? ' and ' : ''}${!hasEnglish ? 'English' : ''} text`,
-                      );
+                      const message = `Missing ${!hasSpanish ? 'Spanish' : ''}${!hasSpanish && !hasEnglish ? ' and ' : ''}${!hasEnglish ? 'English' : ''} text`;
+                      validationMessages.push(message);
+                      errorMessages.push(message);
                     }
 
                     // Find duplicates (only if the row is valid)
@@ -383,6 +366,9 @@ export default function ExampleSetCreator({
                         validationMessages.push(
                           'This duplicate will be removed, keeping the first instance',
                         );
+                        errorMessages.push(
+                          'This duplicate will be removed, keeping the first instance',
+                        );
                       }
                     }
 
@@ -396,7 +382,7 @@ export default function ExampleSetCreator({
                       );
                     }
 
-                    const showError = validationMessages.length > 0;
+                    const showError = errorMessages.length > 0;
 
                     return (
                       <tr
@@ -451,7 +437,7 @@ export default function ExampleSetCreator({
                       ex.spanishExample.includes('ERROR') ||
                       !ex.englishTranslation ||
                       ex.englishTranslation.includes('ERROR');
-                    return hasErrors || existingExamples.has(ex.spanishExample);
+                    return hasErrors;
                   })}
                 >
                   Next
@@ -569,19 +555,36 @@ export default function ExampleSetCreator({
             <button type="button" onClick={clearAndRestart}>
               Restart
             </button>
-            {unsavedFlashcardSet.length > 0 && (
-              <button
-                type="button"
-                onClick={() =>
-                  addFlashcardSetMutation.mutate(unsavedFlashcardSet)
-                }
-              >
-                Save Example Set
-              </button>
+            {flashcardSpanish.length > 0 && (
+              <>
+                {unsavedFlashcardSet.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      addFlashcardSetMutation.mutate(unsavedFlashcardSet)
+                    }
+                    disabled={addFlashcardSetMutation.isPending}
+                  >
+                    {addFlashcardSetMutation.isPending
+                      ? 'Saving...'
+                      : 'Save Example Set'}
+                  </button>
+                )}
+                {unsavedFlashcardSet.length === 0 &&
+                  exampleSetQuery.data &&
+                  exampleSetQuery.data.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setPastingOrEditing('assigning')}
+                    >
+                      Continue to Assignment
+                    </button>
+                  )}
+              </>
             )}
           </div>
           {exampleSetQuery.isLoading && (
-            <LoadingMessage message="Loading examples..." />
+            <LoadingMessage message="Checking for examples..." />
           )}
           {exampleSetQuery.isError && (
             <div>
@@ -605,20 +608,113 @@ export default function ExampleSetCreator({
       {pastingOrEditing === 'assigning' && (
         <div>
           <h3>Assign Examples to Student</h3>
+          <p>Select a student to assign these examples to:</p>
           <div className="student-selector">
             <StudentSearch />
           </div>
-          <div className="buttonBox">
-            <button
-              type="button"
-              onClick={() => setPastingOrEditing('pasting')}
-            >
-              Back to Paste
-            </button>
-            <button type="button" onClick={clearAndRestart}>
-              Restart
-            </button>
-          </div>
+          {exampleSetQuery.data && exampleSetQuery.data.length > 0 && (
+            <>
+              <h4>Examples to be Assigned ({exampleSetQuery.data.length})</h4>
+              <div className="example-preview">
+                {exampleSetQuery.data.map((example) => (
+                  <div key={example.recordId} className="exampleCard">
+                    <div className="exampleCardSpanishText">
+                      {formatSpanishText(
+                        example.spanglish,
+                        example.spanishExample,
+                      )}
+                      <AudioControl audioLink={example.spanishAudioLa} />
+                    </div>
+                    <div className="halfWrapper"></div>
+                    <div className="exampleCardEnglishText">
+                      {formatEnglishText(example.englishTranslation)}
+                      <AudioControl audioLink={example.englishAudio} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {activeStudentQuery.data && (
+                <div className="buttonBox">
+                  <button
+                    type="button"
+                    onClick={() => setShowAssignmentConfirmation(true)}
+                    disabled={addMultipleFlashcardsMutation.isPending}
+                  >
+                    Assign {exampleSetQuery.data.length} Examples to{' '}
+                    {activeStudentQuery.data.name}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPastingOrEditing('pasting')}
+                  >
+                    Back to Paste
+                  </button>
+                  <button type="button" onClick={clearAndRestart}>
+                    Restart
+                  </button>
+                </div>
+              )}
+              {showAssignmentConfirmation && (
+                <div className="confirmation-dialog">
+                  <h4>Confirm Assignment</h4>
+                  <p>
+                    Are you sure you want to assign{' '}
+                    {exampleSetQuery.data?.length} examples to{' '}
+                    {activeStudentQuery.data?.name}?
+                  </p>
+                  <div className="buttonBox">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAssignmentConfirmation(false);
+                        addMultipleFlashcardsMutation.mutate(
+                          (exampleSetQuery.data ?? []).map((example) => {
+                            // Ensure we have all required fields
+                            if (
+                              !example.recordId ||
+                              !example.spanishExample ||
+                              !example.englishTranslation ||
+                              !example.spanglish
+                            ) {
+                              throw new Error(
+                                'Missing required fields in flashcard',
+                              );
+                            }
+                            return {
+                              recordId: example.recordId,
+                              spanishExample: example.spanishExample,
+                              englishTranslation: example.englishTranslation,
+                              spanglish: example.spanglish,
+                              spanishAudioLa: example.spanishAudioLa || '',
+                              englishAudio: example.englishAudio || '',
+                              vocabComplete: false,
+                              vocabIncluded: [],
+                              coachAdded: true,
+                            };
+                          }),
+                          {
+                            onSuccess: () => {
+                              clearAndRestart();
+                            },
+                          },
+                        );
+                      }}
+                      disabled={addMultipleFlashcardsMutation.isPending}
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowAssignmentConfirmation(false)}
+                      disabled={addMultipleFlashcardsMutation.isPending}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>
