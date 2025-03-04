@@ -118,3 +118,30 @@ so we can do col/row later on smaller screens */
 .exampleCard .audioPlayPauseButton {
   transform: translateY(-25%);
 }
+
+.duplicate-row td:first-child {
+  position: relative;
+  padding: 0;
+}
+
+.duplicate-content-wrapper {
+  border: 2px solid darkred;
+  border-radius: 4px;
+  padding: 8px;
+  margin: 2px;
+}
+
+.validation-note {
+  color: var(--text-muted, #666);
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.validation-summary {
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--light);
+  border: 1px solid var(--accent);
+}
