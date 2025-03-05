@@ -380,6 +380,7 @@ export default function AudioQuiz({
   // Currently only used by previousStepButton
   function customIncrementCurrentStep(step: stepValues) {
     pauseAudio();
+    clearCountDown();
     if (step === currentStep) {
       playAudio();
     } else {
