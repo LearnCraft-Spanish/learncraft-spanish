@@ -1,7 +1,6 @@
 import type { Assignment, Week } from 'src/types/CoachingTypes';
 import { useState } from 'react';
 import ContextualControls from 'src/components/ContextualControls';
-import useAssignments from 'src/hooks/CoachingData/useAssignments';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
@@ -72,12 +71,12 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
     coachListQuery,
+    updateAssignmentMutation,
+    deleteAssignmentMutation,
   } = useCoaching();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
     useContextualMenu();
   const { closeModal, openModal } = useModal();
-  const { updateAssignmentMutation, deleteAssignmentMutation } =
-    useAssignments();
 
   const [editMode, setEditMode] = useState(false);
 
@@ -293,7 +292,7 @@ export function NewAssignmentView({
   weekStartsDefaultValue: string;
 }) {
   const { setContextualRef, closeContextual } = useContextualMenu();
-  const { createAssignmentMutation } = useAssignments();
+  const { createAssignmentMutation } = useCoaching();
   const userDataQuery = useUserData();
   const { getStudentFromMembershipId, weeksQuery } = useCoaching();
   const { openModal } = useModal();

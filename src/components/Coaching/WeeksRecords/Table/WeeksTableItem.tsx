@@ -5,7 +5,6 @@ import checkmark from 'src/assets/icons/checkmark_green.svg';
 import pencil from 'src/assets/icons/pencil.svg';
 import x from 'src/assets/icons/x_dark.svg';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import useWeeks from 'src/hooks/CoachingData/useWeeks';
 import { useModal } from 'src/hooks/useModal';
 
 import AssignmentsCell from './AssignmentsCell';
@@ -21,8 +20,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     getPrivateCallsFromWeekRecordId,
     getStudentFromMembershipId,
   } = useCoaching();
-  const { updateWeekMutation } = useWeeks();
-
+  const { updateWeekMutation } = useCoaching();
   const { openModal, closeModal } = useModal();
 
   const dataReady = studentRecordsLessonsQuery.isSuccess;

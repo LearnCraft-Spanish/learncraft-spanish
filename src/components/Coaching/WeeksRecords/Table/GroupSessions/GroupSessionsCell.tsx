@@ -6,8 +6,6 @@ import verifyRequiredInputs from 'src/components/Coaching/general/functions/inpu
 import ContextualControls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
-import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
-import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
@@ -101,16 +99,13 @@ export function GroupSessionView({
     weeksQuery,
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
-  } = useCoaching();
-  const {
-    groupSessionsTopicFieldOptionsQuery,
     createGroupSessionMutation,
     updateGroupSessionMutation,
     deleteGroupSessionMutation,
-  } = useGroupSessions();
-
-  const { createGroupAttendeesMutation, deleteGroupAttendeesMutation } =
-    useGroupAttendees();
+    createGroupAttendeesMutation,
+    deleteGroupAttendeesMutation,
+    groupSessionsTopicFieldOptionsQuery,
+  } = useCoaching();
 
   const dateRange = getDateRange();
 

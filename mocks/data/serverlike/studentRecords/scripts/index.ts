@@ -1,12 +1,12 @@
 /* eslint-disable unused-imports/no-unused-vars */
 import type {
   Assignment,
-  Call,
   Coach,
   Course,
   GroupAttendees,
   GroupSession,
   Membership,
+  PrivateCall,
   Student,
   Week,
 } from 'src/types/CoachingTypes';
@@ -86,12 +86,12 @@ function generateWeekAndRelatedRecords({
 }): {
   week: Week;
   assignments: Assignment[];
-  calls: Call[];
+  calls: PrivateCall[];
   groupSessions: GroupSession[];
   groupAttendees: GroupAttendees[];
 } {
   const assignments: Assignment[] = [];
-  const calls: Call[] = [];
+  const calls: PrivateCall[] = [];
   const groupSessions: GroupSession[] = [];
   const groupAttendees: GroupAttendees[] = [];
 
@@ -221,7 +221,7 @@ function main() {
   const memberships: Membership[] = [];
   const weeks: Week[] = [];
   const assignments: Assignment[] = [];
-  const calls: Call[] = [];
+  const calls: PrivateCall[] = [];
   const groupSessions: GroupSession[] = [];
   const groupAttendees: GroupAttendees[] = [];
 

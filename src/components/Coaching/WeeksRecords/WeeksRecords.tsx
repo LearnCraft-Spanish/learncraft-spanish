@@ -13,15 +13,16 @@ import React, {
 } from 'react';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
-import useWeeks from 'src/hooks/CoachingData/useWeeks';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import LoadingMessage from '../../Loading';
 import getDateRange from '../general/functions/dateRange';
+import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
 import { NewAssignmentView } from './Table/AssignmentsCell';
 import { GroupSessionView } from './Table/GroupSessions/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
+import useDateRange from './useDateRange';
 
 import ViewWeekRecord from './ViewWeekRecord';
 import '../coaching.scss';
@@ -37,9 +38,15 @@ Notes for Test Cases to write:
 
 
 */
-export default function WeeksRecordsSection() {
+
+// Paramaterizing all queries:
+/*
+consider using a context, to pass in the startDate and endDate to all the queries
+*/
+function WeeksRecordsContent() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
+  const { setStartDate, setEndDate } = useDateRange();
   const {
     coachListQuery,
     courseListQuery,
@@ -53,10 +60,15 @@ export default function WeeksRecordsSection() {
     getCourseFromMembershipId,
     getStudentFromMembershipId,
   } = useCoaching();
-
-  const { weeksQuery } = useWeeks();
-
   const dateRange = useMemo(() => getDateRange(), []);
+
+  // const queryClient = useQueryClient();
+
+  // const weeksQuery = useQuery({
+  //   queryKey: ['weeks'],
+  //   queryFn: () => getWeeks(),
+  // });
+
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
@@ -73,6 +85,8 @@ export default function WeeksRecordsSection() {
   // State for the weeks to display
   const [weeks, setWeeks] = useState<Week[] | undefined>();
   const rendered = useRef(false);
+
+  const { weeksQuery } = useCoaching();
 
   const dataReady =
     userDataQuery.isSuccess &&
@@ -111,6 +125,20 @@ export default function WeeksRecordsSection() {
       groupAttendeesQuery.isError ||
       assignmentsQuery.isError ||
       privateCallsQuery.isError);
+
+  function updateWeeksAgoFilterHandler(weeksAgo: string) {
+    if (weeksAgo === '0' && filterByWeeksAgo !== 0) {
+      setStartDate(dateRange.thisWeekDate);
+      setEndDate(dateRange.nextWeekDate);
+    } else if (weeksAgo === '1' && filterByWeeksAgo !== 1) {
+      setStartDate(dateRange.lastSundayDate);
+      setEndDate(dateRange.thisWeekDate);
+    } else if (weeksAgo === '2' && filterByWeeksAgo !== 2) {
+      setStartDate(dateRange.twoSundaysAgoDate);
+      setEndDate(dateRange.lastSundayDate);
+    }
+    updateWeeksAgoFilter(weeksAgo);
+  }
 
   function toggleAdvancedFilteringMenu() {
     setAdvancedFilteringMenu(!advancedFilteringMenu);
@@ -321,7 +349,7 @@ export default function WeeksRecordsSection() {
               filterByCourse={filterByCourse}
               updateCourseFilter={updateCourseFilter}
               filterByWeeksAgo={filterByWeeksAgo}
-              updateWeeksAgoFilter={updateWeeksAgoFilter}
+              updateWeeksAgoFilter={updateWeeksAgoFilterHandler}
               advancedFilteringMenu={advancedFilteringMenu}
               toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
               searchTerm={filterBySearchTerm || ''}
@@ -362,5 +390,14 @@ export default function WeeksRecordsSection() {
         </>
       )}
     </div>
+  );
+}
+
+// Wrap the main component with the provider
+export default function WeeksRecordsSection() {
+  return (
+    <DateRangeProvider>
+      <WeeksRecordsContent />
+    </DateRangeProvider>
   );
 }
