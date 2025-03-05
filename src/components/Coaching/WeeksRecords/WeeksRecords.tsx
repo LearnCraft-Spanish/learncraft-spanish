@@ -13,6 +13,7 @@ import React, {
 } from 'react';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
+import useWeeks from 'src/hooks/CoachingData/useWeeks';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import LoadingMessage from '../../Loading';
@@ -40,7 +41,6 @@ export default function WeeksRecordsSection() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
   const {
-    weeksQuery,
     coachListQuery,
     courseListQuery,
     activeMembershipsQuery,
@@ -53,6 +53,8 @@ export default function WeeksRecordsSection() {
     getCourseFromMembershipId,
     getStudentFromMembershipId,
   } = useCoaching();
+
+  const { weeksQuery } = useWeeks();
 
   const dateRange = useMemo(() => getDateRange(), []);
   // Filtering state

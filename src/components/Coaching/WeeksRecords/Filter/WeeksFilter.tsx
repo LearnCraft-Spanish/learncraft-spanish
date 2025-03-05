@@ -3,10 +3,11 @@ import type { Coach, Course } from 'src/types/CoachingTypes';
 import { useMemo } from 'react';
 
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import useWeeks from 'src/hooks/CoachingData/useWeeks';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { CoachDropdown, Dropdown } from '../../general';
-import getDateRange from '../../general/functions/dateRange';
 
+import getDateRange from '../../general/functions/dateRange';
 import '../../coaching.scss';
 
 interface CoachingFilterProps {
@@ -49,6 +50,7 @@ export default function WeeksFilter({
 }: CoachingFilterProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
   const { openContextual } = useContextualMenu();
+  const { refetchWeeks } = useWeeks();
   const dateRange = useMemo(() => getDateRange(), []);
 
   const coursesWithActiveMemberships = useMemo(() => {
@@ -67,6 +69,15 @@ export default function WeeksFilter({
     activeMembershipsQuery.data,
     activeMembershipsQuery.isSuccess,
   ]);
+
+  const updateWeeksAgoFilterHandler = (value: string) => {
+    if (value === '2') {
+      console.log('refetching weeks');
+      refetchWeeks(dateRange.twoSundaysAgoDate, dateRange.lastSundayDate);
+    }
+
+    updateWeeksAgoFilter(value);
+  };
 
   return (
     dataReady && (
@@ -90,7 +101,7 @@ export default function WeeksFilter({
             <label htmlFor="weekRangeFilter">Week:</label>
             <select
               id="weekRangeFilter"
-              onChange={(e) => updateWeeksAgoFilter(e.target.value)}
+              onChange={(e) => updateWeeksAgoFilterHandler(e.target.value)}
               value={filterByWeeksAgo}
             >
               <option value={0}>
@@ -100,9 +111,10 @@ export default function WeeksFilter({
                 Last Week {`(${dateRange.lastSundayDate})`}
               </option>
               <option value={2}>
-                Two Weeks Ago {`(${dateRange.twoSundaysAgoDate})`}
+                Two Weeks Ago (refetching weeks!)
+                {`(${dateRange.twoSundaysAgoDate})`}
               </option>
-              <option value={-1}>Last Three Weeks (All)</option>
+              {/* <option value={-1}>Last Three Weeks (All)</option> */}
             </select>
           </div>
         </div>
