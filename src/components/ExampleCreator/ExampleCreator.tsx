@@ -7,20 +7,20 @@ import type {
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
+import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import { VocabTag } from './VocabTag';
 import ExamplesTable from '../ExamplesTable/ExamplesTable';
-import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import SearchableStudentList from '../StudentSearch';
 import ExampleSetCreator from './ExampleSetCreator';
 import SingleExampleCreator from './SingleExampleCreator';
+import { VocabTag } from './VocabTag';
 import 'src/App.css';
 import './ExampleCreator.css';
-import { useModal } from 'src/hooks/useModal';
 export default function ExampleCreator() {
   const { openModal, closeModal } = useModal();
   const { openContextual, closeContextual, setContextualRef, contextual } =
@@ -230,7 +230,7 @@ export default function ExampleCreator() {
       }
     }
     setSugestedTags(suggestTen);
-  }, [includedVocabObjects, vocabularyQuery.data]);
+  }, [vocabSearchTerm, includedVocabObjects, vocabularyQuery.data]);
 
   const updateExample = useCallback(
     (example: Flashcard) => {
@@ -240,12 +240,7 @@ export default function ExampleCreator() {
         updateQuizExample(example);
       }
     },
-    [
-      updateRecentlyEditedExample,
-      updateQuizExample,
-      vocabSearchTerm,
-      tableOption,
-    ],
+    [updateRecentlyEditedExample, updateQuizExample, tableOption],
   );
 
   const quizList = useMemo(() => {
@@ -261,7 +256,6 @@ export default function ExampleCreator() {
     if (tableOption === 'none') {
       return recentlyEditedExamplesQuery.data;
     } else if (tableOption === 'student') {
-      console.log(flashcardDataQuery.data);
       return flashcardDataQuery.data?.examples;
     } else {
       return quizExamplesQuery.data;
@@ -362,7 +356,7 @@ export default function ExampleCreator() {
       {singleOrSet === 'single' ? (
         <>
           <SingleExampleCreator
-            editOrCreate={!!selectedExampleId ? 'edit' : 'create'}
+            editOrCreate={selectedExampleId ? 'edit' : 'create'}
             exampleDetails={exampleDetails}
             setExampleDetails={setExampleDetails}
             vocabIncluded={vocabIncluded}

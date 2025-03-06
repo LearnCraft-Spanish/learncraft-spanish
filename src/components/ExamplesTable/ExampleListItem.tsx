@@ -17,7 +17,7 @@ interface FormatExampleForTableProps {
   example: Flashcard;
   showSpanglishLabel?: boolean;
   forceShowVocab?: boolean;
-  selectExample?: (recordId: number) => void;
+  selectExample?: (recordId: number | null) => void;
   selectedExampleId?: number | null;
   studentContext?: boolean;
 }

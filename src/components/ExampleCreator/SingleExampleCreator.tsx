@@ -1,8 +1,7 @@
 import type { NewFlashcard } from 'src/types/interfaceDefinitions';
 import React, { useMemo, useState } from 'react';
+import EditOrCreateExample from 'src/components/EditOrCreateExample';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
-import EditOrCreateExample from '../editOrCreateExample';
-import ExamplesTable from '../ExamplesTable/ExamplesTable';
 
 interface SingleExampleCreatorProps {
   editOrCreate: 'create' | 'edit';

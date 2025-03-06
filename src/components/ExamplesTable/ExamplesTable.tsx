@@ -53,7 +53,7 @@ export default function ExamplesTable({
 
   const selectExample = useMemo(() => {
     if (selectFunction) {
-      return (recordId: number) => {
+      return (recordId: number | null) => {
         selectFunction(recordId);
         setSelectedExampleId(recordId);
       };
