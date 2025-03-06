@@ -4,23 +4,27 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import ExampleListItem from './ExampleListItem';
 import Pagination from './Pagination';
 
+import './ExamplesTable.scss';
+
 interface ExamplesTableProps {
   dataSource: Flashcard[];
   displayOrder: DisplayOrder[];
   showSpanglishLabel?: boolean;
   forceShowVocab?: boolean;
-  selectFunction?: (recordId: number) => void;
+  selectFunction?: (recordId: number | null) => void;
   sorted?: boolean;
+  studentContext?: boolean;
 }
 
-const ExamplesTable: React.FC<ExamplesTableProps> = ({
+export default function ExamplesTable({
   dataSource,
   displayOrder,
   showSpanglishLabel = false,
   sorted = false,
   forceShowVocab = false,
   selectFunction = undefined,
-}: ExamplesTableProps) => {
+  studentContext = true,
+}: ExamplesTableProps) {
   const [page, setPage] = useState(1);
   const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
     null,
@@ -49,7 +53,7 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
 
   const selectExample = useMemo(() => {
     if (selectFunction) {
-      return (recordId: number) => {
+      return (recordId: number | null) => {
         selectFunction(recordId);
         setSelectedExampleId(recordId);
       };
@@ -136,6 +140,7 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
         nextPage={nextPage}
         previousPage={previousPage}
       />
+      {/* unnessessary id? */}
       <div id="examplesTableBody">
         {displayOrderSegment.map((displayOrder) => {
           const id = displayOrder.recordId;
@@ -146,11 +151,12 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
             return (
               <ExampleListItem
                 key={displayOrder.recordId}
-                data={exampleData}
+                example={exampleData}
                 showSpanglishLabel={showSpanglishLabel}
                 forceShowVocab={forceShowVocab}
                 selectExample={selectExample}
                 selectedExampleId={selectedExampleId}
+                studentContext={studentContext}
               />
             );
         })}
@@ -164,6 +170,4 @@ const ExamplesTable: React.FC<ExamplesTableProps> = ({
       />
     </div>
   );
-};
-
-export default ExamplesTable;
+}

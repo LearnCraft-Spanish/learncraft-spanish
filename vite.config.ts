@@ -29,8 +29,9 @@ export default defineConfig(({ mode }) => {
       }),
     ],
     build: {
+      manifest: true,
       outDir: 'build',
-      sourcemap: true, // Enable source maps
+      sourcemap: true,
     },
     resolve: {
       alias: {
