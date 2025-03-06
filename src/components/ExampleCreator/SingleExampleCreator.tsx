@@ -4,43 +4,57 @@ import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEdit
 import EditOrCreateExample from '../editOrCreateExample';
 import ExamplesTable from '../ExamplesTable/ExamplesTable';
 
-export default function SingleExampleCreator() {
-  const [spanishExample, setSpanishExample] = useState('');
-  const [englishTranslation, setEnglishTranslation] = useState('');
-  const [spanishAudioLa, setSpanishAudioLa] = useState('');
-  const [englishAudio, setEnglishAudio] = useState('');
+interface SingleExampleCreatorProps {
+  editOrCreate: 'create' | 'edit';
+  exampleDetails: {
+    spanishExample: string;
+    englishTranslation: string;
+    spanishAudioLa: string;
+    englishAudio: string;
+  };
+  setExampleDetails: React.Dispatch<
+    React.SetStateAction<{
+      spanishExample: string;
+      englishTranslation: string;
+      spanishAudioLa: string;
+      englishAudio: string;
+    }>
+  >;
+  vocabIncluded: string[];
+  setVocabIncluded: React.Dispatch<React.SetStateAction<string[]>>;
+}
 
+export default function SingleExampleCreator({
+  editOrCreate,
+  exampleDetails,
+  setExampleDetails,
+  vocabIncluded,
+  setVocabIncluded,
+}: SingleExampleCreatorProps) {
   const { recentlyEditedExamplesQuery, addUnverifiedExample } =
     useRecentlyEditedExamples();
 
   const spanglish = useMemo(() => {
-    return spanishExample.includes('*') ? 'spanglish' : 'esp';
-  }, [spanishExample]);
+    return exampleDetails.spanishExample.includes('*') ? 'spanglish' : 'esp';
+  }, [exampleDetails.spanishExample]);
 
   const newFlashcard: NewFlashcard = useMemo(() => {
     return {
-      spanishExample,
-      englishTranslation,
+      ...exampleDetails,
       spanglish,
-      englishAudio,
-      spanishAudioLa,
       vocabComplete: false,
     };
-  }, [
-    spanishExample,
-    englishTranslation,
-    spanishAudioLa,
-    englishAudio,
-    spanglish,
-  ]);
+  }, [exampleDetails, spanglish]);
 
   function handleAddExample(e: React.FormEvent) {
     e.preventDefault();
     addUnverifiedExample(newFlashcard);
-    setSpanishExample('');
-    setEnglishTranslation('');
-    setSpanishAudioLa('');
-    setEnglishAudio('');
+    setExampleDetails({
+      spanishExample: '',
+      englishTranslation: '',
+      spanishAudioLa: '',
+      englishAudio: '',
+    });
   }
 
   const displayOrder =
@@ -52,24 +66,28 @@ export default function SingleExampleCreator() {
     <>
       <div id="exampleCreator">
         <EditOrCreateExample
-          editOrCreate="create"
+          editOrCreate={editOrCreate}
           onSubmit={handleAddExample}
-          spanishExample={spanishExample}
-          setSpanishExample={setSpanishExample}
+          spanishExample={exampleDetails.spanishExample}
+          setSpanishExample={(value) =>
+            setExampleDetails((prev) => ({ ...prev, spanishExample: value }))
+          }
           spanglish={spanglish}
-          englishTranslation={englishTranslation}
-          setEnglishTranslation={setEnglishTranslation}
-          spanishAudioLa={spanishAudioLa}
-          setSpanishAudioLa={setSpanishAudioLa}
-          englishAudio={englishAudio}
-          setEnglishAudio={setEnglishAudio}
-        />
-      </div>
-      <div id="newExamples">
-        <h3>New Examples</h3>
-        <ExamplesTable
-          dataSource={recentlyEditedExamplesQuery.data ?? []}
-          displayOrder={displayOrder}
+          englishTranslation={exampleDetails.englishTranslation}
+          setEnglishTranslation={(value) =>
+            setExampleDetails((prev) => ({
+              ...prev,
+              englishTranslation: value,
+            }))
+          }
+          spanishAudioLa={exampleDetails.spanishAudioLa}
+          setSpanishAudioLa={(value) =>
+            setExampleDetails((prev) => ({ ...prev, spanishAudioLa: value }))
+          }
+          englishAudio={exampleDetails.englishAudio}
+          setEnglishAudio={(value) =>
+            setExampleDetails((prev) => ({ ...prev, englishAudio: value }))
+          }
         />
       </div>
     </>

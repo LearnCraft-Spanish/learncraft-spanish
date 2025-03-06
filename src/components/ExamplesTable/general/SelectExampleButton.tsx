@@ -7,11 +7,19 @@ export default function SelectExampleButton({
   selectedExampleId: number | null;
   selectExample: (recordId: number) => void;
 }) {
-  return recordId === selectedExampleId ? (
-    <button type="button">Selected</button>
-  ) : (
-    <button type="button" onClick={() => selectExample(recordId)}>
-      Select
+  const isSelected = recordId === selectedExampleId;
+
+  const handleButtonClick = () => {
+    if (isSelected) {
+      selectExample(null); // Deselect the example
+    } else {
+      selectExample(recordId); // Select the example
+    }
+  };
+
+  return (
+    <button type="button" onClick={handleButtonClick}>
+      {isSelected ? 'Deselect' : 'Select'}
     </button>
   );
 }

@@ -11,7 +11,7 @@ interface ExamplesTableProps {
   displayOrder: DisplayOrder[];
   showSpanglishLabel?: boolean;
   forceShowVocab?: boolean;
-  selectFunction?: (recordId: number) => void;
+  selectFunction?: (recordId: number | null) => void;
   sorted?: boolean;
   studentContext?: boolean;
 }

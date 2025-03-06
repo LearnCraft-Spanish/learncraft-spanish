@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 import { describe, expect, it } from 'vitest';
-import ExampleEditor from './ExampleEditor';
+import ExampleEditor from '../ExampleCreator/ExampleEditor';
 
 function getRenderedComponent() {
   return render(
