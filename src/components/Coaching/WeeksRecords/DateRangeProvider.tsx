@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import React, { useMemo, useState } from 'react';
 import getDateRange from '../general/functions/dateRange';
+import getWeekEnds from '../general/functions/getWeekEnds';
 import { DateRangeContext } from './DateRangeContext';
 
 export function DateRangeProvider({ children }: { children: ReactNode }) {
@@ -11,13 +12,12 @@ export function DateRangeProvider({ children }: { children: ReactNode }) {
       ? dateRange.thisWeekDate
       : dateRange.lastSundayDate,
   );
-  const [endDate, setEndDate] = useState<string>(
-    dateRange.dayOfWeek >= 3 ? dateRange.nextWeekDate : dateRange.thisWeekDate,
-  );
+
+  const endDate = useMemo(() => getWeekEnds(startDate), [startDate]);
 
   const value = useMemo(
-    () => ({ startDate, endDate, setStartDate, setEndDate }),
-    [startDate, endDate, setStartDate, setEndDate],
+    () => ({ startDate, endDate, setStartDate }),
+    [startDate, endDate, setStartDate],
   );
 
   return <DateRangeContext value={value}>{children}</DateRangeContext>;

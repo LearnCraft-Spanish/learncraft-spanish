@@ -46,8 +46,9 @@ consider using a context, to pass in the startDate and endDate to all the querie
 function WeeksRecordsContent() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
-  const { setStartDate, setEndDate } = useDateRange();
+  const { setStartDate } = useDateRange();
   const {
+    weeksQuery,
     coachListQuery,
     courseListQuery,
     activeMembershipsQuery,
@@ -86,7 +87,18 @@ function WeeksRecordsContent() {
   const [weeks, setWeeks] = useState<Week[] | undefined>();
   const rendered = useRef(false);
 
-  const { weeksQuery } = useCoaching();
+  const initialDataLoad =
+    rendered.current === false &&
+    userDataQuery.isLoading &&
+    weeksQuery.isLoading &&
+    coachListQuery.isLoading &&
+    courseListQuery.isLoading &&
+    activeMembershipsQuery.isLoading &&
+    activeStudentsQuery.isLoading &&
+    groupSessionsQuery.isLoading &&
+    groupAttendeesQuery.isLoading &&
+    assignmentsQuery.isLoading &&
+    privateCallsQuery.isLoading;
 
   const dataReady =
     userDataQuery.isSuccess &&
@@ -94,48 +106,27 @@ function WeeksRecordsContent() {
     coachListQuery.isSuccess &&
     courseListQuery.isSuccess &&
     activeMembershipsQuery.isSuccess &&
-    activeStudentsQuery.isSuccess &&
-    groupSessionsQuery.isSuccess &&
-    groupAttendeesQuery.isSuccess &&
-    assignmentsQuery.isSuccess &&
-    privateCallsQuery.isSuccess;
-
-  const dataLoading =
-    !dataReady &&
-    (userDataQuery.isLoading ||
-      weeksQuery.isLoading ||
-      coachListQuery.isLoading ||
-      courseListQuery.isLoading ||
-      activeMembershipsQuery.isLoading ||
-      activeStudentsQuery.isLoading ||
-      groupSessionsQuery.isLoading ||
-      groupAttendeesQuery.isLoading ||
-      assignmentsQuery.isLoading ||
-      privateCallsQuery.isLoading);
+    activeStudentsQuery.isSuccess;
 
   const dataError =
-    !dataReady &&
-    (userDataQuery.isError ||
-      weeksQuery.isError ||
-      coachListQuery.isError ||
-      courseListQuery.isError ||
-      activeMembershipsQuery.isError ||
-      activeStudentsQuery.isError ||
-      groupSessionsQuery.isError ||
-      groupAttendeesQuery.isError ||
-      assignmentsQuery.isError ||
-      privateCallsQuery.isError);
+    userDataQuery.isError ||
+    weeksQuery.isError ||
+    coachListQuery.isError ||
+    courseListQuery.isError ||
+    activeMembershipsQuery.isError ||
+    activeStudentsQuery.isError ||
+    groupSessionsQuery.isError ||
+    groupAttendeesQuery.isError ||
+    assignmentsQuery.isError ||
+    privateCallsQuery.isError;
 
   function updateWeeksAgoFilterHandler(weeksAgo: string) {
     if (weeksAgo === '0' && filterByWeeksAgo !== 0) {
       setStartDate(dateRange.thisWeekDate);
-      setEndDate(dateRange.nextWeekDate);
     } else if (weeksAgo === '1' && filterByWeeksAgo !== 1) {
       setStartDate(dateRange.lastSundayDate);
-      setEndDate(dateRange.thisWeekDate);
     } else if (weeksAgo === '2' && filterByWeeksAgo !== 2) {
       setStartDate(dateRange.twoSundaysAgoDate);
-      setEndDate(dateRange.lastSundayDate);
     }
     updateWeeksAgoFilter(weeksAgo);
   }
@@ -336,9 +327,9 @@ function WeeksRecordsContent() {
 
   return (
     <div className="newCoachingWrapper">
-      {dataLoading && <LoadingMessage message={'Loading Coaching Data'} />}
+      {initialDataLoad && <LoadingMessage message={'Loading Coaching Data'} />}
       {dataError && <p>Error loading data</p>}
-      {dataReady && (
+      {rendered.current && (
         <>
           <h2>Weekly Student Records</h2>
           <div className="filterWrapper">

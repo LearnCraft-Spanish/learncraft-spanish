@@ -403,3 +403,37 @@ td button {
     margin: 0.25rem 0.5rem;
   }
 }
+
+// to clear student selector in AssignmentsCell
+.clearStudent {
+  background: none;
+  border: none;
+  cursor: pointer;
+  img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+#searchStudentWrapper {
+  .loadingContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      margin-left: 1rem;
+      width: 24px;
+      height: 24px;
+      animation: spin 1.4s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  }
+}

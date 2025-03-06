@@ -50,7 +50,7 @@ export default function WeeksFilter({
 }: CoachingFilterProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
   const { openContextual } = useContextualMenu();
-  const { setStartDate, setEndDate } = useDateRange();
+  const { setStartDate } = useDateRange();
   const dateRange = useMemo(() => getDateRange(), []);
 
   const coursesWithActiveMemberships = useMemo(() => {
@@ -73,13 +73,10 @@ export default function WeeksFilter({
   const handleWeeksAgoChange = (weeksAgo: string) => {
     if (weeksAgo === '2') {
       setStartDate(dateRange.twoSundaysAgoDate);
-      setEndDate(dateRange.lastSundayDate);
     } else if (weeksAgo === '1') {
       setStartDate(dateRange.lastSundayDate);
-      setEndDate(dateRange.nextWeekDate);
     } else if (weeksAgo === '0') {
       setStartDate(dateRange.thisWeekDate);
-      setEndDate(dateRange.nextWeekDate);
     }
     updateWeeksAgoFilter(weeksAgo);
   };
