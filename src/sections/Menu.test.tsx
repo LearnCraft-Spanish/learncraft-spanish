@@ -116,6 +116,20 @@ describe('component Menu', () => {
           }
         });
 
+        // Get Help (students only)
+        const hasGetHelp =
+          userCase.roles.includes('student') &&
+          !userCase.roles.includes('admin') &&
+          !userCase.roles.includes('coach');
+        it(`${hasGetHelp ? 'does' : 'does NOT'} render "Need Help?"`, async () => {
+          await renderMenuLoaded();
+          if (hasGetHelp) {
+            expect(screen.getByText('Need Help?')).toBeInTheDocument();
+          } else {
+            expect(screen.queryByText('Need Help?')).toBeNull();
+          }
+        });
+
         // General Staff Tools
         const hasGeneralStaffTools =
           userCase.roles.includes('admin') || userCase.roles.includes('coach');
