@@ -5,7 +5,7 @@ export default function SelectExampleButton({
 }: {
   recordId: number;
   selectedExampleId: number | null;
-  selectExample: (recordId: number) => void;
+  selectExample: (recordId: number | null) => void;
 }) {
   const isSelected = recordId === selectedExampleId;
 
