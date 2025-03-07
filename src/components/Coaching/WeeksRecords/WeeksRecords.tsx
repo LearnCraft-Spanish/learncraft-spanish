@@ -46,7 +46,7 @@ consider using a context, to pass in the startDate and endDate to all the querie
 function WeeksRecordsContent() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
-  const { setStartDate } = useDateRange();
+  const { setStartDate, startDate } = useDateRange();
   const {
     weeksQuery,
     coachListQuery,
@@ -73,7 +73,7 @@ function WeeksRecordsContent() {
   // Filtering state
   const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
   const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
-    dateRange.dayOfWeek >= 3 ? 0 : 1,
+    Number.parseInt(dateRange.dayOfWeekString) >= 3 ? 0 : 1,
   ); // 0 for this week, 1 for last week, 2 for two weeks ago
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
@@ -190,23 +190,9 @@ function WeeksRecordsContent() {
   );
   const filterWeeksByWeeksAgoFunction = useCallback(
     (weeks: Week[]) => {
-      if (filterByWeeksAgo === 0) {
-        return weeks.filter(
-          (week) => week.weekStarts === dateRange.thisWeekDate,
-        );
-      } else if (filterByWeeksAgo === 1) {
-        return weeks.filter(
-          (week) => week.weekStarts === dateRange.lastSundayDate,
-        );
-      } else if (filterByWeeksAgo === 2) {
-        return weeks.filter(
-          (week) => week.weekStarts === dateRange.twoSundaysAgoDate,
-        );
-      } else {
-        return weeks;
-      }
+      return weeks.filter((week) => week.weekStarts === startDate);
     },
-    [filterByWeeksAgo, dateRange],
+    [startDate],
   );
   const filterWeeksByCoachlessFunction = useCallback(
     (weeks: Week[]) => {
@@ -339,7 +325,6 @@ function WeeksRecordsContent() {
               updateCoachFilter={updateCoachFilter}
               filterByCourse={filterByCourse}
               updateCourseFilter={updateCourseFilter}
-              filterByWeeksAgo={filterByWeeksAgo}
               updateWeeksAgoFilter={updateWeeksAgoFilterHandler}
               advancedFilteringMenu={advancedFilteringMenu}
               toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}

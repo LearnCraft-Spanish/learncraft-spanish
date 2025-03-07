@@ -1,7 +1,8 @@
 import type { Coach, Course } from 'src/types/CoachingTypes';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
+import { toReadableMonthDay } from 'src/functions/dateUtils';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { CoachDropdown, Dropdown } from '../../general';
@@ -18,7 +19,6 @@ interface CoachingFilterProps {
   updateCoachFilter: (value: string) => void;
   filterByCourse: Course | undefined;
   updateCourseFilter: (value: string) => void;
-  filterByWeeksAgo: number;
   updateWeeksAgoFilter: (value: string) => void;
   filterCoachless: boolean | undefined;
   updateCoachlessFilter: (value: boolean) => void;
@@ -37,7 +37,6 @@ export default function WeeksFilter({
   updateCoachFilter,
   filterByCourse,
   updateCourseFilter,
-  filterByWeeksAgo,
   updateWeeksAgoFilter,
   filterCoachless,
   updateCoachlessFilter,
@@ -50,8 +49,29 @@ export default function WeeksFilter({
 }: CoachingFilterProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
   const { openContextual } = useContextualMenu();
-  const { setStartDate } = useDateRange();
-  const dateRange = useMemo(() => getDateRange(), []);
+  const { setStartDate, startDate } = useDateRange();
+  const [numWeeks, setNumWeeks] = useState(4); // Start with 4 weeks
+  const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
+
+  const handleLoadMore = () => {
+    setNumWeeks((prev) => prev * 2);
+  };
+
+  const handleWeeksAgoChange = (value: string) => {
+    if (value === 'loadMore') {
+      handleLoadMore();
+      return; // Don't update the selected value
+    }
+    setStartDate(value);
+    // Map the date back to weeks ago for backward compatibility
+    let weeksAgo = '0';
+    if (value === dateRange.lastSundayDate) {
+      weeksAgo = '1';
+    } else if (value === dateRange.twoSundaysAgoDate) {
+      weeksAgo = '2';
+    }
+    updateWeeksAgoFilter(weeksAgo);
+  };
 
   const coursesWithActiveMemberships = useMemo(() => {
     if (!courseListQuery.isSuccess || !activeMembershipsQuery.isSuccess)
@@ -69,17 +89,6 @@ export default function WeeksFilter({
     activeMembershipsQuery.data,
     activeMembershipsQuery.isSuccess,
   ]);
-
-  const handleWeeksAgoChange = (weeksAgo: string) => {
-    if (weeksAgo === '2') {
-      setStartDate(dateRange.twoSundaysAgoDate);
-    } else if (weeksAgo === '1') {
-      setStartDate(dateRange.lastSundayDate);
-    } else if (weeksAgo === '0') {
-      setStartDate(dateRange.thisWeekDate);
-    }
-    updateWeeksAgoFilter(weeksAgo);
-  };
 
   return (
     dataReady && (
@@ -99,17 +108,41 @@ export default function WeeksFilter({
             editMode
             defaultOptionText="All Courses"
           />
-          <div>
+          <div className="weekSelector">
             <label htmlFor="weekRangeFilter">Week:</label>
             <select
               id="weekRangeFilter"
               onChange={(e) => handleWeeksAgoChange(e.target.value)}
-              value={filterByWeeksAgo}
+              value={startDate}
               disabled={!dataReady}
             >
-              <option value={0}>This Week</option>
-              <option value={1}>Last Week</option>
-              <option value={2}>Two Weeks Ago</option>
+              {Array.from({ length: numWeeks }, (_, i) => {
+                const dateKey =
+                  i === 0
+                    ? 'thisWeekDate'
+                    : i === 1
+                      ? 'lastSundayDate'
+                      : i === 2
+                        ? 'twoSundaysAgoDate'
+                        : `${i + 1}SundaysAgoDate`;
+                const date = dateRange[dateKey];
+                const label =
+                  i === 0
+                    ? 'This Week'
+                    : i === 1
+                      ? 'Last Week'
+                      : i === 2
+                        ? 'Two Weeks Ago'
+                        : toReadableMonthDay(date);
+                return (
+                  <option key={date} value={date}>
+                    {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+                  </option>
+                );
+              })}
+              <option value="loadMore" className="loadMoreOption">
+                Load More...
+              </option>
             </select>
           </div>
         </div>

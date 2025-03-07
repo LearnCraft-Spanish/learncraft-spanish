@@ -8,7 +8,7 @@ export function DateRangeProvider({ children }: { children: ReactNode }) {
   const dateRange = getDateRange();
   // depending on day of week, initialize startDate to this week or last week
   const [startDate, setStartDate] = useState<string>(
-    dateRange.dayOfWeek >= 3
+    Number.parseInt(dateRange.dayOfWeekString) >= 3
       ? dateRange.thisWeekDate
       : dateRange.lastSundayDate,
   );

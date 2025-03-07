@@ -2,6 +2,7 @@ import type { Assignment, Week } from 'src/types/CoachingTypes';
 import { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import ContextualControls from 'src/components/ContextualControls';
+import { toReadableMonthDay } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
@@ -300,11 +301,14 @@ export function NewAssignmentView({
   const { getStudentFromMembershipId } = useCoaching();
   const { openModal } = useModal();
   const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
+  const [numWeeks, setNumWeeks] = useState(4);
   const weekEnds = useMemo(() => getWeekEnds(weekStarts), [weekStarts]);
-
+  const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
   const { weeksQuery } = useWeeks(weekStarts, weekEnds);
 
-  const dateRange = getDateRange();
+  const handleLoadMore = () => {
+    setNumWeeks((prev) => prev * 2);
+  };
 
   interface StudentObj {
     studentFullname: string;
@@ -329,8 +333,8 @@ export function NewAssignmentView({
       console.error('No weeks found');
       return;
     }
-    const studentWeek = weeksQuery.data?.find(
-      (week) => week.recordId === relatedWeekId,
+    const studentWeek = weeksQuery.data.find(
+      (week: Week) => week.recordId === relatedWeekId,
     );
     if (!studentWeek) {
       console.error('No student found with recordId:', relatedWeekId);
@@ -344,9 +348,13 @@ export function NewAssignmentView({
     });
   };
 
-  const updateWeekStarts = (weekStarts: string) => {
+  const updateWeekStarts = (value: string) => {
+    if (value === 'loadMore') {
+      handleLoadMore();
+      return; // Don't update the selected value
+    }
     setStudent(undefined);
-    setWeekStarts(weekStarts);
+    setWeekStarts(value);
   };
 
   function createNewAssignment() {
@@ -414,14 +422,32 @@ export function NewAssignmentView({
             value={weekStarts}
             onChange={(e) => updateWeekStarts(e.target.value)}
           >
-            <option value={dateRange.thisWeekDate}>
-              This Week {`(${dateRange.thisWeekDate})`}
-            </option>
-            <option value={dateRange.lastSundayDate}>
-              Last Week {`(${dateRange.lastSundayDate})`}
-            </option>
-            <option value={dateRange.twoSundaysAgoDate}>
-              Two Weeks Ago {`(${dateRange.twoSundaysAgoDate})`}
+            {Array.from({ length: numWeeks }, (_, i) => {
+              const dateKey =
+                i === 0
+                  ? 'thisWeekDate'
+                  : i === 1
+                    ? 'lastSundayDate'
+                    : i === 2
+                      ? 'twoSundaysAgoDate'
+                      : `${i + 1}SundaysAgoDate`;
+              const date = dateRange[dateKey];
+              const label =
+                i === 0
+                  ? 'This Week'
+                  : i === 1
+                    ? 'Last Week'
+                    : i === 2
+                      ? 'Two Weeks Ago'
+                      : toReadableMonthDay(date);
+              return (
+                <option key={date} value={date}>
+                  {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+                </option>
+              );
+            })}
+            <option value="loadMore" className="loadMoreOption">
+              Load More...
             </option>
           </select>
         </div>

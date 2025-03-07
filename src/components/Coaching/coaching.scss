@@ -183,6 +183,7 @@ td button {
   display: flex;
   margin: auto;
 }
+
 /* --------- contextual --------- */
 .checkboxWrapper,
 .lineWrapper {
@@ -203,8 +204,8 @@ td button {
     margin: 16px 0;
   }
 }
+
 .lineWrapper {
-  align-items: flex-start;
   .label {
     font-size: 1rem;
     font-weight: 600;
@@ -409,13 +410,23 @@ td button {
   background: none;
   border: none;
   cursor: pointer;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
   img {
     width: 16px;
     height: 16px;
   }
 }
 
-#searchStudentWrapper {
+#searchStudentWrapper.customSearchStudentWrapper {
+  input {
+    min-width: 300px;
+  }
+
+  #optionsWrapper {
+    min-width: 300px;
+  }
+
   .loadingContainer {
     display: flex;
     align-items: center;
