@@ -87,7 +87,7 @@ function generateWeek({
     ...weekRecordStructure,
 
     // Membership attributes
-    level: 'Membership Level Hard Coded', // not currently in membership object, ignoring for now
+    level: course.name, // not currently in membership object, ignoring for now
     relatedMembership: membership.recordId,
     membershipEndDate: membership.endDate,
     membershipStudentMemberUntil: membership.endDate,

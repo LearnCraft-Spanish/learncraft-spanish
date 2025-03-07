@@ -2,13 +2,18 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { DateRangeProvider } from 'src/components/Coaching/WeeksRecords/DateRangeProvider';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { describe, expect, it } from 'vitest';
 // This would benefit from improved testing. currently only testing existence
 describe('hook useCoaching', () => {
   it('renders without crashing', async () => {
     const { result } = renderHook(() => useCoaching(), {
-      wrapper: MockAllProviders,
+      wrapper: ({ children }) => (
+        <MockAllProviders>
+          <DateRangeProvider>{children}</DateRangeProvider>
+        </MockAllProviders>
+      ),
     });
     await waitFor(() => {
       expect(result.current).toBeDefined();
@@ -29,7 +34,11 @@ describe('hook useCoaching', () => {
     for (const query of listOfQueries) {
       it(`query ${query}: exists and has data`, async () => {
         const { result } = renderHook(() => useCoaching(), {
-          wrapper: MockAllProviders,
+          wrapper: ({ children }) => (
+            <MockAllProviders>
+              <DateRangeProvider>{children}</DateRangeProvider>
+            </MockAllProviders>
+          ),
         });
         await waitFor(() => {
           // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists
@@ -111,15 +120,23 @@ describe('hook useCoaching', () => {
         ),
       },
       {
-        func: 'dateObjectToText',
-        arg: new Date(2024, 10, 25),
-        expected: '2024-10-25',
+        func: 'getAttendeesFromGroupSessionId',
+        arg: generatedMockData.groupSessions[0].recordId,
+        expected: generatedMockData.groupAttendees.filter(
+          (attendee) =>
+            attendee.groupSession ===
+            generatedMockData.groupSessions[0].recordId,
+        ),
       },
     ];
     for (const func of listOfFunctions) {
       it(`function ${func.func}: exists and works as expected`, async () => {
         const { result } = renderHook(() => useCoaching(), {
-          wrapper: MockAllProviders,
+          wrapper: ({ children }) => (
+            <MockAllProviders>
+              <DateRangeProvider>{children}</DateRangeProvider>
+            </MockAllProviders>
+          ),
         });
         await waitFor(() => {
           // @ts-expect-error - I dont want to add type safety to this, it is a test and the attribute exists

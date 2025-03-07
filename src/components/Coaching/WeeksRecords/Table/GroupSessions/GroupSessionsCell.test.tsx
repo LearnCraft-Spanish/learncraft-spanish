@@ -4,6 +4,7 @@ import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentR
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { describe, expect, it } from 'vitest';
+import { DateRangeProvider } from '../../DateRangeProvider';
 import GroupSessionsCell from './GroupSessionsCell';
 
 const week = generatedMockData.weeks.find(
@@ -35,7 +36,12 @@ describe('component StudentCell', () => {
   it('renders with valid data', async () => {
     render(
       <MockAllProviders>
-        <GroupSessionsCell week={week} groupSessions={[relatedGroupSession]} />
+        <DateRangeProvider>
+          <GroupSessionsCell
+            week={week}
+            groupSessions={[relatedGroupSession]}
+          />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     await waitFor(() => {
@@ -49,10 +55,12 @@ describe('component StudentCell', () => {
     async function renderWithPopupActive() {
       render(
         <MockAllProviders>
-          <GroupSessionsCell
-            week={week}
-            groupSessions={[relatedGroupSession]}
-          />
+          <DateRangeProvider>
+            <GroupSessionsCell
+              week={week}
+              groupSessions={[relatedGroupSession]}
+            />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {

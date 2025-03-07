@@ -1,7 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-
 import { describe, expect, it, vi } from 'vitest';
+
+import { DateRangeProvider } from '../DateRangeProvider';
 import WeeksFilter from './WeeksFilter';
 
 const defaultProps = {
@@ -23,6 +24,7 @@ const defaultProps = {
   searchTerm: undefined,
   updateSearchTerm: () => {},
 };
+
 describe('component WeeksFilter', () => {
   afterEach(() => {
     vi.resetAllMocks();
@@ -31,18 +33,23 @@ describe('component WeeksFilter', () => {
   it('renders without crashing', async () => {
     render(
       <MockAllProviders>
-        <WeeksFilter {...defaultProps} />
+        <DateRangeProvider>
+          <WeeksFilter {...defaultProps} />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     await waitFor(() => {
       expect(screen.getByText('Hide')).toBeInTheDocument();
     });
   });
+
   describe('advanced filtering menu', () => {
     it('by default, advanced filtering menu is shown', async () => {
       render(
         <MockAllProviders>
-          <WeeksFilter {...defaultProps} />
+          <DateRangeProvider>
+            <WeeksFilter {...defaultProps} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -58,32 +65,30 @@ describe('component WeeksFilter', () => {
         ).toBeInTheDocument();
       });
     });
-    // Unable to test this PROPERLY, these items are always in the document, just not displayed when advancedFilteringMenu is false.
-    // This is so that the css transition is smooth, otherwise it would snap open/closed
 
     it('when advancedFilteringMenu is false, advanced filtering menu is hidden', async () => {
       render(
         <MockAllProviders>
-          <WeeksFilter {...defaultProps} advancedFilteringMenu={false} />
+          <DateRangeProvider>
+            <WeeksFilter {...defaultProps} advancedFilteringMenu={false} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {
         expect(screen.getByText('More Filters')).toBeInTheDocument();
-        // expect(
-        //   screen.queryByText(/Exclude Students Without Coaches:/),
-        // ).toBeNull();
-        // expect(screen.queryByText(/Exclude Weeks on Hold:/)).toBeNull();
-        // expect(screen.queryByText(/Filter Records By Completion:/)).toBeNull();
       });
     });
+
     it('clicking "Hide" calls toggleAdvancedFilteringMenu', async () => {
       const toggleAdvancedFilteringMenu = vi.fn();
       render(
         <MockAllProviders>
-          <WeeksFilter
-            {...defaultProps}
-            toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
-          />
+          <DateRangeProvider>
+            <WeeksFilter
+              {...defaultProps}
+              toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
+            />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -91,14 +96,17 @@ describe('component WeeksFilter', () => {
       });
       expect(toggleAdvancedFilteringMenu).toHaveBeenCalled();
     });
+
     it('clicking More Filters calls toggleAdvancedFilteringMenu', async () => {
       const toggleAdvancedFilteringMenu = vi.fn();
       render(
         <MockAllProviders>
-          <WeeksFilter
-            {...defaultProps}
-            toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
-          />
+          <DateRangeProvider>
+            <WeeksFilter
+              {...defaultProps}
+              toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
+            />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -116,7 +124,6 @@ describe('component WeeksFilter', () => {
         value: 'allRecords',
         onChange: 'updateFilterByCompletion',
       },
-      //Missing search bar
     ];
     const toggles = [
       {
@@ -132,15 +139,18 @@ describe('component WeeksFilter', () => {
         valueLabel: 'filterHoldWeeks',
       },
     ];
+
     dropdowns.forEach((dropdown) => {
       it(`when dropdown ${dropdown.labelText} value changed to ${dropdown.value}`, async () => {
         const onChange = vi.fn();
         const { getByLabelText } = render(
           <MockAllProviders>
-            <WeeksFilter
-              {...defaultProps}
-              {...{ [dropdown.onChange]: onChange }}
-            />
+            <DateRangeProvider>
+              <WeeksFilter
+                {...defaultProps}
+                {...{ [dropdown.onChange]: onChange }}
+              />
+            </DateRangeProvider>
           </MockAllProviders>,
         );
         await waitFor(() => {
@@ -157,11 +167,13 @@ describe('component WeeksFilter', () => {
         const onChange = vi.fn();
         const { getByAltText } = render(
           <MockAllProviders>
-            <WeeksFilter
-              {...defaultProps}
-              {...{ [toggle.valueLabel]: true }}
-              {...{ [toggle.onChange]: onChange }}
-            />
+            <DateRangeProvider>
+              <WeeksFilter
+                {...defaultProps}
+                {...{ [toggle.valueLabel]: true }}
+                {...{ [toggle.onChange]: onChange }}
+              />
+            </DateRangeProvider>
           </MockAllProviders>,
         );
         await waitFor(() => {
@@ -170,6 +182,7 @@ describe('component WeeksFilter', () => {
         expect(onChange).toHaveBeenCalledWith(toggle.value);
       });
     });
+
     describe('weeks Ago Filter calls onChange function with correct values', () => {
       const values = [0, 1, 2, -1];
       values.forEach((value) => {
@@ -177,10 +190,12 @@ describe('component WeeksFilter', () => {
           const updateWeeksAgoFilter = vi.fn();
           const { getByLabelText } = render(
             <MockAllProviders>
-              <WeeksFilter
-                {...defaultProps}
-                updateWeeksAgoFilter={updateWeeksAgoFilter}
-              />
+              <DateRangeProvider>
+                <WeeksFilter
+                  {...defaultProps}
+                  updateWeeksAgoFilter={updateWeeksAgoFilter}
+                />
+              </DateRangeProvider>
             </MockAllProviders>,
           );
           await waitFor(() => {
@@ -200,10 +215,12 @@ describe('component WeeksFilter', () => {
           const updateFilterByCompletion = vi.fn();
           const { getByLabelText } = render(
             <MockAllProviders>
-              <WeeksFilter
-                {...defaultProps}
-                updateFilterByCompletion={updateFilterByCompletion}
-              />
+              <DateRangeProvider>
+                <WeeksFilter
+                  {...defaultProps}
+                  updateFilterByCompletion={updateFilterByCompletion}
+                />
+              </DateRangeProvider>
             </MockAllProviders>,
           );
           await waitFor(() => {

@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import type {
   Assignment,
   Coach,
@@ -11,9 +10,9 @@ import type {
   Week,
 } from 'src/types/CoachingTypes';
 
+import getDateRange from 'src/components/Coaching/general/functions/dateRange';
 import fakePeople from '../fakePeople.json' assert { type: 'json' };
-
-import { formatDateLikeQB, makeDateRange } from './functions';
+import { formatDateLikeQB } from './functions';
 import generateStudentList from './generateActiveStudentsList';
 import generateAssignment from './generateAssignment';
 import generateGroupAttendee from './generateAttendee';
@@ -40,21 +39,6 @@ function getDateOneMonthAfter(date: Date) {
   const oneMonthAfter = new Date(date);
   oneMonthAfter.setMonth(oneMonthAfter.getMonth() + 1);
   return formatDateLikeQB(oneMonthAfter);
-}
-
-function generateDates() {
-  const dates = makeDateRange();
-
-  const thisWeek = formatDateLikeQB(new Date(dates.thisWeek));
-  const lastWeek = formatDateLikeQB(new Date(dates.lastWeek));
-  const twoWeeksAgo = formatDateLikeQB(new Date(dates.twoWeeksAgo));
-  const upcomingWeek = formatDateLikeQB(new Date(dates.upcomingWeek));
-  return {
-    thisWeek,
-    lastWeek,
-    twoWeeksAgo,
-    upcomingWeek,
-  };
 }
 /* ------------------ Mock Data ------------------ */
 
@@ -225,211 +209,92 @@ function main() {
   const groupSessions: GroupSession[] = [];
   const groupAttendees: GroupAttendees[] = [];
 
-  //
-  const { thisWeek, lastWeek, twoWeeksAgo, upcomingWeek } = generateDates();
+  const { thisWeekDate, lastSundayDate, twoSundaysAgoDate } = getDateRange(3);
 
+  // Generate memberships for all students
   for (let i = 0; i < studentList.length; i++) {
-    /*
-      IMPORTANT
-      - missing from this generate function, is the attribute: 'lastRecordedWeekStarts'. will need to be added after the week is generated
-    */
     memberships.push(
       generateMembership({
-        startDate: getDateOneMonthAgo(new Date(thisWeek)),
-        endDate: getDateOneMonthAfter(new Date(thisWeek)),
-        relatedCourseId: courseList[i % studentList.length].recordId,
+        startDate: getDateOneMonthAgo(new Date(thisWeekDate)),
+        endDate: getDateOneMonthAfter(new Date(thisWeekDate)),
+        relatedCourseId: courseList[i % courseList.length].recordId,
         relatedStudentId: studentList[i].recordId,
       }),
     );
   }
 
-  /*
-  params for generateWeekAndRelatedRecords:
-  {
-    coach: Coach;
-    membership: Membership;
-    student: Student;
-    course: Course;
-    weekStarts: string;
-    holdWeek: boolean;
-    recordsComplete: boolean;
-  
-    numberOfAssignments: number;
-    numberOfCalls: number;
-    numberOfGroupSessions: number;
-  }
-  */
-  /*
-  weeks 
-  - 1 week with assignments, hold week false, (record complete true) ('last' week)
-  - 1 week with calls, hold week false, (record complete true) ('last' week)
-  - 1 week with group sessions, hold week false, (record complete true) ('last' week)
-  - no assignments,calls, or group sessions, hold week true, (record complete false) ('last')
-  - no assignments,calls, or group sessions, hold week false, (record complete false) ('last')
-  - no assignments,calls, or group sessions, hold week false, (record complete true) ('two weeks ago')
-  - no assignments,calls, or group sessions, hold week false, (record complete true) ('this week')
-  */
-
-  // Params for generateWeekAndRelatedRecords
-  const courseWithCalls = courseList.find(
-    (course) => course.weeklyPrivateCalls > 0,
-  )!;
-  const courseWithCallsMembership = memberships.find(
-    (membership) => membership.relatedCourse === courseWithCalls.recordId,
-  )!;
-  const courseWithGroupSessions = courseList.find(
-    (course) => course.hasGroupCalls,
-  )!;
-  const courseWithGroupSessionsMembership = memberships.find(
-    (membership) =>
-      membership.relatedCourse === courseWithGroupSessions.recordId,
-  )!;
-
-  // 1 week with assignments, hold week false, (record complete true) ('last' week)
-  const params1 = {
-    membership: memberships[0],
-    student: studentList.find(
-      (student) => student.recordId === memberships[0].relatedStudent,
-    )!,
-    course: courseList.find(
-      (course) => course.recordId === memberships[0].relatedCourse,
-    )!,
-    coach: coachList[0 % coachList.length],
-    weekStarts: lastWeek,
-    holdWeek: false,
-    recordsComplete: true,
-    numberOfAssignments: 1,
-    numberOfCalls: 0,
-    numberOfGroupSessions: 0,
-  };
-  // 1 week with calls, hold week false, (record complete true) ('last' week)
-  const params2 = {
-    membership: courseWithCallsMembership,
-    student: studentList.find(
-      (student) =>
-        student.recordId === courseWithCallsMembership.relatedStudent,
-    )!,
-    course: courseWithCalls!,
-    coach: coachList[1 % coachList.length],
-    weekStarts: lastWeek,
-    holdWeek: false,
-    recordsComplete: true,
-    numberOfAssignments: 0,
-    numberOfCalls: 1,
-    numberOfGroupSessions: 0,
-  };
-  // 1 week with group sessions, hold week false, (record complete true) ('last' week)
-  const params3 = {
-    membership: courseWithGroupSessionsMembership,
-    student: studentList.find(
-      (student) =>
-        student.recordId === courseWithGroupSessionsMembership.relatedStudent,
-    )!,
-    course: courseWithGroupSessions,
-    coach: coachList[2 % coachList.length],
-    weekStarts: lastWeek,
-    holdWeek: false,
-    recordsComplete: true,
-    numberOfAssignments: 0,
-    numberOfCalls: 0,
-    numberOfGroupSessions: 1,
-  };
-  // no assignments,calls, or group sessions, hold week true, (record complete false) ('last')
-  const params4 = {
-    membership: memberships[2 % memberships.length],
-    student: studentList.find(
-      (student) =>
-        student.recordId === memberships[2 % memberships.length].relatedStudent,
-    )!,
-    course: courseList.find(
-      (course) =>
-        course.recordId === memberships[2 % memberships.length].relatedCourse,
-    )!,
-    coach: coachList[3 % coachList.length],
-    weekStarts: lastWeek,
-    holdWeek: true,
-    recordsComplete: false,
-    numberOfAssignments: 0,
-    numberOfCalls: 0,
-    numberOfGroupSessions: 0,
-  };
-  // no assignments,calls, or group sessions, hold week false, (record complete false) ('last')
-  const params5 = {
-    membership: memberships[3 % memberships.length],
-    student: studentList.find(
-      (student) =>
-        student.recordId === memberships[3 % memberships.length].relatedStudent,
-    )!,
-    course: courseList.find(
-      (course) =>
-        course.recordId === memberships[3 % memberships.length].relatedCourse,
-    )!,
-    coach: coachList[4 % coachList.length],
-    weekStarts: lastWeek,
-    holdWeek: false,
-    recordsComplete: false,
-    numberOfAssignments: 0,
-    numberOfCalls: 0,
-    numberOfGroupSessions: 0,
-  };
-  // no assignments,calls, or group sessions, hold week false, (record complete true) ('two weeks ago')
-  const params6 = {
-    membership: memberships[4 % memberships.length],
-    student: studentList.find(
-      (student) =>
-        student.recordId === memberships[4 % memberships.length].relatedStudent,
-    )!,
-    course: courseList.find(
-      (course) =>
-        course.recordId === memberships[4 % memberships.length].relatedCourse,
-    )!,
-    coach: coachList[5 % coachList.length],
-    weekStarts: twoWeeksAgo,
-    holdWeek: false,
-    recordsComplete: false,
-    numberOfAssignments: 0,
-    numberOfCalls: 0,
-    numberOfGroupSessions: 0,
-  };
-  // no assignments,calls, or group sessions, hold week false, (record complete true) ('this week')
-  const params7 = {
-    membership: memberships[5 % memberships.length],
-    student: studentList.find(
-      (student) =>
-        student.recordId === memberships[5 % memberships.length].relatedStudent,
-    )!,
-    course: courseList.find(
-      (course) =>
-        course.recordId === memberships[5 % memberships.length].relatedCourse,
-    )!,
-    coach: coachList[6 % coachList.length],
-    weekStarts: thisWeek,
-    holdWeek: false,
-    recordsComplete: false,
-    numberOfAssignments: 0,
-    numberOfCalls: 0,
-    numberOfGroupSessions: 0,
+  // Helper function to get course and membership for a specific student
+  const getStudentCourseAndMembership = (studentIndex: number) => {
+    const membership = memberships[studentIndex % memberships.length];
+    return {
+      membership,
+      student: studentList.find(
+        (student) => student.recordId === membership.relatedStudent,
+      )!,
+      course: courseList.find(
+        (course) => course.recordId === membership.relatedCourse,
+      )!,
+      coach: coachList[studentIndex % coachList.length],
+    };
   };
 
-  const paramsList = [
-    params1,
-    params2,
-    params3,
-    params4,
-    params5,
-    params6,
-    params7,
+  // Helper function to generate week parameters
+  const generateWeekParams = (
+    weekStarts: string,
+    studentIndex: number,
+    options: {
+      numberOfAssignments?: number;
+      numberOfCalls?: number;
+      numberOfGroupSessions?: number;
+      holdWeek: boolean;
+      recordsComplete: boolean;
+    },
+  ) => {
+    const { membership, student, course, coach } =
+      getStudentCourseAndMembership(studentIndex);
+    return {
+      membership,
+      student,
+      course,
+      coach,
+      weekStarts,
+      holdWeek: options.holdWeek,
+      recordsComplete: options.recordsComplete,
+      numberOfAssignments: options.numberOfAssignments || 0,
+      numberOfCalls: options.numberOfCalls || 0,
+      numberOfGroupSessions: options.numberOfGroupSessions || 0,
+    };
+  };
+
+  // Generate weeks for each start date with all test cases
+  const weekStartDates = [twoSundaysAgoDate, lastSundayDate, thisWeekDate];
+  const testCases = [
+    // Case 1: 1 assignment, hold week false, record complete true
+    { numberOfAssignments: 1, holdWeek: false, recordsComplete: true },
+    // Case 2: 1 call, hold week false, record complete true
+    { numberOfCalls: 1, holdWeek: false, recordsComplete: true },
+    // Case 3: 1 group session, hold week false, record complete true
+    { numberOfGroupSessions: 1, holdWeek: false, recordsComplete: true },
+    // Case 4: hold week true, record complete false
+    { holdWeek: true, recordsComplete: false },
+    // Case 5: hold week false, record complete false
+    { holdWeek: false, recordsComplete: false },
   ];
 
-  for (let i = 0; i < paramsList.length; i++) {
-    const results = generateWeekAndRelatedRecords(paramsList[i]);
+  // Generate weeks for each combination of start date and test case
+  weekStartDates.forEach((startDate, dateIndex) => {
+    testCases.forEach((testCase, caseIndex) => {
+      const studentIndex = dateIndex * testCases.length + caseIndex;
+      const params = generateWeekParams(startDate, studentIndex, testCase);
+      const results = generateWeekAndRelatedRecords(params);
 
-    weeks.push(results.week);
-    assignments.push(...results.assignments);
-    calls.push(...results.calls);
-    groupSessions.push(...results.groupSessions);
-    groupAttendees.push(...results.groupAttendees);
-  }
+      weeks.push(results.week);
+      assignments.push(...results.assignments);
+      calls.push(...results.calls);
+      groupSessions.push(...results.groupSessions);
+      groupAttendees.push(...results.groupAttendees);
+    });
+  });
 
   return {
     courseList,

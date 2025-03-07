@@ -3,23 +3,23 @@ import { describe, it } from 'vitest';
 import getDateRange from './dateRange';
 
 const returnedAttributes = [
-  'dayOfWeek',
+  'dayOfWeekString',
   'nextWeekDate',
   'thisWeekDate',
   'lastSundayDate',
   'twoSundaysAgoDate',
 ];
+
 describe('function getDateRange', () => {
   it('returns an object with the correct keys', () => {
-    const dateRange = getDateRange();
+    const dateRange = getDateRange(3);
     returnedAttributes.forEach((attribute) => {
       expect(dateRange).toHaveProperty(attribute);
     });
   });
+
   it('returns an object with the correct values', () => {
-    // This feels like a really stupid test, this is literally just the logic in the function, copied and pasted
-    // But I do think we want some way to verify that the dates are correct, so I'm going to leave it in for now
-    const dateRange = getDateRange();
+    const dateRange = getDateRange(3);
     const nowString = Date.now();
     const now = new Date(nowString);
     const dayOfWeek = now.getDay();
@@ -32,7 +32,8 @@ describe('function getDateRange', () => {
     const thisPastSunday = new Date(thisPastSundayString);
     const lastSunday = new Date(lastSundayString);
     const twoSundaysAgo = new Date(twoSundaysAgoString);
-    expect(dateRange.dayOfWeek).toBe(dayOfWeek);
+
+    expect(dateRange.dayOfWeekString).toBe(dayOfWeek.toString());
     expect(dateRange.nextWeekDate).toBe(nextSunday.toISOString().split('T')[0]);
     expect(dateRange.thisWeekDate).toBe(
       thisPastSunday.toISOString().split('T')[0],
@@ -43,5 +44,10 @@ describe('function getDateRange', () => {
     expect(dateRange.twoSundaysAgoDate).toBe(
       twoSundaysAgo.toISOString().split('T')[0],
     );
+  });
+
+  it('handles different dayOfWeek parameters correctly', () => {
+    const dateRange = getDateRange(5); // Testing with a different day of week
+    expect(dateRange.dayOfWeekString).toBe('5');
   });
 });
