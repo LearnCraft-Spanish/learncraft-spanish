@@ -1,9 +1,10 @@
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
-
 import ExampleCreator from 'src/components/ExampleCreator/ExampleCreator';
+
 import ExampleEditor from 'src/components/ExampleEditor/ExampleEditor';
 import FlashcardFinder from 'src/components/FlashcardFinder';
+import StudentDeepDive from 'src/components/StudentDeepDive/StudentDeepDive';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
@@ -86,6 +87,15 @@ export default function AppRoutes() {
           (userDataQuery.data?.roles.adminRole === 'coach' ||
             userDataQuery.data?.roles.adminRole === 'admin') && (
             <WeeksRecordsSection />
+          )
+        }
+      />
+      <Route
+        path="/student-deep-dive"
+        element={
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <StudentDeepDive />
           )
         }
       />

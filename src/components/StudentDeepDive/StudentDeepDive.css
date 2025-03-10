@@ -1,0 +1,370 @@
+.student-deep-dive {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.student-deep-dive h1 {
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.student-deep-dive .content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.student-selection-section {
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.student-selection-section h2 {
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.student-deep-dive-search {
+  position: relative;
+}
+
+.search-input-wrapper {
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.selected-student-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: #f5f5f5;
+}
+
+.clear-student-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: #666;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear-student-button:hover {
+  color: #333;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  padding: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+  background-color: #f0f0f0;
+}
+
+.search-result-item.selected {
+  background-color: #e3f2fd;
+}
+
+.student-details-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.student-details-section h2 {
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.student-info-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #666;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.info-value {
+  color: #333;
+  flex-grow: 1;
+}
+
+.student-memberships {
+  margin-top: 30px;
+}
+
+.student-memberships h3 {
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.memberships-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.membership-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.membership-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.membership-header h4 {
+  margin: 0;
+  color: #333;
+}
+
+.membership-status {
+  display: flex;
+  gap: 8px;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status.active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status.on-hold {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.status.inactive {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.membership-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.detail-row .label {
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-row .value {
+  color: #333;
+}
+
+.view-weeks-button {
+  width: 100%;
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 8px;
+}
+
+.view-weeks-button:hover {
+  background-color: #e0e0e0;
+  border-color: #ccc;
+}
+
+.view-weeks-button:active {
+  background-color: #d0d0d0;
+}
+
+.membership-weeks {
+  margin-top: 30px;
+}
+
+.membership-weeks h3 {
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.weeks-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.week-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.week-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.week-header h4 {
+  margin: 0;
+  color: #333;
+}
+
+.week-date {
+  color: #666;
+  font-size: 14px;
+}
+
+.week-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-value {
+  color: #333;
+  font-weight: 600;
+}
+
+.week-notes {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.notes-label {
+  display: block;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.notes-content {
+  color: #333;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.week-assignments {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+}
+
+.assignments-label {
+  display: block;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.assignments-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.assignment-item {
+  color: #333;
+  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.assignment-item:last-child {
+  border-bottom: none;
+}

@@ -336,6 +336,23 @@ export function useBackend() {
     return getFactory('coaching/active-memberships');
   }, [getFactory]);
 
+  const getStudentMemberships = useCallback(
+    (studentId: number): Promise<StudentRecordsTypes.Membership[]> => {
+      return getFactory(`coaching/student-memberships/${studentId}`);
+    },
+    [getFactory],
+  );
+
+  // const getMemberships = useCallback((): Promise<
+  //   StudentRecordsTypes.Membership[]
+  // > => {
+  //   return getFactory('coaching/memberships');
+  // }, [getFactory]);
+
+  // const getWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
+  //   return getFactory('coaching/weeks');
+  // }, [getFactory]);
+
   // const getGroupAttendees = useCallback((): Promise<
   //   StudentRecordsTypes.GroupAttendees[]
   // > => {
@@ -517,6 +534,9 @@ export function useBackend() {
     getLessonList,
     getLessonsFromBackend,
     getMyExamplesFromBackend,
+
+    getStudentMemberships,
+
     getPMFDataForUser,
     getProgramsFromBackend,
     getQuizExamplesFromBackend,

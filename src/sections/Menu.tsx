@@ -126,6 +126,11 @@ export default function Menu() {
                   Weekly Records Interface
                 </Link>
               </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/student-deep-dive">
+                  Student Deep Dive
+                </Link>
+              </div>
               {userDataQuery.data.roles.adminRole === 'admin' && (
                 <>
                   <div className="buttonBox">
