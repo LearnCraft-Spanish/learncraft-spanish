@@ -4,6 +4,7 @@ import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentR
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { describe, expect, it } from 'vitest';
+import { DateRangeProvider } from '../DateRangeProvider';
 import PrivateCallsCell from './PrivateCallsCell';
 
 // const week = mockData.calls.find((call) => call.rating > 0);
@@ -25,7 +26,9 @@ describe('component StudentCell', () => {
   it('default view renders without crashing', async () => {
     render(
       <MockAllProviders>
-        <PrivateCallsCell week={week} calls={[call]} />
+        <DateRangeProvider>
+          <PrivateCallsCell week={week} calls={[call]} />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     await waitFor(() => {
@@ -36,7 +39,9 @@ describe('component StudentCell', () => {
     it('contextual menu view renders without crashing', async () => {
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} calls={[call]} />
+          <DateRangeProvider>
+            <PrivateCallsCell week={week} calls={[call]} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -55,7 +60,9 @@ describe('component StudentCell', () => {
       const requiredFields = ['Rating:', 'Notes:', 'Difficulties:'];
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} calls={[call]} />
+          <DateRangeProvider>
+            <PrivateCallsCell week={week} calls={[call]} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {
@@ -78,7 +85,9 @@ describe('component StudentCell', () => {
       }
       render(
         <MockAllProviders>
-          <PrivateCallsCell week={week} calls={[call]} />
+          <DateRangeProvider>
+            <PrivateCallsCell week={week} calls={[call]} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {

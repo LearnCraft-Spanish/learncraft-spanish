@@ -1,18 +1,22 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import { useBackend, useBackendHelpers } from '../useBackend';
-import { useUserData } from '../UserData/useUserData';
+import { useBackendHelpers } from '../../useBackend';
+import { useUserData } from '../../UserData/useUserData';
+import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
-export default function usePrivateCalls() {
+export default function usePrivateCalls(
+  startDate: string | undefined,
+  endDate: string | undefined,
+) {
   const userDataQuery = useUserData();
-  const backend = useBackend();
+  const { getPrivateCalls } = useStudentRecordsBackend();
   const { newPostFactory, newPutFactory, newDeleteFactory } =
     useBackendHelpers();
 
   const privateCallsQuery = useQuery({
-    queryKey: ['privateCalls'],
-    queryFn: backend.getPrivateCalls,
+    queryKey: ['privateCalls', { startDate, endDate }],
+    queryFn: getPrivateCalls,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||

@@ -1,8 +1,7 @@
-import type { Call, Week } from 'src/types/CoachingTypes';
+import type { PrivateCall, Week } from 'src/types/CoachingTypes';
 import React, { useState } from 'react';
 import ContextualControls from 'src/components/ContextualControls';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import usePrivateCalls from 'src/hooks/CoachingData/usePrivateCalls';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
@@ -30,7 +29,7 @@ const ratingOptions = [
   'No-Show',
 ];
 const callTypeOptions = ['Monthly Call', 'Uses Credit (Bundle)'];
-function PrivateCall({ call }: { call: Call }) {
+function PrivateCallInstance({ call }: { call: PrivateCall }) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
@@ -46,14 +45,17 @@ function PrivateCall({ call }: { call: Call }) {
   );
 }
 
-function PrivateCallView({ call }: { call: Call }) {
+function PrivateCallView({ call }: { call: PrivateCall }) {
   const userDataQuery = useUserData();
   const { setContextualRef, updateDisableClickOutside, closeContextual } =
     useContextualMenu();
-  const { getStudentFromMembershipId, getMembershipFromWeekRecordId } =
-    useCoaching();
-  const { updatePrivateCallMutation, deletePrivateCallMutation } =
-    usePrivateCalls();
+  const {
+    getStudentFromMembershipId,
+    getMembershipFromWeekRecordId,
+    updatePrivateCallMutation,
+    deletePrivateCallMutation,
+  } = useCoaching();
+
   const { openModal, closeModal } = useModal();
 
   const [editMode, setEditMode] = useState(false);
@@ -256,13 +258,13 @@ export default function PrivateCallsCell({
   calls,
 }: {
   week: Week;
-  calls: Call[] | null;
+  calls: PrivateCall[] | null;
 }) {
-  const { getStudentFromMembershipId } = useCoaching();
+  const { getStudentFromMembershipId, createPrivateCallMutation } =
+    useCoaching();
   const { contextual, setContextualRef, openContextual, closeContextual } =
     useContextualMenu();
   const userDataQuery = useUserData();
-  const { createPrivateCallMutation } = usePrivateCalls();
   const { openModal } = useModal();
 
   // New Record Inputs
@@ -324,7 +326,9 @@ export default function PrivateCallsCell({
     <div className="callBox">
       {/* Existing Calls */}
       {calls &&
-        calls.map((call) => <PrivateCall key={call.recordId} call={call} />)}
+        calls.map((call) => (
+          <PrivateCallInstance key={call.recordId} call={call} />
+        ))}
       {/* New Call Form */}
       <button
         type="button"

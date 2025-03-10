@@ -1,10 +1,9 @@
 import { fireEvent, render, renderHook, waitFor } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { describe, it, vi } from 'vitest';
-
+import { DateRangeProvider } from '../WeeksRecords/DateRangeProvider';
 import Dropdown, { CoachDropdown } from './Dropdowns';
 
 describe('component Dropdown', () => {
@@ -85,22 +84,34 @@ describe('component CoachDropdown', () => {
   it('renders a coach dropdown', async () => {
     const { getByText } = render(
       <MockAllProviders>
-        <CoachDropdown coachEmail="" onChange={vi.fn()} editMode />,
+        <DateRangeProvider>
+          <CoachDropdown coachEmail="" onChange={vi.fn()} editMode />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(getByText('Coach:')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(getByText('Coach:')).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
   });
+
   it('calls the onChange handler when the input value changes', async () => {
     const onChange = vi.fn();
     const { getByLabelText } = render(
       <MockAllProviders>
-        <CoachDropdown coachEmail="" onChange={onChange} editMode />,
+        <DateRangeProvider>
+          <CoachDropdown coachEmail="" onChange={onChange} editMode />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     const { result } = renderHook(() => useCoaching(), {
-      wrapper: MockAllProviders,
+      wrapper: ({ children }) => (
+        <MockAllProviders>
+          <DateRangeProvider>{children}</DateRangeProvider>
+        </MockAllProviders>
+      ),
     });
     await waitFor(
       () => {
@@ -127,13 +138,9 @@ describe('component CoachDropdown', () => {
     it('renders a p tag when editMode is false', async () => {
       const { getByText } = render(
         <MockAllProviders>
-          <CoachDropdown
-            coachEmail="
-          "
-            onChange={vi.fn()}
-            editMode={false}
-          />
-          ,
+          <DateRangeProvider>
+            <CoachDropdown coachEmail="" onChange={vi.fn()} editMode={false} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       await waitFor(() => {

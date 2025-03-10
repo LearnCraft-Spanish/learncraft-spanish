@@ -1,16 +1,22 @@
 import type { Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Pagination from 'src/components/FlashcardFinder/Pagination';
-import QuantifiedRecords from '../quantifyingRecords';
+import LoadingMessage from 'src/components/Loading';
 
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import QuantifiedRecords from '../quantifyingRecords';
 import WeeksTableItem from './WeeksTableItem';
+
 interface NewTableProps {
   weeks: Week[] | undefined;
 }
 export default function WeeksTable({ weeks }: NewTableProps) {
+  const { weeksQuery } = useCoaching();
+
+  const isLoading = weeksQuery.isLoading;
+
   const [page, setPage] = useState(1);
   const itemsPerPage = 20;
-
   const maxPage = Math.ceil(weeks ? weeks.length / itemsPerPage : 0);
 
   const displayOrderSegment = useMemo(() => {
@@ -39,17 +45,18 @@ export default function WeeksTable({ weeks }: NewTableProps) {
     }
   }, [page, weeks]);
   return (
-    weeks && (
+    weeks &&
+    (isLoading ? (
+      <LoadingMessage message={'Retrieving records data...'} />
+    ) : (
       <>
         <div className="numberShowing">
-          {/* THIS NEEDS TO HAVE A CASE FOR 0 EXAMPLES */}
           <QuantifiedRecords
             currentPage={page}
             totalRecords={weeks.length}
             recordsPerPage={itemsPerPage}
           />
         </div>
-        {/* WARNING: this does not update approcatly when on page 2, and we update filters to get <50 records! */}
         <Pagination
           page={page}
           maxPage={maxPage}
@@ -80,6 +87,6 @@ export default function WeeksTable({ weeks }: NewTableProps) {
           </table>
         </div>
       </>
-    )
+    ))
   );
 }

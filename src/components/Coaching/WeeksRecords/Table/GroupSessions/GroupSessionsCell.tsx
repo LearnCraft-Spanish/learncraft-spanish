@@ -1,13 +1,20 @@
 import type { GroupSession, Week } from 'src/types/CoachingTypes';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import getDateRange from 'src/components/Coaching/general/functions/dateRange';
+import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
+import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
 import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
 import ContextualControls from 'src/components/ContextualControls';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import * as helpers from 'src/hooks/CoachingData/helperFunctions';
 
-import useGroupAttendees from 'src/hooks/CoachingData/useGroupAttendees';
-import useGroupSessions from 'src/hooks/CoachingData/useGroupSessions';
+import {
+  useActiveMemberships,
+  useActiveStudents,
+  useCoachList,
+  useGroupSessions,
+  useWeeks,
+} from 'src/hooks/CoachingData/queries';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
@@ -97,26 +104,48 @@ export function GroupSessionView({
 
   const {
     getAttendeesFromGroupSessionId,
-    coachListQuery,
-    weeksQuery,
-    getStudentFromMembershipId,
-    getMembershipFromWeekRecordId,
-  } = useCoaching();
-  const {
-    groupSessionsTopicFieldOptionsQuery,
     createGroupSessionMutation,
     updateGroupSessionMutation,
     deleteGroupSessionMutation,
-  } = useGroupSessions();
+    createGroupAttendeesMutation,
+    deleteGroupAttendeesMutation,
+  } = useCoaching();
+  const [date, setDate] = useState<string>(
+    newRecord
+      ? new Date().toISOString().split('T')[0]
+      : typeof groupSession.date === 'string'
+        ? groupSession.date
+        : new Date(groupSession.date).toISOString().split('T')[0],
+  );
 
-  const { createGroupAttendeesMutation, deleteGroupAttendeesMutation } =
-    useGroupAttendees();
+  const relatedWeekStarts = useMemo(() => {
+    const selectedDate = new Date(date);
+    const day = selectedDate.getUTCDay(); // 0 = Sunday, 1 = Monday, etc.
+    const weekStart = new Date(selectedDate);
+    weekStart.setDate(selectedDate.getDate() - day); // Go back to previous Sunday
+    return weekStart.toISOString().split('T')[0];
+  }, [date]);
 
-  const dateRange = getDateRange();
+  const { coachListQuery } = useCoachList();
+  const { activeMembershipsQuery } = useActiveMemberships();
+  const { activeStudentsQuery } = useActiveStudents();
+  const { weeksQuery } = useWeeks(
+    relatedWeekStarts,
+    getWeekEnds(relatedWeekStarts),
+  );
+  const { groupSessionsTopicFieldOptionsQuery } = useGroupSessions(
+    relatedWeekStarts,
+    getWeekEnds(relatedWeekStarts),
+  );
 
   // Rendering
   const dataReady =
-    coachListQuery.isSuccess && groupSessionsTopicFieldOptionsQuery.isSuccess;
+    coachListQuery.isSuccess &&
+    groupSessionsTopicFieldOptionsQuery.isSuccess &&
+    activeMembershipsQuery.isSuccess &&
+    activeStudentsQuery.isSuccess &&
+    weeksQuery.isSuccess;
+
   const rendered = useRef(false);
 
   // State management
@@ -127,16 +156,11 @@ export function GroupSessionView({
   );
 
   const [sessionType, setSessionType] = useState<string>('');
-  const [date, setDate] = useState<string>(
-    new Date().toISOString().split('T')[0],
-  );
   const [coach, setCoach] = useState<string>('');
   const [topic, setTopic] = useState<string>('');
   const [comments, setComments] = useState<string>('');
   const [callDocument, setCallDocument] = useState<string>('');
   const [zoomLink, setZoomLink] = useState<string>('');
-
-  const [addingAttendee, setAddingAttendee] = useState<string>('');
 
   interface attendeeChangesObj {
     name: string;
@@ -145,38 +169,15 @@ export function GroupSessionView({
   }
   const [attendees, setAttendees] = useState<attendeeChangesObj[]>([]);
 
-  const relatedWeekStarts = useMemo(() => {
-    const dateFormatted = new Date(date).getTime();
-    const nextSunday = new Date(dateRange.nextWeekDate).getTime();
-    const thisPastSunday = new Date(dateRange.thisWeekDate).getTime();
-    const lastSunday = new Date(dateRange.lastSundayDate).getTime();
-    const twoSundaysAgo = new Date(dateRange.twoSundaysAgoDate).getTime();
-    // get the weekStarts of the week that the date is in
-
-    if (dateFormatted >= thisPastSunday && dateFormatted < nextSunday) {
-      return dateRange.thisWeekDate;
-    } else if (dateFormatted >= lastSunday && dateFormatted < thisPastSunday) {
-      return dateRange.lastSundayDate;
-    } else if (dateFormatted >= twoSundaysAgo && dateFormatted < lastSunday) {
-      return dateRange.twoSundaysAgoDate;
-    } else if (dateFormatted >= nextSunday) {
-      return dateRange.nextWeekDate;
-    } else {
-      console.error('Invalid date:', date);
-      return '';
-    }
-  }, [date, dateRange]);
-
   // Edit or Update State
   const setInitialState = useCallback(() => {
     setSessionType(newRecord ? '' : groupSession.sessionType);
-    setDate(
-      groupSession.date
-        ? typeof groupSession.date === 'string'
-          ? groupSession.date
-          : new Date(groupSession.date).toISOString().split('T')[0]
-        : new Date().toISOString().split('T')[0],
-    );
+    const formattedDate = groupSession.date
+      ? typeof groupSession.date === 'string'
+        ? groupSession.date
+        : new Date(groupSession.date).toISOString().split('T')[0]
+      : new Date().toISOString().split('T')[0];
+    setDate(formattedDate);
     setCoach(newRecord ? '' : groupSession.coach.email);
     setTopic(newRecord ? '' : groupSession.topic);
     setComments(newRecord ? '' : groupSession.comments);
@@ -186,19 +187,6 @@ export function GroupSessionView({
     setAttendees(() => {
       if (newRecord) {
         return [];
-        // // select student associated with this week record id
-        // const student = getStudentFromMembershipId(week.relatedMembership);
-        // if (!student) {
-        //   console.error('No student found with week recordId:', week.recordId);
-        //   return [];
-        // }
-        // return [
-        //   {
-        //     name: student.fullName,
-        //     relatedWeek: week.recordId,
-        //     action: 'add',
-        //   },
-        // ];
       } else {
         const attendees = getAttendeesFromGroupSessionId(recordId);
         return attendees?.map((attendee) => ({
@@ -209,27 +197,39 @@ export function GroupSessionView({
     });
   }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
 
-  function handleAddAttendee() {
-    if (!addingAttendee) {
-      console.error('No student selected');
-      return;
-    }
-    if (addingAttendee === 'noAttendees') {
+  function handleAddAttendee(weekRecordId: number) {
+    if (weekRecordId === -1) {
       setAttendees([{ name: 'No Attendees', relatedWeek: -1, action: 'add' }]);
-      setAddingAttendee('');
       return;
     }
-    const addingAttendeeWeekRecordId = Number.parseInt(addingAttendee);
-    if (!addingAttendeeWeekRecordId) {
-      console.error('Invalid student selected');
-    }
-    const student = getStudentFromMembershipId(
-      getMembershipFromWeekRecordId(addingAttendeeWeekRecordId)?.recordId,
+
+    // If adding a real attendee, first remove any "No Attendees" entry
+    setAttendees((prev) =>
+      prev.filter((attendee) => attendee.relatedWeek !== -1),
     );
-    if (!student) {
-      console.error('No student found with week recordId:', addingAttendee);
+
+    const membership = helpers.getMembershipFromWeekRecordId(
+      weekRecordId,
+      weeksQuery.data || [],
+      activeMembershipsQuery.data || [],
+    );
+
+    if (!membership) {
+      console.error('No membership found with week recordId:', weekRecordId);
       return;
     }
+
+    const student = helpers.getStudentFromMembershipId(
+      membership.recordId,
+      activeMembershipsQuery.data || [],
+      activeStudentsQuery.data || [],
+    );
+
+    if (!student) {
+      console.error('No student found with membershipId:', membership.recordId);
+      return;
+    }
+
     // if the student is already in the list, don't add it again
     if (attendees.find((attendee) => attendee.name === student.fullName)) {
       if (
@@ -253,11 +253,10 @@ export function GroupSessionView({
       ...prev,
       {
         name: student.fullName,
-        relatedWeek: addingAttendeeWeekRecordId,
+        relatedWeek: weekRecordId,
         action: 'add',
       },
     ]);
-    setAddingAttendee('');
   }
 
   function handleRemoveAttendee(relatedWeek: number | string) {
@@ -508,6 +507,12 @@ export function GroupSessionView({
       disableEditMode();
     }
   }
+  // Clear attendees when week changes
+  useEffect(() => {
+    if (newRecord) {
+      setAttendees([]);
+    }
+  }, [newRecord, relatedWeekStarts]);
 
   useEffect(() => {
     if (dataReady && !rendered.current) {
@@ -515,6 +520,7 @@ export function GroupSessionView({
       rendered.current = true;
     }
   }, [dataReady, sessionType, setInitialState]);
+
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
@@ -584,53 +590,13 @@ export function GroupSessionView({
         />
         {editMode && (
           <div className="lineWrapper">
-            <label className="label" htmlFor="addAttendee">
-              Add Attendees:
-            </label>
-            <select
-              id="attendee"
-              name="attendee"
-              className="content"
-              value={addingAttendee}
-              onChange={(e) => setAddingAttendee(e.target.value)}
-            >
-              <option value="">Select</option>
-              {newRecord && <option value="noAttendees">No Attendees</option>}
-              {weeksQuery.data
-                ?.filter((filterWeek) => {
-                  return (
-                    filterWeek.membershipCourseHasGroupCalls &&
-                    filterWeek.weekStarts === relatedWeekStarts
-                  );
-                })
-                .map((studentWeek) => ({
-                  ...studentWeek,
-                  studentFullName: getStudentFromMembershipId(
-                    studentWeek.relatedMembership,
-                  )?.fullName,
-                }))
-                .sort(
-                  (a, b) =>
-                    a.studentFullName?.localeCompare(b.studentFullName || '') ||
-                    0,
-                )
-                .map((studentWeek) => (
-                  <option
-                    key={studentWeek.recordId}
-                    value={studentWeek.recordId}
-                  >
-                    {studentWeek.studentFullName || 'No Name Found'}
-                    {` - ${studentWeek.weekStarts}`}
-                  </option>
-                ))}
-            </select>
-            <button
-              type="button"
-              className="addButton addAttendee"
-              onClick={() => handleAddAttendee()}
-            >
-              Add Attendee
-            </button>
+            <label className="label">Add Attendees:</label>
+            <div className="content">
+              <CustomGroupAttendeeSelector
+                weekStarts={relatedWeekStarts}
+                onChange={handleAddAttendee}
+              />
+            </div>
           </div>
         )}
         <div className="lineWrapper">
@@ -684,10 +650,9 @@ export default function GroupSessionsCell({
   week: Week;
   groupSessions: GroupSession[] | null;
 }) {
-  const { groupAttendeesQuery, groupSessionsQuery } = useCoaching();
+  const { groupSessionsQuery } = useCoaching();
 
-  const dataReady =
-    groupAttendeesQuery.isSuccess && groupSessionsQuery.isSuccess;
+  const dataReady = groupSessionsQuery.isSuccess;
   return (
     dataReady && (
       <>
