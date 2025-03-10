@@ -4,19 +4,12 @@ import type {
   GroupSession,
   Week,
 } from '../../../types/CoachingTypes';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import LoadingMessage from '../../Loading';
-import getDateRange from '../general/functions/dateRange';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
 import { NewAssignmentView } from './Table/AssignmentsCell';
@@ -46,7 +39,7 @@ consider using a context, to pass in the startDate and endDate to all the querie
 function WeeksRecordsContent() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
-  const { setStartDate, startDate } = useDateRange();
+  const { startDate } = useDateRange();
   const {
     weeksQuery,
     coachListQuery,
@@ -61,8 +54,6 @@ function WeeksRecordsContent() {
     getCourseFromMembershipId,
     getStudentFromMembershipId,
   } = useCoaching();
-  const dateRange = useMemo(() => getDateRange(), []);
-
   // const queryClient = useQueryClient();
 
   // const weeksQuery = useQuery({
@@ -71,10 +62,6 @@ function WeeksRecordsContent() {
   // });
 
   // Filtering state
-  const [advancedFilteringMenu, setAdvancedFilteringMenu] = useState(true);
-  const [filterByWeeksAgo, setFilterByWeeksAgo] = useState(
-    Number.parseInt(dateRange.dayOfWeekString) >= 3 ? 0 : 1,
-  ); // 0 for this week, 1 for last week, 2 for two weeks ago
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
@@ -89,16 +76,16 @@ function WeeksRecordsContent() {
 
   const initialDataLoad =
     rendered.current === false &&
-    userDataQuery.isLoading &&
-    weeksQuery.isLoading &&
-    coachListQuery.isLoading &&
-    courseListQuery.isLoading &&
-    activeMembershipsQuery.isLoading &&
-    activeStudentsQuery.isLoading &&
-    groupSessionsQuery.isLoading &&
-    groupAttendeesQuery.isLoading &&
-    assignmentsQuery.isLoading &&
-    privateCallsQuery.isLoading;
+    (userDataQuery.isLoading ||
+      weeksQuery.isLoading ||
+      coachListQuery.isLoading ||
+      courseListQuery.isLoading ||
+      activeMembershipsQuery.isLoading ||
+      activeStudentsQuery.isLoading ||
+      groupSessionsQuery.isLoading ||
+      groupAttendeesQuery.isLoading ||
+      assignmentsQuery.isLoading ||
+      privateCallsQuery.isLoading);
 
   const dataReady =
     userDataQuery.isSuccess &&
@@ -120,21 +107,6 @@ function WeeksRecordsContent() {
     assignmentsQuery.isError ||
     privateCallsQuery.isError;
 
-  function updateWeeksAgoFilterHandler(weeksAgo: string) {
-    if (weeksAgo === '0' && filterByWeeksAgo !== 0) {
-      setStartDate(dateRange.thisWeekDate);
-    } else if (weeksAgo === '1' && filterByWeeksAgo !== 1) {
-      setStartDate(dateRange.lastSundayDate);
-    } else if (weeksAgo === '2' && filterByWeeksAgo !== 2) {
-      setStartDate(dateRange.twoSundaysAgoDate);
-    }
-    updateWeeksAgoFilter(weeksAgo);
-  }
-
-  function toggleAdvancedFilteringMenu() {
-    setAdvancedFilteringMenu(!advancedFilteringMenu);
-  }
-
   /* ------------------ Update Filter State ------------------ */
   function updateCoachFilter(coachEmail: string) {
     if (!coachListQuery.data) throw new Error('Unable to load coach list');
@@ -149,9 +121,6 @@ function WeeksRecordsContent() {
       (course) => course.name === courseName,
     );
     setFilterByCourse(courseToSet);
-  }
-  function updateWeeksAgoFilter(weeksAgo: string) {
-    setFilterByWeeksAgo(Number.parseInt(weeksAgo));
   }
   function updateFilterHoldWeeks(value: boolean) {
     setFilterByHoldWeeks(value);
@@ -313,7 +282,9 @@ function WeeksRecordsContent() {
 
   return (
     <div className="newCoachingWrapper">
-      {initialDataLoad && <LoadingMessage message={'Loading Coaching Data'} />}
+      {initialDataLoad && (
+        <LoadingMessage message={'Loading Coaching Data...'} />
+      )}
       {dataError && <p>Error loading data</p>}
       {rendered.current && (
         <>
@@ -325,9 +296,6 @@ function WeeksRecordsContent() {
               updateCoachFilter={updateCoachFilter}
               filterByCourse={filterByCourse}
               updateCourseFilter={updateCourseFilter}
-              updateWeeksAgoFilter={updateWeeksAgoFilterHandler}
-              advancedFilteringMenu={advancedFilteringMenu}
-              toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
               searchTerm={filterBySearchTerm || ''}
               updateSearchTerm={updateFilterBySearchTerm}
               filterCoachless={filterByCoachless}
@@ -353,15 +321,7 @@ function WeeksRecordsContent() {
             />
           )}
           {contextual === 'newAssignment' && (
-            <NewAssignmentView
-              weekStartsDefaultValue={
-                filterByWeeksAgo === 0
-                  ? dateRange.thisWeekDate
-                  : filterByWeeksAgo === 1
-                    ? dateRange.lastSundayDate
-                    : dateRange.twoSundaysAgoDate
-              }
-            />
+            <NewAssignmentView weekStartsDefaultValue={startDate} />
           )}
         </>
       )}

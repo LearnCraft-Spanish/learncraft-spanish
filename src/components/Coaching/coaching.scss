@@ -298,36 +298,6 @@ td button {
     }
 
     .advancedFiltersWrapper {
-      display: block;
-      // background-color: antiquewhite;
-      transition: all 0.5s ease-out;
-      height: 0;
-      opacity: 0;
-      // width: 0;
-
-      overflow: hidden;
-    }
-    .moreFilterButton {
-      height: auto;
-      opacity: 1;
-      transition: opacity 0.7s ease-out;
-    }
-    .moreFilterButton.advFilterActive {
-      height: 0;
-      opacity: 0;
-      padding: 0;
-    }
-    .hideFilterButton {
-      height: 0;
-      opacity: 0;
-      background-color: darkred;
-    }
-    .hideFilterButton.advFilterActive {
-      height: auto;
-      opacity: 1;
-      transition: opacity 0.7s ease-out;
-    }
-    .advancedFiltersWrapper.advFilterActive {
       margin: auto;
       margin: 1rem;
       // width: 100%;

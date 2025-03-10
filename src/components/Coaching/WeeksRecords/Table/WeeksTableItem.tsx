@@ -137,9 +137,10 @@ export default function WeeksTableItem({ week }: { week: Week }) {
           )}
         </td>
         <td>
-          {week.membershipCourseWeeklyPrivateCalls > 0 && (
-            <PrivateCallsCell week={week} calls={privateCalls} />
-          )}
+          {week.membershipCourseWeeklyPrivateCalls > 0 ||
+            (privateCalls?.length && privateCalls?.length > 0 && (
+              <PrivateCallsCell week={week} calls={privateCalls} />
+            ))}
         </td>
         <td>
           {editMode ? (

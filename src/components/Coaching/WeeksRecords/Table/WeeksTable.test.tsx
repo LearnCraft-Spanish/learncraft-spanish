@@ -82,7 +82,9 @@ describe('component WeeksTable', () => {
       const groupSession = generatedMockData.groupSessions.find(
         (groupSession) =>
           generatedMockData.groupAttendees.find(
-            (attendee) => attendee.groupSession === groupSession.recordId,
+            (attendee) =>
+              attendee.groupSession === groupSession.recordId &&
+              attendee.student === weekWithGroupSession?.recordId,
           ),
       );
       if (!weekWithGroupSession) {
@@ -107,12 +109,30 @@ describe('component WeeksTable', () => {
   });
   describe('private call cell', () => {
     it('renders with private calls', async () => {
+      const dateRange = getDateRange();
+      const defaultStartDate =
+        Number.parseInt(dateRange.dayOfWeekString) >= 3
+          ? dateRange.thisWeekDate
+          : dateRange.lastSundayDate;
+
+      // Find weeks that fall within the default date range
+      const weeksInRange = generatedMockData.weeks.filter((w) => {
+        const weekDate = new Date(w.weekStarts);
+
+        return (
+          weekDate >= new Date(defaultStartDate) &&
+          weekDate <= new Date(getWeekEnds(defaultStartDate))
+        );
+      });
+
       const weekWithPrivateCall = weeksInRange.find(
         (week) => week.privateCallsCompleted > 0,
       );
+
       const privateCall = generatedMockData.calls.find(
         (call) => call.relatedWeek === weekWithPrivateCall?.recordId,
       );
+
       if (!weekWithPrivateCall) {
         throw new Error(
           'No week with private calls found within the date range',
@@ -128,6 +148,7 @@ describe('component WeeksTable', () => {
           </DateRangeProvider>
         </MockAllProviders>,
       );
+
       await waitFor(() => {
         expect(screen.getByText(privateCall.rating)).toBeInTheDocument();
       });

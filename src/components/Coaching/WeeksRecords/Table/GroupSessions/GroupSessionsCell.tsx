@@ -145,6 +145,7 @@ export function GroupSessionView({
     activeMembershipsQuery.isSuccess &&
     activeStudentsQuery.isSuccess &&
     weeksQuery.isSuccess;
+
   const rendered = useRef(false);
 
   // State management
@@ -506,6 +507,12 @@ export function GroupSessionView({
       disableEditMode();
     }
   }
+  // Clear attendees when week changes
+  useEffect(() => {
+    if (newRecord) {
+      setAttendees([]);
+    }
+  }, [newRecord, relatedWeekStarts]);
 
   useEffect(() => {
     if (dataReady && !rendered.current) {
@@ -513,11 +520,6 @@ export function GroupSessionView({
       rendered.current = true;
     }
   }, [dataReady, sessionType, setInitialState]);
-
-  // Clear attendees when week changes
-  useEffect(() => {
-    setAttendees([]);
-  }, [relatedWeekStarts]);
 
   return (
     <div className="contextualWrapper">

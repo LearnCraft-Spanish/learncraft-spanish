@@ -1,4 +1,4 @@
-export default function getDateRange(numWeeks: number = 8) {
+export default function getDateRange(numWeeks: number = 4) {
   const nowString = Date.now();
   const now = new Date(nowString);
   const dayOfWeek = now.getDay();

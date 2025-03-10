@@ -13,7 +13,7 @@ interface NewTableProps {
 export default function WeeksTable({ weeks }: NewTableProps) {
   const { weeksQuery } = useCoaching();
 
-  const isLoading = weeksQuery.isFetching;
+  const isLoading = weeksQuery.isLoading;
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 20;

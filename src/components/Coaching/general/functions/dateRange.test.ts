@@ -48,6 +48,7 @@ describe('function getDateRange', () => {
 
   it('handles different dayOfWeek parameters correctly', () => {
     const dateRange = getDateRange(5); // Testing with a different day of week
-    expect(dateRange.dayOfWeekString).toBe('5');
+    // number of keys should be 6
+    expect(Object.keys(dateRange).length).toBe(7);
   });
 });

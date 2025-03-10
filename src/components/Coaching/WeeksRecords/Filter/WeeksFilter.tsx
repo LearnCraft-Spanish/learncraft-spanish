@@ -13,13 +13,10 @@ import '../../coaching.scss';
 
 interface CoachingFilterProps {
   dataReady: boolean;
-  advancedFilteringMenu: boolean;
-  toggleAdvancedFilteringMenu: () => void;
   filterByCoach: Coach | undefined;
   updateCoachFilter: (value: string) => void;
   filterByCourse: Course | undefined;
   updateCourseFilter: (value: string) => void;
-  updateWeeksAgoFilter: (value: string) => void;
   filterCoachless: boolean | undefined;
   updateCoachlessFilter: (value: boolean) => void;
   filterHoldWeeks: boolean | undefined;
@@ -31,13 +28,10 @@ interface CoachingFilterProps {
 }
 export default function WeeksFilter({
   dataReady,
-  advancedFilteringMenu,
-  toggleAdvancedFilteringMenu,
   filterByCoach,
   updateCoachFilter,
   filterByCourse,
   updateCourseFilter,
-  updateWeeksAgoFilter,
   filterCoachless,
   updateCoachlessFilter,
   filterHoldWeeks,
@@ -60,17 +54,10 @@ export default function WeeksFilter({
   const handleWeeksAgoChange = (value: string) => {
     if (value === 'loadMore') {
       handleLoadMore();
-      return; // Don't update the selected value
+      // Don't update the selected value
+    } else {
+      setStartDate(value);
     }
-    setStartDate(value);
-    // Map the date back to weeks ago for backward compatibility
-    let weeksAgo = '0';
-    if (value === dateRange.lastSundayDate) {
-      weeksAgo = '1';
-    } else if (value === dateRange.twoSundaysAgoDate) {
-      weeksAgo = '2';
-    }
-    updateWeeksAgoFilter(weeksAgo);
   };
 
   const coursesWithActiveMemberships = useMemo(() => {
@@ -141,7 +128,7 @@ export default function WeeksFilter({
                 );
               })}
               <option value="loadMore" className="loadMoreOption">
-                Load More...
+                Load More Dates...
               </option>
             </select>
           </div>
@@ -163,26 +150,8 @@ export default function WeeksFilter({
               New Group Call
             </button>
           </div>
-          <button
-            type="button"
-            className={`moreFilterButton ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
-            onClick={toggleAdvancedFilteringMenu}
-          >
-            More Filters
-          </button>
-          <button
-            type="button"
-            className={`hideFilterButton ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
-            onClick={toggleAdvancedFilteringMenu}
-          >
-            Hide
-          </button>
-
-          <div
-            className={`advancedFiltersWrapper ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
-          >
+          <div className={`advancedFiltersWrapper`}>
             <div>
-              {/* <label htmlFor="search">Search:</label> */}
               <input
                 type="text"
                 id="search"

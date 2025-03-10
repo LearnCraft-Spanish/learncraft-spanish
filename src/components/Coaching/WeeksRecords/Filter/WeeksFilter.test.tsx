@@ -7,14 +7,10 @@ import WeeksFilter from './WeeksFilter';
 
 const defaultProps = {
   dataReady: true,
-  advancedFilteringMenu: true,
-  toggleAdvancedFilteringMenu: vi.fn(),
   filterByCoach: undefined,
   updateCoachFilter: () => {},
   filterByCourse: undefined,
   updateCourseFilter: () => {},
-  filterByWeeksAgo: 1,
-  updateWeeksAgoFilter: () => {},
   filterCoachless: undefined,
   updateCoachlessFilter: () => {},
   filterHoldWeeks: undefined,
@@ -39,86 +35,13 @@ describe('component WeeksFilter', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(screen.getByText('Hide')).toBeInTheDocument();
-    });
-  });
-
-  describe('advanced filtering menu', () => {
-    it('by default, advanced filtering menu is shown', async () => {
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <WeeksFilter {...defaultProps} />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-      await waitFor(() => {
-        expect(screen.getByText('Hide')).toBeInTheDocument();
-        expect(
-          screen.queryByText(/Exclude Students Without Coaches:/),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByText(/Exclude Weeks on Hold:/),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByText(/Filter Records By Completion:/),
-        ).toBeInTheDocument();
-      });
-    });
-
-    it('when advancedFilteringMenu is false, advanced filtering menu is hidden', async () => {
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <WeeksFilter {...defaultProps} advancedFilteringMenu={false} />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-      await waitFor(() => {
-        expect(screen.getByText('More Filters')).toBeInTheDocument();
-      });
-    });
-
-    it('clicking "Hide" calls toggleAdvancedFilteringMenu', async () => {
-      const toggleAdvancedFilteringMenu = vi.fn();
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <WeeksFilter
-              {...defaultProps}
-              toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
-            />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-      await waitFor(() => {
-        screen.getByText('Hide').click();
-      });
-      expect(toggleAdvancedFilteringMenu).toHaveBeenCalled();
-    });
-
-    it('clicking More Filters calls toggleAdvancedFilteringMenu', async () => {
-      const toggleAdvancedFilteringMenu = vi.fn();
-      render(
-        <MockAllProviders>
-          <DateRangeProvider>
-            <WeeksFilter
-              {...defaultProps}
-              toggleAdvancedFilteringMenu={toggleAdvancedFilteringMenu}
-            />
-          </DateRangeProvider>
-        </MockAllProviders>,
-      );
-      await waitFor(() => {
-        screen.getByText('More Filters').click();
-      });
-      expect(toggleAdvancedFilteringMenu).toHaveBeenCalled();
+      expect(screen.getByText('Week:')).toBeInTheDocument();
     });
   });
 
   describe('onChange functions', () => {
     const dropdowns = [
-      { labelText: 'Week', value: '-1', onChange: 'updateWeeksAgoFilter' },
+      // { labelText: 'Week', value: '-1', onChange: 'updateWeeksAgoFilter' },
       {
         labelText: 'Filter Records By Completion',
         value: 'allRecords',
@@ -180,31 +103,6 @@ describe('component WeeksFilter', () => {
           fireEvent.click(getByAltText(`${toggle.labelText}`));
         });
         expect(onChange).toHaveBeenCalledWith(toggle.value);
-      });
-    });
-
-    describe('weeks Ago Filter calls onChange function with correct values', () => {
-      const values = [0, 1, 2, -1];
-      values.forEach((value) => {
-        it(`when value is ${value}`, async () => {
-          const updateWeeksAgoFilter = vi.fn();
-          const { getByLabelText } = render(
-            <MockAllProviders>
-              <DateRangeProvider>
-                <WeeksFilter
-                  {...defaultProps}
-                  updateWeeksAgoFilter={updateWeeksAgoFilter}
-                />
-              </DateRangeProvider>
-            </MockAllProviders>,
-          );
-          await waitFor(() => {
-            fireEvent.change(getByLabelText('Week:'), {
-              target: { value: value.toString() },
-            });
-          });
-          expect(updateWeeksAgoFilter).toHaveBeenCalledWith(value.toString());
-        });
       });
     });
 

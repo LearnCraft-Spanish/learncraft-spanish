@@ -2,10 +2,64 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import getDateRange from 'src/components/Coaching/general/functions/dateRange';
+import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
 import { DateRangeProvider } from 'src/components/Coaching/WeeksRecords/DateRangeProvider';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { describe, expect, it } from 'vitest';
-// This would benefit from improved testing. currently only testing existence
+
+// Get the default date range
+const dateRange = getDateRange();
+const defaultStartDate =
+  Number.parseInt(dateRange.dayOfWeekString) >= 3
+    ? dateRange.thisWeekDate
+    : dateRange.lastSundayDate;
+
+// Find weeks that fall within the default date range
+const weeksInRange = generatedMockData.weeks.filter((w) => {
+  const weekDate = new Date(w.weekStarts);
+  return (
+    weekDate >= new Date(defaultStartDate) &&
+    weekDate <= new Date(getWeekEnds(defaultStartDate))
+  );
+});
+
+if (weeksInRange.length === 0) {
+  throw new Error(
+    'No weeks found within the default date range. Please update the mock data.',
+  );
+}
+
+// Find group sessions that fall within the default date range
+const groupSessionsInRange = generatedMockData.groupSessions.filter((gs) => {
+  const sessionDate = new Date(gs.date);
+  return (
+    sessionDate >= new Date(defaultStartDate) &&
+    sessionDate <= new Date(getWeekEnds(defaultStartDate))
+  );
+});
+
+if (groupSessionsInRange.length === 0) {
+  throw new Error(
+    'No group sessions found within the default date range. Please update the mock data.',
+  );
+}
+
+// Helper function to find a week with assignments
+const weekWithAssignments = weeksInRange.find((w) =>
+  generatedMockData.assignments.some((a) => a.relatedWeek === w.recordId),
+);
+
+// Helper function to find a week with private calls
+const weekWithCalls = weeksInRange.find((w) =>
+  generatedMockData.calls.some((c) => c.relatedWeek === w.recordId),
+);
+
+// Helper function to find a group session with attendees
+const groupSessionWithAttendees = groupSessionsInRange.find((gs) =>
+  generatedMockData.groupAttendees.some((a) => a.groupSession === gs.recordId),
+);
+
 describe('hook useCoaching', () => {
   it('renders without crashing', async () => {
     const { result } = renderHook(() => useCoaching(), {
@@ -53,36 +107,40 @@ describe('hook useCoaching', () => {
     const listOfFunctions = [
       {
         func: 'getCoachFromMembershipId',
-        arg: generatedMockData.weeks[0].relatedMembership,
+        arg: weeksInRange[0].relatedMembership,
         expected: generatedMockData.coachList[0],
       },
       {
         func: 'getCourseFromMembershipId',
-        arg: generatedMockData.weeks[0].relatedMembership,
-        expected: generatedMockData.courseList[0],
+        arg: weeksInRange[0].relatedMembership,
+        expected: generatedMockData.courseList.find(
+          (course) => course.name === weeksInRange[0].level,
+        ),
       },
       {
         func: 'getStudentFromMembershipId',
-        arg: generatedMockData.weeks[0].relatedMembership,
-        expected: generatedMockData.studentList[0],
-      },
-      {
-        func: 'getAttendeeWeeksFromGroupSessionId',
-        arg: generatedMockData.groupSessions[0].recordId,
-        expected: generatedMockData.weeks.filter((week) => {
-          const attendeesRelatedToWeek = generatedMockData.groupAttendees
-            .filter(
-              (attendee) =>
-                attendee.groupSession ===
-                generatedMockData.groupSessions[0].recordId,
-            )
-            .map((attendee) => attendee.student);
-          return attendeesRelatedToWeek.includes(week.recordId);
+        arg: weeksInRange[0].relatedMembership,
+        expected: generatedMockData.studentList.find((student) => {
+          const membership = generatedMockData.memberships.find(
+            (membership) =>
+              membership.recordId === weeksInRange[0].relatedMembership,
+          );
+          if (!membership) return undefined;
+          return student.recordId === membership.relatedStudent;
         }),
       },
+      /*
+
+  const membership = memberships.find((item) => item.recordId === membershipId);
+  if (!membership) return undefined;
+
+  const studentId = membership.relatedStudent;
+  const student = students.find((item) => item.recordId === studentId);
+  return student;
+      */
       {
         func: 'getGroupSessionsFromWeekRecordId',
-        arg: generatedMockData.weeks[0].recordId,
+        arg: weeksInRange[0].recordId,
         expected: generatedMockData.groupSessions.filter((groupSession) => {
           const attendeesRelatedToGroupSession =
             generatedMockData.groupAttendees
@@ -91,46 +149,47 @@ describe('hook useCoaching', () => {
               )
               .map((attendee) => attendee.student);
           return attendeesRelatedToGroupSession.includes(
-            generatedMockData.weeks[0].recordId,
+            weeksInRange[0].recordId,
           );
         }),
       },
       {
         func: 'getAssignmentsFromWeekRecordId',
-        arg: generatedMockData.weeks[0].recordId,
+        arg: weekWithAssignments?.recordId,
         expected: generatedMockData.assignments.filter(
           (assignment) =>
-            assignment.relatedWeek === generatedMockData.weeks[0].recordId,
+            assignment.relatedWeek === weekWithAssignments?.recordId,
         ),
       },
       {
         func: 'getMembershipFromWeekRecordId',
-        arg: generatedMockData.weeks[0].recordId,
+        arg: weeksInRange[0].recordId,
         expected: generatedMockData.memberships.find(
           (membership) =>
-            membership.recordId ===
-            generatedMockData.weeks[0].relatedMembership,
+            membership.recordId === weeksInRange[0].relatedMembership,
         ),
       },
       {
         func: 'getPrivateCallsFromWeekRecordId',
-        arg: generatedMockData.weeks[0].recordId,
+        arg: weekWithCalls?.recordId,
         expected: generatedMockData.calls.filter(
-          (call) => call.relatedWeek === generatedMockData.weeks[0].recordId,
+          (call) => call.relatedWeek === weekWithCalls?.recordId,
         ),
       },
       {
         func: 'getAttendeesFromGroupSessionId',
-        arg: generatedMockData.groupSessions[0].recordId,
+        arg: groupSessionWithAttendees?.recordId,
         expected: generatedMockData.groupAttendees.filter(
           (attendee) =>
-            attendee.groupSession ===
-            generatedMockData.groupSessions[0].recordId,
+            attendee.groupSession === groupSessionWithAttendees?.recordId,
         ),
       },
     ];
     for (const func of listOfFunctions) {
       it(`function ${func.func}: exists and works as expected`, async () => {
+        if (!func.arg) {
+          throw new Error('test data incorrect, unable to run test');
+        }
         const { result } = renderHook(() => useCoaching(), {
           wrapper: ({ children }) => (
             <MockAllProviders>

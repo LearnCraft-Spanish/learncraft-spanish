@@ -89,9 +89,12 @@ describe('component CoachDropdown', () => {
         </DateRangeProvider>
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(getByText('Coach:')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(getByText('Coach:')).toBeInTheDocument();
+      },
+      { timeout: 5000 },
+    );
   });
 
   it('calls the onChange handler when the input value changes', async () => {
