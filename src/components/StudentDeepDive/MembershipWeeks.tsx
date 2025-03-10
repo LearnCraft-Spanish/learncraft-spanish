@@ -1,4 +1,5 @@
 import React from 'react';
+import { toISODate } from 'src/functions/dateUtils';
 import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
 
 interface MembershipWeeksProps {
@@ -18,10 +19,6 @@ const MembershipWeeks: React.FC<MembershipWeeksProps> = ({ membershipId }) => {
     return <div>Loading weeks...</div>;
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
-
   const sortedWeeks = weeksQuery.data?.sort((a, b) => {
     const dateA = new Date(a.weekStarts.toString());
     const dateB = new Date(b.weekStarts.toString());
@@ -40,7 +37,7 @@ const MembershipWeeks: React.FC<MembershipWeeksProps> = ({ membershipId }) => {
               <div className="week-header">
                 <h4>Week {week.week}</h4>
                 <span className="week-date">
-                  {formatDate(week.weekStarts.toString())}
+                  {toISODate(new Date(week.weekStarts))}
                 </span>
               </div>
               <div className="week-stats">

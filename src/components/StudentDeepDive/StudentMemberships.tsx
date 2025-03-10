@@ -1,20 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { toISODate } from 'src/functions/dateUtils';
 import { useCourseList } from 'src/hooks/CoachingData/queries';
 import { useStudentMemberships } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
-import MembershipWeeks from './MembershipWeeks';
 
 interface StudentMembershipsProps {
   studentId: string;
+  selectedMembershipId: number | null;
+  onMembershipSelect: (membershipId: number | null) => void;
 }
 
 const StudentMemberships: React.FC<StudentMembershipsProps> = ({
   studentId,
+  selectedMembershipId,
+  onMembershipSelect,
 }) => {
   const { courseListQuery } = useCourseList();
   const studentMembershipsQuery = useStudentMemberships(studentId);
-  const [selectedMembershipId, setSelectedMembershipId] = useState<
-    number | null
-  >(null);
 
   // Enable the query when we have a studentId
   React.useEffect(() => {
@@ -30,10 +31,6 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
   const getCourseName = (courseId: number) => {
     const course = courseListQuery.data?.find((c) => c.recordId === courseId);
     return course?.name || 'Unknown Course';
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -63,20 +60,20 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
                 <div className="detail-row">
                   <span className="label">Start Date:</span>
                   <span className="value">
-                    {formatDate(membership.startDate.toString())}
+                    {toISODate(new Date(membership.startDate))}
                   </span>
                 </div>
                 <div className="detail-row">
                   <span className="label">End Date:</span>
                   <span className="value">
-                    {formatDate(membership.endDate.toString())}
+                    {toISODate(new Date(membership.endDate))}
                   </span>
                 </div>
                 <div className="detail-row">
                   <span className="label">Last Recorded Week:</span>
                   <span className="value">
                     {membership.lastRecordedWeekStarts
-                      ? formatDate(membership.lastRecordedWeekStarts.toString())
+                      ? toISODate(new Date(membership.lastRecordedWeekStarts))
                       : 'No recorded weeks'}
                   </span>
                 </div>
@@ -85,7 +82,7 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
                     className="view-weeks-button"
                     type="button"
                     onClick={() =>
-                      setSelectedMembershipId(
+                      onMembershipSelect(
                         selectedMembershipId === membership.recordId
                           ? null
                           : membership.recordId,
@@ -98,9 +95,6 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
                   </button>
                 </div>
               </div>
-              {selectedMembershipId === membership.recordId && (
-                <MembershipWeeks membershipId={membership.recordId} />
-              )}
             </div>
           ))}
         </div>
