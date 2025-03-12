@@ -1,4 +1,4 @@
-import type { Call, QbUser, Week } from 'src/types/CoachingTypes';
+import type { PrivateCall, QbUser, Week } from 'src/types/CoachingTypes';
 /* ------------------ Helper Functions ------------------ */
 
 /* ------------------ Mock Data ------------------ */
@@ -22,7 +22,7 @@ function generateCall({
   week: Week;
   callDate: string;
   caller: QbUser;
-}): Call {
+}): PrivateCall {
   return {
     recordId: Math.floor(Math.random() * 10000),
     relatedWeek: week.recordId,

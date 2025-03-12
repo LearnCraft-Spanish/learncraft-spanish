@@ -3,6 +3,7 @@ import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentR
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { describe, expect, it } from 'vitest';
+import { DateRangeProvider } from '../DateRangeProvider';
 import StudentCell from './StudentCell';
 
 const week = generatedMockData.weeks[0];
@@ -25,7 +26,9 @@ describe('component StudentCell', () => {
   it('renders with valid data', async () => {
     render(
       <MockAllProviders>
-        <StudentCell week={week} student={student} />
+        <DateRangeProvider>
+          <StudentCell week={week} student={student} />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     // Student Name related to the week record
@@ -36,7 +39,9 @@ describe('component StudentCell', () => {
   it('does not render with invalid data', async () => {
     render(
       <MockAllProviders>
-        <StudentCell week={week} student={null} />
+        <DateRangeProvider>
+          <StudentCell week={week} student={null} />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     // Student Name related to the week record
@@ -48,7 +53,9 @@ describe('component StudentCell', () => {
   it('renders with the correct data', async () => {
     render(
       <MockAllProviders>
-        <StudentCell week={week} student={student} />
+        <DateRangeProvider>
+          <StudentCell week={week} student={student} />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     // Student Name related to the week record

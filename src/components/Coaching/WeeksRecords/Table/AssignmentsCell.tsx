@@ -1,7 +1,9 @@
 import type { Assignment, Week } from 'src/types/CoachingTypes';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import x_dark from 'src/assets/icons/x_dark.svg';
 import ContextualControls from 'src/components/ContextualControls';
-import useAssignments from 'src/hooks/CoachingData/useAssignments';
+import { toReadableMonthDay } from 'src/functions/dateUtils';
+import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
@@ -15,10 +17,11 @@ import {
   TextAreaInput,
 } from '../../general';
 
+import CustomStudentSelector from '../../general/CustomStudentSelector';
+
 import getDateRange from '../../general/functions/dateRange';
-
+import getWeekEnds from '../../general/functions/getWeekEnds';
 import verifyRequiredInputs from '../../general/functions/inputValidation';
-
 const assignmentTypes = [
   'Pronunciation',
   'Writing',
@@ -72,12 +75,12 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
     coachListQuery,
+    updateAssignmentMutation,
+    deleteAssignmentMutation,
   } = useCoaching();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
     useContextualMenu();
   const { closeModal, openModal } = useModal();
-  const { updateAssignmentMutation, deleteAssignmentMutation } =
-    useAssignments();
 
   const [editMode, setEditMode] = useState(false);
 
@@ -293,18 +296,24 @@ export function NewAssignmentView({
   weekStartsDefaultValue: string;
 }) {
   const { setContextualRef, closeContextual } = useContextualMenu();
-  const { createAssignmentMutation } = useAssignments();
+  const { createAssignmentMutation } = useCoaching();
   const userDataQuery = useUserData();
-  const { getStudentFromMembershipId, weeksQuery } = useCoaching();
+  const { getStudentFromMembershipId } = useCoaching();
   const { openModal } = useModal();
+  const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
+  const [numWeeks, setNumWeeks] = useState(4);
+  const weekEnds = useMemo(() => getWeekEnds(weekStarts), [weekStarts]);
+  const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
+  const { weeksQuery } = useWeeks(weekStarts, weekEnds);
 
-  const dateRange = getDateRange();
+  const handleLoadMore = () => {
+    setNumWeeks((prev) => prev * 2);
+  };
 
   interface StudentObj {
     studentFullname: string;
     relatedWeek: Week;
   }
-  const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
   const [student, setStudent] = useState<StudentObj>();
 
   const [homeworkCorrector, setHomeworkCorrector] = useState(
@@ -319,14 +328,13 @@ export function NewAssignmentView({
   const updateHomeworkCorrector = (email: string) => {
     setHomeworkCorrector(email);
   };
-  const updateStudent = (relatedWeekId: string) => {
-    const weekId = Number.parseInt(relatedWeekId, 10);
+  const updateStudent = (relatedWeekId: number) => {
     if (!weeksQuery.data) {
       console.error('No weeks found');
       return;
     }
-    const studentWeek = weeksQuery.data?.find(
-      (week) => week.recordId === weekId,
+    const studentWeek = weeksQuery.data.find(
+      (week: Week) => week.recordId === relatedWeekId,
     );
     if (!studentWeek) {
       console.error('No student found with recordId:', relatedWeekId);
@@ -338,6 +346,15 @@ export function NewAssignmentView({
         '',
       relatedWeek: studentWeek,
     });
+  };
+
+  const updateWeekStarts = (value: string) => {
+    if (value === 'loadMore') {
+      handleLoadMore();
+      return; // Don't update the selected value
+    }
+    setStudent(undefined);
+    setWeekStarts(value);
   };
 
   function createNewAssignment() {
@@ -403,16 +420,34 @@ export function NewAssignmentView({
             id="weekStarts"
             className="content"
             value={weekStarts}
-            onChange={(e) => setWeekStarts(e.target.value)}
+            onChange={(e) => updateWeekStarts(e.target.value)}
           >
-            <option value={dateRange.thisWeekDate}>
-              This Week {`(${dateRange.thisWeekDate})`}
-            </option>
-            <option value={dateRange.lastSundayDate}>
-              Last Week {`(${dateRange.lastSundayDate})`}
-            </option>
-            <option value={dateRange.twoSundaysAgoDate}>
-              Two Weeks Ago {`(${dateRange.twoSundaysAgoDate})`}
+            {Array.from({ length: numWeeks }, (_, i) => {
+              const dateKey =
+                i === 0
+                  ? 'thisWeekDate'
+                  : i === 1
+                    ? 'lastSundayDate'
+                    : i === 2
+                      ? 'twoSundaysAgoDate'
+                      : `${i + 1}SundaysAgoDate`;
+              const date = dateRange[dateKey];
+              const label =
+                i === 0
+                  ? 'This Week'
+                  : i === 1
+                    ? 'Last Week'
+                    : i === 2
+                      ? 'Two Weeks Ago'
+                      : toReadableMonthDay(date);
+              return (
+                <option key={date} value={date}>
+                  {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+                </option>
+              );
+            })}
+            <option value="loadMore" className="loadMoreOption">
+              Load More...
             </option>
           </select>
         </div>
@@ -420,7 +455,7 @@ export function NewAssignmentView({
           <label className="label" htmlFor="student">
             Student:
           </label>
-          <select
+          {/* <select
             id="student"
             className="content"
             value={student?.relatedWeek.recordId || ''}
@@ -448,7 +483,24 @@ export function NewAssignmentView({
                   {` -- ${studentWeek.weekStarts}`}
                 </option>
               ))}
-          </select>
+          </select> */}
+          {student ? (
+            <>
+              <div className="content">{student.studentFullname}</div>
+              <button
+                type="button"
+                className="clearStudent"
+                onClick={() => setStudent(undefined)}
+              >
+                <img src={x_dark} alt="close" />
+              </button>
+            </>
+          ) : (
+            <CustomStudentSelector
+              weekStarts={weekStarts}
+              onChange={updateStudent}
+            />
+          )}
         </div>
 
         <Dropdown
@@ -473,28 +525,24 @@ export function NewAssignmentView({
           options={ratings}
           editMode
         />
-
-        <TextAreaInput
-          label="Notes"
-          editMode
-          value={notes}
-          onChange={setNotes}
-        />
-
-        <TextAreaInput
-          label="Areas of Difficulty"
-          editMode
-          value={areasOfDifficulty}
-          onChange={setAreasOfDifficulty}
-        />
-
         <LinkInput
           label="Assignment Link"
           value={assignmentLink}
           onChange={setAssignmentLink}
           editMode
         />
-
+        <TextAreaInput
+          label="Areas of Difficulty"
+          editMode
+          value={areasOfDifficulty}
+          onChange={setAreasOfDifficulty}
+        />
+        <TextAreaInput
+          label="Notes"
+          editMode
+          value={notes}
+          onChange={setNotes}
+        />
         <FormControls
           editMode
           cancelEdit={closeContextual}

@@ -38,7 +38,17 @@ export const fromISODate = (dateString: string): Date => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
     throw new Error(`Invalid date format: ${dateString}. Expected YYYY-MM-DD.`);
   }
-  return new Date(`${dateString}T00:00:00.000Z`);
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day); // month is 0-based in Date constructor
+};
+
+/* Formats date string (YYYY-MM-DD) as "Month Day" (e.g. "March 2") */
+export const toReadableMonthDay = (dateString: string): string => {
+  const date = fromISODate(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+  });
 };
 
 // Parses a timestamp (ms) into a Date object
@@ -61,6 +71,7 @@ export const dateUtils = Object.freeze({
   toISODate,
   toISODateTime,
   toReadableDate,
+  toReadableMonthDay,
   toTimestamp,
   fromISODate,
   fromISODateTime,

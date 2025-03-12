@@ -2,6 +2,7 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { describe, expect, it } from 'vitest';
+import { DateRangeProvider } from '../DateRangeProvider';
 import AssignmentsCell from './AssignmentsCell';
 
 const assignment = generatedMockData.assignments.find(
@@ -22,7 +23,9 @@ describe('component StudentCell', () => {
   it('default view renders without crashing', () => {
     render(
       <MockAllProviders>
-        <AssignmentsCell assignments={[assignment]} />
+        <DateRangeProvider>
+          <AssignmentsCell assignments={[assignment]} />
+        </DateRangeProvider>
       </MockAllProviders>,
     );
     expect(
@@ -33,7 +36,9 @@ describe('component StudentCell', () => {
     it('contextual menu view renders without crashing', async () => {
       render(
         <MockAllProviders>
-          <AssignmentsCell assignments={[assignment]} />
+          <DateRangeProvider>
+            <AssignmentsCell assignments={[assignment]} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
@@ -56,7 +61,9 @@ describe('component StudentCell', () => {
       ];
       render(
         <MockAllProviders>
-          <AssignmentsCell assignments={[assignment]} />
+          <DateRangeProvider>
+            <AssignmentsCell assignments={[assignment]} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
@@ -78,7 +85,9 @@ describe('component StudentCell', () => {
       }
       render(
         <MockAllProviders>
-          <AssignmentsCell assignments={[assignment]} />
+          <DateRangeProvider>
+            <AssignmentsCell assignments={[assignment]} />
+          </DateRangeProvider>
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
