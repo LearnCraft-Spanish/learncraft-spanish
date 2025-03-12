@@ -108,7 +108,19 @@ describe('hook useCoaching', () => {
       {
         func: 'getCoachFromMembershipId',
         arg: weeksInRange[0].relatedMembership,
-        expected: generatedMockData.coachList[0],
+        // first find membership associated with week, then find student associated with membership, then find coach associated with student
+        expected: generatedMockData.coachList.find((coach) => {
+          const membership = generatedMockData.memberships.find(
+            (membership) =>
+              membership.recordId === weeksInRange[0].relatedMembership,
+          );
+          if (!membership) return undefined;
+          const student = generatedMockData.studentList.find(
+            (student) => student.recordId === membership.relatedStudent,
+          );
+          if (!student) return undefined;
+          return student.primaryCoach?.id === coach.user.id;
+        }),
       },
       {
         func: 'getCourseFromMembershipId',
