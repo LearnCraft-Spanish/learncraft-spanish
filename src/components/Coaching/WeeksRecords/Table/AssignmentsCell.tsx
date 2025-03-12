@@ -525,28 +525,24 @@ export function NewAssignmentView({
           options={ratings}
           editMode
         />
-
-        <TextAreaInput
-          label="Notes"
-          editMode
-          value={notes}
-          onChange={setNotes}
-        />
-
-        <TextAreaInput
-          label="Areas of Difficulty"
-          editMode
-          value={areasOfDifficulty}
-          onChange={setAreasOfDifficulty}
-        />
-
         <LinkInput
           label="Assignment Link"
           value={assignmentLink}
           onChange={setAssignmentLink}
           editMode
         />
-
+        <TextAreaInput
+          label="Areas of Difficulty"
+          editMode
+          value={areasOfDifficulty}
+          onChange={setAreasOfDifficulty}
+        />
+        <TextAreaInput
+          label="Notes"
+          editMode
+          value={notes}
+          onChange={setNotes}
+        />
         <FormControls
           editMode
           cancelEdit={closeContextual}
