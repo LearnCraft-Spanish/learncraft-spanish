@@ -1,25 +1,29 @@
 import React, { useState } from 'react';
-import CoachStudents from './CoachStudents';
-import MembershipWeeks from './MembershipWeeks';
-import StudentDeepDiveSearch from './StudentDeepDiveSearch';
-import StudentInfoCard from './StudentInfoCard';
-import StudentMemberships from './StudentMemberships';
+
+import {
+  CoachStudents,
+  MembershipWeeks,
+  StudentDeepDiveSearch,
+  StudentInfoCard,
+  StudentMemberships,
+} from './components';
+
 import './StudentDeepDive.css';
 
-const StudentDeepDive: React.FC = () => {
+export default function StudentDeepDive() {
   const [selectedStudentId, setSelectedStudentId] = useState<
-    string | undefined
-  >();
+    number | undefined
+  >(undefined);
   const [selectedMembershipId, setSelectedMembershipId] = useState<
-    number | null
-  >(null);
+    number | undefined
+  >(undefined);
 
-  const handleStudentSelect = (studentId: string) => {
+  const handleStudentSelect = (studentId: number | undefined) => {
     setSelectedStudentId(studentId);
-    setSelectedMembershipId(null); // Reset membership selection when student changes
+    setSelectedMembershipId(undefined); // Reset membership selection when student changes
   };
 
-  const handleMembershipSelect = (membershipId: number | null) => {
+  const handleMembershipSelect = (membershipId: number | undefined) => {
     setSelectedMembershipId(membershipId);
   };
 
@@ -59,6 +63,4 @@ const StudentDeepDive: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default StudentDeepDive;
+}

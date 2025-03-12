@@ -6,7 +6,9 @@ interface MembershipWeeksProps {
   membershipId: number;
 }
 
-const MembershipWeeks: React.FC<MembershipWeeksProps> = ({ membershipId }) => {
+export default function MembershipWeeks({
+  membershipId,
+}: MembershipWeeksProps) {
   const weeksQuery = useMembershipWeeks(membershipId);
 
   React.useEffect(() => {
@@ -87,6 +89,4 @@ const MembershipWeeks: React.FC<MembershipWeeksProps> = ({ membershipId }) => {
       )}
     </div>
   );
-};
-
-export default MembershipWeeks;
+}

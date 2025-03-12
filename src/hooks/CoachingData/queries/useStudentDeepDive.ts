@@ -21,12 +21,12 @@ export function useStudentDeepDive() {
   };
 }
 
-export function useStudentMemberships(studentId: string) {
+export function useStudentMemberships(studentId: number) {
   const { getStudentMemberships } = useStudentDeepDive();
 
   return useQuery({
     queryKey: ['studentMemberships', studentId],
-    queryFn: () => getStudentMemberships(Number(studentId)),
+    queryFn: () => getStudentMemberships(studentId),
     staleTime: Infinity,
     enabled: false,
   });

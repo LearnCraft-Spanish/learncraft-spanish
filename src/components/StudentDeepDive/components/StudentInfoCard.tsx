@@ -2,18 +2,18 @@ import type { Student } from 'src/types/CoachingTypes';
 import React from 'react';
 import { useActiveStudents } from 'src/hooks/CoachingData/queries';
 
-interface StudentInfoCardProps {
-  studentId: string;
-}
-
-const StudentInfoCard: React.FC<StudentInfoCardProps> = ({ studentId }) => {
+export default function StudentInfoCard({ studentId }: { studentId: number }) {
   const { activeStudentsQuery } = useActiveStudents();
   const student = activeStudentsQuery.data?.find(
-    (s) => s.recordId === Number(studentId),
+    (s) => s.recordId === studentId,
   ) as Student | undefined;
 
   if (!student) {
-    return <div>Loading student information...</div>;
+    return (
+      <div>
+        Error retrieving student information, please report this to support.
+      </div>
+    );
   }
 
   return (
@@ -46,6 +46,4 @@ const StudentInfoCard: React.FC<StudentInfoCardProps> = ({ studentId }) => {
       </div>
     </div>
   );
-};
-
-export default StudentInfoCard;
+}

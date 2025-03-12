@@ -4,16 +4,16 @@ import { useCourseList } from 'src/hooks/CoachingData/queries';
 import { useStudentMemberships } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
 
 interface StudentMembershipsProps {
-  studentId: string;
-  selectedMembershipId: number | null;
-  onMembershipSelect: (membershipId: number | null) => void;
+  studentId: number;
+  selectedMembershipId: number | undefined;
+  onMembershipSelect: (membershipId: number | undefined) => void;
 }
 
-const StudentMemberships: React.FC<StudentMembershipsProps> = ({
+export default function StudentMemberships({
   studentId,
   selectedMembershipId,
   onMembershipSelect,
-}) => {
+}: StudentMembershipsProps) {
   const { courseListQuery } = useCourseList();
   const studentMembershipsQuery = useStudentMemberships(studentId);
 
@@ -56,6 +56,13 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
                   )}
                 </div>
               </div>
+              {/* Data to display:
+              - start date
+              - end date
+              - last recorded lesson?
+              - active
+              - on hold
+              */}
               <div className="membership-details">
                 <div className="detail-row">
                   <span className="label">Start Date:</span>
@@ -66,15 +73,16 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
                 <div className="detail-row">
                   <span className="label">End Date:</span>
                   <span className="value">
-                    {toISODate(new Date(membership.endDate))}
+                    {membership.endDate &&
+                      toISODate(new Date(membership.endDate))}
                   </span>
                 </div>
                 <div className="detail-row">
-                  <span className="label">Last Recorded Week:</span>
+                  <span className="label">Last Recorded Lesson:</span>
                   <span className="value">
-                    {membership.lastRecordedWeekStarts
-                      ? toISODate(new Date(membership.lastRecordedWeekStarts))
-                      : 'No recorded weeks'}
+                    {membership.lastRecordedLesson
+                      ? toISODate(new Date(membership.lastRecordedLesson))
+                      : 'No recorded lessons'}
                   </span>
                 </div>
                 <div className="detail-row">
@@ -84,7 +92,7 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
                     onClick={() =>
                       onMembershipSelect(
                         selectedMembershipId === membership.recordId
-                          ? null
+                          ? undefined
                           : membership.recordId,
                       )
                     }
@@ -101,6 +109,4 @@ const StudentMemberships: React.FC<StudentMembershipsProps> = ({
       )}
     </div>
   );
-};
-
-export default StudentMemberships;
+}

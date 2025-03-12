@@ -2,14 +2,14 @@ import { useMemo, useState } from 'react';
 import useActiveStudents from 'src/hooks/CoachingData/queries/useActiveStudents';
 
 interface StudentDeepDiveSearchProps {
-  onStudentSelect: (studentId: string) => void;
-  selectedStudentId?: string;
+  onStudentSelect: (studentId: number | undefined) => void;
+  selectedStudentId?: number;
 }
 
-const StudentDeepDiveSearch: React.FC<StudentDeepDiveSearchProps> = ({
+export default function StudentDeepDiveSearch({
   onStudentSelect,
   selectedStudentId,
-}) => {
+}: StudentDeepDiveSearchProps) {
   const [searchString, setSearchString] = useState('');
   const { activeStudentsQuery } = useActiveStudents();
   const listOfStudents = useMemo(() => {
@@ -53,13 +53,13 @@ const StudentDeepDiveSearch: React.FC<StudentDeepDiveSearchProps> = ({
     return matchesSearch;
   }, [listOfStudents, searchString]);
 
-  function handleStudentSelect(studentId: string) {
+  function handleStudentSelect(studentId: number) {
     onStudentSelect(studentId);
     setSearchString('');
   }
 
   function handleClearStudent() {
-    onStudentSelect('');
+    onStudentSelect(undefined);
     setSearchString('');
   }
 
@@ -95,7 +95,7 @@ const StudentDeepDiveSearch: React.FC<StudentDeepDiveSearchProps> = ({
               className={`search-result-item ${
                 student.recordId === Number(selectedStudentId) ? 'selected' : ''
               }`}
-              onClick={() => handleStudentSelect(String(student.recordId))}
+              onClick={() => handleStudentSelect(student.recordId)}
             >
               {student.displayString}
             </div>
@@ -104,6 +104,4 @@ const StudentDeepDiveSearch: React.FC<StudentDeepDiveSearchProps> = ({
       )}
     </div>
   );
-};
-
-export default StudentDeepDiveSearch;
+}
