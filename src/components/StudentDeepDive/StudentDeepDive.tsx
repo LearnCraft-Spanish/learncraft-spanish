@@ -45,7 +45,7 @@ export default function StudentDeepDive() {
               <h2>Student Details</h2>
               <StudentInfoCard studentId={selectedStudentId} />
             </div>
-            <div className="student-details-section">
+            <div>
               <StudentMemberships
                 studentId={selectedStudentId}
                 selectedMembershipId={selectedMembershipId}

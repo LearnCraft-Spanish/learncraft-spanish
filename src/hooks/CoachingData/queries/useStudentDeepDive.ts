@@ -1,6 +1,22 @@
-import type { Week } from 'src/types/CoachingTypes';
+import type {
+  Assignment,
+  GroupAttendees,
+  GroupSession,
+  PrivateCall,
+  Week,
+} from 'src/types/CoachingTypes';
 import { useQuery } from '@tanstack/react-query';
 import { useBackend, useBackendHelpers } from 'src/hooks/useBackend';
+
+interface GroupSessionWithAttendees extends GroupSession {
+  attendees: GroupAttendees[];
+}
+
+interface WeekWithRelations extends Week {
+  assignments: Assignment[];
+  privateCalls: PrivateCall[];
+  groupSessions: GroupSessionWithAttendees[];
+}
 
 export function useStudentDeepDive() {
   const backend = useBackend();
@@ -12,7 +28,9 @@ export function useStudentDeepDive() {
 
   // Add more backend functions here as needed
   const getMembershipWeeks = (membershipId: number) => {
-    return getFactory<Week[]>(`coaching/membership-weeks/${membershipId}`);
+    return getFactory<WeekWithRelations[]>(
+      `coaching/membership-weeks/${membershipId}`,
+    );
   };
 
   return {
@@ -28,7 +46,6 @@ export function useStudentMemberships(studentId: number) {
     queryKey: ['studentMemberships', studentId],
     queryFn: () => getStudentMemberships(studentId),
     staleTime: Infinity,
-    enabled: false,
   });
 }
 
@@ -39,6 +56,5 @@ export function useMembershipWeeks(membershipId: number) {
     queryKey: ['membershipWeeks', membershipId],
     queryFn: () => getMembershipWeeks(membershipId),
     staleTime: Infinity,
-    enabled: false,
   });
 }

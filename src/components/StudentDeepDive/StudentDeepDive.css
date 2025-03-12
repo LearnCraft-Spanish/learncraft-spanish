@@ -144,9 +144,50 @@
   flex-grow: 1;
 }
 
+/* ------------------ Student Memberships ------------------ */
 .student-memberships {
   margin-top: 30px;
 }
+.membership-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+.membership-header {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: start;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+.membership-header h4 {
+  margin: 0;
+  color: #333;
+}
+.membership-details {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.detail-row {
+  display: flex;
+}
+.detail-label {
+  font-weight: 600;
+  color: #666;
+  width: 100px;
+  flex-shrink: 0;
+}
+.detail-value {
+  color: #333;
+  flex-grow: 1;
+}
+
+/*
 
 .student-memberships h3 {
   color: #444;
@@ -182,12 +223,41 @@
   display: flex;
   gap: 8px;
 }
+*/
 
+.view-weeks-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-weeks-button:hover {
+  background-color: #ddd;
+  color: #333;
+}
+.view-weeks-button.active {
+  background-color: #ccc;
+  color: #333;
+}
+.down-arrow {
+  width: 16px;
+  height: 16px;
+  margin: 0.25rem;
+  transition: transform 0.3s ease-in-out;
+}
+.down-arrow.active {
+  transform: rotate(-180deg);
+}
 .status {
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
+  margin: 0 1rem;
 }
 
 .status.active {
@@ -204,7 +274,7 @@
   background-color: #ffebee;
   color: #c62828;
 }
-
+/*
 .membership-details {
   display: flex;
   flex-direction: column;
@@ -254,7 +324,24 @@
 .view-weeks-button:active {
   background-color: #d0d0d0;
 }
+*/
+/* ------------------ Membership Weeks ------------------ */
 
+.membership-weeks h3 {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.week-header {
+  width: 40%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+/*
 .membership-weeks {
   margin-top: 30px;
 }
@@ -265,9 +352,12 @@
 }
 
 .weeks-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 20px;
+  /* display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px; 
 }
 
 .week-card {
@@ -298,7 +388,7 @@
 
 .week-stats {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
   margin-bottom: 15px;
 }
@@ -368,7 +458,7 @@
 .assignment-item:last-child {
   border-bottom: none;
 }
-
+*/
 .coach-students-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
