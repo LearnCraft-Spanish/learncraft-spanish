@@ -31,6 +31,7 @@ interface ExampleAssignmentPanelProps {
   assignedExamplesCount: number;
   onShowConfirmation: () => void;
   onBack: () => void;
+  onBackToEdit: () => void;
   onRestart: () => void;
   isPending: boolean;
   activeStudent: FlashcardStudent | null;
@@ -49,9 +50,9 @@ export function ExampleAssignmentPanel({
   selectedQuizObject,
   exampleSetQuery,
   unassignedExamples,
-  assignedExamplesCount,
   onShowConfirmation,
   onBack,
+  onBackToEdit,
   onRestart,
   isPending,
   activeStudent,
@@ -200,6 +201,9 @@ export function ExampleAssignmentPanel({
           <div className="buttonBox">
             <button type="button" onClick={onBack}>
               Back to Paste
+            </button>
+            <button type="button" onClick={onBackToEdit}>
+              Back to Edit
             </button>
             <button type="button" onClick={onRestart}>
               Restart

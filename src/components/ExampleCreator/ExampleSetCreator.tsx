@@ -489,6 +489,7 @@ export default function ExampleSetCreator({
           assignedExamplesCount={assignedExamplesCount}
           onShowConfirmation={() => setShowAssignmentConfirmation(true)}
           onBack={() => setPastingOrEditing('pasting')}
+          onBackToEdit={() => setPastingOrEditing('editing')}
           onRestart={clearAndRestart}
           isPending={
             addMultipleFlashcardsMutation.isPending ||

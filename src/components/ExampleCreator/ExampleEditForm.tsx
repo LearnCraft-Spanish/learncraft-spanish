@@ -126,12 +126,6 @@ export function ExampleEditForm({
         </>
       )}
       <div className="buttonBox">
-        <button type="button" onClick={onBack}>
-          Back to Paste
-        </button>
-        <button type="button" onClick={onRestart}>
-          Restart
-        </button>
         {unsavedFlashcardSet.length > 0 && (
           <button type="button" onClick={onSave} disabled={isSaving}>
             {isSaving ? 'Saving...' : 'Save Example Set'}
@@ -165,6 +159,14 @@ export function ExampleEditForm({
           studentContext={false}
         />
       )}
+      <div className="buttonBox">
+        <button type="button" onClick={onBack}>
+          Back to Paste
+        </button>
+        <button type="button" onClick={onRestart}>
+          Restart
+        </button>
+      </div>
     </div>
   );
 }
