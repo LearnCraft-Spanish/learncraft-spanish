@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import wheelIcon from 'src/assets/Icon_Blue.svg';
+import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -58,10 +58,7 @@ export default function CustomGroupAttendeeSelector({
   return (
     <div id="searchStudentWrapper" className="customSearchStudentWrapper">
       {isLoading ? (
-        <div className="loadingContainer">
-          <p>Loading student data...</p>
-          <img src={wheelIcon} alt="loading" />
-        </div>
+        <InlineLoading message="Loading student data..." />
       ) : (
         <>
           <input

@@ -5,7 +5,7 @@ import type {
 } from 'src/types/interfaceDefinitions';
 import React, { useCallback, useMemo } from 'react';
 import ExamplesTable from 'src/components/FlashcardFinder/ExamplesTable';
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import NoFlashcards from 'src/components/NoFlashcards';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 

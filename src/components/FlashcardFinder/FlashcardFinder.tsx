@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import Filter from 'src/components/FlashcardFinder/Filter';
 
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';

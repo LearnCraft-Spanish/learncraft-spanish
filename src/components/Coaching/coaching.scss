@@ -396,25 +396,4 @@ td button {
   #optionsWrapper {
     min-width: 300px;
   }
-
-  .loadingContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    img {
-      margin-left: 1rem;
-      width: 24px;
-      height: 24px;
-      animation: spin 1.4s linear infinite;
-    }
-
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
-      }
-      100% {
-        transform: rotate(360deg);
-      }
-    }
-  }
 }

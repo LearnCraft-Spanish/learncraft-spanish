@@ -3,7 +3,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
 
-import Loading from './components/Loading';
+import { Loading } from './components/Loading';
 import Nav from './components/Nav';
 import SubHeader from './components/SubHeader';
 import useAuth from './hooks/useAuth';
