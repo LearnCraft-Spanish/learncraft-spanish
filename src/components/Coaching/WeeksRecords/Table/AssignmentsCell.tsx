@@ -413,6 +413,14 @@ export function NewAssignmentView({
         <ContextualControls />
         <h4>Create Assignment Record</h4>
         <div className="lineWrapper">
+          <label htmlFor="assignmentName" className="label">
+            Assignment Name:
+          </label>
+          <div className="content" id="assignmentName">
+            {student && `${student.relatedWeek.weekName} - ${assignmentType}`}
+          </div>
+        </div>
+        <div className="lineWrapper">
           <label className="label" htmlFor="weekStarts">
             Week Starts:
           </label>

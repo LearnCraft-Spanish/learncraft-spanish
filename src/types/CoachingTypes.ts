@@ -42,6 +42,7 @@ export type Week = Expanded<{
   membershipCourseHasGroupCalls: boolean;
   membershipCourseWeeklyPrivateCalls: number;
   bundleCreditsUsed: number;
+  weekName: string;
 }>;
 
 export type Student = Expanded<{
