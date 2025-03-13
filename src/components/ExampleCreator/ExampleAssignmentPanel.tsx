@@ -134,22 +134,6 @@ export function ExampleAssignmentPanel({
             Examples to be Assigned ({unassignedExamples.length} remaining)
           </h4>
 
-          {/* Display assignment status */}
-          <div className="assignment-status-legend">
-            <div className="status-item">
-              <span className="status-badge assigned">✓ Assigned</span>
-              <span className="status-count">
-                {assignedExamplesCount} examples
-              </span>
-            </div>
-            <div className="status-item">
-              <span className="status-badge pending">Pending</span>
-              <span className="status-count">
-                {unassignedExamples.length} examples
-              </span>
-            </div>
-          </div>
-
           {/* First table: Examples available to assign */}
           <ExamplesTable
             dataSource={unassignedExamples}
@@ -159,7 +143,6 @@ export function ExampleAssignmentPanel({
             studentContext={false}
           />
 
-          <h4>Confirm Assignment</h4>
           {assignmentType === 'students' && (
             <div className="buttonBox">
               <button
