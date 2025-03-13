@@ -541,6 +541,16 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const createMultipleQuizExamples = useCallback(
+    (quizId: number, exampleIdList: number[]): Promise<number[]> => {
+      return newPostFactory<number[]>({
+        path: 'create-multiple-quiz-examples',
+        body: { quizId, exampleIdList },
+      });
+    },
+    [newPostFactory],
+  );
+
   return {
     getAccessToken,
     // GET Requests
@@ -581,6 +591,7 @@ export function useBackend() {
     createUnverifiedExample,
     createMultipleUnverifiedExamples,
     createMultipleStudentExamples,
+    createMultipleQuizExamples,
     updateExample,
     updateMyStudentExample,
     updatePMFDataForUser,

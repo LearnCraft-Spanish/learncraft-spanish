@@ -8,19 +8,14 @@ import React, {
   useState,
 } from 'react';
 import { toast } from 'react-toastify';
-import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
-import LoadingMessage from 'src/components/Loading';
-import StudentSearch from 'src/components/StudentSearch';
-import {
-  formatEnglishText,
-  formatSpanishText,
-} from 'src/functions/formatFlashcardText';
-import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useBackend } from 'src/hooks/useBackend';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { AudioControl } from './AudioControl';
+import ConfirmationDialog from './ConfirmationDialog';
+import ExampleAssignmentPanel from './ExampleAssignmentPanel';
+import ExampleEditForm from './ExampleEditForm';
+import ExamplePasteArea from './ExamplePasteArea';
 
 interface SetExampleCreatorProps {
   hasAccess: boolean;
@@ -53,8 +48,10 @@ export default function ExampleSetCreator({
   const [quizId, setQuizId] = useState<number | undefined>(undefined);
 
   const { activeStudentQuery } = useActiveStudent();
-  const { addMultipleFlashcardsMutation } = useStudentFlashcards();
-  const { officialQuizzesQuery } = useOfficialQuizzes(quizId);
+  const { addMultipleFlashcardsMutation, flashcardDataQuery } =
+    useStudentFlashcards();
+  const { officialQuizzesQuery, quizExamplesQuery, addQuizExamplesMutation } =
+    useOfficialQuizzes(quizId);
 
   // Filter quizzes by selected course
   const quizList = useMemo(() => {
@@ -126,6 +123,49 @@ export default function ExampleSetCreator({
     gcTime: Infinity,
     enabled: hasAccess && flashcardSpanish.length > 0,
   });
+
+  // Get unassigned examples as a derived value
+  const unassignedExamples = useMemo(() => {
+    if (!exampleSetQuery.data) return [];
+
+    // Create sets of Spanish examples that are already assigned
+    const assignedToQuiz = new Set<string>();
+    const assignedToStudent = new Set<string>();
+
+    // If we're in quiz assignment mode and have quiz examples data
+    if (assignmentType === 'quiz' && quizExamplesQuery.data) {
+      quizExamplesQuery.data.forEach((example) =>
+        assignedToQuiz.add(example.spanishExample),
+      );
+    }
+
+    // If we're in student assignment mode and have student flashcards data
+    if (assignmentType === 'students' && flashcardDataQuery.data) {
+      flashcardDataQuery.data.examples.forEach((example) =>
+        assignedToStudent.add(example.spanishExample),
+      );
+    }
+
+    // Filter out examples that are already assigned based on assignment type
+    return exampleSetQuery.data.filter((example) => {
+      if (assignmentType === 'quiz') {
+        return !assignedToQuiz.has(example.spanishExample);
+      } else {
+        return !assignedToStudent.has(example.spanishExample);
+      }
+    });
+  }, [
+    exampleSetQuery.data,
+    assignmentType,
+    quizExamplesQuery.data,
+    flashcardDataQuery.data,
+  ]);
+
+  // Get assigned examples count as a derived value
+  const assignedExamplesCount = useMemo(() => {
+    if (!exampleSetQuery.data) return 0;
+    return exampleSetQuery.data.length - unassignedExamples.length;
+  }, [exampleSetQuery.data, unassignedExamples]);
 
   // Check for existing examples in the database
   const existingExamples = useMemo(() => {
@@ -320,6 +360,89 @@ export default function ExampleSetCreator({
     [unsavedFlashcardSet, flashcardSpanish],
   );
 
+  // Update the confirmation handler to invalidate the appropriate queries after mutation
+  const handleConfirmAssignment = useCallback(() => {
+    setShowAssignmentConfirmation(false);
+
+    if (assignmentType === 'students') {
+      // Map unassigned examples to the format expected by the mutation
+      const exampleData = unassignedExamples.map((example) => {
+        // Ensure we have all required fields
+        if (
+          !example.recordId ||
+          !example.spanishExample ||
+          !example.englishTranslation ||
+          !example.spanglish
+        ) {
+          throw new Error('Missing required fields in flashcard');
+        }
+        return {
+          recordId: example.recordId,
+          spanishExample: example.spanishExample,
+          englishTranslation: example.englishTranslation,
+          spanglish: example.spanglish,
+          spanishAudioLa: example.spanishAudioLa || '',
+          englishAudio: example.englishAudio || '',
+          vocabComplete: false,
+          vocabIncluded: [],
+          coachAdded: true,
+        };
+      });
+
+      if (exampleData.length > 0) {
+        addMultipleFlashcardsMutation.mutate(exampleData, {
+          onSuccess: (data) => {
+            toast.success(
+              `Successfully assigned ${data.length} examples to student`,
+            );
+            // Invalidate the flashcardData query to refresh the list
+            queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
+          },
+        });
+      } else {
+        toast.info('All examples have already been assigned');
+      }
+    } else if (assignmentType === 'quiz' && selectedQuizObject) {
+      // Get the IDs of unassigned examples
+      const exampleIds = unassignedExamples.map((example) => example.recordId);
+
+      if (exampleIds.length > 0) {
+        // Call the mutation to assign examples to the quiz
+        addQuizExamplesMutation.mutate(
+          {
+            quizId: selectedQuizObject.recordId,
+            exampleIds,
+          },
+          {
+            onSuccess: (data) => {
+              toast.success(
+                `Successfully assigned ${data.length} examples to quiz`,
+              );
+              // Invalidate the quizExamples query to refresh the list
+              queryClient.invalidateQueries({
+                queryKey: ['quizExamples', selectedQuizObject.recordId],
+              });
+            },
+          },
+        );
+      } else {
+        toast.info('All examples have already been assigned');
+      }
+    }
+  }, [
+    assignmentType,
+    unassignedExamples,
+    selectedQuizObject,
+    addMultipleFlashcardsMutation,
+    addQuizExamplesMutation,
+    queryClient,
+  ]);
+
+  // Toggle assignment type handler
+  const handleToggleAssignmentType = useCallback(() => {
+    setAssignmentType(assignmentType === 'students' ? 'quiz' : 'students');
+  }, [assignmentType]);
+
   if (!hasAccess) {
     return <div>You do not have access to create example sets.</div>;
   }
@@ -328,530 +451,68 @@ export default function ExampleSetCreator({
     <div>
       <h3>Set Creator</h3>
       {pastingOrEditing === 'pasting' && (
-        <div className="setCreatorContainer">
-          <textarea
-            value={areaInput}
-            onChange={(e) => setAreaInput(e.target.value)}
-            placeholder={
-              'Paste table here in the following format: \nSpanish Example\tEnglish Translation\tSpanish Audio\tEnglish Audio'
-            }
-            rows={6}
-            cols={120}
-          />
-          {validationSummary && (
-            <div className="validation-summary">
-              Found {validationSummary.total} rows: {validationSummary.valid}{' '}
-              valid, {validationSummary.invalid} with errors
-            </div>
-          )}
-          {!!areaInput.length && (
-            <div>
-              <h3>Preview Set</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Spanish Example</th>
-                    <th>English Translation</th>
-                    <th>Spanish Audio</th>
-                    <th>English Audio</th>
-                    <th>Spanglish</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {parsedAreaInput.map((example) => {
-                    // Build validation state for this row
-                    const validationMessages: string[] = [];
-                    const errorMessages: string[] = [];
-
-                    // Check for missing required fields
-                    const hasSpanish =
-                      example.spanishExample &&
-                      !example.spanishExample.includes('ERROR');
-                    const hasEnglish =
-                      example.englishTranslation &&
-                      !example.englishTranslation.includes('ERROR');
-                    if (!hasSpanish || !hasEnglish) {
-                      const message = `Missing ${!hasSpanish ? 'Spanish' : ''}${!hasSpanish && !hasEnglish ? ' and ' : ''}${!hasEnglish ? 'English' : ''} text`;
-                      validationMessages.push(message);
-                      errorMessages.push(message);
-                    }
-
-                    // Find duplicates (only if the row is valid)
-                    if (validationMessages.length === 0) {
-                      const duplicateInstances = parsedAreaInput.filter(
-                        (e) =>
-                          e.spanishExample === example.spanishExample &&
-                          !e.spanishExample.includes('ERROR'),
-                      );
-                      // Only mark as duplicate if this is not the first instance
-                      if (
-                        duplicateInstances.length > 1 &&
-                        duplicateInstances[0].recordId !== example.recordId
-                      ) {
-                        validationMessages.push(
-                          'This duplicate will be removed, keeping the first instance',
-                        );
-                        errorMessages.push(
-                          'This duplicate will be removed, keeping the first instance',
-                        );
-                      }
-                    }
-
-                    // Check for existing examples
-                    const isExisting = existingExamples.has(
-                      example.spanishExample,
-                    );
-                    if (isExisting) {
-                      validationMessages.push(
-                        'This example already exists in the database',
-                      );
-                    }
-
-                    const showError = errorMessages.length > 0;
-
-                    return (
-                      <tr
-                        key={example.recordId}
-                        className={showError ? 'duplicate-row' : ''}
-                      >
-                        <td>
-                          <div
-                            className={
-                              showError ? 'duplicate-content-wrapper' : ''
-                            }
-                          >
-                            {!hasSpanish ? (
-                              <span>{example.spanishExample}</span>
-                            ) : (
-                              formatSpanishText(
-                                example.spanglish,
-                                example.spanishExample,
-                              )
-                            )}
-                            {validationMessages.length > 0 && (
-                              <div className="validation-note">
-                                {validationMessages.join(', ')}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <div
-                            className={
-                              showError ? 'duplicate-content-wrapper' : ''
-                            }
-                          >
-                            {formatEnglishText(example.englishTranslation)}
-                          </div>
-                        </td>
-                        <td>{example.spanishAudioLa}</td>
-                        <td>{example.englishAudio}</td>
-                        <td>{example.spanglish}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <div className="buttonBox">
-                <button
-                  type="button"
-                  onClick={addInputToFlashcardSet}
-                  disabled={parsedAreaInput.every((ex) => {
-                    const hasErrors =
-                      !ex.spanishExample ||
-                      ex.spanishExample.includes('ERROR') ||
-                      !ex.englishTranslation ||
-                      ex.englishTranslation.includes('ERROR');
-                    return hasErrors;
-                  })}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        <ExamplePasteArea
+          areaInput={areaInput}
+          onInputChange={setAreaInput}
+          validationSummary={validationSummary}
+          parsedAreaInput={parsedAreaInput}
+          existingExamples={existingExamples}
+          onNext={addInputToFlashcardSet}
+        />
       )}
+
       {pastingOrEditing === 'editing' && (
-        <div>
-          {unsavedFlashcardSet.length > 0 && (
-            <>
-              <h3>Example Preview</h3>
-              {unsavedFlashcardSet.map((example) => (
-                <div key={example.recordId} className="exampleCard">
-                  <div className="exampleCardSpanishText">
-                    {formatSpanishText(
-                      example.spanglish,
-                      example.spanishExample,
-                    )}
-                    <AudioControl audioLink={example.spanishAudioLa} />
-                  </div>
-                  <div className="halfWrapper"></div>
-                  <div className="exampleCardEnglishText">
-                    {formatEnglishText(example.englishTranslation)}
-                    <AudioControl audioLink={example.englishAudio} />
-                  </div>
-                </div>
-              ))}
-              <h3>Edit Examples</h3>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Spanish Example</th>
-                    <th>English Translation</th>
-                    <th>Spanish Audio</th>
-                    <th>English Audio</th>
-                    <th>Spanglish</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {unsavedFlashcardSet.map((example) => (
-                    <tr key={example.recordId}>
-                      <td className="tdWithoutPadding">
-                        <textarea
-                          rows={3}
-                          className="inputWithoutStyle"
-                          onChange={(e) =>
-                            updateFlashcardSetValues(
-                              example.recordId,
-                              'spanishExample',
-                              e.target.value,
-                            )
-                          }
-                          value={example.spanishExample}
-                        />
-                      </td>
-                      <td className="tdWithoutPadding">
-                        <textarea
-                          rows={3}
-                          className="inputWithoutStyle"
-                          onChange={(e) =>
-                            updateFlashcardSetValues(
-                              example.recordId,
-                              'englishTranslation',
-                              e.target.value,
-                            )
-                          }
-                          value={example.englishTranslation}
-                        />
-                      </td>
-                      <td className="tdWithoutPadding">
-                        <textarea
-                          rows={3}
-                          className="inputWithoutStyle"
-                          onChange={(e) =>
-                            updateFlashcardSetValues(
-                              example.recordId,
-                              'spanishAudioLa',
-                              e.target.value,
-                            )
-                          }
-                          value={example.spanishAudioLa}
-                        />
-                      </td>
-                      <td className="tdWithoutPadding">
-                        <textarea
-                          rows={3}
-                          className="inputWithoutStyle"
-                          onChange={(e) =>
-                            updateFlashcardSetValues(
-                              example.recordId,
-                              'englishAudio',
-                              e.target.value,
-                            )
-                          }
-                          value={example.englishAudio}
-                        />
-                      </td>
-                      <td>{example.spanglish}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
-          <div className="buttonBox">
-            <button
-              type="button"
-              onClick={() => setPastingOrEditing('pasting')}
-            >
-              Back to Paste
-            </button>
-            <button type="button" onClick={clearAndRestart}>
-              Restart
-            </button>
-            {flashcardSpanish.length > 0 && (
-              <>
-                {unsavedFlashcardSet.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      addFlashcardSetMutation.mutate(unsavedFlashcardSet)
-                    }
-                    disabled={addFlashcardSetMutation.isPending}
-                  >
-                    {addFlashcardSetMutation.isPending
-                      ? 'Saving...'
-                      : 'Save Example Set'}
-                  </button>
-                )}
-                {unsavedFlashcardSet.length === 0 &&
-                  exampleSetQuery.data &&
-                  exampleSetQuery.data.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => setPastingOrEditing('assigning')}
-                    >
-                      Continue to Assignment
-                    </button>
-                  )}
-              </>
-            )}
-          </div>
-          {exampleSetQuery.isLoading && (
-            <LoadingMessage message="Checking for examples..." />
-          )}
-          {exampleSetQuery.isError && (
-            <div>
-              <p>Error loading examples</p>
-              <button type="button" onClick={() => exampleSetQuery.refetch()}>
-                Retry
-              </button>
-            </div>
-          )}
-          {exampleSetQuery.data && exampleSetQuery.data.length > 0 && (
-            <ExamplesTable
-              dataSource={exampleSetQuery.data}
-              displayOrder={exampleSetQuery.data.map((ex) => ({
-                recordId: ex.recordId,
-              }))}
-              studentContext={false}
-            />
-          )}
-        </div>
+        <ExampleEditForm
+          unsavedFlashcardSet={unsavedFlashcardSet}
+          onUpdateExample={updateFlashcardSetValues}
+          onSave={() => addFlashcardSetMutation.mutate(unsavedFlashcardSet)}
+          onBack={() => setPastingOrEditing('pasting')}
+          onContinue={() => setPastingOrEditing('assigning')}
+          onRestart={clearAndRestart}
+          isSaving={addFlashcardSetMutation.isPending}
+          exampleSetQuery={exampleSetQuery}
+        />
       )}
+
       {pastingOrEditing === 'assigning' && (
-        <div className="assignment-section">
-          <h3>Assign Examples</h3>
+        <ExampleAssignmentPanel
+          assignmentType={assignmentType}
+          onToggleAssignmentType={handleToggleAssignmentType}
+          tableOption={tableOption}
+          onTableOptionChange={setTableOption}
+          quizId={quizId}
+          onQuizIdChange={setQuizId}
+          quizList={quizList}
+          selectedQuizObject={selectedQuizObject}
+          exampleSetQuery={exampleSetQuery}
+          unassignedExamples={unassignedExamples}
+          assignedExamplesCount={assignedExamplesCount}
+          onShowConfirmation={() => setShowAssignmentConfirmation(true)}
+          onBack={() => setPastingOrEditing('pasting')}
+          onRestart={clearAndRestart}
+          isPending={
+            addMultipleFlashcardsMutation.isPending ||
+            addQuizExamplesMutation.isPending
+          }
+          activeStudent={activeStudentQuery.data || null}
+          flashcardDataQuery={flashcardDataQuery}
+          quizExamplesQuery={quizExamplesQuery}
+        />
+      )}
 
-          <div className="assignment-type-selector">
-            <button
-              type="button"
-              className="toggle-button"
-              onClick={() =>
-                setAssignmentType(
-                  assignmentType === 'students' ? 'quiz' : 'students',
-                )
-              }
-            >
-              {assignmentType === 'students'
-                ? 'Switch to Quiz Assignment'
-                : 'Switch to Student Assignment'}
-              <span className="toggle-arrow">→</span>
-            </button>
-          </div>
-
-          {assignmentType === 'students' && (
-            <div>
-              <p>Select a student to assign these examples to:</p>
-              <div className="student-selector">
-                <StudentSearch />
-              </div>
-            </div>
-          )}
-
-          {assignmentType === 'quiz' && (
-            <div>
-              <p>Select a quiz to assign these examples to:</p>
-              <div className="quiz-selector">
-                <select
-                  value={tableOption}
-                  onChange={(e) => setTableOption(e.target.value)}
-                  className="styledInput"
-                >
-                  <option value="none">Select Course</option>
-                  {quizCourses.map((course) => (
-                    <option key={course.code} value={course.code}>
-                      {course.name}
-                    </option>
-                  ))}
-                </select>
-                {tableOption !== 'none' && quizList && (
-                  <select
-                    value={quizId}
-                    onChange={(e) => setQuizId(Number(e.target.value))}
-                    className="styledInput"
-                    style={{ marginLeft: '10px' }}
-                  >
-                    <option value="">Select a Quiz</option>
-                    {quizList.map((quiz) => (
-                      <option key={quiz.recordId} value={quiz.recordId}>
-                        {quiz.quizNickname || `Quiz ${quiz.quizNumber}`}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-            </div>
-          )}
-
-          {exampleSetQuery.data && exampleSetQuery.data.length > 0 && (
-            <>
-              <h4>Examples to be Assigned ({exampleSetQuery.data.length})</h4>
-              <div className="example-preview">
-                {exampleSetQuery.data.map((example) => (
-                  <div key={example.recordId} className="exampleCard">
-                    <div className="exampleCardSpanishText">
-                      {formatSpanishText(
-                        example.spanglish,
-                        example.spanishExample,
-                      )}
-                      <AudioControl audioLink={example.spanishAudioLa} />
-                    </div>
-                    <div className="halfWrapper"></div>
-                    <div className="exampleCardEnglishText">
-                      {formatEnglishText(example.englishTranslation)}
-                      <AudioControl audioLink={example.englishAudio} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <h4>Confirm Assignment</h4>
-              {assignmentType === 'students' && activeStudentQuery.data && (
-                <div className="buttonBox">
-                  <button
-                    type="button"
-                    onClick={() => setShowAssignmentConfirmation(true)}
-                    disabled={addMultipleFlashcardsMutation.isPending}
-                  >
-                    Assign {exampleSetQuery.data.length} Examples to{' '}
-                    {activeStudentQuery.data.name}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPastingOrEditing('pasting')}
-                  >
-                    Back to Paste
-                  </button>
-                  <button type="button" onClick={clearAndRestart}>
-                    Restart
-                  </button>
-                </div>
-              )}
-              {assignmentType === 'quiz' && selectedQuizObject && (
-                <div className="buttonBox">
-                  <button
-                    type="button"
-                    onClick={() => setShowAssignmentConfirmation(true)}
-                    disabled={false} // Replace with actual mutation pending state when implemented
-                  >
-                    Assign {exampleSetQuery.data.length} Examples to Quiz:{' '}
-                    {selectedQuizObject.quizNickname ||
-                      `Quiz ${selectedQuizObject.quizNumber}`}
-                    ?
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPastingOrEditing('pasting')}
-                  >
-                    Back to Paste
-                  </button>
-                  <button type="button" onClick={clearAndRestart}>
-                    Restart
-                  </button>
-                </div>
-              )}
-              {showAssignmentConfirmation && (
-                <div className="confirmation-dialog">
-                  <div>
-                    <h4>Confirm Assignment</h4>
-                    {assignmentType === 'students' && (
-                      <p>
-                        Are you sure you want to assign{' '}
-                        {exampleSetQuery.data?.length} examples to{' '}
-                        {activeStudentQuery.data?.name}?
-                      </p>
-                    )}
-                    {assignmentType === 'quiz' && selectedQuizObject && (
-                      <p>
-                        Are you sure you want to assign{' '}
-                        {exampleSetQuery.data?.length} examples to Quiz:{' '}
-                        {selectedQuizObject.quizNickname ||
-                          `Quiz ${selectedQuizObject.quizNumber}`}
-                        ?
-                      </p>
-                    )}
-                    <div className="buttonBox">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowAssignmentConfirmation(false);
-
-                          if (assignmentType === 'students') {
-                            addMultipleFlashcardsMutation.mutate(
-                              (exampleSetQuery.data ?? []).map((example) => {
-                                // Ensure we have all required fields
-                                if (
-                                  !example.recordId ||
-                                  !example.spanishExample ||
-                                  !example.englishTranslation ||
-                                  !example.spanglish
-                                ) {
-                                  throw new Error(
-                                    'Missing required fields in flashcard',
-                                  );
-                                }
-                                return {
-                                  recordId: example.recordId,
-                                  spanishExample: example.spanishExample,
-                                  englishTranslation:
-                                    example.englishTranslation,
-                                  spanglish: example.spanglish,
-                                  spanishAudioLa: example.spanishAudioLa || '',
-                                  englishAudio: example.englishAudio || '',
-                                  vocabComplete: false,
-                                  vocabIncluded: [],
-                                  coachAdded: true,
-                                };
-                              }),
-                              {
-                                onSuccess: () => {
-                                  clearAndRestart();
-                                },
-                              },
-                            );
-                          } else if (
-                            assignmentType === 'quiz' &&
-                            selectedQuizObject
-                          ) {
-                            // TODO: Implement the logic to assign examples to a quiz
-                            // This would typically involve a mutation similar to addMultipleFlashcardsMutation
-                            // For now, we'll just show a toast message
-                            toast.success(
-                              `Examples would be assigned to Quiz: ${selectedQuizObject.quizNickname || `Quiz ${selectedQuizObject.quizNumber}`}`,
-                            );
-                            clearAndRestart();
-                          }
-                        }}
-                        disabled={addMultipleFlashcardsMutation.isPending}
-                      >
-                        Confirm
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowAssignmentConfirmation(false)}
-                        disabled={addMultipleFlashcardsMutation.isPending}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+      {showAssignmentConfirmation && (
+        <ConfirmationDialog
+          assignmentType={assignmentType}
+          unassignedExamples={unassignedExamples}
+          selectedQuizObject={selectedQuizObject}
+          activeStudent={activeStudentQuery.data || null}
+          onConfirm={handleConfirmAssignment}
+          onCancel={() => setShowAssignmentConfirmation(false)}
+          isPending={
+            addMultipleFlashcardsMutation.isPending ||
+            addQuizExamplesMutation.isPending
+          }
+        />
       )}
     </div>
   );
