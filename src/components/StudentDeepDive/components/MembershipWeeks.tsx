@@ -4,6 +4,7 @@ import { toISODate } from 'src/functions/dateUtils';
 
 import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
 import AssignmentsCell from './general/AssignmentsCell_Modificed';
+import GroupSessionsCell from './general/GroupSessionsCell_Modified';
 import PrivateCallsCell from './general/PrivateCallsCell_Modificed';
 import '../StudentDeepDive.scss';
 
@@ -69,23 +70,8 @@ export default function MembershipWeeks({
                 </td>
 
                 <td>
-                  {' '}
                   {week.groupSessions.length > 0 && (
-                    <div className="week-group-sessions">
-                      <span className="group-sessions-label">
-                        Group Sessions:
-                      </span>
-                      <ul className="group-sessions-list">
-                        {week.groupSessions.map((session) => (
-                          <li
-                            key={session.recordId}
-                            className="group-session-item"
-                          >
-                            {session.sessionType} - Coach: {session.coach.name}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <GroupSessionsCell groupSessions={week.groupSessions} />
                   )}
                 </td>
                 <td>

@@ -8,11 +8,11 @@ import type {
 import { useQuery } from '@tanstack/react-query';
 import { useBackend, useBackendHelpers } from 'src/hooks/useBackend';
 
-interface GroupSessionWithAttendees extends GroupSession {
+export interface GroupSessionWithAttendees extends GroupSession {
   attendees: GroupAttendees[];
 }
 
-interface WeekWithRelations extends Week {
+export interface WeekWithRelations extends Week {
   assignments: Assignment[];
   privateCalls: PrivateCall[];
   groupSessions: GroupSessionWithAttendees[];
