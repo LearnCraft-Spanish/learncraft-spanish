@@ -145,3 +145,215 @@ so we can do col/row later on smaller screens */
   background-color: var(--light);
   border: 1px solid var(--accent);
 }
+
+/* Confirm submission contextual */
+
+.confirmSubmissionBox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.confirmSubmissionBox form {
+  background-color: var(--light);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  width: 50%;
+}
+
+/* Vocabulary Tagging Styles */
+.vocabTagBox {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  margin-top: 12px;
+  width: 90%;
+}
+
+.vocabTag {
+  font-size: 12px;
+  padding: 7px 5px 0;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--light);
+  border: 4px solid var(--brand);
+  text-align: center;
+  overflow: hidden;
+  margin: 0 5px;
+  margin-top: 4px;
+  border-radius: 0;
+  cursor: pointer;
+  min-height: 80px;
+}
+
+.removeTagButton {
+  background-color: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Vocab Complete Toggle */
+.vocabCompleteContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+/* Example Filter Controls */
+.exampleFilterControls {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+  gap: 20px;
+}
+
+.filterToggleContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Assignment Section Styles */
+.assignment-section {
+  margin: 20px 5%;
+  width: 90%;
+}
+
+.assignment-section h3,
+.assignment-section h4 {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.assignment-section p {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.assignment-type-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.assignment-type-button {
+  padding: 8px 16px;
+  background-color: var(--light);
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.assignment-type-button.active {
+  background-color: var(--brand);
+  color: white;
+  border-color: var(--brand);
+}
+
+.toggle-button {
+  padding: 8px 16px;
+  background-color: var(--brand);
+  color: white;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggle-button:hover {
+  opacity: 0.9;
+}
+
+.toggle-arrow {
+  font-size: 18px;
+  margin-left: 4px;
+}
+
+.quiz-selector {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.student-selector {
+  margin: 15px auto;
+  max-width: 500px;
+}
+
+.example-preview {
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  width: 90%;
+}
+
+.example-preview .exampleCard {
+  margin: 0;
+}
+
+.confirmation-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.confirmation-dialog > div {
+  background-color: var(--light);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  width: 50%;
+  max-width: 500px;
+}
+
+.buttonBox {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
