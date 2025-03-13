@@ -1,24 +1,22 @@
 import type { Coach, Course } from 'src/types/CoachingTypes';
 
-import { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
+import { toReadableMonthDay } from 'src/functions/dateUtils';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { CoachDropdown, Dropdown } from '../../general';
-import getDateRange from '../../general/functions/dateRange';
 
+import getDateRange from '../../general/functions/dateRange';
+import useDateRange from '../useDateRange';
 import '../../coaching.scss';
 
 interface CoachingFilterProps {
   dataReady: boolean;
-  advancedFilteringMenu: boolean;
-  toggleAdvancedFilteringMenu: () => void;
   filterByCoach: Coach | undefined;
   updateCoachFilter: (value: string) => void;
   filterByCourse: Course | undefined;
   updateCourseFilter: (value: string) => void;
-  filterByWeeksAgo: number;
-  updateWeeksAgoFilter: (value: string) => void;
   filterCoachless: boolean | undefined;
   updateCoachlessFilter: (value: boolean) => void;
   filterHoldWeeks: boolean | undefined;
@@ -30,14 +28,10 @@ interface CoachingFilterProps {
 }
 export default function WeeksFilter({
   dataReady,
-  advancedFilteringMenu,
-  toggleAdvancedFilteringMenu,
   filterByCoach,
   updateCoachFilter,
   filterByCourse,
   updateCourseFilter,
-  filterByWeeksAgo,
-  updateWeeksAgoFilter,
   filterCoachless,
   updateCoachlessFilter,
   filterHoldWeeks,
@@ -49,7 +43,22 @@ export default function WeeksFilter({
 }: CoachingFilterProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
   const { openContextual } = useContextualMenu();
-  const dateRange = useMemo(() => getDateRange(), []);
+  const { setStartDate, startDate } = useDateRange();
+  const [numWeeks, setNumWeeks] = useState(4); // Start with 4 weeks
+  const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
+
+  const handleLoadMore = () => {
+    setNumWeeks((prev) => prev * 2);
+  };
+
+  const handleWeeksAgoChange = (value: string) => {
+    if (value === 'loadMore') {
+      handleLoadMore();
+      // Don't update the selected value
+    } else {
+      setStartDate(value);
+    }
+  };
 
   const coursesWithActiveMemberships = useMemo(() => {
     if (!courseListQuery.isSuccess || !activeMembershipsQuery.isSuccess)
@@ -86,23 +95,41 @@ export default function WeeksFilter({
             editMode
             defaultOptionText="All Courses"
           />
-          <div>
+          <div className="weekSelector">
             <label htmlFor="weekRangeFilter">Week:</label>
             <select
               id="weekRangeFilter"
-              onChange={(e) => updateWeeksAgoFilter(e.target.value)}
-              value={filterByWeeksAgo}
+              onChange={(e) => handleWeeksAgoChange(e.target.value)}
+              value={startDate}
+              disabled={!dataReady}
             >
-              <option value={0}>
-                This Week {`(${dateRange.thisWeekDate})`}
+              {Array.from({ length: numWeeks }, (_, i) => {
+                const dateKey =
+                  i === 0
+                    ? 'thisWeekDate'
+                    : i === 1
+                      ? 'lastSundayDate'
+                      : i === 2
+                        ? 'twoSundaysAgoDate'
+                        : `${i + 1}SundaysAgoDate`;
+                const date = dateRange[dateKey];
+                const label =
+                  i === 0
+                    ? 'This Week'
+                    : i === 1
+                      ? 'Last Week'
+                      : i === 2
+                        ? 'Two Weeks Ago'
+                        : toReadableMonthDay(date);
+                return (
+                  <option key={date} value={date}>
+                    {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+                  </option>
+                );
+              })}
+              <option value="loadMore" className="loadMoreOption">
+                Load More Dates...
               </option>
-              <option value={1}>
-                Last Week {`(${dateRange.lastSundayDate})`}
-              </option>
-              <option value={2}>
-                Two Weeks Ago {`(${dateRange.twoSundaysAgoDate})`}
-              </option>
-              <option value={-1}>Last Three Weeks (All)</option>
             </select>
           </div>
         </div>
@@ -123,26 +150,8 @@ export default function WeeksFilter({
               New Group Call
             </button>
           </div>
-          <button
-            type="button"
-            className={`moreFilterButton ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
-            onClick={toggleAdvancedFilteringMenu}
-          >
-            More Filters
-          </button>
-          <button
-            type="button"
-            className={`hideFilterButton ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
-            onClick={toggleAdvancedFilteringMenu}
-          >
-            Hide
-          </button>
-
-          <div
-            className={`advancedFiltersWrapper ${advancedFilteringMenu ? 'advFilterActive' : ''}`}
-          >
+          <div className={`advancedFiltersWrapper`}>
             <div>
-              {/* <label htmlFor="search">Search:</label> */}
               <input
                 type="text"
                 id="search"

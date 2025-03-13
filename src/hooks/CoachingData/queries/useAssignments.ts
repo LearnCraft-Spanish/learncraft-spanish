@@ -1,30 +1,31 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 
-import { useBackend, useBackendHelpers } from '../useBackend';
-import { useUserData } from '../UserData/useUserData';
+import { useBackendHelpers } from '../../useBackend';
+import { useUserData } from '../../UserData/useUserData';
+import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
-export default function useAssignments() {
+export default function useAssignments(startDate: string, endDate: string) {
   const userDataQuery = useUserData();
-  const backend = useBackend();
+  const { getAssignments } = useStudentRecordsBackend();
 
   const { newPostFactory, newPutFactory, newDeleteFactory } =
     useBackendHelpers();
 
   const assignmentsQuery = useQuery({
-    queryKey: ['assignments'],
-    queryFn: backend.getAssignments,
+    queryKey: ['assignments', { startDate, endDate }],
+    queryFn: getAssignments,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||
       userDataQuery.data?.roles.adminRole === 'admin',
   });
 
-  const getAssignment = (recordId: number) => {
-    return assignmentsQuery.data?.find(
-      (assignment) => assignment.recordId === recordId,
-    );
-  };
+  // const getAssignment = (recordId: number) => {
+  //   return assignmentsQuery.data?.find(
+  //     (assignment) => assignment.recordId === recordId,
+  //   );
+  // };
 
   interface AssignmentForCreation {
     relatedWeek: number;
@@ -102,7 +103,6 @@ export default function useAssignments() {
 
   return {
     assignmentsQuery,
-    getAssignment,
     createAssignmentMutation,
     updateAssignmentMutation,
     deleteAssignmentMutation,

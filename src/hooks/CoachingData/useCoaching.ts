@@ -1,307 +1,190 @@
-import { useQuery } from '@tanstack/react-query';
-import { useCallback } from 'react';
-import { useBackend } from '../useBackend';
-import { useUserData } from '../UserData/useUserData';
-
-import useAssignments from './useAssignments';
-import useGroupAttendees from './useGroupAttendees';
-import useGroupSessions from './useGroupSessions';
-import usePrivateCalls from './usePrivateCalls';
-import useWeeks from './useWeeks';
+import { useCallback, useContext } from 'react';
+import { DateRangeContext } from '../../components/Coaching/WeeksRecords/DateRangeContext';
+import * as helpers from './helperFunctions';
+import {
+  useActiveMemberships,
+  useActiveStudents,
+  useAssignments,
+  useCoachList,
+  useCourseList,
+  useGroupAttendees,
+  useGroupSessions,
+  usePrivateCalls,
+  useStudentRecordsLessons,
+  useWeeks,
+} from './queries';
 
 export default function useCoaching() {
-  const userDataQuery = useUserData();
-  const backend = useBackend();
+  const dateRangeContext = useContext(DateRangeContext);
 
-  const { weeksQuery } = useWeeks();
-  const { assignmentsQuery } = useAssignments();
-  const { privateCallsQuery } = usePrivateCalls();
-  const { groupSessionsQuery } = useGroupSessions();
-  const { groupAttendeesQuery } = useGroupAttendees();
+  if (!dateRangeContext) {
+    throw new Error('useCoaching must be used within a DateRangeProvider');
+  }
 
-  /* --------- Queries --------- */
+  const { startDate, endDate } = dateRangeContext;
+  const { weeksQuery, updateWeekMutation } = useWeeks(startDate, endDate);
+  const {
+    assignmentsQuery,
+    createAssignmentMutation,
+    updateAssignmentMutation,
+    deleteAssignmentMutation,
+  } = useAssignments(startDate, endDate);
+  const {
+    privateCallsQuery,
+    createPrivateCallMutation,
+    updatePrivateCallMutation,
+    deletePrivateCallMutation,
+  } = usePrivateCalls(startDate, endDate);
+  const {
+    groupSessionsQuery,
+    createGroupSessionMutation,
+    updateGroupSessionMutation,
+    deleteGroupSessionMutation,
+    groupSessionsTopicFieldOptionsQuery,
+  } = useGroupSessions(startDate, endDate);
+  const {
+    groupAttendeesQuery,
+    createGroupAttendeesMutation,
+    deleteGroupAttendeesMutation,
+  } = useGroupAttendees(startDate, endDate);
+  const { coachListQuery } = useCoachList();
+  const { courseListQuery } = useCourseList();
+  const { activeMembershipsQuery } = useActiveMemberships();
+  const { activeStudentsQuery } = useActiveStudents();
+  const { studentRecordsLessonsQuery } = useStudentRecordsLessons();
 
-  const coachListQuery = useQuery({
-    queryKey: ['coachList'],
-    queryFn: backend.getCoachList,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const courseListQuery = useQuery({
-    queryKey: ['courseList'],
-    queryFn: backend.getCourseList,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const activeMembershipsQuery = useQuery({
-    queryKey: ['activeMemberships'],
-    queryFn: backend.getActiveMemberships,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const activeStudentsQuery = useQuery({
-    queryKey: ['activeStudents'],
-    queryFn: backend.getActiveStudents,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  const studentRecordsLessonsQuery = useQuery({
-    queryKey: ['studentRecordsLessons'],
-    queryFn: backend.getLessonList,
-    staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
-  });
-
-  /*--------- Helper Functions ---------
-  / These functions are used to get data from the queries above.
-  / Error Return values for these functions
-  / null: query holding desired data was not successful / is not ready
-  / undefined: desired data does not exist
-  */
-
+  /*--------- Helper Functions ---------*/
   const getCoachFromMembershipId = useCallback(
     (membershipId: number) => {
       if (
-        !activeMembershipsQuery.isSuccess ||
-        !activeStudentsQuery.isSuccess ||
-        !coachListQuery.isSuccess
+        !activeMembershipsQuery.data ||
+        !activeStudentsQuery.data ||
+        !coachListQuery.data
       ) {
         return null;
       }
-      const membership = activeMembershipsQuery.data.find(
-        (membership) => membership.recordId === membershipId,
+      return helpers.getCoachFromMembershipId(
+        membershipId,
+        activeMembershipsQuery.data,
+        activeStudentsQuery.data,
+        coachListQuery.data,
       );
-      if (!membership) return undefined;
-
-      const studentId = membership.relatedStudent;
-      const student = activeStudentsQuery.data.find(
-        (student) => student.recordId === studentId,
-      );
-      if (!student) return undefined;
-
-      const coachObject = student.primaryCoach;
-      if (!coachObject) return undefined;
-
-      const coach = coachListQuery.data.find(
-        (coach) => coach.user.id === coachObject.id,
-      );
-      if (!coach) return undefined;
-      return coach;
     },
     [
       activeMembershipsQuery.data,
-      activeMembershipsQuery.isSuccess,
       activeStudentsQuery.data,
-      activeStudentsQuery.isSuccess,
       coachListQuery.data,
-      coachListQuery.isSuccess,
     ],
   );
 
   const getCourseFromMembershipId = useCallback(
     (membershipId: number | undefined) => {
-      if (!activeMembershipsQuery.isSuccess || !courseListQuery.isSuccess) {
+      if (!activeMembershipsQuery.data || !courseListQuery.data) {
         return null;
       }
-      if (!membershipId) return undefined;
-
-      const membership = activeMembershipsQuery.data.find(
-        (membership) => membership.recordId === membershipId,
+      return helpers.getCourseFromMembershipId(
+        membershipId,
+        activeMembershipsQuery.data,
+        courseListQuery.data,
       );
-      if (!membership) return undefined;
-
-      const courseId = membership.relatedCourse;
-      const course = courseListQuery.data.find(
-        (course) => course.recordId === courseId,
-      );
-      if (!course) return undefined;
-      return course;
     },
-    [
-      activeMembershipsQuery.data,
-      activeMembershipsQuery.isSuccess,
-      courseListQuery.data,
-      courseListQuery.isSuccess,
-    ],
+    [activeMembershipsQuery.data, courseListQuery.data],
   );
 
   const getStudentFromMembershipId = useCallback(
     (membershipId: number | undefined) => {
-      if (
-        !activeMembershipsQuery.isSuccess ||
-        !activeStudentsQuery.isSuccess ||
-        !membershipId
-      ) {
+      if (!activeMembershipsQuery.data || !activeStudentsQuery.data) {
         return null;
       }
-      const membership = activeMembershipsQuery.data.find(
-        (item) => item.recordId === membershipId,
+      return helpers.getStudentFromMembershipId(
+        membershipId,
+        activeMembershipsQuery.data,
+        activeStudentsQuery.data,
       );
-      if (!membership) return undefined;
-
-      const studentId = membership.relatedStudent;
-      const student = activeStudentsQuery.data.find(
-        (item) => item.recordId === studentId,
-      );
-      if (!student) return undefined;
-      return student;
     },
-    [
-      activeMembershipsQuery.data,
-      activeMembershipsQuery.isSuccess,
-      activeStudentsQuery.data,
-      activeStudentsQuery.isSuccess,
-    ],
+    [activeMembershipsQuery.data, activeStudentsQuery.data],
   );
 
   const getAttendeeWeeksFromGroupSessionId = useCallback(
     (sessionId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !weeksQuery.isSuccess) {
+      if (!groupAttendeesQuery.data || !weeksQuery.data) {
         return null;
       }
-      const attendeeList = groupAttendeesQuery.data.filter(
-        (attendee) => attendee.groupSession === sessionId,
+      return helpers.getAttendeeWeeksFromGroupSessionId(
+        sessionId,
+        groupAttendeesQuery.data,
+        weeksQuery.data,
       );
-      if (attendeeList.length === 0) return undefined;
-
-      const weekRecordsList = attendeeList.map((attendee) =>
-        weeksQuery.data.find((week) => week.recordId === attendee.student),
-      );
-      if (weekRecordsList.length === 0) return undefined;
-      return weekRecordsList;
     },
-    [
-      groupAttendeesQuery.isSuccess,
-      groupAttendeesQuery.data,
-      weeksQuery.isSuccess,
-      weeksQuery.data,
-    ],
+    [groupAttendeesQuery.data, weeksQuery.data],
   );
 
   const getGroupSessionsFromWeekRecordId = useCallback(
     (weekRecordId: number) => {
-      if (!groupAttendeesQuery.isSuccess || !groupSessionsQuery.isSuccess) {
+      if (!groupAttendeesQuery.data || !groupSessionsQuery.data) {
         return null;
       }
-      const attendeeList = groupAttendeesQuery.data.filter(
-        (attendee) => attendee.student === weekRecordId,
+      return helpers.getGroupSessionsFromWeekRecordId(
+        weekRecordId,
+        groupAttendeesQuery.data,
+        groupSessionsQuery.data,
       );
-      const groupSessionList = groupSessionsQuery.data.filter((groupSession) =>
-        attendeeList.find(
-          (attendee) => attendee.groupSession === groupSession.recordId,
-        ),
-      );
-      return groupSessionList;
     },
-    [
-      groupAttendeesQuery.data,
-      groupAttendeesQuery.isSuccess,
-      groupSessionsQuery.data,
-      groupSessionsQuery.isSuccess,
-    ],
+    [groupAttendeesQuery.data, groupSessionsQuery.data],
   );
 
   const getAssignmentsFromWeekRecordId = useCallback(
     (weekRecordId: number) => {
-      if (!assignmentsQuery.isSuccess) {
+      if (!assignmentsQuery.data) {
         return null;
       }
-      const assignments = assignmentsQuery.data.filter(
-        (assignment) => assignment.relatedWeek === weekRecordId,
+      return helpers.getAssignmentsFromWeekRecordId(
+        weekRecordId,
+        assignmentsQuery.data,
       );
-      if (assignments.length === 0) return undefined;
-      return assignments;
     },
-    [assignmentsQuery.data, assignmentsQuery.isSuccess],
+    [assignmentsQuery.data],
   );
 
   const getMembershipFromWeekRecordId = useCallback(
     (weekId: number | undefined) => {
-      if (!activeMembershipsQuery.isSuccess || !weeksQuery.isSuccess) {
+      if (!activeMembershipsQuery.data || !weeksQuery.data) {
         return null;
       }
-      if (!weekId) return undefined;
-
-      const week = weeksQuery.data.find((week) => week.recordId === weekId);
-      if (!week) return undefined;
-
-      const membershipId = week.relatedMembership;
-      const membership = activeMembershipsQuery.data.find(
-        (membership) => membership.recordId === membershipId,
+      return helpers.getMembershipFromWeekRecordId(
+        weekId,
+        weeksQuery.data,
+        activeMembershipsQuery.data,
       );
-      if (!membership) return undefined;
-      return membership;
     },
-    [
-      activeMembershipsQuery.data,
-      activeMembershipsQuery.isSuccess,
-      weeksQuery.data,
-      weeksQuery.isSuccess,
-    ],
+    [activeMembershipsQuery.data, weeksQuery.data],
   );
 
   const getPrivateCallsFromWeekRecordId = useCallback(
     (weekId: number) => {
-      if (!privateCallsQuery.isSuccess) {
+      if (!privateCallsQuery.data) {
         return null;
       }
-      const privateCalls = privateCallsQuery.data.filter(
-        (call) => call.relatedWeek === weekId,
+      return helpers.getPrivateCallsFromWeekRecordId(
+        weekId,
+        privateCallsQuery.data,
       );
-      return privateCalls;
     },
-    [privateCallsQuery.data, privateCallsQuery.isSuccess],
+    [privateCallsQuery.data],
   );
 
   const getAttendeesFromGroupSessionId = useCallback(
     (sessionId: number) => {
-      if (!groupAttendeesQuery.isSuccess) {
+      if (!groupAttendeesQuery.data) {
         return null;
       }
-      return groupAttendeesQuery.data.filter(
-        (attendee) => attendee.groupSession === sessionId,
+      return helpers.getAttendeesFromGroupSessionId(
+        sessionId,
+        groupAttendeesQuery.data,
       );
     },
-    [groupAttendeesQuery.isSuccess, groupAttendeesQuery.data],
+    [groupAttendeesQuery.data],
   );
-  /* --------- Other Helper Functions --------- */
-
-  const dateObjectToText = useCallback((dateObject: Date) => {
-    // This will be depricated soon, use built in date functions instead
-    function formatMonth(date: Date) {
-      // const unformattedMonth = date.getMonth() + 1; // Found it like this, ask Josiash if intentional?
-      const unformattedMonth = date.getMonth();
-      return unformattedMonth < 10
-        ? `0${unformattedMonth}`
-        : `${unformattedMonth}`;
-    }
-    function formatDate(date: Date) {
-      let dateString = date.getDate().toString();
-      if (Number(dateString) < 10) {
-        dateString = `0${dateString}`;
-      }
-      return dateString;
-    }
-
-    function formatYear(date: Date) {
-      return date.getFullYear().toString();
-    }
-    return `${formatYear(dateObject)}-${formatMonth(dateObject)}-${formatDate(dateObject)}`;
-  }, []);
 
   return {
     weeksQuery,
@@ -312,21 +195,33 @@ export default function useCoaching() {
     groupSessionsQuery,
     groupAttendeesQuery,
     studentRecordsLessonsQuery,
-
     assignmentsQuery,
     privateCallsQuery,
+    groupSessionsTopicFieldOptionsQuery,
 
+    // Helper functions
     getCoachFromMembershipId,
     getCourseFromMembershipId,
     getStudentFromMembershipId,
     getAttendeeWeeksFromGroupSessionId,
-    getAttendeesFromGroupSessionId,
     getGroupSessionsFromWeekRecordId,
-
     getAssignmentsFromWeekRecordId,
     getMembershipFromWeekRecordId,
     getPrivateCallsFromWeekRecordId,
+    getAttendeesFromGroupSessionId,
 
-    dateObjectToText,
+    // Mutations
+    createAssignmentMutation,
+    updateAssignmentMutation,
+    deleteAssignmentMutation,
+    createPrivateCallMutation,
+    updatePrivateCallMutation,
+    deletePrivateCallMutation,
+    createGroupSessionMutation,
+    updateGroupSessionMutation,
+    deleteGroupSessionMutation,
+    createGroupAttendeesMutation,
+    deleteGroupAttendeesMutation,
+    updateWeekMutation,
   };
 }

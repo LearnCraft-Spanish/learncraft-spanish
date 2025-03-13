@@ -42,6 +42,7 @@ export type Week = Expanded<{
   membershipCourseHasGroupCalls: boolean;
   membershipCourseWeeklyPrivateCalls: number;
   bundleCreditsUsed: number;
+  weekName: string;
 }>;
 
 export type Student = Expanded<{
@@ -107,7 +108,7 @@ export type Coach = Expanded<{
   user: QbUser;
 }>;
 
-export type Call = Expanded<{
+export type PrivateCall = Expanded<{
   recordId: number;
   relatedWeek: number;
   recording: string;
@@ -130,12 +131,3 @@ export type Assignment = Expanded<{
   homeworkCorrector: QbUser;
   weekStarts: Date | string;
 }>;
-
-/* wild backend call with 5 arrays */
-export type getLastThreeWeeksResponse = [
-  Week[],
-  Call[],
-  GroupSession[],
-  GroupAttendees[],
-  Assignment[],
-];

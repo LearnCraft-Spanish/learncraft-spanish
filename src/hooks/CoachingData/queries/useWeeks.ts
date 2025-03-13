@@ -1,16 +1,21 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useBackend, useBackendHelpers } from '../useBackend';
-import { useUserData } from '../UserData/useUserData';
 
-export default function useWeeks() {
-  const backend = useBackend();
+import { useBackendHelpers } from '../../useBackend';
+import { useUserData } from '../../UserData/useUserData';
+import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
+
+export default function useWeeks(
+  startDate: string | undefined,
+  endDate: string | undefined,
+) {
   const { newPutFactory } = useBackendHelpers();
   const userDataQuery = useUserData();
+  const { getWeeks } = useStudentRecordsBackend();
 
   const weeksQuery = useQuery({
-    queryKey: ['weeksQuery'],
-    queryFn: backend.getWeeks,
+    queryKey: ['weeksQuery', { startDate, endDate }],
+    queryFn: getWeeks,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||

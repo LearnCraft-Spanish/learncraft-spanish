@@ -1,21 +1,22 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
-import { useBackend, useBackendHelpers } from '../useBackend';
-import { useUserData } from '../UserData/useUserData';
+import { useBackendHelpers } from '../../useBackend';
+import { useUserData } from '../../UserData/useUserData';
+import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
 export interface GroupAttendeeMutationObj {
   student: number;
   groupSession: number;
 }
 
-export default function useGroupAttendees() {
+export default function useGroupAttendees(startDate: string, endDate: string) {
   const userDataQuery = useUserData();
-  const backend = useBackend();
+  const { getGroupAttendees } = useStudentRecordsBackend();
   const { newPostFactory, newDeleteFactory } = useBackendHelpers();
 
   const groupAttendeesQuery = useQuery({
-    queryKey: ['groupAttendees'],
-    queryFn: backend.getGroupAttendees,
+    queryKey: ['groupAttendees', { startDate, endDate }],
+    queryFn: getGroupAttendees,
     staleTime: Infinity,
     enabled:
       userDataQuery.data?.roles.adminRole === 'coach' ||

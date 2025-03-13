@@ -336,33 +336,29 @@ export function useBackend() {
     return getFactory('coaching/active-memberships');
   }, [getFactory]);
 
-  const getWeeks = useCallback((): Promise<StudentRecordsTypes.Week[]> => {
-    return getFactory('coaching/weeks');
-  }, [getFactory]);
+  // const getGroupAttendees = useCallback((): Promise<
+  //   StudentRecordsTypes.GroupAttendees[]
+  // > => {
+  //   return getFactory('coaching/group-attendees');
+  // }, [getFactory]);
 
-  const getGroupAttendees = useCallback((): Promise<
-    StudentRecordsTypes.GroupAttendees[]
-  > => {
-    return getFactory('coaching/group-attendees');
-  }, [getFactory]);
+  // const getGroupSessions = useCallback((): Promise<
+  //   StudentRecordsTypes.GroupSession[]
+  // > => {
+  //   return getFactory('coaching/group-sessions');
+  // }, [getFactory]);
 
-  const getGroupSessions = useCallback((): Promise<
-    StudentRecordsTypes.GroupSession[]
-  > => {
-    return getFactory('coaching/group-sessions');
-  }, [getFactory]);
+  // const getAssignments = useCallback((): Promise<
+  //   StudentRecordsTypes.Assignment[]
+  // > => {
+  //   return getFactory('coaching/assignments');
+  // }, [getFactory]);
 
-  const getAssignments = useCallback((): Promise<
-    StudentRecordsTypes.Assignment[]
-  > => {
-    return getFactory('coaching/assignments');
-  }, [getFactory]);
-
-  const getPrivateCalls = useCallback((): Promise<
-    StudentRecordsTypes.Call[]
-  > => {
-    return getFactory('coaching/private-calls');
-  }, [getFactory]);
+  // const getPrivateCalls = useCallback((): Promise<
+  //   StudentRecordsTypes.Call[]
+  // > => {
+  //   return getFactory('coaching/private-calls');
+  // }, [getFactory]);
   /*      POST Requests      */
 
   const createMyStudentExample = useCallback(
@@ -558,19 +554,15 @@ export function useBackend() {
     getActiveMemberships,
     getActiveStudents,
     getAllUsersFromBackend,
-    getAssignments,
     getAudioExamplesFromBackend,
-    getPrivateCalls,
     getCoachList,
     getCourseList,
     getExamplesFromBackend,
-    getGroupAttendees,
-    getGroupSessions,
+
     getLcspQuizzesFromBackend,
     getLessonList,
     getLessonsFromBackend,
     getMyExamplesFromBackend,
-    getWeeks,
     getPMFDataForUser,
     getProgramsFromBackend,
     getQuizExamplesFromBackend,
