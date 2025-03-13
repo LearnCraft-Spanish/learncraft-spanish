@@ -8,14 +8,14 @@ import React, {
   useState,
 } from 'react';
 import { toast } from 'react-toastify';
-import ConfirmationDialog from 'src/components/ExampleManager/ConfirmationDialog';
-import ExampleAssignmentPanel from 'src/components/ExampleManager/ExampleAssignmentPanel';
-import ExampleEditForm from 'src/components/ExampleManager/ExampleEditForm';
-import ExamplePasteArea from 'src/components/ExampleManager/ExamplePasteArea';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useBackend } from 'src/hooks/useBackend';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import ConfirmationDialog from './ConfirmationDialog';
+import ExampleAssignmentPanel from './ExampleAssignmentPanel';
+import ExampleEditForm from './ExampleEditForm';
+import ExamplePasteArea from './ExamplePasteArea';
 
 interface SetExampleCreatorProps {
   hasAccess: boolean;

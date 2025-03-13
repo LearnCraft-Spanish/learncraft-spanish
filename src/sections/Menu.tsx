@@ -128,8 +128,8 @@ export default function Menu() {
               </div>
               {userDataQuery.data.roles.adminRole === 'admin' && (
                 <div className="buttonBox">
-                  <Link className="linkButton" to="/examplecreator">
-                    Example Creator
+                  <Link className="linkButton" to="/examplemanager">
+                    Example Manager
                   </Link>
                 </div>
               )}

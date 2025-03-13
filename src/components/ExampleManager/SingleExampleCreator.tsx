@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import ExampleUpdateForm from 'src/components/ExampleCreator/ExampleUpdateForm';
+import ExampleUpdateForm from 'src/components/ExampleManager/ExampleUpdateForm';
 import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
@@ -428,6 +428,7 @@ export default function SingleExampleCreator({
         }))}
         selectFunction={hasEditAccess ? setSelectedExampleId : undefined}
         forceShowVocab
+        studentContext={false}
       />
     </>
   );

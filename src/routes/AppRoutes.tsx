@@ -1,7 +1,7 @@
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 
-import ExampleCreator from 'src/components/ExampleCreator/ExampleCreator';
+import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
@@ -68,9 +68,9 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/examplecreator"
+        path="/examplemanager"
         element={
-          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleCreator />
+          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleManager />
         }
       />
       <Route
