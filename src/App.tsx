@@ -11,6 +11,7 @@ import { useUserData } from './hooks/UserData/useUserData';
 
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
+import './contextual.scss';
 
 export const App: React.FC = () => {
   // React Router hooks

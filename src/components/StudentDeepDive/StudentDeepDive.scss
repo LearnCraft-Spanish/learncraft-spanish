@@ -327,6 +327,39 @@
 */
 /* ------------------ Membership Weeks ------------------ */
 
+.membership-weeks {
+  margin: 0.5rem;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    th,
+    td {
+      border: 1px solid #eee;
+      padding: 0.5rem;
+    }
+
+    th {
+      border-top: none;
+      &:first-child {
+        border-left: none;
+      }
+      &:last-child {
+        border-right: none;
+      }
+    }
+
+    td {
+      border-bottom: none;
+      &:first-child {
+        border-left: none;
+      }
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+}
+
 .membership-weeks h3 {
   display: flex;
   justify-content: start;
@@ -340,6 +373,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.weeks-list {
+  width: 100%;
 }
 /*
 .membership-weeks {

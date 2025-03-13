@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 
 import {
   CoachStudents,
-  MembershipWeeks,
   StudentDeepDiveSearch,
   StudentInfoCard,
   StudentMemberships,
 } from './components';
 
-import './StudentDeepDive.css';
+import './StudentDeepDive.scss';
 
 export default function StudentDeepDive() {
   const [selectedStudentId, setSelectedStudentId] = useState<
@@ -52,12 +51,6 @@ export default function StudentDeepDive() {
                 onMembershipSelect={handleMembershipSelect}
               />
             </div>
-            {selectedMembershipId && (
-              <div className="student-details-section">
-                <h2>Membership Weeks</h2>
-                <MembershipWeeks membershipId={selectedMembershipId} />
-              </div>
-            )}
           </>
         )}
       </div>
