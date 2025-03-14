@@ -1,6 +1,6 @@
 import type { Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import Pagination from 'src/components/FlashcardFinder/Pagination';
+import Pagination from 'src/components/ExamplesTable/Pagination';
 import LoadingMessage from 'src/components/Loading';
 
 import useCoaching from 'src/hooks/CoachingData/useCoaching';

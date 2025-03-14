@@ -19,7 +19,7 @@ function getCurrentWeek(
   return Math.floor(weekDifference);
 }
 /* ------------------ Mock Data ------------------ */
-const weekRecordStructure = {
+const weekRecordStructure: Week = {
   weekStarts: '00-00-0000',
   weekEnds: '00-00-0000',
   recordId: 0,
@@ -37,6 +37,7 @@ const weekRecordStructure = {
 
   // Generate
   week: 0,
+  weekName: 'TEST WEEK NAME',
   combinedKeyForUniques: '0-0', // relatedMembership-week
   notes: '',
   holdWeek: false,
@@ -127,7 +128,6 @@ function generateWeek({
   // Step Two, data that depends on the weekRecord
   weekRecord.combinedKeyForUniques = `${weekRecord.relatedMembership}-${weekRecord.week}`;
   weekRecord.endingThisWeek = membershipEndingThisWeek(membership, weekRecord);
-
   return weekRecord;
 }
 
