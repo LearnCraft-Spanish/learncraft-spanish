@@ -5,7 +5,10 @@ import type {
 } from 'src/hooks/CoachingData/useBundleCredits';
 import type { UserData } from 'src/types/interfaceDefinitions';
 import React, { useState } from 'react';
+import ContextualControls from 'src/components/ContextualControls';
 import { useBundleCredits } from 'src/hooks/CoachingData/useBundleCredits';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
 interface BundleCreditRowProps {
@@ -15,55 +18,169 @@ interface BundleCreditRowProps {
 interface BundleCreditViewProps {
   studentId: number;
   credit?: BundleCredit; // if provided, we're editing. if not, we're creating
-  onClose: () => void;
 }
 
-function BundleCreditView({
-  studentId,
-  credit,
-  onClose,
-}: BundleCreditViewProps) {
+interface FormDataType {
+  totalCredits: string;
+  usedCredits: string;
+  expiration?: string;
+}
+
+function BundleCreditView({ studentId, credit }: BundleCreditViewProps) {
+  const { setContextualRef, closeContextual } = useContextualMenu();
   const { createBundleCredit, updateBundleCredit, deleteBundleCredit } =
     useBundleCredits(studentId);
-  const [formData, setFormData] = useState<Partial<CreateBundleCreditInput>>({
-    totalCredits: credit?.totalCredits || 0,
-    usedCredits: credit?.usedCredits || 0,
+  const { openModal, closeModal } = useModal();
+  const [formData, setFormData] = useState<FormDataType>({
+    totalCredits: credit?.totalCredits?.toString() ?? '',
+    usedCredits: credit?.usedCredits?.toString() ?? '',
     expiration: credit?.expiration
       ? new Date(credit.expiration).toISOString().split('T')[0]
       : undefined,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const validateForm = () => {
+    // Check for whole numbers
+    const totalCredits = Number(formData.totalCredits);
+    const usedCredits = Number(formData.usedCredits);
+
+    if (
+      formData.totalCredits !== '' &&
+      (!Number.isInteger(totalCredits) || totalCredits < 0)
+    ) {
+      openModal({
+        title: 'Validation Error',
+        body: 'Total credits must be a non-negative whole number',
+        type: 'error',
+      });
+      return false;
+    }
+
+    if (
+      formData.usedCredits !== '' &&
+      (!Number.isInteger(usedCredits) || usedCredits < 0)
+    ) {
+      openModal({
+        title: 'Validation Error',
+        body: 'Used credits must be a non-negative whole number',
+        type: 'error',
+      });
+      return false;
+    }
+
+    // Check if used credits exceed total credits
+    if (
+      formData.totalCredits !== '' &&
+      formData.usedCredits !== '' &&
+      usedCredits > totalCredits
+    ) {
+      openModal({
+        title: 'Validation Error',
+        body: 'Used credits cannot exceed total credits',
+        type: 'error',
+      });
+      return false;
+    }
+
+    // expiration is required, and must be a valid date
+    if (!formData.expiration) {
+      openModal({
+        title: 'Validation Error',
+        body: 'Please enter a valid expiration date',
+        type: 'error',
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleDelete = async () => {
+    closeModal();
     try {
       if (credit) {
-        await updateBundleCredit.mutateAsync({
-          recordId: credit.recordId,
-          totalCredits: formData.totalCredits,
-          usedCredits: formData.usedCredits,
-          expiration: formData.expiration
-            ? `${formData.expiration}T08:00:00`
-            : undefined,
-        } as UpdateBundleCreditInput);
-      } else {
-        await createBundleCredit.mutateAsync({
-          relatedStudent: studentId,
-          totalCredits: formData.totalCredits || 0,
-          usedCredits: formData.usedCredits || 0,
-          expiration: formData.expiration
-            ? `${formData.expiration}T08:00:00`
-            : undefined,
-        } as CreateBundleCreditInput);
+        await deleteBundleCredit.mutateAsync(credit.recordId);
+        closeContextual();
       }
-      onClose();
     } catch (error) {
-      console.error('Failed to save bundle credit:', error);
+      console.error('Failed to delete bundle credit:', error);
+      openModal({
+        title: 'Error',
+        body: 'Failed to delete bundle credit. Please try again.',
+        type: 'error',
+      });
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    try {
+      const parsedTotalCredits =
+        formData.totalCredits === '' ? 0 : Number(formData.totalCredits);
+      const parsedUsedCredits =
+        formData.usedCredits === '' ? 0 : Number(formData.usedCredits);
+
+      if (credit) {
+        await updateBundleCredit.mutateAsync(
+          {
+            recordId: credit.recordId,
+            totalCredits: parsedTotalCredits,
+            usedCredits: parsedUsedCredits,
+            expiration: formData.expiration
+              ? `${formData.expiration}T08:00:00`
+              : undefined,
+          } as UpdateBundleCreditInput,
+          {
+            onSuccess: () => {
+              closeContextual();
+            },
+          },
+        );
+      } else {
+        await createBundleCredit.mutateAsync(
+          {
+            relatedStudent: studentId,
+            totalCredits: parsedTotalCredits,
+            usedCredits: parsedUsedCredits,
+            expiration: formData.expiration
+              ? `${formData.expiration}T08:00:00`
+              : undefined,
+          } as CreateBundleCreditInput,
+          {
+            onSuccess: () => {
+              closeContextual();
+            },
+          },
+        );
+      }
+    } catch (error) {
+      console.error('Failed to save bundle credit:', error);
+      openModal({
+        title: 'Error',
+        body: 'Failed to save bundle credit. Please try again.',
+        type: 'error',
+      });
+    }
+  };
+
+  const confirmDelete = () => {
+    openModal({
+      title: 'Confirm Delete',
+      body: 'Are you sure you want to delete this bundle credit? This action cannot be undone.',
+      type: 'confirm',
+      confirmFunction: handleDelete,
+    });
+  };
+
   return (
-    <div className="bundle-credit-modal">
-      <div className="bundle-credit-modal-content">
+    <div className="contextualWrapper">
+      <div className="contextual" ref={setContextualRef}>
+        <ContextualControls />
         <h3>{credit ? 'Edit Bundle Credit' : 'Create Bundle Credit'}</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -71,14 +188,15 @@ function BundleCreditView({
             <input
               type="number"
               id="totalCredits"
-              value={formData.totalCredits || ''}
+              value={formData.totalCredits}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  totalCredits: Number(e.target.value),
+                  totalCredits: e.target.value,
                 })
               }
-              required
+              min="0"
+              step="1"
             />
           </div>
           <div className="form-group">
@@ -86,14 +204,15 @@ function BundleCreditView({
             <input
               type="number"
               id="usedCredits"
-              value={formData.usedCredits || ''}
+              value={formData.usedCredits}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  usedCredits: Number(e.target.value),
+                  usedCredits: e.target.value,
                 })
               }
-              required
+              min="0"
+              step="1"
             />
           </div>
           <div className="form-group">
@@ -101,7 +220,7 @@ function BundleCreditView({
             <input
               type="date"
               id="expiration"
-              value={formData.expiration || ''}
+              value={formData.expiration}
               onChange={(e) =>
                 setFormData({
                   ...formData,
@@ -114,16 +233,15 @@ function BundleCreditView({
             <button type="submit" className="primary">
               {credit ? 'Update' : 'Create'}
             </button>
-            <button type="button" onClick={onClose} className="secondary">
+            <button
+              type="button"
+              onClick={closeContextual}
+              className="secondary"
+            >
               Cancel
             </button>
-            {/* delete button */}
             {credit && (
-              <button
-                type="button"
-                onClick={() => deleteBundleCredit.mutateAsync(credit.recordId)}
-                className="danger"
-              >
+              <button type="button" onClick={confirmDelete} className="danger">
                 Delete
               </button>
             )}
@@ -135,18 +253,14 @@ function BundleCreditView({
 }
 
 function BundleCreditRow({ credit }: BundleCreditRowProps) {
-  const [isEditing, setIsEditing] = useState(false);
+  const { contextual, openContextual } = useContextualMenu();
   const userDataQuery = useUserData();
   const isAdmin = (userDataQuery.data as UserData)?.roles.adminRole === 'admin';
 
   return (
     <>
-      {isEditing && (
-        <BundleCreditView
-          studentId={credit.relatedStudent}
-          credit={credit}
-          onClose={() => setIsEditing(false)}
-        />
+      {contextual === `bundle-credit-${credit.recordId}` && (
+        <BundleCreditView studentId={credit.relatedStudent} credit={credit} />
       )}
       <div key={credit.recordId} className="credit-details">
         <div className="info-row">
@@ -182,7 +296,7 @@ function BundleCreditRow({ credit }: BundleCreditRowProps) {
         {isAdmin && (
           <div className="admin-controls">
             <button
-              onClick={() => setIsEditing(true)}
+              onClick={() => openContextual(`bundle-credit-${credit.recordId}`)}
               className="edit-button"
               type="button"
             >
@@ -203,7 +317,7 @@ export function BundleCreditsSection({ studentId }: BundleCreditsSectionProps) {
   const { bundleCreditsQuery } = useBundleCredits(studentId);
   const userDataQuery = useUserData();
   const isAdmin = (userDataQuery.data as UserData)?.roles.adminRole === 'admin';
-  const [isCreating, setIsCreating] = useState(false);
+  const { contextual, openContextual } = useContextualMenu();
 
   return (
     <div className="bundle-credits-section">
@@ -211,7 +325,7 @@ export function BundleCreditsSection({ studentId }: BundleCreditsSectionProps) {
         <h3>Bundle Credits</h3>
         {isAdmin && (
           <button
-            onClick={() => setIsCreating(true)}
+            onClick={() => openContextual('create-bundle-credit')}
             className="create-button primary"
             type="button"
           >
@@ -220,11 +334,8 @@ export function BundleCreditsSection({ studentId }: BundleCreditsSectionProps) {
         )}
       </div>
 
-      {isCreating && (
-        <BundleCreditView
-          studentId={studentId}
-          onClose={() => setIsCreating(false)}
-        />
+      {contextual === 'create-bundle-credit' && (
+        <BundleCreditView studentId={studentId} />
       )}
 
       {bundleCreditsQuery.isLoading ? (

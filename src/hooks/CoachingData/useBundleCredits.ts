@@ -1,5 +1,6 @@
 import type { UserData } from 'src/types/interfaceDefinitions';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
@@ -60,10 +61,16 @@ export function useBundleCredits(studentId: number) {
   const createBundleCredit = useMutation({
     mutationFn: async (input: CreateBundleCreditInput) => {
       validateAdminAccess();
-      return newPostFactory<BundleCredit>({
+      const promise = newPostFactory<BundleCredit>({
         path: 'coaching/bundle-credits',
         body: input,
       });
+      toast.promise(promise, {
+        pending: 'Creating bundle credit...',
+        success: 'Bundle credit created!',
+        error: 'Error creating bundle credit',
+      });
+      return promise;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bundleCredits', studentId] });
@@ -75,10 +82,16 @@ export function useBundleCredits(studentId: number) {
     mutationFn: async (input: UpdateBundleCreditInput) => {
       validateAdminAccess();
       const { ...updateData } = input;
-      return newPutFactory<BundleCredit>({
+      const promise = newPutFactory<BundleCredit>({
         path: 'coaching/bundle-credits',
         body: updateData,
       });
+      toast.promise(promise, {
+        pending: 'Updating bundle credit...',
+        success: 'Bundle credit updated!',
+        error: 'Error updating bundle credit',
+      });
+      return promise;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bundleCredits', studentId] });
@@ -89,9 +102,15 @@ export function useBundleCredits(studentId: number) {
   const deleteBundleCredit = useMutation({
     mutationFn: async (bundleId: number) => {
       validateAdminAccess();
-      return newDeleteFactory<void>({
+      const promise = newDeleteFactory<void>({
         path: `coaching/bundle-credits/${bundleId}`,
       });
+      toast.promise(promise, {
+        pending: 'Deleting bundle credit...',
+        success: 'Bundle credit deleted!',
+        error: 'Error deleting bundle credit',
+      });
+      return promise;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bundleCredits', studentId] });
