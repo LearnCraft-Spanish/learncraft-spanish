@@ -1,18 +1,16 @@
 import React from 'react';
 
-interface PaginationProps {
-  page: number;
-  maxPage: number;
-  nextPage: () => void;
-  previousPage: () => void;
-}
-
-const Pagination: React.FC<PaginationProps> = ({
+export default function Pagination({
   page,
   maxPage,
   nextPage,
   previousPage,
-}: PaginationProps) => {
+}: {
+  page: number;
+  maxPage: number;
+  nextPage: () => void;
+  previousPage: () => void;
+}) {
   return (
     maxPage > 1 && (
       <div className="pagination">
@@ -34,6 +32,4 @@ const Pagination: React.FC<PaginationProps> = ({
       </div>
     )
   );
-};
-
-export default Pagination;
+}

@@ -1,9 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 export default function StudentSearch() {
   const { studentListQuery, chooseStudent } = useActiveStudent();
 
   const [searchString, setSearchString] = useState('');
+
+  const selectStudent = useCallback(
+    (studentId: number) => {
+      chooseStudent(studentId);
+      setSearchString('');
+    },
+    [chooseStudent],
+  );
 
   const listOfStudents = useMemo(() => {
     return studentListQuery.isSuccess
@@ -57,6 +65,7 @@ export default function StudentSearch() {
       <input
         type="text"
         placeholder="Search for a student by name or email"
+        value={searchString}
         onChange={(e) => setSearchString(e.target.value)}
       />
       {searchStudentOptions.length > 0 && (
@@ -65,7 +74,7 @@ export default function StudentSearch() {
             <div
               key={student.recordId}
               className="searchResultItem"
-              onClick={() => chooseStudent(student.recordId)}
+              onClick={() => selectStudent(student.recordId)}
             >
               {student.displayString}
             </div>
