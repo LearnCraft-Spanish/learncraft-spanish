@@ -6,7 +6,8 @@ import type {
   Student,
   Week,
 } from 'src/types/CoachingTypes';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'react-toastify';
 import { useBackend, useBackendHelpers } from 'src/hooks/useBackend';
 
 export interface GroupSessionWithAttendees extends GroupSession {
@@ -67,10 +68,38 @@ export function useMembershipWeeks(membershipId: number) {
 
 export function useAllStudents() {
   const { getAllStudents } = useStudentDeepDive();
-
-  return useQuery({
+  const { newPutFactory } = useBackendHelpers();
+  const queryClient = useQueryClient();
+  const allStudentsQuery = useQuery({
     queryKey: ['allStudents'],
     queryFn: getAllStudents,
     staleTime: Infinity,
   });
+
+  const updateStudent = (student: UpdateStudent) => {
+    const promise = newPutFactory<Student>({
+      path: `coaching/update-student`,
+      body: student,
+    });
+    toast.promise(promise, {
+      pending: 'Updating student...',
+      success: 'Student updated!',
+      error: 'Error updating student',
+    });
+    return promise;
+  };
+
+  // make partial type for updateStudent
+  type UpdateStudent = Partial<Student> & { recordId: number };
+  const updateStudentMutation = useMutation({
+    mutationFn: (student: UpdateStudent) => updateStudent(student),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['allStudents'] });
+    },
+  });
+
+  return {
+    allStudentsQuery,
+    updateStudentMutation,
+  };
 }

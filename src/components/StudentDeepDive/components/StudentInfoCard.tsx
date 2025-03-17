@@ -68,7 +68,7 @@ const timezones = [
 ];
 
 export default function StudentInfoCard({ studentId }: { studentId: number }) {
-  const allStudentsQuery = useAllStudents();
+  const { allStudentsQuery } = useAllStudents();
   const userDataQuery = useUserData();
   const student = useMemo(
     () =>
@@ -153,7 +153,7 @@ export default function StudentInfoCard({ studentId }: { studentId: number }) {
 }
 
 export function StudentInfoContextual({ studentId }: { studentId: number }) {
-  const allStudentsQuery = useAllStudents();
+  const { allStudentsQuery, updateStudentMutation } = useAllStudents();
   const userDataQuery = useUserData();
   const { coachListQuery } = useCoachList();
 
@@ -197,7 +197,33 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
   }
 
   function captureSubmitForm() {
-    closeContextual();
+    // if data is undefined, return
+    if (!data) return;
+    // for each field, if it was previously defined, include it. if it was not defined, remove it
+    updateStudentMutation.mutate(
+      {
+        firstName: data.firstName || undefined,
+        lastName: data.lastName || undefined,
+        pronoun: data.pronoun || undefined,
+        email: data.email || undefined,
+        timeZone: data.timeZone || undefined,
+        startingLevel: data.startingLevel || undefined,
+        fluencyGoal: data.fluencyGoal || undefined,
+        advancedStudent: data.advancedStudent || false,
+        billingEmail: data.billingEmail || undefined,
+        billingNotes: data.billingNotes || undefined,
+        recordId: studentId,
+        // fullName: data.fullName,
+        usPhone: data.usPhone || undefined,
+        // primaryCoach: data.primaryCoach,
+        // firstSubscribed: data.firstSubscribed,
+      },
+      {
+        onSuccess: () => {
+          closeContextual();
+        },
+      },
+    );
   }
 
   useEffect(() => {
@@ -213,11 +239,22 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
       </div>
     );
   }
+
   if (
-    student.primaryCoach.id !== currentUserAsQbUser?.recordId.toString() &&
+    student.primaryCoach?.email !== currentUserAsQbUser?.user.email &&
     userDataQuery.data?.roles.adminRole !== 'admin'
   ) {
-    return <div>You are not authorized to edit this student.</div>;
+    return (
+      <div className="contextualWrapper">
+        <div className="contextual">
+          <h3>Unauthorized</h3>
+          <p>Only the primary coach or an admin can edit this student.</p>
+          <button onClick={closeContextual} className="redButton" type="button">
+            Close
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -50,7 +50,7 @@ export interface Student {
   lastName: string;
   fullName: string;
   email: string;
-  timeZone: string;
+  timeZone: string | undefined;
   usPhone: number;
   fluencyGoal: string;
   startingLevel: string;
@@ -59,7 +59,7 @@ export interface Student {
   // currentMembershipEnds: Date;
   // memberUntil: Date;
   // lastMembershipEnded: Date;
-  pronoun: string;
+  pronoun: string | undefined;
   billingEmail: string;
   billingNotes: string;
   firstSubscribed: Date | string;

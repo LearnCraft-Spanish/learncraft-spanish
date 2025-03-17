@@ -23,7 +23,7 @@ export default function StudentDeepDiveSearch({
     debouncedSearch(value);
   };
 
-  const allStudentsQuery = useAllStudents();
+  const { allStudentsQuery } = useAllStudents();
   const listOfStudents = useMemo(() => {
     return allStudentsQuery.isSuccess
       ? allStudentsQuery.data
