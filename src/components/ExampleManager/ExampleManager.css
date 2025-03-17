@@ -71,6 +71,11 @@ so we can do col/row later on smaller screens */
   color: red;
 }
 
+/* for positioning audio controls */
+.exampleAudioWrapper {
+  position: relative;
+}
+
 /* Temporary button styling, should be updated later */
 #exampleForm button {
   width: 33%;

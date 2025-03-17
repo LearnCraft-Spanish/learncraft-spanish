@@ -10,6 +10,7 @@ import React, {
 import { toast } from 'react-toastify';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useBackend } from 'src/hooks/useBackend';
+import { useModal } from 'src/hooks/useModal';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import ConfirmationDialog from './ConfirmationDialog';
@@ -27,6 +28,7 @@ export default function ExampleSetCreator({
   const queryClient = useQueryClient();
   const { getExampleSetBySpanishText, createMultipleUnverifiedExamples } =
     useBackend();
+  const { openModal } = useModal();
 
   const [pastingOrEditing, setPastingOrEditing] = useState<
     'pasting' | 'editing' | 'assigning'
@@ -447,6 +449,35 @@ export default function ExampleSetCreator({
     return <div>You do not have access to create example sets.</div>;
   }
 
+  function handleSaveExampleSet() {
+    // validate the audios
+    // regex verify if the audio link is valid
+    const urlRegex = /^https?:\/\/.+\.(?:mp3|wav|ogg|m4a)$/i;
+    const invalidAudios = unsavedFlashcardSet.filter((flashcard) => {
+      let isValid = false;
+      if (flashcard.spanishAudioLa) {
+        if (!urlRegex.test(flashcard.spanishAudioLa)) {
+          isValid = true;
+        }
+      }
+      if (flashcard.englishAudio) {
+        if (!urlRegex.test(flashcard.englishAudio)) {
+          isValid = true;
+        }
+      }
+      return isValid;
+    });
+    if (invalidAudios.length > 0) {
+      openModal({
+        title: 'Invalid audio links',
+        body: 'One or more audio links are invalid. Please check the audio links and try again.',
+        type: 'error',
+      });
+      return;
+    }
+    addFlashcardSetMutation.mutate(unsavedFlashcardSet);
+  }
+
   return (
     <div>
       <h3>Example Set Creator</h3>
@@ -465,7 +496,7 @@ export default function ExampleSetCreator({
         <ExampleEditForm
           unsavedFlashcardSet={unsavedFlashcardSet}
           onUpdateExample={updateFlashcardSetValues}
-          onSave={() => addFlashcardSetMutation.mutate(unsavedFlashcardSet)}
+          onSave={handleSaveExampleSet}
           onBack={() => setPastingOrEditing('pasting')}
           onContinue={() => setPastingOrEditing('assigning')}
           onRestart={clearAndRestart}
