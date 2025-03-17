@@ -1,9 +1,11 @@
 import { Route } from 'react-router-dom';
-import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 
+import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
+import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import VocabManager from '../components/VocabManager/VocabManager';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
 import FlashcardManager from '../sections/FlashcardManager';
@@ -71,6 +73,14 @@ export default function AppRoutes() {
         path="/examplemanager"
         element={
           userDataQuery.data?.roles.adminRole === 'admin' && <ExampleManager />
+        }
+      />
+      <Route
+        path="/vocabularymanager"
+        element={
+          <ProtectedRoute>
+            <VocabManager />
+          </ProtectedRoute>
         }
       />
       <Route

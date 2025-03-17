@@ -116,6 +116,26 @@ export type ActiveStudent = Expanded<UserData | null>;
 
 export type AudioExamplesTable = Expanded<Array<Flashcard>>;
 
+export type IdiomVocabulary = Expanded<{
+  recordId: number;
+  wordIdiom: string;
+  use: string;
+  frequencyRank: number;
+  descriptionOfVocabularySkill?: string;
+  vocabName: string;
+  verbInfinitive: null;
+  conjugationTags: Array<string>;
+  spellings?: Array<string>;
+}>;
+
+export type VerbVocabulary = Expanded<{
+  recordId: number;
+  wordIdiom: string;
+  use: string;
+  frequencyRank: number;
+  descriptionOfVocabularySkill?: string;
+}>;
+
 export type Vocabulary = Expanded<{
   recordId: number;
   wordIdiom: string;
@@ -224,4 +244,16 @@ export type PMFData = Expanded<{
   recordId: number;
   relatedStudent: number;
   lastContactDate: string;
+}>;
+
+export type Verb = Expanded<{
+  recordId: number;
+  infinitive: string;
+  conjugationTags: Array<string>;
+}>;
+
+export type Subcategory = Expanded<{
+  recordId: number;
+  subcategoryName: string;
+  description?: string;
 }>;
