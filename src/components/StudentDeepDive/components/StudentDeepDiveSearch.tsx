@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
-import useActiveStudents from 'src/hooks/CoachingData/queries/useActiveStudents';
+import { debounce } from 'lodash';
+import { useMemo, useRef, useState } from 'react';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
 
 interface StudentDeepDiveSearchProps {
   onStudentSelect: (studentId: number | undefined) => void;
@@ -10,11 +11,28 @@ export default function StudentDeepDiveSearch({
   onStudentSelect,
   selectedStudentId,
 }: StudentDeepDiveSearchProps) {
+  const [activeStudentsOnly, setActiveStudentsOnly] = useState(true);
   const [searchString, setSearchString] = useState('');
-  const { activeStudentsQuery } = useActiveStudents();
+  const [debouncedSearchString, setDebouncedSearchString] = useState('');
+
+  const debouncedSearch = useRef(
+    debounce((value: string) => setDebouncedSearchString(value), 150),
+  ).current;
+
+  const debouncedSetSearch = (value: string) => {
+    debouncedSearch(value);
+  };
+
+  const allStudentsQuery = useAllStudents();
   const listOfStudents = useMemo(() => {
-    return activeStudentsQuery.isSuccess
-      ? activeStudentsQuery.data
+    return allStudentsQuery.isSuccess
+      ? allStudentsQuery.data
+          .filter((student) => {
+            if (activeStudentsOnly) {
+              return student.active;
+            }
+            return true;
+          })
           .map((student) => {
             const studentEmail = student.email;
             const studentName = student.fullName
@@ -34,7 +52,7 @@ export default function StudentDeepDiveSearch({
             else return -1;
           })
       : [];
-  }, [activeStudentsQuery.isSuccess, activeStudentsQuery.data]);
+  }, [allStudentsQuery.isSuccess, allStudentsQuery.data, activeStudentsOnly]);
 
   const selectedStudent = useMemo(() => {
     if (!selectedStudentId) return null;
@@ -44,64 +62,88 @@ export default function StudentDeepDiveSearch({
   }, [listOfStudents, selectedStudentId]);
 
   const searchStudentOptions = useMemo(() => {
-    if (searchString === '') return [];
+    if (debouncedSearchString === '') return [];
     const matchesSearch = listOfStudents.filter((student) => {
       return student.displayString
         .toLowerCase()
-        .includes(searchString.toLowerCase());
+        .includes(debouncedSearchString.toLowerCase());
     });
     return matchesSearch;
-  }, [listOfStudents, searchString]);
+  }, [listOfStudents, debouncedSearchString]);
 
   function handleStudentSelect(studentId: number) {
     onStudentSelect(studentId);
     setSearchString('');
+    setDebouncedSearchString('');
   }
 
   function handleClearStudent() {
     onStudentSelect(undefined);
     setSearchString('');
+    setDebouncedSearchString('');
   }
 
   return (
     <div className="student-deep-dive-search">
       <div className="search-input-wrapper">
-        {selectedStudent ? (
-          <div className="selected-student-display">
-            <span>{selectedStudent.displayString}</span>
-            <button
-              className="clear-student-button"
-              onClick={handleClearStudent}
-              aria-label="Clear student selection"
-              type="button"
-            >
-              ×
-            </button>
-          </div>
-        ) : (
-          <input
-            type="text"
-            placeholder="Search for a student by name or email"
-            onChange={(e) => setSearchString(e.target.value)}
-            value={searchString}
-          />
-        )}
-      </div>
-      {searchStudentOptions.length > 0 && (
-        <div className="search-results">
-          {searchStudentOptions.map((student) => (
-            <div
-              key={student.recordId}
-              className={`search-result-item ${
-                student.recordId === Number(selectedStudentId) ? 'selected' : ''
-              }`}
-              onClick={() => handleStudentSelect(student.recordId)}
-            >
-              {student.displayString}
+        <div className="search-input-wrapper-inner">
+          {selectedStudent ? (
+            <div className="selected-student-display">
+              <span>{selectedStudent.displayString}</span>
+              <button
+                className="clear-student-button"
+                onClick={handleClearStudent}
+                aria-label="Clear student selection"
+                type="button"
+              >
+                ×
+              </button>
             </div>
-          ))}
+          ) : (
+            <>
+              <input
+                type="text"
+                placeholder="Search for a student by name or email"
+                onChange={(e) => {
+                  setSearchString(e.target.value);
+                  debouncedSetSearch(e.target.value);
+                }}
+                value={searchString}
+              />
+              {searchStudentOptions.length > 0 && (
+                <div className="search-results">
+                  {searchStudentOptions.map((student) => (
+                    <div
+                      key={student.recordId}
+                      className={`search-result-item ${
+                        student.recordId === Number(selectedStudentId)
+                          ? 'selected'
+                          : ''
+                      }`}
+                      onClick={() => handleStudentSelect(student.recordId)}
+                    >
+                      {student.displayString}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
-      )}
+        <div className="active-students-filter">
+          <p>Active Students Only:</p>
+          <label htmlFor="activeStudentsOnly" className="switch">
+            <input
+              alt="Active Students"
+              type="checkbox"
+              id="activeStudentsOnly"
+              checked={activeStudentsOnly}
+              onChange={(e) => setActiveStudentsOnly(e.target.checked)}
+            />
+            <span className="slider round"></span>
+          </label>
+        </div>
+      </div>
     </div>
   );
 }

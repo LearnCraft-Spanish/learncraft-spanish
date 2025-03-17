@@ -32,11 +32,30 @@
 }
 
 .search-input-wrapper {
-  margin-bottom: 10px;
-  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
 }
 
-.search-input-wrapper input {
+.search-input-wrapper-inner {
+  margin-bottom: 10px;
+  position: relative;
+  width: 100%;
+}
+.active-students-filter {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-width: 200px;
+  width: 30%;
+  margin-bottom: 10px;
+}
+.active-students-filter p {
+  margin: 0 0.5rem;
+}
+
+.search-input-wrapper-inner input {
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
@@ -48,7 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width: 70%;
   padding: 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
@@ -74,7 +93,7 @@
 
 .search-results {
   position: absolute;
-  top: 100%;
+  top: 110%;
   left: 0;
   right: 0;
   background: white;

@@ -44,17 +44,26 @@ export type Week = Expanded<{
   bundleCreditsUsed: number;
 }>;
 
-export type Student = Expanded<{
+export interface Student {
   recordId: number;
   firstName: string;
   lastName: string;
   fullName: string;
   email: string;
   timeZone: string;
+  usPhone: number;
   fluencyGoal: string;
   startingLevel: string;
   primaryCoach: QbUser;
-}>;
+  active: boolean;
+  // currentMembershipEnds: Date;
+  // memberUntil: Date;
+  // lastMembershipEnded: Date;
+  pronoun: string;
+  billingEmail: string;
+  billingNotes: string;
+  firstSubscribed: Date | string;
+}
 
 export type Membership = Expanded<{
   recordId: number;
