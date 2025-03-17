@@ -1,7 +1,7 @@
 import CoachStudents from './CoachStudents';
 import MembershipWeeks from './MembershipWeeks';
 import StudentDeepDiveSearch from './StudentDeepDiveSearch';
-import StudentInfoCard from './StudentInfoCard';
+import StudentInfoCard, { StudentInfoContextual } from './StudentInfoCard';
 import StudentMemberships from './StudentMemberships';
 
 export {
@@ -9,5 +9,6 @@ export {
   MembershipWeeks,
   StudentDeepDiveSearch,
   StudentInfoCard,
+  StudentInfoContextual,
   StudentMemberships,
 };

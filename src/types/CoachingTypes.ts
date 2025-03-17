@@ -63,6 +63,7 @@ export interface Student {
   billingEmail: string;
   billingNotes: string;
   firstSubscribed: Date | string;
+  advancedStudent: boolean;
 }
 
 export type Membership = Expanded<{

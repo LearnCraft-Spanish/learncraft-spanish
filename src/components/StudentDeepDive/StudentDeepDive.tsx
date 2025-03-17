@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 
+import pencil from 'src/assets/icons/pencil.svg';
+
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import {
   CoachStudents,
   StudentDeepDiveSearch,
   StudentInfoCard,
+  StudentInfoContextual,
   StudentMemberships,
 } from './components';
-
 import './StudentDeepDive.scss';
 
 export default function StudentDeepDive() {
+  const { contextual, openContextual } = useContextualMenu();
   const [selectedStudentId, setSelectedStudentId] = useState<
     number | undefined
   >(undefined);
@@ -41,8 +45,18 @@ export default function StudentDeepDive() {
         {selectedStudentId && (
           <>
             <div className="student-details-section">
+              <div className="edit-student">
+                <img
+                  src={pencil}
+                  alt="Edit Student"
+                  onClick={() => openContextual('edit-student')}
+                />
+              </div>
               <h2>Student Details</h2>
               <StudentInfoCard studentId={selectedStudentId} />
+              {contextual === 'edit-student' && (
+                <StudentInfoContextual studentId={selectedStudentId} />
+              )}
             </div>
             <div>
               <StudentMemberships
