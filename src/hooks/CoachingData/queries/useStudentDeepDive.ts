@@ -1,8 +1,10 @@
+import type { UseQueryResult } from '@tanstack/react-query';
 import type {
   Assignment,
   GroupAttendees,
   GroupSession,
   PrivateCall,
+  QbUser,
   Student,
   Week,
 } from 'src/types/CoachingTypes';
@@ -90,7 +92,15 @@ export function useAllStudents() {
   };
 
   // make partial type for updateStudent
-  type UpdateStudent = Partial<Student> & { recordId: number };
+  type UpdateStudent = Omit<Partial<Student>, 'primaryCoach'> & {
+    recordId: number;
+    primaryCoach?: string; // Email string for updates
+  };
+
+  type StudentResponse = Omit<Student, 'primaryCoach'> & {
+    primaryCoach: QbUser; // Full QbUser object in responses
+  };
+
   const updateStudentMutation = useMutation({
     mutationFn: (student: UpdateStudent) => updateStudent(student),
     onSuccess: () => {
@@ -99,7 +109,10 @@ export function useAllStudents() {
   });
 
   return {
-    allStudentsQuery,
+    allStudentsQuery: allStudentsQuery as UseQueryResult<
+      StudentResponse[],
+      unknown
+    >,
     updateStudentMutation,
   };
 }

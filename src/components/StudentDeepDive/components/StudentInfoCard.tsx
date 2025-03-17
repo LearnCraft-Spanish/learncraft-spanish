@@ -2,6 +2,7 @@ import type { Student } from 'src/types/CoachingTypes';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Checkbox,
+  CoachDropdown,
   Dropdown,
   FormControls,
   TextInput,
@@ -66,6 +67,12 @@ const timezones = [
   'Chile',
   'MST - Arizona',
 ];
+
+// Create an interface that extends Student to include the primaryCoachEmail field for the form
+interface StudentFormData extends Omit<Student, 'primaryCoach'> {
+  primaryCoach: Student['primaryCoach'];
+  primaryCoachEmail?: string;
+}
 
 export default function StudentInfoCard({ studentId }: { studentId: number }) {
   const { allStudentsQuery } = useAllStudents();
@@ -159,7 +166,7 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
 
   const { closeContextual } = useContextualMenu();
 
-  const [data, setData] = useState<Student | undefined>(undefined);
+  const [data, setData] = useState<StudentFormData | undefined>(undefined);
 
   const student = useMemo(
     () =>
@@ -200,6 +207,17 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
     // if data is undefined, return
     if (!data) return;
     // for each field, if it was previously defined, include it. if it was not defined, remove it
+    let relatedCoach: number | string | undefined =
+      student?.primaryCoach?.id || undefined;
+    if (data.primaryCoachEmail) {
+      const coach = coachListQuery.data?.find(
+        (coach) => coach.user.email === data.primaryCoachEmail,
+      );
+      if (coach) {
+        relatedCoach = coach.recordId;
+      }
+    }
+
     updateStudentMutation.mutate(
       {
         firstName: data.firstName || undefined,
@@ -213,10 +231,8 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
         billingEmail: data.billingEmail || undefined,
         billingNotes: data.billingNotes || undefined,
         recordId: studentId,
-        // fullName: data.fullName,
         usPhone: data.usPhone || undefined,
-        // primaryCoach: data.primaryCoach,
-        // firstSubscribed: data.firstSubscribed,
+        relatedCoach,
       },
       {
         onSuccess: () => {
@@ -228,7 +244,10 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
 
   useEffect(() => {
     if (student) {
-      setData(student);
+      setData({
+        ...student,
+        primaryCoachEmail: student.primaryCoach?.email,
+      });
     }
   }, [student]);
 
@@ -319,6 +338,15 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
             value={data.fluencyGoal}
             onChange={(value) => {
               setData({ ...data, fluencyGoal: value });
+            }}
+            editMode
+          />
+          <CoachDropdown
+            coachEmail={data.primaryCoachEmail || ''}
+            onChange={(value: string) => {
+              setData((prev) =>
+                prev ? { ...prev, primaryCoachEmail: value } : undefined,
+              );
             }}
             editMode
           />

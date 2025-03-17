@@ -64,6 +64,7 @@ export interface Student {
   billingNotes: string;
   firstSubscribed: Date | string;
   advancedStudent: boolean;
+  relatedCoach: string | number | undefined;
 }
 
 export type Membership = Expanded<{
