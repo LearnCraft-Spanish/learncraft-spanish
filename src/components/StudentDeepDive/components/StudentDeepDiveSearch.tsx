@@ -1,6 +1,6 @@
 import { debounce } from 'lodash';
 import { useMemo, useRef, useState } from 'react';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
 
 interface StudentDeepDiveSearchProps {
   onStudentSelect: (studentId: number | undefined) => void;

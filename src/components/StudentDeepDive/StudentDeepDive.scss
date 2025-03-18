@@ -182,6 +182,21 @@
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
+  position: relative;
+}
+
+.editIcon {
+  width: 48px;
+  height: 40px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  padding: 0.5rem;
+  transform: translate(30%, -30%);
+}
+.editIcon:hover {
+  background-color: var(--accent);
 }
 .membership-header h4 {
   margin: 0;
@@ -191,19 +206,22 @@
   display: flex;
   flex-direction: row;
   gap: 10px;
+  flex-wrap: wrap;
 }
 .detail-row {
   display: flex;
+  margin: 0 0.5rem;
 }
 .detail-label {
   font-weight: 600;
   color: #666;
-  width: 100px;
+  min-width: 100px;
   flex-shrink: 0;
 }
 .detail-value {
   color: #333;
   flex-grow: 1;
+  padding: 0 0.5rem;
 }
 
 /*

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 
-import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
+import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/StudentDeepDive';
 import AssignmentsCell from './general/AssignmentsCell_Modificed';
 import GroupSessionsCell from './general/GroupSessionsCell_Modified';
 import PrivateCallsCell from './general/PrivateCallsCell_Modificed';
@@ -49,6 +49,7 @@ export default function MembershipWeeks({
           <thead>
             <tr>
               <th>Week</th>
+              <th>Current Lesson</th>
               <th>Notes</th>
               <th>Private Calls</th>
               <th>Group Calls</th>
@@ -62,6 +63,7 @@ export default function MembershipWeeks({
                   <h4>Week {week.week}</h4>
                   <span>{toISODate(new Date(week.weekStarts))}</span>
                 </td>
+                <td>{week.currentLessonName}</td>
                 <td>{week.notes}</td>
                 <td>
                   {week.privateCalls.length > 0 && (

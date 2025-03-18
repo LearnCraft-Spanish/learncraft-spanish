@@ -3,35 +3,28 @@ import type {
   CreateBundleCreditInput,
   UpdateBundleCreditInput,
 } from 'src/hooks/CoachingData/useBundleCredits';
-import type { UserData } from 'src/types/interfaceDefinitions';
 import React, { useState } from 'react';
 import ContextualControls from 'src/components/ContextualControls';
 import { useBundleCredits } from 'src/hooks/CoachingData/useBundleCredits';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
-interface BundleCreditRowProps {
-  credit: BundleCredit;
-}
-
-interface BundleCreditViewProps {
+function BundleCreditView({
+  studentId,
+  credit,
+}: {
   studentId: number;
-  credit?: BundleCredit; // if provided, we're editing. if not, we're creating
-}
-
-interface FormDataType {
-  totalCredits: string;
-  usedCredits: string;
-  expiration?: string;
-}
-
-function BundleCreditView({ studentId, credit }: BundleCreditViewProps) {
+  credit?: BundleCredit;
+}) {
   const { setContextualRef, closeContextual } = useContextualMenu();
   const { createBundleCredit, updateBundleCredit, deleteBundleCredit } =
     useBundleCredits(studentId);
   const { openModal, closeModal } = useModal();
-  const [formData, setFormData] = useState<FormDataType>({
+  const [formData, setFormData] = useState<{
+    totalCredits: string;
+    usedCredits: string;
+    expiration?: string;
+  }>({
     totalCredits: credit?.totalCredits?.toString() ?? '',
     usedCredits: credit?.usedCredits?.toString() ?? '',
     expiration: credit?.expiration
@@ -252,10 +245,14 @@ function BundleCreditView({ studentId, credit }: BundleCreditViewProps) {
   );
 }
 
-function BundleCreditRow({ credit }: BundleCreditRowProps) {
+function BundleCreditRow({
+  credit,
+  isAdmin,
+}: {
+  credit: BundleCredit;
+  isAdmin: boolean;
+}) {
   const { contextual, openContextual } = useContextualMenu();
-  const userDataQuery = useUserData();
-  const isAdmin = (userDataQuery.data as UserData)?.roles.adminRole === 'admin';
 
   return (
     <>
@@ -309,14 +306,14 @@ function BundleCreditRow({ credit }: BundleCreditRowProps) {
   );
 }
 
-interface BundleCreditsSectionProps {
+export function BundleCreditsSection({
+  studentId,
+  isAdmin,
+}: {
   studentId: number;
-}
-
-export function BundleCreditsSection({ studentId }: BundleCreditsSectionProps) {
+  isAdmin: boolean;
+}) {
   const { bundleCreditsQuery } = useBundleCredits(studentId);
-  const userDataQuery = useUserData();
-  const isAdmin = (userDataQuery.data as UserData)?.roles.adminRole === 'admin';
   const { contextual, openContextual } = useContextualMenu();
 
   return (
@@ -345,7 +342,11 @@ export function BundleCreditsSection({ studentId }: BundleCreditsSectionProps) {
       ) : bundleCreditsQuery.data && bundleCreditsQuery.data.length > 0 ? (
         <div className="bundle-credits-list">
           {bundleCreditsQuery.data.map((credit: BundleCredit) => (
-            <BundleCreditRow key={credit.recordId} credit={credit} />
+            <BundleCreditRow
+              key={credit.recordId}
+              credit={credit}
+              isAdmin={isAdmin}
+            />
           ))}
         </div>
       ) : (

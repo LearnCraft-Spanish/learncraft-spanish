@@ -336,13 +336,6 @@ export function useBackend() {
     return getFactory('coaching/active-memberships');
   }, [getFactory]);
 
-  const getStudentMemberships = useCallback(
-    (studentId: number): Promise<StudentRecordsTypes.Membership[]> => {
-      return getFactory(`coaching/student-memberships/${studentId}`);
-    },
-    [getFactory],
-  );
-
   // const getMemberships = useCallback((): Promise<
   //   StudentRecordsTypes.Membership[]
   // > => {
@@ -534,8 +527,6 @@ export function useBackend() {
     getLessonList,
     getLessonsFromBackend,
     getMyExamplesFromBackend,
-
-    getStudentMemberships,
 
     getPMFDataForUser,
     getProgramsFromBackend,

@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
-
-import pencil from 'src/assets/icons/pencil.svg';
-
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import React, { useMemo, useState } from 'react';
 import {
   CoachStudents,
   StudentDeepDiveSearch,
   StudentInfoCard,
-  StudentInfoContextual,
   StudentMemberships,
 } from './components';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
+import { Student } from 'src/types/CoachingTypes';
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useCoachList } from 'src/hooks/CoachingData/queries';
 import './StudentDeepDive.scss';
 
 export default function StudentDeepDive() {
-  const { contextual, openContextual } = useContextualMenu();
+  const { allStudentsQuery } = useAllStudents();
+  const userDataQuery = useUserData();
+  const { coachListQuery } = useCoachList();
+
   const [selectedStudentId, setSelectedStudentId] = useState<
     number | undefined
   >(undefined);
@@ -30,11 +32,44 @@ export default function StudentDeepDive() {
     setSelectedMembershipId(membershipId);
   };
 
+  const selectedStudent = useMemo(
+    () =>
+      allStudentsQuery.data?.find((s) => s.recordId === selectedStudentId) as
+        | Student
+        | undefined,
+    [allStudentsQuery.data, selectedStudentId],
+  );
+
+  const currentCoach = useMemo(() => {
+    const possibleEmailDomains = [
+      '@learncraftspanish.com',
+      '@masterofmemory.com',
+    ];
+
+    if (userDataQuery.data?.emailAddress) {
+      const currentUserCoach = coachListQuery.data?.find((coach) => {
+        const emailPrefix = userDataQuery.data.emailAddress
+          .split('@')[0]
+          .toLowerCase();
+        for (const domain of possibleEmailDomains) {
+          if (coach.user.email.toLowerCase() === emailPrefix + domain) {
+            return true;
+          }
+        }
+        return false;
+      });
+      if (currentUserCoach) return currentUserCoach;
+    }
+  }, [userDataQuery.data, coachListQuery.data]);
+
   return (
     <div className="student-deep-dive">
       <h1>Student Deep Dive</h1>
       <div className="content">
-        <CoachStudents onStudentSelect={handleStudentSelect} />
+        <CoachStudents
+          onStudentSelect={handleStudentSelect}
+          currentCoach={currentCoach}
+        />
         <div className="student-selection-section">
           <h2>Select a Student</h2>
           <StudentDeepDiveSearch
@@ -42,21 +77,14 @@ export default function StudentDeepDive() {
             selectedStudentId={selectedStudentId}
           />
         </div>
-        {selectedStudentId && (
+        {selectedStudentId && selectedStudent && (
           <>
             <div className="student-details-section">
-              <div className="edit-student">
-                <img
-                  src={pencil}
-                  alt="Edit Student"
-                  onClick={() => openContextual('edit-student')}
-                />
-              </div>
-              <h2>Student Details</h2>
-              <StudentInfoCard studentId={selectedStudentId} />
-              {contextual === 'edit-student' && (
-                <StudentInfoContextual studentId={selectedStudentId} />
-              )}
+              <StudentInfoCard
+                student={selectedStudent}
+                currentCoach={currentCoach}
+                isAdmin={userDataQuery.data?.roles.adminRole === 'admin'}
+              />
             </div>
             <div>
               <StudentMemberships

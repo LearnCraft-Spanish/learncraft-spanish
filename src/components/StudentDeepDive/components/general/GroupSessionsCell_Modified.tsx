@@ -1,4 +1,4 @@
-import type { GroupSessionWithAttendees } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
+import type { GroupSessionWithAttendees } from 'src/types/CoachingTypes';
 import {
   DateInput,
   Dropdown,

@@ -1,33 +1,15 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
 import React, { useMemo } from 'react';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
-import useActiveStudents from 'src/hooks/CoachingData/queries/useActiveStudents';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useActiveStudents } from 'src/hooks/CoachingData/queries';
 
 export default function CoachStudents({
   onStudentSelect,
+  currentCoach,
 }: {
   onStudentSelect: (studentId: number | undefined) => void;
+  currentCoach: Coach | undefined;
 }) {
-  const { coachListQuery } = useCoachList();
   const { activeStudentsQuery } = useActiveStudents();
-  const userDataQuery = useUserData();
-
-  // null if not ready, undefined if not a coach
-  const currentCoach = useMemo(() => {
-    if (!userDataQuery.isSuccess || !coachListQuery.isSuccess) {
-      return null;
-    }
-
-    return coachListQuery.data?.find(
-      (coach: Coach) => coach.user.email === userDataQuery.data.emailAddress,
-    );
-  }, [
-    coachListQuery.data,
-    coachListQuery.isSuccess,
-    userDataQuery.data,
-    userDataQuery.isSuccess,
-  ]);
 
   // Filter students where the current coach is the primary coach
   const coachStudents = useMemo(() => {

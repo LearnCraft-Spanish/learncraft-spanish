@@ -1,14 +1,16 @@
 export default function DateInput({
   value,
   onChange,
+  label = 'Date',
 }: {
   value: string;
   onChange: (value: React.SetStateAction<string>) => void;
+  label?: string;
 }) {
   return (
     <div className="lineWrapper">
       <label className="label" htmlFor="dateInput">
-        Date:
+        {`${label}:`}
       </label>
       <input
         id="dateInput"

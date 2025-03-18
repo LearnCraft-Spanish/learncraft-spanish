@@ -1,4 +1,4 @@
-import type { Student } from 'src/types/CoachingTypes';
+import type { Coach, QbUser, Student } from 'src/types/CoachingTypes';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   Checkbox,
@@ -10,10 +10,11 @@ import {
 import ContextualControls from 'src/components/ContextualControls';
 import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { BundleCreditsSection } from './BundleCreditsSection';
+import pencil from 'src/assets/icons/pencil.svg';
 const timezones = [
   'AZ',
   'CT',
@@ -74,129 +75,115 @@ interface StudentFormData extends Omit<Student, 'primaryCoach'> {
   primaryCoachEmail?: string;
 }
 
-export default function StudentInfoCard({ studentId }: { studentId: number }) {
-  const { allStudentsQuery } = useAllStudents();
+export default function StudentInfoCard({
+  student,
+  currentCoach,
+  isAdmin,
+}: {
+  student: Student;
+  currentCoach: Coach | undefined;
+  isAdmin: boolean;
+}) {
+  const { contextual, openContextual } = useContextualMenu();
   const userDataQuery = useUserData();
-  const student = useMemo(
-    () =>
-      allStudentsQuery.data?.find((s) => s.recordId === studentId) as
-        | Student
-        | undefined,
-    [allStudentsQuery.data, studentId],
-  );
-
-  if (!student) {
-    return (
-      <div>
-        Error retrieving student information, please report this to support.
-      </div>
-    );
-  }
-
   return (
-    <div className="student-info-card">
-      <div className="info-row">
-        <div className="info-label">Name:</div>
-        <div className="info-value">{student.fullName}</div>
-      </div>
-      <div className="info-row">
-        <div className="info-label">Pronoun:</div>
-        <div className="info-value">{student.pronoun}</div>
-      </div>
-      <div className="info-row">
-        <div className="info-label">Email:</div>
-        <div className="info-value">{student.email}</div>
-      </div>
-      <div className="info-row">
-        <div className="info-label">Fluency Goal:</div>
-        <div className="info-value">{student.fluencyGoal}</div>
-      </div>
-      <div className="info-row">
-        <div className="info-label">Time Zone:</div>
-        <div className="info-value">{student.timeZone}</div>
-      </div>
-      <div className="info-row">
-        <div className="info-label">Starting Level:</div>
-        <div className="info-value">{student.startingLevel}</div>
-      </div>
-      <div className="info-row">
-        <div className="info-label">Primary Coach:</div>
-        <div className="info-value">
-          {student.primaryCoach ? student.primaryCoach.name : 'Not assigned'}
-        </div>
-      </div>
-      <div className="info-row">
-        <div className="info-label">Advanced Student:</div>
-        <div className="info-value">
-          {student.advancedStudent ? 'Yes' : 'No'}
-        </div>
-      </div>
-      {/* only show to users who are admins */}
-      {userDataQuery.data?.roles.adminRole === 'admin' && (
-        <>
-          <h3>Billing Information</h3>
-          <div className="info-row">
-            <div className="info-label">Billing Email:</div>
-            <div className="info-value">{student.billingEmail}</div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">Billing Notes:</div>
-            <div className="info-value">{student.billingNotes}</div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">First Subscribed:</div>
-            <div className="info-value">
-              {typeof student.firstSubscribed === 'string'
-                ? student.firstSubscribed
-                : toISODate(student.firstSubscribed)}
-            </div>
-          </div>
-        </>
+    <>
+      {contextual === 'edit-student' && (
+        <StudentInfoContextual
+          student={student}
+          currentCoach={currentCoach}
+          isAdmin={isAdmin}
+        />
       )}
+      <div className="edit-student">
+        <img
+          src={pencil}
+          alt="Edit Student"
+          onClick={() => openContextual('edit-student')}
+        />
+      </div>
+      <h2>Student Details</h2>
+      <div className="student-info-card">
+        <div className="info-row">
+          <div className="info-label">Name:</div>
+          <div className="info-value">{student.fullName}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Pronoun:</div>
+          <div className="info-value">{student.pronoun}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Email:</div>
+          <div className="info-value">{student.email}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Fluency Goal:</div>
+          <div className="info-value">{student.fluencyGoal}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Time Zone:</div>
+          <div className="info-value">{student.timeZone}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Starting Level:</div>
+          <div className="info-value">{student.startingLevel}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Primary Coach:</div>
+          <div className="info-value">
+            {student.primaryCoach ? student.primaryCoach.name : 'Not assigned'}
+          </div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Advanced Student:</div>
+          <div className="info-value">
+            {student.advancedStudent ? 'Yes' : 'No'}
+          </div>
+        </div>
+        {/* only show to users who are admins */}
+        {isAdmin && (
+          <>
+            <h3>Billing Information</h3>
+            <div className="info-row">
+              <div className="info-label">Billing Email:</div>
+              <div className="info-value">{student.billingEmail}</div>
+            </div>
+            <div className="info-row">
+              <div className="info-label">Billing Notes:</div>
+              <div className="info-value">{student.billingNotes}</div>
+            </div>
+            <div className="info-row">
+              <div className="info-label">First Subscribed:</div>
+              <div className="info-value">
+                {typeof student.firstSubscribed === 'string'
+                  ? student.firstSubscribed
+                  : toISODate(student.firstSubscribed)}
+              </div>
+            </div>
+          </>
+        )}
 
-      <BundleCreditsSection studentId={studentId} />
-    </div>
+        <BundleCreditsSection studentId={student.recordId} isAdmin={isAdmin} />
+      </div>
+    </>
   );
 }
 
-export function StudentInfoContextual({ studentId }: { studentId: number }) {
-  const { allStudentsQuery, updateStudentMutation } = useAllStudents();
-  const userDataQuery = useUserData();
+export function StudentInfoContextual({
+  student,
+  currentCoach,
+  isAdmin,
+}: {
+  student: Student;
+  currentCoach: Coach | undefined;
+  isAdmin: boolean;
+}) {
+  const { updateStudentMutation } = useAllStudents();
   const { coachListQuery } = useCoachList();
 
   const { closeContextual } = useContextualMenu();
 
   const [data, setData] = useState<StudentFormData | undefined>(undefined);
-
-  const student = useMemo(
-    () =>
-      allStudentsQuery.data?.find((s) => s.recordId === studentId) as
-        | Student
-        | undefined,
-    [allStudentsQuery.data, studentId],
-  );
-
-  const currentUserAsQbUser = useMemo(() => {
-    const possibleEmailDomains = [
-      '@learncraftspanish.com',
-      '@masterofmemory.com',
-    ];
-
-    if (userDataQuery.data?.emailAddress) {
-      const currentUserCoach = coachListQuery.data?.find((coach) => {
-        const emailPrefix = userDataQuery.data.emailAddress
-          .split('@')[0]
-          .toLowerCase();
-        for (const domain of possibleEmailDomains) {
-          if (coach.user.email.toLowerCase() === emailPrefix + domain) {
-            return true;
-          }
-        }
-        return false;
-      });
-      if (currentUserCoach) return currentUserCoach;
-    }
-  }, [userDataQuery.data, coachListQuery.data]);
 
   function cancelEdit() {
     setData(student);
@@ -230,7 +217,7 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
         advancedStudent: data.advancedStudent || false,
         billingEmail: data.billingEmail || undefined,
         billingNotes: data.billingNotes || undefined,
-        recordId: studentId,
+        recordId: student.recordId,
         usPhone: data.usPhone || undefined,
         relatedCoach,
       },
@@ -251,18 +238,15 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
     }
   }, [student]);
 
-  if (!student) {
-    return (
-      <div>
-        Error retrieving student information, please report this to support.
-      </div>
-    );
-  }
+  // if (!student) {
+  //   return (
+  //     <div>
+  //       Error retrieving student information, please report this to support.
+  //     </div>
+  //   );
+  // }
 
-  if (
-    student.primaryCoach?.email !== currentUserAsQbUser?.user.email &&
-    userDataQuery.data?.roles.adminRole !== 'admin'
-  ) {
+  if (student.primaryCoach?.email !== currentCoach?.user.email && !isAdmin) {
     return (
       <div className="contextualWrapper">
         <div className="contextual">
@@ -358,7 +342,7 @@ export function StudentInfoContextual({ studentId }: { studentId: number }) {
               setData({ ...data, advancedStudent: value });
             }}
           />
-          {userDataQuery.data?.roles.adminRole === 'admin' && (
+          {isAdmin && (
             <>
               <TextInput
                 label="Billing Email"

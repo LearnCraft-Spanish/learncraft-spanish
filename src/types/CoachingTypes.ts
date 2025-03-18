@@ -76,6 +76,9 @@ export type Membership = Expanded<{
   lastRecordedWeekStarts: Date | string;
   relatedCourse: number;
   relatedStudent: number;
+  assignmentsCompleted: number;
+  callsCompleted: number;
+  primaryCoach: number;
 }>;
 
 export type Lesson = Expanded<{
@@ -141,3 +144,23 @@ export type Assignment = Expanded<{
   homeworkCorrector: QbUser;
   weekStarts: Date | string;
 }>;
+
+/* --------- Student Deep Dive Types --------- */
+export type UpdateStudent = Omit<Partial<Student>, 'primaryCoach'> & {
+  recordId: number;
+  primaryCoach?: string; // Email string for updates
+};
+
+export type StudentResponse = Omit<Student, 'primaryCoach'> & {
+  primaryCoach: QbUser; // Full QbUser object in responses
+};
+
+export interface GroupSessionWithAttendees extends GroupSession {
+  attendees: GroupAttendees[];
+}
+
+export interface WeekWithRelations extends Week {
+  assignments: Assignment[];
+  privateCalls: PrivateCall[];
+  groupSessions: GroupSessionWithAttendees[];
+}

@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
-import { useCourseList } from 'src/hooks/CoachingData/queries';
-import { useStudentMemberships } from 'src/hooks/CoachingData/queries/useStudentDeepDive';
+import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';
+import { useStudentMemberships } from 'src/hooks/CoachingData/queries/StudentDeepDive';
 import MembershipWeeks from './MembershipWeeks';
+import pencilIcon from 'src/assets/icons/pencil.svg';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { Membership } from 'src/types/CoachingTypes';
+import ContextualControls from 'src/components/ContextualControls';
+import {
+  DateInput,
+  Checkbox,
+  FormControls,
+  TextInput,
+} from 'src/components/Coaching/general';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 interface StudentMembershipsProps {
   studentId: number;
   selectedMembershipId: number | undefined;
@@ -18,7 +29,7 @@ export default function StudentMemberships({
 }: StudentMembershipsProps) {
   const { courseListQuery } = useCourseList();
   const studentMembershipsQuery = useStudentMemberships(studentId);
-
+  const { contextual, openContextual } = useContextualMenu();
   // Sort memberships only if we have data
   const sortedMemberships = React.useMemo(() => {
     if (!studentMembershipsQuery.isSuccess) return [];
@@ -50,6 +61,16 @@ export default function StudentMemberships({
                 <React.Fragment key={membership.recordId}>
                   <div key={membership.recordId} className="membership-card">
                     <div className="membership-header">
+                      <img
+                        src={pencilIcon}
+                        alt="pencil"
+                        className="editIcon"
+                        onClick={() =>
+                          openContextual(
+                            `edit-membership-${membership.recordId}`,
+                          )
+                        }
+                      />
                       <h4>{getCourseName(membership.relatedCourse)}</h4>
                       <div className="membership-status">
                         {membership.active && !membership.onHold && (
@@ -63,58 +84,52 @@ export default function StudentMemberships({
                         )}
                       </div>
                     </div>
-                    {/* Data to display:
-              - start date
-              - end date
-              - last recorded lesson?
-              - active
-              - on hold
-              */}
                     <div className="membership-details">
-                      <div className="detail-row">
-                        <button
+                      <button
+                        className={
+                          selectedMembershipId === membership.recordId
+                            ? 'view-weeks-button active'
+                            : 'view-weeks-button'
+                        }
+                        type="button"
+                        onClick={() =>
+                          onMembershipSelect(
+                            selectedMembershipId === membership.recordId
+                              ? undefined
+                              : membership.recordId,
+                          )
+                        }
+                      >
+                        <img
+                          src={downArrow}
+                          alt="down-arrow"
                           className={
                             selectedMembershipId === membership.recordId
-                              ? 'view-weeks-button active'
-                              : 'view-weeks-button'
+                              ? 'down-arrow active'
+                              : 'down-arrow'
                           }
-                          type="button"
-                          onClick={() =>
-                            onMembershipSelect(
-                              selectedMembershipId === membership.recordId
-                                ? undefined
-                                : membership.recordId,
-                            )
-                          }
-                        >
-                          <img
-                            src={downArrow}
-                            alt="down-arrow"
-                            className={
-                              selectedMembershipId === membership.recordId
-                                ? 'down-arrow active'
-                                : 'down-arrow'
-                            }
-                          />
-                          {selectedMembershipId === membership.recordId
-                            ? 'Hide Weeks'
-                            : 'View Weeks'}
-                        </button>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">Start Date:</span>
-                        <span className="detail-value">
-                          {toISODate(new Date(membership.startDate))}
-                        </span>
-                      </div>
-                      <div className="detail-row">
-                        <span className="detail-label">End Date:</span>
-                        <span className="detail-value">
-                          {membership.endDate &&
-                            toISODate(new Date(membership.endDate))}
-                        </span>
-                      </div>
-                      {/* <div className="detail-row">
+                        />
+                        {selectedMembershipId === membership.recordId
+                          ? 'Hide Weeks'
+                          : 'View Weeks'}
+                      </button>
+                      <div>
+                        <div className="membership-details">
+                          <div className="detail-row"></div>
+                          <div className="detail-row">
+                            <span className="detail-label">Start Date:</span>
+                            <span className="detail-value">
+                              {toISODate(new Date(membership.startDate))}
+                            </span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">End Date:</span>
+                            <span className="detail-value">
+                              {membership.endDate &&
+                                toISODate(new Date(membership.endDate))}
+                            </span>
+                          </div>
+                          {/* <div className="detail-row">
                   <span className="detail-label">Last Recorded Lesson:</span>
                   <span className="detail-value">
                     {membership.lastRecordedLesson
@@ -122,7 +137,31 @@ export default function StudentMemberships({
                       : 'No recorded lessons'}
                   </span>
                 </div> */}
+                        </div>
+                        <div className="membership-details">
+                          <div className="detail-row">
+                            <span className="detail-label">
+                              Assignments Completed:
+                            </span>
+                            <span className="detail-value">
+                              {membership.assignmentsCompleted}
+                            </span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">
+                              Private Calls Completed:
+                            </span>
+                            <span className="detail-value">
+                              {membership.callsCompleted}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                    {contextual ===
+                      `edit-membership-${membership.recordId}` && (
+                      <StudentMembershipContextual membership={membership} />
+                    )}
                     {selectedMembershipId === membership.recordId && (
                       <div className="membership-weeks">
                         <MembershipWeeks membershipId={membership.recordId} />
@@ -135,6 +174,97 @@ export default function StudentMemberships({
           )}
         </>
       )}
+    </div>
+  );
+}
+
+function StudentMembershipContextual({
+  membership,
+}: {
+  membership: Membership;
+}) {
+  const { closeContextual } = useContextualMenu();
+  const { courseListQuery } = useCourseList();
+  const [endDate, setEndDate] = useState(membership.endDate as string);
+  const [active, setActive] = useState(membership.active);
+  const userDataQuery = useUserData();
+  const { coachListQuery } = useCoachList();
+  // const [advanced, setAdvanced] = useState(membership.advancedStudent);
+  const getCourseName = (courseId: number) => {
+    const course = courseListQuery.data?.find((c) => c.recordId === courseId);
+    return course?.name || 'Unknown Course';
+  };
+  const cancelEdit = () => {
+    setEndDate(membership.endDate as string);
+    setActive(membership.active);
+    closeContextual();
+  };
+  const captureSubmitForm = () => {
+    console.log('captureSubmitForm');
+  };
+
+  const currentUserAsQbUser = useMemo(() => {
+    const possibleEmailDomains = [
+      '@learncraftspanish.com',
+      '@masterofmemory.com',
+    ];
+
+    if (userDataQuery.data?.emailAddress) {
+      const currentUserCoach = coachListQuery.data?.find((coach) => {
+        const emailPrefix = userDataQuery.data.emailAddress
+          .split('@')[0]
+          .toLowerCase();
+        for (const domain of possibleEmailDomains) {
+          if (coach.user.email.toLowerCase() === emailPrefix + domain) {
+            return true;
+          }
+        }
+        return false;
+      });
+      if (currentUserCoach) return currentUserCoach;
+    }
+  }, [userDataQuery.data, coachListQuery.data]);
+
+  if (
+    membership.primaryCoach &&
+    membership.primaryCoach.toString() !== currentUserAsQbUser?.user.id &&
+    userDataQuery.data?.roles.adminRole !== 'admin'
+  ) {
+    return (
+      <div className="contextualWrapper">
+        <div className="contextual">
+          <h3>Unauthorized</h3>
+          <p>
+            Only the primary coach or an admin can edit this student's
+            membership records.
+          </p>
+          <button onClick={closeContextual} className="redButton" type="button">
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="contextualWrapper">
+      <div className="contextual">
+        <ContextualControls />
+        <h3>Edit Membership</h3>
+        <TextInput
+          label="Membership Name"
+          value={getCourseName(membership.relatedCourse)}
+          editMode={false}
+          onChange={() => {}}
+        />
+        <DateInput value={endDate} onChange={setEndDate} label="End Date" />
+        <Checkbox label="Active" value={active} onChange={setActive} />
+        <FormControls
+          editMode
+          cancelEdit={cancelEdit}
+          captureSubmitForm={captureSubmitForm}
+        />
+      </div>
     </div>
   );
 }
