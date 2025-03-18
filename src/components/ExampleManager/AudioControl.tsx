@@ -1,10 +1,20 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import pause from 'src/assets/icons/pause_dark.svg';
 import play from 'src/assets/icons/play_dark.svg';
 
 export function AudioControl({ audioLink }: { audioLink: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  const isValidAudio = useMemo(() => {
+    const urlRegex = /^https?:\/\/.+\.(?:mp3|wav|ogg|m4a)$/i;
+    if (!audioLink) {
+      return true;
+    } else {
+      return urlRegex.test(audioLink);
+    }
+  }, [audioLink]);
+
   async function playAudio() {
     if (audioRef.current) {
       try {
@@ -25,6 +35,7 @@ export function AudioControl({ audioLink }: { audioLink: string }) {
       }
     }
   }
+
   function handlePlayPauseClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     if (isPlaying) {
@@ -36,15 +47,30 @@ export function AudioControl({ audioLink }: { audioLink: string }) {
   return (
     audioLink.length > 0 && (
       <>
-        <audio ref={audioRef} src={audioLink}></audio>
-        <button
-          type="button"
-          className="audioPlayPauseButton"
-          onClick={(e) => handlePlayPauseClick(e)}
-          aria-label="Play/Pause"
-        >
-          <img src={isPlaying ? pause : play} alt="play/pause" />
-        </button>
+        {isValidAudio && (
+          <>
+            <audio ref={audioRef} src={audioLink}></audio>
+            <button
+              type="button"
+              onClick={(e) => handlePlayPauseClick(e)}
+              className="audioPlayPauseButton"
+              aria-label="Play/Pause"
+            >
+              <img src={isPlaying ? pause : play} alt="play/pause" />
+            </button>
+          </>
+        )}
+        {!isValidAudio && (
+          <>
+            <button
+              type="button"
+              className="disabledButton audioError"
+              aria-label="audioError"
+            >
+              <img src={isPlaying ? pause : play} alt="audioError" />
+            </button>
+          </>
+        )}
       </>
     )
   );

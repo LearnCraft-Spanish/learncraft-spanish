@@ -30,7 +30,34 @@
 /* Needed to center audio play/pause button */
 .previewCard .audioPlayPauseButton {
   position: relative;
+  position: absolute;
+  bottom: calc(50% - 12px);
+  right: 0px;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 5;
 }
+
+.audioError {
+  border: 3px solid red;
+  background-color: transparent;
+  position: absolute;
+  bottom: calc(50% - 24px);
+  right: 0px;
+  padding: 12px;
+  cursor: not-allowed;
+  z-index: 5;
+}
+
+.audioError:hover {
+  background-color: red;
+}
+
+.audioError img {
+  width: 24px;
+  height: 24px;
+}
+
 /* Example Labels */
 #examplePreview h4 {
   text-align: left;
@@ -119,10 +146,6 @@ so we can do col/row later on smaller screens */
   height: 100%;
   width: 50%;
 } */
-
-.exampleCard .audioPlayPauseButton {
-  transform: translateY(-25%);
-}
 
 .duplicate-row td:first-child {
   position: relative;
