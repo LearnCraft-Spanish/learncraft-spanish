@@ -1,5 +1,5 @@
+import type { UpdateStudent } from 'src/types/CoachingTypes';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { UpdateStudent } from 'src/types/CoachingTypes';
 import useStudentDeepDiveBackend from './BackendFunctions';
 
 export default function useAllStudents() {

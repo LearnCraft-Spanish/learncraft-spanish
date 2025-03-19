@@ -1,21 +1,20 @@
+import type { Membership } from 'src/types/CoachingTypes';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
+import pencilIcon from 'src/assets/icons/pencil.svg';
+import {
+  DateInput,
+  FormControls,
+  TextInput,
+} from 'src/components/Coaching/general';
+import ContextualControls from 'src/components/ContextualControls';
 import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';
 import { useStudentMemberships } from 'src/hooks/CoachingData/queries/StudentDeepDive';
-import MembershipWeeks from './MembershipWeeks';
-import pencilIcon from 'src/assets/icons/pencil.svg';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { Membership } from 'src/types/CoachingTypes';
-import ContextualControls from 'src/components/ContextualControls';
-import {
-  DateInput,
-  Checkbox,
-  FormControls,
-  TextInput,
-} from 'src/components/Coaching/general';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import MembershipWeeks from './MembershipWeeks';
 interface StudentMembershipsProps {
   studentId: number;
   selectedMembershipId: number | undefined;
@@ -28,7 +27,7 @@ export default function StudentMemberships({
   onMembershipSelect,
 }: StudentMembershipsProps) {
   const { courseListQuery } = useCourseList();
-  const studentMembershipsQuery = useStudentMemberships(studentId);
+  const { studentMembershipsQuery } = useStudentMemberships(studentId);
   const { contextual, openContextual } = useContextualMenu();
   // Sort memberships only if we have data
   const sortedMemberships = React.useMemo(() => {
@@ -186,9 +185,12 @@ function StudentMembershipContextual({
   const { closeContextual } = useContextualMenu();
   const { courseListQuery } = useCourseList();
   const [endDate, setEndDate] = useState(membership.endDate as string);
-  const [active, setActive] = useState(membership.active);
+  // const [active, setActive] = useState(membership.active);
   const userDataQuery = useUserData();
   const { coachListQuery } = useCoachList();
+  const { updateMembershipMutation } = useStudentMemberships(
+    membership.relatedStudent,
+  );
   // const [advanced, setAdvanced] = useState(membership.advancedStudent);
   const getCourseName = (courseId: number) => {
     const course = courseListQuery.data?.find((c) => c.recordId === courseId);
@@ -196,11 +198,21 @@ function StudentMembershipContextual({
   };
   const cancelEdit = () => {
     setEndDate(membership.endDate as string);
-    setActive(membership.active);
+    // setActive(membership.active);
     closeContextual();
   };
   const captureSubmitForm = () => {
-    console.log('captureSubmitForm');
+    updateMembershipMutation.mutate(
+      {
+        recordId: membership.recordId,
+        endDate,
+      },
+      {
+        onSuccess: () => {
+          closeContextual();
+        },
+      },
+    );
   };
 
   const currentUserAsQbUser = useMemo(() => {
@@ -258,7 +270,7 @@ function StudentMembershipContextual({
           onChange={() => {}}
         />
         <DateInput value={endDate} onChange={setEndDate} label="End Date" />
-        <Checkbox label="Active" value={active} onChange={setActive} />
+        {/* <Checkbox label="Active" value={active} onChange={setActive} /> */}
         <FormControls
           editMode
           cancelEdit={cancelEdit}

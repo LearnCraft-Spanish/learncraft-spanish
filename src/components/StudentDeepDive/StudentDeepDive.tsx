@@ -1,14 +1,14 @@
+import type { Student } from 'src/types/CoachingTypes';
 import React, { useMemo, useState } from 'react';
+import { useCoachList } from 'src/hooks/CoachingData/queries';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachStudents,
   StudentDeepDiveSearch,
   StudentInfoCard,
   StudentMemberships,
 } from './components';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
-import { Student } from 'src/types/CoachingTypes';
-import { useUserData } from 'src/hooks/UserData/useUserData';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
 import './StudentDeepDive.scss';
 
 export default function StudentDeepDive() {

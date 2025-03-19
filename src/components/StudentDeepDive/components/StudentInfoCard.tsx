@@ -1,5 +1,6 @@
-import type { Coach, QbUser, Student } from 'src/types/CoachingTypes';
-import React, { useEffect, useMemo, useState } from 'react';
+import type { Coach, Student } from 'src/types/CoachingTypes';
+import React, { useEffect, useState } from 'react';
+import pencil from 'src/assets/icons/pencil.svg';
 import {
   Checkbox,
   CoachDropdown,
@@ -12,9 +13,7 @@ import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import { BundleCreditsSection } from './BundleCreditsSection';
-import pencil from 'src/assets/icons/pencil.svg';
 const timezones = [
   'AZ',
   'CT',
@@ -85,7 +84,6 @@ export default function StudentInfoCard({
   isAdmin: boolean;
 }) {
   const { contextual, openContextual } = useContextualMenu();
-  const userDataQuery = useUserData();
   return (
     <>
       {contextual === 'edit-student' && (

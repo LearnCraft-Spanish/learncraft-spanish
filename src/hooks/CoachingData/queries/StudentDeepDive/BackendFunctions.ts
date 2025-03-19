@@ -1,11 +1,11 @@
-import { useBackendHelpers } from 'src/hooks/useBackend';
-import { toast } from 'react-toastify';
-import {
+import type {
+  Membership,
   Student,
   UpdateStudent,
   WeekWithRelations,
-  Membership,
 } from 'src/types/CoachingTypes';
+import { toast } from 'react-toastify';
+import { useBackendHelpers } from 'src/hooks/useBackend';
 
 export default function useStudentDeepDiveBackend() {
   const { getFactory, newPutFactory } = useBackendHelpers();
@@ -14,6 +14,20 @@ export default function useStudentDeepDiveBackend() {
     return getFactory<Membership[]>(
       `coaching/student-memberships/${studentId}`,
     );
+  };
+  type PartialMembership = Partial<Membership> & { recordId: number };
+
+  const updateMembership = (membership: PartialMembership) => {
+    const promise = newPutFactory<PartialMembership>({
+      path: `coaching/student-memberships`,
+      body: membership,
+    });
+    toast.promise(promise, {
+      pending: 'Updating membership...',
+      success: 'Membership updated!',
+      error: 'Error updating membership',
+    });
+    return promise;
   };
 
   const getMembershipWeeks = (membershipId: number) => {
@@ -41,6 +55,8 @@ export default function useStudentDeepDiveBackend() {
 
   return {
     getStudentMemberships,
+    updateMembership,
+
     getMembershipWeeks,
     getAllStudents,
     updateStudent,
