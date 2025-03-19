@@ -115,30 +115,34 @@ export default function Menu() {
           {(userDataQuery.data.roles.adminRole === 'coach' ||
             userDataQuery.data.roles.adminRole === 'admin') && (
             <div>
-              <h3>Staff Tools</h3>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/frequensay">
-                  FrequenSay
-                </Link>
-              </div>
+              <h3>Coaching Tools</h3>
               <div className="buttonBox">
                 <Link className="linkButton" to="/weeklyrecords">
                   Weekly Records Interface
                 </Link>
               </div>
               <div className="buttonBox">
-                <Link className="linkButton" to="/student-deep-dive">
-                  Student Deep Dive
+                <Link className="linkButton" to="/student-drill-down">
+                  Student Drill Down
                 </Link>
               </div>
-              {userDataQuery.data.roles.adminRole === 'admin' && (
-                <div className="buttonBox">
-                  <Link className="linkButton" to="/examplemanager">
-                    Example Manager
-                  </Link>
-                </div>
-              )}
             </div>
+          )}
+          {userDataQuery.data.roles.adminRole === 'admin' && (
+            <>
+              <h3>Admin Tools</h3>
+
+              <div className="buttonBox">
+                <Link className="linkButton" to="/frequensay">
+                  FrequenSay
+                </Link>
+              </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/examplemanager">
+                  Example Manager
+                </Link>
+              </div>
+            </>
           )}
         </div>
       )}

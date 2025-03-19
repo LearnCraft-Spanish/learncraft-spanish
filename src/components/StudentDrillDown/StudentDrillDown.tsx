@@ -1,17 +1,17 @@
 import type { Student } from 'src/types/CoachingTypes';
 import React, { useMemo, useState } from 'react';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachStudents,
-  StudentDeepDiveSearch,
+  StudentDrillDownSearch,
   StudentInfoCard,
   StudentMemberships,
 } from './components';
-import './StudentDeepDive.scss';
+import './StudentDrillDown.scss';
 
-export default function StudentDeepDive() {
+export default function StudentDrillDown() {
   const { allStudentsQuery } = useAllStudents();
   const userDataQuery = useUserData();
   const { coachListQuery } = useCoachList();
@@ -64,7 +64,7 @@ export default function StudentDeepDive() {
 
   return (
     <div className="student-deep-dive">
-      <h1>Student Deep Dive</h1>
+      <h1>Student Drill Down</h1>
       <div className="content">
         <CoachStudents
           onStudentSelect={handleStudentSelect}
@@ -72,7 +72,7 @@ export default function StudentDeepDive() {
         />
         <div className="student-selection-section">
           <h2>Select a Student</h2>
-          <StudentDeepDiveSearch
+          <StudentDrillDownSearch
             onStudentSelect={handleStudentSelect}
             selectedStudentId={selectedStudentId}
           />

@@ -1,10 +1,10 @@
 import type { Membership } from 'src/types/CoachingTypes';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import useStudentDeepDiveBackend from './BackendFunctions';
+import useStudentDrillDownBackend from './BackendFunctions';
 
 export default function useStudentMemberships(studentId: number) {
   const { getStudentMemberships, updateMembership } =
-    useStudentDeepDiveBackend();
+    useStudentDrillDownBackend();
 
   const studentMembershipsQuery = useQuery({
     queryKey: ['studentMemberships', studentId],

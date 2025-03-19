@@ -11,7 +11,7 @@ import {
 } from 'src/components/FormComponents';
 import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { BundleCreditsSection } from './BundleCreditsSection';
 const timezones = [

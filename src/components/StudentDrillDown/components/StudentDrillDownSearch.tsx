@@ -1,16 +1,16 @@
 import { debounce } from 'lodash';
 import { useMemo, useRef, useState } from 'react';
-import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 
-interface StudentDeepDiveSearchProps {
+interface StudentDrillDownSearchProps {
   onStudentSelect: (studentId: number | undefined) => void;
   selectedStudentId?: number;
 }
 
-export default function StudentDeepDiveSearch({
+export default function StudentDrillDownSearch({
   onStudentSelect,
   selectedStudentId,
-}: StudentDeepDiveSearchProps) {
+}: StudentDrillDownSearchProps) {
   const [activeStudentsOnly, setActiveStudentsOnly] = useState(true);
   const [searchString, setSearchString] = useState('');
   const [debouncedSearchString, setDebouncedSearchString] = useState('');

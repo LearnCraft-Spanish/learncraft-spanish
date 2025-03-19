@@ -146,7 +146,7 @@ export type Assignment = Expanded<{
   weekStarts: Date | string;
 }>;
 
-/* --------- Student Deep Dive Types --------- */
+/* --------- Student Drill Down Types --------- */
 export type UpdateStudent = Omit<Partial<Student>, 'primaryCoach'> & {
   recordId: number;
   primaryCoach?: string; // Email string for updates

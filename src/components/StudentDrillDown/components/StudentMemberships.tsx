@@ -15,7 +15,7 @@ import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';
 import {
   useAllStudents,
   useStudentMemberships,
-} from 'src/hooks/CoachingData/queries/StudentDeepDive';
+} from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import MembershipWeeks from './MembershipWeeks';
@@ -87,11 +87,11 @@ export default function StudentMemberships({
                         {membership.active && !membership.onHold && (
                           <span className="status active">Active</span>
                         )}
+                        {!membership.active && (
+                          <span className="status inactive">Inactive</span>
+                        )}
                         {membership.onHold && (
                           <span className="status on-hold">On Hold</span>
-                        )}
-                        {!membership.active && !membership.onHold && (
-                          <span className="status inactive">Inactive</span>
                         )}
                       </div>
                     </div>

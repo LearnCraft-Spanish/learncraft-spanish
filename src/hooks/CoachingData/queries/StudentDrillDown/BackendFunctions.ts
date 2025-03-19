@@ -7,7 +7,7 @@ import type {
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 
-export default function useStudentDeepDiveBackend() {
+export default function useStudentDrillDownBackend() {
   const { getFactory, newPutFactory } = useBackendHelpers();
 
   const getStudentMemberships = (studentId: number) => {

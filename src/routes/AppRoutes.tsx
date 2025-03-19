@@ -3,7 +3,7 @@ import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecor
 
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
-import StudentDeepDive from 'src/components/StudentDeepDive/StudentDeepDive';
+import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
@@ -84,11 +84,11 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/student-deep-dive"
+        path="/student-drill-down"
         element={
           (userDataQuery.data?.roles.adminRole === 'coach' ||
             userDataQuery.data?.roles.adminRole === 'admin') && (
-            <StudentDeepDive />
+            <StudentDrillDown />
           )
         }
       />

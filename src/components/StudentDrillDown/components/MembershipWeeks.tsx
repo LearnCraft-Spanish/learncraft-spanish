@@ -2,11 +2,11 @@ import React, { useMemo } from 'react';
 import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 
-import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/StudentDeepDive';
+import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import AssignmentsCell from './general/AssignmentsCell_Modificed';
 import GroupSessionsCell from './general/GroupSessionsCell_Modified';
 import PrivateCallsCell from './general/PrivateCallsCell_Modificed';
-import '../StudentDeepDive.scss';
+import '../StudentDrillDown.scss';
 
 interface MembershipWeeksProps {
   membershipId: number;

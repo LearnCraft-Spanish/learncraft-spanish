@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import useStudentDeepDiveBackend from './BackendFunctions';
+import useStudentDrillDownBackend from './BackendFunctions';
 
 export default function useMembershipWeeks(membershipId: number) {
-  const { getMembershipWeeks } = useStudentDeepDiveBackend();
+  const { getMembershipWeeks } = useStudentDrillDownBackend();
 
   return useQuery({
     queryKey: ['membershipWeeks', membershipId],
