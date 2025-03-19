@@ -68,9 +68,9 @@ export function GroupSessionView({
             onChange={() => {}}
             editMode={false}
           /> */}
-          <div>
-            <h4>Coach</h4>
-            <p>{groupSession.coach.email}</p>
+          <div className="lineWrapper">
+            <h4 className="label">Coach</h4>
+            <p className="content">{groupSession.coach.name}</p>
           </div>
           <DateInput
             value={

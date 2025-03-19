@@ -67,125 +67,7 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
   //   deleteAssignmentMutation,
   // } = useCoaching();
   const { setContextualRef } = useContextualMenu();
-  // const { closeModal, openModal } = useModal();
 
-  // const [editMode, setEditMode] = useState(false);
-
-  // const [homeworkCorrector, setHomeworkCorrector] = useState(
-  //   assignment.homeworkCorrector.email,
-  // );
-  // const [assignmentType, setAssignmentType] = useState(
-  //   assignment.assignmentType,
-  // );
-  // const [rating, setRating] = useState(assignment.rating);
-  // const [notes, setNotes] = useState(assignment.notes);
-  // const [areasOfDifficulty, setAreasOfDifficulty] = useState(
-  //   assignment.areasOfDifficulty,
-  // );
-  // const [assignmentLink, setAssignmentLink] = useState(
-  //   assignment.assignmentLink,
-  // );
-
-  // function updateHomeworkCorrector(email: string) {
-  //   const corrector = coachListQuery.data?.find(
-  //     (coach) => coach.user.email === email,
-  //   );
-  //   if (!corrector) {
-  //     console.error('No coach found with email:', email);
-  //     return;
-  //   }
-  //   setHomeworkCorrector(corrector.user.email);
-  // }
-
-  // function enableEditMode() {
-  //   setEditMode(true);
-  //   updateDisableClickOutside(true);
-  // }
-  // function disableEditMode() {
-  //   setEditMode(false);
-  //   updateDisableClickOutside(false);
-  // }
-
-  // function toggleEditMode() {
-  //   if (editMode) {
-  //     cancelEdit();
-  //   } else {
-  //     enableEditMode();
-  //   }
-  // }
-
-  // function cancelEdit() {
-  //   disableEditMode();
-
-  //   // reset states to assignment values
-  //   setHomeworkCorrector(assignment.homeworkCorrector.email);
-  //   setAssignmentType(assignment.assignmentType);
-  //   setRating(assignment.rating);
-  //   setNotes(assignment.notes);
-  //   setAreasOfDifficulty(assignment.areasOfDifficulty);
-  //   setAssignmentLink(assignment.assignmentLink);
-  // }
-  // function deleteRecordFunction() {
-  //   deleteAssignmentMutation.mutate(assignment.recordId, {
-  //     onSuccess: () => {
-  //       closeModal();
-  //       cancelEdit();
-  //       closeContextual();
-  //     },
-  //   });
-  // }
-
-  // function submitEdit() {
-  //   updateAssignmentMutation.mutate(
-  //     {
-  //       relatedWeek: assignment.relatedWeek,
-  //       recordId: assignment.recordId,
-  //       homeworkCorrector,
-  //       assignmentType,
-  //       rating,
-  //       notes,
-  //       areasOfDifficulty,
-  //       assignmentLink,
-  //     },
-  //     {
-  //       onSuccess: () => {
-  //         disableEditMode();
-  //         closeContextual();
-  //       },
-  //     },
-  //   );
-  // }
-
-  // function captureSubmitForm() {
-  //   // check if any fields have changed from the original assignment
-  //   // if not, do nothing
-  //   if (
-  //     homeworkCorrector === assignment.homeworkCorrector.email &&
-  //     assignmentType === assignment.assignmentType &&
-  //     rating === assignment.rating &&
-  //     notes === assignment.notes &&
-  //     areasOfDifficulty === assignment.areasOfDifficulty &&
-  //     assignmentLink === assignment.assignmentLink
-  //   ) {
-  //     disableEditMode();
-  //     return;
-  //   }
-  //   //Check for all required fields
-  //   const badInput = verifyRequiredInputs([
-  //     { label: 'Assignment Type', value: assignmentType },
-  //     { label: 'Homework Corrector', value: homeworkCorrector },
-  //     { label: 'Rating', value: rating },
-  //   ]);
-  //   if (badInput) {
-  //     openModal({
-  //       title: 'Error',
-  //       body: `${badInput} is required`,
-  //       type: 'error',
-  //     });
-  //     return;
-  //   }
-  //   submitEdit();
-  // }
   return (
     <div className="contextualWrapper" key={`assignment${assignment.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
@@ -199,9 +81,9 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
           onChange={() => {}}
           editMode={false}
         />
-        <div>
-          <h4>Corrected by</h4>
-          <p>{assignment.homeworkCorrector.email}</p>
+        <div className="lineWrapper">
+          <h4 className="label">Corrected by</h4>
+          <p className="content">{assignment.homeworkCorrector?.name}</p>
         </div>
 
         {/* <CoachDropdown

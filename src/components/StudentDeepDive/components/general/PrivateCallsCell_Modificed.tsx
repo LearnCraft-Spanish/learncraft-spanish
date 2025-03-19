@@ -19,7 +19,13 @@ const ratingOptions = [
   'No-Show',
 ];
 const callTypeOptions = ['Monthly Call', 'Uses Credit (Bundle)'];
-function PrivateCallInstance({ call }: { call: PrivateCall }) {
+function PrivateCallInstance({
+  call,
+  studentName,
+}: {
+  call: PrivateCall;
+  studentName: string;
+}) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
@@ -30,12 +36,20 @@ function PrivateCallInstance({ call }: { call: PrivateCall }) {
       >
         {call.rating}
       </button>
-      {contextual === `call${call.recordId}` && <PrivateCallView call={call} />}
+      {contextual === `call${call.recordId}` && (
+        <PrivateCallView call={call} studentName={studentName} />
+      )}
     </div>
   );
 }
 
-function PrivateCallView({ call }: { call: PrivateCall }) {
+function PrivateCallView({
+  call,
+  studentName,
+}: {
+  call: PrivateCall;
+  studentName: string;
+}) {
   const { setContextualRef } = useContextualMenu();
 
   return (
@@ -49,7 +63,7 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
                 getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
               )?.fullName
             }{' '} */}
-          student name on{' '}
+          {studentName} on{' '}
           {typeof call.date === 'string' ? call.date : call.date.toString()}
         </h4>
 
@@ -62,12 +76,12 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
                 )?.fullName
               }
             </p> */}
-          student name
+          {studentName}
         </div>
 
-        <div>
-          <h4>Caller</h4>
-          <p>{call.caller.name}</p>
+        <div className="lineWrapper">
+          <h4 className="label">Caller</h4>
+          <p className="content">{call.caller.name}</p>
         </div>
 
         {/* <CoachDropdown
@@ -126,15 +140,21 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
 
 export default function PrivateCallsCell({
   calls,
+  studentName,
 }: {
   calls: PrivateCall[] | null;
+  studentName: string;
 }) {
   return (
     <div className="callBox">
       {/* Existing Calls */}
       {calls &&
         calls.map((call) => (
-          <PrivateCallInstance key={call.recordId} call={call} />
+          <PrivateCallInstance
+            key={call.recordId}
+            call={call}
+            studentName={studentName}
+          />
         ))}
     </div>
   );

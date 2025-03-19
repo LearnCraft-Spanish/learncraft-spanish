@@ -10,10 +10,12 @@ import '../StudentDeepDive.scss';
 
 interface MembershipWeeksProps {
   membershipId: number;
+  studentName: string;
 }
 
 export default function MembershipWeeks({
   membershipId,
+  studentName,
 }: MembershipWeeksProps) {
   const weeksQuery = useMembershipWeeks(membershipId);
 
@@ -67,7 +69,10 @@ export default function MembershipWeeks({
                 <td>{week.notes}</td>
                 <td>
                   {week.privateCalls.length > 0 && (
-                    <PrivateCallsCell calls={week.privateCalls} />
+                    <PrivateCallsCell
+                      calls={week.privateCalls}
+                      studentName={studentName}
+                    />
                   )}
                 </td>
 

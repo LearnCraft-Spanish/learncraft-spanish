@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import pencilIcon from 'src/assets/icons/pencil.svg';
 import {
+  Checkbox,
   DateInput,
   FormControls,
   TextInput,
@@ -11,7 +12,10 @@ import ContextualControls from 'src/components/ContextualControls';
 import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';
-import { useStudentMemberships } from 'src/hooks/CoachingData/queries/StudentDeepDive';
+import {
+  useAllStudents,
+  useStudentMemberships,
+} from 'src/hooks/CoachingData/queries/StudentDeepDive';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import MembershipWeeks from './MembershipWeeks';
@@ -27,6 +31,7 @@ export default function StudentMemberships({
   onMembershipSelect,
 }: StudentMembershipsProps) {
   const { courseListQuery } = useCourseList();
+  const { allStudentsQuery } = useAllStudents();
   const { studentMembershipsQuery } = useStudentMemberships(studentId);
   const { contextual, openContextual } = useContextualMenu();
   // Sort memberships only if we have data
@@ -38,6 +43,13 @@ export default function StudentMemberships({
       return dateB - dateA; // Sort in descending order (newest first)
     });
   }, [studentMembershipsQuery.isSuccess, studentMembershipsQuery.data]);
+
+  const student = useMemo(() => {
+    const student = allStudentsQuery.data?.find(
+      (s) => s.recordId === studentId,
+    );
+    return student ? student.fullName : '';
+  }, [allStudentsQuery.data, studentId]);
 
   const getCourseName = (courseId: number) => {
     const course = courseListQuery.data?.find((c) => c.recordId === courseId);
@@ -163,7 +175,10 @@ export default function StudentMemberships({
                     )}
                     {selectedMembershipId === membership.recordId && (
                       <div className="membership-weeks">
-                        <MembershipWeeks membershipId={membership.recordId} />
+                        <MembershipWeeks
+                          membershipId={membership.recordId}
+                          studentName={student}
+                        />
                       </div>
                     )}
                   </div>
@@ -185,6 +200,7 @@ function StudentMembershipContextual({
   const { closeContextual } = useContextualMenu();
   const { courseListQuery } = useCourseList();
   const [endDate, setEndDate] = useState(membership.endDate as string);
+  const [onHold, setOnHold] = useState(membership.onHold);
   // const [active, setActive] = useState(membership.active);
   const userDataQuery = useUserData();
   const { coachListQuery } = useCoachList();
@@ -206,6 +222,7 @@ function StudentMembershipContextual({
       {
         recordId: membership.recordId,
         endDate,
+        onHold,
       },
       {
         onSuccess: () => {
@@ -269,8 +286,10 @@ function StudentMembershipContextual({
           editMode={false}
           onChange={() => {}}
         />
-        <DateInput value={endDate} onChange={setEndDate} label="End Date" />
-        {/* <Checkbox label="Active" value={active} onChange={setActive} /> */}
+        <Checkbox label="On Hold" value={onHold} onChange={setOnHold} />
+        {userDataQuery.data?.roles.adminRole === 'admin' && (
+          <DateInput value={endDate} onChange={setEndDate} label="End Date" />
+        )}
         <FormControls
           editMode
           cancelEdit={cancelEdit}
