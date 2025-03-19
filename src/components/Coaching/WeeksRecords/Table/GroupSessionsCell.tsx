@@ -3,10 +3,19 @@ import type { GroupSession, Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
 import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
-import verifyRequiredInputs from 'src/components/Coaching/general/functions/inputValidation';
 import ContextualControls from 'src/components/ContextualControls';
-import * as helpers from 'src/hooks/CoachingData/helperFunctions';
+import {
+  CoachDropdown,
+  DateInput,
+  DeleteRecord,
+  Dropdown,
+  FormControls,
+  LinkInput,
+  TextAreaInput,
+  verifyRequiredInputs,
+} from 'src/components/FormComponents';
 
+import * as helpers from 'src/hooks/CoachingData/helperFunctions';
 import {
   useActiveMemberships,
   useActiveStudents,
@@ -18,15 +27,6 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import {
-  CoachDropdown,
-  DateInput,
-  DeleteRecord,
-  Dropdown,
-  FormControls,
-  LinkInput,
-  TextAreaInput,
-} from '../../../general';
 
 const sessionTypeOptions = [
   '1MC',

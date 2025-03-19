@@ -1,11 +1,11 @@
 import type { PrivateCall } from 'src/types/CoachingTypes';
 import React from 'react';
+import ContextualControls from 'src/components/ContextualControls';
 import {
   Dropdown,
   LinkInput,
   TextAreaInput,
-} from 'src/components/Coaching/general';
-import ContextualControls from 'src/components/ContextualControls';
+} from 'src/components/FormComponents';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 const ratingOptions = [

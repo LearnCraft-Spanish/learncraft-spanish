@@ -2,13 +2,13 @@ import type { Membership } from 'src/types/CoachingTypes';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import pencilIcon from 'src/assets/icons/pencil.svg';
+import ContextualControls from 'src/components/ContextualControls';
 import {
   Checkbox,
   DateInput,
   FormControls,
   TextInput,
-} from 'src/components/Coaching/general';
-import ContextualControls from 'src/components/ContextualControls';
+} from 'src/components/FormComponents';
 import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';

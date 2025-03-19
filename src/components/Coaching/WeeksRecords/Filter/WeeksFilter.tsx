@@ -2,10 +2,10 @@ import type { Coach, Course } from 'src/types/CoachingTypes';
 
 import React, { useMemo, useState } from 'react';
 
+import { CoachDropdown, Dropdown } from 'src/components/FormComponents';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { CoachDropdown, Dropdown } from '../../general';
 
 import getDateRange from '../../general/functions/dateRange';
 import useDateRange from '../useDateRange';
@@ -25,6 +25,8 @@ interface CoachingFilterProps {
   updateFilterByCompletion: (value: string) => void;
   searchTerm: string | undefined;
   updateSearchTerm: (value: string) => void;
+  filterByOneMonthChallenge: boolean | undefined;
+  updateFilterByOneMonthChallenge: (value: boolean) => void;
 }
 export default function WeeksFilter({
   dataReady,
@@ -40,6 +42,8 @@ export default function WeeksFilter({
   updateFilterByCompletion,
   searchTerm,
   updateSearchTerm,
+  filterByOneMonthChallenge,
+  updateFilterByOneMonthChallenge,
 }: CoachingFilterProps) {
   const { courseListQuery, activeMembershipsQuery } = useCoaching();
   const { openContextual } = useContextualMenu();
@@ -183,6 +187,21 @@ export default function WeeksFilter({
                   id="filterHoldWeeks"
                   checked={filterHoldWeeks}
                   onChange={(e) => updateFilterHoldWeeks(e.target.checked)}
+                />
+                <span className="slider round"></span>
+              </label>
+            </div>
+            <div className="menuRow">
+              <p>Exclude 1 Month Challenge Weeks:</p>
+              <label htmlFor="filterOneMonthChallenge" className="switch">
+                <input
+                  alt="Exclude 1 Month Challenge Weeks"
+                  type="checkbox"
+                  id="filterOneMonthChallenge"
+                  checked={filterByOneMonthChallenge}
+                  onChange={(e) =>
+                    updateFilterByOneMonthChallenge(e.target.checked)
+                  }
                 />
                 <span className="slider round"></span>
               </label>

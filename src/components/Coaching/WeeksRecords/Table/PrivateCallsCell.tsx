@@ -1,11 +1,6 @@
 import type { PrivateCall, Week } from 'src/types/CoachingTypes';
 import React, { useState } from 'react';
 import ContextualControls from 'src/components/ContextualControls';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
-import { useUserData } from 'src/hooks/UserData/useUserData';
-
 import {
   CoachDropdown,
   DateInput,
@@ -14,9 +9,13 @@ import {
   FormControls,
   LinkInput,
   TextAreaInput,
-} from '../../general';
+  verifyRequiredInputs,
+} from 'src/components/FormComponents';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
 
-import verifyRequiredInputs from '../../general/functions/inputValidation';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 const ratingOptions = [
   'Excellent',

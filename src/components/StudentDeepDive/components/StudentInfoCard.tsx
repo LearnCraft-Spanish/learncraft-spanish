@@ -1,14 +1,14 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
 import React, { useEffect, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
+import ContextualControls from 'src/components/ContextualControls';
 import {
   Checkbox,
   CoachDropdown,
   Dropdown,
   FormControls,
   TextInput,
-} from 'src/components/Coaching/general';
-import ContextualControls from 'src/components/ContextualControls';
+} from 'src/components/FormComponents';
 import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDeepDive';

@@ -1,12 +1,12 @@
 import type { Assignment } from 'src/types/CoachingTypes';
 
+import ContextualControls from 'src/components/ContextualControls';
 import {
   // DeleteRecord,
   Dropdown,
   LinkInput,
   TextAreaInput,
-} from 'src/components/Coaching/general/';
-import ContextualControls from 'src/components/ContextualControls';
+} from 'src/components/FormComponents';
 
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 

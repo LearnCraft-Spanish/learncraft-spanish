@@ -1,12 +1,12 @@
 import type { GroupSessionWithAttendees } from 'src/types/CoachingTypes';
+import ContextualControls from 'src/components/ContextualControls';
+
 import {
   DateInput,
   Dropdown,
   LinkInput,
   TextAreaInput,
-} from 'src/components/Coaching/general/';
-
-import ContextualControls from 'src/components/ContextualControls';
+} from 'src/components/FormComponents';
 
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 

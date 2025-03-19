@@ -3,8 +3,8 @@ import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentR
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
+import { DateRangeProvider } from 'src/components/Coaching/WeeksRecords/DateRangeProvider';
 import { describe, expect, it } from 'vitest';
-import { DateRangeProvider } from '../../DateRangeProvider';
 import GroupSessionsCell from './GroupSessionsCell';
 
 const week = generatedMockData.weeks.find(

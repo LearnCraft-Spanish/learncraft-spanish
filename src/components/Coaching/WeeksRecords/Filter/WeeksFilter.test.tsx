@@ -19,6 +19,8 @@ const defaultProps = {
   updateFilterByCompletion: () => {},
   searchTerm: undefined,
   updateSearchTerm: () => {},
+  filterByOneMonthChallenge: undefined,
+  updateFilterByOneMonthChallenge: () => {},
 };
 
 describe('component WeeksFilter', () => {

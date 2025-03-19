@@ -3,7 +3,7 @@ import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { describe, it, vi } from 'vitest';
-import { DateRangeProvider } from '../WeeksRecords/DateRangeProvider';
+import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
 import Dropdown, { CoachDropdown } from './Dropdowns';
 
 describe('component Dropdown', () => {

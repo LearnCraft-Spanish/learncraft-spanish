@@ -2,12 +2,6 @@ import type { Assignment, Week } from 'src/types/CoachingTypes';
 import { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import ContextualControls from 'src/components/ContextualControls';
-import { toReadableMonthDay } from 'src/functions/dateUtils';
-import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachDropdown,
   DeleteRecord,
@@ -15,13 +9,19 @@ import {
   FormControls,
   LinkInput,
   TextAreaInput,
-} from '../../general';
+  verifyRequiredInputs,
+} from 'src/components/FormComponents';
+import { toReadableMonthDay } from 'src/functions/dateUtils';
+import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import CustomStudentSelector from '../../general/CustomStudentSelector';
 
 import getDateRange from '../../general/functions/dateRange';
 import getWeekEnds from '../../general/functions/getWeekEnds';
-import verifyRequiredInputs from '../../general/functions/inputValidation';
 const assignmentTypes = [
   'Pronunciation',
   'Writing',
