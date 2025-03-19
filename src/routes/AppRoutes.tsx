@@ -1,9 +1,8 @@
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
-import ExampleCreator from 'src/components/ExampleCreator/ExampleCreator';
 
-import ExampleEditor from 'src/components/ExampleEditor/ExampleEditor';
-import FlashcardFinder from 'src/components/FlashcardFinder';
+import ExampleManager from 'src/components/ExampleManager/ExampleManager';
+import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import StudentDeepDive from 'src/components/StudentDeepDive/StudentDeepDive';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
@@ -70,15 +69,9 @@ export default function AppRoutes() {
         }
       />
       <Route
-        path="/examplecreator"
+        path="/examplemanager"
         element={
-          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleCreator />
-        }
-      />
-      <Route
-        path="/exampleeditor"
-        element={
-          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleEditor />
+          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleManager />
         }
       />
       <Route

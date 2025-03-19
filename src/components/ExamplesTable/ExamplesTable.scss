@@ -1,0 +1,135 @@
+/* ------------------ Examples Table ------------------ */
+
+.examplesTable {
+  overflow-y: auto;
+  padding: 0px;
+}
+
+.examplesTable .buttonBox {
+  text-align: center;
+  color: var(--light);
+  font-size: 12px;
+  padding: 0px;
+  align-self: stretch;
+  margin: 5px 30px;
+  width: auto;
+}
+
+.examplesTable .buttonBox button {
+  width: 100%;
+  background-color: var(--theme);
+  margin: 0 auto;
+}
+
+.examplesTable .buttonBox button:hover {
+  background-color: var(--accent);
+}
+
+.displayExamplesDescription {
+  width: 50%;
+  background-color: var(--light);
+  border: 2px solid var(--theme);
+  padding: 0px 20px;
+}
+/* ------------------ Example List Item ------------------ */
+.exampleCard {
+  text-align: center;
+  background-color: var(--accent);
+  color: var(--light);
+  font-size: 12px;
+  padding: 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  margin: 5px 30px;
+}
+
+/* ------------------ Spanglish Label ------------------ */
+.spanglishLabel,
+.spanishLabel {
+  align-content: center;
+  width: 8%;
+  min-width: 100px;
+
+  h4 {
+    color: var(--light);
+  }
+}
+.spanglishLabel {
+  background-color: var(--dark);
+}
+.spanishLabel {
+  background-color: var(--brand);
+}
+
+/* ------------------ Vocabulary Button ------------------ */
+.exampleCardTags {
+  background-color: var(--theme);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0px;
+  padding: 0px;
+}
+
+.exampleCardTagsList {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 0px;
+  padding: 36px 10px 10px;
+}
+
+.showTagsButton {
+  height: 100%;
+  background-color: var(--theme);
+  color: var(--light);
+  margin: 0px;
+  padding: 0px 10px;
+}
+
+.hideTagsButton {
+  background-color: transparent;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.hideTagsButton img {
+  width: 12px;
+  height: 12px;
+  color: var(--light);
+}
+
+/* ------------------ Add Adding Remove Custom ------------------ */
+.customLabel {
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 30px;
+  border: none;
+  cursor: default;
+  /* align text vertically */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--light);
+  background-color: var(--theme);
+}
+
+.customLabel:hover {
+  cursor: default;
+  background-color: var(--theme);
+}
+
+.customLabel h4 {
+  color: var(--light);
+}

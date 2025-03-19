@@ -410,6 +410,20 @@ export function useBackend() {
     [postFactory],
   );
 
+  // Complex queryies have to be sent as POST since GET doesn't allow body
+  const getExampleSetBySpanishText = useCallback(
+    (spanishText: string[]): Promise<types.Flashcard[]> => {
+      return newPostFactory<types.Flashcard[]>({
+        path: 'example-set/by-spanish-text',
+        headers: [],
+        body: {
+          spanishtext: spanishText,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   /*      DELETE Requests      */
 
   const deleteMyStudentExample = useCallback(
@@ -486,6 +500,18 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const createMultipleUnverifiedExamples = useCallback(
+    (examples: types.NewFlashcard[]): Promise<number[]> => {
+      return newPostFactory<number[]>({
+        path: 'add-multiple-unverified-examples',
+        body: {
+          examples,
+        },
+      });
+    },
+    [newPostFactory],
+  );
+
   const updateExample = useCallback(
     (example: Partial<types.Flashcard>): Promise<number> => {
       return newPostFactory<number>({
@@ -506,6 +532,26 @@ export function useBackend() {
           exampleId,
           vocabIdList,
         },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const createMultipleStudentExamples = useCallback(
+    (studentId: number, exampleIdList: number[]): Promise<number[]> => {
+      return newPostFactory<number[]>({
+        path: 'create-multiple-student-examples',
+        body: { studentId, exampleIdList },
+      });
+    },
+    [newPostFactory],
+  );
+
+  const createMultipleQuizExamples = useCallback(
+    (quizId: number, exampleIdList: number[]): Promise<number[]> => {
+      return newPostFactory<number[]>({
+        path: 'create-multiple-quiz-examples',
+        body: { quizId, exampleIdList },
       });
     },
     [newPostFactory],
@@ -532,6 +578,7 @@ export function useBackend() {
     getProgramsFromBackend,
     getQuizExamplesFromBackend,
     getSingleExample,
+    getExampleSetBySpanishText,
     getSpellingsFromBackend,
     getUnverifiedExamplesFromBackend,
     getRecentlyEditedExamples,
@@ -545,6 +592,9 @@ export function useBackend() {
     createPMFDataForUser,
     createStudentExample,
     createUnverifiedExample,
+    createMultipleUnverifiedExamples,
+    createMultipleStudentExamples,
+    createMultipleQuizExamples,
     updateExample,
     updateMyStudentExample,
     updatePMFDataForUser,

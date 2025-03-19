@@ -1,64 +1,8 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { generatedMockData } from 'mocks/data/serverlike/studentRecords/studentRecordsMockData';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import getDateRange from 'src/components/Coaching/general/functions/dateRange';
-import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
 import { DateRangeProvider } from 'src/components/Coaching/WeeksRecords/DateRangeProvider';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { describe, expect, it } from 'vitest';
-
-// Get the default date range
-const dateRange = getDateRange();
-const defaultStartDate =
-  Number.parseInt(dateRange.dayOfWeekString) >= 3
-    ? dateRange.thisWeekDate
-    : dateRange.lastSundayDate;
-
-// Find weeks that fall within the default date range
-const weeksInRange = generatedMockData.weeks.filter((w) => {
-  const weekDate = new Date(w.weekStarts);
-  return (
-    weekDate >= new Date(defaultStartDate) &&
-    weekDate <= new Date(getWeekEnds(defaultStartDate))
-  );
-});
-
-if (weeksInRange.length === 0) {
-  throw new Error(
-    'No weeks found within the default date range. Please update the mock data.',
-  );
-}
-
-// Find group sessions that fall within the default date range
-const groupSessionsInRange = generatedMockData.groupSessions.filter((gs) => {
-  const sessionDate = new Date(gs.date);
-  return (
-    sessionDate >= new Date(defaultStartDate) &&
-    sessionDate <= new Date(getWeekEnds(defaultStartDate))
-  );
-});
-
-if (groupSessionsInRange.length === 0) {
-  throw new Error(
-    'No group sessions found within the default date range. Please update the mock data.',
-  );
-}
-
-// Helper function to find a week with assignments
-const weekWithAssignments = weeksInRange.find((w) =>
-  generatedMockData.assignments.some((a) => a.relatedWeek === w.recordId),
-);
-
-// Helper function to find a week with private calls
-const weekWithCalls = weeksInRange.find((w) =>
-  generatedMockData.calls.some((c) => c.relatedWeek === w.recordId),
-);
-
-// Helper function to find a group session with attendees
-const groupSessionWithAttendees = groupSessionsInRange.find((gs) =>
-  generatedMockData.groupAttendees.some((a) => a.groupSession === gs.recordId),
-);
 
 describe('hook useCoaching', () => {
   it('renders without crashing', async () => {
@@ -73,6 +17,7 @@ describe('hook useCoaching', () => {
       expect(result.current).toBeDefined();
     });
   });
+
   describe('queries exist, with data', () => {
     const listOfQueries = [
       'activeMembershipsQuery',

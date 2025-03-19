@@ -155,11 +155,9 @@ describe('component Menu', () => {
         it(`${hasAdminStaffTools ? 'does' : 'does NOT'} render admin specific staff tools`, async () => {
           await renderMenuLoaded();
           if (hasAdminStaffTools) {
-            expect(screen.queryByText('Example Creator')).toBeInTheDocument();
-            expect(screen.queryByText('Example Editor')).toBeInTheDocument();
+            expect(screen.queryByText('Example Manager')).toBeInTheDocument();
           } else {
-            expect(screen.queryByText('Example Creator')).toBeNull();
-            expect(screen.queryByText('Example Editor')).toBeNull();
+            expect(screen.queryByText('Example Manager')).toBeNull();
           }
         });
       });

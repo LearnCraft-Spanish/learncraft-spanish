@@ -413,6 +413,14 @@ export function NewAssignmentView({
         <ContextualControls />
         <h4>Create Assignment Record</h4>
         <div className="lineWrapper">
+          <label htmlFor="assignmentName" className="label">
+            Assignment Name:
+          </label>
+          <div className="content" id="assignmentName">
+            {student && `${student.relatedWeek.weekName} - ${assignmentType}`}
+          </div>
+        </div>
+        <div className="lineWrapper">
           <label className="label" htmlFor="weekStarts">
             Week Starts:
           </label>
@@ -525,28 +533,24 @@ export function NewAssignmentView({
           options={ratings}
           editMode
         />
-
-        <TextAreaInput
-          label="Notes"
-          editMode
-          value={notes}
-          onChange={setNotes}
-        />
-
-        <TextAreaInput
-          label="Areas of Difficulty"
-          editMode
-          value={areasOfDifficulty}
-          onChange={setAreasOfDifficulty}
-        />
-
         <LinkInput
           label="Assignment Link"
           value={assignmentLink}
           onChange={setAssignmentLink}
           editMode
         />
-
+        <TextAreaInput
+          label="Areas of Difficulty"
+          editMode
+          value={areasOfDifficulty}
+          onChange={setAreasOfDifficulty}
+        />
+        <TextAreaInput
+          label="Notes"
+          editMode
+          value={notes}
+          onChange={setNotes}
+        />
         <FormControls
           editMode
           cancelEdit={closeContextual}

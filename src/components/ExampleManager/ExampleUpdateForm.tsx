@@ -2,14 +2,13 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import { AudioControl } from './ExampleCreator/AudioControl';
+import { AudioControl } from './AudioControl';
 
-interface EditOrCreateExampleProps {
+interface ExampleUpdateFormProps {
   editOrCreate: 'edit' | 'create';
   onSubmit: (e: React.FormEvent) => void;
   spanishExample: string;
   setSpanishExample: (value: string) => void;
-  spanglish: 'spanglish' | 'esp';
   englishTranslation: string;
   setEnglishTranslation: (value: string) => void;
   spanishAudioLa: string;
@@ -17,19 +16,20 @@ interface EditOrCreateExampleProps {
   englishAudio: string;
   setEnglishAudio: (value: string) => void;
 }
-export default function EditOrCreateExample({
+export default function ExampleUpdateForm({
   editOrCreate,
   onSubmit,
   spanishExample,
   setSpanishExample,
-  spanglish,
   englishTranslation,
   setEnglishTranslation,
   spanishAudioLa,
   setSpanishAudioLa,
   englishAudio,
   setEnglishAudio,
-}: EditOrCreateExampleProps) {
+}: ExampleUpdateFormProps) {
+  const spanglish = spanishExample.includes('*') ? 'spanglish' : 'esp';
+
   return (
     <>
       {/* <form id="exampleForm" onSubmit={(e) => handleAddExample(e)}> */}
@@ -86,7 +86,10 @@ export default function EditOrCreateExample({
           </div>
         </div>
         {editOrCreate === 'create' && (
-          <button type="submit">Save Example</button>
+          <button type="submit">Create Example</button>
+        )}
+        {editOrCreate === 'edit' && (
+          <button type="submit">Update Example</button>
         )}
       </form>
       <div id="examplePreview">
