@@ -17,6 +17,7 @@ export const toTimestamp = (date: Date = new Date()): number => {
 
 /* Formats date as "MMM DD, YYYY" (User-friendly, Local Time) */
 export const toReadableDate = (date: Date = new Date()): string =>
+  // use utc
   date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -42,13 +43,14 @@ export const fromISODate = (dateString: string): Date => {
   return new Date(year, month - 1, day); // month is 0-based in Date constructor
 };
 
-/* Formats date string (YYYY-MM-DD) as "Month Day" (e.g. "March 2") */
+/* Formats date string (YYYY-MM-DD) as "Month Day" (e.g. "March 2") in UTC */
 export const toReadableMonthDay = (dateString: string): string => {
   const date = fromISODate(dateString);
-  return date.toLocaleDateString('en-US', {
+  return new Intl.DateTimeFormat('en-US', {
     month: 'long',
     day: 'numeric',
-  });
+    timeZone: 'UTC',
+  }).format(date);
 };
 
 // Parses a timestamp (ms) into a Date object
