@@ -24,7 +24,6 @@ interface ExampleDetails {
   englishTranslation: string;
   spanishAudioLa: string;
   englishAudio: string;
-  vocabIncluded: string[];
 }
 
 export default function SingleExampleCreator({
@@ -54,7 +53,6 @@ export default function SingleExampleCreator({
     englishTranslation: '',
     spanishAudioLa: '',
     englishAudio: '',
-    vocabIncluded: [],
   });
 
   const { vocabularyQuery } = useVocabulary();
@@ -69,10 +67,10 @@ export default function SingleExampleCreator({
       spanglish: exampleDetails.spanishExample.includes('*')
         ? 'spanglish'
         : 'esp',
-      vocabIncluded: exampleDetails.vocabIncluded,
-      vocabComplete: selectedExampleId ? false : vocabComplete,
+      vocabIncluded,
+      vocabComplete: selectedExampleId ? vocabComplete : false,
     };
-  }, [selectedExampleId, exampleDetails, vocabComplete]);
+  }, [selectedExampleId, exampleDetails, vocabComplete, vocabIncluded]);
 
   const newFlashcard: NewFlashcard = useMemo(() => {
     const transitionalObj: Omit<Flashcard, 'recordId' | 'vocabIncluded'> = {
@@ -274,7 +272,6 @@ export default function SingleExampleCreator({
       englishTranslation: '',
       spanishAudioLa: '',
       englishAudio: '',
-      vocabIncluded: [],
     });
   }
 
@@ -292,9 +289,9 @@ export default function SingleExampleCreator({
   function submitExample(e: React.FormEvent) {
     e.preventDefault();
     if (!!selectedExampleId && selectedExampleId > 0) {
-      handleAddExample(e);
-    } else {
       handleEditExample(e);
+    } else {
+      handleAddExample(e);
     }
   }
   const safeTableData = tableData ?? [];
