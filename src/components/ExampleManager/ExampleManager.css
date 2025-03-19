@@ -11,7 +11,7 @@
   width: 50%;
   display: flex;
   flex-direction: column;
-  margin: 10px 0;
+  margin: 15px;
 }
 
 /* ********* Example Preview ********* */
@@ -188,6 +188,20 @@ so we can do col/row later on smaller screens */
   align-items: center;
   z-index: 100;
 }
+
+.tagSearchBox {
+  position: relative;
+}
+
+#vocabTagging .tagSuggestionBox {
+  position: absolute;
+  max-width: 640px;
+  width: 100%;
+  top: 94px;
+  left: 0px;
+  z-index: 999;
+}
+
 .confirmSubmissionBox form {
   background-color: var(--light);
   padding: 20px;
@@ -218,11 +232,14 @@ so we can do col/row later on smaller screens */
   border: 4px solid var(--brand);
   text-align: center;
   overflow: hidden;
-  margin: 0 5px;
-  margin-top: 4px;
+  margin: 5px;
   border-radius: 0;
   cursor: pointer;
   min-height: 80px;
+}
+
+.tagSuggestionBox .vocabTag {
+  margin: 0px;
 }
 
 .removeTagButton {
@@ -232,12 +249,12 @@ so we can do col/row later on smaller screens */
   cursor: pointer;
   font-size: 16px;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 5px;
+  right: 5px;
   padding: 0;
   margin: 0;
-  width: 20px;
-  height: 20px;
+  height: 14px;
+  width: 14px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -246,15 +263,20 @@ so we can do col/row later on smaller screens */
 /* Vocab Complete Toggle */
 .vocabCompleteContainer {
   display: flex;
+  justify-content: center;
   align-items: center;
   margin-top: 10px;
+}
+
+.vocabCompleteContainer label {
+  margin-left: 15px;
 }
 
 /* Example Filter Controls */
 .exampleFilterControls {
   display: flex;
-  align-items: center;
-  margin: 15px 0;
+  justify-content: center;
+  margin: 15px;
   gap: 20px;
 }
 

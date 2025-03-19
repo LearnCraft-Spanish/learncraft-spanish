@@ -346,17 +346,19 @@ export default function ExampleSetCreator({
         setFlashcardSpanish(newSpanishArray);
         newSpanglish = newValue.includes('*') ? 'spanglish' : 'esp';
       }
-      const newFlashcardSet = unsavedFlashcardSet.map((flashcard) => {
-        if (flashcard.recordId === changedObjTempId) {
-          return {
-            ...flashcard,
-            [field]: newValue,
-            spanglish:
-              field === 'spanishExample' ? newSpanglish : flashcard.spanglish,
-          };
-        }
-        return flashcard;
-      });
+      const newFlashcardSet = unsavedFlashcardSet
+        .map((flashcard) => {
+          if (flashcard.recordId === changedObjTempId) {
+            return {
+              ...flashcard,
+              [field]: newValue,
+              spanglish:
+                field === 'spanishExample' ? newSpanglish : flashcard.spanglish,
+            };
+          }
+          return flashcard;
+        })
+        .filter((flashcard) => flashcard.spanishExample.trim().length > 0);
       setUnsavedFlashcardSet(newFlashcardSet);
     },
     [unsavedFlashcardSet, flashcardSpanish],
