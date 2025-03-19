@@ -1,7 +1,7 @@
 import type { Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Pagination from 'src/components/ExamplesTable/Pagination';
-import LoadingMessage from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import QuantifiedRecords from '../quantifyingRecords';
@@ -47,7 +47,7 @@ export default function WeeksTable({ weeks }: NewTableProps) {
   return (
     weeks &&
     (isLoading ? (
-      <LoadingMessage message={'Retrieving records data...'} />
+      <Loading message={'Retrieving records data...'} />
     ) : (
       <>
         <div className="numberShowing">

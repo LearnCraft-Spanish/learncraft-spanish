@@ -2,7 +2,7 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
-import LoadingMessage from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import {
   formatEnglishText,
   formatSpanishText,
@@ -140,7 +140,7 @@ export function ExampleEditForm({
           )}
       </div>
       {exampleSetQuery.isLoading && (
-        <LoadingMessage message="Checking for examples..." />
+        <Loading message="Checking for examples..." />
       )}
       {exampleSetQuery.isError && (
         <div>

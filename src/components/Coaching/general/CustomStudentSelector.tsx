@@ -7,7 +7,7 @@ when a list of students is needed where:
 
 the bones of this component are based on the StudentSearch component, but the list of students is filtered based on the weekStarts date
 */
-import wheelIcon from 'src/assets/Icon_Blue.svg';
+import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -55,33 +55,10 @@ export default function CustomStudentSelector({
     return matchesSearch;
   }, [listOfStudents, searchString]);
 
-  /*
-  loading icon css from LoadingMessage.tsx
-#wheelIcon {
-  position: absolute;
-  top: 18%;
-  left: 18%;
-  width: 40%;
-  animation: spin 1.4s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-  */
   return (
     <div id="searchStudentWrapper" className="customSearchStudentWrapper">
       {isLoading ? (
-        // <LoadingMessage message={'Retrieving students...'} />
-        <div className="loadingContainer">
-          <p>Loading new student data...</p>
-          <img src={wheelIcon} alt="loading" />
-        </div>
+        <InlineLoading message="Loading student data..." />
       ) : (
         <>
           <input

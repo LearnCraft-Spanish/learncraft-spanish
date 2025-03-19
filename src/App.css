@@ -164,53 +164,6 @@ button:hover,
   transform: translate(0, -50%);
 }
 
-/* Load Screen Styles */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  max-height: 70vh;
-  padding: 5% 20%;
-  box-sizing: border-box;
-}
-
-.loadingIcon {
-  position: relative;
-  width: 50%;
-  padding-top: 50%;
-  max-width: 400px;
-  max-height: 400px;
-  min-width: 150px;
-  min-height: 150px;
-}
-
-#headIcon {
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 80%;
-}
-
-#wheelIcon {
-  position: absolute;
-  top: 18%;
-  left: 18%;
-  width: 40%;
-  animation: spin 1.4s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 /*Main Menu Styles*/
 /* MOVED TO NAV */
 /* 

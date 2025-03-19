@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import camelize from 'src/functions/camelize';
 
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useCoachList } from 'src/hooks/CoachingData/queries';
 
 export default function Dropdown({
   label,
@@ -58,7 +58,7 @@ export function CoachDropdown({
   label?: string;
   defaultOptionText?: string;
 }) {
-  const { coachListQuery } = useCoaching();
+  const { coachListQuery } = useCoachList();
 
   const dataReady = coachListQuery.isSuccess;
 

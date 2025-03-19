@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { useUserData } from 'src/hooks/UserData/useUserData';
@@ -124,6 +124,11 @@ export default function Menu() {
               <div className="buttonBox">
                 <Link className="linkButton" to="/weeklyrecords">
                   Weekly Records Interface
+                </Link>
+              </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/student-deep-dive">
+                  Student Deep Dive
                 </Link>
               </div>
               {userDataQuery.data.roles.adminRole === 'admin' && (

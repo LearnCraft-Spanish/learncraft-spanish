@@ -3,7 +3,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
 
-import Loading from './components/Loading';
+import { Loading } from './components/Loading';
 import Nav from './components/Nav';
 import SubHeader from './components/SubHeader';
 import useAuth from './hooks/useAuth';
@@ -11,6 +11,7 @@ import { useUserData } from './hooks/UserData/useUserData';
 
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
+import './contextual.scss';
 
 export const App: React.FC = () => {
   // React Router hooks
@@ -21,7 +22,7 @@ export const App: React.FC = () => {
   return (
     <div className="App">
       <Nav />
-      {location.pathname !== '/coaching' &&
+      {location.pathname !== '/student-deep-dive' &&
         location.pathname !== '/comprehensionquiz' &&
         location.pathname !== '/audioquiz' &&
         location.pathname !== '/myflashcards/quiz' &&

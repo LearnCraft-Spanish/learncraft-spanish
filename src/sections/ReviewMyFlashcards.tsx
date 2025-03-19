@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import NoFlashcards from 'src/components/NoFlashcards';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';

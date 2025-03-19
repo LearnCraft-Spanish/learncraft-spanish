@@ -1,8 +1,9 @@
 import React from 'react';
-import wheelIcon from '../assets/Icon_Blue.svg';
-import headIcon from '../assets/LearnCraft_Wheelless_Head_Blue.svg';
+import wheelIcon from '../../assets/Icon_Blue.svg';
+import headIcon from '../../assets/LearnCraft_Wheelless_Head_Blue.svg';
+import './Loading.scss';
 
-export default function LoadingMessage({ message }: { message: string }) {
+export default function Loading({ message }: { message: string }) {
   return (
     <div className="loading">
       <div className="loadingIcon">

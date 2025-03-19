@@ -5,11 +5,11 @@ import type {
   Week,
 } from '../../../types/CoachingTypes';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { Loading } from 'src/components/Loading';
 
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import LoadingMessage from '../../Loading';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
 import { NewAssignmentView } from './Table/AssignmentsCell';
@@ -282,9 +282,7 @@ function WeeksRecordsContent() {
 
   return (
     <div className="newCoachingWrapper">
-      {initialDataLoad && (
-        <LoadingMessage message={'Loading Coaching Data...'} />
-      )}
+      {initialDataLoad && <Loading message={'Loading Coaching Data...'} />}
       {dataError && <p>Error loading data</p>}
       {rendered.current && (
         <>
