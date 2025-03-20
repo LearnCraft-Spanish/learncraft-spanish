@@ -42,7 +42,7 @@ button:disabled {
 .audioPlayPauseButton {
   background-color: transparent;
   position: absolute;
-  bottom: 0px;
+  bottom: calc(50% - 24px);
   right: 0px;
   padding: 12px;
   cursor: pointer;

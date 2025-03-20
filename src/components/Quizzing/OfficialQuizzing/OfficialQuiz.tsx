@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import QuizComponent from '../TextQuiz/QuizComponent';

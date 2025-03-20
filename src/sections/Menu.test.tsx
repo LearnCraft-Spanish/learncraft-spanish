@@ -131,19 +131,19 @@ describe('component Menu', () => {
         });
 
         // General Staff Tools
-        const hasGeneralStaffTools =
+        const hasCoachingTools =
           userCase.roles.includes('admin') || userCase.roles.includes('coach');
 
-        it(`${hasGeneralStaffTools ? 'does' : 'does NOT'} render general staff tools`, async () => {
+        it(`${hasCoachingTools ? 'does' : 'does NOT'} render coaching tools`, async () => {
           await renderMenuLoaded();
-          if (hasGeneralStaffTools) {
-            expect(screen.queryByText('Staff Tools')).toBeInTheDocument();
+          if (hasCoachingTools) {
+            expect(screen.queryByText('Coaching Tools')).toBeInTheDocument();
             expect(screen.queryByText('FrequenSay')).toBeInTheDocument();
             expect(
               screen.queryByText('Weekly Records Interface'),
             ).toBeInTheDocument();
           } else {
-            expect(screen.queryByText('Staff Tools')).toBeNull();
+            expect(screen.queryByText('Coaching Tools')).toBeNull();
             expect(screen.queryByText('FrequenSay')).toBeNull();
             expect(screen.queryByText('Weekly Records Interface')).toBeNull();
           }
@@ -155,11 +155,9 @@ describe('component Menu', () => {
         it(`${hasAdminStaffTools ? 'does' : 'does NOT'} render admin specific staff tools`, async () => {
           await renderMenuLoaded();
           if (hasAdminStaffTools) {
-            expect(screen.queryByText('Example Creator')).toBeInTheDocument();
-            expect(screen.queryByText('Example Editor')).toBeInTheDocument();
+            expect(screen.queryByText('Example Manager')).toBeInTheDocument();
           } else {
-            expect(screen.queryByText('Example Creator')).toBeNull();
-            expect(screen.queryByText('Example Editor')).toBeNull();
+            expect(screen.queryByText('Example Manager')).toBeNull();
           }
         });
       });

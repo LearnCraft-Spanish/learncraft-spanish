@@ -1,15 +1,20 @@
 import type { Flashcard, Quiz } from 'src/types/interfaceDefinitions';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
+import { toast } from 'react-toastify';
 import useAuth from 'src/hooks/useAuth';
 import { useBackend } from 'src/hooks/useBackend';
 import { useExampleUpdate } from '../ExampleData/useExampleUpdate';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
+  const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth();
   const { updateExampleFromQuery } = useExampleUpdate();
-  const { getLcspQuizzesFromBackend, getQuizExamplesFromBackend } =
-    useBackend();
+  const {
+    getLcspQuizzesFromBackend,
+    getQuizExamplesFromBackend,
+    createMultipleQuizExamples,
+  } = useBackend();
 
   const parseQuizzes = useCallback((quizzes: Quiz[]) => {
     quizzes.forEach((item) => {
@@ -83,6 +88,32 @@ export function useOfficialQuizzes(quizId: number | undefined) {
     enabled: quizExamplesQueryReady(),
   });
 
+  const addQuizExamplesMutation = useMutation({
+    mutationFn: ({
+      quizId,
+      exampleIds,
+    }: {
+      quizId: number;
+      exampleIds: number[];
+    }) => createMultipleQuizExamples(quizId, exampleIds),
+    onSuccess: (data, variables) => {
+      toast.success('Examples assigned to quiz successfully');
+      if (quizId) {
+        queryClient.invalidateQueries({ queryKey: ['quizExamples', quizId] });
+      }
+      // Return the example IDs that were successfully assigned
+      // If the API doesn't return the IDs, we'll use the ones we sent
+      return data || variables.exampleIds;
+    },
+    onError: (error) => {
+      toast.error(
+        `Failed to assign examples to quiz: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+      // Return an empty array to indicate no examples were assigned
+      return [];
+    },
+  });
+
   const updateQuizExample = useCallback(
     (newExampleData: Flashcard) => {
       try {
@@ -94,5 +125,10 @@ export function useOfficialQuizzes(quizId: number | undefined) {
     [updateExampleFromQuery, quizExamplesQuery],
   );
 
-  return { officialQuizzesQuery, quizExamplesQuery, updateQuizExample };
+  return {
+    officialQuizzesQuery,
+    quizExamplesQuery,
+    updateQuizExample,
+    addQuizExamplesMutation,
+  };
 }

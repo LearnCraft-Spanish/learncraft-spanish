@@ -1,0 +1,287 @@
+#exampleCreator,
+#exampleEditor,
+#vocabTagging {
+  display: flex;
+  flex-direction: row;
+}
+
+#examplePreview,
+#exampleForm,
+.halfOfScreen {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  margin: 15px;
+}
+
+/* ********* Example Preview ********* */
+
+.previewCard {
+  position: relative;
+  display: flex;
+  width: auto;
+  flex-direction: row;
+  justify-content: space-between;
+  border: 2px solid var(--accent);
+  background: var(--light);
+  padding: 4px 16px;
+  margin: 5px 30px;
+}
+/* Needed to center audio play/pause button */
+.previewCard .audioPlayPauseButton {
+  position: relative;
+  position: absolute;
+  bottom: calc(50% - 12px);
+  right: 0px;
+  padding: 12px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.audioError {
+  border: 3px solid red;
+  background-color: transparent;
+  position: absolute;
+  bottom: calc(50% - 24px);
+  right: 0px;
+  padding: 12px;
+  cursor: not-allowed;
+  z-index: 5;
+}
+
+.audioError:hover {
+  background-color: red;
+}
+
+.audioError img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Example Labels */
+#examplePreview h4 {
+  text-align: left;
+}
+
+@media screen and (max-width: 834px) {
+  #exampleCreator {
+    flex-direction: column;
+  }
+  #examplePreview,
+  #exampleForm {
+    width: 100%;
+  }
+}
+
+/* ********* Example Creation Form ********* */
+
+/* Form inputs separated into 2 parent divs
+so we can do col/row later on smaller screens */
+#exampleForm > div {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 10%;
+}
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.styledInput {
+  border-color: rgb(181, 183, 185);
+  border-radius: 3px;
+  font-size: 14px;
+  padding: 4px 8px;
+}
+.required::after {
+  content: ' *';
+  color: red;
+}
+
+/* for positioning audio controls */
+.exampleAudioWrapper {
+  position: relative;
+}
+
+/* Temporary button styling, should be updated later */
+#exampleForm button {
+  width: 33%;
+  margin: 10px auto;
+}
+
+.setCreatorContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 10px 3%;
+}
+
+.inputWithoutStyle {
+  width: 100%;
+  border: none;
+  background: none;
+  margin: 0px;
+  padding: 8px;
+  resize: none;
+}
+
+.tdWithoutPadding {
+  padding: 0px;
+}
+
+/* exmaple card */
+
+/* .exampleCard {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  border: 2px solid var(--accent);
+  background: var(--light);
+  padding: 4px 16px;
+  margin: 5px 30px;
+} */
+
+/* .exampleCard .exampleCardSpanishText,
+.exampleCard .exampleCardEnglishText {
+  position: relative;
+  height: 100%;
+  width: 50%;
+} */
+
+.duplicate-row td:first-child {
+  position: relative;
+  padding: 0;
+}
+
+.duplicate-content-wrapper {
+  border: 2px solid darkred;
+  border-radius: 4px;
+  padding: 8px;
+  margin: 2px;
+}
+
+.validation-note {
+  color: var(--text-muted, #666);
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.validation-summary {
+  margin: 10px 0;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--light);
+  border: 1px solid var(--accent);
+}
+
+/* Confirm submission contextual */
+
+.confirmSubmissionBox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+
+.tagSearchBox {
+  position: relative;
+}
+
+#vocabTagging .tagSuggestionBox {
+  position: absolute;
+  max-width: 640px;
+  width: 100%;
+  top: 94px;
+  left: 0px;
+  z-index: 999;
+}
+
+.confirmSubmissionBox form {
+  background-color: var(--light);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  width: 50%;
+}
+
+/* Vocabulary Tagging Styles */
+.vocabTagBox {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  margin-top: 12px;
+  width: 90%;
+}
+
+.vocabTag {
+  font-size: 12px;
+  padding: 7px 5px 0;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--light);
+  border: 4px solid var(--brand);
+  text-align: center;
+  overflow: hidden;
+  margin: 5px;
+  border-radius: 0;
+  cursor: pointer;
+  min-height: 80px;
+}
+
+.tagSuggestionBox .vocabTag {
+  margin: 0px;
+}
+
+.removeTagButton {
+  background-color: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 16px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  padding: 0;
+  margin: 0;
+  height: 14px;
+  width: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Vocab Complete Toggle */
+.vocabCompleteContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.vocabCompleteContainer label {
+  margin-left: 15px;
+}
+
+/* Example Filter Controls */
+.exampleFilterControls {
+  display: flex;
+  justify-content: center;
+  margin: 15px;
+  gap: 20px;
+}
+
+.filterToggleContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}

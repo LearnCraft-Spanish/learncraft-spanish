@@ -5,15 +5,15 @@ import type {
   Week,
 } from '../../../types/CoachingTypes';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { Loading } from 'src/components/Loading';
 
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import LoadingMessage from '../../Loading';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
 import { NewAssignmentView } from './Table/AssignmentsCell';
-import { GroupSessionView } from './Table/GroupSessions/GroupSessionsCell';
+import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
 
@@ -62,6 +62,8 @@ function WeeksRecordsContent() {
   // });
 
   // Filtering state
+  const [filterByOneMonthChallenge, setFilterByOneMonthChallenge] =
+    useState<boolean>(true);
   const [filterByCoach, setFilterByCoach] = useState<Coach | undefined>();
   const [filterByCourse, setFilterByCourse] = useState<Course | undefined>();
   const [filterByCompletion, updateFilterByCompletion] =
@@ -125,6 +127,9 @@ function WeeksRecordsContent() {
   function updateFilterHoldWeeks(value: boolean) {
     setFilterByHoldWeeks(value);
   }
+  function updateFilterByOneMonthChallenge(value: boolean) {
+    setFilterByOneMonthChallenge(value);
+  }
   function updateFilterBySearchTerm(value: string) {
     setFilterBySearchTerm(value.toLowerCase());
   }
@@ -156,6 +161,13 @@ function WeeksRecordsContent() {
       return weeks.filter((week) => !week.holdWeek);
     },
     [filterByHoldWeeks],
+  );
+  const filterByOneMonthChallengeFunction = useCallback(
+    (weeks: Week[]) => {
+      if (!filterByOneMonthChallenge) return weeks;
+      return weeks.filter((week) => week.level !== '1-Month Challenge');
+    },
+    [filterByOneMonthChallenge],
   );
   const filterWeeksByWeeksAgoFunction = useCallback(
     (weeks: Week[]) => {
@@ -215,8 +227,11 @@ function WeeksRecordsContent() {
       }
       const filteredByCoach = filterByCoachFunction(weeks);
       const filteredByWeeksAgo = filterWeeksByWeeksAgoFunction(filteredByCoach);
-
-      const filteredByCourse = filterByCourseFunction(filteredByWeeksAgo);
+      const filteredByOneMonthChallenge =
+        filterByOneMonthChallengeFunction(filteredByWeeksAgo);
+      const filteredByCourse = filterByCourseFunction(
+        filteredByOneMonthChallenge,
+      );
       const filteredByHoldWeeks = filterByHoldWeeksFunction(filteredByCourse);
 
       const filteredByCoachless =
@@ -234,6 +249,7 @@ function WeeksRecordsContent() {
       filterByCoachFunction,
       filterByCourseFunction,
       filterByHoldWeeksFunction,
+      filterByOneMonthChallengeFunction,
       filterWeeksByWeeksAgoFunction,
       filterWeeksByCoachlessFunction,
       filterByCompletionFunction,
@@ -282,9 +298,7 @@ function WeeksRecordsContent() {
 
   return (
     <div className="newCoachingWrapper">
-      {initialDataLoad && (
-        <LoadingMessage message={'Loading Coaching Data...'} />
-      )}
+      {initialDataLoad && <Loading message={'Loading Coaching Data...'} />}
       {dataError && <p>Error loading data</p>}
       {rendered.current && (
         <>
@@ -304,6 +318,8 @@ function WeeksRecordsContent() {
               updateFilterHoldWeeks={updateFilterHoldWeeks}
               filterByCompletion={filterByCompletion}
               updateFilterByCompletion={updateFilterByCompletion}
+              filterByOneMonthChallenge={filterByOneMonthChallenge}
+              updateFilterByOneMonthChallenge={updateFilterByOneMonthChallenge}
             />
           </div>
           <WeeksTable weeks={weeks} />

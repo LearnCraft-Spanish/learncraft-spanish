@@ -112,7 +112,7 @@ describe('app', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(getByText(/example creator/i)).toBeInTheDocument();
+      expect(getByText(/example manager/i)).toBeInTheDocument();
     });
   });
 });

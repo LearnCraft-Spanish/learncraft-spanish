@@ -8,7 +8,7 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useModal } from 'src/hooks/useModal';
 
 import AssignmentsCell from './AssignmentsCell';
-import GroupSessionsCell from './GroupSessions/GroupSessionsCell';
+import GroupSessionsCell from './GroupSessionsCell';
 import PrivateCallsCell from './PrivateCallsCell';
 import StudentCell from './StudentCell';
 

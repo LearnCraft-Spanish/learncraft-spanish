@@ -25,6 +25,7 @@ export function useStudentFlashcards() {
     deleteMyStudentExample,
     updateStudentExample,
     updateMyStudentExample,
+    createMultipleStudentExamples,
   } = useBackend();
 
   // Temporary ID to generate unique placeholder keys for new flashcards
@@ -655,12 +656,219 @@ export function useStudentFlashcards() {
     onSettled: () => debouncedRefetch(),
   });
 
+  // Function to return promise that will either give success data or throw an error.
+  const addMultipleToActiveStudentFlashcards = useCallback(
+    async (flashcards: Flashcard[]) => {
+      const recordIds = flashcards.map((flashcard) => flashcard.recordId);
+      let addPromise;
+      if (
+        (userDataQuery.data?.roles.adminRole === 'coach' ||
+          userDataQuery.data?.roles.adminRole === 'admin') &&
+        activeStudentId
+      ) {
+        addPromise = createMultipleStudentExamples(activeStudentId, recordIds);
+      } else if (userDataQuery.data?.roles.studentRole === 'student') {
+        // For students, we need to add them one by one since there's no bulk endpoint
+        const results = await Promise.all(
+          recordIds.map((recordId) => createMyStudentExample(recordId)),
+        );
+        return results.map((result) => {
+          if (typeof result === 'string') {
+            return Number.parseInt(result);
+          }
+          return result[0];
+        });
+      }
+      if (!addPromise) {
+        throw new Error('No active student');
+      }
+      const addResponse = async () => {
+        const result = await addPromise;
+        return result.map((id: number | string) => {
+          if (typeof id === 'string') {
+            return Number.parseInt(id);
+          }
+          return id;
+        });
+      };
+      return addResponse();
+    },
+    [
+      userDataQuery.data?.roles,
+      activeStudentId,
+      createMyStudentExample,
+      createMultipleStudentExamples,
+    ],
+  );
+
+  interface AddMultipleFlashcardsContext {
+    tempIds: number[];
+    flashcards: Flashcard[];
+  }
+
+  const addMultipleFlashcardsMutation = useMutation<
+    number[], // TData
+    Error, // TError
+    Flashcard[], // TVariables
+    AddMultipleFlashcardsContext | undefined // TContext
+  >({
+    mutationFn: (flashcards: Flashcard[]) =>
+      addMultipleToActiveStudentFlashcards(flashcards),
+    onMutate: async (flashcards: Flashcard[]) => {
+      // Cancel any in-flight queries to prevent race conditions
+      await queryClient.cancelQueries({
+        queryKey: ['flashcardData', activeStudentId],
+      });
+
+      // Generate temporary IDs for all flashcards
+      const tempIds = flashcards.map(() => {
+        let newId = -1;
+        queryClient.setQueryData(['tempIdCounter'], (prevId: number = -1) => {
+          const nextId = prevId - 1;
+          newId = nextId;
+          return nextId;
+        });
+        return newId;
+      });
+
+      // Format exactly matches type as returned from database except for negative recordIds
+      const newStudentExamples: StudentExample[] = flashcards.map(
+        (flashcard, index) => ({
+          studentEmailAddress: userDataQuery.data?.emailAddress || '',
+          recordId: tempIds[index],
+          relatedExample: flashcard.recordId,
+          relatedStudent: activeStudentId!,
+          dateCreated: toISODateTime(),
+          lastReviewedDate: '',
+          nextReviewDate: '',
+          reviewInterval: null,
+          coachAdded: false,
+        }),
+      );
+
+      // Optimistically update the flashcards cache
+      queryClient.setQueryData(
+        ['flashcardData', activeStudentId],
+        (oldFlashcards: StudentFlashcardData) => {
+          if (!oldFlashcards) {
+            const newItem = {
+              examples: flashcards,
+              studentExamples: newStudentExamples,
+            };
+            const trimmedNewFlashcardData = matchAndTrimArrays(newItem);
+            return trimmedNewFlashcardData;
+          }
+          const newExampleArray = [
+            ...oldFlashcards.examples,
+            ...flashcards.map((flashcard) => ({
+              ...flashcard,
+              isCollected: true,
+            })),
+          ];
+          const newStudentExampleArray = [
+            ...oldFlashcards.studentExamples,
+            ...newStudentExamples,
+          ];
+          const newFlashcardData = {
+            examples: newExampleArray,
+            studentExamples: newStudentExampleArray,
+          };
+          const trimmedNewFlashcardData = matchAndTrimArrays(newFlashcardData);
+          return trimmedNewFlashcardData;
+        },
+      );
+      return { tempIds, flashcards };
+    },
+
+    onSuccess: (
+      data: number[],
+      _variables: Flashcard[],
+      context?: AddMultipleFlashcardsContext,
+    ) => {
+      if (!context) return;
+      const { tempIds } = context;
+      const successCount = data.filter(
+        (id: number | string) => Number(id) > 0,
+      ).length;
+      const totalCount = data.length;
+
+      if (successCount === totalCount) {
+        showSuccessToast('All flashcards added successfully');
+      } else {
+        showSuccessToast(
+          `Added ${successCount} of ${totalCount} flashcards successfully`,
+        );
+      }
+
+      queryClient.setQueryData(
+        ['flashcardData', activeStudentId],
+        (oldFlashcards: StudentFlashcardData) => {
+          const oldStudentExamples = oldFlashcards.studentExamples;
+          const newStudentExampleArray = oldStudentExamples.map(
+            (studentExample) => {
+              const tempIdIndex = tempIds.indexOf(studentExample.recordId);
+              if (tempIdIndex !== -1) {
+                const newId = data[tempIdIndex];
+                if (newId > 0) {
+                  return { ...studentExample, recordId: newId };
+                }
+              }
+              return studentExample;
+            },
+          );
+          const newFlashcardData = {
+            examples: oldFlashcards.examples,
+            studentExamples: newStudentExampleArray,
+          };
+          return matchAndTrimArrays(newFlashcardData);
+        },
+      );
+    },
+
+    onError: (
+      error: Error,
+      _variables: Flashcard[],
+      context?: AddMultipleFlashcardsContext,
+    ) => {
+      showErrorToast('Failed to add some flashcards');
+      console.error(error);
+      if (!context) return;
+      // Roll back the cache for just the affected flashcards
+      const { tempIds } = context;
+      queryClient.setQueryData(
+        ['flashcardData', activeStudentId],
+        (oldFlashcards: StudentFlashcardData) => {
+          const oldFlashcardsCopy = [...oldFlashcards.examples];
+          const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
+          const newStudentExampleArray = oldStudentFlashcardsCopy.filter(
+            (studentExample) => !tempIds.includes(studentExample.recordId),
+          );
+          const newExampleArray = oldFlashcardsCopy.filter(
+            (example) =>
+              !newStudentExampleArray.some(
+                (studentExample) =>
+                  studentExample.relatedExample === example.recordId,
+              ),
+          );
+          const newFlashcardData = {
+            examples: newExampleArray,
+            studentExamples: newStudentExampleArray,
+          };
+          return matchAndTrimArrays(newFlashcardData);
+        },
+      );
+    },
+    // Always refetch after success or error:
+    onSettled: () => debouncedRefetch(),
+  });
+
   return {
     flashcardDataQuery,
     exampleIsCollected,
     exampleIsCustom,
     exampleIsPending,
     addFlashcardMutation,
+    addMultipleFlashcardsMutation,
     removeFlashcardMutation,
     updateFlashcardMutation,
   };

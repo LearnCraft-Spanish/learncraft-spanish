@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import Filter from 'src/components/FlashcardFinder/Filter';
 
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
@@ -16,11 +16,11 @@ import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import ExamplesTable from './ExamplesTable';
+import ExamplesTable from '../ExamplesTable/ExamplesTable';
 import 'src/App.css';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
-const FlashcardFinder = () => {
+export default function FlashcardFinder() {
   const userDataQuery = useUserData();
   const { activeStudentQuery } = useActiveStudent();
   const { verifiedExamplesQuery } = useVerifiedExamples();
@@ -137,6 +137,4 @@ const FlashcardFinder = () => {
       )}
     </div>
   );
-};
-
-export default FlashcardFinder;
+}

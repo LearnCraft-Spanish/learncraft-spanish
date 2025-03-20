@@ -43,6 +43,19 @@ h1 {
   margin: 0;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--light);
+}
+
+th,
+td {
+  border: 1px solid var(--dark);
+  padding: 8px;
+  text-align: center;
+}
+
 h2,
 h3,
 h4,
@@ -149,53 +162,6 @@ button:hover,
   top: 50%;
   left: 20px;
   transform: translate(0, -50%);
-}
-
-/* Load Screen Styles */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  max-height: 70vh;
-  padding: 5% 20%;
-  box-sizing: border-box;
-}
-
-.loadingIcon {
-  position: relative;
-  width: 50%;
-  padding-top: 50%;
-  max-width: 400px;
-  max-height: 400px;
-  min-width: 150px;
-  min-height: 150px;
-}
-
-#headIcon {
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 80%;
-}
-
-#wheelIcon {
-  position: absolute;
-  top: 18%;
-  left: 18%;
-  width: 40%;
-  animation: spin 1.4s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 /*Main Menu Styles*/
@@ -464,31 +430,6 @@ button:hover,
 
 /*For Flashcard Manager */
 
-.customLabel {
-  text-align: center;
-  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  padding: 10px 30px;
-  border: none;
-  cursor: default;
-  /* align text vertically */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--light);
-  background-color: var(--theme);
-}
-
-.customLabel:hover {
-  cursor: default;
-  background-color: var(--theme);
-}
-
-.customLabel h4 {
-  color: var(--light);
-}
-
 .spanglishLabel {
   align-content: center;
   width: 8%;
@@ -708,31 +649,6 @@ button:hover,
   width: auto;
 }
 
-.examplesTable {
-  min-height: 1200px;
-  padding: 0px;
-}
-
-.examplesTable .buttonBox {
-  text-align: center;
-  color: var(--light);
-  font-size: 12px;
-  padding: 0px;
-  align-self: stretch;
-  margin: 5px 30px;
-  width: auto;
-}
-
-.examplesTable .buttonBox button {
-  width: 100%;
-  background-color: var(--theme);
-  margin: 0 auto;
-}
-
-.examplesTable .buttonBox button:hover {
-  background-color: var(--accent);
-}
-
 .selectedVocab {
   display: flex;
   flex-direction: row;
@@ -842,70 +758,6 @@ button:hover,
   text-align: left;
   margin-bottom: 0;
   margin: 5px;
-}
-
-.displayExamplesDescription {
-  width: 50%;
-  background-color: var(--light);
-  border: 2px solid var(--theme);
-  padding: 0px 20px;
-}
-
-.exampleCard {
-  text-align: center;
-  background-color: var(--accent);
-  color: var(--light);
-  font-size: 12px;
-  padding: 0px;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  margin: 5px 30px;
-}
-
-.exampleCardTags {
-  background-color: var(--theme);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0px;
-  padding: 0px;
-}
-
-.exampleCardTagsList {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  margin: 0px;
-  padding: 36px 10px 10px;
-}
-
-.showTagsButton {
-  height: 100%;
-  background-color: var(--theme);
-  color: var(--light);
-  margin: 0px;
-  padding: 0px 10px;
-}
-
-.hideTagsButton {
-  background-color: transparent;
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  padding: 12px;
-  cursor: pointer;
-  z-index: 5;
-}
-
-.hideTagsButton img {
-  width: 12px;
-  height: 12px;
-  color: var(--light);
 }
 
 .addButton,
