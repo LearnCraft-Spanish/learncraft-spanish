@@ -255,9 +255,11 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
 export default function PrivateCallsCell({
   week,
   calls,
+  tableEditMode,
 }: {
   week: Week;
   calls: PrivateCall[] | null;
+  tableEditMode: boolean;
 }) {
   const { getStudentFromMembershipId, createPrivateCallMutation } =
     useCoaching();
@@ -333,6 +335,7 @@ export default function PrivateCallsCell({
         type="button"
         className="greenButton"
         onClick={() => openContextual(`addPrivateCall${week.recordId}`)}
+        disabled={tableEditMode}
       >
         New
       </button>

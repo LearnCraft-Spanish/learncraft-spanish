@@ -1,9 +1,6 @@
 import type { Week } from 'src/types/CoachingTypes';
-import { useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import { useMemo } from 'react';
 import checkmark from 'src/assets/icons/checkmark_green.svg';
-import pencil from 'src/assets/icons/pencil.svg';
-import x from 'src/assets/icons/x_dark.svg';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useModal } from 'src/hooks/useModal';
 
@@ -12,7 +9,15 @@ import GroupSessionsCell from './GroupSessionsCell';
 import PrivateCallsCell from './PrivateCallsCell';
 import StudentCell from './StudentCell';
 
-export default function WeeksTableItem({ week }: { week: Week }) {
+export default function WeeksTableItem({
+  week,
+  updateActiveDataWeek,
+  tableEditMode,
+}: {
+  week: Week;
+  updateActiveDataWeek: (week: Week) => void;
+  tableEditMode: boolean;
+}) {
   const {
     studentRecordsLessonsQuery,
     getAssignmentsFromWeekRecordId,
@@ -20,17 +25,16 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     getPrivateCallsFromWeekRecordId,
     getStudentFromMembershipId,
   } = useCoaching();
-  const { updateWeekMutation } = useCoaching();
-  const { openModal, closeModal } = useModal();
+  const { openModal } = useModal();
 
   const dataReady = studentRecordsLessonsQuery.isSuccess;
 
-  const [notes, setNotes] = useState(week.notes);
-  const [holdWeek, setHoldWeek] = useState(week.holdWeek);
-  const [recordsComplete, setRecordsComplete] = useState(week.recordsComplete);
-  const [currentLesson, setCurrentLesson] = useState<string>(
-    week.currentLesson ? week.currentLesson.toString() : '0',
-  );
+  // const [notes, setNotes] = useState(week.notes);
+  // const [holdWeek, setHoldWeek] = useState(week.holdWeek);
+  // const [recordsComplete, setRecordsComplete] = useState(week.recordsComplete);
+  // const [currentLesson, setCurrentLesson] = useState<string>(
+  //   week.currentLesson ? week.currentLesson.toString() : '0',
+  // );
 
   const assignments = useMemo(
     () => getAssignmentsFromWeekRecordId(week.recordId),
@@ -45,28 +49,28 @@ export default function WeeksTableItem({ week }: { week: Week }) {
     [getPrivateCallsFromWeekRecordId, week.recordId],
   );
 
-  const [editMode, setEditMode] = useState(false);
+  // const [editMode, setEditMode] = useState(false);
 
-  function cancelEdit() {
-    setNotes(week.notes);
-    setHoldWeek(week.holdWeek);
-    setRecordsComplete(week.recordsComplete);
-    setCurrentLesson(week.currentLesson ? week.currentLesson.toString() : '0');
-    closeModal();
-    setEditMode(false);
-  }
+  // function cancelEdit() {
+  //   setNotes(week.notes);
+  //   setHoldWeek(week.holdWeek);
+  //   setRecordsComplete(week.recordsComplete);
+  //   setCurrentLesson(week.currentLesson ? week.currentLesson.toString() : '0');
+  //   closeModal();
+  //   setEditMode(false);
+  // }
 
   // This is the same logic as the formula for record Completeable in the database
   function validateRecordCompleteable() {
     if (week.week === 0) {
       return true;
     }
-    if (currentLesson === '0') {
+    if (week.currentLesson === 0) {
       return false;
     }
     if (
       privateCalls?.length === 0 &&
-      notes === '' &&
+      week.notes === '' &&
       groupSessions?.length === 0
     ) {
       return false;
@@ -74,21 +78,52 @@ export default function WeeksTableItem({ week }: { week: Week }) {
 
     return true;
   }
-  function handleSubmit() {
-    // on no changes, do nothing
-    if (
-      notes === week.notes &&
-      holdWeek === week.holdWeek &&
-      recordsComplete === week.recordsComplete &&
-      (week.currentLesson ? week.currentLesson.toString() : '0') ===
-        currentLesson
-    ) {
-      toast.info('No changes detected');
-      setEditMode(false);
-      return;
-    }
+  // function handleSubmit() {
+  //   // on no changes, do nothing
+  //   if (
+  //     notes === week.notes &&
+  //     holdWeek === week.holdWeek &&
+  //     recordsComplete === week.recordsComplete &&
+  //     (week.currentLesson ? week.currentLesson.toString() : '0') ===
+  //       currentLesson
+  //   ) {
+  //     toast.info('No changes detected');
+  //     setEditMode(false);
+  //     return;
+  //   }
 
-    if (recordsComplete) {
+  //   if (recordsComplete) {
+  //     if (!validateRecordCompleteable()) {
+  //       openModal({
+  //         title: 'Error',
+  //         body: 'Cannot mark record as complete without a current lesson, a private or group call, or a note if no calls were made.',
+  //         type: 'error',
+  //       });
+  //       return;
+  //     }
+  //   }
+
+  //   updateWeekMutation.mutate(
+  //     {
+  //       notes,
+  //       holdWeek,
+  //       recordsComplete,
+  //       offTrack: week.offTrack,
+  //       primaryCoachWhenCreated: week.primaryCoachWhenCreated,
+  //       recordId: week.recordId,
+  //       currentLesson:
+  //         currentLesson !== '0' ? Number.parseInt(currentLesson) : undefined,
+  //     },
+  //     {
+  //       onSuccess: () => {
+  //         setEditMode(false);
+  //       },
+  //     },
+  //   );
+  // }
+
+  const handleRecordCompleteableChange = (newValue: boolean) => {
+    if (newValue) {
       if (!validateRecordCompleteable()) {
         openModal({
           title: 'Error',
@@ -98,25 +133,11 @@ export default function WeeksTableItem({ week }: { week: Week }) {
         return;
       }
     }
-
-    updateWeekMutation.mutate(
-      {
-        notes,
-        holdWeek,
-        recordsComplete,
-        offTrack: week.offTrack,
-        primaryCoachWhenCreated: week.primaryCoachWhenCreated,
-        recordId: week.recordId,
-        currentLesson:
-          currentLesson !== '0' ? Number.parseInt(currentLesson) : undefined,
-      },
-      {
-        onSuccess: () => {
-          setEditMode(false);
-        },
-      },
-    );
-  }
+    updateActiveDataWeek({
+      ...week,
+      recordsComplete: newValue,
+    });
+  };
 
   return (
     dataReady && (
@@ -138,26 +159,35 @@ export default function WeeksTableItem({ week }: { week: Week }) {
         </td>
         <td>
           {week.membershipCourseWeeklyPrivateCalls > 0 && (
-            <PrivateCallsCell week={week} calls={privateCalls} />
+            <PrivateCallsCell
+              week={week}
+              calls={privateCalls}
+              tableEditMode={tableEditMode}
+            />
           )}
         </td>
         <td>
-          {editMode ? (
+          {tableEditMode ? (
             <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              disabled={!editMode}
+              value={week.notes}
+              onChange={(e) =>
+                updateActiveDataWeek({ ...week, notes: e.target.value })
+              }
+              disabled={!tableEditMode}
             />
           ) : (
-            <p>{notes}</p>
+            <p>{week.notes}</p>
           )}
         </td>
         <td>
-          {editMode ? (
+          {tableEditMode ? (
             <select
-              value={currentLesson}
+              value={week.currentLesson ? week.currentLesson.toString() : '0'}
               onChange={(e) => {
-                setCurrentLesson(e.target.value);
+                updateActiveDataWeek({
+                  ...week,
+                  currentLesson: Number.parseInt(e.target.value),
+                });
               }}
             >
               <option value={'0'}>Select Lesson</option>
@@ -172,32 +202,36 @@ export default function WeeksTableItem({ week }: { week: Week }) {
           )}
         </td>
         <td>
-          {editMode ? (
+          {tableEditMode ? (
             <input
               type="checkbox"
-              checked={holdWeek}
-              onChange={() => setHoldWeek(!holdWeek)}
+              checked={week.holdWeek}
+              onChange={() =>
+                updateActiveDataWeek({ ...week, holdWeek: !week.holdWeek })
+              }
             />
           ) : (
-            holdWeek && (
+            week.holdWeek && (
               <img className="checkmark" src={checkmark} alt="Checkmark" />
             )
           )}
         </td>
         <td>
-          {editMode ? (
+          {tableEditMode ? (
             <input
               type="checkbox"
-              checked={recordsComplete}
-              onChange={() => setRecordsComplete(!recordsComplete)}
+              checked={week.recordsComplete}
+              onChange={() =>
+                handleRecordCompleteableChange(!week.recordsComplete)
+              }
             />
           ) : (
-            recordsComplete && (
+            week.recordsComplete && (
               <img className="checkmark" src={checkmark} alt="Checkmark" />
             )
           )}
         </td>
-        <td>
+        {/* <td>
           {editMode ? (
             <>
               <img
@@ -223,7 +257,7 @@ export default function WeeksTableItem({ week }: { week: Week }) {
               onClick={() => setEditMode(true)}
             />
           )}
-        </td>
+        </td> */}
       </tr>
     )
   );
