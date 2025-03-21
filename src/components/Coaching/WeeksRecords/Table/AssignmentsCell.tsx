@@ -52,7 +52,13 @@ const ratings = [
   'Advanced',
 ];
 
-function AssignmentCell({ assignment }: { assignment: Assignment }) {
+function AssignmentCell({
+  assignment,
+  tableEditMode,
+}: {
+  assignment: Assignment;
+  tableEditMode: boolean;
+}) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
@@ -61,16 +67,22 @@ function AssignmentCell({ assignment }: { assignment: Assignment }) {
         type="button"
         onClick={() => openContextual(`assignment${assignment.recordId}`)}
       >
-        {assignment.assignmentType}:{assignment.rating}
+        {`${assignment.assignmentType}: ${assignment.rating}`}
       </button>
       {contextual === `assignment${assignment.recordId}` && (
-        <AssignmentView assignment={assignment} />
+        <AssignmentView assignment={assignment} tableEditMode={tableEditMode} />
       )}
     </div>
   );
 }
 
-function AssignmentView({ assignment }: { assignment: Assignment }) {
+function AssignmentView({
+  assignment,
+  tableEditMode,
+}: {
+  assignment: Assignment;
+  tableEditMode?: boolean;
+}) {
   const {
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
@@ -202,7 +214,9 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
   return (
     <div className="contextualWrapper" key={`assignment${assignment.recordId}`}>
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControls editFunction={toggleEditMode} />
+        <ContextualControls
+          editFunction={tableEditMode ? undefined : toggleEditMode}
+        />
         {editMode ? (
           <h4>Edit Assignment</h4>
         ) : (
@@ -274,8 +288,10 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
 
 export default function AssignmentsCell({
   assignments,
+  tableEditMode,
 }: {
   assignments: Assignment[] | null | undefined;
+  tableEditMode: boolean;
 }) {
   return (
     <div className="assignmentsCell">
@@ -283,6 +299,7 @@ export default function AssignmentsCell({
         assignments.map((assignment) => (
           <AssignmentCell
             assignment={assignment}
+            tableEditMode={tableEditMode}
             key={`assignment${assignment.recordId}`}
           />
         ))}

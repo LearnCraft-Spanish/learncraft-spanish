@@ -28,7 +28,13 @@ const ratingOptions = [
   'No-Show',
 ];
 const callTypeOptions = ['Monthly Call', 'Uses Credit (Bundle)'];
-function PrivateCallInstance({ call }: { call: PrivateCall }) {
+function PrivateCallInstance({
+  call,
+  tableEditMode,
+}: {
+  call: PrivateCall;
+  tableEditMode: boolean;
+}) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
@@ -39,12 +45,20 @@ function PrivateCallInstance({ call }: { call: PrivateCall }) {
       >
         {call.rating}
       </button>
-      {contextual === `call${call.recordId}` && <PrivateCallView call={call} />}
+      {contextual === `call${call.recordId}` && (
+        <PrivateCallView call={call} tableEditMode={tableEditMode} />
+      )}
     </div>
   );
 }
 
-function PrivateCallView({ call }: { call: PrivateCall }) {
+function PrivateCallView({
+  call,
+  tableEditMode,
+}: {
+  call: PrivateCall;
+  tableEditMode?: boolean;
+}) {
   const userDataQuery = useUserData();
   const { setContextualRef, updateDisableClickOutside, closeContextual } =
     useContextualMenu();
@@ -165,7 +179,9 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControls editFunction={toggleEditMode} />
+        <ContextualControls
+          editFunction={tableEditMode ? undefined : toggleEditMode}
+        />
         {editMode ? (
           <h4>Edit Call</h4>
         ) : (
@@ -328,7 +344,11 @@ export default function PrivateCallsCell({
       {/* Existing Calls */}
       {calls &&
         calls.map((call) => (
-          <PrivateCallInstance key={call.recordId} call={call} />
+          <PrivateCallInstance
+            key={call.recordId}
+            call={call}
+            tableEditMode={tableEditMode}
+          />
         ))}
       {/* New Call Form */}
       <button

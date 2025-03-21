@@ -286,7 +286,12 @@ function StudentMembershipContextual({
           editMode={false}
           onChange={() => {}}
         />
-        <Checkbox label="On Hold" value={onHold} onChange={setOnHold} />
+        <Checkbox
+          labelText="On Hold"
+          labelFor="onHold"
+          value={onHold}
+          onChange={setOnHold}
+        />
         {userDataQuery.data?.roles.adminRole === 'admin' && (
           <DateInput value={endDate} onChange={setEndDate} label="End Date" />
         )}

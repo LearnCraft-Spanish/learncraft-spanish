@@ -41,7 +41,12 @@ describe('component WeeksTable', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <WeeksTable weeks={[weeksInRange[0]]} />
+          <WeeksTable
+            weeks={[weeksInRange[0]]}
+            tableEditMode={false}
+            setTableEditMode={() => {}}
+            hiddenFields={[]}
+          />
         </DateRangeProvider>
       </MockAllProviders>,
     );
@@ -61,7 +66,12 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithAssignment]} />
+            <WeeksTable
+              weeks={[weekWithAssignment]}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -98,7 +108,12 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithGroupSession]} />
+            <WeeksTable
+              weeks={[weekWithGroupSession]}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -168,7 +183,12 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithHoldWeek]} />
+            <WeeksTable
+              weeks={[weekWithHoldWeek]}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -190,7 +210,12 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithRecordsComplete]} />
+            <WeeksTable
+              weeks={[weekWithRecordsComplete]}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );

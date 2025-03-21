@@ -49,10 +49,12 @@ function GroupSessionCell({
   groupSession,
   week,
   newRecord,
+  tableEditMode,
 }: {
   groupSession: GroupSession;
   week: Week;
   newRecord?: boolean;
+  tableEditMode: boolean;
 }) {
   const { contextual, openContextual } = useContextualMenu();
   return (
@@ -66,6 +68,7 @@ function GroupSessionCell({
               `groupSession${groupSession.recordId}week${week.recordId}`,
             )
           }
+          disabled={tableEditMode}
         >
           New
         </button>
@@ -84,7 +87,11 @@ function GroupSessionCell({
 
       {contextual ===
         `groupSession${groupSession.recordId}week${week.recordId}` && (
-        <GroupSessionView groupSession={groupSession} newRecord={newRecord} />
+        <GroupSessionView
+          groupSession={groupSession}
+          newRecord={newRecord}
+          tableEditMode={tableEditMode}
+        />
       )}
     </div>
   );
@@ -93,9 +100,11 @@ function GroupSessionCell({
 export function GroupSessionView({
   groupSession,
   newRecord,
+  tableEditMode,
 }: {
   groupSession: GroupSession;
   newRecord?: boolean;
+  tableEditMode?: boolean;
 }) {
   const userDataQuery = useUserData();
   const { setContextualRef, closeContextual, updateDisableClickOutside } =
@@ -524,7 +533,9 @@ export function GroupSessionView({
   return (
     <div className="contextualWrapper">
       <div className="contextual" ref={setContextualRef}>
-        <ContextualControls editFunction={toggleEditMode} />
+        <ContextualControls
+          editFunction={tableEditMode ? undefined : toggleEditMode}
+        />
         {editMode ? (
           newRecord ? (
             <h3>New Group Session</h3>
@@ -646,9 +657,11 @@ export function GroupSessionView({
 export default function GroupSessionsCell({
   week,
   groupSessions,
+  tableEditMode,
 }: {
   week: Week;
   groupSessions: GroupSession[] | null;
+  tableEditMode: boolean;
 }) {
   const { groupSessionsQuery } = useCoaching();
 
@@ -661,6 +674,7 @@ export default function GroupSessionsCell({
             groupSession={groupSession}
             key={groupSession.recordId}
             week={week}
+            tableEditMode={tableEditMode}
           />
         ))}
         {/* {week.membershipCourseHasGroupCalls && (

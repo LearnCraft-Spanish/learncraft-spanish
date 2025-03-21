@@ -4,7 +4,13 @@ import type {
   GroupSession,
   Week,
 } from '../../../types/CoachingTypes';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Loading } from 'src/components/Loading';
 
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -76,6 +82,8 @@ function WeeksRecordsContent() {
   const [weeks, setWeeks] = useState<Week[] | undefined>();
   const rendered = useRef(false);
 
+  const [tableEditMode, setTableEditMode] = useState(false);
+
   const initialDataLoad =
     rendered.current === false &&
     (userDataQuery.isLoading ||
@@ -108,6 +116,13 @@ function WeeksRecordsContent() {
     groupAttendeesQuery.isError ||
     assignmentsQuery.isError ||
     privateCallsQuery.isError;
+
+  const hiddenFields = useMemo(() => {
+    const fields = [];
+    if (filterByCoach) fields.push('primaryCoach');
+    if (filterByCourse) fields.push('level');
+    return fields;
+  }, [filterByCoach, filterByCourse]);
 
   /* ------------------ Update Filter State ------------------ */
   function updateCoachFilter(coachEmail: string) {
@@ -241,7 +256,14 @@ function WeeksRecordsContent() {
       const filteredBySearchTerm =
         filterWeeksBySearchTerm(filteredByCompletion);
 
-      const filteredWeeks = filteredBySearchTerm;
+      // sort by relatedStudent
+      // firster first by level, then by weekName
+      const filteredWeeks = filteredBySearchTerm.sort((a, b) => {
+        if (a.level !== b.level) {
+          return a.level.localeCompare(b.level);
+        }
+        return a.weekName.localeCompare(b.weekName);
+      });
       return filteredWeeks;
     },
     [
@@ -302,27 +324,40 @@ function WeeksRecordsContent() {
       {dataError && <p>Error loading data</p>}
       {rendered.current && (
         <>
-          <h2>Weekly Student Records</h2>
-          <div className="filterWrapper">
-            <CoachingFilter
-              dataReady={!!weeks}
-              filterByCoach={filterByCoach}
-              updateCoachFilter={updateCoachFilter}
-              filterByCourse={filterByCourse}
-              updateCourseFilter={updateCourseFilter}
-              searchTerm={filterBySearchTerm || ''}
-              updateSearchTerm={updateFilterBySearchTerm}
-              filterCoachless={filterByCoachless}
-              updateCoachlessFilter={setFilterByCoachless}
-              filterHoldWeeks={filterByHoldWeeks}
-              updateFilterHoldWeeks={updateFilterHoldWeeks}
-              filterByCompletion={filterByCompletion}
-              updateFilterByCompletion={updateFilterByCompletion}
-              filterByOneMonthChallenge={filterByOneMonthChallenge}
-              updateFilterByOneMonthChallenge={updateFilterByOneMonthChallenge}
-            />
-          </div>
-          <WeeksTable weeks={weeks} />
+          {tableEditMode ? (
+            <h2>Edit Weekly Records</h2>
+          ) : (
+            <h2>Weekly Student Records</h2>
+          )}
+          {!tableEditMode && (
+            <div className="filterWrapper">
+              <CoachingFilter
+                dataReady={!!weeks}
+                filterByCoach={filterByCoach}
+                updateCoachFilter={updateCoachFilter}
+                filterByCourse={filterByCourse}
+                updateCourseFilter={updateCourseFilter}
+                searchTerm={filterBySearchTerm || ''}
+                updateSearchTerm={updateFilterBySearchTerm}
+                filterCoachless={filterByCoachless}
+                updateCoachlessFilter={setFilterByCoachless}
+                filterHoldWeeks={filterByHoldWeeks}
+                updateFilterHoldWeeks={updateFilterHoldWeeks}
+                filterByCompletion={filterByCompletion}
+                updateFilterByCompletion={updateFilterByCompletion}
+                filterByOneMonthChallenge={filterByOneMonthChallenge}
+                updateFilterByOneMonthChallenge={
+                  updateFilterByOneMonthChallenge
+                }
+              />
+            </div>
+          )}
+          <WeeksTable
+            weeks={weeks}
+            tableEditMode={tableEditMode}
+            setTableEditMode={setTableEditMode}
+            hiddenFields={hiddenFields}
+          />
           {contextual.startsWith('week') && (
             <ViewWeekRecord
               week={weeks?.find(

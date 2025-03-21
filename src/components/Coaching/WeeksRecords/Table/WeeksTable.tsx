@@ -1,12 +1,17 @@
 import type { Week } from 'src/types/CoachingTypes';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import Pagination from 'src/components/ExamplesTable/Pagination';
 import { Loading } from 'src/components/Loading';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 import QuantifiedRecords from '../quantifyingRecords';
 import WeeksTableItem from './WeeksTableItem';
+
+interface WeekWithFailedToUpdate extends Week {
+  failedToUpdate?: boolean;
+}
 
 interface WeekForUpdate {
   notes: string;
@@ -18,25 +23,40 @@ interface WeekForUpdate {
   currentLesson: number | undefined;
 }
 interface NewTableProps {
-  weeks: Week[] | undefined;
+  weeks: WeekWithFailedToUpdate[] | undefined;
+  tableEditMode: boolean;
+  setTableEditMode: (tableEditMode: boolean) => void;
+  hiddenFields: string[];
 }
-export default function WeeksTable({ weeks }: NewTableProps) {
+export default function WeeksTable({
+  weeks,
+  tableEditMode,
+  setTableEditMode,
+  hiddenFields,
+}: NewTableProps) {
   const { weeksQuery } = useCoaching();
   const { newPutFactory } = useBackendHelpers();
 
   const isLoading = weeksQuery.isLoading;
 
-  const [tableEditMode, setTableEditMode] = useState(false);
-  const [activeData, setActiveData] = useState<Week[]>([]);
+  const [activeData, setActiveData] = useState<WeekWithFailedToUpdate[]>([]);
 
   const updateManyWeeksMutation = useMutation({
     mutationFn: (weeks: WeekForUpdate[]) => {
-      const promise = newPutFactory({
+      const promise = newPutFactory<number[]>({
         path: `coaching/update-many-weeks`,
         body: weeks,
       });
+      toast.promise(promise, {
+        pending: 'Updating weeks...',
+        error: 'Failed to update weeks',
+        success: 'Weeks updated successfully',
+      });
       return promise;
     },
+    // onSuccess: () => {
+    //   weeksQuery.refetch();
+    // },
   });
 
   /*      Pagination      */
@@ -94,6 +114,10 @@ export default function WeeksTable({ weeks }: NewTableProps) {
 
   const handleApplyChanges = useCallback(() => {
     const changedWeeks = activeData.filter((week) => recordChanged(week));
+    if (changedWeeks.length === 0) {
+      toast.info('No changes to apply');
+      return;
+    }
 
     // format the weeks to be of type WeekForUpdate
     const weeksFormattedForUpdate: WeekForUpdate[] = changedWeeks.map(
@@ -107,8 +131,39 @@ export default function WeeksTable({ weeks }: NewTableProps) {
         currentLesson: week.currentLesson ?? undefined,
       }),
     );
-    updateManyWeeksMutation.mutate(weeksFormattedForUpdate);
-  }, [activeData, recordChanged, updateManyWeeksMutation]);
+    // slice the first element of the array
+    updateManyWeeksMutation.mutate(weeksFormattedForUpdate, {
+      // returns the recordIds that were updated
+      onSuccess: (data: number[], variables: WeekForUpdate[]) => {
+        if (data.length < changedWeeks.length) {
+          toast.error('Some weeks failed to update');
+          const identifyingFailedWeeks = displayOrderSegment.map((week) => {
+            if (data.includes(week.recordId)) {
+              return week;
+            }
+            // get the week from the variables
+            const weekFromVariables = variables.find(
+              (v) => v.recordId === week.recordId,
+            );
+            return { ...week, failedToUpdate: true, ...weekFromVariables };
+          });
+          setActiveData(identifyingFailedWeeks);
+        }
+        // weeksQuery.refetch();
+      },
+    });
+  }, [
+    activeData,
+    displayOrderSegment,
+    recordChanged,
+    updateManyWeeksMutation,
+    // weeksQuery,
+  ]);
+
+  const handleDisableEditMode = useCallback(() => {
+    setTableEditMode(false);
+    setActiveData(displayOrderSegment);
+  }, [displayOrderSegment, setTableEditMode]);
 
   /*      Pagination      */
   useEffect(() => {
@@ -130,32 +185,37 @@ export default function WeeksTable({ weeks }: NewTableProps) {
       <Loading message={'Retrieving records data...'} />
     ) : (
       <>
-        <div className="numberShowing">
-          <QuantifiedRecords
-            currentPage={page}
-            totalRecords={weeks.length}
-            recordsPerPage={itemsPerPage}
-          />
-        </div>
-        <Pagination
-          page={page}
-          maxPage={maxPage}
-          nextPage={nextPage}
-          previousPage={previousPage}
-        />
+        {!tableEditMode && (
+          <>
+            <div className="numberShowing">
+              <QuantifiedRecords
+                currentPage={page}
+                totalRecords={weeks.length}
+                recordsPerPage={itemsPerPage}
+              />
+            </div>
+            <Pagination
+              page={page}
+              maxPage={maxPage}
+              nextPage={nextPage}
+              previousPage={previousPage}
+            />
+          </>
+        )}
         <div className="editModeToggle">
           {tableEditMode ? (
-            <div>
-              <button type="button" onClick={handleApplyChanges}>
-                Apply Changes
-              </button>
+            <>
               <button
                 type="button"
-                onClick={() => setTableEditMode(!tableEditMode)}
+                onClick={handleApplyChanges}
+                className="greenButton"
               >
+                Apply Changes
+              </button>
+              <button type="button" onClick={handleDisableEditMode}>
                 Disable Edit Mode
               </button>
-            </div>
+            </>
           ) : (
             <button
               type="button"
@@ -188,6 +248,8 @@ export default function WeeksTable({ weeks }: NewTableProps) {
                   week={week}
                   tableEditMode={tableEditMode}
                   updateActiveDataWeek={updateActiveDataWeek}
+                  failedToUpdate={week.failedToUpdate}
+                  hiddenFields={hiddenFields}
                 />
               ))}
             </tbody>

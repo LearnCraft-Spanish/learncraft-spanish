@@ -6,9 +6,11 @@ import { useContextualMenu } from 'src/hooks/useContextualMenu';
 export default function StudentCell({
   week,
   student,
+  hiddenFields,
 }: {
   week: Week;
   student: Student | null | undefined;
+  hiddenFields: string[];
 }) {
   const { openContextual } = useContextualMenu();
 
@@ -31,12 +33,14 @@ export default function StudentCell({
         <div className="content">
           <h4>{student.fullName}</h4>
           <p>{student.email}</p>
-          <p>
-            {student.primaryCoach
-              ? student.primaryCoach.name
-              : 'No Coach Found'}
-          </p>
-          <p>{week.level}</p>
+          {!hiddenFields.includes('primaryCoach') && (
+            <p>
+              {student.primaryCoach
+                ? student.primaryCoach.name
+                : 'No Coach Found'}
+            </p>
+          )}
+          {!hiddenFields.includes('level') && <p>{week.level}</p>}
         </div>
       </div>
     )

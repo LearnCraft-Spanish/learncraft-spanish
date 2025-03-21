@@ -24,7 +24,7 @@ describe('component StudentCell', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <AssignmentsCell assignments={[assignment]} />
+          <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
         </DateRangeProvider>
       </MockAllProviders>,
     );
@@ -37,7 +37,7 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} />
+            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -62,7 +62,7 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} />
+            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -86,7 +86,7 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} />
+            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
           </DateRangeProvider>
         </MockAllProviders>,
       );

@@ -334,7 +334,8 @@ export function StudentInfoContextual({
           />
           {/* checkbox for advancedStudent */}
           <Checkbox
-            label="Advanced Student"
+            labelText="Advanced Student"
+            labelFor="advancedStudent"
             value={data.advancedStudent}
             onChange={(value) => {
               setData({ ...data, advancedStudent: value });

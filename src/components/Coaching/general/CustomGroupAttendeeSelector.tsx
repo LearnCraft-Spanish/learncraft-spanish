@@ -67,6 +67,11 @@ export default function CustomGroupAttendeeSelector({
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             onFocus={() => setOptionsVisible(true)}
+            onBlur={() => {
+              setTimeout(() => {
+                setOptionsVisible(false);
+              }, 200);
+            }}
           />
           {optionsVisible && (
             <div id="optionsWrapper">
