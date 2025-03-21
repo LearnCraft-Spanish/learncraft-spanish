@@ -29,7 +29,7 @@ describe('component StudentCell', () => {
       </MockAllProviders>,
     );
     expect(
-      screen.getByText(`${assignment.assignmentType}:${assignment.rating}`),
+      screen.getByText(`${assignment.assignmentType}: ${assignment.rating}`),
     ).toBeInTheDocument();
   });
   describe('contextual menu view', () => {
@@ -44,7 +44,7 @@ describe('component StudentCell', () => {
       // Click on the button that opens the contextual menu
       act(() => {
         screen
-          .getByText(`${assignment.assignmentType}:${assignment.rating}`)
+          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
           .click();
       });
       await waitFor(() => {
@@ -69,7 +69,7 @@ describe('component StudentCell', () => {
       // Click on the button that opens the contextual menu
       act(() => {
         screen
-          .getByText(`${assignment.assignmentType}:${assignment.rating}`)
+          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
           .click();
       });
       await waitFor(() => {
@@ -93,7 +93,7 @@ describe('component StudentCell', () => {
       // Click on the button that opens the contextual menu
       act(() => {
         screen
-          .getByText(`${assignment.assignmentType}:${assignment.rating}`)
+          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
           .click();
       });
       await waitFor(() => {

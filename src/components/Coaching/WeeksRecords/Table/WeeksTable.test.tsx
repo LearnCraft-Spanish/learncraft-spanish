@@ -46,6 +46,9 @@ describe('component WeeksTable', () => {
             tableEditMode={false}
             setTableEditMode={() => {}}
             hiddenFields={[]}
+            sortColumn={null}
+            sortDirection={'none'}
+            onHeaderClick={() => {}}
           />
         </DateRangeProvider>
       </MockAllProviders>,
@@ -71,6 +74,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
+              sortColumn={null}
+              sortDirection={'none'}
+              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -113,6 +119,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
+              sortColumn={null}
+              sortDirection={'none'}
+              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -188,6 +197,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
+              sortColumn={null}
+              sortDirection={'none'}
+              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -215,6 +227,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
+              sortColumn={null}
+              sortDirection={'none'}
+              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,

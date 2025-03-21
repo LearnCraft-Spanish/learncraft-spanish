@@ -370,6 +370,33 @@ td button {
   }
 }
 
+.tableWrapper {
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      padding: 12px;
+      transition: background-color 0.2s;
+      user-select: none;
+
+      .thContentWrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+      }
+
+      &.sortable {
+        cursor: pointer;
+      }
+      &.sortable:hover {
+        background-color: darkgrey;
+      }
+    }
+  }
+}
+
 .tableWrapper table td.notesCell {
   padding: 0;
   height: 100%;
