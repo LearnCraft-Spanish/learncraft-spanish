@@ -268,7 +268,7 @@ export default function WeeksTable({
                     <div>Student</div>
                   </div>
                 </th>
-                <th
+                {/* <th
                   onClick={() => onHeaderClick('weekStarts')}
                   className="sortable"
                 >
@@ -289,7 +289,7 @@ export default function WeeksTable({
                     )}
                     <div>Week Starts</div>
                   </div>
-                </th>
+                </th> */}
                 <th
                 // onClick={() => onHeaderClick('assignments')}
                 // style={{ cursor: 'pointer' }}
@@ -311,9 +311,12 @@ export default function WeeksTable({
                   Private Calls{' '}
                   {/* {sortColumn === 'privateCalls' && `(${sortDirection})`} */}
                 </th>
-                <th className="sortable" onClick={() => onHeaderClick('notes')}>
+                <th
+                // className="sortable"
+                // onClick={() => onHeaderClick('notes')}
+                >
                   <div className="thContentWrapper">
-                    {sortColumn === 'notes' && (
+                    {/* {sortColumn === 'notes' && (
                       <img
                         src={arrowUp}
                         alt="arrow up"
@@ -326,16 +329,16 @@ export default function WeeksTable({
                               : 'rotate(0deg)',
                         }}
                       />
-                    )}
+                    )} */}
                     <div>Notes</div>
                   </div>
                 </th>
                 <th
-                  className="sortable"
-                  onClick={() => onHeaderClick('currentLesson')}
+                // className="sortable"
+                // onClick={() => onHeaderClick('currentLesson')}
                 >
                   <div className="thContentWrapper">
-                    {sortColumn === 'currentLesson' && (
+                    {/* {sortColumn === 'currentLesson' && (
                       <img
                         src={arrowUp}
                         alt="arrow up"
@@ -348,16 +351,16 @@ export default function WeeksTable({
                               : 'rotate(0deg)',
                         }}
                       />
-                    )}
+                    )} */}
                     <div>Current Lesson</div>
                   </div>
                 </th>
                 <th
-                  className="sortable"
-                  onClick={() => onHeaderClick('holdWeek')}
+                // className="sortable"
+                // onClick={() => onHeaderClick('holdWeek')}
                 >
                   <div className="thContentWrapper">
-                    {sortColumn === 'holdWeek' && (
+                    {/* {sortColumn === 'holdWeek' && (
                       <img
                         src={arrowUp}
                         alt="arrow up"
@@ -369,17 +372,17 @@ export default function WeeksTable({
                               ? 'rotate(180deg)'
                               : 'rotate(0deg)',
                         }}
-                      />
-                    )}
+                      /> */}
+                    {/* )} */}
                     <div>Hold Week</div>
                   </div>
                 </th>
                 <th
-                  className="sortable"
-                  onClick={() => onHeaderClick('recordsComplete')}
+                // className="sortable"
+                // onClick={() => onHeaderClick('recordsComplete')}
                 >
                   <div className="thContentWrapper">
-                    {sortColumn === 'recordsComplete' && (
+                    {/* {sortColumn === 'recordsComplete' && (
                       <img
                         src={arrowUp}
                         alt="arrow up"
@@ -392,7 +395,7 @@ export default function WeeksTable({
                               : 'rotate(0deg)',
                         }}
                       />
-                    )}
+                    )} */}
                     <div>Records Complete</div>
                   </div>
                 </th>

@@ -159,7 +159,7 @@ export default function WeeksTableItem({
             hiddenFields={hiddenFields}
           />
         </td>
-        <td>{week.weekStarts.toString()}</td>
+        {/* <td>{week.weekStarts.toString()}</td> */}
         <td>
           <AssignmentsCell
             assignments={assignments}

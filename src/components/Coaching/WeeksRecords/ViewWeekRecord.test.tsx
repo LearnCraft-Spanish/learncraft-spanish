@@ -21,7 +21,7 @@ const week = generatedMockData.weeks.find((w) => {
   const weekDate = new Date(w.weekStarts);
   return (
     weekDate >= new Date(defaultStartDate) &&
-    weekDate <= new Date(getWeekEnds(defaultStartDate))
+    weekDate < new Date(getWeekEnds(defaultStartDate))
   );
 });
 

@@ -351,14 +351,15 @@ export default function PrivateCallsCell({
           />
         ))}
       {/* New Call Form */}
-      <button
-        type="button"
-        className="greenButton"
-        onClick={() => openContextual(`addPrivateCall${week.recordId}`)}
-        disabled={tableEditMode}
-      >
-        New
-      </button>
+      {!tableEditMode && (
+        <button
+          type="button"
+          className="greenButton"
+          onClick={() => openContextual(`addPrivateCall${week.recordId}`)}
+        >
+          New
+        </button>
+      )}
       {contextual === `addPrivateCall${week.recordId}` && (
         <div className="contextualWrapper callPopup">
           <div className="contextual" ref={setContextualRef}>

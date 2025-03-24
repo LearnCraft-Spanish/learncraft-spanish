@@ -253,16 +253,16 @@ function WeeksRecordsContent() {
   const handleHeaderClick = useCallback(
     (column: SortColumn) => {
       if (sortColumn === column) {
-        // Cycle through: descending -> ascending -> none
-        if (sortDirection === 'descending') {
-          setSortDirection('ascending');
-        } else if (sortDirection === 'ascending') {
+        // Cycle through: accending -> descending -> none
+        if (sortDirection === 'ascending') {
+          setSortDirection('descending');
+        } else if (sortDirection === 'descending') {
           setSortDirection('none');
           setSortColumn(null);
         }
       } else {
         setSortColumn(column);
-        setSortDirection('descending');
+        setSortDirection('ascending');
       }
     },
     [sortColumn, sortDirection],
@@ -281,42 +281,42 @@ function WeeksRecordsContent() {
           case 'student': {
             const studentA = getStudentFromMembershipId(a.relatedMembership);
             const studentB = getStudentFromMembershipId(b.relatedMembership);
-            comparison = (studentA?.fullName || '').localeCompare(
-              studentB?.fullName || '',
+            comparison = (studentB?.fullName || '').localeCompare(
+              studentA?.fullName || '',
             );
             break;
           }
-          case 'weekStarts':
-            comparison =
-              new Date(a.weekStarts).getTime() -
-              new Date(b.weekStarts).getTime();
-            break;
-          case 'assignments':
-            comparison =
-              (a.assignmentRatings?.length || 0) -
-              (b.assignmentRatings?.length || 0);
-            break;
-          case 'groupCalls':
-            comparison =
-              (a.numberOfGroupCalls || 0) - (b.numberOfGroupCalls || 0);
-            break;
-          case 'privateCalls':
-            comparison =
-              (a.privateCallsCompleted || 0) - (b.privateCallsCompleted || 0);
-            break;
-          case 'notes':
-            comparison = (a.notes || '').localeCompare(b.notes || '');
-            break;
-          case 'currentLesson':
-            comparison = (a.currentLesson || 0) - (b.currentLesson || 0);
-            break;
-          case 'holdWeek':
-            comparison = (a.holdWeek ? 1 : 0) - (b.holdWeek ? 1 : 0);
-            break;
-          case 'recordsComplete':
-            comparison =
-              (a.recordsComplete ? 1 : 0) - (b.recordsComplete ? 1 : 0);
-            break;
+          // case 'weekStarts':
+          //   comparison =
+          //     new Date(a.weekStarts).getTime() -
+          //     new Date(b.weekStarts).getTime();
+          //   break;
+          // case 'assignments':
+          //   comparison =
+          //     (a.assignmentRatings?.length || 0) -
+          //     (b.assignmentRatings?.length || 0);
+          //   break;
+          // case 'groupCalls':
+          //   comparison =
+          //     (a.numberOfGroupCalls || 0) - (b.numberOfGroupCalls || 0);
+          //   break;
+          // case 'privateCalls':
+          //   comparison =
+          //     (a.privateCallsCompleted || 0) - (b.privateCallsCompleted || 0);
+          //   break;
+          // case 'notes':
+          //   comparison = (a.notes || '').localeCompare(b.notes || '');
+          //   break;
+          // case 'currentLesson':
+          //   comparison = (a.currentLesson || 0) - (b.currentLesson || 0);
+          //   break;
+          // case 'holdWeek':
+          //   comparison = (a.holdWeek ? 1 : 0) - (b.holdWeek ? 1 : 0);
+          //   break;
+          // case 'recordsComplete':
+          //   comparison =
+          //     (a.recordsComplete ? 1 : 0) - (b.recordsComplete ? 1 : 0);
+          //   break;
         }
 
         return sortDirection === 'ascending' ? comparison : -comparison;
@@ -402,60 +402,60 @@ function WeeksRecordsContent() {
     }
   }, [dataReady, filterWeeks, weeksQuery.data]);
 
-  const sortedWeeks = useMemo(() => {
-    if (!weeks || !sortColumn || sortDirection === 'none') {
-      return weeks;
-    }
+  // const sortedWeeks = useMemo(() => {
+  //   if (!weeks || !sortColumn || sortDirection === 'none') {
+  //     return weeks;
+  //   }
 
-    return [...weeks].sort((a, b) => {
-      let comparison = 0;
+  //   return [...weeks].sort((a, b) => {
+  //     let comparison = 0;
 
-      switch (sortColumn) {
-        case 'student': {
-          const studentA = getStudentFromMembershipId(a.relatedMembership);
-          const studentB = getStudentFromMembershipId(b.relatedMembership);
-          comparison = (studentA?.fullName || '').localeCompare(
-            studentB?.fullName || '',
-          );
-          break;
-        }
-        case 'weekStarts':
-          comparison =
-            new Date(a.weekStarts).getTime() - new Date(b.weekStarts).getTime();
-          break;
-        case 'assignments':
-          comparison =
-            (a.assignmentRatings?.length || 0) -
-            (b.assignmentRatings?.length || 0);
-          break;
-        case 'groupCalls':
-          comparison =
-            (a.numberOfGroupCalls || 0) - (b.numberOfGroupCalls || 0);
-          break;
-        case 'privateCalls':
-          comparison =
-            (a.privateCallsCompleted || 0) - (b.privateCallsCompleted || 0);
-          break;
-        case 'notes':
-          comparison = (a.notes || '').localeCompare(b.notes || '');
-          break;
-        case 'currentLesson':
-          comparison = (a.currentLessonName || '').localeCompare(
-            b.currentLessonName || '',
-          );
-          break;
-        case 'holdWeek':
-          comparison = (a.holdWeek ? 1 : 0) - (b.holdWeek ? 1 : 0);
-          break;
-        case 'recordsComplete':
-          comparison =
-            (a.recordsComplete ? 1 : 0) - (b.recordsComplete ? 1 : 0);
-          break;
-      }
+  //     switch (sortColumn) {
+  //       case 'student': {
+  //         const studentA = getStudentFromMembershipId(a.relatedMembership);
+  //         const studentB = getStudentFromMembershipId(b.relatedMembership);
+  //         comparison = (studentA?.fullName || '').localeCompare(
+  //           studentB?.fullName || '',
+  //         );
+  //         break;
+  //       }
+  //       case 'weekStarts':
+  //         comparison =
+  //           new Date(a.weekStarts).getTime() - new Date(b.weekStarts).getTime();
+  //         break;
+  //       case 'assignments':
+  //         comparison =
+  //           (a.assignmentRatings?.length || 0) -
+  //           (b.assignmentRatings?.length || 0);
+  //         break;
+  //       case 'groupCalls':
+  //         comparison =
+  //           (a.numberOfGroupCalls || 0) - (b.numberOfGroupCalls || 0);
+  //         break;
+  //       case 'privateCalls':
+  //         comparison =
+  //           (a.privateCallsCompleted || 0) - (b.privateCallsCompleted || 0);
+  //         break;
+  //       case 'notes':
+  //         comparison = (a.notes || '').localeCompare(b.notes || '');
+  //         break;
+  //       case 'currentLesson':
+  //         comparison = (a.currentLessonName || '').localeCompare(
+  //           b.currentLessonName || '',
+  //         );
+  //         break;
+  //       case 'holdWeek':
+  //         comparison = (a.holdWeek ? 1 : 0) - (b.holdWeek ? 1 : 0);
+  //         break;
+  //       case 'recordsComplete':
+  //         comparison =
+  //           (a.recordsComplete ? 1 : 0) - (b.recordsComplete ? 1 : 0);
+  //         break;
+  //     }
 
-      return sortDirection === 'ascending' ? comparison : -comparison;
-    });
-  }, [weeks, sortColumn, sortDirection, getStudentFromMembershipId]);
+  //     return sortDirection === 'ascending' ? comparison : -comparison;
+  //   });
+  // }, [weeks, sortColumn, sortDirection, getStudentFromMembershipId]);
 
   return (
     <div className="newCoachingWrapper">
@@ -492,11 +492,11 @@ function WeeksRecordsContent() {
             </div>
           )}
           <WeeksTable
-            weeks={sortedWeeks}
+            weeks={weeks}
             tableEditMode={tableEditMode}
             setTableEditMode={setTableEditMode}
             hiddenFields={hiddenFields}
-            sortColumn={sortColumn}
+            sortColumn={sortColumn as SortColumn}
             sortDirection={sortDirection}
             onHeaderClick={handleHeaderClick}
           />
