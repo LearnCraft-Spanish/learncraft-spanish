@@ -23,16 +23,6 @@ interface WeekForUpdate {
   currentLesson: number | undefined;
 }
 
-type SortColumn =
-  | 'student'
-  | 'weekStarts'
-  | 'assignments'
-  | 'groupCalls'
-  | 'privateCalls'
-  | 'notes'
-  | 'currentLesson'
-  | 'holdWeek'
-  | 'recordsComplete';
 type SortDirection = 'none' | 'ascending' | 'descending';
 
 interface NewTableProps {
@@ -40,9 +30,9 @@ interface NewTableProps {
   tableEditMode: boolean;
   setTableEditMode: (tableEditMode: boolean) => void;
   hiddenFields: string[];
-  sortColumn: SortColumn | null;
+  sortByStudent: boolean;
+  handleUpdateSortByStudent: () => void;
   sortDirection: SortDirection;
-  onHeaderClick: (column: SortColumn) => void;
 }
 
 export default function WeeksTable({
@@ -50,9 +40,9 @@ export default function WeeksTable({
   tableEditMode,
   setTableEditMode,
   hiddenFields,
-  sortColumn,
+  sortByStudent,
+  handleUpdateSortByStudent,
   sortDirection,
-  onHeaderClick,
 }: NewTableProps) {
   const { weeksQuery } = useCoaching();
   const { newPutFactory } = useBackendHelpers();
@@ -246,12 +236,9 @@ export default function WeeksTable({
           <table>
             <thead>
               <tr>
-                <th
-                  onClick={() => onHeaderClick('student')}
-                  className="sortable"
-                >
+                <th onClick={handleUpdateSortByStudent} className="sortable">
                   <div className="thContentWrapper">
-                    {sortColumn === 'student' && (
+                    {sortByStudent && (
                       <img
                         src={arrowUp}
                         alt="arrow up"
@@ -268,137 +255,13 @@ export default function WeeksTable({
                     <div>Student</div>
                   </div>
                 </th>
-                {/* <th
-                  onClick={() => onHeaderClick('weekStarts')}
-                  className="sortable"
-                >
-                  <div className="thContentWrapper">
-                    {sortColumn === 'weekStarts' && (
-                      <img
-                        src={arrowUp}
-                        alt="arrow up"
-                        style={{
-                          width: 32,
-                          height: 32,
-                          transform:
-                            sortDirection === 'descending'
-                              ? 'rotate(180deg)'
-                              : 'rotate(0deg)',
-                        }}
-                      />
-                    )}
-                    <div>Week Starts</div>
-                  </div>
-                </th> */}
-                <th
-                // onClick={() => onHeaderClick('assignments')}
-                // style={{ cursor: 'pointer' }}
-                >
-                  Assignments{' '}
-                  {/* {sortColumn === 'assignments' && `(${sortDirection})`} */}
-                </th>
-                <th
-                // onClick={() => onHeaderClick('groupCalls')}
-                // style={{ cursor: 'pointer' }}
-                >
-                  Group Calls{' '}
-                  {/* {sortColumn === 'groupCalls' && `(${sortDirection})`} */}
-                </th>
-                <th
-                // onClick={() => onHeaderClick('privateCalls')}
-                // style={{ cursor: 'pointer' }}
-                >
-                  Private Calls{' '}
-                  {/* {sortColumn === 'privateCalls' && `(${sortDirection})`} */}
-                </th>
-                <th
-                // className="sortable"
-                // onClick={() => onHeaderClick('notes')}
-                >
-                  <div className="thContentWrapper">
-                    {/* {sortColumn === 'notes' && (
-                      <img
-                        src={arrowUp}
-                        alt="arrow up"
-                        style={{
-                          width: 32,
-                          height: 32,
-                          transform:
-                            sortDirection === 'descending'
-                              ? 'rotate(180deg)'
-                              : 'rotate(0deg)',
-                        }}
-                      />
-                    )} */}
-                    <div>Notes</div>
-                  </div>
-                </th>
-                <th
-                // className="sortable"
-                // onClick={() => onHeaderClick('currentLesson')}
-                >
-                  <div className="thContentWrapper">
-                    {/* {sortColumn === 'currentLesson' && (
-                      <img
-                        src={arrowUp}
-                        alt="arrow up"
-                        style={{
-                          width: 32,
-                          height: 32,
-                          transform:
-                            sortDirection === 'descending'
-                              ? 'rotate(180deg)'
-                              : 'rotate(0deg)',
-                        }}
-                      />
-                    )} */}
-                    <div>Current Lesson</div>
-                  </div>
-                </th>
-                <th
-                // className="sortable"
-                // onClick={() => onHeaderClick('holdWeek')}
-                >
-                  <div className="thContentWrapper">
-                    {/* {sortColumn === 'holdWeek' && (
-                      <img
-                        src={arrowUp}
-                        alt="arrow up"
-                        style={{
-                          width: 32,
-                          height: 32,
-                          transform:
-                            sortDirection === 'descending'
-                              ? 'rotate(180deg)'
-                              : 'rotate(0deg)',
-                        }}
-                      /> */}
-                    {/* )} */}
-                    <div>Hold Week</div>
-                  </div>
-                </th>
-                <th
-                // className="sortable"
-                // onClick={() => onHeaderClick('recordsComplete')}
-                >
-                  <div className="thContentWrapper">
-                    {/* {sortColumn === 'recordsComplete' && (
-                      <img
-                        src={arrowUp}
-                        alt="arrow up"
-                        style={{
-                          width: 32,
-                          height: 32,
-                          transform:
-                            sortDirection === 'descending'
-                              ? 'rotate(180deg)'
-                              : 'rotate(0deg)',
-                        }}
-                      />
-                    )} */}
-                    <div>Records Complete</div>
-                  </div>
-                </th>
+                <th>Assignments</th>
+                <th>Group Calls</th>
+                <th>Private Calls</th>
+                <th>Notes</th>
+                <th>Current Lesson</th>
+                <th>Hold Week</th>
+                <th>Records Complete</th>
               </tr>
             </thead>
             <tbody>

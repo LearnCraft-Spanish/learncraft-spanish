@@ -46,9 +46,9 @@ describe('component WeeksTable', () => {
             tableEditMode={false}
             setTableEditMode={() => {}}
             hiddenFields={[]}
-            sortColumn={null}
+            sortByStudent={false}
+            handleUpdateSortByStudent={() => {}}
             sortDirection={'none'}
-            onHeaderClick={() => {}}
           />
         </DateRangeProvider>
       </MockAllProviders>,
@@ -74,9 +74,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
-              sortColumn={null}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
               sortDirection={'none'}
-              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -119,9 +119,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
-              sortColumn={null}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
               sortDirection={'none'}
-              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -197,9 +197,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
-              sortColumn={null}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
               sortDirection={'none'}
-              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -227,9 +227,9 @@ describe('component WeeksTable', () => {
               tableEditMode={false}
               setTableEditMode={() => {}}
               hiddenFields={[]}
-              sortColumn={null}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
               sortDirection={'none'}
-              onHeaderClick={() => {}}
             />
           </DateRangeProvider>
         </MockAllProviders>,

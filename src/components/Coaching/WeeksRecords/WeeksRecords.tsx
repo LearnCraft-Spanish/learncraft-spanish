@@ -26,34 +26,8 @@ import useDateRange from './useDateRange';
 import ViewWeekRecord from './ViewWeekRecord';
 import '../coaching.scss';
 
-type SortColumn =
-  | 'student'
-  | 'weekStarts'
-  | 'assignments'
-  | 'groupCalls'
-  | 'privateCalls'
-  | 'notes'
-  | 'currentLesson'
-  | 'holdWeek'
-  | 'recordsComplete';
 type SortDirection = 'none' | 'ascending' | 'descending';
 
-/*
-Notes for Test Cases to write:
-
-- Loads & displays data
-- Filters by all filtering options (coach, weeks ago, course) (and others when adding advanced filtering)
-- if coach logged in, defaults to that coach is selected
-- Pagination works (When implemented)
-- Advanced filtering works
-
-
-*/
-
-// Paramaterizing all queries:
-/*
-consider using a context, to pass in the startDate and endDate to all the queries
-*/
 function WeeksRecordsContent() {
   const userDataQuery = useUserData();
   const { contextual } = useContextualMenu();
@@ -72,12 +46,6 @@ function WeeksRecordsContent() {
     getCourseFromMembershipId,
     getStudentFromMembershipId,
   } = useCoaching();
-  // const queryClient = useQueryClient();
-
-  // const weeksQuery = useQuery({
-  //   queryKey: ['weeks'],
-  //   queryFn: () => getWeeks(),
-  // });
 
   // Filtering state
   const [filterByOneMonthChallenge, setFilterByOneMonthChallenge] =
@@ -97,7 +65,7 @@ function WeeksRecordsContent() {
   const [tableEditMode, setTableEditMode] = useState(false);
 
   // State for sorting
-  const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
+  const [sortByStudent, setSortByStudent] = useState<boolean>(false);
   const [sortDirection, setSortDirection] = useState<SortDirection>('none');
 
   const initialDataLoad =
@@ -249,80 +217,41 @@ function WeeksRecordsContent() {
     },
     [filterByCompletion],
   );
-
-  const handleHeaderClick = useCallback(
-    (column: SortColumn) => {
-      if (sortColumn === column) {
-        // Cycle through: accending -> descending -> none
-        if (sortDirection === 'ascending') {
-          setSortDirection('descending');
-        } else if (sortDirection === 'descending') {
-          setSortDirection('none');
-          setSortColumn(null);
-        }
+  const handleUpdateSortByStudent = useCallback(() => {
+    if (!sortByStudent) {
+      setSortByStudent(true);
+      setSortDirection('ascending');
+    } else {
+      if (sortDirection === 'ascending') {
+        setSortDirection('descending');
       } else {
-        setSortColumn(column);
-        setSortDirection('ascending');
+        setSortByStudent(false);
+        setSortDirection('none');
       }
-    },
-    [sortColumn, sortDirection],
-  );
+    }
+  }, [sortByStudent, sortDirection]);
 
   const sortWeeks = useCallback(
     (weeksToSort: Week[]) => {
-      if (!sortColumn || sortDirection === 'none') {
+      if (!sortByStudent) {
+        return weeksToSort;
+      }
+      if (sortDirection === 'none') {
         return weeksToSort;
       }
 
       return [...weeksToSort].sort((a, b) => {
         let comparison = 0;
+        const studentA = getStudentFromMembershipId(a.relatedMembership);
+        const studentB = getStudentFromMembershipId(b.relatedMembership);
+        comparison = (studentB?.fullName || '').localeCompare(
+          studentA?.fullName || '',
+        );
 
-        switch (sortColumn) {
-          case 'student': {
-            const studentA = getStudentFromMembershipId(a.relatedMembership);
-            const studentB = getStudentFromMembershipId(b.relatedMembership);
-            comparison = (studentB?.fullName || '').localeCompare(
-              studentA?.fullName || '',
-            );
-            break;
-          }
-          // case 'weekStarts':
-          //   comparison =
-          //     new Date(a.weekStarts).getTime() -
-          //     new Date(b.weekStarts).getTime();
-          //   break;
-          // case 'assignments':
-          //   comparison =
-          //     (a.assignmentRatings?.length || 0) -
-          //     (b.assignmentRatings?.length || 0);
-          //   break;
-          // case 'groupCalls':
-          //   comparison =
-          //     (a.numberOfGroupCalls || 0) - (b.numberOfGroupCalls || 0);
-          //   break;
-          // case 'privateCalls':
-          //   comparison =
-          //     (a.privateCallsCompleted || 0) - (b.privateCallsCompleted || 0);
-          //   break;
-          // case 'notes':
-          //   comparison = (a.notes || '').localeCompare(b.notes || '');
-          //   break;
-          // case 'currentLesson':
-          //   comparison = (a.currentLesson || 0) - (b.currentLesson || 0);
-          //   break;
-          // case 'holdWeek':
-          //   comparison = (a.holdWeek ? 1 : 0) - (b.holdWeek ? 1 : 0);
-          //   break;
-          // case 'recordsComplete':
-          //   comparison =
-          //     (a.recordsComplete ? 1 : 0) - (b.recordsComplete ? 1 : 0);
-          //   break;
-        }
-
-        return sortDirection === 'ascending' ? comparison : -comparison;
+        return sortDirection === 'ascending' ? -comparison : comparison;
       });
     },
-    [sortColumn, sortDirection, getStudentFromMembershipId],
+    [sortByStudent, sortDirection, getStudentFromMembershipId],
   );
 
   const filterWeeks = useCallback(
@@ -402,61 +331,6 @@ function WeeksRecordsContent() {
     }
   }, [dataReady, filterWeeks, weeksQuery.data]);
 
-  // const sortedWeeks = useMemo(() => {
-  //   if (!weeks || !sortColumn || sortDirection === 'none') {
-  //     return weeks;
-  //   }
-
-  //   return [...weeks].sort((a, b) => {
-  //     let comparison = 0;
-
-  //     switch (sortColumn) {
-  //       case 'student': {
-  //         const studentA = getStudentFromMembershipId(a.relatedMembership);
-  //         const studentB = getStudentFromMembershipId(b.relatedMembership);
-  //         comparison = (studentA?.fullName || '').localeCompare(
-  //           studentB?.fullName || '',
-  //         );
-  //         break;
-  //       }
-  //       case 'weekStarts':
-  //         comparison =
-  //           new Date(a.weekStarts).getTime() - new Date(b.weekStarts).getTime();
-  //         break;
-  //       case 'assignments':
-  //         comparison =
-  //           (a.assignmentRatings?.length || 0) -
-  //           (b.assignmentRatings?.length || 0);
-  //         break;
-  //       case 'groupCalls':
-  //         comparison =
-  //           (a.numberOfGroupCalls || 0) - (b.numberOfGroupCalls || 0);
-  //         break;
-  //       case 'privateCalls':
-  //         comparison =
-  //           (a.privateCallsCompleted || 0) - (b.privateCallsCompleted || 0);
-  //         break;
-  //       case 'notes':
-  //         comparison = (a.notes || '').localeCompare(b.notes || '');
-  //         break;
-  //       case 'currentLesson':
-  //         comparison = (a.currentLessonName || '').localeCompare(
-  //           b.currentLessonName || '',
-  //         );
-  //         break;
-  //       case 'holdWeek':
-  //         comparison = (a.holdWeek ? 1 : 0) - (b.holdWeek ? 1 : 0);
-  //         break;
-  //       case 'recordsComplete':
-  //         comparison =
-  //           (a.recordsComplete ? 1 : 0) - (b.recordsComplete ? 1 : 0);
-  //         break;
-  //     }
-
-  //     return sortDirection === 'ascending' ? comparison : -comparison;
-  //   });
-  // }, [weeks, sortColumn, sortDirection, getStudentFromMembershipId]);
-
   return (
     <div className="newCoachingWrapper">
       {initialDataLoad && <Loading message={'Loading Coaching Data...'} />}
@@ -496,9 +370,9 @@ function WeeksRecordsContent() {
             tableEditMode={tableEditMode}
             setTableEditMode={setTableEditMode}
             hiddenFields={hiddenFields}
-            sortColumn={sortColumn as SortColumn}
+            sortByStudent={sortByStudent}
+            handleUpdateSortByStudent={handleUpdateSortByStudent}
             sortDirection={sortDirection}
-            onHeaderClick={handleHeaderClick}
           />
           {contextual.startsWith('week') && (
             <ViewWeekRecord
