@@ -2,7 +2,7 @@ import type { Membership } from 'src/types/CoachingTypes';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import pencilIcon from 'src/assets/icons/pencil.svg';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Checkbox,
   DateInput,
@@ -260,47 +260,42 @@ function StudentMembershipContextual({
     userDataQuery.data?.roles.adminRole !== 'admin'
   ) {
     return (
-      <div className="contextualWrapper">
-        <div className="contextual">
-          <h3>Unauthorized</h3>
-          <p>
-            Only the primary coach or an admin can edit this student's
-            membership records.
-          </p>
-          <button onClick={closeContextual} className="redButton" type="button">
-            Close
-          </button>
-        </div>
-      </div>
+      <ContextualView>
+        <h3>Unauthorized</h3>
+        <p>
+          Only the primary coach or an admin can edit this student's membership
+          records.
+        </p>
+        <button onClick={closeContextual} className="redButton" type="button">
+          Close
+        </button>
+      </ContextualView>
     );
   }
 
   return (
-    <div className="contextualWrapper">
-      <div className="contextual">
-        <ContextualControls />
-        <h3>Edit Membership</h3>
-        <TextInput
-          label="Membership Name"
-          value={getCourseName(membership.relatedCourse)}
-          editMode={false}
-          onChange={() => {}}
-        />
-        <Checkbox
-          labelText="On Hold"
-          labelFor="onHold"
-          value={onHold}
-          onChange={setOnHold}
-        />
-        {userDataQuery.data?.roles.adminRole === 'admin' && (
-          <DateInput value={endDate} onChange={setEndDate} label="End Date" />
-        )}
-        <FormControls
-          editMode
-          cancelEdit={cancelEdit}
-          captureSubmitForm={captureSubmitForm}
-        />
-      </div>
-    </div>
+    <ContextualView>
+      <h3>Edit Membership</h3>
+      <TextInput
+        label="Membership Name"
+        value={getCourseName(membership.relatedCourse)}
+        editMode={false}
+        onChange={() => {}}
+      />
+      <Checkbox
+        labelText="On Hold"
+        labelFor="onHold"
+        value={onHold}
+        onChange={setOnHold}
+      />
+      {userDataQuery.data?.roles.adminRole === 'admin' && (
+        <DateInput value={endDate} onChange={setEndDate} label="End Date" />
+      )}
+      <FormControls
+        editMode
+        cancelEdit={cancelEdit}
+        captureSubmitForm={captureSubmitForm}
+      />
+    </ContextualView>
   );
 }

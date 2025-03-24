@@ -1,7 +1,7 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
 import React, { useEffect, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Checkbox,
   CoachDropdown,
@@ -260,114 +260,111 @@ export function StudentInfoContextual({
 
   return (
     data && (
-      <div className="contextualWrapper">
-        <div className="contextual">
-          <h3>Edit Student Information</h3>
-          <ContextualControls />
-          <TextInput
-            label="First Name"
-            value={data.firstName}
-            onChange={(value) => {
-              setData({ ...data, firstName: value });
-            }}
-            editMode
-          />
-          <TextInput
-            label="Last Name"
-            value={data.lastName}
-            onChange={(value) => {
-              setData({ ...data, lastName: value });
-            }}
-            editMode
-          />
-          <Dropdown
-            label="Pronoun"
-            value={data.pronoun}
-            onChange={(value) => {
-              setData({ ...data, pronoun: value });
-            }}
-            options={['He', 'She', 'They', 'Other']}
-            editMode
-          />
+      <ContextualView>
+        <h3>Edit Student Information</h3>
+        <TextInput
+          label="First Name"
+          value={data.firstName}
+          onChange={(value) => {
+            setData({ ...data, firstName: value });
+          }}
+          editMode
+        />
+        <TextInput
+          label="Last Name"
+          value={data.lastName}
+          onChange={(value) => {
+            setData({ ...data, lastName: value });
+          }}
+          editMode
+        />
+        <Dropdown
+          label="Pronoun"
+          value={data.pronoun}
+          onChange={(value) => {
+            setData({ ...data, pronoun: value });
+          }}
+          options={['He', 'She', 'They', 'Other']}
+          editMode
+        />
 
-          <TextInput
-            label="Email"
-            value={data.email}
-            onChange={(value) => {
-              setData({ ...data, email: value });
-            }}
-            editMode
-          />
-          <Dropdown
-            label="Time Zone"
-            value={data.timeZone}
-            onChange={(value) => {
-              setData({ ...data, timeZone: value });
-            }}
-            options={timezones}
-            editMode
-          />
-          <TextInput
-            label="Starting Level"
-            value={data.startingLevel}
-            onChange={(value) => {
-              setData({ ...data, startingLevel: value });
-            }}
-            editMode
-          />
-          <TextInput
-            label="Fluency Goal"
-            value={data.fluencyGoal}
-            onChange={(value) => {
-              setData({ ...data, fluencyGoal: value });
-            }}
-            editMode
-          />
-          <CoachDropdown
-            coachEmail={data.primaryCoachEmail || ''}
-            onChange={(value: string) => {
-              setData((prev) =>
-                prev ? { ...prev, primaryCoachEmail: value } : undefined,
-              );
-            }}
-            editMode
-          />
-          {/* checkbox for advancedStudent */}
-          <Checkbox
-            labelText="Advanced Student"
-            labelFor="advancedStudent"
-            value={data.advancedStudent}
-            onChange={(value) => {
-              setData({ ...data, advancedStudent: value });
-            }}
-          />
-          {isAdmin && (
-            <>
-              <TextInput
-                label="Billing Email"
-                value={data.billingEmail}
-                onChange={(value) => {
-                  setData({ ...data, billingEmail: value });
-                }}
-                editMode
-              />
-              <TextInput
-                label="Billing Notes"
-                value={data.billingNotes}
-                onChange={(value) => {
-                  setData({ ...data, billingNotes: value });
-                }}
-                editMode
-              />
-            </>
-          )}
-          <FormControls
-            editMode
-            cancelEdit={cancelEdit}
-            captureSubmitForm={captureSubmitForm}
-          />
-        </div>
-      </div>
+        <TextInput
+          label="Email"
+          value={data.email}
+          onChange={(value) => {
+            setData({ ...data, email: value });
+          }}
+          editMode
+        />
+        <Dropdown
+          label="Time Zone"
+          value={data.timeZone}
+          onChange={(value) => {
+            setData({ ...data, timeZone: value });
+          }}
+          options={timezones}
+          editMode
+        />
+        <TextInput
+          label="Starting Level"
+          value={data.startingLevel}
+          onChange={(value) => {
+            setData({ ...data, startingLevel: value });
+          }}
+          editMode
+        />
+        <TextInput
+          label="Fluency Goal"
+          value={data.fluencyGoal}
+          onChange={(value) => {
+            setData({ ...data, fluencyGoal: value });
+          }}
+          editMode
+        />
+        <CoachDropdown
+          coachEmail={data.primaryCoachEmail || ''}
+          onChange={(value: string) => {
+            setData((prev) =>
+              prev ? { ...prev, primaryCoachEmail: value } : undefined,
+            );
+          }}
+          editMode
+        />
+        {/* checkbox for advancedStudent */}
+        <Checkbox
+          labelText="Advanced Student"
+          labelFor="advancedStudent"
+          value={data.advancedStudent}
+          onChange={(value) => {
+            setData({ ...data, advancedStudent: value });
+          }}
+        />
+        {isAdmin && (
+          <>
+            <TextInput
+              label="Billing Email"
+              value={data.billingEmail}
+              onChange={(value) => {
+                setData({ ...data, billingEmail: value });
+              }}
+              editMode
+            />
+            <TextInput
+              label="Billing Notes"
+              value={data.billingNotes}
+              onChange={(value) => {
+                setData({ ...data, billingNotes: value });
+              }}
+              editMode
+            />
+          </>
+        )}
+        <FormControls
+          editMode
+          cancelEdit={cancelEdit}
+          captureSubmitForm={captureSubmitForm}
+        />
+      </ContextualView>
     )
   );
 }

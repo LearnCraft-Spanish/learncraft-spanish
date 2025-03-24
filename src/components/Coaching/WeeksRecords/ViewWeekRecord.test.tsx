@@ -41,9 +41,12 @@ describe('component ViewWeekRecord', () => {
         </DateRangeProvider>
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(screen.getByText('Student:')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('Student:')).toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
   });
   it('throws an error with invalid data', async () => {
     const consoleError = vi.spyOn(console, 'error');

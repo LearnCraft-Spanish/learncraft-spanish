@@ -1,7 +1,7 @@
 import type { Assignment, Week } from 'src/types/CoachingTypes';
 import { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   CoachDropdown,
   DeleteRecord,
@@ -90,8 +90,7 @@ function AssignmentView({
     updateAssignmentMutation,
     deleteAssignmentMutation,
   } = useCoaching();
-  const { setContextualRef, closeContextual, updateDisableClickOutside } =
-    useContextualMenu();
+  const { closeContextual, updateDisableClickOutside } = useContextualMenu();
   const { closeModal, openModal } = useModal();
 
   const [editMode, setEditMode] = useState(false);
@@ -212,77 +211,75 @@ function AssignmentView({
     submitEdit();
   }
   return (
-    <div className="contextualWrapper" key={`assignment${assignment.recordId}`}>
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls
-          editFunction={tableEditMode ? undefined : toggleEditMode}
-        />
-        {editMode ? (
-          <h4>Edit Assignment</h4>
-        ) : (
-          <h4>
-            {assignmentType} by{' '}
-            {
-              getStudentFromMembershipId(
-                getMembershipFromWeekRecordId(assignment.relatedWeek)?.recordId,
-              )?.fullName
-            }
-          </h4>
-        )}
+    <ContextualView
+      key={`assignment${assignment.recordId}`}
+      editFunction={tableEditMode ? undefined : toggleEditMode}
+    >
+      {editMode ? (
+        <h4>Edit Assignment</h4>
+      ) : (
+        <h4>
+          {assignmentType} by{' '}
+          {
+            getStudentFromMembershipId(
+              getMembershipFromWeekRecordId(assignment.relatedWeek)?.recordId,
+            )?.fullName
+          }
+        </h4>
+      )}
 
-        <Dropdown
-          label="Assignment Type"
-          editMode={editMode}
-          value={assignmentType}
-          onChange={setAssignmentType}
-          options={assignmentTypes}
-        />
+      <Dropdown
+        label="Assignment Type"
+        editMode={editMode}
+        value={assignmentType}
+        onChange={setAssignmentType}
+        options={assignmentTypes}
+      />
 
-        <CoachDropdown
-          label="Corrected by"
-          editMode={editMode}
-          coachEmail={homeworkCorrector}
-          onChange={updateHomeworkCorrector}
-        />
+      <CoachDropdown
+        label="Corrected by"
+        editMode={editMode}
+        coachEmail={homeworkCorrector}
+        onChange={updateHomeworkCorrector}
+      />
 
-        <Dropdown
-          label="Rating"
-          editMode={editMode}
-          value={rating}
-          onChange={setRating}
-          options={ratings}
-        />
+      <Dropdown
+        label="Rating"
+        editMode={editMode}
+        value={rating}
+        onChange={setRating}
+        options={ratings}
+      />
 
-        <TextAreaInput
-          label="Notes"
-          editMode={editMode}
-          value={notes}
-          onChange={setNotes}
-        />
+      <TextAreaInput
+        label="Notes"
+        editMode={editMode}
+        value={notes}
+        onChange={setNotes}
+      />
 
-        <TextAreaInput
-          label="Areas of Difficulty"
-          editMode={editMode}
-          value={areasOfDifficulty}
-          onChange={setAreasOfDifficulty}
-        />
+      <TextAreaInput
+        label="Areas of Difficulty"
+        editMode={editMode}
+        value={areasOfDifficulty}
+        onChange={setAreasOfDifficulty}
+      />
 
-        <LinkInput
-          label="Assignment Link"
-          value={assignmentLink}
-          onChange={setAssignmentLink}
-          editMode={editMode}
-        />
+      <LinkInput
+        label="Assignment Link"
+        value={assignmentLink}
+        onChange={setAssignmentLink}
+        editMode={editMode}
+      />
 
-        {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
+      {editMode && <DeleteRecord deleteFunction={deleteRecordFunction} />}
 
-        <FormControls
-          editMode={editMode}
-          cancelEdit={cancelEdit}
-          captureSubmitForm={captureSubmitForm}
-        />
-      </div>
-    </div>
+      <FormControls
+        editMode={editMode}
+        cancelEdit={cancelEdit}
+        captureSubmitForm={captureSubmitForm}
+      />
+    </ContextualView>
   );
 }
 
@@ -312,7 +309,7 @@ export function NewAssignmentView({
 }: {
   weekStartsDefaultValue: string;
 }) {
-  const { setContextualRef, closeContextual } = useContextualMenu();
+  const { closeContextual } = useContextualMenu();
   const { createAssignmentMutation } = useCoaching();
   const userDataQuery = useUserData();
   const { getStudentFromMembershipId } = useCoaching();
@@ -425,62 +422,60 @@ export function NewAssignmentView({
   }
 
   return (
-    <div className="contextualWrapper">
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls />
-        <h4>Create Assignment Record</h4>
-        <div className="lineWrapper">
-          <label htmlFor="assignmentName" className="label">
-            Assignment Name:
-          </label>
-          <div className="content" id="assignmentName">
-            {student && `${student.relatedWeek.weekName} - ${assignmentType}`}
-          </div>
+    <ContextualView>
+      <h4>Create Assignment Record</h4>
+      <div className="lineWrapper">
+        <label htmlFor="assignmentName" className="label">
+          Assignment Name:
+        </label>
+        <div className="content" id="assignmentName">
+          {student && `${student.relatedWeek.weekName} - ${assignmentType}`}
         </div>
-        <div className="lineWrapper">
-          <label className="label" htmlFor="weekStarts">
-            Week Starts:
-          </label>
-          <select
-            id="weekStarts"
-            className="content"
-            value={weekStarts}
-            onChange={(e) => updateWeekStarts(e.target.value)}
-          >
-            {Array.from({ length: numWeeks }, (_, i) => {
-              const dateKey =
-                i === 0
-                  ? 'thisWeekDate'
-                  : i === 1
-                    ? 'lastSundayDate'
-                    : i === 2
-                      ? 'twoSundaysAgoDate'
-                      : `${i + 1}SundaysAgoDate`;
-              const date = dateRange[dateKey];
-              const label =
-                i === 0
-                  ? 'This Week'
-                  : i === 1
-                    ? 'Last Week'
-                    : i === 2
-                      ? 'Two Weeks Ago'
-                      : toReadableMonthDay(date);
-              return (
-                <option key={date} value={date}>
-                  {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
-                </option>
-              );
-            })}
-            <option value="loadMore" className="loadMoreOption">
-              Load More...
-            </option>
-          </select>
-        </div>
-        <div className="lineWrapper">
-          <label className="label" htmlFor="student">
-            Student:
-          </label>
-          {/* <select
+      </div>
+      <div className="lineWrapper">
+        <label className="label" htmlFor="weekStarts">
+          Week Starts:
+        </label>
+        <select
+          id="weekStarts"
+          className="content"
+          value={weekStarts}
+          onChange={(e) => updateWeekStarts(e.target.value)}
+        >
+          {Array.from({ length: numWeeks }, (_, i) => {
+            const dateKey =
+              i === 0
+                ? 'thisWeekDate'
+                : i === 1
+                  ? 'lastSundayDate'
+                  : i === 2
+                    ? 'twoSundaysAgoDate'
+                    : `${i + 1}SundaysAgoDate`;
+            const date = dateRange[dateKey];
+            const label =
+              i === 0
+                ? 'This Week'
+                : i === 1
+                  ? 'Last Week'
+                  : i === 2
+                    ? 'Two Weeks Ago'
+                    : toReadableMonthDay(date);
+            return (
+              <option key={date} value={date}>
+                {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+              </option>
+            );
+          })}
+          <option value="loadMore" className="loadMoreOption">
+            Load More...
+          </option>
+        </select>
+      </div>
+      <div className="lineWrapper">
+        <label className="label" htmlFor="student">
+          Student:
+        </label>
+        {/* <select
             id="student"
             className="content"
             value={student?.relatedWeek.recordId || ''}
@@ -509,71 +504,65 @@ export function NewAssignmentView({
                 </option>
               ))}
           </select> */}
-          {student ? (
-            <>
-              <div className="content">{student.studentFullname}</div>
-              <button
-                type="button"
-                className="clearStudent"
-                onClick={() => setStudent(undefined)}
-              >
-                <img src={x_dark} alt="close" />
-              </button>
-            </>
-          ) : (
-            <CustomStudentSelector
-              weekStarts={weekStarts}
-              onChange={updateStudent}
-            />
-          )}
-        </div>
-
-        <Dropdown
-          label="Assignment Type"
-          value={assignmentType}
-          onChange={setAssignmentType}
-          options={assignmentTypes}
-          editMode
-        />
-
-        <CoachDropdown
-          label="Corrected by"
-          editMode
-          coachEmail={homeworkCorrector}
-          onChange={updateHomeworkCorrector}
-        />
-
-        <Dropdown
-          label="Rating"
-          value={rating}
-          onChange={setRating}
-          options={ratings}
-          editMode
-        />
-        <LinkInput
-          label="Assignment Link"
-          value={assignmentLink}
-          onChange={setAssignmentLink}
-          editMode
-        />
-        <TextAreaInput
-          label="Areas of Difficulty"
-          editMode
-          value={areasOfDifficulty}
-          onChange={setAreasOfDifficulty}
-        />
-        <TextAreaInput
-          label="Notes"
-          editMode
-          value={notes}
-          onChange={setNotes}
-        />
-        <FormControls
-          editMode
-          cancelEdit={closeContextual}
-          captureSubmitForm={captureSubmitForm}
-        />
+        {student ? (
+          <>
+            <div className="content">{student.studentFullname}</div>
+            <button
+              type="button"
+              className="clearStudent"
+              onClick={() => setStudent(undefined)}
+            >
+              <img src={x_dark} alt="close" />
+            </button>
+          </>
+        ) : (
+          <CustomStudentSelector
+            weekStarts={weekStarts}
+            onChange={updateStudent}
+          />
+        )}
       </div>
-    </div>
+
+      <Dropdown
+        label="Assignment Type"
+        value={assignmentType}
+        onChange={setAssignmentType}
+        options={assignmentTypes}
+        editMode
+      />
+
+      <CoachDropdown
+        label="Corrected by"
+        editMode
+        coachEmail={homeworkCorrector}
+        onChange={updateHomeworkCorrector}
+      />
+
+      <Dropdown
+        label="Rating"
+        value={rating}
+        onChange={setRating}
+        options={ratings}
+        editMode
+      />
+      <LinkInput
+        label="Assignment Link"
+        value={assignmentLink}
+        onChange={setAssignmentLink}
+        editMode
+      />
+      <TextAreaInput
+        label="Areas of Difficulty"
+        editMode
+        value={areasOfDifficulty}
+        onChange={setAreasOfDifficulty}
+      />
+      <TextAreaInput label="Notes" editMode value={notes} onChange={setNotes} />
+      <FormControls
+        editMode
+        cancelEdit={closeContextual}
+        captureSubmitForm={captureSubmitForm}
+      />
+    </ContextualView>
   );
 }
