@@ -11,15 +11,16 @@ import {
   TextAreaInput,
   verifyRequiredInputs,
 } from 'src/components/FormComponents';
+import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
+
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import CustomStudentSelector from '../../general/CustomStudentSelector';
-
 import getDateRange from '../../general/functions/dateRange';
 import getWeekEnds from '../../general/functions/getWeekEnds';
 const assignmentTypes = [
@@ -193,6 +194,14 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
       openModal({
         title: 'Error',
         body: `${badInput} is required`,
+        type: 'error',
+      });
+      return;
+    }
+    if (assignmentLink && !isValidUrl(assignmentLink)) {
+      openModal({
+        title: 'Error',
+        body: 'Assignment Link must be a valid url',
         type: 'error',
       });
       return;
@@ -400,6 +409,14 @@ export function NewAssignmentView({
       openModal({
         title: 'Error',
         body: `${badInput} is required`,
+        type: 'error',
+      });
+      return;
+    }
+    if (assignmentLink && !isValidUrl(assignmentLink)) {
+      openModal({
+        title: 'Error',
+        body: 'Assignment Link must be a valid url',
         type: 'error',
       });
       return;

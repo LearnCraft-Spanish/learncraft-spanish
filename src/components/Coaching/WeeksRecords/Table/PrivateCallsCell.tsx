@@ -11,10 +11,10 @@ import {
   TextAreaInput,
   verifyRequiredInputs,
 } from 'src/components/FormComponents';
+import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
-
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
 const ratingOptions = [
@@ -111,6 +111,14 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
       openModal({
         title: 'Error',
         body: `${badInput} is a required field`,
+        type: 'error',
+      });
+      return;
+    }
+    if (recording && !isValidUrl(recording)) {
+      openModal({
+        title: 'Error',
+        body: 'Recording Link must be a valid url',
         type: 'error',
       });
       return;
@@ -288,6 +296,14 @@ export default function PrivateCallsCell({
       openModal({
         title: 'Error',
         body: `${badInput} is a required field`,
+        type: 'error',
+      });
+      return;
+    }
+    if (recording && !isValidUrl(recording)) {
+      openModal({
+        title: 'Error',
+        body: 'Recording Link must be a valid url',
         type: 'error',
       });
       return;
