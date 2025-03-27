@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@LearnCraft-Spanish/shared':
+        specifier: npm:@learncraft-spanish/shared@^0.0.1
+        version: '@learncraft-spanish/shared@0.0.1'
       '@auth0/auth0-react':
         specifier: ^2.3.0
         version: 2.3.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -1021,6 +1024,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
+
+  '@learncraft-spanish/shared@0.0.1':
+    resolution: {integrity: sha512-j71/qHaFB9CMIIYrXqQxL/LT6/pOAZXasFr2bhRm1esAx+8DHSgqNkgORu3UskYIhHpuTlXm3YPhHLsABNV6xA==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.0.1/710867023615c7623ab918d56eb2a195f5602a19}
 
   '@mswjs/interceptors@0.37.6':
     resolution: {integrity: sha512-wK+5pLK5XFmgtH3aQ2YVvA3HohS3xqV/OxuVOdNx9Wpnz7VE/fnC+e1A7ln6LFYeck7gOJ/dsZV6OLplOtAJ2w==}
@@ -4987,6 +4993,9 @@ packages:
     resolution: {integrity: sha512-GQHQqAopRhwU8Kt1DDM8NjibDXHC8eoh1erhGAJPEyveY9qqVeXvVikNKrDz69sHowPMorbPUrH/mx8c50eiBQ==}
     engines: {node: '>=18'}
 
+  zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -6055,6 +6064,10 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  '@learncraft-spanish/shared@0.0.1':
+    dependencies:
+      zod: 3.24.2
 
   '@mswjs/interceptors@0.37.6':
     dependencies:
@@ -10799,5 +10812,7 @@ snapshots:
   yoctocolors-cjs@2.1.2: {}
 
   yoctocolors@2.1.1: {}
+
+  zod@3.24.2: {}
 
   zwitch@2.0.4: {}

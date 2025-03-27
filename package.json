@@ -27,9 +27,11 @@
     "start": "vite",
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
+    "update-shared": "pnpm add @LearnCraft-Spanish/shared@latest",
     "validate": "npm run lint:fix && npm run format && npm run typecheck"
   },
   "dependencies": {
+    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.0.1",
     "@auth0/auth0-react": "^2.3.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
