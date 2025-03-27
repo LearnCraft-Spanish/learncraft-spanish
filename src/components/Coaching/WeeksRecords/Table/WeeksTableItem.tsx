@@ -137,6 +137,13 @@ export default function WeeksTableItem({ week }: { week: Week }) {
           )}
         </td>
         <td>
+          {/* We should only show the private calls if:
+          - the student has private calls
+          OR
+          - they have valid bundle credits
+
+          We should implement this when we update the data parsing to be handleled on the backend
+           */}
           <PrivateCallsCell week={week} calls={privateCalls} />
         </td>
         <td>
