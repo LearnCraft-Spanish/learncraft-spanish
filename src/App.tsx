@@ -22,7 +22,7 @@ export const App: React.FC = () => {
   return (
     <div className="App">
       <Nav />
-      {location.pathname !== '/student-deep-dive' &&
+      {location.pathname !== '/student-drill-down' &&
         location.pathname !== '/comprehensionquiz' &&
         location.pathname !== '/audioquiz' &&
         location.pathname !== '/myflashcards/quiz' &&

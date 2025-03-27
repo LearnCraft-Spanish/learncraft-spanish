@@ -44,10 +44,21 @@ export default function WeeksTable({
   handleUpdateSortByStudent,
   sortDirection,
 }: NewTableProps) {
-  const { weeksQuery } = useCoaching();
+  const {
+    weeksQuery,
+    groupSessionsQuery,
+    groupAttendeesQuery,
+    assignmentsQuery,
+    privateCallsQuery,
+  } = useCoaching();
   const { newPutFactory } = useBackendHelpers();
 
-  const isLoading = weeksQuery.isLoading;
+  const isLoading =
+    weeksQuery.isLoading ||
+    groupSessionsQuery.isLoading ||
+    groupAttendeesQuery.isLoading ||
+    assignmentsQuery.isLoading ||
+    privateCallsQuery.isLoading;
 
   const [activeData, setActiveData] = useState<WeekWithFailedToUpdate[]>([]);
 

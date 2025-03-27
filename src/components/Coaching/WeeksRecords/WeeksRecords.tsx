@@ -87,7 +87,11 @@ function WeeksRecordsContent() {
     coachListQuery.isSuccess &&
     courseListQuery.isSuccess &&
     activeMembershipsQuery.isSuccess &&
-    activeStudentsQuery.isSuccess;
+    activeStudentsQuery.isSuccess &&
+    groupSessionsQuery.isSuccess &&
+    groupAttendeesQuery.isSuccess &&
+    assignmentsQuery.isSuccess &&
+    privateCallsQuery.isSuccess;
 
   const dataError =
     userDataQuery.isError ||
