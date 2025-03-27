@@ -6,6 +6,7 @@ import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Checkbox,
   DateInput,
+  Dropdown,
   FormControls,
   TextInput,
 } from 'src/components/FormComponents';
@@ -17,6 +18,7 @@ import {
   useStudentMemberships,
 } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import MembershipWeeks from './MembershipWeeks';
 interface StudentMembershipsProps {
@@ -199,8 +201,12 @@ function StudentMembershipContextual({
 }) {
   const { closeContextual } = useContextualMenu();
   const { courseListQuery } = useCourseList();
+  const { openModal, closeModal } = useModal();
   const [endDate, setEndDate] = useState(membership.endDate as string);
   const [onHold, setOnHold] = useState(membership.onHold);
+  const [selectedCourse, setSelectedCourse] = useState(
+    membership.relatedCourse,
+  );
   // const [active, setActive] = useState(membership.active);
   const userDataQuery = useUserData();
   const { coachListQuery } = useCoachList();
@@ -212,17 +218,40 @@ function StudentMembershipContextual({
     const course = courseListQuery.data?.find((c) => c.recordId === courseId);
     return course?.name || 'Unknown Course';
   };
+
+  const courseOptions = useMemo(() => {
+    if (!courseListQuery.data) return [];
+    return courseListQuery.data.map((course) => course.name);
+  }, [courseListQuery.data]);
+
+  const courseIdByName = useMemo(() => {
+    if (!courseListQuery.data) return new Map();
+    return new Map(
+      courseListQuery.data.map((course) => [course.name, course.recordId]),
+    );
+  }, [courseListQuery.data]);
+
+  const courseNameById = useMemo(() => {
+    if (!courseListQuery.data) return new Map();
+    return new Map(
+      courseListQuery.data.map((course) => [course.recordId, course.name]),
+    );
+  }, [courseListQuery.data]);
+
   const cancelEdit = () => {
     setEndDate(membership.endDate as string);
+    setSelectedCourse(membership.relatedCourse);
     // setActive(membership.active);
     closeContextual();
   };
+
   const captureSubmitForm = () => {
     updateMembershipMutation.mutate(
       {
         recordId: membership.recordId,
         endDate,
         onHold,
+        relatedCourse: selectedCourse,
       },
       {
         onSuccess: () => {
@@ -254,6 +283,24 @@ function StudentMembershipContextual({
     }
   }, [userDataQuery.data, coachListQuery.data]);
 
+  const handleCourseChange = (courseName: string) => {
+    const newCourseId = courseIdByName.get(courseName);
+    if (!newCourseId) return;
+
+    openModal({
+      title: 'Confirm Course Change',
+      body: `If you edit this membership, it will also affect all related week records back to ${toISODate(new Date(membership.startDate))}. Do you wish to continue?`,
+      type: 'confirm',
+      confirmFunction: () => {
+        setSelectedCourse(newCourseId);
+        closeModal();
+      },
+      cancelFunction: () => {
+        /* Do nothing, keep existing course */
+      },
+    });
+  };
+
   if (
     membership.primaryCoach &&
     membership.primaryCoach.toString() !== currentUserAsQbUser?.user.id &&
@@ -276,12 +323,22 @@ function StudentMembershipContextual({
   return (
     <ContextualView>
       <h3>Edit Membership</h3>
-      <TextInput
-        label="Membership Name"
-        value={getCourseName(membership.relatedCourse)}
-        editMode={false}
-        onChange={() => {}}
-      />
+      {userDataQuery.data?.roles.adminRole === 'admin' ? (
+        <Dropdown
+          label="Course"
+          value={courseNameById.get(selectedCourse)}
+          onChange={handleCourseChange}
+          options={courseOptions}
+          editMode
+        />
+      ) : (
+        <TextInput
+          label="Membership Name"
+          value={getCourseName(membership.relatedCourse)}
+          editMode={false}
+          onChange={() => {}}
+        />
+      )}
       <Checkbox
         labelText="On Hold"
         labelFor="onHold"
