@@ -176,13 +176,18 @@ export default function WeeksTableItem({
           )}
         </td>
         <td>
-          {week.membershipCourseWeeklyPrivateCalls > 0 && (
-            <PrivateCallsCell
-              week={week}
-              calls={privateCalls}
-              tableEditMode={tableEditMode}
-            />
-          )}
+          {/* We should only show the private calls if:
+          - the student has private calls
+          OR
+          - they have valid bundle credits
+
+          We should implement this when we update the data parsing to be handleled on the backend
+           */}
+          <PrivateCallsCell
+            week={week}
+            calls={privateCalls}
+            tableEditMode={tableEditMode}
+          />
         </td>
         <td className="notesCell">
           {tableEditMode ? (

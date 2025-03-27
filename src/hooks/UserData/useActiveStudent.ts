@@ -112,7 +112,12 @@ export function useActiveStudent() {
             return activeProgram?.cohortFCurrentLesson;
           case 'G':
             return activeProgram?.cohortGCurrentLesson;
-          // case 'H': return activeProgram?.cohortHCurrentLesson
+          case 'H':
+            return activeProgram?.cohortHCurrentLesson;
+          case 'I':
+            return activeProgram?.cohortICurrentLesson;
+          case 'J':
+            return activeProgram?.cohortJCurrentLesson;
           // etc for futureproofing
         }
       };

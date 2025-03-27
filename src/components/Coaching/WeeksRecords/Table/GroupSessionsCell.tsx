@@ -15,6 +15,7 @@ import {
   verifyRequiredInputs,
 } from 'src/components/FormComponents';
 
+import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import * as helpers from 'src/hooks/CoachingData/helperFunctions';
 import {
   useActiveMemberships,
@@ -381,6 +382,14 @@ export function GroupSessionView({
       openModal({
         title: 'Error',
         body: `${badInput} is a required field`,
+        type: 'error',
+      });
+      return;
+    }
+    if (callDocument && !isValidUrl(callDocument)) {
+      openModal({
+        title: 'Error',
+        body: 'Call Document must be a valid url',
         type: 'error',
       });
       return;

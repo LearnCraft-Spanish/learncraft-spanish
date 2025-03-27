@@ -23,20 +23,18 @@ export default function CustomGroupAttendeeSelector({
 
   const listOfStudents = useMemo(() => {
     if (!weeksQuery.data) return [];
-    const studentList = weeksQuery.data
-      ?.filter((week) => week.membershipCourseHasGroupCalls)
-      .map((week) => {
-        const student = getStudentFromMembershipId(week.relatedMembership);
-        if (!student) return undefined;
-        return {
-          studentFullName: student?.fullName,
-          weekRecordId: week.recordId,
-          weekStarts:
-            week.weekStarts instanceof Date
-              ? toISODate(week.weekStarts)
-              : week.weekStarts,
-        };
-      });
+    const studentList = weeksQuery.data.map((week) => {
+      const student = getStudentFromMembershipId(week.relatedMembership);
+      if (!student) return undefined;
+      return {
+        studentFullName: student?.fullName,
+        weekRecordId: week.recordId,
+        weekStarts:
+          week.weekStarts instanceof Date
+            ? toISODate(week.weekStarts)
+            : week.weekStarts,
+      };
+    });
     return studentList.filter((student) => student !== undefined);
   }, [weeksQuery.data, getStudentFromMembershipId]);
 

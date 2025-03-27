@@ -8,3 +8,18 @@ export default function verifyRequiredInputs(
   }
   return false;
 }
+
+export function isValidUrl(url: string): boolean {
+  if (url === '') {
+    return true;
+  }
+  try {
+    const newUrl = new URL(url);
+    if (newUrl) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
