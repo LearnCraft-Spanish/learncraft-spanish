@@ -117,6 +117,11 @@ export default function Menu() {
             <div>
               <h3>Coaching Tools</h3>
               <div className="buttonBox">
+                <Link className="linkButton" to="/frequensay">
+                  FrequenSay
+                </Link>
+              </div>
+              <div className="buttonBox">
                 <Link className="linkButton" to="/weeklyrecords">
                   Weekly Records Interface
                 </Link>
@@ -131,12 +136,6 @@ export default function Menu() {
           {userDataQuery.data.roles.adminRole === 'admin' && (
             <>
               <h3>Admin Tools</h3>
-
-              <div className="buttonBox">
-                <Link className="linkButton" to="/frequensay">
-                  FrequenSay
-                </Link>
-              </div>
               <div className="buttonBox">
                 <Link className="linkButton" to="/examplemanager">
                   Example Manager
