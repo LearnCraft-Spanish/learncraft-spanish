@@ -68,8 +68,12 @@ export default function mockActiveStudentStub({
           return activeProgram?.cohortFCurrentLesson;
         case 'G':
           return activeProgram?.cohortGCurrentLesson;
-        // case 'H':
-        //  return activeProgram?.cohortHCurrentLesson;
+        case 'H':
+          return activeProgram?.cohortHCurrentLesson;
+        case 'I':
+          return activeProgram?.cohortICurrentLesson;
+        case 'J':
+          return activeProgram?.cohortJCurrentLesson;
         // if added, add to interface and real hook
         // etc for futureproofing
       }
