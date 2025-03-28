@@ -1,0 +1,63 @@
+.searchable-dropdown {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.searchable-dropdown .content {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.searchable-dropdown .options {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.searchable-dropdown .options .option {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.searchable-dropdown .options .option:hover {
+  background-color: #f0f0f0;
+}
+.clearButton {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin: 0.5rem;
+  padding: 0.5rem;
+}
+.clearButton:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.clearButton img {
+  width: 1rem;
+  height: 1rem;
+}
+
+.displayContent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  padding-left: 1rem;
+}
+
+.displayContent p.content {
+  margin: 0;
+}

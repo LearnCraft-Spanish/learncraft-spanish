@@ -1,6 +1,10 @@
 import type { Student } from 'src/types/CoachingTypes';
 import React, { useMemo, useState } from 'react';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
+import { Loading } from 'src/components/Loading';
+import {
+  useActiveStudents,
+  useCoachList,
+} from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
@@ -13,8 +17,27 @@ import './StudentDrillDown.scss';
 
 export default function StudentDrillDown() {
   const { allStudentsQuery } = useAllStudents();
-  const userDataQuery = useUserData();
   const { coachListQuery } = useCoachList();
+  const { activeStudentsQuery } = useActiveStudents();
+  const userDataQuery = useUserData();
+
+  const isLoading =
+    allStudentsQuery.isLoading ||
+    coachListQuery.isLoading ||
+    activeStudentsQuery.isLoading ||
+    userDataQuery.isLoading;
+
+  const isError =
+    allStudentsQuery.isError ||
+    coachListQuery.isError ||
+    activeStudentsQuery.isError ||
+    userDataQuery.isError;
+
+  const isSuccess =
+    allStudentsQuery.isSuccess &&
+    coachListQuery.isSuccess &&
+    activeStudentsQuery.isSuccess &&
+    userDataQuery.isSuccess;
 
   const [selectedStudentId, setSelectedStudentId] = useState<
     number | undefined
@@ -65,37 +88,41 @@ export default function StudentDrillDown() {
   return (
     <div className="student-deep-dive">
       <h1>Student Drill Down</h1>
-      <div className="content">
-        <CoachStudents
-          onStudentSelect={handleStudentSelect}
-          currentCoach={currentCoach}
-        />
-        <div className="student-selection-section">
-          <h2>Select a Student</h2>
-          <StudentDrillDownSearch
+      {isLoading && <Loading message="Loading data..." />}
+      {isError && <div>Error loading data, please try again.</div>}
+      {isSuccess && (
+        <div className="content">
+          <CoachStudents
             onStudentSelect={handleStudentSelect}
-            selectedStudentId={selectedStudentId}
+            currentCoach={currentCoach}
           />
+          <div className="student-selection-section">
+            <h2>Select a Student</h2>
+            <StudentDrillDownSearch
+              onStudentSelect={handleStudentSelect}
+              selectedStudentId={selectedStudentId}
+            />
+          </div>
+          {selectedStudentId && selectedStudent && (
+            <>
+              <div className="student-details-section">
+                <StudentInfoCard
+                  student={selectedStudent}
+                  currentCoach={currentCoach}
+                  isAdmin={userDataQuery.data?.roles.adminRole === 'admin'}
+                />
+              </div>
+              <div>
+                <StudentMemberships
+                  studentId={selectedStudentId}
+                  selectedMembershipId={selectedMembershipId}
+                  onMembershipSelect={handleMembershipSelect}
+                />
+              </div>
+            </>
+          )}
         </div>
-        {selectedStudentId && selectedStudent && (
-          <>
-            <div className="student-details-section">
-              <StudentInfoCard
-                student={selectedStudent}
-                currentCoach={currentCoach}
-                isAdmin={userDataQuery.data?.roles.adminRole === 'admin'}
-              />
-            </div>
-            <div>
-              <StudentMemberships
-                studentId={selectedStudentId}
-                selectedMembershipId={selectedMembershipId}
-                onMembershipSelect={handleMembershipSelect}
-              />
-            </div>
-          </>
-        )}
-      </div>
+      )}
     </div>
   );
 }
