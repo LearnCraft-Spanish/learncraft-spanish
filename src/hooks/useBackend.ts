@@ -321,7 +321,15 @@ export function useBackend() {
   const getLessonList = useCallback((): Promise<
     StudentRecordsTypes.Lesson[]
   > => {
-    return getFactory('coaching/lessons');
+    return getFactory<StudentRecordsTypes.Lesson[]>('coaching/lessons').then(
+      (lessons) => {
+        // sort lessons by lessonName
+        const sortedLessons = lessons.sort((a, b) =>
+          a.lessonName.localeCompare(b.lessonName),
+        );
+        return sortedLessons;
+      },
+    );
   }, [getFactory]);
 
   const getActiveStudents = useCallback((): Promise<

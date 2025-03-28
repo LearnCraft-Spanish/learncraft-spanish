@@ -3,7 +3,7 @@ import type { GroupSession, Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
 import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   CoachDropdown,
   DateInput,
@@ -50,10 +50,12 @@ function GroupSessionCell({
   groupSession,
   week,
   newRecord,
+  tableEditMode,
 }: {
   groupSession: GroupSession;
   week: Week;
   newRecord?: boolean;
+  tableEditMode: boolean;
 }) {
   const { contextual, openContextual } = useContextualMenu();
   return (
@@ -67,6 +69,7 @@ function GroupSessionCell({
               `groupSession${groupSession.recordId}week${week.recordId}`,
             )
           }
+          disabled={tableEditMode}
         >
           New
         </button>
@@ -85,7 +88,11 @@ function GroupSessionCell({
 
       {contextual ===
         `groupSession${groupSession.recordId}week${week.recordId}` && (
-        <GroupSessionView groupSession={groupSession} newRecord={newRecord} />
+        <GroupSessionView
+          groupSession={groupSession}
+          newRecord={newRecord}
+          tableEditMode={tableEditMode}
+        />
       )}
     </div>
   );
@@ -94,13 +101,14 @@ function GroupSessionCell({
 export function GroupSessionView({
   groupSession,
   newRecord,
+  tableEditMode,
 }: {
   groupSession: GroupSession;
   newRecord?: boolean;
+  tableEditMode?: boolean;
 }) {
   const userDataQuery = useUserData();
-  const { setContextualRef, closeContextual, updateDisableClickOutside } =
-    useContextualMenu();
+  const { closeContextual, updateDisableClickOutside } = useContextualMenu();
   const { openModal, closeModal } = useModal();
 
   const {
@@ -531,133 +539,129 @@ export function GroupSessionView({
   }, [dataReady, sessionType, setInitialState]);
 
   return (
-    <div className="contextualWrapper">
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls editFunction={toggleEditMode} />
-        {editMode ? (
-          newRecord ? (
-            <h3>New Group Session</h3>
-          ) : (
-            <h3>Edit Group Session</h3>
-          )
+    <ContextualView editFunction={tableEditMode ? undefined : toggleEditMode}>
+      {editMode ? (
+        newRecord ? (
+          <h3>New Group Session</h3>
         ) : (
-          <h3>{`Session: ${sessionType} on ${date}`}</h3>
-        )}
-        <div>
-          <CoachDropdown
-            coachEmail={coach}
-            onChange={updateCoach}
-            editMode={editMode}
-          />
-          {editMode && <DateInput value={date} onChange={setDate} />}
-          {editMode && (
-            <Dropdown
-              label="Session Type"
-              value={sessionType}
-              onChange={setSessionType}
-              options={sessionTypeOptions}
-              editMode
-            />
-          )}
-        </div>
-        <Dropdown
-          value={topic}
-          onChange={setTopic}
-          editMode={editMode}
-          options={
-            groupSessionsTopicFieldOptionsQuery.data
-              ? groupSessionsTopicFieldOptionsQuery.data.sort((a, b) => {
-                  if (a && b) {
-                    const aString = a.replace(/^"/g, '').toLowerCase();
-                    const bString = b.replace(/^"/g, '').toLowerCase();
-                    if (aString > bString) return 1;
-                    else return -1;
-                  }
-                  return 0;
-                })
-              : []
-          }
-          label="Topic"
-        />
-        <TextAreaInput
-          label="Comments"
-          value={comments}
-          onChange={setComments}
+          <h3>Edit Group Session</h3>
+        )
+      ) : (
+        <h3>{`Session: ${sessionType} on ${date}`}</h3>
+      )}
+      <div>
+        <CoachDropdown
+          coachEmail={coach}
+          onChange={updateCoach}
           editMode={editMode}
         />
-        <LinkInput
-          label="Call Document"
-          value={callDocument}
-          onChange={setCallDocument}
-          editMode={editMode}
-        />
-        <LinkInput
-          label="Zoom Link"
-          value={zoomLink}
-          onChange={setZoomLink}
-          editMode={editMode}
-        />
+        {editMode && <DateInput value={date} onChange={setDate} />}
         {editMode && (
-          <div className="lineWrapper">
-            <label className="label">Add Attendees:</label>
-            <div className="content">
-              <CustomGroupAttendeeSelector
-                weekStarts={relatedWeekStarts}
-                onChange={handleAddAttendee}
-              />
-            </div>
-          </div>
+          <Dropdown
+            label="Session Type"
+            value={sessionType}
+            onChange={setSessionType}
+            options={sessionTypeOptions}
+            editMode
+          />
         )}
+      </div>
+      <Dropdown
+        value={topic}
+        onChange={setTopic}
+        editMode={editMode}
+        options={
+          groupSessionsTopicFieldOptionsQuery.data
+            ? groupSessionsTopicFieldOptionsQuery.data.sort((a, b) => {
+                if (a && b) {
+                  const aString = a.replace(/^"/g, '').toLowerCase();
+                  const bString = b.replace(/^"/g, '').toLowerCase();
+                  if (aString > bString) return 1;
+                  else return -1;
+                }
+                return 0;
+              })
+            : []
+        }
+        label="Topic"
+      />
+      <TextAreaInput
+        label="Comments"
+        value={comments}
+        onChange={setComments}
+        editMode={editMode}
+      />
+      <LinkInput
+        label="Call Document"
+        value={callDocument}
+        onChange={setCallDocument}
+        editMode={editMode}
+      />
+      <LinkInput
+        label="Zoom Link"
+        value={zoomLink}
+        onChange={setZoomLink}
+        editMode={editMode}
+      />
+      {editMode && (
         <div className="lineWrapper">
-          <label className="label">Attendees:</label>
+          <label className="label">Add Attendees:</label>
           <div className="content">
-            {attendees &&
-              attendees.map(
-                (attendee) =>
-                  // if attendee is to be removed, don't display it
-                  attendee.action !== 'remove' && (
-                    <div
-                      key={attendee.relatedWeek}
-                      className="attendee-wrapper"
-                    >
-                      <p> {attendee.name}</p>
-                      {editMode && (
-                        <button
-                          type="button"
-                          className="redButton"
-                          onClick={() =>
-                            handleRemoveAttendee(attendee.relatedWeek)
-                          }
-                        >
-                          Remove Attendee
-                        </button>
-                      )}
-                    </div>
-                  ),
-              )}
+            <CustomGroupAttendeeSelector
+              weekStarts={relatedWeekStarts}
+              onChange={handleAddAttendee}
+            />
           </div>
         </div>
-        {editMode &&
-          !newRecord &&
-          userDataQuery.data?.roles.adminRole === 'admin' && (
-            <DeleteRecord deleteFunction={deleteRecordFunction} />
-          )}
-        <FormControls
-          editMode={editMode}
-          cancelEdit={cancelEdit}
-          captureSubmitForm={captureSubmitForm}
-        />
+      )}
+      <div className="lineWrapper">
+        <label className="label">Attendees:</label>
+        <div className="content">
+          {attendees &&
+            attendees.map(
+              (attendee) =>
+                // if attendee is to be removed, don't display it
+                attendee.action !== 'remove' && (
+                  <div key={attendee.relatedWeek} className="attendee-wrapper">
+                    <p> {attendee.name}</p>
+                    {editMode && (
+                      <button
+                        type="button"
+                        className="redButton"
+                        onClick={() =>
+                          handleRemoveAttendee(attendee.relatedWeek)
+                        }
+                      >
+                        Remove Attendee
+                      </button>
+                    )}
+                  </div>
+                ),
+            )}
+        </div>
       </div>
-    </div>
+      {editMode &&
+        !newRecord &&
+        userDataQuery.data?.roles.adminRole === 'admin' && (
+          <DeleteRecord deleteFunction={deleteRecordFunction} />
+        )}
+      <FormControls
+        editMode={editMode}
+        cancelEdit={cancelEdit}
+        captureSubmitForm={captureSubmitForm}
+      />
+    </ContextualView>
   );
 }
 
 export default function GroupSessionsCell({
   week,
   groupSessions,
+  tableEditMode,
 }: {
   week: Week;
   groupSessions: GroupSession[] | null;
+  tableEditMode: boolean;
 }) {
   const { groupSessionsQuery } = useCoaching();
 
@@ -670,6 +674,7 @@ export default function GroupSessionsCell({
             groupSession={groupSession}
             key={groupSession.recordId}
             week={week}
+            tableEditMode={tableEditMode}
           />
         ))}
         {/* {week.membershipCourseHasGroupCalls && (

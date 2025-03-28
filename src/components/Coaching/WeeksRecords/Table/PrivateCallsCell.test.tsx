@@ -27,7 +27,7 @@ describe('component StudentCell', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <PrivateCallsCell week={week} calls={[call]} />
+          <PrivateCallsCell week={week} calls={[call]} tableEditMode={false} />
         </DateRangeProvider>
       </MockAllProviders>,
     );
@@ -40,7 +40,11 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <PrivateCallsCell week={week} calls={[call]} />
+            <PrivateCallsCell
+              week={week}
+              calls={[call]}
+              tableEditMode={false}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -61,7 +65,11 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <PrivateCallsCell week={week} calls={[call]} />
+            <PrivateCallsCell
+              week={week}
+              calls={[call]}
+              tableEditMode={false}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -86,7 +94,11 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <PrivateCallsCell week={week} calls={[call]} />
+            <PrivateCallsCell
+              week={week}
+              calls={[call]}
+              tableEditMode={false}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
