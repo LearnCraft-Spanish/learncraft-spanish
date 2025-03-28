@@ -1,17 +1,23 @@
-import type { Week } from 'src/types/CoachingTypes';
+import type { GroupSession, Week } from 'src/types/CoachingTypes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { GroupSessionView } from 'src/components/Coaching/WeeksRecords/Table/GroupSessionsCell';
 import Pagination from 'src/components/ExamplesTable/Pagination';
-import { Loading } from 'src/components/Loading';
 
+import { Loading } from 'src/components/Loading';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import QuantifiedRecords from '../quantifyingRecords';
+import ViewWeekRecord from '../ViewWeekRecord';
+import { NewAssignmentView } from './AssignmentsCell';
 import WeeksTableItem from './WeeksTableItem';
 
 interface NewTableProps {
   weeks: Week[] | undefined;
+  startDate: string;
 }
-export default function WeeksTable({ weeks }: NewTableProps) {
+export default function WeeksTable({ weeks, startDate }: NewTableProps) {
   const { weeksQuery } = useCoaching();
+  const { contextual } = useContextualMenu();
 
   const isLoading = weeksQuery.isLoading;
 
@@ -86,6 +92,22 @@ export default function WeeksTable({ weeks }: NewTableProps) {
             </tbody>
           </table>
         </div>
+        {contextual.startsWith('week') && (
+          <ViewWeekRecord
+            week={weeks?.find(
+              (week) => week.recordId === Number(contextual.split('week')[1]),
+            )}
+          />
+        )}
+        {contextual === 'newGroupSession' && (
+          <GroupSessionView
+            groupSession={{ recordId: -1 } as GroupSession}
+            newRecord
+          />
+        )}
+        {contextual === 'newAssignment' && (
+          <NewAssignmentView weekStartsDefaultValue={startDate} />
+        )}
       </>
     ))
   );

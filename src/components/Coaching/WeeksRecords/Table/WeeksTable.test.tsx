@@ -41,7 +41,7 @@ describe('component WeeksTable', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <WeeksTable weeks={[weeksInRange[0]]} />
+          <WeeksTable weeks={[weeksInRange[0]]} startDate={defaultStartDate} />
         </DateRangeProvider>
       </MockAllProviders>,
     );
@@ -61,7 +61,10 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithAssignment]} />
+            <WeeksTable
+              weeks={[weekWithAssignment]}
+              startDate={defaultStartDate}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -98,7 +101,10 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithGroupSession]} />
+            <WeeksTable
+              weeks={[weekWithGroupSession]}
+              startDate={defaultStartDate}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -168,7 +174,10 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithHoldWeek]} />
+            <WeeksTable
+              weeks={[weekWithHoldWeek]}
+              startDate={defaultStartDate}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );
@@ -190,7 +199,10 @@ describe('component WeeksTable', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <WeeksTable weeks={[weekWithRecordsComplete]} />
+            <WeeksTable
+              weeks={[weekWithRecordsComplete]}
+              startDate={defaultStartDate}
+            />
           </DateRangeProvider>
         </MockAllProviders>,
       );

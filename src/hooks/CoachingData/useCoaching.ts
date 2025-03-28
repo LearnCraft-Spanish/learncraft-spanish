@@ -186,6 +186,19 @@ export default function useCoaching() {
     [groupAttendeesQuery.data],
   );
 
+  // get group sessions & attendees for a week
+  const getGroupSessionsAndAttendeesForWeek = useCallback(
+    (weekId: number) => {
+      const groupSessions = getGroupSessionsFromWeekRecordId(weekId);
+      const structuredGroupSessions = groupSessions?.map((session) => ({
+        ...session,
+        attendees: getAttendeesFromGroupSessionId(session.recordId) || [],
+      }));
+      return structuredGroupSessions;
+    },
+    [getGroupSessionsFromWeekRecordId, getAttendeesFromGroupSessionId],
+  );
+
   return {
     weeksQuery,
     coachListQuery,
@@ -209,6 +222,7 @@ export default function useCoaching() {
     getMembershipFromWeekRecordId,
     getPrivateCallsFromWeekRecordId,
     getAttendeesFromGroupSessionId,
+    getGroupSessionsAndAttendeesForWeek,
 
     // Mutations
     createAssignmentMutation,

@@ -1,23 +1,14 @@
-import type {
-  Coach,
-  Course,
-  GroupSession,
-  Week,
-} from '../../../types/CoachingTypes';
+import type { Coach, Course, Week } from '../../../types/CoachingTypes';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Loading } from 'src/components/Loading';
 
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
-import { NewAssignmentView } from './Table/AssignmentsCell';
-import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
 
-import ViewWeekRecord from './ViewWeekRecord';
 import '../coaching.scss';
 
 /*
@@ -38,7 +29,6 @@ consider using a context, to pass in the startDate and endDate to all the querie
 */
 function WeeksRecordsContent() {
   const userDataQuery = useUserData();
-  const { contextual } = useContextualMenu();
   const { startDate } = useDateRange();
   const {
     weeksQuery,
@@ -322,23 +312,7 @@ function WeeksRecordsContent() {
               updateFilterByOneMonthChallenge={updateFilterByOneMonthChallenge}
             />
           </div>
-          <WeeksTable weeks={weeks} />
-          {contextual.startsWith('week') && (
-            <ViewWeekRecord
-              week={weeks?.find(
-                (week) => week.recordId === Number(contextual.split('week')[1]),
-              )}
-            />
-          )}
-          {contextual === 'newGroupSession' && (
-            <GroupSessionView
-              groupSession={{ recordId: -1 } as GroupSession}
-              newRecord
-            />
-          )}
-          {contextual === 'newAssignment' && (
-            <NewAssignmentView weekStartsDefaultValue={startDate} />
-          )}
+          <WeeksTable weeks={weeks} startDate={startDate} />
         </>
       )}
     </div>
