@@ -13,7 +13,7 @@ import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import SentryRoutes from './SentryRoutes';
-
+import VocabQuizDbTables from 'src/components/VocabQuizDbTables/VocabQuizDbTables';
 export default function AppRoutes() {
   const userDataQuery = useUserData();
 
@@ -92,6 +92,7 @@ export default function AppRoutes() {
           )
         }
       />
+      <Route path="/vocab-quiz-db-tables" element={<VocabQuizDbTables />} />
       <Route path="/*" element={<NotFoundPage />} />
     </SentryRoutes>
   );

@@ -67,7 +67,7 @@ export type FlashcardStudent = Expanded<{
   emailAddress: string;
   cohort: string;
   relatedProgram: number;
-  role: '' | 'limited' | 'student';
+  role: '' | 'limited' | 'student' | 'none';
 }>;
 
 export type selectedProgram = Expanded<Program | null>;
