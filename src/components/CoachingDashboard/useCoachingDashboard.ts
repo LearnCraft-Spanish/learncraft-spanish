@@ -1,78 +1,59 @@
-import type { Coach } from 'src/types/CoachingTypes';
-import { useEffect, useState } from 'react';
-import { useCoachList } from 'src/hooks/CoachingData/queries';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useMemo } from 'react';
+import useActiveCoach from './hooks/useActiveCoach';
+import useMyIncompleteWeeklyRecords from './hooks/useMyIncompleteWeeklyRecords';
+import useMyRecentRecords from './hooks/useMyRecentRecords';
+export default function useCoachingDashboard() {
+  const {
+    states: {
+      isLoading: isLoadingActiveCoach,
+      isError: isErrorActiveCoach,
+      isSuccess: isSuccessActiveCoach,
+    },
+    coach,
+  } = useActiveCoach();
 
-export const useCoachingDashboard = () => {
-  const userDataQuery = useUserData();
-  const { coachListQuery } = useCoachList();
-  const { weeksQuery } = useCoaching();
+  const {
+    getMyIncompleteWeeklyRecords,
+    states: {
+      isLoading: isLoadingRecords,
+      isError: isErrorRecords,
+      isSuccess: isSuccessRecords,
+    },
+  } = useMyIncompleteWeeklyRecords();
 
-  const isLoading =
-    userDataQuery.isLoading || coachListQuery.isLoading || weeksQuery.isLoading;
-  const isError =
-    userDataQuery.isError || coachListQuery.isError || weeksQuery.isError;
-  const dataReady =
-    userDataQuery.isSuccess && coachListQuery.isSuccess && weeksQuery.isSuccess;
+  const {
+    myRecentRecordsQuery,
+    states: {
+      isLoading: isLoadingRecentRecords,
+      isError: isErrorRecentRecords,
+      isSuccess: isSuccessRecentRecords,
+    },
+  } = useMyRecentRecords({ coach: coach?.user });
 
-  const [coach, setCoach] = useState<Coach | null>(null);
+  const myIncompleteWeeklyRecords = useMemo(() => {
+    if (!isSuccessActiveCoach || !isSuccessRecords || !coach) return undefined;
+    const records = getMyIncompleteWeeklyRecords(coach?.user);
+    return records;
+  }, [
+    isSuccessActiveCoach,
+    isSuccessRecords,
+    getMyIncompleteWeeklyRecords,
+    coach,
+  ]);
 
-  useEffect(() => {
-    if (dataReady) {
-      const possibleEmailDomains = [
-        '@learncraftspanish.com',
-        '@masterofmemory.com',
-      ];
-      if (userDataQuery.data.emailAddress) {
-        const currentUserCoach = coachListQuery.data.find((coach) => {
-          const emailPrefix = userDataQuery.data.emailAddress
-            .split('@')[0]
-            .toLowerCase();
-          for (const domain of possibleEmailDomains) {
-            if (coach.user.email.toLowerCase() === emailPrefix + domain) {
-              return true;
-            }
-          }
-          return false;
-        });
-        if (currentUserCoach) setCoach(currentUserCoach);
-      }
-    }
-  }, [coachListQuery, userDataQuery, dataReady]);
-
-  return { isLoading, isError, dataReady, coach };
-};
-
-/*
-useEffect(() => {
-    if (
-      !rendered.current &&
-      weeksQuery.isSuccess &&
-      coachListQuery.isSuccess &&
-      userDataQuery.isSuccess
-    ) {
-      const possibleEmailDomains = [
-        '@learncraftspanish.com',
-        '@masterofmemory.com',
-      ];
-
-      if (userDataQuery.data.emailAddress) {
-        const currentUserCoach = coachListQuery.data.find((coach) => {
-          const emailPrefix = userDataQuery.data.emailAddress
-            .split('@')[0]
-            .toLowerCase();
-          for (const domain of possibleEmailDomains) {
-            if (coach.user.email.toLowerCase() === emailPrefix + domain) {
-              return true;
-            }
-          }
-          return false;
-        });
-        if (currentUserCoach) setFilterByCoach(currentUserCoach);
-      }
-      rendered.current = true;
-    }
-  }, [weeksQuery, coachListQuery, userDataQuery]);
-
-*/
+  return {
+    states: {
+      isLoading:
+        isLoadingActiveCoach || isLoadingRecords || isLoadingRecentRecords,
+      isError: isErrorActiveCoach || isErrorRecords || isErrorRecentRecords,
+      isSuccess:
+        isSuccessActiveCoach &&
+        isSuccessRecords &&
+        isSuccessRecentRecords &&
+        myIncompleteWeeklyRecords !== undefined,
+    },
+    coach,
+    myIncompleteWeeklyRecords,
+    recentRecords: myRecentRecordsQuery.data,
+  };
+}

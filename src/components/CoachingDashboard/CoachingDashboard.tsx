@@ -1,21 +1,20 @@
-import { useMemo } from 'react';
 import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
 import WeeksTable from '../Coaching/WeeksRecords/Table/WeeksTable';
 import useDateRange from '../Coaching/WeeksRecords/useDateRange';
 import { InlineLoading, Loading } from '../Loading';
-import { useCoachingDashboard } from './useCoachingDashboard';
-import useMyIncompleteWeeklyRecords from './useMyIncompleteWeeklyRecords';
-
+import RecentRecords from './components/RecentRecords';
+import useCoachingDashboard from './useCoachingDashboard';
 function CoachingDashboard() {
-  const { isLoading, isError, dataReady, coach } = useCoachingDashboard();
-  const { getMyIncompleteWeeklyRecords } = useMyIncompleteWeeklyRecords();
+  const {
+    states: { isLoading, isError, isSuccess },
+    coach,
+    myIncompleteWeeklyRecords,
+    recentRecords,
+  } = useCoachingDashboard();
+
+  const dataReady = isSuccess && recentRecords !== undefined;
+
   const { startDate } = useDateRange();
-
-  const myIncompleteWeeklyRecords = useMemo(() => {
-    if (!dataReady || !coach) return undefined;
-    return getMyIncompleteWeeklyRecords(coach?.user);
-  }, [coach, getMyIncompleteWeeklyRecords, dataReady]);
-
   return (
     <div className="coachingDashbaord">
       {isLoading && <Loading message="Loading user data..." />}
@@ -39,7 +38,7 @@ function CoachingDashboard() {
                 <InlineLoading message="Loading records..." />
               ) : (
                 <WeeksTable
-                  weeks={myIncompleteWeeklyRecords}
+                  weeks={myIncompleteWeeklyRecords ?? []}
                   startDate={startDate}
                 />
               )}
@@ -52,7 +51,7 @@ function CoachingDashboard() {
             {/* Recent Activity */}
             <div className="coachingDashbaord__recentActivity">
               <h3>My Recent Records</h3>
-              <ul></ul>
+              <RecentRecords recentRecords={recentRecords} />
             </div>
           </div>
         </>
