@@ -1,6 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { TextInput } from 'src/components/FormComponents/TextInput';
-
 interface FilterConfig {
   field: string;
   value: string;

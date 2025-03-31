@@ -1,25 +1,80 @@
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
-import { useState } from 'react';
+import type { EditableStudent, NewStudent } from '../types';
+import { useMemo, useState } from 'react';
 import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Dropdown,
   FormControls,
+  GenericDropdown,
   TextInput,
 } from 'src/components/FormComponents';
-
-export default function EditStudentView({
+import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
+import useStudentsTable from 'src/hooks/VocabQuizDbData/useStudentsTable';
+export default function StudentRecordView({
   student,
   onUpdate,
+  createMode,
 }: {
-  student: FlashcardStudent;
-  onUpdate: (student: FlashcardStudent) => void;
+  student: EditableStudent | NewStudent;
+  onUpdate: (student: EditableStudent | NewStudent) => void;
+  createMode?: boolean;
 }) {
-  const [editObject, setEditObject] = useState<FlashcardStudent>(student);
-  const [editMode, setEditMode] = useState(false);
+  const { closeContextual } = useContextualMenu();
+  const { cohortFieldOptionsQuery, programTableQuery } = useStudentsTable();
+  const [editObject, setEditObject] = useState<EditableStudent | NewStudent>(
+    student,
+  );
+  const [editMode, setEditMode] = useState(createMode || false);
+  const { openModal } = useModal();
+  // name, email, related program, cohort
 
+  const captureSubmitForm = () => {
+    const requiredInputs = [
+      { value: editObject.name, label: 'Name' },
+      { value: editObject.emailAddress, label: 'Email' },
+      { value: editObject.program, label: 'Program' },
+      { value: editObject.cohort, label: 'Cohort' },
+      { value: editObject.relatedProgram.toString(), label: 'Related Program' },
+    ];
+    const error = verifyRequiredInputs(requiredInputs);
+    if (error) {
+      openModal({
+        title: 'Error',
+        body: `${error} is a required field. Please fill it out before submitting.`,
+        type: 'error',
+      });
+      return;
+    }
+    onUpdate(editObject);
+    setEditMode(false);
+  };
+
+  const cancelEdit = () => {
+    if (!createMode) {
+      setEditMode(false);
+    } else {
+      closeContextual();
+    }
+  };
+
+  const programOptions = useMemo(() => {
+    return programTableQuery.data?.map((program) => ({
+      value: program.recordId.toString(),
+      text: program.name,
+    }));
+  }, [programTableQuery.data]);
+
+  const selectedProgram = useMemo(() => {
+    return programOptions?.find(
+      (program) => program.value === editObject.relatedProgram.toString(),
+    );
+  }, [programOptions, editObject.relatedProgram]);
   return (
-    <ContextualView editFunction={() => setEditMode(!editMode)}>
-      <div>Edit Student View</div>
+    <ContextualView
+      editFunction={!createMode ? () => setEditMode(!editMode) : undefined}
+    >
+      <h3>{createMode ? 'Create Student' : 'Edit Student'}</h3>
       <TextInput
         label="Name"
         value={editObject.name}
@@ -35,8 +90,29 @@ export default function EditStudentView({
         editMode={editMode}
       />
       <Dropdown
+        label="Program"
+        options={['LCSP', 'SI1M']}
+        value={editObject.program}
+        onChange={(value) =>
+          setEditObject({ ...editObject, program: value as 'LCSP' | 'SI1M' })
+        }
+        editMode={editMode}
+      />
+      <GenericDropdown
+        label="Related Program"
+        options={programOptions || []}
+        selectedValue={selectedProgram?.value || ''}
+        onChange={(value: string) =>
+          setEditObject({
+            ...editObject,
+            relatedProgram: value === '' ? '' : Number(value),
+          })
+        }
+        editMode={editMode}
+      />
+      <Dropdown
         label="Cohort"
-        options={[]}
+        options={cohortFieldOptionsQuery.data || []}
         value={editObject.cohort}
         onChange={(value) => setEditObject({ ...editObject, cohort: value })}
         editMode={editMode}
@@ -56,33 +132,44 @@ export default function EditStudentView({
       {editMode && (
         <FormControls
           editMode={editMode}
-          cancelEdit={() => setEditMode(false)}
-          captureSubmitForm={() => {
-            onUpdate(editObject);
-            setEditMode(false);
-          }}
+          cancelEdit={cancelEdit}
+          captureSubmitForm={captureSubmitForm}
         />
       )}
     </ContextualView>
   );
 }
 
-export function CreateStudentView({
-  onUpdate,
-}: {
-  onUpdate: (student: FlashcardStudent) => void;
-}) {
+export function CreateStudent() {
+  const { createStudentMutation } = useStudentsTable();
+
+  const handleCreate = (student: NewStudent) => {
+    createStudentMutation.mutate(student);
+  };
   return (
-    <EditStudentView
+    <StudentRecordView
       student={{
-        recordId: 0,
         name: '',
         emailAddress: '',
         cohort: '',
         role: '',
         relatedProgram: 0,
+        program: '',
       }}
-      onUpdate={onUpdate}
+      onUpdate={handleCreate}
+      createMode
     />
   );
+}
+
+export function EditStudent({ student }: { student: EditableStudent }) {
+  const { updateStudentMutation } = useStudentsTable();
+  function handleUpdate(student: EditableStudent | NewStudent) {
+    if (!('recordId' in student)) {
+      throw new Error('Student is not editable');
+    }
+    updateStudentMutation.mutate(student);
+  }
+
+  return <StudentRecordView student={student} onUpdate={handleUpdate} />;
 }

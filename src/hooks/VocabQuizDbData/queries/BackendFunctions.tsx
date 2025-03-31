@@ -9,5 +9,9 @@ export default function useVocabQuizDbBackend() {
     return getFactory<FlashcardStudent[]>('vocab-quiz/students');
   };
 
-  return { getStudentsTable };
+  const getStudentsTableCohortFieldOptions = () => {
+    return getFactory<string[]>('vocab-quiz/students/cohort-field-options');
+  };
+
+  return { getStudentsTable, getStudentsTableCohortFieldOptions };
 }

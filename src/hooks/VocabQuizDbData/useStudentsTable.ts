@@ -1,12 +1,20 @@
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
+import type {
+  EditableStudent,
+  NewStudent,
+} from 'src/components/VocabQuizDbTables/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { useProgramTable } from '../CourseData/useProgramTable';
 import { useBackendHelpers } from '../useBackend';
+
 import useVocabQuizDbBackend from './queries/BackendFunctions';
 
 export default function useStudentsTable() {
-  const { getStudentsTable } = useVocabQuizDbBackend();
+  const { getStudentsTable, getStudentsTableCohortFieldOptions } =
+    useVocabQuizDbBackend();
   const { newPostFactory, newPutFactory } = useBackendHelpers();
+
+  const { programTableQuery } = useProgramTable();
 
   const studentsTableQuery = useQuery({
     queryKey: ['students-table'],
@@ -14,9 +22,15 @@ export default function useStudentsTable() {
     staleTime: Infinity,
   });
 
+  const cohortFieldOptionsQuery = useQuery({
+    queryKey: ['cohort-field-options'],
+    queryFn: getStudentsTableCohortFieldOptions,
+    staleTime: Infinity,
+  });
+
   const updateStudentMutation = useMutation({
-    mutationFn: (student: FlashcardStudent) => {
-      const promise = newPutFactory<FlashcardStudent>({
+    mutationFn: (student: EditableStudent) => {
+      const promise = newPutFactory<EditableStudent>({
         path: 'vocab-quiz/students',
         body: student,
       });
@@ -33,8 +47,8 @@ export default function useStudentsTable() {
   });
 
   const createStudentMutation = useMutation({
-    mutationFn: (student: Omit<FlashcardStudent, 'recordId'>) => {
-      const promise = newPostFactory<FlashcardStudent>({
+    mutationFn: (student: NewStudent) => {
+      const promise = newPostFactory<NewStudent>({
         path: 'vocab-quiz/students',
         body: student,
       });
@@ -52,6 +66,8 @@ export default function useStudentsTable() {
 
   return {
     studentsTableQuery,
+    cohortFieldOptionsQuery,
+    programTableQuery,
     updateStudentMutation,
     createStudentMutation,
   };

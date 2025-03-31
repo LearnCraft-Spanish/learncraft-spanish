@@ -1,32 +1,19 @@
 import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
+import type { FilterConfig, SortConfig } from './types';
 import { useCallback, useMemo, useState } from 'react';
-import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useStudentsTable from 'src/hooks/VocabQuizDbData/useStudentsTable';
 import { Loading } from '../Loading';
-import EditStudentView from './components/EditStudentView';
+import { CreateStudent, EditStudent } from './components/EditStudentView';
 import FilterStudentsTable from './components/FilterStudentsTable';
 import StudentTableRow from './components/StudentTableRow';
 import Table from './components/Table';
 
-type SortDirection = 'ascending' | 'descending' | 'none';
-
-interface SortConfig {
-  key: string;
-  direction: SortDirection;
-}
-
-interface FilterConfig {
-  field: string;
-  value: string;
-  operator: string;
-}
-
 export default function VocabQuizDbTables() {
-  const { studentsTableQuery } = useStudentsTable();
-  const { programTableQuery } = useProgramTable();
+  const { studentsTableQuery, cohortFieldOptionsQuery, programTableQuery } =
+    useStudentsTable();
 
-  const { contextual } = useContextualMenu();
+  const { contextual, openContextual } = useContextualMenu();
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: '',
     direction: 'none',
@@ -38,9 +25,18 @@ export default function VocabQuizDbTables() {
     operator: '',
   });
 
-  const isLoading = studentsTableQuery.isLoading;
-  const isError = studentsTableQuery.isError;
-  const isSuccess = studentsTableQuery.isSuccess;
+  const isLoading =
+    studentsTableQuery.isLoading ||
+    cohortFieldOptionsQuery.isLoading ||
+    programTableQuery.isLoading;
+  const isError =
+    studentsTableQuery.isError ||
+    cohortFieldOptionsQuery.isError ||
+    programTableQuery.isError;
+  const isSuccess =
+    studentsTableQuery.isSuccess &&
+    cohortFieldOptionsQuery.isSuccess &&
+    programTableQuery.isSuccess;
 
   const handleSort = (header: string) => {
     setSortConfig((currentConfig) => {
@@ -164,14 +160,6 @@ export default function VocabQuizDbTables() {
     );
   }, [filteredAndSortedData, contextual]);
 
-  const handleUpdate = (_student: FlashcardStudent) => {
-    // TODO: Implement update functionality
-  };
-
-  const _handleCreate = (_student: FlashcardStudent) => {
-    // TODO: Implement create functionality
-  };
-
   return (
     <div>
       {isLoading && <Loading message="Loading StudentData..." />}
@@ -182,6 +170,15 @@ export default function VocabQuizDbTables() {
             filterConfig={filterConfig}
             setFilterConfig={setFilterConfig}
           />
+          <div className="buttonbox">
+            <button
+              className="greenButton"
+              type="button"
+              onClick={() => openContextual('create-student')}
+            >
+              New Student
+            </button>
+          </div>
           <Table
             headers={[
               'Edit Record',
@@ -196,12 +193,8 @@ export default function VocabQuizDbTables() {
             sortConfig={sortConfig}
             onSort={handleSort}
           />
-          {studentToEdit && (
-            <EditStudentView student={studentToEdit} onUpdate={handleUpdate} />
-          )}
-          {/* {contextual.startsWith('create-student') && (
-            <CreateStudentView onUpdate={_handleCreate} />
-          )} */}
+          {studentToEdit && <EditStudent student={studentToEdit} />}
+          {contextual === 'create-student' && <CreateStudent />}
         </>
       )}
     </div>

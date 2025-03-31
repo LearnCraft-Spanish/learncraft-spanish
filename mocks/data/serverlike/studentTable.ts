@@ -8,6 +8,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: '',
     relatedProgram: 2,
     cohort: 'B',
+    program: 'LCSP',
   },
   {
     recordId: 2,
@@ -16,6 +17,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: '',
     relatedProgram: 2,
     cohort: 'A',
+    program: 'LCSP',
   },
   {
     recordId: 3,
@@ -24,6 +26,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: '',
     relatedProgram: 2,
     cohort: 'C',
+    program: 'SI1M',
   },
   {
     recordId: 4,
@@ -32,6 +35,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: 'limited',
     relatedProgram: 3,
     cohort: 'A',
+    program: 'SI1M',
   },
   {
     recordId: 5,
@@ -40,6 +44,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: 'student',
     relatedProgram: 3,
     cohort: 'F',
+    program: 'SI1M',
   },
   {
     recordId: 6,
@@ -48,6 +53,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: 'student',
     relatedProgram: 2,
     cohort: 'G',
+    program: 'LCSP',
   },
   {
     recordId: 7,
@@ -56,6 +62,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: 'student',
     relatedProgram: 5,
     cohort: 'E',
+    program: 'LCSP',
   },
   {
     recordId: 8,
@@ -64,6 +71,7 @@ export const allStudentsTable: FlashcardStudent[] = [
     role: 'student',
     relatedProgram: 2,
     cohort: 'A',
+    program: 'LCSP',
   },
 ];
 
