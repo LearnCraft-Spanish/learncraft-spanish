@@ -27,7 +27,6 @@ export default function StudentRecordView({
   );
   const [editMode, setEditMode] = useState(createMode || false);
   const { openModal } = useModal();
-  // name, email, related program, cohort
 
   const captureSubmitForm = () => {
     const requiredInputs = [

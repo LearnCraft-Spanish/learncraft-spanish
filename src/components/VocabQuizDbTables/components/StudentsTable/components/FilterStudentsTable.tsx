@@ -1,20 +1,18 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { TextInput } from 'src/components/FormComponents/TextInput';
-interface FilterConfig {
-  field: string;
-  value: string;
-  operator: string;
-}
+import type { FilterConfig } from 'src/components/Table/types';
 
-interface FilterStudentsTableProps {
-  filterConfig: FilterConfig;
-  setFilterConfig: Dispatch<SetStateAction<FilterConfig>>;
-}
+import { TextInput } from 'src/components/FormComponents/TextInput';
+
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 export default function FilterStudentsTable({
   filterConfig,
   setFilterConfig,
-}: FilterStudentsTableProps) {
+}: {
+  filterConfig: FilterConfig;
+  setFilterConfig: Dispatch<SetStateAction<FilterConfig>>;
+}) {
+  const { openContextual } = useContextualMenu();
   const handleNameFilterChange = (value: string) => {
     setFilterConfig({
       field: 'name',
@@ -31,6 +29,15 @@ export default function FilterStudentsTable({
         onChange={handleNameFilterChange}
         editMode
       />
+      <div className="buttonbox newStudentButtonWrapper">
+        <button
+          className="greenButton"
+          type="button"
+          onClick={() => openContextual('create-student')}
+        >
+          New Student
+        </button>
+      </div>
     </div>
   );
 }

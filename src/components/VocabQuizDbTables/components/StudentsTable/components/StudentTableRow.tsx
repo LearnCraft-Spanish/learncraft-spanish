@@ -17,11 +17,11 @@ export default function StudentTableRow({
 
   return (
     <tr>
-      <td className="edit-icon-cell">
-        <div
-          onClick={() => openContextual(`edit-student-${recordId}`)}
-          className="edit-icon-container"
-        >
+      <td
+        className="edit-icon-cell"
+        onClick={() => openContextual(`edit-student-${recordId}`)}
+      >
+        <div className="edit-icon-container">
           <img src={pencilIcon} alt="Edit" className="edit-icon" />
         </div>
       </td>

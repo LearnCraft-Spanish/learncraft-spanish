@@ -1,0 +1,111 @@
+.table-wrapper {
+  margin: 1rem;
+}
+
+.body-container {
+  width: auto;
+  table {
+    width: 100%;
+    overflow-y: scroll;
+    margin-top: 1rem;
+    scroll-behavior: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 1rem;
+    line-height: 1.25rem;
+
+    th,
+    td {
+      min-width: 100px;
+      border: 1px solid black;
+      padding: 0.5rem;
+      text-align: start;
+      vertical-align: top;
+      position: relative;
+    }
+
+    thead {
+      th {
+        position: sticky;
+        top: 0px;
+        z-index: 1;
+        color: white;
+        background-color: grey;
+        font-weight: 600;
+
+        &.sortable {
+          cursor: pointer;
+
+          &:hover {
+            background-color: darkgrey;
+          }
+        }
+
+        .thContentWrapper {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          .sortIcon {
+            font-size: 0.75rem;
+            transition: transform 0.2s ease;
+          }
+        }
+      }
+
+      // first cell in thead is sticky
+      th:first-child {
+        position: sticky;
+        left: 0px;
+        z-index: 2;
+      }
+    }
+
+    tbody {
+      td {
+        background-color: #f2f2f2;
+      }
+
+      // first cell in each row is sticky
+      td:first-child {
+        position: sticky;
+        left: 0px;
+        z-index: 1;
+        background-color: var(--accent);
+        font-weight: 600;
+      }
+
+      tr:hover td {
+        // background-color: #e6e6e6;
+      }
+    }
+  }
+}
+.edit-icon {
+  width: 2r.25em;
+  height: 2rem;
+  cursor: pointer;
+}
+
+.edit-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+  width: 2.25rem;
+  height: 2.5rem;
+  background-color: var(--accent);
+  cursor: pointer;
+}
+
+.table-wrapper table tbody td.edit-icon-cell:hover {
+  background-color: gray;
+
+  .edit-icon-container {
+    background-color: gray;
+  }
+}
+
+.noResults {
+  background-color: white !important;
+}

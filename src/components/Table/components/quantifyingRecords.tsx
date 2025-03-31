@@ -1,13 +1,12 @@
-interface QuantifiedRecordsProps {
-  currentPage: number;
-  totalRecords: number;
-  recordsPerPage: number;
-}
 export default function QuantifiedRecords({
   currentPage,
   totalRecords,
   recordsPerPage,
-}: QuantifiedRecordsProps) {
+}: {
+  currentPage: number;
+  totalRecords: number;
+  recordsPerPage: number;
+}) {
   if (totalRecords === 0) {
     return <h5>Showing 0 records</h5>;
   }

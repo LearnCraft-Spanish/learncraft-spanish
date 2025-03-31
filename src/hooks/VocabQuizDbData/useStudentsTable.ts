@@ -1,7 +1,7 @@
 import type {
   EditableStudent,
   NewStudent,
-} from 'src/components/VocabQuizDbTables/types';
+} from 'src/components/VocabQuizDbTables/components/StudentsTable/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useProgramTable } from '../CourseData/useProgramTable';

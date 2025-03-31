@@ -3,11 +3,10 @@ import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import arrowUp from 'src/assets/icons/arrow-up.svg';
-import Pagination from 'src/components/ExamplesTable/Pagination';
 import { Loading } from 'src/components/Loading';
+import { Pagination, QuantifiedRecords } from 'src/components/Table/components';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useBackendHelpers } from 'src/hooks/useBackend';
-import QuantifiedRecords from '../quantifyingRecords';
 import WeeksTableItem from './WeeksTableItem';
 interface WeekWithFailedToUpdate extends Week {
   failedToUpdate?: boolean;
