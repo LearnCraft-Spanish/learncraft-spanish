@@ -136,7 +136,7 @@ export default function Menu() {
               {userDataQuery.data.roles.adminRole === 'admin' && (
                 <div className="buttonBox">
                   <Link className="linkButton" to="/vocabularymanager">
-                    Vocabulary Manager
+                    Create Vocabulary
                   </Link>
                 </div>
               )}

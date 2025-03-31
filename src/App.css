@@ -7,6 +7,8 @@
   --accent: #b0a96f;
   --light: #ffffff;
   --dark: #3c3c3c;
+  --error-bg: darkred;
+  --error-text: red;
 }
 
 * {
