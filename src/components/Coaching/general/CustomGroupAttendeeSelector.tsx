@@ -23,18 +23,20 @@ export default function CustomGroupAttendeeSelector({
 
   const listOfStudents = useMemo(() => {
     if (!weeksQuery.data) return [];
-    const studentList = weeksQuery.data.map((week) => {
-      const student = getStudentFromMembershipId(week.relatedMembership);
-      if (!student) return undefined;
-      return {
-        studentFullName: student?.fullName,
-        weekRecordId: week.recordId,
-        weekStarts:
-          week.weekStarts instanceof Date
-            ? toISODate(week.weekStarts)
-            : week.weekStarts,
-      };
-    });
+    const studentList = weeksQuery.data
+      ?.filter((week) => week.membershipCourseHasGroupCalls)
+      .map((week) => {
+        const student = getStudentFromMembershipId(week.relatedMembership);
+        if (!student) return undefined;
+        return {
+          studentFullName: student?.fullName,
+          weekRecordId: week.recordId,
+          weekStarts:
+            week.weekStarts instanceof Date
+              ? toISODate(week.weekStarts)
+              : week.weekStarts,
+        };
+      });
     return studentList.filter((student) => student !== undefined);
   }, [weeksQuery.data, getStudentFromMembershipId]);
 
@@ -65,6 +67,11 @@ export default function CustomGroupAttendeeSelector({
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             onFocus={() => setOptionsVisible(true)}
+            onBlur={() => {
+              setTimeout(() => {
+                setOptionsVisible(false);
+              }, 200);
+            }}
           />
           {optionsVisible && (
             <div id="optionsWrapper">

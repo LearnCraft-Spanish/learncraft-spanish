@@ -27,7 +27,7 @@ describe('component StudentCell', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <StudentCell week={week} student={student} />
+          <StudentCell week={week} student={student} hiddenFields={[]} />
         </DateRangeProvider>
       </MockAllProviders>,
     );
@@ -40,7 +40,7 @@ describe('component StudentCell', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <StudentCell week={week} student={null} />
+          <StudentCell week={week} student={null} hiddenFields={[]} />
         </DateRangeProvider>
       </MockAllProviders>,
     );
@@ -54,7 +54,7 @@ describe('component StudentCell', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <StudentCell week={week} student={student} />
+          <StudentCell week={week} student={student} hiddenFields={[]} />
         </DateRangeProvider>
       </MockAllProviders>,
     );

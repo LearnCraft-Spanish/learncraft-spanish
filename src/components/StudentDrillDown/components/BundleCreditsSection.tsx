@@ -4,7 +4,7 @@ import type {
   UpdateBundleCreditInput,
 } from 'src/hooks/CoachingData/useBundleCredits';
 import React, { useState } from 'react';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import { useBundleCredits } from 'src/hooks/CoachingData/useBundleCredits';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
@@ -16,7 +16,7 @@ function BundleCreditView({
   studentId: number;
   credit?: BundleCredit;
 }) {
-  const { setContextualRef, closeContextual } = useContextualMenu();
+  const { closeContextual } = useContextualMenu();
   const { createBundleCredit, updateBundleCredit, deleteBundleCredit } =
     useBundleCredits(studentId);
   const { openModal, closeModal } = useModal();
@@ -171,77 +171,70 @@ function BundleCreditView({
   };
 
   return (
-    <div className="contextualWrapper">
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls />
-        <h3>{credit ? 'Edit Bundle Credit' : 'Create Bundle Credit'}</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="totalCredits">Total Credits:</label>
-            <input
-              type="number"
-              id="totalCredits"
-              value={formData.totalCredits}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  totalCredits: e.target.value,
-                })
-              }
-              min="0"
-              step="1"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="usedCredits">Used Credits:</label>
-            <input
-              type="number"
-              id="usedCredits"
-              value={formData.usedCredits}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  usedCredits: e.target.value,
-                })
-              }
-              min="0"
-              step="1"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="expiration">Expiration Date (UTC):</label>
-            <input
-              type="date"
-              id="expiration"
-              value={formData.expiration}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  expiration: e.target.value || undefined,
-                })
-              }
-            />
-          </div>
-          <div className="button-group">
-            <button type="submit" className="primary">
-              {credit ? 'Update' : 'Create'}
+    <ContextualView>
+      <h3>{credit ? 'Edit Bundle Credit' : 'Create Bundle Credit'}</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="totalCredits">Total Credits:</label>
+          <input
+            type="number"
+            id="totalCredits"
+            value={formData.totalCredits}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                totalCredits: e.target.value,
+              })
+            }
+            min="0"
+            step="1"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="usedCredits">Used Credits:</label>
+          <input
+            type="number"
+            id="usedCredits"
+            value={formData.usedCredits}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                usedCredits: e.target.value,
+              })
+            }
+            min="0"
+            step="1"
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="expiration">Expiration Date (UTC):</label>
+          <input
+            type="date"
+            id="expiration"
+            value={formData.expiration}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                expiration: e.target.value || undefined,
+              })
+            }
+          />
+        </div>
+        <div className="button-group">
+          <button type="submit" className="primary">
+            {credit ? 'Update' : 'Create'}
+          </button>
+          <button type="button" onClick={closeContextual} className="secondary">
+            Cancel
+          </button>
+          {credit && (
+            <button type="button" onClick={confirmDelete} className="danger">
+              Delete
             </button>
-            <button
-              type="button"
-              onClick={closeContextual}
-              className="secondary"
-            >
-              Cancel
-            </button>
-            {credit && (
-              <button type="button" onClick={confirmDelete} className="danger">
-                Delete
-              </button>
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
+          )}
+        </div>
+      </form>
+    </ContextualView>
   );
 }
 

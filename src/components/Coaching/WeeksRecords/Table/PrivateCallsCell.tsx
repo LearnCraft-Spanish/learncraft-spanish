@@ -1,6 +1,6 @@
 import type { PrivateCall, Week } from 'src/types/CoachingTypes';
 import React, { useState } from 'react';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   CoachDropdown,
   DateInput,
@@ -28,7 +28,13 @@ const ratingOptions = [
   'No-Show',
 ];
 const callTypeOptions = ['Monthly Call', 'Uses Credit (Bundle)'];
-function PrivateCallInstance({ call }: { call: PrivateCall }) {
+function PrivateCallInstance({
+  call,
+  tableEditMode,
+}: {
+  call: PrivateCall;
+  tableEditMode: boolean;
+}) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
@@ -39,15 +45,22 @@ function PrivateCallInstance({ call }: { call: PrivateCall }) {
       >
         {call.rating}
       </button>
-      {contextual === `call${call.recordId}` && <PrivateCallView call={call} />}
+      {contextual === `call${call.recordId}` && (
+        <PrivateCallView call={call} tableEditMode={tableEditMode} />
+      )}
     </div>
   );
 }
 
-function PrivateCallView({ call }: { call: PrivateCall }) {
+function PrivateCallView({
+  call,
+  tableEditMode,
+}: {
+  call: PrivateCall;
+  tableEditMode?: boolean;
+}) {
   const userDataQuery = useUserData();
-  const { setContextualRef, updateDisableClickOutside, closeContextual } =
-    useContextualMenu();
+  const { updateDisableClickOutside, closeContextual } = useContextualMenu();
   const {
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
@@ -171,106 +184,103 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
   }
 
   return (
-    <div className="contextualWrapper">
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls editFunction={toggleEditMode} />
-        {editMode ? (
-          <h4>Edit Call</h4>
-        ) : (
-          <h4>
+    <ContextualView editFunction={tableEditMode ? undefined : toggleEditMode}>
+      {editMode ? (
+        <h4>Edit Call</h4>
+      ) : (
+        <h4>
+          {
+            getStudentFromMembershipId(
+              getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
+            )?.fullName
+          }{' '}
+          on {typeof call.date === 'string' ? call.date : call.date.toString()}
+        </h4>
+      )}
+      {editMode && (
+        <div className="lineWrapper">
+          <p className="label">Student: </p>
+          <p>
             {
               getStudentFromMembershipId(
                 getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
               )?.fullName
-            }{' '}
-            on{' '}
-            {typeof call.date === 'string' ? call.date : call.date.toString()}
-          </h4>
-        )}
-        {editMode && (
-          <div className="lineWrapper">
-            <p className="label">Student: </p>
-            <p>
-              {
-                getStudentFromMembershipId(
-                  getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
-                )?.fullName
-              }
-            </p>
-          </div>
-        )}
+            }
+          </p>
+        </div>
+      )}
 
-        <CoachDropdown
-          label="Caller"
-          coachEmail={caller}
-          onChange={setCaller}
-          editMode={editMode}
-        />
+      <CoachDropdown
+        label="Caller"
+        coachEmail={caller}
+        onChange={setCaller}
+        editMode={editMode}
+      />
 
-        {editMode && <DateInput value={date} onChange={setDate} />}
+      {editMode && <DateInput value={date} onChange={setDate} />}
 
-        <Dropdown
-          label="Rating"
-          value={rating}
-          onChange={setRating}
-          options={ratingOptions}
-          editMode={editMode}
-        />
+      <Dropdown
+        label="Rating"
+        value={rating}
+        onChange={setRating}
+        options={ratingOptions}
+        editMode={editMode}
+      />
 
-        <TextAreaInput
-          label="Notes"
-          value={notes}
-          onChange={setNotes}
-          editMode={editMode}
-        />
+      <TextAreaInput
+        label="Notes"
+        value={notes}
+        onChange={setNotes}
+        editMode={editMode}
+      />
 
-        <TextAreaInput
-          label="Difficulties"
-          value={areasOfDifficulty}
-          onChange={setAreasOfDifficulty}
-          editMode={editMode}
-        />
+      <TextAreaInput
+        label="Difficulties"
+        value={areasOfDifficulty}
+        onChange={setAreasOfDifficulty}
+        editMode={editMode}
+      />
 
-        <LinkInput
-          label="Recording Link"
-          value={recording}
-          onChange={setRecording}
-          editMode={editMode}
-        />
+      <LinkInput
+        label="Recording Link"
+        value={recording}
+        onChange={setRecording}
+        editMode={editMode}
+      />
 
-        <Dropdown
-          label="Call Type"
-          value={callType}
-          onChange={setCallType}
-          options={callTypeOptions}
-          editMode={editMode}
-        />
+      <Dropdown
+        label="Call Type"
+        value={callType}
+        onChange={setCallType}
+        options={callTypeOptions}
+        editMode={editMode}
+      />
 
-        {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
-          <DeleteRecord deleteFunction={deleteRecordFunction} />
-        )}
+      {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
+        <DeleteRecord deleteFunction={deleteRecordFunction} />
+      )}
 
-        <FormControls
-          captureSubmitForm={captureSubmitForm}
-          cancelEdit={cancelEdit}
-          editMode={editMode}
-        />
-      </div>
-    </div>
+      <FormControls
+        captureSubmitForm={captureSubmitForm}
+        cancelEdit={cancelEdit}
+        editMode={editMode}
+      />
+    </ContextualView>
   );
 }
 
 export default function PrivateCallsCell({
   week,
   calls,
+  tableEditMode,
 }: {
   week: Week;
   calls: PrivateCall[] | null;
+  tableEditMode: boolean;
 }) {
   const { getStudentFromMembershipId, createPrivateCallMutation } =
     useCoaching();
-  const { contextual, setContextualRef, openContextual, closeContextual } =
-    useContextualMenu();
+  const { contextual, openContextual, closeContextual } = useContextualMenu();
   const userDataQuery = useUserData();
   const { openModal } = useModal();
 
@@ -342,77 +352,80 @@ export default function PrivateCallsCell({
       {/* Existing Calls */}
       {calls &&
         calls.map((call) => (
-          <PrivateCallInstance key={call.recordId} call={call} />
+          <PrivateCallInstance
+            key={call.recordId}
+            call={call}
+            tableEditMode={tableEditMode}
+          />
         ))}
       {/* New Call Form */}
-      <button
-        type="button"
-        className="greenButton"
-        onClick={() => openContextual(`addPrivateCall${week.recordId}`)}
-      >
-        New
-      </button>
+      {!tableEditMode && (
+        <button
+          type="button"
+          className="greenButton"
+          onClick={() => openContextual(`addPrivateCall${week.recordId}`)}
+        >
+          New
+        </button>
+      )}
       {contextual === `addPrivateCall${week.recordId}` && (
-        <div className="contextualWrapper callPopup">
-          <div className="contextual" ref={setContextualRef}>
-            <ContextualControls />
-            <h4>
-              {getStudentFromMembershipId(week.relatedMembership)?.fullName} on{' '}
-              {new Date(Date.now()).toISOString().split('T')[0]}
-            </h4>
-            <Dropdown
-              label="Rating"
-              value={rating}
-              onChange={setRating}
-              options={ratingOptions}
-              editMode
-            />
+        <ContextualView>
+          <h4>
+            {getStudentFromMembershipId(week.relatedMembership)?.fullName} on{' '}
+            {new Date(Date.now()).toISOString().split('T')[0]}
+          </h4>
+          <Dropdown
+            label="Rating"
+            value={rating}
+            onChange={setRating}
+            options={ratingOptions}
+            editMode
+          />
 
-            <CoachDropdown
-              label="Caller"
-              coachEmail={caller}
-              onChange={setCaller}
-              editMode
-            />
+          <CoachDropdown
+            label="Caller"
+            coachEmail={caller}
+            onChange={setCaller}
+            editMode
+          />
 
-            <DateInput value={date} onChange={setDate} />
+          <DateInput value={date} onChange={setDate} />
 
-            <TextAreaInput
-              label="Notes"
-              value={notes}
-              onChange={setNotes}
-              editMode
-            />
+          <TextAreaInput
+            label="Notes"
+            value={notes}
+            onChange={setNotes}
+            editMode
+          />
 
-            <TextAreaInput
-              label="Difficulties"
-              value={areasOfDifficulty}
-              onChange={setAreasOfDifficulty}
-              editMode
-            />
+          <TextAreaInput
+            label="Difficulties"
+            value={areasOfDifficulty}
+            onChange={setAreasOfDifficulty}
+            editMode
+          />
 
-            <LinkInput
-              label="Recording Link"
-              value={recording}
-              onChange={setRecording}
-              editMode
-            />
+          <LinkInput
+            label="Recording Link"
+            value={recording}
+            onChange={setRecording}
+            editMode
+          />
 
-            <Dropdown
-              label="Call Type"
-              value={callType}
-              onChange={setCallType}
-              options={callTypeOptions}
-              editMode
-            />
+          <Dropdown
+            label="Call Type"
+            value={callType}
+            onChange={setCallType}
+            options={callTypeOptions}
+            editMode
+          />
 
-            <FormControls
-              captureSubmitForm={createNewPrivateCall}
-              cancelEdit={() => closeContextual()}
-              editMode
-            />
-          </div>
-        </div>
+          <FormControls
+            captureSubmitForm={createNewPrivateCall}
+            cancelEdit={() => closeContextual()}
+            editMode
+          />
+        </ContextualView>
       )}
     </div>
   );
