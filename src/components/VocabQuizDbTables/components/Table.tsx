@@ -1,4 +1,4 @@
-import type { ReactNode} from 'react';
+import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import '../VocabQuizDbTables.scss';
 
@@ -94,7 +94,14 @@ export default function Table<T>({
   onSort,
 }: TableProps<T>) {
   const [page, setPage] = useState(1);
-  const maxPage = Math.ceil(data.length / itemsPerPage);
+  const maxPage = Math.max(1, Math.ceil(data.length / itemsPerPage));
+
+  // Reset page when data changes - moved this hook up before any returns
+  useMemo(() => {
+    if (data.length < (page - 1) * itemsPerPage) {
+      setPage(1);
+    }
+  }, [data.length, page, itemsPerPage]);
 
   const displayData = useMemo(() => {
     return data.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -113,13 +120,6 @@ export default function Table<T>({
     }
     setPage(page - 1);
   }, [page]);
-
-  // Reset page when data changes
-  useMemo(() => {
-    if (data.length < (page - 1) * itemsPerPage) {
-      setPage(1);
-    }
-  }, [data.length, page, itemsPerPage]);
 
   return (
     <>
@@ -166,7 +166,17 @@ export default function Table<T>({
               ))}
             </tr>
           </thead>
-          <tbody>{displayData.map((item) => renderRow(item))}</tbody>
+          <tbody>
+            {displayData.length > 0 ? (
+              displayData.map((item) => renderRow(item))
+            ) : (
+              <tr>
+                <td colSpan={headers.length} className="noResults">
+                  No results found
+                </td>
+              </tr>
+            )}
+          </tbody>
         </table>
       </div>
       <Pagination

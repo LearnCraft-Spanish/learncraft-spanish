@@ -1,18 +1,22 @@
 import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
 import { useState } from 'react';
 import ContextualView from 'src/components/Contextual/ContextualView';
-import { Dropdown, TextInput } from 'src/components/FormComponents';
+import {
+  Dropdown,
+  FormControls,
+  TextInput,
+} from 'src/components/FormComponents';
 
 export default function EditStudentView({
   student,
+  onUpdate,
 }: {
-  student: FlashcardStudent | undefined;
+  student: FlashcardStudent;
+  onUpdate: (student: FlashcardStudent) => void;
 }) {
-  if (!student) {
-    return <div>Student not found</div>;
-  }
   const [editObject, setEditObject] = useState<FlashcardStudent>(student);
   const [editMode, setEditMode] = useState(false);
+
   return (
     <ContextualView editFunction={() => setEditMode(!editMode)}>
       <div>Edit Student View</div>
@@ -49,6 +53,36 @@ export default function EditStudentView({
         }
         editMode={editMode}
       />
+      {editMode && (
+        <FormControls
+          editMode={editMode}
+          cancelEdit={() => setEditMode(false)}
+          captureSubmitForm={() => {
+            onUpdate(editObject);
+            setEditMode(false);
+          }}
+        />
+      )}
     </ContextualView>
+  );
+}
+
+export function CreateStudentView({
+  onUpdate,
+}: {
+  onUpdate: (student: FlashcardStudent) => void;
+}) {
+  return (
+    <EditStudentView
+      student={{
+        recordId: 0,
+        name: '',
+        emailAddress: '',
+        cohort: '',
+        role: '',
+        relatedProgram: 0,
+      }}
+      onUpdate={onUpdate}
+    />
   );
 }
