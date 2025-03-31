@@ -1,5 +1,5 @@
 import type { Coach } from 'src/types/CoachingTypes';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
@@ -11,30 +11,30 @@ export default function useActiveCoach() {
   const isError = userDataQuery.isError || coachListQuery.isError;
   const isSuccess = userDataQuery.isSuccess && coachListQuery.isSuccess;
 
-  const [coach, setCoach] = useState<Coach | null>(null);
+  // const [coach, setCoach] = useState<Coach | null>(null);
 
-  useEffect(() => {
-    if (isSuccess) {
-      const possibleEmailDomains = [
-        '@learncraftspanish.com',
-        '@masterofmemory.com',
-      ];
-      if (userDataQuery.data.emailAddress) {
-        const currentUserCoach = coachListQuery.data.find((coach) => {
-          const emailPrefix = userDataQuery.data.emailAddress
-            .split('@')[0]
-            .toLowerCase();
-          for (const domain of possibleEmailDomains) {
-            if (coach.user.email.toLowerCase() === emailPrefix + domain) {
-              return true;
-            }
+  const coach = useMemo(() => {
+    if (!isSuccess) return null;
+    const possibleEmailDomains = [
+      '@learncraftspanish.com',
+      '@masterofmemory.com',
+    ];
+    if (userDataQuery.data.emailAddress) {
+      const currentUserCoach = coachListQuery.data.find((coach) => {
+        const emailPrefix = userDataQuery.data.emailAddress
+          .split('@')[0]
+          .toLowerCase();
+        for (const domain of possibleEmailDomains) {
+          if (coach.user.email.toLowerCase() === emailPrefix + domain) {
+            return true;
           }
-          return false;
-        });
-        if (currentUserCoach) setCoach(currentUserCoach);
-      }
+        }
+        return false;
+      });
+      if (currentUserCoach) return currentUserCoach;
     }
-  }, [coachListQuery, userDataQuery, isSuccess]);
+    return undefined;
+  }, [isSuccess, userDataQuery.data?.emailAddress, coachListQuery.data]);
 
-  return { states: { isLoading, isError, isSuccess }, coach };
+  return { coach };
 }

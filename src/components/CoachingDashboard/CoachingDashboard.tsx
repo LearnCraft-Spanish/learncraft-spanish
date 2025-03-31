@@ -5,16 +5,15 @@ import { InlineLoading, Loading } from '../Loading';
 import RecentRecords from './components/RecentRecords';
 import useCoachingDashboard from './useCoachingDashboard';
 function CoachingDashboard() {
-  const {
-    states: { isLoading, isError, isSuccess },
-    coach,
-    myIncompleteWeeklyRecords,
-    recentRecords,
-  } = useCoachingDashboard();
-
-  const dataReady = isSuccess && recentRecords !== undefined;
-
   const { startDate } = useDateRange();
+
+  const { coach, myIncompleteWeeklyRecords, states, recentRecords } =
+    useCoachingDashboard();
+
+  const isLoading = states.isLoading;
+  const isError = states.isError;
+  const dataReady = states.isSuccess;
+
   return (
     <div className="coachingDashbaord">
       {isLoading && <Loading message="Loading user data..." />}
@@ -51,7 +50,11 @@ function CoachingDashboard() {
             {/* Recent Activity */}
             <div className="coachingDashbaord__recentActivity">
               <h3>My Recent Records</h3>
-              <RecentRecords recentRecords={recentRecords} />
+              {recentRecords === undefined ? (
+                <InlineLoading message="Loading records..." />
+              ) : (
+                <RecentRecords recentRecords={recentRecords} />
+              )}
             </div>
           </div>
         </>

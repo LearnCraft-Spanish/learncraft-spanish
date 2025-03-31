@@ -63,7 +63,7 @@ export default function useMyIncompleteWeeklyRecords() {
   );
 
   return {
-    states: { isLoading, isError, isSuccess },
     getMyIncompleteWeeklyRecords,
+    states: { isLoading, isError, isSuccess },
   };
 }

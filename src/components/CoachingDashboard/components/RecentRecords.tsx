@@ -29,21 +29,27 @@ export default function RecentRecords({
       <h3>Recent Records</h3>
       <h4>Assignments</h4>
       <ul>
-        {assignments.map((assignment) => (
-          <li key={assignment.recordId}>{assignment.assignmentType}</li>
-        ))}
+        {assignments &&
+          assignments.length > 0 &&
+          assignments.map((assignment) => (
+            <li key={assignment.recordId}>{assignment.assignmentType}</li>
+          ))}
       </ul>
       <h4>Private Calls</h4>
       <ul>
-        {privateCalls.map((privateCall) => (
-          <li key={privateCall.recordId}>{privateCall.callType}</li>
-        ))}
+        {privateCalls &&
+          privateCalls.length > 0 &&
+          privateCalls.map((privateCall) => (
+            <li key={privateCall.recordId}>{privateCall.callType}</li>
+          ))}
       </ul>
       <h4>Group Sessions</h4>
       <ul>
-        {groupSessions.map((groupSession) => (
-          <li key={groupSession.recordId}>{groupSession.sessionType}</li>
-        ))}
+        {groupSessions &&
+          groupSessions.length > 0 &&
+          groupSessions.map((groupSession) => (
+            <li key={groupSession.recordId}>{groupSession.sessionType}</li>
+          ))}
       </ul>
     </div>
   );

@@ -3,57 +3,36 @@ import useActiveCoach from './hooks/useActiveCoach';
 import useMyIncompleteWeeklyRecords from './hooks/useMyIncompleteWeeklyRecords';
 import useMyRecentRecords from './hooks/useMyRecentRecords';
 export default function useCoachingDashboard() {
-  const {
-    states: {
-      isLoading: isLoadingActiveCoach,
-      isError: isErrorActiveCoach,
-      isSuccess: isSuccessActiveCoach,
-    },
-    coach,
-  } = useActiveCoach();
+  const { coach } = useActiveCoach();
 
   const {
     getMyIncompleteWeeklyRecords,
-    states: {
-      isLoading: isLoadingRecords,
-      isError: isErrorRecords,
-      isSuccess: isSuccessRecords,
-    },
+    states: incompleteWeeklyRecordsStates,
   } = useMyIncompleteWeeklyRecords();
 
-  const {
-    myRecentRecordsQuery,
-    states: {
-      isLoading: isLoadingRecentRecords,
-      isError: isErrorRecentRecords,
-      isSuccess: isSuccessRecentRecords,
-    },
-  } = useMyRecentRecords({ coach: coach?.user });
+  const isLoading = incompleteWeeklyRecordsStates.isLoading;
+  const isError = incompleteWeeklyRecordsStates.isError || coach === undefined;
+  const isSuccess =
+    incompleteWeeklyRecordsStates.isSuccess && coach !== undefined;
 
   const myIncompleteWeeklyRecords = useMemo(() => {
-    if (!isSuccessActiveCoach || !isSuccessRecords || !coach) return undefined;
+    if (!coach) return undefined;
     const records = getMyIncompleteWeeklyRecords(coach?.user);
     return records;
-  }, [
-    isSuccessActiveCoach,
-    isSuccessRecords,
-    getMyIncompleteWeeklyRecords,
-    coach,
-  ]);
+  }, [getMyIncompleteWeeklyRecords, coach]);
+
+  const { myRecentRecordsQuery, states: myRecentRecordsStates } =
+    useMyRecentRecords();
+
+  const recentRecords = useMemo(() => {
+    if (!myRecentRecordsQuery.isSuccess) return undefined;
+    return myRecentRecordsQuery.data;
+  }, [myRecentRecordsQuery]);
 
   return {
-    states: {
-      isLoading:
-        isLoadingActiveCoach || isLoadingRecords || isLoadingRecentRecords,
-      isError: isErrorActiveCoach || isErrorRecords || isErrorRecentRecords,
-      isSuccess:
-        isSuccessActiveCoach &&
-        isSuccessRecords &&
-        isSuccessRecentRecords &&
-        myIncompleteWeeklyRecords !== undefined,
-    },
     coach,
     myIncompleteWeeklyRecords,
-    recentRecords: myRecentRecordsQuery.data,
+    recentRecords,
+    states: { isLoading, isError, isSuccess },
   };
 }
