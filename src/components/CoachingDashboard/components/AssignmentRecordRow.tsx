@@ -15,7 +15,11 @@ export default function AssignmentRecordRow({
       <td>{assignment.rating}</td>
       <td>{assignment.areasOfDifficulty}</td>
       <td>{assignment.notes}</td>
-      <td>{assignment.dateCreated}</td>
+      <td>
+        {typeof assignment.dateCreated === 'string'
+          ? assignment.dateCreated
+          : assignment.dateCreated.toLocaleDateString()}
+      </td>
     </tr>
   );
 }

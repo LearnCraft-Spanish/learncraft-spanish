@@ -3,6 +3,10 @@ import type {
   GroupSession,
   PrivateCall,
 } from 'src/types/CoachingTypes';
+import AssignmentRecordRow from './AssignmentRecordRow';
+import GroupCallRecordRow from './GroupCallRecordRow';
+
+import PrivateCallRecordRow from './PrivateCallRecordRow';
 
 interface RecentRecordsObject {
   assignments: Assignment[];
@@ -21,7 +25,6 @@ export default function RecentRecords({
     recentRecords.assignments.length === 0
   )
     return null;
-  console.log(recentRecords);
 
   const { assignments, privateCalls, groupSessions } = recentRecords;
   return (
@@ -32,7 +35,10 @@ export default function RecentRecords({
         {assignments &&
           assignments.length > 0 &&
           assignments.map((assignment) => (
-            <li key={assignment.recordId}>{assignment.assignmentType}</li>
+            <AssignmentRecordRow
+              key={assignment.recordId}
+              assignment={assignment}
+            />
           ))}
       </ul>
       <h4>Private Calls</h4>
@@ -40,7 +46,10 @@ export default function RecentRecords({
         {privateCalls &&
           privateCalls.length > 0 &&
           privateCalls.map((privateCall) => (
-            <li key={privateCall.recordId}>{privateCall.callType}</li>
+            <PrivateCallRecordRow
+              key={privateCall.recordId}
+              privateCall={privateCall}
+            />
           ))}
       </ul>
       <h4>Group Sessions</h4>
@@ -48,7 +57,10 @@ export default function RecentRecords({
         {groupSessions &&
           groupSessions.length > 0 &&
           groupSessions.map((groupSession) => (
-            <li key={groupSession.recordId}>{groupSession.sessionType}</li>
+            <GroupCallRecordRow
+              key={groupSession.recordId}
+              groupCall={groupSession}
+            />
           ))}
       </ul>
     </div>

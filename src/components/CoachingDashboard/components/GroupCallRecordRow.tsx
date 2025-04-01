@@ -1,4 +1,4 @@
-import { GroupSession } from 'src/types/CoachingTypes';
+import type { GroupSession } from 'src/types/CoachingTypes';
 
 export default function GroupCallRecordRow({
   groupCall,
