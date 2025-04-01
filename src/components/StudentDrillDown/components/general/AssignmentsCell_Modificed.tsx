@@ -1,6 +1,6 @@
 import type { Assignment } from 'src/types/CoachingTypes';
 
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   // DeleteRecord,
   Dropdown,
@@ -66,65 +66,61 @@ function AssignmentView({ assignment }: { assignment: Assignment }) {
   //   updateAssignmentMutation,
   //   deleteAssignmentMutation,
   // } = useCoaching();
-  const { setContextualRef } = useContextualMenu();
 
   return (
-    <div className="contextualWrapper" key={`assignment${assignment.recordId}`}>
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls />
-        {<h4>{assignment.assignmentType}</h4>}
+    <ContextualView key={`assignment${assignment.recordId}`}>
+      {<h4>{assignment.assignmentType}</h4>}
 
-        <Dropdown
-          label="Assignment Type"
-          value={assignment.assignmentType}
-          options={assignmentTypes}
-          onChange={() => {}}
-          editMode={false}
-        />
-        <div className="lineWrapper">
-          <h4 className="label">Corrected by</h4>
-          <p className="content">{assignment.homeworkCorrector?.name}</p>
-        </div>
+      <Dropdown
+        label="Assignment Type"
+        value={assignment.assignmentType}
+        options={assignmentTypes}
+        onChange={() => {}}
+        editMode={false}
+      />
+      <div className="lineWrapper">
+        <h4 className="label">Corrected by</h4>
+        <p className="content">{assignment.homeworkCorrector?.name}</p>
+      </div>
 
-        {/* <CoachDropdown
+      {/* <CoachDropdown
           label="Corrected by"
           coachEmail={assignment.homeworkCorrector.email}
           onChange={() => {}}
           editMode={false}
         /> */}
 
-        <Dropdown
-          label="Rating"
-          value={assignment.rating}
-          options={ratings}
-          onChange={() => {}}
-          editMode={false}
-        />
+      <Dropdown
+        label="Rating"
+        value={assignment.rating}
+        options={ratings}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        <TextAreaInput
-          label="Notes"
-          value={assignment.notes}
-          onChange={() => {}}
-          editMode={false}
-        />
+      <TextAreaInput
+        label="Notes"
+        value={assignment.notes}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        <TextAreaInput
-          label="Areas of Difficulty"
-          value={assignment.areasOfDifficulty}
-          onChange={() => {}}
-          editMode={false}
-        />
+      <TextAreaInput
+        label="Areas of Difficulty"
+        value={assignment.areasOfDifficulty}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        <LinkInput
-          label="Assignment Link"
-          value={assignment.assignmentLink}
-          onChange={() => {}}
-          editMode={false}
-        />
+      <LinkInput
+        label="Assignment Link"
+        value={assignment.assignmentLink}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        {/* <DeleteRecord deleteFunction={deleteRecordFunction} /> */}
-      </div>
-    </div>
+      {/* <DeleteRecord deleteFunction={deleteRecordFunction} /> */}
+    </ContextualView>
   );
 }
 

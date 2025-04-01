@@ -1,20 +1,22 @@
 export default function Checkbox({
-  label,
+  labelText,
+  labelFor,
   value,
   onChange,
 }: {
-  label: string;
+  labelText?: string;
+  labelFor: string;
   value: boolean;
   onChange: (value: boolean) => void;
 }) {
   return (
     <div className="lineWrapper">
-      <p className="label">{label}</p>
-      <label htmlFor={label} className="switch">
+      <p className="label">{labelText}</p>
+      <label htmlFor={labelFor} className="switch">
         <input
-          alt={label}
+          alt={labelFor}
           type="checkbox"
-          id={label}
+          id={labelFor}
           checked={value}
           onChange={(e) => onChange(e.target.checked)}
         />

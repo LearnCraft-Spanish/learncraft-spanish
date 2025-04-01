@@ -1,7 +1,6 @@
-import type { QbUser } from 'src/types/CoachingTypes';
 import { useQuery } from '@tanstack/react-query';
-import useCoachingDashboardBackend from './BackendFunctions';
 import useActiveCoach from 'src/components/CoachingDashboard/hooks/useActiveCoach';
+import useCoachingDashboardBackend from './BackendFunctions';
 
 export default function useMyRecentRecordsQuery() {
   const { coach } = useActiveCoach();

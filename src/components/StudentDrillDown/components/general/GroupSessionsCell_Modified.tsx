@@ -1,5 +1,5 @@
 import type { GroupSessionWithAttendees } from 'src/types/CoachingTypes';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 
 import {
   DateInput,
@@ -54,84 +54,78 @@ export function GroupSessionView({
 }: {
   groupSession: GroupSessionWithAttendees;
 }) {
-  const { setContextualRef } = useContextualMenu();
-
   return (
-    <div className="contextualWrapper">
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls />
-
-        <h3>{`Session: ${groupSession.sessionType} on ${groupSession.date}`}</h3>
-        <div>
-          {/* <CoachDropdown
+    <ContextualView>
+      <h3>{`Session: ${groupSession.sessionType} on ${groupSession.date}`}</h3>
+      <div>
+        {/* <CoachDropdown
             coachEmail={groupSession.coach.email}
             onChange={() => {}}
             editMode={false}
           /> */}
-          <div className="lineWrapper">
-            <h4 className="label">Coach</h4>
-            <p className="content">{groupSession.coach.name}</p>
-          </div>
-          <DateInput
-            value={
-              typeof groupSession.date === 'string'
-                ? groupSession.date
-                : groupSession.date.toISOString()
-            }
-            onChange={() => {}}
-          />
-          <Dropdown
-            label="Session Type"
-            value={groupSession.sessionType}
-            onChange={() => {}}
-            options={[]}
-            editMode={false}
-          />
-        </div>
-        <Dropdown
-          value={groupSession.topic}
-          onChange={() => {}}
-          editMode={false}
-          label="Topic"
-          options={[]}
-        />
-        <TextAreaInput
-          label="Comments"
-          value={groupSession.comments}
-          onChange={() => {}}
-          editMode={false}
-        />
-        <LinkInput
-          label="Call Document"
-          value={groupSession.callDocument}
-          onChange={() => {}}
-          editMode={false}
-        />
-        <LinkInput
-          label="Zoom Link"
-          value={groupSession.zoomLink}
-          onChange={() => {}}
-          editMode={false}
-        />
-
         <div className="lineWrapper">
-          <label className="label">Attendees:</label>
-          <div className="content">
-            {groupSession.attendees &&
-              groupSession.attendees.map((attendee) => (
-                // if attendee is to be removed, don't display it
-                <div key={attendee.student} className="attendee-wrapper">
-                  <p> {attendee.weekStudent}</p>
-                </div>
-              ))}
-          </div>
+          <h4 className="label">Coach</h4>
+          <p className="content">{groupSession.coach.name}</p>
         </div>
+        <DateInput
+          value={
+            typeof groupSession.date === 'string'
+              ? groupSession.date
+              : groupSession.date.toISOString()
+          }
+          onChange={() => {}}
+        />
+        <Dropdown
+          label="Session Type"
+          value={groupSession.sessionType}
+          onChange={() => {}}
+          options={[]}
+          editMode={false}
+        />
+      </div>
+      <Dropdown
+        value={groupSession.topic}
+        onChange={() => {}}
+        editMode={false}
+        label="Topic"
+        options={[]}
+      />
+      <TextAreaInput
+        label="Comments"
+        value={groupSession.comments}
+        onChange={() => {}}
+        editMode={false}
+      />
+      <LinkInput
+        label="Call Document"
+        value={groupSession.callDocument}
+        onChange={() => {}}
+        editMode={false}
+      />
+      <LinkInput
+        label="Zoom Link"
+        value={groupSession.zoomLink}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        {/* userDataQuery.data?.roles.adminRole === 'admin' && (
+      <div className="lineWrapper">
+        <label className="label">Attendees:</label>
+        <div className="content">
+          {groupSession.attendees &&
+            groupSession.attendees.map((attendee) => (
+              // if attendee is to be removed, don't display it
+              <div key={attendee.student} className="attendee-wrapper">
+                <p> {attendee.weekStudent}</p>
+              </div>
+            ))}
+        </div>
+      </div>
+
+      {/* userDataQuery.data?.roles.adminRole === 'admin' && (
             <DeleteRecord deleteFunction={deleteRecordFunction} />
           )} */}
-      </div>
-    </div>
+    </ContextualView>
   );
 }
 

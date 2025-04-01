@@ -1,32 +1,33 @@
-import type { Coach, Course, Week } from '../../../types/CoachingTypes';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type {
+  Coach,
+  Course,
+  GroupSession,
+  Week,
+} from '../../../types/CoachingTypes';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Loading } from 'src/components/Loading';
 
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
+import { NewAssignmentView } from './Table/AssignmentsCell';
+
+import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
-
+import ViewWeekRecord from './ViewWeekRecord';
 import '../coaching.scss';
 
-/*
-Notes for Test Cases to write:
+type SortDirection = 'none' | 'ascending' | 'descending';
 
-- Loads & displays data
-- Filters by all filtering options (coach, weeks ago, course) (and others when adding advanced filtering)
-- if coach logged in, defaults to that coach is selected
-- Pagination works (When implemented)
-- Advanced filtering works
-
-
-*/
-
-// Paramaterizing all queries:
-/*
-consider using a context, to pass in the startDate and endDate to all the queries
-*/
 function WeeksRecordsContent() {
   const userDataQuery = useUserData();
   const { startDate } = useDateRange();
@@ -44,12 +45,6 @@ function WeeksRecordsContent() {
     getCourseFromMembershipId,
     getStudentFromMembershipId,
   } = useCoaching();
-  // const queryClient = useQueryClient();
-
-  // const weeksQuery = useQuery({
-  //   queryKey: ['weeks'],
-  //   queryFn: () => getWeeks(),
-  // });
 
   // Filtering state
   const [filterByOneMonthChallenge, setFilterByOneMonthChallenge] =
@@ -65,6 +60,12 @@ function WeeksRecordsContent() {
   // State for the weeks to display
   const [weeks, setWeeks] = useState<Week[] | undefined>();
   const rendered = useRef(false);
+  const { contextual } = useContextualMenu();
+  const [tableEditMode, setTableEditMode] = useState(false);
+
+  // State for sorting
+  const [sortByStudent, setSortByStudent] = useState<boolean>(false);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('none');
 
   const initialDataLoad =
     rendered.current === false &&
@@ -85,7 +86,11 @@ function WeeksRecordsContent() {
     coachListQuery.isSuccess &&
     courseListQuery.isSuccess &&
     activeMembershipsQuery.isSuccess &&
-    activeStudentsQuery.isSuccess;
+    activeStudentsQuery.isSuccess &&
+    groupSessionsQuery.isSuccess &&
+    groupAttendeesQuery.isSuccess &&
+    assignmentsQuery.isSuccess &&
+    privateCallsQuery.isSuccess;
 
   const dataError =
     userDataQuery.isError ||
@@ -98,6 +103,13 @@ function WeeksRecordsContent() {
     groupAttendeesQuery.isError ||
     assignmentsQuery.isError ||
     privateCallsQuery.isError;
+
+  const hiddenFields = useMemo(() => {
+    const fields = [];
+    if (filterByCoach) fields.push('primaryCoach');
+    if (filterByCourse) fields.push('level');
+    return fields;
+  }, [filterByCoach, filterByCourse]);
 
   /* ------------------ Update Filter State ------------------ */
   function updateCoachFilter(coachEmail: string) {
@@ -208,14 +220,50 @@ function WeeksRecordsContent() {
     },
     [filterByCompletion],
   );
+  const handleUpdateSortByStudent = useCallback(() => {
+    if (!sortByStudent) {
+      setSortByStudent(true);
+      setSortDirection('ascending');
+    } else {
+      if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortByStudent(false);
+        setSortDirection('none');
+      }
+    }
+  }, [sortByStudent, sortDirection]);
+
+  const sortWeeks = useCallback(
+    (weeksToSort: Week[]) => {
+      if (!sortByStudent) {
+        return weeksToSort;
+      }
+      if (sortDirection === 'none') {
+        return weeksToSort;
+      }
+
+      return [...weeksToSort].sort((a, b) => {
+        let comparison = 0;
+        const studentA = getStudentFromMembershipId(a.relatedMembership);
+        const studentB = getStudentFromMembershipId(b.relatedMembership);
+        comparison = (studentB?.fullName || '').localeCompare(
+          studentA?.fullName || '',
+        );
+
+        return sortDirection === 'ascending' ? -comparison : comparison;
+      });
+    },
+    [sortByStudent, sortDirection, getStudentFromMembershipId],
+  );
 
   const filterWeeks = useCallback(
-    (weeks: Week[]) => {
+    (weeksToFilter: Week[]) => {
       if (!dataReady) {
         console.error('Data not ready, cannot filter weeks');
-        return weeks;
+        return weeksToFilter;
       }
-      const filteredByCoach = filterByCoachFunction(weeks);
+      const filteredByCoach = filterByCoachFunction(weeksToFilter);
       const filteredByWeeksAgo = filterWeeksByWeeksAgoFunction(filteredByCoach);
       const filteredByOneMonthChallenge =
         filterByOneMonthChallengeFunction(filteredByWeeksAgo);
@@ -223,7 +271,6 @@ function WeeksRecordsContent() {
         filteredByOneMonthChallenge,
       );
       const filteredByHoldWeeks = filterByHoldWeeksFunction(filteredByCourse);
-
       const filteredByCoachless =
         filterWeeksByCoachlessFunction(filteredByHoldWeeks);
       const filteredByCompletion =
@@ -231,8 +278,8 @@ function WeeksRecordsContent() {
       const filteredBySearchTerm =
         filterWeeksBySearchTerm(filteredByCompletion);
 
-      const filteredWeeks = filteredBySearchTerm;
-      return filteredWeeks;
+      // Apply sorting after all filters
+      return sortWeeks(filteredBySearchTerm);
     },
     [
       dataReady,
@@ -244,6 +291,7 @@ function WeeksRecordsContent() {
       filterWeeksByCoachlessFunction,
       filterByCompletionFunction,
       filterWeeksBySearchTerm,
+      sortWeeks,
     ],
   );
 
@@ -292,27 +340,59 @@ function WeeksRecordsContent() {
       {dataError && <p>Error loading data</p>}
       {rendered.current && (
         <>
-          <h2>Weekly Student Records</h2>
-          <div className="filterWrapper">
-            <CoachingFilter
-              dataReady={!!weeks}
-              filterByCoach={filterByCoach}
-              updateCoachFilter={updateCoachFilter}
-              filterByCourse={filterByCourse}
-              updateCourseFilter={updateCourseFilter}
-              searchTerm={filterBySearchTerm || ''}
-              updateSearchTerm={updateFilterBySearchTerm}
-              filterCoachless={filterByCoachless}
-              updateCoachlessFilter={setFilterByCoachless}
-              filterHoldWeeks={filterByHoldWeeks}
-              updateFilterHoldWeeks={updateFilterHoldWeeks}
-              filterByCompletion={filterByCompletion}
-              updateFilterByCompletion={updateFilterByCompletion}
-              filterByOneMonthChallenge={filterByOneMonthChallenge}
-              updateFilterByOneMonthChallenge={updateFilterByOneMonthChallenge}
+          {tableEditMode ? (
+            <h2>Edit Weekly Records</h2>
+          ) : (
+            <h2>Weekly Student Records</h2>
+          )}
+          {!tableEditMode && (
+            <div className="filterWrapper">
+              <CoachingFilter
+                dataReady={!!weeks}
+                filterByCoach={filterByCoach}
+                updateCoachFilter={updateCoachFilter}
+                filterByCourse={filterByCourse}
+                updateCourseFilter={updateCourseFilter}
+                searchTerm={filterBySearchTerm || ''}
+                updateSearchTerm={updateFilterBySearchTerm}
+                filterCoachless={filterByCoachless}
+                updateCoachlessFilter={setFilterByCoachless}
+                filterHoldWeeks={filterByHoldWeeks}
+                updateFilterHoldWeeks={updateFilterHoldWeeks}
+                filterByCompletion={filterByCompletion}
+                updateFilterByCompletion={updateFilterByCompletion}
+                filterByOneMonthChallenge={filterByOneMonthChallenge}
+                updateFilterByOneMonthChallenge={
+                  updateFilterByOneMonthChallenge
+                }
+              />
+            </div>
+          )}
+          <WeeksTable
+            weeks={weeks}
+            tableEditMode={tableEditMode}
+            setTableEditMode={setTableEditMode}
+            hiddenFields={hiddenFields}
+            sortByStudent={sortByStudent}
+            handleUpdateSortByStudent={handleUpdateSortByStudent}
+            sortDirection={sortDirection}
+          />
+          {contextual.startsWith('week') && (
+            <ViewWeekRecord
+              week={weeks?.find(
+                (week) => week.recordId === Number(contextual.split('week')[1]),
+              )}
             />
-          </div>
-          <WeeksTable weeks={weeks} startDate={startDate} />
+          )}
+          {contextual === 'newGroupSession' && (
+            <GroupSessionView
+              groupSession={{ recordId: -1 } as GroupSession}
+              newRecord
+            />
+          )}
+          {contextual === 'newAssignment' && (
+            <NewAssignmentView weekStartsDefaultValue={startDate} />
+          )}
         </>
       )}
     </div>

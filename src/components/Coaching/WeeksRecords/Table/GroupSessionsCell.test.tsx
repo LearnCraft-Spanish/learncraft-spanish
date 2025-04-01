@@ -40,6 +40,7 @@ describe('component StudentCell', () => {
           <GroupSessionsCell
             week={week}
             groupSessions={[relatedGroupSession]}
+            tableEditMode={false}
           />
         </DateRangeProvider>
       </MockAllProviders>,
@@ -59,6 +60,7 @@ describe('component StudentCell', () => {
             <GroupSessionsCell
               week={week}
               groupSessions={[relatedGroupSession]}
+              tableEditMode={false}
             />
           </DateRangeProvider>
         </MockAllProviders>,

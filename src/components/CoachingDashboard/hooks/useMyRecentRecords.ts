@@ -1,4 +1,3 @@
-import type { QbUser } from 'src/types/CoachingTypes';
 import useMyRecentRecordsQuery from 'src/hooks/CoachingData/queries/CoachingDashboard/useMyRecentRecords';
 
 export default function useMyRecentRecords() {

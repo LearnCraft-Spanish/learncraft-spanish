@@ -41,7 +41,15 @@ describe('component WeeksTable', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <WeeksTable weeks={[weeksInRange[0]]} startDate={defaultStartDate} />
+          <WeeksTable
+            weeks={[weeksInRange[0]]}
+            tableEditMode={false}
+            setTableEditMode={() => {}}
+            hiddenFields={[]}
+            sortByStudent={false}
+            handleUpdateSortByStudent={() => {}}
+            sortDirection={'none'}
+          />
         </DateRangeProvider>
       </MockAllProviders>,
     );
@@ -63,7 +71,12 @@ describe('component WeeksTable', () => {
           <DateRangeProvider>
             <WeeksTable
               weeks={[weekWithAssignment]}
-              startDate={defaultStartDate}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
+              sortDirection={'none'}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -103,7 +116,12 @@ describe('component WeeksTable', () => {
           <DateRangeProvider>
             <WeeksTable
               weeks={[weekWithGroupSession]}
-              startDate={defaultStartDate}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
+              sortDirection={'none'}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -176,7 +194,12 @@ describe('component WeeksTable', () => {
           <DateRangeProvider>
             <WeeksTable
               weeks={[weekWithHoldWeek]}
-              startDate={defaultStartDate}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
+              sortDirection={'none'}
             />
           </DateRangeProvider>
         </MockAllProviders>,
@@ -201,7 +224,12 @@ describe('component WeeksTable', () => {
           <DateRangeProvider>
             <WeeksTable
               weeks={[weekWithRecordsComplete]}
-              startDate={defaultStartDate}
+              tableEditMode={false}
+              setTableEditMode={() => {}}
+              hiddenFields={[]}
+              sortByStudent={false}
+              handleUpdateSortByStudent={() => {}}
+              sortDirection={'none'}
             />
           </DateRangeProvider>
         </MockAllProviders>,

@@ -1,6 +1,6 @@
 import type { PrivateCall } from 'src/types/CoachingTypes';
 import React from 'react';
-import ContextualControls from 'src/components/ContextualControls';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Dropdown,
   LinkInput,
@@ -50,91 +50,85 @@ function PrivateCallView({
   call: PrivateCall;
   studentName: string;
 }) {
-  const { setContextualRef } = useContextualMenu();
-
   return (
-    <div className="contextualWrapper">
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls />
-
-        <h4>
-          {/* {
+    <ContextualView>
+      <h4>
+        {/* {
               getStudentFromMembershipId(
                 getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
               )?.fullName
             }{' '} */}
-          {studentName} on{' '}
-          {typeof call.date === 'string' ? call.date : call.date.toString()}
-        </h4>
+        {studentName} on{' '}
+        {typeof call.date === 'string' ? call.date : call.date.toString()}
+      </h4>
 
-        <div className="lineWrapper">
-          <p className="label">Student: </p>
-          {/* <p>
+      <div className="lineWrapper">
+        <p className="label">Student: </p>
+        {/* <p>
               {
                 getStudentFromMembershipId(
                   getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
                 )?.fullName
               }
             </p> */}
-          {studentName}
-        </div>
+        {studentName}
+      </div>
 
-        <div className="lineWrapper">
-          <h4 className="label">Caller</h4>
-          <p className="content">{call.caller.name}</p>
-        </div>
+      <div className="lineWrapper">
+        <h4 className="label">Caller</h4>
+        <p className="content">{call.caller.name}</p>
+      </div>
 
-        {/* <CoachDropdown
+      {/* <CoachDropdown
           label="Caller"
           coachEmail={call.caller}
           onChange={() => {}}
           editMode={false}
         /> */}
 
-        {/* {editMode && <DateInput value={date} onChange={setDate} />} */}
+      {/* {editMode && <DateInput value={date} onChange={setDate} />} */}
 
-        <Dropdown
-          label="Rating"
-          value={call.rating}
-          onChange={() => {}}
-          options={ratingOptions}
-          editMode={false}
-        />
+      <Dropdown
+        label="Rating"
+        value={call.rating}
+        onChange={() => {}}
+        options={ratingOptions}
+        editMode={false}
+      />
 
-        <TextAreaInput
-          label="Notes"
-          value={call.notes}
-          onChange={() => {}}
-          editMode={false}
-        />
+      <TextAreaInput
+        label="Notes"
+        value={call.notes}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        <TextAreaInput
-          label="Difficulties"
-          value={call.areasOfDifficulty}
-          onChange={() => {}}
-          editMode={false}
-        />
+      <TextAreaInput
+        label="Difficulties"
+        value={call.areasOfDifficulty}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        <LinkInput
-          label="Recording Link"
-          value={call.recording}
-          onChange={() => {}}
-          editMode={false}
-        />
+      <LinkInput
+        label="Recording Link"
+        value={call.recording}
+        onChange={() => {}}
+        editMode={false}
+      />
 
-        <Dropdown
-          label="Call Type"
-          value={call.callType}
-          onChange={() => {}}
-          options={callTypeOptions}
-          editMode={false}
-        />
+      <Dropdown
+        label="Call Type"
+        value={call.callType}
+        onChange={() => {}}
+        options={callTypeOptions}
+        editMode={false}
+      />
 
-        {/* {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
+      {/* {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
           <DeleteRecord deleteFunction={deleteRecordFunction} />
         )} */}
-      </div>
-    </div>
+    </ContextualView>
   );
 }
 

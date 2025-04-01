@@ -1,5 +1,4 @@
-import type { Coach } from 'src/types/CoachingTypes';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
