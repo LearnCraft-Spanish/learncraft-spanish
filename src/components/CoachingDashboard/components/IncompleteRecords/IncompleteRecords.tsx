@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import WeeksTableItem from 'src/components/Coaching/WeeksRecords/Table/WeeksTableItem';
+import ViewWeekRecord from 'src/components/Coaching/WeeksRecords/ViewWeekRecord';
 import { InlineLoading } from 'src/components/Loading';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useActiveCoach from '../../hooks/useActiveCoach';
 import useMyIncompleteWeeklyRecords from '../../hooks/useMyIncompleteWeeklyRecords';
 import DisplayOnlyTable from '../RecentRecords/DisplayOnlyTable';
 import SectionHeader from '../SectionHeader';
 
 export function IncompleteRecords() {
+  const { contextual } = useContextualMenu();
+
   const { coach } = useActiveCoach();
   const { myIncompleteWeeklyRecords, startDate } = useMyIncompleteWeeklyRecords(
     {
@@ -51,6 +55,13 @@ export function IncompleteRecords() {
               );
             }}
           />
+          {contextual.startsWith('week') && (
+            <ViewWeekRecord
+              week={myIncompleteWeeklyRecords?.find(
+                (week) => week.recordId === Number(contextual.split('week')[1]),
+              )}
+            />
+          )}{' '}
         </>
       )}
     </div>

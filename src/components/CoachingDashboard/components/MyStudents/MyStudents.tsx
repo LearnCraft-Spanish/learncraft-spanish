@@ -147,7 +147,7 @@ export default function IncompleteRecordsWrapper() {
 */
 
 export default function MyStudentsWrapper() {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const openFunctionWrapper = (_title: string) => {
     setIsOpen(!isOpen);
   };

@@ -1,12 +1,25 @@
 import type { Assignment } from 'src/types/CoachingTypes';
+import eye from 'src/assets/icons/eye.svg';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 export default function AssignmentRecordRow({
   assignment,
 }: {
   assignment: Assignment;
 }) {
+  const { openContextual } = useContextualMenu();
   return (
     <tr>
+      <td className="viewRecordIconCell">
+        <img
+          src={eye}
+          alt="view record"
+          className="viewRecordIcon"
+          onClick={() => {
+            openContextual(`assignment-${assignment.recordId}`);
+          }}
+        />
+      </td>
       <td>{assignment.assignmentName}</td>
       <td>{assignment.assignmentType}</td>
       {/* <td>{assignment.primaryCoach.name}</td> */}

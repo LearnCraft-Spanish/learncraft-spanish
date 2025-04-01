@@ -52,7 +52,7 @@ function PrivateCallInstance({
   );
 }
 
-function PrivateCallView({
+export function PrivateCallView({
   call,
   tableEditMode,
 }: {
