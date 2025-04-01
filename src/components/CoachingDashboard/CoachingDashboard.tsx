@@ -1,14 +1,12 @@
 import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
 import WeeksTable from '../Coaching/WeeksRecords/Table/WeeksTable';
-import useDateRange from '../Coaching/WeeksRecords/useDateRange';
 import { InlineLoading, Loading } from '../Loading';
 import RecentRecords from './components/RecentRecords';
 import useCoachingDashboard from './useCoachingDashboard';
-function CoachingDashboard() {
-  const { startDate } = useDateRange();
+import './CoachingDashboard.scss';
 
-  const { coach, myIncompleteWeeklyRecords, states, recentRecords } =
-    useCoachingDashboard();
+function CoachingDashboard() {
+  const { coach, myIncompleteWeeklyRecords, states } = useCoachingDashboard();
 
   const isLoading = states.isLoading;
   const isError = states.isError;
@@ -38,7 +36,12 @@ function CoachingDashboard() {
               ) : (
                 <WeeksTable
                   weeks={myIncompleteWeeklyRecords ?? []}
-                  startDate={startDate}
+                  tableEditMode={false}
+                  setTableEditMode={() => {}}
+                  hiddenFields={[]}
+                  sortByStudent={false}
+                  handleUpdateSortByStudent={() => {}}
+                  sortDirection={'none'}
                 />
               )}
             </div>
@@ -49,12 +52,7 @@ function CoachingDashboard() {
             </div>
             {/* Recent Activity */}
             <div className="coachingDashbaord__recentActivity">
-              <h3>My Recent Records</h3>
-              {recentRecords === undefined ? (
-                <InlineLoading message="Loading records..." />
-              ) : (
-                <RecentRecords recentRecords={recentRecords} />
-              )}
+              <RecentRecords />
             </div>
           </div>
         </>

@@ -12,7 +12,18 @@ export default function PrivateCallRecordRow({
       <td>{privateCall.rating}</td>
       <td>{privateCall.areasOfDifficulty}</td>
       <td>{privateCall.notes}</td>
-      <td>{privateCall.recording}</td>
+      <td>
+        {privateCall.recording && (
+          <a
+            className="content"
+            href={privateCall.recording}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Recording
+          </a>
+        )}
+      </td>
       <td>{privateCall.caller.name}</td>
       <td>
         {typeof privateCall.date === 'string'

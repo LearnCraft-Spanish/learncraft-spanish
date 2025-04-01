@@ -21,18 +21,9 @@ export default function useCoachingDashboard() {
     return records;
   }, [getMyIncompleteWeeklyRecords, coach]);
 
-  const { myRecentRecordsQuery, states: myRecentRecordsStates } =
-    useMyRecentRecords();
-
-  const recentRecords = useMemo(() => {
-    if (!myRecentRecordsQuery.isSuccess) return undefined;
-    return myRecentRecordsQuery.data;
-  }, [myRecentRecordsQuery]);
-
   return {
     coach,
     myIncompleteWeeklyRecords,
-    recentRecords,
     states: { isLoading, isError, isSuccess },
   };
 }

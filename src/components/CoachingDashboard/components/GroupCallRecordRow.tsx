@@ -13,7 +13,19 @@ export default function GroupCallRecordRow({
           : groupCall.date.toLocaleDateString()}
       </td>
       <td>{groupCall.coach.name}</td>
-      <td>{groupCall.zoomLink}</td>
+      <td>
+        {groupCall.zoomLink && (
+          <a
+            className="content"
+            href={groupCall.zoomLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Zoom Link
+          </a>
+        )}
+      </td>
+
       <td>{groupCall.topic}</td>
       <td>{groupCall.comments}</td>
       <td>Add Attendee</td>

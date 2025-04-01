@@ -1,7 +1,7 @@
 import useMyRecentRecordsQuery from 'src/hooks/CoachingData/queries/CoachingDashboard/useMyRecentRecords';
 
-export default function useMyRecentRecords() {
-  const { myRecentRecordsQuery } = useMyRecentRecordsQuery();
+export default function useMyRecentRecords(month: number) {
+  const { myRecentRecordsQuery } = useMyRecentRecordsQuery(month);
 
   return {
     myRecentRecordsQuery,

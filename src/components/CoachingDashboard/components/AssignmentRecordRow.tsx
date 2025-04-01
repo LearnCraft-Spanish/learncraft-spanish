@@ -11,7 +11,18 @@ export default function AssignmentRecordRow({
       <td>{assignment.assignmentType}</td>
       {/* <td>{assignment.primaryCoach.name}</td> */}
       <td>{assignment.homeworkCorrector.name}</td>
-      <td>{assignment.assignmentLink}</td>
+      <td>
+        {assignment.assignmentLink && (
+          <a
+            className="content"
+            href={assignment.assignmentLink}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Assignment Link
+          </a>
+        )}
+      </td>
       <td>{assignment.rating}</td>
       <td>{assignment.areasOfDifficulty}</td>
       <td>{assignment.notes}</td>
