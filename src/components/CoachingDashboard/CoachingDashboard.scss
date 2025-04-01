@@ -61,3 +61,24 @@
     cursor: pointer;
   }
 }
+
+.viewRecordIconCell {
+  // display: flex;
+  // align-items: center;
+  // justify-content: center;
+  // width: 100%;
+  // height: 100%;
+  position: relative;
+  .viewRecordIcon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.viewRecordIconCell:hover {
+  background-color: lightgray !important;
+}

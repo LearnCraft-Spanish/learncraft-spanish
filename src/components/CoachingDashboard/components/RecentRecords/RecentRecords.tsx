@@ -1,10 +1,16 @@
-import type { Assignment } from 'src/types/CoachingTypes';
+import type {
+  Assignment,
+  GroupSession,
+  PrivateCall,
+} from 'src/types/CoachingTypes';
 
 import { useMemo, useState } from 'react';
 import {
   AssignmentView,
   NewAssignmentView,
 } from 'src/components/Coaching/WeeksRecords/Table/AssignmentsCell';
+import { GroupSessionView } from 'src/components/Coaching/WeeksRecords/Table/GroupSessionsCell';
+import { PrivateCallView } from 'src/components/Coaching/WeeksRecords/Table/PrivateCallsCell';
 import { InlineLoading } from 'src/components/Loading';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 // import Table from 'src/components/Table/Table';
@@ -86,8 +92,7 @@ export function RecentRecords() {
               <button
                 type="button"
                 className="newRecordButton"
-                onClick={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   openContextual('new-assignment');
                 }}
               >
@@ -99,6 +104,7 @@ export function RecentRecords() {
             colapsableMenuObject.sectionTitle === 'Assignments' && (
               <DisplayOnlyTable
                 headers={[
+                  'View',
                   'Assignment',
                   'Type',
                   'Corrector',
@@ -125,12 +131,24 @@ export function RecentRecords() {
               colapsableMenuObject.sectionTitle === 'Private Calls'
             }
             openFunction={updateColapsableMenuOpen}
+            // button={
+            //   <button
+            //     type="button"
+            //     className="newRecordButton"
+            //     onClick={(e) => {
+            //       openContextual('new-private-call');
+            //     }}
+            //   >
+            //     New Private Call
+            //   </button>
+            // }
           />
 
           {colapsableMenuObject.colapsableMenuOpen &&
             colapsableMenuObject.sectionTitle === 'Private Calls' && (
               <DisplayOnlyTable
                 headers={[
+                  'View',
                   'Week',
                   'Rating',
                   'Areas of Difficulty',
@@ -157,11 +175,23 @@ export function RecentRecords() {
               colapsableMenuObject.sectionTitle === 'Group Sessions'
             }
             openFunction={updateColapsableMenuOpen}
+            button={
+              <button
+                type="button"
+                className="newRecordButton"
+                onClick={() => {
+                  openContextual('new-group-call');
+                }}
+              >
+                New Group Call
+              </button>
+            }
           />
           {colapsableMenuObject.colapsableMenuOpen &&
             colapsableMenuObject.sectionTitle === 'Group Sessions' && (
               <DisplayOnlyTable
                 headers={[
+                  'View',
                   'Date',
                   'Coach',
                   'Zoom Link',
@@ -180,15 +210,40 @@ export function RecentRecords() {
             )}
           {/* contextuals records */}
           {contextual === 'new-assignment' && <NewAssignmentViewWrapper />}
-          {/* {contextual.startsWith('assignment') && (
+          {contextual.startsWith('assignment') && (
             <AssignmentViewWrapper
               assignment={assignments.find(
                 (assignment) =>
                   assignment.recordId ===
-                  Number(contextual.split('assignment')[1])!,
+                  Number(contextual.split('assignment-')[1])!,
               )}
             />
-          )} */}
+          )}
+          {/* 
+          ------------------------------------------------------------
+          New private call veiw is going to take more work to refactor, coming back to this
+          ------------------------------------------------------------
+          */}
+          {/* {contextual === 'new-private-call' && <NewPrivateCallViewWrapper />} */}
+          {contextual.startsWith('private-call') && (
+            <PrivateCallViewWrapper
+              privateCall={privateCalls.find(
+                (privateCall) =>
+                  privateCall.recordId ===
+                  Number(contextual.split('private-call-')[1])!,
+              )}
+            />
+          )}
+          {contextual === 'new-group-call' && <NewGroupCallViewWrapper />}
+          {contextual.startsWith('group-call') && (
+            <GroupCallViewWrapper
+              groupCall={groupSessions.find(
+                (groupCall) =>
+                  groupCall.recordId ===
+                  Number(contextual.split('group-call-')[1])!,
+              )}
+            />
+          )}
         </>
       )}
     </div>
@@ -210,7 +265,7 @@ export default function RecentRecordsWrapper() {
 }
 
 /* temp, remove or move to new file */
-function _AssignmentViewWrapper({
+function AssignmentViewWrapper({
   assignment,
 }: {
   assignment: Assignment | undefined;
@@ -239,4 +294,35 @@ function NewAssignmentViewWrapper() {
     return dayOfWeek >= 3 ? dates[0].date : dates[1].date;
   }, []);
   return <NewAssignmentView weekStartsDefaultValue={startDate} />;
+}
+
+function PrivateCallViewWrapper({
+  privateCall,
+}: {
+  privateCall: PrivateCall | undefined;
+}) {
+  if (!privateCall) return null;
+  return <PrivateCallView call={privateCall} />;
+}
+
+// function NewPrivateCallViewWrapper() {
+//   return <NewPrivateCallView />;
+// }
+
+function GroupCallViewWrapper({
+  groupCall,
+}: {
+  groupCall: GroupSession | undefined;
+}) {
+  if (!groupCall) return null;
+  return <GroupSessionView groupSession={groupCall} />;
+}
+
+function NewGroupCallViewWrapper() {
+  return (
+    <GroupSessionView
+      groupSession={{ recordId: -1 } as GroupSession}
+      newRecord
+    />
+  );
 }
