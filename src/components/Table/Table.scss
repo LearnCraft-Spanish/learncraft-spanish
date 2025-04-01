@@ -4,10 +4,12 @@
 
 .body-container {
   width: auto;
+  max-height: 90vh;
+  overflow-x: auto;
+  margin-top: 1rem;
+
   table {
     width: 100%;
-    overflow-y: scroll;
-    margin-top: 1rem;
     scroll-behavior: auto;
     border-collapse: separate;
     border-spacing: 0;

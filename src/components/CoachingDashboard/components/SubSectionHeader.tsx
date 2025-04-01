@@ -1,12 +1,15 @@
-export default function SectionHeader({
+export default function SubSectionHeader({
   title,
+  recordCountString,
   isOpen,
   openFunction,
   button,
 }: {
   title: string;
+  recordCountString: string;
   isOpen: boolean;
   openFunction: (title: string) => void;
+  headerSize?: 'h3';
   button?: React.ReactNode;
 }) {
   return (
@@ -20,7 +23,8 @@ export default function SectionHeader({
         >
           ▲
         </div>
-        <h2>{title}</h2>
+        <h3>{title}</h3>
+        <p>{recordCountString}</p>
       </div>
       {isOpen && button}
     </div>

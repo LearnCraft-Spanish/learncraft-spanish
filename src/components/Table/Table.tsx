@@ -90,7 +90,7 @@ export default function Table<T>({
             ) : (
               <tr>
                 <td colSpan={headers.length} className="noResults">
-                  No results found
+                  No records found
                 </td>
               </tr>
             )}

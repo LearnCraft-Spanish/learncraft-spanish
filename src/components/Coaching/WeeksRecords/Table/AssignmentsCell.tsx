@@ -53,7 +53,7 @@ const ratings = [
   'Advanced',
 ];
 
-function AssignmentCell({
+export function AssignmentCell({
   assignment,
   tableEditMode,
 }: {
@@ -77,7 +77,7 @@ function AssignmentCell({
   );
 }
 
-function AssignmentView({
+export function AssignmentView({
   assignment,
   tableEditMode,
 }: {

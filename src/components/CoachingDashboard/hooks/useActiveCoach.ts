@@ -10,8 +10,6 @@ export default function useActiveCoach() {
   const isError = userDataQuery.isError || coachListQuery.isError;
   const isSuccess = userDataQuery.isSuccess && coachListQuery.isSuccess;
 
-  // const [coach, setCoach] = useState<Coach | null>(null);
-
   const coach = useMemo(() => {
     if (!isSuccess) return null;
     const possibleEmailDomains = [
@@ -35,5 +33,5 @@ export default function useActiveCoach() {
     return undefined;
   }, [isSuccess, userDataQuery.data?.emailAddress, coachListQuery.data]);
 
-  return { coach };
+  return { coach, states: { isLoading, isError, isSuccess } };
 }

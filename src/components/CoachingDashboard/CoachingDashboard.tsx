@@ -1,12 +1,13 @@
 import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
-import WeeksTable from '../Coaching/WeeksRecords/Table/WeeksTable';
-import { InlineLoading, Loading } from '../Loading';
+import { Loading } from '../Loading';
+import IncompleteRecords from './components/IncompleteRecords';
+import MyStudents from './components/MyStudents/MyStudents';
 import RecentRecords from './components/RecentRecords';
 import useCoachingDashboard from './useCoachingDashboard';
 import './CoachingDashboard.scss';
 
 function CoachingDashboard() {
-  const { coach, myIncompleteWeeklyRecords, states } = useCoachingDashboard();
+  const { coach, states } = useCoachingDashboard();
 
   const isLoading = states.isLoading;
   const isError = states.isError;
@@ -24,32 +25,15 @@ function CoachingDashboard() {
       {dataReady && (
         <>
           <div className="coachingDashbaord__header">
-            <h1>Coaching Dashboard</h1>
-            <h2>Welcome back, {coach?.user.name}</h2>
+            <h1 className="coachingDashbaord__header__title">
+              {`Welcome back, ${coach?.user.name}!`}
+            </h1>
           </div>
-          <div className="coachingDashbaord__content">
+          <div className="coachingDashbaordBody">
             {/* Records to Complete */}
-            <div className="coachingDashbaord__recordsToComplete">
-              <h3>Records to Complete</h3>
-              {myIncompleteWeeklyRecords === undefined ? (
-                <InlineLoading message="Loading records..." />
-              ) : (
-                <WeeksTable
-                  weeks={myIncompleteWeeklyRecords ?? []}
-                  tableEditMode={false}
-                  setTableEditMode={() => {}}
-                  hiddenFields={[]}
-                  sortByStudent={false}
-                  handleUpdateSortByStudent={() => {}}
-                  sortDirection={'none'}
-                />
-              )}
-            </div>
+            <IncompleteRecords />
             {/* Student Drill Down */}
-            <div className="coachingDashbaord__studentDrillDown">
-              <h3>Student Drill Down</h3>
-              <ul></ul>
-            </div>
+            <MyStudents />
             {/* Recent Activity */}
             <div className="coachingDashbaord__recentActivity">
               <RecentRecords />

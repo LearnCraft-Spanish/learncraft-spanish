@@ -1,6 +1,7 @@
 import useMyRecentRecordsQuery from 'src/hooks/CoachingData/queries/CoachingDashboard/useMyRecentRecords';
 
-export default function useMyRecentRecords(month: number) {
+// month is in the format of 'YYYY:MM'
+export default function useMyRecentRecords(month: string) {
   const { myRecentRecordsQuery } = useMyRecentRecordsQuery(month);
 
   return {
