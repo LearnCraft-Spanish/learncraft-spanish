@@ -146,6 +146,11 @@ export default function Menu() {
                   Example Manager
                 </Link>
               </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/vocab-quiz-db-tables">
+                  Vocab Quiz DB Tables
+                </Link>
+              </div>
             </>
           )}
         </div>
