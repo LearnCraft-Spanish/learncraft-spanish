@@ -56,9 +56,10 @@ export type UserData = Expanded<{
   cohort: string;
   relatedProgram: number;
   roles: {
-    studentRole: '' | 'limited' | 'student';
+    studentRole: '' | 'limited' | 'student' | 'none';
     adminRole: '' | 'coach' | 'admin';
   };
+  program: 'LCSP' | 'SI1M';
 }>;
 
 export type FlashcardStudent = Expanded<{
@@ -67,7 +68,8 @@ export type FlashcardStudent = Expanded<{
   emailAddress: string;
   cohort: string;
   relatedProgram: number;
-  role: '' | 'limited' | 'student';
+  role: '' | 'limited' | 'student' | 'none';
+  program: 'LCSP' | 'SI1M';
 }>;
 
 export type selectedProgram = Expanded<Program | null>;

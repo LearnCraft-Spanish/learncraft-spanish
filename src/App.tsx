@@ -27,6 +27,7 @@ export const App: React.FC = () => {
         location.pathname !== '/audioquiz' &&
         location.pathname !== '/myflashcards/quiz' &&
         location.pathname !== '/myflashcards/srsquiz' &&
+        location.pathname !== '/coaching-dashboard' &&
         location.pathname.split('/')[1] !== 'officialquizzes' && <SubHeader />}
 
       {isLoading && !isAuthenticated && <Loading message="Logging in..." />}

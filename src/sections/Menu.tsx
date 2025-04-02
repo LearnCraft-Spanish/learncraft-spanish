@@ -131,6 +131,11 @@ export default function Menu() {
                   Student Drill Down
                 </Link>
               </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/coaching-dashboard">
+                  Coaching Dashboard
+                </Link>
+              </div>
             </div>
           )}
           {userDataQuery.data.roles.adminRole === 'admin' && (
@@ -141,6 +146,11 @@ export default function Menu() {
                   Example Manager
                 </Link>
               </div>
+              {/* <div className="buttonBox">
+                <Link className="linkButton" to="/vocab-quiz-db-tables">
+                  Vocab Quiz DB Tables
+                </Link>
+              </div> */}
             </>
           )}
         </div>

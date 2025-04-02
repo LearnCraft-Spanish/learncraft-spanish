@@ -19,10 +19,10 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
 import { NewAssignmentView } from './Table/AssignmentsCell';
+
 import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
-
 import ViewWeekRecord from './ViewWeekRecord';
 import '../coaching.scss';
 
@@ -30,7 +30,6 @@ type SortDirection = 'none' | 'ascending' | 'descending';
 
 function WeeksRecordsContent() {
   const userDataQuery = useUserData();
-  const { contextual } = useContextualMenu();
   const { startDate } = useDateRange();
   const {
     weeksQuery,
@@ -61,7 +60,7 @@ function WeeksRecordsContent() {
   // State for the weeks to display
   const [weeks, setWeeks] = useState<Week[] | undefined>();
   const rendered = useRef(false);
-
+  const { contextual } = useContextualMenu();
   const [tableEditMode, setTableEditMode] = useState(false);
 
   // State for sorting

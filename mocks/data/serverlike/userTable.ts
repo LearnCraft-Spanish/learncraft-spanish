@@ -11,6 +11,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 2,
     cohort: 'B',
+    program: 'LCSP',
   },
   {
     recordId: 2,
@@ -22,6 +23,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 2,
     cohort: 'A',
+    program: 'LCSP',
   },
   {
     recordId: 3,
@@ -33,6 +35,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 2,
     cohort: 'C',
+    program: 'LCSP',
   },
   {
     recordId: 4,
@@ -44,6 +47,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 3,
     cohort: 'A',
+    program: 'SI1M',
   },
   {
     recordId: 5,
@@ -55,6 +59,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 3,
     cohort: 'F',
+    program: 'SI1M',
   },
   {
     recordId: 6,
@@ -66,6 +71,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 2,
     cohort: 'D',
+    program: 'LCSP',
   },
   {
     recordId: 7,
@@ -77,6 +83,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 5,
     cohort: 'E',
+    program: 'LCSP',
   },
   {
     recordId: 8,
@@ -88,6 +95,7 @@ export const allUsersTable: UserData[] = [
     },
     relatedProgram: 2,
     cohort: 'A',
+    program: 'LCSP',
   },
 ];
 

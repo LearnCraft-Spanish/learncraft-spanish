@@ -1,8 +1,8 @@
 import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Pagination } from 'src/components/Table/components';
 import ExampleListItem from './ExampleListItem';
-import Pagination from './Pagination';
 
 import './ExamplesTable.scss';
 
