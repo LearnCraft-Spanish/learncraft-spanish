@@ -10,7 +10,10 @@ import {
   NewAssignmentView,
 } from 'src/components/Coaching/WeeksRecords/Table/AssignmentsCell';
 import { GroupSessionView } from 'src/components/Coaching/WeeksRecords/Table/GroupSessionsCell';
-import { PrivateCallView } from 'src/components/Coaching/WeeksRecords/Table/PrivateCallsCell';
+import {
+  NewPrivateCallView,
+  PrivateCallView,
+} from 'src/components/Coaching/WeeksRecords/Table/PrivateCallsCell';
 import { InlineLoading } from 'src/components/Loading';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 // import Table from 'src/components/Table/Table';
@@ -131,17 +134,17 @@ export function RecentRecords() {
               colapsableMenuObject.sectionTitle === 'Private Calls'
             }
             openFunction={updateColapsableMenuOpen}
-            // button={
-            //   <button
-            //     type="button"
-            //     className="newRecordButton"
-            //     onClick={(e) => {
-            //       openContextual('new-private-call');
-            //     }}
-            //   >
-            //     New Private Call
-            //   </button>
-            // }
+            button={
+              <button
+                type="button"
+                className="newRecordButton"
+                onClick={() => {
+                  openContextual('new-private-call');
+                }}
+              >
+                New Private Call
+              </button>
+            }
           />
 
           {colapsableMenuObject.colapsableMenuOpen &&
@@ -197,7 +200,7 @@ export function RecentRecords() {
                   'Zoom Link',
                   'Topic',
                   'Comments',
-                  'Attendees',
+                  // 'Attendees',
                 ]}
                 data={groupSessions}
                 renderRow={(groupSession) => (
@@ -209,7 +212,13 @@ export function RecentRecords() {
               />
             )}
           {/* contextuals records */}
-          {contextual === 'new-assignment' && <NewAssignmentViewWrapper />}
+          {contextual === 'new-assignment' && (
+            <NewAssignmentViewWrapper
+              onSuccess={() => {
+                myRecentRecordsQuery.refetch();
+              }}
+            />
+          )}
           {contextual.startsWith('assignment') && (
             <AssignmentViewWrapper
               assignment={assignments.find(
@@ -217,6 +226,9 @@ export function RecentRecords() {
                   assignment.recordId ===
                   Number(contextual.split('assignment-')[1])!,
               )}
+              onSuccess={() => {
+                myRecentRecordsQuery.refetch();
+              }}
             />
           )}
           {/* 
@@ -224,7 +236,13 @@ export function RecentRecords() {
           New private call veiw is going to take more work to refactor, coming back to this
           ------------------------------------------------------------
           */}
-          {/* {contextual === 'new-private-call' && <NewPrivateCallViewWrapper />} */}
+          {contextual === 'new-private-call' && (
+            <NewPrivateCallViewWrapper
+              onSuccess={() => {
+                myRecentRecordsQuery.refetch();
+              }}
+            />
+          )}
           {contextual.startsWith('private-call') && (
             <PrivateCallViewWrapper
               privateCall={privateCalls.find(
@@ -232,9 +250,18 @@ export function RecentRecords() {
                   privateCall.recordId ===
                   Number(contextual.split('private-call-')[1])!,
               )}
+              onSuccess={() => {
+                myRecentRecordsQuery.refetch();
+              }}
             />
           )}
-          {contextual === 'new-group-call' && <NewGroupCallViewWrapper />}
+          {contextual === 'new-group-call' && (
+            <NewGroupCallViewWrapper
+              onSuccess={() => {
+                myRecentRecordsQuery.refetch();
+              }}
+            />
+          )}
           {contextual.startsWith('group-call') && (
             <GroupCallViewWrapper
               groupCall={groupSessions.find(
@@ -242,6 +269,9 @@ export function RecentRecords() {
                   groupCall.recordId ===
                   Number(contextual.split('group-call-')[1])!,
               )}
+              onSuccess={() => {
+                myRecentRecordsQuery.refetch();
+              }}
             />
           )}
         </>
@@ -267,14 +297,16 @@ export default function RecentRecordsWrapper() {
 /* temp, remove or move to new file */
 function AssignmentViewWrapper({
   assignment,
+  onSuccess,
 }: {
   assignment: Assignment | undefined;
+  onSuccess: () => void;
 }) {
   // const { contextual } = useContextualMenu();
   if (!assignment) return null;
-  return <AssignmentView assignment={assignment} />;
+  return <AssignmentView assignment={assignment} onSuccess={onSuccess} />;
 }
-function NewAssignmentViewWrapper() {
+function NewAssignmentViewWrapper({ onSuccess }: { onSuccess: () => void }) {
   // Calculate startDate using logic from DateRangeProvider
   const startDate = useMemo(() => {
     const now = new Date();
@@ -293,36 +325,68 @@ function NewAssignmentViewWrapper() {
     // Use this week's date if day >= 3 (Wednesday-Saturday), otherwise use last week's date
     return dayOfWeek >= 3 ? dates[0].date : dates[1].date;
   }, []);
-  return <NewAssignmentView weekStartsDefaultValue={startDate} />;
+  return (
+    <NewAssignmentView
+      weekStartsDefaultValue={startDate}
+      onSuccess={onSuccess}
+    />
+  );
 }
 
 function PrivateCallViewWrapper({
   privateCall,
+  onSuccess,
 }: {
   privateCall: PrivateCall | undefined;
+  onSuccess: () => void;
 }) {
   if (!privateCall) return null;
-  return <PrivateCallView call={privateCall} />;
+  return <PrivateCallView call={privateCall} onSuccess={onSuccess} />;
 }
 
-// function NewPrivateCallViewWrapper() {
-//   return <NewPrivateCallView />;
-// }
+function NewPrivateCallViewWrapper({ onSuccess }: { onSuccess: () => void }) {
+  const startDate = useMemo(() => {
+    const now = new Date();
+    const dayOfWeek = now.getUTCDay();
+    const weekInMs = 7 * 24 * 60 * 60 * 1000;
+
+    // Generate dates array similar to dateRange
+    const dates = Array.from({ length: 2 }, (_, i) => {
+      const msOffset = i * weekInMs;
+      const date = new Date(now.getTime() - dayOfWeek * 86400000 - msOffset);
+      return {
+        date: date.toISOString().split('T')[0],
+      };
+    });
+
+    // Use this week's date if day >= 3 (Wednesday-Saturday), otherwise use last week's date
+    return dayOfWeek >= 3 ? dates[0].date : dates[1].date;
+  }, []);
+  return (
+    <NewPrivateCallView
+      weekStartsDefaultValue={startDate}
+      onSuccess={onSuccess}
+    />
+  );
+}
 
 function GroupCallViewWrapper({
   groupCall,
+  onSuccess,
 }: {
   groupCall: GroupSession | undefined;
+  onSuccess: () => void;
 }) {
   if (!groupCall) return null;
-  return <GroupSessionView groupSession={groupCall} />;
+  return <GroupSessionView groupSession={groupCall} onSuccess={onSuccess} />;
 }
 
-function NewGroupCallViewWrapper() {
+function NewGroupCallViewWrapper({ onSuccess }: { onSuccess: () => void }) {
   return (
     <GroupSessionView
       groupSession={{ recordId: -1 } as GroupSession}
       newRecord
+      onSuccess={onSuccess}
     />
   );
 }

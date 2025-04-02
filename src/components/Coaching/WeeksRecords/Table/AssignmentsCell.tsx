@@ -80,9 +80,11 @@ export function AssignmentCell({
 export function AssignmentView({
   assignment,
   tableEditMode,
+  onSuccess,
 }: {
   assignment: Assignment;
   tableEditMode?: boolean;
+  onSuccess?: () => void;
 }) {
   const {
     getStudentFromMembershipId,
@@ -156,6 +158,7 @@ export function AssignmentView({
         closeModal();
         cancelEdit();
         closeContextual();
+        onSuccess?.();
       },
     });
   }
@@ -176,6 +179,7 @@ export function AssignmentView({
         onSuccess: () => {
           disableEditMode();
           closeContextual();
+          onSuccess?.();
         },
       },
     );
@@ -315,8 +319,10 @@ export default function AssignmentsCell({
 
 export function NewAssignmentView({
   weekStartsDefaultValue,
+  onSuccess,
 }: {
   weekStartsDefaultValue: string;
+  onSuccess?: () => void;
 }) {
   const { closeContextual } = useContextualMenu();
   const { createAssignmentMutation } = useCoaching();
@@ -402,13 +408,14 @@ export function NewAssignmentView({
       {
         onSuccess: () => {
           closeContextual();
-
           setHomeworkCorrector(userDataQuery.data?.emailAddress || '');
           setAssignmentType('');
           setRating('');
           setNotes('');
           setAreasOfDifficulty('');
           setAssignmentLink('');
+
+          onSuccess?.();
         },
       },
     );

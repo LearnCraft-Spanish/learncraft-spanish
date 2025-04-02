@@ -39,7 +39,7 @@ export default function GroupCallRecordRow({
 
       <td>{groupCall.topic}</td>
       <td>{groupCall.comments}</td>
-      <td>Add Attendee</td>
+      {/* <td>currently unavalible, check back after the next update!</td> */}
     </tr>
   );
 }

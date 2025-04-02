@@ -41,8 +41,8 @@ export default function AssignmentRecordRow({
       <td>{assignment.notes}</td>
       <td>
         {typeof assignment.dateCreated === 'string'
-          ? assignment.dateCreated
-          : assignment.dateCreated.toLocaleDateString()}
+          ? assignment.dateCreated.split('T')[0]
+          : assignment.dateCreated.toLocaleDateString().split('T')[0]}
       </td>
     </tr>
   );
