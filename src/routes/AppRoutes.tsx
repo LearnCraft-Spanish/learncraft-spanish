@@ -5,6 +5,8 @@ import CoachingDashboard from 'src/components/CoachingDashboard';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
+import { StudentsTable } from 'src/components/VocabQuizDbTables/components';
+import ProgramsTable from 'src/components/VocabQuizDbTables/components/ProgramsTable/ProgramsTable';
 import VocabQuizDbTables from 'src/components/VocabQuizDbTables/VocabQuizDbTables';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
@@ -102,7 +104,10 @@ export default function AppRoutes() {
           )
         }
       />
-      <Route path="/vocab-quiz-db-tables" element={<VocabQuizDbTables />} />
+      <Route path="/vocab-quiz-db-tables/*" element={<VocabQuizDbTables />}>
+        <Route path="students" element={<StudentsTable />} />
+        <Route path="programs" element={<ProgramsTable />} />
+      </Route>
       <Route path="/*" element={<NotFoundPage />} />
     </SentryRoutes>
   );

@@ -1,4 +1,4 @@
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
+import type { FlashcardStudent, Program } from 'src/types/interfaceDefinitions';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 
 export default function useVocabQuizDbBackend() {
@@ -13,5 +13,14 @@ export default function useVocabQuizDbBackend() {
     return getFactory<string[]>('vocab-quiz/students/cohort-field-options');
   };
 
-  return { getStudentsTable, getStudentsTableCohortFieldOptions };
+  // get programs table
+  const getProgramsTable = () => {
+    return getFactory<Program[]>('vocab-quiz/programs');
+  };
+
+  return {
+    getStudentsTable,
+    getStudentsTableCohortFieldOptions,
+    getProgramsTable,
+  };
 }

@@ -3,3 +3,24 @@
   justify-content: flex-end;
   margin: 1rem;
 }
+
+/* ------------------ Back Button ------------------ */
+.back-button-container {
+  margin: 1rem;
+
+  .back-button {
+    position: absolute;
+    padding: 0.5rem 1rem;
+
+    background-color: var(--brand);
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+
+    transition: all 0.2s ease;
+    &:hover {
+      background-color: var(--accent);
+      text-decoration: underline;
+    }
+  }
+}

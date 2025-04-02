@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import Table from 'src/components/Table';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useStudentsTable from 'src/hooks/VocabQuizDbData/useStudentsTable';
 import { CreateStudent, EditStudent, FilterStudentsTable } from './components';
 import { filterFunction, renderStudentRow, sortFunction } from './functions';
+import './StudentsTable.scss';
 
 export default function VocabQuizDbTables() {
   const { studentsTableQuery, programTableQuery } = useStudentsTable();
@@ -23,12 +25,18 @@ export default function VocabQuizDbTables() {
 
   return (
     <div>
+      <div className="back-button-container">
+        <Link to="/vocab-quiz-db-tables" className="back-button">
+          ← Back to Tables
+        </Link>
+      </div>
       {studentsTableQuery.isLoading && (
         <Loading message="Loading StudentData..." />
       )}
       {studentsTableQuery.isError && <div>Error Loading Student Data </div>}
       {studentsTableQuery.isSuccess && (
         <>
+          <h2>Students Table</h2>
           <Table
             headers={[
               { header: 'Edit Record', sortable: false },
