@@ -87,7 +87,6 @@ export function MyStudents() {
 
   return (
     <div className="student-deep-dive">
-      <h1>Student Drill Down</h1>
       {isLoading && <Loading message="Loading data..." />}
       {isError && <div>Error loading data, please try again.</div>}
       {isSuccess && (

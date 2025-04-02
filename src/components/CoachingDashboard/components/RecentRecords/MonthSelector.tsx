@@ -39,9 +39,11 @@ export default function MonthSelector({
   };
 
   return (
-    <div>
-      <label htmlFor="month-selector">Select Month</label>
-      <select id="month-selector" value={selectedMonth} onChange={handleChange}>
+    <div className="monthSelectorContainer">
+      <label className="monthSelectorLabel" htmlFor="monthSelector">
+        Select Month:
+      </label>
+      <select id="monthSelector" value={selectedMonth} onChange={handleChange}>
         {months.map((month) => (
           <option key={month.value} value={month.value}>
             {month.name}
