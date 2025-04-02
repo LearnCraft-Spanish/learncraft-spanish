@@ -57,9 +57,6 @@ export default function SearchableDropdown({
           setSearchString('');
         }
         break;
-      case 'Escape':
-        setSearchString('');
-        break;
     }
   };
 
