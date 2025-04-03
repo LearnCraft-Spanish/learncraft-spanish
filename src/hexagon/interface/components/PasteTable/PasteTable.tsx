@@ -1,5 +1,6 @@
-import type { TableHook } from '../../application/table/types';
+import type { TableHook } from '../../../application/units/types';
 import React, { useCallback, useMemo, useState } from 'react';
+import { GHOST_ROW_ID } from '../../../application/units/types';
 import { PasteTableErrorBoundary } from './PasteTableErrorBoundary';
 import './PasteTable.scss';
 
@@ -48,12 +49,32 @@ export function PasteTable<T>({
     setActiveCell(null);
   }, []);
 
+  // Ensure there are no duplicate row IDs
+  const uniqueRows = useMemo(() => {
+    const seenIds = new Set<string>();
+    return hook.data.rows.filter((row) => {
+      // Create a default ID if none exists
+      const rowId = row.id || 'unknown-row';
+
+      if (seenIds.has(rowId)) {
+        console.error('Duplicate row ID detected:', rowId);
+        return false;
+      }
+
+      seenIds.add(rowId);
+      return true;
+    });
+  }, [hook.data.rows]);
+
   return (
     <PasteTableErrorBoundary>
       <div className="paste-table">
         <div className="paste-table__header" style={{ gridTemplateColumns }}>
           {hook.columns.map((column) => (
-            <div key={column.id} className="paste-table__column-header">
+            <div
+              key={column.id || `column-${column.label}`}
+              className="paste-table__column-header"
+            >
               {column.label}
             </div>
           ))}
@@ -64,34 +85,51 @@ export function PasteTable<T>({
           style={{ gridTemplateColumns }}
           onPaste={hook.handlePaste}
         >
-          {hook.data.rows.map((row) => (
-            <div key={row.id} className="paste-table__row">
-              {hook.columns.map((column) => (
-                <div
-                  key={`${row.id}-${column.id}`}
-                  className={`paste-table__cell-container ${
-                    activeCell?.rowId === row.id &&
-                    activeCell?.columnId === column.id
-                      ? 'paste-table__cell-container--active'
-                      : ''
-                  }`}
-                >
-                  <input
-                    type="text"
-                    value={row.cells[column.id] || ''}
-                    onChange={(e) =>
-                      hook.handleCellChange(row.id, column.id, e.target.value)
-                    }
-                    onFocus={() => handleCellFocus(row.id, column.id)}
-                    onBlur={handleCellBlur}
-                    className="paste-table__cell"
-                    aria-label={getAriaLabel(column.id, row.id)}
-                    aria-invalid={!!row.validationErrors?.[column.id]}
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
+          {uniqueRows.map((row) => {
+            // Ensure row.id is a valid string that can be used as a key
+            const rowKey =
+              row.id || `row-${Math.random().toString(36).substring(2, 9)}`;
+
+            return (
+              <div key={rowKey} className="paste-table__row">
+                {hook.columns.map((column) => {
+                  // Ensure column.id is a valid string
+                  const columnKey = column.id || `column-${column.label}`;
+                  // Create a safe composite key
+                  const cellKey = `${rowKey}-${columnKey}`;
+
+                  return (
+                    <div
+                      key={cellKey}
+                      className={`paste-table__cell-container ${
+                        activeCell?.rowId === row.id &&
+                        activeCell?.columnId === column.id
+                          ? 'paste-table__cell-container--active'
+                          : ''
+                      }`}
+                    >
+                      <input
+                        type="text"
+                        value={row.cells[column.id] || ''}
+                        onChange={(e) =>
+                          hook.handleCellChange(
+                            row.id,
+                            column.id,
+                            e.target.value,
+                          )
+                        }
+                        onFocus={() => handleCellFocus(row.id, column.id)}
+                        onBlur={handleCellBlur}
+                        className="paste-table__cell"
+                        aria-label={getAriaLabel(column.id, row.id)}
+                        aria-invalid={!!row.validationErrors?.[column.id]}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
 
         <div className="paste-table__footer">

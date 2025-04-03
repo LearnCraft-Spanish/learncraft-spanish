@@ -1,6 +1,6 @@
-import type { TableColumn, TableHook } from '../table/types';
+import type { TableColumn, TableHook } from '../units/types';
 import type { VocabularyEntry, VocabularyRank } from './types';
-import { useTableData } from '../table/useTableData';
+import { useTableData } from '../units/useTableData';
 
 /** Field identifiers derived from VocabularyEntry */
 const VOCABULARY_FIELDS = Object.fromEntries(

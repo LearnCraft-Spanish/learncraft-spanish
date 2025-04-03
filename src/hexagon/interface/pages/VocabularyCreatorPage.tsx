@@ -1,16 +1,13 @@
-import React from 'react';
-import { useVocabularyNavigation } from '../../application/vocabulary/useVocabularyNavigation';
-import { NonVerbCreator } from './NonVerbCreator';
-import { VerbCreator } from './VerbCreator';
+import React, { useState } from 'react';
+import { NonVerbCreator } from '../components/vocabulary/NonVerbCreator';
+import { VerbCreator } from '../components/vocabulary/VerbCreator';
 import './VocabularyCreator.scss';
+export const VocabularyCreatorPage: React.FC = () => {
+  const [mode, setMode] = useState('selection');
 
-export const VocabularyCreator: React.FC = () => {
-  const {
-    mode,
-    navigateToVerbCreation,
-    navigateToNonVerbCreation,
-    navigateToSelection,
-  } = useVocabularyNavigation();
+  const navigateToVerbCreation = () => setMode('verb');
+  const navigateToNonVerbCreation = () => setMode('nonverb');
+  const navigateToSelection = () => setMode('selection');
 
   const renderContent = () => {
     switch (mode) {
@@ -22,12 +19,14 @@ export const VocabularyCreator: React.FC = () => {
         return (
           <div className="vocabulary-creator__options">
             <button
+              type="button"
               className="vocabulary-creator__option vocabulary-creator__option--verb"
               onClick={navigateToVerbCreation}
             >
               Add New Verb
             </button>
             <button
+              type="button"
               className="vocabulary-creator__option vocabulary-creator__option--nonverb"
               onClick={navigateToNonVerbCreation}
             >

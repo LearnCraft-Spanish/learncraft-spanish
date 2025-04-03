@@ -5,7 +5,7 @@ import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import { VocabularyCreator } from '../hexagon/interface/VocabularyCreator';
+import { VocabularyCreatorPage } from '../hexagon/interface/pages/VocabularyCreatorPage';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
 import FlashcardManager from '../sections/FlashcardManager';
@@ -79,7 +79,7 @@ export default function AppRoutes() {
         path="/vocabularymanager"
         element={
           <ProtectedRoute>
-            <VocabularyCreator />
+            <VocabularyCreatorPage />
           </ProtectedRoute>
         }
       />
