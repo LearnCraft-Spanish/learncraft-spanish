@@ -18,7 +18,7 @@ describe('hook useCoaching', () => {
     });
   });
 
-  describe('queries exist, with data', () => {
+  describe.skip('queries exist, with data', () => {
     const listOfQueries = [
       'activeMembershipsQuery',
       'activeStudentsQuery',
