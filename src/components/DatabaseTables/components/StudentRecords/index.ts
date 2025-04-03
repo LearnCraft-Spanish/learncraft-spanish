@@ -1,3 +1,4 @@
+import CoursesTable from './CoursesTable';
 import LessonsTable from './LessonsTable';
 
-export { LessonsTable };
+export { CoursesTable, LessonsTable };

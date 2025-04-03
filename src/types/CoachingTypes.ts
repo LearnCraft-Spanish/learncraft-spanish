@@ -112,8 +112,10 @@ export type Course = Expanded<{
   recordId: number;
   name: string;
   membershipType: string;
+  approxMonthlyCost: number;
   weeklyPrivateCalls: number;
   hasGroupCalls: boolean;
+  weeklyTimeCommitmentMinutes: number;
 }>;
 
 export type Coach = Expanded<{

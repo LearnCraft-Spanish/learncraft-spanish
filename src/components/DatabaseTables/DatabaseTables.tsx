@@ -36,6 +36,11 @@ export default function DatabaseTables() {
                 Lessons Table
               </Link>
             </div>
+            <div className="buttonBox">
+              <Link className="linkButton" to="/database-tables/courses">
+                Courses Table
+              </Link>
+            </div>
           </>
         ) : (
           <Outlet />

@@ -1,0 +1,21 @@
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  text-decoration: none;
+  color: #0066cc;
+  font-weight: 500;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+.check-mark {
+  text-align: center;
+}
