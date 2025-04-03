@@ -1,10 +1,7 @@
 import type { Student } from 'src/types/CoachingTypes';
 import React, { useMemo, useState } from 'react';
 import { Loading } from 'src/components/Loading';
-import {
-  useActiveStudents,
-  useCoachList,
-} from 'src/hooks/CoachingData/queries';
+import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
@@ -18,25 +15,20 @@ import './StudentDrillDown.scss';
 export default function StudentDrillDown() {
   const { allStudentsQuery } = useAllStudents();
   const { coachListQuery } = useCoachList();
-  const { activeStudentsQuery } = useActiveStudents();
+
   const userDataQuery = useUserData();
 
   const isLoading =
     allStudentsQuery.isLoading ||
     coachListQuery.isLoading ||
-    activeStudentsQuery.isLoading ||
     userDataQuery.isLoading;
 
   const isError =
-    allStudentsQuery.isError ||
-    coachListQuery.isError ||
-    activeStudentsQuery.isError ||
-    userDataQuery.isError;
+    allStudentsQuery.isError || coachListQuery.isError || userDataQuery.isError;
 
   const isSuccess =
     allStudentsQuery.isSuccess &&
     coachListQuery.isSuccess &&
-    activeStudentsQuery.isSuccess &&
     userDataQuery.isSuccess;
 
   const [selectedStudentId, setSelectedStudentId] = useState<

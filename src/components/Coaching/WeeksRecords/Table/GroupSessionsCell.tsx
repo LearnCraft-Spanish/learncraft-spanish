@@ -138,8 +138,14 @@ export function GroupSessionView({
   }, [date]);
 
   const { coachListQuery } = useCoachList();
-  const { activeMembershipsQuery } = useActiveMemberships();
-  const { activeStudentsQuery } = useActiveStudents();
+  const { activeMembershipsQuery } = useActiveMemberships({
+    startDate: relatedWeekStarts,
+    endDate: getWeekEnds(relatedWeekStarts),
+  });
+  const { activeStudentsQuery } = useActiveStudents({
+    startDate: relatedWeekStarts,
+    endDate: getWeekEnds(relatedWeekStarts),
+  });
   const { weeksQuery } = useWeeks(
     relatedWeekStarts,
     getWeekEnds(relatedWeekStarts),

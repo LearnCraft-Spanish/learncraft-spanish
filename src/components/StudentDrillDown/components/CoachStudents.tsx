@@ -1,7 +1,6 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
 import React, { useMemo } from 'react';
-import { useActiveStudents } from 'src/hooks/CoachingData/queries';
-
+import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 export default function CoachStudents({
   onStudentSelect,
   currentCoach,
@@ -9,18 +8,19 @@ export default function CoachStudents({
   onStudentSelect: (studentId: number | undefined) => void;
   currentCoach: Coach | undefined;
 }) {
-  const { activeStudentsQuery } = useActiveStudents();
+  // const { activeStudentsQuery } = useActiveStudents();
+  const { allStudentsQuery } = useAllStudents();
 
   // Filter students where the current coach is the primary coach
   const coachStudents = useMemo(() => {
-    if (!activeStudentsQuery.isSuccess || !currentCoach) {
+    if (!allStudentsQuery.isSuccess || !currentCoach) {
       return [];
     }
 
-    return activeStudentsQuery.data.filter(
+    return allStudentsQuery.data.filter(
       (student: Student) => student.primaryCoach?.id === currentCoach.user.id,
     );
-  }, [activeStudentsQuery.data, activeStudentsQuery.isSuccess, currentCoach]);
+  }, [allStudentsQuery.data, allStudentsQuery.isSuccess, currentCoach]);
 
   if (!currentCoach) {
     return null;
