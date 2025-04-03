@@ -2,14 +2,14 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import useAuth from 'src/hooks/useAuth';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import './VocabQuizDbTables.scss';
+import './DatabaseTables.scss';
 
-export default function VocabQuizDbTables() {
+export default function DatabaseTables() {
   const { isAuthenticated, isLoading } = useAuth();
   const userDataQuery = useUserData();
 
   const location = useLocation();
-  const isRoot = location.pathname === '/vocab-quiz-db-tables';
+  const isRoot = location.pathname === '/database-tables';
 
   const dataReady = userDataQuery.isSuccess && !isLoading && isAuthenticated;
 
@@ -21,12 +21,12 @@ export default function VocabQuizDbTables() {
             <h2>Database Tables</h2>
             <h3>Vocabulary/Quiz Database</h3>
             <div className="buttonBox">
-              <Link className="linkButton" to="/vocab-quiz-db-tables/students">
+              <Link className="linkButton" to="/database-tables/students">
                 Students Table
               </Link>
             </div>
             <div className="buttonBox">
-              <Link className="linkButton" to="/vocab-quiz-db-tables/programs">
+              <Link className="linkButton" to="/database-tables/programs">
                 Programs Table
               </Link>
             </div>

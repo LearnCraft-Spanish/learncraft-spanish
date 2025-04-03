@@ -26,7 +26,7 @@ export default function VocabQuizDbTables() {
   return (
     <div>
       <div className="back-button-container">
-        <Link to="/vocab-quiz-db-tables" className="back-button">
+        <Link to="/database-tables" className="back-button">
           ← Back to Tables
         </Link>
       </div>

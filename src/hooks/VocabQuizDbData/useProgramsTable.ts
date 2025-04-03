@@ -1,4 +1,4 @@
-import type { EditableProgram } from 'src/components/VocabQuizDbTables/components/ProgramsTable/types';
+import type { EditableProgram } from 'src/components/DatabaseTables/components/VocabQuizDb/ProgramsTable/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../useBackend';

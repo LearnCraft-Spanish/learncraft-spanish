@@ -147,8 +147,8 @@ export default function Menu() {
                 </Link>
               </div>
               <div className="buttonBox">
-                <Link className="linkButton" to="/vocab-quiz-db-tables">
-                  Vocab Quiz DB Tables
+                <Link className="linkButton" to="/database-tables">
+                  Database Tables
                 </Link>
               </div>
             </>
