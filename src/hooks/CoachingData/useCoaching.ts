@@ -49,8 +49,14 @@ export default function useCoaching() {
   } = useGroupAttendees(startDate, endDate);
   const { coachListQuery } = useCoachList();
   const { courseListQuery } = useCourseList();
-  const { activeMembershipsQuery } = useActiveMemberships();
-  const { activeStudentsQuery } = useActiveStudents();
+  const { activeMembershipsQuery } = useActiveMemberships({
+    startDate,
+    endDate,
+  });
+  const { activeStudentsQuery } = useActiveStudents({
+    startDate,
+    endDate,
+  });
   const { studentRecordsLessonsQuery } = useStudentRecordsLessons();
 
   /*--------- Helper Functions ---------*/
