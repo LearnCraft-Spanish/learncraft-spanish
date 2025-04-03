@@ -1,9 +1,11 @@
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 
+import CoachingDashboard from 'src/components/CoachingDashboard';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
+import VocabQuizDbTables from 'src/components/VocabQuizDbTables/VocabQuizDbTables';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
@@ -13,7 +15,6 @@ import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import SentryRoutes from './SentryRoutes';
-
 export default function AppRoutes() {
   const userDataQuery = useUserData();
 
@@ -92,6 +93,16 @@ export default function AppRoutes() {
           )
         }
       />
+      <Route
+        path="/coaching-dashboard"
+        element={
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <CoachingDashboard />
+          )
+        }
+      />
+      <Route path="/vocab-quiz-db-tables" element={<VocabQuizDbTables />} />
       <Route path="/*" element={<NotFoundPage />} />
     </SentryRoutes>
   );

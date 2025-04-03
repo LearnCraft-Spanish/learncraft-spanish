@@ -132,6 +132,7 @@ export type PrivateCall = Expanded<{
   date: Date | string;
   caller: QbUser;
   callType: string;
+  weekName: string;
 }>;
 
 export type Assignment = Expanded<{
@@ -144,6 +145,8 @@ export type Assignment = Expanded<{
   notes: string;
   homeworkCorrector: QbUser;
   weekStarts: Date | string;
+  dateCreated: Date | string;
+  assignmentName: string;
 }>;
 
 /* --------- Student Drill Down Types --------- */

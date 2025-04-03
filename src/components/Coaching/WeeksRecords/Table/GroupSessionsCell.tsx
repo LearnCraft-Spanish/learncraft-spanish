@@ -102,10 +102,12 @@ export function GroupSessionView({
   groupSession,
   newRecord,
   tableEditMode,
+  onSuccess,
 }: {
   groupSession: GroupSession;
   newRecord?: boolean;
   tableEditMode?: boolean;
+  onSuccess?: () => void;
 }) {
   const userDataQuery = useUserData();
   const { closeContextual, updateDisableClickOutside } = useContextualMenu();
@@ -136,8 +138,14 @@ export function GroupSessionView({
   }, [date]);
 
   const { coachListQuery } = useCoachList();
-  const { activeMembershipsQuery } = useActiveMemberships();
-  const { activeStudentsQuery } = useActiveStudents();
+  const { activeMembershipsQuery } = useActiveMemberships({
+    startDate: relatedWeekStarts,
+    endDate: getWeekEnds(relatedWeekStarts),
+  });
+  const { activeStudentsQuery } = useActiveStudents({
+    startDate: relatedWeekStarts,
+    endDate: getWeekEnds(relatedWeekStarts),
+  });
   const { weeksQuery } = useWeeks(
     relatedWeekStarts,
     getWeekEnds(relatedWeekStarts),
@@ -367,6 +375,7 @@ export function GroupSessionView({
         closeModal();
         cancelEdit();
         closeContextual();
+        onSuccess?.();
       },
     });
   }
@@ -462,6 +471,7 @@ export function GroupSessionView({
                     return;
                   }
                   closeContextual();
+                  onSuccess?.();
                 },
                 onError: (error) => {
                   console.error('Error creating group attendees', error);
@@ -483,16 +493,23 @@ export function GroupSessionView({
         return;
       }
       if (checkInputChanges()) {
-        updateGroupSessionMutation.mutate({
-          recordId,
-          date,
-          coach,
-          sessionType,
-          topic,
-          comments,
-          callDocument,
-          zoomLink,
-        });
+        updateGroupSessionMutation.mutate(
+          {
+            recordId,
+            date,
+            coach,
+            sessionType,
+            topic,
+            comments,
+            callDocument,
+            zoomLink,
+          },
+          {
+            onSuccess: () => {
+              onSuccess?.();
+            },
+          },
+        );
       }
       if (checkAttendeeChanges()) {
         const currentAttendeeRecords = getAttendeesFromGroupSessionId(recordId);
@@ -513,11 +530,21 @@ export function GroupSessionView({
               groupSession: recordId,
               student: attendee.relatedWeek,
             })),
+            {
+              onSuccess: () => {
+                onSuccess?.();
+              },
+            },
           );
         }
         if (attendeesToRemove && attendeesToRemove.length > 0) {
           deleteGroupAttendeesMutation.mutate(
             attendeesToRemove.map((attendee) => attendee.recordId),
+            {
+              onSuccess: () => {
+                onSuccess?.();
+              },
+            },
           );
         }
       }

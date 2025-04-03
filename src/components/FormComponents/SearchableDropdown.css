@@ -13,7 +13,7 @@
 
 .searchable-dropdown .options {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.25rem;
   border: 1px solid #ccc;
   position: absolute;
   top: 100%;
@@ -22,16 +22,29 @@
   max-height: 200px;
   overflow-y: auto;
   background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .searchable-dropdown .options .option {
   padding: 0.5rem;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .searchable-dropdown .options .option:hover {
   background-color: #f0f0f0;
 }
+
+.searchable-dropdown .options .option:focus {
+  outline: 2px solid #007bff;
+  background-color: #e6f3ff;
+}
+
+.searchable-dropdown .options .option.focused {
+  background-color: #e6f3ff;
+  outline: 2px solid #007bff;
+}
+
 .clearButton {
   background-color: transparent;
   border: none;

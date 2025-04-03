@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react';
+import type { KeyboardEvent } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import x from 'src/assets/icons/x_dark.svg';
 import './SearchableDropdown.css';
+
 export default function SearchableDropdown({
   onChange,
   options,
@@ -13,7 +15,9 @@ export default function SearchableDropdown({
   options: { label: string; value: string }[];
 }) {
   const [searchString, setSearchString] = useState('');
-  const [showOptions, setShowOptions] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const optionsRef = useRef<(HTMLDivElement | null)[]>([]);
+
   const filteredOptions = useMemo(() => {
     if (searchString === '') {
       return options;
@@ -25,10 +29,39 @@ export default function SearchableDropdown({
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
+    setFocusedIndex(-1);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setFocusedIndex((prev) => {
+          const next = prev + 1 >= filteredOptions.length ? 0 : prev + 1;
+          optionsRef.current[next]?.focus();
+          return next;
+        });
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setFocusedIndex((prev) => {
+          const next = prev - 1 < 0 ? filteredOptions.length - 1 : prev - 1;
+          optionsRef.current[next]?.focus();
+          return next;
+        });
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (focusedIndex >= 0) {
+          onChange(filteredOptions[focusedIndex].value);
+          setSearchString('');
+        }
+        break;
+    }
   };
 
   return (
-    <div className="searchable-dropdown">
+    <div className="searchable-dropdown" onKeyDown={handleKeyDown}>
       {value !== '0' && value !== '' ? (
         <div className="displayContent">
           <p className="content">{valueText}</p>
@@ -48,20 +81,23 @@ export default function SearchableDropdown({
             className="content"
             value={searchString}
             onChange={handleSearch}
-            onFocus={() => setShowOptions(true)}
-            onBlur={() =>
-              setTimeout(() => {
-                setShowOptions(false);
-              }, 200)
-            }
           />
-          {showOptions && (
-            <div className="options">
-              {filteredOptions.map((option) => (
+          {searchString.length > 0 && filteredOptions.length > 0 && (
+            <div className="options" role="listbox" tabIndex={-1}>
+              {filteredOptions.map((option, index) => (
                 <div
-                  className="option"
+                  className={`option ${focusedIndex === index ? 'focused' : ''}`}
                   key={option.value}
-                  onClick={() => onChange(option.value)}
+                  onClick={() => {
+                    onChange(option.value);
+                    setSearchString('');
+                  }}
+                  ref={(el) => {
+                    optionsRef.current[index] = el;
+                  }}
+                  role="option"
+                  tabIndex={0}
+                  aria-selected={focusedIndex === index}
                 >
                   {option.label}
                 </div>

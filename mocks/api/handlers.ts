@@ -322,12 +322,18 @@ export const handlers = [
   http.get(`${backendUrl}coaching/courses`, async () => {
     return HttpResponse.json(generatedMockData.courseList);
   }),
-  http.get(`${backendUrl}coaching/active-memberships`, async () => {
-    return HttpResponse.json(generatedMockData.memberships);
-  }),
-  http.get(`${backendUrl}coaching/active-students`, async () => {
-    return HttpResponse.json(generatedMockData.studentList);
-  }),
+  http.get(
+    `${backendUrl}coaching/active-memberships/:startDate.:endDate`,
+    async () => {
+      return HttpResponse.json(generatedMockData.memberships);
+    },
+  ),
+  http.get(
+    `${backendUrl}coaching/active-students:startDate.:endDate`,
+    async () => {
+      return HttpResponse.json(generatedMockData.studentList);
+    },
+  ),
   // TEMP, to get current tests to run
   http.get(`${backendUrl}coaching/lessons`, async () => {
     return HttpResponse.json([]);

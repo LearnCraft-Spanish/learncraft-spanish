@@ -1,3 +1,4 @@
+import type { QueryFunctionContext } from '@tanstack/react-query';
 import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
 import type * as types from 'src/types/interfaceDefinitions';
 import { useCallback } from 'react';
@@ -332,17 +333,37 @@ export function useBackend() {
     );
   }, [getFactory]);
 
-  const getActiveStudents = useCallback((): Promise<
-    StudentRecordsTypes.Student[]
-  > => {
-    return getFactory('coaching/active-students');
-  }, [getFactory]);
+  const getActiveStudents = useCallback(
+    ({
+      queryKey,
+    }: QueryFunctionContext<
+      [string, { startDate: string | undefined; endDate: string | undefined }]
+    >): Promise<StudentRecordsTypes.Student[]> => {
+      const [, { startDate, endDate }] = queryKey;
 
-  const getActiveMemberships = useCallback((): Promise<
-    StudentRecordsTypes.Membership[]
-  > => {
-    return getFactory('coaching/active-memberships');
-  }, [getFactory]);
+      if (!startDate || !endDate) {
+        return Promise.resolve([]);
+      }
+      return getFactory(`coaching/active-students/${startDate}.${endDate}`);
+    },
+    [getFactory],
+  );
+
+  const getActiveMemberships = useCallback(
+    ({
+      queryKey,
+    }: QueryFunctionContext<
+      [string, { startDate: string | undefined; endDate: string | undefined }]
+    >): Promise<StudentRecordsTypes.Membership[]> => {
+      const [, { startDate, endDate }] = queryKey;
+
+      if (!startDate || !endDate) {
+        return Promise.resolve([]);
+      }
+      return getFactory(`coaching/active-memberships/${startDate}.${endDate}`);
+    },
+    [getFactory],
+  );
 
   // const getMemberships = useCallback((): Promise<
   //   StudentRecordsTypes.Membership[]
