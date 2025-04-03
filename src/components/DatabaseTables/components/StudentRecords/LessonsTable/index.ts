@@ -1,3 +1,3 @@
 import LessonsTable from './LessonsTable';
 
-export { LessonsTable };
+export default LessonsTable;

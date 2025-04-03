@@ -1,3 +1,4 @@
+import { LessonsTable } from './StudentRecords';
 import StudentsTable from './VocabQuizDb/StudentsTable';
 
-export { StudentsTable };
+export { LessonsTable, StudentsTable };

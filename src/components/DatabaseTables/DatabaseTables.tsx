@@ -32,7 +32,9 @@ export default function DatabaseTables() {
             </div>
             <h3>Student Records Database</h3>
             <div className="buttonBox">
-              <p>coming soon</p>
+              <Link className="linkButton" to="/database-tables/lessons">
+                Lessons Table
+              </Link>
             </div>
           </>
         ) : (

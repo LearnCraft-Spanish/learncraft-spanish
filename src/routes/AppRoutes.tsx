@@ -2,6 +2,7 @@ import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 
 import CoachingDashboard from 'src/components/CoachingDashboard';
+import { LessonsTable } from 'src/components/DatabaseTables/components/StudentRecords';
 import {
   ProgramsTable,
   StudentsTable,
@@ -109,6 +110,7 @@ export default function AppRoutes() {
       <Route path="/database-tables/*" element={<DatabaseTables />}>
         <Route path="students" element={<StudentsTable />} />
         <Route path="programs" element={<ProgramsTable />} />
+        <Route path="lessons" element={<LessonsTable />} />
       </Route>
       <Route path="/*" element={<NotFoundPage />} />
     </SentryRoutes>

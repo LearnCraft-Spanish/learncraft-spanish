@@ -85,7 +85,7 @@ export type Membership = Expanded<{
 export type Lesson = Expanded<{
   recordId: number;
   lessonName: string;
-  weekRef: number;
+  weekRef: number | null;
   type: string;
 }>;
 
