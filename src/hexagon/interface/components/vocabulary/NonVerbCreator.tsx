@@ -1,6 +1,5 @@
 import React from 'react';
-import { useVocabularyCreation } from '../../../application/useCases/useVocabularyCreation';
-import { useVocabularyTable } from '../../../application/useCases/useVocabularyTable';
+import { useNonVerbCreation } from '../../../application/useCases/useNonVerbCreation';
 import { PasteTable } from '../PasteTable/PasteTable';
 import './VocabularyCreator.scss';
 
@@ -9,36 +8,26 @@ interface NonVerbCreatorProps {
 }
 
 export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
-  const tableHook = useVocabularyTable();
+  // Use a single hook that implements the Façade pattern
   const {
-    subcategories,
+    nonVerbSubcategories,
     loadingSubcategories,
     selectedSubcategoryId,
     setSelectedSubcategoryId,
     creating,
     creationError,
-    createVocabularyBatch,
-  } = useVocabularyCreation();
+    tableHook,
+    saveVocabulary,
+  } = useNonVerbCreation();
 
   const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedSubcategoryId(e.target.value);
   };
 
   const handleSave = async () => {
-    if (!selectedSubcategoryId) {
-      // Validation error - no subcategory selected
-      return;
-    }
-
-    // Use the tableHook's validation and save functionality
-    const result = await tableHook.handleSave();
-
-    if (result) {
-      // Pass the data to our use case
-      const success = await createVocabularyBatch(result);
-      if (success) {
-        onBack(); // Return to previous screen on success
-      }
+    const success = await saveVocabulary();
+    if (success) {
+      onBack(); // Return to previous screen on success
     }
   };
 
@@ -65,10 +54,10 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
           disabled={loadingSubcategories || creating}
         >
           <option value="">-- Select Subcategory --</option>
-          {subcategories.map((category) => (
+          {nonVerbSubcategories.map((category) => (
             <option key={category.id} value={category.id}>
-              {category.name}
-              {category.type ? ` (${category.type})` : ''}
+              {category.category}
+              {category.partOfSpeech ? ` (${category.partOfSpeech})` : ''}
             </option>
           ))}
         </select>

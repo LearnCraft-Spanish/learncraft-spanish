@@ -1,8 +1,16 @@
 .paste-table {
   width: 100%;
   border: 2px solid var(--dark);
-  display: flex;
-  flex-direction: column;
+  border-radius: 4px;
+  overflow: hidden; /* Ensure border radius applies to child borders */
+
+  /* Container for the actual table grid that holds both header and rows */
+  &__table-grid {
+    display: grid;
+    grid-template-columns: var(--grid-template-columns);
+    width: 100%;
+    border-bottom: 1px solid var(--dark); /* Add border to separate table from footer */
+  }
 
   &--error {
     border: 2px solid var(--error-bg);
@@ -24,10 +32,7 @@
   }
 
   &__header {
-    display: grid;
-    background-color: var(--theme);
-    color: var(--light);
-    border-radius: 4px 4px 0 0;
+    display: contents; /* Makes the header part of the parent grid */
   }
 
   &__column-header {
@@ -35,6 +40,9 @@
     padding: 0.5rem;
     text-align: left;
     border-right: 1px solid var(--light);
+    background-color: var(--theme);
+    color: var(--light);
+    border-bottom: 1px solid var(--dark);
 
     &:last-child {
       border-right: none;
@@ -42,18 +50,14 @@
   }
 
   &__body {
-    display: grid;
-    border: 1px solid var(--dark);
-    border-radius: 0 0 4px 4px;
-    min-height: 100px;
-    background-color: var(--light);
+    display: contents; /* Make rows part of the parent grid */
   }
 
   &__row {
-    display: contents;
-    border-bottom: 1px solid var(--dark);
+    display: contents; /* Makes cells direct children of the grid */
 
-    &:last-child {
+    /* Apply special styling to the last row's cells to remove bottom borders */
+    &:last-child .paste-table__cell-container {
       border-bottom: none;
     }
   }
@@ -61,9 +65,19 @@
   &__cell-container {
     position: relative;
     border-right: 1px solid var(--dark);
+    border-bottom: 1px solid var(--dark);
+    padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    align-items: stretch;
+    background-color: var(--light);
 
     &:last-child {
       border-right: none;
+    }
+
+    &--active {
+      background-color: rgba(68, 154, 194, 0.1);
     }
   }
 
@@ -74,10 +88,12 @@
     padding: 0.5rem;
     font-family: inherit;
     font-size: inherit;
-    background-color: var(--light);
+    background-color: transparent;
+    border: none;
     cursor: text;
     white-space: pre-wrap;
     word-break: break-word;
+    box-sizing: border-box;
 
     &:focus {
       outline: none;
@@ -120,7 +136,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem;
-    margin-top: 1rem;
+    background-color: var(--light);
   }
 
   &__hint {

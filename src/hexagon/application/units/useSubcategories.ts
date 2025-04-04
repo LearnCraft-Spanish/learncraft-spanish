@@ -1,6 +1,7 @@
 import type { Subcategory } from '@Learncraft-spanish/shared/src/domain/vocabulary/core-types';
 import { useQuery } from '@tanstack/react-query';
 import { useSubcategoryAdapter } from '../adapters/subcategoryAdapter';
+import { normalizeQueryError, queryDefaults } from '../utils/queryUtils';
 
 interface UseSubcategoriesResult {
   subcategories: Subcategory[];
@@ -25,14 +26,14 @@ export function useSubcategories(): UseSubcategoriesResult {
     refetch,
   } = useQuery({
     queryKey: ['subcategories'],
-    queryFn: () => getSubcategories(),
+    queryFn: getSubcategories,
+    ...queryDefaults.referenceData, // Use standard reference data configuration
   });
 
   return {
     subcategories: data,
     loading: isLoading,
-    error:
-      error instanceof Error ? error : error ? new Error(String(error)) : null,
+    error: normalizeQueryError(error),
     refetch,
   };
 }

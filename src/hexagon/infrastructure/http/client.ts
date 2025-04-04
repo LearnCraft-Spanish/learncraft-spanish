@@ -1,4 +1,4 @@
-import type { AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 export interface HttpClient {
@@ -21,6 +21,14 @@ export interface HttpClient {
   delete: <T>(url: string, config?: AxiosRequestConfig) => Promise<T>;
 }
 
+export interface AuthTokenProvider {
+  getAccessToken: () => Promise<string | undefined>;
+}
+
+/**
+ * Creates a standard HTTP client.
+ * For unauthenticated requests.
+ */
 export function createHttpClient(
   baseURL: string,
   config?: AxiosRequestConfig,
@@ -30,6 +38,41 @@ export function createHttpClient(
     ...config,
   });
 
+  return createClientFromAxiosInstance(client);
+}
+
+/**
+ * Creates an authenticated HTTP client that automatically
+ * includes the Auth0 token in requests.
+ */
+export function createAuthenticatedHttpClient(
+  baseURL: string,
+  tokenProvider: AuthTokenProvider,
+  config?: AxiosRequestConfig,
+): HttpClient {
+  const client = axios.create({
+    baseURL,
+    ...config,
+  });
+
+  // Add request interceptor to include auth token
+  client.interceptors.request.use(async (config) => {
+    try {
+      const token = await tokenProvider.getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+    }
+    return config;
+  });
+
+  return createClientFromAxiosInstance(client);
+}
+
+// Helper function to create a client from an Axios instance
+function createClientFromAxiosInstance(client: AxiosInstance): HttpClient {
   return {
     get: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
       const response = await client.get<T>(url, config);

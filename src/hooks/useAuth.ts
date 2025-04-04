@@ -12,15 +12,34 @@ export default function useAuth() {
   } = useAuth0();
 
   const getAccessToken = async () => {
-    const accessToken = await getAccessTokenSilently({
-      authorizationParams: {
-        audience,
-        scope:
-          'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
-      },
-      cacheMode: 'off',
-    });
-    return accessToken as string | undefined;
+    try {
+      // Only attempt to get token if user is authenticated
+      if (!isAuthenticated) {
+        console.error('Cannot get access token: User is not authenticated');
+        return undefined;
+      }
+
+      console.error('Attempting to get access token silently');
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience,
+          scope:
+            'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
+        },
+        cacheMode: 'off',
+      });
+
+      if (!accessToken) {
+        console.error('Received empty access token from Auth0');
+      } else {
+        console.error('Successfully retrieved access token');
+      }
+
+      return accessToken as string | undefined;
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+      return undefined;
+    }
   };
 
   const login = () => {
