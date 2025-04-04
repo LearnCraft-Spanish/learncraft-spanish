@@ -1,8 +1,8 @@
 import type { FilterConfig } from 'src/components/Table/types';
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
+import type { Student } from '../types';
 
 export default function filterFunction(
-  data: FlashcardStudent[],
+  data: Student[],
   filterConfig: FilterConfig,
 ) {
   if (!filterConfig.field || !filterConfig.value) {

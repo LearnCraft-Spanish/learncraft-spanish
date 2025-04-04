@@ -6,7 +6,6 @@ import { FormControls, TextInput } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
 import { useModal } from 'src/hooks/useModal';
 import useProgramsTable from 'src/hooks/VocabQuizDbData/useProgramsTable';
-import './EditProgramView.scss';
 
 type CohortLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J';
 type CohortField = `cohort${CohortLetter}CurrentLesson`;

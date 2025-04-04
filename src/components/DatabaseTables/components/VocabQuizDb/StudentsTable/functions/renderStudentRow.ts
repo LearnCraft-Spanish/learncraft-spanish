@@ -1,21 +1,15 @@
-import type { FlashcardStudent, Program } from 'src/types/interfaceDefinitions';
 import React from 'react';
+import type { Student } from '../types';
 import StudentTableRow from '../components/StudentTableRow';
+import { Program } from 'src/types/interfaceDefinitions';
 
-export default function renderStudentRow(
-  student: FlashcardStudent,
-  programTableQuery: Program[] | undefined,
-) {
-  if (!programTableQuery) {
-    return null;
-  }
-  const programName = programTableQuery.find(
-    (program) => program.recordId === student.relatedProgram,
+export default function renderStudentRow(student: Student, program: Program[]) {
+  const programName = program.find(
+    (p) => p.recordId === student.relatedProgram,
   )?.name;
-
   return React.createElement(StudentTableRow, {
     key: student.recordId,
     student,
-    programName,
+    program: programName ?? '',
   });
 }

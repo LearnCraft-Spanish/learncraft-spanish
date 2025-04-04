@@ -1,17 +1,9 @@
-// src/components/VocabQuizDbTables/VocabQuizDbTables.tsx
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import useAuth from 'src/hooks/useAuth';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { Link, Outlet } from 'react-router-dom';
+import useDatabaseTables from './useDatabaseTables';
 import './DatabaseTables.scss';
 
 export default function DatabaseTables() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const userDataQuery = useUserData();
-
-  const location = useLocation();
-  const isRoot = location.pathname === '/database-tables';
-
-  const dataReady = userDataQuery.isSuccess && !isLoading && isAuthenticated;
+  const { dataReady, isRoot } = useDatabaseTables();
 
   return (
     dataReady && (

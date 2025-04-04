@@ -1,10 +1,7 @@
 import type { SortConfig } from 'src/components/Table/types';
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
+import type { Student } from '../types';
 
-export default function sortFunction(
-  data: FlashcardStudent[],
-  sortConfig: SortConfig,
-) {
+export default function sortFunction(data: Student[], sortConfig: SortConfig) {
   if (!data || sortConfig.direction === 'none') {
     return data;
   }

@@ -7,3 +7,5 @@ export interface EditableStudent
 }
 
 export type NewStudent = Omit<EditableStudent, 'recordId'>;
+
+export type Student = FlashcardStudent;

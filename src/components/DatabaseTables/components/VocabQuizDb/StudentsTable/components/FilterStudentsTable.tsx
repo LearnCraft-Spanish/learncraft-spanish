@@ -2,7 +2,6 @@ import type { Dispatch, SetStateAction } from 'react';
 import type { FilterConfig } from 'src/components/Table/types';
 
 import { TextInput } from 'src/components/FormComponents/TextInput';
-
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 export default function FilterStudentsTable({

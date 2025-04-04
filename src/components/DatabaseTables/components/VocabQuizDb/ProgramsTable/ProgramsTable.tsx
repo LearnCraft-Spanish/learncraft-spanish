@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import Table from 'src/components/Table';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useProgramsTable from 'src/hooks/VocabQuizDbData/useProgramsTable';
+import BackButton from '../../general/BackButton';
 import EditProgramView from './components/EditProgramView';
 import { renderProgramRow, sortFunction } from './functions';
 import './ProgramsTable.scss';
@@ -25,11 +25,7 @@ export default function ProgramsTable() {
 
   return (
     <div>
-      <div className="back-button-container">
-        <Link to="/database-tables" className="back-button">
-          ← Back to Tables
-        </Link>
-      </div>
+      <BackButton />
       {programsTableQuery.isLoading && (
         <Loading message="Loading Program Data..." />
       )}
@@ -55,8 +51,6 @@ export default function ProgramsTable() {
             data={programsTableQuery.data}
             renderRow={renderProgramRow}
             sortFunction={sortFunction}
-            // filterFunction={filterFunction}
-            // filterComponent={FilterProgramsTable}
           />
           {programToEdit && <EditProgramView program={programToEdit} />}
         </>

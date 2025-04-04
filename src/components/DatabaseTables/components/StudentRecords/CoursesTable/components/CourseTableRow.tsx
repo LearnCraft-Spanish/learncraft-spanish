@@ -7,9 +7,7 @@ interface CourseTableRowProps {
   course: Course;
 }
 
-export default function CourseTableRow({
-  course,
-}: CourseTableRowProps): ReactNode {
+export default function CourseTableRow({ course }: CourseTableRowProps) {
   const { openContextual } = useContextualMenu();
   const {
     name,

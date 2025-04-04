@@ -4,15 +4,13 @@ import React from 'react';
 import { TextInput } from 'src/components/FormComponents';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
-interface FilterCoursesTableProps {
-  filterConfig: FilterConfig;
-  setFilterConfig: Dispatch<SetStateAction<FilterConfig>>;
-}
-
 export default function FilterCoursesTable({
   filterConfig,
   setFilterConfig,
-}: FilterCoursesTableProps) {
+}: {
+  filterConfig: FilterConfig;
+  setFilterConfig: Dispatch<SetStateAction<FilterConfig>>;
+}) {
   const { openContextual } = useContextualMenu();
   const handleFilterChange = (value: string) => {
     setFilterConfig({

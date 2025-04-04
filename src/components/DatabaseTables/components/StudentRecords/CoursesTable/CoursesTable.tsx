@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import Table from 'src/components/Table';
 import useCoursesTable from 'src/hooks/StudentRecordsData/useCoursesTable';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import BackButton from '../../general/BackButton';
 import { CreateCourse, EditCourse } from './components/EditCourseView';
 import FilterCoursesTable from './components/FilterCoursesTable';
 import { filterFunction, renderCourseRow, sortFunction } from './functions';
@@ -26,11 +26,8 @@ export default function CoursesTable() {
 
   return (
     <div>
-      <div className="back-button-container">
-        <Link to="/database-tables" className="back-button">
-          ← Back to Tables
-        </Link>
-      </div>
+      <BackButton />
+
       {coursesTableQuery.isLoading && (
         <Loading message="Loading Course Data..." />
       )}

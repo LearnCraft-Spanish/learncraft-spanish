@@ -11,7 +11,6 @@ import verifyRequiredInputs from 'src/components/FormComponents/functions/inputV
 import useLessonsTable from 'src/hooks/StudentRecordsData/useLessonsTable';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
-import './EditLessonView.scss';
 
 export default function EditLessonView({
   lesson,

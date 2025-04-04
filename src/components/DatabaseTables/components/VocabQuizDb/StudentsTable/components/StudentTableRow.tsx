@@ -1,17 +1,15 @@
-import type { ReactNode } from 'react';
-import type { FlashcardStudent } from 'src/types/interfaceDefinitions';
 import pencilIcon from 'src/assets/icons/pencil.svg';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-
-interface StudentTableRowProps {
-  student: FlashcardStudent;
-  programName?: string;
-}
+import type { Student } from '../types';
+import { ReactNode } from 'react';
 
 export default function StudentTableRow({
   student,
-  programName,
-}: StudentTableRowProps): ReactNode {
+  program,
+}: {
+  student: Student;
+  program: string;
+}): ReactNode {
   const { openContextual } = useContextualMenu();
   const { name, emailAddress, cohort, role, recordId } = student;
 
@@ -27,7 +25,7 @@ export default function StudentTableRow({
       </td>
       <td>{name}</td>
       <td>{emailAddress}</td>
-      <td>{programName}</td>
+      <td>{program}</td>
       <td>{cohort}</td>
       <td>{role}</td>
     </tr>
