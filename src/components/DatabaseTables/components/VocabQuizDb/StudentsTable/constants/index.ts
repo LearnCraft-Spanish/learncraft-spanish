@@ -1,4 +1,4 @@
-import { HeaderObject } from 'src/components/Table/types';
+import type { HeaderObject } from 'src/components/Table/types';
 
 const headers: HeaderObject[] = [
   { header: 'Edit Record' },

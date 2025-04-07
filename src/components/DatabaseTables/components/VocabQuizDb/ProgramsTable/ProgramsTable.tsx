@@ -1,56 +1,38 @@
-import { useMemo } from 'react';
 import { Loading } from 'src/components/Loading';
 import Table from 'src/components/Table';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import useProgramsTable from 'src/hooks/VocabQuizDbData/useProgramsTable';
 import BackButton from '../../general/BackButton';
-import EditProgramView from './components/EditProgramView';
-import { renderProgramRow, sortFunction } from './functions';
+
+import { EditProgramView, FilterProgramsTable } from './components';
+import { headers } from './constants';
+import { filterFunction, renderProgramRow, sortFunction } from './functions';
+
+import useProgramsTable from './useProgramsTable';
 import './ProgramsTable.scss';
 
 export default function ProgramsTable() {
-  const { programsTableQuery } = useProgramsTable();
-  const { contextual } = useContextualMenu();
-
-  const programToEdit = useMemo(() => {
-    if (!contextual.startsWith('edit-program-')) {
-      return undefined;
-    }
-
-    const recordId = Number(contextual.split('edit-program-')[1]);
-    return programsTableQuery.data?.find(
-      (program) => program.recordId === recordId,
-    );
-  }, [programsTableQuery.data, contextual]);
+  const {
+    programToEdit,
+    programsTableQuery,
+    states: { isLoading, isError, isSuccess },
+  } = useProgramsTable();
 
   return (
     <div>
       <BackButton />
-      {programsTableQuery.isLoading && (
-        <Loading message="Loading Program Data..." />
+      {isLoading && <Loading message="Loading Program Data..." />}
+      {isError && (
+        <div className="error-message">Error Loading Program Data</div>
       )}
-      {programsTableQuery.isError && <div>Error Loading Program Data</div>}
-      {programsTableQuery.isSuccess && (
+      {isSuccess && (
         <>
           <h2>Programs Table</h2>
           <Table
-            headers={[
-              { header: 'Edit Record', sortable: false },
-              { header: 'Name', sortable: true, noWrap: true },
-              { header: 'Cohort A Current', sortable: true },
-              { header: 'Cohort B Current', sortable: true },
-              { header: 'Cohort C Current', sortable: true },
-              { header: 'Cohort D Current', sortable: true },
-              { header: 'Cohort E Current', sortable: true },
-              { header: 'Cohort F Current', sortable: true },
-              { header: 'Cohort G Current', sortable: true },
-              { header: 'Cohort H Current', sortable: true },
-              { header: 'Cohort I Current', sortable: true },
-              { header: 'Cohort J Current', sortable: true },
-            ]}
-            data={programsTableQuery.data}
-            renderRow={renderProgramRow}
+            headers={headers}
+            data={programsTableQuery.data ?? []}
             sortFunction={sortFunction}
+            filterFunction={filterFunction}
+            filterComponent={FilterProgramsTable}
+            renderRow={renderProgramRow}
           />
           {programToEdit && <EditProgramView program={programToEdit} />}
         </>

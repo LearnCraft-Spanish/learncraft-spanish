@@ -1,7 +1,7 @@
+import type { ReactNode } from 'react';
+import type { Student } from '../types';
 import pencilIcon from 'src/assets/icons/pencil.svg';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import type { Student } from '../types';
-import { ReactNode } from 'react';
 
 export default function StudentTableRow({
   student,

@@ -62,7 +62,7 @@ export type UserData = Expanded<{
   program: 'LCSP' | 'SI1M';
 }>;
 
-export type FlashcardStudent = {
+export interface FlashcardStudent {
   recordId: number;
   name: string;
   emailAddress: string;
@@ -70,7 +70,7 @@ export type FlashcardStudent = {
   relatedProgram: number;
   role: '' | 'limited' | 'student' | 'none';
   program: 'LCSP' | 'SI1M';
-};
+}
 
 export type selectedProgram = Expanded<Program | null>;
 

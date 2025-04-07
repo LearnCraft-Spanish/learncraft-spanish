@@ -1,14 +1,12 @@
 import type { Program } from 'src/types/interfaceDefinitions';
-import type { EditableProgram } from '../types';
+import type { CohortField, CohortLetter, EditableProgram } from '../types';
 import { useState } from 'react';
 import ContextualView from 'src/components/Contextual/ContextualView';
 import { FormControls, TextInput } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
 import { useModal } from 'src/hooks/useModal';
 import useProgramsTable from 'src/hooks/VocabQuizDbData/useProgramsTable';
-
-type CohortLetter = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J';
-type CohortField = `cohort${CohortLetter}CurrentLesson`;
+import { cohorts } from '../constants';
 
 export default function EditProgramView({ program }: { program: Program }) {
   const [editObject, setEditObject] = useState<Program>(program);
@@ -47,19 +45,6 @@ export default function EditProgramView({ program }: { program: Program }) {
       [field]: numValue,
     }));
   };
-
-  const cohorts: CohortLetter[] = [
-    'A',
-    'B',
-    'C',
-    'D',
-    'E',
-    'F',
-    'G',
-    'H',
-    'I',
-    'J',
-  ];
 
   return (
     <ContextualView editFunction={() => setEditMode(!editMode)}>

@@ -1,4 +1,4 @@
-import { LessonsTable } from './StudentRecords';
-import StudentsTable from './VocabQuizDb/StudentsTable';
+import { CoursesTable, LessonsTable } from './StudentRecords';
+import { ProgramsTable, StudentsTable } from './VocabQuizDb';
 
-export { LessonsTable, StudentsTable };
+export { CoursesTable, LessonsTable, ProgramsTable, StudentsTable };

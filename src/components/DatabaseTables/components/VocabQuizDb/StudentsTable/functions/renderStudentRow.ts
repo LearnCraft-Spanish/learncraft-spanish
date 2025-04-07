@@ -1,7 +1,7 @@
-import React from 'react';
+import type { Program } from 'src/types/interfaceDefinitions';
 import type { Student } from '../types';
+import React from 'react';
 import StudentTableRow from '../components/StudentTableRow';
-import { Program } from 'src/types/interfaceDefinitions';
 
 export default function renderStudentRow(student: Student, program: Program[]) {
   const programName = program.find(

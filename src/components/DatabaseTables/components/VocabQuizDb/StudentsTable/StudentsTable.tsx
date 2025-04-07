@@ -3,8 +3,8 @@ import Table from 'src/components/Table';
 import BackButton from '../../general/BackButton';
 
 import { CreateStudent, EditStudent, FilterStudentsTable } from './components';
-import { filterFunction, renderStudentRow, sortFunction } from './functions';
 import { headers } from './constants';
+import { filterFunction, renderStudentRow, sortFunction } from './functions';
 
 import useStudentsTable from './useStudentsTable';
 import './StudentsTable.scss';

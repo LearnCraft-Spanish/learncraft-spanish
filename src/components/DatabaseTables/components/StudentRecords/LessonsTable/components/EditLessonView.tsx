@@ -11,6 +11,7 @@ import verifyRequiredInputs from 'src/components/FormComponents/functions/inputV
 import useLessonsTable from 'src/hooks/StudentRecordsData/useLessonsTable';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
+import { lessonTypes } from '../constants';
 
 export default function EditLessonView({
   lesson,
@@ -100,7 +101,7 @@ export default function EditLessonView({
           onChange={(value: string) =>
             setEditObject({ ...editObject, type: value })
           }
-          options={['LCSP', '1MC/2MC', 'ACCSP', 'COMPREHENSION', 'ADVANCED']}
+          options={lessonTypes}
           editMode={editMode}
         />
         {editMode && (
