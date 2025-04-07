@@ -1,4 +1,4 @@
-import type { PrivateCall, Week, Student } from 'src/types/CoachingTypes';
+import type { PrivateCall, Student, Week } from 'src/types/CoachingTypes';
 import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
 import React, { useEffect, useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
