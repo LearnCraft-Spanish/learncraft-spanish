@@ -22,6 +22,11 @@ export default function DatabaseTables() {
                 Programs Table
               </Link>
             </div>
+            <div className="buttonBox">
+              <Link className="linkButton" to="/database-tables/quizzes">
+                Quizzes Table
+              </Link>
+            </div>
             <h3>Student Records Database</h3>
             <div className="buttonBox">
               <Link className="linkButton" to="/database-tables/lessons">

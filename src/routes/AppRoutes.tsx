@@ -6,6 +6,7 @@ import DatabaseTables, {
   CoursesTable,
   LessonsTable,
   ProgramsTable,
+  QuizzesTable,
   StudentsTable,
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
@@ -117,6 +118,7 @@ export default function AppRoutes() {
         <Route path="programs" element={<ProgramsTable />} />
         <Route path="lessons" element={<LessonsTable />} />
         <Route path="courses" element={<CoursesTable />} />
+        <Route path="quizzes" element={<QuizzesTable />} />
       </Route>
       <Route path="/*" element={<NotFoundPage />} />
     </SentryRoutes>
