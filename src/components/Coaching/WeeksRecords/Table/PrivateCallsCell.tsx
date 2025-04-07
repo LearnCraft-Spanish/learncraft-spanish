@@ -1,9 +1,4 @@
-import type {
-  PrivateCall,
-  Week,
-  Membership,
-  Student,
-} from 'src/types/CoachingTypes';
+import type { PrivateCall, Week, Student } from 'src/types/CoachingTypes';
 import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
 import React, { useEffect, useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
@@ -27,7 +22,6 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
-import { getMembershipFromWeekRecordId } from 'src/hooks/CoachingData/helperFunctions';
 
 const ratingOptions = [
   'Excellent',
