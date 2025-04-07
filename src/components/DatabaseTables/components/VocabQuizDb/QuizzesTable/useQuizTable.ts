@@ -1,5 +1,3 @@
-import type { Quiz } from 'src/types/interfaceDefinitions';
-import type { NewQuiz } from './types';
 import { useMemo } from 'react';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useQuizzesTable from 'src/hooks/VocabQuizDbData/useQuizzesTable';
@@ -17,14 +15,6 @@ export default function useQuizTable() {
     return quizzesTableQuery.data?.find((quiz) => quiz.recordId === recordId);
   }, [quizzesTableQuery.data, contextual]);
 
-  const handleCreateQuiz = (newQuiz: NewQuiz) => {
-    createQuizMutation.mutate(newQuiz);
-  };
-
-  const handleUpdateQuiz = (quiz: Quiz) => {
-    updateQuizMutation.mutate(quiz);
-  };
-
   const states = {
     isLoading: quizzesTableQuery.isLoading,
     isError: quizzesTableQuery.isError,
@@ -36,7 +26,7 @@ export default function useQuizTable() {
     createQuiz: contextual === 'create-quiz',
     quizTableQuery: quizzesTableQuery,
     states,
-    handleCreateQuiz,
-    handleUpdateQuiz,
+    createQuizMutation,
+    updateQuizMutation,
   };
 }

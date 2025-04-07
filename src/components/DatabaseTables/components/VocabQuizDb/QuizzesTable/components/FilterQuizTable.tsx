@@ -25,27 +25,21 @@ export default function FilterQuizTable({
 
   return (
     <div className="filter-container">
-      <form className="filter-form">
-        <TextInput
-          label="Filter by Quiz Nickname"
-          value={
-            filterConfig.field === 'Quiz Nickname' ? filterConfig.value : ''
-          }
-          onChange={handleNameFilterChange}
-          editMode
-        />
+      <TextInput
+        label="Filter by Quiz Nickname"
+        value={filterConfig.field === 'Quiz Nickname' ? filterConfig.value : ''}
+        onChange={handleNameFilterChange}
+        editMode
+      />
 
-        <div className="filter-actions">
-          <button
-            type="button"
-            className="add-new-button"
-            onClick={() => openContextual('create-quiz')}
-            data-action="create"
-          >
-            New Quiz Record
-          </button>
-        </div>
-      </form>
+      <button
+        type="button"
+        className="greenButton"
+        onClick={() => openContextual('create-quiz')}
+        data-action="create"
+      >
+        New Quiz Record
+      </button>
     </div>
   );
 }

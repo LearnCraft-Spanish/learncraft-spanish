@@ -1,5 +1,7 @@
-import type { NewQuiz } from 'src/components/DatabaseTables/components/VocabQuizDb/QuizzesTable/types';
-import type { Quiz } from 'src/types/interfaceDefinitions';
+import type {
+  NewQuiz,
+  QuizObjForUpdate,
+} from 'src/components/DatabaseTables/components/VocabQuizDb/QuizzesTable/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../useBackend';
@@ -36,8 +38,8 @@ export default function useQuizzesTable() {
   });
 
   const updateQuizMutation = useMutation({
-    mutationFn: (quiz: Quiz) => {
-      const promise = newPutFactory<Quiz>({
+    mutationFn: (quiz: QuizObjForUpdate) => {
+      const promise = newPutFactory<QuizObjForUpdate>({
         path: 'vocab-quiz/quizzes',
         body: quiz,
       });
