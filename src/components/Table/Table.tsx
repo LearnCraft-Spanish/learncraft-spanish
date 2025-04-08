@@ -13,7 +13,7 @@ interface TableProps<T> {
   renderRow: (item: T) => ReactNode | null;
   itemsPerPage?: number;
   sortFunction: (data: T[], sortConfig: SortConfig) => T[];
-  filterFunction: (data: T[], filterConfig: FilterConfig) => T[];
+  filterFunction?: (data: T[], filterConfig: FilterConfig) => T[];
   filterComponent?: React.ComponentType<{
     filterConfig: FilterConfig;
     setFilterConfig: Dispatch<SetStateAction<FilterConfig>>;
@@ -44,7 +44,8 @@ export default function Table<T>({
     data,
     itemsPerPage,
     sortFunction,
-    filterFunction,
+    filterFunction:
+      filterFunction || ((data: T[], _filterConfig: FilterConfig) => data),
   });
 
   return (
@@ -96,6 +97,12 @@ export default function Table<T>({
             )}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          maxPage={maxPage}
+          nextPage={nextPage}
+          previousPage={previousPage}
+        />
       </div>
     </div>
   );
