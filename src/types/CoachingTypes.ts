@@ -17,7 +17,7 @@ export type Week = Expanded<{
   notes: string;
   holdWeek: boolean;
   recordsComplete: boolean;
-  currentLesson: number | null;
+  currentLesson: number | null | undefined;
   primaryCoachWhenCreated: string;
   recordCompletable: boolean;
   recordId: number;
