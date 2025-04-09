@@ -1,6 +1,6 @@
-import type { PrivateCall, Week } from 'src/types/CoachingTypes';
+import type { PrivateCall, Student, Week } from 'src/types/CoachingTypes';
 import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import CustomStudentSelector from 'src/components/Coaching/general/CustomStudentSelector';
 import getDateRange from 'src/components/Coaching/general/functions/dateRange';
@@ -284,13 +284,14 @@ export default function PrivateCallsCell({
   week,
   calls,
   tableEditMode,
+  student,
 }: {
   week: Week;
   calls: PrivateCall[] | null;
   tableEditMode: boolean;
+  student?: Student | undefined | null;
 }) {
   const { contextual, openContextual } = useContextualMenu();
-
   return (
     <div className="callBox">
       {/* Existing Calls */}
@@ -319,6 +320,10 @@ export default function PrivateCallsCell({
               ? week.weekStarts
               : week.weekStarts.toISOString()
           }
+          studentObj={{
+            studentFullname: student?.fullName || '',
+            relatedWeek: week,
+          }}
         />
       )}
     </div>
@@ -328,9 +333,17 @@ export default function PrivateCallsCell({
 export function NewPrivateCallView({
   onSuccess,
   weekStartsDefaultValue,
+  studentObj,
 }: {
   onSuccess?: () => void;
   weekStartsDefaultValue: string;
+  studentObj?:
+    | {
+        studentFullname: string;
+        relatedWeek: Week;
+      }
+    | undefined
+    | null;
 }) {
   const { getStudentFromMembershipId, createPrivateCallMutation } =
     useCoaching();
@@ -455,6 +468,12 @@ export function NewPrivateCallView({
     setStudent(undefined);
     setWeekStarts(value);
   };
+
+  useEffect(() => {
+    if (studentObj && studentObj.studentFullname.length > 0) {
+      setStudent(studentObj);
+    }
+  }, [studentObj]);
 
   return (
     <ContextualView>

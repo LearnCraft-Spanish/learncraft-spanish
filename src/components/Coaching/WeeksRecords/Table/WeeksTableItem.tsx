@@ -187,6 +187,7 @@ export default function WeeksTableItem({
             week={week}
             calls={privateCalls}
             tableEditMode={tableEditMode}
+            student={getStudentFromMembershipId(week.relatedMembership)}
           />
         </td>
         <td className="notesCell">
