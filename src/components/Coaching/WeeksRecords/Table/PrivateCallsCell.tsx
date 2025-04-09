@@ -1,6 +1,6 @@
 import type { PrivateCall, Week } from 'src/types/CoachingTypes';
 import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import CustomStudentSelector from 'src/components/Coaching/general/CustomStudentSelector';
 import getDateRange from 'src/components/Coaching/general/functions/dateRange';
@@ -319,7 +319,6 @@ export default function PrivateCallsCell({
               ? week.weekStarts
               : week.weekStarts.toISOString()
           }
-          week={week}
         />
       )}
     </div>
@@ -329,11 +328,9 @@ export default function PrivateCallsCell({
 export function NewPrivateCallView({
   onSuccess,
   weekStartsDefaultValue,
-  week,
 }: {
   onSuccess?: () => void;
   weekStartsDefaultValue: string;
-  week?: Week;
 }) {
   const { getStudentFromMembershipId, createPrivateCallMutation } =
     useCoaching();
@@ -430,28 +427,25 @@ export function NewPrivateCallView({
       },
     );
   }
-  const updateStudent = useCallback(
-    (relatedWeekId: number) => {
-      if (!weeksQuery.data) {
-        console.error('No weeks found');
-        return;
-      }
-      const studentWeek = weeksQuery.data.find(
-        (week: Week) => week.recordId === relatedWeekId,
-      );
-      if (!studentWeek) {
-        console.error('No student found with recordId:', relatedWeekId);
-        return;
-      }
-      setStudent({
-        studentFullname:
-          getStudentFromMembershipId(studentWeek.relatedMembership)?.fullName ||
-          '',
-        relatedWeek: studentWeek,
-      });
-    },
-    [getStudentFromMembershipId, weeksQuery.data],
-  );
+  const updateStudent = (relatedWeekId: number) => {
+    if (!weeksQuery.data) {
+      console.error('No weeks found');
+      return;
+    }
+    const studentWeek = weeksQuery.data.find(
+      (week: Week) => week.recordId === relatedWeekId,
+    );
+    if (!studentWeek) {
+      console.error('No student found with recordId:', relatedWeekId);
+      return;
+    }
+    setStudent({
+      studentFullname:
+        getStudentFromMembershipId(studentWeek.relatedMembership)?.fullName ||
+        '',
+      relatedWeek: studentWeek,
+    });
+  };
 
   const updateWeekStarts = (value: string) => {
     if (value === 'loadMore') {
@@ -461,12 +455,6 @@ export function NewPrivateCallView({
     setStudent(undefined);
     setWeekStarts(value);
   };
-
-  useEffect(() => {
-    if (week) {
-      updateStudent(week.recordId);
-    }
-  }, [week, updateStudent]);
 
   return (
     <ContextualView>
