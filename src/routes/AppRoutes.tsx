@@ -2,10 +2,16 @@ import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 
 import CoachingDashboard from 'src/components/CoachingDashboard';
+import DatabaseTables, {
+  CoursesTable,
+  LessonsTable,
+  ProgramsTable,
+  QuizzesTable,
+  StudentsTable,
+} from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
-import VocabQuizDbTables from 'src/components/VocabQuizDbTables/VocabQuizDbTables';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
@@ -102,7 +108,18 @@ export default function AppRoutes() {
           )
         }
       />
-      <Route path="/vocab-quiz-db-tables" element={<VocabQuizDbTables />} />
+      <Route
+        path="/database-tables/*"
+        element={
+          userDataQuery.data?.roles.adminRole === 'admin' && <DatabaseTables />
+        }
+      >
+        <Route path="students" element={<StudentsTable />} />
+        <Route path="programs" element={<ProgramsTable />} />
+        <Route path="lessons" element={<LessonsTable />} />
+        <Route path="courses" element={<CoursesTable />} />
+        <Route path="quizzes" element={<QuizzesTable />} />
+      </Route>
       <Route path="/*" element={<NotFoundPage />} />
     </SentryRoutes>
   );

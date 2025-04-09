@@ -1,6 +1,7 @@
 export interface HeaderObject {
   header: string;
-  sortable: boolean;
+  sortable?: boolean;
+  noWrap?: boolean;
 }
 export type SortDirection = 'ascending' | 'descending' | 'none';
 
