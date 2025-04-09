@@ -17,22 +17,28 @@ const createGhostRow = (columns: TableColumn[]): TableRow => ({
   cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
 });
 
+/**
+ * Generates a unique row ID based on current timestamp
+ */
+const generateRowId = (): string =>
+  `row-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
 export function useTableData<T>({
   columns,
   validateRow,
   initialData = [],
 }: UseTableDataOptions<T>): TableHook<T> {
   // Convert initial data to TableRows if provided
-  const initialRows: TableRow[] = initialData.map((item, index) => {
+  const initialRows: TableRow[] = initialData.map((_item, _index) => {
     const cells: Record<string, string> = {};
     // Map each item property to a cell using column IDs
     columns.forEach((column) => {
       const key = column.id as keyof T;
-      const value = item[key];
+      const value = _item[key];
       cells[column.id] = value !== undefined ? String(value) : '';
     });
     return {
-      id: `row-${Date.now()}-${index}`,
+      id: generateRowId(),
       cells,
     };
   });
@@ -63,15 +69,15 @@ export function useTableData<T>({
   // Function to set data from external source
   const setExternalData = useCallback(
     (newData: T[]) => {
-      const newRows: TableRow[] = newData.map((item, index) => {
+      const newRows: TableRow[] = newData.map((_item, _index) => {
         const cells: Record<string, string> = {};
         columns.forEach((column) => {
           const key = column.id as keyof T;
-          const value = item[key];
+          const value = _item[key];
           cells[column.id] = value !== undefined ? String(value) : '';
         });
         return {
-          id: `row-${Date.now()}-${index}`,
+          id: generateRowId(),
           cells,
         };
       });
@@ -86,6 +92,8 @@ export function useTableData<T>({
   // Handle cell value changes
   const handleCellChange = useCallback(
     (rowId: string, columnId: string, value: string) => {
+      let newRowId: string | null = null; // Track the new row ID when converting ghost row
+
       setData((prev) => {
         // Check if we're editing the ghost row and adding content
         if (rowId === GHOST_ROW_ID && value.trim() !== '') {
@@ -108,9 +116,12 @@ export function useTableData<T>({
           // Update the specific cell
           newCells[columnId] = String(value);
 
+          // Create a new regular row ID and store it for focus tracking
+          newRowId = generateRowId();
+
           // Create a new regular row from the ghost row
           const newRegularRow: TableRow = {
-            id: `row-${Date.now()}`, // Create a unique ID
+            id: newRowId, // Use the new ID
             cells: newCells, // Use the new cells object
           };
 
@@ -152,6 +163,9 @@ export function useTableData<T>({
           rows: updatedRows,
         };
       });
+
+      // Return the new row ID if we converted a ghost row
+      return newRowId;
     },
     [columns],
   );
@@ -212,7 +226,7 @@ export function useTableData<T>({
             ) {
               // Convert ghost row to regular row
               targetRow = {
-                id: `row-${Date.now()}-${targetRowIndex}`,
+                id: generateRowId(),
                 cells: { ...newRows[targetRowIndex].cells },
               };
             } else {
@@ -222,7 +236,7 @@ export function useTableData<T>({
                 cellsObj[col.id] = '';
               });
               targetRow = {
-                id: `row-${Date.now()}-${targetRowIndex}`,
+                id: generateRowId(),
                 cells: cellsObj,
               };
             }
@@ -330,7 +344,7 @@ export function useTableData<T>({
           }
 
           const newRow: TableRow = {
-            id: jsonData.id || jsonData.rowId || `row-${Date.now()}-0`,
+            id: jsonData.id || jsonData.rowId || generateRowId(),
             cells: cellsObj,
           };
 
@@ -387,15 +401,13 @@ export function useTableData<T>({
           Math.min(potentialHeaderRow.length / 2, columns.length / 2);
       }
 
-      const timestamp = Date.now();
-
       // Skip the header row if detected
       const dataRows = hasHeaderRow ? nonEmptyRows.slice(1) : nonEmptyRows;
 
       // Create new rows with entirely separate cell objects
-      const newRows: TableRow[] = dataRows.map((cells, index) => {
-        // Create a unique ID for each row based on timestamp and index
-        const rowId = `row-${timestamp}-${index}`;
+      const newRows: TableRow[] = dataRows.map((cells, _index) => {
+        // Create a unique ID for each row
+        const rowId = generateRowId();
 
         // Create a fresh cells object with each cell as a primitive value
         const cellsObj: Record<string, string> = {};

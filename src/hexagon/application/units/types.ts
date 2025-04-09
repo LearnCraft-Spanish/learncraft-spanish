@@ -71,7 +71,11 @@ export interface TableHook<T> {
     rowId: string,
     columnId: string,
   ) => void;
-  handleCellChange: (rowId: string, columnId: string, value: string) => void;
+  handleCellChange: (
+    rowId: string,
+    columnId: string,
+    value: string,
+  ) => string | null;
   handleSave: () => Promise<T[] | undefined>;
   clearTable: () => void;
 
