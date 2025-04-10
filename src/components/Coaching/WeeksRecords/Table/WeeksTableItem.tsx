@@ -208,17 +208,27 @@ export default function WeeksTableItem({
           )}
         </td>
         {allowSingleRecordUpdate && (
-          <td>
+          <td className="editIconCell">
             {editMode ? (
               <>
-                <img src={x} alt="Cancel Edit" onClick={cancelEdit} />
-                <button type="button" onClick={handleSubmit}>
+                <img
+                  src={x}
+                  alt="Cancel Edit"
+                  onClick={cancelEdit}
+                  className="cancelEditIcon"
+                />
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="submitEditButton"
+                >
                   Submit Changes
                 </button>
               </>
             ) : (
               <img
                 src={pencil}
+                className="editIconRowRecord"
                 alt="Edit Record"
                 onClick={() => toggleEditMode?.()}
               />
@@ -259,19 +269,15 @@ export function WeeksTableItemWithSiingleRecordEdit({
 
   const dataReady = studentRecordsLessonsQuery.isSuccess;
 
-  const [editMode, setEditMode] = useState(false);
-
-  // Update the data object to include all required Week properties
-  const [dataObject, setDataObject] = useState({
-    ...week,
-  });
+  const [editMode, setEditMode] = useState(tableEditMode);
+  const [localWeek, setLocalWeek] = useState<Week>({ ...week });
 
   // This is the same logic as validateRecordCompleteable in WeeksTableItem
   function validateRecordCompleteable() {
     if (week.week === 0) {
       return true;
     }
-    if (!dataObject.currentLesson || dataObject.currentLesson === 0) {
+    if (!localWeek.currentLesson || localWeek.currentLesson === 0) {
       return false;
     }
 
@@ -280,7 +286,7 @@ export function WeeksTableItemWithSiingleRecordEdit({
 
     if (
       privateCalls?.length === 0 &&
-      dataObject.notes === '' &&
+      localWeek.notes === '' &&
       groupSessions?.length === 0
     ) {
       return false;
@@ -291,10 +297,10 @@ export function WeeksTableItemWithSiingleRecordEdit({
 
   function captureCancelEdit() {
     if (
-      dataObject.notes === week.notes &&
-      dataObject.holdWeek === week.holdWeek &&
-      dataObject.recordsComplete === week.recordsComplete &&
-      dataObject.currentLesson === week.currentLesson
+      localWeek.notes === week.notes &&
+      localWeek.holdWeek === week.holdWeek &&
+      localWeek.recordsComplete === week.recordsComplete &&
+      localWeek.currentLesson === week.currentLesson
     ) {
       toast.info('No changes detected');
       setEditMode(false);
@@ -309,7 +315,7 @@ export function WeeksTableItemWithSiingleRecordEdit({
   }
 
   function cancelEdit() {
-    setDataObject({
+    setLocalWeek({
       ...week,
     });
     closeModal();
@@ -319,10 +325,10 @@ export function WeeksTableItemWithSiingleRecordEdit({
   function handleSubmit() {
     // on no changes, do nothing
     if (
-      dataObject.notes === week.notes &&
-      dataObject.holdWeek === week.holdWeek &&
-      dataObject.recordsComplete === week.recordsComplete &&
-      dataObject.currentLesson === week.currentLesson
+      localWeek.notes === week.notes &&
+      localWeek.holdWeek === week.holdWeek &&
+      localWeek.recordsComplete === week.recordsComplete &&
+      localWeek.currentLesson === week.currentLesson
     ) {
       toast.info('No changes detected');
       setEditMode(false);
@@ -330,7 +336,7 @@ export function WeeksTableItemWithSiingleRecordEdit({
     }
 
     // Validate record completeable
-    if (dataObject.recordsComplete && !validateRecordCompleteable()) {
+    if (localWeek.recordsComplete && !validateRecordCompleteable()) {
       openModal({
         title: 'Error',
         body: 'Cannot mark record as complete without a current lesson, a private or group call, or a note if no calls were made.',
@@ -340,13 +346,13 @@ export function WeeksTableItemWithSiingleRecordEdit({
     }
     updateWeekMutation.mutate(
       {
-        notes: dataObject.notes,
-        holdWeek: dataObject.holdWeek,
-        recordsComplete: dataObject.recordsComplete,
+        notes: localWeek.notes,
+        holdWeek: localWeek.holdWeek,
+        recordsComplete: localWeek.recordsComplete,
         offTrack: week.offTrack,
         primaryCoachWhenCreated: week.primaryCoachWhenCreated,
         recordId: week.recordId,
-        currentLesson: dataObject.currentLesson ?? undefined,
+        currentLesson: localWeek.currentLesson ?? undefined,
       },
       {
         onSuccess: () => {
@@ -364,18 +370,32 @@ export function WeeksTableItemWithSiingleRecordEdit({
       updateActiveDataWeek(week);
     }
 
-    setDataObject(week);
+    setLocalWeek(week);
   };
 
   // Create a modifiedWeek object that combines dataObject properties with week
   const modifiedWeek = {
     ...week,
-    notes: dataObject.notes,
-    holdWeek: dataObject.holdWeek,
-    recordsComplete: dataObject.recordsComplete,
-    currentLesson: dataObject.currentLesson,
-    currentLessonName: dataObject.currentLessonName,
+    notes: localWeek.notes,
+    holdWeek: localWeek.holdWeek,
+    recordsComplete: localWeek.recordsComplete,
+    currentLesson: localWeek.currentLesson,
+    currentLessonName: localWeek.currentLessonName,
   };
+
+  function toggleEditMode() {
+    setEditMode(!editMode);
+
+    // When enabling edit mode, scroll the table wrapper to the far right
+    if (!editMode) {
+      setTimeout(() => {
+        const tableWrapper = document.querySelector('.tableWrapper');
+        if (tableWrapper) {
+          tableWrapper.scrollLeft = tableWrapper.scrollWidth;
+        }
+      }, 50); // Small delay to ensure DOM has updated with the wider content
+    }
+  }
 
   return (
     dataReady && (
@@ -386,7 +406,7 @@ export function WeeksTableItemWithSiingleRecordEdit({
         failedToUpdate={failedToUpdate}
         hiddenFields={hiddenFields}
         allowSingleRecordUpdate={allowSingleRecordUpdate}
-        toggleEditMode={() => setEditMode(!editMode)}
+        toggleEditMode={toggleEditMode}
         cancelEdit={captureCancelEdit}
         handleSubmit={handleSubmit}
       />
