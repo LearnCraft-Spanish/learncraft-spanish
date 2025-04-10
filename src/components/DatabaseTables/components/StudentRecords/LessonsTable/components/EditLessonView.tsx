@@ -83,6 +83,7 @@ export default function EditLessonView({
             setEditObject({ ...editObject, lessonName: value })
           }
           editMode={editMode}
+          required
         />
         <TextInput
           label="Week Ref"

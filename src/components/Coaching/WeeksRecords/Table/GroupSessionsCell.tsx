@@ -581,8 +581,9 @@ export function GroupSessionView({
           coachEmail={coach}
           onChange={updateCoach}
           editMode={editMode}
+          required
         />
-        {editMode && <DateInput value={date} onChange={setDate} />}
+        {editMode && <DateInput value={date} onChange={setDate} required />}
         {editMode && (
           <Dropdown
             label="Session Type"
@@ -590,6 +591,7 @@ export function GroupSessionView({
             onChange={setSessionType}
             options={sessionTypeOptions}
             editMode
+            required
           />
         )}
       </div>

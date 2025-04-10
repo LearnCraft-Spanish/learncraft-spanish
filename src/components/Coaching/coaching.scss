@@ -157,6 +157,13 @@ td button {
     font-size: 1rem;
     font-weight: 600;
     // padding-top: 8px;
+
+    &.required {
+      &::after {
+        content: '*';
+        margin: 0 4px;
+      }
+    }
   }
   .label,
   .content {

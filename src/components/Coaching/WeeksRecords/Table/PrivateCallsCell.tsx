@@ -558,6 +558,7 @@ export function NewPrivateCallView({
         onChange={setRating}
         options={ratingOptions}
         editMode
+        required
       />
 
       <CoachDropdown
@@ -565,9 +566,10 @@ export function NewPrivateCallView({
         coachEmail={caller}
         onChange={setCaller}
         editMode
+        required
       />
 
-      <DateInput value={date} onChange={setDate} />
+      <DateInput value={date} onChange={setDate} required />
 
       <TextAreaInput label="Notes" value={notes} onChange={setNotes} editMode />
 

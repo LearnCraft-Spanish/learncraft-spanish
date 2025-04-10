@@ -5,17 +5,19 @@ export function TextAreaInput({
   value,
   onChange,
   editMode,
+  required = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   editMode: boolean;
+  required?: boolean;
 }) {
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
       <label
-        className="label"
+        className={`label ${required && editMode ? 'required' : ''}`}
         htmlFor={`textAreaInput-${camelLabel}`}
       >{`${label}: `}</label>
       {editMode ? (
@@ -37,17 +39,19 @@ export function TextInput({
   value,
   onChange,
   editMode,
+  required = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   editMode: boolean;
+  required?: boolean;
 }) {
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
       <label
-        className="label"
+        className={`label ${required && editMode ? 'required' : ''}`}
         htmlFor={`textInput-${camelLabel}`}
       >{`${label}: `}</label>
       {editMode ? (
@@ -69,17 +73,19 @@ export function LinkInput({
   value,
   onChange,
   editMode,
+  required = false,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   editMode: boolean;
+  required?: boolean;
 }) {
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
       <label
-        className="label"
+        className={`label ${required && editMode ? 'required' : ''}`}
         htmlFor={`linkInput-${camelLabel}`}
       >{`${label}: `}</label>
       {editMode ? (
