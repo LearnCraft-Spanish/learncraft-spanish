@@ -92,7 +92,7 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
     } else {
       setQuizNumber(Number(quiz.quizNickname.split(' ')[2]));
     }
-  }, [quiz]);
+  }, [quiz, createMode]);
 
   return (
     <ContextualView editFunction={() => setEditMode(!editMode)}>
