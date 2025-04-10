@@ -66,6 +66,7 @@ export interface Student {
   firstSubscribed: Date | string;
   advancedStudent: boolean;
   relatedCoach: string | number | undefined;
+  learningDisabilities: string;
 }
 
 export type Membership = Expanded<{
