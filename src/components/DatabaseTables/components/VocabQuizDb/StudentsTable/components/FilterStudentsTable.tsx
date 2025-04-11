@@ -34,13 +34,37 @@ export default function FilterStudentsTable({
 
   // Initialize filterValues from existing filterConfig if available
   useEffect(() => {
+    // Prevent infinite loop by checking if we need to update
+    const needsUpdate =
+      // For multi-filter
+      (filterConfig.field === 'multi-filter' && filterConfig.value) ||
+      // For legacy single filter
+      (filterConfig.field &&
+        filterConfig.value &&
+        (filterConfig.field === 'name' ||
+          filterConfig.field === 'program' ||
+          filterConfig.field === 'cohort'));
+
+    if (!needsUpdate) return;
+
     if (filterConfig.field === 'multi-filter' && filterConfig.value) {
       try {
         const parsedFilters = JSON.parse(filterConfig.value);
-        setFilterValues({
-          name: parsedFilters.name || '',
-          program: parsedFilters.program || '',
-          cohort: parsedFilters.cohort || '',
+        setFilterValues((prevValues) => {
+          // Only update if values are different to prevent potential re-render cycles
+          if (
+            prevValues.name === (parsedFilters.name || '') &&
+            prevValues.program === (parsedFilters.program || '') &&
+            prevValues.cohort === (parsedFilters.cohort || '')
+          ) {
+            return prevValues;
+          }
+
+          return {
+            name: parsedFilters.name || '',
+            program: parsedFilters.program || '',
+            cohort: parsedFilters.cohort || '',
+          };
         });
       } catch {
         // If parsing fails, just use empty values
@@ -52,21 +76,24 @@ export default function FilterStudentsTable({
       }
     } else if (filterConfig.field && filterConfig.value) {
       // Handle legacy single filter configuration
-      const newFilterValues = {
-        name: '',
-        program: '',
-        cohort: '',
-      };
+      setFilterValues((prevValues) => {
+        const newFilterValues = { ...prevValues };
 
-      // Only set the value if the field is a valid filter field
-      const field = filterConfig.field as FilterField;
-      if (field === 'name' || field === 'program' || field === 'cohort') {
-        newFilterValues[field] = filterConfig.value;
-      }
+        // Only set the value if the field is a valid filter field
+        const field = filterConfig.field as FilterField;
+        if (field === 'name' || field === 'program' || field === 'cohort') {
+          newFilterValues[field] = filterConfig.value;
+        }
 
-      setFilterValues(newFilterValues);
+        // Only update if values are different
+        if (JSON.stringify(prevValues) === JSON.stringify(newFilterValues)) {
+          return prevValues;
+        }
+
+        return newFilterValues;
+      });
     }
-  }, []); // Only run on initial mount
+  }, [filterConfig]); // Add filterConfig as a dependency
 
   // Update the filter configuration when any filter value changes
   const updateFilterConfig = (newValues: typeof filterValues) => {
