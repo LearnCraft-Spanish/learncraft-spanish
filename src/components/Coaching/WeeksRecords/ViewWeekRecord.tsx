@@ -46,10 +46,15 @@ export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
         <p className="label">Time Zone:</p>
         <p className="content">{student.timeZone}</p>
       </div>
-      {/* <div className="lineWrapper">
-          <p className="label">Membership Level:</p>
-          <p className="content">{student.currentLevel}</p>
-        </div> */}
+      <div className="lineWrapper">
+        <p className="label">Pronouns:</p>
+        <p className="content">{student.pronoun}</p>
+      </div>
+      <div className="lineWrapper">
+        <p className="label">Learning Disabilities:</p>
+        <p className="content">{student.learningDisabilities}</p>
+      </div>
+
       <div className="lineWrapper">
         <p className="label">Primary Coach:</p>
         <p className="content">{student.primaryCoach.name}</p>

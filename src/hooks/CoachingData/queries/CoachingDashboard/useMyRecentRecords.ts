@@ -6,13 +6,13 @@ export default function useMyRecentRecordsQuery(month: string) {
   const { coach } = useActiveCoach();
   const { getRecentRecords } = useCoachingDashboardBackend();
   // format name
-  const name = coach?.user.name.replace(/\s+/g, '+');
+  const coachId = coach?.user.id;
   // format month into 'YYYY-MM'
   const formattedMonth = month.replace(':', '-');
   const myRecentRecordsQuery = useQuery({
-    queryKey: ['recent-records', name, formattedMonth],
-    queryFn: () => getRecentRecords(name, formattedMonth),
-    enabled: !!name,
+    queryKey: ['recent-records', coachId, formattedMonth],
+    queryFn: () => getRecentRecords(coachId, formattedMonth),
+    enabled: !!coachId,
     staleTime: Infinity,
   });
 

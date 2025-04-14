@@ -477,68 +477,80 @@ export function NewPrivateCallView({
 
   return (
     <ContextualView>
-      <div className="lineWrapper">
-        <label className="label" htmlFor="weekStarts">
-          Week Starts:
-        </label>
-        <select
-          id="weekStarts"
-          className="content"
-          value={weekStarts}
-          onChange={(e) => updateWeekStarts(e.target.value)}
-        >
-          {Array.from({ length: numWeeks }, (_, i) => {
-            const dateKey =
-              i === 0
-                ? 'thisWeekDate'
-                : i === 1
-                  ? 'lastSundayDate'
-                  : i === 2
-                    ? 'twoSundaysAgoDate'
-                    : `${i + 1}SundaysAgoDate`;
-            const date = dateRange[dateKey];
-            const label =
-              i === 0
-                ? 'This Week'
-                : i === 1
-                  ? 'Last Week'
-                  : i === 2
-                    ? 'Two Weeks Ago'
-                    : toReadableMonthDay(date);
-            return (
-              <option key={date} value={date}>
-                {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
-              </option>
-            );
-          })}
-          <option value="loadMore" className="loadMoreOption">
-            Load More...
-          </option>
-        </select>
-      </div>
-      <div className="lineWrapper">
-        <label className="label" htmlFor="student">
-          Student:
-        </label>
-
-        {student ? (
-          <>
-            <div className="content">{student.studentFullname}</div>
-            <button
-              type="button"
-              className="clearStudent"
-              onClick={() => setStudent(undefined)}
+      {!studentObj ? (
+        <>
+          <div className="lineWrapper">
+            <label className="label" htmlFor="weekStarts">
+              Week Starts:
+            </label>
+            <select
+              id="weekStarts"
+              className="content"
+              value={weekStarts}
+              onChange={(e) => updateWeekStarts(e.target.value)}
             >
-              <img src={x_dark} alt="close" />
-            </button>
-          </>
-        ) : (
-          <CustomStudentSelector
-            weekStarts={weekStarts}
-            onChange={updateStudent}
-          />
-        )}
-      </div>
+              {Array.from({ length: numWeeks }, (_, i) => {
+                const dateKey =
+                  i === 0
+                    ? 'thisWeekDate'
+                    : i === 1
+                      ? 'lastSundayDate'
+                      : i === 2
+                        ? 'twoSundaysAgoDate'
+                        : `${i + 1}SundaysAgoDate`;
+                const date = dateRange[dateKey];
+                const label =
+                  i === 0
+                    ? 'This Week'
+                    : i === 1
+                      ? 'Last Week'
+                      : i === 2
+                        ? 'Two Weeks Ago'
+                        : toReadableMonthDay(date);
+                return (
+                  <option key={date} value={date}>
+                    {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+                  </option>
+                );
+              })}
+              <option value="loadMore" className="loadMoreOption">
+                Load More...
+              </option>
+            </select>
+          </div>
+          <div className="lineWrapper">
+            <label className="label" htmlFor="student">
+              Student:
+            </label>
+
+            {student ? (
+              <>
+                <div className="content">{student.studentFullname}</div>
+                <button
+                  type="button"
+                  className="clearStudent"
+                  onClick={() => setStudent(undefined)}
+                >
+                  <img src={x_dark} alt="close" />
+                </button>
+              </>
+            ) : (
+              <CustomStudentSelector
+                weekStarts={weekStarts}
+                onChange={updateStudent}
+              />
+            )}
+          </div>
+        </>
+      ) : (
+        <Dropdown
+          label="Student"
+          value={student?.studentFullname}
+          onChange={() => {}}
+          options={[student?.studentFullname || '']}
+          editMode={false}
+        />
+      )}
 
       <Dropdown
         label="Rating"
@@ -546,6 +558,7 @@ export function NewPrivateCallView({
         onChange={setRating}
         options={ratingOptions}
         editMode
+        required
       />
 
       <CoachDropdown
@@ -553,9 +566,10 @@ export function NewPrivateCallView({
         coachEmail={caller}
         onChange={setCaller}
         editMode
+        required
       />
 
-      <DateInput value={date} onChange={setDate} />
+      <DateInput value={date} onChange={setDate} required />
 
       <TextAreaInput label="Notes" value={notes} onChange={setNotes} editMode />
 

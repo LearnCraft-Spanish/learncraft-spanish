@@ -14,10 +14,10 @@ interface RecentRecords {
 export default function useCoachingDashboardBackend() {
   const { getFactory } = useBackendHelpers();
 
-  const getRecentRecords = (coachName: string | undefined, month: string) => {
-    if (!coachName) return undefined;
+  const getRecentRecords = (coachId: string | undefined, month: string) => {
+    if (!coachId) return undefined;
     return getFactory<RecentRecords>(
-      `coaching/recent-records/?coachName=${coachName}&month=${month}`,
+      `coaching/recent-records/?coachId=${coachId}&month=${month}`,
     );
   };
 

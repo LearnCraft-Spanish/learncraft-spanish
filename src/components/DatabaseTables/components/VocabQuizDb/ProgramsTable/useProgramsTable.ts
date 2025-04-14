@@ -1,10 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import useProgramsTableQueries from 'src/hooks/VocabQuizDbData/useProgramsTable';
 
 export default function useProgramsTable() {
-  const { programsTableQuery } = useProgramsTableQueries();
+  const { programsTableQuery, updateManyProgramsMutation } =
+    useProgramsTableQueries();
   const { contextual } = useContextualMenu();
+  const [tableEditMode, setTableEditMode] = useState(false);
 
   const programToEdit = useMemo(() => {
     if (!contextual.startsWith('edit-program-')) {
@@ -20,6 +22,9 @@ export default function useProgramsTable() {
   return {
     programToEdit,
     programsTableQuery,
+    tableEditMode,
+    setTableEditMode,
+    updateManyProgramsMutation,
     states: {
       isLoading: programsTableQuery.isLoading,
       isError: programsTableQuery.isError,

@@ -79,6 +79,7 @@ export default function StudentRecordView({
         value={editObject.name}
         onChange={(value) => setEditObject({ ...editObject, name: value })}
         editMode={editMode}
+        required
       />
       <TextInput
         label="Email"
@@ -87,6 +88,7 @@ export default function StudentRecordView({
           setEditObject({ ...editObject, emailAddress: value })
         }
         editMode={editMode}
+        required
       />
       <Dropdown
         label="Program"
@@ -96,6 +98,7 @@ export default function StudentRecordView({
           setEditObject({ ...editObject, program: value as 'LCSP' | 'SI1M' })
         }
         editMode={editMode}
+        required
       />
       <GenericDropdown
         label="Related Program"
@@ -108,6 +111,7 @@ export default function StudentRecordView({
           })
         }
         editMode={editMode}
+        required
       />
       <Dropdown
         label="Cohort"
@@ -115,6 +119,7 @@ export default function StudentRecordView({
         value={editObject.cohort}
         onChange={(value) => setEditObject({ ...editObject, cohort: value })}
         editMode={editMode}
+        required
       />
       <Dropdown
         label="Role"

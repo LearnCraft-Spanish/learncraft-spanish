@@ -32,8 +32,27 @@ export default function useProgramsTable() {
     },
   });
 
+  const updateManyProgramsMutation = useMutation({
+    mutationFn: (programs: EditableProgram[]) => {
+      const promise = newPutFactory<number[]>({
+        path: 'vocab-quiz/programs/bulk-update',
+        body: programs,
+      });
+      toast.promise(promise, {
+        pending: 'Updating programs...',
+        success: 'Programs updated successfully!',
+        error: 'Failed to update programs',
+      });
+      return promise;
+    },
+    onSuccess: () => {
+      programsTableQuery.refetch();
+    },
+  });
+
   return {
     programsTableQuery,
     updateProgramMutation,
+    updateManyProgramsMutation,
   };
 }

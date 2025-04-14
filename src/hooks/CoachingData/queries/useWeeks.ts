@@ -29,7 +29,7 @@ export default function useWeeks(
     offTrack: boolean;
     primaryCoachWhenCreated: string;
     recordId: number;
-    currentLesson: number | undefined;
+    currentLesson: number | undefined | null;
   }
   const updateWeekMutation = useMutation({
     mutationFn: (week: WeekForUpdate) => {

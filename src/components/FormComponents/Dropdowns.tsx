@@ -10,6 +10,7 @@ export default function Dropdown({
   options,
   editMode,
   defaultOptionText,
+  required = false,
 }: {
   label: string;
   value: string | undefined;
@@ -17,12 +18,16 @@ export default function Dropdown({
   options: string[];
   editMode: boolean;
   defaultOptionText?: string;
+  required?: boolean;
 }) {
   const camelLabel = camelize(label);
   return (
     <div className="lineWrapper">
-      <label className="label" htmlFor={`dropdown-${camelLabel}`}>
-        {`${label}: `}
+      <label
+        className={`label ${required && editMode ? 'required' : ''}`}
+        htmlFor={`dropdown-${camelLabel}`}
+      >
+        {`${label}:`}
       </label>
       {editMode ? (
         <select
@@ -51,12 +56,14 @@ export function CoachDropdown({
   editMode,
   label = 'Coach',
   defaultOptionText = undefined,
+  required = false,
 }: {
   coachEmail: string;
   onChange: (value: string) => void;
   editMode: boolean;
   label?: string;
   defaultOptionText?: string;
+  required?: boolean;
 }) {
   const { coachListQuery } = useCoachList();
 
@@ -81,8 +88,11 @@ export function CoachDropdown({
   return (
     dataReady && (
       <div className="lineWrapper">
-        <label className="label" htmlFor="coachDropdown">
-          {`${label}: `}
+        <label
+          className={`label ${required && editMode ? 'required' : ''}`}
+          htmlFor="coachDropdown"
+        >
+          {`${label}:`}
         </label>
         {editMode ? (
           <select
@@ -119,6 +129,7 @@ export function GenericDropdown({
   options,
   editMode = true,
   defaultOptionText = 'Select',
+  required = false,
 }: {
   label: string;
   selectedValue: string;
@@ -126,13 +137,17 @@ export function GenericDropdown({
   options: DropdownOption[];
   editMode?: boolean;
   defaultOptionText?: string;
+  required?: boolean;
 }) {
   const camelLabel = camelize(label);
 
   return (
     <div className="lineWrapper">
-      <label className="label" htmlFor={`dropdown-${camelLabel}`}>
-        {`${label}: `}
+      <label
+        className={`label ${required && editMode ? 'required' : ''}`}
+        htmlFor={`dropdown-${camelLabel}`}
+      >
+        {`${label}:`}
       </label>
       {editMode ? (
         <select

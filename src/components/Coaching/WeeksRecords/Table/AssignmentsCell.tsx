@@ -247,6 +247,7 @@ export function AssignmentView({
         value={assignmentType}
         onChange={setAssignmentType}
         options={assignmentTypes}
+        required
       />
 
       <CoachDropdown
@@ -254,6 +255,7 @@ export function AssignmentView({
         editMode={editMode}
         coachEmail={homeworkCorrector}
         onChange={updateHomeworkCorrector}
+        required
       />
 
       <Dropdown
@@ -262,6 +264,7 @@ export function AssignmentView({
         value={rating}
         onChange={setRating}
         options={ratings}
+        required
       />
 
       <TextAreaInput
@@ -553,6 +556,7 @@ export function NewAssignmentView({
         onChange={setAssignmentType}
         options={assignmentTypes}
         editMode
+        required
       />
 
       <CoachDropdown
@@ -560,6 +564,7 @@ export function NewAssignmentView({
         editMode
         coachEmail={homeworkCorrector}
         onChange={updateHomeworkCorrector}
+        required
       />
 
       <Dropdown
@@ -568,6 +573,7 @@ export function NewAssignmentView({
         onChange={setRating}
         options={ratings}
         editMode
+        required
       />
       <LinkInput
         label="Assignment Link"

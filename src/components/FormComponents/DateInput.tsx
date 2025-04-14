@@ -2,14 +2,19 @@ export default function DateInput({
   value,
   onChange,
   label = 'Date',
+  required = false,
 }: {
   value: string;
   onChange: (value: React.SetStateAction<string>) => void;
   label?: string;
+  required?: boolean;
 }) {
   return (
     <div className="lineWrapper">
-      <label className="label" htmlFor="dateInput">
+      <label
+        className={`label ${required ? 'required' : ''}`}
+        htmlFor="dateInput"
+      >
         {`${label}:`}
       </label>
       <input
