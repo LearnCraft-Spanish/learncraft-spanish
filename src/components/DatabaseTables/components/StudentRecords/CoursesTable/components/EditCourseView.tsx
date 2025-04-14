@@ -77,6 +77,7 @@ export default function EditCourseView({
           value={editObject.name}
           onChange={(value) => setEditObject({ ...editObject, name: value })}
           editMode={editMode}
+          required
         />
         <TextInput
           label="Membership Type"

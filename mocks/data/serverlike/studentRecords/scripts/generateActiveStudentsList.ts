@@ -62,6 +62,7 @@ function generateActiveStudentsData({
       primaryCoach: coachList[i % coachList.length].user,
       relatedCoach: coachList[i % coachList.length].user.id,
       pronoun: '',
+      learningDisabilities: '',
       billingEmail: '',
       billingNotes: '',
       firstSubscribed: '',

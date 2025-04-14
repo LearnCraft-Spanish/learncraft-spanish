@@ -157,6 +157,13 @@ td button {
     font-size: 1rem;
     font-weight: 600;
     // padding-top: 8px;
+
+    &.required {
+      &::after {
+        content: '*';
+        margin: 0 4px;
+      }
+    }
   }
   .label,
   .content {
@@ -425,4 +432,36 @@ td button {
 
 .checkboxCell .switch {
   margin: 0.5rem;
+}
+
+/* --------- Edit Icon - Weeks Table Item --------- */
+
+.tableWrapper table td.editIconCell {
+  text-align: center;
+  vertical-align: middle;
+  background-color: var(--accent);
+  .editIconRowRecord {
+    cursor: pointer;
+    width: 3rem;
+    margin: auto;
+    transition: transform 0.2s;
+  }
+  &:hover {
+    .editIconRowRecord {
+      transform: scale(1.25);
+    }
+  }
+  .cancelEditIcon {
+    cursor: pointer;
+    width: 3rem;
+    margin: 1rem;
+    transition: transform 0.2s;
+    &:hover {
+      transform: scale(1.25);
+    }
+  }
+
+  .submitEditButton:hover {
+    background-color: darkgreen;
+  }
 }

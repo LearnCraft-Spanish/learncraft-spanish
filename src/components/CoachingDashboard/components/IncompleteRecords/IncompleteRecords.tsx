@@ -48,7 +48,7 @@ export function IncompleteRecords() {
                   key={item.id}
                   week={item}
                   updateActiveDataWeek={() => {}}
-                  tableEditMode={false}
+                  editMode={false}
                   failedToUpdate={false}
                   hiddenFields={[]}
                 />

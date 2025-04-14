@@ -1,5 +1,6 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
+import { useModal } from 'src/hooks/useModal';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
@@ -24,7 +25,7 @@ export default function AddToMyFlashcardsButtons({
     exampleIsPending,
   } = useStudentFlashcards();
   const userData = useUserData();
-
+  const { openModal, closeModal } = useModal();
   const dataSuccess = userData.isSuccess && flashcardDataQuery.isSuccess;
   if (!example) {
     throw new Error('No Flashcard passed to AddToMyFlashcardsButtons');
@@ -47,6 +48,18 @@ export default function AddToMyFlashcardsButtons({
   const isCollected = exampleIsCollected(example.recordId);
   const isCustom = exampleIsCustom(example.recordId);
   const isPending = exampleIsPending(example.recordId);
+
+  const handleRemoveCustom = () => {
+    openModal({
+      title: 'Remove Custom Example',
+      body: 'This is one of your custom flashcards! Are you sure you want to delete it?',
+      type: 'confirm',
+      confirmFunction: () => {
+        remove();
+        closeModal();
+      },
+    });
+  };
   if (dataSuccess) {
     if (!isCollected) {
       return (
@@ -76,7 +89,11 @@ export default function AddToMyFlashcardsButtons({
       );
     } else if (isCollected && isCustom) {
       return (
-        <button type="button" className="customFlashcardButton">
+        <button
+          type="button"
+          className="customFlashcardButton"
+          onClick={handleRemoveCustom}
+        >
           Custom Flashcard
         </button>
       );

@@ -17,7 +17,7 @@ export type Week = Expanded<{
   notes: string;
   holdWeek: boolean;
   recordsComplete: boolean;
-  currentLesson: number | null;
+  currentLesson: number | null | undefined;
   primaryCoachWhenCreated: string;
   recordCompletable: boolean;
   recordId: number;
@@ -66,6 +66,7 @@ export interface Student {
   firstSubscribed: Date | string;
   advancedStudent: boolean;
   relatedCoach: string | number | undefined;
+  learningDisabilities: string;
 }
 
 export type Membership = Expanded<{

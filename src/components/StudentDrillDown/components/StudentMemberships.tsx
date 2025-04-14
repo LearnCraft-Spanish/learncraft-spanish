@@ -15,6 +15,7 @@ import { toISODate } from 'src/functions/dateUtils';
 import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';
 import {
   useAllStudents,
+  useMembershipWeeks,
   useStudentMemberships,
 } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
@@ -202,6 +203,7 @@ function StudentMembershipContextual({
   const { closeContextual } = useContextualMenu();
   const { courseListQuery } = useCourseList();
   const { openModal, closeModal } = useModal();
+  const [startDate, setStartDate] = useState(membership.startDate as string);
   const [endDate, setEndDate] = useState(membership.endDate as string);
   const [onHold, setOnHold] = useState(membership.onHold);
   const [selectedCourse, setSelectedCourse] = useState(
@@ -213,6 +215,7 @@ function StudentMembershipContextual({
   const { updateMembershipMutation } = useStudentMemberships(
     membership.relatedStudent,
   );
+  const membershipWeeksQuery = useMembershipWeeks(membership.recordId);
   // const [advanced, setAdvanced] = useState(membership.advancedStudent);
   const getCourseName = (courseId: number) => {
     const course = courseListQuery.data?.find((c) => c.recordId === courseId);
@@ -240,6 +243,7 @@ function StudentMembershipContextual({
 
   const cancelEdit = () => {
     setEndDate(membership.endDate as string);
+    setStartDate(membership.startDate as string);
     setSelectedCourse(membership.relatedCourse);
     // setActive(membership.active);
     closeContextual();
@@ -249,12 +253,14 @@ function StudentMembershipContextual({
     updateMembershipMutation.mutate(
       {
         recordId: membership.recordId,
+        startDate,
         endDate,
         onHold,
         relatedCourse: selectedCourse,
       },
       {
         onSuccess: () => {
+          membershipWeeksQuery.refetch();
           closeContextual();
         },
       },
@@ -346,7 +352,14 @@ function StudentMembershipContextual({
         onChange={setOnHold}
       />
       {userDataQuery.data?.roles.adminRole === 'admin' && (
-        <DateInput value={endDate} onChange={setEndDate} label="End Date" />
+        <>
+          <DateInput
+            value={startDate}
+            onChange={setStartDate}
+            label="Start Date"
+          />
+          <DateInput value={endDate} onChange={setEndDate} label="End Date" />
+        </>
       )}
       <FormControls
         editMode

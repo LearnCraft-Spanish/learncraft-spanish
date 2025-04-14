@@ -50,7 +50,7 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
       if (quizNickname.includes('undefined')) {
         openModal({
           title: 'Error',
-          body: 'Quiz nickname contains undefined',
+          body: 'Quiz nickname cannot contain undefined',
           type: 'error',
         });
         return;
@@ -92,7 +92,7 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
     } else {
       setQuizNumber(Number(quiz.quizNickname.split(' ')[2]));
     }
-  }, [quiz]);
+  }, [quiz, createMode]);
 
   return (
     <ContextualView editFunction={() => setEditMode(!editMode)}>
@@ -121,6 +121,7 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
             onChange={(value) =>
               setQuizType(quizNames.find((quiz) => quiz.code === value))
             }
+            required
           />
         )}
 
@@ -139,6 +140,7 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
                 ),
               )
             }
+            required
           />
         )}
 
@@ -149,6 +151,7 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
             value={quizNumber?.toString() ?? ''}
             onChange={(value) => setQuizNumber(Number(value))}
             editMode={editMode}
+            required
           />
         )}
         <FormControls

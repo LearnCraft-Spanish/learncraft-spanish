@@ -107,8 +107,12 @@ export default function StudentInfoCard({
           <div className="info-value">{student.fullName}</div>
         </div>
         <div className="info-row">
-          <div className="info-label">Pronoun:</div>
+          <div className="info-label">Pronouns:</div>
           <div className="info-value">{student.pronoun}</div>
+        </div>
+        <div className="info-row">
+          <div className="info-label">Learning Disabilities:</div>
+          <div className="info-value">{student.learningDisabilities}</div>
         </div>
         <div className="info-row">
           <div className="info-label">Email:</div>
@@ -208,6 +212,7 @@ export function StudentInfoContextual({
         firstName: data.firstName || undefined,
         lastName: data.lastName || undefined,
         pronoun: data.pronoun || undefined,
+        learningDisabilities: data.learningDisabilities || '',
         email: data.email || undefined,
         timeZone: data.timeZone || undefined,
         startingLevel: data.startingLevel || undefined,
@@ -279,7 +284,7 @@ export function StudentInfoContextual({
           editMode
         />
         <Dropdown
-          label="Pronoun"
+          label="Pronouns"
           value={data.pronoun}
           onChange={(value) => {
             setData({ ...data, pronoun: value });
@@ -287,7 +292,14 @@ export function StudentInfoContextual({
           options={['He', 'She', 'They', 'Other']}
           editMode
         />
-
+        <TextInput
+          label="Learning Disabilities"
+          value={data.learningDisabilities}
+          onChange={(value) => {
+            setData({ ...data, learningDisabilities: value });
+          }}
+          editMode
+        />
         <TextInput
           label="Email"
           value={data.email}

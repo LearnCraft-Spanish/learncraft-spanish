@@ -55,6 +55,7 @@ export default function EditProgramView({ program }: { program: Program }) {
           value={editObject.name}
           onChange={(value) => setEditObject({ ...editObject, name: value })}
           editMode={false}
+          required
         />
         <div>
           {cohorts.map((cohort) => (

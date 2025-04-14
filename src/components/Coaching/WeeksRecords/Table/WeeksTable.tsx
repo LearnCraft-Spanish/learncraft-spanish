@@ -7,7 +7,9 @@ import { Loading } from 'src/components/Loading';
 import { Pagination, QuantifiedRecords } from 'src/components/Table/components';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useBackendHelpers } from 'src/hooks/useBackend';
-import WeeksTableItem from './WeeksTableItem';
+import { useModal } from 'src/hooks/useModal';
+import { WeeksTableItemWithSiingleRecordEdit } from './WeeksTableItem';
+
 interface WeekWithFailedToUpdate extends Week {
   failedToUpdate?: boolean;
 }
@@ -49,8 +51,10 @@ export default function WeeksTable({
     groupAttendeesQuery,
     assignmentsQuery,
     privateCallsQuery,
+    getStudentFromMembershipId,
   } = useCoaching();
   const { newPutFactory } = useBackendHelpers();
+  const { openModal } = useModal();
 
   const isLoading =
     weeksQuery.isLoading ||
@@ -60,6 +64,7 @@ export default function WeeksTable({
     privateCallsQuery.isLoading;
 
   const [activeData, setActiveData] = useState<WeekWithFailedToUpdate[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const updateManyWeeksMutation = useMutation({
     mutationFn: (weeks: WeekForUpdate[]) => {
@@ -105,8 +110,9 @@ export default function WeeksTable({
   const updateActiveDataWeek = useCallback((week: Week) => {
     setActiveData((prev) => {
       const newData = prev.map((w) =>
-        w.recordId === week.recordId ? week : w,
+        w.recordId === week.recordId ? { ...w, ...week } : w,
       );
+      setHasUnsavedChanges(true);
       return newData;
     });
   }, []);
@@ -129,10 +135,85 @@ export default function WeeksTable({
     [displayOrderSegment],
   );
 
+  // Validate that records marked as complete meet the requirements
+  const validateRecordsCompleteable = useCallback(
+    (changedWeeks: WeekWithFailedToUpdate[]) => {
+      const invalidWeeks: WeekWithFailedToUpdate[] = [];
+
+      changedWeeks.forEach((week) => {
+        if (!week.recordsComplete) return; // Skip validation for weeks not marked complete
+
+        // Skip week 0
+        if (week.week === 0) return;
+
+        // Need current lesson
+        if (!week.currentLesson) {
+          invalidWeeks.push(week);
+          return;
+        }
+
+        // Need either private calls, group sessions, or notes
+        const privateCalls = privateCallsQuery.data?.filter(
+          (call) => call.relatedWeek === week.recordId,
+        );
+
+        // For group sessions, we need to check the group attendees to find sessions related to this week
+        const groupSessionIds = groupAttendeesQuery.data
+          ?.filter((attendee) => attendee.student === week.recordId)
+          .map((attendee) => attendee.groupSession);
+
+        const groupSessions = groupSessionsQuery.data?.filter((session) =>
+          groupSessionIds?.includes(session.recordId),
+        );
+
+        if (
+          (!privateCalls || privateCalls.length === 0) &&
+          (!groupSessions || groupSessions.length === 0) &&
+          week.notes === ''
+        ) {
+          invalidWeeks.push(week);
+        }
+      });
+
+      return invalidWeeks;
+    },
+    [privateCallsQuery.data, groupSessionsQuery.data, groupAttendeesQuery.data],
+  );
+
   const handleApplyChanges = useCallback(() => {
     const changedWeeks = activeData.filter((week) => recordChanged(week));
+
     if (changedWeeks.length === 0) {
       toast.info('No changes to apply');
+      return;
+    }
+
+    // Validate completeable records
+    const invalidWeeks = validateRecordsCompleteable(changedWeeks);
+    if (invalidWeeks.length > 0) {
+      // Format student names for display
+      const studentNames = invalidWeeks
+        .map((week) => {
+          // Get student name or fallback to a default label
+          let label = `Week ${week.week}`;
+
+          // Try to find student info through getStudentFromMembershipId
+          const student = getStudentFromMembershipId(week.relatedMembership);
+          if (student) {
+            label = `${student.fullName} (Week ${week.week})`;
+          } else {
+            label = `Student ID: ${week.relatedMembership} (Week ${week.week})`;
+          }
+
+          return `- ${label}`;
+        })
+        .join('\n');
+
+      openModal({
+        title: 'Cannot Complete Records',
+        body: `The following student records cannot be marked as complete without a current lesson, a private or group call, or a note if no calls were made:\n\n${studentNames}`,
+        type: 'error',
+      });
       return;
     }
 
@@ -164,6 +245,7 @@ export default function WeeksTable({
           setActiveData(identifyingFailedWeeks);
         } else {
           weeksQuery.refetch();
+          setHasUnsavedChanges(false);
         }
       },
     });
@@ -171,14 +253,31 @@ export default function WeeksTable({
     activeData,
     displayOrderSegment,
     recordChanged,
+    validateRecordsCompleteable,
     updateManyWeeksMutation,
     weeksQuery,
+    openModal,
+    getStudentFromMembershipId,
   ]);
 
   const handleDisableEditMode = useCallback(() => {
-    setTableEditMode(false);
-    setActiveData(displayOrderSegment);
-  }, [displayOrderSegment, setTableEditMode]);
+    // Check if there are unsaved changes before disabling edit mode
+    if (hasUnsavedChanges) {
+      openModal({
+        title: 'Unsaved Changes',
+        body: 'You have unsaved changes. Are you sure you want to disable edit mode? All changes will be lost.',
+        type: 'confirm',
+        confirmFunction: () => {
+          setTableEditMode(false);
+          setActiveData(displayOrderSegment);
+          setHasUnsavedChanges(false);
+        },
+      });
+    } else {
+      setTableEditMode(false);
+      setActiveData(displayOrderSegment);
+    }
+  }, [displayOrderSegment, setTableEditMode, hasUnsavedChanges, openModal]);
 
   /*      Pagination      */
   useEffect(() => {
@@ -191,6 +290,7 @@ export default function WeeksTable({
   useEffect(() => {
     if (displayOrderSegment) {
       setActiveData(displayOrderSegment);
+      setHasUnsavedChanges(false);
     }
   }, [displayOrderSegment]);
 
@@ -225,6 +325,7 @@ export default function WeeksTable({
                   type="button"
                   onClick={handleApplyChanges}
                   className="greenButton"
+                  disabled={!hasUnsavedChanges}
                 >
                   Apply Changes
                 </button>
@@ -272,17 +373,19 @@ export default function WeeksTable({
                 <th>Current Lesson</th>
                 <th>Hold Week</th>
                 <th>Records Complete</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody>
               {activeData.map((week) => (
-                <WeeksTableItem
+                <WeeksTableItemWithSiingleRecordEdit
                   key={week.recordId}
                   week={week}
                   tableEditMode={tableEditMode}
                   updateActiveDataWeek={updateActiveDataWeek}
                   failedToUpdate={week.failedToUpdate}
                   hiddenFields={hiddenFields}
+                  allowSingleRecordUpdate
                 />
               ))}
             </tbody>
