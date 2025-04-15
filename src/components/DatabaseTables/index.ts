@@ -1,11 +1,5 @@
-import {
-  CoursesTable,
-  LessonsTable,
-  ProgramsTable,
-  QuizzesTable,
-  StudentsTable,
-} from './components';
-import DatabaseTables from './DatabaseTables';
+import { CoursesTable, LessonsTable } from './StudentRecords';
+import { ProgramsTable, QuizzesTable, StudentsTable } from './VocabQuizDb';
 
 export {
   CoursesTable,
@@ -14,4 +8,3 @@ export {
   QuizzesTable,
   StudentsTable,
 };
-export default DatabaseTables;

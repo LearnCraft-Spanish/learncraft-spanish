@@ -1,7 +1,7 @@
 import type {
   NewQuiz,
   QuizObjForUpdate,
-} from 'src/components/DatabaseTables/components/VocabQuizDb/QuizzesTable/types';
+} from 'src/components/DatabaseTables/VocabQuizDb/QuizzesTable/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../useBackend';
