@@ -11,7 +11,7 @@ import type {
 } from 'src/types/CoachingTypes';
 
 import getDateRange from 'src/components/Coaching/general/functions/dateRange';
-import fakePeople from '../fakePeople.json' assert { type: 'json' };
+import fakePeople from '../fakePeople.json';
 import { formatDateLikeQB } from './functions';
 import generateStudentList from './generateActiveStudentsList';
 import generateAssignment from './generateAssignment';
