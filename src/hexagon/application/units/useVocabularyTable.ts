@@ -1,6 +1,6 @@
 import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
 import type { TableColumn, TableHook } from './types';
-import { useTableData } from './useTableData';
+import { usePasteTable } from './pasteTable';
 
 // Define schema fields directly using strings to avoid type issues
 const schemaFields: (keyof CreateNonVerbVocabulary)[] = [
@@ -47,7 +47,7 @@ interface VocabularyTableData {
  * This hook provides a bridge between the table UI and the vocabulary domain models
  */
 export function useVocabularyTable(): TableHook<VocabularyTableData> {
-  return useTableData<VocabularyTableData>({
+  return usePasteTable<VocabularyTableData>({
     columns: VOCABULARY_COLUMNS,
     validateRow: (row) => {
       const errors: Record<string, string> = {};

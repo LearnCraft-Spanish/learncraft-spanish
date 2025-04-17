@@ -1,7 +1,8 @@
 import type { TableHook } from '../../../application/units/types';
+import React from 'react';
 import { PasteTableErrorBoundary } from './PasteTableErrorBoundary';
 import { TableRow } from './TableRow';
-import { usePasteTableInterface } from './usePasteTableInterface';
+import { usePasteTable } from './usePasteTable';
 import './PasteTable.scss';
 
 export interface PasteTableProps<T> {
@@ -34,7 +35,7 @@ export function PasteTable<T>({
     resetTable,
     saveData,
     isSaveEnabled,
-  } = usePasteTableInterface(hook);
+  } = usePasteTable(hook);
 
   return (
     <PasteTableErrorBoundary>

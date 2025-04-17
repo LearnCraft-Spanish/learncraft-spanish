@@ -1,14 +1,11 @@
+import type { TableColumn } from '../../../application/units/types';
 import React from 'react';
 
 // TableCellInput component to handle rendering different input types for table cells
 interface TableCellInputProps {
-  columnType: string;
+  column: TableColumn;
   cellValue: string;
   hasError: boolean;
-  options?: { value: string; label: string }[];
-  min?: number;
-  max?: number;
-  placeholder?: string;
   ariaLabel: string;
   handlers: {
     onChange: (value: string) => void;
@@ -20,13 +17,9 @@ interface TableCellInputProps {
 }
 
 export function TableCellInput({
-  columnType,
+  column,
   cellValue,
   hasError,
-  options,
-  min,
-  max,
-  placeholder,
   ariaLabel,
   handlers,
   cellRef,
@@ -44,8 +37,10 @@ export function TableCellInput({
     onPaste: handlers.onPaste,
     onFocus: handlers.onFocus,
     onBlur: handlers.onBlur,
-    placeholder,
+    placeholder: column.placeholder,
   };
+
+  const columnType = column.type || 'text';
 
   switch (columnType) {
     case 'select':
@@ -57,7 +52,7 @@ export function TableCellInput({
           {...commonProps}
         >
           <option value="">Select...</option>
-          {options?.map((option) => (
+          {column.options?.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -72,8 +67,8 @@ export function TableCellInput({
           type="number"
           value={cellValue}
           onChange={handleChange}
-          min={min}
-          max={max}
+          min={column.min}
+          max={column.max}
           {...commonProps}
         />
       );

@@ -57,13 +57,9 @@ export function TableRow({
             }`}
           >
             <TableCellInput
-              columnType={column.type || 'text'}
+              column={column}
               cellValue={String(cellValue)}
               hasError={!!errorMessage}
-              options={column.options}
-              min={column.min}
-              max={column.max}
-              placeholder={column.placeholder}
               ariaLabel={getAriaLabel(column.id, row.id)}
               handlers={cellSpecificHandlers}
               cellRef={(el) => registerCellRef(cellKey, el)}
