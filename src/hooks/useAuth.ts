@@ -15,11 +15,9 @@ export default function useAuth() {
     try {
       // Only attempt to get token if user is authenticated
       if (!isAuthenticated) {
-        console.error('Cannot get access token: User is not authenticated');
         return undefined;
       }
 
-      console.error('Attempting to get access token silently');
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
           audience,
@@ -29,15 +27,9 @@ export default function useAuth() {
         cacheMode: 'off',
       });
 
-      if (!accessToken) {
-        console.error('Received empty access token from Auth0');
-      } else {
-        console.error('Successfully retrieved access token');
-      }
-
       return accessToken as string | undefined;
     } catch (error) {
-      console.error('Failed to get access token:', error);
+      console.error(error);
       return undefined;
     }
   };

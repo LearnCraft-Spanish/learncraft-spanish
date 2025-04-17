@@ -19,6 +19,7 @@ export interface TableRowProps {
     key: string,
     element: HTMLInputElement | HTMLSelectElement | null,
   ) => void;
+  rowIndex: number; // 1-based row index for accessibility
 }
 
 export function TableRow({
@@ -28,10 +29,11 @@ export function TableRow({
   getAriaLabel,
   cellHandlers,
   registerCellRef,
+  rowIndex,
 }: TableRowProps) {
   return (
-    <div className="paste-table__row">
-      {columns.map((column) => {
+    <div className="paste-table__row" role="row" aria-rowindex={rowIndex}>
+      {columns.map((column, colIndex) => {
         const columnKey = column.id;
         const cellKey = `${row.id}-${columnKey}`;
         const cellValue = row.cells[column.id] || '';
@@ -55,6 +57,9 @@ export function TableRow({
             className={`paste-table__cell-container ${
               isActive ? 'paste-table__cell-container--active' : ''
             }`}
+            role="gridcell"
+            aria-colindex={colIndex + 1}
+            aria-selected={isActive || undefined}
           >
             <TableCellInput
               column={column}

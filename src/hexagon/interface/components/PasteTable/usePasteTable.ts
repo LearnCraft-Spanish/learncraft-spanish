@@ -2,43 +2,21 @@ import type { TableHook } from '../../../application/units/types';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 /**
- * Interface defining the contract between the application layer and UI components
+ * Find the index of a row or column in an array
  */
-export interface PasteTablePort {
-  // Data
-  rows: any[];
-  columns: any[];
-  isSaveEnabled: boolean;
-
-  // UI state
-  activeCell: { rowId: string; columnId: string } | null;
-  tableStyle: React.CSSProperties;
-
-  // Event handlers
-  handlePaste: (e: React.ClipboardEvent) => void;
-  resetTable: () => void;
-  saveData: () => Promise<any[] | undefined>;
-
-  // Cell handling
-  cellHandlers: {
-    onChange: (rowId: string, columnId: string, value: string) => void;
-    onFocus: (rowId: string, columnId: string) => void;
-    onBlur: () => void;
-  };
-
-  // Utilities
-  registerCellRef: (
-    key: string,
-    element: HTMLInputElement | HTMLSelectElement | null,
-  ) => void;
-  getAriaLabel: (columnId: string, rowId: string) => string;
-  focusCell: (rowId: string, columnId: string) => void;
+function findIndex<T>(array: T[], predicate: (item: T) => boolean): number {
+  for (let i = 0; i < array.length; i++) {
+    if (predicate(array[i])) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 /**
  * Hook that adapts the application TableHook for the UI components
  */
-export function usePasteTable<T>(hook: TableHook<T>): PasteTablePort {
+export function usePasteTable<T>(hook: TableHook<T>) {
   // UI state - track which cell is active/focused
   const [activeCell, setActiveCell] = useState<{
     rowId: string;
@@ -109,6 +87,138 @@ export function usePasteTable<T>(hook: TableHook<T>): PasteTablePort {
     [hook.data.columns],
   );
 
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!activeCell) return;
+
+      // Get current indices
+      const rowIndex = findIndex(
+        hook.data.rows,
+        (row) => row.id === activeCell.rowId,
+      );
+      const colIndex = findIndex(
+        hook.data.columns,
+        (col) => col.id === activeCell.columnId,
+      );
+
+      if (rowIndex === -1 || colIndex === -1) return;
+
+      const rows = hook.data.rows;
+      const columns = hook.data.columns;
+
+      let nextRowIndex = rowIndex;
+      let nextColIndex = colIndex;
+
+      // Handle arrow key navigation
+      switch (e.key) {
+        case 'ArrowUp':
+          if (rowIndex > 0) {
+            nextRowIndex = rowIndex - 1;
+            e.preventDefault();
+          }
+          break;
+        case 'ArrowDown':
+          if (rowIndex < rows.length - 1) {
+            nextRowIndex = rowIndex + 1;
+            e.preventDefault();
+          }
+          break;
+        case 'ArrowLeft':
+          if (
+            e.ctrlKey ||
+            e.metaKey ||
+            // Only move left if at start of input or selection is at start
+            (e.target instanceof HTMLInputElement &&
+              e.target.selectionStart === 0 &&
+              e.target.selectionEnd === 0)
+          ) {
+            if (colIndex > 0) {
+              nextColIndex = colIndex - 1;
+              e.preventDefault();
+            } else if (rowIndex > 0) {
+              // Wrap to end of previous row
+              nextRowIndex = rowIndex - 1;
+              nextColIndex = columns.length - 1;
+              e.preventDefault();
+            }
+          }
+          break;
+        case 'ArrowRight':
+          if (
+            e.ctrlKey ||
+            e.metaKey ||
+            // Only move right if at end of input or selection is at end
+            (e.target instanceof HTMLInputElement &&
+              e.target.selectionStart === e.target.value.length &&
+              e.target.selectionEnd === e.target.value.length)
+          ) {
+            if (colIndex < columns.length - 1) {
+              nextColIndex = colIndex + 1;
+              e.preventDefault();
+            } else if (rowIndex < rows.length - 1) {
+              // Wrap to start of next row
+              nextRowIndex = rowIndex + 1;
+              nextColIndex = 0;
+              e.preventDefault();
+            }
+          }
+          break;
+        case 'Tab':
+          if (!e.shiftKey) {
+            // Tab forward
+            if (colIndex < columns.length - 1) {
+              nextColIndex = colIndex + 1;
+            } else if (rowIndex < rows.length - 1) {
+              nextRowIndex = rowIndex + 1;
+              nextColIndex = 0;
+            }
+          } else {
+            // Shift+Tab backward
+            if (colIndex > 0) {
+              nextColIndex = colIndex - 1;
+            } else if (rowIndex > 0) {
+              nextRowIndex = rowIndex - 1;
+              nextColIndex = columns.length - 1;
+            }
+          }
+          // Only prevent default if we're navigating within the table
+          if (nextRowIndex !== rowIndex || nextColIndex !== colIndex) {
+            e.preventDefault();
+          }
+          break;
+        case 'Enter':
+          if (e.shiftKey) {
+            // Shift+Enter - move up
+            if (rowIndex > 0) {
+              nextRowIndex = rowIndex - 1;
+              e.preventDefault();
+            }
+          } else {
+            // Enter - move down
+            if (rowIndex < rows.length - 1) {
+              nextRowIndex = rowIndex + 1;
+              e.preventDefault();
+            }
+          }
+          break;
+        default:
+          return; // Don't handle other keys
+      }
+
+      // If position changed, focus the new cell
+      if (nextRowIndex !== rowIndex || nextColIndex !== colIndex) {
+        const nextRow = rows[nextRowIndex];
+        const nextColumn = columns[nextColIndex];
+
+        if (nextRow && nextColumn) {
+          focusCell(nextRow.id, nextColumn.id);
+        }
+      }
+    },
+    [activeCell, hook.data.rows, hook.data.columns, focusCell],
+  );
+
   // Cell event handlers grouped together
   const cellHandlers = useMemo(
     () => ({
@@ -151,6 +261,7 @@ export function usePasteTable<T>(hook: TableHook<T>): PasteTablePort {
     handlePaste: hook.handlePaste,
     resetTable: hook.resetTable,
     saveData: hook.saveData,
+    handleKeyDown,
 
     // UI utilities
     cellHandlers,

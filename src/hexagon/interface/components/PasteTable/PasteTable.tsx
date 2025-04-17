@@ -32,6 +32,7 @@ export function PasteTable<T>({
     registerCellRef,
     getAriaLabel,
     handlePaste,
+    handleKeyDown,
     resetTable,
     saveData,
     isSaveEnabled,
@@ -39,14 +40,25 @@ export function PasteTable<T>({
 
   return (
     <PasteTableErrorBoundary>
-      <div className="paste-table" onPaste={handlePaste} style={tableStyle}>
-        <div className="paste-table__table-grid">
+      <div
+        className="paste-table"
+        onPaste={handlePaste}
+        onKeyDown={handleKeyDown}
+        style={tableStyle}
+        tabIndex={-1} // Allow div to receive focus but not in tab order
+        role="grid"
+        aria-rowcount={rows.length}
+        aria-colcount={columns.length}
+      >
+        <div className="paste-table__table-grid" role="presentation">
           {/* Header row */}
-          <div className="paste-table__header">
-            {columns.map((column) => (
+          <div className="paste-table__header" role="row" aria-rowindex={1}>
+            {columns.map((column, colIndex) => (
               <div
                 key={column.id || `column-${column.label}`}
                 className="paste-table__column-header"
+                role="columnheader"
+                aria-colindex={colIndex + 1}
               >
                 {column.label}
               </div>
@@ -54,8 +66,8 @@ export function PasteTable<T>({
           </div>
 
           {/* Body rows */}
-          <div className="paste-table__body">
-            {rows.map((row) => {
+          <div className="paste-table__body" role="presentation">
+            {rows.map((row, rowIndex) => {
               const rowKey =
                 row.id || `row-${Math.random().toString(36).substring(2, 9)}`;
               return (
@@ -67,6 +79,7 @@ export function PasteTable<T>({
                   getAriaLabel={getAriaLabel}
                   cellHandlers={cellHandlers}
                   registerCellRef={registerCellRef}
+                  rowIndex={rowIndex + 2} // +2 because header is row 1
                 />
               );
             })}
