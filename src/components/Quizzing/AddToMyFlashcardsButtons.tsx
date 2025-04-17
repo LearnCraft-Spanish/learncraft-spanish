@@ -71,15 +71,32 @@ export default function AddToMyFlashcardsButtons({
           Add to my flashcards
         </button>
       );
-    } else if (isCollected && !isCustom && !isPending) {
+    } else if (isCollected && !isPending) {
       return (
-        <button
-          type="button"
-          className="removeFlashcardButton"
-          onClick={() => remove()}
-        >
-          Remove from my flashcards
-        </button>
+        <>
+          {isCustom && (
+            <button
+              type="button"
+              className="customFlashcardButton onFlashcard"
+              onClick={(e) => e.preventDefault()}
+            >
+              Custom Flashcard
+            </button>
+          )}
+          <button
+            type="button"
+            className="removeFlashcardButton"
+            onClick={() => {
+              if (isCustom) {
+                handleRemoveCustom();
+              } else {
+                remove();
+              }
+            }}
+          >
+            Remove from my flashcards
+          </button>
+        </>
       );
     } else if (isCollected && isPending) {
       return (
@@ -87,16 +104,16 @@ export default function AddToMyFlashcardsButtons({
           Adding to Flashcards...
         </button>
       );
-    } else if (isCollected && isCustom) {
-      return (
-        <button
-          type="button"
-          className="customFlashcardButton"
-          onClick={handleRemoveCustom}
-        >
-          Custom Flashcard
-        </button>
-      );
+      // } else if (isCollected && isCustom) {
+      //   return (
+      //     <button
+      //       type="button"
+      //       className="customFlashcardButton"
+      //       onClick={handleRemoveCustom}
+      //     >
+      //       Custom Flashcard
+      //     </button>
+      //   );
     } else {
       throw new Error('Failed to parse flashcard status');
     }
