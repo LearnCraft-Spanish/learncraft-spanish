@@ -1,13 +1,14 @@
+import type { MembershipReportData } from '../ActiveMemberships/types';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useDropoutsByLevelReport from 'src/hooks/AdminData/useDropoutsByLevelReport';
 
-function renderRow(row: any) {
+function renderRow(row: MembershipReportData) {
   return (
     <tr>
-      <td>{row['Course - Name']}</td>
-      <td>{row['Number of Memberships']}</td>
+      <td>{row.courseName}</td>
+      <td>{row.numberOfMemberships}</td>
     </tr>
   );
 }

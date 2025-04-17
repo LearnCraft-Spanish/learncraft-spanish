@@ -1,13 +1,14 @@
+import type { CoachSummaryData } from './types';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useWeeklyCoachSummary from 'src/hooks/AdminData/useWeeklyCoachSummary';
-function renderRow(row: any) {
+function renderRow(row: CoachSummaryData) {
   return (
     <tr>
-      <td>{row['Primary Coach']}</td>
-      <td>{row['Records Complete Ref (avg)']}</td>
-      <td>{row['Record ID# (distinct count)']}</td>
+      <td>{row.primaryCoach}</td>
+      <td>{row.recordsCompleteRefAvg}</td>
+      <td>{row.recordIdDistinctCount}</td>
     </tr>
   );
 }
@@ -16,11 +17,7 @@ export default function WeekCoachSummary() {
   const { weeklyCoachSummaryQuery } = useWeeklyCoachSummary();
 
   const [isOpen, setIsOpen] = useState(false);
-  const headers = [
-    'Primary Coach',
-    'Records Complete Ref (avg)',
-    'Record ID# (distinct count)',
-  ];
+  const headers = ['Coach', 'Records Complete (percent)', 'Number of Records'];
 
   return (
     <div>

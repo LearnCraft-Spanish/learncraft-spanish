@@ -1,4 +1,4 @@
-export interface ActiveMembershipData {
+export interface MembershipReportData {
   courseName: string;
   numberOfMemberships: number;
 }

@@ -1,3 +1,4 @@
+import type { MembershipReportData } from './types';
 // import type { Membership } from 'src/types/CoachingTypes';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
@@ -36,13 +37,8 @@ export default function ActiveMemberships() {
     </div>
   );
 }
-function RenderRowForReport({
-  'Course - Name': courseName,
-  'Number of Memberships': numberOfMemberships,
-}: {
-  'Course - Name': string;
-  'Number of Memberships': number;
-}) {
+function RenderRowForReport(data: MembershipReportData) {
+  const { courseName, numberOfMemberships } = data;
   // const { openContextual } = useContextualMenu();
   return (
     <tr>

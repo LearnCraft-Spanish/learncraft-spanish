@@ -1,13 +1,14 @@
+import type { AssignmentsCompletedByWeekData } from './types';
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useAssignmentsCompletedByWeek from 'src/hooks/AdminData/useAssignmentsCompletedByWeek';
 
-function renderRow(row: any) {
+function renderRow(row: AssignmentsCompletedByWeekData) {
   return (
     <tr>
-      <td>{row.Level}</td>
-      <td>{row['Assignments Completed (avg)']}</td>
+      <td>{row.level}</td>
+      <td>{row.assignmentsCompletedAvg}</td>
     </tr>
   );
 }
