@@ -1,26 +1,31 @@
 import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
-import ContextualView from 'src/components/Contextual/ContextualView';
-import useAssignmentsCompletedByWeek from 'src/hooks/AdminData/useAssignmentsCompletedByWeek';
+import useLastWeekCoachSummary from 'src/hooks/AdminData/useLastWeekCoachSummary';
 function renderRow(row: any) {
   return (
     <tr>
-      <td>{row.Level}</td>
-      <td>{row['Assignments Completed (avg)']}</td>
+      <td>{row['Primary Coach']}</td>
+      <td>{row['Records Complete Ref (avg)']}</td>
+      <td>{row['Record ID# (distinct count)']}</td>
     </tr>
   );
 }
-export default function AssignmentsCompletedByWeek() {
-  const { data, isLoading, error } = useAssignmentsCompletedByWeek();
+
+export default function LastWeekCoachSummary() {
+  const { data, isLoading, error } = useLastWeekCoachSummary();
 
   const [isOpen, setIsOpen] = useState(false);
-  const headers = ['Level', 'Assignments Completed (avg)'];
+  const headers = [
+    'Primary Coach',
+    'Records Complete Ref (avg)',
+    'Record ID# (distinct count)',
+  ];
 
   return (
     <div>
       <SectionHeader
-        title="Assignments Completed By Week"
+        title="Last Week Coach Summary"
         isOpen={isOpen}
         openFunction={() => setIsOpen(!isOpen)}
       />

@@ -2,6 +2,7 @@ import {
   ActiveMemberships,
   AssignmentsCompletedByWeek,
   DropoutsByLevel,
+  LastWeekCoachSummary,
   WeekCoachSummary,
 } from 'src/components/AdminDashboard';
 import './AdminDashboard.scss';
@@ -10,10 +11,13 @@ export default function AdminDashboard() {
   return (
     <div className="admin-dashboard">
       <h2>Admin Dashboard</h2>
-      <ActiveMemberships />
-      <AssignmentsCompletedByWeek />
-      <DropoutsByLevel />
-      <WeekCoachSummary />
+      <div className="admin-dashboard-grid">
+        <WeekCoachSummary />
+        <LastWeekCoachSummary />
+        <ActiveMemberships />
+        <DropoutsByLevel />
+        <AssignmentsCompletedByWeek />
+      </div>
     </div>
   );
 }

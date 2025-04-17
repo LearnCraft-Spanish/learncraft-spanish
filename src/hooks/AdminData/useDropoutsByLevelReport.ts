@@ -10,5 +10,6 @@ export default function useDropoutsByLevelReport() {
   return useQuery({
     queryKey: ['dropouts-by-level-report'],
     queryFn: getDropoutsByLevelReport,
+    staleTime: Infinity,
   });
 }

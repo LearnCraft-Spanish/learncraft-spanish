@@ -10,8 +10,36 @@ export default function useActiveMembershipsReport() {
     );
   };
 
-  return useQuery({
+  const activeMembershipsReportQuery = useQuery({
     queryKey: ['active-memberships-report'],
     queryFn: getActiveMembershipsReport,
+    staleTime: Infinity,
   });
+
+  return { activeMembershipsReportQuery };
+}
+
+export function useActiveMembershipsReportByCourse(courseName: string) {
+  const { getFactory } = useBackendHelpers();
+  if (!courseName) {
+    throw new Error('Course name is required');
+  }
+
+  const getActiveMembershipsReportByCourse = (courseName: string) => {
+    // replace spaces with '+'
+    console.log('courseName', courseName);
+    const formattedCourseName = courseName.replace(/\s+/g, '+');
+    console.log('formattedCourseName', formattedCourseName);
+    return getFactory<ActiveMembershipData[]>(
+      `admin/report/active-memberships-drilldown?courseName=${courseName.replace(/\s+/g, '+')}`,
+    );
+  };
+
+  const activeMembershipsReportByCourseQuery = useQuery({
+    queryKey: ['active-memberships-report-by-course', courseName],
+    queryFn: () => getActiveMembershipsReportByCourse(courseName),
+    staleTime: Infinity,
+  });
+
+  return { activeMembershipsReportByCourseQuery };
 }
