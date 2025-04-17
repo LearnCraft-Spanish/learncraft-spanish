@@ -60,33 +60,26 @@ export interface TableRow {
  * Focuses purely on data management and business rules.
  */
 export interface TableHook<T> {
-  // Data
-  data: TableData;
-  columns: TableColumn[];
+  // Core data structure
+  data: {
+    rows: TableRow[];
+    columns: TableColumn[];
+  };
 
-  // Event handlers
+  // Core operations
+  updateCell: (rowId: string, columnId: string, value: string) => string | null;
+  saveData: () => Promise<T[] | undefined>;
+  resetTable: () => void;
+
+  // Data import
+  importData: (data: T[]) => void;
   handlePaste: (e: ClipboardEvent<Element>) => void;
-  handleCellPaste: (
-    e: ClipboardEvent<HTMLInputElement>,
-    rowId: string,
-    columnId: string,
-  ) => void;
-  handleCellChange: (
-    rowId: string,
-    columnId: string,
-    value: string,
-  ) => string | null;
-  handleSave: () => Promise<T[] | undefined>;
-  clearTable: () => void;
 
-  // Cell focus tracking
+  // Cell focus tracking (needed for paste operations)
   setActiveCellInfo: (rowId: string, columnId: string) => void;
   clearActiveCellInfo: () => void;
 
-  // External data management
-  setExternalData: (data: T[]) => void;
-
-  // Business rules
+  // State flags
   isSaveEnabled: boolean;
 }
 

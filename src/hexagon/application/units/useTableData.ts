@@ -1,6 +1,6 @@
 import type { ClipboardEvent } from 'react';
 import type { TableColumn, TableData, TableHook, TableRow } from './types';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { GHOST_ROW_ID } from './types';
 
 interface UseTableDataOptions<T> {
@@ -50,49 +50,25 @@ export function useTableData<T>({
 
   const [isValid, setIsValid] = useState(true);
 
-  // Track active cell to coordinate paste operations
+  // Track active cell to coordinate paste operations - only used internally for paste handling
   const [activeCell, setActiveCell] = useState<{
     rowId: string;
     columnId: string;
   } | null>(null);
 
-  // Function to track which cell is currently active
+  // Internal methods for tracking active cell (needed for paste handling)
   const setActiveCellInfo = useCallback((rowId: string, columnId: string) => {
     setActiveCell({ rowId, columnId });
   }, []);
 
-  // Function to clear active cell tracking
   const clearActiveCellInfo = useCallback(() => {
     setActiveCell(null);
   }, []);
 
-  // Function to set data from external source
-  const setExternalData = useCallback(
-    (newData: T[]) => {
-      const newRows: TableRow[] = newData.map((_item, _index) => {
-        const cells: Record<string, string> = {};
-        columns.forEach((column) => {
-          const key = column.id as keyof T;
-          const value = _item[key];
-          cells[column.id] = value !== undefined ? String(value) : '';
-        });
-        return {
-          id: generateRowId(),
-          cells,
-        };
-      });
-
-      setData({
-        rows: [...newRows, createGhostRow(columns)],
-      });
-    },
-    [columns],
-  );
-
-  // Handle cell value changes
-  const handleCellChange = useCallback(
+  // Cell update method - handles both regular cell updates and ghost row conversion
+  const updateCell = useCallback(
     (rowId: string, columnId: string, value: string) => {
-      let newRowId: string | null = null; // Track the new row ID when converting ghost row
+      let newRowId: string | null = null;
 
       setData((prev) => {
         // Check if we're editing the ghost row and adding content
@@ -121,8 +97,8 @@ export function useTableData<T>({
 
           // Create a new regular row from the ghost row
           const newRegularRow: TableRow = {
-            id: newRowId, // Use the new ID
-            cells: newCells, // Use the new cells object
+            id: newRowId,
+            cells: newCells,
           };
 
           // Return new state with the converted row and a fresh ghost row
@@ -164,13 +140,85 @@ export function useTableData<T>({
         };
       });
 
-      // Return the new row ID if we converted a ghost row
+      // Return the new row ID when a ghost row was converted
       return newRowId;
     },
     [columns],
   );
 
-  // Handle cell-specific paste operations
+  // Import data from an external source
+  const importData = useCallback(
+    (newData: T[]) => {
+      const newRows: TableRow[] = newData.map((_item, _index) => {
+        const cells: Record<string, string> = {};
+        columns.forEach((column) => {
+          const key = column.id as keyof T;
+          const value = _item[key];
+          cells[column.id] = value !== undefined ? String(value) : '';
+        });
+        return {
+          id: generateRowId(),
+          cells,
+        };
+      });
+
+      setData({
+        rows: [...newRows, createGhostRow(columns)],
+      });
+    },
+    [columns],
+  );
+
+  // Handle save operation
+  const saveData = useCallback(async () => {
+    // Filter out the ghost row for validation and submission
+    const rows = data.rows.filter((row) => row.id !== GHOST_ROW_ID);
+    const errors: Record<string, Record<string, string>> = {};
+
+    rows.forEach((row) => {
+      const rowData = row.cells as T;
+      const rowErrors = validateRow(rowData);
+      if (Object.keys(rowErrors).length > 0) {
+        errors[row.id] = rowErrors;
+      }
+    });
+
+    // Update validation state
+    setIsValid(Object.keys(errors).length === 0);
+
+    // Update rows with validation errors
+    setData((prev) => ({
+      rows: prev.rows.map((row) => {
+        if (errors[row.id]) {
+          // Create a new row object with validation errors
+          return {
+            ...row,
+            validationErrors: errors[row.id],
+          };
+        }
+        // Create a new row object without validation errors
+        return {
+          ...row,
+          validationErrors: undefined,
+        };
+      }),
+    }));
+
+    if (Object.keys(errors).length === 0) {
+      return rows.map((row) => row.cells as T);
+    }
+    return undefined;
+  }, [data.rows, validateRow]);
+
+  // Reset the table to empty state
+  const resetTable = useCallback(() => {
+    setData({
+      rows: [createGhostRow(columns)],
+    });
+    setIsValid(true);
+  }, [columns]);
+
+  // Helper function for cell-specific paste operations (internal use only)
   const handleCellPaste = useCallback(
     (e: ClipboardEvent<HTMLInputElement>, rowId: string, columnId: string) => {
       e.preventDefault(); // Prevent default paste behavior
@@ -267,13 +315,13 @@ export function useTableData<T>({
         });
       } else {
         // Simple single-cell paste - just update the cell value
-        handleCellChange(rowId, columnId, pastedText);
+        updateCell(rowId, columnId, pastedText);
       }
     },
-    [columns, handleCellChange],
+    [columns, updateCell],
   );
 
-  // Main paste handler (table-level) - delegates to cell paste when appropriate
+  // Main paste handler
   const handlePaste = useCallback(
     (e: ClipboardEvent<Element>) => {
       // If we have an active cell, redirect the paste there
@@ -458,66 +506,22 @@ export function useTableData<T>({
     [activeCell, columns, handleCellPaste],
   );
 
-  const handleSave = useCallback(async () => {
-    // Filter out the ghost row for validation and submission
-    const rows = data.rows.filter((row) => row.id !== GHOST_ROW_ID);
-    const errors: Record<string, Record<string, string>> = {};
-
-    rows.forEach((row) => {
-      const rowData = row.cells as T;
-      const rowErrors = validateRow(rowData);
-      if (Object.keys(rowErrors).length > 0) {
-        errors[row.id] = rowErrors;
-      }
-    });
-
-    // Update validation state
-    setIsValid(Object.keys(errors).length === 0);
-
-    // Update rows with validation errors
-    setData((prev) => ({
-      rows: prev.rows.map((row) => {
-        if (errors[row.id]) {
-          // Create a new row object with validation errors
-          return {
-            ...row,
-            validationErrors: errors[row.id],
-          };
-        }
-        // Create a new row object without validation errors
-        return {
-          ...row,
-          validationErrors: undefined,
-        };
-      }),
-    }));
-
-    if (Object.keys(errors).length === 0) {
-      return rows.map((row) => row.cells as T);
-    }
-    return undefined;
-  }, [data.rows, validateRow]);
-
-  const clearTable = useCallback(() => {
-    setData({
-      rows: [createGhostRow(columns)],
-    });
-    setIsValid(true);
-  }, [columns]);
-
   const isSaveEnabled = isValid && data.rows.length > 1; // More than just the ghost row
 
+  // Return the simplified API
   return {
-    data,
-    columns,
+    data: {
+      rows: data.rows,
+      columns,
+    },
+    updateCell,
+    saveData,
+    resetTable,
+    importData,
     handlePaste,
-    handleCellPaste,
-    handleCellChange,
-    handleSave,
-    clearTable,
+    // Internal cell focus tracking (needed by component)
     setActiveCellInfo,
     clearActiveCellInfo,
-    setExternalData,
     isSaveEnabled,
   };
 }
