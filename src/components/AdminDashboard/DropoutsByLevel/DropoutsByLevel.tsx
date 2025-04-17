@@ -13,7 +13,7 @@ function renderRow(row: any) {
 }
 
 export default function DropoutsByLevel() {
-  const { data, isLoading, error } = useDropoutsByLevelReport();
+  const { dropoutsByLevelReportQuery } = useDropoutsByLevelReport();
 
   const [isOpen, setIsOpen] = useState(false);
   const headers = ['Course - Name', 'Number of Memberships'];
@@ -26,13 +26,11 @@ export default function DropoutsByLevel() {
         openFunction={() => setIsOpen(!isOpen)}
       />
       {isOpen && (
-        <div className="active-memberships-table">
-          <DisplayOnlyTable
-            headers={headers}
-            data={data ?? []}
-            renderRow={renderRow}
-          />
-        </div>
+        <DisplayOnlyTable
+          headers={headers}
+          data={dropoutsByLevelReportQuery.data ?? []}
+          renderRow={renderRow}
+        />
       )}
     </div>
   );

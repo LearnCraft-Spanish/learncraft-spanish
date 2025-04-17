@@ -2,4 +2,10 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
+  margin: 20px;
+
+  // responsive
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }

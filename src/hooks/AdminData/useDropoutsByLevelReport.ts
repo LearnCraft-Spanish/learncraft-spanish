@@ -7,9 +7,11 @@ export default function useDropoutsByLevelReport() {
     return getFactory<ActiveMembershipData[]>('admin/report/dropouts-by-level');
   };
 
-  return useQuery({
+  const dropoutsByLevelReportQuery = useQuery({
     queryKey: ['dropouts-by-level-report'],
     queryFn: getDropoutsByLevelReport,
     staleTime: Infinity,
   });
+
+  return { dropoutsByLevelReportQuery };
 }
