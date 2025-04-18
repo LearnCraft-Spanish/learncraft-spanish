@@ -3,10 +3,20 @@ import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useWeeklyCoachSummary from 'src/hooks/AdminData/useWeeklyCoachSummary';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 function renderRow(row: CoachSummaryData) {
+  const { openContextual } = useContextualMenu();
   return (
     <tr>
-      <td>{row.primaryCoach}</td>
+      <td
+        onClick={() => {
+          openContextual(
+            `week-drilldown_${row.primaryCoach}_Weekly Coach Summary`,
+          );
+        }}
+      >
+        {row.primaryCoach}
+      </td>
       <td>{row.recordsCompleteRefAvg}</td>
       <td>{row.recordIdDistinctCount}</td>
     </tr>

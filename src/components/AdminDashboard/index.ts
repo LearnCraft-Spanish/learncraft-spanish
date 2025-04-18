@@ -1,13 +1,11 @@
 import ActiveMemberships from './ActiveMemberships';
 import AssignmentsCompletedByWeek from './AssignmentsCompletedByWeek';
 import DropoutsByLevel from './DropoutsByLevel';
-import LastWeekCoachSummary from './LastWeekCoachSummary';
-import WeekCoachSummary from './WeekCoachSummary';
+import WeeklySummaries from './WeeklyCoachSummaries/WeeklySummaries';
 
 export {
   ActiveMemberships,
   AssignmentsCompletedByWeek,
   DropoutsByLevel,
-  LastWeekCoachSummary,
-  WeekCoachSummary,
+  WeeklySummaries,
 };
