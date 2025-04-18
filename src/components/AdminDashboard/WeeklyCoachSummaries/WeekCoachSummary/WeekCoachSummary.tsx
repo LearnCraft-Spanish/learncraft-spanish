@@ -1,18 +1,19 @@
+import type { ReactNode } from 'react';
 import type { CoachSummaryData } from './types';
-import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useWeeklyCoachSummary from 'src/hooks/AdminData/useWeeklyCoachSummary';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-function renderRow(row: CoachSummaryData) {
-  const { openContextual } = useContextualMenu();
+function renderRow(
+  row: CoachSummaryData,
+  onClickFunc?: (str: string) => void,
+): ReactNode {
   return (
     <tr>
       <td
         onClick={() => {
-          openContextual(
-            `week-drilldown_${row.primaryCoach}_Weekly Coach Summary`,
-          );
+          if (onClickFunc) {
+            onClickFunc(`${row.primaryCoach}_Weekly Coach Summary`);
+          }
         }}
       >
         {row.primaryCoach}
@@ -23,10 +24,17 @@ function renderRow(row: CoachSummaryData) {
   );
 }
 
-export default function WeekCoachSummary() {
+export default function WeekCoachSummary({
+  setSelectedReport,
+  isOpen,
+  setIsOpen,
+}: {
+  setSelectedReport: (report: string) => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}) {
   const { weeklyCoachSummaryQuery } = useWeeklyCoachSummary();
 
-  const [isOpen, setIsOpen] = useState(false);
   const headers = ['Coach', 'Records Complete (percent)', 'Number of Records'];
 
   return (
@@ -41,6 +49,7 @@ export default function WeekCoachSummary() {
           headers={headers}
           data={weeklyCoachSummaryQuery.data ?? []}
           renderRow={renderRow}
+          onClickFunc={setSelectedReport}
         />
       )}
     </div>

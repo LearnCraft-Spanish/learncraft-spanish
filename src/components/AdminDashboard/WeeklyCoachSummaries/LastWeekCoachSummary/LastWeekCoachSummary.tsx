@@ -1,22 +1,36 @@
 import type { CoachSummaryData } from '../WeekCoachSummary/types';
-import { useState } from 'react';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useLastWeekCoachSummary from 'src/hooks/AdminData/useLastWeekCoachSummary';
-function renderRow(row: CoachSummaryData) {
+function renderRow(row: CoachSummaryData, onClickFunc?: (str: string) => void) {
   return (
     <tr>
-      <td>{row.primaryCoach}</td>
+      <td
+        onClick={() => {
+          if (onClickFunc) {
+            onClickFunc(`${row.primaryCoach}_Last Week Coach Summary`);
+          }
+        }}
+      >
+        {row.primaryCoach}
+      </td>
       <td>{row.recordsCompleteRefAvg}</td>
       <td>{row.recordIdDistinctCount}</td>
     </tr>
   );
 }
 
-export default function LastWeekCoachSummary() {
+export default function LastWeekCoachSummary({
+  setSelectedReport,
+  isOpen,
+  setIsOpen,
+}: {
+  setSelectedReport: (report: string) => void;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}) {
   const { lastWeekCoachSummaryQuery } = useLastWeekCoachSummary();
 
-  const [isOpen, setIsOpen] = useState(false);
   const headers = ['Coach', 'Records Complete (percent)', 'Number of Records'];
 
   return (
@@ -31,6 +45,7 @@ export default function LastWeekCoachSummary() {
           headers={headers}
           data={lastWeekCoachSummaryQuery.data ?? []}
           renderRow={renderRow}
+          onClickFunc={setSelectedReport}
         />
       )}
     </div>

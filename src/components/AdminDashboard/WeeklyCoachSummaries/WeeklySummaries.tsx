@@ -1,16 +1,39 @@
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import DrilldownTable from './Drilldowntable';
+import { useEffect, useState } from 'react';
+import DrilldownTable from './DrilldownTable';
 import LastWeekCoachSummary from './LastWeekCoachSummary';
 import WeekCoachSummary from './WeekCoachSummary';
 
 export default function WeeklySummaries() {
-  const { contextual } = useContextualMenu();
+  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+  const [weekCoachSummaryOpen, setWeekCoachSummaryOpen] = useState(false);
+  const [lastWeekCoachSummaryOpen, setLastWeekCoachSummaryOpen] =
+    useState(false);
+
+  const updateSelectedReport = (str: string) => {
+    setSelectedReport(str);
+  };
+
+  useEffect(() => {
+    if (!weekCoachSummaryOpen && !lastWeekCoachSummaryOpen) {
+      setSelectedReport(null);
+    }
+  }, [weekCoachSummaryOpen, lastWeekCoachSummaryOpen]);
+
   return (
     <div>
-      <WeekCoachSummary />
-      <LastWeekCoachSummary />
-
-      {contextual.startsWith('week-drilldown') && <DrilldownTable />}
+      <div className="admin-dashboard-grid">
+        <WeekCoachSummary
+          setSelectedReport={updateSelectedReport}
+          isOpen={weekCoachSummaryOpen}
+          setIsOpen={setWeekCoachSummaryOpen}
+        />
+        <LastWeekCoachSummary
+          setSelectedReport={updateSelectedReport}
+          isOpen={lastWeekCoachSummaryOpen}
+          setIsOpen={setLastWeekCoachSummaryOpen}
+        />
+      </div>
+      {selectedReport && <DrilldownTable selectedReport={selectedReport} />}
     </div>
   );
 }
