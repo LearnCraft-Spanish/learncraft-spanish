@@ -1,6 +1,7 @@
 import type { CreateVerb, Subcategory } from '@LearnCraft-Spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { useSubcategories } from '../units/useSubcategories';
+import { useVocabulary } from '../units/useVocabulary';
 
 interface VerbData {
   infinitive: string;
@@ -45,12 +46,20 @@ function mapToVerbCommand(data: VerbData): CreateVerb {
 export function useVerbCreation(): UseVerbCreationResult {
   // State
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
-  const [creating, setCreating] = useState(false);
   const [creationError, setCreationError] = useState<Error | null>(null);
 
   // Compose unit hooks
   const { subcategories: allSubcategories, loading: loadingSubcategories } =
     useSubcategories();
+
+  // Use our vocabulary unit for operations
+  const {
+    createVerb: createVerbInVocabulary,
+    creating: creatingVocabulary,
+    creationError: vocabCreationError,
+  } = useVocabulary({
+    isVerb: true,
+  });
 
   // Filter for verb subcategories only
   const verbSubcategories = useMemo(() => {
@@ -62,34 +71,33 @@ export function useVerbCreation(): UseVerbCreationResult {
   }, [allSubcategories]);
 
   // Create verb
-  const createVerb = useCallback(async (verbData: VerbData) => {
-    if (!verbData.subcategoryId) {
-      setCreationError(new Error('No subcategory selected'));
-      return false;
-    }
+  const createVerb = useCallback(
+    async (verbData: VerbData) => {
+      if (!verbData.subcategoryId) {
+        setCreationError(new Error('No subcategory selected'));
+        return false;
+      }
 
-    try {
-      setCreating(true);
-      setCreationError(null);
+      try {
+        setCreationError(null);
 
-      // Map to domain command
-      const command = mapToVerbCommand(verbData);
+        // Map to domain command
+        const command = mapToVerbCommand(verbData);
 
-      // TODO: Replace with actual API call when infrastructure is ready
-      console.error('Creating verb with command:', command);
+        // Use our new vocabulary unit to create the verb
+        await createVerbInVocabulary(command);
+        return true;
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err));
+        setCreationError(error);
+        return false;
+      }
+    },
+    [createVerbInVocabulary],
+  );
 
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      return true;
-    } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
-      setCreationError(error);
-      return false;
-    } finally {
-      setCreating(false);
-    }
-  }, []);
+  // Combine errors from both sources
+  const combinedError = creationError || vocabCreationError;
 
   return {
     // Subcategory selection
@@ -99,8 +107,8 @@ export function useVerbCreation(): UseVerbCreationResult {
     setSelectedSubcategoryId,
 
     // Creation status
-    creating,
-    creationError,
+    creating: creatingVocabulary,
+    creationError: combinedError,
 
     // Creation methods
     createVerb,

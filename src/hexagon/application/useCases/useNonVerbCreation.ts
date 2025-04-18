@@ -5,12 +5,12 @@ import type {
 import type { TableHook } from '../units/pasteTable/types';
 import { useCallback, useMemo, useState } from 'react';
 import { useSubcategories } from '../units/useSubcategories';
+import { useVocabulary } from '../units/useVocabulary';
 import { useVocabularyTable } from '../units/useVocabularyTable';
 
 // Define VocabularyTableData to match what's in useVocabularyTable
-interface VocabularyTableData {
+export interface VocabularyTableData {
   descriptor: string;
-  subcategoryId: number;
   frequency: number;
   spellings: string;
   notes?: string;
@@ -61,12 +61,20 @@ function mapEntryToCommand(
 export function useNonVerbCreation(): UseNonVerbCreationResult {
   // State
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
-  const [creating, setCreating] = useState(false);
   const [creationError, setCreationError] = useState<Error | null>(null);
 
   // Compose unit hooks
   const { subcategories: allSubcategories, loading: loadingSubcategories } =
     useSubcategories();
+
+  // Use our vocabulary unit for operations
+  const {
+    createBatch,
+    creating: creatingVocabulary,
+    creationError: vocabCreationError,
+  } = useVocabulary({
+    isVerb: false,
+  });
 
   // Create the table hook internally
   const tableHook = useVocabularyTable();
@@ -89,7 +97,6 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
       }
 
       try {
-        setCreating(true);
         setCreationError(null);
 
         // Map table entries to proper domain commands
@@ -97,23 +104,16 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
           mapEntryToCommand(entry, selectedSubcategoryId),
         );
 
-        // TODO: Replace with actual API call when infrastructure is ready
-        console.error('Creating non-verb vocabulary batch:');
-        console.error('Commands:', commands);
-
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
+        // Use our new vocabulary unit to create the batch
+        await createBatch(commands);
         return true;
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setCreationError(error);
         return false;
-      } finally {
-        setCreating(false);
       }
     },
-    [selectedSubcategoryId],
+    [selectedSubcategoryId, createBatch],
   );
 
   /**
@@ -145,6 +145,9 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     }
   }, [selectedSubcategoryId, createVocabularyBatch, tableHook]);
 
+  // Combine errors from both sources
+  const combinedError = creationError || vocabCreationError;
+
   return {
     // Subcategory selection
     nonVerbSubcategories,
@@ -153,8 +156,8 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     setSelectedSubcategoryId,
 
     // Creation status
-    creating,
-    creationError,
+    creating: creatingVocabulary,
+    creationError: combinedError,
 
     // Expose table hook through the façade
     tableHook,
