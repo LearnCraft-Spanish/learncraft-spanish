@@ -1,12 +1,11 @@
 import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
-import type { TableColumn, TableHook } from './types';
+import type { TableColumn, TableHook } from './pasteTable/types';
 import { usePasteTable } from './pasteTable';
 
 // Define schema fields directly using strings to avoid type issues
 const schemaFields: (keyof CreateNonVerbVocabulary)[] = [
   'word',
   'descriptor',
-  'subcategoryId',
   'frequency',
   'notes',
 ];
@@ -15,7 +14,6 @@ const schemaFields: (keyof CreateNonVerbVocabulary)[] = [
 const SCHEMA_FIELD_CONFIG: Record<string, { label: string; width: string }> = {
   word: { label: 'Word', width: '1fr' },
   descriptor: { label: 'Descriptor', width: '2fr' },
-  subcategoryId: { label: 'Category', width: '1fr' },
   frequency: { label: 'Frequency', width: '0.5fr' },
   notes: { label: 'Notes', width: '1fr' },
 };
@@ -36,7 +34,6 @@ const VOCABULARY_COLUMNS: TableColumn[] = [
 // Define our interface based on the schema types
 interface VocabularyTableData {
   descriptor: string;
-  subcategoryId: number;
   frequency: number;
   spellings: string; // Simplified for table entry - in schema this is an array
   notes?: string;
@@ -59,10 +56,6 @@ export function useVocabularyTable(): TableHook<VocabularyTableData> {
         errors.descriptor = 'Format must be "word: description (context)"';
       }
 
-      if (!row.subcategoryId) {
-        errors.subcategoryId = 'Category is required';
-      }
-
       const frequencyNum = Number(row.frequency);
       if (
         Number.isNaN(frequencyNum) ||
@@ -70,10 +63,6 @@ export function useVocabularyTable(): TableHook<VocabularyTableData> {
         frequencyNum > 10000
       ) {
         errors.frequency = 'Frequency must be a number between 1 and 10000';
-      }
-
-      if (!row.spellings?.trim()) {
-        errors.spellings = 'At least one spelling is required';
       }
 
       return errors;

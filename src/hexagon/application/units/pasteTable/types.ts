@@ -51,8 +51,16 @@ export interface TableRow {
   id: string;
   /** Map of column IDs to cell values */
   cells: Record<string, string>;
-  /** Optional validation errors for each cell */
-  validationErrors?: Record<string, string>;
+}
+
+/**
+ * Validation result object
+ */
+export interface ValidationState {
+  /** Whether all rows pass validation */
+  isValid: boolean;
+  /** Map of row IDs to their validation errors */
+  errors: Record<string, Record<string, string>>;
 }
 
 /**
@@ -79,8 +87,9 @@ export interface TableHook<T> {
   setActiveCellInfo: (rowId: string, columnId: string) => void;
   clearActiveCellInfo: () => void;
 
-  // State flags
+  // State flags and validation
   isSaveEnabled: boolean;
+  validationState: ValidationState;
 }
 
 /** ID used for the ghost row that appears at the bottom of the table */

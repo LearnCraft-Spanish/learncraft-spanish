@@ -1,4 +1,4 @@
-import type { TableColumn, TableRow } from '../../types';
+import type { TableColumn, TableRow } from '../types';
 import { generateRowId } from './rowCreation';
 
 /**

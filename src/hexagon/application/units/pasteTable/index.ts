@@ -1,13 +1,7 @@
-import type { TableColumn, TableHook } from '../types';
+import type { TableColumn, TableHook } from './types';
 import { useCallback } from 'react';
-import { GHOST_ROW_ID } from '../types';
-import {
-  useGhostRow,
-  useTablePaste,
-  useTableRows,
-  useTableValidation,
-} from './hooks';
-import { convertDataToRows } from './utils';
+import { useTablePaste, useTableRows, useTableValidation } from './hooks';
+import { GHOST_ROW_ID } from './types';
 
 interface UsePasteTableOptions<T> {
   columns: TableColumn[];
@@ -15,6 +9,10 @@ interface UsePasteTableOptions<T> {
   initialData?: T[]; // Allow providing initial data
 }
 
+/**
+ * Main hook for paste table functionality
+ * Validation is purely derived from row data
+ */
 export function usePasteTable<T>({
   columns,
   validateRow,
@@ -24,23 +22,18 @@ export function usePasteTable<T>({
   const {
     rows,
     updateCell: updateCellBase,
-    setRowValidation,
     setRows,
     resetRows,
+    convertGhostRow,
   } = useTableRows<T>({ columns, initialData });
 
-  // Ghost row handling
-  const { convertGhostRow } = useGhostRow({
-    columns,
-    setRows,
-  });
-
-  // Validation
-  const { validateRows, isSaveEnabled } = useTableValidation<T>({
-    rows,
-    validateRow,
-    setRowValidation,
-  });
+  // Validation - now purely derived from row data
+  const { validationState, isSaveEnabled, validateAll } = useTableValidation<T>(
+    {
+      rows,
+      validateRow,
+    },
+  );
 
   // Paste handling
   const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(
@@ -52,15 +45,18 @@ export function usePasteTable<T>({
     },
   );
 
-  // Cell update with ghost row handling
+  // Cell update - no longer triggering validation directly
   const updateCell = useCallback(
     (rowId: string, columnId: string, value: string) => {
+      // Handle ghost row conversion
       if (rowId === GHOST_ROW_ID && value.trim() !== '') {
+        // Convert ghost row to real row
         return convertGhostRow(rowId, columnId, value);
-      } else {
-        updateCellBase(rowId, columnId, value);
-        return null;
       }
+
+      // Simply update cell data - validation is derived automatically
+      updateCellBase(rowId, columnId, value);
+      return null;
     },
     [convertGhostRow, updateCellBase],
   );
@@ -68,31 +64,64 @@ export function usePasteTable<T>({
   // Import data from an external source
   const importData = useCallback(
     (newData: T[]) => {
-      const newRows = convertDataToRows(newData, columns);
-      setRows(newRows);
+      // Convert data to rows with our internal row ID generation
+      const rows = newData.map((item) => {
+        const cells = {} as Record<string, string>;
+        columns.forEach((col) => {
+          const key = col.id as keyof T;
+          const value = item[key];
+          cells[col.id] = value !== undefined ? String(value) : '';
+        });
+        return cells;
+      });
+
+      // Set the rows
+      setRows((currentRows) => {
+        // Find ghost row to preserve it
+        const ghostRow = currentRows.find((row) => row.id === GHOST_ROW_ID);
+
+        // Convert rows to TableRows using updateCellBase
+        const newRows = rows.map((cells) => ({
+          id: `row-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          cells,
+        }));
+
+        // Return with ghost row at the end
+        return [...newRows, ...(ghostRow ? [ghostRow] : [])];
+      });
     },
     [columns, setRows],
   );
 
   // Handle save operation
   const saveData = useCallback(async () => {
-    const { isValid } = validateRows();
+    // Perform one final validation before saving
+    const { isValid } = validateAll();
 
     if (isValid) {
-      // Filter out the ghost row and convert to the original data type
       return rows
         .filter((row) => row.id !== GHOST_ROW_ID)
         .map((row) => row.cells as T);
     }
+
     return undefined;
-  }, [rows, validateRows]);
+  }, [rows, validateAll]);
 
-  // Reset the table to empty state
+  // Reset the table to completely empty state
   const resetTable = useCallback(() => {
+    // Reset rows to just a brand new ghost row
     resetRows();
-  }, [resetRows]);
 
-  // Return the unified API
+    // Clear any active cell info from paste handling
+    clearActiveCellInfo();
+
+    // No need to reset validation explicitly - it will be recalculated
+    // by our derived validation mechanism as soon as rows change
+
+    console.error('Table completely reset'); // Debugging
+  }, [resetRows, clearActiveCellInfo]);
+
+  // Return a clean, focused API
   return {
     data: {
       rows,
@@ -103,9 +132,9 @@ export function usePasteTable<T>({
     resetTable,
     importData,
     handlePaste,
-    // Internal cell focus tracking (needed by component)
     setActiveCellInfo,
     clearActiveCellInfo,
     isSaveEnabled,
+    validationState,
   };
 }

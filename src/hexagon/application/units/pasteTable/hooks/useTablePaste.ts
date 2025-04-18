@@ -1,7 +1,7 @@
 import type { ClipboardEvent } from 'react';
-import type { TableColumn, TableRow } from '../../types';
+import type { TableColumn, TableRow } from '../types';
 import { useCallback, useState } from 'react';
-import { GHOST_ROW_ID } from '../../types';
+import { GHOST_ROW_ID } from '../types';
 import {
   convertJsonToRow,
   convertTsvToRows,

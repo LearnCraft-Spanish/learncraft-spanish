@@ -1,5 +1,8 @@
-import type { TableColumn, TableRow } from '../../types';
-import { GHOST_ROW_ID } from '../../types';
+import type { TableColumn, TableRow } from '../types';
+import { GHOST_ROW_ID } from '../types';
+
+// Counter for generating truly unique row IDs
+let rowIdCounter = 0;
 
 /**
  * Creates an empty ghost row with the given columns
@@ -10,10 +13,22 @@ export const createGhostRow = (columns: TableColumn[]): TableRow => ({
 });
 
 /**
- * Generates a unique row ID based on current timestamp
+ * Generates a guaranteed unique row ID by combining timestamp, counter and random value
  */
-export const generateRowId = (): string =>
-  `row-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+export const generateRowId = (): string => {
+  // Increment the counter first to ensure uniqueness even with same timestamp
+  rowIdCounter += 1;
+
+  // Create a unique ID using timestamp, counter and random number
+  return `row-${Date.now()}-${rowIdCounter}-${Math.floor(Math.random() * 1000)}`;
+};
+
+/**
+ * Reset the row ID counter - mainly for testing purposes
+ */
+export const resetRowIdCounter = (): void => {
+  rowIdCounter = 0;
+};
 
 /**
  * Creates an empty row with all columns initialized

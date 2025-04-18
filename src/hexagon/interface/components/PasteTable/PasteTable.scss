@@ -10,6 +10,8 @@
     grid-template-columns: var(--grid-template-columns);
     width: 100%;
     border-bottom: 1px solid var(--dark); /* Add border to separate table from footer */
+    position: relative; /* Establish a stacking context for error tooltips */
+    z-index: 0; /* Base z-index for the stacking context */
   }
 
   &--error {
@@ -111,7 +113,6 @@
 
   &__cell-error {
     position: absolute;
-    bottom: calc(100% + 4px);
     left: 0;
     right: 0;
     background-color: var(--error-bg);
@@ -119,15 +120,38 @@
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
     font-size: 0.875rem;
-    z-index: 1;
+    z-index: 10;
+    width: 100%;
+    max-width: 250px;
+    word-wrap: break-word;
 
-    &::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 10px;
-      border: 6px solid transparent;
-      border-top-color: var(--error-bg);
+    /* For top row: position below the cell */
+    [aria-rowindex='2'] &,
+    [aria-rowindex='3'] & {
+      top: calc(100% + 4px);
+
+      &::before {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 10px;
+        border: 6px solid transparent;
+        border-bottom-color: var(--error-bg);
+      }
+    }
+
+    /* For other rows: position above the cell */
+    [aria-rowindex]:not([aria-rowindex='2']):not([aria-rowindex='3']) & {
+      bottom: calc(100% + 4px);
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 10px;
+        border: 6px solid transparent;
+        border-top-color: var(--error-bg);
+      }
     }
   }
 
@@ -139,10 +163,21 @@
     background-color: var(--light);
   }
 
+  &__hints {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
   &__hint {
     color: var(--dark);
     margin: 0;
     font-size: 0.875rem;
+
+    &--validation {
+      color: var(--theme);
+      font-style: italic;
+    }
   }
 
   &__actions {

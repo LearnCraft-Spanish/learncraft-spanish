@@ -2,7 +2,7 @@ import type {
   CreateNonVerbVocabulary,
   Subcategory,
 } from '@LearnCraft-Spanish/shared';
-import type { TableHook } from '../units/types';
+import type { TableHook } from '../units/pasteTable/types';
 import { useCallback, useMemo, useState } from 'react';
 import { useSubcategories } from '../units/useSubcategories';
 import { useVocabularyTable } from '../units/useVocabularyTable';
@@ -129,7 +129,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
 
     try {
       // Validate and save the table data
-      const tableData = await tableHook.handleSave();
+      const tableData = await tableHook.saveData();
 
       // If table validation failed or no data
       if (!tableData || tableData.length === 0) {

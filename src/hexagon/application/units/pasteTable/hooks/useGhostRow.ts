@@ -1,6 +1,6 @@
-import type { TableColumn, TableRow } from '../../types';
+import type { TableColumn, TableRow } from '../types';
 import { useCallback } from 'react';
-import { GHOST_ROW_ID } from '../../types';
+import { GHOST_ROW_ID } from '../types';
 import { createGhostRow, generateRowId } from '../utils';
 
 interface UseGhostRowProps {
