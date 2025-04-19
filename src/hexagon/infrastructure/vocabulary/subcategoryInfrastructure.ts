@@ -1,10 +1,8 @@
 import type { Subcategory } from '@LearnCraft-Spanish/shared/src/domain/vocabulary/core-types';
 import type { AuthPort } from '../../application/ports/authPort';
 import type { SubcategoryPort } from '../../application/ports/subcategoryPort';
+import { SubcategoryEndpoints } from '@LearnCraft-Spanish/shared';
 import { createAuthenticatedHttpClient } from '../http/client';
-
-// Default API endpoints
-const SUBCATEGORIES_ENDPOINT = '/subcategories';
 
 /**
  * Creates an implementation of the SubcategoryPort.
@@ -25,15 +23,27 @@ export function createSubcategoryInfrastructure(
   // Create an authenticated HTTP client
   const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
 
+  // Define paths based on API contract
+  const SUBCATEGORIES_ENDPOINT = '/api/subcategories';
+  const getSubcategoryPath = (id: string) => `/api/subcategories/${id}`;
+
   return {
     getSubcategories: async (): Promise<Subcategory[]> => {
-      return httpClient.get<Subcategory[]>(SUBCATEGORIES_ENDPOINT);
+      // Use the subcategories list endpoint
+      // If SubcategoryEndpoints.list exists, use it instead
+      const endpoint =
+        SubcategoryEndpoints.list?.path || SUBCATEGORIES_ENDPOINT;
+
+      const response = await httpClient.get<{ items: Subcategory[] }>(endpoint);
+
+      // The API returns a paginated response, but our port expects an array
+      return response.items;
     },
 
     getSubcategoryById: async (id: string): Promise<Subcategory | null> => {
-      return await httpClient.get<Subcategory>(
-        `${SUBCATEGORIES_ENDPOINT}/${id}`,
-      );
+      // Construct path directly since the endpoint might not be defined in shared
+      const path = getSubcategoryPath(id);
+      return httpClient.get<Subcategory>(path);
     },
   };
 }

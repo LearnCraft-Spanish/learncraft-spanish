@@ -77,15 +77,7 @@ export function createVocabularyInfrastructure(
 
     getVocabularyById: async (id: string): Promise<Vocabulary | null> => {
       const path = VocabularyEndpoints.getById.path.replace(':id', id);
-      try {
-        return await httpClient.get<Vocabulary>(path);
-      } catch (error) {
-        // Return null if the resource is not found
-        if ((error as any)?.response?.status === 404) {
-          return null;
-        }
-        throw error;
-      }
+      return httpClient.get<Vocabulary>(path);
     },
 
     createVerb: async (command: CreateVerb): Promise<Vocabulary> => {

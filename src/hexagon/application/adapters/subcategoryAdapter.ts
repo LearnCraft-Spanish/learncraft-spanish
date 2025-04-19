@@ -5,7 +5,7 @@ import { useAuthAdapter } from './authAdapter';
 
 export function useSubcategoryAdapter(): SubcategoryPort {
   // Get API URL from config
-  const apiUrl = config.apiUrl;
+  const apiUrl = config.backendDomain;
 
   // Use our auth adapter rather than direct dependency on useAuth hook
   const auth = useAuthAdapter();
