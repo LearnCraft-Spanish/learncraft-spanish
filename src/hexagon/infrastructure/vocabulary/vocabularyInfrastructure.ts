@@ -4,11 +4,11 @@ import type {
   ListVocabularyResponse,
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
+import type { AuthPort } from '../../application/ports/authPort';
 import type {
   VocabularyPort,
   VocabularyQueryOptions,
 } from '../../application/ports/vocabularyPort';
-import type { AuthTokenProvider } from '../http/client';
 import { VocabularyEndpoints } from '@LearnCraft-Spanish/shared';
 import { createAuthenticatedHttpClient } from '../http/client';
 
@@ -26,7 +26,7 @@ import { createAuthenticatedHttpClient } from '../http/client';
  */
 export function createVocabularyInfrastructure(
   apiUrl: string,
-  auth: AuthTokenProvider,
+  auth: AuthPort,
 ): VocabularyPort {
   // Create an authenticated HTTP client
   const httpClient = createAuthenticatedHttpClient(apiUrl, auth);

@@ -1,6 +1,6 @@
 import type { Subcategory } from '@LearnCraft-Spanish/shared/src/domain/vocabulary/core-types';
+import type { AuthPort } from '../../application/ports/authPort';
 import type { SubcategoryPort } from '../../application/ports/subcategoryPort';
-import type { AuthTokenProvider } from '../http/client';
 import { createAuthenticatedHttpClient } from '../http/client';
 
 // Default API endpoints
@@ -20,7 +20,7 @@ const SUBCATEGORIES_ENDPOINT = '/subcategories';
  */
 export function createSubcategoryInfrastructure(
   apiUrl: string,
-  auth: AuthTokenProvider,
+  auth: AuthPort,
 ): SubcategoryPort {
   // Create an authenticated HTTP client
   const httpClient = createAuthenticatedHttpClient(apiUrl, auth);

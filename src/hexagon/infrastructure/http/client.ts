@@ -1,4 +1,5 @@
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AuthPort } from '../../application/ports/authPort';
 import axios from 'axios';
 
 export interface HttpClient {
@@ -19,10 +20,6 @@ export interface HttpClient {
     config?: AxiosRequestConfig,
   ) => Promise<T>;
   delete: <T>(url: string, config?: AxiosRequestConfig) => Promise<T>;
-}
-
-export interface AuthTokenProvider {
-  getAccessToken: () => Promise<string | undefined>;
 }
 
 /**
@@ -47,7 +44,7 @@ export function createHttpClient(
  */
 export function createAuthenticatedHttpClient(
   baseURL: string,
-  tokenProvider: AuthTokenProvider,
+  authPort: AuthPort,
   config?: AxiosRequestConfig,
 ): HttpClient {
   const client = axios.create({
@@ -58,7 +55,7 @@ export function createAuthenticatedHttpClient(
   // Add request interceptor to include auth token
   client.interceptors.request.use(async (config) => {
     try {
-      const token = await tokenProvider.getAccessToken();
+      const token = await authPort.getAccessToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
