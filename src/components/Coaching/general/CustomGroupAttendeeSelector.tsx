@@ -26,6 +26,7 @@ export default function CustomGroupAttendeeSelector({
     const studentList = weeksQuery.data
       ?.filter((week) => week.membershipCourseHasGroupCalls)
       .map((week) => {
+        // Foreign Key lookup, form data in backend?
         const student = getStudentFromMembershipId(week.relatedMembership);
         if (!student) return undefined;
         return {

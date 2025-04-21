@@ -250,6 +250,8 @@ function BundleCreditRow({
   return (
     <>
       {contextual === `bundle-credit-${credit.recordId}` && (
+        // Foreign Key lookup, form data in backend
+
         <BundleCreditView studentId={credit.relatedStudent} credit={credit} />
       )}
       <div key={credit.recordId} className="credit-details">

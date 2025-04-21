@@ -205,6 +205,7 @@ export function GroupSessionView({
       if (newRecord) {
         return [];
       } else {
+        // Foreign Key lookup, orm data in backend
         const attendees = getAttendeesFromGroupSessionId(recordId);
         return attendees?.map((attendee) => ({
           name: attendee.weekStudent,
@@ -224,7 +225,7 @@ export function GroupSessionView({
     setAttendees((prev) =>
       prev.filter((attendee) => attendee.relatedWeek !== -1),
     );
-
+    // Foreign Key lookup, orm data in backend
     const membership = helpers.getMembershipFromWeekRecordId(
       weekRecordId,
       weeksQuery.data || [],
@@ -235,7 +236,7 @@ export function GroupSessionView({
       console.error('No membership found with week recordId:', weekRecordId);
       return;
     }
-
+    // Foreign Key lookup, orm data in backend
     const student = helpers.getStudentFromMembershipId(
       membership.recordId,
       activeMembershipsQuery.data || [],
@@ -362,6 +363,7 @@ export function GroupSessionView({
   }
   function deleteRecordFunction() {
     // attendee records to delete afterwards
+    // Foreign Key lookup, orm data in backend
     const attendeesToRemove = getAttendeesFromGroupSessionId(recordId);
     deleteGroupSessionMutation.mutate(recordId, {
       onSuccess: () => {
@@ -512,6 +514,7 @@ export function GroupSessionView({
         );
       }
       if (checkAttendeeChanges()) {
+        // Foreign Key lookup, form data in backend
         const currentAttendeeRecords = getAttendeesFromGroupSessionId(recordId);
         const attendeesToAdd = attendees.filter(
           (attendee) => attendee.action === 'add',

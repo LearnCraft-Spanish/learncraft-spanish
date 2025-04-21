@@ -206,6 +206,7 @@ export default function QuizComponent({
   // Further filter for only SRS examples
   const getStudentExampleFromExampleId = useCallback(
     (exampleId: number) => {
+      // Foreign Key lookup, form data in backend
       const relatedStudentExample =
         flashcardDataQuery.data?.studentExamples.find(
           (element) => element.relatedExample === exampleId,

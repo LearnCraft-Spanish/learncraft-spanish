@@ -41,6 +41,7 @@ export function useSelectedLesson() {
     let allowedVocabulary: string[] = [];
     const program = selectionState.program;
     if (program) {
+      // Foreign Key lookup, form data in backend?
       const foundLesson = program.lessons.find(
         (item) => item.recordId === selectionState.toLesson?.recordId,
       );
@@ -56,9 +57,11 @@ export function useSelectedLesson() {
     let requiredVocabulary: string[] = [];
     const program = selectionState.program;
     if (program) {
+      // Foreign Key lookup, form data in backend?
       const foundFromLesson = program.lessons.find(
         (item) => item.recordId === selectionState.fromLesson?.recordId,
       );
+      // Foreign Key lookup, form data in backend?
       const foundToLesson = program.lessons.find(
         (item) => item.recordId === selectionState.toLesson?.recordId,
       );
@@ -84,6 +87,7 @@ export function useSelectedLesson() {
   // Function to filter flashcards by allowed vocabulary
   const filterExamplesBySelectedLesson = useCallback(
     (examples: Flashcard[]): Flashcard[] => {
+      // Foreign Key lookup, form data in backend?
       const filteredByAllowedVocab = examples.filter((item) => {
         let isAllowed =
           item.vocabIncluded.length > 0 && item.vocabComplete !== false;
@@ -100,6 +104,7 @@ export function useSelectedLesson() {
       if (!requiredVocabulary.length) {
         return [];
       }
+      // Foreign Key lookup, form data in backend?
       return filteredByAllowedVocab.filter((item) => {
         let isRequired = false;
         item.vocabIncluded.forEach((word) => {
@@ -117,6 +122,7 @@ export function useSelectedLesson() {
     (program: Program | null) => {
       const firstLesson = program?.lessons[0] || null;
       if (activeLesson?.recordId) {
+        // Foreign Key lookup, form data in backend?
         const foundLesson = program?.lessons.find(
           (lesson) => lesson.recordId === activeLesson.recordId,
         );
@@ -169,6 +175,7 @@ export function useSelectedLesson() {
       if (typeof newId === 'string') {
         newId = Number.parseInt(newId);
       }
+      // Foreign Key lookup, form data in backend?
       const newFromLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === newId,
       );
@@ -198,6 +205,7 @@ export function useSelectedLesson() {
       if (typeof toLesson === 'string') {
         toLesson = Number.parseInt(toLesson);
       }
+      // Foreign Key lookup, form data in backend?
       const newToLesson = selectionState.program?.lessons.find(
         (item) => item.recordId === toLesson,
       );

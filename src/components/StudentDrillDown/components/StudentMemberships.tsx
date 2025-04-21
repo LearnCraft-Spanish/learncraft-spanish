@@ -85,6 +85,7 @@ export default function StudentMemberships({
                           )
                         }
                       />
+                      {/* // Foreign Key lookup, form data in backend */}
                       <h4>{getCourseName(membership.relatedCourse)}</h4>
                       <div className="membership-status">
                         {membership.active && !membership.onHold && (
@@ -340,6 +341,7 @@ function StudentMembershipContextual({
       ) : (
         <TextInput
           label="Membership Name"
+          // Foreign Key lookup, form data in backend
           value={getCourseName(membership.relatedCourse)}
           editMode={false}
           onChange={() => {}}

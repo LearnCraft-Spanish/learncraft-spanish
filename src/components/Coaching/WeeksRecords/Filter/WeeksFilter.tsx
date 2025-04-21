@@ -68,6 +68,7 @@ export default function WeeksFilter({
     if (!courseListQuery.isSuccess || !activeMembershipsQuery.isSuccess)
       return [];
     return courseListQuery.data.filter((course) => {
+      // Foreign Key lookup, filter in backend
       return (
         activeMembershipsQuery.data.filter(
           (membership) => membership.relatedCourse === course.recordId,

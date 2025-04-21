@@ -153,15 +153,19 @@ export default function WeeksTable({
         }
 
         // Need either private calls, group sessions, or notes
+        // Foreign Key lookup, form data in backend
         const privateCalls = privateCallsQuery.data?.filter(
           (call) => call.relatedWeek === week.recordId,
         );
 
         // For group sessions, we need to check the group attendees to find sessions related to this week
+        // Foreign Key lookup, form data in backend
+
         const groupSessionIds = groupAttendeesQuery.data
           ?.filter((attendee) => attendee.student === week.recordId)
           .map((attendee) => attendee.groupSession);
 
+        // Foreign Key lookup, form data in backend
         const groupSessions = groupSessionsQuery.data?.filter((session) =>
           groupSessionIds?.includes(session.recordId),
         );
@@ -198,6 +202,7 @@ export default function WeeksTable({
           let label = `Week ${week.week}`;
 
           // Try to find student info through getStudentFromMembershipId
+          // Foreign Key lookup, orm data in backend
           const student = getStudentFromMembershipId(week.relatedMembership);
           if (student) {
             label = `${student.fullName} (Week ${week.week})`;

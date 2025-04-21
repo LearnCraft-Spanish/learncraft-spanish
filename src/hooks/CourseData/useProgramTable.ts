@@ -41,6 +41,7 @@ export function useProgramTable() {
         return findNumber(a.lesson) - findNumber(b.lesson);
       };
       const parsedLessonArray: Lesson[] = [];
+      // Foreign Key lookup, form data in backend
       lessonTable.forEach((lesson) => {
         if (lesson.relatedProgram === course.recordId) {
           parsedLessonArray.push({ ...lesson });
@@ -56,10 +57,12 @@ export function useProgramTable() {
           }
         });
         lesson.vocabKnown = [...combinedVocabulary];
+        // Foreign Key lookup, form data in backend
         if (course.recordId === 3) {
           combined1mcVocabulary = [...combinedVocabulary];
         }
         if (course.recordId === 2) {
+          // Foreign Key lookup, form data in backend
           combinedLCSVoabulary = [...combinedVocabulary];
         }
       });

@@ -13,8 +13,10 @@ function FlashcardManager() {
   const { flashcardDataQuery, exampleIsCustom } = useStudentFlashcards();
   const studentFlashcardData = flashcardDataQuery.data;
 
+  // Foreign Key lookup, form data in backend
   const getStudentExampleFromExampleId = useCallback(
     (exampleId: number) => {
+      // Foreign Key lookup, form data in backend
       const studentExample = studentFlashcardData?.studentExamples.find(
         (item) => item.relatedExample === exampleId,
       );
@@ -33,7 +35,9 @@ function FlashcardManager() {
 
   const sortedExamples = useMemo(() => {
     const sortFunction = (a: Flashcard, b: Flashcard) => {
+      // Foreign Key lookup, form data in backend
       const aStudentExample = getStudentExampleFromExampleId(a?.recordId);
+      // Foreign Key lookup, form data in backend
       const bStudentExample = getStudentExampleFromExampleId(b?.recordId);
       const aDate = new Date(aStudentExample.dateCreated);
       const bDate = new Date(bStudentExample.dateCreated);

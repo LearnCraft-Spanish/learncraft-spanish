@@ -43,6 +43,7 @@ export default function useFlashcardFilter() {
             switch (tag.type) {
               case 'subcategory':
                 example.vocabIncluded.forEach((item) => {
+                  // Foreign Key lookup, form data in backend?
                   const word = vocabularyQuery.data.find(
                     (element) => element.descriptionOfVocabularySkill === item,
                   );
@@ -53,6 +54,7 @@ export default function useFlashcardFilter() {
                 break;
               case 'verb':
                 example.vocabIncluded.forEach((item) => {
+                  // Foreign Key lookup, form data in backend?
                   const word = vocabularyQuery.data.find(
                     (element) => element.descriptionOfVocabularySkill === item,
                   );
@@ -63,6 +65,7 @@ export default function useFlashcardFilter() {
                 break;
               case 'conjugation':
                 example.vocabIncluded.forEach((item) => {
+                  // Foreign Key lookup, form data in backend?
                   const word = vocabularyQuery.data.find(
                     (element) => element.descriptionOfVocabularySkill === item,
                   );
@@ -75,6 +78,7 @@ export default function useFlashcardFilter() {
                 break;
               case 'vocabulary':
                 example.vocabIncluded.forEach((item) => {
+                  // Foreign Key lookup, form data in backend?
                   const word = vocabularyQuery.data.find(
                     (element) => element.descriptionOfVocabularySkill === item,
                   );
@@ -88,6 +92,7 @@ export default function useFlashcardFilter() {
                 break;
               case 'idiom':
                 example.vocabIncluded.forEach((item: string) => {
+                  // Foreign Key lookup, form data in backend?
                   const word = vocabularyQuery.data.find(
                     (element) => element.descriptionOfVocabularySkill === item,
                   );

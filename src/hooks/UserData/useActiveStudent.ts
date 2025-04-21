@@ -83,6 +83,7 @@ export function useActiveStudent() {
       programTableQuery.data?.length &&
       activeStudentQuery.data?.relatedProgram
     ) {
+      // Foreign Key lookup, form data in backend
       return (
         programTableQuery.data.find(
           (program) =>

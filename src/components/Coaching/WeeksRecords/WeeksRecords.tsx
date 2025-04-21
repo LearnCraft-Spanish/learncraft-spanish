@@ -141,6 +141,7 @@ function WeeksRecordsContent() {
     (weeks: Week[]) => {
       if (!filterByCoach) return weeks;
       return weeks.filter((week) => {
+        // Foreign Key lookup, form data in backend?
         const weekCoach = getCoachFromMembershipId(week.relatedMembership);
         return weekCoach === filterByCoach;
       });
@@ -151,6 +152,7 @@ function WeeksRecordsContent() {
     (weeks: Week[]) => {
       if (!filterByCourse) return weeks;
       return weeks.filter((week) => {
+        // Foreign Key lookup, form data in backend?
         const weekCourse = getCourseFromMembershipId(week.relatedMembership);
         return weekCourse === filterByCourse;
       });
@@ -181,6 +183,7 @@ function WeeksRecordsContent() {
     (weeks: Week[]) => {
       if (!filterByCoachless) return weeks;
       return weeks.filter((week) => {
+        // Foreign Key lookup, form data in backend?
         const weekCoach = getCoachFromMembershipId(week.relatedMembership);
         return weekCoach;
       });
@@ -191,6 +194,7 @@ function WeeksRecordsContent() {
     (weeks: Week[]) => {
       if (filterBySearchTerm && filterBySearchTerm.length > 0) {
         return weeks.filter((week) => {
+          // Foreign Key lookup, form data in backend?
           const student = getStudentFromMembershipId(week.relatedMembership);
           if (!student) return false;
           const nameMatches = student.fullName
@@ -245,7 +249,9 @@ function WeeksRecordsContent() {
 
       return [...weeksToSort].sort((a, b) => {
         let comparison = 0;
+        // Foreign Key lookup, form data in backend?
         const studentA = getStudentFromMembershipId(a.relatedMembership);
+        // Foreign Key lookup, form data in backend?
         const studentB = getStudentFromMembershipId(b.relatedMembership);
         comparison = (studentB?.fullName || '').localeCompare(
           studentA?.fullName || '',
