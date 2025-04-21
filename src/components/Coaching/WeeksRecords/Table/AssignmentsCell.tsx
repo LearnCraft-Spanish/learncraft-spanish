@@ -234,6 +234,7 @@ export function AssignmentView({
         <h4>
           {assignmentType} by{' '}
           {
+            // Foreign Key lookup, form data in backend
             getStudentFromMembershipId(
               getMembershipFromWeekRecordId(assignment.relatedWeek)?.recordId,
             )?.fullName
@@ -374,6 +375,7 @@ export function NewAssignmentView({
     }
     setStudent({
       studentFullname:
+        // Foreign Key lookup, form data in backend
         getStudentFromMembershipId(studentWeek.relatedMembership)?.fullName ||
         '',
       relatedWeek: studentWeek,

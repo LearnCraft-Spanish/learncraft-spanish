@@ -201,6 +201,7 @@ export function PrivateCallView({
       ) : (
         <h4>
           {
+            // Foreign Key lookup, orm data in backend
             getStudentFromMembershipId(
               getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
             )?.fullName
@@ -213,6 +214,7 @@ export function PrivateCallView({
           <p className="label">Student: </p>
           <p>
             {
+              // Foreign Key lookup, form data in backend
               getStudentFromMembershipId(
                 getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
               )?.fullName
@@ -452,6 +454,7 @@ export function NewPrivateCallView({
       console.error('No student found with recordId:', relatedWeekId);
       return;
     }
+    // Foreign Key lookup, form data in backend
     setStudent({
       studentFullname:
         getStudentFromMembershipId(studentWeek.relatedMembership)?.fullName ||

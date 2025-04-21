@@ -49,6 +49,7 @@ export default function FrequenSay() {
     return 0;
   }
 
+  // Foreign Key lookup, form data in backend
   const getVocab = useCallback(async () => {
     try {
       const spellings = getSpellingsFromBackend();
@@ -57,6 +58,7 @@ export default function FrequenSay() {
         await spellings.then((result) => {
           result.forEach((element) => {
             const relatedVocab = usefulData.find(
+              // Foreign Key lookup, form data in backend
               (record) => record.recordId === element.relatedWordIdiom,
             );
             if (relatedVocab && relatedVocab.spellings) {
@@ -153,6 +155,7 @@ export default function FrequenSay() {
 
   const getAcceptableWordSpellingsFromSelectedLesson = useCallback(() => {
     const acceptableSpellings: string[] = [];
+    // Foreign Key lookup, form data in backend
     if (selectedToLesson?.recordId) {
       selectedToLesson.vocabKnown.forEach((vocabName) => {
         const vocabularyItem = vocabularyTable.find(

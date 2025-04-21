@@ -50,15 +50,17 @@ export default function WeeksTableItem({
   const { openModal } = useModal();
 
   const dataReady = studentRecordsLessonsQuery.isSuccess;
-
+  // Foreign Key lookup, form data in backend
   const assignments = useMemo(
     () => getAssignmentsFromWeekRecordId(week.recordId),
     [getAssignmentsFromWeekRecordId, week.recordId],
   );
+  // Foreign Key lookup, form data in backend
   const groupSessions = useMemo(
     () => getGroupSessionsFromWeekRecordId(week.recordId),
     [getGroupSessionsFromWeekRecordId, week.recordId],
   );
+  // Foreign Key lookup, form data in backend
   const privateCalls = useMemo(
     () => getPrivateCallsFromWeekRecordId(week.recordId),
     [getPrivateCallsFromWeekRecordId, week.recordId],
@@ -106,6 +108,7 @@ export default function WeeksTableItem({
         <td>
           <StudentCell
             week={week}
+            // Foreign Key lookup, form data in backend
             student={getStudentFromMembershipId(week.relatedMembership)}
             hiddenFields={hiddenFields}
           />
@@ -135,6 +138,7 @@ export default function WeeksTableItem({
             week={week}
             calls={privateCalls}
             tableEditMode={editMode}
+            // Foreign Key lookup, form data in backend
             student={getStudentFromMembershipId(week.relatedMembership)}
           />
         </td>

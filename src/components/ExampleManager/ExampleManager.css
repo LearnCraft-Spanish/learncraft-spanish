@@ -28,7 +28,7 @@
   margin: 5px 30px;
 }
 /* Needed to center audio play/pause button */
-.previewCard .audioPlayPauseButton {
+.previewCard > .audioPlayPauseButton {
   position: relative;
   position: absolute;
   bottom: calc(50% - 12px);

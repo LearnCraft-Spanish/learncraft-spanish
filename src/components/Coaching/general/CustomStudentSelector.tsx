@@ -31,6 +31,7 @@ export default function CustomStudentSelector({
   const listOfStudents = useMemo(() => {
     if (!weeksQuery.data) return [];
     const studentList = weeksQuery.data?.map((week) => {
+      // Foreign Key lookup, form data in backend?
       const student = getStudentFromMembershipId(week.relatedMembership);
       if (!student) return undefined;
       return {

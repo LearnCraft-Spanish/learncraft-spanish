@@ -31,6 +31,7 @@ export default function useMyIncompleteWeeklyRecords({
 
       // Then filter for records belonging to the current coach
       const myWeeks = incompleteWeeks.filter((week) => {
+        // Foreign Key lookup, form data in backend?
         const weekCoach = getCoachFromMembershipId(week.relatedMembership);
         return weekCoach?.user.email === user.email;
       });
@@ -47,8 +48,11 @@ export default function useMyIncompleteWeeklyRecords({
       const weeksWithRelations: WeekWithRelations[] =
         nonOneMonthChallengeWeeks.map((week) => ({
           ...week,
+          // Foreign Key lookup, form data in backend
           assignments: getAssignmentsFromWeekRecordId(week.recordId) || [],
+          // Foreign Key lookup, form data in backend
           privateCalls: getPrivateCallsFromWeekRecordId(week.recordId) || [],
+          // Foreign Key lookup, form data in backend
           groupSessions:
             getGroupSessionsAndAttendeesForWeek(week.recordId) || [],
         }));

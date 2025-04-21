@@ -60,6 +60,7 @@ export default function QuizSetupMenu({
     }
     if (quizType === 'audio') {
       // Get Examples from current allowed studentExamples
+      // Foreign Key lookup, form data in backend
       const currentExamples = currentAllowedExamples?.map((studentExample) => {
         return flashcardDataQuery.data?.examples.find(
           (example) => example.recordId === studentExample.relatedExample,
@@ -71,6 +72,7 @@ export default function QuizSetupMenu({
           example?.englishAudio?.length && example?.englishAudio?.length > 0,
       );
       // Filter out studentExamples that don't have an example (with audio)
+      // Foreign Key lookup, form data in backend
       currentAllowedExamples = currentAllowedExamples?.filter(
         (studentExample) =>
           allowedCurrentExamples?.find(

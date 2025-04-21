@@ -69,6 +69,7 @@ export default function useCoaching() {
       ) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getCoachFromMembershipId(
         membershipId,
         activeMembershipsQuery.data,
@@ -88,6 +89,7 @@ export default function useCoaching() {
       if (!activeMembershipsQuery.data || !courseListQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getCourseFromMembershipId(
         membershipId,
         activeMembershipsQuery.data,
@@ -102,6 +104,7 @@ export default function useCoaching() {
       if (!activeMembershipsQuery.data || !activeStudentsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getStudentFromMembershipId(
         membershipId,
         activeMembershipsQuery.data,
@@ -116,6 +119,7 @@ export default function useCoaching() {
       if (!groupAttendeesQuery.data || !weeksQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getAttendeeWeeksFromGroupSessionId(
         sessionId,
         groupAttendeesQuery.data,
@@ -130,6 +134,7 @@ export default function useCoaching() {
       if (!groupAttendeesQuery.data || !groupSessionsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getGroupSessionsFromWeekRecordId(
         weekRecordId,
         groupAttendeesQuery.data,
@@ -144,6 +149,7 @@ export default function useCoaching() {
       if (!assignmentsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getAssignmentsFromWeekRecordId(
         weekRecordId,
         assignmentsQuery.data,
@@ -157,6 +163,7 @@ export default function useCoaching() {
       if (!activeMembershipsQuery.data || !weeksQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getMembershipFromWeekRecordId(
         weekId,
         weeksQuery.data,
@@ -171,6 +178,7 @@ export default function useCoaching() {
       if (!privateCallsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getPrivateCallsFromWeekRecordId(
         weekId,
         privateCallsQuery.data,
@@ -184,6 +192,7 @@ export default function useCoaching() {
       if (!groupAttendeesQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getAttendeesFromGroupSessionId(
         sessionId,
         groupAttendeesQuery.data,
@@ -195,6 +204,7 @@ export default function useCoaching() {
   // get group sessions & attendees for a week
   const getGroupSessionsAndAttendeesForWeek = useCallback(
     (weekId: number) => {
+      // Foreign Key lookup, form data in backend
       const groupSessions = getGroupSessionsFromWeekRecordId(weekId);
       const structuredGroupSessions = groupSessions?.map((session) => ({
         ...session,

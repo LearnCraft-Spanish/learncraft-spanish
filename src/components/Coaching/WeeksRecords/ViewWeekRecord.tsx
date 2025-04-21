@@ -5,7 +5,7 @@ import ContextualView from 'src/components/Contextual/ContextualView';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
   const { getStudentFromMembershipId } = useCoaching();
-
+  // Foreign Key lookup, form data in backend
   const student = useMemo(
     () => getStudentFromMembershipId(week?.relatedMembership),
     [getStudentFromMembershipId, week?.relatedMembership],

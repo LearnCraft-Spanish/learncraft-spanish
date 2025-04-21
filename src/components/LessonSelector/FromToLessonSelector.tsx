@@ -43,6 +43,7 @@ export default function FromToLessonSelector(): React.JSX.Element {
   function makeFromLessonSelector() {
     const lessonSelector: Array<React.JSX.Element> = [];
     const toLessonNumber = getLessonNumber(selectedToLesson);
+    // Foreign Key lookup, form data in backend
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
       const lessonNumber = getLessonNumber(lesson);
       if (lessonNumber && (!toLessonNumber || lessonNumber <= toLessonNumber)) {
@@ -59,6 +60,7 @@ export default function FromToLessonSelector(): React.JSX.Element {
   function makeToLessonSelector() {
     const lessonSelector: Array<React.JSX.Element> = [];
     const fromLessonNumber = getLessonNumber(selectedFromLesson);
+    // Foreign Key lookup, form data in backend
     selectedProgram?.lessons.forEach((lesson: Lesson) => {
       const lessonNumber = getLessonNumber(lesson);
       if (

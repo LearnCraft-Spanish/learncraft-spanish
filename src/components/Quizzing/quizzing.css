@@ -51,3 +51,20 @@
     font-size: 0.75rem;
   }
 }
+
+/* Flashcard Buttons */
+
+.customFlashcardButton.onFlashcard {
+  top: 25px;
+  width: fit-content;
+  font-size: 10px;
+  padding: 5px 10px;
+  margin: 0 auto;
+  z-index: 5;
+  /* width: 170px; */
+
+  &:hover {
+    background-color: var(--brand);
+    cursor: default;
+  }
+}

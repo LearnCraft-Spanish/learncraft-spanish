@@ -15,7 +15,7 @@ describe('flashcard finder', () => {
       </MockAllProviders>,
     );
     await waitFor(() => {
-      expect(screen.getByText('From:')).toBeInTheDocument();
+      expect(screen.getByText('Flashcard Finder')).toBeInTheDocument();
     });
   });
 });
