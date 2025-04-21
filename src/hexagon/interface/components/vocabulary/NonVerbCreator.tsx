@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNonVerbCreation } from '../../../application/useCases/useNonVerbCreation';
 import { PasteTable } from '../PasteTable/PasteTable';
+import { PaginatedVocabularyTable } from '../VocabularyTable/PaginatedVocabularyTable';
 import './VocabularyCreator.scss';
 
 interface NonVerbCreatorProps {
@@ -18,6 +19,7 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
     creationError,
     tableHook,
     saveVocabulary,
+    currentVocabularyPagination,
   } = useNonVerbCreation();
 
   const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -70,13 +72,18 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
         </div>
       )}
 
-      <PasteTable
-        hook={tableHook}
-        saveButtonText="Save Vocabulary"
-        clearButtonText="Clear Table"
-        pasteHint="Paste vocabulary data (tab-separated) or edit cells directly"
-      />
+      {/* Add new vocabulary section - always shown */}
+      <div className="nonverb-creator__add-new">
+        <h4>Add new vocabulary:</h4>
+        <PasteTable
+          hook={tableHook}
+          saveButtonText="Save Vocabulary"
+          clearButtonText="Clear Table"
+          pasteHint="Paste vocabulary data (tab-separated) or edit cells directly"
+        />
+      </div>
 
+      {/* Save button */}
       <div className="nonverb-creator__actions">
         <button
           type="button"
@@ -92,6 +99,24 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
           {creating ? 'Saving...' : 'Save All Vocabulary'}
         </button>
       </div>
+
+      {/* Display existing vocabulary if a subcategory is selected */}
+      {selectedSubcategoryId && (
+        <div className="nonverb-creator__existing-vocabulary">
+          <h4>Existing vocabulary in this subcategory:</h4>
+          {currentVocabularyPagination ? (
+            <PaginatedVocabularyTable
+              paginationState={currentVocabularyPagination}
+              className="nonverb-creator__vocabulary-table"
+              emptyMessage="No vocabulary items found in this subcategory."
+            />
+          ) : (
+            <div className="nonverb-creator__empty-state">
+              Select a subcategory to view existing vocabulary
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

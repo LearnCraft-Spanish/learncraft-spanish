@@ -1,6 +1,7 @@
 import type {
   CreateNonVerbVocabulary,
   CreateVerb,
+  GetTotalCountResponse,
   ListVocabularyResponse,
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
@@ -73,6 +74,23 @@ export function createVocabularyInfrastructure(
       // The API returns a paginated response, but our port expects an array
       // Extract items from the pagination wrapper
       return response.items;
+    },
+
+    getVocabularyCount: async (
+      subcategoryId?: number,
+    ): Promise<GetTotalCountResponse> => {
+      // The backend expects query parameters in the format /api/vocabulary?subcategoryId=16
+      const params: Record<string, string> = {};
+
+      if (subcategoryId !== undefined) {
+        params.subcategoryId = subcategoryId.toString();
+      }
+
+      // Use the list endpoint with the count parameter
+      return httpClient.get<GetTotalCountResponse>(
+        VocabularyEndpoints.getCount.path,
+        { params },
+      );
     },
 
     getVocabularyById: async (id: string): Promise<Vocabulary | null> => {

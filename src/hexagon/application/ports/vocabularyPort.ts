@@ -1,6 +1,7 @@
 import type {
   CreateNonVerbVocabulary,
   CreateVerb,
+  GetTotalCountResponse,
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
 
@@ -18,6 +19,13 @@ export interface VocabularyPort {
    * Get a vocabulary item by ID
    */
   getVocabularyById: (id: string) => Promise<Vocabulary | null>;
+
+  /**
+   * Get the total count of vocabulary items
+   */
+  getVocabularyCount: (
+    subcategoryId?: number,
+  ) => Promise<GetTotalCountResponse>;
 
   /**
    * Create a new verb vocabulary item

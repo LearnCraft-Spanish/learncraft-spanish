@@ -23,26 +23,19 @@ export function createSubcategoryInfrastructure(
   // Create an authenticated HTTP client
   const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
 
-  // Define paths based on API contract
-  const SUBCATEGORIES_ENDPOINT = '/api/subcategories';
-  const getSubcategoryPath = (id: string) => `/api/subcategories/${id}`;
-
   return {
     getSubcategories: async (): Promise<Subcategory[]> => {
-      // Use the subcategories list endpoint
-      // If SubcategoryEndpoints.list exists, use it instead
-      const endpoint =
-        SubcategoryEndpoints.list?.path || SUBCATEGORIES_ENDPOINT;
+      // Always use the endpoint from the shared package contract
+      const response = await httpClient.get<Subcategory[]>(
+        SubcategoryEndpoints.list.path,
+      );
 
-      const response = await httpClient.get<{ items: Subcategory[] }>(endpoint);
-
-      // The API returns a paginated response, but our port expects an array
-      return response.items;
+      return Array.isArray(response) ? response : [];
     },
 
     getSubcategoryById: async (id: string): Promise<Subcategory | null> => {
-      // Construct path directly since the endpoint might not be defined in shared
-      const path = getSubcategoryPath(id);
+      // Use the getById endpoint directly from the shared package
+      const path = SubcategoryEndpoints.getById.path.replace(':id', id);
       return httpClient.get<Subcategory>(path);
     },
   };

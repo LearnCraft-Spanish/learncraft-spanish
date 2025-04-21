@@ -31,7 +31,7 @@
     "validate": "npm run lint:fix && npm run format && npm run typecheck"
   },
   "dependencies": {
-    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.1.7",
+    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.1.11",
     "@auth0/auth0-react": "^2.3.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",

@@ -1,11 +1,13 @@
 import type {
   CreateNonVerbVocabulary,
   Subcategory,
+  Vocabulary,
 } from '@LearnCraft-Spanish/shared';
 import type { TableHook } from '../units/pasteTable/types';
 import { useCallback, useMemo, useState } from 'react';
 import { useSubcategories } from '../units/useSubcategories';
 import { useVocabulary } from '../units/useVocabulary';
+import { useVocabularyPage } from '../units/useVocabularyPage';
 import { useVocabularyTable } from '../units/useVocabularyTable';
 
 // Define VocabularyTableData to match what's in useVocabularyTable
@@ -14,6 +16,22 @@ export interface VocabularyTableData {
   frequency: number;
   spellings: string;
   notes?: string;
+}
+
+// Define pagination state for current vocabulary view
+export interface VocabularyPaginationState {
+  vocabularyItems: Vocabulary[];
+  isLoading: boolean;
+  isCountLoading: boolean;
+  isFetching: boolean;
+  error: Error | null;
+  totalCount: number | null;
+  totalPages: number | null;
+  hasMorePages: boolean;
+  currentPage: number;
+  pageSize: number;
+  goToNextPage: () => void;
+  goToPreviousPage: () => void;
 }
 
 interface UseNonVerbCreationResult {
@@ -32,6 +50,9 @@ interface UseNonVerbCreationResult {
 
   // Unified save action that handles validation, table save, and creation
   saveVocabulary: () => Promise<boolean>;
+
+  // Vocabulary list for currently selected subcategory
+  currentVocabularyPagination: VocabularyPaginationState | null;
 }
 
 /**
@@ -62,6 +83,8 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
   // State
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
   const [creationError, setCreationError] = useState<Error | null>(null);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   // Compose unit hooks
   const { subcategories: allSubcategories, loading: loadingSubcategories } =
@@ -82,11 +105,84 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
   // Filter for non-verb subcategories only
   const nonVerbSubcategories = useMemo(() => {
     return allSubcategories.filter((subcategory) => {
-      // Check if this is likely NOT a verb subcategory
-      const name = subcategory.name?.toLowerCase() || '';
-      return !name.includes('verb') && !name.includes('action');
+      // Exclude only the verb part of speech
+      return subcategory.partOfSpeech !== 'Verb';
     });
   }, [allSubcategories]);
+
+  // Convert selectedSubcategoryId to number for the query
+  // If no valid ID is selected, use 0 which won't match any data
+  const numericSubcategoryId = useMemo(() => {
+    if (!selectedSubcategoryId) return 0;
+    const id = Number(selectedSubcategoryId);
+    return Number.isNaN(id) ? 0 : id;
+  }, [selectedSubcategoryId]);
+
+  // Get paginated vocabulary data for the selected subcategory
+  const {
+    items: vocabularyItems,
+    isLoading: isVocabularyLoading,
+    isCountLoading,
+    error: vocabularyError,
+    totalCount,
+    totalPages,
+    hasMorePages,
+    page: currentPage,
+    isFetching: isPageFetching,
+  } = useVocabularyPage(
+    numericSubcategoryId,
+    page,
+    pageSize,
+    numericSubcategoryId > 0, // Only enable queries when we have a valid subcategory ID
+  );
+
+  // Create pagination state object only if a subcategory is selected
+  const currentVocabularyPagination: VocabularyPaginationState | null =
+    useMemo(() => {
+      if (!selectedSubcategoryId) return null;
+
+      return {
+        vocabularyItems,
+        isLoading: isVocabularyLoading,
+        isCountLoading,
+        isFetching: isPageFetching,
+        error: vocabularyError,
+        totalCount,
+        totalPages,
+        hasMorePages,
+        currentPage,
+        pageSize,
+        goToNextPage: () => {
+          // Only move to next page if we have more pages or are reasonably sure there are more
+          if ((totalPages !== null && page < totalPages) || hasMorePages) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        goToPreviousPage: () => {
+          if (page > 1) {
+            setPage((prev) => prev - 1);
+          }
+        },
+      };
+    }, [
+      selectedSubcategoryId,
+      vocabularyItems,
+      isVocabularyLoading,
+      isCountLoading,
+      isPageFetching,
+      vocabularyError,
+      totalCount,
+      totalPages,
+      hasMorePages,
+      currentPage,
+      page,
+    ]);
+
+  // Reset pagination when changing subcategory
+  const handleSubcategoryChange = useCallback((id: string) => {
+    setSelectedSubcategoryId(id);
+    setPage(1); // Reset to first page when subcategory changes
+  }, []);
 
   // Create vocabulary batch - internal implementation
   const createVocabularyBatch = useCallback(
@@ -153,7 +249,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     nonVerbSubcategories,
     loadingSubcategories,
     selectedSubcategoryId,
-    setSelectedSubcategoryId,
+    setSelectedSubcategoryId: handleSubcategoryChange,
 
     // Creation status
     creating: creatingVocabulary,
@@ -164,5 +260,8 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
 
     // Unified save action
     saveVocabulary,
+
+    // Paginated vocabulary data
+    currentVocabularyPagination,
   };
 }
