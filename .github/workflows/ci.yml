@@ -8,10 +8,12 @@ on:
     branches:
       - development
       - master
+      - main
   push:
     branches:
       - development
       - master
+      - main
   workflow_dispatch:
 
 jobs:
