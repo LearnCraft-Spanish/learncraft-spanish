@@ -27,7 +27,8 @@
     "start": "vite",
     "test": "vitest run --coverage",
     "typecheck": "tsc --noEmit",
-    "validate": "npm run lint:fix && npm run format && npm run typecheck"
+    "validate": "npm run lint:fix && npm run format && npm run typecheck",
+    "metrics": "node METRICS/get_metrics.js"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
