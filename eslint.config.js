@@ -25,6 +25,7 @@ export default antfu(
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
+    ignores: ['**/*.md'],
   },
   {
     files: ['**/*.test.{ts,tsx,js,jsx}'],
@@ -44,6 +45,7 @@ export default antfu(
       'node_modules/',
       '**/mocks/data/**/*.js',
       '*.yml',
+      '**/*.md',
     ],
   },
   prettierConfig,

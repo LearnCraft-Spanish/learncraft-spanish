@@ -215,6 +215,7 @@ export function useBackend() {
     deleteFactory,
     newDeleteFactory,
     newPostFactory,
+    newPutFactory,
   } = useBackendHelpers();
 
   /*      GET Requests      */
@@ -232,6 +233,16 @@ export function useBackend() {
 
   const getVocabFromBackend = useCallback((): Promise<types.Vocabulary[]> => {
     return getFactory<types.Vocabulary[]>('public/vocabulary');
+  }, [getFactory]);
+
+  const getVerbsFromBackend = useCallback((): Promise<types.Verb[]> => {
+    return getFactory<types.Verb[]>('admin/verbs');
+  }, [getFactory]);
+
+  const getSubcategoriesFromBackend = useCallback((): Promise<
+    types.Subcategory[]
+  > => {
+    return getFactory<types.Subcategory[]>('admin/subcategories');
   }, [getFactory]);
 
   const getSpellingsFromBackend = useCallback((): Promise<types.Spelling[]> => {
@@ -586,6 +597,115 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  const createVocabulary = useCallback(
+    (vocabulary: Omit<types.Vocabulary, 'recordId'>): Promise<number> => {
+      return newPostFactory({
+        path: 'admin/vocabulary',
+        body: vocabulary,
+      });
+    },
+    [newPostFactory],
+  );
+
+  const updateVocabulary = useCallback(
+    (vocabulary: types.Vocabulary): Promise<number> => {
+      return newPostFactory({
+        path: `admin/vocabulary/${vocabulary.recordId}`,
+        body: vocabulary,
+      });
+    },
+    [newPostFactory],
+  );
+
+  const deleteVocabulary = useCallback(
+    (recordId: number): Promise<number> => {
+      return newDeleteFactory({
+        path: `admin/vocabulary/${recordId}`,
+      });
+    },
+    [newDeleteFactory],
+  );
+
+  const createSpelling = useCallback(
+    (spelling: Omit<types.Spelling, 'recordId'>): Promise<number> => {
+      return newPostFactory({
+        path: 'admin/spellings',
+        body: spelling,
+      });
+    },
+    [newPostFactory],
+  );
+
+  const deleteSpelling = useCallback(
+    (spelling: types.Spelling): Promise<number> => {
+      return newDeleteFactory({
+        path: 'admin/spellings',
+        body: spelling,
+      });
+    },
+    [newDeleteFactory],
+  );
+
+  const createSubcategory = useCallback(
+    (
+      subcategory: Omit<types.Subcategory, 'recordId'>,
+    ): Promise<types.Subcategory> => {
+      return newPostFactory({
+        path: 'admin/subcategories',
+        body: subcategory,
+      });
+    },
+    [newPostFactory],
+  );
+
+  const updateSubcategory = useCallback(
+    (subcategory: types.Subcategory): Promise<types.Subcategory> => {
+      return newPutFactory({
+        path: `admin/subcategories/${subcategory.recordId}`,
+        body: subcategory,
+      });
+    },
+    [newPutFactory],
+  );
+
+  const deleteSubcategory = useCallback(
+    (recordId: number): Promise<number> => {
+      return newDeleteFactory({
+        path: `admin/subcategories/${recordId}`,
+      });
+    },
+    [newDeleteFactory],
+  );
+
+  const createVerb = useCallback(
+    (verb: Omit<types.Verb, 'recordId'>): Promise<types.Verb> => {
+      return newPostFactory({
+        path: 'admin/verbs',
+        body: verb,
+      });
+    },
+    [newPostFactory],
+  );
+
+  const updateVerb = useCallback(
+    (verb: types.Verb): Promise<types.Verb> => {
+      return newPutFactory({
+        path: `admin/verbs/${verb.recordId}`,
+        body: verb,
+      });
+    },
+    [newPutFactory],
+  );
+
+  const deleteVerb = useCallback(
+    (recordId: number): Promise<number> => {
+      return newDeleteFactory({
+        path: `admin/verbs/${recordId}`,
+      });
+    },
+    [newDeleteFactory],
+  );
+
   return {
     getAccessToken,
     // GET Requests
@@ -614,24 +734,37 @@ export function useBackend() {
     getUserDataFromBackend,
     getVerifiedExamplesFromBackend,
     getVocabFromBackend,
+    getVerbsFromBackend,
+    getSubcategoriesFromBackend,
 
     // POST Requests
     addVocabularyToExample,
     createMyStudentExample,
     createPMFDataForUser,
+    createSpelling,
     createStudentExample,
     createUnverifiedExample,
     createMultipleUnverifiedExamples,
     createMultipleStudentExamples,
     createMultipleQuizExamples,
+    createVocabulary,
     updateExample,
     updateMyStudentExample,
     updatePMFDataForUser,
     updateStudentExample,
+    updateVocabulary,
 
     // DELETE Requests
     deleteMyStudentExample,
+    deleteSpelling,
     deleteStudentExample,
+    deleteVocabulary,
     removeVocabFromExample,
+    createSubcategory,
+    updateSubcategory,
+    deleteSubcategory,
+    createVerb,
+    updateVerb,
+    deleteVerb,
   };
 }

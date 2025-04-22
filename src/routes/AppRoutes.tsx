@@ -1,6 +1,6 @@
 import { Route } from 'react-router-dom';
-import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 
+import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 import CoachingDashboard from 'src/components/CoachingDashboard';
 import {
   CoursesTable,
@@ -11,9 +11,11 @@ import {
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
+import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import DatabaseTables from 'src/sections/DatabaseTables';
+import { VocabularyCreatorPage } from '../hexagon/interface/pages/VocabularyCreatorPage';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
 import FlashcardManager from '../sections/FlashcardManager';
@@ -80,6 +82,14 @@ export default function AppRoutes() {
         path="/examplemanager"
         element={
           userDataQuery.data?.roles.adminRole === 'admin' && <ExampleManager />
+        }
+      />
+      <Route
+        path="/vocabularymanager"
+        element={
+          <ProtectedRoute>
+            <VocabularyCreatorPage />
+          </ProtectedRoute>
         }
       />
       <Route

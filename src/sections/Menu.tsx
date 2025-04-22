@@ -150,6 +150,13 @@ export default function Menu() {
                 <Link className="linkButton" to="/database-tables">
                   Database Tables
                 </Link>
+                {userDataQuery.data.roles.adminRole === 'admin' && (
+                  <div className="buttonBox">
+                    <Link className="linkButton" to="/vocabularymanager">
+                      Create Vocabulary
+                    </Link>
+                  </div>
+                )}
               </div>
             </>
           )}
