@@ -4,7 +4,7 @@ import AssignmentsCell from 'src/components/StudentDrillDown/components/general/
 import GroupSessionsCell from 'src/components/StudentDrillDown/components/general/GroupSessionsCell_Modified';
 import PrivateCallsCell from 'src/components/StudentDrillDown/components/general/PrivateCallsCell_Modificed';
 import { toISODate } from 'src/functions/dateUtils';
-import useDrilldownTable from './useDrilldownTable';
+import useWeeksDrilldownTable from './useWeeksDrilldownTable';
 import 'src/components/Table/Table.scss';
 
 const headers = [
@@ -33,7 +33,7 @@ export default function DrilldownTable({
     throw new Error('Coach ID or report not found');
   }
 
-  const { data, isLoading, isError, isSuccess } = useDrilldownTable(
+  const { data, isLoading, isError, isSuccess } = useWeeksDrilldownTable(
     coachId,
     report,
   );

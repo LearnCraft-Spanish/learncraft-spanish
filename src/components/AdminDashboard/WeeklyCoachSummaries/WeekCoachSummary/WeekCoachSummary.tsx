@@ -8,7 +8,7 @@ function renderRow(
   onClickFunc?: (str: string) => void,
 ): ReactNode {
   return (
-    <tr>
+    <tr key={row.primaryCoach}>
       <td
         onClick={() => {
           if (onClickFunc) {

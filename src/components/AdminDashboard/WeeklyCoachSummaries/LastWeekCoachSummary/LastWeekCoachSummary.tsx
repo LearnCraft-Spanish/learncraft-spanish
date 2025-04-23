@@ -4,7 +4,7 @@ import SectionHeader from 'src/components/CoachingDashboard/components/SectionHe
 import useLastWeekCoachSummary from 'src/hooks/AdminData/useLastWeekCoachSummary';
 function renderRow(row: CoachSummaryData, onClickFunc?: (str: string) => void) {
   return (
-    <tr>
+    <tr key={row.primaryCoach}>
       <td
         onClick={() => {
           if (onClickFunc) {

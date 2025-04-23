@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import DrilldownTable from './DrilldownTable';
 import LastWeekCoachSummary from './LastWeekCoachSummary';
 import WeekCoachSummary from './WeekCoachSummary';
+import WeeksDrilldownTable from './WeeksDrilldownTable';
 
 export default function WeeklySummaries() {
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
@@ -33,7 +33,9 @@ export default function WeeklySummaries() {
           setIsOpen={setLastWeekCoachSummaryOpen}
         />
       </div>
-      {selectedReport && <DrilldownTable selectedReport={selectedReport} />}
+      {selectedReport && (
+        <WeeksDrilldownTable selectedReport={selectedReport} />
+      )}
     </div>
   );
 }
