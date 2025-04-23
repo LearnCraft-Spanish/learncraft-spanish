@@ -41,7 +41,7 @@ function RenderRowForReport(data: MembershipReportData) {
   const { courseName, numberOfMemberships } = data;
   // const { openContextual } = useContextualMenu();
   return (
-    <tr>
+    <tr key={courseName}>
       <td
       // onClick={() =>
       //   openContextual(`active-memberships-by-course-${row['Course - Name']}`)

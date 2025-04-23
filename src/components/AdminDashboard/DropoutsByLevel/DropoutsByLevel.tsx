@@ -6,7 +6,7 @@ import useDropoutsByLevelReport from 'src/hooks/AdminData/useDropoutsByLevelRepo
 
 function renderRow(row: MembershipReportData) {
   return (
-    <tr>
+    <tr key={row.courseName}>
       <td>{row.courseName}</td>
       <td>{row.numberOfMemberships}</td>
     </tr>

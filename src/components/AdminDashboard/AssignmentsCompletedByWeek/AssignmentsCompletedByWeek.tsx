@@ -6,7 +6,7 @@ import useAssignmentsCompletedByWeek from 'src/hooks/AdminData/useAssignmentsCom
 
 function renderRow(row: AssignmentsCompletedByWeekData) {
   return (
-    <tr>
+    <tr key={row.level}>
       <td>{row.level}</td>
       <td>{row.assignmentsCompletedAvg}</td>
     </tr>
