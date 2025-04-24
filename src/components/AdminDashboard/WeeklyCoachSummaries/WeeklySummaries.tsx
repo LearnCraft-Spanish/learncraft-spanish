@@ -20,7 +20,7 @@ export default function WeeklySummaries() {
   }, [weekCoachSummaryOpen, lastWeekCoachSummaryOpen]);
 
   return (
-    <div>
+    <div className="section-with-interactive-table">
       <div className="admin-dashboard-grid">
         <WeekCoachSummary
           setSelectedReport={updateSelectedReport}

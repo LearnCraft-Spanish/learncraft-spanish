@@ -9,3 +9,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+.section-with-interactive-table .body-container table tbody td:first-child {
+  cursor: pointer;
+}

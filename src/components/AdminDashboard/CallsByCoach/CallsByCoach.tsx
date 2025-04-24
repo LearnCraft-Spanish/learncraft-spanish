@@ -20,7 +20,7 @@ export default function CallsByCoach() {
   }, [groupCallsByCoachOpen, privateCallsByCoachOpen]);
 
   return (
-    <div>
+    <div className="section-with-interactive-table">
       <div className="admin-dashboard-grid">
         <GroupCallsByCoach
           setSelectedReport={updateSelectedReport}
