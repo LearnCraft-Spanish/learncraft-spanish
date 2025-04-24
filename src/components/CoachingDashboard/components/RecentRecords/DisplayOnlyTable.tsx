@@ -70,6 +70,12 @@ export default function DisplayOnlyTable({
             )}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          maxPage={maxPage}
+          nextPage={nextPage}
+          previousPage={previousPage}
+        />
       </div>
     </div>
   );

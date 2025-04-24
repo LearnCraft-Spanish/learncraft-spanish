@@ -5,19 +5,29 @@ import {
   DropoutsByLevel,
   WeeklySummaries,
 } from 'src/components/AdminDashboard';
+import { Loading } from 'src/components/Loading';
+import useAdminDashboard from './useAdminDashboard';
 import './AdminDashboard.scss';
 
 export default function AdminDashboard() {
+  const { isLoading, isError, isSuccess } = useAdminDashboard();
+
   return (
     <div className="admin-dashboard">
-      <h2>Admin Dashboard</h2>
-      <WeeklySummaries />
-      <CallsByCoach />
-      <div className="admin-dashboard-grid">
-        <ActiveMemberships />
-        <DropoutsByLevel />
-        <AssignmentsCompletedByWeek />
-      </div>
+      {isLoading && <Loading message={'Loading Admin Dashboard...'} />}
+      {isError && <div>Error</div>}
+      {isSuccess && (
+        <>
+          <h2>Admin Dashboard</h2>
+          <WeeklySummaries />
+          <CallsByCoach />
+          <div className="admin-dashboard-grid">
+            <ActiveMemberships />
+            <DropoutsByLevel />
+            <AssignmentsCompletedByWeek />
+          </div>
+        </>
+      )}
     </div>
   );
 }
