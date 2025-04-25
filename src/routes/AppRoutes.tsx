@@ -13,6 +13,7 @@ import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
@@ -122,6 +123,7 @@ export default function AppRoutes() {
         <Route path="quizzes" element={<QuizzesTable />} />
       </Route>
       <Route path="/*" element={<NotFoundPage />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </SentryRoutes>
   );
 }

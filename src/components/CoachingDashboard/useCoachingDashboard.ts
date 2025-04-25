@@ -1,5 +1,6 @@
 import useActiveCoach from './hooks/useActiveCoach';
 import useMyIncompleteWeeklyRecords from './hooks/useMyIncompleteWeeklyRecords';
+
 export default function useCoachingDashboard() {
   const { coach } = useActiveCoach();
   const { states } = useMyIncompleteWeeklyRecords({
