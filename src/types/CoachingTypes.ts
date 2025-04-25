@@ -171,3 +171,9 @@ export interface WeekWithRelations extends Week {
   privateCalls: PrivateCall[];
   groupSessions: GroupSessionWithAttendees[];
 }
+
+export interface Report {
+  title: string;
+  headers: string[];
+  data: any[];
+}

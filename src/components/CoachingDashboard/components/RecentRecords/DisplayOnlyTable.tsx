@@ -9,11 +9,13 @@ export default function DisplayOnlyTable({
   headers,
   data,
   renderRow,
+  onClickFunc,
   itemsPerPage = 20,
 }: {
   headers: string[];
   data: any[];
-  renderRow: (item: any) => ReactNode;
+  renderRow: (item: any, onClick?: (str: string) => void) => ReactNode;
+  onClickFunc?: (str: string) => void;
   itemsPerPage?: number;
 }) {
   const { page, maxPage, getDisplayData, nextPage, previousPage } =
@@ -53,7 +55,12 @@ export default function DisplayOnlyTable({
           </thead>
           <tbody>
             {displayData.length > 0 ? (
-              displayData.map((item) => renderRow(item))
+              displayData.map((item) => {
+                if (onClickFunc) {
+                  return renderRow(item, onClickFunc);
+                }
+                return renderRow(item);
+              })
             ) : (
               <tr>
                 <td colSpan={headers.length} className="noResults">
@@ -63,6 +70,12 @@ export default function DisplayOnlyTable({
             )}
           </tbody>
         </table>
+        <Pagination
+          page={page}
+          maxPage={maxPage}
+          nextPage={nextPage}
+          previousPage={previousPage}
+        />
       </div>
     </div>
   );
