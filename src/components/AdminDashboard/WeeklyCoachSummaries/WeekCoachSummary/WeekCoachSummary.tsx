@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import type { CoachSummaryData } from './types';
+import type { CoachSummaryData } from '../types';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useWeeklyCoachSummary from 'src/hooks/AdminData/useWeeklyCoachSummary';
+
 function renderRow(
   row: CoachSummaryData,
   onClickFunc?: (str: string) => void,

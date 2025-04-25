@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useBackendHelpers } from '../useBackend';
 export default function useDropoutsByLevelReport() {
   const { getFactory } = useBackendHelpers();
+
   const getDropoutsByLevelReport = () => {
     return getFactory<MembershipReportData[]>('admin/report/dropouts-by-level');
   };

@@ -1,11 +1,14 @@
-// import type { LastWeekCoachSummaryData } from 'src/components/AdminDashboard/LastWeekCoachSummary/types';
+import type { CoachSummaryData } from 'src/components/AdminDashboard/WeeklyCoachSummaries/types';
 import { useQuery } from '@tanstack/react-query';
 import { useBackendHelpers } from '../useBackend';
 
 export default function useLastWeekCoachSummary() {
   const { getFactory } = useBackendHelpers();
+
   const getLastWeekCoachSummary = () => {
-    return getFactory<any[]>('admin/report/last-week-coach-summary');
+    return getFactory<CoachSummaryData[]>(
+      'admin/report/last-week-coach-summary',
+    );
   };
 
   const lastWeekCoachSummaryQuery = useQuery({

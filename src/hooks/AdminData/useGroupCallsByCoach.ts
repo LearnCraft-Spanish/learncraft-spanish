@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useBackendHelpers } from '../useBackend';
 export default function useGroupCallsByCoach() {
   const { getFactory } = useBackendHelpers();
+
   const getGroupCallsByCoach = () => {
     return getFactory<GroupCallData[]>('admin/report/group-calls-by-coach');
   };

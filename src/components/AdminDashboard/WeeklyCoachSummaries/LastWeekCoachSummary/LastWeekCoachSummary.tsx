@@ -1,7 +1,8 @@
-import type { CoachSummaryData } from '../WeekCoachSummary/types';
+import type { CoachSummaryData } from '../types';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
 import SectionHeader from 'src/components/CoachingDashboard/components/SectionHeader';
 import useLastWeekCoachSummary from 'src/hooks/AdminData/useLastWeekCoachSummary';
+
 function renderRow(row: CoachSummaryData, onClickFunc?: (str: string) => void) {
   return (
     <tr key={row.primaryCoach}>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import GroupCallsByCoach from './GroupCallsByCoach/GroupCallsByCoach';
+import GroupCallsByCoach from './GroupCallsByCoach';
 import GroupCallsDrilldownTable from './GroupCallsDrilldownTable';
-import PrivateCallsByCoach from './PrivateCallsByCoach/PrivateCallsByCoach';
+import PrivateCallsByCoach from './PrivateCallsByCoach';
 import PrivateCallsDrilldownTable from './PrivateCallsDrilldownTable';
 
 export default function CallsByCoach() {

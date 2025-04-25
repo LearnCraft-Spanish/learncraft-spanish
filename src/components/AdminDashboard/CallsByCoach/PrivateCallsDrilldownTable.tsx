@@ -39,7 +39,6 @@ export default function DrilldownTable({
 }: {
   selectedReport: string;
 }) {
-  // const { contextual } = useContextualMenu();
   const coachId = selectedReport.split('_')[0];
   const report = selectedReport.split('_')[1];
 
