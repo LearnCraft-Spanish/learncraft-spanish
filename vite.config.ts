@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => {
   // Access the environment variable with proper typing
   const port =
     env.VITE_ENVIRONMENT === 'development'
-      ? Number.parseInt(env.VITE_PORT || '3000', 10)
+      ? Number.parseInt(env.VITE_PORT || '3010', 10)
       : undefined;
 
   return {

@@ -54,21 +54,21 @@ export default function FrequenSay() {
     try {
       const spellings = getSpellingsFromBackend();
       const vocab = await getVocabFromBackend().then(async (result) => {
-        const usefulData = result;
-        await spellings.then((result) => {
-          result.forEach((element) => {
-            const relatedVocab = usefulData.find(
+        const vocabResult = result;
+        await spellings.then((spellingsResult) => {
+          spellingsResult.forEach((spelling) => {
+            const relatedVocab = vocabResult.find(
               // Foreign Key lookup, form data in backend
-              (record) => record.recordId === element.relatedWordIdiom,
+              (vocab) => vocab.recordId === spelling.relatedWordIdiom,
             );
             if (relatedVocab && relatedVocab.spellings) {
-              relatedVocab.spellings.push(element.spellingOption);
+              relatedVocab.spellings.push(spelling.spellingOption);
             } else if (relatedVocab) {
-              relatedVocab.spellings = [element.spellingOption];
+              relatedVocab.spellings = [spelling.spellingOption];
             }
           });
         });
-        return usefulData;
+        return vocabResult;
       });
       vocab.sort(sortVocab);
       return vocab;
@@ -202,6 +202,7 @@ export default function FrequenSay() {
         getVocab().then((vocab) => {
           if (vocab) {
             setVocabularyTable(vocab);
+            console.log(vocab.slice(0, 10));
           }
         });
       }
