@@ -22,7 +22,7 @@
     "mutate": "stryker run",
     "predeploy": "pnpm run build",
     "preview": "vite preview",
-    "preinstall": "echo \"//registry.npmjs.org/:_authToken=$NPM_TOKEN\" > .npmrc",
+    "preinstall": "echo \"//registry.npmjs.org/:_authToken=$GH_PACKAGE_KEY\" > .npmrc",
     "refresh-mockdata": "tsx .github/workflows/update-cache.ts",
     "scss": "sass --watch src/components/Coaching/styles:src/components/Coaching/styles",
     "start": "vite",
