@@ -15,7 +15,7 @@ build
 buld/*
 
 # NPMRC
-.npmrc.local
+.npmrc.*
 
 # misc
 .env
