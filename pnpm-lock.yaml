@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@LearnCraft-Spanish/shared':
-        specifier: npm:@learncraft-spanish/shared@^0.1.11
-        version: '@learncraft-spanish/shared@0.1.11'
+        specifier: npm:@learncraft-spanish/shared@^0.1.16
+        version: '@learncraft-spanish/shared@0.1.16'
       '@auth0/auth0-react':
         specifier: ^2.3.0
         version: 2.3.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -77,6 +77,9 @@ importers:
       web-vitals:
         specifier: ^4.2.4
         version: 4.2.4
+      zod:
+        specifier: ^3.24.3
+        version: 3.24.3
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^4.3.0
@@ -1188,8 +1191,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.1.11':
-    resolution: {integrity: sha512-HkvKzMwPdHKxe0cef7O5cMdC6EFRxhxr8dL/gxu/H00TP5DfM5SzEK4jWP0Kjs2LnKpjr1kXmsCrecS4fkz+sw==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.1.11/39581238e3ed30bc16973ca91ba86c7724df0bc8}
+  '@learncraft-spanish/shared@0.1.16':
+    resolution: {integrity: sha512-TVyMc4FYq5PLIRIIcGWBbVaiytUQeA4lkRINzsF4Q81L/ag29LT7ZnDl+cjxzS1XfPGYivLZI38GWI7CBGLavg==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.1.16/e204d1d0eb951cfb55f0676b4ee2171996e85b1a}
 
   '@mswjs/interceptors@0.37.6':
     resolution: {integrity: sha512-wK+5pLK5XFmgtH3aQ2YVvA3HohS3xqV/OxuVOdNx9Wpnz7VE/fnC+e1A7ln6LFYeck7gOJ/dsZV6OLplOtAJ2w==}
@@ -5169,8 +5172,8 @@ packages:
     resolution: {integrity: sha512-GQHQqAopRhwU8Kt1DDM8NjibDXHC8eoh1erhGAJPEyveY9qqVeXvVikNKrDz69sHowPMorbPUrH/mx8c50eiBQ==}
     engines: {node: '>=18'}
 
-  zod@3.24.2:
-    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+  zod@3.24.3:
+    resolution: {integrity: sha512-HhY1oqzWCQWuUqvBFnsyrtZRhyPeR7SUGv+C4+MsisMuVfSPx8HpwWqH8tRahSlt6M3PiFAcoeFhZAqIXTxoSg==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -6329,9 +6332,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@learncraft-spanish/shared@0.1.11':
+  '@learncraft-spanish/shared@0.1.16':
     dependencies:
-      zod: 3.24.2
+      zod: 3.24.3
 
   '@mswjs/interceptors@0.37.6':
     dependencies:
@@ -11111,6 +11114,6 @@ snapshots:
 
   yoctocolors@2.1.1: {}
 
-  zod@3.24.2: {}
+  zod@3.24.3: {}
 
   zwitch@2.0.4: {}

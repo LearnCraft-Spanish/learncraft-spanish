@@ -7,8 +7,6 @@ import './PasteTable.scss';
 export interface PasteTableProps<T> {
   /** Core table hook from application layer */
   hook: TableHook<T>;
-  /** Optional text for the save button */
-  saveButtonText?: string;
   /** Optional text for the clear button */
   clearButtonText?: string;
   /** Optional hint text for paste functionality */
@@ -29,7 +27,6 @@ function findIndex<T>(array: T[], predicate: (item: T) => boolean): number {
 
 export function PasteTable<T>({
   hook,
-  saveButtonText = 'Save',
   clearButtonText = 'Clear',
   pasteHint = 'Paste tab-separated values',
   validationHint = 'Fields are validated in real-time',
@@ -38,12 +35,10 @@ export function PasteTable<T>({
   const {
     data,
     updateCell,
-    saveData,
     resetTable,
     handlePaste,
     setActiveCellInfo,
     clearActiveCellInfo,
-    isSaveEnabled,
     validationState,
   } = hook;
 
@@ -349,14 +344,6 @@ export function PasteTable<T>({
               type="button"
             >
               {clearButtonText}
-            </button>
-            <button
-              className="paste-table__action-button paste-table__action-button--primary"
-              onClick={saveData}
-              disabled={!isSaveEnabled}
-              type="button"
-            >
-              {saveButtonText}
             </button>
           </div>
         </div>

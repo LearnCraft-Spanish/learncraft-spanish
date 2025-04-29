@@ -1,3 +1,8 @@
+// DEPRECATED: Use the shared types instead
+// All types and contracts should be defined in the shared package
+// If a type is missing, add it to the shared package
+// No new types should be added here
+
 export type Expanded<T> = { [K in keyof T]: T[K] };
 
 export type Lesson = Expanded<{

@@ -32,7 +32,7 @@
     "metrics": "node METRICS/get_metrics.js"
   },
   "dependencies": {
-    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.1.11",
+    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.1.16",
     "@auth0/auth0-react": "^2.3.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
@@ -54,7 +54,8 @@
     "react-toastify": "^11.0.5",
     "rimraf": "^6.0.1",
     "typescript": "^5.7.3",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "zod": "^3.24.3"
   },
   "browserslist": {
     "production": [

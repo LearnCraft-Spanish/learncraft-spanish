@@ -45,7 +45,7 @@ export function usePasteTable<T>({
     },
   );
 
-  // Cell update - no longer triggering validation directly
+  // Cell update - now triggering validation directly
   const updateCell = useCallback(
     (rowId: string, columnId: string, value: string) => {
       // Handle ghost row conversion
@@ -54,7 +54,7 @@ export function usePasteTable<T>({
         return convertGhostRow(rowId, columnId, value);
       }
 
-      // Simply update cell data - validation is derived automatically
+      // Update cell data and trigger validation
       updateCellBase(rowId, columnId, value);
       return null;
     },
@@ -95,13 +95,24 @@ export function usePasteTable<T>({
 
   // Handle save operation
   const saveData = useCallback(async () => {
-    // Perform one final validation before saving
+    // Get fresh validation state
     const { isValid } = validateAll();
 
+    // If validation state says we're valid, we can proceed
     if (isValid) {
       return rows
         .filter((row) => row.id !== GHOST_ROW_ID)
-        .map((row) => row.cells as T);
+        .map((row) => {
+          // Just like in validation, convert frequency to number
+          return {
+            ...row.cells,
+            // Convert frequency to number if it exists
+            frequency:
+              row.cells.frequency !== undefined
+                ? Number(row.cells.frequency)
+                : undefined,
+          } as T;
+        });
     }
 
     return undefined;
