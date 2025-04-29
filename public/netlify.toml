@@ -1,0 +1,7 @@
+[build]
+  command = """
+  echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc &&
+  pnpm install &&
+  pnpm run build
+  """
+  publish = "dist"
