@@ -2,3 +2,15 @@
 from = "/*"
 to = "/index.html"
 status = 200
+
+[build]
+  command = """
+  cat <<EOF > .npmrc
+  //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+  @learncraft-spanish:registry=https://npm.pkg.github.com/
+  package-manager=pnpm@10.10.0
+  EOF
+  pnpm install
+  pnpm run build
+  """
+  publish = "dist"
