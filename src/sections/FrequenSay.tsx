@@ -202,7 +202,6 @@ export default function FrequenSay() {
         getVocab().then((vocab) => {
           if (vocab) {
             setVocabularyTable(vocab);
-            console.log(vocab.slice(0, 10));
           }
         });
       }
