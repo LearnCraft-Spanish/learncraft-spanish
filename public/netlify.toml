@@ -1,7 +1,11 @@
 [build]
   command = """
-  echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > .npmrc &&
-  pnpm install &&
+  cat <<EOF > .npmrc
+  //npm.pkg.github.com/:_authToken=${NPM_TOKEN}
+  @learncraft-spanish:registry=https://npm.pkg.github.com/
+  package-manager=pnpm@10.10.0
+  EOF
+  pnpm install
   pnpm run build
   """
   publish = "dist"
