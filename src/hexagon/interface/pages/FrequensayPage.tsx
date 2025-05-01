@@ -1,70 +1,47 @@
+import { useEffect } from 'react';
 import { FromToLessonSelector } from 'src/components/LessonSelector';
 import { Loading } from 'src/components/Loading';
-import { useFrequensay } from '../../application/units/useFrequensay';
+import { useFrequensay } from 'src/hexagon/application/useCases/useFrequensay';
 import CustomVocabulary from '../components/frequensay/CustomVocabulary';
-export const FrequensayPage: React.FC = () => {
+import TextToCheck from '../components/frequensay/TextToCheck';
+import UnknownWords from '../components/frequensay/UnknownWords';
+
+export default function FrequenSayPage() {
   const {
-    isReady,
-    isLoading,
+    isSuccess,
     isError,
-    userInput,
-    updateUserInput,
-    passageLength,
-    comprehensionPercentage,
-    unknownWordCount,
-    copyTable,
+    isLoading,
+    error,
+
+    CustomVocabularyProps,
+    TextToCheckProps,
+    UnknownWordsProps,
   } = useFrequensay();
 
+  useEffect(() => {
+    if (isError) {
+      console.log(error);
+    }
+  }, [isError, error]);
   return (
-    <div className="frequensay">
-      {isLoading ? (
+    <div>
+      <h2>FrequenSay</h2>
+      <div>
+        <FromToLessonSelector />
+      </div>
+      {isError ? (
+        <div>Error Loading Frequensay Data</div>
+      ) : isLoading ? (
         <Loading message="Loading Frequensay Data..." />
-      ) : isError ? (
-        <div>Error</div>
+      ) : isSuccess ? (
+        <>
+          <CustomVocabulary {...CustomVocabularyProps} />
+          <TextToCheck {...TextToCheckProps} />
+          <UnknownWords {...UnknownWordsProps} />
+        </>
       ) : (
-        isReady && (
-          <>
-            <h2>FrequenSay</h2>
-            <div className="tempBox">
-              <FromToLessonSelector />
-            </div>
-            <CustomVocabulary />
-            <form onSubmit={(e) => e.preventDefault}>
-              <h3>Text to Check:</h3>
-              <textarea
-                value={userInput}
-                rows={12}
-                cols={85}
-                onChange={(e) => updateUserInput(e.target.value)}
-              ></textarea>
-            </form>
-            <div>
-              <p>{`Word Count: ${passageLength.current}`}</p>
-              <p>{`Words Known: ${comprehensionPercentage.current}%`}</p>
-            </div>
-            {unknownWordCount.length > 0 && (
-              <div>
-                <h3>{unknownWordCount.length} Unknown Words:</h3>
-                <div className="buttonBox">
-                  <button type="button" onClick={copyTable}>
-                    Copy Word List
-                  </button>
-                </div>
-                {unknownWordCount.map((item) => (
-                  <div className="exampleCard" key={item.word}>
-                    <div className="exampleCardSpanishText">
-                      <h3>{item.word}</h3>
-                    </div>
-                    <div className="exampleCardEnglishText">
-                      <h4>{item.count}</h4>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </>
-        )
+        <div>Something went wrong</div>
       )}
     </div>
   );
-};
+}

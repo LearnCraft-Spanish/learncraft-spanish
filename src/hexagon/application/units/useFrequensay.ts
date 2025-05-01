@@ -1,5 +1,7 @@
+import type { FrequensayAnalysisResponse } from '@LearnCraft-Spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import { useFrequensayAdapter } from '../adapters/frequensayAdapter';
 import useCustomVocabulary from '../useCases/useCustomVocabulary';
@@ -11,14 +13,24 @@ interface WordCount {
 
 export function useFrequensay() {
   const adapter = useFrequensayAdapter();
-  const { userAddedVocabulary, setUserAddedVocabulary } = useCustomVocabulary();
-  const { selectedToLesson } = useSelectedLesson();
+  const {
+    userAddedVocabulary,
+    setUserAddedVocabulary,
+    addManualVocabulary,
+    disableManualVocabulary,
+    enableManualVocabulary,
+  } = useCustomVocabulary();
+  const { selectedToLesson, selectedProgram } = useSelectedLesson();
   const [userInput, setUserInput] = useState('');
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['frequensay'],
-    queryFn: adapter.getFrequensayVocabulary,
-    staleTime: Infinity,
-  });
+
+  const [frequensayAnalysis, setFrequensayAnalysis] =
+    useState<FrequensayAnalysisResponse | null>(null);
+
+  // const { data, isLoading, error } = useQuery({
+  //   queryKey: ['frequensay'],
+  //   queryFn: adapter.getFrequensayVocabulary,
+  //   staleTime: Infinity,
+  // });
 
   const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([]);
   const [acceptableWordSpellings, setAcceptableWordSpellings] = useState<
@@ -112,59 +124,71 @@ export function useFrequensay() {
     setUnknownWordCount(unknownWordCount);
   }, [acceptableWordSpellings]);
 
-  const getAcceptableWordSpellingsFromSelectedLesson = useCallback(() => {
-    const acceptableSpellings: string[] = [];
-    // Foreign Key lookup, form data in backend
-    if (selectedToLesson?.recordId && data && data.length > 0) {
-      selectedToLesson.vocabKnown.forEach((vocabName) => {
-        const vocabularyItem = data.find(
-          (item) => item.descriptionOfVocabularySkill === vocabName,
-        );
-        if (vocabularyItem?.spellings) {
-          vocabularyItem.spellings.forEach((word) => {
-            acceptableSpellings.push(word);
-          });
-        }
-      });
-    }
-    return acceptableSpellings;
-  }, [selectedToLesson, data]);
+  // const getAcceptableWordSpellingsFromSelectedLesson = useCallback(() => {
+  //   const acceptableSpellings: string[] = [];
+  //   // Foreign Key lookup, form data in backend
+  //   if (selectedToLesson?.recordId && data && data.length > 0) {
+  //     selectedToLesson.vocabKnown.forEach((vocabName) => {
+  //       const vocabularyItem = data.find(
+  //         (item) => item.descriptionOfVocabularySkill === vocabName,
+  //       );
+  //       if (vocabularyItem?.spellings) {
+  //         vocabularyItem.spellings.forEach((word) => {
+  //           acceptableSpellings.push(word);
+  //         });
+  //       }
+  //     });
+  //   }
+  //   return acceptableSpellings;
+  // }, [selectedToLesson, data]);
 
-  useEffect(() => {
-    if (data && data.length > 0) {
-      const acceptableSpellings =
-        getAcceptableWordSpellingsFromSelectedLesson();
-      extraAcceptableWords.current.forEach((word) => {
-        acceptableSpellings.push(word.word);
-      });
-      setAcceptableWordSpellings(acceptableSpellings);
-    }
-  }, [
-    selectedToLesson,
-    data,
-    userAddedVocabulary,
-    getAcceptableWordSpellingsFromSelectedLesson,
-  ]);
+  // useEffect(() => {
+  //   if (data && data.length > 0) {
+  //     const acceptableSpellings =
+  //       getAcceptableWordSpellingsFromSelectedLesson();
+  //     extraAcceptableWords.current.forEach((word) => {
+  //       acceptableSpellings.push(word.word);
+  //     });
+  //     setAcceptableWordSpellings(acceptableSpellings);
+  //   }
+  // }, [
+  //   selectedToLesson,
+  //   data,
+  //   userAddedVocabulary,
+  //   getAcceptableWordSpellingsFromSelectedLesson,
+  // ]);
 
-  useEffect(() => {
-    if (selectedToLesson) {
-      if (selectedToLesson?.recordId) {
-        filterWordCountByUnknown();
-      }
+  // useEffect(() => {
+  //   if (selectedToLesson) {
+  //     if (selectedToLesson?.recordId) {
+  //       filterWordCountByUnknown();
+  //     }
+  //   }
+  // }, [
+  //   selectedToLesson,
+  //   userInput,
+  //   acceptableWordSpellings,
+  //   filterWordCountByUnknown,
+  // ]);
+
+  const runFrequensayAnalysis = useCallback(async () => {
+    if (!selectedProgram?.name || !selectedToLesson?.lessonNumber) {
+      return;
     }
-  }, [
-    selectedToLesson,
-    userInput,
-    acceptableWordSpellings,
-    filterWordCountByUnknown,
-  ]);
+    const data = {
+      courseName: selectedProgram.name,
+      lessonNumber: selectedToLesson.lessonNumber,
+    };
+    const response = await adapter.getSpellingsKnownForLesson(data);
+    setFrequensayAnalysis(response);
+  }, [selectedProgram, selectedToLesson, adapter]);
 
   return {
-    isReady: data && data.length > 0,
-    isLoading,
-    isError: error,
+    // isReady: data && data.length > 0,
+    // isLoading,
+    // isError: error,
 
-    data,
+    // data,
     userAddedVocabulary,
     updateUserAddedVocabulary,
     userInput,
@@ -176,5 +200,13 @@ export function useFrequensay() {
     unknownWordCount,
     comprehensionPercentage,
     copyTable,
+
+    runFrequensayAnalysis,
+    frequensayAnalysis,
+
+    setUserAddedVocabulary,
+    addManualVocabulary,
+    disableManualVocabulary,
+    enableManualVocabulary,
   };
 }

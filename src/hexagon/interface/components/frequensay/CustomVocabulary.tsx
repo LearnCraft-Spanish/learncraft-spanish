@@ -1,15 +1,17 @@
-import useCustomVocabulary from 'src/hexagon/application/useCases/useCustomVocabulary';
+export default function CustomVocabulary({
+  addManualVocabulary,
+  disableManualVocabulary,
+  enableManualVocabulary,
 
-export default function CustomVocabulary() {
-  const {
-    addManualVocabulary,
-    disableManualVocabulary,
-    enableManualVocabulary,
-
-    userAddedVocabulary,
-    setUserAddedVocabulary,
-  } = useCustomVocabulary();
-
+  userAddedVocabulary,
+  setUserAddedVocabulary,
+}: {
+  addManualVocabulary: boolean;
+  disableManualVocabulary: () => void;
+  enableManualVocabulary: () => void;
+  userAddedVocabulary: string;
+  setUserAddedVocabulary: (value: string) => void;
+}) {
   return (
     <>
       <div className="buttonBox">

@@ -1,5 +1,7 @@
-import type { VocabRecordWithSpellings } from '@LearnCraft-Spanish/shared';
+import type { getSpellingsKnownForLessonRequestBody } from '@LearnCraft-Spanish/shared';
 
 export interface FrequensayPort {
-  getFrequensayVocabulary: () => Promise<VocabRecordWithSpellings[]>;
+  getSpellingsKnownForLesson: (
+    data: getSpellingsKnownForLessonRequestBody,
+  ) => Promise<string[]>;
 }
