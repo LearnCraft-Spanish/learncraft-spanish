@@ -12,7 +12,7 @@
   "checkers": ["typescript"],
   "ignoreStatic": true,
   "vitest": {
-    "configFile": "vitest.config.ts"
+    "configFile": "vitest.config-mutations.ts"
   },
   "reporters": ["html", "clear-text", "progress"],
   "timeoutMS": 20000,
