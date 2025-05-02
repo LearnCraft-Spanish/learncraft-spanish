@@ -45,6 +45,7 @@ export function AudioControl({ audioLink }: { audioLink: string }) {
     }
   }
   return (
+    audioLink &&
     audioLink.length > 0 && (
       <>
         {isValidAudio && (
