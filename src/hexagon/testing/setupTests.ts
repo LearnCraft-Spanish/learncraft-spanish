@@ -12,7 +12,7 @@ import { resetTestQueryClient } from './utils/testQueryClient';
 import '@testing-library/jest-dom';
 
 // Replace real adapter implementations with mocks for all tests
-const setupHexagonalMocks = () => {
+const setupAdapterMocks = () => {
   vi.mock('@application/adapters/vocabularyAdapter', () => ({
     useVocabularyAdapter: callMockVocabularyAdapter,
   }));
@@ -22,11 +22,16 @@ const setupHexagonalMocks = () => {
   }));
 };
 
+// Setup adapter mocks for each test
 beforeEach(() => {
-  setupHexagonalMocks();
+  setupAdapterMocks();
 });
 
+// Reset all mocks after each test
 afterEach(() => {
-  vi.resetAllMocks();
+  // Clear mock call history
+  vi.clearAllMocks();
+
+  // Reset React Query client
   resetTestQueryClient();
 });

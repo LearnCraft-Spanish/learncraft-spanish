@@ -1,15 +1,8 @@
 import type { Subcategory } from '@LearnCraft-Spanish/shared';
 import { PartOfSpeech } from '@LearnCraft-Spanish/shared';
+import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { createTypedMock } from '@testing/utils/typedMock';
 import { vi } from 'vitest';
-import {
-  mockUseSubcategories,
-  overrideMockUseSubcategories,
-} from '../units/useSubcategories.mock';
-import {
-  mockUseVocabulary,
-  overrideMockUseVocabulary,
-} from '../units/useVocabulary.mock';
 
 /**
  * VerbData represents the data needed to create a verb.
@@ -43,164 +36,76 @@ export interface UseVerbCreationResult {
   createVerb: (verbData: VerbData) => Promise<boolean>;
 }
 
-/**
- * Creates a default mock result by leveraging unit mocks.
- * This ensures our mock behavior mirrors the real implementation by
- * depending on the same units.
- */
-const createDefaultMockResult = (): UseVerbCreationResult => {
-  // Use the subcategories unit mock
-  const subcategoriesResult = mockUseSubcategories();
-  // We could use vocabulary result here if needed in the future
-  // const vocabularyResult = mockUseVocabulary();
+// Create default mock data
+const defaultSubcategories = createMockSubcategoryList(3);
 
-  // Filter to only verb subcategories
-  const verbSubcategories = subcategoriesResult.subcategories.filter(
-    (subcategory) => subcategory.partOfSpeech === PartOfSpeech.Verb,
-  );
+// Filter for verb subcategories
+const verbSubcategories = defaultSubcategories.filter(
+  (s) => s.partOfSpeech === PartOfSpeech.Verb,
+);
 
-  // Create the mock result using unit mock values
-  return {
-    // Data from unit mocks
-    verbSubcategories,
-    loadingSubcategories: subcategoriesResult.loading,
-
-    // Derived values
-    selectedSubcategoryId: verbSubcategories[0]?.id?.toString() || '1',
-
-    // Status flags
-    creating: false,
-    creationError: null,
-
-    // Operations
-    setSelectedSubcategoryId: createTypedMock<
-      (id: string) => void
-    >().mockImplementation((_id: string) => {
-      /* Mock implementation */
-    }),
-    createVerb: createTypedMock<
+// Default mock result with happy-path data
+const defaultResult: UseVerbCreationResult = {
+  verbSubcategories,
+  loadingSubcategories: false,
+  selectedSubcategoryId:
+    verbSubcategories.length > 0 ? String(verbSubcategories[0].id) : '1',
+  setSelectedSubcategoryId: createTypedMock<(id: string) => void>(),
+  creating: false,
+  creationError: null,
+  createVerb:
+    createTypedMock<
       (verbData: VerbData) => Promise<boolean>
-    >().mockImplementation(async (_verbData: VerbData) => {
-      return Promise.resolve(true);
-    }),
-  };
+    >().mockResolvedValue(true),
 };
 
 /**
- * The main mock for the useVerbCreation hook.
- * This is what gets mocked in place of the real implementation.
+ * Main mock for useVerbCreation hook. Use this in your vi.mock setup.
+ * Always returns the current default or overridden result.
  */
-export const mockUseVerbCreation = createTypedMock<
-  () => UseVerbCreationResult
->().mockImplementation(() => createDefaultMockResult());
+export const mockUseVerbCreation =
+  createTypedMock<() => UseVerbCreationResult>().mockReturnValue(defaultResult);
 
 /**
- * Override function to customize the mock for specific tests.
- * @param config Partial override of the UseVerbCreationResult
- * @returns The customized mock result
+ * Override the default mock result for useVerbCreation.
+ * Note: If you override a nested object, you must provide the full object.
  */
-export const overrideUseVerbCreation = (
+export const overrideMockUseVerbCreation = (
   config: Partial<UseVerbCreationResult> = {},
-): UseVerbCreationResult => {
-  const result = {
-    ...createDefaultMockResult(),
-    ...config,
-  };
-  mockUseVerbCreation.mockImplementation(() => result);
+) => {
+  const result = { ...defaultResult, ...config };
+  mockUseVerbCreation.mockReturnValue(result);
   return result;
 };
 
 /**
- * Helper to call the mock during tests.
- * This simplifies accessing the mock in tests.
+ * Helper to call the mock during tests (for vi.mock setup).
  */
-export const callUseVerbCreation = (): UseVerbCreationResult =>
-  mockUseVerbCreation();
+export const callMockUseVerbCreation = () => mockUseVerbCreation();
 
 /**
- * Configuration type for mockVerbCreation function
- */
-export interface VerbCreationMockConfig {
-  /** Override properties of the useCase itself */
-  useCase?: Partial<UseVerbCreationResult>;
-  /** Override properties of the vocabulary unit */
-  vocabulary?: Parameters<typeof overrideMockUseVocabulary>[0];
-  /** Override properties of the subcategories unit */
-  subcategories?: Parameters<typeof overrideMockUseSubcategories>[0];
-}
-
-/**
- * Sets up the useVerbCreation hook and all its dependencies for testing.
- * This is the main entry point for tests.
- *
- * @example
- * // Basic setup
- * mockVerbCreation();
- *
- * // With custom configurations for the use case
- * mockVerbCreation({
- *   useCase: { creating: true }
- * });
- *
- * // With custom configurations for dependencies
- * mockVerbCreation({
- *   subcategories: { loading: true }
- * });
- *
- * // With both useCase and dependency overrides
- * mockVerbCreation({
- *   useCase: { creating: true },
- *   subcategories: { loading: true },
- *   vocabulary: { error: new Error('Failed to load') }
- * });
+ * Configure mock for tests with optional override
  */
 export function mockVerbCreation(
-  config: VerbCreationMockConfig = {},
+  config: { useCase?: Partial<UseVerbCreationResult> } = {},
 ): UseVerbCreationResult {
-  // 1. Setup dependencies first
-  if (config.vocabulary) {
-    vi.mock('@application/units/useVocabulary', () => ({
-      useVocabulary: () => overrideMockUseVocabulary(config.vocabulary),
-    }));
-  } else {
-    vi.mock('@application/units/useVocabulary', () => ({
-      useVocabulary: mockUseVocabulary,
-    }));
-  }
-
-  if (config.subcategories) {
-    vi.mock('@application/units/useSubcategories', () => ({
-      useSubcategories: () =>
-        overrideMockUseSubcategories(config.subcategories),
-    }));
-  } else {
-    vi.mock('@application/units/useSubcategories', () => ({
-      useSubcategories: mockUseSubcategories,
-    }));
-  }
-
-  // 2. Create a new default mock that uses the configured dependencies
-  if (!config.useCase) {
-    // Refresh the default mock to use the current state of dependencies
-    mockUseVerbCreation.mockImplementation(() => createDefaultMockResult());
-  }
-
-  // 3. Override the useCase itself if needed
+  // Apply overrides if specified
   const mockResult = config.useCase
-    ? overrideUseVerbCreation(config.useCase)
-    : callUseVerbCreation();
+    ? overrideMockUseVerbCreation(config.useCase)
+    : defaultResult;
 
-  // 4. Setup the useCase mock
+  // Set hook implementation to use the mock result
+  mockUseVerbCreation.mockImplementation(() => mockResult);
+
+  // Ensure the vi.mock directive is properly set up
   vi.mock('@application/useCases/useVerbCreation', () => ({
-    useVerbCreation: () => mockResult,
+    useVerbCreation: mockUseVerbCreation,
   }));
 
-  // 5. Return the result for assertions
   return mockResult;
 }
 
-// For backward compatibility with existing tests
-export const setupVerbCreationMocks = mockVerbCreation;
-
-// Export default for global mocking
 export default mockUseVerbCreation;
+
+// Export the default result for defensive test setup
+export { defaultResult };

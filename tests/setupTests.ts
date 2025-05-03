@@ -1,6 +1,8 @@
 import { server } from 'mocks/api/server';
-import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
+import { callMockSubcategoryAdapter } from 'src/hexagon/application/adapters/subcategoryAdapter.mock';
 
+import { callMockVocabularyAdapter } from 'src/hexagon/application/adapters/vocabularyAdapter.mock';
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 import { setupMockAuth } from './setupMockAuth';
 import '@testing-library/jest-dom';
 
@@ -11,8 +13,19 @@ import '@testing-library/jest-dom';
 // Mock the useAuth hook, but leave the mock return configurable per test
 vi.mock('src/hooks/useAuth');
 
+const setupAdapterMocks = () => {
+  vi.mock('@application/adapters/vocabularyAdapter', () => ({
+    useVocabularyAdapter: callMockVocabularyAdapter,
+  }));
+
+  vi.mock('@application/adapters/subcategoryAdapter', () => ({
+    useSubcategoryAdapter: callMockSubcategoryAdapter,
+  }));
+};
+
 beforeEach(() => {
   setupMockAuth();
+  setupAdapterMocks();
 });
 
 // Open the MSW server before all tests

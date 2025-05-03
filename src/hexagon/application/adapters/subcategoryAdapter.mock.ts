@@ -17,7 +17,7 @@ export const mockGetSubcategoryById = createTypedMock<
   Promise.resolve(createMockSubcategory({ id: Number.parseInt(id) })),
 );
 
-// Global mock for the adapter
+// Global mock for the adapter with safe default implementations
 export const mockSubcategoryAdapter: SubcategoryPort = {
   getSubcategories: mockGetSubcategories,
   getSubcategoryById: mockGetSubcategoryById,
@@ -36,7 +36,23 @@ export const overrideMockSubcategoryAdapter = (
   setMockResult(mockGetSubcategoryById, config.getSubcategoryById);
 };
 
-export const callMockSubcategoryAdapter = () => mockSubcategoryAdapter;
+// Always return a valid adapter mock with proper fallbacks
+export const callMockSubcategoryAdapter = () => {
+  try {
+    return mockSubcategoryAdapter;
+  } catch (error) {
+    console.error(
+      'Error in subcategoryAdapter mock, returning fallback',
+      error,
+    );
+    // Create a fresh adapter mock with defaults if the original mock fails
+    return {
+      getSubcategories: () => Promise.resolve(createMockSubcategoryList()),
+      getSubcategoryById: (id: string) =>
+        Promise.resolve(createMockSubcategory({ id: Number.parseInt(id) })),
+    };
+  }
+};
 
 // Export the default mock for global mocking
 export default mockSubcategoryAdapter;

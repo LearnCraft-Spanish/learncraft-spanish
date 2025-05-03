@@ -2,6 +2,151 @@
 
 This directory contains utilities and patterns for testing the hexagonal architecture.
 
+## ⚠️ IMPORTANT: Global Test Setup ⚠️
+
+> **DO NOT MODIFY OR DUPLICATE `setupTests.ts`**
+>
+> Our test infrastructure relies on the global `setupTests.ts` file to properly isolate tests. This file handles adapter mocking and test cleanup. Modifying it or duplicating its functionality in your tests will break test isolation and lead to flaky tests.
+>
+> See below for details on how tests are configured.
+
+### Multiple Configuration Files
+
+> **IMPORTANT: Use the correct configuration file for hexagon tests**
+>
+> The project has two separate test configuration files:
+>
+> - `vitest.config.ts` - Used for general application tests (uses `./tests/setupTests.ts`)
+> - `vitest.config-hexagon.ts` - Used specifically for hexagon architecture tests (uses `./src/hexagon/testing/setupTests.ts`)
+>
+> When running hexagon tests, always specify the hexagon configuration:
+>
+> ```bash
+> npm test -- src/hexagon/some-test.ts --config vitest.config-hexagon.ts
+> ```
+>
+> Failing to use the correct configuration file may cause test failures if adapter mocks are not properly initialized.
+
+## Test Setup Infrastructure
+
+Our testing infrastructure follows best practices for isolation and clean state management. The core setup is managed by the `setupTests.ts` file.
+
+### setupTests.ts Explained
+
+The `setupTests.ts` file handles global test configurations:
+
+```typescript
+// Replace real adapter implementations with mocks for all tests
+const setupAdapterMocks = () => {
+  vi.mock('@application/adapters/vocabularyAdapter', () => ({
+    useVocabularyAdapter: callMockVocabularyAdapter,
+  }));
+
+  vi.mock('@application/adapters/subcategoryAdapter', () => ({
+    useSubcategoryAdapter: callMockSubcategoryAdapter,
+  }));
+};
+
+// Setup adapter mocks for each test
+beforeEach(() => {
+  setupAdapterMocks();
+});
+
+// Reset all mocks after each test
+afterEach(() => {
+  // Clear mock call history
+  vi.clearAllMocks();
+
+  // Reset React Query client
+  resetTestQueryClient();
+});
+```
+
+#### Key Features:
+
+1. **Clean test isolation**:
+
+   - `beforeEach`: Sets up adapter mocks fresh before each test
+   - `afterEach`: Clears mock call history after each test
+   - Tests run with isolated mocks, preventing cross-test contamination
+
+2. **Hexagonal architecture support**:
+
+   - Adapters are mocked centrally following hexagonal architecture patterns
+   - Real implementations are replaced with test mocks
+
+3. **React Query integration**:
+   - The QueryClient is reset between tests with `resetTestQueryClient()`
+   - Prevents cache leakage between tests
+
+### Testing with Manual Mock Setup
+
+If you encounter issues with mocks not working properly, you can explicitly set up the mock implementation in your test:
+
+```typescript
+import { mockGetVocabulary } from '@application/adapters/vocabularyAdapter.mock';
+import { createMockVocabulary } from '@testing/factories/vocabularyFactories';
+
+// In your test's beforeEach:
+beforeEach(() => {
+  // Ensure the mock implementation returns a proper result
+  mockGetVocabulary.mockImplementation(() => {
+    return Promise.resolve([
+      createMockVocabulary({ id: 1, word: 'test1' }),
+      createMockVocabulary({ id: 2, word: 'test2' }),
+      createMockVocabulary({ id: 3, word: 'test3' }),
+    ]);
+  });
+});
+```
+
+This approach provides a safety net if the global setup doesn't work, but using the correct config file is preferred.
+
+### Mock Management Flow
+
+1. **Before each test**:
+
+   - `setupAdapterMocks()` replaces real adapter implementations with mocks
+   - Each test starts with the default mock implementation
+
+2. **During a test**:
+
+   - Tests can use `overrideMockAdapter({...})` functions to customize mocks for that specific test
+   - Tests run with isolated mock configurations
+
+3. **After each test**:
+   - `vi.clearAllMocks()` clears the mock call history but preserves implementations
+   - `resetTestQueryClient()` clears the React Query cache
+   - Prepares for the next test with clean state
+
+### Testing Providers
+
+React components are provided for testing with React Query:
+
+```typescript
+// In your tests:
+import { TestQueryClientProvider } from '@testing';
+
+render(
+  <TestQueryClientProvider>
+    <YourComponent />
+  </TestQueryClientProvider>
+);
+
+// With renderHook:
+import { createQueryClientWrapper } from '@testing';
+
+const { result } = renderHook(() => useYourHook(), {
+  wrapper: createQueryClientWrapper(),
+});
+```
+
+#### Implementation Details:
+
+- `TestQueryClientProvider`: React component provider that uses a test-specific QueryClient
+- `createQueryClientWrapper`: Function to create a wrapper for renderHook
+- Both use a shared `testQueryClient` that's reset between tests
+
 ## Mock Patterns
 
 We follow a consistent pattern for mocking hooks in the hexagonal architecture:

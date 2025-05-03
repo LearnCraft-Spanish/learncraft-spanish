@@ -52,7 +52,13 @@ export default antfu(
     ],
   },
   {
-    files: ['**/*.mock.ts', 'src/hexagon/testing/setup.ts'],
+    files: [
+      '**/*.mock.ts',
+      '**/*.mock.tsx',
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      'src/hexagon/testing/setup.ts',
+    ],
     rules: {
       'react-hooks-extra/no-unnecessary-use-prefix': 'off',
     },

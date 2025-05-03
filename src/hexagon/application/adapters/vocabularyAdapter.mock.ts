@@ -15,7 +15,7 @@ import { createTypedMock } from '@testing/utils/typedMock';
 // Create strongly-typed spies for each VocabularyPort method
 export const mockGetVocabulary = createTypedMock<
   () => Promise<Vocabulary[]>
->().mockResolvedValue(createMockVocabularyList());
+>().mockResolvedValue(createMockVocabularyList(3));
 
 export const mockGetVocabularyById = createTypedMock<
   (id: string) => Promise<Vocabulary | null>
@@ -56,7 +56,7 @@ export const mockSearchVocabulary = createTypedMock<
   Promise.resolve(createMockVocabularyList(2, { word: query })),
 );
 
-// Global mock for the adapter
+// Global mock for the adapter with safe default implementations
 export const mockVocabularyAdapter: VocabularyPort = {
   getVocabulary: mockGetVocabulary,
   getVocabularyById: mockGetVocabularyById,
@@ -104,7 +104,32 @@ export const overrideMockVocabularyAdapter = (
   setMockResult(mockSearchVocabulary, config.searchVocabulary);
 };
 
-export const callMockVocabularyAdapter = () => mockVocabularyAdapter;
+// Always return a valid adapter mock with proper fallbacks
+export const callMockVocabularyAdapter = () => {
+  try {
+    return mockVocabularyAdapter;
+  } catch (error) {
+    console.error('Error in vocabularyAdapter mock, returning fallback', error);
+    // Create a fresh adapter mock with defaults if the original mock fails
+    return {
+      getVocabulary: () => Promise.resolve(createMockVocabularyList(3)),
+      getVocabularyById: (id: string) =>
+        Promise.resolve(createMockVocabulary({ id: Number.parseInt(id) })),
+      getVocabularyCount: () => Promise.resolve({ total: 10 }),
+      createVerb: (command: CreateVerb) =>
+        Promise.resolve(createMockVocabulary({ ...command, id: 1 })),
+      createNonVerbVocabulary: (command: CreateNonVerbVocabulary) =>
+        Promise.resolve(createMockVocabulary({ ...command, id: 1 })),
+      createVocabularyBatch: (commands: CreateNonVerbVocabulary[]) =>
+        Promise.resolve(
+          commands.map((cmd, i) => createMockVocabulary({ ...cmd, id: i })),
+        ),
+      deleteVocabulary: (_id: string) => Promise.resolve(undefined),
+      searchVocabulary: (query: string) =>
+        Promise.resolve(createMockVocabularyList(2, { word: query })),
+    };
+  }
+};
 
 // Export the default mock for global mocking
 export default mockVocabularyAdapter;

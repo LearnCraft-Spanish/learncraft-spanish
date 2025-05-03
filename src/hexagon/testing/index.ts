@@ -13,7 +13,7 @@ export * from './providers/createQueryClientWrapper';
 // Re-export providers
 export * from './providers/TestQueryClientProvider';
 
-export * from './utils/setMockResult';
 // Re-export utilities
+export * from './utils/setMockResult';
 export * from './utils/testQueryClient';
 export * from './utils/typedMock';
