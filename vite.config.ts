@@ -38,6 +38,16 @@ export default defineConfig(({ mode }) => {
         src: path.resolve(__dirname, './src'),
         mocks: path.resolve(__dirname, './mocks'),
         tests: path.resolve(__dirname, './tests'),
+
+        // Hexagonal architecture layers
+        '@domain': path.resolve(__dirname, './src/hexagon/domain'),
+        '@application': path.resolve(__dirname, './src/hexagon/application'),
+        '@infrastructure': path.resolve(
+          __dirname,
+          './src/hexagon/infrastructure',
+        ),
+        '@interface': path.resolve(__dirname, './src/hexagon/interface'),
+        '@testing': path.resolve(__dirname, './src/hexagon/testing'),
       },
     },
     server: {

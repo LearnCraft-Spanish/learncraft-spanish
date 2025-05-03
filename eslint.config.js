@@ -1,6 +1,9 @@
 import antfu from '@antfu/eslint-config';
 import prettierConfig from 'eslint-config-prettier';
 
+// Import our custom rules
+import customRules from './eslint-rules/index.js';
+
 export default antfu(
   {
     react: true,
@@ -49,4 +52,17 @@ export default antfu(
     ],
   },
   prettierConfig,
+  // Add our custom hexagonal testing rules
+  {
+    files: [
+      'src/hexagon/**/*.test.ts',
+      'src/hexagon/**/*.mock.ts',
+      'src/hexagon/**/*mock.ts',
+      'src/hexagon/**/adapters/*Adapter.mock.ts',
+    ],
+    ...customRules,
+    rules: {
+      'custom/no-untyped-mocks': 'error',
+    },
+  },
 );

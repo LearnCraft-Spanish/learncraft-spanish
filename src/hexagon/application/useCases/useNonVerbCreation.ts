@@ -30,7 +30,7 @@ export interface VocabularyPaginationState {
   goToPreviousPage: () => void;
 }
 
-interface UseNonVerbCreationResult {
+export interface UseNonVerbCreationResult {
   // Subcategory selection
   nonVerbSubcategories: Subcategory[];
   loadingSubcategories: boolean;

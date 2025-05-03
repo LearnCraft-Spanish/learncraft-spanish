@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSubcategoryAdapter } from '../adapters/subcategoryAdapter';
 import { normalizeQueryError, queryDefaults } from '../utils/queryUtils';
 
-interface UseSubcategoriesResult {
+export interface UseSubcategoriesResult {
   subcategories: Subcategory[];
   loading: boolean;
   error: Error | null;

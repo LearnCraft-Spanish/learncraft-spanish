@@ -4,7 +4,7 @@ import { validateCreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
 import { usePasteTable } from './pasteTable';
 
 // Column configuration with labels and widths
-const SCHEMA_FIELD_CONFIG: Record<
+export const SCHEMA_FIELD_CONFIG: Record<
   string,
   { label: string; width: string; type: CellType; min?: number; max?: number }
 > = {
@@ -24,7 +24,7 @@ const SCHEMA_FIELD_CONFIG: Record<
  * Column definitions for the vocabulary table.
  * Generated from schema field names as IDs for consistency with the domain model.
  */
-const VOCABULARY_COLUMNS: TableColumn[] = [
+export const VOCABULARY_COLUMNS: TableColumn[] = [
   // Generate columns from schema fields
   ...Object.keys(SCHEMA_FIELD_CONFIG).map((field) => ({
     id: field,

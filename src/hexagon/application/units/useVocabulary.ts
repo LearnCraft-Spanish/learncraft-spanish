@@ -8,7 +8,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useVocabularyAdapter } from '../adapters/vocabularyAdapter';
 import { normalizeQueryError, queryDefaults } from '../utils/queryUtils';
 
-interface UseVocabularyResult {
+export interface UseVocabularyResult {
   // Read operations
   vocabulary: Vocabulary[];
   loading: boolean;
