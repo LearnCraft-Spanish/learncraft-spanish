@@ -1,40 +1,8 @@
 import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
-import type { CellType, TableColumn, TableHook } from './pasteTable/types';
+import type { TableHook } from '../../units/pasteTable/types';
 import { validateCreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
-import { usePasteTable } from './pasteTable';
-
-// Column configuration with labels and widths
-export const SCHEMA_FIELD_CONFIG: Record<
-  string,
-  { label: string; width: string; type: CellType; min?: number; max?: number }
-> = {
-  word: { label: 'Word', width: '1fr', type: 'text' },
-  descriptor: { label: 'Descriptor', width: '2fr', type: 'text' },
-  frequency: {
-    label: 'Frequency',
-    width: '0.5fr',
-    type: 'number',
-    min: 1,
-    max: 10000,
-  },
-  notes: { label: 'Notes', width: '1fr', type: 'text' },
-};
-
-/**
- * Column definitions for the vocabulary table.
- * Generated from schema field names as IDs for consistency with the domain model.
- */
-export const VOCABULARY_COLUMNS: TableColumn[] = [
-  // Generate columns from schema fields
-  ...Object.keys(SCHEMA_FIELD_CONFIG).map((field) => ({
-    id: field,
-    label: SCHEMA_FIELD_CONFIG[field].label,
-    width: SCHEMA_FIELD_CONFIG[field].width,
-    type: SCHEMA_FIELD_CONFIG[field].type,
-    min: SCHEMA_FIELD_CONFIG[field].min,
-    max: SCHEMA_FIELD_CONFIG[field].max,
-  })),
-];
+import { usePasteTable } from '../../units/pasteTable';
+import { SCHEMA_FIELD_CONFIG, VOCABULARY_COLUMNS } from './constants';
 
 /**
  * Custom hook for managing vocabulary data in a table format.
@@ -71,3 +39,6 @@ export function useVocabularyTable(): TableHook<CreateNonVerbVocabulary> {
     },
   });
 }
+
+// Re-export constants to maintain the same public API
+export { SCHEMA_FIELD_CONFIG, VOCABULARY_COLUMNS };

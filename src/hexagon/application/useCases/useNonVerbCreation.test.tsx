@@ -1,16 +1,15 @@
 import { PartOfSpeech } from '@LearnCraft-Spanish/shared';
 import { renderHook } from '@testing-library/react';
 import { createMockSubcategory } from '@testing/factories/subcategoryFactories';
-import { createMockVocabulary } from '@testing/factories/vocabularyFactories';
 import { createTypedMock } from '@testing/utils/typedMock';
 import { act } from 'react';
 import { vi } from 'vitest';
+import { VOCABULARY_COLUMNS } from '../implementations/vocabularyTable/constants';
+import { mockUseVocabularyTable } from '../implementations/vocabularyTable/useVocabularyTable.mock';
 import { mockUsePasteTable } from '../units/pasteTable/usePasteTable.mock';
 import { mockUseSubcategories } from '../units/useSubcategories.mock';
 import { mockUseVocabulary } from '../units/useVocabulary.mock';
 import { mockUseVocabularyPage } from '../units/useVocabularyPage.mock';
-import { VOCABULARY_COLUMNS } from '../units/useVocabularyTable';
-import { mockUseVocabularyTable } from '../units/useVocabularyTable.mock';
 import { useNonVerbCreation } from './useNonVerbCreation';
 
 // Mock dependencies at the module level to isolate the unit under test
@@ -26,9 +25,8 @@ vi.mock('../units/pasteTable/usePasteTable', () => ({
   usePasteTable: mockUsePasteTable,
 }));
 
-vi.mock('../units/useVocabularyTable', () => ({
+vi.mock('../implementations/vocabularyTable/useVocabularyTable', () => ({
   useVocabularyTable: mockUseVocabularyTable,
-  VOCABULARY_COLUMNS,
 }));
 
 vi.mock('../units/useVocabularyPage', () => ({
@@ -115,19 +113,46 @@ describe('useNonVerbCreation', () => {
 
     // Mock the table hook to return test data
     mockUseVocabularyTable.mockReturnValue({
-      data: mockTableData,
+      data: {
+        rows: mockTableData.map((item, index) => ({
+          id: `row-${index}`,
+          cells: {
+            word: item.word,
+            descriptor: item.descriptor,
+            frequency: String(item.frequency), // Convert to string to match TableRow type
+            notes: '',
+          },
+        })),
+        columns: VOCABULARY_COLUMNS,
+      },
       saveData:
         createTypedMock<() => Promise<any[]>>().mockResolvedValue(
           mockTableData,
         ),
       // Add other required properties for TableHook
-      columns: VOCABULARY_COLUMNS,
+      updateCell:
+        createTypedMock<
+          (rowId: string, columnId: string, value: string) => string | null
+        >().mockReturnValue(null),
+      resetTable: createTypedMock<() => void>().mockImplementation(() => {}),
       addRow: createTypedMock<() => void>().mockImplementation(() => {}),
-      updateCell: createTypedMock<() => void>().mockImplementation(() => {}),
-      deleteRow: createTypedMock<() => void>().mockImplementation(() => {}),
       errors: {},
       loading: false,
       pasteData: createTypedMock<() => void>().mockImplementation(() => {}),
+      importData: createTypedMock<(data: any[]) => void>().mockImplementation(
+        () => {},
+      ),
+      handlePaste: createTypedMock<(e: any) => void>().mockImplementation(
+        () => {},
+      ),
+      setActiveCellInfo: createTypedMock<
+        (rowId: string, columnId: string) => void
+      >().mockImplementation(() => {}),
+      clearActiveCellInfo: createTypedMock<() => void>().mockImplementation(
+        () => {},
+      ),
+      isSaveEnabled: true,
+      validationState: { isValid: true, errors: {} },
     });
 
     // Mock the vocabulary creation to return successfully

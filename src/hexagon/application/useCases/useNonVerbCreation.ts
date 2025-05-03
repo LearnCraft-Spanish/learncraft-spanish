@@ -9,10 +9,10 @@ import {
   validateWithSchema,
 } from '@LearnCraft-Spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
+import { useVocabularyTable } from '../implementations/vocabularyTable/useVocabularyTable';
 import { useSubcategories } from '../units/useSubcategories';
 import { useVocabulary } from '../units/useVocabulary';
 import { useVocabularyPage } from '../units/useVocabularyPage';
-import { useVocabularyTable } from '../units/useVocabularyTable';
 
 // Define pagination state for current vocabulary view
 export interface VocabularyPaginationState {

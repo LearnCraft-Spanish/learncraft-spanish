@@ -16,7 +16,7 @@ import {
   mockUseVocabulary,
   overrideMockUseVocabulary,
 } from '../units/useVocabulary.mock';
-import { VOCABULARY_COLUMNS } from '../units/useVocabularyTable';
+import { VOCABULARY_COLUMNS } from '../implementations/useVocabularyTable';
 
 /**
  * Creates a default mock result by leveraging unit mocks.
