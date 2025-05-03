@@ -1,4 +1,3 @@
-import { vi } from 'vitest';
 import { createTypedMock } from './typedMock';
 
 describe('createTypedMock', () => {

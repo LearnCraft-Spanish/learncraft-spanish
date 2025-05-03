@@ -1,11 +1,11 @@
+import type { SubcategoryPort } from '@application/ports/subcategoryPort';
 import type { Subcategory } from '@LearnCraft-Spanish/shared';
-import type { SubcategoryPort } from '../ports/subcategoryPort';
 import {
   createMockSubcategory,
   createMockSubcategoryList,
-} from 'src/hexagon/testing/factories/subcategoryFactories';
-import { setMockResult } from 'src/hexagon/testing/utils/setMockResult';
-import { createTypedMock } from 'src/hexagon/testing/utils/typedMock';
+} from '@testing/factories/subcategoryFactories';
+import { setMockResult } from '@testing/utils/setMockResult';
+import { createTypedMock } from '@testing/utils/typedMock';
 
 // Create strongly-typed spies for each SubcategoryPort method
 export const mockGetSubcategories = createTypedMock<

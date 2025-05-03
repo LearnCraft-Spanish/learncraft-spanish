@@ -11,7 +11,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
         silent: true,
         globals: true,
         environment: 'jsdom',
-        setupFiles: './tests/setupTests',
+        setupFiles: './src/hexagon/testing/setupTests.ts',
         include: ['**/hexagon/**/*.{test,spec}.{js,ts,jsx,tsx}'],
         exclude: ['**/.stryker-tmp/**', '**/node_modules/**'],
         mockReset: true,

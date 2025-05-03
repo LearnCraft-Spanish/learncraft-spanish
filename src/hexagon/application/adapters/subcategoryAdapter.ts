@@ -1,7 +1,7 @@
-import type { SubcategoryPort } from '../ports/subcategoryPort';
-import { config } from '../../config';
-import { createSubcategoryInfrastructure } from '../../infrastructure/vocabulary/subcategoryInfrastructure';
-import { useAuthAdapter } from './authAdapter';
+import type { SubcategoryPort } from '@application/ports/subcategoryPort';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { createSubcategoryInfrastructure } from '@infrastructure/vocabulary/subcategoryInfrastructure';
+import { config } from 'src/hexagon/config';
 
 export function useSubcategoryAdapter(): SubcategoryPort {
   // Get API URL from config

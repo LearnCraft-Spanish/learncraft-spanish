@@ -160,7 +160,6 @@ export function mockVerbCreation(
   // 1. Setup dependencies first
   if (config.vocabulary) {
     vi.mock('@application/units/useVocabulary', () => ({
-      // eslint-disable-next-line react-hooks-extra/no-unnecessary-use-prefix
       useVocabulary: () => overrideMockUseVocabulary(config.vocabulary),
     }));
   } else {
@@ -171,7 +170,6 @@ export function mockVerbCreation(
 
   if (config.subcategories) {
     vi.mock('@application/units/useSubcategories', () => ({
-      // eslint-disable-next-line react-hooks-extra/no-unnecessary-use-prefix
       useSubcategories: () =>
         overrideMockUseSubcategories(config.subcategories),
     }));
@@ -194,7 +192,6 @@ export function mockVerbCreation(
 
   // 4. Setup the useCase mock
   vi.mock('@application/useCases/useVerbCreation', () => ({
-    // eslint-disable-next-line react-hooks-extra/no-unnecessary-use-prefix
     useVerbCreation: () => mockResult,
   }));
 

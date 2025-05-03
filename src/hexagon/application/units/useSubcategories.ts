@@ -1,7 +1,10 @@
 import type { Subcategory } from '@Learncraft-spanish/shared/src/domain/vocabulary/core-types';
+import { useSubcategoryAdapter } from '@application/adapters/subcategoryAdapter';
+import {
+  normalizeQueryError,
+  queryDefaults,
+} from '@application/utils/queryUtils';
 import { useQuery } from '@tanstack/react-query';
-import { useSubcategoryAdapter } from '../adapters/subcategoryAdapter';
-import { normalizeQueryError, queryDefaults } from '../utils/queryUtils';
 
 export interface UseSubcategoriesResult {
   subcategories: Subcategory[];

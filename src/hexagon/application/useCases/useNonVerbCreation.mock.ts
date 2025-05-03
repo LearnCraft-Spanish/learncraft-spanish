@@ -1,22 +1,22 @@
 import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
 import type { TableHook } from '../units/pasteTable/types';
 import type { UseNonVerbCreationResult } from './useNonVerbCreation';
-import { PartOfSpeech } from '@LearnCraft-Spanish/shared';
-import { createTypedMock } from '@testing/utils/typedMock';
-import { vi } from 'vitest';
+import { VOCABULARY_COLUMNS } from '@application/implementations/vocabularyTable/constants';
 import {
   mockUsePasteTable,
   overrideMockUsePasteTable,
-} from '../units/pasteTable/usePasteTable.mock';
+} from '@application/units/pasteTable/usePasteTable.mock';
 import {
   mockUseSubcategories,
   overrideMockUseSubcategories,
-} from '../units/useSubcategories.mock';
+} from '@application/units/useSubcategories.mock';
 import {
   mockUseVocabulary,
   overrideMockUseVocabulary,
-} from '../units/useVocabulary.mock';
-import { VOCABULARY_COLUMNS } from '../implementations/useVocabularyTable';
+} from '@application/units/useVocabulary.mock';
+import { PartOfSpeech } from '@LearnCraft-Spanish/shared';
+import { createTypedMock } from '@testing/utils/typedMock';
+import { vi } from 'vitest';
 
 /**
  * Creates a default mock result by leveraging unit mocks.
@@ -159,7 +159,6 @@ export function mockNonVerbCreation(
   // 1. Setup dependencies first
   if (config.vocabulary) {
     vi.mock('@application/units/useVocabulary', () => ({
-      // eslint-disable-next-line react-hooks-extra/no-unnecessary-use-prefix
       useVocabulary: () => overrideMockUseVocabulary(config.vocabulary),
     }));
   } else {
@@ -170,7 +169,6 @@ export function mockNonVerbCreation(
 
   if (config.subcategories) {
     vi.mock('@application/units/useSubcategories', () => ({
-      // eslint-disable-next-line react-hooks-extra/no-unnecessary-use-prefix
       useSubcategories: () =>
         overrideMockUseSubcategories(config.subcategories),
     }));
@@ -182,7 +180,6 @@ export function mockNonVerbCreation(
 
   if (config.pasteTable) {
     vi.mock('@application/units/pasteTable/usePasteTable', () => ({
-      // eslint-disable-next-line react-hooks-extra/no-unnecessary-use-prefix
       usePasteTable: () => overrideMockUsePasteTable(config.pasteTable),
     }));
   } else {
@@ -204,7 +201,6 @@ export function mockNonVerbCreation(
 
   // 4. Setup the useCase mock
   vi.mock('@application/useCases/useNonVerbCreation', () => ({
-    // eslint-disable-next-line react-hooks-extra/no-unnecessary-use-prefix
     useNonVerbCreation: () => mockResult,
   }));
 

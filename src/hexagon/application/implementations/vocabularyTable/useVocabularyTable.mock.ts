@@ -1,10 +1,10 @@
-import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
-import type { ClipboardEvent } from 'react';
 import type {
   TableHook,
   TableRow,
   ValidationState,
-} from '../../units/pasteTable/types';
+} from '@application/units/pasteTable/types';
+import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
+import type { ClipboardEvent } from 'react';
 import { createTypedMock } from '@testing/utils/typedMock';
 import { VOCABULARY_COLUMNS } from './constants';
 

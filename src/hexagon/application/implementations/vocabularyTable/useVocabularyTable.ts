@@ -1,7 +1,7 @@
+import type { TableHook } from '@application/units/pasteTable';
 import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
-import type { TableHook } from '../../units/pasteTable/types';
+import { usePasteTable } from '@application/units/pasteTable';
 import { validateCreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
-import { usePasteTable } from '../../units/pasteTable';
 import { SCHEMA_FIELD_CONFIG, VOCABULARY_COLUMNS } from './constants';
 
 /**

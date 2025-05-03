@@ -1,12 +1,15 @@
+import type { VocabularyQueryOptions } from '@application/ports/vocabularyPort';
 import type {
   CreateNonVerbVocabulary,
   CreateVerb,
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
-import type { VocabularyQueryOptions } from '../ports/vocabularyPort';
+import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
+import {
+  normalizeQueryError,
+  queryDefaults,
+} from '@application/utils/queryUtils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useVocabularyAdapter } from '../adapters/vocabularyAdapter';
-import { normalizeQueryError, queryDefaults } from '../utils/queryUtils';
 
 export interface UseVocabularyResult {
   // Read operations

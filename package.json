@@ -26,6 +26,8 @@
     "scss": "sass --watch src/components/Coaching/styles:src/components/Coaching/styles",
     "start": "vite",
     "test": "vitest run --coverage",
+    "test:hexagon": "vitest --config vitest.config-hexagon.ts",
+    "test:hexagon:watch": "vitest --config vitest.config-hexagon.ts --watch",
     "typecheck": "tsc --noEmit",
     "update-shared": "pnpm add @LearnCraft-Spanish/shared@latest",
     "validate": "npm run lint:fix && npm run format && npm run typecheck",

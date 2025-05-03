@@ -51,7 +51,12 @@ export default antfu(
       '**/*.md',
     ],
   },
-  prettierConfig,
+  {
+    files: ['**/*.mock.ts', 'src/hexagon/testing/setup.ts'],
+    rules: {
+      'react-hooks-extra/no-unnecessary-use-prefix': 'off',
+    },
+  },
   // Add our custom hexagonal testing rules
   {
     files: [
@@ -65,4 +70,5 @@ export default antfu(
       'custom/no-untyped-mocks': 'error',
     },
   },
+  prettierConfig,
 );

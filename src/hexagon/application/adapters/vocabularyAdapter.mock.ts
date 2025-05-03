@@ -1,16 +1,16 @@
+import type { VocabularyPort } from '@application/ports/vocabularyPort';
 import type {
   CreateNonVerbVocabulary,
   CreateVerb,
   GetTotalCountResponse,
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
-import type { VocabularyPort } from '../ports/vocabularyPort';
 import {
   createMockVocabulary,
   createMockVocabularyList,
-} from 'src/hexagon/testing/factories/vocabularyFactories';
-import { setMockResult } from 'src/hexagon/testing/utils/setMockResult';
-import { createTypedMock } from 'src/hexagon/testing/utils/typedMock';
+} from '@testing/factories/vocabularyFactories';
+import { setMockResult } from '@testing/utils/setMockResult';
+import { createTypedMock } from '@testing/utils/typedMock';
 
 // Create strongly-typed spies for each VocabularyPort method
 export const mockGetVocabulary = createTypedMock<
