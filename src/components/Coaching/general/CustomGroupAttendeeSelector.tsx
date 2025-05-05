@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import wheelIcon from 'src/assets/Icon_Blue.svg';
+import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
@@ -26,6 +26,7 @@ export default function CustomGroupAttendeeSelector({
     const studentList = weeksQuery.data
       ?.filter((week) => week.membershipCourseHasGroupCalls)
       .map((week) => {
+        // Foreign Key lookup, form data in backend?
         const student = getStudentFromMembershipId(week.relatedMembership);
         if (!student) return undefined;
         return {
@@ -58,10 +59,7 @@ export default function CustomGroupAttendeeSelector({
   return (
     <div id="searchStudentWrapper" className="customSearchStudentWrapper">
       {isLoading ? (
-        <div className="loadingContainer">
-          <p>Loading student data...</p>
-          <img src={wheelIcon} alt="loading" />
-        </div>
+        <InlineLoading message="Loading student data..." />
       ) : (
         <>
           <input
@@ -70,6 +68,11 @@ export default function CustomGroupAttendeeSelector({
             value={searchString}
             onChange={(e) => setSearchString(e.target.value)}
             onFocus={() => setOptionsVisible(true)}
+            onBlur={() => {
+              setTimeout(() => {
+                setOptionsVisible(false);
+              }, 200);
+            }}
           />
           {optionsVisible && (
             <div id="optionsWrapper">

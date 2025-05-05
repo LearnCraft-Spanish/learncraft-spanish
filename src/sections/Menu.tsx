@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { useUserData } from 'src/hooks/UserData/useUserData';
@@ -115,7 +115,7 @@ export default function Menu() {
           {(userDataQuery.data.roles.adminRole === 'coach' ||
             userDataQuery.data.roles.adminRole === 'admin') && (
             <div>
-              <h3>Staff Tools</h3>
+              <h3>Coaching Tools</h3>
               <div className="buttonBox">
                 <Link className="linkButton" to="/frequensay">
                   FrequenSay
@@ -126,21 +126,44 @@ export default function Menu() {
                   Weekly Records Interface
                 </Link>
               </div>
-              {userDataQuery.data.roles.adminRole === 'admin' && (
-                <div className="buttonBox">
-                  <Link className="linkButton" to="/examplemanager">
-                    Example Manager
-                  </Link>
-                </div>
-              )}
-              {userDataQuery.data.roles.adminRole === 'admin' && (
-                <div className="buttonBox">
-                  <Link className="linkButton" to="/vocabularymanager">
-                    Create Vocabulary
-                  </Link>
-                </div>
-              )}
+              <div className="buttonBox">
+                <Link className="linkButton" to="/student-drill-down">
+                  Student Drill Down
+                </Link>
+              </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/coaching-dashboard">
+                  Coaching Dashboard
+                </Link>
+              </div>
             </div>
+          )}
+          {userDataQuery.data.roles.adminRole === 'admin' && (
+            <>
+              <h3>Admin Tools</h3>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/admin-dashboard">
+                  Admin Dashboard
+                </Link>
+              </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/examplemanager">
+                  Example Manager
+                </Link>
+              </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/database-tables">
+                  Database Tables
+                </Link>
+                {userDataQuery.data.roles.adminRole === 'admin' && (
+                  <div className="buttonBox">
+                    <Link className="linkButton" to="/vocabularymanager">
+                      Create Vocabulary
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
       )}

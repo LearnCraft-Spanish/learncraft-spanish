@@ -28,11 +28,34 @@ export function ExamplePasteArea({
   existingExamples,
   onNext,
 }: ExamplePasteAreaProps) {
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+  const allowTab = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const textarea = e.currentTarget;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newValue = `${areaInput.substring(0, start)}\t${areaInput.substring(end)}`;
+      onInputChange(newValue);
+      // Use requestAnimationFrame to ensure the DOM has updated
+      requestAnimationFrame(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 1;
+      });
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onInputChange(e.target.value);
+  };
+
   return (
     <div className="setCreatorContainer">
       <textarea
+        ref={textareaRef}
         value={areaInput}
-        onChange={(e) => onInputChange(e.target.value)}
+        onChange={handleChange}
+        onKeyDown={allowTab}
         placeholder={
           'Paste table here in the following format: \nSpanish Example\tEnglish Translation\tSpanish Audio\tEnglish Audio'
         }

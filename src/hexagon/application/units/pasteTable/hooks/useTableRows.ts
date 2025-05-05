@@ -67,7 +67,7 @@ export function useTableRows<T>({
             newCells[key] = String(row.cells[key] || '');
           });
 
-          // Update the specific cell with the new value
+          // Update the specific cell with the new value (as string)
           newCells[columnId] = String(value);
 
           // Create updated row

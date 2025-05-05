@@ -26,6 +26,9 @@ function generateMembership({
     lastRecordedWeekStarts: '',
     relatedCourse: relatedCourseId,
     relatedStudent: relatedStudentId,
+    assignmentsCompleted: 0,
+    callsCompleted: 0,
+    primaryCoach: 0,
   };
   return membership;
 }

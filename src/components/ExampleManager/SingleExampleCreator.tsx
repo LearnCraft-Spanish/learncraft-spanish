@@ -15,6 +15,7 @@ import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import ExamplesTable from '../ExamplesTable/ExamplesTable';
 import { VocabTag } from './VocabTag';
@@ -23,7 +24,6 @@ interface ExampleDetails {
   englishTranslation: string;
   spanishAudioLa: string;
   englishAudio: string;
-  vocabIncluded: string[];
 }
 
 export default function SingleExampleCreator({
@@ -32,6 +32,7 @@ export default function SingleExampleCreator({
   hasEditAccess: boolean;
 }) {
   const { openModal, closeModal } = useModal();
+  const { setContextualRef, openContextual, contextual } = useContextualMenu();
   const { updateRecentlyEditedExample } = useRecentlyEditedExamples();
   const { recentlyEditedExamplesQuery, addUnverifiedExample } =
     useRecentlyEditedExamples();
@@ -52,7 +53,6 @@ export default function SingleExampleCreator({
     englishTranslation: '',
     spanishAudioLa: '',
     englishAudio: '',
-    vocabIncluded: [],
   });
 
   const { vocabularyQuery } = useVocabulary();
@@ -67,10 +67,10 @@ export default function SingleExampleCreator({
       spanglish: exampleDetails.spanishExample.includes('*')
         ? 'spanglish'
         : 'esp',
-      vocabIncluded: exampleDetails.vocabIncluded,
-      vocabComplete: selectedExampleId ? false : vocabComplete,
+      vocabIncluded,
+      vocabComplete: selectedExampleId ? vocabComplete : false,
     };
-  }, [selectedExampleId, exampleDetails, vocabComplete]);
+  }, [selectedExampleId, exampleDetails, vocabComplete, vocabIncluded]);
 
   const newFlashcard: NewFlashcard = useMemo(() => {
     const transitionalObj: Omit<Flashcard, 'recordId' | 'vocabIncluded'> = {
@@ -149,6 +149,7 @@ export default function SingleExampleCreator({
     (vocabTerm: string) => {
       if (vocabTerm && !vocabIncluded.includes(vocabTerm)) {
         setVocabIncluded([...vocabIncluded, vocabTerm]);
+        setVocabSearchTerm('');
       }
     },
     [vocabIncluded],
@@ -271,7 +272,6 @@ export default function SingleExampleCreator({
       englishTranslation: '',
       spanishAudioLa: '',
       englishAudio: '',
-      vocabIncluded: [],
     });
   }
 
@@ -289,9 +289,9 @@ export default function SingleExampleCreator({
   function submitExample(e: React.FormEvent) {
     e.preventDefault();
     if (!!selectedExampleId && selectedExampleId > 0) {
-      handleAddExample(e);
-    } else {
       handleEditExample(e);
+    } else {
+      handleAddExample(e);
     }
   }
   const safeTableData = tableData ?? [];
@@ -325,35 +325,37 @@ export default function SingleExampleCreator({
           }
         />
       </div>
-      <div id="vocabTagging">
-        <div className="halfOfScreen tagSearchBox">
-          <h3>Search for Vocab</h3>
-          <input
-            type="text"
-            name="search"
-            id="search"
-            value={vocabSearchTerm}
-            placeholder="Search vocabulary"
-            className="searchBox"
-            onChange={(e) => updateVocabSearchTerm(e.target)}
-          />
-          {!!vocabSearchTerm.length && (
-            <div className="tagSuggestionBox">
-              {tagsFilteredByInput.map((item) => (
-                <div
-                  key={item.recordId}
-                  className="vocabTag tagCard"
-                  onClick={() => addToSelectedVocab(item.vocabName)}
-                >
-                  <h4 className="vocabName">
-                    {item.descriptionOfVocabularySkill}
-                  </h4>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        {selectedExampleId && selectedExampleId > 0 && (
+      {selectedExampleId && selectedExampleId > 0 && (
+        <div id="vocabTagging">
+          <div className="halfOfScreen tagSearchBox">
+            <h3>Search for Vocab</h3>
+            <input
+              type="text"
+              name="search"
+              id="search"
+              value={vocabSearchTerm}
+              placeholder="Search vocabulary"
+              className="searchBox"
+              onChange={(e) => updateVocabSearchTerm(e.target)}
+              onFocus={() => openContextual('vocabTagging')}
+            />
+            {!!vocabSearchTerm.length && contextual === 'vocabTagging' && (
+              <div className="tagSuggestionBox" ref={setContextualRef}>
+                {tagsFilteredByInput.map((item) => (
+                  <div
+                    key={item.recordId}
+                    className="vocabTag tagCard"
+                    onClick={() => addToSelectedVocab(item.vocabName)}
+                  >
+                    <h4 className="vocabName">
+                      {item.descriptionOfVocabularySkill}
+                    </h4>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="halfOfScreen">
             <h3>Vocab Included</h3>
             <div className="vocabTagBox">
@@ -364,22 +366,22 @@ export default function SingleExampleCreator({
                   removeFromVocabList={removeFromVocabIncluded}
                 />
               ))}
-              <div className="vocabCompleteContainer">
-                <p>Vocab Complete:</p>
-                <label htmlFor="vocabComplete" className="switch">
-                  <input
-                    type="checkbox"
-                    id="vocabComplete"
-                    checked={vocabComplete}
-                    onChange={() => handleVerifyExampleChange(!vocabComplete)}
-                  />
-                  <span className="slider round"></span>
-                </label>
-              </div>
+            </div>
+            <div className="vocabCompleteContainer">
+              <p>Vocab Complete:</p>
+              <label htmlFor="vocabComplete" className="switch">
+                <input
+                  type="checkbox"
+                  id="vocabComplete"
+                  checked={vocabComplete}
+                  onChange={() => handleVerifyExampleChange(!vocabComplete)}
+                />
+                <span className="slider round"></span>
+              </label>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
       <div className="exampleFilterControls">
         <select
           value={tableOption}

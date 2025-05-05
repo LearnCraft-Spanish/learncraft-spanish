@@ -81,22 +81,8 @@ export function useTableValidation<T>({
   // Function to validate all rows on demand (for save)
   // This ensures we get a fresh validation result at save time
   const validateAll = useCallback(() => {
-    const errors: Record<string, Record<string, string>> = {};
-    let hasErrors = false;
-
-    nonGhostRows.forEach((row) => {
-      const rowErrors = validateSingleRow(row);
-      if (Object.keys(rowErrors).length > 0) {
-        errors[row.id] = rowErrors;
-        hasErrors = true;
-      }
-    });
-
-    return {
-      isValid: !hasErrors,
-      errors,
-    };
-  }, [nonGhostRows, validateSingleRow]);
+    return validationState;
+  }, [validationState]);
 
   return {
     validationState,

@@ -1,7 +1,8 @@
 export default function getDateRange(numWeeks: number = 4) {
-  const nowString = Date.now();
-  const now = new Date(nowString);
-  const dayOfWeek = now.getDay();
+  // Get current UTC timestamp
+  const now = new Date();
+  const dayOfWeek = now.getUTCDay();
+
   const weekInMs = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
 
   // Generate array of dates

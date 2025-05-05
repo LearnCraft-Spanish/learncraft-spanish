@@ -1,10 +1,21 @@
 import { Route } from 'react-router-dom';
 
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
+import CoachingDashboard from 'src/components/CoachingDashboard';
+import {
+  CoursesTable,
+  LessonsTable,
+  ProgramsTable,
+  QuizzesTable,
+  StudentsTable,
+} from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import { ProtectedRoute } from 'src/components/ProtectedRoute';
+import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import AdminDashboard from 'src/sections/AdminDashboard';
+import DatabaseTables from 'src/sections/DatabaseTables';
 import { VocabularyCreatorPage } from '../hexagon/interface/pages/VocabularyCreatorPage';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
@@ -14,7 +25,6 @@ import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import SentryRoutes from './SentryRoutes';
-
 export default function AppRoutes() {
   const userDataQuery = useUserData();
 
@@ -92,7 +102,38 @@ export default function AppRoutes() {
           )
         }
       />
+      <Route
+        path="/student-drill-down"
+        element={
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <StudentDrillDown />
+          )
+        }
+      />
+      <Route
+        path="/coaching-dashboard"
+        element={
+          (userDataQuery.data?.roles.adminRole === 'coach' ||
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <CoachingDashboard />
+          )
+        }
+      />
+      <Route
+        path="/database-tables/*"
+        element={
+          userDataQuery.data?.roles.adminRole === 'admin' && <DatabaseTables />
+        }
+      >
+        <Route path="students" element={<StudentsTable />} />
+        <Route path="programs" element={<ProgramsTable />} />
+        <Route path="lessons" element={<LessonsTable />} />
+        <Route path="courses" element={<CoursesTable />} />
+        <Route path="quizzes" element={<QuizzesTable />} />
+      </Route>
       <Route path="/*" element={<NotFoundPage />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </SentryRoutes>
   );
 }

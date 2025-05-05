@@ -1,3 +1,8 @@
+// DEPRECATED: Use the shared types instead
+// All types and contracts should be defined in the shared package
+// If a type is missing, add it to the shared package
+// No new types should be added here
+
 export type Expanded<T> = { [K in keyof T]: T[K] };
 
 export type Lesson = Expanded<{
@@ -28,7 +33,9 @@ export type Program = Expanded<{
   cohortECurrentLesson: number;
   cohortFCurrentLesson: number;
   cohortGCurrentLesson: number;
-  //cohortGCurrentLesson: number;
+  cohortHCurrentLesson: number;
+  cohortICurrentLesson: number;
+  cohortJCurrentLesson: number;
 }>;
 
 export type ProgramUnparsed = Expanded<{
@@ -42,7 +49,9 @@ export type ProgramUnparsed = Expanded<{
   cohortECurrentLesson: number;
   cohortFCurrentLesson: number;
   cohortGCurrentLesson: number;
-  //cohortHCurrentLesson: number;
+  cohortHCurrentLesson: number;
+  cohortICurrentLesson: number;
+  cohortJCurrentLesson: number;
 }>;
 
 export type UserData = Expanded<{
@@ -52,19 +61,21 @@ export type UserData = Expanded<{
   cohort: string;
   relatedProgram: number;
   roles: {
-    studentRole: '' | 'limited' | 'student';
+    studentRole: '' | 'limited' | 'student' | 'none';
     adminRole: '' | 'coach' | 'admin';
   };
+  program: 'LCSP' | 'SI1M';
 }>;
 
-export type FlashcardStudent = Expanded<{
+export interface FlashcardStudent {
   recordId: number;
   name: string;
   emailAddress: string;
   cohort: string;
   relatedProgram: number;
-  role: '' | 'limited' | 'student';
-}>;
+  role: '' | 'limited' | 'student' | 'none';
+  program: 'LCSP' | 'SI1M';
+}
 
 export type selectedProgram = Expanded<Program | null>;
 

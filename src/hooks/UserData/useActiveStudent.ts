@@ -83,6 +83,7 @@ export function useActiveStudent() {
       programTableQuery.data?.length &&
       activeStudentQuery.data?.relatedProgram
     ) {
+      // Foreign Key lookup, form data in backend
       return (
         programTableQuery.data.find(
           (program) =>
@@ -112,7 +113,12 @@ export function useActiveStudent() {
             return activeProgram?.cohortFCurrentLesson;
           case 'G':
             return activeProgram?.cohortGCurrentLesson;
-          // case 'H': return activeProgram?.cohortHCurrentLesson
+          case 'H':
+            return activeProgram?.cohortHCurrentLesson;
+          case 'I':
+            return activeProgram?.cohortICurrentLesson;
+          case 'J':
+            return activeProgram?.cohortJCurrentLesson;
           // etc for futureproofing
         }
       };

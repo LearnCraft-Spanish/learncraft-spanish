@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useSubcategories } from '../units/useSubcategories';
 import { useVocabulary } from '../units/useVocabulary';
 
-interface VerbData {
+export interface VerbData {
   infinitive: string;
   translation: string;
   usage?: string;
@@ -12,7 +12,7 @@ interface VerbData {
   notes?: string;
 }
 
-interface UseVerbCreationResult {
+export interface UseVerbCreationResult {
   // Subcategory selection
   verbSubcategories: Subcategory[]; // Now using proper type
   loadingSubcategories: boolean;

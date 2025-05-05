@@ -1,7 +1,7 @@
-import type { VocabularyPort } from '../ports/vocabularyPort';
-import { config } from '../../config';
-import { createVocabularyInfrastructure } from '../../infrastructure/vocabulary/vocabularyInfrastructure';
-import { useAuthAdapter } from './authAdapter';
+import type { VocabularyPort } from '@application/ports/vocabularyPort';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { createVocabularyInfrastructure } from '@infrastructure/vocabulary/vocabularyInfrastructure';
+import { config } from 'src/hexagon/config';
 
 /**
  * Adapter hook for vocabulary operations.

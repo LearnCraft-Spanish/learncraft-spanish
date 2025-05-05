@@ -483,6 +483,9 @@ const programsTable: Program[] = [
     cohortECurrentLesson: 93,
     cohortFCurrentLesson: 78,
     cohortGCurrentLesson: 17,
+    cohortHCurrentLesson: 10,
+    cohortICurrentLesson: 10,
+    cohortJCurrentLesson: 10,
   },
   {
     recordId: 3,
@@ -2884,6 +2887,9 @@ const programsTable: Program[] = [
     cohortECurrentLesson: 1,
     cohortFCurrentLesson: 1,
     cohortGCurrentLesson: 17,
+    cohortHCurrentLesson: 1,
+    cohortICurrentLesson: 1,
+    cohortJCurrentLesson: 1,
   },
   {
     recordId: 4,
@@ -2955,6 +2961,9 @@ const programsTable: Program[] = [
     cohortECurrentLesson: 1,
     cohortFCurrentLesson: 1,
     cohortGCurrentLesson: 17,
+    cohortHCurrentLesson: 1,
+    cohortICurrentLesson: 1,
+    cohortJCurrentLesson: 1,
   },
   {
     recordId: 5,
@@ -3690,6 +3699,9 @@ const programsTable: Program[] = [
     cohortECurrentLesson: 1,
     cohortFCurrentLesson: 1,
     cohortGCurrentLesson: 17,
+    cohortHCurrentLesson: 1,
+    cohortICurrentLesson: 1,
+    cohortJCurrentLesson: 1,
   },
 ];
 

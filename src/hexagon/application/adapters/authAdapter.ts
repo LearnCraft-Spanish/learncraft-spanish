@@ -1,5 +1,5 @@
-import type { AuthPort } from '../ports/authPort';
-import useAuth from '../../../hooks/useAuth';
+import type { AuthPort } from '@application/ports/authPort';
+import useAuth from 'src/hooks/useAuth';
 
 /**
  * Adapter hook for authentication operations.

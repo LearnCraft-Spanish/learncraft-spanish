@@ -17,7 +17,7 @@ export type Week = Expanded<{
   notes: string;
   holdWeek: boolean;
   recordsComplete: boolean;
-  currentLesson: number | null;
+  currentLesson: number | null | undefined;
   primaryCoachWhenCreated: string;
   recordCompletable: boolean;
   recordId: number;
@@ -45,17 +45,29 @@ export type Week = Expanded<{
   weekName: string;
 }>;
 
-export type Student = Expanded<{
+export interface Student {
   recordId: number;
   firstName: string;
   lastName: string;
   fullName: string;
   email: string;
-  timeZone: string;
+  timeZone: string | undefined;
+  usPhone: number;
   fluencyGoal: string;
   startingLevel: string;
   primaryCoach: QbUser;
-}>;
+  active: boolean;
+  // currentMembershipEnds: Date;
+  // memberUntil: Date;
+  // lastMembershipEnded: Date;
+  pronoun: string | undefined;
+  billingEmail: string;
+  billingNotes: string;
+  firstSubscribed: Date | string;
+  advancedStudent: boolean;
+  relatedCoach: string | number | undefined;
+  learningDisabilities: string;
+}
 
 export type Membership = Expanded<{
   recordId: number;
@@ -66,12 +78,15 @@ export type Membership = Expanded<{
   lastRecordedWeekStarts: Date | string;
   relatedCourse: number;
   relatedStudent: number;
+  assignmentsCompleted: number;
+  callsCompleted: number;
+  primaryCoach: number;
 }>;
 
 export type Lesson = Expanded<{
   recordId: number;
   lessonName: string;
-  weekRef: number;
+  weekRef: number | null;
   type: string;
 }>;
 
@@ -98,14 +113,17 @@ export type Course = Expanded<{
   recordId: number;
   name: string;
   membershipType: string;
+  approxMonthlyCost: number;
   weeklyPrivateCalls: number;
   hasGroupCalls: boolean;
+  weeklyTimeCommitmentMinutes: number;
 }>;
 
 export type Coach = Expanded<{
   recordId: number;
   coach: string;
   user: QbUser;
+  coachUserName: string;
 }>;
 
 export type PrivateCall = Expanded<{
@@ -118,6 +136,7 @@ export type PrivateCall = Expanded<{
   date: Date | string;
   caller: QbUser;
   callType: string;
+  weekName: string;
 }>;
 
 export type Assignment = Expanded<{
@@ -130,4 +149,32 @@ export type Assignment = Expanded<{
   notes: string;
   homeworkCorrector: QbUser;
   weekStarts: Date | string;
+  dateCreated: Date | string;
+  assignmentName: string;
 }>;
+
+/* --------- Student Drill Down Types --------- */
+export type UpdateStudent = Omit<Partial<Student>, 'primaryCoach'> & {
+  recordId: number;
+  primaryCoach?: string; // Email string for updates
+};
+
+export type StudentResponse = Omit<Student, 'primaryCoach'> & {
+  primaryCoach: QbUser; // Full QbUser object in responses
+};
+
+export interface GroupSessionWithAttendees extends GroupSession {
+  attendees: GroupAttendees[];
+}
+
+export interface WeekWithRelations extends Week {
+  assignments: Assignment[];
+  privateCalls: PrivateCall[];
+  groupSessions: GroupSessionWithAttendees[];
+}
+
+export interface Report {
+  title: string;
+  headers: string[];
+  data: any[];
+}

@@ -21,6 +21,7 @@ export default function SRSQuizButtons({
 
   const getStudentExampleFromExample = useCallback(
     (example: Flashcard) => {
+      // Foreign Key lookup, form data in backend
       const relatedStudentExample =
         flashcardDataQuery.data?.studentExamples?.find(
           (item) => item.relatedExample === example.recordId,

@@ -77,7 +77,6 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
         <h4>Add new vocabulary:</h4>
         <PasteTable
           hook={tableHook}
-          saveButtonText="Save Vocabulary"
           clearButtonText="Clear Table"
           pasteHint="Paste vocabulary data (tab-separated) or edit cells directly"
         />

@@ -37,6 +37,8 @@ function generateAssignment({
     weekStarts: week.weekStarts,
     assignmentLink:
       assignmentLinks[Math.floor(Math.random() * assignmentLinks.length)],
+    assignmentName: '',
+    dateCreated: '',
   };
   return assignment;
 }

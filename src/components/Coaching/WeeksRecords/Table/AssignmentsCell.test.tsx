@@ -24,12 +24,12 @@ describe('component StudentCell', () => {
     render(
       <MockAllProviders>
         <DateRangeProvider>
-          <AssignmentsCell assignments={[assignment]} />
+          <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
         </DateRangeProvider>
       </MockAllProviders>,
     );
     expect(
-      screen.getByText(`${assignment.assignmentType}:${assignment.rating}`),
+      screen.getByText(`${assignment.assignmentType}: ${assignment.rating}`),
     ).toBeInTheDocument();
   });
   describe('contextual menu view', () => {
@@ -37,14 +37,14 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} />
+            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
           </DateRangeProvider>
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
       act(() => {
         screen
-          .getByText(`${assignment.assignmentType}:${assignment.rating}`)
+          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
           .click();
       });
       await waitFor(() => {
@@ -62,14 +62,14 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} />
+            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
           </DateRangeProvider>
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
       act(() => {
         screen
-          .getByText(`${assignment.assignmentType}:${assignment.rating}`)
+          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
           .click();
       });
       await waitFor(() => {
@@ -86,14 +86,14 @@ describe('component StudentCell', () => {
       render(
         <MockAllProviders>
           <DateRangeProvider>
-            <AssignmentsCell assignments={[assignment]} />
+            <AssignmentsCell assignments={[assignment]} tableEditMode={false} />
           </DateRangeProvider>
         </MockAllProviders>,
       );
       // Click on the button that opens the contextual menu
       act(() => {
         screen
-          .getByText(`${assignment.assignmentType}:${assignment.rating}`)
+          .getByText(`${assignment.assignmentType}: ${assignment.rating}`)
           .click();
       });
       await waitFor(() => {

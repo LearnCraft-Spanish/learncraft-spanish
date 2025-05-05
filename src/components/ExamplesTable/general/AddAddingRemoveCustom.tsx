@@ -1,14 +1,14 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useModal } from 'src/hooks/useModal';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export default function AddAddingRemoveCustom({
   example,
 }: {
   example: Flashcard;
 }) {
-  const userDataQuery = useUserData();
+  const { openModal, closeModal } = useModal();
   const { activeStudentQuery } = useActiveStudent();
   const {
     flashcardDataQuery,
@@ -26,6 +26,21 @@ export default function AddAddingRemoveCustom({
   const dataReady =
     flashcardDataQuery.isSuccess && activeStudentQuery.isSuccess;
 
+  const handleRemove = () => {
+    if (isCustom) {
+      openModal({
+        title: 'Remove Custom Example',
+        body: 'This is one of your custom flashcards! Are you sure you want to delete it?',
+        type: 'confirm',
+        confirmFunction: () => {
+          removeFlashcardMutation.mutate(example.recordId);
+          closeModal();
+        },
+      });
+    } else {
+      removeFlashcardMutation.mutate(example.recordId);
+    }
+  };
   return (
     dataReady && (
       <>
@@ -58,20 +73,16 @@ export default function AddAddingRemoveCustom({
             Adding...
           </button>
         )}
-        {isCollected &&
-          !isPending &&
-          (!isCustom ||
-            userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
-            <button
-              type="button"
-              className="removeButton"
-              value={example.recordId}
-              onClick={() => removeFlashcardMutation.mutate(example.recordId)}
-            >
-              Remove
-            </button>
-          )}
+        {isCollected && !isPending && (
+          <button
+            type="button"
+            className="removeButton"
+            value={example.recordId}
+            onClick={handleRemove}
+          >
+            Remove
+          </button>
+        )}
       </>
     )
   );

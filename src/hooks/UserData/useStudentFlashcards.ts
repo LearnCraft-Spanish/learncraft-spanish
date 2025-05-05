@@ -54,6 +54,7 @@ export function useStudentFlashcards() {
         (a, b) => a.relatedExample - b.relatedExample,
       );
       const filteredExamples = sortedExamples.filter((example) => {
+        // Foreign Key lookup, form data in backend
         const match = studentExampleArray.find(
           (studentExample) =>
             studentExample.relatedExample === example.recordId,
@@ -62,6 +63,7 @@ export function useStudentFlashcards() {
       });
       const filteredStudentExamples = sortedStudentExamples.filter(
         (studentExample) => {
+          // Foreign Key lookup, form data in backend
           const match = exampleArray.find(
             (example) => example.recordId === studentExample.relatedExample,
           );
@@ -140,6 +142,7 @@ export function useStudentFlashcards() {
   const exampleIsCollected = useCallback(
     (exampleId: number) => {
       const studentFlashcardData = flashcardDataQuery.data?.studentExamples;
+      // Foreign Key lookup, form data in backend
       const foundStudentExample = studentFlashcardData?.find(
         (studentExample) => studentExample.relatedExample === exampleId,
       );
@@ -151,6 +154,7 @@ export function useStudentFlashcards() {
   const exampleIsCustom = useCallback(
     (exampleId: number) => {
       const studentFlashcardData = flashcardDataQuery.data?.studentExamples;
+      // Foreign Key lookup, form data in backend
       const foundStudentExample = studentFlashcardData?.find(
         (studentExample) => studentExample.relatedExample === exampleId,
       );
@@ -162,6 +166,7 @@ export function useStudentFlashcards() {
   const exampleIsPending = useCallback(
     (exampleId: number) => {
       const studentFlashcardData = flashcardDataQuery.data?.studentExamples;
+      // Foreign Key lookup, form data in backend
       const foundStudentExample = studentFlashcardData?.find(
         (studentExample) => studentExample.relatedExample === exampleId,
       );
@@ -332,12 +337,15 @@ export function useStudentFlashcards() {
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.examples];
           const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
+          // Foreign Key lookup, form data in backend
           const studentExampleToRemove = oldStudentFlashcardsCopy.find(
             (studentExample) => studentExample.recordId === thisIdNum,
           );
+          // Foreign Key lookup, form data in backend
           const newStudentExampleArray = oldStudentFlashcardsCopy.filter(
             (studentExample) => studentExample.recordId !== thisIdNum,
           );
+          // Foreign Key lookup, form data in backend
           const newExampleArray = oldFlashcardsCopy.filter(
             (example) =>
               example.recordId !== studentExampleToRemove?.relatedExample,
@@ -358,6 +366,7 @@ export function useStudentFlashcards() {
   // Function to return promise that will either give success data or throw an error.
   const removeFromActiveStudentFlashcards = useCallback(
     async (flashcardId: number) => {
+      // Foreign Key lookup, form data in backend
       const studentFlashcardId = flashcardDataQuery.data?.studentExamples.find(
         (studentFlashcard) => studentFlashcard.relatedExample === flashcardId,
       )?.recordId;
@@ -417,20 +426,24 @@ export function useStudentFlashcards() {
         ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           // Find the studentFlashcard and related flashcard objects
+          // Foreign Key lookup, form data in backend
           studentFlashcardObject = oldFlashcards.studentExamples.find(
             (studentFlashcard) =>
               studentFlashcard.relatedExample === flashcardId,
           );
+          // Foreign Key lookup, form data in backend
           flashcardObject = oldFlashcards.examples.find(
             (flashcard) => flashcard.recordId === flashcardId,
           );
 
           // Remove the studentFlashcard and related flashcard object from the cache
+          // Foreign Key lookup, form data in backend
           const newStudentFlashcardsArray =
             oldFlashcards.studentExamples.filter(
               (studentFlashcard) =>
                 studentFlashcard.relatedExample !== flashcardId,
             );
+          // Foreign Key lookup, form data in backend
           const newFlashcardsArray = oldFlashcards.examples.filter(
             (flashcard) => flashcard.recordId !== flashcardId,
           );
@@ -544,10 +557,12 @@ export function useStudentFlashcards() {
         ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
+          // Foreign Key lookup, form data in backend
           const studentFlashcard = oldFlashcardsCopy.find(
             (studentFlashcard) =>
               studentFlashcard.recordId === studentExampleId,
           );
+          // Foreign Key lookup, form data in backend
           const flashcard = oldFlashcards.examples.find(
             (flashcard) =>
               flashcard.recordId === studentFlashcard?.relatedExample,
@@ -569,15 +584,16 @@ export function useStudentFlashcards() {
             // Replace the flashcards in copy of array
             const newStudentFlashcardsArray = oldFlashcardsCopy.map(
               (studentFlashcard) =>
+                // Foreign Key lookup, form data in backend
                 studentFlashcard.recordId === studentExampleId
                   ? newStudentFlashcard
                   : studentFlashcard,
             );
-            const newFlashcardsArray = oldFlashcards.examples.map(
-              (flashcard) =>
-                flashcard.recordId === studentFlashcard.relatedExample
-                  ? newFlashcard
-                  : flashcard,
+            const newFlashcardsArray = oldFlashcards.examples.map((flashcard) =>
+              // Foreign Key lookup, form data in backend
+              flashcard.recordId === studentFlashcard.relatedExample
+                ? newFlashcard
+                : flashcard,
             );
 
             // Trim the arrays to match
@@ -617,10 +633,12 @@ export function useStudentFlashcards() {
         ['flashcardData', activeStudentId],
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
+          // Foreign Key lookup, form data in backend
           const studentFlashcard = oldFlashcardsCopy.find(
             (studentFlashcard) =>
               studentFlashcard.recordId === studentExampleId,
           );
+          // Foreign Key lookup, form data in backend
           const flashcard = oldFlashcards.examples.find(
             (flashcard) =>
               flashcard.recordId === studentFlashcard?.relatedExample,
@@ -633,15 +651,16 @@ export function useStudentFlashcards() {
             const newFlashcard: Flashcard = { ...flashcard, difficulty };
             const newStudentFlashcardsArray = oldFlashcardsCopy.map(
               (studentFlashcard) =>
+                // Foreign Key lookup, form data in backend
                 studentFlashcard.recordId === studentExampleId
                   ? newStudentFlashcard
                   : studentFlashcard,
             );
-            const newFlashcardsArray = oldFlashcards.examples.map(
-              (flashcard) =>
-                flashcard.recordId === studentFlashcard.relatedExample
-                  ? newFlashcard
-                  : flashcard,
+            const newFlashcardsArray = oldFlashcards.examples.map((flashcard) =>
+              // Foreign Key lookup, form data in backend
+              flashcard.recordId === studentFlashcard.relatedExample
+                ? newFlashcard
+                : flashcard,
             );
             const trimmedNewFlashcardData = matchAndTrimArrays({
               examples: newFlashcardsArray,
@@ -840,6 +859,7 @@ export function useStudentFlashcards() {
         (oldFlashcards: StudentFlashcardData) => {
           const oldFlashcardsCopy = [...oldFlashcards.examples];
           const oldStudentFlashcardsCopy = [...oldFlashcards.studentExamples];
+          // Foreign Key lookup, form data in backend
           const newStudentExampleArray = oldStudentFlashcardsCopy.filter(
             (studentExample) => !tempIds.includes(studentExample.recordId),
           );

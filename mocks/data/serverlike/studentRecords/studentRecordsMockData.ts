@@ -1,4 +1,4 @@
-import hardCodedMockData from './mockDataHardCoded.json' assert { type: 'json' };
+import hardCodedMockData from './mockDataHardCoded.json';
 
 import generateStudentRecordsMockData from './scripts/index';
 

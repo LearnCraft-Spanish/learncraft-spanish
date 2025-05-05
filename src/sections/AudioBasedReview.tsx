@@ -2,7 +2,7 @@ import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React, { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';

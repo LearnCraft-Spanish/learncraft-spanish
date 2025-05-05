@@ -1,7 +1,7 @@
 import type { mockUserNames } from 'src/types/interfaceDefinitions';
 
 import { renderHook, waitFor } from '@testing-library/react';
-import { examples } from 'mocks/data/examples.json' assert { type: 'json' };
+import { examples } from 'mocks/data/examples.json';
 import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { setupMockAuth } from 'tests/setupMockAuth';

@@ -1,8 +1,11 @@
 import type { Vocabulary } from '@LearnCraft-Spanish/shared';
+import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
+import {
+  normalizeQueryError,
+  queryDefaults,
+} from '@application/utils/queryUtils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { useVocabularyAdapter } from '../adapters/vocabularyAdapter';
-import { normalizeQueryError, queryDefaults } from '../utils/queryUtils';
 
 interface VocabularyPageResult {
   items: Vocabulary[];

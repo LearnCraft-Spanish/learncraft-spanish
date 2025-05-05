@@ -12,6 +12,8 @@ const courseList = [
     membershipType: 'Group Conversation',
     weeklyPrivateCalls: 0,
     hasGroupCalls: true,
+    weeklyTimeCommitmentMinutes: 15,
+    approxMonthlyCost: 0,
   },
   {
     recordId: 14,
@@ -19,6 +21,8 @@ const courseList = [
     membershipType: 'Private Coaching',
     weeklyPrivateCalls: 1,
     hasGroupCalls: true,
+    weeklyTimeCommitmentMinutes: 15,
+    approxMonthlyCost: 0,
   },
   // {
   //   recordId: 15,
@@ -54,6 +58,8 @@ const courseList = [
     membershipType: 'Weekly 1:1 Coaching ',
     weeklyPrivateCalls: 1,
     hasGroupCalls: false,
+    weeklyTimeCommitmentMinutes: 15,
+    approxMonthlyCost: 0,
   },
   // {
   //   recordId: 24,

@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react';
+import { use, useCallback } from 'react';
 import { DateRangeContext } from '../../components/Coaching/WeeksRecords/DateRangeContext';
 import * as helpers from './helperFunctions';
 import {
@@ -15,7 +15,7 @@ import {
 } from './queries';
 
 export default function useCoaching() {
-  const dateRangeContext = useContext(DateRangeContext);
+  const dateRangeContext = use(DateRangeContext);
 
   if (!dateRangeContext) {
     throw new Error('useCoaching must be used within a DateRangeProvider');
@@ -49,8 +49,14 @@ export default function useCoaching() {
   } = useGroupAttendees(startDate, endDate);
   const { coachListQuery } = useCoachList();
   const { courseListQuery } = useCourseList();
-  const { activeMembershipsQuery } = useActiveMemberships();
-  const { activeStudentsQuery } = useActiveStudents();
+  const { activeMembershipsQuery } = useActiveMemberships({
+    startDate,
+    endDate,
+  });
+  const { activeStudentsQuery } = useActiveStudents({
+    startDate,
+    endDate,
+  });
   const { studentRecordsLessonsQuery } = useStudentRecordsLessons();
 
   /*--------- Helper Functions ---------*/
@@ -63,6 +69,7 @@ export default function useCoaching() {
       ) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getCoachFromMembershipId(
         membershipId,
         activeMembershipsQuery.data,
@@ -82,6 +89,7 @@ export default function useCoaching() {
       if (!activeMembershipsQuery.data || !courseListQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getCourseFromMembershipId(
         membershipId,
         activeMembershipsQuery.data,
@@ -96,6 +104,7 @@ export default function useCoaching() {
       if (!activeMembershipsQuery.data || !activeStudentsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getStudentFromMembershipId(
         membershipId,
         activeMembershipsQuery.data,
@@ -110,6 +119,7 @@ export default function useCoaching() {
       if (!groupAttendeesQuery.data || !weeksQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getAttendeeWeeksFromGroupSessionId(
         sessionId,
         groupAttendeesQuery.data,
@@ -124,6 +134,7 @@ export default function useCoaching() {
       if (!groupAttendeesQuery.data || !groupSessionsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getGroupSessionsFromWeekRecordId(
         weekRecordId,
         groupAttendeesQuery.data,
@@ -138,6 +149,7 @@ export default function useCoaching() {
       if (!assignmentsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getAssignmentsFromWeekRecordId(
         weekRecordId,
         assignmentsQuery.data,
@@ -151,6 +163,7 @@ export default function useCoaching() {
       if (!activeMembershipsQuery.data || !weeksQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getMembershipFromWeekRecordId(
         weekId,
         weeksQuery.data,
@@ -165,6 +178,7 @@ export default function useCoaching() {
       if (!privateCallsQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getPrivateCallsFromWeekRecordId(
         weekId,
         privateCallsQuery.data,
@@ -178,12 +192,27 @@ export default function useCoaching() {
       if (!groupAttendeesQuery.data) {
         return null;
       }
+      // Foreign Key lookup, form data in backend
       return helpers.getAttendeesFromGroupSessionId(
         sessionId,
         groupAttendeesQuery.data,
       );
     },
     [groupAttendeesQuery.data],
+  );
+
+  // get group sessions & attendees for a week
+  const getGroupSessionsAndAttendeesForWeek = useCallback(
+    (weekId: number) => {
+      // Foreign Key lookup, form data in backend
+      const groupSessions = getGroupSessionsFromWeekRecordId(weekId);
+      const structuredGroupSessions = groupSessions?.map((session) => ({
+        ...session,
+        attendees: getAttendeesFromGroupSessionId(session.recordId) || [],
+      }));
+      return structuredGroupSessions;
+    },
+    [getGroupSessionsFromWeekRecordId, getAttendeesFromGroupSessionId],
   );
 
   return {
@@ -209,6 +238,7 @@ export default function useCoaching() {
     getMembershipFromWeekRecordId,
     getPrivateCallsFromWeekRecordId,
     getAttendeesFromGroupSessionId,
+    getGroupSessionsAndAttendeesForWeek,
 
     // Mutations
     createAssignmentMutation,

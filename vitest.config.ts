@@ -16,6 +16,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
         exclude: [
           '**/node_modules/**',
           '**/mocks/**',
+          '**/src/hexagon/**',
           '**/.stryker-tmp/**',
           'useAuth.ts',
         ],

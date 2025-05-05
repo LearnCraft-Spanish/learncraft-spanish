@@ -33,6 +33,7 @@ function generateCall({
     date: callDate,
     caller,
     callType: Math.random() < 0.2 ? callTypes[1] : callTypes[0],
+    weekName: week.weekName,
   };
 }
 

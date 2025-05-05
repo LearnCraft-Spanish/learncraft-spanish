@@ -4,19 +4,15 @@ import type {
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
 import type { TableHook } from '../units/pasteTable/types';
+import {
+  CreateNonVerbVocabularySchema,
+  validateWithSchema,
+} from '@LearnCraft-Spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
+import { useVocabularyTable } from '../implementations/vocabularyTable/useVocabularyTable';
 import { useSubcategories } from '../units/useSubcategories';
 import { useVocabulary } from '../units/useVocabulary';
 import { useVocabularyPage } from '../units/useVocabularyPage';
-import { useVocabularyTable } from '../units/useVocabularyTable';
-
-// Define VocabularyTableData to match what's in useVocabularyTable
-export interface VocabularyTableData {
-  descriptor: string;
-  frequency: number;
-  spellings: string;
-  notes?: string;
-}
 
 // Define pagination state for current vocabulary view
 export interface VocabularyPaginationState {
@@ -34,7 +30,7 @@ export interface VocabularyPaginationState {
   goToPreviousPage: () => void;
 }
 
-interface UseNonVerbCreationResult {
+export interface UseNonVerbCreationResult {
   // Subcategory selection
   nonVerbSubcategories: Subcategory[];
   loadingSubcategories: boolean;
@@ -46,33 +42,13 @@ interface UseNonVerbCreationResult {
   creationError: Error | null;
 
   // Table hook API - exposed through the façade
-  tableHook: TableHook<VocabularyTableData>;
+  tableHook: TableHook<CreateNonVerbVocabulary>;
 
   // Unified save action that handles validation, table save, and creation
   saveVocabulary: () => Promise<boolean>;
 
   // Vocabulary list for currently selected subcategory
   currentVocabularyPagination: VocabularyPaginationState | null;
-}
-
-/**
- * Maps a VocabularyEntry from the table to a CreateNonVerbVocabulary command
- * Extracts the word from the descriptor if needed
- */
-function mapEntryToCommand(
-  entry: VocabularyTableData,
-  subcategoryId: string,
-): CreateNonVerbVocabulary {
-  // Extract word from descriptor format "word: description (context)"
-  const word = entry.descriptor.split(':')[0]?.trim() || '';
-
-  return {
-    word,
-    descriptor: entry.descriptor,
-    subcategoryId: Number(subcategoryId),
-    frequency: entry.frequency,
-    notes: entry.notes || undefined,
-  };
 }
 
 /**
@@ -186,7 +162,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
 
   // Create vocabulary batch - internal implementation
   const createVocabularyBatch = useCallback(
-    async (data: VocabularyTableData[]) => {
+    async (data: CreateNonVerbVocabulary[]) => {
       if (!selectedSubcategoryId) {
         setCreationError(new Error('No subcategory selected'));
         return false;
@@ -195,12 +171,34 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
       try {
         setCreationError(null);
 
-        // Map table entries to proper domain commands
-        const commands = data.map((entry) =>
-          mapEntryToCommand(entry, selectedSubcategoryId),
-        );
+        // Validate all entries before processing
+        const validationErrors: string[] = [];
+        data.forEach((entry, index) => {
+          const command = {
+            ...entry,
+            subcategoryId: Number(selectedSubcategoryId),
+          };
+          const result = validateWithSchema(
+            CreateNonVerbVocabularySchema,
+            command,
+          );
+          if (!result.isValid) {
+            validationErrors.push(
+              `Row ${index + 1}: ${result.errors.join(', ')}`,
+            );
+          }
+        });
+
+        if (validationErrors.length > 0) {
+          throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
+        }
 
         // Use our new vocabulary unit to create the batch
+        const commands = data.map((entry) => ({
+          ...entry,
+          subcategoryId: Number(selectedSubcategoryId),
+        }));
+
         await createBatch(commands);
         return true;
       } catch (err) {

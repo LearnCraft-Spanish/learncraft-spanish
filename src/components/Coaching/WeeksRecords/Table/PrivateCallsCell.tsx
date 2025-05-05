@@ -1,11 +1,10 @@
-import type { PrivateCall, Week } from 'src/types/CoachingTypes';
-import React, { useState } from 'react';
-import ContextualControls from 'src/components/ContextualControls';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
-import { useUserData } from 'src/hooks/UserData/useUserData';
-
+import type { PrivateCall, Student, Week } from 'src/types/CoachingTypes';
+import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
+import React, { useEffect, useMemo, useState } from 'react';
+import x_dark from 'src/assets/icons/x_dark.svg';
+import CustomStudentSelector from 'src/components/Coaching/general/CustomStudentSelector';
+import getDateRange from 'src/components/Coaching/general/functions/dateRange';
+import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   CoachDropdown,
   DateInput,
@@ -14,9 +13,15 @@ import {
   FormControls,
   LinkInput,
   TextAreaInput,
-} from '../../general';
-
-import verifyRequiredInputs from '../../general/functions/inputValidation';
+  verifyRequiredInputs,
+} from 'src/components/FormComponents';
+import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
+import { toReadableMonthDay } from 'src/functions/dateUtils';
+import { useWeeks } from 'src/hooks/CoachingData/queries';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useModal } from 'src/hooks/useModal';
+import { useUserData } from 'src/hooks/UserData/useUserData';
 
 const ratingOptions = [
   'Excellent',
@@ -29,7 +34,13 @@ const ratingOptions = [
   'No-Show',
 ];
 const callTypeOptions = ['Monthly Call', 'Uses Credit (Bundle)'];
-function PrivateCallInstance({ call }: { call: PrivateCall }) {
+function PrivateCallInstance({
+  call,
+  tableEditMode,
+}: {
+  call: PrivateCall;
+  tableEditMode: boolean;
+}) {
   const { openContextual, contextual } = useContextualMenu();
 
   return (
@@ -40,15 +51,24 @@ function PrivateCallInstance({ call }: { call: PrivateCall }) {
       >
         {call.rating}
       </button>
-      {contextual === `call${call.recordId}` && <PrivateCallView call={call} />}
+      {contextual === `call${call.recordId}` && (
+        <PrivateCallView call={call} tableEditMode={tableEditMode} />
+      )}
     </div>
   );
 }
 
-function PrivateCallView({ call }: { call: PrivateCall }) {
+export function PrivateCallView({
+  call,
+  tableEditMode,
+  onSuccess,
+}: {
+  call: PrivateCall;
+  tableEditMode?: boolean;
+  onSuccess?: () => void;
+}) {
   const userDataQuery = useUserData();
-  const { setContextualRef, updateDisableClickOutside, closeContextual } =
-    useContextualMenu();
+  const { updateDisableClickOutside, closeContextual } = useContextualMenu();
   const {
     getStudentFromMembershipId,
     getMembershipFromWeekRecordId,
@@ -116,9 +136,18 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
       });
       return;
     }
+    if (recording && !isValidUrl(recording)) {
+      openModal({
+        title: 'Error',
+        body: 'Recording Link must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
     updatePrivateCallMutation.mutate(
       {
-        ...call,
+        recordId: call.recordId,
+        relatedWeek: call.relatedWeek,
         rating,
         notes,
         areasOfDifficulty,
@@ -130,6 +159,7 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
       {
         onSuccess: () => {
           disableEditMode();
+          onSuccess?.();
         },
       },
     );
@@ -141,6 +171,7 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
         closeModal();
         cancelEdit();
         closeContextual();
+        onSuccess?.();
       },
     });
   }
@@ -164,106 +195,161 @@ function PrivateCallView({ call }: { call: PrivateCall }) {
   }
 
   return (
-    <div className="contextualWrapper">
-      <div className="contextual" ref={setContextualRef}>
-        <ContextualControls editFunction={toggleEditMode} />
-        {editMode ? (
-          <h4>Edit Call</h4>
-        ) : (
-          <h4>
+    <ContextualView editFunction={tableEditMode ? undefined : toggleEditMode}>
+      {editMode ? (
+        <h4>Edit Call</h4>
+      ) : (
+        <h4>
+          {
+            // Foreign Key lookup, orm data in backend
+            getStudentFromMembershipId(
+              getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
+            )?.fullName
+          }{' '}
+          on {typeof call.date === 'string' ? call.date : call.date.toString()}
+        </h4>
+      )}
+      {editMode && (
+        <div className="lineWrapper">
+          <p className="label">Student: </p>
+          <p>
             {
+              // Foreign Key lookup, form data in backend
               getStudentFromMembershipId(
                 getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
               )?.fullName
-            }{' '}
-            on{' '}
-            {typeof call.date === 'string' ? call.date : call.date.toString()}
-          </h4>
-        )}
-        {editMode && (
-          <div className="lineWrapper">
-            <p className="label">Student: </p>
-            <p>
-              {
-                getStudentFromMembershipId(
-                  getMembershipFromWeekRecordId(call.relatedWeek)?.recordId,
-                )?.fullName
-              }
-            </p>
-          </div>
-        )}
+            }
+          </p>
+        </div>
+      )}
 
-        <CoachDropdown
-          label="Caller"
-          coachEmail={caller}
-          onChange={setCaller}
-          editMode={editMode}
-        />
+      <CoachDropdown
+        label="Caller"
+        coachEmail={caller}
+        onChange={setCaller}
+        editMode={editMode}
+      />
 
-        {editMode && <DateInput value={date} onChange={setDate} />}
+      {editMode && <DateInput value={date} onChange={setDate} />}
 
-        <Dropdown
-          label="Rating"
-          value={rating}
-          onChange={setRating}
-          options={ratingOptions}
-          editMode={editMode}
-        />
+      <Dropdown
+        label="Rating"
+        value={rating}
+        onChange={setRating}
+        options={ratingOptions}
+        editMode={editMode}
+      />
 
-        <TextAreaInput
-          label="Notes"
-          value={notes}
-          onChange={setNotes}
-          editMode={editMode}
-        />
+      <TextAreaInput
+        label="Notes"
+        value={notes}
+        onChange={setNotes}
+        editMode={editMode}
+      />
 
-        <TextAreaInput
-          label="Difficulties"
-          value={areasOfDifficulty}
-          onChange={setAreasOfDifficulty}
-          editMode={editMode}
-        />
+      <TextAreaInput
+        label="Difficulties"
+        value={areasOfDifficulty}
+        onChange={setAreasOfDifficulty}
+        editMode={editMode}
+      />
 
-        <LinkInput
-          label="Recording Link"
-          value={recording}
-          onChange={setRecording}
-          editMode={editMode}
-        />
+      <LinkInput
+        label="Recording Link"
+        value={recording}
+        onChange={setRecording}
+        editMode={editMode}
+      />
 
-        <Dropdown
-          label="Call Type"
-          value={callType}
-          onChange={setCallType}
-          options={callTypeOptions}
-          editMode={editMode}
-        />
+      <Dropdown
+        label="Call Type"
+        value={callType}
+        onChange={setCallType}
+        options={callTypeOptions}
+        editMode={editMode}
+      />
 
-        {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
-          <DeleteRecord deleteFunction={deleteRecordFunction} />
-        )}
+      {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
+        <DeleteRecord deleteFunction={deleteRecordFunction} />
+      )}
 
-        <FormControls
-          captureSubmitForm={captureSubmitForm}
-          cancelEdit={cancelEdit}
-          editMode={editMode}
-        />
-      </div>
-    </div>
+      <FormControls
+        captureSubmitForm={captureSubmitForm}
+        cancelEdit={cancelEdit}
+        editMode={editMode}
+      />
+    </ContextualView>
   );
 }
 
 export default function PrivateCallsCell({
   week,
   calls,
+  tableEditMode,
+  student,
 }: {
   week: Week;
   calls: PrivateCall[] | null;
+  tableEditMode: boolean;
+  student?: Student | undefined | null;
+}) {
+  const { contextual, openContextual } = useContextualMenu();
+  return (
+    <div className="callBox">
+      {/* Existing Calls */}
+      {calls &&
+        calls.map((call) => (
+          <PrivateCallInstance
+            key={call.recordId}
+            call={call}
+            tableEditMode={tableEditMode}
+          />
+        ))}
+      {/* New Call Form */}
+      {!tableEditMode && (
+        <button
+          type="button"
+          className="greenButton"
+          onClick={() => openContextual(`addPrivateCall${week.recordId}`)}
+        >
+          New
+        </button>
+      )}
+      {contextual === `addPrivateCall${week.recordId}` && (
+        <NewPrivateCallView
+          weekStartsDefaultValue={
+            typeof week.weekStarts === 'string'
+              ? week.weekStarts
+              : week.weekStarts.toISOString()
+          }
+          studentObj={{
+            studentFullname: student?.fullName || '',
+            relatedWeek: week,
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
+export function NewPrivateCallView({
+  onSuccess,
+  weekStartsDefaultValue,
+  studentObj,
+}: {
+  onSuccess?: () => void;
+  weekStartsDefaultValue: string;
+  studentObj?:
+    | {
+        studentFullname: string;
+        relatedWeek: Week;
+      }
+    | undefined
+    | null;
 }) {
   const { getStudentFromMembershipId, createPrivateCallMutation } =
     useCoaching();
-  const { contextual, setContextualRef, openContextual, closeContextual } =
-    useContextualMenu();
+  const { closeContextual } = useContextualMenu();
   const userDataQuery = useUserData();
   const { openModal } = useModal();
 
@@ -277,6 +363,24 @@ export default function PrivateCallsCell({
   const [areasOfDifficulty, setAreasOfDifficulty] = useState('');
   const [recording, setRecording] = useState('');
   const [callType, setCallType] = useState('Monthly Call');
+
+  const [student, setStudent] = useState<
+    | {
+        studentFullname: string;
+        relatedWeek: Week;
+      }
+    | undefined
+  >(undefined);
+
+  const [numWeeks, setNumWeeks] = useState(4);
+  const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
+  const weekEnds = useMemo(() => getWeekEnds(weekStarts), [weekStarts]);
+  const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
+  const { weeksQuery } = useWeeks(weekStarts, weekEnds);
+
+  const handleLoadMore = () => {
+    setNumWeeks((prev) => prev * 2);
+  };
 
   function createNewPrivateCall() {
     // Verify inputs
@@ -293,10 +397,25 @@ export default function PrivateCallsCell({
       });
       return;
     }
-
+    if (recording && !isValidUrl(recording)) {
+      openModal({
+        title: 'Error',
+        body: 'Recording Link must be a valid url',
+        type: 'error',
+      });
+      return;
+    }
+    if (!student) {
+      openModal({
+        title: 'Error',
+        body: 'Please select a student',
+        type: 'error',
+      });
+      return;
+    }
     createPrivateCallMutation.mutate(
       {
-        relatedWeek: week.recordId,
+        relatedWeek: student?.relatedWeek.recordId,
         rating,
         notes,
         areasOfDifficulty,
@@ -317,88 +436,173 @@ export default function PrivateCallsCell({
           setDate(new Date(Date.now()).toISOString().split('T')[0]);
           setCaller(userDataQuery.data?.emailAddress || '');
           setCallType('Monthly Call');
+
+          onSuccess?.();
         },
       },
     );
   }
+  const updateStudent = (relatedWeekId: number) => {
+    if (!weeksQuery.data) {
+      console.error('No weeks found');
+      return;
+    }
+    const studentWeek = weeksQuery.data.find(
+      (week: Week) => week.recordId === relatedWeekId,
+    );
+    if (!studentWeek) {
+      console.error('No student found with recordId:', relatedWeekId);
+      return;
+    }
+    // Foreign Key lookup, form data in backend
+    setStudent({
+      studentFullname:
+        getStudentFromMembershipId(studentWeek.relatedMembership)?.fullName ||
+        '',
+      relatedWeek: studentWeek,
+    });
+  };
+
+  const updateWeekStarts = (value: string) => {
+    if (value === 'loadMore') {
+      handleLoadMore();
+      return; // Don't update the selected value
+    }
+    setStudent(undefined);
+    setWeekStarts(value);
+  };
+
+  useEffect(() => {
+    if (studentObj && studentObj.studentFullname.length > 0) {
+      setStudent(studentObj);
+    }
+  }, [studentObj]);
 
   return (
-    <div className="callBox">
-      {/* Existing Calls */}
-      {calls &&
-        calls.map((call) => (
-          <PrivateCallInstance key={call.recordId} call={call} />
-        ))}
-      {/* New Call Form */}
-      <button
-        type="button"
-        className="greenButton"
-        onClick={() => openContextual(`addPrivateCall${week.recordId}`)}
-      >
-        New
-      </button>
-      {contextual === `addPrivateCall${week.recordId}` && (
-        <div className="contextualWrapper callPopup">
-          <div className="contextual" ref={setContextualRef}>
-            <ContextualControls />
-            <h4>
-              {getStudentFromMembershipId(week.relatedMembership)?.fullName} on{' '}
-              {new Date(Date.now()).toISOString().split('T')[0]}
-            </h4>
-            <Dropdown
-              label="Rating"
-              value={rating}
-              onChange={setRating}
-              options={ratingOptions}
-              editMode
-            />
-
-            <CoachDropdown
-              label="Caller"
-              coachEmail={caller}
-              onChange={setCaller}
-              editMode
-            />
-
-            <DateInput value={date} onChange={setDate} />
-
-            <TextAreaInput
-              label="Notes"
-              value={notes}
-              onChange={setNotes}
-              editMode
-            />
-
-            <TextAreaInput
-              label="Difficulties"
-              value={areasOfDifficulty}
-              onChange={setAreasOfDifficulty}
-              editMode
-            />
-
-            <LinkInput
-              label="Recording Link"
-              value={recording}
-              onChange={setRecording}
-              editMode
-            />
-
-            <Dropdown
-              label="Call Type"
-              value={callType}
-              onChange={setCallType}
-              options={callTypeOptions}
-              editMode
-            />
-
-            <FormControls
-              captureSubmitForm={createNewPrivateCall}
-              cancelEdit={() => closeContextual()}
-              editMode
-            />
+    <ContextualView>
+      {!studentObj ? (
+        <>
+          <div className="lineWrapper">
+            <label className="label" htmlFor="weekStarts">
+              Week Starts:
+            </label>
+            <select
+              id="weekStarts"
+              className="content"
+              value={weekStarts}
+              onChange={(e) => updateWeekStarts(e.target.value)}
+            >
+              {Array.from({ length: numWeeks }, (_, i) => {
+                const dateKey =
+                  i === 0
+                    ? 'thisWeekDate'
+                    : i === 1
+                      ? 'lastSundayDate'
+                      : i === 2
+                        ? 'twoSundaysAgoDate'
+                        : `${i + 1}SundaysAgoDate`;
+                const date = dateRange[dateKey];
+                const label =
+                  i === 0
+                    ? 'This Week'
+                    : i === 1
+                      ? 'Last Week'
+                      : i === 2
+                        ? 'Two Weeks Ago'
+                        : toReadableMonthDay(date);
+                return (
+                  <option key={date} value={date}>
+                    {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+                  </option>
+                );
+              })}
+              <option value="loadMore" className="loadMoreOption">
+                Load More...
+              </option>
+            </select>
           </div>
-        </div>
+          <div className="lineWrapper">
+            <label className="label" htmlFor="student">
+              Student:
+            </label>
+
+            {student ? (
+              <>
+                <div className="content">{student.studentFullname}</div>
+                <button
+                  type="button"
+                  className="clearStudent"
+                  onClick={() => setStudent(undefined)}
+                >
+                  <img src={x_dark} alt="close" />
+                </button>
+              </>
+            ) : (
+              <CustomStudentSelector
+                weekStarts={weekStarts}
+                onChange={updateStudent}
+              />
+            )}
+          </div>
+        </>
+      ) : (
+        <Dropdown
+          label="Student"
+          value={student?.studentFullname}
+          onChange={() => {}}
+          options={[student?.studentFullname || '']}
+          editMode={false}
+        />
       )}
-    </div>
+
+      <Dropdown
+        label="Rating"
+        value={rating}
+        onChange={setRating}
+        options={ratingOptions}
+        editMode
+        required
+      />
+
+      <CoachDropdown
+        label="Caller"
+        coachEmail={caller}
+        onChange={setCaller}
+        editMode
+        required
+      />
+
+      <DateInput value={date} onChange={setDate} required />
+
+      <TextAreaInput label="Notes" value={notes} onChange={setNotes} editMode />
+
+      <TextAreaInput
+        label="Difficulties"
+        value={areasOfDifficulty}
+        onChange={setAreasOfDifficulty}
+        editMode
+      />
+
+      <LinkInput
+        label="Recording Link"
+        value={recording}
+        onChange={setRecording}
+        editMode
+      />
+
+      <Dropdown
+        label="Call Type"
+        value={callType}
+        onChange={setCallType}
+        options={callTypeOptions}
+        editMode
+      />
+
+      <FormControls
+        captureSubmitForm={createNewPrivateCall}
+        cancelEdit={() => closeContextual()}
+        editMode
+      />
+    </ContextualView>
   );
 }

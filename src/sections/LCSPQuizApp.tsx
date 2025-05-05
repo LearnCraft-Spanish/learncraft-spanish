@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import MenuButton from 'src/components/Buttons/MenuButton';
-import Loading from 'src/components/Loading';
+import { Loading } from 'src/components/Loading';
 import OfficialQuiz from 'src/components/Quizzing/OfficialQuizzing/OfficialQuiz';
 import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';

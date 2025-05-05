@@ -109,7 +109,7 @@
 }
 
 /* ------------------ Add Adding Remove Custom ------------------ */
-.customLabel {
+button.label.customLabel {
   text-align: center;
   font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
   font-weight: 600;
@@ -122,12 +122,12 @@
   justify-content: center;
   align-items: center;
   color: var(--light);
-  background-color: var(--theme);
+  background-color: var(--brand);
 }
 
-.customLabel:hover {
+button.label.customLabel:hover {
   cursor: default;
-  background-color: var(--theme);
+  background-color: var(--brand);
 }
 
 .customLabel h4 {

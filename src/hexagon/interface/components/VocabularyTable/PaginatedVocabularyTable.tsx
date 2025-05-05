@@ -90,9 +90,7 @@ export function PaginatedVocabularyTable({
             {vocabularyItems.map((item) => (
               <tr key={item.id}>
                 <td>{item.word}</td>
-                <td>
-                  {item.descriptor.split(':')[1]?.trim() || item.descriptor}
-                </td>
+                <td>{item.descriptor}</td>
                 <td>{item.spellings?.map((s) => s.value).join(', ') || ''}</td>
                 <td>{item.notes || ''}</td>
               </tr>

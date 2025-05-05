@@ -4,8 +4,8 @@ import type {
   StudentFlashcardData,
   UserData,
 } from 'src/types/interfaceDefinitions';
-import mockDbData from './mockDbData.json' assert { type: 'json' };
-import mockLessonData from './mockLessonData.json' assert { type: 'json' };
+import mockDbData from './mockDbData.json';
+import mockLessonData from './mockLessonData.json';
 
 export const sampleStudent: UserData = mockDbData.sampleStudent as UserData;
 

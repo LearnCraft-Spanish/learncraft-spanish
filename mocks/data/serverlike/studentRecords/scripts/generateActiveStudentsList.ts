@@ -60,6 +60,15 @@ function generateActiveStudentsData({
           ? exampleStartingLevels[Math.floor(Math.random() * 8)]
           : '',
       primaryCoach: coachList[i % coachList.length].user,
+      relatedCoach: coachList[i % coachList.length].user.id,
+      pronoun: '',
+      learningDisabilities: '',
+      billingEmail: '',
+      billingNotes: '',
+      firstSubscribed: '',
+      advancedStudent: false,
+      active: true,
+      usPhone: 1234567890,
     };
     studentsList.push(student);
   }
