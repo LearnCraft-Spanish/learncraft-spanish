@@ -123,6 +123,7 @@ export type Coach = Expanded<{
   recordId: number;
   coach: string;
   user: QbUser;
+  coachUserName: string;
 }>;
 
 export type PrivateCall = Expanded<{
@@ -170,4 +171,10 @@ export interface WeekWithRelations extends Week {
   assignments: Assignment[];
   privateCalls: PrivateCall[];
   groupSessions: GroupSessionWithAttendees[];
+}
+
+export interface Report {
+  title: string;
+  headers: string[];
+  data: any[];
 }

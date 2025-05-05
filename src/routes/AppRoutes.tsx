@@ -14,6 +14,7 @@ import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import FrequensayPage from '../hexagon/interface/pages/FrequensayPage';
 import { VocabularyCreatorPage } from '../hexagon/interface/pages/VocabularyCreatorPage';
@@ -134,6 +135,7 @@ export default function AppRoutes() {
         <Route path="quizzes" element={<QuizzesTable />} />
       </Route>
       <Route path="/*" element={<NotFoundPage />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </SentryRoutes>
   );
 }

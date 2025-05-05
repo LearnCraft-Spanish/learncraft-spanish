@@ -9,7 +9,13 @@
     "paths": {
       "src/*": ["./src/*"],
       "mocks/*": ["./mocks/*"],
-      "tests/*": ["./tests/*"]
+      "tests/*": ["./tests/*"],
+
+      "@domain/*": ["./src/hexagon/domain/*"],
+      "@application/*": ["./src/hexagon/application/*"],
+      "@infrastructure/*": ["./src/hexagon/infrastructure/*"],
+      "@interface/*": ["./src/hexagon/interface/*"],
+      "@testing/*": ["./src/hexagon/testing/*"]
     },
     "resolveJsonModule": true,
     "types": ["vitest", "node", "msw"],
@@ -22,6 +28,12 @@
     "isolatedModules": true,
     "skipLibCheck": true
   },
-  "include": ["src", "tests", "vite-env.d.ts", "mocks"],
+  "include": [
+    "src",
+    "tests",
+    "vite-env.d.ts",
+    "mocks",
+    "eslint-rules/no-untyped-mocks.ts"
+  ],
   "exclude": ["node_modules", "src/components/Coaching/old/**/*"]
 }

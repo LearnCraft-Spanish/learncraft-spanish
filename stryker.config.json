@@ -3,19 +3,20 @@
   "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
   "packageManager": "pnpm",
   "mutate": [
-    "src/hooks/**/*.{ts,tsx}",
-    "src/sections/**/*.{ts,tsx}",
-    "src/components/**/*.{ts,tsx}",
-    "!**/*.test.{ts,tsx}"
+    "src/hexagon/**/*.{ts,tsx}",
+    "!**/*.test.{ts,tsx}",
+    "!**/*.mock.{ts,tsx}",
+    "!**/*.stub.{ts,tsx}",
+    "!**/*.constants.{ts,tsx}"
   ],
   "testRunner": "vitest",
   "checkers": ["typescript"],
   "ignoreStatic": true,
   "vitest": {
-    "configFile": "vitest.config-mutations.ts"
+    "configFile": "vitest.config-hexagon.ts"
   },
   "reporters": ["html", "clear-text", "progress"],
-  "timeoutMS": 20000,
+  "timeoutMS": 5000,
   "dryRunTimeoutMinutes": 15,
   "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/vitest-runner for information about the vitest plugin.",
   "coverageAnalysis": "perTest",

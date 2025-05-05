@@ -14,8 +14,8 @@ export default defineConfig(({ mode }) => {
 
   // Access the environment variable with proper typing
   const port =
-    env.VITE_ENVIRONMENT === 'development'
-      ? Number.parseInt(env.VITE_PORT || '3010', 10)
+    env.VITE_ENVIRONMENT === 'development' || env.VITE_ENVIRONMENT === 'staging'
+      ? Number.parseInt(env.VITE_PORT || '3000', 10)
       : undefined;
 
   return {
@@ -38,6 +38,16 @@ export default defineConfig(({ mode }) => {
         src: path.resolve(__dirname, './src'),
         mocks: path.resolve(__dirname, './mocks'),
         tests: path.resolve(__dirname, './tests'),
+
+        // Hexagonal architecture layers
+        '@domain': path.resolve(__dirname, './src/hexagon/domain'),
+        '@application': path.resolve(__dirname, './src/hexagon/application'),
+        '@infrastructure': path.resolve(
+          __dirname,
+          './src/hexagon/infrastructure',
+        ),
+        '@interface': path.resolve(__dirname, './src/hexagon/interface'),
+        '@testing': path.resolve(__dirname, './src/hexagon/testing'),
       },
     },
     server: {

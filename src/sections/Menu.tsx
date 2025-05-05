@@ -142,6 +142,11 @@ export default function Menu() {
             <>
               <h3>Admin Tools</h3>
               <div className="buttonBox">
+                <Link className="linkButton" to="/admin-dashboard">
+                  Admin Dashboard
+                </Link>
+              </div>
+              <div className="buttonBox">
                 <Link className="linkButton" to="/examplemanager">
                   Example Manager
                 </Link>

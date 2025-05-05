@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: development
+          ref: staging
 
       # Set up Node.js environment
       - name: Set up Node.js environment
@@ -35,8 +35,9 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run:
-          pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+        env:
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
           # Restore the mock data cache
       - name: Restore mock data cache
