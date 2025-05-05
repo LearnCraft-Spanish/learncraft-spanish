@@ -17,13 +17,17 @@ export default function StudentSearch() {
     return studentListQuery.isSuccess
       ? studentListQuery.data
           .map((student) => {
-            const studentEmail = student.emailAddress;
+            const studentEmail = student.emailAddress
+              ? student.emailAddress
+              : 'No email address';
             const studentRole = student.role;
             const studentName = student.name
-              .toLowerCase()
-              .split(' ')
-              .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-              .join(' ');
+              ? student.name
+                  .toLowerCase()
+                  .split(' ')
+                  .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+                  .join(' ')
+              : 'No name';
             if (
               !studentEmail.includes('(') &&
               (studentRole === 'student' || studentRole === 'limited')

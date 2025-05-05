@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
 
   // Access the environment variable with proper typing
   const port =
-    env.VITE_ENVIRONMENT === 'development'
+    env.VITE_ENVIRONMENT === 'development' || env.VITE_ENVIRONMENT === 'staging'
       ? Number.parseInt(env.VITE_PORT || '3000', 10)
       : undefined;
 

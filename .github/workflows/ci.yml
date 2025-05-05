@@ -6,12 +6,16 @@ on:
   # development branch will accept regardless of the status of the jobs
   pull_request:
     branches:
+      - staging
       - development
       - master
+      - main
   push:
     branches:
+      - staging
       - development
       - master
+      - main
   workflow_dispatch:
 
 jobs:
