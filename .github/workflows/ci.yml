@@ -205,3 +205,66 @@ jobs:
         run: pnpm run test
         env:
           VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
+  test-hexagon:
+    runs-on: ubuntu-latest
+    needs: [format, typecheck, lint]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js environment
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm@9.7
+
+      # Cache Node.js dependencies
+      - name: Cache Node.js dependencies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: cache-node-modules-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            cache-node-modules-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install
+        env:
+          # Suppress context access warning
+          # Context access is safe in this case
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
+
+      # Restore the mock data cache
+      - name: Restore mock data cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ./mocks/data/serverlike/actualServerData.json
+          key: mockdata-${{ hashFiles('./mocks/data/serverlike/actualServerData.json') }}
+          restore-keys: |
+            mockdata-
+
+      # Fetch mock data if cache miss
+      - name: Fetch mock data if cache miss
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pnpm exec tsx .github/workflows/update-cache.ts
+        env:
+          # Suppress context access warning
+          # Context access is safe in this case
+          AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+          AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+          AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+          BACKEND_URL: ${{ secrets.BACKEND_URL }}
+
+        # Run the test suite
+      - name: Run tests in hexagon
+        run: pnpm run test:hexagon
+        env:
+          VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
