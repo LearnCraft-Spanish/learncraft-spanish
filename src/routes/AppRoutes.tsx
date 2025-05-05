@@ -15,7 +15,7 @@ import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import DatabaseTables from 'src/sections/DatabaseTables';
-import FrequenSayPage from '../hexagon/interface/pages/FrequenSayPage';
+import FrequensayPage from '../hexagon/interface/pages/FrequensayPage';
 import { VocabularyCreatorPage } from '../hexagon/interface/pages/VocabularyCreatorPage';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
@@ -76,7 +76,7 @@ export default function AppRoutes() {
         element={
           (userDataQuery.data?.roles.adminRole === 'coach' ||
             userDataQuery.data?.roles.adminRole === 'admin') && (
-            <FrequenSayPage />
+            <FrequensayPage />
           )
         }
       />

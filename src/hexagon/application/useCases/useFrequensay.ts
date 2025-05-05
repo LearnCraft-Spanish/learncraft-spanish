@@ -9,6 +9,8 @@ export function useFrequensay() {
     useSelectedLesson();
   const {
     userAddedVocabulary,
+    setUserAddedVocabulary,
+
     addManualVocabulary,
     disableManualVocabulary,
     enableManualVocabulary,
@@ -61,6 +63,7 @@ export function useFrequensay() {
   function updateUserAddedVocabulary(newInput: string) {
     const vocabWordCount = countVocabularyWords(newInput);
     const uniqueWordsWithCounts = vocabWordCount[0];
+    setUserAddedVocabulary(newInput);
     setExtraAcceptableWords(uniqueWordsWithCounts);
     return uniqueWordsWithCounts;
   }
