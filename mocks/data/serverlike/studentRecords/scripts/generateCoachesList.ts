@@ -36,6 +36,7 @@ function generateCoachList({
         id: generateFakeQBId(),
         name: data.fullName,
       },
+      coachUserName: data.fullName,
     };
     coaches.push(coach);
   }
