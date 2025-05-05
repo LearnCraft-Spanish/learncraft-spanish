@@ -123,6 +123,7 @@ export type Coach = Expanded<{
   recordId: number;
   coach: string;
   user: QbUser;
+  coachUserName: string;
 }>;
 
 export type PrivateCall = Expanded<{
