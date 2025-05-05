@@ -10,18 +10,12 @@
     "!**/*.constants.{ts,tsx}"
   ],
   "testRunner": "vitest",
-  "checkers": [
-    "typescript"
-  ],
+  "checkers": ["typescript"],
   "ignoreStatic": true,
   "vitest": {
     "configFile": "vitest.config-hexagon.ts"
   },
-  "reporters": [
-    "html",
-    "clear-text",
-    "progress"
-  ],
+  "reporters": ["html", "clear-text", "progress"],
   "timeoutMS": 5000,
   "dryRunTimeoutMinutes": 15,
   "testRunner_comment": "Take a look at https://stryker-mutator.io/docs/stryker-js/vitest-runner for information about the vitest plugin.",
