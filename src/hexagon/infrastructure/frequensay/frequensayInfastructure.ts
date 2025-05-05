@@ -14,10 +14,14 @@ export function createFrequensayInfrastructure(
     getSpellingsKnownForLesson: async (
       data: getSpellingsKnownForLessonParams,
     ) => {
+      const lessonFromNumber = data.lessonFromNumber.toString()
+        ? data.lessonFromNumber.toString()
+        : '';
       const formattedCourseName = data.courseName.replace(' ', '+');
       const path = frequensayEndpoints.getSpellingsKnownForLesson.path
         .replace(':courseName', formattedCourseName)
-        .replace(':lessonNumber', data.lessonNumber.toString());
+        .replace(':lessonToNumber', data.lessonToNumber.toString())
+        .replace(':lessonFromNumber', lessonFromNumber);
 
       const response = await httpClient.get<string[]>(path);
       return response;

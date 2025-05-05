@@ -1,17 +1,14 @@
 import type { WordCount } from '../types/frequensay';
-import { useQuery } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { useFrequensayAdapter } from '../adapters/frequensayAdapter';
 import { copyUnknownWordsTable } from '../units/FrequenSay/utils/copyUnknownWordsTable';
+import useSpellingsKnownForLessonRange from '../units/useSpellingsKnownForLessonRange';
 import useCustomVocabulary from './useCustomVocabulary';
 export function useFrequensay() {
-  const adapter = useFrequensayAdapter();
-
-  const { selectedToLesson, selectedProgram } = useSelectedLesson();
+  const { selectedToLesson, selectedProgram, selectedFromLesson } =
+    useSelectedLesson();
   const {
     userAddedVocabulary,
-    setUserAddedVocabulary,
     addManualVocabulary,
     disableManualVocabulary,
     enableManualVocabulary,
@@ -23,17 +20,18 @@ export function useFrequensay() {
   const wordCount = useRef<WordCount[]>([]);
   const passageLength = useRef<number>(0);
   const comprehensionPercentage = useRef<number>(0);
+  const [extraAcceptableWords, setExtraAcceptableWords] = useState<WordCount[]>(
+    [],
+  );
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['SpellingsKnownForLesson', selectedProgram, selectedToLesson],
-    queryFn: () => {
-      return adapter.getSpellingsKnownForLesson({
-        courseName: selectedProgram,
-        lessonNumber: selectedToLesson,
-      });
-    },
-    enabled: !!selectedProgram && !!selectedToLesson,
-    staleTime: Infinity,
+  const {
+    data: spellingsKnownForLessonRange,
+    isLoading,
+    error,
+  } = useSpellingsKnownForLessonRange({
+    courseName: selectedProgram?.name || '',
+    lessonToNumber: selectedToLesson?.lessonNumber || 0,
+    lessonFromNumber: selectedFromLesson?.lessonNumber || 0,
   });
 
   function countVocabularyWords(string: string): [WordCount[], number] {
@@ -60,6 +58,13 @@ export function useFrequensay() {
     return [localWordCount, sanitizedArray.length];
   }
 
+  function updateUserAddedVocabulary(newInput: string) {
+    const vocabWordCount = countVocabularyWords(newInput);
+    const uniqueWordsWithCounts = vocabWordCount[0];
+    setExtraAcceptableWords(uniqueWordsWithCounts);
+    return uniqueWordsWithCounts;
+  }
+
   function updateUserInput(newInput: string) {
     const vocabWordCount = countVocabularyWords(newInput);
     const uniqueWordsWithCounts = vocabWordCount[0];
@@ -72,7 +77,10 @@ export function useFrequensay() {
 
   const filterWordCountByUnknown = useCallback(async () => {
     function filterWordsByUnknown(word: WordCount): boolean {
-      if (data?.includes(word.word)) {
+      if (
+        spellingsKnownForLessonRange?.includes(word.word) ||
+        extraAcceptableWords.some((w) => w.word === word.word)
+      ) {
         return false;
       } else {
         return true;
@@ -88,26 +96,34 @@ export function useFrequensay() {
         ? 100 - Math.floor((totalWordsUnknown / passageLength.current) * 100)
         : 100;
     setUnknownWordCount(unknownWordCount);
-  }, [data]);
+  }, [spellingsKnownForLessonRange, extraAcceptableWords]);
 
   useEffect(() => {
     if (selectedToLesson) {
-      if (selectedToLesson?.recordId && data) {
+      if (selectedToLesson?.recordId && spellingsKnownForLessonRange) {
         filterWordCountByUnknown();
       }
     }
-  }, [selectedToLesson, userInput, data, filterWordCountByUnknown]);
+  }, [
+    selectedToLesson,
+    selectedFromLesson,
+    userInput,
+    extraAcceptableWords,
+
+    spellingsKnownForLessonRange,
+    filterWordCountByUnknown,
+  ]);
 
   return {
-    isSuccess: !!data,
+    isSuccess: !!spellingsKnownForLessonRange,
     isError: !!error,
     isLoading,
-    data,
+    data: spellingsKnownForLessonRange,
     error,
 
     CustomVocabularyProps: {
       userAddedVocabulary,
-      setUserAddedVocabulary,
+      setUserAddedVocabulary: updateUserAddedVocabulary,
       addManualVocabulary,
       disableManualVocabulary,
       enableManualVocabulary,

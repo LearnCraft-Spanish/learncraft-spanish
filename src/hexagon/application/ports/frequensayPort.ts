@@ -1,7 +1,7 @@
-import type { getSpellingsKnownForLessonRequestBody } from '@LearnCraft-Spanish/shared';
+import type { getSpellingsKnownForLessonParams } from '@LearnCraft-Spanish/shared';
 
 export interface FrequensayPort {
   getSpellingsKnownForLesson: (
-    data: getSpellingsKnownForLessonRequestBody,
+    data: getSpellingsKnownForLessonParams,
   ) => Promise<string[]>;
 }

@@ -20,7 +20,7 @@ export default function FrequenSayPage() {
 
   useEffect(() => {
     if (isError) {
-      console.log(error);
+      console.error(error);
     }
   }, [isError, error]);
   return (
@@ -40,7 +40,7 @@ export default function FrequenSayPage() {
           <UnknownWords {...UnknownWordsProps} />
         </>
       ) : (
-        <div>Something went wrong</div>
+        <div>Please select a course and lesson range to enable Frequensay</div>
       )}
     </div>
   );
