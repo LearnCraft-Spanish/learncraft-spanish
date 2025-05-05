@@ -43,6 +43,8 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: pnpm install
+        env:
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
       # Run Prettier
       - name: Run Prettier
@@ -76,6 +78,8 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: pnpm install
+        env:
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
       # Restore the mock data cache
       - name: Restore mock data cache
@@ -132,6 +136,8 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: pnpm install
+        env:
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
       # Run ESLint
       - name: Run ESLint
@@ -166,6 +172,8 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: pnpm install
+        env:
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
       # Restore the mock data cache
       - name: Restore mock data cache
