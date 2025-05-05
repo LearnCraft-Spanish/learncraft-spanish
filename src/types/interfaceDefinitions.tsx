@@ -1,3 +1,8 @@
+// DEPRECATED: Use the shared types instead
+// All types and contracts should be defined in the shared package
+// If a type is missing, add it to the shared package
+// No new types should be added here
+
 export type Expanded<T> = { [K in keyof T]: T[K] };
 
 export type Lesson = Expanded<{
@@ -122,6 +127,26 @@ export type ActiveStudent = Expanded<UserData | null>;
 
 export type AudioExamplesTable = Expanded<Array<Flashcard>>;
 
+export type IdiomVocabulary = Expanded<{
+  recordId: number;
+  wordIdiom: string;
+  use: string;
+  frequencyRank: number;
+  descriptionOfVocabularySkill?: string;
+  vocabName: string;
+  verbInfinitive: null;
+  conjugationTags: Array<string>;
+  spellings?: Array<string>;
+}>;
+
+export type VerbVocabulary = Expanded<{
+  recordId: number;
+  wordIdiom: string;
+  use: string;
+  frequencyRank: number;
+  descriptionOfVocabularySkill?: string;
+}>;
+
 export type Vocabulary = Expanded<{
   recordId: number;
   wordIdiom: string;
@@ -230,4 +255,16 @@ export type PMFData = Expanded<{
   recordId: number;
   relatedStudent: number;
   lastContactDate: string;
+}>;
+
+export type Verb = Expanded<{
+  recordId: number;
+  infinitive: string;
+  conjugationTags: Array<string>;
+}>;
+
+export type Subcategory = Expanded<{
+  recordId: number;
+  subcategoryName: string;
+  description?: string;
 }>;

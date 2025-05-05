@@ -1,4 +1,4 @@
-import { useCallback, useContext } from 'react';
+import { use, useCallback } from 'react';
 import { DateRangeContext } from '../../components/Coaching/WeeksRecords/DateRangeContext';
 import * as helpers from './helperFunctions';
 import {
@@ -15,7 +15,7 @@ import {
 } from './queries';
 
 export default function useCoaching() {
-  const dateRangeContext = useContext(DateRangeContext);
+  const dateRangeContext = use(DateRangeContext);
 
   if (!dateRangeContext) {
     throw new Error('useCoaching must be used within a DateRangeProvider');

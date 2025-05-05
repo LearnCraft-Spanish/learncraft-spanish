@@ -12,15 +12,26 @@ export default function useAuth() {
   } = useAuth0();
 
   const getAccessToken = async () => {
-    const accessToken = await getAccessTokenSilently({
-      authorizationParams: {
-        audience,
-        scope:
-          'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
-      },
-      cacheMode: 'off',
-    });
-    return accessToken as string | undefined;
+    try {
+      // Only attempt to get token if user is authenticated
+      if (!isAuthenticated) {
+        return undefined;
+      }
+
+      const accessToken = await getAccessTokenSilently({
+        authorizationParams: {
+          audience,
+          scope:
+            'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
+        },
+        cacheMode: 'off',
+      });
+
+      return accessToken as string | undefined;
+    } catch (error) {
+      console.error(error);
+      return undefined;
+    }
   };
 
   const login = () => {
