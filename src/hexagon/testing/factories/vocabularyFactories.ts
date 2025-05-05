@@ -3,7 +3,7 @@ import {
   CreateNonVerbVocabularySchema,
   CreateVerbSchema,
   VocabularySchema,
-} from '@learncraft-spanish/shared';
+} from '@LearnCraft-Spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,

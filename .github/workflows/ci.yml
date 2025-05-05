@@ -173,6 +173,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         env:
+          # Suppress context access warning
+          # Context access is safe in this case
           GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
       # Restore the mock data cache

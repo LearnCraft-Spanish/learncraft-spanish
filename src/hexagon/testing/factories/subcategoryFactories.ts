@@ -1,4 +1,4 @@
-import { SubcategorySchema } from '@learncraft-spanish/shared';
+import { SubcategorySchema } from '@LearnCraft-Spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,
