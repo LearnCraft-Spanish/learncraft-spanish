@@ -1,6 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { useFrequensayAdapter } from '../adapters/frequensayAdapter';
 
+export interface UseSpellingsKnownForLessonRangeResult {
+  data: string[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
+}
+
 export default function useSpellingsKnownForLessonRange({
   courseName,
   lessonToNumber,
@@ -9,7 +15,7 @@ export default function useSpellingsKnownForLessonRange({
   courseName?: string;
   lessonToNumber?: number;
   lessonFromNumber?: number;
-}) {
+}): UseSpellingsKnownForLessonRangeResult {
   const adapter = useFrequensayAdapter();
 
   const { data, isLoading, error } = useQuery({

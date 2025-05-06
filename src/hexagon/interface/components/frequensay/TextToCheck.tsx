@@ -11,7 +11,7 @@ export default function TextToCheck({
 }) {
   return (
     <div>
-      <form onSubmit={(e) => e.preventDefault}>
+      <form>
         <h3>Text to Check:</h3>
         <textarea
           value={userInput}

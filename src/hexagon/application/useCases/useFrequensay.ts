@@ -4,7 +4,33 @@ import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import { copyUnknownWordsTable } from '../units/FrequenSay/utils/copyUnknownWordsTable';
 import useSpellingsKnownForLessonRange from '../units/useSpellingsKnownForLessonRange';
 import useCustomVocabulary from './useCustomVocabulary';
-export function useFrequensay() {
+
+export interface UseFrequensayResult {
+  isSuccess: boolean;
+  isError: boolean;
+  isLoading: boolean;
+  error: Error | null;
+  data: string[] | undefined;
+  CustomVocabularyProps: {
+    userAddedVocabulary: string;
+    setUserAddedVocabulary: (value: string) => void;
+    addManualVocabulary: boolean;
+    disableManualVocabulary: () => void;
+    enableManualVocabulary: () => void;
+  };
+  TextToCheckProps: {
+    userInput: string;
+    updateUserInput: (value: string) => void;
+    passageLength: number;
+    comprehensionPercentage: number;
+  };
+  UnknownWordsProps: {
+    unknownWordCount: WordCount[];
+    copyUnknownWordsTable: () => void;
+  };
+}
+
+export function useFrequensay(): UseFrequensayResult {
   const { selectedToLesson, selectedProgram, selectedFromLesson } =
     useSelectedLesson();
   const {

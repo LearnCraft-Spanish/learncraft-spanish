@@ -10,7 +10,7 @@ export default function UnknownWords({
   return (
     unknownWordCount.length > 0 && (
       <div>
-        <h3>{unknownWordCount.length} Unknown Words:</h3>
+        <h3>{`${unknownWordCount.length} Unknown Words:`}</h3>
         <div className="buttonBox">
           <button type="button" onClick={copyUnknownWordsTable}>
             Copy Word List
