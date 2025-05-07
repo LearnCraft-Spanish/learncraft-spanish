@@ -13,4 +13,47 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
+  .frequensay-setup__button {
+    margin-top: 10px;
+  }
+
+  .frequensay-setup__error {
+    color: red;
+  }
+}
+
+.frequensay-page__content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+  }
+
+  .text-to-check,
+  .custom-vocabulary {
+    min-width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    .text-to-check__stats {
+      display: flex;
+      flex-direction: column;
+      align-items: left;
+    }
+  }
+
+  .unknown-words {
+    min-width: 80%;
+    padding-bottom: 40px;
+  }
 }

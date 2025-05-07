@@ -1,16 +1,20 @@
+import { InlineLoading } from 'src/components/Loading';
+
 export default function TextToCheck({
   userInput,
   updateUserInput,
   passageLength,
   comprehensionPercentage,
+  isLoading,
 }: {
   userInput: string;
   updateUserInput: (value: string) => void;
   passageLength: number;
   comprehensionPercentage: number;
+  isLoading: boolean;
 }) {
   return (
-    <div>
+    <div className="text-to-check">
       <form>
         <h3>Text to Check:</h3>
         <textarea
@@ -20,9 +24,15 @@ export default function TextToCheck({
           onChange={(e) => updateUserInput(e.target.value)}
         ></textarea>
       </form>
-      <div>
-        <p>{`Word Count: ${passageLength}`}</p>
-        <p>{`Words Known: ${comprehensionPercentage}%`}</p>
+      <div className="text-to-check__stats">
+        {isLoading ? (
+          <InlineLoading message="fetching updated known words list..." />
+        ) : (
+          <>
+            <p>{`Word Count: ${passageLength}`}</p>
+            <p>{`Words Known: ${comprehensionPercentage}%`}</p>
+          </>
+        )}
       </div>
     </div>
   );

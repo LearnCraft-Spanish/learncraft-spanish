@@ -11,10 +11,12 @@ export function useSpellingsKnownForLessonRange({
   courseName,
   lessonToNumber,
   lessonFromNumber,
+  isFrequensayEnabled,
 }: {
   courseName?: string;
   lessonToNumber?: number;
   lessonFromNumber?: number;
+  isFrequensayEnabled?: boolean;
 }): UseSpellingsKnownForLessonRangeResult {
   const adapter = useFrequensayAdapter();
 
@@ -32,7 +34,7 @@ export function useSpellingsKnownForLessonRange({
         lessonFromNumber: lessonFromNumber?.toString() || '0',
       });
     },
-    enabled: !!courseName && !!lessonToNumber,
+    enabled: !!courseName && !!lessonToNumber && isFrequensayEnabled,
     staleTime: Infinity,
   });
 

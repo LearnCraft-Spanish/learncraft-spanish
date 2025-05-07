@@ -13,7 +13,7 @@ export default function CustomVocabulary({
   setUserAddedVocabulary: (value: string) => void;
 }) {
   return (
-    <>
+    <div className="custom-vocabulary">
       <div className="buttonBox">
         {!addManualVocabulary && (
           <button
@@ -40,11 +40,11 @@ export default function CustomVocabulary({
           <textarea
             value={userAddedVocabulary}
             rows={7}
-            cols={25}
+            cols={85}
             onChange={(e) => setUserAddedVocabulary(e.target.value)}
           ></textarea>
         </form>
       )}
-    </>
+    </div>
   );
 }

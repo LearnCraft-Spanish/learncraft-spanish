@@ -15,6 +15,10 @@ export interface UseFrequensayResult {
   isLoading: boolean;
   error: Error | null;
   data: string[] | undefined;
+  FrequensaySetupProps: {
+    isFrequensayEnabled: boolean;
+    setIsFrequensayEnabled: (value: boolean) => void;
+  };
   CustomVocabularyProps: {
     userAddedVocabulary: string;
     setUserAddedVocabulary: (value: string) => void;
@@ -46,6 +50,8 @@ export function useFrequensay(): UseFrequensayResult {
   const { selectedToLesson, selectedProgram, selectedFromLesson } =
     useSelectedLesson();
 
+  const [isFrequensayEnabled, setIsFrequensayEnabled] = useState(false);
+
   const [userInput, setUserInput] = useState('');
   const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([]);
 
@@ -64,6 +70,7 @@ export function useFrequensay(): UseFrequensayResult {
     courseName: selectedProgram?.name || '',
     lessonToNumber: selectedToLesson?.lessonNumber || 0,
     lessonFromNumber: selectedFromLesson?.lessonNumber || 0,
+    isFrequensayEnabled,
   });
 
   function updateUserAddedVocabulary(newInput: string) {
@@ -117,6 +124,11 @@ export function useFrequensay(): UseFrequensayResult {
     isLoading,
     data: spellingsKnownForLessonRange,
     error,
+
+    FrequensaySetupProps: {
+      isFrequensayEnabled,
+      setIsFrequensayEnabled,
+    },
 
     CustomVocabularyProps: {
       userAddedVocabulary,
