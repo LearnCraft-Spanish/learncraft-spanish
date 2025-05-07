@@ -1,6 +1,6 @@
-import { createTypedMock } from 'src/hexagon/testing/utils/typedMock';
-import { UseSpellingsKnownForLessonRangeResult } from './useSpellingsKnownForLessonRange';
+import type { UseSpellingsKnownForLessonRangeResult } from './useSpellingsKnownForLessonRange';
 import { createMockSpellingsData } from '@testing/factories/spellingsFactory';
+import { createTypedMock } from '@testing/utils/typedMock';
 
 // Default mock implementation
 const defaultSuccessMockResult: UseSpellingsKnownForLessonRangeResult = {

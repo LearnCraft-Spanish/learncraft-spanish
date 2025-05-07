@@ -1,5 +1,5 @@
+import type { UseFrequensayResult } from './useFrequensay';
 import { vi } from 'vitest';
-import { UseFrequensayResult } from './useFrequensay';
 
 export const defaultResult: UseFrequensayResult = {
   isSuccess: true,
@@ -9,24 +9,26 @@ export const defaultResult: UseFrequensayResult = {
   data: [],
   CustomVocabularyProps: {
     userAddedVocabulary: '',
-    setUserAddedVocabulary: vi.fn(),
+    setUserAddedVocabulary: vi.fn<() => void>(),
     addManualVocabulary: false,
-    disableManualVocabulary: vi.fn(),
-    enableManualVocabulary: vi.fn(),
+    disableManualVocabulary: vi.fn<() => void>(),
+    enableManualVocabulary: vi.fn<() => void>(),
   },
   TextToCheckProps: {
     userInput: '',
-    updateUserInput: vi.fn(),
+    updateUserInput: vi.fn<() => void>(),
     passageLength: 0,
     comprehensionPercentage: 0,
   },
   UnknownWordsProps: {
     unknownWordCount: [],
-    copyUnknownWordsTable: vi.fn(),
+    copyUnknownWordsTable: vi.fn<() => void>(),
   },
 };
 
-export const mockUseFrequensay = vi.fn().mockReturnValue(defaultResult);
+export const mockUseFrequensay = vi
+  .fn<() => UseFrequensayResult>()
+  .mockReturnValue(defaultResult);
 
 export const overrideMockUseFrequensay = (
   config: Partial<UseFrequensayResult> = {},

@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { FromToLessonSelector } from 'src/components/LessonSelector';
 import { Loading } from 'src/components/Loading';
 import { useFrequensay } from 'src/hexagon/application/useCases/useFrequensay';
 import CustomVocabulary from '../components/frequensay/CustomVocabulary';
+import FrequensaySetup from '../components/frequensay/FrequensaySetup';
 import TextToCheck from '../components/frequensay/TextToCheck';
 import UnknownWords from '../components/frequensay/UnknownWords';
-
+import './FrequensayPage.scss';
 export default function FrequenSayPage() {
   const {
     isSuccess,
@@ -24,11 +24,9 @@ export default function FrequenSayPage() {
     }
   }, [isError, error]);
   return (
-    <div>
+    <div className="frequensay-page">
       <h2>FrequenSay</h2>
-      <div>
-        <FromToLessonSelector />
-      </div>
+      <FrequensaySetup />
       {isError ? (
         <div>Error Loading Frequensay Data</div>
       ) : isLoading ? (
@@ -40,7 +38,7 @@ export default function FrequenSayPage() {
           <UnknownWords {...UnknownWordsProps} />
         </>
       ) : (
-        <div>Please select a course and lesson range to enable Frequensay</div>
+        <div></div>
       )}
     </div>
   );

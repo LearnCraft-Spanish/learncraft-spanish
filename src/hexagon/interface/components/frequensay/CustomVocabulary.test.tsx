@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import CustomVocabulary from './CustomVocabulary';
-import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
+import CustomVocabulary from './CustomVocabulary';
 
 const mockAddManualVocabulary = false;
 const mockDisableManualVocabulary = vi.fn();
@@ -17,7 +17,7 @@ const defaultStateProps = {
   setUserAddedVocabulary: mockSetUserAddedVocabulary,
 };
 
-describe('CustomVocabulary', () => {
+describe('customVocabulary', () => {
   it('should render', () => {
     render(<CustomVocabulary {...defaultStateProps} />);
     expect(screen.getByText('Add Extra Vocabulary')).toBeInTheDocument();

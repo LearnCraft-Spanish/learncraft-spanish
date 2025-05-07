@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/react';
-import FrequensayPage from './FrequensayPage';
-import { vi } from 'vitest';
 import mockUseFrequensay, {
   defaultResult,
 } from '@application/useCases/useFrequensay.mock';
+import { render, screen } from '@testing-library/react';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
+import { vi } from 'vitest';
+import FrequensayPage from './FrequensayPage';
 
 // Fix: Use a string to refer to the module path instead of an import variable
 vi.mock('@application/useCases/useFrequensay', () => {
@@ -13,7 +13,7 @@ vi.mock('@application/useCases/useFrequensay', () => {
   };
 });
 
-describe('FrequensayPage', () => {
+describe('frequensayPage', () => {
   beforeEach(() => {
     mockUseFrequensay.mockReturnValue(defaultResult);
   });

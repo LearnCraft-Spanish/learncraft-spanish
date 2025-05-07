@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import TextToCheck from './TextToCheck';
-import { vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
+import TextToCheck from './TextToCheck';
 
 const mockUserInput = '';
 const mockUpdateUserInput = vi.fn();
@@ -15,7 +15,7 @@ const defaultProps = {
   comprehensionPercentage: mockComprehensionPercentage,
 };
 
-describe('TextToCheck', () => {
+describe('textToCheck', () => {
   it('should render', () => {
     render(<TextToCheck {...defaultProps} />);
 

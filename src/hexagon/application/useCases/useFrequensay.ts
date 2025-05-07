@@ -1,8 +1,12 @@
 import type { WordCount } from '../types/frequensay';
+import { copyUnknownWordsTable } from '@application/units/FrequenSay/utils/copyUnknownWordsTable';
+import {
+  countVocabularyWords,
+  filterWordsByUnknown,
+} from '@application/units/FrequenSay/utils/vocabularyProcessing';
+import { useSpellingsKnownForLessonRange } from '@application/units/useSpellingsKnownForLessonRange';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { copyUnknownWordsTable } from '../units/FrequenSay/utils/copyUnknownWordsTable';
-import useSpellingsKnownForLessonRange from '../units/useSpellingsKnownForLessonRange';
 import useCustomVocabulary from './useCustomVocabulary';
 
 export interface UseFrequensayResult {
@@ -31,16 +35,16 @@ export interface UseFrequensayResult {
 }
 
 export function useFrequensay(): UseFrequensayResult {
-  const { selectedToLesson, selectedProgram, selectedFromLesson } =
-    useSelectedLesson();
   const {
     userAddedVocabulary,
     setUserAddedVocabulary,
-
     addManualVocabulary,
     disableManualVocabulary,
     enableManualVocabulary,
   } = useCustomVocabulary();
+
+  const { selectedToLesson, selectedProgram, selectedFromLesson } =
+    useSelectedLesson();
 
   const [userInput, setUserInput] = useState('');
   const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([]);
@@ -62,75 +66,40 @@ export function useFrequensay(): UseFrequensayResult {
     lessonFromNumber: selectedFromLesson?.lessonNumber || 0,
   });
 
-  function countVocabularyWords(string: string): [WordCount[], number] {
-    const segmenter = new Intl.Segmenter([], { granularity: 'word' });
-    const segmentedText = segmenter.segment(string);
-
-    const sanitizedArray = [...segmentedText]
-      .filter((s) => s.isWordLike)
-      .map((s) => s.segment.toLowerCase());
-    let u = 0;
-    const localWordCount: WordCount[] = [];
-
-    while (u < sanitizedArray.length) {
-      const thisWord = sanitizedArray[u];
-      const wordFound = localWordCount.find((word) => word.word === thisWord);
-      if (wordFound) {
-        wordFound.count++;
-      } else if (Number.isNaN(Number.parseFloat(thisWord))) {
-        localWordCount.push({ word: thisWord, count: 1 });
-      }
-      u++;
-    }
-    localWordCount.sort((a, b) => b.count - a.count);
-    return [localWordCount, sanitizedArray.length];
-  }
-
   function updateUserAddedVocabulary(newInput: string) {
-    const vocabWordCount = countVocabularyWords(newInput);
-    const uniqueWordsWithCounts = vocabWordCount[0];
+    const [uniqueWordsWithCounts] = countVocabularyWords(newInput);
     setUserAddedVocabulary(newInput);
     setExtraAcceptableWords(uniqueWordsWithCounts);
     return uniqueWordsWithCounts;
   }
 
   function updateUserInput(newInput: string) {
-    const vocabWordCount = countVocabularyWords(newInput);
-    const uniqueWordsWithCounts = vocabWordCount[0];
-    const totalWordCount = vocabWordCount[1];
+    const [uniqueWordsWithCounts, totalWordCount] =
+      countVocabularyWords(newInput);
     setUserInput(newInput);
     wordCount.current = uniqueWordsWithCounts;
     passageLength.current = totalWordCount;
-    return vocabWordCount;
+    return [uniqueWordsWithCounts, totalWordCount];
   }
 
-  const filterWordCountByUnknown = useCallback(async () => {
-    function filterWordsByUnknown(word: WordCount): boolean {
-      if (
-        spellingsKnownForLessonRange?.includes(word.word) ||
-        extraAcceptableWords.some((w) => w.word === word.word)
-      ) {
-        return false;
-      } else {
-        return true;
-      }
+  const processUnknownWords = useCallback(() => {
+    if (spellingsKnownForLessonRange) {
+      const [unknownWords, , percentage] = filterWordsByUnknown(
+        wordCount.current,
+        spellingsKnownForLessonRange,
+        extraAcceptableWords,
+        addManualVocabulary,
+      );
+
+      setUnknownWordCount(unknownWords);
+      comprehensionPercentage.current = percentage;
     }
-    const unknownWordCount = wordCount.current.filter(filterWordsByUnknown);
-    let totalWordsUnknown = 0;
-    unknownWordCount.forEach((count) => {
-      totalWordsUnknown += count.count;
-    });
-    comprehensionPercentage.current =
-      passageLength.current > 0
-        ? 100 - Math.floor((totalWordsUnknown / passageLength.current) * 100)
-        : 100;
-    setUnknownWordCount(unknownWordCount);
-  }, [spellingsKnownForLessonRange, extraAcceptableWords]);
+  }, [spellingsKnownForLessonRange, extraAcceptableWords, addManualVocabulary]);
 
   useEffect(() => {
     if (selectedToLesson) {
       if (selectedToLesson?.recordId && spellingsKnownForLessonRange) {
-        filterWordCountByUnknown();
+        processUnknownWords();
       }
     }
   }, [
@@ -138,9 +107,8 @@ export function useFrequensay(): UseFrequensayResult {
     selectedFromLesson,
     userInput,
     extraAcceptableWords,
-
     spellingsKnownForLessonRange,
-    filterWordCountByUnknown,
+    processUnknownWords,
   ]);
 
   return {
