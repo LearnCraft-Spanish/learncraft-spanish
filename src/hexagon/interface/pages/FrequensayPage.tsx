@@ -20,6 +20,12 @@ export default function FrequenSayPage() {
     UnknownWordsProps,
   } = useFrequensay();
 
+  const initialDataLoading =
+    isLoading && TextToCheckProps.userInput.length <= 0;
+
+  const frequensayIsEnabled =
+    FrequensaySetupProps.isFrequensayEnabled && selectedToLesson;
+
   useEffect(() => {
     if (isError) {
       console.error(error);
@@ -32,9 +38,9 @@ export default function FrequenSayPage() {
       <div className="frequensay-page__content">
         {isError ? (
           <div>Error Loading Frequensay Data</div>
-        ) : isLoading && TextToCheckProps.userInput.length <= 0 ? (
+        ) : initialDataLoading ? (
           <Loading message="Loading Frequensay Data..." />
-        ) : FrequensaySetupProps.isFrequensayEnabled && selectedToLesson ? (
+        ) : frequensayIsEnabled ? (
           <>
             <CustomVocabulary {...CustomVocabularyProps} />
             <TextToCheck {...TextToCheckProps} isLoading={isLoading} />

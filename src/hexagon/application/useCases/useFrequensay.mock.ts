@@ -7,6 +7,10 @@ export const defaultResult: UseFrequensayResult = {
   error: null,
   isLoading: false,
   data: [],
+  FrequensaySetupProps: {
+    isFrequensayEnabled: false,
+    setIsFrequensayEnabled: vi.fn<() => void>(),
+  },
   CustomVocabularyProps: {
     userAddedVocabulary: '',
     setUserAddedVocabulary: vi.fn<() => void>(),

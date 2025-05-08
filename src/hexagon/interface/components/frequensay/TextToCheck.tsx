@@ -25,13 +25,11 @@ export default function TextToCheck({
         ></textarea>
       </form>
       <div className="text-to-check__stats">
+        <p>{`Word Count: ${passageLength}`}</p>
         {isLoading ? (
           <InlineLoading message="fetching updated known words list..." />
         ) : (
-          <>
-            <p>{`Word Count: ${passageLength}`}</p>
-            <p>{`Words Known: ${comprehensionPercentage}%`}</p>
-          </>
+          <p>{`Words Known: ${comprehensionPercentage}%`}</p>
         )}
       </div>
     </div>
