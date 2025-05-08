@@ -62,11 +62,7 @@ export function useFrequensay(): UseFrequensayResult {
     [],
   );
 
-  const {
-    data: spellingsKnownForLessonRange,
-    isLoading,
-    error,
-  } = useSpellingsKnownForLessonRange({
+  const spellingsKnownQuery = useSpellingsKnownForLessonRange({
     courseName: selectedProgram?.name || '',
     lessonToNumber: selectedToLesson?.lessonNumber || 0,
     lessonFromNumber: selectedFromLesson?.lessonNumber || 0,
@@ -90,10 +86,10 @@ export function useFrequensay(): UseFrequensayResult {
   }
 
   const processUnknownWords = useCallback(() => {
-    if (spellingsKnownForLessonRange) {
+    if (spellingsKnownQuery.data) {
       const [unknownWords, , percentage] = filterWordsByUnknown(
         wordCount.current,
-        spellingsKnownForLessonRange,
+        spellingsKnownQuery.data,
         extraAcceptableWords,
         addManualVocabulary,
       );
@@ -101,11 +97,11 @@ export function useFrequensay(): UseFrequensayResult {
       setUnknownWordCount(unknownWords);
       comprehensionPercentage.current = percentage;
     }
-  }, [spellingsKnownForLessonRange, extraAcceptableWords, addManualVocabulary]);
+  }, [spellingsKnownQuery?.data, extraAcceptableWords, addManualVocabulary]);
 
   useEffect(() => {
     if (selectedToLesson) {
-      if (selectedToLesson?.recordId && spellingsKnownForLessonRange) {
+      if (selectedToLesson?.recordId && spellingsKnownQuery.data) {
         processUnknownWords();
       }
     }
@@ -114,16 +110,16 @@ export function useFrequensay(): UseFrequensayResult {
     selectedFromLesson,
     userInput,
     extraAcceptableWords,
-    spellingsKnownForLessonRange,
+    spellingsKnownQuery?.data,
     processUnknownWords,
   ]);
 
   return {
-    isSuccess: !!spellingsKnownForLessonRange,
-    isError: !!error,
-    isLoading,
-    data: spellingsKnownForLessonRange,
-    error,
+    isSuccess: !!spellingsKnownQuery?.data,
+    isError: !!spellingsKnownQuery?.error,
+    isLoading: spellingsKnownQuery?.isLoading,
+    data: spellingsKnownQuery?.data,
+    error: spellingsKnownQuery?.error,
 
     FrequensaySetupProps: {
       isFrequensayEnabled,
