@@ -39,7 +39,7 @@ describe('vocabularyProcessing', () => {
     vi.clearAllMocks();
 
     // Set up a proper Segmenter mock
-    vi.spyOn(global.Intl, 'Segmenter').mockImplementation(() => {
+    vi.spyOn(globalThis.Intl, 'Segmenter').mockImplementation(() => {
       return {
         segment: (text: string) => new MockSegments(text),
       } as unknown as Intl.Segmenter;

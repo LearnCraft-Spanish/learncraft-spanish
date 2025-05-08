@@ -13,6 +13,7 @@ const defaultProps = {
   updateUserInput: mockUpdateUserInput,
   passageLength: mockPassageLength,
   comprehensionPercentage: mockComprehensionPercentage,
+  isLoading: false,
 };
 
 describe('textToCheck', () => {

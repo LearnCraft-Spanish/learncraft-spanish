@@ -20,8 +20,9 @@ describe('copyUnknownWordsTable', () => {
     const unknownWords = createMockWordCountList(3);
     copyUnknownWordsTable(unknownWords);
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-      `Word\tCount\n${ 
-        unknownWords.map((word) => `${word.word}\t${word.count}`).join('\n')}`,
+      `Word\tCount\n${unknownWords
+        .map((word) => `${word.word}\t${word.count}`)
+        .join('\n')}`,
     );
   });
 });
