@@ -69,6 +69,10 @@ export function useFrequensay(): UseFrequensayResult {
     isFrequensayEnabled,
   });
 
+  function updateUnknownWords(unknownWords: WordCount[]) {
+    setUnknownWordCount(unknownWords);
+  }
+
   function updateUserAddedVocabulary(newInput: string) {
     const [uniqueWordsWithCounts] = countVocabularyWords(newInput);
     setUserAddedVocabulary(newInput);
@@ -94,7 +98,7 @@ export function useFrequensay(): UseFrequensayResult {
         addManualVocabulary,
       );
 
-      setUnknownWordCount(unknownWords);
+      updateUnknownWords(unknownWords);
       comprehensionPercentage.current = percentage;
     }
   }, [spellingsKnownQuery?.data, extraAcceptableWords, addManualVocabulary]);
