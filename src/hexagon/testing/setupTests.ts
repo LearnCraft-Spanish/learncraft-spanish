@@ -5,8 +5,9 @@
  * It configures global mocks and provides necessary test utilities.
  */
 
-import { callMockSubcategoryAdapter } from '@application/adapters/subcategoryAdapter.mock';
-import { callMockVocabularyAdapter } from '@application/adapters/vocabularyAdapter.mock';
+import mockSubcategoryAdapter from '@application/adapters/subcategoryAdapter.mock';
+import mockVocabularyAdapter from '@application/adapters/vocabularyAdapter.mock';
+import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { resetTestQueryClient } from './utils/testQueryClient';
 import '@testing-library/jest-dom';
@@ -14,11 +15,11 @@ import '@testing-library/jest-dom';
 // Replace real adapter implementations with mocks for all tests
 const setupAdapterMocks = () => {
   vi.mock('@application/adapters/vocabularyAdapter', () => ({
-    useVocabularyAdapter: callMockVocabularyAdapter,
+    useVocabularyAdapter: () => mockVocabularyAdapter,
   }));
 
   vi.mock('@application/adapters/subcategoryAdapter', () => ({
-    useSubcategoryAdapter: callMockSubcategoryAdapter,
+    useSubcategoryAdapter: () => mockSubcategoryAdapter,
   }));
 };
 
@@ -34,4 +35,7 @@ afterEach(() => {
 
   // Reset React Query client
   resetTestQueryClient();
+
+  // Clean up any rendered components
+  cleanup();
 });

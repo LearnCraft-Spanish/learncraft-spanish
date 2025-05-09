@@ -31,8 +31,5 @@ export const overrideMockUseSubcategories = (
   return mockResult;
 };
 
-// Helper to call the mock during tests
-export const callMockUseSubcategories = () => mockUseSubcategories();
-
 // Export default for global mocking
 export default mockUseSubcategories;

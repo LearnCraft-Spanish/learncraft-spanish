@@ -55,13 +55,5 @@ export const overrideMockUseVocabularyPage = (
   return mockResult;
 };
 
-// Helper to call the mock during tests
-export const callMockUseVocabularyPage = (
-  subcategoryId = 1,
-  page = 1,
-  pageSize = 10,
-  enabled = true,
-) => mockUseVocabularyPage(subcategoryId, page, pageSize, enabled);
-
 // Export default for global mocking
 export default mockUseVocabularyPage;

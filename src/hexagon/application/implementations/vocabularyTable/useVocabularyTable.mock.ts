@@ -102,8 +102,5 @@ export const overrideMockUseVocabularyTable = (
   return mockResult;
 };
 
-// Helper to call the mock during tests
-export const callMockUseVocabularyTable = () => mockUseVocabularyTable();
-
 // Export default for global mocking
 export default mockUseVocabularyTable;

@@ -77,8 +77,5 @@ export const overrideMockUseVocabulary = (
   return mockResult;
 };
 
-// Helper to call the mock during tests
-export const callMockUseVocabulary = () => mockUseVocabulary();
-
 // Export default for global mocking
 export default mockUseVocabulary;

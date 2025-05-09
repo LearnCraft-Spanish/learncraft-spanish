@@ -1,10 +1,8 @@
 import {
-  callMockUseNonVerbCreation,
   defaultResult as defaultNonVerb,
   mockUseNonVerbCreation,
 } from '@application/useCases/useNonVerbCreation.mock';
 import {
-  callMockUseVerbCreation,
   defaultResult as defaultVerb,
   mockUseVerbCreation,
 } from '@application/useCases/useVerbCreation.mock';
@@ -17,10 +15,10 @@ import { VocabularyCreatorPage } from './VocabularyCreatorPage';
 
 // ---- Place these after the relevant mock helpers are imported ----
 vi.mock('@application/useCases/useNonVerbCreation', () => ({
-  useNonVerbCreation: callMockUseNonVerbCreation,
+  useNonVerbCreation: mockUseNonVerbCreation,
 }));
 vi.mock('@application/useCases/useVerbCreation', () => ({
-  useVerbCreation: callMockUseVerbCreation,
+  useVerbCreation: mockUseVerbCreation,
 }));
 
 beforeEach(() => {

@@ -46,10 +46,38 @@ When writing tests for the hexagonal architecture, follow these practices:
 
 ## Mock Structure
 
-Each mock in our hexagonal architecture follows this pattern:
+Each mock should have:
 
-1. **mockX** - The actual mock object
-2. **overrideMockX** - Function to override default behavior
-3. **callMockX** - Helper function to access the mock in tests
+1. **mockX** - The main mock function
+2. **overrideMockX** - Function to override the mock's behavior
+3. **mockX** - Setup function for tests
+
+## Example Implementation
+
+```typescript
+// Create the mock
+export const mockUseExample =
+  createTypedMock<() => UseExampleResult>().mockReturnValue(defaultResult);
+
+// Create override function
+export const overrideMockUseExample = (config = {}) => {
+  const result = { ...defaultResult, ...config };
+  mockUseExample.mockReturnValue(result);
+  return result;
+};
+
+// Create setup function
+export function mockExample(config = {}) {
+  const mockResult = config.useCase
+    ? overrideMockUseExample(config.useCase)
+    : mockUseExample();
+
+  vi.mock('./useExample', () => ({
+    useExample: mockUseExample,
+  }));
+
+  return mockResult;
+}
+```
 
 For more detailed examples, see the main [Hexagonal Architecture Testing README](../README.md).

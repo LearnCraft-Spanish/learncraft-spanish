@@ -2,8 +2,8 @@ import type {
   UseNonVerbCreationResult,
   VocabularyPaginationState,
 } from './useNonVerbCreation';
-import { callMockUseVocabularyTable } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
-import { callMockUseVocabularyPage } from '@application/units/useVocabularyPage.mock';
+import { mockUseVocabularyTable } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
+import { mockUseVocabularyPage } from '@application/units/useVocabularyPage.mock';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { createTypedMock } from '@testing/utils/typedMock';
 
@@ -11,7 +11,7 @@ import { createTypedMock } from '@testing/utils/typedMock';
 const mockSubcategories = createMockSubcategoryList(5).filter(
   (subcategory) => subcategory.partOfSpeech !== 'Verb',
 );
-const mockTableHook = callMockUseVocabularyTable();
+const mockTableHook = mockUseVocabularyTable();
 const mockSaveVocabulary =
   createTypedMock<() => Promise<boolean>>().mockResolvedValue(true);
 const mockSetSubcategoryId = createTypedMock<(id: string) => void>();
@@ -19,7 +19,7 @@ const mockGoToNextPage = createTypedMock<() => void>();
 const mockGoToPreviousPage = createTypedMock<() => void>();
 
 // ---- Create a proper pagination state that matches VocabularyPaginationState
-const vocabularyPageResult = callMockUseVocabularyPage();
+const vocabularyPageResult = mockUseVocabularyPage();
 const mockPagination: VocabularyPaginationState = {
   vocabularyItems: vocabularyPageResult.items,
   isLoading: vocabularyPageResult.isLoading,
@@ -66,9 +66,6 @@ export const overrideMockUseNonVerbCreation = (
   mockUseNonVerbCreation.mockReturnValue(result);
   return result;
 };
-
-// ---- Shortcut for calling
-export const callMockUseNonVerbCreation = () => mockUseNonVerbCreation();
 
 // Export default for global mocking
 export default mockUseNonVerbCreation;

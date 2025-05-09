@@ -39,11 +39,11 @@ The `setupTests.ts` file handles global test configurations:
 // Replace real adapter implementations with mocks for all tests
 const setupAdapterMocks = () => {
   vi.mock('@application/adapters/vocabularyAdapter', () => ({
-    useVocabularyAdapter: callMockVocabularyAdapter,
+    useVocabularyAdapter: () => mockVocabularyAdapter,
   }));
 
   vi.mock('@application/adapters/subcategoryAdapter', () => ({
-    useSubcategoryAdapter: callMockSubcategoryAdapter,
+    useSubcategoryAdapter: () => mockSubcategoryAdapter,
   }));
 };
 
@@ -115,37 +115,61 @@ This approach provides a safety net if the global setup doesn't work, but using 
    - Tests run with isolated mock configurations
 
 3. **After each test**:
-   - `vi.clearAllMocks()` clears the mock call history but preserves implementations
-   - `resetTestQueryClient()` clears the React Query cache
-   - Prepares for the next test with clean state
+   - Mock call history is cleared
+   - React Query client is reset
+   - Each test starts fresh with default mock behavior
 
-### Testing Providers
+### Mock Structure
 
-React components are provided for testing with React Query:
+Each adapter mock follows this pattern:
 
 ```typescript
-// In your tests:
-import { TestQueryClientProvider } from '@testing';
+// Individual method mocks with typed implementations
+export const mockGetVocabulary = createTypedMock<
+  () => Promise<Vocabulary[]>
+>().mockResolvedValue(createMockVocabularyList(3));
 
-render(
-  <TestQueryClientProvider>
-    <YourComponent />
-  </TestQueryClientProvider>
-);
+// The complete adapter mock object
+export const mockVocabularyAdapter: VocabularyPort = {
+  getVocabulary: mockGetVocabulary,
+  // ... other methods
+};
 
-// With renderHook:
-import { createQueryClientWrapper } from '@testing';
+// Override function for test-specific behavior
+export const overrideMockVocabularyAdapter = (
+  config: Partial<{
+    getVocabulary: Awaited<ReturnType<typeof mockGetVocabulary>> | Error;
+    // ... other methods
+  }>,
+) => {
+  setMockResult(mockGetVocabulary, config.getVocabulary);
+  // ... other overrides
+};
 
-const { result } = renderHook(() => useYourHook(), {
-  wrapper: createQueryClientWrapper(),
-});
+// Default export for global mocking
+export default mockVocabularyAdapter;
 ```
 
-#### Implementation Details:
+## Factory Functions
 
-- `TestQueryClientProvider`: React component provider that uses a test-specific QueryClient
-- `createQueryClientWrapper`: Function to create a wrapper for renderHook
-- Both use a shared `testQueryClient` that's reset between tests
+The `factories` directory contains functions to create mock data:
+
+- `createMockVocabulary(overrides)` - Create vocabulary items
+- `createMockVocabularyList(count, overrides)` - Create vocabulary lists
+- `createMockSubcategory(overrides)` - Create subcategories
+- `createMockSubcategories(count, overrides)` - Create subcategory lists
+
+## Path Aliases
+
+The project uses the following path aliases for cleaner imports:
+
+- `@domain` - Domain models and business logic
+- `@application` - Application use cases, units, and ports
+- `@infrastructure` - Infrastructure implementations
+- `@interface` - UI components
+- `@testing` - Test utilities (this module)
+
+This makes imports cleaner and decouples the code from specific directory structures.
 
 ## Mock Patterns
 
@@ -200,10 +224,7 @@ export const overrideMockUseExample = (
   return mockResult;
 };
 
-// 6. Create a helper function for tests
-export const callMockUseExample = () => mockUseExample();
-
-// 7. Export default for global mocking
+// 6. Export default for global mocking
 export default mockUseExample;
 ```
 
@@ -215,11 +236,11 @@ There are three ways to use mocks in tests:
 
 ```typescript
 import { vi } from 'vitest';
-import { callMockUseExample, overrideMockUseExample } from './useExample.mock';
+import { mockUseExample, overrideMockUseExample } from './useExample.mock';
 
 // Mock the hook module
 vi.mock('@application/units/useExample', () => ({
-  useExample: callMockUseExample,
+  useExample: mockUseExample,
 }));
 
 // Test with default values
@@ -238,13 +259,13 @@ test('component shows loading state', () => {
 
 ```typescript
 import { setupHookMock, setupHookMocks } from '@testing/utils/mockHelpers';
-import { callMockUseExample, overrideMockUseExample } from './useExample.mock';
+import { mockUseExample, overrideMockUseExample } from './useExample.mock';
 
 test('component works with default values', () => {
   const cleanup = setupHookMock(
     '@application/units/useExample',
     'useExample',
-    callMockUseExample,
+    mockUseExample,
   );
 
   // ...test code
@@ -258,12 +279,12 @@ test('component uses multiple hooks', () => {
     {
       module: '@application/units/useExample',
       exportName: 'useExample',
-      implementation: callMockUseExample,
+      implementation: mockUseExample,
     },
     {
       module: '@application/units/useOther',
       exportName: 'useOther',
-      implementation: callMockUseOther,
+      implementation: mockUseOther,
     },
   ]);
 
@@ -277,14 +298,14 @@ test('component uses multiple hooks', () => {
 
 ```typescript
 import { createMockTestBuilder } from '@testing/utils/mockHelpers';
-import { callMockUseExample, overrideMockUseExample } from './useExample.mock';
+import { mockUseExample, overrideMockUseExample } from './useExample.mock';
 
 const { withMock, withError, withLoading, run } = createMockTestBuilder();
 
 // Test with loading state
 test('component shows loading state', () => {
   run(
-    withMock('useExample', callMockUseExample, overrideMockUseExample)
+    withMock('useExample', mockUseExample, overrideMockUseExample)
       .withLoading()
       .build(),
     () => {
@@ -296,7 +317,7 @@ test('component shows loading state', () => {
 // Test with error state
 test('component shows error state', () => {
   run(
-    withMock('useExample', callMockUseExample, overrideMockUseExample)
+    withMock('useExample', mockUseExample, overrideMockUseExample)
       .withError(new Error('Test error'))
       .build(),
     () => {
@@ -629,3 +650,115 @@ For useCases:
 ### Implementation Details
 
 The setup functions handle vi.mock calls internally and return the useCase mock result for assertions in your tests. This means you no longer need to manually set up each hook's mock in your tests.
+
+# Testing Guidelines
+
+## Mocking Hooks
+
+When mocking hooks, follow these patterns:
+
+```typescript
+// 1. Create the mock function
+export const mockUseExample =
+  createTypedMock<() => UseExampleResult>().mockReturnValue(defaultResult);
+
+// 2. Create an override function
+export const overrideMockUseExample = (config = {}) => {
+  const result = { ...defaultResult, ...config };
+  mockUseExample.mockReturnValue(result);
+  return result;
+};
+
+// 3. Create a setup function
+export function mockExample(config = {}) {
+  const mockResult = config.useCase
+    ? overrideMockUseExample(config.useCase)
+    : mockUseExample();
+
+  vi.mock('./useExample', () => ({
+    useExample: mockUseExample,
+  }));
+
+  return mockResult;
+}
+```
+
+## Using Mocks in Tests
+
+```typescript
+describe('MyComponent', () => {
+  it('renders correctly', () => {
+    // Setup the mock
+    mockExample();
+
+    render(<MyComponent />);
+    // Assertions...
+  });
+
+  it('handles loading state', () => {
+    // Override the mock
+    mockExample({
+      useCase: {
+        loading: true
+      }
+    });
+
+    render(<MyComponent />);
+    // Assertions...
+  });
+});
+```
+
+## Using Mock Helpers
+
+The testing utilities provide helpers for common mocking patterns:
+
+```typescript
+import {
+  setupHookMock,
+  setupHookMocks,
+  createMockTestBuilder,
+} from '@testing/utils/mockHelpers';
+
+// Single hook mock
+const cleanup = setupHookMock(
+  '@application/units/useExample',
+  'useExample',
+  mockUseExample,
+);
+
+// Multiple hook mocks
+const cleanup = setupHookMocks([
+  {
+    module: '@application/units/useExample',
+    exportName: 'useExample',
+    implementation: mockUseExample,
+  },
+  {
+    module: '@application/units/useOther',
+    exportName: 'useOther',
+    implementation: mockUseOther,
+  },
+]);
+
+// Using the test builder
+const { withMock, withError, withLoading, run } = createMockTestBuilder();
+
+run(
+  withMock('useExample', mockUseExample, overrideMockUseExample)
+    .withLoading()
+    .build(),
+  () => {
+    // Test with loading state
+  },
+);
+
+run(
+  withMock('useExample', mockUseExample, overrideMockUseExample)
+    .withError(new Error('Test error'))
+    .build(),
+  () => {
+    // Test with error state
+  },
+);
+```
