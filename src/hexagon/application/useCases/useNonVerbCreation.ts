@@ -6,7 +6,7 @@ import type {
 import type { TableHook } from '../units/pasteTable/types';
 import {
   CreateNonVerbVocabularySchema,
-  validateWithSchema,
+  // validateWithSchema,
 } from '@LearnCraft-Spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { useVocabularyTable } from '../implementations/vocabularyTable/useVocabularyTable';
@@ -28,6 +28,7 @@ export interface VocabularyPaginationState {
   pageSize: number;
   goToNextPage: () => void;
   goToPreviousPage: () => void;
+  deleteVocabulary: (id: string) => Promise<boolean>;
 }
 
 export interface UseNonVerbCreationResult {
@@ -71,6 +72,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     createBatch,
     creating: creatingVocabulary,
     creationError: vocabCreationError,
+    deleteVocabulary,
   } = useVocabulary({
     isVerb: false,
   });
@@ -139,6 +141,10 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
             setPage((prev) => prev - 1);
           }
         },
+        deleteVocabulary: async (id: string) => {
+          await deleteVocabulary(id);
+          return true;
+        },
       };
     }, [
       selectedSubcategoryId,
@@ -152,6 +158,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
       hasMorePages,
       currentPage,
       page,
+      deleteVocabulary,
     ]);
 
   // Reset pagination when changing subcategory
@@ -178,15 +185,15 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
             ...entry,
             subcategoryId: Number(selectedSubcategoryId),
           };
-          const result = validateWithSchema(
-            CreateNonVerbVocabularySchema,
-            command,
-          );
-          if (!result.isValid) {
-            validationErrors.push(
-              `Row ${index + 1}: ${result.errors.join(', ')}`,
-            );
-          }
+          // const result = validateWithSchema(
+          //   CreateNonVerbVocabularySchema,
+          //   command,
+          // );
+          // if (!result.isValid) {
+          //   validationErrors.push(
+          //     `Row ${index + 1}: ${result.errors.join(', ')}`,
+          //   );
+          // }
         });
 
         if (validationErrors.length > 0) {

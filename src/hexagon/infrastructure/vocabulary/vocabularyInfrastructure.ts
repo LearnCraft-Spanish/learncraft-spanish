@@ -4,6 +4,7 @@ import type {
   GetTotalCountResponse,
   ListVocabularyResponse,
   Vocabulary,
+  VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
 import type { AuthPort } from '../../application/ports/authPort';
 import type {
@@ -12,6 +13,7 @@ import type {
 } from '../../application/ports/vocabularyPort';
 import { VocabularyEndpoints } from '@LearnCraft-Spanish/shared';
 import { createAuthenticatedHttpClient } from '../http/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 /**
  * Creates an implementation of the VocabularyPort.
@@ -130,8 +132,36 @@ export function createVocabularyInfrastructure(
     },
 
     deleteVocabulary: async (id: string): Promise<void> => {
+      // const queryClient = useQueryClient();
+      // const relatedRecordsObject: VocabularyRelatedRecords | undefined =
+      //   queryClient.getQueryData(['vocabulary-related-records', id]);
+      // if (relatedRecordsObject) {
+      //   const vocabExamples =
+      //     relatedRecordsObject.vocabularyExampleRecords.length > 0;
+      //   const vocabLessons =
+      //     relatedRecordsObject.vocabularyLessonRecords.length > 0;
+      //   const vocabSpelling =
+      //     relatedRecordsObject.vocabularySpellingRecords.length > 0;
       const path = VocabularyEndpoints.delete.path.replace(':id', id);
+      // .replace(':vocabularyExamples', vocabExamples.toString())
+      // .replace(':vocabularyLessons', vocabLessons.toString())
+      // .replace(':vocabularySpellings', vocabSpelling.toString());
+
       await httpClient.delete(path);
+      //   return;
+      // }
+      // throw new Error('Vocabulary has no related records object');
+    },
+
+    getAllRecordsAssociatedWithVocabularyRecord: async (
+      id: string,
+    ): Promise<VocabularyRelatedRecords> => {
+      const path =
+        VocabularyEndpoints.getAllRecordsAssociatedWithVocabularyRecord.path.replace(
+          ':id',
+          id,
+        );
+      return httpClient.get<VocabularyRelatedRecords>(path);
     },
 
     searchVocabulary: async (query: string): Promise<Vocabulary[]> => {

@@ -1,6 +1,12 @@
 import type { VocabularyPaginationState } from '../../../application/useCases/useNonVerbCreation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { useModal } from 'src/hooks/useModal';
+import { useAllRecordsAssociatedWithVocabularyRecord } from '../../../application/units/useAllRecordsAssociatedWithVocabularyRecord';
 import './PaginatedVocabularyTable.scss';
+import { useQuery } from '@tanstack/react-query';
+import { useVocabularyAdapter } from 'src/hexagon/application/adapters/vocabularyAdapter';
+import DeleteVocabularyRecord from './DeleteVocabularyRecord';
 
 interface PaginatedVocabularyTableProps {
   paginationState: VocabularyPaginationState;
@@ -18,18 +24,58 @@ export function PaginatedVocabularyTable({
   emptyMessage = 'No vocabulary items found',
 }: PaginatedVocabularyTableProps) {
   const {
-    vocabularyItems,
     isLoading,
+    error,
+    vocabularyItems,
     isFetching,
     isCountLoading,
-    error,
     totalCount,
     totalPages,
     hasMorePages,
     currentPage,
     goToNextPage,
     goToPreviousPage,
+    deleteVocabulary,
   } = paginationState;
+
+  const [vocabId, setVocabId] = useState<string | undefined>(undefined);
+  const { getAllRecordsAssociatedWithVocabularyRecord } =
+    useVocabularyAdapter();
+  // const {
+  //   data: relatedRecords,
+  //   isLoading: isRelatedRecordsLoading,
+  //   error: relatedRecordsError,
+  // } = useAllRecordsAssociatedWithVocabularyRecord(vocabId);
+  const {
+    data: relatedRecords,
+    isLoading: isRelatedRecordsLoading,
+    error: relatedRecordsError,
+  } = useQuery({
+    queryKey: ['vocabulary-related-records', vocabId],
+    queryFn: () => getAllRecordsAssociatedWithVocabularyRecord(vocabId ?? ''),
+    enabled: !!vocabId,
+  });
+
+  const { openModal, closeModal } = useModal();
+
+  const handleDelete = (id: string) => {
+    setVocabId(id);
+    // figure out how to get the related records
+    openModal({
+      title: 'Delete Vocabulary',
+      body: 'Are you sure you want to delete this vocabulary?',
+      type: 'confirm',
+      confirmFunction: async () => {
+        // const promise = deleteVocabulary(id);
+        // toast.promise(promise, {
+        //   pending: 'Deleting vocabulary...',
+        //   success: 'Vocabulary deleted successfully',
+        //   error: 'Failed to delete vocabulary',
+        // });
+        closeModal();
+      },
+    });
+  };
 
   // Handle initial loading state (no data yet)
   if (isLoading && vocabularyItems.length === 0) {
@@ -84,6 +130,9 @@ export function PaginatedVocabularyTable({
               <th>Description</th>
               <th>Spellings</th>
               <th>Notes</th>
+              <th className="paginated-vocabulary__table-header-delete">
+                Delete
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -93,6 +142,9 @@ export function PaginatedVocabularyTable({
                 <td>{item.descriptor}</td>
                 <td>{item.spellings?.map((s) => s.value).join(', ') || ''}</td>
                 <td>{item.notes || ''}</td>
+                <td>
+                  <DeleteVocabularyRecord recordId={item.id.toString()} />
+                </td>
               </tr>
             ))}
           </tbody>

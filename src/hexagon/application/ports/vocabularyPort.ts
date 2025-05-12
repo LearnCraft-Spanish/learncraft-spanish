@@ -3,6 +3,7 @@ import type {
   CreateVerb,
   GetTotalCountResponse,
   Vocabulary,
+  VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
 
 /**
@@ -50,6 +51,13 @@ export interface VocabularyPort {
    * Delete a vocabulary item
    */
   deleteVocabulary: (id: string) => Promise<void>;
+
+  /**
+   * Get all records associated with a vocabulary record
+   */
+  getAllRecordsAssociatedWithVocabularyRecord: (
+    id: string,
+  ) => Promise<VocabularyRelatedRecords>;
 
   /**
    * Search vocabulary items based on criteria
