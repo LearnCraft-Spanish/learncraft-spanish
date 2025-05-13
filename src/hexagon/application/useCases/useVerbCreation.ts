@@ -1,31 +1,8 @@
-import type { CreateVerb, Subcategory } from '@LearnCraft-Spanish/shared';
+import type { CreateVerb } from '@LearnCraft-Spanish/shared';
+import type { UseVerbCreationResult, VerbData } from './types';
+import { useSubcategories } from '@application/units/useSubcategories';
+import { useVocabulary } from '@application/units/useVocabulary';
 import { useCallback, useMemo, useState } from 'react';
-import { useSubcategories } from '../units/useSubcategories';
-import { useVocabulary } from '../units/useVocabulary';
-
-export interface VerbData {
-  infinitive: string;
-  translation: string;
-  usage?: string;
-  subcategoryId: string;
-  isRegular?: boolean;
-  notes?: string;
-}
-
-export interface UseVerbCreationResult {
-  // Subcategory selection
-  verbSubcategories: Subcategory[]; // Now using proper type
-  loadingSubcategories: boolean;
-  selectedSubcategoryId: string;
-  setSelectedSubcategoryId: (id: string) => void;
-
-  // Creation status
-  creating: boolean;
-  creationError: Error | null;
-
-  // Creation methods
-  createVerb: (verbData: VerbData) => Promise<boolean>;
-}
 
 /**
  * Maps verb data to a CreateVerb command
@@ -43,7 +20,7 @@ function mapToVerbCommand(data: VerbData): CreateVerb {
  * Use case for verb creation.
  * Manages verb-specific creation flow with proper subcategory filtering.
  */
-export function useVerbCreation(): UseVerbCreationResult {
+export const useVerbCreation = (): UseVerbCreationResult => {
   // State
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
   const [creationError, setCreationError] = useState<Error | null>(null);
@@ -113,4 +90,4 @@ export function useVerbCreation(): UseVerbCreationResult {
     // Creation methods
     createVerb,
   };
-}
+};

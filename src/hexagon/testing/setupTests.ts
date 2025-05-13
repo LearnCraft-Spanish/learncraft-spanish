@@ -15,11 +15,11 @@ import '@testing-library/jest-dom';
 // Replace real adapter implementations with mocks for all tests
 const setupAdapterMocks = () => {
   vi.mock('@application/adapters/vocabularyAdapter', () => ({
-    useVocabularyAdapter: () => mockVocabularyAdapter,
+    useVocabularyAdapter: () => mockVocabularyAdapter(),
   }));
 
   vi.mock('@application/adapters/subcategoryAdapter', () => ({
-    useSubcategoryAdapter: () => mockSubcategoryAdapter,
+    useSubcategoryAdapter: () => mockSubcategoryAdapter(),
   }));
 };
 

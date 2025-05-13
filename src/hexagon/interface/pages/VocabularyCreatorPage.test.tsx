@@ -1,32 +1,28 @@
-import {
-  defaultResult as defaultNonVerb,
-  mockUseNonVerbCreation,
-} from '@application/useCases/useNonVerbCreation.mock';
-import {
-  defaultResult as defaultVerb,
-  mockUseVerbCreation,
-} from '@application/useCases/useVerbCreation.mock';
+import { mockUseNonVerbCreation } from '@application/useCases/useNonVerbCreation.mock';
+import { mockUseVerbCreation } from '@application/useCases/useVerbCreation.mock';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { cleanupRegisteredMocks, setupModuleMock } from '@testing/mockRegistry';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { VocabularyCreatorPage } from './VocabularyCreatorPage';
 
-// ---- Place these after the relevant mock helpers are imported ----
-vi.mock('@application/useCases/useNonVerbCreation', () => ({
-  useNonVerbCreation: mockUseNonVerbCreation,
-}));
-vi.mock('@application/useCases/useVerbCreation', () => ({
-  useVerbCreation: mockUseVerbCreation,
-}));
-
-beforeEach(() => {
-  mockUseNonVerbCreation.mockReturnValue(defaultNonVerb);
-  mockUseVerbCreation.mockReturnValue(defaultVerb);
-});
-
 describe('vocabularyCreatorPage', () => {
+  beforeEach(() => {
+    // Setup mocks with happy-path defaults
+    setupModuleMock('@application/useCases/useNonVerbCreation', () => ({
+      useNonVerbCreation: mockUseNonVerbCreation,
+    }));
+    setupModuleMock('@application/useCases/useVerbCreation', () => ({
+      useVerbCreation: mockUseVerbCreation,
+    }));
+  });
+
+  afterEach(() => {
+    cleanupRegisteredMocks();
+  });
+
   // Helper to render with providers
   const renderPage = () => {
     return render(

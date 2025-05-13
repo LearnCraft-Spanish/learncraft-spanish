@@ -33,7 +33,7 @@ const defaultMockResult: VocabularyPageResult = {
 // Create the mock hook with default implementation
 export const mockUseVocabularyPage = createTypedMock<
   (
-    subcategoryId: number,
+    subcategoryId?: number,
     page?: number,
     pageSize?: number,
     enabled?: boolean,
