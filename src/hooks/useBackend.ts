@@ -254,12 +254,6 @@ export function useBackend() {
     return getFactory<types.Flashcard[]>('public/examples');
   }, [getFactory]);
 
-  const getVerifiedExamplesFromBackend = useCallback((): Promise<
-    types.Flashcard[]
-  > => {
-    return getFactory<types.Flashcard[]>('public/verified-examples');
-  }, [getFactory]);
-
   const getAudioExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
@@ -274,6 +268,12 @@ export function useBackend() {
     useCallback((): Promise<types.StudentFlashcardData> => {
       return getFactory<types.StudentFlashcardData>('my-examples');
     }, [getFactory]);
+
+  const getVerifiedExamplesFromBackend = useCallback((): Promise<
+    types.Flashcard[]
+  > => {
+    return getFactory<types.Flashcard[]>('public/verified-examples');
+  }, [getFactory]);
 
   const getQuizExamplesFromBackend = useCallback(
     (quizId: number): Promise<types.Flashcard[]> => {
@@ -295,25 +295,6 @@ export function useBackend() {
   const getActiveExamplesFromBackend = useCallback(
     (studentId: number): Promise<types.StudentFlashcardData> => {
       return getFactory<types.StudentFlashcardData>(`${studentId}/examples`);
-    },
-    [getFactory],
-  );
-
-  const getUnverifiedExamplesFromBackend = useCallback((): Promise<
-    types.Flashcard[]
-  > => {
-    return getFactory<types.Flashcard[]>('unverified-examples');
-  }, [getFactory]);
-
-  const getRecentlyEditedExamples = useCallback((): Promise<
-    types.Flashcard[]
-  > => {
-    return getFactory<types.Flashcard[]>('recently-edited-examples');
-  }, [getFactory]);
-
-  const getSingleExample = useCallback(
-    (exampleId: number): Promise<types.Flashcard> => {
-      return getFactory<types.Flashcard>(`single-example/${exampleId}`);
     },
     [getFactory],
   );
@@ -450,20 +431,6 @@ export function useBackend() {
     [postFactory],
   );
 
-  // Complex queryies have to be sent as POST since GET doesn't allow body
-  const getExampleSetBySpanishText = useCallback(
-    (spanishText: string[]): Promise<types.Flashcard[]> => {
-      return newPostFactory<types.Flashcard[]>({
-        path: 'example-set/by-spanish-text',
-        headers: [],
-        body: {
-          spanishtext: spanishText,
-        },
-      });
-    },
-    [newPostFactory],
-  );
-
   /*      DELETE Requests      */
 
   const deleteMyStudentExample = useCallback(
@@ -478,16 +445,6 @@ export function useBackend() {
       return deleteFactory('delete-student-example', { deleteid: recordId });
     },
     [deleteFactory],
-  );
-
-  const removeVocabFromExample = useCallback(
-    (exampleId: number, vocabIdList: number[]): Promise<number> => {
-      return newDeleteFactory({
-        path: 'remove-vocab-from-example',
-        body: { exampleId, vocabIdList },
-      });
-    },
-    [newDeleteFactory],
   );
 
   const getPMFDataForUser = useCallback(
@@ -522,55 +479,6 @@ export function useBackend() {
           studentId,
           recordId,
           hasTakenSurvey,
-        },
-      });
-    },
-    [newPostFactory],
-  );
-
-  const createUnverifiedExample = useCallback(
-    (example: types.NewFlashcard): Promise<number> => {
-      return newPostFactory<number>({
-        path: 'add-unverified-example',
-        body: {
-          example,
-        },
-      });
-    },
-    [newPostFactory],
-  );
-
-  const createMultipleUnverifiedExamples = useCallback(
-    (examples: types.NewFlashcard[]): Promise<number[]> => {
-      return newPostFactory<number[]>({
-        path: 'add-multiple-unverified-examples',
-        body: {
-          examples,
-        },
-      });
-    },
-    [newPostFactory],
-  );
-
-  const updateExample = useCallback(
-    (example: Partial<types.Flashcard>): Promise<number> => {
-      return newPostFactory<number>({
-        path: 'update-example',
-        body: {
-          example,
-        },
-      });
-    },
-    [newPostFactory],
-  );
-
-  const addVocabularyToExample = useCallback(
-    (exampleId: number, vocabIdList: number[]): Promise<number> => {
-      return newPostFactory<number>({
-        path: 'add-vocab-to-example',
-        body: {
-          exampleId,
-          vocabIdList,
         },
       });
     },
@@ -722,33 +630,24 @@ export function useBackend() {
     getLessonList,
     getLessonsFromBackend,
     getMyExamplesFromBackend,
-
+    getVerifiedExamplesFromBackend,
     getPMFDataForUser,
     getProgramsFromBackend,
     getQuizExamplesFromBackend,
-    getSingleExample,
-    getExampleSetBySpanishText,
     getSpellingsFromBackend,
-    getUnverifiedExamplesFromBackend,
-    getRecentlyEditedExamples,
     getUserDataFromBackend,
-    getVerifiedExamplesFromBackend,
     getVocabFromBackend,
     getVerbsFromBackend,
     getSubcategoriesFromBackend,
 
     // POST Requests
-    addVocabularyToExample,
     createMyStudentExample,
     createPMFDataForUser,
     createSpelling,
     createStudentExample,
-    createUnverifiedExample,
-    createMultipleUnverifiedExamples,
     createMultipleStudentExamples,
     createMultipleQuizExamples,
     createVocabulary,
-    updateExample,
     updateMyStudentExample,
     updatePMFDataForUser,
     updateStudentExample,
@@ -759,7 +658,6 @@ export function useBackend() {
     deleteSpelling,
     deleteStudentExample,
     deleteVocabulary,
-    removeVocabFromExample,
     createSubcategory,
     updateSubcategory,
     deleteSubcategory,

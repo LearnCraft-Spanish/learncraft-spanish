@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { toast } from 'react-toastify';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
-import { useBackend } from 'src/hooks/useBackend';
+import useLegacyBackend from 'src/hooks/ExampleManagerLegacyDataFunctions';
 import { useModal } from 'src/hooks/useModal';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
@@ -27,7 +27,7 @@ export default function ExampleSetCreator({
 }: SetExampleCreatorProps) {
   const queryClient = useQueryClient();
   const { getExampleSetBySpanishText, createMultipleUnverifiedExamples } =
-    useBackend();
+    useLegacyBackend();
   const { openModal } = useModal();
 
   const [pastingOrEditing, setPastingOrEditing] = useState<

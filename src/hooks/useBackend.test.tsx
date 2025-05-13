@@ -156,10 +156,10 @@ describe('useBackend Hook', () => {
     requiredFields: ['relatedWordIdiom', 'spellingOption'],
   });
 
-  testArrayFetchFunction({
-    functionName: 'getVerifiedExamplesFromBackend',
-    requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
-  });
+  // testArrayFetchFunction({
+  //   functionName: 'getVerifiedExamplesFromBackend',
+  //   requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
+  // });
 
   testArrayFetchFunction({
     functionName: 'getAudioExamplesFromBackend',

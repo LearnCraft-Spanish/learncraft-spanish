@@ -1,14 +1,15 @@
 import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import useExampleManagerLegacyDataFunctions from '../ExampleManagerLegacyDataFunctions';
 import { useExampleUpdate } from './useExampleUpdate';
 
 export function useRecentlyEditedExamples() {
   const { updateExampleFromQuery } = useExampleUpdate();
   const userDataQuery = useUserData();
-  const { getRecentlyEditedExamples, createUnverifiedExample } = useBackend();
+  const { getRecentlyEditedExamples, createUnverifiedExample } =
+    useExampleManagerLegacyDataFunctions();
   const hasAccess =
     userDataQuery.data?.roles.adminRole === 'coach' ||
     userDataQuery.data?.roles.adminRole === 'admin';

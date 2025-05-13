@@ -13,7 +13,7 @@ import ExampleAssignmentPanel from 'src/components/ExampleManager/ExampleAssignm
 import ExampleEditForm from 'src/components/ExampleManager/ExampleEditForm';
 import ExamplePasteArea from 'src/components/ExampleManager/ExamplePasteArea';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
-import { useBackend } from 'src/hooks/useBackend';
+import useLegacyBackend from 'src/hooks/ExampleManagerLegacyDataFunctions';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
@@ -26,7 +26,7 @@ export default function ExampleSetCreator({
 }: SetExampleCreatorProps) {
   const queryClient = useQueryClient();
   const { getExampleSetBySpanishText, createMultipleUnverifiedExamples } =
-    useBackend();
+    useLegacyBackend();
 
   const [pastingOrEditing, setPastingOrEditing] = useState<
     'pasting' | 'editing' | 'assigning'
