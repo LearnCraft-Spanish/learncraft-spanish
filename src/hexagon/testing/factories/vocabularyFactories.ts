@@ -26,6 +26,3 @@ export const createMockCreateVerbList = createZodListFactory(CreateVerbSchema);
 export const createMockVocabularyRelatedRecords = createZodFactory(
   VocabularyRelatedRecordsSchema,
 );
-export const createMockVocabularyRelatedRecordsList = createZodListFactory(
-  VocabularyRelatedRecordsSchema,
-);
