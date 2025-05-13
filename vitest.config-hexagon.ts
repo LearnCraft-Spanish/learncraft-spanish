@@ -19,8 +19,11 @@ export default defineConfig((configEnv: ConfigEnv) =>
         restoreMocks: true,
         testTimeout: 5000,
         coverage: {
+          include: ['**/hexagon/**'],
           exclude: [
-            '**/!(hexagon)/**',
+            '**/hexagon/testing/**',
+            '**/hexagon/config/**',
+            '**/hexagon/infrastructure/**',
             '**/*{.,-}{test,spec,bench,benchmark}?(-d).?(c|m)[jt]s?(x)',
             '**/{index,types}?(-d).?(c|m)[jt]s?(x)',
             '**/[.]**',
