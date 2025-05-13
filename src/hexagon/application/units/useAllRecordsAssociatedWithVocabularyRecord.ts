@@ -1,17 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
 import { useVocabularyAdapter } from '../adapters/vocabularyAdapter';
 
-export function useAllRecordsAssociatedWithVocabularyRecord(id?: string) {
+export function useAllRecordsAssociatedWithVocabularyRecord(
+  id: string | undefined,
+) {
   const { getAllRecordsAssociatedWithVocabularyRecord } =
     useVocabularyAdapter();
-
-  if (!id) {
-    return { data: undefined, isLoading: false, error: null };
-  }
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['vocabulary-related-records', id],
     queryFn: () => getAllRecordsAssociatedWithVocabularyRecord(id),
+    enabled: !!id,
   });
 
   return { data, isLoading, error };

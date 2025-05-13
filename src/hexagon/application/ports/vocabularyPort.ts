@@ -50,13 +50,13 @@ export interface VocabularyPort {
   /**
    * Delete a vocabulary item
    */
-  deleteVocabulary: (id: string) => Promise<void>;
+  deleteVocabulary: (id: string) => Promise<number>;
 
   /**
    * Get all records associated with a vocabulary record
    */
   getAllRecordsAssociatedWithVocabularyRecord: (
-    id: string,
+    id: string | undefined,
   ) => Promise<VocabularyRelatedRecords>;
 
   /**

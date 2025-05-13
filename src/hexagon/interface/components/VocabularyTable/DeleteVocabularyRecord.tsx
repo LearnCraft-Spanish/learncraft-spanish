@@ -1,8 +1,7 @@
-import { useModal } from 'src/hooks/useModal';
-import { useVocabularyAdapter } from 'src/hexagon/application/adapters/vocabularyAdapter';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useVocabularyAdapter } from 'src/hexagon/application/adapters/vocabularyAdapter';
 
 export default function DeleteVocabularyRecord({
   recordId,

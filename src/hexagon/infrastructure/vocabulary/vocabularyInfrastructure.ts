@@ -13,7 +13,6 @@ import type {
 } from '../../application/ports/vocabularyPort';
 import { VocabularyEndpoints } from '@LearnCraft-Spanish/shared';
 import { createAuthenticatedHttpClient } from '../http/client';
-import { useQueryClient } from '@tanstack/react-query';
 
 /**
  * Creates an implementation of the VocabularyPort.
@@ -131,31 +130,25 @@ export function createVocabularyInfrastructure(
       return results;
     },
 
-    deleteVocabulary: async (id: string): Promise<void> => {
-      // const queryClient = useQueryClient();
-      // const relatedRecordsObject: VocabularyRelatedRecords | undefined =
-      //   queryClient.getQueryData(['vocabulary-related-records', id]);
-      // if (relatedRecordsObject) {
-      //   const vocabExamples =
-      //     relatedRecordsObject.vocabularyExampleRecords.length > 0;
-      //   const vocabLessons =
-      //     relatedRecordsObject.vocabularyLessonRecords.length > 0;
-      //   const vocabSpelling =
-      //     relatedRecordsObject.vocabularySpellingRecords.length > 0;
+    deleteVocabulary: async (id: string): Promise<number> => {
       const path = VocabularyEndpoints.delete.path.replace(':id', id);
-      // .replace(':vocabularyExamples', vocabExamples.toString())
-      // .replace(':vocabularyLessons', vocabLessons.toString())
-      // .replace(':vocabularySpellings', vocabSpelling.toString());
 
-      await httpClient.delete(path);
-      //   return;
-      // }
-      // throw new Error('Vocabulary has no related records object');
+      const result = await httpClient.delete<number>(path);
+
+      return result;
     },
 
     getAllRecordsAssociatedWithVocabularyRecord: async (
-      id: string,
+      id: string | undefined,
     ): Promise<VocabularyRelatedRecords> => {
+      if (!id) {
+        return {
+          vocabularyRecordId: 0,
+          vocabularyExampleRecords: [],
+          vocabularyLessonRecords: [],
+          vocabularySpellingRecords: [],
+        };
+      }
       const path =
         VocabularyEndpoints.getAllRecordsAssociatedWithVocabularyRecord.path.replace(
           ':id',

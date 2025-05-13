@@ -2,6 +2,7 @@
 import {
   CreateNonVerbVocabularySchema,
   CreateVerbSchema,
+  VocabularyRelatedRecordsSchema,
   VocabularySchema,
 } from '@LearnCraft-Spanish/shared';
 import {
@@ -21,3 +22,10 @@ export const createMockCreateNonVerbVocabularyList = createZodListFactory(
 
 export const createMockCreateVerb = createZodFactory(CreateVerbSchema);
 export const createMockCreateVerbList = createZodListFactory(CreateVerbSchema);
+
+export const createMockVocabularyRelatedRecords = createZodFactory(
+  VocabularyRelatedRecordsSchema,
+);
+export const createMockVocabularyRelatedRecordsList = createZodListFactory(
+  VocabularyRelatedRecordsSchema,
+);
