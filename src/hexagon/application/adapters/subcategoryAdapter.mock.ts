@@ -1,10 +1,9 @@
 import type { SubcategoryPort } from '@application/ports/subcategoryPort';
-
 import {
   createMockSubcategory,
   createMockSubcategoryList,
 } from '@testing/factories/subcategoryFactories';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation
 const defaultMockAdapter: SubcategoryPort = {
@@ -13,21 +12,12 @@ const defaultMockAdapter: SubcategoryPort = {
     Promise.resolve(createMockSubcategory({ id: Number.parseInt(id) })),
 };
 
-// Create a single typed mock for the entire adapter hook
-export const mockSubcategoryAdapter =
-  createTypedMock<() => SubcategoryPort>().mockReturnValue(defaultMockAdapter);
-
-// Override function with simpler type definition
-export const overrideMockSubcategoryAdapter = (
-  config: Partial<SubcategoryPort> = {},
-) => {
-  const mockResult = {
-    ...defaultMockAdapter,
-    ...config,
-  };
-  mockSubcategoryAdapter.mockReturnValue(mockResult);
-  return mockResult;
-};
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockSubcategoryAdapter,
+  override: overrideMockSubcategoryAdapter,
+  reset: resetMockSubcategoryAdapter,
+} = createOverrideableMock<SubcategoryPort>(defaultMockAdapter);
 
 // Export the default mock for global mocking
 export default mockSubcategoryAdapter;

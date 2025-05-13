@@ -230,102 +230,107 @@ export default mockUseExample;
 
 ### 3. Using Mocks in Tests
 
-There are three ways to use mocks in tests:
+Our minimal, robust pattern is as follows:
 
-#### Direct Import and Mock
+1. **Register mocks via setupModuleMock** to set up the mock function that will be used in tests.
+
+   Example (in your test file):
+
+   ```ts
+   import { setupModuleMock } from '@testing/mockRegistry';
+   import { mockUseVocabulary } from '@application/units/useVocabulary.mock';
+   import { mockUseSubcategories } from '@application/units/useSubcategories.mock';
+   import { vi } from 'vitest';
+
+   describe('MyTest', () => {
+     // Get references to the mock functions that we can update
+     const mockUseVocabularyFn = vi.fn(() => mockUseVocabulary());
+     const mockUseSubcategoriesFn = vi.fn(() => mockUseSubcategories());
+
+     beforeAll(() => {
+       // Register the mock functions
+       setupModuleMock('@application/units/useVocabulary', () => ({
+         useVocabulary: mockUseVocabularyFn,
+       }));
+       setupModuleMock('@application/units/useSubcategories', () => ({
+         useSubcategories: mockUseSubcategoriesFn,
+       }));
+     });
+
+     beforeEach(() => {
+       // Reset to happy path before each test
+       mockUseVocabularyFn.mockReturnValue(mockUseVocabulary());
+       mockUseSubcategoriesFn.mockReturnValue(mockUseSubcategories());
+     });
+
+     it('should handle happy path', () => {
+       // Test with default happy path behavior
+       // ... test code ...
+     });
+
+     it('should handle error state', () => {
+       // Use overrideMockUseX for non-happy-path cases
+       const errorResult = overrideMockUseVocabulary({
+         error: new Error('Failed to load'),
+         loading: false,
+       });
+       mockUseVocabularyFn.mockReturnValue(errorResult);
+       // ... test error handling ...
+     });
+
+     it('should handle loading state', () => {
+       // Use overrideMockUseX for non-happy-path cases
+       const loadingResult = overrideMockUseVocabulary({
+         loading: true,
+         error: null,
+       });
+       mockUseVocabularyFn.mockReturnValue(loadingResult);
+       // ... test loading state ...
+     });
+   });
+   ```
+
+````
+
+This pattern ensures:
+
+– **Mock factory pattern:** Mocks are created via factories and registered once via setupModuleMock.
+
+– **Simple declarable mocks:** Register mocks once, then use mockReturnValue to control behavior in tests.
+
+– **Minimum boilerplate:** No extra setup functions needed - just register and use mockReturnValue.
+
+– **Clean, isolated tests:** Each test starts with happy path (via beforeEach) and can override as needed.
+
+– **No global state leak:** The registry ensures clean test isolation.
+
+### Using Override Functions
+
+The `overrideMockUseX` functions are specifically for creating non-happy-path test cases. They help create mock results with:
+
+- Error states
+- Loading states
+- Edge cases
+- Custom data scenarios
+
+Example:
 
 ```typescript
-import { vi } from 'vitest';
-import { mockUseExample, overrideMockUseExample } from './useExample.mock';
+it('should handle network error', () => {
+  // Create a mock result with an error state
+  const errorResult = overrideMockUseVocabulary({
+    error: new Error('Network error'),
+    loading: false,
+  });
 
-// Mock the hook module
-vi.mock('@application/units/useExample', () => ({
-  useExample: mockUseExample,
-}));
+  // Use that result in the test
+  mockUseVocabularyFn.mockReturnValue(errorResult);
 
-// Test with default values
-test('component works with default values', () => {
-  // ...test code
+  // Test error handling...
 });
+````
 
-// Test with custom values
-test('component shows loading state', () => {
-  overrideMockUseExample({ loading: true });
-  // ...test code
-});
-```
-
-#### Using Helper Utilities
-
-```typescript
-import { setupHookMock, setupHookMocks } from '@testing/utils/mockHelpers';
-import { mockUseExample, overrideMockUseExample } from './useExample.mock';
-
-test('component works with default values', () => {
-  const cleanup = setupHookMock(
-    '@application/units/useExample',
-    'useExample',
-    mockUseExample,
-  );
-
-  // ...test code
-
-  cleanup();
-});
-
-// Testing with multiple hooks
-test('component uses multiple hooks', () => {
-  const cleanup = setupHookMocks([
-    {
-      module: '@application/units/useExample',
-      exportName: 'useExample',
-      implementation: mockUseExample,
-    },
-    {
-      module: '@application/units/useOther',
-      exportName: 'useOther',
-      implementation: mockUseOther,
-    },
-  ]);
-
-  // ...test code
-
-  cleanup();
-});
-```
-
-#### Using Builder Pattern
-
-```typescript
-import { createMockTestBuilder } from '@testing/utils/mockHelpers';
-import { mockUseExample, overrideMockUseExample } from './useExample.mock';
-
-const { withMock, withError, withLoading, run } = createMockTestBuilder();
-
-// Test with loading state
-test('component shows loading state', () => {
-  run(
-    withMock('useExample', mockUseExample, overrideMockUseExample)
-      .withLoading()
-      .build(),
-    () => {
-      // ...test with loading state
-    },
-  );
-});
-
-// Test with error state
-test('component shows error state', () => {
-  run(
-    withMock('useExample', mockUseExample, overrideMockUseExample)
-      .withError(new Error('Test error'))
-      .build(),
-    () => {
-      // ...test with error state
-    },
-  );
-});
-```
+The override functions are a convenience for creating these non-happy-path cases - they merge your custom state with the default mock result. But the actual test behavior is controlled by `mockReturnValue` on the registered mock function.
 
 ## Factory Utilities
 

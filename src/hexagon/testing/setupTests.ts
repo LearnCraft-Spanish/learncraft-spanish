@@ -5,8 +5,14 @@
  * It configures global mocks and provides necessary test utilities.
  */
 
-import mockSubcategoryAdapter from '@application/adapters/subcategoryAdapter.mock';
-import mockVocabularyAdapter from '@application/adapters/vocabularyAdapter.mock';
+import {
+  mockSubcategoryAdapter,
+  resetMockSubcategoryAdapter,
+} from '@application/adapters/subcategoryAdapter.mock';
+import {
+  mockVocabularyAdapter,
+  resetMockVocabularyAdapter,
+} from '@application/adapters/vocabularyAdapter.mock';
 import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { resetTestQueryClient } from './utils/testQueryClient';
@@ -15,11 +21,11 @@ import '@testing-library/jest-dom';
 // Replace real adapter implementations with mocks for all tests
 const setupAdapterMocks = () => {
   vi.mock('@application/adapters/vocabularyAdapter', () => ({
-    useVocabularyAdapter: () => mockVocabularyAdapter(),
+    useVocabularyAdapter: () => mockVocabularyAdapter,
   }));
 
   vi.mock('@application/adapters/subcategoryAdapter', () => ({
-    useSubcategoryAdapter: () => mockSubcategoryAdapter(),
+    useSubcategoryAdapter: () => mockSubcategoryAdapter,
   }));
 };
 
@@ -30,6 +36,10 @@ beforeEach(() => {
 
 // Reset all mocks after each test
 afterEach(() => {
+  // Reset the adapter mocks to their default implementations
+  resetMockVocabularyAdapter();
+  resetMockSubcategoryAdapter();
+
   // Clear mock call history
   vi.clearAllMocks();
 

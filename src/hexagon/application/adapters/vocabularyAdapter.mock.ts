@@ -7,7 +7,7 @@ import {
   createMockVocabulary,
   createMockVocabularyList,
 } from '@testing/factories/vocabularyFactories';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation
 const defaultMockAdapter: VocabularyPort = {
@@ -28,21 +28,12 @@ const defaultMockAdapter: VocabularyPort = {
     Promise.resolve(createMockVocabularyList(2, { word: query })),
 };
 
-// Create a single typed mock for the entire adapter hook
-export const mockVocabularyAdapter =
-  createTypedMock<() => VocabularyPort>().mockReturnValue(defaultMockAdapter);
-
-// Override function with simpler type definition
-export const overrideMockVocabularyAdapter = (
-  config: Partial<VocabularyPort> = {},
-) => {
-  const mockResult = {
-    ...defaultMockAdapter,
-    ...config,
-  };
-  mockVocabularyAdapter.mockReturnValue(mockResult);
-  return mockResult;
-};
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockVocabularyAdapter,
+  override: overrideMockVocabularyAdapter,
+  reset: resetMockVocabularyAdapter,
+} = createOverrideableMock<VocabularyPort>(defaultMockAdapter);
 
 // Export the default mock for global mocking
 export default mockVocabularyAdapter;

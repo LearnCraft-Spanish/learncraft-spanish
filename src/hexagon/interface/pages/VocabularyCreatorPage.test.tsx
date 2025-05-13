@@ -1,26 +1,25 @@
-import { mockUseNonVerbCreation } from '@application/useCases/useNonVerbCreation.mock';
-import { mockUseVerbCreation } from '@application/useCases/useVerbCreation.mock';
+import { defaultResult as nonVerbCreationDefault } from '@application/useCases/useNonVerbCreation.mock';
+import { defaultResult as verbCreationDefault } from '@application/useCases/useVerbCreation.mock';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { cleanupRegisteredMocks, setupModuleMock } from '@testing/mockRegistry';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import React from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { VocabularyCreatorPage } from './VocabularyCreatorPage';
 
-describe('vocabularyCreatorPage', () => {
-  beforeEach(() => {
-    // Setup mocks with happy-path defaults
-    setupModuleMock('@application/useCases/useNonVerbCreation', () => ({
-      useNonVerbCreation: mockUseNonVerbCreation,
-    }));
-    setupModuleMock('@application/useCases/useVerbCreation', () => ({
-      useVerbCreation: mockUseVerbCreation,
-    }));
-  });
+// Mock the useCase hooks with the proper return values
+vi.mock('@application/useCases/useNonVerbCreation', () => ({
+  useNonVerbCreation: () => nonVerbCreationDefault,
+}));
 
+vi.mock('@application/useCases/useVerbCreation', () => ({
+  useVerbCreation: () => verbCreationDefault,
+}));
+
+describe('vocabularyCreatorPage', () => {
   afterEach(() => {
-    cleanupRegisteredMocks();
+    // Clear mock call history
+    vi.clearAllMocks();
   });
 
   // Helper to render with providers
