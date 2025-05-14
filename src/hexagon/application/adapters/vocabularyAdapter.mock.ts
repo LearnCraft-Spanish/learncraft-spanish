@@ -4,10 +4,12 @@ import type {
   CreateVerb,
   GetTotalCountResponse,
   Vocabulary,
+  VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
 import {
   createMockVocabulary,
   createMockVocabularyList,
+  createMockVocabularyRelatedRecords,
 } from '@testing/factories/vocabularyFactories';
 import { setMockResult } from '@testing/utils/setMockResult';
 import { createTypedMock } from '@testing/utils/typedMock';
@@ -48,13 +50,17 @@ export const mockCreateVocabularyBatch = createTypedMock<
 );
 
 export const mockDeleteVocabulary =
-  createTypedMock<(id: string) => Promise<void>>().mockResolvedValue(undefined);
+  createTypedMock<(id: string) => Promise<number>>().mockResolvedValue(1);
 
 export const mockSearchVocabulary = createTypedMock<
   (query: string) => Promise<Vocabulary[]>
 >().mockImplementation((query) =>
   Promise.resolve(createMockVocabularyList(2, { word: query })),
 );
+
+export const mockGetAllRecordsAssociatedWithVocabularyRecord = createTypedMock<
+  (id: string | undefined) => Promise<VocabularyRelatedRecords>
+>().mockResolvedValue(createMockVocabularyRelatedRecords());
 
 // Global mock for the adapter with safe default implementations
 export const mockVocabularyAdapter: VocabularyPort = {
@@ -66,6 +72,8 @@ export const mockVocabularyAdapter: VocabularyPort = {
   createVocabularyBatch: mockCreateVocabularyBatch,
   deleteVocabulary: mockDeleteVocabulary,
   searchVocabulary: mockSearchVocabulary,
+  getAllRecordsAssociatedWithVocabularyRecord:
+    mockGetAllRecordsAssociatedWithVocabularyRecord,
 };
 
 // Setup function for tests to override mock behavior
