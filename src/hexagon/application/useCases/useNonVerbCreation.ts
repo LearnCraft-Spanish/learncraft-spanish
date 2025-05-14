@@ -4,8 +4,10 @@ import type {
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
 import type { TableHook } from '../units/pasteTable/types';
-import { CreateNonVerbVocabularySchema } from '@LearnCraft-Spanish/shared';
-import { validateWithSchema } from '@LearnCraft-Spanish/shared/dist/domain/validation';
+import {
+  CreateNonVerbVocabularySchema,
+  validateWithSchema,
+} from '@LearnCraft-Spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { useVocabularyTable } from '../implementations/vocabularyTable/useVocabularyTable';
 import { useSubcategories } from '../units/useSubcategories';
