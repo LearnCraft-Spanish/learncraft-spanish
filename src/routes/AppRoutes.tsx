@@ -13,6 +13,7 @@ import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
+import { TestingExamplesRefactor } from 'src/hexagon/interface/pages/TestingExamplesRefactor';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
@@ -134,6 +135,10 @@ export default function AppRoutes() {
       </Route>
       <Route path="/*" element={<NotFoundPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route
+        path="/testing-examples-refactor"
+        element={<TestingExamplesRefactor />}
+      />
     </SentryRoutes>
   );
 }

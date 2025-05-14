@@ -163,6 +163,11 @@ export default function Menu() {
                   </div>
                 )}
               </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/testing-examples-refactor">
+                  Testing Examples Refactor
+                </Link>
+              </div>
             </>
           )}
         </div>

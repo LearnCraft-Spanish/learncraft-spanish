@@ -83,18 +83,24 @@ export default function useLegacyBackend() {
     return getFactory<types.Flashcard[]>('recently-edited-examples');
   }, [getFactory]);
 
-  const getSingleExample = useCallback(
-    (exampleId: number): Promise<types.Flashcard> => {
-      return getFactory<types.Flashcard>(`single-example/${exampleId}`);
-    },
-    [getFactory],
-  );
+  // const getSingleExample = useCallback(
+  //   (exampleId: number): Promise<types.Flashcard> => {
+  //     return getFactory<types.Flashcard>(`single-example/${exampleId}`);
+  //   },
+  //   [getFactory],
+  // );
 
   const getUnverifiedExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
     return getFactory<types.Flashcard[]>('unverified-examples');
   }, [getFactory]);
+
+  /**
+   * -----------------------
+   * ALSO: include a function to get formatted vocabulary from backend
+   * -----------------------
+   */
 
   return {
     getExampleSetBySpanishText,
@@ -104,7 +110,7 @@ export default function useLegacyBackend() {
     addVocabularyToExample,
     removeVocabFromExample,
     getRecentlyEditedExamples,
-    getSingleExample,
+    // getSingleExample,
     getUnverifiedExamplesFromBackend,
   };
 }

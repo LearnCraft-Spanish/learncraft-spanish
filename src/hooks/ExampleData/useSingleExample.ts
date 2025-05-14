@@ -1,16 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import useExampleManagerLegacyDataFunctions from '../ExampleManagerLegacyDataFunctions';
+// import { useQuery } from '@tanstack/react-query';
+// import useExampleManagerLegacyDataFunctions from '../ExampleManagerLegacyDataFunctions';
 
-export function useSingleExample(exampleId: number) {
-  const { getSingleExample } = useExampleManagerLegacyDataFunctions();
+// export function useSingleExample(exampleId: number) {
+//   const { getSingleExample } = useExampleManagerLegacyDataFunctions();
 
-  const singleExampleQuery = useQuery({
-    queryKey: ['singleExample', exampleId],
-    queryFn: () => getSingleExample(exampleId),
-    staleTime: Infinity,
-    gcTime: Infinity,
-    enabled: !!exampleId,
-  });
+//   const singleExampleQuery = useQuery({
+//     queryKey: ['singleExample', exampleId],
+//     queryFn: () => getSingleExample(exampleId),
+//     staleTime: Infinity,
+//     gcTime: Infinity,
+//     enabled: !!exampleId,
+//   });
 
-  return { singleExampleQuery };
-}
+//   return { singleExampleQuery };
+// }
