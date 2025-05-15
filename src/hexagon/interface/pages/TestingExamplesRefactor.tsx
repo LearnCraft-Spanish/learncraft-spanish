@@ -1,8 +1,13 @@
-import { useSingleExample } from '@application/units/useSingleExample';
+import { useRecentlyEditedExamples } from '@application/units/examples/data/useRecentlyEditedExamples';
+import { useSingleExample } from '@application/units/examples/data/useSingleExample';
 import { Loading } from 'src/components/Loading';
 export function TestingExamplesRefactor() {
   const { data, isLoading, error } = useSingleExample(100);
-
+  const {
+    data: recentlyEditedExamples,
+    isLoading: _recentlyEditedExamplesLoading,
+    error: _recentlyEditedExamplesError,
+  } = useRecentlyEditedExamples();
   return (
     <div>
       <h1>Testing Examples Refactor</h1>
@@ -18,6 +23,15 @@ export function TestingExamplesRefactor() {
           <h2>{`Vocab Included: ${data.vocabIncluded}`}</h2>
           <h2>{`Date Created: ${data.dateCreated}`}</h2>
           <h2>{`Date Modified: ${data.dateModified}`}</h2>
+        </div>
+      )}
+      {recentlyEditedExamples && (
+        <div>
+          <h2>Recently Edited Examples</h2>
+          <h3>{`${recentlyEditedExamples.length} examples found`}</h3>
+          {recentlyEditedExamples.map((example) => (
+            <div key={example.recordId}>{example.spanishExample}</div>
+          ))}
         </div>
       )}
     </div>

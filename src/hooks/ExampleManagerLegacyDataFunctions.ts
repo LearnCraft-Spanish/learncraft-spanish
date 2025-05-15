@@ -77,11 +77,11 @@ export default function useLegacyBackend() {
     [newDeleteFactory],
   );
 
-  const getRecentlyEditedExamples = useCallback((): Promise<
-    types.Flashcard[]
-  > => {
-    return getFactory<types.Flashcard[]>('recently-edited-examples');
-  }, [getFactory]);
+  // const getRecentlyEditedExamples = useCallback((): Promise<
+  //   types.Flashcard[]
+  // > => {
+  //   return getFactory<types.Flashcard[]>('recently-edited-examples');
+  // }, [getFactory]);
 
   // const getSingleExample = useCallback(
   //   (exampleId: number): Promise<types.Flashcard> => {
@@ -109,7 +109,7 @@ export default function useLegacyBackend() {
     updateExample,
     addVocabularyToExample,
     removeVocabFromExample,
-    getRecentlyEditedExamples,
+    // getRecentlyEditedExamples,
     // getSingleExample,
     getUnverifiedExamplesFromBackend,
   };

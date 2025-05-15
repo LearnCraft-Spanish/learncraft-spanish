@@ -168,6 +168,14 @@ export default function Menu() {
                   Testing Examples Refactor
                 </Link>
               </div>
+              <div className="buttonBox">
+                <Link
+                  className="linkButton"
+                  to="/testing-new-single-example-creator"
+                >
+                  Testing new Single Example Creator
+                </Link>
+              </div>
             </>
           )}
         </div>

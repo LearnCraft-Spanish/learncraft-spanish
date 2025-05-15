@@ -7,24 +7,17 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
-  useRef,
-  useState,
 } from 'react';
-import ExampleUpdateForm from 'src/components/ExampleManager/ExampleUpdateForm';
-import quizCourses from 'src/functions/QuizCourseList';
-import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
-import ExamplesTable from '../ExamplesTable/ExamplesTable';
-import { VocabTag } from './VocabTag';
-interface ExampleDetails {
-  spanishExample: string;
-  englishTranslation: string;
-  spanishAudioLa: string;
-  englishAudio: string;
-}
+// interface ExampleDetails {
+//   spanishExample: string;
+//   englishTranslation: string;
+//   spanishAudioLa: string;
+//   englishAudio: string;
+// }
 
 export default function SingleExampleCreator({
   hasEditAccess,
@@ -36,41 +29,41 @@ export default function SingleExampleCreator({
   const { updateRecentlyEditedExample } = useRecentlyEditedExamples();
   const { recentlyEditedExamplesQuery, addUnverifiedExample } =
     useRecentlyEditedExamples();
-  const tempIdCounter = useRef(0);
-  const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
-    null,
-  );
-  const [quizId, setQuizId] = useState<number | undefined>(undefined);
-  const { quizExamplesQuery, officialQuizzesQuery, updateQuizExample } =
-    useOfficialQuizzes(quizId);
-  const [tableOption, setTableOption] = useState('none');
-  const [vocabIncluded, setVocabIncluded] = useState<string[]>([]);
-  const [vocabSearchTerm, setVocabSearchTerm] = useState('');
-  const [vocabComplete, setVocabComplete] = useState(false);
-  const [showIncompleteOnly, setShowIncompleteOnly] = useState(false);
-  const [exampleDetails, setExampleDetails] = useState<ExampleDetails>({
-    spanishExample: '',
-    englishTranslation: '',
-    spanishAudioLa: '',
-    englishAudio: '',
-  });
+  // const tempIdCounter = useRef(0);
+  // const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
+  //   null,
+  // );
+  // const [quizId, setQuizId] = useState<number | undefined>(undefined);
+  // const { quizExamplesQuery, officialQuizzesQuery, updateQuizExample } =
+  //   useOfficialQuizzes(quizId);
+  // const [tableOption, setTableOption] = useState('none');
+  // const [vocabIncluded, setVocabIncluded] = useState<string[]>([]);
+  // const [vocabSearchTerm, setVocabSearchTerm] = useState('');
+  // const [vocabComplete, setVocabComplete] = useState(false);
+  // const [showIncompleteOnly, setShowIncompleteOnly] = useState(false);
+  // const [exampleDetails, setExampleDetails] = useState<ExampleDetails>({
+  //   spanishExample: '',
+  //   englishTranslation: '',
+  //   spanishAudioLa: '',
+  //   englishAudio: '',
+  // });
 
   const { vocabularyQuery } = useVocabulary();
 
-  const exampleToSave = useMemo<Flashcard>(() => {
-    return {
-      recordId: selectedExampleId ?? tempIdCounter.current--,
-      spanishExample: exampleDetails.spanishExample,
-      englishTranslation: exampleDetails.englishTranslation,
-      spanishAudioLa: exampleDetails.spanishAudioLa,
-      englishAudio: exampleDetails.englishAudio,
-      spanglish: exampleDetails.spanishExample.includes('*')
-        ? 'spanglish'
-        : 'esp',
-      vocabIncluded,
-      vocabComplete: selectedExampleId ? vocabComplete : false,
-    };
-  }, [selectedExampleId, exampleDetails, vocabComplete, vocabIncluded]);
+  // const exampleToSave = useMemo<Flashcard>(() => {
+  //   return {
+  //     recordId: selectedExampleId ?? tempIdCounter.current--,
+  //     spanishExample: exampleDetails.spanishExample,
+  //     englishTranslation: exampleDetails.englishTranslation,
+  //     spanishAudioLa: exampleDetails.spanishAudioLa,
+  //     englishAudio: exampleDetails.englishAudio,
+  //     spanglish: exampleDetails.spanishExample.includes('*')
+  //       ? 'spanglish'
+  //       : 'esp',
+  //     vocabIncluded,
+  //     vocabComplete: selectedExampleId ? vocabComplete : false,
+  //   };
+  // }, [selectedExampleId, exampleDetails, vocabComplete, vocabIncluded]);
 
   const newFlashcard: NewFlashcard = useMemo(() => {
     const transitionalObj: Omit<Flashcard, 'recordId' | 'vocabIncluded'> = {
@@ -87,25 +80,25 @@ export default function SingleExampleCreator({
     });
   }, [officialQuizzesQuery.data, tableOption]);
 
-  const tableData = useMemo(() => {
-    let data;
-    if (tableOption === 'none') {
-      data = recentlyEditedExamplesQuery.data;
-    } else {
-      data = quizExamplesQuery.data;
-    }
+  // const tableData = useMemo(() => {
+  //   let data;
+  //   if (tableOption === 'none') {
+  //     data = recentlyEditedExamplesQuery.data;
+  //   } else {
+  //     data = quizExamplesQuery.data;
+  //   }
 
-    if (showIncompleteOnly && data) {
-      return data.filter((example) => !example.vocabComplete);
-    }
+  //   if (showIncompleteOnly && data) {
+  //     return data.filter((example) => !example.vocabComplete);
+  //   }
 
-    return data;
-  }, [
-    tableOption,
-    quizExamplesQuery.data,
-    recentlyEditedExamplesQuery.data,
-    showIncompleteOnly,
-  ]);
+  //   return data;
+  // }, [
+  //   tableOption,
+  //   quizExamplesQuery.data,
+  //   recentlyEditedExamplesQuery.data,
+  //   showIncompleteOnly,
+  // ]);
 
   const derivedExampleDetails = useMemo(() => {
     if (selectedExampleId !== null) {
@@ -145,22 +138,22 @@ export default function SingleExampleCreator({
     return quizList?.find((quiz) => quiz.recordId === quizId);
   }, [quizList, quizId]);
 
-  const addToSelectedVocab = useCallback(
-    (vocabTerm: string) => {
-      if (vocabTerm && !vocabIncluded.includes(vocabTerm)) {
-        setVocabIncluded([...vocabIncluded, vocabTerm]);
-        setVocabSearchTerm('');
-      }
-    },
-    [vocabIncluded],
-  );
+  // const addToSelectedVocab = useCallback(
+  //   (vocabTerm: string) => {
+  //     if (vocabTerm && !vocabIncluded.includes(vocabTerm)) {
+  //       setVocabIncluded([...vocabIncluded, vocabTerm]);
+  //       setVocabSearchTerm('');
+  //     }
+  //   },
+  //   [vocabIncluded],
+  // );
 
-  const removeFromVocabIncluded = useCallback(
-    (vocabName: string) => {
-      setVocabIncluded(vocabIncluded.filter((vocab) => vocab !== vocabName));
-    },
-    [vocabIncluded],
-  );
+  // const removeFromVocabIncluded = useCallback(
+  //   (vocabName: string) => {
+  //     setVocabIncluded(vocabIncluded.filter((vocab) => vocab !== vocabName));
+  //   },
+  //   [vocabIncluded],
+  // );
 
   const updateVocabSearchTerm = useCallback(
     (target: EventTarget & HTMLInputElement) => {
@@ -169,16 +162,16 @@ export default function SingleExampleCreator({
     [],
   );
 
-  const includedVocabObjects = useMemo(() => {
-    const mappedVocab = vocabIncluded
-      .map((vocab) => {
-        return vocabularyQuery.data?.find(
-          (word) => word.descriptionOfVocabularySkill === vocab,
-        );
-      })
-      .filter((vocab) => vocab !== undefined) as Vocabulary[];
-    return mappedVocab;
-  }, [vocabIncluded, vocabularyQuery.data]);
+  // const includedVocabObjects = useMemo(() => {
+  //   const mappedVocab = vocabIncluded
+  //     .map((vocab) => {
+  //       return vocabularyQuery.data?.find(
+  //         (word) => word.descriptionOfVocabularySkill === vocab,
+  //       );
+  //     })
+  //     .filter((vocab) => vocab !== undefined) as Vocabulary[];
+  //   return mappedVocab;
+  // }, [vocabIncluded, vocabularyQuery.data]);
 
   const tagsFilteredByInput = useMemo(() => {
     function filterBySearch(vocabularyTable: Vocabulary[] | undefined) {
@@ -228,24 +221,24 @@ export default function SingleExampleCreator({
     return filteredByActiveTags.slice(0, 10);
   }, [vocabSearchTerm, includedVocabObjects, vocabularyQuery.data]);
 
-  const finalizeVerifyExampleChange = (confirmSubmissionValue: boolean) => {
-    setVocabComplete(confirmSubmissionValue);
-    closeModal();
-  };
+  // const finalizeVerifyExampleChange = (confirmSubmissionValue: boolean) => {
+  //   setVocabComplete(confirmSubmissionValue);
+  //   closeModal();
+  // };
 
-  const handleVerifyExampleChange = (newValue: boolean) => {
-    if (newValue) {
-      openModal({
-        title: 'Are you sure?',
-        body: 'Warning! You are about to mark this example as "Vocab Complete", making it visible to students. This action can ONLY be undone through the QuickBase app',
-        type: 'confirm',
-        confirmFunction: () => finalizeVerifyExampleChange(true),
-        cancelFunction: () => finalizeVerifyExampleChange(false),
-      });
-    } else {
-      setVocabComplete(false);
-    }
-  };
+  // const handleVerifyExampleChange = (newValue: boolean) => {
+  //   if (newValue) {
+  //     openModal({
+  //       title: 'Are you sure?',
+  //       body: 'Warning! You are about to mark this example as "Vocab Complete", making it visible to students. This action can ONLY be undone through the QuickBase app',
+  //       type: 'confirm',
+  //       confirmFunction: () => finalizeVerifyExampleChange(true),
+  //       cancelFunction: () => finalizeVerifyExampleChange(false),
+  //     });
+  //   } else {
+  //     setVocabComplete(false);
+  //   }
+  // };
 
   useEffect(() => {
     setExampleDetails(derivedExampleDetails.exampleDetails);
@@ -286,19 +279,19 @@ export default function SingleExampleCreator({
     }
   }
 
-  function submitExample(e: React.FormEvent) {
-    e.preventDefault();
-    if (!!selectedExampleId && selectedExampleId > 0) {
-      handleEditExample(e);
-    } else {
-      handleAddExample(e);
-    }
-  }
-  const safeTableData = tableData ?? [];
+  // function submitExample(e: React.FormEvent) {
+  //   e.preventDefault();
+  //   if (!!selectedExampleId && selectedExampleId > 0) {
+  //     handleEditExample(e);
+  //   } else {
+  //     handleAddExample(e);
+  //   }
+  // }
+  // const safeTableData = tableData ?? [];
 
   return (
     <>
-      <div id="exampleCreator">
+      {/* <div id="exampleCreator">
         <ExampleUpdateForm
           editOrCreate={
             !!selectedExampleId && selectedExampleId > 0 ? 'edit' : 'create'
@@ -324,8 +317,8 @@ export default function SingleExampleCreator({
             setExampleDetails((prev) => ({ ...prev, englishAudio: value }))
           }
         />
-      </div>
-      {selectedExampleId && selectedExampleId > 0 && (
+      </div> */}
+      {/* {selectedExampleId && selectedExampleId > 0 && (
         <div id="vocabTagging">
           <div className="halfOfScreen tagSearchBox">
             <h3>Search for Vocab</h3>
@@ -381,9 +374,9 @@ export default function SingleExampleCreator({
             </div>
           </div>
         </div>
-      )}
+      )} */}
       <div className="exampleFilterControls">
-        <select
+        {/* <select
           value={tableOption}
           onChange={(e) => setTableOption(e.target.value)}
         >
@@ -393,7 +386,7 @@ export default function SingleExampleCreator({
               {course.name}
             </option>
           ))}
-        </select>
+        </select> */}
         {tableOption !== 'none' && quizList && (
           <select onChange={(e) => setQuizId(Number(e.target.value))}>
             <option value="">Select a Quiz</option>
@@ -404,7 +397,7 @@ export default function SingleExampleCreator({
             ))}
           </select>
         )}
-        <div className="filterToggleContainer">
+        {/* <div className="filterToggleContainer">
           <p>Show Incomplete Only:</p>
           <label htmlFor="showIncompleteOnly" className="switch">
             <input
@@ -415,14 +408,14 @@ export default function SingleExampleCreator({
             />
             <span className="slider round"></span>
           </label>
-        </div>
+        </div> */}
       </div>
       {!!tableOption && tableOption !== 'none' && (
         <h3>
           {tableOption} Quiz {selectedQuizObject?.quizNickname}, All Examples
         </h3>
       )}
-      {tableOption === 'none' && <h3>Recently Edited Examples</h3>}
+      {/* {tableOption === 'none' && <h3>Recently Edited Examples</h3>}
       <ExamplesTable
         dataSource={safeTableData}
         displayOrder={safeTableData.map((example) => ({
@@ -431,7 +424,7 @@ export default function SingleExampleCreator({
         selectFunction={hasEditAccess ? setSelectedExampleId : undefined}
         forceShowVocab
         studentContext={false}
-      />
+      /> */}
     </>
   );
 }
