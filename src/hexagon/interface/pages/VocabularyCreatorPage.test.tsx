@@ -1,34 +1,27 @@
-import {
-  callMockUseNonVerbCreation,
-  defaultResult as defaultNonVerb,
-  mockUseNonVerbCreation,
-} from '@application/useCases/useNonVerbCreation.mock';
-import {
-  callMockUseVerbCreation,
-  defaultResult as defaultVerb,
-  mockUseVerbCreation,
-} from '@application/useCases/useVerbCreation.mock';
+import { defaultResult as nonVerbCreationDefault } from '@application/useCases/useNonVerbCreation.mock';
+import { defaultResult as verbCreationDefault } from '@application/useCases/useVerbCreation.mock';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import React from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { VocabularyCreatorPage } from './VocabularyCreatorPage';
 
-// ---- Place these after the relevant mock helpers are imported ----
+// Mock the useCase hooks with the proper return values
 vi.mock('@application/useCases/useNonVerbCreation', () => ({
-  useNonVerbCreation: callMockUseNonVerbCreation,
-}));
-vi.mock('@application/useCases/useVerbCreation', () => ({
-  useVerbCreation: callMockUseVerbCreation,
+  useNonVerbCreation: () => nonVerbCreationDefault,
 }));
 
-beforeEach(() => {
-  mockUseNonVerbCreation.mockReturnValue(defaultNonVerb);
-  mockUseVerbCreation.mockReturnValue(defaultVerb);
-});
+vi.mock('@application/useCases/useVerbCreation', () => ({
+  useVerbCreation: () => verbCreationDefault,
+}));
 
 describe('vocabularyCreatorPage', () => {
+  afterEach(() => {
+    // Clear mock call history
+    vi.clearAllMocks();
+  });
+
   // Helper to render with providers
   const renderPage = () => {
     return render(

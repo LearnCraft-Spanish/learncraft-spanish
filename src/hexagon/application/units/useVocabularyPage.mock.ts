@@ -33,7 +33,7 @@ const defaultMockResult: VocabularyPageResult = {
 // Create the mock hook with default implementation
 export const mockUseVocabularyPage = createTypedMock<
   (
-    subcategoryId: number,
+    subcategoryId?: number,
     page?: number,
     pageSize?: number,
     enabled?: boolean,
@@ -54,14 +54,6 @@ export const overrideMockUseVocabularyPage = (
   mockUseVocabularyPage.mockImplementation(() => mockResult);
   return mockResult;
 };
-
-// Helper to call the mock during tests
-export const callMockUseVocabularyPage = (
-  subcategoryId = 1,
-  page = 1,
-  pageSize = 10,
-  enabled = true,
-) => mockUseVocabularyPage(subcategoryId, page, pageSize, enabled);
 
 // Export default for global mocking
 export default mockUseVocabularyPage;
