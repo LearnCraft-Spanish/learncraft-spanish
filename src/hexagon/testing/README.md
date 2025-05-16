@@ -159,18 +159,6 @@ The `factories` directory contains functions to create mock data:
 - `createMockSubcategory(overrides)` - Create subcategories
 - `createMockSubcategories(count, overrides)` - Create subcategory lists
 
-## Path Aliases
-
-The project uses the following path aliases for cleaner imports:
-
-- `@domain` - Domain models and business logic
-- `@application` - Application use cases, units, and ports
-- `@infrastructure` - Infrastructure implementations
-- `@interface` - UI components
-- `@testing` - Test utilities (this module)
-
-This makes imports cleaner and decouples the code from specific directory structures.
-
 ## Mock Patterns
 
 We follow a consistent pattern for mocking hooks in the hexagonal architecture:
@@ -183,9 +171,85 @@ Each hook should have a corresponding mock file with the following structure:
 useExample.ts → useExample.mock.ts
 ```
 
-### 2. Mock File Structure
+### 2. Modern Mock Pattern with createOverrideableMock
 
-Each mock file should follow this pattern:
+For improved consistency and type safety, we now use `createOverrideableMock` for most mocks. This pattern provides a clean interface for creating, overriding, and resetting mocks:
+
+```typescript
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
+import { createMockFooList } from '@testing/factories/fooFactories';
+
+// Define the default mock implementation
+const defaultMockResult: UseExampleResult = {
+  items: createMockFooList(),
+  loading: false,
+  error: null,
+  doSomething: () => Promise.resolve(),
+};
+
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockUseExample, // The mock object/function to use in vi.mock()
+  override: overrideMockUseExample, // Function to override mock properties
+  reset: resetMockUseExample, // Function to reset to defaults
+} = createOverrideableMock<() => UseExampleResult>(() => defaultMockResult);
+
+// Export default for global mocking
+export default mockUseExample;
+
+// Export the default result for component testing
+export { defaultMockResult as defaultResult };
+```
+
+#### Using in Tests
+
+```typescript
+import { mockUseExample, overrideMockUseExample } from './useExample.mock';
+
+// Mock the module
+vi.mock('./useExample', () => ({
+  useExample: () => mockUseExample,
+}));
+
+describe('Component using useExample', () => {
+  beforeEach(() => {
+    // Reset or provide custom overrides for each test
+    overrideMockUseExample({}); // Must pass an object, even if empty
+  });
+
+  it('handles data correctly', () => {
+    overrideMockUseExample({
+      items: createMockFooList(3, { name: 'test' }),
+    });
+
+    // Test with custom data
+  });
+});
+```
+
+#### Testing Components with Default Mock Data
+
+When testing components that use these hooks, you can also import and use the default mock results directly:
+
+```typescript
+import { defaultResult as exampleDefault } from './useExample.mock';
+
+// Mock the module to return the default result
+vi.mock('./useExample', () => ({
+  useExample: () => exampleDefault,
+}));
+
+describe('Component', () => {
+  it('renders correctly with default data', () => {
+    render(<MyComponent />);
+    // Test with the default mock data
+  });
+});
+```
+
+### 3. Legacy Mock File Structure
+
+The older pattern that you may still see in some files uses `createTypedMock` directly:
 
 ```typescript
 // 1. Import types from the actual implementation
@@ -228,110 +292,6 @@ export const overrideMockUseExample = (
 export default mockUseExample;
 ```
 
-### 3. Using Mocks in Tests
-
-Our minimal, robust pattern is as follows:
-
-1. **Register mocks via setupModuleMock** to set up the mock function that will be used in tests.
-
-   Example (in your test file):
-
-   ```ts
-   import { setupModuleMock } from '@testing/mockRegistry';
-   import { mockUseVocabulary } from '@application/units/useVocabulary.mock';
-   import { mockUseSubcategories } from '@application/units/useSubcategories.mock';
-   import { vi } from 'vitest';
-
-   describe('MyTest', () => {
-     // Get references to the mock functions that we can update
-     const mockUseVocabularyFn = vi.fn(() => mockUseVocabulary());
-     const mockUseSubcategoriesFn = vi.fn(() => mockUseSubcategories());
-
-     beforeAll(() => {
-       // Register the mock functions
-       setupModuleMock('@application/units/useVocabulary', () => ({
-         useVocabulary: mockUseVocabularyFn,
-       }));
-       setupModuleMock('@application/units/useSubcategories', () => ({
-         useSubcategories: mockUseSubcategoriesFn,
-       }));
-     });
-
-     beforeEach(() => {
-       // Reset to happy path before each test
-       mockUseVocabularyFn.mockReturnValue(mockUseVocabulary());
-       mockUseSubcategoriesFn.mockReturnValue(mockUseSubcategories());
-     });
-
-     it('should handle happy path', () => {
-       // Test with default happy path behavior
-       // ... test code ...
-     });
-
-     it('should handle error state', () => {
-       // Use overrideMockUseX for non-happy-path cases
-       const errorResult = overrideMockUseVocabulary({
-         error: new Error('Failed to load'),
-         loading: false,
-       });
-       mockUseVocabularyFn.mockReturnValue(errorResult);
-       // ... test error handling ...
-     });
-
-     it('should handle loading state', () => {
-       // Use overrideMockUseX for non-happy-path cases
-       const loadingResult = overrideMockUseVocabulary({
-         loading: true,
-         error: null,
-       });
-       mockUseVocabularyFn.mockReturnValue(loadingResult);
-       // ... test loading state ...
-     });
-   });
-   ```
-
-````
-
-This pattern ensures:
-
-– **Mock factory pattern:** Mocks are created via factories and registered once via setupModuleMock.
-
-– **Simple declarable mocks:** Register mocks once, then use mockReturnValue to control behavior in tests.
-
-– **Minimum boilerplate:** No extra setup functions needed - just register and use mockReturnValue.
-
-– **Clean, isolated tests:** Each test starts with happy path (via beforeEach) and can override as needed.
-
-– **No global state leak:** The registry ensures clean test isolation.
-
-### Using Override Functions
-
-The `overrideMockUseX` functions are specifically for creating non-happy-path test cases. They help create mock results with:
-
-- Error states
-- Loading states
-- Edge cases
-- Custom data scenarios
-
-Example:
-
-```typescript
-it('should handle network error', () => {
-  // Create a mock result with an error state
-  const errorResult = overrideMockUseVocabulary({
-    error: new Error('Network error'),
-    loading: false,
-  });
-
-  // Use that result in the test
-  mockUseVocabularyFn.mockReturnValue(errorResult);
-
-  // Test error handling...
-});
-````
-
-The override functions are a convenience for creating these non-happy-path cases - they merge your custom state with the default mock result. But the actual test behavior is controlled by `mockReturnValue` on the registered mock function.
-
 ## Factory Utilities
 
 We use factory functions to create test data. These are located in `testing/factories/`.
@@ -351,6 +311,56 @@ export const createMockFooList = createZodListFactory(FooSchema);
 // Usage:
 const singleFoo = createMockFoo({ name: 'Custom Name' });
 const fooList = createMockFooList(5, { type: 'example' });
+```
+
+## The createOverrideableMock Utility
+
+This is our core utility for creating mocks that follow best practices. It provides a consistent pattern for creating, overriding, and resetting mocks:
+
+```typescript
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
+
+// Create a mock function with typesafe overrides
+const {
+  mock, // The mock function/object
+  override, // Function to override properties
+  reset, // Function to reset to defaults
+} = createOverrideableMock<() => ReturnType>(
+  () => defaultImplementation, // Default behavior
+);
+```
+
+### Benefits
+
+- **Type Safety**: Leverages TypeScript for full type checking of mock properties
+- **Consistent Pattern**: Provides a uniform approach across the codebase
+- **Simple API**: Just three functions to remember: mock, override, and reset
+- **Atomic Updates**: Override only the properties you need, keeping defaults for the rest
+- **Immutable**: Doesn't mutate the original default implementation
+- **Deep Mocking**: Automatically makes nested functions into mocks
+
+### Example Implementation
+
+The utility handles all the complexity of mocking and provides a clean interface:
+
+```typescript
+// For a function that returns an object with methods
+const defaultResult = {
+  count: 42,
+  increment: () => 43,
+  data: [1, 2, 3],
+};
+
+const { mock, override, reset } = createOverrideableMock(() => defaultResult);
+
+// Use in tests
+override({
+  count: 100, // Override just what you need
+  increment: vi.fn().mockReturnValue(101), // Can use vi.fn for specific needs
+});
+
+// Reset when needed
+reset();
 ```
 
 ## Mock for Complex Nested Objects
@@ -396,6 +406,87 @@ export const overrideMockUseExample = (
 - Happy-path defaults for all mocks
 - Isolated from global test setup
 - Explicit setup function to avoid conflicts
+
+## Testing Components that Use Hooks
+
+When testing components that use hooks, we have two main approaches:
+
+### 1. Using defaultResult for Component Tests
+
+For components that only need the default mock data and don't need to change behavior between tests:
+
+```typescript
+import { defaultResult as verbCreationDefault } from '@application/useCases/useVerbCreation.mock';
+import { defaultResult as nonVerbCreationDefault } from '@application/useCases/useNonVerbCreation.mock';
+
+// Mock the hooks to return the default results
+vi.mock('@application/useCases/useVerbCreation', () => ({
+  useVerbCreation: () => verbCreationDefault,
+}));
+
+vi.mock('@application/useCases/useNonVerbCreation', () => ({
+  useNonVerbCreation: () => nonVerbCreationDefault,
+}));
+
+describe('VocabularyCreatorPage', () => {
+  it('renders correctly', () => {
+    render(<VocabularyCreatorPage />);
+    // Test with default mock data
+  });
+});
+```
+
+This approach is simpler for component tests that don't need to test different hook behaviors.
+
+### 2. Using mock and override for More Dynamic Tests
+
+For components where you need to test different hook behaviors:
+
+```typescript
+import {
+  mockUseVerbCreation,
+  overrideMockUseVerbCreation
+} from '@application/useCases/useVerbCreation.mock';
+
+// Mock the hooks to return the mocks
+vi.mock('@application/useCases/useVerbCreation', () => ({
+  useVerbCreation: () => mockUseVerbCreation,
+}));
+
+describe('VerbCreator', () => {
+  beforeEach(() => {
+    // Reset to defaults or provide basic overrides for each test
+    overrideMockUseVerbCreation({});  // Pass empty object to avoid errors
+  });
+
+  it('shows loading state', () => {
+    // Override for this specific test
+    overrideMockUseVerbCreation({
+      loadingSubcategories: true,
+    });
+
+    render(<VerbCreator onBack={() => {}} />);
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
+  });
+
+  it('shows error state', () => {
+    overrideMockUseVerbCreation({
+      creationError: new Error('Failed to create verb'),
+    });
+
+    render(<VerbCreator onBack={() => {}} />);
+    expect(screen.getByText(/Failed to create verb/i)).toBeInTheDocument();
+  });
+});
+```
+
+### Key Rules
+
+1. **Always pass an object to override functions**, even if empty: `overrideMockUseVerbCreation({})`
+2. **Don't access mock methods directly** unless absolutely necessary
+3. **Use `defaultResult` for simple component tests** rather than setting up dynamic mocks
+4. **Reset mocks between tests** if using the second approach
+5. **Keep mock initialization in the test file** rather than in global setup
 
 ## Usage
 
