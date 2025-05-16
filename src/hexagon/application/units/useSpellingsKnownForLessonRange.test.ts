@@ -1,5 +1,5 @@
 import {
-  mockGetSpellingsKnownForLesson,
+  mockFrequensayAdapter,
   overrideMockFrequensayAdapter,
 } from '@application/adapters/frequensayAdapter.mock';
 import { renderHook, waitFor } from '@testing-library/react';
@@ -37,7 +37,9 @@ describe('useSpellingsKnownForLessonRange', () => {
 
     // After data loads
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(mockGetSpellingsKnownForLesson).toHaveBeenCalledWith({
+    expect(
+      mockFrequensayAdapter.getSpellingsKnownForLesson,
+    ).toHaveBeenCalledWith({
       courseName: 'Spanish 1',
       lessonToNumber: '10',
       lessonFromNumber: '1',
@@ -59,7 +61,9 @@ describe('useSpellingsKnownForLessonRange', () => {
     );
 
     // The query should not be enabled
-    expect(mockGetSpellingsKnownForLesson).not.toHaveBeenCalled();
+    expect(
+      mockFrequensayAdapter.getSpellingsKnownForLesson,
+    ).not.toHaveBeenCalled();
     expect(result.current.isLoading).toBeFalsy();
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeNull();
@@ -78,7 +82,9 @@ describe('useSpellingsKnownForLessonRange', () => {
     );
 
     // The query should not be enabled
-    expect(mockGetSpellingsKnownForLesson).not.toHaveBeenCalled();
+    expect(
+      mockFrequensayAdapter.getSpellingsKnownForLesson,
+    ).not.toHaveBeenCalled();
     expect(result.current.isLoading).toBeFalsy();
     expect(result.current.data).toBeUndefined();
     expect(result.current.error).toBeNull();

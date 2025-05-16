@@ -28,9 +28,12 @@ export function useSpellingsKnownForLessonRange({
       lessonFromNumber,
     ],
     queryFn: () => {
+      if (!courseName || !lessonToNumber) {
+        throw new Error('Missing required parameters');
+      }
       return adapter.getSpellingsKnownForLesson({
-        courseName: courseName || '',
-        lessonToNumber: lessonToNumber?.toString() || '0',
+        courseName,
+        lessonToNumber: lessonToNumber.toString(),
         lessonFromNumber: lessonFromNumber?.toString() || '0',
       });
     },

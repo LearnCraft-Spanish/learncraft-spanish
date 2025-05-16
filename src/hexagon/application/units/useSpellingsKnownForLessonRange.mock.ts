@@ -3,14 +3,19 @@ import { createMockSpellingsData } from '@testing/factories/spellingsFactory';
 import { createTypedMock } from '@testing/utils/typedMock';
 
 // Default mock implementation
-const defaultSuccessMockResult: UseSpellingsKnownForLessonRangeResult = {
-  data: createMockSpellingsData(10),
+export const defaultSuccessMockResult: UseSpellingsKnownForLessonRangeResult = {
+  data: undefined,
   isLoading: false,
   error: null,
 };
 
 export const mockUseSpellingsKnownForLessonRange = createTypedMock<
-  () => UseSpellingsKnownForLessonRangeResult
+  (params: {
+    courseName?: string;
+    lessonToNumber?: number;
+    lessonFromNumber?: number;
+    isFrequensayEnabled?: boolean;
+  }) => UseSpellingsKnownForLessonRangeResult
 >().mockReturnValue(defaultSuccessMockResult);
 
 export const overrideMockUseSpellingsKnownForLessonRange = (
@@ -25,7 +30,27 @@ export const overrideMockUseSpellingsKnownForLessonRange = (
   return mockResult;
 };
 
-export const callMockUseSpellingsKnownForLessonRange = () =>
-  mockUseSpellingsKnownForLessonRange();
+export const callMockUseSpellingsKnownForLessonRange = (
+  params: {
+    courseName?: string;
+    lessonToNumber?: number;
+    lessonFromNumber?: number;
+    isFrequensayEnabled?: boolean;
+  } = {},
+) => {
+  if (
+    params.isFrequensayEnabled &&
+    params.courseName &&
+    params.lessonToNumber
+  ) {
+    return overrideMockUseSpellingsKnownForLessonRange({
+      data: createMockSpellingsData(
+        params.lessonToNumber - (params.lessonFromNumber || 0),
+      ),
+    });
+  } else {
+    return mockUseSpellingsKnownForLessonRange(params);
+  }
+};
 
 export default mockUseSpellingsKnownForLessonRange;
