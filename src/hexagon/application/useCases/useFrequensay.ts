@@ -137,12 +137,14 @@ export function useFrequensay(): UseFrequensayResult {
       disableManualVocabulary,
       enableManualVocabulary,
     },
+
     TextToCheckProps: {
       userInput,
       updateUserInput,
       passageLength: passageLength.current,
       comprehensionPercentage: comprehensionPercentage.current,
     },
+
     UnknownWordsProps: {
       unknownWordCount,
       copyUnknownWordsTable: () => copyUnknownWordsTable(unknownWordCount),
