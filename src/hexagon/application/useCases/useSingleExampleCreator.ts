@@ -13,7 +13,9 @@ interface ExampleDetails {
   englishAudio: string;
 }
 export default function useSingleExampleCreator() {
+  // This hook should be moved to hexagon
   const userDataQuery = useUserData();
+  // This hook should be moved to hexagon
   const { openModal, closeModal } = useModal();
 
   const hasEditAccess = userDataQuery.data?.roles.adminRole === 'admin';
@@ -21,9 +23,11 @@ export default function useSingleExampleCreator() {
     null,
   );
   const [quizId, setQuizId] = useState<number | undefined>(undefined);
+  // This hook should be moved to hexagon
   const { quizExamplesQuery, officialQuizzesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
   const recentlyEditedExamplesQuery = useRecentlyEditedExamples();
+  // This hook should be moved to hexagon
   const { vocabularyQuery } = useVocabulary();
 
   const tempIdCounter = useRef(0);
@@ -146,6 +150,7 @@ export default function useSingleExampleCreator() {
     createUpdateFormParams: {
       editOrCreate,
       onSubmit: submitExample,
+      selectedExampleId,
       spanishExample: exampleDetails.spanishExample,
       setSpanishExample: (value: string) =>
         setExampleDetails((prev) => ({ ...prev, spanishExample: value })),

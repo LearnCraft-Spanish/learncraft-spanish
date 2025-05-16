@@ -39,6 +39,7 @@ export function createExamplesInfrastructure(
       const path = removeVocabularyFromExampleEndpoint.path;
       return httpClient.post(path, { exampleId, vocabIdList });
     },
+
     getRecentlyEditedExamples: () => {
       const path = getRecentlyEditedExamplesEndpoint.path;
       return httpClient.get(path);

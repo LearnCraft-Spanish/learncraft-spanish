@@ -37,7 +37,6 @@ export default function SingleExampleCreatorPage() {
       <div id="exampleCreator">
         <ExampleCreateUpdateForm
           {...createUpdateFormParams}
-          selectedExampleId={selectedExampleId}
           vocabSearchTerm={vocabSearchTerm}
           setVocabSearchTerm={setVocabSearchTerm}
           vocabComplete={vocabComplete}
