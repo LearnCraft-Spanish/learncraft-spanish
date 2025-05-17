@@ -11,6 +11,8 @@ const programsTable: Program[] = [
         sortReference: null,
         relatedProgram: 2,
         vocabKnown: [],
+        lessonNumber: 1,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 71,
@@ -19,6 +21,8 @@ const programsTable: Program[] = [
         sortReference: null,
         relatedProgram: 2,
         vocabKnown: ['eso/Pronoun, Demonstrative/'],
+        lessonNumber: 2,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 72,
@@ -38,6 +42,8 @@ const programsTable: Program[] = [
           'y/Conjunction, Coordinating/coordinating conjunction/',
           'y/Conjunction, List/and between items in a list/',
         ],
+        lessonNumber: 3,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 73,
@@ -63,6 +69,8 @@ const programsTable: Program[] = [
           'de/Preposition, Preposition/"of"/"from", origin/',
           'no/Adverb, Whether (formerly "boolean")/not/',
         ],
+        lessonNumber: 4,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 74,
@@ -89,6 +97,8 @@ const programsTable: Program[] = [
           'de/Preposition, Preposition/"of", possession/',
           'de/Preposition, Preposition/complement (eg: manera/ forma de)/',
         ],
+        lessonNumber: 5,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 75,
@@ -116,6 +126,8 @@ const programsTable: Program[] = [
           'el/Article, Definite/article/',
           'la/Article, Definite/article/',
         ],
+        lessonNumber: 6,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 76,
@@ -145,6 +157,8 @@ const programsTable: Program[] = [
           'la/Pronoun, Direct Object/direct object/',
           'lo/Pronoun, Direct Object/direct object/',
         ],
+        lessonNumber: 7,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 77,
@@ -180,6 +194,8 @@ const programsTable: Program[] = [
           'un/Article, Indefinite/article/',
           'una/Article, Indefinite/article/',
         ],
+        lessonNumber: 8,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 78,
@@ -239,6 +255,8 @@ const programsTable: Program[] = [
           'por/Preposition, Preposition/during (a length of time), for (a length of time)/',
           'por/Preposition, Preposition/via/by, as in "by phone"/',
         ],
+        lessonNumber: 9,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 79,
@@ -296,6 +314,8 @@ const programsTable: Program[] = [
           'por qué/Cluster, Idiom/why? (either by itself or followed by a phrase/clause)/',
           'qué/Pronoun, Interrogative/what? (specifically in a question)/',
         ],
+        lessonNumber: 10,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 80,
@@ -353,6 +373,8 @@ const programsTable: Program[] = [
           'que/Conjunction, Comparative/than/',
           'qué/Pronoun, Exclamative/what...! (generally as in "¡qué bueno que haya dos!"/',
         ],
+        lessonNumber: 11,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 81,
@@ -409,6 +431,8 @@ const programsTable: Program[] = [
           'qué/Pronoun, Exclamative/what...! (generally as in "¡qué bueno que haya dos!"/',
           'es/Verb, Verb/it/he/she is//3rd person singular "él/ella/eso" ; Present indicative',
         ],
+        lessonNumber: 12,
+        courseName: 'LearnCraft Spanish',
       },
       {
         recordId: 82,
@@ -474,6 +498,8 @@ const programsTable: Program[] = [
           'son/Verb, Verb/they are/',
           'soy/Verb, Verb/I am/',
         ],
+        lessonNumber: 13,
+        courseName: 'LearnCraft Spanish',
       },
     ],
     cohortACurrentLesson: 198,
@@ -498,6 +524,8 @@ const programsTable: Program[] = [
         sortReference: 13,
         relatedProgram: 3,
         vocabKnown: [],
+        lessonNumber: 1,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 2,
@@ -512,6 +540,8 @@ const programsTable: Program[] = [
           'y/Conjunction, Coordinating/coordinating conjunction/',
           'y/Conjunction, List/and between items in a list/',
         ],
+        lessonNumber: 2,
+        courseName: 'Spanish in One Month',
         sortReference: 14,
         relatedProgram: 3,
         vocabKnown: [
@@ -554,6 +584,8 @@ const programsTable: Program[] = [
           'no/Adverb, Whether (formerly "boolean")/not/',
           'no/Interjection, Informational/"no"/',
         ],
+        lessonNumber: 3,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 5,
@@ -590,6 +622,8 @@ const programsTable: Program[] = [
           'un/Article, Indefinite/article/',
           'una/Article, Indefinite/article/',
         ],
+        lessonNumber: 4,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 6,
@@ -668,6 +702,8 @@ const programsTable: Program[] = [
           'por/Preposition, Preposition/on behalf of/',
           'que/Conjunction, Comparative/than/',
         ],
+        lessonNumber: 5,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 7,
@@ -734,6 +770,8 @@ const programsTable: Program[] = [
           'son/Verb, Verb/they are/',
           'soy/Verb, Verb/I am/',
         ],
+        lessonNumber: 6,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 8,
@@ -798,6 +836,8 @@ const programsTable: Program[] = [
           'lo/Pronoun, Attribute/attribute to mean "that way", as in lo es, lo estoy/',
           'usted/Pronoun, Subject/subject pronoun/',
         ],
+        lessonNumber: 7,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 3,
@@ -874,6 +914,8 @@ const programsTable: Program[] = [
           'están/Verb, Verb/they are//3rd person plural "ellos" ; Present indicative',
           'estás/Verb, Verb/you are//2nd person singular "tú" ; 2nd person singular "vos" ; Present indicative',
         ],
+        lessonNumber: 8,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 9,
@@ -963,6 +1005,8 @@ const programsTable: Program[] = [
           'estábamos/Verb, Verb/we were//1st person plural "nosotros" ; Imperfect',
           'éramos/Verb, Verb/we were//1st person plural "nosotros" ; Imperfect',
         ],
+        lessonNumber: 9,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 10,
@@ -1062,6 +1106,8 @@ const programsTable: Program[] = [
           'sean/Verb, Verb/they be/',
           'seas/Verb, Verb/you be/',
         ],
+        lessonNumber: 10,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 11,
@@ -1175,6 +1221,8 @@ const programsTable: Program[] = [
           'tu/Pronoun, Possessive/possessive/',
           'tus/Pronoun, Possessive/possessive/',
         ],
+        lessonNumber: 11,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 12,
@@ -1275,6 +1323,8 @@ const programsTable: Program[] = [
           'tu/Pronoun, Possessive/possessive/',
           'tus/Pronoun, Possessive/possessive/',
         ],
+        lessonNumber: 12,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 13,
@@ -1298,6 +1348,7 @@ const programsTable: Program[] = [
           'sido/Verb, Verb/ser participle/',
           'siendo/Verb, Verb/ser gerund/',
         ],
+
         sortReference: 25,
         relatedProgram: 3,
         vocabKnown: [
@@ -1410,6 +1461,8 @@ const programsTable: Program[] = [
           'sido/Verb, Verb/ser participle/',
           'siendo/Verb, Verb/ser gerund/',
         ],
+        lessonNumber: 13,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 14,
@@ -1566,6 +1619,8 @@ const programsTable: Program[] = [
           'yo/Pronoun, Subject/subject pronoun/',
           'él/Pronoun, Subject/subject pronoun/',
         ],
+        lessonNumber: 14,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 15,
@@ -1739,6 +1794,8 @@ const programsTable: Program[] = [
           'voy/Verb, Verb//1st person singular "yo" ; Present indicative',
           'yendo/Verb, Verb//Gerund',
         ],
+        lessonNumber: 15,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 16,
@@ -1938,6 +1995,8 @@ const programsTable: Program[] = [
           'verdad/Noun, Noun/(not in idiom)/',
           'vez/Noun, Noun/and "veces"/',
         ],
+        lessonNumber: 16,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 17,
@@ -2157,6 +2216,8 @@ const programsTable: Program[] = [
           'todos/Pronoun, Quantifier/',
           'uno/Adjective, Number/number (uno or una)/',
         ],
+        lessonNumber: 17,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 18,
@@ -2187,6 +2248,8 @@ const programsTable: Program[] = [
           'ya/Adverb, Time, general/',
           'él/Pronoun, Prepositional/prepositional pronoun/',
         ],
+        lessonNumber: 18,
+        courseName: 'Spanish in One Month',
         sortReference: 30,
         relatedProgram: 3,
         vocabKnown: [
@@ -2635,6 +2698,8 @@ const programsTable: Program[] = [
           'sabes/Verb, Verb//2nd person singular "tú" ; Present indicative',
           'sé/Verb, Verb/I know//1st person singular "yo" ; Present indicative',
         ],
+        lessonNumber: 19,
+        courseName: 'Spanish in One Month',
       },
       {
         recordId: 20,
@@ -2878,6 +2943,8 @@ const programsTable: Program[] = [
           'hola/Interjection, Greetings/',
           'por favor/Cluster, Idiom/',
         ],
+        lessonNumber: 20,
+        courseName: 'Spanish in One Month',
       },
     ],
     cohortACurrentLesson: 1,
@@ -2908,6 +2975,8 @@ const programsTable: Program[] = [
           'es/Verb, Verb/it/he/she is//3rd person singular "él/ella/eso" ; Present indicative',
           'está/Verb, Verb/he/she/it is//3rd person singular "él/ella/eso" ; Present indicative',
         ],
+        lessonNumber: 1,
+        courseName: 'Ser Estar Mini Course',
       },
       {
         recordId: 346,
@@ -2919,6 +2988,8 @@ const programsTable: Program[] = [
           'es/Verb, Verb/it/he/she is//3rd person singular "él/ella/eso" ; Present indicative',
           'está/Verb, Verb/he/she/it is//3rd person singular "él/ella/eso" ; Present indicative',
         ],
+        lessonNumber: 2,
+        courseName: 'Ser Estar Mini Course',
       },
       {
         recordId: 347,
@@ -2930,6 +3001,8 @@ const programsTable: Program[] = [
           'es/Verb, Verb/it/he/she is//3rd person singular "él/ella/eso" ; Present indicative',
           'está/Verb, Verb/he/she/it is//3rd person singular "él/ella/eso" ; Present indicative',
         ],
+        lessonNumber: 3,
+        courseName: 'Ser Estar Mini Course',
       },
       {
         recordId: 348,
@@ -2941,6 +3014,8 @@ const programsTable: Program[] = [
           'es/Verb, Verb/it/he/she is//3rd person singular "él/ella/eso" ; Present indicative',
           'está/Verb, Verb/he/she/it is//3rd person singular "él/ella/eso" ; Present indicative',
         ],
+        lessonNumber: 4,
+        courseName: 'Ser Estar Mini Course',
       },
       {
         recordId: 349,
@@ -2952,6 +3027,8 @@ const programsTable: Program[] = [
           'es/Verb, Verb/it/he/she is//3rd person singular "él/ella/eso" ; Present indicative',
           'está/Verb, Verb/he/she/it is//3rd person singular "él/ella/eso" ; Present indicative',
         ],
+        lessonNumber: 5,
+        courseName: 'Ser Estar Mini Course',
       },
     ],
     cohortACurrentLesson: 1,
@@ -3202,6 +3279,8 @@ const programsTable: Program[] = [
           'hola/Interjection, Greetings/',
           'por favor/Cluster, Idiom/',
         ],
+        lessonNumber: 1,
+        courseName: 'Post Podcast Lessons',
       },
       {
         recordId: 351,
@@ -3441,6 +3520,8 @@ const programsTable: Program[] = [
           'estuve/Verb, Verb/estar preterite//1st person singular "yo" ; Preterite',
           'estuvo/Verb, Verb/estar preterite//3rd person singular "él/ella/eso" ; Preterite',
         ],
+        lessonNumber: 2,
+        courseName: 'Post Podcast Lessons',
       },
       {
         recordId: 352,
@@ -3453,6 +3534,8 @@ const programsTable: Program[] = [
           'serían/Verb, Verb//3rd person plural "ellos" ; Conditional',
           'serías/Verb, Verb//2nd person singular "tú" ; Conditional',
         ],
+        lessonNumber: 3,
+        courseName: 'Post Podcast Lessons',
         sortReference: null,
         relatedProgram: 5,
         vocabKnown: [

@@ -12,6 +12,8 @@ export type Lesson = Expanded<{
   sortReference: number | null;
   relatedProgram: number;
   vocabKnown: Array<string>;
+  lessonNumber: number;
+  courseName: string;
 }>;
 
 export type LessonUnparsed = Expanded<{
