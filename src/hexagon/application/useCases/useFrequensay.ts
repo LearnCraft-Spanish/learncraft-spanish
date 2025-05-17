@@ -23,7 +23,6 @@ export function useFrequensay(): UseFrequensayResult {
   const [isFrequensayEnabled, setIsFrequensayEnabled] = useState(false);
 
   const [userInput, setUserInput] = useState('');
-  // const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([]);
 
   const wordCount = useRef<WordCount[]>([]);
   const passageLength = useRef<number>(0);
@@ -41,10 +40,6 @@ export function useFrequensay(): UseFrequensayResult {
     lessonNumber: selectedToLesson?.lessonNumber || 0,
     isFrequensayEnabled,
   });
-
-  // function updateUnknownWords(unknownWords: WordCount[]) {
-  //   setUnknownWordCount(unknownWords);
-  // }
 
   function updateUserAddedVocabulary(newInput: string) {
     const [uniqueWordsWithCounts] = countVocabularyWords(newInput);
@@ -88,8 +83,6 @@ export function useFrequensay(): UseFrequensayResult {
       }
     }
     return [];
-    // user input is needed to trigger the useEffect, otherwise it will not work
-    // fix implementation so that it resolves this warning
   }, [selectedToLesson, spellingsKnownData, processUnknownWords, userInput]);
 
   return {
