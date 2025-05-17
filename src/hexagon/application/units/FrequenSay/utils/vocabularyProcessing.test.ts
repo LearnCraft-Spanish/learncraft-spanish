@@ -71,14 +71,14 @@ describe('vocabularyProcessing', () => {
       ];
 
       const knownWords = ['hola', 'como'];
-      const [unknownWords, totalWords, comprehension] = filterWordsByUnknown(
+      const [unknownWords, comprehension] = filterWordsByUnknown(
         wordCounts,
         knownWords,
       );
 
       expect(unknownWords).toHaveLength(2);
       expect(unknownWords.map((w) => w.word)).toEqual(['mundo', 'estas']);
-      expect(totalWords).toBe(5);
+      // expect(totalWords).toBe(5);
       expect(comprehension).toBe(60); // 3/5 known words = 60% comprehension
     });
 
@@ -104,7 +104,7 @@ describe('vocabularyProcessing', () => {
       expect(unknownWords1.map((w) => w.word)).toEqual(['mundo', 'amigo']);
 
       // Then with custom vocabulary
-      const [unknownWords2, , comprehension2] = filterWordsByUnknown(
+      const [unknownWords2, comprehension2] = filterWordsByUnknown(
         wordCounts,
         knownWords,
         customVocabulary,
@@ -117,13 +117,12 @@ describe('vocabularyProcessing', () => {
     });
 
     it('should handle empty word counts', () => {
-      const [unknownWords, totalWords, comprehension] = filterWordsByUnknown(
+      const [unknownWords, comprehension] = filterWordsByUnknown(
         [],
         ['hola', 'mundo'],
       );
 
       expect(unknownWords).toHaveLength(0);
-      expect(totalWords).toBe(0);
       expect(comprehension).toBe(100);
     });
   });

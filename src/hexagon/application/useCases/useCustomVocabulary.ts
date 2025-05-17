@@ -1,12 +1,5 @@
+import type { UseCustomVocabularyResult } from './useCustomVocabulary.types';
 import { useState } from 'react';
-
-export interface UseCustomVocabularyResult {
-  addManualVocabulary: boolean;
-  enableManualVocabulary: () => void;
-  disableManualVocabulary: () => void;
-  userAddedVocabulary: string;
-  setUserAddedVocabulary: (value: string) => void;
-}
 
 export default function useCustomVocabulary(): UseCustomVocabularyResult {
   const [addManualVocabulary, setAddManualVocabulary] = useState(false);

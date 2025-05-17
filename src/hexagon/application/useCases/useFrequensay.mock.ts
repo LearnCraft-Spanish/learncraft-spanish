@@ -1,12 +1,10 @@
-import type { UseFrequensayResult } from './useFrequensay';
+import type { UseFrequensayResult } from './useFrequensay.types';
 import { vi } from 'vitest';
 
 export const defaultResult: UseFrequensayResult = {
-  isSuccess: true,
-  isError: false,
-  error: null,
-  isLoading: false,
-  data: [],
+  spellingsDataError: null,
+  spellingsDataLoading: false,
+  spellingsData: [],
   FrequensaySetupProps: {
     isFrequensayEnabled: false,
     setIsFrequensayEnabled: vi.fn<() => void>(),

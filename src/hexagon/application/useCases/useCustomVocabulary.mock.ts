@@ -1,4 +1,4 @@
-import type { UseCustomVocabularyResult } from './useCustomVocabulary';
+import type { UseCustomVocabularyResult } from './useCustomVocabulary.types';
 import { createTypedMock } from '@testing/utils/typedMock';
 
 // Create the mock hook return value

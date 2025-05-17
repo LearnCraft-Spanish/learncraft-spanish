@@ -1,43 +1,14 @@
 import type { WordCount } from '../types/frequensay';
+import type { UseFrequensayResult } from './useFrequensay.types';
 import { copyUnknownWordsTable } from '@application/units/FrequenSay/utils/copyUnknownWordsTable';
 import {
   countVocabularyWords,
   filterWordsByUnknown,
 } from '@application/units/FrequenSay/utils/vocabularyProcessing';
-import { useSpellingsKnownForLessonRange } from '@application/units/useSpellingsKnownForLessonRange';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSpellingsKnownForLesson } from '@application/units/useSpellingsKnownForLesson';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import useCustomVocabulary from './useCustomVocabulary';
-
-export interface UseFrequensayResult {
-  isSuccess: boolean;
-  isError: boolean;
-  isLoading: boolean;
-  error: Error | null;
-  data: string[] | undefined;
-  FrequensaySetupProps: {
-    isFrequensayEnabled: boolean;
-    setIsFrequensayEnabled: (value: boolean) => void;
-  };
-  CustomVocabularyProps: {
-    userAddedVocabulary: string;
-    setUserAddedVocabulary: (value: string) => void;
-    addManualVocabulary: boolean;
-    disableManualVocabulary: () => void;
-    enableManualVocabulary: () => void;
-  };
-  TextToCheckProps: {
-    userInput: string;
-    updateUserInput: (value: string) => void;
-    passageLength: number;
-    comprehensionPercentage: number;
-  };
-  UnknownWordsProps: {
-    unknownWordCount: WordCount[];
-    copyUnknownWordsTable: () => void;
-  };
-}
-
 export function useFrequensay(): UseFrequensayResult {
   const {
     userAddedVocabulary,
@@ -47,13 +18,12 @@ export function useFrequensay(): UseFrequensayResult {
     enableManualVocabulary,
   } = useCustomVocabulary();
 
-  const { selectedToLesson, selectedProgram, selectedFromLesson } =
-    useSelectedLesson();
+  const { selectedToLesson, selectedProgram } = useSelectedLesson();
 
   const [isFrequensayEnabled, setIsFrequensayEnabled] = useState(false);
 
   const [userInput, setUserInput] = useState('');
-  const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([]);
+  // const [unknownWordCount, setUnknownWordCount] = useState<WordCount[]>([]);
 
   const wordCount = useRef<WordCount[]>([]);
   const passageLength = useRef<number>(0);
@@ -62,16 +32,19 @@ export function useFrequensay(): UseFrequensayResult {
     [],
   );
 
-  const spellingsKnownQuery = useSpellingsKnownForLessonRange({
+  const {
+    data: spellingsKnownData,
+    isLoading: spellingsDataLoading,
+    error: spellingsDataError,
+  } = useSpellingsKnownForLesson({
     courseName: selectedProgram?.name || '',
-    lessonToNumber: selectedToLesson?.lessonNumber || 0,
-    lessonFromNumber: selectedFromLesson?.lessonNumber || 0,
+    lessonNumber: selectedToLesson?.lessonNumber || 0,
     isFrequensayEnabled,
   });
 
-  function updateUnknownWords(unknownWords: WordCount[]) {
-    setUnknownWordCount(unknownWords);
-  }
+  // function updateUnknownWords(unknownWords: WordCount[]) {
+  //   setUnknownWordCount(unknownWords);
+  // }
 
   function updateUserAddedVocabulary(newInput: string) {
     const [uniqueWordsWithCounts] = countVocabularyWords(newInput);
@@ -90,40 +63,39 @@ export function useFrequensay(): UseFrequensayResult {
   }
 
   const processUnknownWords = useCallback(() => {
-    if (spellingsKnownQuery.data) {
-      const [unknownWords, , percentage] = filterWordsByUnknown(
+    if (spellingsKnownData) {
+      const [unknownWords, percentage] = filterWordsByUnknown(
         wordCount.current,
-        spellingsKnownQuery.data,
+        spellingsKnownData,
         extraAcceptableWords,
         addManualVocabulary,
       );
 
-      updateUnknownWords(unknownWords);
       comprehensionPercentage.current = percentage;
+      return unknownWords;
     }
-  }, [spellingsKnownQuery?.data, extraAcceptableWords, addManualVocabulary]);
+    return [];
+  }, [spellingsKnownData, extraAcceptableWords, addManualVocabulary]);
 
-  useEffect(() => {
+  const unknownWordCount = useMemo(() => {
     if (selectedToLesson) {
-      if (selectedToLesson?.recordId && spellingsKnownQuery.data) {
-        processUnknownWords();
+      if (
+        selectedToLesson?.recordId &&
+        spellingsKnownData &&
+        userInput.length > 0
+      ) {
+        return processUnknownWords();
       }
     }
-  }, [
-    selectedToLesson,
-    selectedFromLesson,
-    userInput,
-    extraAcceptableWords,
-    spellingsKnownQuery?.data,
-    processUnknownWords,
-  ]);
+    return [];
+    // user input is needed to trigger the useEffect, otherwise it will not work
+    // fix implementation so that it resolves this warning
+  }, [selectedToLesson, spellingsKnownData, processUnknownWords, userInput]);
 
   return {
-    isSuccess: !!spellingsKnownQuery?.data,
-    isError: !!spellingsKnownQuery?.error,
-    isLoading: spellingsKnownQuery?.isLoading,
-    data: spellingsKnownQuery?.data,
-    error: spellingsKnownQuery?.error,
+    spellingsDataError,
+    spellingsDataLoading,
+    spellingsData: spellingsKnownData ?? [],
 
     FrequensaySetupProps: {
       isFrequensayEnabled,

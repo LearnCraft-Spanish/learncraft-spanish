@@ -1,6 +1,5 @@
-import { FromToLessonSelector } from 'src/components/LessonSelector';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-
+import { LessonSelector } from '../LessonSelector';
 export default function FrequensaySetup({
   isFrequensayEnabled,
   setIsFrequensayEnabled,
@@ -12,7 +11,7 @@ export default function FrequensaySetup({
 
   return (
     <div className="frequensay-page__setup">
-      <FromToLessonSelector />
+      <LessonSelector />
       {!isFrequensayEnabled && (
         <>
           {!selectedToLesson ? (
@@ -27,10 +26,14 @@ export default function FrequensaySetup({
           <button
             className="frequensay-setup__button"
             type="button"
-            disabled={!selectedProgram || !selectedToLesson}
+            disabled={
+              !selectedProgram ||
+              !selectedToLesson ||
+              selectedToLesson.lessonNumber === 0
+            }
             onClick={() => setIsFrequensayEnabled(!isFrequensayEnabled)}
           >
-            {isFrequensayEnabled ? 'Disable Frequensay' : 'Enable Frequensay'}
+            Enable Frequensay
           </button>
         </>
       )}

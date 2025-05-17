@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import { Loading } from 'src/components/Loading';
 import { useFrequensay } from 'src/hexagon/application/useCases/useFrequensay';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import CustomVocabulary from '../components/frequensay/CustomVocabulary';
@@ -10,9 +8,8 @@ import './FrequensayPage.scss';
 export default function FrequenSayPage() {
   const { selectedToLesson } = useSelectedLesson();
   const {
-    isError,
-    isLoading,
-    error,
+    spellingsDataError,
+    spellingsDataLoading,
 
     FrequensaySetupProps,
     CustomVocabularyProps,
@@ -20,31 +17,25 @@ export default function FrequenSayPage() {
     UnknownWordsProps,
   } = useFrequensay();
 
-  const initialDataLoading =
-    isLoading && TextToCheckProps.userInput.length <= 0;
-
+  // this is so that if a user unselects a lesson, the Frequensay is disabled until they select a lesson again
   const frequensayIsEnabled =
     FrequensaySetupProps.isFrequensayEnabled && selectedToLesson;
 
-  useEffect(() => {
-    if (isError) {
-      console.error(error);
-    }
-  }, [isError, error]);
   return (
     <div className="frequensay-page">
       <h2>FrequenSay</h2>
       <FrequensaySetup {...FrequensaySetupProps} />
       <div className="frequensay-page__content">
-        {isError ? (
-          <div>Error Loading Frequensay Data</div>
-        ) : initialDataLoading ? (
-          <Loading message="Loading Frequensay Data..." />
+        {spellingsDataError ? (
+          <div>Error Fetching Frequensay Data</div>
         ) : frequensayIsEnabled ? (
           <>
             <CustomVocabulary {...CustomVocabularyProps} />
-            <TextToCheck {...TextToCheckProps} isLoading={isLoading} />
-            {!isLoading && <UnknownWords {...UnknownWordsProps} />}
+            <TextToCheck
+              {...TextToCheckProps}
+              isLoading={spellingsDataLoading}
+            />
+            {!spellingsDataLoading && <UnknownWords {...UnknownWordsProps} />}
           </>
         ) : (
           <div></div>

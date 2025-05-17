@@ -1,12 +1,17 @@
 import type { FrequensayPort } from '@application/ports/frequensayPort';
-import type { getSpellingsKnownForLessonParams } from '@LearnCraft-Spanish/shared';
+import type {
+  getSpellingsKnownForLessonQuery,
+  getSpellingsKnownForLessonResponse,
+} from '@LearnCraft-Spanish/shared';
 import { createMockSpellingsData } from '@testing/factories/spellingsFactory';
 import { setMockResult } from '@testing/utils/setMockResult';
 import { createTypedMock } from '@testing/utils/typedMock';
 
 // Create strongly-typed spies for each FrequensayPort method
 export const mockGetSpellingsKnownForLesson = createTypedMock<
-  (data: getSpellingsKnownForLessonParams) => Promise<string[]>
+  (
+    data: getSpellingsKnownForLessonQuery,
+  ) => Promise<getSpellingsKnownForLessonResponse>
 >().mockResolvedValue(createMockSpellingsData(5));
 
 // Global mock for the adapter with safe default implementations

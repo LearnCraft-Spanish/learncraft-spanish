@@ -1,8 +1,8 @@
-import mockUseSpellingsKnownForLessonRange, {
-  callMockUseSpellingsKnownForLessonRange,
+import mockuseSpellingsKnownForLesson, {
+  callMockuseSpellingsKnownForLesson,
   defaultSuccessMockResult,
-  overrideMockUseSpellingsKnownForLessonRange,
-} from '@application/units/useSpellingsKnownForLessonRange.mock';
+  overrideMockuseSpellingsKnownForLesson,
+} from '@application/units/useSpellingsKnownForLesson.mock';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createQueryClientWrapper } from '@testing/index';
 import { createMockSpellingsData } from 'src/hexagon/testing/factories/spellingsFactory';
@@ -24,15 +24,13 @@ vi.mock('./useCustomVocabulary', () => ({
 vi.mock('src/hooks/useSelectedLesson', () => ({
   useSelectedLesson: callMockUseSelectedLesson,
 }));
-vi.mock('@application/units/useSpellingsKnownForLessonRange', () => ({
-  useSpellingsKnownForLessonRange: callMockUseSpellingsKnownForLessonRange,
+vi.mock('@application/units/useSpellingsKnownForLesson', () => ({
+  useSpellingsKnownForLesson: callMockuseSpellingsKnownForLesson,
 }));
 
 describe('useFrequensay', () => {
   beforeEach(() => {
-    mockUseSpellingsKnownForLessonRange.mockReturnValue(
-      defaultSuccessMockResult,
-    );
+    mockuseSpellingsKnownForLesson.mockReturnValue(defaultSuccessMockResult);
     mockUseCustomVocabulary.mockReturnValue(mockUseCustomVocabularyReturnValue);
     mockUseSelectedLesson.mockReturnValue(mockUseSelectedLessonReturnValue);
   });
@@ -43,17 +41,14 @@ describe('useFrequensay', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(false);
-      expect(result.current.isError).toBe(false);
-      expect(result.current.isLoading).toBe(false);
-      expect(result.current.error).toBe(null);
-      expect(result.current.data).toBe(undefined);
+      expect(result.current.spellingsDataError).toBe(null);
+      expect(result.current.spellingsDataLoading).toBe(false);
     });
   });
 
   it('render with data, when query is successful', async () => {
     const mockData = createMockSpellingsData(1);
-    overrideMockUseSpellingsKnownForLessonRange({
+    overrideMockuseSpellingsKnownForLesson({
       data: mockData,
     });
 
@@ -62,8 +57,9 @@ describe('useFrequensay', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.isSuccess).toBe(true);
-      expect(result.current.data).toBe(mockData);
+      expect(result.current.spellingsDataError).toBe(null);
+      expect(result.current.spellingsDataLoading).toBe(false);
+      expect(result.current.spellingsData).toBe(mockData);
     });
   });
 });

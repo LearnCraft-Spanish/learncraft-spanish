@@ -1,4 +1,4 @@
-import type { getSpellingsKnownForLessonParams } from '@LearnCraft-Spanish/shared';
+import type { getSpellingsKnownForLessonQuery } from '@LearnCraft-Spanish/shared';
 import type { AuthPort } from '../../application/ports/authPort';
 import type { FrequensayPort } from '../../application/ports/frequensayPort';
 import { frequensayEndpoints } from '@LearnCraft-Spanish/shared';
@@ -12,18 +12,19 @@ export function createFrequensayInfrastructure(
 
   return {
     getSpellingsKnownForLesson: async (
-      data: getSpellingsKnownForLessonParams,
+      data: getSpellingsKnownForLessonQuery,
     ) => {
-      const lessonFromNumber = data.lessonFromNumber.toString()
-        ? data.lessonFromNumber.toString()
-        : '';
+      const lessonNumber = data.lessonNumber.toString();
       const formattedCourseName = data.courseName.replace(' ', '+');
-      const path = frequensayEndpoints.getSpellingsKnownForLesson.path
-        .replace(':courseName', formattedCourseName)
-        .replace(':lessonToNumber', data.lessonToNumber.toString())
-        .replace(':lessonFromNumber', lessonFromNumber);
-
-      const response = await httpClient.get<string[]>(path);
+      const response = await httpClient.get<string[]>(
+        frequensayEndpoints.getSpellingsKnownForLesson.path,
+        {
+          params: {
+            courseName: formattedCourseName,
+            lessonNumber,
+          },
+        },
+      );
       return response;
     },
   };

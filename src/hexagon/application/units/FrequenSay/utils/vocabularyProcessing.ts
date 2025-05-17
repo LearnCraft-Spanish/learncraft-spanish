@@ -37,7 +37,7 @@ export function filterWordsByUnknown(
   knownSpellings: string[] = [],
   customVocabulary: WordCount[] = [],
   useCustomVocabulary: boolean = false,
-): [WordCount[], number, number] {
+): [WordCount[], number] {
   function isUnknown(word: WordCount): boolean {
     if (knownSpellings.includes(word.word)) {
       return false;
@@ -70,5 +70,5 @@ export function filterWordsByUnknown(
       ? 100 - Math.floor((totalWordsUnknown / totalWords) * 100)
       : 100;
 
-  return [unknownWords, totalWords, comprehensionPercentage];
+  return [unknownWords, comprehensionPercentage];
 }
