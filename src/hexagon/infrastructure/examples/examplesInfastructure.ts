@@ -4,8 +4,9 @@ import {
   addVocabularyToExampleEndpoint,
   createUnverifiedExampleEndpoint,
   getExampleEndpoint,
-  getExampleSetBySpanishExampleEndpoint,
+  getExampleSetBySpanishTextEndpoint,
   getRecentlyEditedExamplesEndpoint,
+  getUnverifiedExamplesEndpoint,
   removeVocabularyFromExampleEndpoint,
 } from '@LearnCraft-Spanish/shared';
 import { createAuthenticatedHttpClient } from '../http/client';
@@ -45,8 +46,13 @@ export function createExamplesInfrastructure(
       return httpClient.get(path);
     },
     getExampleSetBySpanishText: (spanishExamples) => {
-      const path = getExampleSetBySpanishExampleEndpoint.path;
+      const path = getExampleSetBySpanishTextEndpoint.path;
       return httpClient.post(path, { spanishExamples });
+    },
+
+    getUnverifiedExamples: () => {
+      const path = getUnverifiedExamplesEndpoint.path;
+      return httpClient.get(path);
     },
   };
 }

@@ -5,9 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 export function useRecentlyEditedExamples() {
   const { getRecentlyEditedExamples } = useExamplesAdapter();
 
-  return useQuery({
+  const recentlyEditedExamplesQuery = useQuery({
     queryKey: ['recentlyEditedExamples'],
     queryFn: getRecentlyEditedExamples,
     ...queryDefaults.referenceData,
   });
+  return {
+    data: recentlyEditedExamplesQuery.data,
+    isLoading: recentlyEditedExamplesQuery.isLoading,
+    error: recentlyEditedExamplesQuery.error,
+    refetch: recentlyEditedExamplesQuery.refetch,
+  };
 }

@@ -22,4 +22,5 @@ export interface ExamplesPort {
   getExampleSetBySpanishText: (
     spanishText: string[],
   ) => Promise<ExampleRecord[]>;
+  getUnverifiedExamples: () => Promise<ExampleRecord[]>;
 }

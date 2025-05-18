@@ -1,11 +1,15 @@
 import type { ExampleRecord } from '@LearnCraft-Spanish/shared';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { CreateExampleRecordSchema } from '@LearnCraft-Spanish/shared';
 
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useRecentlyEditedExamples } from '../units/examples/data/useRecentlyEditedExamples';
+
+import { useUnverifiedExamples } from '../units/examples/data/useUnverifiedExamples';
+
 interface ExampleDetails {
   spanishExample: string;
   englishTranslation: string;
@@ -29,6 +33,8 @@ export default function useSingleExampleCreator() {
   const recentlyEditedExamplesQuery = useRecentlyEditedExamples();
   // This hook should be moved to hexagon
   const { vocabularyQuery } = useVocabulary();
+
+  const { createUnverifiedExample } = useUnverifiedExamples();
 
   const tempIdCounter = useRef(0);
   const [tableOption, setTableOption] = useState('none');
@@ -75,13 +81,20 @@ export default function useSingleExampleCreator() {
     return mappedVocab;
   }, [vocabIncluded, vocabularyQuery.data]);
 
+  // This needs to be refactored, consider using zod to validate the example, based on create/update/unverifed/verified
   const exampleToSave = useMemo<ExampleRecord>(() => {
     return {
       recordId: selectedExampleId ?? tempIdCounter.current--,
       spanishExample: exampleDetails.spanishExample,
       englishTranslation: exampleDetails.englishTranslation,
-      spanishAudioLa: exampleDetails.spanishAudioLa,
-      englishAudio: exampleDetails.englishAudio,
+      spanishAudioLa:
+        exampleDetails.spanishAudioLa.length > 0
+          ? exampleDetails.spanishAudioLa
+          : undefined,
+      englishAudio:
+        exampleDetails.englishAudio.length > 0
+          ? exampleDetails.englishAudio
+          : undefined,
       spanglish: exampleDetails.spanishExample.includes('*')
         ? 'spanglish'
         : 'esp',
@@ -110,13 +123,27 @@ export default function useSingleExampleCreator() {
     showIncompleteOnly,
   ]);
 
+  async function handleAddExample() {
+    const createExampleRecord = CreateExampleRecordSchema.parse(exampleToSave);
+    // this should be done by zod, but I dont want to push a 1 line change to the example schema
+    // The schema is updated, but not live
+    // REMOVE WHEN: shared package is above version 0.2.25
+    // manually remove vocabIncluded
+    const { vocabIncluded, ...rest } = createExampleRecord;
+    const manualParsedCreateExampleRecord = {
+      ...rest,
+    };
+    await createUnverifiedExample(manualParsedCreateExampleRecord);
+    recentlyEditedExamplesQuery.refetch();
+  }
+
   function submitExample(e: React.FormEvent) {
     e.preventDefault();
     // use editOrCreate to determine if we are editing or creating
     if (editOrCreate === 'edit') {
       handleEditExample(e);
     } else {
-      handleAddExample(e);
+      handleAddExample();
     }
   }
 

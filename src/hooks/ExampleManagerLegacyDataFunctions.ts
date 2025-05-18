@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useBackendHelpers } from './useBackend';
 
 export default function useLegacyBackend() {
-  const { newPostFactory, newDeleteFactory, getFactory } = useBackendHelpers();
+  const { newPostFactory, getFactory } = useBackendHelpers();
 
   // Complex queryies have to be sent as POST since GET doesn't allow body
   const getExampleSetBySpanishText = useCallback(
@@ -31,51 +31,51 @@ export default function useLegacyBackend() {
     [newPostFactory],
   );
 
-  const createUnverifiedExample = useCallback(
-    (example: types.NewFlashcard): Promise<number> => {
-      return newPostFactory<number>({
-        path: 'add-unverified-example',
-        body: {
-          example,
-        },
-      });
-    },
-    [newPostFactory],
-  );
+  // const createUnverifiedExample = useCallback(
+  //   (example: types.NewFlashcard): Promise<number> => {
+  //     return newPostFactory<number>({
+  //       path: 'add-unverified-example',
+  //       body: {
+  //         example,
+  //       },
+  //     });
+  //   },
+  //   [newPostFactory],
+  // );
 
-  const updateExample = useCallback(
-    (example: Partial<types.Flashcard>): Promise<number> => {
-      return newPostFactory<number>({
-        path: 'update-example',
-        body: {
-          example,
-        },
-      });
-    },
-    [newPostFactory],
-  );
+  // const updateExample = useCallback(
+  //   (example: Partial<types.Flashcard>): Promise<number> => {
+  //     return newPostFactory<number>({
+  //       path: 'update-example',
+  //       body: {
+  //         example,
+  //       },
+  //     });
+  //   },
+  //   [newPostFactory],
+  // );
 
-  const addVocabularyToExample = useCallback(
-    (exampleId: number, vocabIdList: number[]): Promise<number> => {
-      return newPostFactory<number>({
-        path: 'add-vocab-to-example',
-        body: {
-          exampleId,
-          vocabIdList,
-        },
-      });
-    },
-    [newPostFactory],
-  );
-  const removeVocabFromExample = useCallback(
-    (exampleId: number, vocabIdList: number[]): Promise<number> => {
-      return newDeleteFactory({
-        path: 'remove-vocab-from-example',
-        body: { exampleId, vocabIdList },
-      });
-    },
-    [newDeleteFactory],
-  );
+  // const addVocabularyToExample = useCallback(
+  //   (exampleId: number, vocabIdList: number[]): Promise<number> => {
+  //     return newPostFactory<number>({
+  //       path: 'add-vocab-to-example',
+  //       body: {
+  //         exampleId,
+  //         vocabIdList,
+  //       },
+  //     });
+  //   },
+  //   [newPostFactory],
+  // );
+  // const removeVocabFromExample = useCallback(
+  //   (exampleId: number, vocabIdList: number[]): Promise<number> => {
+  //     return newDeleteFactory({
+  //       path: 'remove-vocab-from-example',
+  //       body: { exampleId, vocabIdList },
+  //     });
+  //   },
+  //   [newDeleteFactory],
+  // );
 
   // const getRecentlyEditedExamples = useCallback((): Promise<
   //   types.Flashcard[]
@@ -90,6 +90,10 @@ export default function useLegacyBackend() {
   //   [getFactory],
   // );
 
+  // ------------------------------------------------------------
+  //                Unused Functions??
+  // ------------------------------------------------------------
+  // ------------------------------------------------------------
   const getUnverifiedExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
@@ -105,10 +109,10 @@ export default function useLegacyBackend() {
   return {
     getExampleSetBySpanishText,
     createMultipleUnverifiedExamples,
-    createUnverifiedExample,
-    updateExample,
-    addVocabularyToExample,
-    removeVocabFromExample,
+    // createUnverifiedExample, // this is now updateExample, will add specifics to validate input based on optional params (if unverified, then make sure vocabComplete is false, etc)
+    // updateExample,
+    // addVocabularyToExample,
+    // removeVocabFromExample,
     // getRecentlyEditedExamples,
     // getSingleExample,
     getUnverifiedExamplesFromBackend,
