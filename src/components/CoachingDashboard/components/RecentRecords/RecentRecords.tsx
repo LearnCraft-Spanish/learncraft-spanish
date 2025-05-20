@@ -23,7 +23,7 @@ import SubSectionHeader from '../SubSectionHeader';
 import AssignmentRecordRow from './AssignmentRecordRow';
 import DisplayOnlyTable from './DisplayOnlyTable';
 import GroupCallRecordRow from './GroupCallRecordRow';
-import MonthSelector from './MonthSelector';
+import MonthYearSelector from './MonthYearSelector';
 import PrivateCallRecordRow from './PrivateCallRecordRow';
 interface colaspableMenuObject {
   sectionTitle: string;
@@ -33,15 +33,16 @@ interface colaspableMenuObject {
 export function RecentRecords() {
   const { contextual, openContextual } = useContextualMenu();
   // make the separator a dash
-  const defaultMonth = new Date().toLocaleDateString('en-US', {
+  const defaultMonthYear = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: '2-digit',
   });
 
-  const [selectedMonth, setSelectedMonth] = useState(
-    defaultMonth.replace('/', ':'),
+  const [selectedMonthYear, setSelectedMonthYear] = useState(
+    defaultMonthYear.replace('/', ':'),
   );
-  const { myRecentRecordsQuery, states } = useMyRecentRecords(selectedMonth);
+  const { myRecentRecordsQuery, states } =
+    useMyRecentRecords(selectedMonthYear);
   const [colapsableMenuObject, setColapsableMenuObject] =
     useState<colaspableMenuObject>({
       sectionTitle: 'Assignments',
@@ -75,9 +76,9 @@ export function RecentRecords() {
 
   return (
     <div>
-      <MonthSelector
-        selectedMonth={selectedMonth}
-        setSelectedMonth={setSelectedMonth}
+      <MonthYearSelector
+        selectedMonthYear={selectedMonthYear}
+        setSelectedMonthYear={setSelectedMonthYear}
       />
       {isLoading && <InlineLoading message="Loading Your Records..." />}
       {isError && <div>Error loading data, please try again.</div>}
