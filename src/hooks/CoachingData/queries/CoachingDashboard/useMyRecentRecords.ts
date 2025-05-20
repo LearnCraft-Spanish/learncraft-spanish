@@ -2,17 +2,17 @@ import { useQuery } from '@tanstack/react-query';
 import useActiveCoach from 'src/components/CoachingDashboard/hooks/useActiveCoach';
 import useCoachingDashboardBackend from './BackendFunctions';
 
-export default function useMyRecentRecordsQuery(month: string) {
+export default function useMyRecentRecordsQuery(monthYear: string) {
   const { coach } = useActiveCoach();
   const { getRecentRecords } = useCoachingDashboardBackend();
   // format name
-  const coachId = coach?.user.id;
+  const coachNameFormatted = coach?.coachUserName.replace(' ', '+');
   // format month into 'YYYY-MM'
-  const formattedMonth = month.replace(':', '-');
+  const formattedDate = monthYear.replace(':', '-');
   const myRecentRecordsQuery = useQuery({
-    queryKey: ['recent-records', coachId, formattedMonth],
-    queryFn: () => getRecentRecords(coachId, formattedMonth),
-    enabled: !!coachId,
+    queryKey: ['recent-records', coachNameFormatted, formattedDate],
+    queryFn: () => getRecentRecords(coachNameFormatted, formattedDate),
+    enabled: !!coachNameFormatted,
     staleTime: Infinity,
   });
 

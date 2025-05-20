@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const generateMonths = (numMonthsToShow: number) => {
+const generateMonthYears = (numMonthsToShow: number) => {
   const months = [];
   const currentDate = new Date();
 
@@ -19,15 +19,15 @@ const generateMonths = (numMonthsToShow: number) => {
   return months;
 };
 
-export default function MonthSelector({
-  selectedMonth,
-  setSelectedMonth,
+export default function MonthYearSelector({
+  selectedMonthYear,
+  setSelectedMonthYear,
 }: {
-  selectedMonth: string;
-  setSelectedMonth: (month: string) => void;
+  selectedMonthYear: string;
+  setSelectedMonthYear: (monthYear: string) => void;
 }) {
   const [numMonths, setNumMonths] = useState(12); // Start with 12 months
-  const months = generateMonths(numMonths);
+  const months = generateMonthYears(numMonths);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -35,7 +35,7 @@ export default function MonthSelector({
       setNumMonths((prev) => prev + 12);
       return;
     }
-    setSelectedMonth(value);
+    setSelectedMonthYear(value);
   };
 
   return (
@@ -43,7 +43,11 @@ export default function MonthSelector({
       <label className="monthSelectorLabel" htmlFor="monthSelector">
         Select Month:
       </label>
-      <select id="monthSelector" value={selectedMonth} onChange={handleChange}>
+      <select
+        id="monthSelector"
+        value={selectedMonthYear}
+        onChange={handleChange}
+      >
         {months.map((month) => (
           <option key={month.value} value={month.value}>
             {month.name}
