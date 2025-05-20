@@ -4,6 +4,7 @@ import type {
   GetTotalCountResponse,
   ListVocabularyResponse,
   Vocabulary,
+  VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
 import type { AuthPort } from '../../application/ports/authPort';
 import type {
@@ -129,9 +130,31 @@ export function createVocabularyInfrastructure(
       return results;
     },
 
-    deleteVocabulary: async (id: string): Promise<void> => {
+    deleteVocabulary: async (id: string): Promise<number> => {
       const path = VocabularyEndpoints.delete.path.replace(':id', id);
-      await httpClient.delete(path);
+
+      const result = await httpClient.delete<number>(path);
+
+      return result;
+    },
+
+    getAllRecordsAssociatedWithVocabularyRecord: async (
+      id: string | undefined,
+    ): Promise<VocabularyRelatedRecords> => {
+      if (!id) {
+        return {
+          vocabularyRecordId: 0,
+          vocabularyExampleRecords: [],
+          vocabularyLessonRecords: [],
+          vocabularySpellingRecords: [],
+        };
+      }
+      const path =
+        VocabularyEndpoints.getAllRecordsAssociatedWithVocabularyRecord.path.replace(
+          ':id',
+          id,
+        );
+      return httpClient.get<VocabularyRelatedRecords>(path);
     },
 
     searchVocabulary: async (query: string): Promise<Vocabulary[]> => {

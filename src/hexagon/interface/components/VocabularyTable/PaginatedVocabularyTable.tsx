@@ -1,5 +1,6 @@
 import type { VocabularyPaginationState } from '../../../application/useCases/useNonVerbCreation';
 import React from 'react';
+import DeleteVocabularyRecord from './DeleteVocabularyRecord';
 import './PaginatedVocabularyTable.scss';
 
 interface PaginatedVocabularyTableProps {
@@ -18,11 +19,11 @@ export function PaginatedVocabularyTable({
   emptyMessage = 'No vocabulary items found',
 }: PaginatedVocabularyTableProps) {
   const {
-    vocabularyItems,
     isLoading,
+    error,
+    vocabularyItems,
     isFetching,
     isCountLoading,
-    error,
     totalCount,
     totalPages,
     hasMorePages,
@@ -84,6 +85,9 @@ export function PaginatedVocabularyTable({
               <th>Description</th>
               <th>Spellings</th>
               <th>Notes</th>
+              <th className="paginated-vocabulary__table-header-delete">
+                Delete
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -93,6 +97,9 @@ export function PaginatedVocabularyTable({
                 <td>{item.descriptor}</td>
                 <td>{item.spellings?.map((s) => s.value).join(', ') || ''}</td>
                 <td>{item.notes || ''}</td>
+                <td>
+                  <DeleteVocabularyRecord recordId={item.id.toString()} />
+                </td>
               </tr>
             ))}
           </tbody>

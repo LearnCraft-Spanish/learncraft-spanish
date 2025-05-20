@@ -34,7 +34,7 @@
     "metrics": "node METRICS/get_metrics.js"
   },
   "dependencies": {
-    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.2.0",
+    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.2.15",
     "@auth0/auth0-react": "^2.3.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
@@ -45,6 +45,7 @@
     "@types/node": "^22.13.5",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@typescript-eslint/utils": "^8.32.1",
     "dotenv": "^16.4.7",
     "glob": "^11.0.1",
     "jsonwebtoken": "^9.0.2",
