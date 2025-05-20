@@ -26,7 +26,7 @@
     "scss": "sass --watch src/components/Coaching/styles:src/components/Coaching/styles",
     "start": "vite",
     "test": "vitest run --coverage",
-    "test:hexagon": "vitest --config vitest.config-hexagon.ts",
+    "test:hexagon": "vitest --config vitest.config-hexagon.ts --coverage",
     "test:hexagon:watch": "vitest --config vitest.config-hexagon.ts --watch",
     "typecheck": "tsc --noEmit",
     "update-shared": "pnpm add @LearnCraft-Spanish/shared@latest",
@@ -34,7 +34,7 @@
     "metrics": "node METRICS/get_metrics.js"
   },
   "dependencies": {
-    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.2.15",
+    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@^0.2.24",
     "@auth0/auth0-react": "^2.3.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
