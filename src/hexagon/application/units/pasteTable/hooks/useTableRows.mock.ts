@@ -1,5 +1,5 @@
 import type { TableColumn, TableRow } from '../types';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { GHOST_ROW_ID } from '../types';
 
 // Define the hook result interface
@@ -38,23 +38,25 @@ export const createMockTableRowsResult = <_T>(options?: {
 }): TableRowsResult<_T> => {
   return {
     rows: options?.rows || [defaultRow, ghostRow],
-    updateCell: createTypedMock<
-      (rowId: string, columnId: string, value: string) => void
-    >().mockImplementation(() => {}),
-    setRows: createTypedMock<
-      React.Dispatch<React.SetStateAction<TableRow[]>>
-    >().mockImplementation(() => {}),
-    resetRows: createTypedMock<() => void>().mockImplementation(() => {}),
-    convertGhostRow: createTypedMock<
-      (rowId: string, columnId: string, value: string) => string | null
-    >().mockImplementation(() => 'new-row-id'),
+    updateCell: (_rowId: string, _columnId: string, _value: string) => {},
+    setRows: () => {},
+    resetRows: () => {},
+    convertGhostRow: (_rowId: string, _columnId: string, _value: string) =>
+      'new-row-id',
   };
 };
 
-// Main mock function for the hook
-export const mockUseTableRows = createTypedMock<
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockUseTableRows,
+  override: overrideMockUseTableRows,
+  reset: resetMockUseTableRows,
+} = createOverrideableMock<
   <T>(options: {
     columns: TableColumn[];
     initialData?: T[];
   }) => TableRowsResult<T>
->().mockImplementation(() => createMockTableRowsResult());
+>(() => createMockTableRowsResult());
+
+// Export the default result for component testing
+export { createMockTableRowsResult as defaultResult };
