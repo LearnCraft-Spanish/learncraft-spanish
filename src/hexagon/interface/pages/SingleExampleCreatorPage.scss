@@ -9,6 +9,17 @@
   flex-direction: row;
 }
 
+#exampleCreateUpdateSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+#exampleFormAndPreview {
+  display: flex;
+  flex-direction: row;
+}
+
 #examplePreview,
 #exampleForm,
 .halfOfScreen {

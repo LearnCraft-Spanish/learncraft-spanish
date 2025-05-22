@@ -1,4 +1,8 @@
-import type { ExampleRecord } from '@LearnCraft-Spanish/shared';
+import type {
+  ExampleRecord,
+  SpanglishType,
+  Vocabulary,
+} from '@LearnCraft-Spanish/shared';
 import { CreateExampleRecordSchema } from '@LearnCraft-Spanish/shared';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -23,9 +27,6 @@ export default function useSingleExampleCreator() {
   const { openModal, closeModal } = useModal();
 
   const hasEditAccess = userDataQuery.data?.roles.adminRole === 'admin';
-  const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
-    null,
-  );
   const [quizId, setQuizId] = useState<number | undefined>(undefined);
   // This hook should be moved to hexagon
   const { quizExamplesQuery, officialQuizzesQuery, updateQuizExample } =
@@ -37,11 +38,9 @@ export default function useSingleExampleCreator() {
   const { createUnverifiedExample } = useUnverifiedExamples();
 
   const tempIdCounter = useRef(0);
-  const [tableOption, setTableOption] = useState('none');
-  const [vocabIncluded, setVocabIncluded] = useState<string[]>([]);
-  const [vocabSearchTerm, setVocabSearchTerm] = useState('');
-  const [vocabComplete, setVocabComplete] = useState(false);
-  const [showIncompleteOnly, setShowIncompleteOnly] = useState(false);
+  const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
+    null,
+  );
   const [exampleDetails, setExampleDetails] = useState<ExampleDetails>({
     spanishExample: '',
     englishTranslation: '',
@@ -49,9 +48,21 @@ export default function useSingleExampleCreator() {
     englishAudio: '',
   });
 
+  const [tableOption, setTableOption] = useState('none');
+  const [vocabIncluded, setVocabIncluded] = useState<string[]>([]);
+  const [vocabSearchTerm, setVocabSearchTerm] = useState('');
+  const [vocabComplete, setVocabComplete] = useState(false);
+  const [showIncompleteOnly, setShowIncompleteOnly] = useState(false);
+
   const editOrCreate = useMemo(() => {
-    return selectedExampleId && selectedExampleId > 0 ? 'edit' : 'create';
+    return selectedExampleId && selectedExampleId > 0
+      ? ('edit' as 'edit' | 'create')
+      : ('create' as 'edit' | 'create');
   }, [selectedExampleId]);
+
+  const updateVocabSearchTerm = useCallback((newTerm: string) => {
+    setVocabSearchTerm(newTerm);
+  }, []);
 
   const addToSelectedVocab = useCallback(
     (vocabTerm: string) => {
@@ -81,6 +92,54 @@ export default function useSingleExampleCreator() {
     return mappedVocab;
   }, [vocabIncluded, vocabularyQuery.data]);
 
+  const tagsFilteredByInput = useMemo(() => {
+    function filterBySearch(vocabularyTable: Vocabulary[] | undefined) {
+      if (!vocabularyTable) {
+        return [];
+      }
+      const filteredTags = [];
+      const searchTerm = vocabSearchTerm.toLowerCase();
+
+      if (searchTerm === '') {
+        return [];
+      }
+
+      for (let i = 0; i < vocabularyTable.length; i++) {
+        const tagLowercase = vocabularyTable[i].vocabName.toLowerCase();
+        const descriptorLowercase =
+          vocabularyTable[i].descriptionOfVocabularySkill;
+        if (
+          tagLowercase.includes(searchTerm) ||
+          descriptorLowercase?.includes(searchTerm)
+        ) {
+          if (
+            tagLowercase === searchTerm ||
+            descriptorLowercase === searchTerm
+          ) {
+            filteredTags.unshift(vocabularyTable[i]);
+          } else {
+            filteredTags.push(vocabularyTable[i]);
+          }
+        }
+      }
+
+      return filteredTags;
+    }
+
+    function filterByActiveTags(tag: Vocabulary) {
+      const matchFound = includedVocabObjects.find(
+        (item) => item.recordId === tag.recordId,
+      );
+      if (matchFound) {
+        return false;
+      }
+      return true;
+    }
+    const filteredBySearch = filterBySearch(vocabularyQuery.data);
+    const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags);
+    return filteredByActiveTags.slice(0, 10);
+  }, [vocabSearchTerm, includedVocabObjects, vocabularyQuery.data]);
+
   // This needs to be refactored, consider using zod to validate the example, based on create/update/unverifed/verified
   const exampleToSave = useMemo<ExampleRecord>(() => {
     return {
@@ -90,14 +149,14 @@ export default function useSingleExampleCreator() {
       spanishAudioLa:
         exampleDetails.spanishAudioLa.length > 0
           ? exampleDetails.spanishAudioLa
-          : undefined,
+          : '',
       englishAudio:
         exampleDetails.englishAudio.length > 0
           ? exampleDetails.englishAudio
-          : undefined,
+          : '',
       spanglish: exampleDetails.spanishExample.includes('*')
-        ? 'spanglish'
-        : 'esp',
+        ? ('spanglish' as SpanglishType)
+        : ('esp' as SpanglishType),
       vocabIncluded,
       vocabComplete: selectedExampleId ? vocabComplete : false,
     };
@@ -122,6 +181,35 @@ export default function useSingleExampleCreator() {
     recentlyEditedExamplesQuery.data,
     showIncompleteOnly,
   ]);
+
+  const handleSelectExample = useCallback(
+    (exampleId: number | null) => {
+      if (!exampleId) {
+        setSelectedExampleId(null);
+        setExampleDetails({
+          spanishExample: '',
+          englishTranslation: '',
+          spanishAudioLa: '',
+          englishAudio: '',
+        });
+        return;
+      }
+
+      setSelectedExampleId(exampleId);
+      const exampleDetails = tableData?.find(
+        (example) => example.recordId === exampleId,
+      );
+      if (exampleDetails) {
+        setExampleDetails({
+          spanishExample: exampleDetails.spanishExample,
+          englishTranslation: exampleDetails.englishTranslation,
+          spanishAudioLa: exampleDetails.spanishAudioLa ?? '',
+          englishAudio: exampleDetails.englishAudio ?? '',
+        });
+      }
+    },
+    [tableData],
+  );
 
   async function handleAddExample() {
     const createExampleRecord = CreateExampleRecordSchema.parse(exampleToSave);
@@ -191,12 +279,24 @@ export default function useSingleExampleCreator() {
       setEnglishAudio: (value: string) =>
         setExampleDetails((prev) => ({ ...prev, englishAudio: value })),
       // Include vocab data and operations
+
+      vocabSearchTerm,
+      setVocabSearchTerm,
+      vocabComplete,
+      setVocabComplete,
+      includedVocabObjects,
+      addToSelectedVocab,
+      removeFromVocabIncluded,
+      tagsFilteredByInput,
+      updateVocabSearchTerm,
+      handleVerifyExampleChange,
     },
     // vocab data / filtering? data
     showIncompleteOnly,
     setShowIncompleteOnly,
     vocabIncluded,
     setVocabIncluded,
+    updateVocabSearchTerm,
 
     vocabSearchTerm,
     setVocabSearchTerm,
@@ -215,5 +315,7 @@ export default function useSingleExampleCreator() {
     // quiz data
     quizId,
     setQuizId,
+
+    handleSelectExample,
   };
 }

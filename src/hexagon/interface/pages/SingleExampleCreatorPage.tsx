@@ -1,4 +1,3 @@
-import type { ExampleRecord } from '@LearnCraft-Spanish/shared';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
 import useSingleExampleCreator from 'src/hexagon/application/useCases/useSingleExampleCreator';
 import ExampleCreateUpdateForm from '../components/ExampleManager/ExampleCreateUpdateForm';
@@ -7,46 +6,36 @@ import './SingleExampleCreatorPage.scss';
 export default function SingleExampleCreatorPage() {
   const {
     hasEditAccess,
-    selectedExampleId,
-    setSelectedExampleId,
+    // selectedExampleId,
+    // setSelectedExampleId,
 
     createUpdateFormParams,
 
     showIncompleteOnly,
     setShowIncompleteOnly,
-    vocabIncluded,
-    setVocabIncluded,
-    vocabSearchTerm,
-    setVocabSearchTerm,
-    vocabComplete,
-    setVocabComplete,
+    // vocabIncluded,
+    // setVocabIncluded,
+    // vocabSearchTerm,
+    // setVocabSearchTerm,
+    // vocabComplete,
+    // setVocabComplete,
     tableOption,
     setTableOption,
-    quizId,
-    setQuizId,
-    quizExamplesQuery,
-    officialQuizzesQuery,
+    // quizId,
+    // setQuizId,
+    // quizExamplesQuery,
+    // officialQuizzesQuery,
     safeTableData,
-    addToSelectedVocab,
-    removeFromVocabIncluded,
-    includedVocabObjects,
-    handleVerifyExampleChange,
+    // addToSelectedVocab,
+    // removeFromVocabIncluded,
+    // includedVocabObjects,
+    // handleVerifyExampleChange,
+    handleSelectExample,
   } = useSingleExampleCreator();
   return (
     <div id="singleExampleCreatorPage">
       <div id="exampleCreator">
-        <ExampleCreateUpdateForm
-          {...createUpdateFormParams}
-          vocabSearchTerm={vocabSearchTerm}
-          setVocabSearchTerm={setVocabSearchTerm}
-          vocabComplete={vocabComplete}
-          setVocabComplete={setVocabComplete}
-          tagsFilteredByInput={includedVocabObjects}
-          addToSelectedVocab={addToSelectedVocab}
-          includedVocabObjects={includedVocabObjects}
-          removeFromVocabIncluded={removeFromVocabIncluded}
-          handleVerifyExampleChange={handleVerifyExampleChange}
-        />
+        <ExampleCreateUpdateForm {...createUpdateFormParams} />
       </div>
       <div id="vocabTagging"></div>
       <div id="exampleFilterControls">
@@ -78,10 +67,8 @@ export default function SingleExampleCreatorPage() {
         {tableOption === 'none' && <h3>Recently Edited Examples</h3>}
         <ExamplesTable
           dataSource={safeTableData}
-          displayOrder={safeTableData.map((example: ExampleRecord) => ({
-            recordId: example.recordId,
-          }))}
-          selectFunction={hasEditAccess ? setSelectedExampleId : undefined}
+          displayOrder={safeTableData}
+          selectFunction={hasEditAccess ? handleSelectExample : undefined}
           forceShowVocab
           studentContext={false}
         />

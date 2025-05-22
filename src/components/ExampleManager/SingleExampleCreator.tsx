@@ -1,14 +1,8 @@
 import type {
   Flashcard,
   NewFlashcard,
-  Vocabulary,
 } from 'src/types/interfaceDefinitions';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-} from 'react';
-import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
+import React, { useEffect, useMemo } from 'react';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
@@ -48,7 +42,7 @@ export default function SingleExampleCreator({
   //   englishAudio: '',
   // });
 
-  const { vocabularyQuery } = useVocabulary();
+  // const { vocabularyQuery } = useVocabulary();
 
   // const exampleToSave = useMemo<Flashcard>(() => {
   //   return {
@@ -155,12 +149,12 @@ export default function SingleExampleCreator({
   //   [vocabIncluded],
   // );
 
-  const updateVocabSearchTerm = useCallback(
-    (target: EventTarget & HTMLInputElement) => {
-      setVocabSearchTerm(target.value);
-    },
-    [],
-  );
+  // const updateVocabSearchTerm = useCallback(
+  //   (target: EventTarget & HTMLInputElement) => {
+  //     setVocabSearchTerm(target.value);
+  //   },
+  //   [],
+  // );
 
   // const includedVocabObjects = useMemo(() => {
   //   const mappedVocab = vocabIncluded
@@ -173,53 +167,53 @@ export default function SingleExampleCreator({
   //   return mappedVocab;
   // }, [vocabIncluded, vocabularyQuery.data]);
 
-  const tagsFilteredByInput = useMemo(() => {
-    function filterBySearch(vocabularyTable: Vocabulary[] | undefined) {
-      if (!vocabularyTable) {
-        return [];
-      }
-      const filteredTags = [];
-      const searchTerm = vocabSearchTerm.toLowerCase();
+  // const tagsFilteredByInput = useMemo(() => {
+  //   function filterBySearch(vocabularyTable: Vocabulary[] | undefined) {
+  //     if (!vocabularyTable) {
+  //       return [];
+  //     }
+  //     const filteredTags = [];
+  //     const searchTerm = vocabSearchTerm.toLowerCase();
 
-      if (searchTerm === '') {
-        return [];
-      }
+  //     if (searchTerm === '') {
+  //       return [];
+  //     }
 
-      for (let i = 0; i < vocabularyTable.length; i++) {
-        const tagLowercase = vocabularyTable[i].vocabName.toLowerCase();
-        const descriptorLowercase =
-          vocabularyTable[i].descriptionOfVocabularySkill;
-        if (
-          tagLowercase.includes(searchTerm) ||
-          descriptorLowercase?.includes(searchTerm)
-        ) {
-          if (
-            tagLowercase === searchTerm ||
-            descriptorLowercase === searchTerm
-          ) {
-            filteredTags.unshift(vocabularyTable[i]);
-          } else {
-            filteredTags.push(vocabularyTable[i]);
-          }
-        }
-      }
+  //     for (let i = 0; i < vocabularyTable.length; i++) {
+  //       const tagLowercase = vocabularyTable[i].vocabName.toLowerCase();
+  //       const descriptorLowercase =
+  //         vocabularyTable[i].descriptionOfVocabularySkill;
+  //       if (
+  //         tagLowercase.includes(searchTerm) ||
+  //         descriptorLowercase?.includes(searchTerm)
+  //       ) {
+  //         if (
+  //           tagLowercase === searchTerm ||
+  //           descriptorLowercase === searchTerm
+  //         ) {
+  //           filteredTags.unshift(vocabularyTable[i]);
+  //         } else {
+  //           filteredTags.push(vocabularyTable[i]);
+  //         }
+  //       }
+  //     }
 
-      return filteredTags;
-    }
+  //     return filteredTags;
+  //   }
 
-    function filterByActiveTags(tag: Vocabulary) {
-      const matchFound = includedVocabObjects.find(
-        (item) => item.recordId === tag.recordId,
-      );
-      if (matchFound) {
-        return false;
-      }
-      return true;
-    }
-    const filteredBySearch = filterBySearch(vocabularyQuery.data);
-    const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags);
-    return filteredByActiveTags.slice(0, 10);
-  }, [vocabSearchTerm, includedVocabObjects, vocabularyQuery.data]);
+  //   function filterByActiveTags(tag: Vocabulary) {
+  //     const matchFound = includedVocabObjects.find(
+  //       (item) => item.recordId === tag.recordId,
+  //     );
+  //     if (matchFound) {
+  //       return false;
+  //     }
+  //     return true;
+  //   }
+  //   const filteredBySearch = filterBySearch(vocabularyQuery.data);
+  //   const filteredByActiveTags = filteredBySearch.filter(filterByActiveTags);
+  //   return filteredByActiveTags.slice(0, 10);
+  // }, [vocabSearchTerm, includedVocabObjects, vocabularyQuery.data]);
 
   // const finalizeVerifyExampleChange = (confirmSubmissionValue: boolean) => {
   //   setVocabComplete(confirmSubmissionValue);
