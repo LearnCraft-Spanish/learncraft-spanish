@@ -1,9 +1,12 @@
 import type { z } from 'zod';
 import { generateMock } from '@anatine/zod-mock';
+import { deriveReadableSeedFromTime } from '@LearnCraft-Spanish/shared';
 
 export function createZodFactory<T>(schema: z.ZodType<T, any, any>) {
   return (overrides: Partial<T> = {}): T => ({
-    ...generateMock(schema),
+    ...generateMock(schema, {
+      seed: deriveReadableSeedFromTime(Date.now()),
+    }),
     ...overrides,
   });
 }

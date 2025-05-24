@@ -1,6 +1,6 @@
 import type { Vocabulary } from '@LearnCraft-Spanish/shared';
 import { createMockVocabularyList } from '@testing/factories/vocabularyFactories';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Interface from the real hook
 interface VocabularyPageResult {
@@ -30,38 +30,22 @@ const defaultMockResult: VocabularyPageResult = {
   pageSize: 10,
 };
 
-// Create the mock hook with default implementation
-export const mockUseVocabularyPage = createTypedMock<
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockUseVocabularyPage,
+  override: overrideMockUseVocabularyPage,
+  reset: resetMockUseVocabularyPage,
+} = createOverrideableMock<
   (
-    subcategoryId: number,
+    subcategoryId?: number,
     page?: number,
     pageSize?: number,
     enabled?: boolean,
   ) => VocabularyPageResult
->().mockImplementation(() => defaultMockResult);
-
-// Setup function to configure the mock for tests
-export const overrideMockUseVocabularyPage = (
-  config: Partial<VocabularyPageResult> = {},
-) => {
-  // Create a new result with defaults and overrides
-  const mockResult = {
-    ...defaultMockResult,
-    ...config,
-  };
-
-  // Reset and configure the mock
-  mockUseVocabularyPage.mockImplementation(() => mockResult);
-  return mockResult;
-};
-
-// Helper to call the mock during tests
-export const callMockUseVocabularyPage = (
-  subcategoryId = 1,
-  page = 1,
-  pageSize = 10,
-  enabled = true,
-) => mockUseVocabularyPage(subcategoryId, page, pageSize, enabled);
+>(() => defaultMockResult);
 
 // Export default for global mocking
 export default mockUseVocabularyPage;
+
+// Export the default result for component testing
+export { defaultMockResult as defaultResult };

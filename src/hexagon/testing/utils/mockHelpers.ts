@@ -16,7 +16,7 @@ import { vi } from 'vitest';
  * const cleanup = setupHookMock(
  *   '@application/units/useVocabulary',
  *   'useVocabulary',
- *   () => callMockUseVocabulary()
+ *   mockUseVocabulary
  * );
  *
  * // Test code...
@@ -50,12 +50,12 @@ export function setupHookMock(
  *   {
  *     module: '@application/units/useVocabulary',
  *     exportName: 'useVocabulary',
- *     implementation: () => callMockUseVocabulary()
+ *     implementation: mockUseVocabulary
  *   },
  *   {
  *     module: '@application/units/useSubcategories',
  *     exportName: 'useSubcategories',
- *     implementation: () => callMockUseSubcategories()
+ *     implementation: mockUseSubcategories
  *   }
  * ]);
  *
@@ -90,7 +90,7 @@ export function setupHookMocks(
  *
  * // Configure and run test with a loading state
  * run(
- *   withMock('useVocabulary', callMockUseVocabulary)
+ *   withMock('useVocabulary', mockUseVocabulary)
  *     .withLoading()
  *     .build(),
  *   () => {
@@ -100,7 +100,7 @@ export function setupHookMocks(
  *
  * // Configure and run test with an error state
  * run(
- *   withMock('useVocabulary', callMockUseVocabulary)
+ *   withMock('useVocabulary', mockUseVocabulary)
  *     .withError(new Error('Test error'))
  *     .build(),
  *   () => {

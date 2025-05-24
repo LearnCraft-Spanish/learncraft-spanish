@@ -2,24 +2,27 @@ import type {
   UseNonVerbCreationResult,
   VocabularyPaginationState,
 } from './useNonVerbCreation';
-import { callMockUseVocabularyTable } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
-import { callMockUseVocabularyPage } from '@application/units/useVocabularyPage.mock';
+import { defaultMockResult as defaultTableHook } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
+import { mockUseVocabularyPage } from '@application/units/useVocabularyPage.mock';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
+import { vi } from 'vitest';
 
 // ---- Reusable mock data
 const mockSubcategories = createMockSubcategoryList(5).filter(
   (subcategory) => subcategory.partOfSpeech !== 'Verb',
 );
-const mockTableHook = callMockUseVocabularyTable();
-const mockSaveVocabulary =
-  createTypedMock<() => Promise<boolean>>().mockResolvedValue(true);
-const mockSetSubcategoryId = createTypedMock<(id: string) => void>();
-const mockGoToNextPage = createTypedMock<() => void>();
-const mockGoToPreviousPage = createTypedMock<() => void>();
+
+// Create simple mocks
+const mockSaveVocabulary = vi
+  .fn<() => Promise<boolean>>()
+  .mockResolvedValue(true);
+const mockSetSubcategoryId = vi.fn<(id: string) => void>();
+const mockGoToNextPage = vi.fn<() => void>();
+const mockGoToPreviousPage = vi.fn<() => void>();
 
 // ---- Create a proper pagination state that matches VocabularyPaginationState
-const vocabularyPageResult = callMockUseVocabularyPage();
+const vocabularyPageResult = mockUseVocabularyPage();
 const mockPagination: VocabularyPaginationState = {
   vocabularyItems: vocabularyPageResult.items,
   isLoading: vocabularyPageResult.isLoading,
@@ -45,30 +48,20 @@ const defaultResult: UseNonVerbCreationResult = {
   creating: false,
   creationError: null,
 
-  tableHook: mockTableHook,
+  // Use the static default table hook instead of calling the mock
+  tableHook: defaultTableHook,
 
   saveVocabulary: mockSaveVocabulary,
 
   currentVocabularyPagination: mockPagination,
 };
 
-// ---- Typed vi.fn mock
-export const mockUseNonVerbCreation =
-  createTypedMock<() => UseNonVerbCreationResult>().mockReturnValue(
-    defaultResult,
-  );
-
-// ---- Per-test override
-export const overrideMockUseNonVerbCreation = (
-  config: Partial<UseNonVerbCreationResult> = {},
-) => {
-  const result = { ...defaultResult, ...config };
-  mockUseNonVerbCreation.mockReturnValue(result);
-  return result;
-};
-
-// ---- Shortcut for calling
-export const callMockUseNonVerbCreation = () => mockUseNonVerbCreation();
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockUseNonVerbCreation,
+  override: overrideMockUseNonVerbCreation,
+  reset: resetMockUseNonVerbCreation,
+} = createOverrideableMock<() => UseNonVerbCreationResult>(() => defaultResult);
 
 // Export default for global mocking
 export default mockUseNonVerbCreation;
