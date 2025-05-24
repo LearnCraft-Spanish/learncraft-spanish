@@ -1,7 +1,6 @@
 // Import the mock implementations
 import {
   mockUseSubcategories,
-  overrideMockUseSubcategories,
   resetMockUseSubcategories,
 } from '@application/units/useSubcategories.mock';
 import {
@@ -11,11 +10,10 @@ import {
 } from '@application/units/useVocabulary.mock';
 import { PartOfSpeech } from '@LearnCraft-Spanish/shared';
 import { renderHook } from '@testing-library/react';
-import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { createMockVocabulary } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useVerbCreation } from './useVerbCreation';
 
 // Mock the hook modules
@@ -28,18 +26,15 @@ vi.mock('@application/units/useVocabulary', () => ({
 }));
 
 describe('useVerbCreation', () => {
-  // Set up mocks before each test
-  beforeEach(() => {
-    // Create mock subcategories for verbs
-    const verbSubcategories = createMockSubcategoryList(3, {
-      partOfSpeech: PartOfSpeech.Verb,
-    });
-
-
   // Reset mocks after each test
   afterEach(() => {
     resetMockUseSubcategories();
     resetMockUseVocabulary();
+  });
+
+  afterAll(() => {
+    vi.unmock('@application/units/useSubcategories');
+    vi.unmock('@application/units/useVocabulary');
   });
 
   it('should filter for verb subcategories', () => {
