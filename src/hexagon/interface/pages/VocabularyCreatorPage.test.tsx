@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { VocabularyCreatorPage } from './VocabularyCreatorPage';
 
 // Mock the useCase hooks with the proper return values
