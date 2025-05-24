@@ -29,6 +29,12 @@ const setupAdapterMocks = () => {
   }));
 };
 
+const resetAdapterMocks = () => {
+  // Reset the adapter mocks to their default implementations
+  resetMockVocabularyAdapter();
+  resetMockSubcategoryAdapter();
+};
+
 // Setup adapter mocks for each test
 beforeEach(() => {
   setupAdapterMocks();
@@ -36,11 +42,8 @@ beforeEach(() => {
 
 // Reset all mocks after each test
 afterEach(() => {
-  // Reset the adapter mocks to their default implementations
-  resetMockVocabularyAdapter();
-  resetMockSubcategoryAdapter();
-
   // Clear mock call history
+  resetAdapterMocks();
   vi.clearAllMocks();
 
   // Reset React Query client

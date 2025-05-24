@@ -35,36 +35,11 @@ describe('useVerbCreation', () => {
       partOfSpeech: PartOfSpeech.Verb,
     });
 
-    // Ensure subcategory names indicate they're for verbs
-    verbSubcategories.forEach((subcategory, index) => {
-      subcategory.name =
-        index === 0
-          ? 'Regular Verbs'
-          : index === 1
-            ? 'Irregular Verbs'
-            : 'Action Words';
-    });
-
-    // Setup useSubcategories mock
-    overrideMockUseSubcategories({
-      subcategories: verbSubcategories,
-      loading: false,
-      error: null,
-      refetch: vi.fn().mockResolvedValue(undefined),
-    });
-
-    // Setup useVocabulary mock with default values that match the implementation
-    overrideMockUseVocabulary({
-      creating: false,
-      creationError: null,
-    });
-  });
 
   // Reset mocks after each test
   afterEach(() => {
     resetMockUseSubcategories();
     resetMockUseVocabulary();
-    vi.clearAllMocks();
   });
 
   it('should filter for verb subcategories', () => {

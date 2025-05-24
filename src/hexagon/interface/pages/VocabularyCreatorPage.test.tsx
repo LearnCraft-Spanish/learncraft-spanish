@@ -17,11 +17,6 @@ vi.mock('@application/useCases/useVerbCreation', () => ({
 }));
 
 describe('vocabularyCreatorPage', () => {
-  afterEach(() => {
-    // Clear mock call history
-    vi.clearAllMocks();
-  });
-
   // Helper to render with providers
   const renderPage = () => {
     return render(

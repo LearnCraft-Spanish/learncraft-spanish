@@ -20,7 +20,7 @@ function mapToVerbCommand(data: VerbData): CreateVerb {
  * Use case for verb creation.
  * Manages verb-specific creation flow with proper subcategory filtering.
  */
-export const useVerbCreation = (): UseVerbCreationResult => {
+export function useVerbCreation(): UseVerbCreationResult {
   // State
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
   const [creationError, setCreationError] = useState<Error | null>(null);
@@ -90,4 +90,4 @@ export const useVerbCreation = (): UseVerbCreationResult => {
     // Creation methods
     createVerb,
   };
-};
+}
