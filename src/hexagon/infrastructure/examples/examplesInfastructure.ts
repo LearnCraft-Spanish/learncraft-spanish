@@ -34,11 +34,17 @@ export function createExamplesInfrastructure(
     },
     addVocabularyToExample: (exampleId, vocabIdList) => {
       const path = addVocabularyToExampleEndpoint.path;
-      return httpClient.post(path, { exampleId, vocabIdList });
+      return httpClient.post(path, {
+        exampleId,
+        vocabullaryIdList: vocabIdList,
+      });
     },
     removeVocabularyFromExample: (exampleId, vocabIdList) => {
       const path = removeVocabularyFromExampleEndpoint.path;
-      return httpClient.post(path, { exampleId, vocabIdList });
+      return httpClient.post(path, {
+        exampleId,
+        vocabullaryIdList: vocabIdList,
+      });
     },
 
     getRecentlyEditedExamples: () => {

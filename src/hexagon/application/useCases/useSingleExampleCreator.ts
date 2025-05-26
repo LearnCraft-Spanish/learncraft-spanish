@@ -31,7 +31,8 @@ export default function useSingleExampleCreator() {
   // This hook should be moved to hexagon
   const { quizExamplesQuery, officialQuizzesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
-  const recentlyEditedExamplesQuery = useRecentlyEditedExamples();
+  const { recentlyEditedExamplesQuery, updateRecentlyEditedExample } =
+    useRecentlyEditedExamples();
   // This hook should be moved to hexagon
   const { vocabularyQuery } = useVocabulary();
 
@@ -149,11 +150,11 @@ export default function useSingleExampleCreator() {
       spanishAudioLa:
         exampleDetails.spanishAudioLa.length > 0
           ? exampleDetails.spanishAudioLa
-          : '',
+          : undefined,
       englishAudio:
         exampleDetails.englishAudio.length > 0
           ? exampleDetails.englishAudio
-          : '',
+          : undefined,
       spanglish: exampleDetails.spanishExample.includes('*')
         ? ('spanglish' as SpanglishType)
         : ('esp' as SpanglishType),
@@ -206,6 +207,7 @@ export default function useSingleExampleCreator() {
           spanishAudioLa: exampleDetails.spanishAudioLa ?? '',
           englishAudio: exampleDetails.englishAudio ?? '',
         });
+        setVocabIncluded(exampleDetails.vocabIncluded ?? []);
       }
     },
     [tableData],
@@ -225,11 +227,27 @@ export default function useSingleExampleCreator() {
     recentlyEditedExamplesQuery.refetch();
   }
 
+  function handleEditExample() {
+    if (!!selectedExampleId && selectedExampleId > 0) {
+      if (!!tableOption && tableOption !== 'none') {
+        // updateQuizExample(exampleToSave);
+      } else if (tableOption === 'none') {
+        console.log('exampleToSave', exampleToSave);
+        console.log(
+          'vocabIncluded in exampleToSave',
+          exampleToSave.vocabIncluded,
+        );
+        // this is temporary, becaue for some reason the vocabIncluded is not working.
+        updateRecentlyEditedExample(exampleToSave, vocabIncluded);
+      }
+    }
+  }
+
   function submitExample(e: React.FormEvent) {
     e.preventDefault();
     // use editOrCreate to determine if we are editing or creating
     if (editOrCreate === 'edit') {
-      handleEditExample(e);
+      handleEditExample();
     } else {
       handleAddExample();
     }

@@ -1,7 +1,4 @@
-import type {
-  Flashcard,
-  NewFlashcard,
-} from 'src/types/interfaceDefinitions';
+import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
 import React, { useEffect, useMemo } from 'react';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
@@ -262,8 +259,7 @@ export default function SingleExampleCreator({
     });
   }
 
-  function handleEditExample(e: React.FormEvent) {
-    e.preventDefault();
+  function handleEditExample() {
     if (!!selectedExampleId && selectedExampleId > 0) {
       if (!!tableOption && tableOption !== 'none') {
         updateQuizExample(exampleToSave);
