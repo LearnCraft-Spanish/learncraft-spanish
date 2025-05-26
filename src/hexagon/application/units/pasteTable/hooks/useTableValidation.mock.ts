@@ -1,5 +1,5 @@
 import type { TableRow, ValidationState } from '../types';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Define the hook result interface
 export interface TableValidationResult<_T> {
@@ -13,25 +13,29 @@ export const createMockTableValidationResult = <_T>(options?: {
   isValid?: boolean;
   errors?: Record<string, Record<string, string>>;
 }): TableValidationResult<_T> => {
+  const validationState = {
+    isValid: options?.isValid ?? true,
+    errors: options?.errors ?? {},
+  };
+
   return {
-    validationState: {
-      isValid: options?.isValid ?? true,
-      errors: options?.errors ?? {},
-    },
+    validationState,
     isSaveEnabled: options?.isValid ?? true,
-    validateAll: createTypedMock<() => ValidationState>().mockImplementation(
-      () => ({
-        isValid: options?.isValid ?? true,
-        errors: options?.errors ?? {},
-      }),
-    ),
+    validateAll: () => validationState,
   };
 };
 
-// Main mock function for the hook
-export const mockUseTableValidation = createTypedMock<
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockUseTableValidation,
+  override: overrideMockUseTableValidation,
+  reset: resetMockUseTableValidation,
+} = createOverrideableMock<
   <T>(options: {
     rows: TableRow[];
     validateRow: (row: T) => Record<string, string>;
   }) => TableValidationResult<T>
->().mockImplementation(() => createMockTableValidationResult());
+>(() => createMockTableValidationResult());
+
+// Export the default result for component testing
+export { createMockTableValidationResult as defaultResult };
