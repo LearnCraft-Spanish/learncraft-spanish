@@ -1,12 +1,25 @@
-import type { VocabTag, Vocabulary } from 'src/types/interfaceDefinitions';
-import { useQuery } from '@tanstack/react-query';
+import type {
+  Spelling,
+  VocabTag,
+  Vocabulary,
+} from 'src/types/interfaceDefinitions';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
+import { toast } from 'react-toastify';
 import { useBackend } from 'src/hooks/useBackend';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export function useVocabulary() {
   const userDataQuery = useUserData();
-  const { getVocabFromBackend } = useBackend();
+  const {
+    getVocabFromBackend,
+    getSpellingsFromBackend,
+    createVocabulary,
+    updateVocabulary,
+    deleteVocabulary,
+    createSpelling,
+    deleteSpelling,
+  } = useBackend();
   const hasAccess =
     userDataQuery.data?.roles.adminRole === 'coach' ||
     userDataQuery.data?.roles.adminRole === 'admin' ||
@@ -27,8 +40,20 @@ export function useVocabulary() {
 
   const setupVocabTable = async () => {
     try {
-      const vocab = await getVocabFromBackend();
-      return vocab.sort(sortVocab);
+      const [vocab, spellings] = await Promise.all([
+        getVocabFromBackend(),
+        getSpellingsFromBackend(),
+      ]);
+
+      // Associate spellings with vocabulary items
+      const vocabWithSpellings = vocab.map((item) => ({
+        ...item,
+        spellings: spellings
+          .filter((spelling) => spelling.relatedWordIdiom === item.recordId)
+          .map((spelling) => spelling.spellingOption),
+      }));
+
+      return vocabWithSpellings.sort(sortVocab);
     } catch (e) {
       throw new Error(`Error: Failed to fetch vocabulary: ${e}`);
     }
@@ -40,6 +65,81 @@ export function useVocabulary() {
     staleTime: Infinity,
     gcTime: Infinity,
     enabled: hasAccess,
+  });
+
+  const createVocabularyMutation = useMutation({
+    mutationFn: (vocabulary: Omit<Vocabulary, 'recordId'>) => {
+      const promise = createVocabulary(vocabulary);
+      toast.promise(promise, {
+        pending: 'Creating vocabulary...',
+        success: 'Vocabulary created!',
+        error: 'Error creating vocabulary',
+      });
+      return promise;
+    },
+    onSettled() {
+      vocabularyQuery.refetch();
+    },
+  });
+
+  const updateVocabularyMutation = useMutation({
+    mutationFn: (vocabulary: Vocabulary) => {
+      const promise = updateVocabulary(vocabulary);
+      toast.promise(promise, {
+        pending: 'Updating vocabulary...',
+        success: 'Vocabulary updated!',
+        error: 'Error updating vocabulary',
+      });
+      return promise;
+    },
+    onSettled() {
+      vocabularyQuery.refetch();
+    },
+  });
+
+  const deleteVocabularyMutation = useMutation({
+    mutationFn: (recordId: number) => {
+      const promise = deleteVocabulary(recordId);
+      toast.promise(promise, {
+        pending: 'Deleting vocabulary...',
+        success: 'Vocabulary deleted!',
+        error: 'Error deleting vocabulary',
+      });
+      return promise;
+    },
+    onSettled() {
+      vocabularyQuery.refetch();
+    },
+  });
+
+  const createSpellingMutation = useMutation({
+    mutationFn: (spelling: Omit<Spelling, 'recordId'>) => {
+      const promise = createSpelling(spelling);
+      toast.promise(promise, {
+        pending: 'Creating spelling...',
+        success: 'Spelling created!',
+        error: 'Error creating spelling',
+      });
+      return promise;
+    },
+    onSettled() {
+      vocabularyQuery.refetch();
+    },
+  });
+
+  const deleteSpellingMutation = useMutation({
+    mutationFn: (spelling: Omit<Spelling, 'recordId'>) => {
+      const promise = deleteSpelling(spelling);
+      toast.promise(promise, {
+        pending: 'Deleting spelling...',
+        success: 'Spelling deleted!',
+        error: 'Error deleting spelling',
+      });
+      return promise;
+    },
+    onSettled() {
+      vocabularyQuery.refetch();
+    },
   });
 
   // Memoized tagTable based on vocabularyQuery.data
@@ -106,5 +206,13 @@ export function useVocabulary() {
     return newTagTable;
   }, [vocabularyQuery.data]); // Re-compute only if vocabulary data changes
 
-  return { vocabularyQuery, tagTable };
+  return {
+    vocabularyQuery,
+    tagTable,
+    createVocabularyMutation,
+    updateVocabularyMutation,
+    deleteVocabularyMutation,
+    createSpellingMutation,
+    deleteSpellingMutation,
+  };
 }

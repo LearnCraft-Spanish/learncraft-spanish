@@ -35,8 +35,9 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run:
-          pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+        env:
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
           # Restore the mock data cache
       - name: Restore mock data cache

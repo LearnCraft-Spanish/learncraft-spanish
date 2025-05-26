@@ -39,6 +39,8 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: pnpm install
+        env:
+          GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
       # Run the update-cache.js script
       - name: Update Cache
