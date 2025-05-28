@@ -6,6 +6,7 @@ import type {
 import {
   createMockVocabulary,
   createMockVocabularyList,
+  createMockVocabularyRelatedRecords,
 } from '@testing/factories/vocabularyFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
@@ -23,9 +24,11 @@ const defaultMockAdapter: VocabularyPort = {
     Promise.resolve(
       commands.map((cmd, i) => createMockVocabulary({ ...cmd, id: i })),
     ),
-  deleteVocabulary: () => Promise.resolve(),
+  deleteVocabulary: (_id: string) => Promise.resolve(1),
   searchVocabulary: (query: string) =>
     Promise.resolve(createMockVocabularyList(2, { word: query })),
+  getAllRecordsAssociatedWithVocabularyRecord: () =>
+    Promise.resolve(createMockVocabularyRelatedRecords()),
 };
 
 // Create an overrideable mock with the default implementation

@@ -16,11 +16,11 @@ import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
+import FrequensayPage from '../hexagon/interface/pages/FrequensayPage';
 import { VocabularyCreatorPage } from '../hexagon/interface/pages/VocabularyCreatorPage';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
 import FlashcardManager from '../sections/FlashcardManager';
-import FrequenSay from '../sections/FrequenSay';
 import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
@@ -76,7 +76,9 @@ export default function AppRoutes() {
         path="/frequensay"
         element={
           (userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && <FrequenSay />
+            userDataQuery.data?.roles.adminRole === 'admin') && (
+            <FrequensayPage />
+          )
         }
       />
       <Route
