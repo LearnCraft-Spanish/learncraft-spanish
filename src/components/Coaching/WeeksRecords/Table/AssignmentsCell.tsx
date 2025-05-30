@@ -462,6 +462,14 @@ export function NewAssignmentView({
         </div>
       </div>
       <div className="lineWrapper">
+        <label htmlFor="primaryCoach" className="label">
+          Primary Coach:
+        </label>
+        <div className="content" id="primaryCoach">
+          {student && `${student.relatedWeek.primaryCoachWhenCreated}`}
+        </div>
+      </div>
+      <div className="lineWrapper">
         <label className="label" htmlFor="weekStarts">
           Week Starts:
         </label>

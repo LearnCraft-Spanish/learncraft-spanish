@@ -95,6 +95,7 @@ export type Flashcard = Expanded<{
   difficulty?: 'easy' | 'hard';
   dateCreated?: string;
   dateModified?: string;
+  errorCoachReport?: boolean;
 }>;
 
 export type NewFlashcard = Expanded<

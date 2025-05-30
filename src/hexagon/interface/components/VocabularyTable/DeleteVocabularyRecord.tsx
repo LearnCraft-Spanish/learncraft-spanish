@@ -63,40 +63,42 @@ function DeleteVocabularyRecordModal({
     setIsModalOpen(false);
   };
   return (
-    <div className="modal">
-      {isRelatedRecordsLoading && <div>Loading...</div>}
-      {relatedRecordsError && <div>Error: {relatedRecordsError.message}</div>}
-      {relatedRecords && (
-        <>
-          <h2>Delete Vocabulary</h2>
-          <p>Are you sure you want to delete this vocabulary?</p>
-          <p>This will also delete the following records:</p>
-          <ul>
-            <li>
-              <p>
-                {`${relatedRecords.vocabularyExampleRecords.length} Vocabulary Example Records`}
-              </p>
-            </li>
-            <li>
-              <p>
-                {`${relatedRecords.vocabularyLessonRecords.length} Vocabulary Lesson Records`}
-              </p>
-            </li>
-            <li>
-              <p>
-                {`${relatedRecords.vocabularySpellingRecords.length} Vocabulary Spelling Records`}
-              </p>
-            </li>
-          </ul>
-        </>
-      )}
-      <div className="buttonBox">
-        <button className="removeButton" type="button" onClick={handleCancel}>
-          Go Back
-        </button>
-        <button type="button" className="addButton" onClick={handleConfirm}>
-          Confirm
-        </button>
+    <div className="modal-container">
+      <div className="modal">
+        {isRelatedRecordsLoading && <div>Loading...</div>}
+        {relatedRecordsError && <div>Error: {relatedRecordsError.message}</div>}
+        {relatedRecords && (
+          <>
+            <h2>Delete Vocabulary</h2>
+            <p>Are you sure you want to delete this vocabulary?</p>
+            <p>This will also delete the following records:</p>
+            <ul>
+              <li>
+                <p>
+                  {`${relatedRecords.vocabularyExampleRecords.length} Vocabulary Example Records`}
+                </p>
+              </li>
+              <li>
+                <p>
+                  {`${relatedRecords.vocabularyLessonRecords.length} Vocabulary Lesson Records`}
+                </p>
+              </li>
+              <li>
+                <p>
+                  {`${relatedRecords.vocabularySpellingRecords.length} Vocabulary Spelling Records`}
+                </p>
+              </li>
+            </ul>
+          </>
+        )}
+        <div className="buttonBox">
+          <button className="removeButton" type="button" onClick={handleCancel}>
+            Go Back
+          </button>
+          <button type="button" className="addButton" onClick={handleConfirm}>
+            Confirm
+          </button>
+        </div>
       </div>
     </div>
   );
