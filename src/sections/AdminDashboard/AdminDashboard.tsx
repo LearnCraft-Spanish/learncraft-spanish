@@ -3,6 +3,7 @@ import {
   AssignmentsCompletedByWeek,
   CallsByCoach,
   DropoutsByLevel,
+  RecentLesson200Students,
   WeeklySummaries,
 } from 'src/components/AdminDashboard';
 import { Loading } from 'src/components/Loading';
@@ -25,6 +26,7 @@ export default function AdminDashboard() {
             <ActiveMemberships />
             <DropoutsByLevel />
             <AssignmentsCompletedByWeek />
+            <RecentLesson200Students />
           </div>
         </>
       )}
