@@ -11,6 +11,8 @@ import {
   VocabularyButton,
 } from './general';
 
+import ExampleManagerExampleListItem from 'src/hexagon/interface/components/ExampleListItem/ExampleManagerExampleListItem';
+
 import './ExamplesTable.scss';
 
 interface FormatExampleForTableProps {
@@ -34,39 +36,41 @@ export default function ExampleListItem({
 }: FormatExampleForTableProps) {
   const { activeStudentQuery } = useActiveStudent();
 
-  return (
-    <div className="exampleCard" key={example.recordId}>
-      {selectExample && (
-        <SelectExampleButton
-          recordId={example.recordId}
-          selectedExampleId={selectedExampleId}
-          selectExample={selectExample}
-        />
-      )}
-      <div className="exampleCardSpanishText">
-        {formatSpanishText(example.spanglish, example.spanishExample)}
-      </div>
-      <div className="exampleCardEnglishText">
-        {formatEnglishText(example.englishTranslation)}
-      </div>
+  return <ExampleManagerExampleListItem example={example} />;
 
-      {showSpanglishLabel && (
-        <div
-          className={
-            example.spanglish === 'spanglish'
-              ? 'spanglishLabel'
-              : 'spanishLabel'
-          }
-        >
-          <h4>{example.spanglish === 'spanglish' ? 'Spanglish' : 'Spanish'}</h4>
-        </div>
-      )}
-      {(example.vocabComplete || forceShowVocab) && (
-        <VocabularyButton vocabIncluded={example.vocabIncluded} />
-      )}
-      {studentContext && activeStudentQuery.data?.role === 'student' && (
-        <AddAddingRemoveCustom example={example} />
-      )}
-    </div>
-  );
+  // return (
+  //   <div className="exampleCard" key={example.recordId}>
+  //     {selectExample && (
+  //       <SelectExampleButton
+  //         recordId={example.recordId}
+  //         selectedExampleId={selectedExampleId}
+  //         selectExample={selectExample}
+  //       />
+  //     )}
+  //     <div className="exampleCardSpanishText">
+  //       {formatSpanishText(example.spanglish, example.spanishExample)}
+  //     </div>
+  //     <div className="exampleCardEnglishText">
+  //       {formatEnglishText(example.englishTranslation)}
+  //     </div>
+  //     {showSpanglishLabel && (
+  //       <div
+  //         className={
+  //           example.spanglish === 'spanglish'
+  //             ? 'spanglishLabel'
+  //             : 'spanishLabel'
+  //         }
+  //       >
+  //         <h4>{example.spanglish === 'spanglish' ? 'Spanglish' : 'Spanish'}</h4>
+  //       </div>
+  //     )}
+  //     x
+  //     {(example.vocabComplete || forceShowVocab) && (
+  //       <VocabularyButton vocabIncluded={example.vocabIncluded} />
+  //     )}
+  //     {studentContext && activeStudentQuery.data?.role === 'student' && (
+  //       <AddAddingRemoveCustom example={example} />
+  //     )}
+  //   </div>
+  // );
 }
