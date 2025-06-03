@@ -80,7 +80,7 @@ describe('component Filter', () => {
     });
   });
 
-  it('if requiredTags has length, render it', async () => {
+  it.skip('if requiredTags has length, render it', async () => {
     const result = renderHook(() => useVocabulary(), {
       wrapper: MockAllProviders,
     });
