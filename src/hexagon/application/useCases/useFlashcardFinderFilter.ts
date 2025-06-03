@@ -1,8 +1,10 @@
 import type { VocabTag } from 'src/types/interfaceDefinitions';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
-import useContextualMenu from 'src/hooks/useContextualMenu';
+import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
+import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import useFlashcardFilter from 'src/hooks/useFlashcardFilter';
 
 export default function useFlashcardFinderFilter() {
   const [includeSpanglish, setIncludeSpanglish] = useState(false);
@@ -10,7 +12,13 @@ export default function useFlashcardFinderFilter() {
   const [suggestedTags, setSuggestedTags] = useState<VocabTag[]>([]);
   const [selectedTags, setSelectedTags] = useState<VocabTag[]>([]);
 
+  const { filterFlashcards } = useFlashcardFilter();
+
+  // This is not hexagon atm. refactor
   const { tagTable } = useVocabulary();
+
+  // this is not the new way to do it. turn the filtering part into an api call
+  const { verifiedExamplesQuery } = useVerifiedExamples();
 
   const toggleIncludeSpanglish = () => {
     setIncludeSpanglish(!includeSpanglish);
@@ -37,6 +45,19 @@ export default function useFlashcardFinderFilter() {
     setSelectedTags(newRequiredTags);
   }
 
+  const filteredFlashcards = useMemo(() => {
+    return filterFlashcards({
+      examples: verifiedExamplesQuery.data || [],
+      includeSpanglish,
+      orTags: selectedTags,
+    });
+  }, [
+    verifiedExamplesQuery.data,
+    includeSpanglish,
+    selectedTags,
+    filterFlashcards,
+  ]);
+
   return {
     includeSpanglish,
     toggleIncludeSpanglish,
@@ -46,5 +67,7 @@ export default function useFlashcardFinderFilter() {
     selectedTags,
     addTag,
     removeTag,
+
+    filteredFlashcards,
   };
 }

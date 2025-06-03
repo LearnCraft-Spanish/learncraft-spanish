@@ -1,21 +1,29 @@
-import useFlashcardFinderFilter from 'src/hexagon/application/useCases/useFlashcardFinderFilter';
+import type { VocabTag } from 'src/types/interfaceDefinitions';
 
+import useFlashcardFinderFilter from 'src/hexagon/application/useCases/useFlashcardFinderFilter';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 import SelectedTags from '../VocabTagFilter/SelectedTags';
 import TagFilter from '../VocabTagFilter/TagFilter';
 
-export default function FlashcardFinderFilter() {
-  const {
-    includeSpanglish,
-    toggleIncludeSpanglish,
-    tagSearchTerm,
-    updateTagSearchTerm,
-    suggestedTags,
-    addTag,
-    removeTag,
-    selectedTags,
-  } = useFlashcardFinderFilter();
-
+export default function FlashcardFinderFilter({
+  includeSpanglish,
+  toggleIncludeSpanglish,
+  tagSearchTerm,
+  updateTagSearchTerm,
+  suggestedTags,
+  addTag,
+  removeTag,
+  selectedTags,
+}: {
+  includeSpanglish: boolean;
+  toggleIncludeSpanglish: () => void;
+  tagSearchTerm: string;
+  updateTagSearchTerm: (target: EventTarget & HTMLInputElement) => void;
+  suggestedTags: VocabTag[];
+  addTag: (id: number) => void;
+  removeTag: (id: number) => void;
+  selectedTags: VocabTag[];
+}) {
   return (
     <div className="filterSection">
       <div className="filterBox options">
