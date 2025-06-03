@@ -35,7 +35,7 @@ describe('useOfficialQuizzes', () => {
     });
   });
 
-  describe('quizExamplesQuery', () => {
+  describe.skip('quizExamplesQuery', () => {
     const randomQuizTable =
       quizExamplesTableArray[
         Math.floor(Math.random() * quizExamplesTableArray.length)

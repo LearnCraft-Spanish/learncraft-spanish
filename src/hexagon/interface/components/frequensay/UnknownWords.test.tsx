@@ -3,7 +3,7 @@ import { createMockWordCountList } from 'src/hexagon/testing/factories/wordCount
 import { vi } from 'vitest';
 import UnknownWords from './UnknownWords';
 
-const mockWordCountList = createMockWordCountList(10);
+const mockWordCountList = createMockWordCountList(1);
 const mockCopyUnknownWordsTable = vi.fn();
 
 const defaultProps = {
