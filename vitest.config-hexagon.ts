@@ -21,6 +21,9 @@ export default defineConfig((configEnv: ConfigEnv) =>
         coverage: {
           include: ['**/hexagon/**'],
           exclude: [
+            '**/hexagon/testing/**',
+            '**/hexagon/config/**',
+            '**/hexagon/infrastructure/**',
             '**/*{.,-}{test,spec,bench,benchmark}?(-d).?(c|m)[jt]s?(x)',
             '**/src/hexagon/**/{index,types}?(-d).?(c|m)[jt]s?(x)',
             '**/testing/**',

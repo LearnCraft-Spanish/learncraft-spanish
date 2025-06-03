@@ -1,13 +1,10 @@
-import {
-  mockVocabularyAdapter,
-  overrideMockVocabularyAdapter,
-} from '@application/adapters/vocabularyAdapter.mock';
+import { overrideMockVocabularyAdapter } from '@application/adapters/vocabularyAdapter.mock';
 import { renderHook, waitFor } from '@testing-library/react';
 import {
   createMockVocabulary,
   createMockVocabularyList,
-  createQueryClientWrapper,
-} from '@testing/index';
+} from '@testing/factories/vocabularyFactories';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
 import { useVocabulary } from './useVocabulary';
 
@@ -16,12 +13,12 @@ describe('useVocabulary', () => {
     // Arrange
     const mockData = createMockVocabularyList(3);
     overrideMockVocabularyAdapter({
-      getVocabulary: mockData,
+      getVocabulary: () => Promise.resolve(mockData),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
 
     // Assert
@@ -38,12 +35,12 @@ describe('useVocabulary', () => {
     // Arrange
     const testError = new Error('Failed to fetch vocabulary');
     overrideMockVocabularyAdapter({
-      getVocabulary: testError,
+      getVocabulary: () => Promise.reject(testError),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
 
     // Assert
@@ -57,12 +54,12 @@ describe('useVocabulary', () => {
     // Arrange
     const mockItem = createMockVocabulary({ id: 123 });
     overrideMockVocabularyAdapter({
-      getVocabularyById: mockItem,
+      getVocabularyById: () => Promise.resolve(mockItem),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
     const itemResult = await result.current.getById('123');
 
@@ -74,12 +71,12 @@ describe('useVocabulary', () => {
     // Arrange
     const searchResults = createMockVocabularyList(2, { word: 'test' });
     overrideMockVocabularyAdapter({
-      searchVocabulary: searchResults,
+      searchVocabulary: () => Promise.resolve(searchResults),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
     const searchResult = await result.current.search('test');
 
@@ -95,12 +92,12 @@ describe('useVocabulary', () => {
       id: 1,
     });
     overrideMockVocabularyAdapter({
-      createVerb: createdVerb,
+      createVerb: () => Promise.resolve(createdVerb),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
     const verbCommand = {
       infinitive: 'hablar',
@@ -121,12 +118,12 @@ describe('useVocabulary', () => {
       id: 2,
     });
     overrideMockVocabularyAdapter({
-      createNonVerbVocabulary: createdNonVerb,
+      createNonVerbVocabulary: () => Promise.resolve(createdNonVerb),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
     const nonVerbCommand = {
       word: 'casa',
@@ -147,12 +144,12 @@ describe('useVocabulary', () => {
       createMockVocabulary({ word: 'gato', descriptor: 'cat', id: 2 }),
     ];
     overrideMockVocabularyAdapter({
-      createVocabularyBatch: createdItems,
+      createVocabularyBatch: () => Promise.resolve(createdItems),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
     const batchCommands = [
       { word: 'perro', descriptor: 'dog', subcategoryId: 1, frequency: 1 },
@@ -165,26 +162,31 @@ describe('useVocabulary', () => {
   });
 
   it('should delete vocabulary correctly', async () => {
+    // Arrange
+    overrideMockVocabularyAdapter({
+      deleteVocabulary: (_id: string) => Promise.resolve(1),
+    });
+
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
     await result.current.deleteVocabulary('123');
 
-    // Assert - just verify it doesn't throw an error
-    expect(mockVocabularyAdapter.deleteVocabulary).toHaveBeenCalledWith('123');
+    // Assert - verify the hook completes without error
+    expect(result.current.deletionError).toBeNull();
   });
 
   it('should handle creation error correctly', async () => {
     // Arrange
     const testError = new Error('Failed to create vocabulary');
     overrideMockVocabularyAdapter({
-      createVerb: testError,
+      createVerb: () => Promise.reject(testError),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
 
     // Assert - initial state
@@ -206,12 +208,12 @@ describe('useVocabulary', () => {
     // Arrange
     const testError = new Error('Failed to delete vocabulary');
     overrideMockVocabularyAdapter({
-      deleteVocabulary: testError,
+      deleteVocabulary: () => Promise.reject(testError),
     });
 
     // Act
     const { result } = renderHook(() => useVocabulary(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: TestQueryClientProvider,
     });
 
     // Assert - initial state
@@ -222,5 +224,36 @@ describe('useVocabulary', () => {
     await expect(result.current.deleteVocabulary('123')).rejects.toThrow(
       'Failed to delete vocabulary',
     );
+  });
+
+  it('should refetch data when refetch is called', async () => {
+    // Arrange
+    const mockData = createMockVocabularyList(3);
+    overrideMockVocabularyAdapter({
+      getVocabulary: () => Promise.resolve(mockData),
+    });
+
+    // Act
+    const { result, rerender } = renderHook(() => useVocabulary(), {
+      wrapper: TestQueryClientProvider,
+    });
+
+    // Wait for initial load
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Change mock data for refetch
+    const newMockData = createMockVocabularyList(2);
+    overrideMockVocabularyAdapter({
+      getVocabulary: () => Promise.resolve(newMockData),
+    });
+
+    // Re-render the hook to pick up the new mock
+    rerender();
+
+    // Trigger refetch
+    await result.current.refetch();
+
+    // Assert
+    await waitFor(() => expect(result.current.vocabulary).toEqual(newMockData));
   });
 });

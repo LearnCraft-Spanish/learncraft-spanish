@@ -5,7 +5,7 @@ import type {
   TableRow,
   ValidationState,
 } from './types';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Utility to create default columns for testing
 export const createDefaultColumns = (): TableColumn[] => {
@@ -48,86 +48,35 @@ export const createMockPasteTableResult = <T>(options?: {
       rows,
       columns,
     },
-    updateCell: createTypedMock<
-      (rowId: string, columnId: string, value: string) => string | null
-    >().mockImplementation(() => null),
-    saveData:
-      createTypedMock<() => Promise<T[] | undefined>>().mockResolvedValue(
-        undefined,
-      ),
-    resetTable: createTypedMock<() => void>().mockImplementation(() => {}),
-    importData: createTypedMock<(data: T[]) => void>().mockImplementation(
-      () => {},
-    ),
-    handlePaste: createTypedMock<
-      (e: ClipboardEvent<Element>) => void
-    >().mockImplementation(() => {}),
-    setActiveCellInfo: createTypedMock<
-      (rowId: string, columnId: string) => void
-    >().mockImplementation(() => {}),
-    clearActiveCellInfo: createTypedMock<() => void>().mockImplementation(
-      () => {},
-    ),
+    updateCell: (_rowId: string, _columnId: string, _value: string) => null,
+    saveData: () => Promise.resolve(undefined),
+    resetTable: () => {},
+    importData: (_data: T[]) => {},
+    handlePaste: (_e: ClipboardEvent<Element>) => {},
+    setActiveCellInfo: (_rowId: string, _columnId: string) => {},
+    clearActiveCellInfo: () => {},
     isSaveEnabled: options?.isSaveEnabled ?? isValid,
     validationState: createDefaultValidationState(isValid),
   };
 };
 
-// Main mock function for the usePasteTable hook
-export const mockUsePasteTable = createTypedMock<
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockUsePasteTable,
+  override: overrideMockUsePasteTable,
+  reset: resetMockUsePasteTable,
+} = createOverrideableMock<
   <T>(options: {
     columns: TableColumn[];
     validateRow: (row: T) => Record<string, string>;
     initialData?: T[];
   }) => TableHook<T>
->().mockImplementation(() => createMockPasteTableResult());
-
-/**
- * Override the usePasteTable mock with custom values
- * @param config Additional configuration to override default mock values
- * @returns The customized mock result
- */
-export const overrideMockUsePasteTable = <T>(
-  config: Partial<TableHook<T>> = {},
-) => {
-  const defaultResult = createMockPasteTableResult<T>();
-
-  // Create a new result with defaults and overrides
-  const mockResult = {
-    ...defaultResult,
-    ...config,
-
-    // Allow deep merge of data if provided
-    ...(config.data && {
-      data: {
-        ...defaultResult.data,
-        ...config.data,
-        // Further handle rows and columns if provided
-        ...(config.data.rows && {
-          rows: config.data.rows,
-        }),
-        ...(config.data.columns && {
-          columns: config.data.columns,
-        }),
-      },
-    }),
-
-    // Allow deep merge of validationState if provided
-    ...(config.validationState && {
-      validationState: {
-        ...defaultResult.validationState,
-        ...config.validationState,
-      },
-    }),
-  };
-
-  // Update the mock implementation
-  mockUsePasteTable.mockImplementation(() => mockResult as any);
-
-  return mockResult;
-};
+>(() => createMockPasteTableResult());
 
 // Function to create test data with the expected shape
 export const createTestData = <T>(data: Partial<T>[]): T[] => {
   return data as T[];
 };
+
+// Export the default result for component testing
+export { createMockPasteTableResult as defaultResult };

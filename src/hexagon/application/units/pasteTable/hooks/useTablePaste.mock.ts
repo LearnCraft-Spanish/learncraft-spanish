@@ -1,6 +1,6 @@
 import type { ClipboardEvent } from 'react';
 import type { TableColumn, TableRow } from '../types';
-import { createTypedMock } from '@testing/utils/typedMock';
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Define the hook result interface
 export interface TablePasteResult {
@@ -12,24 +12,25 @@ export interface TablePasteResult {
 // Factory function to create mock results
 export const createMockTablePasteResult = (): TablePasteResult => {
   return {
-    setActiveCellInfo: createTypedMock<
-      (rowId: string, columnId: string) => void
-    >().mockImplementation(() => {}),
-    clearActiveCellInfo: createTypedMock<() => void>().mockImplementation(
-      () => {},
-    ),
-    handlePaste: createTypedMock<
-      (e: ClipboardEvent<Element>) => void
-    >().mockImplementation(() => {}),
+    setActiveCellInfo: (_rowId: string, _columnId: string) => {},
+    clearActiveCellInfo: () => {},
+    handlePaste: (_e: ClipboardEvent<Element>) => {},
   };
 };
 
-// Main mock function for the hook
-export const mockUseTablePaste = createTypedMock<
+// Create an overrideable mock with the default implementation
+export const {
+  mock: mockUseTablePaste,
+  override: overrideMockUseTablePaste,
+  reset: resetMockUseTablePaste,
+} = createOverrideableMock<
   (options: {
     columns: TableColumn[];
     rows: TableRow[];
     updateCell: (rowId: string, columnId: string, value: string) => void;
     setRows: React.Dispatch<React.SetStateAction<TableRow[]>>;
   }) => TablePasteResult
->().mockImplementation(() => createMockTablePasteResult());
+>(() => createMockTablePasteResult());
+
+// Export the default result for component testing
+export { createMockTablePasteResult as defaultResult };

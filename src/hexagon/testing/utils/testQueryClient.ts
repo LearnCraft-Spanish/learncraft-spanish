@@ -9,6 +9,7 @@ const defaultTestClientOptions = {
     queries: {
       retry: false, // Disable retries for deterministic tests
       gcTime: 0, // Disable caching for test isolation
+      staleTime: 0, // Disable caching for test isolation
       refetchOnWindowFocus: false, // Prevent unwanted refetches
     },
   },
