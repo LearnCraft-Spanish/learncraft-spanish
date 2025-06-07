@@ -49,12 +49,7 @@ export function useVocabularyPage(
     error: pageError,
   } = useQuery({
     queryKey: ['vocabulary', subcategoryId, 'page', page, pageSize],
-    queryFn: () =>
-      adapter.getVocabulary({
-        subcategoryId,
-        limit: pageSize,
-        offset: (page - 1) * pageSize,
-      }),
+    queryFn: () => adapter.getVocabularyBySubcategory(subcategoryId),
     placeholderData: (prev) => prev, // Keep previous data while loading new data
     enabled: shouldRunQueries,
     ...queryDefaults.entityData,

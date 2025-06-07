@@ -3,6 +3,7 @@ import type {
   CreateNonVerbVocabulary,
   CreateVerb,
   Vocabulary,
+  VocabularyAbbreviation,
 } from '@LearnCraft-Spanish/shared';
 import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
 import {
@@ -91,7 +92,7 @@ export function useVocabulary(
   };
 
   // Helper for searching vocabulary
-  const search = async (query: string): Promise<Vocabulary[]> => {
+  const search = async (query: string): Promise<VocabularyAbbreviation[]> => {
     return adapter.searchVocabulary(query);
   };
 
@@ -133,7 +134,6 @@ export function useVocabulary(
     error: normalizeQueryError(error),
     refetch,
     getById,
-    search,
 
     // Write operations
     createVerb,

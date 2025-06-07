@@ -2,8 +2,10 @@ import type {
   CreateNonVerbVocabulary,
   CreateVerb,
   GetTotalCountResponse,
+  ListVocabularyFullResponse,
   ListVocabularyResponse,
   Vocabulary,
+  VocabularyAbbreviation,
 } from '@LearnCraft-Spanish/shared';
 import type { AuthPort } from '../../application/ports/authPort';
 import type {
@@ -64,15 +66,29 @@ export function createVocabularyInfrastructure(
   return {
     getVocabulary: async (
       options?: VocabularyQueryOptions,
-    ): Promise<Vocabulary[]> => {
+    ): Promise<VocabularyAbbreviation[]> => {
       const queryParams = buildQueryParams(options);
       const response = await httpClient.get<ListVocabularyResponse>(
-        VocabularyEndpoints.list.path,
+        VocabularyEndpoints.listAll.path,
         { params: queryParams },
       );
 
       // The API returns a paginated response, but our port expects an array
       // Extract items from the pagination wrapper
+      return response.items;
+    },
+
+    getVocabularyBySubcategory: async (
+      subcategoryId: string,
+    ): Promise<Vocabulary[]> => {
+      const response = await httpClient.get<ListVocabularyFullResponse>(
+        VocabularyEndpoints.listBySubcategory.path.replace(
+          ':subcategoryId',
+          subcategoryId,
+        ),
+        { params: { query: { page: '1', limit: '20' } } },
+      );
+
       return response.items;
     },
 
@@ -134,11 +150,15 @@ export function createVocabularyInfrastructure(
       await httpClient.delete(path);
     },
 
-    searchVocabulary: async (query: string): Promise<Vocabulary[]> => {
+    searchVocabulary: async (
+      subcategoryId: string,
+    ): Promise<VocabularyAbbreviation[]> => {
       // If the API doesn't have a dedicated search endpoint, use the list endpoint with a search param
       const response = await httpClient.get<ListVocabularyResponse>(
-        VocabularyEndpoints.list.path,
-        { params: { search: query } },
+        VocabularyEndpoints.listBySubcategory.path.replace(
+          ':subcategoryId',
+          subcategoryId,
+        ),
       );
 
       // Extract items from the pagination wrapper

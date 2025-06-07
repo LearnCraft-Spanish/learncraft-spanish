@@ -3,6 +3,7 @@ import type {
   CreateVerb,
   GetTotalCountResponse,
   Vocabulary,
+  VocabularyAbbreviation,
 } from '@LearnCraft-Spanish/shared';
 
 /**
@@ -13,12 +14,19 @@ export interface VocabularyPort {
   /**
    * Get all vocabulary items
    */
-  getVocabulary: (options?: VocabularyQueryOptions) => Promise<Vocabulary[]>;
+  getVocabulary: (
+    options?: VocabularyQueryOptions,
+  ) => Promise<VocabularyAbbreviation[]>;
+
+  /**
+   * Get all vocabulary items by subcategory
+   */
+  getVocabularyBySubcategory: (subcategoryId: number) => Promise<Vocabulary[]>;
 
   /**
    * Get a vocabulary item by ID
    */
-  getVocabularyById: (id: string) => Promise<Vocabulary | null>;
+  getVocabularyById: (id: number) => Promise<Vocabulary | null>;
 
   /**
    * Get the total count of vocabulary items
@@ -54,7 +62,7 @@ export interface VocabularyPort {
   /**
    * Search vocabulary items based on criteria
    */
-  searchVocabulary: (query: string) => Promise<Vocabulary[]>;
+  searchVocabulary: (query: string) => Promise<VocabularyAbbreviation[]>;
 }
 
 /**
