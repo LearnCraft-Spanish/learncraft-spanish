@@ -39,6 +39,7 @@ export default function useFlashcardFilter() {
         }
         let isGood = false;
         orTags.forEach((tag) => {
+          console.log('tag', tag);
           if (!isGood) {
             switch (tag.type) {
               case 'subcategory':

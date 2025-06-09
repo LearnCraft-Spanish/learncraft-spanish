@@ -1,9 +1,9 @@
 import useFlashcardFinderFilter from 'src/hexagon/application/useCases/useFlashcardFinderFilter';
 import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
+import FlashcardFinderResults from '../components/FlashcardFinder/FlashcardFinderResults';
 
 export default function FlashcardFinder() {
   const {
-    filteredFlashcards,
     includeSpanglish,
     toggleIncludeSpanglish,
     tagSearchTerm,
@@ -12,6 +12,10 @@ export default function FlashcardFinder() {
     addTag,
     removeTag,
     selectedTags,
+
+    handleGetExamplesFromTags,
+    examples,
+    getExamplesReady,
   } = useFlashcardFinderFilter();
 
   return (
@@ -25,8 +29,10 @@ export default function FlashcardFinder() {
         addTag={addTag}
         removeTag={removeTag}
         selectedTags={selectedTags}
+        handleGetExamplesFromTags={handleGetExamplesFromTags}
+        getExamplesReady={getExamplesReady}
       />
-      <FlashcardFinderResults filteredFlashcards={filteredFlashcards} />
+      <FlashcardFinderResults filteredFlashcards={examples} />
     </div>
   );
 }

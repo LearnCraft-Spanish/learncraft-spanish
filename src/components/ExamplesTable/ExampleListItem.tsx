@@ -1,17 +1,12 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
-import {
-  formatEnglishText,
-  formatSpanishText,
-} from 'src/functions/formatFlashcardText';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 
-import {
-  AddAddingRemoveCustom,
-  SelectExampleButton,
-  VocabularyButton,
-} from './general';
 
 import ExampleManagerExampleListItem from 'src/hexagon/interface/components/ExampleListItem/ExampleManagerExampleListItem';
+
+import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+
+
+
 
 import './ExamplesTable.scss';
 

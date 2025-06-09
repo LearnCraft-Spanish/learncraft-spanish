@@ -10,9 +10,10 @@ import {
   StudentsTable,
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
-import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
+// import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
+import FlashcardFinder from 'src/hexagon/interface/pages/FlashcardFinder';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
@@ -24,6 +25,7 @@ import FlashcardManager from '../sections/FlashcardManager';
 import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
+
 import SentryRoutes from './SentryRoutes';
 export default function AppRoutes() {
   const userDataQuery = useUserData();

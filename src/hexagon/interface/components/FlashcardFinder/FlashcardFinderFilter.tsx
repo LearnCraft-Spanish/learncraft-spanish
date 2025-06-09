@@ -1,6 +1,5 @@
 import type { VocabTag } from 'src/types/interfaceDefinitions';
 
-import useFlashcardFinderFilter from 'src/hexagon/application/useCases/useFlashcardFinderFilter';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 import SelectedTags from '../VocabTagFilter/SelectedTags';
 import TagFilter from '../VocabTagFilter/TagFilter';
@@ -14,6 +13,9 @@ export default function FlashcardFinderFilter({
   addTag,
   removeTag,
   selectedTags,
+
+  handleGetExamplesFromTags,
+  getExamplesReady,
 }: {
   includeSpanglish: boolean;
   toggleIncludeSpanglish: () => void;
@@ -23,6 +25,9 @@ export default function FlashcardFinderFilter({
   addTag: (id: number) => void;
   removeTag: (id: number) => void;
   selectedTags: VocabTag[];
+
+  handleGetExamplesFromTags: () => void;
+  getExamplesReady: boolean;
 }) {
   return (
     <div className="filterSection">
@@ -63,6 +68,15 @@ export default function FlashcardFinderFilter({
           />
           <SelectedTags tags={selectedTags} removeTag={removeTag} />
         </div>
+      </div>
+      <div className="buttonBox">
+        <button
+          onClick={handleGetExamplesFromTags}
+          type="button"
+          disabled={!getExamplesReady}
+        >
+          Get Examples
+        </button>
       </div>
     </div>
   );
