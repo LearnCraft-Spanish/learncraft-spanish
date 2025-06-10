@@ -3,7 +3,6 @@ import type {
   CreateNonVerbVocabulary,
   CreateVerb,
   Vocabulary,
-  VocabularyAbbreviation,
 } from '@LearnCraft-Spanish/shared';
 import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
 import {
@@ -19,7 +18,6 @@ export interface UseVocabularyResult {
   error: Error | null;
   refetch: () => void;
   getById: (id: string) => Promise<Vocabulary | null>;
-  search: (query: string) => Promise<Vocabulary[]>;
 
   // Write operations
   createVerb: (command: CreateVerb) => Promise<Vocabulary>;
@@ -88,12 +86,11 @@ export function useVocabulary(
 
   // Helper for getting a vocabulary item by ID
   const getById = async (id: string): Promise<Vocabulary | null> => {
-    return adapter.getVocabularyById(id);
-  };
-
-  // Helper for searching vocabulary
-  const search = async (query: string): Promise<VocabularyAbbreviation[]> => {
-    return adapter.searchVocabulary(query);
+    const idNumber = Number.parseInt(id);
+    if (Number.isNaN(idNumber)) {
+      throw new TypeError('Invalid vocabulary ID');
+    }
+    return adapter.getVocabularyById(idNumber);
   };
 
   // Create operations with type assertions
@@ -129,7 +126,7 @@ export function useVocabulary(
 
   return {
     // Read operations
-    vocabulary: data,
+    vocabulary: data as Vocabulary[],
     loading: isLoading,
     error: normalizeQueryError(error),
     refetch,

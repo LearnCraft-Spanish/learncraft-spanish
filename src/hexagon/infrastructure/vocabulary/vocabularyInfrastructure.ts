@@ -1,6 +1,5 @@
 import type {
-  CreateNonVerbVocabulary,
-  CreateVerb,
+  CreateVocabulary,
   GetTotalCountResponse,
   ListVocabularyFullResponse,
   ListVocabularyResponse,
@@ -114,35 +113,11 @@ export function createVocabularyInfrastructure(
       return httpClient.get<Vocabulary>(path);
     },
 
-    createVerb: async (command: CreateVerb): Promise<Vocabulary> => {
+    createVerb: async (command: CreateVocabulary): Promise<Vocabulary> => {
       return httpClient.post<Vocabulary>(
-        VocabularyEndpoints.createVerbVocabulary.path,
+        VocabularyEndpoints.create.path,
         command,
       );
-    },
-
-    createNonVerbVocabulary: async (
-      command: CreateNonVerbVocabulary,
-    ): Promise<Vocabulary> => {
-      return httpClient.post<Vocabulary>(
-        VocabularyEndpoints.createNonVerbVocabulary.path,
-        command,
-      );
-    },
-
-    createVocabularyBatch: async (
-      commands: CreateNonVerbVocabulary[],
-    ): Promise<Vocabulary[]> => {
-      // If the API doesn't support batch operations, we can implement it client-side
-      const results = await Promise.all(
-        commands.map((command) =>
-          httpClient.post<Vocabulary>(
-            VocabularyEndpoints.createNonVerbVocabulary.path,
-            command,
-          ),
-        ),
-      );
-      return results;
     },
 
     deleteVocabulary: async (id: string): Promise<void> => {
