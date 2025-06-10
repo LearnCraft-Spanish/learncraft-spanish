@@ -50,6 +50,13 @@ export interface VocabularyPort {
   deleteVocabulary: (id: number) => Promise<number>;
 
   /**
+   * Get all records associated with a vocabulary record
+   */
+  getAllRecordsAssociatedWithVocabularyRecord: (
+    id: string | undefined,
+  ) => Promise<VocabularyRelatedRecords>;
+
+  /**
    * Get the total count of vocabulary items by subcategory
    */
   getRelatedRecords: (id: number) => Promise<VocabularyRelatedRecords[]>;

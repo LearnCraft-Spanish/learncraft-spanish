@@ -54,6 +54,7 @@ export default function SingleExampleCreator({
     spanishAudioLa: '',
     englishAudio: '',
   });
+  const [errorCoachReport, setErrorCoachReport] = useState(false);
 
   const { vocabularyQuery } = useVocabulary();
 
@@ -69,15 +70,19 @@ export default function SingleExampleCreator({
         : 'esp',
       vocabIncluded,
       vocabComplete: selectedExampleId ? vocabComplete : false,
+      errorCoachReport,
     };
-  }, [selectedExampleId, exampleDetails, vocabComplete, vocabIncluded]);
+  }, [
+    selectedExampleId,
+    exampleDetails,
+    vocabComplete,
+    vocabIncluded,
+    errorCoachReport,
+  ]);
 
   const newFlashcard: NewFlashcard = useMemo(() => {
-    const transitionalObj: Omit<Flashcard, 'recordId' | 'vocabIncluded'> = {
-      ...exampleToSave,
-    };
-    const finalObj: NewFlashcard = { ...transitionalObj };
-    return finalObj;
+    const { recordId, vocabIncluded, ...rest } = exampleToSave;
+    return rest;
   }, [exampleToSave]);
 
   const quizList = useMemo(() => {
@@ -357,6 +362,19 @@ export default function SingleExampleCreator({
           </div>
 
           <div className="halfOfScreen">
+            <div className="vocabCompleteContainer">
+              <p>ERROR (coach report):</p>
+              <label htmlFor="errorCoachReport" className="switch">
+                <input
+                  type="checkbox"
+                  id="errorCoachReport"
+                  checked={errorCoachReport}
+                  onChange={() => setErrorCoachReport(!errorCoachReport)}
+                />
+                <span className="slider round"></span>
+              </label>
+            </div>
+
             <h3>Vocab Included</h3>
             <div className="vocabTagBox">
               {includedVocabObjects.map((vocab) => (

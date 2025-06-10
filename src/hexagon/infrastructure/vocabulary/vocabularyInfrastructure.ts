@@ -5,12 +5,10 @@ import type {
   ListVocabularyResponse,
   Vocabulary,
   VocabularyAbbreviation,
+  VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
 import type { AuthPort } from '../../application/ports/authPort';
-import type {
-  VocabularyPort,
-  VocabularyQueryOptions,
-} from '../../application/ports/vocabularyPort';
+import type { VocabularyPort } from '../../application/ports/vocabularyPort';
 import { VocabularyEndpoints } from '@LearnCraft-Spanish/shared';
 import { createAuthenticatedHttpClient } from '../http/client';
 
@@ -33,43 +31,10 @@ export function createVocabularyInfrastructure(
   // Create an authenticated HTTP client
   const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
 
-  // Helper to build pagination parameters according to the contract
-  const buildQueryParams = (
-    options?: VocabularyQueryOptions,
-  ): Record<string, string> => {
-    if (!options) return {};
-
-    const params: Record<string, string> = {};
-
-    // Map our application options to the API's expected query parameters
-    if (options.subcategoryId !== undefined) {
-      params.subcategoryId = options.subcategoryId.toString();
-    }
-
-    // Convert our limit/offset to the API's page/limit pagination model
-    if (options.limit !== undefined) {
-      params.limit = options.limit.toString();
-    }
-
-    if (options.offset !== undefined) {
-      // Convert offset to page number (approximation)
-      const page = Math.floor(options.offset / (options.limit || 20)) + 1;
-      params.page = page.toString();
-    } else {
-      params.page = '1'; // Default to page 1
-    }
-
-    return params;
-  };
-
   return {
-    getVocabulary: async (
-      options?: VocabularyQueryOptions,
-    ): Promise<VocabularyAbbreviation[]> => {
-      const queryParams = buildQueryParams(options);
+    getVocabulary: async (): Promise<VocabularyAbbreviation[]> => {
       const response = await httpClient.get<ListVocabularyResponse>(
         VocabularyEndpoints.listAll.path,
-        { params: queryParams },
       );
 
       // The API returns a paginated response, but our port expects an array
@@ -78,22 +43,22 @@ export function createVocabularyInfrastructure(
     },
 
     getVocabularyBySubcategory: async (
-      subcategoryId: string,
+      subcategoryId: number,
+      page: number,
+      limit: number,
     ): Promise<Vocabulary[]> => {
       const response = await httpClient.get<ListVocabularyFullResponse>(
         VocabularyEndpoints.listBySubcategory.path.replace(
           ':subcategoryId',
-          subcategoryId,
+          subcategoryId.toString(),
         ),
-        { params: { query: { page: '1', limit: '20' } } },
+        { params: { query: { page: page.toString(), limit: limit.toString() } } },
       );
 
       return response.items;
     },
 
-    getVocabularyCount: async (
-      subcategoryId?: number,
-    ): Promise<GetTotalCountResponse> => {
+    getVocabularyCount: async (): Promise<number> => {
       // The backend expects query parameters in the format /api/vocabulary?subcategoryId=16
       const params: Record<string, string> = {};
 
@@ -120,9 +85,23 @@ export function createVocabularyInfrastructure(
       );
     },
 
-    deleteVocabulary: async (id: string): Promise<void> => {
+    deleteVocabulary: async (id: string): Promise<number> => {
       const path = VocabularyEndpoints.delete.path.replace(':id', id);
-      await httpClient.delete(path);
+
+      const result = await httpClient.delete<number>(path);
+
+      return result;
+    },
+
+    getAllRecordsAssociatedWithVocabularyRecord: async (
+      id: string | undefined,
+    ): Promise<VocabularyRelatedRecords> =>
+      const path =
+        VocabularyEndpoints.getAssociatedRecords.path.replace(
+          ':id',
+          id,
+        );
+      return httpClient.get<VocabularyRelatedRecords>(path);
     },
 
     searchVocabulary: async (

@@ -17,7 +17,6 @@ import { cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import { resetTestQueryClient } from './utils/testQueryClient';
 import '@testing-library/jest-dom';
-
 // Replace real adapter implementations with mocks for all tests
 const setupAdapterMocks = () => {
   vi.mock('@application/adapters/vocabularyAdapter', () => ({

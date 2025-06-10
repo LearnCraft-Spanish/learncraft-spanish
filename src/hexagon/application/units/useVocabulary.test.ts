@@ -164,7 +164,7 @@ describe('useVocabulary', () => {
   it('should delete vocabulary correctly', async () => {
     // Arrange
     overrideMockVocabularyAdapter({
-      deleteVocabulary: () => Promise.resolve(),
+      deleteVocabulary: (_id: string) => Promise.resolve(1),
     });
 
     // Act

@@ -4,6 +4,7 @@ import useDropoutsByLevelReport from 'src/hooks/AdminData/useDropoutsByLevelRepo
 import useGroupCallsByCoach from 'src/hooks/AdminData/useGroupCallsByCoach';
 import useLastWeekCoachSummary from 'src/hooks/AdminData/useLastWeekCoachSummary';
 import usePrivateCallsByCoach from 'src/hooks/AdminData/usePrivateCallsByCoach';
+import useRecentLesson200Students from 'src/hooks/AdminData/useRecentLesson200Students';
 import useWeeklyCoachSummary from 'src/hooks/AdminData/useWeeklyCoachSummary';
 
 export default function useAdminDashboard() {
@@ -14,7 +15,7 @@ export default function useAdminDashboard() {
   const { activeMembershipsReportQuery } = useActiveMembershipsReport();
   const { dropoutsByLevelReportQuery } = useDropoutsByLevelReport();
   const { assignmentsCompletedByWeekQuery } = useAssignmentsCompletedByWeek();
-
+  const { recentLesson200StudentsQuery } = useRecentLesson200Students();
   const isLoading =
     weeklyCoachSummaryQuery.isLoading ||
     lastWeekCoachSummaryQuery.isLoading ||
@@ -22,7 +23,8 @@ export default function useAdminDashboard() {
     groupCallsByCoachQuery.isLoading ||
     activeMembershipsReportQuery.isLoading ||
     dropoutsByLevelReportQuery.isLoading ||
-    assignmentsCompletedByWeekQuery.isLoading;
+    assignmentsCompletedByWeekQuery.isLoading ||
+    recentLesson200StudentsQuery.isLoading;
 
   const isError =
     weeklyCoachSummaryQuery.isError ||
@@ -31,7 +33,8 @@ export default function useAdminDashboard() {
     groupCallsByCoachQuery.isError ||
     activeMembershipsReportQuery.isError ||
     dropoutsByLevelReportQuery.isError ||
-    assignmentsCompletedByWeekQuery.isError;
+    assignmentsCompletedByWeekQuery.isError ||
+    recentLesson200StudentsQuery.isError;
 
   const isSuccess =
     weeklyCoachSummaryQuery.isSuccess &&
@@ -40,7 +43,8 @@ export default function useAdminDashboard() {
     groupCallsByCoachQuery.isSuccess &&
     activeMembershipsReportQuery.isSuccess &&
     dropoutsByLevelReportQuery.isSuccess &&
-    assignmentsCompletedByWeekQuery.isSuccess;
+    assignmentsCompletedByWeekQuery.isSuccess &&
+    recentLesson200StudentsQuery.isSuccess;
 
   return {
     isLoading,
