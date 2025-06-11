@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@LearnCraft-Spanish/shared':
-        specifier: npm:@learncraft-spanish/shared@^0.4.5
-        version: '@learncraft-spanish/shared@0.4.5'
+        specifier: npm:@learncraft-spanish/shared@^0.4.9
+        version: '@learncraft-spanish/shared@0.4.9'
       '@auth0/auth0-react':
         specifier: ^2.3.0
         version: 2.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -1076,8 +1076,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.4.5':
-    resolution: {integrity: sha512-kQeX9aBeyHbcyank3HuV3KbW5vi3QbOIH6E1G25FQhlbNESZVZ7r8UILzJ5dnNKOt2L1hcgqFTmdCt3yk8lb2Q==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.4.5/d11b7041bf9af6e6e6afc145dd0b4ca1b7ceb26d}
+  '@learncraft-spanish/shared@0.4.9':
+    resolution: {integrity: sha512-1fLfOhfgnmbKnte12IDJpHck3LHeU01+r5R9c0/DohmD7RxjogFj40jhsyTeA/SWlfUA53CwK0KC4YvU9+B2+Q==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.4.9/1950d721466af13e6faf66b12607d5f0a8b70592}
 
   '@modelcontextprotocol/sdk@1.11.2':
     resolution: {integrity: sha512-H9vwztj5OAqHg9GockCQC06k1natgcxWQSRpQcPJf6i5+MWBzfKkRtxGbjQf0X2ihii0ffLZCRGbYV2f2bjNCQ==}
@@ -6497,7 +6497,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@learncraft-spanish/shared@0.4.5':
+  '@learncraft-spanish/shared@0.4.9':
     dependencies:
       zod: 3.24.4
 
