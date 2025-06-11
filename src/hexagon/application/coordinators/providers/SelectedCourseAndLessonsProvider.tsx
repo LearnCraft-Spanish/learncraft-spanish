@@ -1,20 +1,16 @@
 import type { Lesson } from '@LearnCraft-Spanish/shared';
-import type { SelectedCourseAndLessonsContextType } from '../context/SelectedCourseAndLessonsContext';
+import type { SelectedCourseAndLessonsContextType } from '../contexts/SelectedCourseAndLessonsContext';
+import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { useCallback, useMemo, useState } from 'react';
-import { useProgramTable } from 'src/hooks/CourseData/useProgramTable'; // Assuming this fetches the programs data
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import SelectedCourseAndLessonsContext from '../context/SelectedCourseAndLessonsContext';
-
-// implement this in Hexagon
-// import { useProgramTable } from 'src/hexagon/application/coordinators/hooks/useProgramsTable';
+import SelectedCourseAndLessonsContext from '../contexts/SelectedCourseAndLessonsContext';
 export function SelectedCourseAndLessonsProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { programTableQuery } = useProgramTable(); // Fetch the programs data internally
-  const { activeStudentQuery, activeProgram, activeLesson } =
-    useActiveStudent();
+  const { data: coursesWithLessons } = useCoursesWithLessons();
+  const { activeProgram, activeLesson } = useActiveStudent();
 
   const [userSelectedCourse, setUserSelectedCourse] = useState<number | null>(
     null,
@@ -29,11 +25,8 @@ export function SelectedCourseAndLessonsProvider({
     } else {
       newCourseId = activeProgram?.recordId || 0;
     }
-    return (
-      programTableQuery?.data?.find((item) => item.recordId === newCourseId) ||
-      null
-    );
-  }, [programTableQuery, userSelectedCourse, activeProgram]);
+    return coursesWithLessons?.find((item) => item.id === newCourseId) || null;
+  }, [coursesWithLessons, userSelectedCourse, activeProgram]);
 
   // ------------------ Setters ------------------ //
   const updateLessonFactory = useCallback(
