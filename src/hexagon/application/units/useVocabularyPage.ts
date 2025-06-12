@@ -49,7 +49,8 @@ export function useVocabularyPage(
     error: pageError,
   } = useQuery({
     queryKey: ['vocabulary', subcategoryId, 'page', page, pageSize],
-    queryFn: () => adapter.getVocabularyBySubcategory(subcategoryId),
+    queryFn: () =>
+      adapter.getVocabularyBySubcategory(subcategoryId, page, pageSize),
     placeholderData: (prev) => prev, // Keep previous data while loading new data
     enabled: shouldRunQueries,
     ...queryDefaults.entityData,
@@ -70,14 +71,14 @@ export function useVocabularyPage(
     error: countError,
   } = useQuery({
     queryKey: ['vocabulary', subcategoryId, 'count'],
-    queryFn: () => adapter.getVocabularyCount(subcategoryId),
+    queryFn: () => adapter.getVocabularyCountBySubcategory(subcategoryId),
     // Cache count for longer since it changes less frequently
     staleTime: 15 * 60 * 1000, // 10 min
     enabled: shouldLoadCount,
   });
 
   // 3. Derived metadata
-  const totalCount = countData?.total ?? null;
+  const totalCount = countData ?? null;
   const totalPages =
     totalCount !== null ? Math.ceil(totalCount / pageSize) : null;
 
@@ -102,11 +103,7 @@ export function useVocabularyPage(
       queryClient.prefetchQuery({
         queryKey: ['vocabulary', subcategoryId, 'page', page + 1, pageSize],
         queryFn: () =>
-          adapter.getVocabulary({
-            subcategoryId,
-            limit: pageSize,
-            offset: page * pageSize,
-          }),
+          adapter.getVocabularyBySubcategory(subcategoryId, page + 1, pageSize),
         ...queryDefaults.entityData,
         staleTime: 15 * 60 * 1000, // 2 minutes cache
       });

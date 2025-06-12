@@ -1,8 +1,5 @@
 import type { VocabularyPort } from '@application/ports/vocabularyPort';
-import type {
-  CreateNonVerbVocabulary,
-  CreateVerb,
-} from '@LearnCraft-Spanish/shared';
+import type { CreateVocabulary } from '@LearnCraft-Spanish/shared';
 import {
   createMockVocabulary,
   createMockVocabularyList,
@@ -10,25 +7,18 @@ import {
 } from '@testing/factories/vocabularyFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
-// Create a default mock implementation
+// Create a default mock implementation matching the port exactly
 const defaultMockAdapter: VocabularyPort = {
-  getVocabulary: () => Promise.resolve(createMockVocabularyList(3)),
-  getVocabularyById: (id: string) =>
-    Promise.resolve(createMockVocabulary({ id: Number.parseInt(id) })),
-  getVocabularyCount: () => Promise.resolve({ total: 10 }),
-  createVerb: (command: CreateVerb) =>
-    Promise.resolve(createMockVocabulary({ ...command, id: 1 })),
-  createNonVerbVocabulary: (command: CreateNonVerbVocabulary) =>
-    Promise.resolve(createMockVocabulary({ ...command, id: 1 })),
-  createVocabularyBatch: (commands: CreateNonVerbVocabulary[]) =>
-    Promise.resolve(
-      commands.map((cmd, i) => createMockVocabulary({ ...cmd, id: i })),
-    ),
-  deleteVocabulary: (_id: string) => Promise.resolve(1),
-  searchVocabulary: (query: string) =>
-    Promise.resolve(createMockVocabularyList(2, { word: query })),
-  getAllRecordsAssociatedWithVocabularyRecord: () =>
-    Promise.resolve(createMockVocabularyRelatedRecords()),
+  getVocabulary: () => Promise.resolve(createMockVocabularyList()),
+  getVocabularyBySubcategory: (_subcategoryId, _page, _limit) =>
+    Promise.resolve(createMockVocabularyList()),
+  getVocabularyById: (_id) => Promise.resolve(createMockVocabulary()),
+  getVocabularyCount: () => Promise.resolve(1),
+  getVocabularyCountBySubcategory: (_subcategoryId) => Promise.resolve(1),
+  createVocabulary: (_command: CreateVocabulary) => Promise.resolve(1),
+  deleteVocabulary: (_id: number) => Promise.resolve(1),
+  getRelatedRecords: (_id: number) =>
+    Promise.resolve([createMockVocabularyRelatedRecords()]),
 };
 
 // Create an overrideable mock with the default implementation

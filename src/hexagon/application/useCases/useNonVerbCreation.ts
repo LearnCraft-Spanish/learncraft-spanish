@@ -45,7 +45,7 @@ export interface UseNonVerbCreationResult {
   tableHook: TableHook<CreateNonVerbVocabulary>;
 
   // Unified save action that handles validation, table save, and creation
-  saveVocabulary: () => Promise<boolean>;
+  saveVocabulary: () => Promise<number[]>;
 
   // Vocabulary list for currently selected subcategory
   currentVocabularyPagination: VocabularyPaginationState | null;
@@ -68,12 +68,10 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
 
   // Use our vocabulary unit for operations
   const {
-    createBatch,
     creating: creatingVocabulary,
     creationError: vocabCreationError,
-  } = useVocabulary({
-    isVerb: false,
-  });
+    createNonVerb,
+  } = useVocabulary();
 
   // Create the table hook internally
   const tableHook = useVocabularyTable();
@@ -165,7 +163,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     async (data: CreateNonVerbVocabulary[]) => {
       if (!selectedSubcategoryId) {
         setCreationError(new Error('No subcategory selected'));
-        return false;
+        return [];
       }
 
       try {
@@ -199,26 +197,29 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
           subcategoryId: Number(selectedSubcategoryId),
         }));
 
-        await createBatch(commands);
-        return true;
+        const createdIds = await Promise.all(
+          commands.map((command) => createNonVerb(command)),
+        );
+
+        return createdIds;
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setCreationError(error);
-        return false;
+        return [];
       }
     },
-    [selectedSubcategoryId, createBatch],
+    [selectedSubcategoryId, createNonVerb],
   );
 
   /**
    * Unified save method exposed to the interface.
    * Handles all the steps: validation, table save, and creation.
    */
-  const saveVocabulary = useCallback(async (): Promise<boolean> => {
+  const saveVocabulary = useCallback(async (): Promise<number[]> => {
     // Validate subcategory is selected
     if (!selectedSubcategoryId) {
       setCreationError(new Error('No subcategory selected'));
-      return false;
+      return [];
     }
 
     try {
@@ -227,7 +228,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
 
       // If table validation failed or no data
       if (!tableData || tableData.length === 0) {
-        return false;
+        return [];
       }
 
       // Create the vocabulary batch
@@ -235,7 +236,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
       setCreationError(error);
-      return false;
+      return [];
     }
   }, [selectedSubcategoryId, createVocabularyBatch, tableHook]);
 

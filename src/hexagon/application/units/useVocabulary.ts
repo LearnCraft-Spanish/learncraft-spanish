@@ -1,7 +1,6 @@
-import type { VocabularyQueryOptions } from '@application/ports/vocabularyPort';
 import type {
   CreateNonVerbVocabulary,
-  CreateVerb,
+  CreateVerbVocabulary,
   Vocabulary,
 } from '@LearnCraft-Spanish/shared';
 import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
@@ -20,9 +19,8 @@ export interface UseVocabularyResult {
   getById: (id: string) => Promise<Vocabulary | null>;
 
   // Write operations
-  createVerb: (command: CreateVerb) => Promise<Vocabulary>;
-  createNonVerb: (command: CreateNonVerbVocabulary) => Promise<Vocabulary>;
-  createBatch: (commands: CreateNonVerbVocabulary[]) => Promise<Vocabulary[]>;
+  createVerb: (command: CreateVerbVocabulary) => Promise<number>;
+  createNonVerb: (command: CreateNonVerbVocabulary) => Promise<number>;
   deleteVocabulary: (id: string) => Promise<void>;
   creating: boolean;
   creationError: Error | null;
@@ -34,9 +32,7 @@ export interface UseVocabularyResult {
  * Hook to fetch and manage vocabulary.
  * This unit hook provides operations for all vocabulary types.
  */
-export function useVocabulary(
-  options?: VocabularyQueryOptions,
-): UseVocabularyResult {
+export function useVocabulary(): UseVocabularyResult {
   // Get query client for cache invalidation
   const queryClient = useQueryClient();
 
@@ -50,35 +46,35 @@ export function useVocabulary(
     error,
     refetch,
   } = useQuery({
-    queryKey: ['vocabulary', options],
-    queryFn: () => adapter.getVocabulary(options),
+    queryKey: ['vocabulary'],
+    queryFn: () => adapter.getVocabulary(),
     ...queryDefaults.entityData,
   });
 
   // Mutations for vocabulary operations
   const verbMutation = useMutation({
-    mutationFn: adapter.createVerb,
+    mutationFn: adapter.createVocabulary,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vocabulary'] });
     },
   });
 
   const nonVerbMutation = useMutation({
-    mutationFn: adapter.createNonVerbVocabulary,
+    mutationFn: adapter.createVocabulary,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vocabulary'] });
     },
   });
 
   const batchMutation = useMutation({
-    mutationFn: adapter.createVocabularyBatch,
+    mutationFn: adapter.createVocabulary,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vocabulary'] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: adapter.deleteVocabulary,
+    mutationFn: (id: number) => adapter.deleteVocabulary(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vocabulary'] });
     },
@@ -94,27 +90,24 @@ export function useVocabulary(
   };
 
   // Create operations with type assertions
-  const createVerb = async (command: CreateVerb): Promise<Vocabulary> => {
+  const createVerb = async (command: CreateVerbVocabulary): Promise<number> => {
     const result = await verbMutation.mutateAsync(command);
-    return result as Vocabulary;
+    return result;
   };
 
   const createNonVerb = async (
     command: CreateNonVerbVocabulary,
-  ): Promise<Vocabulary> => {
+  ): Promise<number> => {
     const result = await nonVerbMutation.mutateAsync(command);
-    return result as Vocabulary;
-  };
-
-  const createBatch = async (
-    commands: CreateNonVerbVocabulary[],
-  ): Promise<Vocabulary[]> => {
-    const results = await batchMutation.mutateAsync(commands);
-    return results as Vocabulary[];
+    return result;
   };
 
   const deleteVocabulary = async (id: string): Promise<void> => {
-    await deleteMutation.mutateAsync(id);
+    const idNumber = Number.parseInt(id);
+    if (Number.isNaN(idNumber)) {
+      throw new TypeError('Invalid vocabulary ID');
+    }
+    await deleteMutation.mutateAsync(idNumber);
   };
 
   // Combine errors from all mutations
@@ -135,7 +128,6 @@ export function useVocabulary(
     // Write operations
     createVerb,
     createNonVerb,
-    createBatch,
     deleteVocabulary,
     creating:
       verbMutation.isPending ||

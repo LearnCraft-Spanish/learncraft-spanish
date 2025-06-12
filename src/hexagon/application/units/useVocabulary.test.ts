@@ -67,32 +67,11 @@ describe('useVocabulary', () => {
     expect(itemResult).toEqual(mockItem);
   });
 
-  it('should search vocabulary correctly', async () => {
-    // Arrange
-    const searchResults = createMockVocabularyList(2, { word: 'test' });
-    overrideMockVocabularyAdapter({
-      searchVocabulary: () => Promise.resolve(searchResults),
-    });
-
-    // Act
-    const { result } = renderHook(() => useVocabulary(), {
-      wrapper: TestQueryClientProvider,
-    });
-    const searchResult = await result.current.search('test');
-
-    // Assert
-    expect(searchResult).toEqual(searchResults);
-  });
-
   it('should create verb vocabulary correctly', async () => {
     // Arrange
-    const createdVerb = createMockVocabulary({
-      word: 'hablar',
-      descriptor: 'to speak',
-      id: 1,
-    });
+    const createdId = 1;
     overrideMockVocabularyAdapter({
-      createVerb: () => Promise.resolve(createdVerb),
+      createVocabulary: () => Promise.resolve(createdId),
     });
 
     // Act
@@ -100,25 +79,25 @@ describe('useVocabulary', () => {
       wrapper: TestQueryClientProvider,
     });
     const verbCommand = {
-      infinitive: 'hablar',
-      translation: 'to speak',
-      isRegular: true,
+      word: 'hablar',
+      descriptor: 'to speak',
+      subcategoryId: 1,
+      verbId: 1,
+      conjugationTagIds: [1, 2],
+      frequency: 1,
+      notes: 'Common verb',
     };
     const createResult = await result.current.createVerb(verbCommand);
 
     // Assert
-    expect(createResult).toEqual(createdVerb);
+    expect(createResult).toBe(createdId);
   });
 
   it('should create non-verb vocabulary correctly', async () => {
     // Arrange
-    const createdNonVerb = createMockVocabulary({
-      word: 'casa',
-      descriptor: 'house',
-      id: 2,
-    });
+    const createdId = 2;
     overrideMockVocabularyAdapter({
-      createNonVerbVocabulary: () => Promise.resolve(createdNonVerb),
+      createVocabulary: () => Promise.resolve(createdId),
     });
 
     // Act
@@ -134,37 +113,13 @@ describe('useVocabulary', () => {
     const createResult = await result.current.createNonVerb(nonVerbCommand);
 
     // Assert
-    expect(createResult).toEqual(createdNonVerb);
-  });
-
-  it('should create batch vocabulary correctly', async () => {
-    // Arrange
-    const createdItems = [
-      createMockVocabulary({ word: 'perro', descriptor: 'dog', id: 1 }),
-      createMockVocabulary({ word: 'gato', descriptor: 'cat', id: 2 }),
-    ];
-    overrideMockVocabularyAdapter({
-      createVocabularyBatch: () => Promise.resolve(createdItems),
-    });
-
-    // Act
-    const { result } = renderHook(() => useVocabulary(), {
-      wrapper: TestQueryClientProvider,
-    });
-    const batchCommands = [
-      { word: 'perro', descriptor: 'dog', subcategoryId: 1, frequency: 1 },
-      { word: 'gato', descriptor: 'cat', subcategoryId: 1, frequency: 1 },
-    ];
-    const batchResult = await result.current.createBatch(batchCommands);
-
-    // Assert
-    expect(batchResult).toEqual(createdItems);
+    expect(createResult).toBe(createdId);
   });
 
   it('should delete vocabulary correctly', async () => {
     // Arrange
     overrideMockVocabularyAdapter({
-      deleteVocabulary: (_id: string) => Promise.resolve(1),
+      deleteVocabulary: () => Promise.resolve(1),
     });
 
     // Act
@@ -181,7 +136,7 @@ describe('useVocabulary', () => {
     // Arrange
     const testError = new Error('Failed to create vocabulary');
     overrideMockVocabularyAdapter({
-      createVerb: () => Promise.reject(testError),
+      createVocabulary: () => Promise.reject(testError),
     });
 
     // Act
@@ -195,9 +150,13 @@ describe('useVocabulary', () => {
 
     // Act - trigger error
     const verbCommand = {
-      infinitive: 'hablar',
-      translation: 'to speak',
-      isRegular: true,
+      word: 'hablar',
+      descriptor: 'to speak',
+      subcategoryId: 1,
+      verbId: 1,
+      conjugationTagIds: [1, 2],
+      frequency: 1,
+      notes: 'Common verb',
     };
     await expect(result.current.createVerb(verbCommand)).rejects.toThrow(
       'Failed to create vocabulary',

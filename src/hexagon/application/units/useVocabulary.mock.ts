@@ -1,6 +1,6 @@
 import type {
   CreateNonVerbVocabulary,
-  CreateVerb,
+  CreateVerbVocabulary,
 } from '@LearnCraft-Spanish/shared';
 import type { UseVocabularyResult } from './useVocabulary';
 import {
@@ -9,28 +9,19 @@ import {
 } from '@testing/factories/vocabularyFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
-// Default mock implementation with sensible defaults
+// Default mock implementation matching the interface exactly
 const defaultMockResult: UseVocabularyResult = {
   // Read operations
   vocabulary: createMockVocabularyList(),
   loading: false,
   error: null,
   refetch: () => {},
-  getById: (id: string) =>
-    Promise.resolve(createMockVocabulary({ id: Number.parseInt(id) })),
-  search: (query: string) =>
-    Promise.resolve(createMockVocabularyList(2, { word: query })),
+  getById: (_id: string) => Promise.resolve(createMockVocabulary()),
 
   // Write operations
-  createVerb: (command: CreateVerb) =>
-    Promise.resolve(createMockVocabulary({ ...command, id: 1 })),
-  createNonVerb: (command: CreateNonVerbVocabulary) =>
-    Promise.resolve(createMockVocabulary({ ...command, id: 1 })),
-  createBatch: (commands: CreateNonVerbVocabulary[]) =>
-    Promise.resolve(
-      commands.map((cmd, i) => createMockVocabulary({ ...cmd, id: i })),
-    ),
-  deleteVocabulary: () => Promise.resolve(),
+  createVerb: (_command: CreateVerbVocabulary) => Promise.resolve(1),
+  createNonVerb: (_command: CreateNonVerbVocabulary) => Promise.resolve(1),
+  deleteVocabulary: (_id: string) => Promise.resolve(),
   creating: false,
   creationError: null,
   deleting: false,
