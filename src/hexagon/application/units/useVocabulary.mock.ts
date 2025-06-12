@@ -15,7 +15,6 @@ const defaultMockResult: UseVocabularyResult = {
   vocabulary: createMockVocabularyList(),
   loading: false,
   error: null,
-  refetch: () => {},
   getById: (_id: string) => Promise.resolve(createMockVocabulary()),
 
   // Write operations

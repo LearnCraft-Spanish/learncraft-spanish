@@ -15,7 +15,6 @@ export interface UseVocabularyResult {
   vocabulary: Vocabulary[];
   loading: boolean;
   error: Error | null;
-  refetch: () => void;
   getById: (id: string) => Promise<Vocabulary | null>;
 
   // Write operations
@@ -46,11 +45,10 @@ export function useVocabulary(): UseVocabularyResult {
     data = [],
     isLoading,
     error,
-    refetch,
   } = useQuery({
     queryKey: ['vocabulary'],
     queryFn: () => adapter.getVocabulary(),
-    ...queryDefaults.entityData,
+    ...queryDefaults.referenceData,
   });
 
   // Mutations for vocabulary operations
@@ -126,7 +124,6 @@ export function useVocabulary(): UseVocabularyResult {
     vocabulary: data as Vocabulary[],
     loading: isLoading,
     error: normalizeQueryError(error),
-    refetch,
     getById,
 
     // Write operations

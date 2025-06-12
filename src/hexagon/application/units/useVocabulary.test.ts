@@ -213,9 +213,6 @@ describe('useVocabulary', () => {
     // Re-render the hook to pick up the new mock
     rerender();
 
-    // Trigger refetch
-    await result.current.refetch();
-
     // Assert
     await waitFor(() => expect(result.current.vocabulary).toEqual(newMockData));
   });

@@ -38,7 +38,7 @@ export function createVocabularyInfrastructure(
 
       // The API returns a paginated response, but our port expects an array
       // Extract items from the pagination wrapper
-      return response.items;
+      return response;
     },
 
     getVocabularyBySubcategory: async (
