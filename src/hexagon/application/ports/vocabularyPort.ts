@@ -42,12 +42,12 @@ export interface VocabularyPort {
   /**
    * Create a new vocabulary item
    */
-  createVocabulary: (command: CreateVocabulary) => Promise<number>;
+  createVocabulary: (command: CreateVocabulary[]) => Promise<number[]>;
 
   /**
    * Delete a vocabulary item
    */
-  deleteVocabulary: (id: number) => Promise<number>;
+  deleteVocabulary: (id: number[]) => Promise<number>;
 
   /**
    * Get all records associated with a vocabulary record

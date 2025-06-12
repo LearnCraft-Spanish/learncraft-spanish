@@ -83,17 +83,22 @@ export function createVocabularyInfrastructure(
       return httpClient.get<Vocabulary>(path);
     },
 
-    createVocabulary: async (command: CreateVocabulary): Promise<number> => {
-      return httpClient.post<number>(VocabularyEndpoints.create.path, command);
+    createVocabulary: async (
+      command: CreateVocabulary[],
+    ): Promise<number[]> => {
+      return httpClient.post<number[]>(
+        VocabularyEndpoints.create.path,
+        command,
+      );
     },
 
-    deleteVocabulary: async (id: number): Promise<number> => {
-      const path = VocabularyEndpoints.delete.path.replace(
-        ':id',
-        id.toString(),
+    deleteVocabulary: async (ids: number[]): Promise<number> => {
+      const result = await httpClient.delete<number>(
+        VocabularyEndpoints.delete.path,
+        {
+          data: ids,
+        },
       );
-
-      const result = await httpClient.delete<number>(path);
 
       return result;
     },

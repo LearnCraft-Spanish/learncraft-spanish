@@ -35,8 +35,7 @@ function DeleteVocabularyRecordModal({
   recordId: string;
   setIsModalOpen: (isModalOpen: boolean) => void;
 }) {
-  const { getAllRecordsAssociatedWithVocabularyRecord, deleteVocabulary } =
-    useVocabularyAdapter();
+  const { getRelatedRecords, deleteVocabulary } = useVocabularyAdapter();
 
   const {
     data: relatedRecords,
@@ -44,7 +43,7 @@ function DeleteVocabularyRecordModal({
     error: relatedRecordsError,
   } = useQuery({
     queryKey: ['vocabulary-related-records', recordId],
-    queryFn: () => getAllRecordsAssociatedWithVocabularyRecord(recordId ?? ''),
+    queryFn: () => getRelatedRecords(Number(recordId)),
     enabled: !!recordId,
     staleTime: Infinity,
   });
@@ -54,7 +53,7 @@ function DeleteVocabularyRecordModal({
   };
 
   const handleConfirm = () => {
-    const promise = deleteVocabulary(recordId);
+    const promise = deleteVocabulary([Number(recordId)]);
     toast.promise(promise, {
       pending: 'Deleting vocabulary...',
       success: 'Vocabulary deleted successfully',
@@ -75,17 +74,17 @@ function DeleteVocabularyRecordModal({
             <ul>
               <li>
                 <p>
-                  {`${relatedRecords.vocabularyExampleRecords.length} Vocabulary Example Records`}
+                  {`${relatedRecords[0].vocabularyExampleRecords.length} Vocabulary Example Records`}
                 </p>
               </li>
               <li>
                 <p>
-                  {`${relatedRecords.vocabularyLessonRecords.length} Vocabulary Lesson Records`}
+                  {`${relatedRecords[0].vocabularyLessonRecords.length} Vocabulary Lesson Records`}
                 </p>
               </li>
               <li>
                 <p>
-                  {`${relatedRecords.vocabularySpellingRecords.length} Vocabulary Spelling Records`}
+                  {`${relatedRecords[0].vocabularySpellingRecords.length} Vocabulary Spelling Records`}
                 </p>
               </li>
             </ul>

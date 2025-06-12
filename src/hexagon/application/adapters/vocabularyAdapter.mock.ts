@@ -15,8 +15,9 @@ const defaultMockAdapter: VocabularyPort = {
   getVocabularyById: (_id) => Promise.resolve(createMockVocabulary()),
   getVocabularyCount: () => Promise.resolve(1),
   getVocabularyCountBySubcategory: (_subcategoryId) => Promise.resolve(1),
-  createVocabulary: (_command: CreateVocabulary) => Promise.resolve(1),
-  deleteVocabulary: (_id: number) => Promise.resolve(1),
+  createVocabulary: (_command: CreateVocabulary[]) =>
+    Promise.resolve([1, 2, 3]),
+  deleteVocabulary: (_id: number[]) => Promise.resolve(3),
   getRelatedRecords: (_id: number) =>
     Promise.resolve([createMockVocabularyRelatedRecords()]),
 };

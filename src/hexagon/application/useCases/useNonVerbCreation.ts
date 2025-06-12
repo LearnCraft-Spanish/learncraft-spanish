@@ -1,9 +1,8 @@
+import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
 import type {
-  CreateNonVerbVocabulary,
-  Subcategory,
-  Vocabulary,
-} from '@LearnCraft-Spanish/shared';
-import type { TableHook } from '../units/pasteTable/types';
+  UseNonVerbCreationResult,
+  VocabularyPaginationState,
+} from './types';
 import {
   CreateNonVerbVocabularySchema,
   validateWithSchema,
@@ -13,43 +12,6 @@ import { useVocabularyTable } from '../implementations/vocabularyTable/useVocabu
 import { useSubcategories } from '../units/useSubcategories';
 import { useVocabulary } from '../units/useVocabulary';
 import { useVocabularyPage } from '../units/useVocabularyPage';
-
-// Define pagination state for current vocabulary view
-export interface VocabularyPaginationState {
-  vocabularyItems: Vocabulary[];
-  isLoading: boolean;
-  isCountLoading: boolean;
-  isFetching: boolean;
-  error: Error | null;
-  totalCount: number | null;
-  totalPages: number | null;
-  hasMorePages: boolean;
-  currentPage: number;
-  pageSize: number;
-  goToNextPage: () => void;
-  goToPreviousPage: () => void;
-}
-
-export interface UseNonVerbCreationResult {
-  // Subcategory selection
-  nonVerbSubcategories: Subcategory[];
-  loadingSubcategories: boolean;
-  selectedSubcategoryId: string;
-  setSelectedSubcategoryId: (id: string) => void;
-
-  // Creation status
-  creating: boolean;
-  creationError: Error | null;
-
-  // Table hook API - exposed through the façade
-  tableHook: TableHook<CreateNonVerbVocabulary>;
-
-  // Unified save action that handles validation, table save, and creation
-  saveVocabulary: () => Promise<number[]>;
-
-  // Vocabulary list for currently selected subcategory
-  currentVocabularyPagination: VocabularyPaginationState | null;
-}
 
 /**
  * Use case for non-verb vocabulary creation.
@@ -70,7 +32,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
   const {
     creating: creatingVocabulary,
     creationError: vocabCreationError,
-    createNonVerb,
+    createNonVerbVocabulary,
   } = useVocabulary();
 
   // Create the table hook internally
@@ -197,9 +159,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
           subcategoryId: Number(selectedSubcategoryId),
         }));
 
-        const createdIds = await Promise.all(
-          commands.map((command) => createNonVerb(command)),
-        );
+        const createdIds = await createNonVerbVocabulary(commands);
 
         return createdIds;
       } catch (err) {
@@ -208,7 +168,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
         return [];
       }
     },
-    [selectedSubcategoryId, createNonVerb],
+    [selectedSubcategoryId, createNonVerbVocabulary],
   );
 
   /**

@@ -19,9 +19,11 @@ const defaultMockResult: UseVocabularyResult = {
   getById: (_id: string) => Promise.resolve(createMockVocabulary()),
 
   // Write operations
-  createVerb: (_command: CreateVerbVocabulary) => Promise.resolve(1),
-  createNonVerb: (_command: CreateNonVerbVocabulary) => Promise.resolve(1),
-  deleteVocabulary: (_id: string) => Promise.resolve(),
+  createVerbVocabulary: (_command: CreateVerbVocabulary[]) =>
+    Promise.resolve([1, 2, 3]),
+  createNonVerbVocabulary: (_command: CreateNonVerbVocabulary[]) =>
+    Promise.resolve([1, 2, 3]),
+  deleteVocabulary: (_id: string[]) => Promise.resolve(1),
   creating: false,
   creationError: null,
   deleting: false,

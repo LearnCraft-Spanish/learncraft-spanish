@@ -10,7 +10,7 @@ describe('useVocabularyPage', () => {
     // Reset adapter mock before each test
     overrideMockVocabularyAdapter({
       getVocabulary: () => Promise.resolve([]),
-      getVocabularyCount: () => Promise.resolve({ total: 0 }),
+      getVocabularyCount: () => Promise.resolve(0),
     });
   });
 
@@ -19,7 +19,7 @@ describe('useVocabularyPage', () => {
     const mockItems = createMockVocabularyList(10);
     overrideMockVocabularyAdapter({
       getVocabulary: () => Promise.resolve(mockItems),
-      getVocabularyCount: () => Promise.resolve({ total: 32 }),
+      getVocabularyCount: () => Promise.resolve(32),
     });
 
     // Act
@@ -51,7 +51,7 @@ describe('useVocabularyPage', () => {
     const testError = new Error('Failed to fetch vocabulary');
     overrideMockVocabularyAdapter({
       getVocabulary: () => Promise.reject(testError),
-      getVocabularyCount: () => Promise.resolve({ total: 0 }),
+      getVocabularyCount: () => Promise.resolve(0),
     });
 
     // Act

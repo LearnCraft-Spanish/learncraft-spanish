@@ -71,7 +71,7 @@ describe('useVocabulary', () => {
     // Arrange
     const createdId = 1;
     overrideMockVocabularyAdapter({
-      createVocabulary: () => Promise.resolve(createdId),
+      createVocabulary: () => Promise.resolve([createdId]),
     });
 
     // Act
@@ -87,17 +87,19 @@ describe('useVocabulary', () => {
       frequency: 1,
       notes: 'Common verb',
     };
-    const createResult = await result.current.createVerb(verbCommand);
+    const createResult = await result.current.createVerbVocabulary([
+      verbCommand,
+    ]);
 
     // Assert
-    expect(createResult).toBe(createdId);
+    expect(createResult).toEqual([createdId]);
   });
 
   it('should create non-verb vocabulary correctly', async () => {
     // Arrange
     const createdId = 2;
     overrideMockVocabularyAdapter({
-      createVocabulary: () => Promise.resolve(createdId),
+      createVocabulary: () => Promise.resolve([createdId]),
     });
 
     // Act
@@ -110,10 +112,12 @@ describe('useVocabulary', () => {
       subcategoryId: 1,
       frequency: 1,
     };
-    const createResult = await result.current.createNonVerb(nonVerbCommand);
+    const createResult = await result.current.createNonVerbVocabulary([
+      nonVerbCommand,
+    ]);
 
     // Assert
-    expect(createResult).toBe(createdId);
+    expect(createResult).toEqual([createdId]);
   });
 
   it('should delete vocabulary correctly', async () => {
@@ -126,7 +130,7 @@ describe('useVocabulary', () => {
     const { result } = renderHook(() => useVocabulary(), {
       wrapper: TestQueryClientProvider,
     });
-    await result.current.deleteVocabulary('123');
+    await result.current.deleteVocabulary(['123']);
 
     // Assert - verify the hook completes without error
     expect(result.current.deletionError).toBeNull();
@@ -158,9 +162,9 @@ describe('useVocabulary', () => {
       frequency: 1,
       notes: 'Common verb',
     };
-    await expect(result.current.createVerb(verbCommand)).rejects.toThrow(
-      'Failed to create vocabulary',
-    );
+    await expect(
+      result.current.createVerbVocabulary([verbCommand]),
+    ).rejects.toThrow('Failed to create vocabulary');
   });
 
   it('should handle deletion error correctly', async () => {
@@ -180,7 +184,7 @@ describe('useVocabulary', () => {
     expect(result.current.deletionError).toBeNull();
 
     // Act - trigger error
-    await expect(result.current.deleteVocabulary('123')).rejects.toThrow(
+    await expect(result.current.deleteVocabulary(['123'])).rejects.toThrow(
       'Failed to delete vocabulary',
     );
   });

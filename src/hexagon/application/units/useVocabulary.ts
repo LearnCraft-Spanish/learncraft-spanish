@@ -19,9 +19,11 @@ export interface UseVocabularyResult {
   getById: (id: string) => Promise<Vocabulary | null>;
 
   // Write operations
-  createVerb: (command: CreateVerbVocabulary) => Promise<number>;
-  createNonVerb: (command: CreateNonVerbVocabulary) => Promise<number>;
-  deleteVocabulary: (id: string) => Promise<void>;
+  createVerbVocabulary: (command: CreateVerbVocabulary[]) => Promise<number[]>;
+  createNonVerbVocabulary: (
+    command: CreateNonVerbVocabulary[],
+  ) => Promise<number[]>;
+  deleteVocabulary: (ids: string[]) => Promise<number>;
   creating: boolean;
   creationError: Error | null;
   deleting: boolean;
@@ -74,7 +76,7 @@ export function useVocabulary(): UseVocabularyResult {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => adapter.deleteVocabulary(id),
+    mutationFn: (ids: number[]) => adapter.deleteVocabulary(ids),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vocabulary'] });
     },
@@ -90,24 +92,26 @@ export function useVocabulary(): UseVocabularyResult {
   };
 
   // Create operations with type assertions
-  const createVerb = async (command: CreateVerbVocabulary): Promise<number> => {
+  const createVerbVocabulary = async (
+    command: CreateVerbVocabulary[],
+  ): Promise<number[]> => {
     const result = await verbMutation.mutateAsync(command);
     return result;
   };
 
-  const createNonVerb = async (
-    command: CreateNonVerbVocabulary,
-  ): Promise<number> => {
+  const createNonVerbVocabulary = async (
+    command: CreateNonVerbVocabulary[],
+  ): Promise<number[]> => {
     const result = await nonVerbMutation.mutateAsync(command);
     return result;
   };
 
-  const deleteVocabulary = async (id: string): Promise<void> => {
-    const idNumber = Number.parseInt(id);
-    if (Number.isNaN(idNumber)) {
+  const deleteVocabulary = async (ids: string[]): Promise<number> => {
+    const idNumbers = ids.map(Number.parseInt);
+    if (idNumbers.some(Number.isNaN)) {
       throw new TypeError('Invalid vocabulary ID');
     }
-    await deleteMutation.mutateAsync(idNumber);
+    return deleteMutation.mutateAsync(idNumbers);
   };
 
   // Combine errors from all mutations
@@ -126,8 +130,8 @@ export function useVocabulary(): UseVocabularyResult {
     getById,
 
     // Write operations
-    createVerb,
-    createNonVerb,
+    createVerbVocabulary,
+    createNonVerbVocabulary,
     deleteVocabulary,
     creating:
       verbMutation.isPending ||
