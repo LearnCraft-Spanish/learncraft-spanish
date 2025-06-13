@@ -16,7 +16,7 @@ export default function VocabularySearch({
   onVocabularySelect,
   selectedVocabId,
   placeholder = 'Search vocabulary...',
-  minSearchLength = 2,
+  minSearchLength = 1,
   maxResults = 10,
 }: VocabularySearchProps) {
   const [searchTerm, setSearchTerm] = useState('');

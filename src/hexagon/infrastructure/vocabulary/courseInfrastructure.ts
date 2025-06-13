@@ -56,7 +56,7 @@ export function createCourseInfrastructure(
     getLessonsByVocabulary: async (vocabId: number): Promise<Lesson[]> => {
       const response = await httpClient.get<Lesson[]>(
         coursesEndpoints.getLessonsByVocabularyEndpoint.path.replace(
-          ':vocabId',
+          ':vocabularyId',
           vocabId.toString(),
         ),
       );

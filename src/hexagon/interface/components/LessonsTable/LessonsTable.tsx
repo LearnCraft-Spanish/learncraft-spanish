@@ -29,17 +29,17 @@ export default function LessonsTable({
           <table className="lessons-table__table">
             <thead>
               <tr>
-                <th>Lesson</th>
                 <th>Course</th>
                 <th>Lesson Number</th>
+                <th>Subtitle</th>
               </tr>
             </thead>
             <tbody>
               {lessons.map((lesson) => (
                 <tr key={lesson.id} className="lessons-table__row">
-                  <td>{lesson.subtitle || `Lesson ${lesson.lessonNumber}`}</td>
                   <td>{lesson.courseName}</td>
                   <td>{lesson.lessonNumber}</td>
+                  <td>{lesson.subtitle}</td>
                 </tr>
               ))}
             </tbody>
