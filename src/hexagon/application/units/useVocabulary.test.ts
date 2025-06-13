@@ -214,6 +214,6 @@ describe('useVocabulary', () => {
     rerender();
 
     // Assert
-    expect(result.current.vocabulary.toEqual(newMockData));
+    expect(result.current.vocabulary).toEqual(newMockData);
   });
 });
