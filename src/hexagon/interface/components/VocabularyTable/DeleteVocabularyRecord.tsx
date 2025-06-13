@@ -74,17 +74,17 @@ function DeleteVocabularyRecordModal({
             <ul>
               <li>
                 <p>
-                  {`${relatedRecords[0].vocabularyExampleRecords.length} Vocabulary Example Records`}
+                  {`${relatedRecords.vocabularyExampleRecords.length} Vocabulary Example Records`}
                 </p>
               </li>
               <li>
                 <p>
-                  {`${relatedRecords[0].vocabularyLessonRecords.length} Vocabulary Lesson Records`}
+                  {`${relatedRecords.vocabularyLessonRecords.length} Vocabulary Lesson Records`}
                 </p>
               </li>
               <li>
                 <p>
-                  {`${relatedRecords[0].vocabularySpellingRecords.length} Vocabulary Spelling Records`}
+                  {`${relatedRecords.vocabularySpellingRecords.length} Vocabulary Spelling Records`}
                 </p>
               </li>
             </ul>

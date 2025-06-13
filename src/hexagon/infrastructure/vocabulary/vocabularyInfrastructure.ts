@@ -108,12 +108,12 @@ export function createVocabularyInfrastructure(
 
     getRelatedRecords: async (
       id: number,
-    ): Promise<VocabularyRelatedRecords[]> => {
+    ): Promise<VocabularyRelatedRecords> => {
       const path = VocabularyEndpoints.getAssociatedRecords.path.replace(
         ':id',
         id.toString(),
       );
-      return httpClient.get<VocabularyRelatedRecords[]>(path);
+      return httpClient.get<VocabularyRelatedRecords>(path);
     },
   };
 }

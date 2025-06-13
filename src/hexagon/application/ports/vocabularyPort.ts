@@ -52,5 +52,5 @@ export interface VocabularyPort {
   /**
    * Get all records associated with a vocabulary record
    */
-  getRelatedRecords: (id: number) => Promise<VocabularyRelatedRecords[]>;
+  getRelatedRecords: (id: number) => Promise<VocabularyRelatedRecords>;
 }

@@ -19,7 +19,7 @@ const defaultMockAdapter: VocabularyPort = {
     Promise.resolve([1, 2, 3]),
   deleteVocabulary: (_id: number[]) => Promise.resolve(3),
   getRelatedRecords: (_id: number) =>
-    Promise.resolve([createMockVocabularyRelatedRecords()]),
+    Promise.resolve(createMockVocabularyRelatedRecords()),
 };
 
 // Create an overrideable mock with the default implementation
