@@ -36,8 +36,8 @@ export function useFrequensay(): UseFrequensayResult {
     isLoading: spellingsDataLoading,
     error: spellingsDataError,
   } = useSpellingsKnownForLesson({
-    courseName: selectedProgram?.name || '',
-    lessonNumber: selectedToLesson?.lessonNumber || 0,
+    courseId: selectedProgram?.recordId,
+    lessonNumber: selectedToLesson?.lessonNumber,
     isFrequensayEnabled,
   });
 

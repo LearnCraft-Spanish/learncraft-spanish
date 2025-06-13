@@ -1,7 +1,5 @@
-import type {
-  UseVerbCreationResult,
-  VerbData,
-} from '@application/useCases/types';
+import type { UseVerbCreationResult } from '@application/useCases/types';
+import type { CreateVerbVocabulary } from '@LearnCraft-Spanish/shared';
 import { PartOfSpeech } from '@LearnCraft-Spanish/shared';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { vi } from 'vitest';
@@ -12,13 +10,13 @@ export const defaultResult: UseVerbCreationResult = {
     (s) => s.partOfSpeech === PartOfSpeech.Verb,
   ),
   loadingSubcategories: false,
-  selectedSubcategoryId: '1',
-  setSelectedSubcategoryId: vi.fn<(id: string) => void>(),
+  selectedSubcategoryId: 1,
+  setSelectedSubcategoryId: vi.fn<(id: number) => void>(),
   creating: false,
   creationError: null,
-  createVerb: vi
-    .fn<(verbData: VerbData) => Promise<boolean>>()
-    .mockResolvedValue(true),
+  createVerbVocabulary: vi
+    .fn<(verbData: CreateVerbVocabulary[]) => Promise<number[]>>()
+    .mockResolvedValue([1, 2, 3]),
 };
 
 // Create the mock with its implementation defined here

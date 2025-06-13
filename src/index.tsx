@@ -15,7 +15,17 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 
 // Move QueryClient outside BrowserRouter and Providers
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+      gcTime: Infinity,
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+    },
+  },
+});
 
 root.render(
   <React.StrictMode>

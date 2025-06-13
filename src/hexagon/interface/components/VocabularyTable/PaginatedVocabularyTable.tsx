@@ -1,4 +1,4 @@
-import type { VocabularyPaginationState } from '../../../application/useCases/useNonVerbCreation';
+import type { VocabularyPaginationState } from '@application/useCases/types';
 import React from 'react';
 import DeleteVocabularyRecord from './DeleteVocabularyRecord';
 import './PaginatedVocabularyTable.scss';
@@ -95,7 +95,7 @@ export function PaginatedVocabularyTable({
               <tr key={item.id}>
                 <td>{item.word}</td>
                 <td>{item.descriptor}</td>
-                <td>{item.spellings?.map((s) => s.value).join(', ') || ''}</td>
+                <td>{item.spellings?.join(', ') || ''}</td>
                 <td>{item.notes || ''}</td>
                 <td>
                   <DeleteVocabularyRecord recordId={item.id.toString()} />

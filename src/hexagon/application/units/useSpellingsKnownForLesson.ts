@@ -1,33 +1,31 @@
 import type { useSpellingsKnownForLessonResult } from './useSpellingsKnownForLesson.types';
-import { useFrequensayAdapter } from '@application/adapters/frequensayAdapter';
 import { useQuery } from '@tanstack/react-query';
+import { useCourseAdapter } from '../adapters/courseAdapter';
+
 export function useSpellingsKnownForLesson({
-  courseName,
+  courseId,
   lessonNumber,
   isFrequensayEnabled,
 }: {
-  courseName?: string;
+  courseId?: number;
   lessonNumber?: number;
   isFrequensayEnabled?: boolean;
 }): useSpellingsKnownForLessonResult {
-  const adapter = useFrequensayAdapter();
+  const adapter = useCourseAdapter();
 
   const {
     data = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['spellingsKnownForLesson', courseName, lessonNumber],
+    queryKey: ['spellingsKnownForLesson', courseId, lessonNumber],
     queryFn: () => {
-      if (!courseName || !lessonNumber) {
+      if (!courseId || !lessonNumber) {
         throw new Error('Missing required parameters');
       }
-      return adapter.getSpellingsKnownForLesson({
-        courseName,
-        lessonNumber: lessonNumber.toString(),
-      });
+      return adapter.getSpellingsKnownForLesson(courseId, lessonNumber);
     },
-    enabled: !!courseName && !!lessonNumber && isFrequensayEnabled,
+    enabled: !!courseId && !!lessonNumber && isFrequensayEnabled,
     staleTime: Infinity,
   });
 
