@@ -52,11 +52,14 @@ export function createVocabularyInfrastructure(
           subcategoryId.toString(),
         ),
         {
-          params: { query: { page: page.toString(), limit: limit.toString() } },
+          params: {
+            page: page.toString(),
+            limit: limit.toString(),
+          },
         },
       );
 
-      return response.items;
+      return response;
     },
 
     getVocabularyCount: async (): Promise<number> => {

@@ -53,6 +53,16 @@ export function createCourseInfrastructure(
       return response;
     },
 
+    getLessonsByVocabulary: async (vocabId: number): Promise<Lesson[]> => {
+      const response = await httpClient.get<Lesson[]>(
+        coursesEndpoints.getLessonsByVocabularyEndpoint.path.replace(
+          ':vocabId',
+          vocabId.toString(),
+        ),
+      );
+      return response;
+    },
+
     getSpellingsKnownForLesson: async (
       courseId: number,
       lessonNumber: number,

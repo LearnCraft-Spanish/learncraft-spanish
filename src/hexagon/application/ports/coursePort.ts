@@ -33,4 +33,9 @@ export interface CoursePort {
     courseId: number,
     lessonNumber: number,
   ) => Promise<string[]>;
+
+  /**
+   * Get the lessons that taught a vocabulary
+   */
+  getLessonsByVocabulary: (vocabId: number) => Promise<Lesson[]>;
 }
