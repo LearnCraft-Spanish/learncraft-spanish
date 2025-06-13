@@ -69,7 +69,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     numericSubcategoryId,
     page,
     pageSize,
-    numericSubcategoryId > 0, // Only enable queries when we have a valid subcategory ID
+    // numericSubcategoryId > 0, // Only enable queries when we have a valid subcategory ID
   );
 
   // Create pagination state object only if a subcategory is selected
