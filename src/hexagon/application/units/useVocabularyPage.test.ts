@@ -24,7 +24,7 @@ describe('useVocabularyPage', () => {
     });
 
     // Act
-    const { result } = renderHook(() => useVocabularyPage(1, 1, 10, true), {
+    const { result } = renderHook(() => useVocabularyPage(1, 1, 10), {
       wrapper: TestQueryClientProvider,
     });
 
@@ -48,7 +48,7 @@ describe('useVocabularyPage', () => {
 
   it('should handle disabled state', async () => {
     // Act
-    const { result } = renderHook(() => useVocabularyPage(0, 1, 10, false), {
+    const { result } = renderHook(() => useVocabularyPage(0, 1, 10), {
       wrapper: TestQueryClientProvider,
     });
 
@@ -68,7 +68,7 @@ describe('useVocabularyPage', () => {
     });
 
     // Act
-    const { result } = renderHook(() => useVocabularyPage(1, 1, 10, true), {
+    const { result } = renderHook(() => useVocabularyPage(1, 1, 10), {
       wrapper: TestQueryClientProvider,
     });
 
