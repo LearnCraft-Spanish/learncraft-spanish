@@ -143,4 +143,13 @@
       margin: 0;
     }
   }
+
+  &__no-selection {
+    padding: 2rem;
+    text-align: center;
+    background-color: #f7fafc;
+    border: 1px solid var(--dark);
+    color: #666;
+    font-style: italic;
+  }
 }
