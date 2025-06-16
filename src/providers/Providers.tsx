@@ -1,6 +1,6 @@
 // Providers.tsx
 import type { ReactNode } from 'react';
-import MainProvider from '@application/coordinators/providers/MainProvider'; // Hexagon Providers
+import HexagonProviders from '@application/coordinators/providers/MainProvider'; // Hexagon Providers
 import { Auth0Provider } from '@auth0/auth0-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -35,7 +35,7 @@ function Providers({ children }: ProvidersProps) {
     >
       <ContextualMenuProvider>
         <ModalProvider>
-          <MainProvider>{children}</MainProvider>
+          <HexagonProviders>{children}</HexagonProviders>
         </ModalProvider>
       </ContextualMenuProvider>
     </Auth0Provider>

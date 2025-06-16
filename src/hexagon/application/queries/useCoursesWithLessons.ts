@@ -7,5 +7,6 @@ export function useCoursesWithLessons() {
     queryKey: ['coursesWithLessons'],
     queryFn: () => adapter.getCoursesWithLessons(),
     staleTime: Infinity,
+    enabled: true,
   });
 }

@@ -1,6 +1,6 @@
 import type { useSpellingsKnownForLessonResult } from './useSpellingsKnownForLesson.types';
+import { useSpellingAdapter } from '@application/adapters/spellingAdapter';
 import { useQuery } from '@tanstack/react-query';
-import { useCourseAdapter } from '../adapters/courseAdapter';
 
 export function useSpellingsKnownForLesson({
   courseId,
@@ -11,7 +11,7 @@ export function useSpellingsKnownForLesson({
   lessonNumber?: number;
   isFrequensayEnabled?: boolean;
 }): useSpellingsKnownForLessonResult {
-  const adapter = useCourseAdapter();
+  const adapter = useSpellingAdapter();
 
   const {
     data = [],

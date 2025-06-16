@@ -1,6 +1,4 @@
-import type { Program } from 'src/types/interfaceDefinitions';
-// MOVE THIS INTO HEXAGON
-import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
+import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 
 export default function SelectCourse({
   value,
@@ -9,7 +7,7 @@ export default function SelectCourse({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const { programTableQuery } = useProgramTable();
+  const { data: coursesWithLessons } = useCoursesWithLessons();
   return (
     <label htmlFor="courseList" className="menuRow" id="courseRow">
       <p>Course:</p>
@@ -23,12 +21,11 @@ export default function SelectCourse({
         <option key={0} value={0}>
           –Choose Course–
         </option>
-        {programTableQuery.isSuccess &&
-          programTableQuery.data?.map((item: Program) => (
-            <option key={item.recordId} value={item.recordId}>
-              {item.name}
-            </option>
-          ))}
+        {coursesWithLessons?.map((course) => (
+          <option key={course.id} value={course.id}>
+            {course.name}
+          </option>
+        ))}
       </select>
     </label>
   );
