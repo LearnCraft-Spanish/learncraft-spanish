@@ -1,12 +1,17 @@
 import type { VocabTag } from 'src/types/interfaceDefinitions';
 
+import ToggleSwitch from '@interface/components/general/ToggleSwitch';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 import SelectedTags from '../VocabTagFilter/SelectedTags';
+
 import TagFilter from '../VocabTagFilter/TagFilter';
 
 export default function FlashcardFinderFilter({
   includeSpanglish,
   toggleIncludeSpanglish,
+  audioOnly,
+  toggleAudioOnly,
+
   tagSearchTerm,
   updateTagSearchTerm,
   suggestedTags,
@@ -19,6 +24,9 @@ export default function FlashcardFinderFilter({
 }: {
   includeSpanglish: boolean;
   toggleIncludeSpanglish: () => void;
+  audioOnly: boolean;
+  toggleAudioOnly: () => void;
+
   tagSearchTerm: string;
   updateTagSearchTerm: (target: EventTarget & HTMLInputElement) => void;
   suggestedTags: VocabTag[];
@@ -35,28 +43,20 @@ export default function FlashcardFinderFilter({
         <div className="FromToLessonSelectorWrapper">
           <LessonRangeSelector />
         </div>
-        <div className="removeSpanglishBox">
-          <p>Include Spanglish: </p>
-          <label
-            htmlFor="removeSpanglish"
-            className="switch"
-            aria-label="noSpanglish"
-          >
-            <input
-              type="checkbox"
-              name="removeSpanglish"
-              id="removeSpanglish"
-              checked={includeSpanglish}
-              style={
-                includeSpanglish
-                  ? { backgroundColor: 'darkgreen' }
-                  : { backgroundColor: 'darkred' }
-              }
-              onChange={toggleIncludeSpanglish}
-            />
-            <span className="slider round"></span>
-          </label>
-        </div>
+        <ToggleSwitch
+          id="removeSpanglish"
+          ariaLabel="noSpanglish"
+          label="Include Spanglish: "
+          checked={includeSpanglish}
+          onChange={toggleIncludeSpanglish}
+        />
+        <ToggleSwitch
+          id="audioOnly"
+          ariaLabel="audioOnly"
+          label="Audio FlashcardsOnly: "
+          checked={audioOnly}
+          onChange={toggleAudioOnly}
+        />
       </div>
       <div className="filterBox search">
         <div className="searchFilter">
