@@ -7,35 +7,40 @@ import type {
 
 export interface CoursePort {
   /**
-   * Get the courses
-   */
-  getCourses: () => Promise<Course[]>;
+  //  * Get the courses
+  //  */
+  // getCourses: () => Promise<Course[]>;
 
   /**
-   * Get the course by id
+   * Get the courses with lessons
    */
-  getCourseById: (id: number) => Promise<CourseWithLessons | null>;
+  getCoursesWithLessons: () => Promise<CourseWithLessons[]>;
 
-  /**
-   * Get the lessons
-   */
-  getLessons: () => Promise<Lesson[]>;
+  // /**
+  //  * Get the course by id
+  //  */
+  // getCourseById: (id: number) => Promise<CourseWithLessons | null>;
 
-  /**
-   * Get the lesson by id
-   */
-  getLessonById: (id: number) => Promise<LessonWithVocab | null>;
+  // /**
+  //  * Get the lessons
+  //  */
+  // getLessons: () => Promise<Lesson[]>;
 
-  /**
-   * Get the spellings known for a lesson
-   */
-  getSpellingsKnownForLesson: (
-    courseId: number,
-    lessonNumber: number,
-  ) => Promise<string[]>;
+  // /**
+  //  * Get the lesson by id
+  //  */
+  // getLessonById: (id: number) => Promise<LessonWithVocab | null>;
 
-  /**
-   * Get the lessons that taught a vocabulary
-   */
-  getLessonsByVocabulary: (vocabId: number) => Promise<Lesson[]>;
+  // /**
+  //  * Get the spellings known for a lesson
+  //  */
+  // getSpellingsKnownForLesson: (
+  //   courseId: number,
+  //   lessonNumber: number,
+  // ) => Promise<string[]>;
+
+  // /**
+  //  * Get the lessons that taught a vocabulary
+  //  */
+  // getLessonsByVocabulary: (vocabId: number) => Promise<Lesson[]>;
 }
