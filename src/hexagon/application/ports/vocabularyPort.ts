@@ -1,8 +1,7 @@
 import type {
-  CreateNonVerbVocabulary,
-  CreateVerb,
-  GetTotalCountResponse,
+  CreateVocabulary,
   Vocabulary,
+  VocabularyAbbreviation,
   VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
 
@@ -14,78 +13,44 @@ export interface VocabularyPort {
   /**
    * Get all vocabulary items
    */
-  getVocabulary: (options?: VocabularyQueryOptions) => Promise<Vocabulary[]>;
+  getVocabulary: () => Promise<VocabularyAbbreviation[]>;
+
+  /**
+   * Get all vocabulary items by subcategory
+   */
+  getVocabularyBySubcategory: (
+    subcategoryId: number,
+    page: number,
+    limit: number,
+  ) => Promise<Vocabulary[]>;
 
   /**
    * Get a vocabulary item by ID
    */
-  getVocabularyById: (id: string) => Promise<Vocabulary | null>;
+  getVocabularyById: (id: number) => Promise<Vocabulary | null>;
 
   /**
    * Get the total count of vocabulary items
    */
-  getVocabularyCount: (
-    subcategoryId?: number,
-  ) => Promise<GetTotalCountResponse>;
+  getVocabularyCount: () => Promise<number>;
 
   /**
-   * Create a new verb vocabulary item
+   * Get the total count of vocabulary items by subcategory
    */
-  createVerb: (command: CreateVerb) => Promise<Vocabulary>;
+  getVocabularyCountBySubcategory: (subcategoryId: number) => Promise<number>;
 
   /**
-   * Create a new non-verb vocabulary item
+   * Create a new vocabulary item
    */
-  createNonVerbVocabulary: (
-    command: CreateNonVerbVocabulary,
-  ) => Promise<Vocabulary>;
-
-  /**
-   * Create multiple non-verb vocabulary items in a batch
-   */
-  createVocabularyBatch: (
-    commands: CreateNonVerbVocabulary[],
-  ) => Promise<Vocabulary[]>;
+  createVocabulary: (command: CreateVocabulary[]) => Promise<number[]>;
 
   /**
    * Delete a vocabulary item
    */
-  deleteVocabulary: (id: string) => Promise<number>;
+  deleteVocabulary: (id: number[]) => Promise<number>;
 
   /**
    * Get all records associated with a vocabulary record
    */
-  getAllRecordsAssociatedWithVocabularyRecord: (
-    id: string | undefined,
-  ) => Promise<VocabularyRelatedRecords>;
-
-  /**
-   * Search vocabulary items based on criteria
-   */
-  searchVocabulary: (query: string) => Promise<Vocabulary[]>;
-}
-
-/**
- * Options for filtering vocabulary queries
- */
-export interface VocabularyQueryOptions {
-  /**
-   * Filter by verb/non-verb type
-   */
-  isVerb?: boolean;
-
-  /**
-   * Filter by subcategory ID
-   */
-  subcategoryId?: number;
-
-  /**
-   * Limit the number of results
-   */
-  limit?: number;
-
-  /**
-   * Skip the first n results (for pagination)
-   */
-  offset?: number;
+  getRelatedRecords: (id: number) => Promise<VocabularyRelatedRecords>;
 }

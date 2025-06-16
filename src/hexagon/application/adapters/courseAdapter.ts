@@ -1,7 +1,7 @@
 import type { CoursePort } from '@application/ports/coursePort';
-import { createCourseInfrastructure } from '@infrastructure/courseInfastructure';
-import { config } from '../../config';
-import { useAuthAdapter } from './authAdapter';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { createCourseInfrastructure } from '@infrastructure/vocabulary/courseInfrastructure';
+import { config } from 'src/hexagon/config';
 
 export function useCourseAdapter(): CoursePort {
   const apiUrl = config.backendDomain;

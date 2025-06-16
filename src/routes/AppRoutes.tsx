@@ -1,5 +1,7 @@
+import FrequensayPage from '@interface/pages/FrequensayPage';
+import GetHelpPage from '@interface/pages/GetHelpPage';
+import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
 import { Route } from 'react-router-dom';
-
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
 import CoachingDashboard from 'src/components/CoachingDashboard';
 import {
@@ -16,8 +18,6 @@ import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import { useUserData } from 'src/hooks/UserData/useUserData';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
-import FrequensayPage from '../hexagon/interface/pages/FrequensayPage';
-import { VocabularyCreatorPage } from '../hexagon/interface/pages/VocabularyCreatorPage';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
 import FlashcardManager from '../sections/FlashcardManager';
@@ -25,6 +25,7 @@ import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import SentryRoutes from './SentryRoutes';
+
 export default function AppRoutes() {
   const userDataQuery = useUserData();
 
@@ -79,6 +80,12 @@ export default function AppRoutes() {
             userDataQuery.data?.roles.adminRole === 'admin') && (
             <FrequensayPage />
           )
+        }
+      />
+      <Route
+        path="/get-help"
+        element={
+          userDataQuery.data?.roles.adminRole === 'admin' && <GetHelpPage />
         }
       />
       <Route

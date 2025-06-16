@@ -20,7 +20,7 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
     setSelectedSubcategoryId,
     creating,
     creationError,
-    createVerb,
+    createVerbVocabulary,
   } = useVerbCreation();
 
   const handleInfinitiveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +40,7 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
   };
 
   const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedSubcategoryId(e.target.value);
+    setSelectedSubcategoryId(Number(e.target.value));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -52,13 +52,17 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
     }
 
     // Create and submit the verb using CQRS command
-    createVerb({
-      infinitive,
-      translation,
-      usage,
-      isRegular,
-      subcategoryId: selectedSubcategoryId,
-    }).then((success) => {
+    createVerbVocabulary([
+      {
+        word: infinitive,
+        descriptor: translation,
+        subcategoryId: selectedSubcategoryId,
+        verbId: 0,
+        conjugationTagIds: [],
+        frequency: 0,
+        notes: usage,
+      },
+    ]).then((success) => {
       if (success) {
         onBack();
       }
@@ -68,7 +72,7 @@ export const VerbCreator: React.FC<VerbCreatorProps> = ({ onBack }) => {
   const isSubmitEnabled =
     infinitive.trim() !== '' &&
     translation.trim() !== '' &&
-    selectedSubcategoryId !== '';
+    selectedSubcategoryId !== 0;
 
   return (
     <div className="verb-creator">
