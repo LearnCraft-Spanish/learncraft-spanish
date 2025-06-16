@@ -16,6 +16,7 @@ import {
 } from 'src/components/FormComponents';
 
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
+
 import * as helpers from 'src/hooks/CoachingData/helperFunctions';
 import {
   useActiveMemberships,
@@ -28,6 +29,7 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const sessionTypeOptions = [
   '1MC',
@@ -188,6 +190,11 @@ export function GroupSessionView({
 
   // Edit or Update State
   const setInitialState = useCallback(() => {
+    const defaultCoachForNewRecord =
+      getLoggedInCoach(
+        userDataQuery.data?.emailAddress || '',
+        coachListQuery.data || [],
+      )?.user.email || '';
     setSessionType(newRecord ? '' : groupSession.sessionType);
     const formattedDate = groupSession.date
       ? typeof groupSession.date === 'string'
@@ -195,7 +202,7 @@ export function GroupSessionView({
         : new Date(groupSession.date).toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0];
     setDate(formattedDate);
-    setCoach(newRecord ? '' : groupSession.coach.email);
+    setCoach(newRecord ? defaultCoachForNewRecord : groupSession.coach.email);
     setTopic(newRecord ? '' : groupSession.topic);
     setComments(newRecord ? '' : groupSession.comments);
     setCallDocument(newRecord ? '' : groupSession.callDocument);
