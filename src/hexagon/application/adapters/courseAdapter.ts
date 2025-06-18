@@ -1,6 +1,6 @@
 import type { CoursePort } from '@application/ports/coursePort';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { createCourseInfrastructure } from '@infrastructure/vocabulary/courseInfrastructure';
+import { createCourseInfrastructure } from '@infrastructure/courseInfrastructure';
 import { config } from 'src/hexagon/config';
 
 export function useCourseAdapter(): CoursePort {

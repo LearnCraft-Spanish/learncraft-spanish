@@ -1,5 +1,4 @@
-import type { Lesson } from 'src/types/interfaceDefinitions';
-import { getLessonNumber } from './helpers';
+import type { Lesson } from '@LearnCraft-Spanish/shared';
 
 export default function SelectLesson({
   value,
@@ -32,13 +31,9 @@ export default function SelectLesson({
 }
 
 function makeLessonOption(lesson: Lesson) {
-  const lessonNumber = getLessonNumber(lesson);
-  if (!lessonNumber) {
-    return null;
-  }
   return (
-    <option key={lessonNumber} value={lesson.recordId.toString()}>
-      {`Lesson ${lessonNumber}`}
+    <option key={lesson.lessonNumber} value={lesson.id.toString()}>
+      {`Lesson ${lesson.lessonNumber}`}
     </option>
   );
 }

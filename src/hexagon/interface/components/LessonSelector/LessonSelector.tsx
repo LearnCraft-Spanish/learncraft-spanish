@@ -1,25 +1,25 @@
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 // MOVE THIS INTO HEXAGON
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import SelectCourse from './SelectCourse';
 import SelectLesson from './SelectLesson';
 import './LessonSelector.css';
 
 export default function LessonSelector(): React.JSX.Element {
-  const { selectedProgram, selectedToLesson, setProgram, setToLesson } =
-    useSelectedLesson();
+  const { course, toLesson, updateCourse, updateToLesson } =
+    useSelectedCourseAndLessons();
 
   return (
     <div className="FTLS">
       <SelectCourse
-        value={selectedProgram?.recordId.toString() ?? '0'}
-        onChange={(value: string) => setProgram(value)}
+        value={course?.id.toString() ?? '0'}
+        onChange={(value: string) => updateCourse(Number.parseInt(value))}
       />
-      {selectedProgram?.lessons && (
+      {course?.lessons && (
         <SelectLesson
-          value={selectedToLesson?.recordId.toString() ?? '0'}
-          onChange={(value: string) => setToLesson(value)}
+          value={toLesson?.id.toString() ?? '0'}
+          onChange={(value: string) => updateToLesson(Number.parseInt(value))}
           label="Lesson"
-          lessons={selectedProgram.lessons}
+          lessons={course.lessons}
         />
       )}
     </div>
