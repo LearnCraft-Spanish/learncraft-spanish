@@ -1,4 +1,5 @@
-import { SelectedCourseAndLessonsProvider } from './SelectedCourseAndLessonsProvider';
+import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
+import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 
 export default function MainProvider({
   children,
@@ -6,8 +7,10 @@ export default function MainProvider({
   children: React.ReactNode;
 }) {
   return (
-    <SelectedCourseAndLessonsProvider>
-      {children}
-    </SelectedCourseAndLessonsProvider>
+    <ActiveStudentProvider>
+      <SelectedCourseAndLessonsProvider>
+        {children}
+      </SelectedCourseAndLessonsProvider>
+    </ActiveStudentProvider>
   );
 }
