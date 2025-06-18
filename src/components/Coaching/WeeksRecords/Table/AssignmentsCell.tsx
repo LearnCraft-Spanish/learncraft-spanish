@@ -22,6 +22,7 @@ import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import CustomStudentSelector from '../../general/CustomStudentSelector';
 import getDateRange from '../../general/functions/dateRange';
+import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 import getWeekEnds from '../../general/functions/getWeekEnds';
 const assignmentTypes = [
   'Pronunciation',
@@ -337,6 +338,7 @@ export function NewAssignmentView({
   const weekEnds = useMemo(() => getWeekEnds(weekStarts), [weekStarts]);
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
   const { weeksQuery } = useWeeks(weekStarts, weekEnds);
+  const { coachListQuery } = useCoaching();
 
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
@@ -348,8 +350,17 @@ export function NewAssignmentView({
   }
   const [student, setStudent] = useState<StudentObj>();
 
+  const defaultHomeworkCorrector = useMemo(() => {
+    return (
+      getLoggedInCoach(
+        userDataQuery.data?.emailAddress || '',
+        coachListQuery.data || [],
+      )?.user.email || ''
+    );
+  }, [userDataQuery.data?.emailAddress, coachListQuery.data]);
+
   const [homeworkCorrector, setHomeworkCorrector] = useState(
-    userDataQuery.data?.emailAddress || '',
+    defaultHomeworkCorrector,
   );
   const [assignmentType, setAssignmentType] = useState('');
   const [rating, setRating] = useState('');
