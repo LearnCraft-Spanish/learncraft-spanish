@@ -3,7 +3,10 @@ import type { CoursePort } from '@application/ports/coursePort';
 import type { CourseWithLessons, Lesson } from '@LearnCraft-Spanish/shared';
 
 import { createAuthenticatedHttpClient } from '@infrastructure/http/client';
-import { coursesEndpoints } from '@LearnCraft-Spanish/shared';
+import {
+  getCoursesWithLessonsEndpoint,
+  getLessonsByVocabularyEndpoint,
+} from '@LearnCraft-Spanish/shared';
 
 export function createCourseInfrastructure(
   apiUrl: string,
@@ -14,14 +17,14 @@ export function createCourseInfrastructure(
   return {
     getCoursesWithLessons: async (): Promise<CourseWithLessons[]> => {
       const response = await httpClient.get<CourseWithLessons[]>(
-        coursesEndpoints.getCoursesWithLessonsEndpoint.path,
+        getCoursesWithLessonsEndpoint.path,
       );
       return response;
     },
 
     getLessonsByVocabulary: async (vocabId: number): Promise<Lesson[]> => {
       const response = await httpClient.get<Lesson[]>(
-        coursesEndpoints.getLessonsByVocabularyEndpoint.path.replace(
+        getLessonsByVocabularyEndpoint.path.replace(
           ':vocabularyId',
           vocabId.toString(),
         ),
