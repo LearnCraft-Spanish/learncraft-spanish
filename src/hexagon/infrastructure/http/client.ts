@@ -22,6 +22,44 @@ export interface HttpClient {
   delete: <T>(url: string, config?: AxiosRequestConfig) => Promise<T>;
 }
 
+// Helper function to create a client from an Axios instance
+function createClientFromAxiosInstance(client: AxiosInstance): HttpClient {
+  return {
+    get: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+      const response = await client.get<T>(url, config);
+      return response.data;
+    },
+    post: async <T>(
+      url: string,
+      data?: unknown,
+      config?: AxiosRequestConfig,
+    ): Promise<T> => {
+      const response = await client.post<T>(url, data, config);
+      return response.data;
+    },
+    put: async <T>(
+      url: string,
+      data?: unknown,
+      config?: AxiosRequestConfig,
+    ): Promise<T> => {
+      const response = await client.put<T>(url, data, config);
+      return response.data;
+    },
+    patch: async <T>(
+      url: string,
+      data?: unknown,
+      config?: AxiosRequestConfig,
+    ): Promise<T> => {
+      const response = await client.patch<T>(url, data, config);
+      return response.data;
+    },
+    delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+      const response = await client.delete<T>(url, config);
+      return response.data;
+    },
+  };
+}
+
 /**
  * Creates a standard HTTP client.
  * For unauthenticated requests.
@@ -66,42 +104,4 @@ export function createAuthenticatedHttpClient(
   });
 
   return createClientFromAxiosInstance(client);
-}
-
-// Helper function to create a client from an Axios instance
-function createClientFromAxiosInstance(client: AxiosInstance): HttpClient {
-  return {
-    get: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
-      const response = await client.get<T>(url, config);
-      return response.data;
-    },
-    post: async <T>(
-      url: string,
-      data?: unknown,
-      config?: AxiosRequestConfig,
-    ): Promise<T> => {
-      const response = await client.post<T>(url, data, config);
-      return response.data;
-    },
-    put: async <T>(
-      url: string,
-      data?: unknown,
-      config?: AxiosRequestConfig,
-    ): Promise<T> => {
-      const response = await client.put<T>(url, data, config);
-      return response.data;
-    },
-    patch: async <T>(
-      url: string,
-      data?: unknown,
-      config?: AxiosRequestConfig,
-    ): Promise<T> => {
-      const response = await client.patch<T>(url, data, config);
-      return response.data;
-    },
-    delete: async <T>(url: string, config?: AxiosRequestConfig): Promise<T> => {
-      const response = await client.delete<T>(url, config);
-      return response.data;
-    },
-  };
 }
