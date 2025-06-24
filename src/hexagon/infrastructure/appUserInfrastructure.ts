@@ -4,7 +4,7 @@ import type { AppUserPort } from '../application/ports/appUserPort';
 import type { AuthPort } from '../application/ports/authPort';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
-  getAllAppUsersEndpoint,
+  getAllAppStudentsEndpoint,
   getAppUserEndpoint,
 } from '@LearnCraft-Spanish/shared';
 
@@ -29,8 +29,8 @@ export function createAppUserInfrastructure(
 
     getAllAppStudents: async (): Promise<AppUserAbbreviation[]> => {
       const userList = await httpClient.get<AppUserAbbreviation[]>(
-        getAllAppUsersEndpoint.path,
-        getAllAppUsersEndpoint.requiredScopes,
+        getAllAppStudentsEndpoint.path,
+        getAllAppStudentsEndpoint.requiredScopes,
       );
       return userList;
     },
