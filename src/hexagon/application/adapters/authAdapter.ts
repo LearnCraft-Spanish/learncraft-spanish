@@ -10,6 +10,18 @@ export function useAuthAdapter(): AuthPort {
   const auth = useAuthInfrastructure();
 
   return {
-    ...auth,
+    getAccessToken: async (scopes: string[]) => {
+      return auth.getAccessToken(scopes);
+    },
+
+    isAuthenticated: () => {
+      return auth.isAuthenticated || false;
+    },
+
+    getUserInfo: async () => {
+      // The actual useAuth hook doesn't expose user info directly
+      // We could fetch it separately if needed
+      return null;
+    },
   };
 }
