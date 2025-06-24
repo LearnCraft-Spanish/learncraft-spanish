@@ -21,18 +21,20 @@ export function useAuthInfrastructure(): AuthPort {
   }, [user, audience]);
 
   return {
-    getAccessToken: async () => {
+    getAccessToken: async (scopes: string[] | null) => {
       try {
-        // Only attempt to get token if user is authenticated
         if (!isAuthenticated) {
           return undefined;
         }
 
+        const allScopes = [
+          'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
+        ];
+
         const accessToken = await getAccessTokenSilently({
           authorizationParams: {
             audience,
-            scope:
-              'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
+            scope: scopes ? scopes.join(' ') : allScopes.join(' '),
           },
           cacheMode: 'off',
         });

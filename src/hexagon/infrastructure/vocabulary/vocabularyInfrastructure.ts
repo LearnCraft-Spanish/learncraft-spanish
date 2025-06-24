@@ -8,7 +8,7 @@ import type {
   VocabularyAbbreviation,
   VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
-import { createAuthenticatedHttpClient } from '@infrastructure/http/client';
+import { createHttpClient } from '@infrastructure/http/client';
 import { VocabularyEndpoints } from '@LearnCraft-Spanish/shared';
 
 /**
@@ -28,12 +28,13 @@ export function createVocabularyInfrastructure(
   auth: AuthPort,
 ): VocabularyPort {
   // Create an authenticated HTTP client
-  const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
+  const httpClient = createHttpClient(apiUrl, auth);
 
   return {
     getVocabulary: async (): Promise<VocabularyAbbreviation[]> => {
       const response = await httpClient.get<ListVocabularyResponse>(
         VocabularyEndpoints.listAll.path,
+        VocabularyEndpoints.listAll.requiredScopes,
       );
 
       // The API returns a paginated response, but our port expects an array
@@ -51,6 +52,7 @@ export function createVocabularyInfrastructure(
           ':subcategoryId',
           subcategoryId.toString(),
         ),
+        VocabularyEndpoints.listBySubcategory.requiredScopes,
         {
           params: {
             page: page.toString(),
@@ -64,7 +66,10 @@ export function createVocabularyInfrastructure(
 
     getVocabularyCount: async (): Promise<number> => {
       // Use the list endpoint with the count parameter
-      return httpClient.get<number>(VocabularyEndpoints.getTotalCount.path);
+      return httpClient.get<number>(
+        VocabularyEndpoints.getTotalCount.path,
+        VocabularyEndpoints.getTotalCount.requiredScopes,
+      );
     },
 
     getVocabularyCountBySubcategory: async (
@@ -75,6 +80,7 @@ export function createVocabularyInfrastructure(
           ':subcategoryId',
           subcategoryId.toString(),
         ),
+        VocabularyEndpoints.getCountBySubcategory.requiredScopes,
       );
     },
 
@@ -83,7 +89,10 @@ export function createVocabularyInfrastructure(
         ':id',
         id.toString(),
       );
-      return httpClient.get<Vocabulary>(path);
+      return httpClient.get<Vocabulary>(
+        path,
+        VocabularyEndpoints.getById.requiredScopes,
+      );
     },
 
     createVocabulary: async (
@@ -91,6 +100,7 @@ export function createVocabularyInfrastructure(
     ): Promise<number[]> => {
       return httpClient.post<number[]>(
         VocabularyEndpoints.create.path,
+        VocabularyEndpoints.create.requiredScopes,
         command,
       );
     },
@@ -98,6 +108,7 @@ export function createVocabularyInfrastructure(
     deleteVocabulary: async (ids: number[]): Promise<number> => {
       const result = await httpClient.delete<number>(
         VocabularyEndpoints.delete.path,
+        VocabularyEndpoints.delete.requiredScopes,
         {
           data: ids,
         },
@@ -113,7 +124,10 @@ export function createVocabularyInfrastructure(
         ':id',
         id.toString(),
       );
-      return httpClient.get<VocabularyRelatedRecords>(path);
+      return httpClient.get<VocabularyRelatedRecords>(
+        path,
+        VocabularyEndpoints.getAssociatedRecords.requiredScopes,
+      );
     },
   };
 }

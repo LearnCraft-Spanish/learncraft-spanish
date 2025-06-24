@@ -5,30 +5,30 @@ import axios from 'axios';
 export interface HttpClient {
   get: <T>(
     url: string,
-    scopes: string[],
+    scopes: string[] | null,
     config?: AxiosRequestConfig,
   ) => Promise<T>;
   post: <T>(
     url: string,
-    scopes: string[],
+    scopes: string[] | null,
     data?: unknown,
     config?: AxiosRequestConfig,
   ) => Promise<T>;
   put: <T>(
     url: string,
-    scopes: string[],
+    scopes: string[] | null,
     data?: unknown,
     config?: AxiosRequestConfig,
   ) => Promise<T>;
   patch: <T>(
     url: string,
-    scopes: string[],
+    scopes: string[] | null,
     data?: unknown,
     config?: AxiosRequestConfig,
   ) => Promise<T>;
   delete: <T>(
     url: string,
-    scopes: string[],
+    scopes: string[] | null,
     config?: AxiosRequestConfig,
   ) => Promise<T>;
 }
@@ -41,7 +41,7 @@ function createClientFromAxiosInstance(
   return {
     get: async <T>(
       url: string,
-      scopes: string[],
+      scopes: string[] | null,
       config?: AxiosRequestConfig,
     ): Promise<T> => {
       const token = await authPort.getAccessToken(scopes);
@@ -53,7 +53,7 @@ function createClientFromAxiosInstance(
     },
     post: async <T>(
       url: string,
-      scopes: string[],
+      scopes: string[] | null,
       data?: unknown,
       config?: AxiosRequestConfig,
     ): Promise<T> => {
@@ -66,7 +66,7 @@ function createClientFromAxiosInstance(
     },
     put: async <T>(
       url: string,
-      scopes: string[],
+      scopes: string[] | null,
       data?: unknown,
       config?: AxiosRequestConfig,
     ): Promise<T> => {
@@ -79,7 +79,7 @@ function createClientFromAxiosInstance(
     },
     patch: async <T>(
       url: string,
-      scopes: string[],
+      scopes: string[] | null,
       data?: unknown,
       config?: AxiosRequestConfig,
     ): Promise<T> => {
@@ -92,7 +92,7 @@ function createClientFromAxiosInstance(
     },
     delete: async <T>(
       url: string,
-      scopes: string[],
+      scopes: string[] | null,
       config?: AxiosRequestConfig,
     ): Promise<T> => {
       const token = await authPort.getAccessToken(scopes);
