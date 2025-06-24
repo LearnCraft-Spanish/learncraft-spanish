@@ -1,8 +1,8 @@
+import type { AuthPort } from '@application/ports/authPort';
+import type { SubcategoryPort } from '@application/ports/subcategoryPort';
 import type { Subcategory } from '@LearnCraft-Spanish/shared/src/domain/vocabulary/core-types';
-import type { AuthPort } from '../../application/ports/authPort';
-import type { SubcategoryPort } from '../../application/ports/subcategoryPort';
+import { createHttpClient } from '@infrastructure/http/client';
 import { SubcategoryEndpoints } from '@LearnCraft-Spanish/shared';
-import { createAuthenticatedHttpClient } from '../http/client';
 
 /**
  * Creates an implementation of the SubcategoryPort.
@@ -21,13 +21,14 @@ export function createSubcategoryInfrastructure(
   auth: AuthPort,
 ): SubcategoryPort {
   // Create an authenticated HTTP client
-  const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
+  const httpClient = createHttpClient(apiUrl, auth);
 
   return {
     getSubcategories: async (): Promise<Subcategory[]> => {
       // Always use the endpoint from the shared package contract
       const response = await httpClient.get<Subcategory[]>(
         SubcategoryEndpoints.list.path,
+        SubcategoryEndpoints.list.requiredScopes,
       );
 
       return Array.isArray(response) ? response : [];
@@ -36,7 +37,10 @@ export function createSubcategoryInfrastructure(
     getSubcategoryById: async (id: string): Promise<Subcategory | null> => {
       // Use the getById endpoint directly from the shared package
       const path = SubcategoryEndpoints.getById.path.replace(':id', id);
-      return httpClient.get<Subcategory>(path);
+      return httpClient.get<Subcategory>(
+        path,
+        SubcategoryEndpoints.getById.requiredScopes,
+      );
     },
   };
 }

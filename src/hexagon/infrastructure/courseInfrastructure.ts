@@ -2,29 +2,34 @@ import type { AuthPort } from '@application/ports/authPort';
 import type { CoursePort } from '@application/ports/coursePort';
 import type { CourseWithLessons, Lesson } from '@LearnCraft-Spanish/shared';
 
-import { createAuthenticatedHttpClient } from '@infrastructure/http/client';
-import { coursesEndpoints } from '@LearnCraft-Spanish/shared';
+import { createHttpClient } from '@infrastructure/http/client';
+import {
+  getCoursesWithLessonsEndpoint,
+  getLessonsByVocabularyEndpoint,
+} from '@LearnCraft-Spanish/shared';
 
 export function createCourseInfrastructure(
   apiUrl: string,
   auth: AuthPort,
 ): CoursePort {
-  const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
+  const httpClient = createHttpClient(apiUrl, auth);
 
   return {
     getCoursesWithLessons: async (): Promise<CourseWithLessons[]> => {
       const response = await httpClient.get<CourseWithLessons[]>(
-        coursesEndpoints.getCoursesWithLessonsEndpoint.path,
+        getCoursesWithLessonsEndpoint.path,
+        getCoursesWithLessonsEndpoint.requiredScopes,
       );
       return response;
     },
 
     getLessonsByVocabulary: async (vocabId: number): Promise<Lesson[]> => {
       const response = await httpClient.get<Lesson[]>(
-        coursesEndpoints.getLessonsByVocabularyEndpoint.path.replace(
+        getLessonsByVocabularyEndpoint.path.replace(
           ':vocabularyId',
           vocabId.toString(),
         ),
+        getLessonsByVocabularyEndpoint.requiredScopes,
       );
       return response;
     },
