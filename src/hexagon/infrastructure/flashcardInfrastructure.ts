@@ -4,15 +4,19 @@ import {
   getMyFlashcardsEndpoint,
   getStudentFlashcardsEndpoint,
 } from '@LearnCraft-Spanish/shared';
-import { createAuthenticatedHttpClient } from './http/client';
+import { createHttpClient } from './http/client';
 
-export function createFlashcardInfrastructure(apiUrl: string, auth: AuthPort) {
-  const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
+export function createFlashcardInfrastructure(
+  apiUrl: string,
+  authPort: AuthPort,
+) {
+  const httpClient = createHttpClient(apiUrl, authPort);
 
   return {
     getMyFlashcards: async (): Promise<Flashcard[]> => {
       const response = await httpClient.get<Flashcard[]>(
         getMyFlashcardsEndpoint.path,
+        getMyFlashcardsEndpoint.requiredScopes,
       );
       return response;
     },
@@ -23,6 +27,7 @@ export function createFlashcardInfrastructure(apiUrl: string, auth: AuthPort) {
           ':studentId',
           studentId.toString(),
         ),
+        getStudentFlashcardsEndpoint.requiredScopes,
       );
       return response;
     },
