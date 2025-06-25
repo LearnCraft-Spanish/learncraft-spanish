@@ -10,6 +10,7 @@ interface UseActiveStudentReturnType {
   appUser: AppUser | null;
   isLoading: boolean;
   error: Error | null;
+  isOwnUser: boolean;
   changeActiveStudent: (newEmail: string | null) => void;
 }
 
@@ -82,7 +83,7 @@ export function useActiveStudent(): UseActiveStudentReturnType {
   });
 
   const returnValue = useMemo(
-    () => ({
+    (): UseActiveStudentReturnType => ({
       appUser: appUser || null,
       isLoading,
       error,
