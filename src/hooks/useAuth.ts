@@ -11,18 +11,20 @@ export default function useAuth() {
     logout: auth0Logout,
   } = useAuth0();
 
-  const getAccessToken = async () => {
+  const getAccessToken = async (scopes?: string[]) => {
     try {
       // Only attempt to get token if user is authenticated
       if (!isAuthenticated) {
         return undefined;
       }
 
+      const allScopes = [
+        'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
+      ];
       const accessToken = await getAccessTokenSilently({
         authorizationParams: {
           audience,
-          scope:
-            'openid profile email read:current-student update:current-student read:all-students update:all-students update:course-data',
+          scope: scopes ? scopes.join(' ') : allScopes.join(' '),
         },
         cacheMode: 'off',
       });

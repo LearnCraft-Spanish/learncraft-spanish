@@ -8,8 +8,17 @@ import type {
   VocabularyAbbreviation,
   VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
-import { createAuthenticatedHttpClient } from '@infrastructure/http/client';
-import { VocabularyEndpoints } from '@LearnCraft-Spanish/shared';
+import { createHttpClient } from '@infrastructure/http/client';
+import {
+  createVocabularyEndpoint,
+  deleteVocabularyEndpoint,
+  getAllRecordsAssociatedWithVocabularyRecordEndpoint,
+  getTotalCountEndpoint,
+  getVocabularyByIdEndpoint,
+  getVocabularyBySubcategoryEndpoint,
+  getVocabularyCountBySubcategoryEndpoint,
+  listVocabularyEndpoint,
+} from '@LearnCraft-Spanish/shared';
 
 /**
  * Creates an implementation of the VocabularyPort.
@@ -28,12 +37,13 @@ export function createVocabularyInfrastructure(
   auth: AuthPort,
 ): VocabularyPort {
   // Create an authenticated HTTP client
-  const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
+  const httpClient = createHttpClient(apiUrl, auth);
 
   return {
     getVocabulary: async (): Promise<VocabularyAbbreviation[]> => {
       const response = await httpClient.get<ListVocabularyResponse>(
-        VocabularyEndpoints.listAll.path,
+        listVocabularyEndpoint.path,
+        listVocabularyEndpoint.requiredScopes,
       );
 
       // The API returns a paginated response, but our port expects an array
@@ -47,10 +57,11 @@ export function createVocabularyInfrastructure(
       limit: number,
     ): Promise<Vocabulary[]> => {
       const response = await httpClient.get<ListVocabularyFullResponse>(
-        VocabularyEndpoints.listBySubcategory.path.replace(
+        getVocabularyBySubcategoryEndpoint.path.replace(
           ':subcategoryId',
           subcategoryId.toString(),
         ),
+        getVocabularyBySubcategoryEndpoint.requiredScopes,
         {
           params: {
             page: page.toString(),
@@ -64,40 +75,46 @@ export function createVocabularyInfrastructure(
 
     getVocabularyCount: async (): Promise<number> => {
       // Use the list endpoint with the count parameter
-      return httpClient.get<number>(VocabularyEndpoints.getTotalCount.path);
+      return httpClient.get<number>(
+        getTotalCountEndpoint.path,
+        getTotalCountEndpoint.requiredScopes,
+      );
     },
 
     getVocabularyCountBySubcategory: async (
       subcategoryId: number,
     ): Promise<number> => {
       return httpClient.get<number>(
-        VocabularyEndpoints.getCountBySubcategory.path.replace(
+        getVocabularyCountBySubcategoryEndpoint.path.replace(
           ':subcategoryId',
           subcategoryId.toString(),
         ),
+        getVocabularyCountBySubcategoryEndpoint.requiredScopes,
       );
     },
 
     getVocabularyById: async (id: number): Promise<Vocabulary | null> => {
-      const path = VocabularyEndpoints.getById.path.replace(
-        ':id',
-        id.toString(),
+      const path = getVocabularyByIdEndpoint.path.replace(':id', id.toString());
+      return httpClient.get<Vocabulary>(
+        path,
+        getVocabularyByIdEndpoint.requiredScopes,
       );
-      return httpClient.get<Vocabulary>(path);
     },
 
     createVocabulary: async (
       command: CreateVocabulary[],
     ): Promise<number[]> => {
       return httpClient.post<number[]>(
-        VocabularyEndpoints.create.path,
+        createVocabularyEndpoint.path,
+        createVocabularyEndpoint.requiredScopes,
         command,
       );
     },
 
     deleteVocabulary: async (ids: number[]): Promise<number> => {
       const result = await httpClient.delete<number>(
-        VocabularyEndpoints.delete.path,
+        deleteVocabularyEndpoint.path,
+        deleteVocabularyEndpoint.requiredScopes,
         {
           data: ids,
         },
@@ -109,11 +126,15 @@ export function createVocabularyInfrastructure(
     getRelatedRecords: async (
       id: number,
     ): Promise<VocabularyRelatedRecords> => {
-      const path = VocabularyEndpoints.getAssociatedRecords.path.replace(
-        ':id',
-        id.toString(),
+      const path =
+        getAllRecordsAssociatedWithVocabularyRecordEndpoint.path.replace(
+          ':id',
+          id.toString(),
+        );
+      return httpClient.get<VocabularyRelatedRecords>(
+        path,
+        getAllRecordsAssociatedWithVocabularyRecordEndpoint.requiredScopes,
       );
-      return httpClient.get<VocabularyRelatedRecords>(path);
     },
   };
 }

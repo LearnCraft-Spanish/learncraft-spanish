@@ -2,7 +2,7 @@ import type { AuthPort } from '@application/ports/authPort';
 import type { CoursePort } from '@application/ports/coursePort';
 import type { CourseWithLessons, Lesson } from '@LearnCraft-Spanish/shared';
 
-import { createAuthenticatedHttpClient } from '@infrastructure/http/client';
+import { createHttpClient } from '@infrastructure/http/client';
 import {
   getCoursesWithLessonsEndpoint,
   getLessonsByVocabularyEndpoint,
@@ -12,12 +12,13 @@ export function createCourseInfrastructure(
   apiUrl: string,
   auth: AuthPort,
 ): CoursePort {
-  const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
+  const httpClient = createHttpClient(apiUrl, auth);
 
   return {
     getCoursesWithLessons: async (): Promise<CourseWithLessons[]> => {
       const response = await httpClient.get<CourseWithLessons[]>(
         getCoursesWithLessonsEndpoint.path,
+        getCoursesWithLessonsEndpoint.requiredScopes,
       );
       return response;
     },
@@ -28,6 +29,7 @@ export function createCourseInfrastructure(
           ':vocabularyId',
           vocabId.toString(),
         ),
+        getLessonsByVocabularyEndpoint.requiredScopes,
       );
       return response;
     },

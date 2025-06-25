@@ -1,12 +1,13 @@
+import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import mockuseSpellingsKnownForLesson, {
   callMockuseSpellingsKnownForLesson,
   defaultSuccessMockResult,
   overrideMockuseSpellingsKnownForLesson,
 } from '@application/units/useSpellingsKnownForLesson.mock';
-import { renderHook, waitFor } from '@testing-library/react';
-import { createQueryClientWrapper } from '@testing/index';
-import { createMockSpellingsData } from 'src/hexagon/testing/factories/spellingsFactory';
 
+import { renderHook, waitFor } from '@testing-library/react';
+import { createMockSpellingsData } from 'src/hexagon/testing/factories/spellingsFactory';
+import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
 import callMockUseSelectedLesson, {
   mockUseSelectedLesson,
   mockUseSelectedLessonReturnValue,
@@ -16,6 +17,7 @@ import mockUseCustomVocabulary, {
   callMockUseCustomVocabulary,
   mockUseCustomVocabularyReturnValue,
 } from './useCustomVocabulary.mock';
+
 import { useFrequensay } from './useFrequensay';
 
 vi.mock('./useCustomVocabulary', () => ({
@@ -37,7 +39,13 @@ describe('useFrequensay', () => {
 
   it('should render with default state', async () => {
     const { result } = renderHook(() => useFrequensay(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: ({ children }) => (
+        <TestQueryClientProvider>
+          <SelectedCourseAndLessonsProvider>
+            {children}
+          </SelectedCourseAndLessonsProvider>
+        </TestQueryClientProvider>
+      ),
     });
 
     await waitFor(() => {
@@ -53,7 +61,13 @@ describe('useFrequensay', () => {
     });
 
     const { result } = renderHook(() => useFrequensay(), {
-      wrapper: createQueryClientWrapper(),
+      wrapper: ({ children }) => (
+        <TestQueryClientProvider>
+          <SelectedCourseAndLessonsProvider>
+            {children}
+          </SelectedCourseAndLessonsProvider>
+        </TestQueryClientProvider>
+      ),
     });
 
     await waitFor(() => {

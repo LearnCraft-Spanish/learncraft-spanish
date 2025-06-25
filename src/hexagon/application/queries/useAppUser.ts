@@ -3,30 +3,14 @@ import { useMemo } from 'react';
 import { useAppUserAdapter } from '../adapters/appUserAdapter';
 import { useAuthAdapter } from '../adapters/authAdapter';
 
-export function useAppUser(email: string) {
-  const appUserAdapter = useAppUserAdapter();
-
-  const {
-    data: appUser,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['appUser', email],
-    queryFn: () => appUserAdapter.getAppUserByEmail(email),
-    enabled: !!email,
-  });
-
-  return { appUser, isLoading, error };
-}
-
 export function useAppStudentList() {
   const appUserAdapter = useAppUserAdapter();
   const { authUser } = useAuthAdapter();
 
-  const isEnabled = useMemo(
-    () => authUser.roles.includes('Coach') || authUser.roles.includes('Admin'),
-    [authUser.roles],
-  );
+  const isEnabled = useMemo(() => {
+    if (!authUser) return false;
+    return authUser.roles.includes('Coach') || authUser.roles.includes('Admin');
+  }, [authUser]);
 
   const {
     data: appStudentList,
