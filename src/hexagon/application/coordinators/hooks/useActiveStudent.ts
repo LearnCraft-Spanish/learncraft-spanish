@@ -17,7 +17,7 @@ export function useActiveStudent(): UseActiveStudentReturnType {
   const context = use(ActiveStudentContext);
   if (!context) {
     throw new Error(
-      'useActiveStudent must be used within a ActiveStudentProvider',
+      'useActiveStudent must be used within an ActiveStudentProvider',
     );
   }
   const { activeStudentEmail, updateActiveStudentEmail } = context;
