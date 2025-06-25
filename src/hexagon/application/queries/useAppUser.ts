@@ -6,9 +6,16 @@ import { useAuthAdapter } from '../adapters/authAdapter';
 export function useAppUser(email: string) {
   const appUserAdapter = useAppUserAdapter();
 
+  /**
+   * Before the first fetch, appUser is undefined.
+   * If the fetch succeeds but no data is found (no student record, i.e. a coach), appUser is null.
+   * If the fetch succeeds and data is found, appUser is the AppUser object.
+   */
   const {
     data: appUser,
     isLoading,
+    isError,
+    isSuccess,
     error,
   } = useQuery({
     queryKey: ['appUser', email],
@@ -16,7 +23,7 @@ export function useAppUser(email: string) {
     enabled: !!email,
   });
 
-  return { appUser, isLoading, error };
+  return { appUser, isLoading, isError, isSuccess, error };
 }
 
 export function useAppStudentList() {

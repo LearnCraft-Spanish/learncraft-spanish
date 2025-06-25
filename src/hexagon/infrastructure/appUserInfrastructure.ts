@@ -14,7 +14,7 @@ export function createAppUserInfrastructure(
 ): AppUserPort {
   const httpClient = createHttpClient(apiUrl, auth);
   return {
-    getAppUserByEmail: async (email: string): Promise<AppUser> => {
+    getAppUserByEmail: async (email: string) => {
       const appUser = await httpClient.get<AppUser>(
         getAppUserEndpoint.path,
         getAppUserEndpoint.requiredScopes,
@@ -24,10 +24,13 @@ export function createAppUserInfrastructure(
           },
         },
       );
+      if (typeof appUser === 'string') {
+        return null;
+      }
       return appUser;
     },
 
-    getAllAppStudents: async (): Promise<AppUserAbbreviation[]> => {
+    getAllAppStudents: async () => {
       const userList = await httpClient.get<AppUserAbbreviation[]>(
         getAllAppStudentsEndpoint.path,
         getAllAppStudentsEndpoint.requiredScopes,
