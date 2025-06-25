@@ -6,6 +6,7 @@ import { createHttpClient } from '@infrastructure/http/client';
 import {
   getAllAppStudentsEndpoint,
   getAppUserEndpoint,
+  getMyDataEndpoint,
 } from '@LearnCraft-Spanish/shared';
 
 export function createAppUserInfrastructure(
@@ -14,6 +15,14 @@ export function createAppUserInfrastructure(
 ): AppUserPort {
   const httpClient = createHttpClient(apiUrl, auth);
   return {
+    getMyData: async () => {
+      const appUser = await httpClient.get<AppUser>(
+        getMyDataEndpoint.path,
+        getMyDataEndpoint.requiredScopes,
+      );
+      return appUser;
+    },
+
     getAppUserByEmail: async (email: string) => {
       const appUser = await httpClient.get<AppUser>(
         getAppUserEndpoint.path,

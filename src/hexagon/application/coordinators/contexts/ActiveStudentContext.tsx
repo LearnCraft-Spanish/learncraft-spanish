@@ -2,10 +2,10 @@ import { createContext } from 'react';
 
 interface ActiveStudentContextType {
   // States
-  studentEmail: string | null;
+  activeStudentEmail: string | null;
 
   // Actions
-  updateStudentEmail: (studentEmail: string) => void;
+  updateActiveStudentEmail: (activeStudentEmail: string | null) => void;
 }
 
 const ActiveStudentContext = createContext<ActiveStudentContextType | null>(
