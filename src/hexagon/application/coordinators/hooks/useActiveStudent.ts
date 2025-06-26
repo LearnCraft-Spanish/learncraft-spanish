@@ -37,6 +37,10 @@ export function useActiveStudent(): UseActiveStudentReturnType {
         console.error('User does not have permission to change active student');
         return;
       }
+
+      // Mark that user has made a selection
+      setHasUserMadeSelection(true);
+
       if (!newEmail) {
         updateActiveStudentEmail(null);
         return;
@@ -46,17 +50,17 @@ export function useActiveStudent(): UseActiveStudentReturnType {
         updateActiveStudentEmail(parsedEmail.data);
       } else {
         console.error('Invalid email', parsedEmail.error);
-        return;
       }
-      setHasUserMadeSelection(true);
     },
     [canChangeStudent, updateActiveStudentEmail],
   );
 
   const userToFetch: string | null = useMemo(() => {
+    // If user has made any selection, use the context value (even if null)
     if (hasUserMadeSelection) {
       return activeStudentEmail;
     }
+    // Otherwise, use current user's email
     return authUser?.email || null;
   }, [hasUserMadeSelection, activeStudentEmail, authUser]);
 

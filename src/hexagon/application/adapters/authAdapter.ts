@@ -9,6 +9,13 @@ export function useAuthAdapter(): AuthPort {
   // Get Auth0 provider hook
   const auth = useAuthInfrastructure();
 
+  const authUser = auth.authUser;
+
+  const isAdmin = authUser?.roles.includes('Admin');
+  const isCoach = authUser?.roles.includes('Coach');
+  const isStudent = authUser?.roles.includes('Student');
+  const isLimited = authUser?.roles.includes('Limited');
+
   return {
     getAccessToken: async (scopes: string[] | null) => {
       return auth.getAccessToken(scopes);
@@ -18,7 +25,11 @@ export function useAuthAdapter(): AuthPort {
 
     isLoading: auth.isLoading,
 
-    authUser: auth.authUser,
+    authUser,
+    isAdmin,
+    isCoach,
+    isStudent,
+    isLimited,
 
     login: auth.login,
 

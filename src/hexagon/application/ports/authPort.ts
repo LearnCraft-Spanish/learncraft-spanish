@@ -29,6 +29,14 @@ export interface AuthPort {
   authUser: AuthUser;
 
   /**
+   * Boolean flags for the user's roles
+   */
+  isAdmin: boolean;
+  isCoach: boolean;
+  isStudent: boolean;
+  isLimited: boolean;
+
+  /**
    * Check if the user is authenticated
    */
   isAuthenticated: boolean;
