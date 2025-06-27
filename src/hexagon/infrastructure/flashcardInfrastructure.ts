@@ -1,5 +1,6 @@
 import type { Flashcard } from '@LearnCraft-Spanish/shared';
 import type { AuthPort } from '../application/ports/authPort';
+import type { FlashcardPort } from '../application/ports/flashcardPort';
 import {
   createFlashcardEndpoint,
   deleteFlashcardEndpoint,
@@ -8,7 +9,10 @@ import {
 } from '@LearnCraft-Spanish/shared';
 import { createHttpClient } from './http/client';
 
-export function createFlashcardInfrastructure(apiUrl: string, auth: AuthPort) {
+export function createFlashcardInfrastructure(
+  apiUrl: string,
+  auth: AuthPort,
+): FlashcardPort {
   const httpClient = createHttpClient(apiUrl, auth);
 
   return {
@@ -31,24 +35,35 @@ export function createFlashcardInfrastructure(apiUrl: string, auth: AuthPort) {
       return response;
     },
 
-    createFlashcard: async (flashcard: Flashcard): Promise<Flashcard> => {
-      const response = await httpClient.post<Flashcard>(
+    createStudentExample: async ({
+      studentId,
+      exampleId,
+    }: {
+      studentId: number;
+      exampleId: number;
+    }): Promise<number> => {
+      const response = await httpClient.post<number>(
         createFlashcardEndpoint.path,
         createFlashcardEndpoint.requiredScopes,
-
-        flashcard,
+        {
+          params: {
+            studentId,
+            exampleId,
+          },
+        },
       );
       return response;
     },
 
-    deleteFlashcard: async (flashcardId: number): Promise<void> => {
-      await httpClient.delete(
+    deleteStudentExample: async (flashcardId: number): Promise<number> => {
+      const response = await httpClient.delete<number>(
         deleteFlashcardEndpoint.path.replace(
           ':flashcardId',
           flashcardId.toString(),
         ),
         deleteFlashcardEndpoint.requiredScopes,
       );
+      return response;
     },
   };
 }

@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
+import { showSuccessToast } from 'src/functions/showToast';
 import { useFlashcardAdapter } from '../adapters/flashcardAdapter';
 import { useActiveStudent } from '../coordinators/hooks/useActiveStudent';
 export function useStudentFlashcards(studentId: number | undefined) {
@@ -17,10 +18,36 @@ export function useStudentFlashcards(studentId: number | undefined) {
     data: flashcards,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['studentFlashcards', studentId],
     queryFn: getFlashcards,
     enabled: !!appUser,
+  });
+
+  const createStudentExample = useMutation({
+    mutationFn: async (exampleId: number) => {
+      const response = await adapter.createStudentExample({
+        studentId: studentId!,
+        exampleId,
+      });
+      return response;
+    },
+    onSuccess: (_data, _variables, _context) => {
+      showSuccessToast('Flashcard added successfully');
+      refetch();
+    },
+  });
+
+  const deleteStudentExample = useMutation({
+    mutationFn: async (studentExampleId: number) => {
+      const response = await adapter.deleteStudentExample(studentExampleId);
+      return response;
+    },
+    onSuccess: (_data, _variables, _context) => {
+      showSuccessToast('Flashcard deleted successfully');
+      refetch();
+    },
   });
 
   // This lets us know if a flashcard is collected or not
@@ -36,5 +63,12 @@ export function useStudentFlashcards(studentId: number | undefined) {
     [collectedFlashcardsIds],
   );
 
-  return { flashcards, isLoading, error, isFlashcardCollected };
+  return {
+    flashcards,
+    isLoading,
+    error,
+    isFlashcardCollected,
+    createStudentExample,
+    deleteStudentExample,
+  };
 }
