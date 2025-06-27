@@ -1,14 +1,14 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import React, { useMemo, useState } from 'react';
-import { Navigate } from 'react-router-dom';
 
+import { Navigate } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
 import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import 'src/App.css';
@@ -24,7 +24,11 @@ export default function AudioBasedReview({
   willAutoplay,
 }: AudioBasedReviewProps) {
   const { isAuthenticated, isAdmin, isCoach } = useAuthAdapter();
-  const { activeStudentQuery } = useActiveStudent();
+  const {
+    appUser,
+    isLoading: appUserLoading,
+    error: appUserError,
+  } = useActiveStudent();
   const { filterExamplesBySelectedLesson } = useSelectedLesson();
   const { audioExamplesQuery } = useAudioExamples();
   const { programTableQuery } = useProgramTable();
@@ -32,21 +36,19 @@ export default function AudioBasedReview({
   // Define data readiness for UI updates
   const dataReady =
     isAuthenticated &&
-    activeStudentQuery.isSuccess &&
+    appUser &&
     programTableQuery.isSuccess &&
     audioExamplesQuery.isSuccess &&
     (isAdmin ||
       isCoach ||
-      activeStudentQuery.data?.role === 'student' ||
-      activeStudentQuery.data?.role === 'limited');
+      appUser?.studentRole === 'student' ||
+      appUser?.studentRole === 'limited');
   const isError =
     !dataReady &&
-    (programTableQuery.isError ||
-      audioExamplesQuery.isError ||
-      activeStudentQuery.isError);
+    (programTableQuery.isError || audioExamplesQuery.isError || appUserError);
   const isLoading =
     !dataReady &&
-    (activeStudentQuery.isLoading ||
+    (appUserLoading ||
       programTableQuery.isLoading ||
       audioExamplesQuery.isLoading);
   const unavailable = !dataReady && !isLoading && !isError;
