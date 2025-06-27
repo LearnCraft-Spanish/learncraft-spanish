@@ -1,55 +1,39 @@
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import { useAppStudentList } from '@application/queries/useAppStudentList';
 import { useCallback, useMemo, useState } from 'react';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-export default function StudentSearch() {
-  const { studentListQuery, chooseStudent } = useActiveStudent();
+
+interface StudentSearchProps {
+  closeMenu: () => void;
+}
+
+export default function StudentSearch({ closeMenu }: StudentSearchProps) {
+  const { changeActiveStudent } = useActiveStudent();
+  const { appStudentList } = useAppStudentList();
 
   const [searchString, setSearchString] = useState('');
 
   const selectStudent = useCallback(
-    (studentId: number) => {
-      chooseStudent(studentId);
+    (studentEmail: string | null) => {
+      changeActiveStudent(studentEmail);
       setSearchString('');
+      closeMenu();
     },
-    [chooseStudent],
+    [changeActiveStudent, closeMenu],
   );
 
   const listOfStudents = useMemo(() => {
-    return studentListQuery.isSuccess
-      ? studentListQuery.data
-          .map((student) => {
-            const studentEmail = student.emailAddress
-              ? student.emailAddress
-              : 'No email address';
-            const studentRole = student.role;
-            const studentName = student.name
-              ? student.name
-                  .toLowerCase()
-                  .split(' ')
-                  .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-                  .join(' ')
-              : 'No name';
-            if (
-              !studentEmail.includes('(') &&
-              (studentRole === 'student' || studentRole === 'limited')
-            )
-              return {
-                recordId: student.recordId,
-                displayString: `${studentName} -- ${studentEmail}`,
-              };
-            return undefined;
-          })
-          .filter((student) => student !== undefined)
-          .sort((a, b) => {
-            if (a && b) {
-              const aName = a.displayString;
-              const bName = b.displayString;
-              if (aName > bName) return 1;
-              else return -1;
-            }
-            return 0;
-          })
+    return appStudentList
+      ? appStudentList.sort((a, b) => {
+          if (a && b) {
+            if (a.name > b.name) return 1;
+            else if (a.name < b.name) return -1;
+            else if (a.emailAddress > b.emailAddress) return 1;
+            else if (a.emailAddress < b.emailAddress) return -1;
+          }
+          return 0;
+        })
       : [];
-  }, [studentListQuery.isSuccess, studentListQuery.data]);
+  }, [appStudentList]);
 
   const searchStudentOptions = useMemo(() => {
     if (searchString === '') return [];
@@ -57,9 +41,10 @@ export default function StudentSearch() {
       // return student.displayString.split(' -- ').some((s) => {
       //   return s.trim().toLowerCase().includes(searchString.toLowerCase());
       // });
-      return student.displayString
-        .toLowerCase()
-        .includes(searchString.toLowerCase());
+      const match =
+        student.name.toLowerCase().includes(searchString.toLowerCase()) ||
+        student.emailAddress.toLowerCase().includes(searchString.toLowerCase());
+      return match;
     });
     return matchesSearch;
   }, [listOfStudents, searchString]);
@@ -74,13 +59,15 @@ export default function StudentSearch() {
       />
       {searchStudentOptions.length > 0 && (
         <div id="optionsWrapper">
+          <div onClick={() => selectStudent(null)}> – Clear Selection – </div>
           {searchStudentOptions.map((student) => (
             <div
-              key={student.recordId}
+              key={student.emailAddress}
               className="searchResultItem"
-              onClick={() => selectStudent(student.recordId)}
+              onClick={() => selectStudent(student.emailAddress)}
             >
-              {student.displayString}
+              {student.name ? `${student.name} -- ` : ''}
+              {student.emailAddress}
             </div>
           ))}
         </div>

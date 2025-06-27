@@ -1,7 +1,7 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../../useBackend';
-import { useUserData } from '../../UserData/useUserData';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
 export interface GroupAttendeeMutationObj {
@@ -10,7 +10,7 @@ export interface GroupAttendeeMutationObj {
 }
 
 export default function useGroupAttendees(startDate: string, endDate: string) {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
   const { getGroupAttendees } = useStudentRecordsBackend();
   const { newPostFactory, newDeleteFactory } = useBackendHelpers();
 
@@ -18,9 +18,7 @@ export default function useGroupAttendees(startDate: string, endDate: string) {
     queryKey: ['groupAttendees', { startDate, endDate }],
     queryFn: getGroupAttendees,
     staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
+    enabled: isCoach || isAdmin,
   });
 
   const createGroupAttendeesMutation = useMutation({

@@ -1,4 +1,5 @@
 import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, {
   useCallback,
@@ -14,7 +15,6 @@ import ExampleEditForm from 'src/components/ExampleManager/ExampleEditForm';
 import ExamplePasteArea from 'src/components/ExampleManager/ExamplePasteArea';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useBackend } from 'src/hooks/useBackend';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 interface SetExampleCreatorProps {
@@ -47,7 +47,7 @@ export default function ExampleSetCreator({
   const [tableOption, setTableOption] = useState('none');
   const [quizId, setQuizId] = useState<number | undefined>(undefined);
 
-  const { activeStudentQuery } = useActiveStudent();
+  const { appUser } = useActiveStudent();
   const { addMultipleFlashcardsMutation, flashcardDataQuery } =
     useStudentFlashcards();
   const { officialQuizzesQuery, quizExamplesQuery, addQuizExamplesMutation } =
@@ -495,7 +495,7 @@ export default function ExampleSetCreator({
             addMultipleFlashcardsMutation.isPending ||
             addQuizExamplesMutation.isPending
           }
-          activeStudent={activeStudentQuery.data || null}
+          activeStudent={appUser || null}
           flashcardDataQuery={flashcardDataQuery}
           quizExamplesQuery={quizExamplesQuery}
         />
@@ -506,7 +506,7 @@ export default function ExampleSetCreator({
           assignmentType={assignmentType}
           unassignedExamples={unassignedExamples}
           selectedQuizObject={selectedQuizObject}
-          activeStudent={activeStudentQuery.data || null}
+          activeStudent={appUser || null}
           onConfirm={handleConfirmAssignment}
           onCancel={() => setShowAssignmentConfirmation(false)}
           isPending={

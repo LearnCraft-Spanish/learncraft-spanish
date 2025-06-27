@@ -1,4 +1,7 @@
-import type { ActiveStudentContextType } from '@application/coordinators/contexts/ActiveStudentContext';
+import type {
+  ActiveStudentContextType,
+  ActiveStudentSelection,
+} from '@application/coordinators/contexts/ActiveStudentContext';
 import ActiveStudentContext from '@application/coordinators/contexts/ActiveStudentContext';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -7,23 +10,25 @@ export function ActiveStudentProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [activeStudentEmail, setActiveStudentEmail] = useState<string | null>(
-    null,
-  );
+  const [studentSelectionState, setStudentSelectionState] =
+    useState<ActiveStudentSelection>({
+      email: null,
+      changed: false,
+    });
 
-  const updateActiveStudentEmail = useCallback(
-    (emailAddress: string | null) => {
-      setActiveStudentEmail(emailAddress);
+  const updateSelectedStudent = useCallback(
+    (selection: ActiveStudentSelection) => {
+      setStudentSelectionState(selection);
     },
-    [setActiveStudentEmail],
+    [setStudentSelectionState],
   );
 
   const returnValue: ActiveStudentContextType = useMemo(
     () => ({
-      activeStudentEmail,
-      updateActiveStudentEmail,
+      studentSelectionState,
+      updateSelectedStudent,
     }),
-    [activeStudentEmail, updateActiveStudentEmail],
+    [studentSelectionState, updateSelectedStudent],
   );
 
   return (

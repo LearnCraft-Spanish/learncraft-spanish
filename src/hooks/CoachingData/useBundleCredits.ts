@@ -1,8 +1,7 @@
-import type { UserData } from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from 'src/hooks/useBackend';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export interface BundleCredit {
   recordId: number; // record id
@@ -34,11 +33,10 @@ export function useBundleCredits(studentId: number) {
   const { getFactory, newPostFactory, newPutFactory, newDeleteFactory } =
     useBackendHelpers();
   const queryClient = useQueryClient();
-  const userDataQuery = useUserData();
+  const { isAdmin, isLoading, isAuthenticated } = useAuthAdapter();
 
   const validateAdminAccess = () => {
-    const userData = userDataQuery.data as UserData;
-    if (!userData || userData.roles.adminRole !== 'admin') {
+    if (!isAdmin && !isLoading && isAuthenticated) {
       throw new Error(
         'Unauthorized: Only administrators can modify bundle credits',
       );

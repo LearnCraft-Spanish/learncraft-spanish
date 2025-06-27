@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useState } from 'react';
 import ExampleSetCreator from './ExampleSetCreator';
 import SingleExampleCreator from './SingleExampleCreator';
 import 'src/App.css';
 import './ExampleManager.css';
 
 export default function ExampleManager() {
-  const userDataQuery = useUserData();
-  const adminRole = userDataQuery.data?.roles.adminRole;
-  const hasAccess = adminRole === 'admin' || adminRole === 'coach';
-  const hasEditAccess = adminRole === 'admin';
+  const { isAdmin, isCoach } = useAuthAdapter();
+  const hasAccess = isAdmin || isCoach;
+  const hasEditAccess = isAdmin;
   const [singleOrSet, setSingleOrSet] = useState<'single' | 'set'>('set');
 
   const toggleSingleOrSet = () => {

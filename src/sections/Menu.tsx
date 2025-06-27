@@ -1,58 +1,48 @@
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { Link } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
+import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 import 'src/App.css';
 
 export default function Menu() {
-  const userDataQuery = useUserData();
-  const { activeStudentQuery } = useActiveStudent();
+  const { isAuthenticated, isLoading, isAdmin, isCoach, isStudent, isLimited } =
+    useAuthAdapter();
+  const { appUser, isLoading: appUserLoading } = useActiveStudent();
   const { flashcardDataQuery } = useStudentFlashcards();
 
   // Make sure user data is loaded before showing the menu.
   // Require activeStudent data unless user is Admin.
   // If activeStudent is student, also make sure flashcard data is loaded.
   const menuDataReady =
-    userDataQuery.isSuccess &&
-    (((userDataQuery?.data.roles.adminRole === 'coach' ||
-      userDataQuery?.data.roles.adminRole === 'admin') &&
-      userDataQuery?.data.roles.studentRole !== 'student' &&
-      userDataQuery?.data.roles.studentRole !== 'limited') ||
-      activeStudentQuery.isSuccess) &&
-    (activeStudentQuery.data?.role !== 'student' ||
-      flashcardDataQuery.isSuccess);
+    isAuthenticated &&
+    (((isAdmin || isCoach) && !isStudent && !isLimited) || appUser) &&
+    (appUser?.studentRole !== 'student' || flashcardDataQuery.isSuccess);
 
   // Display loading or error messages if necessary
-  const menuDataError =
-    !menuDataReady &&
-    (userDataQuery.isError ||
-      activeStudentQuery.isError ||
-      flashcardDataQuery.isError);
+  const menuDataError = !menuDataReady && flashcardDataQuery.isError;
 
   const menuDataLoading =
     !menuDataReady &&
     !menuDataError &&
-    (userDataQuery.isLoading ||
-      activeStudentQuery.isLoading ||
-      flashcardDataQuery.isLoading);
+    (isLoading || appUserLoading || flashcardDataQuery.isLoading);
 
   return (
     <div className="menu">
-      {menuDataError && !menuDataReady && userDataQuery.isSuccess && (
+      {menuDataError && !menuDataReady && isAuthenticated && (
         <div className="menuBox">
           <h3>Error Loading Menu</h3>
         </div>
       )}
-      {menuDataLoading && !menuDataReady && userDataQuery.isSuccess && (
+      {menuDataLoading && !menuDataReady && isAuthenticated && (
         <div className="menuBox">
           <Loading message="Loading Menu..." />
         </div>
       )}
       {menuDataReady && (
         <div className="menuBox">
-          {activeStudentQuery.data?.role === 'student' && (
+          {appUser?.studentRole === 'student' && (
             // !!flashcardDataQuery.data?.studentExamples?.length &&
             <div>
               <h3>My Flashcards:</h3>
@@ -74,10 +64,10 @@ export default function Menu() {
               Official Quizzes
             </Link>
           </div>
-          {(activeStudentQuery.data?.role === 'limited' ||
-            activeStudentQuery.data?.role === 'student' ||
-            userDataQuery.data.roles.adminRole === 'coach' ||
-            userDataQuery.data.roles.adminRole === 'admin') && (
+          {(appUser?.studentRole === 'limited' ||
+            appUser?.studentRole === 'student' ||
+            isAdmin ||
+            isCoach) && (
             <div className="buttonBox">
               <Link className="linkButton" to="/audioquiz">
                 Audio Quiz
@@ -87,33 +77,28 @@ export default function Menu() {
               </Link>
             </div>
           )}
-          {(activeStudentQuery.data?.role === 'student' ||
-            userDataQuery.data.roles.adminRole === 'coach' ||
-            userDataQuery.data.roles.adminRole === 'admin') && (
+          {(appUser?.studentRole === 'student' || isAdmin || isCoach) && (
             <div className="buttonBox">
               <Link className="linkButton" to="/flashcardfinder">
                 Find Flashcards
               </Link>
             </div>
           )}
-          {activeStudentQuery.data?.role === 'student' &&
-            userDataQuery.data.roles.adminRole !== 'coach' &&
-            userDataQuery.data.roles.adminRole !== 'admin' && (
-              <div>
-                <h3>Need Help?</h3>
-                <div className="buttonBox">
-                  <Link
-                    className="linkButton"
-                    to="https://learncraft.co/how-to-use-the-app"
-                    target="_blank"
-                  >
-                    How to Use This App
-                  </Link>
-                </div>
+          {appUser?.studentRole === 'student' && !isAdmin && !isCoach && (
+            <div>
+              <h3>Need Help?</h3>
+              <div className="buttonBox">
+                <Link
+                  className="linkButton"
+                  to="https://learncraft.co/how-to-use-the-app"
+                  target="_blank"
+                >
+                  How to Use This App
+                </Link>
               </div>
-            )}
-          {(userDataQuery.data.roles.adminRole === 'coach' ||
-            userDataQuery.data.roles.adminRole === 'admin') && (
+            </div>
+          )}
+          {(isAdmin || isCoach) && (
             <div>
               <h3>Coaching Tools</h3>
               <div className="buttonBox">
@@ -143,7 +128,7 @@ export default function Menu() {
               </div>
             </div>
           )}
-          {userDataQuery.data.roles.adminRole === 'admin' && (
+          {isAdmin && (
             <>
               <h3>Admin Tools</h3>
               <div className="buttonBox">

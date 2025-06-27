@@ -1,4 +1,5 @@
 import type { Membership } from 'src/types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import pencilIcon from 'src/assets/icons/pencil.svg';
@@ -20,7 +21,6 @@ import {
 } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import MembershipWeeks from './MembershipWeeks';
 interface StudentMembershipsProps {
   studentId: number;
@@ -210,8 +210,7 @@ function StudentMembershipContextual({
   const [selectedCourse, setSelectedCourse] = useState(
     membership.relatedCourse,
   );
-  // const [active, setActive] = useState(membership.active);
-  const userDataQuery = useUserData();
+  const { isAdmin, authUser } = useAuthAdapter();
   const { coachListQuery } = useCoachList();
   const { updateMembershipMutation } = useStudentMemberships(
     membership.relatedStudent,
@@ -274,11 +273,9 @@ function StudentMembershipContextual({
       '@masterofmemory.com',
     ];
 
-    if (userDataQuery.data?.emailAddress) {
+    if (authUser?.email) {
       const currentUserCoach = coachListQuery.data?.find((coach) => {
-        const emailPrefix = userDataQuery.data.emailAddress
-          .split('@')[0]
-          .toLowerCase();
+        const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
           if (coach.user.email.toLowerCase() === emailPrefix + domain) {
             return true;
@@ -288,7 +285,7 @@ function StudentMembershipContextual({
       });
       if (currentUserCoach) return currentUserCoach;
     }
-  }, [userDataQuery.data, coachListQuery.data]);
+  }, [authUser, coachListQuery.data]);
 
   const handleCourseChange = (courseName: string) => {
     const newCourseId = courseIdByName.get(courseName);
@@ -311,7 +308,7 @@ function StudentMembershipContextual({
   if (
     membership.primaryCoach &&
     membership.primaryCoach.toString() !== currentUserAsQbUser?.user.id &&
-    userDataQuery.data?.roles.adminRole !== 'admin'
+    isAdmin
   ) {
     return (
       <ContextualView>
@@ -330,7 +327,7 @@ function StudentMembershipContextual({
   return (
     <ContextualView>
       <h3>Edit Membership</h3>
-      {userDataQuery.data?.roles.adminRole === 'admin' ? (
+      {isAdmin ? (
         <Dropdown
           label="Course"
           value={courseNameById.get(selectedCourse)}
@@ -353,7 +350,7 @@ function StudentMembershipContextual({
         value={onHold}
         onChange={setOnHold}
       />
-      {userDataQuery.data?.roles.adminRole === 'admin' && (
+      {isAdmin && (
         <>
           <DateInput
             value={startDate}

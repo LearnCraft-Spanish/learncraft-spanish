@@ -1,6 +1,6 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';
 import { useBackend } from '../../useBackend';
-import { useUserData } from '../../UserData/useUserData';
 
 export default function useActiveStudents({
   startDate,
@@ -9,7 +9,7 @@ export default function useActiveStudents({
   startDate: string | undefined;
   endDate: string | undefined;
 }) {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
 
   const { getActiveStudents } = useBackend();
 
@@ -17,9 +17,7 @@ export default function useActiveStudents({
     queryKey: ['activeStudents', { startDate, endDate }],
     queryFn: getActiveStudents,
     staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
+    enabled: isCoach || isAdmin,
   });
 
   return {

@@ -1,17 +1,22 @@
 import { createContext } from 'react';
 
+interface ActiveStudentSelection {
+  email: string | null;
+  changed: boolean;
+}
+
 interface ActiveStudentContextType {
   // States
-  activeStudentEmail: string | null;
+  studentSelectionState: ActiveStudentSelection;
 
   // Actions
-  updateActiveStudentEmail: (activeStudentEmail: string | null) => void;
+  updateSelectedStudent: (selection: ActiveStudentSelection) => void;
 }
 
 const ActiveStudentContext = createContext<ActiveStudentContextType | null>(
   null,
 );
 
-export type { ActiveStudentContextType };
+export type { ActiveStudentContextType, ActiveStudentSelection };
 
 export default ActiveStudentContext;

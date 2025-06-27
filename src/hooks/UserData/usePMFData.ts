@@ -1,26 +1,28 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react'; // Adjust the import based on your project structure
+import { useCallback, useMemo } from 'react';
 import { useBackend } from 'src/hooks/useBackend';
-import { useUserData } from './useUserData';
 // import useAuth from 'src/hooks/useAuth';
 
 export function usePMFData() {
   const { getPMFDataForUser, createPMFDataForUser, updatePMFDataForUser } =
     useBackend();
-  const userDataQuery = useUserData();
+  const { isStudent } = useAuthAdapter();
+  const { appUser, isOwnUser } = useActiveStudent();
 
   const getPMFData = useCallback(async () => {
-    if (userDataQuery.isSuccess) {
-      return await getPMFDataForUser(userDataQuery.data.recordId);
+    if (appUser && isOwnUser) {
+      return await getPMFDataForUser(appUser.recordId);
     }
-  }, [userDataQuery.isSuccess, userDataQuery.data, getPMFDataForUser]);
+  }, [appUser, isOwnUser, getPMFDataForUser]);
 
   const pmfDataQuery = useQuery({
-    queryKey: ['pmfData', userDataQuery.data?.recordId],
+    queryKey: ['pmfData', appUser?.recordId],
     queryFn: getPMFData,
     staleTime: Infinity,
     gcTime: Infinity,
-    enabled: userDataQuery.data?.roles.studentRole === 'student',
+    enabled: isOwnUser && isStudent,
   });
 
   interface CreateOrUpdatePMFData {
@@ -28,10 +30,10 @@ export function usePMFData() {
   }
   const createOrUpdatePMFData = useCallback(
     async ({ hasTakenSurvey }: CreateOrUpdatePMFData) => {
-      if (userDataQuery.isSuccess && pmfDataQuery.isSuccess) {
+      if (isOwnUser && pmfDataQuery.isSuccess && appUser) {
         if (!pmfDataQuery.data) {
           const result = await createPMFDataForUser(
-            userDataQuery.data.recordId,
+            appUser.recordId,
             hasTakenSurvey,
           );
           if (result === 1) {
@@ -39,7 +41,7 @@ export function usePMFData() {
           }
         } else {
           const result = await updatePMFDataForUser({
-            studentId: userDataQuery.data.recordId,
+            studentId: appUser.recordId,
             recordId: pmfDataQuery.data.recordId,
             hasTakenSurvey,
           });
@@ -50,8 +52,8 @@ export function usePMFData() {
       }
     },
     [
-      userDataQuery.isSuccess,
-      userDataQuery.data,
+      isOwnUser,
+      appUser,
       pmfDataQuery,
       createPMFDataForUser,
       updatePMFDataForUser,
@@ -59,10 +61,7 @@ export function usePMFData() {
   );
 
   const canShowPMF = useMemo(() => {
-    if (
-      !userDataQuery.data ||
-      userDataQuery.data.roles.studentRole !== 'student'
-    ) {
+    if (!isOwnUser || !isStudent) {
       return false;
     }
     // Check if the last contact date is within 60 days
@@ -87,7 +86,7 @@ export function usePMFData() {
       return true;
     }
     return false;
-  }, [pmfDataQuery.data, userDataQuery.data]);
+  }, [pmfDataQuery.data, isOwnUser, isStudent]);
 
   return { pmfDataQuery, createOrUpdatePMFData, canShowPMF };
 }

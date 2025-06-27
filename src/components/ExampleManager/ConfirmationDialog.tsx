@@ -1,7 +1,5 @@
-import type {
-  Flashcard,
-  FlashcardStudent,
-} from 'src/types/interfaceDefinitions';
+import type { AppUser } from '@LearnCraft-Spanish/shared';
+import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
 
 interface ConfirmationDialogProps {
@@ -12,7 +10,7 @@ interface ConfirmationDialogProps {
     quizNickname?: string;
     quizNumber?: number;
   };
-  activeStudent: FlashcardStudent | null;
+  activeStudent: AppUser | null;
   onConfirm: () => void;
   onCancel: () => void;
   isPending: boolean;

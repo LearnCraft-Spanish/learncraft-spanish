@@ -1,4 +1,5 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import React, {
   useCallback,
   useEffect,
@@ -8,7 +9,6 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
 import QuizProgress from '../QuizProgress';
@@ -44,7 +44,7 @@ export default function AudioQuiz({
   quizTitle,
   myFlashcardsQuiz = false,
 }: AudioQuizProps) {
-  const { activeStudentQuery } = useActiveStudent();
+  const { appUser } = useActiveStudent();
 
   const navigate = useNavigate();
   const isMainLocation = location.pathname.split('/').length < 2;
@@ -76,8 +76,8 @@ export default function AudioQuiz({
     return shuffledExamples;
   });
   const quizReady = useMemo(
-    () => displayOrder.length > 0 && activeStudentQuery.isSuccess,
-    [activeStudentQuery.isSuccess, displayOrder.length],
+    () => displayOrder.length > 0 && appUser,
+    [appUser, displayOrder.length],
   );
   // Memo the current example
   // This will update whenever the currentExampleIndex changes
@@ -518,7 +518,7 @@ export default function AudioQuiz({
               resumePlayback={resumePlayback}
               isPlaying={isPlaying}
               currentExample={currentExample}
-              isStudent={activeStudentQuery.data?.role === 'student'}
+              isStudent={appUser?.studentRole === 'student'}
               currentStep={currentStep}
               incrementExample={incrementExample}
               incrementOnAdd={incrementOnAdd}

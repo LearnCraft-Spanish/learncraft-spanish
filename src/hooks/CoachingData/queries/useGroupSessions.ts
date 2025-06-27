@@ -1,11 +1,11 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../../useBackend';
-import { useUserData } from '../../UserData/useUserData';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
 export default function useGroupSessions(startDate: string, endDate: string) {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
   const { getGroupSessions } = useStudentRecordsBackend();
   const { getFactory, newPostFactory, newPutFactory, newDeleteFactory } =
     useBackendHelpers();
@@ -18,9 +18,7 @@ export default function useGroupSessions(startDate: string, endDate: string) {
     queryKey: ['groupSessions', { startDate, endDate }],
     queryFn: getGroupSessions,
     staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
+    enabled: isCoach || isAdmin,
   });
 
   const groupSessionsTopicFieldOptionsQuery = useQuery({

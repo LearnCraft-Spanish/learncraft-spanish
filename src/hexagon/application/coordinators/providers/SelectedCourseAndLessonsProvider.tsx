@@ -1,8 +1,8 @@
 import type { Lesson } from '@LearnCraft-Spanish/shared';
 import type { SelectedCourseAndLessonsContextType } from '../contexts/SelectedCourseAndLessonsContext';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { useCallback, useMemo, useState } from 'react';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import SelectedCourseAndLessonsContext from '../contexts/SelectedCourseAndLessonsContext';
 export function SelectedCourseAndLessonsProvider({
   children,
@@ -10,7 +10,7 @@ export function SelectedCourseAndLessonsProvider({
   children: React.ReactNode;
 }) {
   const { data: coursesWithLessons } = useCoursesWithLessons();
-  const { activeProgram, activeLesson } = useActiveStudent();
+  const { appUser } = useActiveStudent();
 
   const [userSelectedCourse, setUserSelectedCourse] = useState<number | null>(
     null,
@@ -23,10 +23,10 @@ export function SelectedCourseAndLessonsProvider({
     if (userSelectedCourse) {
       newCourseId = userSelectedCourse;
     } else {
-      newCourseId = activeProgram?.recordId || 0;
+      newCourseId = appUser?.courseId || 0;
     }
     return coursesWithLessons?.find((item) => item.id === newCourseId) || null;
-  }, [coursesWithLessons, userSelectedCourse, activeProgram]);
+  }, [coursesWithLessons, userSelectedCourse, appUser?.courseId]);
 
   // ------------------ Setters ------------------ //
   const updateLessonFactory = useCallback(
@@ -66,12 +66,15 @@ export function SelectedCourseAndLessonsProvider({
       updateFromLesson(null);
 
       const newToLessonId =
-        activeLesson?.relatedProgram === courseId
-          ? activeLesson?.recordId
-          : null;
+        appUser?.courseId === courseId ? appUser?.lessonNumber : null;
       updateToLesson(newToLessonId);
     },
-    [activeLesson, updateFromLesson, updateToLesson],
+    [
+      appUser?.courseId,
+      appUser?.lessonNumber,
+      updateFromLesson,
+      updateToLesson,
+    ],
   );
 
   const value: SelectedCourseAndLessonsContextType = useMemo(

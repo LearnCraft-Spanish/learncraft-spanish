@@ -1,9 +1,9 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 
 import {
   AddAddingRemoveCustom,
@@ -32,7 +32,7 @@ export default function ExampleListItem({
   selectedExampleId = null,
   studentContext = true,
 }: FormatExampleForTableProps) {
-  const { activeStudentQuery } = useActiveStudent();
+  const { appUser } = useActiveStudent();
 
   return (
     <div className="exampleCard" key={example.recordId}>
@@ -64,7 +64,7 @@ export default function ExampleListItem({
       {(example.vocabComplete || forceShowVocab) && (
         <VocabularyButton vocabIncluded={example.vocabIncluded} />
       )}
-      {studentContext && activeStudentQuery.data?.role === 'student' && (
+      {studentContext && appUser?.studentRole === 'student' && (
         <AddAddingRemoveCustom example={example} />
       )}
     </div>

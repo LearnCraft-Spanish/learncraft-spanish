@@ -1,7 +1,7 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { SpellingPort } from '@application/ports/spellingPort';
 import { createHttpClient } from '@infrastructure/http/client';
-import { SpellingEndpoints } from '@LearnCraft-Spanish/shared';
+import { getKnownSpellingsByCourseAndLessonEndpoint } from '@LearnCraft-Spanish/shared';
 
 export function createSpellingInfrastructure(
   apiUrl: string,
@@ -15,8 +15,8 @@ export function createSpellingInfrastructure(
       lessonNumber: number,
     ): Promise<string[]> => {
       const response = await httpClient.get<string[]>(
-        SpellingEndpoints.getKnownSpellingsByCourseAndLesson.path,
-        SpellingEndpoints.getKnownSpellingsByCourseAndLesson.requiredScopes,
+        getKnownSpellingsByCourseAndLessonEndpoint.path,
+        getKnownSpellingsByCourseAndLessonEndpoint.requiredScopes,
         {
           params: {
             courseId: courseId.toString(),

@@ -20,6 +20,22 @@ export function useAuthInfrastructure(): AuthPort {
     };
   }, [user, audience]);
 
+  const isAdmin = useMemo(() => {
+    return authUser?.roles.includes('Admin');
+  }, [authUser]);
+
+  const isCoach = useMemo(() => {
+    return authUser?.roles.includes('Coach');
+  }, [authUser]);
+
+  const isStudent = useMemo(() => {
+    return authUser?.roles.includes('Student');
+  }, [authUser]);
+
+  const isLimited = useMemo(() => {
+    return authUser?.roles.includes('Limited');
+  }, [authUser]);
+
   return {
     getAccessToken: async (scopes: string[] | null) => {
       try {
@@ -91,6 +107,12 @@ export function useAuthInfrastructure(): AuthPort {
 
     isAuthenticated,
     isLoading,
+
     authUser,
+
+    isAdmin,
+    isCoach,
+    isStudent,
+    isLimited,
   };
 }
