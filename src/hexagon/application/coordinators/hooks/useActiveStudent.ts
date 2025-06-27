@@ -3,6 +3,7 @@ import type { UseActiveStudentReturnType } from './types';
 import { useAppUserAdapter } from '@application/adapters/appUserAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import ActiveStudentContext from '@application/coordinators/contexts/ActiveStudentContext';
+import { roleHasChangedResponseSchema } from '@LearnCraft-Spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { use, useCallback, useMemo } from 'react';
 import { z } from 'zod';
@@ -15,7 +16,7 @@ export function useActiveStudent(): UseActiveStudentReturnType {
     );
   }
   const { studentSelectionState, updateSelectedStudent } = context;
-  const { authUser } = useAuthAdapter();
+  const { authUser, logout } = useAuthAdapter();
   const { getAppUserByEmail, getMyData } = useAppUserAdapter();
 
   const hasUserMadeSelection = useMemo(
@@ -69,12 +70,18 @@ export function useActiveStudent(): UseActiveStudentReturnType {
     [userToFetch, authUser],
   );
 
-  const userFetchFunction = useCallback((): Promise<AppUser | null> => {
+  const userFetchFunction = useCallback(async (): Promise<AppUser | null> => {
     if (isOwnUser) {
-      return getMyData();
+      const myData = await getMyData();
+      if (myData === roleHasChangedResponseSchema.value) {
+        logout();
+        return null;
+      } else {
+        return myData;
+      }
     }
     return getAppUserByEmail(userToFetch!);
-  }, [isOwnUser, getAppUserByEmail, getMyData, userToFetch]);
+  }, [isOwnUser, getAppUserByEmail, getMyData, userToFetch, logout]);
 
   const {
     data: appUser,

@@ -1,7 +1,13 @@
-import type { AppUser, AppUserAbbreviation } from '@LearnCraft-Spanish/shared';
+import type {
+  AppUser,
+  AppUserAbbreviation,
+  roleHasChangedResponseSchema,
+} from '@LearnCraft-Spanish/shared';
 
 export interface AppUserPort {
-  getMyData: () => Promise<AppUser>;
+  getMyData: () => Promise<
+    AppUser | typeof roleHasChangedResponseSchema.value | null
+  >;
 
   getAppUserByEmail: (email: string) => Promise<AppUser | null>;
 
