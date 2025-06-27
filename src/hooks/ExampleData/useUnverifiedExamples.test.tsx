@@ -1,13 +1,21 @@
 import { renderHook, waitFor } from '@testing-library/react';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
-import { setupMockAuth } from 'tests/setupMockAuth';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('useUnverifiedExamples', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'admin-empty-role' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: true,
+      isCoach: false,
+      isStudent: false,
+      isLimited: false,
+    });
   });
   it('runs without crashing', async () => {
     const { result } = renderHook(() => useVerifiedExamples(), {
@@ -42,7 +50,14 @@ describe('useUnverifiedExamples', () => {
 
   describe('when user is not an admin or student', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'limited' });
+      overrideMockAuthAdapter({
+        authUser: getAuthUserFromEmail('limited@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: false,
+        isLimited: true,
+      });
     });
     it('isSuccess is false, data is undefined', async () => {
       const { result } = renderHook(() => useVerifiedExamples(), {

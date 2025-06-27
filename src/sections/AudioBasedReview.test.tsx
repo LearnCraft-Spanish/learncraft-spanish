@@ -1,10 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+
 import { act } from 'react';
 
-import { setupMockAuth } from 'tests/setupMockAuth';
-import { beforeEach, describe, expect, it } from 'vitest';
-
+import { describe, expect, it } from 'vitest';
 import AudioBasedReview from './AudioBasedReview';
 
 function renderAudioBasedReview(props = {}) {
@@ -39,9 +38,15 @@ async function selectLessons() {
 }
 
 describe('audioBasedReview Component', () => {
-  beforeEach(() => {
-    setupMockAuth();
-  });
+  // beforeEach(() => {
+  //   overrideMockAuthAdapter({
+  //     authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+  //     isAuthenticated: true,
+  //     isAdmin: true,
+  //     isCoach: true,
+  //     isStudent: true,
+  //   });
+  // });
 
   describe('initial State', () => {
     it('displays loading message while waiting for data', async () => {
@@ -80,10 +85,6 @@ describe('audioBasedReview Component', () => {
   });
 
   describe('autoplay Behavior', () => {
-    beforeEach(() => {
-      setupMockAuth({ userName: 'student-admin' });
-    });
-
     it('works in an audio quiz with autoplay enabled', async () => {
       renderAudioBasedReview({
         audioOrComprehension: 'audio',

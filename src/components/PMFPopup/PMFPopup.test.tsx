@@ -1,7 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
 import { act } from 'react';
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import PMFPopup from './PMFPopup';
 
@@ -13,7 +14,14 @@ vi.mock('src/hooks/UserData/usePMFData', () => ({
 }));
 describe('component PMFPopup', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-ser-estar' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-ser-estar@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   describe('when timeToShowPopup is false', () => {
     it('does not render when timeToShowPopup is false', () => {

@@ -1,12 +1,12 @@
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
 import type * as types from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCallback } from 'react';
-import useAuth from './useAuth';
 
 export function useBackendHelpers() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const { getAccessToken } = useAuth();
+  const { getAccessToken } = useAuthAdapter();
 
   const getFactory = useCallback(
     async <T>(path: string, headers?: any): Promise<T> => {
@@ -14,7 +14,7 @@ export function useBackendHelpers() {
       const response = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
+          Authorization: `Bearer ${await getAccessToken(null)}`,
           ...headers,
         },
       });
@@ -39,7 +39,7 @@ export function useBackendHelpers() {
       const response = await fetch(fetchUrl, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
+          Authorization: `Bearer ${await getAccessToken(null)}`,
           'Content-Type': 'application/json',
           ...headers,
         },
@@ -66,7 +66,7 @@ export function useBackendHelpers() {
       const response = await fetch(fetchUrl, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
+          Authorization: `Bearer ${await getAccessToken(null)}`,
           ...headers,
         },
       });
@@ -102,7 +102,7 @@ export function useBackendHelpers() {
       const response = await fetch(fetchUrl, {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
+          Authorization: `Bearer ${await getAccessToken(null)}`,
           'Content-Type': 'application/json',
           ...headers,
         },
@@ -143,7 +143,7 @@ export function useBackendHelpers() {
       const response = await fetch(fetchUrl, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
+          Authorization: `Bearer ${await getAccessToken(null)}`,
           'Content-Type': 'application/json',
           ...headers,
         },
@@ -175,7 +175,7 @@ export function useBackendHelpers() {
       const response = await fetch(fetchUrl, {
         method: 'PUT',
         headers: {
-          Authorization: `Bearer ${await getAccessToken()}`,
+          Authorization: `Bearer ${await getAccessToken(null)}`,
           'Content-Type': 'application/json',
           ...headers,
         },
@@ -219,7 +219,7 @@ export function useBackend() {
   } = useBackendHelpers();
 
   /*      GET Requests      */
-  const { getAccessToken } = useAuth();
+  const { getAccessToken } = useAuthAdapter();
 
   const getProgramsFromBackend = useCallback((): Promise<
     types.ProgramUnparsed[]

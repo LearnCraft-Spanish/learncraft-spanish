@@ -7,7 +7,7 @@ import {
   within,
 } from '@testing-library/react';
 
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import { getAppUserFromName } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
@@ -15,13 +15,11 @@ import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import { beforeEach, describe, expect, it } from 'vitest';
 import FromToLessonSelector from './FromToLessonSelector';
-
 interface WrapperProps {
   children: React.ReactNode;
 }
 
-const userName = 'student-admin';
-const student = getUserDataFromName(userName);
+const student = getAppUserFromName('student-admin')!;
 if (!student) throw new Error('No student found');
 
 // HELPER FUNCTION - this is copy-pasted from FromToLessonSelector
@@ -74,7 +72,7 @@ describe('component FromToLessonSelector', () => {
       const courseSelect = screen.getByLabelText('Course:');
       // Tests
       expect((courseSelect as HTMLSelectElement).value).toBe(
-        student.relatedProgram.toString(),
+        student.courseId.toString(),
       );
     });
   });

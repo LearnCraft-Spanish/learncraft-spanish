@@ -9,9 +9,9 @@ export default function LessonRangeSelector(): React.JSX.Element {
     course,
     toLesson,
     fromLesson,
-    updateCourse,
-    updateToLesson,
-    updateFromLesson,
+    updateUserSelectedCourseId,
+    updateToLessonId,
+    updateFromLessonId,
   } = useSelectedCourseAndLessons();
 
   const fromLessons = useMemo(() => {
@@ -36,14 +36,16 @@ export default function LessonRangeSelector(): React.JSX.Element {
     <div className="FTLS">
       <SelectCourse
         value={course?.id.toString() ?? '0'}
-        onChange={(value: string) => updateCourse(Number.parseInt(value))}
+        onChange={(value: string) =>
+          updateUserSelectedCourseId(Number.parseInt(value))
+        }
       />
       <div>
         {course?.lessons && (
           <SelectLesson
             value={fromLesson?.id.toString() ?? '0'}
             onChange={(value: string) =>
-              updateFromLesson(Number.parseInt(value))
+              updateFromLessonId(Number.parseInt(value))
             }
             label="From"
             lessons={fromLessons ?? []}
@@ -51,7 +53,7 @@ export default function LessonRangeSelector(): React.JSX.Element {
         )}
         <SelectLesson
           value={toLesson?.id.toString() ?? '0'}
-          onChange={(value: string) => updateToLesson(Number.parseInt(value))}
+          onChange={(value: string) => updateToLessonId(Number.parseInt(value))}
           label="To"
           lessons={toLessons ?? []}
         />

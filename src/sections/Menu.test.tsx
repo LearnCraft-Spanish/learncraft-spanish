@@ -1,11 +1,20 @@
-import type { TestUserNames } from 'mocks/data/serverlike/userTable';
+import type { AppUser } from '@LearnCraft-Spanish/shared';
+import type {
+  TestUserEmails,
+  TestUserNames,
+} from 'mocks/data/serverlike/userTable';
+import type { AuthUser } from 'src/hexagon/application/ports/authPort';
+
 import { render, screen, waitFor } from '@testing-library/react';
-import { allUsersTable } from 'mocks/data/serverlike/userTable';
+import {
+  appUserTable,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideMockActiveStudent } from 'src/hexagon/application/coordinators/hooks/useActiveStudent.mock';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Menu from './Menu';
 
@@ -25,7 +34,7 @@ async function renderMenuLoaded() {
 describe('component Menu', () => {
   describe('loading', () => {
     beforeEach(() => {
-      setupMockAuth({ isLoading: true });
+      overrideMockAuthAdapter({ isLoading: true });
     });
     it('render "Loading Menu..."', async () => {
       render(
@@ -44,26 +53,34 @@ describe('component Menu', () => {
     const userCases: {
       name: TestUserNames;
       roles: string[];
+      appUser: AppUser;
+      authUser: AuthUser;
     }[] = [];
 
-    allUsersTable.forEach((user) => {
+    appUserTable.forEach((user) => {
       const roles = [];
-      if (user.roles.studentRole) {
-        roles.push(user.roles.studentRole);
-      }
-      if (user.roles.adminRole) {
-        roles.push(user.roles.adminRole);
+      if (user.studentRole) {
+        roles.push(user.studentRole);
       }
       userCases.push({
         name: user.name as TestUserNames,
         roles,
+        appUser: user,
+        authUser: getAuthUserFromEmail(
+          user.emailAddress as TestUserEmails,
+        ) as AuthUser,
       });
     });
 
     userCases.forEach((userCase) => {
       describe(`case: ${userCase.name}`, () => {
         beforeEach(() => {
-          setupMockAuth({ userName: userCase.name });
+          overrideMockActiveStudent({
+            appUser: userCase.appUser,
+          });
+          overrideMockAuthAdapter({
+            authUser: userCase.authUser,
+          });
         });
 
         // My Flashcards

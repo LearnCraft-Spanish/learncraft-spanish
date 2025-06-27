@@ -1,16 +1,19 @@
 // Types
-import type { UserData } from 'src/types/interfaceDefinitions';
+import type { AppUser } from '@LearnCraft-Spanish/shared';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 
 import programsTable from 'mocks/data/hooklike/programsTable';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+
+import {
+  getAppUserFromName,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 
 import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
-import { setupMockAuth } from 'tests/setupMockAuth';
 
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-
 import { useSelectedLesson } from './useSelectedLesson';
 
 const { api } = serverlikeData();
@@ -24,11 +27,18 @@ async function renderSelectedLesson() {
 }
 
 describe('useSelectedLesson', () => {
-  let student: UserData | null;
+  let student: AppUser | null;
 
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
-    student = getUserDataFromName('student-lcsp');
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
+    student = getAppUserFromName('student-lcsp');
   });
 
   afterEach(() => {
@@ -38,9 +48,7 @@ describe('useSelectedLesson', () => {
   describe('initial state', () => {
     it("selectedProgram is userData's related program", async () => {
       const result = await renderSelectedLesson();
-      expect(result.current.selectedProgram?.recordId).toBe(
-        student?.relatedProgram,
-      );
+      expect(result.current.selectedProgram?.recordId).toBe(student?.courseId);
     });
     it('selectedFromLesson is null in selectedProgram', async () => {
       const result = await renderSelectedLesson();

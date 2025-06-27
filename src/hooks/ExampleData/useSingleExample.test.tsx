@@ -1,9 +1,10 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import data from 'mocks/data/serverlike/serverlikeData';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { useSingleExample } from 'src/hooks/ExampleData/useSingleExample';
-import { setupMockAuth } from 'tests/setupMockAuth';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 describe('useSingleExample', () => {
@@ -21,7 +22,14 @@ describe('useSingleExample', () => {
     exampleId = await getExistingSampleId();
   });
   beforeEach(() => {
-    setupMockAuth({ userName: 'admin-empty-role' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: true,
+      isCoach: false,
+      isStudent: false,
+      isLimited: false,
+    });
   });
   it('runs without crashing', async () => {
     const { result } = renderHook(() => useSingleExample(exampleId), {
@@ -51,7 +59,14 @@ describe('useSingleExample', () => {
   });
   describe('when user is not an admin or student', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'limited' });
+      overrideMockAuthAdapter({
+        authUser: getAuthUserFromEmail('limited@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: false,
+        isLimited: true,
+      });
     });
     it('isSuccess is false, data is undefined', async () => {
       const { result } = renderHook(() => useSingleExample(exampleId), {

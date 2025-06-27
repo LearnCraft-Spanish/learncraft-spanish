@@ -2,19 +2,19 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AudioQuiz from './AudioQuiz';
 
 /*       Testing Setup        */
 const cleanupFunction = vi.fn();
 
-const studentUserData = getUserDataFromName('student-lcsp');
+const studentUserData = getAuthUserFromEmail('student-lcsp@fake.not')!;
 const studentFlashcardDataObject = allStudentFlashcards.find(
-  (student) => student.userName === studentUserData?.name,
+  (student) => student.emailAddress === studentUserData?.email,
 )?.studentFlashcardData;
 
 const audioExamplesTable = serverlikeData().api.audioExamplesTable;
@@ -45,7 +45,14 @@ if (
 */
 describe('component AudioQuiz', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   afterEach(() => {
     vi.clearAllMocks();

@@ -1,8 +1,8 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React from 'react';
-import useAuth from 'src/hooks/useAuth';
 
 function LogoutButton(): React.JSX.Element | false {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuthAdapter();
 
   return (
     isAuthenticated && (

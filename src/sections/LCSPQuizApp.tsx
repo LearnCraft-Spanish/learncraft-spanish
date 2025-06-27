@@ -4,9 +4,9 @@ import MenuButton from 'src/components/Buttons/MenuButton';
 import { Loading } from 'src/components/Loading';
 import OfficialQuiz from 'src/components/Quizzing/OfficialQuizzing/OfficialQuiz';
 import quizCourses from 'src/functions/QuizCourseList';
+import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
-import useAuth from 'src/hooks/useAuth';
 import 'src/App.css';
 
 export default function LCSPQuizApp(): React.JSX.Element {
@@ -14,7 +14,7 @@ export default function LCSPQuizApp(): React.JSX.Element {
   const navigate = useNavigate();
   const { toLesson, course } = useSelectedCourseAndLessons();
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuthAdapter();
   const [chosenQuiz, setChosenQuiz] = useState(0);
   const [menuHidden, setMenuHidden] = useState(false);
   const [defaultCourseFound, setDefaultCourseFound] = useState(false);

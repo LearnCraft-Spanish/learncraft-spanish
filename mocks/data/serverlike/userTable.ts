@@ -1,101 +1,70 @@
-import type { UserData } from 'src/types/interfaceDefinitions';
+import type { AppUser } from '@LearnCraft-Spanish/shared';
+import type { AuthUser } from 'src/hexagon/application/ports/authPort';
 
-export const allUsersTable: UserData[] = [
+export const appUserTable: AppUser[] = [
   {
     recordId: 1,
     name: 'admin-empty-role',
     emailAddress: 'admin-empty-role@fake.not',
-    roles: {
-      studentRole: '',
-      adminRole: 'admin',
-    },
-    relatedProgram: 2,
-    cohort: 'B',
-    program: 'LCSP',
+    studentRole: 'none',
+    courseId: 2,
+    lessonNumber: 20,
   },
   {
     recordId: 2,
     name: 'empty-role',
     emailAddress: 'empty-role@fake.not',
-    roles: {
-      studentRole: '',
-      adminRole: '',
-    },
-    relatedProgram: 2,
-    cohort: 'A',
-    program: 'LCSP',
+    courseId: 2,
+    lessonNumber: 5,
+    studentRole: 'none',
   },
   {
     recordId: 3,
     name: 'none-role',
     emailAddress: 'none-role@fake.not',
-    roles: {
-      studentRole: '',
-      adminRole: '',
-    },
-    relatedProgram: 2,
-    cohort: 'C',
-    program: 'LCSP',
+    courseId: 2,
+    lessonNumber: 40,
+    studentRole: 'none',
   },
   {
     recordId: 4,
     name: 'limited',
     emailAddress: 'limited@fake.not',
-    roles: {
-      studentRole: 'limited',
-      adminRole: '',
-    },
-    relatedProgram: 3,
-    cohort: 'A',
-    program: 'SI1M',
+    courseId: 2,
+    lessonNumber: 15,
+    studentRole: 'limited',
   },
   {
     recordId: 5,
     name: 'student-admin',
     emailAddress: 'student-admin@fake.not',
-    roles: {
-      studentRole: 'student',
-      adminRole: 'admin',
-    },
-    relatedProgram: 3,
-    cohort: 'F',
-    program: 'SI1M',
+    courseId: 3,
+    lessonNumber: 20,
+    studentRole: 'student',
   },
   {
     recordId: 6,
     name: 'student-lcsp',
     emailAddress: 'student-lcsp@fake.not',
-    roles: {
-      studentRole: 'student',
-      adminRole: '',
-    },
-    relatedProgram: 2,
-    cohort: 'D',
-    program: 'LCSP',
+    courseId: 2,
+    lessonNumber: 77,
+    studentRole: 'student',
   },
   {
     recordId: 7,
     name: 'student-ser-estar',
     emailAddress: 'student-ser-estar@fake.not',
-    roles: {
-      studentRole: 'student',
-      adminRole: '',
-    },
-    relatedProgram: 5,
-    cohort: 'E',
-    program: 'LCSP',
+    courseId: 5,
+    lessonNumber: 3,
+    studentRole: 'student',
   },
   {
     recordId: 8,
     name: 'student-no-flashcards',
     emailAddress: 'student-no-flashcards@fake.not',
-    roles: {
-      studentRole: 'student',
-      adminRole: '',
-    },
-    relatedProgram: 2,
-    cohort: 'A',
-    program: 'LCSP',
+    courseId: 2,
+    lessonNumber: 10,
+    studentRole: 'student',
   },
 ];
 
@@ -110,6 +79,55 @@ export type TestUserNames =
   | 'student-no-flashcards'
   | null;
 
-export function getUserDataFromName(name: TestUserNames): UserData | null {
-  return allUsersTable.find((student) => student.name === name) || null;
+export type TestUserEmails =
+  | 'admin-empty-role@fake.not'
+  | 'empty-role@fake.not'
+  | 'none-role@fake.not'
+  | 'limited@fake.not'
+  | 'student-admin@fake.not'
+  | 'student-lcsp@fake.not'
+  | 'student-ser-estar@fake.not'
+  | 'student-no-flashcards@fake.not';
+
+export const authUserTable: AuthUser[] = [
+  {
+    email: 'admin-empty-role@fake.not',
+    roles: ['Admin'],
+  },
+  {
+    email: 'empty-role@fake.not',
+    roles: [''],
+  },
+  {
+    email: 'none-role@fake.not',
+    roles: [''],
+  },
+  {
+    email: 'limited@fake.not',
+    roles: ['Limited'],
+  },
+  {
+    email: 'student-admin@fake.not',
+    roles: ['Student', 'Admin', 'Coach'],
+  },
+  {
+    email: 'student-lcsp@fake.not',
+    roles: ['Student'],
+  },
+  {
+    email: 'student-ser-estar@fake.not',
+    roles: ['Student'],
+  },
+  {
+    email: 'student-no-flashcards@fake.not',
+    roles: ['Student'],
+  },
+];
+
+export function getAppUserFromName(name: TestUserNames): AppUser | null {
+  return appUserTable.find((student) => student.name === name) || null;
+}
+
+export function getAuthUserFromEmail(email: TestUserEmails): AuthUser | null {
+  return authUserTable.find((user) => user.email === email) || null;
 }

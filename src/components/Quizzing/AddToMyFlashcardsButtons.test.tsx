@@ -1,9 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AddToMyFlashcardsButtons from './AddToMyFlashcardsButtons';
 
@@ -26,7 +27,14 @@ const notCollectedFlashcard = verifiedExamplesTable.find(
 describe('component AddToMyFlashcardsButtons', () => {
   describe('user is student', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'student-lcsp' });
+      overrideMockAuthAdapter({
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      });
     });
     it('flashcard is collected: shows "Remove from my flashcards"', async () => {
       render(
@@ -89,7 +97,14 @@ describe('component AddToMyFlashcardsButtons', () => {
 
   describe('user is NOT student', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'limited' });
+      overrideMockAuthAdapter({
+        authUser: getAuthUserFromEmail('limited@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: false,
+        isLimited: true,
+      });
     });
     it('does not display any buttons', async () => {
       render(
