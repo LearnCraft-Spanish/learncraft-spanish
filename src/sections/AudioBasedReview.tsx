@@ -5,10 +5,10 @@ import { Navigate } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
+import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
 import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import 'src/App.css';
@@ -23,7 +23,7 @@ export default function AudioBasedReview({
   audioOrComprehension = 'comprehension',
   willAutoplay,
 }: AudioBasedReviewProps) {
-  const userDataQuery = useUserData();
+  const { isAuthenticated, isAdmin, isCoach } = useAuthAdapter();
   const { activeStudentQuery } = useActiveStudent();
   const { filterExamplesBySelectedLesson } = useSelectedLesson();
   const { audioExamplesQuery } = useAudioExamples();
@@ -31,24 +31,22 @@ export default function AudioBasedReview({
 
   // Define data readiness for UI updates
   const dataReady =
-    userDataQuery.isSuccess &&
+    isAuthenticated &&
     activeStudentQuery.isSuccess &&
     programTableQuery.isSuccess &&
     audioExamplesQuery.isSuccess &&
-    (userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin' ||
+    (isAdmin ||
+      isCoach ||
       activeStudentQuery.data?.role === 'student' ||
       activeStudentQuery.data?.role === 'limited');
   const isError =
     !dataReady &&
-    (userDataQuery.isError ||
-      programTableQuery.isError ||
+    (programTableQuery.isError ||
       audioExamplesQuery.isError ||
       activeStudentQuery.isError);
   const isLoading =
     !dataReady &&
     (activeStudentQuery.isLoading ||
-      userDataQuery.isLoading ||
       programTableQuery.isLoading ||
       audioExamplesQuery.isLoading);
   const unavailable = !dataReady && !isLoading && !isError;

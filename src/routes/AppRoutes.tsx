@@ -1,3 +1,4 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import FrequensayPage from '@interface/pages/FrequensayPage';
 import GetHelpPage from '@interface/pages/GetHelpPage';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
@@ -13,9 +14,7 @@ import {
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
-import { ProtectedRoute } from 'src/components/ProtectedRoute';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
@@ -27,7 +26,7 @@ import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import SentryRoutes from './SentryRoutes';
 
 export default function AppRoutes() {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach, isStudent, isLimited } = useAuthAdapter();
 
   return (
     <SentryRoutes>
@@ -40,21 +39,12 @@ export default function AppRoutes() {
       )
       <Route
         path="/flashcardfinder"
-        element={
-          (userDataQuery.data?.roles.studentRole === 'student' ||
-            userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
-            <FlashcardFinder />
-          )
-        }
+        element={(isStudent || isCoach || isAdmin) && <FlashcardFinder />}
       />
       <Route
         path="/audioquiz/*"
         element={
-          (userDataQuery.data?.roles.studentRole === 'limited' ||
-            userDataQuery.data?.roles.studentRole === 'student' ||
-            userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
+          (isLimited || isStudent || isCoach || isAdmin) && (
             <AudioBasedReview audioOrComprehension="audio" willAutoplay />
           )
         }
@@ -62,10 +52,7 @@ export default function AppRoutes() {
       <Route
         path="/comprehensionquiz/*"
         element={
-          (userDataQuery.data?.roles.studentRole === 'limited' ||
-            userDataQuery.data?.roles.studentRole === 'student' ||
-            userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
+          (isLimited || isStudent || isCoach || isAdmin) && (
             <AudioBasedReview
               audioOrComprehension="comprehension"
               willAutoplay={false}
@@ -75,66 +62,30 @@ export default function AppRoutes() {
       />
       <Route
         path="/frequensay"
-        element={
-          (userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
-            <FrequensayPage />
-          )
-        }
+        element={(isAdmin || isCoach) && <FrequensayPage />}
       />
       <Route
         path="/get-help"
-        element={
-          userDataQuery.data?.roles.adminRole === 'admin' && <GetHelpPage />
-        }
+        element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
       />
-      <Route
-        path="/examplemanager"
-        element={
-          userDataQuery.data?.roles.adminRole === 'admin' && <ExampleManager />
-        }
-      />
+      <Route path="/examplemanager" element={isAdmin && <ExampleManager />} />
       <Route
         path="/vocabularymanager"
-        element={
-          <ProtectedRoute>
-            <VocabularyCreatorPage />
-          </ProtectedRoute>
-        }
+        element={isAdmin && <VocabularyCreatorPage />}
       />
       <Route
         path="/weeklyrecords"
-        element={
-          (userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
-            <WeeksRecordsSection />
-          )
-        }
+        element={(isAdmin || isCoach) && <WeeksRecordsSection />}
       />
       <Route
         path="/student-drill-down"
-        element={
-          (userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
-            <StudentDrillDown />
-          )
-        }
+        element={(isAdmin || isCoach) && <StudentDrillDown />}
       />
       <Route
         path="/coaching-dashboard"
-        element={
-          (userDataQuery.data?.roles.adminRole === 'coach' ||
-            userDataQuery.data?.roles.adminRole === 'admin') && (
-            <CoachingDashboard />
-          )
-        }
+        element={(isAdmin || isCoach) && <CoachingDashboard />}
       />
-      <Route
-        path="/database-tables/*"
-        element={
-          userDataQuery.data?.roles.adminRole === 'admin' && <DatabaseTables />
-        }
-      >
+      <Route path="/database-tables/*" element={isAdmin && <DatabaseTables />}>
         <Route path="students" element={<StudentsTable />} />
         <Route path="programs" element={<ProgramsTable />} />
         <Route path="lessons" element={<LessonsTable />} />

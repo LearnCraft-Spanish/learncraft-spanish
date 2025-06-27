@@ -1,8 +1,8 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 
+import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../../useBackend';
-import { useUserData } from '../../UserData/useUserData';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
 export default function useWeeks(
@@ -10,16 +10,14 @@ export default function useWeeks(
   endDate: string | undefined,
 ) {
   const { newPutFactory } = useBackendHelpers();
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
   const { getWeeks } = useStudentRecordsBackend();
 
   const weeksQuery = useQuery({
     queryKey: ['weeksQuery', { startDate, endDate }],
     queryFn: getWeeks,
     staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
+    enabled: isCoach || isAdmin,
   });
 
   interface WeekForUpdate {

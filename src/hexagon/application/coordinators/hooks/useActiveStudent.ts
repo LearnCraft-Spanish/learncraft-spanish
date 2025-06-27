@@ -3,7 +3,7 @@ import { useAppUserAdapter } from '@application/adapters/appUserAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import ActiveStudentContext from '@application/coordinators/contexts/ActiveStudentContext';
 import { useQuery } from '@tanstack/react-query';
-import { use, useCallback, useMemo, useState } from 'react';
+import { use, useCallback, useMemo } from 'react';
 import { z } from 'zod';
 
 interface UseActiveStudentReturnType {
@@ -21,10 +21,14 @@ export function useActiveStudent(): UseActiveStudentReturnType {
       'useActiveStudent must be used within an ActiveStudentProvider',
     );
   }
-  const { activeStudentEmail, updateActiveStudentEmail } = context;
+  const { studentSelectionState, updateSelectedStudent } = context;
   const { authUser } = useAuthAdapter();
   const { getAppUserByEmail, getMyData } = useAppUserAdapter();
-  const [hasUserMadeSelection, setHasUserMadeSelection] = useState(false);
+
+  const hasUserMadeSelection = useMemo(
+    () => studentSelectionState.changed,
+    [studentSelectionState],
+  );
 
   const canChangeStudent = useMemo(() => {
     if (!authUser) return false;
@@ -38,31 +42,34 @@ export function useActiveStudent(): UseActiveStudentReturnType {
         return;
       }
 
-      // Mark that user has made a selection
-      setHasUserMadeSelection(true);
-
       if (!newEmail) {
-        updateActiveStudentEmail(null);
+        updateSelectedStudent({
+          email: null,
+          changed: true,
+        });
         return;
       }
       const parsedEmail = z.string().email().safeParse(newEmail);
       if (parsedEmail.success) {
-        updateActiveStudentEmail(parsedEmail.data);
+        updateSelectedStudent({
+          email: parsedEmail.data,
+          changed: true,
+        });
       } else {
         console.error('Invalid email', parsedEmail.error);
       }
     },
-    [canChangeStudent, updateActiveStudentEmail],
+    [canChangeStudent, updateSelectedStudent],
   );
 
   const userToFetch: string | null = useMemo(() => {
     // If user has made any selection, use the context value (even if null)
     if (hasUserMadeSelection) {
-      return activeStudentEmail;
+      return studentSelectionState.email;
     }
     // Otherwise, use current user's email
     return authUser?.email || null;
-  }, [hasUserMadeSelection, activeStudentEmail, authUser]);
+  }, [hasUserMadeSelection, studentSelectionState.email, authUser]);
 
   const isOwnUser = useMemo(
     () => userToFetch === authUser?.email,
@@ -82,7 +89,7 @@ export function useActiveStudent(): UseActiveStudentReturnType {
     error,
   } = useQuery({
     queryKey: ['appUser', userToFetch],
-    queryFn: () => userFetchFunction(),
+    queryFn: userFetchFunction,
     enabled: !!userToFetch,
   });
 

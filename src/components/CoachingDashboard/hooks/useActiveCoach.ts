@@ -1,14 +1,18 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMemo } from 'react';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export default function useActiveCoach() {
-  const userDataQuery = useUserData();
+  const {
+    authUser,
+    isAuthenticated,
+    isLoading: authLoading,
+  } = useAuthAdapter();
   const { coachListQuery } = useCoachList();
 
-  const isLoading = userDataQuery.isLoading || coachListQuery.isLoading;
-  const isError = userDataQuery.isError || coachListQuery.isError;
-  const isSuccess = userDataQuery.isSuccess && coachListQuery.isSuccess;
+  const isLoading = authLoading || coachListQuery.isLoading;
+  const isError = coachListQuery.isError;
+  const isSuccess = isAuthenticated && coachListQuery.isSuccess;
 
   const coach = useMemo(() => {
     if (!isSuccess) return null;
@@ -16,11 +20,9 @@ export default function useActiveCoach() {
       '@learncraftspanish.com',
       '@masterofmemory.com',
     ];
-    if (userDataQuery.data.emailAddress) {
+    if (authUser?.email) {
       const currentUserCoach = coachListQuery.data.find((coach) => {
-        const emailPrefix = userDataQuery.data.emailAddress
-          .split('@')[0]
-          .toLowerCase();
+        const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
           if (coach.user.email.toLowerCase() === emailPrefix + domain) {
             return true;
@@ -31,7 +33,7 @@ export default function useActiveCoach() {
       if (currentUserCoach) return currentUserCoach;
     }
     return undefined;
-  }, [isSuccess, userDataQuery.data?.emailAddress, coachListQuery.data]);
+  }, [isSuccess, authUser?.email, coachListQuery.data]);
 
   return { coach, states: { isLoading, isError, isSuccess } };
 }

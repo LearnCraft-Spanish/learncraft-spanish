@@ -1,9 +1,11 @@
 import type { GroupSession, Week } from 'src/types/CoachingTypes';
 
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
 import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
 import ContextualView from 'src/components/Contextual/ContextualView';
+
 import {
   CoachDropdown,
   DateInput,
@@ -16,7 +18,6 @@ import {
 } from 'src/components/FormComponents';
 
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
-
 import * as helpers from 'src/hooks/CoachingData/helperFunctions';
 import {
   useActiveMemberships,
@@ -28,7 +29,6 @@ import {
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const sessionTypeOptions = [
@@ -111,7 +111,7 @@ export function GroupSessionView({
   tableEditMode?: boolean;
   onSuccess?: () => void;
 }) {
-  const userDataQuery = useUserData();
+  const { authUser, isAdmin } = useAuthAdapter();
   const { closeContextual, updateDisableClickOutside } = useContextualMenu();
   const { openModal, closeModal } = useModal();
 
@@ -191,10 +191,8 @@ export function GroupSessionView({
   // Edit or Update State
   const setInitialState = useCallback(() => {
     const defaultCoachForNewRecord =
-      getLoggedInCoach(
-        userDataQuery.data?.emailAddress || '',
-        coachListQuery.data || [],
-      )?.user.email || '';
+      getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
+        .email || '';
     setSessionType(newRecord ? '' : groupSession.sessionType);
     const formattedDate = groupSession.date
       ? typeof groupSession.date === 'string'
@@ -678,11 +676,9 @@ export function GroupSessionView({
             )}
         </div>
       </div>
-      {editMode &&
-        !newRecord &&
-        userDataQuery.data?.roles.adminRole === 'admin' && (
-          <DeleteRecord deleteFunction={deleteRecordFunction} />
-        )}
+      {editMode && !newRecord && isAdmin && (
+        <DeleteRecord deleteFunction={deleteRecordFunction} />
+      )}
       <FormControls
         editMode={editMode}
         cancelEdit={cancelEdit}

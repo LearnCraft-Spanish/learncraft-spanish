@@ -1,12 +1,12 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { toast } from 'react-toastify';
 
+import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../../useBackend';
-import { useUserData } from '../../UserData/useUserData';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
 export default function useAssignments(startDate: string, endDate: string) {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
   const { getAssignments } = useStudentRecordsBackend();
 
   const { newPostFactory, newPutFactory, newDeleteFactory } =
@@ -16,9 +16,7 @@ export default function useAssignments(startDate: string, endDate: string) {
     queryKey: ['assignments', { startDate, endDate }],
     queryFn: getAssignments,
     staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
+    enabled: isCoach || isAdmin,
   });
 
   // const getAssignment = (recordId: number) => {

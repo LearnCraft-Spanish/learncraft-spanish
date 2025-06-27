@@ -1,9 +1,9 @@
 import type { Student } from 'src/types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React, { useMemo, useState } from 'react';
 import { Loading } from 'src/components/Loading';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import {
   CoachStudents,
   StudentDrillDownSearch,
@@ -16,20 +16,21 @@ export default function StudentDrillDown() {
   const { allStudentsQuery } = useAllStudents();
   const { coachListQuery } = useCoachList();
 
-  const userDataQuery = useUserData();
+  const {
+    isLoading: authLoading,
+    isAuthenticated,
+    isAdmin,
+    authUser,
+  } = useAuthAdapter();
 
   const isLoading =
-    allStudentsQuery.isLoading ||
-    coachListQuery.isLoading ||
-    userDataQuery.isLoading;
+    allStudentsQuery.isLoading || coachListQuery.isLoading || authLoading;
 
   const isError =
-    allStudentsQuery.isError || coachListQuery.isError || userDataQuery.isError;
+    allStudentsQuery.isError || coachListQuery.isError || authLoading;
 
   const isSuccess =
-    allStudentsQuery.isSuccess &&
-    coachListQuery.isSuccess &&
-    userDataQuery.isSuccess;
+    allStudentsQuery.isSuccess && coachListQuery.isSuccess && isAuthenticated;
 
   const [selectedStudentId, setSelectedStudentId] = useState<
     number | undefined
@@ -61,11 +62,9 @@ export default function StudentDrillDown() {
       '@masterofmemory.com',
     ];
 
-    if (userDataQuery.data?.emailAddress) {
+    if (authUser?.email) {
       const currentUserCoach = coachListQuery.data?.find((coach) => {
-        const emailPrefix = userDataQuery.data.emailAddress
-          .split('@')[0]
-          .toLowerCase();
+        const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
           if (coach.user.email.toLowerCase() === emailPrefix + domain) {
             return true;
@@ -75,7 +74,7 @@ export default function StudentDrillDown() {
       });
       if (currentUserCoach) return currentUserCoach;
     }
-  }, [userDataQuery.data, coachListQuery.data]);
+  }, [authUser, coachListQuery.data]);
 
   return (
     <div className="student-deep-dive">
@@ -101,7 +100,7 @@ export default function StudentDrillDown() {
                 <StudentInfoCard
                   student={selectedStudent}
                   currentCoach={currentCoach}
-                  isAdmin={userDataQuery.data?.roles.adminRole === 'admin'}
+                  isAdmin={isAdmin}
                 />
               </div>
               <div>

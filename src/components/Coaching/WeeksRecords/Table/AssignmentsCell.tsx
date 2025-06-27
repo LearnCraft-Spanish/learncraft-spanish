@@ -1,4 +1,5 @@
 import type { Assignment, Week } from 'src/types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import ContextualView from 'src/components/Contextual/ContextualView';
@@ -16,9 +17,8 @@ import { toReadableMonthDay } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useModal } from 'src/hooks/useModal';
 
 import CustomStudentSelector from '../../general/CustomStudentSelector';
 import getDateRange from '../../general/functions/dateRange';
@@ -330,7 +330,7 @@ export function NewAssignmentView({
 }) {
   const { closeContextual } = useContextualMenu();
   const { createAssignmentMutation } = useCoaching();
-  const userDataQuery = useUserData();
+  const { authUser } = useAuthAdapter();
   const { getStudentFromMembershipId } = useCoaching();
   const { openModal } = useModal();
   const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
@@ -352,12 +352,10 @@ export function NewAssignmentView({
 
   const defaultHomeworkCorrector = useMemo(() => {
     return (
-      getLoggedInCoach(
-        userDataQuery.data?.emailAddress || '',
-        coachListQuery.data || [],
-      )?.user.email || ''
+      getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
+        .email || ''
     );
-  }, [userDataQuery.data?.emailAddress, coachListQuery.data]);
+  }, [authUser.email, coachListQuery.data]);
 
   const [homeworkCorrector, setHomeworkCorrector] = useState(
     defaultHomeworkCorrector,

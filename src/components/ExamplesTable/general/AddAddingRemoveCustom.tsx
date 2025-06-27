@@ -1,6 +1,6 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useModal } from 'src/hooks/useModal';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 export default function AddAddingRemoveCustom({
@@ -9,7 +9,7 @@ export default function AddAddingRemoveCustom({
   example: Flashcard;
 }) {
   const { openModal, closeModal } = useModal();
-  const { activeStudentQuery } = useActiveStudent();
+  const { appUser } = useActiveStudent();
   const {
     flashcardDataQuery,
     addFlashcardMutation,
@@ -23,8 +23,7 @@ export default function AddAddingRemoveCustom({
   const isPending = exampleIsPending(example.recordId);
   const isCustom = exampleIsCustom(example.recordId);
 
-  const dataReady =
-    flashcardDataQuery.isSuccess && activeStudentQuery.isSuccess;
+  const dataReady = flashcardDataQuery.isSuccess && appUser;
 
   const handleRemove = () => {
     if (isCustom) {

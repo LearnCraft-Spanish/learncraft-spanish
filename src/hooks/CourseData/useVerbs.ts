@@ -1,7 +1,7 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackend } from 'src/hooks/useBackend';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export interface Verb {
   recordId: number;
@@ -10,17 +10,15 @@ export interface Verb {
 }
 
 export function useVerbs() {
-  const userDataQuery = useUserData();
+  const { isAdmin } = useAuthAdapter();
   const { getVerbsFromBackend, createVerb, updateVerb, deleteVerb } =
     useBackend();
-
-  const hasAccess = userDataQuery.data?.roles.adminRole === 'admin';
 
   const verbsQuery = useQuery({
     queryKey: ['verbs'],
     queryFn: getVerbsFromBackend,
     staleTime: Infinity,
-    enabled: hasAccess,
+    enabled: isAdmin,
   });
 
   const createVerbMutation = useMutation({

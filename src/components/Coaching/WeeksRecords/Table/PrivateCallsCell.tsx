@@ -1,4 +1,5 @@
 import type { PrivateCall, Student, Week } from 'src/types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
 import React, { useEffect, useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
@@ -21,7 +22,6 @@ import { useWeeks } from 'src/hooks/CoachingData/queries';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const ratingOptions = [
@@ -68,7 +68,7 @@ export function PrivateCallView({
   tableEditMode?: boolean;
   onSuccess?: () => void;
 }) {
-  const userDataQuery = useUserData();
+  const { isAdmin } = useAuthAdapter();
   const { updateDisableClickOutside, closeContextual } = useContextualMenu();
   const {
     getStudentFromMembershipId,
@@ -270,7 +270,7 @@ export function PrivateCallView({
         editMode={editMode}
       />
 
-      {editMode && userDataQuery.data?.roles.adminRole === 'admin' && (
+      {editMode && isAdmin && (
         <DeleteRecord deleteFunction={deleteRecordFunction} />
       )}
 
@@ -351,15 +351,13 @@ export function NewPrivateCallView({
   const { getStudentFromMembershipId, createPrivateCallMutation } =
     useCoaching();
   const { closeContextual } = useContextualMenu();
-  const userDataQuery = useUserData();
+  const { authUser } = useAuthAdapter();
   const { openModal } = useModal();
   const { coachListQuery } = useCoaching();
 
   const defaultCaller =
-    getLoggedInCoach(
-      userDataQuery.data?.emailAddress || '',
-      coachListQuery.data || [],
-    )?.user.email || '';
+    getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
+      .email || '';
 
   // New Record Inputs
   const [caller, setCaller] = useState(defaultCaller);
