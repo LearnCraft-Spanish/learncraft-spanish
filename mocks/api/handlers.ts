@@ -1,8 +1,12 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
+import { CourseWithLessonsSchema } from '@LearnCraft-Spanish/shared';
 import { http, HttpResponse } from 'msw';
+import { z } from 'zod';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import newData from '../data/serverlike/serverlikeData';
+
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
+
 import { appUserTable } from '../data/serverlike/userTable';
 
 // import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
@@ -75,14 +79,6 @@ export const handlers = [
   //   });
   //   return HttpResponse.json(student);
   // }),
-
-  http.get(`${backendUrl}app-user/my-data`, ({ request }) => {
-    const email = getEmailFromRequest(request);
-    const student = appUserTable.find((student) => {
-      return student.emailAddress === email;
-    });
-    return HttpResponse.json(student);
-  }),
 
   http.get(`${backendUrl}all-students`, () => {
     return HttpResponse.json(apiData.allStudentsTable);
@@ -348,4 +344,18 @@ export const handlers = [
       return HttpResponse.json([]);
     },
   ),
+
+  http.get(`/api/app-user/my-data`, ({ request }) => {
+    const email = getEmailFromRequest(request);
+    const student = appUserTable.find((student) => {
+      return student.emailAddress === email;
+    });
+    return HttpResponse.json(student);
+  }),
+
+  http.get(`/api/courses-with-lessons`, () => {
+    return HttpResponse.json(
+      CourseWithLessonsSchema.parse(generatedMockData.courseList),
+    );
+  }),
 ];
