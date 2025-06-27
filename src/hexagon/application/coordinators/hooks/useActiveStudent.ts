@@ -1,18 +1,11 @@
 import type { AppUser } from '@LearnCraft-Spanish/shared/dist/domain/appUser/core-types';
+import type { UseActiveStudentReturnType } from './types';
 import { useAppUserAdapter } from '@application/adapters/appUserAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import ActiveStudentContext from '@application/coordinators/contexts/ActiveStudentContext';
 import { useQuery } from '@tanstack/react-query';
 import { use, useCallback, useMemo } from 'react';
 import { z } from 'zod';
-
-interface UseActiveStudentReturnType {
-  appUser: AppUser | null;
-  isLoading: boolean;
-  error: Error | null;
-  isOwnUser: boolean;
-  changeActiveStudent: (newEmail: string | null) => void;
-}
 
 export function useActiveStudent(): UseActiveStudentReturnType {
   const context = use(ActiveStudentContext);

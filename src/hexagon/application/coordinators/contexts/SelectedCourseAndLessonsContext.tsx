@@ -1,17 +1,15 @@
-// import type { Course, Lesson } from 'src/types/CoachingTypes';
-import type { CourseWithLessons, Lesson } from '@LearnCraft-Spanish/shared';
 import { createContext } from 'react';
 
 interface SelectedCourseAndLessonsContextType {
   // States
-  course: CourseWithLessons | null;
-  fromLesson: Lesson | null;
-  toLesson: Lesson | null;
+  userSelectedCourseId: number | null;
+  fromLessonId: number | null;
+  toLessonId: number | null;
 
   // Actions
-  updateCourse: (courseId: number) => void;
-  updateFromLesson: (lessonId: number) => void;
-  updateToLesson: (lessonId: number) => void;
+  updateUserSelectedCourseId: (courseId: number) => void;
+  updateFromLessonId: (lessonId: number) => void;
+  updateToLessonId: (lessonId: number) => void;
 
   // Memos
   // allowedVocabulary: VocabularyTag[];
