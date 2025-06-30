@@ -1,7 +1,6 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
 import { CourseWithLessonsSchema } from '@LearnCraft-Spanish/shared';
 import { http, HttpResponse } from 'msw';
-import { z } from 'zod';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import newData from '../data/serverlike/serverlikeData';
 
