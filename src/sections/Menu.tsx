@@ -7,18 +7,14 @@ import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import 'src/App.css';
 
 export default function Menu() {
-  const { isAuthenticated, isLoading, isAdmin, isCoach, isStudent, isLimited } =
-    useAuthAdapter();
+  const { isAuthenticated, isLoading, isAdmin, isCoach } = useAuthAdapter();
   const { appUser, isLoading: appUserLoading } = useActiveStudent();
   const { flashcardDataQuery } = useStudentFlashcards();
 
   // Make sure user data is loaded before showing the menu.
   // Require activeStudent data unless user is Admin.
   // If activeStudent is student, also make sure flashcard data is loaded.
-  const menuDataReady =
-    isAuthenticated &&
-    (((isAdmin || isCoach) && !isStudent && !isLimited) || appUser) &&
-    (appUser?.studentRole !== 'student' || flashcardDataQuery.isSuccess);
+  const menuDataReady = isAuthenticated && !isLoading && !appUserLoading;
 
   // Display loading or error messages if necessary
   const menuDataError = !menuDataReady && flashcardDataQuery.isError;
