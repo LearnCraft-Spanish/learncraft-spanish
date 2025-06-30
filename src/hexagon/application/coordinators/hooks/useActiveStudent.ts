@@ -6,6 +6,7 @@ import ActiveStudentContext from '@application/coordinators/contexts/ActiveStude
 import { roleHasChangedResponseSchema } from '@LearnCraft-Spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { use, useCallback, useMemo } from 'react';
+import { useModal } from 'src/hooks/useModal';
 import { z } from 'zod';
 
 export function useActiveStudent(): UseActiveStudentReturnType {
@@ -18,7 +19,7 @@ export function useActiveStudent(): UseActiveStudentReturnType {
   const { studentSelectionState, updateSelectedStudent } = context;
   const { authUser, logout } = useAuthAdapter();
   const { getAppUserByEmail, getMyData } = useAppUserAdapter();
-
+  const { openModal, closeModal } = useModal();
   const hasUserMadeSelection = useMemo(
     () => studentSelectionState.changed,
     [studentSelectionState],
@@ -70,18 +71,37 @@ export function useActiveStudent(): UseActiveStudentReturnType {
     [userToFetch, authUser],
   );
 
+  const onRoleChange = useCallback(async () => {
+    logout();
+    closeModal();
+  }, [logout, closeModal]);
+
   const userFetchFunction = useCallback(async (): Promise<AppUser | null> => {
     if (isOwnUser) {
       const myData = await getMyData();
       if (myData === roleHasChangedResponseSchema.value) {
-        logout();
+        openModal({
+          title: 'Notice',
+          body: 'Your access level has changed. On confirmation, you will be logged out. Please log in again to see your new access level.',
+          type: 'notice',
+          confirmFunction: () => {
+            onRoleChange();
+          },
+        });
         return null;
       } else {
         return myData;
       }
     }
     return getAppUserByEmail(userToFetch!);
-  }, [isOwnUser, getAppUserByEmail, getMyData, userToFetch, logout]);
+  }, [
+    isOwnUser,
+    getAppUserByEmail,
+    getMyData,
+    userToFetch,
+    openModal,
+    onRoleChange,
+  ]);
 
   const {
     data: appUser,

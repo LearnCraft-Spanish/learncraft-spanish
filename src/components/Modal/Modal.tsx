@@ -3,7 +3,7 @@ import './modal.scss';
 export interface ModalProps {
   title: string;
   body: string;
-  type: 'error' | 'confirm';
+  type: 'error' | 'confirm' | 'notice';
   confirmFunction?: () => void;
   cancelFunction?: () => void;
   closeModal: () => void;
@@ -47,6 +47,12 @@ export default function Modal(props: ModalProps) {
               Confirm
             </button>
           </>
+        );
+      case 'notice':
+        return (
+          <button type="button" className="addButton" onClick={handleConfirm}>
+            Accept
+          </button>
         );
       default:
         return (

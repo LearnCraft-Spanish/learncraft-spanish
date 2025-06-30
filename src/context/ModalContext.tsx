@@ -3,7 +3,7 @@ import { createContext } from 'react';
 interface ModalContentProps {
   title: string;
   body: string;
-  type: 'error' | 'confirm';
+  type: 'error' | 'confirm' | 'notice';
   confirmFunction?: () => void;
   cancelFunction?: () => void;
 }
