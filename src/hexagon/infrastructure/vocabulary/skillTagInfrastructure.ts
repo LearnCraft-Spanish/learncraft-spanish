@@ -1,20 +1,20 @@
 import type { AuthPort } from '@application/ports/authPort';
-
 import type { SkillTag } from '@LearnCraft-Spanish/shared';
-import { createHttpClient } from '@application/utils/httpClient';
+import { createHttpClient } from '@infrastructure/http/client';
 import { getSkillsEndpoint } from '@LearnCraft-Spanish/shared';
 
 export function createSkillTagInfrastructure(
   apiUrl: string,
   auth: AuthPort,
-): SkillTagPort {
+  // ): SkillTagPort {
+) {
   const httpClient = createHttpClient(apiUrl, auth);
 
   return {
     getSkillTagTable: async (): Promise<SkillTag[]> => {
       const response = await httpClient.get<SkillTag[]>(
-        listSkillTagsEndpoint.path,
-        listSkillTagsEndpoint.requiredScopes,
+        getSkillsEndpoint.path,
+        getSkillsEndpoint.requiredScopes,
       );
 
       return Array.isArray(response) ? response : [];
