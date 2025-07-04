@@ -22,13 +22,12 @@ export function createExampleInfrastructure(
       audioOnly?: boolean;
       skillTags?: SkillTag[];
     }) => {
-      const response = await httpClient.post<ExampleWithVocabulary[]>(
-        queryExamplesEndpoint.path,
-        queryExamplesEndpoint.requiredScopes,
-        {
-          data: params,
-        },
-      );
+      const response = await httpClient.post<{
+        examples: ExampleWithVocabulary[];
+        totalCount: number;
+      }>(queryExamplesEndpoint.path, queryExamplesEndpoint.requiredScopes, {
+        data: params,
+      });
       return response;
     },
   };

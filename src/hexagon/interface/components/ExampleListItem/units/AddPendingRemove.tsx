@@ -1,14 +1,13 @@
-import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
 import { useMemo } from 'react';
 
 export default function AddPendingRemove({
-  example,
+  id,
   isCollected,
   isPending,
   handleAdd,
   handleRemove,
 }: {
-  example: ExampleWithVocabulary;
+  id: number;
   isCollected: boolean;
   isPending: boolean;
   handleAdd: () => void;
@@ -47,7 +46,7 @@ export default function AddPendingRemove({
     <button
       type="button"
       className={buttonParams.className}
-      value={example.id}
+      value={id}
       onClick={buttonParams.onClickFunction}
     >
       {buttonParams.text}

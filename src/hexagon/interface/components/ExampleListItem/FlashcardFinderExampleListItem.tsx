@@ -1,5 +1,5 @@
 // THIS WILL NOT LIVE IN THIS FOLDER. IT SHOULD BE LOCATED WITH EXAMPLE MANAGER, i think :)
-import type { ExampleRecord } from '@LearnCraft-Spanish/shared';
+import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
 
 import { useCallback, useState } from 'react';
 import ExampleListItemFactory from './ExampleListItemFactory';
@@ -9,8 +9,16 @@ import MoreInfoViewExample from './units/MoreInfoViewExample';
 
 export default function ExampleListItem({
   example,
+  isCollected,
+  isPending,
+  handleAdd,
+  handleRemove,
 }: {
-  example: ExampleRecord;
+  example: ExampleWithVocabulary;
+  isCollected: boolean;
+  isPending: boolean;
+  handleAdd: () => void;
+  handleRemove: () => void;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
 
@@ -24,13 +32,12 @@ export default function ExampleListItem({
         example={example}
         postTextComponents={[
           <MoreInfoButton
-            example={example}
             onClickFunction={onClickMoreInfo}
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
           <AddPendingRemove
-            example={example}
+            id={example.id}
             isCollected={isCollected}
             isPending={isPending}
             handleAdd={handleAdd}

@@ -18,5 +18,5 @@ export interface ExamplePort {
     spanglishOnly?: boolean;
     audioOnly?: boolean;
     skillTags?: SkillTag[];
-  }) => Promise<ExampleWithVocabulary[]>;
+  }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
 }

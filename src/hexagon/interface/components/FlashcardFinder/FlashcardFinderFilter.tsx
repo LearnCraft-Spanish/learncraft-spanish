@@ -1,83 +1,115 @@
-import type { VocabTag } from 'src/types/interfaceDefinitions';
-
 import ToggleSwitch from '../general/ToggleSwitch';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 import SelectedTags from './VocabTagFilter/SelectedTags';
 
 import TagFilter from './VocabTagFilter/TagFilter';
+import { UseExampleFilterReturnType } from 'src/hexagon/application/units/useExampleFilter';
 
 export default function FlashcardFinderFilter({
-  includeSpanglish,
-  toggleIncludeSpanglish,
-  audioOnly,
-  toggleAudioOnly,
+  filterState: hookFilterState,
+  skillTagSearch,
+}: UseExampleFilterReturnType) {
+  const {
+    filterState,
+    filtersChanging,
+    updateExcludeSpanglish,
+    updateAudioOnly,
+    addSkillTagToFilters,
+    removeSkillTagFromFilters,
+    setFiltersChanging,
+  } = hookFilterState;
 
-  tagSearchTerm,
-  updateTagSearchTerm,
-  suggestedTags,
-  addTag,
-  removeTag,
-  selectedTags,
+  const { tagSearchTerm, tagSuggestions, updateTagSearchTerm } = skillTagSearch;
 
-  handleGetExamplesFromTags,
-  getExamplesReady,
-}: {
-  includeSpanglish: boolean;
-  toggleIncludeSpanglish: () => void;
-  audioOnly: boolean;
-  toggleAudioOnly: () => void;
+  // Create wrapper functions that match ToggleSwitch's expected signature
+  const handleUpdateExcludeSpanglish = () => {
+    updateExcludeSpanglish(!filterState.exampleFilters.excludeSpanglish);
+  };
 
-  tagSearchTerm: string;
-  updateTagSearchTerm: (target: EventTarget & HTMLInputElement) => void;
-  suggestedTags: VocabTag[];
-  addTag: (id: number) => void;
-  removeTag: (id: number) => void;
-  selectedTags: VocabTag[];
+  const handleUpdateAudioOnly = () => {
+    updateAudioOnly(!filterState.exampleFilters.audioOnly);
+  };
 
-  handleGetExamplesFromTags: () => void;
-  getExamplesReady: boolean;
-}) {
+  const handleAddSkillTagToFilters = (tagKey: string) => {
+    addSkillTagToFilters(tagKey);
+  };
+
+  const handleRemoveSkillTagFromFilters = (tagKey: string) => {
+    removeSkillTagFromFilters(tagKey);
+  };
+
+  const { exampleFilters, course, fromLesson, toLesson } = filterState;
+
+  const { excludeSpanglish, audioOnly, skillTags } = exampleFilters;
+
+  // Convert skillTags array of keys to actual SkillTag objects for display
+  const selectedTags = skillTags
+    .map((tagKey) => tagSuggestions.find((t) => t.key === tagKey))
+    .filter((tag): tag is NonNullable<typeof tag> => tag !== undefined);
+
+  /**
+   * TODO: We need an inert (non-interactive) view of the filter state.
+   * The filterChanging state prevents refetches during filter manipulation.
+   */
   return (
     <div className="filterSection">
-      <div className="filterBox options">
-        <div className="FromToLessonSelectorWrapper">
-          <LessonRangeSelector />
+      {filtersChanging && (
+        <div className="buttonBox">
+          <button
+            onClick={() => setFiltersChanging(true)}
+            type="button"
+            disabled={filtersChanging}
+          >
+            Change Filters
+          </button>
         </div>
-        <ToggleSwitch
-          id="removeSpanglish"
-          ariaLabel="noSpanglish"
-          label="Include Spanglish: "
-          checked={includeSpanglish}
-          onChange={toggleIncludeSpanglish}
-        />
-        <ToggleSwitch
-          id="audioOnly"
-          ariaLabel="audioOnly"
-          label="Audio FlashcardsOnly: "
-          checked={audioOnly}
-          onChange={toggleAudioOnly}
-        />
-      </div>
-      <div className="filterBox search">
-        <div className="searchFilter">
-          <TagFilter
-            searchTerm={tagSearchTerm}
-            updateSearchTerm={updateTagSearchTerm}
-            searchResults={suggestedTags}
-            addTag={addTag}
-          />
-          <SelectedTags tags={selectedTags} removeTag={removeTag} />
-        </div>
-      </div>
-      <div className="buttonBox">
-        <button
-          onClick={handleGetExamplesFromTags}
-          type="button"
-          disabled={!getExamplesReady}
-        >
-          Get Examples
-        </button>
-      </div>
+      )}
+      {!filtersChanging && (
+        <>
+          <div className="filterBox options">
+            <div className="FromToLessonSelectorWrapper">
+              <LessonRangeSelector />
+            </div>
+            <ToggleSwitch
+              id="removeSpanglish"
+              ariaLabel="noSpanglish"
+              label="Include Spanglish: "
+              checked={excludeSpanglish}
+              onChange={handleUpdateExcludeSpanglish}
+            />
+            <ToggleSwitch
+              id="audioOnly"
+              ariaLabel="audioOnly"
+              label="Audio FlashcardsOnly: "
+              checked={audioOnly}
+              onChange={handleUpdateAudioOnly}
+            />
+          </div>
+          <div className="filterBox search">
+            <div className="searchFilter">
+              <TagFilter
+                searchTerm={tagSearchTerm}
+                updateSearchTerm={updateTagSearchTerm}
+                searchResults={tagSuggestions}
+                addTag={handleAddSkillTagToFilters}
+              />
+              <SelectedTags
+                tags={selectedTags}
+                removeTag={handleRemoveSkillTagFromFilters}
+              />
+            </div>
+          </div>
+          <div className="buttonBox">
+            <button
+              onClick={() => setFiltersChanging(false)}
+              type="button"
+              disabled={filtersChanging}
+            >
+              Get Examples
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
