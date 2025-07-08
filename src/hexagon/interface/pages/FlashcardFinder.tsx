@@ -1,7 +1,6 @@
-import useFlashcardFinderFilter from 'src/hexagon/application/units/useExampleFilter';
+import useFlashcardFinder from 'src/hexagon/application/useCases/useFlashcardFinder';
 import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
 import FlashcardFinderResults from '../components/FlashcardFinder/FlashcardFinderResults';
-import useFlashcardFinder from 'src/hexagon/application/useCases/useFlashcardFinder';
 
 export default function FlashcardFinder() {
   const { exampleFilter, exampleQuery, flashcardsQuery, totalPages } =

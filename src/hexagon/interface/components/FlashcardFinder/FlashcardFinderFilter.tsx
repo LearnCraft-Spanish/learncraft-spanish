@@ -22,31 +22,10 @@ export default function FlashcardFinderFilter({
 
   const { tagSearchTerm, tagSuggestions, updateTagSearchTerm } = skillTagSearch;
 
-  // Create wrapper functions that match ToggleSwitch's expected signature
-  const handleUpdateExcludeSpanglish = () => {
-    updateExcludeSpanglish(!filterState.exampleFilters.excludeSpanglish);
-  };
+  // const { exampleFilters, course, fromLesson, toLesson } = filterState;
+  const { exampleFilters } = filterState;
 
-  const handleUpdateAudioOnly = () => {
-    updateAudioOnly(!filterState.exampleFilters.audioOnly);
-  };
-
-  const handleAddSkillTagToFilters = (tagKey: string) => {
-    addSkillTagToFilters(tagKey);
-  };
-
-  const handleRemoveSkillTagFromFilters = (tagKey: string) => {
-    removeSkillTagFromFilters(tagKey);
-  };
-
-  const { exampleFilters, course, fromLesson, toLesson } = filterState;
-
-  const { excludeSpanglish, audioOnly, skillTags } = exampleFilters;
-
-  // Convert skillTags array of keys to actual SkillTag objects for display
-  const selectedTags = skillTags
-    .map((tagKey) => tagSuggestions.find((t) => t.key === tagKey))
-    .filter((tag): tag is NonNullable<typeof tag> => tag !== undefined);
+  const { excludeSpanglish, audioOnly } = exampleFilters;
 
   /**
    * TODO: We need an inert (non-interactive) view of the filter state.
@@ -76,14 +55,20 @@ export default function FlashcardFinderFilter({
               ariaLabel="noSpanglish"
               label="Include Spanglish: "
               checked={excludeSpanglish}
-              onChange={handleUpdateExcludeSpanglish}
+              onChange={() =>
+                updateExcludeSpanglish(
+                  !filterState.exampleFilters.excludeSpanglish,
+                )
+              }
             />
             <ToggleSwitch
               id="audioOnly"
               ariaLabel="audioOnly"
               label="Audio FlashcardsOnly: "
               checked={audioOnly}
-              onChange={handleUpdateAudioOnly}
+              onChange={() =>
+                updateAudioOnly(!filterState.exampleFilters.audioOnly)
+              }
             />
           </div>
           <div className="filterBox search">
@@ -92,9 +77,9 @@ export default function FlashcardFinderFilter({
                 searchTerm={tagSearchTerm}
                 updateSearchTerm={updateTagSearchTerm}
                 searchResults={tagSuggestions}
-                addTag={handleAddSkillTagToFilters}
+                addTag={addSkillTagToFilters}
               />
-              <SelectedTags removeTag={handleRemoveSkillTagFromFilters} />
+              <SelectedTags removeTag={removeSkillTagFromFilters} />
             </div>
           </div>
           <div className="buttonBox">

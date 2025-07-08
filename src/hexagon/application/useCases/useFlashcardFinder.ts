@@ -1,12 +1,10 @@
-import { useState, useMemo } from 'react';
 import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
-import {
-  useExampleQuery,
-  UseExampleQueryReturnType,
-} from '../queries/useExampleQuery';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
-import useExampleFilter from '@application/units/useExampleFilter';
+import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
+import useExampleFilter from '@application/units/useExampleFilter';
+import { useMemo, useState } from 'react';
+import { useExampleQuery } from '../queries/useExampleQuery';
 
 export interface UseFlashcardFinderReturnType {
   exampleFilter: UseExampleFilterReturnType;

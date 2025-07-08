@@ -1,9 +1,9 @@
 import type { Flashcard } from '@LearnCraft-Spanish/shared';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { useAuthAdapter } from '../adapters/authAdapter';
 import { useFlashcardAdapter } from '../adapters/flashcardAdapter';
-import { useCallback } from 'react';
 import { queryDefaults } from '../utils/queryUtils';
 
 export interface UseStudentFlashcardsReturnType {
