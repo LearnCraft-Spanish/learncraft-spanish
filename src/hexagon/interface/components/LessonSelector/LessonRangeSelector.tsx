@@ -24,8 +24,11 @@ export default function LessonRangeSelector(): React.JSX.Element {
   }, [course, toLesson]);
 
   const toLessons = useMemo(() => {
-    if (!course || !fromLesson) {
+    if (!course) {
       return [];
+    }
+    if (!fromLesson) {
+      return course?.lessons;
     }
     return course?.lessons.filter((lesson) => {
       return lesson.lessonNumber >= fromLesson?.lessonNumber;
