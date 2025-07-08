@@ -697,10 +697,15 @@ button:hover,
   justify-content: space-between;
 }
 .subcategoryCard,
+.SubcategoryCard,
 .vocabularyCard,
+.VocabularyCard,
 .idiomCard,
+.IdiomCard,
 .conjugationCard,
-.verbCard {
+.ConjugationCard,
+.verbCard,
+.VerbCard {
   width: 100%;
   height: 100%;
   text-align: left;
@@ -708,31 +713,36 @@ button:hover,
   margin: 0px;
 }
 
-.subcategoryCard {
+.subcategoryCard,
+.SubcategoryCard {
   padding: 5px 20px;
   color: var(--light);
   background-color: var(--theme);
 }
 
-.vocabularyCard {
+.vocabularyCard,
+.VocabularyCard {
   padding: 5px 20px;
   color: var(--light);
   background-color: var(--brand);
 }
 
-.idiomCard {
+.idiomCard,
+.IdiomCard {
   padding: 5px 20px;
   color: var(--dark);
   background-color: var(--accent);
 }
 
-.conjugationCard {
+.conjugationCard,
+.ConjugationCard {
   padding: 5px 20px;
   color: var(--dark);
   background-color: var(--light);
 }
 
-.verbCard {
+.verbCard,
+.VerbCard {
   padding: 5px 20px;
   color: var(--accent);
   background-color: var(--dark);

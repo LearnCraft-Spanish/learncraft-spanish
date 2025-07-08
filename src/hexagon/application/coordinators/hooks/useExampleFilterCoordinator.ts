@@ -22,6 +22,7 @@ export interface UseExampleFilterCoordinatorReturnType {
   updateExcludeSpanglish: (excludeSpanglish: boolean) => void;
   updateAudioOnly: (audioOnly: boolean) => void;
   setFiltersChanging: (filtersChanging: boolean) => void;
+  skillTagKeys: string[];
 }
 
 export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturnType {
@@ -92,5 +93,7 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
     updateExcludeSpanglish,
     updateAudioOnly,
     setFiltersChanging,
+
+    skillTagKeys: exampleFilters.skillTags,
   };
 }

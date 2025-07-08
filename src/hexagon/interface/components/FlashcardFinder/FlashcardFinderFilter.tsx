@@ -1,9 +1,10 @@
+import type { UseExampleFilterReturnType } from 'src/hexagon/application/units/useExampleFilter';
 import ToggleSwitch from '../general/ToggleSwitch';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
-import SelectedTags from './VocabTagFilter/SelectedTags';
 
+import SelectedTags from './VocabTagFilter/SelectedTags';
 import TagFilter from './VocabTagFilter/TagFilter';
-import { UseExampleFilterReturnType } from 'src/hexagon/application/units/useExampleFilter';
+import 'src/App.css';
 
 export default function FlashcardFinderFilter({
   filterState: hookFilterState,
@@ -53,7 +54,7 @@ export default function FlashcardFinderFilter({
    */
   return (
     <div className="filterSection">
-      {filtersChanging && (
+      {!filtersChanging && (
         <div className="buttonBox">
           <button
             onClick={() => setFiltersChanging(true)}
@@ -64,7 +65,7 @@ export default function FlashcardFinderFilter({
           </button>
         </div>
       )}
-      {!filtersChanging && (
+      {filtersChanging && (
         <>
           <div className="filterBox options">
             <div className="FromToLessonSelectorWrapper">
@@ -93,10 +94,7 @@ export default function FlashcardFinderFilter({
                 searchResults={tagSuggestions}
                 addTag={handleAddSkillTagToFilters}
               />
-              <SelectedTags
-                tags={selectedTags}
-                removeTag={handleRemoveSkillTagFromFilters}
-              />
+              <SelectedTags removeTag={handleRemoveSkillTagFromFilters} />
             </div>
           </div>
           <div className="buttonBox">
