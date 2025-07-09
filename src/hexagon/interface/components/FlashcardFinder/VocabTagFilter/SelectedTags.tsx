@@ -1,36 +1,20 @@
 import { SkillType } from '@LearnCraft-Spanish/shared';
-import { useMemo } from 'react';
-import { useExampleFilterCoordinator } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
-import { useSkillTags } from 'src/hexagon/application/queries/useSkillTags';
+import useExampleFilter from 'src/hexagon/application/units/useExampleFilter';
 
 export default function SelectedTags({
   removeTag,
 }: {
   removeTag: (tagId: string) => void;
 }) {
-  const { skillTagKeys } = useExampleFilterCoordinator();
-  const { skillTags } = useSkillTags();
-
-  const tags = useMemo(() => {
-    if (!skillTags) {
-      return [];
-    }
-    const tagObjects = skillTagKeys.map((key) =>
-      skillTags.find((t) => t.key === key),
-    );
-    // Filter out undefined values
-    return tagObjects.filter(
-      (tag): tag is NonNullable<typeof tag> => tag !== undefined,
-    );
-  }, [skillTagKeys, skillTags]);
+  const { skillTags } = useExampleFilter();
 
   return (
     <div className="selectedTagsBox">
       <p>Selected Tags:</p>
-      {!!tags.length && (
+      {!!skillTags.length && (
         <div className="selectedVocab">
           {/* <h5>Search Terms:</h5> */}
-          {tags.map((item) => (
+          {skillTags.map((item) => (
             <div
               key={item.key}
               className="tagCard"
