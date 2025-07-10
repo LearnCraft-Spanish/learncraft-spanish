@@ -436,6 +436,7 @@ export function GroupSessionView({
   }
 
   function submitCreationOrUpdate() {
+    disableEditMode();
     if (newRecord) {
       createGroupSessionMutation.mutate(
         {
@@ -459,7 +460,6 @@ export function GroupSessionView({
             if (
               attendees.some((attendee) => attendee.name === 'No Attendees')
             ) {
-              closeContextual();
               return;
             }
             // once it is created, add the attendees
@@ -478,7 +478,6 @@ export function GroupSessionView({
                     console.error('Error creating group attendees');
                     return;
                   }
-                  closeContextual();
                   onSuccess?.();
                 },
                 onError: (error) => {

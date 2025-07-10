@@ -434,17 +434,6 @@ export function NewPrivateCallView({
       },
       {
         onSuccess: () => {
-          closeContextual();
-
-          // Reset State
-          setRating('');
-          setNotes('');
-          setAreasOfDifficulty('');
-          setRecording('');
-          setDate(new Date(Date.now()).toISOString().split('T')[0]);
-          setCaller(userDataQuery.data?.emailAddress || '');
-          setCallType('Monthly Call');
-
           onSuccess?.();
         },
       },

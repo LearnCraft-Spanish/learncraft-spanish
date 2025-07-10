@@ -180,7 +180,6 @@ export function AssignmentView({
       {
         onSuccess: () => {
           disableEditMode();
-          closeContextual();
           onSuccess?.();
         },
       },
@@ -423,14 +422,6 @@ export function NewAssignmentView({
       },
       {
         onSuccess: () => {
-          closeContextual();
-          setHomeworkCorrector(userDataQuery.data?.emailAddress || '');
-          setAssignmentType('');
-          setRating('');
-          setNotes('');
-          setAreasOfDifficulty('');
-          setAssignmentLink('');
-
           onSuccess?.();
         },
       },
