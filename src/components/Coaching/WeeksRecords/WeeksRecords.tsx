@@ -16,10 +16,10 @@ import { Loading } from 'src/components/Loading';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import getLoggedInCoach from '../general/functions/getLoggedInCoach';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
 import { NewAssignmentView } from './Table/AssignmentsCell';
-
 import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
@@ -309,25 +309,12 @@ function WeeksRecordsContent() {
       coachListQuery.isSuccess &&
       userDataQuery.isSuccess
     ) {
-      const possibleEmailDomains = [
-        '@learncraftspanish.com',
-        '@masterofmemory.com',
-      ];
+      const defaultCoach = getLoggedInCoach(
+        userDataQuery.data?.emailAddress || '',
+        coachListQuery.data || [],
+      );
 
-      if (userDataQuery.data.emailAddress) {
-        const currentUserCoach = coachListQuery.data.find((coach) => {
-          const emailPrefix = userDataQuery.data.emailAddress
-            .split('@')[0]
-            .toLowerCase();
-          for (const domain of possibleEmailDomains) {
-            if (coach.user.email.toLowerCase() === emailPrefix + domain) {
-              return true;
-            }
-          }
-          return false;
-        });
-        if (currentUserCoach) setFilterByCoach(currentUserCoach);
-      }
+      if (defaultCoach) setFilterByCoach(defaultCoach);
       rendered.current = true;
     }
   }, [weeksQuery, coachListQuery, userDataQuery]);
