@@ -13,6 +13,7 @@ export default function FlashcardFinderFilter({
   const {
     filterState,
     filtersChanging,
+
     updateExcludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
@@ -86,7 +87,7 @@ export default function FlashcardFinderFilter({
             <button
               onClick={() => setFiltersChanging(false)}
               type="button"
-              disabled={filtersChanging}
+              disabled={!filtersChanging}
             >
               Get Examples
             </button>

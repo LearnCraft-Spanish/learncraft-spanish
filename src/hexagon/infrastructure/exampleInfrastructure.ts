@@ -26,7 +26,10 @@ export function createExampleInfrastructure(
         examples: ExampleWithVocabulary[];
         totalCount: number;
       }>(queryExamplesEndpoint.path, queryExamplesEndpoint.requiredScopes, {
-        data: params,
+        page: 1,
+        limit: 100,
+        filters: params,
+        seed: crypto.randomUUID(),
       });
       return response;
     },

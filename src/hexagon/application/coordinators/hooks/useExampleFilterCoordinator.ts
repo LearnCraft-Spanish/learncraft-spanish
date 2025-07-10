@@ -28,7 +28,7 @@ export interface UseExampleFilterCoordinatorReturnType {
 export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturnType {
   const { exampleFilters, updateExampleFilters } = use(ExampleFilterContext);
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
-  const [filtersChanging, setFiltersChanging] = useState(false);
+  const [filtersChanging, setFiltersChanging] = useState(true);
 
   const filterState: FilterState = useMemo(() => {
     return {

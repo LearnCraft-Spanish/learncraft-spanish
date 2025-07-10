@@ -80,6 +80,13 @@ export default function Menu() {
               </Link>
             </div>
           )}
+          {(appUser?.studentRole === 'student' || isAdmin || isCoach) && (
+            <div className="buttonBox">
+              <Link className="linkButton" to="/newflashcardfinder">
+                New Find Flashcards
+              </Link>
+            </div>
+          )}
           {appUser?.studentRole === 'student' && !isAdmin && !isCoach && (
             <div>
               <h3>Need Help?</h3>

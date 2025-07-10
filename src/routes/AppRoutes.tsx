@@ -1,4 +1,5 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
 import FrequensayPage from '@interface/pages/FrequensayPage';
 import GetHelpPage from '@interface/pages/GetHelpPage';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
@@ -40,6 +41,10 @@ export default function AppRoutes() {
       <Route
         path="/flashcardfinder"
         element={(isStudent || isCoach || isAdmin) && <FlashcardFinder />}
+      />
+      <Route
+        path="/newflashcardfinder"
+        element={(isAdmin || isCoach) && <FlashcardFinderPage />}
       />
       <Route
         path="/audioquiz/*"

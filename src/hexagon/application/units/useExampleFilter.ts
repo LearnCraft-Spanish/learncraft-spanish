@@ -13,6 +13,9 @@ export interface UseExampleFilterReturnType {
   filterState: UseExampleFilterCoordinatorReturnType;
   skillTagSearch: UseSkillTagSearchReturnType;
 
+  filtersChanging: boolean;
+  updateFiltersChanging: (filtersChanging: boolean) => void;
+
   skillTags: SkillTag[];
 }
 
@@ -92,9 +95,9 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
     filterState,
     skillTagSearch,
 
-    skillTags: tags,
+    filtersChanging,
+    updateFiltersChanging: filterState.setFiltersChanging,
 
-    // add filterChanging as an explicit return value
-    // and updateFilterChanging
+    skillTags: tags,
   };
 }

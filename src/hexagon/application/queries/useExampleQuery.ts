@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
 import { useExampleFilterCoordinator } from '../coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
+import useExampleFilter from '../units/useExampleFilter';
 import { useSkillTags } from './useSkillTags';
 
 export interface UseExampleQueryReturnType {
@@ -20,6 +21,7 @@ export const useExampleQuery = (
 ): UseExampleQueryReturnType => {
   const { filterState } = useExampleFilterCoordinator();
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
+  const { filtersChanging } = useExampleFilter();
   const { skillTags } = useSkillTags();
   const exampleAdapter = useExampleAdapter();
   const [page, setPage] = useState(1);
@@ -40,8 +42,8 @@ export const useExampleQuery = (
   const fetchFilteredExamples = useCallback(async () => {
     const { examples, totalCount } = (await exampleAdapter.getFilteredExamples({
       courseId: course!.id,
-      toLessonNumber: toLesson!.id,
-      fromLessonNumber: fromLesson?.id,
+      toLessonNumber: toLesson!.lessonNumber,
+      fromLessonNumber: fromLesson?.lessonNumber,
       spanglishOnly: filterState!.exampleFilters.excludeSpanglish,
       audioOnly: filterState!.exampleFilters.audioOnly,
       skillTags: tagsToSearch,
@@ -70,7 +72,7 @@ export const useExampleQuery = (
       filterState !== null &&
       course !== null &&
       toLesson !== null &&
-      fromLesson !== null,
+      !filtersChanging,
   });
 
   const filteredExamples = useMemo(() => {
