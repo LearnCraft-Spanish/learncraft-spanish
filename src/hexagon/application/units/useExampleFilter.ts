@@ -35,8 +35,7 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
 
   // This logic guards against updating the course and lesson while the search data is fetching
   // This reduces unnecessary re-fetches of the search data
-
-  const filtersChanging = filterState.filtersChanging;
+  const { filtersChanging, updateFiltersChanging } = filterState;
 
   const tags = useMemo(() => {
     if (!skillTags) {
@@ -96,7 +95,7 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
     skillTagSearch,
 
     filtersChanging,
-    updateFiltersChanging: filterState.setFiltersChanging,
+    updateFiltersChanging,
 
     skillTags: tags,
   };

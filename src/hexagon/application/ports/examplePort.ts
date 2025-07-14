@@ -8,14 +8,14 @@ export interface ExamplePort {
     courseId,
     toLessonNumber,
     fromLessonNumber,
-    spanglishOnly,
+    includeSpanglish,
     audioOnly,
     skillTags,
   }: {
     courseId: number;
     toLessonNumber: number;
     fromLessonNumber?: number;
-    spanglishOnly?: boolean;
+    includeSpanglish?: boolean;
     audioOnly?: boolean;
     skillTags?: SkillTag[];
   }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;

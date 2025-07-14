@@ -14,11 +14,11 @@ export default function FlashcardFinderFilter({
     filterState,
     filtersChanging,
 
-    updateExcludeSpanglish,
+    updateIncludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
-    setFiltersChanging,
+    updateFiltersChanging,
   } = hookFilterState;
 
   const { tagSearchTerm, tagSuggestions, updateTagSearchTerm } = skillTagSearch;
@@ -26,7 +26,7 @@ export default function FlashcardFinderFilter({
   // const { exampleFilters, course, fromLesson, toLesson } = filterState;
   const { exampleFilters } = filterState;
 
-  const { excludeSpanglish, audioOnly } = exampleFilters;
+  const { includeSpanglish, audioOnly } = exampleFilters;
 
   /**
    * TODO: We need an inert (non-interactive) view of the filter state.
@@ -37,7 +37,7 @@ export default function FlashcardFinderFilter({
       {!filtersChanging && (
         <div className="buttonBox">
           <button
-            onClick={() => setFiltersChanging(true)}
+            onClick={() => updateFiltersChanging(true)}
             type="button"
             disabled={filtersChanging}
           >
@@ -55,10 +55,10 @@ export default function FlashcardFinderFilter({
               id="removeSpanglish"
               ariaLabel="noSpanglish"
               label="Include Spanglish: "
-              checked={excludeSpanglish}
+              checked={includeSpanglish}
               onChange={() =>
-                updateExcludeSpanglish(
-                  !filterState.exampleFilters.excludeSpanglish,
+                updateIncludeSpanglish(
+                  !filterState.exampleFilters.includeSpanglish,
                 )
               }
             />
@@ -85,7 +85,7 @@ export default function FlashcardFinderFilter({
           </div>
           <div className="buttonBox">
             <button
-              onClick={() => setFiltersChanging(false)}
+              onClick={() => updateFiltersChanging(false)}
               type="button"
               disabled={!filtersChanging}
             >

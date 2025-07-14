@@ -19,9 +19,8 @@ export interface UseExampleQueryReturnType {
 export const useExampleQuery = (
   pageSize: number,
 ): UseExampleQueryReturnType => {
-  const { filterState } = useExampleFilterCoordinator();
+  const { filterState, filtersChanging } = useExampleFilterCoordinator();
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
-  const { filtersChanging } = useExampleFilter();
   const { skillTags } = useSkillTags();
   const exampleAdapter = useExampleAdapter();
   const [page, setPage] = useState(1);
@@ -44,12 +43,12 @@ export const useExampleQuery = (
       courseId: course!.id,
       toLessonNumber: toLesson!.lessonNumber,
       fromLessonNumber: fromLesson?.lessonNumber,
-      spanglishOnly: filterState!.exampleFilters.excludeSpanglish,
+      includeSpanglish: filterState!.exampleFilters.includeSpanglish,
       audioOnly: filterState!.exampleFilters.audioOnly,
       skillTags: tagsToSearch,
     })) || { examples: [], totalCount: 0 };
     return { examples, totalCount };
-  }, [course, toLesson, fromLesson]);
+  }, [course, toLesson, fromLesson, filterState, tagsToSearch, exampleAdapter]);
 
   const {
     data: fullResponse,
@@ -63,9 +62,10 @@ export const useExampleQuery = (
       course?.id,
       toLesson?.id,
       fromLesson?.id,
-      filterState?.exampleFilters.excludeSpanglish,
+      filterState?.exampleFilters.includeSpanglish,
       filterState?.exampleFilters.audioOnly,
       filterState?.exampleFilters.skillTags,
+      filtersChanging,
     ],
     queryFn: fetchFilteredExamples,
     enabled:
@@ -76,6 +76,7 @@ export const useExampleQuery = (
   });
 
   const filteredExamples = useMemo(() => {
+    console.log('filteredExamples Length', fullResponse?.examples.length);
     return fullResponse?.examples ?? null;
   }, [fullResponse, page, pageSize]);
 

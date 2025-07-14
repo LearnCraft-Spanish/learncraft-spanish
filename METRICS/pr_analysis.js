@@ -19,7 +19,7 @@ console.log(
 
 // Generate weekly dates (Mondays) from start to end
 const weeklyDates = [];
-let currentDate = new Date(startDate);
+const currentDate = new Date(startDate);
 
 while (currentDate <= endDate) {
   weeklyDates.push(new Date(currentDate));

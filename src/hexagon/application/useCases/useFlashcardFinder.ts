@@ -11,6 +11,7 @@ export interface UseFlashcardFinderReturnType {
   exampleQuery: UseExampleQueryReturnType;
   flashcardsQuery: UseStudentFlashcardsReturnType;
   totalPages: number | null;
+  pageSize: number;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
@@ -28,11 +29,11 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const [selectedPage, setSelectedPage] = useState(1);
   const totalPages = totalCount ? Math.ceil(totalCount / pageSize) : null;
 
-  // Slice the data for display
+  // // Slice the data for display
   const displayData = useMemo(() => {
     const startIndex = (selectedPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    return filteredExamples?.slice(startIndex, endIndex) ?? [];
+    return filteredExamples ?? [];
   }, [filteredExamples, selectedPage, pageSize]);
 
   // Handle page changes
@@ -59,5 +60,11 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
 
-  return { exampleFilter, exampleQuery, flashcardsQuery, totalPages };
+  return {
+    exampleFilter,
+    exampleQuery,
+    flashcardsQuery,
+    totalPages,
+    pageSize,
+  };
 }

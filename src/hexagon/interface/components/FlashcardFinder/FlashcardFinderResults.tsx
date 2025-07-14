@@ -6,8 +6,12 @@ import { getExampleListItemProps } from './helpers';
 
 export default function FlashcardFinderResults({
   filteredFlashcards,
+  totalCount,
+  pageSize,
 }: {
   filteredFlashcards: ExampleWithVocabulary[];
+  totalCount: number;
+  pageSize: number;
 }) {
   const displayOrder = useMemo(() => {
     return filteredFlashcards.map((flashcard) => ({
@@ -20,6 +24,8 @@ export default function FlashcardFinderResults({
       displayOrder={displayOrder}
       ExampleListItemComponent={FlashcardFinderExampleListItem}
       ExampleListItemProps={getExampleListItemProps}
+      totalCount={totalCount}
+      pageSize={pageSize}
     />
   );
 }

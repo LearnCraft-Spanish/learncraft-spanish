@@ -13,6 +13,8 @@ import {
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 
 interface ExamplesTableProps<T = any> {
+  pageSize?: number;
+  totalCount: number;
   dataSource: ExampleWithVocabulary[];
   displayOrder: DisplayOrder[];
   ExampleListItemProps: (example: ExampleWithVocabulary) => T;
@@ -20,11 +22,15 @@ interface ExamplesTableProps<T = any> {
 }
 
 export default function ExamplesTable<T = any>({
+  pageSize = 50,
+  totalCount,
   dataSource,
   displayOrder,
   ExampleListItemProps,
   ExampleListItemComponent,
 }: ExamplesTableProps<T>) {
+  console.log('totalCount', totalCount);
+  console.log('pageSize', pageSize);
   const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
     null,
   );
@@ -35,7 +41,7 @@ export default function ExamplesTable<T = any>({
     nextPage,
     previousPage,
     setPage,
-  } = usePagination({ displayOrder });
+  } = usePagination({ displayOrder, itemsPerPage: pageSize });
 
   const getExampleById = useCallback(
     (recordId: number) => {
@@ -60,7 +66,9 @@ export default function ExamplesTable<T = any>({
           Copy Table
         </button>
         <div className="displayExamplesDescription">
-          <h4>{`${displayOrder.length} flashcards showing`}</h4>
+          <h4>{`${totalCount} flashcards found (showing ${
+            (page - 1) * pageSize + 1
+          }-${Math.min(page * pageSize, totalCount)})`}</h4>
         </div>
       </div>
       <Pagination

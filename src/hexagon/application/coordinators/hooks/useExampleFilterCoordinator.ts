@@ -19,16 +19,20 @@ export interface UseExampleFilterCoordinatorReturnType {
   filtersChanging: boolean;
   addSkillTagToFilters: (tagKey: string) => void;
   removeSkillTagFromFilters: (tagKey: string) => void;
-  updateExcludeSpanglish: (excludeSpanglish: boolean) => void;
+  updateIncludeSpanglish: (includeSpanglish: boolean) => void;
   updateAudioOnly: (audioOnly: boolean) => void;
-  setFiltersChanging: (filtersChanging: boolean) => void;
+  updateFiltersChanging: (filtersChanging: boolean) => void;
   skillTagKeys: string[];
 }
 
 export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturnType {
-  const { exampleFilters, updateExampleFilters } = use(ExampleFilterContext);
+  const {
+    exampleFilters,
+    updateExampleFilters,
+    filtersChanging,
+    updateFiltersChanging,
+  } = use(ExampleFilterContext);
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
-  const [filtersChanging, setFiltersChanging] = useState(true);
 
   const filterState: FilterState = useMemo(() => {
     return {
@@ -65,12 +69,12 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
     [exampleFilters, filtersChanging, updateExampleFilters],
   );
 
-  const updateExcludeSpanglish = useCallback(
-    (excludeSpanglish: boolean) => {
+  const updateIncludeSpanglish = useCallback(
+    (includeSpanglish: boolean) => {
       if (!filtersChanging) {
         return;
       }
-      updateExampleFilters({ ...exampleFilters, excludeSpanglish });
+      updateExampleFilters({ ...exampleFilters, includeSpanglish });
     },
     [exampleFilters, filtersChanging, updateExampleFilters],
   );
@@ -90,9 +94,9 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
     filtersChanging,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
-    updateExcludeSpanglish,
+    updateIncludeSpanglish,
     updateAudioOnly,
-    setFiltersChanging,
+    updateFiltersChanging,
 
     skillTagKeys: exampleFilters.skillTags,
   };
