@@ -20,6 +20,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "mutate": "stryker run",
+    "mutate:hexagon": "stryker run stryker.config-hexagon.json",
     "predeploy": "pnpm run build",
     "preview": "vite preview",
     "refresh-mockdata": "tsx .github/workflows/update-cache.ts",
