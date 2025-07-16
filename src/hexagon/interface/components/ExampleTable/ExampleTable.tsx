@@ -1,39 +1,32 @@
 import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
 
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
+import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import usePagination from '@application/units/usePagination';
-import { useCallback, useEffect, useState } from 'react';
+
+import { useCallback, useEffect } from 'react';
 
 import { Pagination } from 'src/components/Table/components';
-
+import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import {
   copyTableToClipboard,
   getExampleById as getExampleByIdFunction,
 } from './units/functions';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 
-interface ExamplesTableProps<T = any> {
+interface ExamplesTableProps {
   pageSize?: number;
   totalCount: number;
   dataSource: ExampleWithVocabulary[];
   displayOrder: DisplayOrder[];
-  ExampleListItemProps: (example: ExampleWithVocabulary) => T;
-  ExampleListItemComponent: React.ComponentType<T>;
 }
 
-export default function ExamplesTable<T = any>({
+export default function ExamplesTable({
   pageSize = 50,
   totalCount,
   dataSource,
   displayOrder,
-  ExampleListItemProps,
-  ExampleListItemComponent,
-}: ExamplesTableProps<T>) {
-  console.log('totalCount', totalCount);
-  console.log('pageSize', pageSize);
-  const [selectedExampleId, setSelectedExampleId] = useState<number | null>(
-    null,
-  );
+}: ExamplesTableProps) {
   const {
     displayOrderSegment,
     page,
@@ -42,6 +35,9 @@ export default function ExamplesTable<T = any>({
     previousPage,
     setPage,
   } = usePagination({ displayOrder, itemsPerPage: pageSize });
+
+  const { isExampleCollected, createFlashcards, deleteFlashcards } =
+    useStudentFlashcards();
 
   const getExampleById = useCallback(
     (recordId: number) => {
@@ -80,17 +76,20 @@ export default function ExamplesTable<T = any>({
       {/* unnessessary id? */}
       <div id="examplesTableBody">
         {displayOrderSegment.map((displayOrder) => {
-          const id = displayOrder.recordId;
-          const exampleData = getExampleById(id);
-          if (!exampleData) {
-            return null;
-          } else
-            return (
-              <ExampleListItemComponent
-                key={displayOrder.recordId}
-                {...ExampleListItemProps(exampleData)}
-              />
-            );
+          return (
+            <ExampleListItem
+              key={displayOrder.recordId}
+              example={getExampleById(displayOrder.recordId)}
+              isCollected={isExampleCollected(displayOrder.recordId)}
+              isPending={false}
+              handleAdd={() => {
+                createFlashcards([displayOrder.recordId]);
+              }}
+              handleRemove={() => {
+                deleteFlashcards([displayOrder.recordId]);
+              }}
+            />
+          );
         })}
       </div>
 

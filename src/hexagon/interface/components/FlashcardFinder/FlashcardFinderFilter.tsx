@@ -21,7 +21,12 @@ export default function FlashcardFinderFilter({
     updateFiltersChanging,
   } = hookFilterState;
 
-  const { tagSearchTerm, tagSuggestions, updateTagSearchTerm } = skillTagSearch;
+  const {
+    tagSearchTerm,
+    tagSuggestions,
+    updateTagSearchTerm,
+    removeTagFromSuggestions,
+  } = skillTagSearch;
 
   // const { exampleFilters, course, fromLesson, toLesson } = filterState;
   const { exampleFilters } = filterState;

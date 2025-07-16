@@ -1,8 +1,6 @@
 import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
 import { useMemo } from 'react';
-import FlashcardFinderExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import ExampleTable from '../ExampleTable/ExampleTable';
-import { getExampleListItemProps } from './helpers';
 
 export default function FlashcardFinderResults({
   filteredFlashcards,
@@ -22,8 +20,6 @@ export default function FlashcardFinderResults({
     <ExampleTable
       dataSource={filteredFlashcards}
       displayOrder={displayOrder}
-      ExampleListItemComponent={FlashcardFinderExampleListItem}
-      ExampleListItemProps={getExampleListItemProps}
       totalCount={totalCount}
       pageSize={pageSize}
     />

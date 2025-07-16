@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from 'react';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
 import { useExampleFilterCoordinator } from '../coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
-import useExampleFilter from '../units/useExampleFilter';
 import { useSkillTags } from './useSkillTags';
 
 export interface UseExampleQueryReturnType {
@@ -76,7 +75,6 @@ export const useExampleQuery = (
   });
 
   const filteredExamples = useMemo(() => {
-    console.log('filteredExamples Length', fullResponse?.examples.length);
     return fullResponse?.examples ?? null;
   }, [fullResponse, page, pageSize]);
 

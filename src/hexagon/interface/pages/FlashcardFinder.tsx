@@ -6,10 +6,6 @@ export default function FlashcardFinder() {
   const { exampleFilter, exampleQuery, flashcardsQuery, totalPages, pageSize } =
     useFlashcardFinder();
 
-  console.log(
-    'Filtered Exampels Length Parent',
-    exampleQuery.filteredExamples?.length,
-  );
   const { filterState, skillTagSearch } = exampleFilter;
 
   return (

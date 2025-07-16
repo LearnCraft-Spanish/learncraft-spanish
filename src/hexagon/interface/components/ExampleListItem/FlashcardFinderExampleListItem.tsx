@@ -14,7 +14,7 @@ export default function ExampleListItem({
   handleAdd,
   handleRemove,
 }: {
-  example: ExampleWithVocabulary;
+  example: ExampleWithVocabulary | null;
   isCollected: boolean;
   isPending: boolean;
   handleAdd: () => void;
@@ -25,6 +25,10 @@ export default function ExampleListItem({
   const onClickMoreInfo = useCallback(() => {
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
+
+  if (!example) {
+    return null;
+  }
 
   return (
     <div className="exampleCardWithMoreInfo">

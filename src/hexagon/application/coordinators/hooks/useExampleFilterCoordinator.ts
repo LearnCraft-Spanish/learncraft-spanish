@@ -4,7 +4,7 @@ import type {
   Lesson,
 } from '@LearnCraft-Spanish/shared/dist/domain/courses/core-types';
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
-import { use, useCallback, useMemo, useState } from 'react';
+import { use, useCallback, useMemo } from 'react';
 import { useSelectedCourseAndLessons } from './useSelectedCourseAndLessons';
 
 interface FilterState {

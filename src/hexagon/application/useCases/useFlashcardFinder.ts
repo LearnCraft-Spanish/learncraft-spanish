@@ -3,7 +3,7 @@ import type { UseExampleFilterReturnType } from '@application/units/useExampleFi
 import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useExampleQuery } from '../queries/useExampleQuery';
 
 export interface UseFlashcardFinderReturnType {
@@ -29,13 +29,6 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const [selectedPage, setSelectedPage] = useState(1);
   const totalPages = totalCount ? Math.ceil(totalCount / pageSize) : null;
 
-  // // Slice the data for display
-  const displayData = useMemo(() => {
-    const startIndex = (selectedPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return filteredExamples ?? [];
-  }, [filteredExamples, selectedPage, pageSize]);
-
   // Handle page changes
   const handlePageChange = (newPage: number) => {
     setSelectedPage(newPage);
@@ -48,7 +41,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   };
 
   const exampleQuery: UseExampleQueryReturnType = {
-    filteredExamples: displayData,
+    filteredExamples: filteredExamples ?? [], // fix this
     isLoading,
     error,
     totalCount,
