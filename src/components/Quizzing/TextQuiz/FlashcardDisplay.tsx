@@ -8,7 +8,6 @@ import {
 } from 'src/functions/formatFlashcardText';
 import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 import './Quiz.css';
-// added for initial commit, will be removed in next commit
 
 interface FlashcardProps {
   example: Flashcard;
@@ -69,6 +68,14 @@ export default function FlashcardDisplay({
           )}
         </div>
       )}
+
+      {/* Click to flip */}
+      <div
+        className={`clickToFlipMessage ${audioActive ? 'flashcardWithAudio' : ''}`}
+      >
+        <b>Click to flip</b>
+      </div>
+
       {/* Play/Pause */}
       {audioActive && (
         <button
