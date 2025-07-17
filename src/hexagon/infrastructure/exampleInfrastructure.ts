@@ -18,7 +18,7 @@ export function createExampleInfrastructure(
       courseId: number;
       toLessonNumber: number;
       fromLessonNumber?: number;
-      spanglishOnly?: boolean;
+      includeSpanglish?: boolean;
       audioOnly?: boolean;
       skillTags?: SkillTag[];
     }) => {
