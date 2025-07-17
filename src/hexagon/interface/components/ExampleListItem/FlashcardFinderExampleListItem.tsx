@@ -4,6 +4,7 @@ import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
 import { useCallback, useState } from 'react';
 import ExampleListItemFactory from './ExampleListItemFactory';
 import AddPendingRemove from './units/AddPendingRemove';
+import BulkAddRemove from './units/BulkAddRemove';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewExample from './units/MoreInfoViewExample';
 
@@ -13,12 +14,16 @@ export default function ExampleListItem({
   isPending,
   handleAdd,
   handleRemove,
+  bulkAddMode,
+  isSelected,
 }: {
   example: ExampleWithVocabulary | null;
   isCollected: boolean;
   isPending: boolean;
   handleAdd: () => void;
   handleRemove: () => void;
+  bulkAddMode: boolean;
+  isSelected?: boolean;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
 
@@ -40,14 +45,25 @@ export default function ExampleListItem({
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
-          <AddPendingRemove
-            id={example.id}
-            isCollected={isCollected}
-            isPending={isPending}
-            handleAdd={handleAdd}
-            handleRemove={handleRemove}
-            key="addPendingRemove"
-          />,
+          bulkAddMode ? (
+            <BulkAddRemove
+              id={example.id}
+              isCollected={isCollected}
+              handleAdd={handleAdd}
+              handleRemove={handleRemove}
+              key="addPendingRemove"
+              isSelected={isSelected ?? false}
+            />
+          ) : (
+            <AddPendingRemove
+              id={example.id}
+              isCollected={isCollected}
+              isPending={isPending}
+              handleAdd={handleAdd}
+              handleRemove={handleRemove}
+              key="addPendingRemove"
+            />
+          ),
         ]}
       />
       <MoreInfoViewExample example={example} isOpen={isMoreInfoOpen} />

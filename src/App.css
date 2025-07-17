@@ -553,6 +553,7 @@ button:hover,
   flex-wrap: wrap;
   flex-grow: 1;
   justify-content: flex-start;
+  margin-top: 10px;
   /* align-items: center; */
 }
 .filterBox.options {

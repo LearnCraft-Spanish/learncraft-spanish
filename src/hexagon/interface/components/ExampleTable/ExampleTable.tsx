@@ -4,7 +4,7 @@ import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import usePagination from '@application/units/usePagination';
 
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { Pagination } from 'src/components/Table/components';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
@@ -39,6 +39,8 @@ export default function ExamplesTable({
   const { isExampleCollected, createFlashcards, deleteFlashcards } =
     useStudentFlashcards();
 
+  const [bulkAddMode, setBulkAddMode] = useState(false);
+
   const getExampleById = useCallback(
     (recordId: number) => {
       return getExampleByIdFunction(dataSource, recordId);
@@ -51,6 +53,8 @@ export default function ExamplesTable({
       setPage(1);
     }
   }, [displayOrder, maxPage, setPage]);
+
+  console.log('bulkAddMode', bulkAddMode);
 
   return (
     <div className="examplesTable">
@@ -66,6 +70,11 @@ export default function ExamplesTable({
             (page - 1) * pageSize + 1
           }-${Math.min(page * pageSize, totalCount)})`}</h4>
         </div>
+      </div>
+      <div className="buttonBox">
+        <button type="button" onClick={() => setBulkAddMode(!bulkAddMode)}>
+          {bulkAddMode ? 'Disable Bulk Add' : 'Enable Bulk Add'}
+        </button>
       </div>
       <Pagination
         page={page}
@@ -88,6 +97,7 @@ export default function ExamplesTable({
               handleRemove={() => {
                 deleteFlashcards([displayOrder.recordId]);
               }}
+              bulkAddMode={bulkAddMode}
             />
           );
         })}

@@ -1,0 +1,21 @@
+.selectButton,
+.disabledButton,
+.selectedButton {
+  width: 10%;
+  min-width: 120px;
+  cursor: pointer;
+}
+
+.selectButton {
+  background-color: white;
+  border: 2px solid green;
+  color: green;
+}
+
+.disabledButton {
+  background-color: none;
+}
+
+.selectedButton {
+  background-color: green;
+}

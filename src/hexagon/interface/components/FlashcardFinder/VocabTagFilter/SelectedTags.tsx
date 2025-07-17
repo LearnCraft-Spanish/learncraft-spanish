@@ -1,13 +1,13 @@
+import type { SkillTag } from '@LearnCraft-Spanish/shared';
 import { SkillType } from '@LearnCraft-Spanish/shared';
-import useExampleFilter from 'src/hexagon/application/units/useExampleFilter';
 
 export default function SelectedTags({
   removeTag,
+  skillTags,
 }: {
   removeTag: (tagId: string) => void;
+  skillTags: SkillTag[];
 }) {
-  const { skillTags } = useExampleFilter();
-
   return (
     <div className="selectedTagsBox">
       <p>Selected Tags:</p>

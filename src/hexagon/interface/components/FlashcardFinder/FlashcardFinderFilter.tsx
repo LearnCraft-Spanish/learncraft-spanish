@@ -1,7 +1,10 @@
 import type { UseExampleFilterReturnType } from 'src/hexagon/application/units/useExampleFilter';
+import useExampleFilter from 'src/hexagon/application/units/useExampleFilter';
+import { SectionHeader } from '../general';
+
 import ToggleSwitch from '../general/ToggleSwitch';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
-
+import ReadOnlyFilters from './units/ReadOnlyFilters';
 import SelectedTags from './VocabTagFilter/SelectedTags';
 import TagFilter from './VocabTagFilter/TagFilter';
 import 'src/App.css';
@@ -10,6 +13,8 @@ export default function FlashcardFinderFilter({
   filterState: hookFilterState,
   skillTagSearch,
 }: UseExampleFilterReturnType) {
+  const { skillTags } = useExampleFilter();
+
   const {
     filterState,
     filtersChanging,
@@ -38,20 +43,40 @@ export default function FlashcardFinderFilter({
    * The filterChanging state prevents refetches during filter manipulation.
    */
   return (
-    <div className="filterSection">
-      {!filtersChanging && (
-        <div className="buttonBox">
-          <button
-            onClick={() => updateFiltersChanging(true)}
-            type="button"
-            disabled={filtersChanging}
-          >
-            Change Filters
-          </button>
-        </div>
-      )}
+    <div>
+      <SectionHeader
+        title="Flashcard Finder Filters"
+        isOpen={filtersChanging}
+        openFunction={() => updateFiltersChanging(!filtersChanging)}
+        afterTitleComponents={
+          !filtersChanging
+            ? [
+                <ReadOnlyFilters
+                  key="readOnlyFilters"
+                  includeSpanglish={includeSpanglish}
+                  audioOnly={audioOnly}
+                  skillTags={skillTags}
+                />,
+              ]
+            : []
+        }
+        button={
+          filtersChanging && (
+            <div className="getExamplesButtonWrapper">
+              <button
+                onClick={() => updateFiltersChanging(false)}
+                type="button"
+                className="getExamplesButton"
+                disabled={!filtersChanging}
+              >
+                Get Examples
+              </button>
+            </div>
+          )
+        }
+      />
       {filtersChanging && (
-        <>
+        <div className="filterSection">
           <div className="filterBox options">
             <div className="FromToLessonSelectorWrapper">
               <LessonRangeSelector />
@@ -70,7 +95,7 @@ export default function FlashcardFinderFilter({
             <ToggleSwitch
               id="audioOnly"
               ariaLabel="audioOnly"
-              label="Audio FlashcardsOnly: "
+              label="Audio Flashcards Only: "
               checked={audioOnly}
               onChange={() =>
                 updateAudioOnly(!filterState.exampleFilters.audioOnly)
@@ -85,19 +110,13 @@ export default function FlashcardFinderFilter({
                 searchResults={tagSuggestions}
                 addTag={addSkillTagToFilters}
               />
-              <SelectedTags removeTag={removeSkillTagFromFilters} />
+              <SelectedTags
+                removeTag={removeSkillTagFromFilters}
+                skillTags={skillTags}
+              />
             </div>
           </div>
-          <div className="buttonBox">
-            <button
-              onClick={() => updateFiltersChanging(false)}
-              type="button"
-              disabled={!filtersChanging}
-            >
-              Get Examples
-            </button>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
