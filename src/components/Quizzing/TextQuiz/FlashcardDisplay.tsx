@@ -8,6 +8,7 @@ import {
 } from 'src/functions/formatFlashcardText';
 import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 import './Quiz.css';
+// added for initial commit, will be removed in next commit
 
 interface FlashcardProps {
   example: Flashcard;
