@@ -25,6 +25,8 @@ import getDateRange from '../../general/functions/dateRange';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 import getWeekEnds from '../../general/functions/getWeekEnds';
 
+// temp comment for initial commit
+
 const assignmentTypes = [
   'Pronunciation',
   'Writing',
