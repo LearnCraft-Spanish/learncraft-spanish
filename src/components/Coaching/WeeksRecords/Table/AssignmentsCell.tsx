@@ -13,19 +13,18 @@ import {
 } from 'src/components/FormComponents';
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
+import { getMembershipFromWeekRecordId } from 'src/hooks/CoachingData/helperFunctions';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
+
 import { useModal } from 'src/hooks/useModal';
 
 import { useUserData } from 'src/hooks/UserData/useUserData';
-
 import CustomStudentSelector from '../../general/CustomStudentSelector';
 import getDateRange from '../../general/functions/dateRange';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 import getWeekEnds from '../../general/functions/getWeekEnds';
-
-// temp comment for initial commit
 
 const assignmentTypes = [
   'Pronunciation',
@@ -343,6 +342,8 @@ export function NewAssignmentView({
   const { weeksQuery } = useWeeks(weekStarts, weekEnds);
   const { coachListQuery } = useCoaching();
 
+  const [editMode, setEditMode] = useState(true);
+
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
   };
@@ -412,6 +413,7 @@ export function NewAssignmentView({
       });
       return;
     }
+    setEditMode(false);
     createAssignmentMutation.mutate(
       {
         relatedWeek: student.relatedWeek.recordId,
@@ -454,69 +456,90 @@ export function NewAssignmentView({
     createNewAssignment();
   }
 
+  function toggleEditMode() {
+    if (editMode) {
+      setEditMode(false);
+    } else {
+      setEditMode(true);
+    }
+  }
+
   return (
-    <ContextualView>
-      <h4>Create Assignment Record</h4>
-      <div className="lineWrapper">
-        <label htmlFor="assignmentName" className="label">
-          Assignment Name:
-        </label>
-        <div className="content" id="assignmentName">
-          {student && `${student.relatedWeek.weekName} - ${assignmentType}`}
+    <ContextualView editFunction={toggleEditMode}>
+      {editMode ? (
+        <h4>Create Assignment</h4>
+      ) : (
+        <h4>
+          {assignmentType} by {student?.studentFullname}
+        </h4>
+      )}
+      {editMode && (
+        <div className="lineWrapper">
+          <label htmlFor="assignmentName" className="label">
+            Assignment Name:
+          </label>
+          <div className="content" id="assignmentName">
+            {student && `${student.relatedWeek.weekName} - ${assignmentType}`}
+          </div>
         </div>
-      </div>
-      <div className="lineWrapper">
-        <label htmlFor="primaryCoach" className="label">
-          Primary Coach:
-        </label>
-        <div className="content" id="primaryCoach">
-          {student && `${student.relatedWeek.primaryCoachWhenCreated}`}
+      )}
+      {editMode && (
+        <div className="lineWrapper">
+          <label htmlFor="primaryCoach" className="label">
+            Primary Coach:
+          </label>
+          <div className="content" id="primaryCoach">
+            {student && `${student.relatedWeek.primaryCoachWhenCreated}`}
+          </div>
         </div>
-      </div>
-      <div className="lineWrapper">
-        <label className="label" htmlFor="weekStarts">
-          Week Starts:
-        </label>
-        <select
-          id="weekStarts"
-          className="content"
-          value={weekStarts}
-          onChange={(e) => updateWeekStarts(e.target.value)}
-        >
-          {Array.from({ length: numWeeks }, (_, i) => {
-            const dateKey =
-              i === 0
-                ? 'thisWeekDate'
-                : i === 1
-                  ? 'lastSundayDate'
-                  : i === 2
-                    ? 'twoSundaysAgoDate'
-                    : `${i + 1}SundaysAgoDate`;
-            const date = dateRange[dateKey];
-            const label =
-              i === 0
-                ? 'This Week'
-                : i === 1
-                  ? 'Last Week'
-                  : i === 2
-                    ? 'Two Weeks Ago'
-                    : toReadableMonthDay(date);
-            return (
-              <option key={date} value={date}>
-                {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
-              </option>
-            );
-          })}
-          <option value="loadMore" className="loadMoreOption">
-            Load More...
-          </option>
-        </select>
-      </div>
-      <div className="lineWrapper">
-        <label className="label" htmlFor="student">
-          Student:
-        </label>
-        {/* <select
+      )}
+      {editMode && (
+        <div className="lineWrapper">
+          <label className="label" htmlFor="weekStarts">
+            Week Starts:
+          </label>
+          <select
+            id="weekStarts"
+            className="content"
+            value={weekStarts}
+            onChange={(e) => updateWeekStarts(e.target.value)}
+          >
+            {Array.from({ length: numWeeks }, (_, i) => {
+              const dateKey =
+                i === 0
+                  ? 'thisWeekDate'
+                  : i === 1
+                    ? 'lastSundayDate'
+                    : i === 2
+                      ? 'twoSundaysAgoDate'
+                      : `${i + 1}SundaysAgoDate`;
+              const date = dateRange[dateKey];
+              const label =
+                i === 0
+                  ? 'This Week'
+                  : i === 1
+                    ? 'Last Week'
+                    : i === 2
+                      ? 'Two Weeks Ago'
+                      : toReadableMonthDay(date);
+              return (
+                <option key={date} value={date}>
+                  {i < 3 ? `${label} (${toReadableMonthDay(date)})` : label}
+                </option>
+              );
+            })}
+            <option value="loadMore" className="loadMoreOption">
+              Load More...
+            </option>
+          </select>
+        </div>
+      )}
+      {editMode && (
+        <div className="lineWrapper">
+          <label className="label" htmlFor="student">
+            Student:
+          </label>
+          {/* <select
             id="student"
             className="content"
             value={student?.relatedWeek.recordId || ''}
@@ -545,37 +568,38 @@ export function NewAssignmentView({
                 </option>
               ))}
           </select> */}
-        {student ? (
-          <>
-            <div className="content">{student.studentFullname}</div>
-            <button
-              type="button"
-              className="clearStudent"
-              onClick={() => setStudent(undefined)}
-            >
-              <img src={x_dark} alt="close" />
-            </button>
-          </>
-        ) : (
-          <CustomStudentSelector
-            weekStarts={weekStarts}
-            onChange={updateStudent}
-          />
-        )}
-      </div>
+          {student ? (
+            <>
+              <div className="content">{student.studentFullname}</div>
+              <button
+                type="button"
+                className="clearStudent"
+                onClick={() => setStudent(undefined)}
+              >
+                <img src={x_dark} alt="close" />
+              </button>
+            </>
+          ) : (
+            <CustomStudentSelector
+              weekStarts={weekStarts}
+              onChange={updateStudent}
+            />
+          )}
+        </div>
+      )}
 
       <Dropdown
         label="Assignment Type"
         value={assignmentType}
         onChange={setAssignmentType}
         options={assignmentTypes}
-        editMode
+        editMode={editMode}
         required
       />
 
       <CoachDropdown
         label="Corrected by"
-        editMode
+        editMode={editMode}
         coachEmail={homeworkCorrector}
         onChange={updateHomeworkCorrector}
         required
@@ -586,24 +610,29 @@ export function NewAssignmentView({
         value={rating}
         onChange={setRating}
         options={ratings}
-        editMode
+        editMode={editMode}
         required
       />
       <LinkInput
         label="Assignment Link"
         value={assignmentLink}
         onChange={setAssignmentLink}
-        editMode
+        editMode={editMode}
       />
       <TextAreaInput
         label="Areas of Difficulty"
-        editMode
+        editMode={editMode}
         value={areasOfDifficulty}
         onChange={setAreasOfDifficulty}
       />
-      <TextAreaInput label="Notes" editMode value={notes} onChange={setNotes} />
+      <TextAreaInput
+        label="Notes"
+        editMode={editMode}
+        value={notes}
+        onChange={setNotes}
+      />
       <FormControls
-        editMode
+        editMode={editMode}
         cancelEdit={closeContextual}
         captureSubmitForm={captureSubmitForm}
       />
