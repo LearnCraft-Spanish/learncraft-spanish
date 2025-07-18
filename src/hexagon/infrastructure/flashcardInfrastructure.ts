@@ -40,8 +40,8 @@ export function createFlashcardInfrastructure(
     }: {
       studentId: number;
       exampleIds: number[];
-    }): Promise<number> => {
-      const response = await httpClient.post<number>(
+    }): Promise<Flashcard[]> => {
+      const response = await httpClient.post<Flashcard[]>(
         createStudentExamplesEndpoint.path,
         createStudentExamplesEndpoint.requiredScopes,
         {

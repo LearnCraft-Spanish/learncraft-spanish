@@ -1,0 +1,23 @@
+.buttonBox.bulkAddModeButtons {
+  width: calc(50% - 30px);
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+
+  .bulkAddFlashcardsButton {
+    background-color: darkgreen;
+
+    &:disabled {
+      background-color: var(--dark);
+    }
+  }
+
+  .clearSelectionButton {
+    background-color: darkred;
+
+    &:disabled {
+      background-color: var(--dark);
+    }
+  }
+}

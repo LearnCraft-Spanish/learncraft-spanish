@@ -13,6 +13,7 @@ import {
   getExampleById as getExampleByIdFunction,
 } from './units/functions';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
+import './ExampleTable.scss';
 
 interface ExamplesTableProps {
   pageSize?: number;
@@ -40,6 +41,9 @@ export default function ExamplesTable({
     useStudentFlashcards();
 
   const [bulkAddMode, setBulkAddMode] = useState(false);
+  const [addingInProgress, setAddingInProgress] = useState(false);
+
+  const [bulkAddIds, setBulkAddIds] = useState<number[]>([]);
 
   const getExampleById = useCallback(
     (recordId: number) => {
@@ -54,10 +58,51 @@ export default function ExamplesTable({
     }
   }, [displayOrder, maxPage, setPage]);
 
-  console.log('bulkAddMode', bulkAddMode);
-
   return (
     <div className="examplesTable">
+      <div className="buttonBox bulkAddModeButtons">
+        {bulkAddMode && (
+          <button
+            className="clearSelectionButton"
+            type="button"
+            onClick={() => {
+              setBulkAddIds([]);
+            }}
+            disabled={bulkAddIds.length === 0}
+          >
+            Clear Selection
+          </button>
+        )}
+
+        <button
+          className="toggleBulkAddModeButton"
+          type="button"
+          onClick={() => {
+            setBulkAddMode(!bulkAddMode);
+          }}
+        >
+          {bulkAddMode ? 'Disable Bulk Add' : 'Enable Bulk Add'}
+        </button>
+        {bulkAddMode && (
+          <button
+            className="bulkAddFlashcardsButton"
+            type="button"
+            onClick={() => {
+              setAddingInProgress(true);
+              const promise = createFlashcards(bulkAddIds);
+              promise.then(() => {
+                setAddingInProgress(false);
+                setBulkAddIds([]);
+              });
+            }}
+            disabled={bulkAddIds.length === 0}
+          >
+            {bulkAddIds.length > 0
+              ? `Add ${bulkAddIds.length} Flashcards`
+              : 'Select Flashcards to Add'}
+          </button>
+        )}
+      </div>
       <div className="buttonBox">
         <button
           type="button"
@@ -70,11 +115,6 @@ export default function ExamplesTable({
             (page - 1) * pageSize + 1
           }-${Math.min(page * pageSize, totalCount)})`}</h4>
         </div>
-      </div>
-      <div className="buttonBox">
-        <button type="button" onClick={() => setBulkAddMode(!bulkAddMode)}>
-          {bulkAddMode ? 'Disable Bulk Add' : 'Enable Bulk Add'}
-        </button>
       </div>
       <Pagination
         page={page}
@@ -90,14 +130,21 @@ export default function ExamplesTable({
               key={displayOrder.recordId}
               example={getExampleById(displayOrder.recordId)}
               isCollected={isExampleCollected(displayOrder.recordId)}
-              isPending={false}
+              isPending={
+                addingInProgress && bulkAddIds.includes(displayOrder.recordId)
+              }
               handleAdd={() => {
-                createFlashcards([displayOrder.recordId]);
+                if (bulkAddMode) {
+                  setBulkAddIds([...bulkAddIds, displayOrder.recordId]);
+                } else {
+                  createFlashcards([displayOrder.recordId]);
+                }
               }}
               handleRemove={() => {
                 deleteFlashcards([displayOrder.recordId]);
               }}
               bulkAddMode={bulkAddMode}
+              isSelected={bulkAddIds.includes(displayOrder.recordId)}
             />
           );
         })}

@@ -4,7 +4,7 @@ import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
 import { useCallback, useState } from 'react';
 import ExampleListItemFactory from './ExampleListItemFactory';
 import AddPendingRemove from './units/AddPendingRemove';
-import BulkAddRemove from './units/BulkAddRemove';
+import BulkAddPendingRemove from './units/BulkAddPendingRemove';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewExample from './units/MoreInfoViewExample';
 
@@ -46,13 +46,14 @@ export default function ExampleListItem({
             key="moreInfoButton"
           />,
           bulkAddMode ? (
-            <BulkAddRemove
+            <BulkAddPendingRemove
               id={example.id}
               isCollected={isCollected}
               handleAdd={handleAdd}
               handleRemove={handleRemove}
               key="addPendingRemove"
               isSelected={isSelected ?? false}
+              isPending={isPending}
             />
           ) : (
             <AddPendingRemove

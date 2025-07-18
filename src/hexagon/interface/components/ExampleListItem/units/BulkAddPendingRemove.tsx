@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
-import './BulkAddRemove.scss';
+import './BulkAddPendingRemove.scss';
 
-export default function AddPendingRemove({
+export default function BulkAddPendingRemove({
   id,
   isCollected,
   handleAdd,
   handleRemove,
-
   isSelected,
+  isPending,
 }: {
   id: number;
   isCollected: boolean;
@@ -15,6 +15,7 @@ export default function AddPendingRemove({
   handleRemove: () => void;
 
   isSelected: boolean;
+  isPending: boolean;
 }) {
   interface ButtonParams {
     text: string;
@@ -23,6 +24,13 @@ export default function AddPendingRemove({
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
+    if (isPending) {
+      return {
+        text: 'Adding...',
+        className: 'pendingButton',
+        onClickFunction: () => {},
+      };
+    }
     if (!isCollected && !isSelected) {
       return {
         text: 'Select',

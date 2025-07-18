@@ -1,5 +1,6 @@
 .selectButton,
 .disabledButton,
+.pendingButton,
 .selectedButton {
   width: 10%;
   min-width: 120px;
@@ -17,5 +18,9 @@
 }
 
 .selectedButton {
-  background-color: green;
+  background-color: darkgreen;
+}
+
+.pendingButton {
+  background-color: var(--dark);
 }

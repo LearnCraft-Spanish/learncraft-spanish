@@ -1,6 +1,6 @@
 import type { Flashcard } from '@LearnCraft-Spanish/shared';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { useAuthAdapter } from '../adapters/authAdapter';
@@ -12,7 +12,7 @@ export interface UseStudentFlashcardsReturnType {
   isLoading: boolean;
   error: Error | null;
   isExampleCollected: (exampleId: number) => boolean;
-  createFlashcards: (exampleIds: number[]) => Promise<number>;
+  createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
   deleteFlashcards: (studentExampleIds: number[]) => Promise<number>;
 }
 
@@ -69,8 +69,8 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     [flashcards],
   );
 
-  const createFlashcards = useCallback(
-    async (exampleIds: number[]) => {
+  const createFlashcardsMutation = useMutation({
+    mutationFn: (exampleIds: number[]) => {
       if (!userId) {
         throw new Error('User ID is required');
       }
@@ -83,14 +83,48 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         success: 'Flashcards created',
         error: 'Failed to create flashcards',
       });
-
-      promise.then(() => {
-        queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
-      });
-
       return promise;
     },
-    [createStudentFlashcards, userId, queryClient],
+    onSuccess: (result, _variables, _context) => {
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[]) => [...oldData, ...result],
+      );
+    },
+  });
+
+  // const createFlashcards = useCallback(
+  //   async (exampleIds: number[]) => {
+  //     if (!userId) {
+  //       throw new Error('User ID is required');
+  //     }
+  //     const promise = createStudentFlashcards({
+  //       studentId: userId,
+  //       exampleIds,
+  //     });
+  //     toast.promise(promise, {
+  //       pending: 'Creating flashcards...',
+  //       success: 'Flashcards created',
+  //       error: 'Failed to create flashcards',
+  //     });
+
+  //     const createdFlashcards = await promise;
+  //     console.log('createdFlashcards', createdFlashcards);
+  //     queryClient.setQueryData(
+  //       ['flashcards', userId],
+  //       (oldData: Flashcard[]) => [...oldData, ...createdFlashcards],
+  //     );
+
+  //     return promise;
+  //   },
+  //   [createStudentFlashcards, userId, queryClient],
+  // );
+
+  const createFlashcards = useCallback(
+    (exampleIds: number[]) => {
+      return createFlashcardsMutation.mutateAsync(exampleIds);
+    },
+    [createFlashcardsMutation],
   );
 
   const deleteFlashcards = useCallback(

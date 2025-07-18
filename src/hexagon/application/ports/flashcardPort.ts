@@ -9,7 +9,7 @@ export interface FlashcardPort {
   }: {
     studentId: number;
     exampleIds: number[];
-  }) => Promise<number>;
+  }) => Promise<Flashcard[]>;
   deleteStudentFlashcards: ({
     studentExampleIds,
   }: {

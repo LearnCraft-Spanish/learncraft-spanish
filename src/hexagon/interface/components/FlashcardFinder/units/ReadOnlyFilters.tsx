@@ -1,7 +1,5 @@
 import type { SkillTag } from '@LearnCraft-Spanish/shared';
-import ReadOnlyLessonRangeSelector from '@interface/components/LessonSelector/ReadOnlyLessonRangeSelector';
 import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
-import SelectedTags from '../VocabTagFilter/SelectedTags';
 import '../FlashcardFinder.scss';
 export default function ReadOnlyFilters({
   includeSpanglish,
