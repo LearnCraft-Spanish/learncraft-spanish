@@ -22,6 +22,7 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const ratingOptions = [
   'Excellent',
@@ -352,9 +353,16 @@ export function NewPrivateCallView({
   const { closeContextual } = useContextualMenu();
   const userDataQuery = useUserData();
   const { openModal } = useModal();
+  const { coachListQuery } = useCoaching();
+
+  const defaultCaller =
+    getLoggedInCoach(
+      userDataQuery.data?.emailAddress || '',
+      coachListQuery.data || [],
+    )?.user.email || '';
 
   // New Record Inputs
-  const [caller, setCaller] = useState(userDataQuery.data?.emailAddress || '');
+  const [caller, setCaller] = useState(defaultCaller);
   const [rating, setRating] = useState('');
   const [date, setDate] = useState(
     new Date(Date.now()).toISOString().split('T')[0],
@@ -426,17 +434,6 @@ export function NewPrivateCallView({
       },
       {
         onSuccess: () => {
-          closeContextual();
-
-          // Reset State
-          setRating('');
-          setNotes('');
-          setAreasOfDifficulty('');
-          setRecording('');
-          setDate(new Date(Date.now()).toISOString().split('T')[0]);
-          setCaller(userDataQuery.data?.emailAddress || '');
-          setCallType('Monthly Call');
-
           onSuccess?.();
         },
       },

@@ -28,6 +28,7 @@ import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { useModal } from 'src/hooks/useModal';
 import { useUserData } from 'src/hooks/UserData/useUserData';
+import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const sessionTypeOptions = [
   '1MC',
@@ -189,13 +190,18 @@ export function GroupSessionView({
   // Edit or Update State
   const setInitialState = useCallback(() => {
     setSessionType(newRecord ? '' : groupSession.sessionType);
+    const defaultCoachForNewRecord =
+      getLoggedInCoach(
+        userDataQuery.data?.emailAddress || '',
+        coachListQuery.data || [],
+      )?.user.email || '';
     const formattedDate = groupSession.date
       ? typeof groupSession.date === 'string'
         ? groupSession.date
         : new Date(groupSession.date).toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0];
     setDate(formattedDate);
-    setCoach(newRecord ? '' : groupSession.coach.email);
+    setCoach(newRecord ? defaultCoachForNewRecord : groupSession.coach.email);
     setTopic(newRecord ? '' : groupSession.topic);
     setComments(newRecord ? '' : groupSession.comments);
     setCallDocument(newRecord ? '' : groupSession.callDocument);
@@ -430,6 +436,7 @@ export function GroupSessionView({
   }
 
   function submitCreationOrUpdate() {
+    disableEditMode();
     if (newRecord) {
       createGroupSessionMutation.mutate(
         {
@@ -453,7 +460,6 @@ export function GroupSessionView({
             if (
               attendees.some((attendee) => attendee.name === 'No Attendees')
             ) {
-              closeContextual();
               return;
             }
             // once it is created, add the attendees
@@ -472,7 +478,6 @@ export function GroupSessionView({
                     console.error('Error creating group attendees');
                     return;
                   }
-                  closeContextual();
                   onSuccess?.();
                 },
                 onError: (error) => {
