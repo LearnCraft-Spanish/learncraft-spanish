@@ -11,6 +11,7 @@ export default function FlashcardFinderResults({
   totalCount: number;
   pageSize: number;
 }) {
+  console.log('filteredFlashcards length', filteredFlashcards.length);
   const displayOrder = useMemo(() => {
     return filteredFlashcards.map((flashcard) => ({
       recordId: flashcard.id,

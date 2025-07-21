@@ -4,7 +4,9 @@ import type {
   Lesson,
 } from '@LearnCraft-Spanish/shared/dist/domain/courses/core-types';
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
-import { use, useCallback, useMemo } from 'react';
+import { useSkillTags } from '@application/queries/useSkillTags';
+import { generateFilterUuid } from '@application/utils/filterUuidGenerator';
+import { use, useCallback, useEffect, useMemo } from 'react';
 import { useSelectedCourseAndLessons } from './useSelectedCourseAndLessons';
 
 interface FilterState {
@@ -33,6 +35,43 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
     updateFiltersChanging,
   } = use(ExampleFilterContext);
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
+  const { skillTags } = useSkillTags();
+
+  // Generate UUID when filters change
+  useEffect(() => {
+    if (course && toLesson && skillTags && !filtersChanging) {
+      const tagsToSearch = exampleFilters.skillTags
+        .map((tagKey) => skillTags.find((tag) => tag.key === tagKey))
+        .filter((tag): tag is NonNullable<typeof tag> => tag !== null);
+
+      const newUuid = generateFilterUuid({
+        courseId: course.id,
+        toLessonNumber: toLesson.lessonNumber,
+        fromLessonNumber: fromLesson?.lessonNumber,
+        includeSpanglish: exampleFilters.includeSpanglish,
+        audioOnly: exampleFilters.audioOnly,
+        skillTags: tagsToSearch,
+      });
+
+      // Only update if UUID has changed
+      console.log('newUuid', newUuid);
+      console.log('exampleFilters.filterUuid', exampleFilters.filterUuid);
+      if (newUuid !== exampleFilters.filterUuid) {
+        updateExampleFilters({
+          ...exampleFilters,
+          filterUuid: newUuid,
+        });
+      }
+    }
+  }, [
+    course,
+    toLesson,
+    fromLesson,
+    exampleFilters,
+    skillTags,
+    filtersChanging,
+    updateExampleFilters,
+  ]);
 
   const filterState: FilterState = useMemo(() => {
     return {

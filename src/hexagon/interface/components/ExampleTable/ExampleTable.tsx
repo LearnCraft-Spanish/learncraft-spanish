@@ -31,11 +31,13 @@ export default function ExamplesTable({
   const {
     displayOrderSegment,
     page,
-    maxPage,
+    maxPage: maxPageFromDisplayOrder,
     nextPage,
     previousPage,
     setPage,
   } = usePagination({ displayOrder, itemsPerPage: pageSize });
+
+  const maxPage = Math.ceil(totalCount / pageSize);
 
   const { isExampleCollected, createFlashcards, deleteFlashcards } =
     useStudentFlashcards();

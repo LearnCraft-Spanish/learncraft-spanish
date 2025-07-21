@@ -4,6 +4,7 @@ interface ExampleFilterState {
   includeSpanglish: boolean;
   audioOnly: boolean;
   skillTags: string[];
+  filterUuid: string;
 }
 
 interface ExampleFilterContextType {
@@ -18,6 +19,7 @@ export const ExampleFilterContext = createContext<ExampleFilterContextType>({
     includeSpanglish: false,
     audioOnly: false,
     skillTags: [],
+    filterUuid: '',
   },
   updateExampleFilters: () => {},
   filtersChanging: false,

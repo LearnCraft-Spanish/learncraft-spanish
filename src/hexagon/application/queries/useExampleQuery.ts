@@ -45,9 +45,21 @@ export const useExampleQuery = (
       includeSpanglish: filterState!.exampleFilters.includeSpanglish,
       audioOnly: filterState!.exampleFilters.audioOnly,
       skillTags: tagsToSearch,
+      page,
+      limit: pageSize,
+      seed: filterState!.exampleFilters.filterUuid,
     })) || { examples: [], totalCount: 0 };
     return { examples, totalCount };
-  }, [course, toLesson, fromLesson, filterState, tagsToSearch, exampleAdapter]);
+  }, [
+    course,
+    toLesson,
+    fromLesson,
+    filterState,
+    tagsToSearch,
+    exampleAdapter,
+    page,
+    pageSize,
+  ]);
 
   const {
     data: fullResponse,
