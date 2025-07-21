@@ -1,6 +1,9 @@
+import {
+  mockAuthAdapter,
+  resetMockAuthAdapter,
+} from '@application/adapters/authAdapter.mock';
 import { server } from 'mocks/api/server';
 import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
-import { setupMockAuth } from './setupMockAuth';
 import '@testing-library/jest-dom';
 
 // We no longer import hexagonal mocks globally to avoid conflicts
@@ -8,10 +11,12 @@ import '@testing-library/jest-dom';
 // import { setupHexagonalMocks } from 'src/hexagon/testing';
 
 // Mock the useAuth hook, but leave the mock return configurable per test
-vi.mock('src/hooks/useAuth');
+vi.mock('@application/adapters/authAdapter', () => ({
+  useAuthAdapter: vi.fn(() => mockAuthAdapter),
+}));
 
 beforeEach(() => {
-  setupMockAuth();
+  resetMockAuthAdapter();
 });
 
 // Open the MSW server before all tests

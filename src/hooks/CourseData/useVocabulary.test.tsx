@@ -1,11 +1,12 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { server } from 'mocks/api/server';
 
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { http, HttpResponse } from 'msw';
-import { setupMockAuth } from 'tests/setupMockAuth';
-import { describe, expect, it } from 'vitest';
 
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { describe, expect, it } from 'vitest';
 import { useVocabulary } from './useVocabulary';
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -53,7 +54,14 @@ describe('useVocabulary', () => {
     });
 
     it('vocabularyQuery data is undefined when user is not an admin or student', async () => {
-      setupMockAuth({ userName: 'limited' });
+      overrideMockAuthAdapter({
+        authUser: getAuthUserFromEmail('limited@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: false,
+        isLimited: true,
+      });
       const { result } = renderHook(() => useVocabulary(), {
         wrapper: MockAllProviders,
       });

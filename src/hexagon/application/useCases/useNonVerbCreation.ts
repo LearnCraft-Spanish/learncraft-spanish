@@ -1,9 +1,8 @@
+import type { CreateNonVerbVocabulary } from '@LearnCraft-Spanish/shared';
 import type {
-  CreateNonVerbVocabulary,
-  Subcategory,
-  Vocabulary,
-} from '@LearnCraft-Spanish/shared';
-import type { TableHook } from '../units/pasteTable/types';
+  UseNonVerbCreationResult,
+  VocabularyPaginationState,
+} from './types';
 import {
   CreateNonVerbVocabularySchema,
   validateWithSchema,
@@ -13,43 +12,6 @@ import { useVocabularyTable } from '../implementations/vocabularyTable/useVocabu
 import { useSubcategories } from '../units/useSubcategories';
 import { useVocabulary } from '../units/useVocabulary';
 import { useVocabularyPage } from '../units/useVocabularyPage';
-
-// Define pagination state for current vocabulary view
-export interface VocabularyPaginationState {
-  vocabularyItems: Vocabulary[];
-  isLoading: boolean;
-  isCountLoading: boolean;
-  isFetching: boolean;
-  error: Error | null;
-  totalCount: number | null;
-  totalPages: number | null;
-  hasMorePages: boolean;
-  currentPage: number;
-  pageSize: number;
-  goToNextPage: () => void;
-  goToPreviousPage: () => void;
-}
-
-export interface UseNonVerbCreationResult {
-  // Subcategory selection
-  nonVerbSubcategories: Subcategory[];
-  loadingSubcategories: boolean;
-  selectedSubcategoryId: string;
-  setSelectedSubcategoryId: (id: string) => void;
-
-  // Creation status
-  creating: boolean;
-  creationError: Error | null;
-
-  // Table hook API - exposed through the façade
-  tableHook: TableHook<CreateNonVerbVocabulary>;
-
-  // Unified save action that handles validation, table save, and creation
-  saveVocabulary: () => Promise<boolean>;
-
-  // Vocabulary list for currently selected subcategory
-  currentVocabularyPagination: VocabularyPaginationState | null;
-}
 
 /**
  * Use case for non-verb vocabulary creation.
@@ -68,12 +30,10 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
 
   // Use our vocabulary unit for operations
   const {
-    createBatch,
     creating: creatingVocabulary,
     creationError: vocabCreationError,
-  } = useVocabulary({
-    isVerb: false,
-  });
+    createNonVerbVocabulary,
+  } = useVocabulary();
 
   // Create the table hook internally
   const tableHook = useVocabularyTable();
@@ -109,7 +69,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     numericSubcategoryId,
     page,
     pageSize,
-    numericSubcategoryId > 0, // Only enable queries when we have a valid subcategory ID
+    // numericSubcategoryId > 0, // Only enable queries when we have a valid subcategory ID
   );
 
   // Create pagination state object only if a subcategory is selected
@@ -165,7 +125,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     async (data: CreateNonVerbVocabulary[]) => {
       if (!selectedSubcategoryId) {
         setCreationError(new Error('No subcategory selected'));
-        return false;
+        return [];
       }
 
       try {
@@ -199,26 +159,27 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
           subcategoryId: Number(selectedSubcategoryId),
         }));
 
-        await createBatch(commands);
-        return true;
+        const createdIds = await createNonVerbVocabulary(commands);
+
+        return createdIds;
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setCreationError(error);
-        return false;
+        return [];
       }
     },
-    [selectedSubcategoryId, createBatch],
+    [selectedSubcategoryId, createNonVerbVocabulary],
   );
 
   /**
    * Unified save method exposed to the interface.
    * Handles all the steps: validation, table save, and creation.
    */
-  const saveVocabulary = useCallback(async (): Promise<boolean> => {
+  const saveVocabulary = useCallback(async (): Promise<number[]> => {
     // Validate subcategory is selected
     if (!selectedSubcategoryId) {
       setCreationError(new Error('No subcategory selected'));
-      return false;
+      return [];
     }
 
     try {
@@ -227,7 +188,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
 
       // If table validation failed or no data
       if (!tableData || tableData.length === 0) {
-        return false;
+        return [];
       }
 
       // Create the vocabulary batch
@@ -235,7 +196,7 @@ export function useNonVerbCreation(): UseNonVerbCreationResult {
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
       setCreationError(error);
-      return false;
+      return [];
     }
   }, [selectedSubcategoryId, createVocabularyBatch, tableHook]);
 

@@ -1,17 +1,17 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { beforeEach, describe, expect, it } from 'vitest';
 import QuizSetupMenu from './QuizSetupMenu';
 
-const student = getUserDataFromName('student-lcsp');
+const student = getAuthUserFromEmail('student-lcsp@fake.not')!;
 const studentFlashcards = allStudentFlashcards.find(
-  (x) => x.userName === student?.name,
+  (x) => x.emailAddress === student?.email,
 );
 const defaultProps = {
   examplesToParse: studentFlashcards?.studentFlashcardData.studentExamples,
@@ -42,7 +42,14 @@ async function successfulRender(overrides: any = {}) {
 
 describe('component QuizSetupMenu', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   describe('quiz type (text or audio)', () => {
     const TextQuizOptions = ['Start with Spanish', 'Srs Quiz'];

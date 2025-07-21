@@ -1,17 +1,15 @@
 import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useBackend } from 'src/hooks/useBackend';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import { useExampleUpdate } from './useExampleUpdate';
 
 export function useRecentlyEditedExamples() {
   const { updateExampleFromQuery } = useExampleUpdate();
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
   const { getRecentlyEditedExamples, createUnverifiedExample } = useBackend();
-  const hasAccess =
-    userDataQuery.data?.roles.adminRole === 'coach' ||
-    userDataQuery.data?.roles.adminRole === 'admin';
+  const hasAccess = isAdmin || isCoach;
 
   const recentlyEditedExamplesQuery = useQuery({
     queryKey: ['recentlyEditedExamples'],

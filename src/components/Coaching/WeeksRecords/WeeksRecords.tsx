@@ -4,6 +4,7 @@ import type {
   GroupSession,
   Week,
 } from '../../../types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React, {
   useCallback,
   useEffect,
@@ -11,15 +12,15 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Loading } from 'src/components/Loading';
 
+import { Loading } from 'src/components/Loading';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import getLoggedInCoach from '../general/functions/getLoggedInCoach';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
-import { NewAssignmentView } from './Table/AssignmentsCell';
 
+import { NewAssignmentView } from './Table/AssignmentsCell';
 import { GroupSessionView } from './Table/GroupSessionsCell';
 import WeeksTable from './Table/WeeksTable';
 import useDateRange from './useDateRange';
@@ -29,7 +30,7 @@ import '../coaching.scss';
 type SortDirection = 'none' | 'ascending' | 'descending';
 
 function WeeksRecordsContent() {
-  const userDataQuery = useUserData();
+  const { isAuthenticated, isLoading, authUser } = useAuthAdapter();
   const { startDate } = useDateRange();
   const {
     weeksQuery,
@@ -69,7 +70,7 @@ function WeeksRecordsContent() {
 
   const initialDataLoad =
     rendered.current === false &&
-    (userDataQuery.isLoading ||
+    (isLoading ||
       weeksQuery.isLoading ||
       coachListQuery.isLoading ||
       courseListQuery.isLoading ||
@@ -81,7 +82,7 @@ function WeeksRecordsContent() {
       privateCallsQuery.isLoading);
 
   const dataReady =
-    userDataQuery.isSuccess &&
+    isAuthenticated &&
     weeksQuery.isSuccess &&
     coachListQuery.isSuccess &&
     courseListQuery.isSuccess &&
@@ -93,7 +94,6 @@ function WeeksRecordsContent() {
     privateCallsQuery.isSuccess;
 
   const dataError =
-    userDataQuery.isError ||
     weeksQuery.isError ||
     coachListQuery.isError ||
     courseListQuery.isError ||
@@ -307,30 +307,16 @@ function WeeksRecordsContent() {
       !rendered.current &&
       weeksQuery.isSuccess &&
       coachListQuery.isSuccess &&
-      userDataQuery.isSuccess
+      isAuthenticated
     ) {
-      const possibleEmailDomains = [
-        '@learncraftspanish.com',
-        '@masterofmemory.com',
-      ];
-
-      if (userDataQuery.data.emailAddress) {
-        const currentUserCoach = coachListQuery.data.find((coach) => {
-          const emailPrefix = userDataQuery.data.emailAddress
-            .split('@')[0]
-            .toLowerCase();
-          for (const domain of possibleEmailDomains) {
-            if (coach.user.email.toLowerCase() === emailPrefix + domain) {
-              return true;
-            }
-          }
-          return false;
-        });
-        if (currentUserCoach) setFilterByCoach(currentUserCoach);
-      }
+      const defaultCoach = getLoggedInCoach(
+        authUser.email || '',
+        coachListQuery.data || [],
+      );
+      if (defaultCoach) setFilterByCoach(defaultCoach);
       rendered.current = true;
     }
-  }, [weeksQuery, coachListQuery, userDataQuery]);
+  }, [weeksQuery, coachListQuery, authUser, isAuthenticated]);
 
   // Filtering useEffect
   useEffect(() => {

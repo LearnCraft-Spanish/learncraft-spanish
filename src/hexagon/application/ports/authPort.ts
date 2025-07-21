@@ -1,3 +1,8 @@
+export interface AuthUser {
+  email: string;
+  roles: string[];
+}
+
 /**
  * Port for authentication token operations.
  * This defines the interface that infrastructure must implement.
@@ -6,15 +11,38 @@ export interface AuthPort {
   /**
    * Get the current access token for authenticated requests
    */
-  getAccessToken: () => Promise<string | undefined>;
+  getAccessToken: (scopes: string[] | null) => Promise<string | undefined>;
 
   /**
-   * Check if the user is authenticated
+   * Login the user
    */
-  isAuthenticated: () => boolean;
+  login: () => void;
+
+  /**
+   * Logout the user
+   */
+  logout: () => void;
 
   /**
    * Get the current user's information
    */
-  getUserInfo: () => Promise<unknown | null>;
+  authUser: AuthUser;
+
+  /**
+   * Boolean flags for the user's roles
+   */
+  isAdmin: boolean;
+  isCoach: boolean;
+  isStudent: boolean;
+  isLimited: boolean;
+
+  /**
+   * Check if the user is authenticated
+   */
+  isAuthenticated: boolean;
+
+  /**
+   * Check if the user is loading
+   */
+  isLoading: boolean;
 }

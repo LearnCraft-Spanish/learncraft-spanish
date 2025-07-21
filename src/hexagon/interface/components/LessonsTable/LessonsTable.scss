@@ -1,0 +1,57 @@
+.lessons-table {
+  h2 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+
+  &__content {
+    position: relative;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--light);
+
+    th,
+    td {
+      border: 1px solid var(--dark);
+      padding: 0.75rem;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--accent);
+      color: var(--light);
+      font-weight: bold;
+    }
+
+    tr:hover td {
+      background-color: #f5f5f5;
+    }
+  }
+
+  &__row {
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+
+  &__empty-state {
+    padding: 2rem;
+    text-align: center;
+    background-color: #f7fafc;
+    border: 1px solid var(--dark);
+    color: #666;
+    font-style: italic;
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: var(--dark);
+  }
+}

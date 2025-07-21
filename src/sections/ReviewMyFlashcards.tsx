@@ -1,19 +1,23 @@
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+
 import React, { useEffect, useState } from 'react';
 
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-
 import { Loading } from 'src/components/Loading';
 import NoFlashcards from 'src/components/NoFlashcards';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';
 import QuizSetupMenu from 'src/components/Quizzing/TextQuiz/QuizSetupMenu';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { usePMFData } from 'src/hooks/UserData/usePMFData';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 export default function MyFlashcardsQuiz() {
   const { flashcardDataQuery } = useStudentFlashcards();
-  const { activeStudentQuery } = useActiveStudent();
+  const {
+    appUser,
+    isLoading: appUserLoading,
+    error: appUserError,
+  } = useActiveStudent();
   const { pmfDataQuery } = usePMFData();
 
   const examplesToParse = flashcardDataQuery.data?.studentExamples;
@@ -32,21 +36,16 @@ export default function MyFlashcardsQuiz() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const dataReady =
-    activeStudentQuery.isSuccess && flashcardDataQuery.isSuccess;
-  const dataError =
-    !dataReady && (activeStudentQuery.isError || flashcardDataQuery.isError);
+  const dataReady = appUser && flashcardDataQuery.isSuccess;
+  const dataError = !dataReady || appUserError || flashcardDataQuery.isError;
   const dataLoading =
     !dataReady &&
     !dataError &&
-    (activeStudentQuery.isLoading ||
-      flashcardDataQuery.isLoading ||
-      pmfDataQuery.isLoading);
+    (appUserLoading || flashcardDataQuery.isLoading || pmfDataQuery.isLoading);
 
   //  is this supposted to be an OR or AND?
   const unavailable =
-    (activeStudentQuery.isSuccess &&
-      !(activeStudentQuery.data?.role === 'student')) ||
+    (appUser && !(appUser?.studentRole === 'student')) ||
     (flashcardDataQuery.isSuccess &&
       !flashcardDataQuery.data?.examples?.length);
 

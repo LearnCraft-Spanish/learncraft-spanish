@@ -3,14 +3,14 @@ import type {
   VocabTag,
   Vocabulary,
 } from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useMemo, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { useBackend } from 'src/hooks/useBackend';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export function useVocabulary() {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach, isStudent } = useAuthAdapter();
   const {
     getVocabFromBackend,
     getSpellingsFromBackend,
@@ -20,10 +20,7 @@ export function useVocabulary() {
     createSpelling,
     deleteSpelling,
   } = useBackend();
-  const hasAccess =
-    userDataQuery.data?.roles.adminRole === 'coach' ||
-    userDataQuery.data?.roles.adminRole === 'admin' ||
-    userDataQuery.data?.roles.studentRole === 'student';
+  const hasAccess = isAdmin || isCoach || isStudent;
 
   const nextTagId = useRef(1);
 

@@ -1,7 +1,8 @@
 import { render, waitFor } from '@testing-library/react';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { describe, expect, it } from 'vitest';
 import App from './App';
 
@@ -27,7 +28,7 @@ describe('app', () => {
   });
 
   it('shows a log in button when logged out', async () => {
-    setupMockAuth({ isAuthenticated: false });
+    overrideMockAuthAdapter({ isAuthenticated: false });
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -39,7 +40,7 @@ describe('app', () => {
   });
 
   it("says it won't do anything if not logged in", async () => {
-    setupMockAuth({ isAuthenticated: false });
+    overrideMockAuthAdapter({ isAuthenticated: false });
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -54,7 +55,14 @@ describe('app', () => {
 
   it('shows welcome message', async () => {
     // const mockLimitedStudent = createMockAuth({ userName: "limited" });
-    setupMockAuth({ userName: 'limited' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('limited@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: false,
+      isLimited: true,
+    });
     const { getByText } = render(
       <MockAllProviders>
         <App />
@@ -66,7 +74,7 @@ describe('app', () => {
   });
 
   it('shows a loading spinner when logging in', async () => {
-    setupMockAuth({ isLoading: true });
+    overrideMockAuthAdapter({ isLoading: true });
     const { getByAltText } = render(
       <MockAllProviders>
         <App />
@@ -78,10 +86,14 @@ describe('app', () => {
   });
 
   it('shows official quizzes button', async () => {
-    setupMockAuth({
-      userName: 'limited',
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('limited@fake.not')!,
       isAuthenticated: true,
       isLoading: false,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: false,
+      isLimited: true,
     });
     const { getByText } = render(
       <MockAllProviders>
@@ -105,7 +117,15 @@ describe('app', () => {
   });
 
   it('displays example editor if admin', async () => {
-    setupMockAuth({ userName: 'admin-empty-role' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+      isAuthenticated: true,
+      isLoading: false,
+      isAdmin: true,
+      isCoach: false,
+      isStudent: false,
+      isLimited: false,
+    });
     const { getByText } = render(
       <MockAllProviders>
         <App />

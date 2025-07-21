@@ -1,13 +1,13 @@
+import type { AppUser } from '@LearnCraft-Spanish/shared';
 import type { UseQueryResult } from '@tanstack/react-query';
 import type {
   Flashcard,
-  FlashcardStudent,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
 import React, { useMemo } from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
-import StudentSearch from 'src/components/StudentSearch';
 import quizCourses from 'src/functions/QuizCourseList';
+import SubHeader from '../SubHeader';
 
 interface ExampleAssignmentPanelProps {
   assignmentType: 'students' | 'quiz';
@@ -34,7 +34,7 @@ interface ExampleAssignmentPanelProps {
   onBackToEdit: () => void;
   onRestart: () => void;
   isPending: boolean;
-  activeStudent: FlashcardStudent | null;
+  activeStudent: AppUser | null;
   flashcardDataQuery?: UseQueryResult<StudentFlashcardData | null> | undefined;
   quizExamplesQuery?: UseQueryResult<Flashcard[]> | undefined;
 }
@@ -89,9 +89,7 @@ export function ExampleAssignmentPanel({
       {assignmentType === 'students' && (
         <div>
           <p>Select a student to assign these examples to:</p>
-          <div className="student-selector">
-            <StudentSearch />
-          </div>
+          <SubHeader />
         </div>
       )}
 

@@ -3,45 +3,46 @@ import type {
   Flashcard,
   VocabTag,
 } from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+
 import React, { useCallback, useEffect, useState } from 'react';
-
 import Filter from 'src/components/FlashcardFinder/Filter';
-
 import { Loading } from 'src/components/Loading';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
-import useFlashcardFilter from 'src/hooks/useFlashcardFilter';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import useFlashcardFilter from 'src/hooks/useFlashcardFilter';
 import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import ExamplesTable from '../ExamplesTable/ExamplesTable';
 import 'src/App.css';
 
 // This script displays the Database Tool (Example Retriever), where coaches can lookup example sentences on the database by vocab word
 export default function FlashcardFinder() {
-  const userDataQuery = useUserData();
-  const { activeStudentQuery } = useActiveStudent();
+  const { isAdmin, isCoach, isLoading: authLoading } = useAuthAdapter();
+  const {
+    appUser,
+    isLoading: activeStudentLoading,
+    error: activeStudentError,
+  } = useActiveStudent();
   const { verifiedExamplesQuery } = useVerifiedExamples();
   const { vocabularyQuery, tagTable } = useVocabulary();
   const { filterExamplesBySelectedLesson } = useSelectedLesson();
   const { filterFlashcards } = useFlashcardFilter();
 
   const isError =
-    userDataQuery.isError ||
-    activeStudentQuery.isError ||
+    activeStudentError ||
     verifiedExamplesQuery.isError ||
     vocabularyQuery.isError;
   const dataLoaded =
-    (userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin' ||
-      activeStudentQuery.isSuccess) &&
+    (isAdmin || isCoach || appUser) &&
     verifiedExamplesQuery.isSuccess &&
     vocabularyQuery.isSuccess;
   const isLoading =
-    (userDataQuery.isLoading ||
-      activeStudentQuery.isLoading ||
+    (authLoading ||
+      activeStudentLoading ||
       verifiedExamplesQuery.isLoading ||
       vocabularyQuery.isLoading) &&
     !isError &&

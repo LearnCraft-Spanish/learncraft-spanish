@@ -1,7 +1,7 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackend } from 'src/hooks/useBackend';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 export interface Subcategory {
   recordId: number;
@@ -10,7 +10,7 @@ export interface Subcategory {
 }
 
 export function useSubcategories() {
-  const userDataQuery = useUserData();
+  const { isAdmin } = useAuthAdapter();
   const {
     getSubcategoriesFromBackend,
     createSubcategory,
@@ -18,13 +18,11 @@ export function useSubcategories() {
     deleteSubcategory,
   } = useBackend();
 
-  const hasAccess = userDataQuery.data?.roles.adminRole === 'admin';
-
   const subcategoriesQuery = useQuery({
     queryKey: ['subcategories'],
     queryFn: getSubcategoriesFromBackend,
     staleTime: Infinity,
-    enabled: hasAccess,
+    enabled: isAdmin,
   });
 
   const createSubcategoryMutation = useMutation({

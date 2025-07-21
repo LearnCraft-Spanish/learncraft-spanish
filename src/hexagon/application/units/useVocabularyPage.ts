@@ -27,19 +27,14 @@ interface VocabularyPageResult {
  * @param subcategoryId The subcategory ID to filter by
  * @param page Current page number (1-indexed)
  * @param pageSize Number of items per page
- * @param enabled Whether queries should be enabled (useful when subcategoryId is not valid)
  */
 export function useVocabularyPage(
   subcategoryId: number,
   page: number = 1,
   pageSize: number = 25,
-  enabled: boolean = true,
 ): VocabularyPageResult {
   const queryClient = useQueryClient();
   const adapter = useVocabularyAdapter();
-
-  // Determine if queries should run based on subcategoryId and enabled flag
-  const shouldRunQueries = enabled && subcategoryId > 0;
 
   // 1. Vocabulary page query
   const {
@@ -50,23 +45,12 @@ export function useVocabularyPage(
   } = useQuery({
     queryKey: ['vocabulary', subcategoryId, 'page', page, pageSize],
     queryFn: () =>
-      adapter.getVocabulary({
-        subcategoryId,
-        limit: pageSize,
-        offset: (page - 1) * pageSize,
-      }),
+      adapter.getVocabularyBySubcategory(subcategoryId, page, pageSize),
     placeholderData: (prev) => prev, // Keep previous data while loading new data
-    enabled: shouldRunQueries,
+    enabled: subcategoryId > 0,
     ...queryDefaults.entityData,
     staleTime: 15 * 60 * 1000, // 2 minutes cache
   });
-
-  // Determine if we should load the count - only when needed
-  const shouldLoadCount: boolean = useMemo(() => {
-    if (!shouldRunQueries) return false;
-    // Only load count if we're past page 1 or have enough items to suggest pagination
-    return page > 1 || !!(pageData && pageData.length >= 10);
-  }, [shouldRunQueries, pageData, page]);
 
   // 2. Total count query - lazy loaded to improve performance
   const {
@@ -75,14 +59,14 @@ export function useVocabularyPage(
     error: countError,
   } = useQuery({
     queryKey: ['vocabulary', subcategoryId, 'count'],
-    queryFn: () => adapter.getVocabularyCount(subcategoryId),
+    queryFn: () => adapter.getVocabularyCountBySubcategory(subcategoryId),
     // Cache count for longer since it changes less frequently
     staleTime: 15 * 60 * 1000, // 10 min
-    enabled: shouldLoadCount,
+    enabled: subcategoryId > 0,
   });
 
   // 3. Derived metadata
-  const totalCount = countData?.total ?? null;
+  const totalCount = countData ?? null;
   const totalPages =
     totalCount !== null ? Math.ceil(totalCount / pageSize) : null;
 
@@ -101,28 +85,23 @@ export function useVocabularyPage(
     // We should prefetch if:
     // 1. We know there are more pages (from totalPages), or
     // 2. We have a full page and are guessing there might be more
-    const shouldPrefetch = shouldRunQueries && pageData && hasMorePages;
+    const shouldPrefetch = subcategoryId > 0 && pageData && hasMorePages;
 
     if (shouldPrefetch) {
       queryClient.prefetchQuery({
         queryKey: ['vocabulary', subcategoryId, 'page', page + 1, pageSize],
         queryFn: () =>
-          adapter.getVocabulary({
-            subcategoryId,
-            limit: pageSize,
-            offset: page * pageSize,
-          }),
+          adapter.getVocabularyBySubcategory(subcategoryId, page + 1, pageSize),
         ...queryDefaults.entityData,
         staleTime: 15 * 60 * 1000, // 2 minutes cache
       });
     }
   }, [
-    shouldRunQueries,
+    subcategoryId,
     page,
     pageData,
     hasMorePages,
     queryClient,
-    subcategoryId,
     pageSize,
     adapter,
   ]);
@@ -131,8 +110,8 @@ export function useVocabularyPage(
     items: Array.isArray(pageData) ? pageData : [],
     // Consider both initial loading and fetching for the loading state
     // This ensures we show loading during page transitions
-    isLoading: shouldRunQueries && (isPageLoading || isPageFetching),
-    isCountLoading: shouldLoadCount && isCountLoading,
+    isLoading: subcategoryId > 0 && (isPageLoading || isPageFetching),
+    isCountLoading: subcategoryId > 0 && isCountLoading,
     isFetching: isPageFetching,
     error: normalizeQueryError(pageError || countError),
     totalCount,

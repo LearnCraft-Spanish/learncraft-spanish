@@ -1,12 +1,13 @@
-import type { mockUserNames } from 'src/types/interfaceDefinitions';
+import type { TestUserEmails } from 'mocks/data/serverlike/userTable';
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { examples } from 'mocks/data/examples.json';
 import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { setupMockAuth } from 'tests/setupMockAuth';
-import { beforeEach, describe, expect, it } from 'vitest';
 
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useStudentFlashcards } from './useStudentFlashcards';
 async function renderHookSuccessfully() {
   const { result } = renderHook(useStudentFlashcards, {
@@ -33,7 +34,16 @@ describe('test by role', () => {
     );
     for (const student of studentUsers) {
       beforeEach(() => {
-        setupMockAuth({ userName: student.name as mockUserNames });
+        overrideMockAuthAdapter({
+          authUser: getAuthUserFromEmail(
+            student.emailAddress as TestUserEmails,
+          )!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: true,
+          isLimited: false,
+        });
       });
       it(`${student.name}: has flashcard data`, async () => {
         const {
@@ -64,7 +74,16 @@ describe('test by role', () => {
     );
     for (const student of nonStudentUsers) {
       beforeEach(() => {
-        setupMockAuth({ userName: student.name as mockUserNames });
+        overrideMockAuthAdapter({
+          authUser: getAuthUserFromEmail(
+            student.emailAddress as TestUserEmails,
+          )!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: false,
+          isLimited: false,
+        });
       });
       it(`${student.name}: flashcardDataQuery throws an error`, async () => {
         const { result } = renderHook(useStudentFlashcards, {
@@ -80,7 +99,14 @@ describe('test by role', () => {
 
 describe('removeFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('removes a flashcard successfully', async () => {
     // Initial Render
@@ -136,7 +162,14 @@ describe('removeFlashcardMutation', () => {
 });
 describe('addFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('adds a flashcard successfully', async () => {
     // Initial Render
@@ -200,7 +233,14 @@ describe('addFlashcardMutation', () => {
 
 describe('updateFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it("updates a flashcard's review interval successfully", async () => {
     // Initial Render
@@ -268,7 +308,14 @@ describe('updateFlashcardMutation', () => {
 });
 describe('exampleIsCollected', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('returns true if example is collected', async () => {
     // Initial Render
@@ -291,7 +338,14 @@ describe('exampleIsCollected', () => {
 
 describe('exampleIsPending', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('returns true if example is pending', async () => {
     // Initial Render

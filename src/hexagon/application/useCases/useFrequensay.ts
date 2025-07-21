@@ -7,7 +7,7 @@ import {
 } from '@application/units/FrequenSay/utils/vocabularyProcessing';
 import { useSpellingsKnownForLesson } from '@application/units/useSpellingsKnownForLesson';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
 import useCustomVocabulary from './useCustomVocabulary';
 export function useFrequensay(): UseFrequensayResult {
   const {
@@ -18,7 +18,7 @@ export function useFrequensay(): UseFrequensayResult {
     enableManualVocabulary,
   } = useCustomVocabulary();
 
-  const { selectedToLesson, selectedProgram } = useSelectedLesson();
+  const { toLesson, course } = useSelectedCourseAndLessons();
 
   const [isFrequensayEnabled, setIsFrequensayEnabled] = useState(false);
 
@@ -36,8 +36,8 @@ export function useFrequensay(): UseFrequensayResult {
     isLoading: spellingsDataLoading,
     error: spellingsDataError,
   } = useSpellingsKnownForLesson({
-    courseName: selectedProgram?.name || '',
-    lessonNumber: selectedToLesson?.lessonNumber || 0,
+    courseId: course?.id,
+    lessonNumber: toLesson?.lessonNumber,
     isFrequensayEnabled,
   });
 
@@ -73,17 +73,13 @@ export function useFrequensay(): UseFrequensayResult {
   }, [spellingsKnownData, extraAcceptableWords, addManualVocabulary]);
 
   const unknownWordCount = useMemo(() => {
-    if (selectedToLesson) {
-      if (
-        selectedToLesson?.recordId &&
-        spellingsKnownData &&
-        userInput.length > 0
-      ) {
+    if (toLesson) {
+      if (toLesson?.id && spellingsKnownData && userInput.length > 0) {
         return processUnknownWords();
       }
     }
     return [];
-  }, [selectedToLesson, spellingsKnownData, processUnknownWords, userInput]);
+  }, [toLesson, spellingsKnownData, processUnknownWords, userInput]);
 
   return {
     spellingsDataError,

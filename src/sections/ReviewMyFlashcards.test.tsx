@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import React from 'react';
 
-import { setupMockAuth } from 'tests/setupMockAuth';
+import React from 'react';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { beforeEach, describe, expect, it } from 'vitest';
 import MyFlashcardsQuiz from './ReviewMyFlashcards';
 
@@ -44,7 +45,14 @@ describe('menu for student flashcards', () => {
 
   describe('no flashcards found', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'student-no-flashcards' });
+      overrideMockAuthAdapter({
+        authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      });
     });
     it('shows no flashcards found message', async () => {
       render(

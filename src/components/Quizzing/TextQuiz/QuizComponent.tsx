@@ -1,12 +1,12 @@
 import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
 
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import MenuButton from 'src/components/Buttons/MenuButton';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import QuizProgress from '../QuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
@@ -35,7 +35,7 @@ export default function QuizComponent({
   quizLength = 100,
 }: QuizComponentProps) {
   const location = useLocation();
-  const { activeStudentQuery } = useActiveStudent();
+  const { appUser } = useActiveStudent();
   const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
     useStudentFlashcards();
 
@@ -364,7 +364,7 @@ export default function QuizComponent({
           {currentFlashcardIsValid && (
             <FlashcardDisplay
               example={currentExample}
-              isStudent={activeStudentQuery.data?.role === 'student'}
+              isStudent={appUser?.studentRole === 'student'}
               incrementExampleNumber={incrementExampleNumber}
               onRemove={onRemove}
               answerShowing={answerShowing}

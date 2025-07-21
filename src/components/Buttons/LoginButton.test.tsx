@@ -1,36 +1,35 @@
+import mockAuthAdapter, {
+  overrideMockAuthAdapter,
+  resetMockAuthAdapter,
+} from '@application/adapters/authAdapter.mock';
 import { cleanup, render, screen } from '@testing-library/react';
-import createMockAuth from 'mocks/hooks/useMockAuth';
 import React from 'react';
 
-import useAuth from 'src/hooks/useAuth';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 
 import LoginButton from './LoginButton';
 
 describe('login button', () => {
   afterEach(() => {
-    vi.clearAllMocks();
+    resetMockAuthAdapter();
     cleanup();
   });
 
   it('renders without crashing', () => {
-    const loggedOutAuth = createMockAuth({ isAuthenticated: false });
-    vi.mocked(useAuth).mockReturnValue(loggedOutAuth);
+    overrideMockAuthAdapter({ isAuthenticated: false, isLoading: false });
     render(<LoginButton />);
     expect(screen.getByText('Log in/Register')).toBeInTheDocument();
   });
   it('does not render when authenticated', () => {
-    const loggedInAuth = createMockAuth({ isAuthenticated: true });
-    vi.mocked(useAuth).mockReturnValue(loggedInAuth);
+    overrideMockAuthAdapter({ isAuthenticated: true, isLoading: false });
     render(<LoginButton />);
     expect(screen.queryByText('Log in/Register')).not.toBeInTheDocument();
   });
   it('calls loginWithRedirect when clicked', () => {
-    const loggedOutAuth = createMockAuth({ isAuthenticated: false });
-    vi.mocked(useAuth).mockReturnValue(loggedOutAuth);
+    overrideMockAuthAdapter({ isAuthenticated: false, isLoading: false });
     render(<LoginButton />);
     expect(screen.getByText('Log in/Register')).toBeInTheDocument();
     screen.getByText('Log in/Register').click();
-    expect(loggedOutAuth.login).toHaveBeenCalled();
+    expect(mockAuthAdapter.login).toHaveBeenCalled();
   });
 });

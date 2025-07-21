@@ -2,10 +2,11 @@ import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React, { act } from 'react';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { setupMockAuth } from 'tests/setupMockAuth';
 import { beforeEach, describe, expect, it } from 'vitest';
 import ExamplesTable from './ExamplesTable';
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;
@@ -79,7 +80,14 @@ describe('renders without crashing', () => {
 
 describe('user is not a student', () => {
   it('student buttons: Add/Adding.../Remove are not displayed', async () => {
-    setupMockAuth({ userName: 'admin-empty-role' });
+    overrideMockAuthAdapter({
+      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: true,
+      isCoach: false,
+      isStudent: false,
+      isLimited: false,
+    });
     render(
       <MockAllProviders>
         <ExamplesTable

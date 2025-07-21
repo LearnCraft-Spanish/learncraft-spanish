@@ -1,18 +1,24 @@
+import type { AuthPort } from '@application/ports/authPort';
+import type { VocabularyPort } from '@application/ports/vocabularyPort';
 import type {
-  CreateNonVerbVocabulary,
-  CreateVerb,
-  GetTotalCountResponse,
+  CreateVocabulary,
+  ListVocabularyFullResponse,
   ListVocabularyResponse,
   Vocabulary,
+  VocabularyAbbreviation,
   VocabularyRelatedRecords,
 } from '@LearnCraft-Spanish/shared';
-import type { AuthPort } from '../../application/ports/authPort';
-import type {
-  VocabularyPort,
-  VocabularyQueryOptions,
-} from '../../application/ports/vocabularyPort';
-import { VocabularyEndpoints } from '@LearnCraft-Spanish/shared';
-import { createAuthenticatedHttpClient } from '../http/client';
+import { createHttpClient } from '@infrastructure/http/client';
+import {
+  createVocabularyEndpoint,
+  deleteVocabularyEndpoint,
+  getAllRecordsAssociatedWithVocabularyRecordEndpoint,
+  getTotalCountEndpoint,
+  getVocabularyByIdEndpoint,
+  getVocabularyBySubcategoryEndpoint,
+  getVocabularyCountBySubcategoryEndpoint,
+  listVocabularyEndpoint,
+} from '@LearnCraft-Spanish/shared';
 
 /**
  * Creates an implementation of the VocabularyPort.
@@ -31,141 +37,104 @@ export function createVocabularyInfrastructure(
   auth: AuthPort,
 ): VocabularyPort {
   // Create an authenticated HTTP client
-  const httpClient = createAuthenticatedHttpClient(apiUrl, auth);
-
-  // Helper to build pagination parameters according to the contract
-  const buildQueryParams = (
-    options?: VocabularyQueryOptions,
-  ): Record<string, string> => {
-    if (!options) return {};
-
-    const params: Record<string, string> = {};
-
-    // Map our application options to the API's expected query parameters
-    if (options.subcategoryId !== undefined) {
-      params.subcategoryId = options.subcategoryId.toString();
-    }
-
-    // Convert our limit/offset to the API's page/limit pagination model
-    if (options.limit !== undefined) {
-      params.limit = options.limit.toString();
-    }
-
-    if (options.offset !== undefined) {
-      // Convert offset to page number (approximation)
-      const page = Math.floor(options.offset / (options.limit || 20)) + 1;
-      params.page = page.toString();
-    } else {
-      params.page = '1'; // Default to page 1
-    }
-
-    return params;
-  };
+  const httpClient = createHttpClient(apiUrl, auth);
 
   return {
-    getVocabulary: async (
-      options?: VocabularyQueryOptions,
-    ): Promise<Vocabulary[]> => {
-      const queryParams = buildQueryParams(options);
+    getVocabulary: async (): Promise<VocabularyAbbreviation[]> => {
       const response = await httpClient.get<ListVocabularyResponse>(
-        VocabularyEndpoints.list.path,
-        { params: queryParams },
+        listVocabularyEndpoint.path,
+        listVocabularyEndpoint.requiredScopes,
       );
 
       // The API returns a paginated response, but our port expects an array
       // Extract items from the pagination wrapper
-      return response.items;
+      return response;
     },
 
-    getVocabularyCount: async (
-      subcategoryId?: number,
-    ): Promise<GetTotalCountResponse> => {
-      // The backend expects query parameters in the format /api/vocabulary?subcategoryId=16
-      const params: Record<string, string> = {};
-
-      if (subcategoryId !== undefined) {
-        params.subcategoryId = subcategoryId.toString();
-      }
-
-      // Use the list endpoint with the count parameter
-      return httpClient.get<GetTotalCountResponse>(
-        VocabularyEndpoints.getCount.path,
-        { params },
-      );
-    },
-
-    getVocabularyById: async (id: string): Promise<Vocabulary | null> => {
-      const path = VocabularyEndpoints.getById.path.replace(':id', id);
-      return httpClient.get<Vocabulary>(path);
-    },
-
-    createVerb: async (command: CreateVerb): Promise<Vocabulary> => {
-      return httpClient.post<Vocabulary>(
-        VocabularyEndpoints.createVerbVocabulary.path,
-        command,
-      );
-    },
-
-    createNonVerbVocabulary: async (
-      command: CreateNonVerbVocabulary,
-    ): Promise<Vocabulary> => {
-      return httpClient.post<Vocabulary>(
-        VocabularyEndpoints.createNonVerbVocabulary.path,
-        command,
-      );
-    },
-
-    createVocabularyBatch: async (
-      commands: CreateNonVerbVocabulary[],
+    getVocabularyBySubcategory: async (
+      subcategoryId: number,
+      page: number,
+      limit: number,
     ): Promise<Vocabulary[]> => {
-      // If the API doesn't support batch operations, we can implement it client-side
-      const results = await Promise.all(
-        commands.map((command) =>
-          httpClient.post<Vocabulary>(
-            VocabularyEndpoints.createNonVerbVocabulary.path,
-            command,
-          ),
+      const response = await httpClient.get<ListVocabularyFullResponse>(
+        getVocabularyBySubcategoryEndpoint.path.replace(
+          ':subcategoryId',
+          subcategoryId.toString(),
         ),
+        getVocabularyBySubcategoryEndpoint.requiredScopes,
+        {
+          params: {
+            page: page.toString(),
+            limit: limit.toString(),
+          },
+        },
       );
-      return results;
+
+      return response;
     },
 
-    deleteVocabulary: async (id: string): Promise<number> => {
-      const path = VocabularyEndpoints.delete.path.replace(':id', id);
+    getVocabularyCount: async (): Promise<number> => {
+      // Use the list endpoint with the count parameter
+      return httpClient.get<number>(
+        getTotalCountEndpoint.path,
+        getTotalCountEndpoint.requiredScopes,
+      );
+    },
 
-      const result = await httpClient.delete<number>(path);
+    getVocabularyCountBySubcategory: async (
+      subcategoryId: number,
+    ): Promise<number> => {
+      return httpClient.get<number>(
+        getVocabularyCountBySubcategoryEndpoint.path.replace(
+          ':subcategoryId',
+          subcategoryId.toString(),
+        ),
+        getVocabularyCountBySubcategoryEndpoint.requiredScopes,
+      );
+    },
+
+    getVocabularyById: async (id: number): Promise<Vocabulary | null> => {
+      const path = getVocabularyByIdEndpoint.path.replace(':id', id.toString());
+      return httpClient.get<Vocabulary>(
+        path,
+        getVocabularyByIdEndpoint.requiredScopes,
+      );
+    },
+
+    createVocabulary: async (
+      command: CreateVocabulary[],
+    ): Promise<number[]> => {
+      return httpClient.post<number[]>(
+        createVocabularyEndpoint.path,
+        createVocabularyEndpoint.requiredScopes,
+        command,
+      );
+    },
+
+    deleteVocabulary: async (ids: number[]): Promise<number> => {
+      const result = await httpClient.delete<number>(
+        deleteVocabularyEndpoint.path,
+        deleteVocabularyEndpoint.requiredScopes,
+        {
+          data: ids,
+        },
+      );
 
       return result;
     },
 
-    getAllRecordsAssociatedWithVocabularyRecord: async (
-      id: string | undefined,
+    getRelatedRecords: async (
+      id: number,
     ): Promise<VocabularyRelatedRecords> => {
-      if (!id) {
-        return {
-          vocabularyRecordId: 0,
-          vocabularyExampleRecords: [],
-          vocabularyLessonRecords: [],
-          vocabularySpellingRecords: [],
-        };
-      }
       const path =
-        VocabularyEndpoints.getAllRecordsAssociatedWithVocabularyRecord.path.replace(
+        getAllRecordsAssociatedWithVocabularyRecordEndpoint.path.replace(
           ':id',
-          id,
+          id.toString(),
         );
-      return httpClient.get<VocabularyRelatedRecords>(path);
-    },
-
-    searchVocabulary: async (query: string): Promise<Vocabulary[]> => {
-      // If the API doesn't have a dedicated search endpoint, use the list endpoint with a search param
-      const response = await httpClient.get<ListVocabularyResponse>(
-        VocabularyEndpoints.list.path,
-        { params: { search: query } },
+      return httpClient.get<VocabularyRelatedRecords>(
+        path,
+        getAllRecordsAssociatedWithVocabularyRecordEndpoint.requiredScopes,
       );
-
-      // Extract items from the pagination wrapper
-      return response.items;
     },
   };
 }

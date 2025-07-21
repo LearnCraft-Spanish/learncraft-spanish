@@ -1,4 +1,5 @@
 import type { Assignment, Week } from 'src/types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import ContextualView from 'src/components/Contextual/ContextualView';
@@ -16,12 +17,12 @@ import { toReadableMonthDay } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 
-import { useUserData } from 'src/hooks/UserData/useUserData';
+import { useModal } from 'src/hooks/useModal';
 
 import CustomStudentSelector from '../../general/CustomStudentSelector';
 import getDateRange from '../../general/functions/dateRange';
+import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 import getWeekEnds from '../../general/functions/getWeekEnds';
 const assignmentTypes = [
   'Pronunciation',
@@ -178,7 +179,6 @@ export function AssignmentView({
       {
         onSuccess: () => {
           disableEditMode();
-          closeContextual();
           onSuccess?.();
         },
       },
@@ -330,7 +330,7 @@ export function NewAssignmentView({
 }) {
   const { closeContextual } = useContextualMenu();
   const { createAssignmentMutation } = useCoaching();
-  const userDataQuery = useUserData();
+  const { authUser } = useAuthAdapter();
   const { getStudentFromMembershipId } = useCoaching();
   const { openModal } = useModal();
   const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
@@ -338,6 +338,7 @@ export function NewAssignmentView({
   const weekEnds = useMemo(() => getWeekEnds(weekStarts), [weekStarts]);
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
   const { weeksQuery } = useWeeks(weekStarts, weekEnds);
+  const { coachListQuery } = useCoaching();
 
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
@@ -349,8 +350,15 @@ export function NewAssignmentView({
   }
   const [student, setStudent] = useState<StudentObj>();
 
+  const defaultHomeworkCorrector = useMemo(() => {
+    return (
+      getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
+        .email || ''
+    );
+  }, [authUser.email, coachListQuery.data]);
+
   const [homeworkCorrector, setHomeworkCorrector] = useState(
-    userDataQuery.data?.emailAddress || '',
+    defaultHomeworkCorrector,
   );
   const [assignmentType, setAssignmentType] = useState('');
   const [rating, setRating] = useState('');
@@ -412,14 +420,6 @@ export function NewAssignmentView({
       },
       {
         onSuccess: () => {
-          closeContextual();
-          setHomeworkCorrector(userDataQuery.data?.emailAddress || '');
-          setAssignmentType('');
-          setRating('');
-          setNotes('');
-          setAreasOfDifficulty('');
-          setAssignmentLink('');
-
           onSuccess?.();
         },
       },

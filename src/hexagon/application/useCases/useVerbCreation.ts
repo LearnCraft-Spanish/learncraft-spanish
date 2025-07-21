@@ -1,20 +1,8 @@
-import type { CreateVerb } from '@LearnCraft-Spanish/shared';
-import type { UseVerbCreationResult, VerbData } from './types';
+import type { CreateVerbVocabulary } from '@LearnCraft-Spanish/shared';
+import type { UseVerbCreationResult } from './types';
 import { useSubcategories } from '@application/units/useSubcategories';
 import { useVocabulary } from '@application/units/useVocabulary';
 import { useCallback, useMemo, useState } from 'react';
-
-/**
- * Maps verb data to a CreateVerb command
- */
-function mapToVerbCommand(data: VerbData): CreateVerb {
-  return {
-    infinitive: data.infinitive,
-    translation: data.translation,
-    isRegular: data.isRegular || false,
-    notes: data.usage || data.notes,
-  };
-}
 
 /**
  * Use case for verb creation.
@@ -22,7 +10,7 @@ function mapToVerbCommand(data: VerbData): CreateVerb {
  */
 export function useVerbCreation(): UseVerbCreationResult {
   // State
-  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number>(0);
   const [creationError, setCreationError] = useState<Error | null>(null);
 
   // Compose unit hooks
@@ -31,12 +19,10 @@ export function useVerbCreation(): UseVerbCreationResult {
 
   // Use our vocabulary unit for operations
   const {
-    createVerb: createVerbInVocabulary,
+    createVerbVocabulary: createVerbInVocabulary,
     creating: creatingVocabulary,
     creationError: vocabCreationError,
-  } = useVocabulary({
-    isVerb: true,
-  });
+  } = useVocabulary();
 
   // Filter for verb subcategories only
   const verbSubcategories = useMemo(() => {
@@ -48,26 +34,16 @@ export function useVerbCreation(): UseVerbCreationResult {
   }, [allSubcategories]);
 
   // Create verb
-  const createVerb = useCallback(
-    async (verbData: VerbData) => {
-      if (!verbData.subcategoryId) {
-        setCreationError(new Error('No subcategory selected'));
-        return false;
-      }
-
+  const createVerbVocabulary = useCallback(
+    async (verbData: CreateVerbVocabulary[]) => {
       try {
-        setCreationError(null);
-
-        // Map to domain command
-        const command = mapToVerbCommand(verbData);
-
         // Use our new vocabulary unit to create the verb
-        await createVerbInVocabulary(command);
-        return true;
+        const createdIds = await createVerbInVocabulary(verbData);
+        return createdIds;
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setCreationError(error);
-        return false;
+        return [];
       }
     },
     [createVerbInVocabulary],
@@ -88,6 +64,6 @@ export function useVerbCreation(): UseVerbCreationResult {
     creationError: combinedError,
 
     // Creation methods
-    createVerb,
+    createVerbVocabulary,
   };
 }

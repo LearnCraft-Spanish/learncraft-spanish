@@ -1,7 +1,7 @@
 import type {
   UseNonVerbCreationResult,
   VocabularyPaginationState,
-} from './useNonVerbCreation';
+} from './types';
 import { defaultMockResult as defaultTableHook } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
 import { mockUseVocabularyPage } from '@application/units/useVocabularyPage.mock';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
@@ -15,8 +15,8 @@ const mockSubcategories = createMockSubcategoryList(5).filter(
 
 // Create simple mocks
 const mockSaveVocabulary = vi
-  .fn<() => Promise<boolean>>()
-  .mockResolvedValue(true);
+  .fn<() => Promise<number[]>>()
+  .mockResolvedValue([1, 2, 3]);
 const mockSetSubcategoryId = vi.fn<(id: string) => void>();
 const mockGoToNextPage = vi.fn<() => void>();
 const mockGoToPreviousPage = vi.fn<() => void>();

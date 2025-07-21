@@ -3,15 +3,14 @@ import type {
   Lesson,
   Program,
 } from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useProgramTable } from './CourseData/useProgramTable'; // Assuming this fetches the programs data
-import { useActiveStudent } from './UserData/useActiveStudent';
 
 export function useSelectedLesson() {
   const queryClient = useQueryClient();
-  const { activeStudentQuery, activeProgram, activeLesson } =
-    useActiveStudent(); // Fetch the active student
+  const { appUser } = useActiveStudent(); // Fetch the active student
   const { programTableQuery } = useProgramTable(); // Fetch the programs data internally
 
   const programsQueryData = programTableQuery.data;
@@ -121,10 +120,10 @@ export function useSelectedLesson() {
   const newToLesson = useCallback(
     (program: Program | null) => {
       const firstLesson = program?.lessons[0] || null;
-      if (activeLesson?.recordId) {
+      if (appUser?.lessonNumber) {
         // Foreign Key lookup, form data in backend?
         const foundLesson = program?.lessons.find(
-          (lesson) => lesson.recordId === activeLesson.recordId,
+          (lesson) => lesson.lessonNumber === appUser?.lessonNumber,
         );
         if (foundLesson) {
           return foundLesson;
@@ -133,7 +132,7 @@ export function useSelectedLesson() {
       }
       return firstLesson;
     },
-    [activeLesson],
+    [appUser?.lessonNumber],
   );
 
   // Set selected program
@@ -231,10 +230,10 @@ export function useSelectedLesson() {
 
   // Update program when activeStudent changes
   useEffect(() => {
-    if (activeStudentQuery.data && activeProgram?.recordId) {
-      setProgram(activeProgram.recordId);
+    if (appUser && appUser?.courseId) {
+      setProgram(appUser?.courseId);
     }
-  }, [activeStudentQuery.data, activeProgram?.recordId, setProgram]);
+  }, [appUser, setProgram]);
 
   // Expose current state, vocab, and filtering function
   return {

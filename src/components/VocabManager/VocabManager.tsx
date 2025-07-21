@@ -1,9 +1,9 @@
 import type { Vocabulary } from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React, { useRef, useState } from 'react';
 import { useSubcategories } from 'src/hooks/CourseData/useSubcategories';
 import { useVerbs } from 'src/hooks/CourseData/useVerbs';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 import 'src/App.css';
 
 export interface ParsedVocabulary extends Omit<Vocabulary, 'recordId'> {
@@ -13,9 +13,7 @@ export interface ParsedVocabulary extends Omit<Vocabulary, 'recordId'> {
 }
 
 export default function VocabManager() {
-  const userDataQuery = useUserData();
-  const adminRole = userDataQuery.data?.roles.adminRole;
-  const hasAccess = adminRole === 'admin';
+  const { isAdmin, isLoading, isAuthenticated } = useAuthAdapter();
 
   const {
     verbsQuery,
@@ -52,7 +50,7 @@ export default function VocabManager() {
     return nextTempId.current;
   };
 
-  if (!hasAccess) {
+  if (!isAdmin && !isLoading && isAuthenticated) {
     return <div>Access denied. Admin privileges required.</div>;
   }
 
@@ -150,129 +148,140 @@ export default function VocabManager() {
 
   return (
     <div>
-      <h2>Vocabulary Management</h2>
-      <div className="vocabulary-manager">
-        {/* Verbs Section */}
-        <section>
-          <h3>Verbs</h3>
-          {verbsQuery.isLoading && <div>Loading verbs...</div>}
-          {verbsQuery.isError && <div>Error loading verbs</div>}
-          {verbsQuery.data && (
-            <div>
-              {/* Verb management UI will go here */}
-              <p>Verb management interface coming soon...</p>
-            </div>
-          )}
-        </section>
-
-        {/* Subcategories Section */}
-        <section>
-          <h3>Subcategories</h3>
-          {subcategoriesQuery.isLoading && <div>Loading subcategories...</div>}
-          {subcategoriesQuery.isError && <div>Error loading subcategories</div>}
-          {subcategoriesQuery.data && (
-            <div>
-              {/* Subcategory management UI will go here */}
-              <p>Subcategory management interface coming soon...</p>
-            </div>
-          )}
-        </section>
-
-        {/* Vocabulary Section */}
-        <section>
-          <h3>Vocabulary</h3>
-          {vocabularyQuery.isLoading && <div>Loading vocabulary...</div>}
-          {vocabularyQuery.isError && <div>Error loading vocabulary</div>}
-          {vocabularyQuery.data && (
-            <div className="vocabulary-section">
-              <div className="vocabulary-input">
-                <textarea
-                  value={vocabularyData}
-                  onChange={handleChange}
-                  placeholder="Paste vocabulary data here (tab-separated)"
-                  rows={10}
-                />
-                <button type="button" onClick={parseTable}>
-                  Parse Data
-                </button>
-                {error && <div className="error">{error}</div>}
-              </div>
-
-              {parsedVocabulary.length > 0 && (
-                <div className="vocabulary-preview">
-                  <h4>Preview</h4>
-                  <ul>
-                    {parsedVocabulary.map((vocab) => (
-                      <li key={vocab.tempId}>
-                        {vocab.wordIdiom} - {vocab.descriptionOfVocabularySkill}
-                      </li>
-                    ))}
-                  </ul>
-                  <button type="button" onClick={handleSubmit}>
-                    Save Vocabulary
-                  </button>
+      {isLoading && <div>Loading...</div>}
+      {isAdmin && (
+        <>
+          <h2>Vocabulary Management</h2>
+          <div className="vocabulary-manager">
+            {/* Verbs Section */}
+            <section>
+              <h3>Verbs</h3>
+              {verbsQuery.isLoading && <div>Loading verbs...</div>}
+              {verbsQuery.isError && <div>Error loading verbs</div>}
+              {verbsQuery.data && (
+                <div>
+                  {/* Verb management UI will go here */}
+                  <p>Verb management interface coming soon...</p>
                 </div>
               )}
+            </section>
 
-              <div className="spelling-management">
-                <h4>Manage Spellings</h4>
-                <select
-                  value={selectedVocabulary?.recordId || ''}
-                  onChange={(e) => {
-                    const vocab = vocabularyQuery.data.find(
-                      (v) => v.recordId === Number.parseInt(e.target.value, 10),
-                    );
-                    setSelectedVocabulary(vocab || null);
-                  }}
-                >
-                  <option value="">Select a vocabulary item</option>
-                  {vocabularyQuery.data.map((vocab) => (
-                    <option key={vocab.recordId} value={vocab.recordId}>
-                      {vocab.wordIdiom}
-                    </option>
-                  ))}
-                </select>
+            {/* Subcategories Section */}
+            <section>
+              <h3>Subcategories</h3>
+              {subcategoriesQuery.isLoading && (
+                <div>Loading subcategories...</div>
+              )}
+              {subcategoriesQuery.isError && (
+                <div>Error loading subcategories</div>
+              )}
+              {subcategoriesQuery.data && (
+                <div>
+                  {/* Subcategory management UI will go here */}
+                  <p>Subcategory management interface coming soon...</p>
+                </div>
+              )}
+            </section>
 
-                {selectedVocabulary && (
-                  <>
-                    <div className="spelling-list">
-                      <h5>Current Spellings:</h5>
+            {/* Vocabulary Section */}
+            <section>
+              <h3>Vocabulary</h3>
+              {vocabularyQuery.isLoading && <div>Loading vocabulary...</div>}
+              {vocabularyQuery.isError && <div>Error loading vocabulary</div>}
+              {vocabularyQuery.data && (
+                <div className="vocabulary-section">
+                  <div className="vocabulary-input">
+                    <textarea
+                      value={vocabularyData}
+                      onChange={handleChange}
+                      placeholder="Paste vocabulary data here (tab-separated)"
+                      rows={10}
+                    />
+                    <button type="button" onClick={parseTable}>
+                      Parse Data
+                    </button>
+                    {error && <div className="error">{error}</div>}
+                  </div>
+
+                  {parsedVocabulary.length > 0 && (
+                    <div className="vocabulary-preview">
+                      <h4>Preview</h4>
                       <ul>
-                        {selectedVocabulary.spellings?.map((spelling) => (
-                          <li
-                            key={`${selectedVocabulary.recordId}-${spelling}`}
-                          >
-                            {spelling}
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteSpelling(spelling)}
-                              className="delete-button"
-                            >
-                              Delete
-                            </button>
+                        {parsedVocabulary.map((vocab) => (
+                          <li key={vocab.tempId}>
+                            {vocab.wordIdiom} -{' '}
+                            {vocab.descriptionOfVocabularySkill}
                           </li>
                         ))}
                       </ul>
-                    </div>
-
-                    <div className="add-spelling">
-                      <input
-                        type="text"
-                        value={newSpelling}
-                        onChange={(e) => setNewSpelling(e.target.value)}
-                        placeholder="Enter new spelling"
-                      />
-                      <button type="button" onClick={handleAddSpelling}>
-                        Add Spelling
+                      <button type="button" onClick={handleSubmit}>
+                        Save Vocabulary
                       </button>
                     </div>
-                  </>
-                )}
-              </div>
-            </div>
-          )}
-        </section>
-      </div>
+                  )}
+
+                  <div className="spelling-management">
+                    <h4>Manage Spellings</h4>
+                    <select
+                      value={selectedVocabulary?.recordId || ''}
+                      onChange={(e) => {
+                        const vocab = vocabularyQuery.data.find(
+                          (v) =>
+                            v.recordId === Number.parseInt(e.target.value, 10),
+                        );
+                        setSelectedVocabulary(vocab || null);
+                      }}
+                    >
+                      <option value="">Select a vocabulary item</option>
+                      {vocabularyQuery.data.map((vocab) => (
+                        <option key={vocab.recordId} value={vocab.recordId}>
+                          {vocab.wordIdiom}
+                        </option>
+                      ))}
+                    </select>
+
+                    {selectedVocabulary && (
+                      <>
+                        <div className="spelling-list">
+                          <h5>Current Spellings:</h5>
+                          <ul>
+                            {selectedVocabulary.spellings?.map((spelling) => (
+                              <li
+                                key={`${selectedVocabulary.recordId}-${spelling}`}
+                              >
+                                {spelling}
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteSpelling(spelling)}
+                                  className="delete-button"
+                                >
+                                  Delete
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="add-spelling">
+                          <input
+                            type="text"
+                            value={newSpelling}
+                            onChange={(e) => setNewSpelling(e.target.value)}
+                            placeholder="Enter new spelling"
+                          />
+                          <button type="button" onClick={handleAddSpelling}>
+                            Add Spelling
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -63,7 +63,7 @@ jobs:
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
       - name: Run Mutation Testing
-        run: pnpm stryker run
+        run: pnpm mutate
         env:
           VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
