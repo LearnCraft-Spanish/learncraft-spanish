@@ -4,8 +4,7 @@ import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinder
 import FlashcardFinderResults from '../components/FlashcardFinder/FlashcardFinderResults';
 
 export default function FlashcardFinder() {
-  const { exampleFilter, exampleQuery, flashcardsQuery, totalPages, pageSize } =
-    useFlashcardFinder();
+  const { exampleFilter, exampleQuery, pageSize } = useFlashcardFinder();
 
   const { filterState, skillTagSearch } = exampleFilter;
 
@@ -21,8 +20,8 @@ export default function FlashcardFinder() {
       />
       {!filterState.filtersChanging ? (
         <FlashcardFinderResults
-          filteredFlashcards={exampleQuery.filteredExamples}
-          totalCount={exampleQuery.totalCount}
+          filteredFlashcards={exampleQuery.filteredExamples || []}
+          totalCount={exampleQuery.totalCount || 0}
           pageSize={pageSize}
           fetchingExamples={exampleQuery.isLoading}
         />

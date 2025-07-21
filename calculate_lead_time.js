@@ -18,12 +18,12 @@ function calculateLeadTime() {
       { encoding: 'utf8' },
     ).trim();
 
-    console.log('=== Lead Time for Changes Analysis ===');
-    console.log(`PR: #135 (D-HotFix-1)`);
-    console.log(`First Commit: ${firstCommit} at ${firstCommitTime}`);
-    console.log(`Merge Commit: ${mergeCommit} at ${mergeCommitTime}`);
+    console.error('=== Lead Time for Changes Analysis ===');
+    console.error(`PR: #135 (D-HotFix-1)`);
+    console.error(`First Commit: ${firstCommit} at ${firstCommitTime}`);
+    console.error(`Merge Commit: ${mergeCommit} at ${mergeCommitTime}`);
 
-    console.log('firstCommitTime', firstCommitTime);
+    console.error('firstCommitTime', firstCommitTime);
 
     // Calculate time difference
     const firstDate = new Date(firstCommitTime);
@@ -33,8 +33,8 @@ function calculateLeadTime() {
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
-    console.log(`\nLead Time: ${hours} hours and ${minutes} minutes`);
-    console.log(`Total minutes: ${Math.floor(timeDiff / (1000 * 60))}`);
+    console.error(`\nLead Time: ${hours} hours and ${minutes} minutes`);
+    console.error(`Total minutes: ${Math.floor(timeDiff / (1000 * 60))}`);
 
     return {
       pr: '#135',
@@ -57,8 +57,8 @@ function calculateLeadTime() {
 const result = calculateLeadTime();
 
 if (result) {
-  console.log('\n=== Summary ===');
-  console.log(
+  console.error('\n=== Summary ===');
+  console.error(
     `PR ${result.pr} (${result.tag}) took ${result.leadTimeHours}h ${result.leadTimeMinutesRemainder}m from first commit to merge`,
   );
 }

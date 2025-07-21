@@ -1,4 +1,4 @@
-import type { Course, Lesson, SkillTag } from '@LearnCraft-Spanish/shared';
+import type { SkillTag } from '@LearnCraft-Spanish/shared';
 
 interface FilterParams {
   courseId: number;

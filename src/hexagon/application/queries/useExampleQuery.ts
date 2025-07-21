@@ -1,4 +1,7 @@
-import type { Example, SkillTag } from '@LearnCraft-Spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  SkillTag,
+} from '@LearnCraft-Spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
@@ -8,7 +11,7 @@ import { useSkillTags } from './useSkillTags';
 
 export interface UseExampleQueryReturnType {
   isLoading: boolean;
-  filteredExamples: Example[] | null;
+  filteredExamples: ExampleWithVocabulary[] | null;
   totalCount: number | null;
   error: Error | null;
   page: number;

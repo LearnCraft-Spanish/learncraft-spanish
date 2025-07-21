@@ -9,6 +9,7 @@ const defaultMockAdapter: UseSelectedCourseAndLessonsReturnType = {
   updateUserSelectedCourseId: vi.fn<() => void>(),
   updateFromLessonId: vi.fn<() => void>(),
   updateToLessonId: vi.fn<() => void>(),
+  isLoading: false,
 };
 
 // Create an overrideable mock with the default implementation

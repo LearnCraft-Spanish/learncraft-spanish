@@ -14,6 +14,7 @@ export function ExampleFilterContextProvider({
     includeSpanglish: false,
     audioOnly: false,
     skillTags: [],
+    filterUuid: '',
   });
   const [filtersChanging, setFiltersChanging] = useState(true);
 

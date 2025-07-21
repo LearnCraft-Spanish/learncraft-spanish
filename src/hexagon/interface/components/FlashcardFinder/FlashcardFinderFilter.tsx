@@ -1,7 +1,8 @@
-import type { UseExampleFilterReturnType } from 'src/hexagon/application/units/useExampleFilter';
+import type { UseExampleFilterCoordinatorReturnType } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
+import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/useSkillTagSearch';
+
 import useExampleFilter from 'src/hexagon/application/units/useExampleFilter';
 import { SectionHeader } from '../general';
-
 import ToggleSwitch from '../general/ToggleSwitch';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 import ReadOnlyFilters from './units/ReadOnlyFilters';
@@ -12,7 +13,10 @@ import 'src/App.css';
 export default function FlashcardFinderFilter({
   filterState: hookFilterState,
   skillTagSearch,
-}: UseExampleFilterReturnType) {
+}: {
+  filterState: UseExampleFilterCoordinatorReturnType;
+  skillTagSearch: UseSkillTagSearchReturnType;
+}) {
   const { skillTags } = useExampleFilter();
 
   const {
@@ -109,6 +113,7 @@ export default function FlashcardFinderFilter({
                 updateSearchTerm={updateTagSearchTerm}
                 searchResults={tagSuggestions}
                 addTag={addSkillTagToFilters}
+                removeTagFromSuggestions={removeTagFromSuggestions}
               />
               <SelectedTags
                 removeTag={removeSkillTagFromFilters}
