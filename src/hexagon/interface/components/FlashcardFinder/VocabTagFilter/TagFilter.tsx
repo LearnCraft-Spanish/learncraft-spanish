@@ -7,11 +7,13 @@ export default function TagFilter({
   updateSearchTerm,
   searchResults,
   addTag,
+  removeTagFromSuggestions,
 }: {
   searchTerm: string;
   updateSearchTerm: (e: EventTarget & HTMLInputElement) => void;
   searchResults: SkillTag[];
   addTag: (tagId: string) => void;
+  removeTagFromSuggestions: (tagId: string) => void;
 }) {
   const { contextual, setContextualRef, openContextual } = useContextualMenu();
 
@@ -35,7 +37,10 @@ export default function TagFilter({
               <div
                 key={item.key}
                 className="tagCard"
-                onClick={() => addTag(item.key)}
+                onClick={() => {
+                  addTag(item.key);
+                  removeTagFromSuggestions(item.key);
+                }}
               >
                 <div className={`${item.type}Card`}>
                   <h4 className="vocabName">{item.name}</h4>

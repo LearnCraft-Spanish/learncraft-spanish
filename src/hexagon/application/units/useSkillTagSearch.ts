@@ -7,6 +7,7 @@ export interface UseSkillTagSearchReturnType {
   tagSearchTerm: string;
   tagSuggestions: SkillTag[];
   updateTagSearchTerm: (target: EventTarget & HTMLInputElement) => void;
+  removeTagFromSuggestions: (tagId: string) => void;
   isLoading: boolean;
   error: Error | null;
 }
@@ -14,6 +15,7 @@ export interface UseSkillTagSearchReturnType {
 export function useSkillTagSearch(): UseSkillTagSearchReturnType {
   const { skillTags, isLoading, error } = useSkillTags();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
+  const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(new Set());
 
   const updateTagSearchTerm = (target: EventTarget & HTMLInputElement) => {
     if (target.value.length > 0) {
@@ -21,6 +23,10 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     } else {
       setTagSearchTerm('');
     }
+  };
+
+  const removeTagFromSuggestions = (tagId: string) => {
+    setRemovedTagIds((prev) => new Set([...prev, tagId]));
   };
 
   const tagSuggestions: SkillTag[] = useMemo(() => {
@@ -33,6 +39,9 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
 
     const processTag = (tag: SkillTag) => {
       if (seenKeys.get(tag.key)) return null;
+
+      // Skip tags that have been removed
+      if (removedTagIds.has(tag.key)) return null;
 
       const nameLower = tag.name.toLowerCase();
       const isExactNameMatch = nameLower === searchTerm;
@@ -83,12 +92,13 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     const firstTen = sorted.slice(0, 10);
 
     return firstTen;
-  }, [skillTags, tagSearchTerm]);
+  }, [skillTags, tagSearchTerm, removedTagIds]);
 
   return {
     tagSearchTerm,
     tagSuggestions,
     updateTagSearchTerm,
+    removeTagFromSuggestions,
     isLoading,
     error,
   };
