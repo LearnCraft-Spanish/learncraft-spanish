@@ -38,7 +38,7 @@ export const useExampleQuery = (
   }, [filterState?.exampleFilters.skillTags, skillTags]);
 
   const fetchFilteredExamples = useCallback(async () => {
-    const { examples, totalCount } = (await exampleAdapter.getFilteredExamples({
+    const { examples, totalCount } = await exampleAdapter.getFilteredExamples({
       courseId: course!.id,
       toLessonNumber: toLesson!.lessonNumber,
       fromLessonNumber: fromLesson?.lessonNumber,
@@ -48,7 +48,7 @@ export const useExampleQuery = (
       page,
       limit: pageSize,
       seed: filterState!.exampleFilters.filterUuid,
-    })) || { examples: [], totalCount: 0 };
+    });
     return { examples, totalCount };
   }, [
     course,

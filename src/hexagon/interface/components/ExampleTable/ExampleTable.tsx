@@ -6,6 +6,7 @@ import usePagination from '@application/units/Pagination/usePagination';
 
 import { useCallback, useEffect, useState } from 'react';
 
+import Loading from 'src/components/Loading/Loading';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import { Pagination } from '../general';
 import {
@@ -13,6 +14,7 @@ import {
   getExampleById as getExampleByIdFunction,
 } from './units/functions';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
+
 import './ExampleTable.scss';
 
 interface ExamplesTableProps {
@@ -20,6 +22,8 @@ interface ExamplesTableProps {
   totalCount: number;
   dataSource: ExampleWithVocabulary[];
   displayOrder: DisplayOrder[];
+
+  fetchingExamples: boolean;
 }
 
 export default function ExamplesTable({
@@ -27,6 +31,8 @@ export default function ExamplesTable({
   totalCount,
   dataSource,
   displayOrder,
+
+  fetchingExamples,
 }: ExamplesTableProps) {
   const {
     displayOrderSegment,
@@ -60,6 +66,9 @@ export default function ExamplesTable({
     }
   }, [displayOrder, maxPage, setPage]);
 
+  if (fetchingExamples) {
+    return <Loading message="Fetching Flashcards" />;
+  }
   return (
     <div className="examplesTable">
       <div className="buttonBox bulkAddModeButtons">
@@ -124,7 +133,6 @@ export default function ExamplesTable({
         nextPage={nextPage}
         previousPage={previousPage}
       />
-      {/* unnessessary id? */}
       <div id="examplesTableBody">
         {displayOrderSegment.map((displayOrder: DisplayOrder) => {
           return (

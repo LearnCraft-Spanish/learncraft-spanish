@@ -17,6 +17,8 @@ export interface UseExampleFilterReturnType {
   updateFiltersChanging: (filtersChanging: boolean) => void;
 
   skillTags: SkillTag[];
+
+  initialLoading: boolean;
 }
 
 export default function useExampleFilters(): UseExampleFilterReturnType {
@@ -27,11 +29,13 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
     updateFromLessonId: hookUpdateFromLessonId,
     updateToLessonId: hookUpdateToLessonId,
     updateUserSelectedCourseId: hookUpdateCourseId,
+
+    isLoading: isCourseAndLessonLoading,
   } = useSelectedCourseAndLessons();
   const filterState: UseExampleFilterCoordinatorReturnType =
     useExampleFilterCoordinator();
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
-  const { skillTags } = useSkillTags();
+  const { skillTags, isLoading: isSkillTagsLoading } = useSkillTags();
 
   // This logic guards against updating the course and lesson while the search data is fetching
   // This reduces unnecessary re-fetches of the search data
@@ -87,6 +91,8 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
     updateFromLessonId,
     updateToLessonId,
     updateUserSelectedCourseId,
+
+    isLoading: isCourseAndLessonLoading,
   };
 
   return {
@@ -98,5 +104,7 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
     updateFiltersChanging,
 
     skillTags: tags,
+
+    initialLoading: isCourseAndLessonLoading || isSkillTagsLoading,
   };
 }

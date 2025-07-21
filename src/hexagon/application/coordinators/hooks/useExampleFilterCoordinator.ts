@@ -39,7 +39,7 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
 
   // Generate UUID when filters change
   useEffect(() => {
-    if (course && toLesson && skillTags && !filtersChanging) {
+    if (course && toLesson && skillTags) {
       const tagsToSearch = exampleFilters.skillTags
         .map((tagKey) => skillTags.find((tag) => tag.key === tagKey))
         .filter((tag): tag is NonNullable<typeof tag> => tag !== null);

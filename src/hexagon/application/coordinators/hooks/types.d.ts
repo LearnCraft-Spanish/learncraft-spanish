@@ -19,4 +19,6 @@ export interface UseSelectedCourseAndLessonsReturnType {
   updateUserSelectedCourseId: (courseId: number) => void;
   updateFromLessonId: (lessonId: number) => void;
   updateToLessonId: (lessonId: number) => void;
+
+  isLoading: boolean;
 }

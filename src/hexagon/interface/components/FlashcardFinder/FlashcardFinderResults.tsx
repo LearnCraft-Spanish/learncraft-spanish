@@ -6,10 +6,12 @@ export default function FlashcardFinderResults({
   filteredFlashcards,
   totalCount,
   pageSize,
+  fetchingExamples,
 }: {
   filteredFlashcards: ExampleWithVocabulary[];
   totalCount: number;
   pageSize: number;
+  fetchingExamples: boolean;
 }) {
   const displayOrder = useMemo(() => {
     return filteredFlashcards.map((flashcard) => ({
@@ -22,6 +24,7 @@ export default function FlashcardFinderResults({
       displayOrder={displayOrder}
       totalCount={totalCount}
       pageSize={pageSize}
+      fetchingExamples={fetchingExamples}
     />
   );
 }
