@@ -1,4 +1,4 @@
-name: Mutation Testing Report
+name: Hexagon Mutation Testing Report
 
 on:
   schedule:
@@ -62,8 +62,8 @@ jobs:
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
           BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
-      - name: Run Mutation Testing
-        run: pnpm mutate
+      - name: Run Hexagon Mutation Testing
+        run: pnpm mutate:hexagon
         env:
           VITE_BACKEND_URL: ${{ secrets.BACKEND_URL }}
 
