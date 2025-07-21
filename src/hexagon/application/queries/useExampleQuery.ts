@@ -13,7 +13,7 @@ export interface UseExampleQueryReturnType {
   error: Error | null;
   page: number;
   pageSize: number;
-  changePage: (page: number) => void;
+  changeQueryPage: (page: number) => void;
 }
 export const useExampleQuery = (
   pageSize: number,
@@ -76,6 +76,7 @@ export const useExampleQuery = (
       filterState?.exampleFilters.includeSpanglish,
       filterState?.exampleFilters.audioOnly,
       filterState?.exampleFilters.skillTags,
+      filterState?.exampleFilters.filterUuid,
       filtersChanging,
     ],
     queryFn: fetchFilteredExamples,
@@ -86,21 +87,13 @@ export const useExampleQuery = (
       !filtersChanging,
   });
 
-  const filteredExamples = useMemo(() => {
-    return fullResponse?.examples ?? null;
-  }, [fullResponse, page, pageSize]);
-
-  const totalCount = useMemo(() => {
-    return fullResponse?.totalCount ?? null;
-  }, [fullResponse]);
-
   return {
     isLoading,
-    filteredExamples,
     error,
-    totalCount,
+    filteredExamples: fullResponse?.examples ?? null,
+    totalCount: fullResponse?.totalCount ?? null,
     page,
     pageSize,
-    changePage,
+    changeQueryPage: changePage,
   };
 };

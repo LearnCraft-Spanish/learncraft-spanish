@@ -54,8 +54,6 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
       });
 
       // Only update if UUID has changed
-      console.log('newUuid', newUuid);
-      console.log('exampleFilters.filterUuid', exampleFilters.filterUuid);
       if (newUuid !== exampleFilters.filterUuid) {
         updateExampleFilters({
           ...exampleFilters,
