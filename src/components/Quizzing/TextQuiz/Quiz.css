@@ -254,3 +254,16 @@
   margin: 0 auto;
   margin-bottom: 8px;
 }
+
+.clickToFlipMessage {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.clickToFlipMessage.flashcardWithAudio {
+  right: 44px;
+}
