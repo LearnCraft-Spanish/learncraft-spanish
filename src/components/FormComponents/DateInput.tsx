@@ -3,11 +3,13 @@ export default function DateInput({
   onChange,
   label = 'Date',
   required = false,
+  editMode = true,
 }: {
   value: string;
   onChange: (value: React.SetStateAction<string>) => void;
   label?: string;
   required?: boolean;
+  editMode?: boolean;
 }) {
   return (
     <div className="lineWrapper">
@@ -23,6 +25,7 @@ export default function DateInput({
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        disabled={!editMode}
       />
     </div>
   );
