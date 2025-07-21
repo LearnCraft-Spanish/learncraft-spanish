@@ -71,7 +71,9 @@ export default function FlashcardFinderFilter({
                 onClick={() => updateFiltersChanging(false)}
                 type="button"
                 className="getExamplesButton"
-                disabled={!filtersChanging}
+                disabled={
+                  !filtersChanging || !filterState.toLesson?.lessonNumber
+                }
               >
                 Get Examples
               </button>

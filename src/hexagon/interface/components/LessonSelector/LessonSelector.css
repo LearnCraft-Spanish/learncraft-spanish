@@ -19,3 +19,8 @@
 has styling specific to FlashcardFinder implementation
 located in App.css
 */
+
+.lessonList.required::after {
+  content: '*';
+  margin: 0 4px;
+}

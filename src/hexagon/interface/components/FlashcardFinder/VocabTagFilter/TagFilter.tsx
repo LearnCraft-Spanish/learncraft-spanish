@@ -10,7 +10,7 @@ export default function TagFilter({
   removeTagFromSuggestions,
 }: {
   searchTerm: string;
-  updateSearchTerm: (e: EventTarget & HTMLInputElement) => void;
+  updateSearchTerm: (e?: EventTarget & HTMLInputElement) => void;
   searchResults: SkillTag[];
   addTag: (tagId: string) => void;
   removeTagFromSuggestions: (tagId: string) => void;
@@ -26,8 +26,18 @@ export default function TagFilter({
           onChange={(e) => updateSearchTerm(e.currentTarget)}
           onClick={() => openContextual('tagSuggestionBox')}
           placeholder="Search tags"
+          value={searchTerm}
         />
-        <br></br>
+        <button
+          type="button"
+          onClick={() => {
+            updateSearchTerm();
+          }}
+          className={`clearSearchButton ${!searchTerm.length ? 'disabled' : ''}`}
+          disabled={!searchTerm.length}
+        >
+          Clear
+        </button>
       </div>
       {!!searchTerm.length &&
         contextual === 'tagSuggestionBox' &&

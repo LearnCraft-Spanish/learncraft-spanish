@@ -5,18 +5,22 @@ export default function SelectLesson({
   onChange,
   label,
   lessons,
+  required,
+  id,
 }: {
   value: string;
   onChange: (value: string) => void;
   label: string;
   lessons: Lesson[];
+  required?: boolean;
+  id: string;
 }) {
   return (
-    <label htmlFor="toLesson" className="menuRow" id="toRow">
-      <p>{label}:</p>
+    <label htmlFor={id} className="menuRow" id={id}>
+      <p className={required ? 'required' : ''}>{label}:</p>
       <select
-        id="toLesson"
-        name="toLesson"
+        id={id}
+        name={id}
         className="lessonList"
         value={value}
         onChange={(e) => onChange(e.target.value)}

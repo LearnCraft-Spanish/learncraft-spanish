@@ -6,7 +6,7 @@ import { useSkillTags } from '../queries/useSkillTags';
 export interface UseSkillTagSearchReturnType {
   tagSearchTerm: string;
   tagSuggestions: SkillTag[];
-  updateTagSearchTerm: (target: EventTarget & HTMLInputElement) => void;
+  updateTagSearchTerm: (target?: EventTarget & HTMLInputElement) => void;
   removeTagFromSuggestions: (tagId: string) => void;
   isLoading: boolean;
   error: Error | null;
@@ -17,8 +17,8 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
   const [tagSearchTerm, setTagSearchTerm] = useState('');
   const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(new Set());
 
-  const updateTagSearchTerm = (target: EventTarget & HTMLInputElement) => {
-    if (target.value.length > 0) {
+  const updateTagSearchTerm = (target?: EventTarget & HTMLInputElement) => {
+    if (target && target.value && target.value.length > 0) {
       setTagSearchTerm(target.value);
     } else {
       setTagSearchTerm('');
