@@ -2,12 +2,12 @@ import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
 
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
-import usePagination from '@application/units/usePagination';
+import usePagination from '@application/units/Pagination/usePagination';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { Pagination } from 'src/components/Table/components';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
+import { Pagination } from '../general';
 import {
   copyTableToClipboard,
   getExampleById as getExampleByIdFunction,
@@ -31,13 +31,13 @@ export default function ExamplesTable({
   const {
     displayOrderSegment,
     page,
-    maxPage: maxPageFromDisplayOrder,
+    maxPage,
     nextPage,
     previousPage,
     setPage,
   } = usePagination({ displayOrder, itemsPerPage: pageSize });
 
-  const maxPage = Math.ceil(totalCount / pageSize);
+  // const maxPage = Math.ceil(totalCount / pageSize); // BAD HACK. skipping pagination for now, we'll fix this later
 
   const { isExampleCollected, createFlashcards, deleteFlashcards } =
     useStudentFlashcards();
@@ -126,7 +126,7 @@ export default function ExamplesTable({
       />
       {/* unnessessary id? */}
       <div id="examplesTableBody">
-        {displayOrderSegment.map((displayOrder) => {
+        {displayOrderSegment.map((displayOrder: DisplayOrder) => {
           return (
             <ExampleListItem
               key={displayOrder.recordId}
