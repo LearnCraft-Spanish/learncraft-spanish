@@ -13,7 +13,6 @@ import {
 } from 'src/components/FormComponents';
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
-import { getMembershipFromWeekRecordId } from 'src/hooks/CoachingData/helperFunctions';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';

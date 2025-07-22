@@ -155,7 +155,7 @@ export default function useCoaching() {
         assignmentsQuery.data,
       );
     },
-    [assignmentsQuery.data],
+    [assignmentsQuery],
   );
 
   const getMembershipFromWeekRecordId = useCallback(
