@@ -80,7 +80,7 @@ export const handlers = [
   // }),
 
   http.get(`${backendUrl}all-students`, () => {
-    return HttpResponse.json(apiData.allStudentsTable);
+    return HttpResponse.json(apiData.appUserTable);
   }),
 
   http.get(`${backendUrl}unverified-examples`, () => {

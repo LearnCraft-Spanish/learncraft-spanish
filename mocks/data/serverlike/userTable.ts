@@ -128,6 +128,10 @@ export function getAppUserFromName(name: TestUserNames): AppUser | null {
   return appUserTable.find((student) => student.name === name) || null;
 }
 
+export function getAppUserFromEmail(email: TestUserEmails): AppUser | null {
+  return appUserTable.find((student) => student.emailAddress === email) || null;
+}
+
 export function getAuthUserFromEmail(email: TestUserEmails): AuthUser | null {
   return authUserTable.find((user) => user.email === email) || null;
 }

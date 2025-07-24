@@ -7,8 +7,10 @@ import {
   waitFor,
 } from '@testing-library/react';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
-import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
-import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+import {
+  appUserTable,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 
@@ -72,7 +74,7 @@ describe('official quiz component', () => {
     beforeEach(() => {
       vi.clearAllMocks();
     });
-    const testUsers = allStudentsTable;
+    const testUsers = appUserTable;
     testUsers.forEach((user) => {
       const randomizedQuizzes = fisherYatesShuffle(quizExamplesTableArray);
       const sampledQuiz = randomizedQuizzes[0];

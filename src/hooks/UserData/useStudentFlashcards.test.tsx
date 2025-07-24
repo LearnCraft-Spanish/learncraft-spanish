@@ -2,8 +2,10 @@ import type { TestUserEmails } from 'mocks/data/serverlike/userTable';
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { examples } from 'mocks/data/examples.json';
-import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
-import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+import {
+  appUserTable,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
@@ -28,9 +30,10 @@ async function renderHookSuccessfully() {
 
 describe('test by role', () => {
   describe('user is student with flashcards', () => {
-    const studentUsers = allStudentsTable.filter(
+    const studentUsers = appUserTable.filter(
       (student) =>
-        student.role === 'student' && student.name !== 'student-no-flashcards',
+        student.studentRole === 'student' &&
+        student.name !== 'student-no-flashcards',
     );
     for (const student of studentUsers) {
       beforeEach(() => {
@@ -69,8 +72,8 @@ describe('test by role', () => {
     }
   });
   describe('user is not student', () => {
-    const nonStudentUsers = allStudentsTable.filter(
-      (student) => student.role !== 'student',
+    const nonStudentUsers = appUserTable.filter(
+      (student) => student.studentRole !== 'student',
     );
     for (const student of nonStudentUsers) {
       beforeEach(() => {

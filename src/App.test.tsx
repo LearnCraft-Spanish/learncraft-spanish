@@ -1,9 +1,14 @@
 import { render, waitFor } from '@testing-library/react';
-import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+import {
+  getAppUserFromName,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
-import { describe, expect, it } from 'vitest';
+import { overrideMockActiveStudent } from 'src/hexagon/application/coordinators/hooks/useActiveStudent.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
+import { describe, expect, it, vi } from 'vitest';
 import App from './App';
 
 // Waiting for userData context to be finished
@@ -106,6 +111,16 @@ describe('app', () => {
   });
 
   it('displays my flashcards', async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAdmin: false,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     const { getByText } = render(
       <MockAllProviders>
         <App />

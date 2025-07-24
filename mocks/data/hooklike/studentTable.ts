@@ -1,3 +1,3 @@
-import { allStudentsTable } from '../serverlike/studentTable';
+import { appUserTable } from '../serverlike/userTable';
 
-export default allStudentsTable;
+export default appUserTable;
