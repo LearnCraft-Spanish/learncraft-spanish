@@ -6,6 +6,7 @@ import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AudioQuiz from './AudioQuiz';
 
@@ -45,14 +46,19 @@ if (
 */
 describe('component AudioQuiz', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
-      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
-      isAuthenticated: true,
-      isAdmin: false,
-      isCoach: false,
-      isStudent: true,
-      isLimited: false,
-    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
   });
   afterEach(() => {
     vi.clearAllMocks();

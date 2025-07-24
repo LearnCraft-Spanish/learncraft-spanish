@@ -34,7 +34,7 @@ import { server } from 'mocks/api/server';
 
 import { resetTestQueryClient } from 'src/hexagon/testing/utils/testQueryClient';
 
-import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
 // Replace real adapter implementations with mocks for all tests

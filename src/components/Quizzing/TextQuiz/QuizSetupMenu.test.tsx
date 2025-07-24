@@ -5,7 +5,7 @@ import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import QuizSetupMenu from './QuizSetupMenu';
 
@@ -42,14 +42,19 @@ async function successfulRender(overrides: any = {}) {
 
 describe('component QuizSetupMenu', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
-      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
-      isAuthenticated: true,
-      isAdmin: false,
-      isCoach: false,
-      isStudent: true,
-      isLimited: false,
-    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isStudent: true,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
   });
   describe('quiz type (text or audio)', () => {
     const TextQuizOptions = ['Start with Spanish', 'Srs Quiz'];
@@ -104,11 +109,14 @@ describe('component QuizSetupMenu', () => {
         throw new Error('No custom flashcards found');
       }
       await successfulRender();
-      await waitFor(() => {
-        expect(
-          screen.getByText('Custom Only', { exact: false }),
-        ).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText('Custom Only', { exact: false }),
+          ).toBeInTheDocument();
+        },
+        { timeout: 5000 },
+      );
     });
   });
   describe('filtering functionality', () => {

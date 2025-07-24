@@ -12,6 +12,7 @@ import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Quiz from './QuizComponent';
 
@@ -174,6 +175,15 @@ describe('component Quiz', () => {
 
   describe('isSrsQuiz is true', () => {
     it('renders SrsButtons when isSrsQuiz is true', async () => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isStudent: true,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
       renderQuizYesSrs();
       await waitFor(() => {
         expect(screen.getByLabelText('flashcard')).toBeInTheDocument();

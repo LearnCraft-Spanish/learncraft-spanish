@@ -1,14 +1,10 @@
 import { render, waitFor } from '@testing-library/react';
-import {
-  getAppUserFromName,
-  getAuthUserFromEmail,
-} from 'mocks/data/serverlike/userTable';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
-import { overrideMockActiveStudent } from 'src/hexagon/application/coordinators/hooks/useActiveStudent.mock';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import App from './App';
 
 // Waiting for userData context to be finished
