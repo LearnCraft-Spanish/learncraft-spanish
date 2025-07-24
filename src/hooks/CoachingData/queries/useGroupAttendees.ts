@@ -1,4 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import type { GroupAttendees } from 'src/types/CoachingTypes';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../../useBackend';
 import { useUserData } from '../../UserData/useUserData';
@@ -13,6 +14,7 @@ export default function useGroupAttendees(startDate: string, endDate: string) {
   const userDataQuery = useUserData();
   const { getGroupAttendees } = useStudentRecordsBackend();
   const { newPostFactory, newDeleteFactory } = useBackendHelpers();
+  const queryClient = useQueryClient();
 
   const groupAttendeesQuery = useQuery({
     queryKey: ['groupAttendees', { startDate, endDate }],
@@ -25,7 +27,7 @@ export default function useGroupAttendees(startDate: string, endDate: string) {
 
   const createGroupAttendeesMutation = useMutation({
     mutationFn: (groupAttendees: GroupAttendeeMutationObj[]) => {
-      const promise = newPostFactory({
+      const promise = newPostFactory<GroupAttendees[]>({
         path: 'coaching/group-attendees',
         body: groupAttendees,
       });
@@ -36,8 +38,19 @@ export default function useGroupAttendees(startDate: string, endDate: string) {
       });
       return promise;
     },
-    onSettled() {
-      groupAttendeesQuery.refetch();
+    onSuccess(result: GroupAttendees[], _variables, _context) {
+      const queryKey = ['groupAttendees', { startDate, endDate }];
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: GroupAttendees[] | undefined) => {
+          if (!oldData) {
+            return [result];
+          }
+          // Create a deep copy of the old data and add the new assignment
+          const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+          return [...oldDataCopy, ...result];
+        },
+      );
     },
   });
 

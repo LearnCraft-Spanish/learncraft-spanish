@@ -126,7 +126,7 @@ export default function useCoaching() {
         weeksQuery.data,
       );
     },
-    [groupAttendeesQuery.data, weeksQuery.data],
+    [groupAttendeesQuery, weeksQuery],
   );
 
   const getGroupSessionsFromWeekRecordId = useCallback(
@@ -141,7 +141,7 @@ export default function useCoaching() {
         groupSessionsQuery.data,
       );
     },
-    [groupAttendeesQuery.data, groupSessionsQuery.data],
+    [groupAttendeesQuery, groupSessionsQuery],
   );
 
   const getAssignmentsFromWeekRecordId = useCallback(
@@ -184,7 +184,7 @@ export default function useCoaching() {
         privateCallsQuery.data,
       );
     },
-    [privateCallsQuery.data],
+    [privateCallsQuery],
   );
 
   const getAttendeesFromGroupSessionId = useCallback(
@@ -198,7 +198,7 @@ export default function useCoaching() {
         groupAttendeesQuery.data,
       );
     },
-    [groupAttendeesQuery.data],
+    [groupAttendeesQuery],
   );
 
   // get group sessions & attendees for a week

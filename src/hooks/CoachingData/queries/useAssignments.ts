@@ -68,7 +68,7 @@ export default function useAssignments(startDate: string, endDate: string) {
         },
       );
 
-      // open correct contextual for new data
+      // open correct contextual for new record
       setTimeout(() => {
         openContextual(`assignment${result.recordId}`);
       }, 200);
