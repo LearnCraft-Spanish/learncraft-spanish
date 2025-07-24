@@ -5,7 +5,6 @@ import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AudioQuiz from './AudioQuiz';

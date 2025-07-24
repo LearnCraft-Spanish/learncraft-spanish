@@ -3,11 +3,22 @@ import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 import React from 'react';
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import MyFlashcardsQuiz from './ReviewMyFlashcards';
 
 describe('menu for student flashcards', () => {
+  beforeEach(() => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+  });
   it('shows three setting options', async () => {
     render(
       <MockAllProviders route="/myflashcards">
@@ -45,14 +56,19 @@ describe('menu for student flashcards', () => {
 
   describe('no flashcards found', () => {
     beforeEach(() => {
-      overrideMockAuthAdapter({
-        authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
-        isAuthenticated: true,
-        isAdmin: false,
-        isCoach: false,
-        isStudent: true,
-        isLimited: false,
-      });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: true,
+          isLimited: false,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('shows no flashcards found message', async () => {
       render(

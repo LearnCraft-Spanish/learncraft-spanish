@@ -29,8 +29,16 @@ import {
 
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
+import {
+  mockCourseAdapter,
+  resetMockCourseAdapter,
+} from '../application/adapters/ courseAdapter.mock';
 import { resetTestQueryClient } from './utils/testQueryClient';
 import '@testing-library/jest-dom';
+
+vi.mock('@application/adapters/courseAdapter', () => ({
+  useCourseAdapter: vi.fn(() => mockCourseAdapter),
+}));
 
 // Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/vocabularyAdapter', () => ({
@@ -60,6 +68,7 @@ const resetAdapterMocks = () => {
   resetMockActiveStudent();
   resetMockSelectedCourseAndLessons();
   resetMockAuthAdapter();
+  resetMockCourseAdapter();
 };
 
 // Reset all mocks after each test

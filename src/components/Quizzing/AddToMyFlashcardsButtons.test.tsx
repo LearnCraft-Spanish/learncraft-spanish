@@ -101,14 +101,19 @@ describe('component AddToMyFlashcardsButtons', () => {
 
   describe('user is NOT student', () => {
     beforeEach(() => {
-      overrideMockAuthAdapter({
-        authUser: getAuthUserFromEmail('limited@fake.not')!,
-        isAuthenticated: true,
-        isAdmin: false,
-        isCoach: false,
-        isStudent: false,
-        isLimited: true,
-      });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('limited@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: false,
+          isLimited: true,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('does not display any buttons', async () => {
       render(

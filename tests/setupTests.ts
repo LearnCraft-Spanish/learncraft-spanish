@@ -25,17 +25,21 @@ import {
  * It configures global mocks and provides necessary test utilities.
  */
 
-import {
-  mockSelectedCourseAndLessons,
-  resetMockSelectedCourseAndLessons,
-} from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import { cleanup } from '@testing-library/react';
 import { server } from 'mocks/api/server';
 
-import { resetTestQueryClient } from 'src/hexagon/testing/utils/testQueryClient';
+import {
+  mockCourseAdapter,
+  resetMockCourseAdapter,
+} from 'src/hexagon/application/adapters/ courseAdapter.mock';
 
+import { resetTestQueryClient } from 'src/hexagon/testing/utils/testQueryClient';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 import '@testing-library/jest-dom';
+
+vi.mock('@application/adapters/courseAdapter', () => ({
+  useCourseAdapter: vi.fn(() => mockCourseAdapter),
+}));
 
 // Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/vocabularyAdapter', () => ({
@@ -50,10 +54,6 @@ vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: vi.fn(() => mockActiveStudent),
 }));
 
-vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
-  useSelectedCourseAndLessons: vi.fn(() => mockSelectedCourseAndLessons),
-}));
-
 vi.mock('@application/adapters/authAdapter', () => ({
   useAuthAdapter: vi.fn(() => mockAuthAdapter),
 }));
@@ -63,8 +63,8 @@ const resetAdapterMocks = () => {
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
   resetMockActiveStudent();
-  resetMockSelectedCourseAndLessons();
   resetMockAuthAdapter();
+  resetMockCourseAdapter();
 };
 
 beforeAll(() => {

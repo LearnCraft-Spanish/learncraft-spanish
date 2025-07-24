@@ -5,7 +5,6 @@ import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock'
 import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
 import {
   getAppUserFromEmail,
-  getAppUserFromName,
 } from 'mocks/data/serverlike/userTable';
 
 /**

@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import FlashcardManager from './FlashcardManager';
 
@@ -15,6 +15,15 @@ import FlashcardManager from './FlashcardManager';
 
 describe('component FlashcardManager', () => {
   it('renders without crashing, student has flashcards', async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isLoading: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     render(<FlashcardManager />, { wrapper: MockAllProviders });
     await waitFor(() =>
       expect(screen.getByText('Flashcard Manager')).toBeInTheDocument(),
@@ -23,14 +32,19 @@ describe('component FlashcardManager', () => {
   });
   describe('no flashcards found', () => {
     beforeEach(() => {
-      overrideMockAuthAdapter({
-        authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
-        isAuthenticated: true,
-        isAdmin: false,
-        isCoach: false,
-        isStudent: true,
-        isLimited: false,
-      });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-no-flashcards@fake.not')!,
+          isAuthenticated: true,
+          isStudent: true,
+          isAdmin: false,
+          isCoach: false,
+          isLimited: false,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('shows no flashcards found message', async () => {
       render(<FlashcardManager />, { wrapper: MockAllProviders });
