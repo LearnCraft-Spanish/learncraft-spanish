@@ -8,7 +8,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
     viteConfig(configEnv),
     defineConfig({
       test: {
-        silent: false,
+        silent: true,
         globals: true,
         environment: 'jsdom',
         setupFiles: './tests/setupTests',
