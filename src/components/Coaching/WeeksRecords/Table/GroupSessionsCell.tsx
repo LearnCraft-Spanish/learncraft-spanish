@@ -194,12 +194,18 @@ export function GroupSessionView({
       getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
         .email || '';
     setSessionType(newRecord ? '' : groupSession.sessionType);
+    const defaultCoachForNewRecord =
+      getLoggedInCoach(
+        userDataQuery.data?.emailAddress || '',
+        coachListQuery.data || [],
+      )?.user.email || '';
     const formattedDate = groupSession.date
       ? typeof groupSession.date === 'string'
         ? groupSession.date
         : new Date(groupSession.date).toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0];
     setDate(formattedDate);
+    setCoach(newRecord ? defaultCoachForNewRecord : groupSession.coach.email);
     setCoach(newRecord ? defaultCoachForNewRecord : groupSession.coach.email);
     setTopic(newRecord ? '' : groupSession.topic);
     setComments(newRecord ? '' : groupSession.comments);
@@ -435,6 +441,7 @@ export function GroupSessionView({
   }
 
   function submitCreationOrUpdate() {
+    disableEditMode();
     disableEditMode();
     if (newRecord) {
       createGroupSessionMutation.mutate(

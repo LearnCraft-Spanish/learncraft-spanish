@@ -68,6 +68,14 @@ export default function FlashcardDisplay({
           )}
         </div>
       )}
+
+      {/* Click to flip */}
+      <div
+        className={`clickToFlipMessage ${audioActive ? 'flashcardWithAudio' : ''}`}
+      >
+        <b>Click to flip</b>
+      </div>
+
       {/* Play/Pause */}
       {audioActive && (
         <button
