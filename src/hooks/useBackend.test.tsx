@@ -100,6 +100,21 @@ describe('useBackend Hook', () => {
     describe(`${String(functionName)} function`, () => {
       let data: any[];
 
+      beforeEach(() => {
+        overrideAuthAndAppUser({
+          authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: true,
+          isCoach: true,
+          isStudent: true,
+          isLimited: false,
+        });
+        const { result } = renderHook(() => useBackend(), {
+          wrapper: MockAllProviders,
+        });
+        hookResult = result.current; // Store the current hook result once
+      });
+
       it('resolves the fetch function and returns truthy data', async () => {
         const fetchFunction = hookResult[functionName] as (
           functionParams?: number,
@@ -145,6 +160,21 @@ describe('useBackend Hook', () => {
   }) {
     describe(`${String(functionName)} function`, () => {
       let data: any;
+
+      beforeEach(() => {
+        overrideAuthAndAppUser({
+          authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: true,
+          isCoach: true,
+          isStudent: true,
+          isLimited: false,
+        });
+        const { result } = renderHook(() => useBackend(), {
+          wrapper: MockAllProviders,
+        });
+        hookResult = result.current; // Store the current hook result once
+      });
 
       it('resolves the fetch function and returns truthy data', async () => {
         const fetchFunction = hookResult[functionName] as () => Promise<any>;
