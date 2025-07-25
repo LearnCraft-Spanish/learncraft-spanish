@@ -236,6 +236,11 @@ describe('useBackend Hook', () => {
     requiredFields: ['recordId', 'quizNickname'],
   });
 
+  testArrayFetchFunction({
+    functionName: 'getUnverifiedExamplesFromBackend',
+    requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
+  });
+
   testObjectFetchFunction({
     functionName: 'getMyExamplesFromBackend',
     requiredFields: ['examples', 'studentExamples'],

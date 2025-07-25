@@ -2,13 +2,13 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('useVerifiedExamples', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
+    overrideAuthAndAppUser({
       authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
       isAuthenticated: true,
       isAdmin: false,
@@ -48,7 +48,7 @@ describe('useVerifiedExamples', () => {
   });
   describe('when user is not an admin or student', () => {
     beforeEach(() => {
-      overrideMockAuthAdapter({
+      overrideAuthAndAppUser({
         authUser: getAuthUserFromEmail('limited@fake.not')!,
         isAuthenticated: true,
         isAdmin: false,
