@@ -16,7 +16,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
         exclude: [
           '**/node_modules/**',
           '**/mocks/**',
-          '**/src/hexagon/**',
+          '**/hexagon/**',
           '**/.stryker-tmp/**',
           'useAuth.ts',
         ],
@@ -42,6 +42,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
             '**/useAuth.ts',
             '**/vite-env.d.ts',
             '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
+            '**/hexagon/**',
           ],
         },
       },

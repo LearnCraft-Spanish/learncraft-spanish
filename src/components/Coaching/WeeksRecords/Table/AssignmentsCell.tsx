@@ -24,6 +24,7 @@ import CustomStudentSelector from '../../general/CustomStudentSelector';
 import getDateRange from '../../general/functions/dateRange';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 import getWeekEnds from '../../general/functions/getWeekEnds';
+
 const assignmentTypes = [
   'Pronunciation',
   'Writing',
@@ -349,6 +350,14 @@ export function NewAssignmentView({
     relatedWeek: Week;
   }
   const [student, setStudent] = useState<StudentObj>();
+  const defaultHomeworkCorrector = useMemo(() => {
+    return (
+      getLoggedInCoach(
+        userDataQuery.data?.emailAddress || '',
+        coachListQuery.data || [],
+      )?.user.email || ''
+    );
+  }, [userDataQuery.data?.emailAddress, coachListQuery.data]);
 
   const defaultHomeworkCorrector = useMemo(() => {
     return (

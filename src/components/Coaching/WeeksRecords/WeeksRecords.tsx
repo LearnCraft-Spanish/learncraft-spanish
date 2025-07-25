@@ -16,6 +16,8 @@ import React, {
 import { Loading } from 'src/components/Loading';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useUserData } from 'src/hooks/UserData/useUserData';
+import getLoggedInCoach from '../general/functions/getLoggedInCoach';
 import getLoggedInCoach from '../general/functions/getLoggedInCoach';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';
@@ -307,6 +309,14 @@ function WeeksRecordsContent() {
       !rendered.current &&
       weeksQuery.isSuccess &&
       coachListQuery.isSuccess &&
+      userDataQuery.isSuccess
+    ) {
+      const defaultCoach = getLoggedInCoach(
+        userDataQuery.data?.emailAddress || '',
+        coachListQuery.data || [],
+      );
+
+      if (defaultCoach) setFilterByCoach(defaultCoach);
       isAuthenticated
     ) {
       const defaultCoach = getLoggedInCoach(
