@@ -4,7 +4,7 @@
   "packageManager": "pnpm",
   "mutate": [
     "src/**/*.{ts,tsx}",
-    "!src/hexagon/**/*.{ts,tsx}",
+    "!**/hexagon/**/*.{ts,tsx}",
     "!**/*.test.{ts,tsx}",
     "!**/*.mock.{ts,tsx}",
     "!**/*.stub.{ts,tsx}",
