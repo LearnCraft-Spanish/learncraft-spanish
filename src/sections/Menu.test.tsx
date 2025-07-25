@@ -13,8 +13,7 @@ import {
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
-import { overrideMockActiveStudent } from 'src/hexagon/application/coordinators/hooks/useActiveStudent.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Menu from './Menu';
 
@@ -34,7 +33,13 @@ async function renderMenuLoaded() {
 describe('component Menu', () => {
   describe('loading', () => {
     beforeEach(() => {
-      overrideMockAuthAdapter({ isLoading: true });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isLoading: true,
+        },
+        { isOwnUser: true },
+      );
     });
     it('render "Loading Menu..."', async () => {
       render(
@@ -75,12 +80,18 @@ describe('component Menu', () => {
     userCases.forEach((userCase) => {
       describe(`case: ${userCase.name}`, () => {
         beforeEach(() => {
-          overrideMockActiveStudent({
-            appUser: userCase.appUser,
-          });
-          overrideMockAuthAdapter({
-            authUser: userCase.authUser,
-          });
+          overrideAuthAndAppUser(
+            {
+              authUser: userCase.authUser,
+              isStudent: userCase.roles.includes('student'),
+              isAdmin: userCase.roles.includes('admin'),
+              isCoach: userCase.roles.includes('coach'),
+              isLimited: userCase.roles.includes('limited'),
+            },
+            {
+              isOwnUser: true,
+            },
+          );
         });
 
         // My Flashcards

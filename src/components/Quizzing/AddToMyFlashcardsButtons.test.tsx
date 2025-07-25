@@ -4,10 +4,9 @@ import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import AddToMyFlashcardsButtons from './AddToMyFlashcardsButtons';
-
 /*      Testing Setup       */
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;
 const studentWithFlashcards = allStudentFlashcards.find(
@@ -27,14 +26,19 @@ const notCollectedFlashcard = verifiedExamplesTable.find(
 describe('component AddToMyFlashcardsButtons', () => {
   describe('user is student', () => {
     beforeEach(() => {
-      overrideMockAuthAdapter({
-        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
-        isAuthenticated: true,
-        isAdmin: false,
-        isCoach: false,
-        isStudent: true,
-        isLimited: false,
-      });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: true,
+          isLimited: false,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('flashcard is collected: shows "Remove from my flashcards"', async () => {
       render(
@@ -97,14 +101,19 @@ describe('component AddToMyFlashcardsButtons', () => {
 
   describe('user is NOT student', () => {
     beforeEach(() => {
-      overrideMockAuthAdapter({
-        authUser: getAuthUserFromEmail('limited@fake.not')!,
-        isAuthenticated: true,
-        isAdmin: false,
-        isCoach: false,
-        isStudent: false,
-        isLimited: true,
-      });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('limited@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: false,
+          isLimited: true,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('does not display any buttons', async () => {
       render(

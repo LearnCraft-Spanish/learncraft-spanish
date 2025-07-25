@@ -361,7 +361,6 @@ export function NewPrivateCallView({
 
   // New Record Inputs
   const [caller, setCaller] = useState(defaultCaller);
-  const [caller, setCaller] = useState(defaultCaller);
   const [rating, setRating] = useState('');
   const [date, setDate] = useState(
     new Date(Date.now()).toISOString().split('T')[0],

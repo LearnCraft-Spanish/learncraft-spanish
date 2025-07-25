@@ -32,7 +32,8 @@
     "typecheck": "tsc --noEmit",
     "update-shared": "pnpm add @LearnCraft-Spanish/shared@latest",
     "validate": "npm run lint:fix && npm run format && npm run typecheck",
-    "metrics": "node METRICS/get_metrics.js"
+    "metrics": "node METRICS/get_metrics.js",
+    "lead-time": "node METRICS/lead-time/lead_time_tracker.js"
   },
   "dependencies": {
     "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@0.6.25",

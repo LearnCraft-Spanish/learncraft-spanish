@@ -5,10 +5,11 @@ import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React, { act } from 'react';
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { beforeEach, describe, expect, it } from 'vitest';
 import ExamplesTable from './ExamplesTable';
+
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;
 
 // Helper Functions
@@ -80,14 +81,19 @@ describe('renders without crashing', () => {
 
 describe('user is not a student', () => {
   it('student buttons: Add/Adding.../Remove are not displayed', async () => {
-    overrideMockAuthAdapter({
-      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
-      isAuthenticated: true,
-      isAdmin: true,
-      isCoach: false,
-      isStudent: false,
-      isLimited: false,
-    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: true,
+        isCoach: false,
+        isStudent: false,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     render(
       <MockAllProviders>
         <ExamplesTable
@@ -110,6 +116,21 @@ describe('user is not a student', () => {
 });
 
 describe('user is a student', () => {
+  beforeEach(() => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+  });
   describe('example is unknown', () => {
     beforeEach(async () => {
       const unknownExample = await getUnknownExample();

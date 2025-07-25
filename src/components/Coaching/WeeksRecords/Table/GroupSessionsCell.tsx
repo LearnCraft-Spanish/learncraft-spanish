@@ -194,11 +194,7 @@ export function GroupSessionView({
       getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
         .email || '';
     setSessionType(newRecord ? '' : groupSession.sessionType);
-    const defaultCoachForNewRecord =
-      getLoggedInCoach(
-        userDataQuery.data?.emailAddress || '',
-        coachListQuery.data || [],
-      )?.user.email || '';
+
     const formattedDate = groupSession.date
       ? typeof groupSession.date === 'string'
         ? groupSession.date

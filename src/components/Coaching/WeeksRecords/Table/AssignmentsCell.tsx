@@ -352,15 +352,6 @@ export function NewAssignmentView({
   const [student, setStudent] = useState<StudentObj>();
   const defaultHomeworkCorrector = useMemo(() => {
     return (
-      getLoggedInCoach(
-        userDataQuery.data?.emailAddress || '',
-        coachListQuery.data || [],
-      )?.user.email || ''
-    );
-  }, [userDataQuery.data?.emailAddress, coachListQuery.data]);
-
-  const defaultHomeworkCorrector = useMemo(() => {
-    return (
       getLoggedInCoach(authUser.email || '', coachListQuery.data || [])?.user
         .email || ''
     );

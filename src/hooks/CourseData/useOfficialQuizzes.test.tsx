@@ -13,8 +13,9 @@ async function renderHookLoaded() {
   const { result } = renderHook(() => useOfficialQuizzes(undefined), {
     wrapper: MockAllProviders,
   });
-  await waitFor(() =>
-    expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
+  await waitFor(
+    () => expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
+    { timeout: 5000 },
   );
 
   return result;

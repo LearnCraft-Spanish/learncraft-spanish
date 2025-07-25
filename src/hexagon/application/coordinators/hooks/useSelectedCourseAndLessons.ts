@@ -25,6 +25,7 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
 
   const course = useMemo(() => {
     let newCourseId: number;
+
     if (userSelectedCourseId) {
       newCourseId = userSelectedCourseId;
     } else {
@@ -42,16 +43,12 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
   }, [course, fromLessonId]);
 
   const toLesson = useMemo(() => {
-    let newToLessonId: number;
-    if (!toLessonId || !course) {
+    if (!toLessonId && !course) {
       return null;
     }
-    if (!toLessonId) {
-      newToLessonId = appUser?.lessonNumber || 0;
-    } else {
-      newToLessonId = toLessonId;
-    }
-    return course.lessons.find((item) => item.id === newToLessonId) || null;
+    const newToLessonId = toLessonId || appUser?.lessonNumber || 0;
+
+    return course?.lessons.find((item) => item.id === newToLessonId) || null; // TODO: check if this is correct
   }, [course, toLessonId, appUser]);
 
   // ------------------ Return ------------------ //

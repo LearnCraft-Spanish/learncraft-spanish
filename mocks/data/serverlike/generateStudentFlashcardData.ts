@@ -1,6 +1,6 @@
+import type { AppUser } from '@LearnCraft-Spanish/shared';
 import type {
   Flashcard,
-  FlashcardStudent,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
@@ -9,7 +9,7 @@ import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample
 // we need this to test SRS quizzing functionality
 export default function generateStudentFlashcardData(
-  student: FlashcardStudent,
+  student: AppUser,
   numberOfExamples: number,
   examplesTable: Flashcard[],
 ) {

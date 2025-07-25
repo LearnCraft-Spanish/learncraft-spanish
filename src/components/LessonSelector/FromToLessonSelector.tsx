@@ -1,30 +1,28 @@
 import type { ReactElement } from 'react';
-import type { Lesson, Program } from 'src/types/interfaceDefinitions';
+import type { Program } from 'src/types/interfaceDefinitions';
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import React from 'react';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import './LessonSelector.css';
 
 export default function FromToLessonSelector(): React.JSX.Element {
+  // const {
+  //   selectedProgram,
+  //   selectedFromLesson,
+  //   selectedToLesson,
+  //   setProgram,
+  //   setFromLesson,
+  //   setToLesson,
+  // } = useSelectedLesson();
   const {
-    selectedProgram,
-    selectedFromLesson,
-    selectedToLesson,
-    setProgram,
-    setFromLesson,
-    setToLesson,
-  } = useSelectedLesson();
+    course,
+    fromLesson,
+    toLesson,
+    updateUserSelectedCourseId,
+    updateFromLessonId,
+    updateToLessonId,
+  } = useSelectedCourseAndLessons();
   const { programTableQuery } = useProgramTable();
-  // Helper Function
-  function getLessonNumber(lesson: Lesson | null): number | null {
-    if (!lesson?.lesson) {
-      return null;
-    }
-    const lessonArray = lesson.lesson.split(' ');
-    const lessonNumberString = lessonArray.slice(-1)[0];
-    const lessonNumber = Number.parseInt(lessonNumberString, 10);
-    return lessonNumber;
-  }
 
   function makeCourseSelector() {
     const courseSelector: ReactElement[] = [];
@@ -42,13 +40,13 @@ export default function FromToLessonSelector(): React.JSX.Element {
 
   function makeFromLessonSelector() {
     const lessonSelector: Array<React.JSX.Element> = [];
-    const toLessonNumber = getLessonNumber(selectedToLesson);
+    const toLessonNumber = toLesson?.lessonNumber;
     // Foreign Key lookup, form data in backend
-    selectedProgram?.lessons.forEach((lesson: Lesson) => {
-      const lessonNumber = getLessonNumber(lesson);
+    course?.lessons.forEach((lesson) => {
+      const lessonNumber = lesson.lessonNumber;
       if (lessonNumber && (!toLessonNumber || lessonNumber <= toLessonNumber)) {
         lessonSelector.push(
-          <option key={lesson.lesson} value={lesson.recordId}>
+          <option key={lesson.id} value={lesson.id}>
             {`Lesson ${lessonNumber}`}
           </option>,
         );
@@ -59,16 +57,16 @@ export default function FromToLessonSelector(): React.JSX.Element {
 
   function makeToLessonSelector() {
     const lessonSelector: Array<React.JSX.Element> = [];
-    const fromLessonNumber = getLessonNumber(selectedFromLesson);
+    const fromLessonNumber = fromLesson?.lessonNumber;
     // Foreign Key lookup, form data in backend
-    selectedProgram?.lessons.forEach((lesson: Lesson) => {
-      const lessonNumber = getLessonNumber(lesson);
+    course?.lessons.forEach((lesson) => {
+      const lessonNumber = lesson.lessonNumber;
       if (
         lessonNumber &&
         (!fromLessonNumber || lessonNumber >= fromLessonNumber)
       ) {
         lessonSelector.push(
-          <option key={lesson.lesson} value={lesson.recordId}>
+          <option key={lesson.id} value={lesson.id}>
             {`Lesson ${lessonNumber}`}
           </option>,
         );
@@ -85,8 +83,10 @@ export default function FromToLessonSelector(): React.JSX.Element {
           id="courseList"
           name="courseList"
           className="courseList"
-          value={selectedProgram?.recordId ?? 0}
-          onChange={(e) => setProgram(e.target.value)}
+          value={course?.id ?? 0}
+          onChange={(e) =>
+            updateUserSelectedCourseId(Number.parseInt(e.target.value))
+          }
         >
           <option key={0} value={0}>
             –Choose Course–
@@ -95,15 +95,17 @@ export default function FromToLessonSelector(): React.JSX.Element {
         </select>
       </label>
       <div>
-        {selectedProgram?.lessons && (
+        {course?.lessons && (
           <label htmlFor="fromLesson" className="menuRow" id="fromRow">
             <p>From:</p>
 
             <select
               id="fromLesson"
               name="fromLesson"
-              value={selectedFromLesson?.recordId ?? 0}
-              onChange={(e) => setFromLesson(e.target.value)}
+              value={fromLesson?.id ?? 0}
+              onChange={(e) =>
+                updateFromLessonId(Number.parseInt(e.target.value))
+              }
             >
               <option key={0} value={0}>
                 –Choose Lesson–
@@ -112,7 +114,7 @@ export default function FromToLessonSelector(): React.JSX.Element {
             </select>
           </label>
         )}
-        {selectedProgram?.lessons && (
+        {course?.lessons && (
           <label htmlFor="toLesson" className="menuRow" id="toRow">
             <p>To:</p>
 
@@ -120,8 +122,10 @@ export default function FromToLessonSelector(): React.JSX.Element {
               id="toLesson"
               name="toLesson"
               className="lessonList"
-              value={selectedToLesson?.recordId ?? 0}
-              onChange={(e) => setToLesson(e.target.value)}
+              value={toLesson?.id ?? 0}
+              onChange={(e) =>
+                updateToLessonId(Number.parseInt(e.target.value))
+              }
             >
               <option key={0} value={0}>
                 –Choose Lesson–

@@ -22,6 +22,7 @@ export default function LessonSelector(): React.JSX.Element {
           onChange={(value: string) =>
             updateFromLessonId(Number.parseInt(value))
           }
+          id="toLesson"
           label="Lesson"
           lessons={course.lessons}
         />

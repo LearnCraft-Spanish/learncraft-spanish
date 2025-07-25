@@ -5,6 +5,7 @@
  * Import from this file to get access to all testing tools.
  */
 
+export * from './factories/courseFactory';
 // Re-export factories
 export * from './factories/subcategoryFactories';
 export * from './factories/vocabularyFactories';

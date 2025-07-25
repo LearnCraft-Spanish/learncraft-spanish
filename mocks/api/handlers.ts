@@ -6,7 +6,7 @@ import newData from '../data/serverlike/serverlikeData';
 
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
 
-import { appUserTable } from '../data/serverlike/userTable';
+import { appUserTable, getAppUserFromName } from '../data/serverlike/userTable';
 
 // import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -80,7 +80,7 @@ export const handlers = [
   // }),
 
   http.get(`${backendUrl}all-students`, () => {
-    return HttpResponse.json(apiData.allStudentsTable);
+    return HttpResponse.json(apiData.appUserTable);
   }),
 
   http.get(`${backendUrl}unverified-examples`, () => {
@@ -191,22 +191,22 @@ export const handlers = [
   // TEMPORARY routes to silence warnings in console.
   // I will update these to be proper routes for testing
   // As I add testing to PMF data
-  // http.get(`${backendUrl}pmf/:studentId`, async ({ params }) => {
-  //   const param = params.studentId as string;
-  //   const studentId = Number.parseInt(param);
-  //   if (getAppUserFromName('student-lcsp')?.recordId === studentId) {
-  //     return HttpResponse.json({
-  //       lastContactDate: new Date().toISOString(),
-  //     });
-  //   } else if (
-  //     getAppUserFromName('student-ser-estar')?.recordId === studentId
-  //   ) {
-  //     return HttpResponse.json({
-  //       lastContactDate: new Date(Date.now() - 7776000000).toISOString(),
-  //     });
-  //   }
-  //   return HttpResponse.json('');
-  // }),
+  http.get(`${backendUrl}pmf/:studentId`, async ({ params }) => {
+    const param = params.studentId as string;
+    const studentId = Number.parseInt(param);
+    if (getAppUserFromName('student-lcsp')?.recordId === studentId) {
+      return HttpResponse.json({
+        lastContactDate: new Date().toISOString(),
+      });
+    } else if (
+      getAppUserFromName('student-ser-estar')?.recordId === studentId
+    ) {
+      return HttpResponse.json({
+        lastContactDate: new Date(Date.now() - 7776000000).toISOString(),
+      });
+    }
+    return HttpResponse.json('');
+  }),
   http.post(`${backendUrl}pmf/create`, async () => {
     return HttpResponse.json(1);
   }),

@@ -51,6 +51,7 @@ export default function LessonRangeSelector(): React.JSX.Element {
               updateFromLessonId(Number.parseInt(value))
             }
             label="From"
+            id="fromLesson"
             lessons={fromLessons ?? []}
           />
         )}
@@ -58,7 +59,9 @@ export default function LessonRangeSelector(): React.JSX.Element {
           value={toLesson?.id.toString() ?? '0'}
           onChange={(value: string) => updateToLessonId(Number.parseInt(value))}
           label="To"
+          id="toLesson"
           lessons={toLessons ?? []}
+          required
         />
       </div>
     </div>
