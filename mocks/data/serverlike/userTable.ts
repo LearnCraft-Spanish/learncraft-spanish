@@ -1,7 +1,33 @@
 import type { AppUser } from '@LearnCraft-Spanish/shared';
 import type { AuthUser } from 'src/hexagon/application/ports/authPort';
 
-export const appUserTable: AppUser[] = [
+export type TestUserNames =
+  | 'admin-empty-role'
+  | 'empty-role'
+  | 'none-role'
+  | 'limited'
+  | 'student-admin'
+  | 'student-lcsp'
+  | 'student-ser-estar'
+  | 'student-no-flashcards'
+  | null;
+
+export type TestUserEmails =
+  | 'admin-empty-role@fake.not'
+  | 'empty-role@fake.not'
+  | 'none-role@fake.not'
+  | 'limited@fake.not'
+  | 'student-admin@fake.not'
+  | 'student-lcsp@fake.not'
+  | 'student-ser-estar@fake.not'
+  | 'student-no-flashcards@fake.not';
+
+export type TestAppUsers = AppUser & {
+  name: TestUserNames;
+  emailAddress: TestUserEmails;
+};
+
+export const appUserTable: TestAppUsers[] = [
   {
     recordId: 1,
     name: 'admin-empty-role',
@@ -68,28 +94,11 @@ export const appUserTable: AppUser[] = [
   },
 ];
 
-export type TestUserNames =
-  | 'admin-empty-role'
-  | 'empty-role'
-  | 'none-role'
-  | 'limited'
-  | 'student-admin'
-  | 'student-lcsp'
-  | 'student-ser-estar'
-  | 'student-no-flashcards'
-  | null;
+type TestUser = AuthUser & {
+  email: TestUserEmails;
+};
 
-export type TestUserEmails =
-  | 'admin-empty-role@fake.not'
-  | 'empty-role@fake.not'
-  | 'none-role@fake.not'
-  | 'limited@fake.not'
-  | 'student-admin@fake.not'
-  | 'student-lcsp@fake.not'
-  | 'student-ser-estar@fake.not'
-  | 'student-no-flashcards@fake.not';
-
-export const authUserTable: AuthUser[] = [
+export const authUserTable: TestUser[] = [
   {
     email: 'admin-empty-role@fake.not',
     roles: ['Admin'],
@@ -119,7 +128,7 @@ export const authUserTable: AuthUser[] = [
     roles: ['Student'],
   },
   {
-    email: 'student-no-flashcards@fake.not',
+    email: 'student-no-flashcards@fake.not' as TestUserEmails,
     roles: ['Student'],
   },
 ];

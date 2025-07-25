@@ -1,16 +1,15 @@
-import type { TestUserEmails } from 'mocks/data/serverlike/userTable';
-
 import { renderHook, waitFor } from '@testing-library/react';
 import { examples } from 'mocks/data/examples.json';
 import {
   appUserTable,
   getAuthUserFromEmail,
 } from 'mocks/data/serverlike/userTable';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useStudentFlashcards } from './useStudentFlashcards';
+
 async function renderHookSuccessfully() {
   const { result } = renderHook(useStudentFlashcards, {
     wrapper: MockAllProviders,
@@ -37,10 +36,9 @@ describe('test by role', () => {
     );
     for (const student of studentUsers) {
       beforeEach(() => {
-        overrideMockAuthAdapter({
-          authUser: getAuthUserFromEmail(
-            student.emailAddress as TestUserEmails,
-          )!,
+        overrideAuthAndAppUser({
+          // Non-null assertion: We're only getting student users from the list.
+          authUser: getAuthUserFromEmail(student.emailAddress)!,
           isAuthenticated: true,
           isAdmin: false,
           isCoach: false,
@@ -77,10 +75,8 @@ describe('test by role', () => {
     );
     for (const student of nonStudentUsers) {
       beforeEach(() => {
-        overrideMockAuthAdapter({
-          authUser: getAuthUserFromEmail(
-            student.emailAddress as TestUserEmails,
-          )!,
+        overrideAuthAndAppUser({
+          authUser: getAuthUserFromEmail(student.emailAddress) ?? undefined,
           isAuthenticated: true,
           isAdmin: false,
           isCoach: false,
@@ -102,7 +98,7 @@ describe('test by role', () => {
 
 describe('removeFlashcardMutation', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
+    overrideAuthAndAppUser({
       authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
       isAuthenticated: true,
       isAdmin: false,
@@ -165,7 +161,7 @@ describe('removeFlashcardMutation', () => {
 });
 describe('addFlashcardMutation', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
+    overrideAuthAndAppUser({
       authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
       isAuthenticated: true,
       isAdmin: false,
@@ -236,7 +232,7 @@ describe('addFlashcardMutation', () => {
 
 describe('updateFlashcardMutation', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
+    overrideAuthAndAppUser({
       authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
       isAuthenticated: true,
       isAdmin: false,
@@ -311,7 +307,7 @@ describe('updateFlashcardMutation', () => {
 });
 describe('exampleIsCollected', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
+    overrideAuthAndAppUser({
       authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
       isAuthenticated: true,
       isAdmin: false,
@@ -341,7 +337,7 @@ describe('exampleIsCollected', () => {
 
 describe('exampleIsPending', () => {
   beforeEach(() => {
-    overrideMockAuthAdapter({
+    overrideAuthAndAppUser({
       authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
       isAuthenticated: true,
       isAdmin: false,
