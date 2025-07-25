@@ -5,7 +5,6 @@ import { useProgramTable } from './CourseData/useProgramTable'; // Assuming this
 
 export function useFilterExamplesBySelectedLesson() {
   const { programTableQuery } = useProgramTable(); // Fetch the programs data internally
-
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
 
   // Function to get the allowed vocabulary from the 'to' lesson
@@ -21,7 +20,7 @@ export function useFilterExamplesBySelectedLesson() {
       allowedVocabulary = foundLesson.vocabKnown || [];
     }
     return allowedVocabulary;
-  }, [course, toLesson?.id, programTableQuery.data]);
+  }, [course, toLesson, programTableQuery.data]);
 
   // Function to get the required vocabulary from the 'from' lesson
   const requiredVocabulary = useMemo((): string[] => {
@@ -48,7 +47,7 @@ export function useFilterExamplesBySelectedLesson() {
     }
 
     return requiredVocabulary;
-  }, [course, fromLesson?.id, toLesson?.id, programTableQuery.data]);
+  }, [course, fromLesson, toLesson, programTableQuery.data]);
 
   // Function to filter flashcards by allowed vocabulary
   const filterExamplesBySelectedLesson = useCallback(
