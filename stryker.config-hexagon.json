@@ -3,7 +3,7 @@
   "_comment": "This config was generated using 'stryker init'. Please take a look at: https://stryker-mutator.io/docs/stryker-js/configuration/ for more information.",
   "packageManager": "pnpm",
   "mutate": [
-    "src/hexagon/**/*.{ts,tsx}",
+    "**/hexagon/**/*.{ts,tsx}",
     "!**/*.test.{ts,tsx}",
     "!**/*.mock.{ts,tsx}",
     "!**/*.stub.{ts,tsx}",
