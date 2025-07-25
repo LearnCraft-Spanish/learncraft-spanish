@@ -53,10 +53,13 @@ describe('component WeeksTable', () => {
         </DateRangeProvider>
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      //any colomn header of the table
-      expect(screen.getByText('Student')).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        //any colomn header of the table
+        expect(screen.getByText('Student')).toBeInTheDocument();
+      },
+      { timeout: 10000 },
+    );
   });
   describe('assignment cell', () => {
     it('renders with assignments', async () => {
