@@ -2,14 +2,10 @@ import type {
   QuizExamplesTable,
   QuizUnparsed,
 } from 'src/types/interfaceDefinitions';
-import { tr } from '@faker-js/faker/.';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
-import {
-  getAppUserFromEmail,
-  getAuthUserFromEmail,
-} from 'mocks/data/serverlike/userTable';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';

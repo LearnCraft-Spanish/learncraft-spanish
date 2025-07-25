@@ -39,11 +39,9 @@ export const overrideMockAuthAdapter = (overrides: Partial<AuthPort>) => {
   const result = baseOverrideMockAuthAdapter(overrides);
 
   // If authUser is being overridden, update getAccessToken to return the new email
-  if (overrides.authUser) {
-    mockAuthAdapter.getAccessToken.mockImplementation(
-      async () => overrides.authUser!.email,
-    );
-  }
+  mockAuthAdapter.getAccessToken.mockImplementation(
+    async () => overrides.authUser?.email ?? undefined,
+  );
 
   return result;
 };
