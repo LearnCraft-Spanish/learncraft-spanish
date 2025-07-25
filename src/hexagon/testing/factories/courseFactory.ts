@@ -20,28 +20,63 @@ export function createRealisticCourseWithLessonsList(): CourseWithLessons[] {
       name: 'LearnCraft Spanish',
       lessons: [
         {
-          id: 1,
+          id: 334,
           lessonNumber: 1,
           courseName: 'LearnCraft Spanish',
         },
         {
-          id: 2,
+          id: 71,
           lessonNumber: 2,
           courseName: 'LearnCraft Spanish',
         },
         {
-          id: 3,
+          id: 72,
           lessonNumber: 3,
           courseName: 'LearnCraft Spanish',
         },
         {
-          id: 4,
+          id: 73,
           lessonNumber: 4,
           courseName: 'LearnCraft Spanish',
         },
         {
-          id: 5,
+          id: 74,
           lessonNumber: 5,
+          courseName: 'LearnCraft Spanish',
+        },
+        {
+          id: 75,
+          lessonNumber: 6,
+          courseName: 'LearnCraft Spanish',
+        },
+        {
+          id: 76,
+          lessonNumber: 7,
+          courseName: 'LearnCraft Spanish',
+        },
+        {
+          id: 77,
+          lessonNumber: 8,
+          courseName: 'LearnCraft Spanish',
+        },
+        {
+          id: 78,
+          lessonNumber: 9,
+          courseName: 'LearnCraft Spanish',
+        },
+        {
+          id: 79,
+          lessonNumber: 10,
+          courseName: 'LearnCraft Spanish',
+        },
+        {
+          id: 80,
+          lessonNumber: 11,
+          courseName: 'LearnCraft Spanish',
+        },
+        {
+          id: 131,
+          lessonNumber: 62,
           courseName: 'LearnCraft Spanish',
         },
       ],

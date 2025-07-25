@@ -9,7 +9,7 @@ import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetup
 import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { useFilterExamplesBySelectedLesson } from 'src/hooks/useFilterExamplesBySelectedLesson';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import 'src/App.css';
 import 'src/components/Quizzing/AudioQuiz/AudioBasedReview.css';
@@ -29,7 +29,8 @@ export default function AudioBasedReview({
     isLoading: appUserLoading,
     error: appUserError,
   } = useActiveStudent();
-  const { filterExamplesBySelectedLesson } = useSelectedLesson();
+  const { filterExamplesBySelectedLesson } =
+    useFilterExamplesBySelectedLesson();
   const { audioExamplesQuery } = useAudioExamples();
   const { programTableQuery } = useProgramTable();
 

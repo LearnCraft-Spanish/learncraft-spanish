@@ -14,8 +14,8 @@ import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
 
+import { useFilterExamplesBySelectedLesson } from 'src/hooks/useFilterExamplesBySelectedLesson';
 import useFlashcardFilter from 'src/hooks/useFlashcardFilter';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
 import ExamplesTable from '../ExamplesTable/ExamplesTable';
 import 'src/App.css';
 
@@ -29,7 +29,8 @@ export default function FlashcardFinder() {
   } = useActiveStudent();
   const { verifiedExamplesQuery } = useVerifiedExamples();
   const { vocabularyQuery, tagTable } = useVocabulary();
-  const { filterExamplesBySelectedLesson } = useSelectedLesson();
+  const { filterExamplesBySelectedLesson } =
+    useFilterExamplesBySelectedLesson();
   const { filterFlashcards } = useFlashcardFilter();
 
   const isError =

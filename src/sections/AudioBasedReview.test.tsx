@@ -1,8 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
 import { act } from 'react';
-
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { describe, expect, it } from 'vitest';
 import AudioBasedReview from './AudioBasedReview';
 
@@ -38,15 +40,21 @@ async function selectLessons() {
 }
 
 describe('audioBasedReview Component', () => {
-  // beforeEach(() => {
-  //   overrideMockAuthAdapter({
-  //     authUser: getAuthUserFromEmail('student-admin@fake.not')!,
-  //     isAuthenticated: true,
-  //     isAdmin: true,
-  //     isCoach: true,
-  //     isStudent: true,
-  //   });
-  // });
+  beforeEach(() => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isLoading: false,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+  });
 
   describe('initial State', () => {
     it('displays loading message while waiting for data', async () => {

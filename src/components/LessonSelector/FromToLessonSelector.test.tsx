@@ -1,4 +1,3 @@
-import type { Lesson } from 'src/types/interfaceDefinitions';
 import {
   render,
   renderHook,
@@ -7,12 +6,16 @@ import {
   within,
 } from '@testing-library/react';
 
-import { getAppUserFromName } from 'mocks/data/serverlike/userTable';
+import {
+  getAppUserFromName,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
+import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { beforeEach, describe, expect, it } from 'vitest';
 import FromToLessonSelector from './FromToLessonSelector';
 interface WrapperProps {
@@ -22,23 +25,25 @@ interface WrapperProps {
 const student = getAppUserFromName('student-admin')!;
 if (!student) throw new Error('No student found');
 
-// HELPER FUNCTION - this is copy-pasted from FromToLessonSelector
-function getLessonNumber(lesson: Lesson | null): number | null {
-  if (!lesson?.lesson) {
-    return null;
-  }
-  const lessonArray = lesson.lesson.split(' ');
-  const lessonNumberString = lessonArray.slice(-1)[0];
-  const lessonNumber = Number.parseInt(lessonNumberString, 10);
-  return lessonNumber;
-}
-
 describe('component FromToLessonSelector', () => {
   const wrapper = ({ children }: WrapperProps) => (
     <MockAllProviders>{children}</MockAllProviders>
   );
 
   beforeEach(async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+        isLoading: false,
+        isAdmin: true,
+        isCoach: true,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     // render component, wait for it to load
     render(<FromToLessonSelector />, { wrapper });
     await waitFor(() => expect(screen.getByText('From:')).toBeInTheDocument());
@@ -78,13 +83,13 @@ describe('component FromToLessonSelector', () => {
   });
 
   it.skip('when course is "-Choose Course-" (value = 0), from and to selectors are not displayed', async () => {
-    const result = renderHook(() => useSelectedLesson(), { wrapper });
+    const result = renderHook(() => useSelectedCourseAndLessons(), { wrapper });
     await waitFor(() => {
-      expect(result.result.current.selectedProgram).not.toBeNull();
+      expect(result.result.current.course).not.toBeNull();
     });
     // Set course to 0
     act(() => {
-      result.result.current.setProgram(0);
+      result.result.current.updateUserSelectedCourseId(0);
     });
     const courseSelect = screen.getByLabelText('Course:');
     await waitFor(() =>
@@ -98,32 +103,30 @@ describe('component FromToLessonSelector', () => {
   // This behavior is described incorrectly:
   // the "to" selector only goes back to the from lesson, not to the beginning of the course
   it.skip('to selector has all lessons of that course', async () => {
-    const result = renderHook(() => useSelectedLesson(), { wrapper });
+    const result = renderHook(() => useSelectedCourseAndLessons(), { wrapper });
     act(() => {
-      result.result.current.setProgram(2);
+      result.result.current.updateUserSelectedCourseId(2);
     });
     await waitFor(() => {
-      expect(result.result.current.selectedProgram?.lessons).not.toBeNull();
+      expect(result.result.current.course?.lessons).not.toBeNull();
     });
     // Setup
     const toSelectorContainer = screen.getByLabelText('To:').closest('label');
     const toSelect = within(toSelectorContainer as HTMLElement).getByRole(
       'combobox',
     );
-    const lessons = result.result.current.selectedProgram?.lessons;
+    const lessons = result.result.current.course?.lessons;
     if (!lessons) throw new Error('No lessons found');
     // Tests
     lessons.forEach((lesson) => {
-      const lessonNumber = getLessonNumber(lesson);
-      if (!lessonNumber) throw new Error('No lesson number found');
-      expect(toSelect).toHaveTextContent(`Lesson ${lessonNumber}`);
+      expect(toSelect).toHaveTextContent(`Lesson ${lesson.lessonNumber}`);
     });
   });
 
   it('from selector has all lessons up to current value of toSelector', async () => {
-    const result = renderHook(() => useSelectedLesson(), { wrapper });
+    const result = renderHook(() => useSelectedCourseAndLessons(), { wrapper });
     await waitFor(() => {
-      expect(result.result.current.selectedProgram).not.toBeNull();
+      expect(result.result.current.course).not.toBeNull();
     });
     // Setup
     const fromSelectorContainer = screen
@@ -139,19 +142,18 @@ describe('component FromToLessonSelector', () => {
     );
     const toSelectValue = (toSelect as HTMLSelectElement).value;
     const toLessonRecordId = Number.parseInt(toSelectValue);
-    const toSelectedLesson =
-      result.result.current.selectedProgram?.lessons.find(
-        (lesson) => lesson.recordId === toLessonRecordId,
-      );
+    const toSelectedLesson = result.result.current.course?.lessons.find(
+      (lesson) => lesson.id === toLessonRecordId,
+    );
     if (!toSelectedLesson) throw new Error('No lesson found');
-    const toLessonNumber = getLessonNumber(toSelectedLesson);
+    const toLessonNumber = toSelectedLesson.lessonNumber;
     if (!toLessonNumber) throw new Error('No lesson number found');
     // lesson array
-    const lessons = result.result.current.selectedProgram?.lessons;
+    const lessons = result.result.current.course?.lessons;
     if (!lessons) throw new Error('No lessons found');
     // Tests
     lessons.forEach((lesson) => {
-      const lessonNumber = getLessonNumber(lesson);
+      const lessonNumber = lesson.lessonNumber;
       if (!lessonNumber) throw new Error('No lesson number found');
       if (lessonNumber <= toLessonNumber) {
         expect(fromSelect).toHaveTextContent(`Lesson ${lessonNumber}`);
