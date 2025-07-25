@@ -3,9 +3,7 @@ import type { TestUserEmails } from 'mocks/data/serverlike/userTable';
 import type { AuthUser } from 'src/hexagon/application/ports/authPort';
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
-import {
-  getAppUserFromEmail,
-} from 'mocks/data/serverlike/userTable';
+import { getAppUserFromEmail } from 'mocks/data/serverlike/userTable';
 
 /**
  * Combined override function for both AuthUser and AppUser mocks.
@@ -45,7 +43,7 @@ import {
  */
 export function overrideAuthAndAppUser(
   authOverrides: {
-    authUser: AuthUser;
+    authUser: AuthUser | undefined;
     isAuthenticated?: boolean;
     isLoading?: boolean;
     isAdmin?: boolean;
@@ -54,7 +52,7 @@ export function overrideAuthAndAppUser(
     isLimited?: boolean;
   },
   appUserOverrides?: {
-    appUser?: AppUser;
+    appUser?: AppUser | null;
     isLoading?: boolean;
     error?: Error | null;
     isOwnUser?: boolean;
@@ -66,10 +64,10 @@ export function overrideAuthAndAppUser(
   });
 
   // Override active student with app user data and state flags (if provided)
-  if (appUserOverrides?.isOwnUser) {
+  if (authOverrides.authUser && appUserOverrides?.appUser === undefined) {
     overrideMockActiveStudent({
       appUser: getAppUserFromEmail(
-        authOverrides.authUser.email as TestUserEmails,
+        authOverrides.authUser?.email as TestUserEmails,
       ),
       ...appUserOverrides,
     });

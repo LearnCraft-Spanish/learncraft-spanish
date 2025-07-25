@@ -2,15 +2,18 @@ import type {
   QuizExamplesTable,
   QuizUnparsed,
 } from 'src/types/interfaceDefinitions';
+import { tr } from '@faker-js/faker/.';
 import { renderHook, waitFor } from '@testing-library/react';
-import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 
-import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+import serverlikeData from 'mocks/data/serverlike/serverlikeData';
+import {
+  getAppUserFromEmail,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { useBackend } from './useBackend';
 
 const { api } = serverlikeData();
@@ -20,14 +23,19 @@ describe('useBackend Hook', () => {
 
   // Initialize the hook before all tests
   beforeAll(() => {
-    overrideMockAuthAdapter({
-      authUser: getAuthUserFromEmail('student-admin@fake.not')!,
-      isAuthenticated: true,
-      isAdmin: true,
-      isCoach: true,
-      isStudent: true,
-      isLimited: false,
-    });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: true,
+        isCoach: true,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     const { result } = renderHook(() => useBackend(), {
       wrapper: MockAllProviders,
     });
@@ -40,15 +48,39 @@ describe('useBackend Hook', () => {
   });
 
   describe('getAccessToken function', () => {
+    beforeEach(() => {
+      overrideAuthAndAppUser({
+        authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: true,
+        isCoach: true,
+        isStudent: true,
+        isLimited: false,
+      });
+      const { result } = renderHook(() => useBackend(), {
+        wrapper: MockAllProviders,
+      });
+      hookResult = result.current; // Store the current hook result once
+    });
+
     it('returns a string when logged in', async () => {
       const token = await hookResult.getAccessToken(['']);
       expect(token).toBeDefined();
     });
     it('does not return a string when not logged in', async () => {
-      overrideMockAuthAdapter({
-        isAuthenticated: false,
-        isLoading: false,
-      });
+      overrideAuthAndAppUser(
+        {
+          authUser: undefined,
+          isAuthenticated: false,
+          isLoading: false,
+        },
+        {
+          appUser: undefined,
+          isLoading: false,
+          error: null,
+          isOwnUser: false,
+        },
+      );
       const unauthHookResult = renderHook(() => useBackend(), {
         wrapper: MockAllProviders,
       }).result.current;
@@ -176,16 +208,6 @@ describe('useBackend Hook', () => {
   testArrayFetchFunction({
     functionName: 'getLcspQuizzesFromBackend',
     requiredFields: ['recordId', 'quizNickname'],
-  });
-
-  testArrayFetchFunction({
-    functionName: 'getAllUsersFromBackend',
-    requiredFields: ['role'],
-  });
-
-  testObjectFetchFunction({
-    functionName: 'getUserDataFromBackend',
-    requiredFields: ['recordId', 'emailAddress', 'roles'],
   });
 
   testObjectFetchFunction({

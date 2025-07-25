@@ -282,16 +282,6 @@ export function useBackend() {
     [getFactory],
   );
 
-  const getAllUsersFromBackend = useCallback((): Promise<
-    types.FlashcardStudent[]
-  > => {
-    return getFactory<types.FlashcardStudent[]>('all-students');
-  }, [getFactory]);
-
-  const getUserDataFromBackend = useCallback((): Promise<types.UserData> => {
-    return getFactory<types.UserData>('my-data');
-  }, [getFactory]);
-
   const getActiveExamplesFromBackend = useCallback(
     (studentId: number): Promise<types.StudentFlashcardData> => {
       return getFactory<types.StudentFlashcardData>(`${studentId}/examples`);
@@ -712,7 +702,6 @@ export function useBackend() {
     getActiveExamplesFromBackend,
     getActiveMemberships,
     getActiveStudents,
-    getAllUsersFromBackend,
     getAudioExamplesFromBackend,
     getCoachList,
     getCourseList,
@@ -731,7 +720,6 @@ export function useBackend() {
     getSpellingsFromBackend,
     getUnverifiedExamplesFromBackend,
     getRecentlyEditedExamples,
-    getUserDataFromBackend,
     getVerifiedExamplesFromBackend,
     getVocabFromBackend,
     getVerbsFromBackend,
