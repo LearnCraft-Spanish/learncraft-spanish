@@ -1,15 +1,15 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import type { GroupSession } from 'src/types/CoachingTypes';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useBackendHelpers } from '../../useBackend';
 import { useUserData } from '../../UserData/useUserData';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
-
 export default function useGroupSessions(startDate: string, endDate: string) {
   const userDataQuery = useUserData();
   const { getGroupSessions } = useStudentRecordsBackend();
   const { getFactory, newPostFactory, newPutFactory, newDeleteFactory } =
     useBackendHelpers();
-
+  const queryClient = useQueryClient();
   function getGroupSessionsTopicFieldOptions() {
     return getFactory<string[]>('coaching/group-sessions/topic-field-options');
   }
@@ -44,7 +44,7 @@ export default function useGroupSessions(startDate: string, endDate: string) {
   }
   const createGroupSessionMutation = useMutation({
     mutationFn: (groupSession: CreateGroupSessionMutation) => {
-      const promise = newPostFactory({
+      const promise = newPostFactory<GroupSession>({
         path: 'coaching/group-sessions',
         body: groupSession,
       });
@@ -55,8 +55,19 @@ export default function useGroupSessions(startDate: string, endDate: string) {
       });
       return promise;
     },
-    onSettled() {
-      groupSessionsQuery.refetch();
+    onSuccess(result: GroupSession, _variables, _context) {
+      const queryKey = ['groupSessions', { startDate, endDate }];
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: GroupSession[] | undefined) => {
+          if (!oldData) {
+            return [result];
+          }
+          // Create a deep copy of the old data and add the new assignment
+          const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+          return [...oldDataCopy, { ...result }]; // Add the single result object
+        },
+      );
     },
   });
   interface UpdateGroupSessionMutation {
@@ -72,7 +83,7 @@ export default function useGroupSessions(startDate: string, endDate: string) {
 
   const updateGroupSessionMutation = useMutation({
     mutationFn: (groupSession: UpdateGroupSessionMutation) => {
-      const promise = newPutFactory({
+      const promise = newPutFactory<GroupSession>({
         path: 'coaching/group-sessions',
         body: groupSession,
       });
@@ -83,8 +94,23 @@ export default function useGroupSessions(startDate: string, endDate: string) {
       });
       return promise;
     },
-    onSettled() {
-      groupSessionsQuery.refetch();
+    onSuccess(result: GroupSession, _variables, _context) {
+      // Update the cache with the updated group session
+      const queryKey = ['groupSessions', { startDate, endDate }];
+
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: GroupSession[] | undefined) => {
+          if (!oldData) {
+            return [result];
+          }
+          // Create a deep copy of the old data and add the updated group session
+          const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+          return oldDataCopy.map((item: GroupSession) =>
+            item.recordId === result.recordId ? result : item,
+          );
+        },
+      );
     },
   });
 
