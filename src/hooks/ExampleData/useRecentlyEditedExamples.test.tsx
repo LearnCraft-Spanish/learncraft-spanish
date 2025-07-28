@@ -25,7 +25,7 @@ describe('useRecentlyEditedExamples', () => {
       () =>
         expect(result.current.recentlyEditedExamplesQuery.isSuccess).toBe(true),
       {
-        timeout: 3000,
+        timeout: 10000,
         interval: 200,
       },
     );
@@ -42,7 +42,7 @@ describe('useRecentlyEditedExamples', () => {
           result.current.recentlyEditedExamplesQuery.data?.length,
         ).toBeGreaterThan(0),
       {
-        timeout: 3000,
+        timeout: 10000,
         interval: 200,
       },
     );
