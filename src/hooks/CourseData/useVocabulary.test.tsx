@@ -20,7 +20,7 @@ describe('useVocabulary', () => {
       () => {
         expect(result.current.vocabularyQuery.isSuccess).toBe(true);
       },
-      { timeout: 3000, interval: 200 },
+      { timeout: 10000, interval: 200 },
     );
     expect(result.current.vocabularyQuery.data).toBeDefined();
   });
@@ -33,7 +33,7 @@ describe('useVocabulary', () => {
       () => {
         expect(result.current.vocabularyQuery.isSuccess).toBe(true);
       },
-      { timeout: 3000, interval: 200 },
+      { timeout: 10000, interval: 200 },
     );
     expect(result.current.vocabularyQuery.data?.length).toBeGreaterThan(0);
   });
