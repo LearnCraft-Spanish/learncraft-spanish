@@ -89,7 +89,7 @@ export default function useAssignments(startDate: string, endDate: string) {
   }
   const updateAssignmentMutation = useMutation({
     mutationFn: (assignment: AssignmentForMutation) => {
-      const promise = newPutFactory({
+      const promise = newPutFactory<Assignment>({
         path: `coaching/assignments/${assignment.recordId}`,
         body: assignment,
       });
@@ -100,8 +100,23 @@ export default function useAssignments(startDate: string, endDate: string) {
       });
       return promise;
     },
-    onSettled() {
-      assignmentsQuery.refetch();
+    onSuccess(result: Assignment, _variables, _context) {
+      // Update the cache with the updated assignment
+      const queryKey = ['assignments', { startDate, endDate }];
+
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: Assignment[] | undefined) => {
+          if (!oldData) {
+            return [result];
+          }
+          // Create a deep copy of the old data and add the updated assignment
+          const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+          return oldDataCopy.map((item: Assignment) =>
+            item.recordId === result.recordId ? result : item,
+          );
+        },
+      );
     },
   });
 

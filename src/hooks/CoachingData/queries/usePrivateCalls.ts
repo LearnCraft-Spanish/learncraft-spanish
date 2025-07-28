@@ -85,7 +85,7 @@ export default function usePrivateCalls(
   }
   const updatePrivateCallMutation = useMutation({
     mutationFn: (call: CallForUpdate) => {
-      const promise = newPutFactory({
+      const promise = newPutFactory<PrivateCall>({
         path: `coaching/private-calls/${call.recordId}`,
         body: call,
       });
@@ -96,8 +96,23 @@ export default function usePrivateCalls(
       });
       return promise;
     },
-    onSettled() {
-      privateCallsQuery.refetch();
+    onSuccess(result: PrivateCall, _variables, _context) {
+      // Update the cache with the updated private call
+      const queryKey = ['privateCalls', { startDate, endDate }];
+
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: PrivateCall[] | undefined) => {
+          if (!oldData) {
+            return [result];
+          }
+          // Create a deep copy of the old data and add the updated private call
+          const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+          return oldDataCopy.map((item: PrivateCall) =>
+            item.recordId === result.recordId ? result : item,
+          );
+        },
+      );
     },
   });
 

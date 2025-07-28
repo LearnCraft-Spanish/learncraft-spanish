@@ -83,7 +83,7 @@ export default function useGroupSessions(startDate: string, endDate: string) {
 
   const updateGroupSessionMutation = useMutation({
     mutationFn: (groupSession: UpdateGroupSessionMutation) => {
-      const promise = newPutFactory({
+      const promise = newPutFactory<GroupSession>({
         path: 'coaching/group-sessions',
         body: groupSession,
       });
@@ -94,8 +94,23 @@ export default function useGroupSessions(startDate: string, endDate: string) {
       });
       return promise;
     },
-    onSettled() {
-      groupSessionsQuery.refetch();
+    onSuccess(result: GroupSession, _variables, _context) {
+      // Update the cache with the updated group session
+      const queryKey = ['groupSessions', { startDate, endDate }];
+
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: GroupSession[] | undefined) => {
+          if (!oldData) {
+            return [result];
+          }
+          // Create a deep copy of the old data and add the updated group session
+          const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+          return oldDataCopy.map((item: GroupSession) =>
+            item.recordId === result.recordId ? result : item,
+          );
+        },
+      );
     },
   });
 
