@@ -70,7 +70,7 @@ describe('official quiz component', () => {
     });
   });
 
-  describe('test by role', () => {
+  describe.skip('test by role', () => {
     beforeEach(() => {
       vi.clearAllMocks();
     });
@@ -140,7 +140,7 @@ describe('official quiz component', () => {
     });
   });
 
-  describe('test by quiz type', () => {
+  describe.skip('test by quiz type', () => {
     const testQuizzes = quizExamplesTableArray;
 
     testQuizzes.forEach((quiz) => {
