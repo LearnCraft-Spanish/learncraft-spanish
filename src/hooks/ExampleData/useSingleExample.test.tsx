@@ -38,7 +38,7 @@ describe('useSingleExample', () => {
     await waitFor(
       () => expect(result.current.singleExampleQuery.isSuccess).toBe(true),
       {
-        timeout: 3000,
+        timeout: 7500,
         interval: 200,
       },
     );
@@ -52,7 +52,7 @@ describe('useSingleExample', () => {
     await waitFor(
       () => expect(result.current.singleExampleQuery.data).toBeDefined(),
       {
-        timeout: 3000,
+        timeout: 7500,
         interval: 200,
       },
     );

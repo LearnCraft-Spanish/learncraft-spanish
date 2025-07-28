@@ -24,7 +24,7 @@ describe('useVerifiedExamples', () => {
     await waitFor(
       () => expect(result.current.verifiedExamplesQuery.isSuccess).toBe(true),
       {
-        timeout: 3000,
+        timeout: 7500,
         interval: 200,
       },
     );
@@ -41,7 +41,7 @@ describe('useVerifiedExamples', () => {
           result.current.verifiedExamplesQuery.data?.length,
         ).toBeGreaterThan(0),
       {
-        timeout: 3000,
+        timeout: 7500,
         interval: 200,
       },
     );

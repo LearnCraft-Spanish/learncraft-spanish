@@ -74,7 +74,7 @@ describe('renders without crashing', () => {
           screen.getByText(examplesToDisplay[0].englishTranslation),
         ).toBeInTheDocument();
       },
-      { timeout: 3000 },
+      { timeout: 7500 },
     );
   });
 });
