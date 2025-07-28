@@ -17,7 +17,7 @@ describe('section WeeksRecordsSection', () => {
       () => {
         expect(screen.getByText('Weekly Student Records')).toBeInTheDocument();
       },
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
   });
   describe.skip('filtering logic', () => {

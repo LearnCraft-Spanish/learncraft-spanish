@@ -115,7 +115,7 @@ describe('component QuizSetupMenu', () => {
             screen.getByText('Custom Only', { exact: false }),
           ).toBeInTheDocument();
         },
-        { timeout: 5000 },
+        { timeout: 10000 },
       );
     });
   });

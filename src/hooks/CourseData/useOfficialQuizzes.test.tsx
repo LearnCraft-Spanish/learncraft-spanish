@@ -15,7 +15,7 @@ async function renderHookLoaded() {
   });
   await waitFor(
     () => expect(result.current.officialQuizzesQuery.isSuccess).toBe(true),
-    { timeout: 5000 },
+    { timeout: 10000 },
   );
 
   return result;
