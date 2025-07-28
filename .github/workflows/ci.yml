@@ -33,7 +33,7 @@ jobs:
 
       # Install pnpm
       - name: Install pnpm
-        run: npm install -g pnpm@9.7
+        run: npm install pnpm install --ignore-workspace -g pnpm@9.7
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
