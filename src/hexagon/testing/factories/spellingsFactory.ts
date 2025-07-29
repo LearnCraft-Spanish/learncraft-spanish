@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 const spellingsDataSchema = z.array(z.string());
 

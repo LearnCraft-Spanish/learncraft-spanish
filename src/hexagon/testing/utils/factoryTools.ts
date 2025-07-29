@@ -1,13 +1,9 @@
-import type { z } from 'zod';
-import { generateMock } from '@anatine/zod-mock';
-import { deriveReadableSeedFromTime } from '@LearnCraft-Spanish/shared';
+import type { z } from 'zod/v4';
+import { zocker } from 'zocker';
 
 export function createZodFactory<T>(schema: z.ZodType<T, any, any>) {
-  return (overrides: Partial<T> = {}): T => ({
-    ...generateMock(schema, {
-      seed: deriveReadableSeedFromTime(Date.now()),
-    }),
-    ...overrides,
+  return (): T => ({
+    ...zocker(schema).generate(),
   });
 }
 
@@ -16,6 +12,6 @@ export function createZodListFactory<T>(
   defaultLength = 3,
 ) {
   const createOne = createZodFactory(schema);
-  return (count = defaultLength, overrides?: Partial<T>): T[] =>
-    Array.from({ length: count }, () => createOne(overrides));
+  return (count = defaultLength): T[] =>
+    Array.from({ length: count }, () => createOne());
 }

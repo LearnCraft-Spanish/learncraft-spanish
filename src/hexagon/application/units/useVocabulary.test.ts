@@ -1,11 +1,10 @@
 import { overrideMockVocabularyAdapter } from '@application/adapters/vocabularyAdapter.mock';
+import { VocabularySchema } from '@LearnCraft-Spanish/shared';
 import { renderHook, waitFor } from '@testing-library/react';
-import {
-  createMockVocabulary,
-  createMockVocabularyList,
-} from '@testing/factories/vocabularyFactories';
+import { createMockVocabularyList } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
+import { zocker } from 'zocker';
 import { useVocabulary } from './useVocabulary';
 
 describe('useVocabulary', () => {
@@ -52,7 +51,9 @@ describe('useVocabulary', () => {
 
   it('should get vocabulary by id correctly', async () => {
     // Arrange
-    const mockItem = createMockVocabulary({ id: 123 });
+    const mockItem = zocker(VocabularySchema)
+      .supply(VocabularySchema.options[0].shape.id, 123)
+      .generate();
     overrideMockVocabularyAdapter({
       getVocabularyById: () => Promise.resolve(mockItem),
     });

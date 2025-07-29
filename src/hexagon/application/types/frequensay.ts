@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const WordCountSchema = z.object({
   word: z.string().min(1),

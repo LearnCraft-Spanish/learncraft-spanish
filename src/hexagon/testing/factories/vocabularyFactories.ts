@@ -1,4 +1,8 @@
 // test/factories/vocabulary.ts
+import type {
+  Vocabulary,
+  VocabularyRelatedRecords,
+} from '@LearnCraft-Spanish/shared';
 import {
   CreateNonVerbVocabularySchema,
   CreateVerbSchema,
@@ -10,8 +14,10 @@ import {
   createZodListFactory,
 } from '@testing/utils/factoryTools';
 
-export const createMockVocabulary = createZodFactory(VocabularySchema);
-export const createMockVocabularyList = createZodListFactory(VocabularySchema);
+export const createMockVocabulary =
+  createZodFactory<Vocabulary>(VocabularySchema);
+export const createMockVocabularyList =
+  createZodListFactory<Vocabulary>(VocabularySchema);
 
 export const createMockCreateNonVerbVocabulary = createZodFactory(
   CreateNonVerbVocabularySchema,
@@ -23,6 +29,5 @@ export const createMockCreateNonVerbVocabularyList = createZodListFactory(
 export const createMockCreateVerb = createZodFactory(CreateVerbSchema);
 export const createMockCreateVerbList = createZodListFactory(CreateVerbSchema);
 
-export const createMockVocabularyRelatedRecords = createZodFactory(
-  VocabularyRelatedRecordsSchema,
-);
+export const createMockVocabularyRelatedRecords =
+  createZodFactory<VocabularyRelatedRecords>(VocabularyRelatedRecordsSchema);

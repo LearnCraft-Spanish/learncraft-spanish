@@ -7,7 +7,7 @@ import { roleHasChangedResponseSchema } from '@LearnCraft-Spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { use, useCallback, useMemo } from 'react';
 import { useModal } from 'src/hooks/useModal';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export function useActiveStudent(): UseActiveStudentReturnType {
   const context = use(ActiveStudentContext);

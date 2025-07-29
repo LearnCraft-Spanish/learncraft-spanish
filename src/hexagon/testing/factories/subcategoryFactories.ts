@@ -1,9 +1,11 @@
+import type { Subcategory } from '@LearnCraft-Spanish/shared';
 import { SubcategorySchema } from '@LearnCraft-Spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,
 } from '@testing/utils/factoryTools';
 
-export const createMockSubcategory = createZodFactory(SubcategorySchema);
+export const createMockSubcategory =
+  createZodFactory<Subcategory>(SubcategorySchema);
 export const createMockSubcategoryList =
-  createZodListFactory(SubcategorySchema);
+  createZodListFactory<Subcategory>(SubcategorySchema);
