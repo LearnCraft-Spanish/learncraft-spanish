@@ -24,7 +24,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     createStudentFlashcards,
     deleteStudentFlashcards,
   } = useFlashcardAdapter();
-  const { appUser } = useActiveStudent();
+  const { appUser, isOwnUser } = useActiveStudent();
 
   const userId = appUser?.recordId;
   const queryClient = useQueryClient();
@@ -32,9 +32,13 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
   const hasAccess = isAdmin || isCoach || isStudent;
 
   const getFlashcards = useCallback(async () => {
-    if (isStudent) {
+    if (isOwnUser && appUser?.studentRole === 'student') {
       return getMyFlashcards();
-    } else if ((isAdmin || isCoach) && userId) {
+    } else if (
+      (isAdmin || isCoach) &&
+      appUser?.studentRole === 'student' &&
+      userId
+    ) {
       return getStudentFlashcards(userId);
     }
     console.error('No access to flashcards');
@@ -42,7 +46,8 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
   }, [
     isAdmin,
     isCoach,
-    isStudent,
+    isOwnUser,
+    appUser,
     getMyFlashcards,
     getStudentFlashcards,
     userId,
