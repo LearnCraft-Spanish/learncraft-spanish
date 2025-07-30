@@ -1,4 +1,4 @@
-import type { Flashcard } from '@LearnCraft-Spanish/shared';
+import type { Flashcard } from '@learncraft-spanish/shared';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';

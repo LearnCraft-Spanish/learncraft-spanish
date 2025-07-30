@@ -1,4 +1,4 @@
-import type { Flashcard } from '@LearnCraft-Spanish/shared';
+import type { Flashcard } from '@learncraft-spanish/shared';
 
 export interface FlashcardPort {
   getMyFlashcards: () => Promise<Flashcard[]>;

@@ -2,7 +2,7 @@ import type {
   CreateNonVerbVocabulary,
   CreateVerbVocabulary,
   Vocabulary,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
 import {
   normalizeQueryError,

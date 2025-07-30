@@ -1,7 +1,7 @@
 import type {
   CreateNonVerbVocabulary,
   CreateVerbVocabulary,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import type { UseVocabularyResult } from './useVocabulary';
 import {
   createMockVocabulary,

@@ -1,11 +1,11 @@
-import type { Flashcard } from '@LearnCraft-Spanish/shared';
+import type { Flashcard } from '@learncraft-spanish/shared';
 import type { AuthPort } from '../application/ports/authPort';
 import {
   createStudentExamplesEndpoint,
   deleteStudentExamplesEndpoint,
   getMyFlashcardsEndpoint,
   getStudentFlashcardsEndpoint,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import { createHttpClient } from './http/client';
 
 export function createFlashcardInfrastructure(

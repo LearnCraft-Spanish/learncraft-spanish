@@ -1,12 +1,12 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { CoursePort } from '@application/ports/coursePort';
-import type { CourseWithLessons, Lesson } from '@LearnCraft-Spanish/shared';
+import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   getCoursesWithLessonsEndpoint,
   getLessonsByVocabularyEndpoint,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 export function createCourseInfrastructure(
   apiUrl: string,

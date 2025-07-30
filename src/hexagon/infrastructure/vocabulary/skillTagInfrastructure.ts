@@ -1,7 +1,7 @@
 import type { AuthPort } from '@application/ports/authPort';
-import type { SkillTag } from '@LearnCraft-Spanish/shared';
+import type { SkillTag } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { getSkillsEndpoint } from '@LearnCraft-Spanish/shared';
+import { getSkillsEndpoint } from '@learncraft-spanish/shared';
 
 export function createSkillTagInfrastructure(
   apiUrl: string,

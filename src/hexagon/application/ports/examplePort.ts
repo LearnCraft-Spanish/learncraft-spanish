@@ -1,7 +1,7 @@
 import type {
   ExampleWithVocabulary,
   SkillTag,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 export interface ExamplePort {
   getFilteredExamples: ({

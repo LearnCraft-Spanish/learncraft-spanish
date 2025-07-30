@@ -1,4 +1,4 @@
-import type { Lesson, Vocabulary } from '@LearnCraft-Spanish/shared';
+import type { Lesson, Vocabulary } from '@learncraft-spanish/shared';
 import { useCallback, useState } from 'react';
 import { useLessonsByVocabulary } from '../queries/useLessonsByVocab';
 import { useVocabulary } from '../units/useVocabulary';

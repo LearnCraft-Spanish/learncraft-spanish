@@ -1,5 +1,5 @@
-import type { SkillTag } from '@LearnCraft-Spanish/shared';
-import { SkillType } from '@LearnCraft-Spanish/shared';
+import type { SkillTag } from '@learncraft-spanish/shared';
+import { SkillType } from '@learncraft-spanish/shared';
 import { useMemo, useState } from 'react';
 import { useSkillTags } from '../queries/useSkillTags';
 

@@ -1,11 +1,11 @@
 import type {
   ExampleWithVocabulary,
   SkillTag,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import type { AuthPort } from '../application/ports/authPort';
 import type { ExamplePort } from '../application/ports/examplePort';
 import { createHttpClient } from '@infrastructure/http/client';
-import { queryExamplesEndpoint } from '@LearnCraft-Spanish/shared';
+import { queryExamplesEndpoint } from '@learncraft-spanish/shared';
 
 export function createExampleInfrastructure(
   apiUrl: string,

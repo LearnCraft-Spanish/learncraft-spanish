@@ -1,11 +1,11 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { SubcategoryPort } from '@application/ports/subcategoryPort';
-import type { Subcategory } from '@LearnCraft-Spanish/shared/src/domain/vocabulary/core-types';
+import type { Subcategory } from '@learncraft-spanish/shared/src/domain/vocabulary/core-types';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   getSubcategoryByIdEndpoint,
   listSubcategoriesEndpoint,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 /**
  * Creates an implementation of the SubcategoryPort.

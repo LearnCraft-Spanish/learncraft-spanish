@@ -1,6 +1,6 @@
 import type { UseVerbCreationResult } from '@application/useCases/types';
-import type { CreateVerbVocabulary } from '@LearnCraft-Spanish/shared';
-import { PartOfSpeech } from '@LearnCraft-Spanish/shared';
+import type { CreateVerbVocabulary } from '@learncraft-spanish/shared';
+import { PartOfSpeech } from '@learncraft-spanish/shared';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { vi } from 'vitest';
 

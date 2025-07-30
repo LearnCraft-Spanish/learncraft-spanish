@@ -6,7 +6,7 @@ Always use endpoint definitions from the shared package:
 
 ```typescript
 // CORRECT ✅
-import { Endpoints } from '@LearnCraft-Spanish/shared';
+import { Endpoints } from '@learncraft-spanish/shared';
 const response = await httpClient.get(Endpoints.resource.path);
 
 // WRONG ❌ - DO NOT DO THIS!

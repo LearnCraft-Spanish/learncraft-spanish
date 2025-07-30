@@ -2,7 +2,7 @@ import type {
   AppUser,
   AppUserAbbreviation,
   roleHasChangedResponseSchema,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 export interface AppUserPort {
   getMyData: () => Promise<

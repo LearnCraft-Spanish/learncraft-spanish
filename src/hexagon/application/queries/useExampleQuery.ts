@@ -1,7 +1,7 @@
 import type {
   ExampleWithVocabulary,
   SkillTag,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useExampleAdapter } from '../adapters/exampleAdapter';

@@ -1,4 +1,4 @@
-import type { CreateVerbVocabulary } from '@LearnCraft-Spanish/shared';
+import type { CreateVerbVocabulary } from '@learncraft-spanish/shared';
 import type { UseVerbCreationResult } from './types';
 import { useSubcategories } from '@application/units/useSubcategories';
 import { useVocabulary } from '@application/units/useVocabulary';

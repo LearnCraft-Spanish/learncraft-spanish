@@ -7,7 +7,7 @@ import type {
   Vocabulary,
   VocabularyAbbreviation,
   VocabularyRelatedRecords,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   createVocabularyEndpoint,
@@ -18,7 +18,7 @@ import {
   getVocabularyBySubcategoryEndpoint,
   getVocabularyCountBySubcategoryEndpoint,
   listVocabularyEndpoint,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 /**
  * Creates an implementation of the VocabularyPort.

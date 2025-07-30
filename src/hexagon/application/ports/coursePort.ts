@@ -1,4 +1,4 @@
-import type { CourseWithLessons, Lesson } from '@LearnCraft-Spanish/shared';
+import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 
 export interface CoursePort {
   /**

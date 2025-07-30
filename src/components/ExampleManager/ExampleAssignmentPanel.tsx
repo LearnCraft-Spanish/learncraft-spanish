@@ -1,4 +1,4 @@
-import type { AppUser } from '@LearnCraft-Spanish/shared';
+import type { AppUser } from '@learncraft-spanish/shared';
 import type { UseQueryResult } from '@tanstack/react-query';
 import type {
   Flashcard,
