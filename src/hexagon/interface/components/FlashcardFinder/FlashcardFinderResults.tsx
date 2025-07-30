@@ -1,4 +1,4 @@
-import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useMemo } from 'react';
 import ExampleTable from '../ExampleTable/ExampleTable';
 

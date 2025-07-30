@@ -1,4 +1,4 @@
-import type { Vocabulary } from '@LearnCraft-Spanish/shared';
+import type { Vocabulary } from '@learncraft-spanish/shared';
 import { createMockVocabularyList } from '@testing/factories/vocabularyFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 

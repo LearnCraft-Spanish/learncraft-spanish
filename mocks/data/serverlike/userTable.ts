@@ -1,4 +1,4 @@
-import type { AppUser } from '@LearnCraft-Spanish/shared';
+import type { AppUser } from '@learncraft-spanish/shared';
 import type { AuthUser } from 'src/hexagon/application/ports/authPort';
 
 export type TestUserNames =

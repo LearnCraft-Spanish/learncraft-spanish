@@ -1,4 +1,4 @@
-import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';

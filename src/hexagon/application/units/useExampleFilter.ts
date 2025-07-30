@@ -1,4 +1,4 @@
-import type { SkillTag } from '@LearnCraft-Spanish/shared';
+import type { SkillTag } from '@learncraft-spanish/shared';
 import type { UseSelectedCourseAndLessonsReturnType } from '../coordinators/hooks/types';
 import type { UseExampleFilterCoordinatorReturnType } from '../coordinators/hooks/useExampleFilterCoordinator';
 import type { UseSkillTagSearchReturnType } from './useSkillTagSearch';

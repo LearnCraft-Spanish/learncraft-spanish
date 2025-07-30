@@ -1,5 +1,5 @@
 import type { VocabularyPort } from '@application/ports/vocabularyPort';
-import type { CreateVocabulary } from '@LearnCraft-Spanish/shared';
+import type { CreateVocabulary } from '@learncraft-spanish/shared';
 import {
   createMockVocabulary,
   createMockVocabularyList,

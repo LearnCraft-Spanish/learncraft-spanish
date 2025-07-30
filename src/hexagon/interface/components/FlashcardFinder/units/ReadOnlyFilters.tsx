@@ -1,4 +1,4 @@
-import type { SkillTag } from '@LearnCraft-Spanish/shared';
+import type { SkillTag } from '@learncraft-spanish/shared';
 import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
 import '../FlashcardFinder.scss';
 export default function ReadOnlyFilters({

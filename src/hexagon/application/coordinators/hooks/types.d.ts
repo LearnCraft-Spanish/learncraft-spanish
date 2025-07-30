@@ -2,7 +2,7 @@ import type {
   AppUser,
   CourseWithLessons,
   Lesson,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 export interface UseActiveStudentReturnType {
   appUser: AppUser | null;

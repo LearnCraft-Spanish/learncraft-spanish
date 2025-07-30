@@ -1,6 +1,6 @@
 // called when user clicks 'Copy as Table' button
 
-import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
 // copies sentences in a table format to be pasted into a google doc or excel sheet

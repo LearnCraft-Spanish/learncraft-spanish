@@ -1,4 +1,4 @@
-import type { Vocabulary } from '@LearnCraft-Spanish/shared';
+import type { Vocabulary } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import './VocabularySearch.scss';
 

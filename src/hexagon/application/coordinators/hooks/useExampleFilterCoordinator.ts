@@ -2,7 +2,7 @@ import type { ExampleFilterState } from '@application/coordinators/contexts/Exam
 import type {
   Course,
   Lesson,
-} from '@LearnCraft-Spanish/shared/dist/domain/courses/core-types';
+} from '@learncraft-spanish/shared/dist/domain/courses/core-types';
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import { useSkillTags } from '@application/queries/useSkillTags';
 import { generateFilterUuid } from '@application/utils/filterUuidGenerator';

@@ -1,4 +1,4 @@
-import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { AudioControl } from '../../general';
 
 export default function MoreInfoViewExample({

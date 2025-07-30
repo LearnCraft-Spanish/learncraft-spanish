@@ -4,7 +4,7 @@ import {
   CreateVerbSchema,
   VocabularyRelatedRecordsSchema,
   VocabularySchema,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,

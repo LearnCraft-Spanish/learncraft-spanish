@@ -1,4 +1,4 @@
-import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 
 export default function MoreInfoViewFlashcard({
   example,

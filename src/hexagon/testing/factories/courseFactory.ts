@@ -1,5 +1,5 @@
-import type { CourseWithLessons } from '@LearnCraft-Spanish/shared';
-import { CourseWithLessonsSchema } from '@LearnCraft-Spanish/shared';
+import type { CourseWithLessons } from '@learncraft-spanish/shared';
+import { CourseWithLessonsSchema } from '@learncraft-spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,
