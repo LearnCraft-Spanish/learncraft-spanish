@@ -36,7 +36,7 @@
     "lead-time": "node METRICS/lead-time/lead_time_tracker.js"
   },
   "dependencies": {
-    "@LearnCraft-Spanish/shared": "npm:@learncraft-spanish/shared@0.6.25",
+    "@LearnCraft-Spanish/shared": "^0.6.25",
     "@auth0/auth0-react": "^2.3.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",

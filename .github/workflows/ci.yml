@@ -33,7 +33,7 @@ jobs:
 
       # Install pnpm
       - name: Install pnpm
-        run: npm install pnpm install --ignore-workspace -g pnpm@9.7
+        run: npm install -g pnpm@9.7
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
@@ -46,7 +46,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --ignore-workspace
         env:
           GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
@@ -81,7 +81,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --ignore-workspace
         env:
           GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
@@ -139,7 +139,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --ignore-workspace
         env:
           GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
@@ -175,7 +175,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --ignore-workspace
         env:
           # Suppress context access warning
           # Context access is safe in this case
@@ -238,7 +238,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile --ignore-workspace
         env:
           # Suppress context access warning
           # Context access is safe in this case

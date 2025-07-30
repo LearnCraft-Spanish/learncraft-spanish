@@ -15,8 +15,9 @@ build
 buld/*
 
 
-# NPMRC
+# npm config
 .npmrc.*
+pnpm-workspace.yaml
 
 # misc
 .env

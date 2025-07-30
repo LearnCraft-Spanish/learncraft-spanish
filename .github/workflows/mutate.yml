@@ -22,7 +22,7 @@ jobs:
 
       # Install pnpm
       - name: Install pnpm
-        run: npm install pnpm install --ignore-workspace -g pnpm@9.7
+        run: npm install -g pnpm@9.7
 
       # Cache Node.js dependencies
       - name: Cache Node.js dependencies
@@ -35,7 +35,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-workspace
         env:
           GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
