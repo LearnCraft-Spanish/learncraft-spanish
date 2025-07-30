@@ -145,7 +145,21 @@
   }
 }
 
+.exampleCardSpanishText,
+.exampleCardEnglishText {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding-right: 8px;
+}
+
 .audioWrapper {
+  min-width: 48px;
+  min-height: 48px;
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;

@@ -20,6 +20,8 @@ export default function ExampleListItemFactory({
         isSpanglish={example.spanglish}
         spanishExample={example.spanish}
         englishTranslation={example.english}
+        spanishAudio={example.spanishAudio}
+        englishAudio={example.englishAudio}
       />
       {postTextComponents && [...postTextComponents]}
     </div>

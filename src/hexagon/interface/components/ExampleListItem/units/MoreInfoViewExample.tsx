@@ -1,5 +1,4 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { AudioControl } from '../../general';
 
 export default function MoreInfoViewExample({
   example,
@@ -21,20 +20,6 @@ export default function MoreInfoViewExample({
               </div>
             ))}
           </div>
-        </div>
-        <div className="moreInfoSide">
-          {example.spanishAudio && (
-            <div className="audioWrapper">
-              <div className="audioLabel">Spanish Audio</div>
-              <AudioControl audioLink={example.spanishAudio} />
-            </div>
-          )}
-          {example.englishAudio && (
-            <div className="audioWrapper">
-              <div className="audioLabel">English Audio</div>
-              <AudioControl audioLink={example.englishAudio} />
-            </div>
-          )}
         </div>
         <div className="moreInfoSide">
           <div className="labelsSection">
