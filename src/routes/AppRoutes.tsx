@@ -44,7 +44,7 @@ export default function AppRoutes() {
       />
       <Route
         path="/newflashcardfinder"
-        element={(isAdmin || isCoach) && <FlashcardFinderPage />}
+        element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
       />
       <Route
         path="/audioquiz/*"

@@ -1,7 +1,9 @@
 import type { Flashcard } from '@learncraft-spanish/shared';
 import type { AuthPort } from '../application/ports/authPort';
 import {
+  createMyStudentExamplesEndpoint,
   createStudentExamplesEndpoint,
+  deleteMyStudentExamplesEndpoint,
   deleteStudentExamplesEndpoint,
   getMyFlashcardsEndpoint,
   getStudentFlashcardsEndpoint,
@@ -19,6 +21,39 @@ export function createFlashcardInfrastructure(
       const response = await httpClient.get<Flashcard[]>(
         getMyFlashcardsEndpoint.path,
         getMyFlashcardsEndpoint.requiredScopes,
+      );
+      return response;
+    },
+
+    createMyStudentFlashcards: async (
+      exampleIds: number[],
+    ): Promise<Flashcard[]> => {
+      const response = await httpClient.post<Flashcard[]>(
+        createMyStudentExamplesEndpoint.path,
+        createMyStudentExamplesEndpoint.requiredScopes,
+        {
+          newStudentExamples: exampleIds.map((id) => ({
+            studentId: '10000000', // TEMP, REMOVE ONCE PACKAGE UPDATES
+            exampleId: id.toString(),
+          })),
+        },
+      );
+      return response;
+    },
+
+    deleteMyStudentFlashcards: async ({
+      studentExampleIds,
+    }: {
+      studentExampleIds: number[];
+    }): Promise<number> => {
+      const response = await httpClient.delete<number>(
+        deleteMyStudentExamplesEndpoint.path,
+        deleteMyStudentExamplesEndpoint.requiredScopes,
+        {
+          params: {
+            studentExampleIds: studentExampleIds.join(','),
+          },
+        },
       );
       return response;
     },
