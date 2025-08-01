@@ -2,10 +2,10 @@ import type {
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
-import type { UUID } from 'node:crypto';
-import { randomUUID } from 'node:crypto';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import z from 'zod';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
 import { useExampleFilterCoordinator } from '../coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
@@ -33,18 +33,23 @@ export const useExampleQuery = (
     setPage(page);
   }, []);
 
-  const seed: UUID | null = useMemo(() => {
+  const seed: string | null = useMemo(() => {
     if (
-      !course ||
-      !toLesson ||
-      !fromLesson ||
-      !skillTags?.length ||
+      true ||
+      course ||
+      toLesson ||
+      fromLesson ||
+      skillTags?.length === 0 ||
       filterState?.exampleFilters.includeSpanglish ||
-      !filterState?.exampleFilters.audioOnly
+      filterState?.exampleFilters.audioOnly
     ) {
-      return randomUUID();
+      const uuid = uuidv4();
+      const parsed = z.string().uuid().safeParse(uuid);
+      if (!parsed.success) {
+        throw new Error('Invalid UUID');
+      }
+      return uuid;
     }
-    return randomUUID();
   }, [
     course,
     toLesson,
