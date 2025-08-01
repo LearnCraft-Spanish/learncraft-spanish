@@ -4,9 +4,7 @@ import type {
   Lesson,
 } from '@learncraft-spanish/shared/dist/domain/courses/core-types';
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
-import { useSkillTags } from '@application/queries/useSkillTags';
-import { generateFilterUuid } from '@application/utils/filterUuidGenerator';
-import { use, useCallback, useEffect, useMemo } from 'react';
+import { use, useCallback, useMemo } from 'react';
 import { useSelectedCourseAndLessons } from './useSelectedCourseAndLessons';
 
 interface FilterState {
@@ -35,41 +33,6 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
     updateFiltersChanging,
   } = use(ExampleFilterContext);
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
-  const { skillTags } = useSkillTags();
-
-  // Generate UUID when filters change
-  useEffect(() => {
-    if (course && toLesson && skillTags) {
-      const tagsToSearch = exampleFilters.skillTags
-        .map((tagKey) => skillTags.find((tag) => tag.key === tagKey))
-        .filter((tag): tag is NonNullable<typeof tag> => tag !== null);
-
-      const newUuid = generateFilterUuid({
-        courseId: course.id,
-        toLessonNumber: toLesson.lessonNumber,
-        fromLessonNumber: fromLesson?.lessonNumber,
-        includeSpanglish: exampleFilters.includeSpanglish,
-        audioOnly: exampleFilters.audioOnly,
-        skillTags: tagsToSearch,
-      });
-
-      // Only update if UUID has changed
-      if (newUuid !== exampleFilters.filterUuid) {
-        updateExampleFilters({
-          ...exampleFilters,
-          filterUuid: newUuid,
-        });
-      }
-    }
-  }, [
-    course,
-    toLesson,
-    fromLesson,
-    exampleFilters,
-    skillTags,
-    filtersChanging,
-    updateExampleFilters,
-  ]);
 
   const filterState: FilterState = useMemo(() => {
     return {
@@ -134,7 +97,6 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
     updateIncludeSpanglish,
     updateAudioOnly,
     updateFiltersChanging,
-
     skillTagKeys: exampleFilters.skillTags,
   };
 }

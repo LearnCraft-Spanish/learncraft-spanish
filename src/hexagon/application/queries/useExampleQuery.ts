@@ -2,6 +2,8 @@ import type {
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
+import type { UUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
@@ -31,6 +33,27 @@ export const useExampleQuery = (
     setPage(page);
   }, []);
 
+  const seed: UUID | null = useMemo(() => {
+    if (
+      !course ||
+      !toLesson ||
+      !fromLesson ||
+      !skillTags?.length ||
+      filterState?.exampleFilters.includeSpanglish ||
+      !filterState?.exampleFilters.audioOnly
+    ) {
+      return randomUUID();
+    }
+    return randomUUID();
+  }, [
+    course,
+    toLesson,
+    fromLesson,
+    skillTags,
+    filterState?.exampleFilters.includeSpanglish,
+    filterState?.exampleFilters.audioOnly,
+  ]);
+
   const tagsToSearch: SkillTag[] = useMemo(() => {
     const tagKeys = filterState?.exampleFilters.skillTags;
     const tagsUnfiltered = tagKeys?.map((k) => {
@@ -50,7 +73,7 @@ export const useExampleQuery = (
       skillTags: tagsToSearch,
       page,
       limit: pageSize,
-      seed: filterState!.exampleFilters.filterUuid,
+      seed,
     });
     return { examples, totalCount };
   }, [
@@ -62,6 +85,7 @@ export const useExampleQuery = (
     exampleAdapter,
     page,
     pageSize,
+    seed,
   ]);
 
   const {
@@ -79,8 +103,7 @@ export const useExampleQuery = (
       filterState?.exampleFilters.includeSpanglish,
       filterState?.exampleFilters.audioOnly,
       filterState?.exampleFilters.skillTags,
-      filterState?.exampleFilters.filterUuid,
-      filtersChanging,
+      seed,
     ],
     queryFn: fetchFilteredExamples,
     enabled:
