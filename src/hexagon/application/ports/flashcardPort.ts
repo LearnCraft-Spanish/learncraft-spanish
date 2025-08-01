@@ -3,6 +3,11 @@ import type { Flashcard } from '@learncraft-spanish/shared';
 export interface FlashcardPort {
   getMyFlashcards: () => Promise<Flashcard[]>;
   getStudentFlashcards: (studentId: number) => Promise<Flashcard[]>;
+  createMyStudentFlashcards: ({
+    exampleIds,
+  }: {
+    exampleIds: number[];
+  }) => Promise<Flashcard[]>;
   createStudentFlashcards: ({
     studentId,
     exampleIds,
@@ -10,6 +15,11 @@ export interface FlashcardPort {
     studentId: number;
     exampleIds: number[];
   }) => Promise<Flashcard[]>;
+  deleteMyStudentFlashcards: ({
+    studentExampleIds,
+  }: {
+    studentExampleIds: number[];
+  }) => Promise<number>;
   deleteStudentFlashcards: ({
     studentExampleIds,
   }: {
