@@ -102,7 +102,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
 
   const createMyStudentFlashcardsMutation = useMutation({
     mutationFn: (exampleIds: number[]) => {
-      const promise = createMyStudentFlashcards(exampleIds);
+      const promise = createMyStudentFlashcards({ exampleIds });
       toast.promise(promise, {
         pending: 'Creating flashcards...',
         success: 'Flashcards created',
@@ -130,7 +130,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         return createStudentFlashcardsMutation.mutateAsync(exampleIds);
       }
       console.error('No access to create flashcards');
-      return Promise.resolve([]);
+      return Promise.reject(new Error('No access to create flashcards'));
     },
     [
       createStudentFlashcardsMutation,
@@ -153,8 +153,20 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
       });
       return promise;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+    onSuccess: (result, _variables, _context) => {
+      // check result (number of deletes) is same as studentExampleIds.length
+      if (result !== _variables.length) {
+        queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+        toast.error(
+          `Failed to delete flashcards. ${result} of ${_variables.length} flashcards deleted.`,
+        );
+      } else {
+        queryClient.setQueryData(
+          ['flashcards', userId],
+          (oldData: Flashcard[]) =>
+            oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
+        );
+      }
     },
   });
 
@@ -168,8 +180,20 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
       });
       return promise;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+    onSuccess: (result, _variables, _context) => {
+      // check result (number of deletes) is same as studentExampleIds.length
+      if (result !== _variables.length) {
+        queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+        toast.error(
+          `Failed to delete flashcards. ${result} of ${_variables.length} flashcards deleted.`,
+        );
+      } else {
+        queryClient.setQueryData(
+          ['flashcards', userId],
+          (oldData: Flashcard[]) =>
+            oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
+        );
+      }
     },
   });
 
@@ -196,7 +220,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         );
       } else {
         console.error('No access to delete flashcards');
-        return Promise.resolve(0);
+        return Promise.reject(new Error('No access to delete flashcards'));
       }
     },
     [
@@ -207,6 +231,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
       userId,
       isAdmin,
       isCoach,
+      flashcards,
     ],
   );
 

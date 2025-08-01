@@ -25,15 +25,16 @@ export function createFlashcardInfrastructure(
       return response;
     },
 
-    createMyStudentFlashcards: async (
-      exampleIds: number[],
-    ): Promise<Flashcard[]> => {
+    createMyStudentFlashcards: async ({
+      exampleIds,
+    }: {
+      exampleIds: number[];
+    }): Promise<Flashcard[]> => {
       const response = await httpClient.post<Flashcard[]>(
         createMyStudentExamplesEndpoint.path,
         createMyStudentExamplesEndpoint.requiredScopes,
         {
           newStudentExamples: exampleIds.map((id) => ({
-            studentId: '10000000', // TEMP, REMOVE ONCE PACKAGE UPDATES
             exampleId: id.toString(),
           })),
         },
