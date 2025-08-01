@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
-      
+
       # Write .npmrc
       - name: Write .npmrc
         run: |
@@ -46,7 +46,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile --ignore-workspace
+        run: pnpm install:ci
         env:
           GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 
