@@ -1,6 +1,6 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useMemo } from 'react';
-import ExampleTable from '../ExampleTable/ExampleTable';
+import ExampleTable from '../Tables/ExampleTable';
 
 export default function FlashcardFinderResults({
   filteredFlashcards,

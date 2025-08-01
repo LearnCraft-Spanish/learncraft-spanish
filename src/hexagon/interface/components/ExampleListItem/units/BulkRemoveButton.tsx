@@ -1,19 +1,18 @@
 import { useMemo } from 'react';
-import './BulkAddPendingRemove.scss';
+import './BulkAddRemove.scss';
 
-export default function BulkAddPendingRemove({
+export default function BulkRemoveButton({
   id,
   isCollected,
-  handleAdd,
-  handleRemove,
+  handleSelect,
   isSelected,
   isPending,
+  handleRemoveSelected,
 }: {
   id: number;
   isCollected: boolean;
-  handleAdd: () => void;
-  handleRemove: () => void;
-
+  handleSelect: () => void;
+  handleRemoveSelected: () => void;
   isSelected: boolean;
   isPending: boolean;
 }) {
@@ -26,28 +25,22 @@ export default function BulkAddPendingRemove({
   const buttonParams: ButtonParams = useMemo(() => {
     if (isPending) {
       return {
-        text: 'Adding...',
+        text: 'Removing...',
         className: 'pendingButton',
         onClickFunction: () => {},
       };
     }
-    if (!isCollected && !isSelected) {
+    if (isCollected && !isSelected) {
       return {
         text: 'Select',
-        className: 'selectButton',
-        onClickFunction: handleAdd,
-      };
-    } else if (isCollected) {
-      return {
-        text: 'Owned',
-        className: 'disabledButton',
-        onClickFunction: () => {},
+        className: 'selectRemoveButton',
+        onClickFunction: handleSelect,
       };
     } else if (isSelected) {
       return {
         text: 'Selected',
-        className: 'selectedButton',
-        onClickFunction: handleRemove,
+        className: 'selectedRemoveButton',
+        onClickFunction: handleRemoveSelected,
       };
     }
     return {
@@ -55,7 +48,7 @@ export default function BulkAddPendingRemove({
       className: 'unknownButton',
       onClickFunction: () => {},
     };
-  }, [handleAdd, handleRemove, isCollected, isSelected]);
+  }, [isCollected, isSelected, isPending, handleSelect, handleRemoveSelected]);
 
   return (
     <button

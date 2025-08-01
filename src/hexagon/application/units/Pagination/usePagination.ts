@@ -34,5 +34,6 @@ export default function usePagination({
       setPage(page - 1);
     },
     setPage,
+    pageSize: itemsPerPage,
   };
 }

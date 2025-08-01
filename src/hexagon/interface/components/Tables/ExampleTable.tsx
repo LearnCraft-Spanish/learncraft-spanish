@@ -4,18 +4,19 @@ import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import usePagination from '@application/units/Pagination/usePagination';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import Loading from 'src/components/Loading/Loading';
+import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import { Pagination } from '../general';
 import {
   copyTableToClipboard,
-  getExampleById as getExampleByIdFunction,
+  getExampleOrFlashcardById,
 } from './units/functions';
-import 'src/components/ExamplesTable/ExamplesTable.scss';
 
-import './ExampleTable.scss';
+import 'src/components/ExamplesTable/ExamplesTable.scss';
+import './ExampleAndFlashcardTable.scss';
 
 interface ExamplesTableProps {
   pageSize?: number;
@@ -48,14 +49,22 @@ export default function ExamplesTable({
   const { isExampleCollected, createFlashcards, deleteFlashcards } =
     useStudentFlashcards();
 
-  const [bulkAddMode, setBulkAddMode] = useState(false);
-  const [addingInProgress, setAddingInProgress] = useState(false);
-
-  const [bulkAddIds, setBulkAddIds] = useState<number[]>([]);
+  const {
+    bulkSelectMode,
+    bulkOperationInProgress,
+    bulkSelectIds,
+    addToBulkSelect,
+    removeFromBulkSelect,
+    clearBulkSelect,
+    toggleBulkSelectMode,
+    triggerBulkOperation,
+  } = useBulkSelect(async () => {
+    await createFlashcards(bulkSelectIds);
+  });
 
   const getExampleById = useCallback(
     (recordId: number) => {
-      return getExampleByIdFunction(dataSource, recordId);
+      return getExampleOrFlashcardById(dataSource, recordId);
     },
     [dataSource],
   );
@@ -72,14 +81,12 @@ export default function ExamplesTable({
   return (
     <div className="examplesTable">
       <div className="buttonBox bulkAddModeButtons">
-        {bulkAddMode && (
+        {bulkSelectMode && (
           <button
             className="clearSelectionButton"
             type="button"
-            onClick={() => {
-              setBulkAddIds([]);
-            }}
-            disabled={bulkAddIds.length === 0}
+            onClick={clearBulkSelect}
+            disabled={bulkSelectIds.length === 0}
           >
             Clear Selection
           </button>
@@ -88,28 +95,19 @@ export default function ExamplesTable({
         <button
           className="toggleBulkAddModeButton"
           type="button"
-          onClick={() => {
-            setBulkAddMode(!bulkAddMode);
-          }}
+          onClick={toggleBulkSelectMode}
         >
-          {bulkAddMode ? 'Disable Bulk Add' : 'Enable Bulk Add'}
+          {bulkSelectMode ? 'Disable Bulk Add' : 'Enable Bulk Add'}
         </button>
-        {bulkAddMode && (
+        {bulkSelectMode && (
           <button
             className="bulkAddFlashcardsButton"
             type="button"
-            onClick={() => {
-              setAddingInProgress(true);
-              const promise = createFlashcards(bulkAddIds);
-              promise.then(() => {
-                setAddingInProgress(false);
-                setBulkAddIds([]);
-              });
-            }}
-            disabled={bulkAddIds.length === 0}
+            onClick={triggerBulkOperation}
+            disabled={bulkSelectIds.length === 0}
           >
-            {bulkAddIds.length > 0
-              ? `Add ${bulkAddIds.length} Flashcards`
+            {bulkSelectIds.length > 0
+              ? `Add ${bulkSelectIds.length} Flashcards`
               : 'Select Flashcards to Add'}
           </button>
         )}
@@ -117,7 +115,12 @@ export default function ExamplesTable({
       <div className="buttonBox">
         <button
           type="button"
-          onClick={() => copyTableToClipboard({ displayOrder, getExampleById })}
+          onClick={() =>
+            copyTableToClipboard({
+              displayOrder,
+              getExampleOrFlashcardById: getExampleById,
+            })
+          }
         >
           Copy Table
         </button>
@@ -141,11 +144,12 @@ export default function ExamplesTable({
               example={getExampleById(displayOrder.recordId)}
               isCollected={isExampleCollected(displayOrder.recordId)}
               isPending={
-                addingInProgress && bulkAddIds.includes(displayOrder.recordId)
+                bulkOperationInProgress &&
+                bulkSelectIds.includes(displayOrder.recordId)
               }
               handleAdd={() => {
-                if (bulkAddMode) {
-                  setBulkAddIds([...bulkAddIds, displayOrder.recordId]);
+                if (bulkSelectMode) {
+                  addToBulkSelect(displayOrder.recordId);
                 } else {
                   createFlashcards([displayOrder.recordId]);
                 }
@@ -153,8 +157,14 @@ export default function ExamplesTable({
               handleRemove={() => {
                 deleteFlashcards([displayOrder.recordId]);
               }}
-              bulkAddMode={bulkAddMode}
-              isSelected={bulkAddIds.includes(displayOrder.recordId)}
+              handleRemoveSelected={() => {
+                removeFromBulkSelect(displayOrder.recordId);
+              }}
+              handleSelect={() => {
+                addToBulkSelect(displayOrder.recordId);
+              }}
+              bulkSelectMode={bulkSelectMode}
+              isSelected={bulkSelectIds.includes(displayOrder.recordId)}
             />
           );
         })}

@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
-    "@learncraft-spanish/shared": "^0.7.6",
+    "@learncraft-spanish/shared": "^0.7.8",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
     "@sentry/vite-plugin": "^3.2.1",

@@ -1,15 +1,20 @@
 // called when user clicks 'Copy as Table' button
 
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+} from '@learncraft-spanish/shared';
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
 // copies sentences in a table format to be pasted into a google doc or excel sheet
 export function copyTableToClipboard({
   displayOrder,
-  getExampleById,
+  getExampleOrFlashcardById,
 }: {
   displayOrder: DisplayOrder[];
-  getExampleById: (recordId: number) => ExampleWithVocabulary | null;
+  getExampleOrFlashcardById: (
+    recordId: number,
+  ) => ExampleWithVocabulary | Flashcard | null;
 }) {
   if (!displayOrder.length) {
     return null;
@@ -17,14 +22,25 @@ export function copyTableToClipboard({
   const headers = 'ID\tSpanish\tEnglish\tAudio_Link\n';
   const table = displayOrder
     .map((displayOrderObject) => {
-      const foundExample = getExampleById(displayOrderObject.recordId);
+      const foundExample = getExampleOrFlashcardById(
+        displayOrderObject.recordId,
+      );
       if (!foundExample) {
         return '';
       }
-      return `${foundExample.id}\t\
+      if ('example' in foundExample) {
+        return `${foundExample.id}\t\
+            ${foundExample.example.spanish}\t\
+            ${foundExample.example.english}\t\
+            ${foundExample.example.spanishAudio}\n`;
+      }
+      if ('id' in foundExample) {
+        return `${foundExample.id}\t\
             ${foundExample.spanish}\t\
             ${foundExample.english}\t\
             ${foundExample.spanishAudio}\n`;
+      }
+      return '';
     })
     .join('');
 
@@ -32,8 +48,8 @@ export function copyTableToClipboard({
   navigator.clipboard.writeText(copiedText);
 }
 
-export function getExampleById(
-  dataSource: ExampleWithVocabulary[],
+export function getExampleOrFlashcardById(
+  dataSource: (ExampleWithVocabulary | Flashcard)[],
   recordId: number,
 ) {
   const foundExample = dataSource.find((example) => example.id === recordId);

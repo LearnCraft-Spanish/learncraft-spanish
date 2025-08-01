@@ -1,10 +1,13 @@
 // THIS WILL NOT LIVE IN THIS FOLDER. IT SHOULD BE LOCATED WITH EXAMPLE MANAGER, i think :)
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+} from '@learncraft-spanish/shared';
 
 import { useCallback, useState } from 'react';
 import ExampleListItemFactory from './ExampleListItemFactory';
 import AddPendingRemove from './units/AddPendingRemove';
-import BulkAddPendingRemove from './units/BulkAddPendingRemove';
+import BulkAddButton from './units/BulkAddButton';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewExample from './units/MoreInfoViewExample';
 
@@ -13,16 +16,20 @@ export default function ExampleListItem({
   isCollected,
   isPending,
   handleAdd,
+  handleRemoveSelected,
+  handleSelect,
   handleRemove,
-  bulkAddMode,
+  bulkSelectMode,
   isSelected,
 }: {
-  example: ExampleWithVocabulary | null;
+  example: Flashcard | ExampleWithVocabulary | null;
   isCollected: boolean;
   isPending: boolean;
   handleAdd: () => void;
+  handleRemoveSelected: () => void;
+  handleSelect: () => void;
   handleRemove: () => void;
-  bulkAddMode: boolean;
+  bulkSelectMode: boolean;
   isSelected?: boolean;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
@@ -45,13 +52,12 @@ export default function ExampleListItem({
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
-          bulkAddMode ? (
-            <BulkAddPendingRemove
+          bulkSelectMode ? (
+            <BulkAddButton
               id={example.id}
               isCollected={isCollected}
-              handleAdd={handleAdd}
-              handleRemove={handleRemove}
-              key="addPendingRemove"
+              handleSelect={handleSelect}
+              handleRemoveSelected={handleRemoveSelected}
               isSelected={isSelected ?? false}
               isPending={isPending}
             />

@@ -12,6 +12,7 @@ export interface UseStudentFlashcardsReturnType {
   isLoading: boolean;
   error: Error | null;
   isExampleCollected: (exampleId: number) => boolean;
+  isFlashcardCollected: (flashcardId: number) => boolean;
   createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
 }
@@ -71,6 +72,15 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
       return (
         flashcards?.some((flashcard) => flashcard.example.id === exampleId) ??
         false
+      );
+    },
+    [flashcards],
+  );
+
+  const isFlashcardCollected = useCallback(
+    (flashcardId: number) => {
+      return (
+        flashcards?.some((flashcard) => flashcard.id === flashcardId) ?? false
       );
     },
     [flashcards],
@@ -201,7 +211,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     async (exampleIds: number[]) => {
       // find studentExampleIds from exampleIds
       const studentExampleIds = flashcards
-        ?.filter((flashcard) => exampleIds.includes(flashcard.example.id))
+        ?.filter((flashcard) => exampleIds.includes(flashcard.id))
         .map((flashcard) => flashcard.id);
       if (!studentExampleIds) {
         throw new Error('Student example IDs not found');
@@ -240,6 +250,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     isLoading,
     error,
     isExampleCollected,
+    isFlashcardCollected,
     createFlashcards,
     deleteFlashcards,
   };
