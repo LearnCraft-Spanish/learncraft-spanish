@@ -4,6 +4,8 @@ import type {
 } from '@learncraft-spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import z from 'zod';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
 import { useExampleFilterCoordinator } from '../coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
@@ -31,6 +33,32 @@ export const useExampleQuery = (
     setPage(page);
   }, []);
 
+  const seed: string | null = useMemo(() => {
+    if (
+      true ||
+      course ||
+      toLesson ||
+      fromLesson ||
+      skillTags?.length === 0 ||
+      filterState?.exampleFilters.includeSpanglish ||
+      filterState?.exampleFilters.audioOnly
+    ) {
+      const uuid = uuidv4();
+      const parsed = z.string().uuid().safeParse(uuid);
+      if (!parsed.success) {
+        throw new Error('Invalid UUID');
+      }
+      return uuid;
+    }
+  }, [
+    course,
+    toLesson,
+    fromLesson,
+    skillTags,
+    filterState?.exampleFilters.includeSpanglish,
+    filterState?.exampleFilters.audioOnly,
+  ]);
+
   const tagsToSearch: SkillTag[] = useMemo(() => {
     const tagKeys = filterState?.exampleFilters.skillTags;
     const tagsUnfiltered = tagKeys?.map((k) => {
@@ -50,7 +78,7 @@ export const useExampleQuery = (
       skillTags: tagsToSearch,
       page,
       limit: pageSize,
-      seed: filterState!.exampleFilters.filterUuid,
+      seed,
     });
     return { examples, totalCount };
   }, [
@@ -62,6 +90,7 @@ export const useExampleQuery = (
     exampleAdapter,
     page,
     pageSize,
+    seed,
   ]);
 
   const {
@@ -79,8 +108,7 @@ export const useExampleQuery = (
       filterState?.exampleFilters.includeSpanglish,
       filterState?.exampleFilters.audioOnly,
       filterState?.exampleFilters.skillTags,
-      filterState?.exampleFilters.filterUuid,
-      filtersChanging,
+      seed,
     ],
     queryFn: fetchFilteredExamples,
     enabled:

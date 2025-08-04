@@ -1,15 +1,32 @@
 // THIS WILL NOT LIVE IN THIS FOLDER. IT SHOULD BE LOCATED WITH EXAMPLE MANAGER, i think :)
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+} from '@learncraft-spanish/shared';
 
 import { useCallback, useState } from 'react';
 import ExampleListItemFactory from './ExampleListItemFactory';
+import BulkRemoveButton from './units/BulkRemoveButton';
 import MoreInfoButton from './units/MoreInfoButton';
-import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
+import MoreInfoViewExample from './units/MoreInfoViewExample';
 
 export default function ExampleListItem({
   example,
+  isCollected,
+  isPending,
+  handleRemoveSelected,
+  handleSelect,
+  isSelected,
 }: {
-  example: ExampleWithVocabulary;
+  example: Flashcard | ExampleWithVocabulary | null;
+  isCollected: boolean;
+  isPending: boolean;
+  handleAdd: () => void;
+  handleRemoveSelected: () => void;
+  handleSelect: () => void;
+  handleRemove: () => void;
+  bulkSelectMode: boolean;
+  isSelected?: boolean;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
 
@@ -17,23 +34,33 @@ export default function ExampleListItem({
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
 
+  if (!example) {
+    return null;
+  }
+
   return (
     <div className="exampleCardWithMoreInfo">
       <ExampleListItemFactory
         example={example}
+        preTextComponents={[]}
         postTextComponents={[
           <MoreInfoButton
             onClickFunction={onClickMoreInfo}
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
+          <BulkRemoveButton
+            id={example.id}
+            isCollected={isCollected}
+            handleSelect={handleSelect}
+            handleRemoveSelected={handleRemoveSelected}
+            isSelected={isSelected ?? false}
+            isPending={isPending}
+            key="bulkRemoveButton"
+          />,
         ]}
       />
-      <MoreInfoViewFlashcard
-        example={example}
-        isCustom={false} // ADD A REAL WAY TO CHECK THIS
-        isOpen={isMoreInfoOpen}
-      />
+      <MoreInfoViewExample example={example} isOpen={isMoreInfoOpen} />
     </div>
   );
 }

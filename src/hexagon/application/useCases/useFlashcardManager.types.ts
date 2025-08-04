@@ -1,0 +1,10 @@
+import type usePagination from '@application/units/Pagination/usePagination';
+import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
+import type { Flashcard } from '@learncraft-spanish/shared';
+
+export interface UseFlashcardManagerReturnType {
+  exampleFilter: UseExampleFilterReturnType;
+  allFlashcards: Flashcard[] | undefined;
+  paginationState: ReturnType<typeof usePagination>;
+  pageSize: number;
+}

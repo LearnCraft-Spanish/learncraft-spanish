@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
-    "@learncraft-spanish/shared": "^0.7.6",
+    "@learncraft-spanish/shared": "^0.7.8",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
     "@sentry/vite-plugin": "^3.2.1",
@@ -63,6 +63,7 @@
     "react-toastify": "^11.0.5",
     "rimraf": "^6.0.1",
     "typescript": "^5.7.3",
+    "uuid": "^11.1.0",
     "web-vitals": "^4.2.4",
     "zod": "^3.24.3"
   },

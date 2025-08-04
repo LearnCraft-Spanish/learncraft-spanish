@@ -1,5 +1,6 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
+import FlashcardManager from '@interface/pages/FlashcardManager';
 import FrequensayPage from '@interface/pages/FrequensayPage';
 import GetHelpPage from '@interface/pages/GetHelpPage';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
@@ -20,7 +21,6 @@ import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
-import FlashcardManager from '../sections/FlashcardManager';
 import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
