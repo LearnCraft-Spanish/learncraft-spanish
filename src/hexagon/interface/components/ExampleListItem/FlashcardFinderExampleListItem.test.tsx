@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { createMockFlashcard } from 'src/hexagon/testing/factories/flashcardFactory';
 import { vi } from 'vitest';
 import FlashcardFinderExampleListItem from './FlashcardFinderExampleListItem';
