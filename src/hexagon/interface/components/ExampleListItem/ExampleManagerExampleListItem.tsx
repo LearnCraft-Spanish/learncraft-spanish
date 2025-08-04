@@ -6,7 +6,6 @@ import type {
 
 import { useCallback, useState } from 'react';
 import ExampleListItemFactory from './ExampleListItemFactory';
-import AddPendingRemove from './units/AddPendingRemove';
 import BulkRemoveButton from './units/BulkRemoveButton';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewExample from './units/MoreInfoViewExample';
@@ -15,11 +14,8 @@ export default function ExampleListItem({
   example,
   isCollected,
   isPending,
-  handleAdd,
   handleRemoveSelected,
   handleSelect,
-  handleRemove,
-  bulkSelectMode,
   isSelected,
 }: {
   example: Flashcard | ExampleWithVocabulary | null;
@@ -46,31 +42,22 @@ export default function ExampleListItem({
     <div className="exampleCardWithMoreInfo">
       <ExampleListItemFactory
         example={example}
+        preTextComponents={[]}
         postTextComponents={[
           <MoreInfoButton
             onClickFunction={onClickMoreInfo}
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
-          bulkSelectMode ? (
-            <BulkRemoveButton
-              id={example.id}
-              isCollected={isCollected}
-              handleSelect={handleSelect}
-              handleRemoveSelected={handleRemoveSelected}
-              isSelected={isSelected ?? false}
-              isPending={isPending}
-            />
-          ) : (
-            <AddPendingRemove
-              id={example.id}
-              isCollected={isCollected}
-              isPending={isPending}
-              handleAdd={handleAdd}
-              handleRemove={handleRemove}
-              key="addPendingRemove"
-            />
-          ),
+          <BulkRemoveButton
+            id={example.id}
+            isCollected={isCollected}
+            handleSelect={handleSelect}
+            handleRemoveSelected={handleRemoveSelected}
+            isSelected={isSelected ?? false}
+            isPending={isPending}
+            key="bulkRemoveButton"
+          />,
         ]}
       />
       <MoreInfoViewExample example={example} isOpen={isMoreInfoOpen} />
