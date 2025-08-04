@@ -1,18 +1,10 @@
 import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
-import type { Flashcard } from '@learncraft-spanish/shared';
+import type { UseFlashcardManagerReturnType } from './useFlashcardManager.types';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
 import { useMemo } from 'react';
 import usePagination from '../units/Pagination/usePagination';
-
-export interface UseFlashcardManagerReturnType {
-  exampleFilter: UseExampleFilterReturnType;
-  allFlashcards: Flashcard[] | undefined;
-  paginationState: ReturnType<typeof usePagination>;
-  pageSize: number;
-}
-
 export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
   const pageSize = 25;
