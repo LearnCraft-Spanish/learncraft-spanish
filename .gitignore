@@ -18,7 +18,6 @@ buld/*
 
 
 # npm config
-.npmrc
 .npmrc.*
 pnpm-workspace.yaml
 
