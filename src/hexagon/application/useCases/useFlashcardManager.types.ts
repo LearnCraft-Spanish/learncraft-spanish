@@ -4,7 +4,7 @@ import type { Flashcard } from '@learncraft-spanish/shared';
 
 export interface UseFlashcardManagerReturnType {
   exampleFilter: UseExampleFilterReturnType;
-  allFlashcards: Flashcard[] | undefined;
+  filteredFlashcards: Flashcard[];
   paginationState: ReturnType<typeof usePagination>;
   pageSize: number;
 }
