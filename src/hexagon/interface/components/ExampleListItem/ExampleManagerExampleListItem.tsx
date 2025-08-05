@@ -4,7 +4,7 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 import ExampleListItemFactory from './ExampleListItemFactory';
 import BulkRemoveButton from './units/BulkRemoveButton';
 import MoreInfoButton from './units/MoreInfoButton';
@@ -30,10 +30,6 @@ export default function ExampleListItem({
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
 
-  const onClickMoreInfo = useCallback(() => {
-    setIsMoreInfoOpen(!isMoreInfoOpen);
-  }, [isMoreInfoOpen]);
-
   if (!example) {
     return null;
   }
@@ -42,10 +38,9 @@ export default function ExampleListItem({
     <div className="exampleCardWithMoreInfo">
       <ExampleListItemFactory
         example={example}
-        preTextComponents={[]}
         postTextComponents={[
           <MoreInfoButton
-            onClickFunction={onClickMoreInfo}
+            onClickFunction={() => setIsMoreInfoOpen(!isMoreInfoOpen)}
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
