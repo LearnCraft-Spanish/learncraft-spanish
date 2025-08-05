@@ -1,5 +1,8 @@
 import type { CoursePort } from '../ports/coursePort';
-import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
+import {
+  createMockLessonWithVocab,
+  createRealisticCourseWithLessonsList,
+} from '@testing/factories/courseFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockAdapter: CoursePort = {
@@ -7,6 +10,7 @@ const defaultMockAdapter: CoursePort = {
     return Promise.resolve(createRealisticCourseWithLessonsList());
   },
   getLessonsByVocabulary: () => Promise.resolve([]),
+  getLessonWithVocabulary: () => Promise.resolve(createMockLessonWithVocab()),
 };
 
 export const {
