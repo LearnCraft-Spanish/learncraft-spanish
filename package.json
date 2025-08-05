@@ -17,7 +17,7 @@
     "install:local": "rm -rf lockfiles/local && pnpm install --no-frozen-lockfile --lockfile-dir=lockfiles/local",
     "install:ci": "pnpm install --frozen-lockfile --ignore-workspace --lockfile-dir=lockfiles/ci",
     "install:ci:regenerate": "rm -rf lockfiles/ci && pnpm install --ignore-workspace --lockfile-dir=lockfiles/ci",
-    "preinstall": "echo '//npm.pkg.github.com/:_authToken=${GH_PACKAGE_KEY}' > .npmrc && echo '@learncraft-spanish:registry=https://npm.pkg.github.com' >> .npmrc && echo 'package-manager=pnpm' >> .npmrc && echo 'engine-strict=true' >> .npmrc && echo 'test' >> .nomrc",
+    "preinstall": "echo '//npm.pkg.github.com/:_authToken=${GH_PACKAGE_KEY}' > .npmrc && echo '@learncraft-spanish:registry=https://npm.pkg.github.com' >> .npmrc && echo 'package-manager=pnpm' >> .npmrc && echo 'engine-strict=true' >> .npmrc",
     "build": "vite build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

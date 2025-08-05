@@ -12,14 +12,16 @@ import usePagination from '@application/units/Pagination/usePagination';
 import useExampleFilter from '@application/units/useExampleFilter';
 import { filterExamplesCombined } from '@learncraft-spanish/shared';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
   const { courseAndLessonState, filterState: coordinatorFilterState } =
     exampleFilter;
-  const exampleFilters = coordinatorFilterState.filterState.exampleFilters;
+  const { exampleFilters } = coordinatorFilterState.filterState;
   const pageSize = 25;
+
+  const [filtersEnabled, setFiltersEnabled] = useState(false);
 
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
@@ -55,6 +57,10 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   }, [flashcardsQuery.flashcards]);
 
   const filteredFlashcards = useMemo(() => {
+    if (!filtersEnabled) {
+      return flashcardsQuery.flashcards ?? [];
+    }
+
     const filteredExamples: ExampleWithVocabulary[] = filterExamplesCombined({
       examples: ownedExamples,
       vocabAllowedIds: toLessonVocabIds,
@@ -74,6 +80,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     toLessonVocabIds,
     exampleFilters,
     flashcardsQuery.flashcards,
+    filtersEnabled,
   ]);
 
   const displayOrder = useMemo(() => {
@@ -96,5 +103,8 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     filteredFlashcards,
     paginationState,
     pageSize,
+
+    filtersEnabled,
+    toggleFilters: () => setFiltersEnabled(!filtersEnabled),
   };
 }

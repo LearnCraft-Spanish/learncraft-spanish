@@ -7,4 +7,7 @@ export interface UseFlashcardManagerReturnType {
   filteredFlashcards: Flashcard[];
   paginationState: ReturnType<typeof usePagination>;
   pageSize: number;
+
+  filtersEnabled: boolean;
+  toggleFilters: () => void;
 }
