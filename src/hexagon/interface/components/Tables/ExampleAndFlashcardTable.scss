@@ -1,12 +1,35 @@
-.buttonBox.bulkAddModeButtons {
-  width: calc(50% - 30px);
+#bulkAddModeButtons {
   margin-left: auto;
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  justify-content: flex-end;
+  height: 100%;
+  align-items: center;
+
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  button {
+    margin: 4px;
+    padding: 2px 8px;
+  }
+
+  .bulkAddFlashcardsButton,
+  .clearSelectionButton {
+    font-size: 0.75rem;
+    // border: 2px solid var(--theme);
+    // background-color: var(--light);
+    border-radius: 4px;
+    height: 85%;
+
+    &:hover {
+      background-color: var(--accent);
+    }
+  }
 
   .bulkAddFlashcardsButton {
-    background-color: darkgreen;
+    background-color: darkred;
 
     &:disabled {
       background-color: var(--dark);
@@ -14,10 +37,95 @@
   }
 
   .clearSelectionButton {
-    background-color: darkred;
+    border: 2px solid var(--accent);
+    background-color: var(--light);
+    color: var(--dark);
 
     &:disabled {
       background-color: var(--dark);
     }
+
+    &:hover {
+      color: var(--light);
+    }
   }
+
+  .tableOptionsWrapper {
+    position: relative;
+  }
+
+  .tableOptionsButton {
+    background-color: transparent;
+    margin: 0;
+    border: none;
+    padding: 0;
+    max-width: 48px;
+    margin-left: 8px;
+    margin-right: 8px;
+
+    img {
+      width: 48px;
+    }
+
+    transition: transform 0.1s ease-in-out;
+    &:hover {
+      transform: scale(1.15);
+    }
+  }
+
+  .tableOptions {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background-color: var(--light);
+    max-width: 50vw;
+    // dont text wrap
+    white-space: nowrap;
+    // grow to fit the content
+    display: inline-block;
+    padding: 4px;
+    border: 1px solid var(--theme);
+
+    button {
+      color: var(--dark);
+      padding: 4px;
+      margin: 0;
+      border: none;
+      background-color: transparent;
+      cursor: pointer;
+      text-align: left;
+      display: block;
+
+      p {
+        margin: 0;
+        padding: 0;
+        text-align: left;
+        cursor: pointer;
+      }
+    }
+
+    button:not(:first-child) {
+      border-top: 1px solid var(--theme);
+      padding-top: 4px;
+      margin-top: 4px;
+    }
+
+    button:hover {
+      background-color: var(--accent);
+    }
+  }
+}
+
+.examplesTable .displayExamplesDescription {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.examplesTable {
+  position: relative;
+  overflow: visible;
 }

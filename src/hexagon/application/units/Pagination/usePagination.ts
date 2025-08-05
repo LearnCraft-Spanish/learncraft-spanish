@@ -1,6 +1,6 @@
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function usePagination({
   itemsPerPage = 50,
@@ -16,6 +16,16 @@ export default function usePagination({
     (page - 1) * itemsPerPage,
     page * itemsPerPage,
   );
+
+  const firstItemInPage = useMemo(() => {
+    if (page === 1 && displayOrder.length > 0) {
+      return 1;
+    } else if (displayOrder.length === 0) {
+      return 0;
+    } else {
+      return (page - 1) * itemsPerPage + 1;
+    }
+  }, [page, itemsPerPage, displayOrder]);
 
   return {
     displayOrderSegment,
@@ -35,5 +45,6 @@ export default function usePagination({
     },
     setPage,
     pageSize: itemsPerPage,
+    firstItemInPage,
   };
 }
