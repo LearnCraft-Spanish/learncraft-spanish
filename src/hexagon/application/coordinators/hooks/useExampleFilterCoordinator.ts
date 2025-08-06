@@ -52,10 +52,7 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
 
   const addSkillTagToFilters = useCallback(
     (tagKey: string) => {
-      if (!filtersChanging) {
-        return;
-      }
-      if (exampleFilters.skillTags.includes(tagKey)) {
+      if (exampleFilters.skillTagKeys.includes(tagKey)) {
         return;
       }
       updateExampleFilters({
