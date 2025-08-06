@@ -33,6 +33,7 @@ export default function FlashcardFinderFilter({
     tagSuggestions,
     updateTagSearchTerm,
     removeTagFromSuggestions,
+    addTagBackToSuggestions,
   } = skillTagSearch;
 
   const { includeSpanglish, audioOnly, skillTags, toLessonNumber } =
@@ -108,7 +109,10 @@ export default function FlashcardFinderFilter({
                 removeTagFromSuggestions={removeTagFromSuggestions}
               />
               <SelectedTags
-                removeTag={removeSkillTagFromFilters}
+                removeTag={(tagId) => {
+                  removeSkillTagFromFilters(tagId);
+                  addTagBackToSuggestions(tagId);
+                }}
                 skillTags={skillTags}
               />
             </div>
