@@ -10,6 +10,7 @@ export interface QueryPaginationState {
   maxPageName: string;
   nextPage: () => void;
   previousPage: () => void;
+  resetPagination: () => void;
 }
 export default function useQueryPagination({
   queryPage,
@@ -30,6 +31,7 @@ export default function useQueryPagination({
     : 0;
 
   const pagesPerQuery = Math.ceil(queryPageSize / pageSize);
+
   const pageWithinQueryBatch = page % pagesPerQuery;
 
   const maxPageName: string =
@@ -51,6 +53,11 @@ export default function useQueryPagination({
     changeQueryPage(Math.ceil((page - 1) / pagesPerQuery));
   }, [page, changeQueryPage, pagesPerQuery]);
 
+  const resetPagination = useCallback(() => {
+    setPage(1);
+    changeQueryPage(1);
+  }, [changeQueryPage]);
+
   return {
     page,
     queryPage,
@@ -61,5 +68,6 @@ export default function useQueryPagination({
     maxPageName,
     nextPage,
     previousPage,
+    resetPagination,
   };
 }

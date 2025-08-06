@@ -5,7 +5,7 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/doma
 import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useExampleQuery } from '../queries/useExampleQuery';
 import useQueryPagination from '../units/Pagination/useQueryPagination';
 
@@ -24,7 +24,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const [filtersChanging, setFiltersChanging] = useState(false);
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
 
-  const QUERY_PAGE_SIZE = 100;
+  const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
 
   const {
@@ -55,21 +55,28 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     : null;
 
   // Enable prefetching when we're near the end of a query page batch
-  // This happens on the last two pages of each query batch to ensure smooth pagination
+  // This happens on the last page of each query batch to ensure smooth pagination
   useEffect(() => {
     const isNearEndOfQueryBatch =
-      pagination.pageWithinQueryBatch === 0 ||
       pagination.pageWithinQueryBatch === pagination.pagesPerQuery - 1;
-
     exampleQuery.setCanPrefetch(isNearEndOfQueryBatch);
   }, [pagination.pageWithinQueryBatch, pagination.pagesPerQuery, exampleQuery]);
 
-  const displayExamples = exampleQuery.filteredExamples
-    ? exampleQuery.filteredExamples.slice(
-        pagination.pageSize * (pagination.page - 1),
-        pagination.pageSize * pagination.page,
-      )
-    : [];
+  const startIndex = pagination.pageWithinQueryBatch * pagination.pageSize;
+  const endIndex = startIndex + pagination.pageSize;
+  const displayExamples = useMemo(
+    () =>
+      exampleQuery.filteredExamples
+        ? exampleQuery.filteredExamples.slice(startIndex, endIndex)
+        : [],
+    [exampleQuery.filteredExamples, startIndex, endIndex],
+  );
+
+  useEffect(() => {
+    if (filtersChanging) {
+      pagination.resetPagination();
+    }
+  }, [filtersChanging, pagination]);
 
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
