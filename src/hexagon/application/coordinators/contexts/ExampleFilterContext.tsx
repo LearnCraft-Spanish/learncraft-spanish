@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
 interface ExampleFilterStateWithoutCourseAndLesson {
-  includeSpanglish: boolean;
+  excludeSpanglish: boolean;
   audioOnly: boolean;
   skillTagKeys: string[];
 }
@@ -15,7 +15,7 @@ interface ExampleFilterContextType {
 
 export const ExampleFilterContext = createContext<ExampleFilterContextType>({
   exampleFilters: {
-    includeSpanglish: false,
+    excludeSpanglish: false,
     audioOnly: false,
     skillTagKeys: [],
   },

@@ -67,7 +67,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
         vocabAllowed: toLessonVocabIds,
         vocabRequired: fromLessonVocabIds,
         vocabKnown: fromLessonVocabIds,
-        includeSpanglish: filterState.includeSpanglish,
+        excludeSpanglish: filterState.excludeSpanglish,
         audioOnly: filterState.audioOnly,
         skillTags: filterState.skillTags,
       },

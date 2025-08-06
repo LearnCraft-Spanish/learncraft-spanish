@@ -18,13 +18,12 @@ export function createExampleInfrastructure(
       courseId: number;
       toLessonNumber: number;
       fromLessonNumber?: number;
-      includeSpanglish?: boolean;
+      excludeSpanglish?: boolean;
       audioOnly?: boolean;
       skillTags?: SkillTag[];
-
       page: number;
       limit: number;
-      seed?: string;
+      seed: string;
     }) => {
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
@@ -36,7 +35,7 @@ export function createExampleInfrastructure(
           courseId: params.courseId,
           toLessonNumber: params.toLessonNumber,
           fromLessonNumber: params.fromLessonNumber,
-          includeSpanglish: params.includeSpanglish,
+          excludeSpanglish: params.excludeSpanglish,
           audioOnly: params.audioOnly,
           skillTags: params.skillTags,
         },

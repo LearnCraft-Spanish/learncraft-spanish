@@ -12,7 +12,7 @@ export function ExampleFilterContextProvider({
 }) {
   const [exampleFilters, setExampleFilters] =
     useState<ExampleFilterStateWithoutCourseAndLesson>({
-      includeSpanglish: false,
+      excludeSpanglish: false,
       audioOnly: false,
       skillTagKeys: [],
     });

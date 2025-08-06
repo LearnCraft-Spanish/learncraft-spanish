@@ -3,7 +3,7 @@ import type { UseExampleFilterReturnType } from '@application/units/useExampleFi
 import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useExampleQuery } from '../queries/useExampleQuery';
 
 export interface UseFlashcardFinderReturnType {
@@ -14,36 +14,36 @@ export interface UseFlashcardFinderReturnType {
   pageSize: number;
   filtersChanging: boolean;
   setFiltersChanging: (filtersChanging: boolean) => void;
+  currentDisplayPage: number;
+  setCurrentDisplayPage: (currentDisplayPage: number) => void;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const [filtersChanging, setFiltersChanging] = useState(false);
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
-  const queryPageSize = 1000; // BAD HACK. skipping pagination for now, we'll fix this later
+  const queryPageSize = 100;
   const pageSize = 25;
-  const {
-    filteredExamples,
-    isLoading,
-    error,
-    totalCount,
-    page,
-    changeQueryPage,
-  } = useExampleQuery(queryPageSize);
 
-  // const [currentDisplayPage, setCurrentDisplayPage] = useState(1);
+  // Calculate how many display pages fit into one query page
+  const DISPLAY_PAGES_PER_QUERY = queryPageSize / pageSize; // 4 display pages per query
+  const exampleQuery = useExampleQuery(queryPageSize);
 
-  const totalPages = totalCount ? Math.ceil(totalCount / pageSize) : null;
+  const [currentDisplayPage, setCurrentDisplayPage] = useState(1);
 
-  const exampleQuery: UseExampleQueryReturnType = {
-    // filteredExamples: getExamplesForCurrentPage,
-    filteredExamples: filteredExamples ?? [], // fix this
-    isLoading,
-    error,
-    totalCount,
-    page,
-    pageSize,
-    changeQueryPage,
-  };
+  const totalPages = exampleQuery.totalCount
+    ? Math.ceil(exampleQuery.totalCount / pageSize)
+    : null;
+
+  // Enable prefetching when we're near the end of a query page batch
+  // This happens on the last two pages of each query batch to ensure smooth pagination
+  useEffect(() => {
+    const pageWithinQueryBatch = currentDisplayPage % DISPLAY_PAGES_PER_QUERY;
+    const isNearEndOfQueryBatch =
+      pageWithinQueryBatch === 0 ||
+      pageWithinQueryBatch === DISPLAY_PAGES_PER_QUERY - 1;
+
+    exampleQuery.setCanPrefetch(isNearEndOfQueryBatch);
+  }, [currentDisplayPage, DISPLAY_PAGES_PER_QUERY, exampleQuery]);
 
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
@@ -56,5 +56,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     pageSize,
     filtersChanging,
     setFiltersChanging,
+    currentDisplayPage,
+    setCurrentDisplayPage,
   };
 }

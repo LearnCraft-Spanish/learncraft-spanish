@@ -22,7 +22,7 @@ export default function FlashcardFinderFilter({
 }) {
   const {
     filterState,
-    updateIncludeSpanglish,
+    updateExcludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
@@ -36,7 +36,7 @@ export default function FlashcardFinderFilter({
     addTagBackToSuggestions,
   } = skillTagSearch;
 
-  const { includeSpanglish, audioOnly, skillTags, toLessonNumber } =
+  const { excludeSpanglish, audioOnly, skillTags, toLessonNumber } =
     filterState;
 
   /**
@@ -54,7 +54,7 @@ export default function FlashcardFinderFilter({
             ? [
                 <ReadOnlyFilters
                   key="readOnlyFilters"
-                  includeSpanglish={includeSpanglish ?? true}
+                  excludeSpanglish={excludeSpanglish ?? false}
                   audioOnly={audioOnly ?? false}
                   skillTags={skillTags}
                 />,
@@ -85,10 +85,10 @@ export default function FlashcardFinderFilter({
             <ToggleSwitch
               id="removeSpanglish"
               ariaLabel="noSpanglish"
-              label="Include Spanglish: "
-              checked={includeSpanglish ?? true}
+              label="Exclude Spanglish: "
+              checked={excludeSpanglish ?? false}
               onChange={() =>
-                updateIncludeSpanglish(!filterState.includeSpanglish)
+                updateExcludeSpanglish(!filterState.excludeSpanglish)
               }
             />
             <ToggleSwitch

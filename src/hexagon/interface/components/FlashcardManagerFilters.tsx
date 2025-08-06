@@ -23,7 +23,7 @@ export default function FlashcardManagerFilters({
   const {
     filterState,
 
-    updateIncludeSpanglish,
+    updateExcludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
@@ -37,7 +37,7 @@ export default function FlashcardManagerFilters({
     addTagBackToSuggestions,
   } = skillTagSearch;
 
-  const { includeSpanglish, audioOnly, skillTags } = filterState;
+  const { excludeSpanglish, audioOnly, skillTags } = filterState;
 
   /**
    * TODO: We need an inert (non-interactive) view of the filter state.
@@ -63,10 +63,10 @@ export default function FlashcardManagerFilters({
             <ToggleSwitch
               id="removeSpanglish"
               ariaLabel="noSpanglish"
-              label="Include Spanglish: "
-              checked={includeSpanglish ?? true}
+              label="Exclude Spanglish: "
+              checked={excludeSpanglish ?? false}
               onChange={() =>
-                updateIncludeSpanglish(!filterState.includeSpanglish)
+                updateExcludeSpanglish(!filterState.excludeSpanglish)
               }
             />
             <ToggleSwitch

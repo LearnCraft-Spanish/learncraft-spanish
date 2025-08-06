@@ -1,11 +1,12 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
 import { useExampleFilterCoordinator } from '../coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
+import { queryDefaults } from '../utils/queryUtils';
 
 export interface UseExampleQueryReturnType {
   isLoading: boolean;
@@ -15,14 +16,17 @@ export interface UseExampleQueryReturnType {
   page: number;
   pageSize: number;
   changeQueryPage: (page: number) => void;
+  setCanPrefetch: (canPrefetch: boolean) => void;
 }
 export const useExampleQuery = (
   pageSize: number,
 ): UseExampleQueryReturnType => {
+  const queryClient = useQueryClient();
   const { filterState } = useExampleFilterCoordinator();
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
   const exampleAdapter = useExampleAdapter();
   const [page, setPage] = useState(1);
+  const [canPrefetch, setCanPrefetch] = useState(false);
 
   const changePage = useCallback((page: number) => {
     setPage(page);
@@ -30,12 +34,11 @@ export const useExampleQuery = (
 
   const seed: string | null = useMemo(() => {
     if (
-      true ||
-      course ||
-      toLesson ||
-      fromLesson ||
-      filterState?.includeSpanglish ||
-      filterState?.audioOnly
+      (!!course && !!toLesson) ||
+      !!fromLesson ||
+      !!filterState.skillTags ||
+      !filterState.excludeSpanglish ||
+      !!filterState.audioOnly
     ) {
       const uuid = uuidv4();
       const parsed = z.string().uuid().safeParse(uuid);
@@ -44,12 +47,14 @@ export const useExampleQuery = (
       }
       return uuid;
     }
+    return null;
   }, [
     course,
     toLesson,
     fromLesson,
-    filterState?.includeSpanglish,
-    filterState?.audioOnly,
+    filterState.skillTags,
+    filterState.excludeSpanglish,
+    filterState.audioOnly,
   ]);
 
   const fetchFilteredExamples = useCallback(async () => {
@@ -57,12 +62,12 @@ export const useExampleQuery = (
       courseId: course!.id,
       toLessonNumber: toLesson!.lessonNumber,
       fromLessonNumber: fromLesson?.lessonNumber,
-      includeSpanglish: filterState!.includeSpanglish,
+      excludeSpanglish: filterState!.excludeSpanglish,
       audioOnly: filterState!.audioOnly,
       skillTags: filterState!.skillTags,
       page,
       limit: pageSize,
-      seed,
+      seed: seed!,
     });
     return { examples, totalCount };
   }, [
@@ -86,16 +91,66 @@ export const useExampleQuery = (
       page,
       pageSize,
       course?.id,
-      toLesson?.id,
-      fromLesson?.id,
-      filterState?.includeSpanglish,
+      toLesson?.lessonNumber,
+      fromLesson?.lessonNumber,
+      filterState?.excludeSpanglish,
       filterState?.audioOnly,
       filterState?.skillTags,
       seed,
     ],
     queryFn: fetchFilteredExamples,
-    enabled: !!filterState && !!course && !!toLesson,
+    enabled: !!filterState && !!course && !!toLesson && !!seed,
   });
+
+  const shouldPrefetch = useMemo(() => {
+    const index = pageSize * page;
+    const totalCount = fullResponse?.totalCount ?? null;
+    if (totalCount === null) {
+      return false;
+    }
+    return index < totalCount;
+  }, [page, pageSize, fullResponse?.totalCount]);
+
+  useMemo(() => {
+    if (
+      shouldPrefetch &&
+      canPrefetch &&
+      !!filterState &&
+      !!course &&
+      !!toLesson &&
+      !!fromLesson
+    ) {
+      queryClient.prefetchQuery({
+        queryKey: [
+          'filteredExamples',
+          page + 1,
+          pageSize,
+          course?.id,
+          toLesson?.lessonNumber,
+          fromLesson?.lessonNumber,
+          filterState?.excludeSpanglish,
+          filterState?.audioOnly,
+          filterState?.skillTags,
+          seed,
+        ],
+        queryFn: fetchFilteredExamples,
+        ...queryDefaults.entityData,
+        staleTime: 15 * 60 * 1000, // 2 minutes cache
+      });
+    }
+  }, [
+    shouldPrefetch,
+    canPrefetch,
+    page,
+    pageSize,
+    course,
+    toLesson,
+    fromLesson,
+    filterState,
+    fetchFilteredExamples,
+    queryClient,
+    seed,
+  ]);
 
   return {
     isLoading,
@@ -105,5 +160,6 @@ export const useExampleQuery = (
     page,
     pageSize,
     changeQueryPage: changePage,
+    setCanPrefetch,
   };
 };
