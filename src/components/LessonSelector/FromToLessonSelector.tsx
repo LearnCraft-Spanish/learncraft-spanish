@@ -46,7 +46,7 @@ export default function FromToLessonSelector(): React.JSX.Element {
       const lessonNumber = lesson.lessonNumber;
       if (lessonNumber && (!toLessonNumber || lessonNumber <= toLessonNumber)) {
         lessonSelector.push(
-          <option key={lesson.id} value={lesson.id}>
+          <option key={lesson.lessonNumber} value={lesson.lessonNumber}>
             {`Lesson ${lessonNumber}`}
           </option>,
         );
@@ -66,7 +66,7 @@ export default function FromToLessonSelector(): React.JSX.Element {
         (!fromLessonNumber || lessonNumber >= fromLessonNumber)
       ) {
         lessonSelector.push(
-          <option key={lesson.id} value={lesson.id}>
+          <option key={lesson.lessonNumber} value={lesson.lessonNumber}>
             {`Lesson ${lessonNumber}`}
           </option>,
         );

@@ -64,9 +64,8 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     const filteredExamples: ExampleWithVocabulary[] = filterExamplesCombined(
       ownedExamples,
       {
-        vocabAllowed: toLessonVocabIds,
-        vocabRequired: fromLessonVocabIds,
-        vocabKnown: fromLessonVocabIds,
+        allowedVocabulary: toLessonVocabIds,
+        requiredVocabulary: fromLessonVocabIds,
         excludeSpanglish: filterState.excludeSpanglish,
         audioOnly: filterState.audioOnly,
         skillTags: filterState.skillTags,
