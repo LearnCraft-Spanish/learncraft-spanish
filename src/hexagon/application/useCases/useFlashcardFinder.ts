@@ -1,28 +1,31 @@
 import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
+import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
 import { useCallback, useEffect, useState } from 'react';
 import { useExampleQuery } from '../queries/useExampleQuery';
+import useQueryPagination from '../units/Pagination/useQueryPagination';
 
 export interface UseFlashcardFinderReturnType {
+  pagination: QueryPaginationState;
   exampleFilter: UseExampleFilterReturnType;
   exampleQuery: UseExampleQueryReturnType;
+  displayExamples: ExampleWithVocabulary[];
   flashcardsQuery: UseStudentFlashcardsReturnType;
   totalPages: number | null;
-  pageSize: number;
   filtersChanging: boolean;
   setFiltersChanging: (filtersChanging: boolean) => void;
-  currentDisplayPage: number;
-  setCurrentDisplayPage: (currentDisplayPage: number) => void;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const [filtersChanging, setFiltersChanging] = useState(false);
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
-  const queryPageSize = 100;
-  const pageSize = 25;
+
+  const QUERY_PAGE_SIZE = 100;
+  const PAGE_SIZE = 25;
 
   const {
     updateAudioOnly: updateAudioOnlyFunction,
@@ -31,31 +34,42 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     removeSkillTagFromFilters: removeSkillTagFromFiltersFunction,
   } = exampleFilter.filterState;
 
+  const exampleQuery = useExampleQuery(QUERY_PAGE_SIZE, filtersChanging);
+
+  const pagination: QueryPaginationState = useQueryPagination({
+    queryPage: exampleQuery.page,
+    pageSize: PAGE_SIZE,
+    queryPageSize: QUERY_PAGE_SIZE,
+    totalCount: exampleQuery.totalCount ?? undefined,
+    changeQueryPage: exampleQuery.changeQueryPage,
+  });
+
   const {
     updateFromLessonNumber: updateFromLessonNumberFunction,
     updateToLessonNumber: updateToLessonNumberFunction,
     updateUserSelectedCourseId: updateUserSelectedCourseIdFunction,
   } = exampleFilter.courseAndLessonState;
-  // Calculate how many display pages fit into one query page
-  const DISPLAY_PAGES_PER_QUERY = queryPageSize / pageSize; // 4 display pages per query
-  const exampleQuery = useExampleQuery(queryPageSize, filtersChanging);
-
-  const [currentDisplayPage, setCurrentDisplayPage] = useState(1);
 
   const totalPages = exampleQuery.totalCount
-    ? Math.ceil(exampleQuery.totalCount / pageSize)
+    ? Math.ceil(exampleQuery.totalCount / PAGE_SIZE)
     : null;
 
   // Enable prefetching when we're near the end of a query page batch
   // This happens on the last two pages of each query batch to ensure smooth pagination
   useEffect(() => {
-    const pageWithinQueryBatch = currentDisplayPage % DISPLAY_PAGES_PER_QUERY;
     const isNearEndOfQueryBatch =
-      pageWithinQueryBatch === 0 ||
-      pageWithinQueryBatch === DISPLAY_PAGES_PER_QUERY - 1;
+      pagination.pageWithinQueryBatch === 0 ||
+      pagination.pageWithinQueryBatch === pagination.pagesPerQuery - 1;
 
     exampleQuery.setCanPrefetch(isNearEndOfQueryBatch);
-  }, [currentDisplayPage, DISPLAY_PAGES_PER_QUERY, exampleQuery]);
+  }, [pagination.pageWithinQueryBatch, pagination.pagesPerQuery, exampleQuery]);
+
+  const displayExamples = exampleQuery.filteredExamples
+    ? exampleQuery.filteredExamples.slice(
+        pagination.pageSize * (pagination.page - 1),
+        pagination.pageSize * pagination.page,
+      )
+    : [];
 
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
@@ -127,7 +141,10 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   );
 
   return {
+    pagination,
     exampleFilter: {
+      initialLoading: exampleFilter.initialLoading,
+      skillTagSearch: exampleFilter.skillTagSearch,
       courseAndLessonState: {
         ...exampleFilter.courseAndLessonState,
         updateFromLessonNumber,
@@ -136,21 +153,17 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
       },
       filterState: {
         ...exampleFilter.filterState,
-        updateExcludeSpanglish,
         updateAudioOnly,
+        updateExcludeSpanglish,
         addSkillTagToFilters,
         removeSkillTagFromFilters,
       },
-      skillTagSearch: exampleFilter.skillTagSearch,
-      initialLoading: exampleFilter.initialLoading,
     },
     exampleQuery,
+    displayExamples,
     flashcardsQuery,
     totalPages,
-    pageSize,
     filtersChanging,
     setFiltersChanging,
-    currentDisplayPage,
-    setCurrentDisplayPage,
   };
 }

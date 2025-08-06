@@ -1,13 +1,15 @@
 import Loading from 'src/components/Loading/Loading';
 import useFlashcardFinder from 'src/hexagon/application/useCases/useFlashcardFinder';
 import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
-import FlashcardFinderResults from '../components/FlashcardFinder/FlashcardFinderResults';
+import ExampleTable from '../components/Tables/ExampleTable';
 
 export default function FlashcardFinder() {
   const {
     exampleFilter,
     exampleQuery,
-    pageSize,
+    displayExamples,
+    flashcardsQuery,
+    pagination,
     filtersChanging,
     setFiltersChanging,
   } = useFlashcardFinder();
@@ -27,10 +29,11 @@ export default function FlashcardFinder() {
         setFiltersChanging={setFiltersChanging}
       />
       {!filtersChanging ? (
-        <FlashcardFinderResults
-          filteredFlashcards={exampleQuery.filteredExamples || []}
-          totalCount={exampleQuery.totalCount || 0}
-          pageSize={pageSize}
+        <ExampleTable
+          examples={displayExamples}
+          totalCount={exampleQuery.totalCount ?? 0}
+          studentFlashcards={flashcardsQuery}
+          paginationState={pagination}
           fetchingExamples={exampleQuery.isLoading}
         />
       ) : (

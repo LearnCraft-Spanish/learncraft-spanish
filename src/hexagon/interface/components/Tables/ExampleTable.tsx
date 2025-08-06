@@ -1,53 +1,33 @@
+import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
+
+import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-
-import type { DisplayOrder } from 'src/types/interfaceDefinitions';
-import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
-import usePagination from '@application/units/Pagination/usePagination';
-
-import { useCallback, useEffect } from 'react';
-
 import Loading from 'src/components/Loading/Loading';
+
 import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import { Pagination } from '../general';
-import {
-  copyTableToClipboard,
-  getExampleOrFlashcardById,
-} from './units/functions';
+import { copyTableToClipboard } from './units/functions';
 
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
 
 interface ExamplesTableProps {
-  pageSize?: number;
+  examples: ExampleWithVocabulary[];
   totalCount: number;
-  dataSource: ExampleWithVocabulary[];
-  displayOrder: DisplayOrder[];
-
+  studentFlashcards: UseStudentFlashcardsReturnType;
+  paginationState: QueryPaginationState;
   fetchingExamples: boolean;
 }
 
 export default function ExamplesTable({
-  pageSize = 50,
+  examples,
   totalCount,
-  dataSource,
-  displayOrder,
-
+  studentFlashcards,
+  paginationState,
   fetchingExamples,
 }: ExamplesTableProps) {
-  const {
-    displayOrderSegment,
-    page,
-    maxPage,
-    nextPage,
-    previousPage,
-    setPage,
-  } = usePagination({ displayOrder, itemsPerPage: pageSize });
-
-  // const maxPage = Math.ceil(totalCount / pageSize); // BAD HACK. skipping pagination for now, we'll fix this later
-
-  const { isExampleCollected, createFlashcards, deleteFlashcards } =
-    useStudentFlashcards();
+  const { page, maxPageNumber, nextPage, previousPage } = paginationState;
 
   const {
     bulkSelectMode,
@@ -59,25 +39,13 @@ export default function ExamplesTable({
     toggleBulkSelectMode,
     triggerBulkOperation,
   } = useBulkSelect(async () => {
-    await createFlashcards(bulkSelectIds);
+    await studentFlashcards.createFlashcards(bulkSelectIds);
   });
-
-  const getExampleById = useCallback(
-    (recordId: number) => {
-      return getExampleOrFlashcardById(dataSource, recordId);
-    },
-    [dataSource],
-  );
-
-  useEffect(() => {
-    if (maxPage === 1) {
-      setPage(1);
-    }
-  }, [displayOrder, maxPage, setPage]);
 
   if (fetchingExamples) {
     return <Loading message="Fetching Flashcards" />;
   }
+
   return (
     <div className="examplesTable">
       <div className="buttonBox bulkAddModeButtons">
@@ -117,8 +85,11 @@ export default function ExamplesTable({
           type="button"
           onClick={() =>
             copyTableToClipboard({
-              displayOrder,
-              getExampleOrFlashcardById: getExampleById,
+              displayOrder: examples.map((example) => ({
+                recordId: example.id,
+              })),
+              getExampleOrFlashcardById: (id: number) =>
+                examples.find((example) => example.id === id) ?? null,
             })
           }
         >
@@ -126,45 +97,44 @@ export default function ExamplesTable({
         </button>
         <div className="displayExamplesDescription">
           <h4>{`${totalCount} flashcards found (showing ${
-            (page - 1) * pageSize + 1
-          }-${Math.min(page * pageSize, totalCount)})`}</h4>
+            (page - 1) * paginationState.pageSize + 1
+          }-${Math.min(paginationState.pageSize * page, totalCount)})`}</h4>
         </div>
       </div>
       <Pagination
         page={page}
-        maxPage={maxPage}
+        maxPage={maxPageNumber}
         nextPage={nextPage}
         previousPage={previousPage}
       />
       <div id="examplesTableBody">
-        {displayOrderSegment.map((displayOrder: DisplayOrder) => {
+        {examples.map((example: ExampleWithVocabulary) => {
           return (
             <ExampleListItem
-              key={displayOrder.recordId}
-              example={getExampleById(displayOrder.recordId)}
-              isCollected={isExampleCollected(displayOrder.recordId)}
+              key={example.id}
+              example={example}
+              isCollected={studentFlashcards.isExampleCollected(example.id)}
               isPending={
-                bulkOperationInProgress &&
-                bulkSelectIds.includes(displayOrder.recordId)
+                bulkOperationInProgress && bulkSelectIds.includes(example.id)
               }
               handleAdd={() => {
                 if (bulkSelectMode) {
-                  addToBulkSelect(displayOrder.recordId);
+                  addToBulkSelect(example.id);
                 } else {
-                  createFlashcards([displayOrder.recordId]);
+                  studentFlashcards.createFlashcards([example.id]);
                 }
               }}
               handleRemove={() => {
-                deleteFlashcards([displayOrder.recordId]);
+                studentFlashcards.deleteFlashcards([example.id]);
               }}
               handleRemoveSelected={() => {
-                removeFromBulkSelect(displayOrder.recordId);
+                removeFromBulkSelect(example.id);
               }}
               handleSelect={() => {
-                addToBulkSelect(displayOrder.recordId);
+                addToBulkSelect(example.id);
               }}
               bulkSelectMode={bulkSelectMode}
-              isSelected={bulkSelectIds.includes(displayOrder.recordId)}
+              isSelected={bulkSelectIds.includes(example.id)}
             />
           );
         })}
@@ -172,7 +142,7 @@ export default function ExamplesTable({
 
       <Pagination
         page={page}
-        maxPage={maxPage}
+        maxPage={maxPageNumber}
         nextPage={nextPage}
         previousPage={previousPage}
       />
