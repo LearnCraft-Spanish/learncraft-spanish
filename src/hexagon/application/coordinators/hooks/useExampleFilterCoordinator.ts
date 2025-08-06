@@ -48,6 +48,9 @@ export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturn
       if (!filtersChanging) {
         return;
       }
+      if (exampleFilters.skillTags.includes(tagKey)) {
+        return;
+      }
       updateExampleFilters({
         ...exampleFilters,
         skillTags: [...exampleFilters.skillTags, tagKey],

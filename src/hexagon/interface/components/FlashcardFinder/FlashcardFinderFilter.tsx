@@ -21,12 +21,13 @@ export default function FlashcardFinderFilter({
 
   const {
     filterState,
-    filtersChanging,
 
     updateIncludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
+
+    filtersChanging,
     updateFiltersChanging,
   } = hookFilterState;
 
@@ -35,6 +36,7 @@ export default function FlashcardFinderFilter({
     tagSuggestions,
     updateTagSearchTerm,
     removeTagFromSuggestions,
+    addTagBackToSuggestions,
   } = skillTagSearch;
 
   // const { exampleFilters, course, fromLesson, toLesson } = filterState;
@@ -118,7 +120,10 @@ export default function FlashcardFinderFilter({
                 removeTagFromSuggestions={removeTagFromSuggestions}
               />
               <SelectedTags
-                removeTag={removeSkillTagFromFilters}
+                removeTag={(tagId) => {
+                  removeSkillTagFromFilters(tagId);
+                  addTagBackToSuggestions(tagId);
+                }}
                 skillTags={skillTags}
               />
             </div>

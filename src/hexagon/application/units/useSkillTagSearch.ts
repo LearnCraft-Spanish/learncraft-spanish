@@ -8,6 +8,7 @@ export interface UseSkillTagSearchReturnType {
   tagSuggestions: SkillTag[];
   updateTagSearchTerm: (target?: EventTarget & HTMLInputElement) => void;
   removeTagFromSuggestions: (tagId: string) => void;
+  addTagBackToSuggestions: (tagId: string) => void;
   isLoading: boolean;
   error: Error | null;
 }
@@ -27,6 +28,14 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
 
   const removeTagFromSuggestions = (tagId: string) => {
     setRemovedTagIds((prev) => new Set([...prev, tagId]));
+  };
+
+  const addTagBackToSuggestions = (tagId: string) => {
+    setRemovedTagIds((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(tagId);
+      return newSet;
+    });
   };
 
   const tagSuggestions: SkillTag[] = useMemo(() => {
@@ -99,6 +108,7 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     tagSuggestions,
     updateTagSearchTerm,
     removeTagFromSuggestions,
+    addTagBackToSuggestions,
     isLoading,
     error,
   };
