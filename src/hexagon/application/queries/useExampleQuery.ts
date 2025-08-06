@@ -20,6 +20,7 @@ export interface UseExampleQueryReturnType {
 }
 export const useExampleQuery = (
   pageSize: number,
+  _filtersChanging: boolean, // THIS NEEDS TO BE USED
 ): UseExampleQueryReturnType => {
   const queryClient = useQueryClient();
   const { filterState } = useExampleFilterCoordinator();

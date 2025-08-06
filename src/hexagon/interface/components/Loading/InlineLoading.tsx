@@ -1,4 +1,4 @@
-import wheelIcon from '../../assets/Icon_Blue.svg';
+import wheelIcon from 'src/assets/Icon_Blue.svg';
 import './Loading.scss';
 
 interface InlineLoadingProps {

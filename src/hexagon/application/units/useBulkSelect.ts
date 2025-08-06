@@ -35,7 +35,7 @@ export default function useBulkSelect(
     await bulkOperation(bulkSelectIds);
     setBulkOperationInProgress(false);
     clearBulkSelect();
-  }, [bulkOperation, clearBulkSelect]);
+  }, [bulkOperation, clearBulkSelect, bulkSelectIds]);
 
   return {
     bulkSelectMode,

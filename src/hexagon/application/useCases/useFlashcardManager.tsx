@@ -5,7 +5,10 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 import type { UseFlashcardManagerReturnType } from './useFlashcardManager.types';
-import { useLessonWithVocab } from '@application/queries/useLessonWithVocab';
+import {
+  useLessonRangeVocabRequired,
+  useLessonVocabKnown,
+} from '@application/queries/useLessonWithVocab';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import usePagination from '@application/units/Pagination/usePagination';
 
@@ -26,26 +29,23 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
 
-  const fromLessonWithVocabQuery = useLessonWithVocab(
+  const fromLessonWithVocabQuery = useLessonRangeVocabRequired(
     courseAndLessonState.course?.id,
     courseAndLessonState.fromLesson?.lessonNumber,
+    courseAndLessonState.toLesson?.lessonNumber,
   );
 
   const fromLessonVocabIds: number[] = useMemo(() => {
-    return (
-      fromLessonWithVocabQuery.data?.vocabKnown?.map((vocab) => vocab.id) ?? []
-    );
+    return fromLessonWithVocabQuery.data ?? [];
   }, [fromLessonWithVocabQuery.data]);
 
-  const toLessonWithVocabQuery = useLessonWithVocab(
+  const toLessonWithVocabQuery = useLessonVocabKnown(
     courseAndLessonState.course?.id,
     courseAndLessonState.toLesson?.lessonNumber,
   );
 
   const toLessonVocabIds: number[] = useMemo(() => {
-    return (
-      toLessonWithVocabQuery.data?.vocabKnown?.map((vocab) => vocab.id) ?? []
-    );
+    return toLessonWithVocabQuery.data ?? [];
   }, [toLessonWithVocabQuery.data]);
 
   const ownedExamples: ExampleWithVocabulary[] = useMemo(() => {
@@ -111,5 +111,14 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
 
     filtersEnabled,
     toggleFilters: () => setFiltersEnabled(!filtersEnabled),
+
+    somethingIsLoading:
+      flashcardsQuery.isLoading ||
+      fromLessonWithVocabQuery.isLoading ||
+      toLessonWithVocabQuery.isLoading ||
+      fromLessonWithVocabQuery.isFetching ||
+      toLessonWithVocabQuery.isFetching ||
+      fromLessonWithVocabQuery.isRefetching ||
+      toLessonWithVocabQuery.isRefetching,
   };
 }

@@ -123,6 +123,13 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
+  .inline-loading {
+    color: var(--dark);
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 4px 0;
+  }
 }
 
 .examplesTable {

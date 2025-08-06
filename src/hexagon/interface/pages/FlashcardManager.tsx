@@ -9,6 +9,7 @@ export default function FlashcardManager() {
     paginationState,
     filtersEnabled,
     toggleFilters,
+    somethingIsLoading,
   } = useFlashcardManager();
 
   const { filterState, skillTagSearch } = exampleFilter;
@@ -26,6 +27,7 @@ export default function FlashcardManager() {
         toggleFilters={toggleFilters}
       />
       <FlashcardTable
+        somethingIsLoading={somethingIsLoading}
         dataSource={filteredFlashcards}
         paginationState={paginationState}
       />

@@ -16,7 +16,9 @@ export interface UseSkillTagSearchReturnType {
 export function useSkillTagSearch(): UseSkillTagSearchReturnType {
   const { skillTags, isLoading, error } = useSkillTags();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
-  const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(new Set());
+  const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const updateTagSearchTerm = (target?: EventTarget & HTMLInputElement) => {
     if (target && target.value && target.value.length > 0) {

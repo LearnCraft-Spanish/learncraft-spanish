@@ -10,4 +10,6 @@ export interface UseFlashcardManagerReturnType {
 
   filtersEnabled: boolean;
   toggleFilters: () => void;
+
+  somethingIsLoading: boolean;
 }

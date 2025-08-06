@@ -10,6 +10,7 @@ import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/ExampleManagerExampleListItem';
 import { Pagination } from '../general';
+import { InlineLoading } from '../Loading';
 
 import {
   // copyTableToClipboard,
@@ -22,11 +23,13 @@ import './ExampleAndFlashcardTable.scss';
 interface FlashcardTableProps {
   dataSource: Flashcard[];
   paginationState: ReturnType<typeof usePagination>;
+  somethingIsLoading: boolean;
 }
 
 export default function FlashcardTable({
   dataSource,
   paginationState,
+  somethingIsLoading,
 }: FlashcardTableProps) {
   const {
     displayOrderSegment,
@@ -87,32 +90,23 @@ export default function FlashcardTable({
   return (
     <div className="examplesTable">
       <div className="buttonBox">
-        {/* <button
-          type="button"
-          onClick={() =>
-            copyTableToClipboard({
-              displayOrder: dataSource.map((flashcard) => ({
-                recordId: flashcard.id,
-              })),
-              getExampleOrFlashcardById: getExampleById,
-            })
-          }
-        >
-          Copy Table
-        </button> */}
         <div className="displayExamplesDescription">
-          <h4>
-            {`${dataSource.length} flashcard${
-              dataSource.length === 1 ? '' : 's'
-            } found ${
-              maxPage > 1
-                ? `(showing ${firstItemInPage}-${Math.min(
-                    page * pageSize,
-                    dataSource.length,
-                  )})`
-                : ''
-            }`}
-          </h4>
+          {somethingIsLoading ? (
+            <InlineLoading message="Just a moment..." />
+          ) : (
+            <h4>
+              {`${dataSource.length} flashcard${
+                dataSource.length === 1 ? '' : 's'
+              } found ${
+                maxPage > 1
+                  ? `(showing ${firstItemInPage}-${Math.min(
+                      page * pageSize,
+                      dataSource.length,
+                    )})`
+                  : ''
+              }`}
+            </h4>
+          )}
 
           <div id="bulkAddModeButtons">
             {bulkSelectIds.length > 0 && (
@@ -160,10 +154,10 @@ export default function FlashcardTable({
                     <p>Copy this page to clipboard</p>
                   </button>
                   <button type="button">
-                    <p>Copy all matching flashcards to clipboard</p>
+                    <p>Copy all results to clipboard</p>
                   </button>
                   <button type="button">
-                    <p>Find all matching flashcards in flashcard finder</p>
+                    <p>Use these filters in Flashcard Finder</p>
                   </button>
                 </div>
               )}

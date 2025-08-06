@@ -3,7 +3,7 @@ import type { UseExampleFilterReturnType } from '@application/units/useExampleFi
 import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useExampleQuery } from '../queries/useExampleQuery';
 
 export interface UseFlashcardFinderReturnType {
@@ -24,9 +24,21 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const queryPageSize = 100;
   const pageSize = 25;
 
+  const {
+    updateAudioOnly: updateAudioOnlyFunction,
+    updateExcludeSpanglish: updateExcludeSpanglishFunction,
+    addSkillTagToFilters: addSkillTagToFiltersFunction,
+    removeSkillTagFromFilters: removeSkillTagFromFiltersFunction,
+  } = exampleFilter.filterState;
+
+  const {
+    updateFromLessonNumber: updateFromLessonNumberFunction,
+    updateToLessonNumber: updateToLessonNumberFunction,
+    updateUserSelectedCourseId: updateUserSelectedCourseIdFunction,
+  } = exampleFilter.courseAndLessonState;
   // Calculate how many display pages fit into one query page
   const DISPLAY_PAGES_PER_QUERY = queryPageSize / pageSize; // 4 display pages per query
-  const exampleQuery = useExampleQuery(queryPageSize);
+  const exampleQuery = useExampleQuery(queryPageSize, filtersChanging);
 
   const [currentDisplayPage, setCurrentDisplayPage] = useState(1);
 
@@ -48,8 +60,90 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
 
+  const updateAudioOnly = useCallback(
+    (audioOnly: boolean) => {
+      if (filtersChanging) {
+        updateAudioOnlyFunction(audioOnly);
+      }
+    },
+    [updateAudioOnlyFunction, filtersChanging],
+  );
+
+  const updateExcludeSpanglish = useCallback(
+    (excludeSpanglish: boolean) => {
+      if (filtersChanging) {
+        updateExcludeSpanglishFunction(excludeSpanglish);
+      }
+    },
+    [updateExcludeSpanglishFunction, filtersChanging],
+  );
+
+  const addSkillTagToFilters = useCallback(
+    (tagKey: string) => {
+      if (filtersChanging) {
+        addSkillTagToFiltersFunction(tagKey);
+      }
+    },
+    [addSkillTagToFiltersFunction, filtersChanging],
+  );
+
+  const removeSkillTagFromFilters = useCallback(
+    (tagKey: string) => {
+      if (filtersChanging) {
+        removeSkillTagFromFiltersFunction(tagKey);
+      }
+    },
+    [removeSkillTagFromFiltersFunction, filtersChanging],
+  );
+
+  const updateFromLessonNumber = useCallback(
+    (lessonNumber: number) => {
+      if (!filtersChanging) {
+        return;
+      }
+      updateFromLessonNumberFunction(lessonNumber);
+    },
+    [updateFromLessonNumberFunction, filtersChanging],
+  );
+
+  const updateToLessonNumber = useCallback(
+    (lessonNumber: number) => {
+      if (!filtersChanging) {
+        return;
+      }
+      updateToLessonNumberFunction(lessonNumber);
+    },
+    [updateToLessonNumberFunction, filtersChanging],
+  );
+
+  const updateUserSelectedCourseId = useCallback(
+    (courseId: number) => {
+      if (!filtersChanging) {
+        return;
+      }
+      updateUserSelectedCourseIdFunction(courseId);
+    },
+    [updateUserSelectedCourseIdFunction, filtersChanging],
+  );
+
   return {
-    exampleFilter,
+    exampleFilter: {
+      courseAndLessonState: {
+        ...exampleFilter.courseAndLessonState,
+        updateFromLessonNumber,
+        updateToLessonNumber,
+        updateUserSelectedCourseId,
+      },
+      filterState: {
+        ...exampleFilter.filterState,
+        updateExcludeSpanglish,
+        updateAudioOnly,
+        addSkillTagToFilters,
+        removeSkillTagFromFilters,
+      },
+      skillTagSearch: exampleFilter.skillTagSearch,
+      initialLoading: exampleFilter.initialLoading,
+    },
     exampleQuery,
     flashcardsQuery,
     totalPages,
