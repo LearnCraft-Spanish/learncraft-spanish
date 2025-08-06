@@ -58,9 +58,15 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   // This happens on the last page of each query batch to ensure smooth pagination
   useEffect(() => {
     const isNearEndOfQueryBatch =
-      pagination.pageWithinQueryBatch === pagination.pagesPerQuery - 1;
+      pagination.pageWithinQueryBatch >= pagination.pagesPerQuery / 2;
+
     exampleQuery.setCanPrefetch(isNearEndOfQueryBatch);
-  }, [pagination.pageWithinQueryBatch, pagination.pagesPerQuery, exampleQuery]);
+  }, [
+    pagination.pageWithinQueryBatch,
+    pagination.page,
+    pagination.pagesPerQuery,
+    exampleQuery,
+  ]);
 
   const startIndex = pagination.pageWithinQueryBatch * pagination.pageSize;
   const endIndex = startIndex + pagination.pageSize;

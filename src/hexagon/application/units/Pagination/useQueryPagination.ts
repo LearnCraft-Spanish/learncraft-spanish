@@ -30,9 +30,9 @@ export default function useQueryPagination({
     ? Math.ceil(totalCount / pageSize)
     : 0;
 
-  const pagesPerQuery = Math.ceil(queryPageSize / pageSize);
+  const pagesPerQuery = Math.floor(queryPageSize / pageSize);
 
-  const pageWithinQueryBatch = page % pagesPerQuery;
+  const pageWithinQueryBatch = (page - 1) % pagesPerQuery;
 
   const maxPageName: string =
     maxPageNumber === 0 ? 'many' : maxPageNumber.toString();

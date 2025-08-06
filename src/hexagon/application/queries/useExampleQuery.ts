@@ -1,6 +1,6 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
@@ -103,24 +103,18 @@ export const useExampleQuery = (
     enabled: !!filterState && !!course && !!toLesson && !!seed,
   });
 
-  const shouldPrefetch = useMemo(() => {
-    const index = pageSize * page;
+  const hasMorePages = useMemo(() => {
     const totalCount = fullResponse?.totalCount ?? null;
     if (totalCount === null) {
       return false;
     }
-    return index < totalCount;
+    // Check if there are more items beyond what the next query page would fetch
+    const nextPageStartIndex = pageSize * (page + 1);
+    return nextPageStartIndex <= totalCount;
   }, [page, pageSize, fullResponse?.totalCount]);
 
-  useMemo(() => {
-    if (
-      shouldPrefetch &&
-      canPrefetch &&
-      !!filterState &&
-      !!course &&
-      !!toLesson &&
-      !!fromLesson
-    ) {
+  useEffect(() => {
+    if (hasMorePages && canPrefetch) {
       queryClient.prefetchQuery({
         queryKey: [
           'filteredExamples',
@@ -140,7 +134,7 @@ export const useExampleQuery = (
       });
     }
   }, [
-    shouldPrefetch,
+    hasMorePages,
     canPrefetch,
     page,
     pageSize,
