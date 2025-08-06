@@ -26,9 +26,9 @@ async function selectLessons() {
   const toLessonSelector = (await screen.findByLabelText(
     'To:',
   )) as HTMLSelectElement;
-  fireEvent.change(toLessonSelector, { target: { value: '131' } });
+  fireEvent.change(toLessonSelector, { target: { value: '62' } });
   await waitFor(() => {
-    expect(toLessonSelector.value).toBe('131');
+    expect(toLessonSelector.value).toBe('62');
   });
 
   await waitFor(() => {

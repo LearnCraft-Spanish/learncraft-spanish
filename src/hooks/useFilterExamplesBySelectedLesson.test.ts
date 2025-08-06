@@ -74,7 +74,7 @@ describe('useFilterExamplesBySelectedLesson', () => {
       if (!selectedProgram) {
         throw new Error('selectedProgram is null');
       }
-      const newToLesson = selectedProgram.lessons[4].recordId;
+      const newToLesson = selectedProgram.lessons[4].lessonNumber;
       if (!newToLesson) {
         throw new Error('newFromLesson is null');
       }
