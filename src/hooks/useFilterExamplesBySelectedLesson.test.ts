@@ -79,10 +79,12 @@ describe('useFilterExamplesBySelectedLesson', () => {
         throw new Error('newFromLesson is null');
       }
       act(() => {
-        result.current.courseAndLessons.updateToLessonId(newToLesson);
+        result.current.courseAndLessons.updateToLessonNumber(newToLesson);
       });
       await waitFor(() => {
-        expect(result.current.courseAndLessons.toLesson?.id).toBe(newToLesson);
+        expect(result.current.courseAndLessons.toLesson?.lessonNumber).toBe(
+          newToLesson,
+        );
       });
       const examples = api.verifiedExamplesTable;
       const filteredExamples =
@@ -112,28 +114,30 @@ describe('useFilterExamplesBySelectedLesson', () => {
         throw new Error('lessonWithoutVocab is null');
       }
       act(() => {
-        result.current.courseAndLessons.updateToLessonId(
-          lessonWithoutVocab.recordId,
+        result.current.courseAndLessons.updateToLessonNumber(
+          lessonWithoutVocab.lessonNumber,
         );
-        result.current.courseAndLessons.updateFromLessonId(
-          lessonWithoutVocab.recordId,
+        result.current.courseAndLessons.updateFromLessonNumber(
+          lessonWithoutVocab.lessonNumber,
         );
       });
       await waitFor(
         () => {
-          expect(result.current.courseAndLessons.toLesson?.id).toBe(
-            lessonWithoutVocab.recordId,
+          expect(result.current.courseAndLessons.toLesson?.lessonNumber).toBe(
+            lessonWithoutVocab.lessonNumber,
           );
         },
         { timeout: 1000 },
       );
       const toLesson = selectedProgram.lessons.find(
         (lesson) =>
-          lesson.recordId === result.current.courseAndLessons.toLesson?.id,
+          lesson.lessonNumber ===
+          result.current.courseAndLessons.toLesson?.lessonNumber,
       );
       const fromLesson = selectedProgram.lessons.find(
         (lesson) =>
-          lesson.recordId === result.current.courseAndLessons.fromLesson?.id,
+          lesson.lessonNumber ===
+          result.current.courseAndLessons.fromLesson?.lessonNumber,
       );
       if (toLesson?.vocabIncluded.length || fromLesson?.vocabIncluded.length) {
         throw new Error('Bad data provided: VocabIncluded is not null');

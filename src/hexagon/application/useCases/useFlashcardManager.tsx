@@ -18,7 +18,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
   const { courseAndLessonState, filterState: coordinatorFilterState } =
     exampleFilter;
-  const { exampleFilters } = coordinatorFilterState.filterState;
+  const { filterState } = coordinatorFilterState;
   const pageSize = 25;
 
   const [filtersEnabled, setFiltersEnabled] = useState(false);
@@ -61,12 +61,17 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
       return flashcardsQuery.flashcards ?? [];
     }
 
-    const filteredExamples: ExampleWithVocabulary[] = filterExamplesCombined({
-      examples: ownedExamples,
-      vocabAllowedIds: toLessonVocabIds,
-      vocabRequiredIds: fromLessonVocabIds,
-      filters: exampleFilters,
-    });
+    const filteredExamples: ExampleWithVocabulary[] = filterExamplesCombined(
+      ownedExamples,
+      {
+        vocabAllowed: toLessonVocabIds,
+        vocabRequired: fromLessonVocabIds,
+        vocabKnown: fromLessonVocabIds,
+        includeSpanglish: filterState.includeSpanglish,
+        audioOnly: filterState.audioOnly,
+        skillTags: filterState.skillTags,
+      },
+    );
 
     const flashcardsMapped: Flashcard[] =
       flashcardsQuery.flashcards?.filter((flashcard) =>
@@ -78,7 +83,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     ownedExamples,
     fromLessonVocabIds,
     toLessonVocabIds,
-    exampleFilters,
+    filterState,
     flashcardsQuery.flashcards,
     filtersEnabled,
   ]);

@@ -1,7 +1,6 @@
 import type { UseExampleFilterCoordinatorReturnType } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
 import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/useSkillTagSearch';
 
-import useExampleFilter from 'src/hexagon/application/units/useExampleFilter';
 import SelectedTags from './FlashcardFinder/VocabTagFilter/SelectedTags';
 import TagFilter from './FlashcardFinder/VocabTagFilter/TagFilter';
 import ToggleSwitch from './general/ToggleSwitch';
@@ -21,8 +20,6 @@ export default function FlashcardManagerFilters({
   filtersEnabled: boolean;
   toggleFilters: () => void;
 }) {
-  const { skillTags } = useExampleFilter();
-
   const {
     filterState,
 
@@ -39,9 +36,7 @@ export default function FlashcardManagerFilters({
     removeTagFromSuggestions,
   } = skillTagSearch;
 
-  const { exampleFilters } = filterState;
-
-  const { includeSpanglish, audioOnly } = exampleFilters;
+  const { includeSpanglish, audioOnly, skillTags } = filterState;
 
   /**
    * TODO: We need an inert (non-interactive) view of the filter state.
@@ -68,21 +63,17 @@ export default function FlashcardManagerFilters({
               id="removeSpanglish"
               ariaLabel="noSpanglish"
               label="Include Spanglish: "
-              checked={includeSpanglish}
+              checked={includeSpanglish ?? true}
               onChange={() =>
-                updateIncludeSpanglish(
-                  !filterState.exampleFilters.includeSpanglish,
-                )
+                updateIncludeSpanglish(!filterState.includeSpanglish)
               }
             />
             <ToggleSwitch
               id="audioOnly"
               ariaLabel="audioOnly"
               label="Audio Flashcards Only: "
-              checked={audioOnly}
-              onChange={() =>
-                updateAudioOnly(!filterState.exampleFilters.audioOnly)
-              }
+              checked={audioOnly ?? false}
+              onChange={() => updateAudioOnly(!filterState.audioOnly)}
             />
           </div>
           <div className="filterBox search">

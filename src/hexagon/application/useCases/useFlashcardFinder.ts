@@ -3,6 +3,7 @@ import type { UseExampleFilterReturnType } from '@application/units/useExampleFi
 import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
+import { useState } from 'react';
 import { useExampleQuery } from '../queries/useExampleQuery';
 
 export interface UseFlashcardFinderReturnType {
@@ -11,9 +12,12 @@ export interface UseFlashcardFinderReturnType {
   flashcardsQuery: UseStudentFlashcardsReturnType;
   totalPages: number | null;
   pageSize: number;
+  filtersChanging: boolean;
+  setFiltersChanging: (filtersChanging: boolean) => void;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
+  const [filtersChanging, setFiltersChanging] = useState(false);
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
   const queryPageSize = 1000; // BAD HACK. skipping pagination for now, we'll fix this later
   const pageSize = 25;
@@ -50,5 +54,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     flashcardsQuery,
     totalPages,
     pageSize,
+    filtersChanging,
+    setFiltersChanging,
   };
 }

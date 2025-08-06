@@ -3,13 +3,13 @@ import { createContext } from 'react';
 interface SelectedCourseAndLessonsContextType {
   // States
   userSelectedCourseId: number | null;
-  fromLessonId: number | null;
-  toLessonId: number | null;
+  fromLessonNumber: number | null;
+  toLessonNumber: number | null;
 
   // Actions
   updateUserSelectedCourseId: (courseId: number) => void;
-  updateFromLessonId: (lessonId: number) => void;
-  updateToLessonId: (lessonId: number) => void;
+  updateFromLessonNumber: (lessonNumber: number) => void;
+  updateToLessonNumber: (lessonNumber: number) => void;
 
   // Memos
   // allowedVocabulary: VocabularyTag[];

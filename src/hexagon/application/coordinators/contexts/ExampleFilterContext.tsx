@@ -1,27 +1,28 @@
 import { createContext } from 'react';
 
-interface ExampleFilterState {
+interface ExampleFilterStateWithoutCourseAndLesson {
   includeSpanglish: boolean;
   audioOnly: boolean;
-  skillTags: string[];
+  skillTagKeys: string[];
 }
 
 interface ExampleFilterContextType {
-  exampleFilters: ExampleFilterState;
-  updateExampleFilters: (exampleFilters: ExampleFilterState) => void;
-  filtersChanging: boolean;
-  updateFiltersChanging: (filtersChanging: boolean) => void;
+  exampleFilters: ExampleFilterStateWithoutCourseAndLesson;
+  updateExampleFilters: (
+    exampleFilters: ExampleFilterStateWithoutCourseAndLesson,
+  ) => void;
 }
 
 export const ExampleFilterContext = createContext<ExampleFilterContextType>({
   exampleFilters: {
     includeSpanglish: false,
     audioOnly: false,
-    skillTags: [],
+    skillTagKeys: [],
   },
   updateExampleFilters: () => {},
-  filtersChanging: false,
-  updateFiltersChanging: () => {},
 });
 
-export type { ExampleFilterContextType, ExampleFilterState };
+export type {
+  ExampleFilterContextType,
+  ExampleFilterStateWithoutCourseAndLesson,
+};

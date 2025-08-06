@@ -10,8 +10,8 @@ export function SelectedCourseAndLessonsProvider({
   const [userSelectedCourseId, setUserSelectedCourseId] = useState<
     number | null
   >(null);
-  const [fromLessonId, setFromLessonId] = useState<number | null>(null);
-  const [toLessonId, setToLessonId] = useState<number | null>(null);
+  const [fromLessonNumber, setFromLessonNumber] = useState<number | null>(null);
+  const [toLessonNumber, setToLessonNumber] = useState<number | null>(null);
 
   const updateUserSelectedCourseId = useCallback(
     (courseId: number) => {
@@ -20,36 +20,36 @@ export function SelectedCourseAndLessonsProvider({
     [setUserSelectedCourseId],
   );
 
-  const updateFromLessonId = useCallback(
-    (lessonId: number) => {
-      setFromLessonId(lessonId);
+  const updateFromLessonNumber = useCallback(
+    (lessonNumber: number) => {
+      setFromLessonNumber(lessonNumber);
     },
-    [setFromLessonId],
+    [setFromLessonNumber],
   );
 
-  const updateToLessonId = useCallback(
-    (lessonId: number) => {
-      setToLessonId(lessonId);
+  const updateToLessonNumber = useCallback(
+    (lessonNumber: number) => {
+      setToLessonNumber(lessonNumber);
     },
-    [setToLessonId],
+    [setToLessonNumber],
   );
 
   const value: SelectedCourseAndLessonsContextType = useMemo(
     () => ({
       userSelectedCourseId,
       updateUserSelectedCourseId,
-      fromLessonId,
-      updateFromLessonId,
-      toLessonId,
-      updateToLessonId,
+      fromLessonNumber,
+      updateFromLessonNumber,
+      toLessonNumber,
+      updateToLessonNumber,
     }),
     [
       userSelectedCourseId,
       updateUserSelectedCourseId,
-      fromLessonId,
-      updateFromLessonId,
-      toLessonId,
-      updateToLessonId,
+      fromLessonNumber,
+      updateFromLessonNumber,
+      toLessonNumber,
+      updateToLessonNumber,
     ],
   );
 
