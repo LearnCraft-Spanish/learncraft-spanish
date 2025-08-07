@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { Quiz } from 'src/types/interfaceDefinitions';
 import pencilIcon from 'src/assets/icons/pencil.svg';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 export default function QuizTableRow({ quiz }: { quiz: Quiz }): ReactNode {
   const { openContextual } = useContextualMenu();

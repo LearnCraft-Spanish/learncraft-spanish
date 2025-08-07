@@ -6,7 +6,7 @@ import ActiveStudentContext from '@application/coordinators/contexts/ActiveStude
 import { roleHasChangedResponseSchema } from '@learncraft-spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { use, useCallback, useMemo } from 'react';
-import { useModal } from 'src/hooks/useModal';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { z } from 'zod';
 
 export function useActiveStudent(): UseActiveStudentReturnType {

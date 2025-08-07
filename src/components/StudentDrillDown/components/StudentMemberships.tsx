@@ -3,7 +3,6 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import pencilIcon from 'src/assets/icons/pencil.svg';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Checkbox,
   DateInput,
@@ -13,14 +12,15 @@ import {
 } from 'src/components/FormComponents';
 import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useCoachList, useCourseList } from 'src/hooks/CoachingData/queries';
 import {
   useAllStudents,
   useMembershipWeeks,
   useStudentMemberships,
 } from 'src/hooks/CoachingData/queries/StudentDrillDown';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 import MembershipWeeks from './MembershipWeeks';
 interface StudentMembershipsProps {
   studentId: number;

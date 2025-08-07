@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useProgramsTableQueries from 'src/hooks/VocabQuizDbData/useProgramsTable';
 
 export default function useProgramsTable() {

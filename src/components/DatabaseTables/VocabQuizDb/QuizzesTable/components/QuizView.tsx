@@ -2,14 +2,14 @@ import type { Quiz } from 'src/types/interfaceDefinitions';
 import type { QuizNameObj, QuizSubNameObj } from '../constants';
 import type { NewQuiz, QuizObjForUpdate } from '../types';
 import React, { useEffect, useMemo, useState } from 'react';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   FormControls,
   GenericDropdown,
   TextInput,
 } from 'src/components/FormComponents';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { quizNames, serVsEstarQuizSubNames } from '../constants';
 import useQuizTable from '../useQuizTable';
 interface EditQuizProps {

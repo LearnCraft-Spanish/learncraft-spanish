@@ -1,6 +1,5 @@
 import type { EditableStudent, NewStudent } from '../types';
 import { useMemo, useState } from 'react';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Dropdown,
   FormControls,
@@ -8,8 +7,9 @@ import {
   TextInput,
 } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import useStudentsTable from 'src/hooks/VocabQuizDbData/useStudentsTable';
 export default function StudentRecordView({
   student,

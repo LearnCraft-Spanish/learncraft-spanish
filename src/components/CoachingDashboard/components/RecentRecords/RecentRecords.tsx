@@ -15,7 +15,7 @@ import {
   PrivateCallView,
 } from 'src/components/Coaching/WeeksRecords/Table/PrivateCallsCell';
 import { InlineLoading } from 'src/components/Loading';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 // import Table from 'src/components/Table/Table';
 import useMyRecentRecords from '../../hooks/useMyRecentRecords';
 import SectionHeader from '../SectionHeader';
