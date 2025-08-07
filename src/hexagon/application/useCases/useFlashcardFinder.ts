@@ -1,11 +1,14 @@
 import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
+import type { Lesson } from '@learncraft-spanish/shared';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
+import { useLessonsByVocabulary } from '@application/queries/useLessonsByVocab';
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import useExampleFilter from '@application/units/useExampleFilter';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useExampleQuery } from '../queries/useExampleQuery';
 import useQueryPagination from '../units/Pagination/useQueryPagination';
 
@@ -18,11 +21,21 @@ export interface UseFlashcardFinderReturnType {
   totalPages: number | null;
   filtersChanging: boolean;
   setFiltersChanging: (filtersChanging: boolean) => void;
+  lessonsByVocabulary: Lesson[];
+  lessonsLoading: boolean;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
+  const { contextual } = useContextualMenu();
   const [filtersChanging, setFiltersChanging] = useState(false);
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
+
+  const contextualIsVocabInfo = contextual?.startsWith('vocabInfo-');
+  const contextualVocabId: number | null = contextualIsVocabInfo
+    ? Number.parseInt(contextual?.split('-')[1])
+    : null;
+  const { lessonsByVocabulary, loading: lessonsLoading } =
+    useLessonsByVocabulary(contextualVocabId);
 
   const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
@@ -178,5 +191,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     totalPages,
     filtersChanging,
     setFiltersChanging,
+    lessonsByVocabulary,
+    lessonsLoading,
   };
 }

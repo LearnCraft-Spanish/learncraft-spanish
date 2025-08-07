@@ -12,6 +12,8 @@ export default function FlashcardFinder() {
     pagination,
     filtersChanging,
     setFiltersChanging,
+    lessonsByVocabulary,
+    lessonsLoading,
   } = useFlashcardFinder();
 
   const { filterState, skillTagSearch } = exampleFilter;
@@ -35,6 +37,8 @@ export default function FlashcardFinder() {
           studentFlashcards={flashcardsQuery}
           paginationState={pagination}
           fetchingExamples={exampleQuery.isLoading}
+          lessonsByVocabulary={lessonsByVocabulary}
+          lessonsLoading={lessonsLoading}
         />
       ) : (
         <div>

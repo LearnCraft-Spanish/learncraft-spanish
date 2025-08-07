@@ -1,7 +1,9 @@
 import type {
   ExampleWithVocabulary,
   Flashcard,
+  Lesson,
 } from '@learncraft-spanish/shared';
+import VocabTagContainer from './VocabTagContainer';
 
 export default function MoreInfoViewExample({
   example,
@@ -9,12 +11,16 @@ export default function MoreInfoViewExample({
   openContextual,
   contextual,
   setContextualRef,
+  lessonsByVocabulary,
+  lessonsLoading,
 }: {
   example: ExampleWithVocabulary | Flashcard;
   isOpen: boolean;
   openContextual: (contextual: string) => void;
   contextual: string;
   setContextualRef: (ref: HTMLDivElement | null) => void;
+  lessonsByVocabulary: Lesson[];
+  lessonsLoading: boolean;
 }) {
   let exampleWithVocabulary: ExampleWithVocabulary;
   if ('vocabulary' in example) {
@@ -32,43 +38,15 @@ export default function MoreInfoViewExample({
               <h3>Vocabulary</h3>
               <div className="vocabTagsList">
                 {exampleWithVocabulary.vocabulary.map((vocab) => (
-                  <div className="vocabTagContainer" key={vocab.id}>
-                    <div
-                      className="vocabTag"
-                      onClick={() => {
-                        openContextual(`vocabInfo-${vocab.id}`);
-                      }}
-                    >
-                      {vocab.word}
-                    </div>
-                    {contextual === `vocabInfo-${vocab.id}` && (
-                      <div className="vocabInfo" ref={setContextualRef}>
-                        <div className="vocabInfoHeader">
-                          <h4>{vocab.word}</h4>
-                          <p>{vocab.descriptor}</p>
-                        </div>
-                        {vocab.type !== 'verb' ? (
-                          <div className="nonVerbInfo">
-                            <p>
-                              Part of Speech: {vocab.subcategory.partOfSpeech}
-                            </p>
-                            <p>Category: {vocab.subcategory.category}</p>
-                          </div>
-                        ) : (
-                          <div className="verbInfo">
-                            <p>
-                              Part of Speech: {vocab.subcategory.partOfSpeech}
-                            </p>
-                            <p>Verb Infinitive: {vocab.verb.infinitive}</p>
-                            <p>
-                              Conjugation Notes:{' '}
-                              {vocab.conjugationTags.join(', ')}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <VocabTagContainer
+                    key={vocab.id}
+                    vocabulary={vocab}
+                    openContextual={openContextual}
+                    contextual={contextual}
+                    setContextualRef={setContextualRef}
+                    lessonsLoading={lessonsLoading}
+                    lessons={lessonsByVocabulary}
+                  />
                 ))}
               </div>
             </div>

@@ -2,6 +2,7 @@
 import type {
   ExampleWithVocabulary,
   Flashcard,
+  Lesson,
 } from '@learncraft-spanish/shared';
 
 import { useState } from 'react';
@@ -18,6 +19,8 @@ export default function ExampleListItem({
   handleRemoveSelected,
   handleSelect,
   isSelected,
+  lessonsByVocabulary,
+  lessonsLoading,
 }: {
   example: Flashcard | ExampleWithVocabulary | null;
   isCollected: boolean;
@@ -28,6 +31,8 @@ export default function ExampleListItem({
   handleRemove: () => void;
   bulkSelectMode: boolean;
   isSelected?: boolean;
+  lessonsByVocabulary: Lesson[];
+  lessonsLoading: boolean;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
   const { openContextual, setContextualRef, contextual } = useContextualMenu();
@@ -63,6 +68,8 @@ export default function ExampleListItem({
         openContextual={openContextual}
         contextual={contextual}
         setContextualRef={setContextualRef}
+        lessonsByVocabulary={lessonsByVocabulary}
+        lessonsLoading={lessonsLoading}
       />
     </div>
   );
