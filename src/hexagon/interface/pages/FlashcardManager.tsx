@@ -10,6 +10,7 @@ export default function FlashcardManager() {
     filtersEnabled,
     toggleFilters,
     somethingIsLoading,
+    lessonPopup,
   } = useFlashcardManager();
 
   const { filterState, skillTagSearch } = exampleFilter;
@@ -30,6 +31,7 @@ export default function FlashcardManager() {
         somethingIsLoading={somethingIsLoading}
         dataSource={filteredFlashcards}
         paginationState={paginationState}
+        lessonPopup={lessonPopup}
       />
     </div>
   );

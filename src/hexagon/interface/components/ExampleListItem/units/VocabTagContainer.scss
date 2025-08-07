@@ -1,11 +1,11 @@
 .vocabTagContainer {
   position: relative; // Positioning context for the popup
   display: inline-block;
+  padding: 0px;
 }
 
 .vocabTag {
   font-size: 14px;
-  padding: 0.25rem;
   margin: 0.25rem;
   min-height: 0;
 

@@ -15,6 +15,10 @@ const mockProps = {
   bulkSelectMode: false,
   isSelected: false,
   handleAdd: vi.fn(),
+  lessonPopup: {
+    lessonsByVocabulary: [],
+    lessonsLoading: false,
+  },
 };
 
 describe('exampleManagerExampleListItem', () => {

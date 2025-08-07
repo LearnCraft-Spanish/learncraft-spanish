@@ -1,4 +1,5 @@
-import type { ExampleWithVocabulary, Lesson } from '@learncraft-spanish/shared';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import VocabTagContainer from './VocabTagContainer';
 
 export default function MoreInfoViewFlashcard({
@@ -8,8 +9,7 @@ export default function MoreInfoViewFlashcard({
   openContextual,
   contextual,
   setContextualRef,
-  lessonsByVocabulary,
-  lessonsLoading,
+  lessonPopup,
 }: {
   example: ExampleWithVocabulary;
   isCustom: boolean;
@@ -17,8 +17,7 @@ export default function MoreInfoViewFlashcard({
   openContextual: (contextual: string) => void;
   contextual: string;
   setContextualRef: (ref: HTMLDivElement | null) => void;
-  lessonsByVocabulary: Lesson[];
-  lessonsLoading: boolean;
+  lessonPopup: LessonPopup;
 }) {
   return (
     <div className={`moreInfoView ${isOpen ? 'open' : 'closed'}`}>
@@ -28,12 +27,12 @@ export default function MoreInfoViewFlashcard({
           {example.vocabulary.map((vocab) => (
             <VocabTagContainer
               key={vocab.id}
+              exampleId={example.id}
               vocabulary={vocab}
               openContextual={openContextual}
               contextual={contextual}
               setContextualRef={setContextualRef}
-              lessonsLoading={lessonsLoading}
-              lessons={lessonsByVocabulary}
+              lessonPopup={lessonPopup}
             />
           ))}
         </div>

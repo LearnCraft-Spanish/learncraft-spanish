@@ -16,8 +16,10 @@ import useExampleFilter from '@application/units/useExampleFilter';
 import { filterExamplesCombined } from '@learncraft-spanish/shared';
 
 import { useMemo, useState } from 'react';
+import useLessonPopup from '../units/useLessonPopup';
 
 export default function useFlashcardManager(): UseFlashcardManagerReturnType {
+  const { lessonPopup } = useLessonPopup();
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
   const { courseAndLessonState, filterState: coordinatorFilterState } =
     exampleFilter;
@@ -119,5 +121,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
       toLessonWithVocabQuery.isFetching ||
       fromLessonWithVocabQuery.isRefetching ||
       toLessonWithVocabQuery.isRefetching,
+
+    lessonPopup,
   };
 }

@@ -1,8 +1,8 @@
 import type {
   ExampleWithVocabulary,
   Flashcard,
-  Lesson,
 } from '@learncraft-spanish/shared';
+import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import VocabTagContainer from './VocabTagContainer';
 
 export default function MoreInfoViewExample({
@@ -11,16 +11,14 @@ export default function MoreInfoViewExample({
   openContextual,
   contextual,
   setContextualRef,
-  lessonsByVocabulary,
-  lessonsLoading,
+  lessonPopup,
 }: {
   example: ExampleWithVocabulary | Flashcard;
   isOpen: boolean;
   openContextual: (contextual: string) => void;
   contextual: string;
   setContextualRef: (ref: HTMLDivElement | null) => void;
-  lessonsByVocabulary: Lesson[];
-  lessonsLoading: boolean;
+  lessonPopup: LessonPopup;
 }) {
   let exampleWithVocabulary: ExampleWithVocabulary;
   if ('vocabulary' in example) {
@@ -40,12 +38,12 @@ export default function MoreInfoViewExample({
                 {exampleWithVocabulary.vocabulary.map((vocab) => (
                   <VocabTagContainer
                     key={vocab.id}
+                    exampleId={exampleWithVocabulary.id}
                     vocabulary={vocab}
                     openContextual={openContextual}
                     contextual={contextual}
                     setContextualRef={setContextualRef}
-                    lessonsLoading={lessonsLoading}
-                    lessons={lessonsByVocabulary}
+                    lessonPopup={lessonPopup}
                   />
                 ))}
               </div>

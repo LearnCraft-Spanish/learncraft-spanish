@@ -15,6 +15,10 @@ const mockProps = {
   handleRemove: vi.fn(),
   bulkSelectMode: false,
   isSelected: false,
+  lessonPopup: {
+    lessonsByVocabulary: [],
+    lessonsLoading: false,
+  },
 };
 
 describe('flashcardFinderExampleListItem', () => {

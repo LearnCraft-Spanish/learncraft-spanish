@@ -1,35 +1,38 @@
 import type usePagination from '@application/units/Pagination/usePagination';
 
 import type { Flashcard } from '@learncraft-spanish/shared';
+import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
+
 import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/ExampleManagerExampleListItem';
 import { Pagination } from '../general';
-import { InlineLoading } from '../Loading';
 
+import { InlineLoading } from '../Loading';
 import {
   // copyTableToClipboard,
   getExampleOrFlashcardById,
 } from './units/functions';
-import 'src/components/ExamplesTable/ExamplesTable.scss';
 
+import 'src/components/ExamplesTable/ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
 
 interface FlashcardTableProps {
   dataSource: Flashcard[];
   paginationState: ReturnType<typeof usePagination>;
   somethingIsLoading: boolean;
+  lessonPopup: LessonPopup;
 }
 
 export default function FlashcardTable({
   dataSource,
   paginationState,
   somethingIsLoading,
+  lessonPopup,
 }: FlashcardTableProps) {
   const {
     displayOrderSegment,
@@ -196,6 +199,7 @@ export default function FlashcardTable({
               }}
               bulkSelectMode={bulkSelectMode}
               isSelected={bulkSelectIds.includes(displayOrder.recordId)}
+              lessonPopup={lessonPopup}
             />
           );
         })}

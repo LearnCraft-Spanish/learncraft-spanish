@@ -1,14 +1,15 @@
 import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
 
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
-import type { ExampleWithVocabulary, Lesson } from '@learncraft-spanish/shared';
-import Loading from 'src/components/Loading/Loading';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 
+import Loading from 'src/components/Loading/Loading';
 import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import { Pagination } from '../general';
-import { copyTableToClipboard } from './units/functions';
 
+import { copyTableToClipboard } from './units/functions';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
 
@@ -18,8 +19,7 @@ interface ExamplesTableProps {
   studentFlashcards: UseStudentFlashcardsReturnType;
   paginationState: QueryPaginationState;
   fetchingExamples: boolean;
-  lessonsByVocabulary: Lesson[];
-  lessonsLoading: boolean;
+  lessonPopup: LessonPopup;
 }
 
 export default function ExamplesTable({
@@ -28,8 +28,7 @@ export default function ExamplesTable({
   studentFlashcards,
   paginationState,
   fetchingExamples,
-  lessonsByVocabulary,
-  lessonsLoading,
+  lessonPopup,
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
 
@@ -139,8 +138,7 @@ export default function ExamplesTable({
               }}
               bulkSelectMode={bulkSelectMode}
               isSelected={bulkSelectIds.includes(example.id)}
-              lessonsByVocabulary={lessonsByVocabulary}
-              lessonsLoading={lessonsLoading}
+              lessonPopup={lessonPopup}
             />
           );
         })}
