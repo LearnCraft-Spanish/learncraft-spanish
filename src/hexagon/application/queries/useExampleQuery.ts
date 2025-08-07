@@ -20,7 +20,7 @@ export interface UseExampleQueryReturnType {
 }
 export const useExampleQuery = (
   pageSize: number,
-  _filtersChanging: boolean, // THIS NEEDS TO BE USED
+  filtersChanging: boolean,
 ): UseExampleQueryReturnType => {
   const queryClient = useQueryClient();
   const { filterState } = useExampleFilterCoordinator();
@@ -100,7 +100,8 @@ export const useExampleQuery = (
       seed,
     ],
     queryFn: fetchFilteredExamples,
-    enabled: !!filterState && !!course && !!toLesson && !!seed,
+    enabled:
+      !!filterState && !!course && !!toLesson && !!seed && !filtersChanging,
   });
 
   const hasMorePages = useMemo(() => {
