@@ -6,9 +6,15 @@ import type {
 export default function MoreInfoViewExample({
   example,
   isOpen,
+  openContextual,
+  contextual,
+  setContextualRef,
 }: {
   example: ExampleWithVocabulary | Flashcard;
   isOpen: boolean;
+  openContextual: (contextual: string) => void;
+  contextual: string;
+  setContextualRef: (ref: HTMLDivElement | null) => void;
 }) {
   let exampleWithVocabulary: ExampleWithVocabulary;
   if ('vocabulary' in example) {
@@ -20,17 +26,53 @@ export default function MoreInfoViewExample({
   return (
     isOpen && (
       <div className={`moreInfoView ${isOpen ? 'open' : 'closed'}`}>
-        <div className="vocabTagsSide">
-          <h3>Vocab Tags</h3>
-          {/* This should be a list of Skill Tag display objects, not just strings */}
-          <div className="vocabTagsList">
-            {exampleWithVocabulary.vocabulary.map((vocab) => (
-              <div className="vocabTag" key={vocab.id}>
-                {vocab.word}
+        {exampleWithVocabulary.vocabularyComplete &&
+          exampleWithVocabulary.vocabulary.length > 0 && (
+            <div className="vocabTagsSide">
+              <h3>Vocabulary</h3>
+              <div className="vocabTagsList">
+                {exampleWithVocabulary.vocabulary.map((vocab) => (
+                  <div className="vocabTagContainer" key={vocab.id}>
+                    <div
+                      className="vocabTag"
+                      onClick={() => {
+                        openContextual(`vocabInfo-${vocab.id}`);
+                      }}
+                    >
+                      {vocab.word}
+                    </div>
+                    {contextual === `vocabInfo-${vocab.id}` && (
+                      <div className="vocabInfo" ref={setContextualRef}>
+                        <div className="vocabInfoHeader">
+                          <h4>{vocab.word}</h4>
+                          <p>{vocab.descriptor}</p>
+                        </div>
+                        {vocab.type !== 'verb' ? (
+                          <div className="nonVerbInfo">
+                            <p>
+                              Part of Speech: {vocab.subcategory.partOfSpeech}
+                            </p>
+                            <p>Category: {vocab.subcategory.category}</p>
+                          </div>
+                        ) : (
+                          <div className="verbInfo">
+                            <p>
+                              Part of Speech: {vocab.subcategory.partOfSpeech}
+                            </p>
+                            <p>Verb Infinitive: {vocab.verb.infinitive}</p>
+                            <p>
+                              Conjugation Notes:{' '}
+                              {vocab.conjugationTags.join(', ')}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          )}
         <div className="moreInfoSide">
           <div className="labelsSection">
             {exampleWithVocabulary.spanglish && (

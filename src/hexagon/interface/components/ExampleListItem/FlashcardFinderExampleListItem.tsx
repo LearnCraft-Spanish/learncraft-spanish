@@ -5,6 +5,7 @@ import type {
 } from '@learncraft-spanish/shared';
 
 import { useCallback, useState } from 'react';
+import { useContextualMenu } from '../../hooks/useContextualMenu';
 import ExampleListItemFactory from './ExampleListItemFactory';
 import AddPendingRemove from './units/AddPendingRemove';
 import BulkAddButton from './units/BulkAddButton';
@@ -33,6 +34,7 @@ export default function ExampleListItem({
   isSelected?: boolean;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
+  const { openContextual, setContextualRef, contextual } = useContextualMenu();
 
   const onClickMoreInfo = useCallback(() => {
     setIsMoreInfoOpen(!isMoreInfoOpen);
@@ -73,7 +75,13 @@ export default function ExampleListItem({
           ),
         ]}
       />
-      <MoreInfoViewExample example={example} isOpen={isMoreInfoOpen} />
+      <MoreInfoViewExample
+        example={example}
+        isOpen={isMoreInfoOpen}
+        openContextual={openContextual}
+        contextual={contextual}
+        setContextualRef={setContextualRef}
+      />
     </div>
   );
 }
