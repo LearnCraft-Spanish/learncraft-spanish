@@ -2,6 +2,7 @@ import type {
   CreateNonVerbVocabulary,
   CreateVerbVocabulary,
   Vocabulary,
+  VocabularyAbbreviation,
 } from '@learncraft-spanish/shared';
 import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
 import {
@@ -12,7 +13,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export interface UseVocabularyResult {
   // Read operations
-  vocabulary: Vocabulary[];
+  vocabulary: VocabularyAbbreviation[];
   loading: boolean;
   error: Error | null;
   getById: (id: string) => Promise<Vocabulary | null>;
@@ -121,7 +122,7 @@ export function useVocabulary(): UseVocabularyResult {
 
   return {
     // Read operations
-    vocabulary: data as Vocabulary[],
+    vocabulary: data as VocabularyAbbreviation[],
     loading: isLoading,
     error: normalizeQueryError(error),
     getById,

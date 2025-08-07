@@ -9,7 +9,7 @@ describe('useVocabularyPage', () => {
   beforeEach(() => {
     // Reset adapter mock before each test
     overrideMockVocabularyAdapter({
-      getVocabulary: () => Promise.resolve([]),
+      getVocabularyBySubcategory: () => Promise.resolve([]),
       getVocabularyCount: () => Promise.resolve(0),
     });
   });
@@ -19,7 +19,7 @@ describe('useVocabularyPage', () => {
     // Arrange
     const mockItems = createMockVocabularyList(10);
     overrideMockVocabularyAdapter({
-      getVocabulary: () => Promise.resolve(mockItems),
+      getVocabularyBySubcategory: () => Promise.resolve(mockItems),
       getVocabularyCount: () => Promise.resolve(32),
     });
 

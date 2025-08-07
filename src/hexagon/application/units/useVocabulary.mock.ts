@@ -5,14 +5,14 @@ import type {
 import type { UseVocabularyResult } from './useVocabulary';
 import {
   createMockVocabulary,
-  createMockVocabularyList,
+  createMockVocabularyAbbreviationList,
 } from '@testing/factories/vocabularyFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Default mock implementation matching the interface exactly
 const defaultMockResult: UseVocabularyResult = {
   // Read operations
-  vocabulary: createMockVocabularyList(),
+  vocabulary: createMockVocabularyAbbreviationList(),
   loading: false,
   error: null,
   getById: (_id: string) => Promise.resolve(createMockVocabulary()),
