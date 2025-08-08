@@ -5,9 +5,10 @@ import type {
 } from '@learncraft-spanish/shared';
 
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useContextualMenu } from '../../hooks/useContextualMenu';
 import ExampleListItemFactory from './ExampleListItemFactory';
+import AddPendingRemove from './units/AddPendingRemove';
 import BulkRemoveButton from './units/BulkRemoveButton';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewExample from './units/MoreInfoViewExample';
@@ -16,6 +17,8 @@ export default function ExampleListItem({
   example,
   isCollected,
   isPending,
+  handleSingleAdd,
+  handleRemove,
   handleRemoveSelected,
   handleSelect,
   isSelected,
@@ -24,15 +27,38 @@ export default function ExampleListItem({
   example: Flashcard | ExampleWithVocabulary | null;
   isCollected: boolean;
   isPending: boolean;
-  handleAdd: () => void;
+  handleSingleAdd: () => Promise<void>;
+  handleRemove: () => Promise<void>;
   handleRemoveSelected: () => void;
   handleSelect: () => void;
-  handleRemove: () => void;
-  bulkSelectMode: boolean;
   isSelected?: boolean;
   lessonPopup: LessonPopup;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
+
+  const onClickMoreInfo = useCallback(() => {
+    setIsMoreInfoOpen(!isMoreInfoOpen);
+  }, [isMoreInfoOpen]);
+
+  const [pending, setPending] = useState(false);
+
+  const handleAddWrapper = useCallback(async () => {
+    setPending(true);
+    await handleSingleAdd();
+    setPending(false);
+    if (isSelected) {
+      handleRemoveSelected();
+    }
+  }, [handleSingleAdd, isSelected, handleRemoveSelected]);
+
+  const handleRemoveWrapper = useCallback(async () => {
+    setPending(true);
+    await handleRemove();
+    setPending(false);
+    if (isSelected) {
+      handleRemoveSelected();
+    }
+  }, [handleRemove, isSelected, handleRemoveSelected]);
   const { openContextual, setContextualRef, contextual } = useContextualMenu();
 
   if (!example) {
@@ -42,21 +68,31 @@ export default function ExampleListItem({
   return (
     <div className="exampleCardWithMoreInfo">
       <ExampleListItemFactory
-        example={example}
-        postTextComponents={[
-          <MoreInfoButton
-            onClickFunction={() => setIsMoreInfoOpen(!isMoreInfoOpen)}
-            isOpen={isMoreInfoOpen}
-            key="moreInfoButton"
-          />,
+        preTextComponents={[
           <BulkRemoveButton
+            key="bulkRemoveButton"
             id={example.id}
             isCollected={isCollected}
             handleSelect={handleSelect}
             handleRemoveSelected={handleRemoveSelected}
             isSelected={isSelected ?? false}
-            isPending={isPending}
-            key="bulkRemoveButton"
+            isPending={isPending || pending}
+          />,
+        ]}
+        example={example}
+        postTextComponents={[
+          <MoreInfoButton
+            onClickFunction={onClickMoreInfo}
+            isOpen={isMoreInfoOpen}
+            key="moreInfoButton"
+          />,
+          <AddPendingRemove
+            id={example.id}
+            isCollected={isCollected}
+            isPending={isPending || pending}
+            handleAdd={handleAddWrapper}
+            handleRemove={handleRemoveWrapper}
+            key="addPendingRemove"
           />,
         ]}
       />

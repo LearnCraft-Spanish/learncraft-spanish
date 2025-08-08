@@ -9,7 +9,7 @@ const mockProps = {
   example: f,
   isCollected: false,
   isPending: false,
-  handleAdd: vi.fn(),
+  handleSingleAdd: vi.fn(),
   handleRemoveSelected: vi.fn(),
   handleSelect: vi.fn(),
   handleRemove: vi.fn(),

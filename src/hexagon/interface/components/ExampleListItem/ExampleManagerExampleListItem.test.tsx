@@ -14,7 +14,7 @@ const mockProps = {
   handleRemove: vi.fn(),
   bulkSelectMode: false,
   isSelected: false,
-  handleAdd: vi.fn(),
+  handleSingleAdd: vi.fn(),
   lessonPopup: {
     lessonsByVocabulary: [],
     lessonsLoading: false,

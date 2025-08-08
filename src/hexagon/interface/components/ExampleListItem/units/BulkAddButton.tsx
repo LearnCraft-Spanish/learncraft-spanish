@@ -23,7 +23,13 @@ export default function BulkAddButton({
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
-    if (isPending) {
+    if (isPending && isCollected) {
+      return {
+        text: 'Removing...',
+        className: 'pendingButton',
+        onClickFunction: () => {},
+      };
+    } else if (isPending && !isCollected) {
       return {
         text: 'Adding...',
         className: 'pendingButton',

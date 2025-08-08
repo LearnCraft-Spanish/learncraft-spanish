@@ -17,18 +17,17 @@ export default function ExampleListItem({
   example,
   isCollected,
   isPending,
-  handleAdd,
+  handleSingleAdd,
   handleRemoveSelected,
   handleSelect,
   handleRemove,
-  bulkSelectMode,
   isSelected,
   lessonPopup,
 }: {
   example: Flashcard | ExampleWithVocabulary | null;
   isCollected: boolean;
   isPending: boolean;
-  handleAdd: () => void;
+  handleSingleAdd: () => Promise<void>;
   handleRemoveSelected: () => void;
   handleSelect: () => void;
   handleRemove: () => void;
@@ -43,6 +42,23 @@ export default function ExampleListItem({
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
 
+  const [pending, setPending] = useState(false);
+
+  const handleAddWrapper = useCallback(async () => {
+    setPending(true);
+    await handleSingleAdd();
+    setPending(false);
+    if (isSelected) {
+      handleRemoveSelected();
+    }
+  }, [handleSingleAdd, isSelected, handleRemoveSelected]);
+
+  const handleRemoveWrapper = useCallback(async () => {
+    setPending(true);
+    await handleRemove();
+    setPending(false);
+  }, [handleRemove]);
+
   if (!example) {
     return null;
   }
@@ -50,6 +66,17 @@ export default function ExampleListItem({
   return (
     <div className="exampleCardWithMoreInfo">
       <ExampleListItemFactory
+        preTextComponents={[
+          <BulkAddButton
+            key="bulkAddButton"
+            id={example.id}
+            isCollected={isCollected}
+            handleSelect={handleSelect}
+            handleRemoveSelected={handleRemoveSelected}
+            isSelected={isSelected ?? false}
+            isPending={isPending || pending}
+          />,
+        ]}
         example={example}
         postTextComponents={[
           <MoreInfoButton
@@ -57,25 +84,14 @@ export default function ExampleListItem({
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
-          bulkSelectMode ? (
-            <BulkAddButton
-              id={example.id}
-              isCollected={isCollected}
-              handleSelect={handleSelect}
-              handleRemoveSelected={handleRemoveSelected}
-              isSelected={isSelected ?? false}
-              isPending={isPending}
-            />
-          ) : (
-            <AddPendingRemove
-              id={example.id}
-              isCollected={isCollected}
-              isPending={isPending}
-              handleAdd={handleAdd}
-              handleRemove={handleRemove}
-              key="addPendingRemove"
-            />
-          ),
+          <AddPendingRemove
+            id={example.id}
+            isCollected={isCollected}
+            isPending={isPending || pending}
+            handleAdd={handleAddWrapper}
+            handleRemove={handleRemoveWrapper}
+            key="addPendingRemove"
+          />,
         ]}
       />
       <MoreInfoViewExample

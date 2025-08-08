@@ -2,12 +2,12 @@
   margin-left: auto;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: flex-start;
   height: 100%;
   align-items: center;
 
   position: absolute;
-  right: 0;
+  left: 0;
   top: 0;
 
   button {
@@ -15,7 +15,8 @@
     padding: 2px 8px;
   }
 
-  .bulkAddFlashcardsButton,
+  .bulkAddExamplesButton,
+  .bulkRemoveFlashcardsButton,
   .clearSelectionButton {
     font-size: 0.75rem;
     // border: 2px solid var(--theme);
@@ -28,7 +29,15 @@
     }
   }
 
-  .bulkAddFlashcardsButton {
+  .bulkAddExamplesButton {
+    background-color: darkgreen;
+
+    &:disabled {
+      background-color: var(--dark);
+    }
+  }
+
+  .bulkRemoveFlashcardsButton {
     background-color: darkred;
 
     &:disabled {
@@ -49,10 +58,10 @@
       color: var(--light);
     }
   }
-
-  .tableOptionsWrapper {
-    position: relative;
-  }
+}
+.examplesTable .displayExamplesDescription .tableOptionsWrapper {
+  position: absolute;
+  right: 0;
 
   .tableOptionsButton {
     background-color: transparent;
@@ -77,8 +86,8 @@
     position: absolute;
     bottom: 100%;
     right: 0;
-    background-color: var(--light);
     max-width: 50vw;
+    background-color: var(--light);
     // dont text wrap
     white-space: nowrap;
     // grow to fit the content
