@@ -81,7 +81,11 @@ export default function ExamplesTable({
               type="button"
               className="clearSelectionButton"
               onClick={() => {
-                addAllToBulkSelect(examples.map((example) => example.id));
+                addAllToBulkSelect(
+                  examples
+                    .map((example) => example.id)
+                    .filter((id) => !studentFlashcards.isExampleCollected(id)),
+                );
               }}
             >
               Select All on Page

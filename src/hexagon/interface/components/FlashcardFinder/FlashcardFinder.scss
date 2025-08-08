@@ -14,6 +14,49 @@
       margin: 0px;
       padding: 0px;
     }
+
+    .subcategory,
+    .Subcategory,
+    .vocabulary,
+    .Vocabulary,
+    .idiom,
+    .Idiom,
+    .conjugation,
+    .Conjugation,
+    .verb,
+    .Verb {
+      border: 3px solid var(--dark);
+    }
+
+    .subcategory,
+    .Subcategory {
+      color: var(--light);
+      background-color: var(--theme);
+    }
+
+    .vocabulary,
+    .Vocabulary {
+      color: var(--light);
+      background-color: var(--brand);
+    }
+
+    .idiom,
+    .Idiom {
+      color: var(--dark);
+      background-color: var(--accent);
+    }
+
+    .conjugation,
+    .Conjugation {
+      color: var(--dark);
+      background-color: var(--light);
+    }
+
+    .verb,
+    .Verb {
+      color: var(--accent);
+      background-color: var(--dark);
+    }
   }
 
   .firstRow {
@@ -45,7 +88,7 @@
     overflow: hidden;
     margin: 5px;
     border-radius: 0;
-    cursor: pointer;
+    cursor: default;
   }
 }
 

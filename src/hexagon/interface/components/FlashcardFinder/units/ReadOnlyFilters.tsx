@@ -47,7 +47,7 @@ export default function ReadOnlyFilters({
             <h4>Selected Tags:</h4>
             <div className="vocabTagsList">
               {skillTags.map((tag) => (
-                <div className="vocabTag" key={tag.key}>
+                <div className={`vocabTag ${tag.type}`} key={tag.key}>
                   {tag.name}
                 </div>
               ))}
