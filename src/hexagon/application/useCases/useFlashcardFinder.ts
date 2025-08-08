@@ -25,7 +25,7 @@ export interface UseFlashcardFinderReturnType {
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const { lessonPopup } = useLessonPopup();
-  const [filtersChanging, setFiltersChanging] = useState(false);
+  const [filtersChanging, setFiltersChanging] = useState(true);
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
 
   const QUERY_PAGE_SIZE = 150;
