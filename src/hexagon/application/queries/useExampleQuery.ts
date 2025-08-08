@@ -58,29 +58,34 @@ export const useExampleQuery = (
     filterState.audioOnly,
   ]);
 
-  const fetchFilteredExamples = useCallback(async () => {
-    const { examples, totalCount } = await exampleAdapter.getFilteredExamples({
-      courseId: course!.id,
-      toLessonNumber: toLesson!.lessonNumber,
-      fromLessonNumber: fromLesson?.lessonNumber,
-      excludeSpanglish: filterState!.excludeSpanglish,
-      audioOnly: filterState!.audioOnly,
-      skillTags: filterState!.skillTags,
+  const fetchFilteredExamples = useCallback(
+    async ({ prefetchRequest = false }: { prefetchRequest?: boolean }) => {
+      const { examples, totalCount } = await exampleAdapter.getFilteredExamples(
+        {
+          courseId: course!.id,
+          toLessonNumber: toLesson!.lessonNumber,
+          fromLessonNumber: fromLesson?.lessonNumber,
+          excludeSpanglish: filterState!.excludeSpanglish,
+          audioOnly: filterState!.audioOnly,
+          skillTags: filterState!.skillTags,
+          page: prefetchRequest ? page + 1 : page,
+          limit: pageSize,
+          seed: seed!,
+        },
+      );
+      return { examples, totalCount };
+    },
+    [
+      course,
+      toLesson,
+      fromLesson,
+      filterState,
+      exampleAdapter,
       page,
-      limit: pageSize,
-      seed: seed!,
-    });
-    return { examples, totalCount };
-  }, [
-    course,
-    toLesson,
-    fromLesson,
-    filterState,
-    exampleAdapter,
-    page,
-    pageSize,
-    seed,
-  ]);
+      pageSize,
+      seed,
+    ],
+  );
 
   const {
     data: fullResponse,
@@ -99,7 +104,7 @@ export const useExampleQuery = (
       filterState?.skillTags,
       seed,
     ],
-    queryFn: fetchFilteredExamples,
+    queryFn: () => fetchFilteredExamples({ prefetchRequest: false }),
     enabled:
       !!filterState && !!course && !!toLesson && !!seed && !filtersChanging,
   });
@@ -110,7 +115,7 @@ export const useExampleQuery = (
       return false;
     }
     // Check if there are more items beyond what the next query page would fetch
-    const nextPageStartIndex = pageSize * (page + 1);
+    const nextPageStartIndex = pageSize * page + 1;
     return nextPageStartIndex <= totalCount;
   }, [page, pageSize, fullResponse?.totalCount]);
 
@@ -129,7 +134,7 @@ export const useExampleQuery = (
           filterState?.skillTags,
           seed,
         ],
-        queryFn: fetchFilteredExamples,
+        queryFn: () => fetchFilteredExamples({ prefetchRequest: true }),
         ...queryDefaults.entityData,
         staleTime: 15 * 60 * 1000, // 2 minutes cache
       });
