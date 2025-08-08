@@ -33,14 +33,14 @@
     "test:hexagon": "vitest --config vitest.config-hexagon.ts --coverage",
     "test:hexagon:watch": "vitest --config vitest.config-hexagon.ts --watch",
     "typecheck": "tsc --noEmit",
-    "update-shared": "pnpm add @learncraft-spanish/shared@latest",
+    "update-shared": "pnpm add @learncraft-spanish/shared@latest --lockfile-dir=lockfiles/ci -w && pnpm install:ci:regenerate",
     "validate": "npm run lint:fix && npm run format && npm run typecheck",
     "metrics": "node METRICS/get_metrics.js",
     "lead-time": "node METRICS/lead-time/lead_time_tracker.js"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
-    "@learncraft-spanish/shared": "^0.7.8",
+    "@learncraft-spanish/shared": "^0.8.0",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
     "@sentry/vite-plugin": "^3.2.1",
