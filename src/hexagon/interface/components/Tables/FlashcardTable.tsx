@@ -26,6 +26,7 @@ interface FlashcardTableProps {
   paginationState: ReturnType<typeof usePagination>;
   somethingIsLoading: boolean;
   lessonPopup: LessonPopup;
+  findMore: () => void;
 }
 
 export default function FlashcardTable({
@@ -33,6 +34,7 @@ export default function FlashcardTable({
   paginationState,
   somethingIsLoading,
   lessonPopup,
+  findMore,
 }: FlashcardTableProps) {
   const {
     displayOrderSegment,
@@ -195,8 +197,13 @@ export default function FlashcardTable({
                     })`}
                   </p>
                 </button>
-                <button type="button">
-                  <p>Use these filters in Flashcard Finder (coming soon)</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    findMore();
+                  }}
+                >
+                  <p>Find More Matching Flashcards</p>
                 </button>
               </div>
             )}

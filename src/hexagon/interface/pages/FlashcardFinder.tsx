@@ -13,6 +13,7 @@ export default function FlashcardFinder() {
     filtersChanging,
     setFiltersChanging,
     lessonPopup,
+    manageThese,
   } = useFlashcardFinder();
 
   const { filterState, skillTagSearch } = exampleFilter;
@@ -37,6 +38,7 @@ export default function FlashcardFinder() {
           paginationState={pagination}
           fetchingExamples={exampleQuery.isLoading}
           lessonPopup={lessonPopup}
+          manageThese={manageThese}
         />
       )}
     </div>

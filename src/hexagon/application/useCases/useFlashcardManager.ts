@@ -15,18 +15,28 @@ import usePagination from '@application/units/Pagination/usePagination';
 import useExampleFilter from '@application/units/useExampleFilter';
 import { filterExamplesCombined } from '@learncraft-spanish/shared';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useFilterOwnedFlashcards from '../coordinators/hooks/useFilterOwnedFlashcards';
 import useLessonPopup from '../units/useLessonPopup';
 
 export default function useFlashcardManager(): UseFlashcardManagerReturnType {
+  const navigate = useNavigate();
   const { lessonPopup } = useLessonPopup();
+  const { filterOwnedFlashcards, setFilterOwnedFlashcards } =
+    useFilterOwnedFlashcards();
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
   const { courseAndLessonState, filterState: coordinatorFilterState } =
     exampleFilter;
   const { filterState } = coordinatorFilterState;
   const pageSize = 25;
 
-  const [filtersEnabled, setFiltersEnabled] = useState(false);
+  const setFiltersEnabled = useCallback(
+    (b: boolean) => {
+      setFilterOwnedFlashcards(b);
+    },
+    [setFilterOwnedFlashcards],
+  );
 
   const flashcardsQuery: UseStudentFlashcardsReturnType =
     useStudentFlashcards();
@@ -50,6 +60,10 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     return toLessonWithVocabQuery.data ?? [];
   }, [toLessonWithVocabQuery.data]);
 
+  const findMore = useCallback(() => {
+    navigate('/newflashcardfinder', { replace: true });
+  }, [navigate]);
+
   const ownedExamples: ExampleWithVocabulary[] = useMemo(() => {
     const mappedExamples: ExampleWithVocabulary[] =
       flashcardsQuery.flashcards?.map((flashcard) => {
@@ -59,7 +73,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   }, [flashcardsQuery.flashcards]);
 
   const filteredFlashcards = useMemo(() => {
-    if (!filtersEnabled) {
+    if (!filterOwnedFlashcards) {
       return flashcardsQuery.flashcards ?? [];
     }
 
@@ -86,7 +100,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     toLessonVocabIds,
     filterState,
     flashcardsQuery.flashcards,
-    filtersEnabled,
+    filterOwnedFlashcards,
   ]);
 
   const displayOrder = useMemo(() => {
@@ -109,9 +123,9 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     filteredFlashcards,
     paginationState,
     pageSize,
-
-    filtersEnabled,
-    toggleFilters: () => setFiltersEnabled(!filtersEnabled),
+    filtersEnabled: filterOwnedFlashcards,
+    toggleFilters: () => setFiltersEnabled(!filterOwnedFlashcards),
+    findMore,
 
     somethingIsLoading:
       flashcardsQuery.isLoading ||

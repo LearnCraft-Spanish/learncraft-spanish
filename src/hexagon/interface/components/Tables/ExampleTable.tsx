@@ -24,6 +24,7 @@ interface ExamplesTableProps {
   paginationState: QueryPaginationState;
   fetchingExamples: boolean;
   lessonPopup: LessonPopup;
+  manageThese: () => void;
 }
 
 export default function ExamplesTable({
@@ -33,6 +34,7 @@ export default function ExamplesTable({
   paginationState,
   fetchingExamples,
   lessonPopup,
+  manageThese,
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
 
@@ -150,6 +152,9 @@ export default function ExamplesTable({
                     })`}
                   </p>
                 </button>
+                <button type="button" onClick={manageThese}>
+                  <p>Manage these</p>
+                </button>
                 {/* <button
                     type="button"
                     onClick={() => {
@@ -169,9 +174,6 @@ export default function ExamplesTable({
                       })`}
                     </p>
                   </button> */}
-                <button type="button">
-                  <p>Use these filters in Example Manager (coming soon)</p>
-                </button>
               </div>
             )}
           </div>

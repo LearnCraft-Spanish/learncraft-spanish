@@ -9,6 +9,8 @@ import useQueryPagination from '@application/units/Pagination/useQueryPagination
 import useExampleFilter from '@application/units/useExampleFilter';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useFilterOwnedFlashcards from '../coordinators/hooks/useFilterOwnedFlashcards';
 import { useExampleQuery } from '../queries/useExampleQuery';
 
 export interface UseFlashcardFinderReturnType {
@@ -21,11 +23,14 @@ export interface UseFlashcardFinderReturnType {
   filtersChanging: boolean;
   setFiltersChanging: (filtersChanging: boolean) => void;
   lessonPopup: LessonPopup;
+  manageThese: () => void;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const { lessonPopup } = useLessonPopup();
   const [filtersChanging, setFiltersChanging] = useState(true);
+  const navigate = useNavigate();
+  const { setFilterOwnedFlashcards } = useFilterOwnedFlashcards();
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
 
   const QUERY_PAGE_SIZE = 150;
@@ -157,6 +162,11 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     [updateUserSelectedCourseIdFunction, filtersChanging],
   );
 
+  const manageThese = useCallback(() => {
+    setFilterOwnedFlashcards(true);
+    navigate('/manage-flashcards', { replace: true });
+  }, [navigate, setFilterOwnedFlashcards]);
+
   return {
     pagination,
     exampleFilter: {
@@ -183,5 +193,6 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     filtersChanging,
     setFiltersChanging,
     lessonPopup,
+    manageThese,
   };
 }
