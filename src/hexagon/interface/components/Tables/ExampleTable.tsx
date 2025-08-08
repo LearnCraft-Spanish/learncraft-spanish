@@ -45,6 +45,7 @@ export default function ExamplesTable({
     addToBulkSelect,
     removeFromBulkSelect,
     clearBulkSelect,
+    addAllToBulkSelect,
     // toggleBulkSelectMode,
     triggerBulkOperation,
   } = useBulkSelect(async () => {
@@ -76,6 +77,15 @@ export default function ExamplesTable({
       <div className="buttonBox">
         <div className="displayExamplesDescription">
           <div id="bulkAddModeButtons">
+            <button
+              type="button"
+              className="clearSelectionButton"
+              onClick={() => {
+                addAllToBulkSelect(examples.map((example) => example.id));
+              }}
+            >
+              Select All on Page
+            </button>
             {bulkSelectIds.length > 0 && (
               <button
                 className="bulkAddExamplesButton"

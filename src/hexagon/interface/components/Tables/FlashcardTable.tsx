@@ -56,6 +56,7 @@ export default function FlashcardTable({
     removeFromBulkSelect,
     clearBulkSelect,
     triggerBulkOperation,
+    addAllToBulkSelect,
   } = useBulkSelect(async (exampleIds: number[]) => {
     await deleteFlashcards(exampleIds);
   });
@@ -95,6 +96,13 @@ export default function FlashcardTable({
     [bulkSelectIds, getExampleById],
   );
 
+  const handleSelectAllOnPage = useCallback(() => {
+    const flashcards = displayOrderSegment.map(
+      (displayOrder) => getExampleById(displayOrder.recordId) as Flashcard,
+    );
+    addAllToBulkSelect(flashcards.map((flashcard) => flashcard.example.id));
+  }, [addAllToBulkSelect, displayOrderSegment, getExampleById]);
+
   useEffect(() => {
     if (maxPage === 1) {
       setPage(1);
@@ -106,6 +114,13 @@ export default function FlashcardTable({
       <div className="buttonBox">
         <div className="displayExamplesDescription">
           <div id="bulkAddModeButtons">
+            <button
+              type="button"
+              className="clearSelectionButton"
+              onClick={handleSelectAllOnPage}
+            >
+              Select All on Page
+            </button>
             {bulkSelectIds.length > 0 && (
               <button
                 className="bulkRemoveFlashcardsButton"
