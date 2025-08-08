@@ -53,12 +53,21 @@ export default function TagFilter({
                 }}
               >
                 <div className={`${item.type}Card`}>
-                  <h4 className="vocabName">{item.name}</h4>
+                  <h4 className="vocabName">
+                    {item.type === SkillType.Subcategory
+                      ? item.subcategory
+                      : item.name}
+                  </h4>
                   {item.type === SkillType.Vocabulary && (
                     <h5 className="vocabDescriptor">{item.descriptor}</h5>
                   )}
                   {item.type === SkillType.Idiom && (
                     <h5 className="vocabDescriptor">{item.subcategoryName}</h5>
+                  )}
+                  {item.type === SkillType.Verb && (
+                    <h5 className="vocabDescriptor">
+                      {item.verbTags.join(' - ')}
+                    </h5>
                   )}
                   <p className="vocabUse">{item.type}</p>
                 </div>
