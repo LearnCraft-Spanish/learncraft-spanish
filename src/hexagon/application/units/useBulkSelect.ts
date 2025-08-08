@@ -32,9 +32,13 @@ export default function useBulkSelect(
 
   const triggerBulkOperation = useCallback(async () => {
     setBulkOperationInProgress(true);
-    await bulkOperation(bulkSelectIds);
-    setBulkOperationInProgress(false);
-    clearBulkSelect();
+    bulkOperation(bulkSelectIds)
+      .then(() => {
+        clearBulkSelect();
+      })
+      .finally(() => {
+        setBulkOperationInProgress(false);
+      });
   }, [bulkOperation, clearBulkSelect, bulkSelectIds]);
 
   return {

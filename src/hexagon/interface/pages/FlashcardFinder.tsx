@@ -29,7 +29,7 @@ export default function FlashcardFinder() {
         filtersChanging={filtersChanging}
         setFiltersChanging={setFiltersChanging}
       />
-      {!filtersChanging ? (
+      {!filtersChanging && (
         <ExampleTable
           examples={displayExamples}
           totalCount={exampleQuery.totalCount ?? 0}
@@ -38,10 +38,6 @@ export default function FlashcardFinder() {
           fetchingExamples={exampleQuery.isLoading}
           lessonPopup={lessonPopup}
         />
-      ) : (
-        <div>
-          Please press "Get Examples" or "close without saving" to see results
-        </div>
       )}
     </div>
   );

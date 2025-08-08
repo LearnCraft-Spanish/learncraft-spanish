@@ -79,7 +79,7 @@ export default function ExamplesTable({
                 className="bulkAddExamplesButton"
                 type="button"
                 onClick={triggerBulkOperation}
-                disabled={bulkSelectIds.length === 0}
+                disabled={bulkOperationInProgress}
               >
                 {bulkSelectIds.length > 0
                   ? `Add ${bulkSelectIds.length} Example${

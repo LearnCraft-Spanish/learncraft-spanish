@@ -66,47 +66,49 @@ export default function FlashcardFinderFilter({
         buttonAlwaysVisible
       />
       {filtersChanging && (
-        <div className="filterSection">
-          <div className="filterBox options">
-            <div className="FromToLessonSelectorWrapper">
-              <LessonRangeSelector />
-            </div>
-            <ToggleSwitch
-              id="removeSpanglish"
-              ariaLabel="noSpanglish"
-              label="Exclude Spanglish: "
-              checked={excludeSpanglish ?? false}
-              onChange={() =>
-                updateExcludeSpanglish(!filterState.excludeSpanglish)
-              }
-            />
-            <ToggleSwitch
-              id="audioOnly"
-              ariaLabel="audioOnly"
-              label="Audio Flashcards Only: "
-              checked={audioOnly ?? false}
-              onChange={() => updateAudioOnly(!filterState.audioOnly)}
-            />
-          </div>
-          <div className="filterBox search">
-            <div className="searchFilter">
-              <TagFilter
-                searchTerm={tagSearchTerm}
-                updateSearchTerm={updateTagSearchTerm}
-                searchResults={tagSuggestions}
-                addTag={addSkillTagToFilters}
-                removeTagFromSuggestions={removeTagFromSuggestions}
+        <>
+          <div className="filterSection">
+            <div className="filterBox options">
+              <div className="FromToLessonSelectorWrapper">
+                <LessonRangeSelector />
+              </div>
+              <ToggleSwitch
+                id="removeSpanglish"
+                ariaLabel="noSpanglish"
+                label="Exclude Spanglish: "
+                checked={excludeSpanglish ?? false}
+                onChange={() =>
+                  updateExcludeSpanglish(!filterState.excludeSpanglish)
+                }
               />
-              <SelectedTags
-                removeTag={(tagId) => {
-                  removeSkillTagFromFilters(tagId);
-                  addTagBackToSuggestions(tagId);
-                }}
-                skillTags={skillTags}
+              <ToggleSwitch
+                id="audioOnly"
+                ariaLabel="audioOnly"
+                label="Audio Flashcards Only: "
+                checked={audioOnly ?? false}
+                onChange={() => updateAudioOnly(!filterState.audioOnly)}
               />
             </div>
+            <div className="filterBox search">
+              <div className="searchFilter">
+                <TagFilter
+                  searchTerm={tagSearchTerm}
+                  updateSearchTerm={updateTagSearchTerm}
+                  searchResults={tagSuggestions}
+                  addTag={addSkillTagToFilters}
+                  removeTagFromSuggestions={removeTagFromSuggestions}
+                />
+                <SelectedTags
+                  removeTag={(tagId) => {
+                    removeSkillTagFromFilters(tagId);
+                    addTagBackToSuggestions(tagId);
+                  }}
+                  skillTags={skillTags}
+                />
+              </div>
+            </div>
           </div>
-          <div className="getExamplesButtonWrapper">
+          <div className="getExamplesButtonWrapper buttonBox">
             <button
               onClick={() => setFiltersChanging(false)}
               type="button"
@@ -116,7 +118,7 @@ export default function FlashcardFinderFilter({
               Get Examples
             </button>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -109,7 +109,7 @@ export default function FlashcardTable({
                 className="bulkRemoveFlashcardsButton"
                 type="button"
                 onClick={triggerBulkOperation}
-                disabled={bulkSelectIds.length === 0}
+                disabled={bulkOperationInProgress}
               >
                 {bulkSelectIds.length > 0
                   ? `Remove ${bulkSelectIds.length} Flashcard${

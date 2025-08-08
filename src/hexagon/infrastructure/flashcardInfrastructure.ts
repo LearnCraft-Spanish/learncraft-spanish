@@ -44,18 +44,33 @@ export function createFlashcardInfrastructure(
 
     deleteMyStudentFlashcards: async ({
       studentExampleIds,
+      finallyFunction,
     }: {
       studentExampleIds: number[];
+      finallyFunction?: () => void;
     }): Promise<number> => {
-      const response = await httpClient.delete<number>(
-        deleteMyStudentExamplesEndpoint.path,
-        deleteMyStudentExamplesEndpoint.requiredScopes,
-        {
-          params: {
-            studentExampleIds: studentExampleIds.join(','),
+      const response = await httpClient
+        .delete<number>(
+          deleteMyStudentExamplesEndpoint.path,
+          deleteMyStudentExamplesEndpoint.requiredScopes,
+          {
+            params: {
+              studentExampleIds: studentExampleIds.join(','),
+            },
           },
-        },
-      );
+        )
+        .then((response) => {
+          return response;
+        })
+        .catch((error) => {
+          console.error('error', error);
+          return Promise.reject(error);
+        })
+        .finally(() => {
+          if (finallyFunction) {
+            finallyFunction();
+          }
+        });
       return response;
     },
 

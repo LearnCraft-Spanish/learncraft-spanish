@@ -30,7 +30,7 @@ export default function ExampleListItem({
   handleSingleAdd: () => Promise<void>;
   handleRemoveSelected: () => void;
   handleSelect: () => void;
-  handleRemove: () => void;
+  handleRemove: () => Promise<void>;
   bulkSelectMode: boolean;
   isSelected?: boolean;
   lessonPopup: LessonPopup;
@@ -46,18 +46,29 @@ export default function ExampleListItem({
 
   const handleAddWrapper = useCallback(async () => {
     setPending(true);
-    await handleSingleAdd();
-    setPending(false);
-    if (isSelected) {
-      handleRemoveSelected();
-    }
+    handleSingleAdd()
+      .then(() => {
+        if (isSelected) {
+          handleRemoveSelected();
+        }
+      })
+      .finally(() => {
+        setPending(false);
+      });
   }, [handleSingleAdd, isSelected, handleRemoveSelected]);
 
   const handleRemoveWrapper = useCallback(async () => {
     setPending(true);
-    await handleRemove();
-    setPending(false);
-  }, [handleRemove]);
+    handleRemove()
+      .then(() => {
+        if (isSelected) {
+          handleRemoveSelected();
+        }
+      })
+      .finally(() => {
+        setPending(false);
+      });
+  }, [handleRemove, isSelected, handleRemoveSelected]);
 
   if (!example) {
     return null;

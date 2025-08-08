@@ -53,11 +53,15 @@ export default function ExampleListItem({
 
   const handleRemoveWrapper = useCallback(async () => {
     setPending(true);
-    await handleRemove();
-    setPending(false);
-    if (isSelected) {
-      handleRemoveSelected();
-    }
+    handleRemove()
+      .then(() => {
+        if (isSelected) {
+          handleRemoveSelected();
+        }
+      })
+      .finally(() => {
+        setPending(false);
+      });
   }, [handleRemove, isSelected, handleRemoveSelected]);
   const { openContextual, setContextualRef, contextual } = useContextualMenu();
 
