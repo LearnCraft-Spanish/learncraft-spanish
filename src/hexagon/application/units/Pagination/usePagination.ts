@@ -1,6 +1,6 @@
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export default function usePagination({
   itemsPerPage = 50,
@@ -26,6 +26,13 @@ export default function usePagination({
       return (page - 1) * itemsPerPage + 1;
     }
   }, [page, itemsPerPage, displayOrder]);
+
+  useEffect(() => {
+    if (page > maxPage) {
+      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
+      setPage(maxPage);
+    }
+  }, [page, maxPage]);
 
   return {
     displayOrderSegment,
