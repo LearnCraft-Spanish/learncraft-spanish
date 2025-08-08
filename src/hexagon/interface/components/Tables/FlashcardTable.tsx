@@ -244,7 +244,6 @@ export default function FlashcardTable({
                 if (!flashcardToRemove) {
                   throw new Error('Flashcard not found');
                 }
-                console.log('flashcardToRemove', flashcardToRemove);
                 await deleteFlashcards([flashcardToRemove.example.id]);
 
                 removeFromBulkSelect(flashcardToRemove.example.id);

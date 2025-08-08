@@ -1,9 +1,9 @@
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type { Flashcard } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import VocabTagContainer from './VocabTagContainer';
 
 export default function MoreInfoViewFlashcard({
-  example,
+  flashcard,
   isCustom,
   isOpen,
   openContextual,
@@ -11,7 +11,7 @@ export default function MoreInfoViewFlashcard({
   setContextualRef,
   lessonPopup,
 }: {
-  example: ExampleWithVocabulary;
+  flashcard: Flashcard;
   isCustom: boolean;
   isOpen: boolean;
   openContextual: (contextual: string) => void;
@@ -19,15 +19,37 @@ export default function MoreInfoViewFlashcard({
   setContextualRef: (ref: HTMLDivElement | null) => void;
   lessonPopup: LessonPopup;
 }) {
+  const dateAddedFormatted = flashcard.dateCreated
+    ? new Date(flashcard.dateCreated).toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+      })
+    : 'unknown';
+  const nextReviewFormatted = flashcard.nextReview
+    ? new Date(flashcard.nextReview).toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+      })
+    : 'Today';
+
+  const lastReviewedFormatted = flashcard.lastReviewed
+    ? new Date(flashcard.lastReviewed).toLocaleDateString('en-US', {
+        month: '2-digit',
+        day: '2-digit',
+        year: 'numeric',
+      })
+    : 'Never';
   return (
     <div className={`moreInfoView ${isOpen ? 'open' : 'closed'}`}>
       <div className="vocabTagsSide">
         <h3>Vocabulary</h3>
         <div className="vocabTagsList">
-          {example.vocabulary.map((vocab) => (
+          {flashcard.example.vocabulary.map((vocab) => (
             <VocabTagContainer
               key={vocab.id}
-              exampleId={example.id}
+              exampleId={flashcard.example.id}
               vocabulary={vocab}
               openContextual={openContextual}
               contextual={contextual}
@@ -39,24 +61,28 @@ export default function MoreInfoViewFlashcard({
       </div>
       <div className="moreInfoSide">
         <div className="labelsSection">
-          {example.spanglish && (
+          {flashcard.example.spanglish && (
             <div className="label spanglish">spanglish</div>
           )}
-          {example.spanishAudio && (
+          {flashcard.example.spanishAudio && (
             <div className="label audio">audio flashcard</div>
           )}
           {isCustom && <div className="label custom">custom flashcard</div>}
         </div>
-        {/* <div className="datesSection">
+        <div className="datesSection">
           <div className="lineWrapper">
             <div className="label">Added on:</div>
-            <div className="content">{example.createdAt}</div>
+            <div className="content">{dateAddedFormatted}</div>
+          </div>
+          <div className="lineWrapper">
+            <div className="label">Last Reviewed:</div>
+            <div className="content">{lastReviewedFormatted}</div>
           </div>
           <div className="lineWrapper">
             <div className="label">Next SRS Review:</div>
-            <div className="content">{example.nextReviewDate}</div>
+            <div className="content">{nextReviewFormatted}</div>
           </div>
-        </div> */}
+        </div>
       </div>
     </div>
   );

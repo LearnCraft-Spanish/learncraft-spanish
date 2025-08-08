@@ -11,7 +11,7 @@ import ExampleListItemFactory from './ExampleListItemFactory';
 import AddPendingRemove from './units/AddPendingRemove';
 import BulkRemoveButton from './units/BulkRemoveButton';
 import MoreInfoButton from './units/MoreInfoButton';
-import MoreInfoViewExample from './units/MoreInfoViewExample';
+import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
 
 export default function ExampleListItem({
   example,
@@ -96,8 +96,9 @@ export default function ExampleListItem({
           />,
         ]}
       />
-      <MoreInfoViewExample
-        example={example}
+      <MoreInfoViewFlashcard
+        flashcard={example as Flashcard}
+        isCustom={false} // TODO: add custom flashcard
         isOpen={isMoreInfoOpen}
         openContextual={openContextual}
         contextual={contextual}

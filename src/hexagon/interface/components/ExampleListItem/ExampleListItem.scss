@@ -56,7 +56,7 @@
 
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    // align-items: stretch;
     justify-content: space-between;
 
     // .moreInfoView {
@@ -88,7 +88,7 @@
   margin-left: 40px;
 }
 .moreInfoSide {
-  max-width: 30%;
+  max-width: 50%;
 }
 
 .labelsSection {
@@ -158,4 +158,23 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+}
+
+.datesSection {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 300px;
+  margin-right: 0.5rem;
+
+  .lineWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .label {
+      text-wrap: nowrap;
+    }
+  }
 }
