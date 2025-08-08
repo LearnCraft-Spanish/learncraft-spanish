@@ -4,6 +4,7 @@ import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/
 import { SectionHeader } from '../general';
 import ToggleSwitch from '../general/ToggleSwitch';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
+import Instructions from './units/Instructions';
 import ReadOnlyFilters from './units/ReadOnlyFilters';
 import SelectedTags from './VocabTagFilter/SelectedTags';
 import TagFilter from './VocabTagFilter/TagFilter';
@@ -61,20 +62,8 @@ export default function FlashcardFinderFilter({
               ]
             : []
         }
-        button={
-          filtersChanging && (
-            <div className="getExamplesButtonWrapper">
-              <button
-                onClick={() => setFiltersChanging(false)}
-                type="button"
-                className="getExamplesButton"
-                disabled={!filtersChanging || !toLessonNumber}
-              >
-                Get Examples
-              </button>
-            </div>
-          )
-        }
+        button={<Instructions />}
+        buttonAlwaysVisible
       />
       {filtersChanging && (
         <div className="filterSection">
@@ -116,6 +105,16 @@ export default function FlashcardFinderFilter({
                 skillTags={skillTags}
               />
             </div>
+          </div>
+          <div className="getExamplesButtonWrapper">
+            <button
+              onClick={() => setFiltersChanging(false)}
+              type="button"
+              className="getExamplesButton"
+              disabled={!filtersChanging || !toLessonNumber}
+            >
+              Get Examples
+            </button>
           </div>
         </div>
       )}
