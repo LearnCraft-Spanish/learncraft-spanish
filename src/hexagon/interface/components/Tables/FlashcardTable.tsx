@@ -14,7 +14,7 @@ import { Pagination } from '../general';
 
 import { InlineLoading } from '../Loading';
 import {
-  // copyTableToClipboard,
+  copyTableToClipboard,
   getExampleOrFlashcardById,
 } from './units/functions';
 
@@ -48,13 +48,11 @@ export default function FlashcardTable({
     useStudentFlashcards();
 
   const {
-    bulkSelectMode,
     bulkOperationInProgress,
     bulkSelectIds,
     addToBulkSelect,
     removeFromBulkSelect,
     clearBulkSelect,
-    // toggleBulkSelectMode,
     triggerBulkOperation,
   } = useBulkSelect(async (exampleIds: number[]) => {
     await deleteFlashcards(exampleIds);
@@ -84,6 +82,17 @@ export default function FlashcardTable({
     [dataSource],
   );
 
+  const isSelected = useCallback(
+    (recordId: number) => {
+      const flashcardToSelect = getExampleById(recordId) as Flashcard;
+      if (!flashcardToSelect) {
+        throw new Error('Flashcard not found');
+      }
+      return bulkSelectIds.includes(flashcardToSelect.example.id);
+    },
+    [bulkSelectIds, getExampleById],
+  );
+
   useEffect(() => {
     if (maxPage === 1) {
       setPage(1);
@@ -94,6 +103,32 @@ export default function FlashcardTable({
     <div className="examplesTable">
       <div className="buttonBox">
         <div className="displayExamplesDescription">
+          <div id="bulkAddModeButtons">
+            {bulkSelectIds.length > 0 && (
+              <button
+                className="bulkRemoveFlashcardsButton"
+                type="button"
+                onClick={triggerBulkOperation}
+                disabled={bulkSelectIds.length === 0}
+              >
+                {bulkSelectIds.length > 0
+                  ? `Remove ${bulkSelectIds.length} Flashcard${
+                      bulkSelectIds.length === 1 ? '' : 's'
+                    }`
+                  : 'Select Flashcards to Remove'}
+              </button>
+            )}
+            {bulkSelectIds.length > 0 && (
+              <button
+                className="clearSelectionButton"
+                type="button"
+                onClick={clearBulkSelect}
+                disabled={bulkSelectIds.length === 0}
+              >
+                Clear Selection
+              </button>
+            )}
+          </div>
           {somethingIsLoading ? (
             <InlineLoading message="Just a moment..." />
           ) : (
@@ -111,60 +146,60 @@ export default function FlashcardTable({
             </h4>
           )}
 
-          <div id="bulkAddModeButtons">
-            {bulkSelectIds.length > 0 && (
-              <button
-                className="clearSelectionButton"
-                type="button"
-                onClick={clearBulkSelect}
-                disabled={bulkSelectIds.length === 0}
-              >
-                Clear Selection
-              </button>
-            )}
-
-            {bulkSelectIds.length > 0 && (
-              <button
-                className="bulkAddFlashcardsButton"
-                type="button"
-                onClick={triggerBulkOperation}
-                disabled={bulkSelectIds.length === 0}
-              >
-                {bulkSelectIds.length > 0
-                  ? `Remove ${bulkSelectIds.length} Flashcard${
-                      bulkSelectIds.length === 1 ? '' : 's'
-                    }`
-                  : 'Select Flashcards to Remove'}
-              </button>
-            )}
-
-            <div className="tableOptionsWrapper">
-              <button
-                type="button"
-                className="tableOptionsButton"
+          <div className="tableOptionsWrapper">
+            <button
+              type="button"
+              className="tableOptionsButton"
+              onMouseEnter={show}
+              onMouseLeave={hide}
+            >
+              <img src={ellipsis} alt="Table Options" />
+            </button>
+            {isTableOptionsOpen && (
+              <div
+                className="tableOptions"
                 onMouseEnter={show}
                 onMouseLeave={hide}
               >
-                <img src={ellipsis} alt="Table Options" />
-              </button>
-              {isTableOptionsOpen && (
-                <div
-                  className="tableOptions"
-                  onMouseEnter={show}
-                  onMouseLeave={hide}
+                <button
+                  type="button"
+                  onClick={() => {
+                    copyTableToClipboard({
+                      displayOrder: displayOrderSegment,
+                      getExampleOrFlashcardById: getExampleById,
+                    });
+                  }}
                 >
-                  <button type="button">
-                    <p>Copy this page to clipboard</p>
-                  </button>
-                  <button type="button">
-                    <p>Copy all results to clipboard</p>
-                  </button>
-                  <button type="button">
-                    <p>Use these filters in Flashcard Finder</p>
-                  </button>
-                </div>
-              )}
-            </div>
+                  <p>
+                    Copy this page to clipboard{' '}
+                    {`(${displayOrderSegment.length} item${
+                      displayOrderSegment.length === 1 ? '' : 's'
+                    })`}
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    copyTableToClipboard({
+                      displayOrder: dataSource.map((flashcard) => ({
+                        recordId: flashcard.id,
+                      })),
+                      getExampleOrFlashcardById: getExampleById,
+                    });
+                  }}
+                >
+                  <p>
+                    Copy all results to clipboard{' '}
+                    {`(${dataSource.length} item${
+                      dataSource.length === 1 ? '' : 's'
+                    })`}
+                  </p>
+                </button>
+                <button type="button">
+                  <p>Use these filters in Flashcard Finder (coming soon)</p>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -182,23 +217,48 @@ export default function FlashcardTable({
               example={getExampleById(displayOrder.recordId)}
               isCollected={isFlashcardCollected(displayOrder.recordId)}
               isPending={
-                bulkOperationInProgress &&
-                bulkSelectIds.includes(displayOrder.recordId)
+                bulkOperationInProgress && isSelected(displayOrder.recordId)
               }
-              handleAdd={() => {
-                createFlashcards([displayOrder.recordId]);
+              handleSingleAdd={async () => {
+                const flashcardToAdd = getExampleById(
+                  displayOrder.recordId,
+                ) as Flashcard;
+                if (!flashcardToAdd) {
+                  throw new Error('Flashcard not found');
+                }
+                await createFlashcards([flashcardToAdd.example.id]);
               }}
               handleSelect={() => {
-                addToBulkSelect(displayOrder.recordId);
+                const flashcardToSelect = getExampleById(
+                  displayOrder.recordId,
+                ) as Flashcard;
+                if (!flashcardToSelect) {
+                  throw new Error('Flashcard not found');
+                }
+                addToBulkSelect(flashcardToSelect.example.id);
               }}
-              handleRemove={() => {
-                deleteFlashcards([displayOrder.recordId]);
+              handleRemove={async () => {
+                const flashcardToRemove = getExampleById(
+                  displayOrder.recordId,
+                ) as Flashcard;
+                if (!flashcardToRemove) {
+                  throw new Error('Flashcard not found');
+                }
+                console.log('flashcardToRemove', flashcardToRemove);
+                await deleteFlashcards([flashcardToRemove.example.id]);
+
+                removeFromBulkSelect(flashcardToRemove.example.id);
               }}
               handleRemoveSelected={() => {
-                removeFromBulkSelect(displayOrder.recordId);
+                const flashcardToRemove = getExampleById(
+                  displayOrder.recordId,
+                ) as Flashcard;
+                if (!flashcardToRemove) {
+                  throw new Error('Flashcard not found');
+                }
+                removeFromBulkSelect(flashcardToRemove.example.id);
               }}
-              bulkSelectMode={bulkSelectMode}
-              isSelected={bulkSelectIds.includes(displayOrder.recordId)}
+              isSelected={isSelected(displayOrder.recordId)}
               lessonPopup={lessonPopup}
             />
           );

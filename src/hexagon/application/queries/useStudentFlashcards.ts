@@ -211,7 +211,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     async (exampleIds: number[]) => {
       // find studentExampleIds from exampleIds
       const studentExampleIds = flashcards
-        ?.filter((flashcard) => exampleIds.includes(flashcard.id))
+        ?.filter((flashcard) => exampleIds.includes(flashcard.example.id))
         .map((flashcard) => flashcard.id);
       if (!studentExampleIds) {
         throw new Error('Student example IDs not found');
