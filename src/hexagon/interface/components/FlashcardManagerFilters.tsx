@@ -1,26 +1,29 @@
 import type { UseExampleFilterCoordinatorReturnType } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
 import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/useSkillTagSearch';
 
-import useExampleFilter from 'src/hexagon/application/units/useExampleFilter';
 import SelectedTags from './FlashcardFinder/VocabTagFilter/SelectedTags';
 import TagFilter from './FlashcardFinder/VocabTagFilter/TagFilter';
 import ToggleSwitch from './general/ToggleSwitch';
 import LessonRangeSelector from './LessonSelector/LessonRangeSelector';
+
 import 'src/App.css';
+import './FlashcardManagerFilters.scss';
 
 export default function FlashcardManagerFilters({
   filterState: hookFilterState,
   skillTagSearch,
+  filtersEnabled,
+  toggleFilters,
 }: {
   filterState: UseExampleFilterCoordinatorReturnType;
   skillTagSearch: UseSkillTagSearchReturnType;
+  filtersEnabled: boolean;
+  toggleFilters: () => void;
 }) {
-  const { skillTags } = useExampleFilter();
-
   const {
     filterState,
 
-    updateIncludeSpanglish,
+    updateExcludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
@@ -31,11 +34,10 @@ export default function FlashcardManagerFilters({
     tagSuggestions,
     updateTagSearchTerm,
     removeTagFromSuggestions,
+    addTagBackToSuggestions,
   } = skillTagSearch;
 
-  const { exampleFilters } = filterState;
-
-  const { includeSpanglish, audioOnly } = exampleFilters;
+  const { excludeSpanglish, audioOnly, skillTags } = filterState;
 
   /**
    * TODO: We need an inert (non-interactive) view of the filter state.
@@ -43,48 +45,58 @@ export default function FlashcardManagerFilters({
    */
   return (
     <div>
-      <div className="filterSection">
-        <div className="filterBox options">
-          <div className="FromToLessonSelectorWrapper">
-            <LessonRangeSelector />
-          </div>
-          <ToggleSwitch
-            id="removeSpanglish"
-            ariaLabel="noSpanglish"
-            label="Include Spanglish: "
-            checked={includeSpanglish}
-            onChange={() =>
-              updateIncludeSpanglish(
-                !filterState.exampleFilters.includeSpanglish,
-              )
-            }
-          />
-          <ToggleSwitch
-            id="audioOnly"
-            ariaLabel="audioOnly"
-            label="Audio Flashcards Only: "
-            checked={audioOnly}
-            onChange={() =>
-              updateAudioOnly(!filterState.exampleFilters.audioOnly)
-            }
-          />
-        </div>
-        <div className="filterBox search">
-          <div className="searchFilter">
-            <TagFilter
-              searchTerm={tagSearchTerm}
-              updateSearchTerm={updateTagSearchTerm}
-              searchResults={tagSuggestions}
-              addTag={addSkillTagToFilters}
-              removeTagFromSuggestions={removeTagFromSuggestions}
-            />
-            <SelectedTags
-              removeTag={removeSkillTagFromFilters}
-              skillTags={skillTags}
-            />
-          </div>
-        </div>
+      <div className="ToggleFlashcardFilters">
+        <ToggleSwitch
+          id="filtersEnabled"
+          ariaLabel="filtersEnabled"
+          label="Flashcard Filtering: "
+          checked={filtersEnabled}
+          onChange={toggleFilters}
+        />
       </div>
+      {filtersEnabled && (
+        <div className="filterSection">
+          <div className="filterBox options">
+            <div className="FromToLessonSelectorWrapper">
+              <LessonRangeSelector />
+            </div>
+            <ToggleSwitch
+              id="removeSpanglish"
+              ariaLabel="noSpanglish"
+              label="Exclude Spanglish: "
+              checked={excludeSpanglish ?? false}
+              onChange={() =>
+                updateExcludeSpanglish(!filterState.excludeSpanglish)
+              }
+            />
+            <ToggleSwitch
+              id="audioOnly"
+              ariaLabel="audioOnly"
+              label="Audio Flashcards Only: "
+              checked={audioOnly ?? false}
+              onChange={() => updateAudioOnly(!filterState.audioOnly)}
+            />
+          </div>
+          <div className="filterBox search">
+            <div className="searchFilter">
+              <TagFilter
+                searchTerm={tagSearchTerm}
+                updateSearchTerm={updateTagSearchTerm}
+                searchResults={tagSuggestions}
+                addTag={addSkillTagToFilters}
+                removeTagFromSuggestions={removeTagFromSuggestions}
+              />
+              <SelectedTags
+                removeTag={(tagId) => {
+                  removeSkillTagFromFilters(tagId);
+                  addTagBackToSuggestions(tagId);
+                }}
+                skillTags={skillTags}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

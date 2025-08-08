@@ -1,10 +1,20 @@
 import Loading from 'src/components/Loading/Loading';
 import useFlashcardFinder from 'src/hexagon/application/useCases/useFlashcardFinder';
 import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
-import FlashcardFinderResults from '../components/FlashcardFinder/FlashcardFinderResults';
+import ExampleTable from '../components/Tables/ExampleTable';
 
 export default function FlashcardFinder() {
-  const { exampleFilter, exampleQuery, pageSize } = useFlashcardFinder();
+  const {
+    exampleFilter,
+    exampleQuery,
+    displayExamples,
+    flashcardsQuery,
+    pagination,
+    filtersChanging,
+    setFiltersChanging,
+    lessonPopup,
+    manageThese,
+  } = useFlashcardFinder();
 
   const { filterState, skillTagSearch } = exampleFilter;
 
@@ -17,18 +27,19 @@ export default function FlashcardFinder() {
       <FlashcardFinderFilter
         filterState={filterState}
         skillTagSearch={skillTagSearch}
+        filtersChanging={filtersChanging}
+        setFiltersChanging={setFiltersChanging}
       />
-      {!filterState.filtersChanging ? (
-        <FlashcardFinderResults
-          filteredFlashcards={exampleQuery.filteredExamples || []}
-          totalCount={exampleQuery.totalCount || 0}
-          pageSize={pageSize}
+      {!filtersChanging && (
+        <ExampleTable
+          examples={displayExamples}
+          totalCount={exampleQuery.totalCount ?? 0}
+          studentFlashcards={flashcardsQuery}
+          paginationState={pagination}
           fetchingExamples={exampleQuery.isLoading}
+          lessonPopup={lessonPopup}
+          manageThese={manageThese}
         />
-      ) : (
-        <div>
-          Please press "Get Examples" or "close without saving" to see results
-        </div>
       )}
     </div>
   );

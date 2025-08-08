@@ -1,5 +1,6 @@
 import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
+import FilterOwnedFlashcardsProvider from '@application/coordinators/providers/FilterOwnedFlashcardsProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 
 export default function MainProvider({
@@ -10,7 +11,11 @@ export default function MainProvider({
   return (
     <ActiveStudentProvider>
       <SelectedCourseAndLessonsProvider>
-        <ExampleFilterContextProvider>{children}</ExampleFilterContextProvider>
+        <ExampleFilterContextProvider>
+          <FilterOwnedFlashcardsProvider>
+            {children}
+          </FilterOwnedFlashcardsProvider>
+        </ExampleFilterContextProvider>
       </SelectedCourseAndLessonsProvider>
     </ActiveStudentProvider>
   );

@@ -170,6 +170,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         toast.error(
           `Failed to delete flashcards. ${result} of ${_variables.length} flashcards deleted.`,
         );
+        return false;
       } else {
         queryClient.setQueryData(
           ['flashcards', userId],
@@ -177,6 +178,9 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
             oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
         );
       }
+    },
+    onError: (error, _variables, _context) => {
+      console.error('Failed to delete flashcards', error);
     },
   });
 
@@ -205,13 +209,16 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         );
       }
     },
+    onError: (error, _variables, _context) => {
+      console.error('Failed to delete flashcards', error);
+    },
   });
 
   const deleteFlashcards = useCallback(
     async (exampleIds: number[]) => {
       // find studentExampleIds from exampleIds
       const studentExampleIds = flashcards
-        ?.filter((flashcard) => exampleIds.includes(flashcard.id))
+        ?.filter((flashcard) => exampleIds.includes(flashcard.example.id))
         .map((flashcard) => flashcard.id);
       if (!studentExampleIds) {
         throw new Error('Student example IDs not found');

@@ -23,14 +23,25 @@ export default function BulkRemoveButton({
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
-    if (isPending) {
+    if (isPending && isCollected) {
       return {
         text: 'Removing...',
         className: 'pendingButton',
         onClickFunction: () => {},
       };
-    }
-    if (isCollected && !isSelected) {
+    } else if (isPending && !isCollected) {
+      return {
+        text: 'Adding...',
+        className: 'pendingButton',
+        onClickFunction: () => {},
+      };
+    } else if (!isCollected) {
+      return {
+        text: 'Not Owned',
+        className: 'disabledButton',
+        onClickFunction: () => {},
+      };
+    } else if (isCollected && !isSelected) {
       return {
         text: 'Select',
         className: 'selectRemoveButton',

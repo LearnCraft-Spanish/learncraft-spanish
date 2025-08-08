@@ -1,11 +1,14 @@
-import type { Lesson, Vocabulary } from '@learncraft-spanish/shared';
+import type {
+  Lesson,
+  VocabularyAbbreviation,
+} from '@learncraft-spanish/shared';
 import { useCallback, useState } from 'react';
 import { useLessonsByVocabulary } from '../queries/useLessonsByVocab';
 import { useVocabulary } from '../units/useVocabulary';
 
 export interface UseGetHelpMenuResult {
   lessonsByVocabulary: Lesson[] | null;
-  vocabularyList: Vocabulary[];
+  vocabularyList: VocabularyAbbreviation[];
   isLoading: boolean;
   error: Error | null;
   selectedVocabId: number;

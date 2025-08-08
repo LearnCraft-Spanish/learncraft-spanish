@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import type { Program } from 'src/types/interfaceDefinitions';
 import type { CohortField, CohortLetter } from '../types';
 import pencilIcon from 'src/assets/icons/pencil.svg';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { cohorts } from '../constants';
 
 interface ProgramTableRowProps {

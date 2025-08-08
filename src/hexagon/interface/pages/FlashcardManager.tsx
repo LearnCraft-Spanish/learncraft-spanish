@@ -3,8 +3,16 @@ import useFlashcardManager from 'src/hexagon/application/useCases/useFlashcardMa
 import FlashcardManagerFilters from '../components/FlashcardManagerFilters';
 import FlashcardTable from '../components/Tables/FlashcardTable';
 export default function FlashcardManager() {
-  const { exampleFilter, allFlashcards, paginationState } =
-    useFlashcardManager();
+  const {
+    exampleFilter,
+    filteredFlashcards,
+    paginationState,
+    filtersEnabled,
+    toggleFilters,
+    somethingIsLoading,
+    lessonPopup,
+    findMore,
+  } = useFlashcardManager();
 
   const { filterState, skillTagSearch } = exampleFilter;
 
@@ -17,10 +25,15 @@ export default function FlashcardManager() {
       <FlashcardManagerFilters
         filterState={filterState}
         skillTagSearch={skillTagSearch}
+        filtersEnabled={filtersEnabled}
+        toggleFilters={toggleFilters}
       />
       <FlashcardTable
-        dataSource={allFlashcards ?? []}
+        findMore={findMore}
+        somethingIsLoading={somethingIsLoading}
+        dataSource={filteredFlashcards}
         paginationState={paginationState}
+        lessonPopup={lessonPopup}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import type { ContextualMenuContextType } from '../context/ContextualMenuContext';
+import type { ContextualMenuContextType } from '@composition/context/ContextualMenuContext';
 import React, {
   useCallback,
   useEffect,

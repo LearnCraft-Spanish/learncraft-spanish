@@ -7,7 +7,7 @@ import {
   GenericDropdown,
   TextInput,
 } from 'src/components/FormComponents';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useStudentsTable from '../useStudentsTable';
 
 const cohortOptions = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];

@@ -4,35 +4,66 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 
+import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import { useCallback, useState } from 'react';
+import { useContextualMenu } from '../../hooks/useContextualMenu';
 import ExampleListItemFactory from './ExampleListItemFactory';
+import AddPendingRemove from './units/AddPendingRemove';
 import BulkRemoveButton from './units/BulkRemoveButton';
 import MoreInfoButton from './units/MoreInfoButton';
-import MoreInfoViewExample from './units/MoreInfoViewExample';
+import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
 
 export default function ExampleListItem({
   example,
   isCollected,
   isPending,
+  handleSingleAdd,
+  handleRemove,
   handleRemoveSelected,
   handleSelect,
   isSelected,
+  lessonPopup,
 }: {
   example: Flashcard | ExampleWithVocabulary | null;
   isCollected: boolean;
   isPending: boolean;
-  handleAdd: () => void;
+  handleSingleAdd: () => Promise<void>;
+  handleRemove: () => Promise<void>;
   handleRemoveSelected: () => void;
   handleSelect: () => void;
-  handleRemove: () => void;
-  bulkSelectMode: boolean;
   isSelected?: boolean;
+  lessonPopup: LessonPopup;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
 
   const onClickMoreInfo = useCallback(() => {
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
+
+  const [pending, setPending] = useState(false);
+
+  const handleAddWrapper = useCallback(async () => {
+    setPending(true);
+    await handleSingleAdd();
+    setPending(false);
+    if (isSelected) {
+      handleRemoveSelected();
+    }
+  }, [handleSingleAdd, isSelected, handleRemoveSelected]);
+
+  const handleRemoveWrapper = useCallback(async () => {
+    setPending(true);
+    handleRemove()
+      .then(() => {
+        if (isSelected) {
+          handleRemoveSelected();
+        }
+      })
+      .finally(() => {
+        setPending(false);
+      });
+  }, [handleRemove, isSelected, handleRemoveSelected]);
+  const { openContextual, setContextualRef, contextual } = useContextualMenu();
 
   if (!example) {
     return null;
@@ -41,26 +72,43 @@ export default function ExampleListItem({
   return (
     <div className="exampleCardWithMoreInfo">
       <ExampleListItemFactory
+        preTextComponents={[
+          <BulkRemoveButton
+            key="bulkRemoveButton"
+            id={example.id}
+            isCollected={isCollected}
+            handleSelect={handleSelect}
+            handleRemoveSelected={handleRemoveSelected}
+            isSelected={isSelected ?? false}
+            isPending={isPending || pending}
+          />,
+        ]}
         example={example}
-        preTextComponents={[]}
         postTextComponents={[
           <MoreInfoButton
             onClickFunction={onClickMoreInfo}
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
-          <BulkRemoveButton
+          <AddPendingRemove
             id={example.id}
             isCollected={isCollected}
-            handleSelect={handleSelect}
-            handleRemoveSelected={handleRemoveSelected}
-            isSelected={isSelected ?? false}
-            isPending={isPending}
-            key="bulkRemoveButton"
+            isPending={isPending || pending}
+            handleAdd={handleAddWrapper}
+            handleRemove={handleRemoveWrapper}
+            key="addPendingRemove"
           />,
         ]}
       />
-      <MoreInfoViewExample example={example} isOpen={isMoreInfoOpen} />
+      <MoreInfoViewFlashcard
+        flashcard={example as Flashcard}
+        isCustom={false} // TODO: add custom flashcard
+        isOpen={isMoreInfoOpen}
+        openContextual={openContextual}
+        contextual={contextual}
+        setContextualRef={setContextualRef}
+        lessonPopup={lessonPopup}
+      />
     </div>
   );
 }

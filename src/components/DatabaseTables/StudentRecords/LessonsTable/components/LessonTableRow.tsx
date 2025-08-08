@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { Lesson } from 'src/types/CoachingTypes';
 import pencilIcon from 'src/assets/icons/pencil.svg';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 interface LessonTableRowProps {
   lesson: Lesson;

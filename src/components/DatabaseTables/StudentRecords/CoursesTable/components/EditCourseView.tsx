@@ -1,16 +1,16 @@
 import type { Course } from 'src/types/CoachingTypes';
 import type { EditableCourse, NewCourse } from '../types';
 import React, { useState } from 'react';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Dropdown,
   FormControls,
   TextInput,
 } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import useCoursesTable from 'src/hooks/StudentRecordsData/useCoursesTable';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 import './EditCourseView.scss';
 
 export default function EditCourseView({

@@ -1,4 +1,5 @@
 import type { Week } from 'src/types/CoachingTypes';
+import { useModal } from '@interface/hooks/useModal';
 import { useMutation } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
@@ -7,7 +8,6 @@ import { Loading } from 'src/components/Loading';
 import { Pagination, QuantifiedRecords } from 'src/components/Table/components';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import { useBackendHelpers } from 'src/hooks/useBackend';
-import { useModal } from 'src/hooks/useModal';
 import { WeeksTableItemWithSiingleRecordEdit } from './WeeksTableItem';
 
 interface WeekWithFailedToUpdate extends Week {

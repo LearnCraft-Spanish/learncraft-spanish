@@ -1,4 +1,4 @@
-import { useModal } from 'src/hooks/useModal';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 
 interface DeleteRecordProps {
   deleteFunction: () => void;

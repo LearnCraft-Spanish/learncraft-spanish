@@ -1,12 +1,12 @@
 import type { PrivateCall } from 'src/types/CoachingTypes';
 import React from 'react';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Dropdown,
   LinkInput,
   TextAreaInput,
 } from 'src/components/FormComponents';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 const ratingOptions = [
   'Excellent',

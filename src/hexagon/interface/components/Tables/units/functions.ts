@@ -29,7 +29,7 @@ export function copyTableToClipboard({
         return '';
       }
       if ('example' in foundExample) {
-        return `${foundExample.id}\t\
+        return `${foundExample.example.id}\t\
             ${foundExample.example.spanish}\t\
             ${foundExample.example.english}\t\
             ${foundExample.example.spanishAudio}\n`;

@@ -2,7 +2,7 @@ import { overrideMockVocabularyAdapter } from '@application/adapters/vocabularyA
 import { renderHook, waitFor } from '@testing-library/react';
 import {
   createMockVocabulary,
-  createMockVocabularyList,
+  createMockVocabularyAbbreviationList,
 } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
@@ -11,7 +11,7 @@ import { useVocabulary } from './useVocabulary';
 describe('useVocabulary', () => {
   it('should fetch vocabulary data correctly', async () => {
     // Arrange
-    const mockData = createMockVocabularyList(3);
+    const mockData = createMockVocabularyAbbreviationList(3);
     overrideMockVocabularyAdapter({
       getVocabulary: () => Promise.resolve(mockData),
     });
@@ -191,7 +191,7 @@ describe('useVocabulary', () => {
 
   it.skip('should refetch data when refetch is called', async () => {
     // Arrange
-    const mockData = createMockVocabularyList(3);
+    const mockData = createMockVocabularyAbbreviationList(3);
     overrideMockVocabularyAdapter({
       getVocabulary: () => Promise.resolve(mockData),
     });
@@ -205,7 +205,7 @@ describe('useVocabulary', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     // Change mock data for refetch
-    const newMockData = createMockVocabularyList(2);
+    const newMockData = createMockVocabularyAbbreviationList(2);
     overrideMockVocabularyAdapter({
       getVocabulary: () => Promise.resolve(newMockData),
     });

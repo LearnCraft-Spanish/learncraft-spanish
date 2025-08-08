@@ -1,6 +1,6 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
-import { useModal } from 'src/hooks/useModal';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 interface AddToMyFlashcardsButtonsProps {

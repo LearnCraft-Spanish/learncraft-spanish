@@ -8,6 +8,7 @@ export interface UseSkillTagSearchReturnType {
   tagSuggestions: SkillTag[];
   updateTagSearchTerm: (target?: EventTarget & HTMLInputElement) => void;
   removeTagFromSuggestions: (tagId: string) => void;
+  addTagBackToSuggestions: (tagId: string) => void;
   isLoading: boolean;
   error: Error | null;
 }
@@ -15,7 +16,9 @@ export interface UseSkillTagSearchReturnType {
 export function useSkillTagSearch(): UseSkillTagSearchReturnType {
   const { skillTags, isLoading, error } = useSkillTags();
   const [tagSearchTerm, setTagSearchTerm] = useState('');
-  const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(new Set());
+  const [removedTagIds, setRemovedTagIds] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const updateTagSearchTerm = (target?: EventTarget & HTMLInputElement) => {
     if (target && target.value && target.value.length > 0) {
@@ -29,69 +32,94 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     setRemovedTagIds((prev) => new Set([...prev, tagId]));
   };
 
+  const addTagBackToSuggestions = (tagId: string) => {
+    setRemovedTagIds((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(tagId);
+      return newSet;
+    });
+  };
+
   const tagSuggestions: SkillTag[] = useMemo(() => {
-    if (!skillTags || !tagSearchTerm) return [];
+    // Early return for empty search terms or no skill tags
+    if (!skillTags?.length || !tagSearchTerm.trim()) return [];
 
-    const searchTerm = tagSearchTerm.toLowerCase();
+    const searchTerm = tagSearchTerm.toLowerCase().trim();
+    const exactNameMatches: SkillTag[] = [];
+    const exactTraitMatches: SkillTag[] = [];
+    const partialNameMatches: SkillTag[] = [];
+    const partialTraitMatches: SkillTag[] = [];
 
-    // Create a map to track seen keys functionally
-    const seenKeys = new Map<string, boolean>();
-
-    const processTag = (tag: SkillTag) => {
-      if (seenKeys.get(tag.key)) return null;
-
-      // Skip tags that have been removed
-      if (removedTagIds.has(tag.key)) return null;
+    // Process tags in a single pass
+    for (const tag of skillTags) {
+      // Skip if removed
+      if (removedTagIds.has(tag.key)) {
+        continue;
+      }
 
       const nameLower = tag.name.toLowerCase();
       const isExactNameMatch = nameLower === searchTerm;
-      const isPartialNameMatch = nameLower.includes(searchTerm);
+      let isExactTraitMatch = false;
+      let isPartialNameMatch = false;
+      let isPartialTraitMatch = false;
 
-      const hasDescriptorMatch =
-        tag.type === SkillType.Vocabulary &&
-        tag.descriptor?.toLowerCase().includes(searchTerm);
-      const hasConjugationMatch =
-        tag.type === SkillType.Vocabulary &&
-        tag.conjugationTags?.some((conjugation) =>
-          conjugation.toLowerCase().includes(searchTerm),
-        );
-      const hasVerbTagMatch =
-        tag.type === SkillType.Verb &&
-        tag.verbTags.some((verb) => verb.toLowerCase().includes(searchTerm));
-
-      const hasAnyMatch =
-        isPartialNameMatch ||
-        hasDescriptorMatch ||
-        hasConjugationMatch ||
-        hasVerbTagMatch;
-
-      if (hasAnyMatch) {
-        seenKeys.set(tag.key, true);
-        return { tag, isExactMatch: isExactNameMatch };
+      if (!isExactNameMatch) {
+        const verbTraitMatch =
+          tag.type === SkillType.Verb &&
+          tag.verbTags?.some((verbTag) => verbTag.toLowerCase() === searchTerm);
+        const vocabularyTraitMatch =
+          tag.type === SkillType.Vocabulary &&
+          tag.descriptor?.toLowerCase() === searchTerm;
+        const subcategoryTraitMatch =
+          tag.type === SkillType.Subcategory &&
+          tag.partOfSpeech?.toLowerCase() === searchTerm;
+        isExactTraitMatch =
+          verbTraitMatch || vocabularyTraitMatch || subcategoryTraitMatch;
       }
 
-      return null;
-    };
+      if (!isExactTraitMatch) {
+        isPartialNameMatch = nameLower.includes(searchTerm);
+      }
 
-    // Process all tags functionally
-    const processed = skillTags
-      .map(processTag)
-      .filter(
-        (result): result is { tag: SkillTag; isExactMatch: boolean } =>
-          result !== null,
-      );
+      if (!isPartialNameMatch) {
+        const verbPartialTraitMatch =
+          tag.type === SkillType.Verb &&
+          tag.verbTags.some((verbTag) =>
+            verbTag.toLowerCase().includes(searchTerm),
+          );
+        const vocabularyPartialTraitMatch =
+          tag.type === SkillType.Vocabulary &&
+          tag.descriptor?.toLowerCase().includes(searchTerm);
+        const subcategoryPartialTraitMatch =
+          tag.type === SkillType.Subcategory &&
+          tag.partOfSpeech.toLowerCase().includes(searchTerm);
 
-    // Sort by exact matches first
-    const sorted = processed
-      .sort((a, b) => {
-        if (a.isExactMatch && !b.isExactMatch) return -1;
-        if (!a.isExactMatch && b.isExactMatch) return 1;
-        return 0;
-      })
-      .map((result) => result.tag);
-    const firstTen = sorted.slice(0, 10);
+        isPartialTraitMatch =
+          verbPartialTraitMatch ||
+          vocabularyPartialTraitMatch ||
+          subcategoryPartialTraitMatch;
+      }
 
-    return firstTen;
+      // Categorize by match type for efficient sorting
+      if (isExactNameMatch) {
+        exactNameMatches.push(tag);
+      } else if (isExactTraitMatch) {
+        exactTraitMatches.push(tag);
+      } else if (isPartialNameMatch) {
+        partialNameMatches.push(tag);
+      } else if (isPartialTraitMatch) {
+        partialTraitMatches.push(tag);
+      }
+    }
+
+    // Combine exact matches first, then partial matches, and limit to 10
+    const result = [
+      ...exactNameMatches,
+      ...exactTraitMatches,
+      ...partialNameMatches,
+      ...partialTraitMatches,
+    ];
+    return result.slice(0, 10);
   }, [skillTags, tagSearchTerm, removedTagIds]);
 
   return {
@@ -99,6 +127,7 @@ export function useSkillTagSearch(): UseSkillTagSearchReturnType {
     tagSuggestions,
     updateTagSearchTerm,
     removeTagFromSuggestions,
+    addTagBackToSuggestions,
     isLoading,
     error,
   };

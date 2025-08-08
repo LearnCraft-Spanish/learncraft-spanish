@@ -1,7 +1,7 @@
 import type { Week } from 'src/types/CoachingTypes';
 import { useMemo } from 'react';
 
-import ContextualView from 'src/components/Contextual/ContextualView';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 export default function ViewWeekRecord({ week }: { week: Week | undefined }) {
   const { getStudentFromMembershipId } = useCoaching();

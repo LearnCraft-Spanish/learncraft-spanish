@@ -2,7 +2,6 @@ import type { Assignment, Week } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   CoachDropdown,
   DeleteRecord,
@@ -14,11 +13,12 @@ import {
 } from 'src/components/FormComponents';
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
-import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
-import { useModal } from 'src/hooks/useModal';
+import useCoaching from 'src/hooks/CoachingData/useCoaching';
 
 import CustomStudentSelector from '../../general/CustomStudentSelector';
 import getDateRange from '../../general/functions/dateRange';

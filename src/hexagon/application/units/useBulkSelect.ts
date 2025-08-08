@@ -15,6 +15,14 @@ export default function useBulkSelect(
     [bulkSelectIds],
   );
 
+  const addAllToBulkSelect = useCallback(
+    (ids: number[]) => {
+      const newIds = new Set([...bulkSelectIds, ...ids]);
+      setBulkSelectIds(Array.from(newIds));
+    },
+    [bulkSelectIds],
+  );
+
   const removeFromBulkSelect = useCallback(
     (id: number) => {
       setBulkSelectIds(bulkSelectIds.filter((bulkId) => bulkId !== id));
@@ -32,10 +40,14 @@ export default function useBulkSelect(
 
   const triggerBulkOperation = useCallback(async () => {
     setBulkOperationInProgress(true);
-    await bulkOperation(bulkSelectIds);
-    setBulkOperationInProgress(false);
-    clearBulkSelect();
-  }, [bulkOperation, clearBulkSelect]);
+    bulkOperation(bulkSelectIds)
+      .then(() => {
+        clearBulkSelect();
+      })
+      .finally(() => {
+        setBulkOperationInProgress(false);
+      });
+  }, [bulkOperation, clearBulkSelect, bulkSelectIds]);
 
   return {
     bulkSelectMode,
@@ -46,5 +58,7 @@ export default function useBulkSelect(
     clearBulkSelect,
     toggleBulkSelectMode,
     triggerBulkOperation,
+
+    addAllToBulkSelect,
   };
 }

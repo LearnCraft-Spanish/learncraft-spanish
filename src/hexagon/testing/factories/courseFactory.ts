@@ -1,5 +1,8 @@
 import type { CourseWithLessons } from '@learncraft-spanish/shared';
-import { CourseWithLessonsSchema } from '@learncraft-spanish/shared';
+import {
+  CourseWithLessonsSchema,
+  LessonWithVocabSchema,
+} from '@learncraft-spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,
@@ -10,6 +13,10 @@ export const createMockCourseWithLessons = createZodFactory(
 );
 export const createMockCourseWithLessonsList = createZodListFactory(
   CourseWithLessonsSchema,
+);
+
+export const createMockLessonWithVocab = createZodFactory(
+  LessonWithVocabSchema,
 );
 
 // Create realistic mock data based on the old programsTable structure
