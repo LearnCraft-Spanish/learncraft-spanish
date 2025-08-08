@@ -50,7 +50,7 @@
     border: 2px solid var(--accent);
     border-top: none;
     background-color: var(--light);
-    padding: 0.25rem;
+    padding: 1rem;
     margin-top: -5px;
     position: relative;
 
@@ -85,7 +85,15 @@
 
 .vocabTagsSide {
   max-width: 70%;
-  margin-left: 40px;
+  width: 100%;
+  margin-right: 1rem;
+
+  .vocabTagsHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 .moreInfoSide {
   max-width: 50%;
@@ -96,8 +104,8 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 0.25rem;
-  margin-right: 0.25rem;
+
+  width: 100%;
 
   .label {
     font-size: 12px;
@@ -128,7 +136,8 @@
 .vocabTagsSide {
   h3 {
     text-align: left;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
+    margin-top: 0;
   }
   .vocabTagsList {
     display: flex;
@@ -175,6 +184,12 @@
 
     .label {
       text-wrap: nowrap;
+    }
+
+    .label,
+    .content {
+      font-size: 14px;
+      margin: 0.5rem 0;
     }
   }
 }

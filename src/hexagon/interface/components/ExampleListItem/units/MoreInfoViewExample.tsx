@@ -3,7 +3,8 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
-import VocabTagContainer from './VocabTagContainer';
+import { useState } from 'react';
+import VocabTagContainer from '../../VocabTagDetails';
 
 export default function MoreInfoViewExample({
   example,
@@ -20,6 +21,10 @@ export default function MoreInfoViewExample({
   setContextualRef: (ref: HTMLDivElement | null) => void;
   lessonPopup: LessonPopup;
 }) {
+  const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
+  const handleSelect = (id: number) => {
+    setVocabTagSelected(id);
+  };
   let exampleWithVocabulary: ExampleWithVocabulary;
   if ('vocabulary' in example) {
     exampleWithVocabulary = example;
@@ -44,6 +49,8 @@ export default function MoreInfoViewExample({
                     contextual={contextual}
                     setContextualRef={setContextualRef}
                     lessonPopup={lessonPopup}
+                    handleSelect={handleSelect}
+                    isSelected={vocabTagSelected === vocab.id}
                   />
                 ))}
               </div>

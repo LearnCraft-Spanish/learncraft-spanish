@@ -1,7 +1,8 @@
 import type { Vocabulary } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
+import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
+import { InlineLoading } from '../Loading';
 import './VocabTagContainer.scss';
-
 export default function VocabTagContainer({
   exampleId,
   vocabulary,
@@ -9,6 +10,8 @@ export default function VocabTagContainer({
   contextual,
   setContextualRef,
   lessonPopup,
+  handleSelect,
+  isSelected,
 }: {
   exampleId: number;
   vocabulary: Vocabulary;
@@ -16,13 +19,22 @@ export default function VocabTagContainer({
   contextual: string;
   setContextualRef: (ref: HTMLDivElement | null) => void;
   lessonPopup: LessonPopup;
+  handleSelect: (id: number) => void;
+  isSelected: boolean;
 }) {
+  const { course } = useSelectedCourseAndLessons();
+
   return (
     <div className="vocabTagContainer" key={vocabulary.id}>
       <div
-        className="vocabTag"
+        className={`vocabTag ${
+          isSelected && contextual === `vocabInfo-${exampleId}-${vocabulary.id}`
+            ? 'selected'
+            : ''
+        }`}
         onClick={() => {
           openContextual(`vocabInfo-${exampleId}-${vocabulary.id}`);
+          handleSelect(vocabulary.id);
         }}
       >
         {vocabulary.word}
@@ -48,13 +60,27 @@ export default function VocabTagContainer({
           <div className="lessonsList">
             <h4>Taught in:</h4>
             {lessonPopup.lessonsLoading ? (
-              <div>Loading lessons...</div>
+              <InlineLoading message="Loading lessons..." white />
             ) : lessonPopup.lessonsByVocabulary.length > 0 ? (
-              lessonPopup.lessonsByVocabulary.map((lesson) => (
-                <div key={lesson.id}>
-                  {lesson.courseName} lesson {lesson.lessonNumber}
-                </div>
-              ))
+              lessonPopup.lessonsByVocabulary
+                .sort((a, b) => {
+                  if (a.courseName === course?.name) {
+                    return -1;
+                  } else if (b.courseName === course?.name) {
+                    return 1;
+                  }
+                  return 0;
+                })
+                .map((lesson) => (
+                  <div
+                    key={lesson.id}
+                    className={`lessonItem ${
+                      lesson.courseName === course?.name ? 'mainCourse' : ''
+                    }`}
+                  >
+                    {lesson.courseName} lesson {lesson.lessonNumber}
+                  </div>
+                ))
             ) : (
               <div>No lessons found</div>
             )}

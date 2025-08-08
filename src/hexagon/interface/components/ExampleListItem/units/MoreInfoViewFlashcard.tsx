@@ -1,6 +1,7 @@
 import type { Flashcard } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
-import VocabTagContainer from './VocabTagContainer';
+import { useState } from 'react';
+import VocabTagContainer from '../../VocabTagDetails';
 
 export default function MoreInfoViewFlashcard({
   flashcard,
@@ -19,6 +20,10 @@ export default function MoreInfoViewFlashcard({
   setContextualRef: (ref: HTMLDivElement | null) => void;
   lessonPopup: LessonPopup;
 }) {
+  const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
+  const handleSelect = (id: number) => {
+    setVocabTagSelected(id);
+  };
   const dateAddedFormatted = flashcard.dateCreated
     ? new Date(flashcard.dateCreated).toLocaleDateString('en-US', {
         month: '2-digit',
@@ -44,7 +49,18 @@ export default function MoreInfoViewFlashcard({
   return (
     <div className={`moreInfoView ${isOpen ? 'open' : 'closed'}`}>
       <div className="vocabTagsSide">
-        <h3>Vocabulary</h3>
+        <div className="vocabTagsHeader">
+          <h3>Vocabulary</h3>
+          <div className="labelsSection">
+            {flashcard.example.spanglish && (
+              <div className="label spanglish">spanglish</div>
+            )}
+            {flashcard.example.spanishAudio && (
+              <div className="label audio">audio flashcard</div>
+            )}
+            {isCustom && <div className="label custom">custom flashcard</div>}
+          </div>
+        </div>
         <div className="vocabTagsList">
           {flashcard.example.vocabulary.map((vocab) => (
             <VocabTagContainer
@@ -55,20 +71,13 @@ export default function MoreInfoViewFlashcard({
               contextual={contextual}
               setContextualRef={setContextualRef}
               lessonPopup={lessonPopup}
+              handleSelect={handleSelect}
+              isSelected={vocabTagSelected === vocab.id}
             />
           ))}
         </div>
       </div>
       <div className="moreInfoSide">
-        <div className="labelsSection">
-          {flashcard.example.spanglish && (
-            <div className="label spanglish">spanglish</div>
-          )}
-          {flashcard.example.spanishAudio && (
-            <div className="label audio">audio flashcard</div>
-          )}
-          {isCustom && <div className="label custom">custom flashcard</div>}
-        </div>
         <div className="datesSection">
           <div className="lineWrapper">
             <div className="label">Added on:</div>
