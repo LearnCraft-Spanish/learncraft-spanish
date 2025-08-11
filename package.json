@@ -36,7 +36,8 @@
     "update-shared": "pnpm add @learncraft-spanish/shared@latest --lockfile-dir=lockfiles/ci -w && pnpm install:ci:regenerate",
     "validate": "npm run lint:fix && npm run format && npm run typecheck",
     "metrics": "node METRICS/get_metrics.js",
-    "lead-time": "node METRICS/lead-time/lead_time_tracker.js"
+    "lead-time": "node METRICS/lead-time/lead_time_tracker.js",
+    "deployment-frequency": "node METRICS/deployment_frequency.js"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
