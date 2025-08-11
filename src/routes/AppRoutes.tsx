@@ -15,7 +15,6 @@ import {
   StudentsTable,
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
-import FlashcardFinder from 'src/components/FlashcardFinder/FlashcardFinder';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
@@ -40,10 +39,6 @@ export default function AppRoutes() {
       )
       <Route
         path="/flashcardfinder"
-        element={(isStudent || isCoach || isAdmin) && <FlashcardFinder />}
-      />
-      <Route
-        path="/newflashcardfinder"
         element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
       />
       <Route
