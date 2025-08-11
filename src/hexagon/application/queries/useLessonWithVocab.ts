@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 export const useLessonVocabKnown = (
   courseId: number | undefined,
   lessonNumber: number | undefined,
+  enabled?: boolean,
 ) => {
   const courseInfrastructure = useCourseAdapter();
 
@@ -14,7 +15,7 @@ export const useLessonVocabKnown = (
         courseId: courseId!,
         lessonNumber: lessonNumber!,
       }),
-    enabled: !!courseId && !!lessonNumber,
+    enabled: !!courseId && !!lessonNumber && enabled,
   });
 };
 
@@ -22,6 +23,7 @@ export const useLessonRangeVocabRequired = (
   courseId: number | undefined,
   fromLessonNumber: number | undefined,
   toLessonNumber: number | undefined,
+  enabled?: boolean,
 ) => {
   const courseInfrastructure = useCourseAdapter();
 
@@ -38,6 +40,6 @@ export const useLessonRangeVocabRequired = (
         fromLessonNumber: fromLessonNumber!,
         toLessonNumber: toLessonNumber!,
       }),
-    enabled: !!courseId && !!fromLessonNumber && !!toLessonNumber,
+    enabled: !!courseId && !!fromLessonNumber && !!toLessonNumber && enabled,
   });
 };
