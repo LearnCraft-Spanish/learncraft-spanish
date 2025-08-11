@@ -10,7 +10,7 @@ All API paths MUST come from the shared package endpoint definitions:
 
 ```typescript
 // CORRECT - Using shared package endpoints
-import { SubcategoryEndpoints } from '@LearnCraft-Spanish/shared';
+import { SubcategoryEndpoints } from '@learncraft-spanish/shared';
 
 // Then in your code:
 const path = SubcategoryEndpoints.getById.path.replace(':id', id);

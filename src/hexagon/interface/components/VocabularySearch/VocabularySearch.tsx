@@ -1,9 +1,9 @@
-import type { Vocabulary } from '@LearnCraft-Spanish/shared';
+import type { VocabularyAbbreviation } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import './VocabularySearch.scss';
 
 interface VocabularySearchProps {
-  vocabularyList: Vocabulary[];
+  vocabularyList: VocabularyAbbreviation[];
   onVocabularySelect: (vocabId: number) => void;
   selectedVocabId: number;
   placeholder?: string;
@@ -130,7 +130,7 @@ export default function VocabularySearch({
                 {vocab.descriptor}
               </div>
               <div className="vocabulary-search__item-subcategory">
-                {vocab.subcategory?.name}
+                {vocab.subcategoryAbr?.name}
               </div>
             </div>
           ))}

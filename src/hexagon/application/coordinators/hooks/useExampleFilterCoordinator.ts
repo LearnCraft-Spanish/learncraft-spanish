@@ -1,140 +1,99 @@
-import type { ExampleFilterState } from '@application/coordinators/contexts/ExampleFilterContext';
-import type {
-  Course,
-  Lesson,
-} from '@LearnCraft-Spanish/shared/dist/domain/courses/core-types';
+import type { ExampleFilters, SkillTag } from '@learncraft-spanish/shared';
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
-import { useSkillTags } from '@application/queries/useSkillTags';
-import { generateFilterUuid } from '@application/utils/filterUuidGenerator';
-import { use, useCallback, useEffect, useMemo } from 'react';
+import { use, useCallback, useMemo } from 'react';
+import { useSkillTags } from '../../queries/useSkillTags';
 import { useSelectedCourseAndLessons } from './useSelectedCourseAndLessons';
 
-interface FilterState {
-  exampleFilters: ExampleFilterState;
-  course: Course | null;
-  fromLesson: Lesson | null;
-  toLesson: Lesson | null;
-}
-
 export interface UseExampleFilterCoordinatorReturnType {
-  filterState: FilterState;
-  filtersChanging: boolean;
+  filterState: ExampleFilters;
   addSkillTagToFilters: (tagKey: string) => void;
   removeSkillTagFromFilters: (tagKey: string) => void;
-  updateIncludeSpanglish: (includeSpanglish: boolean) => void;
+  updateExcludeSpanglish: (excludeSpanglish: boolean) => void;
   updateAudioOnly: (audioOnly: boolean) => void;
-  updateFiltersChanging: (filtersChanging: boolean) => void;
-  skillTagKeys: string[];
 }
 
 export function useExampleFilterCoordinator(): UseExampleFilterCoordinatorReturnType {
-  const {
-    exampleFilters,
-    updateExampleFilters,
-    filtersChanging,
-    updateFiltersChanging,
-  } = use(ExampleFilterContext);
+  const { exampleFilters, updateExampleFilters } = use(ExampleFilterContext);
   const { course, fromLesson, toLesson } = useSelectedCourseAndLessons();
-  const { skillTags } = useSkillTags();
+  const { skillTags, isLoading } = useSkillTags();
 
-  // Generate UUID when filters change
-  useEffect(() => {
-    if (course && toLesson && skillTags) {
-      const tagsToSearch = exampleFilters.skillTags
-        .map((tagKey) => skillTags.find((tag) => tag.key === tagKey))
-        .filter((tag): tag is NonNullable<typeof tag> => tag !== null);
+  const courseId = course?.id;
+  const fromLessonNumber = fromLesson?.lessonNumber;
+  const toLessonNumber = toLesson?.lessonNumber;
 
-      const newUuid = generateFilterUuid({
-        courseId: course.id,
-        toLessonNumber: toLesson.lessonNumber,
-        fromLessonNumber: fromLesson?.lessonNumber,
-        includeSpanglish: exampleFilters.includeSpanglish,
-        audioOnly: exampleFilters.audioOnly,
-        skillTags: tagsToSearch,
-      });
-
-      // Only update if UUID has changed
-      if (newUuid !== exampleFilters.filterUuid) {
-        updateExampleFilters({
-          ...exampleFilters,
-          filterUuid: newUuid,
-        });
-      }
+  const selectedSkillTags: SkillTag[] = useMemo(() => {
+    if (isLoading) {
+      return [];
     }
-  }, [
-    course,
-    toLesson,
-    fromLesson,
-    exampleFilters,
-    skillTags,
-    filtersChanging,
-    updateExampleFilters,
-  ]);
+    return (
+      skillTags?.filter((tag) =>
+        exampleFilters.skillTagKeys.includes(tag.key),
+      ) ?? []
+    );
+  }, [skillTags, exampleFilters.skillTagKeys, isLoading]);
 
-  const filterState: FilterState = useMemo(() => {
-    return {
-      exampleFilters,
-      course,
-      fromLesson,
-      toLesson,
+  const filterState: ExampleFilters = useMemo(() => {
+    const filters: ExampleFilters = {
+      excludeSpanglish: exampleFilters.excludeSpanglish,
+      audioOnly: exampleFilters.audioOnly,
+      skillTags: selectedSkillTags,
+      courseId,
+      fromLessonNumber,
+      toLessonNumber,
     };
-  }, [exampleFilters, course, fromLesson, toLesson]);
+    return filters;
+  }, [
+    exampleFilters,
+    courseId,
+    fromLessonNumber,
+    toLessonNumber,
+    selectedSkillTags,
+  ]);
 
   const addSkillTagToFilters = useCallback(
     (tagKey: string) => {
-      if (!filtersChanging) {
+      if (exampleFilters.skillTagKeys.includes(tagKey)) {
         return;
       }
       updateExampleFilters({
         ...exampleFilters,
-        skillTags: [...exampleFilters.skillTags, tagKey],
+        skillTagKeys: [...exampleFilters.skillTagKeys, tagKey],
       });
     },
-    [exampleFilters, filtersChanging, updateExampleFilters],
+    [exampleFilters, updateExampleFilters],
   );
 
   const removeSkillTagFromFilters = useCallback(
-    (tagKey: string) => {
-      if (!filtersChanging) {
-        return;
-      }
+    (keyToRemove: string) => {
       updateExampleFilters({
         ...exampleFilters,
-        skillTags: exampleFilters.skillTags.filter((tag) => tag !== tagKey),
+        skillTagKeys: exampleFilters.skillTagKeys.filter(
+          (tagKey) => tagKey !== keyToRemove,
+        ),
       });
     },
-    [exampleFilters, filtersChanging, updateExampleFilters],
+    [exampleFilters, updateExampleFilters],
   );
 
-  const updateIncludeSpanglish = useCallback(
-    (includeSpanglish: boolean) => {
-      if (!filtersChanging) {
-        return;
-      }
-      updateExampleFilters({ ...exampleFilters, includeSpanglish });
+  const updateExcludeSpanglish = useCallback(
+    (excludeSpanglish: boolean) => {
+      updateExampleFilters({ ...exampleFilters, excludeSpanglish });
     },
-    [exampleFilters, filtersChanging, updateExampleFilters],
+    [exampleFilters, updateExampleFilters],
   );
 
   const updateAudioOnly = useCallback(
     (audioOnly: boolean) => {
-      if (!filtersChanging) {
-        return;
-      }
       updateExampleFilters({ ...exampleFilters, audioOnly });
     },
-    [exampleFilters, filtersChanging, updateExampleFilters],
+    [exampleFilters, updateExampleFilters],
   );
 
   return {
     filterState,
-    filtersChanging,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
-    updateIncludeSpanglish,
+    updateExcludeSpanglish,
     updateAudioOnly,
-    updateFiltersChanging,
-
-    skillTagKeys: exampleFilters.skillTags,
   };
 }

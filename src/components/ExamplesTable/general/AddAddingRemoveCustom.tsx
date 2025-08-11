@@ -1,6 +1,6 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
-import { useModal } from 'src/hooks/useModal';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 export default function AddAddingRemoveCustom({

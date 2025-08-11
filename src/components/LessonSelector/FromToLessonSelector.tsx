@@ -19,8 +19,8 @@ export default function FromToLessonSelector(): React.JSX.Element {
     fromLesson,
     toLesson,
     updateUserSelectedCourseId,
-    updateFromLessonId,
-    updateToLessonId,
+    updateFromLessonNumber,
+    updateToLessonNumber,
   } = useSelectedCourseAndLessons();
   const { programTableQuery } = useProgramTable();
 
@@ -46,7 +46,7 @@ export default function FromToLessonSelector(): React.JSX.Element {
       const lessonNumber = lesson.lessonNumber;
       if (lessonNumber && (!toLessonNumber || lessonNumber <= toLessonNumber)) {
         lessonSelector.push(
-          <option key={lesson.id} value={lesson.id}>
+          <option key={lesson.lessonNumber} value={lesson.lessonNumber}>
             {`Lesson ${lessonNumber}`}
           </option>,
         );
@@ -66,7 +66,7 @@ export default function FromToLessonSelector(): React.JSX.Element {
         (!fromLessonNumber || lessonNumber >= fromLessonNumber)
       ) {
         lessonSelector.push(
-          <option key={lesson.id} value={lesson.id}>
+          <option key={lesson.lessonNumber} value={lesson.lessonNumber}>
             {`Lesson ${lessonNumber}`}
           </option>,
         );
@@ -102,9 +102,9 @@ export default function FromToLessonSelector(): React.JSX.Element {
             <select
               id="fromLesson"
               name="fromLesson"
-              value={fromLesson?.id ?? 0}
+              value={fromLesson?.lessonNumber ?? 0}
               onChange={(e) =>
-                updateFromLessonId(Number.parseInt(e.target.value))
+                updateFromLessonNumber(Number.parseInt(e.target.value))
               }
             >
               <option key={0} value={0}>
@@ -122,9 +122,9 @@ export default function FromToLessonSelector(): React.JSX.Element {
               id="toLesson"
               name="toLesson"
               className="lessonList"
-              value={toLesson?.id ?? 0}
+              value={toLesson?.lessonNumber ?? 0}
               onChange={(e) =>
-                updateToLessonId(Number.parseInt(e.target.value))
+                updateToLessonNumber(Number.parseInt(e.target.value))
               }
             >
               <option key={0} value={0}>

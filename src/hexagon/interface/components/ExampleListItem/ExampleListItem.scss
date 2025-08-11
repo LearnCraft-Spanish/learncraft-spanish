@@ -50,13 +50,13 @@
     border: 2px solid var(--accent);
     border-top: none;
     background-color: var(--light);
-    padding: 0.25rem;
+    padding: 1rem;
     margin-top: -5px;
     position: relative;
 
     display: flex;
     flex-direction: row;
-    align-items: stretch;
+    // align-items: stretch;
     justify-content: space-between;
 
     // .moreInfoView {
@@ -85,9 +85,18 @@
 
 .vocabTagsSide {
   max-width: 70%;
+  width: 100%;
+  margin-right: 1rem;
+
+  .vocabTagsHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 .moreInfoSide {
-  max-width: 30%;
+  max-width: 50%;
 }
 
 .labelsSection {
@@ -95,8 +104,8 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 0.25rem;
-  margin-right: 0.25rem;
+
+  width: 100%;
 
   .label {
     font-size: 12px;
@@ -127,7 +136,8 @@
 .vocabTagsSide {
   h3 {
     text-align: left;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
+    margin-top: 0;
   }
   .vocabTagsList {
     display: flex;
@@ -135,19 +145,51 @@
     flex-wrap: wrap;
     justify-content: flex-start;
     align-items: center;
-
-    .vocabTag {
-      font-size: 14px;
-      padding: 0.25rem;
-      margin: 0.25rem;
-      min-height: 0;
-    }
   }
 }
 
+.exampleCardSpanishText,
+.exampleCardEnglishText {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding-right: 8px;
+}
+
 .audioWrapper {
+  min-width: 48px;
+  min-height: 48px;
+  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
+}
+
+.datesSection {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 300px;
+  margin-right: 0.5rem;
+
+  .lineWrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .label {
+      text-wrap: nowrap;
+    }
+
+    .label,
+    .content {
+      font-size: 14px;
+      margin: 0.5rem 0;
+    }
+  }
 }

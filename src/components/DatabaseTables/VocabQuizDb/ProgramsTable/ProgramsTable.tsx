@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { Loading } from 'src/components/Loading';
 
 import Table from 'src/components/Table';
-import { useModal } from 'src/hooks/useModal';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import BackButton from '../../general/BackButton';
 
 import { EditProgramView, FilterProgramsTable } from './components';

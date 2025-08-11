@@ -1,11 +1,11 @@
 import type {
   ExampleWithVocabulary,
   SkillTag,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import type { AuthPort } from '../application/ports/authPort';
 import type { ExamplePort } from '../application/ports/examplePort';
 import { createHttpClient } from '@infrastructure/http/client';
-import { queryExamplesEndpoint } from '@LearnCraft-Spanish/shared';
+import { queryExamplesEndpoint } from '@learncraft-spanish/shared';
 
 export function createExampleInfrastructure(
   apiUrl: string,
@@ -18,13 +18,12 @@ export function createExampleInfrastructure(
       courseId: number;
       toLessonNumber: number;
       fromLessonNumber?: number;
-      includeSpanglish?: boolean;
+      excludeSpanglish?: boolean;
       audioOnly?: boolean;
       skillTags?: SkillTag[];
-
       page: number;
       limit: number;
-      seed?: string;
+      seed: string;
     }) => {
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
@@ -36,7 +35,7 @@ export function createExampleInfrastructure(
           courseId: params.courseId,
           toLessonNumber: params.toLessonNumber,
           fromLessonNumber: params.fromLessonNumber,
-          includeSpanglish: params.includeSpanglish,
+          excludeSpanglish: params.excludeSpanglish,
           audioOnly: params.audioOnly,
           skillTags: params.skillTags,
         },

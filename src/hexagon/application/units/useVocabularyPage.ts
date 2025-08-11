@@ -1,4 +1,4 @@
-import type { Vocabulary } from '@LearnCraft-Spanish/shared';
+import type { Vocabulary } from '@learncraft-spanish/shared';
 import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
 import {
   normalizeQueryError,

@@ -12,11 +12,11 @@ import React, {
 } from 'react';
 import ExampleUpdateForm from 'src/components/ExampleManager/ExampleUpdateForm';
 import quizCourses from 'src/functions/QuizCourseList';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 import ExamplesTable from '../ExamplesTable/ExamplesTable';
 import { VocabTag } from './VocabTag';
 interface ExampleDetails {

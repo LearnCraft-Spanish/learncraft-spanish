@@ -3,7 +3,7 @@ import type {
   CreateVerbVocabulary,
   Subcategory,
   Vocabulary,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 import type { TableHook } from '../units/pasteTable/types';
 
 /**

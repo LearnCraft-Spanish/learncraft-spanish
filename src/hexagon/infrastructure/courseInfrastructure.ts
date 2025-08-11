@@ -1,12 +1,14 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { CoursePort } from '@application/ports/coursePort';
-import type { CourseWithLessons, Lesson } from '@LearnCraft-Spanish/shared';
+import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   getCoursesWithLessonsEndpoint,
+  getLessonRangeVocabRequiredEndpoint,
   getLessonsByVocabularyEndpoint,
-} from '@LearnCraft-Spanish/shared';
+  getLessonVocabKnownEndpoint,
+} from '@learncraft-spanish/shared';
 
 export function createCourseInfrastructure(
   apiUrl: string,
@@ -19,6 +21,39 @@ export function createCourseInfrastructure(
       const response = await httpClient.get<CourseWithLessons[]>(
         getCoursesWithLessonsEndpoint.path,
         getCoursesWithLessonsEndpoint.requiredScopes,
+      );
+      return response;
+    },
+
+    getLessonVocabKnown: async ({ courseId, lessonNumber }) => {
+      const response = await httpClient.get<number[]>(
+        getLessonVocabKnownEndpoint.path,
+        getLessonVocabKnownEndpoint.requiredScopes,
+        {
+          params: {
+            courseId,
+            lessonNumber,
+          },
+        },
+      );
+      return response;
+    },
+
+    getLessonRangeVocabRequired: async ({
+      courseId,
+      fromLessonNumber,
+      toLessonNumber,
+    }) => {
+      const response = await httpClient.get<number[]>(
+        getLessonRangeVocabRequiredEndpoint.path,
+        getLessonRangeVocabRequiredEndpoint.requiredScopes,
+        {
+          params: {
+            courseId,
+            toLessonNumber,
+            fromLessonNumber,
+          },
+        },
       );
       return response;
     },

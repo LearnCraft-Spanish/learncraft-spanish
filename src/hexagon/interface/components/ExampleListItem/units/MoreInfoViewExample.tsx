@@ -1,47 +1,67 @@
-import type { ExampleWithVocabulary } from '@LearnCraft-Spanish/shared';
-import { AudioControl } from '../../general';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+} from '@learncraft-spanish/shared';
+import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
+import { useState } from 'react';
+import VocabTagContainer from '../../VocabTagDetails';
 
 export default function MoreInfoViewExample({
   example,
   isOpen,
+  openContextual,
+  contextual,
+  setContextualRef,
+  lessonPopup,
 }: {
-  example: ExampleWithVocabulary;
+  example: ExampleWithVocabulary | Flashcard;
   isOpen: boolean;
+  openContextual: (contextual: string) => void;
+  contextual: string;
+  setContextualRef: (ref: HTMLDivElement | null) => void;
+  lessonPopup: LessonPopup;
 }) {
+  const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
+  const handleSelect = (id: number) => {
+    setVocabTagSelected(id);
+  };
+  let exampleWithVocabulary: ExampleWithVocabulary;
+  if ('vocabulary' in example) {
+    exampleWithVocabulary = example;
+  } else {
+    exampleWithVocabulary = example.example;
+  }
+
   return (
     isOpen && (
       <div className={`moreInfoView ${isOpen ? 'open' : 'closed'}`}>
-        <div className="vocabTagsSide">
-          <h3>Vocab Tags</h3>
-          {/* This should be a list of Skill Tag display objects, not just strings */}
-          <div className="vocabTagsList">
-            {example.vocabulary.map((vocab) => (
-              <div className="vocabTag" key={vocab.id}>
-                {vocab.word}
+        {exampleWithVocabulary.vocabularyComplete &&
+          exampleWithVocabulary.vocabulary.length > 0 && (
+            <div className="vocabTagsSide">
+              <h3>Vocabulary</h3>
+              <div className="vocabTagsList">
+                {exampleWithVocabulary.vocabulary.map((vocab) => (
+                  <VocabTagContainer
+                    key={vocab.id}
+                    exampleId={exampleWithVocabulary.id}
+                    vocabulary={vocab}
+                    openContextual={openContextual}
+                    contextual={contextual}
+                    setContextualRef={setContextualRef}
+                    lessonPopup={lessonPopup}
+                    handleSelect={handleSelect}
+                    isSelected={vocabTagSelected === vocab.id}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className="moreInfoSide">
-          {example.spanishAudio && (
-            <div className="audioWrapper">
-              <div className="audioLabel">Spanish Audio</div>
-              <AudioControl audioLink={example.spanishAudio} />
             </div>
           )}
-          {example.englishAudio && (
-            <div className="audioWrapper">
-              <div className="audioLabel">English Audio</div>
-              <AudioControl audioLink={example.englishAudio} />
-            </div>
-          )}
-        </div>
         <div className="moreInfoSide">
           <div className="labelsSection">
-            {example.spanglish && (
+            {exampleWithVocabulary.spanglish && (
               <div className="label spanglish">spanglish</div>
             )}
-            {example.spanishAudio && (
+            {exampleWithVocabulary.spanishAudio && (
               <div className="label audio">audio flashcard</div>
             )}
           </div>

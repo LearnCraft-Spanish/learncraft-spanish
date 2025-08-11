@@ -2,7 +2,7 @@ import type {
   AppUser,
   CourseWithLessons,
   Lesson,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 export interface UseActiveStudentReturnType {
   appUser: AppUser | null;
@@ -17,8 +17,8 @@ export interface UseSelectedCourseAndLessonsReturnType {
   fromLesson: Lesson | null;
   toLesson: Lesson | null;
   updateUserSelectedCourseId: (courseId: number) => void;
-  updateFromLessonId: (lessonId: number) => void;
-  updateToLessonId: (lessonId: number) => void;
+  updateFromLessonNumber: (lessonNumber: number) => void;
+  updateToLessonNumber: (lessonNumber: number) => void;
 
   isLoading: boolean;
 }

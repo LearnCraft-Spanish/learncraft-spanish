@@ -1,14 +1,14 @@
 import type { Assignment } from 'src/types/CoachingTypes';
 
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   // DeleteRecord,
   Dropdown,
   LinkInput,
   TextAreaInput,
 } from 'src/components/FormComponents';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 const assignmentTypes = [
   'Pronunciation',

@@ -9,9 +9,9 @@ import React, {
   useState,
 } from 'react';
 import { toast } from 'react-toastify';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
 import { useBackend } from 'src/hooks/useBackend';
-import { useModal } from 'src/hooks/useModal';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import ConfirmationDialog from './ConfirmationDialog';
 import ExampleAssignmentPanel from './ExampleAssignmentPanel';

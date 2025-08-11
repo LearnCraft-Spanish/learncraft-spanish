@@ -1,14 +1,14 @@
 import type {
   ExampleWithVocabulary,
   SkillTag,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 export interface ExamplePort {
   getFilteredExamples: ({
     courseId,
     toLessonNumber,
     fromLessonNumber,
-    includeSpanglish,
+    excludeSpanglish,
     audioOnly,
     skillTags,
     page,
@@ -18,11 +18,11 @@ export interface ExamplePort {
     courseId: number;
     toLessonNumber: number;
     fromLessonNumber?: number;
-    includeSpanglish?: boolean;
+    excludeSpanglish?: boolean;
     audioOnly?: boolean;
     skillTags?: SkillTag[];
     page: number;
     limit: number;
-    seed?: string;
+    seed: string;
   }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
 }

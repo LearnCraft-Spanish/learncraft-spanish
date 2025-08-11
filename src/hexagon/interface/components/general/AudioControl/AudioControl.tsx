@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import pause from 'src/assets/icons/pause_dark.svg';
 import play from 'src/assets/icons/play_dark.svg';
 import './AudioControl.scss';
@@ -46,31 +46,49 @@ export default function AudioControl({ audioLink }: { audioLink: string }) {
     }
   }
 
-  // when audio finishes playing, reset audio to start
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (audio) {
-      const handleEnded = () => {
-        if (audioRef.current) {
-          audioRef.current.currentTime = 0;
-          setIsPlaying(false);
-        }
-      };
-
-      audio.addEventListener('ended', handleEnded);
-
-      return () => {
-        audio.removeEventListener('ended', handleEnded);
-      };
+  // Event handler for when audio ends
+  const handleEnded = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
     }
-  }, [audioLink]);
+    setIsPlaying(false);
+  }, []);
+
+  // Callback ref to set up event listeners when audio element is available
+  const setAudioRef = useCallback(
+    (node: HTMLAudioElement | null) => {
+      // Remove event listener from previous audio element
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('ended', handleEnded);
+      }
+
+      // Set the ref
+      audioRef.current = node;
+
+      // Add event listener to new audio element
+      if (node) {
+        node.addEventListener('ended', handleEnded);
+      }
+    },
+    [handleEnded],
+  );
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.removeEventListener('ended', handleEnded);
+      }
+    };
+  }, [handleEnded]);
+
   return (
     audioLink &&
     audioLink.length > 0 && (
       <>
         {isValidAudio && (
           <>
-            <audio ref={audioRef} src={audioLink}></audio>
+            <audio ref={setAudioRef} src={audioLink}></audio>
             <button
               type="button"
               onClick={(e) => handlePlayPauseClick(e)}

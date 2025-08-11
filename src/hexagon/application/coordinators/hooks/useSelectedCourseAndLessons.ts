@@ -1,3 +1,4 @@
+import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 import type { UseSelectedCourseAndLessonsReturnType } from './types';
 import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { use, useMemo } from 'react';
@@ -14,42 +15,48 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
   const {
     userSelectedCourseId,
     updateUserSelectedCourseId,
-    fromLessonId,
-    updateFromLessonId,
-    toLessonId,
-    updateToLessonId,
+    fromLessonNumber,
+    updateFromLessonNumber,
+    toLessonNumber,
+    updateToLessonNumber,
   } = context;
 
   const { data: coursesWithLessons, isLoading } = useCoursesWithLessons();
   const { appUser } = useActiveStudent();
 
-  const course = useMemo(() => {
-    let newCourseId: number;
+  const course: CourseWithLessons | null = useMemo(() => {
+    let newCourseId: number | null;
 
     if (userSelectedCourseId) {
       newCourseId = userSelectedCourseId;
     } else {
-      newCourseId = appUser?.courseId || 0;
+      newCourseId = appUser?.courseId ?? null;
     }
     return coursesWithLessons?.find((item) => item.id === newCourseId) || null;
   }, [coursesWithLessons, userSelectedCourseId, appUser?.courseId]);
 
-  const fromLesson = useMemo(() => {
-    if (!fromLessonId || !course) {
+  const fromLesson: Lesson | null = useMemo(() => {
+    if (!fromLessonNumber || !course) {
       return null;
     }
 
-    return course.lessons.find((item) => item.id === fromLessonId) || null;
-  }, [course, fromLessonId]);
+    return (
+      course.lessons.find((item) => item.lessonNumber === fromLessonNumber) ||
+      null
+    );
+  }, [course, fromLessonNumber]);
 
-  const toLesson = useMemo(() => {
-    if (!toLessonId && !course) {
+  const toLesson: Lesson | null = useMemo(() => {
+    if (!toLessonNumber && !course) {
       return null;
     }
-    const newToLessonId = toLessonId || appUser?.lessonNumber || 0;
+    const newToLessonNumber = toLessonNumber || appUser?.lessonNumber || 0;
 
-    return course?.lessons.find((item) => item.id === newToLessonId) || null; // TODO: check if this is correct
-  }, [course, toLessonId, appUser]);
+    return (
+      course?.lessons.find((item) => item.lessonNumber === newToLessonNumber) ||
+      null
+    );
+  }, [course, toLessonNumber, appUser]);
 
   // ------------------ Return ------------------ //
   return {
@@ -57,9 +64,8 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     fromLesson,
     toLesson,
     updateUserSelectedCourseId,
-    updateFromLessonId,
-    updateToLessonId,
-
+    updateFromLessonNumber,
+    updateToLessonNumber,
     isLoading,
   };
 }

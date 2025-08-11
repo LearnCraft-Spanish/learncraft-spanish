@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useQuizzesTable from 'src/hooks/VocabQuizDbData/useQuizzesTable';
 export default function useQuizTable() {
   const { contextual } = useContextualMenu();

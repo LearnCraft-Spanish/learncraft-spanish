@@ -1,4 +1,4 @@
-import type { AppUser } from '@LearnCraft-Spanish/shared';
+import type { AppUser } from '@learncraft-spanish/shared';
 import type {
   Flashcard,
   StudentFlashcardData,

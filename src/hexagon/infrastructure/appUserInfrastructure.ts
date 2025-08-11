@@ -1,4 +1,4 @@
-import type { AppUser, AppUserAbbreviation } from '@LearnCraft-Spanish/shared';
+import type { AppUser, AppUserAbbreviation } from '@learncraft-spanish/shared';
 import type { AppUserPort } from '../application/ports/appUserPort';
 
 import type { AuthPort } from '../application/ports/authPort';
@@ -7,7 +7,7 @@ import {
   getAllAppStudentsEndpoint,
   getAppUserEndpoint,
   getMyDataEndpoint,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 export function createAppUserInfrastructure(
   apiUrl: string,

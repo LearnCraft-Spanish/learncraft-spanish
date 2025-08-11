@@ -5,8 +5,12 @@ import SelectLesson from './SelectLesson';
 import './LessonSelector.css';
 
 export default function LessonSelector(): React.JSX.Element {
-  const { course, toLesson, updateUserSelectedCourseId, updateFromLessonId } =
-    useSelectedCourseAndLessons();
+  const {
+    course,
+    toLesson,
+    updateUserSelectedCourseId,
+    updateFromLessonNumber,
+  } = useSelectedCourseAndLessons();
 
   return (
     <div className="FTLS">
@@ -18,9 +22,9 @@ export default function LessonSelector(): React.JSX.Element {
       />
       {course?.lessons && (
         <SelectLesson
-          value={toLesson?.id.toString() ?? '0'}
+          value={toLesson?.lessonNumber.toString() ?? '0'}
           onChange={(value: string) =>
-            updateFromLessonId(Number.parseInt(value))
+            updateFromLessonNumber(Number.parseInt(value))
           }
           id="toLesson"
           label="Lesson"

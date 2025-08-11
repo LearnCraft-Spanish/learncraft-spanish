@@ -1,19 +1,18 @@
 import { useMemo } from 'react';
-import './BulkAddPendingRemove.scss';
+import './BulkAddRemove.scss';
 
-export default function BulkAddPendingRemove({
+export default function BulkAddButton({
   id,
   isCollected,
-  handleAdd,
-  handleRemove,
+  handleSelect,
   isSelected,
   isPending,
+  handleRemoveSelected,
 }: {
   id: number;
   isCollected: boolean;
-  handleAdd: () => void;
-  handleRemove: () => void;
-
+  handleSelect: () => void;
+  handleRemoveSelected: () => void;
   isSelected: boolean;
   isPending: boolean;
 }) {
@@ -24,30 +23,35 @@ export default function BulkAddPendingRemove({
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
-    if (isPending) {
+    if (isPending && isCollected) {
+      return {
+        text: 'Removing...',
+        className: 'pendingButton',
+        onClickFunction: () => {},
+      };
+    } else if (isPending && !isCollected) {
       return {
         text: 'Adding...',
         className: 'pendingButton',
         onClickFunction: () => {},
       };
-    }
-    if (!isCollected && !isSelected) {
-      return {
-        text: 'Select',
-        className: 'selectButton',
-        onClickFunction: handleAdd,
-      };
     } else if (isCollected) {
       return {
         text: 'Owned',
         className: 'disabledButton',
-        onClickFunction: () => {},
+        onClickFunction: handleRemoveSelected,
+      };
+    } else if (!isCollected && !isSelected) {
+      return {
+        text: 'Select',
+        className: 'selectAddButton',
+        onClickFunction: handleSelect,
       };
     } else if (isSelected) {
       return {
         text: 'Selected',
-        className: 'selectedButton',
-        onClickFunction: handleRemove,
+        className: 'selectedAddButton',
+        onClickFunction: handleRemoveSelected,
       };
     }
     return {
@@ -55,7 +59,7 @@ export default function BulkAddPendingRemove({
       className: 'unknownButton',
       onClickFunction: () => {},
     };
-  }, [handleAdd, handleRemove, isCollected, isSelected]);
+  }, [isCollected, isSelected, isPending, handleSelect, handleRemoveSelected]);
 
   return (
     <button

@@ -1,4 +1,4 @@
-import type { Lesson } from '@LearnCraft-Spanish/shared';
+import type { Lesson } from '@learncraft-spanish/shared';
 import './LessonsTable.scss';
 
 interface LessonsTableProps {

@@ -1,12 +1,12 @@
-import type { SkillTag } from '@LearnCraft-Spanish/shared';
+import type { SkillTag } from '@learncraft-spanish/shared';
 import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
 import '../FlashcardFinder.scss';
 export default function ReadOnlyFilters({
-  includeSpanglish,
+  excludeSpanglish,
   audioOnly,
   skillTags,
 }: {
-  includeSpanglish: boolean;
+  excludeSpanglish: boolean;
   audioOnly: boolean;
   skillTags: SkillTag[];
 }) {
@@ -32,9 +32,9 @@ export default function ReadOnlyFilters({
             <p>{`Lesson ${toLesson?.lessonNumber}`}</p>
           </div>
         )}
-        {includeSpanglish && (
+        {excludeSpanglish && (
           <div className="filterItem">
-            <h4>Include Spanglish</h4>
+            <h4>Exclude Spanglish</h4>
           </div>
         )}
         {audioOnly && (
@@ -47,7 +47,7 @@ export default function ReadOnlyFilters({
             <h4>Selected Tags:</h4>
             <div className="vocabTagsList">
               {skillTags.map((tag) => (
-                <div className="vocabTag" key={tag.key}>
+                <div className={`vocabTag ${tag.type}`} key={tag.key}>
                   {tag.name}
                 </div>
               ))}

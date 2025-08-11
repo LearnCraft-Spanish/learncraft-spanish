@@ -7,6 +7,9 @@ const defaultMockAdapter: CoursePort = {
     return Promise.resolve(createRealisticCourseWithLessonsList());
   },
   getLessonsByVocabulary: () => Promise.resolve([]),
+  getLessonVocabKnown: () => Promise.reject(new Error('Not implemented')),
+  getLessonRangeVocabRequired: () =>
+    Promise.reject(new Error('Not implemented')),
 };
 
 export const {

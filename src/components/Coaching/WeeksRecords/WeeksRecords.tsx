@@ -14,8 +14,8 @@ import React, {
 } from 'react';
 
 import { Loading } from 'src/components/Loading';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import getLoggedInCoach from '../general/functions/getLoggedInCoach';
 import { DateRangeProvider } from './DateRangeProvider';
 import CoachingFilter from './Filter/WeeksFilter';

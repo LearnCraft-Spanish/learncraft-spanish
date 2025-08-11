@@ -1,4 +1,4 @@
-import type { Subcategory } from '@LearnCraft-Spanish/shared/src/domain/vocabulary/core-types';
+import type { Subcategory } from '@learncraft-spanish/shared/src/domain/vocabulary/core-types';
 import { useSubcategoryAdapter } from '@application/adapters/subcategoryAdapter';
 import {
   normalizeQueryError,

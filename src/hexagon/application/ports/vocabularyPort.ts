@@ -3,7 +3,7 @@ import type {
   Vocabulary,
   VocabularyAbbreviation,
   VocabularyRelatedRecords,
-} from '@LearnCraft-Spanish/shared';
+} from '@learncraft-spanish/shared';
 
 /**
  * Port for all vocabulary operations.

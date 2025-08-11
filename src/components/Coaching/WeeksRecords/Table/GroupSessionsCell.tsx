@@ -4,8 +4,6 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
 import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
-import ContextualView from 'src/components/Contextual/ContextualView';
-
 import {
   CoachDropdown,
   DateInput,
@@ -18,6 +16,10 @@ import {
 } from 'src/components/FormComponents';
 
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
+
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import * as helpers from 'src/hooks/CoachingData/helperFunctions';
 import {
   useActiveMemberships,
@@ -27,8 +29,6 @@ import {
   useWeeks,
 } from 'src/hooks/CoachingData/queries';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const sessionTypeOptions = [

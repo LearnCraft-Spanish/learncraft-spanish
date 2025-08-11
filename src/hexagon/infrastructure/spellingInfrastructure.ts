@@ -1,7 +1,7 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type { SpellingPort } from '@application/ports/spellingPort';
 import { createHttpClient } from '@infrastructure/http/client';
-import { getKnownSpellingsByCourseAndLessonEndpoint } from '@LearnCraft-Spanish/shared';
+import { getKnownSpellingsByCourseAndLessonEndpoint } from '@learncraft-spanish/shared';
 
 export function createSpellingInfrastructure(
   apiUrl: string,

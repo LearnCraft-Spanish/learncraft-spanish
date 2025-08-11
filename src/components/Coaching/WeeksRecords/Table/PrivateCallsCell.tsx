@@ -5,7 +5,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
 import CustomStudentSelector from 'src/components/Coaching/general/CustomStudentSelector';
 import getDateRange from 'src/components/Coaching/general/functions/dateRange';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   CoachDropdown,
   DateInput,
@@ -18,10 +17,11 @@ import {
 } from 'src/components/FormComponents';
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useWeeks } from 'src/hooks/CoachingData/queries';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const ratingOptions = [
