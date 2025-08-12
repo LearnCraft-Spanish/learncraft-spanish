@@ -8,7 +8,6 @@ import { useRef, useState } from 'react';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import { InlineLoading } from 'src/components/Loading';
 
-import Loading from 'src/components/Loading/Loading';
 import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import { Pagination } from '../general';
@@ -22,7 +21,8 @@ interface ExamplesTableProps {
   totalCount: number;
   studentFlashcards: UseStudentFlashcardsReturnType;
   paginationState: QueryPaginationState;
-  fetchingExamples: boolean;
+  firstPageLoading: boolean;
+  newPageLoading: boolean;
   lessonPopup: LessonPopup;
   manageThese: () => void;
 }
@@ -32,7 +32,8 @@ export default function ExamplesTable({
   totalCount,
   studentFlashcards,
   paginationState,
-  fetchingExamples,
+  firstPageLoading,
+  newPageLoading,
   lessonPopup,
   manageThese,
 }: ExamplesTableProps) {
@@ -68,8 +69,8 @@ export default function ExamplesTable({
       200,
     ); // slight delay
   };
-  if (fetchingExamples) {
-    return <Loading message="Fetching Flashcards" />;
+  if (firstPageLoading) {
+    return <InlineLoading message="Fetching Flashcards" />;
   }
 
   return (
@@ -116,7 +117,7 @@ export default function ExamplesTable({
             )}
           </div>
 
-          {fetchingExamples ? (
+          {newPageLoading ? (
             <InlineLoading message="Just a moment..." />
           ) : (
             <h4>
@@ -167,7 +168,7 @@ export default function ExamplesTable({
                   </p>
                 </button>
                 <button type="button" onClick={manageThese}>
-                  <p>Manage these</p>
+                  <p>Use these filters on my flashcards</p>
                 </button>
                 {/* <button
                     type="button"
@@ -200,33 +201,37 @@ export default function ExamplesTable({
         previousPage={previousPage}
       />
       <div id="examplesTableBody">
-        {examples.map((example: ExampleWithVocabulary) => {
-          return (
-            <ExampleListItem
-              key={example.id}
-              example={example}
-              isCollected={studentFlashcards.isExampleCollected(example.id)}
-              isPending={
-                bulkOperationInProgress && bulkSelectIds.includes(example.id)
-              }
-              handleSingleAdd={async () => {
-                await studentFlashcards.createFlashcards([example.id]);
-              }}
-              handleRemove={async () => {
-                await studentFlashcards.deleteFlashcards([example.id]);
-              }}
-              handleRemoveSelected={() => {
-                removeFromBulkSelect(example.id);
-              }}
-              handleSelect={() => {
-                addToBulkSelect(example.id);
-              }}
-              bulkSelectMode={bulkSelectMode}
-              isSelected={bulkSelectIds.includes(example.id)}
-              lessonPopup={lessonPopup}
-            />
-          );
-        })}
+        {newPageLoading ? (
+          <InlineLoading message="Just a moment..." />
+        ) : (
+          examples.map((example: ExampleWithVocabulary) => {
+            return (
+              <ExampleListItem
+                key={example.id}
+                example={example}
+                isCollected={studentFlashcards.isExampleCollected(example.id)}
+                isPending={
+                  bulkOperationInProgress && bulkSelectIds.includes(example.id)
+                }
+                handleSingleAdd={async () => {
+                  await studentFlashcards.createFlashcards([example.id]);
+                }}
+                handleRemove={async () => {
+                  await studentFlashcards.deleteFlashcards([example.id]);
+                }}
+                handleRemoveSelected={() => {
+                  removeFromBulkSelect(example.id);
+                }}
+                handleSelect={() => {
+                  addToBulkSelect(example.id);
+                }}
+                bulkSelectMode={bulkSelectMode}
+                isSelected={bulkSelectIds.includes(example.id)}
+                lessonPopup={lessonPopup}
+              />
+            );
+          })
+        )}
       </div>
 
       <Pagination
