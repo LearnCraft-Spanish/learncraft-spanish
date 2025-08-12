@@ -1,10 +1,10 @@
 import type { UseExampleFilterCoordinatorReturnType } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
 import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/useSkillTagSearch';
 
-import SelectedTags from './FlashcardFinder/VocabTagFilter/SelectedTags';
-import TagFilter from './FlashcardFinder/VocabTagFilter/TagFilter';
-import ToggleSwitch from './general/ToggleSwitch';
-import LessonRangeSelector from './LessonSelector/LessonRangeSelector';
+import ToggleSwitch from '../general/ToggleSwitch';
+import SelectedTags from '../general/VocabTagFilter/SelectedTags';
+import TagFilter from '../general/VocabTagFilter/TagFilter';
+import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 
 import 'src/App.css';
 import './FlashcardManagerFilters.scss';

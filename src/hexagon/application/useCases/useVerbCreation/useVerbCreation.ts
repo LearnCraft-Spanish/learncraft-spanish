@@ -1,14 +1,14 @@
 import type { CreateVerbVocabulary } from '@learncraft-spanish/shared';
-import type { UseVerbCreationResult } from './types';
-import { useSubcategories } from '@application/units/useSubcategories';
-import { useVocabulary } from '@application/units/useVocabulary';
+import type { UseVerbCreationResult } from './useVerbCreation.types';
+import { useSubcategories } from '@application/queries/useSubcategories';
+import useVocabulary from '@application/units/useVocabulary';
 import { useCallback, useMemo, useState } from 'react';
 
 /**
  * Use case for verb creation.
  * Manages verb-specific creation flow with proper subcategory filtering.
  */
-export function useVerbCreation(): UseVerbCreationResult {
+export default function useVerbCreation(): UseVerbCreationResult {
   // State
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState<number>(0);
   const [creationError, setCreationError] = useState<Error | null>(null);

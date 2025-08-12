@@ -1,26 +1,27 @@
-import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
+import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
 import type {
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
 import type { UseFlashcardManagerReturnType } from './useFlashcardManager.types';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
+
 import {
   useLessonRangeVocabRequired,
   useLessonVocabKnown,
 } from '@application/queries/useLessonWithVocab';
-import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
 import usePagination from '@application/units/Pagination/usePagination';
 
 import useExampleFilter from '@application/units/useExampleFilter';
+import useLessonPopup from '@application/units/useLessonPopup';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { filterExamplesCombined } from '@learncraft-spanish/shared';
-
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthAdapter } from '../adapters/authAdapter';
-import { useActiveStudent } from '../coordinators/hooks/useActiveStudent';
-import useFilterOwnedFlashcards from '../coordinators/hooks/useFilterOwnedFlashcards';
-import useLessonPopup from '../units/useLessonPopup';
+
 export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   const navigate = useNavigate();
   const { isLoading: activeStudentIsLoading } = useActiveStudent();

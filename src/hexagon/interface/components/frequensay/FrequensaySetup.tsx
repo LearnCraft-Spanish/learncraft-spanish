@@ -1,4 +1,4 @@
-import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { LessonSelector } from '../LessonSelector';
 export default function FrequensaySetup({
   isFrequensayEnabled,
@@ -14,13 +14,9 @@ export default function FrequensaySetup({
       <LessonSelector />
       {!isFrequensayEnabled && (
         <>
-          {!toLesson ? (
+          {!toLesson && (
             <div className="frequensay-setup__error">
               Please select a course and lesson range to enable Frequensay
-            </div>
-          ) : (
-            <div className="frequensay-setup__instructions">
-              Please confirm the lesson range before enabling Frequensay
             </div>
           )}
           <button

@@ -34,7 +34,7 @@ export interface UseVocabularyResult {
  * Hook to fetch and manage vocabulary.
  * This unit hook provides operations for all vocabulary types.
  */
-export function useVocabulary(): UseVocabularyResult {
+export default function useVocabulary(): UseVocabularyResult {
   // Get query client for cache invalidation
   const queryClient = useQueryClient();
 

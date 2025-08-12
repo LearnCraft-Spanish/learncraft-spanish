@@ -1,5 +1,5 @@
+import useVerbCreation from '@application/useCases/useVerbCreation';
 import React, { useState } from 'react';
-import { useVerbCreation } from '../../../application/useCases/useVerbCreation';
 import './VocabularyCreator.scss';
 
 interface VerbCreatorProps {

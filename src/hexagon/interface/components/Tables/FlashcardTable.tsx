@@ -4,7 +4,7 @@ import type { Flashcard } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
-import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';

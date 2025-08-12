@@ -7,7 +7,7 @@ import {
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
-interface VocabularyPageResult {
+export interface VocabularyPageResult {
   items: Vocabulary[];
   isLoading: boolean; // Primary loading state - just for items
   isCountLoading: boolean; // Separate loading state for count
@@ -28,7 +28,7 @@ interface VocabularyPageResult {
  * @param page Current page number (1-indexed)
  * @param pageSize Number of items per page
  */
-export function useVocabularyPage(
+export default function useVocabularyPage(
   subcategoryId: number,
   page: number = 1,
   pageSize: number = 25,

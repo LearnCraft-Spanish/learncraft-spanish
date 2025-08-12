@@ -1,15 +1,16 @@
-import type { WordCount } from '../types/frequensay';
+import type { WordCount } from '@application/types/frequensay';
 import type { UseFrequensayResult } from './useFrequensay.types';
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
+import { useSpellingsKnownForLesson } from '@application/queries/useSpellingsKnownForLesson';
 import { copyUnknownWordsTable } from '@application/units/FrequenSay/utils/copyUnknownWordsTable';
 import {
   countVocabularyWords,
   filterWordsByUnknown,
 } from '@application/units/FrequenSay/utils/vocabularyProcessing';
-import { useSpellingsKnownForLesson } from '@application/units/useSpellingsKnownForLesson';
+import useCustomVocabulary from '@application/units/useCustomVocabulary';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
-import useCustomVocabulary from './useCustomVocabulary';
-export function useFrequensay(): UseFrequensayResult {
+
+export default function useFrequensay(): UseFrequensayResult {
   const {
     userAddedVocabulary,
     setUserAddedVocabulary,

@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { createMockVocabularyList } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useVocabularyPage } from './useVocabularyPage';
+import useVocabularyPage from './useVocabularyPage';
 
 describe('useVocabularyPage', () => {
   beforeEach(() => {

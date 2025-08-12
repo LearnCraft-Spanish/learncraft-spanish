@@ -3,8 +3,12 @@ import mockuseSpellingsKnownForLesson, {
   callMockuseSpellingsKnownForLesson,
   defaultSuccessMockResult,
   overrideMockuseSpellingsKnownForLesson,
-} from '@application/units/useSpellingsKnownForLesson.mock';
+} from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
 
+import mockUseCustomVocabulary, {
+  callMockUseCustomVocabulary,
+  mockUseCustomVocabularyReturnValue,
+} from '@application/units/useCustomVocabulary/useCustomVocabulary.mock';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockSpellingsData } from 'src/hexagon/testing/factories/spellingsFactory';
 import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
@@ -13,12 +17,8 @@ import callMockUseSelectedLesson, {
   mockUseSelectedLessonReturnValue,
 } from 'src/hooks/useSelectedLesson.mock';
 import { vi } from 'vitest';
-import mockUseCustomVocabulary, {
-  callMockUseCustomVocabulary,
-  mockUseCustomVocabularyReturnValue,
-} from './useCustomVocabulary.mock';
 
-import { useFrequensay } from './useFrequensay';
+import useFrequensay from './useFrequensay';
 
 vi.mock('./useCustomVocabulary', () => ({
   default: callMockUseCustomVocabulary,

@@ -1,17 +1,17 @@
-import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
+import type { UseExampleQueryReturnType } from '@application/queries/useExampleQuery';
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
 import type { LessonPopup } from '@application/units/useLessonPopup';
+import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
-import type { UseExampleQueryReturnType } from '../queries/useExampleQuery';
-import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
+import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
+import { useExampleQuery } from '@application/queries/useExampleQuery';
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import useExampleFilter from '@application/units/useExampleFilter';
 import useLessonPopup from '@application/units/useLessonPopup';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useFilterOwnedFlashcards from '../coordinators/hooks/useFilterOwnedFlashcards';
-import { useExampleQuery } from '../queries/useExampleQuery';
 
 export interface UseFlashcardFinderReturnType {
   pagination: QueryPaginationState;

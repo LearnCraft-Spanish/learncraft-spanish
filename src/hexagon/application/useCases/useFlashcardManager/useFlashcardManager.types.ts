@@ -1,7 +1,7 @@
 import type usePagination from '@application/units/Pagination/usePagination';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
+import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { Flashcard } from '@learncraft-spanish/shared';
-import type { LessonPopup } from '../units/useLessonPopup';
 
 export interface UseFlashcardManagerReturnType {
   exampleFilter: UseExampleFilterReturnType;

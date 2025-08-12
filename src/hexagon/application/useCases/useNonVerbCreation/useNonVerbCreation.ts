@@ -1,23 +1,21 @@
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
-import type {
-  UseNonVerbCreationResult,
-  VocabularyPaginationState,
-} from './types';
+import type { VocabularyPaginationState } from '../types';
+import type { UseNonVerbCreationResult } from './useNonVerbCreation.types';
+import { useVocabularyTable } from '@application/implementations/vocabularyTable/useVocabularyTable';
+import { useSubcategories } from '@application/queries/useSubcategories';
+import useVocabulary from '@application/units/useVocabulary';
+import useVocabularyPage from '@application/units/useVocabularyPage';
 import {
   CreateNonVerbVocabularySchema,
   validateWithSchema,
 } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
-import { useVocabularyTable } from '../implementations/vocabularyTable/useVocabularyTable';
-import { useSubcategories } from '../units/useSubcategories';
-import { useVocabulary } from '../units/useVocabulary';
-import { useVocabularyPage } from '../units/useVocabularyPage';
 
 /**
  * Use case for non-verb vocabulary creation.
  * Implements the Façade pattern by composing multiple units into a unified API.
  */
-export function useNonVerbCreation(): UseNonVerbCreationResult {
+export default function useNonVerbCreation(): UseNonVerbCreationResult {
   // State
   const [selectedSubcategoryId, setSelectedSubcategoryId] = useState('');
   const [creationError, setCreationError] = useState<Error | null>(null);
