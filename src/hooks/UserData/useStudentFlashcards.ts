@@ -17,6 +17,8 @@ export function useStudentFlashcards() {
   const { isAuthenticated, authUser, isAdmin, isCoach, isStudent } =
     useAuthAdapter();
   const { appUser } = useActiveStudent();
+
+  const userId = appUser?.recordId;
   const {
     getMyExamplesFromBackend,
     getActiveExamplesFromBackend,
@@ -205,6 +207,7 @@ export function useStudentFlashcards() {
         return createdId;
       };
       const data = await addResponse();
+
       return data;
     },
     [
@@ -317,6 +320,7 @@ export function useStudentFlashcards() {
           return newFlashcardData;
         },
       );
+      queryClient.refetchQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
@@ -453,6 +457,7 @@ export function useStudentFlashcards() {
 
     onSuccess: (_data, _variables, _context) => {
       showSuccessToast('Flashcard removed successfully');
+      queryClient.refetchQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
@@ -783,6 +788,7 @@ export function useStudentFlashcards() {
           return trimmedNewFlashcardData;
         },
       );
+
       return { tempIds, flashcards };
     },
 
@@ -829,6 +835,7 @@ export function useStudentFlashcards() {
           return matchAndTrimArrays(newFlashcardData);
         },
       );
+      queryClient.refetchQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (
