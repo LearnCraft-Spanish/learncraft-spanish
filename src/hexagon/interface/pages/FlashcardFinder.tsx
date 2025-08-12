@@ -36,7 +36,8 @@ export default function FlashcardFinder() {
           totalCount={exampleQuery.totalCount ?? 0}
           studentFlashcards={flashcardsQuery}
           paginationState={pagination}
-          fetchingExamples={exampleQuery.isLoading}
+          firstPageLoading={exampleQuery.isLoading && exampleQuery.page === 1}
+          newPageLoading={exampleQuery.isLoading && exampleQuery.page > 1}
           lessonPopup={lessonPopup}
           manageThese={manageThese}
         />

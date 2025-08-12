@@ -1,5 +1,6 @@
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import './Instructions.scss';
 
 export default function Instructions() {
   const { contextual, openContextual } = useContextualMenu();
@@ -23,7 +24,7 @@ export default function Instructions() {
             the new experience:
           </p>
           <h3> How to Use Filters </h3>
-          <ul>
+          <ul className="numberedList">
             <li>
               <p>
                 Click on the words "Flashcard Finder Filters" to open up filter
@@ -33,7 +34,7 @@ export default function Instructions() {
             <li>
               <p>
                 Choose the filters you want, like a specific lesson range, only
-                audio words, or certain vocabulary tags.
+                audio examples, or certain vocabulary tags.
               </p>
             </li>
             <li>
@@ -43,29 +44,54 @@ export default function Instructions() {
               </p>
               <p>
                 Note: The search won’t start until you click “Get Examples.”
-                This helps us show results to you much faster!
               </p>
             </li>
           </ul>
           <h3>New Features to Try </h3>
-          <ul>
+          <ul className="bulletPointsOnParagraphs">
             <li>
-              <h4>Pick multiple examples </h4>
-              <p>
-                Click “Select” on any examples to add several at once to your
-                flashcard collection.
-              </p>
+              <h4>Select multiple examples </h4>
+              <ul>
+                <li>
+                  <p>
+                    Click “Select” on any examples to select multiple at once.
+                    Then, click "add X flashcards" at the top to add them to
+                    your collection.
+                  </p>
+                </li>
+              </ul>
             </li>
             <li>
               <h4>See all the vocabulary tags </h4>
-              <p>
-                Click “Expand” on an example to view all the tags related to
-                that flashcard.
-              </p>
+              <ul>
+                <li>
+                  <p>
+                    Click “Expand” on an example to view all the tags related to
+                    that flashcard. You can also click on a tag to see its
+                    details, as well as what lesson it was taught in.
+                  </p>
+                </li>
+              </ul>
             </li>
             <li>
               <h4>Listen to example audio </h4>
-              <p>Click the speaker icon to hear the example spoken aloud</p>
+              <ul>
+                <li>
+                  <p>Click the "play" icon to hear the example spoken aloud</p>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <h4>Use filters in Flashcard Manager </h4>
+              <ul>
+                <li>
+                  <p>
+                    Click the elipses (3 dots) in the top right of the flashcard
+                    results to see the option "Use these filters on my
+                    flashcards".
+                  </p>
+                </li>
+              </ul>
             </li>
           </ul>
           <br />
