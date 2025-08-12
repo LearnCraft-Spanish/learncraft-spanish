@@ -10,13 +10,14 @@ export default function FlashcardManager() {
     filtersEnabled,
     toggleFilters,
     somethingIsLoading,
+    initialLoading,
     lessonPopup,
     findMore,
   } = useFlashcardManager();
 
   const { filterState, skillTagSearch } = exampleFilter;
 
-  if (exampleFilter.initialLoading) {
+  if (initialLoading) {
     return <Loading message="Loading Flashcard Manager" />;
   }
 

@@ -17,11 +17,14 @@ import { filterExamplesCombined } from '@learncraft-spanish/shared';
 
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthAdapter } from '../adapters/authAdapter';
+import { useActiveStudent } from '../coordinators/hooks/useActiveStudent';
 import useFilterOwnedFlashcards from '../coordinators/hooks/useFilterOwnedFlashcards';
 import useLessonPopup from '../units/useLessonPopup';
-
 export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   const navigate = useNavigate();
+  const { isLoading: activeStudentIsLoading } = useActiveStudent();
+  const { isLoading: authUserIsLoading } = useAuthAdapter();
   const { lessonPopup } = useLessonPopup();
   const { filterOwnedFlashcards, setFilterOwnedFlashcards } =
     useFilterOwnedFlashcards();
@@ -45,6 +48,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     courseAndLessonState.course?.id,
     courseAndLessonState.fromLesson?.lessonNumber,
     courseAndLessonState.toLesson?.lessonNumber,
+    filterOwnedFlashcards,
   );
 
   const fromLessonVocabIds: number[] = useMemo(() => {
@@ -54,6 +58,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   const toLessonWithVocabQuery = useLessonVocabKnown(
     courseAndLessonState.course?.id,
     courseAndLessonState.toLesson?.lessonNumber,
+    filterOwnedFlashcards,
   );
 
   const toLessonVocabIds: number[] = useMemo(() => {
@@ -61,7 +66,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
   }, [toLessonWithVocabQuery.data]);
 
   const findMore = useCallback(() => {
-    navigate('/newflashcardfinder', { replace: true });
+    navigate('/flashcardfinder', { replace: true });
   }, [navigate]);
 
   const ownedExamples: ExampleWithVocabulary[] = useMemo(() => {
@@ -129,12 +134,19 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
 
     somethingIsLoading:
       flashcardsQuery.isLoading ||
+      activeStudentIsLoading ||
       fromLessonWithVocabQuery.isLoading ||
       toLessonWithVocabQuery.isLoading ||
       fromLessonWithVocabQuery.isFetching ||
       toLessonWithVocabQuery.isFetching ||
       fromLessonWithVocabQuery.isRefetching ||
       toLessonWithVocabQuery.isRefetching,
+
+    initialLoading:
+      flashcardsQuery.isLoading ||
+      exampleFilter.initialLoading ||
+      activeStudentIsLoading ||
+      authUserIsLoading,
 
     lessonPopup,
   };

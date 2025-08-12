@@ -13,5 +13,6 @@ export interface UseFlashcardManagerReturnType {
   findMore: () => void;
 
   somethingIsLoading: boolean;
+  initialLoading: boolean;
   lessonPopup: LessonPopup;
 }

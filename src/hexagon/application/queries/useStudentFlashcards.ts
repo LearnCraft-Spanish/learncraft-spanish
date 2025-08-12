@@ -107,6 +107,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         ['flashcards', userId],
         (oldData: Flashcard[]) => [...oldData, ...result],
       );
+      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
   });
 
@@ -125,6 +126,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         ['flashcards', userId],
         (oldData: Flashcard[]) => [...oldData, ...result],
       );
+      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
   });
 
@@ -178,6 +180,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
             oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
         );
       }
+      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
     onError: (error, _variables, _context) => {
       console.error('Failed to delete flashcards', error);
@@ -208,6 +211,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
             oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
         );
       }
+      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
     onError: (error, _variables, _context) => {
       console.error('Failed to delete flashcards', error);
