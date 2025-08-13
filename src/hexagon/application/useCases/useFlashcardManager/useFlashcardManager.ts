@@ -134,6 +134,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     findMore,
 
     somethingIsLoading:
+      flashcardsQuery.isFetching ||
       flashcardsQuery.isLoading ||
       activeStudentIsLoading ||
       fromLessonWithVocabQuery.isLoading ||

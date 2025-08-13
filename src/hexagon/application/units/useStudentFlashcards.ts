@@ -10,6 +10,7 @@ import { queryDefaults } from '../utils/queryUtils';
 export interface UseStudentFlashcardsReturnType {
   flashcards: Flashcard[] | undefined;
   isLoading: boolean;
+  isFetching: boolean;
   error: Error | null;
   isExampleCollected: (exampleId: number) => boolean;
   isFlashcardCollected: (flashcardId: number) => boolean;
@@ -60,11 +61,12 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     data: flashcards,
     isLoading,
     error,
+    isFetching,
   } = useQuery({
     queryKey: ['flashcards', userId],
     queryFn: () => getFlashcards(),
     enabled: hasAccess && appUser !== null,
-    ...queryDefaults,
+    ...queryDefaults.entityData,
   });
 
   const isExampleCollected = useCallback(
@@ -107,7 +109,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         ['flashcards', userId],
         (oldData: Flashcard[]) => [...oldData, ...result],
       );
-      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
   });
 
@@ -126,7 +128,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         ['flashcards', userId],
         (oldData: Flashcard[]) => [...oldData, ...result],
       );
-      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
   });
 
@@ -180,7 +182,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
             oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
         );
       }
-      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
     onError: (error, _variables, _context) => {
       console.error('Failed to delete flashcards', error);
@@ -211,7 +213,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
             oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
         );
       }
-      queryClient.refetchQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
     onError: (error, _variables, _context) => {
       console.error('Failed to delete flashcards', error);
@@ -259,6 +261,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
   return {
     flashcards,
     isLoading,
+    isFetching,
     error,
     isExampleCollected,
     isFlashcardCollected,

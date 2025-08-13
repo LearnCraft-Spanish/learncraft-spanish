@@ -3,6 +3,7 @@
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { scanForBackendPathUsage } from './backend_variable_paths.js';
+import { analyzeCommitToProductionTime } from './commit_to_production_time.js';
 import { scanForForeignKeyComments } from './foreign_key_comments.js';
 import { analyzeLeadTime } from './lead-time/index.js';
 
@@ -25,6 +26,12 @@ async function runAllMetrics() {
   const leadTimeResults = await analyzeLeadTime();
   console.error(
     `Lead Time: ${leadTimeResults.totalFeatures} completed (${leadTimeResults.incompleteFeaturesCount} incomplete) features/hotfixes, ${(leadTimeResults.averageLeadTime / 24).toFixed(1)}d average`,
+  );
+
+  // Run Commit-to-Production Time metrics
+  const commitProdResults = analyzeCommitToProductionTime();
+  console.error(
+    `Commit-to-Production: ${commitProdResults.totalCommits} commits across ${commitProdResults.totalPRs} PRs, ${(commitProdResults.averageLeadTimeHours / 24).toFixed(1)}d average`,
   );
 
   console.error('\n✅ All metrics completed.\n');
