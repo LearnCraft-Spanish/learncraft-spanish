@@ -1,10 +1,10 @@
 import type { Flashcard } from '@learncraft-spanish/shared';
 import type { AuthPort } from '../application/ports/authPort';
 import {
-  createMyStudentExamplesEndpoint,
-  createStudentExamplesEndpoint,
-  deleteMyStudentExamplesEndpoint,
-  deleteStudentExamplesEndpoint,
+  createFlashcardsEndpoint,
+  createMyFlashcardsEndpoint,
+  deleteFlashcardsEndpoint,
+  deleteMyFlashcardsEndpoint,
   getMyFlashcardsEndpoint,
   getStudentFlashcardsEndpoint,
 } from '@learncraft-spanish/shared';
@@ -31,8 +31,8 @@ export function createFlashcardInfrastructure(
       exampleIds: number[];
     }): Promise<Flashcard[]> => {
       const response = await httpClient.post<Flashcard[]>(
-        createMyStudentExamplesEndpoint.path,
-        createMyStudentExamplesEndpoint.requiredScopes,
+        createMyFlashcardsEndpoint.path,
+        createMyFlashcardsEndpoint.requiredScopes,
         {
           newStudentExamples: exampleIds.map((id) => ({
             exampleId: id.toString(),
@@ -51,8 +51,8 @@ export function createFlashcardInfrastructure(
     }): Promise<number> => {
       const response = await httpClient
         .delete<number>(
-          deleteMyStudentExamplesEndpoint.path,
-          deleteMyStudentExamplesEndpoint.requiredScopes,
+          deleteMyFlashcardsEndpoint.path,
+          deleteMyFlashcardsEndpoint.requiredScopes,
           {
             params: {
               studentExampleIds: studentExampleIds.join(','),
@@ -93,8 +93,8 @@ export function createFlashcardInfrastructure(
       exampleIds: number[];
     }): Promise<Flashcard[]> => {
       const response = await httpClient.post<Flashcard[]>(
-        createStudentExamplesEndpoint.path,
-        createStudentExamplesEndpoint.requiredScopes,
+        createFlashcardsEndpoint.path,
+        createFlashcardsEndpoint.requiredScopes,
         {
           newStudentExamples: exampleIds.map((id) => ({
             studentId: studentId.toString(),
@@ -113,8 +113,8 @@ export function createFlashcardInfrastructure(
       const studentExampleIdsString = studentExampleIds.join(',');
 
       const response = await httpClient.delete<number>(
-        deleteStudentExamplesEndpoint.path,
-        deleteStudentExamplesEndpoint.requiredScopes,
+        deleteFlashcardsEndpoint.path,
+        deleteFlashcardsEndpoint.requiredScopes,
         {
           params: {
             studentExampleIds: studentExampleIdsString,
