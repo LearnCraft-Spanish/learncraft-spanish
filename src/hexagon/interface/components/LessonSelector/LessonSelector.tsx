@@ -1,5 +1,4 @@
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
-// MOVE THIS INTO HEXAGON
 import SelectCourse from './SelectCourse';
 import SelectLesson from './SelectLesson';
 import './LessonSelector.css';
