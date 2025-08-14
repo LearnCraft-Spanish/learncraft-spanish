@@ -9,6 +9,7 @@ import FrequensayPage from './FrequensayPage';
 // Fix: Use a string to refer to the module path instead of an import variable
 vi.mock('@application/useCases/useFrequensay', () => {
   return {
+    default: () => mockUseFrequensay(),
     useFrequensay: () => mockUseFrequensay(),
   };
 });
