@@ -1,6 +1,4 @@
-import mockSelectedCourseAndLessons, {
-  overrideMockSelectedCourseAndLessons,
-} from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import mockSelectedCourseAndLessons from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 
 import mockUseSpellingsKnownForLesson, {
