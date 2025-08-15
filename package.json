@@ -16,7 +16,7 @@
   "scripts": {
     "install:local": "rm -rf lockfiles/local && pnpm install --no-frozen-lockfile --lockfile-dir=lockfiles/local",
     "install:ci": "pnpm install --frozen-lockfile --ignore-workspace --lockfile-dir=lockfiles/ci",
-    "install:ci:regenerate": "rm -rf lockfiles/ci && pnpm install --ignore-workspace --lockfile-dir=lockfiles/ci",
+    "install:ci:regenerate": "rm -rf lockfiles/ci && pnpm install --ignore-workspace --lockfile-dir=lockfiles/ci && pnpm install",
     "build": "vite build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
