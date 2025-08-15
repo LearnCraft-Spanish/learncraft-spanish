@@ -15,7 +15,7 @@ export const SCHEMA_FIELD_CONFIG: Record<
     width: '0.5fr',
     type: 'number',
     min: 1,
-    max: 10000,
+    max: 10001,
   },
   notes: { label: 'Notes', width: '1fr', type: 'text' },
 };
