@@ -1,5 +1,3 @@
-initial feature commit
-
 # LearnCraft Spanish
 
 This is a web application for learning Spanish vocabulary.
