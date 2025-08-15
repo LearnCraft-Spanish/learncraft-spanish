@@ -4,7 +4,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import { useCallback, useState } from 'react';
 import { useLessonsByVocabulary } from '../queries/useLessonsByVocab';
-import { useVocabulary } from '../units/useVocabulary';
+import useVocabulary from '../units/useVocabulary';
 
 export interface UseGetHelpMenuResult {
   lessonsByVocabulary: Lesson[] | null;

@@ -4,15 +4,15 @@ import type { Flashcard } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
-import { useStudentFlashcards } from '@application/queries/useStudentFlashcards';
-
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/ExampleManagerExampleListItem';
 import { Pagination } from '../general';
-
 import { InlineLoading } from '../Loading';
+
+import DeleteAllOwnedSpanglish from './units/DeleteAllOwnedSpanglish';
 import {
   copyTableToClipboard,
   getExampleOrFlashcardById,
@@ -212,6 +212,7 @@ export default function FlashcardTable({
                     })`}
                   </p>
                 </button>
+                <DeleteAllOwnedSpanglish />
                 <button
                   type="button"
                   onClick={() => {

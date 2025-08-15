@@ -1,7 +1,7 @@
+import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
 import Loading from 'src/components/Loading/Loading';
-import useFlashcardFinder from 'src/hexagon/application/useCases/useFlashcardFinder';
 import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
-import ExampleTable from '../components/Tables/ExampleTable';
+import { ExampleTable } from '../components/Tables';
 
 export default function FlashcardFinder() {
   const {

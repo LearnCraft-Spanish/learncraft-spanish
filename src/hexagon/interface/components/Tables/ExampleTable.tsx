@@ -1,6 +1,6 @@
-import type { UseStudentFlashcardsReturnType } from '@application/queries/useStudentFlashcards';
-
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
+
+import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 

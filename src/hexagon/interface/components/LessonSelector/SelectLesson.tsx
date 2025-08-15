@@ -17,7 +17,7 @@ export default function SelectLesson({
 }) {
   return (
     <label htmlFor={id} className="menuRow" id={id}>
-      <p className={required ? 'required' : ''}>{label}:</p>
+      <p className={required ? 'required' : ''}>{`${label}:`}</p>
       <select
         id={id}
         name={id}

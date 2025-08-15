@@ -320,7 +320,7 @@ export function useStudentFlashcards() {
           return newFlashcardData;
         },
       );
-      queryClient.refetchQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
@@ -457,7 +457,7 @@ export function useStudentFlashcards() {
 
     onSuccess: (_data, _variables, _context) => {
       showSuccessToast('Flashcard removed successfully');
-      queryClient.refetchQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
@@ -835,7 +835,7 @@ export function useStudentFlashcards() {
           return matchAndTrimArrays(newFlashcardData);
         },
       );
-      queryClient.refetchQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (

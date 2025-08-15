@@ -3,11 +3,11 @@ import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/
 
 import { SectionHeader } from '../general';
 import ToggleSwitch from '../general/ToggleSwitch';
+import SelectedTags from '../general/VocabTagFilter/SelectedTags';
+import TagFilter from '../general/VocabTagFilter/TagFilter';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 import Instructions from './units/Instructions';
 import ReadOnlyFilters from './units/ReadOnlyFilters';
-import SelectedTags from './VocabTagFilter/SelectedTags';
-import TagFilter from './VocabTagFilter/TagFilter';
 import 'src/App.css';
 
 export default function FlashcardFinderFilter({

@@ -1,5 +1,5 @@
+import useFrequensay from '@application/useCases/useFrequensay';
 import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
-import { useFrequensay } from 'src/hexagon/application/useCases/useFrequensay';
 import CustomVocabulary from '../components/frequensay/CustomVocabulary';
 import FrequensaySetup from '../components/frequensay/FrequensaySetup';
 import TextToCheck from '../components/frequensay/TextToCheck';

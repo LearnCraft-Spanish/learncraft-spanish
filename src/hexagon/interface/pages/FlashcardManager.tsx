@@ -1,7 +1,7 @@
+import useFlashcardManager from '@application/useCases/useFlashcardManager';
 import Loading from 'src/components/Loading/Loading';
-import useFlashcardManager from 'src/hexagon/application/useCases/useFlashcardManager';
-import FlashcardManagerFilters from '../components/FlashcardManagerFilters';
-import FlashcardTable from '../components/Tables/FlashcardTable';
+import FlashcardManagerFilters from '../components/FlashcardManager';
+import { FlashcardTable } from '../components/Tables';
 export default function FlashcardManager() {
   const {
     exampleFilter,

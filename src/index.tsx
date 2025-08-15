@@ -20,9 +20,9 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: Infinity,
       gcTime: Infinity,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
     },
   },
 });
