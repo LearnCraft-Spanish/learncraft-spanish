@@ -2,7 +2,6 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import z from 'zod';
 import { useExampleAdapter } from '../adapters/exampleAdapter';
 import { useExampleFilterCoordinator } from '../coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
@@ -42,10 +41,6 @@ export const useExampleQuery = (
       !!filterState.audioOnly
     ) {
       const uuid = uuidv4();
-      const parsed = z.string().uuid().safeParse(uuid);
-      if (!parsed.success) {
-        throw new Error('Invalid UUID');
-      }
       return uuid;
     }
     return null;
@@ -94,15 +89,15 @@ export const useExampleQuery = (
   } = useQuery({
     queryKey: [
       'filteredExamples',
-      page,
-      pageSize,
-      course?.id,
-      toLesson?.lessonNumber,
-      fromLesson?.lessonNumber,
-      filterState?.excludeSpanglish,
-      filterState?.audioOnly,
-      filterState?.skillTags,
-      seed,
+      { page },
+      { pageSize },
+      { courseId: course?.id },
+      { toLessonNumber: toLesson?.lessonNumber },
+      { fromLessonNumber: fromLesson?.lessonNumber },
+      { excludeSpanglish: filterState?.excludeSpanglish },
+      { audioOnly: filterState?.audioOnly },
+      { skillTags: filterState?.skillTags },
+      { seed },
     ],
     queryFn: () => fetchFilteredExamples({ prefetchRequest: false }),
     enabled:
@@ -124,15 +119,15 @@ export const useExampleQuery = (
       queryClient.prefetchQuery({
         queryKey: [
           'filteredExamples',
-          page + 1,
-          pageSize,
-          course?.id,
-          toLesson?.lessonNumber,
-          fromLesson?.lessonNumber,
-          filterState?.excludeSpanglish,
-          filterState?.audioOnly,
-          filterState?.skillTags,
-          seed,
+          { page: page + 1 },
+          { pageSize },
+          { courseId: course?.id },
+          { toLessonNumber: toLesson?.lessonNumber },
+          { fromLessonNumber: fromLesson?.lessonNumber },
+          { excludeSpanglish: filterState?.excludeSpanglish },
+          { audioOnly: filterState?.audioOnly },
+          { skillTags: filterState?.skillTags },
+          { seed },
         ],
         queryFn: () => fetchFilteredExamples({ prefetchRequest: true }),
         ...queryDefaults.entityData,
