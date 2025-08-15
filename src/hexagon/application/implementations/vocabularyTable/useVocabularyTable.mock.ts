@@ -2,7 +2,7 @@ import type {
   TableHook,
   TableRow,
   ValidationState,
-} from '@application/units/pasteTable/types';
+} from 'src/hexagon/application/units/PasteTable/types';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
 import type { ClipboardEvent } from 'react';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
