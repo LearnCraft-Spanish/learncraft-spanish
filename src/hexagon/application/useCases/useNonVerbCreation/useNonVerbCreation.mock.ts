@@ -1,9 +1,9 @@
 import type { VocabularyPaginationState } from '../types';
 import type { UseNonVerbCreationResult } from './useNonVerbCreation.types';
 import { defaultMockResult as defaultTableHook } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
-import { mockUseVocabularyPage } from '@application/units/useVocabularyPage/useVocabularyPage.mock';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
+import { mockUseVocabularyPage } from 'src/hexagon/application/queries/useVocabularyQuery.mock';
 import { vi } from 'vitest';
 
 // ---- Reusable mock data

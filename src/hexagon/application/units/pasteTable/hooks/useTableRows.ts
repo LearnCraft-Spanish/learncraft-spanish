@@ -1,5 +1,6 @@
 import type { TableColumn, TableData, TableRow } from '../types';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import { createGhostRow } from '../utils';
 
 interface UseTableRowsProps<T> {
@@ -11,16 +12,10 @@ export function useTableRows<T>({
   columns,
   initialData = [],
 }: UseTableRowsProps<T>) {
-  // Use ref for row ID counter to ensure uniqueness
-  const rowIdCounter = useRef(0);
-
   // Generate guaranteed unique row ID
   const generateRowId = useCallback(() => {
-    // Increment counter first for uniqueness
-    rowIdCounter.current += 1;
-
-    // Combine timestamp, counter and random value
-    return `row-${Date.now()}-${rowIdCounter.current}-${Math.floor(Math.random() * 1000)}`;
+    // Generate a unique ID
+    return uuidv4();
   }, []);
 
   // Convert data to rows with unique IDs
@@ -201,9 +196,6 @@ export function useTableRows<T>({
 
   // Reset table to empty state
   const resetRows = useCallback(() => {
-    // Reset the row ID counter
-    rowIdCounter.current = 0;
-
     // Force a complete reset by creating a fresh ghost row
     const freshGhostRow = createGhostRow(columns);
 

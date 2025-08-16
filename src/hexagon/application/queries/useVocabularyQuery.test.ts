@@ -1,11 +1,12 @@
+import type { Vocabulary } from '@learncraft-spanish/shared';
 import { overrideMockVocabularyAdapter } from '@application/adapters/vocabularyAdapter.mock';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockVocabularyList } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it } from 'vitest';
-import useVocabularyPage from './useVocabularyPage';
+import useVocabularyQuery from './useVocabularyQuery';
 
-describe('useVocabularyPage', () => {
+describe('useVocabularyQuery', () => {
   beforeEach(() => {
     // Reset adapter mock before each test
     overrideMockVocabularyAdapter({
@@ -24,13 +25,13 @@ describe('useVocabularyPage', () => {
     });
 
     // Act
-    const { result } = renderHook(() => useVocabularyPage(1, 1, 10), {
+    const { result } = renderHook(() => useVocabularyQuery(1, 10), {
       wrapper: TestQueryClientProvider,
     });
 
     await waitFor(() => expect(result.current.items.length).toBeGreaterThan(0));
 
-    const recievedData = result.current.items.map((item) => {
+    const recievedData = result.current.items.map((item: Vocabulary) => {
       const { createdAt, updatedAt, ...rest } = item;
       return rest;
     });
@@ -42,13 +43,11 @@ describe('useVocabularyPage', () => {
     // Assert
     await waitFor(() => expect(recievedData).toEqual(newData));
     expect(result.current.totalCount).toBe(32);
-    expect(result.current.totalPages).toBe(4); // 32 items / 10 per page = 4 pages
-    expect(result.current.hasMorePages).toBe(true);
   });
 
   it('should handle disabled state', async () => {
     // Act
-    const { result } = renderHook(() => useVocabularyPage(0, 1, 10), {
+    const { result } = renderHook(() => useVocabularyQuery(0, 10), {
       wrapper: TestQueryClientProvider,
     });
 
@@ -68,7 +67,7 @@ describe('useVocabularyPage', () => {
     });
 
     // Act
-    const { result } = renderHook(() => useVocabularyPage(1, 1, 10), {
+    const { result } = renderHook(() => useVocabularyQuery(1, 10), {
       wrapper: TestQueryClientProvider,
     });
 
