@@ -1,6 +1,7 @@
 import type { CreateVerb, VerbTag } from '@learncraft-spanish/shared';
 import { VerbTagSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useVerbAdapter } from '../adapters/verbAdapter';
 
 export default function useVerbInfinitiveCreator() {
@@ -19,7 +20,13 @@ export default function useVerbInfinitiveCreator() {
 
   const createVerb = useCallback(
     async (verb: CreateVerb) => {
-      return await verbAdapter.createVerb(verb);
+      const promise = verbAdapter.createVerb(verb);
+      toast.promise(promise, {
+        pending: 'Creating verb...',
+        success: 'Verb created successfully',
+        error: 'Failed to create verb',
+      });
+      return promise;
     },
     [verbAdapter],
   );
@@ -38,6 +45,10 @@ export default function useVerbInfinitiveCreator() {
     [selectedTags],
   );
 
+  const clearTags = useCallback(() => {
+    setSelectedTags([]);
+  }, []);
+
   return {
     infinitive,
     updateInfinitive: (infinitive: string) => setInfinitive(infinitive),
@@ -47,5 +58,6 @@ export default function useVerbInfinitiveCreator() {
     addableTags,
 
     createVerb,
+    clearTags,
   };
 }

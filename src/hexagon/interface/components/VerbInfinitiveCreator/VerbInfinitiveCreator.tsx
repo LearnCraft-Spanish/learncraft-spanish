@@ -1,7 +1,14 @@
+import type { VerbTag } from '@learncraft-spanish/shared';
 import useVerbInfinitiveCreator from '@application/useCases/useVerbInfinitiveCreator';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { TextInput } from 'src/components/FormComponents';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import ContextualView from '../Contextual/ContextualView';
+import SearchComponents from './units/SearchComponents';
+import SelectedTagsComponent from './units/SelectedTagsComponent';
+import './VerbInfinitiveCreator.scss';
 
-export default function VerbInfinitiveCreator() {
+export default function VerbInfinitiveCreatorContextual() {
   const {
     infinitive,
     updateInfinitive,
@@ -10,65 +17,69 @@ export default function VerbInfinitiveCreator() {
     addableTags,
     createVerb,
     selectedTags,
+    clearTags,
   } = useVerbInfinitiveCreator();
 
-  const allTagsComponent = useMemo(
-    () => (
-      <div>
-        <h3>All Tags</h3>
-        <div>
-          {addableTags &&
-            addableTags.length > 0 &&
-            addableTags.map((tag) => (
-              <button type="button" key={tag} onClick={() => addTag(tag)}>
-                {tag}
-              </button>
-            ))}
-        </div>
-      </div>
-    ),
-    [addableTags, addTag],
-  );
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const selectedTagsComponent = useMemo(
-    () => (
-      <div>
-        <h3>Selected Tags</h3>
-        <div>
-          {selectedTags &&
-            selectedTags.length > 0 &&
-            selectedTags?.map((tag) => (
-              <button
-                type="button"
-                key={`${tag}-${selectedTags.indexOf(tag)}`}
-                onClick={() => removeTag(tag)}
-              >
-                {tag}
-              </button>
-            ))}
-        </div>
-      </div>
-    ),
-    [selectedTags, removeTag],
-  );
+  const searchResults = useMemo(() => {
+    if (!searchTerm.length) return addableTags;
+    return addableTags.filter((tag) => {
+      const tagLower = tag.toLowerCase();
+      const searchTermLower = searchTerm.toLowerCase();
+      return tagLower.includes(searchTermLower);
+    });
+  }, [addableTags, searchTerm]);
+
+  const { openContextual, contextual, closeContextual } = useContextualMenu();
+
+  const handleCreateVerb = () => {
+    createVerb({ infinitive, tags: selectedTags });
+
+    setSearchTerm('');
+    updateInfinitive('');
+    clearTags();
+    closeContextual();
+  };
+
   return (
-    <div>
-      <input
-        type="text"
-        value={infinitive}
-        onChange={(e) => updateInfinitive(e.target.value)}
-      />
-      {allTagsComponent}
-
-      {selectedTagsComponent}
-
+    <div className="VerbInfinitiveCreator">
       <button
         type="button"
-        onClick={() => createVerb({ infinitive, tags: selectedTags })}
-        disabled={!infinitive}
+        onClick={() => openContextual('verbInfinitiveCreator')}
       >
-        Create
+        Create Verb
       </button>
+      {contextual === 'verbInfinitiveCreator' && (
+        <ContextualView>
+          <TextInput
+            label="Verb Infinitive"
+            value={infinitive}
+            onChange={updateInfinitive}
+            editMode={true}
+          />
+          <SearchComponents
+            searchTerm={searchTerm}
+            updateSearchTerm={setSearchTerm}
+            searchResults={searchResults}
+            addTag={(tag) => addTag(tag as VerbTag)}
+          />
+          <SelectedTagsComponent
+            tags={selectedTags}
+            removeTag={(tag) => removeTag(tag as VerbTag)}
+          />
+          <div className="buttonBox">
+            <button
+              className={`${!infinitive.length || !selectedTags.length ? 'disabled' : 'addButton'}`}
+              type="button"
+              onClick={handleCreateVerb}
+              disabled={!infinitive.length || !selectedTags.length}
+            >
+              Create
+            </button>
+          </div>
+        </ContextualView>
+      )}
     </div>
   );
 }
