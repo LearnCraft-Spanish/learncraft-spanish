@@ -116,7 +116,7 @@ export function useVocabularyQuery(
       const result = adapter.createVocabulary(command);
       const success = !!result;
       if (success) {
-        return command.map((c) => c.subcategoryId);
+        return [...new Set(command.map((c) => c.subcategoryId))];
       }
       return [];
     },

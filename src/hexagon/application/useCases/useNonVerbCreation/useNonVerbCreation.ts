@@ -28,8 +28,13 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
 
   const tableHook = useVocabularyTable();
 
+  const vocabularyQuery = useVocabularyQuery(selectedSubcategoryId, PAGE_SIZE);
+
   // Vocabulary Data
   const {
+    items: vocabularyItems,
+    isLoading: isVocabularyLoading,
+    error: vocabularyError,
     page: queryPage,
     pageSize: queryPageSize,
     totalCount: queryTotalCount,
@@ -43,7 +48,7 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
     // deleteVocabulary,
     // deleting,
     // deletionError,
-  } = useVocabularyQuery(selectedSubcategoryId, 150);
+  } = vocabularyQuery;
 
   // Pagination Data
   const queryPagination = useQueryPagination({
@@ -182,5 +187,11 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
 
     // Paginated vocabulary data
     currentVocabularyPagination: queryPagination,
+
+    // Vocabulary query
+    vocabularyItems,
+    isVocabularyLoading,
+    vocabularyError,
+    totalCount: queryTotalCount,
   };
 }

@@ -20,6 +20,10 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
     tableHook,
     saveVocabulary,
     currentVocabularyPagination,
+    vocabularyItems,
+    totalCount,
+    isVocabularyLoading,
+    vocabularyError,
   } = useNonVerbCreation();
 
   const handleSubcategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -106,6 +110,10 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
           {currentVocabularyPagination ? (
             <PaginatedVocabularyTable
               paginationState={currentVocabularyPagination}
+              vocabularyItems={vocabularyItems}
+              totalCount={totalCount}
+              isVocabularyLoading={isVocabularyLoading}
+              vocabularyError={vocabularyError}
               className="nonverb-creator__vocabulary-table"
               emptyMessage="No vocabulary items found in this subcategory."
             />

@@ -52,6 +52,11 @@ const defaultResult: UseNonVerbCreationResult = {
   saveVocabulary: mockSaveVocabulary,
 
   currentVocabularyPagination: mockPagination,
+
+  vocabularyItems: [],
+  isVocabularyLoading: false,
+  vocabularyError: null,
+  totalCount: null,
 };
 
 // Create an overrideable mock with the default implementation
