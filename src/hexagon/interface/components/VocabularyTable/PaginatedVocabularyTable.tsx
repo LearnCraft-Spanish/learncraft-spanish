@@ -1,10 +1,11 @@
-import type { VocabularyPaginationState } from '@application/useCases/types';
-import React from 'react';
+import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
+import React, { useState } from 'react';
+import { useVocabularyQuery } from 'src/hexagon/application/queries/useVocabularyQuery';
 import DeleteVocabularyRecord from './DeleteVocabularyRecord';
 import './PaginatedVocabularyTable.scss';
 
 interface PaginatedVocabularyTableProps {
-  paginationState: VocabularyPaginationState;
+  paginationState: QueryPaginationState;
   className?: string;
   emptyMessage?: string;
 }
@@ -18,22 +19,21 @@ export function PaginatedVocabularyTable({
   className = '',
   emptyMessage = 'No vocabulary items found',
 }: PaginatedVocabularyTableProps) {
+  const [subcategoryId] = useState<number>(0);
   const {
-    isLoading,
-    error,
-    vocabularyItems,
-    isFetching,
-    isCountLoading,
-    totalCount,
-    totalPages,
-    hasMorePages,
-    currentPage,
-    goToNextPage,
-    goToPreviousPage,
+    page,
+    pageSize,
+    pageWithinQueryBatch,
+    maxPageNumber,
+    previousPage,
+    nextPage,
   } = paginationState;
 
+  const { items, isLoading, error, totalCount, isCountLoading } =
+    useVocabularyQuery(subcategoryId, pageSize);
+
   // Handle initial loading state (no data yet)
-  if (isLoading && vocabularyItems.length === 0) {
+  if (isLoading && items.length === 0) {
     return (
       <div className="paginated-vocabulary__loading">
         <div className="paginated-vocabulary__loading-spinner" />
@@ -53,7 +53,7 @@ export function PaginatedVocabularyTable({
   }
 
   // Handle empty state
-  if (vocabularyItems.length === 0) {
+  if (items.length === 0) {
     return <div className="paginated-vocabulary__empty">{emptyMessage}</div>;
   }
 
@@ -64,7 +64,7 @@ export function PaginatedVocabularyTable({
           <span>Loading count...</span>
         ) : (
           <span>
-            Showing {vocabularyItems.length} of {totalCount ?? 'many'} items
+            Showing {items.length} of {totalCount ?? 'many'} items
           </span>
         )}
       </div>
@@ -72,7 +72,7 @@ export function PaginatedVocabularyTable({
       {/* Table implementation with overlay for loading transitions */}
       <div className="paginated-vocabulary__table-container">
         {/* Loading overlay shown during page transitions when we already have data */}
-        {isLoading && vocabularyItems.length > 0 && (
+        {isLoading && items.length > 0 && (
           <div className="paginated-vocabulary__loading-overlay">
             <div className="paginated-vocabulary__loading-spinner" />
           </div>
@@ -91,7 +91,7 @@ export function PaginatedVocabularyTable({
             </tr>
           </thead>
           <tbody>
-            {vocabularyItems.map((item) => (
+            {items.map((item) => (
               <tr key={item.id}>
                 <td>{item.word}</td>
                 <td>{item.descriptor}</td>
@@ -110,10 +110,10 @@ export function PaginatedVocabularyTable({
       <div className="paginated-vocabulary__pagination">
         <button
           type="button"
-          onClick={goToPreviousPage}
-          disabled={currentPage <= 1 || isLoading}
+          onClick={previousPage}
+          disabled={page <= 1 || isLoading}
           className={`paginated-vocabulary__pagination-button ${
-            currentPage <= 1 || isLoading
+            page <= 1 || isLoading
               ? 'paginated-vocabulary__pagination-button--disabled'
               : ''
           }`}
@@ -122,26 +122,26 @@ export function PaginatedVocabularyTable({
         </button>
 
         <span className="paginated-vocabulary__pagination-info">
-          Page {currentPage}
-          {totalPages !== null
-            ? ` of ${totalPages}`
-            : hasMorePages
-              ? ' (more)'
+          Page {page}
+          {maxPageNumber !== null
+            ? ` of ${maxPageNumber}`
+            : pageWithinQueryBatch !== null
+              ? ` of ${pageWithinQueryBatch}`
               : ''}
-          {isFetching && ' ...'}
+          {isLoading && ' ...'}
         </span>
 
         <button
           type="button"
-          onClick={goToNextPage}
+          onClick={nextPage}
           disabled={
-            (totalPages !== null && currentPage >= totalPages) ||
-            !hasMorePages ||
+            (maxPageNumber !== null && page >= maxPageNumber) ||
+            !pageWithinQueryBatch ||
             isLoading
           }
           className={`paginated-vocabulary__pagination-button ${
-            (totalPages !== null && currentPage >= totalPages) ||
-            !hasMorePages ||
+            (maxPageNumber !== null && page >= maxPageNumber) ||
+            !pageWithinQueryBatch ||
             isLoading
               ? 'paginated-vocabulary__pagination-button--disabled'
               : ''

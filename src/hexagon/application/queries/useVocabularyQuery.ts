@@ -32,7 +32,7 @@ export interface VocabularyQueryResult {
  * @param subcategoryId The subcategory ID to filter by
  * @param pageSize Number of items per page
  */
-export default function useVocabularyBySubcategoryQuery(
+export function useVocabularyQuery(
   subcategoryId: number,
   pageSize: number = 150,
 ): VocabularyQueryResult {

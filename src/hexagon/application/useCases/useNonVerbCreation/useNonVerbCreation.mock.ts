@@ -1,4 +1,4 @@
-import type { VocabularyPaginationState } from '../types';
+import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { UseNonVerbCreationResult } from './useNonVerbCreation.types';
 import { defaultMockResult as defaultTableHook } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
@@ -16,24 +16,24 @@ const mockSaveVocabulary = vi
   .fn<() => Promise<number[]>>()
   .mockResolvedValue([1, 2, 3]);
 const mockSetSubcategoryId = vi.fn<(id: string) => void>();
-const mockGoToNextPage = vi.fn<() => void>();
-const mockGoToPreviousPage = vi.fn<() => void>();
+const mockNextPage = vi.fn<() => void>();
+const mockPreviousPage = vi.fn<() => void>();
+const mockResetPagination = vi.fn<() => void>();
+const countOfVocabulary = 25;
 
 // ---- Create a proper pagination state that matches VocabularyPaginationState
 const vocabularyPageResult = mockUseVocabularyPage();
-const mockPagination: VocabularyPaginationState = {
-  vocabularyItems: vocabularyPageResult.items,
-  isLoading: vocabularyPageResult.isLoading,
-  isCountLoading: vocabularyPageResult.isCountLoading,
-  isFetching: vocabularyPageResult.isFetching,
-  error: vocabularyPageResult.error,
-  totalCount: vocabularyPageResult.totalCount,
-  totalPages: vocabularyPageResult.totalPages,
-  hasMorePages: vocabularyPageResult.hasMorePages,
-  currentPage: vocabularyPageResult.page,
-  pageSize: vocabularyPageResult.pageSize,
-  goToNextPage: mockGoToNextPage,
-  goToPreviousPage: mockGoToPreviousPage,
+const mockPagination: QueryPaginationState = {
+  page: vocabularyPageResult.page,
+  queryPage: vocabularyPageResult.page,
+  pageSize: countOfVocabulary,
+  pagesPerQuery: 1,
+  pageWithinQueryBatch: 1,
+  maxPageNumber: 1,
+  maxPageName: '1',
+  previousPage: mockPreviousPage,
+  nextPage: mockNextPage,
+  resetPagination: mockResetPagination,
 };
 
 // ---- Default mock result

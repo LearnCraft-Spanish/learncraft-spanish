@@ -118,11 +118,6 @@ export default function Menu() {
                   Coaching Dashboard
                 </Link>
               </div>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/get-help">
-                  Get Help
-                </Link>
-              </div>
             </div>
           )}
           {isAdmin && (

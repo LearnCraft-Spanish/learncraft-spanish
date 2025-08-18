@@ -4,7 +4,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { createMockVocabularyList } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it } from 'vitest';
-import useVocabularyQuery from './useVocabularyQuery';
+import { useVocabularyQuery } from './useVocabularyQuery';
 
 describe('useVocabularyQuery', () => {
   beforeEach(() => {
