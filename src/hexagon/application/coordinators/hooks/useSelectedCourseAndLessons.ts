@@ -30,10 +30,13 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     if (userSelectedCourseId) {
       newCourseId = userSelectedCourseId;
     } else {
-      newCourseId = appUser?.courseId ?? null;
+      newCourseId =
+        appUser && appUser.courseId
+          ? appUser.courseId
+          : (coursesWithLessons?.[0]?.id ?? null);
     }
     return coursesWithLessons?.find((item) => item.id === newCourseId) || null;
-  }, [coursesWithLessons, userSelectedCourseId, appUser?.courseId]);
+  }, [coursesWithLessons, userSelectedCourseId, appUser]);
 
   const fromLesson: Lesson | null = useMemo(() => {
     if (!fromLessonNumber || !course) {
