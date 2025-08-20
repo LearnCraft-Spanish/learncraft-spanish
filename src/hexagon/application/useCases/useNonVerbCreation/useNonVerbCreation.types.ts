@@ -1,9 +1,10 @@
-import type { TableHook } from '@application/units/pasteTable/types';
+import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type {
   CreateNonVerbVocabulary,
   Subcategory,
+  Vocabulary,
 } from '@learncraft-spanish/shared';
-import type { VocabularyPaginationState } from '../types';
+import type { TableHook } from 'src/hexagon/application/units/PasteTable/types';
 
 export interface UseNonVerbCreationResult {
   // Subcategory selection
@@ -23,5 +24,11 @@ export interface UseNonVerbCreationResult {
   saveVocabulary: () => Promise<number[]>;
 
   // Vocabulary list for currently selected subcategory
-  currentVocabularyPagination: VocabularyPaginationState | null;
+  currentVocabularyPagination: QueryPaginationState | null;
+
+  // Vocabulary query for the currently selected subcategory
+  vocabularyItems: Vocabulary[];
+  isVocabularyLoading: boolean;
+  vocabularyError: Error | null;
+  totalCount: number | null;
 }

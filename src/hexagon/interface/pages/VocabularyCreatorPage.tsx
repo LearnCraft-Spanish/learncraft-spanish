@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+// import { VerbCreator } from '../components/vocabulary/VerbCreator';
+import VerbInfinitiveCreator from '../components/VerbInfinitiveCreator/VerbInfinitiveCreator';
 import { NonVerbCreator } from '../components/vocabulary/NonVerbCreator';
-import { VerbCreator } from '../components/vocabulary/VerbCreator';
 import './VocabularyCreator.scss';
 export const VocabularyCreatorPage: React.FC = () => {
   const [mode, setMode] = useState('selection');
@@ -12,7 +13,7 @@ export const VocabularyCreatorPage: React.FC = () => {
   const renderContent = () => {
     switch (mode) {
       case 'verb':
-        return <VerbCreator onBack={navigateToSelection} />;
+        return <VerbInfinitiveCreator />;
       case 'nonverb':
         return <NonVerbCreator onBack={navigateToSelection} />;
       default:

@@ -2,7 +2,7 @@
   width: 100%;
   border: 2px solid var(--dark);
   border-radius: 4px;
-  overflow: hidden; /* Ensure border radius applies to child borders */
+  overflow: visible; /* Ensure border radius applies to child borders */
 
   /* Container for the actual table grid that holds both header and rows */
   &__table-grid {
@@ -68,7 +68,7 @@
     position: relative;
     border-right: 1px solid var(--dark);
     border-bottom: 1px solid var(--dark);
-    padding: 0;
+    padding: 4px;
     box-sizing: border-box;
     display: flex;
     align-items: stretch;
@@ -76,10 +76,6 @@
 
     &:last-child {
       border-right: none;
-    }
-
-    &--active {
-      background-color: rgba(68, 154, 194, 0.1);
     }
   }
 
@@ -99,19 +95,23 @@
 
     &:focus {
       outline: none;
-      background-color: rgba(68, 154, 194, 0.1);
+      // background-color: rgba(68, 154, 194, 0.1);
     }
 
     &--error {
-      background-color: rgba(255, 0, 0, 0.05);
+      border: 1px solid rgba(255, 0, 0, 1);
 
       &:focus {
         background-color: rgba(255, 0, 0, 0.1);
       }
     }
   }
-
   &__cell-error {
+    display: none;
+  }
+
+  &__cell-container--active &__cell-error {
+    display: block;
     position: absolute;
     left: 0;
     right: 0;

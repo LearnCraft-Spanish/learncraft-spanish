@@ -2,7 +2,6 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
 import FlashcardManager from '@interface/pages/FlashcardManager';
 import FrequensayPage from '@interface/pages/FrequensayPage';
-import GetHelpPage from '@interface/pages/GetHelpPage';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
@@ -63,10 +62,6 @@ export default function AppRoutes() {
       <Route
         path="/frequensay"
         element={(isAdmin || isCoach) && <FrequensayPage />}
-      />
-      <Route
-        path="/get-help"
-        element={(isStudent || isCoach || isAdmin) && <GetHelpPage />}
       />
       <Route path="/examplemanager" element={isAdmin && <ExampleManager />} />
       <Route

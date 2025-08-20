@@ -1,0 +1,30 @@
+.VerbInfinitiveCreator {
+  .contextualWrapper {
+    .contextual {
+      height: 100%;
+    }
+  }
+}
+
+.tagSuggestionBox {
+  top: 41px;
+  left: -6px;
+}
+
+.tagCard {
+  border: 1px solid #000;
+  background-color: #fff;
+  height: auto;
+  padding: 0.5rem;
+
+  .tag {
+    margin: auto;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #000;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+}

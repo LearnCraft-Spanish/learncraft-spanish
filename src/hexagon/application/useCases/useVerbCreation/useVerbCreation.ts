@@ -1,7 +1,7 @@
 import type { CreateVerbVocabulary } from '@learncraft-spanish/shared';
 import type { UseVerbCreationResult } from './useVerbCreation.types';
 import { useSubcategories } from '@application/queries/useSubcategories';
-import useVocabulary from '@application/units/useVocabulary';
+import { useVocabularyQuery } from '@application/queries/useVocabularyQuery';
 import { useCallback, useMemo, useState } from 'react';
 
 /**
@@ -19,10 +19,10 @@ export default function useVerbCreation(): UseVerbCreationResult {
 
   // Use our vocabulary unit for operations
   const {
-    createVerbVocabulary: createVerbInVocabulary,
+    createVocabulary: createVerbInVocabulary,
     creating: creatingVocabulary,
     creationError: vocabCreationError,
-  } = useVocabulary();
+  } = useVocabularyQuery(selectedSubcategoryId, 150);
 
   // Filter for verb subcategories only
   const verbSubcategories = useMemo(() => {

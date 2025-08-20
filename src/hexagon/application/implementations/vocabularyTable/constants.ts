@@ -1,7 +1,7 @@
 import type {
   CellType,
   TableColumn,
-} from '@application/units/pasteTable/types';
+} from 'src/hexagon/application/units/PasteTable/types';
 
 // Column configuration with labels and widths
 export const SCHEMA_FIELD_CONFIG: Record<
@@ -15,7 +15,7 @@ export const SCHEMA_FIELD_CONFIG: Record<
     width: '0.5fr',
     type: 'number',
     min: 1,
-    max: 10000,
+    max: 10001,
   },
   notes: { label: 'Notes', width: '1fr', type: 'text' },
 };
