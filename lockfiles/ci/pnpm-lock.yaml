@@ -12,8 +12,8 @@ importers:
         specifier: ^2.3.0
         version: 2.4.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@learncraft-spanish/shared':
-        specifier: ^0.8.2
-        version: 0.8.2
+        specifier: ^0.8.3
+        version: 0.8.3
       '@sentry/cli':
         specifier: ^2.42.2
         version: 2.52.0
@@ -1076,8 +1076,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.8.2':
-    resolution: {integrity: sha512-1gHsER0xfrzfX6r2leq73v/+H5YKiJ3L7SsbrnotP8ZsokNXTPb9kvdmL28mCQZBk5GWkCzvf3vnnMiXLDR9TQ==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.8.2/1bf939a7948809ad0e9f407f7b23421886c1efed}
+  '@learncraft-spanish/shared@0.8.3':
+    resolution: {integrity: sha512-uHpxs1JLrkkoqJqHHcPpAk+GoYFxLwRXO0szW5nkB6MRl4F8vkP2C1e9cxfxpODb5NolMhOD5IaqiY78WTsIzQ==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.8.3/fc133ecd72907a916d002c571f6fd9f9dc0218f0}
 
   '@mswjs/interceptors@0.39.6':
     resolution: {integrity: sha512-bndDP83naYYkfayr/qhBHMhk0YGwS1iv6vaEGcr0SQbO0IZtbOPqjKjds/WcG+bJA+1T5vCx6kprKOzn5Bg+Vw==}
@@ -2157,8 +2157,8 @@ packages:
     resolution: {integrity: sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==}
     engines: {node: '>= 0.6'}
 
-  core-js-compat@3.45.0:
-    resolution: {integrity: sha512-gRoVMBawZg0OnxaVv3zpqLLxaHmsubEGyTnqdpI/CEBvX4JadI1dMSHxagThprYRtSVbuQxvi6iUatdPxohHpA==}
+  core-js-compat@3.45.1:
+    resolution: {integrity: sha512-tqTt5T4PzsMIZ430XGviK4vzYSoeNJ6CXODi6c/voxOT6IZqBht5/EKaSNnYiEjjRYxjVz7DQIsOsY0XNi8PIA==}
 
   create-jest@29.7.0:
     resolution: {integrity: sha512-Adz2bdH0Vq3F53KEMJOoftQFutWCukm6J24wbPWRO4k1kMY7gS7ds/uoJkNuV8wDCtWWnuwGcJwpWcih+zEW1Q==}
@@ -6295,7 +6295,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@learncraft-spanish/shared@0.8.2':
+  '@learncraft-spanish/shared@0.8.3':
     dependencies:
       zod: 3.25.76
 
@@ -7487,7 +7487,7 @@ snapshots:
 
   cookie@0.7.2: {}
 
-  core-js-compat@3.45.0:
+  core-js-compat@3.45.1:
     dependencies:
       browserslist: 4.25.3
 
@@ -8178,7 +8178,7 @@ snapshots:
       change-case: 5.4.4
       ci-info: 4.3.0
       clean-regexp: 1.0.0
-      core-js-compat: 3.45.0
+      core-js-compat: 3.45.1
       eslint: 9.33.0
       esquery: 1.6.0
       find-up-simple: 1.0.1
