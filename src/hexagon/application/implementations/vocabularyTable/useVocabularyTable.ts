@@ -1,6 +1,6 @@
-import type { TableHook } from '@application/units/PasteTable';
+import type { TableHook } from '@application/units/pasteTable';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
-import { usePasteTable } from '@application/units/PasteTable';
+import { usePasteTable } from '@application/units/pasteTable';
 import { validateCreateNonVerbVocabulary } from '@learncraft-spanish/shared';
 import { SCHEMA_FIELD_CONFIG, VOCABULARY_COLUMNS } from './constants';
 

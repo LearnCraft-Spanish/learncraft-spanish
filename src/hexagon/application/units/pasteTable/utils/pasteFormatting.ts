@@ -1,4 +1,7 @@
-import type { TableColumn, TableRow } from '../types';
+import type {
+  TableColumn,
+  TableRow,
+} from '@application/units/pasteTable/types';
 import { generateRowId } from './rowCreation';
 
 /**
