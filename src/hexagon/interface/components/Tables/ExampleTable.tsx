@@ -8,7 +8,7 @@ import { useRef, useState } from 'react';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import { InlineLoading } from 'src/components/Loading';
 
-import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
+// import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 import { Pagination } from '../general';
 
@@ -39,19 +39,19 @@ export default function ExamplesTable({
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
 
-  const {
-    bulkSelectMode,
-    bulkOperationInProgress,
-    bulkSelectIds,
-    addToBulkSelect,
-    removeFromBulkSelect,
-    clearBulkSelect,
-    addAllToBulkSelect,
-    // toggleBulkSelectMode,
-    triggerBulkOperation,
-  } = useBulkSelect(async () => {
-    await studentFlashcards.createFlashcards(bulkSelectIds);
-  });
+  // const {
+  //   bulkSelectMode,
+  //   bulkOperationInProgress,
+  //   bulkSelectIds,
+  //   addToBulkSelect,
+  //   removeFromBulkSelect,
+  //   clearBulkSelect,
+  //   addAllToBulkSelect,
+  //   // toggleBulkSelectMode,
+  //   triggerBulkOperation,
+  // } = useBulkSelect(async () => {
+  //   await studentFlashcards.createFlashcards(bulkSelectIds);
+  // });
 
   const [isTableOptionsOpen, setIsTableOptionsOpen] = useState(false);
   const hideTableOptionsTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -77,46 +77,6 @@ export default function ExamplesTable({
     <div className="examplesTable">
       <div className="buttonBox">
         <div className="displayExamplesDescription">
-          <div id="bulkAddModeButtons">
-            <button
-              type="button"
-              className="clearSelectionButton"
-              onClick={() => {
-                addAllToBulkSelect(
-                  examples
-                    .map((example) => example.id)
-                    .filter((id) => !studentFlashcards.isExampleCollected(id)),
-                );
-              }}
-            >
-              Select All on Page
-            </button>
-            {bulkSelectIds.length > 0 && (
-              <button
-                className="bulkAddExamplesButton"
-                type="button"
-                onClick={triggerBulkOperation}
-                disabled={bulkOperationInProgress}
-              >
-                {bulkSelectIds.length > 0
-                  ? `Add ${bulkSelectIds.length} Example${
-                      bulkSelectIds.length === 1 ? '' : 's'
-                    }`
-                  : 'Select Examples to Add'}
-              </button>
-            )}
-            {bulkSelectIds.length > 0 && (
-              <button
-                className="clearSelectionButton"
-                type="button"
-                onClick={clearBulkSelect}
-                disabled={bulkSelectIds.length === 0}
-              >
-                Clear Selection
-              </button>
-            )}
-          </div>
-
           {newPageLoading ? (
             <InlineLoading message="Just a moment..." />
           ) : (
@@ -210,23 +170,12 @@ export default function ExamplesTable({
                 key={example.id}
                 example={example}
                 isCollected={studentFlashcards.isExampleCollected(example.id)}
-                isPending={
-                  bulkOperationInProgress && bulkSelectIds.includes(example.id)
-                }
                 handleSingleAdd={async () => {
                   await studentFlashcards.createFlashcards([example.id]);
                 }}
                 handleRemove={async () => {
                   await studentFlashcards.deleteFlashcards([example.id]);
                 }}
-                handleRemoveSelected={() => {
-                  removeFromBulkSelect(example.id);
-                }}
-                handleSelect={() => {
-                  addToBulkSelect(example.id);
-                }}
-                bulkSelectMode={bulkSelectMode}
-                isSelected={bulkSelectIds.includes(example.id)}
                 lessonPopup={lessonPopup}
               />
             );
@@ -243,3 +192,49 @@ export default function ExamplesTable({
     </div>
   );
 }
+
+/*
+BULK SELECT BUTTONS:
+* these were in the header, removing for now
+
+
+<div id="bulkAddModeButtons">
+            <button
+              type="button"
+              className="clearSelectionButton"
+              onClick={() => {
+                addAllToBulkSelect(
+                  examples
+                    .map((example) => example.id)
+                    .filter((id) => !studentFlashcards.isExampleCollected(id)),
+                );
+              }}
+            >
+              Select All on Page
+            </button>
+            {bulkSelectIds.length > 0 && (
+              <button
+                className="bulkAddExamplesButton"
+                type="button"
+                onClick={triggerBulkOperation}
+                disabled={bulkOperationInProgress}
+              >
+                {bulkSelectIds.length > 0
+                  ? `Add ${bulkSelectIds.length} Example${
+                      bulkSelectIds.length === 1 ? '' : 's'
+                    }`
+                  : 'Select Examples to Add'}
+              </button>
+            )}
+            {bulkSelectIds.length > 0 && (
+              <button
+                className="clearSelectionButton"
+                type="button"
+                onClick={clearBulkSelect}
+                disabled={bulkSelectIds.length === 0}
+              >
+                Clear Selection
+              </button>
+            )}
+          </div>
+*/

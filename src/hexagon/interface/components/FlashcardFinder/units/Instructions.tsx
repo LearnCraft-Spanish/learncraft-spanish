@@ -50,18 +50,6 @@ export default function Instructions() {
           <h3>New Features to Try </h3>
           <ul className="bulletPointsOnParagraphs">
             <li>
-              <h4>Select multiple examples </h4>
-              <ul>
-                <li>
-                  <p>
-                    Click “Select” on any examples to select multiple at once.
-                    Then, click "add X flashcards" at the top to add them to
-                    your collection.
-                  </p>
-                </li>
-              </ul>
-            </li>
-            <li>
               <h4>See all the vocabulary tags </h4>
               <ul>
                 <li>

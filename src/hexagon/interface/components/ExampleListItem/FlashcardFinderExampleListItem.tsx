@@ -9,30 +9,21 @@ import { useCallback, useState } from 'react';
 import { useContextualMenu } from '../../hooks/useContextualMenu';
 import ExampleListItemFactory from './ExampleListItemFactory';
 import AddPendingRemove from './units/AddPendingRemove';
-import BulkAddButton from './units/BulkAddButton';
+// import BulkAddButton from './units/BulkAddButton';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewExample from './units/MoreInfoViewExample';
 
 export default function ExampleListItem({
   example,
   isCollected,
-  isPending,
   handleSingleAdd,
-  handleRemoveSelected,
-  handleSelect,
   handleRemove,
-  isSelected,
   lessonPopup,
 }: {
   example: Flashcard | ExampleWithVocabulary | null;
   isCollected: boolean;
-  isPending: boolean;
   handleSingleAdd: () => Promise<void>;
-  handleRemoveSelected: () => void;
-  handleSelect: () => void;
   handleRemove: () => Promise<void>;
-  bulkSelectMode: boolean;
-  isSelected?: boolean;
   lessonPopup: LessonPopup;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
@@ -42,33 +33,21 @@ export default function ExampleListItem({
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
 
-  const [pending, setPending] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   const handleAddWrapper = useCallback(async () => {
-    setPending(true);
-    handleSingleAdd()
-      .then(() => {
-        if (isSelected) {
-          handleRemoveSelected();
-        }
-      })
-      .finally(() => {
-        setPending(false);
-      });
-  }, [handleSingleAdd, isSelected, handleRemoveSelected]);
+    setIsPending(true);
+    handleSingleAdd().finally(() => {
+      setIsPending(false);
+    });
+  }, [handleSingleAdd]);
 
   const handleRemoveWrapper = useCallback(async () => {
-    setPending(true);
-    handleRemove()
-      .then(() => {
-        if (isSelected) {
-          handleRemoveSelected();
-        }
-      })
-      .finally(() => {
-        setPending(false);
-      });
-  }, [handleRemove, isSelected, handleRemoveSelected]);
+    setIsPending(true);
+    handleRemove().finally(() => {
+      setIsPending(false);
+    });
+  }, [handleRemove]);
 
   if (!example) {
     return null;
@@ -77,17 +56,17 @@ export default function ExampleListItem({
   return (
     <div className="exampleCardWithMoreInfo">
       <ExampleListItemFactory
-        preTextComponents={[
-          <BulkAddButton
-            key="bulkAddButton"
-            id={example.id}
-            isCollected={isCollected}
-            handleSelect={handleSelect}
-            handleRemoveSelected={handleRemoveSelected}
-            isSelected={isSelected ?? false}
-            isPending={isPending || pending}
-          />,
-        ]}
+        // preTextComponents={[
+        //   <BulkAddButton
+        //     key="bulkAddButton"
+        //     id={example.id}
+        //     isCollected={isCollected}
+        //     handleSelect={handleSelect}
+        //     handleRemoveSelected={handleRemoveSelected}
+        //     isSelected={isSelected ?? false}
+        //     isPending={isPending || pending}
+        //   />,
+        // ]}
         example={example}
         postTextComponents={[
           <MoreInfoButton
@@ -98,7 +77,7 @@ export default function ExampleListItem({
           <AddPendingRemove
             id={example.id}
             isCollected={isCollected}
-            isPending={isPending || pending}
+            isPending={isPending}
             handleAdd={handleAddWrapper}
             handleRemove={handleRemoveWrapper}
             key="addPendingRemove"
