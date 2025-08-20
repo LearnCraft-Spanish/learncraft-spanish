@@ -1,7 +1,7 @@
 import type {
   CellType,
   TableColumn,
-} from '@application/units/pasteTable/types';
+} from '@application/units/PasteTable/types';
 
 // Column configuration with labels and widths
 export const SCHEMA_FIELD_CONFIG: Record<
