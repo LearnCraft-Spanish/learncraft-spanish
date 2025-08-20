@@ -1,4 +1,4 @@
-import type { TableHook } from '@application/units/pasteTable/types';
+import type { TableHook } from '@application/units/PasteTable/types';
 import type {
   CreateNonVerbVocabulary,
   Subcategory,
