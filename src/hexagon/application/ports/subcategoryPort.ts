@@ -9,9 +9,4 @@ export interface SubcategoryPort {
    * Get all available subcategories
    */
   getSubcategories: () => Promise<Subcategory[]>;
-
-  /**
-   * Get a subcategory by ID
-   */
-  getSubcategoryById: (id: string) => Promise<Subcategory | null>;
 }

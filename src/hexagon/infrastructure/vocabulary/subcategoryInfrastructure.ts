@@ -2,10 +2,7 @@ import type { AuthPort } from '@application/ports/authPort';
 import type { SubcategoryPort } from '@application/ports/subcategoryPort';
 import type { Subcategory } from '@learncraft-spanish/shared/src/domain/vocabulary/core-types';
 import { createHttpClient } from '@infrastructure/http/client';
-import {
-  getSubcategoryByIdEndpoint,
-  listSubcategoriesEndpoint,
-} from '@learncraft-spanish/shared';
+import { listSubcategoriesEndpoint } from '@learncraft-spanish/shared';
 
 /**
  * Creates an implementation of the SubcategoryPort.
@@ -35,15 +32,6 @@ export function createSubcategoryInfrastructure(
       );
 
       return Array.isArray(response) ? response : [];
-    },
-
-    getSubcategoryById: async (id: string): Promise<Subcategory | null> => {
-      // Use the getById endpoint directly from the shared package
-      const path = getSubcategoryByIdEndpoint.path.replace(':id', id);
-      return httpClient.get<Subcategory>(
-        path,
-        getSubcategoryByIdEndpoint.requiredScopes,
-      );
     },
   };
 }

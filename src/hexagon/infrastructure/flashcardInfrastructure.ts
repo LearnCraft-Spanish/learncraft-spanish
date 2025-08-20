@@ -34,7 +34,7 @@ export function createFlashcardInfrastructure(
         createMyFlashcardsEndpoint.path,
         createMyFlashcardsEndpoint.requiredScopes,
         {
-          newStudentExamples: exampleIds.map((id) => ({
+          newFlashcards: exampleIds.map((id) => ({
             exampleId: id.toString(),
           })),
         },
@@ -55,7 +55,7 @@ export function createFlashcardInfrastructure(
           deleteMyFlashcardsEndpoint.requiredScopes,
           {
             params: {
-              studentExampleIds: studentExampleIds.join(','),
+              flashcardIds: studentExampleIds.join(','),
             },
           },
         )
@@ -96,7 +96,7 @@ export function createFlashcardInfrastructure(
         createFlashcardsEndpoint.path,
         createFlashcardsEndpoint.requiredScopes,
         {
-          newStudentExamples: exampleIds.map((id) => ({
+          newFlashcards: exampleIds.map((id) => ({
             studentId: studentId.toString(),
             exampleId: id.toString(),
           })),
@@ -117,7 +117,7 @@ export function createFlashcardInfrastructure(
         deleteFlashcardsEndpoint.requiredScopes,
         {
           params: {
-            studentExampleIds: studentExampleIdsString,
+            flashcardIds: studentExampleIdsString,
           },
         },
       );

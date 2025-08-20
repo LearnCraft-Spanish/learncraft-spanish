@@ -10,13 +10,8 @@ const f = createMockFlashcard();
 const mockProps = {
   example: f,
   isCollected: false,
-  isPending: false,
   handleSingleAdd: vi.fn(),
-  handleRemoveSelected: vi.fn(),
-  handleSelect: vi.fn(),
   handleRemove: vi.fn(),
-  bulkSelectMode: false,
-  isSelected: false,
   lessonPopup: {
     lessonsByVocabulary: [],
     lessonsLoading: false,
@@ -53,15 +48,5 @@ describe('flashcardFinderExampleListItem', () => {
       fireEvent.click(moreInfoButton);
     });
     expect(screen.getByText('Collapse')).toBeInTheDocument();
-  });
-
-  it('isSelected is false by default on bulkAddMode true', () => {
-    render(
-      <ContextualMenuProvider>
-        <FlashcardFinderExampleListItem {...mockProps} bulkSelectMode />
-      </ContextualMenuProvider>,
-    );
-    expect(screen.queryByText('Select')).toBeInTheDocument();
-    expect(screen.queryByText('Selected')).not.toBeInTheDocument();
   });
 });

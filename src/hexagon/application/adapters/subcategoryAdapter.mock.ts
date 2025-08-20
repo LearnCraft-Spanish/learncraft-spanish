@@ -1,15 +1,10 @@
 import type { SubcategoryPort } from '@application/ports/subcategoryPort';
-import {
-  createMockSubcategory,
-  createMockSubcategoryList,
-} from '@testing/factories/subcategoryFactories';
+import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation
 const defaultMockAdapter: SubcategoryPort = {
   getSubcategories: () => Promise.resolve(createMockSubcategoryList(3)),
-  getSubcategoryById: (id: string) =>
-    Promise.resolve(createMockSubcategory({ id: Number.parseInt(id) })),
 };
 
 // Create an overrideable mock with the default implementation
