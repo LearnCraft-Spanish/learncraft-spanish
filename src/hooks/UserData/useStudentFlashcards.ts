@@ -3,19 +3,22 @@ import type {
   StudentExample,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { useCallback, useRef } from 'react';
 import { toISODateTime } from 'src/functions/dateUtils';
 import { showErrorToast, showSuccessToast } from 'src/functions/showToast';
 import { useBackend } from 'src/hooks/useBackend';
-import { useActiveStudent } from './useActiveStudent';
-import { useUserData } from './useUserData';
 
 export function useStudentFlashcards() {
   const queryClient = useQueryClient();
-  const userDataQuery = useUserData();
-  const { activeStudentQuery } = useActiveStudent();
+  const { isAuthenticated, authUser, isAdmin, isCoach, isStudent } =
+    useAuthAdapter();
+  const { appUser } = useActiveStudent();
+
+  const userId = appUser?.recordId;
   const {
     getMyExamplesFromBackend,
     getActiveExamplesFromBackend,
@@ -35,13 +38,11 @@ export function useStudentFlashcards() {
   }
 
   // Abbreviated access since it's used frequently
-  const activeStudentId = activeStudentQuery.data?.recordId;
+  const activeStudentId = appUser?.recordId;
 
   // Dependency array for flashcardDataQuery
   const flashcardDataDependencies =
-    userDataQuery.isSuccess &&
-    activeStudentQuery.isSuccess &&
-    !!activeStudentId;
+    isAuthenticated && !!appUser && !!activeStudentId;
 
   const matchAndTrimArrays = useCallback(
     (flashcardData: StudentFlashcardData) => {
@@ -88,13 +89,9 @@ export function useStudentFlashcards() {
       throw new Error('No active student');
     }
 
-    if (
-      (userDataQuery.data?.roles.adminRole === 'coach' ||
-        userDataQuery.data?.roles.adminRole === 'admin') &&
-      activeStudentId
-    ) {
+    if ((isAdmin || isCoach) && activeStudentId) {
       backendResponse = await getActiveExamplesFromBackend(activeStudentId);
-    } else if (userDataQuery.data?.roles.studentRole === 'student') {
+    } else if (isStudent) {
       backendResponse = await getMyExamplesFromBackend();
     }
 
@@ -188,13 +185,9 @@ export function useStudentFlashcards() {
     async (flashcard: Flashcard) => {
       const recordId = flashcard.recordId;
       let addPromise;
-      if (
-        (userDataQuery.data?.roles.adminRole === 'coach' ||
-          userDataQuery.data?.roles.adminRole === 'admin') &&
-        activeStudentId
-      ) {
+      if ((isAdmin || isCoach) && activeStudentId) {
         addPromise = createStudentExample(activeStudentId, recordId);
-      } else if (userDataQuery.data?.roles.studentRole === 'student') {
+      } else if (isStudent) {
         addPromise = createMyStudentExample(recordId);
       }
       if (!addPromise) {
@@ -214,10 +207,13 @@ export function useStudentFlashcards() {
         return createdId;
       };
       const data = await addResponse();
+
       return data;
     },
     [
-      userDataQuery.data?.roles,
+      isAdmin,
+      isCoach,
+      isStudent,
       activeStudentId,
       createStudentExample,
       createMyStudentExample,
@@ -248,7 +244,7 @@ export function useStudentFlashcards() {
 
       // Format exactly matches type as returned from database except for negative recordId
       const newStudentExample: StudentExample = {
-        studentEmailAddress: userDataQuery.data?.emailAddress || '',
+        studentEmailAddress: authUser.email || '',
         recordId: thisIdNum,
         relatedExample: flashcard.recordId,
         relatedStudent: activeStudentId!,
@@ -324,6 +320,7 @@ export function useStudentFlashcards() {
           return newFlashcardData;
         },
       );
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
@@ -374,13 +371,9 @@ export function useStudentFlashcards() {
         throw new Error('Flashcard Not Found');
       }
       let removePromise;
-      if (
-        (userDataQuery.data?.roles.adminRole === 'coach' ||
-          userDataQuery.data?.roles.adminRole === 'admin') &&
-        activeStudentId
-      ) {
+      if ((isAdmin || isCoach) && activeStudentId) {
         removePromise = deleteStudentExample(studentFlashcardId);
-      } else if (userDataQuery.data?.roles.studentRole === 'student') {
+      } else if (isStudent) {
         removePromise = deleteMyStudentExample(studentFlashcardId);
       }
       if (!removePromise) {
@@ -400,7 +393,9 @@ export function useStudentFlashcards() {
       return removeResponse;
     },
     [
-      userDataQuery.data?.roles,
+      isAdmin,
+      isCoach,
+      isStudent,
       flashcardDataQuery.data,
       activeStudentId,
       deleteStudentExample,
@@ -462,6 +457,7 @@ export function useStudentFlashcards() {
 
     onSuccess: (_data, _variables, _context) => {
       showSuccessToast('Flashcard removed successfully');
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
@@ -501,13 +497,9 @@ export function useStudentFlashcards() {
   const updateActiveStudentFlashcards = useCallback(
     async (studentExampleId: number, newInterval: number) => {
       let updatePromise;
-      if (
-        (userDataQuery.data?.roles.adminRole === 'coach' ||
-          userDataQuery.data?.roles.adminRole === 'admin') &&
-        activeStudentId
-      ) {
+      if ((isAdmin || isCoach) && activeStudentId) {
         updatePromise = updateStudentExample(studentExampleId, newInterval);
-      } else if (userDataQuery.data?.roles.studentRole === 'student') {
+      } else if (isStudent) {
         updatePromise = updateMyStudentExample(studentExampleId, newInterval);
       }
       if (!updatePromise) {
@@ -527,7 +519,9 @@ export function useStudentFlashcards() {
       return updateResponse;
     },
     [
-      userDataQuery.data?.roles,
+      isAdmin,
+      isCoach,
+      isStudent,
       activeStudentId,
       updateStudentExample,
       updateMyStudentExample,
@@ -680,13 +674,9 @@ export function useStudentFlashcards() {
     async (flashcards: Flashcard[]) => {
       const recordIds = flashcards.map((flashcard) => flashcard.recordId);
       let addPromise;
-      if (
-        (userDataQuery.data?.roles.adminRole === 'coach' ||
-          userDataQuery.data?.roles.adminRole === 'admin') &&
-        activeStudentId
-      ) {
+      if ((isAdmin || isCoach) && activeStudentId) {
         addPromise = createMultipleStudentExamples(activeStudentId, recordIds);
-      } else if (userDataQuery.data?.roles.studentRole === 'student') {
+      } else if (isStudent) {
         // For students, we need to add them one by one since there's no bulk endpoint
         const results = await Promise.all(
           recordIds.map((recordId) => createMyStudentExample(recordId)),
@@ -713,7 +703,9 @@ export function useStudentFlashcards() {
       return addResponse();
     },
     [
-      userDataQuery.data?.roles,
+      isAdmin,
+      isCoach,
+      isStudent,
       activeStudentId,
       createMyStudentExample,
       createMultipleStudentExamples,
@@ -753,7 +745,7 @@ export function useStudentFlashcards() {
       // Format exactly matches type as returned from database except for negative recordIds
       const newStudentExamples: StudentExample[] = flashcards.map(
         (flashcard, index) => ({
-          studentEmailAddress: userDataQuery.data?.emailAddress || '',
+          studentEmailAddress: authUser.email || '',
           recordId: tempIds[index],
           relatedExample: flashcard.recordId,
           relatedStudent: activeStudentId!,
@@ -796,6 +788,7 @@ export function useStudentFlashcards() {
           return trimmedNewFlashcardData;
         },
       );
+
       return { tempIds, flashcards };
     },
 
@@ -842,6 +835,7 @@ export function useStudentFlashcards() {
           return matchAndTrimArrays(newFlashcardData);
         },
       );
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (

@@ -23,6 +23,14 @@ jobs:
         with:
           node-version: 'lts/*'
 
+      # Write .npmrc
+      - name: Write .npmrc
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_PACKAGE_KEY }}" > .npmrc
+          echo "@learncraft-spanish:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "package-manager=pnpm" >> .npmrc
+          echo "engine-strict=true" >> .npmrc
+
       # Install pnpm
       - name: Install pnpm
         run: npm install -g pnpm@9.7
@@ -38,7 +46,7 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install:ci
         env:
           GH_PACKAGE_KEY: ${{ secrets.GH_PACKAGE_KEY }}
 

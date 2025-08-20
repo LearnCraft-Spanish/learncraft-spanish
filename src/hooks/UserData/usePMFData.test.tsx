@@ -1,7 +1,9 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import MockQueryClientProvider from 'mocks/Providers/MockQueryClient';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 
-import { setupMockAuth } from 'tests/setupMockAuth';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
+
 import { beforeEach, describe, expect, it } from 'vitest';
 import { usePMFData } from './usePMFData';
 
@@ -16,11 +18,23 @@ all other Students: getPMFData: '', createPMFData: 1, updatePMFData: 1
 describe('usePMFData', () => {
   describe('when student-lcsp is logged in', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'student-lcsp' });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: true,
+          isLimited: false,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('data is successfully fetched', async () => {
       const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockQueryClientProvider,
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
@@ -29,7 +43,7 @@ describe('usePMFData', () => {
     });
     it('createOrUpdatePMFData works', async () => {
       const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockQueryClientProvider,
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
@@ -43,11 +57,23 @@ describe('usePMFData', () => {
   });
   describe('when student-ser-estar is logged in', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'student-ser-estar' });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-ser-estar@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: true,
+          isLimited: false,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('data is successfully fetched', async () => {
       const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockQueryClientProvider,
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
@@ -57,11 +83,23 @@ describe('usePMFData', () => {
   });
   describe('when any other student is logged in', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'student-admin' });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+          isAuthenticated: true,
+          isAdmin: true,
+          isCoach: true,
+          isStudent: true,
+          isLimited: false,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
     });
     it('data is successfully fetched', async () => {
       const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockQueryClientProvider,
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),
@@ -71,7 +109,7 @@ describe('usePMFData', () => {
 
     it('createOrUpdatePMFData works', async () => {
       const { result } = renderHook(() => usePMFData(), {
-        wrapper: MockQueryClientProvider,
+        wrapper: MockAllProviders,
       });
       await waitFor(() =>
         expect(result.current.pmfDataQuery.isSuccess).toBe(true),

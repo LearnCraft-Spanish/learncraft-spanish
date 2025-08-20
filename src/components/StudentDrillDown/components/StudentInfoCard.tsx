@@ -1,7 +1,6 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
 import React, { useEffect, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Checkbox,
   CoachDropdown,
@@ -10,9 +9,10 @@ import {
   TextInput,
 } from 'src/components/FormComponents';
 import { toISODate } from 'src/functions/dateUtils';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 import { BundleCreditsSection } from './BundleCreditsSection';
 const timezones = [
   'AZ',

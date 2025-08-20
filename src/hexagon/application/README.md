@@ -90,25 +90,21 @@ export function useLessonCoordinator() {
 ## Guidelines
 
 1. **Separation of Concerns**
-
    - Use-case hooks should focus on business processes
    - Unit hooks should handle specific functionality
    - Coordinators should manage shared state
 
 2. **Composition**
-
    - Use-case hooks should compose unit hooks and coordinators
    - Unit hooks should be independent and reusable
    - Coordinators should be used sparingly and only for truly shared state
 
 3. **Testing**
-
    - Unit hooks should be thoroughly tested in isolation
    - Use-case hooks should be tested with mocked unit hooks
    - Coordinators should be tested for state management
 
 4. **Dependencies**
-
    - Use-case hooks can depend on unit hooks and coordinators
    - Unit hooks should not depend on use-case hooks or coordinators
    - Coordinators should not depend on use-case hooks

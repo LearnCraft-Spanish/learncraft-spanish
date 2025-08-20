@@ -1,4 +1,4 @@
-import type { TableHook } from '../../../application/units/pasteTable/types';
+import type { TableHook } from '@application/units/pasteTable/types';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { PasteTableErrorBoundary } from './PasteTableErrorBoundary';
 import { TableRow } from './TableRow';

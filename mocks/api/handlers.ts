@@ -1,13 +1,12 @@
 import type { DefaultBodyType, StrictRequest } from 'msw';
-import type { UserData } from 'src/types/interfaceDefinitions';
+import { CourseWithLessonsSchema } from '@learncraft-spanish/shared';
 import { http, HttpResponse } from 'msw';
 import allStudentFlashcards from '../data/hooklike/studentFlashcardData';
 import newData from '../data/serverlike/serverlikeData';
+
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
-import {
-  allUsersTable,
-  getUserDataFromName,
-} from '../data/serverlike/userTable';
+
+import { appUserTable, getAppUserFromName } from '../data/serverlike/userTable';
 
 // import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -72,16 +71,16 @@ export const handlers = [
     return HttpResponse.json(quizExamples);
   }),
 
-  http.get(`${backendUrl}my-data`, ({ request }) => {
-    const email = getEmailFromRequest(request);
-    const student = allUsersTable.find(
-      (student: UserData) => student.emailAddress === email,
-    );
-    return HttpResponse.json(student);
-  }),
+  // http.get(`${backendUrl}my-data`, ({ request }) => {
+  //   const email = getEmailFromRequest(request);
+  //   const student = appUserTable.find((student) => {
+  //     return student.emailAddress === email;
+  //   });
+  //   return HttpResponse.json(student);
+  // }),
 
   http.get(`${backendUrl}all-students`, () => {
-    return HttpResponse.json(apiData.allStudentsTable);
+    return HttpResponse.json(apiData.appUserTable);
   }),
 
   http.get(`${backendUrl}unverified-examples`, () => {
@@ -195,12 +194,12 @@ export const handlers = [
   http.get(`${backendUrl}pmf/:studentId`, async ({ params }) => {
     const param = params.studentId as string;
     const studentId = Number.parseInt(param);
-    if (getUserDataFromName('student-lcsp')?.recordId === studentId) {
+    if (getAppUserFromName('student-lcsp')?.recordId === studentId) {
       return HttpResponse.json({
         lastContactDate: new Date().toISOString(),
       });
     } else if (
-      getUserDataFromName('student-ser-estar')?.recordId === studentId
+      getAppUserFromName('student-ser-estar')?.recordId === studentId
     ) {
       return HttpResponse.json({
         lastContactDate: new Date(Date.now() - 7776000000).toISOString(),
@@ -344,4 +343,18 @@ export const handlers = [
       return HttpResponse.json([]);
     },
   ),
+
+  http.get(`/api/app-user/my-data`, ({ request }) => {
+    const email = getEmailFromRequest(request);
+    const student = appUserTable.find((student) => {
+      return student.emailAddress === email;
+    });
+    return HttpResponse.json(student);
+  }),
+
+  http.get(`/api/courses-with-lessons`, () => {
+    return HttpResponse.json(
+      CourseWithLessonsSchema.parse(generatedMockData.courseList),
+    );
+  }),
 ];

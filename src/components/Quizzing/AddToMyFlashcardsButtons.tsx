@@ -1,8 +1,7 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
-import { useModal } from 'src/hooks/useModal';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { useUserData } from 'src/hooks/UserData/useUserData';
 
 interface AddToMyFlashcardsButtonsProps {
   example: Flashcard | undefined;
@@ -24,9 +23,8 @@ export default function AddToMyFlashcardsButtons({
     exampleIsCustom,
     exampleIsPending,
   } = useStudentFlashcards();
-  const userData = useUserData();
   const { openModal, closeModal } = useModal();
-  const dataSuccess = userData.isSuccess && flashcardDataQuery.isSuccess;
+  const dataSuccess = flashcardDataQuery.isSuccess;
   if (!example) {
     throw new Error('No Flashcard passed to AddToMyFlashcardsButtons');
   }

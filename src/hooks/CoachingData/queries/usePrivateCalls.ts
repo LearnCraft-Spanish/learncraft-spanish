@@ -1,17 +1,17 @@
 import type { PrivateCall } from 'src/types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from 'react-toastify';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useBackendHelpers } from '../../useBackend';
-import { useUserData } from '../../UserData/useUserData';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
 export default function usePrivateCalls(
   startDate: string | undefined,
   endDate: string | undefined,
 ) {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
   const { getPrivateCalls } = useStudentRecordsBackend();
   const queryClient = useQueryClient();
   const { newPostFactory, newPutFactory, newDeleteFactory } =
@@ -21,9 +21,7 @@ export default function usePrivateCalls(
     queryKey: ['privateCalls', { startDate, endDate }],
     queryFn: getPrivateCalls,
     staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
+    enabled: isCoach || isAdmin,
   });
 
   // const getPrivateCall = (recordId: number) => {

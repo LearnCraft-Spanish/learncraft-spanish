@@ -8,21 +8,22 @@ import {
 } from '@testing-library/react';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 
-import { getUserDataFromName } from 'mocks/data/serverlike/userTable';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Quiz from './QuizComponent';
 
 const cleanupFunction = vi.fn();
 
-const user = getUserDataFromName('student-admin');
+const user = getAuthUserFromEmail('student-admin@fake.not')!;
 if (!user) {
   throw new Error(`Student not found in mock data set: student-admin`);
 }
 const userFlashcardData = allStudentFlashcards.find(
-  (student) => student.userName === user.name,
+  (student) => student.emailAddress === user.email,
 )?.studentFlashcardData;
 if (!userFlashcardData) {
   throw new Error(`Student flashcard data not found: student-admin`);
@@ -174,6 +175,15 @@ describe('component Quiz', () => {
 
   describe('isSrsQuiz is true', () => {
     it('renders SrsButtons when isSrsQuiz is true', async () => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isStudent: true,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
       renderQuizYesSrs();
       await waitFor(() => {
         expect(screen.getByLabelText('flashcard')).toBeInTheDocument();

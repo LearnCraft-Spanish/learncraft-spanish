@@ -48,6 +48,7 @@ export default defineConfig(({ mode }) => {
         ),
         '@interface': path.resolve(__dirname, './src/hexagon/interface'),
         '@testing': path.resolve(__dirname, './src/hexagon/testing'),
+        '@composition': path.resolve(__dirname, './src/hexagon/composition'),
       },
     },
     server: {

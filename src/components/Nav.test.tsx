@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Nav from './Nav';
 
@@ -20,7 +20,7 @@ describe('component Nav', () => {
   });
 
   it('shows login button when user is not logged in', () => {
-    setupMockAuth({ isAuthenticated: false });
+    overrideMockAuthAdapter({ isAuthenticated: false });
     render(
       <MockAllProviders>
         <Nav />

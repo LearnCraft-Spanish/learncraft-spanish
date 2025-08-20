@@ -1,6 +1,6 @@
 import type { Course } from 'src/types/CoachingTypes';
 import pencilIcon from 'src/assets/icons/pencil.svg';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 interface CourseTableRowProps {
   course: Course;

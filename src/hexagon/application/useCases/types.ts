@@ -1,31 +1,17 @@
-import type { Subcategory } from '@LearnCraft-Spanish/shared';
+import type { Vocabulary } from '@learncraft-spanish/shared';
 
-/**
- * VerbData represents the data needed to create a verb.
- */
-export interface VerbData {
-  infinitive: string;
-  translation: string;
-  usage?: string;
-  subcategoryId: string;
-  isRegular?: boolean;
-  notes?: string;
-}
-
-/**
- * UseVerbCreationResult represents the return type of the useVerbCreation hook.
- */
-export interface UseVerbCreationResult {
-  // Subcategory selection
-  verbSubcategories: Subcategory[];
-  loadingSubcategories: boolean;
-  selectedSubcategoryId: string;
-  setSelectedSubcategoryId: (id: string) => void;
-
-  // Creation status
-  creating: boolean;
-  creationError: Error | null;
-
-  // Creation methods
-  createVerb: (verbData: VerbData) => Promise<boolean>;
+// Define pagination state for current vocabulary view
+export interface VocabularyPaginationState {
+  vocabularyItems: Vocabulary[];
+  isLoading: boolean;
+  isCountLoading: boolean;
+  isFetching: boolean;
+  error: Error | null;
+  totalCount: number | null;
+  totalPages: number | null;
+  hasMorePages: boolean;
+  currentPage: number;
+  pageSize: number;
+  goToNextPage: () => void;
+  goToPreviousPage: () => void;
 }

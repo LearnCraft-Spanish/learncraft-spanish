@@ -4,30 +4,30 @@ import MenuButton from 'src/components/Buttons/MenuButton';
 import { Loading } from 'src/components/Loading';
 import OfficialQuiz from 'src/components/Quizzing/OfficialQuizzing/OfficialQuiz';
 import quizCourses from 'src/functions/QuizCourseList';
+import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
+import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
-import useAuth from 'src/hooks/useAuth';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
 import 'src/App.css';
 
 export default function LCSPQuizApp(): React.JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
-  const { activeStudentQuery, activeProgram, activeLesson } =
-    useActiveStudent();
+  const { toLesson, course } = useSelectedCourseAndLessons();
   const { officialQuizzesQuery } = useOfficialQuizzes(undefined);
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuthAdapter();
   const [chosenQuiz, setChosenQuiz] = useState(0);
   const [menuHidden, setMenuHidden] = useState(false);
   const [defaultCourseFound, setDefaultCourseFound] = useState(false);
 
-  const dataError = officialQuizzesQuery.isError || activeStudentQuery.isError;
-  const dataLoading =
-    !dataError &&
-    (officialQuizzesQuery.isLoading || activeStudentQuery.isLoading);
+  const dataError = officialQuizzesQuery.isError;
+  const dataLoading = !dataError && officialQuizzesQuery.isLoading;
 
-  const activeCourseCode = quizCourses.find(
-    (course) => course.name === activeProgram?.name,
-  )?.code;
+  const activeCourseCode = useMemo(() => {
+    const foundCourse = quizCourses.find(
+      (quizCourse) => quizCourse.courseId === course?.id,
+    );
+    return foundCourse?.code || 'lcsp';
+  }, [course?.id]);
 
   const currentCourseCode = useMemo(() => {
     const splitPath = location.pathname.split('/');
@@ -184,11 +184,11 @@ export default function LCSPQuizApp(): React.JSX.Element {
   // Ensures the default course is selected, but only when the quiz opens
   // Finds the student's course and navigates to it
   useEffect(() => {
-    if (!defaultCourseFound && activeProgram?.name) {
+    if (!defaultCourseFound && course?.name) {
       // Don't run after first successful run
       // Only run if a course is selected
       const activeCourse = quizCourses.find(
-        (course) => course.name === activeProgram.name,
+        (quizCourse) => quizCourse.name === course?.name,
       );
       if (!quizPath && !!activeCourse) {
         // Only run on root path and only if quiz course is found
@@ -197,7 +197,7 @@ export default function LCSPQuizApp(): React.JSX.Element {
         navigate(urlToNavigate);
       }
     }
-  }, [activeProgram?.name, defaultCourseFound, quizPath, navigate]);
+  }, [course?.name, defaultCourseFound, quizPath, navigate]);
 
   useEffect(() => {}, [defaultCourseFound]);
 
@@ -212,12 +212,10 @@ export default function LCSPQuizApp(): React.JSX.Element {
   useEffect(() => {
     //Don't run until data is ready
     if (!dataError && !dataLoading && officialQuizzesQuery.data?.length) {
-      if (currentCourseCode === activeCourseCode && activeLesson) {
+      if (currentCourseCode === activeCourseCode && toLesson) {
         // Find Default Quiz if selected course is the same as the current course
-        const activeLessonArray = activeLesson?.lesson.split(' ');
-        if (activeLessonArray.length) {
-          const activeLessonString = activeLessonArray.slice(-1)[0];
-          const activeLessonNumber = Number.parseInt(activeLessonString);
+        if (toLesson) {
+          const activeLessonNumber = toLesson.lessonNumber;
           let lastQuizBeforeCurrentLesson = 0;
           const activeQuizzes = officialQuizzesQuery.data.filter(
             (item) => item.quizType === currentCourseCode,
@@ -249,7 +247,7 @@ export default function LCSPQuizApp(): React.JSX.Element {
     dataError,
     dataLoading,
     activeCourseCode,
-    activeLesson,
+    toLesson,
     currentCourseCode,
     officialQuizzesQuery.data,
     updateChosenQuiz,

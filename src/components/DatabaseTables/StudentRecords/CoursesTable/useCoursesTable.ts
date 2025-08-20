@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useCoursesTableQueries from 'src/hooks/StudentRecordsData/useCoursesTable';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 export default function useCoursesTable() {
   const { coursesTableQuery } = useCoursesTableQueries();

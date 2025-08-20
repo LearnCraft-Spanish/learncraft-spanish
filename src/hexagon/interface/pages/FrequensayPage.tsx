@@ -1,12 +1,12 @@
-import { useFrequensay } from 'src/hexagon/application/useCases/useFrequensay';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import useFrequensay from '@application/useCases/useFrequensay';
+import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
 import CustomVocabulary from '../components/frequensay/CustomVocabulary';
 import FrequensaySetup from '../components/frequensay/FrequensaySetup';
 import TextToCheck from '../components/frequensay/TextToCheck';
 import UnknownWords from '../components/frequensay/UnknownWords';
 import './FrequensayPage.scss';
 export default function FrequenSayPage() {
-  const { selectedToLesson } = useSelectedLesson();
+  const { toLesson } = useSelectedCourseAndLessons();
   const {
     spellingsDataError,
     spellingsDataLoading,
@@ -19,7 +19,7 @@ export default function FrequenSayPage() {
 
   // this is so that if a user unselects a lesson, the Frequensay is disabled until they select a lesson again
   const frequensayIsEnabled =
-    FrequensaySetupProps.isFrequensayEnabled && selectedToLesson;
+    FrequensaySetupProps.isFrequensayEnabled && toLesson?.id;
 
   return (
     <div className="frequensay-page">

@@ -1,0 +1,36 @@
+.selectAddButton,
+.selectRemoveButton,
+.disabledButton,
+.pendingButton,
+.selectedAddButton,
+.selectedRemoveButton {
+  width: 10%;
+  min-width: 120px;
+  cursor: pointer;
+}
+
+.selectAddButton {
+  background-color: white;
+  border: 2px solid green;
+  color: green;
+}
+.selectRemoveButton {
+  background-color: white;
+  border: 2px solid red;
+  color: red;
+}
+
+.disabledButton {
+  background-color: none;
+}
+
+.selectedAddButton {
+  background-color: darkgreen;
+}
+.selectedRemoveButton {
+  background-color: darkred;
+}
+
+.pendingButton {
+  background-color: var(--dark);
+}

@@ -1,14 +1,14 @@
 import type { Assignment } from 'src/types/CoachingTypes';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from 'react-toastify';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useBackendHelpers } from '../../useBackend';
-import { useUserData } from '../../UserData/useUserData';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
 export default function useAssignments(startDate: string, endDate: string) {
-  const userDataQuery = useUserData();
+  const { isAdmin, isCoach } = useAuthAdapter();
   const { getAssignments } = useStudentRecordsBackend();
   const queryClient = useQueryClient();
   const { openContextual } = useContextualMenu();
@@ -19,9 +19,7 @@ export default function useAssignments(startDate: string, endDate: string) {
     queryKey: ['assignments', { startDate, endDate }],
     queryFn: getAssignments,
     staleTime: Infinity,
-    enabled:
-      userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin',
+    enabled: isCoach || isAdmin,
   });
 
   // const getAssignment = (recordId: number) => {

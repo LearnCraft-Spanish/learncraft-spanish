@@ -167,6 +167,7 @@ export type QuizCourse = Expanded<{
   name: string;
   url: string;
   code: string;
+  courseId: number | null;
 }>;
 
 export type DisplayOrder = Expanded<{

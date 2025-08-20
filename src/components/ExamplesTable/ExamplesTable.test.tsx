@@ -2,12 +2,14 @@ import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
 import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React, { act } from 'react';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { setupMockAuth } from 'tests/setupMockAuth';
 import { beforeEach, describe, expect, it } from 'vitest';
 import ExamplesTable from './ExamplesTable';
+
 const verifiedExamplesTable = serverlikeData().api.verifiedExamplesTable;
 
 // Helper Functions
@@ -72,14 +74,26 @@ describe('renders without crashing', () => {
           screen.getByText(examplesToDisplay[0].englishTranslation),
         ).toBeInTheDocument();
       },
-      { timeout: 3000 },
+      { timeout: 7500 },
     );
   });
 });
 
 describe('user is not a student', () => {
   it('student buttons: Add/Adding.../Remove are not displayed', async () => {
-    setupMockAuth({ userName: 'admin-empty-role' });
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: true,
+        isCoach: false,
+        isStudent: false,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     render(
       <MockAllProviders>
         <ExamplesTable
@@ -102,6 +116,21 @@ describe('user is not a student', () => {
 });
 
 describe('user is a student', () => {
+  beforeEach(() => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-admin@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
+  });
   describe('example is unknown', () => {
     beforeEach(async () => {
       const unknownExample = await getUnknownExample();

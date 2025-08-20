@@ -45,14 +45,12 @@ const MyComponent = () => {
 The PasteTable system uses a clean three-layer architecture:
 
 1. **Application Layer** (`useTableData`): Handles the core business logic
-
    - Data management and transformation
    - Validation
    - Business rules
    - No UI concerns
 
 2. **Interface Adapter Layer** (`usePasteTableInterface`): Bridges application and UI
-
    - Adapts application hook for UI needs
    - Encapsulates UI-specific state management
    - Manages DOM references and focus behavior
@@ -183,24 +181,20 @@ The component includes:
 ## Best Practices
 
 1. **Clean Architecture**
-
    - Separation of concerns between application logic and UI
    - Adapter pattern via interface hook
    - Small, focused components with single responsibilities
 
 2. **Type Safety**
-
    - Use generics to ensure type safety between your data and the table
    - Define clear interfaces for your data structures
 
 3. **Error Handling**
-
    - Component includes an error boundary for runtime errors
    - Validation errors are displayed inline
    - Clear error messages for accessibility
 
 4. **Performance**
-
    - Memoized calculations for grid layout
    - Efficient re-renders with proper state management
    - Optimized event handlers with useCallback

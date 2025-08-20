@@ -15,7 +15,7 @@ import type {
 } from 'src/types/interfaceDefinitions';
 
 import * as dataJson from './actualServerData.json';
-import { allStudentsTable } from './studentTable';
+import { appUserTable } from './userTable';
 
 interface MockApiData {
   programsTable: ProgramUnparsed[];
@@ -59,7 +59,7 @@ export default function serverlikeData() {
       spellingsTable,
       quizzesTable,
       quizExamplesTableArray,
-      allStudentsTable,
+      appUserTable,
       verifiedExamplesTable,
       audioExamplesTable,
     },

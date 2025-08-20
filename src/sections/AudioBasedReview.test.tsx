@@ -1,10 +1,11 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
+
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
+
 import { act } from 'react';
-
-import { setupMockAuth } from 'tests/setupMockAuth';
-import { beforeEach, describe, expect, it } from 'vitest';
-
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
+import { describe, expect, it } from 'vitest';
 import AudioBasedReview from './AudioBasedReview';
 
 function renderAudioBasedReview(props = {}) {
@@ -25,9 +26,9 @@ async function selectLessons() {
   const toLessonSelector = (await screen.findByLabelText(
     'To:',
   )) as HTMLSelectElement;
-  fireEvent.change(toLessonSelector, { target: { value: '131' } });
+  fireEvent.change(toLessonSelector, { target: { value: '62' } });
   await waitFor(() => {
-    expect(toLessonSelector.value).toBe('131');
+    expect(toLessonSelector.value).toBe('62');
   });
 
   await waitFor(() => {
@@ -40,7 +41,19 @@ async function selectLessons() {
 
 describe('audioBasedReview Component', () => {
   beforeEach(() => {
-    setupMockAuth();
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isLoading: false,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: true,
+        isLimited: false,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
   });
 
   describe('initial State', () => {
@@ -80,10 +93,6 @@ describe('audioBasedReview Component', () => {
   });
 
   describe('autoplay Behavior', () => {
-    beforeEach(() => {
-      setupMockAuth({ userName: 'student-admin' });
-    });
-
     it('works in an audio quiz with autoplay enabled', async () => {
       renderAudioBasedReview({
         audioOrComprehension: 'audio',

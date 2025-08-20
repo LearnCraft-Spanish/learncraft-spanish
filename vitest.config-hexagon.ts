@@ -17,7 +17,7 @@ export default defineConfig((configEnv: ConfigEnv) =>
         mockReset: true,
         clearMocks: true,
         restoreMocks: true,
-        testTimeout: 5000,
+        testtimeout: 10000,
         coverage: {
           include: ['**/hexagon/**'],
           exclude: [

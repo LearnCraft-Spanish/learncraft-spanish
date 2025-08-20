@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { FilterConfig } from 'src/components/Table/types';
 import { TextInput } from 'src/components/FormComponents';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 interface FilterLessonsTableProps {
   filterConfig: FilterConfig;

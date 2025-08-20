@@ -2,13 +2,13 @@ import type { Flashcard, Quiz } from 'src/types/interfaceDefinitions';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
-import useAuth from 'src/hooks/useAuth';
+import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useBackend } from 'src/hooks/useBackend';
 import { useExampleUpdate } from '../ExampleData/useExampleUpdate';
 
 export function useOfficialQuizzes(quizId: number | undefined) {
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthAdapter();
   const { updateExampleFromQuery } = useExampleUpdate();
   const {
     getLcspQuizzesFromBackend,

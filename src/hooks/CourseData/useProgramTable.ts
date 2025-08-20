@@ -3,14 +3,14 @@ import type {
   Program,
   ProgramUnparsed,
 } from 'src/types/interfaceDefinitions';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react'; // Adjust the import based on your project structure
-import useAuth from 'src/hooks/useAuth';
 import { useBackend } from 'src/hooks/useBackend';
 
 export function useProgramTable() {
   const { getLessonsFromBackend, getProgramsFromBackend } = useBackend();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuthAdapter();
 
   function parseLessonsByVocab(
     courses: ProgramUnparsed[],

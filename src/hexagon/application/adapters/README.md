@@ -86,7 +86,6 @@ vi.mock('../adapters/subcategoryAdapter', () => ({
     getSubcategories: vi.fn().mockResolvedValue([
       /* mocked data */
     ]),
-    getSubcategoryById: vi.fn().mockResolvedValue(/* mocked data */),
   }),
 }));
 ```

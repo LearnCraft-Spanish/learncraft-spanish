@@ -1,6 +1,6 @@
 import type { GroupSession } from 'src/types/CoachingTypes';
 import eye from 'src/assets/icons/eye.svg';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 export default function GroupCallRecordRow({
   groupCall,

@@ -1,0 +1,97 @@
+.vocabTagContainer {
+  position: relative; // Positioning context for the popup
+  display: inline-block;
+  padding: 0px;
+
+  .vocabTag {
+    font-size: 14px;
+    margin: 0.25rem;
+    min-height: 0;
+    padding: 4px;
+
+    &:hover {
+      scale: 1.15;
+    }
+
+    &.selected {
+      scale: 1.15;
+      background-color: var(--theme);
+      border: 4px solid var(--theme);
+      color: var(--light);
+
+      &:hover {
+        scale: 1.15;
+      }
+    }
+  }
+
+  // VocabInfo popup styles
+  .vocabInfo {
+    position: absolute;
+    bottom: 100%;
+    color: var(--light);
+    background-color: var(--theme);
+    // border: 4px solid var(--brand);
+    padding: 12px;
+    // margin-bottom: 4px;
+    z-index: 1000;
+    min-width: 200px;
+    max-width: 350px;
+
+    .vocabInfoHeader {
+      margin-bottom: 6px;
+
+      h4 {
+        margin: 0 0 2px 0;
+        color: var(--light);
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      p {
+        margin: 0;
+        // color: var(--dark);
+        font-size: 12px;
+        font-style: italic;
+      }
+    }
+
+    .nonVerbInfo,
+    .verbInfo {
+      p {
+        margin: 2px 0;
+        font-size: 11px;
+        // color: var(--dark);
+
+        &:first-child {
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .lessonsList {
+    margin-top: 12px;
+
+    .inline-loading {
+      font-size: 12px;
+      color: var(--light);
+    }
+
+    h4 {
+      margin: 0;
+      margin-bottom: 4px;
+      font-size: 14px;
+      color: var(--light);
+      font-weight: bold;
+    }
+
+    .lessonItem {
+      font-size: 11px;
+
+      &.mainCourse {
+        font-weight: bold;
+      }
+    }
+  }
+}

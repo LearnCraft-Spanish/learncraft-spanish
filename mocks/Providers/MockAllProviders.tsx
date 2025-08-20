@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
+import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
+import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
+import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
+import { ModalProvider } from '@composition/providers/ModalProvider';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { ContextualMenuProvider } from 'src/providers/ContextualMenuProvider';
-import { ModalProvider } from 'src/providers/ModalProvider';
 import MockQueryClientProvider from './MockQueryClient';
 
 interface contextProps {
@@ -20,17 +22,21 @@ export default function MockAllProviders({
       <ContextualMenuProvider>
         <ModalProvider>
           <MockQueryClientProvider>
-            {route === '/' && (
-              <MockQueryClientProvider>{children}</MockQueryClientProvider>
-            )}
-            {route !== '/' && (
-              <Routes>
-                <Route
-                  path={`${route}${childRoutes ? '/*' : ''}`}
-                  element={children}
-                />
-              </Routes>
-            )}
+            <ActiveStudentProvider>
+              <SelectedCourseAndLessonsProvider>
+                {route === '/' && (
+                  <MockQueryClientProvider>{children}</MockQueryClientProvider>
+                )}
+                {route !== '/' && (
+                  <Routes>
+                    <Route
+                      path={`${route}${childRoutes ? '/*' : ''}`}
+                      element={children}
+                    />
+                  </Routes>
+                )}
+              </SelectedCourseAndLessonsProvider>
+            </ActiveStudentProvider>
           </MockQueryClientProvider>
         </ModalProvider>
       </ContextualMenuProvider>

@@ -1,14 +1,15 @@
+import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import mockUseFrequensay, {
   defaultResult,
-} from '@application/useCases/useFrequensay.mock';
+} from '@application/useCases/useFrequensay/useFrequensay.mock';
 import { render, screen } from '@testing-library/react';
-import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
+import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
 import { vi } from 'vitest';
 import FrequensayPage from './FrequensayPage';
-
 // Fix: Use a string to refer to the module path instead of an import variable
 vi.mock('@application/useCases/useFrequensay', () => {
   return {
+    default: () => mockUseFrequensay(),
     useFrequensay: () => mockUseFrequensay(),
   };
 });
@@ -21,7 +22,9 @@ describe('frequensayPage', () => {
   it('should render', () => {
     render(
       <TestQueryClientProvider>
-        <FrequensayPage />
+        <SelectedCourseAndLessonsProvider>
+          <FrequensayPage />
+        </SelectedCourseAndLessonsProvider>
       </TestQueryClientProvider>,
     );
 
@@ -37,7 +40,9 @@ describe('frequensayPage', () => {
 
     render(
       <TestQueryClientProvider>
-        <FrequensayPage />
+        <SelectedCourseAndLessonsProvider>
+          <FrequensayPage />
+        </SelectedCourseAndLessonsProvider>
       </TestQueryClientProvider>,
     );
 
@@ -57,7 +62,9 @@ describe('frequensayPage', () => {
 
     render(
       <TestQueryClientProvider>
-        <FrequensayPage />
+        <SelectedCourseAndLessonsProvider>
+          <FrequensayPage />
+        </SelectedCourseAndLessonsProvider>
       </TestQueryClientProvider>,
     );
 

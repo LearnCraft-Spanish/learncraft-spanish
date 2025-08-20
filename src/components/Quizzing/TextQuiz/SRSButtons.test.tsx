@@ -7,8 +7,10 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import { sampleStudentFlashcardData } from 'tests/mockData';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -70,6 +72,15 @@ describe('component SRSButtons', () => {
   });
 
   it('answer showing and no difficulty set, shows setting buttons', async () => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isStudent: true,
+      },
+      {
+        isOwnUser: true,
+      },
+    );
     render(
       <MockAllProviders>
         <SRSQuizButtons
@@ -91,6 +102,15 @@ describe('component SRSButtons', () => {
   */
   describe('onClick functions', () => {
     it('increaseDifficulty', async () => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isStudent: true,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
       const { result } = renderHook(() => useStudentFlashcards(), {
         wrapper: MockAllProviders,
       });
@@ -117,6 +137,15 @@ describe('component SRSButtons', () => {
       expect(incrementExampleNumber).toHaveBeenCalled();
     });
     it('decreaseDifficulty', async () => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isStudent: true,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
       const { result } = renderHook(() => useStudentFlashcards(), {
         wrapper: MockAllProviders,
       });
@@ -145,6 +174,15 @@ describe('component SRSButtons', () => {
   });
   describe('handing of undefined values', () => {
     it('doesnt call incrementExample when error finding relatedExample', async () => {
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isStudent: true,
+        },
+        {
+          isOwnUser: true,
+        },
+      );
       render(
         <MockAllProviders>
           <SRSQuizButtons

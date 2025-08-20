@@ -1,5 +1,5 @@
+import useNonVerbCreation from '@application/useCases/useNonVerbCreation';
 import React from 'react';
-import { useNonVerbCreation } from '../../../application/useCases/useNonVerbCreation';
 import { PasteTable } from '../PasteTable/PasteTable';
 import { PaginatedVocabularyTable } from '../VocabularyTable/PaginatedVocabularyTable';
 import './VocabularyCreator.scss';

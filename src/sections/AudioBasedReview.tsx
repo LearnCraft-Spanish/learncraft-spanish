@@ -1,15 +1,15 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import React, { useMemo, useState } from 'react';
-import { Navigate } from 'react-router-dom';
 
+import { Navigate } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 import AudioQuizSetupMenu from 'src/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
+import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
-import { useActiveStudent } from 'src/hooks/UserData/useActiveStudent';
-import { useUserData } from 'src/hooks/UserData/useUserData';
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
+import { useFilterExamplesBySelectedLesson } from 'src/hooks/useFilterExamplesBySelectedLesson';
 import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
 import 'src/App.css';
 import 'src/components/Quizzing/AudioQuiz/AudioBasedReview.css';
@@ -23,32 +23,33 @@ export default function AudioBasedReview({
   audioOrComprehension = 'comprehension',
   willAutoplay,
 }: AudioBasedReviewProps) {
-  const userDataQuery = useUserData();
-  const { activeStudentQuery } = useActiveStudent();
-  const { filterExamplesBySelectedLesson } = useSelectedLesson();
+  const { isAuthenticated, isAdmin, isCoach } = useAuthAdapter();
+  const {
+    appUser,
+    isLoading: appUserLoading,
+    error: appUserError,
+  } = useActiveStudent();
+  const { filterExamplesBySelectedLesson } =
+    useFilterExamplesBySelectedLesson();
   const { audioExamplesQuery } = useAudioExamples();
   const { programTableQuery } = useProgramTable();
 
   // Define data readiness for UI updates
   const dataReady =
-    userDataQuery.isSuccess &&
-    activeStudentQuery.isSuccess &&
+    isAuthenticated &&
+    appUser &&
     programTableQuery.isSuccess &&
     audioExamplesQuery.isSuccess &&
-    (userDataQuery.data?.roles.adminRole === 'coach' ||
-      userDataQuery.data?.roles.adminRole === 'admin' ||
-      activeStudentQuery.data?.role === 'student' ||
-      activeStudentQuery.data?.role === 'limited');
+    (isAdmin ||
+      isCoach ||
+      appUser?.studentRole === 'student' ||
+      appUser?.studentRole === 'limited');
   const isError =
     !dataReady &&
-    (userDataQuery.isError ||
-      programTableQuery.isError ||
-      audioExamplesQuery.isError ||
-      activeStudentQuery.isError);
+    (programTableQuery.isError || audioExamplesQuery.isError || appUserError);
   const isLoading =
     !dataReady &&
-    (activeStudentQuery.isLoading ||
-      userDataQuery.isLoading ||
+    (appUserLoading ||
       programTableQuery.isLoading ||
       audioExamplesQuery.isLoading);
   const unavailable = !dataReady && !isLoading && !isError;

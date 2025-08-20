@@ -65,13 +65,11 @@ afterEach(() => {
 #### Key Features:
 
 1. **Clean test isolation**:
-
    - `beforeEach`: Sets up adapter mocks fresh before each test
    - `afterEach`: Clears mock call history after each test
    - Tests run with isolated mocks, preventing cross-test contamination
 
 2. **Hexagonal architecture support**:
-
    - Adapters are mocked centrally following hexagonal architecture patterns
    - Real implementations are replaced with test mocks
 
@@ -105,12 +103,10 @@ This approach provides a safety net if the global setup doesn't work, but using 
 ### Mock Management Flow
 
 1. **Before each test**:
-
    - `setupAdapterMocks()` replaces real adapter implementations with mocks
    - Each test starts with the default mock implementation
 
 2. **During a test**:
-
    - Tests can use `overrideMockAdapter({...})` functions to customize mocks for that specific test
    - Tests run with isolated mock configurations
 

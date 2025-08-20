@@ -1,16 +1,16 @@
 import type { Lesson } from 'src/types/CoachingTypes';
 import type { EditableLesson, NewLesson } from '../types';
 import { useState } from 'react';
-import ContextualView from 'src/components/Contextual/ContextualView';
 import {
   Dropdown,
   FormControls,
   TextInput,
 } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import useLessonsTable from 'src/hooks/StudentRecordsData/useLessonsTable';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
-import { useModal } from 'src/hooks/useModal';
 import { lessonTypes } from '../constants';
 
 export default function EditLessonView({

@@ -1,6 +1,4 @@
 import type { GroupSessionWithAttendees } from 'src/types/CoachingTypes';
-import ContextualView from 'src/components/Contextual/ContextualView';
-
 import {
   DateInput,
   Dropdown,
@@ -8,7 +6,9 @@ import {
   TextAreaInput,
 } from 'src/components/FormComponents';
 
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
+import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 // const sessionTypeOptions = [
 //   '1MC',

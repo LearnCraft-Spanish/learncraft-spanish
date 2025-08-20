@@ -1,23 +1,26 @@
-import type { Lesson } from 'src/types/interfaceDefinitions';
-import { getLessonNumber } from './helpers';
+import type { Lesson } from '@learncraft-spanish/shared';
 
 export default function SelectLesson({
   value,
   onChange,
   label,
   lessons,
+  required,
+  id,
 }: {
   value: string;
   onChange: (value: string) => void;
   label: string;
   lessons: Lesson[];
+  required?: boolean;
+  id: string;
 }) {
   return (
-    <label htmlFor="toLesson" className="menuRow" id="toRow">
-      <p>{label}:</p>
+    <label htmlFor={id} className="menuRow" id={id}>
+      <p className={required ? 'required' : ''}>{`${label}:`}</p>
       <select
-        id="toLesson"
-        name="toLesson"
+        id={id}
+        name={id}
         className="lessonList"
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -32,13 +35,9 @@ export default function SelectLesson({
 }
 
 function makeLessonOption(lesson: Lesson) {
-  const lessonNumber = getLessonNumber(lesson);
-  if (!lessonNumber) {
-    return null;
-  }
   return (
-    <option key={lessonNumber} value={lesson.recordId.toString()}>
-      {`Lesson ${lessonNumber}`}
+    <option key={lesson.lessonNumber} value={lesson.lessonNumber}>
+      {`Lesson ${lesson.lessonNumber}`}
     </option>
   );
 }

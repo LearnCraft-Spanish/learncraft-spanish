@@ -1,3 +1,4 @@
+import Providers from '@composition/providers/Providers';
 import * as Sentry from '@sentry/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -5,7 +6,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-import Providers from './providers/Providers';
 import './index.css';
 
 const rootElement = document.getElementById('root');
@@ -15,7 +15,17 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 
 // Move QueryClient outside BrowserRouter and Providers
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,
+      gcTime: Infinity,
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+    },
+  },
+});
 
 root.render(
   <React.StrictMode>

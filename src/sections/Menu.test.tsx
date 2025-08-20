@@ -1,11 +1,19 @@
-import type { TestUserNames } from 'mocks/data/serverlike/userTable';
+import type { AppUser } from '@learncraft-spanish/shared';
+import type {
+  TestUserEmails,
+  TestUserNames,
+} from 'mocks/data/serverlike/userTable';
+import type { AuthUser } from 'src/hexagon/application/ports/authPort';
+
 import { render, screen, waitFor } from '@testing-library/react';
-import { allUsersTable } from 'mocks/data/serverlike/userTable';
+import {
+  appUserTable,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-
-import { setupMockAuth } from 'tests/setupMockAuth';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
 import Menu from './Menu';
 
@@ -25,7 +33,13 @@ async function renderMenuLoaded() {
 describe('component Menu', () => {
   describe('loading', () => {
     beforeEach(() => {
-      setupMockAuth({ isLoading: true });
+      overrideAuthAndAppUser(
+        {
+          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+          isLoading: true,
+        },
+        { isOwnUser: true },
+      );
     });
     it('render "Loading Menu..."', async () => {
       render(
@@ -44,26 +58,40 @@ describe('component Menu', () => {
     const userCases: {
       name: TestUserNames;
       roles: string[];
+      appUser: AppUser;
+      authUser: AuthUser;
     }[] = [];
 
-    allUsersTable.forEach((user) => {
+    appUserTable.forEach((user) => {
       const roles = [];
-      if (user.roles.studentRole) {
-        roles.push(user.roles.studentRole);
-      }
-      if (user.roles.adminRole) {
-        roles.push(user.roles.adminRole);
+      if (user.studentRole) {
+        roles.push(user.studentRole);
       }
       userCases.push({
         name: user.name as TestUserNames,
         roles,
+        appUser: user,
+        authUser: getAuthUserFromEmail(
+          user.emailAddress as TestUserEmails,
+        ) as AuthUser,
       });
     });
 
     userCases.forEach((userCase) => {
       describe(`case: ${userCase.name}`, () => {
         beforeEach(() => {
-          setupMockAuth({ userName: userCase.name });
+          overrideAuthAndAppUser(
+            {
+              authUser: userCase.authUser,
+              isStudent: userCase.roles.includes('student'),
+              isAdmin: userCase.roles.includes('admin'),
+              isCoach: userCase.roles.includes('coach'),
+              isLimited: userCase.roles.includes('limited'),
+            },
+            {
+              isOwnUser: true,
+            },
+          );
         });
 
         // My Flashcards

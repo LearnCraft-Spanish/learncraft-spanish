@@ -1,4 +1,4 @@
-import type { Subcategory } from '@LearnCraft-Spanish/shared/src/domain/vocabulary/core-types';
+import type { Subcategory } from '@learncraft-spanish/shared/src/domain/vocabulary/core-types';
 
 /**
  * Port for subcategory operations.
@@ -9,9 +9,4 @@ export interface SubcategoryPort {
    * Get all available subcategories
    */
   getSubcategories: () => Promise<Subcategory[]>;
-
-  /**
-   * Get a subcategory by ID
-   */
-  getSubcategoryById: (id: string) => Promise<Subcategory | null>;
 }

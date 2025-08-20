@@ -4,8 +4,8 @@ import React, { useMemo, useState } from 'react';
 
 import { CoachDropdown, Dropdown } from 'src/components/FormComponents';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
-import { useContextualMenu } from 'src/hooks/useContextualMenu';
 
 import getDateRange from '../../general/functions/dateRange';
 import useDateRange from '../useDateRange';

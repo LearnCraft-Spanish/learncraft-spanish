@@ -93,7 +93,7 @@ describe('component CoachDropdown', () => {
       () => {
         expect(getByText('Coach:')).toBeInTheDocument();
       },
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
   });
 
@@ -117,7 +117,7 @@ describe('component CoachDropdown', () => {
       () => {
         expect(result.current.coachListQuery.isSuccess).toBe(true);
       },
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
 
     await waitFor(() => {

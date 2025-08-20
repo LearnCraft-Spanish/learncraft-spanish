@@ -1,69 +1,69 @@
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useMemo } from 'react';
-// MOVE THIS INTO HEXAGON
-import { useSelectedLesson } from 'src/hooks/useSelectedLesson';
-import { getLessonNumber } from './helpers';
 import SelectCourse from './SelectCourse';
 import SelectLesson from './SelectLesson';
 import './LessonSelector.css';
 
 export default function LessonRangeSelector(): React.JSX.Element {
   const {
-    selectedProgram,
-    selectedToLesson,
-    selectedFromLesson,
-    setProgram,
-    setToLesson,
-    setFromLesson,
-  } = useSelectedLesson();
+    course,
+    toLesson,
+    fromLesson,
+    updateUserSelectedCourseId,
+    updateToLessonNumber,
+    updateFromLessonNumber,
+  } = useSelectedCourseAndLessons();
 
   const fromLessons = useMemo(() => {
-    const toLessonNumber = getLessonNumber(selectedToLesson);
-    if (!toLessonNumber) {
+    if (!course || !toLesson) {
       return [];
     }
-    return selectedProgram?.lessons.filter((lesson) => {
-      const lessonNumber = getLessonNumber(lesson);
-      if (!lessonNumber) {
-        return false;
-      }
-      return lessonNumber <= toLessonNumber;
+    return course?.lessons.filter((lesson) => {
+      return lesson.lessonNumber <= toLesson?.lessonNumber;
     });
-  }, [selectedProgram, selectedToLesson]);
+  }, [course, toLesson]);
 
   const toLessons = useMemo(() => {
-    const fromLessonNumber = getLessonNumber(selectedFromLesson);
-    if (!fromLessonNumber) {
+    if (!course) {
       return [];
     }
-    return selectedProgram?.lessons.filter((lesson) => {
-      const lessonNumber = getLessonNumber(lesson);
-      if (!lessonNumber) {
-        return false;
-      }
-      return lessonNumber >= fromLessonNumber;
+    if (!fromLesson) {
+      return course?.lessons;
+    }
+    return course?.lessons.filter((lesson) => {
+      return lesson.lessonNumber >= fromLesson?.lessonNumber;
     });
-  }, [selectedProgram, selectedFromLesson]);
+  }, [course, fromLesson]);
 
   return (
     <div className="FTLS">
       <SelectCourse
-        value={selectedProgram?.recordId.toString() ?? '0'}
-        onChange={(value: string) => setProgram(value)}
+        value={course?.id.toString() ?? '0'}
+        onChange={(value: string) =>
+          updateUserSelectedCourseId(Number.parseInt(value))
+        }
       />
       <div>
-        {selectedProgram?.lessons && (
+        {course?.lessons && (
           <SelectLesson
-            value={selectedFromLesson?.recordId.toString() ?? '0'}
-            onChange={(value: string) => setFromLesson(value)}
+            value={fromLesson?.lessonNumber.toString() ?? '0'}
+            onChange={(value: string) =>
+              updateFromLessonNumber(Number.parseInt(value))
+            }
             label="From"
+            id="fromLesson"
             lessons={fromLessons ?? []}
           />
         )}
         <SelectLesson
-          value={selectedToLesson?.recordId.toString() ?? '0'}
-          onChange={(value: string) => setToLesson(value)}
+          value={toLesson?.lessonNumber.toString() ?? '0'}
+          onChange={(value: string) =>
+            updateToLessonNumber(Number.parseInt(value))
+          }
           label="To"
+          id="toLesson"
           lessons={toLessons ?? []}
+          required
         />
       </div>
     </div>

@@ -1,13 +1,15 @@
-import type { mockUserNames } from 'src/types/interfaceDefinitions';
-
 import { renderHook, waitFor } from '@testing-library/react';
 import { examples } from 'mocks/data/examples.json';
-import { allStudentsTable } from 'mocks/data/serverlike/studentTable';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { setupMockAuth } from 'tests/setupMockAuth';
-import { beforeEach, describe, expect, it } from 'vitest';
+import {
+  appUserTable,
+  getAuthUserFromEmail,
+} from 'mocks/data/serverlike/userTable';
 
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { useStudentFlashcards } from './useStudentFlashcards';
+
 async function renderHookSuccessfully() {
   const { result } = renderHook(useStudentFlashcards, {
     wrapper: MockAllProviders,
@@ -27,13 +29,22 @@ async function renderHookSuccessfully() {
 
 describe('test by role', () => {
   describe('user is student with flashcards', () => {
-    const studentUsers = allStudentsTable.filter(
+    const studentUsers = appUserTable.filter(
       (student) =>
-        student.role === 'student' && student.name !== 'student-no-flashcards',
+        student.studentRole === 'student' &&
+        student.name !== 'student-no-flashcards',
     );
     for (const student of studentUsers) {
       beforeEach(() => {
-        setupMockAuth({ userName: student.name as mockUserNames });
+        overrideAuthAndAppUser({
+          // Non-null assertion: We're only getting student users from the list.
+          authUser: getAuthUserFromEmail(student.emailAddress)!,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: true,
+          isLimited: false,
+        });
       });
       it(`${student.name}: has flashcard data`, async () => {
         const {
@@ -59,12 +70,19 @@ describe('test by role', () => {
     }
   });
   describe('user is not student', () => {
-    const nonStudentUsers = allStudentsTable.filter(
-      (student) => student.role !== 'student',
+    const nonStudentUsers = appUserTable.filter(
+      (student) => student.studentRole !== 'student',
     );
     for (const student of nonStudentUsers) {
       beforeEach(() => {
-        setupMockAuth({ userName: student.name as mockUserNames });
+        overrideAuthAndAppUser({
+          authUser: getAuthUserFromEmail(student.emailAddress) ?? undefined,
+          isAuthenticated: true,
+          isAdmin: false,
+          isCoach: false,
+          isStudent: false,
+          isLimited: false,
+        });
       });
       it(`${student.name}: flashcardDataQuery throws an error`, async () => {
         const { result } = renderHook(useStudentFlashcards, {
@@ -80,7 +98,14 @@ describe('test by role', () => {
 
 describe('removeFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideAuthAndAppUser({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('removes a flashcard successfully', async () => {
     // Initial Render
@@ -136,7 +161,14 @@ describe('removeFlashcardMutation', () => {
 });
 describe('addFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideAuthAndAppUser({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('adds a flashcard successfully', async () => {
     // Initial Render
@@ -200,7 +232,14 @@ describe('addFlashcardMutation', () => {
 
 describe('updateFlashcardMutation', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideAuthAndAppUser({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it("updates a flashcard's review interval successfully", async () => {
     // Initial Render
@@ -268,7 +307,14 @@ describe('updateFlashcardMutation', () => {
 });
 describe('exampleIsCollected', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideAuthAndAppUser({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('returns true if example is collected', async () => {
     // Initial Render
@@ -291,7 +337,14 @@ describe('exampleIsCollected', () => {
 
 describe('exampleIsPending', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideAuthAndAppUser({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('returns true if example is pending', async () => {
     // Initial Render

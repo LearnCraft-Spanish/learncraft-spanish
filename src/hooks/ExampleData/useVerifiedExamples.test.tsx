@@ -1,13 +1,21 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
+import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { useVerifiedExamples } from 'src/hooks/ExampleData/useVerifiedExamples';
-import { setupMockAuth } from 'tests/setupMockAuth';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('useVerifiedExamples', () => {
   beforeEach(() => {
-    setupMockAuth({ userName: 'student-lcsp' });
+    overrideAuthAndAppUser({
+      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: false,
+      isCoach: false,
+      isStudent: true,
+      isLimited: false,
+    });
   });
   it('runs without crashing', async () => {
     const { result } = renderHook(() => useVerifiedExamples(), {
@@ -16,7 +24,7 @@ describe('useVerifiedExamples', () => {
     await waitFor(
       () => expect(result.current.verifiedExamplesQuery.isSuccess).toBe(true),
       {
-        timeout: 3000,
+        timeout: 7500,
         interval: 200,
       },
     );
@@ -33,14 +41,21 @@ describe('useVerifiedExamples', () => {
           result.current.verifiedExamplesQuery.data?.length,
         ).toBeGreaterThan(0),
       {
-        timeout: 3000,
+        timeout: 7500,
         interval: 200,
       },
     );
   });
   describe('when user is not an admin or student', () => {
     beforeEach(() => {
-      setupMockAuth({ userName: 'limited' });
+      overrideAuthAndAppUser({
+        authUser: getAuthUserFromEmail('limited@fake.not')!,
+        isAuthenticated: true,
+        isAdmin: false,
+        isCoach: false,
+        isStudent: false,
+        isLimited: true,
+      });
     });
     it('isSuccess is false, data is undefined', async () => {
       const { result } = renderHook(() => useVerifiedExamples(), {

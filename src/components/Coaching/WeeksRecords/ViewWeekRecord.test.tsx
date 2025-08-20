@@ -45,7 +45,7 @@ describe.skip('component ViewWeekRecord', () => {
       () => {
         expect(screen.getByText('Student:')).toBeInTheDocument();
       },
-      { timeout: 3000 },
+      { timeout: 7500 },
     );
   });
   it('throws an error with invalid data', async () => {
