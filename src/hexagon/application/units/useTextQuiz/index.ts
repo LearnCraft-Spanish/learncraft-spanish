@@ -1,5 +1,5 @@
 import type { VocabInfo } from '@application/units/useVocabInfo';
-import type { Answer, FlashcardDisplay, Question } from '@domain/quizzing';
+import type { Answer, FlashcardForDisplay, Question } from '@domain/quizzing';
 import type {
   ExampleWithVocabulary,
   Vocabulary,
@@ -8,15 +8,17 @@ import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useVocabInfo } from '@application/units/useVocabInfo';
 import { useState } from 'react';
 
-interface TextQuizProps {
+export interface TextQuizProps {
   examples: ExampleWithVocabulary[];
   startWithSpanish: boolean;
   canCollectFlashcards: boolean;
 }
 
-interface TextQuizReturn {
+export interface TextQuizReturn {
+  addFlashcard: () => void;
+  removeFlashcard: () => void;
   canCollectFlashcards: boolean;
-  quizExample: FlashcardDisplay;
+  quizExample: FlashcardForDisplay;
   nextExample: () => void;
   previousExample: () => void;
   exampleNumber: number;
@@ -29,8 +31,13 @@ export const useTextQuiz = ({
   canCollectFlashcards,
   startWithSpanish = false,
 }: TextQuizProps): TextQuizReturn => {
-  const { isFlashcardCollected, createFlashcards, deleteFlashcards } =
-    useStudentFlashcards();
+  const {
+    isExampleCollected,
+    createFlashcards,
+    deleteFlashcards,
+    isCustomFlashcard,
+    isPendingFlashcard,
+  } = useStudentFlashcards();
   const vocabInfoHook = useVocabInfo;
 
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
@@ -47,21 +54,21 @@ export const useTextQuiz = ({
     }
   };
 
-  const addFlashcard = (flashcardId: number) => {
-    if (isFlashcardCollected(flashcardId)) {
-      return;
-    }
-    createFlashcards([flashcardId]);
-  };
-
-  const removeFlashcard = (flashcardId: number) => {
-    if (!isFlashcardCollected(flashcardId)) {
-      return;
-    }
-    deleteFlashcards([flashcardId]);
-  };
-
   const currentExample: ExampleWithVocabulary = examples[currentExampleIndex];
+
+  const addFlashcard = () => {
+    if (isExampleCollected(currentExample.id)) {
+      return;
+    }
+    createFlashcards([currentExample.id]);
+  };
+
+  const removeFlashcard = () => {
+    if (!isExampleCollected(currentExample.id)) {
+      return;
+    }
+    deleteFlashcards([currentExample.id]);
+  };
 
   const exampleNumber = currentExampleIndex + 1;
   const quizLength = examples.length;
@@ -78,19 +85,24 @@ export const useTextQuiz = ({
     text: currentExample.english,
     hasAudio: !!currentExample.englishAudio,
     audioUrl: currentExample.englishAudio,
-    owned: isFlashcardCollected(currentExample.id),
+    owned: isExampleCollected(currentExample.id),
     addFlashcard,
     removeFlashcard,
     vocabulary: currentExample.vocabulary,
     vocabComplete: currentExample.vocabularyComplete,
   };
 
-  const quizExample: FlashcardDisplay = {
+  const quizExample: FlashcardForDisplay = {
     question,
     answer,
+    exampleIsCollected: isExampleCollected(currentExample.id),
+    exampleIsCustom: isCustomFlashcard(currentExample.id),
+    exampleIsPending: isPendingFlashcard(currentExample.id),
   };
 
   return {
+    addFlashcard,
+    removeFlashcard,
     canCollectFlashcards,
     quizExample,
     exampleNumber,

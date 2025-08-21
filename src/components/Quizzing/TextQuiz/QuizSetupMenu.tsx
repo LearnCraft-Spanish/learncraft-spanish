@@ -1,118 +1,38 @@
-import type { StudentExample } from 'src/types/interfaceDefinitions';
+import type { QuizSetupOptions } from '@application/useCases/useQuizMyFlashcards';
 import React, { useMemo } from 'react';
 import MenuButton from 'src/components/Buttons/MenuButton';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 interface QuizSetupMenuProps {
-  examplesToParse: StudentExample[] | undefined;
-  // setExamplesToParse: (examples: StudentExample[] | undefined) => void;
-  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  quizType: 'text' | 'audio';
-  setQuizType: (quizType: 'text' | 'audio') => void;
-  quizLength: number;
-  setQuizLength: (quizLength: number) => void;
-  customOnly: boolean;
-  setCustomOnly: (customOnly: boolean) => void;
-  isSrs: boolean;
-  setIsSrs: (isSrs: boolean) => void;
-  spanishFirst: boolean;
-  setSpanishFirst: (spanishFirst: boolean) => void;
-  autoplay: boolean;
-  setAutoplay: (autoplay: boolean) => void;
-  audioOrComprehension: 'audio' | 'comprehension';
-  setAudioOrComprehension: (
-    audioOrComprehension: 'audio' | 'comprehension',
-  ) => void;
+  options: QuizSetupOptions;
 }
-export default function QuizSetupMenu({
-  examplesToParse,
-  handleSubmit,
-  quizLength,
-  setQuizLength,
-  quizType,
-  setQuizType,
-  customOnly,
-  setCustomOnly,
-  isSrs,
-  setIsSrs,
-  spanishFirst,
-  setSpanishFirst,
-  autoplay,
-  setAutoplay,
-  audioOrComprehension,
-  setAudioOrComprehension,
-}: QuizSetupMenuProps) {
-  const { flashcardDataQuery } = useStudentFlashcards();
-  const hasCustomExamples = useMemo(() => {
-    return flashcardDataQuery.data?.studentExamples?.some(
-      (studentExample) => studentExample?.coachAdded,
-    );
-  }, [flashcardDataQuery.data?.studentExamples]);
-
-  // const [quizLength, setQuizLength] = useState(10);
-
+export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
+  const {
+    availableFlashcards,
+    srsQuiz,
+    setSrsQuiz,
+    customOnly,
+    setCustomOnly,
+    startWithSpanish,
+    setStartWithSpanish,
+    quizLength,
+    setQuizLength,
+    startQuiz,
+  } = options;
   const calculateQuizLengthOptions = useMemo(() => {
-    let currentAllowedExamples = examplesToParse;
-    if (customOnly) {
-      currentAllowedExamples = flashcardDataQuery.data?.studentExamples?.filter(
-        (studentExample) => studentExample.coachAdded,
-      );
-    }
-    if (quizType === 'audio') {
-      // Get Examples from current allowed studentExamples
-      // Foreign Key lookup, form data in backend
-      const currentExamples = currentAllowedExamples?.map((studentExample) => {
-        return flashcardDataQuery.data?.examples.find(
-          (example) => example.recordId === studentExample.relatedExample,
-        );
-      });
-      // Filter out examples without audio
-      const allowedCurrentExamples = currentExamples?.filter(
-        (example) =>
-          example?.englishAudio?.length && example?.englishAudio?.length > 0,
-      );
-      // Filter out studentExamples that don't have an example (with audio)
-      // Foreign Key lookup, form data in backend
-      currentAllowedExamples = currentAllowedExamples?.filter(
-        (studentExample) =>
-          allowedCurrentExamples?.find(
-            (example) => example?.recordId === studentExample?.relatedExample,
-          ),
-      );
-    } else {
-      if (isSrs) {
-        currentAllowedExamples = currentAllowedExamples?.filter(
-          (studentExample) =>
-            studentExample.nextReviewDate
-              ? new Date(studentExample.nextReviewDate) <= new Date()
-              : true,
-        );
-      }
-    }
-    if (!currentAllowedExamples?.length) {
-      return [0];
-    }
     // Calculate quiz length options
-    const exampleCount = currentAllowedExamples.length;
+    const exampleCount = options.availableFlashcards.length;
     const quizLengthOptions = [];
-    if (currentAllowedExamples?.length > 5) {
+    if (options.availableFlashcards?.length > 5) {
       for (let i = 5; i < exampleCount; i = i * 2) {
         quizLengthOptions.push(i);
       }
     }
     quizLengthOptions.push(exampleCount);
     return quizLengthOptions;
-  }, [
-    customOnly,
-    examplesToParse,
-    flashcardDataQuery.data?.examples,
-    flashcardDataQuery.data?.studentExamples,
-    isSrs,
-    quizType,
-  ]);
+  }, [options.availableFlashcards]);
 
   return (
-    <form className="myFlashcardsForm" onSubmit={(e) => handleSubmit(e)}>
+    <form className="myFlashcardsForm" onSubmit={startQuiz}>
       <div className="myFlashcardsFormContentWrapper">
         <h3>Review My Flashcards</h3>
         <h4>Quiz Type:</h4>
@@ -143,8 +63,8 @@ export default function QuizSetupMenu({
                   type="checkbox"
                   name="Spanish First"
                   id="spanishFirst"
-                  checked={spanishFirst}
-                  onChange={(e) => setSpanishFirst(e.target.checked)}
+                  checked={startWithSpanish}
+                  onChange={(e) => setStartWithSpanish(e.target.checked)}
                 />
                 <span className="slider round"></span>
               </label>
@@ -156,8 +76,8 @@ export default function QuizSetupMenu({
                   type="checkbox"
                   name="Srs"
                   id="isSrs"
-                  checked={isSrs}
-                  onChange={(e) => setIsSrs(e.target.checked)}
+                  checked={srsQuiz}
+                  onChange={(e) => setSrsQuiz(e.target.checked)}
                 />
                 <span className="slider round"></span>
               </label>

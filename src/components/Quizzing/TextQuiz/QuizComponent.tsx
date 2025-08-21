@@ -1,69 +1,51 @@
-import type { DisplayOrder, Flashcard } from 'src/types/interfaceDefinitions';
-
-import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import type { TextQuizReturn } from 'src/hexagon/application/units/useTextQuiz';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import MenuButton from 'src/components/Buttons/MenuButton';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
-import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import QuizProgress from '../QuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
-import SRSQuizButtons from './SRSButtons';
 
 interface QuizComponentProps {
-  quizTitle: string;
-  examplesToParse: readonly Flashcard[];
-  startWithSpanish?: boolean;
-  quizOnlyCollectedExamples?: boolean;
-  quizOnlyCustomExamples?: boolean;
-  isSrsQuiz?: boolean;
+  hook: TextQuizReturn;
   cleanupFunction?: () => void;
-  quizLength?: number;
 }
 
 export default function QuizComponent({
-  quizTitle, // Interface concern
-  examplesToParse, // Should have been parsed already
-  startWithSpanish = false, // Should have been parsed already
-  quizOnlyCollectedExamples = false, // Should have been parsed already
-  isSrsQuiz = false, // Should have been parsed already
-  quizOnlyCustomExamples = false, // Should have been parsed already
-  cleanupFunction, // Internal application logic
-  quizLength = 100, // Should have been parsed already
+  hook,
+  cleanupFunction,
 }: QuizComponentProps) {
+  const {
+    exampleNumber,
+    quizExample,
+    quizLength,
+    nextExample,
+    previousExample,
+    addFlashcard,
+    removeFlashcard,
+  } = hook;
+
   const location = useLocation();
-  const { appUser } = useActiveStudent();
-  const { flashcardDataQuery, exampleIsCollected, exampleIsCustom } =
-    useStudentFlashcards();
+  const isMainLocation = location.pathname.split('/').length < 2;
 
-  // Orders the examples from the quiz-examples set, examples refer to the data itself.
-  const initialDisplayOrder = useRef<DisplayOrder[]>([]);
-  const [displayOrder, setDisplayOrder] = useState<DisplayOrder[]>([]);
-  const [displayOrderReady, setDisplayOrderReady] = useState(false);
-
-  // Interactive states within the Quiz
   const [answerShowing, setAnswerShowing] = useState(false);
-  const [currentExampleNumber, setCurrentExampleNumber] = useState(1);
   const currentAudio = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
-  // currentExample should never be undefined... how to prevent?
-  const currentExample = examplesToParse.find((example) => {
-    const currentRecordId = displayOrder[currentExampleNumber - 1]?.recordId;
-    const exampleRecordId = example.recordId;
-    return currentRecordId === exampleRecordId;
-  });
-
-  // will need to second pass these variables:
-  const spanishShowing = startWithSpanish !== answerShowing;
-
-  const isMainLocation = location.pathname.split('/').length < 2;
-
   function hideAnswer() {
     setAnswerShowing(false);
+  }
+
+  function incrementExample() {
+    nextExample();
+    hideAnswer();
+  }
+
+  function decrementExample() {
+    previousExample();
+    hideAnswer();
   }
 
   const toggleAnswer = useCallback(() => {
@@ -73,42 +55,6 @@ export default function QuizComponent({
     setPlaying(false);
     setAnswerShowing(!answerShowing);
   }, [answerShowing]);
-
-  /*      Audio Component Section       */
-
-  const spanishAudioUrl = currentExample?.spanishAudioLa || undefined;
-  const englishAudioUrl = currentExample?.englishAudio || undefined;
-
-  const activeAudio: string | undefined = spanishShowing
-    ? spanishAudioUrl
-    : englishAudioUrl;
-
-  function spanishAudio() {
-    return (
-      spanishAudioUrl && (
-        <audio
-          ref={currentAudio}
-          src={spanishAudioUrl}
-          onEnded={() => setPlaying(false)}
-        />
-      )
-    );
-  }
-
-  function englishAudio() {
-    return (
-      englishAudioUrl && (
-        <audio
-          ref={currentAudio}
-          src={englishAudioUrl}
-          onEnded={() => setPlaying(false)}
-        />
-      )
-    );
-  }
-
-  const questionAudio = startWithSpanish ? spanishAudio : englishAudio;
-  const answerAudio = startWithSpanish ? englishAudio : spanishAudio;
 
   const playCurrentAudio = useCallback(() => {
     if (currentAudio.current?.duration) {
@@ -125,7 +71,7 @@ export default function QuizComponent({
   }, [currentAudio]);
 
   const togglePlaying = useCallback(() => {
-    if (!(spanishAudioUrl || englishAudioUrl)) {
+    if (!quizExample.question.audioUrl || !quizExample.answer.audioUrl) {
       return;
     }
     if (playing) {
@@ -134,184 +80,20 @@ export default function QuizComponent({
       playCurrentAudio();
     }
   }, [
-    spanishAudioUrl,
-    englishAudioUrl,
+    quizExample.question.audioUrl,
+    quizExample.answer.audioUrl,
     playing,
     pauseCurrentAudio,
     playCurrentAudio,
   ]);
 
-  /*     Increment/Decrement Through Examples       */
-  const incrementExampleNumber = useCallback(() => {
-    if (currentExampleNumber < displayOrder.length) {
-      const newExampleNumber = currentExampleNumber + 1;
-      setCurrentExampleNumber(newExampleNumber);
-    } else {
-      setCurrentExampleNumber(displayOrder.length);
-    }
-    hideAnswer();
-    setPlaying(false);
-  }, [currentExampleNumber, displayOrder]);
-
-  const decrementExampleNumber = useCallback(() => {
-    if (currentExampleNumber > 1) {
-      setCurrentExampleNumber(currentExampleNumber - 1);
-    } else {
-      setCurrentExampleNumber(1);
-    }
-    hideAnswer();
-    setPlaying(false);
-  }, [currentExampleNumber]);
-
-  function onRemove() {
-    if (quizOnlyCollectedExamples || isSrsQuiz) {
-      const quizLength = displayOrder.length;
-      if (currentExampleNumber >= quizLength) {
-        setCurrentExampleNumber(quizLength - 1);
-      }
-    } else {
-      incrementExampleNumber();
-    }
-  }
-
-  // Filter for reviewing only "My Flashcards"
-  const filterIfCollectedOnly = useCallback(
-    (displayOrderArray: DisplayOrder[]) => {
-      if (quizOnlyCollectedExamples || isSrsQuiz) {
-        const filteredList = displayOrderArray.filter((item) =>
-          exampleIsCollected(item.recordId),
-        );
-        return filteredList;
-      } else {
-        return displayOrderArray;
-      }
-    },
-    [quizOnlyCollectedExamples, isSrsQuiz, exampleIsCollected],
-  );
-
-  const filterIfCustomOnly = useCallback(
-    (displayOrderArray: DisplayOrder[]) => {
-      if (quizOnlyCustomExamples) {
-        const filteredList = displayOrderArray.filter((item) =>
-          exampleIsCustom(item.recordId),
-        );
-        return filteredList;
-      } else {
-        return displayOrderArray;
-      }
-    },
-    [quizOnlyCustomExamples, exampleIsCustom],
-  );
-
-  // Further filter for only SRS examples
-  const getStudentExampleFromExampleId = useCallback(
-    (exampleId: number) => {
-      // Foreign Key lookup, form data in backend
-      const relatedStudentExample =
-        flashcardDataQuery.data?.studentExamples.find(
-          (element) => element.relatedExample === exampleId,
-        );
-      return relatedStudentExample;
-    },
-    [flashcardDataQuery.data?.studentExamples],
-  );
-
-  const getDueDateFromExampleId = useCallback(
-    (exampleId: number) => {
-      const relatedStudentExample = getStudentExampleFromExampleId(exampleId);
-      if (!relatedStudentExample) {
-        return '';
-      }
-      const dueDate = relatedStudentExample.nextReviewDate;
-      return dueDate;
-    },
-    [getStudentExampleFromExampleId],
-  );
-
-  const filterByDueExamples = useCallback(
-    (displayOrder: DisplayOrder[]) => {
-      if (!isSrsQuiz) {
-        return displayOrder;
-      }
-      if (!flashcardDataQuery.data) {
-        return [];
-      }
-      const isBeforeToday = (dateArg: string) => {
-        const today = new Date();
-        const reviewDate = new Date(dateArg);
-        if (reviewDate >= today) {
-          return false;
-        }
-        return true;
-      };
-
-      const newDisplayOrder = displayOrder.filter((displayOrder) =>
-        isBeforeToday(getDueDateFromExampleId(displayOrder.recordId)),
-      );
-      return newDisplayOrder;
-    },
-    [getDueDateFromExampleId, isSrsQuiz, flashcardDataQuery.data],
-  );
-
-  const currentFlashcardIsValid = currentExample !== undefined;
-
-  // Randomizes the order of the quiz examples for display
-  // Runs only once to prevent re-scrambling while in use. Mutations handled elsewhere.
-  useEffect(() => {
-    if (examplesToParse.length > 0 && !displayOrderReady && quizLength) {
-      // Create a basic map of the flashcard objects with recordId and isCollected properties
-
-      const exampleOrder: DisplayOrder[] = examplesToParse.map((example) => {
-        return {
-          recordId: example.recordId,
-        };
-      });
-
-      // Randomize the order of the examples
-      const shuffledOrder = fisherYatesShuffle(exampleOrder);
-
-      // If collectedOnly or SRS, filter out uncollected examples
-      const filteredByCollected = filterIfCollectedOnly(shuffledOrder);
-
-      // If SRS, filter out examples not due for review
-      const filteredByDueDate = filterByDueExamples(filteredByCollected);
-
-      // If customOnly, filter out non-custom examples
-      const filteredByCustom = filterIfCustomOnly(filteredByDueDate);
-
-      // Limit the number of examples to the quizLength
-      const limitedOrder = filteredByCustom.slice(0, quizLength);
-
-      // Display the limited order if any are left
-      if (limitedOrder.length > 0) {
-        initialDisplayOrder.current = limitedOrder;
-        setDisplayOrderReady(true);
-      }
-    }
-  }, [
-    examplesToParse,
-    displayOrderReady,
-    quizLength,
-    filterIfCollectedOnly,
-    filterIfCustomOnly,
-    filterByDueExamples,
-  ]);
-
-  // Defines the actual list of items displayed as a mutable subset of the previous
-  useEffect(() => {
-    const filteredByCollected = filterIfCollectedOnly(
-      initialDisplayOrder.current,
-    );
-    setDisplayOrder(filteredByCollected);
-  }, [filterIfCollectedOnly]);
-
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight' || event.key === 'd') {
-        incrementExampleNumber();
+        nextExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
-        decrementExampleNumber();
+        previousExample();
       } else if (
         event.key === 'ArrowUp' ||
         event.key === 'ArrowDown' ||
@@ -325,12 +107,7 @@ export default function QuizComponent({
         togglePlaying();
       }
     },
-    [
-      incrementExampleNumber,
-      decrementExampleNumber,
-      toggleAnswer,
-      togglePlaying,
-    ],
+    [nextExample, previousExample, toggleAnswer, togglePlaying],
   );
 
   useEffect(() => {
@@ -343,51 +120,42 @@ export default function QuizComponent({
   return (
     <>
       <PMFPopup
-        timeToShowPopup={
-          Math.floor(displayOrder.length / 2) === currentExampleNumber
-        }
+        timeToShowPopup={Math.floor(quizLength / 2) === exampleNumber}
       />
-      {displayOrderReady &&
-        !!initialDisplayOrder.current.length &&
-        !displayOrder.length && <Navigate to=".." />}
-      {!displayOrder.length && !!examplesToParse.length && isSrsQuiz && (
-        <NoDueFlashcards />
-      )}
-      {!!displayOrder.length && (
+      {!quizLength && <NoDueFlashcards />}
+      {!!quizLength && (
         <div className="quiz">
           <QuizProgress
-            currentExampleNumber={currentExampleNumber}
-            totalExamplesNumber={displayOrder.length}
-            quizTitle={quizTitle}
+            currentExampleNumber={exampleNumber}
+            totalExamplesNumber={quizLength}
           />
-          {answerShowing ? answerAudio() : questionAudio()}
-          {currentFlashcardIsValid && (
-            <FlashcardDisplay
-              example={currentExample}
-              isStudent={appUser?.studentRole === 'student'}
-              incrementExampleNumber={incrementExampleNumber}
-              onRemove={onRemove}
-              answerShowing={answerShowing}
-              toggleAnswer={toggleAnswer}
-              togglePlaying={togglePlaying}
-              playing={playing}
-              audioActive={activeAudio}
-              startWithSpanish={startWithSpanish}
-            />
-          )}
+          {answerShowing
+            ? quizExample.answer.audioUrl
+            : quizExample.question.audioUrl}
+
+          <FlashcardDisplay
+            quizExample={quizExample}
+            addFlashcard={addFlashcard}
+            removeFlashcard={removeFlashcard}
+            answerShowing={answerShowing}
+            toggleAnswer={toggleAnswer}
+            togglePlaying={togglePlaying}
+            playing={playing}
+          />
           <div className="quizButtons">
-            {isSrsQuiz && currentFlashcardIsValid && (
+            {/* TODO: Add SRS buttons */}
+            {/*srsQuiz && (
               <SRSQuizButtons
-                currentExample={currentExample}
+                currentExample={quizExample}
                 answerShowing={answerShowing}
-                incrementExampleNumber={incrementExampleNumber}
+                incrementExampleNumber={nextExample}
               />
-            )}
+            )*/}
             <QuizButtons
-              decrementExample={decrementExampleNumber}
-              incrementExample={incrementExampleNumber}
-              firstExample={currentExampleNumber === 1}
-              lastExample={currentExampleNumber === displayOrder.length}
+              decrementExample={decrementExample}
+              incrementExample={incrementExample}
+              firstExample={exampleNumber === 1}
+              lastExample={exampleNumber === quizLength}
             />
             <div className="buttonBox">
               {!isMainLocation && (

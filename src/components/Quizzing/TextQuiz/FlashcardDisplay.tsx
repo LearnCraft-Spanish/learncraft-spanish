@@ -1,4 +1,4 @@
-import type { Flashcard } from 'src/types/interfaceDefinitions';
+import type { FlashcardForDisplay } from '@domain/quizzing';
 import React from 'react';
 import pause from 'src/assets/icons/pause_dark.svg';
 import play from 'src/assets/icons/play_dark.svg';
@@ -10,32 +10,33 @@ import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 import './Quiz.css';
 
 interface FlashcardProps {
-  example: Flashcard;
-  isStudent: boolean;
+  quizExample: FlashcardForDisplay;
   answerShowing: boolean;
-  startWithSpanish?: boolean;
-  incrementExampleNumber: () => void;
-  onRemove: () => void;
+  addFlashcard: () => void;
+  removeFlashcard: () => void;
   toggleAnswer: () => void;
-  audioActive: string | undefined;
   togglePlaying: () => void;
   playing: boolean;
 }
 
 export default function FlashcardDisplay({
-  example,
-  isStudent,
+  quizExample,
   answerShowing,
-  incrementExampleNumber,
-  audioActive,
-  onRemove,
-  playing,
-  togglePlaying,
-  startWithSpanish = false,
+  addFlashcard,
+  removeFlashcard,
   toggleAnswer,
+  togglePlaying,
+  playing,
 }: FlashcardProps): React.JSX.Element {
-  const spanishText = example.spanishExample;
-  const englishText = example.englishTranslation;
+  const {
+    question,
+    answer,
+    exampleIsCollected,
+    exampleIsCustom,
+    exampleIsPending,
+  } = quizExample;
+  const audioActive =
+    (answerShowing && answer.hasAudio) || (!answerShowing && question.hasAudio);
 
   function handlePlayPause(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -44,28 +45,36 @@ export default function FlashcardDisplay({
     togglePlaying();
   }
 
-  const questionText = startWithSpanish
-    ? () => formatSpanishText(example.spanglish, spanishText)
-    : () => formatEnglishText(englishText);
-  const answerText = startWithSpanish
-    ? () => formatEnglishText(englishText)
-    : () => formatSpanishText(example.spanglish, spanishText);
+  const questionText = () =>
+    question.spanish
+      ? formatSpanishText(question.text)
+      : formatEnglishText(question.text);
+  const answerText = () =>
+    answer.spanish
+      ? formatSpanishText(answer.text)
+      : formatEnglishText(answer.text);
 
   return (
     <div className="flashcard" onClick={toggleAnswer} aria-label="flashcard">
       {!answerShowing && (
-        <div className="englishTranslation">{questionText()}</div>
+        <div
+          className={`${question.spanish ? 'spanishExample' : 'englishTranslation'}`}
+        >
+          {questionText()}
+        </div>
       )}
       {answerShowing && (
-        <div className="spanishExample">
+        <div
+          className={`${answer.spanish ? 'spanishExample' : 'englishTranslation'}`}
+        >
           {answerText()}
-          {isStudent && (
-            <AddToMyFlashcardsButtons
-              example={example}
-              incrementExampleNumber={incrementExampleNumber}
-              onRemove={onRemove}
-            />
-          )}
+          <AddToMyFlashcardsButtons
+            exampleIsCollected={exampleIsCollected}
+            exampleIsCustom={exampleIsCustom}
+            exampleIsPending={exampleIsPending}
+            addFlashcard={addFlashcard}
+            removeFlashcard={removeFlashcard}
+          />
         </div>
       )}
 

@@ -24,9 +24,12 @@ export const AnswerSchema = z.object({
 
 export type Answer = z.infer<typeof AnswerSchema>;
 
-export const FlashcardDisplaySchema = z.object({
+export const FlashcardForDisplaySchema = z.object({
   question: QuestionSchema,
   answer: AnswerSchema,
+  exampleIsCollected: z.boolean(),
+  exampleIsCustom: z.boolean(),
+  exampleIsPending: z.boolean(),
 });
 
-export type FlashcardDisplay = z.infer<typeof FlashcardDisplaySchema>;
+export type FlashcardForDisplay = z.infer<typeof FlashcardForDisplaySchema>;
