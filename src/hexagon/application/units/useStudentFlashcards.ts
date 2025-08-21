@@ -1,73 +1,28 @@
-import type { Flashcard } from '@learncraft-spanish/shared';
-import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
-import { toast } from 'react-toastify';
-import { useAuthAdapter } from '../adapters/authAdapter';
-import { useFlashcardAdapter } from '../adapters/flashcardAdapter';
-import { queryDefaults } from '../utils/queryUtils';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+} from '@learncraft-spanish/shared';
+import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
+import { useCallback, useMemo } from 'react';
+import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 
 export interface UseStudentFlashcardsReturnType {
   flashcards: Flashcard[] | undefined;
-  isLoading: boolean;
-  isFetching: boolean;
-  error: Error | null;
-  isExampleCollected: (exampleId: number) => boolean;
+  flashcardsDueForReview: Flashcard[] | undefined;
+  getRandomFlashcards: (count: number) => Flashcard[];
+  getRandomFlashcardsDueForReview: (count: number) => Flashcard[];
   isFlashcardCollected: (flashcardId: number) => boolean;
+  isExampleCollected: (exampleId: number) => boolean;
+  collectedExamples: ExampleWithVocabulary[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
   createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
 }
 
 export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
-  const { isAdmin, isCoach, isStudent } = useAuthAdapter();
-  const {
-    getMyFlashcards,
-    getStudentFlashcards,
-    createMyStudentFlashcards,
-    createStudentFlashcards,
-    deleteMyStudentFlashcards,
-    deleteStudentFlashcards,
-  } = useFlashcardAdapter();
-  const { appUser, isOwnUser } = useActiveStudent();
-
-  const userId = appUser?.recordId;
-  const queryClient = useQueryClient();
-
-  const hasAccess = isAdmin || isCoach || isStudent;
-
-  const getFlashcards = useCallback(async () => {
-    if (isOwnUser && appUser?.studentRole === 'student') {
-      return getMyFlashcards();
-    } else if (
-      (isAdmin || isCoach) &&
-      appUser?.studentRole === 'student' &&
-      userId
-    ) {
-      return getStudentFlashcards(userId);
-    }
-    console.error('No access to flashcards');
-    return [];
-  }, [
-    isAdmin,
-    isCoach,
-    isOwnUser,
-    appUser,
-    getMyFlashcards,
-    getStudentFlashcards,
-    userId,
-  ]);
-
-  const {
-    data: flashcards,
-    isLoading,
-    error,
-    isFetching,
-  } = useQuery({
-    queryKey: ['flashcards', userId],
-    queryFn: () => getFlashcards(),
-    enabled: hasAccess && appUser !== null,
-    ...queryDefaults.entityData,
-  });
+  const { flashcards, isLoading, error, createFlashcards, deleteFlashcards } =
+    useFlashcardsQuery();
 
   const isExampleCollected = useCallback(
     (exampleId: number) => {
@@ -88,180 +43,39 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     [flashcards],
   );
 
-  const createStudentFlashcardsMutation = useMutation({
-    mutationFn: (exampleIds: number[]) => {
-      if (!userId) {
-        throw new Error('User ID is required');
-      }
-      const promise = createStudentFlashcards({
-        studentId: userId,
-        exampleIds,
-      });
-      toast.promise(promise, {
-        pending: 'Creating flashcards...',
-        success: 'Flashcards created',
-        error: 'Failed to create flashcards',
-      });
-      return promise;
-    },
-    onSuccess: (result, _variables, _context) => {
-      queryClient.setQueryData(
-        ['flashcards', userId],
-        (oldData: Flashcard[]) => [...oldData, ...result],
-      );
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
-    },
-  });
+  const flashcardsDueForReview = useMemo(() => {
+    return flashcards?.filter(
+      (flashcard) => new Date(flashcard.nextReview) <= new Date(),
+    );
+  }, [flashcards]);
 
-  const createMyStudentFlashcardsMutation = useMutation({
-    mutationFn: (exampleIds: number[]) => {
-      const promise = createMyStudentFlashcards({ exampleIds });
-      toast.promise(promise, {
-        pending: 'Creating flashcards...',
-        success: 'Flashcards created',
-        error: 'Failed to create flashcards',
-      });
-      return promise;
-    },
-    onSuccess: (result, _variables, _context) => {
-      queryClient.setQueryData(
-        ['flashcards', userId],
-        (oldData: Flashcard[]) => [...oldData, ...result],
-      );
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
-    },
-  });
+  const collectedExamples = useMemo(() => {
+    return flashcards?.map((flashcard) => flashcard.example);
+  }, [flashcards]);
 
-  const createFlashcards = useCallback(
-    (exampleIds: number[]) => {
-      if (isOwnUser && appUser?.studentRole === 'student') {
-        return createMyStudentFlashcardsMutation.mutateAsync(exampleIds);
-      } else if (
-        (isAdmin || isCoach) &&
-        appUser?.studentRole === 'student' &&
-        userId
-      ) {
-        return createStudentFlashcardsMutation.mutateAsync(exampleIds);
-      }
-      console.error('No access to create flashcards');
-      return Promise.reject(new Error('No access to create flashcards'));
+  const getRandomFlashcards = useCallback(
+    (count: number) => {
+      if (!flashcards) return [];
+      return fisherYatesShuffle(flashcards).slice(0, count);
     },
-    [
-      createStudentFlashcardsMutation,
-      createMyStudentFlashcardsMutation,
-      isOwnUser,
-      appUser?.studentRole,
-      userId,
-      isAdmin,
-      isCoach,
-    ],
+    [flashcards],
   );
 
-  const deleteMyStudentFlashcardsMutation = useMutation({
-    mutationFn: (studentExampleIds: number[]) => {
-      const promise = deleteMyStudentFlashcards({ studentExampleIds });
-      toast.promise(promise, {
-        pending: 'Deleting flashcards...',
-        success: 'Flashcards deleted',
-        error: 'Failed to delete flashcards',
-      });
-      return promise;
+  const getRandomFlashcardsDueForReview = useCallback(
+    (count: number) => {
+      if (!flashcardsDueForReview) return [];
+      return fisherYatesShuffle(flashcardsDueForReview).slice(0, count);
     },
-    onSuccess: (result, _variables, _context) => {
-      // check result (number of deletes) is same as studentExampleIds.length
-      if (result !== _variables.length) {
-        queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
-        toast.error(
-          `Failed to delete flashcards. ${result} of ${_variables.length} flashcards deleted.`,
-        );
-        return false;
-      } else {
-        queryClient.setQueryData(
-          ['flashcards', userId],
-          (oldData: Flashcard[]) =>
-            oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
-        );
-      }
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
-    },
-    onError: (error, _variables, _context) => {
-      console.error('Failed to delete flashcards', error);
-    },
-  });
-
-  const deleteStudentFlashcardsMutation = useMutation({
-    mutationFn: (studentExampleIds: number[]) => {
-      const promise = deleteStudentFlashcards({ studentExampleIds });
-      toast.promise(promise, {
-        pending: 'Deleting flashcards...',
-        success: 'Flashcards deleted',
-        error: 'Failed to delete flashcards',
-      });
-      return promise;
-    },
-    onSuccess: (result, _variables, _context) => {
-      // check result (number of deletes) is same as studentExampleIds.length
-      if (result !== _variables.length) {
-        queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
-        toast.error(
-          `Failed to delete flashcards. ${result} of ${_variables.length} flashcards deleted.`,
-        );
-      } else {
-        queryClient.setQueryData(
-          ['flashcards', userId],
-          (oldData: Flashcard[]) =>
-            oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
-        );
-      }
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
-    },
-    onError: (error, _variables, _context) => {
-      console.error('Failed to delete flashcards', error);
-    },
-  });
-
-  const deleteFlashcards = useCallback(
-    async (exampleIds: number[]) => {
-      // find studentExampleIds from exampleIds
-      const studentExampleIds = flashcards
-        ?.filter((flashcard) => exampleIds.includes(flashcard.example.id))
-        .map((flashcard) => flashcard.id);
-      if (!studentExampleIds) {
-        throw new Error('Student example IDs not found');
-      }
-      if (isOwnUser && appUser?.studentRole === 'student') {
-        return await deleteMyStudentFlashcardsMutation.mutateAsync(
-          studentExampleIds,
-        );
-      } else if (
-        (isAdmin || isCoach) &&
-        appUser?.studentRole === 'student' &&
-        userId
-      ) {
-        return await deleteStudentFlashcardsMutation.mutateAsync(
-          studentExampleIds,
-        );
-      } else {
-        console.error('No access to delete flashcards');
-        return Promise.reject(new Error('No access to delete flashcards'));
-      }
-    },
-    [
-      deleteMyStudentFlashcardsMutation,
-      deleteStudentFlashcardsMutation,
-      isOwnUser,
-      appUser?.studentRole,
-      userId,
-      isAdmin,
-      isCoach,
-      flashcards,
-    ],
+    [flashcardsDueForReview],
   );
 
   return {
     flashcards,
+    flashcardsDueForReview,
+    getRandomFlashcards,
+    getRandomFlashcardsDueForReview,
+    collectedExamples,
     isLoading,
-    isFetching,
     error,
     isExampleCollected,
     isFlashcardCollected,

@@ -1,6 +1,6 @@
+import { LessonSelector } from '@interface/components/LessonSelector';
 import React from 'react';
 import MenuButton from 'src/components/Buttons/MenuButton';
-import { FromToLessonSelector } from 'src/components/LessonSelector';
 
 import './AudioBasedReview.css';
 
@@ -20,7 +20,7 @@ export default function AudioQuizSetupMenu({
     <div className="audioQuizSetupMenu">
       {/* Change className? currently confusing */}
       <div className="form">
-        <FromToLessonSelector />
+        <LessonSelector />
         <div className="menuRow">
           <p>Autoplay:</p>
           <label

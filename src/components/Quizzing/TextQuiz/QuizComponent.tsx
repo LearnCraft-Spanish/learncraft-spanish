@@ -25,14 +25,14 @@ interface QuizComponentProps {
 }
 
 export default function QuizComponent({
-  quizTitle,
-  examplesToParse,
-  startWithSpanish = false,
-  quizOnlyCollectedExamples = false,
-  isSrsQuiz = false,
-  quizOnlyCustomExamples = false,
-  cleanupFunction,
-  quizLength = 100,
+  quizTitle, // Interface concern
+  examplesToParse, // Should have been parsed already
+  startWithSpanish = false, // Should have been parsed already
+  quizOnlyCollectedExamples = false, // Should have been parsed already
+  isSrsQuiz = false, // Should have been parsed already
+  quizOnlyCustomExamples = false, // Should have been parsed already
+  cleanupFunction, // Internal application logic
+  quizLength = 100, // Should have been parsed already
 }: QuizComponentProps) {
   const location = useLocation();
   const { appUser } = useActiveStudent();
