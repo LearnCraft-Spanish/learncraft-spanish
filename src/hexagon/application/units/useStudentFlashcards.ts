@@ -11,10 +11,18 @@ export interface UseStudentFlashcardsReturnType {
   flashcardsDueForReview: Flashcard[] | undefined;
   customFlashcards: Flashcard[] | undefined;
   customFlashcardsDueForReview: Flashcard[] | undefined;
-  getRandomFlashcards: (count: number) => Flashcard[];
-  getRandomCustomFlashcards: (count: number) => Flashcard[];
-  getRandomFlashcardsDueForReview: (count: number) => Flashcard[];
-  getRandomCustomFlashcardsDueForReview: (count: number) => Flashcard[];
+  audioFlashcards: Flashcard[] | undefined;
+  getRandomFlashcards: ({
+    count,
+    customOnly,
+    srsQuiz,
+    audioOnly,
+  }: {
+    count: number;
+    customOnly?: boolean;
+    srsQuiz?: boolean;
+    audioOnly?: boolean;
+  }) => Flashcard[];
   isFlashcardCollected: (flashcardId: number) => boolean;
   isExampleCollected: (exampleId: number) => boolean;
   isCustomFlashcard: (exampleId: number) => boolean;
@@ -50,6 +58,16 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     },
     [flashcards],
   );
+
+  /*
+  I dont love this method of isPending. Its how we did it in the old version by
+  adding the flashcard with a negative id, but I dont think optomistic updates are the right choice for this. It also 
+  doesnt work with pending removals. I think we could utalize the way bulk Add/Remove works, by putting a state
+  in useStudentFlashcardsthat holds all pending options with the exampleId & weather the operation is an add or remove.
+  We use that to track pending & if its an add or remove pending, then based on result from backend we can either make
+  the successful updates to the query, or give explicit error messages about what flashcard failed
+  (ex: failed to add flashcard with english text: "hello")
+  */
 
   const isPendingFlashcard = useCallback(
     (exampleId: number) => {
@@ -91,36 +109,53 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     return flashcards?.map((flashcard) => flashcard.example);
   }, [flashcards]);
 
+  const audioFlashcards = useMemo(() => {
+    return flashcards?.filter((flashcard) => flashcard.example.spanishAudio);
+  }, [flashcards]);
+
   const getRandomFlashcards = useCallback(
-    (count: number) => {
-      if (!flashcards) return [];
-      return fisherYatesShuffle(flashcards).slice(0, count);
+    ({
+      count,
+      customOnly = false,
+      srsQuiz = false,
+      audioOnly = false,
+    }: {
+      count: number;
+      customOnly?: boolean;
+      srsQuiz?: boolean;
+      audioOnly?: boolean;
+    }) => {
+      if (audioOnly) {
+        // audio only COULD also do srs, but it should not ever be CUSTOM ONLY + AUDIO ONLY
+        return fisherYatesShuffle(audioFlashcards ?? []).slice(0, count);
+      }
+      if (customOnly) {
+        if (srsQuiz) {
+          return fisherYatesShuffle(customFlashcardsDueForReview ?? []).slice(
+            0,
+            count,
+          );
+        } else {
+          return fisherYatesShuffle(customFlashcards ?? []).slice(0, count);
+        }
+      } else {
+        if (srsQuiz) {
+          return fisherYatesShuffle(flashcardsDueForReview ?? []).slice(
+            0,
+            count,
+          );
+        } else {
+          return fisherYatesShuffle(flashcards ?? []).slice(0, count);
+        }
+      }
     },
-    [flashcards],
-  );
-
-  const getRandomCustomFlashcards = useCallback(
-    (count: number) => {
-      if (!customFlashcards) return [];
-      return fisherYatesShuffle(customFlashcards).slice(0, count);
-    },
-    [customFlashcards],
-  );
-
-  const getRandomFlashcardsDueForReview = useCallback(
-    (count: number) => {
-      if (!flashcardsDueForReview) return [];
-      return fisherYatesShuffle(flashcardsDueForReview).slice(0, count);
-    },
-    [flashcardsDueForReview],
-  );
-
-  const getRandomCustomFlashcardsDueForReview = useCallback(
-    (count: number) => {
-      if (!customFlashcardsDueForReview) return [];
-      return fisherYatesShuffle(customFlashcardsDueForReview).slice(0, count);
-    },
-    [customFlashcardsDueForReview],
+    [
+      flashcards,
+      customFlashcards,
+      flashcardsDueForReview,
+      customFlashcardsDueForReview,
+      audioFlashcards,
+    ],
   );
 
   return {
@@ -128,10 +163,8 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     customFlashcards,
     flashcardsDueForReview,
     customFlashcardsDueForReview,
+    audioFlashcards,
     getRandomFlashcards,
-    getRandomCustomFlashcards,
-    getRandomFlashcardsDueForReview,
-    getRandomCustomFlashcardsDueForReview,
     collectedExamples,
     isLoading,
     error,

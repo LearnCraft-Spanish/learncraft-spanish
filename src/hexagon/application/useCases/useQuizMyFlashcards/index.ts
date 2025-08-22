@@ -9,6 +9,12 @@ import { useCallback, useMemo, useState } from 'react';
 
 export interface QuizSetupOptions {
   availableFlashcards: Flashcard[];
+  quizType: 'text' | 'audio';
+  setQuizType: (quizType: 'text' | 'audio') => void;
+  audioOrComprehension: 'audio' | 'comprehension';
+  setAudioOrComprehension: (
+    audioOrComprehension: 'audio' | 'comprehension',
+  ) => void;
   srsQuiz: boolean;
   setSrsQuiz: (srsQuiz: boolean) => void;
   customOnly: boolean;
@@ -40,6 +46,11 @@ export const useQuizMyFlashcards = (): UseQuizMyFlashcardsReturn => {
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
   const [srsQuiz, setSrsQuiz] = useState<boolean>(true);
 
+  const [quizType, setQuizType] = useState<'text' | 'audio'>('text');
+  const [audioOrComprehension, setAudioOrComprehension] = useState<
+    'audio' | 'comprehension'
+  >('audio');
+
   // NOTE: This is a COPY of the flashcards in the state.
   // We need to keep this in sync with the flashcards in the state.
   // It is used for a one-time randomization of the quiz, and so that
@@ -51,12 +62,10 @@ export const useQuizMyFlashcards = (): UseQuizMyFlashcardsReturn => {
     flashcardsDueForReview,
     customFlashcards,
     customFlashcardsDueForReview,
+    audioFlashcards,
     isLoading,
     error,
     getRandomFlashcards,
-    getRandomCustomFlashcards,
-    getRandomFlashcardsDueForReview,
-    getRandomCustomFlashcardsDueForReview,
   } = useStudentFlashcards();
 
   const setupQuiz = useCallback(() => {
@@ -65,25 +74,41 @@ export const useQuizMyFlashcards = (): UseQuizMyFlashcardsReturn => {
     }
     if (srsQuiz) {
       if (customOnly) {
-        const flashcards = getRandomCustomFlashcardsDueForReview(quizLength);
+        const flashcards = getRandomFlashcards({
+          count: quizLength,
+          customOnly,
+          srsQuiz,
+        });
         setSelectedFlashcards(flashcards);
       } else {
-        const flashcards = getRandomFlashcardsDueForReview(quizLength);
+        const flashcards = getRandomFlashcards({
+          count: quizLength,
+          customOnly,
+        });
         setSelectedFlashcards(flashcards);
       }
     } else if (customOnly) {
-      const flashcards = getRandomCustomFlashcards(quizLength);
+      const flashcards = getRandomFlashcards({
+        count: quizLength,
+        customOnly,
+      });
+      setSelectedFlashcards(flashcards);
+    } else if (quizType === 'audio') {
+      const flashcards = getRandomFlashcards({
+        count: quizLength,
+        audioOnly: true,
+      });
       setSelectedFlashcards(flashcards);
     } else {
-      const flashcards = getRandomFlashcards(quizLength);
+      const flashcards = getRandomFlashcards({
+        count: quizLength,
+      });
       setSelectedFlashcards(flashcards);
     }
   }, [
     quizLength,
+    quizType,
     getRandomFlashcards,
-    getRandomCustomFlashcards,
-    getRandomFlashcardsDueForReview,
-    getRandomCustomFlashcardsDueForReview,
     srsQuiz,
     flashcards,
     flashcardsDueForReview,
@@ -99,6 +124,8 @@ export const useQuizMyFlashcards = (): UseQuizMyFlashcardsReturn => {
       }
     } else if (customOnly) {
       return customFlashcards ?? [];
+    } else if (quizType === 'audio') {
+      return audioFlashcards ?? [];
     } else {
       return flashcards ?? [];
     }
@@ -109,10 +136,16 @@ export const useQuizMyFlashcards = (): UseQuizMyFlashcardsReturn => {
     flashcardsDueForReview,
     customFlashcards,
     customFlashcardsDueForReview,
+    audioFlashcards,
+    quizType,
   ]);
 
   const quizSetupOptions = {
     availableFlashcards: filteredFlashcards,
+    quizType,
+    setQuizType,
+    audioOrComprehension,
+    setAudioOrComprehension,
     srsQuiz,
     setSrsQuiz,
     customOnly,
