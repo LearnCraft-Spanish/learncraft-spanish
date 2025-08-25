@@ -22,7 +22,7 @@ function resolveTargetRef(preferred) {
     if (!preferred.includes('/')) candidates.push(preferred);
   }
 
-  // Default to main
+  // Default to mainx
   candidates.push('origin/main', 'main');
 
   // Try remote default branch (origin/HEAD)
