@@ -1,9 +1,11 @@
 import type { UseExampleFilterCoordinatorReturnType } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
 import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/useSkillTagSearch';
 
-import ToggleSwitch from '../general/ToggleSwitch';
-import SelectedTags from '../general/VocabTagFilter/SelectedTags';
-import TagFilter from '../general/VocabTagFilter/TagFilter';
+import {
+  SelectedTags,
+  TagFilter,
+  ToggleSwitch,
+} from '@interface/components/general';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
 
 import 'src/App.css';

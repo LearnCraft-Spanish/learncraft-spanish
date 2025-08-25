@@ -117,12 +117,12 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     ({
       count,
       customOnly = false,
-      srsQuiz = false,
+      dueForReviewOnly = false,
       audioOnly = false,
     }: {
       count: number;
       customOnly?: boolean;
-      srsQuiz?: boolean;
+      dueForReviewOnly?: boolean;
       audioOnly?: boolean;
     }) => {
       if (audioOnly) {
@@ -130,7 +130,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
         return fisherYatesShuffle(audioFlashcards ?? []).slice(0, count);
       }
       if (customOnly) {
-        if (srsQuiz) {
+        if (dueForReviewOnly) {
           return fisherYatesShuffle(customFlashcardsDueForReview ?? []).slice(
             0,
             count,
@@ -139,7 +139,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
           return fisherYatesShuffle(customFlashcards ?? []).slice(0, count);
         }
       } else {
-        if (srsQuiz) {
+        if (dueForReviewOnly) {
           return fisherYatesShuffle(flashcardsDueForReview ?? []).slice(
             0,
             count,
