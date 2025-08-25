@@ -1,11 +1,13 @@
-import { useQuizMyFlashcards } from '@application/useCases/useQuizMyFlashcards';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 
+import { useQuizMyFlashcards } from '@application/useCases/useQuizMyFlashcards';
+import QuizSetupMenu from '@interface/components/QuizSetupMenu';
+import { Route, Routes } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import NoFlashcards from 'src/components/NoFlashcards';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
-import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';
-import QuizSetupMenu from 'src/components/Quizzing/TextQuiz/QuizSetupMenu';
 
+import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';
 export default function MyFlashcardsQuiz() {
   const {
     quizLength,
@@ -13,31 +15,31 @@ export default function MyFlashcardsQuiz() {
     quizSetupOptions,
     showQuiz,
     hideQuiz,
-    textQuiz,
+    // textQuiz,
     setupQuiz,
     isLoading,
     error,
   } = useQuizMyFlashcards();
 
+  const { audioQuizVariant, autoplay } = quizSetupOptions;
+
+  const { flashcards } = useStudentFlashcards();
+
   return (
     <div>
       {!!error && <h2>Error Loading Flashcards</h2>}
       {isLoading && <Loading message="Loading Flashcard Data..." />}
-      {textQuiz.quizLength === 0 && <NoFlashcards />}
+      {quizLength === 0 && <NoFlashcards />}
       {!showQuiz && <QuizSetupMenu options={quizSetupOptions} />}
       <Routes>
         <Route
           path="quiz"
-          element={
-            flashcardDataQuery.data?.examples && (
-              <QuizComponent hook={textQuiz} />
-            )
-          }
+          element={flashcards && <QuizComponent hook={textQuiz} />}
         />
         <Route
           path="srsquiz"
           element={
-            flashcardDataQuery.data?.examples && (
+            flashcards && (
               <QuizComponent hook={textQuiz} cleanupFunction={hideQuiz} />
             )
           }
@@ -45,18 +47,18 @@ export default function MyFlashcardsQuiz() {
         <Route
           path="audio"
           element={
-            flashcardDataQuery.data?.examples && (
+            flashcards && (
               <AudioQuiz
-                examplesToParse={flashcardDataQuery.data?.examples.filter(
-                  (example) => example.englishAudio?.length,
+                examplesToParse={flashcards.filter(
+                  (example) => example.example.englishAudio?.length,
                 )}
                 quizTitle={
-                  audioOrComprehension === 'audio'
-                    ? 'My Audio Quiz'
-                    : 'My Comprehension Quiz'
+                  audioQuizVariant === 'speaking'
+                    ? 'My Speaking Quiz'
+                    : 'My Listening Quiz'
                 }
                 autoplay={autoplay}
-                audioOrComprehension={audioOrComprehension}
+                audioOrComprehension={audioQuizVariant}
                 cleanupFunction={() => setQuizReady(false)}
                 quizLength={quizLength}
                 myFlashcardsQuiz

@@ -1,13 +1,14 @@
 import type { QuizSetupOptions } from '@application/useCases/useQuizMyFlashcards';
 import { MenuButton, ToggleSwitch } from '@interface/components/general';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
+
+import './QuizSetupMenu.scss';
 
 interface QuizSetupMenuProps {
   options: QuizSetupOptions;
 }
 export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
-  const [quizType, setQuizType] = useState<'text' | 'audio'>('text');
   const {
     availableFlashcards,
     srsQuiz,
@@ -19,19 +20,27 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
     quizLength,
     setQuizLength,
     startQuiz,
+    audioQuizVariant,
+    setAudioQuizVariant,
+    autoplay,
+    setAutoplay,
+    hasCustomFlashcards,
+    quizType,
+    setQuizType,
   } = options;
+
   const calculateQuizLengthOptions = useMemo(() => {
     // Calculate quiz length options
-    const exampleCount = options.availableFlashcards.length;
+    const exampleCount = availableFlashcards.length;
     const quizLengthOptions = [];
-    if (options.availableFlashcards?.length > 5) {
+    if (availableFlashcards.length > 5) {
       for (let i = 5; i < exampleCount; i = i * 2) {
         quizLengthOptions.push(i);
       }
     }
     quizLengthOptions.push(exampleCount);
     return quizLengthOptions;
-  }, [options.availableFlashcards]);
+  }, [availableFlashcards]);
 
   return (
     <form className="myFlashcardsForm" onSubmit={startQuiz}>
@@ -77,15 +86,13 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
         {quizType === 'audio' && (
           <div className="quizTypeSettingsWrapper">
             <ToggleSwitch
-              id="isComprehension"
-              ariaLabel="Comprehension Quiz"
-              label="Comprehension Quiz"
-              checked={audioOrComprehension === 'comprehension'}
+              id="isListening"
+              ariaLabel="Listening Quiz"
+              label="Listening Quiz"
+              checked={audioQuizVariant === 'listening'}
               onChange={() =>
-                setAudioOrComprehension(
-                  audioOrComprehension === 'comprehension'
-                    ? 'audio'
-                    : 'comprehension',
+                setAudioQuizVariant(
+                  audioQuizVariant === 'listening' ? 'speaking' : 'listening',
                 )
               }
             />
@@ -98,7 +105,7 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
             />
           </div>
         )}
-        {hasCustomExamples && (
+        {hasCustomFlashcards && (
           <div className="QuizMenuCustomOnly">
             <ToggleSwitch
               id="customOnly"

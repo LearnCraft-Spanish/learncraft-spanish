@@ -6,6 +6,7 @@ interface QuizSetupMenuProps {
   options: QuizSetupOptions;
 }
 export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
+  console.log('options', options);
   const {
     availableFlashcards,
     srsQuiz,

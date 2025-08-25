@@ -12,22 +12,22 @@ export interface UseStudentFlashcardsReturnType {
   customFlashcards: Flashcard[] | undefined;
   customFlashcardsDueForReview: Flashcard[] | undefined;
   audioFlashcards: Flashcard[] | undefined;
+  collectedExamples: ExampleWithVocabulary[] | undefined;
   getRandomFlashcards: ({
     count,
     customOnly,
-    srsQuiz,
+    dueForReviewOnly,
     audioOnly,
   }: {
     count: number;
     customOnly?: boolean;
-    srsQuiz?: boolean;
+    dueForReviewOnly?: boolean;
     audioOnly?: boolean;
   }) => Flashcard[];
   isFlashcardCollected: (flashcardId: number) => boolean;
   isExampleCollected: (exampleId: number) => boolean;
   isCustomFlashcard: (exampleId: number) => boolean;
   isPendingFlashcard: (exampleId: number) => boolean;
-  collectedExamples: ExampleWithVocabulary[] | undefined;
   isLoading: boolean;
   error: Error | null;
   createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
