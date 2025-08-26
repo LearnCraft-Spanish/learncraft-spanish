@@ -6,44 +6,54 @@ import React, { useMemo } from 'react';
 import './QuizSetupMenu.scss';
 
 interface QuizSetupMenuProps {
-  options: QuizSetupOptions;
+  quizSetupOptions: QuizSetupOptions;
+  startQuiz: () => void;
 }
-export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
+export default function QuizSetupMenu({
+  quizSetupOptions,
+  startQuiz,
+}: QuizSetupMenuProps) {
   const {
     availableFlashcards,
-    srsQuiz,
-    setSrsQuiz,
-    customOnly,
-    setCustomOnly,
-    startWithSpanish,
-    setStartWithSpanish,
-    quizLength,
-    setQuizLength,
-    startQuiz,
-    audioQuizVariant,
-    setAudioQuizVariant,
-    autoplay,
-    setAutoplay,
+    maximumQuizLength,
     hasCustomFlashcards,
+
+    quizSettings,
+    updateQuizSettings,
+  } = quizSetupOptions;
+
+  const {
     quizType,
-    setQuizType,
-  } = options;
+    quizLength,
+    startWithSpanish,
+    srsQuiz,
+    customOnly,
+    audioQuizVariant,
+    autoplay,
+  } = quizSettings;
 
   const calculateQuizLengthOptions = useMemo(() => {
     // Calculate quiz length options
-    const exampleCount = availableFlashcards.length;
     const quizLengthOptions = [];
     if (availableFlashcards.length > 5) {
-      for (let i = 5; i < exampleCount; i = i * 2) {
+      for (let i = 5; i < maximumQuizLength; i = i * 2) {
         quizLengthOptions.push(i);
       }
     }
-    quizLengthOptions.push(exampleCount);
+    quizLengthOptions.push(maximumQuizLength);
     return quizLengthOptions;
-  }, [availableFlashcards]);
+  }, [availableFlashcards, maximumQuizLength]);
 
   return (
-    <form className="myFlashcardsForm" onSubmit={startQuiz}>
+    <form
+      className="myFlashcardsForm"
+      onSubmit={(e) => {
+        console.error(
+          'QuizSetupMenu form submitted. was this supposted to happen?',
+        );
+        e.preventDefault();
+      }}
+    >
       <div className="myFlashcardsFormContentWrapper">
         <h3>Review My Flashcards</h3>
         <h4>Quiz Type:</h4>
@@ -52,7 +62,7 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
           <label
             htmlFor="quizType"
             className={quizType === 'text' ? 'selected' : ''}
-            onClick={() => setQuizType('text')}
+            onClick={() => updateQuizSettings('quizType', 'text')}
           >
             Text
           </label>
@@ -60,7 +70,7 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
           <label
             htmlFor="audio"
             className={quizType === 'audio' ? 'selected' : ''}
-            onClick={() => setQuizType('audio')}
+            onClick={() => updateQuizSettings('quizType', 'audio')}
           >
             Audio
           </label>
@@ -72,14 +82,16 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
               ariaLabel="Start with Spanish"
               label="Start with Spanish"
               checked={startWithSpanish}
-              onChange={() => setStartWithSpanish(!startWithSpanish)}
+              onChange={() =>
+                updateQuizSettings('startWithSpanish', !startWithSpanish)
+              }
             />
             <ToggleSwitch
               id="srsQuiz"
               ariaLabel="SRS Quiz"
               label="SRS Quiz"
               checked={srsQuiz}
-              onChange={() => setSrsQuiz(!srsQuiz)}
+              onChange={() => updateQuizSettings('srsQuiz', !srsQuiz)}
             />
           </div>
         )}
@@ -91,7 +103,8 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
               label="Listening Quiz"
               checked={audioQuizVariant === 'listening'}
               onChange={() =>
-                setAudioQuizVariant(
+                updateQuizSettings(
+                  'audioQuizVariant',
                   audioQuizVariant === 'listening' ? 'speaking' : 'listening',
                 )
               }
@@ -101,7 +114,7 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
               ariaLabel="Autoplay"
               label="Autoplay"
               checked={autoplay}
-              onChange={() => setAutoplay(!autoplay)}
+              onChange={() => updateQuizSettings('autoplay', !autoplay)}
             />
           </div>
         )}
@@ -112,7 +125,7 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
               ariaLabel="Custom Only"
               label="Custom Only"
               checked={customOnly}
-              onChange={() => setCustomOnly(!customOnly)}
+              onChange={() => updateQuizSettings('customOnly', !customOnly)}
             />
           </div>
         )}
@@ -121,8 +134,10 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
           <select
             name="length"
             id="quizLength"
-            onChange={(e) => setQuizLength(Number.parseInt(e.target.value))}
-            defaultValue={quizLength}
+            onChange={(e) =>
+              updateQuizSettings('quizLength', Number.parseInt(e.target.value))
+            }
+            value={quizLength}
           >
             {calculateQuizLengthOptions.map((option) => (
               <option key={option} value={option}>
@@ -133,7 +148,7 @@ export default function QuizSetupMenu({ options }: QuizSetupMenuProps) {
         </label>
       </div>
       <div className="buttonBox">
-        <button type="submit" disabled={calculateQuizLengthOptions[0] === 0}>
+        <button type="submit" disabled={quizLength === 0} onClick={startQuiz}>
           Start Quiz
         </button>
       </div>

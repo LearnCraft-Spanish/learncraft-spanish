@@ -1,49 +1,93 @@
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useQuizMyFlashcards } from '@application/useCases/useQuizMyFlashcards';
 import QuizSetupMenu from '@interface/components/QuizSetupMenu';
-import { Route, Routes } from 'react-router-dom';
+import { useCallback, useState } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import NoFlashcards from 'src/components/NoFlashcards';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
-
 import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';
 export default function MyFlashcardsQuiz() {
+  const [examplesForQuiz, setExamplesForQuiz] = useState<
+    ExampleWithVocabulary[]
+  >([]);
   const {
-    quizLength,
-    updateQuizLength,
+    myFlashcardsLoading: isLoading,
+    myFlashcardsError: error,
+
     quizSetupOptions,
-    showQuiz,
-    hideQuiz,
-    // textQuiz,
+
+    quizReady,
+    setQuizReady,
+
     setupQuiz,
-    isLoading,
-    error,
   } = useQuizMyFlashcards();
 
-  const { audioQuizVariant, autoplay } = quizSetupOptions;
+  const { maximumQuizLength } = quizSetupOptions;
+  const navigate = useNavigate();
+  const startQuiz = useCallback(() => {
+    const examples = setupQuiz();
+    if (!examples) {
+      console.error('No examples found in SetupQuiz function');
+      return;
+    }
+    setExamplesForQuiz(examples);
+  }, [setupQuiz, quizSetupOptions]);
 
-  const { flashcards } = useStudentFlashcards();
+  // const { flashcards } = useStudentFlashcards();
+  if (error) {
+    return <h2>Error Loading Flashcards</h2>;
+  }
+  if (isLoading) {
+    return <Loading message="Loading Flashcard Data..." />;
+  }
 
   return (
     <div>
-      {!!error && <h2>Error Loading Flashcards</h2>}
-      {isLoading && <Loading message="Loading Flashcard Data..." />}
-      {quizLength === 0 && <NoFlashcards />}
-      {!showQuiz && <QuizSetupMenu options={quizSetupOptions} />}
-      <Routes>
+      {maximumQuizLength === 0 && <NoFlashcards />}
+      {!quizReady && (
+        <QuizSetupMenu
+          quizSetupOptions={quizSetupOptions}
+          startQuiz={startQuiz}
+        />
+      )}
+      {quizReady && examplesForQuiz.length > 0 && (
+        <QuizComponent
+          examples={examplesForQuiz}
+          startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
+        />
+      )}
+      {/*<Routes>
+        <Route path="/" element={<Navigate to="/quiz" />} />
         <Route
           path="quiz"
-          element={flashcards && <QuizComponent hook={textQuiz} />}
+          element={
+            quizReady && (
+              <QuizComponent
+                examples={examplesForQuiz}
+                startWithSpanish={
+                  quizSetupOptions.quizSettings.startWithSpanish
+                }
+              />
+            )
+          }
         />
         <Route
           path="srsquiz"
           element={
-            flashcards && (
-              <QuizComponent hook={textQuiz} cleanupFunction={hideQuiz} />
+            quizReady && (
+              <QuizComponent
+                examples={examplesForQuiz}
+                startWithSpanish={
+                  quizSetupOptions.quizSettings.startWithSpanish
+                }
+              />
             )
           }
         />
+
         <Route
           path="audio"
           element={
@@ -66,7 +110,7 @@ export default function MyFlashcardsQuiz() {
             )
           }
         />
-      </Routes>
+      </Routes> */}
     </div>
   );
 }

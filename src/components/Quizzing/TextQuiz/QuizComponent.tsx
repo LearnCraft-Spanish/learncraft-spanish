@@ -1,4 +1,5 @@
-import type { TextQuizReturn } from 'src/hexagon/application/units/useTextQuiz';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import { useTextQuiz } from '@application/units/useTextQuiz';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import MenuButton from 'src/components/Buttons/MenuButton';
@@ -7,14 +8,15 @@ import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import QuizProgress from '../QuizProgress';
 import FlashcardDisplay from './FlashcardDisplay';
 import QuizButtons from './QuizButtons';
-
 interface QuizComponentProps {
-  hook: TextQuizReturn;
+  examples: ExampleWithVocabulary[];
+  startWithSpanish: boolean;
   cleanupFunction?: () => void;
 }
 
 export default function QuizComponent({
-  hook,
+  examples,
+  startWithSpanish,
   cleanupFunction,
 }: QuizComponentProps) {
   const {
@@ -25,7 +27,7 @@ export default function QuizComponent({
     previousExample,
     addFlashcard,
     removeFlashcard,
-  } = hook;
+  } = useTextQuiz({ examples, startWithSpanish, canCollectFlashcards: true });
 
   const location = useLocation();
   const isMainLocation = location.pathname.split('/').length < 2;
