@@ -2,13 +2,12 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useQuizMyFlashcards } from '@application/useCases/useQuizMyFlashcards';
-import QuizSetupMenu from '@interface/components/QuizSetupMenu';
+import { QuizSetupMenu, TextQuiz } from '@interface/components/Quizzing';
 import { useCallback, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import NoFlashcards from 'src/components/NoFlashcards';
 import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
-import QuizComponent from 'src/components/Quizzing/TextQuiz/QuizComponent';
 export default function MyFlashcardsQuiz() {
   const [examplesForQuiz, setExamplesForQuiz] = useState<
     ExampleWithVocabulary[]
@@ -18,15 +17,11 @@ export default function MyFlashcardsQuiz() {
     myFlashcardsError: error,
 
     quizSetupOptions,
-
     quizReady,
-    setQuizReady,
-
     setupQuiz,
   } = useQuizMyFlashcards();
 
   const { maximumQuizLength } = quizSetupOptions;
-  const navigate = useNavigate();
   const startQuiz = useCallback(() => {
     const examples = setupQuiz();
     if (!examples) {
@@ -34,7 +29,7 @@ export default function MyFlashcardsQuiz() {
       return;
     }
     setExamplesForQuiz(examples);
-  }, [setupQuiz, quizSetupOptions]);
+  }, [setupQuiz]);
 
   // const { flashcards } = useStudentFlashcards();
   if (error) {
@@ -54,7 +49,7 @@ export default function MyFlashcardsQuiz() {
         />
       )}
       {quizReady && examplesForQuiz.length > 0 && (
-        <QuizComponent
+        <TextQuiz
           examples={examplesForQuiz}
           startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
         />

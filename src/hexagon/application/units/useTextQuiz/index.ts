@@ -17,6 +17,7 @@ export interface TextQuizProps {
 export interface TextQuizReturn {
   addFlashcard: () => void;
   removeFlashcard: () => void;
+  updateFlashcard: (exampleId: string) => void;
   canCollectFlashcards: boolean;
   quizExample: FlashcardForDisplay;
   nextExample: () => void;
@@ -103,6 +104,12 @@ export const useTextQuiz = ({
   return {
     addFlashcard,
     removeFlashcard,
+    updateFlashcard: () => {
+      console.error(
+        'not implemented yet. called with current example id:',
+        currentExample.id,
+      );
+    },
     canCollectFlashcards,
     quizExample,
     exampleNumber,

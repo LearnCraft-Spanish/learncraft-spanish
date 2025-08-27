@@ -9,7 +9,7 @@ interface QuizSetupMenuProps {
   quizSetupOptions: QuizSetupOptions;
   startQuiz: () => void;
 }
-export default function QuizSetupMenu({
+export function QuizSetupMenu({
   quizSetupOptions,
   startQuiz,
 }: QuizSetupMenuProps) {

@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { TextQuiz } from '@interface/components/Quizzing';
 
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import quizCourses from 'src/functions/QuizCourseList';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
-import QuizComponent from '../TextQuiz/QuizComponent';
 import 'src/App.css';
 
 interface officialQuizProps {
@@ -89,7 +89,7 @@ export default function OfficialQuiz({
             <h2 className="error">Error Loading Quiz</h2>
           )}
           {quizExamplesQuery.data && (
-            <QuizComponent
+            <TextQuiz
               examplesToParse={quizExamplesQuery.data}
               quizTitle={makeQuizTitle()}
               cleanupFunction={showMenu}

@@ -5,20 +5,26 @@ import { Link, useLocation } from 'react-router-dom';
 import MenuButton from 'src/components/Buttons/MenuButton';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
-import QuizProgress from '../QuizProgress';
-import FlashcardDisplay from './FlashcardDisplay';
-import QuizButtons from './QuizButtons';
-interface QuizComponentProps {
+import {
+  FlashcardDisplay,
+  QuizButtons,
+  QuizProgress,
+  SRSButtons,
+} from '../general';
+
+interface TextQuizProps {
   examples: ExampleWithVocabulary[];
-  startWithSpanish: boolean;
   cleanupFunction?: () => void;
+  startWithSpanish?: boolean;
+  srsQuiz?: boolean;
 }
 
-export default function QuizComponent({
+export function TextQuiz({
   examples,
-  startWithSpanish,
+  startWithSpanish = false,
+  srsQuiz = false,
   cleanupFunction,
-}: QuizComponentProps) {
+}: TextQuizProps) {
   const {
     exampleNumber,
     quizExample,
@@ -145,14 +151,13 @@ export default function QuizComponent({
             playing={playing}
           />
           <div className="quizButtons">
-            {/* TODO: Add SRS buttons */}
-            {/*srsQuiz && (
-              <SRSQuizButtons
+            {srsQuiz && (
+              <SRSButtons
                 currentExample={quizExample}
                 answerShowing={answerShowing}
                 incrementExampleNumber={nextExample}
               />
-            )*/}
+            )}
             <QuizButtons
               decrementExample={decrementExample}
               incrementExample={incrementExample}
