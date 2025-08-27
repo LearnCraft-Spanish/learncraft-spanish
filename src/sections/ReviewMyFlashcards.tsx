@@ -2,7 +2,11 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useQuizMyFlashcards } from '@application/useCases/useQuizMyFlashcards';
-import { QuizSetupMenu, TextQuiz } from '@interface/components/Quizzing';
+import {
+  QuizSetupMenu,
+  SrsQuiz,
+  TextQuiz,
+} from '@interface/components/Quizzing';
 import { useCallback, useState } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
@@ -21,7 +25,7 @@ export default function MyFlashcardsQuiz() {
     setupQuiz,
   } = useQuizMyFlashcards();
 
-  const { maximumQuizLength } = quizSetupOptions;
+  const { maximumQuizLength, quizSettings } = quizSetupOptions;
   const startQuiz = useCallback(() => {
     const examples = setupQuiz();
     if (!examples) {
@@ -48,12 +52,22 @@ export default function MyFlashcardsQuiz() {
           startQuiz={startQuiz}
         />
       )}
-      {quizReady && examplesForQuiz.length > 0 && (
-        <TextQuiz
-          examples={examplesForQuiz}
-          startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
-        />
-      )}
+      {quizReady &&
+        quizSettings.quizType === 'text' &&
+        quizSettings.srsQuiz && (
+          <SrsQuiz
+            examples={examplesForQuiz}
+            startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
+          />
+        )}
+      {quizReady &&
+        quizSettings.quizType === 'text' &&
+        !quizSettings.srsQuiz && (
+          <TextQuiz
+            examples={examplesForQuiz}
+            startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
+          />
+        )}
       {/*<Routes>
         <Route path="/" element={<Navigate to="/quiz" />} />
         <Route

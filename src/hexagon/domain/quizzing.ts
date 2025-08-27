@@ -20,6 +20,10 @@ export const AnswerSchema = z.object({
   removeFlashcard: z.function().args(z.number()).returns(z.void()),
   vocabComplete: z.boolean(),
   vocabulary: z.array(VocabularySchema),
+  updateFlashcardInterval: z
+    .function()
+    .args(z.number(), z.enum(['easy', 'hard']))
+    .returns(z.void()),
 });
 
 export type Answer = z.infer<typeof AnswerSchema>;

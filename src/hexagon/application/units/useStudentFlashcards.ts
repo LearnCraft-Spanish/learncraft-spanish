@@ -32,6 +32,10 @@ export interface UseStudentFlashcardsReturnType {
   error: Error | null;
   createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
+  updateFlashcardInterval: (
+    exampleId: number,
+    difficulty: 'easy' | 'hard',
+  ) => Promise<number>;
 }
 
 export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
@@ -172,6 +176,20 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     isFlashcardCollected,
     createFlashcards,
     deleteFlashcards,
+    updateFlashcardInterval: (
+      _exampleId: number,
+      _difficulty: 'easy' | 'hard',
+    ) => {
+      console.error(
+        `not implemented yet. exampleId: ${_exampleId} called with new difficulty: ${_difficulty}`,
+      );
+      return Promise.resolve(0);
+      // return Promise.reject(
+      //   new Error(
+      //     `not implemented yet. exampleId: ${_exampleId} called with new difficulty: ${_difficulty}`,
+      //   ),
+      // );
+    },
     isCustomFlashcard,
     isPendingFlashcard,
   };

@@ -1,53 +1,27 @@
-import type { Flashcard } from 'src/types/interfaceDefinitions';
-
+import type { FlashcardForDisplay } from '@domain/quizzing';
 import React, { useCallback } from 'react';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 interface SRSButtonsProps {
-  currentExample: Flashcard;
+  quizExample: FlashcardForDisplay;
   answerShowing: boolean;
   incrementExampleNumber: () => void;
-  updateFlashcardInterval: (difficulty: 'easy' | 'hard') => void;
+  hasExampleBeenReviewed: 'easy' | 'hard' | null;
+  handleReviewExample: (difficulty: 'easy' | 'hard') => void;
 }
 
 export function SRSButtons({
-  updateFlashcardInterval
-  currentExample,
+  hasExampleBeenReviewed,
+  handleReviewExample,
   answerShowing,
   incrementExampleNumber,
 }: SRSButtonsProps) {
-  // const updateFlashcardInterval = useCallback(
-  //   async (difficulty: 'easy' | 'hard') => {
-  //     const exampleId = currentExample?.recordId;
-  //     const studentExampleId =
-  //       getStudentExampleFromExample(currentExample)?.recordId;
-  //     const currentInterval = getIntervalFromExample(currentExample);
-  //     if (exampleId === undefined || studentExampleId === undefined) {
-  //       return;
-  //     }
-  //     incrementExampleNumber();
-  //     let newInterval;
-
-  //     if (difficulty === 'easy') {
-  //       newInterval = currentInterval + 1;
-  //     } else {
-  //       newInterval = currentInterval > 0 ? currentInterval - 1 : 0;
-  //     }
-  //     const updateStatus = updateFlashcard({
-  //       studentExampleId,
-  //       newInterval,
-  //       difficulty,
-  //     });
-  //     return updateStatus;
-  //   },
-  //   [
-  //     currentExample,
-  //     getIntervalFromExample,
-  //     getStudentExampleFromExample,
-  //     incrementExampleNumber,
-  //     updateFlashcard,
-  //   ],
-  // );
+  const handleReviewAndIncrementExample = useCallback(
+    (difficulty: 'easy' | 'hard') => {
+      incrementExampleNumber();
+      handleReviewExample(difficulty);
+    },
+    [handleReviewExample, incrementExampleNumber],
+  );
 
   /* keyboard controlls */
   const handleKeyPress = useCallback(
@@ -58,7 +32,7 @@ export function SRSButtons({
         event.key === ',' ||
         event.key === '<'
       ) {
-        updateFlashcardInterval('hard');
+        handleReviewAndIncrementExample('hard');
       }
       if (
         event.key === 'e' ||
@@ -66,10 +40,10 @@ export function SRSButtons({
         event.key === '.' ||
         event.key === '>'
       ) {
-        updateFlashcardInterval('easy');
+        handleReviewAndIncrementExample('easy');
       }
     },
-    [updateFlashcardInterval],
+    [handleReviewAndIncrementExample],
   );
 
   React.useEffect(() => {
@@ -81,28 +55,26 @@ export function SRSButtons({
 
   return (
     <div className="buttonBox srsButtons">
-      {
-        answerShowing &&
-        !currentExample.difficulty && (
-          <>
-            <button
-              type="button"
-              className="redButton"
-              onClick={() => updateFlashcardInterval('hard')}
-            >
-              This was hard
-            </button>
-            <button
-              type="button"
-              className="greenButton"
-              onClick={() => updateFlashcardInterval('easy')}
-            >
-              This was easy
-            </button>
-          </>
-        )}
-      {currentExample.difficulty &&
-        (currentExample.difficulty === 'hard' ? (
+      {answerShowing && !hasExampleBeenReviewed && (
+        <>
+          <button
+            type="button"
+            className="redButton"
+            onClick={() => handleReviewAndIncrementExample('hard')}
+          >
+            This was hard
+          </button>
+          <button
+            type="button"
+            className="greenButton"
+            onClick={() => handleReviewAndIncrementExample('easy')}
+          >
+            This was easy
+          </button>
+        </>
+      )}
+      {hasExampleBeenReviewed &&
+        (hasExampleBeenReviewed === 'hard' ? (
           <button type="button" className="hardBanner">
             Labeled: Hard
           </button>

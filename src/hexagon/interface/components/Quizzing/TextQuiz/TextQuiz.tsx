@@ -1,3 +1,4 @@
+import type { UseSrsReturn } from '@application/units/useTextQuiz';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -12,17 +13,17 @@ import {
   SRSButtons,
 } from '../general';
 
-interface TextQuizProps {
+export interface TextQuizProps {
   examples: ExampleWithVocabulary[];
   cleanupFunction?: () => void;
   startWithSpanish?: boolean;
-  srsQuiz?: boolean;
+  srsQuizProps?: UseSrsReturn;
 }
 
 export function TextQuiz({
   examples,
   startWithSpanish = false,
-  srsQuiz = false,
+  srsQuizProps,
   cleanupFunction,
 }: TextQuizProps) {
   const {
@@ -33,6 +34,8 @@ export function TextQuiz({
     previousExample,
     addFlashcard,
     removeFlashcard,
+
+    currentExample,
   } = useTextQuiz({ examples, startWithSpanish, canCollectFlashcards: true });
 
   const location = useLocation();
@@ -99,9 +102,9 @@ export function TextQuiz({
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight' || event.key === 'd') {
-        nextExample();
+        incrementExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
-        previousExample();
+        decrementExample();
       } else if (
         event.key === 'ArrowUp' ||
         event.key === 'ArrowDown' ||
@@ -115,7 +118,7 @@ export function TextQuiz({
         togglePlaying();
       }
     },
-    [nextExample, previousExample, toggleAnswer, togglePlaying],
+    [decrementExample, incrementExample, toggleAnswer, togglePlaying],
   );
 
   useEffect(() => {
@@ -151,11 +154,20 @@ export function TextQuiz({
             playing={playing}
           />
           <div className="quizButtons">
-            {srsQuiz && (
+            {srsQuizProps && (
               <SRSButtons
-                currentExample={quizExample}
+                hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
+                  currentExample.id,
+                )}
+                handleReviewExample={(difficulty) =>
+                  srsQuizProps.handleReviewExample(
+                    currentExample.id,
+                    difficulty,
+                  )
+                }
+                quizExample={quizExample}
                 answerShowing={answerShowing}
-                incrementExampleNumber={nextExample}
+                incrementExampleNumber={incrementExample}
               />
             )}
             <QuizButtons
