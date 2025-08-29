@@ -1,21 +1,19 @@
 import type { FlashcardDisplayProps } from './FlashcardDisplay.types';
+import AudioControl from '@interface/components/general/AudioControl/AudioControl';
 import React from 'react';
-import pause from 'src/assets/icons/pause_dark.svg';
-import play from 'src/assets/icons/play_dark.svg';
 import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
 import { AddToMyFlashcardsButtons } from '../AddToMyFlashcardsButtons';
 import './FlashcardDisplay.scss';
+
 export function FlashcardDisplay({
   quizExample,
   answerShowing,
   addFlashcard,
   removeFlashcard,
   toggleAnswer,
-  togglePlaying,
-  playing,
 }: FlashcardDisplayProps) {
   const {
     question,
@@ -26,13 +24,12 @@ export function FlashcardDisplay({
   } = quizExample;
   const audioActive =
     (answerShowing && answer.hasAudio) || (!answerShowing && question.hasAudio);
-
-  function handlePlayPause(
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ): void {
-    e.stopPropagation();
-    togglePlaying();
-  }
+  const audioUrl =
+    answerShowing && answer.hasAudio
+      ? answer.audioUrl
+      : question.hasAudio
+        ? question.audioUrl
+        : null;
 
   const questionText = () =>
     question.spanish
@@ -75,15 +72,13 @@ export function FlashcardDisplay({
       </div>
 
       {/* Play/Pause */}
-      {audioActive && (
-        <button
-          type="button"
-          className="audioPlayPauseButton"
-          onClick={(e) => handlePlayPause(e)}
-          aria-label="Play/Pause"
+      {audioUrl && (
+        <div
+          className="audioControlContainer"
+          onClick={(e) => e.stopPropagation()}
         >
-          <img src={playing ? pause : play} alt="play/pause" />
-        </button>
+          <AudioControl audioLink={audioUrl} />
+        </div>
       )}
     </div>
   );

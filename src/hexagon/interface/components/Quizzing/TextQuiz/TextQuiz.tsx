@@ -2,16 +2,12 @@ import type { UseSrsReturn } from '@application/units/useTextQuiz';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
-import {
-  FlashcardDisplay,
-  QuizButtons,
-  QuizProgress,
-  SRSButtons,
-} from '../general';
+import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
+import { SRSButtons } from '../general/SRSButtons';
 
 export interface TextQuizProps {
   examples: ExampleWithVocabulary[];
@@ -42,8 +38,6 @@ export function TextQuiz({
   const isMainLocation = location.pathname.split('/').length < 2;
 
   const [answerShowing, setAnswerShowing] = useState(false);
-  const currentAudio = useRef<HTMLAudioElement | null>(null);
-  const [playing, setPlaying] = useState(false);
 
   const hideAnswer = useCallback(() => {
     setAnswerShowing(false);
@@ -60,43 +54,8 @@ export function TextQuiz({
   }, [previousExample, hideAnswer]);
 
   const toggleAnswer = useCallback(() => {
-    if (currentAudio.current) {
-      currentAudio.current.currentTime = 0;
-    }
-    setPlaying(false);
     setAnswerShowing(!answerShowing);
   }, [answerShowing]);
-
-  const playCurrentAudio = useCallback(() => {
-    if (currentAudio.current?.duration) {
-      currentAudio.current.play();
-      setPlaying(true);
-    }
-  }, [currentAudio]);
-
-  const pauseCurrentAudio = useCallback(() => {
-    if (currentAudio.current?.duration) {
-      currentAudio.current.pause();
-      setPlaying(false);
-    }
-  }, [currentAudio]);
-
-  const togglePlaying = useCallback(() => {
-    if (!quizExample.question.audioUrl || !quizExample.answer.audioUrl) {
-      return;
-    }
-    if (playing) {
-      pauseCurrentAudio();
-    } else {
-      playCurrentAudio();
-    }
-  }, [
-    quizExample.question.audioUrl,
-    quizExample.answer.audioUrl,
-    playing,
-    pauseCurrentAudio,
-    playCurrentAudio,
-  ]);
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
@@ -113,12 +72,9 @@ export function TextQuiz({
       ) {
         event.preventDefault();
         toggleAnswer();
-      } else if (event.key === ' ') {
-        event.preventDefault();
-        togglePlaying();
       }
     },
-    [decrementExample, incrementExample, toggleAnswer, togglePlaying],
+    [decrementExample, incrementExample, toggleAnswer],
   );
 
   useEffect(() => {
@@ -141,9 +97,6 @@ export function TextQuiz({
             currentExampleNumber={exampleNumber}
             totalExamplesNumber={quizLength}
           />
-          {answerShowing
-            ? quizExample.answer.audioUrl
-            : quizExample.question.audioUrl}
 
           <FlashcardDisplay
             quizExample={quizExample}
@@ -151,8 +104,6 @@ export function TextQuiz({
             removeFlashcard={removeFlashcard}
             answerShowing={answerShowing}
             toggleAnswer={toggleAnswer}
-            togglePlaying={togglePlaying}
-            playing={playing}
           />
           <div className="quizButtons">
             {srsQuizProps && (
@@ -160,7 +111,7 @@ export function TextQuiz({
                 hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
                   currentExample.id,
                 )}
-                handleReviewExample={(difficulty) =>
+                handleReviewExample={(difficulty: 'easy' | 'hard') =>
                   srsQuizProps.handleReviewExample(
                     currentExample.id,
                     difficulty,

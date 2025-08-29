@@ -15,24 +15,14 @@
     background-color: var(--theme);
   }
 
-  h3 {
-    margin: 12px 0 0 0;
-  }
-
   p {
     margin: 0 0 6px 0;
   }
 
   @media (max-width: 480px) {
-    h3,
     p {
       width: 70vw;
       color: var(--light);
-    }
-    h3 {
-      font-size: 1rem;
-    }
-    p {
       font-size: 0.75rem;
     }
   }

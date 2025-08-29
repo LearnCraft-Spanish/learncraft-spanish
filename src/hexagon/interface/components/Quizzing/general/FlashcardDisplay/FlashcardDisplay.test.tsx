@@ -17,7 +17,6 @@ const audioExample = sampleStudentFlashcardData.examples.filter(
 const addFlashcard = vi.fn(() => {});
 const removeFlashcard = vi.fn(() => {});
 const toggleAnswer = vi.fn();
-const togglePlaying = vi.fn();
 
 // Helper function to transform old example format to new FlashcardForDisplay format
 function createQuizExample(
@@ -84,8 +83,6 @@ function FlashcardSpanishFirst() {
         addFlashcard={addFlashcard}
         removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        togglePlaying={togglePlaying}
-        playing={false}
       />
     </MockAllProviders>
   );
@@ -100,8 +97,6 @@ function FlashcardEnglishFirst() {
         addFlashcard={addFlashcard}
         removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        togglePlaying={togglePlaying}
-        playing={false}
       />
     </MockAllProviders>
   );
@@ -116,8 +111,6 @@ function FlashcardSpanishFirstAnswerShowing() {
         addFlashcard={addFlashcard}
         removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        togglePlaying={togglePlaying}
-        playing={false}
       />
     </MockAllProviders>
   );
@@ -132,8 +125,6 @@ function FlashcardEnglishFirstAnswerShowing() {
         addFlashcard={addFlashcard}
         removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        togglePlaying={togglePlaying}
-        playing={false}
       />
     </MockAllProviders>
   );
@@ -149,8 +140,6 @@ function FlashcardSpanishFirstNotStudent() {
         addFlashcard={addFlashcard}
         removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        togglePlaying={togglePlaying}
-        playing={false}
       />
     </MockAllProviders>
   );
@@ -166,8 +155,6 @@ function FlashcardWithAudio() {
         addFlashcard={addFlashcard}
         removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        togglePlaying={togglePlaying}
-        playing={false}
       />
     </MockAllProviders>
   );
@@ -193,14 +180,6 @@ describe('component Flashcard', () => {
     it('renders correctly', () => {
       render(<FlashcardWithAudio />);
       expect(screen.getAllByLabelText('Play/Pause')).toBeTruthy();
-    });
-    it('on click, calls togglePlaying', () => {
-      render(<FlashcardWithAudio />);
-      const playPause = screen.getAllByLabelText('Play/Pause')[0];
-      act(() => {
-        playPause.click();
-      });
-      expect(togglePlaying).toHaveBeenCalled();
     });
     it('on click, does NOT propagate to also call toggleAnswer', () => {
       render(<FlashcardWithAudio />);

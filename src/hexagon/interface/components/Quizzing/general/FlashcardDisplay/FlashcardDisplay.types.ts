@@ -6,6 +6,4 @@ export interface FlashcardDisplayProps {
   addFlashcard: () => void;
   removeFlashcard: () => void;
   toggleAnswer: () => void;
-  togglePlaying: () => void;
-  playing: boolean;
 }
