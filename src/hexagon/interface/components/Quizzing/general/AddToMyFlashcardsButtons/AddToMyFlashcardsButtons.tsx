@@ -1,13 +1,8 @@
+import type { AddToMyFlashcardsButtonsProps } from './AddToMyFlashcardsButtons.types';
 import React from 'react';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import './AddToMyFlashcardsButtons.scss';
-interface AddToMyFlashcardsButtonsProps {
-  exampleIsCollected: boolean;
-  exampleIsCustom: boolean;
-  exampleIsPending: boolean;
-  addFlashcard: () => void;
-  removeFlashcard: () => void;
-}
+
 export function AddToMyFlashcardsButtons({
   exampleIsCollected,
   exampleIsCustom,
@@ -29,6 +24,7 @@ export function AddToMyFlashcardsButtons({
     });
   };
   if (!exampleIsCollected) {
+    // Not Owned Flashcard
     return (
       <button
         type="button"
@@ -39,6 +35,8 @@ export function AddToMyFlashcardsButtons({
       </button>
     );
   } else if (exampleIsCollected && !exampleIsPending) {
+    // Owned Flashcard
+    // Will show custom tag if it is a custom flashcard, as well as a remove button
     return (
       <>
         {exampleIsCustom && (
@@ -71,16 +69,6 @@ export function AddToMyFlashcardsButtons({
         Adding to Flashcards...
       </button>
     );
-    // } else if (isCollected && isCustom) {
-    //   return (
-    //     <button
-    //       type="button"
-    //       className="customFlashcardButton"
-    //       onClick={handleRemoveCustom}
-    //     >
-    //       Custom Flashcard
-    //     </button>
-    //   );
   } else {
     throw new Error('Failed to parse flashcard status');
   }

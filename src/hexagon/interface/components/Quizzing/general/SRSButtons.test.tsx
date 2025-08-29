@@ -1,38 +1,13 @@
-import type { Flashcard } from 'src/types/interfaceDefinitions';
-
-import {
-  cleanup,
-  render,
-  renderHook,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
-import { sampleStudentFlashcardData } from 'tests/mockData';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { SRSButtons } from './SRSButtons';
 
-// vi.mock('src/hooks/useStudentFlashcards', () => {
-//   return {
-//     useStudentFlashcards: () => ({
-//       flashcardDataQuery: { data: sampleStudentFlashcardData },
-//       updateFlashcardMutation: { mutate: vi.fn() },
-//     }),
-//   };
-// });
-// These examples could be defined in a better way
-const currentExample: Flashcard = { ...sampleStudentFlashcardData.examples[0] };
-
-const currentExampleEasy: Flashcard = { ...currentExample, difficulty: 'easy' };
-
-const currentExampleHard: Flashcard = { ...currentExample, difficulty: 'hard' };
-
-// const incrementExampleNumber = vi.fn(() => {})
 let incrementExampleNumber = vi.fn();
+const handleReviewExample = vi.fn();
 
 describe('component SRSButtons', () => {
   beforeAll(() => {
@@ -48,9 +23,10 @@ describe('component SRSButtons', () => {
     render(
       <MockAllProviders>
         <SRSButtons
-          currentExample={currentExampleEasy}
+          hasExampleBeenReviewed="easy"
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
+          handleReviewExample={handleReviewExample}
         />
       </MockAllProviders>,
     );
@@ -60,9 +36,10 @@ describe('component SRSButtons', () => {
     render(
       <MockAllProviders>
         <SRSButtons
-          currentExample={currentExampleHard}
+          hasExampleBeenReviewed="hard"
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
+          handleReviewExample={handleReviewExample}
         />
       </MockAllProviders>,
     );
@@ -84,9 +61,10 @@ describe('component SRSButtons', () => {
     render(
       <MockAllProviders>
         <SRSButtons
-          currentExample={currentExample}
+          hasExampleBeenReviewed={null}
           answerShowing
           incrementExampleNumber={incrementExampleNumber}
+          handleReviewExample={handleReviewExample}
         />
       </MockAllProviders>,
     );
@@ -96,10 +74,6 @@ describe('component SRSButtons', () => {
     });
   });
 
-  /*
-  Future Testing:
-  - Test the onClick events for the buttons (unsure how to do it currently, as the functions passed in are called withen the component's own functions)
-  */
   describe('onClick functions', () => {
     it('increaseDifficulty', async () => {
       overrideAuthAndAppUser(
@@ -111,22 +85,13 @@ describe('component SRSButtons', () => {
           isOwnUser: true,
         },
       );
-      const { result } = renderHook(() => useStudentFlashcards(), {
-        wrapper: MockAllProviders,
-      });
-      await waitFor(() =>
-        expect(result.current.flashcardDataQuery.isSuccess).toBe(true),
-      );
-      const example = result.current.flashcardDataQuery.data?.examples[0];
-      if (!example) {
-        throw new Error('example not found for test setup');
-      }
       render(
         <MockAllProviders>
           <SRSButtons
-            currentExample={example}
+            hasExampleBeenReviewed={null}
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
+            handleReviewExample={handleReviewExample}
           />
         </MockAllProviders>,
       );
@@ -135,6 +100,7 @@ describe('component SRSButtons', () => {
       });
       screen.getByText('This was easy').click();
       expect(incrementExampleNumber).toHaveBeenCalled();
+      expect(handleReviewExample).toHaveBeenCalledWith('easy');
     });
     it('decreaseDifficulty', async () => {
       overrideAuthAndAppUser(
@@ -146,22 +112,13 @@ describe('component SRSButtons', () => {
           isOwnUser: true,
         },
       );
-      const { result } = renderHook(() => useStudentFlashcards(), {
-        wrapper: MockAllProviders,
-      });
-      await waitFor(() =>
-        expect(result.current.flashcardDataQuery.isSuccess).toBe(true),
-      );
-      const example = result.current.flashcardDataQuery.data?.examples[0];
-      if (!example) {
-        throw new Error('example not found for test setup');
-      }
       render(
         <MockAllProviders>
           <SRSButtons
-            currentExample={example}
+            hasExampleBeenReviewed={null}
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
+            handleReviewExample={handleReviewExample}
           />
         </MockAllProviders>,
       );
@@ -170,35 +127,7 @@ describe('component SRSButtons', () => {
       });
       screen.getByText('This was hard').click();
       expect(incrementExampleNumber).toHaveBeenCalled();
-    });
-  });
-  describe('handing of undefined values', () => {
-    it('doesnt call incrementExample when error finding relatedExample', async () => {
-      overrideAuthAndAppUser(
-        {
-          authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
-          isStudent: true,
-        },
-        {
-          isOwnUser: true,
-        },
-      );
-      render(
-        <MockAllProviders>
-          <SRSButtons
-            currentExample={{ ...currentExample, recordId: 999 }}
-            answerShowing
-            incrementExampleNumber={incrementExampleNumber}
-          />
-        </MockAllProviders>,
-      );
-      await waitFor(() => {
-        expect(screen.getByText('This was easy')).toBeTruthy();
-      });
-      screen.getByText('This was easy').click();
-      expect(incrementExampleNumber).not.toHaveBeenCalled();
-      screen.getByText('This was hard').click();
-      expect(incrementExampleNumber).not.toHaveBeenCalled();
+      expect(handleReviewExample).toHaveBeenCalledWith('hard');
     });
   });
 });

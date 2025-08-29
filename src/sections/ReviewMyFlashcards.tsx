@@ -1,6 +1,5 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useQuizMyFlashcards } from '@application/useCases/useQuizMyFlashcards';
 import {
   QuizSetupMenu,
@@ -8,10 +7,8 @@ import {
   TextQuiz,
 } from '@interface/components/Quizzing';
 import { useCallback, useState } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
 import NoFlashcards from 'src/components/NoFlashcards';
-import AudioQuiz from 'src/components/Quizzing/AudioQuiz/AudioQuiz';
 export default function MyFlashcardsQuiz() {
   const [examplesForQuiz, setExamplesForQuiz] = useState<
     ExampleWithVocabulary[]

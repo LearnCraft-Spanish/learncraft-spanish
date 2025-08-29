@@ -3,12 +3,13 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { applyQuizLengthRoundingRules } from './helpers';
 
 interface QuizSettings {
   // Universal Quiz Settings
   quizType: 'text' | 'audio';
-  quizLength: number;
+  userSelectedQuizLength: number;
 
   // Text Quiz Settings
   startWithSpanish: boolean;
@@ -46,20 +47,13 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
 
   const [quizSettings, setQuizSettings] = useState<QuizSettings>({
     quizType: 'text',
-    quizLength: 0,
+    userSelectedQuizLength: 0,
     startWithSpanish: false,
     srsQuiz: true,
     customOnly: false,
     audioQuizVariant: 'speaking',
     autoplay: true,
   });
-
-  const updateQuizSettings = useCallback(
-    (key: keyof QuizSettings, value: QuizSettings[keyof QuizSettings]) => {
-      setQuizSettings({ ...quizSettings, [key]: value });
-    },
-    [quizSettings],
-  );
 
   const {
     flashcards,
@@ -73,26 +67,31 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   } = useStudentFlashcards();
 
   const filteredFlashcards: Flashcard[] = useMemo(() => {
-    if (quizSettings.quizType === 'text') {
-      if (quizSettings.srsQuiz) {
-        if (quizSettings.customOnly) {
+    const quizType = quizSettings.quizType;
+    const srsQuiz = quizSettings.srsQuiz;
+    const customOnly = quizSettings.customOnly;
+    if (quizType === 'text') {
+      if (srsQuiz) {
+        if (customOnly) {
           return customFlashcardsDueForReview ?? [];
         } else {
           return flashcardsDueForReview ?? [];
         }
-      } else if (quizSettings.customOnly) {
+      } else if (customOnly) {
         return customFlashcards ?? [];
       } else {
         return flashcards ?? [];
       }
-    } else if (quizSettings.quizType === 'audio') {
+    } else if (quizType === 'audio') {
       return audioFlashcards ?? [];
     }
     console.error('This should not happen');
     console.error('Invalid quiz type:', quizSettings.quizType);
     return [];
   }, [
-    quizSettings,
+    quizSettings.quizType,
+    quizSettings.srsQuiz,
+    quizSettings.customOnly,
     flashcards,
     flashcardsDueForReview,
     customFlashcards,
@@ -105,88 +104,65 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   // - If maximum shrinks below current quizLength, clamp to new maximum
   const maximumQuizLength = filteredFlashcards.length;
 
-  useEffect(() => {
-    setQuizSettings((previousSettings) => {
-      if (maximumQuizLength === 0) {
-        return previousSettings.quizLength === 0
-          ? previousSettings
-          : { ...previousSettings, quizLength: 0 };
-      }
+  const updateQuizSettings = useCallback(
+    (key: keyof QuizSettings, value: QuizSettings[keyof QuizSettings]) => {
+      setQuizSettings({ ...quizSettings, [key]: value });
+    },
+    [quizSettings],
+  );
+  const quizLength = useMemo(() => {
+    const userSelectedQuizLength = quizSettings.userSelectedQuizLength;
 
-      const desiredDefault = Math.min(10, maximumQuizLength);
-      console.log('maximumQuizLength', maximumQuizLength);
-      console.log('previousSettings.quizLength', previousSettings.quizLength);
-      console.log('desiredDefault', desiredDefault);
-      if (previousSettings.quizLength === 0) {
-        return { ...previousSettings, quizLength: desiredDefault };
-      }
-
-      if (previousSettings.quizLength > maximumQuizLength) {
-        return { ...previousSettings, quizLength: maximumQuizLength };
-      }
-
-      if (previousSettings.quizLength < maximumQuizLength) {
-        console.log('rounding to nearest 10: ', desiredDefault);
-        const roundedQuizLength =
-          Math.round(previousSettings.quizLength / 10) * 10;
-        // round to nearest 10
-        return {
-          ...previousSettings,
-          quizLength:
-            roundedQuizLength < maximumQuizLength && roundedQuizLength !== 0
-              ? roundedQuizLength
-              : desiredDefault,
-        };
-      }
-
-      return previousSettings;
-    });
-  }, [maximumQuizLength]);
-  /*
-  const maximumQuizLength = useMemo(() => {
-    if (quizSettings.quizType === 'text') {
-      if (quizSettings.customOnly) {
-        if (quizSettings.srsQuiz) {
-          return customFlashcardsDueForReview?.length ?? 0;
-        } else {
-          return customFlashcards?.length ?? 0;
-        }
-      } else {
-        if (quizSettings.srsQuiz) {
-          return flashcardsDueForReview?.length ?? 0;
-        } else {
-          return flashcards?.length ?? 0;
-        }
-      }
-    } else {
-      return audioFlashcards?.length ?? 0;
+    // No flashcards available
+    if (maximumQuizLength === 0) {
+      return 0;
     }
-  }, [
-    quizSettings,
-    flashcards,
-    flashcardsDueForReview,
-    audioFlashcards,
-    customFlashcards,
-    customFlashcardsDueForReview,
-  ]);
-  */
+
+    const defaultQuizLength = Math.min(10, maximumQuizLength);
+
+    // User hasn't selected a length yet - use default
+    if (userSelectedQuizLength === 0) {
+      return defaultQuizLength;
+    }
+
+    // User selection exceeds available cards - clamp to maximum
+    if (userSelectedQuizLength > maximumQuizLength) {
+      return maximumQuizLength;
+    }
+
+    // User selection equals maximum - use as-is
+    if (userSelectedQuizLength === maximumQuizLength) {
+      return userSelectedQuizLength;
+    }
+
+    // User selection is less than maximum - apply rounding rules
+    const newValue = applyQuizLengthRoundingRules(
+      userSelectedQuizLength,
+      maximumQuizLength,
+      defaultQuizLength,
+    );
+    return newValue;
+  }, [quizSettings.userSelectedQuizLength, maximumQuizLength]);
 
   const setupQuiz = useCallback(() => {
-    if (!filteredFlashcards.length || quizSettings.quizLength === 0) {
+    const quizType = quizSettings.quizType;
+    const customOnly = quizSettings.customOnly;
+    const srsQuiz = quizSettings.srsQuiz;
+    if (!filteredFlashcards.length || quizLength === 0) {
       return null;
     }
     let randomizedFlashcards = [];
 
-    if (quizSettings.quizType === 'text') {
+    if (quizType === 'text') {
       randomizedFlashcards = getRandomFlashcards({
-        count: quizSettings.quizLength,
-        customOnly: quizSettings.customOnly,
-        dueForReviewOnly: quizSettings.srsQuiz,
+        count: quizLength,
+        customOnly,
+        dueForReviewOnly: srsQuiz,
       });
       // } else if (quizType === 'audio') {
     } else {
       randomizedFlashcards = getRandomFlashcards({
-        count: quizSettings.quizLength,
+        count: quizLength,
         audioOnly: true,
       });
     }
@@ -194,7 +170,14 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     const examples = randomizedFlashcards.map((flashcard) => flashcard.example);
     setQuizReady(true);
     return examples;
-  }, [quizSettings, getRandomFlashcards, filteredFlashcards]);
+  }, [
+    getRandomFlashcards,
+    filteredFlashcards,
+    quizLength,
+    quizSettings.quizType,
+    quizSettings.customOnly,
+    quizSettings.srsQuiz,
+  ]);
 
   const quizSetupOptions = {
     availableFlashcards: filteredFlashcards,
@@ -230,7 +213,13 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     myFlashcardsLoading: isLoading,
     myFlashcardsError: error,
 
-    quizSetupOptions,
+    quizSetupOptions: {
+      ...quizSetupOptions,
+      quizSettings: {
+        ...quizSetupOptions.quizSettings,
+        userSelectedQuizLength: quizLength,
+      },
+    },
 
     quizReady,
     setQuizReady,

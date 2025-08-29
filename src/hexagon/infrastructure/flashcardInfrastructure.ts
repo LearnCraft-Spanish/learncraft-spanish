@@ -1,4 +1,7 @@
-import type { Flashcard } from '@learncraft-spanish/shared';
+import type {
+  Flashcard,
+  UpdateFlashcardIntervalCommand,
+} from '@learncraft-spanish/shared';
 import type { AuthPort } from '../application/ports/authPort';
 import {
   createFlashcardsEndpoint,
@@ -7,6 +10,7 @@ import {
   deleteMyFlashcardsEndpoint,
   getMyFlashcardsEndpoint,
   getStudentFlashcardsEndpoint,
+  updateMyFlashcardsEndpoint,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from './http/client';
 
@@ -37,6 +41,21 @@ export function createFlashcardInfrastructure(
           newFlashcards: exampleIds.map((id) => ({
             exampleId: id.toString(),
           })),
+        },
+      );
+      return response;
+    },
+
+    updateMyStudentFlashcards: async ({
+      updates,
+    }: {
+      updates: UpdateFlashcardIntervalCommand[];
+    }): Promise<Flashcard[]> => {
+      const response = await httpClient.put<Flashcard[]>(
+        updateMyFlashcardsEndpoint.path,
+        updateMyFlashcardsEndpoint.requiredScopes,
+        {
+          updates,
         },
       );
       return response;

@@ -1,4 +1,4 @@
-import type { FlashcardForDisplay } from '@domain/quizzing';
+import type { FlashcardDisplayProps } from './FlashcardDisplay.types';
 import React from 'react';
 import pause from 'src/assets/icons/pause_dark.svg';
 import play from 'src/assets/icons/play_dark.svg';
@@ -6,20 +6,9 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
-import './Quiz.css';
-
-interface FlashcardProps {
-  quizExample: FlashcardForDisplay;
-  answerShowing: boolean;
-  addFlashcard: () => void;
-  removeFlashcard: () => void;
-  toggleAnswer: () => void;
-  togglePlaying: () => void;
-  playing: boolean;
-}
-
-export default function FlashcardDisplay({
+import { AddToMyFlashcardsButtons } from '../AddToMyFlashcardsButtons';
+import './FlashcardDisplay.scss';
+export function FlashcardDisplay({
   quizExample,
   answerShowing,
   addFlashcard,
@@ -27,7 +16,7 @@ export default function FlashcardDisplay({
   toggleAnswer,
   togglePlaying,
   playing,
-}: FlashcardProps): React.JSX.Element {
+}: FlashcardDisplayProps) {
   const {
     question,
     answer,

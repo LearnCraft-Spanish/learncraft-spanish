@@ -1,8 +1,6 @@
-import type { FlashcardForDisplay } from '@domain/quizzing';
 import React, { useCallback } from 'react';
 
 interface SRSButtonsProps {
-  quizExample: FlashcardForDisplay;
   answerShowing: boolean;
   incrementExampleNumber: () => void;
   hasExampleBeenReviewed: 'easy' | 'hard' | null;

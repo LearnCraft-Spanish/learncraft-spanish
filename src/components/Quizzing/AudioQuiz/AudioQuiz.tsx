@@ -1,5 +1,6 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, {
   useCallback,
   useEffect,
@@ -11,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
-import QuizProgress from '../QuizProgress';
 import 'src/App.css';
 import '../AudioQuiz/AudioBasedReview.css';
 

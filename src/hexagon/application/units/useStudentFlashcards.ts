@@ -1,10 +1,16 @@
 import type {
   ExampleWithVocabulary,
   Flashcard,
+  UpdateFlashcardIntervalCommand,
 } from '@learncraft-spanish/shared';
+import type { SrsDifficulty } from 'src/hexagon/domain/srs';
 import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
 import { useCallback, useMemo } from 'react';
 import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import {
+  calculateNewSrsInterval,
+  getCurrentInterval,
+} from 'src/hexagon/domain/srs';
 
 export interface UseStudentFlashcardsReturnType {
   flashcards: Flashcard[] | undefined;
@@ -32,15 +38,24 @@ export interface UseStudentFlashcardsReturnType {
   error: Error | null;
   createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
+  updateFlashcards: (
+    updates: UpdateFlashcardIntervalCommand[],
+  ) => Promise<Flashcard[]>;
   updateFlashcardInterval: (
     exampleId: number,
-    difficulty: 'easy' | 'hard',
+    difficulty: SrsDifficulty,
   ) => Promise<number>;
 }
 
 export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
-  const { flashcards, isLoading, error, createFlashcards, deleteFlashcards } =
-    useFlashcardsQuery();
+  const {
+    flashcards,
+    isLoading,
+    error,
+    createFlashcards,
+    deleteFlashcards,
+    updateFlashcards,
+  } = useFlashcardsQuery();
 
   const isExampleCollected = useCallback(
     (exampleId: number) => {
@@ -99,13 +114,15 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
 
   const flashcardsDueForReview = useMemo(() => {
     return flashcards?.filter(
-      (flashcard) => new Date(flashcard.nextReview) <= new Date(),
+      (flashcard) =>
+        new Date(flashcard.nextReview) <= new Date() || !flashcard.nextReview,
     );
   }, [flashcards]);
 
   const customFlashcardsDueForReview = useMemo(() => {
     return customFlashcards?.filter(
-      (flashcard) => new Date(flashcard.nextReview) <= new Date(),
+      (flashcard) =>
+        new Date(flashcard.nextReview) <= new Date() || !flashcard.nextReview,
     );
   }, [customFlashcards]);
 
@@ -162,6 +179,31 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     ],
   );
 
+  const updateFlashcardInterval = useCallback(
+    async (exampleId: number, difficulty: SrsDifficulty): Promise<number> => {
+      // Find the flashcard by example ID
+      const flashcard = flashcards?.find(
+        (flashcard) => flashcard.example.id === exampleId,
+      );
+
+      if (!flashcard) {
+        throw new Error(`Flashcard not found for example ID: ${exampleId}`);
+      }
+
+      // Calculate the new interval using domain logic
+      const currentInterval = getCurrentInterval(flashcard);
+      const newInterval = calculateNewSrsInterval(currentInterval, difficulty);
+
+      // Update the flashcard with the new interval
+      await updateFlashcards([
+        { flashcardId: flashcard.id, interval: newInterval },
+      ]);
+
+      return newInterval;
+    },
+    [flashcards, updateFlashcards],
+  );
+
   return {
     flashcards,
     customFlashcards,
@@ -176,20 +218,8 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
     isFlashcardCollected,
     createFlashcards,
     deleteFlashcards,
-    updateFlashcardInterval: (
-      _exampleId: number,
-      _difficulty: 'easy' | 'hard',
-    ) => {
-      console.error(
-        `not implemented yet. exampleId: ${_exampleId} called with new difficulty: ${_difficulty}`,
-      );
-      return Promise.resolve(0);
-      // return Promise.reject(
-      //   new Error(
-      //     `not implemented yet. exampleId: ${_exampleId} called with new difficulty: ${_difficulty}`,
-      //   ),
-      // );
-    },
+    updateFlashcards,
+    updateFlashcardInterval,
     isCustomFlashcard,
     isPendingFlashcard,
   };

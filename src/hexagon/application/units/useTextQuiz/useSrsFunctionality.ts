@@ -51,8 +51,12 @@ export function useSrsFunctionality(): UseSrsReturn {
 
   const handleReviewExample = useCallback(
     async (exampleId: number, difficulty: 'easy' | 'hard') => {
-      await updateFlashcardInterval(exampleId, difficulty);
-      markExampleAsReviewed(exampleId, difficulty);
+      try {
+        await updateFlashcardInterval(exampleId, difficulty);
+        markExampleAsReviewed(exampleId, difficulty);
+      } catch (error) {
+        console.error('Failed to update flashcard interval:', error);
+      }
     },
     [markExampleAsReviewed, updateFlashcardInterval],
   );

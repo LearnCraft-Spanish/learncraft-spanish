@@ -165,7 +165,6 @@ export function TextQuiz({
                     difficulty,
                   )
                 }
-                quizExample={quizExample}
                 answerShowing={answerShowing}
                 incrementExampleNumber={incrementExample}
               />

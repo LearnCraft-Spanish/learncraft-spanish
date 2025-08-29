@@ -4,7 +4,7 @@ import { act } from 'react';
 import { sampleStudentFlashcardData } from 'tests/mockData';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import Flashcard from './FlashcardDisplay';
+import { FlashcardDisplay } from './FlashcardDisplay';
 
 const example = {
   ...sampleStudentFlashcardData.examples[0],
@@ -14,33 +14,76 @@ const audioExample = sampleStudentFlashcardData.examples.filter(
   (example) => example.spanishAudioLa.length,
 )[0];
 
-const incrementExampleNumber = vi.fn(() => {});
-const onRemove = vi.fn(() => {});
+const addFlashcard = vi.fn(() => {});
+const removeFlashcard = vi.fn(() => {});
 const toggleAnswer = vi.fn();
 const togglePlaying = vi.fn();
 
-// vi.mock('src/hooks/useStudentFlashcards', () => ({
-//   useStudentFlashcards: () => ({
-//     addFlashcardMutation: { mutate: vi.fn() },
-//     removeFlashcardMutation: { mutate: vi.fn() },
-//     exampleIsCollected: vi.fn((x: number) => x === example.recordId),
-//     exampleIsPending: vi.fn((x: number) => x < 0),
-//     exampleIsCustom: vi.fn((x: number) => x < 0),
-//   }),
-// }));
+// Helper function to transform old example format to new FlashcardForDisplay format
+function createQuizExample(
+  example: (typeof sampleStudentFlashcardData.examples)[0],
+  startWithSpanish: boolean,
+  isStudent: boolean = true,
+) {
+  const question = startWithSpanish
+    ? {
+        spanish: true,
+        text: example.spanishExample,
+        hasAudio: !!example.spanishAudioLa,
+        audioUrl: example.spanishAudioLa || '',
+      }
+    : {
+        spanish: false,
+        text: example.englishTranslation,
+        hasAudio: !!example.englishAudio,
+        audioUrl: example.englishAudio || '',
+      };
+
+  const answer = startWithSpanish
+    ? {
+        spanish: false,
+        text: example.englishTranslation,
+        hasAudio: !!example.englishAudio,
+        audioUrl: example.englishAudio || '',
+        owned: isStudent,
+        addFlashcard: () => addFlashcard(),
+        removeFlashcard: () => removeFlashcard(),
+        vocabComplete: example.vocabComplete,
+        vocabulary: [],
+        updateFlashcardInterval: vi.fn(),
+      }
+    : {
+        spanish: true,
+        text: example.spanishExample,
+        hasAudio: !!example.spanishAudioLa,
+        audioUrl: example.spanishAudioLa || '',
+        owned: isStudent,
+        addFlashcard: () => addFlashcard(),
+        removeFlashcard: () => removeFlashcard(),
+        vocabComplete: example.vocabComplete,
+        vocabulary: [],
+        updateFlashcardInterval: vi.fn(),
+      };
+
+  return {
+    question,
+    answer,
+    exampleIsCollected: (example as any).isCollected || false,
+    exampleIsCustom: false,
+    exampleIsPending: false,
+  };
+}
 
 function FlashcardSpanishFirst() {
+  const quizExample = createQuizExample(example, true, true);
   return (
     <MockAllProviders>
-      <Flashcard
-        example={example}
-        isStudent
+      <FlashcardDisplay
+        quizExample={quizExample}
         answerShowing={false}
-        startWithSpanish
-        incrementExampleNumber={incrementExampleNumber}
-        onRemove={onRemove}
+        addFlashcard={addFlashcard}
+        removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        audioActive=""
         togglePlaying={togglePlaying}
         playing={false}
       />
@@ -48,17 +91,15 @@ function FlashcardSpanishFirst() {
   );
 }
 function FlashcardEnglishFirst() {
+  const quizExample = createQuizExample(example, false, true);
   return (
     <MockAllProviders>
-      <Flashcard
-        example={example}
-        isStudent
+      <FlashcardDisplay
+        quizExample={quizExample}
         answerShowing={false}
-        startWithSpanish={false}
-        incrementExampleNumber={incrementExampleNumber}
-        onRemove={onRemove}
+        addFlashcard={addFlashcard}
+        removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        audioActive=""
         togglePlaying={togglePlaying}
         playing={false}
       />
@@ -66,17 +107,15 @@ function FlashcardEnglishFirst() {
   );
 }
 function FlashcardSpanishFirstAnswerShowing() {
+  const quizExample = createQuizExample(example, true, true);
   return (
     <MockAllProviders>
-      <Flashcard
-        example={example}
-        isStudent
+      <FlashcardDisplay
+        quizExample={quizExample}
         answerShowing
-        startWithSpanish
-        incrementExampleNumber={incrementExampleNumber}
-        onRemove={onRemove}
+        addFlashcard={addFlashcard}
+        removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        audioActive=""
         togglePlaying={togglePlaying}
         playing={false}
       />
@@ -84,17 +123,15 @@ function FlashcardSpanishFirstAnswerShowing() {
   );
 }
 function FlashcardEnglishFirstAnswerShowing() {
+  const quizExample = createQuizExample(example, false, true);
   return (
     <MockAllProviders>
-      <Flashcard
-        example={example}
-        isStudent
+      <FlashcardDisplay
+        quizExample={quizExample}
         answerShowing
-        startWithSpanish={false}
-        incrementExampleNumber={incrementExampleNumber}
-        onRemove={onRemove}
+        addFlashcard={addFlashcard}
+        removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        audioActive=""
         togglePlaying={togglePlaying}
         playing={false}
       />
@@ -103,17 +140,15 @@ function FlashcardEnglishFirstAnswerShowing() {
 }
 
 function FlashcardSpanishFirstNotStudent() {
+  const quizExample = createQuizExample(example, true, false);
   return (
     <MockAllProviders>
-      <Flashcard
-        example={example}
-        isStudent={false}
+      <FlashcardDisplay
+        quizExample={quizExample}
         answerShowing={false}
-        startWithSpanish
-        incrementExampleNumber={incrementExampleNumber}
-        onRemove={onRemove}
+        addFlashcard={addFlashcard}
+        removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        audioActive=""
         togglePlaying={togglePlaying}
         playing={false}
       />
@@ -122,17 +157,15 @@ function FlashcardSpanishFirstNotStudent() {
 }
 
 function FlashcardWithAudio() {
+  const quizExample = createQuizExample(audioExample, true, true);
   return (
     <MockAllProviders>
-      <Flashcard
-        example={audioExample}
-        isStudent
+      <FlashcardDisplay
+        quizExample={quizExample}
         answerShowing={false}
-        startWithSpanish
-        incrementExampleNumber={incrementExampleNumber}
-        onRemove={onRemove}
+        addFlashcard={addFlashcard}
+        removeFlashcard={removeFlashcard}
         toggleAnswer={toggleAnswer}
-        audioActive="active"
         togglePlaying={togglePlaying}
         playing={false}
       />

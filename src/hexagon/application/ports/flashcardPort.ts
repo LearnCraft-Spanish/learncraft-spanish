@@ -1,4 +1,7 @@
-import type { Flashcard } from '@learncraft-spanish/shared';
+import type {
+  Flashcard,
+  UpdateFlashcardIntervalCommand,
+} from '@learncraft-spanish/shared';
 
 export interface FlashcardPort {
   getMyFlashcards: () => Promise<Flashcard[]>;
@@ -25,4 +28,9 @@ export interface FlashcardPort {
   }: {
     studentExampleIds: number[];
   }) => Promise<number>;
+  updateMyStudentFlashcards: ({
+    updates,
+  }: {
+    updates: UpdateFlashcardIntervalCommand[];
+  }) => Promise<Flashcard[]>;
 }

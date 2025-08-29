@@ -24,7 +24,7 @@ export function QuizSetupMenu({
 
   const {
     quizType,
-    quizLength,
+    userSelectedQuizLength: quizLength,
     startWithSpanish,
     srsQuiz,
     customOnly,
@@ -135,7 +135,10 @@ export function QuizSetupMenu({
             name="length"
             id="quizLength"
             onChange={(e) =>
-              updateQuizSettings('quizLength', Number.parseInt(e.target.value))
+              updateQuizSettings(
+                'userSelectedQuizLength',
+                Number.parseInt(e.target.value),
+              )
             }
             value={quizLength}
           >

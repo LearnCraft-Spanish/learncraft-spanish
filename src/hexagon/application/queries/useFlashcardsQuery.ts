@@ -1,4 +1,7 @@
-import type { Flashcard } from '@learncraft-spanish/shared';
+import type {
+  Flashcard,
+  UpdateFlashcardIntervalCommand,
+} from '@learncraft-spanish/shared';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useFlashcardAdapter } from '@application/adapters/flashcardAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
@@ -14,11 +17,15 @@ export interface UseFlashcardsQueryReturnType {
   error: Error | null;
   createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
+  updateFlashcards: (
+    updates: UpdateFlashcardIntervalCommand[],
+  ) => Promise<Flashcard[]>;
 }
 
 export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   const { isAdmin, isCoach, isStudent } = useAuthAdapter();
   const {
+    updateMyStudentFlashcards,
     getMyFlashcards,
     getStudentFlashcards,
     createMyStudentFlashcards,
@@ -105,6 +112,30 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       queryClient.setQueryData(
         ['flashcards', userId],
         (oldData: Flashcard[]) => [...oldData, ...result],
+      );
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+    },
+  });
+
+  const updateMyStudentFlashcardsMutation = useMutation({
+    mutationFn: (updates: UpdateFlashcardIntervalCommand[]) => {
+      const promise = updateMyStudentFlashcards({ updates });
+      // toast.promise(promise, {
+      //   pending: 'Updating flashcards...',
+      //   success: 'Flashcards updated',
+      //   error: 'Failed to update flashcards',
+      // });
+      return promise;
+    },
+    onSuccess: (result, _variables, _context) => {
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[]) => {
+          if (!oldData) return result;
+          // Update the flashcards with the returned updated flashcards
+          const updatedMap = new Map(result.map((fc) => [fc.id, fc]));
+          return oldData.map((fc) => updatedMap.get(fc.id) || fc);
+        },
       );
       queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
     },
@@ -236,11 +267,23 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     ],
   );
 
+  const updateFlashcards = useCallback(
+    (updates: UpdateFlashcardIntervalCommand[]) => {
+      if (isOwnUser && appUser?.studentRole === 'student') {
+        return updateMyStudentFlashcardsMutation.mutateAsync(updates);
+      }
+      console.error('No access to update flashcards');
+      return Promise.reject(new Error('No access to update flashcards'));
+    },
+    [updateMyStudentFlashcardsMutation, isOwnUser, appUser?.studentRole],
+  );
+
   return {
     flashcards,
     isLoading,
     error,
     createFlashcards,
     deleteFlashcards,
+    updateFlashcards,
   };
 };
