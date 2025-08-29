@@ -2,6 +2,8 @@ import type {
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useCallback, useMemo, useState } from 'react';
 import { applyQuizLengthRoundingRules } from './helpers';
@@ -38,7 +40,7 @@ interface UseQuizMyFlashcardsReturn {
   setQuizReady: (quizReady: boolean) => void;
   setupQuiz: () => ExampleWithVocabulary[] | null;
 
-  myFlashcardsLoading: boolean;
+  isLoading: boolean;
   myFlashcardsError: Error | null;
 }
 
@@ -55,16 +57,23 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     autoplay: true,
   });
 
+  // Prerequisite loading states
+  const { isLoading: activeStudentIsLoading } = useActiveStudent();
+  const { isLoading: authUserIsLoading } = useAuthAdapter();
+
   const {
     flashcards,
     flashcardsDueForReview,
     customFlashcards,
     customFlashcardsDueForReview,
     audioFlashcards,
-    isLoading,
+    isLoading: flashcardsLoading,
     error,
     getRandomFlashcards,
   } = useStudentFlashcards();
+
+  const isLoading =
+    activeStudentIsLoading || authUserIsLoading || flashcardsLoading;
 
   const filteredFlashcards: Flashcard[] = useMemo(() => {
     const quizType = quizSettings.quizType;
@@ -210,7 +219,7 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   // });
 
   return {
-    myFlashcardsLoading: isLoading,
+    isLoading,
     myFlashcardsError: error,
 
     quizSetupOptions: {

@@ -3,6 +3,7 @@ import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
 import FlashcardManager from '@interface/pages/FlashcardManager';
 import FrequensayPage from '@interface/pages/FrequensayPage';
 import GetHelpPage from '@interface/pages/GetHelpPage';
+import ReviewMyFlashcards from '@interface/pages/ReviewMyFlashcards';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
@@ -22,17 +23,20 @@ import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
 import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
-import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import SentryRoutes from './SentryRoutes';
 
 export default function AppRoutes() {
-  const { isAdmin, isCoach, isStudent, isLimited } = useAuthAdapter();
+  const { isAdmin, isCoach, isStudent, isLimited, isAuthenticated } =
+    useAuthAdapter();
 
   return (
     <SentryRoutes>
       <Route path="/" element={<Menu />} />
       {/* <Route path="/callback" element={<CallbackPage />} /> */}
-      <Route path="/myflashcards/*" element={<ReviewMyFlashcards />} />
+      <Route
+        path="/myflashcards/*"
+        element={isAuthenticated && <ReviewMyFlashcards />}
+      />
       <Route path="/manage-flashcards" element={<FlashcardManager />} />
       (
       <Route path="/officialquizzes/*" element={<LCSPQuizApp />} />

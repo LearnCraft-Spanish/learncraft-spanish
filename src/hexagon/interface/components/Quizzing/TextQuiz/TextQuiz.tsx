@@ -1,9 +1,9 @@
 import type { UseSrsReturn } from '@application/units/useTextQuiz';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useTextQuiz } from '@application/units/useTextQuiz';
+import { MenuButton } from '@interface/components/general/Buttons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import MenuButton from 'src/components/Buttons/MenuButton';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import {
@@ -45,19 +45,19 @@ export function TextQuiz({
   const currentAudio = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
 
-  function hideAnswer() {
+  const hideAnswer = useCallback(() => {
     setAnswerShowing(false);
-  }
+  }, []);
 
-  function incrementExample() {
+  const incrementExample = useCallback(() => {
     nextExample();
     hideAnswer();
-  }
+  }, [nextExample, hideAnswer]);
 
-  function decrementExample() {
+  const decrementExample = useCallback(() => {
     previousExample();
     hideAnswer();
-  }
+  }, [previousExample, hideAnswer]);
 
   const toggleAnswer = useCallback(() => {
     if (currentAudio.current) {
@@ -133,6 +133,7 @@ export function TextQuiz({
       <PMFPopup
         timeToShowPopup={Math.floor(quizLength / 2) === exampleNumber}
       />
+      {/* I believe 'NoDueFlashcards' is an artifact of the old quizzing system. nonetheless, we have nothing else to show if there is a quiz with no length, so we will leave it for now. */}
       {!quizLength && <NoDueFlashcards />}
       {!!quizLength && (
         <div className="quiz">
