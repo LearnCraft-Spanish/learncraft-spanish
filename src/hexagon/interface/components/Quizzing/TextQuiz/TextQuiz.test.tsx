@@ -68,6 +68,11 @@ function renderQuizYesSrs({
         examples={examplesForTextQuiz}
         startWithSpanish={startWithSpanish}
         cleanupFunction={cleanupFunction}
+        srsQuizProps={{
+          examplesReviewedResults: [],
+          handleReviewExample: () => {},
+          hasExampleBeenReviewed: () => null,
+        }}
       />
     </MockAllProviders>,
   );
