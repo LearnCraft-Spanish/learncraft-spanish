@@ -262,6 +262,7 @@ button:hover,
 }
 
 .quiz {
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   justify-items: center;
