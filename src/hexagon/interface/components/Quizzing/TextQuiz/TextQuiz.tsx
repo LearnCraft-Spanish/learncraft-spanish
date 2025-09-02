@@ -3,7 +3,6 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
@@ -33,9 +32,6 @@ export function TextQuiz({
 
     currentExample,
   } = useTextQuiz({ examples, startWithSpanish, canCollectFlashcards: true });
-
-  const location = useLocation();
-  const isMainLocation = location.pathname.split('/').length < 2;
 
   const [answerShowing, setAnswerShowing] = useState(false);
 
@@ -128,11 +124,17 @@ export function TextQuiz({
               lastExample={exampleNumber === quizLength}
             />
             <div className="buttonBox">
-              {!isMainLocation && (
-                <Link className="linkButton" to=".." onClick={cleanupFunction}>
+              {/* if cleanupFunction is a function, show a back button */}
+              {!!cleanupFunction && (
+                <button
+                  type="button"
+                  className="linkButton"
+                  onClick={cleanupFunction}
+                >
                   Back
-                </Link>
+                </button>
               )}
+
               <MenuButton />
             </div>
           </div>

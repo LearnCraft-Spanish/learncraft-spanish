@@ -34,7 +34,7 @@ export default function AppRoutes() {
       <Route path="/" element={<Menu />} />
       {/* <Route path="/callback" element={<CallbackPage />} /> */}
       <Route
-        path="/myflashcards/*"
+        path="/myflashcards"
         element={isAuthenticated && <ReviewMyFlashcards />}
       />
       <Route path="/manage-flashcards" element={<FlashcardManager />} />

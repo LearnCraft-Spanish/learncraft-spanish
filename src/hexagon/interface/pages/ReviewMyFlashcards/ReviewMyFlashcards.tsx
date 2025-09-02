@@ -10,11 +10,9 @@ import {
   TextQuiz,
 } from '@interface/components/Quizzing';
 import { useCallback, useState } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
 import './ReviewMyFlashcards.scss';
 
 export default function MyFlashcardsQuiz() {
-  const navigate = useNavigate();
   const [examplesForQuiz, setExamplesForQuiz] = useState<
     ExampleWithVocabulary[]
   >([]);
@@ -33,17 +31,17 @@ export default function MyFlashcardsQuiz() {
 
   const { quizSettings } = quizSetupOptions;
 
-  const navigateToQuiz = useCallback(() => {
-    if (quizSettings.quizType === 'audio') {
-      navigate('./audio');
-    } else if (quizSettings.quizType === 'text') {
-      if (quizSettings.srsQuiz) {
-        navigate('./srsquiz');
-      } else {
-        navigate('./quiz');
-      }
-    }
-  }, [quizSettings.quizType, quizSettings.srsQuiz, navigate]);
+  // const navigateToQuiz = useCallback(() => {
+  //   if (quizSettings.quizType === 'audio') {
+  //     navigate('./audio');
+  //   } else if (quizSettings.quizType === 'text') {
+  //     if (quizSettings.srsQuiz) {
+  //       navigate('./srsquiz');
+  //     } else {
+  //       navigate('./quiz');
+  //     }
+  //   }
+  // }, [quizSettings.quizType, quizSettings.srsQuiz, navigate]);
 
   const startQuiz = useCallback(() => {
     const examples = setupQuiz();
@@ -52,8 +50,7 @@ export default function MyFlashcardsQuiz() {
       return;
     }
     setExamplesForQuiz(examples);
-    navigateToQuiz();
-  }, [setupQuiz, navigateToQuiz]);
+  }, [setupQuiz]);
 
   if (error) {
     return <h2>Error Loading Flashcards</h2>;
@@ -79,56 +76,29 @@ export default function MyFlashcardsQuiz() {
           </div>
         </div>
       )}
-      {!quizReady && (
+      {!quizReady ? (
         <QuizSetupMenu
           quizSetupOptions={quizSetupOptions}
           startQuiz={startQuiz}
         />
+      ) : quizSettings.quizType === 'text' ? (
+        quizSettings.srsQuiz ? (
+          <SrsQuiz
+            examples={examplesForQuiz}
+            startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
+            cleanupFunction={() => setQuizReady(false)}
+          />
+        ) : (
+          <TextQuiz
+            examples={examplesForQuiz}
+            startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
+            cleanupFunction={() => setQuizReady(false)}
+          />
+        )
+      ) : (
+        // ) : quizSettings.quizType === 'audio' ? (
+        <div>Audio Quiz Not Implemented. Please come back Later :D</div>
       )}
-
-      <Routes>
-        <Route
-          path="/quiz"
-          element={
-            quizReady &&
-            quizSettings.quizType === 'text' &&
-            !quizSettings.srsQuiz && (
-              <TextQuiz
-                examples={examplesForQuiz}
-                startWithSpanish={
-                  quizSetupOptions.quizSettings.startWithSpanish
-                }
-                cleanupFunction={() => setQuizReady(false)}
-              />
-            )
-          }
-        />
-        <Route
-          path="/srsquiz"
-          element={
-            quizReady &&
-            quizSettings.quizType === 'text' &&
-            quizSettings.srsQuiz && (
-              <SrsQuiz
-                examples={examplesForQuiz}
-                startWithSpanish={
-                  quizSetupOptions.quizSettings.startWithSpanish
-                }
-                cleanupFunction={() => setQuizReady(false)}
-              />
-            )
-          }
-        />
-        <Route
-          path="/audio"
-          element={
-            quizReady &&
-            quizSettings.quizType === 'audio' && (
-              <h3>Audio Quiz Not Implemented. Please come back Later :D</h3>
-            )
-          }
-        />
-      </Routes>
     </div>
   );
 }
