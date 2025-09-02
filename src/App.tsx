@@ -6,6 +6,7 @@ import { ToastContainer, Zoom } from 'react-toastify';
 import { Loading } from './components/Loading';
 import Nav from './components/Nav';
 import SubHeader from './components/SubHeader';
+import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
 
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
@@ -18,6 +19,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="App">
+      <ExtraCoachingCTA />
       <Nav />
       {location.pathname !== '/student-drill-down' &&
         location.pathname !== '/comprehensionquiz' &&
