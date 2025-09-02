@@ -143,10 +143,7 @@ export function ExamplePasteArea({
                         {!hasSpanish ? (
                           <span>{example.spanishExample}</span>
                         ) : (
-                          formatSpanishText(
-                            example.spanglish,
-                            example.spanishExample,
-                          )
+                          formatSpanishText(example.spanishExample)
                         )}
                         {validationMessages.length > 0 && (
                           <div className="validation-note">

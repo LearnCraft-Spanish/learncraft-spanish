@@ -38,7 +38,7 @@ export function ExampleEditForm({
           {unsavedFlashcardSet.map((example) => (
             <div key={example.recordId} className="exampleCard">
               <div className="exampleCardSpanishText exampleAudioWrapper">
-                {formatSpanishText(example.spanglish, example.spanishExample)}
+                {formatSpanishText(example.spanishExample)}
                 <AudioControl audioLink={example.spanishAudioLa} />
               </div>
               <div className="halfWrapper"></div>

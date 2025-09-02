@@ -1,15 +1,11 @@
-import type { AudioEvent } from '@application/ports/audioPort';
 import { createContext } from 'react';
 
 export interface AudioEngine {
-  ctx: AudioContext | null;
-  keeper: ConstantSourceNode | null;
-  baseline: number; // ctx.currentTime at play baseline
-  events: AudioEvent[]; // active absolute schedule
-  nextIdx: number; // next event to schedule
-  scheduled: AudioBufferSourceNode[];
-  timerId: number | null; // scheduler interval
-  cache: Map<string, AudioBuffer>; // decode cache
+  playingAudioRef: React.RefObject<HTMLAudioElement | null>;
+  currentSpanishAudioRef: React.RefObject<HTMLAudioElement | null>;
+  currentEnglishAudioRef: React.RefObject<HTMLAudioElement | null>;
+  nextSpanishAudioRef: React.RefObject<HTMLAudioElement | null>;
+  nextEnglishAudioRef: React.RefObject<HTMLAudioElement | null>;
 }
 
 export const AudioContext = createContext<AudioEngine | null>(null);

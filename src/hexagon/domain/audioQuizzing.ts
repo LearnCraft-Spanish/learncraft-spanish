@@ -14,15 +14,10 @@ export enum AudioQuizType {
 
 export const AudioQuizTypeSchema = z.nativeEnum(AudioQuizType);
 
-export const DurationSchema = z.union([
-  z.number().int().positive(),
-  z.literal('pending'),
-]);
-
 export const AudioQuizQuestionSchema = z.object({
   spanish: z.boolean(),
   step: z.literal(AudioQuizStep.Question),
-  duration: DurationSchema,
+  duration: z.number().int().positive(),
   audioUrl: z.string().url(),
 });
 
@@ -30,7 +25,7 @@ export type AudioQuizQuestion = z.infer<typeof AudioQuizQuestionSchema>;
 
 export const AudioQuizGuessSchema = z.object({
   step: z.literal(AudioQuizStep.Guess),
-  duration: DurationSchema,
+  duration: z.number().int().positive(),
   audioUrl: z.string().url(),
 });
 
@@ -39,8 +34,9 @@ export type AudioQuizGuess = z.infer<typeof AudioQuizGuessSchema>;
 export const AudioQuizHintSchema = z.object({
   spanish: z.literal(true),
   step: z.literal(AudioQuizStep.Hint),
-  duration: DurationSchema,
+  duration: z.number().int().positive(),
   audioUrl: z.string().url(),
+  padAudioDuration: z.number().int().positive(),
   padAudioUrl: z.string().url(),
 });
 
@@ -49,8 +45,9 @@ export type AudioQuizHint = z.infer<typeof AudioQuizHintSchema>;
 export const AudioQuizAnswerSchema = z.object({
   spanish: z.boolean(),
   step: z.literal(AudioQuizStep.Answer),
-  duration: DurationSchema,
+  duration: z.number().int().positive(),
   audioUrl: z.string().url(),
+  padAudioDuration: z.number().int().positive(),
   padAudioUrl: z.string().url(),
 });
 
@@ -100,17 +97,6 @@ export const SpeakingQuizExampleSchema = z.object({
 
 export type SpeakingQuizExample = z.infer<typeof SpeakingQuizExampleSchema>;
 
-export const ListeningQuizSchema = z.array(ListeningQuizExampleSchema);
-
-export type ListeningQuiz = z.infer<typeof ListeningQuizSchema>;
-
-export const SpeakingQuizSchema = z.array(SpeakingQuizExampleSchema);
-
-export type SpeakingQuiz = z.infer<typeof SpeakingQuizSchema>;
-
-export const AudioQuizSchema = z.union([
-  ListeningQuizSchema,
-  SpeakingQuizSchema,
-]);
-
-export type AudioQuiz = z.infer<typeof AudioQuizSchema>;
+// NOTE: NO TYPES FOR COMPLETE AUDIO QUIZ.
+// THE FULL ARRAYS ARE NOT AVAILABLE UPON INITIAL LOAD.
+// WE MUST DERIVE ONE AT A TIME.

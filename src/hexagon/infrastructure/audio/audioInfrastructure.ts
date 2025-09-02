@@ -1,193 +1,160 @@
 import type {
-  AudioEvent,
+  AudioElementState,
   AudioPort,
-  ClipInfo,
 } from '@application/ports/audioPort';
 import { AudioContext } from '@composition/context/AudioContext';
-import { use, useCallback, useMemo } from 'react';
+import { use, useCallback, useEffect, useRef, useState } from 'react';
 
 export function useAudioInfrastructure(): AudioPort {
-  const eng = use(AudioContext);
-  if (!eng) throw new Error('AudioContext not found');
+  const context = use(AudioContext);
+  if (!context) throw new Error('AudioContext not found');
 
-  // --- helpers bound to the engine ---
-  const ensureCtx = useCallback((): AudioContext => {
-    if (eng.ctx) return eng.ctx;
-    const Ctor = window.AudioContext;
-    const ctx: AudioContext = new Ctor();
-    // keep context from autosuspending during intended silences
-    const keeper = new ConstantSourceNode(ctx, { offset: 0 });
-    keeper.connect(ctx.destination);
-    keeper.start();
-    eng.ctx = ctx;
-    eng.keeper = keeper;
-    return ctx;
-  }, [eng]);
+  const tickRef = useRef<NodeJS.Timeout | null>(null);
 
-  const clearScheduled = useCallback(() => {
-    eng.scheduled.forEach((n: AudioBufferSourceNode) => {
-      try {
-        n.stop();
-      } catch {}
-      try {
-        n.disconnect();
-      } catch {}
-    });
-    eng.scheduled = [];
-  }, [eng]);
+  // State for the playing state of the audio
+  const [isPlaying, setIsPlaying] = useState(false);
+  // State for the current time of the playing audio
+  const [currentTime, setCurrentTime] = useState(0);
 
-  const stopTimer = useCallback(() => {
-    if (eng.timerId != null) {
-      clearInterval(eng.timerId);
-      eng.timerId = null;
-    }
-  }, [eng]);
-
-  const decodeToBuffer = useCallback(
-    async (url: string): Promise<AudioBuffer> => {
-      const cached = eng.cache.get(url);
-      if (cached) return cached;
-      const res = await fetch(url, { mode: 'cors' });
-      const arr = await res.arrayBuffer();
-      const ctx = ensureCtx();
-      const buf = await new Promise<AudioBuffer>((resolve, reject) =>
-        ctx.decodeAudioData(arr, resolve, reject),
-      );
-      eng.cache.set(url, buf);
-      return buf;
-    },
-    [eng, ensureCtx],
-  );
-
-  // --- port methods ---
-  const startOnce = useCallback(async () => {
-    const ctx = ensureCtx();
-    if (ctx.state === 'suspended') await ctx.resume(); // must be called in a user gesture
-    eng.baseline = ctx.currentTime; // reset baseline on arm
-  }, [eng, ensureCtx]);
-
-  const decode = useCallback(
-    async (url: string): Promise<ClipInfo> => {
-      const buf = await decodeToBuffer(url);
-      return { url, audioDur: buf.duration };
-    },
-    [decodeToBuffer],
-  );
-
-  const playAbsolute = useCallback(
-    async (events: AudioEvent[], opts?: { startAt?: number }) => {
-      const ctx = ensureCtx();
-      await ctx.resume(); // safe if already running
-
-      // Normalize schedule
-      eng.events = [...events].sort((a, b) => a.start - b.start);
-      eng.nextIdx = 0;
-
-      // Pre-decode audio URLs to avoid blocking in the scheduler tick
-      const urls = Array.from(
-        new Set(
-          eng.events
-            .filter((e) => e.kind === 'audio')
-            .map((e) => e.url as string),
-        ),
-      );
-      await Promise.all(urls.map(decodeToBuffer));
-
-      // Establish baseline so now() = 0 at start
-      const startAt = opts?.startAt ?? 0;
-      eng.baseline = ctx.currentTime - startAt;
-
-      clearScheduled();
-      stopTimer();
-
-      // Look-ahead scheduler
-      const AHEAD_SEC = 0.5;
-      const TICK_MS = 30;
-
-      const tick = async () => {
-        const now = ctx.currentTime - eng.baseline;
-        const until = now + AHEAD_SEC;
-
-        while (
-          eng.nextIdx < eng.events.length &&
-          eng.events[eng.nextIdx].start <= until
-        ) {
-          const ev = eng.events[eng.nextIdx++];
-          if (ev.kind === 'audio') {
-            const buf = await decodeToBuffer(ev.url);
-            const src = new AudioBufferSourceNode(ctx, { buffer: buf });
-            src.connect(ctx.destination);
-            // schedule at absolute time (baseline + start)
-            try {
-              src.start(eng.baseline + ev.start, 0, ev.dur);
-            } catch {}
-            eng.scheduled.push(src);
-          }
-          // gaps are implicit in the timeline; no node needed
-        }
-      };
-
-      // prime once, then interval
-      await tick();
-      eng.timerId = window.setInterval(() => {
-        tick().catch(() => {});
-      }, TICK_MS);
-    },
-    [eng, ensureCtx, decodeToBuffer, clearScheduled, stopTimer],
-  );
+  const play = useCallback(async () => {
+    // If the audio is already playing, do nothing
+    if (!context.playingAudioRef.current || isPlaying) return;
+    await context.playingAudioRef.current.play();
+    setIsPlaying(true);
+  }, [context, isPlaying, setIsPlaying]);
 
   const pause = useCallback(async () => {
-    stopTimer();
-    const ctx = ensureCtx();
-    if (ctx.state === 'running') await ctx.suspend(); // freezes the same clock UI reads
-  }, [ensureCtx, stopTimer]);
+    // If the audio is not playing, do nothing
+    if (!context.playingAudioRef.current || !isPlaying) return;
+    // Pause the audio
+    await context.playingAudioRef.current.pause();
+    // Stop the UI update propagation
+    if (tickRef.current) clearInterval(tickRef.current);
+    // UI state update
+    setIsPlaying(false);
+  }, [context, isPlaying, setIsPlaying]);
 
-  const resume = useCallback(async () => {
-    const ctx = ensureCtx();
-    if (ctx.state !== 'closed') {
-      await ctx.resume();
-      // restart scheduler; baseline remains unchanged, so UI stays in sync
-      const evs = eng.events; // noop if nothing scheduled
-      if (evs.length)
-        await playAbsolute(evs, { startAt: ctx.currentTime - eng.baseline });
-    }
-  }, [ensureCtx, eng, playAbsolute]);
+  const updateCurrentTime = useCallback(() => {
+    if (!isPlaying || !context.playingAudioRef.current) return;
+    const currentTimeRef = context.playingAudioRef.current?.currentTime ?? 0;
+    setCurrentTime(currentTimeRef);
+  }, [context.playingAudioRef, isPlaying, setCurrentTime]);
 
-  const stop = useCallback(async () => {
-    stopTimer();
-    clearScheduled();
-    const ctx = eng.ctx;
-    if (ctx && ctx.state !== 'closed') {
-      try {
-        await ctx.suspend();
-      } catch {}
-    }
-    eng.nextIdx = 0;
-  }, [eng, stopTimer, clearScheduled]);
+  // Helper function to get audio duration
+  const getAudioDuration = (
+    audioElement: HTMLAudioElement | null,
+  ): Promise<number | null> => {
+    if (!audioElement) return Promise.resolve(null);
 
-  const now = useCallback(() => {
-    const ctx = eng.ctx;
-    if (!ctx) return 0;
-    return Math.max(0, ctx.currentTime - eng.baseline);
-  }, [eng]);
+    return new Promise((resolve) => {
+      if (audioElement.readyState >= 1) {
+        // Metadata already loaded
+        resolve(audioElement.duration);
+      } else {
+        // Wait for metadata to load
+        const handleLoadedMetadata = () => {
+          // Clean up the event listener
+          audioElement.removeEventListener(
+            'loadedmetadata',
+            handleLoadedMetadata,
+          );
+          // Resolve the promise with the duration
+          resolve(audioElement.duration);
+        };
+        audioElement.addEventListener('loadedmetadata', handleLoadedMetadata);
+      }
+    });
+  };
 
-  const state = useCallback(() => {
-    const s = eng.ctx?.state ?? 'closed';
-    return s as 'running' | 'suspended' | 'closed';
-  }, [eng]);
-
-  // Return a stable object (nice for deps)
-  return useMemo<AudioPort>(
-    () => ({
-      startOnce,
-      decode,
-      playAbsolute,
-      pause,
-      resume,
-      stop,
-      now,
-      state,
-    }),
-    [startOnce, decode, playAbsolute, pause, resume, stop, now, state],
+  const changeCurrentAudio = useCallback(
+    async (current: AudioElementState) => {
+      if (!context.playingAudioRef.current) return;
+      context.playingAudioRef.current.src = current.src;
+      context.playingAudioRef.current.currentTime = current.currentTime;
+      updateCurrentTime();
+      context.playingAudioRef.current.onended = current.onEnded;
+      current.playing ? play() : pause();
+    },
+    [context, play, pause, updateCurrentTime],
   );
+
+  const updateCurrentAudioQueue = useCallback(
+    async (newQueue: { english: string; spanish: string }) => {
+      // If the context Audio Elements are not set, return null values
+      if (
+        !context.currentEnglishAudioRef.current ||
+        !context.currentSpanishAudioRef.current
+      ) {
+        return {
+          englishDuration: null,
+          spanishDuration: null,
+        };
+      }
+      // Update the source of the audio elements
+      context.currentEnglishAudioRef.current.src = newQueue.english;
+      context.currentSpanishAudioRef.current.src = newQueue.spanish;
+
+      // Get the duration of the audio elements
+      const [englishDuration, spanishDuration] = await Promise.all([
+        getAudioDuration(context.currentEnglishAudioRef.current),
+        getAudioDuration(context.currentSpanishAudioRef.current),
+      ]);
+
+      // Return the duration of the audio elements
+      return {
+        englishDuration,
+        spanishDuration,
+      };
+    },
+    [context],
+  );
+
+  const updateNextAudioQueue = useCallback(
+    async (newQueue: { english: string; spanish: string }) => {
+      // If the context Audio Elements are not set, return null values
+      if (
+        !context.nextEnglishAudioRef.current ||
+        !context.nextSpanishAudioRef.current
+      ) {
+        return {
+          englishDuration: null,
+          spanishDuration: null,
+        };
+      }
+      // Update the source of the audio elements
+      context.nextEnglishAudioRef.current.src = newQueue.english;
+      context.nextSpanishAudioRef.current.src = newQueue.spanish;
+
+      // Get the duration of the audio elements
+      const [englishDuration, spanishDuration] = await Promise.all([
+        getAudioDuration(context.nextEnglishAudioRef.current),
+        getAudioDuration(context.nextSpanishAudioRef.current),
+      ]);
+
+      // Return the duration of the audio elements
+      return {
+        englishDuration,
+        spanishDuration,
+      };
+    },
+    [context],
+  );
+
+  useEffect(() => {
+    if (!isPlaying || !context.playingAudioRef.current) return;
+    tickRef.current = setInterval(updateCurrentTime, 50);
+    return () => {
+      if (tickRef.current) clearInterval(tickRef.current);
+    };
+  }, [context.playingAudioRef, isPlaying, updateCurrentTime]);
+
+  return {
+    play,
+    pause,
+    isPlaying,
+    currentTime,
+    changeCurrentAudio,
+    updateCurrentAudioQueue,
+    updateNextAudioQueue,
+  };
 }

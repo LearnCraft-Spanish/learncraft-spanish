@@ -13,6 +13,7 @@ interface officialQuizProps {
   hideMenu: () => void;
   showMenu: () => void;
   updateChosenQuiz: (quizNumber: number) => void;
+  startWithSpanish: boolean;
 }
 
 export default function OfficialQuiz({
@@ -21,6 +22,7 @@ export default function OfficialQuiz({
   hideMenu,
   showMenu,
   updateChosenQuiz,
+  startWithSpanish,
 }: officialQuizProps) {
   // Import Statements
   const navigate = useNavigate();
@@ -90,8 +92,8 @@ export default function OfficialQuiz({
           )}
           {quizExamplesQuery.data && (
             <TextQuiz
-              examplesToParse={quizExamplesQuery.data}
-              quizTitle={makeQuizTitle()}
+              examples={quizExamplesQuery.data}
+              startWithSpanish={startWithSpanish}
               cleanupFunction={showMenu}
             />
           )}

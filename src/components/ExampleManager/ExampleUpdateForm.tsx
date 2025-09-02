@@ -97,7 +97,7 @@ export default function ExampleUpdateForm({
         <div>
           <h4>Spanish Example:</h4>
           <div className="previewCard">
-            {formatSpanishText(spanglish, spanishExample)}
+            {formatSpanishText(spanishExample)}
             <AudioControl audioLink={spanishAudioLa} />
           </div>
         </div>
