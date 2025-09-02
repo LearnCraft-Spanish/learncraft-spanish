@@ -24,5 +24,8 @@
   "plugins": [
     "@stryker-mutator/vitest-runner",
     "@stryker-mutator/typescript-checker"
-  ]
+  ],
+  "htmlReporter": {
+    "fileName": "reports/mutation/mutation.html"
+  }
 }
