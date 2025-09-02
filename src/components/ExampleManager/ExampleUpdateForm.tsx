@@ -28,7 +28,7 @@ export default function ExampleUpdateForm({
   englishAudio,
   setEnglishAudio,
 }: ExampleUpdateFormProps) {
-  const spanglish = spanishExample.includes('*') ? 'spanglish' : 'esp';
+  //const spanglish = spanishExample.includes('*') ? 'spanglish' : 'esp';
 
   return (
     <>
