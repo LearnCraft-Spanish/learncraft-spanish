@@ -23,6 +23,7 @@ export interface AudioQuizReturn {
   currentExampleNumber: number;
   currentExampleReady: boolean;
   currentExample: Example | null;
+  currentStep: AudioQuizStep;
   currentStepValue:
     | AudioQuizQuestion
     | AudioQuizGuess
@@ -471,6 +472,7 @@ export function useAudioQuiz({
 
   return {
     currentExample: currentExample ?? null, // Otherwise the example data is not loaded
+    currentStep,
     currentStepValue: currentStepValue ?? null, // Otherwise the current audio is still parsing
     currentExampleReady: !!currentAudioExample, // Otherwise the quiz is still loading
     nextExampleReady: !!nextAudioExample, // Otherwise prevent advancing to next example
