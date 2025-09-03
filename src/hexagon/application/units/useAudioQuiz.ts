@@ -44,7 +44,7 @@ export interface AudioQuizReturn {
   quizLength: number;
 }
 
-export default function useAudioQuiz({
+export function useAudioQuiz({
   examplesToQuiz,
   audioQuizType,
   autoplay,

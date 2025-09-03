@@ -164,6 +164,7 @@ export default function LCSPQuizApp(): React.JSX.Element {
                   <OfficialQuiz
                     chosenQuiz={chosenQuiz}
                     quizCourse={currentCourseCode}
+                    startWithSpanish={false}
                     hideMenu={hideMenu}
                     showMenu={showMenu}
                     updateChosenQuiz={updateChosenQuiz}
@@ -301,6 +302,7 @@ export default function LCSPQuizApp(): React.JSX.Element {
                 <OfficialQuiz
                   chosenQuiz={chosenQuiz}
                   quizCourse={currentCourseCode}
+                  startWithSpanish={false}
                   hideMenu={hideMenu}
                   showMenu={showMenu}
                   updateChosenQuiz={updateChosenQuiz}

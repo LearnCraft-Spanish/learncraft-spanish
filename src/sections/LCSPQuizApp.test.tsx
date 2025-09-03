@@ -16,7 +16,7 @@ import React from 'react';
 
 import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
+import { fisherYatesShuffle } from '../hexagon/domain/functions/fisherYatesShuffle';
 import LCSPQuizApp from './LCSPQuizApp';
 
 const { quizExamplesTableArray } = serverlikeData().api;

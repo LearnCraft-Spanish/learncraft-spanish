@@ -10,7 +10,7 @@ import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useProgramTable } from 'src/hooks/CourseData/useProgramTable';
 import { useAudioExamples } from 'src/hooks/ExampleData/useAudioExamples';
 import { useFilterExamplesBySelectedLesson } from 'src/hooks/useFilterExamplesBySelectedLesson';
-import { fisherYatesShuffle } from '../functions/fisherYatesShuffle';
+import { fisherYatesShuffle } from '../hexagon/domain/functions/fisherYatesShuffle';
 import 'src/App.css';
 import 'src/components/Quizzing/AudioQuiz/AudioBasedReview.css';
 

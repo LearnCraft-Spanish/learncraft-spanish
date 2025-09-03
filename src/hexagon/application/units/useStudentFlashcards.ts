@@ -6,7 +6,7 @@ import type {
 import type { SrsDifficulty } from 'src/hexagon/domain/srs';
 import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
 import { useCallback, useMemo } from 'react';
-import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
 import {
   calculateNewSrsInterval,
   getCurrentInterval,

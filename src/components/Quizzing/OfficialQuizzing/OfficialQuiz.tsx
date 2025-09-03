@@ -1,5 +1,3 @@
-import { TextQuiz } from '@interface/components/Quizzing';
-
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loading } from 'src/components/Loading';
@@ -90,13 +88,13 @@ export default function OfficialQuiz({
           {quizExamplesQuery.isError && (
             <h2 className="error">Error Loading Quiz</h2>
           )}
-          {quizExamplesQuery.data && (
+          {/*quizExamplesQuery.data && (
             <TextQuiz
               examples={quizExamplesQuery.data}
               startWithSpanish={startWithSpanish}
               cleanupFunction={showMenu}
             />
-          )}
+          )*/}
         </>
       )}
     </>
