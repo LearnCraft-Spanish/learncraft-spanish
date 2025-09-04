@@ -8,36 +8,24 @@ export function AudioEngineProvider({
   children: React.ReactNode;
 }) {
   const playingAudioRef = useRef<HTMLAudioElement | null>(null);
-  const currentSpanishAudioRef = useRef<HTMLAudioElement | null>(null);
-  const currentEnglishAudioRef = useRef<HTMLAudioElement | null>(null);
-  const nextSpanishAudioRef = useRef<HTMLAudioElement | null>(null);
-  const nextEnglishAudioRef = useRef<HTMLAudioElement | null>(null);
+  const englishParseAudioRef = useRef<HTMLAudioElement | null>(null);
+  const spanishParseAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const audioEngine: AudioEngine = useMemo(
     () =>
       ({
         playingAudioRef,
-        currentSpanishAudioRef,
-        currentEnglishAudioRef,
-        nextSpanishAudioRef,
-        nextEnglishAudioRef,
+        englishParseAudioRef,
+        spanishParseAudioRef,
       }) satisfies AudioEngine,
-    [
-      playingAudioRef,
-      currentSpanishAudioRef,
-      currentEnglishAudioRef,
-      nextSpanishAudioRef,
-      nextEnglishAudioRef,
-    ],
+    [playingAudioRef, englishParseAudioRef, spanishParseAudioRef],
   );
 
   return (
     <AudioContext value={audioEngine}>
       <audio ref={playingAudioRef} />
-      <audio ref={currentSpanishAudioRef} muted={true} />
-      <audio ref={currentEnglishAudioRef} muted={true} />
-      <audio ref={nextSpanishAudioRef} muted={true} />
-      <audio ref={nextEnglishAudioRef} muted={true} />
+      <audio ref={englishParseAudioRef} muted={true} />
+      <audio ref={spanishParseAudioRef} muted={true} />
       {children}
     </AudioContext>
   );

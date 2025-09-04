@@ -20,7 +20,7 @@ export interface UseMyAudioQuizReturn {
   error: Error | null;
 }
 
-export const useMyAudioQuiz = (): UseMyAudioQuizReturn => {
+export const useMyAudioQuiz = (ready: boolean): UseMyAudioQuizReturn => {
   // To get the flashcards
   const flashcardsHook = useStudentFlashcards();
 
@@ -28,12 +28,13 @@ export const useMyAudioQuiz = (): UseMyAudioQuizReturn => {
   const { audioFlashcards, isLoading, error } = flashcardsHook;
 
   // Get the examples from the flashcards
-  const collectedAudioExamples = audioFlashcards?.map(
-    (flashcard) => flashcard.example,
+  const collectedAudioExamples = useMemo(
+    () => audioFlashcards?.map((flashcard) => flashcard.example) ?? [],
+    [audioFlashcards],
   );
 
   // Call setup hook to return
-  const audioQuizSetup = useAudioQuizSetup(collectedAudioExamples ?? []);
+  const audioQuizSetup = useAudioQuizSetup(collectedAudioExamples);
 
   // Access the traits we need for our internal parsing
   const quizLength = audioQuizSetup.selectedQuizLength;
@@ -43,7 +44,8 @@ export const useMyAudioQuiz = (): UseMyAudioQuizReturn => {
   // Shuffle the owned examples and take a slice of the correct size
   const examplesToQuiz: ExampleWithVocabulary[] = useMemo(() => {
     const shuffledExamples = fisherYatesShuffle(collectedAudioExamples ?? []);
-    return shuffledExamples.slice(0, quizLength);
+    const slice = shuffledExamples.slice(0, quizLength);
+    return slice;
   }, [collectedAudioExamples, quizLength]);
 
   // Composition of audio quiz props to pass to useAudioQuiz
@@ -51,6 +53,7 @@ export const useMyAudioQuiz = (): UseMyAudioQuizReturn => {
     examplesToQuiz,
     audioQuizType,
     autoplay,
+    ready,
   };
 
   // Call the audio quiz hook

@@ -44,11 +44,18 @@ export function useAudioQuizSetup(
   }, [examples, quizLengthOptions]);
 
   // Take the longest available quiz Length as the default
-  const lastOption: number = availableQuizLengths.slice(-1)[0];
+  const lastOption: number = useMemo(() => {
+    const lastOption = availableQuizLengths.slice(-1)[0];
+    return lastOption;
+  }, [availableQuizLengths]);
 
   // Local state for choice of quiz length
-  const [selectedQuizLength, setSelectedQuizLength] =
-    useState<number>(lastOption);
+  const [selectedQuizLength, setSelectedQuizLength] = useState<number>(0);
+
+  // Strange pattern but this will only run once since zero will never be an option
+  if (lastOption && selectedQuizLength === 0) {
+    setSelectedQuizLength(lastOption);
+  }
 
   // Return audio quiz hook and local state
   return {

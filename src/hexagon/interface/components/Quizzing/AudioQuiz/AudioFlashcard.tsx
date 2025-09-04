@@ -1,13 +1,13 @@
 import React from 'react';
-import pause from 'src/assets/icons/pause.svg';
-import play from 'src/assets/icons/play.svg';
+import pauseIcon from 'src/assets/icons/pause.svg';
+import playIcon from 'src/assets/icons/play.svg';
 interface AudioFlashcardProps {
   currentExampleText: string;
   nextStep: () => void;
   autoplay: boolean;
   progressStatus: number;
-  pausePlayback: () => void;
-  resumePlayback: () => void;
+  pause: () => void;
+  play: () => void;
   isPlaying: boolean;
 }
 
@@ -16,8 +16,8 @@ export default function AudioFlashcardComponent({
   nextStep,
   autoplay,
   progressStatus,
-  pausePlayback,
-  resumePlayback,
+  pause,
+  play,
   isPlaying,
 }: AudioFlashcardProps): React.JSX.Element {
   function handlePlayPauseClick(
@@ -25,9 +25,9 @@ export default function AudioFlashcardComponent({
   ): void {
     e.stopPropagation();
     if (isPlaying) {
-      pausePlayback();
+      pause();
     } else {
-      resumePlayback();
+      play();
     }
   }
 
@@ -38,20 +38,21 @@ export default function AudioFlashcardComponent({
       onClick={!autoplay ? () => nextStep() : () => {}}
     >
       <p>{currentExampleText}</p>
-      {autoplay && (
-        <button
-          type="button"
-          className="audioPlayPauseButton"
-          onClick={(e) => handlePlayPauseClick(e)}
-          aria-label="Play/Pause"
-        >
-          <img src={isPlaying ? pause : play} alt="play/pause" />
-        </button>
-      )}
+      <button
+        type="button"
+        className="audioPlayPauseButton"
+        onClick={(e) => handlePlayPauseClick(e)}
+        aria-label="Play/Pause"
+      >
+        <img src={isPlaying ? pauseIcon : playIcon} alt="play/pause" />
+      </button>
       {autoplay && (
         <div
           className="progressStatus"
-          style={{ width: `${progressStatus * 100}%` }}
+          style={{
+            width: `${progressStatus * 100}%`,
+            transition: `${progressStatus ? 'width 0.2s' : 'none'}`,
+          }}
         />
       )}
     </div>

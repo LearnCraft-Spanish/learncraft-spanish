@@ -21,7 +21,9 @@ export default function MyFlashcardsQuiz() {
     quizType,
     setQuizType,
     quizReady,
-    setQuizReady,
+    quizNotReady,
+    readyQuiz,
+    cleanupQuiz,
     noFlashcards,
     isLoading,
     isError,
@@ -96,7 +98,7 @@ export default function MyFlashcardsQuiz() {
             )}
           </div>
           <div className="buttonBox">
-            <button type="submit" onClick={() => setQuizReady(true)}>
+            <button type="submit" disabled={quizNotReady} onClick={readyQuiz}>
               Start Quiz
             </button>
           </div>
@@ -108,18 +110,18 @@ export default function MyFlashcardsQuiz() {
         textQuizHook.textQuizSetup.srsQuiz ? (
           <SrsQuiz
             textQuizHook={textQuizHook.textQuiz}
-            cleanupFunction={() => setQuizReady(false)}
+            cleanupFunction={() => cleanupQuiz()}
           />
         ) : (
           <TextQuiz
             textQuizHook={textQuizHook.textQuiz}
-            cleanupFunction={() => setQuizReady(false)}
+            cleanupFunction={() => cleanupQuiz()}
           />
         )
       ) : (
         <AudioQuiz
           audioQuizHook={audioQuizHook.audioQuiz}
-          cleanupFunction={() => setQuizReady(false)}
+          cleanupFunction={() => cleanupQuiz()}
           autoplay={audioQuizHook.autoplay}
           audioQuizType={audioQuizHook.audioQuizType}
         />

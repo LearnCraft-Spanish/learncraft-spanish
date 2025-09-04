@@ -508,6 +508,7 @@ button:hover,
   background-color: var(--theme);
   color: var(--light);
   z-index: 1;
+  transition: width 0.2s;
 }
 
 .audioAutoplayFlashcardWrapper {

@@ -123,7 +123,6 @@ export default function LCSPQuizApp(): React.JSX.Element {
         });
       } else {
         quizList.forEach((item) => {
-          // console.log(item)
           quizSelections.push(
             <option key={i} value={item.quizNumber}>
               {courseName}

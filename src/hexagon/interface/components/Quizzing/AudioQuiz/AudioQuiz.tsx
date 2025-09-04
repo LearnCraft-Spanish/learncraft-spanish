@@ -91,8 +91,8 @@ export default function AudioQuiz({
               nextStep={nextStep}
               autoplay={autoplay}
               progressStatus={progressStatus}
-              pausePlayback={pause}
-              resumePlayback={play}
+              pause={pause}
+              play={play}
               isPlaying={isPlaying}
             />
           </div>
