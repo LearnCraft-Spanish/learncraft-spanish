@@ -44,6 +44,7 @@ export interface AudioQuizReturn {
   nextExample: () => void;
   previousExample: () => void;
   quizLength: number;
+  resetQuiz: () => void;
 }
 
 export function useAudioQuiz({
@@ -142,6 +143,12 @@ export function useAudioQuiz({
   // Ref to track changes to the current example index
   const previousExampleIndexRef = useRef<number>(-1);
 
+  // Ref to track changes to the current step
+  const previousStepRef = useRef<AudioQuizStep | null>(null);
+
+  // Ref used for autoplay to mark when the audio has entered the padding
+  const isInPadding = useRef(false);
+
   // The current example number (1-indexed for UI purposes)
   // Used only in export for UI, should not be referenced for stateful logic
   const currentExampleNumber = currentExampleIndex + 1; // 1-indexed
@@ -152,6 +159,20 @@ export function useAudioQuiz({
   const [parsedAudioExamples, setParsedAudioExamples] = useState<
     Record<number, SpeakingQuizExample | ListeningQuizExample | null>
   >({});
+
+  const resetQuiz = useCallback(() => {
+    setSelectedExampleIndex(0);
+    setCurrentStep(AudioQuizStep.Question);
+    previousStepRef.current = null;
+    isInPadding.current = false;
+    previousExampleIndexRef.current = -1;
+    changeCurrentAudio({
+      currentTime: 0,
+      src: '',
+      onEnded: () => {},
+      playOnLoad: true,
+    });
+  }, [changeCurrentAudio]);
 
   // Steps the quiz forward
   const incrementCurrentStep = useCallback(() => {
@@ -172,7 +193,7 @@ export function useAudioQuiz({
         break;
       case AudioQuizStep.Answer:
         if (currentExampleIndex === safeExamples.length - 1 && autoplay) {
-          pause();
+          resetQuiz();
           return;
         }
         incrementExampleIndex();
@@ -182,19 +203,13 @@ export function useAudioQuiz({
         console.error('Invalid currentStep value: ', currentStep);
     }
   }, [
-    pause,
+    resetQuiz,
     autoplay,
     currentStep,
     incrementExampleIndex,
     currentExampleIndex,
     safeExamples.length,
   ]);
-
-  // Ref to track changes to the current step
-  const previousStepRef = useRef<AudioQuizStep | null>(null);
-
-  // Ref used for autoplay to mark when the audio has entered the padding
-  const isInPadding = useRef(false);
 
   // Simple memos for the current, next, and previous examples
   // Undefined if unavailable, implies either loading state or out of array bounds
@@ -482,5 +497,6 @@ export function useAudioQuiz({
     progressStatus,
     currentExampleNumber,
     quizLength: safeExamples.length,
+    resetQuiz,
   };
 }

@@ -76,8 +76,11 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   }, [quizNotReady, setQuizReady]);
 
   const cleanupQuiz = useCallback(() => {
+    if (quizType === MyFlashcardsQuizType.Audio) {
+      audioQuizHook.audioQuiz.resetQuiz();
+    }
     setQuizReady(false);
-  }, [setQuizReady]);
+  }, [setQuizReady, audioQuizHook.audioQuiz, quizType]);
 
   // Return the hooks and local state
   return {

@@ -53,7 +53,6 @@ export function useAudioInfrastructure(): AudioPort {
   const updateCurrentTime = useCallback(() => {
     if (!context.playingAudioRef.current) return;
     const currentTimeRef = context.playingAudioRef.current.currentTime;
-    console.log('current time:', currentTimeRef);
     setCurrentTime(currentTimeRef);
   }, [context.playingAudioRef, setCurrentTime]);
 
