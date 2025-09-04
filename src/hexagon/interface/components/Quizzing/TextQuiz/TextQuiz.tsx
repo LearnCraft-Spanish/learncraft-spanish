@@ -1,6 +1,7 @@
-import type { UseSrsReturn } from '@application/units/useTextQuiz';
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { useTextQuiz } from '@application/units/useTextQuiz';
+import type {
+  TextQuizReturn,
+  UseSrsReturn,
+} from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
 import React, { useCallback, useEffect, useState } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
@@ -9,15 +10,13 @@ import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
 import { SRSButtons } from '../general/SRSButtons';
 
 export interface TextQuizProps {
-  examples: ExampleWithVocabulary[];
+  textQuizHook: TextQuizReturn;
   cleanupFunction?: () => void;
-  startWithSpanish?: boolean;
   srsQuizProps?: UseSrsReturn;
 }
 
 export function TextQuiz({
-  examples,
-  startWithSpanish = false,
+  textQuizHook,
   srsQuizProps,
   cleanupFunction,
 }: TextQuizProps) {
@@ -29,9 +28,8 @@ export function TextQuiz({
     previousExample,
     addFlashcard,
     removeFlashcard,
-
     currentExample,
-  } = useTextQuiz({ examples, startWithSpanish, canCollectFlashcards: true });
+  } = textQuizHook;
 
   const [answerShowing, setAnswerShowing] = useState(false);
 
@@ -102,7 +100,7 @@ export function TextQuiz({
             toggleAnswer={toggleAnswer}
           />
           <div className="quizButtons">
-            {srsQuizProps && (
+            {srsQuizProps && currentExample && (
               <SRSButtons
                 hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
                   currentExample.id,

@@ -1,103 +1,128 @@
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { useQuizMyFlashcards } from '@application/useCases/useQuizMyFlashcards';
+import {
+  MyFlashcardsQuizType,
+  useQuizMyFlashcards,
+} from '@application/useCases/useQuizMyFlashcards';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
 import {
-  QuizSetupMenu,
+  MyAudioQuizMenu,
+  MyTextQuizMenu,
   SrsQuiz,
   TextQuiz,
 } from '@interface/components/Quizzing';
-import { useCallback, useState } from 'react';
+import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './ReviewMyFlashcards.scss';
 
 export default function MyFlashcardsQuiz() {
-  const [examplesForQuiz, setExamplesForQuiz] = useState<
-    ExampleWithVocabulary[]
-  >([]);
   const {
-    isLoading,
-    myFlashcardsError: error,
-
-    quizSetupOptions,
+    audioQuizHook,
+    textQuizHook,
+    quizType,
+    setQuizType,
     quizReady,
     setQuizReady,
-    setupQuiz,
+    noFlashcards,
+    isLoading,
+    isError,
   } = useQuizMyFlashcards();
 
-  // This is only used to display the "No Flashcards Found" message, if student has no flashcards
-  const { flashcards } = useStudentFlashcards();
-
-  const { quizSettings } = quizSetupOptions;
-
-  // const navigateToQuiz = useCallback(() => {
-  //   if (quizSettings.quizType === 'audio') {
-  //     navigate('./audio');
-  //   } else if (quizSettings.quizType === 'text') {
-  //     if (quizSettings.srsQuiz) {
-  //       navigate('./srsquiz');
-  //     } else {
-  //       navigate('./quiz');
-  //     }
-  //   }
-  // }, [quizSettings.quizType, quizSettings.srsQuiz, navigate]);
-
-  const startQuiz = useCallback(() => {
-    const examples = setupQuiz();
-    if (!examples) {
-      console.error('No examples found in SetupQuiz function');
-      return;
-    }
-    setExamplesForQuiz(examples);
-  }, [setupQuiz]);
-
-  if (error) {
+  if (isError) {
     return <h2>Error Loading Flashcards</h2>;
   }
   if (isLoading) {
     return <Loading message="Loading Flashcard Data..." />;
   }
 
+  if (noFlashcards) {
+    return (
+      <div className="noFlashcardsWrapper">
+        <h2>No Flashcards Found</h2>
+        <p>It seems you have not collected any flashcards yet.</p>
+        <p>
+          You can collect flashcards by clicking the "add to my flashcards"
+          button (located on the back of a flashcard) during a quiz, or by using
+          the "Find Flashcards" page to search for flashcards to add to your
+          collection.
+        </p>
+        <div className="buttonBox">
+          <MenuButton />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      {flashcards?.length === 0 && (
-        <div className="noFlashcardsWrapper">
-          <h2>No Flashcards Found</h2>
-          <p>It seems you have not collected any flashcards yet.</p>
-          <p>
-            You can collect flashcards by clicking the "add to my flashcards"
-            button (located on the back of a flashcard) during a quiz, or by
-            using the "Find Flashcards" page to search for flashcards to add to
-            your collection.
-          </p>
+      {!quizReady ? (
+        <form
+          className="myFlashcardsForm"
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
+          <div className="myFlashcardsFormContentWrapper">
+            <h3>Review My Flashcards</h3>
+            <h4>Quiz Type:</h4>
+            <div className="buttonBox header">
+              <input type="radio" id="quizType" value="text" name="quizType" />
+              <label
+                htmlFor="quizType"
+                className={
+                  quizType === MyFlashcardsQuizType.Text ? 'selected' : ''
+                }
+                onClick={() => setQuizType(MyFlashcardsQuizType.Text)}
+              >
+                Text
+              </label>
+              <input type="radio" id="audio" value="audio" name="quizType" />
+              <label
+                htmlFor="audio"
+                className={
+                  quizType === MyFlashcardsQuizType.Audio ? 'selected' : ''
+                }
+                onClick={() => setQuizType(MyFlashcardsQuizType.Audio)}
+              >
+                Audio
+              </label>
+            </div>
+            {quizType === MyFlashcardsQuizType.Text && (
+              <MyTextQuizMenu quizSetupOptions={textQuizHook.textQuizSetup} />
+            )}
+            {quizType === MyFlashcardsQuizType.Audio && (
+              <MyAudioQuizMenu
+                quizSetupOptions={audioQuizHook.audioQuizSetup}
+              />
+            )}
+          </div>
+          <div className="buttonBox">
+            <button type="submit" onClick={() => setQuizReady(true)}>
+              Start Quiz
+            </button>
+          </div>
           <div className="buttonBox">
             <MenuButton />
           </div>
-        </div>
-      )}
-      {!quizReady ? (
-        <QuizSetupMenu
-          quizSetupOptions={quizSetupOptions}
-          startQuiz={startQuiz}
-        />
-      ) : quizSettings.quizType === 'text' ? (
-        quizSettings.srsQuiz ? (
+        </form>
+      ) : quizType === MyFlashcardsQuizType.Text ? (
+        textQuizHook.textQuizSetup.srsQuiz ? (
           <SrsQuiz
-            examples={examplesForQuiz}
-            startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
+            textQuizHook={textQuizHook.textQuiz}
             cleanupFunction={() => setQuizReady(false)}
           />
         ) : (
           <TextQuiz
-            examples={examplesForQuiz}
-            startWithSpanish={quizSetupOptions.quizSettings.startWithSpanish}
+            textQuizHook={textQuizHook.textQuiz}
             cleanupFunction={() => setQuizReady(false)}
           />
         )
       ) : (
-        // ) : quizSettings.quizType === 'audio' ? (
-        <div>Audio Quiz Not Implemented. Please come back Later :D</div>
+        <AudioQuiz
+          audioQuizHook={audioQuizHook.audioQuiz}
+          cleanupFunction={() => setQuizReady(false)}
+          autoplay={audioQuizHook.autoplay}
+          audioQuizType={audioQuizHook.audioQuizType}
+        />
       )}
     </div>
   );

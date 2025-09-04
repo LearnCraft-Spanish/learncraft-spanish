@@ -15,6 +15,9 @@ export function FlashcardDisplay({
   removeFlashcard,
   toggleAnswer,
 }: FlashcardDisplayProps) {
+  if (!quizExample) {
+    return <p>Example not found</p>;
+  }
   const {
     question,
     answer,

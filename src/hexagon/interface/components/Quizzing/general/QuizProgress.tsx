@@ -11,7 +11,7 @@ export function QuizProgress({
 }: QuizProgressProps): React.JSX.Element {
   return (
     <div className="quizProgress">
-      <p>{`${currentExampleNumber}/${totalExamplesNumber}`}</p>
+      <p>{`${currentExampleNumber} of ${totalExamplesNumber}`}</p>
       <div className="progressBar">
         <div
           className="progressBarFill"

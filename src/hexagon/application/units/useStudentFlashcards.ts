@@ -12,7 +12,7 @@ import {
   getCurrentInterval,
 } from 'src/hexagon/domain/srs';
 
-export interface UseStudentFlashcardsReturnType {
+export interface UseStudentFlashcardsReturn {
   flashcards: Flashcard[] | undefined;
   flashcardsDueForReview: Flashcard[] | undefined;
   customFlashcards: Flashcard[] | undefined;
@@ -47,7 +47,7 @@ export interface UseStudentFlashcardsReturnType {
   ) => Promise<number>;
 }
 
-export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
+export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   const {
     flashcards,
     isLoading,

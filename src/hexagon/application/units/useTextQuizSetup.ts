@@ -1,31 +1,40 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { AudioQuizType } from '@domain/audioQuizzing';
 import { useMemo, useState } from 'react';
 
-export interface AudioQuizSetupReturn {
+export interface TextQuizSetupReturn {
   availableQuizLengths: number[];
   selectedQuizLength: number;
   setSelectedQuizLength: (selectedQuizLength: number) => void;
+  srsQuiz: boolean;
+  setSrsQuiz: (srsQuiz: boolean) => void;
+  startWithSpanish: boolean;
+  setStartWithSpanish: (startWithSpanish: boolean) => void;
+  customOnly: boolean;
+  setCustomOnly: (customOnly: boolean) => void;
   totalExamples: number;
-  audioQuizType: AudioQuizType;
-  setAudioQuizType: (audioQuizType: AudioQuizType) => void;
-  autoplay: boolean;
-  setAutoplay: (autoplay: boolean) => void;
 }
 
-export function useAudioQuizSetup(
-  examples: ExampleWithVocabulary[],
-): AudioQuizSetupReturn {
-  // Local state for choice between speaking and listening quizzes
-  const [audioQuizType, setAudioQuizType] = useState<AudioQuizType>(
-    AudioQuizType.Speaking,
-  );
+export interface TextQuizSetupProps {
+  examples: ExampleWithVocabulary[];
+  srsQuiz: boolean;
+  setSrsQuiz: (srsQuiz: boolean) => void;
+  startWithSpanish: boolean;
+  setStartWithSpanish: (startWithSpanish: boolean) => void;
+  customOnly: boolean;
+  setCustomOnly: (customOnly: boolean) => void;
+}
 
+export function useTextQuizSetup({
+  examples,
+  srsQuiz,
+  setSrsQuiz,
+  startWithSpanish,
+  setStartWithSpanish,
+  customOnly,
+  setCustomOnly,
+}: TextQuizSetupProps) {
   // Arbitrary definitions for permissible quiz lengths
   const quizLengthOptions = useMemo(() => [10, 20, 50, 75, 100, 150], []);
-
-  // Local state for choice to autoplay audio or not
-  const [autoplay, setAutoplay] = useState<boolean>(true);
 
   // Which quiz lengths are usable for the number of examples we have
   const availableQuizLengths: number[] = useMemo(() => {
@@ -50,14 +59,16 @@ export function useAudioQuizSetup(
   const [selectedQuizLength, setSelectedQuizLength] =
     useState<number>(lastOption);
 
-  // Return audio quiz hook and local state
+  // Return bundled options
   return {
     totalExamples: examples.length,
     selectedQuizLength,
-    audioQuizType,
-    setAudioQuizType,
-    autoplay,
-    setAutoplay,
+    srsQuiz,
+    setSrsQuiz,
+    startWithSpanish,
+    setStartWithSpanish,
+    customOnly,
+    setCustomOnly,
     availableQuizLengths,
     setSelectedQuizLength,
   };
