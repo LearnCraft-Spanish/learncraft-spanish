@@ -4,9 +4,9 @@ import type {
   Flashcard,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
+import { officialQuizCourses } from '@learncraft-spanish/shared';
 import React, { useMemo } from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
-import quizCourses from 'src/functions/QuizCourseList';
 import SubHeader from '../SubHeader';
 
 interface ExampleAssignmentPanelProps {
@@ -103,7 +103,7 @@ export function ExampleAssignmentPanel({
               className="styledInput"
             >
               <option value="none">Select Course</option>
-              {quizCourses.map((course) => (
+              {officialQuizCourses.map((course) => (
                 <option key={course.code} value={course.code}>
                   {course.name}
                 </option>

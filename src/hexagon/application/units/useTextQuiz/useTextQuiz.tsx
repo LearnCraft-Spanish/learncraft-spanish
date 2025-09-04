@@ -79,16 +79,20 @@ export function useTextQuiz({
 
   const question: Question = {
     spanish: startWithSpanish,
-    text: currentExample.spanish,
+    text: startWithSpanish ? currentExample.spanish : currentExample.english,
     hasAudio: !!currentExample.spanishAudio,
-    audioUrl: currentExample.spanishAudio,
+    audioUrl: startWithSpanish
+      ? currentExample.spanishAudio
+      : currentExample.englishAudio,
   };
 
   const answer: Answer = {
     spanish: !startWithSpanish,
-    text: currentExample.english,
+    text: startWithSpanish ? currentExample.english : currentExample.spanish,
     hasAudio: !!currentExample.englishAudio,
-    audioUrl: currentExample.englishAudio,
+    audioUrl: startWithSpanish
+      ? currentExample.englishAudio
+      : currentExample.spanishAudio,
     owned: isExampleCollected(currentExample.id),
     addFlashcard,
     removeFlashcard,

@@ -9,6 +9,7 @@ import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
 import { SRSButtons } from '../general/SRSButtons';
 
 export interface TextQuizProps {
+  quizTitle?: string;
   examples: ExampleWithVocabulary[];
   cleanupFunction?: () => void;
   startWithSpanish?: boolean;
@@ -16,6 +17,7 @@ export interface TextQuizProps {
 }
 
 export function TextQuiz({
+  quizTitle,
   examples,
   startWithSpanish = false,
   srsQuizProps,
@@ -90,6 +92,7 @@ export function TextQuiz({
       {!!quizLength && (
         <div className="quiz">
           <QuizProgress
+            quizTitle={quizTitle}
             currentExampleNumber={exampleNumber}
             totalExamplesNumber={quizLength}
           />

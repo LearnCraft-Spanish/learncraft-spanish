@@ -3,6 +3,7 @@ import type {
   NewFlashcard,
   Vocabulary,
 } from 'src/types/interfaceDefinitions';
+import { officialQuizCourses } from '@learncraft-spanish/shared';
 import React, {
   useCallback,
   useEffect,
@@ -11,7 +12,6 @@ import React, {
   useState,
 } from 'react';
 import ExampleUpdateForm from 'src/components/ExampleManager/ExampleUpdateForm';
-import quizCourses from 'src/functions/QuizCourseList';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
@@ -406,7 +406,7 @@ export default function SingleExampleCreator({
           onChange={(e) => setTableOption(e.target.value)}
         >
           <option value="none">Recently Edited</option>
-          {quizCourses.map((course) => (
+          {officialQuizCourses.map((course) => (
             <option key={course.code} value={course.code}>
               {course.name}
             </option>

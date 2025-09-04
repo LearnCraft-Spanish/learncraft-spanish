@@ -6,7 +6,8 @@ import type {
 import React, { useCallback, useMemo } from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
 import { Loading } from 'src/components/Loading';
-import NoFlashcards from 'src/components/NoFlashcards';
+import { MenuButton } from 'src/hexagon/interface/components/general/Buttons';
+// import NoFlashcards from 'src/components/NoFlashcards';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 function FlashcardManager() {
@@ -83,7 +84,22 @@ function FlashcardManager() {
       )}
       {flashcardDataQuery.isError && <h2>Error Loading Flashcards</h2>}
       {flashcardDataQuery.isSuccess &&
-        !flashcardDataQuery.data?.studentExamples?.length && <NoFlashcards />}
+        !flashcardDataQuery.data?.studentExamples?.length && (
+          // <NoFlashcards />
+          <div className="noFlashcardsWrapper">
+            <h2>No Flashcards Found</h2>
+            <p>It seems you have not collected any flashcards yet.</p>
+            <p>
+              You can collect flashcards by clicking the "add to my flashcards"
+              button (located on the back of a flashcard) during a quiz, or by
+              using the "Find Flashcards" page to search for flashcards to add
+              to your collection.
+            </p>
+            <div className="buttonBox">
+              <MenuButton />
+            </div>
+          </div>
+        )}
       {flashcardDataQuery.isSuccess &&
         !!flashcardDataQuery.data?.examples?.length && (
           <div>
