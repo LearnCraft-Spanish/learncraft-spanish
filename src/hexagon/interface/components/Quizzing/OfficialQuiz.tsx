@@ -16,7 +16,7 @@ export function OfficialQuiz() {
   });
 
   if (isLoading) {
-    return <Loading message="Loading Official Quiz..." />;
+    return <Loading message="Loading Quiz..." />;
   }
   if (error) {
     return <h2 className="error">Error Loading Official Quiz</h2>;
@@ -36,11 +36,5 @@ export function OfficialQuiz() {
     );
   }
 
-  return (
-    <div>
-      <h1>Official Quiz</h1>
-      <h2>{quizNumber}</h2>
-      <h2>{courseCode}</h2>
-    </div>
-  );
+  return <div>Error Loading Official Quiz</div>;
 }

@@ -6,6 +6,15 @@ import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
 import { useBackend } from 'src/hooks/useBackend';
 import { useExampleUpdate } from '../ExampleData/useExampleUpdate';
 
+/*
+ * DEPRECATED: Use the new useOfficialQuizzes hook instead
+ * As of 9/4/2025, officialQuizzes refactor, this hook is still used in:
+ * - src/components/ExampleCreator/ExampleSetCreator.tsx
+ * - src/components/ExampleManager/ExampleSetCreator.tsx
+ * - src/components/ExampleManager/SingleExampleCreator.tsx
+ *
+ */
+
 export function useOfficialQuizzes(quizId: number | undefined) {
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuthAdapter();

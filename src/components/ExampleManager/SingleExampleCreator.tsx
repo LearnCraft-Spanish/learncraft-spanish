@@ -14,7 +14,7 @@ import React, {
 import ExampleUpdateForm from 'src/components/ExampleManager/ExampleUpdateForm';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/OLD_useOfficialQuizzes';
 import { useVocabulary } from 'src/hooks/CourseData/useVocabulary';
 import { useRecentlyEditedExamples } from 'src/hooks/ExampleData/useRecentlyEditedExamples';
 import ExamplesTable from '../ExamplesTable/ExamplesTable';

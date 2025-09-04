@@ -1,6 +1,8 @@
 import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
+import './OfficialQuizSetupMenu.scss';
+
 export interface OfficialQuizSetupMenuProps {
   currentCourseCode: string;
   setCurrentCourseCode: (courseCode: string) => void;

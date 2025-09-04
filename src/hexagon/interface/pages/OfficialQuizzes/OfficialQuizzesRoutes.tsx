@@ -39,7 +39,7 @@ export function OfficialQuizzesRoutes() {
         path="/"
         element={
           isLoading ? (
-            <Loading message="Loading Official Quizzes in route component..." />
+            <Loading message="Loading Official Quizzes..." />
           ) : error ? (
             <h2>Error Loading Official Quizzes</h2>
           ) : (
