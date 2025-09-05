@@ -88,6 +88,7 @@ export default function AudioQuiz({
             />
             <AudioFlashcard
               currentExampleText={currentExample?.spanish ?? ''}
+              currentStep={currentStep}
               nextStep={nextStep}
               autoplay={autoplay}
               progressStatus={progressStatus}

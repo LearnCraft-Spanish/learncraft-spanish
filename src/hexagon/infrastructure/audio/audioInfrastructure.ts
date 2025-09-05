@@ -139,7 +139,7 @@ export function useAudioInfrastructure(): AudioPort {
   // Ticks the current time of the playing audio, pushes to state
   useEffect(() => {
     if (isPlaying) {
-      tickRef.current = setInterval(updateCurrentTime, 100);
+      tickRef.current = setInterval(updateCurrentTime, 30);
     } else {
       if (tickRef.current) clearInterval(tickRef.current);
     }

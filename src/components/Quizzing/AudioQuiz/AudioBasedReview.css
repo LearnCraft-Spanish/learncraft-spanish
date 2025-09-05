@@ -64,7 +64,6 @@ button:disabled {
 
 .progressStatus {
   z-index: 1;
-  transition: width 0.2s;
 }
 
 @media screen and (max-width: 480px) {

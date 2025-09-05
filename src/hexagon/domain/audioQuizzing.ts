@@ -15,16 +15,21 @@ export enum AudioQuizType {
 export const AudioQuizTypeSchema = z.nativeEnum(AudioQuizType);
 
 export const AudioQuizQuestionSchema = z.object({
-  spanish: z.boolean(),
   step: z.literal(AudioQuizStep.Question),
+  spanish: z.boolean(),
+  displayText: z.string().min(1),
   duration: z.number().int().positive(),
   audioUrl: z.string().url(),
+  padAudioDuration: z.number().int().positive(),
+  padAudioUrl: z.string().url(),
 });
 
 export type AudioQuizQuestion = z.infer<typeof AudioQuizQuestionSchema>;
 
 export const AudioQuizGuessSchema = z.object({
   step: z.literal(AudioQuizStep.Guess),
+  spanish: z.literal(false),
+  displayText: z.string().min(1),
   duration: z.number().int().positive(),
   audioUrl: z.string().url(),
 });
@@ -32,8 +37,9 @@ export const AudioQuizGuessSchema = z.object({
 export type AudioQuizGuess = z.infer<typeof AudioQuizGuessSchema>;
 
 export const AudioQuizHintSchema = z.object({
-  spanish: z.literal(true),
   step: z.literal(AudioQuizStep.Hint),
+  spanish: z.literal(true),
+  displayText: z.string().min(1),
   duration: z.number().int().positive(),
   audioUrl: z.string().url(),
   padAudioDuration: z.number().int().positive(),
@@ -43,8 +49,9 @@ export const AudioQuizHintSchema = z.object({
 export type AudioQuizHint = z.infer<typeof AudioQuizHintSchema>;
 
 export const AudioQuizAnswerSchema = z.object({
-  spanish: z.boolean(),
   step: z.literal(AudioQuizStep.Answer),
+  spanish: z.boolean(),
+  displayText: z.string().min(1),
   duration: z.number().int().positive(),
   audioUrl: z.string().url(),
   padAudioDuration: z.number().int().positive(),
