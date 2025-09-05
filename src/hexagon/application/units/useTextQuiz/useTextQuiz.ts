@@ -7,17 +7,19 @@ import type {
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useVocabInfo } from '@application/units/useVocabInfo';
 import { useCallback, useMemo, useState } from 'react';
+import { useAuthAdapter } from '../../adapters/authAdapter';
 
 export interface TextQuizProps {
   examples: ExampleWithVocabulary[];
   startWithSpanish: boolean;
-  canCollectFlashcards: boolean;
+}
+export interface AddPendingRemoveProps {
+  addFlashcard: () => void;
+  removeFlashcard: () => void;
 }
 
 export interface TextQuizReturn {
-  addFlashcard: () => void;
-  removeFlashcard: () => void;
-  canCollectFlashcards: boolean;
+  addPendingRemoveProps: AddPendingRemoveProps | undefined;
   quizExample: FlashcardForDisplay | null;
   nextExample: () => void;
   previousExample: () => void;
@@ -29,9 +31,10 @@ export interface TextQuizReturn {
 
 export function useTextQuiz({
   examples,
-  canCollectFlashcards,
   startWithSpanish = false,
 }: TextQuizProps): TextQuizReturn {
+  const { isStudent } = useAuthAdapter();
+
   const {
     isExampleCollected,
     createFlashcards,
@@ -91,9 +94,13 @@ export function useTextQuiz({
     }
     return {
       spanish: startWithSpanish,
-      text: currentExample.spanish,
-      hasAudio: !!currentExample.spanishAudio,
-      audioUrl: currentExample.spanishAudio,
+      text: startWithSpanish ? currentExample.spanish : currentExample.english,
+      hasAudio: startWithSpanish
+        ? !!currentExample.spanishAudio
+        : !!currentExample.englishAudio,
+      audioUrl: startWithSpanish
+        ? currentExample.spanishAudio
+        : currentExample.englishAudio,
     };
   }, [currentExample, startWithSpanish]);
 
@@ -103,9 +110,13 @@ export function useTextQuiz({
     }
     return {
       spanish: !startWithSpanish,
-      text: currentExample.english,
-      hasAudio: !!currentExample.englishAudio,
-      audioUrl: currentExample.englishAudio,
+      text: startWithSpanish ? currentExample.english : currentExample.spanish,
+      hasAudio: startWithSpanish
+        ? !!currentExample.englishAudio
+        : !!currentExample.spanishAudio,
+      audioUrl: startWithSpanish
+        ? currentExample.englishAudio
+        : currentExample.spanishAudio,
       owned: isExampleCollected(currentExample.id),
       addFlashcard,
       removeFlashcard,
@@ -149,9 +160,13 @@ export function useTextQuiz({
   ]);
 
   return {
-    addFlashcard,
-    removeFlashcard,
-    canCollectFlashcards,
+    addPendingRemoveProps: isStudent
+      ? {
+          addFlashcard,
+          removeFlashcard,
+        }
+      : undefined,
+
     quizExample,
     exampleNumber,
     quizLength,

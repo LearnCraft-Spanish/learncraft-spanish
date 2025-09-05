@@ -1,5 +1,6 @@
 import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
 import { useLocation, useNavigate } from 'react-router-dom';
+import NotFoundPage from 'src/NotFoundPage';
 import { Loading } from '../Loading';
 import { TextQuiz } from './TextQuiz';
 export function OfficialQuiz() {
@@ -19,6 +20,10 @@ export function OfficialQuiz() {
     return <Loading message="Loading Quiz..." />;
   }
   if (error) {
+    if ((error as any)?.response?.status === 404) {
+      return <NotFoundPage />;
+    }
+    console.error(error);
     return <h2 className="error">Error Loading Official Quiz</h2>;
   }
   if (quizExamples) {

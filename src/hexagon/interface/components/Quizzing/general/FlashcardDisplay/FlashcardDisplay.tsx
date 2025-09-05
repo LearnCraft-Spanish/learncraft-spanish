@@ -11,9 +11,8 @@ import './FlashcardDisplay.scss';
 export function FlashcardDisplay({
   quizExample,
   answerShowing,
-  addFlashcard,
-  removeFlashcard,
   toggleAnswer,
+  addPendingRemoveProps,
 }: FlashcardDisplayProps) {
   if (!quizExample) {
     return <p>Example not found</p>;
@@ -57,13 +56,15 @@ export function FlashcardDisplay({
           className={`${answer.spanish ? 'spanishExample' : 'englishTranslation'}`}
         >
           {answerText()}
-          <AddToMyFlashcardsButtons
-            exampleIsCollected={exampleIsCollected}
-            exampleIsCustom={exampleIsCustom}
-            exampleIsPending={exampleIsPending}
-            addFlashcard={addFlashcard}
-            removeFlashcard={removeFlashcard}
-          />
+          {addPendingRemoveProps && (
+            <AddToMyFlashcardsButtons
+              exampleIsCollected={exampleIsCollected}
+              exampleIsCustom={exampleIsCustom}
+              exampleIsPending={exampleIsPending}
+              addFlashcard={addPendingRemoveProps.addFlashcard}
+              removeFlashcard={addPendingRemoveProps.removeFlashcard}
+            />
+          )}
         </div>
       )}
 

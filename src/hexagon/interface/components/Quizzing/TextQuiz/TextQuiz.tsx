@@ -1,7 +1,6 @@
-import type {
-  TextQuizReturn,
-  UseSrsReturn,
-} from '@application/units/useTextQuiz';
+import type { UseSrsReturn } from '@application/units/useTextQuiz';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
 import React, { useCallback, useEffect, useState } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
@@ -12,6 +11,7 @@ import { SRSButtons } from '../general/SRSButtons';
 export interface TextQuizProps {
   quizTitle?: string;
   examples: ExampleWithVocabulary[];
+  startWithSpanish: boolean;
   cleanupFunction?: () => void;
   srsQuizProps?: UseSrsReturn;
 }
@@ -29,10 +29,12 @@ export function TextQuiz({
     quizLength,
     nextExample,
     previousExample,
-    addFlashcard,
-    removeFlashcard,
     currentExample,
-  } = textQuizHook;
+    addPendingRemoveProps,
+  } = useTextQuiz({
+    examples,
+    startWithSpanish,
+  });
 
   const [answerShowing, setAnswerShowing] = useState(false);
 
@@ -98,10 +100,9 @@ export function TextQuiz({
 
           <FlashcardDisplay
             quizExample={quizExample}
-            addFlashcard={addFlashcard}
-            removeFlashcard={removeFlashcard}
             answerShowing={answerShowing}
             toggleAnswer={toggleAnswer}
+            addPendingRemoveProps={addPendingRemoveProps}
           />
           <div className="quizButtons">
             {srsQuizProps && currentExample && (
