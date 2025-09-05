@@ -17,11 +17,11 @@ import {
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
+import { OfficialQuizzesRoutes } from 'src/hexagon/interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
 import AudioBasedReview from '../sections/AudioBasedReview';
-import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
 
@@ -38,9 +38,7 @@ export default function AppRoutes() {
         element={isAuthenticated && <ReviewMyFlashcards />}
       />
       <Route path="/manage-flashcards" element={<FlashcardManager />} />
-      (
-      <Route path="/officialquizzes/*" element={<LCSPQuizApp />} />
-      )
+      <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
       <Route
         path="/flashcardfinder"
         element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}

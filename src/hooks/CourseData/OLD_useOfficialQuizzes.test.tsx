@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import mockData from 'mocks/data/serverlike/serverlikeData';
 
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/OLD_useOfficialQuizzes';
 import { describe, expect, it } from 'vitest';
 
 const { api } = mockData();
@@ -21,7 +21,7 @@ async function renderHookLoaded() {
   return result;
 }
 
-describe('useOfficialQuizzes', () => {
+describe('old useOfficialQuizzes', () => {
   describe('officialQuizzesQuery', () => {
     it('runs without crashing', async () => {
       const result = await renderHookLoaded();

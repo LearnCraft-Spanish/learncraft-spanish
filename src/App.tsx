@@ -27,8 +27,11 @@ export const App: React.FC = () => {
         location.pathname !== '/coaching-dashboard' &&
         location.pathname.split('/')[1] !== 'officialquizzes' && <SubHeader />}
 
-      {isLoading && !isAuthenticated && <Loading message="Logging in..." />}
-      <AppRoutes />
+      {isLoading && !isAuthenticated ? (
+        <Loading message="Logging in..." />
+      ) : (
+        <AppRoutes />
+      )}
       <ToastContainer
         theme="colored"
         transition={Zoom}
