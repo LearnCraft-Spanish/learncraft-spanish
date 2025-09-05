@@ -3,13 +3,12 @@ import type {
   AudioQuizGuess,
   AudioQuizHint,
   AudioQuizQuestion,
-  AudioQuizType,
   ListeningQuizExample,
   SpeakingQuizExample,
 } from '@domain/audioQuizzing';
 import type { Example } from '@learncraft-spanish/shared';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
-import { AudioQuizStep } from '@domain/audioQuizzing';
+import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getAudioQuizExample } from '../utils/audioQuizzingMappers';
 
@@ -17,7 +16,7 @@ interface AudioQuizProps {
   examplesToQuiz: Example[];
   audioQuizType: AudioQuizType;
   autoplay: boolean;
-  ready: boolean;
+  ready: boolean; // Flag to prevent audio from playing in the background
 }
 
 export interface AudioQuizReturn {
@@ -51,7 +50,7 @@ export function useAudioQuiz({
   examplesToQuiz,
   audioQuizType,
   autoplay,
-  ready,
+  ready, // Flag to prevent audio from playing in the background
 }: AudioQuizProps): AudioQuizReturn {
   const {
     play,
@@ -115,7 +114,7 @@ export function useAudioQuiz({
   }, []);
 
   // Simple utility functions to increment and decrement the example index
-  const incrementExampleIndex = useCallback(() => {
+  const nextExample = useCallback(() => {
     if (currentExampleIndex + 1 < safeExamples.length - 1) {
       setSelectedExampleIndex(currentExampleIndex + 1);
       goToQuestion();
@@ -130,7 +129,7 @@ export function useAudioQuiz({
     goToQuestion,
   ]);
 
-  const decrementExampleIndex = useCallback(() => {
+  const previousExample = useCallback(() => {
     if (currentExampleIndex > 0) {
       setSelectedExampleIndex(currentExampleIndex - 1);
       goToQuestion();
@@ -156,8 +155,12 @@ export function useAudioQuiz({
   // Audio examples are parsed on the fly
   // This is a map of example id to the parsed example
   // We use it to avoid parsing the same example multiple times
-  const [parsedAudioExamples, setParsedAudioExamples] = useState<
-    Record<number, SpeakingQuizExample | ListeningQuizExample | null>
+  const [parsedListeningExamples, setParsedListeningExamples] = useState<
+    Record<number, ListeningQuizExample>
+  >({});
+
+  const [parsedSpeakingExamples, setParsedSpeakingExamples] = useState<
+    Record<number, SpeakingQuizExample>
   >({});
 
   const resetQuiz = useCallback(() => {
@@ -175,7 +178,7 @@ export function useAudioQuiz({
   }, [changeCurrentAudio]);
 
   // Steps the quiz forward
-  const incrementCurrentStep = useCallback(() => {
+  const nextStep = useCallback(() => {
     switch (currentStep) {
       case AudioQuizStep.Question:
         if (autoplay) {
@@ -196,7 +199,7 @@ export function useAudioQuiz({
           resetQuiz();
           return;
         }
-        incrementExampleIndex();
+        nextExample();
         // Proceed to next question
         break;
       default:
@@ -206,20 +209,20 @@ export function useAudioQuiz({
     resetQuiz,
     autoplay,
     currentStep,
-    incrementExampleIndex,
+    nextExample,
     currentExampleIndex,
     safeExamples.length,
   ]);
 
   // Simple memos for the current, next, and previous examples
   // Undefined if unavailable, implies either loading state or out of array bounds
-  const currentExample = useMemo((): Example | undefined => {
+  const currentExampleMemo = useMemo((): Example | undefined => {
     if (safeExamples.length > 0) {
       return safeExamples[currentExampleIndex];
     }
   }, [safeExamples, currentExampleIndex]);
 
-  const nextExample = useMemo((): Example | undefined => {
+  const nextExampleMemo = useMemo((): Example | undefined => {
     if (
       safeExamples.length > 0 &&
       currentExampleIndex + 1 < safeExamples.length
@@ -228,7 +231,7 @@ export function useAudioQuiz({
     }
   }, [safeExamples, currentExampleIndex]);
 
-  const previousExample = useMemo((): Example | undefined => {
+  const previousExampleMemo = useMemo((): Example | undefined => {
     if (safeExamples.length > 0 && currentExampleIndex > 0) {
       return safeExamples[currentExampleIndex - 1];
     }
@@ -238,23 +241,21 @@ export function useAudioQuiz({
     async (safeIndex: number) => {
       // Prevent race conditions by checking if a parse is already in progress
       if (parseInProgress.current) {
-        console.error('parse is already in progress, waiting for it to finish');
         return;
       }
+
+      // Get the example to parse
       const example = safeExamples[safeIndex];
 
-      // If the next example is out of bounds, return
-      if (safeIndex >= safeExamples.length) {
-        return;
-      }
-
-      // If the next example is not ready, return
-      if (!example) {
-        return;
-      }
-
-      // If the next example is already parsed, return
-      if (parsedAudioExamples[example.id]) {
+      // If the next example is out of bounds, not ready, or already parsed, return
+      if (
+        safeIndex >= safeExamples.length ||
+        !example ||
+        (audioQuizType === AudioQuizType.Speaking &&
+          parsedSpeakingExamples[example.id]) ||
+        (audioQuizType === AudioQuizType.Listening &&
+          parsedListeningExamples[example.id])
+      ) {
         return;
       }
 
@@ -267,9 +268,8 @@ export function useAudioQuiz({
         spanish: example.spanishAudio,
       });
 
-      // If it comes back valid, parse it
       if (spanishDuration && englishDuration) {
-        parseInProgress.current = false;
+        // If it comes back valid, parse it
         const parsedExample = getAudioQuizExample(
           example,
           audioQuizType,
@@ -278,19 +278,28 @@ export function useAudioQuiz({
           autoplay,
         );
         // Record the parsed example in the map
-        setParsedAudioExamples((prev) => ({
-          ...prev,
-          [example.id]: parsedExample,
-        }));
-        // Otherwise, mark the example as bad
+        if (audioQuizType === AudioQuizType.Speaking) {
+          setParsedSpeakingExamples((prev) => ({
+            ...prev,
+            [example.id]: parsedExample as SpeakingQuizExample,
+          }));
+        } else {
+          setParsedListeningExamples((prev) => ({
+            ...prev,
+            [example.id]: parsedExample as ListeningQuizExample,
+          }));
+        }
       } else {
-        parseInProgress.current = false;
+        // Otherwise, mark the example as bad
         markExampleAsBad(example.id);
       }
+      // either way, mark the parse as finished
+      parseInProgress.current = false;
     },
     [
       safeExamples,
-      parsedAudioExamples,
+      parsedSpeakingExamples,
+      parsedListeningExamples,
       audioQuizType,
       autoplay,
       preloadAudio,
@@ -302,9 +311,21 @@ export function useAudioQuiz({
   const currentAudioExample: SpeakingQuizExample | ListeningQuizExample | null =
     useMemo(() => {
       // If the current example is parsed, return it
-      const parsedExample = parsedAudioExamples[currentExample?.id ?? -1];
-      return parsedExample ?? null;
-    }, [currentExample, parsedAudioExamples]);
+      if (audioQuizType === AudioQuizType.Speaking) {
+        const parsedExample =
+          parsedSpeakingExamples[currentExampleMemo?.id ?? -1];
+        return parsedExample ?? null;
+      } else {
+        const parsedExample =
+          parsedListeningExamples[currentExampleMemo?.id ?? -1];
+        return parsedExample ?? null;
+      }
+    }, [
+      currentExampleMemo,
+      parsedSpeakingExamples,
+      parsedListeningExamples,
+      audioQuizType,
+    ]);
 
   const currentExampleReady = useMemo(() => {
     if (!currentAudioExample) {
@@ -324,9 +345,20 @@ export function useAudioQuiz({
   const nextAudioExample: SpeakingQuizExample | ListeningQuizExample | null =
     useMemo(() => {
       // If the next example is not parsed, parse it
-      const parsedExample = parsedAudioExamples[nextExample?.id ?? -1];
-      return parsedExample ?? null;
-    }, [nextExample, parsedAudioExamples]);
+      if (audioQuizType === AudioQuizType.Speaking) {
+        const parsedExample = parsedSpeakingExamples[nextExampleMemo?.id ?? -1];
+        return parsedExample ?? null;
+      } else {
+        const parsedExample =
+          parsedListeningExamples[nextExampleMemo?.id ?? -1];
+        return parsedExample ?? null;
+      }
+    }, [
+      nextExampleMemo,
+      parsedSpeakingExamples,
+      parsedListeningExamples,
+      audioQuizType,
+    ]);
 
   const nextExampleReady = useMemo(() => {
     return nextAudioExample !== null;
@@ -336,17 +368,41 @@ export function useAudioQuiz({
     | SpeakingQuizExample
     | ListeningQuizExample
     | null = useMemo(() => {
-    const parsedExample = parsedAudioExamples[previousExample?.id ?? -1];
-    if (previousExample?.id && !parsedExample) {
-      console.error(
-        'Example with id',
-        previousExample.id,
-        'was skipped in parsing!',
-      );
-      return null;
+    if (audioQuizType === AudioQuizType.Speaking) {
+      const parsedExample =
+        parsedSpeakingExamples[previousExampleMemo?.id ?? -1];
+      if (previousExampleMemo?.id && !parsedExample) {
+        console.error(
+          'Example with id',
+          previousExampleMemo.id,
+          'was skipped in parsing!',
+        );
+        parseAudioExample(currentExampleIndex - 1);
+        return null;
+      }
+      return parsedExample ?? null;
+    } else {
+      const parsedExample =
+        parsedListeningExamples[previousExampleMemo?.id ?? -1];
+      if (previousExampleMemo?.id && !parsedExample) {
+        console.error(
+          'Example with id',
+          previousExampleMemo.id,
+          'was skipped in parsing!',
+        );
+        parseAudioExample(currentExampleIndex - 1);
+        return null;
+      }
+      return parsedExample ?? null;
     }
-    return parsedExample ?? null;
-  }, [previousExample, parsedAudioExamples]);
+  }, [
+    previousExampleMemo,
+    parsedSpeakingExamples,
+    parsedListeningExamples,
+    audioQuizType,
+    parseAudioExample,
+    currentExampleIndex,
+  ]);
 
   const previousExampleReady = useMemo(() => {
     return previousAudioExample !== null;
@@ -405,11 +461,11 @@ export function useAudioQuiz({
       changeCurrentAudio({
         currentTime: 0,
         src: currentStepValue.padAudioUrl,
-        onEnded: incrementCurrentStep,
+        onEnded: nextStep,
         playOnLoad: true,
       });
     }
-  }, [autoplay, currentStepValue, changeCurrentAudio, incrementCurrentStep]);
+  }, [autoplay, currentStepValue, changeCurrentAudio, nextStep]);
 
   // What to do when the audio ends
   const onEndedCallback = useCallback(() => {
@@ -419,9 +475,9 @@ export function useAudioQuiz({
     if (currentStepValue && 'padAudioDuration' in currentStepValue) {
       playPaddingAudio();
     } else {
-      incrementCurrentStep();
+      nextStep();
     }
-  }, [autoplay, currentStepValue, playPaddingAudio, incrementCurrentStep]);
+  }, [autoplay, currentStepValue, playPaddingAudio, nextStep]);
 
   // Complex effect to handle changes to the example or step
   useEffect(() => {
@@ -479,21 +535,21 @@ export function useAudioQuiz({
   ]);
 
   return {
-    currentExample: currentExample ?? null, // Otherwise the example data is not loaded
-    currentStep,
+    currentExample: currentExampleMemo ?? null, // Otherwise the example data is not loaded
+    currentStep, // The current step of the quiz
     currentStepValue: currentStepValue ?? null, // Otherwise the current audio is still parsing
-    currentExampleReady,
-    nextExampleReady,
-    previousExampleReady,
+    currentExampleReady, // Whether the current example is ready to be played
+    nextExampleReady, // Whether the next example is ready to be played
+    previousExampleReady, // Whether the previous example is ready to be played
     isPlaying,
-    pause,
+    pause, // Pauses the current audio
     play,
-    nextStep: incrementCurrentStep,
+    nextStep,
     goToQuestion,
     goToHint,
     goToAnswer,
-    nextExample: incrementExampleIndex,
-    previousExample: decrementExampleIndex,
+    nextExample,
+    previousExample,
     progressStatus,
     currentExampleNumber,
     quizLength: safeExamples.length,
