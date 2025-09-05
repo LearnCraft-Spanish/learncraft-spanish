@@ -5,15 +5,15 @@ import { TextQuiz } from './TextQuiz';
 export function OfficialQuiz() {
   // use useLocation
   const location = useLocation();
-  const navigate = useNavigate();
-  // grab the quizNumber & courseCode from the url
-  const result = location.pathname.split('/');
-  const courseCode = result[2];
-  const quizNumber = Number(result[3]);
+  const relativePath = location.pathname.split('/');
+  // ["", "officialquizzes", "courseCode", "quizNumber"]
+  const courseCode = relativePath[2];
+  const quizNumber = Number(relativePath[3]);
   const { quizExamples, isLoading, error, quizTitle } = useOfficialQuiz({
     courseCode,
     quizNumber,
   });
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <Loading message="Loading Quiz..." />;
@@ -27,9 +27,7 @@ export function OfficialQuiz() {
         <TextQuiz
           quizTitle={quizTitle}
           examples={quizExamples}
-          cleanupFunction={() => {
-            navigate('/officialquizzes');
-          }} // navigate back to the quiz setup menu
+          cleanupFunction={() => navigate('/officialquizzes')} // navigate back to the quiz setup menu
           startWithSpanish={false}
         />
       </>

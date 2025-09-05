@@ -1,11 +1,11 @@
-import type { QuizPort } from '@application/ports/quizPort';
+import type { OfficialQuizPort } from '@application/ports/officialQuizPort';
 
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockOfficialQuizRecordList } from '@testing/factories/quizFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation matching the QuizPort exactly
-const defaultMockAdapter: QuizPort = {
+const defaultMockAdapter: OfficialQuizPort = {
   getOfficialQuizRecords: () =>
     Promise.resolve(createMockOfficialQuizRecordList(3)()),
   getOfficialQuizExamples: (_args: {
@@ -16,10 +16,10 @@ const defaultMockAdapter: QuizPort = {
 
 // Create an overrideable mock with the default implementation
 export const {
-  mock: mockQuizAdapter,
-  override: overrideMockQuizAdapter,
-  reset: resetMockQuizAdapter,
-} = createOverrideableMock<QuizPort>(defaultMockAdapter);
+  mock: mockOfficialQuizAdapter,
+  override: overrideMockOfficialQuizAdapter,
+  reset: resetMockOfficialQuizAdapter,
+} = createOverrideableMock<OfficialQuizPort>(defaultMockAdapter);
 
 // Export the default mock for global mocking
-export default mockQuizAdapter;
+export default mockOfficialQuizAdapter;

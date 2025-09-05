@@ -3,7 +3,7 @@ import type {
   OfficialQuizRecord,
 } from '@learncraft-spanish/shared';
 
-export interface QuizPort {
+export interface OfficialQuizPort {
   getOfficialQuizRecords: () => Promise<OfficialQuizRecord[]>;
   getOfficialQuizExamples: ({
     courseCode,

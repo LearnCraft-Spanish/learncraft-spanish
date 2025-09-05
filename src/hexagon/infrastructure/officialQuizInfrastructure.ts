@@ -8,7 +8,10 @@ import {
   getOfficialQuizExamplesEndpoint,
   listOfficialQuizzesEndpoint,
 } from '@learncraft-spanish/shared';
-export function createQuizInfrastructure(apiUrl: string, auth: AuthPort) {
+export function createOfficialQuizInfrastructure(
+  apiUrl: string,
+  auth: AuthPort,
+) {
   const httpClient = createHttpClient(apiUrl, auth);
 
   return {

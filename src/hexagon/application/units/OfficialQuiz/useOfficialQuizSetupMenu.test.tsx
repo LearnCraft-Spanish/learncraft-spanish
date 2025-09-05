@@ -3,14 +3,14 @@ import { MemoryRouter } from 'react-router-dom';
 import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
 import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { overrideMockQuizAdapter } from '../../adapters/quizAdapter.mock';
+import { overrideMockOfficialQuizAdapter } from '../../adapters/officialQuizAdapter.mock';
 import { overrideMockActiveStudent } from '../../coordinators/hooks/useActiveStudent.mock';
 import { overrideMockSelectedCourseAndLessons } from '../../coordinators/hooks/useSelectedCourseAndLessons.mock';
 import { useOfficialQuizSetupMenu } from './useOfficialQuizSetupMenu';
 
 describe('useOfficialQuizSetupMenu', () => {
   beforeEach(() => {
-    overrideMockQuizAdapter({
+    overrideMockOfficialQuizAdapter({
       getOfficialQuizRecords: async () => [
         createMockOfficialQuizRecord({
           id: 1,

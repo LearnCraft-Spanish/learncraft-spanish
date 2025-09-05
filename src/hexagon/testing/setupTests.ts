@@ -14,9 +14,9 @@ import {
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
 import {
-  mockQuizAdapter,
-  resetMockQuizAdapter,
-} from '@application/adapters/quizAdapter.mock';
+  mockOfficialQuizAdapter,
+  resetMockOfficialQuizAdapter,
+} from '@application/adapters/officialQuizAdapter.mock';
 import {
   mockSubcategoryAdapter,
   resetMockSubcategoryAdapter,
@@ -73,8 +73,8 @@ vi.mock('@application/adapters/flashcardAdapter', () => ({
   useFlashcardAdapter: vi.fn(() => mockFlashcardAdapter),
 }));
 
-vi.mock('@application/adapters/quizAdapter', () => ({
-  useQuizAdapter: vi.fn(() => mockQuizAdapter),
+vi.mock('@application/adapters/officialQuizAdapter', () => ({
+  useOfficialQuizAdapter: vi.fn(() => mockOfficialQuizAdapter),
 }));
 
 const resetAdapterMocks = () => {
@@ -86,7 +86,7 @@ const resetAdapterMocks = () => {
   resetMockAuthAdapter();
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();
-  resetMockQuizAdapter();
+  resetMockOfficialQuizAdapter();
 };
 
 // Reset all mocks after each test

@@ -1,8 +1,8 @@
-import { useQuizAdapter } from '@application/adapters/quizAdapter';
+import { useOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter';
 import { useQuery } from '@tanstack/react-query';
 
 export function useOfficialQuizzesQuery() {
-  const { getOfficialQuizRecords } = useQuizAdapter();
+  const { getOfficialQuizRecords } = useOfficialQuizAdapter();
 
   const officialQuizRecordsQuery = useQuery({
     queryKey: ['officialQuizzes'],

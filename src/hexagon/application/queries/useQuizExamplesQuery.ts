@@ -1,4 +1,4 @@
-import { useQuizAdapter } from '@application/adapters/quizAdapter';
+import { useOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter';
 import { useQuery } from '@tanstack/react-query';
 
 export function useQuizExamplesQuery({
@@ -8,7 +8,7 @@ export function useQuizExamplesQuery({
   courseCode: string;
   quizNumber: number;
 }) {
-  const { getOfficialQuizExamples } = useQuizAdapter();
+  const { getOfficialQuizExamples } = useOfficialQuizAdapter();
   const quizExamplesQuery = useQuery({
     queryKey: ['quizExamples', courseCode, quizNumber],
     queryFn: () => getOfficialQuizExamples({ courseCode, quizNumber }),
