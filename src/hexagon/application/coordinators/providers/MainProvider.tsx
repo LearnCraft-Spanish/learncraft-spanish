@@ -2,6 +2,7 @@ import { ActiveStudentProvider } from '@application/coordinators/providers/Activ
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
 import FilterOwnedFlashcardsProvider from '@application/coordinators/providers/FilterOwnedFlashcardsProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
+import { AudioEngineProvider } from '@composition/providers/AudioProvider';
 
 export default function MainProvider({
   children,
@@ -11,11 +12,13 @@ export default function MainProvider({
   return (
     <ActiveStudentProvider>
       <SelectedCourseAndLessonsProvider>
-        <ExampleFilterContextProvider>
-          <FilterOwnedFlashcardsProvider>
-            {children}
-          </FilterOwnedFlashcardsProvider>
-        </ExampleFilterContextProvider>
+        <AudioEngineProvider>
+          <ExampleFilterContextProvider>
+            <FilterOwnedFlashcardsProvider>
+              {children}
+            </FilterOwnedFlashcardsProvider>
+          </ExampleFilterContextProvider>
+        </AudioEngineProvider>
       </SelectedCourseAndLessonsProvider>
     </ActiveStudentProvider>
   );

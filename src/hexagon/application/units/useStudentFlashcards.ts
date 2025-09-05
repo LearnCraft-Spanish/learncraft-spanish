@@ -6,13 +6,13 @@ import type {
 import type { SrsDifficulty } from 'src/hexagon/domain/srs';
 import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
 import { useCallback, useMemo } from 'react';
-import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
 import {
   calculateNewSrsInterval,
   getCurrentInterval,
 } from 'src/hexagon/domain/srs';
 
-export interface UseStudentFlashcardsReturnType {
+export interface UseStudentFlashcardsReturn {
   flashcards: Flashcard[] | undefined;
   flashcardsDueForReview: Flashcard[] | undefined;
   customFlashcards: Flashcard[] | undefined;
@@ -47,7 +47,7 @@ export interface UseStudentFlashcardsReturnType {
   ) => Promise<number>;
 }
 
-export const useStudentFlashcards = (): UseStudentFlashcardsReturnType => {
+export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   const {
     flashcards,
     isLoading,

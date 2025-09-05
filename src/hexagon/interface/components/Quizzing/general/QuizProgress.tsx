@@ -14,7 +14,7 @@ export function QuizProgress({
   return (
     <div className="quizProgress">
       {quizTitle && <h3>{quizTitle}</h3>}
-      <p>{`${currentExampleNumber}/${totalExamplesNumber}`}</p>
+      <p>{`${currentExampleNumber} of ${totalExamplesNumber}`}</p>
       <div className="progressBar">
         <div
           className="progressBarFill"

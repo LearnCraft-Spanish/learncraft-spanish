@@ -255,7 +255,6 @@ describe('useBackend Hook', () => {
     if (!quizId) {
       throw new Error('Quiz ID not found');
     }
-    // console.log('quiz record id: ', quizId)
     testArrayFetchFunction({
       functionName: 'getQuizExamplesFromBackend',
       functionParams: quizId,

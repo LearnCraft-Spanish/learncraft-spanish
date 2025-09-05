@@ -1,0 +1,130 @@
+import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import React from 'react';
+
+interface AudioQuizButtonsProps {
+  audioQuizType: AudioQuizType;
+  currentStep: AudioQuizStep;
+  nextStep: () => void;
+  autoplay: boolean;
+  nextExample: () => void;
+  previousExample: () => void;
+  goToQuestion: () => void;
+  goToHint: () => void;
+  closeQuiz: () => void;
+}
+
+export default function AudioQuizButtons({
+  audioQuizType,
+  currentStep,
+  nextStep,
+  autoplay,
+  nextExample,
+  previousExample,
+  goToQuestion,
+  goToHint,
+  closeQuiz,
+}: AudioQuizButtonsProps): React.JSX.Element {
+  function nextStepButtonText(): string {
+    switch (audioQuizType) {
+      case AudioQuizType.Speaking:
+        switch (currentStep) {
+          case AudioQuizStep.Question:
+            if (autoplay) {
+              return 'Skip to Guess';
+            } else {
+              return 'Play Spanish';
+            }
+          case AudioQuizStep.Guess:
+            return 'Play Spanish';
+          case AudioQuizStep.Hint:
+            return 'Play Again';
+          case AudioQuizStep.Answer:
+            return 'Next';
+        }
+        break;
+      case AudioQuizType.Listening:
+        switch (currentStep) {
+          case AudioQuizStep.Question:
+            if (autoplay) {
+              return 'Skip to Guess';
+            } else {
+              return 'Show Spanish';
+            }
+          case AudioQuizStep.Guess:
+            return 'Show Spanish';
+          case AudioQuizStep.Hint:
+            return 'Show English';
+          case AudioQuizStep.Answer:
+            return 'Next';
+        }
+        break;
+      default:
+        return 'Next';
+    }
+  }
+
+  function previousStepButton(): React.JSX.Element {
+    if (audioQuizType === AudioQuizType.Speaking) {
+      return (
+        <button type="button" onClick={() => goToQuestion()}>
+          Replay English
+        </button>
+      );
+    } else {
+      switch (currentStep) {
+        case AudioQuizStep.Question:
+          return (
+            <button type="button" onClick={() => goToQuestion()}>
+              Replay Spanish
+            </button>
+          );
+        case AudioQuizStep.Guess:
+          return (
+            <button type="button" onClick={() => goToQuestion()}>
+              Replay Spanish
+            </button>
+          );
+        case AudioQuizStep.Hint:
+          return (
+            <button type="button" onClick={() => goToHint()}>
+              Replay Spanish
+            </button>
+          );
+        case AudioQuizStep.Answer:
+          return (
+            <button type="button" onClick={() => goToHint()}>
+              Replay Spanish
+            </button>
+          );
+      }
+    }
+  }
+
+  return (
+    <div className="audioQuizButtons">
+      <div className="buttonBox switchOnMobile">
+        {previousStepButton()}
+        <button
+          type="button"
+          className="greenButton"
+          onClick={() => nextStep()}
+        >
+          {nextStepButtonText()}
+        </button>
+      </div>
+      <div className="buttonBox">
+        <button type="button" onClick={() => previousExample()}>
+          Previous
+        </button>
+        <button type="button" onClick={() => nextExample()}>
+          Next
+        </button>
+      </div>
+      <div className="buttonBox">
+        <button type="button" onClick={() => closeQuiz()}>
+          Back
+        </button>
+      </div>
+    </div>
+  );
+}

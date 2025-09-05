@@ -11,10 +11,14 @@ import type {
 import type { Example } from '@learncraft-spanish/shared';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 
-const localAudioPath = './assets/audio/';
+const localAudioPath = '/src/assets/audio/';
 
 const FALLBACK_GUESS_DURATION = 8;
 const PADDING_DURATION = 3;
+
+const GUESS_DISPLAY_TEXT = 'Make a guess!';
+const LISTENING_QUESTION_DISPLAY_TEXT = 'Listen to Audio';
+const SPEAKING_HINT_DISPLAY_TEXT = 'Listen to Audio';
 
 export function getEmptyFilePathFromDuration(duration: number): string {
   if (duration < 1) {
@@ -33,32 +37,46 @@ function getAudioQuizQuestion(
   audioQuizType: AudioQuizType.Speaking,
   englishDuration: number,
   spanishDuration: number,
+  autoplay: boolean,
 ): SpeakingQuizQuestion;
 function getAudioQuizQuestion(
   example: Example,
   audioQuizType: AudioQuizType.Listening,
   englishDuration: number,
   spanishDuration: number,
+  autoplay: boolean,
 ): ListeningQuizQuestion;
 function getAudioQuizQuestion(
   example: Example,
   audioQuizType: AudioQuizType,
   englishDuration: number,
   spanishDuration: number,
+  autoplay: boolean,
 ): SpeakingQuizQuestion | ListeningQuizQuestion {
+  const baseDuration =
+    audioQuizType === AudioQuizType.Speaking
+      ? englishDuration
+      : spanishDuration;
+  const autoplayDuration = baseDuration + PADDING_DURATION;
   if (audioQuizType === AudioQuizType.Speaking) {
     return {
       spanish: false,
       step: AudioQuizStep.Question,
-      duration: englishDuration,
+      displayText: example.english,
+      duration: autoplay ? autoplayDuration : baseDuration,
       audioUrl: example.englishAudio,
+      padAudioDuration: PADDING_DURATION,
+      padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
     } satisfies SpeakingQuizQuestion;
   } else {
     return {
       spanish: true,
       step: AudioQuizStep.Question,
-      duration: spanishDuration,
+      displayText: LISTENING_QUESTION_DISPLAY_TEXT,
+      duration: autoplay ? autoplayDuration : baseDuration,
       audioUrl: example.spanishAudio,
+      padAudioDuration: PADDING_DURATION,
+      padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
     } satisfies ListeningQuizQuestion;
   }
 }
@@ -70,6 +88,8 @@ function getAudioQuizGuess(spanishDuration: number): AudioQuizGuess {
     : FALLBACK_GUESS_DURATION;
   return {
     step: AudioQuizStep.Guess,
+    spanish: false,
+    displayText: GUESS_DISPLAY_TEXT,
     duration: guessDuration,
     audioUrl: getEmptyFilePathFromDuration(guessDuration),
   } satisfies AudioQuizGuess;
@@ -78,19 +98,33 @@ function getAudioQuizGuess(spanishDuration: number): AudioQuizGuess {
 // Overloaded function to get the hint based on the example, spanishDuration and autoplay
 function getAudioQuizHint(
   example: Example,
+  audioQuizType: AudioQuizType,
   spanishDuration: number,
   autoplay: boolean,
 ): AudioQuizHint {
   const baseDuration = spanishDuration;
-  const autoplayDuration = baseDuration + PADDING_DURATION * 1000; // 1000 is to convert seconds to milliseconds
-  return {
-    spanish: true,
-    step: AudioQuizStep.Hint,
-    duration: autoplay ? autoplayDuration : baseDuration,
-    audioUrl: example.spanishAudio,
-    padAudioDuration: PADDING_DURATION * 1000,
-    padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
-  } satisfies AudioQuizHint;
+  const autoplayDuration = baseDuration + PADDING_DURATION;
+  if (audioQuizType === AudioQuizType.Speaking) {
+    return {
+      spanish: true,
+      displayText: SPEAKING_HINT_DISPLAY_TEXT,
+      step: AudioQuizStep.Hint,
+      duration: autoplay ? autoplayDuration : baseDuration,
+      audioUrl: example.spanishAudio,
+      padAudioDuration: PADDING_DURATION,
+      padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
+    } satisfies AudioQuizHint;
+  } else {
+    return {
+      spanish: true,
+      step: AudioQuizStep.Hint,
+      displayText: example.spanish,
+      duration: autoplay ? autoplayDuration : baseDuration,
+      audioUrl: example.spanishAudio,
+      padAudioDuration: PADDING_DURATION,
+      padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
+    } satisfies AudioQuizHint;
+  }
 }
 
 // Overloaded function to get the answer based on the audioQuizType, example, spanishDuration, englishDuration and autoplay
@@ -117,25 +151,27 @@ function getAudioQuizAnswer(
 ): SpeakingQuizAnswer | ListeningQuizAnswer {
   const baseDuration =
     audioQuizType === AudioQuizType.Speaking
-      ? englishDuration
-      : spanishDuration;
-  const autoplayDuration = baseDuration + PADDING_DURATION * 1000; // 1000 is to convert seconds to milliseconds
+      ? spanishDuration
+      : englishDuration;
+  const autoplayDuration = baseDuration + PADDING_DURATION;
   if (audioQuizType === AudioQuizType.Speaking) {
     return {
       spanish: true,
       step: AudioQuizStep.Answer,
+      displayText: example.spanish,
       duration: autoplay ? autoplayDuration : baseDuration,
       audioUrl: example.spanishAudio,
-      padAudioDuration: PADDING_DURATION * 1000,
+      padAudioDuration: PADDING_DURATION,
       padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
     } satisfies SpeakingQuizAnswer;
   } else {
     return {
       spanish: false,
       step: AudioQuizStep.Answer,
+      displayText: example.english,
       duration: autoplay ? autoplayDuration : baseDuration,
       audioUrl: example.englishAudio,
-      padAudioDuration: PADDING_DURATION * 1000,
+      padAudioDuration: PADDING_DURATION,
       padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
     } satisfies ListeningQuizAnswer;
   }
@@ -157,10 +193,12 @@ export function getAudioQuizExample(
         audioQuizType,
         englishDuration,
         spanishDuration,
+        autoplay,
       ) satisfies SpeakingQuizQuestion,
       guess: getAudioQuizGuess(spanishDuration) satisfies AudioQuizGuess,
       hint: getAudioQuizHint(
         example,
+        audioQuizType,
         spanishDuration,
         autoplay,
       ) satisfies AudioQuizHint,
@@ -180,10 +218,12 @@ export function getAudioQuizExample(
         audioQuizType,
         englishDuration,
         spanishDuration,
+        autoplay,
       ) satisfies ListeningQuizQuestion,
       guess: getAudioQuizGuess(spanishDuration) satisfies AudioQuizGuess,
       hint: getAudioQuizHint(
         example,
+        audioQuizType,
         spanishDuration,
         autoplay,
       ) satisfies AudioQuizHint,

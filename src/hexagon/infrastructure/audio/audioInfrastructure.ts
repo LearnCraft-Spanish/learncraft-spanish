@@ -17,10 +17,25 @@ export function useAudioInfrastructure(): AudioPort {
   const [currentTime, setCurrentTime] = useState(0);
 
   const play = useCallback(async () => {
-    // If the audio is already playing, do nothing
-    if (!context.playingAudioRef.current || isPlaying) return;
-    await context.playingAudioRef.current.play();
+    // If the audio element is not mounted or is already playing, do nothing
+    if (!context.playingAudioRef.current || isPlaying) {
+      return;
+    } else if (context.playingAudioRef.current.readyState < 1) {
+      setIsPlaying(true);
+      // If the audio is not ready to be played, play it when the metadata is loaded
+      await context.playingAudioRef.current.addEventListener(
+        'loadedmetadata',
+        () => {
+          if (context.playingAudioRef.current) {
+            context.playingAudioRef.current.play();
+          }
+        },
+      );
+      return;
+    }
     setIsPlaying(true);
+    // If the audio is ready to be played, play it
+    await context.playingAudioRef.current.play();
   }, [context, isPlaying, setIsPlaying]);
 
   const pause = useCallback(async () => {
@@ -34,11 +49,13 @@ export function useAudioInfrastructure(): AudioPort {
     setIsPlaying(false);
   }, [context, isPlaying, setIsPlaying]);
 
+  // Updates the current time state of the playing audio
   const updateCurrentTime = useCallback(() => {
-    if (!isPlaying || !context.playingAudioRef.current) return;
-    const currentTimeRef = context.playingAudioRef.current?.currentTime ?? 0;
+    if (!context.playingAudioRef.current) return;
+    const currentTimeRef = context.playingAudioRef.current.currentTime;
+    console.log('currentTimeRef', currentTimeRef);
     setCurrentTime(currentTimeRef);
-  }, [context.playingAudioRef, isPlaying, setCurrentTime]);
+  }, [context.playingAudioRef, setCurrentTime]);
 
   // Helper function to get audio duration
   const getAudioDuration = (
@@ -67,23 +84,35 @@ export function useAudioInfrastructure(): AudioPort {
   };
 
   const changeCurrentAudio = useCallback(
-    async (current: AudioElementState) => {
+    async (newAudio: AudioElementState) => {
+      if (newAudio.playOnLoad) {
+        if (context.playingAudioRef.current) {
+          context.playingAudioRef.current.addEventListener(
+            'loadedmetadata',
+            () => {
+              if (context.playingAudioRef.current) {
+                context.playingAudioRef.current.play();
+                setIsPlaying(true);
+              }
+            },
+          );
+        }
+      }
       if (!context.playingAudioRef.current) return;
-      context.playingAudioRef.current.src = current.src;
-      context.playingAudioRef.current.currentTime = current.currentTime;
+      context.playingAudioRef.current.src = newAudio.src;
+      context.playingAudioRef.current.currentTime = newAudio.currentTime;
+      context.playingAudioRef.current.onended = newAudio.onEnded;
       updateCurrentTime();
-      context.playingAudioRef.current.onended = current.onEnded;
-      current.playing ? play() : pause();
     },
-    [context, play, pause, updateCurrentTime],
+    [context, updateCurrentTime],
   );
 
-  const updateCurrentAudioQueue = useCallback(
+  const preloadAudio = useCallback(
     async (newQueue: { english: string; spanish: string }) => {
       // If the context Audio Elements are not set, return null values
       if (
-        !context.currentEnglishAudioRef.current ||
-        !context.currentSpanishAudioRef.current
+        !context.englishParseAudioRef.current ||
+        !context.spanishParseAudioRef.current
       ) {
         return {
           englishDuration: null,
@@ -91,58 +120,30 @@ export function useAudioInfrastructure(): AudioPort {
         };
       }
       // Update the source of the audio elements
-      context.currentEnglishAudioRef.current.src = newQueue.english;
-      context.currentSpanishAudioRef.current.src = newQueue.spanish;
+      context.englishParseAudioRef.current.src = newQueue.english;
+      context.spanishParseAudioRef.current.src = newQueue.spanish;
 
       // Get the duration of the audio elements
       const [englishDuration, spanishDuration] = await Promise.all([
-        getAudioDuration(context.currentEnglishAudioRef.current),
-        getAudioDuration(context.currentSpanishAudioRef.current),
+        getAudioDuration(context.englishParseAudioRef.current),
+        getAudioDuration(context.spanishParseAudioRef.current),
       ]);
-
       // Return the duration of the audio elements
       return {
         englishDuration,
         spanishDuration,
       };
     },
-    [context],
+    [context.englishParseAudioRef, context.spanishParseAudioRef],
   );
 
-  const updateNextAudioQueue = useCallback(
-    async (newQueue: { english: string; spanish: string }) => {
-      // If the context Audio Elements are not set, return null values
-      if (
-        !context.nextEnglishAudioRef.current ||
-        !context.nextSpanishAudioRef.current
-      ) {
-        return {
-          englishDuration: null,
-          spanishDuration: null,
-        };
-      }
-      // Update the source of the audio elements
-      context.nextEnglishAudioRef.current.src = newQueue.english;
-      context.nextSpanishAudioRef.current.src = newQueue.spanish;
-
-      // Get the duration of the audio elements
-      const [englishDuration, spanishDuration] = await Promise.all([
-        getAudioDuration(context.nextEnglishAudioRef.current),
-        getAudioDuration(context.nextSpanishAudioRef.current),
-      ]);
-
-      // Return the duration of the audio elements
-      return {
-        englishDuration,
-        spanishDuration,
-      };
-    },
-    [context],
-  );
-
+  // Ticks the current time of the playing audio, pushes to state
   useEffect(() => {
-    if (!isPlaying || !context.playingAudioRef.current) return;
-    tickRef.current = setInterval(updateCurrentTime, 50);
+    if (isPlaying) {
+      tickRef.current = setInterval(updateCurrentTime, 30);
+    } else {
+      if (tickRef.current) clearInterval(tickRef.current);
+    }
     return () => {
       if (tickRef.current) clearInterval(tickRef.current);
     };
@@ -154,7 +155,6 @@ export function useAudioInfrastructure(): AudioPort {
     isPlaying,
     currentTime,
     changeCurrentAudio,
-    updateCurrentAudioQueue,
-    updateNextAudioQueue,
+    preloadAudio,
   };
 }

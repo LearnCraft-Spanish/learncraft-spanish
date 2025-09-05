@@ -1,8 +1,8 @@
 export interface AudioElementState {
-  playing: boolean;
   currentTime: number;
   src: string;
   onEnded: () => void;
+  playOnLoad: boolean;
 }
 
 export interface AudioPort {
@@ -19,19 +19,8 @@ export interface AudioPort {
   // Changes the current audio element
   changeCurrentAudio: (current: AudioElementState) => Promise<void>;
 
-  // Updates the audio queue
-  updateCurrentAudioQueue: (newQueue: {
-    english: string;
-    spanish: string;
-  }) => Promise<{
-    englishDuration: number | null;
-    spanishDuration: number | null;
-  }>;
-
-  updateNextAudioQueue: (newQueue: {
-    english: string;
-    spanish: string;
-  }) => Promise<{
+  // Preloads the audio durations
+  preloadAudio: (newQueue: { english: string; spanish: string }) => Promise<{
     englishDuration: number | null;
     spanishDuration: number | null;
   }>;

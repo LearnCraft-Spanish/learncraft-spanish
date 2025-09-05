@@ -1,7 +1,7 @@
 import type { FlashcardForDisplay } from 'src/hexagon/domain/quizzing';
 
 export interface FlashcardDisplayProps {
-  quizExample: FlashcardForDisplay;
+  quizExample: FlashcardForDisplay | null;
   answerShowing: boolean;
   addFlashcard: () => void;
   removeFlashcard: () => void;
