@@ -22,7 +22,6 @@ interface AudioQuizProps {
 export interface AudioQuizReturn {
   currentExampleNumber: number;
   currentExampleReady: boolean;
-  currentExample: Example | null;
   currentStep: AudioQuizStep;
   currentStepValue:
     | AudioQuizQuestion
@@ -68,7 +67,7 @@ export function useAudioQuiz({
   // Marks an example as bad, removing it from the review list
   const markExampleAsBad = useCallback((exampleId: number) => {
     console.error('unplayable example found with id', exampleId);
-    setBadAudioExamples((prev) => [...prev, exampleId]);
+    setBadAudioExamples((prev: number[]) => [...prev, exampleId]);
   }, []);
 
   // The examples to reviw, but with invalid audio filtered out
@@ -101,43 +100,26 @@ export function useAudioQuiz({
     AudioQuizStep.Question,
   );
 
-  const goToQuestion = useCallback(() => {
-    setCurrentStep(AudioQuizStep.Question);
-  }, []);
-
-  const goToHint = useCallback(() => {
-    setCurrentStep(AudioQuizStep.Hint);
-  }, []);
-
-  const goToAnswer = useCallback(() => {
-    setCurrentStep(AudioQuizStep.Answer);
-  }, []);
-
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
     if (currentExampleIndex + 1 < safeExamples.length - 1) {
       setSelectedExampleIndex(currentExampleIndex + 1);
-      goToQuestion();
+      setCurrentStep(AudioQuizStep.Question);
     } else {
       setSelectedExampleIndex(safeExamples.length - 1);
-      goToQuestion();
+      setCurrentStep(AudioQuizStep.Question);
     }
-  }, [
-    currentExampleIndex,
-    setSelectedExampleIndex,
-    safeExamples,
-    goToQuestion,
-  ]);
+  }, [currentExampleIndex, setSelectedExampleIndex, safeExamples]);
 
   const previousExample = useCallback(() => {
     if (currentExampleIndex > 0) {
       setSelectedExampleIndex(currentExampleIndex - 1);
-      goToQuestion();
+      setCurrentStep(AudioQuizStep.Question);
     } else {
       setSelectedExampleIndex(0);
-      goToQuestion();
+      setCurrentStep(AudioQuizStep.Question);
     }
-  }, [currentExampleIndex, setSelectedExampleIndex, goToQuestion]);
+  }, [currentExampleIndex, setSelectedExampleIndex]);
 
   // Ref to track changes to the current example index
   const previousExampleIndexRef = useRef<number>(-1);
@@ -154,7 +136,7 @@ export function useAudioQuiz({
 
   // Audio examples are parsed on the fly
   // This is a map of example id to the parsed example
-  // We use it to avoid parsing the same example multiple times
+  // Separated for listening and speaking quizzes
   const [parsedListeningExamples, setParsedListeningExamples] = useState<
     Record<number, ListeningQuizExample>
   >({});
@@ -163,6 +145,7 @@ export function useAudioQuiz({
     Record<number, SpeakingQuizExample>
   >({});
 
+  // Resets the quiz to the initial state, called on menu and end of autoplay
   const resetQuiz = useCallback(() => {
     setSelectedExampleIndex(0);
     setCurrentStep(AudioQuizStep.Question);
@@ -237,19 +220,15 @@ export function useAudioQuiz({
     }
   }, [safeExamples, currentExampleIndex]);
 
+  // Parses the audio example at the given index
   const parseAudioExample = useCallback(
     async (safeIndex: number) => {
-      // Prevent race conditions by checking if a parse is already in progress
-      if (parseInProgress.current) {
-        return;
-      }
-
       // Get the example to parse
       const example = safeExamples[safeIndex];
 
       // If the next example is out of bounds, not ready, or already parsed, return
       if (
-        safeIndex >= safeExamples.length ||
+        safeIndex > safeExamples.length - 1 ||
         !example ||
         (audioQuizType === AudioQuizType.Speaking &&
           parsedSpeakingExamples[example.id]) ||
@@ -279,15 +258,19 @@ export function useAudioQuiz({
         );
         // Record the parsed example in the map
         if (audioQuizType === AudioQuizType.Speaking) {
-          setParsedSpeakingExamples((prev) => ({
-            ...prev,
-            [example.id]: parsedExample as SpeakingQuizExample,
-          }));
+          setParsedSpeakingExamples(
+            (prev: Record<number, SpeakingQuizExample>) => ({
+              ...prev,
+              [example.id]: parsedExample as SpeakingQuizExample,
+            }),
+          );
         } else {
-          setParsedListeningExamples((prev) => ({
-            ...prev,
-            [example.id]: parsedExample as ListeningQuizExample,
-          }));
+          setParsedListeningExamples(
+            (prev: Record<number, ListeningQuizExample>) => ({
+              ...prev,
+              [example.id]: parsedExample as ListeningQuizExample,
+            }),
+          );
         }
       } else {
         // Otherwise, mark the example as bad
@@ -430,24 +413,37 @@ export function useAudioQuiz({
 
   // Calculates the progress status of the current step, including the padding if autoplay is on
   const progressStatus = useMemo(() => {
+    if (!autoplay) {
+      return 0;
+    }
+
+    if (
+      previousStepRef.current &&
+      currentStep &&
+      currentStep !== previousStepRef.current
+    ) {
+      return 0;
+    }
+
+    // If the step value is not ready, return 0
     if (!currentStepValue || !currentStepValue.duration) {
       return 0;
     }
+
     // If audio has entered the padding, return the progress status of the padding
-    if (
-      autoplay &&
-      'padAudioDuration' in currentStepValue &&
-      isInPadding.current
-    ) {
-      return (
+    if ('padAudioDuration' in currentStepValue && isInPadding.current) {
+      const progress =
         (currentStepValue.duration -
           currentStepValue.padAudioDuration +
           currentTime) /
-        currentStepValue.duration
-      );
+        currentStepValue.duration;
+      return progress;
     }
-    return currentTime / currentStepValue.duration;
-  }, [currentTime, currentStepValue, autoplay]);
+
+    // Otherwise, return the progress status of the current step
+    const progress = currentTime / currentStepValue.duration;
+    return progress;
+  }, [currentTime, currentStepValue, autoplay, previousStepRef, currentStep]);
 
   // If autoplay and padding is needed, play the padding audio
   const playPaddingAudio = useCallback(() => {
@@ -479,18 +475,97 @@ export function useAudioQuiz({
     }
   }, [autoplay, currentStepValue, playPaddingAudio, nextStep]);
 
-  // Complex effect to handle changes to the example or step
+  const goToQuestion = useCallback(() => {
+    setCurrentStep(AudioQuizStep.Question);
+    if (
+      previousStepRef.current === AudioQuizStep.Question &&
+      currentAudioExample
+    ) {
+      changeCurrentAudio({
+        currentTime: 0,
+        src: currentAudioExample?.question.audioUrl,
+        onEnded: onEndedCallback,
+        playOnLoad: true,
+      });
+    }
+  }, [
+    currentAudioExample,
+    previousStepRef,
+    changeCurrentAudio,
+    onEndedCallback,
+  ]);
+
+  const goToHint = useCallback(() => {
+    setCurrentStep(AudioQuizStep.Hint);
+    if (previousStepRef.current === AudioQuizStep.Hint && currentAudioExample) {
+      changeCurrentAudio({
+        currentTime: 0,
+        src: currentAudioExample?.hint.audioUrl,
+        onEnded: onEndedCallback,
+        playOnLoad: true,
+      });
+    }
+  }, [
+    currentAudioExample,
+    previousStepRef,
+    changeCurrentAudio,
+    onEndedCallback,
+  ]);
+
+  const goToAnswer = useCallback(() => {
+    setCurrentStep(AudioQuizStep.Answer);
+    if (
+      previousStepRef.current === AudioQuizStep.Answer &&
+      currentAudioExample
+    ) {
+      changeCurrentAudio({
+        currentTime: 0,
+        src: currentAudioExample?.answer.audioUrl,
+        onEnded: onEndedCallback,
+        playOnLoad: true,
+      });
+    }
+  }, [
+    currentAudioExample,
+    previousStepRef,
+    changeCurrentAudio,
+    onEndedCallback,
+  ]);
+
+  // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
-    // Do not proceed with the changes unless the audio is ready to be played
     if (!currentExampleReady) {
       // Parse the current audio example
       parseAudioExample(currentExampleIndex);
-      return;
-    }
-    if (!nextExampleReady) {
+    } else if (currentExampleReady && !nextExampleReady) {
       // Parse the next audio example
+      if (parseInProgress.current) {
+        return;
+      }
       parseAudioExample(currentExampleIndex + 1);
+    } else if (
+      currentExampleReady &&
+      nextExampleReady &&
+      !previousExampleReady
+    ) {
+      // Parse the previous audio example
+      if (parseInProgress.current) {
+        return;
+      }
+      parseAudioExample(currentExampleIndex - 1);
     }
+  }, [
+    currentExampleReady,
+    nextExampleReady,
+    previousExampleReady,
+    currentExampleIndex,
+    progressStatus,
+    parseAudioExample,
+  ]);
+
+  // Complex effect to handle changes to the example or step
+  useEffect(() => {
+    // Do not proceed with the changes unless the audio is ready to be played
     if (!ready) {
       return;
     }
@@ -509,7 +584,7 @@ export function useAudioQuiz({
         playOnLoad: true,
       });
     } else if (currentStep !== previousStepRef.current && currentStepValue) {
-      // If the step has changed but the step has, handle the step change
+      // If the step has changed but the index has not, handle the step change
       previousStepRef.current = currentStep;
       isInPadding.current = false;
       // Handle step change
@@ -520,6 +595,14 @@ export function useAudioQuiz({
         playOnLoad: true,
       });
     }
+    return () => {
+      changeCurrentAudio({
+        currentTime: 0,
+        src: '',
+        onEnded: () => {},
+        playOnLoad: true,
+      });
+    };
   }, [
     ready,
     currentExampleReady,
@@ -533,7 +616,6 @@ export function useAudioQuiz({
   ]);
 
   return {
-    currentExample: currentExampleMemo ?? null, // Otherwise the example data is not loaded
     currentStep, // The current step of the quiz
     currentStepValue: currentStepValue ?? null, // Otherwise the current audio is still parsing
     currentExampleReady, // Whether the current example is ready to be played

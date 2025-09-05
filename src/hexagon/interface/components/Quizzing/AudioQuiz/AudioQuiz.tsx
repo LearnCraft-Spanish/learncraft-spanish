@@ -32,7 +32,7 @@ export default function AudioQuiz({
     isPlaying,
     quizLength,
     progressStatus,
-    currentExample,
+    currentStepValue,
     currentExampleNumber,
     currentStep,
   } = audioQuizHook;
@@ -87,7 +87,7 @@ export default function AudioQuiz({
               totalExamplesNumber={quizLength}
             />
             <AudioFlashcard
-              currentExampleText={currentExample?.spanish ?? ''}
+              currentExampleText={currentStepValue?.displayText ?? ''}
               currentStep={currentStep}
               nextStep={nextStep}
               autoplay={autoplay}

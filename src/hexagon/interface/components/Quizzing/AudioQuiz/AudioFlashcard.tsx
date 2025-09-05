@@ -64,7 +64,7 @@ export default function AudioFlashcardComponent({
             className="progressStatus"
             style={{
               width: `${progressStatus * 100}%`,
-              transition: `${'width 0.1s'}`,
+              transition: `${progressStatus < 0.015 || progressStatus > 0.985 ? 'none' : 'width 0.1s'}`,
               backgroundColor: 'var(--dark)',
             }}
           />
@@ -76,7 +76,7 @@ export default function AudioFlashcardComponent({
             className="progressStatus"
             style={{
               width: `${progressStatus * 100}%`,
-              transition: `${'width 0.1s'}`,
+              transition: `${progressStatus < 0.015 || progressStatus > 0.985 ? 'none' : 'width 0.1s'}`,
               backgroundColor: 'var(--theme)',
             }}
           />

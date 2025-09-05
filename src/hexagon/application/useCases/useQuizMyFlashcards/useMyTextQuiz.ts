@@ -113,7 +113,6 @@ export const useMyTextQuiz = (): UseMyTextQuizReturn => {
   // Composition of text quiz props to pass to useTextQuiz
   const textQuizProps: TextQuizProps = {
     examples: examplesToQuiz,
-    canCollectFlashcards,
     startWithSpanish,
   };
 

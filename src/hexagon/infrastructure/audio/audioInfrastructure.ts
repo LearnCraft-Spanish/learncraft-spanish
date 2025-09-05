@@ -51,10 +51,12 @@ export function useAudioInfrastructure(): AudioPort {
 
   // Updates the current time state of the playing audio
   const updateCurrentTime = useCallback(() => {
-    if (!context.playingAudioRef.current) return;
+    if (!context.playingAudioRef.current) {
+      setCurrentTime(0);
+      return;
+    }
     const currentTimeRef = context.playingAudioRef.current.currentTime;
-    console.log('currentTimeRef', currentTimeRef);
-    setCurrentTime(currentTimeRef);
+    setCurrentTime(currentTimeRef || 0);
   }, [context.playingAudioRef, setCurrentTime]);
 
   // Helper function to get audio duration
@@ -140,14 +142,14 @@ export function useAudioInfrastructure(): AudioPort {
   // Ticks the current time of the playing audio, pushes to state
   useEffect(() => {
     if (isPlaying) {
-      tickRef.current = setInterval(updateCurrentTime, 30);
+      tickRef.current = setInterval(updateCurrentTime, 50);
     } else {
       if (tickRef.current) clearInterval(tickRef.current);
     }
     return () => {
-      if (tickRef.current) clearInterval(tickRef.current);
+      pause();
     };
-  }, [context.playingAudioRef, isPlaying, updateCurrentTime]);
+  }, [context.playingAudioRef, isPlaying, updateCurrentTime, pause]);
 
   return {
     play,
