@@ -37,25 +37,33 @@ function getAudioQuizQuestion(
   audioQuizType: AudioQuizType.Speaking,
   englishDuration: number,
   spanishDuration: number,
+  autoplay: boolean,
 ): SpeakingQuizQuestion;
 function getAudioQuizQuestion(
   example: Example,
   audioQuizType: AudioQuizType.Listening,
   englishDuration: number,
   spanishDuration: number,
+  autoplay: boolean,
 ): ListeningQuizQuestion;
 function getAudioQuizQuestion(
   example: Example,
   audioQuizType: AudioQuizType,
   englishDuration: number,
   spanishDuration: number,
+  autoplay: boolean,
 ): SpeakingQuizQuestion | ListeningQuizQuestion {
+  const baseDuration =
+    audioQuizType === AudioQuizType.Speaking
+      ? englishDuration
+      : spanishDuration;
+  const autoplayDuration = baseDuration + PADDING_DURATION;
   if (audioQuizType === AudioQuizType.Speaking) {
     return {
       spanish: false,
       step: AudioQuizStep.Question,
       displayText: example.english,
-      duration: englishDuration,
+      duration: autoplay ? autoplayDuration : baseDuration,
       audioUrl: example.englishAudio,
       padAudioDuration: PADDING_DURATION,
       padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
@@ -65,7 +73,7 @@ function getAudioQuizQuestion(
       spanish: true,
       step: AudioQuizStep.Question,
       displayText: LISTENING_QUESTION_DISPLAY_TEXT,
-      duration: spanishDuration,
+      duration: autoplay ? autoplayDuration : baseDuration,
       audioUrl: example.spanishAudio,
       padAudioDuration: PADDING_DURATION,
       padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
@@ -185,6 +193,7 @@ export function getAudioQuizExample(
         audioQuizType,
         englishDuration,
         spanishDuration,
+        autoplay,
       ) satisfies SpeakingQuizQuestion,
       guess: getAudioQuizGuess(spanishDuration) satisfies AudioQuizGuess,
       hint: getAudioQuizHint(
@@ -209,6 +218,7 @@ export function getAudioQuizExample(
         audioQuizType,
         englishDuration,
         spanishDuration,
+        autoplay,
       ) satisfies ListeningQuizQuestion,
       guess: getAudioQuizGuess(spanishDuration) satisfies AudioQuizGuess,
       hint: getAudioQuizHint(
