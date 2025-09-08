@@ -11,11 +11,15 @@ import {
   TextQuiz,
 } from '@interface/components/Quizzing';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import FlashcardManagerFilters from '../../components/FlashcardManager/FlashcardManagerFilters';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './ReviewMyFlashcards.scss';
 
 export default function MyFlashcardsQuiz() {
   const {
+    filtersEnabled,
+    setFiltersEnabled,
+    exampleFilter,
     audioQuizSetup,
     textQuizSetup,
     audioQuizProps,
@@ -29,6 +33,8 @@ export default function MyFlashcardsQuiz() {
     isLoading,
     error,
   } = useQuizMyFlashcards();
+
+  const { filterState, skillTagSearch } = exampleFilter;
 
   if (error) {
     return <h2>Error Loading Flashcards</h2>;
@@ -64,6 +70,12 @@ export default function MyFlashcardsQuiz() {
             e.preventDefault();
           }}
         >
+          <FlashcardManagerFilters
+            filterState={filterState}
+            skillTagSearch={skillTagSearch}
+            filtersEnabled={filtersEnabled}
+            toggleFilters={() => setFiltersEnabled(!filtersEnabled)}
+          />
           <div className="myFlashcardsFormContentWrapper">
             <h3>Review My Flashcards</h3>
             <h4>Quiz Type:</h4>

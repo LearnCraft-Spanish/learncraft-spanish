@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { AudioQuizStep, AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
 
+import { describe, expect, it, vi } from 'vitest';
 import AudioQuizButtons from './AudioQuizButtons';
 
 const incrementCurrentStep = vi.fn();
-const customIncrementCurrentStep = vi.fn();
 const decrementExample = vi.fn();
 const incrementExample = vi.fn();
 const unReadyQuiz = vi.fn();
@@ -19,14 +19,15 @@ describe('initial render', () => {
   it('renders without crashing', () => {
     render(
       <AudioQuizButtons
-        audioOrComprehension="audio"
-        currentStep="question"
-        incrementCurrentStep={incrementCurrentStep}
+        audioQuizType={AudioQuizType.Speaking}
+        currentStep={AudioQuizStep.Question}
+        nextStep={incrementCurrentStep}
         autoplay={false}
-        customIncrementCurrentStep={customIncrementCurrentStep}
-        decrementExample={decrementExample}
-        incrementExample={incrementExample}
-        unReadyQuiz={unReadyQuiz}
+        nextExample={incrementExample}
+        previousExample={decrementExample}
+        goToQuestion={() => {}}
+        goToHint={() => {}}
+        closeQuiz={unReadyQuiz}
       />,
     );
     expect(screen.getByText('Previous')).toBeTruthy();
@@ -39,14 +40,15 @@ describe('audioOrComprehension is audio', () => {
   it('displays correct text when currentStep is question & autoplay is true', () => {
     render(
       <AudioQuizButtons
-        audioOrComprehension="audio"
-        currentStep="question"
-        incrementCurrentStep={incrementCurrentStep}
+        audioQuizType={AudioQuizType.Speaking}
+        currentStep={AudioQuizStep.Question}
+        nextStep={incrementCurrentStep}
         autoplay
-        customIncrementCurrentStep={customIncrementCurrentStep}
-        decrementExample={decrementExample}
-        incrementExample={incrementExample}
-        unReadyQuiz={unReadyQuiz}
+        nextExample={incrementExample}
+        previousExample={decrementExample}
+        goToQuestion={() => {}}
+        goToHint={() => {}}
+        closeQuiz={unReadyQuiz}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();
@@ -57,14 +59,15 @@ describe('audioOrComprehension is comprehension', () => {
   it('displays correct text when currentStep is question & autoplay is true', () => {
     render(
       <AudioQuizButtons
-        audioOrComprehension="comprehension"
-        currentStep="question"
-        incrementCurrentStep={incrementCurrentStep}
+        audioQuizType={AudioQuizType.Listening}
+        currentStep={AudioQuizStep.Question}
+        nextStep={incrementCurrentStep}
         autoplay
-        customIncrementCurrentStep={customIncrementCurrentStep}
-        decrementExample={decrementExample}
-        incrementExample={incrementExample}
-        unReadyQuiz={unReadyQuiz}
+        nextExample={incrementExample}
+        previousExample={decrementExample}
+        goToQuestion={() => {}}
+        goToHint={() => {}}
+        closeQuiz={unReadyQuiz}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();

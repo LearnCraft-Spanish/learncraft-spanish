@@ -24,7 +24,8 @@ import './ExampleAndFlashcardTable.scss';
 interface FlashcardTableProps {
   dataSource: Flashcard[];
   paginationState: ReturnType<typeof usePagination>;
-  somethingIsLoading: boolean;
+  isLoading: boolean;
+  error: Error | null;
   lessonPopup: LessonPopup;
   findMore: () => void;
 }
@@ -32,7 +33,8 @@ interface FlashcardTableProps {
 export default function FlashcardTable({
   dataSource,
   paginationState,
-  somethingIsLoading,
+  isLoading,
+  error,
   lessonPopup,
   findMore,
 }: FlashcardTableProps) {
@@ -146,7 +148,7 @@ export default function FlashcardTable({
               </button>
             )}
           </div>
-          {somethingIsLoading ? (
+          {isLoading ? (
             <InlineLoading message="Just a moment..." />
           ) : (
             <h4>
@@ -162,6 +164,7 @@ export default function FlashcardTable({
               }`}
             </h4>
           )}
+          {error && <h2>Error Loading New Lesson Information</h2>}
 
           <div className="tableOptionsWrapper">
             <button

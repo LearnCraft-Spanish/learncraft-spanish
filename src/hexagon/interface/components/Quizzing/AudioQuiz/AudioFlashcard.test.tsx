@@ -1,7 +1,8 @@
+import { AudioQuizStep } from '@domain/audioQuizzing';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import AudioFlashcardComponent from './AudioFlashcard';
 
 const incrementCurrentStep = vi.fn(() => {});
@@ -18,11 +19,12 @@ function AudioFlashcardAutoplayOn() {
   return (
     <AudioFlashcardComponent
       currentExampleText="currentExampleText"
+      currentStep={AudioQuizStep.Question}
       nextStep={incrementCurrentStep}
       autoplay
       progressStatus={0.5}
-      pausePlayback={pausePlayback}
-      resumePlayback={resumePlayback}
+      pause={pausePlayback}
+      play={resumePlayback}
       isPlaying
     />
   );
@@ -31,11 +33,12 @@ function AudioFlashcardAutoplayOff() {
   return (
     <AudioFlashcardComponent
       currentExampleText="currentExampleText"
+      currentStep={AudioQuizStep.Question}
       nextStep={incrementCurrentStep}
       autoplay={false}
       progressStatus={0.5}
-      pausePlayback={pausePlayback}
-      resumePlayback={resumePlayback}
+      pause={pausePlayback}
+      play={resumePlayback}
       isPlaying
     />
   );
@@ -45,11 +48,12 @@ function AudioFlashcardPlaying() {
   return (
     <AudioFlashcardComponent
       currentExampleText="currentExampleText"
+      currentStep={AudioQuizStep.Question}
       nextStep={incrementCurrentStep}
       autoplay
       progressStatus={0.5}
-      pausePlayback={pausePlayback}
-      resumePlayback={resumePlayback}
+      pause={pausePlayback}
+      play={resumePlayback}
       isPlaying
     />
   );
@@ -58,11 +62,12 @@ function AudioFlashcardPaused() {
   return (
     <AudioFlashcardComponent
       currentExampleText="currentExampleText"
+      currentStep={AudioQuizStep.Question}
       nextStep={incrementCurrentStep}
       autoplay
       progressStatus={0.5}
-      pausePlayback={pausePlayback}
-      resumePlayback={resumePlayback}
+      pause={pausePlayback}
+      play={resumePlayback}
       isPlaying={false}
     />
   );

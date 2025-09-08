@@ -2,13 +2,24 @@ import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
 import { useEffect, useMemo, useState } from 'react';
 
+export interface UsePaginationReturn {
+  displayOrderSegment: DisplayOrder[];
+  page: number;
+  maxPage: number;
+  nextPage: () => void;
+  previousPage: () => void;
+  setPage: (page: number) => void;
+  pageSize: number;
+  firstItemInPage: number;
+}
+
 export default function usePagination({
   itemsPerPage = 50,
   displayOrder,
 }: {
-  itemsPerPage?: number;
+  itemsPerPage: number;
   displayOrder: DisplayOrder[];
-}) {
+}): UsePaginationReturn {
   const [page, setPage] = useState(1);
   const maxPage = Math.ceil(displayOrder.length / itemsPerPage);
 

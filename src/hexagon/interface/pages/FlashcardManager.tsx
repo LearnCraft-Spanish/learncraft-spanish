@@ -4,21 +4,26 @@ import FlashcardManagerFilters from '../components/FlashcardManager';
 import { FlashcardTable } from '../components/Tables';
 export default function FlashcardManager() {
   const {
-    exampleFilter,
     filteredFlashcards,
     paginationState,
     filtersEnabled,
     toggleFilters,
-    somethingIsLoading,
-    initialLoading,
+    exampleFilter,
+    isLoading,
+    isLoadingPartial,
+    error,
+    errorPartial,
     lessonPopup,
     findMore,
   } = useFlashcardManager();
 
   const { filterState, skillTagSearch } = exampleFilter;
 
-  if (initialLoading) {
+  if (isLoading) {
     return <Loading message="Loading Flashcard Manager" />;
+  }
+  if (error) {
+    return <h2>Error Loading Flashcard Manager</h2>;
   }
 
   return (
@@ -31,7 +36,8 @@ export default function FlashcardManager() {
       />
       <FlashcardTable
         findMore={findMore}
-        somethingIsLoading={somethingIsLoading}
+        isLoading={isLoadingPartial}
+        error={errorPartial}
         dataSource={filteredFlashcards}
         paginationState={paginationState}
         lessonPopup={lessonPopup}
