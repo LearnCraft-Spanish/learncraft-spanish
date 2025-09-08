@@ -170,7 +170,7 @@ function getAudioQuizAnswer(
       step: AudioQuizStep.Answer,
       displayText: example.english,
       duration: autoplay ? autoplayDuration : baseDuration,
-      audioUrl: example.englishAudio,
+      audioUrl: getEmptyFilePathFromDuration(baseDuration),
       padAudioDuration: PADDING_DURATION,
       padAudioUrl: getEmptyFilePathFromDuration(PADDING_DURATION),
     } satisfies ListeningQuizAnswer;

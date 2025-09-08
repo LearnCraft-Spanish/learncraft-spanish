@@ -228,7 +228,6 @@ export function useAudioQuiz({
 
       // If the next example is out of bounds, not ready, or already parsed, return
       if (
-        safeIndex > safeExamples.length - 1 ||
         !example ||
         (audioQuizType === AudioQuizType.Speaking &&
           parsedSpeakingExamples[example.id]) ||
@@ -595,14 +594,6 @@ export function useAudioQuiz({
         playOnLoad: true,
       });
     }
-    return () => {
-      changeCurrentAudio({
-        currentTime: 0,
-        src: '',
-        onEnded: () => {},
-        playOnLoad: true,
-      });
-    };
   }, [
     ready,
     currentExampleReady,
