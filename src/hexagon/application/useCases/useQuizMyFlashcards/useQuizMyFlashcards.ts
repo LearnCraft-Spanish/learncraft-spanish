@@ -1,7 +1,7 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import type { TextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
-import type { TextQuizProps } from '@interface/components/Quizzing/TextQuiz';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
@@ -113,7 +113,6 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
 
   // Return the text quiz props
   const textQuizProps: TextQuizProps = {
-    quizTitle: 'My Flashcards',
     examples: textExamplesToQuiz,
     startWithSpanish,
     cleanupFunction: cleanupQuiz,
@@ -137,6 +136,7 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     audioQuizType,
     autoplay,
     ready: quizReady,
+    cleanupFunction: cleanupQuiz,
   };
 
   // Return the hooks, props, and local state

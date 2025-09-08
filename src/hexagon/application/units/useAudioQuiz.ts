@@ -17,9 +17,12 @@ export interface AudioQuizProps {
   audioQuizType: AudioQuizType;
   autoplay: boolean;
   ready: boolean; // Flag to prevent audio from playing in the background
+  cleanupFunction: () => void;
 }
 
 export interface AudioQuizReturn {
+  autoplay: boolean;
+  audioQuizType: AudioQuizType;
   currentExampleNumber: number;
   currentExampleReady: boolean;
   currentStep: AudioQuizStep;
@@ -43,6 +46,7 @@ export interface AudioQuizReturn {
   previousExample: () => void;
   quizLength: number;
   resetQuiz: () => void;
+  cleanupFunction: () => void;
 }
 
 export function useAudioQuiz({
@@ -50,6 +54,7 @@ export function useAudioQuiz({
   audioQuizType,
   autoplay,
   ready, // Flag to prevent audio from playing in the background
+  cleanupFunction, // Function to clean up the quiz
 }: AudioQuizProps): AudioQuizReturn {
   const {
     play,
@@ -607,6 +612,8 @@ export function useAudioQuiz({
   ]);
 
   return {
+    autoplay,
+    audioQuizType,
     currentStep, // The current step of the quiz
     currentStepValue: currentStepValue ?? null, // Otherwise the current audio is still parsing
     currentExampleReady, // Whether the current example is ready to be played
@@ -625,5 +632,6 @@ export function useAudioQuiz({
     currentExampleNumber,
     quizLength: safeExamples.length,
     resetQuiz,
+    cleanupFunction,
   };
 }

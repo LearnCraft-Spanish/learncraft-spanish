@@ -4,14 +4,15 @@ import type {
   ExampleWithVocabulary,
   Vocabulary,
 } from '@learncraft-spanish/shared';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useVocabInfo } from '@application/units/useVocabInfo';
 import { useCallback, useMemo, useState } from 'react';
-import { useAuthAdapter } from '../../adapters/authAdapter';
 
 export interface TextQuizProps {
   examples: ExampleWithVocabulary[] | null;
   startWithSpanish: boolean;
+  cleanupFunction: () => void;
 }
 export interface AddPendingRemoveProps {
   addFlashcard: () => void;
@@ -27,11 +28,13 @@ export interface TextQuizReturn {
   quizLength: number;
   vocabInfoHook: (vocab: Vocabulary) => VocabInfo;
   currentExample: ExampleWithVocabulary | null;
+  cleanupFunction: () => void;
 }
 
 export function useTextQuiz({
   examples,
   startWithSpanish = false,
+  cleanupFunction,
 }: TextQuizProps): TextQuizReturn {
   const { isStudent } = useAuthAdapter();
 
@@ -175,5 +178,6 @@ export function useTextQuiz({
     vocabInfoHook,
 
     currentExample,
+    cleanupFunction,
   };
 }

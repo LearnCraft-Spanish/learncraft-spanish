@@ -1,5 +1,5 @@
-import type { AudioQuizReturn } from '@application/units/useAudioQuiz';
-import type { AudioQuizType } from '@domain/audioQuizzing';
+import type { AudioQuizProps } from '@application/units/useAudioQuiz';
+import { useAudioQuiz } from '@application/units/useAudioQuiz';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
 import AudioFlashcard from './AudioFlashcard';
@@ -7,19 +7,11 @@ import AudioQuizButtons from './AudioQuizButtons';
 import 'src/App.css';
 import '../AudioQuiz/AudioBasedReview.css';
 
-interface AudioQuizProps {
-  audioQuizHook: AudioQuizReturn;
-  cleanupFunction: () => void;
-  autoplay: boolean;
-  audioQuizType: AudioQuizType;
-}
-
 export default function AudioQuiz({
-  audioQuizHook,
-  cleanupFunction,
-  autoplay,
-  audioQuizType,
-}: AudioQuizProps) {
+  audioQuizProps,
+}: {
+  audioQuizProps: AudioQuizProps;
+}) {
   // Destructure the hook return
   const {
     goToQuestion,
@@ -35,7 +27,10 @@ export default function AudioQuiz({
     currentStepValue,
     currentExampleNumber,
     currentStep,
-  } = audioQuizHook;
+    autoplay,
+    audioQuizType,
+    cleanupFunction,
+  } = useAudioQuiz(audioQuizProps);
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(

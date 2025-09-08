@@ -51,16 +51,22 @@ export function useAudioQuizSetup(
 
   // Keep the selected quiz length within the available options
   const safeQuizLength = useMemo(() => {
+    if (availableQuizLengths.length === 0) {
+      // If no options are available, return 0
+      return 0;
+    } else if (selectedQuizLength < availableQuizLengths[0]) {
+      // If the quiz length is invalid/unspecified, return the largest option
+      return availableQuizLengths[availableQuizLengths.length - 1];
+    }
+    // If the quiz length is valid, find all smaller options
     const acceptableOptions: number[] = [];
     for (const option of availableQuizLengths) {
       if (option <= selectedQuizLength) {
         acceptableOptions.push(option);
       }
     }
-    if (acceptableOptions.length > 0) {
-      return acceptableOptions[acceptableOptions.length - 1];
-    }
-    return selectedQuizLength;
+    // If there are acceptable options, return the largest one
+    return acceptableOptions[acceptableOptions.length - 1] || 0;
   }, [selectedQuizLength, availableQuizLengths]);
 
   // Return audio quiz hook and local state

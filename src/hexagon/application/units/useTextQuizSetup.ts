@@ -1,4 +1,7 @@
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+} from '@learncraft-spanish/shared';
 import { useMemo, useRef, useState } from 'react';
 import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
 import { useAuthAdapter } from '../adapters/authAdapter';
@@ -67,9 +70,9 @@ export function useTextQuizSetup({
   const quizLengthOptions = useRef<number[]>([10, 20, 50, 75, 100, 150]);
 
   // Local states with boolean choices
-  const [srsQuiz, setSrsQuiz] = useState<boolean>(canAccessSRS);
+  const [srsQuiz, setSrsQuiz] = useState<boolean>(true);
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
-  const [customOnly, setCustomOnly] = useState<boolean>(canAccessCustom);
+  const [customOnly, setCustomOnly] = useState<boolean>(false);
 
   // Which quiz lengths are usable for the number of examples we have
   const availableQuizLengths: number[] = useMemo(() => {
@@ -92,59 +95,77 @@ export function useTextQuizSetup({
 
   // Keep the selected quiz length within the available options
   const safeQuizLength: number = useMemo(() => {
+    if (availableQuizLengths.length === 0) {
+      // If no options are available, return 0
+      return 0;
+    } else if (selectedQuizLength < availableQuizLengths[0]) {
+      // If the quiz length is invalid/unspecified, return the largest option
+      return availableQuizLengths[availableQuizLengths.length - 1];
+    }
+    // If the quiz length is valid, find all smaller options
     const acceptableOptions: number[] = [];
-    // Find all options that are less than or equal to the selected quiz length
     for (const option of availableQuizLengths) {
       if (option <= selectedQuizLength) {
         acceptableOptions.push(option);
       }
     }
     // If there are acceptable options, return the largest one
-    if (acceptableOptions.length > 0) {
-      return acceptableOptions[acceptableOptions.length - 1];
-    }
-    // Otherwise, return 0
-    return 0;
+    return acceptableOptions[acceptableOptions.length - 1] || 0;
   }, [selectedQuizLength, availableQuizLengths]);
 
   // Find owned flashcards with the chosen criteria
-  const allowedFlashcards = useMemo(() => {
-    if (srsQuiz) {
-      if (customOnly) {
+  const allowedFlashcards: Flashcard[] | null = useMemo(() => {
+    if (srsQuiz && canAccessSRS) {
+      if (customOnly && canAccessCustom) {
         return customFlashcardsDueForReview ?? [];
       } else {
         return flashcardsDueForReview ?? [];
       }
-    } else if (customOnly) {
+    } else if (customOnly && canAccessCustom) {
       return customFlashcards ?? [];
-    } else {
+    } else if (ownedOnly) {
       return flashcards ?? [];
     }
+    return null;
   }, [
     flashcards,
     flashcardsDueForReview,
     customFlashcards,
     customFlashcardsDueForReview,
     srsQuiz,
+    canAccessSRS,
+    canAccessCustom,
     customOnly,
+    ownedOnly,
   ]);
 
   // Find examples from owned flashcards with the chosen criteria
   const chosenExamples = useMemo(() => {
-    const examples = allowedFlashcards.map((flashcard) => flashcard.example);
-    return examples;
-  }, [allowedFlashcards]);
+    // If no restrictions, use the examples passed in
+    if (allowedFlashcards === null) {
+      return examples;
+    }
+    // Otherwise, use the allowed flashcards
+    const allowedExamples = allowedFlashcards.map(
+      (flashcard) => flashcard.example,
+    );
+    return allowedExamples;
+  }, [allowedFlashcards, examples]);
 
   // Filter the examples to only include the chosen examples
   const filteredExamples = useMemo(() => {
-    return examples.filter((example) => chosenExamples.includes(example));
+    const filtered = examples.filter((example) => {
+      const id = example.id;
+      return chosenExamples.some((chosenExample) => chosenExample.id === id);
+    });
+    return filtered;
   }, [examples, chosenExamples]);
 
   // Shuffle the owned examples and take a slice of the correct size
   const examplesToQuiz: ExampleWithVocabulary[] = useMemo(() => {
     const shuffledExamples = fisherYatesShuffle(filteredExamples ?? []);
-    return shuffledExamples.slice(0, selectedQuizLength);
-  }, [filteredExamples, selectedQuizLength]);
+    return shuffledExamples.slice(0, safeQuizLength);
+  }, [filteredExamples, safeQuizLength]);
 
   // Return bundled options
   return {

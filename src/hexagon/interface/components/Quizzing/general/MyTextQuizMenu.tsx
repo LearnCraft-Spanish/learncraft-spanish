@@ -11,12 +11,12 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
   const {
     srsQuiz,
     startWithSpanish,
-    totalExamples,
     setSrsQuiz,
     setStartWithSpanish,
     customOnly,
     setCustomOnly,
-    selectedQuizLength,
+    quizLength,
+    examplesToQuiz,
     setSelectedQuizLength,
     availableQuizLengths,
   } = quizSetupOptions;
@@ -54,7 +54,7 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
           onChange={(e) =>
             setSelectedQuizLength(Number.parseInt(e.target.value))
           }
-          value={selectedQuizLength}
+          value={quizLength}
         >
           {availableQuizLengths.map((option) => (
             <option key={option} value={option}>
@@ -63,7 +63,7 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
           ))}
         </select>
       </label>
-      <p>{`${totalExamples} examples found`}</p>
+      <p>{`${examplesToQuiz.length} examples found`}</p>
     </>
   );
 }

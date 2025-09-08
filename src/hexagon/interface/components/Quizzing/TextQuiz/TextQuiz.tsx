@@ -1,5 +1,7 @@
-import type { UseSrsReturn } from '@application/units/useTextQuiz';
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type {
+  TextQuizProps,
+  UseSrsReturn,
+} from '@application/units/useTextQuiz';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -8,21 +10,15 @@ import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
 import { SRSButtons } from '../general/SRSButtons';
 
-export interface TextQuizProps {
-  quizTitle?: string;
-  examples: ExampleWithVocabulary[];
-  startWithSpanish: boolean;
-  cleanupFunction?: () => void;
-  srsQuizProps?: UseSrsReturn;
-}
-
 export function TextQuiz({
   quizTitle,
-  examples,
-  startWithSpanish = false,
+  textQuizProps,
   srsQuizProps,
-  cleanupFunction,
-}: TextQuizProps) {
+}: {
+  quizTitle?: string;
+  textQuizProps: TextQuizProps;
+  srsQuizProps?: UseSrsReturn;
+}) {
   const {
     exampleNumber,
     quizExample,
@@ -31,10 +27,8 @@ export function TextQuiz({
     previousExample,
     currentExample,
     addPendingRemoveProps,
-  } = useTextQuiz({
-    examples,
-    startWithSpanish,
-  });
+    cleanupFunction,
+  } = useTextQuiz(textQuizProps);
 
   const [showGetHelp, setShowGetHelp] = useState(false);
 

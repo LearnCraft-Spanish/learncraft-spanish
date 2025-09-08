@@ -16,20 +16,21 @@ import './ReviewMyFlashcards.scss';
 
 export default function MyFlashcardsQuiz() {
   const {
-    audioQuizHook,
-    textQuizHook,
+    audioQuizSetup,
+    textQuizSetup,
+    audioQuizProps,
+    textQuizProps,
     quizType,
     setQuizType,
     quizReady,
     quizNotReady,
     readyQuiz,
-    cleanupQuiz,
     noFlashcards,
     isLoading,
-    isError,
+    error,
   } = useQuizMyFlashcards();
 
-  if (isError) {
+  if (error) {
     return <h2>Error Loading Flashcards</h2>;
   }
   if (isLoading) {
@@ -89,12 +90,10 @@ export default function MyFlashcardsQuiz() {
               </label>
             </div>
             {quizType === MyFlashcardsQuizType.Text && (
-              <MyTextQuizMenu quizSetupOptions={textQuizHook.textQuizSetup} />
+              <MyTextQuizMenu quizSetupOptions={textQuizSetup} />
             )}
             {quizType === MyFlashcardsQuizType.Audio && (
-              <MyAudioQuizMenu
-                quizSetupOptions={audioQuizHook.audioQuizSetup}
-              />
+              <MyAudioQuizMenu quizSetupOptions={audioQuizSetup} />
             )}
           </div>
           <div className="buttonBox">
@@ -107,24 +106,18 @@ export default function MyFlashcardsQuiz() {
           </div>
         </form>
       ) : quizType === MyFlashcardsQuizType.Text ? (
-        textQuizHook.textQuizSetup.srsQuiz ? (
-          <SrsQuiz
-            textQuizHook={textQuizHook.textQuiz}
-            cleanupFunction={() => cleanupQuiz()}
-          />
+        textQuizSetup.srsQuiz ? (
+          <SrsQuiz textQuizProps={textQuizProps} />
         ) : (
           <TextQuiz
-            textQuizHook={textQuizHook.textQuiz}
-            cleanupFunction={() => cleanupQuiz()}
+            textQuizProps={textQuizProps}
+            srsQuizProps={
+              textQuizSetup.srsQuiz ? textQuizSetup.srsQuiz : undefined
+            }
           />
         )
       ) : (
-        <AudioQuiz
-          audioQuizHook={audioQuizHook.audioQuiz}
-          cleanupFunction={() => cleanupQuiz()}
-          autoplay={audioQuizHook.autoplay}
-          audioQuizType={audioQuizHook.audioQuizType}
-        />
+        <AudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );
