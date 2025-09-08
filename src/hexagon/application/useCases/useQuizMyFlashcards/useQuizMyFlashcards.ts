@@ -1,8 +1,10 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
+import useExampleFilter from '@application/units/useExampleFilter';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
@@ -16,6 +18,8 @@ export enum MyFlashcardsQuizType {
 export interface UseQuizMyFlashcardsReturn {
   audioQuizSetup: AudioQuizSetupReturn;
   textQuizSetup: TextQuizSetupReturn;
+
+  exampleFilter: UseExampleFilterReturnType;
 
   textQuizProps: UseTextQuizProps;
   audioQuizProps: AudioQuizProps;
@@ -50,6 +54,8 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     isLoading: filteredFlashcardsLoading,
     error: filteredFlashcardsError,
   } = useFilteredOwnedFlashcards();
+
+  const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
 
   // Get the examples from the flashcards
   const filteredExamples = useMemo(
@@ -89,7 +95,8 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   const error = filteredFlashcardsError || textQuizError;
 
   // To warn user if they try to quiz without flashcards
-  const noFlashcards = !isLoading && !error && filteredExamples?.length === 0;
+  const noFlashcards =
+    !isLoading && !error && !filtersEnabled && filteredExamples?.length === 0;
 
   // Quiz Not Ready
   const quizNotReady = useMemo(() => {
@@ -162,6 +169,7 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     // Quiz Setup Hooks
     audioQuizSetup,
     textQuizSetup,
+    exampleFilter,
 
     // Quiz Props
     textQuizProps,

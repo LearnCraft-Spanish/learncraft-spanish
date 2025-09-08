@@ -74,45 +74,6 @@ export function useTextQuizSetup({
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
   const [customOnly, setCustomOnly] = useState<boolean>(false);
 
-  // Which quiz lengths are usable for the number of examples we have
-  const availableQuizLengths: number[] = useMemo(() => {
-    // Empty array if examples still loading
-    if (!examples) return [];
-    // Remove lengths longer than the available set
-    const filteredOptions = quizLengthOptions.current.filter(
-      (number: number) => number <= examples.length,
-    );
-    // Add precise total if not included and under 150
-    if (examples.length < 150 && !filteredOptions.includes(examples.length)) {
-      filteredOptions.push(examples.length);
-    }
-    // Return parsed options
-    return filteredOptions.sort();
-  }, [examples, quizLengthOptions]);
-
-  // Local state for choice of quiz length
-  const [selectedQuizLength, setSelectedQuizLength] = useState<number>(0);
-
-  // Keep the selected quiz length within the available options
-  const safeQuizLength: number = useMemo(() => {
-    if (availableQuizLengths.length === 0) {
-      // If no options are available, return 0
-      return 0;
-    } else if (selectedQuizLength < availableQuizLengths[0]) {
-      // If the quiz length is invalid/unspecified, return the largest option
-      return availableQuizLengths[availableQuizLengths.length - 1];
-    }
-    // If the quiz length is valid, find all smaller options
-    const acceptableOptions: number[] = [];
-    for (const option of availableQuizLengths) {
-      if (option <= selectedQuizLength) {
-        acceptableOptions.push(option);
-      }
-    }
-    // If there are acceptable options, return the largest one
-    return acceptableOptions[acceptableOptions.length - 1] || 0;
-  }, [selectedQuizLength, availableQuizLengths]);
-
   // Find owned flashcards with the chosen criteria
   const allowedFlashcards: Flashcard[] | null = useMemo(() => {
     if (srsQuiz && canAccessSRS) {
@@ -160,6 +121,48 @@ export function useTextQuizSetup({
     });
     return filtered;
   }, [examples, chosenExamples]);
+
+  // Which quiz lengths are usable for the number of examples we have
+  const availableQuizLengths: number[] = useMemo(() => {
+    // Empty array if examples still loading
+    if (!filteredExamples) return [];
+    // Remove lengths longer than the available set
+    const filteredOptions = quizLengthOptions.current.filter(
+      (number: number) => number <= filteredExamples.length,
+    );
+    // Add precise total if not included and under 150
+    if (
+      filteredExamples.length < 150 &&
+      !filteredOptions.includes(filteredExamples.length)
+    ) {
+      filteredOptions.push(filteredExamples.length);
+    }
+    // Return parsed options
+    return filteredOptions.sort();
+  }, [filteredExamples, quizLengthOptions]);
+
+  // Local state for choice of quiz length
+  const [selectedQuizLength, setSelectedQuizLength] = useState<number>(0);
+
+  // Keep the selected quiz length within the available options
+  const safeQuizLength: number = useMemo(() => {
+    if (availableQuizLengths.length === 0) {
+      // If no options are available, return 0
+      return 0;
+    } else if (selectedQuizLength < availableQuizLengths[0]) {
+      // If the quiz length is invalid/unspecified, return the largest option
+      return availableQuizLengths[availableQuizLengths.length - 1];
+    }
+    // If the quiz length is valid, find all smaller options
+    const acceptableOptions: number[] = [];
+    for (const option of availableQuizLengths) {
+      if (option <= selectedQuizLength) {
+        acceptableOptions.push(option);
+      }
+    }
+    // If there are acceptable options, return the largest one
+    return acceptableOptions[acceptableOptions.length - 1];
+  }, [selectedQuizLength, availableQuizLengths]);
 
   // Shuffle the owned examples and take a slice of the correct size
   const examplesToQuiz: ExampleWithVocabulary[] = useMemo(() => {
