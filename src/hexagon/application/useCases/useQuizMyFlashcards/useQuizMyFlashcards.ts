@@ -3,7 +3,7 @@ import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup'
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useCallback, useMemo, useState } from 'react';
@@ -20,6 +20,8 @@ export interface UseQuizMyFlashcardsReturn {
   textQuizProps: UseTextQuizProps;
   audioQuizProps: AudioQuizProps;
 
+  filtersEnabled: boolean;
+  setFiltersEnabled: (filtersEnabled: boolean) => void;
   quizType: MyFlashcardsQuizType;
   setQuizType: (quizType: MyFlashcardsQuizType) => void;
   quizReady: boolean;
@@ -40,26 +42,42 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     MyFlashcardsQuizType.Text,
   );
 
-  // To get the flashcards
+  // To get the filtered owned flashcards
   const {
-    collectedExamples,
-    audioFlashcards,
-    isLoading: flashcardsLoading,
-    error: flashcardsError,
-  } = useStudentFlashcards();
+    filteredFlashcards,
+    setFiltersEnabled,
+    filtersEnabled,
+    isLoading: filteredFlashcardsLoading,
+    error: filteredFlashcardsError,
+  } = useFilteredOwnedFlashcards();
 
   // Get the examples from the flashcards
-  const collectedAudioExamples = useMemo(
-    () => audioFlashcards?.map((flashcard) => flashcard.example) ?? [],
-    [audioFlashcards],
+  const filteredExamples = useMemo(
+    () => filteredFlashcards?.map((flashcard) => flashcard.example) ?? [],
+    [filteredFlashcards],
+  );
+
+  // Filtered for audio also
+  const filteredAudioFlashcards = useMemo(
+    () =>
+      filteredFlashcards?.filter(
+        (flashcard) => flashcard.example.spanishAudio?.length > 0,
+      ),
+    [filteredFlashcards],
+  );
+
+  // Get the examples from the flashcards
+  const filteredAudioExamples = useMemo(
+    () => filteredAudioFlashcards?.map((flashcard) => flashcard.example) ?? [],
+    [filteredAudioFlashcards],
   );
 
   // Call the audio quiz setup hook
-  const audioQuizSetup = useAudioQuizSetup(collectedAudioExamples);
+  const audioQuizSetup = useAudioQuizSetup(filteredAudioExamples);
 
   // call the text quiz setup hook
   const textQuizSetup = useTextQuizSetup({
-    examples: collectedExamples ?? [],
+    examples: filteredExamples ?? [],
     ownedOnly: true,
   });
 
@@ -67,11 +85,11 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   const { isLoading: textQuizLoading, error: textQuizError } = textQuizSetup;
 
   // Combine the loading and error states (audio would be redundant, purely derived)
-  const isLoading = flashcardsLoading || textQuizLoading;
-  const error = flashcardsError || textQuizError;
+  const isLoading = filteredFlashcardsLoading || textQuizLoading;
+  const error = filteredFlashcardsError || textQuizError;
 
   // To warn user if they try to quiz without flashcards
-  const noFlashcards = !isLoading && !error && collectedExamples?.length === 0;
+  const noFlashcards = !isLoading && !error && filteredExamples?.length === 0;
 
   // Quiz Not Ready
   const quizNotReady = useMemo(() => {
@@ -125,11 +143,11 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     selectedQuizLength: audioQuizLength,
   } = audioQuizSetup;
 
-  // Filter and shuffle the audio examples to quiz
+  // Slice and shuffle the audio examples to quiz
   const audioExamplesToQuiz = useMemo(() => {
-    const shuffledExamples = fisherYatesShuffle(collectedAudioExamples);
+    const shuffledExamples = fisherYatesShuffle(filteredAudioExamples);
     return shuffledExamples.slice(0, audioQuizLength);
-  }, [collectedAudioExamples, audioQuizLength]);
+  }, [filteredAudioExamples, audioQuizLength]);
 
   const audioQuizProps: AudioQuizProps = {
     examplesToQuiz: audioExamplesToQuiz,
@@ -150,6 +168,8 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     audioQuizProps,
 
     // Local states and methods for top level
+    filtersEnabled,
+    setFiltersEnabled,
     quizType,
     setQuizType,
     quizReady,

@@ -2,7 +2,7 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/doma
 import type { Flashcard } from '@learncraft-spanish/shared/dist/domain/flashcard';
 import type { UseExampleFilterReturnType } from './useExampleFilter';
 import type { UseStudentFlashcardsReturn } from './useStudentFlashcards';
-import { filterExamplesCombined } from '@learncraft-spanish/shared/dist/functions/exampleWithVocabularyFilters';
+import { filterExamplesCombined } from '@learncraft-spanish/shared';
 import { useCallback, useMemo } from 'react';
 import useFilterOwnedFlashcards from '../coordinators/hooks/useFilterOwnedFlashcards';
 import {
@@ -12,7 +12,7 @@ import {
 import useExampleFilter from './useExampleFilter';
 import { useStudentFlashcards } from './useStudentFlashcards';
 
-export default function useFilteredOwnedFlashcards() {
+export function useFilteredOwnedFlashcards() {
   // The coordinator state to track whether owned filters are filtered
   const { filterOwnedFlashcards, setFilterOwnedFlashcards } =
     useFilterOwnedFlashcards();
@@ -54,8 +54,8 @@ export default function useFilteredOwnedFlashcards() {
   );
 
   // Simple array memo for easy reference
-  const fromLessonVocabIds: number[] = useMemo(() => {
-    return lessonRangeVocabRequired ?? [];
+  const fromLessonVocabIds: number[] | undefined = useMemo(() => {
+    return lessonRangeVocabRequired;
   }, [lessonRangeVocabRequired]);
 
   // Separate query to get known vocabulary for the to lesson
