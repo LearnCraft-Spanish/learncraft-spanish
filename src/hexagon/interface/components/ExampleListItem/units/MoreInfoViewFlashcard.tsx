@@ -20,10 +20,19 @@ export default function MoreInfoViewFlashcard({
   setContextualRef: (ref: HTMLDivElement | null) => void;
   lessonPopup: LessonPopup;
 }) {
+  // local state for the selected vocabulary tag
   const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
-  const handleSelect = (id: number) => {
+
+  // handle the selection of a vocabulary tag
+  const handleSelect = (id: number | null) => {
+    if (id === null) {
+      setVocabTagSelected(null);
+      return;
+    }
     setVocabTagSelected(id);
   };
+
+  // format the date added
   const dateAddedFormatted = flashcard.dateCreated
     ? new Date(flashcard.dateCreated).toLocaleDateString('en-US', {
         month: '2-digit',
@@ -71,7 +80,7 @@ export default function MoreInfoViewFlashcard({
               contextual={contextual}
               setContextualRef={setContextualRef}
               lessonPopup={lessonPopup}
-              handleSelect={handleSelect}
+              handleSelect={(id) => handleSelect(id)}
               isSelected={vocabTagSelected === vocab.id}
             />
           ))}

@@ -22,7 +22,11 @@ export default function MoreInfoViewExample({
   lessonPopup: LessonPopup;
 }) {
   const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
-  const handleSelect = (id: number) => {
+  const handleSelect = (id: number | null) => {
+    if (id === null) {
+      setVocabTagSelected(null);
+      return;
+    }
     setVocabTagSelected(id);
   };
   let exampleWithVocabulary: ExampleWithVocabulary;
@@ -49,7 +53,7 @@ export default function MoreInfoViewExample({
                     contextual={contextual}
                     setContextualRef={setContextualRef}
                     lessonPopup={lessonPopup}
-                    handleSelect={handleSelect}
+                    handleSelect={(id) => handleSelect(id)}
                     isSelected={vocabTagSelected === vocab.id}
                   />
                 ))}

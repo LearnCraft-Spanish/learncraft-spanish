@@ -50,9 +50,11 @@ function renderQuiz({
   render(
     <MockAllProviders>
       <TextQuiz
-        examples={examplesForTextQuiz}
-        startWithSpanish={startWithSpanish}
-        cleanupFunction={cleanupFunction}
+        textQuizProps={{
+          examples: examplesForTextQuiz,
+          startWithSpanish,
+          cleanupFunction,
+        }}
       />
     </MockAllProviders>,
   );
@@ -65,9 +67,11 @@ function renderQuizYesSrs({
   render(
     <MockAllProviders>
       <TextQuiz
-        examples={examplesForTextQuiz}
-        startWithSpanish={startWithSpanish}
-        cleanupFunction={cleanupFunction}
+        textQuizProps={{
+          examples: examplesForTextQuiz,
+          startWithSpanish,
+          cleanupFunction,
+        }}
         srsQuizProps={{
           examplesReviewedResults: [],
           handleReviewExample: () => {},
