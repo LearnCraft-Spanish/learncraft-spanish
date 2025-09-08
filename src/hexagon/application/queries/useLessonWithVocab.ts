@@ -7,8 +7,11 @@ export const useLessonVocabKnown = (
   enabled?: boolean,
 ) => {
   const courseInfrastructure = useCourseAdapter();
-
-  return useQuery({
+  const {
+    data: lessonVocabKnown,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['lessonWithVocab', courseId, lessonNumber],
     queryFn: () =>
       courseInfrastructure.getLessonVocabKnown({
@@ -17,6 +20,8 @@ export const useLessonVocabKnown = (
       }),
     enabled: !!courseId && !!lessonNumber && enabled,
   });
+
+  return { lessonVocabKnown, isLoading, error };
 };
 
 export const useLessonRangeVocabRequired = (
@@ -27,7 +32,11 @@ export const useLessonRangeVocabRequired = (
 ) => {
   const courseInfrastructure = useCourseAdapter();
 
-  return useQuery({
+  const {
+    data: lessonRangeVocabRequired,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: [
       'lessonRangeVocabRequired',
       courseId,
@@ -42,4 +51,6 @@ export const useLessonRangeVocabRequired = (
       }),
     enabled: !!courseId && !!fromLessonNumber && !!toLessonNumber && enabled,
   });
+
+  return { lessonRangeVocabRequired, isLoading, error };
 };

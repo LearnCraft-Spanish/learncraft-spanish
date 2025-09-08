@@ -1,6 +1,6 @@
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 
-import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
+import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 
@@ -19,7 +19,7 @@ import './ExampleAndFlashcardTable.scss';
 interface ExamplesTableProps {
   examples: ExampleWithVocabulary[];
   totalCount: number;
-  studentFlashcards: UseStudentFlashcardsReturnType;
+  studentFlashcards: UseStudentFlashcardsReturn;
   paginationState: QueryPaginationState;
   firstPageLoading: boolean;
   newPageLoading: boolean;

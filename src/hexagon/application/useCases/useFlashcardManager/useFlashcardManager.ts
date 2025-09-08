@@ -1,113 +1,57 @@
+import type { UsePaginationReturn } from '@application/units/Pagination/usePagination';
+
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
-import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
-import type {
-  ExampleWithVocabulary,
-  Flashcard,
-} from '@learncraft-spanish/shared';
-import type { UseFlashcardManagerReturnType } from './useFlashcardManager.types';
-import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
-import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
 
-import {
-  useLessonRangeVocabRequired,
-  useLessonVocabKnown,
-} from '@application/queries/useLessonWithVocab';
+import type { LessonPopup } from '@application/units/useLessonPopup';
+import type { Flashcard } from '@learncraft-spanish/shared';
 import usePagination from '@application/units/Pagination/usePagination';
-
 import useExampleFilter from '@application/units/useExampleFilter';
+import useFilteredOwnedFlashcards from '@application/units/useFilteredOwnedFlashcards';
 import useLessonPopup from '@application/units/useLessonPopup';
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { filterExamplesCombined } from '@learncraft-spanish/shared';
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function useFlashcardManager(): UseFlashcardManagerReturnType {
+export interface UseFlashcardManagerReturn {
+  filteredFlashcards: Flashcard[];
+  paginationState: UsePaginationReturn;
+  filtersEnabled: boolean;
+  exampleFilter: UseExampleFilterReturnType;
+
+  toggleFilters: () => void;
+  findMore: () => void;
+  lessonPopup: LessonPopup;
+
+  isLoading: boolean;
+  isLoadingPartial: boolean;
+  error: Error | null;
+  errorPartial: Error | null;
+}
+
+export default function useFlashcardManager(): UseFlashcardManagerReturn {
+  // This doesn't belong here. This is an interface responsibility.
   const navigate = useNavigate();
-  const { isLoading: activeStudentIsLoading } = useActiveStudent();
-  const { isLoading: authUserIsLoading } = useAuthAdapter();
-  const { lessonPopup } = useLessonPopup();
-  const { filterOwnedFlashcards, setFilterOwnedFlashcards } =
-    useFilterOwnedFlashcards();
-  const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
-  const { courseAndLessonState, filterState: coordinatorFilterState } =
-    exampleFilter;
-  const { filterState } = coordinatorFilterState;
+
   const pageSize = 25;
 
-  const setFiltersEnabled = useCallback(
-    (b: boolean) => {
-      setFilterOwnedFlashcards(b);
-    },
-    [setFilterOwnedFlashcards],
-  );
+  const {
+    filteredFlashcards,
+    filtersEnabled,
+    setFiltersEnabled,
+    isLoading,
+    isLoadingPartial,
+    error,
+    errorPartial,
+  } = useFilteredOwnedFlashcards();
 
-  const flashcardsQuery: UseStudentFlashcardsReturn = useStudentFlashcards();
+  const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
 
-  const fromLessonWithVocabQuery = useLessonRangeVocabRequired(
-    courseAndLessonState.course?.id,
-    courseAndLessonState.fromLesson?.lessonNumber,
-    courseAndLessonState.toLesson?.lessonNumber,
-    filterOwnedFlashcards,
-  );
-
-  const fromLessonVocabIds: number[] = useMemo(() => {
-    return fromLessonWithVocabQuery.data ?? [];
-  }, [fromLessonWithVocabQuery.data]);
-
-  const toLessonWithVocabQuery = useLessonVocabKnown(
-    courseAndLessonState.course?.id,
-    courseAndLessonState.toLesson?.lessonNumber,
-    filterOwnedFlashcards,
-  );
-
-  const toLessonVocabIds: number[] = useMemo(() => {
-    return toLessonWithVocabQuery.data ?? [];
-  }, [toLessonWithVocabQuery.data]);
-
+  // Simple callback to navigate to the flashcard finder
+  // This doesn't belong here. This is an interface responsibility.
   const findMore = useCallback(() => {
     navigate('/flashcardfinder', { replace: true });
   }, [navigate]);
 
-  const ownedExamples: ExampleWithVocabulary[] = useMemo(() => {
-    const mappedExamples: ExampleWithVocabulary[] =
-      flashcardsQuery.flashcards?.map((flashcard) => {
-        return flashcard.example;
-      }) ?? [];
-    return mappedExamples;
-  }, [flashcardsQuery.flashcards]);
-
-  const filteredFlashcards = useMemo(() => {
-    if (!filterOwnedFlashcards) {
-      return flashcardsQuery.flashcards ?? [];
-    }
-
-    const filteredExamples: ExampleWithVocabulary[] = filterExamplesCombined(
-      ownedExamples,
-      {
-        allowedVocabulary: toLessonVocabIds,
-        requiredVocabulary: fromLessonVocabIds,
-        excludeSpanglish: filterState.excludeSpanglish,
-        audioOnly: filterState.audioOnly,
-        skillTags: filterState.skillTags,
-      },
-    );
-
-    const flashcardsMapped: Flashcard[] =
-      flashcardsQuery.flashcards?.filter((flashcard) =>
-        filteredExamples.some((example) => example.id === flashcard.example.id),
-      ) ?? [];
-
-    return flashcardsMapped;
-  }, [
-    ownedExamples,
-    fromLessonVocabIds,
-    toLessonVocabIds,
-    filterState,
-    flashcardsQuery.flashcards,
-    filterOwnedFlashcards,
-  ]);
-
+  // We use this to randomize the flashcard order for display
   const displayOrder = useMemo(() => {
     if (!filteredFlashcards) {
       return [];
@@ -118,32 +62,28 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     }));
   }, [filteredFlashcards]);
 
+  // We use this to paginate the flashcards
   const paginationState = usePagination({
     itemsPerPage: pageSize,
     displayOrder,
   });
 
+  const { lessonPopup } = useLessonPopup();
+
   return {
-    exampleFilter,
     filteredFlashcards,
     paginationState,
-    pageSize,
-    filtersEnabled: filterOwnedFlashcards,
-    toggleFilters: () => setFiltersEnabled(!filterOwnedFlashcards),
+    filtersEnabled,
+    exampleFilter,
+    toggleFilters: () => setFiltersEnabled(!filtersEnabled),
+
+    // This doesn't belong here. This is an interface responsibility.
     findMore,
-
-    somethingIsLoading:
-      flashcardsQuery.isLoading ||
-      activeStudentIsLoading ||
-      fromLessonWithVocabQuery.isLoading ||
-      toLessonWithVocabQuery.isLoading,
-
-    initialLoading:
-      flashcardsQuery.isLoading ||
-      exampleFilter.initialLoading ||
-      activeStudentIsLoading ||
-      authUserIsLoading,
-
     lessonPopup,
+
+    isLoading,
+    isLoadingPartial,
+    error,
+    errorPartial,
   };
 }

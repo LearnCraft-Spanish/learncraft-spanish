@@ -5,6 +5,7 @@ import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
+import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import AudioQuiz from './AudioQuiz';
@@ -67,10 +68,11 @@ describe('component AudioQuiz', () => {
     it('renders without crashing', async () => {
       render(
         <AudioQuiz
-          quizTitle={'Test Quiz'}
-          examplesToParse={unknownAudioExamples}
-          cleanupFunction={cleanupFunction}
+          examplesToQuiz={unknownAudioExamples}
+          audioQuizType={AudioQuizType.Speaking}
           autoplay={false}
+          cleanupFunction={cleanupFunction}
+          ready={true}
         />,
         {
           wrapper: MockAllProviders,
@@ -203,7 +205,8 @@ describe('component AudioQuiz', () => {
     it('autoplay is false, 2nd step is NOT guess', async () => {
       render(
         <AudioQuiz
-          quizTitle={'Test Quiz'}
+          examplesToQuiz={unknownAudioExamples}
+          audioQuizType={AudioQuizType.Speaking}
           examplesToParse={unknownAudioExamples}
           cleanupFunction={cleanupFunction}
           autoplay={false}
