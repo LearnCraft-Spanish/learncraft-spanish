@@ -1,6 +1,6 @@
 import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 import { useEffect } from 'react';
-import usePagination from './usePagination';
+import { usePagination } from './usePagination';
 
 export default function usePaginationWithPrefetch({
   itemsPerPage = 50,

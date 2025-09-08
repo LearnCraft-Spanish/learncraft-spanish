@@ -1,4 +1,4 @@
-import type usePagination from '@application/units/Pagination/usePagination';
+import type { usePagination } from '@application/units/Pagination/usePagination';
 
 import type { Flashcard } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';

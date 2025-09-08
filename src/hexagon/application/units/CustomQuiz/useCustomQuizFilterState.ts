@@ -1,7 +1,7 @@
-import type { UseExampleFilterReturnType } from '../../units/useExampleFilter';
+import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
 import type { CustomQuizFilterState } from './types';
+import { useExampleFilter } from '@application/units/useExampleFilter';
 import { useCallback, useMemo } from 'react';
-import useExampleFilter from '../../units/useExampleFilter';
 
 export function useCustomQuizFilterState() {
   const exampleFilter: UseExampleFilterReturnType = useExampleFilter();

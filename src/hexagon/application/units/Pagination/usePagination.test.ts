@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import usePagination from './usePagination';
+import { usePagination } from './usePagination';
 
 describe('usePagination', () => {
   it('should render', () => {
