@@ -2,7 +2,7 @@ import type { UseExampleQueryReturnType } from '@application/queries/useExampleQ
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
 import type { LessonPopup } from '@application/units/useLessonPopup';
-import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
+import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
 import { useExampleQuery } from '@application/queries/useExampleQuery';
@@ -18,7 +18,7 @@ export interface UseFlashcardFinderReturnType {
   exampleFilter: UseExampleFilterReturnType;
   exampleQuery: UseExampleQueryReturnType;
   displayExamples: ExampleWithVocabulary[];
-  flashcardsQuery: UseStudentFlashcardsReturnType;
+  flashcardsQuery: UseStudentFlashcardsReturn;
   totalPages: number | null;
   filtersChanging: boolean;
   setFiltersChanging: (filtersChanging: boolean) => void;
@@ -93,8 +93,7 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     }
   }, [filtersChanging, pagination]);
 
-  const flashcardsQuery: UseStudentFlashcardsReturnType =
-    useStudentFlashcards();
+  const flashcardsQuery: UseStudentFlashcardsReturn = useStudentFlashcards();
 
   const updateAudioOnly = useCallback(
     (audioOnly: boolean) => {

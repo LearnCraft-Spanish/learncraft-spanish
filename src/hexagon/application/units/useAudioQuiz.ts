@@ -12,7 +12,7 @@ import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getAudioQuizExample } from '../utils/audioQuizzingMappers';
 
-interface AudioQuizProps {
+export interface AudioQuizProps {
   examplesToQuiz: Example[];
   audioQuizType: AudioQuizType;
   autoplay: boolean;

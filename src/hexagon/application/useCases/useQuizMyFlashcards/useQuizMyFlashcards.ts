@@ -1,11 +1,12 @@
-import type { UseMyAudioQuizReturn } from './useMyAudioQuiz';
-import type { UseMyTextQuizReturn } from './useMyTextQuiz';
-import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import type { AudioQuizProps } from '@application/units/useAudioQuiz';
+import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
+import type { TextQuizProps } from '@interface/components/Quizzing/TextQuiz';
+import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useCallback, useMemo, useState } from 'react';
-import { useMyAudioQuiz } from './useMyAudioQuiz';
-import { useMyTextQuiz } from './useMyTextQuiz';
 
 export enum MyFlashcardsQuizType {
   Text = 'text',
@@ -13,8 +14,12 @@ export enum MyFlashcardsQuizType {
 }
 
 export interface UseQuizMyFlashcardsReturn {
-  audioQuizHook: UseMyAudioQuizReturn;
-  textQuizHook: UseMyTextQuizReturn;
+  audioQuizSetup: AudioQuizSetupReturn;
+  textQuizSetup: TextQuizSetupReturn;
+
+  textQuizProps: TextQuizProps;
+  audioQuizProps: AudioQuizProps;
+
   quizType: MyFlashcardsQuizType;
   setQuizType: (quizType: MyFlashcardsQuizType) => void;
   quizReady: boolean;
@@ -22,50 +27,64 @@ export interface UseQuizMyFlashcardsReturn {
   readyQuiz: () => void;
   cleanupQuiz: () => void;
   noFlashcards: boolean;
+
   isLoading: boolean;
-  isError: boolean;
+  error: Error | null;
 }
 
 export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
+  // Local state for the quiz ready state
   const [quizReady, setQuizReady] = useState(false);
+  // Local state for the quiz type
   const [quizType, setQuizType] = useState<MyFlashcardsQuizType>(
     MyFlashcardsQuizType.Text,
   );
 
-  // Prerequisite loading and error states
-  const { isLoading: activeStudentIsLoading, error: activeStudentError } =
-    useActiveStudent();
-  const { isLoading: authLoading } = useAuthAdapter();
-  const flashcardsHook = useStudentFlashcards();
-  const { isLoading: flashcardsLoading, error: flashcardsError } =
-    flashcardsHook;
+  // To get the flashcards
+  const {
+    collectedExamples,
+    audioFlashcards,
+    isLoading: flashcardsLoading,
+    error: flashcardsError,
+  } = useStudentFlashcards();
 
-  // Combine loading and error states
-  const isLoading = authLoading || flashcardsLoading || activeStudentIsLoading;
-  const isError = !!flashcardsError || !!activeStudentError;
-
-  // Call the quiz hooks
-  const audioQuizHook = useMyAudioQuiz(
-    quizReady && quizType === MyFlashcardsQuizType.Audio,
+  // Get the examples from the flashcards
+  const collectedAudioExamples = useMemo(
+    () => audioFlashcards?.map((flashcard) => flashcard.example) ?? [],
+    [audioFlashcards],
   );
-  const textQuizHook = useMyTextQuiz();
+
+  // Call the audio quiz setup hook
+  const audioQuizSetup = useAudioQuizSetup(collectedAudioExamples);
+
+  // call the text quiz setup hook
+  const textQuizSetup = useTextQuizSetup({
+    examples: collectedExamples ?? [],
+    ownedOnly: true,
+  });
+
+  // Destructuring only the traits we need here
+  const { isLoading: textQuizLoading, error: textQuizError } = textQuizSetup;
+
+  // Combine the loading and error states (audio would be redundant, purely derived)
+  const isLoading = flashcardsLoading || textQuizLoading;
+  const error = flashcardsError || textQuizError;
 
   // To warn user if they try to quiz without flashcards
-  const noFlashcards =
-    !isLoading && !isError && flashcardsHook.flashcards?.length === 0;
+  const noFlashcards = !isLoading && !error && collectedExamples?.length === 0;
 
   // Quiz Not Ready
   const quizNotReady = useMemo(() => {
     if (quizType === MyFlashcardsQuizType.Text) {
-      return !textQuizHook.textQuiz.currentExample;
+      return !textQuizSetup.examplesToQuiz.length;
     } else if (quizType === MyFlashcardsQuizType.Audio) {
-      return !audioQuizHook.audioQuiz.currentExampleReady;
+      return !audioQuizSetup.totalExamples;
     }
     return false;
   }, [
     quizType,
-    textQuizHook.textQuiz.currentExample,
-    audioQuizHook.audioQuiz.currentExampleReady,
+    textQuizSetup.examplesToQuiz.length,
+    audioQuizSetup.totalExamples,
   ]);
 
   const readyQuiz = useCallback(() => {
@@ -76,16 +95,61 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   }, [quizNotReady, setQuizReady]);
 
   const cleanupQuiz = useCallback(() => {
-    if (quizType === MyFlashcardsQuizType.Audio) {
-      audioQuizHook.audioQuiz.resetQuiz();
-    }
     setQuizReady(false);
-  }, [setQuizReady, audioQuizHook.audioQuiz, quizType]);
+  }, [setQuizReady]);
 
-  // Return the hooks and local state
+  // Destructure for the text quiz props
+  const {
+    examplesToQuiz: textExamplesToQuizUnfiltered,
+    startWithSpanish,
+    quizLength: textQuizLength,
+  } = textQuizSetup;
+
+  // Filter and shuffle the text examples to quiz
+  const textExamplesToQuiz = useMemo(() => {
+    const shuffledExamples = fisherYatesShuffle(textExamplesToQuizUnfiltered);
+    return shuffledExamples.slice(0, textQuizLength);
+  }, [textExamplesToQuizUnfiltered, textQuizLength]);
+
+  // Return the text quiz props
+  const textQuizProps: TextQuizProps = {
+    quizTitle: 'My Flashcards',
+    examples: textExamplesToQuiz,
+    startWithSpanish,
+    cleanupFunction: cleanupQuiz,
+  };
+
+  // Destructure for the audio quiz props
+  const {
+    audioQuizType,
+    autoplay,
+    selectedQuizLength: audioQuizLength,
+  } = audioQuizSetup;
+
+  // Filter and shuffle the audio examples to quiz
+  const audioExamplesToQuiz = useMemo(() => {
+    const shuffledExamples = fisherYatesShuffle(collectedAudioExamples);
+    return shuffledExamples.slice(0, audioQuizLength);
+  }, [collectedAudioExamples, audioQuizLength]);
+
+  const audioQuizProps: AudioQuizProps = {
+    examplesToQuiz: audioExamplesToQuiz,
+    audioQuizType,
+    autoplay,
+    ready: quizReady,
+  };
+
+  // Return the hooks, props, and local state
   return {
-    audioQuizHook,
-    textQuizHook,
+    // Quiz Setup Hooks
+    audioQuizSetup,
+    textQuizSetup,
+
+    // Quiz Props
+    textQuizProps,
+    audioQuizProps,
+
+    // Local states and methods for top level
     quizType,
     setQuizType,
     quizReady,
@@ -93,7 +157,9 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     readyQuiz,
     cleanupQuiz,
     noFlashcards,
+
+    // Loading and error states
     isLoading,
-    isError,
+    error,
   };
 }

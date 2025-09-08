@@ -1,5 +1,5 @@
 import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
-import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
+import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type {
   ExampleWithVocabulary,
   Flashcard,
@@ -42,8 +42,7 @@ export default function useFlashcardManager(): UseFlashcardManagerReturnType {
     [setFilterOwnedFlashcards],
   );
 
-  const flashcardsQuery: UseStudentFlashcardsReturnType =
-    useStudentFlashcards();
+  const flashcardsQuery: UseStudentFlashcardsReturn = useStudentFlashcards();
 
   const fromLessonWithVocabQuery = useLessonRangeVocabRequired(
     courseAndLessonState.course?.id,
