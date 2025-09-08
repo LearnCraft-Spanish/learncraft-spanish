@@ -23,8 +23,13 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
 
     isLoading: isCourseAndLessonLoading,
   } = useSelectedCourseAndLessons();
-  const filterState: UseExampleFilterCoordinatorReturnType =
-    useExampleFilterCoordinator();
+  const {
+    filterState,
+    addSkillTagToFilters,
+    removeSkillTagFromFilters,
+    updateExcludeSpanglish,
+    updateAudioOnly,
+  }: UseExampleFilterCoordinatorReturnType = useExampleFilterCoordinator();
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
   const courseAndLessonState: UseSelectedCourseAndLessonsReturnType = {
@@ -41,7 +46,13 @@ export default function useExampleFilters(): UseExampleFilterReturnType {
   return {
     initialLoading: isCourseAndLessonLoading,
     courseAndLessonState,
-    filterState,
+    filterState: {
+      filterState,
+      addSkillTagToFilters,
+      removeSkillTagFromFilters,
+      updateExcludeSpanglish,
+      updateAudioOnly,
+    },
     skillTagSearch,
   };
 }

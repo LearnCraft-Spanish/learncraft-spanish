@@ -1,0 +1,132 @@
+/* ------------------ Custom Quiz Setup Menu ------------------ */
+
+.buttonBox.header.customQuizTypeSelector {
+  //border box-sizing: border-box
+  box-sizing: border-box;
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  label {
+    border: 1px solid var(--dark);
+  }
+}
+
+.startQuizButtonContainer {
+  display: inline-block;
+  position: relative;
+  flex-grow: 2;
+  max-width: 100%;
+
+  display: flex;
+  // center child
+  justify-content: center;
+  align-items: center;
+}
+
+#customQuizType {
+  border: 1px solid var(--dark);
+}
+
+.CustomQuizSetupMenu {
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  border: 1px solid var(--dark);
+  box-sizing: border-box;
+  margin: 30px auto;
+
+  .header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 18px;
+    background-color: var(--brand);
+    padding: 10px 30px;
+    border-bottom: 1px solid var(--dark);
+
+    h2 {
+      font-size: 18px;
+      margin: 0px;
+      color: var(--light);
+    }
+  }
+  .content {
+    width: 100%;
+    padding: 10px 30px;
+  }
+
+  .menuRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 100%;
+  }
+
+  .toggleSwitch {
+    padding: 0px;
+    width: 100%;
+  }
+  .buttonBox {
+    min-width: 100px;
+    width: 100%;
+  }
+
+  .startQuizButton {
+    background-color: darkgreen;
+
+    &.disabled {
+      background-color: var(--dark);
+      cursor: not-allowed;
+    }
+  }
+
+  .totalCount {
+    font-size: 14px;
+    // italic, centered
+    font-style: italic;
+    text-align: center;
+    margin: auto;
+  }
+}
+
+/* ------------------ Custom Quiz Filters ------------------ */
+
+.CustomQuizFilters {
+  // Removing white space from lesson selector & .toggleSwitch
+  p {
+    margin: 0px;
+  }
+
+  .filterBox.options {
+    margin-top: 16px;
+
+    .FromToLessonSelectorWrapper {
+      margin-bottom: 16px;
+    }
+  }
+
+  label#fromLesson {
+    margin: 20px 0;
+  }
+  .toggleSwitch {
+    margin: 3px;
+  }
+}
+
+/* ------------------ Custom Pre-set Quizzes ------------------ */
+
+.customPreSetQuizzes {
+  display: flex;
+  flex-direction: row;
+  // space between
+  justify-content: space-between;
+  max-width: 70vw;
+  margin: 0 auto;
+  align-items: center;
+}
