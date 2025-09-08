@@ -28,6 +28,7 @@ export default function FlashcardManager() {
 
   return (
     <div>
+      <h2>Flashcard Manager</h2>
       <FlashcardManagerFilters
         filterState={filterState}
         skillTagSearch={skillTagSearch}

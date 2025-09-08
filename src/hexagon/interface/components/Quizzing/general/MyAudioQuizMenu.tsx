@@ -25,19 +25,16 @@ export function MyAudioQuizMenu({
   return (
     <>
       <div className="quizTypeSettingsWrapper">
-        <ToggleSwitch
-          id="isListening"
-          ariaLabel="Listening Quiz"
-          label="Listening Quiz"
-          checked={audioQuizType === AudioQuizType.Listening}
-          onChange={() =>
-            setAudioQuizType(
-              audioQuizType === AudioQuizType.Listening
-                ? AudioQuizType.Speaking
-                : AudioQuizType.Listening,
-            )
-          }
-        />
+        <label htmlFor="isListening">Quiz Type:</label>
+        <select
+          id="quizType"
+          aria-label="Listening Quiz"
+          value={audioQuizType}
+          onChange={(e) => setAudioQuizType(e.target.value as AudioQuizType)}
+        >
+          <option value={AudioQuizType.Speaking.toString()}>Speaking</option>
+          <option value={AudioQuizType.Listening.toString()}>Listening</option>
+        </select>
         <ToggleSwitch
           id="autoplay"
           ariaLabel="Autoplay"

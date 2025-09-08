@@ -1,13 +1,11 @@
-import type { UseExampleFilterCoordinatorReturnType } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
-import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/useSkillTagSearch';
-
+import type { UseExampleFilterCoordinatorReturnType } from '@application/coordinators/hooks/useExampleFilterCoordinator';
+import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import {
   SelectedTags,
   TagFilter,
   ToggleSwitch,
 } from '@interface/components/general';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
-
 import 'src/App.css';
 import './FlashcardManagerFilters.scss';
 
@@ -46,7 +44,7 @@ export default function FlashcardManagerFilters({
    * The filterChanging state prevents refetches during filter manipulation.
    */
   return (
-    <div>
+    <div className="flashcardManagerFilters">
       <div className="ToggleFlashcardFilters">
         <ToggleSwitch
           id="filtersEnabled"

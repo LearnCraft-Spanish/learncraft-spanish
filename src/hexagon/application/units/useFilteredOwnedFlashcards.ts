@@ -9,7 +9,7 @@ import {
   useLessonRangeVocabRequired,
   useLessonVocabKnown,
 } from '../queries/useLessonWithVocab';
-import useExampleFilter from './useExampleFilter';
+import { useExampleFilter } from './useExampleFilter';
 import { useStudentFlashcards } from './useStudentFlashcards';
 
 export function useFilteredOwnedFlashcards() {

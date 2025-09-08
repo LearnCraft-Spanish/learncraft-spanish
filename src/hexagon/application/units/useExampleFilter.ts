@@ -12,7 +12,7 @@ export interface UseExampleFilterReturnType {
   skillTagSearch: UseSkillTagSearchReturnType;
 }
 
-export default function useExampleFilters(): UseExampleFilterReturnType {
+export function useExampleFilter(): UseExampleFilterReturnType {
   const {
     course,
     fromLesson,

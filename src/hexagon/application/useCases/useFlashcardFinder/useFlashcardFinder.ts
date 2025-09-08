@@ -7,7 +7,7 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/doma
 import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
 import { useExampleQuery } from '@application/queries/useExampleQuery';
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
-import useExampleFilter from '@application/units/useExampleFilter';
+import { useExampleFilter } from '@application/units/useExampleFilter';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useCallback, useEffect, useMemo, useState } from 'react';

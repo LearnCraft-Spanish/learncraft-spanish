@@ -4,8 +4,8 @@ import type { UseExampleFilterReturnType } from '@application/units/useExampleFi
 
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { Flashcard } from '@learncraft-spanish/shared';
-import usePagination from '@application/units/Pagination/usePagination';
-import useExampleFilter from '@application/units/useExampleFilter';
+import { usePagination } from '@application/units/Pagination/usePagination';
+import { useExampleFilter } from '@application/units/useExampleFilter';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useCallback, useMemo } from 'react';

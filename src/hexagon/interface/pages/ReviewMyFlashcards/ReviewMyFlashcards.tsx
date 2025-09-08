@@ -64,59 +64,66 @@ export default function MyFlashcardsQuiz() {
   return (
     <div>
       {!quizReady ? (
-        <form
-          className="myFlashcardsForm"
-          onSubmit={(e) => {
-            e.preventDefault();
-          }}
-        >
+        <>
+          <h2>Review My Flashcards</h2>
           <FlashcardManagerFilters
             filterState={filterState}
             skillTagSearch={skillTagSearch}
             filtersEnabled={filtersEnabled}
             toggleFilters={() => setFiltersEnabled(!filtersEnabled)}
           />
-          <div className="myFlashcardsFormContentWrapper">
-            <h3>Review My Flashcards</h3>
-            <h4>Quiz Type:</h4>
-            <div className="buttonBox header">
-              <input type="radio" id="quizType" value="text" name="quizType" />
-              <label
-                htmlFor="quizType"
-                className={
-                  quizType === MyFlashcardsQuizType.Text ? 'selected' : ''
-                }
-                onClick={() => setQuizType(MyFlashcardsQuizType.Text)}
-              >
-                Text
-              </label>
-              <input type="radio" id="audio" value="audio" name="quizType" />
-              <label
-                htmlFor="audio"
-                className={
-                  quizType === MyFlashcardsQuizType.Audio ? 'selected' : ''
-                }
-                onClick={() => setQuizType(MyFlashcardsQuizType.Audio)}
-              >
-                Audio
-              </label>
+          <form
+            className="myFlashcardsForm"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <div className="myFlashcardsFormContentWrapper">
+              <h4>Quiz Options:</h4>
+              <div className="buttonBox header">
+                <input
+                  type="radio"
+                  id="quizType"
+                  value="text"
+                  name="quizType"
+                />
+                <label
+                  htmlFor="quizType"
+                  className={
+                    quizType === MyFlashcardsQuizType.Text ? 'selected' : ''
+                  }
+                  onClick={() => setQuizType(MyFlashcardsQuizType.Text)}
+                >
+                  Flashcards
+                </label>
+                <input type="radio" id="audio" value="audio" name="quizType" />
+                <label
+                  htmlFor="audio"
+                  className={
+                    quizType === MyFlashcardsQuizType.Audio ? 'selected' : ''
+                  }
+                  onClick={() => setQuizType(MyFlashcardsQuizType.Audio)}
+                >
+                  Audio
+                </label>
+              </div>
+              {quizType === MyFlashcardsQuizType.Text && (
+                <MyTextQuizMenu quizSetupOptions={textQuizSetup} />
+              )}
+              {quizType === MyFlashcardsQuizType.Audio && (
+                <MyAudioQuizMenu quizSetupOptions={audioQuizSetup} />
+              )}
             </div>
-            {quizType === MyFlashcardsQuizType.Text && (
-              <MyTextQuizMenu quizSetupOptions={textQuizSetup} />
-            )}
-            {quizType === MyFlashcardsQuizType.Audio && (
-              <MyAudioQuizMenu quizSetupOptions={audioQuizSetup} />
-            )}
-          </div>
-          <div className="buttonBox">
-            <button type="submit" disabled={quizNotReady} onClick={readyQuiz}>
-              Start Quiz
-            </button>
-          </div>
-          <div className="buttonBox">
-            <MenuButton />
-          </div>
-        </form>
+            <div className="buttonBox">
+              <button type="submit" disabled={quizNotReady} onClick={readyQuiz}>
+                Start Quiz
+              </button>
+            </div>
+            <div className="buttonBox">
+              <MenuButton />
+            </div>
+          </form>
+        </>
       ) : quizType === MyFlashcardsQuizType.Text ? (
         textQuizSetup.srsQuiz ? (
           <SrsQuiz textQuizProps={textQuizProps} />

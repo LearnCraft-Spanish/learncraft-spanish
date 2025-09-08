@@ -13,7 +13,7 @@ export interface UsePaginationReturn {
   firstItemInPage: number;
 }
 
-export default function usePagination({
+export function usePagination({
   itemsPerPage = 50,
   displayOrder,
 }: {

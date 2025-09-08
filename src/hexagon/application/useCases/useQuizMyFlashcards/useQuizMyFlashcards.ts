@@ -4,7 +4,7 @@ import type { UseExampleFilterReturnType } from '@application/units/useExampleFi
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
-import useExampleFilter from '@application/units/useExampleFilter';
+import { useExampleFilter } from '@application/units/useExampleFilter';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';

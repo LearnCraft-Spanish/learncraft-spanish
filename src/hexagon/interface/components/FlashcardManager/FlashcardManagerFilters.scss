@@ -1,4 +1,10 @@
 .ToggleFlashcardFilters {
   max-width: 30vw;
-  margin: 1rem 2rem;
+}
+
+.flashcardManagerFilters {
+  margin: 0 2%;
+  border: 1px solid var(--dark);
+  background-color: var(--light);
+  padding: 1rem;
 }
