@@ -29,7 +29,10 @@ export function AddToMyFlashcardsButtons({
       <button
         type="button"
         className="addFlashcardButton"
-        onClick={() => addFlashcard()}
+        onClick={(e) => {
+          e.stopPropagation();
+          addFlashcard();
+        }}
       >
         Add to my flashcards
       </button>
@@ -51,7 +54,8 @@ export function AddToMyFlashcardsButtons({
         <button
           type="button"
           className="removeFlashcardButton"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation();
             if (exampleIsCustom) {
               handleRemoveCustom();
             } else {

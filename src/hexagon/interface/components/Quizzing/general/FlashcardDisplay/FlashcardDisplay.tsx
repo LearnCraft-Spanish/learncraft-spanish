@@ -6,6 +6,7 @@ import {
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
 import { AddToMyFlashcardsButtons } from '../AddToMyFlashcardsButtons';
+import { GetHelpDisplay } from './GetHelpDisplay';
 import './FlashcardDisplay.scss';
 
 export function FlashcardDisplay({
@@ -13,6 +14,8 @@ export function FlashcardDisplay({
   answerShowing,
   toggleAnswer,
   addPendingRemoveProps,
+  showGetHelp,
+  setShowGetHelp,
 }: FlashcardDisplayProps) {
   if (!quizExample) {
     return <p>Example not found</p>;
@@ -65,6 +68,34 @@ export function FlashcardDisplay({
               removeFlashcard={addPendingRemoveProps.removeFlashcard}
             />
           )}
+          {answer.vocabComplete && (
+            <>
+              {showGetHelp ? (
+                <button
+                  className="getHelpButton"
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowGetHelp(false);
+                  }}
+                >
+                  Hide Help
+                </button>
+              ) : (
+                <button
+                  className="getHelpButton"
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowGetHelp(true);
+                  }}
+                >
+                  Get Help
+                </button>
+              )}
+            </>
+          )}
+          {showGetHelp && <GetHelpDisplay vocabulary={answer.vocabulary} />}
         </div>
       )}
 

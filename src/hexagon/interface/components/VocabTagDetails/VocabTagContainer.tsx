@@ -19,7 +19,7 @@ export default function VocabTagContainer({
   contextual: string;
   setContextualRef: (ref: HTMLDivElement | null) => void;
   lessonPopup: LessonPopup;
-  handleSelect: (id: number) => void;
+  handleSelect: (id: number | null) => void;
   isSelected: boolean;
 }) {
   const { course } = useSelectedCourseAndLessons();
@@ -32,7 +32,14 @@ export default function VocabTagContainer({
             ? 'selected'
             : ''
         }`}
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
+          // if its selected, close contextual and set selected to null
+          if (isSelected) {
+            setContextualRef(null);
+            handleSelect(null);
+            return;
+          }
           openContextual(`vocabInfo-${exampleId}-${vocabulary.id}`);
           handleSelect(vocabulary.id);
         }}

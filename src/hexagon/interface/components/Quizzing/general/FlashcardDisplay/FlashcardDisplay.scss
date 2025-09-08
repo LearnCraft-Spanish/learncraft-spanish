@@ -9,7 +9,7 @@
   background-color: var(--light);
   border: 4px solid var(--accent);
   text-align: center;
-  overflow: hidden;
+  overflow: none;
 
   max-width: 640px;
   width: 80vw;
@@ -84,4 +84,21 @@
   bottom: 0;
   right: 0;
   padding: 4px;
+}
+
+.flashcard {
+  .customFlashcardButton,
+  .addFlashcardButton,
+  .removeFlashcardButton,
+  .pendingFlashcardButton {
+    border-radius: 0 6px 0 0;
+  }
+}
+
+.getHelpButton {
+  position: absolute;
+  bottom: 10px;
+  // center horizontally
+  left: 50%;
+  transform: translateX(-50%);
 }
