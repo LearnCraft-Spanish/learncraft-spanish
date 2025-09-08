@@ -109,12 +109,7 @@ export default function MyFlashcardsQuiz() {
         textQuizSetup.srsQuiz ? (
           <SrsQuiz textQuizProps={textQuizProps} />
         ) : (
-          <TextQuiz
-            textQuizProps={textQuizProps}
-            srsQuizProps={
-              textQuizSetup.srsQuiz ? textQuizSetup.srsQuiz : undefined
-            }
-          />
+          <TextQuiz textQuizProps={textQuizProps} />
         )
       ) : (
         <AudioQuiz audioQuizProps={audioQuizProps} />

@@ -9,11 +9,12 @@ import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useVocabInfo } from '@application/units/useVocabInfo';
 import { useCallback, useMemo, useState } from 'react';
 
-export interface TextQuizProps {
+export interface UseTextQuizProps {
   examples: ExampleWithVocabulary[] | null;
   startWithSpanish: boolean;
   cleanupFunction: () => void;
 }
+
 export interface AddPendingRemoveProps {
   addFlashcard: () => void;
   removeFlashcard: () => void;
@@ -35,7 +36,7 @@ export function useTextQuiz({
   examples,
   startWithSpanish = false,
   cleanupFunction,
-}: TextQuizProps): TextQuizReturn {
+}: UseTextQuizProps): TextQuizReturn {
   const { isStudent } = useAuthAdapter();
 
   const {
@@ -49,24 +50,34 @@ export function useTextQuiz({
 
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
 
-  const nextExample = useCallback(() => {
-    if (examples && currentExampleIndex < examples.length - 1) {
-      setCurrentExampleIndex(currentExampleIndex + 1);
+  const safeExampleIndex = useMemo(() => {
+    if (currentExampleIndex < 0) {
+      return 0;
     }
+    if (currentExampleIndex > (examples?.length || 0) - 1) {
+      return (examples?.length || 0) - 1;
+    }
+    return currentExampleIndex;
   }, [currentExampleIndex, examples]);
 
-  const previousExample = useCallback(() => {
-    if (currentExampleIndex > 0) {
-      setCurrentExampleIndex(currentExampleIndex - 1);
+  const nextExample = useCallback(() => {
+    if (examples && safeExampleIndex < (examples?.length || 0) - 1) {
+      setCurrentExampleIndex(safeExampleIndex + 1);
     }
-  }, [currentExampleIndex]);
+  }, [safeExampleIndex, examples]);
+
+  const previousExample = useCallback(() => {
+    if (safeExampleIndex > 0) {
+      setCurrentExampleIndex(safeExampleIndex - 1);
+    }
+  }, [safeExampleIndex]);
 
   const currentExample: ExampleWithVocabulary | null = useMemo(() => {
     if (examples && examples.length > 0) {
-      return examples[currentExampleIndex];
+      return examples[safeExampleIndex];
     }
     return null;
-  }, [examples, currentExampleIndex]);
+  }, [examples, safeExampleIndex]);
 
   const addFlashcard = useCallback(() => {
     if (!currentExample) {
@@ -88,7 +99,7 @@ export function useTextQuiz({
     deleteFlashcards([currentExample.id]);
   }, [currentExample, isExampleCollected, deleteFlashcards]);
 
-  const exampleNumber = currentExampleIndex + 1;
+  const exampleNumber = safeExampleIndex + 1;
   const quizLength = examples?.length || 0;
 
   const question: Question | null = useMemo(() => {

@@ -1,6 +1,6 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
-import type { TextQuizProps } from '@application/units/useTextQuiz';
+import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
@@ -17,7 +17,7 @@ export interface UseQuizMyFlashcardsReturn {
   audioQuizSetup: AudioQuizSetupReturn;
   textQuizSetup: TextQuizSetupReturn;
 
-  textQuizProps: TextQuizProps;
+  textQuizProps: UseTextQuizProps;
   audioQuizProps: AudioQuizProps;
 
   quizType: MyFlashcardsQuizType;
@@ -112,7 +112,7 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   }, [textExamplesToQuizUnfiltered, textQuizLength]);
 
   // Return the text quiz props
-  const textQuizProps: TextQuizProps = {
+  const textQuizProps: UseTextQuizProps = {
     examples: textExamplesToQuiz,
     startWithSpanish,
     cleanupFunction: cleanupQuiz,

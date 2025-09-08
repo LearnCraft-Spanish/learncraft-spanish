@@ -1,6 +1,6 @@
 import type {
-  TextQuizProps,
   UseSrsReturn,
+  UseTextQuizProps,
 } from '@application/units/useTextQuiz';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
@@ -10,15 +10,17 @@ import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
 import { SRSButtons } from '../general/SRSButtons';
 
+export interface TextQuizComponentProps {
+  quizTitle?: string;
+  textQuizProps: UseTextQuizProps;
+  srsQuizProps?: UseSrsReturn;
+}
+
 export function TextQuiz({
   quizTitle,
   textQuizProps,
   srsQuizProps,
-}: {
-  quizTitle?: string;
-  textQuizProps: TextQuizProps;
-  srsQuizProps?: UseSrsReturn;
-}) {
+}: TextQuizComponentProps) {
   const {
     exampleNumber,
     quizExample,
