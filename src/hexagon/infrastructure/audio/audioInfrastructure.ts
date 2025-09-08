@@ -21,8 +21,8 @@ export function useAudioInfrastructure(): AudioPort {
     if (!context.playingAudioRef.current || isPlaying) {
       return;
     } else if (context.playingAudioRef.current.readyState < 1) {
-      setIsPlaying(true);
       // If the audio is not ready to be played, play it when the metadata is loaded
+      setIsPlaying(true);
       await context.playingAudioRef.current.addEventListener(
         'loadedmetadata',
         () => {
@@ -33,8 +33,8 @@ export function useAudioInfrastructure(): AudioPort {
       );
       return;
     }
-    setIsPlaying(true);
     // If the audio is ready to be played, play it
+    setIsPlaying(true);
     await context.playingAudioRef.current.play();
   }, [context, isPlaying, setIsPlaying]);
 
@@ -87,18 +87,16 @@ export function useAudioInfrastructure(): AudioPort {
 
   const changeCurrentAudio = useCallback(
     async (newAudio: AudioElementState) => {
-      if (newAudio.playOnLoad) {
-        if (context.playingAudioRef.current) {
-          context.playingAudioRef.current.addEventListener(
-            'loadedmetadata',
-            () => {
-              if (context.playingAudioRef.current) {
-                context.playingAudioRef.current.play();
-                setIsPlaying(true);
-              }
-            },
-          );
-        }
+      if (context.playingAudioRef.current && newAudio.playOnLoad) {
+        context.playingAudioRef.current.addEventListener(
+          'loadedmetadata',
+          () => {
+            if (context.playingAudioRef.current) {
+              context.playingAudioRef.current.play();
+              setIsPlaying(true);
+            }
+          },
+        );
       }
       if (!context.playingAudioRef.current) return;
       context.playingAudioRef.current.src = newAudio.src;
@@ -149,7 +147,7 @@ export function useAudioInfrastructure(): AudioPort {
     return () => {
       pause();
     };
-  }, [context.playingAudioRef, isPlaying, updateCurrentTime, pause]);
+  }, [context.playingAudioRef, isPlaying, updateCurrentTime, pause, play]);
 
   return {
     play,

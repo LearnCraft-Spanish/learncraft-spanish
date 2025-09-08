@@ -10,7 +10,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useAuthAdapter } from '../../adapters/authAdapter';
 
 export interface TextQuizProps {
-  examples: ExampleWithVocabulary[];
+  examples: ExampleWithVocabulary[] | null;
   startWithSpanish: boolean;
 }
 export interface AddPendingRemoveProps {
@@ -47,10 +47,10 @@ export function useTextQuiz({
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
 
   const nextExample = useCallback(() => {
-    if (currentExampleIndex < examples.length - 1) {
+    if (examples && currentExampleIndex < examples.length - 1) {
       setCurrentExampleIndex(currentExampleIndex + 1);
     }
-  }, [currentExampleIndex, examples.length]);
+  }, [currentExampleIndex, examples]);
 
   const previousExample = useCallback(() => {
     if (currentExampleIndex > 0) {
@@ -59,7 +59,7 @@ export function useTextQuiz({
   }, [currentExampleIndex]);
 
   const currentExample: ExampleWithVocabulary | null = useMemo(() => {
-    if (examples.length > 0) {
+    if (examples && examples.length > 0) {
       return examples[currentExampleIndex];
     }
     return null;
@@ -86,7 +86,7 @@ export function useTextQuiz({
   }, [currentExample, isExampleCollected, deleteFlashcards]);
 
   const exampleNumber = currentExampleIndex + 1;
-  const quizLength = examples.length;
+  const quizLength = examples?.length || 0;
 
   const question: Question | null = useMemo(() => {
     if (!currentExample) {
