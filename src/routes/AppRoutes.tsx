@@ -1,4 +1,5 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { CustomQuiz } from '@interface/components/Quizzing/CustomQuiz/CustomQuiz';
 import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
 import FlashcardManager from '@interface/pages/FlashcardManager';
 import FrequensayPage from '@interface/pages/FrequensayPage';
@@ -39,6 +40,7 @@ export default function AppRoutes() {
       />
       <Route path="/manage-flashcards" element={<FlashcardManager />} />
       <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
+      <Route path="/customquiz" element={<CustomQuiz />} />
       <Route
         path="/flashcardfinder"
         element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
