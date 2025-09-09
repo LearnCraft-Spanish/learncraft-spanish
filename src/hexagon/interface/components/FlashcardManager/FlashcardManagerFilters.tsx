@@ -1,5 +1,5 @@
-import type { UseExampleFilterCoordinatorReturnType } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
+import type { UseCombinedFiltersWithVocabularyReturnType } from 'src/hexagon/application/units/Filtering/useCombinedFiltersWithVocabulary';
 import {
   SelectedTags,
   TagFilter,
@@ -10,24 +10,24 @@ import 'src/App.css';
 import './FlashcardManagerFilters.scss';
 
 export default function FlashcardManagerFilters({
-  filterState: hookFilterState,
+  filterState,
   skillTagSearch,
-  filtersEnabled,
-  toggleFilters,
+  filterOwnedFlashcards,
+  setFilterOwnedFlashcards,
 }: {
-  filterState: UseExampleFilterCoordinatorReturnType;
+  filterState: UseCombinedFiltersWithVocabularyReturnType;
   skillTagSearch: UseSkillTagSearchReturnType;
-  filtersEnabled: boolean;
-  toggleFilters: () => void;
+  filterOwnedFlashcards: boolean;
+  setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
 }) {
   const {
-    filterState,
+    combinedFilterState,
 
     updateExcludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
-  } = hookFilterState;
+  } = filterState;
 
   const {
     tagSearchTerm,
@@ -37,7 +37,7 @@ export default function FlashcardManagerFilters({
     addTagBackToSuggestions,
   } = skillTagSearch;
 
-  const { excludeSpanglish, audioOnly, skillTags } = filterState;
+  const { excludeSpanglish, audioOnly, skillTags } = combinedFilterState;
 
   /**
    * TODO: We need an inert (non-interactive) view of the filter state.
@@ -50,11 +50,11 @@ export default function FlashcardManagerFilters({
           id="filtersEnabled"
           ariaLabel="filtersEnabled"
           label="Flashcard Filtering: "
-          checked={filtersEnabled}
-          onChange={toggleFilters}
+          checked={filterOwnedFlashcards}
+          onChange={() => setFilterOwnedFlashcards(!filterOwnedFlashcards)}
         />
       </div>
-      {filtersEnabled && (
+      {filterOwnedFlashcards && (
         <div className="filterSection">
           <div className="filterBox options">
             <div className="FromToLessonSelectorWrapper">
@@ -66,7 +66,7 @@ export default function FlashcardManagerFilters({
               label="Exclude Spanglish: "
               checked={excludeSpanglish ?? false}
               onChange={() =>
-                updateExcludeSpanglish(!filterState.excludeSpanglish)
+                updateExcludeSpanglish(!combinedFilterState.excludeSpanglish)
               }
             />
             <ToggleSwitch
@@ -74,7 +74,7 @@ export default function FlashcardManagerFilters({
               ariaLabel="audioOnly"
               label="Audio Flashcards Only: "
               checked={audioOnly ?? false}
-              onChange={() => updateAudioOnly(!filterState.audioOnly)}
+              onChange={() => updateAudioOnly(!combinedFilterState.audioOnly)}
             />
           </div>
           <div className="filterBox search">

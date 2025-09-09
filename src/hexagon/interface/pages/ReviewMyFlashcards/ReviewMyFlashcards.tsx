@@ -2,27 +2,28 @@ import {
   MyFlashcardsQuizType,
   useQuizMyFlashcards,
 } from '@application/useCases/useQuizMyFlashcards';
+import FlashcardManagerFilters from '@interface/components/FlashcardManager/FlashcardManagerFilters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
 import {
-  MyAudioQuizMenu,
+  AudioQuizMenu,
   MyTextQuizMenu,
   SrsQuiz,
   TextQuiz,
 } from '@interface/components/Quizzing';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
-import FlashcardManagerFilters from '../../components/FlashcardManager/FlashcardManagerFilters';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './ReviewMyFlashcards.scss';
 
 export default function MyFlashcardsQuiz() {
   const {
-    filtersEnabled,
-    setFiltersEnabled,
+    filterOwnedFlashcards,
+    setFilterOwnedFlashcards,
     exampleFilter,
     audioQuizSetup,
     textQuizSetup,
     audioQuizProps,
+    skillTagSearch,
     textQuizProps,
     quizType,
     setQuizType,
@@ -33,8 +34,6 @@ export default function MyFlashcardsQuiz() {
     isLoading,
     error,
   } = useQuizMyFlashcards();
-
-  const { filterState, skillTagSearch } = exampleFilter;
 
   if (error) {
     return <h2>Error Loading Flashcards</h2>;
@@ -67,10 +66,10 @@ export default function MyFlashcardsQuiz() {
         <>
           <h2>Review My Flashcards</h2>
           <FlashcardManagerFilters
-            filterState={filterState}
+            filterState={exampleFilter}
             skillTagSearch={skillTagSearch}
-            filtersEnabled={filtersEnabled}
-            toggleFilters={() => setFiltersEnabled(!filtersEnabled)}
+            filterOwnedFlashcards={filterOwnedFlashcards}
+            setFilterOwnedFlashcards={setFilterOwnedFlashcards}
           />
           <form
             className="myFlashcardsForm"
@@ -111,7 +110,7 @@ export default function MyFlashcardsQuiz() {
                 <MyTextQuizMenu quizSetupOptions={textQuizSetup} />
               )}
               {quizType === MyFlashcardsQuizType.Audio && (
-                <MyAudioQuizMenu quizSetupOptions={audioQuizSetup} />
+                <AudioQuizMenu quizSetupOptions={audioQuizSetup} />
               )}
             </div>
             <div className="buttonBox">

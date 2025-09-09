@@ -1,6 +1,6 @@
 import type {
   ExampleFilterContextType,
-  ExampleFilterStateWithoutCourseAndLesson,
+  ExampleFilterStateWithoutLesson,
 } from '@application/coordinators/contexts/ExampleFilterContext';
 import { ExampleFilterContext } from '@application/coordinators/contexts/ExampleFilterContext';
 import { useCallback, useMemo, useState } from 'react';
@@ -11,14 +11,14 @@ export function ExampleFilterContextProvider({
   children: React.ReactNode;
 }) {
   const [exampleFilters, setExampleFilters] =
-    useState<ExampleFilterStateWithoutCourseAndLesson>({
+    useState<ExampleFilterStateWithoutLesson>({
       excludeSpanglish: false,
       audioOnly: false,
       skillTagKeys: [],
     });
 
   const updateExampleFilters = useCallback(
-    (filters: ExampleFilterStateWithoutCourseAndLesson) => {
+    (filters: ExampleFilterStateWithoutLesson) => {
       setExampleFilters(filters);
     },
     [],

@@ -1,17 +1,19 @@
-import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
 import type { CustomQuizFilterState } from './types';
-import { useExampleFilter } from '@application/units/useExampleFilter';
+import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import { useCallback, useMemo } from 'react';
+import { useSkillTagSearch } from '../useSkillTagSearch';
 
 export function useCustomQuizFilterState() {
-  const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
+  const filterState = useCombinedFilters();
+
+  const { addTagBackToSuggestions } = useSkillTagSearch();
 
   const removeSkillTagFromFilters = useCallback(
     (tagId: string) => {
-      exampleFilter.filterState.removeSkillTagFromFilters(tagId);
-      exampleFilter.skillTagSearch.addTagBackToSuggestions(tagId);
+      filterState.removeSkillTagFromFilters(tagId);
+      addTagBackToSuggestions(tagId);
     },
-    [exampleFilter.filterState, exampleFilter.skillTagSearch],
+    [filterState, addTagBackToSuggestions],
   );
 
   // turn return type into memo
@@ -19,31 +21,25 @@ export function useCustomQuizFilterState() {
     () =>
       ({
         // Exclude Spanglish
-        excludeSpanglish:
-          exampleFilter.filterState.filterState.excludeSpanglish,
-        updateExcludeSpanglish:
-          exampleFilter.filterState.updateExcludeSpanglish,
+        excludeSpanglish: filterState.excludeSpanglish,
+        updateExcludeSpanglish: filterState.updateExcludeSpanglish,
         // Audio Only
-        audioOnly: exampleFilter.filterState.filterState.audioOnly,
-        updateAudioOnly: exampleFilter.filterState.updateAudioOnly,
+        audioOnly: filterState.audioOnly,
+        updateAudioOnly: filterState.updateAudioOnly,
 
         // Tag Search
-        tagSearchTerm: exampleFilter.skillTagSearch.tagSearchTerm,
-        updateTagSearchTerm: exampleFilter.skillTagSearch.updateTagSearchTerm,
-        tagSuggestions: exampleFilter.skillTagSearch.tagSuggestions,
-        addSkillTagToFilters: exampleFilter.filterState.addSkillTagToFilters,
+        tagSearchTerm: filterState.skillTagSearch.tagSearchTerm,
+        updateTagSearchTerm: filterState.skillTagSearch.updateTagSearchTerm,
+        tagSuggestions: filterState.skillTagSearch.tagSuggestions,
+        addSkillTagToFilters: filterState.addSkillTagToFilters,
         removeTagFromSuggestions:
-          exampleFilter.skillTagSearch.removeTagFromSuggestions,
+          filterState.skillTagSearch.removeTagFromSuggestions,
 
         // Selected Tags
-        skillTags: exampleFilter.filterState.filterState.skillTags,
+        skillTags: filterState.selectedSkillTags,
         removeSkillTagFromFilters,
       }) satisfies CustomQuizFilterState,
-    [
-      exampleFilter.filterState,
-      exampleFilter.skillTagSearch,
-      removeSkillTagFromFilters,
-    ],
+    [filterState, removeSkillTagFromFilters],
   );
 
   return {

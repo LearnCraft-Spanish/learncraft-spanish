@@ -14,11 +14,15 @@ export interface UseActiveStudentReturnType {
 
 export interface UseSelectedCourseAndLessonsReturnType {
   course: CourseWithLessons | null;
+  courseId: number | null;
   fromLesson: Lesson | null;
+  fromLessonNumber: number | null;
   toLesson: Lesson | null;
+  toLessonNumber: number | null;
   updateUserSelectedCourseId: (courseId: number) => void;
   updateFromLessonNumber: (lessonNumber: number) => void;
   updateToLessonNumber: (lessonNumber: number) => void;
 
   isLoading: boolean;
+  error: Error | null;
 }

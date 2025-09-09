@@ -1,35 +1,43 @@
-import type { UseExampleFilterCoordinatorReturnType } from 'src/hexagon/application/coordinators/hooks/useExampleFilterCoordinator';
-import type { UseSkillTagSearchReturnType } from 'src/hexagon/application/units/useSkillTagSearch';
-
+import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import {
   SectionHeader,
   SelectedTags,
   TagFilter,
   ToggleSwitch,
 } from '@interface/components/general';
+import { useState } from 'react';
 import LessonRangeSelector from '../LessonSelector/LessonRangeSelector';
+import PresetSelector from './PresetSelector';
 import Instructions from './units/Instructions';
 import ReadOnlyFilters from './units/ReadOnlyFilters';
+import './FlashcardFinder.scss';
 import 'src/App.css';
 
 export default function FlashcardFinderFilter({
-  filterState: hookFilterState,
-  skillTagSearch,
   filtersChanging,
   setFiltersChanging,
+  requireAudioOnly = false,
+  closeable = true,
 }: {
-  filterState: UseExampleFilterCoordinatorReturnType;
-  skillTagSearch: UseSkillTagSearchReturnType;
   filtersChanging: boolean;
   setFiltersChanging: (filtersChanging: boolean) => void;
+  requireAudioOnly?: boolean;
+  closeable?: boolean;
 }) {
+  const [filterMode, setFilterMode] = useState<'preset' | 'search'>('preset');
+
   const {
-    filterState,
+    excludeSpanglish,
+    audioOnly,
+    selectedSkillTags,
     updateExcludeSpanglish,
     updateAudioOnly,
     addSkillTagToFilters,
     removeSkillTagFromFilters,
-  } = hookFilterState;
+    skillTagSearch,
+    filterPreset,
+    setFilterPreset,
+  } = useCombinedFilters();
 
   const {
     tagSearchTerm,
@@ -39,34 +47,33 @@ export default function FlashcardFinderFilter({
     addTagBackToSuggestions,
   } = skillTagSearch;
 
-  const { excludeSpanglish, audioOnly, skillTags, toLessonNumber } =
-    filterState;
-
   /**
    * TODO: We need an inert (non-interactive) view of the filter state.
    * The filterChanging state prevents refetches during filter manipulation.
    */
   return (
-    <div>
-      <SectionHeader
-        title="Flashcard Finder Filters"
-        isOpen={filtersChanging}
-        openFunction={() => setFiltersChanging(!filtersChanging)}
-        afterTitleComponents={
-          !filtersChanging
-            ? [
-                <ReadOnlyFilters
-                  key="readOnlyFilters"
-                  excludeSpanglish={excludeSpanglish ?? false}
-                  audioOnly={audioOnly ?? false}
-                  skillTags={skillTags}
-                />,
-              ]
-            : []
-        }
-        button={<Instructions />}
-        buttonAlwaysVisible
-      />
+    <div className="flashcardFinderFilter">
+      {closeable && (
+        <SectionHeader
+          title="Flashcard Finder Filters"
+          isOpen={filtersChanging}
+          openFunction={() => setFiltersChanging(!filtersChanging)}
+          afterTitleComponents={
+            !filtersChanging
+              ? [
+                  <ReadOnlyFilters
+                    key="readOnlyFilters"
+                    excludeSpanglish={excludeSpanglish ?? false}
+                    audioOnly={audioOnly ?? false}
+                    skillTags={selectedSkillTags}
+                  />,
+                ]
+              : []
+          }
+          button={<Instructions />}
+          buttonAlwaysVisible
+        />
+      )}
       {filtersChanging && (
         <>
           <div className="filterSection">
@@ -79,46 +86,74 @@ export default function FlashcardFinderFilter({
                 ariaLabel="noSpanglish"
                 label="Exclude Spanglish: "
                 checked={excludeSpanglish ?? false}
-                onChange={() =>
-                  updateExcludeSpanglish(!filterState.excludeSpanglish)
-                }
+                onChange={() => updateExcludeSpanglish(!excludeSpanglish)}
               />
-              <ToggleSwitch
-                id="audioOnly"
-                ariaLabel="audioOnly"
-                label="Audio Flashcards Only: "
-                checked={audioOnly ?? false}
-                onChange={() => updateAudioOnly(!filterState.audioOnly)}
-              />
+              {!requireAudioOnly && (
+                <ToggleSwitch
+                  id="audioOnly"
+                  ariaLabel="audioOnly"
+                  label="Audio Flashcards Only: "
+                  checked={audioOnly ?? false}
+                  onChange={() => updateAudioOnly(!(audioOnly ?? false))}
+                />
+              )}
             </div>
             <div className="filterBox search">
-              <div className="searchFilter">
-                <TagFilter
-                  searchTerm={tagSearchTerm}
-                  updateSearchTerm={updateTagSearchTerm}
-                  searchResults={tagSuggestions}
-                  addTag={addSkillTagToFilters}
-                  removeTagFromSuggestions={removeTagFromSuggestions}
+              <div className="buttonBox header">
+                <input
+                  type="radio"
+                  id="presetMode"
+                  value="preset"
+                  name="filterMode"
                 />
-                <SelectedTags
-                  removeTag={(tagId) => {
-                    removeSkillTagFromFilters(tagId);
-                    addTagBackToSuggestions(tagId);
-                  }}
-                  skillTags={skillTags}
+                <label
+                  htmlFor="presetMode"
+                  className={filterMode === 'preset' ? 'selected' : ''}
+                  onClick={() => setFilterMode('preset')}
+                >
+                  Presets
+                </label>
+                <input
+                  type="radio"
+                  id="searchMode"
+                  value="search"
+                  name="filterMode"
                 />
+                <label
+                  htmlFor="searchMode"
+                  className={filterMode === 'search' ? 'selected' : ''}
+                  onClick={() => setFilterMode('search')}
+                >
+                  Search Tags
+                </label>
               </div>
+              {filterMode === 'preset' && (
+                <div className="presetSelector">
+                  <PresetSelector
+                    setFilterPreset={setFilterPreset}
+                    filterPreset={filterPreset}
+                  />
+                </div>
+              )}
+              {filterMode === 'search' && (
+                <div className="searchFilter">
+                  <TagFilter
+                    searchTerm={tagSearchTerm}
+                    updateSearchTerm={updateTagSearchTerm}
+                    searchResults={tagSuggestions}
+                    addTag={addSkillTagToFilters}
+                    removeTagFromSuggestions={removeTagFromSuggestions}
+                  />
+                  <SelectedTags
+                    removeTag={(tagId) => {
+                      removeSkillTagFromFilters(tagId);
+                      addTagBackToSuggestions(tagId);
+                    }}
+                    skillTags={selectedSkillTags}
+                  />
+                </div>
+              )}
             </div>
-          </div>
-          <div className="getExamplesButtonWrapper buttonBox">
-            <button
-              onClick={() => setFiltersChanging(false)}
-              type="button"
-              className="getExamplesButton"
-              disabled={!filtersChanging || !toLessonNumber}
-            >
-              Get Examples
-            </button>
           </div>
         </>
       )}

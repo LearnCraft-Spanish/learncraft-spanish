@@ -5,7 +5,6 @@ import { ExampleTable } from '../components/Tables';
 
 export default function FlashcardFinder() {
   const {
-    exampleFilter,
     exampleQuery,
     displayExamples,
     flashcardsQuery,
@@ -16,17 +15,13 @@ export default function FlashcardFinder() {
     manageThese,
   } = useFlashcardFinder();
 
-  const { filterState, skillTagSearch } = exampleFilter;
-
-  if (exampleFilter.initialLoading) {
+  if (exampleQuery.isLoading) {
     return <Loading message="Loading Flashcard Finder" />;
   }
 
   return (
     <div>
       <FlashcardFinderFilter
-        filterState={filterState}
-        skillTagSearch={skillTagSearch}
         filtersChanging={filtersChanging}
         setFiltersChanging={setFiltersChanging}
       />

@@ -1,4 +1,4 @@
-import { preSetQuizzes } from '@domain/preSetQuizzes';
+import { preSetQuizzes } from 'src/hexagon/application/units/Filtering/FilterPresets/preSetQuizzes';
 
 export default function CustomPreSetQuizzes({
   handleSetQuizObject,
@@ -11,10 +11,10 @@ export default function CustomPreSetQuizzes({
         <button
           type="button"
           className="customPreSetQuiz"
-          key={quiz.quizTitle}
+          key={quiz.preset}
           onClick={() => handleSetQuizObject(quiz)}
         >
-          {quiz.quizTitle}
+          {quiz.preset}
         </button>
       ))}
     </div>

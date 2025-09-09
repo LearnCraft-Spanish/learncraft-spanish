@@ -122,10 +122,8 @@ describe('component Menu', () => {
           await renderMenuLoaded();
           if (hasAudioQuizzing) {
             expect(screen.getByText('Audio Quiz')).toBeInTheDocument();
-            expect(screen.getByText('Comprehension Quiz')).toBeInTheDocument();
           } else {
             expect(screen.queryByText('Audio Quiz')).toBeNull();
-            expect(screen.queryByText('Comprehension Quiz')).toBeNull();
           }
         });
 

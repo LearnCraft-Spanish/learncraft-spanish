@@ -1,10 +1,10 @@
 import { useCustomPreSetQuizQuery } from '@application/queries/useCustomPreSetQuizQuery';
-import { TextQuiz } from '../TextQuiz/TextQuiz';
+import { Loading } from '@interface/components/Loading';
+import { TextQuiz } from '@interface/components/Quizzing/TextQuiz/TextQuiz';
 
 export default function CustomPreSetQuizWrapper({
   quizTitle,
   quizSkillTagKeys,
-
   cleanupFunction,
 }: {
   quizTitle: string;
@@ -17,7 +17,7 @@ export default function CustomPreSetQuizWrapper({
   });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading message="Loading..." />;
   }
 
   if (error) {

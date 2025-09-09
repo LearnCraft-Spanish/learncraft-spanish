@@ -6,18 +6,15 @@ export default function FlashcardManager() {
   const {
     filteredFlashcards,
     paginationState,
-    filtersEnabled,
-    toggleFilters,
+    filterOwnedFlashcards,
+    skillTagSearch,
+    setFilterOwnedFlashcards,
     exampleFilter,
     isLoading,
-    isLoadingPartial,
     error,
-    errorPartial,
     lessonPopup,
     findMore,
   } = useFlashcardManager();
-
-  const { filterState, skillTagSearch } = exampleFilter;
 
   if (isLoading) {
     return <Loading message="Loading Flashcard Manager" />;
@@ -30,15 +27,15 @@ export default function FlashcardManager() {
     <div>
       <h2>Flashcard Manager</h2>
       <FlashcardManagerFilters
-        filterState={filterState}
+        filterState={exampleFilter}
         skillTagSearch={skillTagSearch}
-        filtersEnabled={filtersEnabled}
-        toggleFilters={toggleFilters}
+        filterOwnedFlashcards={filterOwnedFlashcards}
+        setFilterOwnedFlashcards={setFilterOwnedFlashcards}
       />
       <FlashcardTable
         findMore={findMore}
-        isLoading={isLoadingPartial}
-        error={errorPartial}
+        isLoading={isLoading}
+        error={error}
         dataSource={filteredFlashcards}
         paginationState={paginationState}
         lessonPopup={lessonPopup}

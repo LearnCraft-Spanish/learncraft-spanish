@@ -1,9 +1,11 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { CustomQuiz } from '@interface/components/Quizzing/CustomQuiz/CustomQuiz';
+import CustomAudioQuiz from '@interface/pages/CustomAudioQuiz';
 import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
 import FlashcardManager from '@interface/pages/FlashcardManager';
 import FrequensayPage from '@interface/pages/FrequensayPage';
 import GetHelpPage from '@interface/pages/GetHelpPage';
+import { OfficialQuizzesRoutes } from '@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
 import ReviewMyFlashcards from '@interface/pages/ReviewMyFlashcards';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
 import { Route } from 'react-router-dom';
@@ -18,11 +20,9 @@ import {
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
-import { OfficialQuizzesRoutes } from 'src/hexagon/interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
-import AudioBasedReview from '../sections/AudioBasedReview';
 import Menu from '../sections/Menu';
 import SentryRoutes from './SentryRoutes';
 
@@ -48,20 +48,7 @@ export default function AppRoutes() {
       <Route
         path="/audioquiz/*"
         element={
-          (isLimited || isStudent || isCoach || isAdmin) && (
-            <AudioBasedReview audioOrComprehension="audio" willAutoplay />
-          )
-        }
-      />
-      <Route
-        path="/comprehensionquiz/*"
-        element={
-          (isLimited || isStudent || isCoach || isAdmin) && (
-            <AudioBasedReview
-              audioOrComprehension="comprehension"
-              willAutoplay={false}
-            />
-          )
+          (isLimited || isStudent || isCoach || isAdmin) && <CustomAudioQuiz />
         }
       />
       <Route

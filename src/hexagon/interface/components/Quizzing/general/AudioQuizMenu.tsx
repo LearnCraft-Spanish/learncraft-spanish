@@ -6,7 +6,7 @@ import React from 'react';
 import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
 import './QuizSetupMenu.scss';
 
-export function MyAudioQuizMenu({
+export function AudioQuizMenu({
   quizSetupOptions,
 }: {
   quizSetupOptions: AudioQuizSetupReturn;

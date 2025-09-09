@@ -1,30 +1,31 @@
+import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
+
 import type { UsePaginationReturn } from '@application/units/Pagination/usePagination';
-
-import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
-
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { Flashcard } from '@learncraft-spanish/shared';
+import type { UseSkillTagSearchReturnType } from '../../units/useSkillTagSearch';
+import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import { usePagination } from '@application/units/Pagination/usePagination';
-import { useExampleFilter } from '@application/units/useExampleFilter';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSkillTagSearch } from '../../units/useSkillTagSearch';
 
 export interface UseFlashcardManagerReturn {
   filteredFlashcards: Flashcard[];
   paginationState: UsePaginationReturn;
-  filtersEnabled: boolean;
-  exampleFilter: UseExampleFilterReturnType;
+  exampleFilter: UseCombinedFiltersWithVocabularyReturnType;
 
-  toggleFilters: () => void;
+  filterOwnedFlashcards: boolean;
+  setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
+
   findMore: () => void;
   lessonPopup: LessonPopup;
+  skillTagSearch: UseSkillTagSearchReturnType;
 
   isLoading: boolean;
-  isLoadingPartial: boolean;
   error: Error | null;
-  errorPartial: Error | null;
 }
 
 export default function useFlashcardManager(): UseFlashcardManagerReturn {
@@ -35,15 +36,14 @@ export default function useFlashcardManager(): UseFlashcardManagerReturn {
 
   const {
     filteredFlashcards,
-    filtersEnabled,
-    setFiltersEnabled,
+    filterOwnedFlashcards,
+    setFilterOwnedFlashcards,
     isLoading,
-    isLoadingPartial,
     error,
-    errorPartial,
   } = useFilteredOwnedFlashcards();
 
-  const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
+  const exampleFilter: UseCombinedFiltersWithVocabularyReturnType =
+    useCombinedFiltersWithVocabulary();
 
   // Simple callback to navigate to the flashcard finder
   // This doesn't belong here. This is an interface responsibility.
@@ -68,22 +68,23 @@ export default function useFlashcardManager(): UseFlashcardManagerReturn {
     displayOrder,
   });
 
+  const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
+
   const { lessonPopup } = useLessonPopup();
 
   return {
     filteredFlashcards,
     paginationState,
-    filtersEnabled,
     exampleFilter,
-    toggleFilters: () => setFiltersEnabled(!filtersEnabled),
+    filterOwnedFlashcards,
+    setFilterOwnedFlashcards,
 
     // This doesn't belong here. This is an interface responsibility.
     findMore,
     lessonPopup,
+    skillTagSearch,
 
     isLoading,
-    isLoadingPartial,
     error,
-    errorPartial,
   };
 }

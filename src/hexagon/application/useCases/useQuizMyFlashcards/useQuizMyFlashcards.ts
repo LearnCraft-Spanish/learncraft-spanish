@@ -1,14 +1,16 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
-import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
+import type { UseCombinedFiltersWithVocabularyReturnType } from '../../units/Filtering/useCombinedFiltersWithVocabulary';
+import type { UseSkillTagSearchReturnType } from '../../units/useSkillTagSearch';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
-import { useExampleFilter } from '@application/units/useExampleFilter';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useCallback, useMemo, useState } from 'react';
+import { useCombinedFiltersWithVocabulary } from '../../units/Filtering/useCombinedFiltersWithVocabulary';
+import { useSkillTagSearch } from '../../units/useSkillTagSearch';
 
 export enum MyFlashcardsQuizType {
   Text = 'text',
@@ -19,13 +21,13 @@ export interface UseQuizMyFlashcardsReturn {
   audioQuizSetup: AudioQuizSetupReturn;
   textQuizSetup: TextQuizSetupReturn;
 
-  exampleFilter: UseExampleFilterReturnType;
-
+  exampleFilter: UseCombinedFiltersWithVocabularyReturnType;
+  skillTagSearch: UseSkillTagSearchReturnType;
   textQuizProps: UseTextQuizProps;
   audioQuizProps: AudioQuizProps;
 
-  filtersEnabled: boolean;
-  setFiltersEnabled: (filtersEnabled: boolean) => void;
+  filterOwnedFlashcards: boolean;
+  setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
   quizType: MyFlashcardsQuizType;
   setQuizType: (quizType: MyFlashcardsQuizType) => void;
   quizReady: boolean;
@@ -49,13 +51,14 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   // To get the filtered owned flashcards
   const {
     filteredFlashcards,
-    setFiltersEnabled,
-    filtersEnabled,
+    setFilterOwnedFlashcards,
+    filterOwnedFlashcards,
     isLoading: filteredFlashcardsLoading,
     error: filteredFlashcardsError,
   } = useFilteredOwnedFlashcards();
 
-  const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
+  const exampleFilter: UseCombinedFiltersWithVocabularyReturnType =
+    useCombinedFiltersWithVocabulary();
 
   // Get the examples from the flashcards
   const filteredExamples = useMemo(
@@ -96,7 +99,10 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
 
   // To warn user if they try to quiz without flashcards
   const noFlashcards =
-    !isLoading && !error && !filtersEnabled && filteredExamples?.length === 0;
+    !isLoading &&
+    !error &&
+    !filterOwnedFlashcards &&
+    filteredExamples?.length === 0;
 
   // Quiz Not Ready
   const quizNotReady = useMemo(() => {
@@ -164,20 +170,22 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
     cleanupFunction: cleanupQuiz,
   };
 
+  const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
+
   // Return the hooks, props, and local state
   return {
     // Quiz Setup Hooks
     audioQuizSetup,
     textQuizSetup,
     exampleFilter,
-
+    skillTagSearch,
     // Quiz Props
     textQuizProps,
     audioQuizProps,
 
     // Local states and methods for top level
-    filtersEnabled,
-    setFiltersEnabled,
+    filterOwnedFlashcards,
+    setFilterOwnedFlashcards,
     quizType,
     setQuizType,
     quizReady,

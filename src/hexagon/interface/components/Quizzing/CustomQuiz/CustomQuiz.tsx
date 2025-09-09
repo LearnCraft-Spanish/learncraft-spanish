@@ -1,4 +1,4 @@
-import type { preSetQuizzes } from 'src/hexagon/domain/preSetQuizzes';
+import type { preSetQuizzes } from 'src/hexagon/application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCustomQuiz } from '@application/useCases/useCustomQuiz/useCustomQuiz';
 import { useCallback, useState } from 'react';
 import { TextQuiz } from '../TextQuiz';
@@ -39,8 +39,8 @@ export function CustomQuiz() {
   const handleSetQuizObject = useCallback(
     (quiz: (typeof preSetQuizzes)[0]) => {
       setQuizObject({
-        quizTitle: quiz.quizTitle,
-        quizSkillTagKeys: quiz.SkilltagKeys,
+        quizTitle: quiz.preset,
+        quizSkillTagKeys: quiz.SkillTagKeys,
       });
       setPresetQuizReady(true);
     },

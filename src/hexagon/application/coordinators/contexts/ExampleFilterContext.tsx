@@ -1,15 +1,15 @@
 import { createContext } from 'react';
 
-interface ExampleFilterStateWithoutCourseAndLesson {
+interface ExampleFilterStateWithoutLesson {
   excludeSpanglish: boolean;
   audioOnly: boolean;
   skillTagKeys: string[];
 }
 
 interface ExampleFilterContextType {
-  exampleFilters: ExampleFilterStateWithoutCourseAndLesson;
+  exampleFilters: ExampleFilterStateWithoutLesson;
   updateExampleFilters: (
-    exampleFilters: ExampleFilterStateWithoutCourseAndLesson,
+    exampleFilters: ExampleFilterStateWithoutLesson,
   ) => void;
 }
 
@@ -22,7 +22,4 @@ export const ExampleFilterContext = createContext<ExampleFilterContextType>({
   updateExampleFilters: () => {},
 });
 
-export type {
-  ExampleFilterContextType,
-  ExampleFilterStateWithoutCourseAndLesson,
-};
+export type { ExampleFilterContextType, ExampleFilterStateWithoutLesson };

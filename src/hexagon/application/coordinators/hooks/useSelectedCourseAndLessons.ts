@@ -21,7 +21,11 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     updateToLessonNumber,
   } = context;
 
-  const { data: coursesWithLessons, isLoading } = useCoursesWithLessons();
+  const {
+    data: coursesWithLessons,
+    isLoading,
+    error,
+  } = useCoursesWithLessons();
   const { appUser } = useActiveStudent();
 
   const course: CourseWithLessons | null = useMemo(() => {
@@ -61,11 +65,15 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
   // ------------------ Return ------------------ //
   return {
     course,
+    courseId: course?.id ?? null,
     fromLesson,
+    fromLessonNumber: fromLesson?.lessonNumber ?? null,
     toLesson,
+    toLessonNumber: toLesson?.lessonNumber ?? null,
     updateUserSelectedCourseId,
     updateFromLessonNumber,
     updateToLessonNumber,
     isLoading,
+    error,
   };
 }
