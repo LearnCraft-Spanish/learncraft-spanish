@@ -43,7 +43,8 @@ export function useAudioQuizSetup(
       filteredOptions.push(audioExamples.length);
     }
     // Return parsed options
-    return filteredOptions.sort();
+    const sortedOptions = filteredOptions.sort((a, b) => a - b);
+    return sortedOptions;
   }, [audioExamples, quizLengthOptions]);
 
   // Local state for choice of quiz length

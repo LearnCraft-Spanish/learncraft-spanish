@@ -103,13 +103,6 @@ export default function AudioQuizSetupMenu({
           Start
         </button>
       </div>
-      <div className="buttonBox">
-        {!(totalExamples > 0) ? (
-          <p>There are no audio examples for this lesson range</p>
-        ) : (
-          <p>{`${totalExamples} examples found`}</p>
-        )}
-      </div>
     </div>
   );
 }

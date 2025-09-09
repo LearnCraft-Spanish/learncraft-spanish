@@ -16,7 +16,6 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
     customOnly,
     setCustomOnly,
     quizLength,
-    examplesToQuiz,
     setSelectedQuizLength,
     availableQuizLengths,
   } = quizSetupOptions;
@@ -47,7 +46,7 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
         />
       </div>
       <label htmlFor="quizLength">
-        <p>Number of Flashcards:</p>
+        <p>Number to Quiz:</p>
         <select
           name="length"
           id="quizLength"
@@ -63,7 +62,6 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
           ))}
         </select>
       </label>
-      <p>{`${examplesToQuiz.length} examples found`}</p>
     </>
   );
 }

@@ -14,7 +14,6 @@ export function AudioQuizMenu({
   const {
     audioQuizType,
     autoplay,
-    totalExamples,
     setAutoplay,
     setAudioQuizType,
     selectedQuizLength,
@@ -24,7 +23,7 @@ export function AudioQuizMenu({
 
   return (
     <>
-      <div className="quizTypeSettingsWrapper">
+      <div className="menuRow">
         <label htmlFor="isListening">Quiz Type:</label>
         <select
           id="quizType"
@@ -35,6 +34,8 @@ export function AudioQuizMenu({
           <option value={AudioQuizType.Speaking.toString()}>Speaking</option>
           <option value={AudioQuizType.Listening.toString()}>Listening</option>
         </select>
+      </div>
+      <div className="menuRow">
         <ToggleSwitch
           id="autoplay"
           ariaLabel="Autoplay"
@@ -43,24 +44,25 @@ export function AudioQuizMenu({
           onChange={() => setAutoplay(!autoplay)}
         />
       </div>
-      <label htmlFor="quizLength">
-        <p>Number of Flashcards:</p>
-        <select
-          name="length"
-          id="quizLength"
-          onChange={(e) =>
-            setSelectedQuizLength(Number.parseInt(e.target.value))
-          }
-          value={selectedQuizLength}
-        >
-          {availableQuizLengths.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </label>
-      <p>{`${totalExamples} examples found`}</p>
+      <div className="menuRow">
+        <label htmlFor="quizLength">
+          <p>Number to Quiz:</p>
+          <select
+            name="length"
+            id="quizLength"
+            onChange={(e) =>
+              setSelectedQuizLength(Number.parseInt(e.target.value))
+            }
+            value={selectedQuizLength}
+          >
+            {availableQuizLengths.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
     </>
   );
 }

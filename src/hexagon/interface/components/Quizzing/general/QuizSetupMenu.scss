@@ -17,8 +17,7 @@
   }
 }
 
-.myFlashcardsFormContentWrapper > label,
-.myFlashcardsFormContentWrapper > div > div,
+.myFlashcardsFormContentWrapper > .menuRow,
 .QuizMenuCustomOnly {
   /* align on right side of parent */
 
@@ -27,6 +26,11 @@
   justify-content: space-between;
   width: 100%;
   align-items: center;
+  padding: 5px 0px;
+}
+
+.myFlashcardsFormContentWrapper > .menuRow > label {
+  width: 100%;
 }
 
 .quizTypeSettingsWrapper {
