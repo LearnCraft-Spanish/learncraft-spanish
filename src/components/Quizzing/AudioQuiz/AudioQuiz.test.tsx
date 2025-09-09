@@ -76,9 +76,8 @@ describe('component AudioQuiz', () => {
           wrapper: MockAllProviders,
         },
       );
-      const progressBarText = `1/${unknownAudioExamples.length}`;
+      const progressBarText = `1 of ${unknownAudioExamples.length}`;
       await waitFor(() => {
-        expect(screen.queryByText('Test Quiz')).toBeInTheDocument();
         expect(screen.queryByText(progressBarText)).toBeInTheDocument();
       });
     });

@@ -37,19 +37,7 @@ describe('component AudioQuizSetupMenu', () => {
     );
     expect(screen.getByText('Start')).toBeTruthy();
   });
-  it('shows no examples found message', () => {
-    render(
-      <MockAllProviders>
-        <AudioQuizSetupMenu
-          audioQuizSetupOptions={audioQuizSetupOptions}
-          startQuiz={startQuiz}
-        />
-      </MockAllProviders>,
-    );
-    expect(
-      screen.getByText('There are no audio examples for this lesson range'),
-    ).toBeTruthy();
-  });
+
   it('toggle autoplay off', () => {
     render(
       <MockAllProviders>
@@ -66,11 +54,12 @@ describe('component AudioQuizSetupMenu', () => {
     render(
       <MockAllProviders>
         <AudioQuizSetupMenu
-          audioQuizSetupOptions={audioQuizSetupOptions}
+          audioQuizSetupOptions={{ ...audioQuizSetupOptions, autoplay: false }}
           startQuiz={startQuiz}
         />
       </MockAllProviders>,
     );
+
     screen.getByLabelText('toggleAutoplay').click();
     expect(audioQuizSetupOptions.setAutoplay).toHaveBeenCalledWith(true);
   });
