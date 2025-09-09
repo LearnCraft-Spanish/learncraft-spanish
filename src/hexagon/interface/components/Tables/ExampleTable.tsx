@@ -5,17 +5,17 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
-import { InlineLoading } from 'src/components/Loading';
 
+import { InlineLoading } from 'src/components/Loading';
 // import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
-import { Pagination } from '../general';
 
+import { Pagination } from '../general';
 import { copyTableToClipboard } from './units/functions';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
-
 interface ExamplesTableProps {
   examples: ExampleWithVocabulary[];
   totalCount: number;
@@ -38,7 +38,7 @@ export default function ExamplesTable({
   manageThese,
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
-
+  const navigate = useNavigate();
   // const {
   //   bulkSelectMode,
   //   bulkOperationInProgress,
@@ -129,6 +129,14 @@ export default function ExamplesTable({
                 </button>
                 <button type="button" onClick={manageThese}>
                   <p>Use these filters on my flashcards</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate('/customquiz');
+                  }}
+                >
+                  <p>Create a quiz from these examples</p>
                 </button>
                 {/* <button
                     type="button"

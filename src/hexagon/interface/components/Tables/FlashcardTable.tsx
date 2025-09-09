@@ -6,21 +6,21 @@ import type { DisplayOrder } from 'src/types/interfaceDefinitions';
 
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/ExampleManagerExampleListItem';
 import { Pagination } from '../general';
-import { InlineLoading } from '../Loading';
 
+import { InlineLoading } from '../Loading';
 import DeleteAllOwnedSpanglish from './units/DeleteAllOwnedSpanglish';
+
 import {
   copyTableToClipboard,
   getExampleOrFlashcardById,
 } from './units/functions';
-
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
-
 interface FlashcardTableProps {
   dataSource: Flashcard[];
   paginationState: ReturnType<typeof usePagination>;
@@ -50,7 +50,7 @@ export default function FlashcardTable({
   } = paginationState;
   const { isFlashcardCollected, createFlashcards, deleteFlashcards } =
     useStudentFlashcards();
-
+  const navigate = useNavigate();
   const {
     bulkOperationInProgress,
     bulkSelectIds,
@@ -223,6 +223,14 @@ export default function FlashcardTable({
                   }}
                 >
                   <p>Find More Matching Flashcards</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate('/customquiz');
+                  }}
+                >
+                  <p>Create a quiz from these flashcards</p>
                 </button>
               </div>
             )}

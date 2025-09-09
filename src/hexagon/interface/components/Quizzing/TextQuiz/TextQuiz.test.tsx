@@ -93,7 +93,7 @@ describe('component TextQuiz', () => {
     await waitFor(() => {
       expect(screen.getByLabelText('flashcard')).toBeInTheDocument();
     });
-    expect(screen.getByText(/\d+\/\d+/)).toBeTruthy();
+    expect(screen.getByText(/1 of/)).toBeTruthy();
   });
 
   it('calls cleanupFunction on Back link click (if present)', () => {
