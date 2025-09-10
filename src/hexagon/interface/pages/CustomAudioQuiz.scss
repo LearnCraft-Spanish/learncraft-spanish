@@ -1,65 +1,20 @@
-// Clean up the quiz settings layout
-.quizTypeSettingsWrapper {
-  border: none;
-  padding: 0px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-
-  .menuRow {
+// Highest level Wrapper
+.CustomAudioQuizWrapper {
+  .loadingWrapper {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    padding: 30px;
+  }
+  .errorMessage {
+    background-color: #fee;
+    color: #c33;
+    padding: 15px;
+    border-radius: 0px;
+    border: 1px solid #fcc;
+    text-align: center;
+    margin: 20px 0px;
   }
 }
 
-// Quiz length section
-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-
-  p {
-    margin: 0px;
-  }
-}
-
-// Clean up button styling
-.buttonBox {
-  button {
-    border: none;
-    outline: none;
-
-    &:focus {
-      outline: none;
-      border: none;
-    }
-  }
-}
-
-// Fix transparent outline issues
-select {
-  &:focus {
-    outline: none;
-    border-color: var(--brand);
-  }
-}
-
-.errorMessage {
-  background-color: #fee;
-  color: #c33;
-  padding: 15px;
-  border-radius: 0px;
-  border: 1px solid #fcc;
-  text-align: center;
-  margin: 20px 0px;
-}
-
-.loadingWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-}
+// All other styles are in QuizSetupMenu.scss

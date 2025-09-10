@@ -1,17 +1,6 @@
 import { ToggleSwitch } from '@interface/components/general';
 import { InlineLoading } from '../../Loading';
-// Universal Settings:
-
-// collected flashcard only
-// audio or text
-// quiz length (max of 150)
-
-//text settings:
-// spanish first
-
-// audio settings:
-// autoplay
-// listening or speaking
+import '@interface/styles/QuizSetupMenu.scss';
 
 export function CustomQuizSetupMenu({
   availableQuizLengths,
@@ -33,11 +22,10 @@ export function CustomQuizSetupMenu({
   totalCount: number;
 }) {
   return (
-    <div className="CustomQuizSetupMenu">
-      <div className="header">
-        <h2>Custom Quiz Settings</h2>
-      </div>
-      <div className="content">
+    <div className="quizSettingsWrapper">
+      <div className="quizSettingsHeader titleOnly">Custom Quiz Settings</div>
+
+      <div className="quizSettingsBody">
         <div className="menuRow">
           <ToggleSwitch
             id="startWithSpanish"

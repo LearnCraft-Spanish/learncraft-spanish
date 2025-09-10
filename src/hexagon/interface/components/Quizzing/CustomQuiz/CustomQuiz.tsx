@@ -1,11 +1,13 @@
 import type { preSetQuizzes } from 'src/hexagon/application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCustomQuiz } from '@application/useCases/useCustomQuiz/useCustomQuiz';
+import FlashcardFinderFilter from '@interface/components/FlashcardFinder/FlashcardFinderFilter';
 import { useCallback, useState } from 'react';
 import { TextQuiz } from '../TextQuiz';
 import CustomPreSetQuizWrapper from './CustomPreSetQuizWrapper';
 import CustomPreSetQuizzes from './CustomPreSetQuizzes';
-import CustomQuizFilters from './CustomQuizFilters';
 import { CustomQuizSetupMenu } from './CustomQuizSetupMenu';
+import './CustomQuiz.scss';
+
 export interface CustomQuizProps {
   filtersChanging: boolean;
   setFiltersChanging: (filtersChanging: boolean) => void;
@@ -13,7 +15,7 @@ export interface CustomQuizProps {
 
 export function CustomQuiz() {
   const {
-    filterState,
+    filterState: _filterState, // Temp fix to avoid lint error
     availableQuizLengths,
     safeQuizLength,
     setSelectedQuizLength,
@@ -28,7 +30,7 @@ export function CustomQuiz() {
     totalCount,
 
     customQuizType,
-    setCustomQuizType,
+    setCustomQuizType: _setCustomQuizType, // Temp fix to avoid lint error
   } = useCustomQuiz();
 
   const [quizObject, setQuizObject] = useState<{
@@ -48,53 +50,61 @@ export function CustomQuiz() {
   );
   return (
     <>
-      {!customQuizReady && !presetQuizReady && (
-        <div className="customQuizTypeSelector buttonBox header">
-          <input
-            type="radio"
-            id="customQuizType"
-            value="custom-filters"
-            name="customQuizType"
-          />
+      {/* {!customQuizReady && !presetQuizReady && (
+        <div className="FilterToggle">
           <label
             htmlFor="customQuizType"
-            className={customQuizType === 'custom-filters' ? 'selected' : ''}
+            className={`option ${customQuizType === 'custom-filters' ? 'selected' : ''}`}
             onClick={() => setCustomQuizType('custom-filters')}
           >
             Custom Filters
+            <input
+              type="radio"
+              id="customQuizType"
+              value="custom-filters"
+              name="customQuizType"
+            />
           </label>
-          <input
-            type="radio"
-            id="preSetQuizzes"
-            value="preSetQuizzes"
-            name="preSetQuizzes"
-          />
+
           <label
             htmlFor="preSetQuizzes"
-            className={customQuizType === 'pre-set-quizzes' ? 'selected' : ''}
+            className={`option ${customQuizType === 'pre-set-quizzes' ? 'selected' : ''}`}
             onClick={() => setCustomQuizType('pre-set-quizzes')}
           >
             Pre-set Quizzes
+            <input
+              type="radio"
+              id="preSetQuizzes"
+              value="preSetQuizzes"
+              name="preSetQuizzes"
+            />
           </label>
         </div>
-      )}
+      )} */}
 
       {customQuizType === 'custom-filters' &&
         (!customQuizReady ? (
           <>
-            <CustomQuizFilters filterState={filterState} />
-            <CustomQuizSetupMenu
-              availableQuizLengths={availableQuizLengths}
-              safeQuizLength={safeQuizLength}
-              setSelectedQuizLength={setSelectedQuizLength}
-              startQuizFunction={() => setCustomQuizReady(true)}
-              startWithSpanish={startWithSpanish}
-              updateStartWithSpanish={() =>
-                setStartWithSpanish(!startWithSpanish)
-              }
-              isLoadingExamples={isLoadingExamples}
-              totalCount={totalCount ?? 0}
+            {/* <CustomQuizFilters filterState={filterState} /> */}
+            <FlashcardFinderFilter
+              filtersChanging={true}
+              setFiltersChanging={() => {}}
+              closeable={false}
             />
+            <div className="customQuizSettingsWrapper">
+              <CustomQuizSetupMenu
+                availableQuizLengths={availableQuizLengths}
+                safeQuizLength={safeQuizLength}
+                setSelectedQuizLength={setSelectedQuizLength}
+                startQuizFunction={() => setCustomQuizReady(true)}
+                startWithSpanish={startWithSpanish}
+                updateStartWithSpanish={() =>
+                  setStartWithSpanish(!startWithSpanish)
+                }
+                isLoadingExamples={isLoadingExamples}
+                totalCount={totalCount ?? 0}
+              />
+            </div>
           </>
         ) : (
           <TextQuiz

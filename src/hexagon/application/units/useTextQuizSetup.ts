@@ -60,7 +60,8 @@ export function useTextQuizSetup({
   const canAccessCustom =
     ownedOnly &&
     appUser?.studentRole === 'student' &&
-    (isAdmin || isCoach || isOwnUser);
+    (isAdmin || isCoach || isOwnUser) &&
+    (customFlashcards?.length ?? 0) > 0;
 
   // SRS quizzes are only accessible to the students themselves
   const canAccessSRS =

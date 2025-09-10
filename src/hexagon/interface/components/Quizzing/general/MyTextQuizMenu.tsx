@@ -4,11 +4,15 @@ import { ToggleSwitch } from '@interface/components/general';
 import React from 'react';
 import './QuizSetupMenu.scss';
 
+import '@interface/styles/QuizSetupMenu.scss';
+
 interface MyTextQuizMenuProps {
   quizSetupOptions: TextQuizSetupReturn;
 }
 export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
   const {
+    canAccessSRS,
+    canAccessCustom,
     srsQuiz,
     startWithSpanish,
     setSrsQuiz,
@@ -21,15 +25,19 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
   } = quizSetupOptions;
 
   return (
-    <>
-      <div className="quizTypeSettingsWrapper">
-        <ToggleSwitch
-          id="srsQuiz"
-          ariaLabel="SRS Quiz"
-          label="SRS Quiz"
-          checked={srsQuiz}
-          onChange={() => setSrsQuiz(!srsQuiz)}
-        />
+    <div className="quizSettingsBody">
+      {canAccessSRS && (
+        <div className="menuRow">
+          <ToggleSwitch
+            id="srsQuiz"
+            ariaLabel="SRS Quiz"
+            label="SRS Quiz"
+            checked={srsQuiz}
+            onChange={() => setSrsQuiz(!srsQuiz)}
+          />
+        </div>
+      )}
+      <div className="menuRow">
         <ToggleSwitch
           id="startWithSpanish"
           ariaLabel="Start With Spanish"
@@ -37,16 +45,21 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
           checked={startWithSpanish}
           onChange={() => setStartWithSpanish(!startWithSpanish)}
         />
-        <ToggleSwitch
-          id="customOnly"
-          ariaLabel="Custom Only"
-          label="Custom Only"
-          checked={customOnly}
-          onChange={() => setCustomOnly(!customOnly)}
-        />
       </div>
-      <label htmlFor="quizLength">
-        <p>Number to Quiz:</p>
+      {canAccessCustom && (
+        <div className="menuRow">
+          <ToggleSwitch
+            id="customOnly"
+            ariaLabel="Custom Only"
+            label="Custom Only"
+            checked={customOnly}
+            onChange={() => setCustomOnly(!customOnly)}
+          />
+        </div>
+      )}
+      <div className="menuRow dropdown">
+        <label htmlFor="quizLength">Quiz Length:</label>
+
         <select
           name="length"
           id="quizLength"
@@ -61,7 +74,7 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
             </option>
           ))}
         </select>
-      </label>
-    </>
+      </div>
+    </div>
   );
 }

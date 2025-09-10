@@ -6,6 +6,8 @@ import React from 'react';
 import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
 import './QuizSetupMenu.scss';
 
+import '@interface/styles/QuizSetupMenu.scss';
+
 export function AudioQuizMenu({
   quizSetupOptions,
 }: {
@@ -22,19 +24,17 @@ export function AudioQuizMenu({
   } = quizSetupOptions;
 
   return (
-    <>
-      <div className="menuRow">
-        <label htmlFor="isListening">Quiz Type:</label>
+    <div className="quizSettingsBody">
+      <label className="menuRow dropdown">
+        Quiz Type:
         <select
-          id="quizType"
-          aria-label="Listening Quiz"
           value={audioQuizType}
           onChange={(e) => setAudioQuizType(e.target.value as AudioQuizType)}
         >
           <option value={AudioQuizType.Speaking.toString()}>Speaking</option>
           <option value={AudioQuizType.Listening.toString()}>Listening</option>
         </select>
-      </div>
+      </label>
       <div className="menuRow">
         <ToggleSwitch
           id="autoplay"
@@ -44,25 +44,21 @@ export function AudioQuizMenu({
           onChange={() => setAutoplay(!autoplay)}
         />
       </div>
-      <div className="menuRow">
-        <label htmlFor="quizLength">
-          <p>Number to Quiz:</p>
-          <select
-            name="length"
-            id="quizLength"
-            onChange={(e) =>
-              setSelectedQuizLength(Number.parseInt(e.target.value))
-            }
-            value={selectedQuizLength}
-          >
-            {availableQuizLengths.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-    </>
+      <label className="menuRow dropdown">
+        Quiz Length:
+        <select
+          onChange={(e) =>
+            setSelectedQuizLength(Number.parseInt(e.target.value))
+          }
+          value={selectedQuizLength}
+        >
+          {availableQuizLengths.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
   );
 }

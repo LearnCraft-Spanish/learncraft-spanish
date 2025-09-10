@@ -14,88 +14,23 @@
   }
 }
 
-.startQuizButtonContainer {
-  display: inline-block;
-  position: relative;
-  flex-grow: 2;
-  max-width: 100%;
-
-  display: flex;
-  // center child
-  justify-content: center;
-  align-items: center;
-}
-
 #customQuizType {
   border: 1px solid var(--dark);
 }
 
-.CustomQuizSetupMenu {
-  max-width: 300px;
+/* ------------------ Custom Quiz Filters ------------------ */
+
+// Toggle between custom filters and pre-set quizzes
+.FilterToggle {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  margin: auto;
-  border: 1px solid var(--dark);
-  box-sizing: border-box;
-  margin: 30px auto;
+  justify-content: center;
 
-  .header {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 18px;
-    background-color: var(--brand);
-    padding: 10px 30px;
-    border-bottom: 1px solid var(--dark);
-
-    h2 {
-      font-size: 18px;
-      margin: 0px;
-      color: var(--light);
-    }
-  }
-  .content {
-    width: 100%;
-    padding: 10px 30px;
-  }
-
-  .menuRow {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 100%;
-  }
-
-  .toggleSwitch {
-    padding: 0px;
-    width: 100%;
-  }
-  .buttonBox {
-    min-width: 100px;
-    width: 100%;
-  }
-
-  .startQuizButton {
-    background-color: darkgreen;
-
-    &.disabled {
-      background-color: var(--dark);
-      cursor: not-allowed;
-    }
-  }
-
-  .totalCount {
-    font-size: 14px;
-    // italic, centered
-    font-style: italic;
-    text-align: center;
-    margin: auto;
+  input {
+    display: none;
   }
 }
-
-/* ------------------ Custom Quiz Filters ------------------ */
 
 .CustomQuizFilters {
   // Removing white space from lesson selector & .toggleSwitch

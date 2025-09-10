@@ -91,14 +91,14 @@ button:disabled {
   width: 90%;
 }
 
-.menuRow {
+/* .menuRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin: 0;
   padding: 0;
   width: 100%;
-}
+} */
 .audioQuizSetupMenu .buttonBox {
   display: flex;
   justify-content: space-between;

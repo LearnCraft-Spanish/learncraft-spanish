@@ -67,7 +67,19 @@ h6 {
   text-align: center;
 }
 
-.bannerMessage {
+/* Menu Row Styles */
+.menuRow {
+  /* .menuRow > label.quizLength { */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.menuRow > label.quizLength p {
+  margin: 0;
+}
+*/ .bannerMessage {
   position: fixed;
   top: 50px;
   left: 50%;
@@ -491,43 +503,6 @@ button:hover,
 }
 .audioAutoplayFlashcardWrapper .audioExample {
   border: none;
-}
-
-/* For Flashcard Finder */
-
-.flashcardFinderHeader {
-  margin: 0px;
-  padding: 0px;
-}
-
-.filterSection {
-  padding: 0px 20px;
-  display: flex;
-  flex-direction: row-reverse;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-}
-
-.filterBox {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  flex-grow: 1;
-  justify-content: flex-start;
-  margin-top: 10px;
-  /* align-items: center; */
-}
-.filterBox.options {
-  flex-direction: column;
-  max-width: 320px;
-  margin: 0px 16px;
-  margin-bottom: 16px;
-}
-.filterBox.search {
-  flex-direction: column;
-  justify-self: left;
-  flex-grow: 3;
 }
 
 .removeSpanglishBox {

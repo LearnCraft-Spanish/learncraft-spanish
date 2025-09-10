@@ -1,0 +1,132 @@
+// used in CustomQuiz & CustomAudioQuiz, wraps quizSettingsWrapper
+.customQuizSettingsWrapper {
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  // border: 1px solid var(--dark);
+  box-sizing: border-box;
+  margin: 30px auto;
+}
+
+// Standard Quiz Settings Wrapper
+.quizSettingsWrapper {
+  width: 100%;
+  border: 1px solid var(--dark);
+
+  .quizSettingsHeader {
+    width: 100%;
+    margin: 0px;
+    border-bottom: 1px solid var(--dark);
+
+    // Text
+    font-weight: 600;
+    text-align: center;
+
+    // use this class for a title only header
+    &.titleOnly {
+      background-color: var(--brand);
+      color: var(--light);
+      box-sizing: border-box;
+      padding: 10px 30px;
+      font-size: 18px;
+    }
+
+    // use this class for a two option header (radio buttons)
+    &.twoOptions {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+
+      .option {
+        width: 50%;
+        padding: 10px 30px;
+        cursor: pointer;
+
+        background-color: var(--light);
+        color: var(--dark);
+
+        &.selected {
+          background-color: var(--brand);
+          color: var(--light);
+        }
+
+        &:hover {
+          background-color: var(--accent);
+        }
+
+        // add the middle border
+        &:last-child {
+          border-left: 1px solid var(--dark);
+        }
+
+        // hide the radio buttons
+        input {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Quiz Settings Body
+  .quizSettingsBody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    margin: 0 auto;
+
+    padding: 14px 12px;
+    // padding-bottom: 18px;
+    background-color: var(--light);
+
+    // Remove right padding from toggle switch
+    .toggleSwitch {
+      padding-right: 0px;
+    }
+
+    // add standard margin to menu row
+    .menuRow {
+      margin: 0.5rem 0;
+    }
+    // remove margin-top from first child menu row
+    .menuRow:first-child {
+      margin-top: 0;
+    }
+
+    // dropdown styling
+    .dropdown {
+      select {
+        cursor: pointer;
+        padding: 5px;
+      }
+    }
+
+    // We use these in CustomQuiz & CustomAudioQuiz
+
+    // Override default min-width of 300px
+    .buttonBox {
+      min-width: 100px;
+      width: 100%;
+    }
+
+    .startQuizButton {
+      background-color: darkgreen;
+
+      &.disabled {
+        background-color: var(--dark);
+        cursor: not-allowed;
+      }
+    }
+
+    .totalCount {
+      font-size: 14px;
+      font-style: italic;
+      text-align: center;
+      margin: auto;
+    }
+  }
+}
