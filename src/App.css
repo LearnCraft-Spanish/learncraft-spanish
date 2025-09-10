@@ -1170,3 +1170,16 @@ i {
 .add-spelling-form button:hover {
   background-color: #218838;
 }
+
+/* From refactoring QuizSetupMenu and FlashcardFinderFilters, styles used elsewhere but not in those components */
+/* / THESE ARE USED ELSEWHERE. PLEASE REMOVE WHEN REFACTORING. */
+.presetSelector,
+.searchFilter {
+  padding: 15px;
+  border: 1px solid var(--dark);
+  border-top: 0px;
+  background-color: var(--light);
+  min-height: 200px;
+  margin-bottom: 15px;
+}
+/* END OF THESE ARE USED ELSEWHERE. PLEASE REMOVE WHEN REFACTORING. */

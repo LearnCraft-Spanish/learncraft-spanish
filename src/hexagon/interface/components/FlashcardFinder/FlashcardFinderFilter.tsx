@@ -99,60 +99,51 @@ export default function FlashcardFinderFilter({
               )}
             </div>
             <div className="filterBox search">
-              <div className="buttonBox header">
-                <input
-                  type="radio"
-                  id="presetMode"
-                  value="preset"
-                  name="filterMode"
-                />
+              <div className="filterHeader">
                 <label
                   htmlFor="presetMode"
-                  className={filterMode === 'preset' ? 'selected' : ''}
+                  className={`option ${filterMode === 'preset' ? 'selected' : ''}`}
                   onClick={() => setFilterMode('preset')}
                 >
+                  <input type="radio" value="preset" name="filterMode" />
                   Presets
                 </label>
-                <input
-                  type="radio"
-                  id="searchMode"
-                  value="search"
-                  name="filterMode"
-                />
+
                 <label
                   htmlFor="searchMode"
-                  className={filterMode === 'search' ? 'selected' : ''}
+                  className={`option ${filterMode === 'search' ? 'selected' : ''}`}
                   onClick={() => setFilterMode('search')}
                 >
+                  <input type="radio" value="search" name="filterMode" />
                   Search Tags
                 </label>
               </div>
-              {filterMode === 'preset' && (
-                <div className="presetSelector">
+              <div className="filterContentWrapper">
+                {filterMode === 'preset' && (
                   <PresetSelector
                     setFilterPreset={setFilterPreset}
                     filterPreset={filterPreset}
                   />
-                </div>
-              )}
-              {filterMode === 'search' && (
-                <div className="searchFilter">
-                  <TagFilter
-                    searchTerm={tagSearchTerm}
-                    updateSearchTerm={updateTagSearchTerm}
-                    searchResults={tagSuggestions}
-                    addTag={addSkillTagToFilters}
-                    removeTagFromSuggestions={removeTagFromSuggestions}
-                  />
-                  <SelectedTags
-                    removeTag={(tagId) => {
-                      removeSkillTagFromFilters(tagId);
-                      addTagBackToSuggestions(tagId);
-                    }}
-                    skillTags={selectedSkillTags}
-                  />
-                </div>
-              )}
+                )}
+                {filterMode === 'search' && (
+                  <>
+                    <TagFilter
+                      searchTerm={tagSearchTerm}
+                      updateSearchTerm={updateTagSearchTerm}
+                      searchResults={tagSuggestions}
+                      addTag={addSkillTagToFilters}
+                      removeTagFromSuggestions={removeTagFromSuggestions}
+                    />
+                    <SelectedTags
+                      removeTag={(tagId) => {
+                        removeSkillTagFromFilters(tagId);
+                        addTagBackToSuggestions(tagId);
+                      }}
+                      skillTags={selectedSkillTags}
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </>

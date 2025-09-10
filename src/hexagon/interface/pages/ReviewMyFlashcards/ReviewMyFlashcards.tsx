@@ -79,39 +79,47 @@ export default function MyFlashcardsQuiz() {
           >
             <div className="myFlashcardsFormContentWrapper">
               <h4>Quiz Options:</h4>
-              <div className="buttonBox header">
-                <input
-                  type="radio"
-                  id="quizType"
-                  value="text"
-                  name="quizType"
-                />
-                <label
-                  htmlFor="quizType"
-                  className={
-                    quizType === MyFlashcardsQuizType.Text ? 'selected' : ''
-                  }
-                  onClick={() => setQuizType(MyFlashcardsQuizType.Text)}
-                >
-                  Flashcards
-                </label>
-                <input type="radio" id="audio" value="audio" name="quizType" />
-                <label
-                  htmlFor="audio"
-                  className={
-                    quizType === MyFlashcardsQuizType.Audio ? 'selected' : ''
-                  }
-                  onClick={() => setQuizType(MyFlashcardsQuizType.Audio)}
-                >
-                  Audio
-                </label>
+              <div className="quizSettingsWrapper">
+                <div className="quizSettingsHeader twoOptions">
+                  <label
+                    htmlFor="quizType"
+                    className={`option ${
+                      quizType === MyFlashcardsQuizType.Text ? 'selected' : ''
+                    }`}
+                    onClick={() => setQuizType(MyFlashcardsQuizType.Text)}
+                  >
+                    Flashcards
+                    <input
+                      type="radio"
+                      id="quizType"
+                      value="text"
+                      name="quizType"
+                    />
+                  </label>
+
+                  <label
+                    htmlFor="audio"
+                    className={`option ${
+                      quizType === MyFlashcardsQuizType.Audio ? 'selected' : ''
+                    }`}
+                    onClick={() => setQuizType(MyFlashcardsQuizType.Audio)}
+                  >
+                    Audio
+                    <input
+                      type="radio"
+                      id="audio"
+                      value="audio"
+                      name="quizType"
+                    />
+                  </label>
+                </div>
+                {quizType === MyFlashcardsQuizType.Text && (
+                  <MyTextQuizMenu quizSetupOptions={textQuizSetup} />
+                )}
+                {quizType === MyFlashcardsQuizType.Audio && (
+                  <AudioQuizMenu quizSetupOptions={audioQuizSetup} />
+                )}
               </div>
-              {quizType === MyFlashcardsQuizType.Text && (
-                <MyTextQuizMenu quizSetupOptions={textQuizSetup} />
-              )}
-              {quizType === MyFlashcardsQuizType.Audio && (
-                <AudioQuizMenu quizSetupOptions={audioQuizSetup} />
-              )}
             </div>
             <div className="buttonBox">
               <button type="submit" disabled={quizNotReady} onClick={readyQuiz}>
