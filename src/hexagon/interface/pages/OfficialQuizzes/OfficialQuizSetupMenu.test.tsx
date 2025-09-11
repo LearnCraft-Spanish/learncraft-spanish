@@ -2,13 +2,10 @@ import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
 import type { OfficialQuizSetupMenuProps } from './OfficialQuizSetupMenu';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { fireEvent, render, screen } from '@testing-library/react';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
 import { describe, expect, it, vi } from 'vitest';
 import { OfficialQuizSetupMenu } from './OfficialQuizSetupMenu';
-
-vi.mock('@interface/components/general/Buttons', () => ({
-  MenuButton: () => <div>MockedMenuButton</div>,
-}));
 
 function createQuizOptions(
   courseCode: string,
@@ -24,27 +21,29 @@ function createQuizOptions(
   );
 }
 const defaultProps: OfficialQuizSetupMenuProps = {
-  currentCourseCode: officialQuizCourses[0]?.code ?? 'lcsp',
-  setCurrentCourseCode: vi.fn(),
-  chosenQuizNumber: 0,
-  setChosenQuizNumber: vi.fn(),
+  courseCode: officialQuizCourses[0]?.code ?? 'lcsp',
+  setUserSelectedCourseCode: vi.fn(),
+  quizNumber: 0,
+  setUserSelectedQuizNumber: vi.fn(),
   quizOptions: createQuizOptions(officialQuizCourses[0]?.code, 2),
   startQuiz: vi.fn(),
 };
 
 function renderWithOverrides(overrides?: Partial<OfficialQuizSetupMenuProps>) {
   return render(
-    <OfficialQuizSetupMenu {...defaultProps} {...(overrides ?? {})} />,
+    <MockAllProviders>
+      <OfficialQuizSetupMenu {...defaultProps} {...(overrides ?? {})} />
+    </MockAllProviders>,
   );
 }
 
 describe('officialQuizSetupMenu', () => {
   it('renders course and quiz selects with options', () => {
-    const currentCourseCode = officialQuizCourses[0]?.code ?? 'lcsp';
-    const quizOptions = createQuizOptions(currentCourseCode, 2);
+    const courseCode = officialQuizCourses[0]?.code ?? 'lcsp';
+    const quizOptions = createQuizOptions(courseCode, 2);
 
     renderWithOverrides({
-      currentCourseCode,
+      courseCode,
       quizOptions,
     });
 
@@ -54,7 +53,7 @@ describe('officialQuizSetupMenu', () => {
       'Select Course',
     ) as HTMLSelectElement;
     expect(courseSelect).toBeInTheDocument();
-    expect(courseSelect.value).toBe(currentCourseCode);
+    expect(courseSelect.value).toBe(courseCode);
     // has all official courses
     for (const course of officialQuizCourses) {
       expect(
@@ -77,22 +76,22 @@ describe('officialQuizSetupMenu', () => {
     }
 
     // MenuButton stub rendered
-    expect(screen.getByText('MockedMenuButton')).toBeInTheDocument();
+    expect(screen.getByText('Back to Home')).toBeInTheDocument();
   });
 
-  it('changes course calls setCurrentCourseCode and resets quiz number', () => {
-    const currentCourseCode = officialQuizCourses[0]?.code ?? 'lcsp';
-    const nextCourseCode = officialQuizCourses[1]?.code ?? currentCourseCode;
-    const quizOptions = createQuizOptions(currentCourseCode, 2);
-    const setCurrentCourseCode = vi.fn();
-    const setChosenQuizNumber = vi.fn();
+  it('changes course calls setUserSelectedCourseCode and resets quiz number', () => {
+    const courseCode = officialQuizCourses[0]?.code ?? 'lcsp';
+    const nextCourseCode = officialQuizCourses[1]?.code ?? courseCode;
+    const quizOptions = createQuizOptions(courseCode, 2);
+    const setUserSelectedCourseCode = vi.fn();
+    const setUserSelectedQuizNumber = vi.fn();
 
     renderWithOverrides({
-      currentCourseCode,
-      chosenQuizNumber: 2,
+      courseCode,
+      quizNumber: 2,
       quizOptions,
-      setCurrentCourseCode,
-      setChosenQuizNumber,
+      setUserSelectedCourseCode,
+      setUserSelectedQuizNumber,
     });
 
     const courseSelect = screen.getByLabelText(
@@ -100,65 +99,71 @@ describe('officialQuizSetupMenu', () => {
     ) as HTMLSelectElement;
     fireEvent.change(courseSelect, { target: { value: nextCourseCode } });
 
-    expect(setCurrentCourseCode).toHaveBeenCalledWith(nextCourseCode);
-    expect(setChosenQuizNumber).toHaveBeenCalledWith(0);
+    expect(setUserSelectedCourseCode).toHaveBeenCalledWith(nextCourseCode);
+    expect(setUserSelectedQuizNumber).toHaveBeenCalledWith(0);
   });
 
   it('changes quiz calls setChosenQuizNumber', () => {
-    const setChosenQuizNumber = vi.fn();
+    const setUserSelectedQuizNumber = vi.fn();
 
-    renderWithOverrides({ setChosenQuizNumber });
+    renderWithOverrides({ setUserSelectedQuizNumber });
 
     const quizSelect = screen.getByLabelText(
       'Select Quiz',
     ) as HTMLSelectElement;
     fireEvent.change(quizSelect, { target: { value: '2' } });
 
-    expect(setChosenQuizNumber).toHaveBeenCalledWith(2);
+    expect(setUserSelectedQuizNumber).toHaveBeenCalledWith(2);
   });
 
   it('begin Review button enabled only when course and quiz selected; clicking calls startQuiz', () => {
-    const currentCourseCode = officialQuizCourses[0]?.code ?? '';
-    const quizOptions = createQuizOptions(currentCourseCode || 'lcsp', 2);
-    const setCurrentCourseCode = vi.fn();
-    const setChosenQuizNumber = vi.fn();
+    const courseCode = officialQuizCourses[0]?.code ?? '';
+    const quizOptions = createQuizOptions(courseCode || 'lcsp', 2);
+    const setUserSelectedCourseCode = vi.fn();
+    const setUserSelectedQuizNumber = vi.fn();
     const startQuiz = vi.fn();
 
     const { rerender } = render(
-      <OfficialQuizSetupMenu
-        currentCourseCode={''}
-        setCurrentCourseCode={setCurrentCourseCode}
-        chosenQuizNumber={0}
-        setChosenQuizNumber={setChosenQuizNumber}
-        quizOptions={quizOptions}
-        startQuiz={startQuiz}
-      />,
+      <MockAllProviders>
+        <OfficialQuizSetupMenu
+          courseCode={''}
+          setUserSelectedCourseCode={setUserSelectedCourseCode}
+          quizNumber={0}
+          setUserSelectedQuizNumber={setUserSelectedQuizNumber}
+          quizOptions={quizOptions}
+          startQuiz={startQuiz}
+        />
+      </MockAllProviders>,
     );
 
     const button = screen.getByRole('button', { name: 'Begin Review' });
     expect(button).toBeDisabled();
 
     rerender(
-      <OfficialQuizSetupMenu
-        currentCourseCode={currentCourseCode}
-        setCurrentCourseCode={setCurrentCourseCode}
-        chosenQuizNumber={0}
-        setChosenQuizNumber={setChosenQuizNumber}
-        quizOptions={quizOptions}
-        startQuiz={startQuiz}
-      />,
+      <MockAllProviders>
+        <OfficialQuizSetupMenu
+          courseCode={courseCode}
+          setUserSelectedCourseCode={setUserSelectedCourseCode}
+          quizNumber={0}
+          setUserSelectedQuizNumber={setUserSelectedQuizNumber}
+          quizOptions={quizOptions}
+          startQuiz={startQuiz}
+        />
+      </MockAllProviders>,
     );
     expect(button).toBeDisabled();
 
     rerender(
-      <OfficialQuizSetupMenu
-        currentCourseCode={currentCourseCode}
-        setCurrentCourseCode={setCurrentCourseCode}
-        chosenQuizNumber={2}
-        setChosenQuizNumber={setChosenQuizNumber}
-        quizOptions={quizOptions}
-        startQuiz={startQuiz}
-      />,
+      <MockAllProviders>
+        <OfficialQuizSetupMenu
+          courseCode={courseCode}
+          setUserSelectedCourseCode={setUserSelectedCourseCode}
+          quizNumber={2}
+          setUserSelectedQuizNumber={setUserSelectedQuizNumber}
+          quizOptions={quizOptions}
+          startQuiz={startQuiz}
+        />
+      </MockAllProviders>,
     );
     expect(button).toBeEnabled();
 

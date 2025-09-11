@@ -36,7 +36,7 @@ describe('useOfficialQuizSetupMenu', () => {
     });
   });
 
-  it('prefills course and quiz number, filters quizOptions, and sets setupMenuReady', async () => {
+  it('prefills course and quiz number, filters quizOptions', async () => {
     const Wrapper = ({ children }: { children: React.ReactNode }) => (
       <MemoryRouter>
         <TestQueryClientProvider>{children}</TestQueryClientProvider>
@@ -47,13 +47,12 @@ describe('useOfficialQuizSetupMenu', () => {
       wrapper: Wrapper,
     });
 
-    await waitFor(() => expect(result.current.currentCourseCode).toBe('lcsp'));
-    await waitFor(() => expect(result.current.chosenQuizNumber).toBe(1));
+    await waitFor(() => expect(result.current.courseCode).toBe('lcsp'));
+    await waitFor(() => expect(result.current.quizNumber).toBe(1));
     await waitFor(() =>
       expect(result.current.quizOptions.map((q) => q.courseCode)).toEqual([
         'lcsp',
       ]),
     );
-    await waitFor(() => expect(result.current.setupMenuReady).toBe(true));
   });
 });

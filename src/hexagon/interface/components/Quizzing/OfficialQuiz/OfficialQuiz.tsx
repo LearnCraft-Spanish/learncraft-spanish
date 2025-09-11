@@ -1,8 +1,8 @@
 import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NotFoundPage from 'src/NotFoundPage';
-import { Loading } from '../Loading';
-import { TextQuiz } from './TextQuiz';
+import { Loading } from '../../Loading';
+import { TextQuiz } from '../TextQuiz';
 export function OfficialQuiz() {
   // use useLocation
   const location = useLocation();

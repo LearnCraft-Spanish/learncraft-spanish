@@ -4,18 +4,18 @@ import { officialQuizCourses } from '@learncraft-spanish/shared';
 import './OfficialQuizSetupMenu.scss';
 
 export interface OfficialQuizSetupMenuProps {
-  currentCourseCode: string;
-  setCurrentCourseCode: (courseCode: string) => void;
-  chosenQuizNumber: number;
-  setChosenQuizNumber: (quizNumber: number) => void;
+  courseCode: string;
+  setUserSelectedCourseCode: (courseCode: string) => void;
+  quizNumber: number;
+  setUserSelectedQuizNumber: (quizNumber: number) => void;
   quizOptions: OfficialQuizRecord[];
   startQuiz: () => void;
 }
 export function OfficialQuizSetupMenu({
-  currentCourseCode,
-  setCurrentCourseCode,
-  chosenQuizNumber,
-  setChosenQuizNumber,
+  courseCode,
+  setUserSelectedCourseCode,
+  quizNumber,
+  setUserSelectedQuizNumber,
   quizOptions,
   startQuiz,
 }: OfficialQuizSetupMenuProps) {
@@ -26,10 +26,10 @@ export function OfficialQuizSetupMenu({
         className="quizMenu"
         role="select"
         aria-label="Select Course"
-        value={currentCourseCode}
+        value={courseCode}
         onChange={(e) => {
-          setCurrentCourseCode(e.target.value);
-          setChosenQuizNumber(0);
+          setUserSelectedCourseCode(e.target.value);
+          setUserSelectedQuizNumber(0);
         }}
       >
         {officialQuizCourses.map((course) => (
@@ -42,9 +42,9 @@ export function OfficialQuizSetupMenu({
         className="quizMenu"
         role="select"
         aria-label="Select Quiz"
-        value={chosenQuizNumber}
+        value={quizNumber}
         onChange={(e) =>
-          setChosenQuizNumber(Number.parseInt(e.target.value) || 0)
+          setUserSelectedQuizNumber(Number.parseInt(e.target.value) || 0)
         }
       >
         <option value={0}>Select a Quiz</option>
@@ -58,7 +58,7 @@ export function OfficialQuizSetupMenu({
         <button
           type="button"
           onClick={startQuiz}
-          disabled={!currentCourseCode || !chosenQuizNumber}
+          disabled={!courseCode || !quizNumber}
         >
           Begin Review
         </button>

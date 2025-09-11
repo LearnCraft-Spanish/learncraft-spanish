@@ -1,24 +1,29 @@
 import { useOfficialQuizzes } from '@application/useCases/useOfficialQuizzes/useOfficialQuizzes';
 import { Loading } from '@interface/components/Loading';
 import { OfficialQuiz } from '@interface/components/Quizzing/OfficialQuiz';
-import React, { useEffect } from 'react';
-import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import React from 'react';
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { OfficialQuizSetupMenu } from './OfficialQuizSetupMenu';
 
 function LegacyQuizRedirect() {
   const { number } = useParams<{ number: string }>();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    navigate(`/officialquizzes/lcsp/${number}`, { replace: true });
-  }, [navigate, number]);
+  // Validate the number parameter
+  if (!number || Number.isNaN(Number(number))) {
+    return <Navigate to="/officialquizzes" replace />;
+  }
 
-  return null;
+  return <Navigate to={`/officialquizzes/lcsp/${number}`} replace />;
 }
 
 export function OfficialQuizzesRoutes() {
-  const { isLoading, error, officialQuizCourses, quizSetupMenuProps } =
-    useOfficialQuizzes();
+  const {
+    isLoading,
+    error,
+    officialQuizCourses,
+    quizSetupMenuProps,
+    isLoggedIn,
+  } = useOfficialQuizzes();
 
   return (
     <Routes>
@@ -38,14 +43,14 @@ export function OfficialQuizzesRoutes() {
       <Route
         path="/"
         element={
-          isLoading ? (
+          !isLoggedIn ? (
+            <h2>You must be logged in to use this app.</h2>
+          ) : isLoading ? (
             <Loading message="Loading Official Quizzes..." />
           ) : error ? (
             <h2>Error Loading Official Quizzes</h2>
           ) : (
-            quizSetupMenuProps.setupMenuReady && (
-              <OfficialQuizSetupMenu {...quizSetupMenuProps} />
-            )
+            <OfficialQuizSetupMenu {...quizSetupMenuProps} />
           )
         }
       />

@@ -1,9 +1,9 @@
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useActiveStudent } from '../../coordinators/hooks/useActiveStudent';
+
 function getCourseCodeFromName(courseName: string) {
   switch (courseName) {
     case 'LearnCraft Spanish':
@@ -27,88 +27,61 @@ export function useOfficialQuizSetupMenu() {
     isLoading: officialQuizzesLoading,
     error,
   } = useOfficialQuizzesQuery();
-  const {
-    toLesson,
-    course,
-    isLoading: courseLoading,
-  } = useSelectedCourseAndLessons();
+  const { toLesson, course } = useSelectedCourseAndLessons();
 
-  const { appUser } = useActiveStudent();
   const navigate = useNavigate();
 
-  const [currentCourseCode, setCurrentCourseCode] = useState('');
-  const [chosenQuizNumber, setChosenQuizNumber] = useState(0); //quizNumber
-  const [setupMenuReady, setSetupMenuReady] = useState(false);
+  const [userSelectedCourseCode, setUserSelectedCourseCode] = useState('');
+  const [userSelectedQuizNumber, setUserSelectedQuizNumber] = useState(0); //quizNumber
 
+  // useMemo to memoize the courseCode and quizNumber
+  const courseCode = useMemo(() => {
+    if (userSelectedCourseCode) {
+      return userSelectedCourseCode;
+    }
+    return getCourseCodeFromName(course?.name ?? '');
+  }, [userSelectedCourseCode, course]);
+
+  const quizNumber = useMemo(() => {
+    if (userSelectedQuizNumber) {
+      return userSelectedQuizNumber;
+    }
+    return toLesson?.lessonNumber ?? 0;
+  }, [userSelectedQuizNumber, toLesson]);
+
+  // quizOptions are the quizzes for the selected course
   const quizOptions = useMemo(() => {
     if (!officialQuizRecords || officialQuizzesLoading || error) {
       return [];
     }
     const filteredQuizzes = officialQuizRecords.filter(
-      (quiz) => quiz.courseCode === currentCourseCode,
+      (quiz) => quiz.courseCode === courseCode,
     );
     return filteredQuizzes;
-  }, [currentCourseCode, officialQuizRecords, officialQuizzesLoading, error]);
+  }, [courseCode, officialQuizRecords, officialQuizzesLoading, error]);
 
+  // startQuiz navigates to the quiz
   const startQuiz = useCallback(() => {
-    if (chosenQuizNumber && currentCourseCode) {
+    if (quizNumber && courseCode) {
       // get course
       const course = officialQuizCourses.find(
-        (course) => course.code === currentCourseCode,
+        (course) => course.code === courseCode,
       );
       if (!course) {
         console.error('Course not found');
         return;
       }
-      const navigateTarget = `/officialquizzes/${course.url}/${chosenQuizNumber.toString()}`;
+      const navigateTarget = `/officialquizzes/${course.url}/${quizNumber.toString()}`;
       navigate(navigateTarget);
     }
-  }, [currentCourseCode, chosenQuizNumber, navigate]);
-
-  useEffect(() => {
-    if (setupMenuReady) {
-      return;
-    }
-    if (courseLoading || officialQuizzesLoading) {
-      return;
-    }
-    if (course) {
-      const courseCode = getCourseCodeFromName(course.name);
-      if (courseCode) {
-        setCurrentCourseCode(courseCode);
-      }
-    }
-    if (toLesson) {
-      setChosenQuizNumber(toLesson.lessonNumber);
-    }
-    if (!courseLoading && !officialQuizzesLoading && !setupMenuReady) {
-      if (appUser?.studentRole !== 'student') {
-        setSetupMenuReady(true);
-      } else {
-        if (
-          toLesson?.lessonNumber === chosenQuizNumber &&
-          toLesson?.lessonNumber === appUser?.lessonNumber
-        ) {
-          setSetupMenuReady(true);
-        }
-      }
-    }
-  }, [
-    courseLoading,
-    officialQuizzesLoading,
-    setupMenuReady,
-    toLesson,
-    chosenQuizNumber,
-    appUser?.studentRole,
-  ]);
+  }, [courseCode, quizNumber, navigate]);
 
   return {
-    currentCourseCode,
-    setCurrentCourseCode,
-    chosenQuizNumber,
-    setChosenQuizNumber,
+    courseCode,
+    setUserSelectedCourseCode,
+    quizNumber,
+    setUserSelectedQuizNumber,
     quizOptions,
     startQuiz,
-    setupMenuReady,
   };
 }

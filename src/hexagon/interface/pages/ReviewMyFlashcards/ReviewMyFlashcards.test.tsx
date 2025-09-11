@@ -43,7 +43,7 @@ describe('menu for student flashcards', () => {
       expect(screen.getByText(/srs quiz/i)).toBeInTheDocument();
       expect(screen.getByText(/start with spanish/i)).toBeInTheDocument();
       expect(screen.getByText(/custom only/i)).toBeInTheDocument();
-      expect(screen.getByText(/number of flashcards/i)).toBeInTheDocument();
+      expect(screen.getByText(/quiz length/i)).toBeInTheDocument();
     });
   });
   it('shows start quiz button', async () => {
