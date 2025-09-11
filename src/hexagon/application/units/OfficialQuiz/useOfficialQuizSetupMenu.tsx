@@ -4,7 +4,7 @@ import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function getCourseCodeFromName(courseName: string) {
+export function getCourseCodeFromName(courseName: string) {
   switch (courseName) {
     case 'LearnCraft Spanish':
       return 'lcsp';

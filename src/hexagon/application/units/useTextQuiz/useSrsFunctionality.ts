@@ -34,6 +34,17 @@ export function useSrsFunctionality(): UseSrsReturn {
 
   const markExampleAsReviewed = useCallback(
     (exampleId: number, difficulty: 'easy' | 'hard') => {
+      setExamplesReviewedResults((prev) => [
+        ...prev,
+        { exampleId, difficulty },
+      ]);
+    },
+    [],
+  );
+
+  const handleReviewExample = useCallback(
+    async (exampleId: number, difficulty: 'easy' | 'hard') => {
+      // Check if already reviewed before making API call
       if (hasExampleBeenReviewed(exampleId)) {
         console.error(
           'Flashcard has already been reviewed, this should not happen',
@@ -41,16 +52,6 @@ export function useSrsFunctionality(): UseSrsReturn {
         return;
       }
 
-      setExamplesReviewedResults([
-        ...examplesReviewedResults,
-        { exampleId, difficulty },
-      ]);
-    },
-    [examplesReviewedResults, hasExampleBeenReviewed],
-  );
-
-  const handleReviewExample = useCallback(
-    async (exampleId: number, difficulty: 'easy' | 'hard') => {
       try {
         await updateFlashcardInterval(exampleId, difficulty);
         markExampleAsReviewed(exampleId, difficulty);
@@ -58,7 +59,7 @@ export function useSrsFunctionality(): UseSrsReturn {
         console.error('Failed to update flashcard interval:', error);
       }
     },
-    [markExampleAsReviewed, updateFlashcardInterval],
+    [hasExampleBeenReviewed, markExampleAsReviewed, updateFlashcardInterval],
   );
 
   return {

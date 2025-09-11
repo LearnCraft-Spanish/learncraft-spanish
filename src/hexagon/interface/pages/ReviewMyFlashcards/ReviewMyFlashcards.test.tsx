@@ -1,7 +1,6 @@
-import { overrideMockFlashcardAdapter } from '@application/adapters/flashcardAdapter.mock';
+import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import { render, screen, waitFor } from '@testing-library/react';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
-
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 import { createMockFlashcardList } from 'src/hexagon/testing/factories/flashcardFactory';
@@ -25,11 +24,10 @@ describe('menu for student flashcards', () => {
       },
     );
 
-    overrideMockFlashcardAdapter({
-      getMyFlashcards: () =>
-        Promise.resolve(createMockFlashcardList(5)(5, { custom: true })),
-      getStudentFlashcards: () =>
-        Promise.resolve(createMockFlashcardList(5)(5, { custom: true })),
+    overrideMockUseStudentFlashcards({
+      flashcards: createMockFlashcardList()(5, { custom: true }),
+      isLoading: false,
+      error: null,
     });
   });
   it('shows three setting options', async () => {
@@ -84,9 +82,10 @@ describe('menu for student flashcards', () => {
       );
 
       // Mock empty flashcards for the no-flashcards student
-      overrideMockFlashcardAdapter({
-        getMyFlashcards: () => Promise.resolve([]),
-        getStudentFlashcards: () => Promise.resolve([]),
+      overrideMockUseStudentFlashcards({
+        flashcards: [],
+        isLoading: false,
+        error: null,
       });
     });
     it('shows no flashcards found message', async () => {
