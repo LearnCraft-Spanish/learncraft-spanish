@@ -5,6 +5,7 @@ export interface FlashcardDisplayProps {
   answerShowing: boolean;
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
   toggleAnswer: () => void;
-  showGetHelp: boolean;
-  setShowGetHelp: (showGetHelp: boolean) => void;
+  allowGetHelp: boolean;
+  getHelpIsOpen: boolean;
+  setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
 }

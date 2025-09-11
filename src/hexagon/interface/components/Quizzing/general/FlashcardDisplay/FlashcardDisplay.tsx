@@ -14,8 +14,9 @@ export function FlashcardDisplay({
   answerShowing,
   toggleAnswer,
   addPendingRemoveProps,
-  showGetHelp,
-  setShowGetHelp,
+  allowGetHelp,
+  getHelpIsOpen,
+  setGetHelpIsOpen,
 }: FlashcardDisplayProps) {
   if (!quizExample) {
     return <p>Example not found</p>;
@@ -68,15 +69,15 @@ export function FlashcardDisplay({
               removeFlashcard={addPendingRemoveProps.removeFlashcard}
             />
           )}
-          {answer.vocabComplete && (
+          {answer.vocabComplete && allowGetHelp && (
             <>
-              {showGetHelp ? (
+              {getHelpIsOpen ? (
                 <button
                   className="getHelpButton"
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowGetHelp(false);
+                    setGetHelpIsOpen(false);
                   }}
                 >
                   Hide Help
@@ -87,7 +88,7 @@ export function FlashcardDisplay({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    setShowGetHelp(true);
+                    setGetHelpIsOpen(true);
                   }}
                 >
                   Get Help
@@ -95,7 +96,7 @@ export function FlashcardDisplay({
               )}
             </>
           )}
-          {showGetHelp && <GetHelpDisplay vocabulary={answer.vocabulary} />}
+          {allowGetHelp && <GetHelpDisplay vocabulary={answer.vocabulary} />}
         </div>
       )}
 

@@ -34,10 +34,11 @@ export function TextQuiz({
     previousExample,
     currentExample,
     addPendingRemoveProps,
+    allowGetHelp,
     cleanupFunction,
   } = useTextQuiz(textQuizProps);
 
-  const [showGetHelp, setShowGetHelp] = useState(false);
+  const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
 
   const [answerShowing, setAnswerShowing] = useState(false);
 
@@ -48,13 +49,13 @@ export function TextQuiz({
   const incrementExample = useCallback(() => {
     nextExample();
     hideAnswer();
-    setShowGetHelp(false);
+    setGetHelpIsOpen(false);
   }, [nextExample, hideAnswer]);
 
   const decrementExample = useCallback(() => {
     previousExample();
     hideAnswer();
-    setShowGetHelp(false);
+    setGetHelpIsOpen(false);
   }, [previousExample, hideAnswer]);
 
   const toggleAnswer = useCallback(() => {
@@ -115,8 +116,9 @@ export function TextQuiz({
             answerShowing={answerShowing}
             toggleAnswer={toggleAnswer}
             addPendingRemoveProps={addPendingRemoveProps}
-            showGetHelp={showGetHelp}
-            setShowGetHelp={setShowGetHelp}
+            allowGetHelp={allowGetHelp}
+            getHelpIsOpen={getHelpIsOpen}
+            setGetHelpIsOpen={setGetHelpIsOpen}
           />
           <div className="quizButtons">
             {srsQuizProps && currentExample && (
