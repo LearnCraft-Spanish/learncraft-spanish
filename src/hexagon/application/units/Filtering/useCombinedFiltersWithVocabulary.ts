@@ -15,7 +15,7 @@ export interface UseCombinedFiltersWithVocabularyReturnType
 }
 
 export function useCombinedFiltersWithVocabulary(): UseCombinedFiltersWithVocabularyReturnType {
-  const combinedFilterHook = useCombinedFilters();
+  const combinedFilterHook = useCombinedFilters({});
 
   // Destructure only the properties we need locally
   const {

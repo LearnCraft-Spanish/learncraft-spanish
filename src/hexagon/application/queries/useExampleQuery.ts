@@ -19,9 +19,18 @@ export interface UseExampleQueryReturnType {
 }
 export const useExampleQuery = (
   pageSize: number,
-  filtersChanging: boolean,
   audioRequired?: boolean,
 ): UseExampleQueryReturnType => {
+  const [page, setPage] = useState(1);
+  const changePage = useCallback((page: number) => {
+    setPage(page);
+  }, []);
+
+  // Memoize to prev
+  const onFilterChange = useCallback(() => {
+    changePage(1);
+  }, [changePage]);
+
   const queryClient = useQueryClient();
 
   // Destructure the combined filter state
@@ -29,7 +38,9 @@ export const useExampleQuery = (
     combinedFilterState,
     isLoading: isLoadingCombinedFilters,
     error: errorCombinedFilters,
-  } = useCombinedFilters();
+  } = useCombinedFilters({
+    onFilterChange,
+  });
 
   // Destructure the combined filter state
   const {
@@ -49,12 +60,7 @@ export const useExampleQuery = (
   }, [audioRequired, audioOnlyState]);
 
   const exampleAdapter = useExampleAdapter();
-  const [page, setPage] = useState(1);
   const [canPrefetch, setCanPrefetch] = useState(false);
-
-  const changePage = useCallback((page: number) => {
-    setPage(page);
-  }, []);
 
   const seed: string | null = useMemo(() => {
     if (
@@ -131,11 +137,7 @@ export const useExampleQuery = (
     ],
     queryFn: () => fetchFilteredExamples({ prefetchRequest: false }),
     ...queryDefaults.referenceData,
-    enabled:
-      !isLoadingCombinedFilters &&
-      !errorCombinedFilters &&
-      !!seed &&
-      !filtersChanging,
+    enabled: !isLoadingCombinedFilters && !errorCombinedFilters && !!seed,
   });
 
   const hasMorePages = useMemo(() => {

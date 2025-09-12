@@ -4,7 +4,7 @@ import { useCallback, useMemo } from 'react';
 import { useSkillTagSearch } from '../useSkillTagSearch';
 
 export function useCustomQuizFilterState() {
-  const filterState = useCombinedFilters();
+  const filterState = useCombinedFilters({});
 
   const { addTagBackToSuggestions } = useSkillTagSearch();
 

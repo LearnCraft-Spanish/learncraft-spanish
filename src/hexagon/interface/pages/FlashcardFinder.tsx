@@ -1,5 +1,6 @@
 import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
-import Loading from 'src/components/Loading/Loading';
+import { useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
 import { ExampleTable } from '../components/Tables';
 
@@ -9,34 +10,30 @@ export default function FlashcardFinder() {
     displayExamples,
     flashcardsQuery,
     pagination,
-    filtersChanging,
-    setFiltersChanging,
     lessonPopup,
-    manageThese,
+    onManageThese,
   } = useFlashcardFinder();
 
-  if (exampleQuery.isLoading) {
-    return <Loading message="Loading Flashcard Finder" />;
-  }
+  const navigate = useNavigate();
+
+  const manageThese = useCallback(() => {
+    onManageThese();
+    navigate('/manage-flashcards', { replace: true });
+  }, [navigate, onManageThese]);
 
   return (
     <div>
-      <FlashcardFinderFilter
-        filtersChanging={filtersChanging}
-        setFiltersChanging={setFiltersChanging}
+      <FlashcardFinderFilter />
+      <ExampleTable
+        examples={displayExamples}
+        totalCount={exampleQuery.totalCount ?? 0}
+        studentFlashcards={flashcardsQuery}
+        paginationState={pagination}
+        firstPageLoading={exampleQuery.isLoading && exampleQuery.page === 1}
+        newPageLoading={exampleQuery.isLoading && exampleQuery.page > 1}
+        lessonPopup={lessonPopup}
+        manageThese={manageThese}
       />
-      {!filtersChanging && (
-        <ExampleTable
-          examples={displayExamples}
-          totalCount={exampleQuery.totalCount ?? 0}
-          studentFlashcards={flashcardsQuery}
-          paginationState={pagination}
-          firstPageLoading={exampleQuery.isLoading && exampleQuery.page === 1}
-          newPageLoading={exampleQuery.isLoading && exampleQuery.page > 1}
-          lessonPopup={lessonPopup}
-          manageThese={manageThese}
-        />
-      )}
     </div>
   );
 }

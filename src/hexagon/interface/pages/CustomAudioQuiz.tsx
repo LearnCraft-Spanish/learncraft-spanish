@@ -35,12 +35,7 @@ export default function CustomAudioQuiz() {
       {!quizReady ? (
         <div className="CustomAudioQuizWrapper">
           <h2>Audio Quiz</h2>
-          <FlashcardFinderFilter
-            filtersChanging={true}
-            setFiltersChanging={() => {}}
-            requireAudioOnly={true}
-            closeable={false}
-          />
+          <FlashcardFinderFilter requireAudioOnly={true} closeable={false} />
           {errorExamples ? (
             <div className="errorMessage">Error: {errorExamples.message}</div>
           ) : (

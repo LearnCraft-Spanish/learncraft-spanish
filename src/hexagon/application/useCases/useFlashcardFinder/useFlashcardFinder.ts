@@ -11,8 +11,7 @@ import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilt
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useSkillTagSearch } from '../../units/useSkillTagSearch';
 
 export interface UseFlashcardFinderReturnType {
@@ -22,35 +21,19 @@ export interface UseFlashcardFinderReturnType {
   displayExamples: ExampleWithVocabulary[];
   flashcardsQuery: UseStudentFlashcardsReturn;
   totalPages: number | null;
-  filtersChanging: boolean;
-  setFiltersChanging: (filtersChanging: boolean) => void;
   lessonPopup: LessonPopup;
-  manageThese: () => void;
   skillTagSearch: UseSkillTagSearchReturnType;
+  onManageThese: () => void;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const { lessonPopup } = useLessonPopup();
-  const [filtersChanging, setFiltersChanging] = useState(true);
-  const navigate = useNavigate();
   const { setFilterOwnedFlashcards } = useFilterOwnedFlashcards();
-  const exampleFilter: UseCombinedFiltersReturnType = useCombinedFilters();
 
   const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
 
-  const {
-    // Namecast these to modify before returning.
-    updateAudioOnly: updateAudioOnlyFunction,
-    updateExcludeSpanglish: updateExcludeSpanglishFunction,
-    addSkillTagToFilters: addSkillTagToFiltersFunction,
-    removeSkillTagFromFilters: removeSkillTagFromFiltersFunction,
-    updateFromLessonNumber: updateFromLessonNumberFunction,
-    updateToLessonNumber: updateToLessonNumberFunction,
-    updateUserSelectedCourseId: updateUserSelectedCourseIdFunction,
-  } = exampleFilter;
-
-  const exampleQuery = useExampleQuery(QUERY_PAGE_SIZE, filtersChanging);
+  const exampleQuery = useExampleQuery(QUERY_PAGE_SIZE);
 
   const pagination: QueryPaginationState = useQueryPagination({
     queryPage: exampleQuery.page,
@@ -63,6 +46,8 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const totalPages = exampleQuery.totalCount
     ? Math.ceil(exampleQuery.totalCount / PAGE_SIZE)
     : null;
+
+  const exampleFilter: UseCombinedFiltersReturnType = useCombinedFilters({});
 
   // Enable prefetching when we're near the end of a query page batch
   // This happens on the last page of each query batch to ensure smooth pagination
@@ -88,121 +73,23 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     [exampleQuery.filteredExamples, startIndex, endIndex],
   );
 
-  useEffect(() => {
-    if (filtersChanging) {
-      pagination.resetPagination();
-    }
-  }, [filtersChanging, pagination]);
-
   const flashcardsQuery: UseStudentFlashcardsReturn = useStudentFlashcards();
-
-  const updateAudioOnly = useCallback(
-    (audioOnly: boolean) => {
-      if (filtersChanging) {
-        updateAudioOnlyFunction(audioOnly);
-      }
-    },
-    [updateAudioOnlyFunction, filtersChanging],
-  );
-
-  const updateExcludeSpanglish = useCallback(
-    (excludeSpanglish: boolean) => {
-      if (filtersChanging) {
-        updateExcludeSpanglishFunction(excludeSpanglish);
-      }
-    },
-    [updateExcludeSpanglishFunction, filtersChanging],
-  );
-
-  const addSkillTagToFilters = useCallback(
-    (tagKey: string) => {
-      if (filtersChanging) {
-        addSkillTagToFiltersFunction(tagKey);
-      }
-    },
-    [addSkillTagToFiltersFunction, filtersChanging],
-  );
-
-  const removeSkillTagFromFilters = useCallback(
-    (tagKey: string) => {
-      if (filtersChanging) {
-        removeSkillTagFromFiltersFunction(tagKey);
-      }
-    },
-    [removeSkillTagFromFiltersFunction, filtersChanging],
-  );
-
-  const updateFromLessonNumber = useCallback(
-    (lessonNumber: number) => {
-      if (!filtersChanging) {
-        return;
-      }
-      updateFromLessonNumberFunction(lessonNumber);
-    },
-    [updateFromLessonNumberFunction, filtersChanging],
-  );
-
-  const updateToLessonNumber = useCallback(
-    (lessonNumber: number) => {
-      if (!filtersChanging) {
-        return;
-      }
-      updateToLessonNumberFunction(lessonNumber);
-    },
-    [updateToLessonNumberFunction, filtersChanging],
-  );
-
-  const updateUserSelectedCourseId = useCallback(
-    (courseId: number) => {
-      if (!filtersChanging) {
-        return;
-      }
-      updateUserSelectedCourseIdFunction(courseId);
-    },
-    [updateUserSelectedCourseIdFunction, filtersChanging],
-  );
-
-  //Return a new object with the modified callbacks
-  const exampleFilterWithCallbacks = useMemo(() => {
-    return {
-      ...exampleFilter,
-      updateAudioOnly,
-      updateExcludeSpanglish,
-      addSkillTagToFilters,
-      removeSkillTagFromFilters,
-      updateFromLessonNumber,
-      updateToLessonNumber,
-      updateUserSelectedCourseId,
-    };
-  }, [
-    exampleFilter,
-    updateAudioOnly,
-    updateExcludeSpanglish,
-    addSkillTagToFilters,
-    removeSkillTagFromFilters,
-    updateFromLessonNumber,
-    updateToLessonNumber,
-    updateUserSelectedCourseId,
-  ]);
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
-  const manageThese = useCallback(() => {
+  const onManageThese = useCallback(() => {
     setFilterOwnedFlashcards(true);
-    navigate('/manage-flashcards', { replace: true });
-  }, [navigate, setFilterOwnedFlashcards]);
+  }, [setFilterOwnedFlashcards]);
 
   return {
     pagination,
-    exampleFilter: exampleFilterWithCallbacks,
+    exampleFilter,
     exampleQuery,
     displayExamples,
     flashcardsQuery,
     totalPages,
-    filtersChanging,
-    setFiltersChanging,
     lessonPopup,
-    manageThese,
     skillTagSearch,
+    onManageThese,
   };
 }

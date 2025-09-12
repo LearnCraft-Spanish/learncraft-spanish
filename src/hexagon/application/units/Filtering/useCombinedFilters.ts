@@ -18,7 +18,13 @@ export type UseCombinedFiltersReturnType =
       setFilterPreset: (preset: PreSetQuizPreset) => void;
     };
 
-export function useCombinedFilters(): UseCombinedFiltersReturnType {
+export interface UseCombinedFiltersProps {
+  onFilterChange?: () => void;
+}
+
+export function useCombinedFilters({
+  onFilterChange = () => {},
+}: UseCombinedFiltersProps): UseCombinedFiltersReturnType {
   // Destructure the filter properties from the coordinator
   const {
     filterStateWithoutLesson,
@@ -62,6 +68,7 @@ export function useCombinedFilters(): UseCombinedFiltersReturnType {
       fromLessonNumber: fromLesson?.lessonNumber,
       toLessonNumber: toLesson?.lessonNumber,
     };
+    onFilterChange();
     return structuredFilters;
   }, [
     excludeSpanglish,
@@ -70,6 +77,7 @@ export function useCombinedFilters(): UseCombinedFiltersReturnType {
     course,
     fromLesson,
     toLesson,
+    onFilterChange,
   ]);
 
   // If the selected tags exactly match a preset, return the preset
