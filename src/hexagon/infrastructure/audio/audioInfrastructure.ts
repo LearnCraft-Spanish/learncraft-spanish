@@ -5,6 +5,66 @@ import type {
 import { AudioContext } from '@composition/context/AudioContext';
 import { use, useCallback, useEffect, useRef, useState } from 'react';
 
+// Helper function to convert AudioBuffer to WAV blob
+function audioBufferToWav(buffer: AudioBuffer): Blob {
+  const numberOfChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const format = 1; // PCM
+  const bitDepth = 16;
+
+  const bytesPerSample = bitDepth / 8;
+  const blockAlign = numberOfChannels * bytesPerSample;
+
+  const buffer32 = new ArrayBuffer(
+    44 + buffer.length * numberOfChannels * bytesPerSample,
+  );
+  const view = new DataView(buffer32);
+
+  // WAV header
+  const writeString = (offset: number, string: string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
+
+  writeString(0, 'RIFF');
+  view.setUint32(
+    4,
+    36 + buffer.length * numberOfChannels * bytesPerSample,
+    true,
+  );
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, format, true);
+  view.setUint16(22, numberOfChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitDepth, true);
+  writeString(36, 'data');
+  view.setUint32(40, buffer.length * numberOfChannels * bytesPerSample, true);
+
+  // Convert float samples to 16-bit PCM
+  let offset = 44;
+  for (let i = 0; i < buffer.length; i++) {
+    for (let channel = 0; channel < numberOfChannels; channel++) {
+      const sample = Math.max(
+        -1,
+        Math.min(1, buffer.getChannelData(channel)[i]),
+      );
+      view.setInt16(
+        offset,
+        sample < 0 ? sample * 0x8000 : sample * 0x7fff,
+        true,
+      );
+      offset += 2;
+    }
+  }
+
+  return new Blob([buffer32], { type: 'audio/wav' });
+}
+
 export function useAudioInfrastructure(): AudioPort {
   const context = use(AudioContext);
   if (!context) throw new Error('AudioContext not found');
@@ -23,13 +83,20 @@ export function useAudioInfrastructure(): AudioPort {
     } else if (context.playingAudioRef.current.readyState < 1) {
       // If the audio is not ready to be played, play it when the metadata is loaded
       setIsPlaying(true);
-      await context.playingAudioRef.current.addEventListener(
+
+      const handlePlayOnLoad = () => {
+        if (context.playingAudioRef.current) {
+          context.playingAudioRef.current.play();
+        }
+        // Remove this listener after it fires once
+        context.playingAudioRef.current?.removeEventListener(
+          'loadedmetadata',
+          handlePlayOnLoad,
+        );
+      };
+      context.playingAudioRef.current.addEventListener(
         'loadedmetadata',
-        () => {
-          if (context.playingAudioRef.current) {
-            context.playingAudioRef.current.play();
-          }
-        },
+        handlePlayOnLoad,
       );
       return;
     }
@@ -87,21 +154,41 @@ export function useAudioInfrastructure(): AudioPort {
 
   const changeCurrentAudio = useCallback(
     async (newAudio: AudioElementState) => {
-      if (context.playingAudioRef.current && newAudio.playOnLoad) {
-        context.playingAudioRef.current.addEventListener(
-          'loadedmetadata',
-          () => {
-            if (context.playingAudioRef.current) {
-              context.playingAudioRef.current.play();
-              setIsPlaying(true);
-            }
-          },
-        );
-      }
       if (!context.playingAudioRef.current) return;
+
+      // Remove any existing loadedmetadata listeners to prevent double play
+      const audioElement = context.playingAudioRef.current;
+      const existingListeners = audioElement.cloneNode(
+        true,
+      ) as HTMLAudioElement;
+      audioElement.replaceWith(existingListeners);
+      context.playingAudioRef.current = existingListeners;
+
+      // Set up new audio properties
       context.playingAudioRef.current.src = newAudio.src;
       context.playingAudioRef.current.currentTime = newAudio.currentTime;
       context.playingAudioRef.current.onended = newAudio.onEnded;
+
+      // Add single loadedmetadata listener if playOnLoad is true
+      if (newAudio.playOnLoad) {
+        setIsPlaying(true);
+
+        const handleLoadedMetadata = () => {
+          if (context.playingAudioRef.current) {
+            context.playingAudioRef.current.play();
+          }
+          // Remove this listener after it fires once
+          context.playingAudioRef.current?.removeEventListener(
+            'loadedmetadata',
+            handleLoadedMetadata,
+          );
+        };
+        context.playingAudioRef.current.addEventListener(
+          'loadedmetadata',
+          handleLoadedMetadata,
+        );
+      }
+
       updateCurrentTime();
     },
     [context, updateCurrentTime],
@@ -137,6 +224,98 @@ export function useAudioInfrastructure(): AudioPort {
     [context.englishParseAudioRef, context.spanishParseAudioRef],
   );
 
+  const concatenateAudioWithPadding = useCallback(
+    async (mainAudioUrl: string, paddingAudioUrl: string) => {
+      try {
+        // Create audio context
+        const audioContext = new (window.AudioContext ||
+          (window as any).webkitAudioContext)();
+
+        // Fetch both audio files
+        const [mainResponse, paddingResponse] = await Promise.all([
+          fetch(mainAudioUrl),
+          fetch(paddingAudioUrl),
+        ]);
+
+        const [mainArrayBuffer, paddingArrayBuffer] = await Promise.all([
+          mainResponse.arrayBuffer(),
+          paddingResponse.arrayBuffer(),
+        ]);
+
+        // Decode audio data
+        const [mainAudioBuffer, paddingAudioBuffer] = await Promise.all([
+          audioContext.decodeAudioData(mainArrayBuffer),
+          audioContext.decodeAudioData(paddingArrayBuffer),
+        ]);
+
+        // Calculate total duration and create concatenated buffer
+        // Ensure we only use exactly 3 seconds of padding (PADDING_DURATION)
+        const PADDING_DURATION = 3;
+        const paddingDurationToUse = Math.min(
+          paddingAudioBuffer.duration,
+          PADDING_DURATION,
+        );
+        const totalDuration = mainAudioBuffer.duration + paddingDurationToUse;
+
+        const sampleRate = mainAudioBuffer.sampleRate;
+        const numberOfChannels = Math.max(
+          mainAudioBuffer.numberOfChannels,
+          paddingAudioBuffer.numberOfChannels,
+        );
+
+        const concatenatedBuffer = audioContext.createBuffer(
+          numberOfChannels,
+          Math.ceil(totalDuration * sampleRate),
+          sampleRate,
+        );
+
+        // Copy main audio data
+        for (let channel = 0; channel < numberOfChannels; channel++) {
+          const concatenatedData = concatenatedBuffer.getChannelData(channel);
+
+          // Copy main audio (handle mono to stereo conversion if needed)
+          const mainChannelData = mainAudioBuffer.getChannelData(
+            Math.min(channel, mainAudioBuffer.numberOfChannels - 1),
+          );
+          concatenatedData.set(mainChannelData, 0);
+
+          // Copy padding audio (only the duration we need)
+          const paddingChannelData = paddingAudioBuffer.getChannelData(
+            Math.min(channel, paddingAudioBuffer.numberOfChannels - 1),
+          );
+          const paddingSamplesToCopy = Math.ceil(
+            paddingDurationToUse * sampleRate,
+          );
+          const paddingDataToCopy = paddingChannelData.slice(
+            0,
+            paddingSamplesToCopy,
+          );
+          concatenatedData.set(paddingDataToCopy, mainAudioBuffer.length);
+        }
+
+        // Convert to WAV blob
+        const wavBlob = audioBufferToWav(concatenatedBuffer);
+        const concatenatedAudioUrl = URL.createObjectURL(wavBlob);
+
+        // Cleanup function to revoke object URL
+        const cleanup = () => {
+          URL.revokeObjectURL(concatenatedAudioUrl);
+          audioContext.close();
+        };
+
+        return {
+          concatenatedAudioUrl,
+          totalDuration, // This now reflects the actual duration used (main + exactly 3s padding)
+          cleanup,
+        };
+      } catch (error) {
+        console.error('Failed to concatenate audio:', error);
+        throw error;
+      }
+    },
+    [],
+  );
+
   // Ticks the current time of the playing audio, pushes to state
   useEffect(() => {
     if (isPlaying) {
@@ -156,5 +335,6 @@ export function useAudioInfrastructure(): AudioPort {
     currentTime,
     changeCurrentAudio,
     preloadAudio,
+    concatenateAudioWithPadding,
   };
 }

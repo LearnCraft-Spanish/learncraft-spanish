@@ -24,4 +24,14 @@ export interface AudioPort {
     englishDuration: number | null;
     spanishDuration: number | null;
   }>;
+
+  // Concatenates main audio with padding audio into a single seamless audio file
+  concatenateAudioWithPadding: (
+    mainAudioUrl: string,
+    paddingAudioUrl: string,
+  ) => Promise<{
+    concatenatedAudioUrl: string;
+    totalDuration: number;
+    cleanup: () => void;
+  }>;
 }
