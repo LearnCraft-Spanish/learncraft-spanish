@@ -1,68 +1,84 @@
-import type { DisplayOrder } from 'src/types/interfaceDefinitions';
+import { useCallback, useMemo, useState } from 'react';
 
-import { useEffect, useMemo, useState } from 'react';
-
-export interface UsePaginationReturn {
-  displayOrderSegment: DisplayOrder[];
-  page: number;
-  maxPage: number;
-  nextPage: () => void;
-  previousPage: () => void;
-  setPage: (page: number) => void;
+export interface PaginationState {
+  totalItems: number;
+  pageNumber: number;
+  maxPageNumber: number;
+  startIndex: number;
+  endIndex: number;
   pageSize: number;
-  firstItemInPage: number;
+  isOnFirstPage: boolean;
+  isOnLastPage: boolean;
+  previousPage: () => void;
+  nextPage: () => void;
+  firstPage: () => void;
 }
 
 export function usePagination({
   itemsPerPage = 50,
-  displayOrder,
+  totalItems,
 }: {
   itemsPerPage: number;
-  displayOrder: DisplayOrder[];
-}): UsePaginationReturn {
-  const [page, setPage] = useState(1);
-  const maxPage = Math.ceil(displayOrder.length / itemsPerPage);
+  totalItems: number;
+}): PaginationState {
+  const [selectedPageNumber, setSelectedPageNumber] = useState(1);
+  const maxPage = Math.ceil(totalItems / itemsPerPage);
 
-  const displayOrderSegment = displayOrder.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage,
-  );
-
-  const firstItemInPage = useMemo(() => {
-    if (page === 1 && displayOrder.length > 0) {
+  const safePageNumber = useMemo(() => {
+    if (selectedPageNumber > maxPage) {
+      return maxPage;
+    }
+    if (selectedPageNumber < 1) {
       return 1;
-    } else if (displayOrder.length === 0) {
-      return 0;
-    } else {
-      return (page - 1) * itemsPerPage + 1;
     }
-  }, [page, itemsPerPage, displayOrder]);
+    return selectedPageNumber;
+  }, [selectedPageNumber, maxPage]);
 
-  useEffect(() => {
-    if (page > maxPage && maxPage > 0) {
-      // eslint-disable-next-line react-hooks-extra/no-direct-set-state-in-use-effect
-      setPage(maxPage);
+  const startIndex = useMemo(() => {
+    return (safePageNumber - 1) * itemsPerPage;
+  }, [safePageNumber, itemsPerPage]);
+
+  const endIndex = useMemo(() => {
+    return startIndex + itemsPerPage;
+  }, [startIndex, itemsPerPage]);
+
+  const nextPage = useCallback(() => {
+    if (safePageNumber >= maxPage) {
+      return;
     }
-  }, [page, maxPage]);
+    setSelectedPageNumber(safePageNumber + 1);
+  }, [safePageNumber, maxPage]);
+
+  const previousPage = useCallback(() => {
+    if (safePageNumber <= 1) {
+      return;
+    }
+    setSelectedPageNumber(safePageNumber - 1);
+  }, [safePageNumber]);
+
+  const firstPage = useCallback(() => {
+    setSelectedPageNumber(1);
+  }, []);
+
+  const isOnFirstPage = useMemo(() => {
+    return safePageNumber === 1;
+  }, [safePageNumber]);
+
+  const isOnLastPage = useMemo(() => {
+    return safePageNumber === maxPage;
+  }, [safePageNumber, maxPage]);
 
   return {
-    displayOrderSegment,
-    page,
-    maxPage,
-    nextPage: () => {
-      if (page >= maxPage) {
-        return;
-      }
-      setPage(page + 1);
-    },
-    previousPage: () => {
-      if (page <= 1) {
-        return;
-      }
-      setPage(page - 1);
-    },
-    setPage,
+    totalItems,
+    pageNumber: safePageNumber,
     pageSize: itemsPerPage,
-    firstItemInPage,
+    maxPageNumber: maxPage,
+    startIndex,
+    endIndex,
+    isOnFirstPage,
+    isOnLastPage,
+    nextPage,
+    previousPage,
+    firstPage,
   };
 }

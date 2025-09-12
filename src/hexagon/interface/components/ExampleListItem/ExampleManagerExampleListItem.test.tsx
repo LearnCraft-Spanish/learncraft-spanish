@@ -7,11 +7,11 @@ import ExampleManagerExampleListItem from './ExampleManagerExampleListItem';
 const f = createMockFlashcard();
 
 const mockProps = {
-  example: f,
+  flashcard: f,
   isCollected: false,
   isPending: false,
   handleSelect: vi.fn(),
-  handleRemoveSelected: vi.fn(),
+  handleDeselect: vi.fn(),
   handleRemove: vi.fn(),
   bulkSelectMode: false,
   isSelected: false,

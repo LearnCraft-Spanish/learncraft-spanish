@@ -7,12 +7,12 @@ export default function BulkRemoveButton({
   handleSelect,
   isSelected,
   isPending,
-  handleRemoveSelected,
+  handleDeselect,
 }: {
   id: number;
   isCollected: boolean;
   handleSelect: () => void;
-  handleRemoveSelected: () => void;
+  handleDeselect: () => void;
   isSelected: boolean;
   isPending: boolean;
 }) {
@@ -51,7 +51,7 @@ export default function BulkRemoveButton({
       return {
         text: 'Selected',
         className: 'selectedRemoveButton',
-        onClickFunction: handleRemoveSelected,
+        onClickFunction: handleDeselect,
       };
     }
     return {
@@ -59,7 +59,7 @@ export default function BulkRemoveButton({
       className: 'unknownButton',
       onClickFunction: () => {},
     };
-  }, [isCollected, isSelected, isPending, handleSelect, handleRemoveSelected]);
+  }, [isCollected, isSelected, isPending, handleSelect, handleDeselect]);
 
   return (
     <button

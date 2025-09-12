@@ -1,19 +1,16 @@
 import useFlashcardManager from '@application/useCases/useFlashcardManager';
+import FlashcardManagerFilters from '@interface/components/FlashcardManager/FlashcardManagerFilters';
 import { Loading } from '@interface/components/Loading';
-import FlashcardManagerFilters from '../components/FlashcardManager';
-import { FlashcardTable } from '../components/Tables';
+import { FlashcardTable } from '@interface/components/Tables';
 export default function FlashcardManager() {
   const {
-    filteredFlashcards,
+    allFlashcards,
+    displayFlashcards,
     paginationState,
     filterOwnedFlashcards,
-    skillTagSearch,
     setFilterOwnedFlashcards,
-    exampleFilter,
     isLoading,
     error,
-    lessonPopup,
-    findMore,
   } = useFlashcardManager();
 
   if (isLoading) {
@@ -27,18 +24,15 @@ export default function FlashcardManager() {
     <div>
       <h2>Flashcard Manager</h2>
       <FlashcardManagerFilters
-        filterState={exampleFilter}
-        skillTagSearch={skillTagSearch}
         filterOwnedFlashcards={filterOwnedFlashcards}
         setFilterOwnedFlashcards={setFilterOwnedFlashcards}
       />
       <FlashcardTable
-        findMore={findMore}
+        allFlashcards={allFlashcards}
+        displayFlashcards={displayFlashcards}
+        paginationState={paginationState}
         isLoading={isLoading}
         error={error}
-        dataSource={filteredFlashcards}
-        paginationState={paginationState}
-        lessonPopup={lessonPopup}
       />
     </div>
   );

@@ -1,39 +1,26 @@
-import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
-
-import type { UsePaginationReturn } from '@application/units/Pagination/usePagination';
-import type { LessonPopup } from '@application/units/useLessonPopup';
+import type { PaginationState } from '@application/units/Pagination/usePagination';
 import type { Flashcard } from '@learncraft-spanish/shared';
-import type { UseSkillTagSearchReturnType } from '../../units/useSkillTagSearch';
-import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import { usePagination } from '@application/units/Pagination/usePagination';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
-import useLessonPopup from '@application/units/useLessonPopup';
-import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSkillTagSearch } from '../../units/useSkillTagSearch';
+import { useMemo } from 'react';
 
 export interface UseFlashcardManagerReturn {
-  filteredFlashcards: Flashcard[];
-  paginationState: UsePaginationReturn;
-  exampleFilter: UseCombinedFiltersWithVocabularyReturnType;
+  allFlashcards: Flashcard[];
+  displayFlashcards: Flashcard[];
+  paginationState: PaginationState;
 
   filterOwnedFlashcards: boolean;
   setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
-
-  findMore: () => void;
-  lessonPopup: LessonPopup;
-  skillTagSearch: UseSkillTagSearchReturnType;
 
   isLoading: boolean;
   error: Error | null;
 }
 
 export default function useFlashcardManager(): UseFlashcardManagerReturn {
-  // This doesn't belong here. This is an interface responsibility.
-  const navigate = useNavigate();
+  // Arbitrary definition
+  const PAGE_SIZE = 25;
 
-  const pageSize = 25;
-
+  // This is the principal hook for this use case
   const {
     filteredFlashcards,
     filterOwnedFlashcards,
@@ -42,48 +29,26 @@ export default function useFlashcardManager(): UseFlashcardManagerReturn {
     error,
   } = useFilteredOwnedFlashcards();
 
-  const exampleFilter: UseCombinedFiltersWithVocabularyReturnType =
-    useCombinedFiltersWithVocabulary();
-
-  // Simple callback to navigate to the flashcard finder
-  // This doesn't belong here. This is an interface responsibility.
-  const findMore = useCallback(() => {
-    navigate('/flashcardfinder', { replace: true });
-  }, [navigate]);
-
-  // We use this to randomize the flashcard order for display
-  const displayOrder = useMemo(() => {
-    if (!filteredFlashcards) {
-      return [];
-    }
-
-    return filteredFlashcards.map((flashcard) => ({
-      recordId: flashcard.id,
-    }));
-  }, [filteredFlashcards]);
-
   // We use this to paginate the flashcards
   const paginationState = usePagination({
-    itemsPerPage: pageSize,
-    displayOrder,
+    itemsPerPage: PAGE_SIZE,
+    totalItems: filteredFlashcards.length,
   });
 
-  const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
-
-  const { lessonPopup } = useLessonPopup();
+  // We display only the flashcards that are in the current page
+  const displayFlashcards = useMemo(() => {
+    return filteredFlashcards.slice(
+      paginationState.startIndex,
+      paginationState.endIndex,
+    );
+  }, [filteredFlashcards, paginationState]);
 
   return {
-    filteredFlashcards,
+    allFlashcards: filteredFlashcards,
+    displayFlashcards,
     paginationState,
-    exampleFilter,
     filterOwnedFlashcards,
     setFilterOwnedFlashcards,
-
-    // This doesn't belong here. This is an interface responsibility.
-    findMore,
-    lessonPopup,
-    skillTagSearch,
-
     isLoading,
     error,
   };

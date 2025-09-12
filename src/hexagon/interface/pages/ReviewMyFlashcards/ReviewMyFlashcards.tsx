@@ -19,11 +19,9 @@ export default function MyFlashcardsQuiz() {
   const {
     filterOwnedFlashcards,
     setFilterOwnedFlashcards,
-    exampleFilter,
     audioQuizSetup,
     textQuizSetup,
     audioQuizProps,
-    skillTagSearch,
     textQuizProps,
     quizType,
     setQuizType,
@@ -66,8 +64,6 @@ export default function MyFlashcardsQuiz() {
         <>
           <h2>Review My Flashcards</h2>
           <FlashcardManagerFilters
-            filterState={exampleFilter}
-            skillTagSearch={skillTagSearch}
             filterOwnedFlashcards={filterOwnedFlashcards}
             setFilterOwnedFlashcards={setFilterOwnedFlashcards}
           />

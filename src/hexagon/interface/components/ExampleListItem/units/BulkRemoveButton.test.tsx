@@ -8,7 +8,7 @@ const mockProps = {
   handleSelect: vi.fn(),
   isSelected: false,
   isPending: false,
-  handleRemoveSelected: vi.fn(),
+  handleDeselect: vi.fn(),
 };
 
 describe('component BulkRemoveButton', () => {
@@ -69,7 +69,7 @@ describe('component BulkRemoveButton', () => {
     });
 
     expect(mockProps.handleSelect).toHaveBeenCalledTimes(1);
-    expect(mockProps.handleRemoveSelected).not.toHaveBeenCalled();
+    expect(mockProps.handleDeselect).not.toHaveBeenCalled();
   });
 
   it('should call handleRemoveSelected when Selected button is clicked', () => {
@@ -82,7 +82,7 @@ describe('component BulkRemoveButton', () => {
       fireEvent.click(button);
     });
 
-    expect(mockProps.handleRemoveSelected).toHaveBeenCalledTimes(1);
+    expect(mockProps.handleDeselect).toHaveBeenCalledTimes(1);
     expect(mockProps.handleSelect).not.toHaveBeenCalled();
   });
 });

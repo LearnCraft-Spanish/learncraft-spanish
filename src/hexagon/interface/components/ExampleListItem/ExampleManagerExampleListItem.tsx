@@ -1,8 +1,5 @@
 // THIS WILL NOT LIVE IN THIS FOLDER. IT SHOULD BE LOCATED WITH EXAMPLE MANAGER, i think :)
-import type {
-  ExampleWithVocabulary,
-  Flashcard,
-} from '@learncraft-spanish/shared';
+import type { Flashcard } from '@learncraft-spanish/shared';
 
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import { useCallback, useState } from 'react';
@@ -14,22 +11,22 @@ import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
 
 export default function ExampleListItem({
-  example,
+  flashcard,
   isCollected,
   isPending,
   handleSingleAdd,
   handleRemove,
-  handleRemoveSelected,
+  handleDeselect,
   handleSelect,
   isSelected,
   lessonPopup,
 }: {
-  example: Flashcard | ExampleWithVocabulary | null;
+  flashcard: Flashcard | null;
   isCollected: boolean;
   isPending: boolean;
   handleSingleAdd: () => Promise<void>;
   handleRemove: () => Promise<void>;
-  handleRemoveSelected: () => void;
+  handleDeselect: () => void;
   handleSelect: () => void;
   isSelected?: boolean;
   lessonPopup: LessonPopup;
@@ -47,25 +44,25 @@ export default function ExampleListItem({
     await handleSingleAdd();
     setPending(false);
     if (isSelected) {
-      handleRemoveSelected();
+      handleDeselect();
     }
-  }, [handleSingleAdd, isSelected, handleRemoveSelected]);
+  }, [handleSingleAdd, isSelected, handleDeselect]);
 
   const handleRemoveWrapper = useCallback(async () => {
     setPending(true);
     handleRemove()
       .then(() => {
         if (isSelected) {
-          handleRemoveSelected();
+          handleDeselect();
         }
       })
       .finally(() => {
         setPending(false);
       });
-  }, [handleRemove, isSelected, handleRemoveSelected]);
+  }, [handleRemove, isSelected, handleDeselect]);
   const { openContextual, setContextualRef, contextual } = useContextualMenu();
 
-  if (!example) {
+  if (!flashcard) {
     return null;
   }
 
@@ -75,15 +72,15 @@ export default function ExampleListItem({
         preTextComponents={[
           <BulkRemoveButton
             key="bulkRemoveButton"
-            id={example.id}
+            id={flashcard.example.id}
             isCollected={isCollected}
             handleSelect={handleSelect}
-            handleRemoveSelected={handleRemoveSelected}
+            handleDeselect={handleDeselect}
             isSelected={isSelected ?? false}
             isPending={isPending || pending}
           />,
         ]}
-        example={example}
+        example={flashcard.example}
         postTextComponents={[
           <MoreInfoButton
             onClickFunction={onClickMoreInfo}
@@ -91,7 +88,7 @@ export default function ExampleListItem({
             key="moreInfoButton"
           />,
           <AddPendingRemove
-            id={example.id}
+            id={flashcard.example.id}
             isCollected={isCollected}
             isPending={isPending || pending}
             handleAdd={handleAddWrapper}
@@ -100,8 +97,9 @@ export default function ExampleListItem({
           />,
         ]}
       />
+
       <MoreInfoViewFlashcard
-        flashcard={example as Flashcard}
+        flashcard={flashcard}
         isCustom={false} // TODO: add custom flashcard
         isOpen={isMoreInfoOpen}
         openContextual={openContextual}
