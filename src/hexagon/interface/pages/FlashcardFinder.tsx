@@ -1,8 +1,8 @@
 import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
+import FlashcardFinderFilter from '@interface/components/FlashcardFinder/FlashcardFinderFilter';
+import { ExampleTable } from '@interface/components/Tables';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
-import { ExampleTable } from '../components/Tables';
 
 export default function FlashcardFinder() {
   const {
