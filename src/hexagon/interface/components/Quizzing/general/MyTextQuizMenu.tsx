@@ -2,14 +2,19 @@ import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { ToggleSwitch } from '@interface/components/general';
 
 import React from 'react';
-import './QuizSetupMenu.scss';
+import { InlineLoading } from '../../Loading';
 
+import './QuizSetupMenu.scss';
 import '@interface/styles/QuizSetupMenu.scss';
 
 interface MyTextQuizMenuProps {
   quizSetupOptions: TextQuizSetupReturn;
+  filteringIsLoading?: boolean;
 }
-export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
+export function MyTextQuizMenu({
+  quizSetupOptions,
+  filteringIsLoading = false,
+}: MyTextQuizMenuProps) {
   const {
     canAccessSRS,
     canAccessCustom,
@@ -57,24 +62,28 @@ export function MyTextQuizMenu({ quizSetupOptions }: MyTextQuizMenuProps) {
           />
         </div>
       )}
-      <div className="menuRow dropdown">
-        <label htmlFor="quizLength">Quiz Length:</label>
+      {filteringIsLoading ? (
+        <InlineLoading message="Filtering examples..." />
+      ) : (
+        <div className="menuRow dropdown">
+          <label htmlFor="quizLength">Quiz Length:</label>
 
-        <select
-          name="length"
-          id="quizLength"
-          onChange={(e) =>
-            setSelectedQuizLength(Number.parseInt(e.target.value))
-          }
-          value={quizLength}
-        >
-          {availableQuizLengths.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
+          <select
+            name="length"
+            id="quizLength"
+            onChange={(e) =>
+              setSelectedQuizLength(Number.parseInt(e.target.value))
+            }
+            value={quizLength}
+          >
+            {availableQuizLengths.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 }

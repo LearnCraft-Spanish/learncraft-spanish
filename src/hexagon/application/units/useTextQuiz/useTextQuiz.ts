@@ -11,7 +11,8 @@ import { useCallback, useMemo, useState } from 'react';
 
 export interface UseTextQuizProps {
   examples: ExampleWithVocabulary[] | null;
-  startWithSpanish: boolean;
+  examplesAreLoading?: boolean;
+  startWithSpanish?: boolean;
   cleanupFunction: () => void;
 }
 
@@ -21,8 +22,8 @@ export interface AddPendingRemoveProps {
 }
 
 export interface TextQuizReturn {
+  examplesAreLoading?: boolean;
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
-  allowGetHelp: boolean;
   quizExample: FlashcardForDisplay | null;
   nextExample: () => void;
   previousExample: () => void;
@@ -35,6 +36,7 @@ export interface TextQuizReturn {
 
 export function useTextQuiz({
   examples,
+  examplesAreLoading = false,
   startWithSpanish = false,
   cleanupFunction,
 }: UseTextQuizProps): TextQuizReturn {
@@ -175,13 +177,13 @@ export function useTextQuiz({
   ]);
 
   return {
+    examplesAreLoading,
     addPendingRemoveProps: isStudent
       ? {
           addFlashcard,
           removeFlashcard,
         }
       : undefined,
-    allowGetHelp: isStudent,
 
     quizExample,
     exampleNumber,

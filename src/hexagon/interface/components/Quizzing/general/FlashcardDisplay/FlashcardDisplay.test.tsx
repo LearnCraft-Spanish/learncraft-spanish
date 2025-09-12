@@ -86,7 +86,6 @@ function FlashcardSpanishFirst() {
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
-        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -102,7 +101,6 @@ function FlashcardEnglishFirst() {
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
-        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -118,7 +116,6 @@ function FlashcardSpanishFirstAnswerShowing() {
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
-        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -134,7 +131,6 @@ function FlashcardEnglishFirstAnswerShowing() {
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
-        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -151,7 +147,6 @@ function FlashcardSpanishFirstNotStudent() {
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
-        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -168,7 +163,6 @@ function FlashcardWithAudio() {
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
-        allowGetHelp
       />
     </MockAllProviders>
   );

@@ -7,6 +7,7 @@ import { MenuButton } from '@interface/components/general/Buttons';
 import React, { useCallback, useEffect, useState } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
+import Loading from '../../Loading/Loading';
 import {
   FlashcardDisplay,
   QuizButtons,
@@ -27,6 +28,7 @@ export function TextQuiz({
   srsQuizProps,
 }: TextQuizComponentProps) {
   const {
+    examplesAreLoading,
     exampleNumber,
     quizExample,
     quizLength,
@@ -34,7 +36,6 @@ export function TextQuiz({
     previousExample,
     currentExample,
     addPendingRemoveProps,
-    allowGetHelp,
     cleanupFunction,
   } = useTextQuiz(textQuizProps);
 
@@ -89,6 +90,9 @@ export function TextQuiz({
     };
   }, [handleKeyPress]);
 
+  if (examplesAreLoading) {
+    return <Loading message="Setting up Quiz..." />;
+  }
   return (
     <>
       <PMFPopup
@@ -116,7 +120,6 @@ export function TextQuiz({
             answerShowing={answerShowing}
             toggleAnswer={toggleAnswer}
             addPendingRemoveProps={addPendingRemoveProps}
-            allowGetHelp={allowGetHelp}
             getHelpIsOpen={getHelpIsOpen}
             setGetHelpIsOpen={setGetHelpIsOpen}
           />
