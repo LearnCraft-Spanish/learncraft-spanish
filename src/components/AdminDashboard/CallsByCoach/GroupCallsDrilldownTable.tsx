@@ -1,6 +1,6 @@
 import type { GroupSessionWithAttendees } from 'src/types/CoachingTypes';
+import { InlineLoading } from '@interface/components/Loading';
 import DisplayOnlyTable from 'src/components/CoachingDashboard/components/RecentRecords/DisplayOnlyTable';
-import { InlineLoading } from 'src/components/Loading';
 import useCallsDrilldownTable from './useCallsDrilldownTable';
 import 'src/components/Table/Table.scss';
 

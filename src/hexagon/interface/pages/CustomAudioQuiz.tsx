@@ -1,7 +1,7 @@
 import FlashcardFinderFilter from '@interface/components/FlashcardFinder/FlashcardFinderFilter';
 import { ToggleSwitch } from '@interface/components/general';
+import { InlineLoading } from '@interface/components/Loading';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
-import { InlineLoading } from 'src/components/Loading';
 import { useCustomAudioQuiz } from 'src/hexagon/application/useCases/useCustomAudioQuiz';
 import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';

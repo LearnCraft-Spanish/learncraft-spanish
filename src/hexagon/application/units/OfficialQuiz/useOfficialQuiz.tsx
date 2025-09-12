@@ -22,6 +22,7 @@ export function useOfficialQuiz({
     return quizRecord?.quizTitle;
   }, [courseCode, quizNumber, officialQuizRecords]);
   return {
+    officialQuizRecords,
     quizExamples,
     isLoading,
     error,

@@ -4,6 +4,7 @@ import type {
   PrivateCall,
 } from 'src/types/CoachingTypes';
 
+import { InlineLoading } from '@interface/components/Loading';
 import { useMemo, useState } from 'react';
 import {
   AssignmentView,
@@ -14,7 +15,6 @@ import {
   NewPrivateCallView,
   PrivateCallView,
 } from 'src/components/Coaching/WeeksRecords/Table/PrivateCallsCell';
-import { InlineLoading } from 'src/components/Loading';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 // import Table from 'src/components/Table/Table';
 import useMyRecentRecords from '../../hooks/useMyRecentRecords';

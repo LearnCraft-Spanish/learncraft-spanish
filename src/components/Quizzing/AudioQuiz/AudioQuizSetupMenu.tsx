@@ -1,6 +1,6 @@
+import { MenuButton } from '@interface/components/general/Buttons';
 import { LessonSelector } from '@interface/components/LessonSelector';
 import React from 'react';
-import MenuButton from 'src/components/Buttons/MenuButton';
 
 import './AudioBasedReview.css';
 

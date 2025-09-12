@@ -17,8 +17,8 @@ const audioExample = sampleStudentFlashcardData.examples.filter(
 const addFlashcard = vi.fn(() => {});
 const removeFlashcard = vi.fn(() => {});
 const toggleAnswer = vi.fn();
-const showGetHelp = false;
-const setShowGetHelp = vi.fn();
+const getHelpIsOpen = false;
+const setGetHelpIsOpen = vi.fn();
 
 // Helper function to transform old example format to new FlashcardForDisplay format
 function createQuizExample(
@@ -84,9 +84,9 @@ function FlashcardSpanishFirst() {
         answerShowing={false}
         addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
         toggleAnswer={toggleAnswer}
-        allowGetHelp={showGetHelp}
-        getHelpIsOpen={showGetHelp}
-        setGetHelpIsOpen={setShowGetHelp}
+        getHelpIsOpen={getHelpIsOpen}
+        setGetHelpIsOpen={setGetHelpIsOpen}
+        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -100,9 +100,9 @@ function FlashcardEnglishFirst() {
         answerShowing={false}
         addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
         toggleAnswer={toggleAnswer}
-        allowGetHelp={showGetHelp}
-        getHelpIsOpen={showGetHelp}
-        setGetHelpIsOpen={setShowGetHelp}
+        getHelpIsOpen={getHelpIsOpen}
+        setGetHelpIsOpen={setGetHelpIsOpen}
+        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -116,9 +116,9 @@ function FlashcardSpanishFirstAnswerShowing() {
         answerShowing
         addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
         toggleAnswer={toggleAnswer}
-        allowGetHelp={showGetHelp}
-        getHelpIsOpen={showGetHelp}
-        setGetHelpIsOpen={setShowGetHelp}
+        getHelpIsOpen={getHelpIsOpen}
+        setGetHelpIsOpen={setGetHelpIsOpen}
+        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -131,10 +131,10 @@ function FlashcardEnglishFirstAnswerShowing() {
         quizExample={quizExample}
         answerShowing
         addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
-        allowGetHelp={showGetHelp}
-        getHelpIsOpen={showGetHelp}
-        setGetHelpIsOpen={setShowGetHelp}
         toggleAnswer={toggleAnswer}
+        getHelpIsOpen={getHelpIsOpen}
+        setGetHelpIsOpen={setGetHelpIsOpen}
+        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -148,10 +148,10 @@ function FlashcardSpanishFirstNotStudent() {
         quizExample={quizExample}
         answerShowing={false}
         addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
-        allowGetHelp={showGetHelp}
-        getHelpIsOpen={showGetHelp}
-        setGetHelpIsOpen={setShowGetHelp}
         toggleAnswer={toggleAnswer}
+        getHelpIsOpen={getHelpIsOpen}
+        setGetHelpIsOpen={setGetHelpIsOpen}
+        allowGetHelp
       />
     </MockAllProviders>
   );
@@ -165,10 +165,10 @@ function FlashcardWithAudio() {
         quizExample={quizExample}
         answerShowing={false}
         addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
-        allowGetHelp={showGetHelp}
-        getHelpIsOpen={showGetHelp}
-        setGetHelpIsOpen={setShowGetHelp}
         toggleAnswer={toggleAnswer}
+        getHelpIsOpen={getHelpIsOpen}
+        setGetHelpIsOpen={setGetHelpIsOpen}
+        allowGetHelp
       />
     </MockAllProviders>
   );
