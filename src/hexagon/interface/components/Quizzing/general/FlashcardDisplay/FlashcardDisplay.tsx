@@ -14,7 +14,6 @@ export function FlashcardDisplay({
   answerShowing,
   toggleAnswer,
   addPendingRemoveProps,
-  allowGetHelp,
   getHelpIsOpen,
   setGetHelpIsOpen,
 }: FlashcardDisplayProps) {
@@ -69,7 +68,7 @@ export function FlashcardDisplay({
               removeFlashcard={addPendingRemoveProps.removeFlashcard}
             />
           )}
-          {answer.vocabComplete && allowGetHelp && (
+          {answer.vocabComplete && (
             <>
               {getHelpIsOpen ? (
                 <button
@@ -96,7 +95,7 @@ export function FlashcardDisplay({
               )}
             </>
           )}
-          {allowGetHelp && <GetHelpDisplay vocabulary={answer.vocabulary} />}
+          {getHelpIsOpen && <GetHelpDisplay vocabulary={answer.vocabulary} />}
         </div>
       )}
 

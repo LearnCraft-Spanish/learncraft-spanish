@@ -34,7 +34,6 @@ export function TextQuiz({
     previousExample,
     currentExample,
     addPendingRemoveProps,
-    allowGetHelp,
     cleanupFunction,
   } = useTextQuiz(textQuizProps);
 
@@ -116,7 +115,6 @@ export function TextQuiz({
             answerShowing={answerShowing}
             toggleAnswer={toggleAnswer}
             addPendingRemoveProps={addPendingRemoveProps}
-            allowGetHelp={allowGetHelp}
             getHelpIsOpen={getHelpIsOpen}
             setGetHelpIsOpen={setGetHelpIsOpen}
           />

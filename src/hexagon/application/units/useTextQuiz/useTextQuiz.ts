@@ -22,7 +22,6 @@ export interface AddPendingRemoveProps {
 
 export interface TextQuizReturn {
   addPendingRemoveProps: AddPendingRemoveProps | undefined;
-  allowGetHelp: boolean;
   quizExample: FlashcardForDisplay | null;
   nextExample: () => void;
   previousExample: () => void;
@@ -181,7 +180,6 @@ export function useTextQuiz({
           removeFlashcard,
         }
       : undefined,
-    allowGetHelp: isStudent,
 
     quizExample,
     exampleNumber,

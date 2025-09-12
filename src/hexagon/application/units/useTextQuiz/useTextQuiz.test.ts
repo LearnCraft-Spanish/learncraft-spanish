@@ -233,7 +233,6 @@ describe('useTextQuiz', () => {
       );
 
       expect(result.current.addPendingRemoveProps).toBeDefined();
-      expect(result.current.allowGetHelp).toBe(true);
     });
 
     it('should not provide add/remove props for non-students', () => {
@@ -248,7 +247,6 @@ describe('useTextQuiz', () => {
       );
 
       expect(result.current.addPendingRemoveProps).toBeUndefined();
-      expect(result.current.allowGetHelp).toBe(false);
     });
 
     it('should call createFlashcards when adding flashcard', () => {
