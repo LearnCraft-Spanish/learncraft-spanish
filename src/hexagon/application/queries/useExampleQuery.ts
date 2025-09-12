@@ -16,20 +16,29 @@ export interface UseExampleQueryReturnType {
   pageSize: number;
   changeQueryPage: (page: number) => void;
   setCanPrefetch: (canPrefetch: boolean) => void;
+  updatePageSize: (newPageSize: number) => void;
 }
 export const useExampleQuery = (
   pageSize: number,
   audioRequired?: boolean,
 ): UseExampleQueryReturnType => {
   const [page, setPage] = useState(1);
+  const [currentPageSize, setCurrentPageSize] = useState(pageSize);
+
   const changePage = useCallback((page: number) => {
     setPage(page);
+  }, []);
+
+  const updatePageSize = useCallback((newPageSize: number) => {
+    setCurrentPageSize(newPageSize);
+    setPage(1); // Reset to first page when changing page size
   }, []);
 
   // Memoize to prev
   const onFilterChange = useCallback(() => {
     changePage(1);
-  }, [changePage]);
+    updatePageSize(pageSize); // reset pageSize to the original default passed in
+  }, [changePage, updatePageSize, pageSize]);
 
   const queryClient = useQueryClient();
 
@@ -98,7 +107,7 @@ export const useExampleQuery = (
           audioOnly: audioOnly!,
           skillTags: skillTags!,
           page: prefetchRequest ? page + 1 : page,
-          limit: pageSize,
+          limit: currentPageSize,
           seed: seed!,
         },
       );
@@ -113,7 +122,7 @@ export const useExampleQuery = (
       skillTags,
       exampleAdapter,
       page,
-      pageSize,
+      currentPageSize,
       seed,
     ],
   );
@@ -126,7 +135,7 @@ export const useExampleQuery = (
     queryKey: [
       'filteredExamples',
       { page },
-      { pageSize },
+      { pageSize: currentPageSize },
       { courseId },
       { toLessonNumber },
       { fromLessonNumber },
@@ -146,9 +155,9 @@ export const useExampleQuery = (
       return false;
     }
     // Check if there are more items beyond what the next query page would fetch
-    const nextPageStartIndex = pageSize * page + 1;
+    const nextPageStartIndex = currentPageSize * page + 1;
     return nextPageStartIndex <= totalCount;
-  }, [page, pageSize, fullResponse?.totalCount]);
+  }, [page, currentPageSize, fullResponse?.totalCount]);
 
   useEffect(() => {
     if (hasMorePages && canPrefetch) {
@@ -156,7 +165,7 @@ export const useExampleQuery = (
         queryKey: [
           'filteredExamples',
           page + 1,
-          pageSize,
+          currentPageSize,
           { courseId },
           { toLessonNumber },
           { fromLessonNumber },
@@ -173,7 +182,7 @@ export const useExampleQuery = (
     hasMorePages,
     canPrefetch,
     page,
-    pageSize,
+    currentPageSize,
     courseId,
     toLessonNumber,
     fromLessonNumber,
@@ -191,8 +200,9 @@ export const useExampleQuery = (
     filteredExamples: fullResponse?.examples ?? null,
     totalCount: fullResponse?.totalCount ?? null,
     page,
-    pageSize,
+    pageSize: currentPageSize,
     changeQueryPage: changePage,
     setCanPrefetch,
+    updatePageSize,
   };
 };

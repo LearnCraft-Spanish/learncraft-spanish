@@ -114,10 +114,16 @@ export default function MyFlashcardsQuiz() {
                   </label>
                 </div>
                 {quizType === MyFlashcardsQuizType.Text && (
-                  <MyTextQuizMenu quizSetupOptions={textQuizSetup} />
+                  <MyTextQuizMenu
+                    quizSetupOptions={textQuizSetup}
+                    filteringIsLoading={exampleFilter.isLoading}
+                  />
                 )}
                 {quizType === MyFlashcardsQuizType.Audio && (
-                  <AudioQuizMenu quizSetupOptions={audioQuizSetup} />
+                  <AudioQuizMenu
+                    quizSetupOptions={audioQuizSetup}
+                    filteringIsLoading={exampleFilter.isLoading}
+                  />
                 )}
               </div>
             </div>

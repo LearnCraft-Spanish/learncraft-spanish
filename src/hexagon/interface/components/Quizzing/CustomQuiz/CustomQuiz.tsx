@@ -23,6 +23,7 @@ export function CustomQuiz() {
     presetQuizReady,
     setPresetQuizReady,
     setCustomQuizReady,
+    startCustomQuiz,
     examplesToQuiz,
     startWithSpanish,
     setStartWithSpanish,
@@ -92,7 +93,7 @@ export function CustomQuiz() {
                 availableQuizLengths={availableQuizLengths}
                 safeQuizLength={safeQuizLength}
                 setSelectedQuizLength={setSelectedQuizLength}
-                startQuizFunction={() => setCustomQuizReady(true)}
+                startQuizFunction={startCustomQuiz}
                 startWithSpanish={startWithSpanish}
                 updateStartWithSpanish={() =>
                   setStartWithSpanish(!startWithSpanish)
@@ -105,6 +106,7 @@ export function CustomQuiz() {
         ) : (
           <TextQuiz
             textQuizProps={{
+              examplesAreLoading: isLoadingExamples,
               examples: examplesToQuiz,
               startWithSpanish,
               cleanupFunction: () => setCustomQuizReady(false),

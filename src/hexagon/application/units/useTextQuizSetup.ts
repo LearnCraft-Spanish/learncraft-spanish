@@ -67,9 +67,6 @@ export function useTextQuizSetup({
   const canAccessSRS =
     ownedOnly && isOwnUser && appUser?.studentRole === 'student';
 
-  // Arbitrary definitions for permissible quiz lengths
-  const quizLengthOptions = useRef<number[]>([10, 20, 50, 75, 100, 150]);
-
   // Local states with boolean choices
   const [srsQuiz, setSrsQuiz] = useState<boolean>(true);
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
@@ -123,6 +120,9 @@ export function useTextQuizSetup({
     return filtered;
   }, [examples, chosenExamples]);
 
+  // Arbitrary definitions for permissible quiz lengths
+  const quizLengthOptions = useRef<number[]>([10, 20, 50, 100]);
+
   // Which quiz lengths are usable for the number of examples we have
   const availableQuizLengths: number[] = useMemo(() => {
     // Empty array if examples still loading
@@ -131,15 +131,19 @@ export function useTextQuizSetup({
     const filteredOptions = quizLengthOptions.current.filter(
       (number: number) => number <= filteredExamples.length,
     );
-    // Add precise total if not included and under 150
-    if (
-      filteredExamples.length < 150 &&
-      !filteredOptions.includes(filteredExamples.length)
-    ) {
-      filteredOptions.push(filteredExamples.length);
+    // Add precise total if not included and not equal to an existing option
+    if (!filteredOptions.includes(filteredExamples.length)) {
+      if (filteredExamples.length < 100) {
+        // Add length if under 100
+        filteredOptions.push(filteredExamples.length);
+      } else {
+        // Add total count if over 100
+        filteredOptions.push(filteredExamples.length);
+      }
     }
     // Return parsed options
-    return filteredOptions.sort();
+    // sort by size, smallest to largest
+    return filteredOptions.sort((a, b) => a - b);
   }, [filteredExamples, quizLengthOptions]);
 
   // Local state for choice of quiz length
@@ -151,8 +155,13 @@ export function useTextQuizSetup({
       // If no options are available, return 0
       return 0;
     } else if (selectedQuizLength < availableQuizLengths[0]) {
-      // If the quiz length is invalid/unspecified, return the largest option
-      return availableQuizLengths[availableQuizLengths.length - 1];
+      // If the quiz length is invalid/unspecified, default to 20 if available
+      // Otherwise, use the largest available option that's <= 20, or the smallest option
+      const defaultOption = availableQuizLengths.includes(20)
+        ? 20
+        : availableQuizLengths.find((option) => option <= 20) ||
+          availableQuizLengths[0];
+      return defaultOption;
     }
     // If the quiz length is valid, find all smaller options
     const acceptableOptions: number[] = [];
@@ -162,7 +171,7 @@ export function useTextQuizSetup({
       }
     }
     // If there are acceptable options, return the largest one
-    return acceptableOptions[acceptableOptions.length - 1];
+    return acceptableOptions[acceptableOptions.length - 1] || 0;
   }, [selectedQuizLength, availableQuizLengths]);
 
   // Shuffle the owned examples and take a slice of the correct size

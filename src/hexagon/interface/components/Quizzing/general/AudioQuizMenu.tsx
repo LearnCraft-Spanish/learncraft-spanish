@@ -4,13 +4,16 @@ import { ToggleSwitch } from '@interface/components/general';
 import React from 'react';
 
 import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
-import './QuizSetupMenu.scss';
+import { InlineLoading } from '../../Loading';
 
+import './QuizSetupMenu.scss';
 import '@interface/styles/QuizSetupMenu.scss';
 
 export function AudioQuizMenu({
   quizSetupOptions,
+  filteringIsLoading = false,
 }: {
+  filteringIsLoading?: boolean;
   quizSetupOptions: AudioQuizSetupReturn;
 }) {
   const {
@@ -44,21 +47,25 @@ export function AudioQuizMenu({
           onChange={() => setAutoplay(!autoplay)}
         />
       </div>
-      <label className="menuRow dropdown">
-        Quiz Length:
-        <select
-          onChange={(e) =>
-            setSelectedQuizLength(Number.parseInt(e.target.value))
-          }
-          value={selectedQuizLength}
-        >
-          {availableQuizLengths.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </label>
+      {filteringIsLoading ? (
+        <InlineLoading message="Filtering examples..." />
+      ) : (
+        <label className="menuRow dropdown">
+          Quiz Length:
+          <select
+            onChange={(e) =>
+              setSelectedQuizLength(Number.parseInt(e.target.value))
+            }
+            value={selectedQuizLength}
+          >
+            {availableQuizLengths.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
     </div>
   );
 }

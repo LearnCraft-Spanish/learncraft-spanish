@@ -9,6 +9,7 @@ export function useCustomQuiz() {
     isLoading: isLoadingExamples,
     filteredExamples,
     totalCount,
+    updatePageSize,
   } = useExampleQuery(150, false);
   const [customQuizReady, setCustomQuizReady] = useState(false);
   const [presetQuizReady, setPresetQuizReady] = useState(false);
@@ -19,7 +20,7 @@ export function useCustomQuiz() {
   >('custom-filters');
 
   // Arbitrary definitions for permissible quiz lengths
-  const quizLengthOptions = useRef<number[]>([10, 20, 50, 75, 100, 150]);
+  const quizLengthOptions = useRef<number[]>([10, 20, 50, 100]);
 
   // Which quiz lengths are usable for the number of examples we have
   const availableQuizLengths: number[] = useMemo(() => {
@@ -29,17 +30,20 @@ export function useCustomQuiz() {
     const filteredOptions = quizLengthOptions.current.filter(
       (number: number) => number <= filteredExamples.length,
     );
-    // Add precise total if not included and under 150
-    if (
-      filteredExamples.length < 150 &&
-      !filteredOptions.includes(filteredExamples.length)
-    ) {
-      filteredOptions.push(filteredExamples.length);
+    // Add precise total if not included and not equal to an existing option
+    if (!filteredOptions.includes(filteredExamples.length)) {
+      if (filteredExamples.length < 100) {
+        // Add length if under 100
+        filteredOptions.push(filteredExamples.length);
+      } else {
+        // Add total count if over 100
+        filteredOptions.push(totalCount ?? 0);
+      }
     }
     // Return parsed options
     // sort by size, smallest to largest
     return filteredOptions.sort((a, b) => a - b);
-  }, [filteredExamples, quizLengthOptions]);
+  }, [filteredExamples, quizLengthOptions, totalCount]);
 
   // Local state for choice of quiz length
   const [selectedQuizLength, setSelectedQuizLength] = useState<number>(0);
@@ -50,8 +54,13 @@ export function useCustomQuiz() {
       // If no options are available, return 0
       return 0;
     } else if (selectedQuizLength < availableQuizLengths[0]) {
-      // If the quiz length is invalid/unspecified, return the largest option
-      return availableQuizLengths[availableQuizLengths.length - 1];
+      // If the quiz length is invalid/unspecified, default to 20 if available
+      // Otherwise, use the largest available option that's <= 20, or the smallest option
+      const defaultOption = availableQuizLengths.includes(20)
+        ? 20
+        : availableQuizLengths.find((option) => option <= 20) ||
+          availableQuizLengths[0];
+      return defaultOption;
     }
     // If the quiz length is valid, find all smaller options
     const acceptableOptions: number[] = [];
@@ -69,6 +78,15 @@ export function useCustomQuiz() {
     const shuffledExamples = fisherYatesShuffle(filteredExamples);
     return shuffledExamples.slice(0, safeQuizLength);
   }, [filteredExamples, safeQuizLength]);
+
+  // Function to handle starting the quiz with dynamic page size
+  const startCustomQuiz = () => {
+    // If the selected quiz length is greater than 150, update the page size
+    if (safeQuizLength > 150) {
+      updatePageSize(safeQuizLength);
+    }
+    setCustomQuizReady(true);
+  };
 
   return {
     examplesToQuiz,
@@ -88,6 +106,7 @@ export function useCustomQuiz() {
 
     customQuizReady,
     setCustomQuizReady,
+    startCustomQuiz,
     presetQuizReady,
     setPresetQuizReady,
   };
