@@ -21,6 +21,7 @@ export default function MyFlashcardsQuiz() {
     setFilterOwnedFlashcards,
     audioQuizSetup,
     textQuizSetup,
+    exampleFilter,
     audioQuizProps,
     textQuizProps,
     quizType,
