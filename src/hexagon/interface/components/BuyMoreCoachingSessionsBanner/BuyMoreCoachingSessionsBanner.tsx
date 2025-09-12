@@ -11,10 +11,11 @@ import './BuyMoreCoachingSessionsBanner.scss';
 
 export default function ExtraCoachingCTA() {
   const { isBannerVisible, closeBanner } = useBannerDisplay();
-  const { isAuthenticated, isLoading, isStudent } = useAuthAdapter();
+  const { isAuthenticated, isLoading, isStudent, isCoach, isAdmin } =
+    useAuthAdapter();
 
-  // Only show banner if user is a student
-  if (!isStudent) {
+  // Only show banner if user is a student (and not a coach or admin)
+  if (!isStudent || isCoach || isAdmin) {
     return null;
   }
   // Only show banner if user is authenticated and banner hasn't been closed

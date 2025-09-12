@@ -1,7 +1,29 @@
 import type { BannerDisplayContextType } from '@application/coordinators/contexts/BannerDisplayContext';
+import { CookieAdapter } from '@application/adapters/cookieAdapter';
 import BannerDisplayContext from '@application/coordinators/contexts/BannerDisplayContext';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+
+// Banner-specific constants and logic
+const COACHING_BANNER_COOKIE_NAME = 'coachingBannerSeen';
+
+/**
+ * Calculates the expiration date for the coaching banner cookie
+ * Sets expiration to midnight on the day after next (2 days from now)
+ * Example: If seen on Tuesday 8am, expires Wednesday midnight (visible again Thursday)
+ */
+function getCoachingBannerCookieExpiration(): Date {
+  const now = new Date();
+  const expireDate = new Date();
+
+  // Add 2 days to current date
+  expireDate.setDate(now.getDate() + 2);
+
+  // Set time to midnight (00:00:00.000)
+  expireDate.setHours(0, 0, 0, 0);
+
+  return expireDate;
+}
 
 export function BannerDisplayProvider({
   children,
@@ -9,16 +31,27 @@ export function BannerDisplayProvider({
   children: React.ReactNode;
 }) {
   const location = useLocation();
+  const cookieAdapter = CookieAdapter();
 
   // Track the initial route that the user loaded on
   const initialRouteRef = useRef<string | null>(null);
 
-  // Show banner only on initial app load - once closed, it stays closed for the session
-  const [isBannerVisible, setIsBannerVisible] = useState(true);
+  // Check if banner should be visible based on cookie
+  const [isBannerVisible, setIsBannerVisible] = useState(() => {
+    // Initially check if cookie exists - if it does, hide banner
+    const cookieExists = cookieAdapter.getCookie(COACHING_BANNER_COOKIE_NAME);
+    return !cookieExists;
+  });
 
   const closeBanner = useCallback(() => {
+    const expirationDate = getCoachingBannerCookieExpiration();
+    cookieAdapter.setCookie(
+      COACHING_BANNER_COOKIE_NAME,
+      'true',
+      expirationDate,
+    );
     setIsBannerVisible(false);
-  }, []);
+  }, [cookieAdapter]);
 
   // Set initial route on first render
   useEffect(() => {
