@@ -1,8 +1,8 @@
+import { InlineLoading } from '@interface/components/Loading';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import WeeksTableItem from 'src/components/Coaching/WeeksRecords/Table/WeeksTableItem';
 import ViewWeekRecord from 'src/components/Coaching/WeeksRecords/ViewWeekRecord';
-import { InlineLoading } from 'src/components/Loading';
 import { toReadableMonthDay } from 'src/functions/dateUtils';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useActiveCoach from '../../hooks/useActiveCoach';

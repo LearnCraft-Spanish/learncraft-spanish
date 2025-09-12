@@ -1,5 +1,5 @@
+import { Loading } from '@interface/components/Loading';
 import { DateRangeProvider } from '../Coaching/WeeksRecords/DateRangeProvider';
-import { Loading } from '../Loading';
 import IncompleteRecords from './components/IncompleteRecords';
 import MyStudents from './components/MyStudents/MyStudents';
 import RecentRecords from './components/RecentRecords';

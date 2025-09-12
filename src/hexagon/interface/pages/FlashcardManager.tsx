@@ -1,5 +1,5 @@
 import useFlashcardManager from '@application/useCases/useFlashcardManager';
-import Loading from 'src/components/Loading/Loading';
+import { Loading } from '@interface/components/Loading';
 import FlashcardManagerFilters from '../components/FlashcardManager';
 import { FlashcardTable } from '../components/Tables';
 export default function FlashcardManager() {

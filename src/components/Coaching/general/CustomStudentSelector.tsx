@@ -1,4 +1,3 @@
-import { useMemo, useState } from 'react';
 /*
 The specific use case for this component:
 when a list of students is needed where:
@@ -7,7 +6,8 @@ when a list of students is needed where:
 
 the bones of this component are based on the StudentSearch component, but the list of students is filtered based on the weekStarts date
 */
-import { InlineLoading } from 'src/components/Loading';
+import { InlineLoading } from '@interface/components/Loading';
+import { useMemo, useState } from 'react';
 import { toISODate } from 'src/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';

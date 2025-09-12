@@ -1,7 +1,7 @@
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import { MenuButton } from '@interface/components/general/Buttons';
 import { LessonSelector } from '@interface/components/LessonSelector';
 import React from 'react';
-import MenuButton from 'src/components/Buttons/MenuButton';
 
 import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
 import './AudioBasedReview.css';

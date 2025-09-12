@@ -1,7 +1,7 @@
+import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { cleanup, render, screen } from '@testing-library/react';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
-import { overrideMockAuthAdapter } from 'src/hexagon/application/adapters/authAdapter.mock';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Nav from './Nav';
 

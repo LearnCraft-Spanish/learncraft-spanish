@@ -1,5 +1,5 @@
+import { InlineLoading } from '@interface/components/Loading';
 import React, { useMemo } from 'react';
-import { InlineLoading } from 'src/components/Loading';
 import { toISODate } from 'src/functions/dateUtils';
 
 import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/StudentDrillDown';

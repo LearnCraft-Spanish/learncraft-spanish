@@ -4,11 +4,11 @@ import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFl
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 
+import { InlineLoading } from '@interface/components/Loading';
 import { useRef, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
-
-import { InlineLoading } from 'src/components/Loading';
 // import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
 

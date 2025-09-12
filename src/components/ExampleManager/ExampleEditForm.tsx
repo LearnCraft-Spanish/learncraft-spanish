@@ -1,8 +1,8 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { Loading } from '@interface/components/Loading';
 import React from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
-import { Loading } from 'src/components/Loading';
 import {
   formatEnglishText,
   formatSpanishText,

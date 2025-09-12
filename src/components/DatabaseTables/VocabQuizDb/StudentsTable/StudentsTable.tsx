@@ -1,4 +1,4 @@
-import { Loading } from 'src/components/Loading';
+import { Loading } from '@interface/components/Loading';
 import Table from 'src/components/Table';
 import BackButton from '../../general/BackButton';
 

@@ -1,7 +1,7 @@
 import type { Student } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { Loading } from '@interface/components/Loading';
 import React, { useMemo, useState } from 'react';
-import { Loading } from 'src/components/Loading';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
 import { useAllStudents } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import {

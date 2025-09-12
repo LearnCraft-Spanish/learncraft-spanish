@@ -1,5 +1,5 @@
 import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
-import Loading from 'src/components/Loading/Loading';
+import { Loading } from '@interface/components/Loading';
 import FlashcardFinderFilter from '../components/FlashcardFinder/FlashcardFinderFilter';
 import { ExampleTable } from '../components/Tables';
 
