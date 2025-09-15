@@ -106,6 +106,10 @@ export function useAudioQuiz({
     AudioQuizStep.Question,
   );
 
+  // Refs to track changes to the current example index and step
+  const previousExampleIndexRef = useRef<number>(-1);
+  const previousStepRef = useRef<AudioQuizStep | null>(null);
+
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
     if (currentExampleIndex + 1 < safeExamples.length - 1) {
@@ -115,6 +119,8 @@ export function useAudioQuiz({
       setSelectedExampleIndex(safeExamples.length - 1);
       setCurrentStep(AudioQuizStep.Question);
     }
+    // Reset the previous step ref to null so progress animation works immediately on new example
+    previousStepRef.current = null;
   }, [currentExampleIndex, setSelectedExampleIndex, safeExamples]);
 
   const previousExample = useCallback(() => {
@@ -125,13 +131,9 @@ export function useAudioQuiz({
       setSelectedExampleIndex(0);
       setCurrentStep(AudioQuizStep.Question);
     }
+    // Reset the previous step ref to null so progress animation works immediately on new example
+    previousStepRef.current = null;
   }, [currentExampleIndex, setSelectedExampleIndex]);
-
-  // Ref to track changes to the current example index
-  const previousExampleIndexRef = useRef<number>(-1);
-
-  // Ref to track changes to the current step
-  const previousStepRef = useRef<AudioQuizStep | null>(null);
 
   // Note: isInPadding ref removed - no longer needed with concatenated audio
 
@@ -150,9 +152,12 @@ export function useAudioQuiz({
     Record<number, SpeakingQuizExample>
   >({});
 
-  // Store concatenated audio URLs and their cleanup functions for autoplay mode
+  // Store concatenated audio URLs, durations, and their cleanup functions for autoplay mode
   const [concatenatedAudioData, setConcatenatedAudioData] = useState<
-    Record<number, Record<string, { url: string; cleanup: () => void }>>
+    Record<
+      number,
+      Record<string, { url: string; duration: number; cleanup: () => void }>
+    >
   >({});
 
   // Resets the quiz to the initial state, called on menu and end of autoplay
@@ -276,7 +281,7 @@ export function useAudioQuiz({
         if (autoplay) {
           const concatenatedData: Record<
             string,
-            { url: string; cleanup: () => void }
+            { url: string; duration: number; cleanup: () => void }
           > = {};
 
           try {
@@ -300,6 +305,7 @@ export function useAudioQuiz({
                       key,
                       result: {
                         url: result.concatenatedAudioUrl,
+                        duration: result.totalDuration,
                         cleanup: result.cleanup,
                       },
                     };
@@ -387,6 +393,8 @@ export function useAudioQuiz({
       setSelectedExampleIndex(safeExamples.length - 1);
       setCurrentStep(AudioQuizStep.Question);
     }
+    // Reset the previous step ref to null so progress animation works immediately on new example
+    previousStepRef.current = null;
 
     // Trigger aggressive prefetching of upcoming examples when user is actively progressing
     if (autoplay && !parseInProgress.current) {
@@ -521,13 +529,20 @@ export function useAudioQuiz({
     return previousAudioExample !== null;
   }, [previousAudioExample]);
 
-  // Helper function to get the appropriate audio URL (concatenated if available, original if not)
-  const getAudioUrl = useCallback(
+  // Helper function to get the appropriate audio URL and duration (concatenated if available, original if not)
+  const getAudioUrlAndDuration = useCallback(
     (stepValue: any, stepKey: string, exampleId: number) => {
       if (autoplay && concatenatedAudioData[exampleId]?.[stepKey]) {
-        return concatenatedAudioData[exampleId][stepKey].url;
+        const concatenatedData = concatenatedAudioData[exampleId][stepKey];
+        return {
+          audioUrl: concatenatedData.url,
+          duration: concatenatedData.duration,
+        };
       }
-      return stepValue.audioUrl;
+      return {
+        audioUrl: stepValue.audioUrl,
+        duration: stepValue.duration,
+      };
     },
     [autoplay, concatenatedAudioData],
   );
@@ -563,12 +578,23 @@ export function useAudioQuiz({
         return null;
     }
 
-    // Return step value with potentially updated audio URL
+    // Return step value with potentially updated audio URL and duration
+    const audioData = getAudioUrlAndDuration(
+      stepValue,
+      stepKey,
+      currentExampleMemo.id,
+    );
     return {
       ...stepValue,
-      audioUrl: getAudioUrl(stepValue, stepKey, currentExampleMemo.id),
+      audioUrl: audioData.audioUrl,
+      duration: audioData.duration,
     };
-  }, [currentStep, currentAudioExample, currentExampleMemo, getAudioUrl]);
+  }, [
+    currentStep,
+    currentAudioExample,
+    currentExampleMemo,
+    getAudioUrlAndDuration,
+  ]);
 
   // Calculates the progress status of the current step - simplified with concatenated audio
   const progressStatus = useMemo(() => {
