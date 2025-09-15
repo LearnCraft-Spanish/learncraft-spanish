@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-interface FilterOwnedFlashcardsContextType {
+export interface FilterOwnedFlashcardsContextType {
   filterOwnedFlashcards: boolean;
   setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
 }

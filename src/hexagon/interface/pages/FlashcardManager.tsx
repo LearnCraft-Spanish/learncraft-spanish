@@ -8,6 +8,7 @@ export default function FlashcardManager() {
     displayFlashcards,
     paginationState,
     filterOwnedFlashcards,
+    onGoingToQuiz,
     setFilterOwnedFlashcards,
     isLoading,
     error,
@@ -31,6 +32,7 @@ export default function FlashcardManager() {
         allFlashcards={allFlashcards}
         displayFlashcards={displayFlashcards}
         paginationState={paginationState}
+        onGoingToQuiz={onGoingToQuiz}
         isLoading={isLoading}
         error={error}
       />

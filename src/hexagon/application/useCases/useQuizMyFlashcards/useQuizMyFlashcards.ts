@@ -1,16 +1,16 @@
+import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
-import type { UseCombinedFiltersWithVocabularyReturnType } from '../../units/Filtering/useCombinedFiltersWithVocabulary';
-import type { UseSkillTagSearchReturnType } from '../../units/useSkillTagSearch';
+import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
+import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useCombinedFiltersWithVocabulary } from '../../units/Filtering/useCombinedFiltersWithVocabulary';
-import { useSkillTagSearch } from '../../units/useSkillTagSearch';
+import { useCallback, useMemo, useState } from 'react';
 
 export enum MyFlashcardsQuizType {
   Text = 'text',
@@ -171,14 +171,6 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   };
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
-
-  // Always reset to false on exit
-  useEffect(() => {
-    return () => {
-      setFilterOwnedFlashcards(false);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Return the hooks, props, and local state
   return {

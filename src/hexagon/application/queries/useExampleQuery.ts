@@ -29,6 +29,8 @@ export const useExampleQuery = (
     setPage(page);
   }, []);
 
+  // Mainly used when we need the whole query (unpaginated).
+  // That case still requires us to get the total items first so we can't initialize that way.
   const updatePageSize = useCallback((newPageSize: number) => {
     setCurrentPageSize(newPageSize);
     setPage(1); // Reset to first page when changing page size

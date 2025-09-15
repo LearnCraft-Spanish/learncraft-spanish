@@ -2,7 +2,7 @@ import type { PaginationState } from '@application/units/Pagination/usePaginatio
 import type { Flashcard } from '@learncraft-spanish/shared';
 import { usePagination } from '@application/units/Pagination/usePagination';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 export interface UseFlashcardManagerReturn {
   allFlashcards: Flashcard[];
@@ -11,6 +11,7 @@ export interface UseFlashcardManagerReturn {
 
   filterOwnedFlashcards: boolean;
   setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
+  onGoingToQuiz: () => void;
 
   isLoading: boolean;
   error: Error | null;
@@ -43,12 +44,17 @@ export default function useFlashcardManager(): UseFlashcardManagerReturn {
     );
   }, [filteredFlashcards, paginationState]);
 
+  const onGoingToQuiz = useCallback(() => {
+    setFilterOwnedFlashcards(true);
+  }, [setFilterOwnedFlashcards]);
+
   return {
     allFlashcards: filteredFlashcards,
     displayFlashcards,
     paginationState,
     filterOwnedFlashcards,
     setFilterOwnedFlashcards,
+    onGoingToQuiz,
     isLoading,
     error,
   };

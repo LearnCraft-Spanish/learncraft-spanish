@@ -1,10 +1,6 @@
+import type { FilterOwnedFlashcardsContextType } from '@application/coordinators/contexts/FilterOwnedFlashcardsContext';
+import FilterOwnedFlashcardsContext from '@application/coordinators/contexts/FilterOwnedFlashcardsContext';
 import { useMemo, useState } from 'react';
-import FilterOwnedFlashcardsContext from '../contexts/FilterOwnedFlashcardsContext';
-
-interface FilterOwnedFlashcardsContextType {
-  filterOwnedFlashcards: boolean;
-  setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
-}
 
 export default function FilterOwnedFlashcardsProvider({
   children,
