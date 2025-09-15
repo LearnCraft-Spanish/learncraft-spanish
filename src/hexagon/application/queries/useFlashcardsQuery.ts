@@ -8,7 +8,7 @@ import { useActiveStudent } from '@application/coordinators/hooks/useActiveStude
 
 import { queryDefaults } from '@application/utils/queryUtils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { toast } from 'react-toastify';
 
 export interface UseFlashcardsQueryReturnType {
@@ -39,6 +39,16 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   const queryClient = useQueryClient();
 
   const hasAccess = isAdmin || isCoach || isStudent;
+
+  const pendingDeletes = useMemo(
+    () =>
+      queryClient.getQueryData<number[]>([
+        'flashcards',
+        'pendingDeletes',
+        userId,
+      ]),
+    [queryClient, userId],
+  );
 
   const getFlashcards = useCallback(async () => {
     if (isOwnUser && appUser?.studentRole === 'student') {
@@ -167,8 +177,8 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   );
 
   const deleteMyStudentFlashcardsMutation = useMutation({
-    mutationFn: (studentExampleIds: number[]) => {
-      const promise = deleteMyStudentFlashcards({ studentExampleIds });
+    mutationFn: (flashcardIds: number[]) => {
+      const promise = deleteMyStudentFlashcards({ flashcardIds });
       toast.promise(promise, {
         pending: 'Deleting flashcards...',
         success: 'Flashcards deleted',
@@ -177,7 +187,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       return promise;
     },
     onSuccess: (result, _variables, _context) => {
-      // check result (number of deletes) is same as studentExampleIds.length
+      // check result (number of deletes) is same as flashcardIds.length
       if (result !== _variables.length) {
         queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
         toast.error(
@@ -199,8 +209,12 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   });
 
   const deleteStudentFlashcardsMutation = useMutation({
-    mutationFn: (studentExampleIds: number[]) => {
-      const promise = deleteStudentFlashcards({ studentExampleIds });
+    mutationFn: (flashcardIds: number[]) => {
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => [...oldData, ...flashcardIds],
+      );
+      const promise = deleteStudentFlashcards({ flashcardIds });
       toast.promise(promise, {
         pending: 'Deleting flashcards...',
         success: 'Flashcards deleted',
@@ -209,7 +223,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       return promise;
     },
     onSuccess: (result, _variables, _context) => {
-      // check result (number of deletes) is same as studentExampleIds.length
+      // check result (number of deletes) is same as flashcardIds.length
       if (result !== _variables.length) {
         queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
         toast.error(
@@ -231,25 +245,23 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
 
   const deleteFlashcards = useCallback(
     async (exampleIds: number[]) => {
-      // find studentExampleIds from exampleIds
-      const studentExampleIds = flashcards
+      // find flashcardIds from exampleIds
+      const flashcardIds = flashcards
         ?.filter((flashcard) => exampleIds.includes(flashcard.example.id))
         .map((flashcard) => flashcard.id);
-      if (!studentExampleIds) {
+      if (!flashcardIds) {
         throw new Error('Student example IDs not found');
       }
       if (isOwnUser && appUser?.studentRole === 'student') {
         return await deleteMyStudentFlashcardsMutation.mutateAsync(
-          studentExampleIds,
+          flashcardIds,
         );
       } else if (
         (isAdmin || isCoach) &&
         appUser?.studentRole === 'student' &&
         userId
       ) {
-        return await deleteStudentFlashcardsMutation.mutateAsync(
-          studentExampleIds,
-        );
+        return await deleteStudentFlashcardsMutation.mutateAsync(flashcardIds);
       } else {
         console.error('No access to delete flashcards');
         return Promise.reject(new Error('No access to delete flashcards'));
