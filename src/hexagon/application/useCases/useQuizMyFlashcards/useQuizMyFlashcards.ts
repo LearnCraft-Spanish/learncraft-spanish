@@ -5,8 +5,8 @@ import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTag
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
+import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
-import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
@@ -15,6 +15,10 @@ import { useCallback, useMemo, useState } from 'react';
 export enum MyFlashcardsQuizType {
   Text = 'text',
   Audio = 'audio',
+}
+
+export interface UseQuizMyFlashcardsProps {
+  initialFilterOwnedFlashcards?: boolean;
 }
 
 export interface UseQuizMyFlashcardsReturn {
@@ -40,22 +44,28 @@ export interface UseQuizMyFlashcardsReturn {
   error: Error | null;
 }
 
-export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
+export function useQuizMyFlashcards(
+  props: UseQuizMyFlashcardsProps = {},
+): UseQuizMyFlashcardsReturn {
+  const { initialFilterOwnedFlashcards = false } = props;
+
   // Local state for the quiz ready state
   const [quizReady, setQuizReady] = useState(false);
   // Local state for the quiz type
   const [quizType, setQuizType] = useState<MyFlashcardsQuizType>(
     MyFlashcardsQuizType.Text,
   );
+  // Local state for filtering owned flashcards
+  const [filterOwnedFlashcards, setFilterOwnedFlashcards] = useState(
+    initialFilterOwnedFlashcards,
+  );
 
-  // To get the filtered owned flashcards
+  // To get the filtered owned flashcards - create local version
   const {
     filteredFlashcards,
-    setFilterOwnedFlashcards,
-    filterOwnedFlashcards,
     isLoading: filteredFlashcardsLoading,
     error: filteredFlashcardsError,
-  } = useFilteredOwnedFlashcards();
+  } = useFilterOwnedFlashcards(filterOwnedFlashcards);
 
   const exampleFilter: UseCombinedFiltersWithVocabularyReturnType =
     useCombinedFiltersWithVocabulary();

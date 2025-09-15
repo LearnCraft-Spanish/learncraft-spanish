@@ -57,7 +57,7 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
 
   const goToQuiz = () => {
     onGoingToQuiz();
-    navigate('/myflashcards');
+    navigate('/myflashcards?enableFiltering=true');
   };
 
   const findMore = () => {
@@ -176,7 +176,7 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
                   <p>Find More Matching Flashcards</p>
                 </button>
                 <button type="button" onClick={goToQuiz}>
-                  <p>Create a quiz from these flashcards</p>
+                  <p>Quiz my Flashcards matching these filters</p>
                 </button>
               </div>
             )}
