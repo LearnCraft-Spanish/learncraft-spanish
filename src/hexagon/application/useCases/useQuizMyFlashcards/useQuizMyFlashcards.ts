@@ -4,13 +4,15 @@ import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup'
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { useStudentFlashcards } from '../../units/useStudentFlashcards';
 
 export enum MyFlashcardsQuizType {
   Text = 'text',
@@ -49,6 +51,10 @@ export function useQuizMyFlashcards(
 ): UseQuizMyFlashcardsReturn {
   const { initialFilterOwnedFlashcards = false } = props;
 
+  // Static snapshots of examples taken when quiz starts to prevent live updates from affecting active quiz
+  const staticTextExamples = useRef<ExampleWithVocabulary[]>([]);
+  const staticAudioExamples = useRef<ExampleWithVocabulary[]>([]);
+
   // Local state for the quiz ready state
   const [quizReady, setQuizReady] = useState(false);
   // Local state for the quiz type
@@ -59,6 +65,9 @@ export function useQuizMyFlashcards(
   const [filterOwnedFlashcards, setFilterOwnedFlashcards] = useState(
     initialFilterOwnedFlashcards,
   );
+
+  const { isLoading: studentFlashcardsLoading, error: studentFlashcardsError } =
+    useStudentFlashcards();
 
   // To get the filtered owned flashcards - create local version
   const {
@@ -104,8 +113,10 @@ export function useQuizMyFlashcards(
   const { isLoading: textQuizLoading, error: textQuizError } = textQuizSetup;
 
   // Combine the loading and error states (audio would be redundant, purely derived)
-  const isLoading = filteredFlashcardsLoading || textQuizLoading;
-  const error = filteredFlashcardsError || textQuizError;
+  const isLoading =
+    filteredFlashcardsLoading || textQuizLoading || studentFlashcardsLoading;
+  const error =
+    filteredFlashcardsError || textQuizError || studentFlashcardsError;
 
   // To warn user if they try to quiz without flashcards
   const noFlashcards =
