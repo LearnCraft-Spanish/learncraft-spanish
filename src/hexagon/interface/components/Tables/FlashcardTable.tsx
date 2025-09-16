@@ -28,13 +28,14 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
     removeFromSelectedIds,
     selectAllOnPage,
     clearSelection,
-    deleteSingleFlashcard,
+    deleteFlashcard,
     deleteSelectedFlashcards,
-    deleteInProgress,
     onGoingToQuiz,
     isLoading,
     error,
     lessonPopup,
+    isSomethingPending,
+    isRemovingFlashcard,
   } = useFlashcardTable(props);
 
   const [isTableOptionsOpen, setIsTableOptionsOpen] = useState(false);
@@ -88,7 +89,7 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
                 className="bulkRemoveFlashcardsButton"
                 type="button"
                 onClick={deleteSelectedFlashcards}
-                disabled={deleteInProgress}
+                disabled={isSomethingPending}
               >
                 {selectedIds.length > 0
                   ? `Remove ${selectedIds.length} Flashcard${
@@ -196,15 +197,16 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
               key={flashcard.example.id}
               flashcard={flashcard}
               isCollected={true}
-              isPending={deleteInProgress && isSelected(flashcard.example.id)}
+              isAdding={false}
+              isRemoving={isRemovingFlashcard(flashcard.example.id)}
               // Not handling add as they will never appear unowned
-              handleSingleAdd={async () => {}}
+              handleAdd={async () => {}}
+              handleRemove={async () => {
+                deleteFlashcard(flashcard.example.id);
+                removeFromSelectedIds(flashcard.example.id);
+              }}
               handleSelect={() => {
                 addToSelectedIds(flashcard.example.id);
-              }}
-              handleRemove={async () => {
-                deleteSingleFlashcard(flashcard.example.id);
-                removeFromSelectedIds(flashcard.example.id);
               }}
               handleDeselect={() => {
                 removeFromSelectedIds(flashcard.example.id);

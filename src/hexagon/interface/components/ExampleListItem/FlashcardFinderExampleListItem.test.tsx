@@ -10,7 +10,9 @@ const f = createMockFlashcard();
 const mockProps = {
   example: f,
   isCollected: false,
-  handleSingleAdd: vi.fn(),
+  isAdding: false,
+  isRemoving: false,
+  handleAdd: vi.fn(),
   handleRemove: vi.fn(),
   lessonPopup: {
     lessonsByVocabulary: [],

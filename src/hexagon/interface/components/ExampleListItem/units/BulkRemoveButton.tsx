@@ -6,7 +6,8 @@ export default function BulkRemoveButton({
   isCollected,
   handleSelect,
   isSelected,
-  isPending,
+  isAdding,
+  isRemoving,
   handleDeselect,
 }: {
   id: number;
@@ -14,7 +15,8 @@ export default function BulkRemoveButton({
   handleSelect: () => void;
   handleDeselect: () => void;
   isSelected: boolean;
-  isPending: boolean;
+  isAdding: boolean;
+  isRemoving: boolean;
 }) {
   interface ButtonParams {
     text: string;
@@ -23,13 +25,13 @@ export default function BulkRemoveButton({
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
-    if (isPending && isCollected) {
+    if (isRemoving) {
       return {
         text: 'Removing...',
         className: 'pendingButton',
         onClickFunction: () => {},
       };
-    } else if (isPending && !isCollected) {
+    } else if (isAdding) {
       return {
         text: 'Adding...',
         className: 'pendingButton',
@@ -59,7 +61,14 @@ export default function BulkRemoveButton({
       className: 'unknownButton',
       onClickFunction: () => {},
     };
-  }, [isCollected, isSelected, isPending, handleSelect, handleDeselect]);
+  }, [
+    isCollected,
+    isSelected,
+    handleSelect,
+    handleDeselect,
+    isAdding,
+    isRemoving,
+  ]);
 
   return (
     <button

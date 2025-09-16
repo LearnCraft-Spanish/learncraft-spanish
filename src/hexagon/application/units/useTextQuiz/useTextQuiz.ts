@@ -17,6 +17,9 @@ export interface UseTextQuizProps {
 }
 
 export interface AddPendingRemoveProps {
+  isAdding: boolean;
+  isRemoving: boolean;
+  isCollected: boolean;
   addFlashcard: () => void;
   removeFlashcard: () => void;
 }
@@ -47,7 +50,9 @@ export function useTextQuiz({
     createFlashcards,
     deleteFlashcards,
     isCustomFlashcard,
-    isPendingFlashcard,
+    isAddingFlashcard,
+    isRemovingFlashcard,
+    isFlashcardCollected,
   } = useStudentFlashcards();
   const vocabInfoHook = useVocabInfo;
 
@@ -89,7 +94,7 @@ export function useTextQuiz({
     if (isExampleCollected(currentExample.id)) {
       return;
     }
-    createFlashcards([currentExample.id]);
+    createFlashcards([currentExample]);
   }, [currentExample, isExampleCollected, createFlashcards]);
 
   const removeFlashcard = useCallback(() => {
@@ -165,14 +170,16 @@ export function useTextQuiz({
       answer,
       exampleIsCollected: isExampleCollected(currentExample.id),
       exampleIsCustom: isCustomFlashcard(currentExample.id),
-      exampleIsPending: isPendingFlashcard(currentExample.id),
+      exampleIsAdding: isAddingFlashcard(currentExample.id),
+      exampleIsRemoving: isRemovingFlashcard(currentExample.id),
     };
   }, [
     question,
     answer,
     isExampleCollected,
     isCustomFlashcard,
-    isPendingFlashcard,
+    isAddingFlashcard,
+    isRemovingFlashcard,
     currentExample,
   ]);
 
@@ -180,6 +187,9 @@ export function useTextQuiz({
     examplesAreLoading,
     addPendingRemoveProps: isStudent
       ? {
+          isAdding: isAddingFlashcard(currentExample?.id ?? 0),
+          isRemoving: isRemovingFlashcard(currentExample?.id ?? 0),
+          isCollected: isFlashcardCollected(currentExample?.id ?? 0),
           addFlashcard,
           removeFlashcard,
         }

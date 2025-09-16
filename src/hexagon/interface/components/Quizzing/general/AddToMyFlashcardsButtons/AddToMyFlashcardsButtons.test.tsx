@@ -11,7 +11,8 @@ function renderComponentWithOverrides(
   const defaultProps: AddToMyFlashcardsButtonsProps = {
     exampleIsCollected: false,
     exampleIsCustom: false,
-    exampleIsPending: false,
+    exampleIsAdding: false,
+    exampleIsRemoving: false,
     addFlashcard: () => {},
     removeFlashcard: () => {},
   };
@@ -40,15 +41,25 @@ describe('component AddToMyFlashcardsButtons', () => {
         expect(screen.getByText(/add /i)).toBeInTheDocument();
       });
     });
-    it('when pending: shows "Adding to Flashcards..."', async () => {
+    it('when adding: shows "Adding to Flashcards..."', async () => {
       const incrementExampleFunction = vi.fn();
       renderComponentWithOverrides({
-        exampleIsPending: true,
+        exampleIsAdding: true,
         exampleIsCollected: true,
         addFlashcard: incrementExampleFunction,
       });
 
       expect(screen.getByText(/adding/i)).toBeInTheDocument();
+    });
+    it('when removing: shows "Removing from Flashcards..."', async () => {
+      const incrementExampleFunction = vi.fn();
+      renderComponentWithOverrides({
+        exampleIsRemoving: true,
+        exampleIsCollected: true,
+        addFlashcard: incrementExampleFunction,
+      });
+
+      expect(screen.getByText(/removing/i)).toBeInTheDocument();
     });
     it('when custom: shows "Custom Flashcard"', async () => {
       renderComponentWithOverrides({

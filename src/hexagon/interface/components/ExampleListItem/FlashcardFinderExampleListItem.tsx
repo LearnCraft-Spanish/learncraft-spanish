@@ -16,14 +16,18 @@ import MoreInfoViewExample from './units/MoreInfoViewExample';
 export default function ExampleListItem({
   example,
   isCollected,
-  handleSingleAdd,
+  isAdding,
+  isRemoving,
+  handleAdd,
   handleRemove,
   lessonPopup,
 }: {
   example: Flashcard | ExampleWithVocabulary | null;
   isCollected: boolean;
-  handleSingleAdd: () => Promise<void>;
-  handleRemove: () => Promise<void>;
+  isAdding: boolean;
+  isRemoving: boolean;
+  handleAdd: () => void;
+  handleRemove: () => void;
   lessonPopup: LessonPopup;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
@@ -32,22 +36,6 @@ export default function ExampleListItem({
   const onClickMoreInfo = useCallback(() => {
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
-
-  const [isPending, setIsPending] = useState(false);
-
-  const handleAddWrapper = useCallback(async () => {
-    setIsPending(true);
-    handleSingleAdd().finally(() => {
-      setIsPending(false);
-    });
-  }, [handleSingleAdd]);
-
-  const handleRemoveWrapper = useCallback(async () => {
-    setIsPending(true);
-    handleRemove().finally(() => {
-      setIsPending(false);
-    });
-  }, [handleRemove]);
 
   if (!example) {
     return null;
@@ -77,9 +65,10 @@ export default function ExampleListItem({
           <AddPendingRemove
             id={example.id}
             isCollected={isCollected}
-            isPending={isPending}
-            handleAdd={handleAddWrapper}
-            handleRemove={handleRemoveWrapper}
+            isAdding={isAdding}
+            isRemoving={isRemoving}
+            handleAdd={handleAdd}
+            handleRemove={handleRemove}
             key="addPendingRemove"
           />,
         ]}

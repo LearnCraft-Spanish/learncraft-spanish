@@ -2,6 +2,7 @@ import { ActiveStudentProvider } from '@application/coordinators/providers/Activ
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
+import TempIdContextProvider from './TempIdContextProvider';
 
 export default function MainProvider({
   children,
@@ -9,14 +10,16 @@ export default function MainProvider({
   children: React.ReactNode;
 }) {
   return (
-    <ActiveStudentProvider>
-      <SelectedCourseAndLessonsProvider>
-        <AudioEngineProvider>
-          <ExampleFilterContextProvider>
-            {children}
-          </ExampleFilterContextProvider>
-        </AudioEngineProvider>
-      </SelectedCourseAndLessonsProvider>
-    </ActiveStudentProvider>
+    <TempIdContextProvider>
+      <ActiveStudentProvider>
+        <SelectedCourseAndLessonsProvider>
+          <AudioEngineProvider>
+            <ExampleFilterContextProvider>
+              {children}
+            </ExampleFilterContextProvider>
+          </AudioEngineProvider>
+        </SelectedCourseAndLessonsProvider>
+      </ActiveStudentProvider>
+    </TempIdContextProvider>
   );
 }

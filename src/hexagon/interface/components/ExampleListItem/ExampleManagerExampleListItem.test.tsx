@@ -9,13 +9,14 @@ const f = createMockFlashcard();
 const mockProps = {
   flashcard: f,
   isCollected: false,
-  isPending: false,
+  isAdding: false,
+  isRemoving: false,
   handleSelect: vi.fn(),
   handleDeselect: vi.fn(),
   handleRemove: vi.fn(),
   bulkSelectMode: false,
   isSelected: false,
-  handleSingleAdd: vi.fn(),
+  handleAdd: vi.fn(),
   lessonPopup: {
     lessonsByVocabulary: [],
     lessonsLoading: false,

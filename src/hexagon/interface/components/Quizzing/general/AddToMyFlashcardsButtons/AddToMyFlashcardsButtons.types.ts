@@ -1,7 +1,8 @@
 export interface AddToMyFlashcardsButtonsProps {
   exampleIsCollected: boolean;
   exampleIsCustom: boolean;
-  exampleIsPending: boolean;
+  exampleIsAdding: boolean;
+  exampleIsRemoving: boolean;
   addFlashcard: () => void;
   removeFlashcard: () => void;
 }

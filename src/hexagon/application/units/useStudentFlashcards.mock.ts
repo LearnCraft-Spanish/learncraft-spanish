@@ -24,6 +24,8 @@ const defaultMockUseStudentFlashcards: UseStudentFlashcardsReturn = {
   },
   isFlashcardCollected: () => false,
   isExampleCollected: () => false,
+  isAddingFlashcard: () => false,
+  isRemovingFlashcard: () => false,
   isCustomFlashcard: () => false,
   isPendingFlashcard: () => false,
 
