@@ -46,12 +46,12 @@ function resolveTargetRef(preferred) {
   } catch {}
 
   // Other common names
-  candidates.push(
-    'origin/development',
-    'development',
-    'origin/master',
-    'master',
-  );
+  // candidates.push(
+  //   'origin/development',
+  //   'development',
+  //   'origin/master',
+  //   'master',
+  // );
 
   for (const ref of candidates) {
     try {
@@ -329,61 +329,157 @@ export function analyzeCommitToProductionTime(
 }
 
 /**
- * Main function to run the analysis and output results
+ * Get the current date (today)
+ * @returns {Date} - Current date object
+ */
+function getCurrentDate() {
+  const now = new Date();
+  // Set to end of day
+  now.setHours(23, 59, 59, 999);
+  return now;
+}
+
+/**
+ * Get the date for N days before a specific date in ISO format
+ * @param {Date} endDate - The end date to count back from
+ * @param {number} daysBack - Number of days to go back
+ * @returns {string} - ISO date string
+ */
+function getSinceIsoDateFromEnd(endDate, daysBack = DAYS_DEFAULT) {
+  const since = new Date(endDate.getTime() - daysBack * 24 * 60 * 60 * 1000);
+  return since.toISOString();
+}
+
+/**
+ * Modified git log function that takes an end date
+ * @param {string} sinceIso - ISO date string for since parameter
+ * @param {string} untilIso - ISO date string for until parameter
+ * @param {string} ref - Git reference (branch)
+ * @returns {object} - Git log output and used reference
+ */
+function runGitLogWithDateRange(sinceIso, untilIso, ref) {
+  // Use %x7C to render literal '|' to avoid shell piping
+  const pretty = '%H%x7C%cI%x7C%s';
+  const cmd = `git log --no-color --first-parent ${ref} --since='${sinceIso}' --until='${untilIso}' --pretty=format:${pretty}`;
+  const output = execSync(cmd, { encoding: 'utf8' });
+  return { output, usedRef: ref };
+}
+
+/**
+ * Analyze commit-to-production time for a specific date range
+ * @param {Date} endDate - The end date for the analysis period
+ * @param {number} days - Number of days to analyze before the end date
+ * @param {string} branch - Target branch (default auto-detected)
+ * @returns {object} - Analysis results
+ */
+function analyzeCommitToProductionTimeForPeriod(
+  endDate,
+  days = DAYS_DEFAULT,
+  branch = null,
+) {
+  const sinceIso = getSinceIsoDateFromEnd(endDate, days);
+  const untilIso = endDate.toISOString();
+  const ref = resolveTargetRef(branch);
+  const { output } = runGitLogWithDateRange(sinceIso, untilIso, ref);
+  const prs = parsePrsFromGitLog(output);
+
+  if (prs.length === 0) {
+    return {
+      totalPRs: 0,
+      totalCommits: 0,
+      averageLeadTimeHours: 0,
+      medianLeadTimeHours: 0,
+      minLeadTimeHours: 0,
+      maxLeadTimeHours: 0,
+      prDetails: [],
+      analysisDate: endDate.toISOString(),
+      analysisPeriodDays: days,
+      targetBranch: ref,
+      periodStart: sinceIso,
+      periodEnd: untilIso,
+    };
+  }
+
+  const { commitLeadTimes, prDetails } = calculateCommitToProductionTimes(prs);
+
+  if (commitLeadTimes.length === 0) {
+    return {
+      totalPRs: prs.length,
+      totalCommits: 0,
+      averageLeadTimeHours: 0,
+      medianLeadTimeHours: 0,
+      minLeadTimeHours: 0,
+      maxLeadTimeHours: 0,
+      prDetails: [],
+      analysisDate: endDate.toISOString(),
+      analysisPeriodDays: days,
+      targetBranch: ref,
+      periodStart: sinceIso,
+      periodEnd: untilIso,
+    };
+  }
+
+  // Calculate statistics
+  const averageLeadTimeHours =
+    commitLeadTimes.reduce((sum, time) => sum + time, 0) /
+    commitLeadTimes.length;
+
+  // Calculate median
+  const sortedTimes = [...commitLeadTimes].sort((a, b) => a - b);
+  const medianLeadTimeHours =
+    sortedTimes.length % 2 === 0
+      ? (sortedTimes[sortedTimes.length / 2 - 1] +
+          sortedTimes[sortedTimes.length / 2]) /
+        2
+      : sortedTimes[Math.floor(sortedTimes.length / 2)];
+
+  const minLeadTimeHours = Math.min(...commitLeadTimes);
+  const maxLeadTimeHours = Math.max(...commitLeadTimes);
+
+  return {
+    totalPRs: prDetails.length,
+    totalCommits: commitLeadTimes.length,
+    averageLeadTimeHours,
+    medianLeadTimeHours,
+    minLeadTimeHours,
+    maxLeadTimeHours,
+    prDetails,
+    analysisDate: endDate.toISOString(),
+    analysisPeriodDays: days,
+    targetBranch: ref,
+    periodStart: sinceIso,
+    periodEnd: untilIso,
+  };
+}
+
+/**
+ * Main function to get this week's lead time
  */
 function main() {
-  const daysArg = process.argv.find((arg) => arg.startsWith('--days='));
-  const branchArg = process.argv.find((arg) => arg.startsWith('--branch='));
-  const days = daysArg
-    ? Number.parseInt(daysArg.split('=')[1], 10)
-    : DAYS_DEFAULT;
-  const preferredBranch = branchArg
-    ? branchArg.split('=')[1]
-    : process.env.GIT_TARGET_BRANCH;
-
   console.error('📊 Analyzing commit-to-production lead time...\n');
 
-  const results = analyzeCommitToProductionTime(
-    Number.isFinite(days) ? days : DAYS_DEFAULT,
-    preferredBranch,
+  // Get today's date
+  const today = getCurrentDate();
+
+  // Analyze with 30-day rolling window ending today
+  const results = analyzeCommitToProductionTimeForPeriod(
+    today,
+    DAYS_DEFAULT,
+    null,
   );
 
+  const todayDate = today.toISOString().split('T')[0];
   console.error(
-    `Analyzing commits merged into ${results.targetBranch} in the past ${results.analysisPeriodDays} days`,
+    `Analysis date ${todayDate}: ${formatDuration(results.averageLeadTimeHours)}`,
   );
   console.error(
-    `Found ${results.totalPRs} PR(s) with ${results.totalCommits} total commits\n`,
-  );
-
-  if (results.totalCommits === 0) {
-    console.error('No commits found in the specified time period.');
-    return;
-  }
-
-  console.error('📈 Commit-to-Production Lead Time Results:');
-  console.error(
-    `   Average lead time: ${formatDuration(results.averageLeadTimeHours)}`,
-  );
-  console.error(
-    `   Median lead time: ${formatDuration(results.medianLeadTimeHours)}`,
-  );
-  console.error(
-    `   Min lead time: ${formatDuration(results.minLeadTimeHours)}`,
-  );
-  console.error(
-    `   Max lead time: ${formatDuration(results.maxLeadTimeHours)}`,
+    `(${results.totalCommits} commits from ${results.totalPRs} PRs in ${DAYS_DEFAULT}-day window)`,
   );
 
-  if (results.prDetails.length > 0) {
-    console.error(`\n📋 PR Details:`);
-    results.prDetails.forEach((pr) => {
-      const date = new Date(pr.mergedAt).toISOString().split('T')[0];
-      console.error(
-        `   PR #${pr.prNumber} (${date}): ${pr.commitCount} commits, ${formatDuration(pr.avgLeadTimeHours)} avg`,
-      );
-      console.error(`      → ${pr.subject}`);
-    });
-  }
+  // Output the raw average lead time in hours
+  console.error(
+    `\nAverage lead time: ${results.averageLeadTimeHours.toFixed(2)} hours`,
+  );
 }
 
 // Run if this is the main module

@@ -995,7 +995,7 @@ i {
 .div-header {
   display: flex;
   justify-content: space-between;
-  padding: calc(5px + 1.5%) 5%;
+  padding: calc(5px + 0.75%) 2.5%;
   background-color: var(--theme);
   color: var(--light);
   margin: 0;
