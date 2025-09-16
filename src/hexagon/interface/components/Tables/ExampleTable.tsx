@@ -24,7 +24,6 @@ interface ExamplesTableProps {
   firstPageLoading: boolean;
   newPageLoading: boolean;
   lessonPopup: LessonPopup;
-  manageThese: () => void;
 }
 
 export default function ExamplesTable({
@@ -35,7 +34,6 @@ export default function ExamplesTable({
   firstPageLoading,
   newPageLoading,
   lessonPopup,
-  manageThese,
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
   const navigate = useNavigate();
@@ -127,7 +125,12 @@ export default function ExamplesTable({
                     })`}
                   </p>
                 </button>
-                <button type="button" onClick={manageThese}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate('/manage-flashcards?enableFiltering=true');
+                  }}
+                >
                   <p>Use these filters on my flashcards</p>
                 </button>
                 <button

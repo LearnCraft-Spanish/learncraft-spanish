@@ -5,13 +5,12 @@ import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import type { UseSkillTagSearchReturnType } from '../../units/useSkillTagSearch';
-import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
 import { useExampleQuery } from '@application/queries/useExampleQuery';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useSkillTagSearch } from '../../units/useSkillTagSearch';
 
 export interface UseFlashcardFinderReturnType {
@@ -23,12 +22,10 @@ export interface UseFlashcardFinderReturnType {
   totalPages: number | null;
   lessonPopup: LessonPopup;
   skillTagSearch: UseSkillTagSearchReturnType;
-  onManageThese: () => void;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
   const { lessonPopup } = useLessonPopup();
-  const { setFilterOwnedFlashcards } = useFilterOwnedFlashcards();
 
   const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
@@ -77,10 +74,6 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
-  const onManageThese = useCallback(() => {
-    setFilterOwnedFlashcards(true);
-  }, [setFilterOwnedFlashcards]);
-
   return {
     pagination,
     exampleFilter,
@@ -90,6 +83,5 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     totalPages,
     lessonPopup,
     skillTagSearch,
-    onManageThese,
   };
 }

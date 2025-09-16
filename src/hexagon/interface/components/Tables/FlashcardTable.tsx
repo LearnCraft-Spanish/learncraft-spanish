@@ -31,6 +31,7 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
     deleteSingleFlashcard,
     deleteSelectedFlashcards,
     deleteInProgress,
+    onGoingToQuiz,
     isLoading,
     error,
     lessonPopup,
@@ -53,6 +54,15 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
     ); // slight delay
   };
   const navigate = useNavigate();
+
+  const goToQuiz = () => {
+    onGoingToQuiz();
+    navigate('/myflashcards?enableFiltering=true');
+  };
+
+  const findMore = () => {
+    navigate('/flashcardfinder');
+  };
 
   if (isLoading) {
     return <InlineLoading message="Loading Flashcards" />;
@@ -162,16 +172,11 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
                   </p>
                 </button>
                 <DeleteAllOwnedSpanglish />
-                <button type="button" onClick={() => {}}>
+                <button type="button" onClick={findMore}>
                   <p>Find More Matching Flashcards</p>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigate('/customquiz');
-                  }}
-                >
-                  <p>Create a quiz from these flashcards</p>
+                <button type="button" onClick={goToQuiz}>
+                  <p>Quiz my Flashcards matching these filters</p>
                 </button>
               </div>
             )}

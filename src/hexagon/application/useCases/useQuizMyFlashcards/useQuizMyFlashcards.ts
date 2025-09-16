@@ -1,21 +1,24 @@
+import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import type { UseCombinedFiltersWithVocabularyReturnType } from '../../units/Filtering/useCombinedFiltersWithVocabulary';
-import type { UseSkillTagSearchReturnType } from '../../units/useSkillTagSearch';
+import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
+import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
-import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
+import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useCombinedFiltersWithVocabulary } from '../../units/Filtering/useCombinedFiltersWithVocabulary';
-import { useSkillTagSearch } from '../../units/useSkillTagSearch';
+import { useCallback, useMemo, useState } from 'react';
 
 export enum MyFlashcardsQuizType {
   Text = 'text',
   Audio = 'audio',
+}
+
+export interface UseQuizMyFlashcardsProps {
+  initialFilterOwnedFlashcards?: boolean;
 }
 
 export interface UseQuizMyFlashcardsReturn {
@@ -41,26 +44,28 @@ export interface UseQuizMyFlashcardsReturn {
   error: Error | null;
 }
 
-export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
+export function useQuizMyFlashcards(
+  props: UseQuizMyFlashcardsProps = {},
+): UseQuizMyFlashcardsReturn {
+  const { initialFilterOwnedFlashcards = false } = props;
+
   // Local state for the quiz ready state
   const [quizReady, setQuizReady] = useState(false);
   // Local state for the quiz type
   const [quizType, setQuizType] = useState<MyFlashcardsQuizType>(
     MyFlashcardsQuizType.Text,
   );
+  // Local state for filtering owned flashcards
+  const [filterOwnedFlashcards, setFilterOwnedFlashcards] = useState(
+    initialFilterOwnedFlashcards,
+  );
 
-  // Static snapshots of examples taken when quiz starts to prevent live updates from affecting active quiz
-  const staticTextExamples = useRef<ExampleWithVocabulary[]>([]);
-  const staticAudioExamples = useRef<ExampleWithVocabulary[]>([]);
-
-  // To get the filtered owned flashcards
+  // To get the filtered owned flashcards - create local version
   const {
     filteredFlashcards,
-    setFilterOwnedFlashcards,
-    filterOwnedFlashcards,
     isLoading: filteredFlashcardsLoading,
     error: filteredFlashcardsError,
-  } = useFilteredOwnedFlashcards();
+  } = useFilterOwnedFlashcards(filterOwnedFlashcards);
 
   const exampleFilter: UseCombinedFiltersWithVocabularyReturnType =
     useCombinedFiltersWithVocabulary();
@@ -203,14 +208,6 @@ export function useQuizMyFlashcards(): UseQuizMyFlashcardsReturn {
   };
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
-
-  // Always reset to false on exit
-  useEffect(() => {
-    return () => {
-      setFilterOwnedFlashcards(false);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Return the hooks, props, and local state
   return {

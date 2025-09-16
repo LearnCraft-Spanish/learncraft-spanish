@@ -9,6 +9,7 @@ export interface UseFlashcardTableProps {
   allFlashcards: Flashcard[];
   displayFlashcards: Flashcard[];
   paginationState: PaginationState;
+  onGoingToQuiz: () => void;
   isLoading: boolean;
   error: Error | null;
 }
@@ -17,6 +18,7 @@ export interface UseFlashcardTableReturn {
   allFlashcards: Flashcard[];
   displayFlashcards: Flashcard[];
   paginationState: PaginationState;
+  onGoingToQuiz: () => void;
   isLoading: boolean;
   error: Error | null;
   selectedIds: number[];
@@ -35,6 +37,7 @@ export function useFlashcardTable({
   allFlashcards,
   displayFlashcards,
   paginationState,
+  onGoingToQuiz,
   isLoading,
   error,
 }: UseFlashcardTableProps): UseFlashcardTableReturn {
@@ -90,6 +93,7 @@ export function useFlashcardTable({
     allFlashcards, // Returned only for the full-table writeToClipboard
     displayFlashcards,
     paginationState,
+    onGoingToQuiz,
     isLoading,
     error,
     selectedIds,
