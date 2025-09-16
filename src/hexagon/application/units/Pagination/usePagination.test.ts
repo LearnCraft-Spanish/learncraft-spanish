@@ -14,7 +14,7 @@ describe('usePagination', () => {
     expect(result.current.maxPageNumber).toBe(3);
     expect(result.current.pageSize).toBe(5);
     expect(result.current.startIndex).toBe(0);
-    expect(result.current.endIndex).toBe(4);
+    expect(result.current.endIndex).toBe(5);
     expect(result.current.nextPage).toBeDefined();
     expect(result.current.previousPage).toBeDefined();
   });

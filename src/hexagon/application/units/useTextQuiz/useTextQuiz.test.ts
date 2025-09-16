@@ -1,3 +1,4 @@
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import { act, renderHook } from '@testing-library/react';
@@ -7,7 +8,8 @@ import { useTextQuiz } from './useTextQuiz';
 
 describe('useTextQuiz', () => {
   const mockCleanupFunction = vi.fn();
-  const mockExamples = createMockExampleWithVocabularyList()(3);
+  const mockExamples: ExampleWithVocabulary[] =
+    createMockExampleWithVocabularyList()(3);
 
   beforeEach(() => {
     mockCleanupFunction.mockClear();
@@ -270,7 +272,7 @@ describe('useTextQuiz', () => {
         result.current.addPendingRemoveProps!.addFlashcard();
       });
 
-      expect(mockCreateFlashcards).toHaveBeenCalledWith([mockExamples[0].id]);
+      expect(mockCreateFlashcards).toHaveBeenCalledWith([mockExamples[0]]);
     });
 
     it('should call deleteFlashcards when removing flashcard', () => {
@@ -384,11 +386,11 @@ describe('useTextQuiz', () => {
       expect(result.current.quizExample!.exampleIsCustom).toBe(true);
     });
 
-    it('should correctly identify pending flashcards', () => {
-      const mockIsPendingFlashcard = vi.fn().mockReturnValue(true);
+    it('should correctly identify adding flashcards', () => {
+      const mockIsAddingFlashcard = vi.fn().mockReturnValue(true);
 
       overrideMockUseStudentFlashcards({
-        isPendingFlashcard: mockIsPendingFlashcard,
+        isAddingFlashcard: mockIsAddingFlashcard,
       });
 
       const { result } = renderHook(() =>
@@ -400,6 +402,23 @@ describe('useTextQuiz', () => {
       );
 
       expect(result.current.quizExample!.exampleIsAdding).toBe(true);
+    });
+    it('should correctly identify removing flashcards', () => {
+      const mockIsRemovingFlashcard = vi.fn().mockReturnValue(true);
+
+      overrideMockUseStudentFlashcards({
+        isRemovingFlashcard: mockIsRemovingFlashcard,
+      });
+
+      const { result } = renderHook(() =>
+        useTextQuiz({
+          examples: mockExamples,
+          startWithSpanish: false,
+          cleanupFunction: mockCleanupFunction,
+        }),
+      );
+
+      expect(result.current.quizExample!.exampleIsRemoving).toBe(true);
     });
   });
 });

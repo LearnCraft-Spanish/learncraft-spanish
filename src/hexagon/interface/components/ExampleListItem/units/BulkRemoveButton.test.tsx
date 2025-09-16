@@ -51,10 +51,8 @@ describe('component BulkRemoveButton', () => {
     expect(button).toHaveClass('pendingButton');
   });
 
-  it('should render Removing... when pending and collected', () => {
-    render(
-      <BulkRemoveButton {...mockProps} isCollected={true} isAdding={true} />,
-    );
+  it('should render Removing... when removing', () => {
+    render(<BulkRemoveButton {...mockProps} isRemoving={true} />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Removing...');
