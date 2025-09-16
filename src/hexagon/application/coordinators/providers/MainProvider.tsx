@@ -3,6 +3,7 @@ import { ExampleFilterContextProvider } from '@application/coordinators/provider
 import FilterOwnedFlashcardsProvider from '@application/coordinators/providers/FilterOwnedFlashcardsProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
+import TempIdContextProvider from './TempIdContextProvider';
 
 export default function MainProvider({
   children,
@@ -10,16 +11,18 @@ export default function MainProvider({
   children: React.ReactNode;
 }) {
   return (
-    <ActiveStudentProvider>
-      <SelectedCourseAndLessonsProvider>
-        <AudioEngineProvider>
-          <ExampleFilterContextProvider>
-            <FilterOwnedFlashcardsProvider>
-              {children}
-            </FilterOwnedFlashcardsProvider>
-          </ExampleFilterContextProvider>
-        </AudioEngineProvider>
-      </SelectedCourseAndLessonsProvider>
-    </ActiveStudentProvider>
+    <TempIdContextProvider>
+      <ActiveStudentProvider>
+        <SelectedCourseAndLessonsProvider>
+          <AudioEngineProvider>
+            <ExampleFilterContextProvider>
+              <FilterOwnedFlashcardsProvider>
+                {children}
+              </FilterOwnedFlashcardsProvider>
+            </ExampleFilterContextProvider>
+          </AudioEngineProvider>
+        </SelectedCourseAndLessonsProvider>
+      </ActiveStudentProvider>
+    </TempIdContextProvider>
   );
 }

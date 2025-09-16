@@ -6,7 +6,8 @@ import './AddToMyFlashcardsButtons.scss';
 export function AddToMyFlashcardsButtons({
   exampleIsCollected,
   exampleIsCustom,
-  exampleIsPending,
+  exampleIsAdding,
+  exampleIsRemoving,
   addFlashcard,
   removeFlashcard,
 }: AddToMyFlashcardsButtonsProps): React.JSX.Element | undefined {
@@ -23,7 +24,7 @@ export function AddToMyFlashcardsButtons({
       },
     });
   };
-  if (!exampleIsCollected) {
+  if (!exampleIsCollected && !exampleIsAdding && !exampleIsRemoving) {
     // Not Owned Flashcard
     return (
       <button
@@ -37,7 +38,7 @@ export function AddToMyFlashcardsButtons({
         Add to my flashcards
       </button>
     );
-  } else if (exampleIsCollected && !exampleIsPending) {
+  } else if (exampleIsCollected && !exampleIsAdding && !exampleIsRemoving) {
     // Owned Flashcard
     // Will show custom tag if it is a custom flashcard, as well as a remove button
     return (
@@ -67,10 +68,16 @@ export function AddToMyFlashcardsButtons({
         </button>
       </>
     );
-  } else if (exampleIsCollected && exampleIsPending) {
+  } else if (exampleIsAdding) {
     return (
       <button type="button" className="pendingFlashcardButton">
         Adding to Flashcards...
+      </button>
+    );
+  } else if (exampleIsRemoving) {
+    return (
+      <button type="button" className="pendingFlashcardButton">
+        Removing from Flashcards...
       </button>
     );
   } else {

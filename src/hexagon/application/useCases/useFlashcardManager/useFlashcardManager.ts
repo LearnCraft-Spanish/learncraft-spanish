@@ -2,7 +2,7 @@ import type { PaginationState } from '@application/units/Pagination/usePaginatio
 import type { Flashcard } from '@learncraft-spanish/shared';
 import { usePagination } from '@application/units/Pagination/usePagination';
 import { useFilteredOwnedFlashcards } from '@application/units/useFilteredOwnedFlashcards';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export interface UseFlashcardManagerReturn {
   allFlashcards: Flashcard[];

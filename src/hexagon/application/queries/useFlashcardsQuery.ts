@@ -1,12 +1,16 @@
 import type {
+  ExampleWithVocabulary,
   Flashcard,
   UpdateFlashcardIntervalCommand,
 } from '@learncraft-spanish/shared';
+
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useFlashcardAdapter } from '@application/adapters/flashcardAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
-
+import { useTempId } from '@application/coordinators/hooks/useTempId';
 import { queryDefaults } from '@application/utils/queryUtils';
+import { toISODate, toISODateTime } from '@domain/functions/dateUtils';
+
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { toast } from 'react-toastify';
@@ -15,7 +19,8 @@ export interface UseFlashcardsQueryReturnType {
   flashcards: Flashcard[] | undefined;
   isLoading: boolean;
   error: Error | null;
-  createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
+  pendingDeleteExampleIds: number[] | undefined;
+  createFlashcards: (examples: ExampleWithVocabulary[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
   updateFlashcards: (
     updates: UpdateFlashcardIntervalCommand[],
@@ -33,12 +38,27 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     deleteMyStudentFlashcards,
     deleteStudentFlashcards,
   } = useFlashcardAdapter();
+
+  const { getNextTempId } = useTempId();
+
   const { appUser, isOwnUser } = useActiveStudent();
 
   const userId = appUser?.recordId;
   const queryClient = useQueryClient();
 
   const hasAccess = isAdmin || isCoach || isStudent;
+
+  // Pending deletes are registered by exampleId rather than flashcardId.
+  const { data: pendingDeleteExampleIds } = useQuery({
+    queryKey: ['flashcards', 'pendingDeletes', userId],
+    queryFn: () =>
+      queryClient.getQueryData<number[]>([
+        'flashcards',
+        'pendingDeletes',
+        userId,
+      ]) ?? [],
+    ...queryDefaults.entityData,
+  });
 
   const getFlashcards = useCallback(async () => {
     if (isOwnUser && appUser?.studentRole === 'student') {
@@ -69,51 +89,181 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   } = useQuery({
     queryKey: ['flashcards', userId],
     queryFn: () => getFlashcards(),
-    enabled: hasAccess && appUser !== null,
+    enabled: hasAccess && appUser !== null && userId !== undefined,
     ...queryDefaults.entityData,
   });
 
+  const createTempFlashcards = useCallback(
+    (examples: ExampleWithVocabulary[]) => {
+      return examples.map((example) => ({
+        example,
+        id: getNextTempId(), // Negative id for temporary flashcards, decrements
+        custom: false,
+        dateCreated: toISODateTime(),
+        userId: userId!, // In the enabled trait of the query, never undefined
+        interval: 1, // Default interval, same as real flashcards
+        lastReviewed: toISODate(),
+        nextReview: toISODate(),
+      }));
+    },
+    [getNextTempId, userId],
+  );
+
   const createStudentFlashcardsMutation = useMutation({
-    mutationFn: (exampleIds: number[]) => {
+    mutationFn: (examples: ExampleWithVocabulary[]) => {
       if (!userId) {
         throw new Error('User ID is required');
       }
+
+      // Call backend to create flashcards
       const promise = createStudentFlashcards({
         studentId: userId,
-        exampleIds,
+        examples,
       });
-      toast.promise(promise, {
-        pending: 'Creating flashcards...',
-        success: 'Flashcards created',
-        error: 'Failed to create flashcards',
-      });
+
       return promise;
     },
-    onSuccess: (result, _variables, _context) => {
+
+    onMutate: (examples: ExampleWithVocabulary[]) => {
+      // Cancel any in-flight queries to prevent race conditions
+      queryClient.cancelQueries({
+        queryKey: ['flashcards', userId],
+      });
+
+      // Temporary flashcards for optimistic update, uses real example data
+      const tempFlashcards: Flashcard[] = createTempFlashcards(examples);
+
+      // Optimistically update the flashcards cache
       queryClient.setQueryData(
         ['flashcards', userId],
-        (oldData: Flashcard[]) => [...oldData, ...result],
+        (oldData: Flashcard[]) => {
+          if (!oldData) return tempFlashcards;
+          return [...oldData, ...tempFlashcards];
+        },
       );
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+
+      // Return context for rollback
+      return tempFlashcards;
+    },
+
+    onError: (error, _variables, context) => {
+      // In the case of an error, first log the error
+      console.error('Failed to create flashcards', error);
+      // Toast the failure
+      toast.error('Failed to create flashcards');
+      if (!context) return;
+      // Refer to the context (the temporary flashcards) for rollback
+      const tempFlashcards = context;
+      // Map the ids to remove
+      const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
+      // Remove the flashcards with the mapped ids from the cache
+      queryClient.setQueryData(['flashcards', userId], (oldData: Flashcard[]) =>
+        oldData.filter((flashcard) => !idsToRemove.includes(flashcard.id)),
+      );
+    },
+    onSuccess: (result, _variables, context) => {
+      // Refer to the context (the temporary flashcards) for rollback
+      const tempFlashcards = context;
+
+      // Map the ids to remove
+      const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
+
+      // Check the current state of the cache, fallback to empty array if undefined
+      const oldData: Flashcard[] =
+        queryClient.getQueryData(['flashcards', userId]) ?? [];
+
+      // Remove the flashcards with the mapped ids from the cache
+      const filteredData = oldData.filter(
+        (flashcard) => !idsToRemove.includes(flashcard.id),
+      );
+
+      // concatenate the filtered data with the result
+      const newData = [...filteredData, ...result];
+
+      // Add the result to the cache
+      queryClient.setQueryData(['flashcards', userId], () => newData);
+    },
+    onSettled: () => {
+      // regardless of outcome, refetch both relevant queries.
+      // Inside hexagon flashcard query (this query, ensures accurate data)
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+      // Outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
     },
   });
 
   const createMyStudentFlashcardsMutation = useMutation({
-    mutationFn: (exampleIds: number[]) => {
-      const promise = createMyStudentFlashcards({ exampleIds });
-      toast.promise(promise, {
-        pending: 'Creating flashcards...',
-        success: 'Flashcards created',
-        error: 'Failed to create flashcards',
-      });
+    mutationFn: (examples: ExampleWithVocabulary[]) => {
+      // Call backend to create flashcards
+      const promise = createMyStudentFlashcards({ examples });
       return promise;
     },
-    onSuccess: (result, _variables, _context) => {
+    onMutate: (examples: ExampleWithVocabulary[]) => {
+      // Cancel any in-flight queries to prevent race conditions
+      queryClient.cancelQueries({
+        queryKey: ['flashcards', userId],
+      });
+
+      // Temporary flashcards for optimistic update, uses real example data
+      const tempFlashcards: Flashcard[] = createTempFlashcards(examples);
+
+      // Optimistically update the flashcards cache
       queryClient.setQueryData(
         ['flashcards', userId],
-        (oldData: Flashcard[]) => [...oldData, ...result],
+        (oldData: Flashcard[]) => {
+          if (!oldData) return tempFlashcards;
+          return [...oldData, ...tempFlashcards];
+        },
       );
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+
+      // Return context for rollback
+      return tempFlashcards;
+    },
+    onError: (error, _variables, context) => {
+      // In the case of an error, first log the error
+      console.error('Failed to create flashcards', error);
+      // Toast the failure
+      toast.error('Failed to create flashcards');
+      if (!context) return;
+      // Refer to the context (the temporary flashcards) for rollback
+      const tempFlashcards = context;
+      // Map the ids to remove
+      const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
+      // Remove the flashcards with the mapped ids from the cache
+      queryClient.setQueryData(['flashcards', userId], (oldData: Flashcard[]) =>
+        oldData.filter((flashcard) => !idsToRemove.includes(flashcard.id)),
+      );
+    },
+    onSuccess: (result, _variables, context) => {
+      // Refer to the context (the temporary flashcards) for rollback
+      const tempFlashcards = context;
+      // The new flashcards are returned from the backend
+      const newFlashcards = result;
+
+      // Map the ids to remove
+      const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
+
+      // Check the current state of the cache, fallback to empty array if undefined
+      const oldData: Flashcard[] =
+        queryClient.getQueryData(['flashcards', userId]) ?? [];
+
+      // Remove the temporary flashcards from the cache
+      const oldFlashcards = oldData.filter(
+        (flashcard) => !idsToRemove.includes(flashcard.id),
+      );
+
+      // concatenate the filtered data with the result
+      const newData = [...oldFlashcards, ...newFlashcards];
+
+      // Add the result to the cache
+      queryClient.setQueryData(['flashcards', userId], () => newData);
+    },
+    onSettled: () => {
+      // regardless of outcome, refetch both relevant queries.
+      // Inside hexagon flashcard query (this query, ensures accurate data)
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+      // Outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
     },
   });
 
@@ -137,20 +287,25 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
           return oldData.map((fc) => updatedMap.get(fc.id) || fc);
         },
       );
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+    },
+    onSettled: () => {
+      // refetch inside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+      // refetch outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
     },
   });
 
   const createFlashcards = useCallback(
-    (exampleIds: number[]) => {
+    (examples: ExampleWithVocabulary[]) => {
       if (isOwnUser && appUser?.studentRole === 'student') {
-        return createMyStudentFlashcardsMutation.mutateAsync(exampleIds);
+        return createMyStudentFlashcardsMutation.mutateAsync(examples);
       } else if (
         (isAdmin || isCoach) &&
         appUser?.studentRole === 'student' &&
         userId
       ) {
-        return createStudentFlashcardsMutation.mutateAsync(exampleIds);
+        return createStudentFlashcardsMutation.mutateAsync(examples);
       }
       console.error('No access to create flashcards');
       return Promise.reject(new Error('No access to create flashcards'));
@@ -167,89 +322,207 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   );
 
   const deleteMyStudentFlashcardsMutation = useMutation({
-    mutationFn: (studentExampleIds: number[]) => {
-      const promise = deleteMyStudentFlashcards({ studentExampleIds });
-      toast.promise(promise, {
-        pending: 'Deleting flashcards...',
-        success: 'Flashcards deleted',
-        error: 'Failed to delete flashcards',
-      });
+    mutationFn: (flashcardIds: number[]) => {
+      const promise = deleteMyStudentFlashcards({ flashcardIds });
       return promise;
     },
-    onSuccess: (result, _variables, _context) => {
-      // check result (number of deletes) is same as studentExampleIds.length
-      if (result !== _variables.length) {
-        queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
-        toast.error(
-          `Failed to delete flashcards. ${result} of ${_variables.length} flashcards deleted.`,
-        );
-        return false;
-      } else {
-        queryClient.setQueryData(
-          ['flashcards', userId],
-          (oldData: Flashcard[]) =>
-            oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
-        );
+    onMutate: (flashcardIds: number[]) => {
+      queryClient.cancelQueries({
+        queryKey: ['flashcards', userId],
+      });
+      if (!flashcards) {
+        throw new Error('Flashcards not found');
       }
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+      const exampleIds = flashcardIds.map((flashcardId) => {
+        const flashcard = flashcards.find(
+          (flashcard) => flashcard.id === flashcardId,
+        );
+        if (!flashcard) {
+          throw new Error('Flashcard not found');
+        }
+        return flashcard.example.id;
+      });
+      const deletedFlashcards = flashcards.filter((flashcard) =>
+        flashcardIds.includes(flashcard.id),
+      );
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => {
+          if (!oldData) return exampleIds;
+          return [...oldData, ...exampleIds];
+        },
+      );
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[]) => {
+          return oldData.filter(
+            (flashcard) => !flashcardIds.includes(flashcard.id),
+          );
+        },
+      );
+
+      // Return the deleted flashcards for rollback
+      return { exampleIds, deletedFlashcards };
     },
-    onError: (error, _variables, _context) => {
+    onError: (error, _variables, context) => {
+      // Log the error
       console.error('Failed to delete flashcards', error);
+      // Toast the failure
+      toast.error('Failed to delete flashcards');
+      // Refer to the context (the deleted flashcards) for rollback
+      if (!context) return;
+      const { exampleIds, deletedFlashcards } = context;
+      // Remove the exampleIds from the pending deletes
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => oldData.filter((id) => !exampleIds.includes(id)),
+      );
+      // Add the flashcards back to the cache
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[]) => {
+          if (!oldData) return deletedFlashcards;
+          return [...oldData, ...deletedFlashcards];
+        },
+      );
+    },
+    onSuccess: (result, variables, context) => {
+      const { exampleIds } = context;
+      // check result (number of deletes) is same as flashcardIds.length
+      if (result !== variables.length) {
+        // Toast the failure
+        toast.error(
+          `Failed to delete some flashcards. ${result} of ${variables.length} flashcards deleted.`,
+        );
+        // We have no way to restore this state since we only get a number back from the backend.
+        // Rely on invalidation alone, which onSettled will handle.
+      }
+      // Either way, remove the exampleIds from the pending deletes
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => oldData.filter((id) => !exampleIds.includes(id)),
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
     },
   });
 
   const deleteStudentFlashcardsMutation = useMutation({
-    mutationFn: (studentExampleIds: number[]) => {
-      const promise = deleteStudentFlashcards({ studentExampleIds });
-      toast.promise(promise, {
-        pending: 'Deleting flashcards...',
-        success: 'Flashcards deleted',
-        error: 'Failed to delete flashcards',
-      });
+    mutationFn: (flashcardIds: number[]) => {
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => {
+          if (!oldData) return flashcardIds;
+          return [...oldData, ...flashcardIds];
+        },
+      );
+      const promise = deleteStudentFlashcards({ flashcardIds });
       return promise;
     },
-    onSuccess: (result, _variables, _context) => {
-      // check result (number of deletes) is same as studentExampleIds.length
-      if (result !== _variables.length) {
-        queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
-        toast.error(
-          `Failed to delete flashcards. ${result} of ${_variables.length} flashcards deleted.`,
-        );
-      } else {
-        queryClient.setQueryData(
-          ['flashcards', userId],
-          (oldData: Flashcard[]) =>
-            oldData.filter((flashcard) => !_variables.includes(flashcard.id)),
-        );
+    onMutate: (flashcardIds: number[]) => {
+      queryClient.cancelQueries({
+        queryKey: ['flashcards', userId],
+      });
+      if (!flashcards) {
+        throw new Error('Flashcards not found');
       }
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+      const exampleIds = flashcardIds.map((flashcardId) => {
+        const flashcard = flashcards.find(
+          (flashcard) => flashcard.id === flashcardId,
+        );
+        if (!flashcard) {
+          throw new Error('Flashcard not found');
+        }
+        return flashcard.example.id;
+      });
+      const deletedFlashcards = flashcards.filter((flashcard) =>
+        exampleIds.includes(flashcard.example.id),
+      );
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => {
+          if (!oldData) return exampleIds;
+          return [...oldData, ...exampleIds];
+        },
+      );
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[]) => {
+          return oldData.filter(
+            (flashcard) => !flashcardIds.includes(flashcard.id),
+          );
+        },
+      );
+
+      // Return the deleted flashcards for rollback
+      return { exampleIds, deletedFlashcards };
     },
-    onError: (error, _variables, _context) => {
+    onError: (error, _variables, context) => {
+      // Log the error
       console.error('Failed to delete flashcards', error);
+      // Toast the failure
+      toast.error('Failed to delete flashcards');
+      // Refer to the context (the deleted flashcards) for rollback
+      if (!context) return;
+      const { exampleIds, deletedFlashcards } = context;
+      // Remove the exampleIds from the pending deletes
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => oldData.filter((id) => !exampleIds.includes(id)),
+      );
+      // Add the flashcards back to the cache
+      queryClient.setQueryData(
+        ['flashcards', userId],
+        (oldData: Flashcard[]) => {
+          if (!oldData) return deletedFlashcards;
+          return [...oldData, ...deletedFlashcards];
+        },
+      );
+    },
+    onSuccess: (result, variables, context) => {
+      const { exampleIds } = context;
+      // check result (number of deletes) is same as flashcardIds.length
+      if (result !== variables.length) {
+        // Toast the failure
+        toast.error(
+          `Failed to delete some flashcards. ${result} of ${variables.length} flashcards deleted.`,
+        );
+        // We have no way to restore this state since we only get a number back from the backend.
+        // Rely on invalidation alone, which onSettled will handle.
+      }
+      // Either way, remove the exampleIds from the pending deletes
+      queryClient.setQueryData(
+        ['flashcards', 'pendingDeletes', userId],
+        (oldData: number[]) => oldData.filter((id) => !exampleIds.includes(id)),
+      );
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
     },
   });
 
   const deleteFlashcards = useCallback(
     async (exampleIds: number[]) => {
-      // find studentExampleIds from exampleIds
-      const studentExampleIds = flashcards
+      // find flashcardIds from exampleIds
+      const flashcardIds = flashcards
         ?.filter((flashcard) => exampleIds.includes(flashcard.example.id))
         .map((flashcard) => flashcard.id);
-      if (!studentExampleIds) {
+      if (!flashcardIds) {
         throw new Error('Student example IDs not found');
       }
       if (isOwnUser && appUser?.studentRole === 'student') {
         return await deleteMyStudentFlashcardsMutation.mutateAsync(
-          studentExampleIds,
+          flashcardIds,
         );
       } else if (
         (isAdmin || isCoach) &&
         appUser?.studentRole === 'student' &&
         userId
       ) {
-        return await deleteStudentFlashcardsMutation.mutateAsync(
-          studentExampleIds,
-        );
+        return await deleteStudentFlashcardsMutation.mutateAsync(flashcardIds);
       } else {
         console.error('No access to delete flashcards');
         return Promise.reject(new Error('No access to delete flashcards'));
@@ -282,6 +555,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
     flashcards,
     isLoading,
     error,
+    pendingDeleteExampleIds,
     createFlashcards,
     deleteFlashcards,
     updateFlashcards,

@@ -8,7 +8,7 @@ the bones of this component are based on the StudentSearch component, but the li
 */
 import { InlineLoading } from '@interface/components/Loading';
 import { useMemo, useState } from 'react';
-import { toISODate } from 'src/functions/dateUtils';
+import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import useWeeks from 'src/hooks/CoachingData/queries/useWeeks';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
 import getWeekEnds from './functions/getWeekEnds';

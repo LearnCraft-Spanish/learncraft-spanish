@@ -1,5 +1,8 @@
 import type { FlashcardPort } from '@application/ports/flashcardPort';
-import type { UpdateFlashcardIntervalCommand } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  UpdateFlashcardIntervalCommand,
+} from '@learncraft-spanish/shared';
 import {
   createMockFlashcard,
   createMockFlashcardList,
@@ -11,25 +14,28 @@ const defaultMockAdapter: FlashcardPort = {
   getMyFlashcards: () => Promise.resolve(createMockFlashcardList(5)()),
   getStudentFlashcards: (_studentId: number) =>
     Promise.resolve(createMockFlashcardList(5)()),
-  createMyStudentFlashcards: ({ exampleIds }: { exampleIds: number[] }) =>
-    Promise.resolve(exampleIds.map((id) => createMockFlashcard({ id }))),
+  createMyStudentFlashcards: ({
+    examples,
+  }: {
+    examples: ExampleWithVocabulary[];
+  }) =>
+    Promise.resolve(
+      examples.map((example) => createMockFlashcard({ id: example.id })),
+    ),
   createStudentFlashcards: ({
     studentId: _studentId,
-    exampleIds,
+    examples,
   }: {
     studentId: number;
-    exampleIds: number[];
-  }) => Promise.resolve(exampleIds.map((id) => createMockFlashcard({ id }))),
-  deleteMyStudentFlashcards: ({
-    studentExampleIds,
-  }: {
-    studentExampleIds: number[];
-  }) => Promise.resolve(studentExampleIds.length),
-  deleteStudentFlashcards: ({
-    studentExampleIds,
-  }: {
-    studentExampleIds: number[];
-  }) => Promise.resolve(studentExampleIds.length),
+    examples: ExampleWithVocabulary[];
+  }) =>
+    Promise.resolve(
+      examples.map((example) => createMockFlashcard({ id: example.id })),
+    ),
+  deleteMyStudentFlashcards: ({ flashcardIds }: { flashcardIds: number[] }) =>
+    Promise.resolve(flashcardIds.length),
+  deleteStudentFlashcards: ({ flashcardIds }: { flashcardIds: number[] }) =>
+    Promise.resolve(flashcardIds.length),
   updateMyStudentFlashcards: ({
     updates,
   }: {

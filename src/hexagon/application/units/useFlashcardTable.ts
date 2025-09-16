@@ -1,7 +1,7 @@
 import type { Flashcard } from '@learncraft-spanish/shared';
 import type { PaginationState } from './Pagination/usePagination';
 import type { LessonPopup } from './useLessonPopup';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import useLessonPopup from './useLessonPopup';
 import { useStudentFlashcards } from './useStudentFlashcards';
 
@@ -27,10 +27,11 @@ export interface UseFlashcardTableReturn {
   removeFromSelectedIds: (id: number) => void;
   selectAllOnPage: () => void;
   clearSelection: () => void;
-  deleteSingleFlashcard: (id: number) => void;
-  deleteSelectedFlashcards: () => void;
-  deleteInProgress: boolean;
+  deleteFlashcard: (id: number) => Promise<number>;
+  deleteSelectedFlashcards: () => Promise<number>;
+  isSomethingPending: boolean;
   lessonPopup: LessonPopup;
+  isRemovingFlashcard: (id: number) => boolean;
 }
 
 export function useFlashcardTable({
@@ -42,13 +43,18 @@ export function useFlashcardTable({
   error,
 }: UseFlashcardTableProps): UseFlashcardTableReturn {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [deleteInProgress, setDeleteInProgress] = useState(false);
+
+  const safeSelectedIds = useMemo(() => {
+    return selectedIds.filter((id) =>
+      displayFlashcards.some((flashcard) => flashcard.example.id === id),
+    );
+  }, [selectedIds, displayFlashcards]);
 
   const isSelected = useCallback(
     (id: number) => {
-      return selectedIds.includes(id);
+      return safeSelectedIds.includes(id);
     },
-    [selectedIds],
+    [safeSelectedIds],
   );
 
   const addToSelectedIds = useCallback((id: number) => {
@@ -68,23 +74,35 @@ export function useFlashcardTable({
   }, []);
 
   // Student flashcards hook call for delete operations and ownership checks
-  const { deleteFlashcards } = useStudentFlashcards();
+  const { deleteFlashcards, isPendingFlashcard, flashcards } =
+    useStudentFlashcards();
 
-  // Single delete operation
-  const deleteSingleFlashcard = useCallback(
+  // Some add or remove is pending
+  const isSomethingPending = useMemo(() => {
+    return (
+      flashcards?.some((flashcard) =>
+        isPendingFlashcard(flashcard.example.id),
+      ) ?? false
+    );
+  }, [flashcards, isPendingFlashcard]);
+
+  const deleteFlashcard = useCallback(
     (id: number) => {
-      deleteFlashcards([id]);
+      return deleteFlashcards([id]);
     },
     [deleteFlashcards],
   );
 
-  // Bulk delete operation
   const deleteSelectedFlashcards = useCallback(() => {
-    setDeleteInProgress(true);
-    deleteFlashcards(selectedIds).then(() => {
-      setDeleteInProgress(false);
-    });
-  }, [deleteFlashcards, selectedIds]);
+    return deleteFlashcards(safeSelectedIds);
+  }, [deleteFlashcards, safeSelectedIds]);
+
+  const isRemovingFlashcard = useCallback(
+    (id: number) => {
+      return isPendingFlashcard(id);
+    },
+    [isPendingFlashcard],
+  );
 
   // For more info view (does this belong here?)
   const { lessonPopup } = useLessonPopup();
@@ -96,15 +114,16 @@ export function useFlashcardTable({
     onGoingToQuiz,
     isLoading,
     error,
-    selectedIds,
+    selectedIds: safeSelectedIds,
     isSelected,
     addToSelectedIds,
     removeFromSelectedIds,
     selectAllOnPage,
     clearSelection,
-    deleteSingleFlashcard,
+    isSomethingPending,
+    deleteFlashcard,
     deleteSelectedFlashcards,
-    deleteInProgress,
     lessonPopup,
+    isRemovingFlashcard,
   };
 }
