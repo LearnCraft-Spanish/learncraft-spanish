@@ -9,7 +9,7 @@ import { useActiveStudent } from '@application/coordinators/hooks/useActiveStude
 
 import { queryDefaults } from '@application/utils/queryUtils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { toast } from 'react-toastify';
 import {
   toISODate,
@@ -21,7 +21,7 @@ export interface UseFlashcardsQueryReturnType {
   flashcards: Flashcard[] | undefined;
   isLoading: boolean;
   error: Error | null;
-  pendingDeleteExampleIds: number[];
+  pendingDeleteExampleIds: number[] | undefined;
   createFlashcards: (examples: ExampleWithVocabulary[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
   updateFlashcards: (
@@ -51,15 +51,16 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   const hasAccess = isAdmin || isCoach || isStudent;
 
   // Pending deletes are registered by exampleId rather than flashcardId.
-  const pendingDeleteExampleIds: number[] = useMemo(
-    () =>
+  const { data: pendingDeleteExampleIds } = useQuery({
+    queryKey: ['flashcards', 'pendingDeletes', userId],
+    queryFn: () =>
       queryClient.getQueryData<number[]>([
         'flashcards',
         'pendingDeletes',
         userId,
       ]) ?? [],
-    [queryClient, userId],
-  );
+    ...queryDefaults.entityData,
+  });
 
   const getFlashcards = useCallback(async () => {
     if (isOwnUser && appUser?.studentRole === 'student') {
@@ -288,7 +289,12 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
           return oldData.map((fc) => updatedMap.get(fc.id) || fc);
         },
       );
-      queryClient.invalidateQueries({ queryKey: ['flashcardData'] }); // refetch outside hexagon flashcard query
+    },
+    onSettled: () => {
+      // refetch inside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcards', userId] });
+      // refetch outside hexagon flashcard query
+      queryClient.invalidateQueries({ queryKey: ['flashcardData'] });
     },
   });
 
@@ -323,6 +329,9 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       return promise;
     },
     onMutate: (flashcardIds: number[]) => {
+      queryClient.cancelQueries({
+        queryKey: ['flashcards', userId],
+      });
       if (!flashcards) {
         throw new Error('Flashcards not found');
       }
@@ -415,6 +424,9 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       return promise;
     },
     onMutate: (flashcardIds: number[]) => {
+      queryClient.cancelQueries({
+        queryKey: ['flashcards', userId],
+      });
       if (!flashcards) {
         throw new Error('Flashcards not found');
       }

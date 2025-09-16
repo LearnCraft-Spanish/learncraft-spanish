@@ -106,7 +106,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
     (exampleId: number) => {
       // Removing flashcards are registered separately in the query client.
       // They are registered by exampleId rather than flashcardId.
-      return pendingDeleteExampleIds.includes(exampleId);
+      return pendingDeleteExampleIds?.includes(exampleId) ?? false;
     },
     [pendingDeleteExampleIds],
   );
