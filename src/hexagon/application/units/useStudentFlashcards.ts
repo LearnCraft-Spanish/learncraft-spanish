@@ -33,10 +33,12 @@ export interface UseStudentFlashcardsReturn {
   isFlashcardCollected: (flashcardId: number) => boolean;
   isExampleCollected: (exampleId: number) => boolean;
   isCustomFlashcard: (exampleId: number) => boolean;
+  isAddingFlashcard: (exampleId: number) => boolean;
+  isRemovingFlashcard: (exampleId: number) => boolean;
   isPendingFlashcard: (exampleId: number) => boolean;
   isLoading: boolean;
   error: Error | null;
-  createFlashcards: (exampleIds: number[]) => Promise<Flashcard[]>;
+  createFlashcards: (examples: ExampleWithVocabulary[]) => Promise<Flashcard[]>;
   deleteFlashcards: (exampleIds: number[]) => Promise<number>;
   updateFlashcards: (
     updates: UpdateFlashcardIntervalCommand[],
@@ -52,6 +54,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
     flashcards,
     isLoading,
     error,
+    pendingDeleteExampleIds,
     createFlashcards,
     deleteFlashcards,
     updateFlashcards,
@@ -88,7 +91,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   (ex: failed to add flashcard with english text: "hello")
   */
 
-  const isPendingFlashcard = useCallback(
+  const isAddingFlashcard = useCallback(
     (exampleId: number) => {
       return (
         flashcards?.some(
@@ -97,6 +100,25 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
       );
     },
     [flashcards],
+  );
+
+  const isRemovingFlashcard = useCallback(
+    (exampleId: number) => {
+      // Removing flashcards are registered separately in the query client.
+      // They are registered by exampleId rather than flashcardId.
+      return pendingDeleteExampleIds.includes(exampleId);
+    },
+    [pendingDeleteExampleIds],
+  );
+
+  const isPendingFlashcard = useCallback(
+    (exampleId: number) => {
+      // Pending flashcard is either being added or removed
+      const isAdding = isAddingFlashcard(exampleId);
+      const isRemoving = isRemovingFlashcard(exampleId);
+      return isAdding || isRemoving;
+    },
+    [isAddingFlashcard, isRemovingFlashcard],
   );
 
   const isFlashcardCollected = useCallback(
@@ -216,6 +238,8 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
     error,
     isExampleCollected,
     isFlashcardCollected,
+    isAddingFlashcard,
+    isRemovingFlashcard,
     createFlashcards,
     deleteFlashcards,
     updateFlashcards,

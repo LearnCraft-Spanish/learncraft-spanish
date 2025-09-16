@@ -399,7 +399,7 @@ describe('useTextQuiz', () => {
         }),
       );
 
-      expect(result.current.quizExample!.exampleIsPending).toBe(true);
+      expect(result.current.quizExample!.exampleIsAdding).toBe(true);
     });
   });
 });

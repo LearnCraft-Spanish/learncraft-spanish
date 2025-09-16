@@ -3,7 +3,7 @@ import checkmark from 'src/assets/icons/checkmark_green.svg';
 import AssignmentsCell from 'src/components/StudentDrillDown/components/general/AssignmentsCell_Modificed';
 import GroupSessionsCell from 'src/components/StudentDrillDown/components/general/GroupSessionsCell_Modified';
 import PrivateCallsCell from 'src/components/StudentDrillDown/components/general/PrivateCallsCell_Modificed';
-import { toISODate } from 'src/functions/dateUtils';
+import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import useWeeksDrilldownTable from './useWeeksDrilldownTable';
 import 'src/components/Table/Table.scss';
 

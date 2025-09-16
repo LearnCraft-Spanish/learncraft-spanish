@@ -178,11 +178,13 @@ export default function ExamplesTable({
                 key={example.id}
                 example={example}
                 isCollected={studentFlashcards.isExampleCollected(example.id)}
-                handleSingleAdd={async () => {
-                  await studentFlashcards.createFlashcards([example.id]);
+                isAdding={studentFlashcards.isAddingFlashcard(example.id)}
+                isRemoving={studentFlashcards.isRemovingFlashcard(example.id)}
+                handleAdd={() => {
+                  studentFlashcards.createFlashcards([example]);
                 }}
-                handleRemove={async () => {
-                  await studentFlashcards.deleteFlashcards([example.id]);
+                handleRemove={() => {
+                  studentFlashcards.deleteFlashcards([example.id]);
                 }}
                 lessonPopup={lessonPopup}
               />

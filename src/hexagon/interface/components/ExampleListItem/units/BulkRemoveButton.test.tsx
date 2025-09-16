@@ -7,8 +7,9 @@ const mockProps = {
   isCollected: false,
   handleSelect: vi.fn(),
   isSelected: false,
-  isPending: false,
   handleDeselect: vi.fn(),
+  isAdding: false,
+  isRemoving: false,
 };
 
 describe('component BulkRemoveButton', () => {
@@ -43,7 +44,7 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should render Adding... when pending and not collected', () => {
-    render(<BulkRemoveButton {...mockProps} isPending={true} />);
+    render(<BulkRemoveButton {...mockProps} isAdding={true} />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Adding...');
@@ -52,7 +53,7 @@ describe('component BulkRemoveButton', () => {
 
   it('should render Removing... when pending and collected', () => {
     render(
-      <BulkRemoveButton {...mockProps} isCollected={true} isPending={true} />,
+      <BulkRemoveButton {...mockProps} isCollected={true} isAdding={true} />,
     );
 
     const button = screen.getByRole('button');

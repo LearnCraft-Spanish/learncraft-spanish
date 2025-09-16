@@ -25,7 +25,8 @@ export function FlashcardDisplay({
     answer,
     exampleIsCollected,
     exampleIsCustom,
-    exampleIsPending,
+    exampleIsAdding,
+    exampleIsRemoving,
   } = quizExample;
   const audioActive =
     (answerShowing && answer.hasAudio) || (!answerShowing && question.hasAudio);
@@ -63,7 +64,8 @@ export function FlashcardDisplay({
             <AddToMyFlashcardsButtons
               exampleIsCollected={exampleIsCollected}
               exampleIsCustom={exampleIsCustom}
-              exampleIsPending={exampleIsPending}
+              exampleIsAdding={exampleIsAdding}
+              exampleIsRemoving={exampleIsRemoving}
               addFlashcard={addPendingRemoveProps.addFlashcard}
               removeFlashcard={addPendingRemoveProps.removeFlashcard}
             />

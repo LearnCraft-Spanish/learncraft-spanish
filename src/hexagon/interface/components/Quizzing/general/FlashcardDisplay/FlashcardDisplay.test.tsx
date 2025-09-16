@@ -71,7 +71,8 @@ function createQuizExample(
     answer,
     exampleIsCollected: (example as any).isCollected || false,
     exampleIsCustom: false,
-    exampleIsPending: false,
+    exampleIsAdding: false,
+    exampleIsRemoving: false,
   };
 }
 
@@ -82,7 +83,13 @@ function FlashcardSpanishFirst() {
       <FlashcardDisplay
         quizExample={quizExample}
         answerShowing={false}
-        addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+        }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
@@ -97,7 +104,13 @@ function FlashcardEnglishFirst() {
       <FlashcardDisplay
         quizExample={quizExample}
         answerShowing={false}
-        addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+        }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
@@ -112,7 +125,13 @@ function FlashcardSpanishFirstAnswerShowing() {
       <FlashcardDisplay
         quizExample={quizExample}
         answerShowing
-        addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+        }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
@@ -127,7 +146,13 @@ function FlashcardEnglishFirstAnswerShowing() {
       <FlashcardDisplay
         quizExample={quizExample}
         answerShowing
-        addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+        }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
@@ -143,7 +168,13 @@ function FlashcardSpanishFirstNotStudent() {
       <FlashcardDisplay
         quizExample={quizExample}
         answerShowing={false}
-        addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+        }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}
@@ -159,7 +190,13 @@ function FlashcardWithAudio() {
       <FlashcardDisplay
         quizExample={quizExample}
         answerShowing={false}
-        addPendingRemoveProps={{ addFlashcard, removeFlashcard }}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+        }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
         setGetHelpIsOpen={setGetHelpIsOpen}

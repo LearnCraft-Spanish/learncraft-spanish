@@ -13,8 +13,9 @@ import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
 export default function ExampleListItem({
   flashcard,
   isCollected,
-  isPending,
-  handleSingleAdd,
+  isAdding,
+  isRemoving,
+  handleAdd,
   handleRemove,
   handleDeselect,
   handleSelect,
@@ -23,8 +24,9 @@ export default function ExampleListItem({
 }: {
   flashcard: Flashcard | null;
   isCollected: boolean;
-  isPending: boolean;
-  handleSingleAdd: () => Promise<void>;
+  isAdding: boolean;
+  isRemoving: boolean;
+  handleAdd: () => Promise<void>;
   handleRemove: () => Promise<void>;
   handleDeselect: () => void;
   handleSelect: () => void;
@@ -37,29 +39,6 @@ export default function ExampleListItem({
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
 
-  const [pending, setPending] = useState(false);
-
-  const handleAddWrapper = useCallback(async () => {
-    setPending(true);
-    await handleSingleAdd();
-    setPending(false);
-    if (isSelected) {
-      handleDeselect();
-    }
-  }, [handleSingleAdd, isSelected, handleDeselect]);
-
-  const handleRemoveWrapper = useCallback(async () => {
-    setPending(true);
-    handleRemove()
-      .then(() => {
-        if (isSelected) {
-          handleDeselect();
-        }
-      })
-      .finally(() => {
-        setPending(false);
-      });
-  }, [handleRemove, isSelected, handleDeselect]);
   const { openContextual, setContextualRef, contextual } = useContextualMenu();
 
   if (!flashcard) {
@@ -77,7 +56,8 @@ export default function ExampleListItem({
             handleSelect={handleSelect}
             handleDeselect={handleDeselect}
             isSelected={isSelected ?? false}
-            isPending={isPending || pending}
+            isAdding={isAdding}
+            isRemoving={isRemoving}
           />,
         ]}
         example={flashcard.example}
@@ -90,9 +70,10 @@ export default function ExampleListItem({
           <AddPendingRemove
             id={flashcard.example.id}
             isCollected={isCollected}
-            isPending={isPending || pending}
-            handleAdd={handleAddWrapper}
-            handleRemove={handleRemoveWrapper}
+            isAdding={isAdding}
+            isRemoving={isRemoving}
+            handleAdd={handleAdd}
+            handleRemove={handleRemove}
             key="addPendingRemove"
           />,
         ]}

@@ -33,7 +33,8 @@ export const FlashcardForDisplaySchema = z.object({
   answer: AnswerSchema,
   exampleIsCollected: z.boolean(),
   exampleIsCustom: z.boolean(),
-  exampleIsPending: z.boolean(),
+  exampleIsAdding: z.boolean(),
+  exampleIsRemoving: z.boolean(),
 });
 
 export type FlashcardForDisplay = z.infer<typeof FlashcardForDisplaySchema>;

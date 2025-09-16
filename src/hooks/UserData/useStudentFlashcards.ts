@@ -8,8 +8,8 @@ import { useActiveStudent } from '@application/coordinators/hooks/useActiveStude
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { useCallback, useRef } from 'react';
-import { toISODateTime } from 'src/functions/dateUtils';
 import { showErrorToast, showSuccessToast } from 'src/functions/showToast';
+import { toISODateTime } from 'src/hexagon/domain/functions/dateUtils';
 import { useBackend } from 'src/hooks/useBackend';
 
 export function useStudentFlashcards() {
