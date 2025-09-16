@@ -132,25 +132,53 @@ export function useQuizMyFlashcards(
     if (quizNotReady) {
       return;
     }
+
+    // Take static snapshots of current examples when quiz starts
+    if (quizType === MyFlashcardsQuizType.Text) {
+      const shuffledExamples = fisherYatesShuffle([
+        ...textQuizSetup.examplesToQuiz,
+      ]);
+      staticTextExamples.current = shuffledExamples.slice(
+        0,
+        textQuizSetup.quizLength,
+      );
+    } else if (quizType === MyFlashcardsQuizType.Audio) {
+      const shuffledExamples = fisherYatesShuffle([...filteredAudioExamples]);
+      staticAudioExamples.current = shuffledExamples.slice(
+        0,
+        audioQuizSetup.selectedQuizLength,
+      );
+    }
+
     setQuizReady(true);
-  }, [quizNotReady, setQuizReady]);
+  }, [
+    quizNotReady,
+    setQuizReady,
+    quizType,
+    textQuizSetup.examplesToQuiz,
+    textQuizSetup.quizLength,
+    filteredAudioExamples,
+    audioQuizSetup.selectedQuizLength,
+  ]);
 
   const cleanupQuiz = useCallback(() => {
+    // Clear static snapshots when quiz ends
+    staticTextExamples.current = [];
+    staticAudioExamples.current = [];
     setQuizReady(false);
   }, [setQuizReady]);
 
   // Destructure for the text quiz props
-  const {
-    examplesToQuiz: textExamplesToQuizUnfiltered,
-    startWithSpanish,
-    quizLength: textQuizLength,
-  } = textQuizSetup;
+  const { startWithSpanish } = textQuizSetup;
 
-  // Filter and shuffle the text examples to quiz
+  // Use static examples when quiz is ready, otherwise use live data for setup
   const textExamplesToQuiz = useMemo(() => {
-    const shuffledExamples = fisherYatesShuffle(textExamplesToQuizUnfiltered);
-    return shuffledExamples.slice(0, textQuizLength);
-  }, [textExamplesToQuizUnfiltered, textQuizLength]);
+    if (quizReady) {
+      return staticTextExamples.current;
+    }
+    // During setup, still use live data for quiz length calculations
+    return [];
+  }, [quizReady]);
 
   // Return the text quiz props
   const textQuizProps: UseTextQuizProps = {
@@ -160,17 +188,16 @@ export function useQuizMyFlashcards(
   };
 
   // Destructure for the audio quiz props
-  const {
-    audioQuizType,
-    autoplay,
-    selectedQuizLength: audioQuizLength,
-  } = audioQuizSetup;
+  const { audioQuizType, autoplay } = audioQuizSetup;
 
-  // Slice and shuffle the audio examples to quiz
+  // Use static examples when quiz is ready, otherwise use live data for setup
   const audioExamplesToQuiz = useMemo(() => {
-    const shuffledExamples = fisherYatesShuffle(filteredAudioExamples);
-    return shuffledExamples.slice(0, audioQuizLength);
-  }, [filteredAudioExamples, audioQuizLength]);
+    if (quizReady) {
+      return staticAudioExamples.current;
+    }
+    // During setup, still use live data for quiz length calculations
+    return [];
+  }, [quizReady]);
 
   const audioQuizProps: AudioQuizProps = {
     examplesToQuiz: audioExamplesToQuiz,

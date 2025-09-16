@@ -2,6 +2,7 @@ import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import { useAudioQuiz } from '@application/units/useAudioQuiz';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
+import { Loading } from '../../Loading';
 import AudioFlashcard from './AudioFlashcard';
 import AudioQuizButtons from './AudioQuizButtons';
 import 'src/App.css';
@@ -71,6 +72,11 @@ export default function AudioQuiz({
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  // This is a little hacky way to prevent the ui flash on quiz load. may causes side effects.
+  if (currentExampleNumber <= 0 || !currentStepValue?.displayText) {
+    return <Loading message="Setting up Quiz..." />;
+  }
 
   return (
     <div className="quiz">

@@ -8,12 +8,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import Loading from '../../Loading/Loading';
-import {
-  FlashcardDisplay,
-  QuizButtons,
-  QuizProgress,
-  SRSQuizProgress,
-} from '../general';
+import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
 import { SRSButtons } from '../general/SRSButtons';
 
 export interface TextQuizComponentProps {
@@ -102,18 +97,18 @@ export function TextQuiz({
       {!quizLength && <NoDueFlashcards />}
       {!!quizLength && (
         <div className="quiz">
-          {srsQuizProps ? (
+          {/* {srsQuizProps ? (
             <SRSQuizProgress
               quizTitle={quizTitle}
               totalExamplesNumber={quizLength}
             />
-          ) : (
-            <QuizProgress
-              quizTitle={quizTitle}
-              currentExampleNumber={exampleNumber}
-              totalExamplesNumber={quizLength}
-            />
-          )}
+          ) : ( */}
+          <QuizProgress
+            quizTitle={quizTitle}
+            currentExampleNumber={exampleNumber}
+            totalExamplesNumber={quizLength}
+          />
+          {/* )} */}
 
           <FlashcardDisplay
             quizExample={quizExample}

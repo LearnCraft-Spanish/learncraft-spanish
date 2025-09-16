@@ -63,6 +63,7 @@ export function useAudioQuiz({
     currentTime,
     changeCurrentAudio,
     preloadAudio,
+    concatenateAudioWithPadding,
   } = useAudioAdapter();
 
   // Examples that have bad audio and should be skipped
@@ -105,6 +106,10 @@ export function useAudioQuiz({
     AudioQuizStep.Question,
   );
 
+  // Refs to track changes to the current example index and step
+  const previousExampleIndexRef = useRef<number>(-1);
+  const previousStepRef = useRef<AudioQuizStep | null>(null);
+
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
     if (currentExampleIndex + 1 < safeExamples.length - 1) {
@@ -114,6 +119,8 @@ export function useAudioQuiz({
       setSelectedExampleIndex(safeExamples.length - 1);
       setCurrentStep(AudioQuizStep.Question);
     }
+    // Reset the previous step ref to null so progress animation works immediately on new example
+    previousStepRef.current = null;
   }, [currentExampleIndex, setSelectedExampleIndex, safeExamples]);
 
   const previousExample = useCallback(() => {
@@ -124,16 +131,11 @@ export function useAudioQuiz({
       setSelectedExampleIndex(0);
       setCurrentStep(AudioQuizStep.Question);
     }
+    // Reset the previous step ref to null so progress animation works immediately on new example
+    previousStepRef.current = null;
   }, [currentExampleIndex, setSelectedExampleIndex]);
 
-  // Ref to track changes to the current example index
-  const previousExampleIndexRef = useRef<number>(-1);
-
-  // Ref to track changes to the current step
-  const previousStepRef = useRef<AudioQuizStep | null>(null);
-
-  // Ref used for autoplay to mark when the audio has entered the padding
-  const isInPadding = useRef(false);
+  // Note: isInPadding ref removed - no longer needed with concatenated audio
 
   // The current example number (1-indexed for UI purposes)
   // Used only in export for UI, should not be referenced for stateful logic
@@ -150,20 +152,34 @@ export function useAudioQuiz({
     Record<number, SpeakingQuizExample>
   >({});
 
+  // Store concatenated audio URLs, durations, and their cleanup functions for autoplay mode
+  const [concatenatedAudioData, setConcatenatedAudioData] = useState<
+    Record<
+      number,
+      Record<string, { url: string; duration: number; cleanup: () => void }>
+    >
+  >({});
+
   // Resets the quiz to the initial state, called on menu and end of autoplay
   const resetQuiz = useCallback(() => {
     setSelectedExampleIndex(0);
     setCurrentStep(AudioQuizStep.Question);
     previousStepRef.current = null;
-    isInPadding.current = false;
     previousExampleIndexRef.current = -1;
+
+    // Clean up concatenated audio URLs
+    Object.values(concatenatedAudioData).forEach((exampleData) => {
+      Object.values(exampleData).forEach(({ cleanup }) => cleanup());
+    });
+    setConcatenatedAudioData({});
+
     changeCurrentAudio({
       currentTime: 0,
       src: '',
       onEnded: () => {},
       playOnLoad: true,
     });
-  }, [changeCurrentAudio]);
+  }, [changeCurrentAudio, concatenatedAudioData]);
 
   // Steps the quiz forward
   const nextStep = useCallback(() => {
@@ -260,6 +276,78 @@ export function useAudioQuiz({
           englishDuration,
           autoplay,
         );
+
+        // For autoplay mode, create concatenated audio files for steps with padding
+        if (autoplay) {
+          const concatenatedData: Record<
+            string,
+            { url: string; duration: number; cleanup: () => void }
+          > = {};
+
+          try {
+            // Create concatenated audio for steps that have padding
+            const stepsWithPadding = [
+              { key: 'question', step: parsedExample.question },
+              { key: 'hint', step: parsedExample.hint },
+              { key: 'answer', step: parsedExample.answer },
+            ];
+
+            // Process all concatenations in parallel for better performance
+            const concatenationPromises = stepsWithPadding.map(
+              async ({ key, step }) => {
+                if ('padAudioUrl' in step) {
+                  try {
+                    const result = await concatenateAudioWithPadding(
+                      step.audioUrl,
+                      step.padAudioUrl,
+                    );
+                    return {
+                      key,
+                      result: {
+                        url: result.concatenatedAudioUrl,
+                        duration: result.totalDuration,
+                        cleanup: result.cleanup,
+                      },
+                    };
+                  } catch (error) {
+                    console.error(
+                      `Failed to concatenate ${key} audio for example ${example.id}:`,
+                      error,
+                    );
+                    return null;
+                  }
+                }
+                return null;
+              },
+            );
+
+            const concatenationResults = await Promise.all(
+              concatenationPromises,
+            );
+
+            // Store successful concatenations
+            concatenationResults.forEach((result) => {
+              if (result) {
+                concatenatedData[result.key] = result.result;
+              }
+            });
+
+            // Store concatenated audio data
+            setConcatenatedAudioData((prev) => ({
+              ...prev,
+              [example.id]: concatenatedData,
+            }));
+          } catch (error) {
+            console.error(
+              'Failed to create concatenated audio for example',
+              example.id,
+              error,
+            );
+            // Clean up any partial concatenations
+            Object.values(concatenatedData).forEach(({ cleanup }) => cleanup());
+          }
+        }
+
         // Record the parsed example in the map
         if (audioQuizType === AudioQuizType.Speaking) {
           setParsedSpeakingExamples(
@@ -290,9 +378,55 @@ export function useAudioQuiz({
       audioQuizType,
       autoplay,
       preloadAudio,
+      concatenateAudioWithPadding,
       markExampleAsBad,
     ],
   );
+
+  // Enhanced nextExample function with aggressive prefetching for autoplay
+  const nextExampleWithPrefetch = useCallback(() => {
+    // Call the original nextExample logic
+    if (currentExampleIndex + 1 < safeExamples.length - 1) {
+      setSelectedExampleIndex(currentExampleIndex + 1);
+      setCurrentStep(AudioQuizStep.Question);
+    } else {
+      setSelectedExampleIndex(safeExamples.length - 1);
+      setCurrentStep(AudioQuizStep.Question);
+    }
+    // Reset the previous step ref to null so progress animation works immediately on new example
+    previousStepRef.current = null;
+
+    // Trigger aggressive prefetching of upcoming examples when user is actively progressing
+    if (autoplay && !parseInProgress.current) {
+      const nextIndex = currentExampleIndex + 2; // Two examples ahead
+      if (nextIndex < safeExamples.length) {
+        const nextExample = safeExamples[nextIndex];
+        if (
+          nextExample &&
+          ((audioQuizType === AudioQuizType.Speaking &&
+            !parsedSpeakingExamples[nextExample.id]) ||
+            (audioQuizType === AudioQuizType.Listening &&
+              !parsedListeningExamples[nextExample.id]))
+        ) {
+          // Prefetch in the background without blocking
+          setTimeout(() => {
+            if (!parseInProgress.current) {
+              parseAudioExample(nextIndex);
+            }
+          }, 100);
+        }
+      }
+    }
+  }, [
+    currentExampleIndex,
+    setSelectedExampleIndex,
+    safeExamples,
+    autoplay,
+    audioQuizType,
+    parsedSpeakingExamples,
+    parsedListeningExamples,
+    parseAudioExample,
+  ]);
 
   // These references are for the audio-quiz-specific types.
   const currentAudioExample: SpeakingQuizExample | ListeningQuizExample | null =
@@ -395,27 +529,74 @@ export function useAudioQuiz({
     return previousAudioExample !== null;
   }, [previousAudioExample]);
 
+  // Helper function to get the appropriate audio URL and duration (concatenated if available, original if not)
+  const getAudioUrlAndDuration = useCallback(
+    (stepValue: any, stepKey: string, exampleId: number) => {
+      if (autoplay && concatenatedAudioData[exampleId]?.[stepKey]) {
+        const concatenatedData = concatenatedAudioData[exampleId][stepKey];
+        return {
+          audioUrl: concatenatedData.url,
+          duration: concatenatedData.duration,
+        };
+      }
+      return {
+        audioUrl: stepValue.audioUrl,
+        duration: stepValue.duration,
+      };
+    },
+    [autoplay, concatenatedAudioData],
+  );
+
   // Get the values related to the current step
   const currentStepValue = useMemo(() => {
-    if (!currentAudioExample) {
+    if (!currentAudioExample || !currentExampleMemo) {
       return null;
     }
+
+    let stepValue: any;
+    let stepKey: string;
+
     switch (currentStep) {
       case AudioQuizStep.Question:
-        return currentAudioExample.question;
+        stepValue = currentAudioExample.question;
+        stepKey = 'question';
+        break;
       case AudioQuizStep.Guess:
-        return currentAudioExample.guess;
+        stepValue = currentAudioExample.guess;
+        stepKey = 'guess';
+        break;
       case AudioQuizStep.Hint:
-        return currentAudioExample.hint;
+        stepValue = currentAudioExample.hint;
+        stepKey = 'hint';
+        break;
       case AudioQuizStep.Answer:
-        return currentAudioExample.answer;
+        stepValue = currentAudioExample.answer;
+        stepKey = 'answer';
+        break;
       default:
         console.error('Invalid currentStep value: ', currentStep);
         return null;
     }
-  }, [currentStep, currentAudioExample]);
 
-  // Calculates the progress status of the current step, including the padding if autoplay is on
+    // Return step value with potentially updated audio URL and duration
+    const audioData = getAudioUrlAndDuration(
+      stepValue,
+      stepKey,
+      currentExampleMemo.id,
+    );
+    return {
+      ...stepValue,
+      audioUrl: audioData.audioUrl,
+      duration: audioData.duration,
+    };
+  }, [
+    currentStep,
+    currentAudioExample,
+    currentExampleMemo,
+    getAudioUrlAndDuration,
+  ]);
+
+  // Calculates the progress status of the current step - simplified with concatenated audio
   const progressStatus = useMemo(() => {
     if (!autoplay) {
       return 0;
@@ -434,50 +615,19 @@ export function useAudioQuiz({
       return 0;
     }
 
-    // If audio has entered the padding, return the progress status of the padding
-    if ('padAudioDuration' in currentStepValue && isInPadding.current) {
-      const progress =
-        (currentStepValue.duration -
-          currentStepValue.padAudioDuration +
-          currentTime) /
-        currentStepValue.duration;
-      return progress;
-    }
-
-    // Otherwise, return the progress status of the current step
+    // Simple progress calculation - concatenated audio handles padding seamlessly
     const progress = currentTime / currentStepValue.duration;
     return progress;
   }, [currentTime, currentStepValue, autoplay, previousStepRef, currentStep]);
 
-  // If autoplay and padding is needed, play the padding audio
-  const playPaddingAudio = useCallback(() => {
-    if (
-      autoplay &&
-      currentStepValue &&
-      'padAudioDuration' in currentStepValue &&
-      !isInPadding.current
-    ) {
-      isInPadding.current = true;
-      changeCurrentAudio({
-        currentTime: 0,
-        src: currentStepValue.padAudioUrl,
-        onEnded: nextStep,
-        playOnLoad: true,
-      });
-    }
-  }, [autoplay, currentStepValue, changeCurrentAudio, nextStep]);
-
-  // What to do when the audio ends
+  // What to do when the audio ends - simplified since concatenated audio handles padding
   const onEndedCallback = useCallback(() => {
     if (!autoplay) {
       return;
     }
-    if (currentStepValue && 'padAudioDuration' in currentStepValue) {
-      playPaddingAudio();
-    } else {
-      nextStep();
-    }
-  }, [autoplay, currentStepValue, playPaddingAudio, nextStep]);
+    // No need for complex padding logic - concatenated audio handles it seamlessly
+    nextStep();
+  }, [autoplay, nextStep]);
 
   const goToQuestion = useCallback(() => {
     setCurrentStep(AudioQuizStep.Question);
@@ -557,6 +707,28 @@ export function useAudioQuiz({
         return;
       }
       parseAudioExample(currentExampleIndex - 1);
+    } else if (
+      currentExampleReady &&
+      nextExampleReady &&
+      previousExampleReady
+    ) {
+      // All adjacent examples are parsed, now prefetch blobs for better autoplay performance
+      // Prefetch next 2 examples if they exist and aren't already parsed
+      for (let i = currentExampleIndex + 2; i <= currentExampleIndex + 3; i++) {
+        if (i < safeExamples.length && !parseInProgress.current) {
+          const example = safeExamples[i];
+          if (
+            example &&
+            ((audioQuizType === AudioQuizType.Speaking &&
+              !parsedSpeakingExamples[example.id]) ||
+              (audioQuizType === AudioQuizType.Listening &&
+                !parsedListeningExamples[example.id]))
+          ) {
+            parseAudioExample(i);
+            break; // Parse one at a time to avoid overwhelming the system
+          }
+        }
+      }
     }
   }, [
     currentExampleReady,
@@ -565,6 +737,10 @@ export function useAudioQuiz({
     currentExampleIndex,
     progressStatus,
     parseAudioExample,
+    safeExamples,
+    audioQuizType,
+    parsedSpeakingExamples,
+    parsedListeningExamples,
   ]);
 
   // Complex effect to handle changes to the example or step
@@ -579,7 +755,6 @@ export function useAudioQuiz({
     ) {
       // If the example index has changed, handle the example change
       previousExampleIndexRef.current = currentExampleIndex;
-      isInPadding.current = false;
       // Handle example change
       changeCurrentAudio({
         currentTime: 0,
@@ -590,7 +765,6 @@ export function useAudioQuiz({
     } else if (currentStep !== previousStepRef.current && currentStepValue) {
       // If the step has changed but the index has not, handle the step change
       previousStepRef.current = currentStep;
-      isInPadding.current = false;
       // Handle step change
       changeCurrentAudio({
         currentTime: 0,
@@ -626,7 +800,7 @@ export function useAudioQuiz({
     goToQuestion,
     goToHint,
     goToAnswer,
-    nextExample,
+    nextExample: nextExampleWithPrefetch,
     previousExample,
     progressStatus,
     currentExampleNumber,
