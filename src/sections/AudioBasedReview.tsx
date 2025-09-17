@@ -37,7 +37,6 @@ export default function AudioBasedReview({
   // Define data readiness for UI updates
   const dataReady =
     isAuthenticated &&
-    appUser &&
     programTableQuery.isSuccess &&
     audioExamplesQuery.isSuccess &&
     (isAdmin ||

@@ -76,8 +76,8 @@ export default function AudioQuiz({
     return shuffledExamples;
   });
   const quizReady = useMemo(
-    () => displayOrder.length > 0 && appUser,
-    [appUser, displayOrder.length],
+    () => displayOrder.length > 0,
+    [displayOrder.length],
   );
   // Memo the current example
   // This will update whenever the currentExampleIndex changes
