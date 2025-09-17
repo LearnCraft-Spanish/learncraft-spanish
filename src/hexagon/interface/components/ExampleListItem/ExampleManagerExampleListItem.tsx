@@ -39,7 +39,7 @@ export default function ExampleListItem({
     setIsMoreInfoOpen(!isMoreInfoOpen);
   }, [isMoreInfoOpen]);
 
-  const { openContextual, setContextualRef, contextual } = useContextualMenu();
+  const { openContextual, closeContextual, contextual } = useContextualMenu();
 
   if (!flashcard) {
     return null;
@@ -85,7 +85,7 @@ export default function ExampleListItem({
         isOpen={isMoreInfoOpen}
         openContextual={openContextual}
         contextual={contextual}
-        setContextualRef={setContextualRef}
+        closeContextual={closeContextual}
         lessonPopup={lessonPopup}
       />
     </div>

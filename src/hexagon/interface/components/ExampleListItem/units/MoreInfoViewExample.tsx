@@ -11,14 +11,14 @@ export default function MoreInfoViewExample({
   isOpen,
   openContextual,
   contextual,
-  setContextualRef,
+  closeContextual,
   lessonPopup,
 }: {
   example: ExampleWithVocabulary | Flashcard;
   isOpen: boolean;
   openContextual: (contextual: string) => void;
   contextual: string;
-  setContextualRef: (ref: HTMLDivElement | null) => void;
+  closeContextual: () => void;
   lessonPopup: LessonPopup;
 }) {
   const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
@@ -51,9 +51,9 @@ export default function MoreInfoViewExample({
                     vocabulary={vocab}
                     openContextual={openContextual}
                     contextual={contextual}
-                    setContextualRef={setContextualRef}
+                    closeContextual={closeContextual}
                     lessonPopup={lessonPopup}
-                    handleSelect={(id) => handleSelect(id)}
+                    handleSelect={handleSelect}
                     isSelected={vocabTagSelected === vocab.id}
                   />
                 ))}

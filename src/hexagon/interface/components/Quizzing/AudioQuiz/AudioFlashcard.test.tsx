@@ -26,6 +26,10 @@ function AudioFlashcardAutoplayOn() {
       pause={pausePlayback}
       play={resumePlayback}
       isPlaying
+      vocabComplete={false}
+      vocabulary={[]}
+      getHelpIsOpen={false}
+      setGetHelpIsOpen={() => {}}
     />
   );
 }
@@ -40,6 +44,10 @@ function AudioFlashcardAutoplayOff() {
       pause={pausePlayback}
       play={resumePlayback}
       isPlaying
+      vocabComplete={false}
+      vocabulary={[]}
+      getHelpIsOpen={false}
+      setGetHelpIsOpen={() => {}}
     />
   );
 }
@@ -55,6 +63,10 @@ function AudioFlashcardPlaying() {
       pause={pausePlayback}
       play={resumePlayback}
       isPlaying
+      vocabComplete={false}
+      vocabulary={[]}
+      getHelpIsOpen={false}
+      setGetHelpIsOpen={() => {}}
     />
   );
 }
@@ -69,6 +81,10 @@ function AudioFlashcardPaused() {
       pause={pausePlayback}
       play={resumePlayback}
       isPlaying={false}
+      vocabComplete={false}
+      vocabulary={[]}
+      getHelpIsOpen={false}
+      setGetHelpIsOpen={() => {}}
     />
   );
 }

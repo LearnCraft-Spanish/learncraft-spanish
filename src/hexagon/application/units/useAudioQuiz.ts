@@ -6,14 +6,17 @@ import type {
   ListeningQuizExample,
   SpeakingQuizExample,
 } from '@domain/audioQuizzing';
-import type { Example } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  Vocabulary,
+} from '@learncraft-spanish/shared';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getAudioQuizExample } from '../utils/audioQuizzingMappers';
 
 export interface AudioQuizProps {
-  examplesToQuiz: Example[];
+  examplesToQuiz: ExampleWithVocabulary[];
   audioQuizType: AudioQuizType;
   autoplay: boolean;
   ready: boolean; // Flag to prevent audio from playing in the background
@@ -47,6 +50,12 @@ export interface AudioQuizReturn {
   quizLength: number;
   resetQuiz: () => void;
   cleanupFunction: () => void;
+
+  // Get Help
+  getHelpIsOpen: boolean;
+  setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
+  vocabComplete: boolean;
+  vocabulary: Vocabulary[];
 }
 
 export function useAudioQuiz({
@@ -65,6 +74,8 @@ export function useAudioQuiz({
     preloadAudio,
     concatenateAudioWithPadding,
   } = useAudioAdapter();
+
+  const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
 
   // Examples that have bad audio and should be skipped
   const [badAudioExamples, setBadAudioExamples] = useState<number[]>([]);
@@ -119,6 +130,8 @@ export function useAudioQuiz({
       setSelectedExampleIndex(safeExamples.length - 1);
       setCurrentStep(AudioQuizStep.Question);
     }
+    setGetHelpIsOpen(false);
+
     // Reset the previous step ref to null so progress animation works immediately on new example
     previousStepRef.current = null;
   }, [currentExampleIndex, setSelectedExampleIndex, safeExamples]);
@@ -131,9 +144,12 @@ export function useAudioQuiz({
       setSelectedExampleIndex(0);
       setCurrentStep(AudioQuizStep.Question);
     }
+    if (getHelpIsOpen) {
+      setGetHelpIsOpen(false);
+    }
     // Reset the previous step ref to null so progress animation works immediately on new example
     previousStepRef.current = null;
-  }, [currentExampleIndex, setSelectedExampleIndex]);
+  }, [currentExampleIndex, setSelectedExampleIndex, getHelpIsOpen]);
 
   // Note: isInPadding ref removed - no longer needed with concatenated audio
 
@@ -179,7 +195,11 @@ export function useAudioQuiz({
       onEnded: () => {},
       playOnLoad: true,
     });
-  }, [changeCurrentAudio, concatenatedAudioData]);
+
+    if (getHelpIsOpen) {
+      setGetHelpIsOpen(false);
+    }
+  }, [changeCurrentAudio, concatenatedAudioData, getHelpIsOpen]);
 
   // Steps the quiz forward
   const nextStep = useCallback(() => {
@@ -220,13 +240,13 @@ export function useAudioQuiz({
 
   // Simple memos for the current, next, and previous examples
   // Undefined if unavailable, implies either loading state or out of array bounds
-  const currentExampleMemo = useMemo((): Example | undefined => {
+  const currentExampleMemo = useMemo((): ExampleWithVocabulary | undefined => {
     if (safeExamples.length > 0) {
       return safeExamples[currentExampleIndex];
     }
   }, [safeExamples, currentExampleIndex]);
 
-  const nextExampleMemo = useMemo((): Example | undefined => {
+  const nextExampleMemo = useMemo((): ExampleWithVocabulary | undefined => {
     if (
       safeExamples.length > 0 &&
       currentExampleIndex + 1 < safeExamples.length
@@ -235,11 +255,25 @@ export function useAudioQuiz({
     }
   }, [safeExamples, currentExampleIndex]);
 
-  const previousExampleMemo = useMemo((): Example | undefined => {
+  const previousExampleMemo = useMemo((): ExampleWithVocabulary | undefined => {
     if (safeExamples.length > 0 && currentExampleIndex > 0) {
       return safeExamples[currentExampleIndex - 1];
     }
   }, [safeExamples, currentExampleIndex]);
+
+  const vocabComplete = useMemo(() => {
+    if (currentExampleMemo) {
+      return currentExampleMemo.vocabularyComplete;
+    }
+    return false;
+  }, [currentExampleMemo]);
+
+  const vocabulary = useMemo(() => {
+    if (currentExampleMemo) {
+      return currentExampleMemo.vocabulary;
+    }
+    return [];
+  }, [currentExampleMemo]);
 
   // Parses the audio example at the given index
   const parseAudioExample = useCallback(
@@ -807,5 +841,11 @@ export function useAudioQuiz({
     quizLength: safeExamples.length,
     resetQuiz,
     cleanupFunction,
+
+    // Get Help
+    getHelpIsOpen,
+    setGetHelpIsOpen,
+    vocabComplete,
+    vocabulary,
   };
 }

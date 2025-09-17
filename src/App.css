@@ -489,6 +489,9 @@ button:hover,
 
 /* This is for the visual overlay for AudioFlashcard */
 .progressStatus {
+  /* round the top left and bottom right corners */
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   position: absolute;
   top: 0px;
   bottom: 0px;

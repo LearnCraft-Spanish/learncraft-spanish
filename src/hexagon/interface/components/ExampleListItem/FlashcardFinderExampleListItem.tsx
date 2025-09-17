@@ -31,7 +31,7 @@ export default function ExampleListItem({
   lessonPopup: LessonPopup;
 }) {
   const [isMoreInfoOpen, setIsMoreInfoOpen] = useState(false);
-  const { openContextual, setContextualRef, contextual } = useContextualMenu();
+  const { openContextual, closeContextual, contextual } = useContextualMenu();
 
   const onClickMoreInfo = useCallback(() => {
     setIsMoreInfoOpen(!isMoreInfoOpen);
@@ -78,7 +78,7 @@ export default function ExampleListItem({
         isOpen={isMoreInfoOpen}
         openContextual={openContextual}
         contextual={contextual}
-        setContextualRef={setContextualRef}
+        closeContextual={closeContextual}
         lessonPopup={lessonPopup}
       />
     </div>

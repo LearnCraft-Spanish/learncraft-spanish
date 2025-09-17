@@ -31,6 +31,11 @@ export default function AudioQuiz({
     autoplay,
     audioQuizType,
     cleanupFunction,
+
+    getHelpIsOpen,
+    setGetHelpIsOpen,
+    vocabComplete,
+    vocabulary,
   } = useAudioQuiz(audioQuizProps);
 
   /*    Keyboard Controls       */
@@ -54,6 +59,9 @@ export default function AudioQuiz({
           play();
         }
       }
+      if (getHelpIsOpen) {
+        setGetHelpIsOpen(false);
+      }
     },
     [
       nextExample,
@@ -63,6 +71,8 @@ export default function AudioQuiz({
       pause,
       isPlaying,
       play,
+      getHelpIsOpen,
+      setGetHelpIsOpen,
     ],
   );
 
@@ -96,6 +106,11 @@ export default function AudioQuiz({
               pause={pause}
               play={play}
               isPlaying={isPlaying}
+              // Get Help
+              getHelpIsOpen={getHelpIsOpen}
+              setGetHelpIsOpen={setGetHelpIsOpen}
+              vocabComplete={vocabComplete}
+              vocabulary={vocabulary}
             />
           </div>
           <AudioQuizButtons
