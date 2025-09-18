@@ -10,7 +10,8 @@ import { useCombinedFiltersWithVocabulary } from './useCombinedFiltersWithVocabu
 
 export interface UseFilterOwnedFlashcardsReturn {
   filteredFlashcards: Flashcard[];
-  isLoading: boolean;
+  studentFlashcardsLoading: boolean;
+  filteredFlashcardsLoading: boolean;
   error: Error | null;
 }
 
@@ -24,6 +25,7 @@ export function useFilterOwnedFlashcards(
     audioOnly,
     lessonRangeVocabRequired,
     lessonVocabKnown,
+    isLoading: isLoadingCombinedFiltersWithVocabulary,
   } = useCombinedFiltersWithVocabulary();
 
   // The owned flashcards to be filtered from the useStudentFlashcards hook
@@ -69,7 +71,8 @@ export function useFilterOwnedFlashcards(
 
   return {
     filteredFlashcards,
-    isLoading,
+    studentFlashcardsLoading: isLoading,
+    filteredFlashcardsLoading: isLoadingCombinedFiltersWithVocabulary,
     error,
   };
 }

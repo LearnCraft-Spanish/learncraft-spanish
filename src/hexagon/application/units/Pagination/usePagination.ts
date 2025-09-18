@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 export interface PaginationState {
   totalItems: number;
@@ -11,7 +11,7 @@ export interface PaginationState {
   isOnLastPage: boolean;
   previousPage: () => void;
   nextPage: () => void;
-  firstPage: () => void;
+  goToFirstPage: () => void;
 }
 
 export function usePagination({
@@ -22,9 +22,14 @@ export function usePagination({
   totalItems: number;
 }): PaginationState {
   const [selectedPageNumber, setSelectedPageNumber] = useState(1);
+  const previousTotalItems = useRef(0);
   const maxPage = Math.ceil(totalItems / itemsPerPage);
 
   const safePageNumber = useMemo(() => {
+    if (previousTotalItems.current !== totalItems) {
+      previousTotalItems.current = totalItems;
+      return 1;
+    }
     if (selectedPageNumber > maxPage) {
       return maxPage;
     }
@@ -32,7 +37,7 @@ export function usePagination({
       return 1;
     }
     return selectedPageNumber;
-  }, [selectedPageNumber, maxPage]);
+  }, [selectedPageNumber, maxPage, totalItems]);
 
   const startIndex = useMemo(() => {
     return (safePageNumber - 1) * itemsPerPage;
@@ -56,7 +61,7 @@ export function usePagination({
     setSelectedPageNumber(safePageNumber - 1);
   }, [safePageNumber]);
 
-  const firstPage = useCallback(() => {
+  const goToFirstPage = useCallback(() => {
     setSelectedPageNumber(1);
   }, []);
 
@@ -79,6 +84,6 @@ export function usePagination({
     isOnLastPage,
     nextPage,
     previousPage,
-    firstPage,
+    goToFirstPage,
   };
 }
