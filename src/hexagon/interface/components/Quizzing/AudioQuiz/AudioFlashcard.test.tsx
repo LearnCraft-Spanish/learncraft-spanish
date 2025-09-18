@@ -1,13 +1,17 @@
 import { AudioQuizStep } from '@domain/audioQuizzing';
 import { cleanup, render, screen } from '@testing-library/react';
-import React from 'react';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
+import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import AudioFlashcardComponent from './AudioFlashcard';
 
 const incrementCurrentStep = vi.fn(() => {});
 const pausePlayback = vi.fn(() => {});
 const resumePlayback = vi.fn(() => {});
+
+const addFlashcard = vi.fn(() => {});
+const removeFlashcard = vi.fn(() => {});
 
 /*
   currentExample: Flashcard | undefined;
@@ -17,75 +21,115 @@ const resumePlayback = vi.fn(() => {});
 */
 function AudioFlashcardAutoplayOn() {
   return (
-    <AudioFlashcardComponent
-      currentExampleText="currentExampleText"
-      currentStep={AudioQuizStep.Question}
-      nextStep={incrementCurrentStep}
-      autoplay
-      progressStatus={0.5}
-      pause={pausePlayback}
-      play={resumePlayback}
-      isPlaying
-      vocabComplete={false}
-      vocabulary={[]}
-      getHelpIsOpen={false}
-      setGetHelpIsOpen={() => {}}
-    />
+    <MockAllProviders>
+      <AudioFlashcardComponent
+        currentExampleText="currentExampleText"
+        currentStep={AudioQuizStep.Question}
+        nextStep={incrementCurrentStep}
+        autoplay
+        progressStatus={0.5}
+        pause={pausePlayback}
+        play={resumePlayback}
+        isPlaying
+        vocabComplete={false}
+        vocabulary={[]}
+        getHelpIsOpen={false}
+        setGetHelpIsOpen={() => {}}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+          isCustom: false,
+        }}
+      />
+    </MockAllProviders>
   );
 }
 function AudioFlashcardAutoplayOff() {
   return (
-    <AudioFlashcardComponent
-      currentExampleText="currentExampleText"
-      currentStep={AudioQuizStep.Question}
-      nextStep={incrementCurrentStep}
-      autoplay={false}
-      progressStatus={0.5}
-      pause={pausePlayback}
-      play={resumePlayback}
-      isPlaying
-      vocabComplete={false}
-      vocabulary={[]}
-      getHelpIsOpen={false}
-      setGetHelpIsOpen={() => {}}
-    />
+    <MockAllProviders>
+      <AudioFlashcardComponent
+        currentExampleText="currentExampleText"
+        currentStep={AudioQuizStep.Question}
+        nextStep={incrementCurrentStep}
+        autoplay={false}
+        progressStatus={0.5}
+        pause={pausePlayback}
+        play={resumePlayback}
+        isPlaying
+        vocabComplete={false}
+        vocabulary={[]}
+        getHelpIsOpen={false}
+        setGetHelpIsOpen={() => {}}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+          isCustom: false,
+        }}
+      />
+    </MockAllProviders>
   );
 }
 
 function AudioFlashcardPlaying() {
   return (
-    <AudioFlashcardComponent
-      currentExampleText="currentExampleText"
-      currentStep={AudioQuizStep.Question}
-      nextStep={incrementCurrentStep}
-      autoplay
-      progressStatus={0.5}
-      pause={pausePlayback}
-      play={resumePlayback}
-      isPlaying
-      vocabComplete={false}
-      vocabulary={[]}
-      getHelpIsOpen={false}
-      setGetHelpIsOpen={() => {}}
-    />
+    <MockAllProviders>
+      <AudioFlashcardComponent
+        currentExampleText="currentExampleText"
+        currentStep={AudioQuizStep.Question}
+        nextStep={incrementCurrentStep}
+        autoplay
+        progressStatus={0.5}
+        pause={pausePlayback}
+        play={resumePlayback}
+        isPlaying
+        vocabComplete={false}
+        vocabulary={[]}
+        getHelpIsOpen={false}
+        setGetHelpIsOpen={() => {}}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+          isCustom: false,
+        }}
+      />
+    </MockAllProviders>
   );
 }
 function AudioFlashcardPaused() {
   return (
-    <AudioFlashcardComponent
-      currentExampleText="currentExampleText"
-      currentStep={AudioQuizStep.Question}
-      nextStep={incrementCurrentStep}
-      autoplay
-      progressStatus={0.5}
-      pause={pausePlayback}
-      play={resumePlayback}
-      isPlaying={false}
-      vocabComplete={false}
-      vocabulary={[]}
-      getHelpIsOpen={false}
-      setGetHelpIsOpen={() => {}}
-    />
+    <MockAllProviders>
+      <AudioFlashcardComponent
+        currentExampleText="currentExampleText"
+        currentStep={AudioQuizStep.Question}
+        nextStep={incrementCurrentStep}
+        autoplay
+        progressStatus={0.5}
+        pause={pausePlayback}
+        play={resumePlayback}
+        isPlaying={false}
+        vocabComplete={false}
+        vocabulary={[]}
+        getHelpIsOpen={false}
+        setGetHelpIsOpen={() => {}}
+        addPendingRemoveProps={{
+          addFlashcard,
+          removeFlashcard,
+          isAdding: false,
+          isRemoving: false,
+          isCollected: false,
+          isCustom: false,
+        }}
+      />
+    </MockAllProviders>
   );
 }
 

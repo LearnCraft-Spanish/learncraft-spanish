@@ -36,6 +36,8 @@ export default function AudioQuiz({
     setGetHelpIsOpen,
     vocabComplete,
     vocabulary,
+
+    addPendingRemoveProps,
   } = useAudioQuiz(audioQuizProps);
 
   /*    Keyboard Controls       */
@@ -111,6 +113,8 @@ export default function AudioQuiz({
               setGetHelpIsOpen={setGetHelpIsOpen}
               vocabComplete={vocabComplete}
               vocabulary={vocabulary}
+              // Add Pending Remove Props
+              addPendingRemoveProps={addPendingRemoveProps}
             />
           </div>
           <AudioQuizButtons
