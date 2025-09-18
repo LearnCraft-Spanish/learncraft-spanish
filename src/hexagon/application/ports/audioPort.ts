@@ -18,20 +18,4 @@ export interface AudioPort {
 
   // Changes the current audio element
   changeCurrentAudio: (current: AudioElementState) => Promise<void>;
-
-  // Preloads the audio durations
-  preloadAudio: (newQueue: { english: string; spanish: string }) => Promise<{
-    englishDuration: number | null;
-    spanishDuration: number | null;
-  }>;
-
-  // Concatenates main audio with padding audio into a single seamless audio file
-  concatenateAudioWithPadding: (
-    mainAudioUrl: string,
-    paddingAudioUrl: string,
-  ) => Promise<{
-    concatenatedAudioUrl: string;
-    totalDuration: number;
-    cleanup: () => void;
-  }>;
 }
