@@ -28,6 +28,12 @@ export default defineConfig(({ mode }) => {
         project: 'learncraft-spanish-frontend',
       }),
     ],
+    optimizeDeps: {
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+    },
+    worker: {
+      format: 'es',
+    },
     build: {
       manifest: true,
       outDir: 'build',

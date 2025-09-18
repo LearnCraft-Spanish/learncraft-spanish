@@ -2,7 +2,7 @@ import { ActiveStudentProvider } from '@application/coordinators/providers/Activ
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
-import { AudioParserProvider } from '@composition/providers/AudioParserProvider';
+import { AudioTranscodingProvider } from '@composition/providers/AudioTranscodingProvider';
 import TempIdContextProvider from './TempIdContextProvider';
 
 export default function MainProvider({
@@ -15,11 +15,11 @@ export default function MainProvider({
       <ActiveStudentProvider>
         <SelectedCourseAndLessonsProvider>
           <AudioEngineProvider>
-            <AudioParserProvider>
+            <AudioTranscodingProvider>
               <ExampleFilterContextProvider>
                 {children}
               </ExampleFilterContextProvider>
-            </AudioParserProvider>
+            </AudioTranscodingProvider>
           </AudioEngineProvider>
         </SelectedCourseAndLessonsProvider>
       </ActiveStudentProvider>

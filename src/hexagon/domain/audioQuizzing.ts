@@ -95,6 +95,13 @@ export const SpeakingQuizExampleSchema = z.object({
 
 export type SpeakingQuizExample = z.infer<typeof SpeakingQuizExampleSchema>;
 
+export const AudioQuizExampleSchema = z.object({
+  speaking: SpeakingQuizExampleSchema,
+  listening: ListeningQuizExampleSchema,
+});
+
+export type AudioQuizExample = z.infer<typeof AudioQuizExampleSchema>;
+
 // NOTE: NO TYPES FOR COMPLETE AUDIO QUIZ.
 // THE FULL ARRAYS ARE NOT AVAILABLE UPON INITIAL LOAD.
 // WE MUST DERIVE ONE AT A TIME.

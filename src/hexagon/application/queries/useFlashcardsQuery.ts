@@ -166,7 +166,8 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       const tempFlashcards = context;
 
       // Map the ids to remove
-      const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
+      const idsToRemove =
+        tempFlashcards?.map((flashcard) => flashcard.id) ?? [];
 
       // Check the current state of the cache, fallback to empty array if undefined
       const oldData: Flashcard[] =
@@ -241,7 +242,8 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       const newFlashcards = result;
 
       // Map the ids to remove
-      const idsToRemove = tempFlashcards.map((flashcard) => flashcard.id);
+      const idsToRemove =
+        tempFlashcards?.map((flashcard) => flashcard.id) ?? [];
 
       // Check the current state of the cache, fallback to empty array if undefined
       const oldData: Flashcard[] =
@@ -375,7 +377,8 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       // Remove the exampleIds from the pending deletes
       queryClient.setQueryData(
         ['flashcards', 'pendingDeletes', userId],
-        (oldData: number[]) => oldData.filter((id) => !exampleIds.includes(id)),
+        (oldData: number[]) =>
+          oldData.filter((deletedId) => !exampleIds.includes(deletedId)),
       );
       // Add the flashcards back to the cache
       queryClient.setQueryData(
@@ -387,6 +390,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       );
     },
     onSuccess: (result, variables, context) => {
+      if (!context) return;
       const { exampleIds } = context;
       // check result (number of deletes) is same as flashcardIds.length
       if (result !== variables.length) {
@@ -400,7 +404,8 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       // Either way, remove the exampleIds from the pending deletes
       queryClient.setQueryData(
         ['flashcards', 'pendingDeletes', userId],
-        (oldData: number[]) => oldData.filter((id) => !exampleIds.includes(id)),
+        (oldData: number[]) =>
+          oldData.filter((deletedId) => !exampleIds.includes(deletedId)),
       );
     },
     onSettled: () => {
@@ -482,6 +487,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       );
     },
     onSuccess: (result, variables, context) => {
+      if (!context) return;
       const { exampleIds } = context;
       // check result (number of deletes) is same as flashcardIds.length
       if (result !== variables.length) {
@@ -495,7 +501,8 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
       // Either way, remove the exampleIds from the pending deletes
       queryClient.setQueryData(
         ['flashcards', 'pendingDeletes', userId],
-        (oldData: number[]) => oldData.filter((id) => !exampleIds.includes(id)),
+        (oldData: number[]) =>
+          oldData.filter((deletedId) => !exampleIds.includes(deletedId)),
       );
     },
     onSettled: () => {
