@@ -76,6 +76,11 @@ export interface AudioTranscodingPort {
   isLoading: () => boolean;
 
   /**
+   * Get the current loading progress (0-100)
+   */
+  loadingProgress: () => number;
+
+  /**
    * Convert MP3 audio to WAV format
    * @param mp3Url - URL to the MP3 file
    * @param options - Conversion options

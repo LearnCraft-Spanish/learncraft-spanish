@@ -34,6 +34,7 @@ export interface AudioQuizReturn {
   currentExampleReady: boolean;
   currentStep: AudioQuizStep;
   isAudioTranscoderLoading: boolean;
+  audioTranscoderLoadingProgress: number;
   currentStepValue:
     | AudioQuizQuestion
     | AudioQuizGuess
@@ -129,8 +130,11 @@ export function useAudioQuiz({
   const { play, pause, isPlaying, currentTime, changeCurrentAudio } =
     useAudioAdapter();
 
-  const { parseExampleForQuiz, isAudioTranscoderLoading } =
-    useAudioQuizMapper();
+  const {
+    parseExampleForQuiz,
+    isAudioTranscoderLoading,
+    audioTranscoderLoadingProgress,
+  } = useAudioQuizMapper();
 
   const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
 
@@ -721,6 +725,7 @@ export function useAudioQuiz({
     audioQuizType,
     currentStep, // The current step of the quiz
     isAudioTranscoderLoading: isAudioTranscoderLoading(),
+    audioTranscoderLoadingProgress: audioTranscoderLoadingProgress(),
     currentStepValue: currentStepValue ?? null, // Otherwise the current audio is still parsing
     currentExampleReady, // Whether the current example is ready to be played
     nextExampleReady, // Whether the next example is ready to be played

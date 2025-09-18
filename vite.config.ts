@@ -30,6 +30,10 @@ export default defineConfig(({ mode }) => {
     ],
     optimizeDeps: {
       exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+      include: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+    },
+    define: {
+      global: 'globalThis',
     },
     worker: {
       format: 'es',
@@ -38,6 +42,12 @@ export default defineConfig(({ mode }) => {
       manifest: true,
       outDir: 'build',
       sourcemap: true,
+      rollupOptions: {
+        external: [],
+        output: {
+          globals: {},
+        },
+      },
     },
     resolve: {
       alias: {
@@ -60,6 +70,11 @@ export default defineConfig(({ mode }) => {
     server: {
       port,
       open: true,
+      headers: {
+        'Cross-Origin-Embedder-Policy': 'require-corp',
+        'Cross-Origin-Opener-Policy': 'same-origin',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+      },
     },
     css: {
       preprocessorOptions: {

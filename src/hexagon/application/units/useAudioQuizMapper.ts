@@ -63,6 +63,11 @@ export interface AudioQuizMapperReturn {
    * Check if the audio transcoder is currently loading/initializing
    */
   isAudioTranscoderLoading: () => boolean;
+
+  /**
+   * Get the current loading progress (0-100)
+   */
+  audioTranscoderLoadingProgress: () => number;
 }
 
 /**
@@ -115,8 +120,13 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
    * - Handles quiz-specific audio processing requirements
    */
 
-  const { mp3ToWav, generateSilence, concatenateAudio, isLoading } =
-    useAudioTranscoderAdapter();
+  const {
+    mp3ToWav,
+    generateSilence,
+    concatenateAudio,
+    isLoading,
+    loadingProgress,
+  } = useAudioTranscoderAdapter();
   // Create function with useCallback
   const parseExampleForQuiz = useCallback(
     async (
@@ -220,5 +230,6 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
   return {
     parseExampleForQuiz,
     isAudioTranscoderLoading: isLoading,
+    audioTranscoderLoadingProgress: loadingProgress,
   };
 }
