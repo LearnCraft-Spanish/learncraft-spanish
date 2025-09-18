@@ -68,7 +68,6 @@ export default function ExampleListItem({
             key="moreInfoButton"
           />,
           <AddPendingRemove
-            id={flashcard.example.id}
             isCollected={isCollected}
             isAdding={isAdding}
             isRemoving={isRemoving}

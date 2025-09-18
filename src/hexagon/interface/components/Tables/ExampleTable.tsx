@@ -180,9 +180,15 @@ export default function ExamplesTable({
               <ExampleListItem
                 key={example.id}
                 example={example}
-                isCollected={studentFlashcards.isExampleCollected(example.id)}
-                isAdding={studentFlashcards.isAddingFlashcard(example.id)}
-                isRemoving={studentFlashcards.isRemovingFlashcard(example.id)}
+                isCollected={studentFlashcards.isExampleCollected({
+                  exampleId: example.id,
+                })}
+                isAdding={studentFlashcards.isAddingFlashcard({
+                  exampleId: example.id,
+                })}
+                isRemoving={studentFlashcards.isRemovingFlashcard({
+                  exampleId: example.id,
+                })}
                 handleAdd={() => {
                   studentFlashcards.createFlashcards([example]);
                 }}

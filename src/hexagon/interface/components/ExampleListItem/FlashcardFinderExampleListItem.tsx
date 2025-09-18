@@ -63,7 +63,6 @@ export default function ExampleListItem({
             key="moreInfoButton"
           />,
           <AddPendingRemove
-            id={example.id}
             isCollected={isCollected}
             isAdding={isAdding}
             isRemoving={isRemoving}

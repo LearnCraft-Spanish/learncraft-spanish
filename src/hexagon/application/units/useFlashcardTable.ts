@@ -79,7 +79,7 @@ export function useFlashcardTable({
   const isSomethingPending = useMemo(() => {
     return (
       flashcards?.some((flashcard) =>
-        isPendingFlashcard(flashcard.example.id),
+        isPendingFlashcard({ exampleId: flashcard.example.id }),
       ) ?? false
     );
   }, [flashcards, isPendingFlashcard]);
@@ -97,7 +97,7 @@ export function useFlashcardTable({
 
   const isRemovingFlashcard = useCallback(
     (id: number) => {
-      return isPendingFlashcard(id);
+      return isPendingFlashcard({ exampleId: id });
     },
     [isPendingFlashcard],
   );

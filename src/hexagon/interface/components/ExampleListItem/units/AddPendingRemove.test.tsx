@@ -3,7 +3,6 @@ import { vi } from 'vitest';
 import AddPendingRemove from './AddPendingRemove';
 
 const mockProps = {
-  id: 123,
   isCollected: false,
   isAdding: false,
   isRemoving: false,
@@ -24,7 +23,6 @@ describe('component AddPendingRemove', () => {
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Add');
       expect(button).toHaveClass('addButton');
-      expect(button).toHaveAttribute('value', '123');
     });
 
     it('should render Remove button when collected and not pending', () => {
@@ -34,7 +32,6 @@ describe('component AddPendingRemove', () => {
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Remove');
       expect(button).toHaveClass('removeButton');
-      expect(button).toHaveAttribute('value', '123');
     });
 
     it('should render Adding... disabled button when adding', () => {
@@ -44,7 +41,6 @@ describe('component AddPendingRemove', () => {
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Adding...');
       expect(button).toHaveClass('disabledButton');
-      expect(button).toHaveAttribute('value', '123');
     });
 
     it('should render Removing... disabled button when removing', () => {
@@ -60,7 +56,6 @@ describe('component AddPendingRemove', () => {
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Removing...');
       expect(button).toHaveClass('disabledButton');
-      expect(button).toHaveAttribute('value', '123');
     });
   });
 
@@ -120,19 +115,10 @@ describe('component AddPendingRemove', () => {
     });
   });
 
-  describe('props validation', () => {
-    it('should render with different id values', () => {
-      render(<AddPendingRemove {...mockProps} id={456} />);
+  it('should have button type="button"', () => {
+    render(<AddPendingRemove {...mockProps} />);
 
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('value', '456');
-    });
-
-    it('should have button type="button"', () => {
-      render(<AddPendingRemove {...mockProps} />);
-
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('type', 'button');
-    });
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('type', 'button');
   });
 });

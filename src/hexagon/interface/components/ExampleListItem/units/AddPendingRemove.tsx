@@ -1,14 +1,12 @@
 import { useMemo } from 'react';
 
 export default function AddPendingRemove({
-  id,
   isAdding,
   isRemoving,
   isCollected,
   handleAdd,
   handleRemove,
 }: {
-  id: number;
   isAdding: boolean;
   isRemoving: boolean;
   isCollected: boolean;
@@ -56,7 +54,6 @@ export default function AddPendingRemove({
     <button
       type="button"
       className={buttonParams.className}
-      value={id}
       onClick={buttonParams.onClickFunction}
     >
       {buttonParams.text}
