@@ -66,13 +66,12 @@ export function useQuizMyFlashcards(
     initialFilterOwnedFlashcards,
   );
 
-  const { isLoading: studentFlashcardsLoading, error: studentFlashcardsError } =
-    useStudentFlashcards();
+  const { error: studentFlashcardsError } = useStudentFlashcards();
 
   // To get the filtered owned flashcards - create local version
   const {
     filteredFlashcards,
-    isLoading: filteredFlashcardsLoading,
+    studentFlashcardsLoading,
     error: filteredFlashcardsError,
   } = useFilterOwnedFlashcards(filterOwnedFlashcards);
 
@@ -113,8 +112,7 @@ export function useQuizMyFlashcards(
   const { isLoading: textQuizLoading, error: textQuizError } = textQuizSetup;
 
   // Combine the loading and error states (audio would be redundant, purely derived)
-  const isLoading =
-    filteredFlashcardsLoading || textQuizLoading || studentFlashcardsLoading;
+  const isLoading = textQuizLoading || studentFlashcardsLoading;
   const error =
     filteredFlashcardsError || textQuizError || studentFlashcardsError;
 

@@ -1,8 +1,10 @@
 import type { Vocabulary } from '@learncraft-spanish/shared';
+import type { AddPendingRemoveProps } from 'src/hexagon/application/units/useTextQuiz';
 import { AudioQuizStep } from '@domain/audioQuizzing';
 import React from 'react';
 import pauseIcon from 'src/assets/icons/pause.svg';
 import playIcon from 'src/assets/icons/play.svg';
+import { AddToMyFlashcardsButtons } from '../general/AddToMyFlashcardsButtons';
 import { GetHelpDisplay } from '../general/FlashcardDisplay/GetHelpDisplay';
 interface AudioFlashcardProps {
   vocabComplete: boolean;
@@ -17,6 +19,7 @@ interface AudioFlashcardProps {
   isPlaying: boolean;
   getHelpIsOpen: boolean;
   setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
+  addPendingRemoveProps: AddPendingRemoveProps | undefined;
 }
 
 export default function AudioFlashcardComponent({
@@ -32,6 +35,7 @@ export default function AudioFlashcardComponent({
   isPlaying,
   getHelpIsOpen,
   setGetHelpIsOpen,
+  addPendingRemoveProps,
 }: AudioFlashcardProps): React.JSX.Element {
   function handlePlayPauseClick(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -91,6 +95,18 @@ export default function AudioFlashcardComponent({
             }}
           />
         )}
+      {addPendingRemoveProps && currentStep === AudioQuizStep.Answer && (
+        <div className="AddPendingRemoveButtons">
+          <AddToMyFlashcardsButtons
+            exampleIsCollected={addPendingRemoveProps.isCollected}
+            exampleIsAdding={addPendingRemoveProps.isAdding}
+            exampleIsRemoving={addPendingRemoveProps.isRemoving}
+            exampleIsCustom={addPendingRemoveProps.isCustom}
+            addFlashcard={addPendingRemoveProps.addFlashcard}
+            removeFlashcard={addPendingRemoveProps.removeFlashcard}
+          />
+        </div>
+      )}
       {currentStep === AudioQuizStep.Answer && vocabComplete && (
         <div className="getHelpContainer">
           {getHelpIsOpen ? (

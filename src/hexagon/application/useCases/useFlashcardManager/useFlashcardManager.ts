@@ -13,7 +13,8 @@ export interface UseFlashcardManagerReturn {
   setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
   onGoingToQuiz: () => void;
 
-  isLoading: boolean;
+  studentFlashcardsLoading: boolean;
+  filteredFlashcardsLoading: boolean;
   error: Error | null;
 }
 
@@ -31,16 +32,18 @@ export default function useFlashcardManager({
   );
 
   // This is the principal hook for this use case
-  const { filteredFlashcards, isLoading, error } = useFilterOwnedFlashcards(
-    filterOwnedFlashcards,
-  );
+  const {
+    filteredFlashcards,
+    studentFlashcardsLoading,
+    filteredFlashcardsLoading,
+    error,
+  } = useFilterOwnedFlashcards(filterOwnedFlashcards);
 
   // We use this to paginate the flashcards
   const paginationState = usePagination({
     itemsPerPage: PAGE_SIZE,
     totalItems: filteredFlashcards.length,
   });
-
   // We display only the flashcards that are in the current page
   const displayFlashcards = useMemo(() => {
     return filteredFlashcards.slice(
@@ -60,7 +63,8 @@ export default function useFlashcardManager({
     filterOwnedFlashcards,
     setFilterOwnedFlashcards,
     onGoingToQuiz,
-    isLoading,
+    studentFlashcardsLoading,
+    filteredFlashcardsLoading,
     error,
   };
 }

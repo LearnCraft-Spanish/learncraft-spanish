@@ -89,6 +89,7 @@ function FlashcardSpanishFirst() {
           isAdding: false,
           isRemoving: false,
           isCollected: false,
+          isCustom: false,
         }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
@@ -110,6 +111,7 @@ function FlashcardEnglishFirst() {
           isAdding: false,
           isRemoving: false,
           isCollected: false,
+          isCustom: false,
         }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
@@ -131,6 +133,7 @@ function FlashcardSpanishFirstAnswerShowing() {
           isAdding: false,
           isRemoving: false,
           isCollected: false,
+          isCustom: false,
         }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
@@ -152,6 +155,7 @@ function FlashcardEnglishFirstAnswerShowing() {
           isAdding: false,
           isRemoving: false,
           isCollected: false,
+          isCustom: false,
         }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
@@ -174,6 +178,7 @@ function FlashcardSpanishFirstNotStudent() {
           isAdding: false,
           isRemoving: false,
           isCollected: false,
+          isCustom: false,
         }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}
@@ -196,6 +201,7 @@ function FlashcardWithAudio() {
           isAdding: false,
           isRemoving: false,
           isCollected: false,
+          isCustom: false,
         }}
         toggleAnswer={toggleAnswer}
         getHelpIsOpen={getHelpIsOpen}

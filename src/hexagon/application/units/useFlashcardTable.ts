@@ -19,7 +19,6 @@ export interface UseFlashcardTableReturn {
   displayFlashcards: Flashcard[];
   paginationState: PaginationState;
   onGoingToQuiz: () => void;
-  isLoading: boolean;
   error: Error | null;
   selectedIds: number[];
   isSelected: (id: number) => boolean;
@@ -39,7 +38,6 @@ export function useFlashcardTable({
   displayFlashcards,
   paginationState,
   onGoingToQuiz,
-  isLoading,
   error,
 }: UseFlashcardTableProps): UseFlashcardTableReturn {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -81,7 +79,7 @@ export function useFlashcardTable({
   const isSomethingPending = useMemo(() => {
     return (
       flashcards?.some((flashcard) =>
-        isPendingFlashcard(flashcard.example.id),
+        isPendingFlashcard({ exampleId: flashcard.example.id }),
       ) ?? false
     );
   }, [flashcards, isPendingFlashcard]);
@@ -99,7 +97,7 @@ export function useFlashcardTable({
 
   const isRemovingFlashcard = useCallback(
     (id: number) => {
-      return isPendingFlashcard(id);
+      return isPendingFlashcard({ exampleId: id });
     },
     [isPendingFlashcard],
   );
@@ -112,7 +110,6 @@ export function useFlashcardTable({
     displayFlashcards,
     paginationState,
     onGoingToQuiz,
-    isLoading,
     error,
     selectedIds: safeSelectedIds,
     isSelected,

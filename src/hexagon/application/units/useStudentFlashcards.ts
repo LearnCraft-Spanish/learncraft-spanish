@@ -7,10 +7,7 @@ import type { SrsDifficulty } from 'src/hexagon/domain/srs';
 import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
 import { useCallback, useMemo } from 'react';
 import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
-import {
-  calculateNewSrsInterval,
-  getCurrentInterval,
-} from 'src/hexagon/domain/srs';
+import { calculateNewSrsInterval } from 'src/hexagon/domain/srs';
 
 export interface UseStudentFlashcardsReturn {
   flashcards: Flashcard[] | undefined;
@@ -30,12 +27,12 @@ export interface UseStudentFlashcardsReturn {
     dueForReviewOnly?: boolean;
     audioOnly?: boolean;
   }) => Flashcard[];
-  isFlashcardCollected: (flashcardId: number) => boolean;
-  isExampleCollected: (exampleId: number) => boolean;
-  isCustomFlashcard: (exampleId: number) => boolean;
-  isAddingFlashcard: (exampleId: number) => boolean;
-  isRemovingFlashcard: (exampleId: number) => boolean;
-  isPendingFlashcard: (exampleId: number) => boolean;
+  isFlashcardCollected: ({ flashcardId }: { flashcardId: number }) => boolean;
+  isExampleCollected: ({ exampleId }: { exampleId: number }) => boolean;
+  isCustomFlashcard: ({ exampleId }: { exampleId: number }) => boolean;
+  isAddingFlashcard: ({ exampleId }: { exampleId: number }) => boolean;
+  isRemovingFlashcard: ({ exampleId }: { exampleId: number }) => boolean;
+  isPendingFlashcard: ({ exampleId }: { exampleId: number }) => boolean;
   isLoading: boolean;
   error: Error | null;
   createFlashcards: (examples: ExampleWithVocabulary[]) => Promise<Flashcard[]>;
@@ -61,7 +58,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   } = useFlashcardsQuery();
 
   const isExampleCollected = useCallback(
-    (exampleId: number) => {
+    ({ exampleId }: { exampleId: number }) => {
       return (
         flashcards?.some((flashcard) => flashcard.example.id === exampleId) ??
         false
@@ -71,7 +68,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   );
 
   const isCustomFlashcard = useCallback(
-    (exampleId: number) => {
+    ({ exampleId }: { exampleId: number }) => {
       return (
         flashcards?.some(
           (flashcard) => flashcard.example.id === exampleId && flashcard.custom,
@@ -92,7 +89,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   */
 
   const isAddingFlashcard = useCallback(
-    (exampleId: number) => {
+    ({ exampleId }: { exampleId: number }) => {
       return (
         flashcards?.some(
           (flashcard) => flashcard.example.id === exampleId && flashcard.id < 0,
@@ -103,7 +100,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   );
 
   const isRemovingFlashcard = useCallback(
-    (exampleId: number) => {
+    ({ exampleId }: { exampleId: number }) => {
       // Removing flashcards are registered separately in the query client.
       // They are registered by exampleId rather than flashcardId.
       return pendingDeleteExampleIds?.includes(exampleId) ?? false;
@@ -112,17 +109,17 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
   );
 
   const isPendingFlashcard = useCallback(
-    (exampleId: number) => {
+    ({ exampleId }: { exampleId: number }) => {
       // Pending flashcard is either being added or removed
-      const isAdding = isAddingFlashcard(exampleId);
-      const isRemoving = isRemovingFlashcard(exampleId);
+      const isAdding = isAddingFlashcard({ exampleId });
+      const isRemoving = isRemovingFlashcard({ exampleId });
       return isAdding || isRemoving;
     },
     [isAddingFlashcard, isRemovingFlashcard],
   );
 
   const isFlashcardCollected = useCallback(
-    (flashcardId: number) => {
+    ({ flashcardId }: { flashcardId: number }) => {
       return (
         flashcards?.some((flashcard) => flashcard.id === flashcardId) ?? false
       );
@@ -213,7 +210,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
       }
 
       // Calculate the new interval using domain logic
-      const currentInterval = getCurrentInterval(flashcard);
+      const currentInterval = flashcard.interval ?? 0;
       const newInterval = calculateNewSrsInterval(currentInterval, difficulty);
 
       // Update the flashcard with the new interval

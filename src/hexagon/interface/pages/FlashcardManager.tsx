@@ -32,13 +32,14 @@ export default function FlashcardManager() {
     filterOwnedFlashcards,
     onGoingToQuiz,
     setFilterOwnedFlashcards,
-    isLoading,
+    studentFlashcardsLoading,
+    filteredFlashcardsLoading,
     error,
   } = useFlashcardManager({
     enableFilteringByDefault: enableFiltering,
   });
 
-  if (isLoading) {
+  if (studentFlashcardsLoading) {
     return <Loading message="Loading Flashcard Manager" />;
   }
   if (error) {
@@ -57,7 +58,7 @@ export default function FlashcardManager() {
         displayFlashcards={displayFlashcards}
         paginationState={paginationState}
         onGoingToQuiz={onGoingToQuiz}
-        isLoading={isLoading}
+        isLoading={filteredFlashcardsLoading}
         error={error}
       />
     </div>
