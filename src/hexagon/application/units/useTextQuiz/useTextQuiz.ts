@@ -36,6 +36,8 @@ export interface TextQuizReturn {
   vocabInfoHook: (vocab: Vocabulary) => VocabInfo;
   currentExample: ExampleWithVocabulary | null;
   cleanupFunction: () => void;
+  isQuizComplete: boolean;
+  restartQuiz: () => void;
 }
 
 export function useTextQuiz({
@@ -57,6 +59,7 @@ export function useTextQuiz({
   const vocabInfoHook = useVocabInfo;
 
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
+  const [isQuizComplete, setIsQuizComplete] = useState(false);
 
   const safeExampleIndex = useMemo(() => {
     if (currentExampleIndex < 0) {
@@ -71,6 +74,9 @@ export function useTextQuiz({
   const nextExample = useCallback(() => {
     if (examples && safeExampleIndex < (examples?.length || 0) - 1) {
       setCurrentExampleIndex(safeExampleIndex + 1);
+    } else if (examples && safeExampleIndex === (examples?.length || 0) - 1) {
+      // We're at the last example and trying to go next, mark quiz as complete
+      setIsQuizComplete(true);
     }
   }, [safeExampleIndex, examples]);
 
@@ -78,7 +84,16 @@ export function useTextQuiz({
     if (safeExampleIndex > 0) {
       setCurrentExampleIndex(safeExampleIndex - 1);
     }
-  }, [safeExampleIndex]);
+    // If we're going back from quiz complete state, reset it
+    if (isQuizComplete) {
+      setIsQuizComplete(false);
+    }
+  }, [safeExampleIndex, isQuizComplete]);
+
+  const restartQuiz = useCallback(() => {
+    setCurrentExampleIndex(0);
+    setIsQuizComplete(false);
+  }, []);
 
   const currentExample: ExampleWithVocabulary | null = useMemo(() => {
     if (examples && examples.length > 0) {
@@ -209,5 +224,7 @@ export function useTextQuiz({
 
     currentExample,
     cleanupFunction,
+    isQuizComplete,
+    restartQuiz,
   };
 }

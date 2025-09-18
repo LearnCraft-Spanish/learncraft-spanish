@@ -11,6 +11,8 @@ interface AudioQuizButtonsProps {
   goToQuestion: () => void;
   goToHint: () => void;
   closeQuiz: () => void;
+  currentExampleNumber: number;
+  totalExamplesNumber: number;
 }
 
 export default function AudioQuizButtons({
@@ -23,6 +25,8 @@ export default function AudioQuizButtons({
   goToQuestion,
   goToHint,
   closeQuiz,
+  currentExampleNumber,
+  // totalExamplesNumber, // temporarily removed
 }: AudioQuizButtonsProps): React.JSX.Element {
   function nextStepButtonText(): string {
     switch (audioQuizType) {
@@ -113,9 +117,14 @@ export default function AudioQuizButtons({
         </button>
       </div>
       <div className="buttonBox">
-        <button type="button" onClick={() => previousExample()}>
+        <button
+          type="button"
+          onClick={() => previousExample()}
+          disabled={currentExampleNumber === 1}
+        >
           Previous
         </button>
+
         <button type="button" onClick={() => nextExample()}>
           Next
         </button>

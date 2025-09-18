@@ -127,6 +127,8 @@ export default function AudioQuiz({
             goToQuestion={goToQuestion}
             currentStep={currentStep}
             closeQuiz={cleanupFunction}
+            currentExampleNumber={currentExampleNumber}
+            totalExamplesNumber={quizLength}
           />
         </>
       )}
