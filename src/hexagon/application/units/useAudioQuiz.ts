@@ -49,6 +49,7 @@ export interface AudioQuizReturn {
   play: () => void;
   nextStep: () => void;
   goToQuestion: () => void;
+  goToGuess: () => void;
   goToHint: () => void;
   goToAnswer: () => void;
   nextExample: () => void;
@@ -494,9 +495,13 @@ export function useAudioQuiz({
       return 0;
     }
 
-    // Simple progress calculation - concatenated audio handles padding seamlessly
-    const progress = currentTime / currentStepValue.duration;
-    return progress;
+    // Progress calculation for concatenated audio
+    // Since each step uses the full concatenated audio (original + buffer),
+    // we calculate progress as currentTime / total duration
+    const progress = Math.min(currentTime / currentStepValue.duration, 1);
+    const finalProgress = Math.max(progress, 0);
+
+    return finalProgress;
   }, [currentTime, currentStepValue, autoplay, previousStepRef, currentStep]);
 
   // What to do when the audio ends - simplified since concatenated audio handles padding
@@ -504,66 +509,30 @@ export function useAudioQuiz({
     if (!autoplay) {
       return;
     }
+
     // No need for complex padding logic - concatenated audio handles it seamlessly
     nextStep();
   }, [autoplay, nextStep]);
 
   const goToQuestion = useCallback(() => {
     setCurrentStep(AudioQuizStep.Question);
-    if (
-      previousStepRef.current === AudioQuizStep.Question &&
-      currentAudioExample
-    ) {
-      changeCurrentAudio({
-        currentTime: 0,
-        src: currentAudioExample?.question.blobUrl,
-        onEnded: onEndedCallback,
-        playOnLoad: true,
-      });
-    }
-  }, [
-    currentAudioExample,
-    previousStepRef,
-    changeCurrentAudio,
-    onEndedCallback,
-  ]);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
+
+  const goToGuess = useCallback(() => {
+    setCurrentStep(AudioQuizStep.Guess);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
 
   const goToHint = useCallback(() => {
     setCurrentStep(AudioQuizStep.Hint);
-    if (previousStepRef.current === AudioQuizStep.Hint && currentAudioExample) {
-      changeCurrentAudio({
-        currentTime: 0,
-        src: currentAudioExample?.hint.blobUrl,
-        onEnded: onEndedCallback,
-        playOnLoad: true,
-      });
-    }
-  }, [
-    currentAudioExample,
-    previousStepRef,
-    changeCurrentAudio,
-    onEndedCallback,
-  ]);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
 
   const goToAnswer = useCallback(() => {
     setCurrentStep(AudioQuizStep.Answer);
-    if (
-      previousStepRef.current === AudioQuizStep.Answer &&
-      currentAudioExample
-    ) {
-      changeCurrentAudio({
-        currentTime: 0,
-        src: currentAudioExample?.answer.blobUrl,
-        onEnded: onEndedCallback,
-        playOnLoad: true,
-      });
-    }
-  }, [
-    currentAudioExample,
-    previousStepRef,
-    changeCurrentAudio,
-    onEndedCallback,
-  ]);
+    // Let the main useEffect handle audio changes for consistency
+  }, []);
 
   // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
@@ -618,15 +587,37 @@ export function useAudioQuiz({
   // Complex effect to handle changes to the example or step
   useEffect(() => {
     // Do not proceed with the changes unless the audio is ready to be played
-    if (!ready) {
+    if (!ready || !currentStepValue) {
+      console.error('❌ Audio change blocked:', {
+        ready,
+        hasStepValue: !!currentStepValue,
+      });
       return;
     }
-    if (
-      currentExampleIndex !== previousExampleIndexRef.current &&
-      currentStepValue
-    ) {
+
+    const exampleChanged =
+      currentExampleIndex !== previousExampleIndexRef.current;
+    const stepChanged = currentStep !== previousStepRef.current;
+
+    console.error('🎵 Audio Change Check:', {
+      exampleChanged,
+      stepChanged,
+      currentStep,
+      previousStep: previousStepRef.current,
+      currentStepValue: {
+        step: currentStepValue.step,
+        blobUrl: `${currentStepValue.blobUrl?.substring(0, 50)}...`,
+        duration: currentStepValue.duration,
+        displayText: currentStepValue.displayText,
+      },
+    });
+
+    if (exampleChanged) {
+      console.error('📝 Example changed - updating audio');
       // If the example index has changed, handle the example change
       previousExampleIndexRef.current = currentExampleIndex;
+      // Reset and set the step ref for the new example
+      previousStepRef.current = currentStep;
       // Handle example change
       changeCurrentAudio({
         currentTime: 0,
@@ -634,8 +625,9 @@ export function useAudioQuiz({
         onEnded: onEndedCallback,
         playOnLoad: true,
       });
-    } else if (currentStep !== previousStepRef.current && currentStepValue) {
-      // If the step has changed but the index has not, handle the step change
+    } else if (stepChanged) {
+      console.error('🔄 Step changed - updating audio');
+      // Handle step changes (both initial and subsequent)
       previousStepRef.current = currentStep;
       // Handle step change
       changeCurrentAudio({
@@ -644,16 +636,15 @@ export function useAudioQuiz({
         onEnded: onEndedCallback,
         playOnLoad: true,
       });
+    } else {
+      console.error('⏭️ No audio change needed');
     }
   }, [
     ready,
-    currentExampleReady,
-    nextExampleReady,
     currentStep,
     currentExampleIndex,
     currentStepValue,
     changeCurrentAudio,
-    parseAudioExample,
     onEndedCallback,
   ]);
 
@@ -735,6 +726,7 @@ export function useAudioQuiz({
     play,
     nextStep,
     goToQuestion,
+    goToGuess,
     goToHint,
     goToAnswer,
     nextExample: nextExampleWithPrefetch,

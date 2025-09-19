@@ -19,6 +19,7 @@ export const AudioQuizStepPropertiesSchema = z.object({
   spanish: z.boolean(),
   displayText: z.string().min(1),
   blobUrl: z.string().url(),
+  duration: z.number().positive(),
 });
 
 export type AudioQuizStepProperties = z.infer<

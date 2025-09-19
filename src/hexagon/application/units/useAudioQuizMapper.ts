@@ -145,7 +145,7 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
       const englishAudioUrl = example.englishAudio;
 
       // Business rule: Apply appropriate buffer duration
-      const BUFFER_LENGTH_SECONDS = 3; // Could be configurable based on quiz settings
+      const BUFFER_LENGTH_SECONDS = 3;
 
       // Use transcoding port for raw audio operations
       const spanishAudioBlob = await mp3ToWav(spanishAudioUrl);
@@ -160,6 +160,11 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
         silenceBlob,
       ]);
 
+      // Create a silence blob that matches the total duration of the English audio
+      const guessSilenceBlob = await generateSilence(
+        combinedEnglishAudioBlob.durationSec,
+      );
+
       // Create both quiz examples using the same audio blobs
       const speakingExample: SpeakingQuizExample = {
         type: AudioQuizType.Speaking,
@@ -168,24 +173,28 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
           spanish: false,
           displayText: englishText,
           blobUrl: combinedEnglishAudioBlob.url,
+          duration: combinedEnglishAudioBlob.durationSec,
         },
         guess: {
           step: AudioQuizStep.Guess,
           spanish: false,
           displayText: guessText,
-          blobUrl: combinedSpanishAudioBlob.url,
+          blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
+          duration: guessSilenceBlob.durationSec,
         },
         hint: {
           step: AudioQuizStep.Hint,
           spanish: true,
           displayText: hintText,
           blobUrl: combinedSpanishAudioBlob.url,
+          duration: combinedSpanishAudioBlob.durationSec,
         },
         answer: {
           step: AudioQuizStep.Answer,
           spanish: true,
           displayText: spanishText,
           blobUrl: combinedSpanishAudioBlob.url,
+          duration: combinedSpanishAudioBlob.durationSec,
         },
       };
 
@@ -196,24 +205,28 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
           spanish: true,
           displayText: listeningQuestionText,
           blobUrl: combinedSpanishAudioBlob.url,
+          duration: combinedSpanishAudioBlob.durationSec,
         },
         guess: {
           step: AudioQuizStep.Guess,
           spanish: false,
           displayText: guessText,
-          blobUrl: combinedSpanishAudioBlob.url,
+          blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
+          duration: guessSilenceBlob.durationSec,
         },
         hint: {
           step: AudioQuizStep.Hint,
           spanish: true,
           displayText: hintText,
           blobUrl: combinedSpanishAudioBlob.url,
+          duration: combinedSpanishAudioBlob.durationSec,
         },
         answer: {
           step: AudioQuizStep.Answer,
           spanish: false,
           displayText: spanishText,
           blobUrl: combinedSpanishAudioBlob.url,
+          duration: combinedSpanishAudioBlob.durationSec,
         },
       };
 

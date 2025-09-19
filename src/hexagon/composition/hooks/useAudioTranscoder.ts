@@ -1,6 +1,6 @@
-import { useContext } from 'react';
-import { AudioTranscodingContext } from '@composition/context/AudioTranscodingContext';
 import type { AudioTranscodingPort } from '@application/ports/audioTranscodingPort';
+import { AudioTranscodingContext } from '@composition/context/AudioTranscodingContext';
+import { use } from 'react';
 
 /**
  * Hook to access the AudioTranscoder singleton from context
@@ -24,7 +24,7 @@ import type { AudioTranscodingPort } from '@application/ports/audioTranscodingPo
  * ```
  */
 export function useAudioTranscoder(): AudioTranscodingPort {
-  const context = useContext(AudioTranscodingContext);
+  const context = use(AudioTranscodingContext);
 
   if (!context) {
     throw new Error(

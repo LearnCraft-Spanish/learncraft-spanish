@@ -30,7 +30,6 @@ export default defineConfig(({ mode }) => {
     ],
     optimizeDeps: {
       exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
-      include: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
     },
     define: {
       global: 'globalThis',
@@ -70,11 +69,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port,
       open: true,
-      headers: {
-        'Cross-Origin-Embedder-Policy': 'require-corp',
-        'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Resource-Policy': 'cross-origin',
-      },
+      // Remove global Cross-Origin headers that interfere with Auth0
+      // FFmpeg will handle SharedArrayBuffer requirements internally when needed
     },
     css: {
       preprocessorOptions: {

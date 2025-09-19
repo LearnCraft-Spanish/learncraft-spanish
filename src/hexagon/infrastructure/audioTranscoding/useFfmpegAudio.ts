@@ -85,22 +85,27 @@ const calculateWavDuration = (wavBytes: Uint8Array): number => {
   const sampleRate = dv.getUint32(24, true);
   const channels = dv.getUint16(22, true);
   const bitsPerSample = dv.getUint16(34, true);
-  const dataSize = dv.getUint32(40, true);
 
-  return dataSize / ((sampleRate * channels * bitsPerSample) / 8);
+  // Use actual file size minus WAV header (44 bytes) instead of potentially incorrect header field
+  const actualDataSize = wavBytes.length - 44;
+
+  const durationFromActualSize =
+    actualDataSize / ((sampleRate * channels * bitsPerSample) / 8);
+
+  return durationFromActualSize;
 };
 
 /**
  * Clean up temporary files from FFmpeg's virtual filesystem
  */
-const cleanupFiles = (ffmpeg: FFmpeg, files: string[]): void => {
-  files.forEach((file) => {
+const cleanupFiles = async (ffmpeg: FFmpeg, files: string[]): Promise<void> => {
+  for (const file of files) {
     try {
-      (ffmpeg as any).FS('unlink', file);
+      await ffmpeg.deleteFile(file);
     } catch {
       // Ignore errors - file might not exist
     }
-  });
+  }
 };
 
 // ============================================================================
@@ -162,28 +167,23 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
   const init = useCallback(async () => {
     // If already initialized, return immediately
     if (ffmpegRef.current) {
-      console.log('FFmpeg already initialized');
       return;
     }
 
     // If initialization is in progress, wait for it to complete
     if (isInitializingRef.current && initPromiseRef.current) {
-      console.log('FFmpeg initialization already in progress, waiting...');
       return initPromiseRef.current;
     }
-
-    console.log('Starting FFmpeg initialization...');
     isInitializingRef.current = true;
     setIsLoading(true);
 
     initPromiseRef.current = (async () => {
       try {
-        console.log('Creating FFmpeg instance...');
         const ffmpeg = new FFmpeg();
 
         // Check for SharedArrayBuffer support
         if (typeof SharedArrayBuffer === 'undefined') {
-          console.warn(
+          console.error(
             'SharedArrayBuffer not supported - FFmpeg may not work properly',
           );
         }
@@ -191,12 +191,10 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
         // Add progress callback for real FFmpeg progress tracking
         ffmpeg.on('progress', ({ progress }) => {
           const progressPercent = Math.round(progress * 100);
-          console.log(`FFmpeg actual progress: ${progressPercent}%`);
           setLoadingProgress(progressPercent);
         });
 
         // Try the simplest possible approach - let FFmpeg handle everything
-        console.log('Loading FFmpeg with default configuration...');
         const loadPromise = ffmpeg.load();
 
         // Set initial progress
@@ -218,13 +216,11 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
         try {
           await Promise.race([loadPromise, timeoutPromise]);
           setLoadingProgress(100);
-          console.log('FFmpeg loaded successfully with default configuration!');
         } catch (error) {
           setLoadingProgress(0);
           throw error;
         }
 
-        console.log('FFmpeg loaded successfully');
         ffmpegRef.current = ffmpeg;
         setIsReady(true);
         setIsLoading(false);
@@ -251,9 +247,6 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
         ) {
           retryCountRef.current += 1;
           const delay = 2 ** retryCountRef.current * 1000; // 2s, 4s
-          console.log(
-            `Retrying FFmpeg initialization in ${delay}ms (attempt ${retryCountRef.current}/${maxRetries}) - ${isTimeoutError ? 'timeout' : 'network'} error`,
-          );
 
           setTimeout(() => {
             isInitializingRef.current = false;
@@ -352,10 +345,10 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
         const mp3Bytes = await response.arrayBuffer();
 
         // Write input file
-        (ffmpeg as any).FS('writeFile', 'input.mp3', new Uint8Array(mp3Bytes));
+        await ffmpeg.writeFile('input.mp3', new Uint8Array(mp3Bytes));
 
         // Convert MP3 to WAV
-        await (ffmpeg as any).run(
+        await ffmpeg.exec([
           '-i',
           'input.mp3',
           '-ac',
@@ -365,11 +358,17 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
           '-c:a',
           'pcm_s16le', // 16-bit PCM
           'output.wav',
-        );
+        ]);
 
         // Read result and create blob URL
-        const wavBytes = (ffmpeg as any).FS('readFile', 'output.wav');
-        const blob = new Blob([wavBytes], { type: 'audio/wav' });
+        const wavData = await ffmpeg.readFile('output.wav');
+        const wavBytes =
+          wavData instanceof Uint8Array
+            ? wavData
+            : new Uint8Array(wavData as unknown as ArrayBuffer);
+        const blob = new Blob([new Uint8Array(wavBytes)], {
+          type: 'audio/wav',
+        });
         const url = URL.createObjectURL(blob);
 
         // Calculate duration from WAV header
@@ -377,7 +376,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
 
         // Cleanup temporary files
         if (ffmpegRef.current) {
-          cleanupFiles(ffmpegRef.current, ['input.mp3', 'output.wav']);
+          await cleanupFiles(ffmpegRef.current, ['input.mp3', 'output.wav']);
         }
 
         return {
@@ -389,7 +388,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
       } catch (error) {
         // Cleanup on error
         if (ffmpegRef.current) {
-          cleanupFiles(ffmpegRef.current, ['input.mp3', 'output.wav']);
+          await cleanupFiles(ffmpegRef.current, ['input.mp3', 'output.wav']);
         }
         throw error;
       }
@@ -421,7 +420,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
 
       try {
         // Generate silence
-        await (ffmpeg as any).run(
+        await ffmpeg.exec([
           '-f',
           'lavfi',
           '-i',
@@ -431,11 +430,17 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
           '-c:a',
           'pcm_s16le',
           'silence.wav',
-        );
+        ]);
 
         // Read result and create blob URL
-        const wavBytes = (ffmpeg as any).FS('readFile', 'silence.wav');
-        const blob = new Blob([wavBytes], { type: 'audio/wav' });
+        const wavData = await ffmpeg.readFile('silence.wav');
+        const wavBytes =
+          wavData instanceof Uint8Array
+            ? wavData
+            : new Uint8Array(wavData as unknown as ArrayBuffer);
+        const blob = new Blob([new Uint8Array(wavBytes)], {
+          type: 'audio/wav',
+        });
         const url = URL.createObjectURL(blob);
 
         // Calculate duration from WAV header
@@ -443,7 +448,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
 
         // Cleanup temporary files
         if (ffmpegRef.current) {
-          cleanupFiles(ffmpegRef.current, ['silence.wav']);
+          await cleanupFiles(ffmpegRef.current, ['silence.wav']);
         }
 
         return {
@@ -455,7 +460,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
       } catch (error) {
         // Cleanup on error
         if (ffmpegRef.current) {
-          cleanupFiles(ffmpegRef.current, ['silence.wav']);
+          await cleanupFiles(ffmpegRef.current, ['silence.wav']);
         }
         throw error;
       }
@@ -498,25 +503,20 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
           // Fetch the blob data
           const response = await fetch(audioBlobs[i].url);
           const arrayBuffer = await response.arrayBuffer();
-          (ffmpeg as any).FS(
-            'writeFile',
-            fileName,
-            new Uint8Array(arrayBuffer),
-          );
+          await ffmpeg.writeFile(fileName, new Uint8Array(arrayBuffer));
         }
 
         // Create concat file list
         const concatContent = fileNames
           .map((name) => `file '${name}'\n`)
           .join('');
-        (ffmpeg as any).FS(
-          'writeFile',
+        await ffmpeg.writeFile(
           'concat.txt',
           new TextEncoder().encode(concatContent),
         );
 
         // Concatenate files
-        await (ffmpeg as any).run(
+        await ffmpeg.exec([
           '-f',
           'concat',
           '-safe',
@@ -526,11 +526,17 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
           '-c',
           'copy',
           'output.wav',
-        );
+        ]);
 
         // Read result and create blob URL
-        const wavBytes = (ffmpeg as any).FS('readFile', 'output.wav');
-        const blob = new Blob([wavBytes], { type: 'audio/wav' });
+        const wavData = await ffmpeg.readFile('output.wav');
+        const wavBytes =
+          wavData instanceof Uint8Array
+            ? wavData
+            : new Uint8Array(wavData as unknown as ArrayBuffer);
+        const blob = new Blob([new Uint8Array(wavBytes)], {
+          type: 'audio/wav',
+        });
         const url = URL.createObjectURL(blob);
 
         // Calculate duration from WAV header
@@ -538,7 +544,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
 
         // Cleanup temporary files
         if (ffmpegRef.current) {
-          cleanupFiles(ffmpegRef.current, [
+          await cleanupFiles(ffmpegRef.current, [
             ...fileNames,
             'concat.txt',
             'output.wav',
@@ -555,7 +561,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
         // Cleanup on error
         if (ffmpegRef.current) {
           const fileNames = audioBlobs.map((_, i) => `input${i}.wav`);
-          cleanupFiles(ffmpegRef.current, [
+          await cleanupFiles(ffmpegRef.current, [
             ...fileNames,
             'concat.txt',
             'output.wav',
@@ -575,16 +581,13 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
     mp3ToWav,
     generateSilence,
     concatenateAudio,
-    dispose: () => {
+    dispose: async () => {
       // Cleanup FFmpeg files if needed
       if (ffmpegRef.current) {
         try {
-          const files = (ffmpegRef.current as any).FS('readdir', '/');
-          files.forEach((file: string) => {
-            if (file !== '.' && file !== '..') {
-              (ffmpegRef.current as any).FS('unlink', file);
-            }
-          });
+          // In FFmpeg.wasm 0.12.x, we don't have direct FS access for listing files
+          // The cleanup is now handled by individual function cleanup calls
+          // This is a no-op for now, but kept for interface compatibility
         } catch {
           // Ignore cleanup errors
         }

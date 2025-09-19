@@ -28,6 +28,8 @@ describe('initial render', () => {
         goToQuestion={() => {}}
         goToHint={() => {}}
         closeQuiz={unReadyQuiz}
+        currentExampleNumber={1}
+        totalExamplesNumber={10}
       />,
     );
     expect(screen.getByText('Previous')).toBeTruthy();
@@ -49,6 +51,8 @@ describe('audioOrComprehension is audio', () => {
         goToQuestion={() => {}}
         goToHint={() => {}}
         closeQuiz={unReadyQuiz}
+        currentExampleNumber={1}
+        totalExamplesNumber={10}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();
@@ -68,6 +72,8 @@ describe('audioOrComprehension is comprehension', () => {
         goToQuestion={() => {}}
         goToHint={() => {}}
         closeQuiz={unReadyQuiz}
+        currentExampleNumber={1}
+        totalExamplesNumber={10}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();
