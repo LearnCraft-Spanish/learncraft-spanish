@@ -65,7 +65,6 @@ import type {
   AudioTranscodingPort,
 } from '@application/ports/audioTranscodingPort';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { toBlobURL } from '@ffmpeg/util';
 import { useCallback, useRef, useState } from 'react';
 
 // ============================================================================
@@ -189,103 +188,38 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
           );
         }
 
-        // Add progress callback for better tracking
+        // Add progress callback for real FFmpeg progress tracking
         ffmpeg.on('progress', ({ progress }) => {
           const progressPercent = Math.round(progress * 100);
           console.log(`FFmpeg actual progress: ${progressPercent}%`);
-          setLoadingProgress(Math.min(progressPercent, 90));
+          setLoadingProgress(progressPercent);
         });
 
-        console.log('Getting FFmpeg core URL...');
+        // Try the simplest possible approach - let FFmpeg handle everything
+        console.log('Loading FFmpeg with default configuration...');
+        const loadPromise = ffmpeg.load();
 
-        // Try multiple CDN sources for better reliability - using stable version
-        const cdnUrls = [
-          'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
-          'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd/ffmpeg-core.js',
-          'https://unpkg.com/@ffmpeg/core@0.12.10/dist/umd/ffmpeg-core.js',
-        ];
-
-        let url: string;
-        let lastError: Error | null = null;
-
-        for (const cdnUrl of cdnUrls) {
-          try {
-            console.log(`Trying CDN: ${cdnUrl}`);
-            // Try direct URL first, then blob URL as fallback
-            try {
-              const response = await fetch(cdnUrl);
-              if (response.ok) {
-                url = cdnUrl; // Use direct URL
-                console.log(`Using direct URL: ${cdnUrl}`);
-                break;
-              }
-            } catch {
-              // Fall back to blob URL
-              url = await toBlobURL(cdnUrl, 'text/javascript');
-              console.log(`Using blob URL from: ${cdnUrl}`);
-              break;
-            }
-          } catch (error) {
-            console.warn(`Failed to load from ${cdnUrl}:`, error);
-            lastError = error as Error;
-            continue;
-          }
-        }
-
-        if (!url!) {
-          throw new Error(
-            `Failed to load FFmpeg core from any CDN. Last error: ${lastError?.message}`,
-          );
-        }
-
-        console.log('Loading FFmpeg core...');
-        console.log('Core URL:', url);
-        console.log(
-          'WASM URL:',
-          url.replace('ffmpeg-core.js', 'ffmpeg-core.wasm'),
-        );
-        console.log(
-          'Worker URL:',
-          url.replace('ffmpeg-core.js', 'ffmpeg-core.worker.js'),
-        );
-
-        // Add progress tracking with longer timeout for actual loading
+        // Set initial progress
         setLoadingProgress(0);
-        const progressInterval = setInterval(() => {
-          setLoadingProgress((prev) => {
-            const newProgress = Math.min(prev + 2, 90); // Increment by 2% up to 90%
-            console.log(`FFmpeg loading progress: ${newProgress}%`);
-            return newProgress;
-          });
-        }, 1000);
-
-        const loadPromise = ffmpeg.load({
-          coreURL: url,
-          wasmURL: url.replace('ffmpeg-core.js', 'ffmpeg-core.wasm'),
-          // Try without worker for better compatibility
-        });
 
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(
             () => {
-              clearInterval(progressInterval);
               reject(
                 new Error(
-                  'FFmpeg load timeout after 20 seconds - try refreshing the page or check browser compatibility',
+                  'FFmpeg load timeout after 30 seconds - this may be a browser compatibility issue',
                 ),
               );
             },
-            20000, // Reduced timeout to 20 seconds
+            30000, // 30 seconds for default loading
           );
         });
 
         try {
           await Promise.race([loadPromise, timeoutPromise]);
-          clearInterval(progressInterval);
           setLoadingProgress(100);
-          console.log('FFmpeg core loaded successfully!');
+          console.log('FFmpeg loaded successfully with default configuration!');
         } catch (error) {
-          clearInterval(progressInterval);
           setLoadingProgress(0);
           throw error;
         }
@@ -316,7 +250,7 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
           (isNetworkError || !isTimeoutError)
         ) {
           retryCountRef.current += 1;
-          const delay = Math.pow(2, retryCountRef.current) * 1000; // 2s, 4s
+          const delay = 2 ** retryCountRef.current * 1000; // 2s, 4s
           console.log(
             `Retrying FFmpeg initialization in ${delay}ms (attempt ${retryCountRef.current}/${maxRetries}) - ${isTimeoutError ? 'timeout' : 'network'} error`,
           );
