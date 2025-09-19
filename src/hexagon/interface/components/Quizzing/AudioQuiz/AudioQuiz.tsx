@@ -180,8 +180,8 @@ export default function AudioQuiz({
             goToQuestion={goToQuestion}
             currentStep={currentStep}
             closeQuiz={cleanupFunction}
-            currentExampleNumber={currentExampleNumber}
-            totalExamplesNumber={quizLength}
+            isFirstExample={currentExampleNumber === 1}
+            isLastExample={currentExampleNumber === quizLength}
           />
         </>
       )}

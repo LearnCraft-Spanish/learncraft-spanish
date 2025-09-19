@@ -64,6 +64,8 @@ export function TextQuiz({
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
+      if (isQuizComplete) return; // prevent keyboard controls when quiz is complete
+
       if (event.key === 'ArrowRight' || event.key === 'd') {
         incrementExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {

@@ -9,12 +9,6 @@ const decrementExample = vi.fn();
 const incrementExample = vi.fn();
 const unReadyQuiz = vi.fn();
 
-/*
-  It is my understanding that further testing of this component is not
-  necessary as it is a simple component that renders buttons based on the props
-  passed to it.
-  It would be testing implementation instead of behavior.
-*/
 describe('initial render', () => {
   it('renders without crashing', () => {
     render(
@@ -28,8 +22,8 @@ describe('initial render', () => {
         goToQuestion={() => {}}
         goToHint={() => {}}
         closeQuiz={unReadyQuiz}
-        currentExampleNumber={1}
-        totalExamplesNumber={10}
+        isFirstExample={true}
+        isLastExample={false}
       />,
     );
     expect(screen.getByText('Previous')).toBeTruthy();
@@ -51,8 +45,8 @@ describe('audioOrComprehension is audio', () => {
         goToQuestion={() => {}}
         goToHint={() => {}}
         closeQuiz={unReadyQuiz}
-        currentExampleNumber={1}
-        totalExamplesNumber={10}
+        isFirstExample={true}
+        isLastExample={false}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();
@@ -72,8 +66,8 @@ describe('audioOrComprehension is comprehension', () => {
         goToQuestion={() => {}}
         goToHint={() => {}}
         closeQuiz={unReadyQuiz}
-        currentExampleNumber={1}
-        totalExamplesNumber={10}
+        isFirstExample={true}
+        isLastExample={false}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();

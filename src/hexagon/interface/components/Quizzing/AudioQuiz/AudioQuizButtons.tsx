@@ -11,8 +11,8 @@ interface AudioQuizButtonsProps {
   goToQuestion: () => void;
   goToHint: () => void;
   closeQuiz: () => void;
-  currentExampleNumber: number;
-  totalExamplesNumber: number;
+  isFirstExample: boolean;
+  isLastExample: boolean;
 }
 
 export default function AudioQuizButtons({
@@ -25,8 +25,8 @@ export default function AudioQuizButtons({
   goToQuestion,
   goToHint,
   closeQuiz,
-  currentExampleNumber,
-  // totalExamplesNumber, // temporarily removed
+  isFirstExample,
+  isLastExample,
 }: AudioQuizButtonsProps): React.JSX.Element {
   function nextStepButtonText(): string {
     switch (audioQuizType) {
@@ -43,7 +43,11 @@ export default function AudioQuizButtons({
           case AudioQuizStep.Hint:
             return 'Play Again';
           case AudioQuizStep.Answer:
-            return 'Next';
+            if (isLastExample) {
+              return 'Finish';
+            } else {
+              return 'Next';
+            }
         }
         break;
       case AudioQuizType.Listening:
@@ -59,7 +63,11 @@ export default function AudioQuizButtons({
           case AudioQuizStep.Hint:
             return 'Show English';
           case AudioQuizStep.Answer:
-            return 'Next';
+            if (isLastExample) {
+              return 'Finish';
+            } else {
+              return 'Next';
+            }
         }
         break;
       default:
@@ -120,13 +128,13 @@ export default function AudioQuizButtons({
         <button
           type="button"
           onClick={() => previousExample()}
-          disabled={currentExampleNumber === 1}
+          disabled={isFirstExample}
         >
           Previous
         </button>
 
         <button type="button" onClick={() => nextExample()}>
-          Next
+          {isLastExample ? 'Finish' : 'Next'}
         </button>
       </div>
       <div className="buttonBox">
