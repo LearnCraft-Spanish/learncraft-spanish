@@ -1,8 +1,14 @@
+import type { Vocabulary } from '@learncraft-spanish/shared';
+import type { AddPendingRemoveProps } from 'src/hexagon/application/units/useTextQuiz';
 import { AudioQuizStep } from '@domain/audioQuizzing';
 import React from 'react';
 import pauseIcon from 'src/assets/icons/pause.svg';
 import playIcon from 'src/assets/icons/play.svg';
+import { AddToMyFlashcardsButtons } from '../general/AddToMyFlashcardsButtons';
+import { GetHelpDisplay } from '../general/FlashcardDisplay/GetHelpDisplay';
 interface AudioFlashcardProps {
+  vocabComplete: boolean;
+  vocabulary: Vocabulary[];
   currentExampleText: string;
   currentStep: AudioQuizStep;
   nextStep: () => void;
@@ -11,9 +17,14 @@ interface AudioFlashcardProps {
   pause: () => void;
   play: () => void;
   isPlaying: boolean;
+  getHelpIsOpen: boolean;
+  setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
+  addPendingRemoveProps: AddPendingRemoveProps | undefined;
 }
 
 export default function AudioFlashcardComponent({
+  vocabComplete,
+  vocabulary,
   currentExampleText,
   currentStep,
   nextStep,
@@ -22,6 +33,9 @@ export default function AudioFlashcardComponent({
   pause,
   play,
   isPlaying,
+  getHelpIsOpen,
+  setGetHelpIsOpen,
+  addPendingRemoveProps,
 }: AudioFlashcardProps): React.JSX.Element {
   function handlePlayPauseClick(
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
@@ -48,7 +62,7 @@ export default function AudioFlashcardComponent({
             : 'var(--dark)',
       }}
     >
-      <p>{currentExampleText}</p>
+      <p className="audioFlashcardText">{currentExampleText}</p>
       <button
         type="button"
         className="audioPlayPauseButton"
@@ -81,6 +95,46 @@ export default function AudioFlashcardComponent({
             }}
           />
         )}
+      {addPendingRemoveProps && currentStep === AudioQuizStep.Answer && (
+        <div className="AddPendingRemoveButtons">
+          <AddToMyFlashcardsButtons
+            exampleIsCollected={addPendingRemoveProps.isCollected}
+            exampleIsAdding={addPendingRemoveProps.isAdding}
+            exampleIsRemoving={addPendingRemoveProps.isRemoving}
+            exampleIsCustom={addPendingRemoveProps.isCustom}
+            addFlashcard={addPendingRemoveProps.addFlashcard}
+            removeFlashcard={addPendingRemoveProps.removeFlashcard}
+          />
+        </div>
+      )}
+      {currentStep === AudioQuizStep.Answer && vocabComplete && (
+        <div className="getHelpContainer">
+          {getHelpIsOpen ? (
+            <button
+              className="getHelpButton"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setGetHelpIsOpen(false);
+              }}
+            >
+              Hide Help
+            </button>
+          ) : (
+            <button
+              className="getHelpButton"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setGetHelpIsOpen(true);
+              }}
+            >
+              Get Help
+            </button>
+          )}
+          {getHelpIsOpen && <GetHelpDisplay vocabulary={vocabulary} />}
+        </div>
+      )}
     </div>
   );
 }

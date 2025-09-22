@@ -18,8 +18,8 @@ export function QuizButtons({
       <button type="button" onClick={decrementExample} disabled={firstExample}>
         Previous
       </button>
-      <button type="button" onClick={incrementExample} disabled={lastExample}>
-        Next
+      <button type="button" onClick={incrementExample}>
+        {lastExample ? 'Finish' : 'Next'}
       </button>
     </div>
   );

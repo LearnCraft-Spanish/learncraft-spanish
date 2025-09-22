@@ -27,9 +27,9 @@ button:disabled {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow: hidden;
+  /* overflow: hidden; */
   text-align: center;
-  color: var(--light) !important;
+  /* color: var(--light) !important; */
   background-color: var(--dark);
   max-width: 640px;
   width: 80vw;
@@ -39,12 +39,25 @@ button:disabled {
   border-radius: 10px;
   cursor: pointer;
 }
+
+.audioFlashcard .AddPendingRemoveButtons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  border-top-right-radius: 10px;
+  width: 200px;
+  height: 50px;
+  overflow: hidden;
+}
+
 .audioPlayPauseButton {
   background-color: transparent;
   position: absolute;
   bottom: 0px;
   right: 0px;
   padding: 12px;
+  border-bottom-right-radius: 10px;
   cursor: pointer;
   z-index: 5;
 }
@@ -54,7 +67,8 @@ button:disabled {
   height: 24px;
 }
 
-.audioFlashcard p {
+.audioFlashcardText {
+  color: var(--light) !important;
   font-weight: bold;
   font-size: 1.25rem;
   margin: 0;
@@ -66,6 +80,24 @@ button:disabled {
   z-index: 1;
 }
 
+.getHelpContainer {
+  position: absolute;
+  overflow: visible;
+  top: 50%;
+  left: 10%;
+  width: 80%;
+  height: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+}
+
+.audioFlashcard .vocabTag.selected {
+  background-color: var(--brand);
+  border: 4px solid var(--brand);
+}
+
 @media screen and (max-width: 480px) {
   .audioFlashcard {
     min-height: 200px;
@@ -73,7 +105,8 @@ button:disabled {
     height: 80vw;
     margin-top: 10vw;
   }
-  .audioFlashcard p {
+
+  .audioFlashcardText {
     font-size: 1.125rem;
   }
 }

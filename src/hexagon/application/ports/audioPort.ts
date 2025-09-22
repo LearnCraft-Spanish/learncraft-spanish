@@ -18,10 +18,4 @@ export interface AudioPort {
 
   // Changes the current audio element
   changeCurrentAudio: (current: AudioElementState) => Promise<void>;
-
-  // Preloads the audio durations
-  preloadAudio: (newQueue: { english: string; spanish: string }) => Promise<{
-    englishDuration: number | null;
-    spanishDuration: number | null;
-  }>;
 }

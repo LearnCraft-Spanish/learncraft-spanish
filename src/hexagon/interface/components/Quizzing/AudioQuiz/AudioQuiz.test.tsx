@@ -1,4 +1,3 @@
-import type { Example } from '@learncraft-spanish/shared';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
@@ -19,9 +18,8 @@ const studentFlashcardDataObject = allStudentFlashcards.find(
   (student) => student.emailAddress === studentUserData?.email,
 )?.studentFlashcardData;
 
-const unknownAudioExamples: Example[] =
-  createMockExampleWithVocabularyList(5)();
-const knownAudioExamples: Example[] = createMockExampleWithVocabularyList(5)();
+const unknownAudioExamples = createMockExampleWithVocabularyList(5)();
+const knownAudioExamples = createMockExampleWithVocabularyList(5)();
 
 if (
   !studentFlashcardDataObject ||

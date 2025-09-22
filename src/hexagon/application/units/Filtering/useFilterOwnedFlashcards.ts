@@ -1,25 +1,23 @@
-import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example';
-import type { Flashcard } from '@learncraft-spanish/shared/dist/domain/flashcard';
-import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+} from '@learncraft-spanish/shared';
+import type { UseStudentFlashcardsReturn } from '../useStudentFlashcards';
 import { filterExamplesCombined } from '@learncraft-spanish/shared';
 import { useMemo } from 'react';
-import { useCombinedFiltersWithVocabulary } from './Filtering/useCombinedFiltersWithVocabulary';
+import { useStudentFlashcards } from '../useStudentFlashcards';
+import { useCombinedFiltersWithVocabulary } from './useCombinedFiltersWithVocabulary';
 
-export interface UseFilteredOwnedFlashcardsReturn {
+export interface UseFilterOwnedFlashcardsReturn {
   filteredFlashcards: Flashcard[];
-  filterOwnedFlashcards: boolean;
-  setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
-  isLoading: boolean;
+  studentFlashcardsLoading: boolean;
+  filteredFlashcardsLoading: boolean;
   error: Error | null;
 }
 
-export function useFilteredOwnedFlashcards(): UseFilteredOwnedFlashcardsReturn {
-  // The coordinator state to track whether owned filters are filtered
-  const { filterOwnedFlashcards, setFilterOwnedFlashcards } =
-    useFilterOwnedFlashcards();
-
+export function useFilterOwnedFlashcards(
+  filterOwnedFlashcards: boolean,
+): UseFilterOwnedFlashcardsReturn {
   // The coordinator state to track the active filters
   const {
     selectedSkillTags,
@@ -27,6 +25,7 @@ export function useFilteredOwnedFlashcards(): UseFilteredOwnedFlashcardsReturn {
     audioOnly,
     lessonRangeVocabRequired,
     lessonVocabKnown,
+    isLoading: isLoadingCombinedFiltersWithVocabulary,
   } = useCombinedFiltersWithVocabulary();
 
   // The owned flashcards to be filtered from the useStudentFlashcards hook
@@ -72,9 +71,8 @@ export function useFilteredOwnedFlashcards(): UseFilteredOwnedFlashcardsReturn {
 
   return {
     filteredFlashcards,
-    filterOwnedFlashcards,
-    setFilterOwnedFlashcards,
-    isLoading,
+    studentFlashcardsLoading: isLoading,
+    filteredFlashcardsLoading: isLoadingCombinedFiltersWithVocabulary,
     error,
   };
 }

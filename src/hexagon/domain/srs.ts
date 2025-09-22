@@ -20,15 +20,3 @@ export function calculateNewSrsInterval(
     return Math.max(0, currentInterval - 1);
   }
 }
-
-/**
- * Gets the current interval from a flashcard, defaulting to 0 if not set
- * @param flashcard - The flashcard to get the interval from
- * @param flashcard.interval - The interval property of the flashcard
- * @returns The current interval (defaults to 0 if null or undefined)
- */
-export function getCurrentInterval(flashcard: {
-  interval?: number | null;
-}): number {
-  return flashcard.interval ?? 0;
-}

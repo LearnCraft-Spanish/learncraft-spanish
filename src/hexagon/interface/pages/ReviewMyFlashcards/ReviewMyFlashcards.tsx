@@ -12,10 +12,19 @@ import {
   TextQuiz,
 } from '@interface/components/Quizzing';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './ReviewMyFlashcards.scss';
 
 export default function MyFlashcardsQuiz() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check for URL parameter to enable filtering by default
+  const searchParams = new URLSearchParams(location.search);
+  const enableFiltering = searchParams.get('enableFiltering') === 'true';
+
   const {
     filterOwnedFlashcards,
     setFilterOwnedFlashcards,
@@ -32,7 +41,21 @@ export default function MyFlashcardsQuiz() {
     noFlashcards,
     isLoading,
     error,
-  } = useQuizMyFlashcards();
+  } = useQuizMyFlashcards({
+    initialFilterOwnedFlashcards: enableFiltering,
+  });
+
+  // Clean up URL parameter after initialization
+  useEffect(() => {
+    if (enableFiltering) {
+      // Remove the parameter from the URL without causing a page refresh
+      const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete('enableFiltering');
+      const newSearch = newSearchParams.toString();
+      const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+      navigate(newUrl, { replace: true });
+    }
+  }, [enableFiltering, location.pathname, location.search, navigate]);
 
   if (error) {
     return <h2>Error Loading Flashcards</h2>;

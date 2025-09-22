@@ -20,6 +20,7 @@ export interface AddPendingRemoveProps {
   isAdding: boolean;
   isRemoving: boolean;
   isCollected: boolean;
+  isCustom: boolean;
   addFlashcard: () => void;
   removeFlashcard: () => void;
 }
@@ -35,6 +36,8 @@ export interface TextQuizReturn {
   vocabInfoHook: (vocab: Vocabulary) => VocabInfo;
   currentExample: ExampleWithVocabulary | null;
   cleanupFunction: () => void;
+  isQuizComplete: boolean;
+  restartQuiz: () => void;
 }
 
 export function useTextQuiz({
@@ -52,11 +55,11 @@ export function useTextQuiz({
     isCustomFlashcard,
     isAddingFlashcard,
     isRemovingFlashcard,
-    isFlashcardCollected,
   } = useStudentFlashcards();
   const vocabInfoHook = useVocabInfo;
 
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
+  const [isQuizComplete, setIsQuizComplete] = useState(false);
 
   const safeExampleIndex = useMemo(() => {
     if (currentExampleIndex < 0) {
@@ -71,6 +74,9 @@ export function useTextQuiz({
   const nextExample = useCallback(() => {
     if (examples && safeExampleIndex < (examples?.length || 0) - 1) {
       setCurrentExampleIndex(safeExampleIndex + 1);
+    } else if (examples && safeExampleIndex === (examples?.length || 0) - 1) {
+      // We're at the last example and trying to go next, mark quiz as complete
+      setIsQuizComplete(true);
     }
   }, [safeExampleIndex, examples]);
 
@@ -78,7 +84,16 @@ export function useTextQuiz({
     if (safeExampleIndex > 0) {
       setCurrentExampleIndex(safeExampleIndex - 1);
     }
-  }, [safeExampleIndex]);
+    // If we're going back from quiz complete state, reset it
+    if (isQuizComplete) {
+      setIsQuizComplete(false);
+    }
+  }, [safeExampleIndex, isQuizComplete]);
+
+  const restartQuiz = useCallback(() => {
+    setCurrentExampleIndex(0);
+    setIsQuizComplete(false);
+  }, []);
 
   const currentExample: ExampleWithVocabulary | null = useMemo(() => {
     if (examples && examples.length > 0) {
@@ -91,7 +106,7 @@ export function useTextQuiz({
     if (!currentExample) {
       return;
     }
-    if (isExampleCollected(currentExample.id)) {
+    if (isExampleCollected({ exampleId: currentExample.id })) {
       return;
     }
     createFlashcards([currentExample]);
@@ -101,7 +116,7 @@ export function useTextQuiz({
     if (!currentExample) {
       return;
     }
-    if (!isExampleCollected(currentExample.id)) {
+    if (!isExampleCollected({ exampleId: currentExample.id })) {
       return;
     }
     deleteFlashcards([currentExample.id]);
@@ -139,7 +154,7 @@ export function useTextQuiz({
       audioUrl: startWithSpanish
         ? currentExample.englishAudio
         : currentExample.spanishAudio,
-      owned: isExampleCollected(currentExample.id),
+      owned: isExampleCollected({ exampleId: currentExample.id }),
       addFlashcard,
       removeFlashcard,
       updateFlashcardInterval: (
@@ -168,10 +183,10 @@ export function useTextQuiz({
     return {
       question,
       answer,
-      exampleIsCollected: isExampleCollected(currentExample.id),
-      exampleIsCustom: isCustomFlashcard(currentExample.id),
-      exampleIsAdding: isAddingFlashcard(currentExample.id),
-      exampleIsRemoving: isRemovingFlashcard(currentExample.id),
+      exampleIsCollected: isExampleCollected({ exampleId: currentExample.id }),
+      exampleIsCustom: isCustomFlashcard({ exampleId: currentExample.id }),
+      exampleIsAdding: isAddingFlashcard({ exampleId: currentExample.id }),
+      exampleIsRemoving: isRemovingFlashcard({ exampleId: currentExample.id }),
     };
   }, [
     question,
@@ -187,9 +202,14 @@ export function useTextQuiz({
     examplesAreLoading,
     addPendingRemoveProps: isStudent
       ? {
-          isAdding: isAddingFlashcard(currentExample?.id ?? 0),
-          isRemoving: isRemovingFlashcard(currentExample?.id ?? 0),
-          isCollected: isFlashcardCollected(currentExample?.id ?? 0),
+          isAdding: isAddingFlashcard({ exampleId: currentExample?.id ?? 0 }),
+          isRemoving: isRemovingFlashcard({
+            exampleId: currentExample?.id ?? 0,
+          }),
+          isCollected: isExampleCollected({
+            exampleId: currentExample?.id ?? 0,
+          }),
+          isCustom: isCustomFlashcard({ exampleId: currentExample?.id ?? 0 }),
           addFlashcard,
           removeFlashcard,
         }
@@ -204,5 +224,7 @@ export function useTextQuiz({
 
     currentExample,
     cleanupFunction,
+    isQuizComplete,
+    restartQuiz,
   };
 }

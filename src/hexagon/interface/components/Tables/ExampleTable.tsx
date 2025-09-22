@@ -24,7 +24,6 @@ interface ExamplesTableProps {
   firstPageLoading: boolean;
   newPageLoading: boolean;
   lessonPopup: LessonPopup;
-  manageThese: () => void;
 }
 
 export default function ExamplesTable({
@@ -35,7 +34,6 @@ export default function ExamplesTable({
   firstPageLoading,
   newPageLoading,
   lessonPopup,
-  manageThese,
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
   const navigate = useNavigate();
@@ -127,7 +125,12 @@ export default function ExamplesTable({
                     })`}
                   </p>
                 </button>
-                <button type="button" onClick={manageThese}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate('/manage-flashcards?enableFiltering=true');
+                  }}
+                >
                   <p>Use these filters on my flashcards</p>
                 </button>
                 <button
@@ -177,9 +180,15 @@ export default function ExamplesTable({
               <ExampleListItem
                 key={example.id}
                 example={example}
-                isCollected={studentFlashcards.isExampleCollected(example.id)}
-                isAdding={studentFlashcards.isAddingFlashcard(example.id)}
-                isRemoving={studentFlashcards.isRemovingFlashcard(example.id)}
+                isCollected={studentFlashcards.isExampleCollected({
+                  exampleId: example.id,
+                })}
+                isAdding={studentFlashcards.isAddingFlashcard({
+                  exampleId: example.id,
+                })}
+                isRemoving={studentFlashcards.isRemovingFlashcard({
+                  exampleId: example.id,
+                })}
                 handleAdd={() => {
                   studentFlashcards.createFlashcards([example]);
                 }}

@@ -23,13 +23,20 @@ export function useAudioInfrastructure(): AudioPort {
     } else if (context.playingAudioRef.current.readyState < 1) {
       // If the audio is not ready to be played, play it when the metadata is loaded
       setIsPlaying(true);
-      await context.playingAudioRef.current.addEventListener(
+
+      const handlePlayOnLoad = () => {
+        if (context.playingAudioRef.current) {
+          context.playingAudioRef.current.play();
+        }
+        // Remove this listener after it fires once
+        context.playingAudioRef.current?.removeEventListener(
+          'loadedmetadata',
+          handlePlayOnLoad,
+        );
+      };
+      context.playingAudioRef.current.addEventListener(
         'loadedmetadata',
-        () => {
-          if (context.playingAudioRef.current) {
-            context.playingAudioRef.current.play();
-          }
-        },
+        handlePlayOnLoad,
       );
       return;
     }
@@ -59,82 +66,46 @@ export function useAudioInfrastructure(): AudioPort {
     setCurrentTime(currentTimeRef || 0);
   }, [context.playingAudioRef, setCurrentTime]);
 
-  // Helper function to get audio duration
-  const getAudioDuration = (
-    audioElement: HTMLAudioElement | null,
-  ): Promise<number | null> => {
-    if (!audioElement) return Promise.resolve(null);
-
-    return new Promise((resolve) => {
-      if (audioElement.readyState >= 1) {
-        // Metadata already loaded
-        resolve(audioElement.duration);
-      } else {
-        // Wait for metadata to load
-        const handleLoadedMetadata = () => {
-          // Clean up the event listener
-          audioElement.removeEventListener(
-            'loadedmetadata',
-            handleLoadedMetadata,
-          );
-          // Resolve the promise with the duration
-          resolve(audioElement.duration);
-        };
-        audioElement.addEventListener('loadedmetadata', handleLoadedMetadata);
-      }
-    });
-  };
-
   const changeCurrentAudio = useCallback(
     async (newAudio: AudioElementState) => {
-      if (context.playingAudioRef.current && newAudio.playOnLoad) {
-        context.playingAudioRef.current.addEventListener(
-          'loadedmetadata',
-          () => {
-            if (context.playingAudioRef.current) {
-              context.playingAudioRef.current.play();
-              setIsPlaying(true);
-            }
-          },
-        );
-      }
       if (!context.playingAudioRef.current) return;
+
+      // Remove any existing loadedmetadata listeners to prevent double play
+      const audioElement = context.playingAudioRef.current;
+      const existingListeners = audioElement.cloneNode(
+        true,
+      ) as HTMLAudioElement;
+      audioElement.replaceWith(existingListeners);
+      context.playingAudioRef.current = existingListeners;
+
+      // Set up new audio properties
       context.playingAudioRef.current.src = newAudio.src;
       context.playingAudioRef.current.currentTime = newAudio.currentTime;
       context.playingAudioRef.current.onended = newAudio.onEnded;
+
+      // Add single loadedmetadata listener if playOnLoad is true
+      if (newAudio.playOnLoad) {
+        setIsPlaying(true);
+
+        const handleLoadedMetadata = () => {
+          if (context.playingAudioRef.current) {
+            context.playingAudioRef.current.play();
+          }
+          // Remove this listener after it fires once
+          context.playingAudioRef.current?.removeEventListener(
+            'loadedmetadata',
+            handleLoadedMetadata,
+          );
+        };
+        context.playingAudioRef.current.addEventListener(
+          'loadedmetadata',
+          handleLoadedMetadata,
+        );
+      }
+
       updateCurrentTime();
     },
     [context, updateCurrentTime],
-  );
-
-  const preloadAudio = useCallback(
-    async (newQueue: { english: string; spanish: string }) => {
-      // If the context Audio Elements are not set, return null values
-      if (
-        !context.englishParseAudioRef.current ||
-        !context.spanishParseAudioRef.current
-      ) {
-        return {
-          englishDuration: null,
-          spanishDuration: null,
-        };
-      }
-      // Update the source of the audio elements
-      context.englishParseAudioRef.current.src = newQueue.english;
-      context.spanishParseAudioRef.current.src = newQueue.spanish;
-
-      // Get the duration of the audio elements
-      const [englishDuration, spanishDuration] = await Promise.all([
-        getAudioDuration(context.englishParseAudioRef.current),
-        getAudioDuration(context.spanishParseAudioRef.current),
-      ]);
-      // Return the duration of the audio elements
-      return {
-        englishDuration,
-        spanishDuration,
-      };
-    },
-    [context.englishParseAudioRef, context.spanishParseAudioRef],
   );
 
   // Ticks the current time of the playing audio, pushes to state
@@ -155,6 +126,5 @@ export function useAudioInfrastructure(): AudioPort {
     isPlaying,
     currentTime,
     changeCurrentAudio,
-    preloadAudio,
   };
 }

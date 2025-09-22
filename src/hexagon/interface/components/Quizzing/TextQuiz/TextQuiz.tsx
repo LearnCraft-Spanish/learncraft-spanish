@@ -8,13 +8,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 import Loading from '../../Loading/Loading';
-import {
-  FlashcardDisplay,
-  QuizButtons,
-  QuizProgress,
-  SRSQuizProgress,
-} from '../general';
+import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
 import { SRSButtons } from '../general/SRSButtons';
+import TextQuizEnd from '../general/TextQuizEnd';
 
 export interface TextQuizComponentProps {
   quizTitle?: string;
@@ -37,6 +33,8 @@ export function TextQuiz({
     currentExample,
     addPendingRemoveProps,
     cleanupFunction,
+    isQuizComplete,
+    restartQuiz,
   } = useTextQuiz(textQuizProps);
 
   const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
@@ -66,6 +64,8 @@ export function TextQuiz({
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
+      if (isQuizComplete) return; // prevent keyboard controls when quiz is complete
+
       if (event.key === 'ArrowRight' || event.key === 'd') {
         incrementExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
@@ -100,68 +100,75 @@ export function TextQuiz({
       />
       {/* I believe 'NoDueFlashcards' is an artifact of the old quizzing system. nonetheless, we have nothing else to show if there is a quiz with no length, so we will leave it for now. */}
       {!quizLength && <NoDueFlashcards />}
-      {!!quizLength && (
-        <div className="quiz">
-          {srsQuizProps ? (
+      {!!quizLength &&
+        (isQuizComplete ? (
+          <TextQuizEnd
+            isSrsQuiz={!!srsQuizProps}
+            restartQuiz={restartQuiz}
+            returnToQuizSetup={cleanupFunction}
+          />
+        ) : (
+          <div className="quiz">
+            {/* {srsQuizProps ? (
             <SRSQuizProgress
               quizTitle={quizTitle}
               totalExamplesNumber={quizLength}
             />
-          ) : (
+          ) : ( */}
             <QuizProgress
               quizTitle={quizTitle}
               currentExampleNumber={exampleNumber}
               totalExamplesNumber={quizLength}
             />
-          )}
+            {/* )} */}
 
-          <FlashcardDisplay
-            quizExample={quizExample}
-            answerShowing={answerShowing}
-            toggleAnswer={toggleAnswer}
-            addPendingRemoveProps={addPendingRemoveProps}
-            getHelpIsOpen={getHelpIsOpen}
-            setGetHelpIsOpen={setGetHelpIsOpen}
-          />
-          <div className="quizButtons">
-            {srsQuizProps && currentExample && (
-              <SRSButtons
-                hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
-                  currentExample.id,
-                )}
-                handleReviewExample={(difficulty: 'easy' | 'hard') =>
-                  srsQuizProps.handleReviewExample(
-                    currentExample.id,
-                    difficulty,
-                  )
-                }
-                answerShowing={answerShowing}
-                incrementExampleNumber={incrementExample}
-              />
-            )}
-            <QuizButtons
-              decrementExample={decrementExample}
-              incrementExample={incrementExample}
-              firstExample={exampleNumber === 1}
-              lastExample={exampleNumber === quizLength}
+            <FlashcardDisplay
+              quizExample={quizExample}
+              answerShowing={answerShowing}
+              toggleAnswer={toggleAnswer}
+              addPendingRemoveProps={addPendingRemoveProps}
+              getHelpIsOpen={getHelpIsOpen}
+              setGetHelpIsOpen={setGetHelpIsOpen}
             />
-            <div className="buttonBox">
-              {/* if cleanupFunction is a function, show a back button */}
-              {!!cleanupFunction && (
-                <button
-                  type="button"
-                  className="linkButton"
-                  onClick={cleanupFunction}
-                >
-                  Back
-                </button>
+            <div className="quizButtons">
+              {srsQuizProps && currentExample && (
+                <SRSButtons
+                  hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
+                    currentExample.id,
+                  )}
+                  handleReviewExample={(difficulty: 'easy' | 'hard') =>
+                    srsQuizProps.handleReviewExample(
+                      currentExample.id,
+                      difficulty,
+                    )
+                  }
+                  answerShowing={answerShowing}
+                  incrementExampleNumber={incrementExample}
+                />
               )}
+              <QuizButtons
+                decrementExample={decrementExample}
+                incrementExample={incrementExample}
+                firstExample={exampleNumber === 1}
+                lastExample={exampleNumber === quizLength}
+              />
+              <div className="buttonBox">
+                {/* if cleanupFunction is a function, show a back button */}
+                {!!cleanupFunction && (
+                  <button
+                    type="button"
+                    className="linkButton"
+                    onClick={cleanupFunction}
+                  >
+                    Back
+                  </button>
+                )}
 
-              <MenuButton />
+                <MenuButton />
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        ))}
     </>
   );
 }

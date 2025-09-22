@@ -51,7 +51,7 @@ describe('component QuizButtons', () => {
     );
     expect(screen.getByText('Previous').attributes).toHaveProperty('disabled');
   });
-  it('disables the Next button when lastExample is true', () => {
+  it('shows the Finish button when lastExample is true', () => {
     render(
       <QuizButtons
         decrementExample={decrementExample}
@@ -60,6 +60,6 @@ describe('component QuizButtons', () => {
         lastExample
       />,
     );
-    expect(screen.getByText('Next').attributes).toHaveProperty('disabled');
+    expect(screen.getByText('Finish')).toBeTruthy();
   });
 });

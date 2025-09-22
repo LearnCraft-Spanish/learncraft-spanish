@@ -8,7 +8,7 @@ export default function VocabTagContainer({
   vocabulary,
   openContextual,
   contextual,
-  setContextualRef,
+  closeContextual,
   lessonPopup,
   handleSelect,
   isSelected,
@@ -17,7 +17,7 @@ export default function VocabTagContainer({
   vocabulary: Vocabulary;
   openContextual: (contextual: string) => void;
   contextual: string;
-  setContextualRef: (ref: HTMLDivElement | null) => void;
+  closeContextual: () => void;
   lessonPopup: LessonPopup;
   handleSelect: (id: number | null) => void;
   isSelected: boolean;
@@ -36,18 +36,18 @@ export default function VocabTagContainer({
           e.stopPropagation();
           // if its selected, close contextual and set selected to null
           if (isSelected) {
-            setContextualRef(null);
+            closeContextual();
             handleSelect(null);
-            return;
+          } else {
+            openContextual(`vocabInfo-${exampleId}-${vocabulary.id}`);
+            handleSelect(vocabulary.id);
           }
-          openContextual(`vocabInfo-${exampleId}-${vocabulary.id}`);
-          handleSelect(vocabulary.id);
         }}
       >
         {vocabulary.word}
       </div>
       {contextual === `vocabInfo-${exampleId}-${vocabulary.id}` && (
-        <div className="vocabInfo" ref={setContextualRef}>
+        <div className="vocabInfo">
           <div className="vocabInfoHeader">
             <h4>{vocabulary.word}</h4>
             <p>{vocabulary.descriptor}</p>

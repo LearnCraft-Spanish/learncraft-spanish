@@ -1,8 +1,8 @@
 import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
-import FilterOwnedFlashcardsProvider from '@application/coordinators/providers/FilterOwnedFlashcardsProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
+import { AudioTranscodingProvider } from '@composition/providers/AudioTranscodingProvider';
 import TempIdContextProvider from './TempIdContextProvider';
 
 export default function MainProvider({
@@ -15,11 +15,11 @@ export default function MainProvider({
       <ActiveStudentProvider>
         <SelectedCourseAndLessonsProvider>
           <AudioEngineProvider>
-            <ExampleFilterContextProvider>
-              <FilterOwnedFlashcardsProvider>
+            <AudioTranscodingProvider>
+              <ExampleFilterContextProvider>
                 {children}
-              </FilterOwnedFlashcardsProvider>
-            </ExampleFilterContextProvider>
+              </ExampleFilterContextProvider>
+            </AudioTranscodingProvider>
           </AudioEngineProvider>
         </SelectedCourseAndLessonsProvider>
       </ActiveStudentProvider>
