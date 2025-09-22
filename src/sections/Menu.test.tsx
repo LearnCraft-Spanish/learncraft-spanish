@@ -111,16 +111,12 @@ describe('component Menu', () => {
           expect(screen.getByText('Official Quizzes')).toBeInTheDocument();
         });
 
-        // Audio Quizzing
-        const hasAudioQuizzing =
-          userCase.roles.includes('student') ||
-          userCase.roles.includes('limited') ||
-          userCase.authUser.roles.includes('Admin') ||
-          userCase.authUser.roles.includes('Coach');
+        // Audio Quiz (only for limited users)
+        const hasAudioQuiz = userCase.roles.includes('limited');
 
-        it(`${hasAudioQuizzing ? 'does' : 'does NOT'} render "Audio Quiz"`, async () => {
+        it(`${hasAudioQuiz ? 'does' : 'does NOT'} render "Audio Quiz"`, async () => {
           await renderMenuLoaded();
-          if (hasAudioQuizzing) {
+          if (hasAudioQuiz) {
             expect(screen.getByText('Audio Quiz')).toBeInTheDocument();
           } else {
             expect(screen.queryByText('Audio Quiz')).toBeNull();
@@ -156,9 +152,8 @@ describe('component Menu', () => {
           }
         });
 
-        // Custom Quiz (limited, students, admin, coach)
+        // Custom Quiz (students, admin, coach - but NOT limited)
         const hasCustomQuiz =
-          userCase.roles.includes('limited') ||
           userCase.roles.includes('student') ||
           userCase.authUser.roles.includes('Admin') ||
           userCase.authUser.roles.includes('Coach');

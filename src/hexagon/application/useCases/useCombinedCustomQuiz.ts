@@ -55,7 +55,8 @@ export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
   const staticTextExamples = useRef<any[]>([]);
   const staticAudioExamples = useRef<any[]>([]);
 
-  // Get examples data - require audio when quiz type is Audio
+  // Get examples data - only require audio when quiz type is Audio
+  // For text quiz, let user choose via the audio-only checkbox
   const audioRequired = quizType === CombinedCustomQuizType.Audio;
   const {
     isDependenciesLoading,
