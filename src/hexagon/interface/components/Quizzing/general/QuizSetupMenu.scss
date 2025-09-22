@@ -1,0 +1,114 @@
+.myFlashcardsFormContentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.myFlashcardsForm {
+  width: 30vw;
+  min-width: 360px;
+  margin: 0 auto;
+}
+@media screen and (max-width: 480px) {
+  .myFlashcardsForm {
+    width: 90vw;
+    min-width: 280px;
+  }
+}
+
+// .myFlashcardsFormContentWrapper > .menuRow {
+//   /* align on right side of parent */
+
+//   display: flex;
+//   flex-direction: row;
+//   justify-content: space-between;
+//   width: 100%;
+//   align-items: center;
+//   padding: 5px 0px;
+// }
+
+// .quizTypeSettingsWrapper {
+//   .toggleSwitch {
+//     width: 100%;
+//     // padding-right: 0px;
+//     margin: 0.5rem 0rem;
+//   }
+//   label {
+//     margin: 0.5rem 0rem;
+//   }
+//   select {
+//     margin: 0.5rem 0rem;
+//   }
+// }
+
+// .buttonBox.header label {
+//   width: 50%;
+//   display: block;
+//   text-align: center;
+//   /* background-color: var(--brand); */
+//   padding: 10px 30px;
+//   /* font-size: 14px; */
+//   font-weight: 600;
+//   color: var(--dark);
+//   border: 1px solid var(--dark);
+//   cursor: pointer;
+//   border-bottom: 0px;
+// }
+// .buttonBox.header {
+//   width: 100%;
+//   margin: 0px;
+// }
+
+// .quizTypeSettingsWrapper {
+//   padding: 10px;
+//   border: 1px solid var(--dark);
+// }
+
+// .quizTypeSettingsWrapper {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: space-between;
+//   width: 100%;
+//   margin: 0 auto;
+//   margin-bottom: 8px;
+// }
+
+/*
+copied and removed from Flashcard Finder Filters
+
+// Tab button styling
+.buttonBox.header {
+  width: 100%;
+  margin: 0px;
+
+  input {
+    display: none;
+  }
+
+  label {
+    width: 50%;
+    display: block;
+    text-align: center;
+    padding: 10px 30px;
+    font-weight: 600;
+    color: var(--light);
+    border: 1px solid var(--dark);
+    cursor: pointer;
+    border-bottom: 0px;
+    background-color: var(--theme);
+
+    &.selected {
+      background-color: var(--light);
+      color: var(--dark);
+    }
+
+    &:hover {
+      border-color: var(--dark);
+      border-bottom: none;
+    }
+  }
+}
+
+*/

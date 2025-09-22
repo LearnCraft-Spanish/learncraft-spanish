@@ -1,9 +1,3 @@
-/**
- *
- * Thesse styles currently live in App.css
- * Move them to a file here when we have a chance
- */
-
 import './ToggleSwitch.scss';
 
 export default function ToggleSwitch({

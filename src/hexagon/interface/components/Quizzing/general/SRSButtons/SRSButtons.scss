@@ -1,0 +1,25 @@
+.srsButtons {
+  min-height: 41.8px;
+
+  @media screen and (max-width: 480px) {
+    min-height: 62.8px;
+  }
+}
+
+.greenButton {
+  background-color: darkgreen;
+}
+
+.redButton {
+  background-color: darkred;
+}
+
+.easyBanner {
+  background-color: darkgreen !important;
+  cursor: default !important;
+}
+
+.hardBanner {
+  background-color: darkred !important;
+  cursor: default !important;
+}

@@ -73,6 +73,17 @@ export default function AudioControl({ audioLink }: { audioLink: string }) {
     [handleEnded],
   );
 
+  // Reset playing state when audio link changes
+  useEffect(() => {
+    // When the audio source changes, we want to reset to the paused state
+    // This prevents the UI from showing "pause" when a different audio is loaded
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsPlaying(false);
+  }, [audioLink]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {

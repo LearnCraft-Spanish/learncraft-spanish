@@ -1,15 +1,17 @@
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+// import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import { Loading } from '@interface/components/Loading';
 import { Link } from 'react-router-dom';
-import { Loading } from 'src/components/Loading';
 import { useAuthAdapter } from 'src/hexagon/application/adapters/authAdapter';
-import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
 import 'src/App.css';
 
 export default function Menu() {
   const { isAuthenticated, isLoading, isAdmin, isCoach } = useAuthAdapter();
   const { appUser, isLoading: appUserLoading } = useActiveStudent();
-  const { flashcardDataQuery } = useStudentFlashcards();
+  const { isLoading: flashcardsLoading, error: flashcardsError } =
+    useStudentFlashcards();
 
   // Make sure user data is loaded before showing the menu.
   // Require activeStudent data unless user is Admin.
@@ -17,12 +19,12 @@ export default function Menu() {
   const menuDataReady = isAuthenticated && !isLoading && !appUserLoading;
 
   // Display loading or error messages if necessary
-  const menuDataError = !menuDataReady && flashcardDataQuery.isError;
+  const menuDataError = !menuDataReady && flashcardsError;
 
   const menuDataLoading =
     !menuDataReady &&
     !menuDataError &&
-    (isLoading || appUserLoading || flashcardDataQuery.isLoading);
+    (isLoading || appUserLoading || flashcardsLoading);
 
   return (
     <div className="menu">
@@ -39,7 +41,6 @@ export default function Menu() {
       {menuDataReady && (
         <div className="menuBox">
           {appUser?.studentRole === 'student' && (
-            // !!flashcardDataQuery.data?.studentExamples?.length &&
             <div>
               <h3>My Flashcards:</h3>
               <div className="buttonBox">
@@ -65,11 +66,10 @@ export default function Menu() {
             isAdmin ||
             isCoach) && (
             <div className="buttonBox">
-              <Link className="linkButton" to="/audioquiz">
-                Audio Quiz
-              </Link>
-              <Link className="linkButton" to="/comprehensionquiz">
-                Comprehension Quiz
+              <Link className="linkButton" to="/customquiz">
+                {appUser?.studentRole === 'limited'
+                  ? 'Audio Quiz'
+                  : 'Custom Quiz'}
               </Link>
             </div>
           )}

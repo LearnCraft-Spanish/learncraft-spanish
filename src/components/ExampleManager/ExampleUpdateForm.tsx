@@ -28,7 +28,7 @@ export default function ExampleUpdateForm({
   englishAudio,
   setEnglishAudio,
 }: ExampleUpdateFormProps) {
-  const spanglish = spanishExample.includes('*') ? 'spanglish' : 'esp';
+  //const spanglish = spanishExample.includes('*') ? 'spanglish' : 'esp';
 
   return (
     <>
@@ -97,7 +97,7 @@ export default function ExampleUpdateForm({
         <div>
           <h4>Spanish Example:</h4>
           <div className="previewCard">
-            {formatSpanishText(spanglish, spanishExample)}
+            {formatSpanishText(spanishExample)}
             <AudioControl audioLink={spanishAudioLa} />
           </div>
         </div>

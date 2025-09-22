@@ -44,7 +44,7 @@ export default function ExampleListItem({
         />
       )}
       <div className="exampleCardSpanishText">
-        {formatSpanishText(example.spanglish, example.spanishExample)}
+        {formatSpanishText(example.spanishExample)}
       </div>
       <div className="exampleCardEnglishText">
         {formatEnglishText(example.englishTranslation)}

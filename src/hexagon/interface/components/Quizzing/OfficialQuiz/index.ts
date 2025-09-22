@@ -1,0 +1,1 @@
+export { OfficialQuiz } from './OfficialQuiz';

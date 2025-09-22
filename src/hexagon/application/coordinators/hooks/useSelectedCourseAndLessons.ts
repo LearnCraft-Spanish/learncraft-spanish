@@ -21,7 +21,11 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     updateToLessonNumber,
   } = context;
 
-  const { data: coursesWithLessons, isLoading } = useCoursesWithLessons();
+  const {
+    data: coursesWithLessons,
+    isLoading,
+    error,
+  } = useCoursesWithLessons();
   const { appUser } = useActiveStudent();
 
   const course: CourseWithLessons | null = useMemo(() => {
@@ -45,7 +49,7 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
 
     return (
       course.lessons.find((item) => item.lessonNumber === fromLessonNumber) ||
-      null
+      course.lessons[0]
     );
   }, [course, fromLessonNumber]);
 
@@ -53,7 +57,10 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     if (!toLessonNumber && !course) {
       return null;
     }
-    const newToLessonNumber = toLessonNumber || appUser?.lessonNumber || 0;
+    const newToLessonNumber =
+      toLessonNumber ||
+      appUser?.lessonNumber ||
+      course?.lessons[0].lessonNumber;
 
     return (
       course?.lessons.find((item) => item.lessonNumber === newToLessonNumber) ||
@@ -64,11 +71,15 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
   // ------------------ Return ------------------ //
   return {
     course,
+    courseId: course?.id ?? null,
     fromLesson,
+    fromLessonNumber: fromLesson?.lessonNumber ?? null,
     toLesson,
+    toLessonNumber: toLesson?.lessonNumber ?? null,
     updateUserSelectedCourseId,
     updateFromLessonNumber,
     updateToLessonNumber,
     isLoading,
+    error,
   };
 }

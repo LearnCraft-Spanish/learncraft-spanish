@@ -1,1 +1,3 @@
-export { default } from './AudioControl';
+import AudioControl from './AudioControl';
+
+export { AudioControl };

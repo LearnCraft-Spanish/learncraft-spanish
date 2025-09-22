@@ -3,7 +3,7 @@ import type {
   Flashcard,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
-import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
+import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
 // This is a script files that creates the data, and outputs it to console. It is not used in the application.
 
 // This data is used to simulate the lastReviewedDate and reviewInterval for each studentExample

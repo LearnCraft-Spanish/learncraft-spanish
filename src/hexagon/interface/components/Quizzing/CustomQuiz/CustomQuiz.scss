@@ -1,0 +1,67 @@
+/* ------------------ Custom Quiz Setup Menu ------------------ */
+
+.buttonBox.header.customQuizTypeSelector {
+  //border box-sizing: border-box
+  box-sizing: border-box;
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  label {
+    border: 1px solid var(--dark);
+  }
+}
+
+#customQuizType {
+  border: 1px solid var(--dark);
+}
+
+/* ------------------ Custom Quiz Filters ------------------ */
+
+// Toggle between custom filters and pre-set quizzes
+.FilterToggle {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  input {
+    display: none;
+  }
+}
+
+.CustomQuizFilters {
+  // Removing white space from lesson selector & .toggleSwitch
+  p {
+    margin: 0px;
+  }
+
+  .filterBox.options {
+    margin-top: 16px;
+
+    .FromToLessonSelectorWrapper {
+      margin-bottom: 16px;
+    }
+  }
+
+  label#fromLesson {
+    margin: 20px 0;
+  }
+  .toggleSwitch {
+    margin: 3px;
+  }
+}
+
+/* ------------------ Custom Pre-set Quizzes ------------------ */
+
+.customPreSetQuizzes {
+  display: flex;
+  flex-direction: row;
+  // space between
+  justify-content: space-between;
+  max-width: 70vw;
+  margin: 0 auto;
+  align-items: center;
+}

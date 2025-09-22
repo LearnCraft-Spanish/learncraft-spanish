@@ -28,10 +28,25 @@ export default defineConfig(({ mode }) => {
         project: 'learncraft-spanish-frontend',
       }),
     ],
+    optimizeDeps: {
+      exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
+    },
+    define: {
+      global: 'globalThis',
+    },
+    worker: {
+      format: 'es',
+    },
     build: {
       manifest: true,
       outDir: 'build',
       sourcemap: true,
+      rollupOptions: {
+        external: [],
+        output: {
+          globals: {},
+        },
+      },
     },
     resolve: {
       alias: {
@@ -54,6 +69,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port,
       open: true,
+      // Remove global Cross-Origin headers that interfere with Auth0
+      // FFmpeg will handle SharedArrayBuffer requirements internally when needed
     },
     css: {
       preprocessorOptions: {

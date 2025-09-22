@@ -1,0 +1,171 @@
+import {
+  MyFlashcardsQuizType,
+  useQuizMyFlashcards,
+} from '@application/useCases/useQuizMyFlashcards';
+import FlashcardManagerFilters from '@interface/components/FlashcardManager/FlashcardManagerFilters';
+import { MenuButton } from '@interface/components/general/Buttons';
+import { Loading } from '@interface/components/Loading';
+import {
+  AudioQuizMenu,
+  MyTextQuizMenu,
+  SrsQuiz,
+  TextQuiz,
+} from '@interface/components/Quizzing';
+import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
+import './ReviewMyFlashcards.scss';
+
+export default function MyFlashcardsQuiz() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check for URL parameter to enable filtering by default
+  const searchParams = new URLSearchParams(location.search);
+  const enableFiltering = searchParams.get('enableFiltering') === 'true';
+
+  const {
+    filterOwnedFlashcards,
+    setFilterOwnedFlashcards,
+    audioQuizSetup,
+    textQuizSetup,
+    exampleFilter,
+    audioQuizProps,
+    textQuizProps,
+    quizType,
+    setQuizType,
+    quizReady,
+    quizNotReady,
+    readyQuiz,
+    noFlashcards,
+    isLoading,
+    error,
+  } = useQuizMyFlashcards({
+    initialFilterOwnedFlashcards: enableFiltering,
+  });
+
+  // Clean up URL parameter after initialization
+  useEffect(() => {
+    if (enableFiltering) {
+      // Remove the parameter from the URL without causing a page refresh
+      const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete('enableFiltering');
+      const newSearch = newSearchParams.toString();
+      const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+      navigate(newUrl, { replace: true });
+    }
+  }, [enableFiltering, location.pathname, location.search, navigate]);
+
+  if (error) {
+    return <h2>Error Loading Flashcards</h2>;
+  }
+  if (isLoading) {
+    return <Loading message="Loading Flashcard Data..." />;
+  }
+
+  if (noFlashcards) {
+    return (
+      <div className="noFlashcardsWrapper">
+        <h2>No Flashcards Found</h2>
+        <p>It seems you have not collected any flashcards yet.</p>
+        <p>
+          You can collect flashcards by clicking the "add to my flashcards"
+          button (located on the back of a flashcard) during a quiz, or by using
+          the "Find Flashcards" page to search for flashcards to add to your
+          collection.
+        </p>
+        <div className="buttonBox">
+          <MenuButton />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {!quizReady ? (
+        <>
+          <h2>Review My Flashcards</h2>
+          <FlashcardManagerFilters
+            filterOwnedFlashcards={filterOwnedFlashcards}
+            setFilterOwnedFlashcards={setFilterOwnedFlashcards}
+          />
+          <form
+            className="myFlashcardsForm"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <div className="myFlashcardsFormContentWrapper">
+              <h4>Quiz Options:</h4>
+              <div className="quizSettingsWrapper">
+                <div className="quizSettingsHeader twoOptions">
+                  <label
+                    htmlFor="quizType"
+                    className={`option ${
+                      quizType === MyFlashcardsQuizType.Text ? 'selected' : ''
+                    }`}
+                    onClick={() => setQuizType(MyFlashcardsQuizType.Text)}
+                  >
+                    Flashcards
+                    <input
+                      type="radio"
+                      id="quizType"
+                      value="text"
+                      name="quizType"
+                    />
+                  </label>
+
+                  <label
+                    htmlFor="audio"
+                    className={`option ${
+                      quizType === MyFlashcardsQuizType.Audio ? 'selected' : ''
+                    }`}
+                    onClick={() => setQuizType(MyFlashcardsQuizType.Audio)}
+                  >
+                    Audio
+                    <input
+                      type="radio"
+                      id="audio"
+                      value="audio"
+                      name="quizType"
+                    />
+                  </label>
+                </div>
+                {quizType === MyFlashcardsQuizType.Text && (
+                  <MyTextQuizMenu
+                    quizSetupOptions={textQuizSetup}
+                    filteringIsLoading={exampleFilter.isLoading}
+                  />
+                )}
+                {quizType === MyFlashcardsQuizType.Audio && (
+                  <AudioQuizMenu
+                    quizSetupOptions={audioQuizSetup}
+                    filteringIsLoading={exampleFilter.isLoading}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="buttonBox">
+              <button type="submit" disabled={quizNotReady} onClick={readyQuiz}>
+                Start Quiz
+              </button>
+            </div>
+            <div className="buttonBox">
+              <MenuButton />
+            </div>
+          </form>
+        </>
+      ) : quizType === MyFlashcardsQuizType.Text ? (
+        textQuizSetup.srsQuiz ? (
+          <SrsQuiz textQuizProps={textQuizProps} />
+        ) : (
+          <TextQuiz textQuizProps={textQuizProps} />
+        )
+      ) : (
+        <AudioQuiz audioQuizProps={audioQuizProps} />
+      )}
+    </div>
+  );
+}

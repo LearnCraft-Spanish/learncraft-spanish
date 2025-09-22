@@ -1,30 +1,29 @@
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 
-import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
+import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 
+import { InlineLoading } from '@interface/components/Loading';
 import { useRef, useState } from 'react';
-import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
-import { InlineLoading } from 'src/components/Loading';
 
+import { useNavigate } from 'react-router-dom';
+import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 // import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
 import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
-import { Pagination } from '../general';
 
+import { Pagination } from '../general';
 import { copyTableToClipboard } from './units/functions';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
-
 interface ExamplesTableProps {
   examples: ExampleWithVocabulary[];
   totalCount: number;
-  studentFlashcards: UseStudentFlashcardsReturnType;
+  studentFlashcards: UseStudentFlashcardsReturn;
   paginationState: QueryPaginationState;
   firstPageLoading: boolean;
   newPageLoading: boolean;
   lessonPopup: LessonPopup;
-  manageThese: () => void;
 }
 
 export default function ExamplesTable({
@@ -35,10 +34,9 @@ export default function ExamplesTable({
   firstPageLoading,
   newPageLoading,
   lessonPopup,
-  manageThese,
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
-
+  const navigate = useNavigate();
   // const {
   //   bulkSelectMode,
   //   bulkOperationInProgress,
@@ -127,8 +125,21 @@ export default function ExamplesTable({
                     })`}
                   </p>
                 </button>
-                <button type="button" onClick={manageThese}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate('/manage-flashcards?enableFiltering=true');
+                  }}
+                >
                   <p>Use these filters on my flashcards</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate('/customquiz');
+                  }}
+                >
+                  <p>Create a quiz from these examples</p>
                 </button>
                 {/* <button
                     type="button"
@@ -169,12 +180,20 @@ export default function ExamplesTable({
               <ExampleListItem
                 key={example.id}
                 example={example}
-                isCollected={studentFlashcards.isExampleCollected(example.id)}
-                handleSingleAdd={async () => {
-                  await studentFlashcards.createFlashcards([example.id]);
+                isCollected={studentFlashcards.isExampleCollected({
+                  exampleId: example.id,
+                })}
+                isAdding={studentFlashcards.isAddingFlashcard({
+                  exampleId: example.id,
+                })}
+                isRemoving={studentFlashcards.isRemovingFlashcard({
+                  exampleId: example.id,
+                })}
+                handleAdd={() => {
+                  studentFlashcards.createFlashcards([example]);
                 }}
-                handleRemove={async () => {
-                  await studentFlashcards.deleteFlashcards([example.id]);
+                handleRemove={() => {
+                  studentFlashcards.deleteFlashcards([example.id]);
                 }}
                 lessonPopup={lessonPopup}
               />

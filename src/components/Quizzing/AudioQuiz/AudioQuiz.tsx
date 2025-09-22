@@ -1,5 +1,7 @@
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
+import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, {
   useCallback,
   useEffect,
@@ -8,10 +10,8 @@ import React, {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fisherYatesShuffle } from 'src/functions/fisherYatesShuffle';
 import AudioFlashcard from '../AudioQuiz/AudioFlashcard';
 import AudioQuizButtons from '../AudioQuiz/AudioQuizButtons';
-import QuizProgress from '../QuizProgress';
 import 'src/App.css';
 import '../AudioQuiz/AudioBasedReview.css';
 
@@ -41,7 +41,6 @@ export default function AudioQuiz({
   cleanupFunction,
   quizLength,
   incrementOnAdd, // serves same perpose as myflashcardsquiz + autoplay? investigate and hopefully remove
-  quizTitle,
   myFlashcardsQuiz = false,
 }: AudioQuizProps) {
   const { appUser } = useActiveStudent();
@@ -338,7 +337,6 @@ export default function AudioQuiz({
         break;
       case 'hint':
         setCurrentStep('answer');
-
         break;
       case 'answer':
         incrementExample();
@@ -507,7 +505,6 @@ export default function AudioQuiz({
             <QuizProgress
               currentExampleNumber={currentExampleIndex + 1}
               totalExamplesNumber={displayOrder.length}
-              quizTitle={quizTitle}
             />
             <AudioFlashcard
               currentExampleText={currentStepValue.text}

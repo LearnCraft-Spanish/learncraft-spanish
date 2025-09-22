@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 
 export default function AddPendingRemove({
-  id,
+  isAdding,
+  isRemoving,
   isCollected,
-  isPending,
   handleAdd,
   handleRemove,
 }: {
-  id: number;
+  isAdding: boolean;
+  isRemoving: boolean;
   isCollected: boolean;
-  isPending: boolean;
   handleAdd: () => void;
   handleRemove: () => void;
 }) {
@@ -20,13 +20,13 @@ export default function AddPendingRemove({
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
-    if (isPending && isCollected) {
+    if (isRemoving) {
       return {
         text: 'Removing...',
         className: 'disabledButton',
         onClickFunction: () => {},
       };
-    } else if (isPending && !isCollected) {
+    } else if (isAdding) {
       return {
         text: 'Adding...',
         className: 'disabledButton',
@@ -48,13 +48,12 @@ export default function AddPendingRemove({
         onClickFunction: handleRemove,
       };
     }
-  }, [handleAdd, handleRemove, isCollected, isPending]);
+  }, [handleAdd, handleRemove, isCollected, isAdding, isRemoving]);
 
   return (
     <button
       type="button"
       className={buttonParams.className}
-      value={id}
       onClick={buttonParams.onClickFunction}
     >
       {buttonParams.text}

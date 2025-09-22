@@ -7,8 +7,9 @@ const mockProps = {
   isCollected: false,
   handleSelect: vi.fn(),
   isSelected: false,
-  isPending: false,
-  handleRemoveSelected: vi.fn(),
+  handleDeselect: vi.fn(),
+  isAdding: false,
+  isRemoving: false,
 };
 
 describe('component BulkRemoveButton', () => {
@@ -43,17 +44,15 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should render Adding... when pending and not collected', () => {
-    render(<BulkRemoveButton {...mockProps} isPending={true} />);
+    render(<BulkRemoveButton {...mockProps} isAdding={true} />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Adding...');
     expect(button).toHaveClass('pendingButton');
   });
 
-  it('should render Removing... when pending and collected', () => {
-    render(
-      <BulkRemoveButton {...mockProps} isCollected={true} isPending={true} />,
-    );
+  it('should render Removing... when removing', () => {
+    render(<BulkRemoveButton {...mockProps} isRemoving={true} />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Removing...');
@@ -69,7 +68,7 @@ describe('component BulkRemoveButton', () => {
     });
 
     expect(mockProps.handleSelect).toHaveBeenCalledTimes(1);
-    expect(mockProps.handleRemoveSelected).not.toHaveBeenCalled();
+    expect(mockProps.handleDeselect).not.toHaveBeenCalled();
   });
 
   it('should call handleRemoveSelected when Selected button is clicked', () => {
@@ -82,7 +81,7 @@ describe('component BulkRemoveButton', () => {
       fireEvent.click(button);
     });
 
-    expect(mockProps.handleRemoveSelected).toHaveBeenCalledTimes(1);
+    expect(mockProps.handleDeselect).toHaveBeenCalledTimes(1);
     expect(mockProps.handleSelect).not.toHaveBeenCalled();
   });
 });

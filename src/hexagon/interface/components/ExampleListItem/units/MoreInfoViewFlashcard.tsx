@@ -9,7 +9,7 @@ export default function MoreInfoViewFlashcard({
   isOpen,
   openContextual,
   contextual,
-  setContextualRef,
+  closeContextual,
   lessonPopup,
 }: {
   flashcard: Flashcard;
@@ -17,13 +17,22 @@ export default function MoreInfoViewFlashcard({
   isOpen: boolean;
   openContextual: (contextual: string) => void;
   contextual: string;
-  setContextualRef: (ref: HTMLDivElement | null) => void;
+  closeContextual: () => void;
   lessonPopup: LessonPopup;
 }) {
+  // local state for the selected vocabulary tag
   const [vocabTagSelected, setVocabTagSelected] = useState<number | null>(null);
-  const handleSelect = (id: number) => {
+
+  // handle the selection of a vocabulary tag
+  const handleSelect = (id: number | null) => {
+    if (id === null) {
+      setVocabTagSelected(null);
+      return;
+    }
     setVocabTagSelected(id);
   };
+
+  // format the date added
   const dateAddedFormatted = flashcard.dateCreated
     ? new Date(flashcard.dateCreated).toLocaleDateString('en-US', {
         month: '2-digit',
@@ -69,7 +78,7 @@ export default function MoreInfoViewFlashcard({
               vocabulary={vocab}
               openContextual={openContextual}
               contextual={contextual}
-              setContextualRef={setContextualRef}
+              closeContextual={closeContextual}
               lessonPopup={lessonPopup}
               handleSelect={handleSelect}
               isSelected={vocabTagSelected === vocab.id}

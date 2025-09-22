@@ -11,9 +11,15 @@ importers:
       '@auth0/auth0-react':
         specifier: ^2.3.0
         version: 2.4.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@ffmpeg/ffmpeg':
+        specifier: ^0.12.15
+        version: 0.12.15
+      '@ffmpeg/util':
+        specifier: ^0.12.2
+        version: 0.12.2
       '@learncraft-spanish/shared':
-        specifier: ^0.8.3
-        version: 0.8.3
+        specifier: ^0.9.0
+        version: 0.9.0
       '@sentry/cli':
         specifier: ^2.42.2
         version: 2.50.2
@@ -902,6 +908,18 @@ packages:
     resolution: {integrity: sha512-OEl393iCOoo/z8bMezRlJu+GlRGlsKbUAN7jKB6LhnKoqKve5DXRpalbItIIcwnCjs1k/FOPjFzcA6Qn+H+YbA==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
+  '@ffmpeg/ffmpeg@0.12.15':
+    resolution: {integrity: sha512-1C8Obr4GsN3xw+/1Ww6PFM84wSQAGsdoTuTWPOj2OizsRDLT4CXTaVjPhkw6ARyDus1B9X/L2LiXHqYYsGnRFw==}
+    engines: {node: '>=18.x'}
+
+  '@ffmpeg/types@0.12.4':
+    resolution: {integrity: sha512-k9vJQNBGTxE5AhYDtOYR5rO5fKsspbg51gbcwtbkw2lCdoIILzklulcjJfIDwrtn7XhDeF2M+THwJ2FGrLeV6A==}
+    engines: {node: '>=16.x'}
+
+  '@ffmpeg/util@0.12.2':
+    resolution: {integrity: sha512-ouyoW+4JB7WxjeZ2y6KpRvB+dLp7Cp4ro8z0HIVpZVCM7AwFlHa0c4R8Y/a4M3wMqATpYKhC7lSFHQ0T11MEDw==}
+    engines: {node: '>=18.x'}
+
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -1110,8 +1128,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.8.3':
-    resolution: {integrity: sha512-uHpxs1JLrkkoqJqHHcPpAk+GoYFxLwRXO0szW5nkB6MRl4F8vkP2C1e9cxfxpODb5NolMhOD5IaqiY78WTsIzQ==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.8.3/fc133ecd72907a916d002c571f6fd9f9dc0218f0}
+  '@learncraft-spanish/shared@0.9.0':
+    resolution: {integrity: sha512-K0J+G+aNJLPt88ssbAgHMBht5aTefPclusR3BO8eykzBhUWafOdx84Eb/tiLkcNyNSPj4E8T0n8ElQ5vPFnR1g==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.9.0/f55b7efea6f4f0b8a6f1eee7850336ea07883052}
 
   '@mswjs/interceptors@0.39.5':
     resolution: {integrity: sha512-B9nHSJYtsv79uo7QdkZ/b/WoKm20IkVSmTc/WCKarmDtFwM0dRx2ouEniqwNkzCSLn3fydzKmnMzjtfdOWt3VQ==}
@@ -6009,6 +6027,14 @@ snapshots:
 
   '@faker-js/faker@9.9.0': {}
 
+  '@ffmpeg/ffmpeg@0.12.15':
+    dependencies:
+      '@ffmpeg/types': 0.12.4
+
+  '@ffmpeg/types@0.12.4': {}
+
+  '@ffmpeg/util@0.12.2': {}
+
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.6':
@@ -6353,7 +6379,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@learncraft-spanish/shared@0.8.3':
+  '@learncraft-spanish/shared@0.9.0':
     dependencies:
       zod: 3.25.76
 

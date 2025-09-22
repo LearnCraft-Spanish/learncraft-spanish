@@ -1,8 +1,10 @@
 import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
 import { BannerDisplayProvider } from '@application/coordinators/providers/BannerDisplayProvider';
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
-import FilterOwnedFlashcardsProvider from '@application/coordinators/providers/FilterOwnedFlashcardsProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
+import { AudioEngineProvider } from '@composition/providers/AudioProvider';
+import { AudioTranscodingProvider } from '@composition/providers/AudioTranscodingProvider';
+import TempIdContextProvider from './TempIdContextProvider';
 
 export default function MainProvider({
   children,
@@ -11,15 +13,19 @@ export default function MainProvider({
 }) {
   return (
     <BannerDisplayProvider>
-      <ActiveStudentProvider>
-        <SelectedCourseAndLessonsProvider>
-          <ExampleFilterContextProvider>
-            <FilterOwnedFlashcardsProvider>
-              {children}
-            </FilterOwnedFlashcardsProvider>
-          </ExampleFilterContextProvider>
-        </SelectedCourseAndLessonsProvider>
-      </ActiveStudentProvider>
+      <TempIdContextProvider>
+        <ActiveStudentProvider>
+          <SelectedCourseAndLessonsProvider>
+            <AudioEngineProvider>
+              <AudioTranscodingProvider>
+                <ExampleFilterContextProvider>
+                  {children}
+                </ExampleFilterContextProvider>
+              </AudioTranscodingProvider>
+            </AudioEngineProvider>
+          </SelectedCourseAndLessonsProvider>
+        </ActiveStudentProvider>
+      </TempIdContextProvider>
     </BannerDisplayProvider>
   );
 }

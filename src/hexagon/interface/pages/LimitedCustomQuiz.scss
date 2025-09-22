@@ -1,0 +1,40 @@
+// Limited Custom Quiz Wrapper
+.LimitedCustomQuizWrapper {
+  max-width: 400px;
+  margin: 0 auto;
+
+  .errorMessage {
+    background-color: #fee;
+    color: #c33;
+    padding: 15px;
+    border-radius: 0px;
+    border: 1px solid #fcc;
+    text-align: center;
+    margin: 20px 0px;
+  }
+
+  .lessonSelectorWrapper {
+    // margin-bottom: 20px;
+    // padding: 15px;
+    // border: 1px solid #ddd;
+    // border-radius: 4px;
+    // background-color: #f9f9f9;
+
+    h3 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+  }
+}
+
+// Form styling following ReviewMyFlashcards pattern
+.limitedCustomQuizForm {
+  .limitedCustomQuizFormContentWrapper {
+    h4 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+  }
+}
+
+// All other styles are inherited from QuizSetupMenu.scss

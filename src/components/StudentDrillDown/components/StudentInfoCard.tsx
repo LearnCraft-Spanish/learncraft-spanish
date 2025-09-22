@@ -8,7 +8,7 @@ import {
   FormControls,
   TextInput,
 } from 'src/components/FormComponents';
-import { toISODate } from 'src/functions/dateUtils';
+import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useCoachList } from 'src/hooks/CoachingData/queries';

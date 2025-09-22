@@ -1,5 +1,4 @@
-import MenuButton from './Buttons/MenuButton';
-import './components.scss';
+import { MenuButton } from '@interface/components/general/Buttons';
 
 export default function NoDueFlashcards() {
   return (

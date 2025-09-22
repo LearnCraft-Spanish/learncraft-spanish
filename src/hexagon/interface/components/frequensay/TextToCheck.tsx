@@ -1,4 +1,4 @@
-import { InlineLoading } from 'src/components/Loading';
+import { InlineLoading } from '@interface/components/Loading';
 
 export default function TextToCheck({
   userInput,

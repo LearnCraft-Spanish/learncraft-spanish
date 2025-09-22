@@ -1,7 +1,21 @@
-import type { Vocabulary } from '@learncraft-spanish/shared';
+import type {
+  Lesson,
+  Subcategory,
+  Verb,
+  Vocabulary,
+} from '@learncraft-spanish/shared';
 import { useLessonsByVocabulary } from '../queries/useLessonsByVocab';
 
-export default function useVocabInfo(vocab: Vocabulary) {
+export interface VocabInfo {
+  word: string;
+  descriptor: string;
+  subcategory: Subcategory;
+  verb: Verb | null;
+  conjugationTags: string[] | null;
+  lessons: Lesson[] | null;
+  lessonsLoading: boolean;
+}
+export function useVocabInfo(vocab: Vocabulary): VocabInfo {
   const { lessonsByVocabulary: lessons, loading: lessonsLoading } =
     useLessonsByVocabulary(vocab.id);
   const word = vocab.word;

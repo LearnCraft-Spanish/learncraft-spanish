@@ -1,3 +1,84 @@
+// COPY FROM App.css
+.flashcardFinderHeader {
+  margin: 0px;
+  padding: 0px;
+}
+
+.filterSection {
+  padding: 0px 20px;
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+}
+
+.filterBox {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  justify-content: flex-start;
+  margin-top: 10px;
+  /* align-items: center; */
+}
+.filterBox.options {
+  flex-direction: column;
+  max-width: 320px;
+  margin: 0px 16px;
+  margin-bottom: 16px;
+}
+.filterBox.search {
+  flex-direction: column;
+  justify-self: left;
+  flex-grow: 3;
+}
+// END COPY FROM App.css
+
+.flashcardFinderFilter {
+  width: 100%;
+}
+
+.filterSection {
+  width: 100%;
+}
+
+// Filter section header (presets & search tags)
+.filterHeader {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid var(--dark);
+
+  .option {
+    width: 50%;
+    cursor: pointer;
+    padding: 10px;
+    font-weight: 600;
+    font-size: 18px;
+
+    background-color: var(--light);
+
+    &.selected {
+      background-color: var(--brand);
+      color: var(--light);
+    }
+
+    // add the middle border
+    &:last-child {
+      border-left: 1px solid var(--dark);
+    }
+
+    // hide the radio buttons
+    input {
+      display: none;
+    }
+  }
+}
+
 .readOnlyFilterSection {
   display: flex;
   flex-direction: column;
@@ -103,26 +184,60 @@
   cursor: pointer;
   margin-top: 10px;
 }
-// .filterSection {
-//   padding: 0px 20px;
-//   display: flex;
-//   flex-direction: column;
-//   flex-wrap: wrap;
-// }
 
-.searchTermBox {
-  display: flex;
-  flex-direction: row;
-  height: 41px;
-}
+.filterSection {
+  // Filter content parent component
+  .filterContentWrapper {
+    padding: 15px;
+    border: 1px solid var(--dark);
+    border-top: 0px;
+    background-color: var(--light);
+    min-height: 200px;
+    margin-bottom: 15px;
+  }
 
-.clearSearchButton {
-  &.disabled {
-    // i want it to be invisible, but still take up space
-    visibility: hidden;
-    width: 98px;
-    height: 0px;
-    opacity: 0;
-    pointer-events: none;
+  /* Styles for PresetSelector*/
+  .presetSelectorContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    gap: 25px;
+
+    label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      width: 100%;
+      max-width: 500px;
+
+      p {
+        margin: 0;
+        font-weight: 600;
+        font-size: 18px;
+        text-align: center;
+      }
+
+      select {
+        width: 100%;
+        padding: 16px;
+        font-size: 18px;
+        text-align: center;
+        border-radius: 8px;
+        border: 2px solid var(--brand);
+        background-color: var(--light);
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: var(--accent);
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+      }
+    }
   }
 }

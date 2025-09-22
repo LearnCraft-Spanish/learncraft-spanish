@@ -1,9 +1,9 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 
+import { Loading } from '@interface/components/Loading';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
-import { Loading } from './components/Loading';
 import Nav from './components/Nav';
 import SubHeader from './components/SubHeader';
 import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
@@ -23,14 +23,16 @@ export const App: React.FC = () => {
       <Nav />
       {location.pathname !== '/student-drill-down' &&
         location.pathname !== '/comprehensionquiz' &&
-        location.pathname !== '/audioquiz' &&
         location.pathname !== '/myflashcards/quiz' &&
         location.pathname !== '/myflashcards/srsquiz' &&
         location.pathname !== '/coaching-dashboard' &&
         location.pathname.split('/')[1] !== 'officialquizzes' && <SubHeader />}
 
-      {isLoading && !isAuthenticated && <Loading message="Logging in..." />}
-      <AppRoutes />
+      {isLoading && !isAuthenticated ? (
+        <Loading message="Logging in..." />
+      ) : (
+        <AppRoutes />
+      )}
       <ToastContainer
         theme="colored"
         transition={Zoom}

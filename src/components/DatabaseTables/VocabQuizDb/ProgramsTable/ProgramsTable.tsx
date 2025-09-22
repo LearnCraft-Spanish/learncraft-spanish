@@ -1,8 +1,8 @@
 import type { Program } from 'src/types/interfaceDefinitions';
 import type { EditableProgram } from './types';
+import { Loading } from '@interface/components/Loading';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Loading } from 'src/components/Loading';
 
 import Table from 'src/components/Table';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';

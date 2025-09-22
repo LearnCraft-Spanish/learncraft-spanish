@@ -1,5 +1,6 @@
 import type { Membership } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { InlineLoading } from '@interface/components/Loading';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
 import pencilIcon from 'src/assets/icons/pencil.svg';
@@ -10,8 +11,7 @@ import {
   FormControls,
   TextInput,
 } from 'src/components/FormComponents';
-import { InlineLoading } from 'src/components/Loading';
-import { toISODate } from 'src/functions/dateUtils';
+import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';

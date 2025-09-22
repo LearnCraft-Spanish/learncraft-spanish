@@ -67,7 +67,19 @@ h6 {
   text-align: center;
 }
 
-.bannerMessage {
+/* Menu Row Styles */
+.menuRow {
+  /* .menuRow > label.quizLength { */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.menuRow > label.quizLength p {
+  margin: 0;
+}
+*/ .bannerMessage {
   position: fixed;
   top: 50px;
   left: 50%;
@@ -262,6 +274,7 @@ button:hover,
 }
 
 .quiz {
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   justify-items: center;
@@ -344,45 +357,6 @@ button:hover,
 
 .redButton {
   background-color: darkred;
-}
-
-.hardButton:hover,
-.easyButton:hover {
-  background-color: var(--dark);
-}
-
-.easyBanner {
-  background-color: darkgreen !important;
-  cursor: default !important;
-}
-
-.hardBanner {
-  background-color: darkred !important;
-  cursor: default !important;
-}
-
-.quizSelector {
-  display: flex;
-  flex-direction: column;
-  align-content: space-between;
-  margin: 0 auto;
-  justify-content: space-between;
-  width: 50%;
-}
-@media screen and (max-width: 800px) {
-  .quizSelector {
-    width: 70vw;
-  }
-}
-@media screen and (max-width: 480px) {
-  .quizSelector {
-    width: 90vw;
-  }
-}
-.quizMenu {
-  margin-bottom: 20px;
-  height: 65px;
-  text-align: center;
 }
 
 .addFlashcardButton,
@@ -515,6 +489,9 @@ button:hover,
 
 /* This is for the visual overlay for AudioFlashcard */
 .progressStatus {
+  /* round the top left and bottom right corners */
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   position: absolute;
   top: 0px;
   bottom: 0px;
@@ -529,43 +506,6 @@ button:hover,
 }
 .audioAutoplayFlashcardWrapper .audioExample {
   border: none;
-}
-
-/* For Flashcard Finder */
-
-.flashcardFinderHeader {
-  margin: 0px;
-  padding: 0px;
-}
-
-.filterSection {
-  padding: 0px 20px;
-  display: flex;
-  flex-direction: row-reverse;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-}
-
-.filterBox {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  flex-grow: 1;
-  justify-content: flex-start;
-  margin-top: 10px;
-  /* align-items: center; */
-}
-.filterBox.options {
-  flex-direction: column;
-  max-width: 320px;
-  margin: 0px 16px;
-  margin-bottom: 16px;
-}
-.filterBox.search {
-  flex-direction: column;
-  justify-self: left;
-  flex-grow: 3;
 }
 
 .removeSpanglishBox {
@@ -869,115 +809,6 @@ button:hover,
 }
 .spanishExample .spanishFlashcardText {
   font-size: 18px;
-}
-
-/*      My Flashcards styles      */
-
-/* .myFlashcardsForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 auto;
-} */
-
-.myFlashcardsFormContentWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.myFlashcardsForm {
-  width: 30vw;
-  min-width: 360px;
-  margin: 0 auto;
-}
-@media screen and (max-width: 480px) {
-  .myFlashcardsForm {
-    width: 90vw;
-    min-width: 280px;
-  }
-}
-
-.myFlashcardsFormContentWrapper > label,
-.myFlashcardsFormContentWrapper > div > div,
-.QuizMenuCustomOnly {
-  /* align on right side of parent */
-
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-}
-
-/*      Toggle Switch Styling */
-
-/* The switch - the box around the slider */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-
-  /* do not let it flex grow */
-  flex-grow: 0;
-}
-
-/* Hide default HTML checkbox */
-/* .switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-} */
-
-/* The slider */
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: '';
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: 0.4s;
-  transition: 0.4s;
-}
-
-input:checked + .slider {
-  background-color: var(--brand);
-}
-
-input:focus + .slider {
-  box-shadow: 0 0 1px var(--brand);
-}
-
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
 }
 
 #quizLength {
@@ -1342,3 +1173,16 @@ i {
 .add-spelling-form button:hover {
   background-color: #218838;
 }
+
+/* From refactoring QuizSetupMenu and FlashcardFinderFilters, styles used elsewhere but not in those components */
+/* / THESE ARE USED ELSEWHERE. PLEASE REMOVE WHEN REFACTORING. */
+.presetSelector,
+.searchFilter {
+  padding: 15px;
+  border: 1px solid var(--dark);
+  border-top: 0px;
+  background-color: var(--light);
+  min-height: 200px;
+  margin-bottom: 15px;
+}
+/* END OF THESE ARE USED ELSEWHERE. PLEASE REMOVE WHEN REFACTORING. */

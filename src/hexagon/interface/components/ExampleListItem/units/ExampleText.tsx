@@ -1,4 +1,4 @@
-import { AudioControl } from '../../general';
+import { AudioControl } from '@interface/components/general';
 import { formatEnglishText, formatSpanishText } from './helpers';
 
 export default function ExampleText({

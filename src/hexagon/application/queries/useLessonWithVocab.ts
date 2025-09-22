@@ -2,13 +2,16 @@ import { useCourseAdapter } from '@application/adapters/courseAdapter';
 import { useQuery } from '@tanstack/react-query';
 
 export const useLessonVocabKnown = (
-  courseId: number | undefined,
-  lessonNumber: number | undefined,
+  courseId: number | null,
+  lessonNumber: number | null,
   enabled?: boolean,
 ) => {
   const courseInfrastructure = useCourseAdapter();
-
-  return useQuery({
+  const {
+    data: lessonVocabKnown,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['lessonWithVocab', courseId, lessonNumber],
     queryFn: () =>
       courseInfrastructure.getLessonVocabKnown({
@@ -17,17 +20,23 @@ export const useLessonVocabKnown = (
       }),
     enabled: !!courseId && !!lessonNumber && enabled,
   });
+
+  return { lessonVocabKnown, isLoading, error };
 };
 
 export const useLessonRangeVocabRequired = (
-  courseId: number | undefined,
-  fromLessonNumber: number | undefined,
-  toLessonNumber: number | undefined,
+  courseId: number | null,
+  fromLessonNumber: number | null,
+  toLessonNumber: number | null,
   enabled?: boolean,
 ) => {
   const courseInfrastructure = useCourseAdapter();
 
-  return useQuery({
+  const {
+    data: lessonRangeVocabRequired,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: [
       'lessonRangeVocabRequired',
       courseId,
@@ -42,4 +51,6 @@ export const useLessonRangeVocabRequired = (
       }),
     enabled: !!courseId && !!fromLessonNumber && !!toLessonNumber && enabled,
   });
+
+  return { lessonRangeVocabRequired, isLoading, error };
 };

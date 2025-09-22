@@ -13,7 +13,7 @@ import ConfirmationDialog from 'src/components/ExampleManager/ConfirmationDialog
 import ExampleAssignmentPanel from 'src/components/ExampleManager/ExampleAssignmentPanel';
 import ExampleEditForm from 'src/components/ExampleManager/ExampleEditForm';
 import ExamplePasteArea from 'src/components/ExampleManager/ExamplePasteArea';
-import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/OLD_useOfficialQuizzes';
 import { useBackend } from 'src/hooks/useBackend';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 
