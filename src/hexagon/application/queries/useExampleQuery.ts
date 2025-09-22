@@ -9,6 +9,7 @@ import { queryDefaults } from '../utils/queryUtils';
 
 export interface UseExampleQueryReturnType {
   isLoading: boolean;
+  isDependenciesLoading: boolean;
   filteredExamples: ExampleWithVocabulary[] | null;
   totalCount: number | null;
   error: Error | null;
@@ -197,6 +198,7 @@ export const useExampleQuery = (
   ]);
 
   return {
+    isDependenciesLoading: isLoadingCombinedFilters,
     isLoading,
     error,
     filteredExamples: fullResponse?.examples ?? null,

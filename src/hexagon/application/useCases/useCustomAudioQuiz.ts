@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import useQueryPagination from '../units/Pagination/useQueryPagination';
 
 export interface UseCustomAudioQuizReturnType {
+  isDependenciesLoading: boolean;
   pagination: QueryPaginationState;
   audioQuizSetup: AudioQuizSetupReturn;
   audioQuizProps: AudioQuizProps;
@@ -24,6 +25,7 @@ export function useCustomAudioQuiz(): UseCustomAudioQuizReturnType {
   const [quizReady, setQuizReady] = useState(false);
 
   const {
+    isDependenciesLoading,
     filteredExamples: exampleQuery,
     isLoading: isLoadingExamples,
     page,
@@ -67,6 +69,7 @@ export function useCustomAudioQuiz(): UseCustomAudioQuizReturnType {
   };
 
   return {
+    isDependenciesLoading,
     pagination,
     audioQuizSetup,
     audioQuizProps,

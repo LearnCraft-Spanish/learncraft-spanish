@@ -55,14 +55,16 @@ export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
   const staticTextExamples = useRef<any[]>([]);
   const staticAudioExamples = useRef<any[]>([]);
 
-  // Get examples data
+  // Get examples data - require audio when quiz type is Audio
+  const audioRequired = quizType === CombinedCustomQuizType.Audio;
   const {
+    isDependenciesLoading,
     filteredExamples: exampleQuery,
     isLoading: isLoadingExamples,
     totalCount,
     error: errorExamples,
     updatePageSize,
-  } = useExampleQuery(QUERY_PAGE_SIZE, false);
+  } = useExampleQuery(QUERY_PAGE_SIZE, audioRequired);
 
   // Update the ref when we successfully get data
   if (totalCount !== null && !hasLoadedDataBefore.current) {
@@ -71,8 +73,11 @@ export function useCombinedCustomQuiz(): UseCombinedCustomQuizReturn {
 
   // Determine if this is initial loading (never loaded before) vs filter changes (have loaded before)
   const isInitialLoading = useMemo(() => {
-    return isLoadingExamples && !hasLoadedDataBefore.current;
-  }, [isLoadingExamples]);
+    return (
+      isDependenciesLoading ||
+      (isLoadingExamples && !hasLoadedDataBefore.current)
+    );
+  }, [isLoadingExamples, isDependenciesLoading]);
 
   // Filter examples that have audio for audio quiz
   const safeAudioExamples = useMemo(() => {

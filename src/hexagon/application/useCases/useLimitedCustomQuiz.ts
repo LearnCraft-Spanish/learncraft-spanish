@@ -38,6 +38,7 @@ export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
 
   // Get examples data (audio only for limited users)
   const {
+    isDependenciesLoading,
     filteredExamples: exampleQuery,
     isLoading: isLoadingExamples,
     totalCount,
@@ -51,8 +52,11 @@ export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
 
   // Determine if this is initial loading (never loaded before) vs filter changes (have loaded before)
   const isInitialLoading = useMemo(() => {
-    return isLoadingExamples && !hasLoadedDataBefore.current;
-  }, [isLoadingExamples]);
+    return (
+      isDependenciesLoading ||
+      (isLoadingExamples && !hasLoadedDataBefore.current)
+    );
+  }, [isLoadingExamples, isDependenciesLoading]);
 
   // Filter examples that have audio (should be all of them since audioRequired=true)
   const safeAudioExamples = useMemo(() => {
