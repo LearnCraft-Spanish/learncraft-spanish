@@ -1,7 +1,9 @@
+import type { PrivateCall } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { toast } from 'react-toastify';
+import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useBackendHelpers } from '../../useBackend';
 import useStudentRecordsBackend from './StudentRecordsBackendFunctions';
 
@@ -11,9 +13,10 @@ export default function usePrivateCalls(
 ) {
   const { isAdmin, isCoach } = useAuthAdapter();
   const { getPrivateCalls } = useStudentRecordsBackend();
+  const queryClient = useQueryClient();
   const { newPostFactory, newPutFactory, newDeleteFactory } =
     useBackendHelpers();
-
+  const { openContextual } = useContextualMenu();
   const privateCallsQuery = useQuery({
     queryKey: ['privateCalls', { startDate, endDate }],
     queryFn: getPrivateCalls,
@@ -38,7 +41,7 @@ export default function usePrivateCalls(
 
   const createPrivateCallMutation = useMutation({
     mutationFn: (call: CallForCreation) => {
-      const promise = newPostFactory({
+      const promise = newPostFactory<PrivateCall>({
         path: 'coaching/private-calls',
         body: call,
       });
@@ -49,8 +52,21 @@ export default function usePrivateCalls(
       });
       return promise;
     },
-    onSettled() {
+    onSuccess(result: PrivateCall, _variables, _context) {
+      const queryKey = ['privateCalls', { startDate, endDate }];
       privateCallsQuery.refetch();
+      queryClient.setQueryData(queryKey, (oldData: PrivateCall[]) => {
+        if (!oldData) {
+          return [result];
+        }
+        // Create a deep copy of the old data and add the new assignment
+        const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+        return [...oldDataCopy, { ...result }]; // Add the single result object
+      });
+      // open correct contextual for new record
+      setTimeout(() => {
+        openContextual(`call${result.recordId}`);
+      }, 200);
     },
   });
 
@@ -67,7 +83,7 @@ export default function usePrivateCalls(
   }
   const updatePrivateCallMutation = useMutation({
     mutationFn: (call: CallForUpdate) => {
-      const promise = newPutFactory({
+      const promise = newPutFactory<PrivateCall>({
         path: `coaching/private-calls/${call.recordId}`,
         body: call,
       });
@@ -78,8 +94,23 @@ export default function usePrivateCalls(
       });
       return promise;
     },
-    onSettled() {
-      privateCallsQuery.refetch();
+    onSuccess(result: PrivateCall, _variables, _context) {
+      // Update the cache with the updated private call
+      const queryKey = ['privateCalls', { startDate, endDate }];
+
+      queryClient.setQueryData(
+        queryKey,
+        (oldData: PrivateCall[] | undefined) => {
+          if (!oldData) {
+            return [result];
+          }
+          // Create a deep copy of the old data and add the updated private call
+          const oldDataCopy = JSON.parse(JSON.stringify(oldData));
+          return oldDataCopy.map((item: PrivateCall) =>
+            item.recordId === result.recordId ? result : item,
+          );
+        },
+      );
     },
   });
 

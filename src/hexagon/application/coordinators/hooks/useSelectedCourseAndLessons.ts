@@ -34,9 +34,10 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     if (userSelectedCourseId) {
       newCourseId = userSelectedCourseId;
     } else {
-      if (appUser && appUser.studentRole === 'student')
-        newCourseId = appUser.courseId;
-      else newCourseId = 2;
+      newCourseId =
+        appUser && appUser.courseId
+          ? appUser.courseId
+          : (coursesWithLessons?.[0]?.id ?? null);
     }
     return coursesWithLessons?.find((item) => item.id === newCourseId) || null;
   }, [coursesWithLessons, userSelectedCourseId, appUser]);

@@ -1,4 +1,5 @@
 import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
+import { BannerDisplayProvider } from '@application/coordinators/providers/BannerDisplayProvider';
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
@@ -11,18 +12,20 @@ export default function MainProvider({
   children: React.ReactNode;
 }) {
   return (
-    <TempIdContextProvider>
-      <ActiveStudentProvider>
-        <SelectedCourseAndLessonsProvider>
-          <AudioEngineProvider>
-            <AudioTranscodingProvider>
-              <ExampleFilterContextProvider>
-                {children}
-              </ExampleFilterContextProvider>
-            </AudioTranscodingProvider>
-          </AudioEngineProvider>
-        </SelectedCourseAndLessonsProvider>
-      </ActiveStudentProvider>
-    </TempIdContextProvider>
+    <BannerDisplayProvider>
+      <TempIdContextProvider>
+        <ActiveStudentProvider>
+          <SelectedCourseAndLessonsProvider>
+            <AudioEngineProvider>
+              <AudioTranscodingProvider>
+                <ExampleFilterContextProvider>
+                  {children}
+                </ExampleFilterContextProvider>
+              </AudioTranscodingProvider>
+            </AudioEngineProvider>
+          </SelectedCourseAndLessonsProvider>
+        </ActiveStudentProvider>
+      </TempIdContextProvider>
+    </BannerDisplayProvider>
   );
 }

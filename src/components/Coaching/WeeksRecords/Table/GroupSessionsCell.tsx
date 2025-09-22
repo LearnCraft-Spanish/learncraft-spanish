@@ -1,4 +1,8 @@
-import type { GroupSession, Week } from 'src/types/CoachingTypes';
+import type {
+  GroupAttendees,
+  GroupSession,
+  Week,
+} from 'src/types/CoachingTypes';
 
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -112,7 +116,8 @@ export function GroupSessionView({
   onSuccess?: () => void;
 }) {
   const { authUser, isAdmin } = useAuthAdapter();
-  const { closeContextual, updateDisableClickOutside } = useContextualMenu();
+  const { closeContextual, openContextual, updateDisableClickOutside } =
+    useContextualMenu();
   const { openModal, closeModal } = useModal();
 
   const {
@@ -374,7 +379,7 @@ export function GroupSessionView({
     const attendeesToRemove = getAttendeesFromGroupSessionId(recordId);
     deleteGroupSessionMutation.mutate(recordId, {
       onSuccess: () => {
-        if (attendeesToRemove) {
+        if (attendeesToRemove && attendeesToRemove.length > 0) {
           deleteGroupAttendeesMutation.mutate(
             attendeesToRemove?.map((attendee) => attendee.recordId),
           );
@@ -451,14 +456,13 @@ export function GroupSessionView({
           zoomLink,
         },
         {
-          onSuccess: (data) => {
-            const idsCreated = data as number[];
+          onSuccess: (data: GroupSession) => {
             // data will be an array of record ID's created
-            if (idsCreated.length !== 1) {
+            if (!data) {
               console.error('Error creating group session');
               return;
             }
-            const newRecordId = idsCreated[0];
+            const newRecordId = data.recordId;
             if (
               attendees.some((attendee) => attendee.name === 'No Attendees')
             ) {
@@ -474,12 +478,18 @@ export function GroupSessionView({
                 student: attendee.relatedWeek,
               })),
               {
-                onSuccess: (data) => {
+                onSuccess: (data: GroupAttendees[]) => {
                   // data will be an array of record ID's created
-                  if ((data as number[]).length !== attendeesToAdd.length) {
+                  if (data.length !== attendeesToAdd.length) {
                     console.error('Error creating group attendees');
                     return;
                   }
+                  // open correct contextual for new record
+                  setTimeout(() => {
+                    openContextual(
+                      `groupSession${newRecordId}week${attendeesToAdd[0].relatedWeek}`,
+                    );
+                  }, 200);
                   onSuccess?.();
                 },
                 onError: (error) => {

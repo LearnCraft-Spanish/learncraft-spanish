@@ -369,7 +369,6 @@ export function NewPrivateCallView({
   const [areasOfDifficulty, setAreasOfDifficulty] = useState('');
   const [recording, setRecording] = useState('');
   const [callType, setCallType] = useState('Monthly Call');
-
   const [student, setStudent] = useState<
     | {
         studentFullname: string;
@@ -377,12 +376,13 @@ export function NewPrivateCallView({
       }
     | undefined
   >(undefined);
-
   const [numWeeks, setNumWeeks] = useState(4);
   const [weekStarts, setWeekStarts] = useState(weekStartsDefaultValue);
   const weekEnds = useMemo(() => getWeekEnds(weekStarts), [weekStarts]);
   const dateRange = useMemo(() => getDateRange(numWeeks), [numWeeks]);
   const { weeksQuery } = useWeeks(weekStarts, weekEnds);
+
+  const [editMode, setEditMode] = useState(true);
 
   const handleLoadMore = () => {
     setNumWeeks((prev) => prev * 2);
@@ -419,6 +419,7 @@ export function NewPrivateCallView({
       });
       return;
     }
+    setEditMode(false);
     createPrivateCallMutation.mutate(
       {
         relatedWeek: student?.relatedWeek.recordId,
@@ -437,6 +438,7 @@ export function NewPrivateCallView({
       },
     );
   }
+
   const updateStudent = (relatedWeekId: number) => {
     if (!weeksQuery.data) {
       console.error('No weeks found');
@@ -473,9 +475,24 @@ export function NewPrivateCallView({
     }
   }, [studentObj]);
 
+  function toggleEditMode() {
+    if (editMode) {
+      setEditMode(false);
+    } else {
+      setEditMode(true);
+    }
+  }
+
   return (
-    <ContextualView>
-      {!studentObj ? (
+    <ContextualView editFunction={toggleEditMode}>
+      {editMode ? (
+        <h4>Create Call</h4>
+      ) : (
+        <h4>
+          {student?.studentFullname} on {toReadableMonthDay(date)}
+        </h4>
+      )}
+      {!studentObj && editMode && (
         <>
           <div className="lineWrapper">
             <label className="label" htmlFor="weekStarts">
@@ -540,13 +557,14 @@ export function NewPrivateCallView({
             )}
           </div>
         </>
-      ) : (
+      )}
+      {studentObj && (
         <Dropdown
           label="Student"
           value={student?.studentFullname}
           onChange={() => {}}
           options={[student?.studentFullname || '']}
-          editMode={false}
+          editMode={editMode}
         />
       )}
 
@@ -555,7 +573,7 @@ export function NewPrivateCallView({
         value={rating}
         onChange={setRating}
         options={ratingOptions}
-        editMode
+        editMode={editMode}
         required
       />
 
@@ -563,26 +581,31 @@ export function NewPrivateCallView({
         label="Caller"
         coachEmail={caller}
         onChange={setCaller}
-        editMode
+        editMode={editMode}
         required
       />
 
-      <DateInput value={date} onChange={setDate} required />
+      <DateInput value={date} onChange={setDate} required editMode={editMode} />
 
-      <TextAreaInput label="Notes" value={notes} onChange={setNotes} editMode />
+      <TextAreaInput
+        label="Notes"
+        value={notes}
+        onChange={setNotes}
+        editMode={editMode}
+      />
 
       <TextAreaInput
         label="Difficulties"
         value={areasOfDifficulty}
         onChange={setAreasOfDifficulty}
-        editMode
+        editMode={editMode}
       />
 
       <LinkInput
         label="Recording Link"
         value={recording}
         onChange={setRecording}
-        editMode
+        editMode={editMode}
       />
 
       <Dropdown
@@ -590,13 +613,13 @@ export function NewPrivateCallView({
         value={callType}
         onChange={setCallType}
         options={callTypeOptions}
-        editMode
+        editMode={editMode}
       />
 
       <FormControls
         captureSubmitForm={createNewPrivateCall}
         cancelEdit={() => closeContextual()}
-        editMode
+        editMode={editMode}
       />
     </ContextualView>
   );
