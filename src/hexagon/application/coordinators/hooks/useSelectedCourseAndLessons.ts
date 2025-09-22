@@ -34,10 +34,12 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     if (userSelectedCourseId) {
       newCourseId = userSelectedCourseId;
     } else {
-      newCourseId = appUser?.courseId ?? null;
+      if (appUser && appUser.studentRole === 'student')
+        newCourseId = appUser.courseId;
+      else newCourseId = 2;
     }
     return coursesWithLessons?.find((item) => item.id === newCourseId) || null;
-  }, [coursesWithLessons, userSelectedCourseId, appUser?.courseId]);
+  }, [coursesWithLessons, userSelectedCourseId, appUser]);
 
   const fromLesson: Lesson | null = useMemo(() => {
     if (!fromLessonNumber || !course) {
@@ -46,7 +48,7 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
 
     return (
       course.lessons.find((item) => item.lessonNumber === fromLessonNumber) ||
-      null
+      course.lessons[0]
     );
   }, [course, fromLessonNumber]);
 
@@ -54,7 +56,10 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     if (!toLessonNumber && !course) {
       return null;
     }
-    const newToLessonNumber = toLessonNumber || appUser?.lessonNumber || 0;
+    const newToLessonNumber =
+      toLessonNumber ||
+      appUser?.lessonNumber ||
+      course?.lessons[0].lessonNumber;
 
     return (
       course?.lessons.find((item) => item.lessonNumber === newToLessonNumber) ||

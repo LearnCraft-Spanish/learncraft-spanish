@@ -1,10 +1,10 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { CustomQuiz } from '@interface/components/Quizzing/CustomQuiz/CustomQuiz';
-import CustomAudioQuiz from '@interface/pages/CustomAudioQuiz';
+import CombinedCustomQuiz from '@interface/pages/CombinedCustomQuiz';
 import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
 import FlashcardManager from '@interface/pages/FlashcardManager';
 import FrequensayPage from '@interface/pages/FrequensayPage';
 import GetHelpPage from '@interface/pages/GetHelpPage';
+import LimitedCustomQuiz from '@interface/pages/LimitedCustomQuiz';
 import { OfficialQuizzesRoutes } from '@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
 import ReviewMyFlashcards from '@interface/pages/ReviewMyFlashcards';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
@@ -40,16 +40,16 @@ export default function AppRoutes() {
       />
       <Route path="/manage-flashcards" element={<FlashcardManager />} />
       <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
-      <Route path="/customquiz" element={<CustomQuiz />} />
+      <Route
+        path="/customquiz"
+        element={
+          (isLimited || isStudent || isCoach || isAdmin) &&
+          (isLimited ? <LimitedCustomQuiz /> : <CombinedCustomQuiz />)
+        }
+      />
       <Route
         path="/flashcardfinder"
         element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
-      />
-      <Route
-        path="/audioquiz/*"
-        element={
-          (isLimited || isStudent || isCoach || isAdmin) && <CustomAudioQuiz />
-        }
       />
       <Route
         path="/frequensay"

@@ -66,14 +66,11 @@ export default function Menu() {
             isAdmin ||
             isCoach) && (
             <div className="buttonBox">
-              <Link className="linkButton" to="/audioquiz">
-                Audio Quiz
+              <Link className="linkButton" to="/customquiz">
+                {appUser?.studentRole === 'limited'
+                  ? 'Audio Quiz'
+                  : 'Custom Quiz'}
               </Link>
-              {appUser?.studentRole === 'student' && (
-                <Link className="linkButton" to="/customquiz">
-                  Custom Quiz
-                </Link>
-              )}
             </div>
           )}
 

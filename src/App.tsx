@@ -21,7 +21,6 @@ export const App: React.FC = () => {
       <Nav />
       {location.pathname !== '/student-drill-down' &&
         location.pathname !== '/comprehensionquiz' &&
-        location.pathname !== '/audioquiz' &&
         location.pathname !== '/myflashcards/quiz' &&
         location.pathname !== '/myflashcards/srsquiz' &&
         location.pathname !== '/coaching-dashboard' &&

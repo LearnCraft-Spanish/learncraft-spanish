@@ -1,0 +1,24 @@
+// Combined Custom Quiz Wrapper
+.CombinedCustomQuizWrapper {
+  .errorMessage {
+    background-color: #fee;
+    color: #c33;
+    padding: 15px;
+    border-radius: 0px;
+    border: 1px solid #fcc;
+    text-align: center;
+    margin: 20px 0px;
+  }
+}
+
+// Form styling following ReviewMyFlashcards pattern
+.combinedCustomQuizForm {
+  .combinedCustomQuizFormContentWrapper {
+    h4 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+  }
+}
+
+// All other styles are inherited from QuizSetupMenu.scss

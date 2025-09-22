@@ -156,8 +156,12 @@ describe('component Menu', () => {
           }
         });
 
-        // Custom Quiz (students only)
-        const hasCustomQuiz = userCase.roles.includes('student');
+        // Custom Quiz (limited, students, admin, coach)
+        const hasCustomQuiz =
+          userCase.roles.includes('limited') ||
+          userCase.roles.includes('student') ||
+          userCase.authUser.roles.includes('Admin') ||
+          userCase.authUser.roles.includes('Coach');
         it(`${hasCustomQuiz ? 'does' : 'does NOT'} render "Custom Quiz"`, async () => {
           await renderMenuLoaded();
           if (hasCustomQuiz) {

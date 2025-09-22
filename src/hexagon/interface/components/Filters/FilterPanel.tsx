@@ -15,7 +15,7 @@ export default function FilterPanel({
   onFilterChange?: () => void;
   requireAudioOnly: boolean;
 }) {
-  const [filterMode, setFilterMode] = useState<'preset' | 'search'>('preset');
+  const [filterMode, setFilterMode] = useState<'preset' | 'search'>('search');
 
   const {
     excludeSpanglish,
@@ -64,21 +64,20 @@ export default function FilterPanel({
       <div className="filterBox search">
         <div className="filterHeader">
           <label
-            htmlFor="presetMode"
-            className={`option ${filterMode === 'preset' ? 'selected' : ''}`}
-            onClick={() => setFilterMode('preset')}
-          >
-            <input type="radio" value="preset" name="filterMode" />
-            Presets
-          </label>
-
-          <label
             htmlFor="searchMode"
             className={`option ${filterMode === 'search' ? 'selected' : ''}`}
             onClick={() => setFilterMode('search')}
           >
             <input type="radio" value="search" name="filterMode" />
             Search Tags
+          </label>
+          <label
+            htmlFor="presetMode"
+            className={`option ${filterMode === 'preset' ? 'selected' : ''}`}
+            onClick={() => setFilterMode('preset')}
+          >
+            <input type="radio" value="preset" name="filterMode" />
+            Presets
           </label>
         </div>
         <div className="filterContentWrapper">
