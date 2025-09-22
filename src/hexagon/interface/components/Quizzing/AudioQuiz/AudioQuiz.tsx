@@ -1,8 +1,10 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import { useAudioQuiz } from '@application/units/useAudioQuiz';
+import { AudioQuizType } from '@domain/audioQuizzing';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
 import { Loading } from '../../Loading';
+import AudioQuizEnd from '../general/AudioQuizEnd';
 import AudioFlashcard from './AudioFlashcard';
 import AudioQuizButtons from './AudioQuizButtons';
 import 'src/App.css';
@@ -79,6 +81,8 @@ export default function AudioQuiz({
     audioQuizType,
     cleanupFunction,
     isAudioTranscoderLoading,
+    isQuizComplete,
+    restartQuiz,
 
     getHelpIsOpen,
     setGetHelpIsOpen,
@@ -91,6 +95,8 @@ export default function AudioQuiz({
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
+      if (isQuizComplete) return; // prevent keyboard controls when quiz is complete
+
       if (event.key === 'ArrowRight' || event.key === 'd') {
         nextExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
@@ -114,6 +120,7 @@ export default function AudioQuiz({
       }
     },
     [
+      isQuizComplete,
       nextExample,
       previousExample,
       goToQuestion,
@@ -141,6 +148,20 @@ export default function AudioQuiz({
       );
     }
     return <Loading message="Setting up Quiz..." />;
+  }
+
+  // Show quiz end screen when complete
+  if (isQuizComplete) {
+    return (
+      <AudioQuizEnd
+        speakingOrListening={
+          audioQuizType === AudioQuizType.Speaking ? 'speaking' : 'listening'
+        }
+        isAutoplay={autoplay}
+        restartQuiz={restartQuiz}
+        returnToQuizSetup={cleanupFunction}
+      />
+    );
   }
 
   return (

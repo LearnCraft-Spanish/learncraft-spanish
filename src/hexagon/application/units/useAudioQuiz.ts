@@ -55,8 +55,9 @@ export interface AudioQuizReturn {
   nextExample: () => void;
   previousExample: () => void;
   quizLength: number;
-  resetQuiz: () => void;
   cleanupFunction: () => void;
+  isQuizComplete: boolean;
+  restartQuiz: () => void;
 
   // Get Help
   getHelpIsOpen: boolean;
@@ -138,6 +139,7 @@ export function useAudioQuiz({
   } = useAudioQuizMapper();
 
   const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
+  const [isQuizComplete, setIsQuizComplete] = useState(false);
 
   // Examples that have bad audio and should be skipped
   const [badAudioExamples, setBadAudioExamples] = useState<number[]>([]);
@@ -185,12 +187,12 @@ export function useAudioQuiz({
 
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
-    if (currentExampleIndex + 1 < safeExamples.length - 1) {
+    if (currentExampleIndex + 1 < safeExamples.length) {
       setSelectedExampleIndex(currentExampleIndex + 1);
       setCurrentStep(AudioQuizStep.Question);
-    } else {
-      setSelectedExampleIndex(safeExamples.length - 1);
-      setCurrentStep(AudioQuizStep.Question);
+    } else if (currentExampleIndex === safeExamples.length - 1) {
+      // We're at the last example and trying to go next, mark quiz as complete
+      setIsQuizComplete(true);
     }
     setGetHelpIsOpen(false);
 
@@ -206,12 +208,21 @@ export function useAudioQuiz({
       setSelectedExampleIndex(0);
       setCurrentStep(AudioQuizStep.Question);
     }
+    // If we're going back from quiz complete state, reset it
+    if (isQuizComplete) {
+      setIsQuizComplete(false);
+    }
     if (getHelpIsOpen) {
       setGetHelpIsOpen(false);
     }
     // Reset the previous step ref to null so progress animation works immediately on new example
     previousStepRef.current = null;
-  }, [currentExampleIndex, setSelectedExampleIndex, getHelpIsOpen]);
+  }, [
+    currentExampleIndex,
+    setSelectedExampleIndex,
+    getHelpIsOpen,
+    isQuizComplete,
+  ]);
 
   // Note: isInPadding ref removed - no longer needed with concatenated audio
 
@@ -229,11 +240,12 @@ export function useAudioQuiz({
   // Note: This is now handled by the AudioQuizMapper, so we can remove this complex state management
 
   // Resets the quiz to the initial state, called on menu and end of autoplay
-  const resetQuiz = useCallback(() => {
+  const restartQuiz = useCallback(() => {
     setSelectedExampleIndex(0);
     setCurrentStep(AudioQuizStep.Question);
     previousStepRef.current = null;
     previousExampleIndexRef.current = -1;
+    setIsQuizComplete(false);
 
     changeCurrentAudio({
       currentTime: 0,
@@ -265,24 +277,13 @@ export function useAudioQuiz({
         setCurrentStep(AudioQuizStep.Answer);
         break;
       case AudioQuizStep.Answer:
-        if (currentExampleIndex === safeExamples.length - 1 && autoplay) {
-          resetQuiz();
-          return;
-        }
         nextExample();
         // Proceed to next question
         break;
       default:
         console.error('Invalid currentStep value: ', currentStep);
     }
-  }, [
-    resetQuiz,
-    autoplay,
-    currentStep,
-    nextExample,
-    currentExampleIndex,
-    safeExamples.length,
-  ]);
+  }, [autoplay, currentStep, nextExample]);
 
   // Simple memos for the current, next, and previous examples
   // Undefined if unavailable, implies either loading state or out of array bounds
@@ -358,14 +359,7 @@ export function useAudioQuiz({
 
   // Enhanced nextExample function with aggressive prefetching for autoplay
   const nextExampleWithPrefetch = useCallback(() => {
-    // Call the original nextExample logic
-    if (currentExampleIndex + 1 < safeExamples.length - 1) {
-      setSelectedExampleIndex(currentExampleIndex + 1);
-      setCurrentStep(AudioQuizStep.Question);
-    } else {
-      setSelectedExampleIndex(safeExamples.length - 1);
-      setCurrentStep(AudioQuizStep.Question);
-    }
+    nextExample();
     // Reset the previous step ref to null so progress animation works immediately on new example
     previousStepRef.current = null;
 
@@ -386,9 +380,10 @@ export function useAudioQuiz({
     }
   }, [
     currentExampleIndex,
-    setSelectedExampleIndex,
+
     safeExamples,
     autoplay,
+    nextExample,
     parsedExamples,
     parseAudioExample,
   ]);
@@ -588,10 +583,6 @@ export function useAudioQuiz({
   useEffect(() => {
     // Do not proceed with the changes unless the audio is ready to be played
     if (!ready || !currentStepValue) {
-      console.error('❌ Audio change blocked:', {
-        ready,
-        hasStepValue: !!currentStepValue,
-      });
       return;
     }
 
@@ -599,21 +590,7 @@ export function useAudioQuiz({
       currentExampleIndex !== previousExampleIndexRef.current;
     const stepChanged = currentStep !== previousStepRef.current;
 
-    console.error('🎵 Audio Change Check:', {
-      exampleChanged,
-      stepChanged,
-      currentStep,
-      previousStep: previousStepRef.current,
-      currentStepValue: {
-        step: currentStepValue.step,
-        blobUrl: `${currentStepValue.blobUrl?.substring(0, 50)}...`,
-        duration: currentStepValue.duration,
-        displayText: currentStepValue.displayText,
-      },
-    });
-
     if (exampleChanged) {
-      console.error('📝 Example changed - updating audio');
       // If the example index has changed, handle the example change
       previousExampleIndexRef.current = currentExampleIndex;
       // Reset and set the step ref for the new example
@@ -626,7 +603,6 @@ export function useAudioQuiz({
         playOnLoad: true,
       });
     } else if (stepChanged) {
-      console.error('🔄 Step changed - updating audio');
       // Handle step changes (both initial and subsequent)
       previousStepRef.current = currentStep;
       // Handle step change
@@ -734,8 +710,9 @@ export function useAudioQuiz({
     progressStatus,
     currentExampleNumber,
     quizLength: safeExamples.length,
-    resetQuiz,
+    restartQuiz,
     cleanupFunction,
+    isQuizComplete,
 
     // Get Help
     getHelpIsOpen,
