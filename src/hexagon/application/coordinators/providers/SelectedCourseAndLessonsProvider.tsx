@@ -16,6 +16,8 @@ export function SelectedCourseAndLessonsProvider({
   const updateUserSelectedCourseId = useCallback(
     (courseId: number) => {
       setUserSelectedCourseId(courseId);
+      setFromLessonNumber(null);
+      setToLessonNumber(null);
     },
     [setUserSelectedCourseId],
   );
