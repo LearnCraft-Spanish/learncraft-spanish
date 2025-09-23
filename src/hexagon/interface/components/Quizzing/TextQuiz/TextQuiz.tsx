@@ -142,6 +142,9 @@ export function TextQuiz({
                       difficulty,
                     )
                   }
+                  isExampleReviewPending={srsQuizProps.isExampleReviewPending(
+                    currentExample.id,
+                  )}
                   answerShowing={answerShowing}
                   incrementExampleNumber={incrementExample}
                 />
