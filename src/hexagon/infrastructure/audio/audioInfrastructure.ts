@@ -108,6 +108,26 @@ export function useAudioInfrastructure(): AudioPort {
     [context, updateCurrentTime],
   );
 
+  // Clean up audio state completely
+  const cleanupAudio = useCallback(() => {
+    // Stop any playing audio
+    if (context.playingAudioRef.current) {
+      context.playingAudioRef.current.pause();
+      context.playingAudioRef.current.currentTime = 0;
+      context.playingAudioRef.current.src = '';
+    }
+
+    // Clear any intervals
+    if (tickRef.current) {
+      clearInterval(tickRef.current);
+      tickRef.current = null;
+    }
+
+    // Reset state
+    setIsPlaying(false);
+    setCurrentTime(0);
+  }, [context]);
+
   // Ticks the current time of the playing audio, pushes to state
   useEffect(() => {
     if (isPlaying) {
@@ -126,5 +146,6 @@ export function useAudioInfrastructure(): AudioPort {
     isPlaying,
     currentTime,
     changeCurrentAudio,
+    cleanupAudio,
   };
 }

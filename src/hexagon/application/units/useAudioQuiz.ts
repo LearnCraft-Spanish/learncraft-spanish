@@ -129,8 +129,14 @@ export function useAudioQuiz({
     deleteFlashcards,
   } = useStudentFlashcards();
 
-  const { play, pause, isPlaying, currentTime, changeCurrentAudio } =
-    useAudioAdapter();
+  const {
+    play,
+    pause,
+    isPlaying,
+    currentTime,
+    changeCurrentAudio,
+    cleanupAudio,
+  } = useAudioAdapter();
 
   const {
     parseExampleForQuiz,
@@ -144,6 +150,22 @@ export function useAudioQuiz({
   // Examples that have bad audio and should be skipped
   const [badAudioExamples, setBadAudioExamples] = useState<number[]>([]);
   const parseInProgress = useRef(false);
+
+  // Debouncing for example navigation to prevent rapid skipping
+  const lastSkipTime = useRef<number>(0);
+  const SKIP_DEBOUNCE_MS = 250; // 0.25 seconds
+
+  // Helper function to check if example skipping is allowed (debounced)
+  const canSkipExample = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLastSkip = now - lastSkipTime.current;
+    return timeSinceLastSkip >= SKIP_DEBOUNCE_MS;
+  }, [SKIP_DEBOUNCE_MS]);
+
+  // Helper function to update the last skip time
+  const updateSkipTime = useCallback(() => {
+    lastSkipTime.current = Date.now();
+  }, []);
 
   // Marks an example as bad, removing it from the review list
   const markExampleAsBad = useCallback((exampleId: number) => {
@@ -187,26 +209,46 @@ export function useAudioQuiz({
 
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
+    // Check if skipping is allowed (debounced)
+    if (!canSkipExample()) {
+      return;
+    }
+
     if (currentExampleIndex + 1 < safeExamples.length) {
       setSelectedExampleIndex(currentExampleIndex + 1);
       setCurrentStep(AudioQuizStep.Question);
+      updateSkipTime(); // Update the last skip time
     } else if (currentExampleIndex === safeExamples.length - 1) {
       // We're at the last example and trying to go next, mark quiz as complete
       setIsQuizComplete(true);
+      updateSkipTime(); // Update the last skip time
     }
     setGetHelpIsOpen(false);
 
     // Reset the previous step ref to null so progress animation works immediately on new example
     previousStepRef.current = null;
-  }, [currentExampleIndex, setSelectedExampleIndex, safeExamples]);
+  }, [
+    currentExampleIndex,
+    setSelectedExampleIndex,
+    safeExamples,
+    canSkipExample,
+    updateSkipTime,
+  ]);
 
   const previousExample = useCallback(() => {
+    // Check if skipping is allowed (debounced)
+    if (!canSkipExample()) {
+      return;
+    }
+
     if (currentExampleIndex > 0) {
       setSelectedExampleIndex(currentExampleIndex - 1);
       setCurrentStep(AudioQuizStep.Question);
+      updateSkipTime(); // Update the last skip time
     } else {
       setSelectedExampleIndex(0);
       setCurrentStep(AudioQuizStep.Question);
+      updateSkipTime(); // Update the last skip time
     }
     // If we're going back from quiz complete state, reset it
     if (isQuizComplete) {
@@ -222,6 +264,8 @@ export function useAudioQuiz({
     setSelectedExampleIndex,
     getHelpIsOpen,
     isQuizComplete,
+    canSkipExample,
+    updateSkipTime,
   ]);
 
   // Note: isInPadding ref removed - no longer needed with concatenated audio
@@ -247,17 +291,13 @@ export function useAudioQuiz({
     previousExampleIndexRef.current = -1;
     setIsQuizComplete(false);
 
-    changeCurrentAudio({
-      currentTime: 0,
-      src: '',
-      onEnded: () => {},
-      playOnLoad: true,
-    });
+    // Clean up audio completely instead of just changing it
+    cleanupAudio();
 
     if (getHelpIsOpen) {
       setGetHelpIsOpen(false);
     }
-  }, [changeCurrentAudio, getHelpIsOpen]);
+  }, [cleanupAudio, getHelpIsOpen]);
 
   // Steps the quiz forward
   const nextStep = useCallback(() => {
@@ -477,11 +517,17 @@ export function useAudioQuiz({
       return 0;
     }
 
-    if (
-      previousStepRef.current &&
-      currentStep &&
-      currentStep !== previousStepRef.current
-    ) {
+    // If we're in the middle of an example change, always return 0 to prevent flash
+    const exampleChanged =
+      currentExampleIndex !== previousExampleIndexRef.current;
+    if (exampleChanged) {
+      return 0;
+    }
+
+    // If step just changed, return 0 for smooth reset
+    const stepChanged =
+      previousStepRef.current && currentStep !== previousStepRef.current;
+    if (stepChanged) {
       return 0;
     }
 
@@ -497,7 +543,14 @@ export function useAudioQuiz({
     const finalProgress = Math.max(progress, 0);
 
     return finalProgress;
-  }, [currentTime, currentStepValue, autoplay, previousStepRef, currentStep]);
+  }, [
+    currentTime,
+    currentStepValue,
+    autoplay,
+    previousStepRef,
+    currentStep,
+    currentExampleIndex,
+  ]);
 
   // What to do when the audio ends - simplified since concatenated audio handles padding
   const onEndedCallback = useCallback(() => {
@@ -623,6 +676,13 @@ export function useAudioQuiz({
     changeCurrentAudio,
     onEndedCallback,
   ]);
+
+  // Cleanup audio when the quiz component unmounts or cleanupFunction is called
+  useEffect(() => {
+    return () => {
+      cleanupAudio();
+    };
+  }, [cleanupAudio]);
 
   /*
     addPendingRemoveProps: isStudent
