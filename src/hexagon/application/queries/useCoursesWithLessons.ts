@@ -11,7 +11,7 @@ export function useCoursesWithLessons() {
   return useQuery({
     queryKey: ['coursesWithLessons'],
     queryFn: () => {
-      // if user is not an admin, or appUser.courseId !== 10, filter out course with id 10
+      // Subjunctives Challenge course is only accessible to admins & students currently enrolled in the course
       if (!isAdmin && appUser?.courseId !== 10) {
         return adapter
           .getCoursesWithLessons()
