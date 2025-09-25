@@ -44,6 +44,8 @@ export interface UseQuizMyFlashcardsReturn {
 
   isLoading: boolean;
   error: Error | null;
+  isLoadingExamples: boolean;
+  totalCount: number | null;
 }
 
 export function useQuizMyFlashcards(
@@ -218,6 +220,15 @@ export function useQuizMyFlashcards(
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
+  const totalCount = useMemo(() => {
+    if (quizType === MyFlashcardsQuizType.Text) {
+      return textQuizSetup.totalCount;
+    } else if (quizType === MyFlashcardsQuizType.Audio) {
+      return audioQuizSetup.totalExamples;
+    }
+    return 0;
+  }, [quizType, textQuizSetup.totalCount, audioQuizSetup.totalExamples]);
+
   // Return the hooks, props, and local state
   return {
     // Quiz Setup Hooks
@@ -243,5 +254,8 @@ export function useQuizMyFlashcards(
     // Loading and error states
     isLoading,
     error,
+
+    isLoadingExamples: studentFlashcardsLoading,
+    totalCount,
   };
 }

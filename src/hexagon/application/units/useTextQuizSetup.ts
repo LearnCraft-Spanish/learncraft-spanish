@@ -23,6 +23,7 @@ export interface TextQuizSetupReturn {
   examplesToQuiz: ExampleWithVocabulary[];
   isLoading: boolean;
   error: Error | null;
+  totalCount: number;
 }
 
 export interface UseTextQuizSetupProps {
@@ -196,5 +197,6 @@ export function useTextQuizSetup({
     setSelectedQuizLength,
     isLoading,
     error,
+    totalCount: filteredExamples?.length ?? 0,
   };
 }

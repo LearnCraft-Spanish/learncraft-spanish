@@ -76,6 +76,11 @@
     input {
       display: none;
     }
+
+    // on hover, show accent background color
+    &:hover {
+      background-color: var(--accent);
+    }
   }
 }
 

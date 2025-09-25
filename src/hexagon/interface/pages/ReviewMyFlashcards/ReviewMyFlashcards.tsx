@@ -14,6 +14,8 @@ import {
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Tooltip } from 'react-tooltip';
+// import { Tooltip } from '../../components/Tooltip';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './ReviewMyFlashcards.scss';
 
@@ -41,6 +43,7 @@ export default function MyFlashcardsQuiz() {
     noFlashcards,
     isLoading,
     error,
+    totalCount,
   } = useQuizMyFlashcards({
     initialFilterOwnedFlashcards: enableFiltering,
   });
@@ -101,48 +104,85 @@ export default function MyFlashcardsQuiz() {
               <h4>Quiz Options:</h4>
               <div className="quizSettingsWrapper">
                 <div className="quizSettingsHeader twoOptions">
-                  <label
-                    htmlFor="quizType"
+                  <a
+                    data-tooltip-id="quizType"
                     className={`option ${
                       quizType === MyFlashcardsQuizType.Text ? 'selected' : ''
                     }`}
-                    onClick={() => setQuizType(MyFlashcardsQuizType.Text)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setQuizType(MyFlashcardsQuizType.Text);
+                    }}
                   >
-                    Flashcards
-                    <input
-                      type="radio"
-                      id="quizType"
-                      value="text"
-                      name="quizType"
-                    />
-                  </label>
-
-                  <label
-                    htmlFor="audio"
+                    <label htmlFor="quizType">
+                      Flashcards
+                      <input
+                        type="radio"
+                        id="quizType"
+                        value="text"
+                        name="quizType"
+                      />
+                    </label>
+                  </a>
+                  <Tooltip id="quizType" style={{ maxWidth: '350px' }}>
+                    <h3 style={{ color: 'white' }}>
+                      Flashcard Quizzing Settings
+                    </h3>
+                    <p>
+                      SRS Quiz: SRS is a study technique that stands for Spaced
+                      Repetition System. It is a technique that helps you
+                      remember information by repeating it over time at
+                      increasing intervals.
+                    </p>
+                  </Tooltip>
+                  <a
+                    data-tooltip-id="audioQuizType"
                     className={`option ${
                       quizType === MyFlashcardsQuizType.Audio ? 'selected' : ''
                     }`}
-                    onClick={() => setQuizType(MyFlashcardsQuizType.Audio)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setQuizType(MyFlashcardsQuizType.Audio);
+                    }}
                   >
-                    Audio
-                    <input
-                      type="radio"
-                      id="audio"
-                      value="audio"
-                      name="quizType"
-                    />
-                  </label>
+                    <label htmlFor="audio">
+                      Audio
+                      <input
+                        type="radio"
+                        id="audio"
+                        value="audio"
+                        name="quizType"
+                      />
+                    </label>
+                  </a>
+                  <Tooltip id="audioQuizType" style={{ maxWidth: '350px' }}>
+                    <h3 style={{ color: 'white' }}>Audio Quizzing Settings</h3>
+                    <p>
+                      Speaking Quiz: This quiz helps you practice speaking in
+                      Spanish.
+                    </p>
+                    <p>
+                      Listening Quiz: This quiz helps you practice listening to
+                      Spanish.
+                    </p>
+                    <p>
+                      Autoplay: This option allows the quiz to progress
+                      automatically.
+                    </p>
+                  </Tooltip>
                 </div>
                 {quizType === MyFlashcardsQuizType.Text && (
                   <MyTextQuizMenu
                     quizSetupOptions={textQuizSetup}
                     filteringIsLoading={exampleFilter.isLoading}
+                    totalCount={totalCount}
                   />
                 )}
                 {quizType === MyFlashcardsQuizType.Audio && (
                   <AudioQuizMenu
                     quizSetupOptions={audioQuizSetup}
                     filteringIsLoading={exampleFilter.isLoading}
+                    totalCount={totalCount}
                   />
                 )}
               </div>

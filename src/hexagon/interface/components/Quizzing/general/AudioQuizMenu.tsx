@@ -12,9 +12,11 @@ import '@interface/styles/QuizSetupMenu.scss';
 export function AudioQuizMenu({
   quizSetupOptions,
   filteringIsLoading = false,
+  totalCount,
 }: {
   filteringIsLoading?: boolean;
   quizSetupOptions: AudioQuizSetupReturn;
+  totalCount?: number | null;
 }) {
   const {
     audioQuizType,
@@ -50,21 +52,28 @@ export function AudioQuizMenu({
       {filteringIsLoading ? (
         <InlineLoading message="Filtering examples..." />
       ) : (
-        <label className="menuRow dropdown">
-          Quiz Length:
-          <select
-            onChange={(e) =>
-              setSelectedQuizLength(Number.parseInt(e.target.value))
-            }
-            value={selectedQuizLength}
-          >
-            {availableQuizLengths.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </label>
+        <>
+          <label className="menuRow dropdown">
+            Quiz Length:
+            <select
+              onChange={(e) =>
+                setSelectedQuizLength(Number.parseInt(e.target.value))
+              }
+              value={selectedQuizLength}
+            >
+              {availableQuizLengths.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="quizSettingsBody">
+            <div className="menuRow">
+              <p className="totalCount">{`${totalCount ?? 0} examples found`}</p>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
