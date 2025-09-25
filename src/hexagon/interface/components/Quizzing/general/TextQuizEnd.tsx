@@ -1,5 +1,6 @@
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { MenuButton } from '@interface/components/general/Buttons';
+import './QuizEnd.scss';
 export default function TextQuizEnd({
   isSrsQuiz,
   restartQuiz,
@@ -12,7 +13,7 @@ export default function TextQuizEnd({
   const { flashcardsDueForReview } = useStudentFlashcards();
 
   return (
-    <div className="srsQuizEndWrapper">
+    <div className="QuizEndWrapper">
       <h2>{isSrsQuiz ? 'SRS Quiz Complete!' : 'Quiz Complete!'}</h2>
       <p>Congratulations! You've completed the quiz.</p>
       {isSrsQuiz ? (
@@ -30,20 +31,24 @@ export default function TextQuizEnd({
           </p>
         )
       ) : (
-        <p>
-          If you would like to retake the quiz, click{' '}
-          <button type="button" onClick={() => restartQuiz()}>
-            Restart Quiz
-          </button>
-        </p>
+        <p>If you would like to retake the quiz, click "Restart Quiz"</p>
       )}
 
       <p>
-        If you would like to create a new quiz, click{' '}
+        If you would like to create a new quiz, click "Return to Quiz Setup"
+      </p>
+      {!isSrsQuiz && (
+        <div className="buttonBox">
+          <button type="button" onClick={() => restartQuiz()}>
+            Restart Quiz
+          </button>
+        </div>
+      )}
+      <div className="buttonBox">
         <button type="button" onClick={() => returnToQuizSetup()}>
           Return to Quiz Setup
         </button>
-      </p>
+      </div>
       <div className="buttonBox">
         <MenuButton />
       </div>

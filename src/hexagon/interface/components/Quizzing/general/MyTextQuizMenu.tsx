@@ -2,8 +2,9 @@ import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { ToggleSwitch } from '@interface/components/general';
 
 import React from 'react';
-import { InlineLoading } from '../../Loading';
+import ToggleSwitchWithTooltip from '../../general/ToggleSwitch/ToggleSwitchWithTooltip';
 
+import { InlineLoading } from '../../Loading';
 import './QuizSetupMenu.scss';
 import '@interface/styles/QuizSetupMenu.scss';
 
@@ -33,12 +34,13 @@ export function MyTextQuizMenu({
     <div className="quizSettingsBody">
       {canAccessSRS && (
         <div className="menuRow">
-          <ToggleSwitch
+          <ToggleSwitchWithTooltip
             id="srsQuiz"
             ariaLabel="SRS Quiz"
             label="SRS Quiz"
             checked={srsQuiz}
             onChange={() => setSrsQuiz(!srsQuiz)}
+            tooltipText="SRS Quiz Tooltip"
           />
         </div>
       )}
