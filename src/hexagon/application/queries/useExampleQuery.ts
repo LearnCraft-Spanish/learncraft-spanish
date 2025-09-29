@@ -45,24 +45,21 @@ export const useExampleQuery = (
 
   const queryClient = useQueryClient();
 
-  // Destructure the combined filter state
+  // Destructure the filter state
   const {
-    combinedFilterState,
+    filterState,
     isLoading: isLoadingCombinedFilters,
     error: errorCombinedFilters,
   } = useCombinedFilters({
     onFilterChange,
   });
 
-  // Destructure the combined filter state
+  // Destructure the filter state
   const {
-    courseId,
-    fromLessonNumber,
-    toLessonNumber,
     skillTags,
     excludeSpanglish,
     audioOnly: audioOnlyState,
-  } = combinedFilterState;
+  } = filterState;
 
   const audioOnly = useMemo(() => {
     if (audioRequired) {
@@ -76,8 +73,7 @@ export const useExampleQuery = (
 
   const seed: string | null = useMemo(() => {
     if (
-      (!!courseId && !!toLessonNumber) ||
-      !!fromLessonNumber ||
+      (filterState.lessonRanges && filterState.lessonRanges.length > 0) ||
       !!skillTags ||
       !excludeSpanglish ||
       !!audioOnly
@@ -90,25 +86,13 @@ export const useExampleQuery = (
       return uuid;
     }
     return null;
-  }, [
-    courseId,
-    toLessonNumber,
-    fromLessonNumber,
-    skillTags,
-    excludeSpanglish,
-    audioOnly,
-  ]);
+  }, [filterState.lessonRanges, skillTags, excludeSpanglish, audioOnly]);
 
   const fetchFilteredExamples = useCallback(
     async ({ prefetchRequest = false }: { prefetchRequest?: boolean }) => {
       const { examples, totalCount } = await exampleAdapter.getFilteredExamples(
         {
-          courseId: courseId!,
-          toLessonNumber: toLessonNumber!,
-          fromLessonNumber: fromLessonNumber!,
-          excludeSpanglish: excludeSpanglish!,
-          audioOnly: audioOnly!,
-          skillTags: skillTags!,
+          ...filterState,
           page: prefetchRequest ? page + 1 : page,
           limit: currentPageSize,
           seed: seed!,
@@ -116,18 +100,7 @@ export const useExampleQuery = (
       );
       return { examples, totalCount };
     },
-    [
-      courseId,
-      toLessonNumber,
-      fromLessonNumber,
-      excludeSpanglish,
-      audioOnly,
-      skillTags,
-      exampleAdapter,
-      page,
-      currentPageSize,
-      seed,
-    ],
+    [filterState, exampleAdapter, page, currentPageSize, seed],
   );
 
   const {
@@ -139,12 +112,7 @@ export const useExampleQuery = (
       'filteredExamples',
       { page },
       { pageSize: currentPageSize },
-      { courseId },
-      { toLessonNumber },
-      { fromLessonNumber },
-      { excludeSpanglish },
-      { audioOnly },
-      { skillTags },
+      filterState, // Use the filter state which always includes lesson ranges
       seed,
     ],
     queryFn: () => fetchFilteredExamples({ prefetchRequest: false }),
@@ -167,14 +135,9 @@ export const useExampleQuery = (
       queryClient.prefetchQuery({
         queryKey: [
           'filteredExamples',
-          page + 1,
-          currentPageSize,
-          { courseId },
-          { toLessonNumber },
-          { fromLessonNumber },
-          { excludeSpanglish },
-          { audioOnly },
-          { skillTags },
+          { page: page + 1 },
+          { pageSize: currentPageSize },
+          filterState,
           seed,
         ],
         queryFn: () => fetchFilteredExamples({ prefetchRequest: true }),
@@ -186,12 +149,7 @@ export const useExampleQuery = (
     canPrefetch,
     page,
     currentPageSize,
-    courseId,
-    toLessonNumber,
-    fromLessonNumber,
-    excludeSpanglish,
-    audioOnly,
-    skillTags,
+    filterState,
     fetchFilteredExamples,
     queryClient,
     seed,

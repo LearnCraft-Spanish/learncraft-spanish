@@ -1,4 +1,5 @@
 import { useCourseAdapter } from '@application/adapters/courseAdapter';
+import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useQuery } from '@tanstack/react-query';
 
 export const useLessonVocabKnown = (
@@ -13,11 +14,18 @@ export const useLessonVocabKnown = (
     error,
   } = useQuery({
     queryKey: ['lessonWithVocab', courseId, lessonNumber],
-    queryFn: () =>
-      courseInfrastructure.getLessonVocabKnown({
-        courseId: courseId!,
-        lessonNumber: lessonNumber!,
-      }),
+    queryFn: () => {
+      // Transform single lesson to lesson range format
+      const lessonRanges = transformToLessonRanges({
+        courseId,
+        fromLessonNumber: lessonNumber,
+        toLessonNumber: lessonNumber,
+      });
+
+      return courseInfrastructure.getLessonVocabKnown({
+        lessonRanges,
+      });
+    },
     enabled: !!courseId && !!lessonNumber && enabled,
   });
 
@@ -43,13 +51,20 @@ export const useLessonRangeVocabRequired = (
       fromLessonNumber,
       toLessonNumber,
     ],
-    queryFn: () =>
-      courseInfrastructure.getLessonRangeVocabRequired({
-        courseId: courseId!,
-        fromLessonNumber: fromLessonNumber!,
-        toLessonNumber: toLessonNumber!,
-      }),
-    enabled: !!courseId && !!fromLessonNumber && !!toLessonNumber && enabled,
+    queryFn: async () => {
+      // Always transform to lesson ranges
+      const lessonRanges = transformToLessonRanges({
+        courseId,
+        fromLessonNumber,
+        toLessonNumber,
+      });
+
+      // Use the lesson range vocab required endpoint
+      return courseInfrastructure.getLessonRangeVocabRequired({
+        lessonRanges,
+      });
+    },
+    enabled: !!courseId && !!toLessonNumber && enabled,
   });
 
   return { lessonRangeVocabRequired, isLoading, error };

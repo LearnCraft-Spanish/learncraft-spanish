@@ -1,4 +1,8 @@
 import type { SelectedCourseAndLessonsContextType } from '../contexts/SelectedCourseAndLessonsContext';
+import {
+  generateVirtualLessonId,
+  getPrerequisitesForCourse,
+} from '@domain/coursePrerequisites';
 import { useCallback, useMemo, useState } from 'react';
 import SelectedCourseAndLessonsContext from '../contexts/SelectedCourseAndLessonsContext';
 
@@ -16,8 +20,18 @@ export function SelectedCourseAndLessonsProvider({
   const updateUserSelectedCourseId = useCallback(
     (courseId: number) => {
       setUserSelectedCourseId(courseId);
-      setFromLessonNumber(null);
       setToLessonNumber(null);
+
+      // Check if the course has prerequisites and auto-select the first one
+      const prerequisites = getPrerequisitesForCourse(courseId);
+      if (prerequisites && prerequisites.prerequisites.length > 0) {
+        // Set the from lesson to the first prerequisite
+        const firstPrerequisiteId = generateVirtualLessonId(courseId, 0);
+        setFromLessonNumber(firstPrerequisiteId);
+      } else {
+        // No prerequisites, reset to null
+        setFromLessonNumber(null);
+      }
     },
     [setUserSelectedCourseId],
   );

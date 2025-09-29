@@ -1,6 +1,7 @@
 import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 import type { UseSelectedCourseAndLessonsReturnType } from './types';
 import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
+import { getPrerequisiteFromVirtualId } from '@domain/coursePrerequisites';
 import { use, useMemo } from 'react';
 import SelectedCourseAndLessonsContext from '../contexts/SelectedCourseAndLessonsContext';
 import { useActiveStudent } from './useActiveStudent';
@@ -53,6 +54,19 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
     }
 
     if (fromLessonNumber) {
+      // Handle virtual prerequisite lessons (negative numbers)
+      if (fromLessonNumber < 0) {
+        const prerequisite = getPrerequisiteFromVirtualId(fromLessonNumber);
+        if (prerequisite) {
+          // Return a virtual lesson object for UI display
+          return {
+            id: fromLessonNumber,
+            lessonNumber: fromLessonNumber,
+            courseName: prerequisite.displayName,
+          } as Lesson;
+        }
+      }
+
       return (
         course.lessons.find((item) => item.lessonNumber === fromLessonNumber) ||
         course.lessons[0]

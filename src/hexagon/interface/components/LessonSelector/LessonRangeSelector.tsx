@@ -1,4 +1,9 @@
+import type { ExtendedLesson } from './SelectLesson';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
+import {
+  generateVirtualLessonId,
+  getPrerequisitesForCourse,
+} from '@domain/coursePrerequisites';
 import { useMemo } from 'react';
 import SelectCourse from './SelectCourse';
 import SelectLesson from './SelectLesson';
@@ -14,24 +19,50 @@ export default function LessonRangeSelector(): React.JSX.Element {
     updateFromLessonNumber,
   } = useSelectedCourseAndLessons();
 
-  const fromLessons = useMemo(() => {
-    if (!course || !toLesson) {
+  const fromLessons = useMemo((): ExtendedLesson[] => {
+    if (!course) {
       return [];
     }
-    return course?.lessons.filter((lesson) => {
-      return lesson.lessonNumber <= toLesson?.lessonNumber;
-    });
+
+    const prerequisites = getPrerequisitesForCourse(course.id);
+    const virtualLessons: ExtendedLesson[] = prerequisites
+      ? prerequisites.prerequisites.map((prereq, index) => ({
+          id: generateVirtualLessonId(course.id, index),
+          lessonNumber: generateVirtualLessonId(course.id, index),
+          courseName: prereq.courseName,
+          isVirtual: true,
+          displayName: prereq.displayName,
+        }))
+      : [];
+
+    // If no "To" lesson is selected, only show prerequisite options
+    if (!toLesson) {
+      return virtualLessons;
+    }
+
+    // If "To" lesson is selected, show prerequisites + filtered regular lessons
+    const filteredLessons = course.lessons.filter(
+      (lesson) => lesson.lessonNumber <= toLesson.lessonNumber,
+    );
+
+    return [...virtualLessons, ...filteredLessons];
   }, [course, toLesson]);
 
-  const toLessons = useMemo(() => {
+  const toLessons = useMemo((): ExtendedLesson[] => {
     if (!course) {
       return [];
     }
     if (!fromLesson) {
-      return course?.lessons;
+      return course.lessons;
     }
-    return course?.lessons.filter((lesson) => {
-      return lesson.lessonNumber >= fromLesson?.lessonNumber;
+
+    // If fromLesson is virtual, show all lessons in the target course
+    if (fromLesson.lessonNumber < 0) {
+      return course.lessons;
+    }
+
+    return course.lessons.filter((lesson) => {
+      return lesson.lessonNumber >= fromLesson.lessonNumber;
     });
   }, [course, fromLesson]);
 
