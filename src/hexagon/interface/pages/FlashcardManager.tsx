@@ -52,6 +52,8 @@ export default function FlashcardManager() {
       <FlashcardManagerFilters
         filterOwnedFlashcards={filterOwnedFlashcards}
         setFilterOwnedFlashcards={setFilterOwnedFlashcards}
+        requireNoSpanglish={false}
+        requireAudioOnly={false}
       />
       <FlashcardTable
         allFlashcards={allFlashcards}

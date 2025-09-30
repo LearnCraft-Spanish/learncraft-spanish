@@ -52,6 +52,7 @@ export default function CombinedCustomQuiz() {
           <h2>Custom Quiz</h2>
           <FlashcardFinderFilter
             requireAudioOnly={quizType === CombinedCustomQuizType.Audio}
+            requireNoSpanglish={quizType === CombinedCustomQuizType.Audio}
             closeable={false}
           />
 

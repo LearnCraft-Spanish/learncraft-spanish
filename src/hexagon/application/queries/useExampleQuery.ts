@@ -92,7 +92,10 @@ export const useExampleQuery = (
     async ({ prefetchRequest = false }: { prefetchRequest?: boolean }) => {
       const { examples, totalCount } = await exampleAdapter.getFilteredExamples(
         {
-          ...filterState,
+          skillTags,
+          lessonRanges: filterState.lessonRanges,
+          excludeSpanglish,
+          audioOnly,
           page: prefetchRequest ? page + 1 : page,
           limit: currentPageSize,
           seed: seed!,

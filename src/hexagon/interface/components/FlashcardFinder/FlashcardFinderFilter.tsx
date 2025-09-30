@@ -7,9 +7,11 @@ import 'src/App.css';
 
 export default function FlashcardFinderFilter({
   requireAudioOnly = false,
+  requireNoSpanglish = false,
   closeable = true,
 }: {
   requireAudioOnly?: boolean;
+  requireNoSpanglish?: boolean;
   closeable?: boolean;
 }) {
   const [filtersOpen, setFiltersOpen] = useState(true);
@@ -25,7 +27,12 @@ export default function FlashcardFinderFilter({
           buttonAlwaysVisible
         />
       )}
-      {filtersOpen && <FilterPanel requireAudioOnly={requireAudioOnly} />}
+      {filtersOpen && (
+        <FilterPanel
+          requireAudioOnly={requireAudioOnly}
+          requireNoSpanglish={requireNoSpanglish}
+        />
+      )}
     </div>
   );
 }
