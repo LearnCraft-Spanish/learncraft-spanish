@@ -87,7 +87,7 @@ export function CustomQuiz() {
         (!customQuizReady ? (
           <>
             {/* <CustomQuizFilters filterState={filterState} /> */}
-            <FlashcardFinderFilter closeable={false} />
+            <FlashcardFinderFilter />
             <div className="customQuizSettingsWrapper">
               <CustomQuizSetupMenu
                 availableQuizLengths={availableQuizLengths}
