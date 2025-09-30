@@ -103,7 +103,16 @@ export const useExampleQuery = (
       );
       return { examples, totalCount };
     },
-    [filterState, exampleAdapter, page, currentPageSize, seed],
+    [
+      exampleAdapter,
+      skillTags,
+      filterState.lessonRanges,
+      excludeSpanglish,
+      audioOnly,
+      page,
+      currentPageSize,
+      seed,
+    ],
   );
 
   const {
