@@ -1,5 +1,6 @@
 import { MenuButton } from '@interface/components/general/Buttons';
 import { useEffect, useState } from 'react';
+import './QuizEnd.scss';
 
 export default function AudioQuizEnd({
   speakingOrListening,
@@ -38,7 +39,7 @@ export default function AudioQuizEnd({
   };
 
   return (
-    <div className="srsQuizEndWrapper">
+    <div className="QuizEndWrapper">
       <h2>
         {speakingOrListening === 'speaking' ? 'Speaking' : 'Listening'} Quiz
         Complete!
@@ -54,8 +55,8 @@ export default function AudioQuizEnd({
         </div>
       )}
 
-      <div className="button-section">
-        {isAutoplay && isCountingDown && (
+      {isAutoplay && isCountingDown && (
+        <div className="buttonBox">
           <button
             type="button"
             onClick={handleRestartNow}
@@ -63,8 +64,9 @@ export default function AudioQuizEnd({
           >
             Restart Quiz Now
           </button>
-        )}
-
+        </div>
+      )}
+      <div className="buttonBox">
         <button type="button" onClick={returnToQuizSetup} className="setup-btn">
           Return to Quiz Setup
         </button>

@@ -27,6 +27,7 @@ describe('component SRSButtons', () => {
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
           handleReviewExample={handleReviewExample}
+          isExampleReviewPending={false}
         />
       </MockAllProviders>,
     );
@@ -40,6 +41,7 @@ describe('component SRSButtons', () => {
           answerShowing={false}
           incrementExampleNumber={incrementExampleNumber}
           handleReviewExample={handleReviewExample}
+          isExampleReviewPending={false}
         />
       </MockAllProviders>,
     );
@@ -65,6 +67,7 @@ describe('component SRSButtons', () => {
           answerShowing
           incrementExampleNumber={incrementExampleNumber}
           handleReviewExample={handleReviewExample}
+          isExampleReviewPending={false}
         />
       </MockAllProviders>,
     );
@@ -72,6 +75,60 @@ describe('component SRSButtons', () => {
       expect(screen.getByText('This was easy')).toBeTruthy();
       expect(screen.getByText('This was hard')).toBeTruthy();
     });
+  });
+
+  it('when review is pending, shows labeled state instead of buttons', async () => {
+    render(
+      <MockAllProviders>
+        <SRSButtons
+          hasExampleBeenReviewed="easy"
+          answerShowing
+          incrementExampleNumber={incrementExampleNumber}
+          handleReviewExample={handleReviewExample}
+          isExampleReviewPending={true}
+        />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText('Labeled: Easy')).toBeTruthy();
+    });
+    expect(screen.queryByText('This was easy')).toBeNull();
+    expect(screen.queryByText('This was hard')).toBeNull();
+  });
+
+  it('when review is pending but no difficulty set, shows hard labeled state', async () => {
+    render(
+      <MockAllProviders>
+        <SRSButtons
+          hasExampleBeenReviewed="hard"
+          answerShowing
+          incrementExampleNumber={incrementExampleNumber}
+          handleReviewExample={handleReviewExample}
+          isExampleReviewPending={true}
+        />
+      </MockAllProviders>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText('Labeled: Hard')).toBeTruthy();
+    });
+    expect(screen.queryByText('This was easy')).toBeNull();
+    expect(screen.queryByText('This was hard')).toBeNull();
+  });
+
+  it('when answer not showing, does not show buttons regardless of pending state', () => {
+    render(
+      <MockAllProviders>
+        <SRSButtons
+          hasExampleBeenReviewed={null}
+          answerShowing={false}
+          incrementExampleNumber={incrementExampleNumber}
+          handleReviewExample={handleReviewExample}
+          isExampleReviewPending={false}
+        />
+      </MockAllProviders>,
+    );
+    expect(screen.queryByText('This was easy')).toBeNull();
+    expect(screen.queryByText('This was hard')).toBeNull();
   });
 
   describe('onClick functions', () => {
@@ -92,6 +149,7 @@ describe('component SRSButtons', () => {
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
             handleReviewExample={handleReviewExample}
+            isExampleReviewPending={false}
           />
         </MockAllProviders>,
       );
@@ -119,6 +177,7 @@ describe('component SRSButtons', () => {
             answerShowing
             incrementExampleNumber={incrementExampleNumber}
             handleReviewExample={handleReviewExample}
+            isExampleReviewPending={false}
           />
         </MockAllProviders>,
       );

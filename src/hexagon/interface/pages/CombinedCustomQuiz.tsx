@@ -52,7 +52,7 @@ export default function CombinedCustomQuiz() {
           <h2>Custom Quiz</h2>
           <FlashcardFinderFilter
             requireAudioOnly={quizType === CombinedCustomQuizType.Audio}
-            closeable={false}
+            requireNoSpanglish={quizType === CombinedCustomQuizType.Audio}
           />
 
           <form
@@ -102,36 +102,20 @@ export default function CombinedCustomQuiz() {
 
                 {/* Text Quiz Settings */}
                 {quizType === CombinedCustomQuizType.Text && (
-                  <>
-                    <MyTextQuizMenu
-                      quizSetupOptions={textQuizSetup}
-                      filteringIsLoading={isLoadingExamples}
-                    />
-                    {!isLoadingExamples && (
-                      <div className="quizSettingsBody">
-                        <div className="menuRow">
-                          <p className="totalCount">{`${totalCount ?? 0} flashcards found`}</p>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  <MyTextQuizMenu
+                    quizSetupOptions={textQuizSetup}
+                    filteringIsLoading={isLoadingExamples}
+                    totalCount={totalCount}
+                  />
                 )}
 
                 {/* Audio Quiz Settings */}
                 {quizType === CombinedCustomQuizType.Audio && (
-                  <>
-                    <AudioQuizMenu
-                      quizSetupOptions={audioQuizSetup}
-                      filteringIsLoading={isLoadingExamples}
-                    />
-                    {!isLoadingExamples && (
-                      <div className="quizSettingsBody">
-                        <div className="menuRow">
-                          <p className="totalCount">{`${totalCount ?? 0} examples found`}</p>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                  <AudioQuizMenu
+                    quizSetupOptions={audioQuizSetup}
+                    filteringIsLoading={isLoadingExamples}
+                    totalCount={totalCount}
+                  />
                 )}
               </div>
             </div>

@@ -73,6 +73,7 @@ function renderQuizYesSrs({
           cleanupFunction,
         }}
         srsQuizProps={{
+          isExampleReviewPending: () => false,
           examplesReviewedResults: [],
           handleReviewExample: () => {},
           hasExampleBeenReviewed: () => null,

@@ -7,6 +7,7 @@ export function SrsQuiz(textQuizProps: TextQuizComponentProps) {
     examplesReviewedResults,
     handleReviewExample,
     hasExampleBeenReviewed,
+    isExampleReviewPending,
   } = useSrsFunctionality();
 
   return (
@@ -16,6 +17,7 @@ export function SrsQuiz(textQuizProps: TextQuizComponentProps) {
         examplesReviewedResults,
         handleReviewExample,
         hasExampleBeenReviewed,
+        isExampleReviewPending,
       }}
     />
   );

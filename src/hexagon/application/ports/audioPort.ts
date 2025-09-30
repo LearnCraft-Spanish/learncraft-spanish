@@ -18,4 +18,7 @@ export interface AudioPort {
 
   // Changes the current audio element
   changeCurrentAudio: (current: AudioElementState) => Promise<void>;
+
+  // Completely cleans up audio state
+  cleanupAudio: () => void;
 }

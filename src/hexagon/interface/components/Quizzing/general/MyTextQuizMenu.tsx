@@ -2,18 +2,20 @@ import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { ToggleSwitch } from '@interface/components/general';
 
 import React from 'react';
-import { InlineLoading } from '../../Loading';
 
+import { InlineLoading } from '../../Loading';
 import './QuizSetupMenu.scss';
 import '@interface/styles/QuizSetupMenu.scss';
 
 interface MyTextQuizMenuProps {
   quizSetupOptions: TextQuizSetupReturn;
   filteringIsLoading?: boolean;
+  totalCount?: number | null;
 }
 export function MyTextQuizMenu({
   quizSetupOptions,
   filteringIsLoading = false,
+  totalCount,
 }: MyTextQuizMenuProps) {
   const {
     canAccessSRS,
@@ -65,24 +67,31 @@ export function MyTextQuizMenu({
       {filteringIsLoading ? (
         <InlineLoading message="Filtering examples..." />
       ) : (
-        <div className="menuRow dropdown">
-          <label htmlFor="quizLength">Quiz Length:</label>
+        <>
+          <div className="menuRow dropdown">
+            <label htmlFor="quizLength">Quiz Length:</label>
 
-          <select
-            name="length"
-            id="quizLength"
-            onChange={(e) =>
-              setSelectedQuizLength(Number.parseInt(e.target.value))
-            }
-            value={quizLength}
-          >
-            {availableQuizLengths.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+            <select
+              name="length"
+              id="quizLength"
+              onChange={(e) =>
+                setSelectedQuizLength(Number.parseInt(e.target.value))
+              }
+              value={quizLength}
+            >
+              {availableQuizLengths.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="quizSettingsBody">
+            <div className="menuRow">
+              <p className="totalCount">{`${totalCount ?? 0} flashcards found`}</p>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

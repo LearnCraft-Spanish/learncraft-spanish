@@ -39,7 +39,7 @@ export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
   // Get examples data (audio only for limited users)
   const {
     isDependenciesLoading,
-    filteredExamples: exampleQuery,
+    filteredExamples,
     isLoading: isLoadingExamples,
     totalCount,
     error: errorExamples,
@@ -58,18 +58,8 @@ export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
     );
   }, [isLoadingExamples, isDependenciesLoading]);
 
-  // Filter examples that have audio (should be all of them since audioRequired=true)
-  const safeAudioExamples = useMemo(() => {
-    if (!exampleQuery) {
-      return [];
-    }
-    return exampleQuery.filter((example) => {
-      return example.spanishAudio?.length > 0;
-    });
-  }, [exampleQuery]);
-
   // Audio quiz setup hook
-  const audioQuizSetup = useAudioQuizSetup(safeAudioExamples);
+  const audioQuizSetup = useAudioQuizSetup(filteredExamples ?? []);
 
   // Quiz readiness checks
   const quizNotReady = useMemo(() => {
@@ -79,7 +69,7 @@ export function useLimitedCustomQuiz(): UseLimitedCustomQuizReturn {
   // Function to ready the quiz
   const readyQuiz = () => {
     // Take snapshot of audio examples
-    const shuffledAudioExamples = fisherYatesShuffle(safeAudioExamples);
+    const shuffledAudioExamples = fisherYatesShuffle(filteredExamples ?? []);
     staticAudioExamples.current = shuffledAudioExamples.slice(
       0,
       audioQuizSetup.selectedQuizLength,

@@ -43,6 +43,29 @@ describe('useSrsFunctionality', () => {
     });
   });
 
+  describe('isExampleReviewPending', () => {
+    it('should return false for unreviewed examples', () => {
+      const { result } = renderHook(() => useSrsFunctionality());
+
+      expect(result.current.isExampleReviewPending(123)).toBe(false);
+    });
+
+    it('should return false for completed reviews', async () => {
+      const mockUpdateFlashcardInterval = vi.fn().mockResolvedValue(2);
+      overrideMockUseStudentFlashcards({
+        updateFlashcardInterval: mockUpdateFlashcardInterval,
+      });
+
+      const { result } = renderHook(() => useSrsFunctionality());
+
+      await act(async () => {
+        await result.current.handleReviewExample(123, 'easy');
+      });
+
+      expect(result.current.isExampleReviewPending(123)).toBe(false);
+    });
+  });
+
   describe('handleReviewExample', () => {
     it('should successfully review an example with easy difficulty', async () => {
       const mockUpdateFlashcardInterval = vi.fn().mockResolvedValue(2);
@@ -58,7 +81,7 @@ describe('useSrsFunctionality', () => {
 
       expect(mockUpdateFlashcardInterval).toHaveBeenCalledWith(123, 'easy');
       expect(result.current.examplesReviewedResults).toEqual([
-        { exampleId: 123, difficulty: 'easy' },
+        { exampleId: 123, difficulty: 'easy', pending: false },
       ]);
       expect(result.current.hasExampleBeenReviewed(123)).toBe('easy');
     });
@@ -77,7 +100,7 @@ describe('useSrsFunctionality', () => {
 
       expect(mockUpdateFlashcardInterval).toHaveBeenCalledWith(456, 'hard');
       expect(result.current.examplesReviewedResults).toEqual([
-        { exampleId: 456, difficulty: 'hard' },
+        { exampleId: 456, difficulty: 'hard', pending: false },
       ]);
       expect(result.current.hasExampleBeenReviewed(456)).toBe('hard');
     });
@@ -98,16 +121,16 @@ describe('useSrsFunctionality', () => {
 
       expect(mockUpdateFlashcardInterval).toHaveBeenCalledTimes(3);
       expect(result.current.examplesReviewedResults).toEqual([
-        { exampleId: 123, difficulty: 'easy' },
-        { exampleId: 456, difficulty: 'hard' },
-        { exampleId: 789, difficulty: 'easy' },
+        { exampleId: 123, difficulty: 'easy', pending: false },
+        { exampleId: 456, difficulty: 'hard', pending: false },
+        { exampleId: 789, difficulty: 'easy', pending: false },
       ]);
       expect(result.current.hasExampleBeenReviewed(123)).toBe('easy');
       expect(result.current.hasExampleBeenReviewed(456)).toBe('hard');
       expect(result.current.hasExampleBeenReviewed(789)).toBe('easy');
     });
 
-    it('should log error and not mark as reviewed when updateFlashcardInterval fails', async () => {
+    it('should log error and leave example in pending state when updateFlashcardInterval fails', async () => {
       const mockError = new Error('Failed to update interval');
       const mockUpdateFlashcardInterval = vi.fn().mockRejectedValue(mockError);
       const consoleErrorSpy = vi
@@ -129,8 +152,11 @@ describe('useSrsFunctionality', () => {
         'Failed to update flashcard interval:',
         mockError,
       );
-      expect(result.current.examplesReviewedResults).toEqual([]);
-      expect(result.current.hasExampleBeenReviewed(123)).toBeNull();
+      expect(result.current.examplesReviewedResults).toEqual([
+        { exampleId: 123, difficulty: 'easy', pending: true },
+      ]);
+      expect(result.current.hasExampleBeenReviewed(123)).toBe('easy');
+      expect(result.current.isExampleReviewPending(123)).toBe(true);
 
       consoleErrorSpy.mockRestore();
     });
@@ -186,8 +212,8 @@ describe('useSrsFunctionality', () => {
       });
 
       expect(result.current.examplesReviewedResults).toEqual([
-        { exampleId: 123, difficulty: 'easy' },
-        { exampleId: 456, difficulty: 'easy' },
+        { exampleId: 123, difficulty: 'easy', pending: false },
+        { exampleId: 456, difficulty: 'easy', pending: false },
       ]);
       expect(result.current.hasExampleBeenReviewed(123)).toBe('easy');
       expect(result.current.hasExampleBeenReviewed(456)).toBe('easy');

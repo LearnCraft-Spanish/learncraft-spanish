@@ -140,7 +140,8 @@ export default function AudioQuiz({
     };
   }, [handleKeyPress]);
 
-  // This is a little hacky way to prevent the ui flash on quiz load. may causes side effects.
+  // Prevent UI flash on quiz load by showing loading until currentStepValue is ready
+  // With debounced navigation, this should rarely be seen during normal usage
   if (currentExampleNumber <= 0 || !currentStepValue?.displayText) {
     if (isAudioTranscoderLoading) {
       return (

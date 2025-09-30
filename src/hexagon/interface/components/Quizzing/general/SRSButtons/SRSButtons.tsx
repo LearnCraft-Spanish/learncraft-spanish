@@ -6,6 +6,7 @@ interface SRSButtonsProps {
   incrementExampleNumber: () => void;
   hasExampleBeenReviewed: 'easy' | 'hard' | null;
   handleReviewExample: (difficulty: 'easy' | 'hard') => void;
+  isExampleReviewPending: boolean;
 }
 
 export function SRSButtons({
@@ -13,6 +14,7 @@ export function SRSButtons({
   handleReviewExample,
   answerShowing,
   incrementExampleNumber,
+  isExampleReviewPending,
 }: SRSButtonsProps) {
   const handleReviewAndIncrementExample = useCallback(
     (difficulty: 'easy' | 'hard') => {
@@ -54,7 +56,7 @@ export function SRSButtons({
 
   return (
     <div className="buttonBox srsButtons">
-      {answerShowing && !hasExampleBeenReviewed && (
+      {answerShowing && !hasExampleBeenReviewed && !isExampleReviewPending && (
         <>
           <button
             type="button"
@@ -72,7 +74,7 @@ export function SRSButtons({
           </button>
         </>
       )}
-      {hasExampleBeenReviewed &&
+      {(hasExampleBeenReviewed || isExampleReviewPending) &&
         (hasExampleBeenReviewed === 'hard' ? (
           <button type="button" className="hardBanner">
             Labeled: Hard

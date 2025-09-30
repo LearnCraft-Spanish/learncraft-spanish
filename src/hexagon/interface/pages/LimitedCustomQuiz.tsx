@@ -14,10 +14,10 @@ export default function LimitedCustomQuiz() {
     readyQuiz,
     isLoadingExamples,
     isInitialLoading,
-    totalCount,
     errorExamples,
     audioQuizSetup,
     audioQuizProps,
+    totalCount,
   } = useLimitedCustomQuiz();
 
   if (errorExamples) {
@@ -62,14 +62,8 @@ export default function LimitedCustomQuiz() {
                 <AudioQuizMenu
                   quizSetupOptions={audioQuizSetup}
                   filteringIsLoading={isLoadingExamples}
+                  totalCount={totalCount}
                 />
-                {!isLoadingExamples && (
-                  <div className="quizSettingsBody">
-                    <div className="menuRow">
-                      <p className="totalCount">{`${totalCount ?? 0} audio examples found`}</p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 

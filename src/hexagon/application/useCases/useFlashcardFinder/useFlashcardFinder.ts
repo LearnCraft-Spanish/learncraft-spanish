@@ -10,7 +10,7 @@ import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilt
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSkillTagSearch } from '../../units/useSkillTagSearch';
 
 export interface UseFlashcardFinderReturnType {
@@ -22,6 +22,11 @@ export interface UseFlashcardFinderReturnType {
   totalPages: number | null;
   lessonPopup: LessonPopup;
   skillTagSearch: UseSkillTagSearchReturnType;
+
+  // Loading states similar to FlashcardManager
+  filteredExamplesLoading: boolean;
+  initialLoading: boolean;
+  error: Error | null;
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
@@ -45,6 +50,38 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     : null;
 
   const exampleFilter: UseCombinedFiltersReturnType = useCombinedFilters({});
+
+  // Track previous filter state to detect actual changes
+  const previousFilterState = useRef<string | null>(null);
+
+  // Reset pagination when filter state changes
+  useEffect(() => {
+    const currentFilterState = JSON.stringify({
+      selectedSkillTags: exampleFilter.selectedSkillTags,
+      excludeSpanglish: exampleFilter.excludeSpanglish,
+      audioOnly: exampleFilter.audioOnly,
+      courseId: exampleFilter.courseId,
+      fromLessonNumber: exampleFilter.fromLessonNumber,
+      toLessonNumber: exampleFilter.toLessonNumber,
+    });
+
+    if (
+      previousFilterState.current !== null &&
+      previousFilterState.current !== currentFilterState
+    ) {
+      pagination.resetPagination();
+    }
+
+    previousFilterState.current = currentFilterState;
+  }, [
+    exampleFilter.selectedSkillTags,
+    exampleFilter.excludeSpanglish,
+    exampleFilter.audioOnly,
+    exampleFilter.courseId,
+    exampleFilter.fromLessonNumber,
+    exampleFilter.toLessonNumber,
+    pagination,
+  ]);
 
   // Enable prefetching when we're near the end of a query page batch
   // This happens on the last page of each query batch to ensure smooth pagination
@@ -83,5 +120,13 @@ export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
     totalPages,
     lessonPopup,
     skillTagSearch,
+
+    // Loading states similar to FlashcardManager
+    initialLoading:
+      flashcardsQuery.isLoading ||
+      exampleFilter.isLoading ||
+      skillTagSearch.isLoading,
+    filteredExamplesLoading: exampleQuery.isLoading,
+    error: flashcardsQuery.error || exampleFilter.error,
   };
 }

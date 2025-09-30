@@ -1,3 +1,4 @@
+import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,13 +24,20 @@ export function useCustomPreSetQuizQuery({
     );
   }, [skillTags, quizSkillTagKeys]);
 
+  // Transform lesson selection to handle virtual prerequisites
+  const lessonRanges = useMemo(() => {
+    return transformToLessonRanges({
+      courseId: course?.id,
+      fromLessonNumber: fromLesson?.lessonNumber,
+      toLessonNumber: toLesson?.lessonNumber,
+    });
+  }, [course, fromLesson, toLesson]);
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ['customPreSetQuiz', quizTitle],
+    queryKey: ['customPreSetQuiz', quizTitle, lessonRanges],
     queryFn: () =>
       exampleAdapter.getFilteredExamples({
-        courseId: course!.id,
-        toLessonNumber: toLesson!.lessonNumber,
-        fromLessonNumber: fromLesson?.lessonNumber,
+        lessonRanges,
         excludeSpanglish: false,
         audioOnly: false,
         skillTags: skillTagsForQuiz,
@@ -37,6 +45,7 @@ export function useCustomPreSetQuizQuery({
         limit: 150,
         seed: uuidv4(),
       }),
+    enabled: !!course && !!toLesson,
   });
 
   return {

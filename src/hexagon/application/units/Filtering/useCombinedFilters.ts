@@ -1,10 +1,11 @@
 import type { UseSelectedCourseAndLessonsReturnType } from '@application/coordinators/hooks/types';
 import type { UseExampleFilterCoordinatorReturnType } from '@application/coordinators/hooks/useExampleFilterCoordinator';
+import type { ExampleFilters as LocalExampleFilters } from '@application/ports/examplePort';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
-import type { ExampleFilters } from '@learncraft-spanish/shared';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
+import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useMemo } from 'react';
 import { PreSetQuizPreset, preSetQuizzes } from './FilterPresets/preSetQuizzes';
 import { usePresetFilters } from './FilterPresets/usePresetFilters';
@@ -12,7 +13,7 @@ import { usePresetFilters } from './FilterPresets/usePresetFilters';
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &
     UseSelectedCourseAndLessonsReturnType & {
-      combinedFilterState: ExampleFilters;
+      filterState: LocalExampleFilters; // Always uses lesson ranges
       skillTagSearch: UseSkillTagSearchReturnType;
       filterPreset: PreSetQuizPreset;
       setFilterPreset: (preset: PreSetQuizPreset) => void;
@@ -58,18 +59,22 @@ export function useCombinedFilters({
 
   const skillTagSearch: UseSkillTagSearchReturnType = useSkillTagSearch();
 
-  // Combined state for the example filter, with vocabulary excluded
-  const combinedFilterState: ExampleFilters = useMemo(() => {
-    const structuredFilters: ExampleFilters = {
-      excludeSpanglish,
-      audioOnly,
-      skillTags: selectedSkillTags,
+  // Filter state that always uses lesson ranges
+  const filterState: LocalExampleFilters = useMemo(() => {
+    const lessonRanges = transformToLessonRanges({
       courseId: course?.id,
       fromLessonNumber: fromLesson?.lessonNumber,
       toLessonNumber: toLesson?.lessonNumber,
-    };
+    });
+
     onFilterChange();
-    return structuredFilters;
+
+    return {
+      excludeSpanglish,
+      audioOnly,
+      skillTags: selectedSkillTags,
+      lessonRanges,
+    };
   }, [
     excludeSpanglish,
     audioOnly,
@@ -111,7 +116,7 @@ export function useCombinedFilters({
 
   return {
     // Headline return: This is everything that is needed for the example filter
-    combinedFilterState,
+    filterState, // Always uses lesson ranges
 
     // Destructure the filter properties from the filter coordinator
     filterStateWithoutLesson,

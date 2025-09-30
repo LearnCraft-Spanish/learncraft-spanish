@@ -9,7 +9,7 @@ import { useCombinedFilters } from './useCombinedFilters';
 
 export interface UseCombinedFiltersWithVocabularyReturnType
   extends UseCombinedFiltersReturnType {
-  combinedFilterStateWithVocabulary: ExampleFiltersWithVocabulary;
+  filterStateWithVocabulary: ExampleFiltersWithVocabulary;
   lessonRangeVocabRequired: number[] | undefined;
   lessonVocabKnown: number[] | undefined;
 }
@@ -49,18 +49,18 @@ export function useCombinedFiltersWithVocabulary(): UseCombinedFiltersWithVocabu
     toLessonNumber ?? null,
   );
 
-  // combined filter state with vocabulary
-  const combinedFilterStateWithVocabulary: ExampleFiltersWithVocabulary =
+  // filter state with vocabulary
+  const filterStateWithVocabulary: ExampleFiltersWithVocabulary =
     useMemo(() => {
       return {
-        ...combinedFilterHook.combinedFilterState,
+        ...combinedFilterHook.filterState,
         requiredVocabulary: fromLessonNumber
           ? lessonRangeVocabRequired
           : undefined,
         allowedVocabulary: lessonVocabKnown ?? [],
       };
     }, [
-      combinedFilterHook.combinedFilterState,
+      combinedFilterHook.filterState,
       fromLessonNumber,
       lessonRangeVocabRequired,
       lessonVocabKnown,
@@ -93,7 +93,7 @@ export function useCombinedFiltersWithVocabulary(): UseCombinedFiltersWithVocabu
   ]);
 
   return {
-    combinedFilterStateWithVocabulary,
+    filterStateWithVocabulary,
     // Spread the combined filter hook
     ...combinedFilterHook,
 

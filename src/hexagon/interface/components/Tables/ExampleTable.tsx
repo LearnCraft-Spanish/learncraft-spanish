@@ -24,6 +24,7 @@ interface ExamplesTableProps {
   firstPageLoading: boolean;
   newPageLoading: boolean;
   lessonPopup: LessonPopup;
+  filteredExamplesLoading: boolean;
 }
 
 export default function ExamplesTable({
@@ -31,9 +32,9 @@ export default function ExamplesTable({
   totalCount,
   studentFlashcards,
   paginationState,
-  firstPageLoading,
   newPageLoading,
   lessonPopup,
+  filteredExamplesLoading,
 }: ExamplesTableProps) {
   const { page, maxPageNumber, nextPage, previousPage } = paginationState;
   const navigate = useNavigate();
@@ -67,15 +68,12 @@ export default function ExamplesTable({
       200,
     ); // slight delay
   };
-  if (firstPageLoading) {
-    return <InlineLoading message="Fetching Flashcards" />;
-  }
 
   return (
     <div className="examplesTable">
       <div className="buttonBox">
         <div className="displayExamplesDescription">
-          {newPageLoading ? (
+          {newPageLoading || filteredExamplesLoading ? (
             <InlineLoading message="Just a moment..." />
           ) : (
             <h4>
@@ -165,49 +163,50 @@ export default function ExamplesTable({
           </div>
         </div>
       </div>
-      <Pagination
-        page={page}
-        maxPage={maxPageNumber}
-        nextPage={nextPage}
-        previousPage={previousPage}
-      />
-      <div id="examplesTableBody">
-        {newPageLoading ? (
-          <InlineLoading message="Just a moment..." />
-        ) : (
-          examples.map((example: ExampleWithVocabulary) => {
-            return (
-              <ExampleListItem
-                key={example.id}
-                example={example}
-                isCollected={studentFlashcards.isExampleCollected({
-                  exampleId: example.id,
-                })}
-                isAdding={studentFlashcards.isAddingFlashcard({
-                  exampleId: example.id,
-                })}
-                isRemoving={studentFlashcards.isRemovingFlashcard({
-                  exampleId: example.id,
-                })}
-                handleAdd={() => {
-                  studentFlashcards.createFlashcards([example]);
-                }}
-                handleRemove={() => {
-                  studentFlashcards.deleteFlashcards([example.id]);
-                }}
-                lessonPopup={lessonPopup}
-              />
-            );
-          })
-        )}
-      </div>
+      {!filteredExamplesLoading && (
+        <>
+          <Pagination
+            page={page}
+            maxPage={maxPageNumber}
+            nextPage={nextPage}
+            previousPage={previousPage}
+          />
 
-      <Pagination
-        page={page}
-        maxPage={maxPageNumber}
-        nextPage={nextPage}
-        previousPage={previousPage}
-      />
+          <div id="examplesTableBody">
+            {examples.map((example: ExampleWithVocabulary) => {
+              return (
+                <ExampleListItem
+                  key={example.id}
+                  example={example}
+                  isCollected={studentFlashcards.isExampleCollected({
+                    exampleId: example.id,
+                  })}
+                  isAdding={studentFlashcards.isAddingFlashcard({
+                    exampleId: example.id,
+                  })}
+                  isRemoving={studentFlashcards.isRemovingFlashcard({
+                    exampleId: example.id,
+                  })}
+                  handleAdd={() => {
+                    studentFlashcards.createFlashcards([example]);
+                  }}
+                  handleRemove={() => {
+                    studentFlashcards.deleteFlashcards([example.id]);
+                  }}
+                  lessonPopup={lessonPopup}
+                />
+              );
+            })}
+          </div>
+
+          <Pagination
+            page={page}
+            maxPage={maxPageNumber}
+            nextPage={nextPage}
+            previousPage={previousPage}
+          />
+        </>
+      )}
     </div>
   );
 }

@@ -7,9 +7,13 @@ import './FlashcardManagerFilters.scss';
 export default function FlashcardManagerFilters({
   filterOwnedFlashcards,
   setFilterOwnedFlashcards,
+  requireNoSpanglish,
+  requireAudioOnly,
 }: {
   filterOwnedFlashcards: boolean;
   setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
+  requireNoSpanglish: boolean;
+  requireAudioOnly: boolean;
 }) {
   return (
     <div className="flashcardManagerFilters">
@@ -22,7 +26,12 @@ export default function FlashcardManagerFilters({
           onChange={() => setFilterOwnedFlashcards(!filterOwnedFlashcards)}
         />
       </div>
-      {filterOwnedFlashcards && <FilterPanel requireAudioOnly={false} />}
+      {filterOwnedFlashcards && (
+        <FilterPanel
+          requireAudioOnly={requireAudioOnly}
+          requireNoSpanglish={requireNoSpanglish}
+        />
+      )}
     </div>
   );
 }
