@@ -93,6 +93,8 @@ export default function MyFlashcardsQuiz() {
           <FlashcardManagerFilters
             filterOwnedFlashcards={filterOwnedFlashcards}
             setFilterOwnedFlashcards={setFilterOwnedFlashcards}
+            requireNoSpanglish={quizType === MyFlashcardsQuizType.Audio}
+            requireAudioOnly={quizType === MyFlashcardsQuizType.Audio}
           />
           <form
             className="myFlashcardsForm"

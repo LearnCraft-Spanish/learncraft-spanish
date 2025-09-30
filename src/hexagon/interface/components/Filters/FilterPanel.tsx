@@ -11,9 +11,11 @@ import { useState } from 'react';
 export default function FilterPanel({
   onFilterChange,
   requireAudioOnly,
+  requireNoSpanglish,
 }: {
   onFilterChange?: () => void;
   requireAudioOnly: boolean;
+  requireNoSpanglish: boolean;
 }) {
   const [filterMode, setFilterMode] = useState<'preset' | 'search'>('search');
 
@@ -44,13 +46,15 @@ export default function FilterPanel({
         <div className="FromToLessonSelectorWrapper">
           <LessonRangeSelector />
         </div>
-        <ToggleSwitch
-          id="removeSpanglish"
-          ariaLabel="noSpanglish"
-          label="Exclude Spanglish: "
-          checked={excludeSpanglish ?? false}
-          onChange={() => updateExcludeSpanglish(!excludeSpanglish)}
-        />
+        {!requireNoSpanglish && (
+          <ToggleSwitch
+            id="removeSpanglish"
+            ariaLabel="noSpanglish"
+            label="Exclude Spanglish: "
+            checked={excludeSpanglish ?? false}
+            onChange={() => updateExcludeSpanglish(!excludeSpanglish)}
+          />
+        )}
         {!requireAudioOnly && (
           <ToggleSwitch
             id="audioOnly"
