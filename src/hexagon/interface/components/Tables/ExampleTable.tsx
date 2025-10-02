@@ -71,7 +71,7 @@ export default function ExamplesTable({
 
   return (
     <div className="examplesTable">
-      <div className="buttonBox">
+      <div className="tableHeader">
         <div className="displayExamplesDescription">
           {newPageLoading || filteredExamplesLoading ? (
             <InlineLoading message="Just a moment..." />

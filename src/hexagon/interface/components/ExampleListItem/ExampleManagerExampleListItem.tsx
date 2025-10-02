@@ -5,8 +5,8 @@ import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
 import { useCallback, useState } from 'react';
 import { useContextualMenu } from '../../hooks/useContextualMenu';
 import ExampleListItemFactory from './ExampleListItemFactory';
-import AddPendingRemove from './units/AddPendingRemove';
 import BulkRemoveButton from './units/BulkRemoveButton';
+import DeleteFlashcard from './units/DeleteFlashcard';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
 
@@ -15,7 +15,6 @@ export default function ExampleListItem({
   isCollected,
   isAdding,
   isRemoving,
-  handleAdd,
   handleRemove,
   handleDeselect,
   handleSelect,
@@ -26,7 +25,6 @@ export default function ExampleListItem({
   isCollected: boolean;
   isAdding: boolean;
   isRemoving: boolean;
-  handleAdd: () => Promise<void>;
   handleRemove: () => Promise<void>;
   handleDeselect: () => void;
   handleSelect: () => void;
@@ -67,14 +65,7 @@ export default function ExampleListItem({
             isOpen={isMoreInfoOpen}
             key="moreInfoButton"
           />,
-          <AddPendingRemove
-            isCollected={isCollected}
-            isAdding={isAdding}
-            isRemoving={isRemoving}
-            handleAdd={handleAdd}
-            handleRemove={handleRemove}
-            key="addPendingRemove"
-          />,
+          <DeleteFlashcard handleRemove={handleRemove} key="deleteFlashcard" />,
         ]}
       />
 

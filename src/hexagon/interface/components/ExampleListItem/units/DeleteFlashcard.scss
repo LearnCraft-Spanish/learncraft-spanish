@@ -1,0 +1,29 @@
+.removeButton {
+  .removeButtonIcon {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    background-color: transparent;
+    min-width: 32px;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px;
+
+    .removeButtonText {
+      display: none;
+    }
+
+    .removeButtonIcon {
+      min-width: 32px;
+      width: 32px;
+      height: 32px;
+      display: inline-block;
+      filter: brightness(0) saturate(100%) invert(8%) sepia(83%) saturate(4661%)
+        hue-rotate(1deg) brightness(112%) contrast(116%);
+    }
+  }
+}

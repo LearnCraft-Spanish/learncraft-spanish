@@ -571,18 +571,6 @@ button:hover,
   z-index: 999;
 }
 
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  width: 95%;
-  text-align: center;
-  font-size: 12px;
-  padding: 0px;
-  align-self: stretch;
-  margin: 5px 30px;
-  width: auto;
-}
-
 .tagCard {
   cursor: pointer;
   text-align: left;

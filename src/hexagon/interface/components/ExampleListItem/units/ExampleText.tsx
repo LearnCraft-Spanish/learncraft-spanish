@@ -15,7 +15,7 @@ export default function ExampleText({
   englishAudio: string;
 }) {
   return (
-    <>
+    <div className="exampleCardText">
       <div className="exampleCardSpanishText">
         {formatSpanishText(isSpanglish, spanishExample)}
         {spanishAudio && (
@@ -32,6 +32,6 @@ export default function ExampleText({
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
