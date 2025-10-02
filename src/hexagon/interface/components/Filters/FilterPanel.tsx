@@ -1,5 +1,4 @@
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
-import PresetSelector from '@interface/components/FlashcardFinder/PresetSelector';
 import {
   SelectedTags,
   TagFilter,
@@ -7,8 +6,10 @@ import {
 } from '@interface/components/general';
 import LessonRangeSelector from '@interface/components/LessonSelector/LessonRangeSelector';
 import { useState } from 'react';
+import PresetSelector from './PresetSelector';
+import './FilterPanel.scss';
 
-export default function FilterPanel({
+export function FilterPanel({
   onFilterChange,
   requireAudioOnly,
   requireNoSpanglish,
@@ -41,8 +42,9 @@ export default function FilterPanel({
   } = skillTagSearch;
 
   return (
-    <div className="filterSection">
-      <div className="filterBox options">
+    <div className="filterPanel">
+      <div className="filterPanelColumn basicOptions">
+        {/* <div className="filterPanelRightSide"> */}
         <div className="FromToLessonSelectorWrapper">
           <LessonRangeSelector />
         </div>
@@ -65,11 +67,11 @@ export default function FilterPanel({
           />
         )}
       </div>
-      <div className="filterBox search">
-        <div className="filterHeader">
+      <div className="filterPanelColumn tagFiltering">
+        <div className="filterPanel_modeSelector">
           <label
             htmlFor="searchMode"
-            className={`option ${filterMode === 'search' ? 'selected' : ''}`}
+            className={`modeSelectorOption ${filterMode === 'search' ? 'selected' : ''}`}
             onClick={() => setFilterMode('search')}
           >
             <input type="radio" value="search" name="filterMode" />
@@ -77,14 +79,14 @@ export default function FilterPanel({
           </label>
           <label
             htmlFor="presetMode"
-            className={`option ${filterMode === 'preset' ? 'selected' : ''}`}
+            className={`modeSelectorOption ${filterMode === 'preset' ? 'selected' : ''}`}
             onClick={() => setFilterMode('preset')}
           >
             <input type="radio" value="preset" name="filterMode" />
             Presets
           </label>
         </div>
-        <div className="filterContentWrapper">
+        <div className="filterPanel_contentArea">
           {filterMode === 'preset' && (
             <PresetSelector
               setFilterPreset={setFilterPreset}

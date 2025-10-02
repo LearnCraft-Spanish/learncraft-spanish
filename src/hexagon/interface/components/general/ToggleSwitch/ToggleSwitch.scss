@@ -10,11 +10,18 @@
 
   padding-right: 15%;
 
+  // at breakpoint of 480px, set padding-right to 0px
+  @media screen and (max-width: 768px) {
+    padding-right: 0px;
+  }
+
   p {
     cursor: default;
     margin: 8px 0px;
     max-width: 70%;
   }
+
+  // at breakpoint of
 }
 
 /* The switch - the box around the slider */

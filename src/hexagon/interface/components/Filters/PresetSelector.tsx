@@ -1,4 +1,5 @@
-import { PreSetQuizPreset } from 'src/hexagon/application/units/Filtering/FilterPresets/preSetQuizzes';
+import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
+import './FilterPanel.scss';
 
 export default function PresetSelector({
   setFilterPreset,

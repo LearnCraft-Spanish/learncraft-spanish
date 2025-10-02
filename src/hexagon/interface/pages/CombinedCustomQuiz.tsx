@@ -2,7 +2,7 @@ import {
   CombinedCustomQuizType,
   useCombinedCustomQuiz,
 } from '@application/useCases/useCombinedCustomQuiz';
-import FlashcardFinderFilter from '@interface/components/FlashcardFinder/FlashcardFinderFilter';
+import { FilterPanel } from '@interface/components/Filters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
@@ -50,7 +50,7 @@ export default function CombinedCustomQuiz() {
       {!quizReady ? (
         <>
           <h2>Custom Quiz</h2>
-          <FlashcardFinderFilter
+          <FilterPanel
             requireAudioOnly={quizType === CombinedCustomQuizType.Audio}
             requireNoSpanglish={quizType === CombinedCustomQuizType.Audio}
           />

@@ -1,5 +1,5 @@
 import useFlashcardManager from '@application/useCases/useFlashcardManager';
-import FlashcardManagerFilters from '@interface/components/FlashcardManager/FlashcardManagerFilters';
+import { CloseableFilterPanel } from '@interface/components/Filters';
 import { Loading } from '@interface/components/Loading';
 import { FlashcardTable } from '@interface/components/Tables';
 import { useEffect } from 'react';
@@ -49,9 +49,9 @@ export default function FlashcardManager() {
   return (
     <div>
       <h2>Flashcard Manager</h2>
-      <FlashcardManagerFilters
-        filterOwnedFlashcards={filterOwnedFlashcards}
-        setFilterOwnedFlashcards={setFilterOwnedFlashcards}
+      <CloseableFilterPanel
+        isOpen={filterOwnedFlashcards}
+        setIsOpen={setFilterOwnedFlashcards}
         requireNoSpanglish={false}
         requireAudioOnly={false}
       />
