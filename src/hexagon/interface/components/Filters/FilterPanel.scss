@@ -99,6 +99,12 @@
 
   .ToggleFilterPanel {
     max-width: 30vw;
+
+    @media screen and (max-width: 768px) {
+      width: 80vw;
+      max-width: 320px;
+      margin: 0 auto;
+    }
   }
 }
 
