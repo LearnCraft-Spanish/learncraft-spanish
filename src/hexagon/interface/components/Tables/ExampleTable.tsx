@@ -95,6 +95,13 @@ export default function ExamplesTable({
               className="tableOptionsButton"
               onMouseEnter={show}
               onMouseLeave={hide}
+              onClick={() => {
+                if (isTableOptionsOpen) {
+                  hide();
+                } else {
+                  show();
+                }
+              }}
             >
               <img src={ellipsis} alt="Table Options" />
             </button>

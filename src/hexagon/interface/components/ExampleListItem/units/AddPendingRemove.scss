@@ -1,0 +1,84 @@
+/* ------------------ Remove Button ------------------ */
+.addPendingRemoveButton.removeButton {
+  .removeIcon {
+    display: none;
+  }
+
+  @media (max-width: 480px) {
+    background-color: transparent;
+    min-width: 32px;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px;
+
+    .removeText {
+      display: none;
+    }
+
+    .removeIcon {
+      min-width: 32px;
+      width: 32px;
+      height: 32px;
+      display: inline-block;
+      filter: brightness(0) saturate(100%) invert(8%) sepia(83%) saturate(4661%)
+        hue-rotate(1deg) brightness(112%) contrast(116%);
+    }
+  }
+}
+
+/* ------------------ Add Button ------------------ */
+.addPendingRemoveButton.addButton {
+  .addIcon {
+    display: none;
+  }
+  @media (max-width: 480px) {
+    background-color: transparent;
+    min-width: 32px;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px;
+    box-sizing: border-box;
+
+    .addText {
+      display: none;
+    }
+
+    .addIcon {
+      min-width: 32px;
+      width: 32px;
+      height: 32px;
+      display: inline-block;
+      filter: brightness(0) saturate(100%) invert(22%) sepia(44%)
+        saturate(3021%) hue-rotate(101deg) brightness(96%) contrast(104%);
+    }
+  }
+}
+
+/* ------------------ Disabled Button ------------------ */
+.addPendingRemoveButton.disabledButton {
+  min-width: 100px;
+  min-height: 0px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  background-color: transparent;
+  color: var(--dark);
+  font-weight: 600;
+  display: flex;
+  justify-content: right;
+
+  .disabledIcon {
+    display: none;
+  }
+  @media (max-width: 480px) {
+  }
+}

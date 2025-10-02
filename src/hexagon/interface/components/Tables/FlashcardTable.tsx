@@ -72,7 +72,7 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
   }
 
   return (
-    <div className="examplesTable">
+    <div className="flashcardTable">
       <div className="tableHeader">
         <div className="displayExamplesDescription">
           <div id="bulkAddModeButtons">

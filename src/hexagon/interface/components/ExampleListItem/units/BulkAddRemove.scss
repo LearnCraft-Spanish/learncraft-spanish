@@ -40,6 +40,7 @@
 
 // Styling for mobile friendly Bulk Remove
 @media (max-width: 480px) {
+  .pendingButton,
   .selectRemoveButton,
   .selectedRemoveButton {
     margin: 2px;

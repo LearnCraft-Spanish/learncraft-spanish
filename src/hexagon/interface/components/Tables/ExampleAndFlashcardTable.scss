@@ -59,7 +59,8 @@
     }
   }
 }
-.examplesTable .displayExamplesDescription .tableOptionsWrapper {
+.examplesTable .displayExamplesDescription .tableOptionsWrapper,
+.flashcardTable .displayExamplesDescription .tableOptionsWrapper {
   position: absolute;
   right: 0;
 
@@ -143,7 +144,8 @@
   }
 }
 
-.examplesTable .displayExamplesDescription {
+.examplesTable .displayExamplesDescription,
+.flashcardTable .displayExamplesDescription {
   width: 100%;
   position: relative;
   display: flex;
@@ -159,7 +161,8 @@
   }
 }
 
-.examplesTable {
+.examplesTable,
+.flashcardTable {
   position: relative;
   overflow: visible;
 
@@ -176,6 +179,15 @@
     }
     @media screen and (max-width: 480px) {
       margin: 5px 0;
+    }
+  }
+}
+// Only add BulkAddModeButtons on mobile for ExampleTable, not FlashcardTable
+
+.flashcardTable {
+  .tableHeader {
+    @media screen and (max-width: 480px) {
+      margin: 5px 0;
       margin-bottom: 45px;
 
       #bulkAddModeButtons {
@@ -185,6 +197,14 @@
           margin: 0;
         }
       }
+    }
+  }
+}
+.flashcardTable {
+  .tableHeader {
+    @media screen and (max-width: 480px) {
+      margin: 5px 0;
+      margin-bottom: 45px;
     }
   }
 }
