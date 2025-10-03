@@ -20,7 +20,7 @@ const quizCourses: QuizCourse[] = [
   },
   { name: 'Post-1MC Cohort', url: 'post-1mc', code: 'post-1mc', courseId: 5 },
   {
-    name: 'Subjunctive Challenge',
+    name: 'Subjunctives Challenge',
     url: 'subjunctive',
     code: 'subjunctive',
     courseId: 10,
