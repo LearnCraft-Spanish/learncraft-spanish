@@ -121,6 +121,15 @@ export default function LCSPQuizApp(): React.JSX.Element {
           );
           i++;
         });
+      } else if (currentCourseCode === 'subjunctive') {
+        quizList.forEach((item) => {
+          quizSelections.push(
+            <option key={i} value={item.recordId}>
+              {item.subtitle}
+            </option>,
+          );
+          i++;
+        });
       } else {
         quizList.forEach((item) => {
           // console.log(item)
@@ -213,6 +222,14 @@ export default function LCSPQuizApp(): React.JSX.Element {
     //Don't run until data is ready
     if (!dataError && !dataLoading && officialQuizzesQuery.data?.length) {
       if (currentCourseCode === activeCourseCode && toLesson) {
+        if (currentCourseCode === 'subjunctive') {
+          const firstQuiz = officialQuizzesQuery.data.filter(
+            (item) => item.quizType === currentCourseCode,
+          )[0].recordId;
+          updateChosenQuiz(firstQuiz);
+          return;
+        }
+
         // Find Default Quiz if selected course is the same as the current course
         if (toLesson) {
           const activeLessonNumber = toLesson.lessonNumber;
@@ -237,9 +254,14 @@ export default function LCSPQuizApp(): React.JSX.Element {
         }
       } else {
         // Otherwise set to first quiz of selected course
-        const firstQuiz = officialQuizzesQuery.data.filter(
+        let firstQuiz = officialQuizzesQuery.data.filter(
           (item) => item.quizType === currentCourseCode,
         )[0].quizNumber;
+        if (currentCourseCode === 'subjunctive') {
+          firstQuiz = officialQuizzesQuery.data.filter(
+            (item) => item.quizType === currentCourseCode,
+          )[0].recordId;
+        }
         updateChosenQuiz(firstQuiz);
       }
     }

@@ -45,6 +45,15 @@ export default function OfficialQuiz({
         ? thisQuizObject.subtitle
         : quizNumberAsString;
       return `Ser/Estar Lesson ${lessonNumber}, ${subtitle}`;
+    } else if (officialQuizzesQuery.data && quizCourse === 'subjunctive') {
+      // find the qui object from officialQuizzesQuery, the title is the subtitle
+      const thisQuizObject = officialQuizzesQuery.data.find(
+        (quiz) => quiz.recordId === thisQuiz && quiz.quizType === quizCourse,
+      );
+      const subtitle = thisQuizObject
+        ? thisQuizObject.subtitle
+        : thisQuiz.toString();
+      return `${subtitle}`;
     } else {
       return `${courseName} Quiz ${thisQuiz}`;
     }
@@ -65,11 +74,21 @@ export default function OfficialQuiz({
   // Finds the current quiz object and sets the quiz example query state to the quiz id
   useEffect(() => {
     if (officialQuizzesQuery.data && thisQuiz) {
-      const quizToSearch = officialQuizzesQuery.data.find(
-        (quiz) => quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
-      );
-      if (quizToSearch?.recordId) {
-        setThisQuizID(quizToSearch.recordId);
+      if (quizCourse === 'subjunctive') {
+        const quizToSearch = officialQuizzesQuery.data.find(
+          (quiz) => quiz.recordId === thisQuiz && quiz.quizType === quizCourse,
+        );
+        if (quizToSearch?.recordId) {
+          setThisQuizID(quizToSearch.recordId);
+        }
+      } else {
+        const quizToSearch = officialQuizzesQuery.data.find(
+          (quiz) =>
+            quiz.quizNumber === thisQuiz && quiz.quizType === quizCourse,
+        );
+        if (quizToSearch?.recordId) {
+          setThisQuizID(quizToSearch.recordId);
+        }
       }
     }
   }, [officialQuizzesQuery.data, thisQuiz, quizCourse]);
