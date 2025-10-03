@@ -14,7 +14,7 @@ export function useCoursesWithLessons() {
       return adapter.getCoursesWithLessons().then((courses) => {
         // Filter out the Subjunctives Challenge course for non-admin/coach users
         // and users not enrolled in the course
-        if (!isAdmin || !isCoach || appUser?.courseId !== 10) {
+        if (!isAdmin && !isCoach && appUser?.courseId !== 10) {
           return courses.filter((course) => course.id !== 10);
         }
         return courses;
