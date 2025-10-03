@@ -19,6 +19,12 @@ const quizCourses: QuizCourse[] = [
     courseId: 4,
   },
   { name: 'Post-1MC Cohort', url: 'post-1mc', code: 'post-1mc', courseId: 5 },
+  {
+    name: 'Subjunctive Challenge',
+    url: 'subjunctive',
+    code: 'subjunctive',
+    courseId: 10,
+  },
 ];
 
 export default quizCourses;

@@ -54,6 +54,15 @@ export function useOfficialQuizzes(quizId: number | undefined) {
         };
         const subtitle: string = getSubtitleFromNumber(quizSubNumber);
         item.subtitle = subtitle;
+      } else if (item.quizNickname.includes('Subjunctive')) {
+        item.subtitle = item.quizNickname;
+        item.quizType = 'subjunctive';
+        item.lessonNumber = Number.parseInt(
+          item.subtitle.split(',')[0].slice(-1)[0],
+        );
+        item.quizNumber = Number.parseInt(
+          item.subtitle.split(',')[0].slice(-1)[0],
+        );
       } else {
         const quizNumber = Number.parseInt(itemArray.slice(-1)[0]);
         item.quizNumber = quizNumber;
