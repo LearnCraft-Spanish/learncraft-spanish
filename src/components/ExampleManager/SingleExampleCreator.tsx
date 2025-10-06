@@ -86,6 +86,13 @@ export default function SingleExampleCreator({
   }, [exampleToSave]);
 
   const quizList = useMemo(() => {
+    // special case for subjunctive, for now
+    if (tableOption === 'subjunctive') {
+      return officialQuizzesQuery.data?.filter((quiz) => {
+        return quiz.quizType === tableOption;
+      });
+    }
+
     return officialQuizzesQuery.data?.filter((quiz) => {
       const courseCode = quiz.quizNickname.split(' ')[0];
       return courseCode === tableOption;
