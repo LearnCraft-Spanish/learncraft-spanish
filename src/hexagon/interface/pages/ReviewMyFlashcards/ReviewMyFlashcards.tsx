@@ -2,7 +2,7 @@ import {
   MyFlashcardsQuizType,
   useQuizMyFlashcards,
 } from '@application/useCases/useQuizMyFlashcards';
-import FlashcardManagerFilters from '@interface/components/FlashcardManager/FlashcardManagerFilters';
+import { CloseableFilterPanel } from '@interface/components/Filters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
 import {
@@ -90,9 +90,9 @@ export default function MyFlashcardsQuiz() {
       {!quizReady ? (
         <>
           <h2>Review My Flashcards</h2>
-          <FlashcardManagerFilters
-            filterOwnedFlashcards={filterOwnedFlashcards}
-            setFilterOwnedFlashcards={setFilterOwnedFlashcards}
+          <CloseableFilterPanel
+            isOpen={filterOwnedFlashcards}
+            setIsOpen={setFilterOwnedFlashcards}
             requireNoSpanglish={quizType === MyFlashcardsQuizType.Audio}
             requireAudioOnly={quizType === MyFlashcardsQuizType.Audio}
           />

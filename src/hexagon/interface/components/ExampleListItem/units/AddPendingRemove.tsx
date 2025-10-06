@@ -1,4 +1,7 @@
 import { useMemo } from 'react';
+import addIcon from 'src/assets/icons/add-button.svg';
+import trash from 'src/assets/icons/trashcan-dark.svg';
+import './AddPendingRemove.scss';
 
 export default function AddPendingRemove({
   isAdding,
@@ -15,37 +18,53 @@ export default function AddPendingRemove({
 }) {
   interface ButtonParams {
     text: string;
-    className: string;
+    buttonClass: string;
+    textClass: string;
+    iconClass: string;
     onClickFunction: () => void;
+    icon: string | null;
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
     if (isRemoving) {
       return {
         text: 'Removing...',
-        className: 'disabledButton',
+        buttonClass: 'disabledButton',
+        textClass: 'disabledText',
+        iconClass: 'disabledIcon',
         onClickFunction: () => {},
+        icon: null,
       };
     } else if (isAdding) {
       return {
         text: 'Adding...',
-        className: 'disabledButton',
+        buttonClass: 'disabledButton',
+        textClass: 'disabledText',
+        iconClass: 'disabledIcon',
+
         onClickFunction: () => {},
+        icon: null,
       };
     }
     if (!isCollected) {
       return {
         text: 'Add',
-        className: 'addButton',
+        buttonClass: 'addButton',
+        textClass: 'addText',
+        iconClass: 'addIcon',
         onClickFunction: handleAdd,
+        icon: addIcon,
       };
 
       // } else if (isCollected && !isPending) {
     } else {
       return {
         text: 'Remove',
-        className: 'removeButton',
+        buttonClass: 'removeButton',
+        textClass: 'removeText',
+        iconClass: 'removeIcon',
         onClickFunction: handleRemove,
+        icon: trash,
       };
     }
   }, [handleAdd, handleRemove, isCollected, isAdding, isRemoving]);
@@ -53,10 +72,17 @@ export default function AddPendingRemove({
   return (
     <button
       type="button"
-      className={buttonParams.className}
+      className={`addPendingRemoveButton ${buttonParams.buttonClass}`}
       onClick={buttonParams.onClickFunction}
     >
-      {buttonParams.text}
+      <span className={buttonParams.textClass}>{buttonParams.text}</span>
+      {buttonParams.icon && (
+        <img
+          className={buttonParams.iconClass}
+          src={buttonParams.icon}
+          alt={buttonParams.text}
+        />
+      )}
     </button>
   );
 }

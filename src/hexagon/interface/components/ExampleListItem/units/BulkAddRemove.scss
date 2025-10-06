@@ -34,3 +34,50 @@
 .pendingButton {
   background-color: var(--dark);
 }
+.bulkRemoveButtonIcon {
+  display: none;
+}
+
+// Styling for mobile friendly Bulk Remove
+@media (max-width: 480px) {
+  .pendingButton,
+  .selectRemoveButton,
+  .selectedRemoveButton {
+    margin: 2px;
+    margin-right: 0;
+    padding: 0;
+    min-width: 0px;
+    border: none;
+    background-color: var(--light);
+
+    &:hover {
+      background-color: var(--light);
+    }
+
+    .bulkRemoveButtonText {
+      display: none;
+    }
+
+    .bulkRemoveButtonIcon {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 2px solid red;
+      border-radius: 4px;
+    }
+  }
+
+  .selectedRemoveButton {
+    .bulkRemoveButtonIcon {
+      background-color: red;
+      position: relative;
+      img {
+        filter: brightness(0) saturate(100%) invert(100%) sepia(100%)
+          saturate(0%);
+        width: 24px;
+        height: 24px;
+        margin: auto;
+      }
+    }
+  }
+}

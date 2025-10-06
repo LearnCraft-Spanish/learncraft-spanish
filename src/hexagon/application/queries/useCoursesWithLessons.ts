@@ -5,20 +5,23 @@ import { useActiveStudent } from '../coordinators/hooks/useActiveStudent';
 
 export function useCoursesWithLessons() {
   const adapter = useCourseAdapter();
-  const { isAuthenticated, isAdmin } = useAuthAdapter();
+  const { isAuthenticated, isAdmin, isCoach } = useAuthAdapter();
   const { appUser, isLoading } = useActiveStudent();
 
   return useQuery({
     queryKey: ['coursesWithLessons'],
     queryFn: () => {
-      // Subjunctives Challenge course is only accessible to admins & students currently enrolled in the course
-      if (!isAdmin && appUser?.courseId !== 10) {
-        return adapter
-          .getCoursesWithLessons()
-          .then((courses) => courses.filter((course) => course.id !== 10));
-      }
-      return adapter.getCoursesWithLessons();
+      return adapter.getCoursesWithLessons().then((courses) => {
+        // Filter out the Subjunctives Challenge course for non-admin/coach users
+        // and users not enrolled in the course
+        if (isAdmin || isCoach || appUser?.courseId === 10) {
+          return courses;
+        } else {
+          return courses.filter((course) => course.id !== 10);
+        }
+      });
     },
+
     staleTime: Infinity,
     enabled: isAuthenticated && !isLoading,
   });

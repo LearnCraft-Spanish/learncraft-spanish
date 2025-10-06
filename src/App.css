@@ -557,17 +557,8 @@ button:hover,
   width: 100%;
 }
 
-.searchTermBox p,
 .searchTermBox input {
-  margin: 0 5px;
-}
-
-.selectedTagsBox {
-  width: 100%;
-  margin: 0px 12px;
-}
-.selectedTagsBox p {
-  text-align: left;
+  margin: 0 5px 0 0;
 }
 
 .vocabSuggestionBox,
@@ -575,30 +566,9 @@ button:hover,
   position: absolute;
   max-width: 640px;
   width: 100%;
-  top: 35px;
+  top: 41px;
   left: 0px;
   z-index: 999;
-}
-
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  width: 95%;
-  text-align: center;
-  font-size: 12px;
-  padding: 0px;
-  align-self: stretch;
-  margin: 5px 30px;
-  width: auto;
-}
-
-.selectedVocab {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  max-width: 60vw;
 }
 
 .tagCard {
@@ -610,11 +580,8 @@ button:hover,
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: baseline;
-  margin: 0 6px;
+  /* margin: 0 6px; */
   height: 90px;
-}
-.selectedVocab .tagCard {
-  margin: 2px 4px;
 }
 
 .tagCard:hover {

@@ -13,14 +13,15 @@
     top: 0;
     width: 100vw;
     background-color: var(--theme);
+    height: 40px;
   }
 
   h3 {
-    margin: 12px 0 0 0;
+    margin: 0px 0 0 0;
   }
 
   p {
-    margin: 0 0 6px 0;
+    margin: 0 0 0 0;
   }
 
   @media (max-width: 480px) {
@@ -30,7 +31,7 @@
       color: var(--light);
     }
     h3 {
-      font-size: 1rem;
+      font-size: 0.75rem;
     }
     p {
       font-size: 0.75rem;
@@ -40,7 +41,7 @@
   .progressBar {
     background-color: #d9d9d9;
     width: 100%;
-    height: 4px;
+    height: 4px !important;
 
     .progressBarFill {
       background-color: var(--brand);

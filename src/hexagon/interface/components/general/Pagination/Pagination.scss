@@ -1,3 +1,99 @@
+/* Pagination Container */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  font-size: 12px;
+  padding: 0px;
+  align-self: stretch;
+  margin: 5px 30px;
+  @media screen and (max-width: 768px) {
+    margin: 0;
+  }
+
+  p {
+    margin: auto;
+  }
+}
+
+/* Pagination Button Styles */
 .paginationButton {
   width: 120px;
+}
+
+.paginationButton.disabled {
+  background-color: var(--dark);
+  cursor: disabled;
+}
+
+/* Pagination Text Styles */
+.paginationText {
+  display: inline-block;
+}
+
+/* Arrow Icon Styles */
+.paginationArrow {
+  display: none;
+  width: 40px;
+  height: 40px;
+  margin-left: 8px;
+  filter: brightness(0) saturate(100%) invert(60%) sepia(14%) saturate(2020%)
+    hue-rotate(154deg) brightness(91%) contrast(74%); // same as var(--brand)
+  transition: filter 0.2s ease-in-out;
+}
+
+.paginationArrow.previous {
+  transform: rotate(270deg);
+}
+
+.paginationArrow.next {
+  transform: rotate(90deg);
+}
+
+/* Label and Disabled Button Styles */
+.label {
+  text-align: center;
+  font-family: 'Poppins', 'Avenir', 'Helvetica', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 30px;
+  color: var(--light);
+  background-color: var(--brand);
+  border: none;
+  cursor: default;
+  /* align text vertically  */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Mobile Styles - Show arrows instead of text on mobile */
+@media screen and (max-width: 480px) {
+  .paginationButton,
+  .paginationButton.disabled {
+    background-color: transparent;
+  }
+  .paginationText {
+    display: none;
+  }
+
+  .paginationArrow.previous,
+  .paginationArrow.next {
+    display: inline-block;
+    margin-left: 0;
+  }
+
+  .paginationButton,
+  .label {
+    width: auto;
+    padding: 10px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .paginationArrow.disabled {
+    color: var(--light);
+    filter: brightness(0) saturate(100%) invert(16%) sepia(0%) saturate(43%)
+      hue-rotate(138deg) brightness(100%) contrast(78%); // same as var(--dark)
+    cursor: disabled;
+  }
 }

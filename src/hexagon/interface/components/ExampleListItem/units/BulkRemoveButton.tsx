@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import checkmark from 'src/assets/icons/checkmark.svg';
 import './BulkAddRemove.scss';
 
 export default function BulkRemoveButton({
@@ -77,7 +78,10 @@ export default function BulkRemoveButton({
       value={id}
       onClick={buttonParams.onClickFunction}
     >
-      {buttonParams.text}
+      <p className="bulkRemoveButtonText">{buttonParams.text}</p>
+      <div className="bulkRemoveButtonIcon">
+        {isSelected && <img src={checkmark} alt="Checkmark" />}
+      </div>
     </button>
   );
 }

@@ -1,0 +1,36 @@
+.moreInfo {
+  background-color: var(--accent);
+  color: var(--dark);
+  font-size: 14px;
+  margin: 2px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--accent);
+  }
+
+  &.open {
+    background-color: var(--brand);
+    color: var(--light);
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .moreInfo {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    padding: 8px;
+    background-color: var(--brand);
+    color: var(--light);
+    // border bottom and left 1 px solid accent
+    border-bottom: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+  }
+
+  .moreInfoText {
+    margin: 0;
+  }
+}

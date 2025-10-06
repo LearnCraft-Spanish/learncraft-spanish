@@ -1,0 +1,15 @@
+{
+  "short_name": "LearnCraft",
+  "name": "LearnCraft Spanish",
+  "icons": [
+    {
+      "src": "/src/assets/logo192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#449ac2",
+  "background_color": "#449ac2"
+}

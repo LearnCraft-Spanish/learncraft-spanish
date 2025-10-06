@@ -1,3 +1,4 @@
+import './MoreInfoButton.scss';
 export default function MoreInfoButton({
   onClickFunction,
   isOpen,
@@ -11,7 +12,7 @@ export default function MoreInfoButton({
       className={`moreInfo ${isOpen ? 'open' : 'closed'}`}
       onClick={onClickFunction}
     >
-      <p>{isOpen ? 'Collapse' : 'Expand'}</p>
+      <p className="moreInfoText">{isOpen ? 'Collapse' : 'Expand'}</p>
     </button>
   );
 }

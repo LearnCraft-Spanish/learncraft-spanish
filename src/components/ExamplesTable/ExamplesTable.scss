@@ -42,6 +42,10 @@
   flex-direction: row;
   align-items: stretch;
   margin: 5px 30px;
+
+  @media screen and (max-width: 768px) {
+    margin: 5px 0;
+  }
 }
 
 /* ------------------ Spanglish Label ------------------ */

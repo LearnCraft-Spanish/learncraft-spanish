@@ -72,8 +72,8 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
   }
 
   return (
-    <div className="examplesTable">
-      <div className="buttonBox">
+    <div className="flashcardTable">
+      <div className="tableHeader">
         <div className="displayExamplesDescription">
           <div id="bulkAddModeButtons">
             <button
@@ -132,6 +132,13 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
               className="tableOptionsButton"
               onMouseEnter={show}
               onMouseLeave={hide}
+              onClick={() => {
+                if (isTableOptionsOpen) {
+                  hide();
+                } else {
+                  show();
+                }
+              }}
             >
               <img src={ellipsis} alt="Table Options" />
             </button>
@@ -202,8 +209,6 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
               isCollected={true}
               isAdding={false}
               isRemoving={isRemovingFlashcard(flashcard.example.id)}
-              // Not handling add as they will never appear unowned
-              handleAdd={async () => {}}
               handleRemove={async () => {
                 deleteFlashcard(flashcard.example.id);
                 removeFromSelectedIds(flashcard.example.id);

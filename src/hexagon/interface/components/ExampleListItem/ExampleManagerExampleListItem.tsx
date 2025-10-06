@@ -9,13 +9,11 @@ import AddPendingRemove from './units/AddPendingRemove';
 import BulkRemoveButton from './units/BulkRemoveButton';
 import MoreInfoButton from './units/MoreInfoButton';
 import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
-
 export default function ExampleListItem({
   flashcard,
   isCollected,
   isAdding,
   isRemoving,
-  handleAdd,
   handleRemove,
   handleDeselect,
   handleSelect,
@@ -26,7 +24,6 @@ export default function ExampleListItem({
   isCollected: boolean;
   isAdding: boolean;
   isRemoving: boolean;
-  handleAdd: () => Promise<void>;
   handleRemove: () => Promise<void>;
   handleDeselect: () => void;
   handleSelect: () => void;
@@ -71,7 +68,7 @@ export default function ExampleListItem({
             isCollected={isCollected}
             isAdding={isAdding}
             isRemoving={isRemoving}
-            handleAdd={handleAdd}
+            handleAdd={() => {}}
             handleRemove={handleRemove}
             key="addPendingRemove"
           />,

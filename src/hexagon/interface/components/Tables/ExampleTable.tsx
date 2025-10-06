@@ -71,7 +71,7 @@ export default function ExamplesTable({
 
   return (
     <div className="examplesTable">
-      <div className="buttonBox">
+      <div className="tableHeader">
         <div className="displayExamplesDescription">
           {newPageLoading || filteredExamplesLoading ? (
             <InlineLoading message="Just a moment..." />
@@ -95,6 +95,13 @@ export default function ExamplesTable({
               className="tableOptionsButton"
               onMouseEnter={show}
               onMouseLeave={hide}
+              onClick={() => {
+                if (isTableOptionsOpen) {
+                  hide();
+                } else {
+                  show();
+                }
+              }}
             >
               <img src={ellipsis} alt="Table Options" />
             </button>

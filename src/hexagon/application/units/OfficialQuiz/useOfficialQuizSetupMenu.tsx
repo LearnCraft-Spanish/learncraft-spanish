@@ -16,6 +16,8 @@ export function getCourseCodeFromName(courseName: string) {
       return 'lcsp';
     case 'Ser Estar Mini Course':
       return 'ser-estar';
+    case 'Subjunctives Challenge':
+      return 'subjunctive';
     default:
       return 'lcsp';
   }
@@ -46,8 +48,18 @@ export function useOfficialQuizSetupMenu() {
     if (userSelectedQuizNumber) {
       return userSelectedQuizNumber;
     }
+    if (courseCode === 'subjunctive') {
+      const firstMatchingQuiz = officialQuizRecords?.find(
+        (quiz) =>
+          quiz.courseCode === courseCode &&
+          Math.floor(quiz.quizNumber / 100) === toLesson?.lessonNumber,
+      );
+
+      return firstMatchingQuiz?.quizNumber ?? 0;
+    }
+    // find first
     return toLesson?.lessonNumber ?? 0;
-  }, [userSelectedQuizNumber, toLesson]);
+  }, [userSelectedQuizNumber, toLesson, courseCode, officialQuizRecords]);
 
   // quizOptions are the quizzes for the selected course
   const quizOptions = useMemo(() => {

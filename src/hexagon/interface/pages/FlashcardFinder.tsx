@@ -1,5 +1,5 @@
 import useFlashcardFinder from '@application/useCases/useFlashcardFinder';
-import FlashcardFinderFilter from '@interface/components/FlashcardFinder/FlashcardFinderFilter';
+import { FilterPanel } from '@interface/components/Filters';
 import { Loading } from '@interface/components/Loading';
 import { ExampleTable } from '@interface/components/Tables';
 
@@ -25,7 +25,7 @@ export default function FlashcardFinder() {
   return (
     <div>
       <h2>Flashcard Finder</h2>
-      <FlashcardFinderFilter />
+      <FilterPanel requireAudioOnly={false} requireNoSpanglish={false} />
       <ExampleTable
         examples={displayExamples}
         totalCount={exampleQuery.totalCount ?? 0}
