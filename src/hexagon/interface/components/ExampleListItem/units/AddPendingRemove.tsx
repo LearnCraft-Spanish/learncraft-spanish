@@ -1,63 +1,88 @@
 import { useMemo } from 'react';
+import addIcon from 'src/assets/icons/add-button.svg';
+import trash from 'src/assets/icons/trashcan-dark.svg';
+import './AddPendingRemove.scss';
 
 export default function AddPendingRemove({
-  id,
+  isAdding,
+  isRemoving,
   isCollected,
-  isPending,
   handleAdd,
   handleRemove,
 }: {
-  id: number;
+  isAdding: boolean;
+  isRemoving: boolean;
   isCollected: boolean;
-  isPending: boolean;
   handleAdd: () => void;
   handleRemove: () => void;
 }) {
   interface ButtonParams {
     text: string;
-    className: string;
+    buttonClass: string;
+    textClass: string;
+    iconClass: string;
     onClickFunction: () => void;
+    icon: string | null;
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
-    if (isPending && isCollected) {
+    if (isRemoving) {
       return {
         text: 'Removing...',
-        className: 'disabledButton',
+        buttonClass: 'disabledButton',
+        textClass: 'disabledText',
+        iconClass: 'disabledIcon',
         onClickFunction: () => {},
+        icon: null,
       };
-    } else if (isPending && !isCollected) {
+    } else if (isAdding) {
       return {
         text: 'Adding...',
-        className: 'disabledButton',
+        buttonClass: 'disabledButton',
+        textClass: 'disabledText',
+        iconClass: 'disabledIcon',
+
         onClickFunction: () => {},
+        icon: null,
       };
     }
     if (!isCollected) {
       return {
         text: 'Add',
-        className: 'addButton',
+        buttonClass: 'addButton',
+        textClass: 'addText',
+        iconClass: 'addIcon',
         onClickFunction: handleAdd,
+        icon: addIcon,
       };
 
       // } else if (isCollected && !isPending) {
     } else {
       return {
         text: 'Remove',
-        className: 'removeButton',
+        buttonClass: 'removeButton',
+        textClass: 'removeText',
+        iconClass: 'removeIcon',
         onClickFunction: handleRemove,
+        icon: trash,
       };
     }
-  }, [handleAdd, handleRemove, isCollected, isPending]);
+  }, [handleAdd, handleRemove, isCollected, isAdding, isRemoving]);
 
   return (
     <button
       type="button"
-      className={buttonParams.className}
-      value={id}
+      className={`addPendingRemoveButton ${buttonParams.buttonClass}`}
       onClick={buttonParams.onClickFunction}
     >
-      {buttonParams.text}
+      <span className={buttonParams.textClass}>{buttonParams.text}</span>
+      {buttonParams.icon && (
+        <img
+          className={buttonParams.iconClass}
+          src={buttonParams.icon}
+          alt={buttonParams.text}
+        />
+      )}
     </button>
   );
 }

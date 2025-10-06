@@ -10,7 +10,7 @@ import React, {
 } from 'react';
 import { toast } from 'react-toastify';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
-import { useOfficialQuizzes } from 'src/hooks/CourseData/useOfficialQuizzes';
+import { useOfficialQuizzes } from 'src/hooks/CourseData/OLD_useOfficialQuizzes';
 import { useBackend } from 'src/hooks/useBackend';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
 import ConfirmationDialog from './ConfirmationDialog';

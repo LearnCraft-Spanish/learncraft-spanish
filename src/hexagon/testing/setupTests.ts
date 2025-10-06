@@ -10,6 +10,14 @@ import {
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
 import {
+  mockFlashcardAdapter,
+  resetMockFlashcardAdapter,
+} from '@application/adapters/flashcardAdapter.mock';
+import {
+  mockOfficialQuizAdapter,
+  resetMockOfficialQuizAdapter,
+} from '@application/adapters/officialQuizAdapter.mock';
+import {
   mockSubcategoryAdapter,
   resetMockSubcategoryAdapter,
 } from '@application/adapters/subcategoryAdapter.mock';
@@ -26,6 +34,10 @@ import {
   mockSelectedCourseAndLessons,
   resetMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import {
+  mockUseStudentFlashcards,
+  resetMockUseStudentFlashcards,
+} from '@application/units/useStudentFlashcards.mock';
 
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
@@ -61,6 +73,18 @@ vi.mock('@application/adapters/authAdapter', () => ({
   useAuthAdapter: vi.fn(() => mockAuthAdapter),
 }));
 
+vi.mock('@application/adapters/flashcardAdapter', () => ({
+  useFlashcardAdapter: vi.fn(() => mockFlashcardAdapter),
+}));
+
+vi.mock('@application/adapters/officialQuizAdapter', () => ({
+  useOfficialQuizAdapter: vi.fn(() => mockOfficialQuizAdapter),
+}));
+
+vi.mock('@application/units/useStudentFlashcards', () => ({
+  useStudentFlashcards: vi.fn(() => mockUseStudentFlashcards),
+}));
+
 const resetAdapterMocks = () => {
   // Reset the adapter mocks to their default implementations
   resetMockVocabularyAdapter();
@@ -69,6 +93,9 @@ const resetAdapterMocks = () => {
   resetMockSelectedCourseAndLessons();
   resetMockAuthAdapter();
   resetMockCourseAdapter();
+  resetMockFlashcardAdapter();
+  resetMockOfficialQuizAdapter();
+  resetMockUseStudentFlashcards();
 };
 
 // Reset all mocks after each test

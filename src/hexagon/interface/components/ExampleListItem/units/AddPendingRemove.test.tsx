@@ -3,9 +3,9 @@ import { vi } from 'vitest';
 import AddPendingRemove from './AddPendingRemove';
 
 const mockProps = {
-  id: 123,
   isCollected: false,
-  isPending: false,
+  isAdding: false,
+  isRemoving: false,
   handleAdd: vi.fn(),
   handleRemove: vi.fn(),
 };
@@ -23,7 +23,6 @@ describe('component AddPendingRemove', () => {
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Add');
       expect(button).toHaveClass('addButton');
-      expect(button).toHaveAttribute('value', '123');
     });
 
     it('should render Remove button when collected and not pending', () => {
@@ -33,29 +32,30 @@ describe('component AddPendingRemove', () => {
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Remove');
       expect(button).toHaveClass('removeButton');
-      expect(button).toHaveAttribute('value', '123');
     });
 
-    it('should render Adding... disabled button when pending and not collected', () => {
-      render(<AddPendingRemove {...mockProps} isPending={true} />);
+    it('should render Adding... disabled button when adding', () => {
+      render(<AddPendingRemove {...mockProps} isAdding={true} />);
 
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Adding...');
       expect(button).toHaveClass('disabledButton');
-      expect(button).toHaveAttribute('value', '123');
     });
 
-    it('should render Removing... disabled button when pending and collected', () => {
+    it('should render Removing... disabled button when removing', () => {
       render(
-        <AddPendingRemove {...mockProps} isCollected={true} isPending={true} />,
+        <AddPendingRemove
+          {...mockProps}
+          isCollected={true}
+          isRemoving={true}
+        />,
       );
 
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Removing...');
       expect(button).toHaveClass('disabledButton');
-      expect(button).toHaveAttribute('value', '123');
     });
   });
 
@@ -85,7 +85,7 @@ describe('component AddPendingRemove', () => {
     });
 
     it('should not call any handlers when clicking disabled Adding button', () => {
-      render(<AddPendingRemove {...mockProps} isPending={true} />);
+      render(<AddPendingRemove {...mockProps} isAdding={true} />);
 
       const button = screen.getByRole('button');
       act(() => {
@@ -98,7 +98,11 @@ describe('component AddPendingRemove', () => {
 
     it('should not call any handlers when clicking disabled Removing button', () => {
       render(
-        <AddPendingRemove {...mockProps} isCollected={true} isPending={true} />,
+        <AddPendingRemove
+          {...mockProps}
+          isCollected={true}
+          isRemoving={true}
+        />,
       );
 
       const button = screen.getByRole('button');
@@ -111,19 +115,10 @@ describe('component AddPendingRemove', () => {
     });
   });
 
-  describe('props validation', () => {
-    it('should render with different id values', () => {
-      render(<AddPendingRemove {...mockProps} id={456} />);
+  it('should have button type="button"', () => {
+    render(<AddPendingRemove {...mockProps} />);
 
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('value', '456');
-    });
-
-    it('should have button type="button"', () => {
-      render(<AddPendingRemove {...mockProps} />);
-
-      const button = screen.getByRole('button');
-      expect(button).toHaveAttribute('type', 'button');
-    });
+    const button = screen.getByRole('button');
+    expect(button).toHaveAttribute('type', 'button');
   });
 });

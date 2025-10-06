@@ -1,6 +1,6 @@
+import { InlineLoading } from '@interface/components/Loading';
 import React, { useMemo } from 'react';
-import { InlineLoading } from 'src/components/Loading';
-import { toISODate } from 'src/functions/dateUtils';
+import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 
 import { useMembershipWeeks } from 'src/hooks/CoachingData/queries/StudentDrillDown';
 import AssignmentsCell from './general/AssignmentsCell_Modificed';

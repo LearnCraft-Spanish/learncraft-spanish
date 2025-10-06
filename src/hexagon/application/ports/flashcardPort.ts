@@ -1,28 +1,37 @@
-import type { Flashcard } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  Flashcard,
+  UpdateFlashcardIntervalCommand,
+} from '@learncraft-spanish/shared';
 
 export interface FlashcardPort {
   getMyFlashcards: () => Promise<Flashcard[]>;
   getStudentFlashcards: (studentId: number) => Promise<Flashcard[]>;
   createMyStudentFlashcards: ({
-    exampleIds,
+    examples,
   }: {
-    exampleIds: number[];
+    examples: ExampleWithVocabulary[];
   }) => Promise<Flashcard[]>;
   createStudentFlashcards: ({
     studentId,
-    exampleIds,
+    examples,
   }: {
     studentId: number;
-    exampleIds: number[];
+    examples: ExampleWithVocabulary[];
   }) => Promise<Flashcard[]>;
   deleteMyStudentFlashcards: ({
-    studentExampleIds,
+    flashcardIds,
   }: {
-    studentExampleIds: number[];
+    flashcardIds: number[];
   }) => Promise<number>;
   deleteStudentFlashcards: ({
-    studentExampleIds,
+    flashcardIds,
   }: {
-    studentExampleIds: number[];
+    flashcardIds: number[];
   }) => Promise<number>;
+  updateMyStudentFlashcards: ({
+    updates,
+  }: {
+    updates: UpdateFlashcardIntervalCommand[];
+  }) => Promise<Flashcard[]>;
 }

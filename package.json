@@ -40,7 +40,9 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.3.0",
-    "@learncraft-spanish/shared": "^0.8.3",
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
+    "@learncraft-spanish/shared": "^0.9.3",
     "@sentry/cli": "^2.42.2",
     "@sentry/react": "^9.2.0",
     "@sentry/vite-plugin": "^3.2.1",
@@ -60,6 +62,7 @@
     "react-howler": "^5.2.0",
     "react-router-dom": "^6.30.0",
     "react-toastify": "^11.0.5",
+    "react-tooltip": "^5.29.1",
     "rimraf": "^6.0.1",
     "typescript": "^5.7.3",
     "uuid": "^11.1.0",

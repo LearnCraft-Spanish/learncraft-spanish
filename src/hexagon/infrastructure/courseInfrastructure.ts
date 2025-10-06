@@ -25,34 +25,23 @@ export function createCourseInfrastructure(
       return response;
     },
 
-    getLessonVocabKnown: async ({ courseId, lessonNumber }) => {
-      const response = await httpClient.get<number[]>(
+    getLessonVocabKnown: async ({ lessonRanges }) => {
+      const response = await httpClient.post<number[]>(
         getLessonVocabKnownEndpoint.path,
         getLessonVocabKnownEndpoint.requiredScopes,
         {
-          params: {
-            courseId,
-            lessonNumber,
-          },
+          lessonRanges,
         },
       );
       return response;
     },
 
-    getLessonRangeVocabRequired: async ({
-      courseId,
-      fromLessonNumber,
-      toLessonNumber,
-    }) => {
-      const response = await httpClient.get<number[]>(
+    getLessonRangeVocabRequired: async ({ lessonRanges }) => {
+      const response = await httpClient.post<number[]>(
         getLessonRangeVocabRequiredEndpoint.path,
         getLessonRangeVocabRequiredEndpoint.requiredScopes,
         {
-          params: {
-            courseId,
-            toLessonNumber,
-            fromLessonNumber,
-          },
+          lessonRanges,
         },
       );
       return response;

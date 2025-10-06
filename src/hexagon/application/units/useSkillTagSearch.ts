@@ -1,7 +1,7 @@
 import type { SkillTag } from '@learncraft-spanish/shared';
+import { useSkillTags } from '@application/queries/useSkillTags';
 import { SkillType } from '@learncraft-spanish/shared';
 import { useMemo, useState } from 'react';
-import { useSkillTags } from '../queries/useSkillTags';
 
 export interface UseSkillTagSearchReturnType {
   tagSearchTerm: string;

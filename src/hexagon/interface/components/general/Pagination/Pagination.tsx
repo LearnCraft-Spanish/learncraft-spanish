@@ -1,3 +1,4 @@
+import arrowUp from 'src/assets/icons/arrow-up.svg';
 import './Pagination.scss';
 
 export default function Pagination({
@@ -14,25 +15,39 @@ export default function Pagination({
   return (
     maxPage > 1 && (
       <div className="pagination">
-        {page !== 1 && (
-          <button
-            type="button"
-            onClick={previousPage}
-            className="paginationButton"
-          >
-            Previous
-          </button>
-        )}
-        {page === 1 && <div className="label disabledButton">Previous</div>}
+        {/* Previous Button */}
+
+        <button
+          type="button"
+          onClick={previousPage}
+          className={`paginationButton ${page === 1 ? 'disabled' : ''}`}
+        >
+          <span className="paginationText">Previous</span>
+          <img
+            src={arrowUp}
+            alt="Previous"
+            className={`paginationArrow previous ${page === 1 ? 'disabled' : ''}`}
+          />
+        </button>
+
         <p>
           Page {page} of {maxPage}
         </p>
-        {page !== maxPage && (
-          <button type="button" onClick={nextPage} className="paginationButton">
-            Next
-          </button>
-        )}
-        {page === maxPage && <div className="label disabledButton">Next</div>}
+
+        {/* Next Button */}
+
+        <button
+          type="button"
+          onClick={nextPage}
+          className={`paginationButton ${page === maxPage ? 'disabled' : ''}`}
+        >
+          <span className="paginationText">Next</span>
+          <img
+            src={arrowUp}
+            alt="Next"
+            className={`paginationArrow next ${page === maxPage ? 'disabled' : ''}`}
+          />
+        </button>
       </div>
     )
   );

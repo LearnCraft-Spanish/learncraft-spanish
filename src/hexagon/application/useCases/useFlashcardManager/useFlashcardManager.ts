@@ -1,155 +1,70 @@
-import type { UseExampleFilterReturnType } from '@application/units/useExampleFilter';
-import type { UseStudentFlashcardsReturnType } from '@application/units/useStudentFlashcards';
-import type {
-  ExampleWithVocabulary,
-  Flashcard,
-} from '@learncraft-spanish/shared';
-import type { UseFlashcardManagerReturnType } from './useFlashcardManager.types';
-import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
-import useFilterOwnedFlashcards from '@application/coordinators/hooks/useFilterOwnedFlashcards';
+import type { PaginationState } from '@application/units/Pagination/usePagination';
+import type { Flashcard } from '@learncraft-spanish/shared';
+import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
+import { usePagination } from '@application/units/Pagination/usePagination';
+import { useCallback, useMemo, useState } from 'react';
 
-import {
-  useLessonRangeVocabRequired,
-  useLessonVocabKnown,
-} from '@application/queries/useLessonWithVocab';
-import usePagination from '@application/units/Pagination/usePagination';
+export interface UseFlashcardManagerReturn {
+  allFlashcards: Flashcard[];
+  displayFlashcards: Flashcard[];
+  paginationState: PaginationState;
 
-import useExampleFilter from '@application/units/useExampleFilter';
-import useLessonPopup from '@application/units/useLessonPopup';
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { filterExamplesCombined } from '@learncraft-spanish/shared';
-import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+  filterOwnedFlashcards: boolean;
+  setFilterOwnedFlashcards: (filterOwnedFlashcards: boolean) => void;
+  onGoingToQuiz: () => void;
 
-export default function useFlashcardManager(): UseFlashcardManagerReturnType {
-  const navigate = useNavigate();
-  const { isLoading: activeStudentIsLoading } = useActiveStudent();
-  const { isLoading: authUserIsLoading } = useAuthAdapter();
-  const { lessonPopup } = useLessonPopup();
-  const { filterOwnedFlashcards, setFilterOwnedFlashcards } =
-    useFilterOwnedFlashcards();
-  const exampleFilter: UseExampleFilterReturnType = useExampleFilter();
-  const { courseAndLessonState, filterState: coordinatorFilterState } =
-    exampleFilter;
-  const { filterState } = coordinatorFilterState;
-  const pageSize = 25;
+  studentFlashcardsLoading: boolean;
+  filteredFlashcardsLoading: boolean;
+  error: Error | null;
+}
 
-  const setFiltersEnabled = useCallback(
-    (b: boolean) => {
-      setFilterOwnedFlashcards(b);
-    },
-    [setFilterOwnedFlashcards],
+export default function useFlashcardManager({
+  enableFilteringByDefault,
+}: {
+  enableFilteringByDefault: boolean;
+}): UseFlashcardManagerReturn {
+  // Arbitrary definition
+  const PAGE_SIZE = 25;
+
+  // Local state for filtering owned flashcards
+  const [filterOwnedFlashcards, setFilterOwnedFlashcards] = useState(
+    enableFilteringByDefault,
   );
 
-  const flashcardsQuery: UseStudentFlashcardsReturnType =
-    useStudentFlashcards();
+  // This is the principal hook for this use case
+  const {
+    filteredFlashcards,
+    studentFlashcardsLoading,
+    filteredFlashcardsLoading,
+    error,
+  } = useFilterOwnedFlashcards(filterOwnedFlashcards);
 
-  const fromLessonWithVocabQuery = useLessonRangeVocabRequired(
-    courseAndLessonState.course?.id,
-    courseAndLessonState.fromLesson?.lessonNumber,
-    courseAndLessonState.toLesson?.lessonNumber,
-    filterOwnedFlashcards,
-  );
-
-  const fromLessonVocabIds: number[] = useMemo(() => {
-    return fromLessonWithVocabQuery.data ?? [];
-  }, [fromLessonWithVocabQuery.data]);
-
-  const toLessonWithVocabQuery = useLessonVocabKnown(
-    courseAndLessonState.course?.id,
-    courseAndLessonState.toLesson?.lessonNumber,
-    filterOwnedFlashcards,
-  );
-
-  const toLessonVocabIds: number[] = useMemo(() => {
-    return toLessonWithVocabQuery.data ?? [];
-  }, [toLessonWithVocabQuery.data]);
-
-  const findMore = useCallback(() => {
-    navigate('/flashcardfinder', { replace: true });
-  }, [navigate]);
-
-  const ownedExamples: ExampleWithVocabulary[] = useMemo(() => {
-    const mappedExamples: ExampleWithVocabulary[] =
-      flashcardsQuery.flashcards?.map((flashcard) => {
-        return flashcard.example;
-      }) ?? [];
-    return mappedExamples;
-  }, [flashcardsQuery.flashcards]);
-
-  const filteredFlashcards = useMemo(() => {
-    if (!filterOwnedFlashcards) {
-      return flashcardsQuery.flashcards ?? [];
-    }
-
-    const filteredExamples: ExampleWithVocabulary[] = filterExamplesCombined(
-      ownedExamples,
-      {
-        allowedVocabulary: toLessonVocabIds,
-        requiredVocabulary: fromLessonVocabIds,
-        excludeSpanglish: filterState.excludeSpanglish,
-        audioOnly: filterState.audioOnly,
-        skillTags: filterState.skillTags,
-      },
-    );
-
-    const flashcardsMapped: Flashcard[] =
-      flashcardsQuery.flashcards?.filter((flashcard) =>
-        filteredExamples.some((example) => example.id === flashcard.example.id),
-      ) ?? [];
-
-    return flashcardsMapped;
-  }, [
-    ownedExamples,
-    fromLessonVocabIds,
-    toLessonVocabIds,
-    filterState,
-    flashcardsQuery.flashcards,
-    filterOwnedFlashcards,
-  ]);
-
-  const displayOrder = useMemo(() => {
-    if (!filteredFlashcards) {
-      return [];
-    }
-
-    return filteredFlashcards.map((flashcard) => ({
-      recordId: flashcard.id,
-    }));
-  }, [filteredFlashcards]);
-
+  // We use this to paginate the flashcards
   const paginationState = usePagination({
-    itemsPerPage: pageSize,
-    displayOrder,
+    itemsPerPage: PAGE_SIZE,
+    totalItems: filteredFlashcards.length,
   });
+  // We display only the flashcards that are in the current page
+  const displayFlashcards = useMemo(() => {
+    return filteredFlashcards.slice(
+      paginationState.startIndex,
+      paginationState.endIndex,
+    );
+  }, [filteredFlashcards, paginationState]);
+
+  const onGoingToQuiz = useCallback(() => {
+    setFilterOwnedFlashcards(true);
+  }, []);
 
   return {
-    exampleFilter,
-    filteredFlashcards,
+    allFlashcards: filteredFlashcards,
+    displayFlashcards,
     paginationState,
-    pageSize,
-    filtersEnabled: filterOwnedFlashcards,
-    toggleFilters: () => setFiltersEnabled(!filterOwnedFlashcards),
-    findMore,
-
-    somethingIsLoading:
-      flashcardsQuery.isFetching ||
-      flashcardsQuery.isLoading ||
-      activeStudentIsLoading ||
-      fromLessonWithVocabQuery.isLoading ||
-      toLessonWithVocabQuery.isLoading ||
-      fromLessonWithVocabQuery.isFetching ||
-      toLessonWithVocabQuery.isFetching ||
-      fromLessonWithVocabQuery.isRefetching ||
-      toLessonWithVocabQuery.isRefetching,
-
-    initialLoading:
-      flashcardsQuery.isLoading ||
-      exampleFilter.initialLoading ||
-      activeStudentIsLoading ||
-      authUserIsLoading,
-
-    lessonPopup,
+    filterOwnedFlashcards,
+    setFilterOwnedFlashcards,
+    onGoingToQuiz,
+    studentFlashcardsLoading,
+    filteredFlashcardsLoading,
+    error,
   };
 }

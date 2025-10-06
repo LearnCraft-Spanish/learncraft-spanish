@@ -1,8 +1,8 @@
 import type { UseQueryResult } from '@tanstack/react-query';
 import type { Flashcard } from 'src/types/interfaceDefinitions';
+import { Loading } from '@interface/components/Loading';
 import React from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
-import { Loading } from 'src/components/Loading';
 import {
   formatEnglishText,
   formatSpanishText,
@@ -38,7 +38,7 @@ export function ExampleEditForm({
           {unsavedFlashcardSet.map((example) => (
             <div key={example.recordId} className="exampleCard">
               <div className="exampleCardSpanishText exampleAudioWrapper">
-                {formatSpanishText(example.spanglish, example.spanishExample)}
+                {formatSpanishText(example.spanishExample)}
                 <AudioControl audioLink={example.spanishAudioLa} />
               </div>
               <div className="halfWrapper"></div>

@@ -1,4 +1,4 @@
-import { AudioControl } from '../../general';
+import { AudioControl } from '@interface/components/general';
 import { formatEnglishText, formatSpanishText } from './helpers';
 
 export default function ExampleText({
@@ -15,7 +15,7 @@ export default function ExampleText({
   englishAudio: string;
 }) {
   return (
-    <>
+    <div className="exampleCardText">
       <div className="exampleCardSpanishText">
         {formatSpanishText(isSpanglish, spanishExample)}
         {spanishAudio && (
@@ -32,6 +32,6 @@ export default function ExampleText({
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }

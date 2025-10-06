@@ -1,0 +1,62 @@
+.searchTermBox {
+  display: flex;
+  flex-direction: row;
+  height: 41px;
+}
+
+.clearSearchButton {
+  &.disabled {
+    // i want it to be invisible, but still take up space
+    visibility: hidden;
+    width: 98px;
+    height: 0px;
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* ------------------ TagFilter ------------------ */
+
+/* ------------------ SelectedTags ------------------ */
+
+.selectedTagsBox {
+  width: 100%;
+  margin: 0px 12px;
+  @media screen and (max-width: 768px) {
+    margin: 0px;
+  }
+
+  p {
+    text-align: left;
+  }
+}
+
+.selectedVocab {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 60vw;
+  @media screen and (max-width: 768px) {
+    max-width: 100%;
+  }
+
+  // Many tag Card stylings are still in App.css
+
+  .tagCard {
+    margin: 2px 4px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .tagCard {
+      // remove height defined on main tagCard class
+      height: auto;
+    }
+    .tagCard div {
+      min-height: 80px;
+
+      padding: 8px;
+    }
+  }
+}

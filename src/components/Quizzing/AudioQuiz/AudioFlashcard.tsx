@@ -2,6 +2,7 @@ import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
 import pause from 'src/assets/icons/pause.svg';
 import play from 'src/assets/icons/play.svg';
+// THIS IS THE OLD COMPONENT. Please update to use the new one inside hexagon & delete this one when ready.
 import AddToMyFlashcardsButtons from '../AddToMyFlashcardsButtons';
 interface AudioFlashcardProps {
   currentExampleText: string | React.JSX.Element;
@@ -75,6 +76,7 @@ export default function AudioFlashcardComponent({
         />
       )}
       {isStudent && currentStep !== 'question' && currentStep !== 'guess' && (
+        // THIS IS THE OLD COMPONENT. Please update to use the new one inside hexagon & delete this one when ready.
         <AddToMyFlashcardsButtons
           example={currentExample}
           incrementExampleNumber={incrementExample}

@@ -2,9 +2,9 @@ import { createContext } from 'react';
 
 interface SelectedCourseAndLessonsContextType {
   // States
-  userSelectedCourseId: number | null;
-  fromLessonNumber: number | null;
-  toLessonNumber: number | null;
+  userSelectedCourseId: number | null | undefined; // undefined before user makes selection, null when user selects the "choose course" option, number when user selects a course
+  fromLessonNumber: number | null | undefined; // undefined before user makes selection, null when user selects the "choose lesson" option, number when user selects a lesson
+  toLessonNumber: number | null | undefined; // undefined before user makes selection, null when user selects the "choose lesson" option, number when user selects a lesson
 
   // Actions
   updateUserSelectedCourseId: (courseId: number) => void;

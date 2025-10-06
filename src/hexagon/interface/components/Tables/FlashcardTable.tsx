@@ -1,65 +1,41 @@
-import type usePagination from '@application/units/Pagination/usePagination';
-
+import type { UseFlashcardTableProps } from '@application/units/useFlashcardTable';
 import type { Flashcard } from '@learncraft-spanish/shared';
-import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
-import type { DisplayOrder } from 'src/types/interfaceDefinitions';
+import { useFlashcardTable } from '@application/units/useFlashcardTable';
+import ExampleListItem from '@interface/components/ExampleListItem/ExampleManagerExampleListItem';
+import { Pagination } from '@interface/components/general';
+import { InlineLoading } from '@interface/components/Loading';
+import DeleteAllOwnedSpanglish from '@interface/components/Tables/units/DeleteAllOwnedSpanglish';
+import { writeTableToClipboard } from '@interface/components/Tables/units/functions';
 
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { useCallback, useEffect, useRef, useState } from 'react';
+// React
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+// Assets and styles
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
-import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
-import ExampleListItem from '../ExampleListItem/ExampleManagerExampleListItem';
-import { Pagination } from '../general';
-import { InlineLoading } from '../Loading';
-
-import DeleteAllOwnedSpanglish from './units/DeleteAllOwnedSpanglish';
-import {
-  copyTableToClipboard,
-  getExampleOrFlashcardById,
-} from './units/functions';
-
 import 'src/components/ExamplesTable/ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
 
-interface FlashcardTableProps {
-  dataSource: Flashcard[];
-  paginationState: ReturnType<typeof usePagination>;
-  somethingIsLoading: boolean;
-  lessonPopup: LessonPopup;
-  findMore: () => void;
-}
-
-export default function FlashcardTable({
-  dataSource,
-  paginationState,
-  somethingIsLoading,
-  lessonPopup,
-  findMore,
-}: FlashcardTableProps) {
+export default function FlashcardTable(props: UseFlashcardTableProps) {
+  // Call the use case hook for this component with its props
   const {
-    displayOrderSegment,
-    page,
-    maxPage,
-    nextPage,
-    previousPage,
-    setPage,
-    pageSize,
-    firstItemInPage,
-  } = paginationState;
-  const { isFlashcardCollected, createFlashcards, deleteFlashcards } =
-    useStudentFlashcards();
-
-  const {
-    bulkOperationInProgress,
-    bulkSelectIds,
-    addToBulkSelect,
-    removeFromBulkSelect,
-    clearBulkSelect,
-    triggerBulkOperation,
-    addAllToBulkSelect,
-  } = useBulkSelect(async (exampleIds: number[]) => {
-    await deleteFlashcards(exampleIds);
-  });
+    allFlashcards,
+    displayFlashcards,
+    paginationState,
+    isSelected,
+    selectedIds,
+    addToSelectedIds,
+    removeFromSelectedIds,
+    selectAllOnPage,
+    clearSelection,
+    deleteFlashcard,
+    deleteSelectedFlashcards,
+    onGoingToQuiz,
+    error,
+    lessonPopup,
+    isSomethingPending,
+    isRemovingFlashcard,
+  } = useFlashcardTable(props);
 
   const [isTableOptionsOpen, setIsTableOptionsOpen] = useState(false);
   const hideTableOptionsTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -77,91 +53,78 @@ export default function FlashcardTable({
       200,
     ); // slight delay
   };
+  const navigate = useNavigate();
 
-  const getExampleById = useCallback(
-    (recordId: number) => {
-      return getExampleOrFlashcardById(dataSource, recordId);
-    },
-    [dataSource],
-  );
+  const goToQuiz = () => {
+    onGoingToQuiz();
+    navigate('/myflashcards?enableFiltering=true');
+  };
 
-  const isSelected = useCallback(
-    (recordId: number) => {
-      const flashcardToSelect = getExampleById(recordId) as Flashcard;
-      if (!flashcardToSelect) {
-        throw new Error('Flashcard not found');
-      }
-      return bulkSelectIds.includes(flashcardToSelect.example.id);
-    },
-    [bulkSelectIds, getExampleById],
-  );
+  const findMore = () => {
+    navigate('/flashcardfinder');
+  };
 
-  const handleSelectAllOnPage = useCallback(() => {
-    const flashcards = displayOrderSegment.map(
-      (displayOrder) => getExampleById(displayOrder.recordId) as Flashcard,
-    );
-    addAllToBulkSelect(flashcards.map((flashcard) => flashcard.example.id));
-  }, [addAllToBulkSelect, displayOrderSegment, getExampleById]);
-
-  useEffect(() => {
-    if (maxPage === 1) {
-      setPage(1);
-    }
-  }, [maxPage, setPage]);
+  // if (isLoading) {
+  //   return <InlineLoading message="Loading Flashcards" />;
+  // }
+  if (error) {
+    return <h2>Error Loading Flashcards</h2>;
+  }
 
   return (
-    <div className="examplesTable">
-      <div className="buttonBox">
+    <div className="flashcardTable">
+      <div className="tableHeader">
         <div className="displayExamplesDescription">
           <div id="bulkAddModeButtons">
             <button
               type="button"
               className="clearSelectionButton"
-              onClick={handleSelectAllOnPage}
+              onClick={selectAllOnPage}
             >
               Select All on Page
             </button>
-            {bulkSelectIds.length > 0 && (
+            {selectedIds.length > 0 && (
               <button
                 className="bulkRemoveFlashcardsButton"
                 type="button"
-                onClick={triggerBulkOperation}
-                disabled={bulkOperationInProgress}
+                onClick={deleteSelectedFlashcards}
+                disabled={isSomethingPending}
               >
-                {bulkSelectIds.length > 0
-                  ? `Remove ${bulkSelectIds.length} Flashcard${
-                      bulkSelectIds.length === 1 ? '' : 's'
+                {selectedIds.length > 0
+                  ? `Remove ${selectedIds.length} Flashcard${
+                      selectedIds.length === 1 ? '' : 's'
                     }`
                   : 'Select Flashcards to Remove'}
               </button>
             )}
-            {bulkSelectIds.length > 0 && (
+            {selectedIds.length > 0 && (
               <button
                 className="clearSelectionButton"
                 type="button"
-                onClick={clearBulkSelect}
-                disabled={bulkSelectIds.length === 0}
+                onClick={clearSelection}
+                disabled={selectedIds.length === 0}
               >
                 Clear Selection
               </button>
             )}
           </div>
-          {somethingIsLoading ? (
+          {props.isLoading ? (
             <InlineLoading message="Just a moment..." />
           ) : (
             <h4>
-              {`${dataSource.length} flashcard${
-                dataSource.length === 1 ? '' : 's'
+              {`${paginationState.totalItems} flashcard${
+                paginationState.totalItems === 1 ? '' : 's'
               } found ${
-                maxPage > 1
-                  ? `(showing ${firstItemInPage}-${Math.min(
-                      page * pageSize,
-                      dataSource.length,
+                paginationState.maxPageNumber > 1
+                  ? `(showing ${paginationState.startIndex + 1}-${Math.min(
+                      paginationState.endIndex,
+                      paginationState.totalItems,
                     )})`
                   : ''
               }`}
             </h4>
           )}
+          {error && <h2>Error Loading New Lesson Information</h2>}
 
           <div className="tableOptionsWrapper">
             <button
@@ -169,6 +132,13 @@ export default function FlashcardTable({
               className="tableOptionsButton"
               onMouseEnter={show}
               onMouseLeave={hide}
+              onClick={() => {
+                if (isTableOptionsOpen) {
+                  hide();
+                } else {
+                  show();
+                }
+              }}
             >
               <img src={ellipsis} alt="Table Options" />
             </button>
@@ -181,118 +151,88 @@ export default function FlashcardTable({
                 <button
                   type="button"
                   onClick={() => {
-                    copyTableToClipboard({
-                      displayOrder: displayOrderSegment,
-                      getExampleOrFlashcardById: getExampleById,
-                    });
+                    writeTableToClipboard(
+                      displayFlashcards.map((flashcard) => flashcard.example),
+                    );
                   }}
                 >
                   <p>
                     Copy this page to clipboard{' '}
-                    {`(${displayOrderSegment.length} item${
-                      displayOrderSegment.length === 1 ? '' : 's'
+                    {`(${displayFlashcards.length} item${
+                      displayFlashcards.length === 1 ? '' : 's'
                     })`}
                   </p>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    copyTableToClipboard({
-                      displayOrder: dataSource.map((flashcard) => ({
-                        recordId: flashcard.id,
-                      })),
-                      getExampleOrFlashcardById: getExampleById,
-                    });
+                    writeTableToClipboard(
+                      allFlashcards.map((flashcard) => flashcard.example),
+                    );
                   }}
                 >
                   <p>
                     Copy all results to clipboard{' '}
-                    {`(${dataSource.length} item${
-                      dataSource.length === 1 ? '' : 's'
+                    {`(${allFlashcards.length} item${
+                      allFlashcards.length === 1 ? '' : 's'
                     })`}
                   </p>
                 </button>
                 <DeleteAllOwnedSpanglish />
-                <button
-                  type="button"
-                  onClick={() => {
-                    findMore();
-                  }}
-                >
+                <button type="button" onClick={findMore}>
                   <p>Find More Matching Flashcards</p>
+                </button>
+                <button type="button" onClick={goToQuiz}>
+                  <p>Quiz my Flashcards matching these filters</p>
                 </button>
               </div>
             )}
           </div>
         </div>
       </div>
-      <Pagination
-        page={page}
-        maxPage={maxPage}
-        nextPage={nextPage}
-        previousPage={previousPage}
-      />
+      {props.isLoading ? (
+        <InlineLoading message="Just a moment..." />
+      ) : (
+        <Pagination
+          page={paginationState.pageNumber}
+          maxPage={paginationState.maxPageNumber}
+          nextPage={paginationState.nextPage}
+          previousPage={paginationState.previousPage}
+        />
+      )}
       <div id="examplesTableBody">
-        {displayOrderSegment.map((displayOrder: DisplayOrder) => {
+        {displayFlashcards.map((flashcard: Flashcard) => {
           return (
             <ExampleListItem
-              key={displayOrder.recordId}
-              example={getExampleById(displayOrder.recordId)}
-              isCollected={isFlashcardCollected(displayOrder.recordId)}
-              isPending={
-                bulkOperationInProgress && isSelected(displayOrder.recordId)
-              }
-              handleSingleAdd={async () => {
-                const flashcardToAdd = getExampleById(
-                  displayOrder.recordId,
-                ) as Flashcard;
-                if (!flashcardToAdd) {
-                  throw new Error('Flashcard not found');
-                }
-                await createFlashcards([flashcardToAdd.example.id]);
+              key={flashcard.example.id}
+              flashcard={flashcard}
+              isCollected={true}
+              isAdding={false}
+              isRemoving={isRemovingFlashcard(flashcard.example.id)}
+              handleRemove={async () => {
+                deleteFlashcard(flashcard.example.id);
+                removeFromSelectedIds(flashcard.example.id);
               }}
               handleSelect={() => {
-                const flashcardToSelect = getExampleById(
-                  displayOrder.recordId,
-                ) as Flashcard;
-                if (!flashcardToSelect) {
-                  throw new Error('Flashcard not found');
-                }
-                addToBulkSelect(flashcardToSelect.example.id);
+                addToSelectedIds(flashcard.example.id);
               }}
-              handleRemove={async () => {
-                const flashcardToRemove = getExampleById(
-                  displayOrder.recordId,
-                ) as Flashcard;
-                if (!flashcardToRemove) {
-                  throw new Error('Flashcard not found');
-                }
-                await deleteFlashcards([flashcardToRemove.example.id]);
-
-                removeFromBulkSelect(flashcardToRemove.example.id);
+              handleDeselect={() => {
+                removeFromSelectedIds(flashcard.example.id);
               }}
-              handleRemoveSelected={() => {
-                const flashcardToRemove = getExampleById(
-                  displayOrder.recordId,
-                ) as Flashcard;
-                if (!flashcardToRemove) {
-                  throw new Error('Flashcard not found');
-                }
-                removeFromBulkSelect(flashcardToRemove.example.id);
-              }}
-              isSelected={isSelected(displayOrder.recordId)}
+              isSelected={isSelected(flashcard.example.id)}
               lessonPopup={lessonPopup}
             />
           );
         })}
       </div>
-
-      <Pagination
-        page={page}
-        maxPage={maxPage}
-        nextPage={nextPage}
-        previousPage={previousPage}
-      />
+      {!props.isLoading && (
+        <Pagination
+          page={paginationState.pageNumber}
+          maxPage={paginationState.maxPageNumber}
+          nextPage={paginationState.nextPage}
+          previousPage={paginationState.previousPage}
+        />
+      )}
     </div>
   );
 }

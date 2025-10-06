@@ -12,7 +12,7 @@ import {
   verifyRequiredInputs,
 } from 'src/components/FormComponents';
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
-import { toReadableMonthDay } from 'src/functions/dateUtils';
+import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';

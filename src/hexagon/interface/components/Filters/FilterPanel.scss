@@ -1,0 +1,154 @@
+/* ------------------ Filter Panel ------------------ */
+.filterPanel {
+  width: 100%;
+  padding: 0px 20px;
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+
+  // any class that starts with filterPanel_
+  .filterPanelColumn {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    justify-content: flex-start;
+    margin-top: 10px;
+
+    &.basicOptions {
+      flex-direction: column;
+      max-width: 320px;
+      margin: 0px 16px;
+      margin-bottom: 16px;
+    }
+
+    &.tagFiltering {
+      flex-direction: column;
+      justify-self: left;
+      flex-grow: 3;
+    }
+  }
+
+  .filterPanelColumn.tagFiltering {
+    .filterPanel_modeSelector {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 1px solid var(--dark);
+
+      .modeSelectorOption {
+        width: 50%;
+        cursor: pointer;
+        padding: 10px;
+        font-weight: 600;
+        font-size: 18px;
+
+        background-color: var(--light);
+
+        &.selected {
+          background-color: var(--brand);
+          color: var(--light);
+        }
+
+        // add the middle border
+        &:last-child {
+          border-left: 1px solid var(--dark);
+        }
+
+        // hide the radio buttons
+        input {
+          display: none;
+        }
+
+        // on hover, show accent background color
+        &:hover {
+          background-color: var(--accent);
+        }
+      }
+    }
+
+    .filterPanel_contentArea {
+      padding: 15px;
+      border: 1px solid var(--dark);
+      border-top: 0px;
+      background-color: var(--light);
+      min-height: 200px;
+      margin-bottom: 15px;
+    }
+    @media screen and (max-width: 768px) {
+      .filterPanel_contentArea {
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+    }
+  }
+}
+
+/* ------------------ Closeable Filter Panel ------------------ */
+
+.CloseableFilterPanel {
+  margin: 0 2%;
+  border: 1px solid var(--dark);
+  background-color: var(--light);
+  padding: 1rem;
+
+  .ToggleFilterPanel {
+    max-width: 30vw;
+
+    @media screen and (max-width: 768px) {
+      width: 80vw;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+  }
+}
+
+/* ------------------ PresetSelector ------------------ */
+.presetSelectorContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  gap: 25px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    max-width: 500px;
+
+    p {
+      margin: 0;
+      font-weight: 600;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    select {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      text-align: center;
+      border-radius: 8px;
+      border: 2px solid var(--brand);
+      background-color: var(--light);
+      cursor: pointer;
+
+      &:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+      }
+    }
+  }
+}

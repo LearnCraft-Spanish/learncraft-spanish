@@ -5,14 +5,12 @@ export default function SectionHeader({
   isOpen,
   openFunction,
   button,
-  afterTitleComponents,
   buttonAlwaysVisible,
 }: {
   title: string;
   isOpen: boolean;
   openFunction: (title: string) => void;
   button?: React.ReactNode;
-  afterTitleComponents?: React.ReactNode[];
   buttonAlwaysVisible?: boolean;
 }) {
   return (
@@ -29,7 +27,6 @@ export default function SectionHeader({
           </div>
           <h2>{title}</h2>
         </div>
-        {afterTitleComponents && [...afterTitleComponents]}
       </div>
       {(isOpen || buttonAlwaysVisible) && button}
     </div>

@@ -2,6 +2,7 @@ import type { Flashcard } from 'src/types/interfaceDefinitions';
 import React from 'react';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { useStudentFlashcards } from 'src/hooks/UserData/useStudentFlashcards';
+// THIS IS THE OLD COMPONENT. Please delete this one when ready.
 
 interface AddToMyFlashcardsButtonsProps {
   example: Flashcard | undefined;
@@ -9,6 +10,7 @@ interface AddToMyFlashcardsButtonsProps {
   onRemove: () => void;
   incrementOnAdd?: boolean;
 }
+// THIS IS THE OLD COMPONENT. Please delete this one when ready.
 export default function AddToMyFlashcardsButtons({
   example,
   incrementExampleNumber,

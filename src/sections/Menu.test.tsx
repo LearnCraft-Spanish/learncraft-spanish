@@ -84,8 +84,8 @@ describe('component Menu', () => {
             {
               authUser: userCase.authUser,
               isStudent: userCase.roles.includes('student'),
-              isAdmin: userCase.roles.includes('admin'),
-              isCoach: userCase.roles.includes('coach'),
+              isAdmin: userCase.authUser.roles.includes('Admin'),
+              isCoach: userCase.authUser.roles.includes('Coach'),
               isLimited: userCase.roles.includes('limited'),
             },
             {
@@ -111,29 +111,23 @@ describe('component Menu', () => {
           expect(screen.getByText('Official Quizzes')).toBeInTheDocument();
         });
 
-        // Audio Quizzing
-        const hasAudioQuizzing =
-          userCase.roles.includes('student') ||
-          userCase.roles.includes('limited') ||
-          userCase.roles.includes('admin') ||
-          userCase.roles.includes('coach');
+        // Audio Quiz (only for limited users)
+        const hasAudioQuiz = userCase.roles.includes('limited');
 
-        it(`${hasAudioQuizzing ? 'does' : 'does NOT'} render "Audio Quiz"`, async () => {
+        it(`${hasAudioQuiz ? 'does' : 'does NOT'} render "Audio Quiz"`, async () => {
           await renderMenuLoaded();
-          if (hasAudioQuizzing) {
+          if (hasAudioQuiz) {
             expect(screen.getByText('Audio Quiz')).toBeInTheDocument();
-            expect(screen.getByText('Comprehension Quiz')).toBeInTheDocument();
           } else {
             expect(screen.queryByText('Audio Quiz')).toBeNull();
-            expect(screen.queryByText('Comprehension Quiz')).toBeNull();
           }
         });
 
         // Find Flashcards
         const hasFindFlashcards =
           userCase.roles.includes('student') ||
-          userCase.roles.includes('admin') ||
-          userCase.roles.includes('coach');
+          userCase.authUser.roles.includes('Admin') ||
+          userCase.authUser.roles.includes('Coach');
 
         it(`${hasFindFlashcards ? 'does' : 'does NOT'} render "Find Flashcards"`, async () => {
           await renderMenuLoaded();
@@ -144,11 +138,11 @@ describe('component Menu', () => {
           }
         });
 
-        // Get Help (students only)
+        // Get Help (students only - not admin or coach)
         const hasGetHelp =
           userCase.roles.includes('student') &&
-          !userCase.roles.includes('admin') &&
-          !userCase.roles.includes('coach');
+          !userCase.authUser.roles.includes('Admin') &&
+          !userCase.authUser.roles.includes('Coach');
         it(`${hasGetHelp ? 'does' : 'does NOT'} render "Need Help?"`, async () => {
           await renderMenuLoaded();
           if (hasGetHelp) {
@@ -158,9 +152,24 @@ describe('component Menu', () => {
           }
         });
 
+        // Custom Quiz (students, admin, coach - but NOT limited)
+        const hasCustomQuiz =
+          userCase.roles.includes('student') ||
+          userCase.authUser.roles.includes('Admin') ||
+          userCase.authUser.roles.includes('Coach');
+        it(`${hasCustomQuiz ? 'does' : 'does NOT'} render "Custom Quiz"`, async () => {
+          await renderMenuLoaded();
+          if (hasCustomQuiz) {
+            expect(screen.getByText('Custom Quiz')).toBeInTheDocument();
+          } else {
+            expect(screen.queryByText('Custom Quiz')).toBeNull();
+          }
+        });
+
         // General Staff Tools
         const hasCoachingTools =
-          userCase.roles.includes('admin') || userCase.roles.includes('coach');
+          userCase.authUser.roles.includes('Admin') ||
+          userCase.authUser.roles.includes('Coach');
 
         it(`${hasCoachingTools ? 'does' : 'does NOT'} render coaching tools`, async () => {
           await renderMenuLoaded();
@@ -170,22 +179,40 @@ describe('component Menu', () => {
             expect(
               screen.queryByText('Weekly Records Interface'),
             ).toBeInTheDocument();
+            expect(
+              screen.queryByText('Student Drill Down'),
+            ).toBeInTheDocument();
+            expect(
+              screen.queryByText('Coaching Dashboard'),
+            ).toBeInTheDocument();
+            expect(screen.queryByText('Get Help')).toBeInTheDocument();
           } else {
             expect(screen.queryByText('Coaching Tools')).toBeNull();
             expect(screen.queryByText('FrequenSay')).toBeNull();
             expect(screen.queryByText('Weekly Records Interface')).toBeNull();
+            expect(screen.queryByText('Student Drill Down')).toBeNull();
+            expect(screen.queryByText('Coaching Dashboard')).toBeNull();
+            expect(screen.queryByText('Get Help')).toBeNull();
           }
         });
 
         // Admin Staff Tools
-        const hasAdminStaffTools = userCase.roles.includes('admin');
+        const hasAdminStaffTools = userCase.authUser.roles.includes('Admin');
 
         it(`${hasAdminStaffTools ? 'does' : 'does NOT'} render admin specific staff tools`, async () => {
           await renderMenuLoaded();
           if (hasAdminStaffTools) {
+            expect(screen.queryByText('Admin Tools')).toBeInTheDocument();
+            expect(screen.queryByText('Admin Dashboard')).toBeInTheDocument();
             expect(screen.queryByText('Example Manager')).toBeInTheDocument();
+            expect(screen.queryByText('Database Tables')).toBeInTheDocument();
+            expect(screen.queryByText('Create Vocabulary')).toBeInTheDocument();
           } else {
+            expect(screen.queryByText('Admin Tools')).toBeNull();
+            expect(screen.queryByText('Admin Dashboard')).toBeNull();
             expect(screen.queryByText('Example Manager')).toBeNull();
+            expect(screen.queryByText('Database Tables')).toBeNull();
+            expect(screen.queryByText('Create Vocabulary')).toBeNull();
           }
         });
       });

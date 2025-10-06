@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import checkmark from 'src/assets/icons/checkmark.svg';
 import './BulkAddRemove.scss';
 
 export default function BulkRemoveButton({
@@ -6,15 +7,17 @@ export default function BulkRemoveButton({
   isCollected,
   handleSelect,
   isSelected,
-  isPending,
-  handleRemoveSelected,
+  isAdding,
+  isRemoving,
+  handleDeselect,
 }: {
   id: number;
   isCollected: boolean;
   handleSelect: () => void;
-  handleRemoveSelected: () => void;
+  handleDeselect: () => void;
   isSelected: boolean;
-  isPending: boolean;
+  isAdding: boolean;
+  isRemoving: boolean;
 }) {
   interface ButtonParams {
     text: string;
@@ -23,13 +26,13 @@ export default function BulkRemoveButton({
   }
 
   const buttonParams: ButtonParams = useMemo(() => {
-    if (isPending && isCollected) {
+    if (isRemoving) {
       return {
         text: 'Removing...',
         className: 'pendingButton',
         onClickFunction: () => {},
       };
-    } else if (isPending && !isCollected) {
+    } else if (isAdding) {
       return {
         text: 'Adding...',
         className: 'pendingButton',
@@ -51,7 +54,7 @@ export default function BulkRemoveButton({
       return {
         text: 'Selected',
         className: 'selectedRemoveButton',
-        onClickFunction: handleRemoveSelected,
+        onClickFunction: handleDeselect,
       };
     }
     return {
@@ -59,7 +62,14 @@ export default function BulkRemoveButton({
       className: 'unknownButton',
       onClickFunction: () => {},
     };
-  }, [isCollected, isSelected, isPending, handleSelect, handleRemoveSelected]);
+  }, [
+    isCollected,
+    isSelected,
+    handleSelect,
+    handleDeselect,
+    isAdding,
+    isRemoving,
+  ]);
 
   return (
     <button
@@ -68,7 +78,10 @@ export default function BulkRemoveButton({
       value={id}
       onClick={buttonParams.onClickFunction}
     >
-      {buttonParams.text}
+      <p className="bulkRemoveButtonText">{buttonParams.text}</p>
+      <div className="bulkRemoveButtonIcon">
+        {isSelected && <img src={checkmark} alt="Checkmark" />}
+      </div>
     </button>
   );
 }

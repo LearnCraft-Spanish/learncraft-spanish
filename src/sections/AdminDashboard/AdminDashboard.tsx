@@ -1,3 +1,4 @@
+import { Loading } from '@interface/components/Loading';
 import {
   ActiveMemberships,
   AssignmentsCompletedByWeek,
@@ -6,7 +7,6 @@ import {
   RecentLesson200Students,
   WeeklySummaries,
 } from 'src/components/AdminDashboard';
-import { Loading } from 'src/components/Loading';
 import useAdminDashboard from './useAdminDashboard';
 import './AdminDashboard.scss';
 

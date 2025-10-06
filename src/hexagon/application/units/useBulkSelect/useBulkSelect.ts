@@ -8,46 +8,42 @@ export default function useBulkSelect(
 
   const [bulkSelectIds, setBulkSelectIds] = useState<number[]>([]);
 
-  const addToBulkSelect = useCallback(
-    (id: number) => {
-      setBulkSelectIds([...bulkSelectIds, id]);
-    },
-    [bulkSelectIds],
-  );
+  const addToBulkSelect = useCallback((id: number) => {
+    setBulkSelectIds((prev) => [...prev, id]);
+  }, []);
 
-  const addAllToBulkSelect = useCallback(
-    (ids: number[]) => {
-      const newIds = new Set([...bulkSelectIds, ...ids]);
-      setBulkSelectIds(Array.from(newIds));
-    },
-    [bulkSelectIds],
-  );
+  const addAllToBulkSelect = useCallback((ids: number[]) => {
+    setBulkSelectIds((prev) => {
+      const newIds = new Set([...prev, ...ids]);
+      return Array.from(newIds);
+    });
+  }, []);
 
-  const removeFromBulkSelect = useCallback(
-    (id: number) => {
-      setBulkSelectIds(bulkSelectIds.filter((bulkId) => bulkId !== id));
-    },
-    [bulkSelectIds],
-  );
+  const removeFromBulkSelect = useCallback((id: number) => {
+    setBulkSelectIds((prev) => prev.filter((bulkId) => bulkId !== id));
+  }, []);
 
   const clearBulkSelect = useCallback(() => {
     setBulkSelectIds([]);
   }, []);
 
   const toggleBulkSelectMode = useCallback(() => {
-    setBulkSelectMode(!bulkSelectMode);
-  }, [bulkSelectMode]);
+    setBulkSelectMode((prev) => !prev);
+  }, []);
 
   const triggerBulkOperation = useCallback(async () => {
     setBulkOperationInProgress(true);
-    bulkOperation(bulkSelectIds)
-      .then(() => {
-        clearBulkSelect();
-      })
-      .finally(() => {
-        setBulkOperationInProgress(false);
-      });
-  }, [bulkOperation, clearBulkSelect, bulkSelectIds]);
+    setBulkSelectIds((currentIds) => {
+      bulkOperation(currentIds)
+        .then(() => {
+          clearBulkSelect();
+        })
+        .finally(() => {
+          setBulkOperationInProgress(false);
+        });
+      return currentIds; // Return unchanged to avoid state update
+    });
+  }, [bulkOperation, clearBulkSelect]);
 
   return {
     bulkSelectMode,

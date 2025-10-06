@@ -1,40 +1,67 @@
 import useFlashcardManager from '@application/useCases/useFlashcardManager';
-import Loading from 'src/components/Loading/Loading';
-import FlashcardManagerFilters from '../components/FlashcardManager';
-import { FlashcardTable } from '../components/Tables';
+import { CloseableFilterPanel } from '@interface/components/Filters';
+import { Loading } from '@interface/components/Loading';
+import { FlashcardTable } from '@interface/components/Tables';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 export default function FlashcardManager() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Check for URL parameter to enable filtering by default
+  const searchParams = new URLSearchParams(location.search);
+  const enableFiltering = searchParams.get('enableFiltering') === 'true';
+
+  // Clean up URL parameter after initialization
+  useEffect(() => {
+    if (enableFiltering) {
+      // Remove the parameter from the URL without causing a page refresh
+      const newSearchParams = new URLSearchParams(location.search);
+      newSearchParams.delete('enableFiltering');
+      const newSearch = newSearchParams.toString();
+      const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`;
+      navigate(newUrl, { replace: true });
+    }
+  }, [enableFiltering, location.pathname, location.search, navigate]);
+
   const {
-    exampleFilter,
-    filteredFlashcards,
+    allFlashcards,
+    displayFlashcards,
     paginationState,
-    filtersEnabled,
-    toggleFilters,
-    somethingIsLoading,
-    initialLoading,
-    lessonPopup,
-    findMore,
-  } = useFlashcardManager();
+    filterOwnedFlashcards,
+    onGoingToQuiz,
+    setFilterOwnedFlashcards,
+    studentFlashcardsLoading,
+    filteredFlashcardsLoading,
+    error,
+  } = useFlashcardManager({
+    enableFilteringByDefault: enableFiltering,
+  });
 
-  const { filterState, skillTagSearch } = exampleFilter;
-
-  if (initialLoading) {
+  if (studentFlashcardsLoading) {
     return <Loading message="Loading Flashcard Manager" />;
+  }
+  if (error) {
+    return <h2>Error Loading Flashcard Manager</h2>;
   }
 
   return (
     <div>
-      <FlashcardManagerFilters
-        filterState={filterState}
-        skillTagSearch={skillTagSearch}
-        filtersEnabled={filtersEnabled}
-        toggleFilters={toggleFilters}
+      <h2>Flashcard Manager</h2>
+      <CloseableFilterPanel
+        isOpen={filterOwnedFlashcards}
+        setIsOpen={setFilterOwnedFlashcards}
+        requireNoSpanglish={false}
+        requireAudioOnly={false}
       />
       <FlashcardTable
-        findMore={findMore}
-        somethingIsLoading={somethingIsLoading}
-        dataSource={filteredFlashcards}
+        allFlashcards={allFlashcards}
+        displayFlashcards={displayFlashcards}
         paginationState={paginationState}
-        lessonPopup={lessonPopup}
+        onGoingToQuiz={onGoingToQuiz}
+        isLoading={filteredFlashcardsLoading}
+        error={error}
       />
     </div>
   );

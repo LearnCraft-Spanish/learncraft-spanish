@@ -1,5 +1,11 @@
 import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 
+export interface LessonRange {
+  courseId: number;
+  fromLessonNumber: number;
+  toLessonNumber: number;
+}
+
 export interface CoursePort {
   /**
    * Get the courses with lessons
@@ -7,21 +13,15 @@ export interface CoursePort {
   getCoursesWithLessons: () => Promise<CourseWithLessons[]>;
 
   getLessonVocabKnown: ({
-    courseId,
-    lessonNumber,
+    lessonRanges,
   }: {
-    courseId: number;
-    lessonNumber: number;
+    lessonRanges: LessonRange[];
   }) => Promise<number[]>;
 
   getLessonRangeVocabRequired: ({
-    courseId,
-    fromLessonNumber,
-    toLessonNumber,
+    lessonRanges,
   }: {
-    courseId: number;
-    fromLessonNumber: number;
-    toLessonNumber: number;
+    lessonRanges: LessonRange[];
   }) => Promise<number[]>;
 
   /**

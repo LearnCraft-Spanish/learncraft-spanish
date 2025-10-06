@@ -1,8 +1,12 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import CombinedCustomQuiz from '@interface/pages/CombinedCustomQuiz';
 import FlashcardFinderPage from '@interface/pages/FlashcardFinder';
 import FlashcardManager from '@interface/pages/FlashcardManager';
 import FrequensayPage from '@interface/pages/FrequensayPage';
 import GetHelpPage from '@interface/pages/GetHelpPage';
+import LimitedCustomQuiz from '@interface/pages/LimitedCustomQuiz';
+import { OfficialQuizzesRoutes } from '@interface/pages/OfficialQuizzes/OfficialQuizzesRoutes';
+import ReviewMyFlashcards from '@interface/pages/ReviewMyFlashcards';
 import { VocabularyCreatorPage } from '@interface/pages/VocabularyCreatorPage';
 import { Route } from 'react-router-dom';
 import WeeksRecordsSection from 'src/components/Coaching/WeeksRecords/WeeksRecords';
@@ -19,46 +23,33 @@ import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
-import AudioBasedReview from '../sections/AudioBasedReview';
-import LCSPQuizApp from '../sections/LCSPQuizApp';
 import Menu from '../sections/Menu';
-import ReviewMyFlashcards from '../sections/ReviewMyFlashcards';
 import SentryRoutes from './SentryRoutes';
 
 export default function AppRoutes() {
-  const { isAdmin, isCoach, isStudent, isLimited } = useAuthAdapter();
+  const { isAdmin, isCoach, isStudent, isLimited, isAuthenticated } =
+    useAuthAdapter();
 
   return (
     <SentryRoutes>
       <Route path="/" element={<Menu />} />
       {/* <Route path="/callback" element={<CallbackPage />} /> */}
-      <Route path="/myflashcards/*" element={<ReviewMyFlashcards />} />
+      <Route
+        path="/myflashcards"
+        element={isAuthenticated && <ReviewMyFlashcards />}
+      />
       <Route path="/manage-flashcards" element={<FlashcardManager />} />
-      (
-      <Route path="/officialquizzes/*" element={<LCSPQuizApp />} />
-      )
+      <Route path="/officialquizzes/*" element={<OfficialQuizzesRoutes />} />
+      <Route
+        path="/customquiz"
+        element={
+          (isLimited || isStudent || isCoach || isAdmin) &&
+          (isLimited ? <LimitedCustomQuiz /> : <CombinedCustomQuiz />)
+        }
+      />
       <Route
         path="/flashcardfinder"
         element={(isStudent || isAdmin || isCoach) && <FlashcardFinderPage />}
-      />
-      <Route
-        path="/audioquiz/*"
-        element={
-          (isLimited || isStudent || isCoach || isAdmin) && (
-            <AudioBasedReview audioOrComprehension="audio" willAutoplay />
-          )
-        }
-      />
-      <Route
-        path="/comprehensionquiz/*"
-        element={
-          (isLimited || isStudent || isCoach || isAdmin) && (
-            <AudioBasedReview
-              audioOrComprehension="comprehension"
-              willAutoplay={false}
-            />
-          )
-        }
       />
       <Route
         path="/frequensay"

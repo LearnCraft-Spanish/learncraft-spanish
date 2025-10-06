@@ -2,12 +2,18 @@ import type {
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
+import type { LessonRange } from './coursePort';
+
+export interface ExampleFilters {
+  lessonRanges: LessonRange[]; // Always required - no more single course params
+  excludeSpanglish?: boolean;
+  audioOnly?: boolean;
+  skillTags?: SkillTag[];
+}
 
 export interface ExamplePort {
   getFilteredExamples: ({
-    courseId,
-    toLessonNumber,
-    fromLessonNumber,
+    lessonRanges,
     excludeSpanglish,
     audioOnly,
     skillTags,
@@ -15,9 +21,7 @@ export interface ExamplePort {
     limit,
     seed,
   }: {
-    courseId: number;
-    toLessonNumber: number;
-    fromLessonNumber?: number;
+    lessonRanges: LessonRange[]; // Always required - no more single course params
     excludeSpanglish?: boolean;
     audioOnly?: boolean;
     skillTags?: SkillTag[];
