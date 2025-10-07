@@ -12,7 +12,7 @@ export function QuizProgress({
   totalExamplesNumber,
 }: QuizProgressProps): React.JSX.Element {
   return (
-    <div className="quizProgress">
+    <div className={`quizProgress ${!quizTitle ? 'noTitle' : ''}`}>
       {quizTitle && <h3>{quizTitle}</h3>}
       <p>{`${currentExampleNumber} of ${totalExamplesNumber}`}</p>
       <div className="progressBar">
