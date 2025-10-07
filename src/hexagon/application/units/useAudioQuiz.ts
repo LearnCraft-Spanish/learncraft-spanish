@@ -52,6 +52,7 @@ export interface AudioQuizReturn {
   goToGuess: () => void;
   goToHint: () => void;
   goToAnswer: () => void;
+  restartCurrentStep: () => void;
   nextExample: () => void;
   previousExample: () => void;
   quizLength: number;
@@ -206,6 +207,10 @@ export function useAudioQuiz({
   // Refs to track changes to the current example index and step
   const previousExampleIndexRef = useRef<number>(-1);
   const previousStepRef = useRef<AudioQuizStep | null>(null);
+  const previousRestartTriggerRef = useRef<number>(0);
+
+  // State to trigger audio restart without changing step or example
+  const [restartTrigger, setRestartTrigger] = useState<number>(0);
 
   // Simple utility functions to increment and decrement the example index
   const nextExample = useCallback(() => {
@@ -289,6 +294,7 @@ export function useAudioQuiz({
     setCurrentStep(AudioQuizStep.Question);
     previousStepRef.current = null;
     previousExampleIndexRef.current = -1;
+    previousRestartTriggerRef.current = 0;
     setIsQuizComplete(false);
 
     // Clean up audio completely instead of just changing it
@@ -582,6 +588,12 @@ export function useAudioQuiz({
     // Let the main useEffect handle audio changes for consistency
   }, []);
 
+  const restartCurrentStep = useCallback(() => {
+    // Trigger a restart by incrementing the restart trigger
+    // This will cause the audio effect to restart without changing step or example
+    setRestartTrigger((prev) => prev + 1);
+  }, []);
+
   // Effect to parse the audio examples when the current example is ready
   useEffect(() => {
     if (!currentExampleReady) {
@@ -632,7 +644,7 @@ export function useAudioQuiz({
     parsedExamples,
   ]);
 
-  // Complex effect to handle changes to the example or step
+  // Complex effect to handle changes to the example, step, or restart trigger
   useEffect(() => {
     // Do not proceed with the changes unless the audio is ready to be played
     if (!ready || !currentStepValue) {
@@ -642,12 +654,16 @@ export function useAudioQuiz({
     const exampleChanged =
       currentExampleIndex !== previousExampleIndexRef.current;
     const stepChanged = currentStep !== previousStepRef.current;
+    const restartTriggerChanged =
+      restartTrigger !== previousRestartTriggerRef.current;
 
     if (exampleChanged) {
       // If the example index has changed, handle the example change
       previousExampleIndexRef.current = currentExampleIndex;
       // Reset and set the step ref for the new example
       previousStepRef.current = currentStep;
+      // Update restart trigger ref
+      previousRestartTriggerRef.current = restartTrigger;
       // Handle example change
       changeCurrentAudio({
         currentTime: 0,
@@ -658,7 +674,18 @@ export function useAudioQuiz({
     } else if (stepChanged) {
       // Handle step changes (both initial and subsequent)
       previousStepRef.current = currentStep;
+      // Update restart trigger ref
+      previousRestartTriggerRef.current = restartTrigger;
       // Handle step change
+      changeCurrentAudio({
+        currentTime: 0,
+        src: currentStepValue.blobUrl,
+        onEnded: onEndedCallback,
+        playOnLoad: true,
+      });
+    } else if (restartTriggerChanged) {
+      // Handle restart trigger - restart current audio without changing step or example
+      previousRestartTriggerRef.current = restartTrigger;
       changeCurrentAudio({
         currentTime: 0,
         src: currentStepValue.blobUrl,
@@ -673,6 +700,7 @@ export function useAudioQuiz({
     currentStep,
     currentExampleIndex,
     currentStepValue,
+    restartTrigger,
     changeCurrentAudio,
     onEndedCallback,
   ]);
@@ -765,6 +793,7 @@ export function useAudioQuiz({
     goToGuess,
     goToHint,
     goToAnswer,
+    restartCurrentStep, // Restart the current step audio
     nextExample: nextExampleWithPrefetch,
     previousExample,
     progressStatus,

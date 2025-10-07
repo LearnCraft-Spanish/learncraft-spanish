@@ -14,6 +14,7 @@ export default function ExampleListItem({
   isCollected,
   isAdding,
   isRemoving,
+  isCustom,
   handleRemove,
   handleDeselect,
   handleSelect,
@@ -24,6 +25,7 @@ export default function ExampleListItem({
   isCollected: boolean;
   isAdding: boolean;
   isRemoving: boolean;
+  isCustom: boolean;
   handleRemove: () => Promise<void>;
   handleDeselect: () => void;
   handleSelect: () => void;
@@ -77,7 +79,7 @@ export default function ExampleListItem({
 
       <MoreInfoViewFlashcard
         flashcard={flashcard}
-        isCustom={false} // TODO: add custom flashcard
+        isCustom={isCustom}
         isOpen={isMoreInfoOpen}
         openContextual={openContextual}
         contextual={contextual}

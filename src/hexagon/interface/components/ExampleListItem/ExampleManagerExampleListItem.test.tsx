@@ -10,6 +10,7 @@ const mockProps = {
   flashcard: f,
   isCollected: false,
   isAdding: false,
+  isCustom: false,
   isRemoving: false,
   handleSelect: vi.fn(),
   handleDeselect: vi.fn(),
