@@ -66,6 +66,7 @@ export default function AudioQuiz({
   const {
     goToQuestion,
     goToHint,
+    restartCurrentStep,
     nextExample,
     previousExample,
     nextStep,
@@ -200,6 +201,7 @@ export default function AudioQuiz({
             audioQuizType={audioQuizType}
             goToHint={goToHint}
             goToQuestion={goToQuestion}
+            restartCurrentStep={restartCurrentStep}
             currentStep={currentStep}
             closeQuiz={cleanupFunction}
             isFirstExample={currentExampleNumber === 1}
