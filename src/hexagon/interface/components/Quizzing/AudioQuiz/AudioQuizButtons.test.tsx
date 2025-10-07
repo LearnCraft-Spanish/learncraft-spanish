@@ -8,6 +8,7 @@ const incrementCurrentStep = vi.fn();
 const decrementExample = vi.fn();
 const incrementExample = vi.fn();
 const unReadyQuiz = vi.fn();
+const restartCurrentStep = vi.fn();
 
 describe('initial render', () => {
   it('renders without crashing', () => {
@@ -21,6 +22,7 @@ describe('initial render', () => {
         previousExample={decrementExample}
         goToQuestion={() => {}}
         goToHint={() => {}}
+        restartCurrentStep={restartCurrentStep}
         closeQuiz={unReadyQuiz}
         isFirstExample={true}
         isLastExample={false}
@@ -44,6 +46,7 @@ describe('audioOrComprehension is audio', () => {
         previousExample={decrementExample}
         goToQuestion={() => {}}
         goToHint={() => {}}
+        restartCurrentStep={restartCurrentStep}
         closeQuiz={unReadyQuiz}
         isFirstExample={true}
         isLastExample={false}
@@ -65,6 +68,7 @@ describe('audioOrComprehension is comprehension', () => {
         previousExample={decrementExample}
         goToQuestion={() => {}}
         goToHint={() => {}}
+        restartCurrentStep={restartCurrentStep}
         closeQuiz={unReadyQuiz}
         isFirstExample={true}
         isLastExample={false}
