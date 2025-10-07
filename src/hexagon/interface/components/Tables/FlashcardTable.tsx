@@ -209,6 +209,7 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
               isCollected={true}
               isAdding={false}
               isRemoving={isRemovingFlashcard(flashcard.example.id)}
+              isCustom={flashcard.custom}
               handleRemove={async () => {
                 deleteFlashcard(flashcard.example.id);
                 removeFromSelectedIds(flashcard.example.id);
