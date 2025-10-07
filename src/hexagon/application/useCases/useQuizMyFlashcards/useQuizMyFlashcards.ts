@@ -11,7 +11,7 @@ import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useStudentFlashcards } from '../../units/useStudentFlashcards';
 
 export enum MyFlashcardsQuizType {
