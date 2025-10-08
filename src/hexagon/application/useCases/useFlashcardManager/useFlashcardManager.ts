@@ -64,7 +64,8 @@ export default function useFlashcardManager({
     setFilterOwnedFlashcards,
     onGoingToQuiz,
     studentFlashcardsLoading,
-    filteredFlashcardsLoading,
+    filteredFlashcardsLoading:
+      filteredFlashcardsLoading && filterOwnedFlashcards,
     error,
   };
 }
