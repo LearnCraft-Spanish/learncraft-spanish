@@ -23,6 +23,7 @@
  * INTERFACE METHODS:
  * - isReady(): Check if transcoding service is available
  * - isLoading(): Check if service is initializing (for UI feedback)
+ * - checkCompatibility(): Check browser compatibility for FFmpeg.wasm
  * - mp3ToWav(): Convert MP3 files to WAV format
  * - generateSilence(): Create silence audio of specified duration
  * - concatenateAudio(): Combine multiple audio blobs
@@ -43,6 +44,12 @@
  * USAGE PATTERN:
  * ```typescript
  * const transcoder = useAudioTranscoderAdapter();
+ *
+ * // Check browser compatibility first
+ * const compatibility = transcoder.checkCompatibility();
+ * if (!compatibility.isSupported) {
+ *   return <Error message={compatibility.errorMessage} />;
+ * }
  *
  * if (!transcoder.isReady()) {
  *   // Show loading UI
@@ -79,6 +86,15 @@ export interface AudioTranscodingPort {
    * Get the current loading progress (0-100)
    */
   loadingProgress: () => number;
+
+  /**
+   * Check browser compatibility for the transcoding service
+   * @returns Object with isSupported boolean and optional errorMessage
+   */
+  checkCompatibility: () => {
+    isSupported: boolean;
+    errorMessage?: string;
+  };
 
   /**
    * Convert MP3 audio to WAV format

@@ -72,6 +72,36 @@ import { useCallback, useRef, useState } from 'react';
 // ============================================================================
 
 /**
+ * Check browser compatibility for FFmpeg.wasm
+ */
+const checkBrowserCompatibility = (): {
+  isSupported: boolean;
+  errorMessage?: string;
+} => {
+  // Check for WebAssembly support (required)
+  if (typeof WebAssembly === 'undefined') {
+    return {
+      isSupported: false,
+      errorMessage:
+        'WebAssembly is not supported in this browser. FFmpeg.wasm requires WebAssembly support. ' +
+        'Please use a modern browser that supports WebAssembly.',
+    };
+  }
+
+  // Check for required APIs (required)
+  if (typeof Worker === 'undefined') {
+    return {
+      isSupported: false,
+      errorMessage:
+        'Web Workers are not supported in this browser. FFmpeg.wasm requires Web Worker support. ' +
+        'Please use a modern browser that supports Web Workers.',
+    };
+  }
+
+  return { isSupported: true };
+};
+
+/**
  * Calculate WAV file duration from raw bytes
  */
 const calculateWavDuration = (wavBytes: Uint8Array): number => {
@@ -179,14 +209,17 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
 
     initPromiseRef.current = (async () => {
       try {
-        const ffmpeg = new FFmpeg();
-
-        // Check for SharedArrayBuffer support
-        if (typeof SharedArrayBuffer === 'undefined') {
+        // Check browser compatibility before attempting to initialize FFmpeg
+        const compatibility = checkBrowserCompatibility();
+        if (!compatibility.isSupported) {
           console.error(
-            'SharedArrayBuffer not supported - FFmpeg may not work properly',
+            'Browser compatibility check failed:',
+            compatibility.errorMessage,
           );
+          throw new Error(compatibility.errorMessage);
         }
+
+        const ffmpeg = new FFmpeg();
 
         // Add progress callback for real FFmpeg progress tracking
         ffmpeg.on('progress', ({ progress }) => {
@@ -573,11 +606,19 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
     [init],
   );
 
+  /**
+   * Check if the browser supports FFmpeg.wasm requirements
+   */
+  const checkCompatibility = useCallback(() => {
+    return checkBrowserCompatibility();
+  }, []);
+
   return {
     kind: 'ffmpeg',
     isReady: () => isReady,
     isLoading: () => isLoading,
     loadingProgress: () => loadingProgress,
+    checkCompatibility,
     mp3ToWav,
     generateSilence,
     concatenateAudio,
