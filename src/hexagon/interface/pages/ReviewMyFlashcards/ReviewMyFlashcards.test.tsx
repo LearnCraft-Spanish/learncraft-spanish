@@ -40,7 +40,7 @@ describe('menu for student flashcards', () => {
     await waitFor(() => {
       expect(screen.getByText(/srs quiz/i)).toBeInTheDocument();
       expect(screen.getByText(/start with spanish/i)).toBeInTheDocument();
-      expect(screen.getByText(/custom only/i)).toBeInTheDocument();
+      expect(screen.getByText(/custom flashcards/i)).toBeInTheDocument();
       expect(screen.getByText(/quiz length/i)).toBeInTheDocument();
     });
   });

@@ -10,6 +10,7 @@ interface AudioQuizButtonsProps {
   previousExample: () => void;
   goToQuestion: () => void;
   goToHint: () => void;
+  restartCurrentStep: () => void;
   closeQuiz: () => void;
   isFirstExample: boolean;
   isLastExample: boolean;
@@ -24,6 +25,7 @@ export default function AudioQuizButtons({
   previousExample,
   goToQuestion,
   goToHint,
+  restartCurrentStep,
   closeQuiz,
   isFirstExample,
   isLastExample,
@@ -77,16 +79,24 @@ export default function AudioQuizButtons({
 
   function previousStepButton(): React.JSX.Element {
     if (audioQuizType === AudioQuizType.Speaking) {
-      return (
-        <button type="button" onClick={() => goToQuestion()}>
-          Replay English
-        </button>
-      );
+      if (currentStep === AudioQuizStep.Question) {
+        return (
+          <button type="button" onClick={() => restartCurrentStep()}>
+            Replay English
+          </button>
+        );
+      } else {
+        return (
+          <button type="button" onClick={() => goToQuestion()}>
+            Replay English
+          </button>
+        );
+      }
     } else {
       switch (currentStep) {
         case AudioQuizStep.Question:
           return (
-            <button type="button" onClick={() => goToQuestion()}>
+            <button type="button" onClick={() => restartCurrentStep()}>
               Replay Spanish
             </button>
           );
@@ -98,7 +108,7 @@ export default function AudioQuizButtons({
           );
         case AudioQuizStep.Hint:
           return (
-            <button type="button" onClick={() => goToHint()}>
+            <button type="button" onClick={() => restartCurrentStep()}>
               Replay Spanish
             </button>
           );
