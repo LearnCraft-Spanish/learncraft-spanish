@@ -24,8 +24,8 @@ export function MyTextQuizMenu({
     startWithSpanish,
     setSrsQuiz,
     setStartWithSpanish,
-    customOnly,
-    setCustomOnly,
+    customFlashcardsChoice,
+    setCustomFlashcardsChoice,
     quizLength,
     setSelectedQuizLength,
     availableQuizLengths,
@@ -54,14 +54,23 @@ export function MyTextQuizMenu({
         />
       </div>
       {canAccessCustom && (
-        <div className="menuRow">
-          <ToggleSwitch
-            id="customOnly"
-            ariaLabel="Custom Only"
-            label="Custom Only"
-            checked={customOnly}
-            onChange={() => setCustomOnly(!customOnly)}
-          />
+        <div className="menuRow dropdown">
+          <label htmlFor="customFlashcardsChoice">Custom Flashcards:</label>
+
+          <select
+            name="customFlashcardsChoice"
+            id="customFlashcardsChoice"
+            onChange={(e) =>
+              setCustomFlashcardsChoice(
+                e.target.value as 'included' | 'onlyCustom' | 'excluded',
+              )
+            }
+            value={customFlashcardsChoice}
+          >
+            <option value="included">Included</option>
+            <option value="onlyCustom">Only Custom</option>
+            <option value="excluded">Excluded</option>
+          </select>
         </div>
       )}
       {filteringIsLoading ? (
