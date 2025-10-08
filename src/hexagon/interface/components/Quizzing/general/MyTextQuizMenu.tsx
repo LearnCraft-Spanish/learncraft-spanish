@@ -55,7 +55,7 @@ export function MyTextQuizMenu({
       </div>
       {canAccessCustom && (
         <div className="menuRow dropdown">
-          <label htmlFor="customFlashcardsChoice">Custom Flashcards:</label>
+          <label htmlFor="customFlashcardsChoice">Custom Flashcards</label>
 
           <select
             name="customFlashcardsChoice"
