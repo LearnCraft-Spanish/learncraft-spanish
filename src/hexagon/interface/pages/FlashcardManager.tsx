@@ -34,12 +34,13 @@ export default function FlashcardManager() {
     setFilterOwnedFlashcards,
     studentFlashcardsLoading,
     filteredFlashcardsLoading,
+    dependenciesLoading,
     error,
   } = useFlashcardManager({
     enableFilteringByDefault: enableFiltering,
   });
 
-  if (studentFlashcardsLoading) {
+  if (studentFlashcardsLoading || dependenciesLoading) {
     return <Loading message="Loading Flashcard Manager" />;
   }
   if (error) {
