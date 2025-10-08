@@ -217,16 +217,16 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
         hint: {
           step: AudioQuizStep.Hint,
           spanish: true,
-          displayText: hintText,
+          displayText: spanishText,
           blobUrl: combinedSpanishAudioBlob.url,
           duration: combinedSpanishAudioBlob.durationSec,
         },
         answer: {
           step: AudioQuizStep.Answer,
           spanish: false,
-          displayText: spanishText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
+          displayText: englishText,
+          blobUrl: combinedEnglishAudioBlob.url,
+          duration: combinedEnglishAudioBlob.durationSec,
         },
       };
 

@@ -93,6 +93,15 @@ export default function Menu() {
                   How to Use This App
                 </Link>
               </div>
+              <div className="buttonBox">
+                <Link
+                  className="linkButton"
+                  to="https://www.youtube.com/watch?v=A1MgjOCPQlQ"
+                  target="_blank"
+                >
+                  October App Update
+                </Link>
+              </div>
             </div>
           )}
           {(isAdmin || isCoach) && (

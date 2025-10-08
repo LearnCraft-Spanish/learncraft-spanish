@@ -81,16 +81,14 @@ button:disabled {
 }
 
 .getHelpContainer {
-  position: absolute;
-  overflow: visible;
-  top: 50%;
-  left: 10%;
-  width: 80%;
-  height: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 5;
+}
+
+.getHelpButton {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .audioFlashcard .vocabTag.selected {
