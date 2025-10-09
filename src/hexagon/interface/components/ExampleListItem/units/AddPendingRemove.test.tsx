@@ -40,7 +40,7 @@ describe('component AddPendingRemove', () => {
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Adding...');
-      expect(button).toHaveClass('disabledButton');
+      expect(button).toHaveClass('addingButton');
     });
 
     it('should render Removing... disabled button when removing', () => {
@@ -55,7 +55,7 @@ describe('component AddPendingRemove', () => {
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
       expect(button).toHaveTextContent('Removing...');
-      expect(button).toHaveClass('disabledButton');
+      expect(button).toHaveClass('removingButton');
     });
   });
 
