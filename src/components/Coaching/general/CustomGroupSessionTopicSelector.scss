@@ -1,0 +1,12 @@
+.topicOptions {
+  max-height: 200px;
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  background-color: var(--light);
+  border: 1px solid var(--dark);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  overflow-y: auto;
+}
