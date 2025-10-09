@@ -1,10 +1,11 @@
-.customFlashcardButton.onFlashcard {
+.flashcard .customFlashcardButton.onFlashcard {
   top: 25px;
   width: fit-content;
   font-size: 10px;
   padding: 5px 10px;
   margin: 0 auto;
   z-index: 5;
+  border-radius: 0;
   /* width: 170px; */
 
   &:hover {
