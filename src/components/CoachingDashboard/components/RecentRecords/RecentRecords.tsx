@@ -15,6 +15,7 @@ import {
   NewPrivateCallView,
   PrivateCallView,
 } from 'src/components/Coaching/WeeksRecords/Table/PrivateCallsCell';
+import { Dropdown } from 'src/components/FormComponents';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 // import Table from 'src/components/Table/Table';
 import useMyRecentRecords from '../../hooks/useMyRecentRecords';
@@ -25,6 +26,8 @@ import DisplayOnlyTable from './DisplayOnlyTable';
 import GroupCallRecordRow from './GroupCallRecordRow';
 import MonthYearSelector from './MonthYearSelector';
 import PrivateCallRecordRow from './PrivateCallRecordRow';
+
+import './RecentRecords.scss';
 interface colaspableMenuObject {
   sectionTitle: string;
   colapsableMenuOpen: boolean;
@@ -51,6 +54,13 @@ export function RecentRecords() {
 
   const { isLoading, isError, isSuccess } = states;
 
+  const [privateCallsSorting, setPrivateCallsSorting] = useState<
+    'Student Name' | 'Date'
+  >('Student Name');
+  const [assignmentsSorting, setAssignmentsSorting] = useState<
+    'Assignment Name' | 'Date'
+  >('Date');
+
   const updateColapsableMenuOpen = (title: string) => {
     if (colapsableMenuObject.sectionTitle === title) {
       setColapsableMenuObject({
@@ -65,11 +75,35 @@ export function RecentRecords() {
     }
   };
   const assignments = useMemo(() => {
-    return myRecentRecordsQuery.data?.assignments || [];
-  }, [myRecentRecordsQuery.data]);
+    if (!myRecentRecordsQuery.data) return [];
+    if (assignmentsSorting === 'Assignment Name') {
+      return [...myRecentRecordsQuery.data.assignments].sort((a, b) =>
+        a.assignmentName
+          .split(' ')[0]
+          .localeCompare(b.assignmentName.split(' ')[0]),
+      );
+    } else {
+      return [...myRecentRecordsQuery.data.assignments].sort(
+        (a, b) =>
+          new Date(b.dateCreated as string).getTime() -
+          new Date(a.dateCreated as string).getTime(),
+      );
+    }
+  }, [myRecentRecordsQuery.data, assignmentsSorting]);
+
   const privateCalls = useMemo(() => {
-    return myRecentRecordsQuery.data?.privateCalls || [];
-  }, [myRecentRecordsQuery.data]);
+    if (!myRecentRecordsQuery.data) return [];
+    if (privateCallsSorting === 'Student Name') {
+      return [...myRecentRecordsQuery.data.privateCalls].sort((a, b) =>
+        a.weekName.split(' ')[0].localeCompare(b.weekName.split(' ')[0]),
+      );
+    } else {
+      return [...myRecentRecordsQuery.data.privateCalls].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      );
+    }
+  }, [myRecentRecordsQuery.data, privateCallsSorting]);
+
   const groupSessions = useMemo(() => {
     return myRecentRecordsQuery.data?.groupSessions || [];
   }, [myRecentRecordsQuery.data]);
@@ -102,6 +136,19 @@ export function RecentRecords() {
               >
                 New Assignment
               </button>
+            }
+            sortingComponent={
+              <div className="sortingComponentWrapper">
+                <Dropdown
+                  label="Sort by"
+                  editMode={true}
+                  options={['Date', 'Assignment Name']}
+                  value={assignmentsSorting}
+                  onChange={(value) =>
+                    setAssignmentsSorting(value as 'Assignment Name' | 'Date')
+                  }
+                />
+              </div>
             }
           />
           {colapsableMenuObject.colapsableMenuOpen &&
@@ -145,6 +192,19 @@ export function RecentRecords() {
               >
                 New Private Call
               </button>
+            }
+            sortingComponent={
+              <div className="sortingComponentWrapper">
+                <Dropdown
+                  label="Sort by"
+                  editMode={true}
+                  options={['Student Name', 'Date']}
+                  value={privateCallsSorting}
+                  onChange={(value) =>
+                    setPrivateCallsSorting(value as 'Student Name' | 'Date')
+                  }
+                />
+              </div>
             }
           />
 
