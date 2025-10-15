@@ -687,6 +687,12 @@ export function useAudioQuiz({
     const restartTriggerChanged =
       restartTrigger !== previousRestartTriggerRef.current;
 
+    // check if quiz ended, end current audio
+    if (isQuizComplete) {
+      cleanupAudio();
+      return;
+    }
+
     if (exampleChanged) {
       // If the example index has changed, handle the example change
       previousExampleIndexRef.current = currentExampleIndex;
