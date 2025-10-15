@@ -371,16 +371,22 @@ export function useAudioQuiz({
   // Parses the audio example at the given index
   const parseAudioExample = useCallback(
     async (safeIndex: number) => {
+      if (parseInProgress.current) {
+        console.error('Audio parse already in progress');
+        return;
+      }
+      // Mark that a parse is in progress to prevent race conditions
+      parseInProgress.current = true;
+
       // Get the example to parse
       const example = safeExamples[safeIndex];
 
       // If the example is out of bounds or already parsed, return
       if (!example || parsedExamples[example.id]) {
+        // Free the queue
+        parseInProgress.current = false;
         return;
       }
-
-      // Mark that a parse is in progress to prevent race conditions
-      parseInProgress.current = true;
 
       try {
         // Use our new simplified mapper to get both quiz types at once
@@ -426,7 +432,6 @@ export function useAudioQuiz({
     }
   }, [
     currentExampleIndex,
-
     safeExamples,
     autoplay,
     nextExample,
@@ -439,6 +444,7 @@ export function useAudioQuiz({
     useMemo(() => {
       const parsedExample = parsedExamples[currentExampleMemo?.id ?? -1];
       if (!parsedExample) {
+        parseAudioExample(currentExampleIndex);
         return null;
       }
 
@@ -446,7 +452,13 @@ export function useAudioQuiz({
       return audioQuizType === AudioQuizType.Speaking
         ? parsedExample.speaking
         : parsedExample.listening;
-    }, [parsedExamples, currentExampleMemo, audioQuizType]);
+    }, [
+      parsedExamples,
+      currentExampleMemo,
+      audioQuizType,
+      parseAudioExample,
+      currentExampleIndex,
+    ]);
 
   const currentExampleReady = useMemo(() => {
     return currentAudioExample !== null;
@@ -456,6 +468,9 @@ export function useAudioQuiz({
     useMemo(() => {
       const parsedExample = parsedExamples[nextExampleMemo?.id ?? -1];
       if (!parsedExample) {
+        if (!parseInProgress.current) {
+          parseAudioExample(currentExampleIndex + 1);
+        }
         return null;
       }
 
@@ -463,7 +478,13 @@ export function useAudioQuiz({
       return audioQuizType === AudioQuizType.Speaking
         ? parsedExample.speaking
         : parsedExample.listening;
-    }, [parsedExamples, nextExampleMemo, audioQuizType]);
+    }, [
+      parsedExamples,
+      nextExampleMemo,
+      audioQuizType,
+      parseAudioExample,
+      currentExampleIndex,
+    ]);
 
   const nextExampleReady = useMemo(() => {
     return nextAudioExample !== null;
@@ -475,6 +496,9 @@ export function useAudioQuiz({
     | null = useMemo(() => {
     const parsedExample = parsedExamples[previousExampleMemo?.id ?? -1];
     if (!parsedExample) {
+      if (!parseInProgress.current) {
+        parseAudioExample(currentExampleIndex - 1);
+      }
       return null;
     }
 
@@ -482,7 +506,13 @@ export function useAudioQuiz({
     return audioQuizType === AudioQuizType.Speaking
       ? parsedExample.speaking
       : parsedExample.listening;
-  }, [parsedExamples, previousExampleMemo, audioQuizType]);
+  }, [
+    parsedExamples,
+    previousExampleMemo,
+    audioQuizType,
+    parseAudioExample,
+    currentExampleIndex,
+  ]);
 
   const previousExampleReady = useMemo(() => {
     return previousAudioExample !== null;
@@ -692,8 +722,6 @@ export function useAudioQuiz({
         onEnded: onEndedCallback,
         playOnLoad: true,
       });
-    } else {
-      console.error('⏭️ No audio change needed');
     }
   }, [
     ready,
@@ -711,22 +739,6 @@ export function useAudioQuiz({
       cleanupAudio();
     };
   }, [cleanupAudio]);
-
-  /*
-    addPendingRemoveProps: isStudent
-      ? {
-          isAdding: isAddingFlashcard({ exampleId: currentExample?.id ?? 0 }),
-          isRemoving: isRemovingFlashcard({
-            exampleId: currentExample?.id ?? 0,
-          }),
-          isCollected: isExampleCollected({
-            exampleId: currentExample?.id ?? 0,
-          }),
-          addFlashcard,
-          removeFlashcard,
-        }
-      : undefined,
-  */
 
   // This is the memo for add pending remove
   const addFlashcard = useCallback(() => {

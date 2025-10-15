@@ -345,11 +345,21 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
    * - Converts Spanish and English MP3s to WAV
    * - Used by AudioQuizMapper for quiz preparation
    */
+
+  const isProcessingRef = useRef(false);
+
   const mp3ToWav = useCallback(
     async (
       mp3Url: string,
-      options: { sampleRate?: number; channels?: number } = {},
+      options: {
+        sampleRate?: number;
+        channels?: number;
+      } = {},
     ): Promise<AudioBlob> => {
+      if (isProcessingRef.current) {
+        throw new Error('Audio transcoding is already in progress');
+      }
+      isProcessingRef.current = true;
       // Lazy initialization - only download when actually needed
       if (!ffmpegRef.current) {
         await init();
@@ -424,6 +434,8 @@ export const useFfmpegAudio = (): AudioTranscodingPort => {
           await cleanupFiles(ffmpegRef.current, ['input.mp3', 'output.wav']);
         }
         throw error;
+      } finally {
+        isProcessingRef.current = false;
       }
     },
     [init],

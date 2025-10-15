@@ -44,7 +44,7 @@ import type {
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useAudioTranscoderAdapter } from '@application/adapters/audioTranscoderAdapter';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 export interface AudioQuizMapperReturn {
   /**
@@ -127,6 +127,8 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
     isLoading,
     loadingProgress,
   } = useAudioTranscoderAdapter();
+
+  const isProcessingRef = useRef(false);
   // Create function with useCallback
   const parseExampleForQuiz = useCallback(
     async (
@@ -135,107 +137,130 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
       speaking: SpeakingQuizExample;
       listening: ListeningQuizExample;
     }> => {
-      // Business rule: Determine which audio to use based on quiz type
-      const spanishText = example.spanish;
-      const englishText = example.english;
-      const guessText = 'Make a guess!';
-      const hintText = 'Listen to Audio';
-      const listeningQuestionText = 'Listen to Audio';
-      const spanishAudioUrl = example.spanishAudio;
-      const englishAudioUrl = example.englishAudio;
+      if (isProcessingRef.current) {
+        throw new Error('Audio transcoding is already in progress');
+      }
+      isProcessingRef.current = true;
 
-      // Business rule: Apply appropriate buffer duration
-      const BUFFER_LENGTH_SECONDS = 3;
+      try {
+        // Business rule: Determine which audio to use based on quiz type
+        const spanishText = example.spanish;
+        const englishText = example.english;
+        const guessText = 'Make a guess!';
+        const hintText = 'Listen to Audio';
+        const listeningQuestionText = 'Listen to Audio';
+        const spanishAudioUrl = example.spanishAudio;
+        const englishAudioUrl = example.englishAudio;
 
-      // Use transcoding port for raw audio operations
-      const spanishAudioBlob = await mp3ToWav(spanishAudioUrl);
-      const englishAudioBlob = await mp3ToWav(englishAudioUrl);
-      const silenceBlob = await generateSilence(BUFFER_LENGTH_SECONDS);
-      const combinedSpanishAudioBlob = await concatenateAudio([
-        spanishAudioBlob,
-        silenceBlob,
-      ]);
-      const combinedEnglishAudioBlob = await concatenateAudio([
-        englishAudioBlob,
-        silenceBlob,
-      ]);
+        // Business rule: Apply appropriate buffer duration
+        const BUFFER_LENGTH_SECONDS = 3;
 
-      // Create a silence blob that matches the total duration of the English audio
-      const guessSilenceBlob = await generateSilence(
-        combinedEnglishAudioBlob.durationSec,
-      );
+        // Use transcoding port for raw audio operations
+        // NOTE: THESE MUST BE SEQUENTIAL!
+        // Trying to run simultaneously will cause only one to be processed!
+        const startTime = performance.now();
+        const spanishAudioBlob = await mp3ToWav(spanishAudioUrl);
+        const englishAudioBlob = await mp3ToWav(englishAudioUrl);
+        const silenceBlob = await generateSilence(BUFFER_LENGTH_SECONDS);
+        const combinedSpanishAudioBlob = await concatenateAudio([
+          spanishAudioBlob,
+          silenceBlob,
+        ]);
+        const combinedEnglishAudioBlob = await concatenateAudio([
+          englishAudioBlob,
+          silenceBlob,
+        ]);
 
-      // Create both quiz examples using the same audio blobs
-      const speakingExample: SpeakingQuizExample = {
-        type: AudioQuizType.Speaking,
-        question: {
-          step: AudioQuizStep.Question,
-          spanish: false,
-          displayText: englishText,
-          blobUrl: combinedEnglishAudioBlob.url,
-          duration: combinedEnglishAudioBlob.durationSec,
-        },
-        guess: {
-          step: AudioQuizStep.Guess,
-          spanish: false,
-          displayText: guessText,
-          blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
-          duration: guessSilenceBlob.durationSec,
-        },
-        hint: {
-          step: AudioQuizStep.Hint,
-          spanish: true,
-          displayText: hintText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-        answer: {
-          step: AudioQuizStep.Answer,
-          spanish: true,
-          displayText: spanishText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-      };
+        spanishAudioBlob.dispose();
+        englishAudioBlob.dispose();
+        silenceBlob.dispose();
 
-      const listeningExample: ListeningQuizExample = {
-        type: AudioQuizType.Listening,
-        question: {
-          step: AudioQuizStep.Question,
-          spanish: true,
-          displayText: listeningQuestionText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-        guess: {
-          step: AudioQuizStep.Guess,
-          spanish: false,
-          displayText: guessText,
-          blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
-          duration: guessSilenceBlob.durationSec,
-        },
-        hint: {
-          step: AudioQuizStep.Hint,
-          spanish: true,
-          displayText: spanishText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-        answer: {
-          step: AudioQuizStep.Answer,
-          spanish: false,
-          displayText: englishText,
-          blobUrl: combinedEnglishAudioBlob.url,
-          duration: combinedEnglishAudioBlob.durationSec,
-        },
-      };
+        // Create a silence blob that matches the total duration of the English audio
+        const guessSilenceBlob = await generateSilence(
+          combinedEnglishAudioBlob.durationSec,
+        );
+        // Create both quiz examples using the same audio blobs
+        const speakingExample: SpeakingQuizExample = {
+          type: AudioQuizType.Speaking,
+          question: {
+            step: AudioQuizStep.Question,
+            spanish: false,
+            displayText: englishText,
+            blobUrl: combinedEnglishAudioBlob.url,
+            duration: combinedEnglishAudioBlob.durationSec,
+          },
+          guess: {
+            step: AudioQuizStep.Guess,
+            spanish: false,
+            displayText: guessText,
+            blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
+            duration: guessSilenceBlob.durationSec,
+          },
+          hint: {
+            step: AudioQuizStep.Hint,
+            spanish: true,
+            displayText: hintText,
+            blobUrl: combinedSpanishAudioBlob.url,
+            duration: combinedSpanishAudioBlob.durationSec,
+          },
+          answer: {
+            step: AudioQuizStep.Answer,
+            spanish: true,
+            displayText: spanishText,
+            blobUrl: combinedSpanishAudioBlob.url,
+            duration: combinedSpanishAudioBlob.durationSec,
+          },
+        };
 
-      const audioQuizExample: AudioQuizExample = {
-        speaking: speakingExample,
-        listening: listeningExample,
-      };
+        const listeningExample: ListeningQuizExample = {
+          type: AudioQuizType.Listening,
+          question: {
+            step: AudioQuizStep.Question,
+            spanish: true,
+            displayText: listeningQuestionText,
+            blobUrl: combinedSpanishAudioBlob.url,
+            duration: combinedSpanishAudioBlob.durationSec,
+          },
+          guess: {
+            step: AudioQuizStep.Guess,
+            spanish: false,
+            displayText: guessText,
+            blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
+            duration: guessSilenceBlob.durationSec,
+          },
+          hint: {
+            step: AudioQuizStep.Hint,
+            spanish: true,
+            displayText: spanishText,
+            blobUrl: combinedSpanishAudioBlob.url,
+            duration: combinedSpanishAudioBlob.durationSec,
+          },
+          answer: {
+            step: AudioQuizStep.Answer,
+            spanish: false,
+            displayText: englishText,
+            blobUrl: combinedEnglishAudioBlob.url,
+            duration: combinedEnglishAudioBlob.durationSec,
+          },
+        };
 
-      return audioQuizExample;
+        const audioQuizExample: AudioQuizExample = {
+          speaking: speakingExample,
+          listening: listeningExample,
+        };
+        const endTime = performance.now();
+        console.log(
+          'Time taken to parse example for quiz:',
+          endTime - startTime,
+        );
+
+        return audioQuizExample;
+      } catch (error) {
+        console.error(error);
+        throw new Error('Failed to parse example for quiz', { cause: error });
+      } finally {
+        isProcessingRef.current = false;
+      }
     },
     [mp3ToWav, generateSilence, concatenateAudio],
   );
