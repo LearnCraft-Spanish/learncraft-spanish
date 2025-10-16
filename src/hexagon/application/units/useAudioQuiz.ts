@@ -130,12 +130,15 @@ export function useAudioQuiz({
 
   // The examples to reviw, but with invalid audio filtered out
   const safeExamples = useMemo(() => {
-    return examplesToQuiz.filter((example) => {
+    const toReturn = examplesToQuiz.filter((example) => {
       if (badAudioExamples.includes(example.id)) {
         return false;
       }
       return true;
     });
+    console.log('badAudioExamples', badAudioExamples);
+    console.log('safeExamples', toReturn);
+    return toReturn;
   }, [examplesToQuiz, badAudioExamples]);
 
   // The selected example index within the safe examples
@@ -189,6 +192,7 @@ export function useAudioQuiz({
       safeExamples.length > 0 &&
       currentExampleIndex + 1 < safeExamples.length
     ) {
+      console.log('nextExampleMemo', safeExamples[currentExampleIndex + 1]);
       return safeExamples[currentExampleIndex + 1];
     }
   }, [safeExamples, currentExampleIndex]);
@@ -592,7 +596,7 @@ export function useAudioQuiz({
       // Handle example change
       changeCurrentAudio({
         currentTime: 0,
-        src: currentStepValue.blobUrl,
+        src: currentStepValue.mp3AudioUrl,
         onEnded: onEndedCallback,
         playOnLoad: true,
       });
@@ -604,7 +608,7 @@ export function useAudioQuiz({
       // Handle step change
       changeCurrentAudio({
         currentTime: 0,
-        src: currentStepValue.blobUrl,
+        src: currentStepValue.mp3AudioUrl,
         onEnded: onEndedCallback,
         playOnLoad: true,
       });
@@ -613,7 +617,7 @@ export function useAudioQuiz({
       previousRestartTriggerRef.current = restartTrigger;
       changeCurrentAudio({
         currentTime: 0,
-        src: currentStepValue.blobUrl,
+        src: currentStepValue.mp3AudioUrl,
         onEnded: onEndedCallback,
         playOnLoad: true,
       });
