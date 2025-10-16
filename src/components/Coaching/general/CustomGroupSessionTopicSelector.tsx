@@ -31,9 +31,21 @@ export default function CustomGroupSessionTopicSelector({
   }, [topicOptions, searchString]);
 
   function handleAddNewTopic(searchString: string) {
+    if (searchString.includes(',')) {
+      openModal({
+        title: 'Invalid Topic',
+        body: 'Topics cannot contain commas. Please remove any commas from the topic name.',
+        type: 'error',
+        confirmFunction: () => {
+          closeModal();
+        },
+      });
+      return;
+    }
+
     openModal({
       title: 'Add New Topic',
-      body: `Are you sure you want to add the topic "${searchString}"? Please double check the spelling, and that it does not already exist. WARNING: DO NOT USE COMMAS`,
+      body: `Are you sure you want to add the topic "${searchString}"? Please double check the spelling, and that it does not already exist.`,
       type: 'confirm',
       confirmFunction: async () => {
         closeModal();
