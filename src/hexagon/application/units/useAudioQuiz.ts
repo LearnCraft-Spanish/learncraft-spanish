@@ -136,8 +136,6 @@ export function useAudioQuiz({
       }
       return true;
     });
-    console.log('badAudioExamples', badAudioExamples);
-    console.log('safeExamples', toReturn);
     return toReturn;
   }, [examplesToQuiz, badAudioExamples]);
 
@@ -192,7 +190,6 @@ export function useAudioQuiz({
       safeExamples.length > 0 &&
       currentExampleIndex + 1 < safeExamples.length
     ) {
-      console.log('nextExampleMemo', safeExamples[currentExampleIndex + 1]);
       return safeExamples[currentExampleIndex + 1];
     }
   }, [safeExamples, currentExampleIndex]);
@@ -278,7 +275,7 @@ export function useAudioQuiz({
         return null;
       }
 
-      // Return the appropriate quiz type based on current quiz type
+      // Return the appropriate quiz example type based on current quiz type
       return audioQuizType === AudioQuizType.Speaking
         ? parsedExample.speaking
         : parsedExample.listening;

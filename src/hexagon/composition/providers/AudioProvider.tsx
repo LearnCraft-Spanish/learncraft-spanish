@@ -15,7 +15,6 @@ export function AudioEngineProvider({
   if (!probeElementRef.current) {
     const element = new Audio();
     element.preload = 'metadata';
-    element.crossOrigin = 'anonymous';
     probeElementRef.current = element;
   }
 

@@ -19,21 +19,15 @@ export function useAudioInfrastructure(): AudioPort {
   const [currentTime, setCurrentTime] = useState(0);
 
   const play = useCallback(async () => {
-    console.log('play');
-    console.log('playingAudioRef.current', playingAudioRef.current?.src);
     // If the audio element is not mounted or is already playing, do nothing
     if (!playingAudioRef.current || isPlaying) {
-      console.log('not playing');
       return;
     } else if (playingAudioRef.current.readyState < 1) {
-      console.log('not ready');
       // If the audio is not ready to be played, play it when the metadata is loaded
       setIsPlaying(true);
 
       const handlePlayOnLoad = () => {
-        console.log('handlePlayOnLoad');
         if (playingAudioRef.current) {
-          console.log('playing');
           playingAudioRef.current.play();
         }
         // Remove this listener after it fires once
