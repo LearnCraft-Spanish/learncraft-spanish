@@ -33,7 +33,7 @@ export default function CustomGroupSessionTopicSelector({
   function handleAddNewTopic(searchString: string) {
     openModal({
       title: 'Add New Topic',
-      body: `Are you sure you want to add the topic "${searchString}"? Please double check the spelling, and that it does not already exist.`,
+      body: `Are you sure you want to add the topic "${searchString}"? Please double check the spelling, and that it does not already exist. WARNING: DO NOT USE COMMAS`,
       type: 'confirm',
       confirmFunction: async () => {
         closeModal();
