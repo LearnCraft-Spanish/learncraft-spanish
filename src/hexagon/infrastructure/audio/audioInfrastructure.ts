@@ -9,6 +9,8 @@ export function useAudioInfrastructure(): AudioPort {
   const context = use(AudioContext);
   if (!context) throw new Error('AudioContext not found');
 
+  const { playingAudioRef, probeElementRef, runProbeTask } = context;
+
   const tickRef = useRef<NodeJS.Timeout | null>(null);
 
   // State for the playing state of the audio
@@ -17,24 +19,30 @@ export function useAudioInfrastructure(): AudioPort {
   const [currentTime, setCurrentTime] = useState(0);
 
   const play = useCallback(async () => {
+    console.log('play');
+    console.log('playingAudioRef.current', playingAudioRef.current?.src);
     // If the audio element is not mounted or is already playing, do nothing
-    if (!context.playingAudioRef.current || isPlaying) {
+    if (!playingAudioRef.current || isPlaying) {
+      console.log('not playing');
       return;
-    } else if (context.playingAudioRef.current.readyState < 1) {
+    } else if (playingAudioRef.current.readyState < 1) {
+      console.log('not ready');
       // If the audio is not ready to be played, play it when the metadata is loaded
       setIsPlaying(true);
 
       const handlePlayOnLoad = () => {
-        if (context.playingAudioRef.current) {
-          context.playingAudioRef.current.play();
+        console.log('handlePlayOnLoad');
+        if (playingAudioRef.current) {
+          console.log('playing');
+          playingAudioRef.current.play();
         }
         // Remove this listener after it fires once
-        context.playingAudioRef.current?.removeEventListener(
+        playingAudioRef.current?.removeEventListener(
           'loadedmetadata',
           handlePlayOnLoad,
         );
       };
-      context.playingAudioRef.current.addEventListener(
+      playingAudioRef.current.addEventListener(
         'loadedmetadata',
         handlePlayOnLoad,
       );
@@ -42,62 +50,62 @@ export function useAudioInfrastructure(): AudioPort {
     }
     // If the audio is ready to be played, play it
     setIsPlaying(true);
-    await context.playingAudioRef.current.play();
-  }, [context, isPlaying, setIsPlaying]);
+    await playingAudioRef.current.play();
+  }, [playingAudioRef, isPlaying, setIsPlaying]);
 
   const pause = useCallback(async () => {
     // If the audio is not playing, do nothing
-    if (!context.playingAudioRef.current || !isPlaying) return;
+    if (!playingAudioRef.current || !isPlaying) return;
     // Pause the audio
-    await context.playingAudioRef.current.pause();
+    await playingAudioRef.current.pause();
     // Stop the UI update propagation
     if (tickRef.current) clearInterval(tickRef.current);
     // UI state update
     setIsPlaying(false);
-  }, [context, isPlaying, setIsPlaying]);
+  }, [playingAudioRef, isPlaying, setIsPlaying]);
 
   // Updates the current time state of the playing audio
   const updateCurrentTime = useCallback(() => {
-    if (!context.playingAudioRef.current) {
+    if (!playingAudioRef.current) {
       setCurrentTime(0);
       return;
     }
-    const currentTimeRef = context.playingAudioRef.current.currentTime;
+    const currentTimeRef = playingAudioRef.current.currentTime;
     setCurrentTime(currentTimeRef || 0);
-  }, [context.playingAudioRef, setCurrentTime]);
+  }, [playingAudioRef, setCurrentTime]);
 
   const changeCurrentAudio = useCallback(
     async (newAudio: AudioElementState) => {
-      if (!context.playingAudioRef.current) return;
+      if (!playingAudioRef.current) return;
 
       // Remove any existing loadedmetadata listeners to prevent double play
-      const audioElement = context.playingAudioRef.current;
+      const audioElement = playingAudioRef.current;
       const existingListeners = audioElement.cloneNode(
         true,
       ) as HTMLAudioElement;
       audioElement.replaceWith(existingListeners);
-      context.playingAudioRef.current = existingListeners;
+      playingAudioRef.current = existingListeners;
 
       // Set up new audio properties
-      context.playingAudioRef.current.src = newAudio.src;
-      context.playingAudioRef.current.currentTime = newAudio.currentTime;
-      context.playingAudioRef.current.onended = newAudio.onEnded;
+      playingAudioRef.current.src = newAudio.src;
+      playingAudioRef.current.currentTime = newAudio.currentTime;
+      playingAudioRef.current.onended = newAudio.onEnded;
 
       // Add single loadedmetadata listener if playOnLoad is true
       if (newAudio.playOnLoad) {
         setIsPlaying(true);
 
         const handleLoadedMetadata = () => {
-          if (context.playingAudioRef.current) {
-            context.playingAudioRef.current.play();
+          if (playingAudioRef.current) {
+            playingAudioRef.current.play();
           }
           // Remove this listener after it fires once
-          context.playingAudioRef.current?.removeEventListener(
+          playingAudioRef.current?.removeEventListener(
             'loadedmetadata',
             handleLoadedMetadata,
           );
         };
-        context.playingAudioRef.current.addEventListener(
+        playingAudioRef.current.addEventListener(
           'loadedmetadata',
           handleLoadedMetadata,
         );
@@ -105,16 +113,16 @@ export function useAudioInfrastructure(): AudioPort {
 
       updateCurrentTime();
     },
-    [context, updateCurrentTime],
+    [playingAudioRef, updateCurrentTime],
   );
 
   // Clean up audio state completely
   const cleanupAudio = useCallback(() => {
     // Stop any playing audio
-    if (context.playingAudioRef.current) {
-      context.playingAudioRef.current.pause();
-      context.playingAudioRef.current.currentTime = 0;
-      context.playingAudioRef.current.src = '';
+    if (playingAudioRef.current) {
+      playingAudioRef.current.pause();
+      playingAudioRef.current.currentTime = 0;
+      playingAudioRef.current.src = '';
     }
 
     // Clear any intervals
@@ -126,7 +134,7 @@ export function useAudioInfrastructure(): AudioPort {
     // Reset state
     setIsPlaying(false);
     setCurrentTime(0);
-  }, [context]);
+  }, [playingAudioRef]);
 
   // Ticks the current time of the playing audio, pushes to state
   useEffect(() => {
@@ -138,7 +146,66 @@ export function useAudioInfrastructure(): AudioPort {
     return () => {
       pause();
     };
-  }, [context.playingAudioRef, isPlaying, updateCurrentTime, pause, play]);
+  }, [playingAudioRef, isPlaying, updateCurrentTime, pause, play]);
+
+  const getAudioDurationSeconds = useCallback(
+    async (audioUrl: string) => {
+      const probeElement = probeElementRef.current!;
+      return runProbeTask<number>(() => {
+        return new Promise<number>((resolve, reject) => {
+          let handleLoadedMetadata: () => void;
+          let handleError: () => void;
+          // Reset before reuse (cancels any prior network activity)
+          probeElement.src = '';
+          probeElement.load();
+
+          const cleanup = () => {
+            probeElement.removeEventListener(
+              'loadedmetadata',
+              handleLoadedMetadata,
+            );
+            probeElement.removeEventListener('error', handleError);
+          };
+
+          handleLoadedMetadata = () => {
+            const durationSeconds = probeElement.duration;
+            if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+              cleanup();
+              reject(new Error('unknown-duration'));
+            } else {
+              resolve(durationSeconds);
+            }
+          };
+
+          handleError = () => {
+            cleanup();
+            reject(new Error('media-error'));
+          };
+
+          // Attach one-shot listeners
+          probeElement.addEventListener(
+            'loadedmetadata',
+            handleLoadedMetadata,
+            { once: true },
+          );
+          probeElement.addEventListener('error', handleError, { once: true });
+
+          try {
+            probeElement.src = audioUrl;
+            probeElement.load(); // metadata-only fetch
+          } catch {
+            cleanup();
+            reject(new Error('network'));
+          }
+
+          return () => {
+            cleanup();
+          };
+        });
+      });
+    },
+    [probeElementRef, runProbeTask],
+  );
 
   return {
     play,
@@ -147,5 +214,6 @@ export function useAudioInfrastructure(): AudioPort {
     currentTime,
     changeCurrentAudio,
     cleanupAudio,
+    getAudioDurationSeconds,
   };
 }

@@ -69,6 +69,8 @@ export default function AudioQuiz({
     restartCurrentStep,
     nextExample,
     previousExample,
+    nextExampleReady,
+    previousExampleReady,
     nextStep,
     pause,
     play,
@@ -81,7 +83,6 @@ export default function AudioQuiz({
     autoplay,
     audioQuizType,
     cleanupFunction,
-    isAudioTranscoderLoading,
     isQuizComplete,
     restartQuiz,
 
@@ -144,11 +145,6 @@ export default function AudioQuiz({
   // Prevent UI flash on quiz load by showing loading until currentStepValue is ready
   // With debounced navigation, this should rarely be seen during normal usage
   if (currentExampleNumber <= 0 || !currentStepValue?.displayText) {
-    if (isAudioTranscoderLoading) {
-      return (
-        <Loading message="Initializing audio engine... This may take a moment on first load." />
-      );
-    }
     return <Loading message="Setting up Quiz..." />;
   }
 
@@ -194,18 +190,20 @@ export default function AudioQuiz({
             />
           </div>
           <AudioQuizButtons
-            nextStep={nextStep}
-            autoplay={autoplay}
-            previousExample={previousExample}
-            nextExample={nextExample}
             audioQuizType={audioQuizType}
+            autoplay={autoplay}
+            closeQuiz={cleanupFunction}
+            currentStep={currentStep}
             goToHint={goToHint}
             goToQuestion={goToQuestion}
-            restartCurrentStep={restartCurrentStep}
-            currentStep={currentStep}
-            closeQuiz={cleanupFunction}
             isFirstExample={currentExampleNumber === 1}
             isLastExample={currentExampleNumber === quizLength}
+            nextExample={nextExample}
+            nextExampleReady={nextExampleReady}
+            nextStep={nextStep}
+            previousExample={previousExample}
+            previousExampleReady={previousExampleReady}
+            restartCurrentStep={restartCurrentStep}
           />
         </>
       )}
