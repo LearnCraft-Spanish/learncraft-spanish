@@ -27,6 +27,26 @@ export default function useGroupSessions(startDate: string, endDate: string) {
     staleTime: Infinity,
     enabled: groupSessionsQuery.isSuccess,
   });
+  // a post to group-sessions/topic-field-options, with the body being { newChoice: string}
+  const createGroupSessionsTopicFieldOptionsMutation = useMutation({
+    mutationFn: async (newChoice: string) => {
+      const promise = newPostFactory<string[]>({
+        path: 'coaching/group-sessions/topic-field-options',
+        body: { newChoice },
+      });
+      toast.promise(promise, {
+        pending: 'Creating group session topic field options...',
+        success: 'Group session topic field options created!',
+        error: 'Error creating group session topic field options',
+      });
+
+      return await promise;
+    },
+    onSuccess: (_data: string[]) => {
+      groupSessionsTopicFieldOptionsQuery.refetch();
+      return true;
+    },
+  });
 
   // get group session by recordId
 
@@ -132,6 +152,7 @@ export default function useGroupSessions(startDate: string, endDate: string) {
   return {
     groupSessionsQuery,
     groupSessionsTopicFieldOptionsQuery,
+    createGroupSessionsTopicFieldOptionsMutation,
 
     createGroupSessionMutation,
     updateGroupSessionMutation,

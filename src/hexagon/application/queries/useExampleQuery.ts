@@ -22,6 +22,7 @@ export interface UseExampleQueryReturnType {
 export const useExampleQuery = (
   pageSize: number,
   audioRequired?: boolean,
+  disableCache: boolean = false,
 ): UseExampleQueryReturnType => {
   const [page, setPage] = useState(1);
   const [currentPageSize, setCurrentPageSize] = useState(pageSize);
@@ -99,6 +100,7 @@ export const useExampleQuery = (
           page: prefetchRequest ? page + 1 : page,
           limit: currentPageSize,
           seed: seed!,
+          disableCache,
         },
       );
       return { examples, totalCount };
@@ -112,6 +114,7 @@ export const useExampleQuery = (
       page,
       currentPageSize,
       seed,
+      disableCache,
     ],
   );
 
