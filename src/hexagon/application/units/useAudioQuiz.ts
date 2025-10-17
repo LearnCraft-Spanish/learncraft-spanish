@@ -222,14 +222,26 @@ export function useAudioQuiz({
     }
   }, [safeExamples, currentExampleIndex]);
 
+  const breakOnce = useRef(false);
+
   // Parses the audio example at the given index
   const parseAudioExample = useCallback(
     async (safeIndex: number) => {
-      if (examplesConsideredForParsing.current.includes(safeIndex)) {
+      if (safeIndex === 7 && !breakOnce.current) {
+        breakOnce.current = true;
+        console.log('breaking once');
+        markExampleAsBad(safeExamples[safeIndex].id);
+        return;
+      }
+      if (
+        examplesConsideredForParsing.current.includes(
+          safeExamples[safeIndex].id,
+        )
+      ) {
         return;
       }
       // Mark that a parse is in progress to prevent race conditions
-      examplesConsideredForParsing.current.push(safeIndex);
+      examplesConsideredForParsing.current.push(safeExamples[safeIndex].id);
 
       // Get the example to parse
       const example = safeExamples[safeIndex];
@@ -286,13 +298,11 @@ export function useAudioQuiz({
   const nextAudioExample: SpeakingQuizExample | ListeningQuizExample | null =
     useMemo(() => {
       const parsedExample = parsedExamples[nextExampleMemo?.id ?? -1];
-      if (!parsedExample) {
+      if (!parsedExample && nextExampleMemo?.id) {
         if (
-          !examplesConsideredForParsing.current.includes(
-            currentExampleIndex + 1,
-          )
+          !examplesConsideredForParsing.current.includes(nextExampleMemo.id)
         ) {
-          parseAudioExample(currentExampleIndex + 1);
+          parseAudioExample(nextExampleMemo.id);
         }
         return null;
       }
@@ -304,12 +314,13 @@ export function useAudioQuiz({
     }, [
       parsedExamples,
       nextExampleMemo,
+      examplesConsideredForParsing,
       audioQuizType,
       parseAudioExample,
-      currentExampleIndex,
     ]);
 
   const nextExampleReady = useMemo(() => {
+    console.log('nextExampleReady', nextAudioExample);
     return nextAudioExample !== null;
   }, [nextAudioExample]);
 
@@ -318,11 +329,11 @@ export function useAudioQuiz({
     | ListeningQuizExample
     | null = useMemo(() => {
     const parsedExample = parsedExamples[previousExampleMemo?.id ?? -1];
-    if (!parsedExample) {
+    if (!parsedExample && previousExampleMemo?.id) {
       if (
-        !examplesConsideredForParsing.current.includes(currentExampleIndex - 1)
+        !examplesConsideredForParsing.current.includes(previousExampleMemo.id)
       ) {
-        parseAudioExample(currentExampleIndex - 1);
+        parseAudioExample(previousExampleMemo.id);
       }
       return null;
     }
@@ -336,7 +347,7 @@ export function useAudioQuiz({
     previousExampleMemo,
     audioQuizType,
     parseAudioExample,
-    currentExampleIndex,
+    examplesConsideredForParsing,
   ]);
 
   const previousExampleReady = useMemo(() => {
@@ -530,14 +541,18 @@ export function useAudioQuiz({
     if (!currentExampleReady) {
       // Parse the current audio example
       parseAudioExample(currentExampleIndex);
-    } else if (currentExampleReady && !nextExampleReady) {
+    } else if (
+      currentExampleReady &&
+      !nextExampleReady &&
+      nextExampleMemo?.id
+    ) {
       // Parse the next audio example
-      if (
-        examplesConsideredForParsing.current.includes(currentExampleIndex + 1)
-      ) {
+      console.log('parsing next example');
+      if (examplesConsideredForParsing.current.includes(nextExampleMemo.id)) {
+        console.log('already parsed next example');
         return;
       }
-      parseAudioExample(currentExampleIndex + 1);
+      parseAudioExample(nextExampleMemo.id);
     } else if (
       currentExampleReady &&
       nextExampleReady &&
@@ -545,33 +560,10 @@ export function useAudioQuiz({
     ) {
       // Parse the previous audio example
       if (
-        examplesConsideredForParsing.current.includes(currentExampleIndex - 1)
+        previousExampleMemo?.id &&
+        !examplesConsideredForParsing.current.includes(previousExampleMemo.id)
       ) {
-        return;
-      }
-      parseAudioExample(currentExampleIndex - 1);
-    } else if (
-      currentExampleReady &&
-      nextExampleReady &&
-      previousExampleReady
-    ) {
-      // All adjacent examples are parsed, now prefetch blobs for better autoplay performance
-      // Prefetch next 2 examples if they exist and aren't already parsed
-      for (
-        let i = currentExampleIndex + 20;
-        i <= currentExampleIndex + 3;
-        i++
-      ) {
-        if (
-          i < safeExamples.length &&
-          !examplesConsideredForParsing.current.includes(i)
-        ) {
-          const example = safeExamples[i];
-          if (example && !parsedExamples[example.id]) {
-            parseAudioExample(i);
-            break; // Parse one at a time to avoid overwhelming the system
-          }
-        }
+        parseAudioExample(previousExampleMemo.id);
       }
     }
   }, [
@@ -583,6 +575,8 @@ export function useAudioQuiz({
     parseAudioExample,
     safeExamples,
     audioQuizType,
+    nextExampleMemo,
+    previousExampleMemo,
     parsedExamples,
   ]);
 
