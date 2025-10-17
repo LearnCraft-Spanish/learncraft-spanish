@@ -222,17 +222,9 @@ export function useAudioQuiz({
     }
   }, [safeExamples, currentExampleIndex]);
 
-  const breakOnce = useRef(false);
-
   // Parses the audio example at the given index
   const parseAudioExample = useCallback(
     async (safeIndex: number) => {
-      if (safeIndex === 7 && !breakOnce.current) {
-        breakOnce.current = true;
-        console.log('breaking once');
-        markExampleAsBad(safeExamples[safeIndex].id);
-        return;
-      }
       if (
         safeExamples[safeIndex]?.id &&
         examplesConsideredForParsing.current.includes(
@@ -274,8 +266,11 @@ export function useAudioQuiz({
   // These references are for the audio-quiz-specific types.
   const currentAudioExample: SpeakingQuizExample | ListeningQuizExample | null =
     useMemo(() => {
+      if (!currentExampleMemo) {
+        return null;
+      }
       const parsedExample: AudioQuizExample | undefined =
-        parsedExamples[currentExampleMemo?.id ?? -1];
+        parsedExamples[currentExampleMemo?.id];
       if (!parsedExample) {
         parseAudioExample(currentExampleIndex);
         return null;
@@ -299,8 +294,12 @@ export function useAudioQuiz({
 
   const nextAudioExample: SpeakingQuizExample | ListeningQuizExample | null =
     useMemo(() => {
-      const parsedExample = parsedExamples[nextExampleMemo?.id ?? -1];
-      if (!parsedExample && nextExampleMemo?.id) {
+      if (!nextExampleMemo) {
+        return null;
+      }
+      const parsedExample: AudioQuizExample | undefined =
+        parsedExamples[nextExampleMemo.id];
+      if (!parsedExample) {
         if (
           !examplesConsideredForParsing.current.includes(nextExampleMemo.id)
         ) {
@@ -323,7 +322,6 @@ export function useAudioQuiz({
     ]);
 
   const nextExampleReady = useMemo(() => {
-    console.log('nextExampleReady', nextAudioExample);
     return nextAudioExample !== null;
   }, [nextAudioExample]);
 
@@ -331,8 +329,11 @@ export function useAudioQuiz({
     | SpeakingQuizExample
     | ListeningQuizExample
     | null = useMemo(() => {
+    if (!previousExampleMemo) {
+      return null;
+    }
     const parsedExample: AudioQuizExample | undefined =
-      parsedExamples[previousExampleMemo?.id ?? -1];
+      parsedExamples[previousExampleMemo?.id];
     if (!parsedExample && previousExampleMemo?.id) {
       if (
         !examplesConsideredForParsing.current.includes(previousExampleMemo.id)
@@ -551,10 +552,8 @@ export function useAudioQuiz({
       !nextExampleReady &&
       nextExampleMemo?.id
     ) {
-      // Parse the next audio example
-      console.log('parsing next example');
+      // Parse the next audio example unless it has already been considered for parsing
       if (examplesConsideredForParsing.current.includes(nextExampleMemo.id)) {
-        console.log('already parsed next example');
         return;
       }
       parseAudioExample(currentExampleIndex + 1);
@@ -563,7 +562,7 @@ export function useAudioQuiz({
       nextExampleReady &&
       !previousExampleReady
     ) {
-      // Parse the previous audio example
+      // Parse the previous audio example unless it has already been considered for parsing
       if (
         previousExampleMemo?.id &&
         !examplesConsideredForParsing.current.includes(previousExampleMemo.id)
