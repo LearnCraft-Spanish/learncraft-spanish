@@ -23,6 +23,7 @@ export function createExampleInfrastructure(
       page: number;
       limit: number;
       seed: string;
+      disableCache?: boolean;
     }) => {
       // Always use lesson ranges - no more backward compatibility
       const filters = {
@@ -40,6 +41,7 @@ export function createExampleInfrastructure(
         limit: params.limit,
         filters,
         seed: params.seed,
+        disableCache: params.disableCache ?? false,
       });
       return response;
     },

@@ -4,6 +4,7 @@ export default function SubSectionHeader({
   isOpen,
   openFunction,
   button,
+  sortingComponent,
 }: {
   title: string;
   recordCountString: string;
@@ -11,6 +12,7 @@ export default function SubSectionHeader({
   openFunction: (title: string) => void;
   headerSize?: 'h3';
   button?: React.ReactNode;
+  sortingComponent?: React.ReactNode;
 }) {
   return (
     <div className="sectionHeader">
@@ -26,6 +28,8 @@ export default function SubSectionHeader({
         <h3>{title}</h3>
         <p>{recordCountString}</p>
       </div>
+      {isOpen && sortingComponent}
+
       {isOpen && button}
     </div>
   );

@@ -3,6 +3,8 @@ import type { Flashcard } from '@learncraft-spanish/shared';
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { usePagination } from '@application/units/Pagination/usePagination';
 import { useCallback, useMemo, useState } from 'react';
+import { useAuthAdapter } from '../../adapters/authAdapter';
+import { useActiveStudent } from '../../coordinators/hooks/useActiveStudent';
 
 export interface UseFlashcardManagerReturn {
   allFlashcards: Flashcard[];
@@ -15,6 +17,7 @@ export interface UseFlashcardManagerReturn {
 
   studentFlashcardsLoading: boolean;
   filteredFlashcardsLoading: boolean;
+  dependenciesLoading: boolean;
   error: Error | null;
 }
 
@@ -23,6 +26,9 @@ export default function useFlashcardManager({
 }: {
   enableFilteringByDefault: boolean;
 }): UseFlashcardManagerReturn {
+  const { isLoading: activeStudentLoading } = useActiveStudent();
+  const { isLoading: authLoading } = useAuthAdapter();
+
   // Arbitrary definition
   const PAGE_SIZE = 25;
 
@@ -64,7 +70,9 @@ export default function useFlashcardManager({
     setFilterOwnedFlashcards,
     onGoingToQuiz,
     studentFlashcardsLoading,
-    filteredFlashcardsLoading,
+    filteredFlashcardsLoading:
+      filteredFlashcardsLoading && filterOwnedFlashcards,
+    dependenciesLoading: activeStudentLoading || authLoading,
     error,
   };
 }

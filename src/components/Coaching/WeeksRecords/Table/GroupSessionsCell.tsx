@@ -18,10 +18,10 @@ import {
   TextAreaInput,
   verifyRequiredInputs,
 } from 'src/components/FormComponents';
-
 import { isValidUrl } from 'src/components/FormComponents/functions/inputValidation';
 
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
+
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import * as helpers from 'src/hooks/CoachingData/helperFunctions';
@@ -33,6 +33,7 @@ import {
   useWeeks,
 } from 'src/hooks/CoachingData/queries';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';
+import CustomGroupSessionTopicSelector from '../../general/CustomGroupSessionTopicSelector';
 import getLoggedInCoach from '../../general/functions/getLoggedInCoach';
 
 const sessionTypeOptions = [
@@ -157,10 +158,10 @@ export function GroupSessionView({
     relatedWeekStarts,
     getWeekEnds(relatedWeekStarts),
   );
-  const { groupSessionsTopicFieldOptionsQuery } = useGroupSessions(
-    relatedWeekStarts,
-    getWeekEnds(relatedWeekStarts),
-  );
+  const {
+    groupSessionsTopicFieldOptionsQuery,
+    createGroupSessionsTopicFieldOptionsMutation,
+  } = useGroupSessions(relatedWeekStarts, getWeekEnds(relatedWeekStarts));
 
   // Rendering
   const dataReady =
@@ -615,7 +616,7 @@ export function GroupSessionView({
           />
         )}
       </div>
-      <Dropdown
+      {/* <Dropdown
         value={topic}
         onChange={setTopic}
         editMode={editMode}
@@ -633,6 +634,16 @@ export function GroupSessionView({
             : []
         }
         label="Topic"
+      /> */}
+      <CustomGroupSessionTopicSelector
+        selectedTopic={topic}
+        selectTopicFunction={setTopic}
+        topicOptions={groupSessionsTopicFieldOptionsQuery.data || []}
+        addNewTopicFunction={
+          createGroupSessionsTopicFieldOptionsMutation.mutate
+        }
+        removeSelectedTopicFunction={() => setTopic('')}
+        isLoading={groupSessionsTopicFieldOptionsQuery.isLoading}
       />
       <TextAreaInput
         label="Comments"

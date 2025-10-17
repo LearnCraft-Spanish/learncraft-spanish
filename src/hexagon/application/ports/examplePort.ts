@@ -20,6 +20,7 @@ export interface ExamplePort {
     page,
     limit,
     seed,
+    disableCache,
   }: {
     lessonRanges: LessonRange[]; // Always required - no more single course params
     excludeSpanglish?: boolean;
@@ -28,5 +29,6 @@ export interface ExamplePort {
     page: number;
     limit: number;
     seed: string;
+    disableCache?: boolean;
   }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
 }

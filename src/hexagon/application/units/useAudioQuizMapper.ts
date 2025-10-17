@@ -42,9 +42,75 @@ import type {
   SpeakingQuizExample,
 } from '@domain/audioQuizzing';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { useAudioTranscoderAdapter } from '@application/adapters/audioTranscoderAdapter';
+import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback } from 'react';
+
+// Import silence audio files so Vite can process them at build time
+import silence1s from 'src/assets/audio/1s.mp3';
+import silence2s from 'src/assets/audio/2s.mp3';
+import silence3s from 'src/assets/audio/3s.mp3';
+import silence4s from 'src/assets/audio/4s.mp3';
+import silence5s from 'src/assets/audio/5s.mp3';
+import silence6s from 'src/assets/audio/6s.mp3';
+import silence7s from 'src/assets/audio/7s.mp3';
+import silence8s from 'src/assets/audio/8s.mp3';
+import silence9s from 'src/assets/audio/9s.mp3';
+import silence10s from 'src/assets/audio/10s.mp3';
+import silence11s from 'src/assets/audio/11s.mp3';
+import silence12s from 'src/assets/audio/12s.mp3';
+import silence13s from 'src/assets/audio/13s.mp3';
+import silence14s from 'src/assets/audio/14s.mp3';
+import silence15s from 'src/assets/audio/15s.mp3';
+import silence16s from 'src/assets/audio/16s.mp3';
+import silence17s from 'src/assets/audio/17s.mp3';
+import silence18s from 'src/assets/audio/18s.mp3';
+import silence19s from 'src/assets/audio/19s.mp3';
+import silence20s from 'src/assets/audio/20s.mp3';
+import silence21s from 'src/assets/audio/21s.mp3';
+import silence22s from 'src/assets/audio/22s.mp3';
+import silence23s from 'src/assets/audio/23s.mp3';
+import silence24s from 'src/assets/audio/24s.mp3';
+import silence25s from 'src/assets/audio/25s.mp3';
+import silence26s from 'src/assets/audio/26s.mp3';
+import silence27s from 'src/assets/audio/27s.mp3';
+import silence28s from 'src/assets/audio/28s.mp3';
+import silence29s from 'src/assets/audio/29s.mp3';
+import silence30s from 'src/assets/audio/30s.mp3';
+
+// Map duration (in seconds) to imported audio file URL
+const SILENCE_AUDIO_MAP: Record<number, string> = {
+  1: silence1s,
+  2: silence2s,
+  3: silence3s,
+  4: silence4s,
+  5: silence5s,
+  6: silence6s,
+  7: silence7s,
+  8: silence8s,
+  9: silence9s,
+  10: silence10s,
+  11: silence11s,
+  12: silence12s,
+  13: silence13s,
+  14: silence14s,
+  15: silence15s,
+  16: silence16s,
+  17: silence17s,
+  18: silence18s,
+  19: silence19s,
+  20: silence20s,
+  21: silence21s,
+  22: silence22s,
+  23: silence23s,
+  24: silence24s,
+  25: silence25s,
+  26: silence26s,
+  27: silence27s,
+  28: silence28s,
+  29: silence29s,
+  30: silence30s,
+};
 
 export interface AudioQuizMapperReturn {
   /**
@@ -58,16 +124,6 @@ export interface AudioQuizMapperReturn {
     speaking: SpeakingQuizExample;
     listening: ListeningQuizExample;
   }>;
-
-  /**
-   * Check if the audio transcoder is currently loading/initializing
-   */
-  isAudioTranscoderLoading: () => boolean;
-
-  /**
-   * Get the current loading progress (0-100)
-   */
-  audioTranscoderLoadingProgress: () => number;
 }
 
 /**
@@ -111,6 +167,8 @@ export interface AudioQuizMapperReturn {
  * - Maintains quiz integrity on audio errors
  */
 export function useAudioQuizMapper(): AudioQuizMapperReturn {
+  const { getAudioDurationSeconds } = useAudioAdapter();
+
   /**
    * Parse an example for audio quizzing
    *
@@ -120,13 +178,6 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
    * - Handles quiz-specific audio processing requirements
    */
 
-  const {
-    mp3ToWav,
-    generateSilence,
-    concatenateAudio,
-    isLoading,
-    loadingProgress,
-  } = useAudioTranscoderAdapter();
   // Create function with useCallback
   const parseExampleForQuiz = useCallback(
     async (
@@ -135,114 +186,127 @@ export function useAudioQuizMapper(): AudioQuizMapperReturn {
       speaking: SpeakingQuizExample;
       listening: ListeningQuizExample;
     }> => {
-      // Business rule: Determine which audio to use based on quiz type
-      const spanishText = example.spanish;
-      const englishText = example.english;
-      const guessText = 'Make a guess!';
-      const hintText = 'Listen to Audio';
-      const listeningQuestionText = 'Listen to Audio';
-      const spanishAudioUrl = example.spanishAudio;
-      const englishAudioUrl = example.englishAudio;
+      try {
+        // Business rule: Determine which audio to use based on quiz type
+        const spanishText = example.spanish;
+        const englishText = example.english;
+        const guessText = 'Make a guess!';
+        const hintText = 'Listen to Audio';
+        const listeningQuestionText = 'Listen to Audio';
+        const spanishAudioUrl = example.spanishAudio;
+        const englishAudioUrl = example.englishAudio;
 
-      // Business rule: Apply appropriate buffer duration
-      const BUFFER_LENGTH_SECONDS = 3;
+        let englishAudioDurationSeconds: number;
+        let spanishAudioDurationSeconds: number;
+        try {
+          englishAudioDurationSeconds =
+            await getAudioDurationSeconds(englishAudioUrl);
+          spanishAudioDurationSeconds =
+            await getAudioDurationSeconds(spanishAudioUrl);
+        } catch (error) {
+          console.error(error);
+          throw new Error('Failed to parse audio durations', { cause: error });
+        }
 
-      // Use transcoding port for raw audio operations
-      const spanishAudioBlob = await mp3ToWav(spanishAudioUrl);
-      const englishAudioBlob = await mp3ToWav(englishAudioUrl);
-      const silenceBlob = await generateSilence(BUFFER_LENGTH_SECONDS);
-      const combinedSpanishAudioBlob = await concatenateAudio([
-        spanishAudioBlob,
-        silenceBlob,
-      ]);
-      const combinedEnglishAudioBlob = await concatenateAudio([
-        englishAudioBlob,
-        silenceBlob,
-      ]);
+        // Business rule: Calculate silence duration and get the appropriate audio file
+        const guessSilenceLengthSeconds = englishAudioDurationSeconds * 1.5;
+        const guessSilenceLengthRounded = Math.ceil(guessSilenceLengthSeconds);
 
-      // Create a silence blob that matches the total duration of the English audio
-      const guessSilenceBlob = await generateSilence(
-        combinedEnglishAudioBlob.durationSec,
-      );
+        // Clamp to available silence durations (1-30 seconds)
+        const clampedSilenceDuration = Math.max(
+          1,
+          Math.min(30, guessSilenceLengthRounded),
+        );
 
-      // Create both quiz examples using the same audio blobs
-      const speakingExample: SpeakingQuizExample = {
-        type: AudioQuizType.Speaking,
-        question: {
-          step: AudioQuizStep.Question,
-          spanish: false,
-          displayText: englishText,
-          blobUrl: combinedEnglishAudioBlob.url,
-          duration: combinedEnglishAudioBlob.durationSec,
-        },
-        guess: {
-          step: AudioQuizStep.Guess,
-          spanish: false,
-          displayText: guessText,
-          blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
-          duration: guessSilenceBlob.durationSec,
-        },
-        hint: {
-          step: AudioQuizStep.Hint,
-          spanish: true,
-          displayText: hintText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-        answer: {
-          step: AudioQuizStep.Answer,
-          spanish: true,
-          displayText: spanishText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-      };
+        // Get the imported audio URL from the map
+        const guessMp3Path = SILENCE_AUDIO_MAP[clampedSilenceDuration];
 
-      const listeningExample: ListeningQuizExample = {
-        type: AudioQuizType.Listening,
-        question: {
-          step: AudioQuizStep.Question,
-          spanish: true,
-          displayText: listeningQuestionText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-        guess: {
-          step: AudioQuizStep.Guess,
-          spanish: false,
-          displayText: guessText,
-          blobUrl: guessSilenceBlob.url, // Use full-duration silence for guess step
-          duration: guessSilenceBlob.durationSec,
-        },
-        hint: {
-          step: AudioQuizStep.Hint,
-          spanish: true,
-          displayText: spanishText,
-          blobUrl: combinedSpanishAudioBlob.url,
-          duration: combinedSpanishAudioBlob.durationSec,
-        },
-        answer: {
-          step: AudioQuizStep.Answer,
-          spanish: false,
-          displayText: englishText,
-          blobUrl: combinedEnglishAudioBlob.url,
-          duration: combinedEnglishAudioBlob.durationSec,
-        },
-      };
+        if (!guessMp3Path) {
+          throw new Error(
+            `No silence audio file found for ${clampedSilenceDuration} seconds`,
+          );
+        }
 
-      const audioQuizExample: AudioQuizExample = {
-        speaking: speakingExample,
-        listening: listeningExample,
-      };
+        // Create both quiz examples using the same audio blobs
+        const speakingExample: SpeakingQuizExample = {
+          type: AudioQuizType.Speaking,
+          question: {
+            step: AudioQuizStep.Question,
+            spanish: false,
+            displayText: englishText,
+            mp3AudioUrl: englishAudioUrl,
+            duration: englishAudioDurationSeconds,
+          },
+          guess: {
+            step: AudioQuizStep.Guess,
+            spanish: false,
+            displayText: guessText,
+            mp3AudioUrl: guessMp3Path, // Use full-duration silence for guess step
+            duration: clampedSilenceDuration,
+          },
+          hint: {
+            step: AudioQuizStep.Hint,
+            spanish: true,
+            displayText: hintText,
+            mp3AudioUrl: spanishAudioUrl,
+            duration: spanishAudioDurationSeconds,
+          },
+          answer: {
+            step: AudioQuizStep.Answer,
+            spanish: true,
+            displayText: spanishText,
+            mp3AudioUrl: spanishAudioUrl,
+            duration: spanishAudioDurationSeconds,
+          },
+        };
 
-      return audioQuizExample;
+        const listeningExample: ListeningQuizExample = {
+          type: AudioQuizType.Listening,
+          question: {
+            step: AudioQuizStep.Question,
+            spanish: true,
+            displayText: listeningQuestionText,
+            mp3AudioUrl: spanishAudioUrl,
+            duration: spanishAudioDurationSeconds,
+          },
+          guess: {
+            step: AudioQuizStep.Guess,
+            spanish: false,
+            displayText: guessText,
+            mp3AudioUrl: guessMp3Path, // Use full-duration silence for guess step
+            duration: clampedSilenceDuration,
+          },
+          hint: {
+            step: AudioQuizStep.Hint,
+            spanish: true,
+            displayText: spanishText,
+            mp3AudioUrl: spanishAudioUrl,
+            duration: spanishAudioDurationSeconds,
+          },
+          answer: {
+            step: AudioQuizStep.Answer,
+            spanish: false,
+            displayText: englishText,
+            mp3AudioUrl: englishAudioUrl,
+            duration: englishAudioDurationSeconds,
+          },
+        };
+
+        const audioQuizExample: AudioQuizExample = {
+          speaking: speakingExample,
+          listening: listeningExample,
+        };
+
+        return audioQuizExample;
+      } catch (error) {
+        console.error(error);
+        throw new Error('Failed to parse example for quiz', { cause: error });
+      }
     },
-    [mp3ToWav, generateSilence, concatenateAudio],
+    [getAudioDurationSeconds],
   );
 
   return {
     parseExampleForQuiz,
-    isAudioTranscoderLoading: isLoading,
-    audioTranscoderLoadingProgress: loadingProgress,
   };
 }

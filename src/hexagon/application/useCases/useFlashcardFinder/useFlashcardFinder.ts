@@ -11,6 +11,7 @@ import useQueryPagination from '@application/units/Pagination/useQueryPagination
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useEffect, useMemo, useRef } from 'react';
+import { useAuthAdapter } from '../../adapters/authAdapter';
 import { useSkillTagSearch } from '../../units/useSkillTagSearch';
 
 export interface UseFlashcardFinderReturnType {
@@ -30,12 +31,18 @@ export interface UseFlashcardFinderReturnType {
 }
 
 export default function useFlashcardFinder(): UseFlashcardFinderReturnType {
+  // isCoach or isAdmin
+  const { isCoach, isAdmin } = useAuthAdapter();
   const { lessonPopup } = useLessonPopup();
 
   const QUERY_PAGE_SIZE = 150;
   const PAGE_SIZE = 25;
 
-  const exampleQuery = useExampleQuery(QUERY_PAGE_SIZE);
+  const exampleQuery = useExampleQuery(
+    QUERY_PAGE_SIZE,
+    false,
+    isCoach || isAdmin, // disable cache if isCoach or isAdmin
+  );
 
   const pagination: QueryPaginationState = useQueryPagination({
     queryPage: exampleQuery.page,

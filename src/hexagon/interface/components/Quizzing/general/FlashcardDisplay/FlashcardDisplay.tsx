@@ -28,8 +28,7 @@ export function FlashcardDisplay({
     exampleIsAdding,
     exampleIsRemoving,
   } = quizExample;
-  const audioActive =
-    (answerShowing && answer.hasAudio) || (!answerShowing && question.hasAudio);
+
   const audioUrl =
     answerShowing && answer.hasAudio
       ? answer.audioUrl
@@ -102,9 +101,7 @@ export function FlashcardDisplay({
       )}
 
       {/* Click to flip */}
-      <div
-        className={`clickToFlipMessage ${audioActive ? 'flashcardWithAudio' : ''}`}
-      >
+      <div className="clickToFlipMessage">
         <b>Click to flip</b>
       </div>
 

@@ -21,4 +21,7 @@ export interface AudioPort {
 
   // Completely cleans up audio state
   cleanupAudio: () => void;
+
+  // Gets the duration of an audio file in seconds
+  getAudioDurationSeconds: (audioUrl: string) => Promise<number>;
 }

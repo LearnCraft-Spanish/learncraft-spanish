@@ -3,7 +3,6 @@ import { BannerDisplayProvider } from '@application/coordinators/providers/Banne
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
-import { AudioTranscodingProvider } from '@composition/providers/AudioTranscodingProvider';
 import TempIdContextProvider from './TempIdContextProvider';
 
 export default function MainProvider({
@@ -17,11 +16,9 @@ export default function MainProvider({
         <ActiveStudentProvider>
           <SelectedCourseAndLessonsProvider>
             <AudioEngineProvider>
-              <AudioTranscodingProvider>
-                <ExampleFilterContextProvider>
-                  {children}
-                </ExampleFilterContextProvider>
-              </AudioTranscodingProvider>
+              <ExampleFilterContextProvider>
+                {children}
+              </ExampleFilterContextProvider>
             </AudioEngineProvider>
           </SelectedCourseAndLessonsProvider>
         </ActiveStudentProvider>
