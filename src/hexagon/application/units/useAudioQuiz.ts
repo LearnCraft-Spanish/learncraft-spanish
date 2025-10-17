@@ -234,7 +234,7 @@ export function useAudioQuiz({
         return;
       }
       if (
-        safeExamples[safeIndex].id &&
+        safeExamples[safeIndex]?.id &&
         examplesConsideredForParsing.current.includes(
           safeExamples[safeIndex].id,
         )
