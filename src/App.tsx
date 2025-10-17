@@ -22,9 +22,8 @@ export const App: React.FC = () => {
       <ExtraCoachingCTA />
       <Nav />
       {location.pathname !== '/student-drill-down' &&
-        location.pathname !== '/comprehensionquiz' &&
-        location.pathname !== '/myflashcards/quiz' &&
-        location.pathname !== '/myflashcards/srsquiz' &&
+        location.pathname !== '/customquiz' &&
+        location.pathname !== '/myflashcards' &&
         location.pathname !== '/coaching-dashboard' &&
         location.pathname.split('/')[1] !== 'officialquizzes' && <SubHeader />}
 

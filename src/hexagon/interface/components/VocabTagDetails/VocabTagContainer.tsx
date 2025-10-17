@@ -1,5 +1,7 @@
 import type { Vocabulary } from '@learncraft-spanish/shared';
 import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
+import { useEffect, useRef, useState } from 'react';
+
 import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
 import { InlineLoading } from '../Loading';
 import './VocabTagContainer.scss';
@@ -23,9 +25,110 @@ export default function VocabTagContainer({
   isSelected: boolean;
 }) {
   const { course } = useSelectedCourseAndLessons();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const [popupPosition, setPopupPosition] = useState<{
+    vertical: 'top' | 'bottom';
+    horizontal: 'left' | 'right' | 'center';
+  }>({ vertical: 'top', horizontal: 'center' });
+  const [isPositionCalculated, setIsPositionCalculated] = useState(false);
+
+  // Function to detect overflow and adjust positioning
+  const adjustPopupPosition = () => {
+    if (!containerRef.current || !popupRef.current) return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const popupRect = popupRef.current.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let vertical: 'top' | 'bottom' = 'top';
+    let horizontal: 'left' | 'right' | 'center' = 'center';
+
+    // Check vertical overflow (top/bottom)
+    const spaceAbove = containerRect.top;
+    const spaceBelow = viewportHeight - containerRect.bottom;
+    const popupHeight = popupRect.height;
+
+    if (spaceAbove < popupHeight && spaceBelow > spaceAbove) {
+      vertical = 'bottom';
+    }
+
+    // Check horizontal overflow (left/right)
+    const spaceLeft = containerRect.left;
+    const spaceRight = viewportWidth - containerRect.right;
+    const popupWidth = popupRect.width;
+
+    // Calculate if popup would overflow when centered
+    const centerOverflowLeft = spaceLeft < popupWidth / 2;
+    const centerOverflowRight = spaceRight < popupWidth / 2;
+
+    if (centerOverflowLeft && centerOverflowRight) {
+      // Not enough space on either side, choose the side with more space
+      if (spaceLeft > spaceRight) {
+        horizontal = 'left';
+      } else {
+        horizontal = 'right';
+      }
+    } else if (centerOverflowLeft) {
+      // Would overflow left when centered, check if right positioning works
+      if (spaceRight >= popupWidth) {
+        horizontal = 'left';
+      } else {
+        // Even right positioning would overflow, use left with max-width constraint
+        horizontal = 'right';
+      }
+    } else if (centerOverflowRight) {
+      // Would overflow right when centered, check if left positioning works
+      if (spaceLeft >= popupWidth) {
+        horizontal = 'right';
+      } else {
+        // Even left positioning would overflow, use right with max-width constraint
+        horizontal = 'left';
+      }
+    } else {
+      // Enough space on both sides, center it
+      horizontal = 'center';
+    }
+
+    setPopupPosition({ vertical, horizontal });
+    setIsPositionCalculated(true);
+  };
+
+  // Reset positioning state when popup opens/closes
+  useEffect(() => {
+    setIsPositionCalculated(false);
+  }, [isSelected, contextual, exampleId, vocabulary.id]);
+
+  // Adjust position when popup becomes visible
+  useEffect(() => {
+    if (
+      isSelected &&
+      contextual === `vocabInfo-${exampleId}-${vocabulary.id}`
+    ) {
+      // Small delay to ensure popup is rendered
+      const timeoutId = setTimeout(adjustPopupPosition, 10);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isSelected, contextual, exampleId, vocabulary.id]);
+
+  // Handle window resize to recalculate position
+  useEffect(() => {
+    const handleResize = () => {
+      if (
+        isSelected &&
+        contextual === `vocabInfo-${exampleId}-${vocabulary.id}`
+      ) {
+        adjustPopupPosition();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [isSelected, contextual, exampleId, vocabulary.id]);
 
   return (
-    <div className="vocabTagContainer" key={vocabulary.id}>
+    <div className="vocabTagContainer" key={vocabulary.id} ref={containerRef}>
       <div
         className={`vocabTag ${
           isSelected && contextual === `vocabInfo-${exampleId}-${vocabulary.id}`
@@ -47,7 +150,10 @@ export default function VocabTagContainer({
         {vocabulary.word}
       </div>
       {contextual === `vocabInfo-${exampleId}-${vocabulary.id}` && (
-        <div className="vocabInfo">
+        <div
+          className={`vocabInfo ${popupPosition.vertical} ${popupPosition.horizontal} ${!isPositionCalculated ? 'positioning' : ''}`}
+          ref={popupRef}
+        >
           <div className="vocabInfoHeader">
             <h4>{vocabulary.word}</h4>
             <p>{vocabulary.descriptor}</p>

@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
+import wheelIcon from 'src/assets/Icon_White.svg';
 import addIcon from 'src/assets/icons/add-button.svg';
 import trash from 'src/assets/icons/trashcan-dark.svg';
+
 import './AddPendingRemove.scss';
 
 export default function AddPendingRemove({
@@ -29,21 +31,20 @@ export default function AddPendingRemove({
     if (isRemoving) {
       return {
         text: 'Removing...',
-        buttonClass: 'disabledButton',
-        textClass: 'disabledText',
-        iconClass: 'disabledIcon',
+        buttonClass: 'removingButton',
+        textClass: 'removingText',
+        iconClass: 'removingIcon',
         onClickFunction: () => {},
-        icon: null,
+        icon: wheelIcon,
       };
     } else if (isAdding) {
       return {
         text: 'Adding...',
-        buttonClass: 'disabledButton',
-        textClass: 'disabledText',
-        iconClass: 'disabledIcon',
-
+        buttonClass: 'addingButton',
+        textClass: 'addingText',
+        iconClass: 'addingIcon',
         onClickFunction: () => {},
-        icon: null,
+        icon: wheelIcon,
       };
     }
     if (!isCollected) {

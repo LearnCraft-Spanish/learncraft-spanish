@@ -1,0 +1,9 @@
+.sortingComponentWrapper {
+  align-self: center;
+  justify-content: center;
+  .lineWrapper .label {
+    padding-top: 0;
+    min-width: 0;
+    margin-left: 10px;
+  }
+}

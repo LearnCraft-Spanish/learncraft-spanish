@@ -26,6 +26,8 @@ describe('initial render', () => {
         closeQuiz={unReadyQuiz}
         isFirstExample={true}
         isLastExample={false}
+        nextExampleReady={true}
+        previousExampleReady={true}
       />,
     );
     expect(screen.getByText('Previous')).toBeTruthy();
@@ -50,6 +52,8 @@ describe('audioOrComprehension is audio', () => {
         closeQuiz={unReadyQuiz}
         isFirstExample={true}
         isLastExample={false}
+        nextExampleReady={true}
+        previousExampleReady={true}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();
@@ -72,6 +76,8 @@ describe('audioOrComprehension is comprehension', () => {
         closeQuiz={unReadyQuiz}
         isFirstExample={true}
         isLastExample={false}
+        nextExampleReady={true}
+        previousExampleReady={true}
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();

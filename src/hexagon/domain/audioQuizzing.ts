@@ -18,7 +18,7 @@ export const AudioQuizStepPropertiesSchema = z.object({
   step: z.nativeEnum(AudioQuizStep),
   spanish: z.boolean(),
   displayText: z.string().min(1),
-  blobUrl: z.string().url(),
+  mp3AudioUrl: z.string().url(),
   duration: z.number().positive(),
 });
 

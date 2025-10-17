@@ -18,8 +18,10 @@ export interface TextQuizSetupReturn {
   startWithSpanish: boolean;
   setStartWithSpanish: (startWithSpanish: boolean) => void;
   canAccessCustom: boolean;
-  customOnly: boolean;
-  setCustomOnly: (customOnly: boolean) => void;
+  customFlashcardsChoice: 'included' | 'onlyCustom' | 'excluded';
+  setCustomFlashcardsChoice: (
+    customFlashcardsChoice: 'included' | 'onlyCustom' | 'excluded',
+  ) => void;
   examplesToQuiz: ExampleWithVocabulary[];
   isLoading: boolean;
   error: Error | null;
@@ -71,18 +73,28 @@ export function useTextQuizSetup({
   // Local states with boolean choices
   const [srsQuiz, setSrsQuiz] = useState<boolean>(true);
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
-  const [customOnly, setCustomOnly] = useState<boolean>(false);
+  const [customFlashcardsChoice, setCustomFlashcardsChoice] = useState<
+    'included' | 'onlyCustom' | 'excluded'
+  >('included'); // included is just "flashcards"
 
   // Find owned flashcards with the chosen criteria
   const allowedFlashcards: Flashcard[] | null = useMemo(() => {
     if (srsQuiz && canAccessSRS) {
-      if (customOnly && canAccessCustom) {
+      if (customFlashcardsChoice === 'onlyCustom' && canAccessCustom) {
         return customFlashcardsDueForReview ?? [];
+      } else if (customFlashcardsChoice === 'excluded' && canAccessCustom) {
+        return (
+          flashcardsDueForReview?.filter((flashcard) => !flashcard.custom) ?? []
+        );
       } else {
         return flashcardsDueForReview ?? [];
       }
-    } else if (customOnly && canAccessCustom) {
+    } else if (customFlashcardsChoice === 'onlyCustom' && canAccessCustom) {
       return customFlashcards ?? [];
+    } else if (customFlashcardsChoice === 'excluded' && canAccessCustom) {
+      return flashcards?.filter((flashcard) => !flashcard.custom) ?? [];
+    } else if (customFlashcardsChoice === 'included' && canAccessCustom) {
+      return flashcards ?? [];
     } else if (ownedOnly) {
       return flashcards ?? [];
     }
@@ -95,7 +107,7 @@ export function useTextQuizSetup({
     srsQuiz,
     canAccessSRS,
     canAccessCustom,
-    customOnly,
+    customFlashcardsChoice,
     ownedOnly,
   ]);
 
@@ -191,8 +203,8 @@ export function useTextQuizSetup({
     startWithSpanish,
     setStartWithSpanish,
     canAccessCustom, // DO NOT render Custom controls if false
-    customOnly,
-    setCustomOnly,
+    customFlashcardsChoice,
+    setCustomFlashcardsChoice,
     availableQuizLengths,
     setSelectedQuizLength,
     isLoading,

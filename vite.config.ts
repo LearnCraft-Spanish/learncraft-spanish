@@ -69,8 +69,6 @@ export default defineConfig(({ mode }) => {
     server: {
       port,
       open: true,
-      // Remove global Cross-Origin headers that interfere with Auth0
-      // FFmpeg will handle SharedArrayBuffer requirements internally when needed
     },
     css: {
       preprocessorOptions: {

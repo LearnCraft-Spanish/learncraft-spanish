@@ -34,7 +34,10 @@ export default function Dropdown({
           id={`dropdown-${camelLabel}`}
           className="content"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            e.preventDefault();
+            onChange(e.target.value);
+          }}
         >
           <option value={''}>{defaultOptionText || 'Select'}</option>
           {options.map((option) => (

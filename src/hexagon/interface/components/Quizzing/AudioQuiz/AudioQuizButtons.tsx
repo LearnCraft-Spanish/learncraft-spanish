@@ -3,32 +3,36 @@ import React from 'react';
 
 interface AudioQuizButtonsProps {
   audioQuizType: AudioQuizType;
-  currentStep: AudioQuizStep;
-  nextStep: () => void;
   autoplay: boolean;
-  nextExample: () => void;
-  previousExample: () => void;
-  goToQuestion: () => void;
-  goToHint: () => void;
-  restartCurrentStep: () => void;
   closeQuiz: () => void;
+  currentStep: AudioQuizStep;
+  goToHint: () => void;
+  goToQuestion: () => void;
   isFirstExample: boolean;
   isLastExample: boolean;
+  nextExample: () => void;
+  nextExampleReady: boolean;
+  nextStep: () => void;
+  previousExample: () => void;
+  previousExampleReady: boolean;
+  restartCurrentStep: () => void;
 }
 
 export default function AudioQuizButtons({
   audioQuizType,
-  currentStep,
-  nextStep,
   autoplay,
-  nextExample,
-  previousExample,
-  goToQuestion,
-  goToHint,
-  restartCurrentStep,
   closeQuiz,
+  currentStep,
+  goToHint,
+  goToQuestion,
   isFirstExample,
   isLastExample,
+  nextExample,
+  nextExampleReady,
+  nextStep,
+  previousExample,
+  previousExampleReady,
+  restartCurrentStep,
 }: AudioQuizButtonsProps): React.JSX.Element {
   function nextStepButtonText(): string {
     switch (audioQuizType) {
@@ -71,9 +75,6 @@ export default function AudioQuizButtons({
               return 'Next';
             }
         }
-        break;
-      default:
-        return 'Next';
     }
   }
 
@@ -138,12 +139,16 @@ export default function AudioQuizButtons({
         <button
           type="button"
           onClick={() => previousExample()}
-          disabled={isFirstExample}
+          disabled={isFirstExample || !previousExampleReady}
         >
           Previous
         </button>
 
-        <button type="button" onClick={() => nextExample()}>
+        <button
+          type="button"
+          onClick={() => nextExample()}
+          disabled={!nextExampleReady && !isLastExample}
+        >
           {isLastExample ? 'Finish' : 'Next'}
         </button>
       </div>
