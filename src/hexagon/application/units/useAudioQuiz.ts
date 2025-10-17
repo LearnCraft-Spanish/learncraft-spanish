@@ -274,7 +274,8 @@ export function useAudioQuiz({
   // These references are for the audio-quiz-specific types.
   const currentAudioExample: SpeakingQuizExample | ListeningQuizExample | null =
     useMemo(() => {
-      const parsedExample = parsedExamples[currentExampleMemo?.id ?? -1];
+      const parsedExample: AudioQuizExample | undefined =
+        parsedExamples[currentExampleMemo?.id ?? -1];
       if (!parsedExample) {
         parseAudioExample(currentExampleIndex);
         return null;
@@ -330,7 +331,8 @@ export function useAudioQuiz({
     | SpeakingQuizExample
     | ListeningQuizExample
     | null = useMemo(() => {
-    const parsedExample = parsedExamples[previousExampleMemo?.id ?? -1];
+    const parsedExample: AudioQuizExample | undefined =
+      parsedExamples[previousExampleMemo?.id ?? -1];
     if (!parsedExample && previousExampleMemo?.id) {
       if (
         !examplesConsideredForParsing.current.includes(previousExampleMemo.id)
