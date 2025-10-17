@@ -303,7 +303,7 @@ export function useAudioQuiz({
         if (
           !examplesConsideredForParsing.current.includes(nextExampleMemo.id)
         ) {
-          parseAudioExample(nextExampleMemo.id);
+          parseAudioExample(currentExampleIndex + 1);
         }
         return null;
       }
@@ -314,6 +314,7 @@ export function useAudioQuiz({
         : parsedExample.listening;
     }, [
       parsedExamples,
+      currentExampleIndex,
       nextExampleMemo,
       examplesConsideredForParsing,
       audioQuizType,
@@ -334,7 +335,7 @@ export function useAudioQuiz({
       if (
         !examplesConsideredForParsing.current.includes(previousExampleMemo.id)
       ) {
-        parseAudioExample(previousExampleMemo.id);
+        parseAudioExample(currentExampleIndex - 1);
       }
       return null;
     }
@@ -346,6 +347,7 @@ export function useAudioQuiz({
   }, [
     parsedExamples,
     previousExampleMemo,
+    currentExampleIndex,
     audioQuizType,
     parseAudioExample,
     examplesConsideredForParsing,
@@ -553,7 +555,7 @@ export function useAudioQuiz({
         console.log('already parsed next example');
         return;
       }
-      parseAudioExample(nextExampleMemo.id);
+      parseAudioExample(currentExampleIndex + 1);
     } else if (
       currentExampleReady &&
       nextExampleReady &&
@@ -564,7 +566,7 @@ export function useAudioQuiz({
         previousExampleMemo?.id &&
         !examplesConsideredForParsing.current.includes(previousExampleMemo.id)
       ) {
-        parseAudioExample(previousExampleMemo.id);
+        parseAudioExample(currentExampleIndex - 1);
       }
     }
   }, [
