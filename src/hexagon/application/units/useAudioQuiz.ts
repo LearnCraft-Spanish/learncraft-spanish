@@ -1,3 +1,4 @@
+import type { AddPendingRemoveProps } from '@application/units/useTextQuiz';
 import type {
   AudioQuizAnswer,
   AudioQuizExample,
@@ -7,11 +8,16 @@ import type {
   ListeningQuizExample,
   SpeakingQuizExample,
 } from '@domain/audioQuizzing';
-import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type {
+  ExampleWithVocabulary,
+  Vocabulary,
+} from '@learncraft-spanish/shared';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
 import { useAudioQuizMapper } from '@application/units/useAudioQuizMapper';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useAuthAdapter } from '../adapters/authAdapter';
+import { useStudentFlashcards } from './useStudentFlashcards';
 
 export interface AudioQuizProps {
   examplesToQuiz: ExampleWithVocabulary[];
@@ -51,6 +57,13 @@ export interface AudioQuizReturn {
   cleanupFunction: () => void;
   isQuizComplete: boolean;
   restartQuiz: () => void;
+  // Get Help
+  getHelpIsOpen: boolean;
+  setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
+  vocabComplete: boolean;
+  vocabulary: Vocabulary[];
+  // Add/Pending/Remove Button
+  addPendingRemoveProps: AddPendingRemoveProps | undefined;
 }
 
 /**
@@ -112,6 +125,15 @@ export function useAudioQuiz({
     changeCurrentAudio,
     cleanupAudio,
   } = useAudioAdapter();
+  const { isStudent } = useAuthAdapter();
+  const {
+    isExampleCollected,
+    isAddingFlashcard,
+    isRemovingFlashcard,
+    isCustomFlashcard,
+    createFlashcards,
+    deleteFlashcards,
+  } = useStudentFlashcards();
 
   const { parseExampleForQuiz } = useAudioQuizMapper();
 
@@ -638,6 +660,88 @@ export function useAudioQuiz({
     };
   }, [cleanupAudio]);
 
+  // for getHelp
+  const vocabComplete = useMemo(() => {
+    if (currentExampleMemo) {
+      return currentExampleMemo.vocabularyComplete;
+    }
+
+    return false;
+  }, [currentExampleMemo]);
+
+  const vocabulary = useMemo(() => {
+    if (currentExampleMemo) {
+      return currentExampleMemo.vocabulary;
+    }
+
+    return [];
+  }, [currentExampleMemo]);
+
+  // Add/Pending/Remove props
+  // This is the memo for add pending remove
+
+  const addFlashcard = useCallback(() => {
+    if (
+      !currentExampleMemo ||
+      isExampleCollected({ exampleId: currentExampleMemo.id })
+    ) {
+      return;
+    }
+
+    createFlashcards([currentExampleMemo]);
+  }, [currentExampleMemo, createFlashcards, isExampleCollected]);
+
+  const removeFlashcard = useCallback(() => {
+    if (
+      !currentExampleMemo ||
+      !isExampleCollected({ exampleId: currentExampleMemo.id })
+    ) {
+      return;
+    }
+
+    deleteFlashcards([currentExampleMemo.id]);
+  }, [currentExampleMemo, deleteFlashcards, isExampleCollected]);
+
+  const addPendingRemoveProps = useMemo(() => {
+    if (!isStudent) {
+      return undefined;
+    }
+
+    return {
+      isAdding: isAddingFlashcard({ exampleId: currentExampleMemo?.id ?? 0 }),
+
+      isRemoving: isRemovingFlashcard({
+        exampleId: currentExampleMemo?.id ?? 0,
+      }),
+
+      isCollected: isExampleCollected({
+        exampleId: currentExampleMemo?.id ?? 0,
+      }),
+
+      isCustom: isCustomFlashcard({ exampleId: currentExampleMemo?.id ?? 0 }),
+
+      addFlashcard,
+
+      removeFlashcard,
+    };
+  }, [
+    isStudent,
+
+    currentExampleMemo,
+
+    addFlashcard,
+
+    removeFlashcard,
+
+    isAddingFlashcard,
+
+    isRemovingFlashcard,
+
+    isExampleCollected,
+
+    isCustomFlashcard,
+  ]);
+
   return {
     autoplay,
     audioQuizType,
@@ -663,5 +767,10 @@ export function useAudioQuiz({
     restartQuiz,
     cleanupFunction,
     isQuizComplete,
+    getHelpIsOpen,
+    setGetHelpIsOpen,
+    vocabComplete,
+    vocabulary,
+    addPendingRemoveProps,
   };
 }
