@@ -107,7 +107,7 @@ export function createVocabularyInfrastructure(
       return httpClient.post<number[]>(
         createVocabularyEndpoint.path,
         createVocabularyEndpoint.requiredScopes,
-        command,
+        { vocabulary: command },
       );
     },
 
@@ -116,7 +116,7 @@ export function createVocabularyInfrastructure(
         deleteVocabularyEndpoint.path,
         deleteVocabularyEndpoint.requiredScopes,
         {
-          data: ids,
+          data: { vocabularyIds: ids },
         },
       );
 

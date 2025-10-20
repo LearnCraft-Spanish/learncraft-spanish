@@ -70,7 +70,7 @@ export default function WeeksTable({
     mutationFn: (weeks: WeekForUpdate[]) => {
       const promise = newPutFactory<number[]>({
         path: `coaching/update-many-weeks`,
-        body: weeks,
+        body: { weeks },
       });
       toast.promise(promise, {
         pending: 'Updating weeks...',
@@ -378,7 +378,7 @@ export default function WeeksTable({
                 <th>Current Lesson</th>
                 <th>Hold Week</th>
                 <th>Records Complete</th>
-                <th>Edit</th>
+                {!tableEditMode && <th>Edit</th>}
               </tr>
             </thead>
             <tbody>
@@ -390,7 +390,7 @@ export default function WeeksTable({
                   updateActiveDataWeek={updateActiveDataWeek}
                   failedToUpdate={week.failedToUpdate}
                   hiddenFields={hiddenFields}
-                  allowSingleRecordUpdate
+                  allowSingleRecordUpdate={!tableEditMode}
                 />
               ))}
             </tbody>
