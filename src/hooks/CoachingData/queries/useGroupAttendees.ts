@@ -27,7 +27,7 @@ export default function useGroupAttendees(startDate: string, endDate: string) {
     mutationFn: (groupAttendees: GroupAttendeeMutationObj[]) => {
       const promise = newPostFactory<GroupAttendees[]>({
         path: 'coaching/group-attendees',
-        body: groupAttendees,
+        body: { groupAttendees },
       });
       toast.promise(promise, {
         pending: 'Creating group attendees...',
@@ -56,7 +56,7 @@ export default function useGroupAttendees(startDate: string, endDate: string) {
     mutationFn: (recordIds: number[]) => {
       const promise = newDeleteFactory({
         path: `coaching/group-attendees`,
-        body: recordIds,
+        body: { recordIds },
       });
       toast.promise(promise, {
         pending: 'Removing designated group attendees...',
