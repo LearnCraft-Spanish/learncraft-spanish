@@ -67,6 +67,31 @@ _For LearnCraft Spanish Software Development_
 
 ---
 
+## 🧹 Test Environment & Cleanup
+
+**Philosophy: "Leave the testing environment the way you found it"**
+
+We follow the principle of cleaning up after ourselves rather than assuming nothing about the test environment. This enables tests to be more efficient while maintaining isolation.
+
+1. **Mock Cleanup is Required**
+   - If you mock anything in a test file, you **must** clean it up at the end (e.g., in `afterEach` or `afterAll`).
+   - Unmock or reset all mocked functions/modules to their original state.
+
+2. **Assume Default Mocks from Setup**
+   - If something is mocked in the `setupTests` file, assume it is using the **default mock values** (happy path).
+   - You can rely on these defaults without redeclaring them in every test.
+
+3. **Override and Restore**
+   - If you override a mock (e.g., to test an error state), you **must** reset the mock to its base implementation at the end of the test file.
+   - Use `afterEach(() => { mockFn.mockRestore() })` or similar cleanup patterns.
+
+4. **Why This Matters**
+   - Prevents test pollution and unexpected failures.
+   - Allows tests to run in any order without side effects.
+   - Makes test files more readable by reducing redundant setup.
+
+---
+
 ## 📈 Progressive Improvement
 
 - **No required % coverage**, but **coverage should never decrease**.
