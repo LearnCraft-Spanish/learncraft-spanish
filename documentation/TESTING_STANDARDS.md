@@ -67,6 +67,34 @@ _For LearnCraft Spanish Software Development_
 
 ---
 
+## Using Mocks
+
+1. All Mocks will be created using createOverrideableMock function, located at:
+   `@testing/utils/createOverrideableMock.ts`
+1. The Mock should return the defaultMockImplementation, overrideMock function, and resetMock functions.
+
+- **All Mocks used in a test file must be initialized using the below pattern**
+  - Mock the component using either the defaultMockImplementation imported from the mock's file, or one defined locally in the test file
+
+```
+vi.mock('@path/to/file' () => {
+   overrideMock(defaultMockImplementation)
+})
+```
+
+- **Modified Global Mocks must be cleaned up with the following pattern**
+  - Resets to the default mock implementation, imported from the mock file
+
+```
+
+  afterAll(() => {
+   resetComponentToBeMocked();
+  });
+
+```
+
+- All Mocks set using vi.mock in a test file are automatically cleaned up by vitest
+
 ## 🧹 Test Environment & Cleanup
 
 **Philosophy: "Leave the testing environment the way you found it"**
