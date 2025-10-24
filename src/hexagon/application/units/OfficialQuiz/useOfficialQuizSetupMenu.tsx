@@ -1,7 +1,9 @@
+import type { UseOfficialQuizSetupMenuReturnType } from './useOfficialQuizSetupMenu.type';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 
 export function getCourseCodeFromName(courseName: string) {
@@ -23,7 +25,7 @@ export function getCourseCodeFromName(courseName: string) {
   }
 }
 
-export function useOfficialQuizSetupMenu() {
+export function useOfficialQuizSetupMenu(): UseOfficialQuizSetupMenuReturnType {
   const {
     officialQuizRecords,
     isLoading: officialQuizzesLoading,

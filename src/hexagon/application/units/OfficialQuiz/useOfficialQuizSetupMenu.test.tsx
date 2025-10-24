@@ -115,9 +115,7 @@ describe('useOfficialQuizSetupMenu', () => {
       result.current.startQuiz();
 
       // Verify navigation was called with correct URL
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/officialquizzes/learncraft-spanish/1',
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/officialquizzes/lcsp/1');
     });
 
     it('navigates correctly for different course codes', async () => {
@@ -139,9 +137,7 @@ describe('useOfficialQuizSetupMenu', () => {
       result.current.startQuiz();
 
       // Verify navigation was called with correct URL for si1m course
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/officialquizzes/spanish-in-one-month/3',
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/officialquizzes/si1m/3');
     });
 
     it('does not navigate when quizNumber is 0', async () => {

@@ -1,24 +1,19 @@
-import mockSelectedCourseAndLessons from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 
-import mockUseSpellingsKnownForLesson, {
+import {
   overrideMockUseSpellingsKnownForLesson,
+  resetMockUseSpellingsKnownForLesson,
 } from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockSpellingsData } from 'src/hexagon/testing/factories/spellingsFactory';
 import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
-import { vi } from 'vitest';
 
 import useFrequensay from './useFrequensay';
 
-vi.mock('@application/queries/useSpellingsKnownForLesson/', () => ({
-  useSpellingsKnownForLesson: () => mockUseSpellingsKnownForLesson,
-}));
-vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
-  useSelectedCourseAndLessons: () => mockSelectedCourseAndLessons,
-}));
-
 describe('useFrequensay', () => {
+  afterAll(() => {
+    resetMockUseSpellingsKnownForLesson();
+  });
   it('should render with default state', async () => {
     const { result } = renderHook(() => useFrequensay(), {
       wrapper: ({ children }) => (
