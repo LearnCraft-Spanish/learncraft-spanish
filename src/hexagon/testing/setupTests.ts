@@ -35,6 +35,11 @@ import {
   resetMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import {
+  mockUseSpellingsKnownForLesson,
+  resetMockUseSpellingsKnownForLesson,
+} from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
+
+import {
   mockUseStudentFlashcards,
   resetMockUseStudentFlashcards,
 } from '@application/units/useStudentFlashcards.mock';
@@ -85,6 +90,10 @@ vi.mock('@application/units/useStudentFlashcards', () => ({
   useStudentFlashcards: vi.fn(() => mockUseStudentFlashcards),
 }));
 
+vi.mock('@application/queries/useSpellingsKnownForLesson', () => ({
+  useSpellingsKnownForLesson: vi.fn(() => mockUseSpellingsKnownForLesson),
+}));
+
 const resetAdapterMocks = () => {
   // Reset the adapter mocks to their default implementations
   resetMockVocabularyAdapter();
@@ -96,16 +105,14 @@ const resetAdapterMocks = () => {
   resetMockFlashcardAdapter();
   resetMockOfficialQuizAdapter();
   resetMockUseStudentFlashcards();
+  resetMockUseSpellingsKnownForLesson();
 };
-
-// Reset all mocks after each test file is run
-afterAll(() => {
-  resetAdapterMocks();
-});
 
 afterEach(() => {
   // Clear mock call history
   vi.clearAllMocks();
+  // Reset the adapter mocks to their default implementations
+  resetAdapterMocks();
 
   // Reset React Query client
   resetTestQueryClient();
