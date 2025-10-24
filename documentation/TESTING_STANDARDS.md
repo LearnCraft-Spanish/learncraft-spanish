@@ -35,9 +35,9 @@ _For LearnCraft Spanish Software Development_
 | ------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | **Domain**         | Fully unit tested. Pure logic should be testable directly. No tests for definitions          | None                                                                                               |
 | **Application**    | Units are unit tested, useCases are unit and integration tested                              | Adapters, anything that is maniuplating external data (namely units, sometimes coordinator hooks?) |
-| **Ports**          | Covered indirectly by application layer integration tests                                    | Mocked at the adapter level inside application layer                                               |
+| **Ports**          | None                                                                                         | Mocked at the adapter level inside application layer                                               |
 | **Interface**      | Unit tests for units, Integration tests for compositional components (pages, 'parent' units) | none. should use mocks established in application layer                                            |
-| **Infrastructure** | None                                                                                         | All utalized mocks should be made in the ports that access them                                    |
+| **Infrastructure** | None                                                                                         | All utilized mocks should be made in the adapters that call them (application level) them          |
 | **Composition**    | None                                                                                         | None. all data hooks consumed must be mocked                                                       |
 
 ---
@@ -146,5 +146,3 @@ We follow the principle of cleaning up after ourselves rather than assuming noth
 - Experimental code may be committed to the development branch without test coverage if:
   - It is **clearly marked** (e.g., `EXPERIMENTAL_` or TODO)
   - A test plan or coverage task is tracked separately before merge
-
----

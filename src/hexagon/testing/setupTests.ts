@@ -45,7 +45,7 @@ import {
 } from '@application/units/useStudentFlashcards.mock';
 
 import { cleanup } from '@testing-library/react';
-import { afterAll, afterEach, vi } from 'vitest';
+import { afterEach, vi } from 'vitest';
 import {
   mockCourseAdapter,
   resetMockCourseAdapter,

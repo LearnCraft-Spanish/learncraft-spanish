@@ -8,7 +8,6 @@ import {
   getAppUserFromName,
   getAuthUserFromEmail,
 } from 'mocks/data/serverlike/userTable';
-import { overrideMockActiveStudent } from 'src/hexagon/application/coordinators/hooks/useActiveStudent.mock';
 import { overrideAuthAndAppUser } from './overrideAuthAndAppUser';
 
 // Example: Student, own user
@@ -28,18 +27,20 @@ export function setupStudentUser() {
 
 // Example: admin, not own user
 export function setupAdminUser() {
-  overrideAuthAndAppUser({
-    authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
-    isAuthenticated: true,
-    isAdmin: true,
-    isCoach: false,
-    isStudent: false,
-    isLimited: false,
-  });
-  overrideMockActiveStudent({
-    appUser: getAppUserFromName('student-lcsp')!,
-    isOwnUser: false,
-  });
+  overrideAuthAndAppUser(
+    {
+      authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
+      isAuthenticated: true,
+      isAdmin: true,
+      isCoach: false,
+      isStudent: false,
+      isLimited: false,
+    },
+    {
+      appUser: getAppUserFromName('student-lcsp')!,
+      isOwnUser: false,
+    },
+  );
 }
 
 // Example: Setup limited user

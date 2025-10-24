@@ -1,4 +1,4 @@
-import type { UseOfficialQuizSetupMenuReturnType } from './useOfficialQuizSetupMenu.type';
+import type { UseOfficialQuizSetupMenuReturnType } from './useOfficialQuizSetupMenu';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 

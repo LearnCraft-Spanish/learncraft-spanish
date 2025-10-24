@@ -1,11 +1,18 @@
-import type { UseOfficialQuizSetupMenuReturnType } from './useOfficialQuizSetupMenu.type';
+import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-
+export interface UseOfficialQuizSetupMenuReturnType {
+  courseCode: string;
+  setUserSelectedCourseCode: (courseCode: string) => void;
+  quizNumber: number;
+  setUserSelectedQuizNumber: (quizNumber: number) => void;
+  quizOptions: OfficialQuizRecord[];
+  startQuiz: () => void;
+}
 export function getCourseCodeFromName(courseName: string) {
   switch (courseName) {
     case 'LearnCraft Spanish':
