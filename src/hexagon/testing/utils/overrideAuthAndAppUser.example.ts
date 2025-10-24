@@ -8,21 +8,10 @@ import {
   getAppUserFromName,
   getAuthUserFromEmail,
 } from 'mocks/data/serverlike/userTable';
+import { overrideMockActiveStudent } from 'src/hexagon/application/coordinators/hooks/useActiveStudent.mock';
 import { overrideAuthAndAppUser } from './overrideAuthAndAppUser';
 
-// OLD PATTERN (from App.test.tsx):
-// overrideMockAuthAdapter({
-//   authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
-//   isAdmin: false,
-//   isCoach: false,
-//   isStudent: true,
-// });
-// overrideMockActiveStudent({
-//   appUser: getAppUserFromName('student-lcsp')!,
-//   isOwnUser: true,
-// });
-
-// NEW PATTERN - Single function call:
+// Example: Student, own user
 export function setupStudentUser() {
   overrideAuthAndAppUser(
     {
@@ -32,13 +21,12 @@ export function setupStudentUser() {
       isStudent: true,
     },
     {
-      appUser: getAppUserFromName('student-lcsp')!,
       isOwnUser: true,
     },
   );
 }
 
-// Example: Setup admin user
+// Example: admin, not own user
 export function setupAdminUser() {
   overrideAuthAndAppUser({
     authUser: getAuthUserFromEmail('admin-empty-role@fake.not')!,
@@ -47,6 +35,10 @@ export function setupAdminUser() {
     isCoach: false,
     isStudent: false,
     isLimited: false,
+  });
+  overrideMockActiveStudent({
+    appUser: getAppUserFromName('student-lcsp')!,
+    isOwnUser: false,
   });
 }
 
@@ -65,10 +57,7 @@ export function setupLimitedUser() {
 // Example: Setup logged out user
 export function setupLoggedOutUser() {
   overrideAuthAndAppUser({
-    authUser: {
-      email: '',
-      roles: [],
-    },
+    authUser: undefined,
     isAuthenticated: false,
     isLoading: false,
   });
@@ -77,10 +66,7 @@ export function setupLoggedOutUser() {
 // Example: Setup loading state
 export function setupLoadingUser() {
   overrideAuthAndAppUser({
-    authUser: {
-      email: '',
-      roles: [],
-    },
+    authUser: undefined,
     isLoading: true,
   });
 }

@@ -1,5 +1,6 @@
 import type { AppUser } from '@learncraft-spanish/shared';
 import type { AuthUser } from 'src/hexagon/application/ports/authPort';
+import { z } from 'zod';
 
 export type TestUserNames =
   | 'admin-empty-role'
@@ -12,19 +13,22 @@ export type TestUserNames =
   | 'student-no-flashcards'
   | null;
 
-export type TestUserEmails =
-  | 'admin-empty-role@fake.not'
-  | 'empty-role@fake.not'
-  | 'none-role@fake.not'
-  | 'limited@fake.not'
-  | 'student-admin@fake.not'
-  | 'student-lcsp@fake.not'
-  | 'student-ser-estar@fake.not'
-  | 'student-no-flashcards@fake.not';
+export const testUserEmailsSchema = z.enum([
+  'admin-empty-role@fake.not',
+  'empty-role@fake.not',
+  'none-role@fake.not',
+  'limited@fake.not',
+  'student-admin@fake.not',
+  'student-lcsp@fake.not',
+  'student-ser-estar@fake.not',
+  'student-no-flashcards@fake.not',
+] as const);
+
+export type TestUserEmail = z.infer<typeof testUserEmailsSchema>;
 
 export type TestAppUsers = AppUser & {
   name: TestUserNames;
-  emailAddress: TestUserEmails;
+  emailAddress: TestUserEmail;
 };
 
 export const appUserTable: TestAppUsers[] = [
@@ -95,7 +99,7 @@ export const appUserTable: TestAppUsers[] = [
 ];
 
 type TestUser = AuthUser & {
-  email: TestUserEmails;
+  email: TestUserEmail;
 };
 
 export const authUserTable: TestUser[] = [
@@ -128,7 +132,7 @@ export const authUserTable: TestUser[] = [
     roles: ['Student'],
   },
   {
-    email: 'student-no-flashcards@fake.not' as TestUserEmails,
+    email: 'student-no-flashcards@fake.not' as TestUserEmail,
     roles: ['Student'],
   },
 ];
@@ -137,10 +141,10 @@ export function getAppUserFromName(name: TestUserNames): AppUser | null {
   return appUserTable.find((student) => student.name === name) || null;
 }
 
-export function getAppUserFromEmail(email: TestUserEmails): AppUser | null {
+export function getAppUserFromEmail(email: TestUserEmail): AppUser | null {
   return appUserTable.find((student) => student.emailAddress === email) || null;
 }
 
-export function getAuthUserFromEmail(email: TestUserEmails): AuthUser | null {
+export function getAuthUserFromEmail(email: TestUserEmail): AuthUser | null {
   return authUserTable.find((user) => user.email === email) || null;
 }
