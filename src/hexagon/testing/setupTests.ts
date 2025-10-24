@@ -48,11 +48,11 @@ import {
 import { resetTestQueryClient } from './utils/testQueryClient';
 import '@testing-library/jest-dom';
 
+// Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/courseAdapter', () => ({
   useCourseAdapter: vi.fn(() => mockCourseAdapter),
 }));
 
-// Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/vocabularyAdapter', () => ({
   useVocabularyAdapter: vi.fn(() => mockVocabularyAdapter),
 }));
