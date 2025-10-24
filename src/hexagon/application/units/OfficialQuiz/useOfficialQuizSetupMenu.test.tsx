@@ -3,9 +3,18 @@ import { MemoryRouter } from 'react-router-dom';
 import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
 import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { overrideMockOfficialQuizAdapter } from '../../adapters/officialQuizAdapter.mock';
-import { overrideMockActiveStudent } from '../../coordinators/hooks/useActiveStudent.mock';
-import { overrideMockSelectedCourseAndLessons } from '../../coordinators/hooks/useSelectedCourseAndLessons.mock';
+import {
+  overrideMockOfficialQuizAdapter,
+  resetMockOfficialQuizAdapter,
+} from '../../adapters/officialQuizAdapter.mock';
+import {
+  overrideMockActiveStudent,
+  resetMockActiveStudent,
+} from '../../coordinators/hooks/useActiveStudent.mock';
+import {
+  overrideMockSelectedCourseAndLessons,
+  resetMockSelectedCourseAndLessons,
+} from '../../coordinators/hooks/useSelectedCourseAndLessons.mock';
 import {
   getCourseCodeFromName,
   useOfficialQuizSetupMenu,
@@ -21,15 +30,15 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock officialQuizCourses from shared package
-vi.mock('@learncraft-spanish/shared', () => ({
-  officialQuizCourses: [
-    { code: 'lcsp', name: 'LearnCraft Spanish', url: 'learncraft-spanish' },
-    { code: 'si1m', name: 'Spanish in One Month', url: 'spanish-in-one-month' },
-    { code: 'post-1mc', name: 'Post-1MC Cohort', url: 'post-1mc-cohort' },
-    { code: 'ser-estar', name: 'Ser Estar Mini Course', url: 'ser-estar-mini' },
-  ],
-}));
+// // Mock officialQuizCourses from shared package
+// vi.mock('@learncraft-spanish/shared', () => ({
+//   officialQuizCourses: [
+//     { code: 'lcsp', name: 'LearnCraft Spanish', url: 'learncraft-spanish' },
+//     { code: 'si1m', name: 'Spanish in One Month', url: 'spanish-in-one-month' },
+//     { code: 'post-1mc', name: 'Post-1MC Cohort', url: 'post-1mc-cohort' },
+//     { code: 'ser-estar', name: 'Ser Estar Mini Course', url: 'ser-estar-mini' },
+//   ],
+// }));
 
 describe('useOfficialQuizSetupMenu', () => {
   beforeEach(() => {
@@ -58,6 +67,12 @@ describe('useOfficialQuizSetupMenu', () => {
     overrideMockActiveStudent({
       appUser: { studentRole: 'student', lessonNumber: 1 } as any,
     });
+  });
+
+  afterAll(() => {
+    resetMockOfficialQuizAdapter();
+    resetMockSelectedCourseAndLessons();
+    resetMockActiveStudent();
   });
 
   it('prefills course and quiz number, filters quizOptions', async () => {
