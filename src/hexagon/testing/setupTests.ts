@@ -40,7 +40,7 @@ import {
 } from '@application/units/useStudentFlashcards.mock';
 
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { afterAll, afterEach, vi } from 'vitest';
 import {
   mockCourseAdapter,
   resetMockCourseAdapter,
@@ -98,10 +98,13 @@ const resetAdapterMocks = () => {
   resetMockUseStudentFlashcards();
 };
 
-// Reset all mocks after each test
+// Reset all mocks after each test file is run
+afterAll(() => {
+  resetAdapterMocks();
+});
+
 afterEach(() => {
   // Clear mock call history
-  resetAdapterMocks();
   vi.clearAllMocks();
 
   // Reset React Query client
