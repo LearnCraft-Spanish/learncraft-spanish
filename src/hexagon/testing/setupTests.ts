@@ -43,13 +43,13 @@ import {
   mockUseStudentFlashcards,
   resetMockUseStudentFlashcards,
 } from '@application/units/useStudentFlashcards.mock';
-
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 import {
   mockCourseAdapter,
   resetMockCourseAdapter,
 } from '../application/adapters/ courseAdapter.mock';
+
 import { resetTestQueryClient } from './utils/testQueryClient';
 import '@testing-library/jest-dom';
 
@@ -66,24 +66,24 @@ vi.mock('@application/adapters/subcategoryAdapter', () => ({
   useSubcategoryAdapter: vi.fn(() => mockSubcategoryAdapter),
 }));
 
-vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
-  useActiveStudent: vi.fn(() => mockActiveStudent),
-}));
-
-vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
-  useSelectedCourseAndLessons: vi.fn(() => mockSelectedCourseAndLessons),
-}));
-
-vi.mock('@application/adapters/authAdapter', () => ({
-  useAuthAdapter: vi.fn(() => mockAuthAdapter),
-}));
-
 vi.mock('@application/adapters/flashcardAdapter', () => ({
   useFlashcardAdapter: vi.fn(() => mockFlashcardAdapter),
 }));
 
 vi.mock('@application/adapters/officialQuizAdapter', () => ({
   useOfficialQuizAdapter: vi.fn(() => mockOfficialQuizAdapter),
+}));
+
+vi.mock('@application/adapters/authAdapter', () => ({
+  useAuthAdapter: vi.fn(() => mockAuthAdapter),
+}));
+
+vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
+  useActiveStudent: vi.fn(() => mockActiveStudent),
+}));
+
+vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
+  useSelectedCourseAndLessons: vi.fn(() => mockSelectedCourseAndLessons),
 }));
 
 vi.mock('@application/units/useStudentFlashcards', () => ({
@@ -94,25 +94,33 @@ vi.mock('@application/queries/useSpellingsKnownForLesson', () => ({
   useSpellingsKnownForLesson: vi.fn(() => mockUseSpellingsKnownForLesson),
 }));
 
-const resetAdapterMocks = () => {
-  // Reset the adapter mocks to their default implementations
+const resetGlobalMocks = () => {
+  //resetAuthAdapter
+  resetMockAuthAdapter();
+
+  // adapter mocks
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
   resetMockActiveStudent();
-  resetMockSelectedCourseAndLessons();
-  resetMockAuthAdapter();
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();
   resetMockOfficialQuizAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();
+
+  // coordinator mocks
+  resetMockActiveStudent();
+  resetMockSelectedCourseAndLessons();
+
+  // unit mocks
+  resetMockUseStudentFlashcards();
 };
 
 afterEach(() => {
   // Clear mock call history
   vi.clearAllMocks();
   // Reset the adapter mocks to their default implementations
-  resetAdapterMocks();
+  resetGlobalMocks();
 
   // Reset React Query client
   resetTestQueryClient();

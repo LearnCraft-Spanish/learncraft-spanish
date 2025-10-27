@@ -58,18 +58,21 @@ vi.mock('@application/adapters/vocabularyAdapter', () => ({
   useVocabularyAdapter: vi.fn(() => mockVocabularyAdapter),
 }));
 
+// function to reset mocks to base implementation
+const resetGlobalMocks = () => {
+  resetMockVocabularyAdapter();
+};
+
 // After each test: Clear call history, reset query client, cleanup components
 afterEach(() => {
+  // clear all mock history
   vi.clearAllMocks();
+  // reset global mocks
+  resetGlobalMocks();
+  // reset tanstack query client
   resetTestQueryClient();
+  // cleanup DOM
   cleanup();
-});
-
-// After each test file: Reset all mocks to default implementations
-afterAll(() => {
-  resetMockVocabularyAdapter();
-  resetMockSubcategoryAdapter();
-  // ... other resets
 });
 ```
 
@@ -77,8 +80,7 @@ afterAll(() => {
 
 - **Default values**: All global mocks use "happy path" default values
 - **Test-specific overrides**: Use `overrideMock` functions to customize behavior for specific tests
-- **Automatic cleanup**: Mock call history is cleared after each test
-- **Full reset**: Mock implementations reset to defaults after each test file
+- **Automatic cleanup**: Mock call history, implementation, and state is cleared and reset after each test
 
 ---
 
@@ -133,12 +135,12 @@ import {
 
 // Initialize the mock with default implementation
 vi.mock('@path/to/useExample', () => ({
-  useExample: overrideMockUseExample(defaultMockImplementation),
+  useExample: () => defaultMockImplementation),
 }));
 
 describe('Component using useExample', () => {
-  // Clean up: Reset to defaults after all tests
-  afterAll(() => {
+  // Clean up: Reset to defaults before each test
+  beforeEach(() => {
     resetMockUseExample();
   });
 
@@ -208,7 +210,7 @@ const customList = createMockVocabularyList(3, { type: 'verb' });
 2. **Use factory functions** - Create realistic test data consistently
 3. **Default to happy path** - Provide realistic default implementations
 4. **Override for edge cases** - Test loading, error, and edge cases with overrides
-5. **Clean up after yourself** - Always reset mocks in `afterAll`
+5. **Clean up after yourself** - Always reset mocks in `beforeEach` or `afterEach`
 6. **Test at the right layer** - See `/documentation/TESTING_STANDARDS.md` for layer-specific guidance
 
 ---
