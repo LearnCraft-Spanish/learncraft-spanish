@@ -65,3 +65,36 @@ This checklist ensures both the **technical stability** of the release and that 
 ---
 
 📌 _Note: It is the responsibility of the Tech Team to verify technical rediness, prepare all relevent communication documents, and distribute them to the nessessary interal recipients. It is the responsibility of the Admin department to distribute all relevent communication documents to their external recipients._
+
+---
+
+## 📋 Copy-Paste Pre-Merge Checklist
+
+_Use this checklist in your production PR description or tracking system. Assign each task to a team member._
+
+```
+## Production Release Pre-Merge Checklist
+
+### 🧪 Technical Readiness
+- [ ] All automated CI checks are passing
+- [ ] Code adheres to Testing Standards
+- [ ] PR Standards checklist is fully complete
+- [ ] Manual testing has been performed
+- [ ] In-App announcement notification created & configured — Assigned to: ___________
+
+### 🚦 Final Validation
+- [ ] PR reviewed & approved by all necessary team members
+- [ ] No critical bugs or blockers are open
+- [ ] All stakeholders have received demos and given approval — Assigned to: ___________
+
+### 📣 Communication Prep (2-3 Days Before Release)
+- [ ] Walkthrough videos recorded and ready — Assigned to: ___________
+- [ ] Slack announcement drafted for #tech-announcements — Assigned to: ___________
+- [ ] New Release Email written and shared with admin team — Assigned to: ___________
+- [ ] External user email announcement drafted — Assigned to: ___________
+- [ ] (Optional) Slack announcement for student channels drafted — Assigned to: ___________
+
+### ✅ Ready to Merge
+- [ ] All above items completed and verified
+- [ ] Final approval from: ___________
+```
