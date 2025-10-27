@@ -5,10 +5,7 @@ import { createMockExampleWithVocabularyList } from 'src/hexagon/testing/factori
 import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
 import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
-import {
-  overrideMockOfficialQuizAdapter,
-  resetMockOfficialQuizAdapter,
-} from '../../adapters/officialQuizAdapter.mock';
+import { overrideMockOfficialQuizAdapter } from '../../adapters/officialQuizAdapter.mock';
 import { useOfficialQuiz } from './useOfficialQuiz';
 
 const mockQuizRecords: OfficialQuizRecord[] = [];
@@ -31,10 +28,6 @@ describe('useOfficialQuiz', () => {
       getOfficialQuizRecords: async () => mockQuizRecords,
       getOfficialQuizExamples: async () => mockQuizExample,
     });
-  });
-
-  afterAll(() => {
-    resetMockOfficialQuizAdapter();
   });
 
   it('returns examples, loading state, error, and derived quizTitle', async () => {

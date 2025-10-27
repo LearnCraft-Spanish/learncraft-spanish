@@ -1,19 +1,14 @@
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 
-import {
-  overrideMockUseSpellingsKnownForLesson,
-  resetMockUseSpellingsKnownForLesson,
-} from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
+import { overrideMockUseSpellingsKnownForLesson } from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockSpellingsData } from 'src/hexagon/testing/factories/spellingsFactory';
 import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
 
 import useFrequensay from './useFrequensay';
 
+// We dont need to reset mockUseSpellingsKnownForLesson as it is reset by the setupTests.js file
 describe('useFrequensay', () => {
-  afterAll(() => {
-    resetMockUseSpellingsKnownForLesson();
-  });
   it('should render with default state', async () => {
     const { result } = renderHook(() => useFrequensay(), {
       wrapper: ({ children }) => (
