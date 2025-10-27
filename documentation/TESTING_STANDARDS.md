@@ -31,14 +31,14 @@ _For LearnCraft Spanish Software Development_
 
 ## 🧱 Testing in Hexagonal Architecture
 
-| Layer              | What to Test                                                                                 | What to Mock                                                                                       |
-| ------------------ | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| **Domain**         | Fully unit tested. Pure logic should be testable directly. No tests for definitions          | None                                                                                               |
-| **Application**    | Units are unit tested, useCases are unit and integration tested                              | Adapters, anything that is maniuplating external data (namely units, sometimes coordinator hooks?) |
-| **Ports**          | None                                                                                         | Mocked at the adapter level inside application layer                                               |
-| **Interface**      | Unit tests for units, Integration tests for compositional components (pages, 'parent' units) | none. should use mocks established in application layer                                            |
-| **Infrastructure** | None                                                                                         | All utilized mocks should be made in the adapters that call them (application level) them          |
-| **Composition**    | None                                                                                         | None. all data hooks consumed must be mocked                                                       |
+| Layer              | What to Test                                                                                 | What to Mock                                                                                                                                                    |
+| ------------------ | -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Domain**         | Fully unit tested. Pure logic should be testable directly. No tests for definitions          | None                                                                                                                                                            |
+| **Application**    | Units are unit tested, useCases are unit and integration tested                              | Adapters, anything that is maniuplating external data (namely units, queries, and sometimes coordinator hooks)                                                  |
+| **Ports**          | Covered indirectly by application layer integration tests                                    | Mocked at the adapter level inside application layer                                                                                                            |
+| **Interface**      | Unit tests for units, Integration tests for compositional components (pages, 'parent' units) | None                                                                                                                                                            |
+| **Infrastructure** | None                                                                                         | None (Infrastructure should never be used in testing. All access should come through ports & adapters in application layer, and should be mocked at that level) |
+| **Composition**    | None                                                                                         | Some Providers require mocks                                                                                                                                    |
 
 ---
 
@@ -86,11 +86,17 @@ vi.mock('@path/to/file' () => {
   - Resets to the default mock implementation, imported from the mock file
 
 ```
-
-  afterAll(() => {
+  afterEach(() => {
    resetComponentToBeMocked();
   });
+```
 
+OR
+
+```
+beforeEach(() => {
+   resetComponentToBeMocked();
+});
 ```
 
 - All Mocks set using vi.mock in a test file are automatically cleaned up by vitest
@@ -101,17 +107,15 @@ vi.mock('@path/to/file' () => {
 
 We follow the principle of cleaning up after ourselves rather than assuming nothing about the test environment. This enables tests to be more efficient while maintaining isolation.
 
-1. **Mock Cleanup is Required**
-   - If you mock anything in a test file, you **must** clean it up at the end (e.g., in `afterEach` or `afterAll`).
-   - Unmock or reset all mocked functions/modules to their original state.
+1. **Mock Cleanup is automatic**
+   - everything mocked in a test file is cleaned up by Vitest automatically. All global mocks get reset by the setupTests.js file
 
 2. **Assume Default Mocks from Setup**
    - If something is mocked in the `setupTests` file, assume it is using the **default mock values** (happy path).
    - You can rely on these defaults without redeclaring them in every test.
 
 3. **Override and Restore**
-   - If you override a mock (e.g., to test an error state), you **must** reset the mock to its base implementation at the end of the test file.
-   - Use `afterEach(() => { mockFn.mockRestore() })` or similar cleanup patterns.
+   - If you override a mock (e.g., to test an error state), you can trust Vitest to reset it after the test file is done.
 
 4. **Why This Matters**
    - Prevents test pollution and unexpected failures.
