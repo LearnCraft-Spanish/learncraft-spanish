@@ -189,48 +189,49 @@ _Copy this checklist into your PR description before requesting review._
 
 ```
 ## PR Author Checklist
+Quick Access Checkbox emoticons: --✅---❌--
 
 ### 🧪 Testing
-- [ ] All existing tests are passing locally
-- [ ] New tests added according to Testing Standards
-- [ ] Tests are deterministic (no flaky behavior)
-- [ ] Manual testing performed for UI changes or critical flows
+- [] All existing tests are passing locally
+- [] New tests added according to Testing Standards
+- [] Tests are deterministic (no flaky behavior)
+- [] Manual testing performed for UI changes or critical flows
 
 ### 🎨 Code Quality
-- [ ] Code follows Hexagonal Architecture Standards
-- [ ] No commented-out code (unless marked as TODO with context)
-- [ ] No console logs or debugging statements
-- [ ] Code is DRY to a reasonable extent
-- [ ] Functions and components have clear, descriptive names
-- [ ] Complex logic includes explanatory comments
-- [ ] TypeScript types are properly defined
-- [ ] File and folder organization follows existing conventions
-- [ ] No unused imports or variables
-- [ ] pnpm validate has been run & passes
+- [] Code follows Hexagonal Architecture Standards
+- [] No commented-out code (unless marked as TODO with context)
+- [] No console logs or debugging statements
+- [] Code is DRY to a reasonable extent
+- [] Functions and components have clear, descriptive names
+- [] Complex logic includes explanatory comments
+- [] TypeScript types are properly defined
+- [] File and folder organization follows existing conventions
+- [] No unused imports or variables
+- [] pnpm validate has been run & passes
 
 ### 📝 Documentation
-- [ ] PR description explains what changed and why
-- [ ] Breaking changes are clearly documented
-- [ ] New features include usage examples or documentation updates
-- [ ] README or relevant docs updated if necessary
+- [] PR description explains what changed and why
+- [] Breaking changes are clearly documented
+- [] New features include usage examples or documentation updates
+- [] README or relevant docs updated if necessary
 
 ### 🚦 CI/CD & Build
-- [ ] All CI checks are passing
-- [ ] No linter errors
-- [ ] Build completes successfully
-- [ ] No console errors in the browser (for UI changes)
-- [ ] Performance implications have been considered
+- [] All CI checks are passing
+- [] No linter errors
+- [] Build completes successfully
+- [] No console errors in the browser (for UI changes)
+- [] Performance implications have been considered
 
 ### 🧹 Git Hygiene
-- [ ] Branch is up to date with the base branch
-- [ ] Commit messages are clear and descriptive
-- [ ] No merge conflicts
-- [ ] Sensitive information is not committed
+- [] Branch is up to date with the base branch
+- [] Commit messages are clear and descriptive
+- [] No merge conflicts
+- [] Sensitive information is not committed
 
 ### 🔍 Self-Review
-- [ ] I have reviewed my own code
-- [ ] PR is focused and addresses a single concern
-- [ ] PR size is reasonable (< 500 lines preferred)
+- [] I have reviewed my own code
+- [] PR is focused and addresses a single concern
+- [] PR size is reasonable (< 500 lines preferred)
 
 **Ready for review!**
 ```
@@ -243,6 +244,7 @@ _Copy this checklist to track your review progress._
 
 ```
 ## PR Review Checklist
+Quick Access Checkbox emoticons: --✅---❌--
 
 **PR Title:** ___________
 **Author:** ___________
@@ -250,53 +252,53 @@ _Copy this checklist to track your review progress._
 **Date:** ___________
 
 ### 🔍 Initial Assessment
-- [ ] PR description is clear and complete
-- [ ] PR size is manageable (consider requesting split if > 500 lines)
-- [ ] Changes align with stated purpose
+- [] PR description is clear and complete
+- [] PR size is manageable (consider requesting split if > 500 lines)
+- [] Changes align with stated purpose
 
 ### 🧪 Testing Review
-- [ ] Tests are passing in CI
-- [ ] New/modified code has appropriate test coverage
-- [ ] Tests are clear and test the right things
-- [ ] No flaky or unreliable tests introduced
+- [] Tests are passing in CI
+- [] New/modified code has appropriate test coverage
+- [] Tests are clear and test the right things
+- [] No flaky or unreliable tests introduced
 
 ### 🎨 Code Quality Review
-- [ ] Code follows Hexagonal Architecture pattern
-- [ ] Logic is clear and easy to understand
-- [ ] No unnecessary complexity or over-engineering
-- [ ] Functions/components are appropriately sized
-- [ ] Naming is clear and consistent
-- [ ] No code duplication
-- [ ] TypeScript types are properly used
-- [ ] No console logs or debug code left in
+- [] Code follows Hexagonal Architecture pattern
+- [] Logic is clear and easy to understand
+- [] No unnecessary complexity or over-engineering
+- [] Functions/components are appropriately sized
+- [] Naming is clear and consistent
+- [] No code duplication
+- [] TypeScript types are properly used
+- [] No console logs or debug code left in
 
 ### 🏗️ Architecture Review
-- [ ] Changes respect layer boundaries
-- [ ] Dependencies flow in the correct direction
-- [ ] External integrations are properly abstracted
-- [ ] Domain logic remains pure
+- [] Changes respect layer boundaries
+- [] Dependencies flow in the correct direction
+- [] External integrations are properly abstracted
+- [] Domain logic remains pure
 
 ### 🐛 Logic & Edge Cases
-- [ ] Logic is correct
-- [ ] Edge cases are handled
-- [ ] Error handling is appropriate
-- [ ] No potential bugs or race conditions spotted
+- [] Logic is correct
+- [] Edge cases are handled
+- [] Error handling is appropriate
+- [] No potential bugs or race conditions spotted
 
 ### 📝 Documentation Review
-- [ ] Code comments explain "why" not just "what"
-- [ ] Complex logic is well-documented
-- [ ] Breaking changes are documented
-- [ ] Relevant docs/README updated
+- [] Code comments explain "why" not just "what"
+- [] Complex logic is well-documented
+- [] Breaking changes are documented
+- [] Relevant docs/README updated
 
 ### ✅ Final Check
-- [ ] All my comments/questions have been addressed
-- [ ] No blocking concerns remain
-- [ ] Changes improve the codebase
+- [] All my comments/questions have been addressed
+- [] No blocking concerns remain
+- [] Changes improve the codebase
 
 **Review Status:**
 - [ ] ✅ Approved
 - [ ] 💬 Comments/Questions
-- [ ] 🚫 Request Changes
+- [ ] ❌ Request Changes
 
 **Additional Notes:**
 ___________
