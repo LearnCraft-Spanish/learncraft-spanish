@@ -2,7 +2,7 @@
 
 ## What is This?
 
-The hexagon directory implements a **hexagonal architecture** (ports and adapters) with **pragmatic layer boundaries** for the LearnCraft Spanish React SPA.
+The hexagon directory implements an adaptation of **hexagonal architecture** (ports and adapters) with **pragmatic layer boundaries** for the LearnCraft Spanish React SPA.
 
 **Note:** This is **NOT** strict DDD. We use a practical adaptation:
 
@@ -13,11 +13,20 @@ The hexagon directory implements a **hexagonal architecture** (ports and adapter
 - **Composition** = Static application bootstrap and provider wiring
 - **Testing** = Test utilities, factories, and mock helpers
 
-This works well for data-heavy React applications where business rules involve querying and aggregating across multiple sources.
+This architecture supports LearnCraft Spanish's language learning features: vocabulary management, interactive quizzes (audio and text), flashcard systems, course progression, spaced repetition, and multi-role support (students, coaches, admins).
 
-## ⚠️ Longevity Warning
+## ⚠️ Longevity Warning: Anemic Domain Model
 
-**Current State:** Business logic lives in the application layer (anemic domain model). This is pragmatic and works, but:
+**Current State:** We have an **anemic domain model** - most business logic lives in the application layer rather than in rich domain objects. The domain layer currently contains mostly pure transformation functions and type definitions.
+
+**Why This Exists:**
+
+For a React SPA, this approach is somewhat reasonable because:
+
+- React's hook-based architecture naturally encourages behavior in hooks (application layer)
+- Frontend state management patterns align with anemic models
+- Many business rules are tied to UI interactions and React state
+- The pragmatic approach gets features shipped faster
 
 **Known Risks:**
 
@@ -26,39 +35,65 @@ This works well for data-heavy React applications where business rules involve q
 - Can lead to duplication as complexity grows
 - Refactoring becomes harder over time
 - Testing individual rules requires full orchestration setup
+- Domain knowledge is less explicit and discoverable
 
-**Mitigation Strategy:**
+**Current Mitigation Strategy:**
 
 - Document business rules clearly in comments (like the "cumulative" vs "range" distinction)
 - Keep related logic together (units directory)
 - Write thorough tests that capture the business semantics
-- Refactor incrementally if rules become complex (consider moving to domain)
+- Use explicit return types on use-cases to document behavior
+
+**Future Mitigation Strategy:**
+
+As the application grows, consider incrementally enriching the domain:
+
+1. **Identify Complex Rules:** When business rules become complex or are duplicated across multiple use-cases, extract them to domain functions
+2. **Domain Aggregates:** For entities with rich behavior (e.g., Quiz, Vocabulary, Flashcard), consider creating domain functions that encapsulate their rules
+3. **Value Objects:** Extract domain concepts into value objects (e.g., `QuizConfig`, `LessonRange`) that enforce invariants
+4. **Incremental Refactoring:** Move logic to domain layer incrementally, not in big-bang rewrites
+5. **Domain Events:** Consider domain events for cross-aggregate coordination as complexity increases
+
+**Decision Criteria for Moving to Domain:**
+
+- Rule is used in 3+ places → Consider domain function
+- Rule has complex conditional logic → Consider domain function
+- Rule represents core business concept → Consider domain function
+- Rule is pure (no side effects) → Good candidate for domain
 
 ## Layer Responsibilities
+
+Dependencies flow inward (outermost → innermost):
 
 ```
 ┌─────────────────────────────────────┐
 │  composition/ - Static bootstrap    │
-│  (Providers, root render)          │
+│  (Providers, root render)           │
+│  ↓ depends on interface             │
 ├─────────────────────────────────────┤
 │  interface/   - React UI            │
-│  (Components, pages, routing)      │
-├─────────────────────────────────────┤
-│  application/ - Business workflows  │
-│  (Use-cases, units, coordinators)   │
-│  - Complex orchestration             │
-│  - Multi-source coordination         │
-│  - React hooks and state             │
-├─────────────────────────────────────┤
-│  domain/      - Pure logic          │
-│  (Pure functions, transformations)  │
-│  - Business rules                    │
-│  - Data transformations              │
+│  (Components, pages, routing)       │
+│  ↓ depends on application/use-cases │
 ├─────────────────────────────────────┤
 │  infrastructure/ - External adapters│
 │  (HTTP clients, API bindings)       │
-│  - Side effects                      │
-│  - Third-party integrations          │
+│  - Side effects                     │
+│  - Third-party integrations         │
+│  ↓ implements application ports     │
+├─────────────────────────────────────┤
+│  application/ - Business workflows  │
+│  (Use-cases, units, coordinators)   │
+│  - Complex orchestration            │
+│  - Multi-source coordination        │
+│  - React hooks and state            |
+|  — NO COMPONENTS OR TSX             │
+├─────────────────────────────────────┤
+│  domain/      - Pure logic          │
+│  (Pure functions, transformations)  │
+│  - Business rules                   │
+│  - Data transformations             │
+│  - NO REACT                         │
+│  (No dependencies - innermost)      │
 └─────────────────────────────────────┘
 ```
 
@@ -74,14 +109,56 @@ This works well for data-heavy React applications where business rules involve q
 - Testing depends on all layers for mocks and factories
 - **NEVER let inner layers know about outer layers**
 
+### ⚠️ Two Exceptions to the Dependency Rule
+
+These exceptions accommodate React's patterns: adapters bridge infrastructure via hooks, and coordinators access composition-layer context through React's context API:
+
+1. **Adapters → Infrastructure**: Adapters (in `application/adapters/`) import from `infrastructure/` to wrap infrastructure implementations. This is by design - adapters bridge infrastructure to application ports, so they must know about infrastructure.
+
+   ```typescript
+   // application/adapters/vocabularyAdapter.ts
+   import { createVocabularyInfrastructure } from '@infrastructure/vocabulary/vocabularyInfrastructure';
+
+   export function useVocabularyAdapter(): VocabularyPort {
+     return createVocabularyInfrastructure(/* ... */);
+   }
+   ```
+
+2. **Coordinators → Composition**: Coordinator hooks (in `application/coordinators/hooks/`) can import context-accessing hooks from `composition/` to access composition-layer context. Coordinators should NOT import providers directly - providers are composed at the composition layer level. Only the context-accessing hooks are used by coordinators.
+
+   ```typescript
+   // ✅ CORRECT: Coordinator hook uses context-accessing hook
+   // application/coordinators/hooks/useAudioCoordinator.ts
+   import { useAudioContext } from '@composition/context/AudioContext';
+
+   export function useAudioCoordinator() {
+     const audioEngine = useAudioContext(); // Exception: coordinator accesses composition context
+     // ... use audioEngine
+   }
+
+   // ❌ INCORRECT: Coordinator provider should NOT import composition providers
+   // application/coordinators/providers/MainProvider.tsx
+   // import { AudioEngineProvider } from '@composition/providers/AudioProvider'; // NO!
+   // Providers are composed at composition layer, not in coordinator providers
+   ```
+
+**Why these exceptions are acceptable:**
+
+- They're limited to specific, well-defined boundaries:
+  - Adapters wrapping infrastructure (adapters exist to bridge infrastructure)
+  - Coordinators accessing composition context via hooks (context access, not provider composition)
+- They don't introduce business logic dependencies
+- They maintain separation of concerns while enabling necessary composition
+- Provider composition happens at the composition layer, not in coordinators
+
 ## Strict Dos and Don'ts
 
 ### ✅ DO
 
 - Keep each layer focused on its responsibility
-- Pass dependencies as function parameters
 - Use pure functions in domain
 - Use React hooks in application for runtime behavior
+- Use Explicitly defined return types (no typeof)
 - Keep domain framework-agnostic (no React)
 - Let composition wire all dependencies
 - Document business rules clearly in comments
