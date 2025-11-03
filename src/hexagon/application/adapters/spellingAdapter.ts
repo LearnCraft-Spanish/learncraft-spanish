@@ -1,7 +1,7 @@
-import type { SpellingPort } from '../ports/spellingPort';
+import type { SpellingPort } from '@application/ports/spellingPort';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { config } from '@config';
 import { createSpellingInfrastructure } from '@infrastructure/spellingInfrastructure';
-import { config } from 'src/hexagon/config';
 
 export function useSpellingAdapter(): SpellingPort {
   const apiUrl = config.backendDomain;

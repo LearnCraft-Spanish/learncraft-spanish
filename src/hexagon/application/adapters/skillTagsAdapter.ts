@@ -1,7 +1,7 @@
-import type { SkillTagsPort } from '../ports/skillTagsPort';
+import type { SkillTagsPort } from '@application/ports/skillTagsPort';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { config } from '@config';
 import { createSkillTagsInfrastructure } from '@infrastructure/skillTagsInfrastructure';
-import { config } from 'src/hexagon/config';
-import { useAuthAdapter } from './authAdapter';
 
 export function useSkillTagsAdapter(): SkillTagsPort {
   const apiUrl = config.backendDomain;

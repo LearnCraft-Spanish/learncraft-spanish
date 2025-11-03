@@ -1,3 +1,5 @@
+// TO DO : Move this to the domain layer
+
 import { z } from 'zod';
 
 export const WordCountSchema = z.object({
