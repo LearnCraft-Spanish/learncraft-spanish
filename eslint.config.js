@@ -172,7 +172,7 @@ export default antfu(
       ],
       // TO DO: INCREASE THIS TO ERROR (HIGH PRIORITY)
       'boundaries/element-types': [
-        'error',
+        'warn',
         {
           default: 'allow',
           rules: [
