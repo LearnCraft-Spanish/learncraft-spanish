@@ -34,6 +34,7 @@ application/
 ### ✅ DO
 
 - Use React hooks for runtime behavior and state
+- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
 - Compose domain functions for business logic
 - Define ports (interfaces) for external dependencies
 - Use adapters to wrap infrastructure implementations
@@ -67,20 +68,31 @@ application/
 ## Examples of What Belongs Here
 
 ```typescript
-// ✅ Use-case hook orchestrating multiple units
-export function useCustomQuiz() {
+// ✅ Use-case hook orchestrating multiple units (EXPLICIT return type)
+export interface UseCustomQuizResult {
+  quizItems: QuizItem[];
+  // ... other properties
+}
+
+export function useCustomQuiz(): UseCustomQuizResult {
   const { vocabulary } = useVocabulary();
   const { filter } = useFiltering();
   const { paginate } = usePagination();
-  
+
   return {
     quizItems: paginate(filter(vocabulary)),
     // ... orchestration logic
   };
 }
 
-// ✅ Unit hook with reusable logic
-export function usePagination<T>(items: T[]) {
+// ✅ Unit hook with reusable logic (EXPLICIT return type)
+export interface UsePaginationResult<T> {
+  paginated: T[];
+  page: number;
+  setPage: (page: number) => void;
+}
+
+export function usePagination<T>(items: T[]): UsePaginationResult<T> {
   const [page, setPage] = useState(1);
   const paginated = useMemo(() => {
     return items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -88,8 +100,13 @@ export function usePagination<T>(items: T[]) {
   return { paginated, page, setPage };
 }
 
-// ✅ Coordinator for shared state
-export function useSelectedLesson() {
+// ✅ Coordinator for shared state (EXPLICIT return type)
+export interface UseSelectedLessonResult {
+  lesson: Lesson | null;
+  setLesson: (lesson: Lesson | null) => void;
+}
+
+export function useSelectedLesson(): UseSelectedLessonResult {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   // ... shared state logic
   return { lesson, setLesson };
@@ -101,7 +118,7 @@ export interface VocabularyPort {
   createVocabulary(data: Vocabulary): Promise<Vocabulary>;
 }
 
-// ✅ Adapter wrapping infrastructure (no logic)
+// ✅ Adapter wrapping infrastructure (no logic, EXPLICIT return type)
 export function useVocabularyAdapter(): VocabularyPort {
   const { getVocabulary, createVocabulary } = useVocabularyInfrastructure();
   return { getVocabulary, createVocabulary };
@@ -140,16 +157,19 @@ import { useRouter } from 'react-router-dom';
 ## Ports and Adapters Pattern
 
 **Ports** (`ports/`):
+
 - Define the interface that infrastructure must implement
 - Pure TypeScript types/interfaces
 - No implementation
 
 **Adapters** (`adapters/`):
+
 - Wrap infrastructure implementations to match ports
 - Thin layer - no business logic
 - Just function/type mapping
 
 **Infrastructure** (separate layer):
+
 - Implements the actual HTTP calls, database queries, etc.
 - Must match port interfaces
 - Adapters use infrastructure
@@ -180,4 +200,3 @@ import { useRouter } from 'react-router-dom';
 - New external dependency interface → `ports/`
 - New infrastructure wrapper → `adapters/` (thin, no logic)
 - New data queries → `queries/`
-

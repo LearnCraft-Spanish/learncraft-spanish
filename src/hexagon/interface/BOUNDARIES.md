@@ -32,9 +32,10 @@ interface/
 ### ✅ DO
 
 - Use React components for rendering
-- Call **exactly ONE use-case hook** per component (no more, no less)
-- **Only destructure** the use-case hook result (no business logic, no transformations)
-- Pass use-case values directly to child components (no logical combination with props)
+- Call **exactly ONE hook** per component (no more, no less)
+- **Only destructure** the hook result (no business logic, no transformations)
+- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
+- Pass values directly to child components (no logical combination with props)
 - Handle UI events and call application hooks
 - Compose smaller components into pages
 - Implement UI-specific state (modals, popups, theme) sparingly
@@ -45,12 +46,12 @@ interface/
 ### ❌ DON'T
 
 - **NO business logic** (use application hooks instead)
-- **NO multiple use-case hooks** in a single component (ONE hook only)
+- **NO multiple hooks** in a single component (ONE hook only)
 - **NO transformations or logic** on use-case hook results (destructure only)
 - **NO logical combination** of props and use-case hook values (pass them separately)
 - **NO direct infrastructure imports** (go through application layer)
 - **NO domain logic** (use application layer)
-- **NO API calls** (use application use-cases)
+- **NO API calls** (use application hooks)
 - **NO complex orchestration** (application layer handles that)
 - **NO classes or OOP** (functional components only)
 - **NO direct state management libraries** (use application coordinators)
@@ -99,8 +100,14 @@ export default function VocabularyPage() {
   );
 }
 
-// ✅ UI-specific hook (strictly visual, no use-case)
-export function useModal() {
+// ✅ UI-specific hook (strictly visual, no use-case, EXPLICIT return type)
+export interface UseModalResult {
+  isOpen: boolean;
+  open: () => void;
+  close: () => void;
+}
+
+export function useModal(): UseModalResult {
   const [isOpen, setIsOpen] = useState(false);
   return {
     isOpen,

@@ -21,6 +21,7 @@ Bridging infrastructure to application ports:
 
 - Keep adapters **thin** (minimal code, no logic)
 - Match port interfaces exactly
+- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
 - Export React hooks (even if just wrapping)
 - Use infrastructure implementations
 - Provide mock files (`*.mock.ts`) for testing

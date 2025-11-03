@@ -37,6 +37,7 @@ External IO, API bindings, and third-party effects:
 - **NO testable logic** (if you need tests, logic belongs in application)
 - **NO classes or OOP** (functions/hooks only)
 - **NO framework types in domain/application** (but React is OK here for hooks)
+- **NO mixing of external concerns** (one infrastructure file = one external system)
 
 ## Dependency Rules
 
@@ -55,19 +56,19 @@ External IO, API bindings, and third-party effects:
 // ✅ HTTP implementation matching a port
 export function useVocabularyInfrastructure() {
   const queryClient = useQueryClient();
-  
+
   const getVocabulary = async (): Promise<Vocabulary[]> => {
     const path = SharedEndpoints.vocabulary.list.path;
     const response = await httpClient.get(path);
     return response.data;
   };
-  
+
   const createVocabulary = async (data: Vocabulary): Promise<Vocabulary> => {
     const path = SharedEndpoints.vocabulary.create.path;
     const response = await httpClient.post(path, data);
     return response.data;
   };
-  
+
   return { getVocabulary, createVocabulary };
 }
 
@@ -133,13 +134,40 @@ export function useQuizInfrastructure() {
   };
 }
 
+// ❌ Mixing external concerns (one file = one external system)
+export function useVocabularyInfrastructure() {
+  // ❌ NO! Mixing HTTP API calls with localStorage
+  return {
+    getVocabulary: async () => {
+      return await httpClient.get(path);
+    },
+    // ❌ NO! This belongs in a separate cookie/storage infrastructure file
+    getCachedVocabulary: () => {
+      return localStorage.getItem('vocab');
+    },
+  };
+}
+
+// ❌ Mixing auth with API calls
+export function useVocabularyInfrastructure() {
+  // ❌ NO! Auth belongs in separate authInfrastructure file
+  const token = authClient.getToken();
+  return {
+    getVocabulary: async () => {
+      return await httpClient.get(path, { headers: { Authorization: token } });
+    },
+  };
+}
+
 // ❌ React components
 export function VocabularyList() {
   return <div>...</div>;
 }
 ```
 
-## ⚠️ CRITICAL: No Hardcoded Paths
+## ⚠️ CRITICAL Rules
+
+### 1. No Hardcoded Paths
 
 **NEVER hardcode API paths in infrastructure. This will lead to immediate firing.**
 
@@ -152,6 +180,52 @@ const path = SharedEndpoints.vocabulary.getById.path.replace(':id', id);
 // ❌ INCORRECT - DO NOT DO THIS!
 const path = '/api/vocabulary/:id'.replace(':id', id);
 ```
+
+### 2. No Mixing External Concerns
+
+**Each infrastructure file must handle ONLY ONE external concern.**
+
+- ✅ One file = one external system (HTTP API, localStorage, cookies, auth, etc.)
+- ❌ Do NOT mix HTTP calls with localStorage in the same file
+- ❌ Do NOT mix auth with API calls in the same file
+- ❌ Do NOT mix different external services in the same file
+
+```typescript
+// ✅ CORRECT: Separate files for separate concerns
+// vocabularyInfrastructure.ts - HTTP API only
+export function useVocabularyInfrastructure() {
+  return {
+    getVocabulary: async () => httpClient.get(path),
+    createVocabulary: async (data) => httpClient.post(path, data),
+  };
+}
+
+// cookieInfrastructure.ts - Cookies only
+export function useCookieInfrastructure() {
+  return {
+    get: (key) => document.cookie.split('; ').find(...),
+    set: (key, value) => { document.cookie = `${key}=${value}`; },
+  };
+}
+
+// ❌ INCORRECT: Mixing concerns
+export function useVocabularyInfrastructure() {
+  return {
+    // HTTP API
+    getVocabulary: async () => httpClient.get(path),
+    // ❌ NO! Cookies belong in separate file
+    getCookie: (key) => document.cookie.split('; ').find(...),
+  };
+}
+```
+
+**Why this matters:**
+
+- Clear separation of concerns
+- Easier to test and mock
+- Easier to swap implementations
+- Prevents accidental coupling
+- Makes dependencies explicit
 
 ## Testing
 
@@ -184,4 +258,3 @@ ports/VocabularyPort.ts    →       vocabularyInfrastructure.ts
 ```
 
 The application layer's `adapters/` directory wraps infrastructure implementations to match the ports, providing a clean separation.
-

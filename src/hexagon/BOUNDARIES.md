@@ -158,7 +158,7 @@ These exceptions accommodate React's patterns: adapters bridge infrastructure vi
 - Keep each layer focused on its responsibility
 - Use pure functions in domain
 - Use React hooks in application for runtime behavior
-- Use Explicitly defined return types (no typeof)
+- **Use EXPLICIT return types for ALL hooks** (no inferred types, no `typeof`, export interfaces)
 - Keep domain framework-agnostic (no React)
 - Let composition wire all dependencies
 - Document business rules clearly in comments
@@ -176,6 +176,7 @@ These exceptions accommodate React's patterns: adapters bridge infrastructure vi
 - NO HTTP types outside infrastructure layer
 - NO database types outside infrastructure layer
 - NO untyped mocks (`vi.fn()` - use `createTypedMock<T>()`)
+- **NO inferred return types for hooks** (no `typeof`, no `ReturnType<>`, no type inference - always export interfaces)
 
 ## Reading Order
 

@@ -20,6 +20,7 @@ Data fetching and caching:
 ### ✅ DO
 
 - Use TanStack Query (`useQuery`, `useMutation`)
+- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
 - Provide loading and error states
 - Use appropriate query keys
 - Follow query configuration patterns
@@ -53,10 +54,10 @@ Data fetching and caching:
 ## Examples of What Belongs Here
 
 ```typescript
-// ✅ Simple data fetching query
+// ✅ Simple data fetching query (EXPLICIT return type)
 export function useSubcategories(): UseSubcategoriesResult {
   const { getSubcategories } = useSubcategoryAdapter();
-  
+
   const {
     data = [],
     isLoading,
@@ -67,7 +68,7 @@ export function useSubcategories(): UseSubcategoriesResult {
     queryFn: getSubcategories,
     ...queryDefaults.referenceData,
   });
-  
+
   return {
     subcategories: data,
     loading: isLoading,
@@ -81,30 +82,30 @@ export function useFlashcardsQuery(): UseFlashcardsQueryReturnType {
   const { getFlashcards } = useFlashcardAdapter();
   const { appUser } = useActiveStudent(); // coordinator
   const userId = appUser?.recordId;
-  
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['flashcards', userId],
     queryFn: () => getFlashcards(),
     enabled: userId !== undefined,
     ...queryDefaults.entityData,
   });
-  
+
   return { flashcards: data ?? [], isLoading, error };
 }
 
 // ✅ Query with filters (using coordinators)
 export function useExampleQuery(
   pageSize: number,
-  audioRequired?: boolean
+  audioRequired?: boolean,
 ): UseExampleQueryReturnType {
   const { filterState } = useCombinedFilters(); // coordinator
   const { getFilteredExamples } = useExampleAdapter();
-  
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['examples', filterState, pageSize],
     queryFn: () => getFilteredExamples({ ...filterState, pageSize }),
   });
-  
+
   return { examples: data ?? [], isLoading, error };
 }
 ```
@@ -118,12 +119,12 @@ export function useVocabularyQuery() {
     queryKey: ['vocabulary'],
     queryFn: getVocabulary,
   });
-  
+
   // ❌ NO! Filtering is business logic
   const activeVocab = useMemo(() => {
-    return data?.filter(v => v.active && v.frequency > 10) ?? [];
+    return data?.filter((v) => v.active && v.frequency > 10) ?? [];
   }, [data]);
-  
+
   return { vocabulary: activeVocab };
 }
 
@@ -133,7 +134,7 @@ export function useQuizDataQuery() {
   const vocab = useVocabularyQuery();
   const examples = useExampleQuery();
   const flashcards = useFlashcardsQuery();
-  
+
   return combineAll(vocab, examples, flashcards);
 }
 
@@ -143,12 +144,12 @@ export function useExampleQuery() {
     queryKey: ['examples'],
     queryFn: getExamples,
   });
-  
+
   // ❌ NO! Transformation belongs in units/use-cases
   const enriched = useMemo(() => {
-    return data?.map(e => enrichExample(e)) ?? [];
+    return data?.map((e) => enrichExample(e)) ?? [];
   }, [data]);
-  
+
   return { examples: enriched };
 }
 
@@ -169,7 +170,7 @@ export function useVocabularyQuery() {
 ```typescript
 export function useResourceQuery() {
   const { getResource } = useResourceAdapter();
-  
+
   return useQuery({
     queryKey: ['resource'],
     queryFn: getResource,
@@ -183,7 +184,7 @@ export function useResourceQuery() {
 ```typescript
 export function useResourceByIdQuery(id: number) {
   const { getResourceById } = useResourceAdapter();
-  
+
   return useQuery({
     queryKey: ['resource', id],
     queryFn: () => getResourceById(id),
@@ -197,7 +198,7 @@ export function useResourceByIdQuery(id: number) {
 ```typescript
 export function useFilteredResourceQuery(filters: Filters) {
   const { getFilteredResource } = useResourceAdapter();
-  
+
   return useQuery({
     queryKey: ['resource', filters],
     queryFn: () => getFilteredResource(filters),
@@ -254,14 +255,17 @@ export default mockUseSubcategories;
 ## Key Distinctions
 
 **Queries vs Use Cases:**
+
 - Queries = Simple data fetching
 - Use cases = Complete workflows (may use queries)
 
 **Queries vs Units:**
+
 - Queries = Data fetching only
 - Units = Logic and transformations (may use queries)
 
 **Queries vs Adapters:**
+
 - Queries = React Query wrappers with caching
 - Adapters = Thin infrastructure wrappers
 
@@ -285,13 +289,14 @@ queryDefaults.entityData = {
 ## When to Create a Query
 
 Create a query when:
+
 - ✅ Fetching data from infrastructure
 - ✅ Need caching and automatic refetching
 - ✅ Need loading/error states
 - ✅ Data is used by multiple use-cases
 
 Don't create a query for:
+
 - ❌ Business logic processing (use unit/use-case)
 - ❌ Simple local state (use useState)
 - ❌ Derived/computed data (use useMemo in unit/use-case)
-

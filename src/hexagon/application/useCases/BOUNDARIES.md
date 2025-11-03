@@ -20,7 +20,7 @@ Complete business workflows and user interactions:
 ### ✅ DO
 
 - Compose multiple units and coordinators
-- Define explicit return types (export interfaces)
+- **Define EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
 - Provide complete feature APIs (CRUD, loading states, error handling)
 - Maintain state that spans multiple units
 - Handle reactive state changes across units
@@ -39,7 +39,7 @@ Complete business workflows and user interactions:
 
 ## Core Principles
 
-1. **Explicit Return Types**: Every use case MUST have an explicitly defined and exported return type
+1. **EXPLICIT Return Types**: Every use case MUST have an explicitly defined and exported return type interface - NO inferred types, NO `typeof`, NO `ReturnType<>` - Export the interface directly
 2. **Interface Boundary**: Interface components may ONLY call use cases, never units or other application layers directly
 3. **Application Logic Exposure**: Application logic can ONLY be exposed to the interface through use cases
 

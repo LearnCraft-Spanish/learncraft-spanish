@@ -36,6 +36,7 @@ composition/
 - Compose providers statically
 - Wire contexts together
 - **Define provider-accessing hooks** (simple context access, no business logic)
+- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
 - Export root component(s)
 - Use simple, declarative JSX composition
 - Keep it minimal and focused
@@ -115,7 +116,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// ✅ Provider-accessing hook (context access only, NO business logic)
+// ✅ Provider-accessing hook (context access only, NO business logic, EXPLICIT return type)
 export function useAudioContext(): AudioEngine {
   const context = use(AudioContext);
   if (!context) {
@@ -289,7 +290,7 @@ export interface SomeContextType {
 
 export const SomeContext = createContext<SomeContextType | null>(null);
 
-// ✅ Provider-accessing hook - ONLY this pattern
+// ✅ Provider-accessing hook - ONLY this pattern (EXPLICIT return type)
 export function useSomeContext(): SomeContextType {
   const context = use(SomeContext);
   if (!context) {

@@ -31,7 +31,7 @@ coordinators/
 - Manage truly shared state (used across multiple features)
 - Provide React context for state sharing
 - Keep state updates atomic and predictable
-- Export explicit return types
+- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
 - Write 100% test coverage (`*.test.ts`, `*.stub.ts`)
 - Use TypeScript for type safety
 - Document state shape and update patterns

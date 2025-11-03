@@ -22,6 +22,7 @@ Reusable, focused functionality:
 - Keep single responsibility (one focused task)
 - Make hooks composable and reusable
 - Use React hooks for local state
+- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
 - Return focused, typed interfaces
 - Write 100% test coverage (`*.test.ts`)
 - Keep units independent (minimal dependencies)
@@ -52,8 +53,17 @@ Reusable, focused functionality:
 ## Examples of What Belongs Here
 
 ```typescript
-// ✅ Reusable pagination logic
-export function usePagination<T>(items: T[], pageSize: number = 10) {
+// ✅ Reusable pagination logic (EXPLICIT return type)
+export interface UsePaginationResult<T> {
+  paginated: T[];
+  page: number;
+  totalPages: number;
+  setPage: (page: number) => void;
+  nextPage: () => void;
+  prevPage: () => void;
+}
+
+export function usePagination<T>(items: T[], pageSize: number = 10): UsePaginationResult<T> {
   const [page, setPage] = useState(1);
   
   const paginated = useMemo(() => {
@@ -61,21 +71,27 @@ export function usePagination<T>(items: T[], pageSize: number = 10) {
     return items.slice(start, start + pageSize);
   }, [items, page, pageSize]);
   
+  const totalPages = Math.ceil(items.length / pageSize);
+  
   return {
     paginated,
     page,
-    totalPages: Math.ceil(items.length / pageSize),
+    totalPages,
     setPage,
     nextPage: () => setPage(p => Math.min(p + 1, totalPages)),
     prevPage: () => setPage(p => Math.max(1, p - 1)),
   };
 }
 
-// ✅ Focused filtering logic
+// ✅ Focused filtering logic (EXPLICIT return type)
+export interface UseFilteringResult<T> {
+  filtered: T[];
+}
+
 export function useFiltering<T>(
   items: T[],
   filterFn: (item: T) => boolean
-) {
+): UseFilteringResult<T> {
   const filtered = useMemo(() => {
     return items.filter(filterFn);
   }, [items, filterFn]);
