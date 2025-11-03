@@ -66,7 +66,7 @@ coordinators/
 export function useActiveStudent(): UseActiveStudentReturnType {
   const context = use(ActiveStudentContext);
   const { getAppUserByEmail } = useAppUserAdapter();
-  
+
   // Shared state management
   return {
     appUser: context.studentSelectionState.appUser,
@@ -79,7 +79,7 @@ export function useActiveStudent(): UseActiveStudentReturnType {
 // ✅ Cross-cutting concerns
 export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturnType {
   const context = use(SelectedCourseAndLessonsContext);
-  
+
   // Shared across multiple use-cases (quiz creation, vocabulary, etc.)
   return {
     course: context.course,
@@ -93,7 +93,7 @@ export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturn
 // ✅ Global filter state (used by multiple features)
 export function useExampleFilterCoordinator() {
   const context = use(ExampleFilterContext);
-  
+
   // Shared filter state used across quiz and example features
   return {
     filterState: context.filterState,
@@ -116,7 +116,7 @@ export function useVerbCreationState() {
 // ❌ Business logic (belongs in useCases/ or units/)
 export function useSelectedLesson() {
   const [lesson, setLesson] = useState(null);
-  
+
   // ❌ NO! Validation logic belongs in use-case or unit
   const validateLesson = (lesson) => {
     if (!lesson.title) throw new Error('Title required');
@@ -155,7 +155,7 @@ export const ActiveStudentContext = createContext<ActiveStudentContextType | nul
 // Provider component
 export function ActiveStudentProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState(initialState);
-  
+
   return (
     <ActiveStudentContext.Provider value={{ state, setState }}>
       {children}
@@ -198,27 +198,31 @@ export function useActiveStudent() {
 ## Key Distinctions
 
 **Coordinators vs Use Cases:**
+
 - Coordinators = Shared state, cross-cutting
 - Use cases = Feature workflows, orchestration
 
 **Coordinators vs Units:**
+
 - Coordinators = Shared, application-wide
 - Units = Local, reusable building blocks
 
 **Coordinators vs Interface State:**
+
 - Coordinators = Shared across features
 - Interface state = Component-specific UI state
 
 ## When to Use Coordinators
 
 Use coordinators when:
+
 - ✅ State is needed by multiple use-cases
 - ✅ State represents global application state
 - ✅ State needs to persist across route changes
 - ✅ State coordinates between features
 
 Don't use coordinators for:
+
 - ❌ Feature-specific state (use use-case)
 - ❌ Component-specific UI state (use interface)
 - ❌ Local transformations (use unit)
-

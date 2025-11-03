@@ -141,9 +141,8 @@ export { mock as mockUseExample, override as overrideMockUseExample };
 ```typescript
 import { createTypedMock } from '@testing/utils/typedMock';
 
-export const mockUseExample = createTypedMock<
-  () => UseExampleResult
->().mockReturnValue(defaultResult);
+export const mockUseExample =
+  createTypedMock<() => UseExampleResult>().mockReturnValue(defaultResult);
 ```
 
 ### 3. Factory Pattern
@@ -159,16 +158,16 @@ export const createMockVocabularyList = createZodListFactory(VocabularySchema);
 
 ### Coverage Requirements
 
-| Layer | Coverage | Test Files |
-|-------|----------|------------|
-| `domain/` | ✅ 100% | `*.test.ts` |
-| `application/useCases/` | ✅ 100% | `*.test.ts`, `*.stub.ts` |
-| `application/units/` | ✅ 100% | `*.test.ts` |
-| `application/coordinators/` | ✅ 100% | `*.test.ts`, `*.stub.ts` |
-| `interface/components/` | ✅ 100% | `*.test.tsx` |
-| `interface/pages/` | ✅ 100% | `*.test.tsx` |
-| `application/adapters/` | ❌ N/A | `*.mock.ts` |
-| `infrastructure/` | ❌ N/A | No logic = no tests |
+| Layer                       | Coverage | Test Files               |
+| --------------------------- | -------- | ------------------------ |
+| `domain/`                   | ✅ 100%  | `*.test.ts`              |
+| `application/useCases/`     | ✅ 100%  | `*.test.ts`, `*.stub.ts` |
+| `application/units/`        | ✅ 100%  | `*.test.ts`              |
+| `application/coordinators/` | ✅ 100%  | `*.test.ts`, `*.stub.ts` |
+| `interface/components/`     | ✅ 100%  | `*.test.tsx`             |
+| `interface/pages/`          | ✅ 100%  | `*.test.tsx`             |
+| `application/adapters/`     | ❌ N/A   | `*.mock.ts`              |
+| `infrastructure/`           | ❌ N/A   | No logic = no tests      |
 
 ### Mock File Locations
 
@@ -181,6 +180,7 @@ export const createMockVocabularyList = createZodListFactory(VocabularySchema);
 ⚠️ **DO NOT MODIFY OR DUPLICATE `setupTests.ts`**
 
 The global `setupTests.ts` file handles:
+
 - Adapter mocking
 - Test isolation
 - Query client reset
@@ -251,4 +251,3 @@ it('renders correctly', () => {
 4. **Defaults**: Provide happy-path defaults for all mocks
 5. **Override**: Support test-specific overrides without global mutation
 6. **Colocation**: Keep mocks close to implementations
-

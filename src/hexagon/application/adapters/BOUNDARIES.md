@@ -77,7 +77,7 @@ import { exampleInfrastructure } from '../../infrastructure/exampleInfrastructur
 
 export function useExampleAdapter(): ExamplePort {
   const infra = exampleInfrastructure;
-  
+
   return {
     // Just mapping function names/parameters to match port
     getExamples: (filters: ExampleFilters) => {
@@ -101,16 +101,19 @@ import { useState, useCallback } from 'react';
 export function useAudioAdapter(): AudioPort {
   const [cache, setCache] = useState<AudioCache>({});
   const infra = audioInfrastructure;
-  
-  const playAudio = useCallback(async (url: string) => {
-    if (cache[url]) {
-      return cache[url]; // React state management
-    }
-    const audio = await infra.play(url);
-    setCache(prev => ({ ...prev, [url]: audio }));
-    return audio;
-  }, [cache]);
-  
+
+  const playAudio = useCallback(
+    async (url: string) => {
+      if (cache[url]) {
+        return cache[url]; // React state management
+      }
+      const audio = await infra.play(url);
+      setCache((prev) => ({ ...prev, [url]: audio }));
+      return audio;
+    },
+    [cache],
+  );
+
   return { playAudio };
 }
 ```
@@ -124,7 +127,7 @@ export function useVocabularyAdapter(): VocabularyPort {
     getVocabulary: async () => {
       const data = await infrastructure.getVocabulary();
       // ❌ NO! Filtering is business logic - belongs in use-case
-      return data.filter(v => v.active && v.frequency > 10);
+      return data.filter((v) => v.active && v.frequency > 10);
     },
   };
 }
@@ -147,7 +150,7 @@ export function useExampleAdapter(): ExamplePort {
     getExamples: async (filters) => {
       const data = await infrastructure.getExamples();
       // ❌ NO! Transformation logic belongs in units/use-cases
-      return data.map(e => enrichExample(e));
+      return data.map((e) => enrichExample(e));
     },
   };
 }
@@ -157,7 +160,7 @@ export function useVocabularyAdapter(): VocabularyPort {
   return {
     // ❌ NO! Use infrastructure instead
     getVocabulary: async () => {
-      return await fetch('/api/vocabulary').then(r => r.json());
+      return await fetch('/api/vocabulary').then((r) => r.json());
     },
   };
 }
@@ -223,6 +226,7 @@ export default mockVocabularyAdapter;
 ## Testing
 
 Adapters typically don't need complex tests (they're thin wrappers), but:
+
 - Mock files (`*.mock.ts`) are required
 - If adapter has transformation logic, test it
 - Ensure adapters match ports exactly
@@ -243,14 +247,17 @@ Adapters typically don't need complex tests (they're thin wrappers), but:
 ## Key Distinctions
 
 **Adapters vs Infrastructure:**
+
 - Adapters = React hooks wrapping infrastructure
 - Infrastructure = Pure IO implementations
 
 **Adapters vs Use Cases:**
+
 - Adapters = Thin wrappers, no logic
 - Use cases = Business workflows, orchestration
 
 **Adapters vs Ports:**
+
 - Adapters = Implementations (hooks)
 - Ports = Interface definitions (types)
 
@@ -261,4 +268,3 @@ Adapters typically don't need complex tests (they're thin wrappers), but:
 - **Clear separation**: Adapter layer has a clear purpose as React/non-React boundary
 - **Flexibility**: Infrastructure can be used in non-React contexts
 - **Portability**: Infrastructure can be shared with other platforms
-

@@ -63,23 +63,26 @@ export interface UsePaginationResult<T> {
   prevPage: () => void;
 }
 
-export function usePagination<T>(items: T[], pageSize: number = 10): UsePaginationResult<T> {
+export function usePagination<T>(
+  items: T[],
+  pageSize: number = 10,
+): UsePaginationResult<T> {
   const [page, setPage] = useState(1);
-  
+
   const paginated = useMemo(() => {
     const start = (page - 1) * pageSize;
     return items.slice(start, start + pageSize);
   }, [items, page, pageSize]);
-  
+
   const totalPages = Math.ceil(items.length / pageSize);
-  
+
   return {
     paginated,
     page,
     totalPages,
     setPage,
-    nextPage: () => setPage(p => Math.min(p + 1, totalPages)),
-    prevPage: () => setPage(p => Math.max(1, p - 1)),
+    nextPage: () => setPage((p) => Math.min(p + 1, totalPages)),
+    prevPage: () => setPage((p) => Math.max(1, p - 1)),
   };
 }
 
@@ -90,37 +93,37 @@ export interface UseFilteringResult<T> {
 
 export function useFiltering<T>(
   items: T[],
-  filterFn: (item: T) => boolean
+  filterFn: (item: T) => boolean,
 ): UseFilteringResult<T> {
   const filtered = useMemo(() => {
     return items.filter(filterFn);
   }, [items, filterFn]);
-  
+
   return { filtered };
 }
 
 // ✅ Data transformation hook
 export function useAudioQuizMapper(examples: Example[]) {
   const mapped = useMemo(() => {
-    return examples.map(example => ({
+    return examples.map((example) => ({
       id: example.id,
       audioUrl: example.audioUrl,
       correctAnswer: example.spanish,
       // ... transformation logic
     }));
   }, [examples]);
-  
+
   return { mappedExamples: mapped };
 }
 
 // ✅ Local state management
 export function useCustomQuizSettingsState() {
   const [settings, setSettings] = useState<QuizSettings>(defaultSettings);
-  
+
   const updateSetting = useCallback((key: string, value: any) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
   }, []);
-  
+
   return { settings, updateSetting };
 }
 ```
@@ -200,14 +203,17 @@ units/
 ## Key Distinctions
 
 **Units vs Use Cases:**
+
 - Units = Building blocks, single responsibilities
 - Use cases = Complete workflows, orchestration
 
 **Units vs Queries:**
+
 - Units = Logic and transformations
 - Queries = Data fetching (units may use queries, but queries are simpler)
 
 **Units vs Coordinators:**
+
 - Units = Local state, independent functionality
 - Coordinators = Shared state, cross-cutting concerns
 
@@ -218,7 +224,7 @@ Units should be **composable** - they can be combined in use-cases:
 ```typescript
 // Use-case composes multiple units
 export function useCustomQuiz() {
-  const { vocabulary } = useVocabulary();      // unit
+  const { vocabulary } = useVocabulary(); // unit
   const { filtered } = useFiltering(vocabulary); // unit
   const { paginated } = usePagination(filtered); // unit
   // ... orchestration
@@ -226,4 +232,3 @@ export function useCustomQuiz() {
 ```
 
 Units should **not** compose other units unnecessarily - keep them focused and independent.
-

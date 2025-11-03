@@ -74,7 +74,7 @@ export function useCustomAudioQuiz(): UseCustomAudioQuizResult {
   const { examples } = useExamples();
   const { filter } = useFiltering();
   const { selectedLesson } = useSelectedLesson();
-  
+
   // Orchestrate complete quiz workflow
   return {
     quizItems: combineAndFilter(vocabulary, examples, filter),
@@ -165,7 +165,7 @@ export function setupVerbCreationMocks(config = {}) {
   // Setup dependencies
   setupMockVocabulary(config.vocabulary);
   setupMockSubcategories(config.subcategories);
-  
+
   // Setup and return use-case mock
   return overrideMockUseVerbCreation(config.useCase);
 }
@@ -188,14 +188,16 @@ export function setupVerbCreationMocks(config = {}) {
 ## Key Distinctions
 
 **Use Cases vs Units:**
+
 - Use cases = Complete workflows, user-facing features
 - Units = Reusable building blocks, single responsibilities
 
 **Use Cases vs Queries:**
+
 - Use cases = Business workflows that may use queries
 - Queries = Simple data fetching hooks
 
 **Use Cases vs Coordinators:**
+
 - Use cases = Feature-specific orchestration
 - Coordinators = Cross-cutting shared state
-

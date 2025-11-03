@@ -171,6 +171,7 @@ export interface ExamplePort {
 ## Testing
 
 Ports are pure types, so they don't need tests. However:
+
 - Mock implementations in `application/adapters/*.mock.ts` should match ports
 - Infrastructure implementations must match ports
 - Tests verify that adapters/infrastructure conform to ports
@@ -191,14 +192,17 @@ Ports are pure types, so they don't need tests. However:
 ## Key Distinctions
 
 **Ports vs Adapters:**
+
 - Ports = Interface definitions (types)
 - Adapters = React hooks that wrap infrastructure to match ports
 
 **Ports vs Infrastructure:**
+
 - Ports = What we need (contract)
 - Infrastructure = What we have (implementation)
 
 **Ports vs Domain:**
+
 - Ports = External dependency contracts
 - Domain = Core business types
 
@@ -233,4 +237,3 @@ export function useVocabulary() {
 ```
 
 This pattern ensures the application layer never directly depends on infrastructure.
-
