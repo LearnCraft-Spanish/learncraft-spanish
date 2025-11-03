@@ -32,7 +32,9 @@ interface/
 ### ✅ DO
 
 - Use React components for rendering
-- Inject application use-case hooks via props or direct import
+- Call **exactly ONE use-case hook** per component (no more, no less)
+- **Only destructure** the use-case hook result (no business logic, no transformations)
+- Pass use-case values directly to child components (no logical combination with props)
 - Handle UI events and call application hooks
 - Compose smaller components into pages
 - Implement UI-specific state (modals, popups, theme) sparingly
@@ -43,6 +45,9 @@ interface/
 ### ❌ DON'T
 
 - **NO business logic** (use application hooks instead)
+- **NO multiple use-case hooks** in a single component (ONE hook only)
+- **NO transformations or logic** on use-case hook results (destructure only)
+- **NO logical combination** of props and use-case hook values (pass them separately)
 - **NO direct infrastructure imports** (go through application layer)
 - **NO domain logic** (use application layer)
 - **NO API calls** (use application use-cases)
@@ -56,6 +61,9 @@ interface/
 **Interface depends ONLY on application use-cases:**
 
 - ✅ Can import from `application/useCases/` (hooks)
+- ✅ **MUST call exactly ONE use-case hook per component**
+- ✅ **MUST only destructure** the use-case hook result (no logic, no transformations)
+- ✅ **MUST NOT combine** props and use-case values logically (pass separately)
 - ✅ Can use React and React Router
 - ✅ Can use composition layer providers via context
 - ❌ Cannot import from `application/units/` or `application/coordinators/` directly (use use-cases)
@@ -65,7 +73,7 @@ interface/
 ## Examples of What Belongs Here
 
 ```typescript
-// ✅ Presentational component
+// ✅ Presentational component (no use-case hook)
 export function VocabularyCard({ vocabulary, onSelect }: Props) {
   return (
     <div onClick={() => onSelect(vocabulary.id)}>
@@ -75,13 +83,13 @@ export function VocabularyCard({ vocabulary, onSelect }: Props) {
   );
 }
 
-// ✅ Page component using use-case hook
+// ✅ Page component using ONE use-case hook (destructure only)
 export default function VocabularyPage() {
-  const { vocabulary, loading, error } = useCustomVocabulary();
-  
+  const { vocabulary, loading, error } = useCustomVocabulary(); // ONE hook only
+
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage error={error} />;
-  
+
   return (
     <div>
       {vocabulary.map(v => (
@@ -91,7 +99,7 @@ export default function VocabularyPage() {
   );
 }
 
-// ✅ UI-specific hook (strictly visual)
+// ✅ UI-specific hook (strictly visual, no use-case)
 export function useModal() {
   const [isOpen, setIsOpen] = useState(false);
   return {
@@ -101,10 +109,10 @@ export function useModal() {
   };
 }
 
-// ✅ Event handler calling application hook
+// ✅ Event handler calling application hook (ONE hook only)
 export function QuizButton() {
-  const { startQuiz } = useCustomAudioQuiz();
-  
+  const { startQuiz } = useCustomAudioQuiz(); // ONE hook only
+
   return (
     <button onClick={() => startQuiz()}>
       Start Quiz
@@ -116,15 +124,36 @@ export function QuizButton() {
 ## Examples of What Does NOT Belong Here
 
 ```typescript
-// ❌ Business logic
-export function VocabularyCard({ vocabulary }: Props) {
-  // ❌ NO! Filtering is business logic
+// ❌ Multiple use-case hooks (ONE hook only per component)
+export function VocabularyPage() {
+  // ❌ NO! Only ONE use-case hook allowed
+  const { vocabulary } = useCustomVocabulary();
+  const { subcategories } = useSubcategories(); // NO!
+  const { filters } = useFiltering(); // NO!
+}
+
+// ❌ Business logic on use-case results (destructure only)
+export function VocabularyPage() {
+  const { vocabulary } = useCustomVocabulary();
+
+  // ❌ NO! Filtering is business logic - belongs in use-case
   const activeVocab = vocabulary.filter(v => v.active);
-  
-  // ❌ NO! This calculation belongs in application/domain
-  const difficulty = calculateDifficulty(vocabulary);
-  
-  return <div>...</div>;
+
+  // ❌ NO! Calculation belongs in application/domain
+  const difficulty = vocabulary.map(v => calculateDifficulty(v));
+
+  // ❌ NO! Transformations - use-case should provide this
+  const enrichedVocab = vocabulary.map(v => ({ ...v, displayName: formatName(v) }));
+}
+
+// ❌ Logical combination of props and use-case values
+export function VocabularyCard({ userId, vocabulary }: Props) {
+  const { userPreferences } = useUserPreferences(); // ❌ NO! Multiple hooks
+
+  // ❌ NO! Logical combination - belongs in use-case
+  const filteredVocab = vocabulary.filter(v =>
+    v.userId === userId && userPreferences.showActive
+  );
 }
 
 // ❌ Direct infrastructure import
@@ -164,6 +193,7 @@ Interface-level hooks are allowed for **strictly visual concerns**:
 - Tooltip positioning
 
 **These hooks must NEVER:**
+
 - Duplicate application/domain logic
 - Mutate business state
 - Call infrastructure directly
@@ -205,4 +235,3 @@ Interface Layer:              Application Layer:
 ```
 
 Interface components call application use-case hooks to get data and trigger actions. All business logic stays in the application layer.
-
