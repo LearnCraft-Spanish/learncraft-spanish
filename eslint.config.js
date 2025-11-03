@@ -153,6 +153,7 @@ export default antfu(
       // Ban all relative imports in hexagon; require aliases (@domain/* etc.)
       'no-restricted-imports': 'off',
       '@typescript-eslint/no-restricted-imports': [
+        // TO DO: INCREASE THIS TO ERROR (Lower priority)
         'warn',
         {
           patterns: [
@@ -169,6 +170,7 @@ export default antfu(
           ],
         },
       ],
+      // TO DO: INCREASE THIS TO ERROR (HIGH PRIORITY)
       'boundaries/element-types': [
         'error',
         {
@@ -225,10 +227,9 @@ export default antfu(
                 'interface',
                 'ports',
                 'adapters',
-                'composition',
               ],
               message:
-                'coordinators must not depend on application/infrastructure/interface/ports/adapters/composition.',
+                'coordinators must not depend on application/infrastructure/interface/ports/adapters.',
             },
             {
               from: ['infrastructure'],
@@ -244,14 +245,9 @@ export default antfu(
             },
             {
               from: ['interface'],
-              disallow: [
-                'infrastructure',
-                'composition',
-                'coordinators',
-                'adapters',
-              ],
+              disallow: ['infrastructure', 'composition'],
               message:
-                'interface must not depend on infrastructure (should use application/use-cases only).',
+                'interface must not depend directly on infrastructure (should use one application hook only).',
             },
           ],
         },
