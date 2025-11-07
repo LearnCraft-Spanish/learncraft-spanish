@@ -6,10 +6,10 @@ The hexagon directory implements an adaptation of **hexagonal architecture** (po
 
 **Note:** This is **NOT** strict DDD. We use a practical adaptation:
 
-- **Domain** = Pure business logic and data transformations
-- **Application** = Business workflows, orchestration, and runtime behavior
-- **Infrastructure** = External IO, API bindings, and third-party integrations
-- **Interface** = React UI components and rendering logic
+- **Domain** = Pure business logic and data transformations (schemas, types and pure functions)
+- **Application** = Business workflows, orchestration, and runtime behavior (mostly hooks)
+- **Infrastructure** = External IO, API bindings, and third-party integrations (port implementations)
+- **Interface** = React UI components and rendering logic (mostly components)
 - **Composition** = Static application bootstrap and provider wiring
 - **Testing** = Test utilities, factories, and mock helpers
 
@@ -104,7 +104,7 @@ Dependencies flow inward (outermost → innermost):
 - Domain has NO dependencies (not even other layers)
 - Application depends only on domain
 - Infrastructure implements application ports (no business logic)
-- Interface depends on application/use-cases only (via hooks)
+- Interface depends on application layer (no more than one hook, via explicit return type)
 - Composition depends on interface and wires everything together
 - Testing depends on all layers for mocks and factories
 - **NEVER let inner layers know about outer layers**
@@ -113,7 +113,7 @@ Dependencies flow inward (outermost → innermost):
 
 These exceptions accommodate React's patterns: adapters bridge infrastructure via hooks, and coordinators access composition-layer context through React's context API:
 
-1. **Adapters → Infrastructure**: Adapters (in `application/adapters/`) import from `infrastructure/` to wrap infrastructure implementations. This is by design - adapters bridge infrastructure to application ports, so they must know about infrastructure.
+1. **Adapters → Infrastructure**: Adapters (in `application/adapters/`) import from `infrastructure/` to wrap infrastructure implementations. This is a pragmatic concession for the React idiom, since injection of an adapter hook to a port at composition doesn't fit idiomatic React.
 
    ```typescript
    // application/adapters/vocabularyAdapter.ts
