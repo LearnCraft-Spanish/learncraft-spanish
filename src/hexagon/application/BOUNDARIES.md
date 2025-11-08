@@ -2,7 +2,7 @@
 
 ## What is This?
 
-The application layer contains **runtime behavior and orchestration** - all the business workflows that coordinate data flow between domain and infrastructure. This is where most of the business logic lives (for now, see longevity warning in main BOUNDARIES.md).
+The application layer contains **runtime behavior and orchestration** - all the business workflows that coordinate data flow between domain and infrastructure. This is where most of the business logic lives (for now, see longevity warning in main ARCHITECTURE.md).
 
 ## Responsibility
 
