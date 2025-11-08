@@ -20,10 +20,8 @@ Type definitions for external dependencies:
 
 - Define pure TypeScript interfaces/types
 - Keep ports focused and minimal
-- Document assumptions or requirements
-- Use clear, descriptive names
+- Use domain types from `@learncraft-spanish/shared` and `hexagon/domain` in port definitions
 - Match infrastructure capabilities realistically
-- Export types/interfaces only
 
 ### ❌ DON'T
 
@@ -33,132 +31,15 @@ Type definitions for external dependencies:
 - **NO React hooks or components** (just types)
 - **NO classes** (TypeScript interfaces/types only)
 - **NO imports from infrastructure** (would break dependency rule)
-- **NO imports from other layers** (except domain types if needed)
+- **NO imports from other hexagon layers** (except shared types)
 
 ## Dependency Rules
 
 **Ports can depend on:**
 
-- ✅ `domain/` - Use domain types in port definitions
-- ✅ TypeScript standard library
+- ✅ `@learncraft-spanish/shared` - Use shared domain types in port definitions
+- ✅ `hexagon/domain` — Ensure outside dependencies are adapted to our fronted types for fronetnd-specific concerns
 - ❌ Cannot import from `infrastructure/` (that's what we're abstracting)
-- ❌ Cannot import from `application/` (except domain types through re-export)
+- ❌ Cannot import from other `application/` subdirectories
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/adapters/`, `application/useCases/`, etc.
-
-## Port Design Principles
-
-### 1. Keep Ports Focused
-
-Each port should represent one logical external dependency:
-
-```typescript
-// ✅ Good: Focused port
-export interface VocabularyPort {
-  // Vocabulary-related operations only
-}
-
-// ❌ Bad: Too broad
-export interface DataPort {
-  // Mixing vocabulary, examples, flashcards, etc.
-}
-```
-
-### 2. Match Infrastructure Capabilities
-
-Ports should reflect what infrastructure can actually provide:
-
-```typescript
-// ✅ Realistic port
-export interface VocabularyPort {
-  getVocabulary(): Promise<Vocabulary[]>; // Async is realistic
-}
-
-// ❌ Unrealistic expectations
-export interface VocabularyPort {
-  getVocabulary(): Vocabulary[]; // Sync might not be possible
-}
-```
-
-### 3. Use Domain Types
-
-Leverage domain types in port definitions:
-
-```typescript
-import type { Vocabulary, Lesson } from '@domain/types';
-
-export interface ExamplePort {
-  getExamples(lesson: Lesson): Promise<Example[]>;
-  createExample(vocabulary: Vocabulary): Promise<Example>;
-}
-```
-
-## Testing
-
-Ports are pure types, so they don't need tests. However:
-
-- Mock implementations in `application/adapters/*.mock.ts` should match ports
-- Infrastructure implementations must match ports
-- Tests verify that adapters/infrastructure conform to ports
-
-## Reading Order
-
-1. `ports/` - Understand required interfaces
-2. `application/adapters/` - See how ports are implemented
-3. `infrastructure/` - See concrete implementations
-4. `application/useCases/` - See how ports are used
-
-## Where to Add Code?
-
-- New external dependency interface → New port file
-- New operations on existing dependency → Update port file
-- Type definitions for port → Port file or types file
-
-## Key Distinctions
-
-**Ports vs Adapters:**
-
-- Ports = Interface definitions (types)
-- Adapters = React hooks that wrap infrastructure to match ports
-
-**Ports vs Infrastructure:**
-
-- Ports = What we need (contract)
-- Infrastructure = What we have (implementation)
-
-**Ports vs Domain:**
-
-- Ports = External dependency contracts
-- Domain = Core business types
-
-## Port Usage Pattern
-
-```typescript
-// 1. Define port (ports/vocabularyPort.ts)
-export interface VocabularyPort {
-  getVocabulary(): Promise<Vocabulary[]>;
-}
-
-// 2. Adapter implements port (adapters/vocabularyAdapter.ts)
-export function useVocabularyAdapter(): VocabularyPort {
-  const infra = useVocabularyInfrastructure();
-  return { getVocabulary: infra.getVocabulary };
-}
-
-// 3. Infrastructure implements adapter (infrastructure/vocabularyInfrastructure.ts)
-export function useVocabularyInfrastructure() {
-  return {
-    getVocabulary: async () => {
-      return await httpClient.get(SharedEndpoints.vocabulary.list.path);
-    },
-  };
-}
-
-// 4. Use-case uses adapter (useCases/useVocabulary.ts)
-export function useVocabulary() {
-  const adapter = useVocabularyAdapter();
-  // Use adapter.getVocabulary()
-}
-```
-
-This pattern ensures the application layer never directly depends on infrastructure.

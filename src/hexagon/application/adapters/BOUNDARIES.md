@@ -2,18 +2,16 @@
 
 ## What is This?
 
-Adapters are **thin wrappers** that bridge infrastructure implementations to application-defined ports. They convert non-React infrastructure into React hooks and ensure infrastructure matches application port interfaces.
+Adapters are **boundary enforcers** that call infrastructure into explicit port interfaces. They do basically nothing - just ensure infrastructure matches application-defined ports. The infrastructure layer is the real adapter (adapting external services). Adapters exist **for the boundaries** - to enforce architectural separation.
 
 ## Responsibility
 
-Bridging infrastructure to application ports:
+Enforcing boundaries between infrastructure and application:
 
-- Wrap infrastructure implementations to match ports
+- Call infrastructure implementations
+- Ensure infrastructure matches port interfaces
 - Convert non-React infrastructure into React hooks
 - Keep React dependencies out of infrastructure
-- Provide consistent interfaces for use-cases
-- Handle minimal data transformations (if needed)
-- Enable easy mocking in tests
 
 ## ⚠️ Critical Rules
 
@@ -21,11 +19,7 @@ Bridging infrastructure to application ports:
 
 - Keep adapters **thin** (minimal code, no logic)
 - Match port interfaces exactly
-- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
-- Export React hooks (even if just wrapping)
 - Use infrastructure implementations
-- Provide mock files (`*.mock.ts`) for testing
-- Handle React-specific concerns (state, effects) if needed
 
 ### ❌ DON'T
 
@@ -37,117 +31,34 @@ Bridging infrastructure to application ports:
 - **NO classes or OOP** (functions/hooks only)
 - **NO direct HTTP calls** (use infrastructure)
 
+## Adapter Pattern
+
+**This is a central pattern for adapting hexagonal architecture to React.** Adapters are boundary enforcers that do basically nothing - just call infrastructure and ensure it matches the port:
+
+```typescript
+export function useVocabularyAdapter(): VocabularyPort {
+  const apiUrl = config.backendDomain;
+  const auth = useAuthAdapter();
+  return createVocabularyInfrastructure(apiUrl, auth);
+}
+```
+
+The adapter:
+
+1. Gets dependencies (config, auth adapter)
+2. Calls infrastructure factory or hook with those dependencies
+3. Returns the infrastructure implementation (which matches the port)
+
+**The infrastructure is the real adapter** (adapting external services). The adapter in `application/adapters/` exists **for the boundaries** - to enforce architectural separation and ensure type safety.
+
 ## Dependency Rules
 
 **Adapters can depend on:**
 
 - ✅ `application/ports/` - Port interfaces to implement
 - ✅ `infrastructure/` - Concrete implementations to wrap
-- ✅ React hooks (for React-specific concerns)
+- ✅ React hooks (for React-specific concerns like config/context)
 - ❌ Cannot import from `application/useCases/` or `application/units/` (would create circular dependency)
 - ❌ Cannot import from `interface/` or `composition/`
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/useCases/`, `application/queries/`, etc.
-
-## Adapter Patterns
-
-### Pattern 1: Direct Hook (Most Common)
-
-```typescript
-export function useSubcategoryAdapter(): SubcategoryPort {
-  return subcategoryInfrastructure;
-}
-```
-
-**Use when:** Infrastructure matches port exactly.
-
-### Pattern 2: Function Mapping
-
-```typescript
-export function useExampleAdapter(): ExamplePort {
-  return {
-    getExamples: infrastructure.fetchExamples,
-    createExample: infrastructure.createExample,
-  };
-}
-```
-
-**Use when:** Simple function name mapping needed.
-
-### Pattern 3: React State Wrapper
-
-```typescript
-export function useAudioAdapter(): AudioPort {
-  const [cache, setCache] = useState({});
-  // ... React-specific state management
-}
-```
-
-**Use when:** Infrastructure needs React state/effects.
-
-## Mock Files
-
-Every adapter should have a corresponding mock file:
-
-```typescript
-// vocabularyAdapter.mock.ts
-import type { VocabularyPort } from '../ports/vocabularyPort';
-import { createTypedMock } from '@testing/utils/typedMock';
-
-export const mockGetVocabulary = createTypedMock<
-  () => Promise<Vocabulary[]>
->().mockResolvedValue([]);
-
-export const mockVocabularyAdapter: VocabularyPort = {
-  getVocabulary: mockGetVocabulary,
-  // ... other methods
-};
-
-export default mockVocabularyAdapter;
-```
-
-## Testing
-
-Adapters typically don't need complex tests (they're thin wrappers), but:
-
-- Mock files (`*.mock.ts`) are required
-- If adapter has transformation logic, test it
-- Ensure adapters match ports exactly
-
-## Reading Order
-
-1. `application/ports/` - Understand required interface
-2. `application/adapters/` - See how infrastructure is wrapped
-3. `infrastructure/` - See concrete implementation
-4. `application/useCases/` - See how adapters are used
-
-## Where to Add Code?
-
-- New infrastructure wrapper → New adapter file
-- New port implementation → Update or create adapter
-- React-specific wrapping → Update adapter file
-
-## Key Distinctions
-
-**Adapters vs Infrastructure:**
-
-- Adapters = React hooks wrapping infrastructure
-- Infrastructure = Pure IO implementations
-
-**Adapters vs Use Cases:**
-
-- Adapters = Thin wrappers, no logic
-- Use cases = Business workflows, orchestration
-
-**Adapters vs Ports:**
-
-- Adapters = Implementations (hooks)
-- Ports = Interface definitions (types)
-
-## Architecture Benefits
-
-- **Infrastructure remains pure**: No React dependencies in infrastructure
-- **Testing is simpler**: Non-React infrastructure is easier to test
-- **Clear separation**: Adapter layer has a clear purpose as React/non-React boundary
-- **Flexibility**: Infrastructure can be used in non-React contexts
-- **Portability**: Infrastructure can be shared with other platforms

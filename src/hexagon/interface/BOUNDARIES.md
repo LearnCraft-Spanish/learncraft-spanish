@@ -32,7 +32,7 @@ interface/
 ### ✅ DO
 
 - Use React components for rendering
-- Call **no more than ONE hook** per component (define a use-case in application if needed)
+- Call **no more than ONE hook** per component (define a use-case in application if complex)
 - **Only destructure** the hook result (no business logic, no transformations)
 - **Reference explicit return types for application hooks** - Application-defined interfaces, never use inferred types or `typeof`
 - Pass values directly to child components (no logical combination with props)
@@ -73,29 +73,3 @@ Interface-level hooks are allowed for **strictly visual concerns**:
 - Perform business calculations
 
 If you find yourself needing business logic in an interface hook, it belongs in `application/` instead.
-
-## Reading Order
-
-1. `application/useCases/` - Understand available hooks
-2. `interface/components/` - See reusable UI components
-3. `interface/pages/` - See complete pages
-4. `composition/` - See how it's all wired together
-
-## Where to Add Code?
-
-- New reusable UI component → `components/`
-- New page/route → `pages/`
-- New UI-specific hook (visual only) → `hooks/` or inline in component
-- New styles → `styles/` or component-level SCSS files
-- New accessibility helpers → Component utilities
-
-## Relationship to Application Layer
-
-```
-Interface Layer:              Application Layer:
-─────────────────             ──────────────────
-<VocabularyPage>    →         useCustomVocabulary()
-  (renders UI)                  (business logic)
-```
-
-Interface components call application use-case hooks to get data and trigger actions. All business logic stays in the application layer.

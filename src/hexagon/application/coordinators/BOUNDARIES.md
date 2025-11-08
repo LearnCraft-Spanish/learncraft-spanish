@@ -30,11 +30,8 @@ coordinators/
 
 - Manage truly shared state (used across multiple features)
 - Provide React context for state sharing
-- Keep state updates atomic and predictable
-- **Use EXPLICIT return types for ALL hooks** - Export interfaces, never use inferred types or `typeof`
-- Write 100% test coverage (`*.test.ts`, `*.stub.ts`)
-- Use TypeScript for type safety
-- Document state shape and update patterns
+- Use explicit return types for all hooks
+- Import provider-accessing hooks from `composition/context/` (exception to dependency rule - see ARCHITECTURE.md)
 
 ### ❌ DON'T
 
@@ -53,79 +50,12 @@ coordinators/
 - ✅ `application/adapters/` - Infrastructure wrappers
 - ✅ `application/queries/` - Data fetching (for shared data)
 - ✅ `domain/` - Pure business logic
+- ✅ `composition/context/` - Provider-accessing hooks (exception - see ARCHITECTURE.md)
 - ✅ React context APIs
 - ❌ Cannot import from `application/useCases/` (avoid circular dependencies)
-- ❌ Cannot import from `application/units/` directly (use sparingly)
+- ❌ Cannot import from `application/units/` directly (avoid circular dependencies)
 - ❌ Cannot be imported by `domain/`
-- ❌ Should not be imported by `interface/` directly (go through use-cases)
-
-## Provider Pattern
-
-Coordinators use React context providers:
-
-```typescript
-// Context definition
-export const ActiveStudentContext = createContext<ActiveStudentContextType | null>(null);
-
-// Provider component
-export function ActiveStudentProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState(initialState);
-
-  return (
-    <ActiveStudentContext.Provider value={{ state, setState }}>
-      {children}
-    </ActiveStudentContext.Provider>
-  );
-}
-
-// Hook to use coordinator
-export function useActiveStudent() {
-  const context = use(ActiveStudentContext);
-  if (!context) {
-    throw new Error('useActiveStudent must be used within ActiveStudentProvider');
-  }
-  return context;
-}
-```
-
-## Testing Requirements
-
-- **100% test coverage** required
-- Test state management and updates
-- Test context provider behavior
-- Colocated test files: `*.test.ts`, `*.stub.ts`
-- Use typed mocks (`createTypedMock<T>()`, not `vi.fn()`)
-
-## Reading Order
-
-1. `coordinators/hooks/` - See coordinator hooks
-2. `coordinators/contexts/` - See context definitions
-3. `coordinators/providers/` - See provider components
-4. `useCases/` - See how coordinators are used
-
-## Where to Add Code?
-
-- New shared state across features → New coordinator hook + provider
-- New cross-cutting concern → New coordinator
-- New global lifecycle management → New coordinator
-- New application-wide filter/selection → New coordinator
-
-## Key Distinctions
-
-**Coordinators vs Use Cases:**
-
-- Coordinators = Shared state, cross-cutting
-- Use cases = Feature workflows, orchestration
-
-**Coordinators vs Units:**
-
-- Coordinators = Shared, application-wide
-- Units = Local, reusable building blocks
-
-**Coordinators vs Interface State:**
-
-- Coordinators = Shared across features
-- Interface state = Component-specific UI state
+- ✅ Can be imported by `application/useCases/` and `application/units`
 
 ## When to Use Coordinators
 
