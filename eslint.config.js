@@ -141,6 +141,11 @@ export default antfu(
           mode: 'folder',
           pattern: 'src/hexagon/composition/**',
         },
+        {
+          type: 'testing',
+          mode: 'folder',
+          pattern: 'src/hexagon/testing/**',
+        },
       ],
       'import/resolver': {
         typescript: {
@@ -248,6 +253,19 @@ export default antfu(
               disallow: ['infrastructure', 'composition'],
               message:
                 'interface must not depend directly on infrastructure (should use one application hook only).',
+            },
+            {
+              from: ['testing'],
+              disallow: [
+                'infrastructure',
+                'interface',
+                'application',
+                'ports',
+                'adapters',
+                'coordinators',
+                'units',
+              ],
+              message: 'testing can only depend on domain.',
             },
           ],
         },
