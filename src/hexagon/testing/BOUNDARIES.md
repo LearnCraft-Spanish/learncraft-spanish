@@ -20,38 +20,25 @@ Test utilities and infrastructure:
 ### ✅ DO
 
 - Export utilities for reuse
-- Import from any layer to understand what to mock
+- Import types and schemas from domain
 - Keep utilities focused on test infrastructure
 
 ### ❌ DON'T
 
 - **NO imports by production code** (testing layer is test-only)
 - **NO test logic in production code** (keep tests separate)
-- **NO mocks in testing layer** (mocks are colocated with implementations)
 
 ## Dependency Rules
 
 **Testing layer dependencies:**
 
-- ✅ **Can import from ALL layers** (domain, application, infrastructure, interface, composition)
-  - Needed to understand types and interfaces for creating utilities
-  - Needed to create factories for domain/application types
-- ✅ **Can import from external testing libraries** (Vitest, React Testing Library, etc.)
-- ✅ **Can import from shared schemas** (`@learncraft-spanish/shared`) for factory creation
-- ❌ **Cannot be imported by production code** (domain, application, infrastructure, interface, composition)
-  - Testing layer is **test-only**
-  - Production code must never depend on test utilities
-
-**Boundary enforcement:**
-
-```
-Production Layers (domain, application, infrastructure, interface, composition)
-  ❌ Cannot import from testing/
-
-Testing Layer
-  ✅ Can import from all production layers
-  ✅ Can import from testing libraries
-```
+- ✅ **Import types and schemas from domain**
+  - This section is for global test setup and utilities
+  - Leave implementation-specific test setup to the colocated files
+- ✅ **Can be imported to ALL layers** (domain, application, infrastructure, interface, composition)
+  - Needed to set up colocated mocks and tests
+- ✅ **Can be imported by colocated test and mock files** (`someItem.test.ts`, `someItem.mock.tsx`, etc)
+- ❌ **Cannot be imported by production code** (`someItem.ts`)
 
 ## Testing Requirements
 
