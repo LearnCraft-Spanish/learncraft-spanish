@@ -96,7 +96,7 @@ export function useBackendHelpers() {
     async <T>({
       path,
       headers = [],
-      body = [],
+      body = {},
     }: DeleteFactoryOptions): Promise<T> => {
       const fetchUrl = `${backendUrl}${path}`;
       const response = await fetch(fetchUrl, {
@@ -137,7 +137,7 @@ export function useBackendHelpers() {
     async <T>({
       path,
       headers = [],
-      body = [],
+      body = {},
     }: PostFactoryOptions): Promise<T> => {
       const fetchUrl = `${backendUrl}${path}`;
       const response = await fetch(fetchUrl, {
@@ -169,7 +169,7 @@ export function useBackendHelpers() {
     async <T>({
       path,
       headers = [],
-      body = [],
+      body = {},
     }: PostFactoryOptions): Promise<T> => {
       const fetchUrl = `${backendUrl}${path}`;
       const response = await fetch(fetchUrl, {

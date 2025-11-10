@@ -36,7 +36,7 @@ export default function useProgramsTable() {
     mutationFn: (programs: EditableProgram[]) => {
       const promise = newPutFactory<number[]>({
         path: 'vocab-quiz/programs/bulk-update',
-        body: programs,
+        body: { programs },
       });
       toast.promise(promise, {
         pending: 'Updating programs...',
