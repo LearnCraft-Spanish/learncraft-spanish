@@ -1,7 +1,7 @@
-import type { AppUserPort } from '../ports/appUserPort';
+import type { AppUserPort } from '@application/ports/appUserPort';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { config } from '@config';
 import { createAppUserInfrastructure } from '@infrastructure/appUserInfrastructure';
-import { config } from 'src/hexagon/config';
-import { useAuthAdapter } from './authAdapter';
 
 export function useAppUserAdapter(): AppUserPort {
   const apiUrl = config.backendDomain;

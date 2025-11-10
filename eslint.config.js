@@ -1,5 +1,6 @@
 import antfu from '@antfu/eslint-config';
 import prettierConfig from 'eslint-config-prettier';
+import boundaries from 'eslint-plugin-boundaries';
 
 // Import our custom rules
 import customRules from './eslint-rules/index.js';
@@ -20,6 +21,9 @@ export default antfu(
         afterEach: true,
         afterAll: true,
       },
+    },
+    plugins: {
+      boundaries,
     },
     rules: {
       'no-console': ['error', { allow: ['error'] }],
@@ -76,5 +80,198 @@ export default antfu(
       'custom/no-untyped-mocks': 'error',
     },
   },
+
+  // TypeScript-specific rules
+  {
+    files: ['**/*.ts'],
+    rules: {
+      // Prefer TS type-only imports where possible
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports' },
+      ],
+    },
+  },
+  // Boundaries plugin configuration
+  {
+    files: ['src/hexagon/**/*.{ts,tsx}'],
+    settings: {
+      'boundaries/elements': [
+        { type: 'domain', mode: 'folder', pattern: 'src/hexagon/domain/**' },
+        {
+          type: 'ports',
+          mode: 'folder',
+          pattern: 'src/hexagon/application/ports/**',
+        },
+        {
+          type: 'adapters',
+          mode: 'folder',
+          pattern: 'src/hexagon/application/adapters/**',
+        },
+        {
+          type: 'coordinators',
+          mode: 'folder',
+          pattern: 'src/hexagon/application/coordinators/**',
+        },
+        {
+          type: 'application',
+          mode: 'folder',
+          pattern: [
+            'src/hexagon/application/implementations/**',
+            'src/hexagon/application/queries/**',
+            'src/hexagon/application/types/**',
+            'src/hexagon/application/units/**',
+            'src/hexagon/application/useCases/**',
+            'src/hexagon/application/utils/**',
+            'src/hexagon/application/*',
+          ],
+        },
+        {
+          type: 'infrastructure',
+          mode: 'folder',
+          pattern: 'src/hexagon/infrastructure/**',
+        },
+        {
+          type: 'interface',
+          mode: 'folder',
+          pattern: 'src/hexagon/interface/**',
+        },
+        {
+          type: 'composition',
+          mode: 'folder',
+          pattern: 'src/hexagon/composition/**',
+        },
+        {
+          type: 'testing',
+          mode: 'folder',
+          pattern: 'src/hexagon/testing/**',
+        },
+      ],
+      'import/resolver': {
+        typescript: {
+          alwaysTryTypes: true,
+          project: './tsconfig.json',
+        },
+      },
+    },
+    rules: {
+      // Ban all relative imports in hexagon; require aliases (@domain/* etc.)
+      'no-restricted-imports': 'off',
+      '@typescript-eslint/no-restricted-imports': [
+        // TO DO: INCREASE THIS TO ERROR (Lower priority)
+        'warn',
+        {
+          patterns: [
+            {
+              group: ['../**', './**', '.*/**'],
+              message:
+                'Use aliased imports (e.g., @domain/*) instead of relative paths.',
+            },
+            {
+              group: ['src/hexagon/**'],
+              message:
+                'Use aliased imports (@domain/*, @application/*, etc.) instead of src/hexagon/* paths.',
+            },
+          ],
+        },
+      ],
+      // TO DO: INCREASE THIS TO ERROR (HIGH PRIORITY)
+      'boundaries/element-types': [
+        'warn',
+        {
+          default: 'allow',
+          rules: [
+            {
+              from: ['domain'],
+              disallow: [
+                'application',
+                'ports',
+                'adapters',
+                'coordinators',
+                'infrastructure',
+                'interface',
+                'composition',
+              ],
+              message: 'domain must not depend on any other layers.',
+            },
+            {
+              from: ['ports'],
+              disallow: [
+                'application',
+                'infrastructure',
+                'interface',
+                'composition',
+                'coordinators',
+                'adapters',
+              ],
+              message:
+                'ports must not depend on any other layers except for domain.',
+            },
+            {
+              from: ['adapters'],
+              disallow: [
+                'application',
+                'interface',
+                'composition',
+                'coordinators',
+              ],
+              message:
+                'adapters must not depend on any other layers except for domain, ports, and infrastructure.',
+            },
+            {
+              from: ['application'],
+              disallow: ['infrastructure', 'interface', 'composition'],
+              message:
+                'application must not depend on any other layers except for ports, adapters, coordinators, and domain.',
+            },
+            {
+              from: ['coordinators'],
+              disallow: [
+                'application',
+                'infrastructure',
+                'interface',
+                'ports',
+                'adapters',
+              ],
+              message:
+                'coordinators must not depend on application/infrastructure/interface/ports/adapters.',
+            },
+            {
+              from: ['infrastructure'],
+              disallow: [
+                'application',
+                'interface',
+                'composition',
+                'coordinators',
+                'adapters',
+              ],
+              message:
+                'infrastructure must not depend on application/interface/composition/coordinators/adapters.',
+            },
+            {
+              from: ['interface'],
+              disallow: ['infrastructure', 'composition'],
+              message:
+                'interface must not depend directly on infrastructure (should use one application hook only).',
+            },
+            {
+              from: ['testing'],
+              disallow: [
+                'infrastructure',
+                'interface',
+                'application',
+                'ports',
+                'adapters',
+                'coordinators',
+                'units',
+              ],
+              message: 'testing can only depend on domain.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   prettierConfig,
 );

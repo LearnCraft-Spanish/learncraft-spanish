@@ -2,8 +2,8 @@ import { ActiveStudentProvider } from '@application/coordinators/providers/Activ
 import { BannerDisplayProvider } from '@application/coordinators/providers/BannerDisplayProvider';
 import { ExampleFilterContextProvider } from '@application/coordinators/providers/ExampleFilterContextProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
+import TempIdContextProvider from '@application/coordinators/providers/TempIdContextProvider';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
-import TempIdContextProvider from './TempIdContextProvider';
 
 export default function MainProvider({
   children,

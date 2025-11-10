@@ -1,6 +1,6 @@
 import type { ExamplePort } from '../ports/examplePort';
+import { config } from '@config';
 import { createExampleInfrastructure } from '@infrastructure/exampleInfrastructure';
-import { config } from 'src/hexagon/config';
 import { useAuthAdapter } from './authAdapter';
 
 export function useExampleAdapter(): ExamplePort {

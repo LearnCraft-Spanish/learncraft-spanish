@@ -1,5 +1,5 @@
 import type { FlashcardPort } from '../ports/flashcardPort';
-import { config } from 'src/hexagon/config';
+import { config } from '@config';
 import { createFlashcardInfrastructure } from 'src/hexagon/infrastructure/flashcardInfrastructure';
 import { useAuthAdapter } from './authAdapter';
 
