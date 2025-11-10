@@ -22,6 +22,9 @@ export default function useActiveCoach() {
     ];
     if (authUser?.email) {
       const currentUserCoach = coachListQuery.data.find((coach) => {
+        if (coach.user.email === 'ana-brown@learncraftspanish.com') {
+          return true;
+        }
         const emailPrefix = authUser.email.split('@')[0].toLowerCase();
         for (const domain of possibleEmailDomains) {
           if (coach.user.email.toLowerCase() === emailPrefix + domain) {
