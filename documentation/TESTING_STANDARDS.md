@@ -67,6 +67,63 @@ _For LearnCraft Spanish Software Development_
 
 ---
 
+## Using Mocks
+
+1. All Mocks will be created using createOverrideableMock function, located at:
+   `@testing/utils/createOverrideableMock.ts`
+1. The Mock should return the defaultMockImplementation, overrideMock function, and resetMock functions.
+
+- **All Mocks used in a test file must be initialized using the below pattern**
+  - Mock the component using either the defaultMockImplementation imported from the mock's file, or one defined locally in the test file
+
+```
+vi.mock('@path/to/file' () => {
+   overrideMock(defaultMockImplementation)
+})
+```
+
+- **Modified Global Mocks must be cleaned up with the following pattern**
+  - Resets to the default mock implementation, imported from the mock file
+
+```
+  afterEach(() => {
+   resetComponentToBeMocked();
+  });
+```
+
+OR
+
+```
+beforeEach(() => {
+   resetComponentToBeMocked();
+});
+```
+
+- All Mocks set using vi.mock in a test file are automatically cleaned up by vitest
+
+## 🧹 Test Environment & Cleanup
+
+**Philosophy: "Leave the testing environment the way you found it"**
+
+We follow the principle of cleaning up after ourselves rather than assuming nothing about the test environment. This enables tests to be more efficient while maintaining isolation.
+
+1. **Mock Cleanup is automatic**
+   - everything mocked in a test file is cleaned up by Vitest automatically. All global mocks get reset by the setupTests.js file
+
+2. **Assume Default Mocks from Setup**
+   - If something is mocked in the `setupTests` file, assume it is using the **default mock values** (happy path).
+   - You can rely on these defaults without redeclaring them in every test.
+
+3. **Override and Restore**
+   - If you override a mock (e.g., to test an error state), you can trust Vitest to reset it after the test file is done.
+
+4. **Why This Matters**
+   - Prevents test pollution and unexpected failures.
+   - Allows tests to run in any order without side effects.
+   - Makes test files more readable by reducing redundant setup.
+
+---
+
 ## 📈 Progressive Improvement
 
 - **No required % coverage**, but **coverage should never decrease**.
@@ -93,5 +150,3 @@ _For LearnCraft Spanish Software Development_
 - Experimental code may be committed to the development branch without test coverage if:
   - It is **clearly marked** (e.g., `EXPERIMENTAL_` or TODO)
   - A test plan or coverage task is tracked separately before merge
-
----

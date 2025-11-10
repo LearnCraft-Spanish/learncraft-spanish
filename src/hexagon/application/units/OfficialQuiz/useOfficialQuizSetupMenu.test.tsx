@@ -21,16 +21,6 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-// Mock officialQuizCourses from shared package
-vi.mock('@learncraft-spanish/shared', () => ({
-  officialQuizCourses: [
-    { code: 'lcsp', name: 'LearnCraft Spanish', url: 'learncraft-spanish' },
-    { code: 'si1m', name: 'Spanish in One Month', url: 'spanish-in-one-month' },
-    { code: 'post-1mc', name: 'Post-1MC Cohort', url: 'post-1mc-cohort' },
-    { code: 'ser-estar', name: 'Ser Estar Mini Course', url: 'ser-estar-mini' },
-  ],
-}));
-
 describe('useOfficialQuizSetupMenu', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
@@ -100,9 +90,7 @@ describe('useOfficialQuizSetupMenu', () => {
       result.current.startQuiz();
 
       // Verify navigation was called with correct URL
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/officialquizzes/learncraft-spanish/1',
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/officialquizzes/lcsp/1');
     });
 
     it('navigates correctly for different course codes', async () => {
@@ -124,9 +112,7 @@ describe('useOfficialQuizSetupMenu', () => {
       result.current.startQuiz();
 
       // Verify navigation was called with correct URL for si1m course
-      expect(mockNavigate).toHaveBeenCalledWith(
-        '/officialquizzes/spanish-in-one-month/3',
-      );
+      expect(mockNavigate).toHaveBeenCalledWith('/officialquizzes/si1m/3');
     });
 
     it('does not navigate when quizNumber is 0', async () => {

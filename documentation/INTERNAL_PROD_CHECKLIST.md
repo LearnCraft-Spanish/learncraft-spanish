@@ -48,7 +48,8 @@ This checklist ensures both the **technical stability** of the release and that 
 
 ## 📤 3. Day-of-Release Tasks
 
-- [ ] Merge PR and deploy to production
+- [ ] Merge PR
+- [ ] Verify post-merge codebase successfully built & deployed without errors
 - [ ] Post Slack announcement in **#tech-announcements**
 - [ ] Send **email to students/customers**
 

@@ -29,6 +29,7 @@ describe('useOfficialQuiz', () => {
       getOfficialQuizExamples: async () => mockQuizExample,
     });
   });
+
   it('returns examples, loading state, error, and derived quizTitle', async () => {
     const selectedQuizRecord = mockQuizRecords[1];
     // default state already set above
