@@ -5,6 +5,7 @@ import {
   CallsByCoach,
   DropoutsByLevel,
   RecentLesson200Students,
+  StudentsBySalariedCoach,
   WeeklySummaries,
 } from 'src/components/AdminDashboard';
 import useAdminDashboard from './useAdminDashboard';
@@ -22,6 +23,7 @@ export default function AdminDashboard() {
           <h2>Admin Dashboard</h2>
           <WeeklySummaries />
           <CallsByCoach />
+          <StudentsBySalariedCoach />
           <div className="admin-dashboard-grid">
             <ActiveMemberships />
             <DropoutsByLevel />
