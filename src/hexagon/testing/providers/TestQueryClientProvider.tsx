@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { testQueryClient } from '@testing/utils/testQueryClient';
 import React from 'react';
-import { testQueryClient } from '../utils/testQueryClient';
 
 interface WrapperProps {
   children: ReactNode;

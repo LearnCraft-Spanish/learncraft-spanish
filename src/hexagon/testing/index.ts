@@ -5,16 +5,16 @@
  * Import from this file to get access to all testing tools.
  */
 
-export * from './factories/courseFactory';
+export * from '@testing/factories/courseFactory';
 // Re-export factories
-export * from './factories/subcategoryFactories';
-export * from './factories/vocabularyFactories';
+export * from '@testing/factories/subcategoryFactories';
+export * from '@testing/factories/vocabularyFactories';
 
-export * from './providers/createQueryClientWrapper';
+export * from '@testing/providers/createQueryClientWrapper';
 // Re-export providers
-export * from './providers/TestQueryClientProvider';
+export * from '@testing/providers/TestQueryClientProvider';
 
 // Re-export utilities
-export * from './utils/setMockResult';
-export * from './utils/testQueryClient';
-export * from './utils/typedMock';
+export * from '@testing/utils/setMockResult';
+export * from '@testing/utils/testQueryClient';
+export * from '@testing/utils/typedMock';

@@ -10,6 +10,10 @@ import {
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
 import {
+  mockCourseAdapter,
+  resetMockCourseAdapter,
+} from '@application/adapters/courseAdapter.mock';
+import {
   mockFlashcardAdapter,
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
@@ -25,32 +29,28 @@ import {
   mockVocabularyAdapter,
   resetMockVocabularyAdapter,
 } from '@application/adapters/vocabularyAdapter.mock';
+
 import {
   mockActiveStudent,
   resetMockActiveStudent,
 } from '@application/coordinators/hooks/useActiveStudent.mock';
-
 import {
   mockSelectedCourseAndLessons,
   resetMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+
 import {
   mockUseSpellingsKnownForLesson,
   resetMockUseSpellingsKnownForLesson,
 } from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
-
 import {
   mockUseStudentFlashcards,
   resetMockUseStudentFlashcards,
 } from '@application/units/useStudentFlashcards.mock';
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
-import {
-  mockCourseAdapter,
-  resetMockCourseAdapter,
-} from '../application/adapters/ courseAdapter.mock';
+import { resetTestQueryClient } from '@testing/utils/testQueryClient';
 
-import { resetTestQueryClient } from './utils/testQueryClient';
+import { afterEach, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
 // Replace real adapter implementations with mocks for all tests

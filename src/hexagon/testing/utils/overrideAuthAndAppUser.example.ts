@@ -4,11 +4,11 @@
  * overrideMockAuthAdapter and overrideMockActiveStudent separately.
  */
 
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import {
   getAppUserFromName,
   getAuthUserFromEmail,
 } from 'mocks/data/serverlike/userTable';
-import { overrideAuthAndAppUser } from './overrideAuthAndAppUser';
 
 // Example: Student, own user
 export function setupStudentUser() {

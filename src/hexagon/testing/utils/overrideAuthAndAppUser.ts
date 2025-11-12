@@ -1,6 +1,6 @@
+import type { AuthUser } from '@application/ports/authPort';
 import type { AppUser } from '@learncraft-spanish/shared';
 import type { TestUserEmail } from 'mocks/data/serverlike/userTable';
-import type { AuthUser } from 'src/hexagon/application/ports/authPort';
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
 import {
