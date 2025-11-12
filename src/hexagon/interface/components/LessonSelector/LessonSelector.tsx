@@ -7,7 +7,7 @@ import {
 import SelectCourse from '@interface/components/LessonSelector/SelectCourse';
 import SelectLesson from '@interface/components/LessonSelector/SelectLesson';
 import { useMemo } from 'react';
-import '@interface/components/LessonSelector/LessonSelector.css';
+import './LessonSelector.css';
 
 export default function LessonSelector(): React.JSX.Element {
   const { course, toLesson, updateUserSelectedCourseId, updateToLessonNumber } =

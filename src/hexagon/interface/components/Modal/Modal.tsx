@@ -1,4 +1,4 @@
-import '@interface/components/Modal/modal.scss';
+import './modal.scss';
 
 export interface ModalProps {
   title: string;

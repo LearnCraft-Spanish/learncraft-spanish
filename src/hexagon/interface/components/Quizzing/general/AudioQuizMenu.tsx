@@ -6,7 +6,7 @@ import { ToggleSwitch } from '@interface/components/general';
 import { InlineLoading } from '@interface/components/Loading';
 import React from 'react';
 
-import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
+import './QuizSetupMenu.scss';
 import '@interface/styles/QuizSetupMenu.scss';
 
 export function AudioQuizMenu({

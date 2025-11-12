@@ -7,7 +7,7 @@ import {
 } from '@interface/components/general';
 import LessonRangeSelector from '@interface/components/LessonSelector/LessonRangeSelector';
 import { useState } from 'react';
-import '@interface/components/Filters/FilterPanel.scss';
+import './FilterPanel.scss';
 
 export function FilterPanel({
   onFilterChange,

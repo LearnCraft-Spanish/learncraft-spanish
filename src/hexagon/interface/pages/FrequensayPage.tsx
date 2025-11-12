@@ -4,7 +4,7 @@ import CustomVocabulary from '@interface/components/frequensay/CustomVocabulary'
 import FrequensaySetup from '@interface/components/frequensay/FrequensaySetup';
 import TextToCheck from '@interface/components/frequensay/TextToCheck';
 import UnknownWords from '@interface/components/frequensay/UnknownWords';
-import '@interface/pages/FrequensayPage.scss';
+import './FrequensayPage.scss';
 export default function FrequenSayPage() {
   // TO DO: Reduce to one use case hook
   const { toLesson } = useSelectedCourseAndLessons();

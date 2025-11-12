@@ -1,7 +1,7 @@
 import type { AddToMyFlashcardsButtonsProps } from '@interface/components/Quizzing/general/AddToMyFlashcardsButtons/AddToMyFlashcardsButtons.types';
 import { useModal } from '@interface/hooks/useModal';
 import React from 'react';
-import '@interface/components/Quizzing/general/AddToMyFlashcardsButtons/AddToMyFlashcardsButtons.scss';
+import './AddToMyFlashcardsButtons.scss';
 
 export function AddToMyFlashcardsButtons({
   exampleIsCollected,

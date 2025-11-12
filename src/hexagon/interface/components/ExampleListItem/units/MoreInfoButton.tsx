@@ -1,4 +1,4 @@
-import '@interface/components/ExampleListItem/units/MoreInfoButton.scss';
+import './MoreInfoButton.scss';
 export default function MoreInfoButton({
   onClickFunction,
   isOpen,

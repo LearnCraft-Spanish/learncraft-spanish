@@ -2,7 +2,7 @@ import { useGetHelpMenu } from '@application/useCases/useGetHelpMenu';
 import LessonsTable from '@interface/components/LessonsTable/LessonsTable';
 import VocabularySearch from '@interface/components/VocabularySearch/VocabularySearch';
 import { useCallback, useMemo } from 'react';
-import '@interface/pages/GetHelpPage.scss';
+import './GetHelpPage.scss';
 
 export default function GetHelpPage() {
   const {

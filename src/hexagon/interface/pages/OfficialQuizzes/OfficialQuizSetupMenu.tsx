@@ -1,7 +1,7 @@
 import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
-import '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenu.scss';
+import './OfficialQuizSetupMenu.scss';
 
 export interface OfficialQuizSetupMenuProps {
   courseCode: string;

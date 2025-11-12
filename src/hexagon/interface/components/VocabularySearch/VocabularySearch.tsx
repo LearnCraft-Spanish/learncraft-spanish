@@ -1,6 +1,6 @@
 import type { VocabularyAbbreviation } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
-import '@interface/components/VocabularySearch/VocabularySearch.scss';
+import './VocabularySearch.scss';
 
 interface VocabularySearchProps {
   vocabularyList: VocabularyAbbreviation[];

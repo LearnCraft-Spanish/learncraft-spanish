@@ -1,5 +1,5 @@
 import arrowUp from 'src/assets/icons/arrow-up.svg';
-import '@interface/components/general/Pagination/Pagination.scss';
+import './Pagination.scss';
 
 export default function Pagination({
   page,

@@ -8,7 +8,7 @@ import AudioQuizEnd from '@interface/components/Quizzing/general/AudioQuizEnd';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
 import 'src/App.css';
-import '@interface/components/Quizzing/AudioQuiz/AudioBasedReview.css';
+import './AudioBasedReview.css';
 
 /**
  * Audio Quiz UI Component

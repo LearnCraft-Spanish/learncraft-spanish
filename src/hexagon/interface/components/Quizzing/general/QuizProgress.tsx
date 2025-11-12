@@ -1,5 +1,5 @@
 import React from 'react';
-import '@interface/components/Quizzing/general/QuizProgress.scss';
+import './QuizProgress.scss';
 interface QuizProgressProps {
   quizTitle?: string;
   currentExampleNumber: number;

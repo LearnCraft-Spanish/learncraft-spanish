@@ -1,7 +1,7 @@
 import { FilterPanel } from '@interface/components/Filters/FilterPanel';
 import { ToggleSwitch } from '@interface/components/general';
 
-import '@interface/components/Filters/FilterPanel.scss';
+import './FilterPanel.scss';
 
 export function CloseableFilterPanel({
   isOpen,

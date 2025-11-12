@@ -1,7 +1,7 @@
 import type { SkillTag } from '@learncraft-spanish/shared';
 import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import { SkillType } from '@learncraft-spanish/shared';
-import '@interface/components/general/VocabTagFilter/VocabTagFilter.scss';
+import './VocabTagFilter.scss';
 
 export default function TagFilter({
   searchTerm,

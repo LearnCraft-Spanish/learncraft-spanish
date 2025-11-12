@@ -1,4 +1,4 @@
-import '@interface/components/general/ToggleSwitch/ToggleSwitch.scss';
+import './ToggleSwitch.scss';
 
 export default function ToggleSwitch({
   id,

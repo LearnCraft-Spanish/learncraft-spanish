@@ -7,7 +7,7 @@ import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import '@interface/components/Quizzing/general/FlashcardDisplay/FlashcardDisplay.scss';
+import './FlashcardDisplay.scss';
 
 export function FlashcardDisplay({
   quizExample,

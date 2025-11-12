@@ -1,6 +1,6 @@
 import useVerbCreation from '@application/useCases/useVerbCreation';
 import React, { useState } from 'react';
-import '@interface/components/vocabulary/VocabularyCreator.scss';
+import './VerbCreator.scss';
 
 interface VerbCreatorProps {
   onBack: () => void;

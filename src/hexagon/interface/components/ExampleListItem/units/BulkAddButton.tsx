@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import '@interface/components/ExampleListItem/units/BulkAddRemove.scss';
+import './BulkAddRemove.scss';
 
 export default function BulkAddButton({
   id,

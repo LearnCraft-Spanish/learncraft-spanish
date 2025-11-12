@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import checkmark from 'src/assets/icons/checkmark.svg';
-import '@interface/components/ExampleListItem/units/BulkAddRemove.scss';
+import './BulkAddRemove.scss';
 
 export default function BulkRemoveButton({
   id,

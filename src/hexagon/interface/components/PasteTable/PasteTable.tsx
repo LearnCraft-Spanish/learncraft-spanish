@@ -2,7 +2,7 @@ import type { TableHook } from '@application/units/pasteTable/types';
 import { PasteTableErrorBoundary } from '@interface/components/PasteTable/PasteTableErrorBoundary';
 import { TableRow } from '@interface/components/PasteTable/TableRow';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import '@interface/components/PasteTable/PasteTable.scss';
+import './PasteTable.scss';
 
 export interface PasteTableProps<T> {
   /** Core table hook from application layer */

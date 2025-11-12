@@ -5,7 +5,7 @@ import { Loading } from '@interface/components/Loading';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { AudioQuizMenu } from '@interface/components/Quizzing/general';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
-import '@interface/pages/LimitedCustomQuiz.scss';
+import './LimitedCustomQuiz.scss';
 
 export default function LimitedCustomQuiz() {
   const {

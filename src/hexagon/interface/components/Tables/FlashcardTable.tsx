@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 // Assets and styles
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
-import '@interface/components/Tables/ExampleAndFlashcardTable.scss';
+import './ExampleAndFlashcardTable.scss';
 
 export default function FlashcardTable(props: UseFlashcardTableProps) {
   // Call the use case hook for this component with its props

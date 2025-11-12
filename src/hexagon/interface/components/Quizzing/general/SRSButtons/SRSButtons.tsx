@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import '@interface/components/Quizzing/general/SRSButtons/SRSButtons.scss';
+import './SRSButtons.scss';
 
 interface SRSButtonsProps {
   answerShowing: boolean;

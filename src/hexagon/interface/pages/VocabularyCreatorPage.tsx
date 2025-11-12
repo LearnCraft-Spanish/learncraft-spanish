@@ -1,7 +1,7 @@
 import { NonVerbCreator } from '@interface/components/vocabulary/NonVerbCreator';
 import { VerbCreator } from '@interface/components/vocabulary/VerbCreator';
 import React, { useState } from 'react';
-import '@interface/pages/VocabularyCreator.scss';
+import './VocabularyCreator.scss';
 export const VocabularyCreatorPage: React.FC = () => {
   const [mode, setMode] = useState('selection');
 

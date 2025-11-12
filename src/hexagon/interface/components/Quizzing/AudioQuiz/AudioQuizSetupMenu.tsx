@@ -4,7 +4,7 @@ import { MenuButton } from '@interface/components/general/Buttons';
 import { LessonSelector } from '@interface/components/LessonSelector';
 
 import React from 'react';
-import '@interface/components/Quizzing/AudioQuiz/AudioBasedReview.css';
+import './AudioBasedReview.css';
 
 interface AudioQuizSetupMenuProps {
   audioQuizSetupOptions: AudioQuizSetupReturn;
