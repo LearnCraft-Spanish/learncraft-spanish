@@ -1,8 +1,8 @@
 import { useGetHelpMenu } from '@application/useCases/useGetHelpMenu';
+import LessonsTable from '@interface/components/LessonsTable/LessonsTable';
+import VocabularySearch from '@interface/components/VocabularySearch/VocabularySearch';
 import { useCallback, useMemo } from 'react';
-import LessonsTable from '../components/LessonsTable/LessonsTable';
-import VocabularySearch from '../components/VocabularySearch/VocabularySearch';
-import './GetHelpPage.scss';
+import '@interface/pages/GetHelpPage.scss';
 
 export default function GetHelpPage() {
   const {

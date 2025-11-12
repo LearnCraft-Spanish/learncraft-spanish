@@ -1,8 +1,8 @@
 import type { Vocabulary } from '@learncraft-spanish/shared';
+import useLessonPopup from '@application/units/useLessonPopup';
 import VocabTagContainer from '@interface/components/VocabTagDetails/VocabTagContainer';
 import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import { useState } from 'react';
-import useLessonPopup from 'src/hexagon/application/units/useLessonPopup';
 
 export function GetHelpDisplay({ vocabulary }: { vocabulary: Vocabulary[] }) {
   const { contextual, closeContextual, openContextual } = useContextualMenu();

@@ -1,8 +1,8 @@
+import { QuizButtons } from '@interface/components/Quizzing/general/QuizButtons';
 import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { QuizButtons } from './QuizButtons';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const decrementExample = vi.fn();
 const incrementExample = vi.fn();

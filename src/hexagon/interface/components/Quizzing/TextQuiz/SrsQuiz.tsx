@@ -1,6 +1,6 @@
-import type { TextQuizComponentProps } from './TextQuiz';
+import type { TextQuizComponentProps } from '@interface/components/Quizzing/TextQuiz';
 import { useSrsFunctionality } from '@application/units/useTextQuiz';
-import { TextQuiz } from './TextQuiz';
+import { TextQuiz } from '@interface/components/Quizzing/TextQuiz';
 
 export function SrsQuiz(textQuizProps: TextQuizComponentProps) {
   const {

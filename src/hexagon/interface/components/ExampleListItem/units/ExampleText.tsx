@@ -1,5 +1,8 @@
+import {
+  formatEnglishText,
+  formatSpanishText,
+} from '@interface/components/ExampleListItem/units/helpers';
 import { AudioControl } from '@interface/components/general';
-import { formatEnglishText, formatSpanishText } from './helpers';
 
 export default function ExampleText({
   isSpanglish,

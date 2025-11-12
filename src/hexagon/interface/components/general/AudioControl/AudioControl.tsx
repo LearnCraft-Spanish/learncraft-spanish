@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import pause from 'src/assets/icons/pause_dark.svg';
 import play from 'src/assets/icons/play_dark.svg';
-import './AudioControl.scss';
+import '@interface/components/general/AudioControl/AudioControl.scss';
 
 export default function AudioControl({ audioLink }: { audioLink: string }) {
   const [isPlaying, setIsPlaying] = useState(false);

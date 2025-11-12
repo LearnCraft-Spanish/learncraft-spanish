@@ -1,6 +1,6 @@
+import MoreInfoButton from '@interface/components/ExampleListItem/units/MoreInfoButton';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import MoreInfoButton from './MoreInfoButton';
 
 const mockProps = {
   onClickFunction: vi.fn(),

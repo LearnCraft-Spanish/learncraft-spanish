@@ -1,6 +1,6 @@
 import type { SkillTag } from '@learncraft-spanish/shared';
 import { SkillType } from '@learncraft-spanish/shared';
-import './VocabTagFilter.scss';
+import '@interface/components/general/VocabTagFilter/VocabTagFilter.scss';
 
 export default function SelectedTags({
   removeTag,

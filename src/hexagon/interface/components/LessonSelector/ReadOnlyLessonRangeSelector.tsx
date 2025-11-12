@@ -1,5 +1,5 @@
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
-import './LessonSelector.css';
+import '@interface/components/LessonSelector/LessonSelector.css';
 
 export default function ReadOnlyLessonRangeSelector(): React.JSX.Element {
   const { course, toLesson, fromLesson } = useSelectedCourseAndLessons();

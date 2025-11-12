@@ -17,7 +17,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 // import { Tooltip } from '../../components/Tooltip';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
-import './ReviewMyFlashcards.scss';
+import '@interface/pages/ReviewMyFlashcards/ReviewMyFlashcards.scss';
 
 export default function MyFlashcardsQuiz() {
   const location = useLocation();

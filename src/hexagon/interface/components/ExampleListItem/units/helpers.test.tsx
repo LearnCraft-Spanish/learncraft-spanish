@@ -1,5 +1,8 @@
+import {
+  formatEnglishText,
+  formatSpanishText,
+} from '@interface/components/ExampleListItem/units/helpers';
 import { render } from '@testing-library/react';
-import { formatEnglishText, formatSpanishText } from './helpers';
 
 describe('helpers', () => {
   describe('formatEnglishText', () => {

@@ -1,14 +1,14 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import { useAudioQuiz } from '@application/units/useAudioQuiz';
 import { AudioQuizType } from '@domain/audioQuizzing';
+import { Loading } from '@interface/components/Loading';
+import AudioFlashcard from '@interface/components/Quizzing/AudioQuiz/AudioFlashcard';
+import AudioQuizButtons from '@interface/components/Quizzing/AudioQuiz/AudioQuizButtons';
+import AudioQuizEnd from '@interface/components/Quizzing/general/AudioQuizEnd';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
-import { Loading } from '../../Loading';
-import AudioQuizEnd from '../general/AudioQuizEnd';
-import AudioFlashcard from './AudioFlashcard';
-import AudioQuizButtons from './AudioQuizButtons';
 import 'src/App.css';
-import '../AudioQuiz/AudioBasedReview.css';
+import '@interface/components/Quizzing/AudioQuiz/AudioBasedReview.css';
 
 /**
  * Audio Quiz UI Component

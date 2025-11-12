@@ -1,6 +1,6 @@
 import { MenuButton } from '@interface/components/general/Buttons';
 import { useEffect, useState } from 'react';
-import './QuizEnd.scss';
+import '@interface/components/Quizzing/general/QuizEnd.scss';
 
 export default function AudioQuizEnd({
   speakingOrListening,

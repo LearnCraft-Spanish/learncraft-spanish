@@ -3,7 +3,7 @@ import wheelIcon from 'src/assets/Icon_White.svg';
 import addIcon from 'src/assets/icons/add-button.svg';
 import trash from 'src/assets/icons/trashcan-dark.svg';
 
-import './AddPendingRemove.scss';
+import '@interface/components/ExampleListItem/units/AddPendingRemove.scss';
 
 export default function AddPendingRemove({
   isAdding,

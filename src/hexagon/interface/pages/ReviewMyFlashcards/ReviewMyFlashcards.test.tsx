@@ -1,12 +1,12 @@
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
+import MyFlashcardsQuiz from '@interface/pages/ReviewMyFlashcards';
 import { render, screen, waitFor } from '@testing-library/react';
+import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-import { createMockFlashcardList } from 'src/hexagon/testing/factories/flashcardFactory';
-import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
-import MyFlashcardsQuiz from './ReviewMyFlashcards';
 
 describe('menu for student flashcards', () => {
   beforeEach(() => {

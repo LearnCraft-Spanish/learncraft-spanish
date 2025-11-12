@@ -1,7 +1,7 @@
 import React from 'react';
 import wheelIcon from 'src/assets/Icon_Blue.svg';
 import headIcon from 'src/assets/LearnCraft_Wheelless_Head_Blue.svg';
-import './Loading.scss';
+import '@interface/components/Loading/Loading.scss';
 
 export default function Loading({ message }: { message: string }) {
   return (

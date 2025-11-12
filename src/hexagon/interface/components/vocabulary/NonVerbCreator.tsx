@@ -1,8 +1,8 @@
 import useNonVerbCreation from '@application/useCases/useNonVerbCreation';
+import { PasteTable } from '@interface/components/PasteTable/PasteTable';
+import { PaginatedVocabularyTable } from '@interface/components/VocabularyTable/PaginatedVocabularyTable';
 import React from 'react';
-import { PasteTable } from '../PasteTable/PasteTable';
-import { PaginatedVocabularyTable } from '../VocabularyTable/PaginatedVocabularyTable';
-import './VocabularyCreator.scss';
+import '@interface/components/vocabulary/VocabularyCreator.scss';
 
 interface NonVerbCreatorProps {
   onBack: () => void;

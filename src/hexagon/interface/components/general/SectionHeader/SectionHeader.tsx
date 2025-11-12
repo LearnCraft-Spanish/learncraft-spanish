@@ -1,4 +1,4 @@
-import './SectionHeader.scss';
+import '@interface/components/general/SectionHeader/SectionHeader.scss';
 
 export default function SectionHeader({
   title,

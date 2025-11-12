@@ -1,21 +1,21 @@
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 
+import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
+
+// import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
+import ExampleListItem from '@interface/components/ExampleListItem/FlashcardFinderExampleListItem';
+import { Pagination } from '@interface/components/general';
 
 import { InlineLoading } from '@interface/components/Loading';
+import { copyTableToClipboard } from '@interface/components/Tables/units/functions';
 import { useRef, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
-// import useBulkSelect from 'src/hexagon/application/units/useBulkSelect';
-import ExampleListItem from '../ExampleListItem/FlashcardFinderExampleListItem';
-
-import { Pagination } from '../general';
-import { copyTableToClipboard } from './units/functions';
 import 'src/components/ExamplesTable/ExamplesTable.scss';
-import './ExampleAndFlashcardTable.scss';
+import '@interface/components/Tables/ExampleAndFlashcardTable.scss';
 interface ExamplesTableProps {
   examples: ExampleWithVocabulary[];
   totalCount: number;

@@ -1,5 +1,5 @@
 import { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
-import './FilterPanel.scss';
+import '@interface/components/Filters/FilterPanel.scss';
 
 export default function PresetSelector({
   setFilterPreset,

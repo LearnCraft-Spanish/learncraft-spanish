@@ -1,9 +1,9 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { AudioQuizType } from '@domain/audioQuizzing';
 
+import AudioQuizSetupMenu from '@interface/components/Quizzing/AudioQuiz/AudioQuizSetupMenu';
+import { cleanup, render, screen } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import AudioQuizSetupMenu from './AudioQuizSetupMenu';
 const audioQuizSetupOptions = {
   availableQuizLengths: [10, 20, 30],
   selectedQuizLength: 10,

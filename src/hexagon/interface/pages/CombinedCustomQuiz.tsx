@@ -12,7 +12,7 @@ import {
 } from '@interface/components/Quizzing/general';
 import { TextQuiz } from '@interface/components/Quizzing/TextQuiz';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
-import './CombinedCustomQuiz.scss';
+import '@interface/pages/CombinedCustomQuiz.scss';
 
 export default function CombinedCustomQuiz() {
   const {

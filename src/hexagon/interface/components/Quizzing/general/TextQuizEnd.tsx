@@ -1,6 +1,6 @@
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { MenuButton } from '@interface/components/general/Buttons';
-import './QuizEnd.scss';
+import '@interface/components/Quizzing/general/QuizEnd.scss';
 export default function TextQuizEnd({
   isSrsQuiz,
   restartQuiz,

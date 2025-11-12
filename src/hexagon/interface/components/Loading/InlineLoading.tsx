@@ -1,6 +1,6 @@
 import wheelIcon from 'src/assets/Icon_Blue.svg';
 import wheelIconWhite from 'src/assets/Icon_White.svg';
-import './Loading.scss';
+import '@interface/components/Loading/Loading.scss';
 
 interface InlineLoadingProps {
   message?: string;

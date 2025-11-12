@@ -1,7 +1,7 @@
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import { useModal } from '@interface/hooks/useModal';
 import { useMemo } from 'react';
 import { showErrorToast } from 'src/functions/showToast';
-import { useModal } from 'src/hexagon/interface/hooks/useModal';
 
 export default function DeleteAllOwnedSpanglish() {
   const { deleteFlashcards, flashcards } = useStudentFlashcards();

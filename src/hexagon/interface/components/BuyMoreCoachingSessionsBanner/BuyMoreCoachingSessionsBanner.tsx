@@ -7,7 +7,7 @@ Add extra coaching sessions and accelerate your Spanish.
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useBannerDisplay } from '@application/coordinators/hooks/useBannerDisplay';
 import closeIcon from 'src/assets/icons/x.svg';
-import './BuyMoreCoachingSessionsBanner.scss';
+import '@interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner.scss';
 
 export default function ExtraCoachingCTA() {
   const { isBannerVisible, closeBanner } = useBannerDisplay();

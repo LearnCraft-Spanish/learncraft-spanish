@@ -1,5 +1,5 @@
 import type { Lesson } from '@learncraft-spanish/shared';
-import './LessonsTable.scss';
+import '@interface/components/LessonsTable/LessonsTable.scss';
 
 interface LessonsTableProps {
   lessons: Lesson[] | null;

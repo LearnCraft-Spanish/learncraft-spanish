@@ -1,6 +1,6 @@
+import { SelectButton } from '@interface/components/ExampleListItem/units';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import SelectButton from './SelectButton';
 
 const mockProps = {
   recordId: 123,

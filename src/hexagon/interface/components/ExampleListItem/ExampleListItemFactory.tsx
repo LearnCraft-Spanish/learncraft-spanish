@@ -3,9 +3,8 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 import type { ReactNode } from 'react';
-import { ExampleText } from './units';
-
-import './ExampleListItem.scss';
+import { ExampleText } from '@interface/components/ExampleListItem/units';
+import '@interface/components/ExampleListItem/ExampleListItem.scss';
 
 export default function ExampleListItemFactory({
   example,

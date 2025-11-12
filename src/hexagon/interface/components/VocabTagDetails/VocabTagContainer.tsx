@@ -1,10 +1,9 @@
+import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { Vocabulary } from '@learncraft-spanish/shared';
-import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
-import { useEffect, useRef, useState } from 'react';
-
-import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
-import { InlineLoading } from '../Loading';
-import './VocabTagContainer.scss';
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
+import { InlineLoading } from '@interface/components/Loading';
+import React, { useEffect, useRef, useState } from 'react';
+import '@interface/components/VocabTagDetails/VocabTagContainer.scss';
 export default function VocabTagContainer({
   exampleId,
   vocabulary,

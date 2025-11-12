@@ -4,13 +4,17 @@ import type {
 } from '@application/units/useTextQuiz';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
+import Loading from '@interface/components/Loading/Loading';
+import {
+  FlashcardDisplay,
+  QuizButtons,
+  QuizProgress,
+} from '@interface/components/Quizzing/general';
+import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons';
+import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
 import React, { useCallback, useEffect, useState } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
-import Loading from '../../Loading/Loading';
-import { FlashcardDisplay, QuizButtons, QuizProgress } from '../general';
-import { SRSButtons } from '../general/SRSButtons';
-import TextQuizEnd from '../general/TextQuizEnd';
 
 export interface TextQuizComponentProps {
   quizTitle?: string;

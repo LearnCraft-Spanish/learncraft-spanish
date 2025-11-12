@@ -1,11 +1,11 @@
-import { fireEvent, render, screen } from '@testing-library/react';
 import {
   mockSelectedCourseAndLessons,
   overrideMockSelectedCourseAndLessons,
-} from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons.mock';
-import { createRealisticCourseWithLessonsList } from 'src/hexagon/testing/factories/courseFactory';
+} from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import LessonRangeSelector from '@interface/components/LessonSelector/LessonRangeSelector';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
 import { vi } from 'vitest';
-import LessonRangeSelector from './LessonRangeSelector';
 
 vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
   useSelectedCourseAndLessons: () => mockSelectedCourseAndLessons,

@@ -1,10 +1,10 @@
 import type { TextQuizSetupReturn } from '@application/units/useTextQuizSetup';
 import { ToggleSwitch } from '@interface/components/general';
 
-import React from 'react';
+import { InlineLoading } from '@interface/components/Loading';
 
-import { InlineLoading } from '../../Loading';
-import './QuizSetupMenu.scss';
+import React from 'react';
+import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import '@interface/styles/QuizSetupMenu.scss';
 
 interface MyTextQuizMenuProps {

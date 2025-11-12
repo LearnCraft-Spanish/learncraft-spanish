@@ -1,5 +1,5 @@
+import { AudioControl } from '@interface/components/general/AudioControl';
 import { render, screen } from '@testing-library/react';
-import AudioControl from './AudioControl';
 
 const audioLink = 'https://example.com/audio.mp3';
 
