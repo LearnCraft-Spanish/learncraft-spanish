@@ -99,6 +99,7 @@ export type GroupSession = Expanded<{
   comments: string;
   sessionType: string;
   callDocument: string;
+  attendees?: GroupAttendees[] | undefined;
 }>;
 
 export type GroupAttendees = Expanded<{
