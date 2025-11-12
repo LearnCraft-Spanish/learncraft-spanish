@@ -217,14 +217,16 @@ export function GroupSessionView({
     setAttendees(() => {
       if (newRecord) {
         return [];
-      } else {
-        // Foreign Key lookup, orm data in backend
-        const attendees = getAttendeesFromGroupSessionId(recordId);
-        return attendees?.map((attendee) => ({
+      }
+      // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
+      const attendeesData =
+        groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
+      return (
+        attendeesData?.map((attendee) => ({
           name: attendee.weekStudent,
           relatedWeek: attendee.student,
-        })) as attendeeChangesObj[];
-      }
+        })) ?? []
+      );
     });
   }, [getAttendeesFromGroupSessionId, groupSession, newRecord, recordId]);
 
@@ -376,8 +378,9 @@ export function GroupSessionView({
   }
   function deleteRecordFunction() {
     // attendee records to delete afterwards
-    // Foreign Key lookup, orm data in backend
-    const attendeesToRemove = getAttendeesFromGroupSessionId(recordId);
+    // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
+    const attendeesToRemove =
+      groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
     deleteGroupSessionMutation.mutate(recordId, {
       onSuccess: () => {
         if (attendeesToRemove && attendeesToRemove.length > 0) {
@@ -532,8 +535,9 @@ export function GroupSessionView({
         );
       }
       if (checkAttendeeChanges()) {
-        // Foreign Key lookup, form data in backend
-        const currentAttendeeRecords = getAttendeesFromGroupSessionId(recordId);
+        // Use preloaded attendees if available, otherwise do Foreign Key lookup from backend
+        const currentAttendeeRecords =
+          groupSession.attendees ?? getAttendeesFromGroupSessionId(recordId);
         const attendeesToAdd = attendees.filter(
           (attendee) => attendee.action === 'add',
         );
