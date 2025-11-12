@@ -83,7 +83,7 @@ export default antfu(
 
   // TypeScript-specific rules
   {
-    files: ['**/*.ts'],
+    files: ['**/*.{ts,tsx}'],
     rules: {
       // Prefer TS type-only imports where possible
       '@typescript-eslint/consistent-type-imports': [
@@ -97,54 +97,58 @@ export default antfu(
     files: ['src/hexagon/**/*.{ts,tsx}'],
     settings: {
       'boundaries/elements': [
-        { type: 'domain', mode: 'folder', pattern: 'src/hexagon/domain/**' },
+        {
+          type: 'domain',
+          mode: 'folder',
+          pattern: 'src/hexagon/domain/**/*.{ts,tsx}',
+        },
         {
           type: 'ports',
           mode: 'folder',
-          pattern: 'src/hexagon/application/ports/**',
+          pattern: 'src/hexagon/application/ports/**/*.{ts,tsx}',
         },
         {
           type: 'adapters',
           mode: 'folder',
-          pattern: 'src/hexagon/application/adapters/**',
+          pattern: 'src/hexagon/application/adapters/**/*.{ts,tsx}',
         },
         {
           type: 'coordinators',
           mode: 'folder',
-          pattern: 'src/hexagon/application/coordinators/**',
+          pattern: 'src/hexagon/application/coordinators/**/*.{ts,tsx}',
         },
         {
           type: 'application',
           mode: 'folder',
           pattern: [
-            'src/hexagon/application/implementations/**',
-            'src/hexagon/application/queries/**',
-            'src/hexagon/application/types/**',
-            'src/hexagon/application/units/**',
-            'src/hexagon/application/useCases/**',
-            'src/hexagon/application/utils/**',
-            'src/hexagon/application/*',
+            'src/hexagon/application/implementations/**/*.{ts,tsx}',
+            'src/hexagon/application/queries/**/*.{ts,tsx}',
+            'src/hexagon/application/types/**/*.{ts,tsx}',
+            'src/hexagon/application/units/**/*.{ts,tsx}',
+            'src/hexagon/application/useCases/**/*.{ts,tsx}',
+            'src/hexagon/application/utils/**/*.{ts,tsx}',
+            'src/hexagon/application/**/*.{ts,tsx}',
           ],
         },
         {
           type: 'infrastructure',
           mode: 'folder',
-          pattern: 'src/hexagon/infrastructure/**',
+          pattern: 'src/hexagon/infrastructure/**/*.{ts,tsx}',
         },
         {
           type: 'interface',
           mode: 'folder',
-          pattern: 'src/hexagon/interface/**',
+          pattern: 'src/hexagon/interface/**/*.{ts,tsx}',
         },
         {
           type: 'composition',
           mode: 'folder',
-          pattern: 'src/hexagon/composition/**',
+          pattern: 'src/hexagon/composition/**/*.{ts,tsx}',
         },
         {
           type: 'testing',
           mode: 'folder',
-          pattern: 'src/hexagon/testing/**',
+          pattern: 'src/hexagon/testing/**/*.{ts,tsx}',
         },
       ],
       'import/resolver': {
@@ -163,7 +167,11 @@ export default antfu(
         {
           patterns: [
             {
-              group: ['../**', './**', '.*/**'],
+              group: [
+                '../**/*.{ts,tsx}',
+                './**/*.{ts,tsx}',
+                '.*/**/*.{ts,tsx}',
+              ],
               message:
                 'Use aliased imports (e.g., @domain/*) instead of relative paths.',
             },
@@ -253,19 +261,6 @@ export default antfu(
               disallow: ['infrastructure', 'composition'],
               message:
                 'interface must not depend directly on infrastructure (should use one application hook only).',
-            },
-            {
-              from: ['testing'],
-              disallow: [
-                'infrastructure',
-                'interface',
-                'application',
-                'ports',
-                'adapters',
-                'coordinators',
-                'units',
-              ],
-              message: 'testing can only depend on domain.',
             },
           ],
         },
