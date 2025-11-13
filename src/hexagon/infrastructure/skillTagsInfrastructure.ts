@@ -1,6 +1,6 @@
+import type { AuthPort } from '@application/ports/authPort';
+import type { SkillTagsPort } from '@application/ports/skillTagsPort';
 import type { SkillTag } from '@learncraft-spanish/shared';
-import type { AuthPort } from '../application/ports/authPort';
-import type { SkillTagsPort } from '../application/ports/skillTagsPort';
 import { createHttpClient } from '@infrastructure/http/client';
 import { getSkillsEndpoint } from '@learncraft-spanish/shared';
 

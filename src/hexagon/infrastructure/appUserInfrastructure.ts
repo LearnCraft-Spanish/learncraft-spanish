@@ -1,7 +1,6 @@
+import type { AppUserPort } from '@application/ports/appUserPort';
+import type { AuthPort } from '@application/ports/authPort';
 import type { AppUser, AppUserAbbreviation } from '@learncraft-spanish/shared';
-import type { AppUserPort } from '../application/ports/appUserPort';
-
-import type { AuthPort } from '../application/ports/authPort';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
   getAllAppStudentsEndpoint,

@@ -1,5 +1,5 @@
+import type { AuthPort } from '@application/ports/authPort';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
-import type { AuthPort } from '../../application/ports/authPort';
 import axios from 'axios';
 
 export interface HttpClient {
