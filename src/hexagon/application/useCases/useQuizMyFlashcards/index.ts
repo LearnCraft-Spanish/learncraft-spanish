@@ -1,2 +1,2 @@
-export * from './useQuizMyFlashcards';
-export type * from './useQuizMyFlashcards';
+export * from '@application/useCases/useQuizMyFlashcards/useQuizMyFlashcards';
+export type * from '@application/useCases/useQuizMyFlashcards/useQuizMyFlashcards';

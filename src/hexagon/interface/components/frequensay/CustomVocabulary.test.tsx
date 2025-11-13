@@ -1,7 +1,7 @@
+import CustomVocabulary from '@interface/components/frequensay/CustomVocabulary';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import CustomVocabulary from './CustomVocabulary';
 
 const mockAddManualVocabulary = false;
 const mockDisableManualVocabulary = vi.fn();

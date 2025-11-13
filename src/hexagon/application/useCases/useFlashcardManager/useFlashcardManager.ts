@@ -1,10 +1,10 @@
 import type { PaginationState } from '@application/units/Pagination/usePagination';
 import type { Flashcard } from '@learncraft-spanish/shared';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { usePagination } from '@application/units/Pagination/usePagination';
 import { useCallback, useMemo, useState } from 'react';
-import { useAuthAdapter } from '../../adapters/authAdapter';
-import { useActiveStudent } from '../../coordinators/hooks/useActiveStudent';
 
 export interface UseFlashcardManagerReturn {
   allFlashcards: Flashcard[];

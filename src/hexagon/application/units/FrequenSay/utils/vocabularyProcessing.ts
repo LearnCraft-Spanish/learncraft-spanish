@@ -1,4 +1,4 @@
-import type { WordCount } from '../../../types/frequensay';
+import type { WordCount } from '@application/types/frequensay';
 
 /**
  * Counts vocabulary words in a string and returns word counts and total word count

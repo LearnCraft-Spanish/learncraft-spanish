@@ -1,12 +1,12 @@
-import type { ExtendedLesson } from './SelectLesson';
+import type { ExtendedLesson } from '@interface/components/LessonSelector/SelectLesson';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import {
   generateVirtualLessonId,
   getPrerequisitesForCourse,
 } from '@domain/coursePrerequisites';
+import SelectCourse from '@interface/components/LessonSelector/SelectCourse';
+import SelectLesson from '@interface/components/LessonSelector/SelectLesson';
 import { useMemo } from 'react';
-import SelectCourse from './SelectCourse';
-import SelectLesson from './SelectLesson';
 import './LessonSelector.css';
 
 export default function LessonSelector(): React.JSX.Element {

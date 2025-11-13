@@ -2,12 +2,12 @@ import mockAuthAdapter, {
   overrideMockAuthAdapter,
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
+import LoginButton from '@interface/components/general/Buttons/LoginButton';
 import { cleanup, render, screen } from '@testing-library/react';
+
 import React from 'react';
 
 import { afterEach, describe, expect, it } from 'vitest';
-
-import LoginButton from './LoginButton';
 
 describe('login button', () => {
   afterEach(() => {

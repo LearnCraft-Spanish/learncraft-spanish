@@ -2,11 +2,11 @@ import type {
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';
-import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
-import { useAuthAdapter } from '../adapters/authAdapter';
-import { useActiveStudent } from '../coordinators/hooks/useActiveStudent';
-import { useStudentFlashcards } from './useStudentFlashcards';
 
 export interface TextQuizSetupReturn {
   availableQuizLengths: number[];

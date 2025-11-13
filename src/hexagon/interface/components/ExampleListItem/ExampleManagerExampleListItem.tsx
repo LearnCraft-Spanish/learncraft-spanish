@@ -1,14 +1,12 @@
-// THIS WILL NOT LIVE IN THIS FOLDER. IT SHOULD BE LOCATED WITH EXAMPLE MANAGER, i think :)
+import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { Flashcard } from '@learncraft-spanish/shared';
-
-import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
+import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
+import AddPendingRemove from '@interface/components/ExampleListItem/units/AddPendingRemove';
+import BulkRemoveButton from '@interface/components/ExampleListItem/units/BulkRemoveButton';
+import MoreInfoButton from '@interface/components/ExampleListItem/units/MoreInfoButton';
+import MoreInfoViewFlashcard from '@interface/components/ExampleListItem/units/MoreInfoViewFlashcard';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import { useCallback, useState } from 'react';
-import { useContextualMenu } from '../../hooks/useContextualMenu';
-import ExampleListItemFactory from './ExampleListItemFactory';
-import AddPendingRemove from './units/AddPendingRemove';
-import BulkRemoveButton from './units/BulkRemoveButton';
-import MoreInfoButton from './units/MoreInfoButton';
-import MoreInfoViewFlashcard from './units/MoreInfoViewFlashcard';
 export default function ExampleListItem({
   flashcard,
   isCollected,

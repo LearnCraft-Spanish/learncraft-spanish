@@ -1,5 +1,5 @@
+import Loading from '@interface/components/Loading/Loading';
 import { render, screen } from '@testing-library/react';
-import Loading from './Loading';
 
 describe('component Loading', () => {
   it('should render with message', () => {

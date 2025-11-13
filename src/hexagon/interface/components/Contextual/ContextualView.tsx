@@ -1,5 +1,5 @@
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import ContextualControls from './ContextualControls';
+import ContextualControls from '@interface/components/Contextual/ContextualControls';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 
 export default function ContextualView({
   editFunction,

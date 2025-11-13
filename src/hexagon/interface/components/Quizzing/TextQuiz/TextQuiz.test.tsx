@@ -1,4 +1,6 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import { TextQuiz } from '@interface/components/Quizzing/TextQuiz/TextQuiz';
+
 import {
   act,
   cleanup,
@@ -7,15 +9,13 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { TextQuiz } from './TextQuiz';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const cleanupFunction = vi.fn();
 

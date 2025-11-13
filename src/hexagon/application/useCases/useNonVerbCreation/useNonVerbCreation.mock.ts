@@ -1,5 +1,5 @@
-import type { VocabularyPaginationState } from '../types';
-import type { UseNonVerbCreationResult } from './useNonVerbCreation.types';
+import type { VocabularyPaginationState } from '@application/useCases/types';
+import type { UseNonVerbCreationResult } from '@application/useCases/useNonVerbCreation/useNonVerbCreation.types';
 import { defaultMockResult as defaultTableHook } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
 import { mockUseVocabularyPage } from '@application/units/useVocabularyPage/useVocabularyPage.mock';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';

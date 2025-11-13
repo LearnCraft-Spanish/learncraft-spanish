@@ -1,4 +1,4 @@
-import type { UseStudentFlashcardsReturn } from './useStudentFlashcards';
+import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';

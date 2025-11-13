@@ -163,7 +163,7 @@ export default antfu(
       'no-restricted-imports': 'off',
       '@typescript-eslint/no-restricted-imports': [
         // TO DO: INCREASE THIS TO ERROR (Lower priority)
-        'warn',
+        'error',
         {
           patterns: [
             {

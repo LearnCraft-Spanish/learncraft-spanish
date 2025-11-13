@@ -1,11 +1,11 @@
+import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
 import type { ExampleFiltersWithVocabulary } from '@learncraft-spanish/shared';
-import type { UseCombinedFiltersReturnType } from './useCombinedFilters';
 import {
   useLessonRangeVocabRequired,
   useLessonVocabKnown,
 } from '@application/queries/useLessonWithVocab';
+import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import { useMemo } from 'react';
-import { useCombinedFilters } from './useCombinedFilters';
 
 export interface UseCombinedFiltersWithVocabularyReturnType
   extends UseCombinedFiltersReturnType {

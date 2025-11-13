@@ -1,4 +1,4 @@
-import { TestQueryClientProvider } from './TestQueryClientProvider';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 
 /**
  * Create a wrapper function for renderHook and render.

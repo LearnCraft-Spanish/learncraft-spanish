@@ -1,9 +1,9 @@
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import { AudioQuizType } from '@domain/audioQuizzing';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { LessonSelector } from '@interface/components/LessonSelector';
-import React from 'react';
 
-import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
+import React from 'react';
 import './AudioBasedReview.css';
 
 interface AudioQuizSetupMenuProps {

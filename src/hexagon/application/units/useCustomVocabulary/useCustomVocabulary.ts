@@ -1,4 +1,4 @@
-import type { UseCustomVocabularyResult } from './useCustomVocabulary.types';
+import type { UseCustomVocabularyResult } from '@application/units/useCustomVocabulary/useCustomVocabulary.types';
 import { useState } from 'react';
 
 export default function useCustomVocabulary(): UseCustomVocabularyResult {

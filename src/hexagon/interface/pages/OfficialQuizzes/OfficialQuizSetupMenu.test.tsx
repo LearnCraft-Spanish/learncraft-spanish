@@ -1,11 +1,11 @@
+import type { OfficialQuizSetupMenuProps } from '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenu';
 import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
-import type { OfficialQuizSetupMenuProps } from './OfficialQuizSetupMenu';
+import { OfficialQuizSetupMenu } from '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenu';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createMockOfficialQuizRecord } from '@testing/factories/quizFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
 import { describe, expect, it, vi } from 'vitest';
-import { OfficialQuizSetupMenu } from './OfficialQuizSetupMenu';
 
 function createQuizOptions(
   courseCode: string,

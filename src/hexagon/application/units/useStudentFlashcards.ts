@@ -1,13 +1,13 @@
+import type { SrsDifficulty } from '@domain/srs';
 import type {
   ExampleWithVocabulary,
   Flashcard,
   UpdateFlashcardIntervalCommand,
 } from '@learncraft-spanish/shared';
-import type { SrsDifficulty } from 'src/hexagon/domain/srs';
 import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
+import { calculateNewSrsInterval } from '@domain/srs';
 import { useCallback, useMemo } from 'react';
-import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
-import { calculateNewSrsInterval } from 'src/hexagon/domain/srs';
 
 export interface UseStudentFlashcardsReturn {
   flashcards: Flashcard[] | undefined;

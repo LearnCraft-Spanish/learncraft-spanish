@@ -3,8 +3,8 @@ import type {
   TableRow as TableRowType,
   ValidationState,
 } from '@application/units/pasteTable/types';
+import { TableCellInput } from '@interface/components/PasteTable/TableCell';
 import React from 'react';
-import { TableCellInput } from './TableCell';
 
 export interface TableRowProps {
   row: TableRowType;

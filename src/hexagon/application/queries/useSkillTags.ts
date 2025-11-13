@@ -1,7 +1,7 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useSkillTagsAdapter } from '@application/adapters/skillTagsAdapter';
+import { queryDefaults } from '@application/utils/queryUtils';
 import { useQuery } from '@tanstack/react-query';
-import { useAuthAdapter } from '../adapters/authAdapter';
-import { useSkillTagsAdapter } from '../adapters/skillTagsAdapter';
-import { queryDefaults } from '../utils/queryUtils';
 
 export function useSkillTags() {
   const skillTagsAdapter = useSkillTagsAdapter();

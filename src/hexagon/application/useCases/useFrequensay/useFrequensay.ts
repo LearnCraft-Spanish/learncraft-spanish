@@ -1,5 +1,5 @@
 import type { WordCount } from '@application/types/frequensay';
-import type { UseFrequensayResult } from './useFrequensay.types';
+import type { UseFrequensayResult } from '@application/useCases/useFrequensay/useFrequensay.types';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useSpellingsKnownForLesson } from '@application/queries/useSpellingsKnownForLesson';
 import { copyUnknownWordsTable } from '@application/units/FrequenSay/utils/copyUnknownWordsTable';

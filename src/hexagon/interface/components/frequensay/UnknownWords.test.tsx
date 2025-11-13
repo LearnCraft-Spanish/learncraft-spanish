@@ -1,7 +1,7 @@
+import UnknownWords from '@interface/components/frequensay/UnknownWords';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { createMockWordCountList } from 'src/hexagon/testing/factories/wordCountFactory';
+import { createMockWordCountList } from '@testing/factories/wordCountFactory';
 import { vi } from 'vitest';
-import UnknownWords from './UnknownWords';
 
 const mockWordCountList = createMockWordCountList(1);
 const mockCopyUnknownWordsTable = vi.fn();

@@ -1,10 +1,10 @@
+import { FlashcardDisplay } from '@interface/components/Quizzing/general/FlashcardDisplay/FlashcardDisplay';
 import { cleanup, render, screen } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { sampleStudentFlashcardData } from 'tests/mockData';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { FlashcardDisplay } from './FlashcardDisplay';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const example = {
   ...sampleStudentFlashcardData.examples[0],

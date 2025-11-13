@@ -1,6 +1,9 @@
-import type { TableColumn, TableRow } from '../types';
+import type {
+  TableColumn,
+  TableRow,
+} from '@application/units/pasteTable/types';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
-import { GHOST_ROW_ID } from '../types';
 
 // Define the hook result interface
 export interface TableRowsResult<_T> {

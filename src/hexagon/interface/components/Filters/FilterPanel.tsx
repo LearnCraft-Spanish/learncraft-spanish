@@ -1,4 +1,5 @@
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
+import PresetSelector from '@interface/components/Filters/PresetSelector';
 import {
   SelectedTags,
   TagFilter,
@@ -6,7 +7,6 @@ import {
 } from '@interface/components/general';
 import LessonRangeSelector from '@interface/components/LessonSelector/LessonRangeSelector';
 import { useState } from 'react';
-import PresetSelector from './PresetSelector';
 import './FilterPanel.scss';
 
 export function FilterPanel({

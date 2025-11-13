@@ -1,11 +1,11 @@
+import type { AddPendingRemoveProps } from '@application/units/useTextQuiz';
 import type { Vocabulary } from '@learncraft-spanish/shared';
-import type { AddPendingRemoveProps } from 'src/hexagon/application/units/useTextQuiz';
 import { AudioQuizStep } from '@domain/audioQuizzing';
+import { AddToMyFlashcardsButtons } from '@interface/components/Quizzing/general/AddToMyFlashcardsButtons';
+import { GetHelpDisplay } from '@interface/components/Quizzing/general/FlashcardDisplay/GetHelpDisplay';
 import React from 'react';
 import pauseIcon from 'src/assets/icons/pause.svg';
 import playIcon from 'src/assets/icons/play.svg';
-import { AddToMyFlashcardsButtons } from '../general/AddToMyFlashcardsButtons';
-import { GetHelpDisplay } from '../general/FlashcardDisplay/GetHelpDisplay';
 interface AudioFlashcardProps {
   vocabComplete: boolean;
   vocabulary: Vocabulary[];

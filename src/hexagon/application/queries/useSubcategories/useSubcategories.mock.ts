@@ -1,4 +1,4 @@
-import type { UseSubcategoriesResult } from './useSubcategories';
+import type { UseSubcategoriesResult } from '@application/queries/useSubcategories/useSubcategories';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 

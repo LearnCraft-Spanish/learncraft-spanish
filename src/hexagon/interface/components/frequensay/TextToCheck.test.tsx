@@ -1,7 +1,7 @@
+import TextToCheck from '@interface/components/frequensay/TextToCheck';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { vi } from 'vitest';
-import TextToCheck from './TextToCheck';
 
 const mockUserInput = '';
 const mockUpdateUserInput = vi.fn();

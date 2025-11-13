@@ -1,4 +1,5 @@
 import { overrideMockVocabularyAdapter } from '@application/adapters/vocabularyAdapter.mock';
+import useVocabulary from '@application/units/useVocabulary/useVocabulary';
 import { renderHook, waitFor } from '@testing-library/react';
 import {
   createMockVocabulary,
@@ -6,7 +7,6 @@ import {
 } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
-import useVocabulary from './useVocabulary';
 
 describe('useVocabulary', () => {
   it('should fetch vocabulary data correctly', async () => {

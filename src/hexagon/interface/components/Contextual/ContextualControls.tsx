@@ -1,6 +1,6 @@
-import pencil from 'src/assets/icons/pencil-50.svg';
-import x_dark from 'src/assets/icons/x_dark.svg';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
+import pencil from '@assets/icons/pencil-50.svg';
+import x_dark from '@assets/icons/x_dark.svg';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 
 // edit function is an optional prop
 export default function ContextualControls({

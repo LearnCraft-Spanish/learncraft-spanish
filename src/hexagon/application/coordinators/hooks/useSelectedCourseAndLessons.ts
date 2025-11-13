@@ -1,10 +1,10 @@
+import type { UseSelectedCourseAndLessonsReturnType } from '@application/coordinators/hooks/types';
 import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
-import type { UseSelectedCourseAndLessonsReturnType } from './types';
+import SelectedCourseAndLessonsContext from '@application/coordinators/contexts/SelectedCourseAndLessonsContext';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { getPrerequisiteFromVirtualId } from '@domain/coursePrerequisites';
 import { use, useMemo } from 'react';
-import SelectedCourseAndLessonsContext from '../contexts/SelectedCourseAndLessonsContext';
-import { useActiveStudent } from './useActiveStudent';
 
 export function useSelectedCourseAndLessons(): UseSelectedCourseAndLessonsReturnType {
   const context = use(SelectedCourseAndLessonsContext);

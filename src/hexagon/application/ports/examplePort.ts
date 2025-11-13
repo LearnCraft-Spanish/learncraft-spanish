@@ -1,8 +1,8 @@
+import type { LessonRange } from '@application/ports/coursePort';
 import type {
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
-import type { LessonRange } from './coursePort';
 
 export interface ExampleFilters {
   lessonRanges: LessonRange[]; // Always required - no more single course params
