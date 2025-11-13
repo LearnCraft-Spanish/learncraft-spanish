@@ -5,8 +5,8 @@ import type {
 
 import ModalContext from '@composition/context/ModalContext';
 import Modal from '@interface/components/Modal/Modal';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
 export const ModalProvider: React.FC<{
   children: React.ReactNode;
