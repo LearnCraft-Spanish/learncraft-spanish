@@ -167,7 +167,14 @@ export default antfu(
         {
           patterns: [
             {
-              group: ['../**/*', './**/*', '!./**/*.css', '!./**/*.scss'],
+              group: [
+                '../**/*',
+                './**/*',
+                // Exclude stylesheets
+                '!./**/*.css',
+                '!./**/*.scss',
+                // However, deep relative imports are still not allowed
+              ],
               message:
                 'Use aliased imports (e.g., @domain/*) instead of relative paths.',
             },
@@ -179,8 +186,8 @@ export default antfu(
           ],
         },
       ],
-      // TO DO: INCREASE THIS TO ERROR (HIGH PRIORITY)
       'boundaries/element-types': [
+        // TO DO: INCREASE THIS TO ERROR (HIGH PRIORITY)
         'warn',
         {
           default: 'allow',
