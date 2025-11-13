@@ -1,7 +1,7 @@
 import type { Lesson } from '@learncraft-spanish/shared';
+import { useLessonsByVocabulary } from '@application/queries/useLessonsByVocab';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
 import { useMemo } from 'react';
-import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
-import { useLessonsByVocabulary } from '../queries/useLessonsByVocab';
 
 export interface LessonPopup {
   lessonsByVocabulary: Lesson[];

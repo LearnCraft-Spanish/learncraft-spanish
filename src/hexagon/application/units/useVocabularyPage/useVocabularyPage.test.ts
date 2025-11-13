@@ -1,9 +1,9 @@
 import { overrideMockVocabularyAdapter } from '@application/adapters/vocabularyAdapter.mock';
+import useVocabularyPage from '@application/units/useVocabularyPage/useVocabularyPage';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockVocabularyList } from '@testing/factories/vocabularyFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it } from 'vitest';
-import useVocabularyPage from './useVocabularyPage';
 
 describe('useVocabularyPage', () => {
   beforeEach(() => {

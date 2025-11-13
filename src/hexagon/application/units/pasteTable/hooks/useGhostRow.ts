@@ -1,7 +1,13 @@
-import type { TableColumn, TableRow } from '../types';
+import type {
+  TableColumn,
+  TableRow,
+} from '@application/units/pasteTable/types';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
+import {
+  createGhostRow,
+  generateRowId,
+} from '@application/units/pasteTable/utils/rowCreation';
 import { useCallback } from 'react';
-import { GHOST_ROW_ID } from '../types';
-import { createGhostRow, generateRowId } from '../utils';
 
 interface UseGhostRowProps {
   columns: TableColumn[];

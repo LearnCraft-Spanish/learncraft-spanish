@@ -1,6 +1,6 @@
+import useCustomVocabulary from '@application/units/useCustomVocabulary/useCustomVocabulary';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import useCustomVocabulary from './useCustomVocabulary';
 
 describe('useCustomVocabulary', () => {
   it('should initialize with default values', () => {

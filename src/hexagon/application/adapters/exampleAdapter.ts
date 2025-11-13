@@ -1,7 +1,7 @@
-import type { ExamplePort } from '../ports/examplePort';
+import type { ExamplePort } from '@application/ports/examplePort';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { config } from '@config';
 import { createExampleInfrastructure } from '@infrastructure/exampleInfrastructure';
-import { useAuthAdapter } from './authAdapter';
 
 export function useExampleAdapter(): ExamplePort {
   const apiUrl = config.backendDomain;

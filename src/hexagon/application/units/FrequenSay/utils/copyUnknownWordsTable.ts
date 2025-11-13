@@ -1,4 +1,4 @@
-import type { WordCount } from 'src/hexagon/application/types/frequensay';
+import type { WordCount } from '@application/types/frequensay';
 
 export function copyUnknownWordsTable(unknownWordCount: WordCount[]) {
   const headers = 'Word\tCount\n';

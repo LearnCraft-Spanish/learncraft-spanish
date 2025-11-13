@@ -2,9 +2,9 @@ import type {
   Lesson,
   VocabularyAbbreviation,
 } from '@learncraft-spanish/shared';
+import { useLessonsByVocabulary } from '@application/queries/useLessonsByVocab';
+import useVocabulary from '@application/units/useVocabulary';
 import { useCallback, useState } from 'react';
-import { useLessonsByVocabulary } from '../queries/useLessonsByVocab';
-import useVocabulary from '../units/useVocabulary';
 
 export interface UseGetHelpMenuResult {
   lessonsByVocabulary: Lesson[] | null;

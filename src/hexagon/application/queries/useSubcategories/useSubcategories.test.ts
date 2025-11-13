@@ -1,9 +1,9 @@
 import { overrideMockSubcategoryAdapter } from '@application/adapters/subcategoryAdapter.mock';
+import { useSubcategories } from '@application/queries/useSubcategories/useSubcategories';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
-import { useSubcategories } from './useSubcategories';
 
 describe('useSubcategories', () => {
   it('should fetch subcategories correctly', async () => {

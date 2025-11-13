@@ -1,7 +1,7 @@
-import type { PreSetQuizPreset } from './preSetQuizzes';
+import type { PreSetQuizPreset } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
+import { preSetQuizzes } from '@application/units/Filtering/FilterPresets/preSetQuizzes';
 import { useCallback } from 'react';
-import { preSetQuizzes } from './preSetQuizzes';
 
 export function usePresetFilters() {
   const { bulkUpdateSkillTagKeys } = useExampleFilterCoordinator();

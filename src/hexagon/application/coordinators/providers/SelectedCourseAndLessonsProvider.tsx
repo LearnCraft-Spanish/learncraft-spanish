@@ -1,10 +1,10 @@
-import type { SelectedCourseAndLessonsContextType } from '../contexts/SelectedCourseAndLessonsContext';
+import type { SelectedCourseAndLessonsContextType } from '@application/coordinators/contexts/SelectedCourseAndLessonsContext';
+import SelectedCourseAndLessonsContext from '@application/coordinators/contexts/SelectedCourseAndLessonsContext';
 import {
   generateVirtualLessonId,
   getPrerequisitesForCourse,
 } from '@domain/coursePrerequisites';
 import { useCallback, useMemo, useState } from 'react';
-import SelectedCourseAndLessonsContext from '../contexts/SelectedCourseAndLessonsContext';
 
 export function SelectedCourseAndLessonsProvider({
   children,

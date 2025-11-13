@@ -1,10 +1,10 @@
+import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
+import { useSkillTags } from '@application/queries/useSkillTags';
 import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useExampleAdapter } from '../adapters/exampleAdapter';
-import { useSelectedCourseAndLessons } from '../coordinators/hooks/useSelectedCourseAndLessons';
-import { useSkillTags } from './useSkillTags';
 
 export function useCustomPreSetQuizQuery({
   quizTitle,

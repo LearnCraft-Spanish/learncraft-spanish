@@ -1,6 +1,6 @@
+import useBulkSelect from '@application/units/useBulkSelect/useBulkSelect';
 import { act, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
-import useBulkSelect from './useBulkSelect';
 
 describe('useBulkSelect', () => {
   it('should render with initial state', () => {

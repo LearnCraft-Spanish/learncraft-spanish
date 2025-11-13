@@ -1,5 +1,5 @@
-import type { UseVocabularyResult } from './useVocabulary';
-import useVocabulary from './useVocabulary';
+import type { UseVocabularyResult } from '@application/units/useVocabulary/useVocabulary';
+import useVocabulary from '@application/units/useVocabulary/useVocabulary';
 
 export default useVocabulary;
 

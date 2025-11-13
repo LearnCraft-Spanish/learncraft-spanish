@@ -1,6 +1,6 @@
+import type { VocabularyPaginationState } from '@application/useCases/types';
+import type { UseNonVerbCreationResult } from '@application/useCases/useNonVerbCreation/useNonVerbCreation.types';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
-import type { VocabularyPaginationState } from '../types';
-import type { UseNonVerbCreationResult } from './useNonVerbCreation.types';
 import { useVocabularyTable } from '@application/implementations/vocabularyTable/useVocabularyTable';
 import { useSubcategories } from '@application/queries/useSubcategories';
 import useVocabulary from '@application/units/useVocabulary';

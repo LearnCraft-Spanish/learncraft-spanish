@@ -1,4 +1,4 @@
-import type { WordCount } from '../../../types/frequensay';
+import type { WordCount } from '@application/types/frequensay';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   countVocabularyWords,

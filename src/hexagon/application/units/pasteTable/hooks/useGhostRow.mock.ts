@@ -1,4 +1,7 @@
-import type { TableColumn, TableRow } from '../types';
+import type {
+  TableColumn,
+  TableRow,
+} from '@application/units/pasteTable/types';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Define the hook result interface

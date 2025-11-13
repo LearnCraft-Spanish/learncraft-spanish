@@ -1,4 +1,4 @@
-import type { CoursePort } from '../ports/coursePort';
+import type { CoursePort } from '@application/ports/coursePort';
 import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 

@@ -1,14 +1,14 @@
+import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
+import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
+
+import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
+import { overrideMockSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import { mockUseOfficialQuizSetupMenu } from '@application/units/OfficialQuiz/useOfficialQuizSetupMenu.mock';
+import { useOfficialQuizzes } from '@application/useCases/useOfficialQuizzes/useOfficialQuizzes';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { renderHook, waitFor } from '@testing-library/react';
-
-import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { overrideMockAuthAdapter } from '../../adapters/authAdapter.mock';
-import { overrideMockOfficialQuizAdapter } from '../../adapters/officialQuizAdapter.mock';
-import { overrideMockActiveStudent } from '../../coordinators/hooks/useActiveStudent.mock';
-import { overrideMockSelectedCourseAndLessons } from '../../coordinators/hooks/useSelectedCourseAndLessons.mock';
-import { mockUseOfficialQuizSetupMenu } from '../../units/OfficialQuiz/useOfficialQuizSetupMenu.mock';
-import { useOfficialQuizzes } from './useOfficialQuizzes';
 
 vi.mock('@application/units/OfficialQuiz/useOfficialQuizSetupMenu', () => ({
   useOfficialQuizSetupMenu: vi.fn(() => mockUseOfficialQuizSetupMenu),

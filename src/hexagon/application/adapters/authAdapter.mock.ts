@@ -1,4 +1,4 @@
-import type { AuthPort } from '../ports/authPort';
+import type { AuthPort } from '@application/ports/authPort';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import { vi } from 'vitest';

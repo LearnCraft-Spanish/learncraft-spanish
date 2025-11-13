@@ -1,3 +1,3 @@
-import useCustomVocabulary from './useCustomVocabulary';
+import useCustomVocabulary from '@application/units/useCustomVocabulary/useCustomVocabulary';
 
 export default useCustomVocabulary;

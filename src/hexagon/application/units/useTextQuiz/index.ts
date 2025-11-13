@@ -1,5 +1,5 @@
-export * from './useSrsFunctionality';
-export type * from './useSrsFunctionality';
+export * from '@application/units/useTextQuiz/useSrsFunctionality';
+export type * from '@application/units/useTextQuiz/useSrsFunctionality';
 
-export * from './useTextQuiz';
-export type * from './useTextQuiz';
+export * from '@application/units/useTextQuiz/useTextQuiz';
+export type * from '@application/units/useTextQuiz/useTextQuiz';

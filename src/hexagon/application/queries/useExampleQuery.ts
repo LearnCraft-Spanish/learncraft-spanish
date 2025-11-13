@@ -1,11 +1,11 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
+import { queryDefaults } from '@application/utils/queryUtils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
-import { useExampleAdapter } from '../adapters/exampleAdapter';
-import { queryDefaults } from '../utils/queryUtils';
 
 export interface UseExampleQueryReturnType {
   isLoading: boolean;
