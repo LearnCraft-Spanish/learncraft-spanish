@@ -1,15 +1,15 @@
 import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
 import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
 import { overrideMockSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import {
+  getCourseCodeFromName,
+  useOfficialQuizSetupMenu,
+} from '@application/units/OfficialQuiz/useOfficialQuizSetupMenu';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockOfficialQuizRecord } from '@testing/factories/quizFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  getCourseCodeFromName,
-  useOfficialQuizSetupMenu,
-} from './useOfficialQuizSetupMenu';
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();

@@ -1,9 +1,9 @@
 import type { WordCount } from '@application/types/frequensay';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   countVocabularyWords,
   filterWordsByUnknown,
-} from './vocabularyProcessing';
+} from '@application/units/FrequenSay/utils/vocabularyProcessing';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('vocabularyProcessing', () => {
   beforeEach(() => {

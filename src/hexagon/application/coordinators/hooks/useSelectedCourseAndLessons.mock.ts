@@ -1,4 +1,4 @@
-import type { UseSelectedCourseAndLessonsReturnType } from './types';
+import type { UseSelectedCourseAndLessonsReturnType } from '@application/coordinators/hooks/types';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 
