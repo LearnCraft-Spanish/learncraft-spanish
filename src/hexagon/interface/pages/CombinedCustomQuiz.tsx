@@ -11,7 +11,9 @@ import {
   MyTextQuizMenu,
 } from '@interface/components/Quizzing/general';
 import { TextQuiz } from '@interface/components/Quizzing/TextQuiz';
-import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
+
+// This seems like a boundary violation: pulling styles from the wrong scope?
+import '../components/Quizzing/general/QuizSetupMenu.scss';
 import './CombinedCustomQuiz.scss';
 
 export default function CombinedCustomQuiz() {

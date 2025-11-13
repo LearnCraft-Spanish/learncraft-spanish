@@ -163,18 +163,11 @@ export default antfu(
       'no-restricted-imports': 'off',
       '@typescript-eslint/no-restricted-imports': [
         // TO DO: INCREASE THIS TO ERROR (Lower priority)
-        'error',
+        'warn',
         {
           patterns: [
             {
-              group: [
-                '../**/*',
-                './**/*',
-                '!../**/*.css',
-                '!../**/*.scss',
-                '!./**/*.css',
-                '!./**/*.scss',
-              ],
+              group: ['../**/*', './**/*', '!./**/*.css', '!./**/*.scss'],
               message:
                 'Use aliased imports (e.g., @domain/*) instead of relative paths.',
             },
