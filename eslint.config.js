@@ -162,7 +162,6 @@ export default antfu(
       // Ban all relative imports in hexagon; require aliases (@domain/* etc.)
       'no-restricted-imports': 'off',
       '@typescript-eslint/no-restricted-imports': [
-        // TO DO: INCREASE THIS TO ERROR (Lower priority)
         'error',
         {
           patterns: [
@@ -187,8 +186,7 @@ export default antfu(
         },
       ],
       'boundaries/element-types': [
-        // TO DO: INCREASE THIS TO ERROR (HIGH PRIORITY)
-        'warn',
+        'error',
         {
           default: 'allow',
           rules: [
