@@ -2,11 +2,16 @@ import type { AuthPort } from '@application/ports/authPort';
 import type { LessonRange } from '@application/ports/coursePort';
 import type { ExamplePort } from '@application/ports/examplePort';
 import type {
+  ExampleTextSearch,
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { queryExamplesEndpoint } from '@learncraft-spanish/shared';
+import {
+  getExamplesByIdsEndpoint,
+  queryExamplesEndpoint,
+  searchExamplesByTextEndpoint,
+} from '@learncraft-spanish/shared';
 
 export function createExampleInfrastructure(
   apiUrl: string,
@@ -43,6 +48,37 @@ export function createExampleInfrastructure(
         seed: params.seed,
         disableCache: params.disableCache ?? false,
       });
+      return response;
+    },
+
+    getExamplesByIds: async (ids: number[]) => {
+      const response = await httpClient.post<{
+        examples: ExampleWithVocabulary[];
+      }>(
+        getExamplesByIdsEndpoint.path,
+        getExamplesByIdsEndpoint.requiredScopes,
+        {
+          ids,
+        },
+      );
+      return response;
+    },
+    searchExamplesByText: async (
+      searchText: ExampleTextSearch,
+      page: number,
+      limit: number,
+    ) => {
+      const response = await httpClient.post<{
+        examples: ExampleWithVocabulary[];
+      }>(
+        searchExamplesByTextEndpoint.path,
+        searchExamplesByTextEndpoint.requiredScopes,
+        {
+          searchText,
+          page,
+          limit,
+        },
+      );
       return response;
     },
   };

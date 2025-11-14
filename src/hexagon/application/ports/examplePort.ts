@@ -1,5 +1,6 @@
 import type { LessonRange } from '@application/ports/coursePort';
 import type {
+  ExampleTextSearch,
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
@@ -31,4 +32,12 @@ export interface ExamplePort {
     seed: string;
     disableCache?: boolean;
   }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
+  getExamplesByIds: (
+    ids: number[],
+  ) => Promise<{ examples: ExampleWithVocabulary[] }>;
+  searchExamplesByText: (
+    searchText: ExampleTextSearch,
+    page: number,
+    limit: number,
+  ) => Promise<{ examples: ExampleWithVocabulary[] }>;
 }
