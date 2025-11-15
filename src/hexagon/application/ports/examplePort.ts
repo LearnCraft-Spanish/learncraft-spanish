@@ -1,5 +1,6 @@
 import type { LessonRange } from '@application/ports/coursePort';
 import type {
+  ExampleTechnical,
   ExampleTextSearch,
   ExampleWithVocabulary,
   SkillTag,
@@ -35,6 +36,9 @@ export interface ExamplePort {
   getExamplesByIds: (
     ids: number[],
   ) => Promise<{ examples: ExampleWithVocabulary[] }>;
+  getExamplesForEditingByIds: (
+    ids: number[],
+  ) => Promise<{ examples: ExampleTechnical[] }>;
   searchExamplesByText: (
     searchText: ExampleTextSearch,
     page: number,

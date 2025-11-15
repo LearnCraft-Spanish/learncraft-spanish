@@ -29,7 +29,7 @@ export const useSearchExamplesQuery = (
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['searchExamples', searchText, page, PAGE_SIZE],
+    queryKey: ['examples', 'by search text', searchText, page, PAGE_SIZE],
     queryFn: () => searchExamplesByText(searchText, page, PAGE_SIZE),
     ...queryDefaults.referenceData,
   });

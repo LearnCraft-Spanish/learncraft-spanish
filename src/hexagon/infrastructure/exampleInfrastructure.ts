@@ -2,13 +2,15 @@ import type { AuthPort } from '@application/ports/authPort';
 import type { LessonRange } from '@application/ports/coursePort';
 import type { ExamplePort } from '@application/ports/examplePort';
 import type {
+  ExampleTechnical,
   ExampleTextSearch,
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
-  getExamplesByIdsEndpoint,
+  getExamplesByIdsWithTechnicalDataEndpoint,
+  getExamplesByIdsWithVocabularyEndpoint,
   queryExamplesEndpoint,
   searchExamplesByTextEndpoint,
 } from '@learncraft-spanish/shared';
@@ -55,11 +57,22 @@ export function createExampleInfrastructure(
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
       }>(
-        getExamplesByIdsEndpoint.path,
-        getExamplesByIdsEndpoint.requiredScopes,
+        getExamplesByIdsWithVocabularyEndpoint.path,
+        getExamplesByIdsWithVocabularyEndpoint.requiredScopes,
         {
           ids,
         },
+      );
+      return response;
+    },
+
+    getExamplesForEditingByIds: async (ids: number[]) => {
+      const response = await httpClient.post<{
+        examples: ExampleTechnical[];
+      }>(
+        getExamplesByIdsWithTechnicalDataEndpoint.path,
+        getExamplesByIdsWithTechnicalDataEndpoint.requiredScopes,
+        { ids },
       );
       return response;
     },
