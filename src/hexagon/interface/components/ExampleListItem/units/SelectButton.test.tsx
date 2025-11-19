@@ -1,4 +1,4 @@
-import { SelectButton } from '@interface/components/ExampleListItem/units';
+import SelectButton from '@interface/components/ExampleListItem/units/SelectButton';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 

@@ -1,4 +1,4 @@
-import type { TableHook } from '@application/units/pasteTable/types';
+import type { TableHook } from '@application/units/pasteTable';
 import type { VocabularyPaginationState } from '@application/useCases/types';
 import type {
   CreateNonVerbVocabulary,

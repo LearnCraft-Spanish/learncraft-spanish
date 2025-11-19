@@ -12,7 +12,7 @@ import {
 import {
   mockCourseAdapter,
   resetMockCourseAdapter,
-} from '@application/adapters/courseAdapter.mock';
+} from '@application/adapters/ courseAdapter.mock';
 import {
   mockFlashcardAdapter,
   resetMockFlashcardAdapter,

@@ -162,15 +162,17 @@ export default antfu(
       // Ban all relative imports in hexagon; require aliases (@domain/* etc.)
       'no-restricted-imports': 'off',
       '@typescript-eslint/no-restricted-imports': [
-        // TO DO: INCREASE THIS TO ERROR (Lower priority)
-        'warn',
+        'error',
         {
           patterns: [
             {
               group: [
-                '../**/*.{ts,tsx}',
-                './**/*.{ts,tsx}',
-                '.*/**/*.{ts,tsx}',
+                '../**/*',
+                './**/*',
+                // Exclude stylesheets
+                '!./**/*.css',
+                '!./**/*.scss',
+                // However, deep relative imports are still not allowed
               ],
               message:
                 'Use aliased imports (e.g., @domain/*) instead of relative paths.',
@@ -183,9 +185,8 @@ export default antfu(
           ],
         },
       ],
-      // TO DO: INCREASE THIS TO ERROR (HIGH PRIORITY)
       'boundaries/element-types': [
-        'warn',
+        'error',
         {
           default: 'allow',
           rules: [

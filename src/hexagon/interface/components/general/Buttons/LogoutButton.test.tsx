@@ -2,7 +2,7 @@ import mockAuthAdapter, {
   overrideMockAuthAdapter,
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
-import { LogoutButton } from '@interface/components/general/Buttons';
+import LogoutButton from '@interface/components/general/Buttons/LogoutButton';
 import { cleanup, render, screen } from '@testing-library/react';
 
 import React from 'react';

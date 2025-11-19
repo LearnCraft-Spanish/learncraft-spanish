@@ -5,6 +5,8 @@ import { InlineLoading } from '@interface/components/Loading';
 
 import React from 'react';
 import './QuizSetupMenu.scss';
+
+// What is this? Why the duplicate styles?
 import '@interface/styles/QuizSetupMenu.scss';
 
 interface MyTextQuizMenuProps {

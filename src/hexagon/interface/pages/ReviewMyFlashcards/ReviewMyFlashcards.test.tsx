@@ -1,5 +1,5 @@
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
-import MyFlashcardsQuiz from '@interface/pages/ReviewMyFlashcards';
+import MyFlashcardsQuiz from '@interface/pages/ReviewMyFlashcards/ReviewMyFlashcards';
 import { render, screen, waitFor } from '@testing-library/react';
 import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';

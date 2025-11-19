@@ -3,7 +3,7 @@ import type {
   TableData,
   TableRow,
 } from '@application/units/pasteTable/types';
-import { createGhostRow } from '@application/units/pasteTable/utils/rowCreation';
+import { createGhostRow } from '@application/units/pasteTable/utils';
 import { useCallback, useRef, useState } from 'react';
 
 interface UseTableRowsProps<T> {

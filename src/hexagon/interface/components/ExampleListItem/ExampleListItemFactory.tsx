@@ -4,6 +4,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import type { ReactNode } from 'react';
 import { ExampleText } from '@interface/components/ExampleListItem/units';
+
 import './ExampleListItem.scss';
 
 export default function ExampleListItemFactory({

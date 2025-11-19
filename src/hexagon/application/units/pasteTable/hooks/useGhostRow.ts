@@ -6,7 +6,7 @@ import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
 import {
   createGhostRow,
   generateRowId,
-} from '@application/units/pasteTable/utils/rowCreation';
+} from '@application/units/pasteTable/utils';
 import { useCallback } from 'react';
 
 interface UseGhostRowProps {

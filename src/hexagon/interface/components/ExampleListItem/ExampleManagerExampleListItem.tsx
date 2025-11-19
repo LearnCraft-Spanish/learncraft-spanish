@@ -1,6 +1,4 @@
 import type { LessonPopup } from '@application/units/useLessonPopup';
-
-// THIS WILL NOT LIVE IN THIS FOLDER. IT SHOULD BE LOCATED WITH EXAMPLE MANAGER, i think :)
 import type { Flashcard } from '@learncraft-spanish/shared';
 import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
 import AddPendingRemove from '@interface/components/ExampleListItem/units/AddPendingRemove';

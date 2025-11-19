@@ -10,7 +10,7 @@ import {
   detectHeaderRow,
   parseTsv,
   tryParseJson,
-} from '@application/units/pasteTable/utils/pasteFormatting';
+} from '@application/units/pasteTable/utils';
 import { useCallback, useState } from 'react';
 
 interface UseTablePasteProps {
