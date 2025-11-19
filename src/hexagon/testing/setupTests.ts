@@ -10,6 +10,10 @@ import {
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
 import {
+  mockCourseAdapter,
+  resetMockCourseAdapter,
+} from '@application/adapters/ courseAdapter.mock';
+import {
   mockFlashcardAdapter,
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
@@ -25,52 +29,41 @@ import {
   mockVocabularyAdapter,
   resetMockVocabularyAdapter,
 } from '@application/adapters/vocabularyAdapter.mock';
+
 import {
   mockActiveStudent,
   resetMockActiveStudent,
 } from '@application/coordinators/hooks/useActiveStudent.mock';
-
 import {
   mockSelectedCourseAndLessons,
   resetMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+
+import {
+  mockUseSpellingsKnownForLesson,
+  resetMockUseSpellingsKnownForLesson,
+} from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
 import {
   mockUseStudentFlashcards,
   resetMockUseStudentFlashcards,
 } from '@application/units/useStudentFlashcards.mock';
-
 import { cleanup } from '@testing-library/react';
+import { resetTestQueryClient } from '@testing/utils/testQueryClient';
+
 import { afterEach, vi } from 'vitest';
-import {
-  mockCourseAdapter,
-  resetMockCourseAdapter,
-} from '../application/adapters/ courseAdapter.mock';
-import { resetTestQueryClient } from './utils/testQueryClient';
 import '@testing-library/jest-dom';
 
+// Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/courseAdapter', () => ({
   useCourseAdapter: vi.fn(() => mockCourseAdapter),
 }));
 
-// Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/vocabularyAdapter', () => ({
   useVocabularyAdapter: vi.fn(() => mockVocabularyAdapter),
 }));
 
 vi.mock('@application/adapters/subcategoryAdapter', () => ({
   useSubcategoryAdapter: vi.fn(() => mockSubcategoryAdapter),
-}));
-
-vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
-  useActiveStudent: vi.fn(() => mockActiveStudent),
-}));
-
-vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
-  useSelectedCourseAndLessons: vi.fn(() => mockSelectedCourseAndLessons),
-}));
-
-vi.mock('@application/adapters/authAdapter', () => ({
-  useAuthAdapter: vi.fn(() => mockAuthAdapter),
 }));
 
 vi.mock('@application/adapters/flashcardAdapter', () => ({
@@ -81,28 +74,53 @@ vi.mock('@application/adapters/officialQuizAdapter', () => ({
   useOfficialQuizAdapter: vi.fn(() => mockOfficialQuizAdapter),
 }));
 
+vi.mock('@application/adapters/authAdapter', () => ({
+  useAuthAdapter: vi.fn(() => mockAuthAdapter),
+}));
+
+vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
+  useActiveStudent: vi.fn(() => mockActiveStudent),
+}));
+
+vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
+  useSelectedCourseAndLessons: vi.fn(() => mockSelectedCourseAndLessons),
+}));
+
 vi.mock('@application/units/useStudentFlashcards', () => ({
   useStudentFlashcards: vi.fn(() => mockUseStudentFlashcards),
 }));
 
-const resetAdapterMocks = () => {
-  // Reset the adapter mocks to their default implementations
+vi.mock('@application/queries/useSpellingsKnownForLesson', () => ({
+  useSpellingsKnownForLesson: vi.fn(() => mockUseSpellingsKnownForLesson),
+}));
+
+const resetGlobalMocks = () => {
+  //resetAuthAdapter
+  resetMockAuthAdapter();
+
+  // adapter mocks
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
   resetMockActiveStudent();
-  resetMockSelectedCourseAndLessons();
-  resetMockAuthAdapter();
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();
   resetMockOfficialQuizAdapter();
   resetMockUseStudentFlashcards();
+  resetMockUseSpellingsKnownForLesson();
+
+  // coordinator mocks
+  resetMockActiveStudent();
+  resetMockSelectedCourseAndLessons();
+
+  // unit mocks
+  resetMockUseStudentFlashcards();
 };
 
-// Reset all mocks after each test
 afterEach(() => {
   // Clear mock call history
-  resetAdapterMocks();
   vi.clearAllMocks();
+  // Reset the adapter mocks to their default implementations
+  resetGlobalMocks();
 
   // Reset React Query client
   resetTestQueryClient();

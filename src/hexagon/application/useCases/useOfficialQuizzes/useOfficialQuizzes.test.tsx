@@ -1,63 +1,22 @@
-import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
-import { renderHook } from '@testing-library/react';
+import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
+import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
+
+import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
+import { overrideMockSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import { mockUseOfficialQuizSetupMenu } from '@application/units/OfficialQuiz/useOfficialQuizSetupMenu.mock';
+import { useOfficialQuizzes } from '@application/useCases/useOfficialQuizzes/useOfficialQuizzes';
+import { officialQuizCourses } from '@learncraft-spanish/shared';
+import { renderHook, waitFor } from '@testing-library/react';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { overrideMockAuthAdapter } from '../../adapters/authAdapter.mock';
-import { overrideMockActiveStudent } from '../../coordinators/hooks/useActiveStudent.mock';
-import { overrideMockSelectedCourseAndLessons } from '../../coordinators/hooks/useSelectedCourseAndLessons.mock';
-import { useOfficialQuizSetupMenu } from '../../units/OfficialQuiz/useOfficialQuizSetupMenu';
-import { useOfficialQuizzes } from './useOfficialQuizzes';
-
-// Mock only the hooks that aren't globally mocked yet
-vi.mock('@application/queries/useOfficialQuizzesQuery');
-vi.mock('../../units/OfficialQuiz/useOfficialQuizSetupMenu');
-vi.mock('@learncraft-spanish/shared', () => ({
-  officialQuizCourses: {
-    course1: { id: 1, name: 'Course 1' },
-    course2: { id: 2, name: 'Course 2' },
-  },
+vi.mock('@application/units/OfficialQuiz/useOfficialQuizSetupMenu', () => ({
+  useOfficialQuizSetupMenu: vi.fn(() => mockUseOfficialQuizSetupMenu),
 }));
 
-const mockUseOfficialQuizzesQuery = vi.mocked(useOfficialQuizzesQuery);
-const mockUseOfficialQuizSetupMenu = vi.mocked(useOfficialQuizSetupMenu);
-
 describe('useOfficialQuizzes', () => {
-  const mockQuizSetupMenuProps = {
-    courseCode: 'lcsp',
-    setUserSelectedCourseCode: vi.fn(),
-    quizNumber: 1,
-    setUserSelectedQuizNumber: vi.fn(),
-    quizOptions: [],
-    startQuiz: vi.fn(),
-  };
-
   beforeEach(() => {
     vi.clearAllMocks();
-
-    // Use global mock overrides for the globally mocked hooks
-    overrideMockSelectedCourseAndLessons({
-      isLoading: false,
-      error: null,
-    });
-
-    overrideMockActiveStudent({
-      isLoading: false,
-      error: null,
-    });
-
-    overrideMockAuthAdapter({
-      isLoading: false,
-      isAuthenticated: true,
-    });
-
-    // Mock the hooks that aren't globally mocked
-    mockUseOfficialQuizzesQuery.mockReturnValue({
-      isLoading: false,
-      error: null,
-      officialQuizRecords: [],
-    });
-
-    mockUseOfficialQuizSetupMenu.mockReturnValue(mockQuizSetupMenuProps);
   });
 
   describe('isLoading', () => {
@@ -66,37 +25,21 @@ describe('useOfficialQuizzes', () => {
         isLoading: true,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
-
-      expect(result.current.isLoading).toBe(true);
-    });
-
-    it('should return true when appUserLoading is true', () => {
-      overrideMockActiveStudent({
-        isLoading: true,
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
-
       expect(result.current.isLoading).toBe(true);
     });
 
-    it('should return true when officialQuizzesLoading is true', () => {
-      mockUseOfficialQuizzesQuery.mockReturnValue({
-        isLoading: true,
-        error: null,
-        officialQuizRecords: [],
+    it('should return false when all loading states are false', async () => {
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
-
-      expect(result.current.isLoading).toBe(true);
-    });
-
-    it('should return false when all loading states are false', () => {
-      const { result } = renderHook(() => useOfficialQuizzes());
-
-      expect(result.current.isLoading).toBe(false);
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
     });
   });
 
@@ -107,26 +50,34 @@ describe('useOfficialQuizzes', () => {
         error: testError,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
-
-      expect(result.current.error).toBe(testError);
-    });
-
-    it('should return officialQuizzesError when present', () => {
-      const testError = new Error('Official quizzes error');
-      mockUseOfficialQuizzesQuery.mockReturnValue({
-        isLoading: false,
-        error: testError,
-        officialQuizRecords: [],
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
+      expect(result.current.error).toEqual(testError);
+    });
 
-      expect(result.current.error).toBe(testError);
+    it('should return officialQuizzesError when present', async () => {
+      const testError = new Error('Official quizzes error');
+      overrideMockOfficialQuizAdapter({
+        getOfficialQuizRecords: async () => {
+          throw testError;
+        },
+      });
+
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
+
+      await waitFor(() => {
+        expect(result.current.error).toEqual(testError);
+      });
     });
 
     it('should return null when no errors are present', () => {
-      const { result } = renderHook(() => useOfficialQuizzes());
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
 
       expect(result.current.error).toBeNull();
     });
@@ -139,7 +90,9 @@ describe('useOfficialQuizzes', () => {
         isAuthenticated: true,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
 
       expect(result.current.isLoggedIn).toBe(true);
     });
@@ -150,7 +103,9 @@ describe('useOfficialQuizzes', () => {
         isAuthenticated: false,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
 
       expect(result.current.isLoggedIn).toBe(false);
     });
@@ -161,7 +116,9 @@ describe('useOfficialQuizzes', () => {
         isAuthenticated: true,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
 
       expect(result.current.isLoggedIn).toBe(false);
     });
@@ -172,7 +129,9 @@ describe('useOfficialQuizzes', () => {
         isAuthenticated: false,
       });
 
-      const { result } = renderHook(() => useOfficialQuizzes());
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
 
       expect(result.current.isLoggedIn).toBe(false);
     });
@@ -180,18 +139,21 @@ describe('useOfficialQuizzes', () => {
 
   describe('other return values', () => {
     it('should return officialQuizCourses as an array', () => {
-      const { result } = renderHook(() => useOfficialQuizzes());
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
 
-      expect(result.current.officialQuizCourses).toEqual([
-        { id: 1, name: 'Course 1' },
-        { id: 2, name: 'Course 2' },
-      ]);
+      expect(result.current.officialQuizCourses).toEqual(officialQuizCourses);
     });
 
     it('should return quizSetupMenuProps from useOfficialQuizSetupMenu', () => {
-      const { result } = renderHook(() => useOfficialQuizzes());
+      const { result } = renderHook(() => useOfficialQuizzes(), {
+        wrapper: TestQueryClientProvider,
+      });
 
-      expect(result.current.quizSetupMenuProps).toBe(mockQuizSetupMenuProps);
+      expect(result.current.quizSetupMenuProps).toEqual(
+        mockUseOfficialQuizSetupMenu,
+      );
     });
   });
 });

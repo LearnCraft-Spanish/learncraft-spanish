@@ -1,6 +1,6 @@
+import BulkRemoveButton from '@interface/components/ExampleListItem/units/BulkRemoveButton';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import BulkRemoveButton from './BulkRemoveButton';
 
 const mockProps = {
   id: 123,

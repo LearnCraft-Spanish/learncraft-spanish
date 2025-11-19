@@ -1,5 +1,5 @@
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useCallback, useState } from 'react';
-import { useStudentFlashcards } from '../useStudentFlashcards';
 
 export interface ExampleReviewedResults {
   exampleId: number;

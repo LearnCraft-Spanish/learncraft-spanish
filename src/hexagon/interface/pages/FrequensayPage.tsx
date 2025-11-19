@@ -1,11 +1,12 @@
+import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import useFrequensay from '@application/useCases/useFrequensay';
-import { useSelectedCourseAndLessons } from 'src/hexagon/application/coordinators/hooks/useSelectedCourseAndLessons';
-import CustomVocabulary from '../components/frequensay/CustomVocabulary';
-import FrequensaySetup from '../components/frequensay/FrequensaySetup';
-import TextToCheck from '../components/frequensay/TextToCheck';
-import UnknownWords from '../components/frequensay/UnknownWords';
+import CustomVocabulary from '@interface/components/frequensay/CustomVocabulary';
+import FrequensaySetup from '@interface/components/frequensay/FrequensaySetup';
+import TextToCheck from '@interface/components/frequensay/TextToCheck';
+import UnknownWords from '@interface/components/frequensay/UnknownWords';
 import './FrequensayPage.scss';
 export default function FrequenSayPage() {
+  // TO DO: Reduce to one use case hook
   const { toLesson } = useSelectedCourseAndLessons();
   const {
     spellingsDataError,

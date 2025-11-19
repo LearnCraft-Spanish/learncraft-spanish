@@ -1,6 +1,6 @@
+import { useAppUserAdapter } from '@application/adapters/appUserAdapter';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';
-import { useAppUserAdapter } from '../adapters/appUserAdapter';
-import { useAuthAdapter } from '../adapters/authAdapter';
 
 export function useAppStudentList() {
   const appUserAdapter = useAppUserAdapter();

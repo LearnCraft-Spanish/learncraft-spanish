@@ -1,10 +1,10 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
+import { useTextQuiz } from '@application/units/useTextQuiz/useTextQuiz';
 import { act, renderHook } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useTextQuiz } from './useTextQuiz';
 
 describe('useTextQuiz', () => {
   const mockCleanupFunction = vi.fn();

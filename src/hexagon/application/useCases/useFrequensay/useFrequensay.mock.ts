@@ -1,4 +1,4 @@
-import type { UseFrequensayResult } from './useFrequensay.types';
+import type { UseFrequensayResult } from '@application/useCases/useFrequensay/useFrequensay.types';
 import { vi } from 'vitest';
 
 export const defaultResult: UseFrequensayResult = {

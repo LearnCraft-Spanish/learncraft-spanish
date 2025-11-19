@@ -2,12 +2,12 @@ import mockAuthAdapter, {
   overrideMockAuthAdapter,
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
+import LogoutButton from '@interface/components/general/Buttons/LogoutButton';
 import { cleanup, render, screen } from '@testing-library/react';
+
 import React from 'react';
 
 import { afterEach, describe, expect, it } from 'vitest';
-
-import LogoutButton from './LogoutButton';
 
 describe('logout button', () => {
   afterEach(() => {

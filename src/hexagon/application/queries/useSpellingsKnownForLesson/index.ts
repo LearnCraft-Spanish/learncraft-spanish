@@ -1,1 +1,1 @@
-export * from './useSpellingsKnownForLesson';
+export * from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson';

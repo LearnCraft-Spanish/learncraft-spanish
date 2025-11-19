@@ -1,8 +1,11 @@
-import AddPendingRemove from './AddPendingRemove';
-import ExampleText from './ExampleText';
-import { formatEnglishText, formatSpanishText } from './helpers';
+import AddPendingRemove from '@interface/components/ExampleListItem/units/AddPendingRemove';
+import ExampleText from '@interface/components/ExampleListItem/units/ExampleText';
+import {
+  formatEnglishText,
+  formatSpanishText,
+} from '@interface/components/ExampleListItem/units/helpers';
 
-import SelectButton from './SelectButton';
+import SelectButton from '@interface/components/ExampleListItem/units/SelectButton';
 
 export {
   AddPendingRemove,

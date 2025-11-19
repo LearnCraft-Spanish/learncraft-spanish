@@ -1,7 +1,7 @@
+import InlineLoading from '@interface/components/Loading/InlineLoading';
 import { render, screen } from '@testing-library/react';
 import wheelIcon from 'src/assets/Icon_Blue.svg';
 import wheelIconWhite from 'src/assets/Icon_White.svg';
-import InlineLoading from './InlineLoading';
 
 describe('component InlineLoading', () => {
   it('should render with message', () => {

@@ -1,11 +1,11 @@
+import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
-import type { QueryPaginationState } from '../units/Pagination/useQueryPagination';
 import { useExampleQuery } from '@application/queries/useExampleQuery';
+import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useState } from 'react';
-import useQueryPagination from '../units/Pagination/useQueryPagination';
 
 export interface UseCustomAudioQuizReturnType {
   isDependenciesLoading: boolean;

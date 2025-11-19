@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react';
-import { AudioQuizStep, AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
+import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
+import AudioQuizButtons from '@interface/components/Quizzing/AudioQuiz/AudioQuizButtons';
 
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import AudioQuizButtons from './AudioQuizButtons';
 
 const incrementCurrentStep = vi.fn();
 const decrementExample = vi.fn();

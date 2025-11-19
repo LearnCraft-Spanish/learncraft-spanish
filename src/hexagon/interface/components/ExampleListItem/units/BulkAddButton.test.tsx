@@ -1,6 +1,6 @@
+import BulkAddButton from '@interface/components/ExampleListItem/units/BulkAddButton';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import BulkAddButton from './BulkAddButton';
 
 const mockProps = {
   id: 123,

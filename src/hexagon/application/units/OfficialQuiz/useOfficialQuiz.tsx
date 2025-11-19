@@ -1,6 +1,6 @@
+import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
+import { useQuizExamplesQuery } from '@application/queries/useQuizExamplesQuery';
 import { useMemo } from 'react';
-import { useOfficialQuizzesQuery } from '../../queries/useOfficialQuizzesQuery';
-import { useQuizExamplesQuery } from '../../queries/useQuizExamplesQuery';
 export function useOfficialQuiz({
   courseCode,
   quizNumber,

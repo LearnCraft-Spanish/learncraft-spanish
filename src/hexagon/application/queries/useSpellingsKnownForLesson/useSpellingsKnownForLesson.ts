@@ -1,4 +1,4 @@
-import type { useSpellingsKnownForLessonResult } from './useSpellingsKnownForLesson.types';
+import type { useSpellingsKnownForLessonResult } from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.types';
 import { useSpellingAdapter } from '@application/adapters/spellingAdapter';
 import { useQuery } from '@tanstack/react-query';
 

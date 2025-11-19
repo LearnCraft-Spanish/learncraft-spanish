@@ -1,5 +1,5 @@
-import type { VocabularyPageResult } from './useVocabularyPage';
-import useVocabularyPage from './useVocabularyPage';
+import type { VocabularyPageResult } from '@application/units/useVocabularyPage/useVocabularyPage';
+import useVocabularyPage from '@application/units/useVocabularyPage/useVocabularyPage';
 
 export default useVocabularyPage;
 

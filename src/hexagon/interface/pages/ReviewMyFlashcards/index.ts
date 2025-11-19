@@ -1,1 +1,1 @@
-export { default } from './ReviewMyFlashcards';
+export { default } from '@interface/pages/ReviewMyFlashcards/ReviewMyFlashcards';

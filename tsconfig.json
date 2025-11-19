@@ -16,7 +16,8 @@
       "@infrastructure/*": ["./src/hexagon/infrastructure/*"],
       "@interface/*": ["./src/hexagon/interface/*"],
       "@testing/*": ["./src/hexagon/testing/*"],
-      "@composition/*": ["./src/hexagon/composition/*"]
+      "@composition/*": ["./src/hexagon/composition/*"],
+      "@config": ["./src/hexagon/config"]
     },
     "resolveJsonModule": true,
     "types": ["vitest", "node", "msw"],

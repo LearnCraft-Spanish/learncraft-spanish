@@ -1,8 +1,8 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
+import { useExampleQuery } from '@application/queries/useExampleQuery';
+import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';
-import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
-import { useExampleQuery } from '../queries/useExampleQuery';
-import { useAudioQuizSetup } from '../units/useAudioQuizSetup';
 
 export interface UseLimitedCustomQuizReturn {
   // Quiz readiness

@@ -1,6 +1,6 @@
 import type { AppUser } from '@learncraft-spanish/shared';
 import type {
-  TestUserEmails,
+  TestUserEmail,
   TestUserNames,
 } from 'mocks/data/serverlike/userTable';
 import type { AuthUser } from 'src/hexagon/application/ports/authPort';
@@ -72,7 +72,7 @@ describe('component Menu', () => {
         roles,
         appUser: user,
         authUser: getAuthUserFromEmail(
-          user.emailAddress as TestUserEmails,
+          user.emailAddress as TestUserEmail,
         ) as AuthUser,
       });
     });

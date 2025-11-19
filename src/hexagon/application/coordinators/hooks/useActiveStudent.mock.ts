@@ -1,4 +1,4 @@
-import type { UseActiveStudentReturnType } from './types';
+import type { UseActiveStudentReturnType } from '@application/coordinators/hooks/types';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 

@@ -1,17 +1,17 @@
+import type { LessonPopup } from '@application/units/useLessonPopup';
+
 // THIS WILL NOT LIVE IN THIS FOLDER. IT SHOULD BE LOCATED WITH FLASHCARD FINDER, i think :)
 import type {
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
-
-import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
-import { useCallback, useState } from 'react';
-import { useContextualMenu } from '../../hooks/useContextualMenu';
-import ExampleListItemFactory from './ExampleListItemFactory';
-import AddPendingRemove from './units/AddPendingRemove';
+import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
+import AddPendingRemove from '@interface/components/ExampleListItem/units/AddPendingRemove';
 // import BulkAddButton from './units/BulkAddButton';
-import MoreInfoButton from './units/MoreInfoButton';
-import MoreInfoViewExample from './units/MoreInfoViewExample';
+import MoreInfoButton from '@interface/components/ExampleListItem/units/MoreInfoButton';
+import MoreInfoViewExample from '@interface/components/ExampleListItem/units/MoreInfoViewExample';
+import { useContextualMenu } from '@interface/hooks/useContextualMenu';
+import { useCallback, useState } from 'react';
 
 export default function ExampleListItem({
   example,

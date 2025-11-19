@@ -4,11 +4,14 @@ import type { ExampleFilters as LocalExampleFilters } from '@application/ports/e
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import { useExampleFilterCoordinator } from '@application/coordinators/hooks/useExampleFilterCoordinator';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
+import {
+  PreSetQuizPreset,
+  preSetQuizzes,
+} from '@application/units/Filtering/FilterPresets/preSetQuizzes';
+import { usePresetFilters } from '@application/units/Filtering/FilterPresets/usePresetFilters';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { useMemo } from 'react';
-import { PreSetQuizPreset, preSetQuizzes } from './FilterPresets/preSetQuizzes';
-import { usePresetFilters } from './FilterPresets/usePresetFilters';
 
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &

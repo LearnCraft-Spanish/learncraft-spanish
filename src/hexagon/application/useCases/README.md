@@ -5,8 +5,6 @@ Use cases coordinate between multiple units to accomplish specific user tasks. T
 ## Core Principles
 
 1. **Explicit Return Types**: Every use case MUST have an explicitly defined and exported return type.
-2. **Interface Boundary**: Interface components may ONLY call use cases, never units or other application layers directly.
-3. **Application Logic Exposure**: Application logic can ONLY be exposed to the interface through use cases.
 
 ## Structure
 

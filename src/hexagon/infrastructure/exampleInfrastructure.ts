@@ -1,10 +1,10 @@
+import type { AuthPort } from '@application/ports/authPort';
+import type { LessonRange } from '@application/ports/coursePort';
+import type { ExamplePort } from '@application/ports/examplePort';
 import type {
   ExampleWithVocabulary,
   SkillTag,
 } from '@learncraft-spanish/shared';
-import type { AuthPort } from '../application/ports/authPort';
-import type { LessonRange } from '../application/ports/coursePort';
-import type { ExamplePort } from '../application/ports/examplePort';
 import { createHttpClient } from '@infrastructure/http/client';
 import { queryExamplesEndpoint } from '@learncraft-spanish/shared';
 

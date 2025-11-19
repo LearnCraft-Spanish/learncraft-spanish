@@ -1,12 +1,12 @@
+import type { UseActiveStudentReturnType } from '@application/coordinators/hooks/types';
 import type { AppUser } from '@learncraft-spanish/shared/dist/domain/appUser/core-types';
-import type { UseActiveStudentReturnType } from './types';
 import { useAppUserAdapter } from '@application/adapters/appUserAdapter';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import ActiveStudentContext from '@application/coordinators/contexts/ActiveStudentContext';
+import { useModal } from '@interface/hooks/useModal';
 import { roleHasChangedResponseSchema } from '@learncraft-spanish/shared';
 import { useQuery } from '@tanstack/react-query';
 import { use, useCallback, useMemo } from 'react';
-import { useModal } from 'src/hexagon/interface/hooks/useModal';
 import { z } from 'zod';
 
 export function useActiveStudent(): UseActiveStudentReturnType {

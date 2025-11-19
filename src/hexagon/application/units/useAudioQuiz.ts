@@ -13,11 +13,11 @@ import type {
   Vocabulary,
 } from '@learncraft-spanish/shared';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useAudioQuizMapper } from '@application/units/useAudioQuizMapper';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAuthAdapter } from '../adapters/authAdapter';
-import { useStudentFlashcards } from './useStudentFlashcards';
 
 export interface AudioQuizProps {
   examplesToQuiz: ExampleWithVocabulary[];

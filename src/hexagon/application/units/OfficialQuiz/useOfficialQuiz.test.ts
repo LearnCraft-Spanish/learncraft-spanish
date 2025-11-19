@@ -1,12 +1,12 @@
 import type { OfficialQuizRecord } from '@learncraft-spanish/shared/dist/domain/quiz/core-types';
-import { renderHook, waitFor } from '@testing-library/react';
-import { createMockExampleWithVocabularyList } from 'src/hexagon/testing/factories/exampleFactory';
+import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
+import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
 
-import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
-import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
+import { renderHook, waitFor } from '@testing-library/react';
+import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
+import { createMockOfficialQuizRecord } from '@testing/factories/quizFactory';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
-import { overrideMockOfficialQuizAdapter } from '../../adapters/officialQuizAdapter.mock';
-import { useOfficialQuiz } from './useOfficialQuiz';
 
 const mockQuizRecords: OfficialQuizRecord[] = [];
 for (let i = 0; i < 10; i++) {
@@ -29,6 +29,7 @@ describe('useOfficialQuiz', () => {
       getOfficialQuizExamples: async () => mockQuizExample,
     });
   });
+
   it('returns examples, loading state, error, and derived quizTitle', async () => {
     const selectedQuizRecord = mockQuizRecords[1];
     // default state already set above

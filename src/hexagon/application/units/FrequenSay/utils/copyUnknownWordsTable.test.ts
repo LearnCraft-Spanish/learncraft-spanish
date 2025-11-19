@@ -1,6 +1,6 @@
+import { copyUnknownWordsTable } from '@application/units/FrequenSay/utils/copyUnknownWordsTable';
 import { createMockWordCountList } from '@testing/factories/wordCountFactory';
 import { beforeEach, describe, it, vi } from 'vitest';
-import { copyUnknownWordsTable } from './copyUnknownWordsTable';
 
 describe('copyUnknownWordsTable', () => {
   beforeEach(() => {

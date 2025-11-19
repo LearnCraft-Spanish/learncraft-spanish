@@ -1,6 +1,10 @@
-import type { TableColumn, TableData, TableRow } from '../types';
+import type {
+  TableColumn,
+  TableData,
+  TableRow,
+} from '@application/units/pasteTable/types';
+import { createGhostRow } from '@application/units/pasteTable/utils';
 import { useCallback, useRef, useState } from 'react';
-import { createGhostRow } from '../utils';
 
 interface UseTableRowsProps<T> {
   columns: TableColumn[];

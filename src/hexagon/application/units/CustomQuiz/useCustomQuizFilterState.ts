@@ -1,7 +1,7 @@
-import type { CustomQuizFilterState } from './types';
+import type { CustomQuizFilterState } from '@application/units/CustomQuiz/types';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
+import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useCallback, useMemo } from 'react';
-import { useSkillTagSearch } from '../useSkillTagSearch';
 
 export function useCustomQuizFilterState() {
   const filterState = useCombinedFilters({});

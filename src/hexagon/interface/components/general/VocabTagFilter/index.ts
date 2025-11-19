@@ -1,4 +1,4 @@
-import SelectedTags from './SelectedTags';
-import TagFilter from './TagFilter';
+import SelectedTags from '@interface/components/general/VocabTagFilter/SelectedTags';
+import TagFilter from '@interface/components/general/VocabTagFilter/TagFilter';
 
 export { SelectedTags, TagFilter };

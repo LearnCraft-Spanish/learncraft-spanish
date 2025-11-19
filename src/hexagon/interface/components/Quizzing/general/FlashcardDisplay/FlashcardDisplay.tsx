@@ -1,12 +1,12 @@
-import type { FlashcardDisplayProps } from './FlashcardDisplay.types';
+import type { FlashcardDisplayProps } from '@interface/components/Quizzing/general/FlashcardDisplay/FlashcardDisplay.types';
 import AudioControl from '@interface/components/general/AudioControl/AudioControl';
+import { AddToMyFlashcardsButtons } from '@interface/components/Quizzing/general/AddToMyFlashcardsButtons';
+import { GetHelpDisplay } from '@interface/components/Quizzing/general/FlashcardDisplay/GetHelpDisplay';
 import React from 'react';
 import {
   formatEnglishText,
   formatSpanishText,
 } from 'src/functions/formatFlashcardText';
-import { AddToMyFlashcardsButtons } from '../AddToMyFlashcardsButtons';
-import { GetHelpDisplay } from './GetHelpDisplay';
 import './FlashcardDisplay.scss';
 
 export function FlashcardDisplay({

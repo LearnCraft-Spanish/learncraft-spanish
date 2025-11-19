@@ -1,9 +1,9 @@
 import { useOfficialQuizzes } from '@application/useCases/useOfficialQuizzes/useOfficialQuizzes';
 import { Loading } from '@interface/components/Loading';
 import { OfficialQuiz } from '@interface/components/Quizzing/OfficialQuiz';
+import { OfficialQuizSetupMenu } from '@interface/pages/OfficialQuizzes/OfficialQuizSetupMenu';
 import React from 'react';
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { OfficialQuizSetupMenu } from './OfficialQuizSetupMenu';
 
 function LegacyQuizRedirect() {
   const { number } = useParams<{ number: string }>();

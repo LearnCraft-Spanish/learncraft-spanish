@@ -1,14 +1,14 @@
+import { AudioEngineProvider } from '@composition/providers/AudioProvider';
+import { AudioQuizType } from '@domain/audioQuizzing';
+import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import allStudentFlashcards from 'mocks/data/hooklike/studentFlashcardData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
-import { AudioEngineProvider } from 'src/hexagon/composition/providers/AudioProvider';
-import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
-import { createMockExampleWithVocabularyList } from 'src/hexagon/testing/factories/exampleFactory';
-import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import AudioQuiz from './AudioQuiz';
 
 /*       Testing Setup        */
 const cleanupFunction = vi.fn();

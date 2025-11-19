@@ -1,7 +1,7 @@
+import SelectCourse from '@interface/components/LessonSelector/SelectCourse';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { createRealisticCourseWithLessonsList } from 'src/hexagon/testing/factories/courseFactory';
+import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
 import { vi } from 'vitest';
-import SelectCourse from './SelectCourse';
 
 vi.mock('@application/queries/useCoursesWithLessons', () => ({
   useCoursesWithLessons: () => ({

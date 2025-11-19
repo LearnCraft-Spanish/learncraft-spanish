@@ -1,9 +1,9 @@
+import type { PaginationState } from '@application/units/Pagination/usePagination';
+import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { Flashcard } from '@learncraft-spanish/shared';
-import type { PaginationState } from './Pagination/usePagination';
-import type { LessonPopup } from './useLessonPopup';
+import useLessonPopup from '@application/units/useLessonPopup';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useCallback, useMemo, useState } from 'react';
-import useLessonPopup from './useLessonPopup';
-import { useStudentFlashcards } from './useStudentFlashcards';
 
 export interface UseFlashcardTableProps {
   allFlashcards: Flashcard[];

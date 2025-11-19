@@ -2,11 +2,11 @@
 import type { ReactNode } from 'react';
 import HexagonProviders from '@application/coordinators/providers/MainProvider'; // Hexagon Providers
 import { Auth0Provider } from '@auth0/auth0-react';
+import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
+import { ModalProvider } from '@composition/providers/ModalProvider';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ContextualMenuProvider } from './ContextualMenuProvider';
 
-import { ModalProvider } from './ModalProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface ProvidersProps {
   children: ReactNode;

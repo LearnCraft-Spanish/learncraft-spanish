@@ -1,1 +1,1 @@
-export { default } from './VocabTagContainer';
+export { default } from '@interface/components/VocabTagDetails/VocabTagContainer';

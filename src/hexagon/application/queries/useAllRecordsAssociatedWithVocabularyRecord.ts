@@ -1,5 +1,5 @@
+import { useVocabularyAdapter } from '@application/adapters/vocabularyAdapter';
 import { useQuery } from '@tanstack/react-query';
-import { useVocabularyAdapter } from '../adapters/vocabularyAdapter';
 
 export function useAllRecordsAssociatedWithVocabularyRecord(
   id: number | undefined,

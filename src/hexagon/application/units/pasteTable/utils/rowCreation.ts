@@ -1,5 +1,8 @@
-import type { TableColumn, TableRow } from '../types';
-import { GHOST_ROW_ID } from '../types';
+import type {
+  TableColumn,
+  TableRow,
+} from '@application/units/pasteTable/types';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
 
 // Counter for generating truly unique row IDs
 let rowIdCounter = 0;

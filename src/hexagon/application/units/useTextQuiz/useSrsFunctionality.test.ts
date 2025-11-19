@@ -1,7 +1,7 @@
+import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
+import { useSrsFunctionality } from '@application/units/useTextQuiz/useSrsFunctionality';
 import { act, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
-import { overrideMockUseStudentFlashcards } from '../useStudentFlashcards.mock';
-import { useSrsFunctionality } from './useSrsFunctionality';
 
 describe('useSrsFunctionality', () => {
   beforeEach(() => {

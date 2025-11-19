@@ -1,10 +1,10 @@
+import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons/SRSButtons';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { SRSButtons } from './SRSButtons';
 
 let incrementExampleNumber = vi.fn();
 const handleReviewExample = vi.fn();

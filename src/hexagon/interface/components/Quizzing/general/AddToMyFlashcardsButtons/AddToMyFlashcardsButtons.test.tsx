@@ -1,9 +1,9 @@
-import type { AddToMyFlashcardsButtonsProps } from './AddToMyFlashcardsButtons.types';
+import type { AddToMyFlashcardsButtonsProps } from '@interface/components/Quizzing/general/AddToMyFlashcardsButtons/AddToMyFlashcardsButtons.types';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { ModalProvider } from '@composition/providers/ModalProvider';
+import { AddToMyFlashcardsButtons } from '@interface/components/Quizzing/general/AddToMyFlashcardsButtons/AddToMyFlashcardsButtons';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { AddToMyFlashcardsButtons } from './AddToMyFlashcardsButtons';
 
 function renderComponentWithOverrides(
   overrideProps?: Partial<AddToMyFlashcardsButtonsProps>,
