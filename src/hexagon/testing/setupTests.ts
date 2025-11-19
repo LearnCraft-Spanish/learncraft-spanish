@@ -14,6 +14,10 @@ import {
   resetMockCourseAdapter,
 } from '@application/adapters/ courseAdapter.mock';
 import {
+  mockExampleAdapter,
+  resetMockExampleAdapter,
+} from '@application/adapters/exampleAdapter.mock';
+import {
   mockFlashcardAdapter,
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
@@ -66,6 +70,10 @@ vi.mock('@application/adapters/subcategoryAdapter', () => ({
   useSubcategoryAdapter: vi.fn(() => mockSubcategoryAdapter),
 }));
 
+vi.mock('@application/adapters/exampleAdapter', () => ({
+  useExampleAdapter: vi.fn(() => mockExampleAdapter),
+}));
+
 vi.mock('@application/adapters/flashcardAdapter', () => ({
   useFlashcardAdapter: vi.fn(() => mockFlashcardAdapter),
 }));
@@ -101,6 +109,7 @@ const resetGlobalMocks = () => {
   // adapter mocks
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
+  resetMockExampleAdapter();
   resetMockActiveStudent();
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();

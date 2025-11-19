@@ -18,8 +18,8 @@ const studentFlashcardDataObject = allStudentFlashcards.find(
   (student) => student.emailAddress === studentUserData?.email,
 )?.studentFlashcardData;
 
-const unknownAudioExamples = createMockExampleWithVocabularyList(5)();
-const knownAudioExamples = createMockExampleWithVocabularyList(5)();
+const unknownAudioExamples = createMockExampleWithVocabularyList(5);
+const knownAudioExamples = createMockExampleWithVocabularyList(5);
 
 if (
   !studentFlashcardDataObject ||
