@@ -2,7 +2,7 @@ import type {
   TableColumn,
   TableRow as TableRowType,
   ValidationState,
-} from '@application/units/pasteTable/types';
+} from '@domain/PasteTable/General';
 import { TableCellInput } from '@interface/components/PasteTable/TableCell';
 import React from 'react';
 

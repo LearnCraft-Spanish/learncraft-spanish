@@ -2,7 +2,7 @@ import type {
   TableColumn,
   TableData,
   TableRow,
-} from '@application/units/pasteTable/types';
+} from '@domain/PasteTable/General';
 import { createGhostRow } from '@application/units/pasteTable/utils';
 import { useCallback, useRef, useState } from 'react';
 

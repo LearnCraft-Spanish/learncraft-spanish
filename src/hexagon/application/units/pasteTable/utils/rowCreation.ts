@@ -1,8 +1,5 @@
-import type {
-  TableColumn,
-  TableRow,
-} from '@application/units/pasteTable/types';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
+import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 
 // Counter for generating truly unique row IDs
 let rowIdCounter = 0;
@@ -40,24 +37,3 @@ export const createGhostRow = (columns: TableColumn[]): TableRow => ({
   id: GHOST_ROW_ID,
   cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
 });
-
-/**
- * Converts typed data to table rows
- */
-export const convertDataToRows = <T>(
-  data: T[],
-  columns: TableColumn[],
-): TableRow[] => {
-  return data.map((item) => {
-    const cells: Record<string, string> = {};
-    columns.forEach((column) => {
-      const key = column.id as keyof T;
-      const value = item[key];
-      cells[column.id] = value !== undefined ? String(value) : '';
-    });
-    return {
-      id: generateRowId(),
-      cells,
-    };
-  });
-};
