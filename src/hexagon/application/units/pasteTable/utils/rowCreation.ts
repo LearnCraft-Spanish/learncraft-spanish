@@ -8,12 +8,11 @@ import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
 let rowIdCounter = 0;
 
 /**
- * Creates an empty ghost row with the given columns
+ * Reset the row ID counter - mainly for testing purposes
  */
-export const createGhostRow = (columns: TableColumn[]): TableRow => ({
-  id: GHOST_ROW_ID,
-  cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
-});
+export const resetRowIdCounter = (): void => {
+  rowIdCounter = 0;
+};
 
 /**
  * Generates a guaranteed unique row ID by combining timestamp, counter and random value
@@ -27,17 +26,18 @@ export const generateRowId = (): string => {
 };
 
 /**
- * Reset the row ID counter - mainly for testing purposes
- */
-export const resetRowIdCounter = (): void => {
-  rowIdCounter = 0;
-};
-
-/**
  * Creates an empty row with all columns initialized
  */
 export const createEmptyRow = (columns: TableColumn[]): TableRow => ({
   id: generateRowId(),
+  cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
+});
+
+/**
+ * Creates an empty ghost row with the given columns
+ */
+export const createGhostRow = (columns: TableColumn[]): TableRow => ({
+  id: GHOST_ROW_ID,
   cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
 });
 
