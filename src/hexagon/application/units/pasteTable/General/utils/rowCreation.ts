@@ -12,7 +12,8 @@ export const convertDataToRows = <T>(
     columns.forEach((column) => {
       const key = column.id as keyof T;
       const value = item[key];
-      cells[column.id] = value !== undefined ? String(value) : '';
+      cells[column.id] =
+        value === undefined || value === null ? '' : String(value);
     });
     return {
       id: generateRowId(),

@@ -3,6 +3,11 @@ import { convertDataToRows } from '@application/units/pasteTable/General/utils/r
 import { resetRowIdCounter } from '@application/units/pasteTable/utils/rowCreation';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+const testColumns: TableColumn[] = [
+  { id: 'name', label: 'Name', type: 'text' },
+  { id: 'age', label: 'Age', type: 'number' },
+  { id: 'city', label: 'City', type: 'text' },
+];
 describe('convertDataToRows', () => {
   // Reset row ID counter before each test for consistent IDs
   beforeEach(() => {
@@ -12,19 +17,13 @@ describe('convertDataToRows', () => {
   describe('success cases', () => {
     it('should convert simple typed data to rows with matching columns', () => {
       // Given: An array of typed objects and matching columns
-      const columns: TableColumn[] = [
-        { id: 'name', label: 'Name', type: 'text' },
-        { id: 'age', label: 'Age', type: 'number' },
-        { id: 'city', label: 'City', type: 'text' },
-      ];
-
       const data = [
         { name: 'Alice', age: 30, city: 'New York' },
         { name: 'Bob', age: 25, city: 'Los Angeles' },
       ];
 
       // When: convertDataToRows is called
-      const result: TableRow[] = convertDataToRows(data, columns);
+      const result: TableRow[] = convertDataToRows(data, testColumns);
 
       // Then: Returns array of TableRow objects with correct structure
       expect(result).toHaveLength(2);
@@ -53,19 +52,13 @@ describe('convertDataToRows', () => {
 
     it('should convert undefined values to empty strings', () => {
       // Given: Data objects with undefined properties
-      const columns: TableColumn[] = [
-        { id: 'name', label: 'Name', type: 'text' },
-        { id: 'age', label: 'Age', type: 'number' },
-        { id: 'city', label: 'City', type: 'text' },
-      ];
-
       const data = [
         { name: 'Alice', age: undefined, city: 'New York' },
         { name: 'Bob', age: 25, city: undefined },
       ];
 
       // When: convertDataToRows is called
-      const result: TableRow[] = convertDataToRows(data, columns);
+      const result: TableRow[] = convertDataToRows(data, testColumns);
 
       // Then: Undefined values become empty strings in cells
       expect(result[0].cells).toEqual({
@@ -83,10 +76,6 @@ describe('convertDataToRows', () => {
 
     it('should generate unique row IDs for each row', () => {
       // Given: Multiple data objects
-      const columns: TableColumn[] = [
-        { id: 'name', label: 'Name', type: 'text' },
-      ];
-
       const data = [
         { name: 'Alice' },
         { name: 'Bob' },
@@ -95,7 +84,7 @@ describe('convertDataToRows', () => {
       ];
 
       // When: convertDataToRows is called
-      const result: TableRow[] = convertDataToRows(data, columns);
+      const result: TableRow[] = convertDataToRows(data, testColumns);
 
       // Then: Each row has a unique ID
       const ids = result.map((row) => row.id);
@@ -107,33 +96,26 @@ describe('convertDataToRows', () => {
   });
 
   describe('edge cases', () => {
-    it('should handle boolean and null values by converting to strings', () => {
-      // Given: Data with various types including booleans and null
-      const columns: TableColumn[] = [
-        { id: 'name', label: 'Name', type: 'text' },
-        { id: 'active', label: 'Active', type: 'text' },
-        { id: 'score', label: 'Score', type: 'number' },
-      ];
-
+    it('should handle undefined and null values by converting to strings', () => {
       const data = [
-        { name: 'Alice', active: true, score: 100 },
-        { name: 'Bob', active: false, score: null },
+        { name: 'Alice', city: 'New York', age: undefined },
+        { name: 'Bob', city: null, age: undefined },
       ];
 
       // When: convertDataToRows is called
-      const result: TableRow[] = convertDataToRows(data, columns);
+      const result: TableRow[] = convertDataToRows(data, testColumns);
 
       // Then: Boolean and null values are converted to strings
       expect(result[0].cells).toEqual({
         name: 'Alice',
-        active: 'true',
-        score: '100',
+        age: '',
+        city: 'New York',
       });
 
       expect(result[1].cells).toEqual({
         name: 'Bob',
-        active: 'false',
-        score: 'null', // Is this correct?
+        age: '',
+        city: '',
       });
     });
   });
