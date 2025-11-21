@@ -78,4 +78,3 @@ describe('useExampleByIdsQuery', () => {
     expect(result.current.error).toBeNull();
   });
 });
-

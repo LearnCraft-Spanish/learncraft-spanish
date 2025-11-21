@@ -80,4 +80,3 @@ describe('useExamplesToEditQuery', () => {
     expect(result.current.error).toBeNull();
   });
 });
-
