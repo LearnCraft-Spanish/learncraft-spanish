@@ -77,6 +77,7 @@ function renderQuizYesSrs({
           examplesReviewedResults: [],
           handleReviewExample: () => {},
           hasExampleBeenReviewed: () => null,
+          flushBatch: vi.fn(),
         }}
       />
     </MockAllProviders>,
@@ -178,6 +179,38 @@ describe('component TextQuiz', () => {
         expect(screen.getByText(/this was hard/i)).toBeInTheDocument();
         expect(screen.queryByText(/this was easy/i)).toBeInTheDocument();
       });
+    });
+
+    it('calls flushBatch when cleanup function is called', async () => {
+      const mockFlushBatch = vi.fn();
+      render(
+        <MockAllProviders>
+          <TextQuiz
+            textQuizProps={{
+              examples: examplesForTextQuiz,
+              startWithSpanish: false,
+              cleanupFunction,
+            }}
+            srsQuizProps={{
+              isExampleReviewPending: () => false,
+              examplesReviewedResults: [],
+              handleReviewExample: () => {},
+              hasExampleBeenReviewed: () => null,
+              flushBatch: mockFlushBatch,
+            }}
+          />
+        </MockAllProviders>,
+      );
+
+      const backLink = screen.queryByText('Back');
+      if (backLink) {
+        await act(async () => {
+          backLink.click();
+          // Wait for async flushBatch to be called
+          await new Promise((resolve) => setTimeout(resolve, 10));
+        });
+        expect(mockFlushBatch).toHaveBeenCalled();
+      }
     });
   });
 });

@@ -12,7 +12,7 @@ import {
 } from '@interface/components/Quizzing/general';
 import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons';
 import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 
@@ -65,6 +65,27 @@ export function TextQuiz({
     setAnswerShowing(!answerShowing);
   }, [answerShowing]);
 
+  // Enhanced cleanup function that flushes SRS batch before cleanup
+  const enhancedCleanupFunction = useCallback(async () => {
+    if (srsQuizProps?.flushBatch) {
+      await srsQuizProps.flushBatch();
+    }
+    if (cleanupFunction) {
+      cleanupFunction();
+    }
+  }, [srsQuizProps, cleanupFunction]);
+
+  // Store srsQuizProps in a ref to avoid recreating the effect
+  const srsQuizPropsRef = useRef(srsQuizProps);
+  srsQuizPropsRef.current = srsQuizProps;
+
+  // Flush batch when quiz completes
+  useEffect(() => {
+    if (isQuizComplete && srsQuizPropsRef.current?.flushBatch) {
+      void srsQuizPropsRef.current.flushBatch();
+    }
+  }, [isQuizComplete]); // Only depend on isQuizComplete
+
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -109,7 +130,9 @@ export function TextQuiz({
           <TextQuizEnd
             isSrsQuiz={!!srsQuizProps}
             restartQuiz={restartQuiz}
-            returnToQuizSetup={cleanupFunction}
+            returnToQuizSetup={() => {
+              void enhancedCleanupFunction();
+            }}
           />
         ) : (
           <div className="quiz">
@@ -165,7 +188,9 @@ export function TextQuiz({
                   <button
                     type="button"
                     className="linkButton"
-                    onClick={cleanupFunction}
+                    onClick={() => {
+                      void enhancedCleanupFunction();
+                    }}
                   >
                     Back
                   </button>
