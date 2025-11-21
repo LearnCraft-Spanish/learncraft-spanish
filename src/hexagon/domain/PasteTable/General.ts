@@ -3,7 +3,13 @@ import type { ClipboardEvent } from 'react';
 /**
  * Supported cell input types
  */
-export type CellType = 'text' | 'number' | 'select' | 'date';
+export type CellType =
+  | 'text'
+  | 'number'
+  | 'select'
+  | 'date'
+  | 'read-only'
+  | 'boolean';
 
 /**
  * Options for select-type cells
