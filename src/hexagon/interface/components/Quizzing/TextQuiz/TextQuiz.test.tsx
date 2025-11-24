@@ -212,5 +212,45 @@ describe('component TextQuiz', () => {
         expect(mockFlushBatch).toHaveBeenCalled();
       }
     });
+
+    it('marks flashcard as viewed when next is pressed without review', async () => {
+      const mockHandleReviewExample = vi.fn();
+      const mockHasExampleBeenReviewed = vi.fn().mockReturnValue(null);
+
+      render(
+        <MockAllProviders>
+          <TextQuiz
+            textQuizProps={{
+              examples: examplesForTextQuiz,
+              startWithSpanish: false,
+              cleanupFunction,
+            }}
+            srsQuizProps={{
+              isExampleReviewPending: () => false,
+              examplesReviewedResults: [],
+              handleReviewExample: mockHandleReviewExample,
+              hasExampleBeenReviewed: mockHasExampleBeenReviewed,
+              flushBatch: vi.fn(),
+            }}
+          />
+        </MockAllProviders>,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('flashcard')).toBeInTheDocument();
+      });
+
+      const nextButton = screen.getByRole('button', { name: 'Next' });
+
+      act(() => {
+        fireEvent.click(nextButton);
+      });
+
+      // Should have called handleReviewExample with 'viewed'
+      expect(mockHandleReviewExample).toHaveBeenCalledWith(
+        examplesForTextQuiz[0].id,
+        'viewed',
+      );
+    });
   });
 });

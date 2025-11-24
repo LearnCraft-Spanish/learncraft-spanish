@@ -1,10 +1,11 @@
+import type { SrsDifficulty } from '@domain/srs';
 import React, { useCallback } from 'react';
 import './SRSButtons.scss';
 
 interface SRSButtonsProps {
   answerShowing: boolean;
   incrementExampleNumber: () => void;
-  hasExampleBeenReviewed: 'easy' | 'hard' | null;
+  hasExampleBeenReviewed: SrsDifficulty | null;
   handleReviewExample: (difficulty: 'easy' | 'hard') => void;
   isExampleReviewPending: boolean;
 }
@@ -56,25 +57,28 @@ export function SRSButtons({
 
   return (
     <div className="buttonBox srsButtons">
-      {answerShowing && !hasExampleBeenReviewed && !isExampleReviewPending && (
-        <>
-          <button
-            type="button"
-            className="redButton"
-            onClick={() => handleReviewAndIncrementExample('hard')}
-          >
-            This was hard
-          </button>
-          <button
-            type="button"
-            className="greenButton"
-            onClick={() => handleReviewAndIncrementExample('easy')}
-          >
-            This was easy
-          </button>
-        </>
-      )}
+      {answerShowing &&
+        (!hasExampleBeenReviewed || hasExampleBeenReviewed === 'viewed') &&
+        !isExampleReviewPending && (
+          <>
+            <button
+              type="button"
+              className="redButton"
+              onClick={() => handleReviewAndIncrementExample('hard')}
+            >
+              This was hard
+            </button>
+            <button
+              type="button"
+              className="greenButton"
+              onClick={() => handleReviewAndIncrementExample('easy')}
+            >
+              This was easy
+            </button>
+          </>
+        )}
       {(hasExampleBeenReviewed || isExampleReviewPending) &&
+        hasExampleBeenReviewed !== 'viewed' &&
         (hasExampleBeenReviewed === 'hard' ? (
           <button type="button" className="hardBanner">
             Labeled: Hard

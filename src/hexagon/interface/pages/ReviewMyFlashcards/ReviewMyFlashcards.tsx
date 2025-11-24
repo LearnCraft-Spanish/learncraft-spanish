@@ -9,9 +9,8 @@ import {
   AudioQuizMenu,
   MyTextQuizMenu,
   SrsQuiz,
-  TextQuiz,
 } from '@interface/components/Quizzing';
-import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import { SrsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/SrsAudioQuiz';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
@@ -200,13 +199,12 @@ export default function MyFlashcardsQuiz() {
           </form>
         </>
       ) : quizType === MyFlashcardsQuizType.Text ? (
-        textQuizSetup.srsQuiz ? (
-          <SrsQuiz textQuizProps={textQuizProps} />
-        ) : (
-          <TextQuiz textQuizProps={textQuizProps} />
-        )
+        <SrsQuiz
+          textQuizProps={textQuizProps}
+          showSrsButtons={textQuizSetup.srsQuiz}
+        />
       ) : (
-        <AudioQuiz audioQuizProps={audioQuizProps} />
+        <SrsAudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );

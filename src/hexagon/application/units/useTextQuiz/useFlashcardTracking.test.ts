@@ -1,10 +1,10 @@
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
-import { useSrsFunctionality } from '@application/units/useTextQuiz/useSrsFunctionality';
+import { useSrsFunctionality } from '@application/units/useTextQuiz/useFlashcardTracking';
 import { act, renderHook } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
 import { vi } from 'vitest';
 
-describe('useSrsFunctionality', () => {
+describe('useFlashcardTracking', () => {
   beforeEach(() => {
     // Reset console.error spy
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -304,6 +304,111 @@ describe('useSrsFunctionality', () => {
       );
       // Should still mark as reviewed (not pending) even on error
       expect(result.current.examplesReviewedResults[0].pending).toBe(false);
+
+      consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('viewed flashcards', () => {
+    it('should keep the same interval when flashcard is marked as viewed', async () => {
+      const mockUpdateFlashcards = vi.fn().mockResolvedValue([]);
+      const flashcard = createMockFlashcard({ id: 1, interval: 5 });
+      const mockFlashcards = [
+        { ...flashcard, example: { ...flashcard.example, id: 1 } },
+      ];
+
+      overrideMockUseStudentFlashcards({
+        flashcards: mockFlashcards,
+        updateFlashcards: mockUpdateFlashcards,
+      });
+
+      const { result } = renderHook(() => useSrsFunctionality());
+
+      act(() => {
+        result.current.handleReviewExample(1, 'viewed');
+      });
+
+      await act(async () => {
+        await result.current.flushBatch();
+      });
+
+      expect(mockUpdateFlashcards).toHaveBeenCalledTimes(1);
+      const updateCall = mockUpdateFlashcards.mock.calls[0][0][0];
+      expect(updateCall.interval).toBe(5); // Same as original interval
+      expect(updateCall.lastReviewedDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+
+    it('should allow re-reviewing a viewed flashcard with easy/hard', async () => {
+      const mockUpdateFlashcards = vi.fn().mockResolvedValue([]);
+      const flashcard = createMockFlashcard({ id: 1, interval: 5 });
+      const mockFlashcards = [
+        { ...flashcard, example: { ...flashcard.example, id: 1 } },
+      ];
+
+      overrideMockUseStudentFlashcards({
+        flashcards: mockFlashcards,
+        updateFlashcards: mockUpdateFlashcards,
+      });
+
+      const { result } = renderHook(() => useSrsFunctionality());
+
+      // First mark as viewed
+      act(() => {
+        result.current.handleReviewExample(1, 'viewed');
+      });
+
+      // Then mark as easy (should update the batch)
+      act(() => {
+        result.current.handleReviewExample(1, 'easy');
+      });
+
+      await act(async () => {
+        await result.current.flushBatch();
+      });
+
+      expect(mockUpdateFlashcards).toHaveBeenCalledTimes(1);
+      const updateCall = mockUpdateFlashcards.mock.calls[0][0][0];
+      expect(updateCall.interval).toBe(6); // Increased from 5 to 6 (easy)
+    });
+
+    it('should not allow re-reviewing a flashcard marked as easy or hard', async () => {
+      const mockUpdateFlashcards = vi.fn().mockResolvedValue([]);
+      const flashcard = createMockFlashcard({ id: 1, interval: 5 });
+      const mockFlashcards = [
+        { ...flashcard, example: { ...flashcard.example, id: 1 } },
+      ];
+      const consoleErrorSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      overrideMockUseStudentFlashcards({
+        flashcards: mockFlashcards,
+        updateFlashcards: mockUpdateFlashcards,
+      });
+
+      const { result } = renderHook(() => useSrsFunctionality());
+
+      // First mark as easy
+      act(() => {
+        result.current.handleReviewExample(1, 'easy');
+      });
+
+      // Try to mark as hard (should be blocked)
+      act(() => {
+        result.current.handleReviewExample(1, 'hard');
+      });
+
+      await act(async () => {
+        await result.current.flushBatch();
+      });
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Flashcard has already been reviewed, this should not happen',
+      );
+      // Should only have one update (the first easy one)
+      expect(mockUpdateFlashcards).toHaveBeenCalledTimes(1);
+      const updateCall = mockUpdateFlashcards.mock.calls[0][0][0];
+      expect(updateCall.interval).toBe(6); // easy
 
       consoleErrorSpy.mockRestore();
     });

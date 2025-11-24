@@ -20,12 +20,14 @@ export interface TextQuizComponentProps {
   quizTitle?: string;
   textQuizProps: UseTextQuizProps;
   srsQuizProps?: UseSrsReturn;
+  showSrsButtons?: boolean;
 }
 
 export function TextQuiz({
   quizTitle,
   textQuizProps,
   srsQuizProps,
+  showSrsButtons = true,
 }: TextQuizComponentProps) {
   const {
     examplesAreLoading,
@@ -50,10 +52,19 @@ export function TextQuiz({
   }, []);
 
   const incrementExample = useCallback(() => {
+    // If SRS quiz and current example hasn't been reviewed, mark as viewed
+    if (srsQuizProps && currentExample) {
+      const hasBeenReviewed = srsQuizProps.hasExampleBeenReviewed(
+        currentExample.id,
+      );
+      if (!hasBeenReviewed) {
+        srsQuizProps.handleReviewExample(currentExample.id, 'viewed');
+      }
+    }
     nextExample();
     hideAnswer();
     setGetHelpIsOpen(false);
-  }, [nextExample, hideAnswer]);
+  }, [nextExample, hideAnswer, srsQuizProps, currentExample]);
 
   const decrementExample = useCallback(() => {
     previousExample();
@@ -105,7 +116,7 @@ export function TextQuiz({
         toggleAnswer();
       }
     },
-    [decrementExample, incrementExample, toggleAnswer],
+    [decrementExample, incrementExample, toggleAnswer, isQuizComplete],
   );
 
   useEffect(() => {
@@ -158,7 +169,7 @@ export function TextQuiz({
               setGetHelpIsOpen={setGetHelpIsOpen}
             />
             <div className="quizButtons">
-              {srsQuizProps && currentExample && (
+              {srsQuizProps && currentExample && showSrsButtons && (
                 <SRSButtons
                   hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
                     currentExample.id,

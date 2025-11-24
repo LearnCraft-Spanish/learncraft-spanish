@@ -1,3 +1,4 @@
+import type { SrsDifficulty } from '@domain/srs';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { calculateNewSrsInterval } from '@domain/srs';
 import { useCallback, useRef, useState } from 'react';
@@ -6,19 +7,19 @@ const BATCH_SIZE = 10;
 
 export interface ExampleReviewedResults {
   exampleId: number;
-  difficulty: 'easy' | 'hard';
+  difficulty: SrsDifficulty;
   pending: boolean;
 }
 
 interface PendingBatchUpdate {
   exampleId: number;
-  difficulty: 'easy' | 'hard';
+  difficulty: SrsDifficulty;
 }
 
 export interface UseSrsReturn {
   examplesReviewedResults: ExampleReviewedResults[];
-  handleReviewExample: (exampleId: number, difficulty: 'easy' | 'hard') => void;
-  hasExampleBeenReviewed: (exampleId: number) => 'easy' | 'hard' | null;
+  handleReviewExample: (exampleId: number, difficulty: SrsDifficulty) => void;
+  hasExampleBeenReviewed: (exampleId: number) => SrsDifficulty | null;
   isExampleReviewPending: (exampleId: number) => boolean;
   flushBatch: () => Promise<void>;
 }
@@ -58,7 +59,7 @@ export function useSrsFunctionality(): UseSrsReturn {
   );
 
   const markExampleAsReviewed = useCallback(
-    (exampleId: number, difficulty: 'easy' | 'hard', pending: boolean) => {
+    (exampleId: number, difficulty: SrsDifficulty, pending: boolean) => {
       setExamplesReviewedResults((prev) => {
         // find example if its already in the array
         const example = prev.find((result) => result.exampleId === exampleId);
@@ -143,7 +144,7 @@ export function useSrsFunctionality(): UseSrsReturn {
   }, [isFlushing, markExampleAsReviewed, updateFlashcards, flashcards]);
 
   const addToBatch = useCallback(
-    (exampleId: number, difficulty: 'easy' | 'hard') => {
+    (exampleId: number, difficulty: SrsDifficulty) => {
       // Check if this example is already in the batch and update it
       const existingIndex = pendingBatchRef.current.findIndex(
         (update) => update.exampleId === exampleId,
@@ -170,9 +171,11 @@ export function useSrsFunctionality(): UseSrsReturn {
   );
 
   const handleReviewExample = useCallback(
-    (exampleId: number, difficulty: 'easy' | 'hard') => {
+    (exampleId: number, difficulty: SrsDifficulty) => {
       // Check if already reviewed before adding to batch
-      if (hasExampleBeenReviewed(exampleId)) {
+      // Allow re-reviewing if it's just marked as 'viewed'
+      const existingReview = hasExampleBeenReviewed(exampleId);
+      if (existingReview && existingReview !== 'viewed') {
         console.error(
           'Flashcard has already been reviewed, this should not happen',
         );

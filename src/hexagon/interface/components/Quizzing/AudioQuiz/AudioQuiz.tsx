@@ -1,4 +1,5 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
+import type { UseSrsReturn } from '@application/units/useTextQuiz/useFlashcardTracking';
 import { useAudioQuiz } from '@application/units/useAudioQuiz';
 import { AudioQuizType } from '@domain/audioQuizzing';
 import { Loading } from '@interface/components/Loading';
@@ -6,7 +7,7 @@ import AudioFlashcard from '@interface/components/Quizzing/AudioQuiz/AudioFlashc
 import AudioQuizButtons from '@interface/components/Quizzing/AudioQuiz/AudioQuizButtons';
 import AudioQuizEnd from '@interface/components/Quizzing/general/AudioQuizEnd';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 // TO DO: Remove duplicate styles.
 import 'src/App.css';
@@ -60,11 +61,15 @@ import './AudioBasedReview.css';
  * - Continues quiz with available examples
  * - Clear error messaging for users
  */
+export interface AudioQuizComponentProps {
+  audioQuizProps: AudioQuizProps;
+  srsQuizProps?: UseSrsReturn;
+}
+
 export default function AudioQuiz({
   audioQuizProps,
-}: {
-  audioQuizProps: AudioQuizProps;
-}) {
+  srsQuizProps,
+}: AudioQuizComponentProps) {
   // Destructure the hook return
   const {
     goToQuestion,
@@ -82,6 +87,7 @@ export default function AudioQuiz({
     progressStatus,
     currentStepValue,
     currentExampleNumber,
+    currentExample,
     currentStep,
     autoplay,
     audioQuizType,
@@ -97,13 +103,57 @@ export default function AudioQuiz({
     addPendingRemoveProps,
   } = useAudioQuiz(audioQuizProps);
 
+  // SRS FUNCTIONALITY
+  // Audio quizzes automatically mark all viewed examples as "viewed" to update lastReviewedDate
+  // Unlike text quizzes, audio quizzes don't show easy/hard rating buttons
+
+  // Store srsQuizProps in a ref to avoid recreating effects
+  const srsQuizPropsRef = useRef(srsQuizProps);
+  useEffect(() => {
+    srsQuizPropsRef.current = srsQuizProps;
+  }, [srsQuizProps]);
+
+  // Wrap nextExample to mark as viewed if not reviewed
+  const handleNextExample = useCallback(() => {
+    // If SRS quiz and current example hasn't been reviewed, mark as viewed
+    if (srsQuizPropsRef.current && currentExample) {
+      const hasBeenReviewed = srsQuizPropsRef.current.hasExampleBeenReviewed(
+        currentExample.id,
+      );
+      if (!hasBeenReviewed) {
+        srsQuizPropsRef.current.handleReviewExample(
+          currentExample.id,
+          'viewed',
+        );
+      }
+    }
+    nextExample();
+  }, [nextExample, currentExample]);
+
+  // Enhanced cleanup function that flushes SRS batch before cleanup
+  const enhancedCleanupFunction = useCallback(async () => {
+    if (srsQuizPropsRef.current?.flushBatch) {
+      await srsQuizPropsRef.current.flushBatch();
+    }
+    if (cleanupFunction) {
+      cleanupFunction();
+    }
+  }, [cleanupFunction]);
+
+  // Flush batch when quiz completes
+  useEffect(() => {
+    if (isQuizComplete && srsQuizPropsRef.current?.flushBatch) {
+      void srsQuizPropsRef.current.flushBatch();
+    }
+  }, [isQuizComplete]);
+
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
       if (isQuizComplete) return; // prevent keyboard controls when quiz is complete
 
       if (event.key === 'ArrowRight' || event.key === 'd') {
-        nextExample();
+        handleNextExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
         previousExample();
       } else if (event.key === 'ArrowUp' || event.key === 'w') {
@@ -126,7 +176,7 @@ export default function AudioQuiz({
     },
     [
       isQuizComplete,
-      nextExample,
+      handleNextExample,
       previousExample,
       goToQuestion,
       nextStep,
@@ -160,7 +210,9 @@ export default function AudioQuiz({
         }
         isAutoplay={autoplay}
         restartQuiz={restartQuiz}
-        returnToQuizSetup={cleanupFunction}
+        returnToQuizSetup={() => {
+          void enhancedCleanupFunction();
+        }}
       />
     );
   }
@@ -195,13 +247,15 @@ export default function AudioQuiz({
           <AudioQuizButtons
             audioQuizType={audioQuizType}
             autoplay={autoplay}
-            closeQuiz={cleanupFunction}
+            closeQuiz={() => {
+              void enhancedCleanupFunction();
+            }}
             currentStep={currentStep}
             goToHint={goToHint}
             goToQuestion={goToQuestion}
             isFirstExample={currentExampleNumber === 1}
             isLastExample={currentExampleNumber === quizLength}
-            nextExample={nextExample}
+            nextExample={handleNextExample}
             nextExampleReady={nextExampleReady}
             nextStep={nextStep}
             previousExample={previousExample}
