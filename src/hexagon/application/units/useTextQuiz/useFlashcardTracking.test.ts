@@ -109,34 +109,6 @@ describe('useFlashcardTracking', () => {
   });
 
   describe('edge cases and error handling', () => {
-    it('should prevent reviewing the same example twice', () => {
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
-      const { result } = renderHook(() => useSrsFunctionality());
-
-      // First review should succeed
-      act(() => {
-        result.current.handleReviewExample(123, 'easy');
-      });
-
-      expect(result.current.examplesReviewedResults).toHaveLength(1);
-
-      // Second review of same example should be prevented
-      act(() => {
-        result.current.handleReviewExample(123, 'hard');
-      });
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Flashcard has already been reviewed, this should not happen',
-      );
-      expect(result.current.examplesReviewedResults).toHaveLength(1);
-      expect(result.current.hasExampleBeenReviewed(123)).toBe('easy'); // Still shows original difficulty
-
-      consoleErrorSpy.mockRestore();
-    });
-
     it('should handle reviewing different examples with same difficulty', () => {
       const { result } = renderHook(() => useSrsFunctionality());
 
@@ -369,48 +341,6 @@ describe('useFlashcardTracking', () => {
       expect(mockUpdateFlashcards).toHaveBeenCalledTimes(1);
       const updateCall = mockUpdateFlashcards.mock.calls[0][0][0];
       expect(updateCall.interval).toBe(6); // Increased from 5 to 6 (easy)
-    });
-
-    it('should not allow re-reviewing a flashcard marked as easy or hard', async () => {
-      const mockUpdateFlashcards = vi.fn().mockResolvedValue([]);
-      const flashcard = createMockFlashcard({ id: 1, interval: 5 });
-      const mockFlashcards = [
-        { ...flashcard, example: { ...flashcard.example, id: 1 } },
-      ];
-      const consoleErrorSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
-      overrideMockUseStudentFlashcards({
-        flashcards: mockFlashcards,
-        updateFlashcards: mockUpdateFlashcards,
-      });
-
-      const { result } = renderHook(() => useSrsFunctionality());
-
-      // First mark as easy
-      act(() => {
-        result.current.handleReviewExample(1, 'easy');
-      });
-
-      // Try to mark as hard (should be blocked)
-      act(() => {
-        result.current.handleReviewExample(1, 'hard');
-      });
-
-      await act(async () => {
-        await result.current.flushBatch();
-      });
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Flashcard has already been reviewed, this should not happen',
-      );
-      // Should only have one update (the first easy one)
-      expect(mockUpdateFlashcards).toHaveBeenCalledTimes(1);
-      const updateCall = mockUpdateFlashcards.mock.calls[0][0][0];
-      expect(updateCall.interval).toBe(6); // easy
-
-      consoleErrorSpy.mockRestore();
     });
   });
 });

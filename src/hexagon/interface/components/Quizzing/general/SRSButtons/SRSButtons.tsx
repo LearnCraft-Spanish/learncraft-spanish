@@ -6,7 +6,7 @@ interface SRSButtonsProps {
   answerShowing: boolean;
   incrementExampleNumber: () => void;
   hasExampleBeenReviewed: SrsDifficulty | null;
-  handleReviewExample: (difficulty: 'easy' | 'hard') => void;
+  handleReviewExample: (difficulty: SrsDifficulty) => void;
   isExampleReviewPending: boolean;
 }
 
@@ -18,7 +18,7 @@ export function SRSButtons({
   isExampleReviewPending,
 }: SRSButtonsProps) {
   const handleReviewAndIncrementExample = useCallback(
-    (difficulty: 'easy' | 'hard') => {
+    (difficulty: SrsDifficulty) => {
       incrementExampleNumber();
       handleReviewExample(difficulty);
     },
@@ -34,7 +34,7 @@ export function SRSButtons({
         event.key === ',' ||
         event.key === '<'
       ) {
-        handleReviewAndIncrementExample('hard');
+        handleReviewAndIncrementExample('hard' as SrsDifficulty);
       }
       if (
         event.key === 'e' ||
@@ -42,7 +42,7 @@ export function SRSButtons({
         event.key === '.' ||
         event.key === '>'
       ) {
-        handleReviewAndIncrementExample('easy');
+        handleReviewAndIncrementExample('easy' as SrsDifficulty);
       }
     },
     [handleReviewAndIncrementExample],
@@ -56,38 +56,64 @@ export function SRSButtons({
   }, [handleKeyPress]);
 
   return (
-    <div className="buttonBox srsButtons">
-      {answerShowing &&
-        (!hasExampleBeenReviewed || hasExampleBeenReviewed === 'viewed') &&
-        !isExampleReviewPending && (
+    <>
+      {(hasExampleBeenReviewed || isExampleReviewPending) &&
+        hasExampleBeenReviewed !== 'viewed' && (
+          <div className="buttonBox srsButtons">
+            {hasExampleBeenReviewed === 'hard' ? (
+              <button type="button" className="hardBanner">
+                Labeled: Hard
+              </button>
+            ) : (
+              <button type="button" className="easyBanner">
+                Labeled: Easy
+              </button>
+            )}
+          </div>
+        )}
+      <div className="buttonBox srsButtons">
+        {answerShowing &&
+          (hasExampleBeenReviewed === 'viewed' || !hasExampleBeenReviewed) &&
+          !isExampleReviewPending && (
+            <>
+              <button
+                type="button"
+                className="redButton"
+                onClick={() => handleReviewAndIncrementExample('hard')}
+              >
+                This was hard
+              </button>
+              <button
+                type="button"
+                className="greenButton"
+                onClick={() => handleReviewAndIncrementExample('easy')}
+              >
+                This was easy
+              </button>
+            </>
+          )}
+        {hasExampleBeenReviewed && hasExampleBeenReviewed !== 'viewed' && (
           <>
             <button
               type="button"
-              className="redButton"
-              onClick={() => handleReviewAndIncrementExample('hard')}
+              className="greenButton"
+              disabled={hasExampleBeenReviewed === 'easy'}
+              onClick={() => handleReviewExample('easy')}
             >
-              This was hard
+              Update to easy
             </button>
+
             <button
               type="button"
-              className="greenButton"
-              onClick={() => handleReviewAndIncrementExample('easy')}
+              className="redButton"
+              disabled={hasExampleBeenReviewed === 'hard'}
+              onClick={() => handleReviewExample('hard')}
             >
-              This was easy
+              Update to hard
             </button>
           </>
         )}
-      {(hasExampleBeenReviewed || isExampleReviewPending) &&
-        hasExampleBeenReviewed !== 'viewed' &&
-        (hasExampleBeenReviewed === 'hard' ? (
-          <button type="button" className="hardBanner">
-            Labeled: Hard
-          </button>
-        ) : (
-          <button type="button" className="easyBanner">
-            Labeled: Easy
-          </button>
-        ))}
-    </div>
+      </div>
+    </>
   );
 }

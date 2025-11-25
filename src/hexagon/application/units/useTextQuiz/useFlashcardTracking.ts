@@ -172,19 +172,9 @@ export function useSrsFunctionality(): UseSrsReturn {
 
   const handleReviewExample = useCallback(
     (exampleId: number, difficulty: SrsDifficulty) => {
-      // Check if already reviewed before adding to batch
-      // Allow re-reviewing if it's just marked as 'viewed'
-      const existingReview = hasExampleBeenReviewed(exampleId);
-      if (existingReview && existingReview !== 'viewed') {
-        console.error(
-          'Flashcard has already been reviewed, this should not happen',
-        );
-        return;
-      }
-
       addToBatch(exampleId, difficulty);
     },
-    [addToBatch, hasExampleBeenReviewed],
+    [addToBatch],
   );
 
   return {

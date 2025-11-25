@@ -2,6 +2,7 @@ import type {
   UseSrsReturn,
   UseTextQuizProps,
 } from '@application/units/useTextQuiz';
+import type { SrsDifficulty } from '@domain/srs';
 import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
 import Loading from '@interface/components/Loading/Loading';
@@ -27,7 +28,7 @@ export function TextQuiz({
   quizTitle,
   textQuizProps,
   srsQuizProps,
-  showSrsButtons = true,
+  showSrsButtons = false,
 }: TextQuizComponentProps) {
   const {
     examplesAreLoading,
@@ -77,9 +78,9 @@ export function TextQuiz({
   }, [answerShowing]);
 
   // Enhanced cleanup function that flushes SRS batch before cleanup
-  const enhancedCleanupFunction = useCallback(async () => {
+  const enhancedCleanupFunction = useCallback(() => {
     if (srsQuizProps?.flushBatch) {
-      await srsQuizProps.flushBatch();
+      srsQuizProps.flushBatch();
     }
     if (cleanupFunction) {
       cleanupFunction();
@@ -174,7 +175,7 @@ export function TextQuiz({
                   hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
                     currentExample.id,
                   )}
-                  handleReviewExample={(difficulty: 'easy' | 'hard') =>
+                  handleReviewExample={(difficulty: SrsDifficulty) =>
                     srsQuizProps.handleReviewExample(
                       currentExample.id,
                       difficulty,
@@ -199,9 +200,7 @@ export function TextQuiz({
                   <button
                     type="button"
                     className="linkButton"
-                    onClick={() => {
-                      void enhancedCleanupFunction();
-                    }}
+                    onClick={enhancedCleanupFunction}
                   >
                     Back
                   </button>

@@ -72,6 +72,7 @@ function renderQuizYesSrs({
           startWithSpanish,
           cleanupFunction,
         }}
+        showSrsButtons={true}
         srsQuizProps={{
           isExampleReviewPending: () => false,
           examplesReviewedResults: [],
