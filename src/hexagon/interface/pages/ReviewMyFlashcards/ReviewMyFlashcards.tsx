@@ -201,7 +201,7 @@ export default function MyFlashcardsQuiz() {
       ) : quizType === MyFlashcardsQuizType.Text ? (
         <SrsQuiz
           textQuizProps={textQuizProps}
-          showSrsButtons={textQuizSetup.srsQuiz}
+          showSrsButtons={textQuizSetup.srsQuiz} // what actually determines if its an srs quiz!
         />
       ) : (
         <SrsAudioQuiz audioQuizProps={audioQuizProps} />

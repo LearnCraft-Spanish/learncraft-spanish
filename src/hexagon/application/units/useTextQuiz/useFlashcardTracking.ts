@@ -1,19 +1,22 @@
 import type { SrsDifficulty } from '@domain/srs';
+import { LocalStorageAdapter } from '@application/adapters/localStorageAdapter';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { calculateNewSrsInterval } from '@domain/srs';
-import { useCallback, useRef, useState } from 'react';
-
-const BATCH_SIZE = 10;
-
+import {
+  BATCH_SIZE,
+  calculateNewSrsInterval,
+  PENDING_UPDATES_KEY,
+} from '@domain/srs';
+import { useCallback, useEffect, useRef, useState } from 'react';
 export interface ExampleReviewedResults {
   exampleId: number;
   difficulty: SrsDifficulty;
   pending: boolean;
 }
 
-interface PendingBatchUpdate {
+export interface PendingBatchUpdate {
   exampleId: number;
   difficulty: SrsDifficulty;
+  lastReviewedDate: string; // YYYY-MM-DD format, when the review was made
 }
 
 export interface UseSrsReturn {
@@ -25,7 +28,8 @@ export interface UseSrsReturn {
 }
 
 export function useSrsFunctionality(): UseSrsReturn {
-  const { flashcards, updateFlashcards } = useStudentFlashcards();
+  const { updateFlashcards, getFlashcardByExampleId } = useStudentFlashcards();
+  const localStorage = LocalStorageAdapter();
 
   const [examplesReviewedResults, setExamplesReviewedResults] = useState<
     ExampleReviewedResults[]
@@ -34,6 +38,18 @@ export function useSrsFunctionality(): UseSrsReturn {
   // Batch pending updates - using ref to avoid stale closure issues
   const pendingBatchRef = useRef<PendingBatchUpdate[]>([]);
   const [isFlushing, setIsFlushing] = useState(false);
+
+  // Load pending updates from localStorage on mount
+  useEffect(() => {
+    const storedUpdates =
+      localStorage.getItem<PendingBatchUpdate[]>(PENDING_UPDATES_KEY);
+    if (storedUpdates && Array.isArray(storedUpdates)) {
+      pendingBatchRef.current = storedUpdates;
+    }
+  }, [localStorage]);
+
+  // Track if we've already tried to flush on mount
+  // const hasAttemptedInitialFlush = useRef(false);
 
   const hasExampleBeenReviewed = useCallback(
     (exampleId: number) => {
@@ -100,9 +116,7 @@ export function useSrsFunctionality(): UseSrsReturn {
       // Convert exampleId + difficulty to flashcard updates with intervals
       const updates = batchToFlush
         .map(({ exampleId, difficulty }) => {
-          const flashcard = flashcards?.find(
-            (fc) => fc.example.id === exampleId,
-          );
+          const flashcard = getFlashcardByExampleId({ exampleId });
           if (!flashcard) {
             console.error(`Flashcard not found for example ID: ${exampleId}`);
             return null;
@@ -132,31 +146,57 @@ export function useSrsFunctionality(): UseSrsReturn {
       batchToFlush.forEach(({ exampleId, difficulty }) => {
         markExampleAsReviewed(exampleId, difficulty, false);
       });
+
+      // Clear localStorage on successful flush
+      localStorage.removeItem(PENDING_UPDATES_KEY);
     } catch (error) {
       console.error('[SRS Batching] Failed to flush batch update:', error);
-      // On error, mark all as not pending but keep the difficulty
+      // On error, restore the batch to try again later
+      pendingBatchRef.current = batchToFlush;
+      localStorage.setItem(PENDING_UPDATES_KEY, batchToFlush);
+      // Mark all as not pending but keep the difficulty
       batchToFlush.forEach(({ exampleId, difficulty }) => {
         markExampleAsReviewed(exampleId, difficulty, false);
       });
     } finally {
       setIsFlushing(false);
     }
-  }, [isFlushing, markExampleAsReviewed, updateFlashcards, flashcards]);
+  }, [
+    isFlushing,
+    markExampleAsReviewed,
+    updateFlashcards,
+    getFlashcardByExampleId,
+    localStorage,
+  ]);
 
   const addToBatch = useCallback(
     (exampleId: number, difficulty: SrsDifficulty) => {
+      // Get current date in YYYY-MM-DD format
+      const lastReviewedDate = new Date().toISOString().slice(0, 10);
+
       // Check if this example is already in the batch and update it
       const existingIndex = pendingBatchRef.current.findIndex(
         (update) => update.exampleId === exampleId,
       );
 
       if (existingIndex !== -1) {
-        // Update existing entry in batch
-        pendingBatchRef.current[existingIndex] = { exampleId, difficulty };
+        // Update existing entry in batch with new difficulty and date
+        pendingBatchRef.current[existingIndex] = {
+          exampleId,
+          difficulty,
+          lastReviewedDate,
+        };
       } else {
         // Add new entry to batch
-        pendingBatchRef.current.push({ exampleId, difficulty });
+        pendingBatchRef.current.push({
+          exampleId,
+          difficulty,
+          lastReviewedDate,
+        });
       }
+
+      // Save updated batch to localStorage
+      localStorage.setItem(PENDING_UPDATES_KEY, pendingBatchRef.current);
 
       // Mark as reviewed locally (optimistic update)
       markExampleAsReviewed(exampleId, difficulty, false);
@@ -167,7 +207,7 @@ export function useSrsFunctionality(): UseSrsReturn {
         void flushBatch();
       }
     },
-    [flushBatch, markExampleAsReviewed],
+    [flushBatch, markExampleAsReviewed, localStorage],
   );
 
   const handleReviewExample = useCallback(
@@ -176,6 +216,59 @@ export function useSrsFunctionality(): UseSrsReturn {
     },
     [addToBatch],
   );
+
+  // // Auto-flush pending updates from localStorage on mount (after flashcards are loaded)
+  // useEffect(() => {
+  //   if (
+  //     flashcards &&
+  //     pendingBatchRef.current.length > 0 &&
+  //     !hasAttemptedInitialFlush.current
+  //   ) {
+  //     hasAttemptedInitialFlush.current = true;
+
+  //     // Filter out updates that have already been synced
+  //     // Compare localStorage updates with flashcard lastReviewed date
+  //     const filteredUpdates = pendingBatchRef.current.filter(
+  //       ({ exampleId, lastReviewedDate }) => {
+  //         const flashcard = flashcards.find(
+  //           (fc) => fc.example.id === exampleId,
+  //         );
+
+  //         if (!flashcard) {
+  //           // Keep in batch - we'll handle missing flashcards in flushBatch
+  //           return true;
+  //         }
+
+  //         // If flashcard has a lastReviewed date, compare it with our pending update date
+  //         if (flashcard.lastReviewed) {
+  //           const flashcardDate = flashcard.lastReviewed; // YYYY-MM-DD format
+
+  //           // If flashcard's lastReviewed is same or more recent than our pending update,
+  //           // the update has already been synced - remove from batch
+  //           if (flashcardDate >= lastReviewedDate) {
+  //             return false;
+  //           }
+  //         }
+
+  //         // Keep in batch - needs to be synced
+  //         return true;
+  //       },
+  //     );
+
+  //     // Update the batch with filtered updates
+  //     pendingBatchRef.current = filteredUpdates;
+
+  //     // Update localStorage with filtered batch
+  //     if (filteredUpdates.length > 0) {
+  //       localStorage.setItem(PENDING_UPDATES_KEY, filteredUpdates);
+  //       // Try to flush remaining pending updates from previous session
+  //       void flushBatch();
+  //     } else {
+  //       // Nothing left to flush, clear localStorage
+  //       localStorage.removeItem(PENDING_UPDATES_KEY);
+  //     }
+  //   }
+  // }, [flashcards, flushBatch, localStorage]);
 
   return {
     examplesReviewedResults,
