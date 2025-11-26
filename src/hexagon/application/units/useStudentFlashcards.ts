@@ -44,6 +44,11 @@ export interface UseStudentFlashcardsReturn {
     exampleId: number,
     difficulty: SrsDifficulty,
   ) => Promise<number>;
+  getFlashcardByExampleId: ({
+    exampleId,
+  }: {
+    exampleId: number;
+  }) => Flashcard | undefined;
 }
 
 export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
@@ -227,6 +232,15 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
     [flashcards, updateFlashcards],
   );
 
+  const getFlashcardByExampleId = useCallback(
+    ({ exampleId }: { exampleId: number }) => {
+      return flashcards?.find(
+        (flashcard) => flashcard.example.id === exampleId,
+      );
+    },
+    [flashcards],
+  );
+
   return {
     flashcards,
     customFlashcards,
@@ -247,5 +261,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
     updateFlashcardInterval,
     isCustomFlashcard,
     isPendingFlashcard,
+
+    getFlashcardByExampleId,
   };
 };
