@@ -1,4 +1,4 @@
-import type { TableHook } from '@application/units/pasteTable/types';
+import type { TableHook } from '@domain/PasteTable/General';
 import { PasteTableErrorBoundary } from '@interface/components/PasteTable/PasteTableErrorBoundary';
 import { TableRow } from '@interface/components/PasteTable/TableRow';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -33,7 +33,7 @@ export function PasteTable<T>({
 }: PasteTableProps<T>) {
   // Get application data and functions directly from the hook
   const {
-    data,
+    data: { rows, columns },
     updateCell,
     resetTable,
     handlePaste,
@@ -42,7 +42,7 @@ export function PasteTable<T>({
     validationState,
   } = hook;
 
-  const { rows, columns } = data;
+  // const { rows, columns } = data;
 
   // UI-specific state
   const [activeCell, setActiveCell] = useState<{
@@ -141,14 +141,19 @@ export function PasteTable<T>({
             e.preventDefault();
           }
           break;
-        case 'ArrowLeft':
-          if (
+        case 'ArrowLeft': {
+          // For number inputs, selectionStart/End are null, so we need special handling
+          const shouldNavigateLeft =
             e.ctrlKey ||
             e.metaKey ||
             (e.target instanceof HTMLInputElement &&
+              e.target.type === 'number') ||
+            (e.target instanceof HTMLInputElement &&
+              e.target.type !== 'number' &&
               e.target.selectionStart === 0 &&
-              e.target.selectionEnd === 0)
-          ) {
+              e.target.selectionEnd === 0);
+
+          if (shouldNavigateLeft) {
             if (colIndex > 0) {
               nextColIndex = colIndex - 1;
               e.preventDefault();
@@ -159,14 +164,20 @@ export function PasteTable<T>({
             }
           }
           break;
-        case 'ArrowRight':
-          if (
+        }
+        case 'ArrowRight': {
+          // For number inputs, selectionStart/End are null, so we need special handling
+          const shouldNavigateRight =
             e.ctrlKey ||
             e.metaKey ||
             (e.target instanceof HTMLInputElement &&
+              e.target.type === 'number') ||
+            (e.target instanceof HTMLInputElement &&
+              e.target.type !== 'number' &&
               e.target.selectionStart === e.target.value.length &&
-              e.target.selectionEnd === e.target.value.length)
-          ) {
+              e.target.selectionEnd === e.target.value.length);
+
+          if (shouldNavigateRight) {
             if (colIndex < columns.length - 1) {
               nextColIndex = colIndex + 1;
               e.preventDefault();
@@ -177,6 +188,7 @@ export function PasteTable<T>({
             }
           }
           break;
+        }
         case 'Tab':
           if (!e.shiftKey) {
             if (colIndex < columns.length - 1) {

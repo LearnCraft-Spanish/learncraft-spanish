@@ -1,9 +1,5 @@
-import type {
-  TableColumn,
-  TableRow,
-} from '@application/units/pasteTable/types';
+import type { TableColumn, TableRow } from '@domain/PasteTable/General';
 import type { ClipboardEvent } from 'react';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
 import {
   convertJsonToRow,
   convertTsvToRows,
@@ -11,6 +7,7 @@ import {
   parseTsv,
   tryParseJson,
 } from '@application/units/pasteTable/utils';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useCallback, useState } from 'react';
 
 interface UseTablePasteProps {
