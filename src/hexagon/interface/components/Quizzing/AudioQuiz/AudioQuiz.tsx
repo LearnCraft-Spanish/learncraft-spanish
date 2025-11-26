@@ -1,5 +1,5 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
-import type { UseSrsReturn } from '@application/units/useTextQuiz/useFlashcardTracking';
+import type { UseStudentFlashcardUpdatesReturn } from '@application/units/useTextQuiz/useStudentFlashcardUpdates';
 import { useAudioQuiz } from '@application/units/useAudioQuiz';
 import { AudioQuizType } from '@domain/audioQuizzing';
 import { Loading } from '@interface/components/Loading';
@@ -63,7 +63,7 @@ import './AudioBasedReview.css';
  */
 export interface AudioQuizComponentProps {
   audioQuizProps: AudioQuizProps;
-  srsQuizProps?: UseSrsReturn;
+  srsQuizProps?: UseStudentFlashcardUpdatesReturn;
 }
 
 export default function AudioQuiz({

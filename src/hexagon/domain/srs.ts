@@ -3,10 +3,6 @@
  */
 
 export type SrsDifficulty = 'easy' | 'hard' | 'viewed';
-
-export const BATCH_SIZE = 10;
-export const PENDING_UPDATES_KEY = 'srs-pending-updates';
-
 /**
  * Calculates the new interval for a flashcard based on the current interval and difficulty
  * @param currentInterval - The current review interval of the flashcard

@@ -1,5 +1,5 @@
 import type {
-  UseSrsReturn,
+  UseStudentFlashcardUpdatesReturn,
   UseTextQuizProps,
 } from '@application/units/useTextQuiz';
 import type { SrsDifficulty } from '@domain/srs';
@@ -20,7 +20,7 @@ import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 export interface TextQuizComponentProps {
   quizTitle?: string;
   textQuizProps: UseTextQuizProps;
-  srsQuizProps?: UseSrsReturn;
+  srsQuizProps?: UseStudentFlashcardUpdatesReturn;
   showSrsButtons?: boolean;
 }
 
@@ -181,9 +181,6 @@ export function TextQuiz({
                       difficulty,
                     )
                   }
-                  isExampleReviewPending={srsQuizProps.isExampleReviewPending(
-                    currentExample.id,
-                  )}
                   answerShowing={answerShowing}
                   incrementExampleNumber={incrementExample}
                 />

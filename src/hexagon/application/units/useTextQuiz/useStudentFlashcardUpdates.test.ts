@@ -1,10 +1,10 @@
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
-import { useSrsFunctionality } from '@application/units/useTextQuiz/useFlashcardTracking';
+import { useStudentFlashcardUpdates } from '@application/units/useTextQuiz/useStudentFlashcardUpdates';
 import { act, renderHook } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
 import { vi } from 'vitest';
 
-describe('useFlashcardTracking', () => {
+describe('useStudentFlashcardUpdates', () => {
   beforeEach(() => {
     // Reset console.error spy
     vi.spyOn(console, 'error').mockImplementation(() => {});
@@ -15,20 +15,20 @@ describe('useFlashcardTracking', () => {
   });
 
   it('should initialize with empty results', () => {
-    const { result } = renderHook(() => useSrsFunctionality());
+    const { result } = renderHook(() => useStudentFlashcardUpdates());
 
     expect(result.current.examplesReviewedResults).toEqual([]);
   });
 
   describe('hasExampleBeenReviewed', () => {
     it('should return null for unreviewed examples', () => {
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       expect(result.current.hasExampleBeenReviewed(123)).toBeNull();
     });
 
     it('should return difficulty for reviewed examples', () => {
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       // Review an example (batched, not sent yet)
       act(() => {
@@ -41,13 +41,13 @@ describe('useFlashcardTracking', () => {
 
   describe('isExampleReviewPending', () => {
     it('should return false for unreviewed examples', () => {
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       expect(result.current.isExampleReviewPending(123)).toBe(false);
     });
 
     it('should return false for batched but not yet flushed reviews', () => {
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(123, 'easy');
@@ -59,7 +59,7 @@ describe('useFlashcardTracking', () => {
 
   describe('handleReviewExample', () => {
     it('should add example to batch with easy difficulty', () => {
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(123, 'easy');
@@ -72,7 +72,7 @@ describe('useFlashcardTracking', () => {
     });
 
     it('should add example to batch with hard difficulty', () => {
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(456, 'hard');
@@ -90,7 +90,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(123, 'easy');
@@ -110,7 +110,7 @@ describe('useFlashcardTracking', () => {
 
   describe('edge cases and error handling', () => {
     it('should handle reviewing different examples with same difficulty', () => {
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(123, 'easy');
@@ -139,7 +139,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       // Add 9 reviews - should NOT trigger flush
       act(() => {
@@ -182,7 +182,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       // Add 3 reviews
       act(() => {
@@ -214,7 +214,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(1, 'easy');
@@ -235,7 +235,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       await act(async () => {
         await result.current.flushBatch();
@@ -260,7 +260,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(1, 'easy');
@@ -294,7 +294,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       act(() => {
         result.current.handleReviewExample(1, 'viewed');
@@ -322,7 +322,7 @@ describe('useFlashcardTracking', () => {
         updateFlashcards: mockUpdateFlashcards,
       });
 
-      const { result } = renderHook(() => useSrsFunctionality());
+      const { result } = renderHook(() => useStudentFlashcardUpdates());
 
       // First mark as viewed
       act(() => {

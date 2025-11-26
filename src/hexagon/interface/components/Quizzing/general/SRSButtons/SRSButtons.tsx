@@ -7,7 +7,6 @@ interface SRSButtonsProps {
   incrementExampleNumber: () => void;
   hasExampleBeenReviewed: SrsDifficulty | null;
   handleReviewExample: (difficulty: SrsDifficulty) => void;
-  isExampleReviewPending: boolean;
 }
 
 export function SRSButtons({
@@ -15,7 +14,6 @@ export function SRSButtons({
   handleReviewExample,
   answerShowing,
   incrementExampleNumber,
-  isExampleReviewPending,
 }: SRSButtonsProps) {
   const handleReviewAndIncrementExample = useCallback(
     (difficulty: SrsDifficulty) => {
@@ -57,24 +55,22 @@ export function SRSButtons({
 
   return (
     <>
-      {(hasExampleBeenReviewed || isExampleReviewPending) &&
-        hasExampleBeenReviewed !== 'viewed' && (
-          <div className="buttonBox srsButtons">
-            {hasExampleBeenReviewed === 'hard' ? (
-              <button type="button" className="hardBanner">
-                Labeled: Hard
-              </button>
-            ) : (
-              <button type="button" className="easyBanner">
-                Labeled: Easy
-              </button>
-            )}
-          </div>
-        )}
+      {hasExampleBeenReviewed && hasExampleBeenReviewed !== 'viewed' && (
+        <div className="buttonBox srsButtons">
+          {hasExampleBeenReviewed === 'hard' ? (
+            <button type="button" className="hardBanner">
+              Labeled: Hard
+            </button>
+          ) : (
+            <button type="button" className="easyBanner">
+              Labeled: Easy
+            </button>
+          )}
+        </div>
+      )}
       <div className="buttonBox srsButtons">
         {answerShowing &&
-          (hasExampleBeenReviewed === 'viewed' || !hasExampleBeenReviewed) &&
-          !isExampleReviewPending && (
+          (hasExampleBeenReviewed === 'viewed' || !hasExampleBeenReviewed) && (
             <>
               <button
                 type="button"

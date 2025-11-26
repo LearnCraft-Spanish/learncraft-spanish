@@ -1,5 +1,5 @@
 import type { AudioQuizComponentProps } from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
-import { useSrsFunctionality } from '@application/units/useTextQuiz';
+import { useStudentFlashcardUpdates } from '@application/units/useTextQuiz';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { useEffect, useRef } from 'react';
 
@@ -8,9 +8,8 @@ export function SrsAudioQuiz(audioQuizProps: AudioQuizComponentProps) {
     examplesReviewedResults,
     handleReviewExample,
     hasExampleBeenReviewed,
-    isExampleReviewPending,
     flushBatch,
-  } = useSrsFunctionality();
+  } = useStudentFlashcardUpdates();
 
   // Store flushBatch in a ref to avoid recreating the effect on every render
   const flushBatchRef = useRef(flushBatch);
@@ -32,7 +31,6 @@ export function SrsAudioQuiz(audioQuizProps: AudioQuizComponentProps) {
         examplesReviewedResults,
         handleReviewExample,
         hasExampleBeenReviewed,
-        isExampleReviewPending,
         flushBatch,
       }}
     />
