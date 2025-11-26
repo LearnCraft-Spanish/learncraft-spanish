@@ -74,7 +74,6 @@ function renderQuizYesSrs({
         }}
         showSrsButtons={true}
         srsQuizProps={{
-          isExampleReviewPending: () => false,
           examplesReviewedResults: [],
           handleReviewExample: () => {},
           hasExampleBeenReviewed: () => null,
@@ -193,7 +192,6 @@ describe('component TextQuiz', () => {
               cleanupFunction,
             }}
             srsQuizProps={{
-              isExampleReviewPending: () => false,
               examplesReviewedResults: [],
               handleReviewExample: () => {},
               hasExampleBeenReviewed: () => null,
@@ -227,7 +225,6 @@ describe('component TextQuiz', () => {
               cleanupFunction,
             }}
             srsQuizProps={{
-              isExampleReviewPending: () => false,
               examplesReviewedResults: [],
               handleReviewExample: mockHandleReviewExample,
               hasExampleBeenReviewed: mockHasExampleBeenReviewed,
