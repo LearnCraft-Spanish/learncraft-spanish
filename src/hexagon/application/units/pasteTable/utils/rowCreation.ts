@@ -13,6 +13,7 @@ export const resetRowIdCounter = (): void => {
 
 /**
  * Generates a guaranteed unique row ID by combining timestamp, counter and random value
+ * TODO: Use UUID instead of timestamp, counter and random value
  */
 export const generateRowId = (): string => {
   // Increment the counter first to ensure uniqueness even with same timestamp
