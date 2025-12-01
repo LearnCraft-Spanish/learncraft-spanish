@@ -3,8 +3,12 @@ import type {
   CreateExamplesCommand,
   ExampleTechnical,
   ExampleWithVocabulary,
+  UpdateExamplesCommand,
 } from '@learncraft-spanish/shared';
-import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
+import {
+  createMockExampleTechnicalList,
+  createMockExampleWithVocabularyList,
+} from '@testing/factories/exampleFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation
@@ -19,11 +23,8 @@ const defaultMockAdapter: ExamplePort = {
   getExamplesForEditingByIds: async (): Promise<{
     examples: ExampleTechnical[];
   }> => {
-    // Create minimal mock data for ExampleTechnical
-    // Using ExampleWithVocabulary as base since we don't have a factory for ExampleTechnical
-    const baseExamples = createMockExampleWithVocabularyList(2);
     return {
-      examples: baseExamples as unknown as ExampleTechnical[],
+      examples: createMockExampleTechnicalList(2),
     };
   },
   searchExamplesByText: async () => ({
@@ -35,7 +36,7 @@ const defaultMockAdapter: ExamplePort = {
     return createMockExampleWithVocabularyList(1);
   },
   updateExamples: async (
-    _exampleEdits: any,
+    _exampleEdits: UpdateExamplesCommand,
   ): Promise<ExampleWithVocabulary[]> => {
     return createMockExampleWithVocabularyList(1);
   },
