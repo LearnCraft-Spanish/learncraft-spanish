@@ -10,7 +10,7 @@ import {
   AudioQuizMenu,
   MyTextQuizMenu,
 } from '@interface/components/Quizzing/general';
-import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz/RegularTextQuiz';
+import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz';
 
 // This seems like a boundary violation: pulling styles from the wrong scope?
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';

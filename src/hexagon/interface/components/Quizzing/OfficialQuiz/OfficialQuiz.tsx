@@ -1,6 +1,6 @@
 import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
 import { Loading } from '@interface/components/Loading';
-import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz/RegularTextQuiz';
+import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NotFoundPage from 'src/NotFoundPage';
 

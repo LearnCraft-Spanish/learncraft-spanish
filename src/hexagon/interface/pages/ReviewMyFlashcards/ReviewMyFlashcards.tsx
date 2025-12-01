@@ -7,8 +7,10 @@ import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
 import { AudioQuizMenu, MyTextQuizMenu } from '@interface/components/Quizzing';
 import { ReviewMyFlashcardsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/ReviewMyFlashcardsAudioQuiz';
-import { ReviewMyFlashcardsTextQuiz } from '@interface/components/Quizzing/TextQuiz/ReviewMyFlashcardsTextQuiz';
-import { SrsTextQuiz } from '@interface/components/Quizzing/TextQuiz/SrsTextQuiz';
+import {
+  ReviewMyFlashcardsTextQuiz,
+  SrsTextQuiz,
+} from '@interface/components/Quizzing/TextQuiz';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
