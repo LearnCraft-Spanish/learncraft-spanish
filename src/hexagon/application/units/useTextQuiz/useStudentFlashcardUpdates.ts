@@ -48,7 +48,6 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
 
       const oldFlashcardUpdateObjects =
         getPendingFlashcardUpdateObjectsFromLocalStorage();
-
       // add the new record to the array, and remove the old record if it exists
       const newFlashcardUpdateObjects = [
         ...(oldFlashcardUpdateObjects?.filter(
@@ -56,7 +55,6 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
         ) ?? []),
         newRecord,
       ];
-
       setPendingFlashcardUpdateObjectsInLocalStorage(newFlashcardUpdateObjects);
       setExamplesReviewedResults(newFlashcardUpdateObjects);
     },
