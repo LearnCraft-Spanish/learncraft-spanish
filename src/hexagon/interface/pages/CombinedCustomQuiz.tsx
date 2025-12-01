@@ -5,7 +5,7 @@ import {
 import { FilterPanel } from '@interface/components/Filters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
-import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import { RegularAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/RegularAudioQuiz';
 import {
   AudioQuizMenu,
   MyTextQuizMenu,
@@ -140,7 +140,7 @@ export default function CombinedCustomQuiz() {
       ) : quizType === CombinedCustomQuizType.Text ? (
         <RegularTextQuiz textQuizProps={textQuizProps} />
       ) : (
-        <AudioQuiz audioQuizProps={audioQuizProps} />
+        <RegularAudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );
