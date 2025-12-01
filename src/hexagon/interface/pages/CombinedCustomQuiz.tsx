@@ -10,7 +10,7 @@ import {
   AudioQuizMenu,
   MyTextQuizMenu,
 } from '@interface/components/Quizzing/general';
-import { TextQuiz } from '@interface/components/Quizzing/TextQuiz';
+import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz/RegularTextQuiz';
 
 // This seems like a boundary violation: pulling styles from the wrong scope?
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
@@ -138,7 +138,7 @@ export default function CombinedCustomQuiz() {
           </form>
         </>
       ) : quizType === CombinedCustomQuizType.Text ? (
-        <TextQuiz textQuizProps={textQuizProps} />
+        <RegularTextQuiz textQuizProps={textQuizProps} />
       ) : (
         <AudioQuiz audioQuizProps={audioQuizProps} />
       )}

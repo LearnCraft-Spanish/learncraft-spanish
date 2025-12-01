@@ -79,22 +79,6 @@ export function useTextQuiz({
     setAnswerShowing(!answerShowing);
   }, [answerShowing]);
 
-  // MOVE TO HOOK
-  // const incrementExample = useCallback(() => {
-  //   // If SRS quiz and current example hasn't been reviewed, mark as viewed
-  //   // if (srsQuizProps && currentExample) {
-  //   //   const hasBeenReviewed = srsQuizProps.hasExampleBeenReviewed(
-  //   //     currentExample.id,
-  //   //   );
-  //   //   if (!hasBeenReviewed) {
-  //   //     srsQuizProps.handleReviewExample(currentExample.id, 'viewed');
-  //   //   }
-  //   // }
-  //   nextExample();
-  //   hideAnswer();
-  //   setGetHelpIsOpen(false);
-  // }, [nextExample, hideAnswer, srsQuizProps, currentExample]);
-
   const safeExampleIndex = useMemo(() => {
     if (currentExampleIndex < 0) {
       return 0;

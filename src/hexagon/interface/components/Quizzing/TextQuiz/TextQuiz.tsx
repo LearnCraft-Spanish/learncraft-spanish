@@ -1,9 +1,8 @@
 import type {
+  TextQuizReturn,
   UseStudentFlashcardUpdatesReturn,
-  UseTextQuizProps,
 } from '@application/units/useTextQuiz';
 import type { SrsDifficulty } from '@domain/srs';
-import { useTextQuiz } from '@application/units/useTextQuiz';
 import { MenuButton } from '@interface/components/general/Buttons';
 import Loading from '@interface/components/Loading/Loading';
 import {
@@ -13,22 +12,21 @@ import {
 } from '@interface/components/Quizzing/general';
 import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons';
 import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 
 export interface TextQuizComponentProps {
   quizTitle?: string;
-  textQuizProps: UseTextQuizProps;
+  useTextQuizReturn: TextQuizReturn;
   srsQuizProps?: UseStudentFlashcardUpdatesReturn;
-  showSrsButtons?: boolean;
 }
 
 export function TextQuiz({
+  useTextQuizReturn,
   quizTitle,
-  textQuizProps,
+  // textQuizProps,
   srsQuizProps,
-  showSrsButtons = false,
 }: TextQuizComponentProps) {
   const {
     examplesAreLoading,
@@ -48,30 +46,7 @@ export function TextQuiz({
 
     getHelpIsOpen,
     setGetHelpIsOpen,
-  } = useTextQuiz(textQuizProps);
-
-  // MOVE TO HOOK
-  // Enhanced cleanup function that flushes SRS batch before cleanup
-  const enhancedCleanupFunction = useCallback(() => {
-    if (srsQuizProps?.flushBatch) {
-      srsQuizProps.flushBatch();
-    }
-    if (cleanupFunction) {
-      cleanupFunction();
-    }
-  }, [srsQuizProps, cleanupFunction]);
-
-  // Store srsQuizProps in a ref to avoid recreating the effect
-  const srsQuizPropsRef = useRef(srsQuizProps);
-  srsQuizPropsRef.current = srsQuizProps;
-
-  // MOVE TO HOOK? Wrapper Component!
-  // Flush batch when quiz completes
-  useEffect(() => {
-    if (isQuizComplete && srsQuizPropsRef.current?.flushBatch) {
-      void srsQuizPropsRef.current.flushBatch();
-    }
-  }, [isQuizComplete]); // Only depend on isQuizComplete
+  } = useTextQuizReturn;
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
@@ -117,9 +92,7 @@ export function TextQuiz({
           <TextQuizEnd
             isSrsQuiz={!!srsQuizProps}
             restartQuiz={restartQuiz}
-            returnToQuizSetup={() => {
-              void enhancedCleanupFunction();
-            }}
+            returnToQuizSetup={cleanupFunction}
           />
         ) : (
           <div className="quiz">
@@ -145,7 +118,7 @@ export function TextQuiz({
               setGetHelpIsOpen={setGetHelpIsOpen}
             />
             <div className="quizButtons">
-              {srsQuizProps && currentExample && showSrsButtons && (
+              {srsQuizProps && currentExample && (
                 <SRSButtons
                   hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
                     currentExample.id,
@@ -172,7 +145,7 @@ export function TextQuiz({
                   <button
                     type="button"
                     className="linkButton"
-                    onClick={enhancedCleanupFunction}
+                    onClick={cleanupFunction}
                   >
                     Back
                   </button>

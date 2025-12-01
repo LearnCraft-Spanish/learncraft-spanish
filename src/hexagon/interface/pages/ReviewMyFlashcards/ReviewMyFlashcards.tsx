@@ -5,12 +5,10 @@ import {
 import { CloseableFilterPanel } from '@interface/components/Filters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
-import {
-  AudioQuizMenu,
-  MyTextQuizMenu,
-  SrsQuiz,
-} from '@interface/components/Quizzing';
+import { AudioQuizMenu, MyTextQuizMenu } from '@interface/components/Quizzing';
 import { ReviewMyFlashcardsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/ReviewMyFlashcardsAudioQuiz';
+import { ReviewMyFlashcardsTextQuiz } from '@interface/components/Quizzing/TextQuiz/ReviewMyFlashcardsTextQuiz';
+import { SrsTextQuiz } from '@interface/components/Quizzing/TextQuiz/SrsTextQuiz';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
@@ -199,10 +197,11 @@ export default function MyFlashcardsQuiz() {
           </form>
         </>
       ) : quizType === MyFlashcardsQuizType.Text ? (
-        <SrsQuiz
-          textQuizProps={textQuizProps}
-          showSrsButtons={textQuizSetup.srsQuiz} // what actually determines if its an srs quiz!
-        />
+        textQuizSetup.srsQuiz ? (
+          <SrsTextQuiz textQuizProps={textQuizProps} />
+        ) : (
+          <ReviewMyFlashcardsTextQuiz textQuizProps={textQuizProps} />
+        )
       ) : (
         <ReviewMyFlashcardsAudioQuiz audioQuizProps={audioQuizProps} />
       )}
