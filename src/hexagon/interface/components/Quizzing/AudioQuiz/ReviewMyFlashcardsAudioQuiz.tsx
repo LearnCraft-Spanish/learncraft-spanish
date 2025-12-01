@@ -1,9 +1,13 @@
-import type { AudioQuizComponentProps } from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import { useStudentFlashcardUpdates } from '@application/units/useTextQuiz';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { useEffect, useRef } from 'react';
 
-export function SrsAudioQuiz(audioQuizProps: AudioQuizComponentProps) {
+export function ReviewMyFlashcardsAudioQuiz({
+  audioQuizProps,
+}: {
+  audioQuizProps: AudioQuizProps;
+}) {
   const {
     examplesReviewedResults,
     handleReviewExample,
@@ -26,8 +30,8 @@ export function SrsAudioQuiz(audioQuizProps: AudioQuizComponentProps) {
 
   return (
     <AudioQuiz
-      {...audioQuizProps}
-      srsQuizProps={{
+      audioQuizProps={audioQuizProps}
+      reviewMyFlashcardsProps={{
         examplesReviewedResults,
         handleReviewExample,
         hasExampleBeenReviewed,

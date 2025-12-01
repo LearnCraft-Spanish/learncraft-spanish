@@ -10,7 +10,7 @@ import {
   MyTextQuizMenu,
   SrsQuiz,
 } from '@interface/components/Quizzing';
-import { SrsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/SrsAudioQuiz';
+import { ReviewMyFlashcardsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/ReviewMyFlashcardsAudioQuiz';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
@@ -204,7 +204,7 @@ export default function MyFlashcardsQuiz() {
           showSrsButtons={textQuizSetup.srsQuiz} // what actually determines if its an srs quiz!
         />
       ) : (
-        <SrsAudioQuiz audioQuizProps={audioQuizProps} />
+        <ReviewMyFlashcardsAudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );

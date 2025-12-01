@@ -1,7 +1,7 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import { AudioQuizType } from '@domain/audioQuizzing';
-import { SrsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/SrsAudioQuiz';
+import { ReviewMyFlashcardsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/ReviewMyFlashcardsAudioQuiz';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
@@ -13,13 +13,13 @@ const cleanupFunction = vi.fn();
 const mockExamples: ExampleWithVocabulary[] =
   createMockExampleWithVocabularyList(5)();
 
-describe.skip('component SrsAudioQuiz', () => {
+describe.skip('component ReviewMyFlashcardsAudioQuiz', () => {
   afterEach(() => {
     vi.clearAllMocks();
     cleanup();
   });
 
-  it('renders AudioQuiz with SRS functionality', async () => {
+  it('renders AudioQuiz with ReviewMyFlashcards functionality', async () => {
     const mockFlashcards = createMockFlashcardList(5)();
     const mockUpdateFlashcards = vi.fn().mockResolvedValue(mockFlashcards);
     overrideMockUseStudentFlashcards({
@@ -29,7 +29,7 @@ describe.skip('component SrsAudioQuiz', () => {
 
     render(
       <MockAllProviders>
-        <SrsAudioQuiz
+        <ReviewMyFlashcardsAudioQuiz
           audioQuizProps={{
             examplesToQuiz: mockExamples,
             audioQuizType: AudioQuizType.Speaking,
@@ -62,7 +62,7 @@ describe.skip('component SrsAudioQuiz', () => {
 
     const { unmount } = render(
       <MockAllProviders>
-        <SrsAudioQuiz
+        <ReviewMyFlashcardsAudioQuiz
           audioQuizProps={{
             examplesToQuiz: mockExamples,
             audioQuizType: AudioQuizType.Speaking,

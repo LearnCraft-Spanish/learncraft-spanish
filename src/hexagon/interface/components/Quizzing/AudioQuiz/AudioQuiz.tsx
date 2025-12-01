@@ -63,12 +63,12 @@ import './AudioBasedReview.css';
  */
 export interface AudioQuizComponentProps {
   audioQuizProps: AudioQuizProps;
-  srsQuizProps?: UseStudentFlashcardUpdatesReturn;
+  reviewMyFlashcardsProps?: UseStudentFlashcardUpdatesReturn;
 }
 
 export default function AudioQuiz({
   audioQuizProps,
-  srsQuizProps,
+  reviewMyFlashcardsProps,
 }: AudioQuizComponentProps) {
   // Destructure the hook return
   const {
@@ -103,25 +103,26 @@ export default function AudioQuiz({
     addPendingRemoveProps,
   } = useAudioQuiz(audioQuizProps);
 
-  // SRS FUNCTIONALITY
+  // REVIEW MY FLASHCARDS FUNCTIONALITY
   // Audio quizzes automatically mark all viewed examples as "viewed" to update lastReviewedDate
   // Unlike text quizzes, audio quizzes don't show easy/hard rating buttons
 
-  // Store srsQuizProps in a ref to avoid recreating effects
-  const srsQuizPropsRef = useRef(srsQuizProps);
+  // Store reviewMyFlashcardsProps in a ref to avoid recreating effects
+  const reviewMyFlashcardsPropsRef = useRef(reviewMyFlashcardsProps);
   useEffect(() => {
-    srsQuizPropsRef.current = srsQuizProps;
-  }, [srsQuizProps]);
+    reviewMyFlashcardsPropsRef.current = reviewMyFlashcardsProps;
+  }, [reviewMyFlashcardsProps]);
 
   // Wrap nextExample to mark as viewed if not reviewed
-  const handleNextExample = useCallback(() => {
-    // If SRS quiz and current example hasn't been reviewed, mark as viewed
-    if (srsQuizPropsRef.current && currentExample) {
-      const hasBeenReviewed = srsQuizPropsRef.current.hasExampleBeenReviewed(
-        currentExample.id,
-      );
+  const enchancedNextExample = useCallback(() => {
+    // If reviewMyFlashcards quiz and current example hasn't been reviewed, mark as viewed
+    if (reviewMyFlashcardsPropsRef.current && currentExample) {
+      const hasBeenReviewed =
+        reviewMyFlashcardsPropsRef.current.hasExampleBeenReviewed(
+          currentExample.id,
+        );
       if (!hasBeenReviewed) {
-        srsQuizPropsRef.current.handleReviewExample(
+        reviewMyFlashcardsPropsRef.current.handleReviewExample(
           currentExample.id,
           'viewed',
         );
@@ -130,10 +131,10 @@ export default function AudioQuiz({
     nextExample();
   }, [nextExample, currentExample]);
 
-  // Enhanced cleanup function that flushes SRS batch before cleanup
+  // Enhanced cleanup function that flushes reviewMyFlashcards batch before cleanup
   const enhancedCleanupFunction = useCallback(async () => {
-    if (srsQuizPropsRef.current?.flushBatch) {
-      await srsQuizPropsRef.current.flushBatch();
+    if (reviewMyFlashcardsPropsRef.current?.flushBatch) {
+      await reviewMyFlashcardsPropsRef.current.flushBatch();
     }
     if (cleanupFunction) {
       cleanupFunction();
@@ -142,8 +143,8 @@ export default function AudioQuiz({
 
   // Flush batch when quiz completes
   useEffect(() => {
-    if (isQuizComplete && srsQuizPropsRef.current?.flushBatch) {
-      void srsQuizPropsRef.current.flushBatch();
+    if (isQuizComplete && reviewMyFlashcardsPropsRef.current?.flushBatch) {
+      void reviewMyFlashcardsPropsRef.current.flushBatch();
     }
   }, [isQuizComplete]);
 
@@ -153,7 +154,7 @@ export default function AudioQuiz({
       if (isQuizComplete) return; // prevent keyboard controls when quiz is complete
 
       if (event.key === 'ArrowRight' || event.key === 'd') {
-        handleNextExample();
+        enchancedNextExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
         previousExample();
       } else if (event.key === 'ArrowUp' || event.key === 'w') {
@@ -176,7 +177,7 @@ export default function AudioQuiz({
     },
     [
       isQuizComplete,
-      handleNextExample,
+      enchancedNextExample,
       previousExample,
       goToQuestion,
       nextStep,
@@ -255,7 +256,7 @@ export default function AudioQuiz({
             goToQuestion={goToQuestion}
             isFirstExample={currentExampleNumber === 1}
             isLastExample={currentExampleNumber === quizLength}
-            nextExample={handleNextExample}
+            nextExample={enchancedNextExample}
             nextExampleReady={nextExampleReady}
             nextStep={nextStep}
             previousExample={previousExample}
