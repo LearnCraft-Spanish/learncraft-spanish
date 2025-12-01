@@ -42,41 +42,15 @@ export function TextQuiz({
     cleanupFunction,
     isQuizComplete,
     restartQuiz,
+
+    answerShowing,
+    toggleAnswer,
+
+    getHelpIsOpen,
+    setGetHelpIsOpen,
   } = useTextQuiz(textQuizProps);
 
-  const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
-
-  const [answerShowing, setAnswerShowing] = useState(false);
-
-  const hideAnswer = useCallback(() => {
-    setAnswerShowing(false);
-  }, []);
-
-  const incrementExample = useCallback(() => {
-    // If SRS quiz and current example hasn't been reviewed, mark as viewed
-    if (srsQuizProps && currentExample) {
-      const hasBeenReviewed = srsQuizProps.hasExampleBeenReviewed(
-        currentExample.id,
-      );
-      if (!hasBeenReviewed) {
-        srsQuizProps.handleReviewExample(currentExample.id, 'viewed');
-      }
-    }
-    nextExample();
-    hideAnswer();
-    setGetHelpIsOpen(false);
-  }, [nextExample, hideAnswer, srsQuizProps, currentExample]);
-
-  const decrementExample = useCallback(() => {
-    previousExample();
-    hideAnswer();
-    setGetHelpIsOpen(false);
-  }, [previousExample, hideAnswer]);
-
-  const toggleAnswer = useCallback(() => {
-    setAnswerShowing(!answerShowing);
-  }, [answerShowing]);
-
+  // MOVE TO HOOK
   // Enhanced cleanup function that flushes SRS batch before cleanup
   const enhancedCleanupFunction = useCallback(() => {
     if (srsQuizProps?.flushBatch) {
@@ -91,6 +65,7 @@ export function TextQuiz({
   const srsQuizPropsRef = useRef(srsQuizProps);
   srsQuizPropsRef.current = srsQuizProps;
 
+  // MOVE TO HOOK? Wrapper Component!
   // Flush batch when quiz completes
   useEffect(() => {
     if (isQuizComplete && srsQuizPropsRef.current?.flushBatch) {
@@ -104,9 +79,9 @@ export function TextQuiz({
       if (isQuizComplete) return; // prevent keyboard controls when quiz is complete
 
       if (event.key === 'ArrowRight' || event.key === 'd') {
-        incrementExample();
+        nextExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
-        decrementExample();
+        previousExample();
       } else if (
         event.key === 'ArrowUp' ||
         event.key === 'ArrowDown' ||
@@ -117,7 +92,7 @@ export function TextQuiz({
         toggleAnswer();
       }
     },
-    [decrementExample, incrementExample, toggleAnswer, isQuizComplete],
+    [previousExample, nextExample, toggleAnswer, isQuizComplete],
   );
 
   useEffect(() => {
@@ -182,12 +157,12 @@ export function TextQuiz({
                     )
                   }
                   answerShowing={answerShowing}
-                  incrementExampleNumber={incrementExample}
+                  incrementExampleNumber={nextExample}
                 />
               )}
               <QuizButtons
-                decrementExample={decrementExample}
-                incrementExample={incrementExample}
+                decrementExample={previousExample}
+                incrementExample={nextExample}
                 firstExample={exampleNumber === 1}
                 lastExample={exampleNumber === quizLength}
               />

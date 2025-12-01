@@ -38,6 +38,12 @@ export interface TextQuizReturn {
   cleanupFunction: () => void;
   isQuizComplete: boolean;
   restartQuiz: () => void;
+
+  answerShowing: boolean;
+  toggleAnswer: () => void;
+
+  getHelpIsOpen: boolean;
+  setGetHelpIsOpen: (getHelpIsOpen: boolean) => void;
 }
 
 export function useTextQuiz({
@@ -61,6 +67,34 @@ export function useTextQuiz({
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
   const [isQuizComplete, setIsQuizComplete] = useState(false);
 
+  const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
+
+  const [answerShowing, setAnswerShowing] = useState(false);
+
+  const hideAnswer = useCallback(() => {
+    setAnswerShowing(false);
+  }, []);
+
+  const toggleAnswer = useCallback(() => {
+    setAnswerShowing(!answerShowing);
+  }, [answerShowing]);
+
+  // MOVE TO HOOK
+  // const incrementExample = useCallback(() => {
+  //   // If SRS quiz and current example hasn't been reviewed, mark as viewed
+  //   // if (srsQuizProps && currentExample) {
+  //   //   const hasBeenReviewed = srsQuizProps.hasExampleBeenReviewed(
+  //   //     currentExample.id,
+  //   //   );
+  //   //   if (!hasBeenReviewed) {
+  //   //     srsQuizProps.handleReviewExample(currentExample.id, 'viewed');
+  //   //   }
+  //   // }
+  //   nextExample();
+  //   hideAnswer();
+  //   setGetHelpIsOpen(false);
+  // }, [nextExample, hideAnswer, srsQuizProps, currentExample]);
+
   const safeExampleIndex = useMemo(() => {
     if (currentExampleIndex < 0) {
       return 0;
@@ -71,7 +105,7 @@ export function useTextQuiz({
     return currentExampleIndex;
   }, [currentExampleIndex, examples]);
 
-  const nextExample = useCallback(() => {
+  const nextExampleInternal = useCallback(() => {
     if (examples && safeExampleIndex < (examples?.length || 0) - 1) {
       setCurrentExampleIndex(safeExampleIndex + 1);
     } else if (examples && safeExampleIndex === (examples?.length || 0) - 1) {
@@ -80,7 +114,14 @@ export function useTextQuiz({
     }
   }, [safeExampleIndex, examples]);
 
-  const previousExample = useCallback(() => {
+  // next example function for use in TextQuiz component
+  const nextExample = useCallback(() => {
+    nextExampleInternal();
+    hideAnswer();
+    setGetHelpIsOpen(false);
+  }, [nextExampleInternal, hideAnswer]);
+
+  const previousExampleInternal = useCallback(() => {
     if (safeExampleIndex > 0) {
       setCurrentExampleIndex(safeExampleIndex - 1);
     }
@@ -89,6 +130,13 @@ export function useTextQuiz({
       setIsQuizComplete(false);
     }
   }, [safeExampleIndex, isQuizComplete]);
+
+  // previous example function for use in TextQuiz component
+  const previousExample = useCallback(() => {
+    previousExampleInternal();
+    hideAnswer();
+    setGetHelpIsOpen(false);
+  }, [previousExampleInternal, hideAnswer]);
 
   const restartQuiz = useCallback(() => {
     setCurrentExampleIndex(0);
@@ -226,5 +274,11 @@ export function useTextQuiz({
     cleanupFunction,
     isQuizComplete,
     restartQuiz,
+
+    answerShowing,
+    toggleAnswer,
+
+    getHelpIsOpen,
+    setGetHelpIsOpen,
   };
 }
