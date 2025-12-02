@@ -1,18 +1,10 @@
-import {
-  mockLocalStorageAdapter,
-  resetMockLocalStorageAdapter,
-} from '@application/adapters/localStorageAdapter.mock';
+import { mockLocalStorageAdapter } from '@application/adapters/localStorageAdapter.mock';
 import { useStudentFlashcardUpdates } from '@application/units/studentFlashcardUpdates';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import { act, renderHook } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { vi } from 'vitest';
-
-// Mock the localStorage adapter
-vi.mock('@application/adapters/localStorageAdapter', () => ({
-  LocalStorageAdapter: () => mockLocalStorageAdapter,
-}));
 
 describe('useStudentFlashcardUpdates', () => {
   beforeEach(() => {
@@ -22,7 +14,6 @@ describe('useStudentFlashcardUpdates', () => {
 
   afterEach(() => {
     // Reset the localStorage mock and clear storage
-    resetMockLocalStorageAdapter();
     vi.restoreAllMocks();
   });
 

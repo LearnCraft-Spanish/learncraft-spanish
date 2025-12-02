@@ -1,7 +1,7 @@
 import type { UseStudentFlashcardUpdatesReturn } from '@application/units/studentFlashcardUpdates';
 import type { TextQuizReturn } from '@application/units/useTextQuiz';
-import type { FlashcardForDisplay } from '@domain/quizzing';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import { createMockFlashcardForDisplay } from '@application/units/useTextQuiz/useTextQuiz.mock';
 import { TextQuiz } from '@interface/components/Quizzing/TextQuiz/TextQuiz';
 
 import {
@@ -86,43 +86,8 @@ function MockQuizWrapper({
     setAnswerShowing(!answerShowing);
   };
 
-  const quizExample: FlashcardForDisplay | null = currentExample
-    ? {
-        question: {
-          spanish: startWithSpanish,
-          text: startWithSpanish
-            ? currentExample.spanish
-            : currentExample.english,
-          hasAudio: startWithSpanish
-            ? !!currentExample.spanishAudio
-            : !!currentExample.englishAudio,
-          audioUrl: startWithSpanish
-            ? currentExample.spanishAudio
-            : currentExample.englishAudio,
-        },
-        answer: {
-          spanish: !startWithSpanish,
-          text: startWithSpanish
-            ? currentExample.english
-            : currentExample.spanish,
-          hasAudio: startWithSpanish
-            ? !!currentExample.englishAudio
-            : !!currentExample.spanishAudio,
-          audioUrl: startWithSpanish
-            ? currentExample.englishAudio
-            : currentExample.spanishAudio,
-          owned: false,
-          addFlashcard: vi.fn(),
-          removeFlashcard: vi.fn(),
-          updateFlashcardInterval: vi.fn(),
-          vocabulary: currentExample.vocabulary,
-          vocabComplete: currentExample.vocabularyComplete,
-        },
-        exampleIsCollected: false,
-        exampleIsCustom: false,
-        exampleIsAdding: false,
-        exampleIsRemoving: false,
-      }
+  const quizExample = currentExample
+    ? createMockFlashcardForDisplay(currentExample, startWithSpanish)
     : null;
 
   const useTextQuizReturn: TextQuizReturn = {

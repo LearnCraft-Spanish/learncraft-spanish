@@ -1,11 +1,6 @@
 import type { AudioQuizReturn } from '@application/units/AudioQuiz/useAudioQuiz';
-import type {
-  AudioQuizAnswer,
-  AudioQuizGuess,
-  AudioQuizHint,
-  AudioQuizQuestion,
-} from '@domain/audioQuizzing';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import { createMockStepValue } from '@application/units/AudioQuiz/useAudioQuiz.mock';
 import { AudioEngineProvider } from '@composition/providers/AudioProvider';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
@@ -105,53 +100,12 @@ function MockAudioQuizWrapper({
     setIsQuizComplete(false);
   };
 
-  // Create mock step value based on current step
-  let currentStepValue:
-    | AudioQuizQuestion
-    | AudioQuizGuess
-    | AudioQuizHint
-    | AudioQuizAnswer
-    | null = null;
-
-  if (currentStep === AudioQuizStep.Question) {
-    currentStepValue = {
-      step: AudioQuizStep.Question,
-      spanish: audioQuizType === AudioQuizType.Listening,
-      displayText:
-        audioQuizType === AudioQuizType.Speaking
-          ? 'Playing English'
-          : 'Listen to audio',
-      mp3AudioUrl:
-        currentExample?.englishAudio ?? 'http://example.com/audio.mp3',
-      duration: 1.0,
-    };
-  } else if (currentStep === AudioQuizStep.Answer) {
-    currentStepValue = {
-      step: AudioQuizStep.Answer,
-      spanish: audioQuizType === AudioQuizType.Speaking,
-      displayText: currentExample?.spanish ?? '',
-      mp3AudioUrl:
-        currentExample?.spanishAudio ?? 'http://example.com/audio.mp3',
-      duration: 1.0,
-    };
-  } else if (currentStep === AudioQuizStep.Guess) {
-    currentStepValue = {
-      step: AudioQuizStep.Guess,
-      spanish: false,
-      displayText: 'Make a guess',
-      mp3AudioUrl: 'http://example.com/audio.mp3',
-      duration: 0,
-    };
-  } else {
-    currentStepValue = {
-      step: AudioQuizStep.Hint,
-      spanish: true,
-      displayText: currentExample?.english ?? '',
-      mp3AudioUrl:
-        currentExample?.englishAudio ?? 'http://example.com/audio.mp3',
-      duration: 1.0,
-    };
-  }
+  // Create mock step value using the mock helper
+  const currentStepValue = createMockStepValue(
+    currentStep,
+    currentExample,
+    audioQuizType,
+  );
 
   const audioQuizReturn: AudioQuizReturn = {
     autoplay,
