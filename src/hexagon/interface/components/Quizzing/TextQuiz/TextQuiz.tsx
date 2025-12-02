@@ -1,7 +1,5 @@
-import type {
-  TextQuizReturn,
-  UseStudentFlashcardUpdatesReturn,
-} from '@application/units/useTextQuiz';
+import type { UseStudentFlashcardUpdatesReturn } from '@application/units/studentFlashcardUpdates';
+import type { TextQuizReturn } from '@application/units/useTextQuiz';
 import type { SrsDifficulty } from '@domain/srs';
 import { MenuButton } from '@interface/components/general/Buttons';
 import Loading from '@interface/components/Loading/Loading';
@@ -22,10 +20,17 @@ export interface TextQuizComponentProps {
   srsQuizProps?: UseStudentFlashcardUpdatesReturn;
 }
 
+/**
+ * TextQuiz component
+ * Note: This is the base level TextQuiz. It should not be used directly. Instead, use the RegularTextQuiz, ReviewMyFlashcardsTextQuiz, or SrsTextQuiz components.
+ * @param props - props
+ * @param props.useTextQuizReturn - The return object from the useTextQuiz hook
+ * @param props.quizTitle - The title of the quiz (optional)
+ * @param props.srsQuizProps - The return object from the useStudentFlashcardUpdates hook (optional)
+ */
 export function TextQuiz({
   useTextQuizReturn,
   quizTitle,
-  // textQuizProps,
   srsQuizProps,
 }: TextQuizComponentProps) {
   const {

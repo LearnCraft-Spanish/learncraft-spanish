@@ -1,5 +1,5 @@
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
-import { useStudentFlashcardUpdates } from '@application/units/useTextQuiz/useStudentFlashcardUpdates';
+import { useStudentFlashcardUpdates } from '@application/units/studentFlashcardUpdates';
 import { useTextQuiz } from '@application/units/useTextQuiz/useTextQuiz';
 import { useCallback, useEffect, useRef } from 'react';
 

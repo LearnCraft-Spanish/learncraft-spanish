@@ -1,7 +1,5 @@
-import type {
-  TextQuizReturn,
-  UseStudentFlashcardUpdatesReturn,
-} from '@application/units/useTextQuiz';
+import type { UseStudentFlashcardUpdatesReturn } from '@application/units/studentFlashcardUpdates';
+import type { TextQuizReturn } from '@application/units/useTextQuiz';
 import type { FlashcardForDisplay } from '@domain/quizzing';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { TextQuiz } from '@interface/components/Quizzing/TextQuiz/TextQuiz';

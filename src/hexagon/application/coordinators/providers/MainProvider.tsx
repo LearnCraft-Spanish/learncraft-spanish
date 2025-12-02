@@ -17,7 +17,6 @@ export default function MainProvider({
           <SelectedCourseAndLessonsProvider>
             <AudioEngineProvider>
               <ExampleFilterContextProvider>
-                {/* TODO: this provider does not need to be global? Find a way to make it more localized */}
                 <IsFlushingStudentFlashcardUpdatesProvider>
                   {children}
                 </IsFlushingStudentFlashcardUpdatesProvider>

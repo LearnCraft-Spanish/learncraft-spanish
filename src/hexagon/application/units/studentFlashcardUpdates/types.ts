@@ -1,13 +1,5 @@
 import type { SrsDifficulty } from '@domain/srs';
 
-// This is the data that is stored in the state of the useStudentFlashcardUpdates hook
-// It stores the difficulty from srs (easy, hard, viewed) and if the review is pending (not yet sent to the backend)
-// export interface ExampleReviewedResults {
-//   exampleId: number;
-//   difficulty: SrsDifficulty;
-//   pending: boolean;
-// }
-
 // This is the data that is stored in the localStorage of the useStudentFlashcardUpdates hook
 // It stores the exampleId and difficulty of the flashcard that is being reviewed
 // It also stores the lastReviewedDate, which is the date when the review was made
@@ -18,6 +10,6 @@ export interface PendingFlashcardUpdateObject {
   exampleId: number;
   difficulty: SrsDifficulty;
   // YYYY-MM-DD format, when the review was made
-  // TODO: Change to date.isoString format
+  // TODO: Change to date-time ISO string format
   lastReviewedDate: string;
 }

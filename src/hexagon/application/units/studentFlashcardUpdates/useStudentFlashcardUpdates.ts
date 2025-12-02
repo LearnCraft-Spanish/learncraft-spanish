@@ -2,7 +2,7 @@ import type { PendingFlashcardUpdateObject } from '@application/units/studentFla
 import type { SrsDifficulty } from '@domain/srs';
 
 import { useIsFlushingStudentFlashcardUpdates } from '@application/coordinators/hooks/useIsFlushingStudentFlashcardUpdates';
-import { useStudentFlashcardUpdatesUtils } from '@application/units/studentFlashcardUpdates/utils';
+import { useStudentFlashcardUpdatesUtils } from '@application/units/studentFlashcardUpdates';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { calculateNewSrsInterval } from '@domain/srs';
 import { useCallback, useState } from 'react';

@@ -59,14 +59,18 @@ import './AudioBasedReview.css';
  * - Continues quiz with available examples
  * - Clear error messaging for users
  */
-export interface AudioQuizComponentProps {
-  audioQuizReturn: AudioQuizReturn;
-}
 
+/**
+ * AudioQuiz component
+ * Note: This is the base level AudioQuiz. It should not be used directly. Instead, use the RegularAudioQuiz, ReviewMyFlashcardsAudioQuiz, or SrsAudioQuiz components.
+ * @param props - props
+ * @param props.audioQuizReturn - The return object from the useAudioQuiz hook
+ */
 export default function AudioQuiz({
   audioQuizReturn,
-  // reviewMyFlashcardsProps,
-}: AudioQuizComponentProps) {
+}: {
+  audioQuizReturn: AudioQuizReturn;
+}) {
   // Destructure the hook return
   const {
     goToQuestion,

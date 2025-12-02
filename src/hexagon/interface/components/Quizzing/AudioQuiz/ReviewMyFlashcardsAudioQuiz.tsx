@@ -1,6 +1,6 @@
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
-import { useAudioQuiz } from '@application/units/useAudioQuiz';
-import { useStudentFlashcardUpdates } from '@application/units/useTextQuiz';
+import { useAudioQuiz } from '@application/units/AudioQuiz/useAudioQuiz';
+import { useStudentFlashcardUpdates } from '@application/units/studentFlashcardUpdates';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 import { useCallback, useEffect, useRef } from 'react';
 export function ReviewMyFlashcardsAudioQuiz({

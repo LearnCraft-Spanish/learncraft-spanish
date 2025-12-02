@@ -2,8 +2,8 @@ import {
   mockLocalStorageAdapter,
   resetMockLocalStorageAdapter,
 } from '@application/adapters/localStorageAdapter.mock';
+import { useStudentFlashcardUpdates } from '@application/units/studentFlashcardUpdates';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
-import { useStudentFlashcardUpdates } from '@application/units/useTextQuiz/useStudentFlashcardUpdates';
 import { act, renderHook } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
