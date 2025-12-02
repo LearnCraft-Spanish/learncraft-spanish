@@ -7,7 +7,8 @@ import {
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import { useMemo } from 'react';
 
-export interface UseCombinedFiltersWithVocabularyReturnType extends UseCombinedFiltersReturnType {
+export interface UseCombinedFiltersWithVocabularyReturnType
+  extends UseCombinedFiltersReturnType {
   filterStateWithVocabulary: ExampleFiltersWithVocabulary;
   lessonRangeVocabRequired: number[] | undefined;
   lessonVocabKnown: number[] | undefined;

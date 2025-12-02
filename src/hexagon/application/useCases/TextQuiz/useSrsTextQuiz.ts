@@ -1,6 +1,6 @@
+import type { UseStudentFlashcardUpdatesReturn } from '@application/units/studentFlashcardUpdates/useStudentFlashcardUpdates';
 import type {
   TextQuizReturn,
-  UseStudentFlashcardUpdatesReturn,
   UseTextQuizProps,
 } from '@application/units/useTextQuiz';
 import { useStudentFlashcardUpdates } from '@application/units/studentFlashcardUpdates';

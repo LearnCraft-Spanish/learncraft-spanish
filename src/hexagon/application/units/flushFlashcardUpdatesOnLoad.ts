@@ -1,6 +1,6 @@
+import { useStudentFlashcardUpdates } from '@application/units/studentFlashcardUpdates/useStudentFlashcardUpdates';
 import { useStudentFlashcardUpdatesUtils } from '@application/units/studentFlashcardUpdates/utils';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
-import { useStudentFlashcardUpdates } from '@application/units/useTextQuiz/useStudentFlashcardUpdates';
 import { useEffect, useRef } from 'react';
 
 export function useFlushFlashcardUpdatesOnLoad() {

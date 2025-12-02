@@ -1,5 +1,5 @@
-import type { AudioQuizProps } from '@application/units/useAudioQuiz';
-import { useAudioQuiz } from '@application/units/useAudioQuiz';
+import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
+import { useAudioQuiz } from '@application/units/AudioQuiz/useAudioQuiz';
 import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
 
 export function RegularAudioQuiz({

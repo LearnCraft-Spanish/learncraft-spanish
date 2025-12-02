@@ -1,4 +1,4 @@
-import type { AudioQuizReturn } from '@application/units/useAudioQuiz';
+import type { AudioQuizReturn } from '@application/units/AudioQuiz/useAudioQuiz';
 import { AudioQuizType } from '@domain/audioQuizzing';
 import { Loading } from '@interface/components/Loading';
 import AudioFlashcard from '@interface/components/Quizzing/AudioQuiz/AudioFlashcard';

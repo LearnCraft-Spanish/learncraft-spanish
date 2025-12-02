@@ -1,4 +1,4 @@
-import type { AudioQuizReturn } from '@application/units/useAudioQuiz';
+import type { AudioQuizReturn } from '@application/units/AudioQuiz/useAudioQuiz';
 import type {
   AudioQuizAnswer,
   AudioQuizGuess,
