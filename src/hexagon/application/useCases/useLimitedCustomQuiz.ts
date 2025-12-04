@@ -1,5 +1,5 @@
 import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
-import { useExampleQuery } from '@application/queries/useExampleQuery';
+import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';

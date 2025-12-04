@@ -3,7 +3,7 @@ import type {
   TableHook,
   TableRow,
   ValidationState,
-} from '@application/units/pasteTable/types';
+} from '@domain/PasteTable/General';
 import type { ClipboardEvent } from 'react';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 

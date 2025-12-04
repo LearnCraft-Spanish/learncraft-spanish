@@ -9,7 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 describe('useTextQuiz', () => {
   const mockCleanupFunction = vi.fn();
   const mockExamples: ExampleWithVocabulary[] =
-    createMockExampleWithVocabularyList()(3);
+    createMockExampleWithVocabularyList(3);
 
   beforeEach(() => {
     mockCleanupFunction.mockClear();

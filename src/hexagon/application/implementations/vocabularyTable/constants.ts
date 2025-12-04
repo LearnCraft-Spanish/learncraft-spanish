@@ -1,7 +1,4 @@
-import type {
-  CellType,
-  TableColumn,
-} from '@application/units/pasteTable/types';
+import type { CellType, TableColumn } from '@domain/PasteTable/General';
 
 // Column configuration with labels and widths
 export const SCHEMA_FIELD_CONFIG: Record<

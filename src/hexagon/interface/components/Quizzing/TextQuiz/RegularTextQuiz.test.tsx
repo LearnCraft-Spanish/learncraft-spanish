@@ -18,7 +18,7 @@ vi.mock('@application/units/useTextQuiz', () => ({
 
 describe('regularTextQuiz', () => {
   const mockExamples: ExampleWithVocabulary[] =
-    createMockExampleWithVocabularyList()(3);
+    createMockExampleWithVocabularyList(3);
   const mockCleanupFunction = vi.fn();
 
   const defaultProps = {

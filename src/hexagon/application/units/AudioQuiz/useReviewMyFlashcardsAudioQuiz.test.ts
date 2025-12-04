@@ -34,7 +34,7 @@ vi.mock('@application/units/studentFlashcardUpdates', () => ({
 describe('useReviewMyFlashcardsAudioQuiz', () => {
   const mockCleanupFunction = vi.fn();
   const mockExamples: ExampleWithVocabulary[] =
-    createMockExampleWithVocabularyList()(3);
+    createMockExampleWithVocabularyList(3);
 
   const defaultProps = {
     audioQuizProps: {

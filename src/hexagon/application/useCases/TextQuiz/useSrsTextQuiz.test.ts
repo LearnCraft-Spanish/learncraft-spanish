@@ -25,7 +25,7 @@ vi.mock('@application/units/useTextQuiz/useTextQuiz', () => ({
 
 describe('useSrsTextQuiz', () => {
   const mockExamples: ExampleWithVocabulary[] =
-    createMockExampleWithVocabularyList()(3);
+    createMockExampleWithVocabularyList(3);
   const mockCleanupFunction = vi.fn();
   const mockNextExample = vi.fn();
 

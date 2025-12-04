@@ -28,7 +28,7 @@ vi.mock('@application/units/useAudioQuizMapper', () => ({
 describe('useAudioQuiz', () => {
   const mockCleanupFunction = vi.fn();
   const mockExamples: ExampleWithVocabulary[] =
-    createMockExampleWithVocabularyList()(3);
+    createMockExampleWithVocabularyList(3);
 
   beforeEach(() => {
     mockCleanupFunction.mockClear();

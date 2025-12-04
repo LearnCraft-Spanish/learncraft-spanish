@@ -18,7 +18,7 @@ vi.mock('@application/useCases/TextQuiz/useReviewMyFlashcardsTextQuiz', () => ({
 
 describe('reviewMyFlashcardsTextQuiz', () => {
   const mockExamples: ExampleWithVocabulary[] =
-    createMockExampleWithVocabularyList()(3);
+    createMockExampleWithVocabularyList(3);
   const mockCleanupFunction = vi.fn();
 
   const defaultProps = {
