@@ -1,4 +1,4 @@
-import type { AudioQuizProps } from '@application/units/useAudioQuiz';
+import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';

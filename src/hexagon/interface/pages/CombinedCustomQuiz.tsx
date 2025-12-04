@@ -5,12 +5,12 @@ import {
 import { FilterPanel } from '@interface/components/Filters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
-import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import { RegularAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/RegularAudioQuiz';
 import {
   AudioQuizMenu,
   MyTextQuizMenu,
 } from '@interface/components/Quizzing/general';
-import { TextQuiz } from '@interface/components/Quizzing/TextQuiz';
+import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz';
 
 // This seems like a boundary violation: pulling styles from the wrong scope?
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
@@ -138,9 +138,9 @@ export default function CombinedCustomQuiz() {
           </form>
         </>
       ) : quizType === CombinedCustomQuizType.Text ? (
-        <TextQuiz textQuizProps={textQuizProps} />
+        <RegularTextQuiz textQuizProps={textQuizProps} />
       ) : (
-        <AudioQuiz audioQuizProps={audioQuizProps} />
+        <RegularAudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );

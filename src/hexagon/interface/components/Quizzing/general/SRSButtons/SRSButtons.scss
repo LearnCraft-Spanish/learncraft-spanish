@@ -1,4 +1,7 @@
 .srsButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   min-height: 41.8px;
 
   @media screen and (max-width: 480px) {
@@ -15,11 +18,13 @@
 }
 
 .easyBanner {
+  flex-grow: 2;
   background-color: darkgreen !important;
   cursor: default !important;
 }
 
 .hardBanner {
+  flex-grow: 2;
   background-color: darkred !important;
   cursor: default !important;
 }

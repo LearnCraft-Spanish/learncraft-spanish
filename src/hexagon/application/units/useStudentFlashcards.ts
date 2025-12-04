@@ -44,6 +44,11 @@ export interface UseStudentFlashcardsReturn {
     exampleId: number,
     difficulty: SrsDifficulty,
   ) => Promise<number>;
+  getFlashcardByExampleId: ({
+    exampleId,
+  }: {
+    exampleId: number;
+  }) => Flashcard | undefined;
 }
 
 export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
@@ -218,13 +223,22 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
         {
           flashcardId: flashcard.id,
           interval: newInterval,
-          lastReviewedDate: new Date().toISOString(),
+          lastReviewedDate: new Date().toISOString().slice(0, 10), // YYYY-MM-DD UTC format
         },
       ]);
 
       return newInterval;
     },
     [flashcards, updateFlashcards],
+  );
+
+  const getFlashcardByExampleId = useCallback(
+    ({ exampleId }: { exampleId: number }) => {
+      return flashcards?.find(
+        (flashcard) => flashcard.example.id === exampleId,
+      );
+    },
+    [flashcards],
   );
 
   return {
@@ -247,5 +261,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
     updateFlashcardInterval,
     isCustomFlashcard,
     isPendingFlashcard,
+
+    getFlashcardByExampleId,
   };
 };

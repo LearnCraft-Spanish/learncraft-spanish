@@ -1,6 +1,6 @@
 import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
 import { Loading } from '@interface/components/Loading';
-import { TextQuiz } from '@interface/components/Quizzing/TextQuiz';
+import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NotFoundPage from 'src/NotFoundPage';
 
@@ -43,7 +43,7 @@ export function OfficialQuiz() {
   if (quizExamples) {
     return (
       <>
-        <TextQuiz
+        <RegularTextQuiz
           quizTitle={quizTitle}
           textQuizProps={{
             examples: quizExamples,

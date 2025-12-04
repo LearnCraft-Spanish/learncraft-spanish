@@ -22,6 +22,10 @@ import {
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
 import {
+  mockLocalStorageAdapter,
+  resetMockLocalStorageAdapter,
+} from '@application/adapters/localStorageAdapter.mock';
+import {
   mockOfficialQuizAdapter,
   resetMockOfficialQuizAdapter,
 } from '@application/adapters/officialQuizAdapter.mock';
@@ -86,6 +90,10 @@ vi.mock('@application/adapters/authAdapter', () => ({
   useAuthAdapter: vi.fn(() => mockAuthAdapter),
 }));
 
+vi.mock('@application/adapters/localStorageAdapter', () => ({
+  LocalStorageAdapter: () => mockLocalStorageAdapter,
+}));
+
 vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: vi.fn(() => mockActiveStudent),
 }));
@@ -113,6 +121,7 @@ const resetGlobalMocks = () => {
   resetMockActiveStudent();
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();
+  resetMockLocalStorageAdapter();
   resetMockOfficialQuizAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();

@@ -1,6 +1,9 @@
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
-import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
+import {
+  createMockFlashcard,
+  createMockFlashcardList,
+} from '@testing/factories/flashcardFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockUseStudentFlashcards: UseStudentFlashcardsReturn = {
@@ -38,6 +41,15 @@ const defaultMockUseStudentFlashcards: UseStudentFlashcardsReturn = {
   },
   updateFlashcards: async (updates) => {
     return Promise.resolve(createMockFlashcardList()(updates.length));
+  },
+
+  getFlashcardByExampleId: ({ exampleId }: { exampleId: number }) => {
+    const flashcard = createMockFlashcard({ id: exampleId });
+    const flashcardWithExampleId = {
+      ...flashcard,
+      example: { ...flashcard.example, id: exampleId },
+    };
+    return flashcardWithExampleId;
   },
 };
 

@@ -18,7 +18,7 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       '@learncraft-spanish/shared':
-        specifier: ^0.10.4
+        specifier: ^0.10.5
         version: 0.10.5
       '@sentry/cli':
         specifier: ^2.42.2

@@ -1,5 +1,4 @@
-import type { AudioQuizProps } from '@application/units/useAudioQuiz';
-import { useAudioQuiz } from '@application/units/useAudioQuiz';
+import type { AudioQuizReturn } from '@application/units/AudioQuiz/useAudioQuiz';
 import { AudioQuizType } from '@domain/audioQuizzing';
 import { Loading } from '@interface/components/Loading';
 import AudioFlashcard from '@interface/components/Quizzing/AudioQuiz/AudioFlashcard';
@@ -60,10 +59,17 @@ import './AudioBasedReview.css';
  * - Continues quiz with available examples
  * - Clear error messaging for users
  */
+
+/**
+ * AudioQuiz component
+ * Note: This is the base level AudioQuiz. It should not be used directly. Instead, use the RegularAudioQuiz, ReviewMyFlashcardsAudioQuiz, or SrsAudioQuiz components.
+ * @param props - props
+ * @param props.audioQuizReturn - The return object from the useAudioQuiz hook
+ */
 export default function AudioQuiz({
-  audioQuizProps,
+  audioQuizReturn,
 }: {
-  audioQuizProps: AudioQuizProps;
+  audioQuizReturn: AudioQuizReturn;
 }) {
   // Destructure the hook return
   const {
@@ -95,7 +101,7 @@ export default function AudioQuiz({
     vocabulary,
 
     addPendingRemoveProps,
-  } = useAudioQuiz(audioQuizProps);
+  } = audioQuizReturn;
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
