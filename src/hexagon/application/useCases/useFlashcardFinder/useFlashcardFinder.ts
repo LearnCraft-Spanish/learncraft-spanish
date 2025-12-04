@@ -1,4 +1,4 @@
-import type { UseExampleQueryReturnType } from '@application/queries/useExampleQuery';
+import type { UseExampleQueryReturnType } from '@application/queries/ExampleQueries/useExampleQuery';
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { LessonPopup } from '@application/units/useLessonPopup';
@@ -6,7 +6,7 @@ import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTag
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-import { useExampleQuery } from '@application/queries/useExampleQuery';
+import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';

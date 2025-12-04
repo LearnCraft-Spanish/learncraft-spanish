@@ -215,7 +215,11 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
 
       // Update the flashcard with the new interval
       await updateFlashcards([
-        { flashcardId: flashcard.id, interval: newInterval },
+        {
+          flashcardId: flashcard.id,
+          interval: newInterval,
+          lastReviewedDate: new Date().toISOString(),
+        },
       ]);
 
       return newInterval;

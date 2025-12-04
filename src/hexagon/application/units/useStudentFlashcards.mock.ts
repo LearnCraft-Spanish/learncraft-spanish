@@ -10,7 +10,7 @@ const defaultMockUseStudentFlashcards: UseStudentFlashcardsReturn = {
   customFlashcards: createMockFlashcardList()(1),
   customFlashcardsDueForReview: createMockFlashcardList()(1),
   audioFlashcards: createMockFlashcardList()(2),
-  collectedExamples: createMockExampleWithVocabularyList()(3),
+  collectedExamples: createMockExampleWithVocabularyList(3),
   isLoading: false,
   error: null,
 

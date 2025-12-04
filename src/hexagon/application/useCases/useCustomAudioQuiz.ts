@@ -1,7 +1,7 @@
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
-import { useExampleQuery } from '@application/queries/useExampleQuery';
+import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';

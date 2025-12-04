@@ -20,7 +20,7 @@ for (let i = 0; i < 10; i++) {
   );
 }
 
-const mockQuizExample = createMockExampleWithVocabularyList(10)();
+const mockQuizExample = createMockExampleWithVocabularyList(10);
 
 describe('useOfficialQuiz', () => {
   beforeEach(() => {
