@@ -157,6 +157,11 @@ export default function Menu() {
                   Create Vocabulary
                 </Link>
               </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/example-search">
+                  Example Search Interface (beta)
+                </Link>
+              </div>
             </>
           )}
         </div>
