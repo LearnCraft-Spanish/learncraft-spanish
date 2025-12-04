@@ -1,4 +1,4 @@
-import { useExampleQuery } from '@application/queries/useExampleQuery';
+import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useCustomQuizFilterState } from '@application/units/CustomQuiz';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';

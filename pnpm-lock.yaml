@@ -18,8 +18,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       '@learncraft-spanish/shared':
-        specifier: ^0.9.5
-        version: 0.9.5
+        specifier: ^0.10.4
+        version: 0.10.5
       '@sentry/cli':
         specifier: ^2.42.2
         version: 2.50.2
@@ -202,8 +202,8 @@ importers:
         specifier: ^2.7.3
         version: 2.10.4(@types/node@22.17.0)(typescript@5.8.3)
       prettier:
-        specifier: ^3.5.2
-        version: 3.6.2
+        specifier: ^3.7.3
+        version: 3.7.3
       sass-embedded:
         specifier: ^1.85.1
         version: 1.89.2
@@ -1155,8 +1155,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.9':
     resolution: {integrity: sha512-3Belt6tdc8bPgAtbcmdtNJlirVoTmEb5e2gC94PnkwEW9jI6CAHUeoG85tjWP5WquqfavoMtMwiG4P926ZKKuQ==}
 
-  '@learncraft-spanish/shared@0.9.5':
-    resolution: {integrity: sha512-t06EC0rqEMrpwm0YZ/+hZItxinn9PNtcoQnLfhBhyCKMbgtcptA4td7sTx3aeDqWZkrTiTcXbIXQ0Kn09uueHA==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.9.5/cf797666b6d99330813a7db74b827c9efff4f989}
+  '@learncraft-spanish/shared@0.10.5':
+    resolution: {integrity: sha512-kDSnw6OR1+U4uyZ4ULOwiWO3Ew0S4U/Nip9ivKHZd7MOJAU/zLHC+/TPOuNDbVYZIAfybx8km4eJdhXm15Prtw==, tarball: https://npm.pkg.github.com/download/@learncraft-spanish/shared/0.10.5/5987933bf557ab5b9fa8616d59c008611d3ab940}
 
   '@mswjs/interceptors@0.39.5':
     resolution: {integrity: sha512-B9nHSJYtsv79uo7QdkZ/b/WoKm20IkVSmTc/WCKarmDtFwM0dRx2ouEniqwNkzCSLn3fydzKmnMzjtfdOWt3VQ==}
@@ -4288,6 +4288,11 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
+  prettier@3.7.3:
+    resolution: {integrity: sha512-QgODejq9K3OzoBbuyobZlUhznP5SKwPqp+6Q6xw6o8gnhr4O85L2U915iM2IDcfF2NPXVaM9zlo9tdwipnYwzg==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   pretty-format@27.5.1:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
@@ -6586,7 +6591,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.4
 
-  '@learncraft-spanish/shared@0.9.5':
+  '@learncraft-spanish/shared@0.10.5':
     dependencies:
       zod: 3.25.76
 
@@ -10469,6 +10474,8 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   prettier@3.6.2: {}
+
+  prettier@3.7.3: {}
 
   pretty-format@27.5.1:
     dependencies:

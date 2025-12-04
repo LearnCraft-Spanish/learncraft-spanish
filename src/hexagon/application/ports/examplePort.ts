@@ -1,7 +1,11 @@
 import type { LessonRange } from '@application/ports/coursePort';
 import type {
+  CreateExamplesCommand,
+  ExampleTechnical,
+  ExampleTextSearch,
   ExampleWithVocabulary,
   SkillTag,
+  UpdateExamplesCommand,
 } from '@learncraft-spanish/shared';
 
 export interface ExampleFilters {
@@ -12,6 +16,7 @@ export interface ExampleFilters {
 }
 
 export interface ExamplePort {
+  // Query methods
   getFilteredExamples: ({
     lessonRanges,
     excludeSpanglish,
@@ -31,4 +36,27 @@ export interface ExamplePort {
     seed: string;
     disableCache?: boolean;
   }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
+  getExamplesByIds: (
+    ids: number[],
+  ) => Promise<{ examples: ExampleWithVocabulary[] }>;
+  // Returns more traits for editing
+  getExamplesForEditingByIds: (
+    ids: number[],
+  ) => Promise<{ examples: ExampleTechnical[] }>;
+  searchExamplesByText: (
+    searchText: ExampleTextSearch,
+    page: number,
+    limit: number,
+  ) => Promise<{ examples: ExampleWithVocabulary[] }>;
+
+  // Mutation methods
+  createExamples: (
+    exampleCreates: CreateExamplesCommand,
+  ) => Promise<ExampleWithVocabulary[]>;
+
+  updateExamples: (
+    exampleEdits: UpdateExamplesCommand,
+  ) => Promise<ExampleWithVocabulary[]>;
+
+  deleteExamples: (exampleIds: number[]) => Promise<number[]>;
 }

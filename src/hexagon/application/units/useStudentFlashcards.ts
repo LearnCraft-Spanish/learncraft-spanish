@@ -218,6 +218,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
         {
           flashcardId: flashcard.id,
           interval: newInterval,
+          lastReviewedDate: new Date().toISOString(),
         },
       ]);
 

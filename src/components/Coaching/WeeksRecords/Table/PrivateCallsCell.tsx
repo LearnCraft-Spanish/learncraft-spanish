@@ -190,7 +190,8 @@ export function PrivateCallView({
       call.areasOfDifficulty === areasOfDifficulty &&
       call.recording === recording &&
       call.date === date &&
-      call.caller.email === caller
+      call.caller.email === caller &&
+      call.callType === callType
     ) {
       cancelEdit();
       return;

@@ -124,7 +124,8 @@ export const useExampleQuery = (
     error,
   } = useQuery({
     queryKey: [
-      'filteredExamples',
+      'examples',
+      'by query',
       { page },
       { pageSize: currentPageSize },
       filterState, // Use the filter state which always includes lesson ranges
@@ -149,7 +150,8 @@ export const useExampleQuery = (
     if (hasMorePages && canPrefetch) {
       queryClient.prefetchQuery({
         queryKey: [
-          'filteredExamples',
+          'examples',
+          'by query',
           { page: page + 1 },
           { pageSize: currentPageSize },
           filterState,
