@@ -1,4 +1,4 @@
-export type DateMode = 'created' | 'modified';
+export type DateMode = 'created' | 'edited';
 
 export interface SearchByDateProps {
   fromDate: string;
@@ -17,55 +17,58 @@ export function SearchByDate({
   onToDateChange,
   onModeChange,
 }: SearchByDateProps) {
-  return (
-    <div>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
-        <label
-          style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-        >
-          <input
-            type="radio"
-            name="dateSearchMode"
-            value="modified"
-            checked={mode === 'modified'}
-            onChange={() => onModeChange('modified')}
-          />
-          <span>Recently Modified</span>
-        </label>
-        <label
-          style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-        >
-          <input
-            type="radio"
-            name="dateSearchMode"
-            value="created"
-            checked={mode === 'created'}
-            onChange={() => onModeChange('created')}
-          />
-          <span>Recently Created</span>
-        </label>
-      </div>
+  // This should be a date range selector
+  return <div></div>;
+  // <div>
+  //   <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
+  //     <label
+  //       style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+  //     >
+  //       <input
+  //         type="radio"
+  //         name="dateSearchMode"
+  //         value="created"
+  //         checked={mode === 'created'}
+  //         onChange={() => onModeChange('created')}
+  //       />
+  //       <span>Recently Created</span>
+  //     </label>
 
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
-        <div>
-          <div>From</div>
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(event) => onFromDateChange(event.target.value)}
-            style={{ padding: '0.5rem' }}
-          />
-        </div>
-        <div>
-          <div>To</div>
-          <input
-            type="date"
-            value={toDate}
-            onChange={(event) => onToDateChange(event.target.value)}
-            style={{ padding: '0.5rem' }}
-          />
-        </div>
-      </div>
-    </div>
-  );
+  //     <label
+  //       style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+  //     >
+  //       <input
+  //         type="radio"
+  //         name="dateSearchMode"
+  //         value="edited"
+  //         checked={mode === 'edited'}
+  //         onChange={() => onModeChange('edited')}
+  //       />
+  //       <span>Recently Edited</span>
+  //     </label>
+  //   </div>
+
+  //   <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
+  //     <div>
+  //       <div>From</div>
+  //       <input
+  //         type="date"
+  //         value={fromDate}
+  //         onChange={(event) => onFromDateChange(event.target.value)}
+  //         style={{ padding: '0.5rem' }}
+  //         max={toDate}
+  //       />
+  //     </div>
+  //     <div>
+  //       <div>To</div>
+  //       <input
+  //         type="date"
+  //         value={toDate}
+  //         onChange={(event) => onToDateChange(event.target.value)}
+  //         style={{ padding: '0.5rem' }}
+  //         min={fromDate}
+  //       />
+  //     </div>
+  //   </div>
+  // </div>
 }

@@ -13,13 +13,13 @@ export function SearchByTextsOrIds({
   onModeChange,
   onInputChange,
 }: SearchByTextsOrIdsProps) {
-  const parsedIds =
-    mode === 'ids'
-      ? input
-          .split(',')
-          .map((val) => Number(val.trim()))
-          .filter((val) => !Number.isNaN(val))
-      : [];
+  // const parsedIds =
+  //   mode === 'ids'
+  //     ? input
+  //         .split(',')
+  //         .map((val) => Number(val.trim()))
+  //         .filter((val) => !Number.isNaN(val))
+  //     : [];
 
   return (
     <div>
@@ -64,7 +64,7 @@ export function SearchByTextsOrIds({
             checked={mode === 'ids'}
             onChange={() => onModeChange('ids')}
           />
-          <span>IDs (comma separated)</span>
+          <span>ID</span>
         </label>
       </div>
 
@@ -82,11 +82,11 @@ export function SearchByTextsOrIds({
         style={{ width: '100%', padding: '0.5rem', marginBottom: '0.75rem' }}
       />
 
-      {mode === 'ids' && (
+      {/* {mode === 'ids' && (
         <div style={{ marginBottom: '0.75rem' }}>
           <small>Parsed IDs: {parsedIds.join(', ') || 'None'}</small>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

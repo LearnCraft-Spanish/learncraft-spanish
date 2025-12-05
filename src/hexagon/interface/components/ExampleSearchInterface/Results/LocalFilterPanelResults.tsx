@@ -38,7 +38,7 @@ export function LocalFilterPanelResults({
   }, [lessonRanges, skillTags, excludeSpanglish, audioOnly]);
 
   const fetchFilteredExamples = useCallback(async () => {
-    const { examples, totalCount } = await exampleAdapter.getFilteredExamples({
+    const result = await exampleAdapter.getFilteredExamples({
       skillTags,
       lessonRanges,
       excludeSpanglish,
@@ -48,7 +48,7 @@ export function LocalFilterPanelResults({
       seed: seed!,
       disableCache: true,
     });
-    return { examples, totalCount };
+    return result.examples;
   }, [
     exampleAdapter,
     skillTags,
@@ -80,7 +80,7 @@ export function LocalFilterPanelResults({
     <BaseResultsComponent
       isLoading={isLoading}
       error={error ?? null}
-      examples={results?.examples}
+      examples={results ?? undefined}
     />
   );
 }

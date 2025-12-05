@@ -39,7 +39,7 @@ export function BaseResultsComponent({
     <ul>
       {examples.map((example) => (
         <li key={example.id}>
-          <strong>{example.spanish}</strong> — {example.english}
+          {example.id} - <strong>{example.spanish}</strong> — {example.english}
         </li>
       ))}
     </ul>

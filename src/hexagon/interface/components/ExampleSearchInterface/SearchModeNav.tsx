@@ -1,6 +1,6 @@
 // import type { ReactNode } from 'react';
 
-export type ExampleSearchMode = 'filter' | 'quiz' | 'text' | 'date';
+export type ExampleSearchMode = 'filter' | 'quiz' | 'text' | 'ids' | 'date';
 
 interface NavOption {
   mode: ExampleSearchMode;
@@ -11,7 +11,8 @@ interface NavOption {
 const NAV_OPTIONS: NavOption[] = [
   { mode: 'filter', label: 'Filter Panel' },
   { mode: 'quiz', label: 'Search by Quiz' },
-  { mode: 'text', label: 'Search by Text / IDs' },
+  { mode: 'text', label: 'Search by Text' },
+  { mode: 'ids', label: 'Search by IDs' },
   { mode: 'date', label: 'Search by Date' },
 ];
 

@@ -85,7 +85,6 @@ export function useCombinedFilters({
     course,
     fromLesson,
     toLesson,
-    onFilterChange,
   ]);
 
   // If the selected tags exactly match a preset, return the preset

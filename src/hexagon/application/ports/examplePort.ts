@@ -36,18 +36,18 @@ export interface ExamplePort {
     seed: string;
     disableCache?: boolean;
   }) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
-  getExamplesByIds: (
-    ids: number[],
-  ) => Promise<{ examples: ExampleWithVocabulary[] }>;
+  getExamplesByIds: (ids: number[]) => Promise<ExampleWithVocabulary[]>;
   // Returns more traits for editing
-  getExamplesForEditingByIds: (
-    ids: number[],
-  ) => Promise<{ examples: ExampleTechnical[] }>;
+  getExamplesForEditingByIds: (ids: number[]) => Promise<ExampleTechnical[]>;
   searchExamplesByText: (
-    searchText: ExampleTextSearch,
+    search: ExampleTextSearch,
     page: number,
     limit: number,
-  ) => Promise<{ examples: ExampleWithVocabulary[] }>;
+  ) => Promise<ExampleWithVocabulary[]>;
+  getExamplesByRecentlyModified: (
+    page: number,
+    limit: number,
+  ) => Promise<ExampleTechnical[]>;
 
   // Mutation methods
   createExamples: (

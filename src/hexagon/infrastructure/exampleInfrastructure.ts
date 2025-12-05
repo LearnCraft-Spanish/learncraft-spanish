@@ -15,6 +15,7 @@ import {
   deleteExamplesEndpoint,
   getExamplesByIdsWithTechnicalDataEndpoint,
   getExamplesByIdsWithVocabularyEndpoint,
+  getExamplesByMostRecentlyModifiedEndpoint,
   queryExamplesEndpoint,
   searchExamplesByTextEndpoint,
   updateExamplesEndpoint,
@@ -60,10 +61,8 @@ export function createExampleInfrastructure(
 
     getExamplesByIds: async (
       ids: number[],
-    ): Promise<{ examples: ExampleWithVocabulary[] }> => {
-      const response = await httpClient.post<{
-        examples: ExampleWithVocabulary[];
-      }>(
+    ): Promise<ExampleWithVocabulary[]> => {
+      const response = await httpClient.post<ExampleWithVocabulary[]>(
         getExamplesByIdsWithVocabularyEndpoint.path,
         getExamplesByIdsWithVocabularyEndpoint.requiredScopes,
         {
@@ -86,17 +85,31 @@ export function createExampleInfrastructure(
       return response;
     },
     searchExamplesByText: async (
-      searchText: ExampleTextSearch,
+      search: ExampleTextSearch,
       page: number,
       limit: number,
-    ): Promise<{ examples: ExampleWithVocabulary[] }> => {
+    ): Promise<ExampleWithVocabulary[]> => {
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
       }>(
         searchExamplesByTextEndpoint.path,
         searchExamplesByTextEndpoint.requiredScopes,
         {
-          searchText,
+          search,
+          page,
+          limit,
+        },
+      );
+      return response;
+    },
+    getExamplesByRecentlyModified: async (
+      page: number,
+      limit: number,
+    ): Promise<ExampleTechnical[]> => {
+      const response = await httpClient.post<ExampleTechnical[]>(
+        getExamplesByMostRecentlyModifiedEndpoint.path,
+        getExamplesByMostRecentlyModifiedEndpoint.requiredScopes,
+        {
           page,
           limit,
         },
