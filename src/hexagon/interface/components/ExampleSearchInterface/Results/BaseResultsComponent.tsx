@@ -1,5 +1,7 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-
+import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
+import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
+import BulkAddButton from '@interface/components/ExampleListItem/units/BulkAddButton';
 /**
  * BaseResultsComponent is a component that displays the search results.
  * all implementations will be a wrapper fetching, then displaying the results.
@@ -15,6 +17,8 @@ export function BaseResultsComponent({
   examples: ExampleWithVocabulary[] | undefined;
   info?: string;
 }) {
+  const { addSelectedExample, removeSelectedExample, selectedExampleIds } =
+    useSelectedExamplesContext();
   if (info) {
     return <p>{info}</p>;
   }
@@ -36,10 +40,30 @@ export function BaseResultsComponent({
   }
 
   return (
-    <ul>
+    // Remove bullet point style
+    <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
       {examples.map((example) => (
         <li key={example.id}>
-          {example.id} - <strong>{example.spanish}</strong> — {example.english}
+          {/* {example.id} - <strong>{example.spanish}</strong> — {example.english} */}
+          <ExampleListItemFactory
+            example={example}
+            preTextComponents={[
+              <BulkAddButton
+                key="bulkAddButton"
+                id={example.id}
+                handleSelect={() => {
+                  addSelectedExample(example.id);
+                }}
+                handleRemoveSelected={() => {
+                  removeSelectedExample(example.id);
+                }}
+                isSelected={selectedExampleIds.includes(example.id)}
+                // Unused Props
+                isCollected={false}
+                isPending={false}
+              />,
+            ]}
+          />
         </li>
       ))}
     </ul>
