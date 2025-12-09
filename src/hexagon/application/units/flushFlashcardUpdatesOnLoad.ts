@@ -33,12 +33,12 @@ export function useFlushFlashcardUpdatesOnLoad() {
 
           if (!flashcard) return false; // flashcard has been deleted, remove from batch
 
-          // If flashcard has a lastReviewed date, compare it with our pending update date
+          // If flashcard's lastReviewed is same or more recent than our pending update,
+          // the update has already been synced - remove from batch
           if (flashcard.lastReviewed) {
-            // If flashcard's lastReviewed is same or more recent than our pending update,
-            // the update has already been synced - remove from batch
-            // TODO: Change to date.isoString DAY formay, make comparison actually work
-            if (flashcard.lastReviewed >= lastReviewedDate) {
+            const dateOnFlashcard = new Date(flashcard.lastReviewed);
+            const dateOnPendingUpdate = new Date(lastReviewedDate);
+            if (dateOnFlashcard >= dateOnPendingUpdate) {
               return false;
             }
           }
