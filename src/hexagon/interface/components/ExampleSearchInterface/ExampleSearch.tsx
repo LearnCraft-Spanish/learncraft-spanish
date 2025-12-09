@@ -5,6 +5,7 @@ import { transformToLessonRanges } from '@domain/coursePrerequisites';
 import { Filters } from '@interface/components/ExampleSearchInterface/Filters/Filters';
 import { Results } from '@interface/components/ExampleSearchInterface/Results/Results';
 import { SearchModeNav } from '@interface/components/ExampleSearchInterface/SearchModeNav';
+import { SelectedExamples } from '@interface/components/ExampleSearchInterface/SelectedExamples';
 import { useMemo, useState } from 'react';
 
 export default function ExampleSearch() {
@@ -194,6 +195,7 @@ export default function ExampleSearch() {
           />
         )}
       </div>
+      <SelectedExamples />
     </div>
   );
 }
