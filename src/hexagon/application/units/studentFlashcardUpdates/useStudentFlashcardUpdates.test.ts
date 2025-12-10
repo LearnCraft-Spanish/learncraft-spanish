@@ -9,11 +9,20 @@ import {
 } from '@application/units/useStudentFlashcards.mock';
 import { act, renderHook } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
+import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { vi } from 'vitest';
 
 describe('useStudentFlashcardUpdates', () => {
   beforeEach(() => {
+    overrideAuthAndAppUser(
+      {
+        authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
+        isStudent: true,
+      },
+      { isOwnUser: true },
+    );
     // Reset mocks to default state before each test
     resetMockLocalStorageAdapter();
     resetMockUseStudentFlashcards();
