@@ -71,7 +71,7 @@ export function useTextQuizSetup({
     ownedOnly && isOwnUser && appUser?.studentRole === 'student';
 
   // Local states with boolean choices
-  const [srsQuiz, setSrsQuiz] = useState<boolean>(true);
+  const [srsQuiz, setSrsQuiz] = useState<boolean>(canAccessSRS);
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
   const [customFlashcardsChoice, setCustomFlashcardsChoice] = useState<
     'included' | 'onlyCustom' | 'excluded'
