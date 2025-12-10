@@ -1,13 +1,10 @@
-import type {
-  TableColumn,
-  TableHook,
-} from '@application/units/pasteTable/types';
+import type { TableColumn, TableHook } from '@domain/PasteTable/General';
 import {
   useTablePaste,
   useTableRows,
   useTableValidation,
 } from '@application/units/pasteTable/hooks';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useCallback } from 'react';
 
 interface UsePasteTableOptions<T> {

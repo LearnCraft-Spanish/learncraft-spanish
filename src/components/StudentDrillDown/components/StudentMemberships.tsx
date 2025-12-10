@@ -170,6 +170,16 @@ export default function StudentMemberships({
                               {membership.callsCompleted}
                             </span>
                           </div>
+                          <div className="membership-details">
+                            <div className="detail-row">
+                              <span className="detail-label">
+                                Total Strategy Calls:
+                              </span>
+                              <span className="detail-value">
+                                {membership.totalStrategyCalls}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>

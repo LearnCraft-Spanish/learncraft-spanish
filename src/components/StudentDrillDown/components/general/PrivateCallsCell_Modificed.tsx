@@ -18,7 +18,11 @@ const ratingOptions = [
   'Late Cancel',
   'No-Show',
 ];
-const callTypeOptions = ['Monthly Call', 'Uses Credit (Bundle)'];
+const callTypeOptions = [
+  'Monthly Call',
+  'Strategy Call',
+  'Uses Credit (Bundle)',
+];
 function PrivateCallInstance({
   call,
   studentName,

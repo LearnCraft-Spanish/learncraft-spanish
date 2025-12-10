@@ -1,4 +1,4 @@
-import type { TableColumn } from '@application/units/pasteTable/types';
+import type { TableColumn } from '@domain/PasteTable/General';
 import React from 'react';
 
 // TableCellInput component to handle rendering different input types for table cells

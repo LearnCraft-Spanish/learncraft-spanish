@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
+import { IsFlushingStudentFlashcardUpdatesProvider } from '@application/coordinators/providers/IsFlushingStudentFlashcardUpdatesProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { ModalProvider } from '@composition/providers/ModalProvider';
@@ -24,17 +25,21 @@ export default function MockAllProviders({
           <MockQueryClientProvider>
             <ActiveStudentProvider>
               <SelectedCourseAndLessonsProvider>
-                {route === '/' && (
-                  <MockQueryClientProvider>{children}</MockQueryClientProvider>
-                )}
-                {route !== '/' && (
-                  <Routes>
-                    <Route
-                      path={`${route}${childRoutes ? '/*' : ''}`}
-                      element={children}
-                    />
-                  </Routes>
-                )}
+                <IsFlushingStudentFlashcardUpdatesProvider>
+                  {route === '/' && (
+                    <MockQueryClientProvider>
+                      {children}
+                    </MockQueryClientProvider>
+                  )}
+                  {route !== '/' && (
+                    <Routes>
+                      <Route
+                        path={`${route}${childRoutes ? '/*' : ''}`}
+                        element={children}
+                      />
+                    </Routes>
+                  )}
+                </IsFlushingStudentFlashcardUpdatesProvider>
               </SelectedCourseAndLessonsProvider>
             </ActiveStudentProvider>
           </MockQueryClientProvider>

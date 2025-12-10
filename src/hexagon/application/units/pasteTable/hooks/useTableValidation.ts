@@ -1,5 +1,5 @@
-import type { TableRow } from '@application/units/pasteTable/types';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/types';
+import type { TableRow } from '@domain/PasteTable/General';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useCallback, useMemo } from 'react';
 
 interface UseTableValidationProps<T> {

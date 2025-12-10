@@ -2,11 +2,23 @@ import type { AuthPort } from '@application/ports/authPort';
 import type { LessonRange } from '@application/ports/coursePort';
 import type { ExamplePort } from '@application/ports/examplePort';
 import type {
+  CreateExamplesCommand,
+  ExampleTechnical,
+  ExampleTextSearch,
   ExampleWithVocabulary,
   SkillTag,
+  UpdateExamplesCommand,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
-import { queryExamplesEndpoint } from '@learncraft-spanish/shared';
+import {
+  createExamplesEndpoint,
+  deleteExamplesEndpoint,
+  getExamplesByIdsWithTechnicalDataEndpoint,
+  getExamplesByIdsWithVocabularyEndpoint,
+  queryExamplesEndpoint,
+  searchExamplesByTextEndpoint,
+  updateExamplesEndpoint,
+} from '@learncraft-spanish/shared';
 
 export function createExampleInfrastructure(
   apiUrl: string,
@@ -24,7 +36,7 @@ export function createExampleInfrastructure(
       limit: number;
       seed: string;
       disableCache?: boolean;
-    }) => {
+    }): Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }> => {
       // Always use lesson ranges - no more backward compatibility
       const filters = {
         lessonRanges: params.lessonRanges,
@@ -44,6 +56,83 @@ export function createExampleInfrastructure(
         disableCache: params.disableCache ?? false,
       });
       return response;
+    },
+
+    getExamplesByIds: async (
+      ids: number[],
+    ): Promise<{ examples: ExampleWithVocabulary[] }> => {
+      const response = await httpClient.post<{
+        examples: ExampleWithVocabulary[];
+      }>(
+        getExamplesByIdsWithVocabularyEndpoint.path,
+        getExamplesByIdsWithVocabularyEndpoint.requiredScopes,
+        {
+          ids,
+        },
+      );
+      return response;
+    },
+
+    getExamplesForEditingByIds: async (
+      ids: number[],
+    ): Promise<{ examples: ExampleTechnical[] }> => {
+      const response = await httpClient.post<{
+        examples: ExampleTechnical[];
+      }>(
+        getExamplesByIdsWithTechnicalDataEndpoint.path,
+        getExamplesByIdsWithTechnicalDataEndpoint.requiredScopes,
+        { ids },
+      );
+      return response;
+    },
+    searchExamplesByText: async (
+      searchText: ExampleTextSearch,
+      page: number,
+      limit: number,
+    ): Promise<{ examples: ExampleWithVocabulary[] }> => {
+      const response = await httpClient.post<{
+        examples: ExampleWithVocabulary[];
+      }>(
+        searchExamplesByTextEndpoint.path,
+        searchExamplesByTextEndpoint.requiredScopes,
+        {
+          searchText,
+          page,
+          limit,
+        },
+      );
+      return response;
+    },
+    createExamples: async (
+      exampleCreates: CreateExamplesCommand,
+    ): Promise<ExampleWithVocabulary[]> => {
+      const response = await httpClient.post<{
+        examples: ExampleWithVocabulary[];
+      }>(createExamplesEndpoint.path, createExamplesEndpoint.requiredScopes, {
+        body: exampleCreates,
+      });
+      return response.examples;
+    },
+    updateExamples: async (
+      exampleEdits: UpdateExamplesCommand,
+    ): Promise<ExampleWithVocabulary[]> => {
+      const response = await httpClient.put<{
+        examples: ExampleWithVocabulary[];
+      }>(updateExamplesEndpoint.path, updateExamplesEndpoint.requiredScopes, {
+        body: exampleEdits,
+      });
+      return response.examples;
+    },
+
+    deleteExamples: async (exampleIds: number[]): Promise<number[]> => {
+      const response = await httpClient.delete<{
+        deletedExampleIds: number[];
+      }>(deleteExamplesEndpoint.path, deleteExamplesEndpoint.requiredScopes, {
+        params: {
+          exampleIds: exampleIds.join(','),
+        },
+      });
+      return response.deletedExampleIds;
     },
   };
 }

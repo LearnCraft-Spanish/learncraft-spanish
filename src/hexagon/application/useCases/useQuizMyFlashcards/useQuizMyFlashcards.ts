@@ -1,5 +1,5 @@
+import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
-import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';

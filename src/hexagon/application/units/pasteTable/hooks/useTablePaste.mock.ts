@@ -1,7 +1,4 @@
-import type {
-  TableColumn,
-  TableRow,
-} from '@application/units/pasteTable/types';
+import type { TableColumn, TableRow } from '@domain/PasteTable/General';
 import type { ClipboardEvent } from 'react';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 

@@ -80,6 +80,7 @@ export type Membership = Expanded<{
   relatedStudent: number;
   assignmentsCompleted: number;
   callsCompleted: number;
+  totalStrategyCalls: number;
   primaryCoach: number;
 }>;
 

@@ -1,5 +1,5 @@
-import type { TableHook } from '@application/units/pasteTable';
 import type { VocabularyPaginationState } from '@application/useCases/types';
+import type { TableHook } from '@domain/PasteTable/General';
 import type {
   CreateNonVerbVocabulary,
   Subcategory,
