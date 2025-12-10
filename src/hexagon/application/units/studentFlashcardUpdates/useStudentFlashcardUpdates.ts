@@ -95,7 +95,18 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
             console.error(`Flashcard not found for example ID: ${exampleId}`);
             return null;
           }
-
+          // Filter out updates that have already been synced
+          // Compare flashcard lastReviewed date with localStorage update lastReviewedDate
+          if (flashcard.lastReviewed) {
+            const dateOnFlashcard = new Date(flashcard.lastReviewed);
+            const dateOnPendingUpdate = new Date(lastReviewedDate);
+            if (dateOnFlashcard >= dateOnPendingUpdate) {
+              console.error(
+                `Flashcard ${flashcard.id} has already been reviewed on ${dateOnFlashcard.toISOString()}.`,
+              );
+              return null;
+            }
+          }
           const newInterval = calculateNewSrsInterval(
             flashcard.interval ?? 0, // current interval
             difficulty,
@@ -108,7 +119,6 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
           };
         })
         .filter((update) => update !== null);
-
       // Send batch update to backend
       if (updates.length > 0) {
         await updateFlashcards(updates);
