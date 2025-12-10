@@ -1,3 +1,4 @@
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useStudentFlashcardUpdates } from '@application/units/studentFlashcardUpdates/useStudentFlashcardUpdates';
 import { useStudentFlashcardUpdatesUtils } from '@application/units/studentFlashcardUpdates/utils';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
@@ -5,6 +6,7 @@ import { useEffect, useRef } from 'react';
 
 export function useFlushFlashcardUpdatesOnLoad() {
   const { flashcards, getFlashcardByExampleId } = useStudentFlashcards();
+  const { appUser, isOwnUser } = useActiveStudent();
 
   const { flushBatch: flushStudentFlashcardUpdates } =
     useStudentFlashcardUpdates();
@@ -20,6 +22,7 @@ export function useFlushFlashcardUpdatesOnLoad() {
   useEffect(() => {
     if (!hasAttemptedInitialFlushRef.current && flashcards) {
       hasAttemptedInitialFlushRef.current = true;
+      if (!isOwnUser || appUser?.studentRole !== 'student') return; // Only Students can have flashcards & flashcard updates
 
       const storedUpdates = getPendingFlashcardUpdateObjectsFromLocalStorage();
 
@@ -60,6 +63,8 @@ export function useFlushFlashcardUpdatesOnLoad() {
     }
   }, [
     flashcards,
+    isOwnUser,
+    appUser?.studentRole,
     getFlashcardByExampleId,
     flushStudentFlashcardUpdates,
     getPendingFlashcardUpdateObjectsFromLocalStorage,
