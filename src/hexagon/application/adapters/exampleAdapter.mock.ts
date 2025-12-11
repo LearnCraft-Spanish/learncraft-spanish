@@ -1,7 +1,6 @@
 import type { ExamplePort } from '@application/ports/examplePort';
 import type {
   CreateExamplesCommand,
-  ExampleTechnical,
   ExampleWithVocabulary,
   UpdateExamplesCommand,
 } from '@learncraft-spanish/shared';
@@ -17,19 +16,10 @@ const defaultMockAdapter: ExamplePort = {
     examples: createMockExampleWithVocabularyList(3),
     totalCount: 3,
   }),
-  getExamplesByIds: async () => ({
-    examples: createMockExampleWithVocabularyList(2),
-  }),
-  getExamplesForEditingByIds: async (): Promise<{
-    examples: ExampleTechnical[];
-  }> => {
-    return {
-      examples: createMockExampleTechnicalList(2),
-    };
-  },
-  searchExamplesByText: async () => ({
-    examples: createMockExampleWithVocabularyList(5),
-  }),
+  getExamplesByIds: async () => createMockExampleWithVocabularyList(2),
+  getExamplesForEditingByIds: async () => createMockExampleTechnicalList(2),
+  searchExamplesByText: async () => createMockExampleWithVocabularyList(5),
+  getExamplesByRecentlyModified: async () => createMockExampleTechnicalList(2),
   createExamples: async (
     _exampleCreates: CreateExamplesCommand,
   ): Promise<ExampleWithVocabulary[]> => {

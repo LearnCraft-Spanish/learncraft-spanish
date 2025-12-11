@@ -1,5 +1,4 @@
 import type { LocalFilterPanelProps } from '@interface/components/ExampleSearchInterface/Filters/LocalFilterPanel';
-import type { SearchByDateProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByDate';
 import type { SearchByIdsProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
 import type { SearchByQuizProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import type { SearchByTextProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
@@ -13,14 +12,12 @@ import { SearchByText } from '@interface/components/ExampleSearchInterface/Filte
 export function Filters({
   mode,
   localFilterProps,
-  searchByDateProps,
   searchByQuizProps,
   searchByTextProps,
   searchByIdsProps,
 }: {
   mode: ExampleSearchMode;
   localFilterProps: LocalFilterPanelProps;
-  searchByDateProps: SearchByDateProps;
   searchByQuizProps: SearchByQuizProps;
   searchByTextProps: SearchByTextProps;
   searchByIdsProps: SearchByIdsProps;
@@ -28,7 +25,7 @@ export function Filters({
   if (mode === 'filter') {
     return <LocalFilterPanel {...localFilterProps} />;
   } else if (mode === 'date') {
-    return <SearchByDate {...searchByDateProps} />;
+    return <SearchByDate />;
   } else if (mode === 'quiz') {
     return <SearchByQuiz {...searchByQuizProps} />;
   } else if (mode === 'text') {

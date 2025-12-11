@@ -9,9 +9,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 describe('useSearchExamplesQuery', () => {
   beforeEach(() => {
     overrideMockExampleAdapter({
-      searchExamplesByText: async () => ({
-        examples: createMockExampleWithVocabularyList(5),
-      }),
+      searchExamplesByText: async () => createMockExampleWithVocabularyList(5),
     });
   });
 
@@ -23,9 +21,7 @@ describe('useSearchExamplesQuery', () => {
       englishText: 'hello',
     };
     overrideMockExampleAdapter({
-      searchExamplesByText: async () => ({
-        examples: mockData,
-      }),
+      searchExamplesByText: async () => mockData,
     });
 
     // Act
@@ -81,9 +77,9 @@ describe('useSearchExamplesQuery', () => {
     overrideMockExampleAdapter({
       searchExamplesByText: async (_searchText, page, _limit) => {
         if (page === 1) {
-          return { examples: page1Data };
+          return page1Data;
         }
-        return { examples: page2Data };
+        return page2Data;
       },
     });
 
@@ -111,9 +107,7 @@ describe('useSearchExamplesQuery', () => {
       englishText: 'nonexistent',
     };
     overrideMockExampleAdapter({
-      searchExamplesByText: async () => ({
-        examples: [],
-      }),
+      searchExamplesByText: async () => [],
     });
 
     // Act

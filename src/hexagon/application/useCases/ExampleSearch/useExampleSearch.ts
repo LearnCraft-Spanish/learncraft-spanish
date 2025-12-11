@@ -1,13 +1,8 @@
 import type { LocalFilterPanelProps } from '@interface/components/ExampleSearchInterface/Filters/LocalFilterPanel';
-import type {
-  DateMode,
-  SearchByDateProps,
-} from '@interface/components/ExampleSearchInterface/Filters/SearchByDate';
 import type { SearchByIdsProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
 import type { SearchByQuizProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import type { SearchByTextProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
 import type { LocalFilterPanelResultsProps } from '@interface/components/ExampleSearchInterface/Results/LocalFilterPanelResults';
-import type { SearchByDateResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByDateResults';
 import type { SearchByIdsResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByIdsResults';
 import type { SearchByQuizResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByQuizResults';
 import type { SearchByTextResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByTextResults';
@@ -18,7 +13,6 @@ import { useCallback, useMemo, useState } from 'react';
 
 export interface SearchComponentProps {
   localFilterProps: LocalFilterPanelProps;
-  searchByDateProps: SearchByDateProps;
   searchByQuizProps: SearchByQuizProps;
   searchByTextProps: SearchByTextProps;
   searchByIdsProps: SearchByIdsProps;
@@ -26,7 +20,6 @@ export interface SearchComponentProps {
 
 export interface SearchResultProps {
   localFilterResultsProps: LocalFilterPanelResultsProps;
-  dateResultsProps: SearchByDateResultsProps;
   quizResultsProps: SearchByQuizResultsProps;
   textResultsProps: SearchByTextResultsProps;
   idsResultsProps: SearchByIdsResultsProps;
@@ -47,15 +40,6 @@ export function useExampleSearch() {
   // Quiz search state
   const [courseCode, setCourseCode] = useState('');
   const [quizNumber, setQuizNumber] = useState<number | ''>('');
-
-  // Date search state
-  const [fromDate, setFromDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 7);
-    return d.toISOString().slice(0, 10);
-  });
-  const [toDate, setToDate] = useState(new Date().toISOString().slice(0, 10));
-  const [dateMode, setDateMode] = useState<DateMode>('created');
 
   // Filter panel state
   const [selectedCourseId, setSelectedCourseId] = useState<number>(0);
@@ -156,14 +140,6 @@ export function useExampleSearch() {
         onFromLessonChange: withSearchReset(setFromLessonNumber),
         onToLessonChange: withSearchReset(setToLessonNumber),
       },
-      searchByDateProps: {
-        fromDate: fromDate ?? '',
-        toDate: toDate ?? '',
-        mode: dateMode,
-        onFromDateChange: withSearchReset(setFromDate),
-        onToDateChange: withSearchReset(setToDate),
-        onModeChange: withSearchReset(setDateMode),
-      },
       searchByQuizProps: {
         courseCode: courseCode ?? '',
         quizNumber: quizNumber ?? 0,
@@ -186,9 +162,6 @@ export function useExampleSearch() {
       selectedCourseId,
       fromLessonNumber,
       toLessonNumber,
-      fromDate,
-      toDate,
-      dateMode,
       courseCode,
       quizNumber,
       spanishInput,
@@ -205,10 +178,6 @@ export function useExampleSearch() {
         excludeSpanglish: filtersForUI.excludeSpanglish,
         audioOnly: filtersForUI.audioOnly,
         lessonRanges,
-      },
-      dateResultsProps: {
-        _fromDate: fromDate,
-        _toDate: toDate,
       },
       quizResultsProps: {
         courseCode,
@@ -227,8 +196,6 @@ export function useExampleSearch() {
       filtersForUI.excludeSpanglish,
       filtersForUI.audioOnly,
       lessonRanges,
-      fromDate,
-      toDate,
       courseCode,
       quizNumber,
       spanishInput,

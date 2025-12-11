@@ -14,18 +14,25 @@ export function LocalFilterPanelResults({
   audioOnly,
   lessonRanges,
 }: LocalFilterPanelResultsProps) {
-  const { examples, isLoading, error } = useLocalFilterPanelResults({
-    skillTags,
-    excludeSpanglish,
-    audioOnly,
-    lessonRanges,
-  });
+  const { examples, isLoading, error, paginationState } =
+    useLocalFilterPanelResults({
+      skillTags,
+      excludeSpanglish,
+      audioOnly,
+      lessonRanges,
+    });
 
   return (
     <BaseResultsComponent
       isLoading={isLoading}
       error={error}
       examples={examples}
+      pagination={{
+        page: paginationState.page,
+        maxPage: paginationState.maxPageNumber,
+        nextPage: paginationState.nextPage,
+        previousPage: paginationState.previousPage,
+      }}
     />
   );
 }

@@ -6,13 +6,21 @@ export interface SearchByIdsResultsProps {
 }
 
 export function SearchByIdsResults({ ids }: SearchByIdsResultsProps) {
-  const { examples, isLoading, error } = useSearchByIdsResults({ ids });
+  const { examples, isLoading, error, paginationState } = useSearchByIdsResults(
+    { ids },
+  );
 
   return (
     <BaseResultsComponent
       isLoading={isLoading}
       error={error}
       examples={examples}
+      pagination={{
+        page: paginationState.pageNumber,
+        maxPage: paginationState.maxPageNumber,
+        nextPage: paginationState.nextPage,
+        previousPage: paginationState.previousPage,
+      }}
     />
   );
 }

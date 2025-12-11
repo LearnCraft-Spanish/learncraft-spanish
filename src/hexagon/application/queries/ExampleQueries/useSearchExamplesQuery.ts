@@ -5,7 +5,7 @@ import type {
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { queryDefaults } from '@application/utils/queryUtils';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export interface UseSearchExamplesQueryReturnType {
   examples: ExampleWithVocabulary[] | undefined;
@@ -25,7 +25,7 @@ export const useSearchExamplesQuery = (
   }, []);
   const { searchExamplesByText } = useExampleAdapter();
   const {
-    data: examplesResponse,
+    data: examples,
     isLoading,
     error,
   } = useQuery({
@@ -33,10 +33,6 @@ export const useSearchExamplesQuery = (
     queryFn: () => searchExamplesByText(searchText, page, PAGE_SIZE),
     ...queryDefaults.referenceData,
   });
-
-  const examples = useMemo(() => {
-    return examplesResponse?.examples ?? undefined;
-  }, [examplesResponse]);
 
   return {
     examples,

@@ -9,7 +9,7 @@ export function useExamplesByRecentlyModified(page: number, limit: number) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['examples', 'by recently modified'],
+    queryKey: ['examples', 'by recently modified', page],
     queryFn: () => getExamplesByRecentlyModified(page, limit),
     ...queryDefaults.referenceData,
   });

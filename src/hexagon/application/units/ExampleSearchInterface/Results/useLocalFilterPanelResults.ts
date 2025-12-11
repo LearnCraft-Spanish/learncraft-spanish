@@ -1,9 +1,13 @@
 import type { LessonRange, SkillTag } from '@learncraft-spanish/shared';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import z from 'zod';
+
+const PAGE_SIZE = 25;
+const QUERY_PAGE_SIZE = 100;
 
 export interface UseLocalFilterPanelResultsParams {
   skillTags: SkillTag[];
@@ -18,6 +22,12 @@ export function useLocalFilterPanelResults({
   audioOnly,
   lessonRanges,
 }: UseLocalFilterPanelResultsParams) {
+  const [queryPage, setQueryPage] = useState(1);
+
+  const changeQueryPage = useCallback((page: number) => {
+    setQueryPage(page);
+  }, []);
+
   const exampleAdapter = useExampleAdapter();
 
   const seed: string | null = useMemo(() => {
@@ -43,18 +53,19 @@ export function useLocalFilterPanelResults({
       lessonRanges,
       excludeSpanglish,
       audioOnly,
-      page: 1, //TEMPORARY - we don't support pagination for this query
-      limit: 100, //TEMPORARY - we don't support pagination for this query
+      page: queryPage,
+      limit: QUERY_PAGE_SIZE,
       seed: seed!,
       disableCache: true,
     });
-    return result.examples;
+    return { examples: result.examples, totalCount: result.totalCount };
   }, [
     exampleAdapter,
     skillTags,
     lessonRanges,
     excludeSpanglish,
     audioOnly,
+    queryPage,
     seed,
   ]);
 
@@ -70,15 +81,30 @@ export function useLocalFilterPanelResults({
       excludeSpanglish,
       audioOnly,
       lessonRanges,
+      queryPage,
       seed,
     ],
     queryFn: () => fetchFilteredExamples(),
     enabled: !!seed,
   });
 
+  const paginationState = useQueryPagination({
+    queryPage,
+    pageSize: PAGE_SIZE,
+    queryPageSize: QUERY_PAGE_SIZE,
+    totalCount: results?.totalCount,
+    changeQueryPage,
+  });
+
+  // Calculate the examples for the current page
+  const startIndex = paginationState.pageWithinQueryBatch * PAGE_SIZE;
+  const endIndex = startIndex + PAGE_SIZE;
+  const paginatedExamples = results?.examples.slice(startIndex, endIndex) ?? [];
+
   return {
-    examples: results ?? undefined,
+    examples: paginatedExamples,
     isLoading,
     error: error ?? null,
+    paginationState,
   };
 }

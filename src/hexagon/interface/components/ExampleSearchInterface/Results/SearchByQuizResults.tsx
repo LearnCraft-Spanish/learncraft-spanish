@@ -9,16 +9,23 @@ export function SearchByQuizResults({
   courseCode,
   quizNumber,
 }: SearchByQuizResultsProps) {
-  const { examples, isLoading, error } = useSearchByQuizResults({
-    courseCode,
-    quizNumber,
-  });
+  const { examples, isLoading, error, paginationState } =
+    useSearchByQuizResults({
+      courseCode,
+      quizNumber,
+    });
 
   return (
     <BaseResultsComponent
       isLoading={isLoading}
       error={error}
       examples={examples}
+      pagination={{
+        page: paginationState.pageNumber,
+        maxPage: paginationState.maxPageNumber,
+        nextPage: paginationState.nextPage,
+        previousPage: paginationState.previousPage,
+      }}
     />
   );
 }

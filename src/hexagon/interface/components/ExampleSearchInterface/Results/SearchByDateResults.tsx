@@ -1,20 +1,21 @@
-import { useExamplesByRecentlyModified } from '@application/queries/ExampleQueries/useExamplesByRecentlyModified';
+import { useSearchByDatePagination } from '@application/units/ExampleSearchInterface/Results/useSearchByDatePagination';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
 
-export interface SearchByDateResultsProps {
-  _fromDate: string;
-  _toDate: string;
-}
-export function SearchByDateResults({
-  _fromDate,
-  _toDate,
-}: SearchByDateResultsProps) {
-  const { examples, isLoading, error } = useExamplesByRecentlyModified(1, 100);
+export function SearchByDateResults() {
+  const { examples, isLoading, error, paginationState } =
+    useSearchByDatePagination();
+
   return (
     <BaseResultsComponent
       isLoading={isLoading}
-      error={error ?? null}
+      error={error}
       examples={examples}
+      pagination={{
+        page: paginationState.page,
+        maxPage: paginationState.maxPageNumber || 100,
+        nextPage: paginationState.nextPage,
+        previousPage: paginationState.previousPage,
+      }}
     />
   );
 }

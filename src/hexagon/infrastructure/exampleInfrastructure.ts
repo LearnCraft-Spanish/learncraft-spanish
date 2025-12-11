@@ -74,10 +74,8 @@ export function createExampleInfrastructure(
 
     getExamplesForEditingByIds: async (
       ids: number[],
-    ): Promise<{ examples: ExampleTechnical[] }> => {
-      const response = await httpClient.post<{
-        examples: ExampleTechnical[];
-      }>(
+    ): Promise<ExampleTechnical[]> => {
+      const response = await httpClient.post<ExampleTechnical[]>(
         getExamplesByIdsWithTechnicalDataEndpoint.path,
         getExamplesByIdsWithTechnicalDataEndpoint.requiredScopes,
         { ids },
@@ -89,9 +87,7 @@ export function createExampleInfrastructure(
       page: number,
       limit: number,
     ): Promise<ExampleWithVocabulary[]> => {
-      const response = await httpClient.post<{
-        examples: ExampleWithVocabulary[];
-      }>(
+      const response = await httpClient.post<ExampleWithVocabulary[]>(
         searchExamplesByTextEndpoint.path,
         searchExamplesByTextEndpoint.requiredScopes,
         {

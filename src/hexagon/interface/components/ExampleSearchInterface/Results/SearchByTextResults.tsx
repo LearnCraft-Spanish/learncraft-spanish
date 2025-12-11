@@ -10,16 +10,23 @@ export function SearchByTextResults({
   spanishString,
   englishString,
 }: SearchByTextResultsProps) {
-  const { examples, isLoading, error } = useSearchByTextResults({
-    spanishString,
-    englishString,
-  });
+  const { examples, isLoading, error, paginationState } =
+    useSearchByTextResults({
+      spanishString,
+      englishString,
+    });
 
   return (
     <BaseResultsComponent
       isLoading={isLoading}
       error={error}
       examples={examples}
+      pagination={{
+        page: paginationState.page,
+        maxPage: paginationState.maxPageNumber || 100,
+        nextPage: paginationState.nextPage,
+        previousPage: paginationState.previousPage,
+      }}
     />
   );
 }

@@ -1,43 +1,21 @@
-import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import { useExamplesByRecentlyModified } from '@application/queries/ExampleQueries/useExamplesByRecentlyModified';
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
-import { useQuery } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
 const PAGE_SIZE = 25;
 const QUERY_PAGE_SIZE = 100;
 
-export interface UseSearchByTextResultsParams {
-  spanishString: string;
-  englishString: string;
-}
-
-export function useSearchByTextResults({
-  spanishString,
-  englishString,
-}: UseSearchByTextResultsParams) {
+export function useSearchByDatePagination() {
   const [queryPage, setQueryPage] = useState(1);
 
   const changeQueryPage = useCallback((page: number) => {
     setQueryPage(page);
   }, []);
 
-  const { searchExamplesByText } = useExampleAdapter();
-  const {
-    data: results,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['examples', 'by text', spanishString, englishString, queryPage],
-    queryFn: () =>
-      searchExamplesByText(
-        {
-          spanishText: spanishString,
-          englishText: englishString,
-        },
-        queryPage,
-        QUERY_PAGE_SIZE,
-      ),
-  });
+  const { examples, isLoading, error } = useExamplesByRecentlyModified(
+    queryPage,
+    QUERY_PAGE_SIZE,
+  );
 
   const paginationState = useQueryPagination({
     queryPage,
@@ -50,7 +28,7 @@ export function useSearchByTextResults({
   // Calculate the examples for the current page
   const startIndex = paginationState.pageWithinQueryBatch * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
-  const paginatedExamples = results?.slice(startIndex, endIndex) ?? [];
+  const paginatedExamples = examples?.slice(startIndex, endIndex) ?? [];
 
   return {
     examples: paginatedExamples,
