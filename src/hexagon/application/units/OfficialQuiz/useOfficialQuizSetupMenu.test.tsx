@@ -1,3 +1,6 @@
+import mockSelectedCourseAndLessons from '../../coordinators/hooks/useSelectedCourseAndLessons.mock';
+
+import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { renderHook, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
@@ -187,6 +190,56 @@ describe('useOfficialQuizSetupMenu', () => {
 
       // Clean up
       consoleErrorSpy.mockRestore();
+    });
+  });
+
+  describe('setUserSelectedCourseCode function', () => {
+    const Wrapper = ({ children }: { children: React.ReactNode }) => (
+      <MemoryRouter>
+        <TestQueryClientProvider>{children}</TestQueryClientProvider>
+      </MemoryRouter>
+    );
+
+    beforeEach(() => {
+      mockSelectedCourseAndLessons.updateUserSelectedCourseId.mockClear();
+    });
+
+    it('converts lcspx to lcsp, updates coordinator', async () => {
+      const lcspCourseId =
+        officialQuizCourses.find((course) => course.code === 'lcsp')
+          ?.courseId ?? null;
+
+      const { result } = renderHook(() => useOfficialQuizSetupMenu(), {
+        wrapper: Wrapper,
+      });
+
+      await waitFor(() => expect(result.current.courseCode).toBe('lcsp'));
+      await waitFor(() => expect(result.current.quizNumber).toBe(1));
+
+      result.current.setUserSelectedCourseCode('lcspx');
+
+      await waitFor(() => expect(result.current.courseCode).toBe('lcspx'));
+      expect(
+        mockSelectedCourseAndLessons.updateUserSelectedCourseId,
+      ).toHaveBeenCalledWith(lcspCourseId);
+    });
+
+    it('calls coordinator with courseId for a valid course', async () => {
+      const si1mCourseId =
+        officialQuizCourses.find((course) => course.code === 'si1m')
+          ?.courseId ?? null;
+
+      const { result } = renderHook(() => useOfficialQuizSetupMenu(), {
+        wrapper: Wrapper,
+      });
+
+      result.current.setUserSelectedCourseCode('si1m');
+
+      await waitFor(() =>
+        expect(
+          mockSelectedCourseAndLessons.updateUserSelectedCourseId,
+        ).toHaveBeenCalledWith(si1mCourseId),
+      );
     });
   });
 

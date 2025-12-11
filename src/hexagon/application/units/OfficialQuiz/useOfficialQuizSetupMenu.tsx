@@ -88,6 +88,26 @@ export function useOfficialQuizSetupMenu() {
     }
   }, [courseCode, quizNumber, navigate]);
 
+  const setUserSelectedCourseCode = useCallback(
+    (newCourseCode: string) => {
+      // if courseCode is lcspx, convert to lcsp JUST for updateUserSelectedCourseId
+      const stableCourseCode =
+        newCourseCode === 'lcspx' ? 'lcsp' : newCourseCode;
+      const course = officialQuizCourses.find(
+        (course) => course.code === stableCourseCode,
+      );
+      // update Coordinator context
+      if (!course || !course.courseId) {
+        console.error('Course not found');
+      } else {
+        updateUserSelectedCourseId(course.courseId);
+      }
+      // update local state
+      setUserSelectedCourseCodeState(newCourseCode);
+      setUserSelectedQuizNumber(0);
+    },
+    [updateUserSelectedCourseId],
+  );
   return {
     courseCode,
     setUserSelectedCourseCode,
