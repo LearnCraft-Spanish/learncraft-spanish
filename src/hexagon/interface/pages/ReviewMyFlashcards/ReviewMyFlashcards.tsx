@@ -5,13 +5,12 @@ import {
 import { CloseableFilterPanel } from '@interface/components/Filters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
+import { AudioQuizMenu, MyTextQuizMenu } from '@interface/components/Quizzing';
+import { ReviewMyFlashcardsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/ReviewMyFlashcardsAudioQuiz';
 import {
-  AudioQuizMenu,
-  MyTextQuizMenu,
-  SrsQuiz,
-  TextQuiz,
-} from '@interface/components/Quizzing';
-import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+  ReviewMyFlashcardsTextQuiz,
+  SrsTextQuiz,
+} from '@interface/components/Quizzing/TextQuiz';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
@@ -201,12 +200,12 @@ export default function MyFlashcardsQuiz() {
         </>
       ) : quizType === MyFlashcardsQuizType.Text ? (
         textQuizSetup.srsQuiz ? (
-          <SrsQuiz textQuizProps={textQuizProps} />
+          <SrsTextQuiz textQuizProps={textQuizProps} />
         ) : (
-          <TextQuiz textQuizProps={textQuizProps} />
+          <ReviewMyFlashcardsTextQuiz textQuizProps={textQuizProps} />
         )
       ) : (
-        <AudioQuiz audioQuizProps={audioQuizProps} />
+        <ReviewMyFlashcardsAudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );

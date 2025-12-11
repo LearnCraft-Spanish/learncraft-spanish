@@ -12,7 +12,7 @@ const ratings = [
   'Late Cancel',
   'No-Show',
 ];
-const callTypes = ['Monthly Call', 'Uses Credit (Bundle)'];
+const callTypes = ['Monthly Call', 'Strategy Call', 'Uses Credit (Bundle)'];
 /* ------------------ Main Function ------------------ */
 function generateCall({
   week,

@@ -1,8 +1,6 @@
-import type {
-  UseSrsReturn,
-  UseTextQuizProps,
-} from '@application/units/useTextQuiz';
-import { useTextQuiz } from '@application/units/useTextQuiz';
+import type { UseStudentFlashcardUpdatesReturn } from '@application/units/studentFlashcardUpdates';
+import type { TextQuizReturn } from '@application/units/useTextQuiz';
+import type { SrsDifficulty } from '@domain/srs';
 import { MenuButton } from '@interface/components/general/Buttons';
 import Loading from '@interface/components/Loading/Loading';
 import {
@@ -12,19 +10,27 @@ import {
 } from '@interface/components/Quizzing/general';
 import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons';
 import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 
 export interface TextQuizComponentProps {
   quizTitle?: string;
-  textQuizProps: UseTextQuizProps;
-  srsQuizProps?: UseSrsReturn;
+  useTextQuizReturn: TextQuizReturn;
+  srsQuizProps?: UseStudentFlashcardUpdatesReturn;
 }
 
+/**
+ * TextQuiz component
+ * Note: This is the base level TextQuiz. It should not be used directly. Instead, use the RegularTextQuiz, ReviewMyFlashcardsTextQuiz, or SrsTextQuiz components.
+ * @param props - props
+ * @param props.useTextQuizReturn - The return object from the useTextQuiz hook
+ * @param props.quizTitle - The title of the quiz (optional)
+ * @param props.srsQuizProps - The return object from the useStudentFlashcardUpdates hook (optional)
+ */
 export function TextQuiz({
+  useTextQuizReturn,
   quizTitle,
-  textQuizProps,
   srsQuizProps,
 }: TextQuizComponentProps) {
   const {
@@ -39,31 +45,13 @@ export function TextQuiz({
     cleanupFunction,
     isQuizComplete,
     restartQuiz,
-  } = useTextQuiz(textQuizProps);
 
-  const [getHelpIsOpen, setGetHelpIsOpen] = useState(false);
+    answerShowing,
+    toggleAnswer,
 
-  const [answerShowing, setAnswerShowing] = useState(false);
-
-  const hideAnswer = useCallback(() => {
-    setAnswerShowing(false);
-  }, []);
-
-  const incrementExample = useCallback(() => {
-    nextExample();
-    hideAnswer();
-    setGetHelpIsOpen(false);
-  }, [nextExample, hideAnswer]);
-
-  const decrementExample = useCallback(() => {
-    previousExample();
-    hideAnswer();
-    setGetHelpIsOpen(false);
-  }, [previousExample, hideAnswer]);
-
-  const toggleAnswer = useCallback(() => {
-    setAnswerShowing(!answerShowing);
-  }, [answerShowing]);
+    getHelpIsOpen,
+    setGetHelpIsOpen,
+  } = useTextQuizReturn;
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(
@@ -71,9 +59,9 @@ export function TextQuiz({
       if (isQuizComplete) return; // prevent keyboard controls when quiz is complete
 
       if (event.key === 'ArrowRight' || event.key === 'd') {
-        incrementExample();
+        nextExample();
       } else if (event.key === 'ArrowLeft' || event.key === 'a') {
-        decrementExample();
+        previousExample();
       } else if (
         event.key === 'ArrowUp' ||
         event.key === 'ArrowDown' ||
@@ -84,7 +72,7 @@ export function TextQuiz({
         toggleAnswer();
       }
     },
-    [decrementExample, incrementExample, toggleAnswer],
+    [previousExample, nextExample, toggleAnswer, isQuizComplete],
   );
 
   useEffect(() => {
@@ -140,22 +128,19 @@ export function TextQuiz({
                   hasExampleBeenReviewed={srsQuizProps.hasExampleBeenReviewed(
                     currentExample.id,
                   )}
-                  handleReviewExample={(difficulty: 'easy' | 'hard') =>
+                  handleReviewExample={(difficulty: SrsDifficulty) =>
                     srsQuizProps.handleReviewExample(
                       currentExample.id,
                       difficulty,
                     )
                   }
-                  isExampleReviewPending={srsQuizProps.isExampleReviewPending(
-                    currentExample.id,
-                  )}
                   answerShowing={answerShowing}
-                  incrementExampleNumber={incrementExample}
+                  incrementExampleNumber={nextExample}
                 />
               )}
               <QuizButtons
-                decrementExample={decrementExample}
-                incrementExample={incrementExample}
+                decrementExample={previousExample}
+                incrementExample={nextExample}
                 firstExample={exampleNumber === 1}
                 lastExample={exampleNumber === quizLength}
               />

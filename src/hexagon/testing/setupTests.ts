@@ -14,9 +14,17 @@ import {
   resetMockCourseAdapter,
 } from '@application/adapters/ courseAdapter.mock';
 import {
+  mockExampleAdapter,
+  resetMockExampleAdapter,
+} from '@application/adapters/exampleAdapter.mock';
+import {
   mockFlashcardAdapter,
   resetMockFlashcardAdapter,
 } from '@application/adapters/flashcardAdapter.mock';
+import {
+  mockLocalStorageAdapter,
+  resetMockLocalStorageAdapter,
+} from '@application/adapters/localStorageAdapter.mock';
 import {
   mockOfficialQuizAdapter,
   resetMockOfficialQuizAdapter,
@@ -66,6 +74,10 @@ vi.mock('@application/adapters/subcategoryAdapter', () => ({
   useSubcategoryAdapter: vi.fn(() => mockSubcategoryAdapter),
 }));
 
+vi.mock('@application/adapters/exampleAdapter', () => ({
+  useExampleAdapter: vi.fn(() => mockExampleAdapter),
+}));
+
 vi.mock('@application/adapters/flashcardAdapter', () => ({
   useFlashcardAdapter: vi.fn(() => mockFlashcardAdapter),
 }));
@@ -76,6 +88,10 @@ vi.mock('@application/adapters/officialQuizAdapter', () => ({
 
 vi.mock('@application/adapters/authAdapter', () => ({
   useAuthAdapter: vi.fn(() => mockAuthAdapter),
+}));
+
+vi.mock('@application/adapters/localStorageAdapter', () => ({
+  LocalStorageAdapter: () => mockLocalStorageAdapter,
 }));
 
 vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
@@ -101,9 +117,11 @@ const resetGlobalMocks = () => {
   // adapter mocks
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
+  resetMockExampleAdapter();
   resetMockActiveStudent();
   resetMockCourseAdapter();
   resetMockFlashcardAdapter();
+  resetMockLocalStorageAdapter();
   resetMockOfficialQuizAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();

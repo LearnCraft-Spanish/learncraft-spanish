@@ -2,7 +2,7 @@ import { useLimitedCustomQuiz } from '@application/useCases/useLimitedCustomQuiz
 import { MenuButton } from '@interface/components/general/Buttons';
 import { LessonRangeSelector } from '@interface/components/LessonSelector';
 import { Loading } from '@interface/components/Loading';
-import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+import { RegularAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/RegularAudioQuiz';
 import { AudioQuizMenu } from '@interface/components/Quizzing/general';
 import '@interface/components/Quizzing/general/QuizSetupMenu.scss';
 import './LimitedCustomQuiz.scss';
@@ -83,7 +83,7 @@ export default function LimitedCustomQuiz() {
           </form>
         </>
       ) : (
-        <AudioQuiz audioQuizProps={audioQuizProps} />
+        <RegularAudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );
