@@ -86,8 +86,11 @@ export function createExampleInfrastructure(
       search: ExampleTextSearch,
       page: number,
       limit: number,
-    ): Promise<ExampleWithVocabulary[]> => {
-      const response = await httpClient.post<ExampleWithVocabulary[]>(
+    ): Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }> => {
+      const response = await httpClient.post<{
+        examples: ExampleWithVocabulary[];
+        totalCount: number;
+      }>(
         searchExamplesByTextEndpoint.path,
         searchExamplesByTextEndpoint.requiredScopes,
         {

@@ -18,7 +18,10 @@ const defaultMockAdapter: ExamplePort = {
   }),
   getExamplesByIds: async () => createMockExampleWithVocabularyList(2),
   getExamplesForEditingByIds: async () => createMockExampleTechnicalList(2),
-  searchExamplesByText: async () => createMockExampleWithVocabularyList(5),
+  searchExamplesByText: async () => ({
+    examples: createMockExampleWithVocabularyList(5),
+    totalCount: 5,
+  }),
   getExamplesByRecentlyModified: async () => createMockExampleTechnicalList(2),
   createExamples: async (
     _exampleCreates: CreateExamplesCommand,

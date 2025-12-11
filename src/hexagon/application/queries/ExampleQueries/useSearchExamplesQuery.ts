@@ -5,40 +5,30 @@ import type {
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { queryDefaults } from '@application/utils/queryUtils';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useState } from 'react';
 
 export interface UseSearchExamplesQueryReturnType {
   examples: ExampleWithVocabulary[] | undefined;
+  totalCount: number | undefined;
   isLoading: boolean;
   error: Error | null;
-  page: number;
-  changePage: (page: number) => void;
 }
 
 export const useSearchExamplesQuery = (
   searchText: ExampleTextSearch,
+  page: number = 1,
+  pageSize: number = 100,
 ): UseSearchExamplesQueryReturnType => {
-  const PAGE_SIZE = 50;
-  const [page, setPage] = useState(1);
-  const changePage = useCallback((page: number) => {
-    setPage(page);
-  }, []);
   const { searchExamplesByText } = useExampleAdapter();
-  const {
-    data: examples,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['examples', 'by search text', searchText, page, PAGE_SIZE],
-    queryFn: () => searchExamplesByText(searchText, page, PAGE_SIZE),
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['examples', 'by search text', searchText, page, pageSize],
+    queryFn: () => searchExamplesByText(searchText, page, pageSize),
     ...queryDefaults.referenceData,
   });
 
   return {
-    examples,
+    examples: data?.examples,
+    totalCount: data?.totalCount,
     isLoading,
     error,
-    page,
-    changePage,
   };
 };
