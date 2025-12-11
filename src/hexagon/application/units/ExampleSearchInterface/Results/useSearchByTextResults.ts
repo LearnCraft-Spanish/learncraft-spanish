@@ -22,11 +22,7 @@ export function useSearchByTextResults({
   }, []);
 
   const { searchExamplesByText } = useExampleAdapter();
-  const {
-    data: results,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['examples', 'by text', spanishString, englishString, queryPage],
     queryFn: () =>
       searchExamplesByText(
@@ -43,14 +39,14 @@ export function useSearchByTextResults({
     queryPage,
     pageSize: PAGE_SIZE,
     queryPageSize: QUERY_PAGE_SIZE,
-    totalCount: undefined, // Backend doesn't provide total count
+    totalCount: data?.totalCount,
     changeQueryPage,
   });
 
   // Calculate the examples for the current page
   const startIndex = paginationState.pageWithinQueryBatch * PAGE_SIZE;
   const endIndex = startIndex + PAGE_SIZE;
-  const paginatedExamples = results?.slice(startIndex, endIndex) ?? [];
+  const paginatedExamples = data?.examples.slice(startIndex, endIndex) ?? [];
 
   return {
     examples: paginatedExamples,

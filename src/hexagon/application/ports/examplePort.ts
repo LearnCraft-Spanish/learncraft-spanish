@@ -43,7 +43,7 @@ export interface ExamplePort {
     search: ExampleTextSearch,
     page: number,
     limit: number,
-  ) => Promise<ExampleWithVocabulary[]>;
+  ) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
   getExamplesByRecentlyModified: (
     page: number,
     limit: number,

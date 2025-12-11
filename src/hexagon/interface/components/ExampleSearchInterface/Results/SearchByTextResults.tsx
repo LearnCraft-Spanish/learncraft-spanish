@@ -23,7 +23,7 @@ export function SearchByTextResults({
       examples={examples}
       pagination={{
         page: paginationState.page,
-        maxPage: paginationState.maxPageNumber || 100,
+        maxPage: paginationState.maxPageNumber,
         nextPage: paginationState.nextPage,
         previousPage: paginationState.previousPage,
       }}

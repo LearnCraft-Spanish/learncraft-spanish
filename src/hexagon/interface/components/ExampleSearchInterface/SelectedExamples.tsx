@@ -12,7 +12,9 @@ export function SelectedExamples() {
   const selectedExamples = useMemo(() => {
     if (selectedExampleIds.length === 0) return [];
 
-    const cachedQueries = queryClient.getQueriesData<ExampleWithVocabulary[]>({
+    const cachedQueries = queryClient.getQueriesData<
+      { examples: ExampleWithVocabulary[] } | ExampleWithVocabulary[]
+    >({
       queryKey: ['examples'],
     });
 
@@ -22,6 +24,11 @@ export function SelectedExamples() {
           if (Array.isArray(data)) {
             const found = data.find((ex) => ex.id === id);
             if (found) return found;
+          } else {
+            if (data && Array.isArray(data.examples)) {
+              const found = data.examples.find((ex) => ex.id === id);
+              if (found) return found;
+            }
           }
         }
         return null;
