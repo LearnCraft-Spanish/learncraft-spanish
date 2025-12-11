@@ -5,21 +5,33 @@ import {
   useTableValidation,
 } from '@application/units/pasteTable/hooks';
 import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
-import { useCallback } from 'react';
+import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
+import { mapTableRowToDomain } from '@domain/PasteTable/functions/mappers';
+import { normalizeRowCells } from '@domain/PasteTable/functions/normalization';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
+import type { z } from 'zod';
+import { useCallback, useMemo } from 'react';
 
-interface UsePasteTableOptions<T> {
+interface UsePasteTableOptions<T extends Record<string, unknown>> {
   columns: TableColumn[];
-  validateRow: (row: T) => Record<string, string>;
+  /** Row validation function (optional if rowSchema or column schemas provided)
+   * @deprecated Prefer using rowSchema or column schemas for type-safe validation
+   */
+  validateRow?: (row: T) => Record<string, string>;
+  /** Full row Zod schema for row-level validation (preferred) */
+  rowSchema?: z.ZodType<T, any, any>;
   initialData?: T[]; // Allow providing initial data
 }
 
 /**
  * Main hook for paste table functionality
  * Validation is purely derived from row data
+ * Supports Zod schemas (column-level or row-level) or custom validateRow function
  */
 export function usePasteTable<T>({
   columns,
-  validateRow,
+  validateRow: validateRowFn,
+  rowSchema,
   initialData = [],
 }: UsePasteTableOptions<T>): TableHook<T> {
   // Core row management
@@ -31,13 +43,51 @@ export function usePasteTable<T>({
     convertGhostRow,
   } = useTableRows<T>({ columns, initialData });
 
+  // Generate validateRow function from schemas if provided
+  // All validation operates on normalized, typed domain entities
+  const validateRow = useMemo(() => {
+    // Extract domain columns (without UI properties)
+    const domainColumns: ColumnDefinition[] = columns.map((col) => {
+      const { label, width, placeholder, ...domainCol } = col;
+      return domainCol;
+    });
+
+    // Check if we have column schemas or row schema
+    const hasColumnSchemas = domainColumns.some((col) => col.schema);
+    const hasRowSchema = !!rowSchema;
+
+    // If we have schemas, generate validator from them (normalizes + maps internally)
+    if (hasColumnSchemas || hasRowSchema) {
+      return createCombinedValidateRow<T>(domainColumns, rowSchema);
+    }
+
+    // Otherwise, use provided function (but we still need to normalize + map)
+    if (!validateRowFn) {
+      throw new Error(
+        'Either validateRow function, rowSchema, or column schemas must be provided',
+      );
+    }
+
+    // Adapter: normalize + map TableRow to T, then call validateRowFn
+    return (row: TableRow): Record<string, string> => {
+      // Normalize cells to canonical format
+      const normalizedCells = normalizeRowCells(row.cells, domainColumns);
+      const normalizedRow: TableRow = { ...row, cells: normalizedCells };
+
+      // Map to typed domain entity
+      const domainEntity = mapTableRowToDomain<T>(normalizedRow, domainColumns);
+
+      // Validate the normalized, typed entity
+      return validateRowFn(domainEntity);
+    };
+  }, [columns, rowSchema, validateRowFn]);
+
   // Validation - now purely derived from row data
-  const { validationState, isSaveEnabled, validateAll } = useTableValidation<T>(
-    {
-      rows,
-      validateRow,
-    },
-  );
+  // validateRow function operates on TableRow (normalized, typed)
+  const { validationState, isSaveEnabled, validateAll } = useTableValidation({
+    rows,
+    validateRow,
+  });
 
   // Paste handling
   const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(

@@ -2,9 +2,10 @@ import type { TableRow } from '@domain/PasteTable/General';
 import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useCallback, useMemo } from 'react';
 
-interface UseTableValidationProps<T> {
+interface UseTableValidationProps {
   rows: TableRow[];
-  validateRow: (row: T) => Record<string, string>;
+  /** Validates a TableRow (normalized, typed data) and returns field errors */
+  validateRow: (row: TableRow) => Record<string, string>;
 }
 
 interface ValidationResult {
@@ -22,11 +23,13 @@ interface ValidationResult {
 /**
  * Hook for deriving validation state directly from row data
  * No internal state - purely computed from props on every render
+ *
+ * Validation operates on normalized, typed TableRow data
  */
-export function useTableValidation<T>({
+export function useTableValidation({
   rows,
   validateRow,
-}: UseTableValidationProps<T>): ValidationResult {
+}: UseTableValidationProps): ValidationResult {
   // The key to derived validation is to compute it fresh on every render
   // from the current row data, without any internal state or caching
 
@@ -37,10 +40,11 @@ export function useTableValidation<T>({
   );
 
   // Validate a specific row and return errors
+  // validateRow already handles normalization and type conversion
   const validateSingleRow = useCallback(
     (row: TableRow): Record<string, string> => {
       if (row.id === GHOST_ROW_ID) return {};
-      return validateRow(row.cells as T);
+      return validateRow(row);
     },
     [validateRow],
   );

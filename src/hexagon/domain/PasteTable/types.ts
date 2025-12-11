@@ -3,6 +3,8 @@
  * Separated from interface concerns
  */
 
+import type { z } from 'zod';
+
 /**
  * Supported cell input types
  */
@@ -38,8 +40,8 @@ interface BaseColumnDefinition {
   editable?: boolean;
   /** Is this field required? */
   required?: boolean;
-  /** Custom validation function */
-  validate?: (value: string) => string | null;
+  /** Zod schema for column-level validation */
+  schema?: z.ZodType<unknown, any, unknown>;
 }
 
 /**

@@ -18,6 +18,9 @@ export * from '@domain/PasteTable/functions/rowComparison';
 // Row ID generation
 export * from '@domain/PasteTable/functions/rowId';
 
+// Schema validation
+export * from '@domain/PasteTable/functions/schemaValidation';
+
 // Type conversions
 export * from '@domain/PasteTable/functions/typeConversions';
 
