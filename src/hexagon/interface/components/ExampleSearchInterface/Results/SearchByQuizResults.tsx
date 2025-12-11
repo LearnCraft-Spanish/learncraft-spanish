@@ -1,6 +1,5 @@
-import { useOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter';
+import { useSearchByQuizResults } from '@application/units/ExampleSearchInterface/Results/useSearchByQuizResults';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
-import { useQuery } from '@tanstack/react-query';
 
 export interface SearchByQuizResultsProps {
   courseCode: string;
@@ -10,23 +9,16 @@ export function SearchByQuizResults({
   courseCode,
   quizNumber,
 }: SearchByQuizResultsProps) {
-  const { getOfficialQuizExamples } = useOfficialQuizAdapter();
-  const {
-    data: results,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['examples', 'by quiz', courseCode, quizNumber],
-    queryFn: () =>
-      getOfficialQuizExamples({ courseCode, quizNumber: quizNumber! }),
-    enabled: !!courseCode && !!quizNumber,
+  const { examples, isLoading, error } = useSearchByQuizResults({
+    courseCode,
+    quizNumber,
   });
 
   return (
     <BaseResultsComponent
       isLoading={isLoading}
-      error={error ?? null}
-      examples={results}
+      error={error}
+      examples={examples}
     />
   );
 }

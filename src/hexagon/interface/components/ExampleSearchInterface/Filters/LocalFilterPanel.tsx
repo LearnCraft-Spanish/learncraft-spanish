@@ -1,16 +1,10 @@
-import type { ExtendedLesson } from '@interface/components/LessonSelector/SelectLesson';
 import type { SkillTag } from '@learncraft-spanish/shared';
-import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
-import {
-  generateVirtualLessonId,
-  getPrerequisitesForCourse,
-} from '@domain/coursePrerequisites';
+import { useLocalFilterPanelLogic } from '@application/units/ExampleSearchInterface/Filters/useLocalFilterPanelLogic';
 import { ToggleSwitch } from '@interface/components/general';
 import SelectedTags from '@interface/components/general/VocabTagFilter/SelectedTags';
 import TagFilter from '@interface/components/general/VocabTagFilter/TagFilter';
 import SelectCourse from '@interface/components/LessonSelector/SelectCourse';
 import SelectLesson from '@interface/components/LessonSelector/SelectLesson';
-import { useMemo } from 'react';
 import '@interface/components/LessonSelector/LessonSelector.css';
 
 export interface LocalFilterPanelProps {
@@ -54,112 +48,19 @@ export function LocalFilterPanel({
   onFromLessonChange,
   onToLessonChange,
 }: LocalFilterPanelProps) {
-  const { data: coursesWithLessons } = useCoursesWithLessons();
-
-  const course = useMemo(() => {
-    return coursesWithLessons?.find((c) => c.id === selectedCourseId);
-  }, [coursesWithLessons, selectedCourseId]);
-
-  const toLesson = useMemo(() => {
-    if (!course) return undefined;
-    return course.lessons.find((l) => l.lessonNumber === toLessonNumber);
-  }, [course, toLessonNumber]);
-
-  const fromLesson = useMemo(() => {
-    if (!course) return undefined;
-    if (fromLessonNumber < 0) {
-      // Virtual lesson
-      const prerequisites = getPrerequisitesForCourse(course.id);
-      if (!prerequisites) return undefined;
-      const prereqIndex = prerequisites.prerequisites.findIndex(
-        (_, index) =>
-          generateVirtualLessonId(course.id, index) === fromLessonNumber,
-      );
-      if (prereqIndex === -1) return undefined;
-      const prereq = prerequisites.prerequisites[prereqIndex];
-      return {
-        id: fromLessonNumber,
-        lessonNumber: fromLessonNumber,
-        courseName: prereq.courseName,
-        isVirtual: true,
-        displayName: prereq.displayName,
-      } as ExtendedLesson;
-    }
-    return course.lessons.find((l) => l.lessonNumber === fromLessonNumber);
-  }, [course, fromLessonNumber]);
-
-  const fromLessons = useMemo((): ExtendedLesson[] => {
-    if (!course) {
-      return [];
-    }
-
-    const prerequisites = getPrerequisitesForCourse(course.id);
-    const virtualLessons: ExtendedLesson[] = prerequisites
-      ? prerequisites.prerequisites.map((prereq, index) => ({
-          id: generateVirtualLessonId(course.id, index),
-          lessonNumber: generateVirtualLessonId(course.id, index),
-          courseName: prereq.courseName,
-          isVirtual: true,
-          displayName: prereq.displayName,
-        }))
-      : [];
-
-    // If no "To" lesson is selected, only show prerequisite options
-    if (!toLesson) {
-      return virtualLessons;
-    }
-
-    // If "To" lesson is selected, show prerequisites + filtered regular lessons
-    const filteredLessons = course.lessons.filter(
-      (lesson) => lesson.lessonNumber <= toLesson.lessonNumber,
-    );
-
-    return [...virtualLessons, ...filteredLessons];
-  }, [course, toLesson]);
-
-  const toLessons = useMemo((): ExtendedLesson[] => {
-    if (!course) {
-      return [];
-    }
-    if (!fromLesson) {
-      return course.lessons;
-    }
-
-    // If fromLesson is virtual, show all lessons in the target course
-    if (fromLesson.lessonNumber < 0) {
-      return course.lessons;
-    }
-
-    return course.lessons.filter((lesson) => {
-      return lesson.lessonNumber >= fromLesson.lessonNumber;
+  const { course, fromLessons, toLessons, getDefaultLessonsForCourse } =
+    useLocalFilterPanelLogic({
+      selectedCourseId,
+      fromLessonNumber,
+      toLessonNumber,
     });
-  }, [course, fromLesson]);
 
   const handleCourseChange = (courseId: number) => {
     onCourseChange(courseId);
-    const newCourse = coursesWithLessons?.find((c) => c.id === courseId);
-    // find first lesson in the course
-    const firstLesson = newCourse?.lessons?.[0]?.lessonNumber;
-    if (firstLesson) {
-      onToLessonChange(firstLesson);
-    } else {
-      onToLessonChange(0);
-    }
-
-    // Check if the course has prerequisites and auto-select the first one
-    const prerequisites = getPrerequisitesForCourse(courseId);
-    if (prerequisites && prerequisites.prerequisites.length > 0) {
-      // Set the from lesson to the first prerequisite
-      const firstPrerequisiteId = generateVirtualLessonId(courseId, 0);
-      onFromLessonChange(firstPrerequisiteId);
-    } else {
-      const firstLesson = newCourse?.lessons?.[0]?.lessonNumber;
-      if (firstLesson) {
-        onFromLessonChange(firstLesson);
-      } else {
-        onFromLessonChange(0);
-      }
-    }
+    const { defaultToLesson, defaultFromLesson } =
+      getDefaultLessonsForCourse(courseId);
+    onToLessonChange(defaultToLesson);
+    onFromLessonChange(defaultFromLesson);
   };
 
   return (
@@ -172,6 +73,7 @@ export function LocalFilterPanel({
               onChange={(value: string) =>
                 handleCourseChange(Number.parseInt(value))
               }
+              required
             />
             <div>
               {course?.lessons && (

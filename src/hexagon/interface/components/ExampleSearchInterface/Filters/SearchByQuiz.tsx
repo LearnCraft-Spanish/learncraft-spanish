@@ -1,6 +1,5 @@
-import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
+import { useSearchByQuizFilter } from '@application/units/ExampleSearchInterface/Filters/useSearchByQuizFilter';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
-import { useMemo } from 'react';
 export interface SearchByQuizProps {
   courseCode: string;
   quizNumber: number | '';
@@ -14,23 +13,7 @@ export function SearchByQuiz({
   onCourseCodeChange,
   onQuizNumberChange,
 }: SearchByQuizProps) {
-  // this should use the useOfficialQuiz hook to populate data for a dropdown?
-  const {
-    officialQuizRecords,
-    isLoading: officialQuizzesLoading,
-    error,
-  } = useOfficialQuizzesQuery();
-
-  // quizOptions are the quizzes for the selected course
-  const quizOptions = useMemo(() => {
-    if (!officialQuizRecords || officialQuizzesLoading || error) {
-      return [];
-    }
-    const filteredQuizzes = officialQuizRecords.filter(
-      (quiz) => quiz.courseCode === courseCode,
-    );
-    return filteredQuizzes;
-  }, [courseCode, officialQuizRecords, officialQuizzesLoading, error]);
+  const { quizOptions } = useSearchByQuizFilter({ courseCode });
 
   return (
     <div>

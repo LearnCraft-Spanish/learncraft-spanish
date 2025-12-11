@@ -19,6 +19,7 @@ export function BaseResultsComponent({
 }) {
   const { addSelectedExample, removeSelectedExample, selectedExampleIds } =
     useSelectedExamplesContext();
+
   if (info) {
     return <p>{info}</p>;
   }
@@ -40,23 +41,17 @@ export function BaseResultsComponent({
   }
 
   return (
-    // Remove bullet point style
     <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
       {examples.map((example) => (
         <li key={example.id}>
-          {/* {example.id} - <strong>{example.spanish}</strong> — {example.english} */}
           <ExampleListItemFactory
             example={example}
             preTextComponents={[
               <BulkAddButton
                 key="bulkAddButton"
                 id={example.id}
-                handleSelect={() => {
-                  addSelectedExample(example.id);
-                }}
-                handleRemoveSelected={() => {
-                  removeSelectedExample(example.id);
-                }}
+                handleSelect={() => addSelectedExample(example.id)}
+                handleRemoveSelected={() => removeSelectedExample(example.id)}
                 isSelected={selectedExampleIds.includes(example.id)}
                 // Unused Props
                 isCollected={false}
