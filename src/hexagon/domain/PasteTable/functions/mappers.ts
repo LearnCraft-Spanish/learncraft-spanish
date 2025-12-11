@@ -4,6 +4,7 @@
  */
 
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
+import type { z } from 'zod';
 import {
   formatDateForTable,
   parseDateFromTable,
@@ -103,6 +104,20 @@ export function mapDomainToTableRow<T extends Record<string, unknown>>(
         break;
       }
 
+      case 'multi-select': {
+        // Multi-select: domain has string[] array, convert to comma-separated string
+        if (Array.isArray(value)) {
+          const separator = col.separator || ',';
+          cells[col.id] = value.join(separator);
+        } else if (typeof value === 'string') {
+          // Already a string, normalize it
+          cells[col.id] = normalizeCellValue(value, col);
+        } else {
+          cells[col.id] = '';
+        }
+        break;
+      }
+
       case 'text':
       default: {
         // Text and other types: normalize to trimmed string
@@ -168,6 +183,16 @@ function convertCellValueToDomainType(
       return normalized || undefined;
     }
 
+    case 'multi-select': {
+      // Multi-select: parse comma-separated string to string[] array
+      const separator = column.separator || ',';
+      const values = normalized
+        .split(separator)
+        .map((v) => v.trim())
+        .filter((v) => v !== '');
+      return values.length > 0 ? values : undefined;
+    }
+
     case 'text':
     default: {
       return normalized || undefined;
@@ -218,4 +243,22 @@ export function mapTableRowsToDomain<T extends Record<string, unknown>>(
   return rows
     .filter((row) => row.id !== ghostRowId) // Exclude ghost row
     .map((row) => mapTableRowToDomain<T>(row, columns));
+}
+
+/**
+ * Convert array of TableRows to validated domain entities
+ * Parses through Zod schema to ensure completeness and return T[]
+ *
+ * @template T - The domain entity type (must be a record type)
+ */
+export function mapAndParseTableRowsToDomain<T extends Record<string, unknown>>(
+  rows: TableRow[],
+  columns: ColumnDefinition[],
+  rowSchema: z.ZodType<T, any, any>,
+  ghostRowId: string = 'ghost-row',
+): T[] {
+  const partialData = mapTableRowsToDomain<T>(rows, columns, ghostRowId);
+
+  // Parse each row through the schema to get complete T[]
+  return partialData.map((partial) => rowSchema.parse(partial));
 }

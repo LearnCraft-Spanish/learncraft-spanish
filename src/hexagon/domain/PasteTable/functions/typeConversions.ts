@@ -120,4 +120,3 @@ export function normalizeDate(value: string): string {
   // If parsing fails, return original (validation will catch it)
   return trimmed;
 }
-

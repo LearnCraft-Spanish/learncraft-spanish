@@ -1,5 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { generateRowId, resetRowIdCounter } from './rowId';
+import {
+  generateRowId,
+  resetRowIdCounter,
+} from '@domain/PasteTable/functions/rowId';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('rowId', () => {
   beforeEach(() => {
@@ -44,4 +47,3 @@ describe('rowId', () => {
     });
   });
 });
-

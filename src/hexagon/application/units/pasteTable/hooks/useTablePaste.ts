@@ -5,8 +5,8 @@ import {
   detectHeaderRow,
   parseDelimitedText,
 } from '@application/units/pasteTable/utils';
-import { cellsEqual } from '@domain/PasteTable/functions/rowComparison';
 import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
+import { cellsEqual } from '@domain/PasteTable/functions/rowComparison';
 import { useCallback, useState } from 'react';
 
 interface UseTablePasteProps {
@@ -268,7 +268,16 @@ export function useTablePaste({
         setRows([...existingRows, ...pastedRows]);
       }
     },
-    [activeCell, columns, rows, handleCellPaste, setRows, mode, idColumnId, onRowUpdated],
+    [
+      activeCell,
+      columns,
+      rows,
+      handleCellPaste,
+      setRows,
+      mode,
+      idColumnId,
+      onRowUpdated,
+    ],
   );
 
   return {

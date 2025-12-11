@@ -24,4 +24,3 @@ export const generateRowId = (): string => {
   // Create a unique ID using timestamp, counter and random number
   return `row-${Date.now()}-${rowIdCounter}-${Math.floor(Math.random() * 1000)}`;
 };
-

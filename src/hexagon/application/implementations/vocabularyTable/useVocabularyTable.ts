@@ -1,45 +1,21 @@
-import type { TableHook } from '@domain/PasteTable/General';
+import type { CreateTableHook } from '@domain/PasteTable/CreateTable';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
 import {
   SCHEMA_FIELD_CONFIG,
   VOCABULARY_COLUMNS,
 } from '@application/implementations/vocabularyTable/constants';
-import { usePasteTable } from '@application/units/pasteTable';
-import { validateCreateNonVerbVocabulary } from '@learncraft-spanish/shared';
+import { useCreateTable } from '@application/units/pasteTable';
+import { CreateNonVerbVocabularySchema } from '@learncraft-spanish/shared';
 
 /**
  * Custom hook for managing vocabulary data in a table format.
  * This hook provides a bridge between the table UI and the vocabulary domain models.
  * It handles table-specific concerns like column configuration and basic data validation.
  */
-export function useVocabularyTable(): TableHook<CreateNonVerbVocabulary> {
-  return usePasteTable<CreateNonVerbVocabulary>({
+export function useVocabularyTable(): CreateTableHook<CreateNonVerbVocabulary> {
+  return useCreateTable<CreateNonVerbVocabulary>({
     columns: VOCABULARY_COLUMNS,
-    validateRow: (row) => {
-      const errors: Record<string, string> = {};
-
-      // Create a copy with frequency as number for validation
-      const dataForValidation = {
-        ...row,
-        // Convert frequency to number if it exists and is a valid number
-        frequency:
-          row.frequency !== undefined ? Number(row.frequency) : undefined,
-      };
-
-      // Use shared validation function
-      const result = validateCreateNonVerbVocabulary(dataForValidation);
-      if (!result.valid) {
-        // Map validation errors to field errors
-        result.errors.forEach((error) => {
-          const field = error.split(':')[0].trim();
-          if (field in SCHEMA_FIELD_CONFIG) {
-            errors[field] = error;
-          }
-        });
-      }
-
-      return errors;
-    },
+    rowSchema: CreateNonVerbVocabularySchema,
   });
 }
 

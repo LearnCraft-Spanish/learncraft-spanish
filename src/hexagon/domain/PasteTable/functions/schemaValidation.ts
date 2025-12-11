@@ -1,23 +1,23 @@
 /**
  * Schema-based validation utilities
  * Generate validation functions from Zod schemas
- * 
+ *
  * Validation operates on normalized, typed domain entities (not raw string cells).
  * The flow is: TableRow (strings) → normalize → map to domain entity → validate against schema
  */
 
-import { z } from 'zod';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
 import { mapTableRowToDomain } from '@domain/PasteTable/functions/mappers';
 import { normalizeRowCells } from '@domain/PasteTable/functions/normalization';
+import { z } from 'zod';
 
 /**
  * Generate a validateRow function from column schemas
  * Validates each column independently on the normalized, typed domain entity
  */
-export function createValidateRowFromColumnSchemas<T extends Record<string, unknown>>(
-  columns: ColumnDefinition[],
-): (row: TableRow) => Record<string, string> {
+export function createValidateRowFromColumnSchemas<
+  T extends Record<string, unknown>,
+>(columns: ColumnDefinition[]): (row: TableRow) => Record<string, string> {
   return (row: TableRow) => {
     const errors: Record<string, string> = {};
 
@@ -59,7 +59,9 @@ export function createValidateRowFromColumnSchemas<T extends Record<string, unkn
  * Generate a validateRow function from a full row Zod schema
  * Validates the entire row as a single entity after normalization and mapping
  */
-export function createValidateRowFromRowSchema<T extends Record<string, unknown>>(
+export function createValidateRowFromRowSchema<
+  T extends Record<string, unknown>,
+>(
   rowSchema: z.ZodType<T, any, any>,
   columns: ColumnDefinition[],
 ): (row: TableRow) => Record<string, string> {
@@ -100,7 +102,7 @@ export function createValidateRowFromRowSchema<T extends Record<string, unknown>
 /**
  * Combine column schemas and row schema validation
  * Column schemas are checked first, then row schema
- * 
+ *
  * Both operate on normalized, typed domain entities
  */
 export function createCombinedValidateRow<T extends Record<string, unknown>>(
@@ -128,4 +130,3 @@ export function createCombinedValidateRow<T extends Record<string, unknown>>(
     return errors;
   };
 }
-

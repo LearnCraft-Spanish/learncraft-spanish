@@ -1,5 +1,9 @@
+import type {
+  TableColumn,
+  TableRow,
+  ValidationState,
+} from '@domain/PasteTable/types';
 import type { ClipboardEvent } from 'react';
-import type { TableColumn, TableRow, ValidationState } from './types';
 
 /**
  * ID used for the ghost row that appears at the bottom of create tables
@@ -32,5 +36,6 @@ export interface CreateTableHook<T> {
   validationState: ValidationState;
 
   // Save operation (returns data for external save)
+  // Returns T[] after validation ensures all required fields are present
   saveData: () => Promise<T[] | undefined>;
 }

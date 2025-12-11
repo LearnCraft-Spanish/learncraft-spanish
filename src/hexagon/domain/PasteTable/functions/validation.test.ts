@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest';
-import {
-  validateRow,
-  computeValidationState,
-  validateCell,
-} from './validation';
 import type {
-  TableRow,
   ColumnDefinition,
   NumberColumnDefinition,
+  TableRow,
 } from '@domain/PasteTable/types';
+import {
+  computeValidationState,
+  validateCell,
+  validateRow,
+} from '@domain/PasteTable/functions/validation';
+import { describe, expect, it } from 'vitest';
 
 describe('validation', () => {
   describe('validateRow', () => {
@@ -90,7 +90,11 @@ describe('validation', () => {
         return errors;
       };
 
-      const result = computeValidationState(rows, validateFn, new Set(['ghost-row']));
+      const result = computeValidationState(
+        rows,
+        validateFn,
+        new Set(['ghost-row']),
+      );
       expect(result.isValid).toBe(false);
       expect(result.errors).toEqual({
         'row-1': { name: 'Name required' },
@@ -168,12 +172,6 @@ describe('validation', () => {
       const column: ColumnDefinition = {
         id: 'email',
         type: 'text',
-        validate: (value) => {
-          if (!value.includes('@')) {
-            return 'Invalid email format';
-          }
-          return null;
-        },
       };
 
       expect(validateCell('test@example.com', column)).toBeNull();
@@ -181,4 +179,3 @@ describe('validation', () => {
     });
   });
 });
-

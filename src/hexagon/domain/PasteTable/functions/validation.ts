@@ -4,10 +4,9 @@
  */
 
 import type {
+  ColumnDefinition,
   TableRow,
   ValidationState,
-  ColumnDefinition,
-  NumberColumnDefinition,
 } from '@domain/PasteTable/types';
 import { isNumberColumn } from '@domain/PasteTable/types';
 
@@ -73,11 +72,5 @@ export function validateCell(
     }
   }
 
-  // Custom validator
-  if (column.validate) {
-    return column.validate(value);
-  }
-
   return null; // Valid
 }
-

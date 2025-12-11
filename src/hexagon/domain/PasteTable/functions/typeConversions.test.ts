@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
-import {
-  parseBoolean,
-  formatBooleanForTable,
-  convertCellValue,
-  normalizeDate,
-} from './typeConversions';
 import type { ColumnDefinition } from '@domain/PasteTable/types';
+import {
+  convertCellValue,
+  formatBooleanForTable,
+  normalizeDate,
+  parseBoolean,
+} from '@domain/PasteTable/functions/typeConversions';
+import { describe, expect, it } from 'vitest';
 
 describe('typeConversions', () => {
   describe('parseBoolean', () => {
@@ -209,4 +209,3 @@ describe('typeConversions', () => {
     });
   });
 });
-

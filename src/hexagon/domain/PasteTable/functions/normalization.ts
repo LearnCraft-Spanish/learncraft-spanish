@@ -101,6 +101,26 @@ export function normalizeCellValue(
       return trimmed;
     }
 
+    case 'multi-select': {
+      // For multi-select, parse comma-separated values and normalize each
+      const separator = column.separator || ',';
+      const values = trimmed
+        .split(separator)
+        .map((v) => v.trim())
+        .filter((v) => v !== '');
+
+      // Normalize each value to match option values (case-insensitive)
+      const normalizedValues = values.map((value) => {
+        const matchingOption = column.options.find(
+          (opt) => opt.value.toLowerCase() === value.toLowerCase(),
+        );
+        return matchingOption ? matchingOption.value : value;
+      });
+
+      // Return comma-separated normalized values
+      return normalizedValues.join(separator);
+    }
+
     case 'text':
     default: {
       // Text: trim whitespace, but preserve internal spaces

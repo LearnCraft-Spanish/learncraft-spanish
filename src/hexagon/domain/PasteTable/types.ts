@@ -8,7 +8,13 @@ import type { z } from 'zod';
 /**
  * Supported cell input types
  */
-export type CellType = 'text' | 'number' | 'select' | 'date' | 'boolean';
+export type CellType =
+  | 'text'
+  | 'number'
+  | 'select'
+  | 'multi-select'
+  | 'date'
+  | 'boolean';
 
 /**
  * Options for select-type cells
@@ -81,12 +87,23 @@ export interface DateColumnDefinition extends BaseColumnDefinition {
 }
 
 /**
- * Select column definition
+ * Select column definition (single choice)
  */
 export interface SelectColumnDefinition extends BaseColumnDefinition {
   type: 'select';
   /** Valid choices for select */
   options: SelectOption[]; // Required for select type
+}
+
+/**
+ * Multi-select column definition (multiple choice)
+ */
+export interface MultiSelectColumnDefinition extends BaseColumnDefinition {
+  type: 'multi-select';
+  /** Valid choices for multi-select */
+  options: SelectOption[]; // Required for multi-select type
+  /** Separator for storing multiple values in cell (default: ',') */
+  separator?: string; // Default: ','
 }
 
 /**
@@ -97,7 +114,8 @@ export type ColumnDefinition =
   | NumberColumnDefinition
   | BooleanColumnDefinition
   | DateColumnDefinition
-  | SelectColumnDefinition;
+  | SelectColumnDefinition
+  | MultiSelectColumnDefinition;
 
 /**
  * Type guard functions for column definitions
@@ -130,6 +148,12 @@ export function isSelectColumn(
   col: ColumnDefinition,
 ): col is SelectColumnDefinition {
   return col.type === 'select';
+}
+
+export function isMultiSelectColumn(
+  col: ColumnDefinition,
+): col is MultiSelectColumnDefinition {
+  return col.type === 'multi-select';
 }
 
 /**

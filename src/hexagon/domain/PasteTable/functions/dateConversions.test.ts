@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import {
-  parseDateFromTable,
-  formatDateForTable,
-  validateDate,
-} from './dateConversions';
 import type { ColumnDefinition } from '@domain/PasteTable/types';
+import {
+  formatDateForTable,
+  parseDateFromTable,
+  validateDate,
+} from '@domain/PasteTable/functions/dateConversions';
+import { describe, expect, it } from 'vitest';
 
 describe('dateConversions', () => {
   describe('parseDateFromTable', () => {
@@ -186,4 +186,3 @@ describe('dateConversions', () => {
     });
   });
 });
-

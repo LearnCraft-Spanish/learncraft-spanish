@@ -43,6 +43,7 @@ export interface TableHook<T> {
 
   // Core operations
   updateCell: (rowId: string, columnId: string, value: string) => string | null;
+  // Returns T[] after validation ensures all required fields are present
   saveData: () => Promise<T[] | undefined>;
   resetTable: () => void;
 

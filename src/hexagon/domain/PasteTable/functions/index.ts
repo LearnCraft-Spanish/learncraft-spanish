@@ -3,6 +3,9 @@
  * Pure functions with no React dependencies
  */
 
+// Audio URL adapter
+export * from '@domain/PasteTable/functions/audioUrlAdapter';
+
 // Date conversions
 export * from '@domain/PasteTable/functions/dateConversions';
 

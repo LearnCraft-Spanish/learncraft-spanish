@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
 import {
   mapDomainToTableRow,
   mapDomainToTableRows,
-  mapTableRowToDomain,
   mapTableRowsToDomain,
-} from './mappers';
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
+  mapTableRowToDomain,
+} from '@domain/PasteTable/functions/mappers';
+import { describe, expect, it } from 'vitest';
 
 describe('mappers', () => {
   const columns: ColumnDefinition[] = [
@@ -111,8 +111,20 @@ describe('mappers', () => {
   describe('mapDomainToTableRows', () => {
     it('should convert array of entities to TableRows', () => {
       const entities = [
-        { id: '1', name: 'John', age: 30, active: true, birthday: '2024-01-15' },
-        { id: '2', name: 'Jane', age: 25, active: false, birthday: '2024-02-20' },
+        {
+          id: '1',
+          name: 'John',
+          age: 30,
+          active: true,
+          birthday: '2024-01-15',
+        },
+        {
+          id: '2',
+          name: 'Jane',
+          age: 25,
+          active: false,
+          birthday: '2024-02-20',
+        },
       ];
 
       const result = mapDomainToTableRows(entities, columns);
@@ -184,9 +196,7 @@ describe('mappers', () => {
         cells: { age: '42' },
       };
 
-      const numberColumns: ColumnDefinition[] = [
-        { id: 'age', type: 'number' },
-      ];
+      const numberColumns: ColumnDefinition[] = [{ id: 'age', type: 'number' }];
 
       const result = mapTableRowToDomain(row, numberColumns);
       expect(result.age).toBe(42);
@@ -198,9 +208,7 @@ describe('mappers', () => {
         cells: { age: 'not-a-number' },
       };
 
-      const numberColumns: ColumnDefinition[] = [
-        { id: 'age', type: 'number' },
-      ];
+      const numberColumns: ColumnDefinition[] = [{ id: 'age', type: 'number' }];
 
       const result = mapTableRowToDomain(row, numberColumns);
       expect(result.age).toBeUndefined();
@@ -212,11 +220,21 @@ describe('mappers', () => {
       const rows: TableRow[] = [
         {
           id: 'row-1',
-          cells: { name: 'John', age: '30', active: 'true', birthday: '2024-01-15' },
+          cells: {
+            name: 'John',
+            age: '30',
+            active: 'true',
+            birthday: '2024-01-15',
+          },
         },
         {
           id: 'row-2',
-          cells: { name: 'Jane', age: '25', active: 'false', birthday: '2024-02-20' },
+          cells: {
+            name: 'Jane',
+            age: '25',
+            active: 'false',
+            birthday: '2024-02-20',
+          },
         },
       ];
 
@@ -231,7 +249,12 @@ describe('mappers', () => {
       const rows: TableRow[] = [
         {
           id: 'row-1',
-          cells: { name: 'John', age: '30', active: 'true', birthday: '2024-01-15' },
+          cells: {
+            name: 'John',
+            age: '30',
+            active: 'true',
+            birthday: '2024-01-15',
+          },
         },
         {
           id: 'ghost-row',
@@ -249,7 +272,12 @@ describe('mappers', () => {
       const rows: TableRow[] = [
         {
           id: 'row-1',
-          cells: { name: 'John', age: '30', active: 'true', birthday: '2024-01-15' },
+          cells: {
+            name: 'John',
+            age: '30',
+            active: 'true',
+            birthday: '2024-01-15',
+          },
         },
         {
           id: 'custom-ghost',
@@ -264,4 +292,3 @@ describe('mappers', () => {
     });
   });
 });
-

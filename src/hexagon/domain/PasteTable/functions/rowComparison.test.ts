@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import type { TableRow } from '@domain/PasteTable/types';
 import {
   cellsEqual,
-  rowsEqual,
-  hasRowChanged,
   findDirtyRows,
-} from './rowComparison';
-import type { TableRow } from '@domain/PasteTable/types';
+  hasRowChanged,
+  rowsEqual,
+} from '@domain/PasteTable/functions/rowComparison';
+import { describe, expect, it } from 'vitest';
 
 describe('rowComparison', () => {
   describe('cellsEqual', () => {
@@ -168,13 +168,10 @@ describe('rowComparison', () => {
         { id: 'row-1', cells: { name: 'John' } },
         { id: 'row-3', cells: { name: 'New Row' } },
       ];
-      const original: TableRow[] = [
-        { id: 'row-1', cells: { name: 'John' } },
-      ];
+      const original: TableRow[] = [{ id: 'row-1', cells: { name: 'John' } }];
 
       const dirty = findDirtyRows(current, original);
       expect(dirty.size).toBe(0);
     });
   });
 });
-
