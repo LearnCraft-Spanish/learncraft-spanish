@@ -58,7 +58,10 @@ export function OfficialQuizSetupMenu({
         <button
           type="button"
           onClick={startQuiz}
-          disabled={!courseCode || !quizNumber}
+          disabled={
+            quizOptions.find((quiz) => quiz.quizNumber === quizNumber) ===
+            undefined
+          }
         >
           Begin Review
         </button>
