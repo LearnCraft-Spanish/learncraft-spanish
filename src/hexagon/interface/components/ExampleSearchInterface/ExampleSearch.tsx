@@ -3,7 +3,7 @@ import { Filters } from '@interface/components/ExampleSearchInterface/Filters/Fi
 import { Results } from '@interface/components/ExampleSearchInterface/Results/Results';
 import { SearchModeNav } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { SelectedExamples } from '@interface/components/ExampleSearchInterface/SelectedExamples';
-
+import '@interface/components/ExampleSearchInterface/ExampleSearch.scss';
 export default function ExampleSearch() {
   const {
     mode,
@@ -22,20 +22,24 @@ export default function ExampleSearch() {
 
       <div style={{ marginTop: '1rem' }}>
         <Filters mode={mode} {...searchComponentProps} />
-
-        {!isValidSearch ? (
-          <small>ERROR: Fill required fields to see search results.</small>
-        ) : (
-          <button type="button" onClick={triggerSearch}>
-            Search
-          </button>
-        )}
       </div>
 
+      {!searchIsTriggered &&
+        (!isValidSearch ? (
+          <div className="notValidSearchError">
+            ERROR: Fill required fields to see search results.
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="searchButton"
+            onClick={triggerSearch}
+          >
+            Search
+          </button>
+        ))}
       <div style={{ marginTop: '1rem' }}>
-        {isValidSearch && searchIsTriggered && (
-          <Results mode={mode} {...searchResultProps} />
-        )}
+        {searchIsTriggered && <Results mode={mode} {...searchResultProps} />}
       </div>
       <SelectedExamples />
     </div>

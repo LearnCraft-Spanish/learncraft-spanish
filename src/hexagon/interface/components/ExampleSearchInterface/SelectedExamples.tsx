@@ -42,8 +42,8 @@ export function SelectedExamples() {
 
   return (
     <div>
-      <h3>{selectedExampleIds.length} Selected Examples</h3>
       <BaseResultsComponent
+        title={`${selectedExampleIds.length} Selected Examples`}
         examples={selectedExamples}
         isLoading={false}
         error={null}

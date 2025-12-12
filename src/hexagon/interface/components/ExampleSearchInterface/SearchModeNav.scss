@@ -1,0 +1,34 @@
+.searchModeNav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin: 0 1rem;
+
+  .searchModeNavOption {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--dark);
+    cursor: pointer;
+    background-color: var(--light);
+
+    &:hover {
+      background-color: var(--accent);
+    }
+    &.selected {
+      background-color: var(--brand);
+      color: var(--light);
+    }
+
+    input {
+      display: none;
+    }
+
+    span {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+  }
+}

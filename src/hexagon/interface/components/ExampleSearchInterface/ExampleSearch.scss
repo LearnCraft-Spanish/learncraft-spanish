@@ -1,0 +1,13 @@
+.notValidSearchError {
+  color: var(--error-text);
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.searchButton {
+  margin: 1rem auto;
+  display: block;
+  font-size: 1.2rem;
+}

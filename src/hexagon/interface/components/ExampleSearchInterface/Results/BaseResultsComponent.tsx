@@ -3,6 +3,7 @@ import { useSelectedExamplesContext } from '@application/coordinators/hooks/useS
 import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
 import BulkAddButton from '@interface/components/ExampleListItem/units/BulkAddButton';
 import Pagination from '@interface/components/general/Pagination/Pagination';
+import { InlineLoading } from '@interface/components/Loading';
 
 export interface PaginationProps {
   page: number;
@@ -21,12 +22,14 @@ export function BaseResultsComponent({
   examples,
   info,
   pagination,
+  title,
 }: {
   isLoading: boolean;
   error: Error | null;
   examples: ExampleWithVocabulary[] | undefined;
   info?: string;
   pagination?: PaginationProps;
+  title?: string;
 }) {
   const { addSelectedExample, removeSelectedExample, selectedExampleIds } =
     useSelectedExamplesContext();
@@ -36,7 +39,7 @@ export function BaseResultsComponent({
   }
 
   if (isLoading) {
-    return <p>Loading results…</p>;
+    return <InlineLoading message="Loading results..." />;
   }
 
   if (error) {
@@ -55,6 +58,7 @@ export function BaseResultsComponent({
 
   return (
     <div>
+      {title && <h3>{title}</h3>}
       {showPagination && (
         <Pagination
           page={pagination.page}

@@ -7,6 +7,7 @@ export function SearchByDateResults() {
 
   return (
     <BaseResultsComponent
+      title="Search Results"
       isLoading={isLoading}
       error={error}
       examples={examples}

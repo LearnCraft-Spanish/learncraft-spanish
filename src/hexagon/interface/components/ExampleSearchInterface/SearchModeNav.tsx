@@ -1,5 +1,5 @@
 // import type { ReactNode } from 'react';
-
+import '@interface/components/ExampleSearchInterface/SearchModeNav.scss';
 export type ExampleSearchMode = 'filter' | 'quiz' | 'text' | 'ids' | 'date';
 
 interface NavOption {
@@ -24,17 +24,11 @@ export function SearchModeNav({
   onModeChange: (mode: ExampleSearchMode) => void;
 }) {
   return (
-    <div>
+    <div className="searchModeNav">
       {NAV_OPTIONS.map((option) => (
         <label
           key={option.mode}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.35rem',
-            marginRight: '1rem',
-            cursor: 'pointer',
-          }}
+          className={`searchModeNavOption ${activeMode === option.mode ? 'selected' : ''}`}
         >
           <input
             type="radio"
