@@ -116,7 +116,7 @@ describe('officialQuizSetupMenu', () => {
     expect(setUserSelectedQuizNumber).toHaveBeenCalledWith(2);
   });
 
-  it('begin Review button enabled only when course and quiz selected; clicking calls startQuiz', () => {
+  it('begin Review button enabled only when quiz selected is valid quiz', () => {
     const courseCode = officialQuizCourses[0]?.code ?? '';
     const quizOptions = createQuizOptions(courseCode || 'lcsp', 2);
     const setUserSelectedCourseCode = vi.fn();
