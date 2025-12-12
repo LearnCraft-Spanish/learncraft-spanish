@@ -29,11 +29,12 @@ export function useOfficialQuizSetupMenu() {
     isLoading: officialQuizzesLoading,
     error,
   } = useOfficialQuizzesQuery();
-  const { toLesson, course } = useSelectedCourseAndLessons();
+  const { toLesson, course, updateUserSelectedCourseId } =
+    useSelectedCourseAndLessons();
 
   const navigate = useNavigate();
 
-  const [userSelectedCourseCode, setUserSelectedCourseCode] = useState('');
+  const [userSelectedCourseCode, setUserSelectedCourseCodeState] = useState('');
   const [userSelectedQuizNumber, setUserSelectedQuizNumber] = useState(0); //quizNumber
 
   // useMemo to memoize the courseCode and quizNumber
