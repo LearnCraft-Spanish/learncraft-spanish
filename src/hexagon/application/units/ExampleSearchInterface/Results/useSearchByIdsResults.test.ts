@@ -10,7 +10,6 @@ import { createMockExampleWithVocabularyList } from '@testing/factories/exampleF
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock the hooks - define implementations inline to avoid hoisting issues
 vi.mock('@application/adapters/exampleAdapter', () => ({
   useExampleAdapter: vi.fn(() => ({
     getExamplesByIds: mockExampleAdapter.getExamplesByIds,

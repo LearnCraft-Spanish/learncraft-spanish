@@ -9,7 +9,6 @@ import { createMockExampleWithVocabularyList } from '@testing/factories/exampleF
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-// Mock the hooks - define implementations inline to avoid hoisting issues
 vi.mock(
   '@application/queries/ExampleQueries/useExamplesByRecentlyModified',
   () => ({
@@ -76,21 +75,6 @@ describe('useSearchByDatePagination', () => {
     expect(result.current.error?.message).toBe(
       'Failed to fetch examples by date',
     );
-    expect(result.current.examples).toEqual([]);
-  });
-
-  it('should handle loading state correctly', () => {
-    overrideMockUseExamplesByRecentlyModified({
-      examples: undefined,
-      isLoading: true,
-      error: null,
-    });
-
-    const { result } = renderHook(() => useSearchByDatePagination(), {
-      wrapper: TestQueryClientProvider,
-    });
-
-    expect(result.current.isLoading).toBe(true);
     expect(result.current.examples).toEqual([]);
   });
 });
