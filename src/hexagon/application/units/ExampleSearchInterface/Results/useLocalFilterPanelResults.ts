@@ -1,6 +1,6 @@
 import type { LessonRange, SkillTag } from '@learncraft-spanish/shared';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
-import useQueryPagination from '@application/units/Pagination/useQueryPagination';
+import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';

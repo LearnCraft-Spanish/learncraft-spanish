@@ -1,5 +1,5 @@
 import { useSearchExamplesQuery } from '@application/queries/ExampleQueries/useSearchExamplesQuery';
-import useQueryPagination from '@application/units/Pagination/useQueryPagination';
+import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
 import { useCallback, useState } from 'react';
 
 const PAGE_SIZE = 25;

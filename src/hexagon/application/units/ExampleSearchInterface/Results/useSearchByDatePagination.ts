@@ -1,5 +1,5 @@
 import { useExamplesByRecentlyModified } from '@application/queries/ExampleQueries/useExamplesByRecentlyModified';
-import useQueryPagination from '@application/units/Pagination/useQueryPagination';
+import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
 import { useCallback, useState } from 'react';
 
 const PAGE_SIZE = 25;
