@@ -1,6 +1,5 @@
-import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import { useExampleByIdsQuery } from '@application/queries/ExampleQueries/useExampleByIdsQuery';
 import { usePagination } from '@application/units/Pagination/usePagination';
-import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 const PAGE_SIZE = 25;
@@ -10,25 +9,17 @@ export interface UseSearchByIdsResultsParams {
 }
 
 export function useSearchByIdsResults({ ids }: UseSearchByIdsResultsParams) {
-  const { getExamplesByIds } = useExampleAdapter();
-  const {
-    data: results,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['examples', 'by ids', ids],
-    queryFn: () => getExamplesByIds(ids),
-  });
+  const { examples, isLoading, error } = useExampleByIdsQuery(ids);
 
   const paginationState = usePagination({
     itemsPerPage: PAGE_SIZE,
-    totalItems: results?.length ?? 0,
+    totalItems: examples?.length ?? 0,
   });
 
   const paginatedExamples = useMemo(() => {
-    if (!results) return undefined;
-    return results.slice(paginationState.startIndex, paginationState.endIndex);
-  }, [results, paginationState.startIndex, paginationState.endIndex]);
+    if (!examples) return undefined;
+    return examples.slice(paginationState.startIndex, paginationState.endIndex);
+  }, [examples, paginationState.startIndex, paginationState.endIndex]);
 
   return {
     examples: paginatedExamples,
