@@ -1,6 +1,7 @@
 import type { PendingFlashcardUpdateObject } from '@application/units/studentFlashcardUpdates/types';
 import type { SrsDifficulty } from '@domain/srs';
 
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useIsFlushingStudentFlashcardUpdates } from '@application/coordinators/hooks/useIsFlushingStudentFlashcardUpdates';
 import { useStudentFlashcardUpdatesUtils } from '@application/units/studentFlashcardUpdates';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
@@ -15,6 +16,7 @@ export interface UseStudentFlashcardUpdatesReturn {
 
 export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
   const { updateFlashcards, getFlashcardByExampleId } = useStudentFlashcards();
+  const { appUser, isOwnUser } = useActiveStudent();
   const { isFlushing, setIsFlushing } = useIsFlushingStudentFlashcardUpdates();
   const {
     getPendingFlashcardUpdateObjectsFromLocalStorage,
@@ -66,12 +68,14 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
 
   const handleReviewExample = useCallback(
     (exampleId: number, difficulty: SrsDifficulty) => {
+      if (!isOwnUser || appUser?.studentRole !== 'student') return; // Only Students can have flashcards & flashcard updates
       addToBatch(exampleId, difficulty);
     },
-    [addToBatch],
+    [addToBatch, isOwnUser, appUser?.studentRole],
   );
 
   const flushBatch = useCallback(async () => {
+    if (!isOwnUser || appUser?.studentRole !== 'student') return; // Only Students can have flashcards & flashcard updates
     const pendingFlashcardUpdateObjects =
       getPendingFlashcardUpdateObjectsFromLocalStorage();
     if (
@@ -95,7 +99,18 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
             console.error(`Flashcard not found for example ID: ${exampleId}`);
             return null;
           }
-
+          // Filter out updates that have already been synced
+          // Compare flashcard lastReviewed date with localStorage update lastReviewedDate
+          if (flashcard.lastReviewed) {
+            const dateOnFlashcard = new Date(flashcard.lastReviewed);
+            const dateOnPendingUpdate = new Date(lastReviewedDate);
+            if (dateOnFlashcard >= dateOnPendingUpdate) {
+              console.error(
+                `Flashcard ${flashcard.id} has already been reviewed on ${dateOnFlashcard.toISOString()}.`,
+              );
+              return null;
+            }
+          }
           const newInterval = calculateNewSrsInterval(
             flashcard.interval ?? 0, // current interval
             difficulty,
@@ -108,7 +123,6 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
           };
         })
         .filter((update) => update !== null);
-
       // Send batch update to backend
       if (updates.length > 0) {
         await updateFlashcards(updates);
@@ -127,6 +141,8 @@ export function useStudentFlashcardUpdates(): UseStudentFlashcardUpdatesReturn {
     setPendingFlashcardUpdateObjectsInLocalStorage,
     updateFlashcards,
     getFlashcardByExampleId,
+    isOwnUser,
+    appUser?.studentRole,
   ]);
 
   return {
