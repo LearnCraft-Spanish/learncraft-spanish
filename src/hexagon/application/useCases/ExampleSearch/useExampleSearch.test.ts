@@ -137,11 +137,11 @@ describe('useExampleSearch', () => {
     });
   });
 
-  it('always validates date mode', () => {
+  it('always validates recentlyEdited mode', () => {
     const { result } = renderHook(() => useExampleSearch());
 
     act(() => {
-      result.current.handleChangeMode('date');
+      result.current.handleChangeMode('recentlyEdited');
     });
 
     expect(result.current.isValidSearch).toBe(true);

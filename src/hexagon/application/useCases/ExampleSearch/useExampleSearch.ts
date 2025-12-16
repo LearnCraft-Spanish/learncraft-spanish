@@ -89,7 +89,7 @@ export function useExampleSearch() {
         quizNumber > 0
       );
     }
-    if (mode === 'date') {
+    if (mode === 'recentlyEdited') {
       return true;
     }
     if (mode === 'filter') {

@@ -11,9 +11,11 @@ vi.mock(
 );
 
 vi.mock(
-  '@interface/components/ExampleSearchInterface/Results/SearchByDateResults',
+  '@interface/components/ExampleSearchInterface/Results/SearchByRecentlyEditedResults',
   () => ({
-    SearchByDateResults: () => <div>Search By Date Results</div>,
+    SearchByRecentlyEditedResults: () => (
+      <div>Search By Recently Edited Results</div>
+    ),
   }),
 );
 
@@ -55,10 +57,12 @@ describe('component: Results', () => {
       ).toBeInTheDocument();
     });
 
-    it('should render SearchByDateResults when mode is "date"', () => {
-      render(<Results mode="date" {...mockProps} />);
+    it('should render SearchByRecentlyEditedResults when mode is "recentlyEdited"', () => {
+      render(<Results mode="recentlyEdited" {...mockProps} />);
 
-      expect(screen.getByText('Search By Date Results')).toBeInTheDocument();
+      expect(
+        screen.getByText('Search By Recently Edited Results'),
+      ).toBeInTheDocument();
     });
 
     it('should render SearchByQuizResults when mode is "quiz"', () => {
@@ -94,7 +98,7 @@ describe('component: Results', () => {
         screen.getByText('Local Filter Panel Results'),
       ).toBeInTheDocument();
       expect(
-        screen.queryByText('Search By Date Results'),
+        screen.queryByText('Search By Recently Edited Results'),
       ).not.toBeInTheDocument();
       expect(
         screen.queryByText('Search By Quiz Results'),
@@ -106,12 +110,14 @@ describe('component: Results', () => {
         screen.queryByText('Search By Ids Results'),
       ).not.toBeInTheDocument();
 
-      rerender(<Results mode="text" {...mockProps} />);
+      rerender(<Results mode="recentlyEdited" {...mockProps} />);
 
       expect(
         screen.queryByText('Local Filter Panel Results'),
       ).not.toBeInTheDocument();
-      expect(screen.getByText('Search By Text Results')).toBeInTheDocument();
+      expect(
+        screen.getByText('Search By Recently Edited Results'),
+      ).toBeInTheDocument();
     });
   });
 });

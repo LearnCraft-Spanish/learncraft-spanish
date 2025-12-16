@@ -23,7 +23,7 @@ export function Filters({
 }) {
   if (mode === 'filter') {
     return <LocalFilterPanel {...localFilterProps} />;
-  } else if (mode === 'date') {
+  } else if (mode === 'recentlyEdited') {
     return null;
   } else if (mode === 'quiz') {
     return <SearchByQuiz {...searchByQuizProps} />;

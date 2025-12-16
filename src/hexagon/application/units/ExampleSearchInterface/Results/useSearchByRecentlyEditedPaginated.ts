@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react';
 const PAGE_SIZE = 25;
 const QUERY_PAGE_SIZE = 100;
 
-export function useSearchByDatePagination() {
+export function useSearchByRecentlyEditedPaginated() {
   const [queryPage, setQueryPage] = useState(1);
 
   const changeQueryPage = useCallback((page: number) => {

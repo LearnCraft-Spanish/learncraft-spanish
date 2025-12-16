@@ -1,13 +1,13 @@
-import { useSearchByDatePagination } from '@application/units/ExampleSearchInterface/Results/useSearchByDatePagination';
-import { SearchByDateResults } from '@interface/components/ExampleSearchInterface/Results/SearchByDateResults';
+import { useExamplesByRecentlyModified } from '@application/queries/ExampleQueries/useExamplesByRecentlyModified';
+import { SearchByRecentlyEditedResults } from '@interface/components/ExampleSearchInterface/Results/SearchByRecentlyEditedResults';
 import { render, screen } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { describe, expect, it, vi } from 'vitest';
 
 vi.mock(
-  '@application/units/ExampleSearchInterface/Results/useSearchByDatePagination',
+  '@application/queries/ExampleQueries/useExamplesByRecentlyModified',
   () => ({
-    useSearchByDatePagination: vi.fn(() => ({
+    useExamplesByRecentlyModified: vi.fn(() => ({
       examples: createMockExampleWithVocabularyList(1),
       isLoading: false,
       error: null,
@@ -24,14 +24,14 @@ vi.mock('@application/coordinators/hooks/useSelectedExamplesContext', () => ({
   })),
 }));
 
-describe('searchByDateResults', () => {
+describe('searchByRecentlyEditedResults', () => {
   it('should render', () => {
-    render(<SearchByDateResults />);
+    render(<SearchByRecentlyEditedResults />);
     expect(screen.getByText('Search Results')).toBeInTheDocument();
   });
 
-  it('uses useSearchByDatePagination hook', () => {
-    render(<SearchByDateResults />);
-    expect(useSearchByDatePagination).toHaveBeenCalled();
+  it('uses useExamplesByRecentlyModified hook', () => {
+    render(<SearchByRecentlyEditedResults />);
+    expect(useExamplesByRecentlyModified).toHaveBeenCalled();
   });
 });

@@ -1,9 +1,9 @@
-import { useSearchByDatePagination } from '@application/units/ExampleSearchInterface/Results/useSearchByDatePagination';
+import { useSearchByRecentlyEditedPaginated } from '@application/units/ExampleSearchInterface/Results/useSearchByRecentlyEditedPaginated';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
 
-export function SearchByDateResults() {
+export function SearchByRecentlyEditedResults() {
   const { examples, isLoading, error, paginationState } =
-    useSearchByDatePagination();
+    useSearchByRecentlyEditedPaginated();
 
   return (
     <BaseResultsComponent

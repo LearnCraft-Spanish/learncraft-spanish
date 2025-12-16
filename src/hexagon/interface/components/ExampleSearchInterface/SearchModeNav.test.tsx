@@ -19,7 +19,7 @@ describe('component: SearchModeNav', () => {
       expect(screen.getByText('Search by Quiz')).toBeInTheDocument();
       expect(screen.getByText('Search by Text')).toBeInTheDocument();
       expect(screen.getByText('Search by IDs')).toBeInTheDocument();
-      expect(screen.getByText('Search by Date')).toBeInTheDocument();
+      expect(screen.getByText('Recently Edited Examples')).toBeInTheDocument();
     });
 
     describe('active mode', () => {

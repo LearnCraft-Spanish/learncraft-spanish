@@ -1,6 +1,11 @@
 // import type { ReactNode } from 'react';
 import '@interface/components/ExampleSearchInterface/SearchModeNav.scss';
-export type ExampleSearchMode = 'filter' | 'quiz' | 'text' | 'ids' | 'date';
+export type ExampleSearchMode =
+  | 'filter'
+  | 'quiz'
+  | 'text'
+  | 'ids'
+  | 'recentlyEdited';
 
 interface NavOption {
   mode: ExampleSearchMode;
@@ -13,7 +18,7 @@ const NAV_OPTIONS: NavOption[] = [
   { mode: 'quiz', label: 'Search by Quiz' },
   { mode: 'text', label: 'Search by Text' },
   { mode: 'ids', label: 'Search by IDs' },
-  { mode: 'date', label: 'Search by Date' },
+  { mode: 'recentlyEdited', label: 'Recently Edited Examples' },
 ];
 
 export function SearchModeNav({

@@ -3,7 +3,7 @@ import {
   overrideMockUseExamplesByRecentlyModified,
   resetMockUseExamplesByRecentlyModified,
 } from '@application/queries/ExampleQueries/useExamplesByRecentlyModified.mock';
-import { useSearchByDatePagination } from '@application/units/ExampleSearchInterface/Results/useSearchByDatePagination';
+import { useSearchByRecentlyEditedPaginated } from '@application/units/ExampleSearchInterface/Results/useSearchByRecentlyEditedPaginated';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
@@ -16,12 +16,12 @@ vi.mock(
   }),
 );
 
-describe('useSearchByDatePagination', () => {
+describe('useSearchByRecentlyEditedPaginated', () => {
   beforeEach(() => {
     resetMockUseExamplesByRecentlyModified();
   });
 
-  it('should return paginated examples by date correctly', async () => {
+  it('should return paginated examples by recently modified correctly', async () => {
     const mockExamples = createMockExampleWithVocabularyList(30);
 
     overrideMockUseExamplesByRecentlyModified({
@@ -30,7 +30,7 @@ describe('useSearchByDatePagination', () => {
       error: null,
     });
 
-    const { result } = renderHook(() => useSearchByDatePagination(), {
+    const { result } = renderHook(() => useSearchByRecentlyEditedPaginated(), {
       wrapper: TestQueryClientProvider,
     });
 
@@ -48,7 +48,7 @@ describe('useSearchByDatePagination', () => {
       error: null,
     });
 
-    const { result } = renderHook(() => useSearchByDatePagination(), {
+    const { result } = renderHook(() => useSearchByRecentlyEditedPaginated(), {
       wrapper: TestQueryClientProvider,
     });
 
@@ -58,7 +58,9 @@ describe('useSearchByDatePagination', () => {
   });
 
   it('should handle query errors correctly', async () => {
-    const testError = new Error('Failed to fetch examples by date');
+    const testError = new Error(
+      'Failed to fetch examples by recently modified',
+    );
 
     overrideMockUseExamplesByRecentlyModified({
       examples: undefined,
@@ -66,14 +68,14 @@ describe('useSearchByDatePagination', () => {
       error: testError,
     });
 
-    const { result } = renderHook(() => useSearchByDatePagination(), {
+    const { result } = renderHook(() => useSearchByRecentlyEditedPaginated(), {
       wrapper: TestQueryClientProvider,
     });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.error).toBeInstanceOf(Error);
     expect(result.current.error?.message).toBe(
-      'Failed to fetch examples by date',
+      'Failed to fetch examples by recently modified',
     );
     expect(result.current.examples).toEqual([]);
   });
