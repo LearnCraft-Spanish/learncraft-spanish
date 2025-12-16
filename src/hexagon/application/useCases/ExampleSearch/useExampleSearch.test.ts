@@ -1,7 +1,7 @@
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
 import { useExampleSearch } from '@application/useCases/ExampleSearch/useExampleSearch';
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockUseCombinedFilters = vi.fn();
 
@@ -96,9 +96,9 @@ describe('useExampleSearch', () => {
     });
 
     expect(result.current.isValidSearch).toBe(true);
-    expect(result.current.searchResultProps.textResultsProps.spanishString).toBe(
-      'hola',
-    );
+    expect(
+      result.current.searchResultProps.textResultsProps.spanishString,
+    ).toBe('hola');
   });
 
   it('validates ids mode when parsed IDs exist', () => {
@@ -112,7 +112,9 @@ describe('useExampleSearch', () => {
     });
 
     expect(result.current.isValidSearch).toBe(true);
-    expect(result.current.searchResultProps.idsResultsProps.ids).toEqual([10, 5]);
+    expect(result.current.searchResultProps.idsResultsProps.ids).toEqual([
+      10, 5,
+    ]);
   });
 
   it('validates quiz mode when course and quiz number are set', () => {
@@ -123,7 +125,9 @@ describe('useExampleSearch', () => {
       result.current.searchComponentProps.searchByQuizProps.onCourseCodeChange(
         'lcsp',
       );
-      result.current.searchComponentProps.searchByQuizProps.onQuizNumberChange(2);
+      result.current.searchComponentProps.searchByQuizProps.onQuizNumberChange(
+        2,
+      );
     });
 
     expect(result.current.isValidSearch).toBe(true);
@@ -149,16 +153,16 @@ describe('useExampleSearch', () => {
     act(() => {
       result.current.handleChangeMode('filter');
       result.current.searchComponentProps.localFilterProps.onCourseChange(7);
-      result.current.searchComponentProps.localFilterProps.onFromLessonChange(1);
+      result.current.searchComponentProps.localFilterProps.onFromLessonChange(
+        1,
+      );
       result.current.searchComponentProps.localFilterProps.onToLessonChange(10);
     });
 
     expect(result.current.isValidSearch).toBe(true);
     expect(
       result.current.searchResultProps.localFilterResultsProps.lessonRanges,
-    ).toEqual([
-      { courseId: 7, fromLessonNumber: 1, toLessonNumber: 10 },
-    ]);
+    ).toEqual([{ courseId: 7, fromLessonNumber: 1, toLessonNumber: 10 }]);
   });
 
   it('withSearchReset clears searchIsTriggered when inputs change', () => {
@@ -177,10 +181,8 @@ describe('useExampleSearch', () => {
     });
 
     expect(result.current.searchIsTriggered).toBe(false);
-    expect(result.current.searchResultProps.textResultsProps.englishString).toBe(
-      'hello',
-    );
+    expect(
+      result.current.searchResultProps.textResultsProps.englishString,
+    ).toBe('hello');
   });
 });
-
-
