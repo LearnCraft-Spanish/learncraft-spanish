@@ -12,6 +12,14 @@ export interface PaginationProps {
   previousPage: () => void;
 }
 
+export interface BaseResultsComponentProps {
+  isLoading: boolean;
+  error: Error | null;
+  examples: ExampleWithVocabulary[] | undefined;
+  info?: string;
+  pagination?: PaginationProps;
+  title?: string;
+}
 /**
  * BaseResultsComponent is a component that displays the search results.
  * all implementations will be a wrapper fetching, then displaying the results.
@@ -23,14 +31,7 @@ export function BaseResultsComponent({
   info,
   pagination,
   title,
-}: {
-  isLoading: boolean;
-  error: Error | null;
-  examples: ExampleWithVocabulary[] | undefined;
-  info?: string;
-  pagination?: PaginationProps;
-  title?: string;
-}) {
+}: BaseResultsComponentProps) {
   const { addSelectedExample, removeSelectedExample, selectedExampleIds } =
     useSelectedExamplesContext();
 

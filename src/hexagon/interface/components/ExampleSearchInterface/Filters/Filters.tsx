@@ -4,7 +4,6 @@ import type { SearchByQuizProps } from '@interface/components/ExampleSearchInter
 import type { SearchByTextProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { LocalFilterPanel } from '@interface/components/ExampleSearchInterface/Filters/LocalFilterPanel';
-import { SearchByDate } from '@interface/components/ExampleSearchInterface/Filters/SearchByDate';
 import { SearchByIds } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
 import { SearchByQuiz } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import { SearchByText } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
@@ -25,7 +24,7 @@ export function Filters({
   if (mode === 'filter') {
     return <LocalFilterPanel {...localFilterProps} />;
   } else if (mode === 'date') {
-    return <SearchByDate />;
+    return null;
   } else if (mode === 'quiz') {
     return <SearchByQuiz {...searchByQuizProps} />;
   } else if (mode === 'text') {

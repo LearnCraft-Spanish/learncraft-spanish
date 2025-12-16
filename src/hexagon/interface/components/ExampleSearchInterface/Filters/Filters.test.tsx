@@ -11,13 +11,6 @@ vi.mock(
 );
 
 vi.mock(
-  '@interface/components/ExampleSearchInterface/Filters/SearchByDate',
-  () => ({
-    SearchByDate: () => <div>Search By Date</div>,
-  }),
-);
-
-vi.mock(
   '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz',
   () => ({
     SearchByQuiz: () => <div>Search By Quiz</div>,
@@ -53,12 +46,6 @@ describe('component: Filters', () => {
       expect(screen.getByText('Local Filter Panel')).toBeInTheDocument();
     });
 
-    it('should render SearchByDate when mode is "date"', () => {
-      render(<Filters mode="date" {...mockProps} />);
-
-      expect(screen.getByText('Search By Date')).toBeInTheDocument();
-    });
-
     it('should render SearchByQuiz when mode is "quiz"', () => {
       render(<Filters mode="quiz" {...mockProps} />);
 
@@ -89,7 +76,6 @@ describe('component: Filters', () => {
       const { rerender } = render(<Filters mode="filter" {...mockProps} />);
 
       expect(screen.getByText('Local Filter Panel')).toBeInTheDocument();
-      expect(screen.queryByText('Search By Date')).not.toBeInTheDocument();
       expect(screen.queryByText('Search By Quiz')).not.toBeInTheDocument();
       expect(screen.queryByText('Search By Text')).not.toBeInTheDocument();
       expect(screen.queryByText('Search By Ids')).not.toBeInTheDocument();
