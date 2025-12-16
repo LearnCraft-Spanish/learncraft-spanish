@@ -1,12 +1,7 @@
-import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
+import type { UseOfficialQuizzesQueryReturn } from '@application/queries/useOfficialQuizzesQuery';
 import { createMockOfficialQuizRecordList } from '@testing/factories/quizFactory';
-import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
-interface UseOfficialQuizzesQueryReturn {
-  officialQuizRecords: OfficialQuizRecord[] | undefined;
-  isLoading: boolean;
-  error: Error | null;
-}
+import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation
 const defaultMockImplementation: UseOfficialQuizzesQueryReturn = {

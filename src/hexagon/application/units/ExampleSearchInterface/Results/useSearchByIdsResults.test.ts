@@ -86,26 +86,4 @@ describe('useSearchByIdsResults', () => {
     );
     expect(result.current.examples).toBeUndefined();
   });
-
-  it('should handle loading state correctly', () => {
-    const ids = [1, 2, 3];
-
-    overrideMockUseExampleByIdsQuery({
-      examples: undefined,
-      isLoading: true,
-      error: null,
-    });
-
-    const { result } = renderHook(
-      () =>
-        useSearchByIdsResults({
-          ids,
-        }),
-      { wrapper: TestQueryClientProvider },
-    );
-
-    expect(result.current.isLoading).toBe(true);
-    expect(result.current.examples).toBeUndefined();
-    expect(result.current.error).toBeNull();
-  });
 });

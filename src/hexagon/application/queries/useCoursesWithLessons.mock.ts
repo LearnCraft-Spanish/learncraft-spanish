@@ -1,12 +1,6 @@
-import type { CourseWithLessons } from '@learncraft-spanish/shared';
+import type { UseCoursesWithLessonsReturn } from '@application/queries/useCoursesWithLessons';
 import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
-
-interface UseCoursesWithLessonsReturn {
-  data: CourseWithLessons[] | undefined;
-  isLoading: boolean;
-  error: Error | null;
-}
 
 // Create a default mock implementation
 const defaultMockImplementation: UseCoursesWithLessonsReturn = {
