@@ -1,34 +1,19 @@
 import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
+import type { ExampleEditRow } from '@domain/PasteTable/exampleEditRow';
 import type { TableColumn } from '@domain/PasteTable/General';
-import type {
-  ExampleTechnical,
-  UpdateExampleCommand,
-} from '@learncraft-spanish/shared';
+import type { ExampleTechnical } from '@learncraft-spanish/shared';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
+import {
+  mapEditRowToUpdateCommand,
+  mapExampleToEditRow,
+} from '@domain/PasteTable/exampleEditRow';
 import { createAudioUrlAdapter } from '@domain/PasteTable/functions/audioUrlAdapter';
 import { updateExampleCommandSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 
-/**
- * Table row type for editing examples
- * Uses hasAudio boolean instead of two separate URL fields
- */
-export interface ExampleEditRow extends Record<string, unknown> {
-  /** Domain ID for matching during edit operations */
-  id: number;
-  /** Spanish example text */
-  spanish: string;
-  /** English translation */
-  english: string;
-  /** Single boolean to represent audio availability */
-  hasAudio: boolean;
-  /** Whether this is a spanglish example */
-  spanglish: boolean;
-  /** Whether vocabulary is complete for this example */
-  vocabularyComplete: boolean;
-}
+export type { ExampleEditRow };
 
 /**
  * Props for the useExampleEditor hook
@@ -125,51 +110,6 @@ const exampleEditColumns: TableColumn[] = [
     type: 'boolean',
   },
 ];
-
-/**
- * Map ExampleTechnical to ExampleEditRow
- * Converts two audio URL fields to single hasAudio boolean
- */
-function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
-  // hasAudio is true if BOTH audio URLs are present and non-empty
-  const hasAudio = !!(example.spanishAudio && example.englishAudio);
-
-  return {
-    id: example.id,
-    spanish: example.spanish,
-    english: example.english,
-    hasAudio,
-    spanglish: example.spanglish,
-    vocabularyComplete: example.vocabularyComplete,
-  };
-}
-
-/**
- * Map ExampleEditRow back to UpdateExampleCommand
- * Converts hasAudio boolean back to two audio URL fields
- */
-function mapEditRowToUpdateCommand(
-  row: Partial<ExampleEditRow>,
-  audioUrlAdapter: ReturnType<typeof createAudioUrlAdapter>,
-): UpdateExampleCommand {
-  const exampleId = row.id!;
-
-  // Generate audio URLs from hasAudio boolean
-  const audioUrls = audioUrlAdapter.generateAudioUrls(
-    row.hasAudio ?? false,
-    exampleId,
-  );
-
-  return {
-    exampleId,
-    spanish: row.spanish,
-    english: row.english,
-    spanishAudio: audioUrls.spanishAudioLa,
-    englishAudio: audioUrls.englishAudio,
-    vocabularyComplete: row.vocabularyComplete,
-    // Note: spanglish is not in UpdateExampleCommand - it's computed server-side
-  };
-}
 
 /**
  * Use case hook for editing examples using a paste table

@@ -3,6 +3,9 @@
  * Exports all types, interfaces, and functions
  */
 
+// Entity-specific types and mappers
+export * from '@domain/PasteTable/exampleEditRow';
+
 // Functions
 export * from '@domain/PasteTable/functions';
 

@@ -11,6 +11,12 @@ import {
   useTableRows,
   useTableValidation,
 } from '@application/units/pasteTable/hooks';
+import {
+  mapAndParseTableRowsToDomain,
+  mapDomainToTableRows,
+} from '@domain/PasteTable/functions/mappers';
+import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
+import { useCallback, useMemo } from 'react';
 
 /**
  * ID used for the ghost row that appears at the bottom of create tables
@@ -46,12 +52,6 @@ export interface CreateTableHook<T> {
   // Returns T[] after validation ensures all required fields are present
   saveData: () => Promise<T[] | undefined>;
 }
-import {
-  mapAndParseTableRowsToDomain,
-  mapDomainToTableRows,
-} from '@domain/PasteTable/functions/mappers';
-import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
-import { useCallback, useMemo } from 'react';
 
 interface UseCreateTableOptions<T extends Record<string, unknown>> {
   columns: TableColumn[];
