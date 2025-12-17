@@ -3,14 +3,16 @@ import { useCoursesWithLessons } from '@application/queries/useCoursesWithLesson
 export default function SelectCourse({
   value,
   onChange,
+  required,
 }: {
   value: string;
   onChange: (value: string) => void;
+  required?: boolean;
 }) {
   const { data: coursesWithLessons } = useCoursesWithLessons();
   return (
     <label htmlFor="courseList" className="menuRow" id="courseRow">
-      <p>Course:</p>
+      <p className={required ? 'required' : ''}>Course:</p>
       <select
         id="courseList"
         name="courseList"

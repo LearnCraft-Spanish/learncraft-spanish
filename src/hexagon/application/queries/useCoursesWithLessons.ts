@@ -1,9 +1,14 @@
+import type { CourseWithLessons } from '@learncraft-spanish/shared';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCourseAdapter } from '@application/adapters/courseAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useQuery } from '@tanstack/react-query';
-
-export function useCoursesWithLessons() {
+export interface UseCoursesWithLessonsReturn {
+  data: CourseWithLessons[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
+}
+export function useCoursesWithLessons(): UseCoursesWithLessonsReturn {
   const adapter = useCourseAdapter();
   const { isAuthenticated, isAdmin, isCoach } = useAuthAdapter();
   const { appUser, isLoading } = useActiveStudent();
