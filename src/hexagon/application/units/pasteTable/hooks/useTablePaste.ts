@@ -1,11 +1,11 @@
 import type { TableColumn, TableRow } from '@domain/PasteTable/General';
 import type { ClipboardEvent } from 'react';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import {
   convertTsvToRows,
   detectHeaderRow,
   parseDelimitedText,
 } from '@application/units/pasteTable/utils';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { cellsEqual } from '@domain/PasteTable/functions/rowComparison';
 import { useCallback, useState } from 'react';
 

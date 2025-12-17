@@ -1,8 +1,4 @@
-import type {
-  ExampleEditRow,
-  UseExampleEditorProps,
-  UseExampleEditorResult,
-} from '@application/useCases/useExampleEditor/useExampleEditor.types';
+import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
 import type { TableColumn } from '@domain/PasteTable/General';
 import type {
   ExampleTechnical,
@@ -11,20 +7,81 @@ import type {
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
 import { createAudioUrlAdapter } from '@domain/PasteTable/functions/audioUrlAdapter';
+import { updateExampleCommandSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 
 /**
- * Schema for validating example edit rows
+ * Table row type for editing examples
+ * Uses hasAudio boolean instead of two separate URL fields
  */
-const exampleEditRowSchema = z.object({
-  id: z.coerce.number(),
-  spanish: z.string().min(1, 'Spanish text is required'),
-  english: z.string().min(1, 'English translation is required'),
-  hasAudio: z.coerce.boolean(),
-  spanglish: z.coerce.boolean(),
-  vocabularyComplete: z.coerce.boolean(),
-});
+export interface ExampleEditRow extends Record<string, unknown> {
+  /** Domain ID for matching during edit operations */
+  id: number;
+  /** Spanish example text */
+  spanish: string;
+  /** English translation */
+  english: string;
+  /** Single boolean to represent audio availability */
+  hasAudio: boolean;
+  /** Whether this is a spanglish example */
+  spanglish: boolean;
+  /** Whether vocabulary is complete for this example */
+  vocabularyComplete: boolean;
+}
+
+/**
+ * Props for the useExampleEditor hook
+ */
+export interface UseExampleEditorProps {
+  /** Source examples from TanStack query */
+  examples: ExampleTechnical[];
+  /** Callback when examples are saved */
+  onSave?: () => void;
+}
+
+/**
+ * Return type for the useExampleEditor hook
+ */
+export interface UseExampleEditorResult {
+  /** The edit table hook with all table operations */
+  tableHook: EditTableHook<ExampleEditRow>;
+  /** Discard all changes and revert to source data */
+  discardChanges: () => void;
+  /** Apply changes - saves dirty rows */
+  applyChanges: () => Promise<void>;
+  /** Whether the table has unsaved changes */
+  hasUnsavedChanges: boolean;
+  /** Whether save is in progress */
+  isSaving: boolean;
+  /** Error from save operation */
+  saveError: Error | null;
+}
+
+/**
+ * Schema for validating example edit rows
+ * Derived from updateExampleCommandSchema, adapted for table UI:
+ * - Renames exampleId -> id
+ * - Replaces audio URL fields with hasAudio boolean
+ * - Adds spanglish (display-only, computed server-side)
+ * - Makes vocabularyComplete required (has default in UI)
+ */
+const exampleEditRowSchema = updateExampleCommandSchema
+  .omit({
+    exampleId: true,
+    spanishAudio: true,
+    englishAudio: true,
+    relatedVocabulary: true,
+    vocabularyComplete: true,
+  })
+  .extend({
+    id: z.coerce.number(),
+    spanish: z.string().min(1, 'Spanish text is required'),
+    english: z.string().min(1, 'English translation is required'),
+    hasAudio: z.coerce.boolean(),
+    spanglish: z.coerce.boolean(),
+    vocabularyComplete: z.coerce.boolean(),
+  });
 
 /**
  * Column definitions for the example edit table
