@@ -262,8 +262,6 @@ export function PasteTable<T>({
 
   // Enhanced reset handler to completely clear all state
   const handleReset = useCallback(() => {
-    console.error('Starting UI reset'); // Debugging
-
     // Reset table data via application hook
     resetTable();
 
@@ -279,8 +277,6 @@ export function PasteTable<T>({
     if (tableEl instanceof HTMLElement) {
       tableEl.focus();
     }
-
-    console.error('UI reset complete'); // Debugging
   }, [resetTable]);
 
   return (

@@ -1,37 +1,75 @@
-import type { TableColumn, TableHook } from '@domain/PasteTable/General';
-import type { ColumnDefinition } from '@domain/PasteTable/types';
+import type {
+  ColumnDefinition,
+  TableColumn,
+  TableRow,
+  ValidationState,
+} from '@domain/PasteTable/types';
+import type { ClipboardEvent } from 'react';
 import type { z } from 'zod';
 import {
   useTablePaste,
   useTableRows,
   useTableValidation,
 } from '@application/units/pasteTable/hooks';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import {
   mapAndParseTableRowsToDomain,
   mapDomainToTableRows,
-  mapTableRowsToDomain,
 } from '@domain/PasteTable/functions/mappers';
 import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
 import { useCallback, useMemo } from 'react';
 
-interface UsePasteTableOptions<T extends Record<string, unknown>> {
+/**
+ * ID used for the ghost row that appears at the bottom of create tables
+ */
+export const GHOST_ROW_ID = 'ghost-row';
+
+/**
+ * Create table hook interface
+ * For tables that allow creating new records via paste/editing
+ */
+export interface CreateTableHook<T> {
+  // Data
+  data: {
+    rows: TableRow[];
+    columns: TableColumn[];
+  };
+
+  // Operations
+  updateCell: (rowId: string, columnId: string, value: string) => string | null;
+  handlePaste: (e: ClipboardEvent<Element>) => void;
+  importData: (data: T[]) => void;
+  resetTable: () => void;
+
+  // Focus tracking (for paste operations)
+  setActiveCellInfo: (rowId: string, columnId: string) => void;
+  clearActiveCellInfo: () => void;
+
+  // State
+  isSaveEnabled: boolean;
+  validationState: ValidationState;
+
+  // Save operation (returns data for external save)
+  // Returns T[] after validation ensures all required fields are present
+  saveData: () => Promise<T[] | undefined>;
+}
+
+interface UseCreateTableOptions<T extends Record<string, unknown>> {
   columns: TableColumn[];
   /** Full row Zod schema for row-level validation (preferred) */
   rowSchema?: z.ZodType<T, any, any>;
-  initialData?: T[]; // Allow providing initial data
+  initialData?: T[];
 }
 
 /**
- * Main hook for paste table functionality
- * Validation is purely derived from row data
- * Requires Zod schemas (column-level or row-level) for validation
+ * Hook for create table functionality
+ * Allows creating new records via paste/editing
+ * Implements CreateTableHook<T> interface
  */
-export function usePasteTable<T extends Record<string, unknown>>({
+export function useCreateTable<T extends Record<string, unknown>>({
   columns,
   rowSchema,
   initialData = [],
-}: UsePasteTableOptions<T>): TableHook<T> {
+}: UseCreateTableOptions<T>): CreateTableHook<T> {
   // Extract domain columns for mapping
   const domainColumns: ColumnDefinition[] = useMemo(
     () =>
@@ -42,7 +80,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
     [columns],
   );
 
-  // Core row management
+  // Core row management (includes ghost row handling)
   const {
     rows,
     updateCell: updateCellBase,
@@ -69,33 +107,33 @@ export function usePasteTable<T extends Record<string, unknown>>({
     return createCombinedValidateRow<T>(domainColumns, rowSchema);
   }, [domainColumns, rowSchema]);
 
-  // Validation - now purely derived from row data
-  // validateRow function operates on TableRow (normalized, typed)
+  // Validation - derived from row data
   const { validationState, isSaveEnabled, validateAll } = useTableValidation({
     rows,
     validateRow,
   });
 
-  // Paste handling
+  // Paste handling - create mode (always creates new rows)
   const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(
     {
       columns,
       rows,
       updateCell: updateCellBase,
       setRows,
+      mode: 'create', // Explicitly set create mode
     },
   );
 
-  // Cell update - now triggering validation directly
+  // Cell update - handles ghost row conversion
   const updateCell = useCallback(
-    (rowId: string, columnId: string, value: string) => {
+    (rowId: string, columnId: string, value: string): string | null => {
       // Handle ghost row conversion
       if (rowId === GHOST_ROW_ID && value.trim() !== '') {
-        // Convert ghost row to real row
+        // Convert ghost row to real row, returns new row ID
         return convertGhostRow(rowId, columnId, value);
       }
 
-      // Update cell data and trigger validation
+      // Regular cell update
       updateCellBase(rowId, columnId, value);
       return null;
     },
@@ -118,8 +156,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
   );
 
   // Save operation - returns data for external save
-  // If rowSchema is provided, parses through schema to get complete T[]
-  // Otherwise returns Partial<T>[] (column schemas alone can't guarantee completeness)
+  // Parses through schema to get complete T[] (not Partial<T>[])
   const saveData = useCallback(async (): Promise<T[] | undefined> => {
     // Get fresh validation state
     const { isValid } = validateAll();
@@ -129,51 +166,43 @@ export function usePasteTable<T extends Record<string, unknown>>({
       return undefined;
     }
 
-    // Filter out ghost row
-    const dataRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
-
-    // If we have a rowSchema, parse through it to get complete T[]
-    if (rowSchema) {
-      return mapAndParseTableRowsToDomain<T>(
-        dataRows,
-        domainColumns,
-        rowSchema,
-        GHOST_ROW_ID,
+    // Require rowSchema for complete type (can't guarantee completeness with column schemas alone)
+    if (!rowSchema) {
+      throw new Error(
+        'rowSchema is required for saveData to return complete T[]',
       );
     }
 
-    // Without rowSchema, we can't guarantee completeness
-    // This shouldn't happen since we require at least one schema, but handle it gracefully
-    const data = mapTableRowsToDomain<T>(dataRows, domainColumns);
-    return data as T[]; // Type assertion needed here - caller should provide rowSchema
+    // Map and parse through schema to get complete T[]
+    const dataRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
+    return mapAndParseTableRowsToDomain<T>(
+      dataRows,
+      domainColumns,
+      rowSchema,
+      GHOST_ROW_ID,
+    );
   }, [rows, domainColumns, rowSchema, validateAll]);
 
-  // Reset the table to completely empty state
+  // Reset table to empty state
   const resetTable = useCallback(() => {
-    // Reset rows to just a brand new ghost row
     resetRows();
-
-    // Clear any active cell info from paste handling
     clearActiveCellInfo();
-
-    // No need to reset validation explicitly - it will be recalculated
-    // by our derived validation mechanism as soon as rows change
   }, [resetRows, clearActiveCellInfo]);
 
-  // Return a clean, focused API
+  // Return CreateTableHook interface
   return {
     data: {
       rows,
       columns,
     },
     updateCell,
-    saveData,
-    resetTable,
-    importData,
     handlePaste,
+    importData,
+    resetTable,
     setActiveCellInfo,
     clearActiveCellInfo,
     isSaveEnabled,
     validationState,
+    saveData,
   };
 }

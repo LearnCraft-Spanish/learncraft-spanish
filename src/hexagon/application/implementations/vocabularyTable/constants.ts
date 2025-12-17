@@ -25,10 +25,9 @@ export const VOCABULARY_COLUMNS: TableColumn[] = [
   // Generate columns from schema fields
   ...Object.keys(SCHEMA_FIELD_CONFIG).map((field) => ({
     id: field,
+    type: SCHEMA_FIELD_CONFIG[field].type,
     label: SCHEMA_FIELD_CONFIG[field].label,
     width: SCHEMA_FIELD_CONFIG[field].width,
-    type: SCHEMA_FIELD_CONFIG[field].type,
-    min: SCHEMA_FIELD_CONFIG[field].min,
-    max: SCHEMA_FIELD_CONFIG[field].max,
+    options: [],
   })),
 ];

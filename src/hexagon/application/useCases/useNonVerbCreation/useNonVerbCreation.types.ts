@@ -1,5 +1,5 @@
+import type { CreateTableHook } from '@application/units/pasteTable/useCreateTable';
 import type { VocabularyPaginationState } from '@application/useCases/types';
-import type { TableHook } from '@domain/PasteTable/General';
 import type {
   CreateNonVerbVocabulary,
   Subcategory,
@@ -17,7 +17,7 @@ export interface UseNonVerbCreationResult {
   creationError: Error | null;
 
   // Table hook API - exposed through the façade
-  tableHook: TableHook<CreateNonVerbVocabulary>;
+  tableHook: CreateTableHook<CreateNonVerbVocabulary>;
 
   // Unified save action that handles validation, table save, and creation
   saveVocabulary: () => Promise<number[]>;
