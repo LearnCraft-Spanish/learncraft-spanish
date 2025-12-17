@@ -167,6 +167,10 @@ function convertCellValueToDomainType(
     }
 
     case 'number': {
+      // Empty string should return undefined, not 0
+      if (normalized === '') {
+        return undefined;
+      }
       const numValue = Number(normalized);
       if (!Number.isNaN(numValue)) {
         return numValue;

@@ -188,27 +188,24 @@ export function formatDateForTable(
 
 /**
  * Format date for UI display
+ * Uses UTC to avoid timezone issues - ISO under the hood, local only at display
  */
 function formatDateDisplay(date: Date, format: string): string {
+  // Use UTC methods to avoid timezone shifts
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+
   // Manual formatting for common formats
   if (format === 'YYYY-MM-DD') {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
 
   if (format === 'MM/DD/YYYY') {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const year = date.getFullYear();
     return `${month}/${day}/${year}`;
   }
 
   if (format === 'DD-MM-YYYY') {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   }
 

@@ -2,6 +2,7 @@ import type {
   ColumnDefinition,
   NumberColumnDefinition,
   TableRow,
+  TextColumnDefinition,
 } from '@domain/PasteTable/types';
 import {
   computeValidationState,
@@ -9,6 +10,7 @@ import {
   validateRow,
 } from '@domain/PasteTable/functions/validation';
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
 describe('validation', () => {
   describe('validateRow', () => {
@@ -168,10 +170,12 @@ describe('validation', () => {
       expect(result).toBe('age must be at most 100');
     });
 
-    it('should use custom validator', () => {
-      const column: ColumnDefinition = {
+    it('should use custom schema validator', () => {
+      const emailSchema = z.string().email('Invalid email format');
+      const column: TextColumnDefinition = {
         id: 'email',
         type: 'text',
+        schema: emailSchema,
       };
 
       expect(validateCell('test@example.com', column)).toBeNull();

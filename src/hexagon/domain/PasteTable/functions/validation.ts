@@ -58,6 +58,15 @@ export function validateCell(
     return `${column.id} is required`;
   }
 
+  // Custom schema validation takes precedence
+  if (column.schema) {
+    const result = column.schema.safeParse(value);
+    if (!result.success) {
+      // Return the first error message
+      return result.error.errors[0]?.message || `${column.id} is invalid`;
+    }
+  }
+
   // Type-specific validation with type guards
   if (isNumberColumn(column)) {
     const numValue = Number(value);

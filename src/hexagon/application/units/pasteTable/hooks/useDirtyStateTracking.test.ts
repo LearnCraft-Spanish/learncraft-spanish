@@ -3,7 +3,10 @@ import { useDirtyStateTracking } from '@application/units/pasteTable/hooks/useDi
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 // Helper to create test rows
-const createTestRow = (id: string, cells: Record<string, string>): TableRow => ({
+const createTestRow = (
+  id: string,
+  cells: Record<string, string>,
+): TableRow => ({
   id,
   cells,
 });
@@ -371,4 +374,3 @@ describe('useDirtyStateTracking', () => {
     });
   });
 });
-
