@@ -318,9 +318,7 @@ describe('useEditTable', () => {
       });
 
       // Row with ID 1 should be updated
-      const row1 = result.current.data.rows.find(
-        (r) => r.cells.id === '1',
-      );
+      const row1 = result.current.data.rows.find((r) => r.cells.id === '1');
       expect(row1?.cells.name).toBe('Updated Name');
       expect(row1?.cells.value).toBe('100');
     });
@@ -464,4 +462,3 @@ describe('useEditTable', () => {
     });
   });
 });
-

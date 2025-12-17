@@ -1,7 +1,7 @@
 import type { TableColumn, TableRow } from '@domain/PasteTable/General';
 import type { ClipboardEvent } from 'react';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useTablePaste } from '@application/units/pasteTable/hooks/useTablePaste';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { act, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 
@@ -224,16 +224,12 @@ describe('useTablePaste', () => {
       const updatedRows = setRows.mock.calls[0][0];
 
       // Row with id=1 should be updated
-      const row1 = updatedRows.find(
-        (r: TableRow) => r.cells.id === '1',
-      );
+      const row1 = updatedRows.find((r: TableRow) => r.cells.id === '1');
       expect(row1?.cells.name).toBe('Updated 1');
       expect(row1?.cells.value).toBe('100');
 
       // Row with id=2 should be unchanged
-      const row2 = updatedRows.find(
-        (r: TableRow) => r.cells.id === '2',
-      );
+      const row2 = updatedRows.find((r: TableRow) => r.cells.id === '2');
       expect(row2?.cells.name).toBe('Original 2');
     });
 
@@ -375,7 +371,7 @@ describe('useTablePaste', () => {
     });
   });
 
-  describe('CSV parsing', () => {
+  describe('cSV parsing', () => {
     it('should parse CSV with commas correctly', () => {
       const setRows = vi.fn();
       const rows = [createGhostRow()];
@@ -464,4 +460,3 @@ describe('useTablePaste', () => {
     });
   });
 });
-

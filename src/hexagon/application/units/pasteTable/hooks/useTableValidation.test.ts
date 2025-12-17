@@ -1,10 +1,13 @@
 import type { TableRow } from '@domain/PasteTable/General';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useTableValidation } from '@application/units/pasteTable/hooks/useTableValidation';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { act, renderHook } from '@testing-library/react';
 
 // Helper to create test rows
-const createTestRow = (id: string, cells: Record<string, string>): TableRow => ({
+const createTestRow = (
+  id: string,
+  cells: Record<string, string>,
+): TableRow => ({
   id,
   cells,
 });
@@ -144,7 +147,9 @@ describe('useTableValidation', () => {
 
       // Should be valid because ghost row is skipped
       expect(result.current.validationState.isValid).toBe(true);
-      expect(result.current.validationState.errors[GHOST_ROW_ID]).toBeUndefined();
+      expect(
+        result.current.validationState.errors[GHOST_ROW_ID],
+      ).toBeUndefined();
     });
   });
 
@@ -309,4 +314,3 @@ describe('useTableValidation', () => {
     });
   });
 });
-

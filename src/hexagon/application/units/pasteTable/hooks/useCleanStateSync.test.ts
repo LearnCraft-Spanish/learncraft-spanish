@@ -4,7 +4,10 @@ import { act, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 
 // Helper to create test rows
-const createTestRow = (id: string, cells: Record<string, string>): TableRow => ({
+const createTestRow = (
+  id: string,
+  cells: Record<string, string>,
+): TableRow => ({
   id,
   cells,
 });
@@ -319,4 +322,3 @@ describe('useCleanStateSync', () => {
     });
   });
 });
-

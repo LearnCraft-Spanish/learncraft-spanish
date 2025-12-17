@@ -1,7 +1,6 @@
-export { useExampleEditor } from './useExampleEditor';
+export { useExampleEditor } from '@application/useCases/useExampleEditor/useExampleEditor';
 export type {
   ExampleEditRow,
   UseExampleEditorProps,
   UseExampleEditorResult,
-} from './useExampleEditor.types';
-
+} from '@application/useCases/useExampleEditor/useExampleEditor.types';
