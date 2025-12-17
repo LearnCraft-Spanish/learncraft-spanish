@@ -1,14 +1,7 @@
-import {
-  generateRowId,
-  resetRowIdCounter,
-} from '@domain/PasteTable/functions/rowId';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { generateRowId } from '@domain/PasteTable/functions/rowId';
+import { describe, expect, it } from 'vitest';
 
 describe('rowId', () => {
-  beforeEach(() => {
-    resetRowIdCounter();
-  });
-
   describe('generateRowId', () => {
     it('should generate unique row IDs', () => {
       const id1 = generateRowId();
@@ -20,30 +13,20 @@ describe('rowId', () => {
       expect(id1).not.toBe(id3);
     });
 
-    it('should generate IDs with expected format', () => {
+    it('should generate IDs with row- prefix and UUID format', () => {
       const id = generateRowId();
-      expect(id).toMatch(/^row-\d+-\d+-\d+$/);
+      // UUID v4 format: row-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+      expect(id).toMatch(
+        /^row-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+      );
     });
 
-    it('should generate different IDs even with same timestamp', () => {
-      const id1 = generateRowId();
-      const id2 = generateRowId();
-
-      expect(id1).not.toBe(id2);
-    });
-  });
-
-  describe('resetRowIdCounter', () => {
-    it('should reset counter to 0', () => {
-      generateRowId();
-      generateRowId();
-      const beforeReset = generateRowId();
-
-      resetRowIdCounter();
-
-      const afterReset = generateRowId();
-      // Counter should be lower after reset
-      expect(afterReset).not.toBe(beforeReset);
+    it('should generate different IDs on each call', () => {
+      const ids = new Set<string>();
+      for (let i = 0; i < 100; i++) {
+        ids.add(generateRowId());
+      }
+      expect(ids.size).toBe(100);
     });
   });
 });

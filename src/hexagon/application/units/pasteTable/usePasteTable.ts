@@ -158,8 +158,6 @@ export function usePasteTable<T extends Record<string, unknown>>({
 
     // No need to reset validation explicitly - it will be recalculated
     // by our derived validation mechanism as soon as rows change
-
-    console.error('Table completely reset'); // Debugging
   }, [resetRows, clearActiveCellInfo]);
 
   // Return a clean, focused API

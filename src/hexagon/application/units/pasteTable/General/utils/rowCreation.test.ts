@@ -1,19 +1,14 @@
 import type { TableColumn, TableRow } from '@domain/PasteTable/General';
 import { convertDataToRows } from '@application/units/pasteTable/General/utils/rowCreation';
-import { resetRowIdCounter } from '@application/units/pasteTable/utils/rowCreation';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 const testColumns: TableColumn[] = [
   { id: 'name', label: 'Name', type: 'text' },
   { id: 'age', label: 'Age', type: 'number' },
   { id: 'city', label: 'City', type: 'text' },
 ];
-describe('convertDataToRows', () => {
-  // Reset row ID counter before each test for consistent IDs
-  beforeEach(() => {
-    resetRowIdCounter();
-  });
 
+describe('convertDataToRows', () => {
   describe('success cases', () => {
     it('should convert simple typed data to rows with matching columns', () => {
       // Given: An array of typed objects and matching columns
