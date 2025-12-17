@@ -1,6 +1,6 @@
 import type { TableColumn } from '@domain/PasteTable/General';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useTableRows } from '@application/units/pasteTable/hooks/useTableRows';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { act, renderHook } from '@testing-library/react';
 
 // Test columns
@@ -118,7 +118,11 @@ describe('useTableRows', () => {
 
       let newRowId: string | null = null;
       act(() => {
-        newRowId = result.current.convertGhostRow(GHOST_ROW_ID, 'name', 'New Item');
+        newRowId = result.current.convertGhostRow(
+          GHOST_ROW_ID,
+          'name',
+          'New Item',
+        );
       });
 
       expect(newRowId).not.toBeNull();
@@ -150,7 +154,11 @@ describe('useTableRows', () => {
 
       let returnValue: string | null = null;
       act(() => {
-        returnValue = result.current.convertGhostRow(GHOST_ROW_ID, 'name', '   ');
+        returnValue = result.current.convertGhostRow(
+          GHOST_ROW_ID,
+          'name',
+          '   ',
+        );
       });
 
       expect(returnValue).toBeNull();
@@ -226,7 +234,9 @@ describe('useTableRows', () => {
 
       // Should only have 2 rows (no duplicate ghost row)
       expect(result.current.rows).toHaveLength(2);
-      expect(result.current.rows.filter((r) => r.id === GHOST_ROW_ID)).toHaveLength(1);
+      expect(
+        result.current.rows.filter((r) => r.id === GHOST_ROW_ID),
+      ).toHaveLength(1);
     });
   });
 
@@ -340,4 +350,3 @@ describe('useTableRows', () => {
     });
   });
 });
-

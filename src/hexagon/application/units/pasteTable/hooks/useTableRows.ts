@@ -9,11 +9,14 @@ import { useCallback, useRef, useState } from 'react';
 interface UseTableRowsProps<T> {
   columns: TableColumn[];
   initialData?: T[];
+  /** Whether to include ghost row for adding new entries (default: true) */
+  includeGhostRow?: boolean;
 }
 
 export function useTableRows<T>({
   columns,
   initialData = [],
+  includeGhostRow = true,
 }: UseTableRowsProps<T>) {
   // Use ref for row ID counter to ensure uniqueness
   const rowIdCounter = useRef(0);
@@ -49,9 +52,11 @@ export function useTableRows<T>({
   // Convert initial data to TableRows
   const initialRows = convertToRows(initialData);
 
-  // Initialize with converted rows + ghost row
+  // Initialize with converted rows (+ ghost row if enabled)
   const [data, setData] = useState<TableData>(() => ({
-    rows: [...initialRows, createGhostRow(columns)],
+    rows: includeGhostRow
+      ? [...initialRows, createGhostRow(columns)]
+      : initialRows,
   }));
 
   // Regular cell update for non-ghost rows
@@ -178,7 +183,7 @@ export function useTableRows<T>({
     [columns, generateRowId],
   );
 
-  // Replace all rows while preserving ghost row
+  // Replace all rows while preserving ghost row (if enabled)
   // This version supports both direct row assignments and updater functions
   const setRows = useCallback(
     (
@@ -191,6 +196,11 @@ export function useTableRows<T>({
             ? newRowsOrUpdater(prev.rows)
             : newRowsOrUpdater;
 
+        // Only add ghost row if enabled
+        if (!includeGhostRow) {
+          return { rows: updatedRows };
+        }
+
         // Ensure we have a ghost row at the end
         const hasGhostRow = updatedRows.some((row) => row.id === 'ghost-row');
         const finalRows = hasGhostRow
@@ -200,7 +210,7 @@ export function useTableRows<T>({
         return { rows: finalRows };
       });
     },
-    [columns],
+    [columns, includeGhostRow],
   );
 
   // Reset table to empty state
@@ -208,14 +218,14 @@ export function useTableRows<T>({
     // Reset the row ID counter
     rowIdCounter.current = 0;
 
-    // Force a complete reset by creating a fresh ghost row
-    const freshGhostRow = createGhostRow(columns);
-
-    // Explicitly set data to only contain the fresh ghost row
-    setData({
-      rows: [freshGhostRow],
-    });
-  }, [columns]);
+    // Reset to empty (with ghost row if enabled)
+    if (includeGhostRow) {
+      const freshGhostRow = createGhostRow(columns);
+      setData({ rows: [freshGhostRow] });
+    } else {
+      setData({ rows: [] });
+    }
+  }, [columns, includeGhostRow]);
 
   return {
     rows: data.rows,

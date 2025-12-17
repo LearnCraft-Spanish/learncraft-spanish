@@ -64,6 +64,7 @@ export function useEditTable<T extends Record<string, unknown>>({
   } = useTableRows<T>({
     columns,
     initialData: cleanRows.length > 0 ? sourceData : [],
+    includeGhostRow: false, // Edit mode doesn't allow creating new rows
   });
 
   // Track dirty state by comparing rows to cleanRows

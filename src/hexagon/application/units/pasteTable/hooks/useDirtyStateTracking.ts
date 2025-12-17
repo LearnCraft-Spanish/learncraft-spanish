@@ -40,18 +40,20 @@ export function useDirtyStateTracking({
   }, [rows, cleanRows, idColumnId]);
 
   // Sync computed dirty state to state when it changes
-  const prevComputedDirtyRef = useRef(computedDirtyRowIds);
+  // Initialize ref with undefined so first render triggers sync
+  const prevComputedDirtyRef = useRef<Set<string> | undefined>(undefined);
   if (prevComputedDirtyRef.current !== computedDirtyRowIds) {
     // Only update if actually different (avoid infinite loops)
     const isDifferent =
+      !prevComputedDirtyRef.current ||
       computedDirtyRowIds.size !== dirtyRowIds.size ||
       Array.from(computedDirtyRowIds).some((id) => !dirtyRowIds.has(id)) ||
       Array.from(dirtyRowIds).some((id) => !computedDirtyRowIds.has(id));
 
     if (isDifferent) {
       setDirtyRowIds(computedDirtyRowIds);
-      prevComputedDirtyRef.current = computedDirtyRowIds;
     }
+    prevComputedDirtyRef.current = computedDirtyRowIds;
   }
 
   // Mark a row as dirty (for paste operations)

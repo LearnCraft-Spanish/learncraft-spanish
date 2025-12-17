@@ -1,6 +1,6 @@
 import type { TableRow } from '@domain/PasteTable/types';
 import { useDirtyStateTracking } from '@application/units/pasteTable/hooks/useDirtyStateTracking';
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
 // Helper to create test rows
 const createTestRow = (id: string, cells: Record<string, string>): TableRow => ({
@@ -30,7 +30,7 @@ describe('useDirtyStateTracking', () => {
       expect(result.current.dirtyRowIds.size).toBe(0);
     });
 
-    it('should detect dirty rows on initialization', () => {
+    it('should detect dirty rows on initialization', async () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Modified' }),
       ];
@@ -46,12 +46,15 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      // State sync happens asynchronously during render
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      });
     });
   });
 
   describe('dirty detection by row ID', () => {
-    it('should match rows by row ID when comparing', () => {
+    it('should match rows by row ID when comparing', async () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Changed' }),
       ];
@@ -67,10 +70,12 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      });
     });
 
-    it('should match rows by domain ID when row IDs differ', () => {
+    it('should match rows by domain ID when row IDs differ', async () => {
       const rows: TableRow[] = [
         createTestRow('new-row-id', { id: '1', name: 'Changed' }),
       ];
@@ -86,7 +91,9 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      expect(result.current.dirtyRowIds.has('new-row-id')).toBe(true);
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.has('new-row-id')).toBe(true);
+      });
     });
   });
 
@@ -139,7 +146,7 @@ describe('useDirtyStateTracking', () => {
   });
 
   describe('clearDirtyRows', () => {
-    it('should clear specific rows from dirty set', () => {
+    it('should clear specific rows from dirty set', async () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Changed 1' }),
         createTestRow('row-2', { id: '2', name: 'Changed 2' }),
@@ -157,8 +164,10 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
-      expect(result.current.dirtyRowIds.has('row-2')).toBe(true);
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+        expect(result.current.dirtyRowIds.has('row-2')).toBe(true);
+      });
 
       act(() => {
         result.current.clearDirtyRows(['row-1']);
@@ -168,7 +177,7 @@ describe('useDirtyStateTracking', () => {
       expect(result.current.dirtyRowIds.has('row-2')).toBe(true);
     });
 
-    it('should clear multiple rows at once', () => {
+    it('should clear multiple rows at once', async () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Changed 1' }),
         createTestRow('row-2', { id: '2', name: 'Changed 2' }),
@@ -188,6 +197,10 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.size).toBe(3);
+      });
+
       act(() => {
         result.current.clearDirtyRows(['row-1', 'row-3']);
       });
@@ -199,7 +212,7 @@ describe('useDirtyStateTracking', () => {
   });
 
   describe('clearAllDirty', () => {
-    it('should clear all dirty state', () => {
+    it('should clear all dirty state', async () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Changed 1' }),
         createTestRow('row-2', { id: '2', name: 'Changed 2' }),
@@ -217,7 +230,9 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      expect(result.current.dirtyRowIds.size).toBe(2);
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.size).toBe(2);
+      });
 
       act(() => {
         result.current.clearAllDirty();
@@ -259,7 +274,7 @@ describe('useDirtyStateTracking', () => {
       expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
     });
 
-    it('should clear dirty state when row reverts to clean value', () => {
+    it('should clear dirty state when row reverts to clean value', async () => {
       const cleanRows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Original' }),
       ];
@@ -278,7 +293,9 @@ describe('useDirtyStateTracking', () => {
         { initialProps: { rows: dirtyRows } },
       );
 
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      });
 
       // Revert to original
       const revertedRows: TableRow[] = [
@@ -287,12 +304,14 @@ describe('useDirtyStateTracking', () => {
 
       rerender({ rows: revertedRows });
 
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
+      });
     });
   });
 
   describe('custom idColumnId', () => {
-    it('should use custom idColumnId for matching', () => {
+    it('should use custom idColumnId for matching', async () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { vocabId: '100', name: 'Changed' }),
       ];
@@ -309,7 +328,9 @@ describe('useDirtyStateTracking', () => {
       );
 
       // Should match by vocabId and detect the change
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      await waitFor(() => {
+        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
+      });
     });
   });
 
