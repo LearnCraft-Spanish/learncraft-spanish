@@ -1,5 +1,10 @@
-import type { EditTableHook } from '@domain/PasteTable/EditTable';
-import type { ColumnDefinition, TableColumn } from '@domain/PasteTable/types';
+import type {
+  ColumnDefinition,
+  TableColumn,
+  TableRow,
+  ValidationState,
+} from '@domain/PasteTable/types';
+import type { ClipboardEvent } from 'react';
 import type { z } from 'zod';
 import {
   useCleanStateSync,
@@ -15,6 +20,35 @@ import {
 import { cellsEqual } from '@domain/PasteTable/functions/rowComparison';
 import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
 import { useCallback, useMemo } from 'react';
+
+/**
+ * Edit table hook interface
+ * For tables that allow editing existing records
+ */
+export interface EditTableHook<T> {
+  // Data
+  data: {
+    rows: TableRow[];
+    columns: TableColumn[];
+  };
+
+  // Operations
+  updateCell: (rowId: string, columnId: string, value: string) => void;
+  handlePaste: (e: ClipboardEvent<Element>) => void;
+  importData: (data: T[]) => void;
+  discardChanges: () => void;
+
+  // Focus tracking
+  setActiveCellInfo: (rowId: string, columnId: string) => void;
+  clearActiveCellInfo: () => void;
+
+  // State
+  hasUnsavedChanges: boolean; // Alias for isDirty
+  validationState: ValidationState;
+
+  // Save operation
+  applyChanges: () => Promise<void>;
+}
 
 interface UseEditTableOptions<T extends Record<string, unknown>> {
   columns: TableColumn[];

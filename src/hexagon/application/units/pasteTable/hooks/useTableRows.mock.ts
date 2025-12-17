@@ -1,5 +1,5 @@
 import type { TableColumn, TableRow } from '@domain/PasteTable/General';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Define the hook result interface

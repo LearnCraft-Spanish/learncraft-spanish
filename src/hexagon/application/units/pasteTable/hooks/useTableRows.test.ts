@@ -1,6 +1,6 @@
 import type { TableColumn } from '@domain/PasteTable/General';
 import { useTableRows } from '@application/units/pasteTable/hooks/useTableRows';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { act, renderHook } from '@testing-library/react';
 
 // Test columns

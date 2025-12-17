@@ -3,14 +3,7 @@
  * Ensures all cell values are in canonical string format based on column type
  */
 
-import type {
-  BooleanColumnDefinition,
-  ColumnDefinition,
-  DateColumnDefinition,
-  NumberColumnDefinition,
-  SelectColumnDefinition,
-  TextColumnDefinition,
-} from '@domain/PasteTable/types';
+import type { ColumnDefinition } from '@domain/PasteTable/types';
 import {
   formatBooleanForTable,
   normalizeDate,
@@ -20,33 +13,7 @@ import {
 /**
  * Normalize a cell value to its canonical string representation
  * This ensures consistent format regardless of input source (paste, edit, domain entity)
- *
- * Uses function overloads for better type safety based on column type
  */
-export function normalizeCellValue(
-  value: string,
-  column: TextColumnDefinition,
-): string;
-export function normalizeCellValue(
-  value: string,
-  column: NumberColumnDefinition,
-): string;
-export function normalizeCellValue(
-  value: string,
-  column: BooleanColumnDefinition,
-): string;
-export function normalizeCellValue(
-  value: string,
-  column: DateColumnDefinition,
-): string;
-export function normalizeCellValue(
-  value: string,
-  column: SelectColumnDefinition,
-): string;
-export function normalizeCellValue(
-  value: string,
-  column: ColumnDefinition,
-): string;
 export function normalizeCellValue(
   value: string,
   column: ColumnDefinition,

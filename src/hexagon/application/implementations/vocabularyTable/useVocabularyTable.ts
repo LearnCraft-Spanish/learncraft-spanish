@@ -1,4 +1,4 @@
-import type { CreateTableHook } from '@domain/PasteTable/CreateTable';
+import type { CreateTableHook } from '@application/units/pasteTable/useCreateTable';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
 import {
   SCHEMA_FIELD_CONFIG,

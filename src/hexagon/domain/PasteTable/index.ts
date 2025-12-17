@@ -3,11 +3,6 @@
  * Exports all types, interfaces, and functions
  */
 
-export * from '@domain/PasteTable/CreateTable';
-
-// Constants
-export { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
-export * from '@domain/PasteTable/EditTable';
 // Functions
 export * from '@domain/PasteTable/functions';
 

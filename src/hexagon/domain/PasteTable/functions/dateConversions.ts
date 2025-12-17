@@ -5,7 +5,6 @@
 
 import type {
   ColumnDefinition,
-  DateColumnDefinition,
   DateFormatConfig,
 } from '@domain/PasteTable/types';
 import { isDateColumn } from '@domain/PasteTable/types';
@@ -220,18 +219,6 @@ function formatDateDisplay(date: Date, format: string): string {
  * @param value - The date string to validate
  * @param column - Must be a DateColumnDefinition (type guard ensures this)
  */
-export function validateDate(
-  value: string,
-  column: DateColumnDefinition,
-): string | null;
-/**
- * Validate date string (overload for general ColumnDefinition)
- * Returns error message if invalid, null if valid
- */
-export function validateDate(
-  value: string,
-  column: ColumnDefinition,
-): string | null;
 export function validateDate(
   value: string,
   column: ColumnDefinition,

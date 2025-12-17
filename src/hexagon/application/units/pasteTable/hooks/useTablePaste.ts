@@ -5,7 +5,7 @@ import {
   detectHeaderRow,
   parseDelimitedText,
 } from '@application/units/pasteTable/utils';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { cellsEqual } from '@domain/PasteTable/functions/rowComparison';
 import { useCallback, useState } from 'react';
 

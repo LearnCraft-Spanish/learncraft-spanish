@@ -11,6 +11,13 @@ interface UseDirtyStateTrackingProps {
 /**
  * Hook to track dirty state by comparing current rows to clean rows
  * Computes dirty state reactively and syncs to state
+ *
+ * TODO: This hook may be overcomplicated. The useState + manual marking functions
+ * (markRowDirty, clearDirtyRows, clearAllDirty) appear redundant since dirty state
+ * is derived from comparing rows to cleanRows in the useMemo. The memo overwrites
+ * any manual state changes on re-render. Consider simplifying to just return the
+ * memo result directly, and have callers update cleanRows to affect dirty state.
+ * Verify with manual UI testing before refactoring.
  */
 export function useDirtyStateTracking({
   rows,

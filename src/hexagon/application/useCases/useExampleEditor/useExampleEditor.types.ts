@@ -1,4 +1,4 @@
-import type { EditTableHook } from '@domain/PasteTable/EditTable';
+import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
 import type { ExampleTechnical } from '@learncraft-spanish/shared';
 
 /**

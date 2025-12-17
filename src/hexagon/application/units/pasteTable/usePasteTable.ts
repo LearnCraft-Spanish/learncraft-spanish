@@ -6,7 +6,7 @@ import {
   useTableRows,
   useTableValidation,
 } from '@application/units/pasteTable/hooks';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import {
   mapAndParseTableRowsToDomain,
   mapDomainToTableRows,
