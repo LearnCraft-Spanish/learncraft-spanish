@@ -4,7 +4,11 @@ import { Results } from '@interface/components/ExampleSearchInterface/Results/Re
 import { SearchModeNav } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { SelectedExamples } from '@interface/components/ExampleSearchInterface/SelectedExamples';
 import '@interface/components/ExampleSearchInterface/ExampleSearch.scss';
-export default function ExampleSearch() {
+export default function ExampleSearch({
+  activateEdit,
+}: {
+  activateEdit: () => void;
+}) {
   const {
     mode,
     searchIsTriggered,
@@ -42,6 +46,9 @@ export default function ExampleSearch() {
         {searchIsTriggered && <Results mode={mode} {...searchResultProps} />}
       </div>
       <SelectedExamples />
+      <button type="button" className="editButton" onClick={activateEdit}>
+        Edit
+      </button>
     </div>
   );
 }
