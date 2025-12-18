@@ -1,8 +1,16 @@
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import useNonVerbCreation from '@application/useCases/useNonVerbCreation';
 import { PasteTable } from '@interface/components/PasteTable/PasteTable';
 import { PaginatedVocabularyTable } from '@interface/components/VocabularyTable/PaginatedVocabularyTable';
 import React from 'react';
 import './VocabularyCreator.scss';
+
+const vocabularyDisplayConfig: ColumnDisplayConfig[] = [
+  { id: 'word', label: 'Word', width: '1fr' },
+  { id: 'descriptor', label: 'Descriptor', width: '2fr' },
+  { id: 'frequency', label: 'Frequency', width: '0.5fr' },
+  { id: 'notes', label: 'Notes', width: '1fr' },
+];
 
 interface NonVerbCreatorProps {
   onBack: () => void;
@@ -77,6 +85,7 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
         <h4>Add new vocabulary:</h4>
         <PasteTable
           hook={tableHook}
+          displayConfig={vocabularyDisplayConfig}
           clearButtonText="Clear Table"
           pasteHint="Paste vocabulary data (tab-separated) or edit cells directly"
         />

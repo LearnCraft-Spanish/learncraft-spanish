@@ -1,4 +1,4 @@
-import type { TableRow } from '@domain/PasteTable/types';
+import type { TableRow } from '@domain/PasteTable';
 import { useCleanStateSync } from '@application/units/pasteTable/hooks/useCleanStateSync';
 import { act, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';

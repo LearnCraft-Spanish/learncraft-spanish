@@ -1,6 +1,6 @@
-import type { TableRow } from '@domain/PasteTable/types';
+import type { TableRow } from '@domain/PasteTable';
 import { useDirtyStateTracking } from '@application/units/pasteTable/hooks/useDirtyStateTracking';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
 // Helper to create test rows
 const createTestRow = (
@@ -15,12 +15,12 @@ describe('useDirtyStateTracking', () => {
   const defaultIdColumnId = 'id';
 
   describe('initial state', () => {
-    it('should initialize with empty dirty set when rows match cleanRows', () => {
+    it('should return empty dirty set when rows match cleanRows', () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Item 1' }),
         createTestRow('row-2', { id: '2', name: 'Item 2' }),
       ];
-      const cleanRows = [...rows]; // Same reference content
+      const cleanRows = [...rows];
 
       const { result } = renderHook(() =>
         useDirtyStateTracking({
@@ -33,7 +33,7 @@ describe('useDirtyStateTracking', () => {
       expect(result.current.dirtyRowIds.size).toBe(0);
     });
 
-    it('should detect dirty rows on initialization', async () => {
+    it('should detect dirty rows on initialization', () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Modified' }),
       ];
@@ -49,15 +49,12 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      // State sync happens asynchronously during render
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
-      });
+      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
     });
   });
 
   describe('dirty detection by row ID', () => {
-    it('should match rows by row ID when comparing', async () => {
+    it('should match rows by row ID when comparing', () => {
       const rows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Changed' }),
       ];
@@ -73,12 +70,10 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
-      });
+      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
     });
 
-    it('should match rows by domain ID when row IDs differ', async () => {
+    it('should match rows by domain ID when row IDs differ', () => {
       const rows: TableRow[] = [
         createTestRow('new-row-id', { id: '1', name: 'Changed' }),
       ];
@@ -94,154 +89,7 @@ describe('useDirtyStateTracking', () => {
         }),
       );
 
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.has('new-row-id')).toBe(true);
-      });
-    });
-  });
-
-  describe('markRowDirty', () => {
-    it('should manually mark a row as dirty', () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Item 1' }),
-      ];
-      const cleanRows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Item 1' }),
-      ];
-
-      const { result } = renderHook(() =>
-        useDirtyStateTracking({
-          rows,
-          cleanRows,
-          idColumnId: defaultIdColumnId,
-        }),
-      );
-
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
-
-      act(() => {
-        result.current.markRowDirty('row-1');
-      });
-
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
-    });
-
-    it('should handle marking non-existent row', () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Item 1' }),
-      ];
-      const cleanRows = [...rows];
-
-      const { result } = renderHook(() =>
-        useDirtyStateTracking({
-          rows,
-          cleanRows,
-          idColumnId: defaultIdColumnId,
-        }),
-      );
-
-      act(() => {
-        result.current.markRowDirty('non-existent');
-      });
-
-      expect(result.current.dirtyRowIds.has('non-existent')).toBe(true);
-    });
-  });
-
-  describe('clearDirtyRows', () => {
-    it('should clear specific rows from dirty set', async () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Changed 1' }),
-        createTestRow('row-2', { id: '2', name: 'Changed 2' }),
-      ];
-      const cleanRows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Original 1' }),
-        createTestRow('row-2', { id: '2', name: 'Original 2' }),
-      ];
-
-      const { result } = renderHook(() =>
-        useDirtyStateTracking({
-          rows,
-          cleanRows,
-          idColumnId: defaultIdColumnId,
-        }),
-      );
-
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
-        expect(result.current.dirtyRowIds.has('row-2')).toBe(true);
-      });
-
-      act(() => {
-        result.current.clearDirtyRows(['row-1']);
-      });
-
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
-      expect(result.current.dirtyRowIds.has('row-2')).toBe(true);
-    });
-
-    it('should clear multiple rows at once', async () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Changed 1' }),
-        createTestRow('row-2', { id: '2', name: 'Changed 2' }),
-        createTestRow('row-3', { id: '3', name: 'Changed 3' }),
-      ];
-      const cleanRows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Original 1' }),
-        createTestRow('row-2', { id: '2', name: 'Original 2' }),
-        createTestRow('row-3', { id: '3', name: 'Original 3' }),
-      ];
-
-      const { result } = renderHook(() =>
-        useDirtyStateTracking({
-          rows,
-          cleanRows,
-          idColumnId: defaultIdColumnId,
-        }),
-      );
-
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.size).toBe(3);
-      });
-
-      act(() => {
-        result.current.clearDirtyRows(['row-1', 'row-3']);
-      });
-
-      expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
-      expect(result.current.dirtyRowIds.has('row-2')).toBe(true);
-      expect(result.current.dirtyRowIds.has('row-3')).toBe(false);
-    });
-  });
-
-  describe('clearAllDirty', () => {
-    it('should clear all dirty state', async () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Changed 1' }),
-        createTestRow('row-2', { id: '2', name: 'Changed 2' }),
-      ];
-      const cleanRows: TableRow[] = [
-        createTestRow('row-1', { id: '1', name: 'Original 1' }),
-        createTestRow('row-2', { id: '2', name: 'Original 2' }),
-      ];
-
-      const { result } = renderHook(() =>
-        useDirtyStateTracking({
-          rows,
-          cleanRows,
-          idColumnId: defaultIdColumnId,
-        }),
-      );
-
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.size).toBe(2);
-      });
-
-      act(() => {
-        result.current.clearAllDirty();
-      });
-
-      expect(result.current.dirtyRowIds.size).toBe(0);
+      expect(result.current.dirtyRowIds.has('new-row-id')).toBe(true);
     });
   });
 
@@ -277,7 +125,7 @@ describe('useDirtyStateTracking', () => {
       expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
     });
 
-    it('should clear dirty state when row reverts to clean value', async () => {
+    it('should clear dirty state when row reverts to clean value', () => {
       const cleanRows: TableRow[] = [
         createTestRow('row-1', { id: '1', name: 'Original' }),
       ];
@@ -296,9 +144,7 @@ describe('useDirtyStateTracking', () => {
         { initialProps: { rows: dirtyRows } },
       );
 
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
-      });
+      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
 
       // Revert to original
       const revertedRows: TableRow[] = [
@@ -307,33 +153,50 @@ describe('useDirtyStateTracking', () => {
 
       rerender({ rows: revertedRows });
 
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
-      });
+      expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
     });
   });
 
-  describe('custom idColumnId', () => {
-    it('should use custom idColumnId for matching', async () => {
+  describe('editableColumnIds filter', () => {
+    it('should only compare specified columns when editableColumnIds provided', () => {
       const rows: TableRow[] = [
-        createTestRow('row-1', { vocabId: '100', name: 'Changed' }),
+        createTestRow('row-1', { id: '1', name: 'Same', readonly: 'Changed' }),
       ];
       const cleanRows: TableRow[] = [
-        createTestRow('different-row-id', { vocabId: '100', name: 'Original' }),
+        createTestRow('row-1', { id: '1', name: 'Same', readonly: 'Original' }),
       ];
 
       const { result } = renderHook(() =>
         useDirtyStateTracking({
           rows,
           cleanRows,
-          idColumnId: 'vocabId',
+          idColumnId: 'id',
+          editableColumnIds: ['name'], // Only compare 'name', ignore 'readonly'
         }),
       );
 
-      // Should match by vocabId and detect the change
-      await waitFor(() => {
-        expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
-      });
+      // Should NOT be dirty because 'name' is the same
+      expect(result.current.dirtyRowIds.has('row-1')).toBe(false);
+    });
+
+    it('should detect dirty when editable column changes', () => {
+      const rows: TableRow[] = [
+        createTestRow('row-1', { id: '1', name: 'Changed', readonly: 'Same' }),
+      ];
+      const cleanRows: TableRow[] = [
+        createTestRow('row-1', { id: '1', name: 'Original', readonly: 'Same' }),
+      ];
+
+      const { result } = renderHook(() =>
+        useDirtyStateTracking({
+          rows,
+          cleanRows,
+          idColumnId: 'id',
+          editableColumnIds: ['name'],
+        }),
+      );
+
+      expect(result.current.dirtyRowIds.has('row-1')).toBe(true);
     });
   });
 

@@ -1,6 +1,6 @@
 import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import type { ExampleEditRow } from '@domain/PasteTable/exampleEditRow';
-import type { TableColumn } from '@domain/PasteTable/General';
 import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
 import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
@@ -52,46 +52,15 @@ const exampleEditRowSchema = updateExampleCommandSchema
   });
 
 /**
- * Column definitions for the example edit table
+ * Column definitions for the example edit table (domain only)
  */
-const exampleEditColumns: TableColumn[] = [
-  {
-    id: 'id',
-    label: 'ID',
-    width: '80px',
-    type: 'read-only',
-    editable: false, // ID is readonly
-  },
-  {
-    id: 'spanish',
-    label: 'Spanish',
-    width: '2fr',
-    type: 'text',
-  },
-  {
-    id: 'english',
-    label: 'English',
-    width: '2fr',
-    type: 'text',
-  },
-  {
-    id: 'hasAudio',
-    label: 'Audio',
-    width: '80px',
-    type: 'boolean',
-  },
-  {
-    id: 'spanglish',
-    label: 'Spanglish',
-    width: '100px',
-    type: 'read-only',
-  },
-  {
-    id: 'vocabularyComplete',
-    label: 'Vocab Complete',
-    width: '120px',
-    type: 'boolean',
-  },
+const exampleEditColumns: ColumnDefinition[] = [
+  { id: 'id', type: 'text', editable: false },
+  { id: 'spanish', type: 'text', required: true },
+  { id: 'english', type: 'text', required: true },
+  { id: 'hasAudio', type: 'boolean' },
+  { id: 'spanglish', type: 'text', editable: false, derived: true },
+  { id: 'vocabularyComplete', type: 'boolean' },
 ];
 
 /**
@@ -141,7 +110,7 @@ export function useExampleEditor(): UseExampleEditorResult {
         );
 
         // Call the adapter to save
-        await updateExamples.mutateAsync(updateCommands);
+        await updateExamples(updateCommands);
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setSaveError(error);

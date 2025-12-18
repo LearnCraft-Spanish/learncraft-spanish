@@ -1,4 +1,4 @@
-import type { TableColumn } from '@domain/PasteTable/General';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import {
   GHOST_ROW_ID,
@@ -17,18 +17,14 @@ const TestRowSchema = z.object({
 type TestRow = z.infer<typeof TestRowSchema>;
 
 // Test columns with schema
-const testColumns: TableColumn[] = [
+const testColumns: ColumnDefinition[] = [
   {
     id: 'name',
-    label: 'Name',
-    width: '1fr',
     type: 'text',
     schema: z.string().min(1, 'Name is required'),
   },
   {
     id: 'value',
-    label: 'Value',
-    width: '1fr',
     type: 'number',
     schema: z.coerce.number().min(0, 'Value must be positive'),
   },
@@ -80,8 +76,8 @@ describe('useCreateTable', () => {
 
     it('should throw error if no schema provided', () => {
       // Columns without schema and no rowSchema should throw
-      const columnsWithoutSchema: TableColumn[] = [
-        { id: 'name', label: 'Name', width: '1fr', type: 'text' },
+      const columnsWithoutSchema: ColumnDefinition[] = [
+        { id: 'name', type: 'text' },
       ];
 
       expect(() => {

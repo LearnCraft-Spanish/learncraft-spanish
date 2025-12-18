@@ -1,19 +1,19 @@
-import type { TableColumn } from '@domain/PasteTable/types';
+import type { ColumnDefinition } from '@domain/PasteTable';
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import {
   isBooleanColumn,
   isDateColumn,
   isMultiSelectColumn,
-  isReadOnlyColumn,
   isSelectColumn,
-} from '@domain/PasteTable/types';
+} from '@domain/PasteTable';
 import { ToggleSwitch } from '@interface/components/general';
 import React from 'react';
 import './TableCell.scss';
 
-// TableCellInput component to handle rendering different input types for table cells
 interface TableCellInputProps {
   cellKey: string;
-  column: TableColumn;
+  column: ColumnDefinition;
+  display: ColumnDisplayConfig;
   cellValue: string;
   hasError: boolean;
   ariaLabel: string;
@@ -29,6 +29,7 @@ interface TableCellInputProps {
 export function TableCellInput({
   cellKey,
   column,
+  display,
   cellValue,
   hasError,
   ariaLabel,
@@ -48,11 +49,16 @@ export function TableCellInput({
     onPaste: handlers.onPaste,
     onFocus: handlers.onFocus,
     onBlur: handlers.onBlur,
-    placeholder: column.placeholder,
+    placeholder: display.placeholder,
   };
 
-  // Use type guards to safely access type-specific properties
-  if (isSelectColumn(column)) {
+  // Readonly column
+  if (column.editable === false) {
+    return <div className="paste-table__cell-readonly">{cellValue}</div>;
+  }
+
+  // Select column
+  if (isSelectColumn(column) && column.options) {
     return (
       <select
         ref={(el) => cellRef(el)}
@@ -70,9 +76,8 @@ export function TableCellInput({
     );
   }
 
+  // Multi-select column
   if (isMultiSelectColumn(column)) {
-    // Multi-select: comma-separated values in cell, display as text input for now
-    // TODO: Implement proper multi-select UI (checkboxes or multi-select dropdown)
     return (
       <input
         ref={(el) => cellRef(el)}
@@ -85,8 +90,8 @@ export function TableCellInput({
     );
   }
 
+  // Boolean column
   if (isBooleanColumn(column)) {
-    // Boolean: checkbox or select based on format
     const format = column.booleanFormat || 'true-false';
     if (format === 'true-false' || format === 'auto') {
       return (
@@ -101,7 +106,6 @@ export function TableCellInput({
         />
       );
     }
-    // For other formats, use text input
     return (
       <input
         ref={(el) => cellRef(el)}
@@ -113,6 +117,7 @@ export function TableCellInput({
     );
   }
 
+  // Date column
   if (isDateColumn(column)) {
     return (
       <input
@@ -125,7 +130,7 @@ export function TableCellInput({
     );
   }
 
-  // Number or text (default)
+  // Number column
   if (column.type === 'number') {
     return (
       <input
@@ -136,9 +141,6 @@ export function TableCellInput({
         {...commonProps}
       />
     );
-  }
-  if (isReadOnlyColumn(column)) {
-    return <div className="paste-table__cell-readonly">{cellValue}</div>;
   }
 
   // Default: text input

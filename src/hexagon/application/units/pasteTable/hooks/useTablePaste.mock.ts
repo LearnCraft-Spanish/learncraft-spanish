@@ -1,4 +1,4 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
@@ -25,7 +25,7 @@ export const {
   reset: resetMockUseTablePaste,
 } = createOverrideableMock<
   (options: {
-    columns: TableColumn[];
+    columns: ColumnDefinition[];
     rows: TableRow[];
     updateCell: (rowId: string, columnId: string, value: string) => void;
     setRows: React.Dispatch<React.SetStateAction<TableRow[]>>;

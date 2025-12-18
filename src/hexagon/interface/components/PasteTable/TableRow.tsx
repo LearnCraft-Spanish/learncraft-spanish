@@ -1,14 +1,16 @@
 import type {
-  TableColumn,
+  ColumnDefinition,
   TableRow as TableRowType,
   ValidationState,
-} from '@domain/PasteTable/General';
+} from '@domain/PasteTable';
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import { TableCellInput } from '@interface/components/PasteTable/TableCell';
 import React from 'react';
 
 export interface TableRowProps {
   row: TableRowType;
-  columns: TableColumn[];
+  columns: ColumnDefinition[];
+  displayConfig: ColumnDisplayConfig[];
   activeCell: { rowId: string; columnId: string } | null;
   validationState: ValidationState;
   getAriaLabel: (columnId: string, rowId: string) => string;
@@ -21,12 +23,13 @@ export interface TableRowProps {
     key: string,
     element: HTMLInputElement | HTMLSelectElement | null,
   ) => void;
-  rowIndex: number; // 1-based row index for accessibility
+  rowIndex: number;
 }
 
 export function TableRow({
   row,
   columns,
+  displayConfig,
   activeCell,
   validationState,
   getAriaLabel,
@@ -34,20 +37,20 @@ export function TableRow({
   registerCellRef,
   rowIndex,
 }: TableRowProps) {
-  // Get row errors from validationState
   const rowErrors = validationState.errors[row.id] || {};
+
+  const getDisplay = (columnId: string) =>
+    displayConfig.find((d) => d.id === columnId) ?? { id: columnId, label: columnId };
 
   return (
     <div className="paste-table__row" role="row" aria-rowindex={rowIndex}>
       {columns.map((column, colIndex) => {
-        // const columnKey = column.id;
         const cellKey = `${row.id}-${column.id}`;
         const cellValue = row.cells[column.id] || '';
         const errorMessage = rowErrors[column.id];
         const isActive =
           activeCell?.rowId === row.id && activeCell?.columnId === column.id;
 
-        // Create cell-specific handlers that include row and column context
         const cellSpecificHandlers = {
           onChange: (value: string) =>
             cellHandlers.onChange(row.id, column.id, value),
@@ -68,6 +71,7 @@ export function TableRow({
             <TableCellInput
               cellKey={cellKey}
               column={column}
+              display={getDisplay(column.id)}
               cellValue={String(cellValue)}
               hasError={!!errorMessage}
               ariaLabel={getAriaLabel(column.id, row.id)}

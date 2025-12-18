@@ -1,5 +1,4 @@
-import type { TableColumn, TableHook } from '@domain/PasteTable/General';
-import type { ColumnDefinition } from '@domain/PasteTable/types';
+import type { ColumnDefinition, TableRow, ValidationState } from '@domain/PasteTable';
 import type { z } from 'zod';
 import {
   useTablePaste,
@@ -16,7 +15,7 @@ import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaVa
 import { useCallback, useMemo } from 'react';
 
 interface UsePasteTableOptions<T extends Record<string, unknown>> {
-  columns: TableColumn[];
+  columns: ColumnDefinition[];
   /** Full row Zod schema for row-level validation (preferred) */
   rowSchema?: z.ZodType<T, any, any>;
   initialData?: T[]; // Allow providing initial data
@@ -31,16 +30,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
   columns,
   rowSchema,
   initialData = [],
-}: UsePasteTableOptions<T>): TableHook<T> {
-  // Extract domain columns for mapping
-  const domainColumns: ColumnDefinition[] = useMemo(
-    () =>
-      columns.map((col) => {
-        const { label, width, placeholder, ...domainCol } = col;
-        return domainCol;
-      }),
-    [columns],
-  );
+}: UsePasteTableOptions<T>) {
 
   // Core row management
   const {
@@ -55,7 +45,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
   // Requires either column schemas or row schema to be provided
   const validateRow = useMemo(() => {
     // Check if we have column schemas or row schema
-    const hasColumnSchemas = domainColumns.some((col) => col.schema);
+    const hasColumnSchemas = columns.some((col) => col.schema);
     const hasRowSchema = !!rowSchema;
 
     // Require at least one schema to be provided
@@ -66,8 +56,8 @@ export function usePasteTable<T extends Record<string, unknown>>({
     }
 
     // Generate validator from schemas (handles normalization and mapping internally)
-    return createCombinedValidateRow<T>(domainColumns, rowSchema);
-  }, [domainColumns, rowSchema]);
+    return createCombinedValidateRow<T>(columns, rowSchema);
+  }, [columns, rowSchema]);
 
   // Validation - now purely derived from row data
   // validateRow function operates on TableRow (normalized, typed)
@@ -106,7 +96,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
   const importData = useCallback(
     (newData: T[]) => {
       // Map domain entities to TableRows
-      const newRows = mapDomainToTableRows(newData, domainColumns);
+      const newRows = mapDomainToTableRows(newData, columns);
 
       // Set rows, preserving ghost row
       setRows((currentRows) => {
@@ -114,7 +104,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
         return [...newRows, ...(ghostRow ? [ghostRow] : [])];
       });
     },
-    [domainColumns, setRows],
+    [columns, setRows],
   );
 
   // Save operation - returns data for external save
@@ -136,7 +126,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
     if (rowSchema) {
       return mapAndParseTableRowsToDomain<T>(
         dataRows,
-        domainColumns,
+        columns,
         rowSchema,
         GHOST_ROW_ID,
       );
@@ -144,9 +134,9 @@ export function usePasteTable<T extends Record<string, unknown>>({
 
     // Without rowSchema, we can't guarantee completeness
     // This shouldn't happen since we require at least one schema, but handle it gracefully
-    const data = mapTableRowsToDomain<T>(dataRows, domainColumns);
+    const data = mapTableRowsToDomain<T>(dataRows, columns);
     return data as T[]; // Type assertion needed here - caller should provide rowSchema
-  }, [rows, domainColumns, rowSchema, validateAll]);
+  }, [rows, columns, rowSchema, validateAll]);
 
   // Reset the table to completely empty state
   const resetTable = useCallback(() => {

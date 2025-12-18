@@ -3,7 +3,7 @@
  * Convert between domain entities (typed) and TableRows (string-based)
  */
 
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { z } from 'zod';
 import {
   formatDateForTable,

@@ -1,4 +1,4 @@
-import type { TableRow } from '@domain/PasteTable/types';
+import type { TableRow } from '@domain/PasteTable';
 import {
   cellsEqual,
   findDirtyRows,

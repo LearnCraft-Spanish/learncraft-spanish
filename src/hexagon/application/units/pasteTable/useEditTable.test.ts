@@ -1,4 +1,4 @@
-import type { TableColumn } from '@domain/PasteTable/General';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
 import { act, renderHook, waitFor } from '@testing-library/react';
@@ -15,25 +15,19 @@ const TestRowSchema = z.object({
 type TestRow = z.infer<typeof TestRowSchema>;
 
 // Test columns with schema
-const testColumns: TableColumn[] = [
+const testColumns: ColumnDefinition[] = [
   {
     id: 'id',
-    label: 'ID',
-    width: '1fr',
     type: 'number',
     schema: z.coerce.number(),
   },
   {
     id: 'name',
-    label: 'Name',
-    width: '1fr',
     type: 'text',
     schema: z.string().min(1, 'Name is required'),
   },
   {
     id: 'value',
-    label: 'Value',
-    width: '1fr',
     type: 'number',
     schema: z.coerce.number().min(0, 'Value must be positive'),
   },
@@ -417,9 +411,9 @@ describe('useEditTable', () => {
 
   describe('custom idColumnId', () => {
     it('should use custom idColumnId for edit mode matching', async () => {
-      const columnsWithCustomId: TableColumn[] = [
-        { id: 'vocabId', label: 'Vocab ID', width: '1fr', type: 'number' },
-        { id: 'name', label: 'Name', width: '1fr', type: 'text' },
+      const columnsWithCustomId: ColumnDefinition[] = [
+        { id: 'vocabId', type: 'number' },
+        { id: 'name', type: 'text' },
       ];
 
       const CustomSchema = z.object({

@@ -53,7 +53,7 @@ export function mapEditRowToUpdateCommand(
   row: Partial<ExampleEditRow>,
   audioUrlAdapter: ReturnType<typeof createAudioUrlAdapter>,
 ): UpdateExampleCommand {
-  const exampleId = row.id!;
+  const exampleId = Number(row.id);
 
   // Generate audio URLs from hasAudio boolean
   const audioUrls = audioUrlAdapter.generateAudioUrls(

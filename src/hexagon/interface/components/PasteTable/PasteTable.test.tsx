@@ -1,15 +1,22 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import { createMockPasteTableResult } from '@application/units/pasteTable/usePasteTable.mock';
 import { PasteTable } from '@interface/components/PasteTable/PasteTable';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-const createTestColumns = (types: Array<'text' | 'number'>): TableColumn[] => {
+const createTestColumns = (types: Array<'text' | 'number'>): ColumnDefinition[] => {
   return types.map((type, index) => ({
     id: `col${index + 1}`,
-    label: `Column ${index + 1}`,
     type,
+  }));
+};
+
+const createTestDisplayConfig = (numCols: number): ColumnDisplayConfig[] => {
+  return Array.from({ length: numCols }, (_, index) => ({
+    id: `col${index + 1}`,
+    label: `Column ${index + 1}`,
     width: '1fr',
   }));
 };
@@ -27,13 +34,14 @@ const createTestRows = (numRows: number, numCols: number): TableRow[] => {
 describe('pasteTable', () => {
   it('should navigate left and right from number inputs immediately', async () => {
     // Given: A table with number input cells
+    const columns = createTestColumns(['text', 'number', 'text']);
     const mockHook = createMockPasteTableResult({
-      columns: createTestColumns(['text', 'number', 'text']),
+      columns,
       rows: createTestRows(1, 3),
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} />);
+    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(3)} />);
 
     const cells = screen.getAllByRole('gridcell');
     const numberInput = within(cells[1]).getByRole('spinbutton');
@@ -61,7 +69,7 @@ describe('pasteTable', () => {
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} />);
+    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(2)} />);
 
     const cells = screen.getAllByRole('gridcell');
     const textInput = within(cells[1]).getByRole('textbox') as HTMLInputElement;
@@ -90,7 +98,7 @@ describe('pasteTable', () => {
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} />);
+    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(2)} />);
 
     const cells = screen.getAllByRole('gridcell');
     const textInput = within(cells[0]).getByRole('textbox') as HTMLInputElement;
@@ -112,7 +120,7 @@ describe('pasteTable', () => {
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} />);
+    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(1)} />);
 
     const cells = screen.getAllByRole('gridcell');
     const row1Input = within(cells[0]).getByRole('textbox');

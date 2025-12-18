@@ -1,4 +1,4 @@
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import {
   mapDomainToTableRow,
   mapDomainToTableRows,

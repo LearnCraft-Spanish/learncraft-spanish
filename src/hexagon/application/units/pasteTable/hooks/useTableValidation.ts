@@ -1,4 +1,4 @@
-import type { TableRow } from '@domain/PasteTable/General';
+import type { TableRow } from '@domain/PasteTable';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { useCallback, useMemo } from 'react';
 
