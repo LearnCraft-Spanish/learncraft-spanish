@@ -3,12 +3,16 @@ import {
   isBooleanColumn,
   isDateColumn,
   isMultiSelectColumn,
+  isReadOnlyColumn,
   isSelectColumn,
 } from '@domain/PasteTable/types';
+import { ToggleSwitch } from '@interface/components/general';
 import React from 'react';
+import './TableCell.scss';
 
 // TableCellInput component to handle rendering different input types for table cells
 interface TableCellInputProps {
+  cellKey: string;
   column: TableColumn;
   cellValue: string;
   hasError: boolean;
@@ -23,6 +27,7 @@ interface TableCellInputProps {
 }
 
 export function TableCellInput({
+  cellKey,
   column,
   cellValue,
   hasError,
@@ -85,16 +90,15 @@ export function TableCellInput({
     const format = column.booleanFormat || 'true-false';
     if (format === 'true-false' || format === 'auto') {
       return (
-        <select
-          ref={(el) => cellRef(el)}
-          value={cellValue}
-          onChange={handleChange}
-          {...commonProps}
-        >
-          <option value="">--</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
+        <ToggleSwitch
+          id={cellKey}
+          ariaLabel={ariaLabel}
+          label={''}
+          checked={cellValue === 'true'}
+          onChange={() =>
+            handlers.onChange(cellValue === 'true' ? 'false' : 'true')
+          }
+        />
       );
     }
     // For other formats, use text input
@@ -132,6 +136,9 @@ export function TableCellInput({
         {...commonProps}
       />
     );
+  }
+  if (isReadOnlyColumn(column)) {
+    return <div className="paste-table__cell-readonly">{cellValue}</div>;
   }
 
   // Default: text input

@@ -14,7 +14,8 @@ export type CellType =
   | 'select'
   | 'multi-select'
   | 'date'
-  | 'boolean';
+  | 'boolean'
+  | 'read-only';
 
 /**
  * Options for select-type cells
@@ -50,6 +51,12 @@ interface BaseColumnDefinition {
   schema?: z.ZodType<unknown, any, unknown>;
 }
 
+/**
+ * Read-only column definition
+ */
+export interface ReadOnlyColumnDefinition extends BaseColumnDefinition {
+  type: 'read-only';
+}
 /**
  * Text column definition
  */
@@ -110,6 +117,7 @@ export interface MultiSelectColumnDefinition extends BaseColumnDefinition {
  * Type-specific column definitions using discriminated unions
  */
 export type ColumnDefinition =
+  | ReadOnlyColumnDefinition
   | TextColumnDefinition
   | NumberColumnDefinition
   | BooleanColumnDefinition
@@ -154,6 +162,12 @@ export function isMultiSelectColumn(
   col: ColumnDefinition,
 ): col is MultiSelectColumnDefinition {
   return col.type === 'multi-select';
+}
+
+export function isReadOnlyColumn(
+  col: ColumnDefinition,
+): col is ReadOnlyColumnDefinition {
+  return col.type === 'read-only';
 }
 
 /**

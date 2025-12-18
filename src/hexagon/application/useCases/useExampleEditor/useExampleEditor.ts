@@ -59,7 +59,7 @@ const exampleEditColumns: TableColumn[] = [
     id: 'id',
     label: 'ID',
     width: '80px',
-    type: 'number',
+    type: 'read-only',
     editable: false, // ID is readonly
   },
   {
@@ -84,7 +84,7 @@ const exampleEditColumns: TableColumn[] = [
     id: 'spanglish',
     label: 'Spanglish',
     width: '100px',
-    type: 'boolean',
+    type: 'read-only',
   },
   {
     id: 'vocabularyComplete',

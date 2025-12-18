@@ -66,6 +66,7 @@ export function TableRow({
             aria-selected={isActive || undefined}
           >
             <TableCellInput
+              cellKey={cellKey}
               column={column}
               cellValue={String(cellValue)}
               hasError={!!errorMessage}
