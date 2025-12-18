@@ -41,6 +41,7 @@ export interface EditTableHook<T> {
 
   // State
   hasUnsavedChanges: boolean;
+  dirtyRowIds: Set<string>;
   validationState: ValidationState;
 
   // Save operation
@@ -202,6 +203,7 @@ export function useEditTable<T extends Record<string, unknown>>({
     setActiveCellInfo,
     clearActiveCellInfo,
     hasUnsavedChanges: dirtyRowIds.size > 0,
+    dirtyRowIds,
     validationState,
     applyChanges,
   };

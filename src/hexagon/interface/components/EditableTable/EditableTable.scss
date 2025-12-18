@@ -1,0 +1,31 @@
+// Import existing PasteTable styles
+@import '../PasteTable/PasteTable.scss';
+
+// Add dirty state styling
+.paste-table__cell-container--dirty {
+  background-color: rgba(255, 193, 7, 0.1); // Light yellow background
+
+  input,
+  select {
+    background-color: rgba(255, 193, 7, 0.15);
+  }
+}
+
+// Error state styling - must come after dirty to override it
+.paste-table__cell-container--error {
+  background-color: rgba(255, 0, 0, 0.25); // Red background for errors
+
+  input,
+  select {
+    background-color: rgba(255, 0, 0, 0.3);
+  }
+}
+
+// Loading state
+.paste-table__loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary, #666);
+  font-style: italic;
+}
+

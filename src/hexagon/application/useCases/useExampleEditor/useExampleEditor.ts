@@ -19,13 +19,16 @@ import { z } from 'zod';
 
 /**
  * Table row type for editing examples
- * Uses hasAudio boolean instead of two separate URL fields
+ * Uses hasAudio boolean instead of two separate URL fields for editing
+ * Includes audio URLs for playback (derived/display-only)
  */
 export interface ExampleEditRow extends Record<string, unknown> {
   id: number;
   spanish: string;
   english: string;
   hasAudio: boolean;
+  spanishAudio?: string; // For audio playback (derived, display-only)
+  englishAudio?: string; // For audio playback (derived, display-only)
   spanglish: boolean;
   vocabularyComplete: boolean;
 }
@@ -40,6 +43,8 @@ function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
     spanish: example.spanish,
     english: example.english,
     hasAudio,
+    spanishAudio: example.spanishAudio,
+    englishAudio: example.englishAudio,
     spanglish: example.spanglish,
     vocabularyComplete: example.vocabularyComplete,
   };
@@ -73,7 +78,11 @@ function mapEditRowToUpdateCommand(
 export interface UseExampleEditorResult {
   /** The edit table hook with all table operations */
   editTable: EditTableHook<ExampleEditRow>;
+  /** Whether data is currently loading */
+  isLoading: boolean;
+  /** Whether save operation is in progress */
   isSaving: boolean;
+  /** Error from save operation, if any */
   saveError: Error | null;
 }
 
@@ -110,6 +119,8 @@ const exampleEditColumns: ColumnDefinition[] = [
   { id: 'spanish', type: 'text', required: true },
   { id: 'english', type: 'text', required: true },
   { id: 'hasAudio', type: 'boolean' },
+  { id: 'spanishAudio', type: 'text', editable: false, derived: true },
+  { id: 'englishAudio', type: 'text', editable: false, derived: true },
   { id: 'spanglish', type: 'text', editable: false, derived: true },
   { id: 'vocabularyComplete', type: 'boolean' },
 ];
@@ -133,7 +144,7 @@ export function useExampleEditor(): UseExampleEditorResult {
 
   const {
     examples: examplesToEdit,
-    isLoading: _isLoadingExamplesToEdit,
+    isLoading: isLoadingExamplesToEdit,
     error: _errorExamplesToEdit,
   } = useExamplesToEditQuery(selectedExampleIds);
 
@@ -184,6 +195,7 @@ export function useExampleEditor(): UseExampleEditorResult {
 
   return {
     editTable,
+    isLoading: isLoadingExamplesToEdit,
     isSaving,
     saveError,
   };

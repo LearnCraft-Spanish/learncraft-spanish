@@ -111,6 +111,10 @@ export interface CellRenderProps {
   isEditable: boolean;
   /** Call to update the cell value */
   onChange: (value: string) => void;
+  /** Call when cell receives focus */
+  onFocus: () => void;
+  /** Call when cell loses focus */
+  onBlur: () => void;
   /** Ref callback for focus management */
   cellRef: RefCallback<HTMLElement>;
 }
