@@ -1,8 +1,9 @@
 import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
 import type { ExampleEditRow } from '@domain/PasteTable/exampleEditRow';
 import type { TableColumn } from '@domain/PasteTable/General';
-import type { ExampleTechnical } from '@learncraft-spanish/shared';
-import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
+import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
+import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
 import {
   mapEditRowToUpdateCommand,
@@ -16,30 +17,12 @@ import { z } from 'zod';
 export type { ExampleEditRow };
 
 /**
- * Props for the useExampleEditor hook
- */
-export interface UseExampleEditorProps {
-  /** Source examples from TanStack query */
-  examples: ExampleTechnical[];
-  /** Callback when examples are saved */
-  onSave?: () => void;
-}
-
-/**
  * Return type for the useExampleEditor hook
  */
 export interface UseExampleEditorResult {
   /** The edit table hook with all table operations */
-  tableHook: EditTableHook<ExampleEditRow>;
-  /** Discard all changes and revert to source data */
-  discardChanges: () => void;
-  /** Apply changes - saves dirty rows */
-  applyChanges: () => Promise<void>;
-  /** Whether the table has unsaved changes */
-  hasUnsavedChanges: boolean;
-  /** Whether save is in progress */
+  editTable: EditTableHook<ExampleEditRow>;
   isSaving: boolean;
-  /** Error from save operation */
   saveError: Error | null;
 }
 
@@ -121,24 +104,28 @@ const exampleEditColumns: TableColumn[] = [
  * - Validation
  * - Save dirty changes to server
  */
-export function useExampleEditor({
-  examples,
-  onSave,
-}: UseExampleEditorProps): UseExampleEditorResult {
+export function useExampleEditor(): UseExampleEditorResult {
   // State for save operation
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<Error | null>(null);
 
-  // Get the example adapter for saving
-  const exampleAdapter = useExampleAdapter();
+  const { selectedExampleIds } = useSelectedExamplesContext();
+
+  const {
+    examples: examplesToEdit,
+    isLoading: _isLoadingExamplesToEdit,
+    error: _errorExamplesToEdit,
+  } = useExamplesToEditQuery(selectedExampleIds);
+
+  const { updateExamples } = useExampleMutations();
 
   // Create audio URL adapter for generating URLs from hasAudio
   const audioUrlAdapter = useMemo(() => createAudioUrlAdapter(), []);
 
   // Map source examples to edit rows
   const sourceData = useMemo(
-    () => examples.map(mapExampleToEditRow),
-    [examples],
+    () => examplesToEdit?.map(mapExampleToEditRow) ?? [],
+    [examplesToEdit],
   );
 
   // Handle applying changes - maps back to UpdateExamplesCommand
@@ -154,10 +141,7 @@ export function useExampleEditor({
         );
 
         // Call the adapter to save
-        await exampleAdapter.updateExamples(updateCommands);
-
-        // Call onSave callback if provided
-        onSave?.();
+        await updateExamples.mutateAsync(updateCommands);
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
         setSaveError(error);
@@ -166,7 +150,7 @@ export function useExampleEditor({
         setIsSaving(false);
       }
     },
-    [audioUrlAdapter, exampleAdapter, onSave],
+    [audioUrlAdapter, updateExamples],
   );
 
   // Use the edit table hook
@@ -179,10 +163,7 @@ export function useExampleEditor({
   });
 
   return {
-    tableHook: editTable,
-    discardChanges: editTable.discardChanges,
-    applyChanges: editTable.applyChanges,
-    hasUnsavedChanges: editTable.hasUnsavedChanges,
+    editTable,
     isSaving,
     saveError,
   };

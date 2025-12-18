@@ -1,4 +1,4 @@
-import type { TableHook } from '@domain/PasteTable/General';
+import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
 import { PasteTableErrorBoundary } from '@interface/components/PasteTable/PasteTableErrorBoundary';
 import { TableRow } from '@interface/components/PasteTable/TableRow';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -6,7 +6,7 @@ import './PasteTable.scss';
 
 export interface PasteTableProps<T> {
   /** Core table hook from application layer */
-  hook: TableHook<T>;
+  hook: EditTableHook<T>;
   /** Optional text for the clear button */
   clearButtonText?: string;
   /** Optional hint text for paste functionality */
@@ -35,7 +35,7 @@ export function PasteTable<T>({
   const {
     data: { rows, columns },
     updateCell,
-    resetTable,
+    discardChanges,
     handlePaste,
     setActiveCellInfo,
     clearActiveCellInfo,
@@ -263,7 +263,7 @@ export function PasteTable<T>({
   // Enhanced reset handler to completely clear all state
   const handleReset = useCallback(() => {
     // Reset table data via application hook
-    resetTable();
+    discardChanges();
 
     // Fully reset UI state
     setActiveCell(null);
@@ -277,7 +277,7 @@ export function PasteTable<T>({
     if (tableEl instanceof HTMLElement) {
       tableEl.focus();
     }
-  }, [resetTable]);
+  }, [discardChanges]);
 
   return (
     <PasteTableErrorBoundary>

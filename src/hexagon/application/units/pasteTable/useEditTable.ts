@@ -33,7 +33,7 @@ export interface EditTableHook<T> {
   };
 
   // Operations
-  updateCell: (rowId: string, columnId: string, value: string) => void;
+  updateCell: (rowId: string, columnId: string, value: string) => null;
   handlePaste: (e: ClipboardEvent<Element>) => void;
   importData: (data: T[]) => void;
   discardChanges: () => void;
@@ -191,6 +191,7 @@ export function useEditTable<T extends Record<string, unknown>>({
           clearDirtyRows([rowId]);
         }
       }
+      return null;
     },
     [updateCellBase, rows, cleanRows, idColumnId, markRowDirty, clearDirtyRows],
   );
