@@ -17,26 +17,18 @@ import {
 } from '@domain/PasteTable/functions/typeConversions';
 
 /**
- * Type guard to check if entity has an id property
- */
-function hasId<T>(entity: T): entity is T & { id: string } {
-  return (
-    typeof entity === 'object' &&
-    entity !== null &&
-    'id' in entity &&
-    typeof (entity as { id: unknown }).id === 'string'
-  );
-}
-
-/**
  * Convert domain entity to TableRow
  * Handles type conversion: Date → string, number → string, boolean → string
+ *
+ * Row ID is deterministic: `row-{entityId}` where entityId comes from idColumnId.
+ * If no idColumnId provided or entity lacks that field, generates a UUID.
  *
  * @template T - The domain entity type
  */
 export function mapDomainToTableRow<T extends Record<string, unknown>>(
   entity: T,
   columns: ColumnDefinition[],
+  idColumnId?: string,
 ): TableRow {
   const cells: Record<string, string> = {};
 
@@ -127,8 +119,9 @@ export function mapDomainToTableRow<T extends Record<string, unknown>>(
     }
   });
 
-  // Type-safe ID extraction
-  const rowId = hasId(entity) ? entity.id : generateRowId();
+  // Deterministic row ID from entity ID, or generate if not available
+  const entityId = idColumnId && idColumnId in entity ? entity[idColumnId] : null;
+  const rowId = entityId != null ? `row-${entityId}` : generateRowId();
 
   return {
     id: rowId,
@@ -144,8 +137,11 @@ export function mapDomainToTableRow<T extends Record<string, unknown>>(
 export function mapDomainToTableRows<T extends Record<string, unknown>>(
   entities: T[],
   columns: ColumnDefinition[],
+  idColumnId?: string,
 ): TableRow[] {
-  return entities.map((entity) => mapDomainToTableRow(entity, columns));
+  return entities.map((entity) =>
+    mapDomainToTableRow(entity, columns, idColumnId),
+  );
 }
 
 /**

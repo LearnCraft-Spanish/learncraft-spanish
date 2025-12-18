@@ -4,11 +4,8 @@
 
 // Core types
 export * from '@domain/PasteTable/columnDefinition';
-// Entity-specific
-export * from '@domain/PasteTable/exampleEditRow';
+export * from '@domain/PasteTable/tableRow';
+export * from '@domain/PasteTable/validationTypes';
+
 // Functions
 export * from '@domain/PasteTable/functions';
-
-export * from '@domain/PasteTable/tableRow';
-
-export * from '@domain/PasteTable/validationTypes';

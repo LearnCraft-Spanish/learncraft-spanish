@@ -257,7 +257,7 @@ describe('useEditTable', () => {
   });
 
   describe('importData', () => {
-    it('should replace current data and clear dirty state', async () => {
+    it('should import data as diffs against source', async () => {
       const { result } = renderHook(() =>
         useEditTable<TestRow>({
           columns: testColumns,
@@ -277,15 +277,26 @@ describe('useEditTable', () => {
         expect(result.current.hasUnsavedChanges).toBe(true);
       });
 
-      // Import new data
-      const newData: TestRow[] = [{ id: 99, name: 'New Item', value: 99 }];
+      // Import data with matching IDs - computes diffs against source
+      const newData: TestRow[] = [
+        { id: 1, name: 'Imported Item 1', value: 10 },
+        { id: 2, name: 'Item 2', value: 20 }, // Same as source - no diff
+        { id: 3, name: 'Imported Item 3', value: 30 },
+      ];
       act(() => {
         result.current.importData(newData);
       });
 
-      expect(result.current.data.rows).toHaveLength(1);
-      expect(result.current.data.rows[0].cells.name).toBe('New Item');
-      expect(result.current.hasUnsavedChanges).toBe(false);
+      // Still 3 rows (from source)
+      expect(result.current.data.rows).toHaveLength(3);
+      // Row 1 has imported value (different from source)
+      expect(result.current.data.rows[0].cells.name).toBe('Imported Item 1');
+      // Row 2 matches source, so no diff
+      expect(result.current.data.rows[1].cells.name).toBe('Item 2');
+      // Row 3 has imported value
+      expect(result.current.data.rows[2].cells.name).toBe('Imported Item 3');
+      // Has unsaved changes (rows 1 and 3 differ from source)
+      expect(result.current.hasUnsavedChanges).toBe(true);
     });
   });
 

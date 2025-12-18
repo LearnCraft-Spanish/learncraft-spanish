@@ -15,6 +15,9 @@ export * from '@domain/PasteTable/functions/entityValidation';
 // Mappers
 export * from '@domain/PasteTable/functions/mappers';
 
+// Merge source with diffs
+export * from '@domain/PasteTable/functions/mergeSourceWithDiffs';
+
 // Normalization
 export * from '@domain/PasteTable/functions/normalization';
 

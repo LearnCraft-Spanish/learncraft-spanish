@@ -1,20 +1,71 @@
 import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
 import type { ColumnDefinition } from '@domain/PasteTable';
-import type { ExampleEditRow } from '@domain/PasteTable/exampleEditRow';
+import type {
+  ExampleTechnical,
+  UpdateExampleCommand,
+} from '@learncraft-spanish/shared';
 import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
 import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
-import {
-  mapEditRowToUpdateCommand,
-  mapExampleToEditRow,
-} from '@domain/PasteTable/exampleEditRow';
 import { createAudioUrlAdapter } from '@domain/PasteTable/functions/audioUrlAdapter';
 import { updateExampleCommandSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 
-export type { ExampleEditRow };
+// ============================================================================
+// Example Edit Row - use-case specific type and mappers
+// ============================================================================
+
+/**
+ * Table row type for editing examples
+ * Uses hasAudio boolean instead of two separate URL fields
+ */
+export interface ExampleEditRow extends Record<string, unknown> {
+  id: number;
+  spanish: string;
+  english: string;
+  hasAudio: boolean;
+  spanglish: boolean;
+  vocabularyComplete: boolean;
+}
+
+/**
+ * Map ExampleTechnical to ExampleEditRow
+ */
+function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
+  const hasAudio = !!(example.spanishAudio && example.englishAudio);
+  return {
+    id: example.id,
+    spanish: example.spanish,
+    english: example.english,
+    hasAudio,
+    spanglish: example.spanglish,
+    vocabularyComplete: example.vocabularyComplete,
+  };
+}
+
+/**
+ * Map ExampleEditRow back to UpdateExampleCommand
+ */
+function mapEditRowToUpdateCommand(
+  row: Partial<ExampleEditRow>,
+  audioUrlAdapter: ReturnType<typeof createAudioUrlAdapter>,
+): UpdateExampleCommand {
+  const exampleId = Number(row.id);
+  const audioUrls = audioUrlAdapter.generateAudioUrls(
+    row.hasAudio ?? false,
+    exampleId,
+  );
+  return {
+    exampleId,
+    spanish: row.spanish,
+    english: row.english,
+    spanishAudio: audioUrls.spanishAudioLa,
+    englishAudio: audioUrls.englishAudio,
+    vocabularyComplete: row.vocabularyComplete,
+  };
+}
 
 /**
  * Return type for the useExampleEditor hook

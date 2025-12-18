@@ -433,6 +433,17 @@ describe('useExampleEditor', () => {
       const updateExamplesSpy = vi.fn().mockResolvedValue([]);
       overrideMockExampleAdapter({ updateExamples: updateExamplesSpy });
 
+      // Use stable examples with fixed IDs
+      const stableExamples = createMockExampleTechnicalList(3);
+      stableExamples[0].id = 100;
+      stableExamples[1].id = 101;
+      stableExamples[2].id = 102;
+      vi.mocked(useExamplesToEditQuery).mockReturnValue({
+        examples: stableExamples,
+        isLoading: false,
+        error: null,
+      });
+
       const { result } = renderHook(() => useExampleEditor(), {
         wrapper: MockAllProviders,
       });
