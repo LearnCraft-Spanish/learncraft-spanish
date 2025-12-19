@@ -103,8 +103,8 @@ export function TableCellInput({
   // Boolean column
   if (isBooleanColumn(column)) {
     // Boolean: checkbox or select based on format
-    const format = column.booleanFormat || 'true-false';
-    if (format === 'true-false' || format === 'auto') {
+    const format = column.booleanFormat || 'auto';
+    if (format === 'auto') {
       return (
         <BooleanCell
           cellKey={cellKey}
