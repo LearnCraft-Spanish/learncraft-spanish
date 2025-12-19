@@ -6,8 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
 import Nav from './components/Nav';
 import SubHeader from './components/SubHeader';
-import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
-
+import AppIssuesNotification from './hexagon/interface/components/AppIssuesNotification/AppIssuesNotification';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
 import './contextual.scss';
@@ -19,7 +18,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="App">
-      <ExtraCoachingCTA />
+      {/* <ExtraCoachingCTA /> */}
+      <AppIssuesNotification />
       <Nav />
       {location.pathname !== '/student-drill-down' &&
         location.pathname !== '/customquiz' &&
