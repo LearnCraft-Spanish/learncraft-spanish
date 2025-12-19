@@ -11,6 +11,7 @@ import { AudioPlaybackCell } from '@interface/components/ExampleEditorInterface/
 
 /**
  * Display configuration for example editor columns
+ * Defines labels and widths for each column in the table UI
  */
 const exampleDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'id', label: 'ID', width: '80px' },
@@ -24,18 +25,34 @@ const exampleDisplayConfig: ColumnDisplayConfig[] = [
 ];
 
 /**
- * Custom cell renderer that uses AudioPlaybackCell for audio columns,
- * StandardCell for all others
+ * Cell renderer function for example editor table
+ *
+ * This function is called by EditableTable for each cell to determine which
+ * component to render. It receives CellRenderProps containing:
+ * - Cell value, row data, column definition
+ * - Focus state, validation errors, dirty state
+ * - Event handlers (onChange, onFocus, onBlur)
+ *
+ * Pattern: The render function allows interface-layer customization of cell
+ * rendering without modifying the generic EditableTable component. This keeps
+ * the table reusable while allowing use-case-specific cell types.
+ *
+ * Flow: ExampleEditor → EditableTable → EditableTableRow → renderCell()
+ *
+ * @param props - Cell rendering props from EditableTableRow
+ * @returns React component for the cell (AudioPlaybackCell or StandardCell)
  */
-function renderCell(props: CellRenderProps) {
+function renderExampleEditorCell(props: CellRenderProps) {
   const { column } = props;
 
-  // Use custom renderer for audio playback columns
+  // Audio URL columns: Use custom playback component (read-only, displays audio player)
+  // These columns are marked as 'derived' in column definitions (see useExampleEditor)
   if (column.id === 'spanishAudio' || column.id === 'englishAudio') {
     return <AudioPlaybackCell {...props} />;
   }
 
-  // Use standard renderer for all other columns
+  // All other columns: Use standard editable cell component
+  // Handles text, textarea, boolean, number, date, etc. based on column.type
   return <StandardCell {...props} />;
 }
 
@@ -66,7 +83,7 @@ export function ExampleEditor() {
         isLoading={isLoading}
         isSaving={isSaving}
         isValid={editTable.validationState.isValid}
-        renderCell={renderCell}
+        renderCell={renderExampleEditorCell}
       />
     </div>
   );

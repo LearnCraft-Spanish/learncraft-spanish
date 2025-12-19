@@ -117,7 +117,18 @@ const exampleEditRowSchema = updateExampleCommandSchema
   });
 
 /**
- * Column definitions for the example edit table (domain only)
+ * Column definitions for the example edit table
+ *
+ * These definitions control:
+ * - Data types and validation (via rowSchema)
+ * - Editability (editable: false = read-only)
+ * - Display behavior (derived: true = computed/display-only)
+ *
+ * Note: Custom cell rendering (e.g., AudioPlaybackCell for audio columns) is
+ * handled in the interface layer (ExampleEditor component) via the renderCell
+ * function. The column definitions here mark audio columns as 'derived' to
+ * indicate they're display-only, but the actual component selection happens
+ * in the interface layer based on column.id.
  */
 const exampleEditColumns: ColumnDefinition[] = [
   { id: 'id', type: 'read-only', editable: false },

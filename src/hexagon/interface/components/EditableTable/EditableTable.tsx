@@ -23,6 +23,18 @@ export interface EditableTableProps {
   dirtyRowIds: Set<string>;
   validationErrors: Record<string, Record<string, string>>;
   onCellChange: (rowId: string, columnId: string, value: string) => void;
+  /**
+   * Cell renderer function - determines which component to render for each cell
+   *
+   * This function is called by EditableTableRow for every cell, allowing
+   * interface-layer customization of cell rendering (e.g., custom components
+   * for specific column types).
+   *
+   * The function receives CellRenderProps containing all cell state and handlers.
+   * Return a React component (typically StandardCell or a custom cell component).
+   *
+   * Default behavior: If not provided, StandardCell is used for all cells.
+   */
   renderCell: (props: CellRenderProps) => React.ReactNode;
   /** Paste handler from hook */
   onPaste?: (e: React.ClipboardEvent<Element>) => void;

@@ -20,6 +20,10 @@ interface EditableTableRowProps {
     rowId: string,
     columnId: string,
   ) => (element: HTMLElement | null) => void;
+  /**
+   * Cell renderer function from parent EditableTable
+   * Called once per cell to determine which component to render
+   */
   renderCell: (props: CellRenderProps) => React.ReactNode;
 }
 
@@ -45,6 +49,7 @@ export function EditableTableRow({
       aria-rowindex={rowIndex + 2}
     >
       {columns.map((column, colIndex) => {
+        // Extract cell state and metadata
         const display = getDisplay(column.id);
         const value = row.cells[column.id] ?? '';
         const isDirty = dirtyRowIds.has(row.id);
@@ -53,6 +58,8 @@ export function EditableTableRow({
           activeCell?.rowId === row.id && activeCell?.columnId === column.id;
         const isEditable = column.editable !== false;
 
+        // Construct props object for cell renderer
+        // This object contains all state and handlers needed by any cell component
         const cellProps: CellRenderProps = {
           row,
           column,
@@ -81,6 +88,8 @@ export function EditableTableRow({
 
         const hasError = !!error;
 
+        // Render the cell using the renderer function from parent
+        // The renderer decides which component to use (StandardCell, custom component, etc.)
         return (
           <div
             key={column.id}
