@@ -102,6 +102,8 @@
 
   // Hide on mobile devices
   @media (max-width: 768px) {
-    display: none;
+    .content {
+      max-width: 90vw;
+    }
   }
 }
