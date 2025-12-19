@@ -30,23 +30,63 @@ export interface ExampleEditRow extends Record<string, unknown> {
   hasAudio: boolean;
   spanishAudio?: string; // For audio playback (derived, display-only)
   englishAudio?: string; // For audio playback (derived, display-only)
-  spanglish: boolean;
   vocabularyComplete: boolean;
 }
 
 /**
+ * Compute spanglish status from spanish text
+ * Spanglish is true if the text contains one or more asterisks (*)
+ */
+function computeSpanglish(spanish: string): boolean {
+  return spanish.includes('*');
+}
+
+/**
+ * Compute derived fields for a row based on current cell values
+ * Pure function that computes audio URLs and spanglish from row data
+ */
+function computeDerivedFields(row: { cells: Record<string, string> }): {
+  spanishAudio: string;
+  englishAudio: string;
+  spanglish: string;
+} {
+  const domainId = Number(row.cells.id);
+  const hasAudio = row.cells.hasAudio === 'true';
+  const spanish = row.cells.spanish || '';
+
+  // Compute audio URLs from hasAudio boolean
+  const audioUrls = generateAudioUrls(hasAudio, domainId);
+
+  // Compute spanglish from spanish text (contains asterisks)
+  const spanglish = computeSpanglish(spanish);
+
+  return {
+    spanishAudio: audioUrls.spanishAudioLa,
+    englishAudio: audioUrls.englishAudio,
+    spanglish: String(spanglish),
+  };
+}
+
+/**
  * Map ExampleTechnical to ExampleEditRow
+ *
+ * Derives:
+ * - hasAudio: true if both audio URLs exist
+ * - spanishAudio/englishAudio: Generated from hasAudio using generateAudioUrls
+ * - spanglish: Computed from spanish text (contains asterisks)
  */
 function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
   const hasAudio = !!(example.spanishAudio && example.englishAudio);
+  const audioUrls = generateAudioUrls(hasAudio, example.id);
+
   return {
     id: example.id,
     spanish: example.spanish,
     english: example.english,
     hasAudio,
-    spanishAudio: example.spanishAudio,
-    englishAudio: example.englishAudio,
-    spanglish: example.spanglish,
+    // Audio URLs are derived from hasAudio boolean
+    spanishAudio: audioUrls.spanishAudioLa,
+    englishAudio: audioUrls.englishAudio,
     vocabularyComplete: example.vocabularyComplete,
   };
 }
@@ -138,7 +178,6 @@ const exampleEditColumns: ColumnDefinition[] = [
   { id: 'hasAudio', type: 'boolean' },
   { id: 'spanishAudio', type: 'text', editable: false, derived: true },
   { id: 'englishAudio', type: 'text', editable: false, derived: true },
-  { id: 'spanglish', type: 'text', editable: false, derived: true },
   { id: 'vocabularyComplete', type: 'boolean' },
 ];
 
@@ -164,13 +203,15 @@ export function useExampleEditor(): UseExampleEditorResult {
 
   const { updateExamples } = useExampleMutations();
 
-  // Map source examples to edit rows
+  // 1. Source data is always true and fresh (from server)
+  // Map source examples to edit rows with initial derived field computation
   const sourceData = useMemo(
     () => examplesToEdit?.map(mapExampleToEditRow) ?? [],
     [examplesToEdit],
   );
 
-  // Handle applying changes - maps back to UpdateExamplesCommand
+  // 2. Handle applying changes - maps back to UpdateExampleCommand
+  // Computed data from merged rows is used for saves
   const handleApplyChanges = useCallback(
     async (dirtyData: Partial<ExampleEditRow>[]) => {
       setIsSaving(true);
@@ -178,10 +219,10 @@ export function useExampleEditor(): UseExampleEditorResult {
 
       try {
         // Map dirty rows to update commands
+        // Derived fields (audio URLs) are computed here from hasAudio
         const updateCommands = dirtyData.map((row) =>
           mapEditRowToUpdateCommand(row),
         );
-
         // Call the mutation to save changes
         await updateExamples(updateCommands);
       } catch (err) {
@@ -195,13 +236,23 @@ export function useExampleEditor(): UseExampleEditorResult {
     [updateExamples],
   );
 
-  // Use the edit table hook
+  // 3. Compute derived fields function - computes from current cell values
+  // This ensures derived fields stay in sync with current row values (source + user edits)
+  const computeDerivedFieldsForRow = useCallback(
+    (row: { cells: Record<string, string> }): Record<string, string> => {
+      return computeDerivedFields(row);
+    },
+    [],
+  );
+
+  // 4. Use edit table hook - merges source + diffs and computes derived fields
   const editTable = useEditTable<ExampleEditRow>({
     columns: exampleEditColumns,
     sourceData,
     rowSchema: exampleEditRowSchema,
     idColumnId: 'id',
     onApplyChanges: handleApplyChanges,
+    computeDerivedFields: computeDerivedFieldsForRow,
   });
 
   return {

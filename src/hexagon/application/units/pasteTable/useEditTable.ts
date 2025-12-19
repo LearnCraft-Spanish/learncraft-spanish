@@ -58,6 +58,12 @@ interface UseEditTableOptions<T extends Record<string, unknown>> {
   idColumnId?: string;
   /** Callback when changes are applied (for external persistence) */
   onApplyChanges?: (dirtyData: Partial<T>[]) => Promise<void>;
+  /**
+   * Optional function to compute derived fields for merged rows
+   * Called after source + diffs are merged, allows recomputing derived fields
+   * based on current cell values (e.g., audio URLs from hasAudio boolean)
+   */
+  computeDerivedFields?: (row: TableRow) => Record<string, string>;
 }
 
 /**
@@ -70,6 +76,7 @@ export function useEditTable<T extends Record<string, unknown>>({
   rowSchema,
   idColumnId = 'id',
   onApplyChanges,
+  computeDerivedFields,
 }: UseEditTableOptions<T>): EditTableHook<T> {
   // Map source data to TableRows (reactive - updates when React Query updates)
   // Uses idColumnId for deterministic row IDs
@@ -95,10 +102,26 @@ export function useEditTable<T extends Record<string, unknown>>({
     });
 
   // Derive display rows by merging source with diffs
-  const rows = useMemo(
-    () => mergeSourceWithDiffs(sourceRows, diffs),
-    [sourceRows, diffs],
-  );
+  // If computeDerivedFields is provided, recompute derived fields after merging
+  const rows = useMemo(() => {
+    const merged = mergeSourceWithDiffs(sourceRows, diffs);
+    
+    if (computeDerivedFields) {
+      // Recompute derived fields from current merged cell values
+      return merged.map((row) => {
+        const derived = computeDerivedFields(row);
+        return {
+          ...row,
+          cells: {
+            ...row.cells,
+            ...derived,
+          },
+        };
+      });
+    }
+    
+    return merged;
+  }, [sourceRows, diffs, computeDerivedFields]);
 
   // Generate validateRow function from Zod schemas
   const validateRow = useMemo(() => {
