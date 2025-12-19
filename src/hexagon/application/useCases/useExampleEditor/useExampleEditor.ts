@@ -8,7 +8,7 @@ import { useSelectedExamplesContext } from '@application/coordinators/hooks/useS
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
 import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
-import { createAudioUrlAdapter } from '@domain/PasteTable/functions/audioUrlAdapter';
+import { generateAudioUrls } from '@domain/PasteTable/functions/audioUrlAdapter';
 import { updateExampleCommandSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
@@ -52,16 +52,21 @@ function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
 
 /**
  * Map ExampleEditRow back to UpdateExampleCommand
+ *
+ * Note: `row.id` here is the domain entity ID (number), not the table row ID (string).
+ * The table system's `mapTableRowsToDomain` extracts the domain ID from `row.cells.id`
+ * and converts it to the appropriate type, so `dirtyData` contains domain entities.
  */
 function mapEditRowToUpdateCommand(
   row: Partial<ExampleEditRow>,
-  audioUrlAdapter: ReturnType<typeof createAudioUrlAdapter>,
 ): UpdateExampleCommand {
+  if (!row.id) {
+    throw new Error('Row ID is required to update example');
+  }
+
   const exampleId = Number(row.id);
-  const audioUrls = audioUrlAdapter.generateAudioUrls(
-    row.hasAudio ?? false,
-    exampleId,
-  );
+  const audioUrls = generateAudioUrls(row.hasAudio ?? false, exampleId);
+
   return {
     exampleId,
     spanish: row.spanish,
@@ -142,16 +147,10 @@ export function useExampleEditor(): UseExampleEditorResult {
 
   const { selectedExampleIds } = useSelectedExamplesContext();
 
-  const {
-    examples: examplesToEdit,
-    isLoading: isLoadingExamplesToEdit,
-    error: _errorExamplesToEdit,
-  } = useExamplesToEditQuery(selectedExampleIds);
+  const { examples: examplesToEdit, isLoading: isLoadingExamplesToEdit } =
+    useExamplesToEditQuery(selectedExampleIds);
 
   const { updateExamples } = useExampleMutations();
-
-  // Create audio URL adapter for generating URLs from hasAudio
-  const audioUrlAdapter = useMemo(() => createAudioUrlAdapter(), []);
 
   // Map source examples to edit rows
   const sourceData = useMemo(
@@ -168,10 +167,10 @@ export function useExampleEditor(): UseExampleEditorResult {
       try {
         // Map dirty rows to update commands
         const updateCommands = dirtyData.map((row) =>
-          mapEditRowToUpdateCommand(row, audioUrlAdapter),
+          mapEditRowToUpdateCommand(row),
         );
 
-        // Call the adapter to save
+        // Call the mutation to save changes
         await updateExamples(updateCommands);
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err));
@@ -181,7 +180,7 @@ export function useExampleEditor(): UseExampleEditorResult {
         setIsSaving(false);
       }
     },
-    [audioUrlAdapter, updateExamples],
+    [updateExamples],
   );
 
   // Use the edit table hook

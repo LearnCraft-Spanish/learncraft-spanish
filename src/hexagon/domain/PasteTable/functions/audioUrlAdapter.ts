@@ -1,5 +1,5 @@
 /**
- * Audio URL Adapter
+ * Audio URL Generation
  * Converts boolean hasAudio field to English and Spanish audio URLs
  *
  * This is domain logic for generating audio URLs based on a boolean flag.
@@ -7,52 +7,37 @@
  * external services or file paths.
  */
 
-export interface AudioUrlAdapter {
-  /**
-   * Generate audio URLs from hasAudio boolean
-   * @param hasAudio - Boolean flag indicating if audio should be generated
-   * @param recordId - The record ID to use for URL generation
-   * @returns Object with spanishAudioLa and englishAudio URLs, or empty strings if hasAudio is false
-   */
-  generateAudioUrls: (
-    hasAudio: boolean,
-    recordId: number,
-  ) => {
-    spanishAudioLa: string;
-    englishAudio: string;
-  };
-}
-
 /**
- * Create an audio URL adapter
- * Generates URLs based on recordId and a base URL pattern
+ * Generate audio URLs from hasAudio boolean
+ * Pure domain function for URL generation based on record ID
  *
- * This is a domain function - pure business logic for URL generation.
- * Infrastructure concerns (actual URL fetching, S3 access, etc.) should be
- * handled in the infrastructure layer.
- *
+ * @param hasAudio - Boolean flag indicating if audio should be generated
+ * @param recordId - The record ID to use for URL generation
  * @param baseUrl - Optional base URL for audio files (defaults to S3 bucket)
- * @returns AudioUrlAdapter implementation
+ * @returns Object with spanishAudioLa and englishAudio URLs, or empty strings if hasAudio is false
  */
-export function createAudioUrlAdapter(baseUrl?: string): AudioUrlAdapter {
+export function generateAudioUrls(
+  hasAudio: boolean,
+  recordId: number,
+  baseUrl?: string,
+): {
+  spanishAudioLa: string;
+  englishAudio: string;
+} {
+  if (!hasAudio) {
+    return {
+      spanishAudioLa: '',
+      englishAudio: '',
+    };
+  }
+
   const defaultBaseUrl =
     baseUrl || 'https://dbexamples.s3.us-east-2.amazonaws.com/dbexamples';
 
+  // Generate URLs based on recordId
+  // This is domain logic - the pattern for URL generation
   return {
-    generateAudioUrls: (hasAudio: boolean, recordId: number) => {
-      if (!hasAudio) {
-        return {
-          spanishAudioLa: '',
-          englishAudio: '',
-        };
-      }
-
-      // Generate URLs based on recordId
-      // This is domain logic - the pattern for URL generation
-      return {
-        spanishAudioLa: `${defaultBaseUrl}/ex${recordId}la.mp3`,
-        englishAudio: `${defaultBaseUrl}/ex${recordId}en.mp3`,
-      };
-    },
+    spanishAudioLa: `${defaultBaseUrl}/ex${recordId}la.mp3`,
+    englishAudio: `${defaultBaseUrl}/ex${recordId}en.mp3`,
   };
 }
