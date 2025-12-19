@@ -17,7 +17,9 @@ export function TextAreaCell({
 
   const resizeTextarea = useCallback((el: HTMLTextAreaElement | null) => {
     if (!el) return;
-    el.style.height = 'auto';
+    // Reset height to force recalculation, then set to scrollHeight
+    // This ensures the textarea both grows and shrinks properly
+    el.style.height = '1px';
     el.style.height = `${el.scrollHeight}px`;
   }, []);
 
@@ -27,6 +29,7 @@ export function TextAreaCell({
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
+    // Resize immediately on change for responsive behavior
     resizeTextarea(e.target);
   };
 
@@ -47,4 +50,3 @@ export function TextAreaCell({
     />
   );
 }
-
