@@ -23,7 +23,7 @@ export interface EditableTableProps {
   dirtyRowIds: Set<string>;
   validationErrors: Record<string, Record<string, string>>;
   onCellChange: (rowId: string, columnId: string, value: string) => void;
-  children: (props: CellRenderProps) => React.ReactNode;
+  renderCell: (props: CellRenderProps) => React.ReactNode;
   /** Paste handler from hook */
   onPaste?: (e: React.ClipboardEvent<Element>) => void;
   /** Set active cell info (for paste operations) */
@@ -53,7 +53,7 @@ export function EditableTable({
   dirtyRowIds,
   validationErrors,
   onCellChange,
-  children,
+  renderCell,
   onPaste,
   setActiveCellInfo,
   clearActiveCellInfo,
@@ -173,9 +173,8 @@ export function EditableTable({
                     onFocus={handleCellFocus}
                     onBlur={handleCellBlur}
                     createCellRef={createCellRef}
-                  >
-                    {children}
-                  </EditableTableRow>
+                    renderCell={renderCell}
+                  />
                 ))}
               </div>
             </div>

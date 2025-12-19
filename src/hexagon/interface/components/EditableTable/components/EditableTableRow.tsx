@@ -16,8 +16,11 @@ interface EditableTableRowProps {
   onCellChange: (rowId: string, columnId: string, value: string) => void;
   onFocus: (rowId: string, columnId: string) => void;
   onBlur: () => void;
-  createCellRef: (rowId: string, columnId: string) => (element: HTMLElement | null) => void;
-  children: (props: CellRenderProps) => React.ReactNode;
+  createCellRef: (
+    rowId: string,
+    columnId: string,
+  ) => (element: HTMLElement | null) => void;
+  renderCell: (props: CellRenderProps) => React.ReactNode;
 }
 
 export function EditableTableRow({
@@ -32,7 +35,7 @@ export function EditableTableRow({
   onFocus,
   onBlur,
   createCellRef,
-  children,
+  renderCell,
 }: EditableTableRowProps) {
   return (
     <div
@@ -47,8 +50,7 @@ export function EditableTableRow({
         const isDirty = dirtyRowIds.has(row.id);
         const error = validationErrors[row.id]?.[column.id];
         const isActive =
-          activeCell?.rowId === row.id &&
-          activeCell?.columnId === column.id;
+          activeCell?.rowId === row.id && activeCell?.columnId === column.id;
         const isEditable = column.editable !== false;
 
         const cellProps: CellRenderProps = {
@@ -91,11 +93,10 @@ export function EditableTableRow({
             aria-colindex={colIndex + 1}
             aria-selected={isActive || undefined}
           >
-            {children?.(cellProps) ?? null}
+            {renderCell(cellProps)}
           </div>
         );
       })}
     </div>
   );
 }
-

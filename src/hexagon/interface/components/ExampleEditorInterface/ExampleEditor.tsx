@@ -66,9 +66,8 @@ export function ExampleEditor() {
         isLoading={isLoading}
         isSaving={isSaving}
         isValid={editTable.validationState.isValid}
-      >
-        {renderCell}
-      </EditableTable>
+        renderCell={renderCell}
+      />
     </div>
   );
 }
