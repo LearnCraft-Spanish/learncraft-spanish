@@ -8,6 +8,7 @@ import { useSelectedExamplesContext } from '@application/coordinators/hooks/useS
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
 import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
+import { normalizeError } from '@application/utils/queryUtils';
 import { generateAudioUrls } from '@domain/PasteTable/functions/audioUrlAdapter';
 import { updateExampleCommandSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
@@ -184,7 +185,7 @@ export function useExampleEditor(): UseExampleEditorResult {
         // Call the mutation to save changes
         await updateExamples(updateCommands);
       } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
+        const error = normalizeError(err);
         setSaveError(error);
         throw error; // Re-throw so useEditTable knows it failed
       } finally {
