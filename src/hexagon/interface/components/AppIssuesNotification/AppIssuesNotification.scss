@@ -1,0 +1,107 @@
+.appIssuesNotification {
+  background: white;
+  color: var(--dark);
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 4px solid var(--brand);
+  width: 100%;
+  margin: 0 auto;
+
+  h2 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    max-width: 80vw;
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      h2 {
+        margin: 0;
+        margin-right: 8px;
+      }
+    }
+  }
+
+  p {
+    margin: 0 16px 0 0;
+    font-size: 15px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  &__closeButton {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: black;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: var(--accent);
+    }
+
+    &:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    img {
+      width: 12px;
+      height: 12px;
+      filter: brightness(0) invert(0); // Makes the icon white
+    }
+  }
+
+  &__ctaButton {
+    background: darkgreen;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: var(--accent);
+      // border: 2px solid darkgreen;
+      color: white;
+      // transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  // Tablet adjustments
+  @media (max-width: 1024px) and (min-width: 769px) {
+    .content {
+      max-width: 84vw;
+    }
+  }
+
+  // Hide on mobile devices
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
