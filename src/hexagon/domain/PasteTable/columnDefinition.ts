@@ -17,7 +17,9 @@ export type CellType =
   | 'select'
   | 'multi-select'
   | 'date'
-  | 'custom';
+  | 'custom'
+  | 'read-only'
+  | 'textarea';
 
 /**
  * Options for select-type cells
@@ -116,4 +118,12 @@ export function isSelectColumn(col: ColumnDefinition): boolean {
 
 export function isMultiSelectColumn(col: ColumnDefinition): boolean {
   return col.type === 'multi-select';
+}
+
+export function isReadOnlyColumn(col: ColumnDefinition): boolean {
+  return col.type === 'read-only';
+}
+
+export function isTextAreaColumn(col: ColumnDefinition): boolean {
+  return col.type === 'textarea';
 }

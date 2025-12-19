@@ -115,9 +115,9 @@ const exampleEditRowSchema = updateExampleCommandSchema
  * Column definitions for the example edit table (domain only)
  */
 const exampleEditColumns: ColumnDefinition[] = [
-  { id: 'id', type: 'text', editable: false },
-  { id: 'spanish', type: 'text', required: true },
-  { id: 'english', type: 'text', required: true },
+  { id: 'id', type: 'read-only', editable: false },
+  { id: 'spanish', type: 'textarea', required: true },
+  { id: 'english', type: 'textarea', required: true },
   { id: 'hasAudio', type: 'boolean' },
   { id: 'spanishAudio', type: 'text', editable: false, derived: true },
   { id: 'englishAudio', type: 'text', editable: false, derived: true },

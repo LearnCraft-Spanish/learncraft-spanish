@@ -21,7 +21,7 @@ export interface TableRowProps {
   };
   registerCellRef: (
     key: string,
-    element: HTMLInputElement | HTMLSelectElement | null,
+    element: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null,
   ) => void;
   rowIndex: number;
 }

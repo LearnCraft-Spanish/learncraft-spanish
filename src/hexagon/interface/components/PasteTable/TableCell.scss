@@ -7,3 +7,30 @@
   text-align: center;
   background-color: lightgray;
 }
+
+textarea.paste-table__cell {
+  resize: none;
+  // overflow: hidden;
+  height: auto;
+  min-height: 2.5rem;
+  line-height: 1.4;
+  font-family: inherit;
+}
+
+.paste-table__cell-boolean-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  .toggleSwitch {
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+textarea {
+  background-color: transparent;
+}

@@ -5,9 +5,11 @@ import {
   isDateColumn,
   isMultiSelectColumn,
   isSelectColumn,
+  isTextAreaColumn,
 } from '@domain/PasteTable';
-import { ToggleSwitch } from '@interface/components/general';
-import React from 'react';
+import { BooleanCell } from '@interface/components/PasteTable/TableCell/BooleanCell';
+import { SelectCell } from '@interface/components/PasteTable/TableCell/SelectCell';
+import { TextAreaCell } from '@interface/components/PasteTable/TableCell/TextAreaCell';
 import './TableCell.scss';
 
 interface TableCellInputProps {
@@ -23,7 +25,9 @@ interface TableCellInputProps {
     onFocus: () => void;
     onBlur: () => void;
   };
-  cellRef: (el: HTMLInputElement | HTMLSelectElement | null) => void;
+  cellRef: (
+    el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null,
+  ) => void;
 }
 
 export function TableCellInput({
@@ -37,7 +41,9 @@ export function TableCellInput({
   cellRef,
 }: TableCellInputProps) {
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     handlers.onChange(e.target.value);
   };
@@ -60,19 +66,13 @@ export function TableCellInput({
   // Select column
   if (isSelectColumn(column) && column.options) {
     return (
-      <select
-        ref={(el) => cellRef(el)}
-        value={cellValue}
-        onChange={handleChange}
-        {...commonProps}
-      >
-        <option value="">Select...</option>
-        {column.options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <SelectCell
+        cellValue={cellValue}
+        handleChange={handleChange}
+        options={column.options}
+        commonProps={commonProps}
+        cellRef={cellRef}
+      />
     );
   }
 
@@ -89,23 +89,32 @@ export function TableCellInput({
       />
     );
   }
+  if (isTextAreaColumn(column)) {
+    return (
+      <TextAreaCell
+        cellValue={cellValue}
+        handleChange={handleChange}
+        commonProps={commonProps}
+        cellRef={cellRef}
+      />
+    );
+  }
 
   // Boolean column
   if (isBooleanColumn(column)) {
+    // Boolean: checkbox or select based on format
     const format = column.booleanFormat || 'true-false';
     if (format === 'true-false' || format === 'auto') {
       return (
-        <ToggleSwitch
-          id={cellKey}
+        <BooleanCell
+          cellKey={cellKey}
           ariaLabel={ariaLabel}
-          label={''}
-          checked={cellValue === 'true'}
-          onChange={() =>
-            handlers.onChange(cellValue === 'true' ? 'false' : 'true')
-          }
+          cellValue={cellValue}
+          handlers={handlers}
         />
       );
     }
+    // For other formats, use text input
     return (
       <input
         ref={(el) => cellRef(el)}

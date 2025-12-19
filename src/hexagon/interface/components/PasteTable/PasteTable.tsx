@@ -72,9 +72,9 @@ export function PasteTable<T>({
   } | null>(null);
 
   // Refs for cell elements
-  const cellRefs = useRef<Map<string, HTMLInputElement | HTMLSelectElement>>(
-    new Map(),
-  );
+  const cellRefs = useRef<
+    Map<string, HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  >(new Map());
 
   // Helper to get display config for a column
   const getDisplay = useCallback(
@@ -107,7 +107,14 @@ export function PasteTable<T>({
 
   // Register cell refs
   const registerCellRef = useCallback(
-    (key: string, element: HTMLInputElement | HTMLSelectElement | null) => {
+    (
+      key: string,
+      element:
+        | HTMLInputElement
+        | HTMLSelectElement
+        | HTMLTextAreaElement
+        | null,
+    ) => {
       if (element) {
         cellRefs.current.set(key, element);
       } else {
@@ -124,7 +131,11 @@ export function PasteTable<T>({
 
     if (element) {
       element.focus();
-      if (element instanceof HTMLInputElement && element.value) {
+      if (
+        (element instanceof HTMLInputElement ||
+          element instanceof HTMLTextAreaElement) &&
+        element.value
+      ) {
         const length = element.value.length;
         element.setSelectionRange(length, length);
       }
@@ -180,6 +191,9 @@ export function PasteTable<T>({
             (e.target instanceof HTMLInputElement &&
               e.target.type !== 'number' &&
               e.target.selectionStart === 0 &&
+              e.target.selectionEnd === 0) ||
+            (e.target instanceof HTMLTextAreaElement &&
+              e.target.selectionStart === 0 &&
               e.target.selectionEnd === 0);
 
           if (shouldNavigateLeft) {
@@ -203,6 +217,9 @@ export function PasteTable<T>({
               e.target.type === 'number') ||
             (e.target instanceof HTMLInputElement &&
               e.target.type !== 'number' &&
+              e.target.selectionStart === e.target.value.length &&
+              e.target.selectionEnd === e.target.value.length) ||
+            (e.target instanceof HTMLTextAreaElement &&
               e.target.selectionStart === e.target.value.length &&
               e.target.selectionEnd === e.target.value.length);
 

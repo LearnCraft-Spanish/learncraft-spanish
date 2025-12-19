@@ -1,4 +1,4 @@
-import type { ColumnDefinition, TableRow, ValidationState } from '@domain/PasteTable';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import type { z } from 'zod';
 import {
   useTablePaste,
