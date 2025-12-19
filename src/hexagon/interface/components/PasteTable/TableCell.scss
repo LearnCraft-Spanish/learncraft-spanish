@@ -11,6 +11,7 @@
 textarea.paste-table__cell {
   resize: none;
   // overflow: hidden;
+  background-color: transparent;
   height: auto;
   min-height: 2.5rem;
   line-height: 1.4;
