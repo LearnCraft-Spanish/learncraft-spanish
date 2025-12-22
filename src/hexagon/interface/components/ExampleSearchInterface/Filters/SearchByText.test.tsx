@@ -12,6 +12,8 @@ describe('component: SearchByText', () => {
 
     render(
       <SearchByText
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         spanishInput={spanishValue}
         englishInput={englishValue}
         onSpanishInputChange={onSpanishInputChange}
@@ -38,6 +40,8 @@ describe('component: SearchByText', () => {
 
     render(
       <SearchByText
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         spanishInput={spanishInputOriginalValue}
         englishInput=""
         onSpanishInputChange={onSpanishInputChange}
@@ -67,6 +71,8 @@ describe('component: SearchByText', () => {
 
     render(
       <SearchByText
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         spanishInput=""
         englishInput={englishInputOriginalValue}
         onSpanishInputChange={onSpanishInputChange}

@@ -31,6 +31,7 @@ export interface ExampleEditRow extends Record<string, unknown> {
   hasAudio: boolean;
   spanishAudio?: string; // For audio playback (derived, display-only)
   englishAudio?: string; // For audio playback (derived, display-only)
+  relatedVocabulary: number[];
   vocabularyComplete: boolean;
 }
 
@@ -79,6 +80,9 @@ function computeDerivedFields(row: { cells: Record<string, string> }): {
 function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
   const hasAudio = !!(example.spanishAudio && example.englishAudio);
   const audioUrls = generateAudioUrls(hasAudio, example.id);
+  const relatedVocabulary = example.vocabulary.map(
+    (vocabulary) => vocabulary.id,
+  );
 
   return {
     id: example.id,
@@ -88,6 +92,8 @@ function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
     // Audio URLs are derived from hasAudio boolean
     spanishAudio: audioUrls.spanishAudioLa,
     englishAudio: audioUrls.englishAudio,
+    // The ids of the vocabulary items that are related to this example
+    relatedVocabulary,
     vocabularyComplete: example.vocabularyComplete,
   };
 }
@@ -115,6 +121,7 @@ function mapEditRowToUpdateCommand(
     english: row.english,
     spanishAudio: audioUrls.spanishAudioLa,
     englishAudio: audioUrls.englishAudio,
+    relatedVocabulary: row.relatedVocabulary,
     vocabularyComplete: row.vocabularyComplete,
   };
 }
@@ -161,6 +168,7 @@ const exampleEditRowSchema = updateExampleCommandSchema
     spanish: z.string().min(1, 'Spanish text is required'),
     english: z.string().min(1, 'English translation is required'),
     hasAudio: z.coerce.boolean(),
+    relatedVocabulary: z.array(z.coerce.number()),
     spanglish: z.coerce.boolean(),
     vocabularyComplete: z.coerce.boolean(),
   });

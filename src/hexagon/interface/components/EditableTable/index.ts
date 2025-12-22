@@ -1,4 +1,3 @@
-export { EditableTable } from './EditableTable';
-export type { EditableTableProps } from './EditableTable';
-export { StandardCell } from './StandardCell';
-
+export { StandardCell } from '@interface/components/EditableTable/cells/StandardCell';
+export { EditableTable } from '@interface/components/EditableTable/EditableTable';
+export type { EditableTableProps } from '@interface/components/EditableTable/EditableTable';

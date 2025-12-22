@@ -37,6 +37,8 @@ describe('component: SearchByQuiz', () => {
 
     render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode=""
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
@@ -61,6 +63,8 @@ describe('component: SearchByQuiz', () => {
 
     render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode=""
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
@@ -80,6 +84,8 @@ describe('component: SearchByQuiz', () => {
 
     render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode=""
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
@@ -100,6 +106,8 @@ describe('component: SearchByQuiz', () => {
 
     render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode=""
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
@@ -119,6 +127,8 @@ describe('component: SearchByQuiz', () => {
 
     render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode="lcsp"
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
@@ -138,6 +148,8 @@ describe('component: SearchByQuiz', () => {
 
     render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode="lcsp"
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
@@ -157,6 +169,8 @@ describe('component: SearchByQuiz', () => {
 
     render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode="lcsp"
         quizNumber={2}
         onCourseCodeChange={onCourseCodeChange}
@@ -176,6 +190,8 @@ describe('component: SearchByQuiz', () => {
 
     const { rerender } = render(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode="lcsp"
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
@@ -187,6 +203,8 @@ describe('component: SearchByQuiz', () => {
 
     rerender(
       <SearchByQuiz
+        vocabularyComplete={undefined}
+        onVocabularyCompleteChange={vi.fn()}
         courseCode="lcspx"
         quizNumber=""
         onCourseCodeChange={onCourseCodeChange}
