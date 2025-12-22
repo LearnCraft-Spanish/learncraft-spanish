@@ -114,16 +114,7 @@ export default function AudioControl({
 
   // Show error state if audio failed to load
   if (hasLoadError && audioLink) {
-    return (
-      <div
-        className="paste-table__cell-error"
-        role="alert"
-        title="Audio failed to load"
-        style={{ padding: '4px', color: '#d32f2f' }}
-      >
-        <span aria-label="Audio error">⚠️</span>
-      </div>
-    );
+    return <span style={{ color: '#d32f2f' }}>error</span>;
   }
 
   return (
@@ -143,17 +134,7 @@ export default function AudioControl({
             </button>
           </>
         )}
-        {!isValidAudio && (
-          <>
-            <button
-              type="button"
-              className="disabledButton audioError"
-              aria-label="audioError"
-            >
-              <img src={isPlaying ? pause : play} alt="audioError" />
-            </button>
-          </>
-        )}
+        {!isValidAudio && <span style={{ color: '#d32f2f' }}>error</span>}
       </>
     )
   );

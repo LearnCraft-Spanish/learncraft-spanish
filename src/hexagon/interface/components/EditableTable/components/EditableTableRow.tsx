@@ -29,7 +29,6 @@ interface EditableTableRowProps {
 
 export function EditableTableRow({
   row,
-  rowIndex,
   columns,
   getDisplay,
   dirtyRowIds,
@@ -42,13 +41,8 @@ export function EditableTableRow({
   renderCell,
 }: EditableTableRowProps) {
   return (
-    <div
-      key={row.id}
-      className="paste-table__row"
-      role="row"
-      aria-rowindex={rowIndex + 2}
-    >
-      {columns.map((column, colIndex) => {
+    <tr className="paste-table__row">
+      {columns.map((column) => {
         // Extract cell state and metadata
         const display = getDisplay(column.id);
         const value = row.cells[column.id] ?? '';
@@ -91,21 +85,19 @@ export function EditableTableRow({
         // Render the cell using the renderer function from parent
         // The renderer decides which component to use (StandardCell, custom component, etc.)
         return (
-          <div
+          <td
             key={column.id}
             className={`paste-table__cell-container ${
               isActive ? 'paste-table__cell-container--active' : ''
             } ${hasError ? 'paste-table__cell-container--error' : ''} ${
               isDirty && !hasError ? 'paste-table__cell-container--dirty' : ''
             }`}
-            role="gridcell"
-            aria-colindex={colIndex + 1}
             aria-selected={isActive || undefined}
           >
             {renderCell(cellProps)}
-          </div>
+          </td>
         );
       })}
-    </div>
+    </tr>
   );
 }

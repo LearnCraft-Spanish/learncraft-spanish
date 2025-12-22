@@ -7,7 +7,6 @@ export function SelectCell({
   column,
   value,
   display,
-  error,
   onChange,
   onFocus,
   onBlur,
@@ -16,37 +15,44 @@ export function SelectCell({
   if (!column.options) {
     // Fallback to text input if no options provided
     return (
-      <input
-        ref={cellRef}
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+      <div
         onFocus={onFocus}
         onBlur={onBlur}
-        aria-label={display.label}
-        className={`paste-table__cell${error ? ' paste-table__cell--error' : ''}`}
-        placeholder={display.placeholder}
-      />
+        className="paste-table__cell-wrapper"
+      >
+        <input
+          ref={cellRef}
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={display.label}
+          className="paste-table__cell"
+          placeholder={display.placeholder}
+        />
+      </div>
     );
   }
 
   return (
-    <select
-      ref={cellRef}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+    <div
       onFocus={onFocus}
       onBlur={onBlur}
-      aria-label={display.label}
-      className={`paste-table__cell${error ? ' paste-table__cell--error' : ''}`}
+      className="paste-table__cell-wrapper"
     >
-      <option value="">Select...</option>
-      {column.options.map((option) => (
-        <option key={option.value} value={option.value}>
-          {option.label}
-        </option>
-      ))}
-    </select>
+      <select
+        ref={cellRef}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={display.label}
+        className="paste-table__cell"
+      >
+        <option value="">Select...</option>
+        {column.options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
-

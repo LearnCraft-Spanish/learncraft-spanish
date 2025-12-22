@@ -6,24 +6,26 @@ import type { CellRenderProps } from '@interface/components/EditableTable/types'
 export function MultiSelectCell({
   value,
   display,
-  error,
   onChange,
   onFocus,
   onBlur,
   cellRef,
 }: CellRenderProps) {
   return (
-    <input
-      ref={cellRef}
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+    <div
       onFocus={onFocus}
       onBlur={onBlur}
-      aria-label={display.label}
-      className={`paste-table__cell${error ? ' paste-table__cell--error' : ''}`}
-      placeholder="Comma-separated values"
-    />
+      className="paste-table__cell-wrapper"
+    >
+      <input
+        ref={cellRef}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={display.label}
+        className="paste-table__cell"
+        placeholder="Comma-separated values"
+      />
+    </div>
   );
 }
-

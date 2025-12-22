@@ -7,7 +7,6 @@ import { useCallback, useEffect, useRef } from 'react';
 export function TextAreaCell({
   value,
   display,
-  error,
   onChange,
   onFocus,
   onBlur,
@@ -34,19 +33,23 @@ export function TextAreaCell({
   };
 
   return (
-    <textarea
-      ref={(el) => {
-        textAreaRef.current = el;
-        cellRef(el);
-        resizeTextarea(el);
-      }}
-      value={value}
-      onChange={handleChange}
+    <div
       onFocus={onFocus}
       onBlur={onBlur}
-      aria-label={display.label}
-      className={`paste-table__cell${error ? ' paste-table__cell--error' : ''}`}
-      placeholder={display.placeholder}
-    />
+      className="paste-table__cell-wrapper"
+    >
+      <textarea
+        ref={(el) => {
+          textAreaRef.current = el;
+          cellRef(el);
+          resizeTextarea(el);
+        }}
+        value={value}
+        onChange={handleChange}
+        aria-label={display.label}
+        className="paste-table__cell"
+        placeholder={display.placeholder}
+      />
+    </div>
   );
 }

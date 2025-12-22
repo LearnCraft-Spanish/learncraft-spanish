@@ -104,31 +104,10 @@ export function EditableTable({
     [displayConfig],
   );
 
-  // Normalize width value for CSS grid (add 'fr' unit if no unit specified)
-  const normalizeWidth = (width: string | undefined): string => {
-    if (!width) return '1fr';
-    if (width.endsWith('fr') || width.endsWith('px') || width.endsWith('%')) {
-      return width;
-    }
-    return `${width}fr`;
-  };
-
-  // Process column widths for grid template
-  const gridTemplateColumnsValue = useMemo(() => {
-    return columns
-      .map((col) => {
-        const display = getDisplay(col.id);
-        return normalizeWidth(display.width);
-      })
-      .join(' ');
-  }, [columns, getDisplay]);
-
-  // Create inline style with CSS variable for grid
+  // Table style - column widths are applied via colgroup or inline styles on th/td
   const tableStyle = useMemo(() => {
-    return {
-      '--grid-template-columns': gridTemplateColumnsValue,
-    } as React.CSSProperties;
-  }, [gridTemplateColumnsValue]);
+    return {} as React.CSSProperties;
+  }, []);
 
   // Handle cell focus
   const handleCellFocus = useCallback(
@@ -151,11 +130,7 @@ export function EditableTable({
         className={`paste-table ${className || ''}`}
         onPaste={onPaste}
         onKeyDown={handleKeyDown}
-        style={tableStyle}
         tabIndex={-1}
-        role="grid"
-        aria-rowcount={rows.length}
-        aria-colcount={columns.length}
       >
         {isLoading ? (
           <div
@@ -167,10 +142,11 @@ export function EditableTable({
           </div>
         ) : (
           <>
-            <div className="paste-table__table-grid" role="presentation">
-              <EditableTableHeader columns={columns} getDisplay={getDisplay} />
-
-              <div className="paste-table__body" role="presentation">
+            <table className="paste-table__table" style={tableStyle}>
+              <thead>
+                <EditableTableHeader columns={columns} getDisplay={getDisplay} />
+              </thead>
+              <tbody>
                 {rows.map((row, rowIndex) => (
                   <EditableTableRow
                     key={row.id}
@@ -188,8 +164,8 @@ export function EditableTable({
                     renderCell={renderCell}
                   />
                 ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
 
             <EditableTableFooter
               hasUnsavedChanges={hasUnsavedChanges}

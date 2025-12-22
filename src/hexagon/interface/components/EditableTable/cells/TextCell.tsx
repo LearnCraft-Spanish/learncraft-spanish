@@ -1,4 +1,5 @@
 import type { CellRenderProps } from '@interface/components/EditableTable/types';
+import React from 'react';
 
 /**
  * Standard text input cell
@@ -6,23 +7,26 @@ import type { CellRenderProps } from '@interface/components/EditableTable/types'
 export function TextCell({
   value,
   display,
-  error,
   onChange,
   onFocus,
   onBlur,
   cellRef,
 }: CellRenderProps) {
   return (
-    <input
-      ref={cellRef}
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+    <div
       onFocus={onFocus}
       onBlur={onBlur}
-      aria-label={display.label}
-      className={`paste-table__cell${error ? ' paste-table__cell--error' : ''}`}
-      placeholder={display.placeholder}
-    />
+      className="paste-table__cell-wrapper"
+    >
+      <input
+        ref={cellRef}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={display.label}
+        className="paste-table__cell"
+        placeholder={display.placeholder}
+      />
+    </div>
   );
 }

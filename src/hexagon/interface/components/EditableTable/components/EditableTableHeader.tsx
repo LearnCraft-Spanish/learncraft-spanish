@@ -12,21 +12,20 @@ export function EditableTableHeader({
   getDisplay,
 }: EditableTableHeaderProps) {
   return (
-    <div className="paste-table__header" role="row" aria-rowindex={1}>
-      {columns.map((column, colIndex) => {
+    <tr className="paste-table__header">
+      {columns.map((column) => {
         const display = getDisplay(column.id);
         return (
-          <div
+          <th
             key={column.id}
             className="paste-table__column-header"
-            role="columnheader"
-            aria-colindex={colIndex + 1}
+            style={display.width ? { width: display.width } : undefined}
           >
             {display.label}
-          </div>
+          </th>
         );
       })}
-    </div>
+    </tr>
   );
 }
 

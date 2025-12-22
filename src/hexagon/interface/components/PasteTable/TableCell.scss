@@ -3,9 +3,11 @@
   height: 100%;
   min-height: 1.5rem;
   padding: 0.5rem;
-
   text-align: center;
-  background-color: lightgray;
+  background-color: transparent; // No background - cell-container handles it
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 textarea.paste-table__cell {

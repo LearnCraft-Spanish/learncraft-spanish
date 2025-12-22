@@ -9,7 +9,6 @@ export function BooleanCell({
   row,
   display,
   value,
-  error,
   onChange,
   onFocus,
   onBlur,
@@ -29,7 +28,7 @@ export function BooleanCell({
         role="checkbox"
         aria-checked={value === 'true'}
         aria-label={display.label}
-        className={`paste-table__cell-boolean-wrapper${error ? ' paste-table__cell--error' : ''}`}
+        className="paste-table__cell-boolean-wrapper"
       >
         <ToggleSwitch
           id={cellKey}
@@ -44,16 +43,20 @@ export function BooleanCell({
 
   // Other formats: use text input
   return (
-    <input
+    <div
       ref={cellRef}
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
       onFocus={onFocus}
       onBlur={onBlur}
-      aria-label={display.label}
-      className="paste-table__cell"
-      placeholder={display.placeholder}
-    />
+      className="paste-table__cell-wrapper"
+    >
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={display.label}
+        className="paste-table__cell"
+        placeholder={display.placeholder}
+      />
+    </div>
   );
 }

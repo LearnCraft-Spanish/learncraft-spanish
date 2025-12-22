@@ -6,24 +6,27 @@ import type { CellRenderProps } from '@interface/components/EditableTable/types'
 export function DateCell({
   value,
   display,
-  error,
   onChange,
   onFocus,
   onBlur,
   cellRef,
 }: CellRenderProps) {
   return (
-    <input
-      ref={cellRef}
-      type="date"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+    <div
       onFocus={onFocus}
       onBlur={onBlur}
-      aria-label={display.label}
-      className={`paste-table__cell${error ? ' paste-table__cell--error' : ''}`}
-      placeholder={display.placeholder}
-    />
+      className="paste-table__cell-wrapper"
+    >
+      <input
+        ref={cellRef}
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={display.label}
+        className="paste-table__cell"
+        placeholder={display.placeholder}
+      />
+    </div>
   );
 }
 
