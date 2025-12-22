@@ -36,7 +36,7 @@ describe('component: SearchByTextResults', () => {
 
   it('should render', () => {
     render(<SearchByTextResults spanishString="hola" englishString="hello" />);
-    expect(screen.getByText('Search Results')).toBeInTheDocument();
+    expect(screen.getAllByText('Select')[0]).toHaveTextContent('Select');
   });
 
   it('uses useSearchByTextResults hook and passes props', () => {

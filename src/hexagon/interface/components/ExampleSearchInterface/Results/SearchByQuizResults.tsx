@@ -17,7 +17,6 @@ export function SearchByQuizResults({
 
   return (
     <BaseResultsComponent
-      title="Search Results"
       isLoading={isLoading}
       error={error}
       examples={examples}

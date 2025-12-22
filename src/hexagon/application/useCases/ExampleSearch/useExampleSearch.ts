@@ -29,6 +29,8 @@ export function useExampleSearch() {
   // Mode state
   const [mode, setMode] = useState<ExampleSearchMode>('filter');
   const [searchIsTriggered, setSearchIsTriggered] = useState(false);
+  const [nonValidSearchErrorMessage, setNonValidSearchErrorMessage] =
+    useState('');
 
   // Text search state
   const [spanishInput, setSpanishInput] = useState('');
@@ -77,23 +79,49 @@ export function useExampleSearch() {
   // Validation
   const isValidSearch = useMemo(() => {
     if (mode === 'text') {
-      return trimmedSpanishInput.length > 0 || trimmedEnglishInput.length > 0;
+      if (
+        trimmedSpanishInput.length === 0 &&
+        trimmedEnglishInput.length === 0
+      ) {
+        setNonValidSearchErrorMessage(
+          'ERROR: Please enter at least one charcter in either the Spanish or English field.',
+        );
+        return false;
+      }
+      return true;
     }
     if (mode === 'ids') {
-      return parsedIds.length > 0;
+      if (parsedIds.length === 0) {
+        setNonValidSearchErrorMessage('ERROR: Please enter at least one ID.');
+        return false;
+      }
+      return true;
     }
     if (mode === 'quiz') {
-      return (
-        courseCode.trim().length > 0 &&
-        typeof quizNumber === 'number' &&
-        quizNumber > 0
-      );
+      if (
+        courseCode.trim().length === 0 ||
+        typeof quizNumber !== 'number' ||
+        quizNumber <= 0
+      ) {
+        setNonValidSearchErrorMessage(
+          'ERROR: Please select a course and quiz.',
+        );
+        return false;
+      }
+      return true;
     }
     if (mode === 'recentlyEdited') {
       return true;
     }
     if (mode === 'filter') {
-      return selectedCourseId > 0;
+      if (selectedCourseId <= 0 || toLessonNumber <= 0) {
+        setNonValidSearchErrorMessage(
+          'ERROR: Please select a course and To Lesson.',
+        );
+        return false;
+      }
+
+      return true;
     }
     return true;
   }, [
@@ -218,6 +246,7 @@ export function useExampleSearch() {
     mode,
     searchIsTriggered,
     isValidSearch,
+    nonValidSearchErrorMessage,
 
     // Actions
     handleChangeMode,

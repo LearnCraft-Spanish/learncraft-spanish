@@ -19,7 +19,7 @@ export function SearchByQuiz({
     <div>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
         <select
-          className="quizMenu"
+          className="quizMenu required"
           role="select"
           aria-label="Select Course"
           value={courseCode}
@@ -36,7 +36,7 @@ export function SearchByQuiz({
           ))}
         </select>
         <select
-          className="quizMenu"
+          className="quizMenu required"
           role="select"
           aria-label="Select Quiz"
           value={quizNumber}
