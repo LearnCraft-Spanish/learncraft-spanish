@@ -7,11 +7,14 @@ export interface AudioControlProps {
   audioLink: string;
   /** Optional callback when audio fails to load */
   onError?: () => void;
+  /** Optional callback when audio loads and can play */
+  onSuccess?: () => void;
 }
 
 export default function AudioControl({
   audioLink,
   onError,
+  onSuccess,
 }: AudioControlProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -73,6 +76,11 @@ export default function AudioControl({
     onError?.();
   }, [onError]);
 
+  const handleCanPlay = useCallback(() => {
+    setHasLoadError(false);
+    onSuccess?.();
+  }, [onSuccess]);
+
   // Callback ref to set up event listeners when audio element is available
   const setAudioRef = useCallback(
     (node: HTMLAudioElement | null) => {
@@ -80,6 +88,7 @@ export default function AudioControl({
       if (audioRef.current) {
         audioRef.current.removeEventListener('ended', handleEnded);
         audioRef.current.removeEventListener('error', handleError);
+        audioRef.current.removeEventListener('canplay', handleCanPlay);
       }
 
       // Set the ref
@@ -89,9 +98,10 @@ export default function AudioControl({
       if (node) {
         node.addEventListener('ended', handleEnded);
         node.addEventListener('error', handleError);
+        node.addEventListener('canplay', handleCanPlay);
       }
     },
-    [handleEnded, handleError],
+    [handleEnded, handleError, handleCanPlay],
   );
 
   // Reset audio element when audioLink changes
@@ -108,9 +118,10 @@ export default function AudioControl({
       if (audioRef.current) {
         audioRef.current.removeEventListener('ended', handleEnded);
         audioRef.current.removeEventListener('error', handleError);
+        audioRef.current.removeEventListener('canplay', handleCanPlay);
       }
     };
-  }, [handleEnded, handleError]);
+  }, [handleEnded, handleError, handleCanPlay]);
 
   // Show error state if audio failed to load
   if (hasLoadError && audioLink) {

@@ -1,5 +1,6 @@
 import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
 import type { ColumnDefinition } from '@domain/PasteTable';
+import type { ValidationState } from '@domain/PasteTable/validationTypes';
 import type {
   ExampleTechnical,
   UpdateExampleCommand,
@@ -130,6 +131,13 @@ export interface UseExampleEditorResult {
   isSaving: boolean;
   /** Error from save operation, if any */
   saveError: Error | null;
+  /** Combined validation that includes audio load errors */
+  validationState: ValidationState;
+  /** Handlers to track audio load success/failure */
+  audioErrorHandlers: {
+    onAudioError: (rowId: string, columnId: string) => void;
+    onAudioSuccess: (rowId: string, columnId: string) => void;
+  };
 }
 
 /**
@@ -195,6 +203,10 @@ export function useExampleEditor(): UseExampleEditorResult {
   // State for save operation
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<Error | null>(null);
+  // Track audio errors by row/column so we can block save
+  const [audioErrors, setAudioErrors] = useState<Map<string, Set<string>>>(
+    () => new Map(),
+  );
 
   const { selectedExampleIds } = useSelectedExamplesContext();
 
@@ -255,10 +267,71 @@ export function useExampleEditor(): UseExampleEditorResult {
     computeDerivedFields: computeDerivedFieldsForRow,
   });
 
+  const registerAudioError = useCallback((rowId: string, columnId: string) => {
+    setAudioErrors((prev) => {
+      const next = new Map(prev);
+      const existing = next.get(rowId) ?? new Set<string>();
+      existing.add(columnId);
+      next.set(rowId, existing);
+      return next;
+    });
+  }, []);
+
+  const clearAudioError = useCallback((rowId: string, columnId: string) => {
+    setAudioErrors((prev) => {
+      const next = new Map(prev);
+      const existing = next.get(rowId);
+      if (existing) {
+        existing.delete(columnId);
+        if (existing.size === 0) {
+          next.delete(rowId);
+        } else {
+          next.set(rowId, existing);
+        }
+      }
+      return next;
+    });
+  }, []);
+
+  const mergedValidationState: ValidationState = useMemo(() => {
+    const mergedErrors: Record<string, Record<string, string>> = {
+      ...editTable.validationState.errors,
+    };
+
+    const rowsWithAudio = new Set(
+      editTable.data.rows
+        .filter((row) => String(row.cells.hasAudio).toLowerCase() === 'true')
+        .map((row) => row.id),
+    );
+
+    let hasAudioErrors = false;
+
+    audioErrors.forEach((columnIds, rowId) => {
+      if (!rowsWithAudio.has(rowId)) {
+        return;
+      }
+      if (!mergedErrors[rowId]) mergedErrors[rowId] = {};
+      columnIds.forEach((columnId) => {
+        mergedErrors[rowId][columnId] = 'Audio failed to load';
+        hasAudioErrors = true;
+      });
+    });
+
+    return {
+      isValid: editTable.validationState.isValid && !hasAudioErrors,
+      errors: mergedErrors,
+    };
+  }, [audioErrors, editTable.data.rows, editTable.validationState]);
+
   return {
     editTable,
     isLoading: isLoadingExamplesToEdit,
     isSaving,
     saveError,
+    validationState: mergedValidationState,
+    audioErrorHandlers: {
+      onAudioError: registerAudioError,
+      onAudioSuccess: clearAudioError,
+    },
   };
 }

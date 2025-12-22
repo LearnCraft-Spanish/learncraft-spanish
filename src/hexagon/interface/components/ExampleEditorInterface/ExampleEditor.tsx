@@ -24,40 +24,44 @@ const exampleDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'vocabularyComplete', label: 'Vocab Complete', width: '120px' },
 ];
 
-/**
- * Cell renderer function for example editor table
- *
- * This function is called by EditableTable for each cell to determine which
- * component to render. It receives CellRenderProps containing:
- * - Cell value, row data, column definition
- * - Focus state, validation errors, dirty state
- * - Event handlers (onChange, onFocus, onBlur)
- *
- * Pattern: The render function allows interface-layer customization of cell
- * rendering without modifying the generic EditableTable component. This keeps
- * the table reusable while allowing use-case-specific cell types.
- *
- * Flow: ExampleEditor → EditableTable → EditableTableRow → renderCell()
- *
- * @param props - Cell rendering props from EditableTableRow
- * @returns React component for the cell (AudioPlaybackCell or StandardCell)
- */
-function renderExampleEditorCell(props: CellRenderProps) {
-  const { column } = props;
-
-  // Audio URL columns: Use custom playback component (read-only, displays audio player)
-  // These columns are marked as 'derived' in column definitions (see useExampleEditor)
-  if (column.id === 'spanishAudio' || column.id === 'englishAudio') {
-    return <AudioPlaybackCell {...props} />;
-  }
-
-  // All other columns: Use standard editable cell component
-  // Handles text, textarea, boolean, number, date, etc. based on column.type
-  return <StandardCell {...props} />;
-}
-
 export function ExampleEditor() {
-  const { editTable, isLoading, isSaving, saveError } = useExampleEditor();
+  const {
+    editTable,
+    isLoading,
+    isSaving,
+    saveError,
+    audioErrorHandlers,
+    validationState,
+  } = useExampleEditor();
+  /**
+   * Cell renderer function for example editor table
+   *
+   * This function is called by EditableTable for each cell to determine which
+   * component to render. It receives CellRenderProps containing:
+   * - Cell value, row data, column definition
+   * - Focus state, validation errors, dirty state
+   * - Event handlers (onChange, onFocus, onBlur)
+   *
+   * Pattern: The render function allows interface-layer customization of cell
+   * rendering without modifying the generic EditableTable component. This keeps
+   * the table reusable while allowing use-case-specific cell types.
+   *
+   * Flow: ExampleEditor → EditableTable → EditableTableRow → renderCell()
+   *
+   * @param props - Cell rendering props from EditableTableRow
+   * @returns React component for the cell (AudioPlaybackCell or StandardCell)
+   */
+  const renderCellWithAudioHandlers = (props: CellRenderProps) => {
+    const { column } = props;
+
+    if (column.id === 'spanishAudio' || column.id === 'englishAudio') {
+      return (
+        <AudioPlaybackCell {...props} audioErrorHandlers={audioErrorHandlers} />
+      );
+    }
+
+    return <StandardCell {...props} />;
+  };
 
   return (
     <div>
@@ -72,7 +76,7 @@ export function ExampleEditor() {
         columns={editTable.data.columns}
         displayConfig={exampleDisplayConfig}
         dirtyRowIds={editTable.dirtyRowIds}
-        validationErrors={editTable.validationState.errors}
+        validationErrors={validationState.errors}
         onCellChange={editTable.updateCell}
         onPaste={editTable.handlePaste}
         setActiveCellInfo={editTable.setActiveCellInfo}
@@ -82,8 +86,8 @@ export function ExampleEditor() {
         onDiscard={editTable.discardChanges}
         isLoading={isLoading}
         isSaving={isSaving}
-        isValid={editTable.validationState.isValid}
-        renderCell={renderExampleEditorCell}
+        isValid={validationState.isValid}
+        renderCell={renderCellWithAudioHandlers}
       />
     </div>
   );
