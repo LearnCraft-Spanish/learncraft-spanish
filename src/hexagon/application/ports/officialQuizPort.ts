@@ -8,8 +8,10 @@ export interface OfficialQuizPort {
   getOfficialQuizExamples: ({
     courseCode,
     quizNumber,
+    vocabularyComplete,
   }: {
     courseCode: string;
     quizNumber: number;
+    vocabularyComplete?: boolean;
   }) => Promise<ExampleWithVocabulary[]>;
 }

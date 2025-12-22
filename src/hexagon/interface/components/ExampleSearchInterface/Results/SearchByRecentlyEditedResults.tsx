@@ -1,9 +1,15 @@
 import { useSearchByRecentlyEditedPaginated } from '@application/units/ExampleSearchInterface/Results/useSearchByRecentlyEditedPaginated';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
 
-export function SearchByRecentlyEditedResults() {
+export interface SearchByRecentlyEditedResultsProps {
+  vocabularyComplete?: boolean;
+}
+
+export function SearchByRecentlyEditedResults({
+  vocabularyComplete,
+}: SearchByRecentlyEditedResultsProps) {
   const { examples, isLoading, error, paginationState } =
-    useSearchByRecentlyEditedPaginated();
+    useSearchByRecentlyEditedPaginated({ vocabularyComplete });
 
   return (
     <BaseResultsComponent

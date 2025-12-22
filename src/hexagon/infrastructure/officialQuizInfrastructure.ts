@@ -25,14 +25,25 @@ export function createOfficialQuizInfrastructure(
     getOfficialQuizExamples: async ({
       courseCode,
       quizNumber,
+      vocabularyComplete,
     }: {
       courseCode: string;
       quizNumber: number;
+      vocabularyComplete?: boolean;
     }) => {
-      const response = await httpClient.get<ExampleWithVocabulary[]>(
+      const params = new URLSearchParams();
+      if (vocabularyComplete !== undefined) {
+        params.append('vocabularyComplete', String(vocabularyComplete));
+      }
+
+      const pathWithParams =
         getOfficialQuizExamplesEndpoint.path
           .replace(':courseCode', courseCode)
-          .replace(':quizNumber', quizNumber.toString()),
+          .replace(':quizNumber', quizNumber.toString()) +
+        (params.toString() ? `?${params.toString()}` : '');
+
+      const response = await httpClient.get<ExampleWithVocabulary[]>(
+        pathWithParams,
         getOfficialQuizExamplesEndpoint.requiredScopes,
       );
       return response;

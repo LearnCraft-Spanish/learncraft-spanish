@@ -4,16 +4,19 @@ import { BaseResultsComponent } from '@interface/components/ExampleSearchInterfa
 export interface SearchByTextResultsProps {
   spanishString: string;
   englishString: string;
+  vocabularyComplete?: boolean;
 }
 
 export function SearchByTextResults({
   spanishString,
   englishString,
+  vocabularyComplete,
 }: SearchByTextResultsProps) {
   const { examples, isLoading, error, paginationState } =
     useSearchByTextResults({
       spanishString,
       englishString,
+      vocabularyComplete,
     });
 
   return (

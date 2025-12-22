@@ -16,6 +16,10 @@ export interface SearchComponentProps {
   searchByQuizProps: SearchByQuizProps;
   searchByTextProps: SearchByTextProps;
   searchByIdsProps: SearchByIdsProps;
+  searchByRecentlyEditedProps: {
+    vocabularyComplete: boolean | undefined;
+    onVocabularyCompleteChange: (value: boolean | undefined) => void;
+  };
 }
 
 export interface SearchResultProps {
@@ -23,6 +27,7 @@ export interface SearchResultProps {
   quizResultsProps: SearchByQuizResultsProps;
   textResultsProps: SearchByTextResultsProps;
   idsResultsProps: SearchByIdsResultsProps;
+  recentlyEditedResultsProps: { vocabularyComplete: boolean | undefined };
 }
 
 export function useExampleSearch() {
@@ -42,6 +47,11 @@ export function useExampleSearch() {
   // Quiz search state
   const [courseCode, setCourseCode] = useState('');
   const [quizNumber, setQuizNumber] = useState<number | ''>('');
+
+  // Shared vocabulary complete filter (for text, quiz, and recentlyEdited modes)
+  const [vocabularyComplete, setVocabularyComplete] = useState<
+    boolean | undefined
+  >(undefined);
 
   // Filter panel state
   const [selectedCourseId, setSelectedCourseId] = useState<number>(2); // Default to LearnCraft Spanish
@@ -173,16 +183,24 @@ export function useExampleSearch() {
         quizNumber: quizNumber ?? 0,
         onCourseCodeChange: withSearchReset(setCourseCode),
         onQuizNumberChange: withSearchReset(setQuizNumber),
+        vocabularyComplete,
+        onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
       searchByTextProps: {
         spanishInput,
         englishInput,
         onSpanishInputChange: withSearchReset(setSpanishInput),
         onEnglishInputChange: withSearchReset(setEnglishInput),
+        vocabularyComplete,
+        onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
       searchByIdsProps: {
         input: idsInput,
         onInputChange: withSearchReset(setIdsInput),
+      },
+      searchByRecentlyEditedProps: {
+        vocabularyComplete,
+        onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
     }),
     [
@@ -195,6 +213,7 @@ export function useExampleSearch() {
       spanishInput,
       englishInput,
       idsInput,
+      vocabularyComplete,
       withSearchReset,
     ],
   );
@@ -210,10 +229,15 @@ export function useExampleSearch() {
       quizResultsProps: {
         courseCode,
         quizNumber: typeof quizNumber === 'number' ? quizNumber : undefined,
+        vocabularyComplete,
       },
       textResultsProps: {
         spanishString: spanishInput,
         englishString: englishInput,
+        vocabularyComplete,
+      },
+      recentlyEditedResultsProps: {
+        vocabularyComplete,
       },
       idsResultsProps: {
         ids: parsedIds,
@@ -229,11 +253,13 @@ export function useExampleSearch() {
       spanishInput,
       englishInput,
       parsedIds,
+      vocabularyComplete,
     ],
   );
 
   const handleChangeMode = useCallback((newMode: ExampleSearchMode) => {
     setSearchIsTriggered(false);
+    setVocabularyComplete(undefined);
     setMode(newMode);
   }, []);
 
