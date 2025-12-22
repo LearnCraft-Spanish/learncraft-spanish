@@ -267,7 +267,7 @@ describe('useLocalFilterPanelLogic', () => {
 
     // Assert
     expect(defaults.defaultFromLesson).toBe(1);
-    expect(defaults.defaultToLesson).toBe(1);
+    expect(defaults.defaultToLesson).toBe(2); // Last lesson of the course
   });
 
   it('should return default lessons for a course with prerequisites', () => {
@@ -304,6 +304,6 @@ describe('useLocalFilterPanelLogic', () => {
     // Assert
     // Should default to virtual lesson (negative number)
     expect(defaults.defaultFromLesson).toBeLessThan(0);
-    expect(defaults.defaultToLesson).toBe(1);
+    expect(defaults.defaultToLesson).toBe(2); // Last lesson of the course
   });
 });

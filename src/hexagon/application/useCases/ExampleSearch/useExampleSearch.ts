@@ -42,9 +42,9 @@ export function useExampleSearch() {
   const [quizNumber, setQuizNumber] = useState<number | ''>('');
 
   // Filter panel state
-  const [selectedCourseId, setSelectedCourseId] = useState<number>(0);
+  const [selectedCourseId, setSelectedCourseId] = useState<number>(2); // Default to LearnCraft Spanish
   const [fromLessonNumber, setFromLessonNumber] = useState<number>(0);
-  const [toLessonNumber, setToLessonNumber] = useState<number>(0);
+  const [toLessonNumber, setToLessonNumber] = useState<number>(250); // Default to last lesson of the course
 
   // Combined filters for filter panel
   const filtersForUI = useCombinedFilters({});
