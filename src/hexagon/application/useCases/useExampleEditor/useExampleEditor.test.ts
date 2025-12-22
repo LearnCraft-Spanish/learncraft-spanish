@@ -83,7 +83,6 @@ describe('useExampleEditor', () => {
       expect(columnIds).toContain('spanish');
       expect(columnIds).toContain('english');
       expect(columnIds).toContain('hasAudio');
-      expect(columnIds).toContain('spanglish');
       expect(columnIds).toContain('vocabularyComplete');
     });
   });
@@ -184,7 +183,7 @@ describe('useExampleEditor', () => {
           id: 42,
           spanish: 'Hola mundo',
           english: 'Hello world',
-          spanglish: true,
+          spanglish: false,
           vocabularyComplete: false,
           spanishAudio: 'https://example.com/ex42la.mp3',
           englishAudio: 'https://example.com/ex42en.mp3',
@@ -201,7 +200,7 @@ describe('useExampleEditor', () => {
       expect(row.cells.id).toBe('42');
       expect(row.cells.spanish).toBe('Hola mundo');
       expect(row.cells.english).toBe('Hello world');
-      expect(row.cells.spanglish).toBe('true');
+      expect(row.cells.spanglish).toBe('false');
       expect(row.cells.vocabularyComplete).toBe('false');
       expect(row.cells.hasAudio).toBe('true');
     });
