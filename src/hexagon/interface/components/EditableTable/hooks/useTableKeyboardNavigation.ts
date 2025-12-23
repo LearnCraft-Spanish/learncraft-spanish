@@ -151,4 +151,3 @@ export function useTableKeyboardNavigation({
 
   return { handleKeyDown };
 }
-

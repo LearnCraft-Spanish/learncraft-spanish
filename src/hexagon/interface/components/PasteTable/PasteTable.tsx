@@ -1,4 +1,8 @@
-import type { ColumnDefinition, TableRow as TableRowType, ValidationState } from '@domain/PasteTable';
+import type {
+  ColumnDefinition,
+  TableRow as TableRowType,
+  ValidationState,
+} from '@domain/PasteTable';
 import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import { PasteTableErrorBoundary } from '@interface/components/PasteTable/PasteTableErrorBoundary';
 import { TableRow } from '@interface/components/PasteTable/TableRow';
@@ -79,7 +83,10 @@ export function PasteTable<T>({
   // Helper to get display config for a column
   const getDisplay = useCallback(
     (columnId: string) =>
-      displayConfig.find((d) => d.id === columnId) ?? { id: columnId, label: columnId },
+      displayConfig.find((d) => d.id === columnId) ?? {
+        id: columnId,
+        label: columnId,
+      },
     [displayConfig],
   );
 

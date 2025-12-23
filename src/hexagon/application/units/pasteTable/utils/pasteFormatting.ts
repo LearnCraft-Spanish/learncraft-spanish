@@ -159,7 +159,6 @@ export function convertTsvToRows(
   // Skip the header row if detected
   const dataRows = hasHeaderRow ? parsedRows.slice(1) : parsedRows;
 
-
   return dataRows.map((rowCells) => {
     // rowCells is an array of cell values: ['value1', 'value2', ...]
     // Create a unique ID for each row

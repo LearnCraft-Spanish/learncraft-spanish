@@ -40,7 +40,10 @@ export function TableRow({
   const rowErrors = validationState.errors[row.id] || {};
 
   const getDisplay = (columnId: string) =>
-    displayConfig.find((d) => d.id === columnId) ?? { id: columnId, label: columnId };
+    displayConfig.find((d) => d.id === columnId) ?? {
+      id: columnId,
+      label: columnId,
+    };
 
   return (
     <div className="paste-table__row" role="row" aria-rowindex={rowIndex}>

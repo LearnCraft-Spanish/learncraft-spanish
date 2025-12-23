@@ -3,10 +3,7 @@
  * Handle parsing, formatting, and validation of dates
  */
 
-import type {
-  ColumnDefinition,
-  DateFormatConfig,
-} from '@domain/PasteTable';
+import type { ColumnDefinition, DateFormatConfig } from '@domain/PasteTable';
 import { isDateColumn } from '@domain/PasteTable';
 
 /**

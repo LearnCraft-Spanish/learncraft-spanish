@@ -6,4 +6,3 @@ import type { CellRenderProps } from '@interface/components/EditableTable/types'
 export function ReadOnlyCell({ value }: CellRenderProps) {
   return <div className="paste-table__cell-readonly">{value}</div>;
 }
-

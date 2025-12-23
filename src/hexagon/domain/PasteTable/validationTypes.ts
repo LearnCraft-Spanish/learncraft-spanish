@@ -21,4 +21,3 @@ export interface ValidationState {
   /** Map of row IDs to their validation errors */
   errors: Record<string, Record<string, string>>; // rowId -> { columnId -> errorMessage }
 }
-

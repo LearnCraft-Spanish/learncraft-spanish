@@ -130,7 +130,8 @@ export function mapDomainToTableRow<T extends Record<string, unknown>>(
   });
 
   // Deterministic row ID from entity ID, or generate if not available
-  const entityId = idColumnId && idColumnId in entity ? entity[idColumnId] : null;
+  const entityId =
+    idColumnId && idColumnId in entity ? entity[idColumnId] : null;
   const rowId = entityId != null ? `row-${entityId}` : generateRowId();
 
   return {

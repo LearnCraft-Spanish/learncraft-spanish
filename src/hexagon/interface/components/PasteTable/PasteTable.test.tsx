@@ -6,7 +6,9 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
-const createTestColumns = (types: Array<'text' | 'number'>): ColumnDefinition[] => {
+const createTestColumns = (
+  types: Array<'text' | 'number'>,
+): ColumnDefinition[] => {
   return types.map((type, index) => ({
     id: `col${index + 1}`,
     type,
@@ -41,7 +43,9 @@ describe('pasteTable', () => {
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(3)} />);
+    render(
+      <PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(3)} />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     const numberInput = within(cells[1]).getByRole('spinbutton');
@@ -69,7 +73,9 @@ describe('pasteTable', () => {
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(2)} />);
+    render(
+      <PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(2)} />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     const textInput = within(cells[1]).getByRole('textbox') as HTMLInputElement;
@@ -98,7 +104,9 @@ describe('pasteTable', () => {
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(2)} />);
+    render(
+      <PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(2)} />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     const textInput = within(cells[0]).getByRole('textbox') as HTMLInputElement;
@@ -120,7 +128,9 @@ describe('pasteTable', () => {
     });
 
     const user = userEvent.setup();
-    render(<PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(1)} />);
+    render(
+      <PasteTable hook={mockHook} displayConfig={createTestDisplayConfig(1)} />,
+    );
 
     const cells = screen.getAllByRole('gridcell');
     const row1Input = within(cells[0]).getByRole('textbox');

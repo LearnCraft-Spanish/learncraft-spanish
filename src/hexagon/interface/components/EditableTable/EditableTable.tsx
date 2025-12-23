@@ -144,7 +144,10 @@ export function EditableTable({
           <>
             <table className="paste-table__table" style={tableStyle}>
               <thead>
-                <EditableTableHeader columns={columns} getDisplay={getDisplay} />
+                <EditableTableHeader
+                  columns={columns}
+                  getDisplay={getDisplay}
+                />
               </thead>
               <tbody>
                 {rows.map((row, rowIndex) => (
