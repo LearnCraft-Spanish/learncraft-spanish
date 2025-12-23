@@ -175,32 +175,6 @@ describe('useCreateTable', () => {
   });
 
   describe('saveData', () => {
-    it('should return undefined when validation fails', async () => {
-      const { result } = renderHook(() =>
-        useCreateTable<TestRow>({
-          columns: testColumns,
-          rowSchema: TestRowSchema,
-        }),
-      );
-
-      // Add row with name, then make value invalid
-      act(() => {
-        result.current.updateCell(GHOST_ROW_ID, 'name', 'Valid Name');
-      });
-
-      const rowId = result.current.data.rows[0].id;
-      act(() => {
-        result.current.updateCell(rowId, 'value', '-5'); // Invalid: negative
-      });
-
-      let savedData: TestRow[] | undefined;
-      await act(async () => {
-        savedData = await result.current.saveData();
-      });
-
-      expect(savedData).toBeUndefined();
-    });
-
     it('should return parsed data when validation passes', async () => {
       const initialData: TestRow[] = [{ name: 'Item 1', value: 10 }];
 

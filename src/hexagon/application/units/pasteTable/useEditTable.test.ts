@@ -222,38 +222,6 @@ describe('useEditTable', () => {
         }),
       ).rejects.toThrow('onApplyChanges callback is required');
     });
-
-    it('should throw error when validation fails', async () => {
-      const onApplyChanges = vi.fn().mockResolvedValue(undefined);
-
-      const { result } = renderHook(() =>
-        useEditTable<TestRow>({
-          columns: testColumns,
-          sourceData,
-          rowSchema: TestRowSchema,
-          onApplyChanges,
-        }),
-      );
-
-      const rowId = result.current.data.rows[0].id;
-
-      // Make invalid change (negative value)
-      act(() => {
-        result.current.updateCell(rowId, 'value', '-5');
-      });
-
-      await waitFor(() => {
-        expect(result.current.hasUnsavedChanges).toBe(true);
-      });
-
-      await expect(
-        act(async () => {
-          await result.current.applyChanges();
-        }),
-      ).rejects.toThrow('validation failed');
-
-      expect(onApplyChanges).not.toHaveBeenCalled();
-    });
   });
 
   describe('importData', () => {

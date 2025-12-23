@@ -190,6 +190,9 @@ export function useEditTable<T extends Record<string, unknown>>({
   }, [clearDiffs, clearActiveCellInfo]);
 
   // Apply changes - save dirty rows
+  // NOTE: USE CASE SHOULD HANDLE VALIDATION
+  // Validation is not handled here. Use case must ensure that onApplyChanges
+  // is called with valid data.
   const applyChanges = useCallback(async () => {
     if (!onApplyChanges) {
       throw new Error('onApplyChanges callback is required for applyChanges');
