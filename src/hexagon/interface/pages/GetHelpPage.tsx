@@ -39,7 +39,7 @@ export default function GetHelpPage() {
             <VocabularySearch
               vocabularyList={vocabularyList}
               onVocabularySelect={handleVocabSelect}
-              selectedVocabId={selectedVocabId}
+              selectedVocabIds={[selectedVocabId]}
               placeholder="Search vocabulary by word or descriptor..."
               minSearchLength={2}
               maxResults={10}

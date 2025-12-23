@@ -1,4 +1,4 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { generateRowId } from '@domain/PasteTable/functions/rowId';
 
@@ -8,7 +8,7 @@ export { generateRowId };
 /**
  * Creates an empty row with all columns initialized
  */
-export const createEmptyRow = (columns: TableColumn[]): TableRow => ({
+export const createEmptyRow = (columns: ColumnDefinition[]): TableRow => ({
   id: generateRowId(),
   cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
 });
@@ -16,7 +16,7 @@ export const createEmptyRow = (columns: TableColumn[]): TableRow => ({
 /**
  * Creates an empty ghost row with the given columns
  */
-export const createGhostRow = (columns: TableColumn[]): TableRow => ({
+export const createGhostRow = (columns: ColumnDefinition[]): TableRow => ({
   id: GHOST_ROW_ID,
   cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
 });

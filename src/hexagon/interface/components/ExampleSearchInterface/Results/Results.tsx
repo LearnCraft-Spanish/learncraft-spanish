@@ -1,6 +1,7 @@
 import type { LocalFilterPanelResultsProps } from '@interface/components/ExampleSearchInterface/Results/LocalFilterPanelResults';
 import type { SearchByIdsResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByIdsResults';
 import type { SearchByQuizResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByQuizResults';
+import type { SearchByRecentlyEditedResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByRecentlyEditedResults';
 import type { SearchByTextResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByTextResults';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { LocalFilterPanelResults } from '@interface/components/ExampleSearchInterface/Results/LocalFilterPanelResults';
@@ -14,17 +15,19 @@ export function Results({
   quizResultsProps,
   textResultsProps,
   idsResultsProps,
+  recentlyEditedResultsProps,
 }: {
   mode: ExampleSearchMode;
   localFilterResultsProps: LocalFilterPanelResultsProps;
   quizResultsProps: SearchByQuizResultsProps;
   textResultsProps: SearchByTextResultsProps;
   idsResultsProps: SearchByIdsResultsProps;
+  recentlyEditedResultsProps: SearchByRecentlyEditedResultsProps;
 }) {
   if (mode === 'filter') {
     return <LocalFilterPanelResults {...localFilterResultsProps} />;
   } else if (mode === 'recentlyEdited') {
-    return <SearchByRecentlyEditedResults />;
+    return <SearchByRecentlyEditedResults {...recentlyEditedResultsProps} />;
   } else if (mode === 'quiz') {
     return <SearchByQuizResults {...quizResultsProps} />;
   } else if (mode === 'text') {

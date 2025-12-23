@@ -1,8 +1,5 @@
-import type {
-  TableHook,
-  TableRow,
-  ValidationState,
-} from '@domain/PasteTable/General';
+import type { CreateTableHook } from '@application/units/pasteTable/useCreateTable';
+import type { TableRow, ValidationState } from '@domain/PasteTable';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
 import type { ClipboardEvent } from 'react';
 import { VOCABULARY_COLUMNS } from '@application/implementations/vocabularyTable/constants';
@@ -26,7 +23,7 @@ const defaultValidationState: ValidationState = {
 };
 
 // Default mock implementation that provides happy-path data
-export const defaultMockResult: TableHook<CreateNonVerbVocabulary> = {
+export const defaultMockResult: CreateTableHook<CreateNonVerbVocabulary> = {
   // Core data structure
   data: {
     rows: [defaultRow],
@@ -56,7 +53,6 @@ export const defaultMockResult: TableHook<CreateNonVerbVocabulary> = {
   clearActiveCellInfo: () => {},
 
   // State flags and validation
-  isSaveEnabled: true,
   validationState: defaultValidationState,
 };
 
@@ -65,7 +61,7 @@ export const {
   mock: mockUseVocabularyTable,
   override: overrideMockUseVocabularyTable,
   reset: resetMockUseVocabularyTable,
-} = createOverrideableMock<() => TableHook<CreateNonVerbVocabulary>>(
+} = createOverrideableMock<() => CreateTableHook<CreateNonVerbVocabulary>>(
   () => defaultMockResult,
 );
 

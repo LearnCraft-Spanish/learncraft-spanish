@@ -9,8 +9,14 @@ export * from '@domain/PasteTable/functions/audioUrlAdapter';
 // Date conversions
 export * from '@domain/PasteTable/functions/dateConversions';
 
+// Entity validation (Zod-based)
+export * from '@domain/PasteTable/functions/entityValidation';
+
 // Mappers
 export * from '@domain/PasteTable/functions/mappers';
+
+// Merge source with diffs
+export * from '@domain/PasteTable/functions/mergeSourceWithDiffs';
 
 // Normalization
 export * from '@domain/PasteTable/functions/normalization';
@@ -21,11 +27,8 @@ export * from '@domain/PasteTable/functions/rowComparison';
 // Row ID generation
 export * from '@domain/PasteTable/functions/rowId';
 
-// Schema validation
+// Schema validation (Zod-based)
 export * from '@domain/PasteTable/functions/schemaValidation';
 
 // Type conversions
 export * from '@domain/PasteTable/functions/typeConversions';
-
-// Validation
-export * from '@domain/PasteTable/functions/validation';

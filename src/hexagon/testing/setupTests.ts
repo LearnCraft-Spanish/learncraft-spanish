@@ -30,6 +30,10 @@ import {
   resetMockOfficialQuizAdapter,
 } from '@application/adapters/officialQuizAdapter.mock';
 import {
+  mockSkillTagsAdapter,
+  resetMockSkillTagsAdapter,
+} from '@application/adapters/skillTagsAdapter.mock';
+import {
   mockSubcategoryAdapter,
   resetMockSubcategoryAdapter,
 } from '@application/adapters/subcategoryAdapter.mock';
@@ -86,6 +90,10 @@ vi.mock('@application/adapters/officialQuizAdapter', () => ({
   useOfficialQuizAdapter: vi.fn(() => mockOfficialQuizAdapter),
 }));
 
+vi.mock('@application/adapters/skillTagsAdapter', () => ({
+  useSkillTagsAdapter: vi.fn(() => mockSkillTagsAdapter),
+}));
+
 vi.mock('@application/adapters/authAdapter', () => ({
   useAuthAdapter: vi.fn(() => mockAuthAdapter),
 }));
@@ -123,6 +131,7 @@ const resetGlobalMocks = () => {
   resetMockFlashcardAdapter();
   resetMockLocalStorageAdapter();
   resetMockOfficialQuizAdapter();
+  resetMockSkillTagsAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();
 

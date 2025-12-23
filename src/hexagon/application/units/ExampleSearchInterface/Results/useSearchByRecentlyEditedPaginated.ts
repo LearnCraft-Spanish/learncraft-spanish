@@ -5,7 +5,13 @@ import { useCallback, useState } from 'react';
 const PAGE_SIZE = 25;
 const QUERY_PAGE_SIZE = 100;
 
-export function useSearchByRecentlyEditedPaginated() {
+export interface UseSearchByRecentlyEditedPaginatedParams {
+  vocabularyComplete?: boolean;
+}
+
+export function useSearchByRecentlyEditedPaginated({
+  vocabularyComplete,
+}: UseSearchByRecentlyEditedPaginatedParams = {}) {
   const [queryPage, setQueryPage] = useState(1);
 
   const changeQueryPage = useCallback((page: number) => {
@@ -15,6 +21,7 @@ export function useSearchByRecentlyEditedPaginated() {
   const { examples, isLoading, error } = useExamplesByRecentlyModified(
     queryPage,
     QUERY_PAGE_SIZE,
+    vocabularyComplete,
   );
 
   const paginationState = useQueryPagination({

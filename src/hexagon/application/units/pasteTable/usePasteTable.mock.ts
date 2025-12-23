@@ -1,17 +1,16 @@
 import type {
-  TableColumn,
-  TableHook,
+  ColumnDefinition,
   TableRow,
   ValidationState,
-} from '@domain/PasteTable/General';
+} from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Utility to create default columns for testing
-export const createDefaultColumns = (): TableColumn[] => {
+export const createDefaultColumns = (): ColumnDefinition[] => {
   return [
-    { id: 'column1', label: 'Column 1', width: '1fr', type: 'text' },
-    { id: 'column2', label: 'Column 2', width: '1fr', type: 'text' },
+    { id: 'column1', type: 'text' },
+    { id: 'column2', type: 'text' },
   ];
 };
 
@@ -35,10 +34,10 @@ export const createDefaultValidationState = (
 // Factory function to create a mock PasteTable hook result
 export const createMockPasteTableResult = <T>(options?: {
   rows?: TableRow[];
-  columns?: TableColumn[];
+  columns?: ColumnDefinition[];
   isValid?: boolean;
   isSaveEnabled?: boolean;
-}): TableHook<T> => {
+}) => {
   const columns = options?.columns || createDefaultColumns();
   const rows = options?.rows || [createDefaultRow()];
   const isValid = options?.isValid ?? true;
@@ -67,10 +66,10 @@ export const {
   reset: resetMockUsePasteTable,
 } = createOverrideableMock<
   <T>(options: {
-    columns: TableColumn[];
+    columns: ColumnDefinition[];
     validateRow: (row: T) => Record<string, string>;
     initialData?: T[];
-  }) => TableHook<T>
+  }) => ReturnType<typeof createMockPasteTableResult>
 >(() => createMockPasteTableResult());
 
 // Function to create test data with the expected shape

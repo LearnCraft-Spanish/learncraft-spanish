@@ -1,11 +1,11 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import { convertDataToRows } from '@application/units/pasteTable/General/utils/rowCreation';
 import { describe, expect, it } from 'vitest';
 
-const testColumns: TableColumn[] = [
-  { id: 'name', label: 'Name', type: 'text' },
-  { id: 'age', label: 'Age', type: 'number' },
-  { id: 'city', label: 'City', type: 'text' },
+const testColumns: ColumnDefinition[] = [
+  { id: 'name', type: 'text' },
+  { id: 'age', type: 'number' },
+  { id: 'city', type: 'text' },
 ];
 
 describe('convertDataToRows', () => {

@@ -1,6 +1,5 @@
 export type {
   ExampleEditRow,
-  UseExampleEditorProps,
   UseExampleEditorResult,
 } from '@application/useCases/useExampleEditor/useExampleEditor';
 

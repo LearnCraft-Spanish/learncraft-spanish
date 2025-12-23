@@ -14,11 +14,11 @@ interface NavOption {
 }
 
 const NAV_OPTIONS: NavOption[] = [
+  { mode: 'ids', label: 'Search by IDs' },
+  { mode: 'text', label: 'Search by Text' },
+  { mode: 'recentlyEdited', label: 'Recently Edited Examples' },
   { mode: 'filter', label: 'Filter Panel' },
   { mode: 'quiz', label: 'Search by Quiz' },
-  { mode: 'text', label: 'Search by Text' },
-  { mode: 'ids', label: 'Search by IDs' },
-  { mode: 'recentlyEdited', label: 'Recently Edited Examples' },
 ];
 
 export function SearchModeNav({

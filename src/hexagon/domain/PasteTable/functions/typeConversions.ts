@@ -3,7 +3,7 @@
  * Convert between string (table) and typed (domain) representations
  */
 
-import type { ColumnDefinition } from '@domain/PasteTable/types';
+import type { ColumnDefinition } from '@domain/PasteTable';
 
 /**
  * Parse boolean from string (multiple formats)

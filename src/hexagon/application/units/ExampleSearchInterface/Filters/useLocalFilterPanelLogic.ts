@@ -25,6 +25,7 @@ export function useLocalFilterPanelLogic({
 
   const toLesson = useMemo(() => {
     if (!course) return undefined;
+
     return course.lessons.find((l) => l.lessonNumber === toLessonNumber);
   }, [course, toLessonNumber]);
 
@@ -101,6 +102,8 @@ export function useLocalFilterPanelLogic({
   const getDefaultLessonsForCourse = (courseId: number) => {
     const newCourse = coursesWithLessons?.find((c) => c.id === courseId);
     const firstLesson = newCourse?.lessons?.[0]?.lessonNumber ?? 0;
+    const lastLesson =
+      newCourse?.lessons?.[newCourse?.lessons.length - 1]?.lessonNumber ?? 0;
 
     const prerequisites = getPrerequisitesForCourse(courseId);
     const defaultFromLesson =
@@ -109,7 +112,7 @@ export function useLocalFilterPanelLogic({
         : firstLesson;
 
     return {
-      defaultToLesson: firstLesson,
+      defaultToLesson: lastLesson,
       defaultFromLesson,
     };
   };

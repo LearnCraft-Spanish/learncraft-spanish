@@ -8,11 +8,13 @@ const QUERY_PAGE_SIZE = 100;
 export interface UseSearchByTextResultsParams {
   spanishString: string;
   englishString: string;
+  vocabularyComplete?: boolean;
 }
 
 export function useSearchByTextResults({
   spanishString,
   englishString,
+  vocabularyComplete,
 }: UseSearchByTextResultsParams) {
   const [queryPage, setQueryPage] = useState(1);
 
@@ -27,6 +29,7 @@ export function useSearchByTextResults({
     },
     queryPage,
     QUERY_PAGE_SIZE,
+    vocabularyComplete,
   );
 
   const paginationState = useQueryPagination({

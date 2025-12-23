@@ -3,7 +3,7 @@
  * Ensures all cell values are in canonical string format based on column type
  */
 
-import type { ColumnDefinition } from '@domain/PasteTable/types';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import {
   formatBooleanForTable,
   normalizeDate,
@@ -58,8 +58,10 @@ export function normalizeCellValue(
 
     case 'select': {
       // For select, ensure value matches one of the options (case-insensitive)
+      if (!column.options) return trimmed;
       const matchingOption = column.options.find(
-        (opt) => opt.value.toLowerCase() === trimmed.toLowerCase(),
+        (opt: { value: string }) =>
+          opt.value.toLowerCase() === trimmed.toLowerCase(),
       );
       if (matchingOption) {
         return matchingOption.value; // Return canonical option value
@@ -70,6 +72,7 @@ export function normalizeCellValue(
 
     case 'multi-select': {
       // For multi-select, parse comma-separated values and normalize each
+      if (!column.options) return trimmed;
       const separator = column.separator || ',';
       const values = trimmed
         .split(separator)
@@ -78,8 +81,9 @@ export function normalizeCellValue(
 
       // Normalize each value to match option values (case-insensitive)
       const normalizedValues = values.map((value) => {
-        const matchingOption = column.options.find(
-          (opt) => opt.value.toLowerCase() === value.toLowerCase(),
+        const matchingOption = column.options!.find(
+          (opt: { value: string }) =>
+            opt.value.toLowerCase() === value.toLowerCase(),
         );
         return matchingOption ? matchingOption.value : value;
       });

@@ -1,11 +1,11 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import { generateRowId } from '@application/units/pasteTable/utils/rowCreation';
 /**
  * Converts typed data to table rows
  */
 export const convertDataToRows = <T>(
   data: T[],
-  columns: TableColumn[],
+  columns: ColumnDefinition[],
 ): TableRow[] => {
   return data.map((item) => {
     const cells: Record<string, string> = {};

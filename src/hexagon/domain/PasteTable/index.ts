@@ -1,16 +1,11 @@
 /**
  * PasteTable Domain
- * Exports all types, interfaces, and functions
  */
 
-// Entity-specific types and mappers
-export * from '@domain/PasteTable/exampleEditRow';
-
+// Core types
+export * from '@domain/PasteTable/columnDefinition';
 // Functions
 export * from '@domain/PasteTable/functions';
+export * from '@domain/PasteTable/tableRow';
 
-// Interfaces
-export * from '@domain/PasteTable/General'; // Includes TableHook (legacy)
-
-// Types
-export * from '@domain/PasteTable/types';
+export * from '@domain/PasteTable/validationTypes';

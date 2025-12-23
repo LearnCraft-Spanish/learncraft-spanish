@@ -1,8 +1,9 @@
 import type {
-  TableColumn,
+  ColumnDefinition,
   TableRow as TableRowType,
   ValidationState,
-} from '@domain/PasteTable/General';
+} from '@domain/PasteTable';
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import { TableRow } from '@interface/components/PasteTable/TableRow';
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -21,9 +22,14 @@ const createTestProps = (overrides?: {
     },
   };
 
-  const defaultColumns: TableColumn[] = [
-    { id: 'col1', label: 'Column 1', type: 'text', width: '1fr' },
-    { id: 'col2', label: 'Column 2', type: 'text', width: '1fr' },
+  const defaultColumns: ColumnDefinition[] = [
+    { id: 'col1', type: 'text' },
+    { id: 'col2', type: 'text' },
+  ];
+
+  const defaultDisplayConfig: ColumnDisplayConfig[] = [
+    { id: 'col1', label: 'Column 1', width: '1fr' },
+    { id: 'col2', label: 'Column 2', width: '1fr' },
   ];
 
   const defaultValidationState: ValidationState = {
@@ -34,6 +40,7 @@ const createTestProps = (overrides?: {
   return {
     row: { ...defaultRow, ...overrides?.row } as TableRowType,
     columns: defaultColumns,
+    displayConfig: defaultDisplayConfig,
     activeCell: overrides?.activeCell ?? null,
     validationState: {
       ...defaultValidationState,

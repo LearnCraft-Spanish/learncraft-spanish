@@ -50,7 +50,7 @@ describe('component: LocalFilterPanelResults', () => {
       />,
     );
 
-    expect(screen.getByText('Search Results')).toBeInTheDocument();
+    expect(screen.getAllByText('Select')[0]).toHaveTextContent('Select');
     expect(screen.getByText('Example 1')).toBeInTheDocument();
   });
 

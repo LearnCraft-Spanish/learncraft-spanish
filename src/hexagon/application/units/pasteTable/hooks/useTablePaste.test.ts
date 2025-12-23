@@ -1,4 +1,4 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import { useTablePaste } from '@application/units/pasteTable/hooks/useTablePaste';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
@@ -6,10 +6,10 @@ import { act, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 
 // Test columns
-const testColumns: TableColumn[] = [
-  { id: 'id', label: 'ID', width: '1fr', type: 'number' },
-  { id: 'name', label: 'Name', width: '1fr', type: 'text' },
-  { id: 'value', label: 'Value', width: '1fr', type: 'number' },
+const testColumns: ColumnDefinition[] = [
+  { id: 'id', type: 'number' },
+  { id: 'name', type: 'text' },
+  { id: 'value', type: 'number' },
 ];
 
 // Helper to create test rows

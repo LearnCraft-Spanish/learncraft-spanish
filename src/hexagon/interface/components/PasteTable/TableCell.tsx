@@ -1,15 +1,21 @@
-import type { TableColumn } from '@domain/PasteTable/types';
+import type { ColumnDefinition } from '@domain/PasteTable';
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import {
   isBooleanColumn,
   isDateColumn,
   isMultiSelectColumn,
   isSelectColumn,
-} from '@domain/PasteTable/types';
-import React from 'react';
+  isTextAreaColumn,
+} from '@domain/PasteTable';
+import { BooleanCell } from '@interface/components/PasteTable/TableCell/BooleanCell';
+import { SelectCell } from '@interface/components/PasteTable/TableCell/SelectCell';
+import { TextAreaCell } from '@interface/components/PasteTable/TableCell/TextAreaCell';
+import './TableCell.scss';
 
-// TableCellInput component to handle rendering different input types for table cells
 interface TableCellInputProps {
-  column: TableColumn;
+  cellKey: string;
+  column: ColumnDefinition;
+  display: ColumnDisplayConfig;
   cellValue: string;
   hasError: boolean;
   ariaLabel: string;
@@ -19,11 +25,15 @@ interface TableCellInputProps {
     onFocus: () => void;
     onBlur: () => void;
   };
-  cellRef: (el: HTMLInputElement | HTMLSelectElement | null) => void;
+  cellRef: (
+    el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null,
+  ) => void;
 }
 
 export function TableCellInput({
+  cellKey,
   column,
+  display,
   cellValue,
   hasError,
   ariaLabel,
@@ -31,7 +41,9 @@ export function TableCellInput({
   cellRef,
 }: TableCellInputProps) {
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     handlers.onChange(e.target.value);
   };
@@ -43,31 +55,29 @@ export function TableCellInput({
     onPaste: handlers.onPaste,
     onFocus: handlers.onFocus,
     onBlur: handlers.onBlur,
-    placeholder: column.placeholder,
+    placeholder: display.placeholder,
   };
 
-  // Use type guards to safely access type-specific properties
-  if (isSelectColumn(column)) {
+  // Readonly column
+  if (column.editable === false) {
+    return <div className="paste-table__cell-readonly">{cellValue}</div>;
+  }
+
+  // Select column
+  if (isSelectColumn(column) && column.options) {
     return (
-      <select
-        ref={(el) => cellRef(el)}
-        value={cellValue}
-        onChange={handleChange}
-        {...commonProps}
-      >
-        <option value="">Select...</option>
-        {column.options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <SelectCell
+        cellValue={cellValue}
+        handleChange={handleChange}
+        options={column.options}
+        commonProps={commonProps}
+        cellRef={cellRef}
+      />
     );
   }
 
+  // Multi-select column
   if (isMultiSelectColumn(column)) {
-    // Multi-select: comma-separated values in cell, display as text input for now
-    // TODO: Implement proper multi-select UI (checkboxes or multi-select dropdown)
     return (
       <input
         ref={(el) => cellRef(el)}
@@ -79,22 +89,29 @@ export function TableCellInput({
       />
     );
   }
+  if (isTextAreaColumn(column)) {
+    return (
+      <TextAreaCell
+        cellValue={cellValue}
+        handleChange={handleChange}
+        commonProps={commonProps}
+        cellRef={cellRef}
+      />
+    );
+  }
 
+  // Boolean column
   if (isBooleanColumn(column)) {
     // Boolean: checkbox or select based on format
-    const format = column.booleanFormat || 'true-false';
-    if (format === 'true-false' || format === 'auto') {
+    const format = column.booleanFormat || 'auto';
+    if (format === 'auto') {
       return (
-        <select
-          ref={(el) => cellRef(el)}
-          value={cellValue}
-          onChange={handleChange}
-          {...commonProps}
-        >
-          <option value="">--</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
+        <BooleanCell
+          cellKey={cellKey}
+          ariaLabel={ariaLabel}
+          cellValue={cellValue}
+          handlers={handlers}
+        />
       );
     }
     // For other formats, use text input
@@ -109,6 +126,7 @@ export function TableCellInput({
     );
   }
 
+  // Date column
   if (isDateColumn(column)) {
     return (
       <input
@@ -121,7 +139,7 @@ export function TableCellInput({
     );
   }
 
-  // Number or text (default)
+  // Number column
   if (column.type === 'number') {
     return (
       <input

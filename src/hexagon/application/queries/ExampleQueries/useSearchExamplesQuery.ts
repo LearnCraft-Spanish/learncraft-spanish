@@ -17,11 +17,20 @@ export const useSearchExamplesQuery = (
   searchText: ExampleTextSearch,
   page: number = 1,
   pageSize: number = 100,
+  vocabularyComplete?: boolean,
 ): UseSearchExamplesQueryReturnType => {
   const { searchExamplesByText } = useExampleAdapter();
   const { data, isLoading, error } = useQuery({
-    queryKey: ['examples', 'by search text', searchText, page, pageSize],
-    queryFn: () => searchExamplesByText(searchText, page, pageSize),
+    queryKey: [
+      'examples',
+      'by search text',
+      searchText,
+      page,
+      pageSize,
+      vocabularyComplete,
+    ],
+    queryFn: () =>
+      searchExamplesByText(searchText, page, pageSize, vocabularyComplete),
     ...queryDefaults.referenceData,
   });
 

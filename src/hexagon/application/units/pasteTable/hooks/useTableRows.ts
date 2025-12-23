@@ -1,13 +1,9 @@
-import type {
-  TableColumn,
-  TableData,
-  TableRow,
-} from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableData, TableRow } from '@domain/PasteTable';
 import { createGhostRow } from '@application/units/pasteTable/utils';
 import { useCallback, useRef, useState } from 'react';
 
 interface UseTableRowsProps<T> {
-  columns: TableColumn[];
+  columns: ColumnDefinition[];
   initialData?: T[];
   /** Whether to include ghost row for adding new entries (default: true) */
   includeGhostRow?: boolean;

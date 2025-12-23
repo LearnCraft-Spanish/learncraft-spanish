@@ -36,7 +36,7 @@ describe('component: SearchByQuizResults', () => {
 
   it('should render', () => {
     render(<SearchByQuizResults courseCode="spanish-1" quizNumber={1} />);
-    expect(screen.getByText('Search Results')).toBeInTheDocument();
+    expect(screen.getAllByText('Select')[0]).toHaveTextContent('Select');
   });
 
   it('uses useSearchByQuizResults hook and passes props', () => {

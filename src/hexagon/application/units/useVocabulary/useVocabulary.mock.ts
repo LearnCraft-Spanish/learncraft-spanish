@@ -5,14 +5,14 @@ import type {
 } from '@learncraft-spanish/shared';
 import {
   createMockVocabulary,
-  createMockVocabularyAbbreviationList,
+  createMockVocabularyList,
 } from '@testing/factories/vocabularyFactories';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Default mock implementation matching the interface exactly
 const defaultMockResult: UseVocabularyResult = {
   // Read operations
-  vocabulary: createMockVocabularyAbbreviationList(),
+  vocabulary: createMockVocabularyList(),
   loading: false,
   error: null,
   getById: (_id: string) => Promise.resolve(createMockVocabulary()),

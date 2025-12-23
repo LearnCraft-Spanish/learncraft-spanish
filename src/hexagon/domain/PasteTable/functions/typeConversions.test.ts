@@ -1,4 +1,4 @@
-import type { ColumnDefinition } from '@domain/PasteTable/types';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import {
   convertCellValue,
   formatBooleanForTable,

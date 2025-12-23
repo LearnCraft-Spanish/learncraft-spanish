@@ -43,10 +43,12 @@ export interface ExamplePort {
     search: ExampleTextSearch,
     page: number,
     limit: number,
+    vocabularyComplete?: boolean,
   ) => Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }>;
   getExamplesByRecentlyModified: (
     page: number,
     limit: number,
+    vocabularyComplete?: boolean,
   ) => Promise<ExampleTechnical[]>;
 
   // Mutation methods

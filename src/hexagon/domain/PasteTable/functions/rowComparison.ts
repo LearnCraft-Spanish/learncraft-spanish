@@ -3,23 +3,28 @@
  * Compare rows and cells for change tracking
  */
 
-import type { TableRow } from '@domain/PasteTable/types';
+import type { TableRow } from '@domain/PasteTable';
 
 /**
  * Deep equality check for cells
+ * @param columnIds - If provided, only compare these columns
  */
 export function cellsEqual(
   cells1: Record<string, string>,
   cells2: Record<string, string>,
+  columnIds?: string[],
 ): boolean {
-  const keys1 = Object.keys(cells1);
-  const keys2 = Object.keys(cells2);
+  const keysToCompare = columnIds ?? Object.keys(cells1);
 
-  if (keys1.length !== keys2.length) {
-    return false;
+  // If no columnIds filter, also check key count matches
+  if (!columnIds) {
+    const keys2 = Object.keys(cells2);
+    if (keysToCompare.length !== keys2.length) {
+      return false;
+    }
   }
 
-  for (const key of keys1) {
+  for (const key of keysToCompare) {
     if (cells1[key] !== cells2[key]) {
       return false;
     }

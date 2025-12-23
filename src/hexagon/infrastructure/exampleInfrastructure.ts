@@ -86,6 +86,7 @@ export function createExampleInfrastructure(
       search: ExampleTextSearch,
       page: number,
       limit: number,
+      vocabularyComplete?: boolean,
     ): Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }> => {
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
@@ -97,6 +98,7 @@ export function createExampleInfrastructure(
           search,
           page,
           limit,
+          vocabularyComplete,
         },
       );
       return response;
@@ -104,6 +106,7 @@ export function createExampleInfrastructure(
     getExamplesByRecentlyModified: async (
       page: number,
       limit: number,
+      vocabularyComplete?: boolean,
     ): Promise<ExampleTechnical[]> => {
       const response = await httpClient.post<ExampleTechnical[]>(
         getExamplesByMostRecentlyModifiedEndpoint.path,
@@ -111,6 +114,7 @@ export function createExampleInfrastructure(
         {
           page,
           limit,
+          vocabularyComplete,
         },
       );
       return response;
@@ -121,17 +125,17 @@ export function createExampleInfrastructure(
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
       }>(createExamplesEndpoint.path, createExamplesEndpoint.requiredScopes, {
-        body: exampleCreates,
+        exampleCreates,
       });
       return response.examples;
     },
     updateExamples: async (
-      exampleEdits: UpdateExamplesCommand,
+      exampleUpdates: UpdateExamplesCommand,
     ): Promise<ExampleWithVocabulary[]> => {
       const response = await httpClient.put<{
         examples: ExampleWithVocabulary[];
       }>(updateExamplesEndpoint.path, updateExamplesEndpoint.requiredScopes, {
-        body: exampleEdits,
+        exampleUpdates,
       });
       return response.examples;
     },

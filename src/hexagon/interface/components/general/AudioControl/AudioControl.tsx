@@ -3,9 +3,25 @@ import pause from 'src/assets/icons/pause_dark.svg';
 import play from 'src/assets/icons/play_dark.svg';
 import './AudioControl.scss';
 
-export default function AudioControl({ audioLink }: { audioLink: string }) {
-  const [isPlaying, setIsPlaying] = useState(false);
+export interface AudioControlProps {
+  audioLink: string;
+  /** Optional callback when audio fails to load */
+  onError?: () => void;
+  /** Optional callback when audio loads and can play */
+  onSuccess?: () => void;
+}
+
+export default function AudioControl({
+  audioLink,
+  onError,
+  onSuccess,
+}: AudioControlProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // State is computed fresh on each render - no reset needed
+  // When audioLink changes, component remounts via key prop
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [hasLoadError, setHasLoadError] = useState(false);
 
   const isValidAudio = useMemo(() => {
     const urlRegex = /^https?:\/\/.+\.(?:mp3|wav|ogg|m4a)$/i;
@@ -54,34 +70,46 @@ export default function AudioControl({ audioLink }: { audioLink: string }) {
     setIsPlaying(false);
   }, []);
 
+  // Handle audio loading errors
+  const handleError = useCallback(() => {
+    setHasLoadError(true);
+    onError?.();
+  }, [onError]);
+
+  const handleCanPlay = useCallback(() => {
+    setHasLoadError(false);
+    onSuccess?.();
+  }, [onSuccess]);
+
   // Callback ref to set up event listeners when audio element is available
   const setAudioRef = useCallback(
     (node: HTMLAudioElement | null) => {
-      // Remove event listener from previous audio element
+      // Remove event listeners from previous audio element
       if (audioRef.current) {
         audioRef.current.removeEventListener('ended', handleEnded);
+        audioRef.current.removeEventListener('error', handleError);
+        audioRef.current.removeEventListener('canplay', handleCanPlay);
       }
 
       // Set the ref
       audioRef.current = node;
 
-      // Add event listener to new audio element
+      // Add event listeners to new audio element
       if (node) {
         node.addEventListener('ended', handleEnded);
+        node.addEventListener('error', handleError);
+        node.addEventListener('canplay', handleCanPlay);
       }
     },
-    [handleEnded],
+    [handleEnded, handleError, handleCanPlay],
   );
 
-  // Reset playing state when audio link changes
+  // Reset audio element when audioLink changes
   useEffect(() => {
-    // When the audio source changes, we want to reset to the paused state
-    // This prevents the UI from showing "pause" when a different audio is loaded
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-    setIsPlaying(false);
   }, [audioLink]);
 
   // Cleanup on unmount
@@ -89,9 +117,16 @@ export default function AudioControl({ audioLink }: { audioLink: string }) {
     return () => {
       if (audioRef.current) {
         audioRef.current.removeEventListener('ended', handleEnded);
+        audioRef.current.removeEventListener('error', handleError);
+        audioRef.current.removeEventListener('canplay', handleCanPlay);
       }
     };
-  }, [handleEnded]);
+  }, [handleEnded, handleError, handleCanPlay]);
+
+  // Show error state if audio failed to load
+  if (hasLoadError && audioLink) {
+    return <span style={{ color: '#d32f2f' }}>error</span>;
+  }
 
   return (
     audioLink &&
@@ -110,17 +145,7 @@ export default function AudioControl({ audioLink }: { audioLink: string }) {
             </button>
           </>
         )}
-        {!isValidAudio && (
-          <>
-            <button
-              type="button"
-              className="disabledButton audioError"
-              aria-label="audioError"
-            >
-              <img src={isPlaying ? pause : play} alt="audioError" />
-            </button>
-          </>
-        )}
+        {!isValidAudio && <span style={{ color: '#d32f2f' }}>error</span>}
       </>
     )
   );

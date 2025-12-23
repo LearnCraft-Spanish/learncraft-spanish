@@ -4,20 +4,22 @@ import { BaseResultsComponent } from '@interface/components/ExampleSearchInterfa
 export interface SearchByQuizResultsProps {
   courseCode: string;
   quizNumber: number | undefined;
+  vocabularyComplete?: boolean;
 }
 export function SearchByQuizResults({
   courseCode,
   quizNumber,
+  vocabularyComplete,
 }: SearchByQuizResultsProps) {
   const { examples, isLoading, error, paginationState } =
     useSearchByQuizResults({
       courseCode,
       quizNumber,
+      vocabularyComplete,
     });
 
   return (
     <BaseResultsComponent
-      title="Search Results"
       isLoading={isLoading}
       error={error}
       examples={examples}

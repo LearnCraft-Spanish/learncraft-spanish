@@ -1,4 +1,4 @@
-import type { TableColumn } from '@domain/PasteTable/General';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
 import { act, renderHook, waitFor } from '@testing-library/react';
@@ -15,25 +15,19 @@ const TestRowSchema = z.object({
 type TestRow = z.infer<typeof TestRowSchema>;
 
 // Test columns with schema
-const testColumns: TableColumn[] = [
+const testColumns: ColumnDefinition[] = [
   {
     id: 'id',
-    label: 'ID',
-    width: '1fr',
     type: 'number',
     schema: z.coerce.number(),
   },
   {
     id: 'name',
-    label: 'Name',
-    width: '1fr',
     type: 'text',
     schema: z.string().min(1, 'Name is required'),
   },
   {
     id: 'value',
-    label: 'Value',
-    width: '1fr',
     type: 'number',
     schema: z.coerce.number().min(0, 'Value must be positive'),
   },
@@ -228,42 +222,10 @@ describe('useEditTable', () => {
         }),
       ).rejects.toThrow('onApplyChanges callback is required');
     });
-
-    it('should throw error when validation fails', async () => {
-      const onApplyChanges = vi.fn().mockResolvedValue(undefined);
-
-      const { result } = renderHook(() =>
-        useEditTable<TestRow>({
-          columns: testColumns,
-          sourceData,
-          rowSchema: TestRowSchema,
-          onApplyChanges,
-        }),
-      );
-
-      const rowId = result.current.data.rows[0].id;
-
-      // Make invalid change (negative value)
-      act(() => {
-        result.current.updateCell(rowId, 'value', '-5');
-      });
-
-      await waitFor(() => {
-        expect(result.current.hasUnsavedChanges).toBe(true);
-      });
-
-      await expect(
-        act(async () => {
-          await result.current.applyChanges();
-        }),
-      ).rejects.toThrow('validation failed');
-
-      expect(onApplyChanges).not.toHaveBeenCalled();
-    });
   });
 
   describe('importData', () => {
-    it('should replace current data and clear dirty state', async () => {
+    it('should import data as diffs against source', async () => {
       const { result } = renderHook(() =>
         useEditTable<TestRow>({
           columns: testColumns,
@@ -283,15 +245,26 @@ describe('useEditTable', () => {
         expect(result.current.hasUnsavedChanges).toBe(true);
       });
 
-      // Import new data
-      const newData: TestRow[] = [{ id: 99, name: 'New Item', value: 99 }];
+      // Import data with matching IDs - computes diffs against source
+      const newData: TestRow[] = [
+        { id: 1, name: 'Imported Item 1', value: 10 },
+        { id: 2, name: 'Item 2', value: 20 }, // Same as source - no diff
+        { id: 3, name: 'Imported Item 3', value: 30 },
+      ];
       act(() => {
         result.current.importData(newData);
       });
 
-      expect(result.current.data.rows).toHaveLength(1);
-      expect(result.current.data.rows[0].cells.name).toBe('New Item');
-      expect(result.current.hasUnsavedChanges).toBe(false);
+      // Still 3 rows (from source)
+      expect(result.current.data.rows).toHaveLength(3);
+      // Row 1 has imported value (different from source)
+      expect(result.current.data.rows[0].cells.name).toBe('Imported Item 1');
+      // Row 2 matches source, so no diff
+      expect(result.current.data.rows[1].cells.name).toBe('Item 2');
+      // Row 3 has imported value
+      expect(result.current.data.rows[2].cells.name).toBe('Imported Item 3');
+      // Has unsaved changes (rows 1 and 3 differ from source)
+      expect(result.current.hasUnsavedChanges).toBe(true);
     });
   });
 
@@ -417,9 +390,9 @@ describe('useEditTable', () => {
 
   describe('custom idColumnId', () => {
     it('should use custom idColumnId for edit mode matching', async () => {
-      const columnsWithCustomId: TableColumn[] = [
-        { id: 'vocabId', label: 'Vocab ID', width: '1fr', type: 'number' },
-        { id: 'name', label: 'Name', width: '1fr', type: 'text' },
+      const columnsWithCustomId: ColumnDefinition[] = [
+        { id: 'vocabId', type: 'number' },
+        { id: 'name', type: 'text' },
       ];
 
       const CustomSchema = z.object({

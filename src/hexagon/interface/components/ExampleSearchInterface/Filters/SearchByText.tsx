@@ -1,8 +1,12 @@
+import { VocabularyCompleteFilter } from '@interface/components/ExampleSearchInterface/Filters/VocabularyCompleteFilter';
+
 export interface SearchByTextProps {
   spanishInput: string;
   englishInput: string;
   onSpanishInputChange: (value: string) => void;
   onEnglishInputChange: (value: string) => void;
+  vocabularyComplete: boolean | undefined;
+  onVocabularyCompleteChange: (value: boolean | undefined) => void;
 }
 
 export function SearchByText({
@@ -10,6 +14,8 @@ export function SearchByText({
   englishInput,
   onSpanishInputChange,
   onEnglishInputChange,
+  vocabularyComplete,
+  onVocabularyCompleteChange,
 }: SearchByTextProps) {
   return (
     <div>
@@ -46,6 +52,11 @@ export function SearchByText({
           style={{ width: '100%', padding: '0.5rem' }}
         />
       </div>
+
+      <VocabularyCompleteFilter
+        value={vocabularyComplete}
+        onChange={onVocabularyCompleteChange}
+      />
     </div>
   );
 }

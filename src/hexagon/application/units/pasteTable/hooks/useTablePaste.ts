@@ -1,4 +1,4 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import {
@@ -10,7 +10,7 @@ import { cellsEqual } from '@domain/PasteTable/functions/rowComparison';
 import { useCallback, useState } from 'react';
 
 interface UseTablePasteProps {
-  columns: TableColumn[];
+  columns: ColumnDefinition[];
   rows: TableRow[];
   updateCell: (rowId: string, columnId: string, value: string) => void;
   setRows: (rows: TableRow[]) => void;

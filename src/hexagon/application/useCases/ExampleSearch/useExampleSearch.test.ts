@@ -66,7 +66,7 @@ describe('useExampleSearch', () => {
     expect(mockUseCombinedFilters).toHaveBeenCalledWith({});
     expect(result.current.mode).toBe('filter');
     expect(result.current.searchIsTriggered).toBe(false);
-    expect(result.current.isValidSearch).toBe(false); // selectedCourseId is 0
+    expect(result.current.isValidSearch).toBe(true); // selectedCourseId is 2 by default
   });
 
   it('handleChangeMode resets searchIsTriggered', () => {
