@@ -1,20 +1,13 @@
 .vocabTagEditor {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 
   &__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 2px;
     align-items: flex-start;
-  }
-
-  &__tagWrapper {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    position: relative;
   }
 
   &__tag {
@@ -39,16 +32,16 @@
     border: none;
     color: var(--dark);
     cursor: pointer;
-    font-size: 18px;
+    font-size: 14px;
     line-height: 1;
     padding: 0;
-    margin-left: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     flex-shrink: 0;
+    margin-left: 2px;
 
     &:hover {
       font-weight: bold;
@@ -56,4 +49,3 @@
     }
   }
 }
-

@@ -11,12 +11,8 @@ export interface VocabTagEditorProps {
   selectedVocabularyIds: number[];
   onVocabularyAdd: (vocabId: number) => void;
   onVocabularyRemove: (vocabId: number) => void;
-  exampleId?: number; // Optional example ID for popup context
-  // Full vocabulary objects - will be available once backend returns them
-  fullVocabularyList?: Vocabulary[];
+  exampleId?: number;
 }
-
-const EMPTY_VOCAB_LIST: Vocabulary[] = [];
 
 export function VocabTagEditor({
   vocabularyList,
@@ -24,7 +20,6 @@ export function VocabTagEditor({
   onVocabularyAdd,
   onVocabularyRemove,
   exampleId = 0,
-  fullVocabularyList = EMPTY_VOCAB_LIST,
 }: VocabTagEditorProps) {
   const { contextual, openContextual, closeContextual } = useContextualMenu();
   const { lessonPopup } = useLessonPopup();
@@ -47,25 +42,22 @@ export function VocabTagEditor({
       {/* Selected vocabulary tags */}
       <div className="vocabTagEditor__tags">
         {selectedVocabularyIds.map((vocabId) => {
-          const vocabAbbr = vocabularyList.find((v) => v.id === vocabId);
-          const fullVocab = fullVocabularyList.find((v) => v.id === vocabId);
+          const vocabulary = vocabularyList.find((v) => v.id === vocabId);
 
-          if (!vocabAbbr) return null;
+          if (!vocabulary) return null;
 
-          // If we have full vocab, use VocabTagContainer for popup with remove button
-          if (fullVocab) {
-            return (
-              <div key={vocabId} className="vocabTagEditor__tagWrapper">
-                <VocabTagContainer
-                  exampleId={exampleId}
-                  vocabulary={fullVocab}
-                  openContextual={openContextual}
-                  contextual={contextual}
-                  closeContextual={closeContextual}
-                  lessonPopup={lessonPopup}
-                  handleSelect={handleSelect}
-                  isSelected={selectedVocabId === vocabId}
-                />
+          return (
+            <VocabTagContainer
+              key={vocabId}
+              exampleId={exampleId}
+              vocabulary={vocabulary}
+              openContextual={openContextual}
+              contextual={contextual}
+              closeContextual={closeContextual}
+              lessonPopup={lessonPopup}
+              handleSelect={handleSelect}
+              isSelected={selectedVocabId === vocabId}
+              removeButton={
                 <button
                   type="button"
                   className="vocabTagEditor__remove"
@@ -74,23 +66,8 @@ export function VocabTagEditor({
                 >
                   ×
                 </button>
-              </div>
-            );
-          }
-
-          // Fallback: just show tag with remove button (no popup until full vocab available)
-          return (
-            <div key={vocabId} className="vocabTagEditor__tag">
-              <span>{vocabAbbr.word}</span>
-              <button
-                type="button"
-                className="vocabTagEditor__remove"
-                onClick={(e) => handleRemove(vocabId, e)}
-                aria-label="Remove vocabulary"
-              >
-                ×
-              </button>
-            </div>
+              }
+            />
           );
         })}
       </div>

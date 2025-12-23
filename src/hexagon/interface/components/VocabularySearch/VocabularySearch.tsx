@@ -18,30 +18,47 @@ export default function VocabularySearch({
   selectedVocabIds,
   placeholder = 'Search vocabulary...',
   minSearchLength = 1,
-  maxResults = 10,
+  maxResults = 20,
   hideSelectedDisplay = false,
 }: VocabularySearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Filter vocabulary based on search term
+  // Filter vocabulary based on search term, with exact matches sorted to the top
   const filteredVocabulary = useMemo(() => {
     if (!searchTerm.trim() || searchTerm.length < minSearchLength) {
       return [];
     }
 
     const lowerSearchTerm = searchTerm.toLowerCase();
-    const filtered = vocabularyList.filter((vocab) => {
-      const wordMatch = vocab.word?.toLowerCase().includes(lowerSearchTerm);
-      const descriptorMatch = vocab.descriptor
-        ?.toLowerCase()
-        .includes(lowerSearchTerm);
+    const exactMatches: Vocabulary[] = [];
+    const partialWordMatches: Vocabulary[] = [];
+    const partialDescriptorMatches: Vocabulary[] = [];
 
-      return wordMatch || descriptorMatch;
+    vocabularyList.forEach((vocab) => {
+      const wordLower = vocab.word?.toLowerCase() ?? '';
+      const descriptorLower = vocab.descriptor?.toLowerCase() ?? '';
+
+      const wordExactMatch = wordLower === lowerSearchTerm;
+      const descriptorExactMatch = descriptorLower === lowerSearchTerm;
+      const wordPartialMatch = wordLower.includes(lowerSearchTerm);
+      const descriptorPartialMatch = descriptorLower.includes(lowerSearchTerm);
+
+      if (wordExactMatch || descriptorExactMatch) {
+        exactMatches.push(vocab);
+      } else if (wordPartialMatch) {
+        partialWordMatches.push(vocab);
+      } else if (descriptorPartialMatch) {
+        partialDescriptorMatches.push(vocab);
+      }
     });
 
-    // Limit results
-    return filtered.slice(0, maxResults);
+    // Combine exact matches first, then partial word matches, then partial descriptor matches, and limit results
+    return [
+      ...exactMatches,
+      ...partialWordMatches,
+      ...partialDescriptorMatches,
+    ].slice(0, maxResults);
   }, [vocabularyList, searchTerm, minSearchLength, maxResults]);
 
   // Get selected vocabulary item for display
