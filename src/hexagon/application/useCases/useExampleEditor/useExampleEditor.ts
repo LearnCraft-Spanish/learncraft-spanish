@@ -231,8 +231,8 @@ export function useExampleEditor(): UseExampleEditorResult {
   );
 
   // 2. Handle applying changes - maps back to UpdateExampleCommand
-  // Computed data from merged rows is used for saves
-  const handleApplyChanges = useCallback(
+  // Note: This will be updated to check validation after mergedValidationState is computed
+  let handleApplyChanges = useCallback(
     async (dirtyData: Partial<ExampleEditRow>[]) => {
       setIsSaving(true);
       setSaveError(null);
@@ -372,6 +372,37 @@ export function useExampleEditor(): UseExampleEditorResult {
       errors: mergedErrors,
     };
   }, [audioErrors, editTable.data.rows, editTable.validationState]);
+
+  // 5. Update handleApplyChanges to check validation before calling updateExamples
+  // Defined after mergedValidationState so it can access it directly
+  handleApplyChanges = useCallback(
+    async (dirtyData: Partial<ExampleEditRow>[]) => {
+      // Check validation before proceeding
+      if (Object.keys(mergedValidationState.errors).length > 0) {
+        throw new Error('validation failed');
+      }
+
+      setIsSaving(true);
+      setSaveError(null);
+
+      try {
+        // Map dirty rows to update commands
+        // Derived fields (audio URLs) are computed here from hasAudio
+        const updateCommands = dirtyData.map((row) =>
+          mapEditRowToUpdateCommand(row),
+        );
+        // Call the mutation to save changes
+        await updateExamples(updateCommands);
+      } catch (err) {
+        const error = normalizeError(err);
+        setSaveError(error);
+        throw error; // Re-throw so useEditTable knows it failed
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [mergedValidationState.errors, updateExamples],
+  );
 
   return {
     editTable,
