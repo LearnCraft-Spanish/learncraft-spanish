@@ -1,7 +1,6 @@
 import type {
   CreateVocabulary,
   Vocabulary,
-  VocabularyAbbreviation,
   VocabularyRelatedRecords,
 } from '@learncraft-spanish/shared';
 
@@ -13,7 +12,7 @@ export interface VocabularyPort {
   /**
    * Get all vocabulary items
    */
-  getVocabulary: () => Promise<VocabularyAbbreviation[]>;
+  getVocabulary: () => Promise<Vocabulary[]>;
 
   /**
    * Get all vocabulary items by subcategory

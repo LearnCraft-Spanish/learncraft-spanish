@@ -97,12 +97,7 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
           type="button"
           className="nonverb-creator__save-button"
           onClick={handleSave}
-          disabled={
-            !selectedSubcategoryId ||
-            !tableHook.isSaveEnabled ||
-            creating ||
-            loadingSubcategories
-          }
+          disabled={!selectedSubcategoryId || creating || loadingSubcategories}
         >
           {creating ? 'Saving...' : 'Save All Vocabulary'}
         </button>

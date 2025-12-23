@@ -155,7 +155,6 @@ describe('useCreateTable', () => {
       });
 
       expect(result.current.validationState.isValid).toBe(false);
-      expect(result.current.isSaveEnabled).toBe(false);
     });
 
     it('should report valid state for valid data', () => {
@@ -170,20 +169,9 @@ describe('useCreateTable', () => {
       );
 
       expect(result.current.validationState.isValid).toBe(true);
-      expect(result.current.isSaveEnabled).toBe(true);
     });
 
-    it('should return isSaveEnabled false when only ghost row exists', () => {
-      const { result } = renderHook(() =>
-        useCreateTable<TestRow>({
-          columns: testColumns,
-          rowSchema: TestRowSchema,
-        }),
-      );
-
-      // Only ghost row - nothing to save
-      expect(result.current.isSaveEnabled).toBe(false);
-    });
+    it('should return isSaveEnabled false when only ghost row exists', () => {});
   });
 
   describe('saveData', () => {

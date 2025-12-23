@@ -31,7 +31,6 @@ export function usePasteTable<T extends Record<string, unknown>>({
   rowSchema,
   initialData = [],
 }: UsePasteTableOptions<T>) {
-
   // Core row management
   const {
     rows,
@@ -61,7 +60,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
 
   // Validation - now purely derived from row data
   // validateRow function operates on TableRow (normalized, typed)
-  const { validationState, isSaveEnabled, validateAll } = useTableValidation({
+  const { validationState } = useTableValidation({
     rows,
     validateRow,
   });
@@ -111,14 +110,6 @@ export function usePasteTable<T extends Record<string, unknown>>({
   // If rowSchema is provided, parses through schema to get complete T[]
   // Otherwise returns Partial<T>[] (column schemas alone can't guarantee completeness)
   const saveData = useCallback(async (): Promise<T[] | undefined> => {
-    // Get fresh validation state
-    const { isValid } = validateAll();
-
-    // Only return data if valid
-    if (!isValid) {
-      return undefined;
-    }
-
     // Filter out ghost row
     const dataRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
 
@@ -136,7 +127,7 @@ export function usePasteTable<T extends Record<string, unknown>>({
     // This shouldn't happen since we require at least one schema, but handle it gracefully
     const data = mapTableRowsToDomain<T>(dataRows, columns);
     return data as T[]; // Type assertion needed here - caller should provide rowSchema
-  }, [rows, columns, rowSchema, validateAll]);
+  }, [rows, columns, rowSchema]);
 
   // Reset the table to completely empty state
   const resetTable = useCallback(() => {
@@ -163,7 +154,6 @@ export function usePasteTable<T extends Record<string, unknown>>({
     handlePaste,
     setActiveCellInfo,
     clearActiveCellInfo,
-    isSaveEnabled,
     validationState,
   };
 }

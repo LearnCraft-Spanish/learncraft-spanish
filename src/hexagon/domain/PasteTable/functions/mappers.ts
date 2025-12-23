@@ -110,6 +110,16 @@ export function mapDomainToTableRow<T extends Record<string, unknown>>(
         break;
       }
 
+      case 'custom': {
+        // Custom types: handle arrays specially (JSON serialize), otherwise stringify
+        if (Array.isArray(value)) {
+          cells[col.id] = JSON.stringify(value);
+        } else {
+          cells[col.id] = normalizeCellValue(String(value), col);
+        }
+        break;
+      }
+
       case 'text':
       default: {
         // Text and other types: normalize to trimmed string
@@ -191,6 +201,20 @@ function convertCellValueToDomainType(
         .map((v) => v.trim())
         .filter((v) => v !== '');
       return values.length > 0 ? values : undefined;
+    }
+
+    case 'custom': {
+      // Custom types: try to parse as JSON (for arrays), otherwise return as-is
+      if (normalized === '') {
+        return undefined;
+      }
+      try {
+        const parsed = JSON.parse(normalized);
+        return parsed;
+      } catch {
+        // Not valid JSON, return as string
+        return normalized || undefined;
+      }
     }
 
     case 'text':

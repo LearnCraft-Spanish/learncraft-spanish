@@ -1,3 +1,4 @@
+import type { DiffsMap } from '@application/units/pasteTable/hooks/useDiffs';
 import type {
   ColumnDefinition,
   TableRow,
@@ -42,6 +43,7 @@ export interface EditTableHook<T> {
   // State
   hasUnsavedChanges: boolean;
   dirtyRowIds: Set<string>;
+  diffs: DiffsMap;
   validationState: ValidationState;
 
   // Save operation
@@ -105,7 +107,7 @@ export function useEditTable<T extends Record<string, unknown>>({
   // If computeDerivedFields is provided, recompute derived fields after merging
   const rows = useMemo(() => {
     const merged = mergeSourceWithDiffs(sourceRows, diffs);
-    
+
     if (computeDerivedFields) {
       // Recompute derived fields from current merged cell values
       return merged.map((row) => {
@@ -119,7 +121,7 @@ export function useEditTable<T extends Record<string, unknown>>({
         };
       });
     }
-    
+
     return merged;
   }, [sourceRows, diffs, computeDerivedFields]);
 
@@ -138,7 +140,7 @@ export function useEditTable<T extends Record<string, unknown>>({
   }, [columns, rowSchema]);
 
   // Validation - derived from merged rows
-  const { validationState, validateAll } = useTableValidation({
+  const { validationState } = useTableValidation({
     rows,
     validateRow,
   });
@@ -193,11 +195,6 @@ export function useEditTable<T extends Record<string, unknown>>({
       throw new Error('onApplyChanges callback is required for applyChanges');
     }
 
-    const { isValid } = validateAll();
-    if (!isValid) {
-      throw new Error('Cannot apply changes: validation failed');
-    }
-
     // Get only dirty rows from merged state
     // Use diffs.keys() directly to ensure fresh state
     const currentDirtyIds = new Set(diffs.keys());
@@ -212,7 +209,7 @@ export function useEditTable<T extends Record<string, unknown>>({
     // After successful save, React Query will refetch and update sourceData
     // When sourceData updates, sourceRows updates, and diffs that match
     // the new source will effectively be "clean" (though we could also clear them)
-  }, [rows, diffs, columns, validateAll, onApplyChanges]);
+  }, [rows, diffs, columns, onApplyChanges]);
 
   return {
     data: {
@@ -227,6 +224,7 @@ export function useEditTable<T extends Record<string, unknown>>({
     clearActiveCellInfo,
     hasUnsavedChanges: dirtyRowIds.size > 0,
     dirtyRowIds,
+    diffs,
     validationState,
     applyChanges,
   };

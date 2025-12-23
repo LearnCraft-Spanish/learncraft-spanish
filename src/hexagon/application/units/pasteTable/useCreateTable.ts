@@ -44,7 +44,6 @@ export interface CreateTableHook<T> {
   clearActiveCellInfo: () => void;
 
   // State
-  isSaveEnabled: boolean;
   validationState: ValidationState;
 
   // Save operation (returns data for external save)
@@ -97,7 +96,7 @@ export function useCreateTable<T extends Record<string, unknown>>({
   }, [columns, rowSchema]);
 
   // Validation - derived from row data
-  const { validationState, isSaveEnabled, validateAll } = useTableValidation({
+  const { validationState } = useTableValidation({
     rows,
     validateRow,
   });
@@ -147,14 +146,6 @@ export function useCreateTable<T extends Record<string, unknown>>({
   // Save operation - returns data for external save
   // Parses through schema to get complete T[] (not Partial<T>[])
   const saveData = useCallback(async (): Promise<T[] | undefined> => {
-    // Get fresh validation state
-    const { isValid } = validateAll();
-
-    // Only return data if valid
-    if (!isValid) {
-      return undefined;
-    }
-
     // Require rowSchema for complete type (can't guarantee completeness with column schemas alone)
     if (!rowSchema) {
       throw new Error(
@@ -170,7 +161,7 @@ export function useCreateTable<T extends Record<string, unknown>>({
       rowSchema,
       GHOST_ROW_ID,
     );
-  }, [rows, columns, rowSchema, validateAll]);
+  }, [rows, columns, rowSchema]);
 
   // Reset table to empty state
   const resetTable = useCallback(() => {
@@ -190,7 +181,6 @@ export function useCreateTable<T extends Record<string, unknown>>({
     resetTable,
     setActiveCellInfo,
     clearActiveCellInfo,
-    isSaveEnabled,
     validationState,
     saveData,
   };

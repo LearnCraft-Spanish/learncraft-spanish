@@ -13,14 +13,11 @@ interface ValidationResult {
     isValid: boolean;
     errors: Record<string, Record<string, string>>;
   };
-  isSaveEnabled: boolean;
-  validateAll: () => {
-    isValid: boolean;
-    errors: Record<string, Record<string, string>>;
-  };
 }
 
 /**
+ * NOT AUTHORITATIVE: Validation belongs to the use case calling.
+ * This hook simplifies the process.
  * Hook for deriving validation state directly from row data
  * No internal state - purely computed from props on every render
  *
@@ -76,21 +73,7 @@ export function useTableValidation({
     };
   }, [nonGhostRows, validateSingleRow]);
 
-  // Determine if save is enabled based on validation state and row presence
-  const isSaveEnabled = useMemo(
-    () => nonGhostRows.length > 0 && validationState.isValid,
-    [nonGhostRows, validationState.isValid],
-  );
-
-  // Function to validate all rows on demand (for save)
-  // This ensures we get a fresh validation result at save time
-  const validateAll = useCallback(() => {
-    return validationState;
-  }, [validationState]);
-
   return {
     validationState,
-    isSaveEnabled,
-    validateAll,
   };
 }

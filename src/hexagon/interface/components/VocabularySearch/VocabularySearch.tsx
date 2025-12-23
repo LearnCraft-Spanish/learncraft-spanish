@@ -1,23 +1,25 @@
-import type { VocabularyAbbreviation } from '@learncraft-spanish/shared';
+import type { Vocabulary } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import './VocabularySearch.scss';
 
 interface VocabularySearchProps {
-  vocabularyList: VocabularyAbbreviation[];
+  vocabularyList: Vocabulary[];
   onVocabularySelect: (vocabId: number) => void;
-  selectedVocabId: number;
+  selectedVocabIds: number[];
   placeholder?: string;
   minSearchLength?: number;
   maxResults?: number;
+  hideSelectedDisplay?: boolean;
 }
 
 export default function VocabularySearch({
   vocabularyList,
   onVocabularySelect,
-  selectedVocabId,
+  selectedVocabIds,
   placeholder = 'Search vocabulary...',
   minSearchLength = 1,
   maxResults = 10,
+  hideSelectedDisplay = false,
 }: VocabularySearchProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -44,8 +46,8 @@ export default function VocabularySearch({
 
   // Get selected vocabulary item for display
   const selectedVocabulary = useMemo(() => {
-    return vocabularyList.find((vocab) => vocab.id === selectedVocabId);
-  }, [vocabularyList, selectedVocabId]);
+    return vocabularyList.find((vocab) => selectedVocabIds.includes(vocab.id));
+  }, [vocabularyList, selectedVocabIds]);
 
   const handleSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,7 +85,7 @@ export default function VocabularySearch({
   return (
     <div className="vocabulary-search">
       {/* Selected vocabulary display */}
-      {selectedVocabulary && (
+      {!hideSelectedDisplay && selectedVocabulary && (
         <div className="vocabulary-search__selected-display">
           <span className="vocabulary-search__selected-text">
             <strong>Selected:</strong> {selectedVocabulary.word} -{' '}
@@ -119,7 +121,7 @@ export default function VocabularySearch({
             <div
               key={vocab.id}
               className={`vocabulary-search__dropdown-item ${
-                selectedVocabId === vocab.id
+                selectedVocabIds.includes(vocab.id)
                   ? 'vocabulary-search__dropdown-item--selected'
                   : ''
               }`}
@@ -130,7 +132,7 @@ export default function VocabularySearch({
                 {vocab.descriptor}
               </div>
               <div className="vocabulary-search__item-subcategory">
-                {vocab.subcategoryAbr?.name}
+                {vocab.subcategory?.name}
               </div>
             </div>
           ))}

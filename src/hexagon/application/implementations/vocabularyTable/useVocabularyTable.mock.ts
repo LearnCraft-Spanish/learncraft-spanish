@@ -53,7 +53,6 @@ export const defaultMockResult: CreateTableHook<CreateNonVerbVocabulary> = {
   clearActiveCellInfo: () => {},
 
   // State flags and validation
-  isSaveEnabled: true,
   validationState: defaultValidationState,
 };
 

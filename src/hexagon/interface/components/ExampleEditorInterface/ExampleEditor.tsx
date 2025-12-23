@@ -2,12 +2,15 @@ import type {
   CellRenderProps,
   ColumnDisplayConfig,
 } from '@interface/components/EditableTable/types';
+import useVocabulary from '@application/units/useVocabulary/useVocabulary';
 import { useExampleEditor } from '@application/useCases/useExampleEditor';
 import {
   EditableTable,
   StandardCell,
 } from '@interface/components/EditableTable';
 import { AudioPlaybackCell } from '@interface/components/ExampleEditorInterface/AudioPlaybackCell';
+import { RelatedVocabularyCell } from '@interface/components/ExampleEditorInterface/RelatedVocabularyCell';
+import { useCallback } from 'react';
 
 /**
  * Display configuration for example editor columns
@@ -33,6 +36,59 @@ export function ExampleEditor() {
     audioErrorHandlers,
     validationState,
   } = useExampleEditor();
+
+  const { vocabulary: vocabularyList } = useVocabulary();
+
+  // Business logic: handle vocabulary add/remove for relatedVocabulary column
+  // The cell value is stored as JSON string "[1,2,3]" which we parse/stringify
+  const handleVocabularyAdd = useCallback(
+    (rowId: string, vocabId: number) => {
+      const row = editTable.data.rows.find((r) => r.id === rowId);
+      if (!row) return;
+
+      const currentIds: number[] = (() => {
+        const value = row.cells.relatedVocabulary || '';
+        if (!value) return [];
+        try {
+          return JSON.parse(value);
+        } catch {
+          return [];
+        }
+      })();
+
+      if (!currentIds.includes(vocabId)) {
+        const newIds = [...currentIds, vocabId];
+        editTable.updateCell(
+          rowId,
+          'relatedVocabulary',
+          JSON.stringify(newIds),
+        );
+      }
+    },
+    [editTable],
+  );
+
+  const handleVocabularyRemove = useCallback(
+    (rowId: string, vocabId: number) => {
+      const row = editTable.data.rows.find((r) => r.id === rowId);
+      if (!row) return;
+
+      const currentIds: number[] = (() => {
+        const value = row.cells.relatedVocabulary || '';
+        if (!value) return [];
+        try {
+          return JSON.parse(value);
+        } catch {
+          return [];
+        }
+      })();
+
+      const newIds = currentIds.filter((id) => id !== vocabId);
+      editTable.updateCell(rowId, 'relatedVocabulary', JSON.stringify(newIds));
+    },
+    [editTable],
+  );
+
   /**
    * Cell renderer function for example editor table
    *
@@ -51,12 +107,28 @@ export function ExampleEditor() {
    * @param props - Cell rendering props from EditableTableRow
    * @returns React component for the cell (AudioPlaybackCell or StandardCell)
    */
-  const renderCellWithAudioHandlers = (props: CellRenderProps) => {
+  const renderCellWithSpecialHandlers = (props: CellRenderProps) => {
     const { column } = props;
 
     if (column.id === 'spanishAudio' || column.id === 'englishAudio') {
       return (
         <AudioPlaybackCell {...props} audioErrorHandlers={audioErrorHandlers} />
+      );
+    }
+
+    if (column.id === 'relatedVocabulary') {
+      return (
+        <RelatedVocabularyCell
+          value={props.value}
+          vocabularyList={vocabularyList}
+          onVocabularyAdd={(vocabId) =>
+            handleVocabularyAdd(props.row.id, vocabId)
+          }
+          onVocabularyRemove={(vocabId) =>
+            handleVocabularyRemove(props.row.id, vocabId)
+          }
+          rowId={props.row.id}
+        />
       );
     }
 
@@ -87,7 +159,7 @@ export function ExampleEditor() {
         isLoading={isLoading}
         isSaving={isSaving}
         isValid={validationState.isValid}
-        renderCell={renderCellWithAudioHandlers}
+        renderCell={renderCellWithSpecialHandlers}
       />
     </div>
   );

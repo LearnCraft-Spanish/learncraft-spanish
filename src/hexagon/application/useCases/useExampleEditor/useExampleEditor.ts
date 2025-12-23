@@ -152,8 +152,8 @@ export interface UseExampleEditorResult {
  * Derived from updateExampleCommandSchema, adapted for table UI:
  * - Renames exampleId -> id
  * - Replaces audio URL fields with hasAudio boolean
- * - Adds spanglish (display-only, computed server-side)
  * - Makes vocabularyComplete required (has default in UI)
+ *
  */
 const exampleEditRowSchema = updateExampleCommandSchema
   .omit({
@@ -169,7 +169,6 @@ const exampleEditRowSchema = updateExampleCommandSchema
     english: z.string().min(1, 'English translation is required'),
     hasAudio: z.coerce.boolean(),
     relatedVocabulary: z.array(z.coerce.number()),
-    spanglish: z.coerce.boolean(),
     vocabularyComplete: z.coerce.boolean(),
   });
 
@@ -194,6 +193,7 @@ const exampleEditColumns: ColumnDefinition[] = [
   { id: 'hasAudio', type: 'boolean' },
   { id: 'spanishAudio', type: 'text', editable: false, derived: true },
   { id: 'englishAudio', type: 'text', editable: false, derived: true },
+  { id: 'relatedVocabulary', type: 'custom', editable: false, derived: true },
   { id: 'vocabularyComplete', type: 'boolean' },
 ];
 
@@ -260,7 +260,8 @@ export function useExampleEditor(): UseExampleEditorResult {
   // This ensures derived fields stay in sync with current row values (source + user edits)
   const computeDerivedFieldsForRow = useCallback(
     (row: { cells: Record<string, string> }): Record<string, string> => {
-      return computeDerivedFields(row);
+      const computedFields = computeDerivedFields(row);
+      return computedFields;
     },
     [],
   );
@@ -325,8 +326,49 @@ export function useExampleEditor(): UseExampleEditorResult {
       });
     });
 
+    // Custom validation for relatedVocabulary: must be valid JSON array of numbers
+    let hasRelatedVocabularyErrors = false;
+    editTable.data.rows.forEach((row) => {
+      const value = row.cells.relatedVocabulary || '';
+      if (!value.trim()) {
+        // Empty is valid (no vocabulary selected)
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed)) {
+          if (!mergedErrors[row.id]) mergedErrors[row.id] = {};
+          mergedErrors[row.id].relatedVocabulary =
+            'Related vocabulary must be an array';
+          hasRelatedVocabularyErrors = true;
+          return;
+        }
+
+        // Validate all items are numbers
+        const invalidItems = parsed.filter(
+          (item) => typeof item !== 'number' || Number.isNaN(item),
+        );
+        if (invalidItems.length > 0) {
+          if (!mergedErrors[row.id]) mergedErrors[row.id] = {};
+          mergedErrors[row.id].relatedVocabulary =
+            'All vocabulary IDs must be valid numbers';
+          hasRelatedVocabularyErrors = true;
+        }
+      } catch {
+        // Invalid JSON
+        if (!mergedErrors[row.id]) mergedErrors[row.id] = {};
+        mergedErrors[row.id].relatedVocabulary =
+          'Invalid format: must be a valid array';
+        hasRelatedVocabularyErrors = true;
+      }
+    });
+
     return {
-      isValid: editTable.validationState.isValid && !hasAudioErrors,
+      isValid:
+        editTable.validationState.isValid &&
+        !hasAudioErrors &&
+        !hasRelatedVocabularyErrors,
       errors: mergedErrors,
     };
   }, [audioErrors, editTable.data.rows, editTable.validationState]);

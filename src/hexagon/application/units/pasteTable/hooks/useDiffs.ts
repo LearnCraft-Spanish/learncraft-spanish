@@ -1,5 +1,5 @@
 import type { TableRow } from '@domain/PasteTable';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 /**
  * Diffs map: rowId → { colId → value }
@@ -34,7 +34,7 @@ export function useDiffs({
   sourceRows,
   editableColumnIds,
 }: UseDiffsOptions): UseDiffsResult {
-  const [diffs, setDiffs] = useState<DiffsMap>(new Map());
+  const [diffs, setDiffs] = useState<DiffsMap>(() => new Map());
 
   // Build lookup for source values
   const sourceValueLookup = useMemo(() => {
@@ -45,8 +45,43 @@ export function useDiffs({
     return lookup;
   }, [sourceRows]);
 
-  // Derive dirty row IDs from diffs keys
-  const dirtyRowIds = useMemo(() => new Set(diffs.keys()), [diffs]);
+  // Derive cleaned diffs: prune diffs that now match source (when source changes)
+  // This is pure derivation - no useEffect, no setState
+  const cleanedDiffs = useMemo(() => {
+    if (diffs.size === 0) return diffs;
+
+    const next = new Map<string, Record<string, string>>();
+
+    for (const [rowId, rowDiffs] of diffs) {
+      const sourceCells = sourceValueLookup.get(rowId);
+      if (!sourceCells) {
+        // Row no longer exists in source - skip (don't include in cleaned diffs)
+        continue;
+      }
+
+      const cleanedRowDiffs: Record<string, string> = {};
+      for (const [colId, diffValue] of Object.entries(rowDiffs)) {
+        const sourceValue = sourceCells[colId] ?? '';
+        if (diffValue !== sourceValue) {
+          // Still different from source - keep the diff
+          cleanedRowDiffs[colId] = diffValue;
+        }
+        // If matches source, don't include (auto-cleaned)
+      }
+
+      if (Object.keys(cleanedRowDiffs).length > 0) {
+        next.set(rowId, cleanedRowDiffs);
+      }
+    }
+
+    return next;
+  }, [diffs, sourceValueLookup]);
+
+  // Derive dirty row IDs from cleaned diffs keys
+  const dirtyRowIds = useMemo(
+    () => new Set(cleanedDiffs.keys()),
+    [cleanedDiffs],
+  );
 
   // Update a single cell - auto-reverts if matches source
   const updateDiff = useCallback(
@@ -54,28 +89,27 @@ export function useDiffs({
       const sourceCells = sourceValueLookup.get(rowId);
       const sourceValue = sourceCells?.[colId] ?? '';
 
-      setDiffs((prev) => {
-        const next = new Map(prev);
-        const rowDiffs = { ...prev.get(rowId) };
+      // Start from cleaned diffs (current cleaned state), not raw diffs
+      const next = new Map(cleanedDiffs);
+      const rowDiffs = { ...cleanedDiffs.get(rowId) };
 
-        if (value === sourceValue) {
-          // Matches source - remove from diffs
-          delete rowDiffs[colId];
-          if (Object.keys(rowDiffs).length === 0) {
-            next.delete(rowId);
-          } else {
-            next.set(rowId, rowDiffs);
-          }
+      if (value === sourceValue) {
+        // Matches source - remove from diffs
+        delete rowDiffs[colId];
+        if (Object.keys(rowDiffs).length === 0) {
+          next.delete(rowId);
         } else {
-          // Different from source - add to diffs
-          rowDiffs[colId] = value;
           next.set(rowId, rowDiffs);
         }
+      } else {
+        // Different from source - add to diffs
+        rowDiffs[colId] = value;
+        next.set(rowId, rowDiffs);
+      }
 
-        return next;
-      });
+      setDiffs(next);
     },
-    [sourceValueLookup],
+    [sourceValueLookup, cleanedDiffs],
   );
 
   // Compute diffs from full rows (for paste operations)
@@ -113,55 +147,11 @@ export function useDiffs({
     setDiffs(new Map());
   }, []);
 
-  // Auto-cleanup: when source changes, prune diffs that now match source
-  useEffect(() => {
-    setDiffs((prev) => {
-      if (prev.size === 0) return prev;
-
-      const next = new Map(prev);
-      let changed = false;
-
-      for (const [rowId, rowDiffs] of prev) {
-        const sourceCells = sourceValueLookup.get(rowId);
-        if (!sourceCells) {
-          // Row no longer exists in source - remove diffs
-          next.delete(rowId);
-          changed = true;
-          continue;
-        }
-
-        const cleanedRowDiffs: Record<string, string> = {};
-        for (const [colId, diffValue] of Object.entries(rowDiffs)) {
-          const sourceValue = sourceCells[colId] ?? '';
-          if (diffValue !== sourceValue) {
-            // Still different - keep the diff
-            cleanedRowDiffs[colId] = diffValue;
-          } else {
-            changed = true;
-          }
-        }
-
-        if (Object.keys(cleanedRowDiffs).length === 0) {
-          next.delete(rowId);
-          changed = true;
-        } else if (
-          Object.keys(cleanedRowDiffs).length !== Object.keys(rowDiffs).length
-        ) {
-          next.set(rowId, cleanedRowDiffs);
-          changed = true;
-        }
-      }
-
-      return changed ? next : prev;
-    });
-  }, [sourceValueLookup]);
-
   return {
-    diffs,
+    diffs: cleanedDiffs, // Return cleaned diffs, not raw diffs
     dirtyRowIds,
     updateDiff,
     setRowsViaDiffs,
     clearDiffs,
   };
 }
-
