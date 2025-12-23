@@ -7,7 +7,6 @@ import { ToastContainer, Zoom } from 'react-toastify';
 import Nav from './components/Nav';
 import SubHeader from './components/SubHeader';
 import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
-
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
 import './contextual.scss';
