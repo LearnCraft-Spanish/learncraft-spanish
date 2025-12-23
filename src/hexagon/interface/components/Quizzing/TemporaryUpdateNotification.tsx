@@ -27,7 +27,7 @@ export function TemporaryUpdateNotification() {
     }
     openModal({
       title: 'SRS Quiz Update',
-      body: 'We’ve updated the SRS quiz to better reflect your learning progress. It’s going to start doing a better job of showing you ONLY the flashcards you haven’t reviewed recently (even if you didn’t review them via the SRS). As you continue toreview your flashcard collection, please give the new-and-improved SRS a try and let us know what you think of the changes!',
+      body: 'We’ve updated the SRS quiz to better reflect your learning progress. It’s going to start doing a better job of showing you ONLY the flashcards you haven’t reviewed recently (even if you didn’t review them via the SRS). As you continue to review your flashcard collection, please give the new-and-improved SRS a try and let us know what you think of the changes!',
       type: 'notice',
       confirmFunction: setTemporaryUpdateNotificationCookie,
     });
