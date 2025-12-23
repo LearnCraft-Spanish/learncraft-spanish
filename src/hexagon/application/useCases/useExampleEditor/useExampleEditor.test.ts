@@ -647,7 +647,9 @@ describe('useExampleEditor', () => {
       // Validation state should reflect the error
       expect(result.current.validationState.isValid).toBe(false);
       expect(result.current.validationState.errors[rowId]).toBeDefined();
-      expect(result.current.validationState.errors[rowId].spanish).toBeDefined();
+      expect(
+        result.current.validationState.errors[rowId].spanish,
+      ).toBeDefined();
 
       // Note: applyChanges does not throw - validation is handled at UI level
       // (save button is disabled when isValid is false)
