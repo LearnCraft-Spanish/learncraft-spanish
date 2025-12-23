@@ -1,6 +1,6 @@
-import type { TableRow } from '../types';
+import type { TableRow } from '@domain/PasteTable/General';
+import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
 import { useCallback, useMemo } from 'react';
-import { GHOST_ROW_ID } from '../types';
 
 interface UseTableValidationProps<T> {
   rows: TableRow[];

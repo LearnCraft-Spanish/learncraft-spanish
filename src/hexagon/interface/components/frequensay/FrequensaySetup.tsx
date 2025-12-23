@@ -1,5 +1,5 @@
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
-import { LessonSelector } from '../LessonSelector';
+import { LessonSelector } from '@interface/components/LessonSelector';
 export default function FrequensaySetup({
   isFrequensayEnabled,
   setIsFrequensayEnabled,

@@ -1,4 +1,5 @@
 import type { ContextualMenuContextType } from '@composition/context/ContextualMenuContext';
+import ContextualMenuContext from '@composition/context/ContextualMenuContext';
 import React, {
   useCallback,
   useEffect,
@@ -6,7 +7,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import ContextualMenuContext from '../context/ContextualMenuContext';
 
 export const ContextualMenuProvider: React.FC<{
   children: React.ReactNode;

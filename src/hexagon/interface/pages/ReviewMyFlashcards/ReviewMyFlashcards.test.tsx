@@ -1,12 +1,12 @@
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
+import MyFlashcardsQuiz from '@interface/pages/ReviewMyFlashcards/ReviewMyFlashcards';
 import { render, screen, waitFor } from '@testing-library/react';
+import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
+import { overrideAuthAndAppUser } from '@testing/utils/overrideAuthAndAppUser';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
-import { createMockFlashcardList } from 'src/hexagon/testing/factories/flashcardFactory';
-import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeEach, describe, expect, it } from 'vitest';
-import MyFlashcardsQuiz from './ReviewMyFlashcards';
 
 describe('menu for student flashcards', () => {
   beforeEach(() => {
@@ -38,7 +38,7 @@ describe('menu for student flashcards', () => {
     );
     // wait for the menu to load
     await waitFor(() => {
-      expect(screen.getByText(/srs quiz/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/srs quiz/i).length).toBeGreaterThan(0);
       expect(screen.getByText(/start with spanish/i)).toBeInTheDocument();
       expect(screen.getByText(/custom flashcards/i)).toBeInTheDocument();
       expect(screen.getByText(/quiz length/i)).toBeInTheDocument();

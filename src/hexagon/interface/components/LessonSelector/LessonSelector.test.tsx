@@ -3,10 +3,10 @@ import {
   overrideMockSelectedCourseAndLessons,
   resetMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
+import LessonSelector from '@interface/components/LessonSelector/LessonSelector';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createRealisticCourseWithLessonsList } from '@testing/factories/courseFactory';
 import { vi } from 'vitest';
-import LessonSelector from './LessonSelector';
 
 vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
   useSelectedCourseAndLessons: () => mockSelectedCourseAndLessons,

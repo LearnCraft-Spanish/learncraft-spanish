@@ -3,7 +3,7 @@ import type {
   Flashcard,
 } from '@learncraft-spanish/shared';
 import type { ReactNode } from 'react';
-import { ExampleText } from './units';
+import { ExampleText } from '@interface/components/ExampleListItem/units';
 
 import './ExampleListItem.scss';
 

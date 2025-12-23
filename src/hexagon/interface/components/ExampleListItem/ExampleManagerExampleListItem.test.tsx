@@ -1,8 +1,8 @@
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
+import ExampleManagerExampleListItem from '@interface/components/ExampleListItem/ExampleManagerExampleListItem';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
 import { vi } from 'vitest';
-import ExampleManagerExampleListItem from './ExampleManagerExampleListItem';
 
 const f = createMockFlashcard();
 

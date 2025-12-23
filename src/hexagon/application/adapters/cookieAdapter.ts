@@ -1,4 +1,4 @@
-import type { CookiePort } from '../ports/cookiePort';
+import type { CookiePort } from '@application/ports/cookiePort';
 import { createCookieInfrastructure } from '@infrastructure/cookieInfrastructure';
 
 export function CookieAdapter(): CookiePort {

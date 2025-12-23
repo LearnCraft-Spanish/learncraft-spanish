@@ -1,4 +1,4 @@
-import type { CookiePort } from '../application/ports/cookiePort';
+import type { CookiePort } from '@application/ports/cookiePort';
 
 /**
  * Creates a cookie infrastructure implementation that works with browser cookies

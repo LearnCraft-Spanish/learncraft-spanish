@@ -1,8 +1,8 @@
+import type { UseVocabularyResult } from '@application/units/useVocabulary/useVocabulary';
 import type {
   CreateNonVerbVocabulary,
   CreateVerbVocabulary,
 } from '@learncraft-spanish/shared';
-import type { UseVocabularyResult } from './useVocabulary';
 import {
   createMockVocabulary,
   createMockVocabularyAbbreviationList,

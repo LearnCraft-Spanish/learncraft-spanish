@@ -1,5 +1,5 @@
+import type { UseVerbCreationResult } from '@application/useCases/useVerbCreation/useVerbCreation.types';
 import type { CreateVerbVocabulary } from '@learncraft-spanish/shared';
-import type { UseVerbCreationResult } from './useVerbCreation.types';
 import { useSubcategories } from '@application/queries/useSubcategories';
 import useVocabulary from '@application/units/useVocabulary';
 import { useCallback, useMemo, useState } from 'react';

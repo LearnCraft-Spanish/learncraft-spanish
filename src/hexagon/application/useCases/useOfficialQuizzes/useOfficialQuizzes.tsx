@@ -1,9 +1,9 @@
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
+import { useOfficialQuizSetupMenu } from '@application/units/OfficialQuiz/useOfficialQuizSetupMenu';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
-import { useAuthAdapter } from '../../adapters/authAdapter';
-import { useOfficialQuizSetupMenu } from '../../units/OfficialQuiz/useOfficialQuizSetupMenu';
 export function useOfficialQuizzes() {
   const { isLoading: courseLoading } = useSelectedCourseAndLessons();
   const { isLoading: appUserLoading, error: appUserError } = useActiveStudent();

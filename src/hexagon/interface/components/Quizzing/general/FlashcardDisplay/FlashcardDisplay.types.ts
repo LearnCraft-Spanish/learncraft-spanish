@@ -1,5 +1,5 @@
-import type { AddPendingRemoveProps } from 'src/hexagon/application/units/useTextQuiz/useTextQuiz';
-import type { FlashcardForDisplay } from 'src/hexagon/domain/quizzing';
+import type { AddPendingRemoveProps } from '@application/units/useTextQuiz/useTextQuiz';
+import type { FlashcardForDisplay } from '@domain/quizzing';
 export interface FlashcardDisplayProps {
   quizExample: FlashcardForDisplay | null;
   answerShowing: boolean;

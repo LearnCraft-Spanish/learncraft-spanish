@@ -2,11 +2,11 @@ import type {
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useMemo, useRef, useState } from 'react';
-import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
-import { useAuthAdapter } from '../adapters/authAdapter';
-import { useActiveStudent } from '../coordinators/hooks/useActiveStudent';
-import { useStudentFlashcards } from './useStudentFlashcards';
 
 export interface TextQuizSetupReturn {
   availableQuizLengths: number[];
@@ -71,7 +71,7 @@ export function useTextQuizSetup({
     ownedOnly && isOwnUser && appUser?.studentRole === 'student';
 
   // Local states with boolean choices
-  const [srsQuiz, setSrsQuiz] = useState<boolean>(true);
+  const [srsQuiz, setSrsQuiz] = useState<boolean>(canAccessSRS);
   const [startWithSpanish, setStartWithSpanish] = useState<boolean>(false);
   const [customFlashcardsChoice, setCustomFlashcardsChoice] = useState<
     'included' | 'onlyCustom' | 'excluded'

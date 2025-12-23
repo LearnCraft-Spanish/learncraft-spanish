@@ -1,12 +1,12 @@
+import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type {
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
-import type { UseStudentFlashcardsReturn } from '../useStudentFlashcards';
+import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { filterExamplesCombined } from '@learncraft-spanish/shared';
 import { useMemo } from 'react';
-import { useStudentFlashcards } from '../useStudentFlashcards';
-import { useCombinedFiltersWithVocabulary } from './useCombinedFiltersWithVocabulary';
 
 export interface UseFilterOwnedFlashcardsReturn {
   filteredFlashcards: Flashcard[];

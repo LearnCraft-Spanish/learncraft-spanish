@@ -1,9 +1,9 @@
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
+import FlashcardFinderExampleListItem from '@interface/components/ExampleListItem/FlashcardFinderExampleListItem';
 import { act, fireEvent, render, screen } from '@testing-library/react';
-import { createMockFlashcard } from 'src/hexagon/testing/factories/flashcardFactory';
 
+import { createMockFlashcard } from '@testing/factories/flashcardFactory';
 import { vi } from 'vitest';
-import FlashcardFinderExampleListItem from './FlashcardFinderExampleListItem';
 
 const f = createMockFlashcard();
 

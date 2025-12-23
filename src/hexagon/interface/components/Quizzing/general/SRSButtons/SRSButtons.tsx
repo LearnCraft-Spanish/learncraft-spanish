@@ -1,12 +1,12 @@
+import type { SrsDifficulty } from '@domain/srs';
 import React, { useCallback } from 'react';
 import './SRSButtons.scss';
 
 interface SRSButtonsProps {
   answerShowing: boolean;
   incrementExampleNumber: () => void;
-  hasExampleBeenReviewed: 'easy' | 'hard' | null;
-  handleReviewExample: (difficulty: 'easy' | 'hard') => void;
-  isExampleReviewPending: boolean;
+  hasExampleBeenReviewed: SrsDifficulty | null;
+  handleReviewExample: (difficulty: SrsDifficulty) => void;
 }
 
 export function SRSButtons({
@@ -14,10 +14,9 @@ export function SRSButtons({
   handleReviewExample,
   answerShowing,
   incrementExampleNumber,
-  isExampleReviewPending,
 }: SRSButtonsProps) {
   const handleReviewAndIncrementExample = useCallback(
-    (difficulty: 'easy' | 'hard') => {
+    (difficulty: SrsDifficulty) => {
       incrementExampleNumber();
       handleReviewExample(difficulty);
     },
@@ -33,7 +32,7 @@ export function SRSButtons({
         event.key === ',' ||
         event.key === '<'
       ) {
-        handleReviewAndIncrementExample('hard');
+        handleReviewAndIncrementExample('hard' as SrsDifficulty);
       }
       if (
         event.key === 'e' ||
@@ -41,7 +40,7 @@ export function SRSButtons({
         event.key === '.' ||
         event.key === '>'
       ) {
-        handleReviewAndIncrementExample('easy');
+        handleReviewAndIncrementExample('easy' as SrsDifficulty);
       }
     },
     [handleReviewAndIncrementExample],
@@ -55,35 +54,62 @@ export function SRSButtons({
   }, [handleKeyPress]);
 
   return (
-    <div className="buttonBox srsButtons">
-      {answerShowing && !hasExampleBeenReviewed && !isExampleReviewPending && (
-        <>
-          <button
-            type="button"
-            className="redButton"
-            onClick={() => handleReviewAndIncrementExample('hard')}
-          >
-            This was hard
-          </button>
-          <button
-            type="button"
-            className="greenButton"
-            onClick={() => handleReviewAndIncrementExample('easy')}
-          >
-            This was easy
-          </button>
-        </>
+    <>
+      {hasExampleBeenReviewed && hasExampleBeenReviewed !== 'viewed' && (
+        <div className="buttonBox srsButtons">
+          {hasExampleBeenReviewed === 'hard' ? (
+            <button type="button" className="hardBanner">
+              Labeled: Hard
+            </button>
+          ) : (
+            <button type="button" className="easyBanner">
+              Labeled: Easy
+            </button>
+          )}
+        </div>
       )}
-      {(hasExampleBeenReviewed || isExampleReviewPending) &&
-        (hasExampleBeenReviewed === 'hard' ? (
-          <button type="button" className="hardBanner">
-            Labeled: Hard
-          </button>
-        ) : (
-          <button type="button" className="easyBanner">
-            Labeled: Easy
-          </button>
-        ))}
-    </div>
+      <div className="buttonBox srsButtons">
+        {answerShowing &&
+          (hasExampleBeenReviewed === 'viewed' || !hasExampleBeenReviewed) && (
+            <>
+              <button
+                type="button"
+                className="redButton"
+                onClick={() => handleReviewAndIncrementExample('hard')}
+              >
+                This was hard
+              </button>
+              <button
+                type="button"
+                className="greenButton"
+                onClick={() => handleReviewAndIncrementExample('easy')}
+              >
+                This was easy
+              </button>
+            </>
+          )}
+        {hasExampleBeenReviewed && hasExampleBeenReviewed !== 'viewed' && (
+          <>
+            <button
+              type="button"
+              className="greenButton"
+              disabled={hasExampleBeenReviewed === 'easy'}
+              onClick={() => handleReviewExample('easy')}
+            >
+              Update to easy
+            </button>
+
+            <button
+              type="button"
+              className="redButton"
+              disabled={hasExampleBeenReviewed === 'hard'}
+              onClick={() => handleReviewExample('hard')}
+            >
+              Update to hard
+            </button>
+          </>
+        )}
+      </div>
+    </>
   );
 }

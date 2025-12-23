@@ -1,1 +1,1 @@
-export { PasteTable } from './PasteTable';
+export { PasteTable } from '@interface/components/PasteTable/PasteTable';

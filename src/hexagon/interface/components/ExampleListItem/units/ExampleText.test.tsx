@@ -1,7 +1,7 @@
+import ExampleText from '@interface/components/ExampleListItem/units/ExampleText';
+import * as helpers from '@interface/components/ExampleListItem/units/helpers';
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import ExampleText from './ExampleText';
-import * as helpers from './helpers';
 
 // Mock the AudioControl component
 vi.mock('../../general', () => ({

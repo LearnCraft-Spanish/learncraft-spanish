@@ -1,6 +1,6 @@
 import type { VocabularyPaginationState } from '@application/useCases/types';
+import DeleteVocabularyRecord from '@interface/components/VocabularyTable/DeleteVocabularyRecord';
 import React from 'react';
-import DeleteVocabularyRecord from './DeleteVocabularyRecord';
 import './PaginatedVocabularyTable.scss';
 
 interface PaginatedVocabularyTableProps {

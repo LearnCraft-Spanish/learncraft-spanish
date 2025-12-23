@@ -1,3 +1,3 @@
-import ToggleSwitch from './ToggleSwitch';
+import ToggleSwitch from '@interface/components/general/ToggleSwitch/ToggleSwitch';
 
 export { ToggleSwitch };

@@ -1,1 +1,1 @@
-export { SRSButtons } from './SRSButtons';
+export { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons/SRSButtons';

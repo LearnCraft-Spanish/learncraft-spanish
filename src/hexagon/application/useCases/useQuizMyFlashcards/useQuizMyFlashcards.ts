@@ -1,5 +1,5 @@
+import type { AudioQuizProps } from '@application/units/AudioQuiz/useAudioQuiz';
 import type { UseCombinedFiltersWithVocabularyReturnType } from '@application/units/Filtering/useCombinedFiltersWithVocabulary';
-import type { AudioQuizProps } from '@application/units/useAudioQuiz';
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
 import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { UseTextQuizProps } from '@application/units/useTextQuiz';
@@ -9,10 +9,10 @@ import { useCombinedFiltersWithVocabulary } from '@application/units/Filtering/u
 import { useFilterOwnedFlashcards } from '@application/units/Filtering/useFilterOwnedFlashcards';
 import { useAudioQuizSetup } from '@application/units/useAudioQuizSetup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useTextQuizSetup } from '@application/units/useTextQuizSetup';
 import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useStudentFlashcards } from '../../units/useStudentFlashcards';
 
 export enum MyFlashcardsQuizType {
   Text = 'text',

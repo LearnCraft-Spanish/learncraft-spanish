@@ -13,11 +13,11 @@ import type {
   Vocabulary,
 } from '@learncraft-spanish/shared';
 import { useAudioAdapter } from '@application/adapters/audioAdapter';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useAudioQuizMapper } from '@application/units/useAudioQuizMapper';
+import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { AudioQuizStep, AudioQuizType } from '@domain/audioQuizzing';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useAuthAdapter } from '../adapters/authAdapter';
-import { useStudentFlashcards } from './useStudentFlashcards';
 
 export interface AudioQuizProps {
   examplesToQuiz: ExampleWithVocabulary[];
@@ -31,6 +31,7 @@ export interface AudioQuizReturn {
   autoplay: boolean;
   audioQuizType: AudioQuizType;
   currentExampleNumber: number;
+  currentExample: ExampleWithVocabulary | undefined;
   currentExampleReady: boolean;
   currentStep: AudioQuizStep;
   currentStepValue:
@@ -745,6 +746,7 @@ export function useAudioQuiz({
     audioQuizType,
     currentStep, // The current step of the quiz
     currentStepValue: currentStepValue ?? null, // Otherwise the current audio is still parsing
+    currentExample: currentExampleMemo, // The current example being quizzed
     currentExampleReady, // Whether the current example is ready to be played
     nextExampleReady, // Whether the next example is ready to be played
     previousExampleReady, // Whether the previous example is ready to be played

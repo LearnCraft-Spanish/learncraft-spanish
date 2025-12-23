@@ -1,18 +1,18 @@
-import type { UseExampleQueryReturnType } from '@application/queries/useExampleQuery';
+import type { UseExampleQueryReturnType } from '@application/queries/ExampleQueries/useExampleQuery';
 import type { UseCombinedFiltersReturnType } from '@application/units/Filtering/useCombinedFilters';
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
 import type { LessonPopup } from '@application/units/useLessonPopup';
+import type { UseSkillTagSearchReturnType } from '@application/units/useSkillTagSearch';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
-import type { UseSkillTagSearchReturnType } from '../../units/useSkillTagSearch';
-import { useExampleQuery } from '@application/queries/useExampleQuery';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
 import useQueryPagination from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';
+import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useEffect, useMemo, useRef } from 'react';
-import { useAuthAdapter } from '../../adapters/authAdapter';
-import { useSkillTagSearch } from '../../units/useSkillTagSearch';
 
 export interface UseFlashcardFinderReturnType {
   pagination: QueryPaginationState;

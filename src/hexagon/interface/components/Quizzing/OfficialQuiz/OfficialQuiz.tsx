@@ -1,8 +1,9 @@
 import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
+import { Loading } from '@interface/components/Loading';
+import { RegularTextQuiz } from '@interface/components/Quizzing/TextQuiz';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NotFoundPage from 'src/NotFoundPage';
-import { Loading } from '../../Loading';
-import { TextQuiz } from '../TextQuiz';
+
 export function OfficialQuiz() {
   // use useLocation
   const location = useLocation();
@@ -42,7 +43,7 @@ export function OfficialQuiz() {
   if (quizExamples) {
     return (
       <>
-        <TextQuiz
+        <RegularTextQuiz
           quizTitle={quizTitle}
           textQuizProps={{
             examples: quizExamples,

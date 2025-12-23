@@ -1,10 +1,10 @@
-import type { ClipboardEvent } from 'react';
 import type {
   TableColumn,
   TableHook,
   TableRow,
   ValidationState,
-} from './types';
+} from '@domain/PasteTable/General';
+import type { ClipboardEvent } from 'react';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Utility to create default columns for testing

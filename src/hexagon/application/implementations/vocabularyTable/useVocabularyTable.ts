@@ -1,8 +1,11 @@
-import type { TableHook } from '@application/units/pasteTable';
+import type { TableHook } from '@domain/PasteTable/General';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
+import {
+  SCHEMA_FIELD_CONFIG,
+  VOCABULARY_COLUMNS,
+} from '@application/implementations/vocabularyTable/constants';
 import { usePasteTable } from '@application/units/pasteTable';
 import { validateCreateNonVerbVocabulary } from '@learncraft-spanish/shared';
-import { SCHEMA_FIELD_CONFIG, VOCABULARY_COLUMNS } from './constants';
 
 /**
  * Custom hook for managing vocabulary data in a table format.

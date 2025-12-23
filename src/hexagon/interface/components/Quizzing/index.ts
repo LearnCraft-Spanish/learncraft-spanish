@@ -1,3 +1,3 @@
-export * from './general';
-export * from './OfficialQuiz';
-export * from './TextQuiz';
+export * from '@interface/components/Quizzing/general';
+export * from '@interface/components/Quizzing/OfficialQuiz';
+export * from '@interface/components/Quizzing/TextQuiz';

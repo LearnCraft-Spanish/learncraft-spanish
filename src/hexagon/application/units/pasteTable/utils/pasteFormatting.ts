@@ -1,8 +1,5 @@
-import type {
-  TableColumn,
-  TableRow,
-} from '@application/units/pasteTable/types';
-import { generateRowId } from './rowCreation';
+import type { TableColumn, TableRow } from '@domain/PasteTable/General';
+import { generateRowId } from '@application/units/pasteTable/utils/rowCreation';
 
 /**
  * Parse tab-separated values into a 2D array

@@ -1,9 +1,9 @@
-import type { TableHook } from '@application/units/pasteTable/types';
+import type { VocabularyPaginationState } from '@application/useCases/types';
+import type { TableHook } from '@domain/PasteTable/General';
 import type {
   CreateNonVerbVocabulary,
   Subcategory,
 } from '@learncraft-spanish/shared';
-import type { VocabularyPaginationState } from '../types';
 
 export interface UseNonVerbCreationResult {
   // Subcategory selection

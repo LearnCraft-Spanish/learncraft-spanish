@@ -1,10 +1,10 @@
 import { AudioQuizStep } from '@domain/audioQuizzing';
+import AudioFlashcardComponent from '@interface/components/Quizzing/AudioQuiz/AudioFlashcard';
 import { cleanup, render, screen } from '@testing-library/react';
-import MockAllProviders from 'mocks/Providers/MockAllProviders';
 
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import AudioFlashcardComponent from './AudioFlashcard';
 
 const incrementCurrentStep = vi.fn(() => {});
 const pausePlayback = vi.fn(() => {});

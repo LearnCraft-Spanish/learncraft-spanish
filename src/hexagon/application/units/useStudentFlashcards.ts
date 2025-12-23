@@ -1,13 +1,13 @@
+import type { SrsDifficulty } from '@domain/srs';
 import type {
   ExampleWithVocabulary,
   Flashcard,
   UpdateFlashcardIntervalCommand,
 } from '@learncraft-spanish/shared';
-import type { SrsDifficulty } from 'src/hexagon/domain/srs';
 import { useFlashcardsQuery } from '@application/queries/useFlashcardsQuery';
+import { fisherYatesShuffle } from '@domain/functions/fisherYatesShuffle';
+import { calculateNewSrsInterval } from '@domain/srs';
 import { useCallback, useMemo } from 'react';
-import { fisherYatesShuffle } from 'src/hexagon/domain/functions/fisherYatesShuffle';
-import { calculateNewSrsInterval } from 'src/hexagon/domain/srs';
 
 export interface UseStudentFlashcardsReturn {
   flashcards: Flashcard[] | undefined;
@@ -44,6 +44,11 @@ export interface UseStudentFlashcardsReturn {
     exampleId: number,
     difficulty: SrsDifficulty,
   ) => Promise<number>;
+  getFlashcardByExampleId: ({
+    exampleId,
+  }: {
+    exampleId: number;
+  }) => Flashcard | undefined;
 }
 
 export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
@@ -215,12 +220,25 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
 
       // Update the flashcard with the new interval
       await updateFlashcards([
-        { flashcardId: flashcard.id, interval: newInterval },
+        {
+          flashcardId: flashcard.id,
+          interval: newInterval,
+          lastReviewedDate: new Date().toISOString().slice(0, 10), // YYYY-MM-DD UTC format
+        },
       ]);
 
       return newInterval;
     },
     [flashcards, updateFlashcards],
+  );
+
+  const getFlashcardByExampleId = useCallback(
+    ({ exampleId }: { exampleId: number }) => {
+      return flashcards?.find(
+        (flashcard) => flashcard.example.id === exampleId,
+      );
+    },
+    [flashcards],
   );
 
   return {
@@ -243,5 +261,7 @@ export const useStudentFlashcards = (): UseStudentFlashcardsReturn => {
     updateFlashcardInterval,
     isCustomFlashcard,
     isPendingFlashcard,
+
+    getFlashcardByExampleId,
   };
 };

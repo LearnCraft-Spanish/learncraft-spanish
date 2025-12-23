@@ -1,7 +1,7 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useCourseAdapter } from '@application/adapters/courseAdapter';
+import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useQuery } from '@tanstack/react-query';
-import { useActiveStudent } from '../coordinators/hooks/useActiveStudent';
 
 export function useCoursesWithLessons() {
   const adapter = useCourseAdapter();

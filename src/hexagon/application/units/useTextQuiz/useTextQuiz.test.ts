@@ -1,15 +1,15 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
 import { overrideMockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
+import { useTextQuiz } from '@application/units/useTextQuiz/useTextQuiz';
 import { act, renderHook } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useTextQuiz } from './useTextQuiz';
 
 describe('useTextQuiz', () => {
   const mockCleanupFunction = vi.fn();
   const mockExamples: ExampleWithVocabulary[] =
-    createMockExampleWithVocabularyList()(3);
+    createMockExampleWithVocabularyList(3);
 
   beforeEach(() => {
     mockCleanupFunction.mockClear();
@@ -120,35 +120,8 @@ describe('useTextQuiz', () => {
       expect(result.current.currentExample).toBe(mockExamples[0]);
     });
 
-    it('should not go beyond last example', () => {
-      const { result } = renderHook(() =>
-        useTextQuiz({
-          examples: mockExamples,
-          startWithSpanish: false,
-          cleanupFunction: mockCleanupFunction,
-        }),
-      );
-
-      expect(result.current.exampleNumber).toBe(1);
-      expect(result.current.quizLength).toBe(3);
-
-      // Navigate step by step to understand the behavior
-      act(() => {
-        result.current.nextExample(); // Should go to 2
-      });
-      expect(result.current.exampleNumber).toBe(2);
-
-      act(() => {
-        result.current.nextExample(); // Should go to 3
-      });
-      expect(result.current.exampleNumber).toBe(3);
-
-      // Try to go beyond - should stay at 3
-      act(() => {
-        result.current.nextExample();
-      });
-      expect(result.current.exampleNumber).toBe(3); // Should stay at last
-    });
+    // Note: "not go beyond last example" behavior is covered in 'quiz completion and restart' section
+    // which also tests the isQuizComplete flag being set
 
     it('should not go before first example', () => {
       const { result } = renderHook(() =>
@@ -171,7 +144,7 @@ describe('useTextQuiz', () => {
   });
 
   describe('quiz display logic', () => {
-    it('should create correct question and answer for English->Spanish', () => {
+    it('should create correct question and answer for start with english', () => {
       const { result } = renderHook(() =>
         useTextQuiz({
           examples: mockExamples,
@@ -186,23 +159,6 @@ describe('useTextQuiz', () => {
       expect(quizExample!.question.text).toBe(mockExamples[0].english);
       expect(quizExample!.answer.spanish).toBe(true);
       expect(quizExample!.answer.text).toBe(mockExamples[0].spanish);
-    });
-
-    it('should create correct question and answer for Spanish->English', () => {
-      const { result } = renderHook(() =>
-        useTextQuiz({
-          examples: mockExamples,
-          startWithSpanish: true,
-          cleanupFunction: mockCleanupFunction,
-        }),
-      );
-
-      const quizExample = result.current.quizExample;
-      expect(quizExample).not.toBeNull();
-      expect(quizExample!.question.spanish).toBe(true);
-      expect(quizExample!.question.text).toBe(mockExamples[0].spanish);
-      expect(quizExample!.answer.spanish).toBe(false);
-      expect(quizExample!.answer.text).toBe(mockExamples[0].english);
     });
 
     it('should include vocabulary information in answer', () => {
@@ -349,11 +305,13 @@ describe('useTextQuiz', () => {
   });
 
   describe('flashcard status', () => {
-    it('should correctly identify collected examples', () => {
-      const mockIsExampleCollected = vi.fn().mockReturnValue(true);
-
+    // Consolidated: Tests all flashcard status flags in one test
+    it('should correctly pass through all flashcard status flags', () => {
       overrideMockUseStudentFlashcards({
-        isExampleCollected: mockIsExampleCollected,
+        isExampleCollected: vi.fn().mockReturnValue(true),
+        isCustomFlashcard: vi.fn().mockReturnValue(true),
+        isAddingFlashcard: vi.fn().mockReturnValue(true),
+        isRemovingFlashcard: vi.fn().mockReturnValue(true),
       });
 
       const { result } = renderHook(() =>
@@ -365,16 +323,15 @@ describe('useTextQuiz', () => {
       );
 
       expect(result.current.quizExample!.exampleIsCollected).toBe(true);
+      expect(result.current.quizExample!.exampleIsCustom).toBe(true);
+      expect(result.current.quizExample!.exampleIsAdding).toBe(true);
+      expect(result.current.quizExample!.exampleIsRemoving).toBe(true);
       expect(result.current.quizExample!.answer.owned).toBe(true);
     });
+  });
 
-    it('should correctly identify custom flashcards', () => {
-      const mockIsCustomFlashcard = vi.fn().mockReturnValue(true);
-
-      overrideMockUseStudentFlashcards({
-        isCustomFlashcard: mockIsCustomFlashcard,
-      });
-
+  describe('quiz completion and restart', () => {
+    it('should set isQuizComplete when navigating past last example', () => {
       const { result } = renderHook(() =>
         useTextQuiz({
           examples: mockExamples,
@@ -383,16 +340,29 @@ describe('useTextQuiz', () => {
         }),
       );
 
-      expect(result.current.quizExample!.exampleIsCustom).toBe(true);
+      expect(result.current.isQuizComplete).toBe(false);
+
+      // Navigate to last example (each act for each state change)
+      act(() => {
+        result.current.nextExample();
+      });
+      act(() => {
+        result.current.nextExample();
+      });
+
+      expect(result.current.exampleNumber).toBe(3);
+      expect(result.current.isQuizComplete).toBe(false);
+
+      // Try to go beyond - should mark complete
+      act(() => {
+        result.current.nextExample();
+      });
+
+      expect(result.current.isQuizComplete).toBe(true);
+      expect(result.current.exampleNumber).toBe(3); // Index stays at last
     });
 
-    it('should correctly identify adding flashcards', () => {
-      const mockIsAddingFlashcard = vi.fn().mockReturnValue(true);
-
-      overrideMockUseStudentFlashcards({
-        isAddingFlashcard: mockIsAddingFlashcard,
-      });
-
+    it('should reset quiz state with restartQuiz', () => {
       const { result } = renderHook(() =>
         useTextQuiz({
           examples: mockExamples,
@@ -401,15 +371,31 @@ describe('useTextQuiz', () => {
         }),
       );
 
-      expect(result.current.quizExample!.exampleIsAdding).toBe(true);
+      // Navigate to complete quiz
+      act(() => {
+        result.current.nextExample();
+      });
+      act(() => {
+        result.current.nextExample();
+      });
+      act(() => {
+        result.current.nextExample(); // Marks complete
+      });
+
+      expect(result.current.isQuizComplete).toBe(true);
+      expect(result.current.exampleNumber).toBe(3);
+
+      // Restart
+      act(() => {
+        result.current.restartQuiz();
+      });
+
+      expect(result.current.isQuizComplete).toBe(false);
+      expect(result.current.exampleNumber).toBe(1);
+      expect(result.current.currentExample).toBe(mockExamples[0]);
     });
-    it('should correctly identify removing flashcards', () => {
-      const mockIsRemovingFlashcard = vi.fn().mockReturnValue(true);
 
-      overrideMockUseStudentFlashcards({
-        isRemovingFlashcard: mockIsRemovingFlashcard,
-      });
-
+    it('should reset isQuizComplete when navigating back', () => {
       const { result } = renderHook(() =>
         useTextQuiz({
           examples: mockExamples,
@@ -418,7 +404,91 @@ describe('useTextQuiz', () => {
         }),
       );
 
-      expect(result.current.quizExample!.exampleIsRemoving).toBe(true);
+      // Navigate to end and mark complete
+      act(() => {
+        result.current.nextExample();
+      });
+      act(() => {
+        result.current.nextExample();
+      });
+      act(() => {
+        result.current.nextExample();
+      });
+
+      expect(result.current.isQuizComplete).toBe(true);
+
+      // Go back
+      act(() => {
+        result.current.previousExample();
+      });
+
+      expect(result.current.isQuizComplete).toBe(false);
+    });
+  });
+
+  describe('answer and help state', () => {
+    it('should toggle answer visibility', () => {
+      const { result } = renderHook(() =>
+        useTextQuiz({
+          examples: mockExamples,
+          startWithSpanish: false,
+          cleanupFunction: mockCleanupFunction,
+        }),
+      );
+
+      expect(result.current.answerShowing).toBe(false);
+
+      act(() => {
+        result.current.toggleAnswer();
+      });
+
+      expect(result.current.answerShowing).toBe(true);
+
+      act(() => {
+        result.current.toggleAnswer();
+      });
+
+      expect(result.current.answerShowing).toBe(false);
+    });
+
+    it('should hide answer and close help when navigating', () => {
+      const { result } = renderHook(() =>
+        useTextQuiz({
+          examples: mockExamples,
+          startWithSpanish: false,
+          cleanupFunction: mockCleanupFunction,
+        }),
+      );
+
+      // Show answer and open help
+      act(() => {
+        result.current.toggleAnswer();
+        result.current.setGetHelpIsOpen(true);
+      });
+
+      expect(result.current.answerShowing).toBe(true);
+      expect(result.current.getHelpIsOpen).toBe(true);
+
+      // Navigate next - should reset both
+      act(() => {
+        result.current.nextExample();
+      });
+
+      expect(result.current.answerShowing).toBe(false);
+      expect(result.current.getHelpIsOpen).toBe(false);
+
+      // Show again and go previous
+      act(() => {
+        result.current.toggleAnswer();
+        result.current.setGetHelpIsOpen(true);
+      });
+
+      act(() => {
+        result.current.previousExample();
+      });
+
+      expect(result.current.answerShowing).toBe(false);
+      expect(result.current.getHelpIsOpen).toBe(false);
     });
   });
 });

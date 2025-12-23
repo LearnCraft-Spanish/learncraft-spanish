@@ -1,23 +1,13 @@
-import mockSelectedCourseAndLessons from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
 
-import mockUseSpellingsKnownForLesson, {
-  overrideMockUseSpellingsKnownForLesson,
-} from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
+import { overrideMockUseSpellingsKnownForLesson } from '@application/queries/useSpellingsKnownForLesson/useSpellingsKnownForLesson.mock';
+import useFrequensay from '@application/useCases/useFrequensay/useFrequensay';
 import { renderHook, waitFor } from '@testing-library/react';
-import { createMockSpellingsData } from 'src/hexagon/testing/factories/spellingsFactory';
-import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
-import { vi } from 'vitest';
+import { createMockSpellingsData } from '@testing/factories/spellingsFactory';
 
-import useFrequensay from './useFrequensay';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 
-vi.mock('@application/queries/useSpellingsKnownForLesson/', () => ({
-  useSpellingsKnownForLesson: () => mockUseSpellingsKnownForLesson,
-}));
-vi.mock('@application/coordinators/hooks/useSelectedCourseAndLessons', () => ({
-  useSelectedCourseAndLessons: () => mockSelectedCourseAndLessons,
-}));
-
+// We dont need to reset mockUseSpellingsKnownForLesson as it is reset by the setupTests.js file
 describe('useFrequensay', () => {
   it('should render with default state', async () => {
     const { result } = renderHook(() => useFrequensay(), {

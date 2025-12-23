@@ -1,4 +1,4 @@
-import { createTypedMock } from './typedMock';
+import { createTypedMock } from '@testing/utils/typedMock';
 
 describe('createTypedMock', () => {
   it('should create a typed mock function', () => {

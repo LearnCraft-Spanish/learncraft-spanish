@@ -28,6 +28,7 @@ function generateMembership({
     relatedStudent: relatedStudentId,
     assignmentsCompleted: 0,
     callsCompleted: 0,
+    totalStrategyCalls: 0,
     primaryCoach: 0,
   };
   return membership;

@@ -1,5 +1,2 @@
-// Export the hook's types
-export type * from './types';
-
 // Re-export the main hook
-export * from './usePasteTable';
+export * from '@application/units/pasteTable/usePasteTable';

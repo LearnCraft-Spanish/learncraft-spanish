@@ -1,5 +1,5 @@
+import type { TableColumn, TableRow } from '@domain/PasteTable/General';
 import type { ClipboardEvent } from 'react';
-import type { TableColumn, TableRow } from '../types';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Define the hook result interface

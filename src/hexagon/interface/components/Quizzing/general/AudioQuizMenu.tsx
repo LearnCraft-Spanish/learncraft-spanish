@@ -1,10 +1,10 @@
 import type { AudioQuizSetupReturn } from '@application/units/useAudioQuizSetup';
+import { AudioQuizType } from '@domain/audioQuizzing';
+
 import { ToggleSwitch } from '@interface/components/general';
 
+import { InlineLoading } from '@interface/components/Loading';
 import React from 'react';
-
-import { AudioQuizType } from 'src/hexagon/domain/audioQuizzing';
-import { InlineLoading } from '../../Loading';
 
 import './QuizSetupMenu.scss';
 import '@interface/styles/QuizSetupMenu.scss';

@@ -1,5 +1,5 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
-
+import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcardUpdatesOnLoad';
 import { Loading } from '@interface/components/Loading';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
@@ -15,6 +15,9 @@ export const App: React.FC = () => {
   // React Router hooks
   const location = useLocation();
   const { isAuthenticated, isLoading } = useAuthAdapter();
+
+  // Auto-flush any pending SRS updates from localStorage on app load
+  useFlushFlashcardUpdatesOnLoad();
 
   return (
     <div className="App">

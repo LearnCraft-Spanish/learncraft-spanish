@@ -1,7 +1,7 @@
 import type { OfficialQuizPort } from '@application/ports/officialQuizPort';
+import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { config } from '@config';
 import { createOfficialQuizInfrastructure } from '@infrastructure/officialQuizInfrastructure';
-import { config } from 'src/hexagon/config';
-import { useAuthAdapter } from './authAdapter';
 
 export function useOfficialQuizAdapter(): OfficialQuizPort {
   const apiUrl = config.backendDomain;

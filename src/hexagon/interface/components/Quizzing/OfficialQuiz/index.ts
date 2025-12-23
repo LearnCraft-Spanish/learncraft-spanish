@@ -1,1 +1,1 @@
-export { OfficialQuiz } from './OfficialQuiz';
+export { OfficialQuiz } from '@interface/components/Quizzing/OfficialQuiz/OfficialQuiz';

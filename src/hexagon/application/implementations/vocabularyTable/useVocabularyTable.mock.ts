@@ -2,11 +2,11 @@ import type {
   TableHook,
   TableRow,
   ValidationState,
-} from '@application/units/pasteTable/types';
+} from '@domain/PasteTable/General';
 import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
 import type { ClipboardEvent } from 'react';
+import { VOCABULARY_COLUMNS } from '@application/implementations/vocabularyTable/constants';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
-import { VOCABULARY_COLUMNS } from './constants';
 
 // Default row for testing
 const defaultRow: TableRow = {

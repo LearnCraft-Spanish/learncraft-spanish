@@ -5,13 +5,13 @@ import {
 import { CloseableFilterPanel } from '@interface/components/Filters';
 import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
+import { AudioQuizMenu, MyTextQuizMenu } from '@interface/components/Quizzing';
+import { ReviewMyFlashcardsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/ReviewMyFlashcardsAudioQuiz';
+import { TemporaryUpdateNotification } from '@interface/components/Quizzing/TemporaryUpdateNotification';
 import {
-  AudioQuizMenu,
-  MyTextQuizMenu,
-  SrsQuiz,
-  TextQuiz,
-} from '@interface/components/Quizzing';
-import AudioQuiz from '@interface/components/Quizzing/AudioQuiz/AudioQuiz';
+  ReviewMyFlashcardsTextQuiz,
+  SrsTextQuiz,
+} from '@interface/components/Quizzing/TextQuiz';
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
@@ -89,6 +89,7 @@ export default function MyFlashcardsQuiz() {
     <div>
       {!quizReady ? (
         <>
+          <TemporaryUpdateNotification />
           <h2>Review My Flashcards</h2>
           <CloseableFilterPanel
             isOpen={filterOwnedFlashcards}
@@ -131,10 +132,10 @@ export default function MyFlashcardsQuiz() {
                       Flashcard Quizzing Settings
                     </h3>
                     <p>
-                      SRS Quiz: SRS is a study technique that stands for Spaced
-                      Repetition System. It is a technique that helps you
-                      remember information by repeating it over time at
-                      increasing intervals.
+                      SRS Quiz: Turn this on to use our “spaced repetition
+                      system”. Then you’ll only see the flashcards you currently
+                      need the most help with. (Make sure to click “this was
+                      hard” or “this was easy” while you review!)
                     </p>
                   </Tooltip>
                   <a
@@ -201,12 +202,12 @@ export default function MyFlashcardsQuiz() {
         </>
       ) : quizType === MyFlashcardsQuizType.Text ? (
         textQuizSetup.srsQuiz ? (
-          <SrsQuiz textQuizProps={textQuizProps} />
+          <SrsTextQuiz textQuizProps={textQuizProps} />
         ) : (
-          <TextQuiz textQuizProps={textQuizProps} />
+          <ReviewMyFlashcardsTextQuiz textQuizProps={textQuizProps} />
         )
       ) : (
-        <AudioQuiz audioQuizProps={audioQuizProps} />
+        <ReviewMyFlashcardsAudioQuiz audioQuizProps={audioQuizProps} />
       )}
     </div>
   );

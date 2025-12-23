@@ -1,6 +1,6 @@
+import AddPendingRemove from '@interface/components/ExampleListItem/units/AddPendingRemove';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import AddPendingRemove from './AddPendingRemove';
 
 const mockProps = {
   isCollected: false,

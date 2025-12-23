@@ -1,10 +1,10 @@
+import type { LessonPopup } from '@application/units/useLessonPopup';
 import type {
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
-import type { LessonPopup } from 'src/hexagon/application/units/useLessonPopup';
+import VocabTagContainer from '@interface/components/VocabTagDetails/VocabTagContainer';
 import { useState } from 'react';
-import VocabTagContainer from '../../VocabTagDetails';
 
 export default function MoreInfoViewExample({
   example,

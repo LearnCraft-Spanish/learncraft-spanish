@@ -1,14 +1,16 @@
-import type { AudioQuizProps } from '@application/units/useAudioQuiz';
-import { useAudioQuiz } from '@application/units/useAudioQuiz';
+import type { AudioQuizReturn } from '@application/units/AudioQuiz/useAudioQuiz';
 import { AudioQuizType } from '@domain/audioQuizzing';
+import { Loading } from '@interface/components/Loading';
+import AudioFlashcard from '@interface/components/Quizzing/AudioQuiz/AudioFlashcard';
+import AudioQuizButtons from '@interface/components/Quizzing/AudioQuiz/AudioQuizButtons';
+import AudioQuizEnd from '@interface/components/Quizzing/general/AudioQuizEnd';
 import { QuizProgress } from '@interface/components/Quizzing/general/QuizProgress';
 import React, { useCallback, useEffect } from 'react';
-import { Loading } from '../../Loading';
-import AudioQuizEnd from '../general/AudioQuizEnd';
-import AudioFlashcard from './AudioFlashcard';
-import AudioQuizButtons from './AudioQuizButtons';
+
+// TO DO: Remove duplicate styles.
 import 'src/App.css';
-import '../AudioQuiz/AudioBasedReview.css';
+
+import './AudioBasedReview.css';
 
 /**
  * Audio Quiz UI Component
@@ -57,10 +59,17 @@ import '../AudioQuiz/AudioBasedReview.css';
  * - Continues quiz with available examples
  * - Clear error messaging for users
  */
+
+/**
+ * AudioQuiz component
+ * Note: This is the base level AudioQuiz. It should not be used directly. Instead, use the RegularAudioQuiz, ReviewMyFlashcardsAudioQuiz, or SrsAudioQuiz components.
+ * @param props - props
+ * @param props.audioQuizReturn - The return object from the useAudioQuiz hook
+ */
 export default function AudioQuiz({
-  audioQuizProps,
+  audioQuizReturn,
 }: {
-  audioQuizProps: AudioQuizProps;
+  audioQuizReturn: AudioQuizReturn;
 }) {
   // Destructure the hook return
   const {
@@ -92,7 +101,7 @@ export default function AudioQuiz({
     vocabulary,
 
     addPendingRemoveProps,
-  } = useAudioQuiz(audioQuizProps);
+  } = audioQuizReturn;
 
   /*    Keyboard Controls       */
   const handleKeyPress = useCallback(

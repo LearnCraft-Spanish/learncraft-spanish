@@ -1,6 +1,6 @@
-import type { TempIdContextType } from '../contexts/TempIdContext';
+import type { TempIdContextType } from '@application/coordinators/contexts/TempIdContext';
+import TempIdContext from '@application/coordinators/contexts/TempIdContext';
 import { useCallback, useMemo, useRef } from 'react';
-import TempIdContext from '../contexts/TempIdContext';
 
 export default function TempIdContextProvider({
   children,

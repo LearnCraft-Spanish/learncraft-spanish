@@ -2,9 +2,9 @@ import type {
   TableColumn,
   TableRow as TableRowType,
   ValidationState,
-} from '@application/units/pasteTable/types';
+} from '@domain/PasteTable/General';
+import { TableCellInput } from '@interface/components/PasteTable/TableCell';
 import React from 'react';
-import { TableCellInput } from './TableCell';
 
 export interface TableRowProps {
   row: TableRowType;
@@ -40,8 +40,8 @@ export function TableRow({
   return (
     <div className="paste-table__row" role="row" aria-rowindex={rowIndex}>
       {columns.map((column, colIndex) => {
-        const columnKey = column.id;
-        const cellKey = `${row.id}-${columnKey}`;
+        // const columnKey = column.id;
+        const cellKey = `${row.id}-${column.id}`;
         const cellValue = row.cells[column.id] || '';
         const errorMessage = rowErrors[column.id];
         const isActive =
@@ -60,9 +60,7 @@ export function TableRow({
         return (
           <div
             key={cellKey}
-            className={`paste-table__cell-container ${
-              isActive ? 'paste-table__cell-container--active' : ''
-            }`}
+            className={`paste-table__cell-container ${isActive ? 'paste-table__cell-container--active' : ''}`}
             role="gridcell"
             aria-colindex={colIndex + 1}
             aria-selected={isActive || undefined}
@@ -76,7 +74,7 @@ export function TableRow({
               cellRef={(el) => registerCellRef(cellKey, el)}
             />
 
-            {errorMessage && (
+            {errorMessage && isActive && (
               <div className="paste-table__cell-error">{errorMessage}</div>
             )}
           </div>

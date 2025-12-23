@@ -1,6 +1,6 @@
+import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
 import { render, screen } from '@testing-library/react';
 import { createMockFlashcard } from '@testing/factories/flashcardFactory';
-import ExampleListItemFactory from './ExampleListItemFactory';
 
 const f = createMockFlashcard();
 

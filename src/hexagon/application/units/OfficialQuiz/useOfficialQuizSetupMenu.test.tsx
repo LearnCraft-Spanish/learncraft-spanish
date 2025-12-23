@@ -1,19 +1,20 @@
-import { officialQuizCourses } from '@learncraft-spanish/shared';
+import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
 
-import { renderHook, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { createMockOfficialQuizRecord } from 'src/hexagon/testing/factories/quizFactory';
-import { TestQueryClientProvider } from 'src/hexagon/testing/providers/TestQueryClientProvider';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { overrideMockOfficialQuizAdapter } from '../../adapters/officialQuizAdapter.mock';
-import { overrideMockActiveStudent } from '../../coordinators/hooks/useActiveStudent.mock';
-import mockSelectedCourseAndLessons, {
+import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
+import {
+  mockSelectedCourseAndLessons,
   overrideMockSelectedCourseAndLessons,
-} from '../../coordinators/hooks/useSelectedCourseAndLessons.mock';
+} from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import {
   getCourseCodeFromName,
   useOfficialQuizSetupMenu,
-} from './useOfficialQuizSetupMenu';
+} from '@application/units/OfficialQuiz/useOfficialQuizSetupMenu';
+import { officialQuizCourses } from '@learncraft-spanish/shared';
+import { renderHook, waitFor } from '@testing-library/react';
+import { createMockOfficialQuizRecord } from '@testing/factories/quizFactory';
+import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
+import { MemoryRouter } from 'react-router-dom';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock react-router-dom
 const mockNavigate = vi.fn();
@@ -188,7 +189,9 @@ describe('useOfficialQuizSetupMenu', () => {
     );
 
     beforeEach(() => {
-      mockSelectedCourseAndLessons.updateUserSelectedCourseId.mockClear();
+      overrideMockSelectedCourseAndLessons({
+        updateUserSelectedCourseId: vi.fn(),
+      });
     });
 
     it('converts lcspx to lcsp, updates coordinator', async () => {

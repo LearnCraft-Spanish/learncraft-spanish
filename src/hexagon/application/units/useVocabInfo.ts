@@ -4,7 +4,7 @@ import type {
   Verb,
   Vocabulary,
 } from '@learncraft-spanish/shared';
-import { useLessonsByVocabulary } from '../queries/useLessonsByVocab';
+import { useLessonsByVocabulary } from '@application/queries/useLessonsByVocab';
 
 export interface VocabInfo {
   word: string;
