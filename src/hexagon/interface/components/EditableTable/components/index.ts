@@ -1,4 +1,3 @@
-export { EditableTableFooter } from './EditableTableFooter';
-export { EditableTableHeader } from './EditableTableHeader';
-export { EditableTableRow } from './EditableTableRow';
-
+export { EditableTableFooter } from '@interface/components/EditableTable/components/EditableTableFooter';
+export { EditableTableHeader } from '@interface/components/EditableTable/components/EditableTableHeader';
+export { EditableTableRow } from '@interface/components/EditableTable/components/EditableTableRow';
