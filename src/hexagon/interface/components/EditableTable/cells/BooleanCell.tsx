@@ -15,7 +15,7 @@ export function BooleanCell({
   cellRef,
 }: CellRenderProps) {
   const cellKey = `${row.id}-${column.id}`;
-  const format = column.booleanFormat || 'auto';
+  const format = column.booleanFormat || undefined;
 
   // Auto format: use ToggleSwitch
   if (format === 'auto') {
