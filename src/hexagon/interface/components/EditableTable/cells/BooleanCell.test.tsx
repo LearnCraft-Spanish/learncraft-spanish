@@ -145,7 +145,7 @@ describe('booleanCell', () => {
       expect(input).toBeInTheDocument();
     });
 
-    it('should render a text input when booleanFormat is undefined', () => {
+    it('should render a checkbox input when booleanFormat is undefined', () => {
       const props = createMockProps({
         column: {
           id: 'test-column',
@@ -155,7 +155,7 @@ describe('booleanCell', () => {
 
       render(<BooleanCell {...props} />);
 
-      const input = screen.getByRole('textbox');
+      const input = screen.getAllByRole('checkbox')[0];
       expect(input).toBeInTheDocument();
     });
 

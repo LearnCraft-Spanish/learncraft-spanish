@@ -74,7 +74,7 @@ export function useExampleSearch() {
   const trimmedEnglishInput = englishInput.trim();
   const trimmedIdsInput = idsInput.trim();
   const parsedIds = trimmedIdsInput
-    .split(',')
+    .split(/[\t\n\r, ]/)
     .map((val) => Number(val.trim()))
     .filter((val) => val > 0 && !Number.isNaN(val));
 
