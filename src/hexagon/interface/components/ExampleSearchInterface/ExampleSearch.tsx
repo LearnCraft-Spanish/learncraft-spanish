@@ -39,11 +39,6 @@ export default function ExampleSearch({
 
       {!searchIsTriggered && (
         <>
-          {!isValidSearch && (
-            <div className="notValidSearchError">
-              {nonValidSearchErrorMessage}
-            </div>
-          )}
           <button
             type="button"
             className="searchButton"
@@ -52,6 +47,11 @@ export default function ExampleSearch({
           >
             Search
           </button>
+          {!isValidSearch && (
+            <div className="notValidSearchError">
+              {nonValidSearchErrorMessage}
+            </div>
+          )}
         </>
       )}
       <div style={{ marginTop: '1rem' }}>

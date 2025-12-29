@@ -21,10 +21,11 @@ const exampleDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'spanish', label: 'Spanish', width: '2fr' },
   { id: 'english', label: 'English', width: '2fr' },
   { id: 'hasAudio', label: 'Audio', width: '80px' },
-  { id: 'spanishAudio', label: 'Spanish Audio', width: '100px' },
-  { id: 'englishAudio', label: 'English Audio', width: '100px' },
+  { id: 'spanishAudio', label: 'Spanish Audio', width: '80px' },
+  { id: 'englishAudio', label: 'English Audio', width: '80px' },
   { id: 'spanglish', label: 'Spanglish', width: '100px' },
-  { id: 'vocabularyComplete', label: 'Vocab Complete', width: '120px' },
+  { id: 'vocabularyComplete', label: 'Vocab Complete', width: '100px' },
+  { id: 'relatedVocabulary', label: 'Related Vocabulary', width: '2fr' },
 ];
 
 export function ExampleEditor() {

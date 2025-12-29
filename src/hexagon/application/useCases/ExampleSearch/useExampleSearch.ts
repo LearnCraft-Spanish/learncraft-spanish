@@ -32,7 +32,7 @@ export interface SearchResultProps {
 
 export function useExampleSearch() {
   // Mode state
-  const [mode, setMode] = useState<ExampleSearchMode>('filter');
+  const [mode, setMode] = useState<ExampleSearchMode>('ids');
   const [searchIsTriggered, setSearchIsTriggered] = useState(false);
   const [nonValidSearchErrorMessage, setNonValidSearchErrorMessage] =
     useState('');
