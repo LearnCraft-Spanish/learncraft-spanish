@@ -4,6 +4,21 @@
  */
 
 /**
+ * Normalizes any caught error value to ensure it's always an Error instance.
+ * Use this in catch blocks to handle cases where non-Error values might be thrown.
+ *
+ * JavaScript allows throwing any value (strings, objects, etc.), and TypeScript
+ * catch blocks have type 'unknown'. This function ensures type safety and consistent
+ * error handling by always returning an Error instance.
+ *
+ * @param error The unknown error value from a catch block
+ * @returns A proper Error object (never null)
+ */
+export function normalizeError(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error));
+}
+
+/**
  * Normalizes a TanStack Query error to ensure it's always an Error instance.
  * This provides a consistent error interface for consumers.
  *
@@ -13,7 +28,7 @@
 export function normalizeQueryError(error: unknown): Error | null {
   if (!error) return null;
 
-  return error instanceof Error ? error : new Error(String(error));
+  return normalizeError(error);
 }
 
 /**

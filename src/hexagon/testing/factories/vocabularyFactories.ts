@@ -2,7 +2,6 @@
 import {
   CreateNonVerbVocabularySchema,
   CreateVerbSchema,
-  VocabularyAbbreviationSchema,
   VocabularyRelatedRecordsSchema,
   VocabularySchema,
 } from '@learncraft-spanish/shared';
@@ -13,12 +12,6 @@ import {
 
 export const createMockVocabulary = createZodFactory(VocabularySchema);
 export const createMockVocabularyList = createZodListFactory(VocabularySchema);
-export const createMockVocabularyAbbreviation = createZodFactory(
-  VocabularyAbbreviationSchema,
-);
-export const createMockVocabularyAbbreviationList = createZodListFactory(
-  VocabularyAbbreviationSchema,
-);
 
 export const createMockCreateNonVerbVocabulary = createZodFactory(
   CreateNonVerbVocabularySchema,

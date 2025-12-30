@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ActiveStudentProvider } from '@application/coordinators/providers/ActiveStudentProvider';
 import { IsFlushingStudentFlashcardUpdatesProvider } from '@application/coordinators/providers/IsFlushingStudentFlashcardUpdatesProvider';
 import { SelectedCourseAndLessonsProvider } from '@application/coordinators/providers/SelectedCourseAndLessonsProvider';
+import { SelectedExamplesProvider } from '@application/coordinators/providers/SelectedExamplesProvider';
 import { ContextualMenuProvider } from '@composition/providers/ContextualMenuProvider';
 import { ModalProvider } from '@composition/providers/ModalProvider';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -26,19 +27,21 @@ export default function MockAllProviders({
             <ActiveStudentProvider>
               <SelectedCourseAndLessonsProvider>
                 <IsFlushingStudentFlashcardUpdatesProvider>
-                  {route === '/' && (
-                    <MockQueryClientProvider>
-                      {children}
-                    </MockQueryClientProvider>
-                  )}
-                  {route !== '/' && (
-                    <Routes>
-                      <Route
-                        path={`${route}${childRoutes ? '/*' : ''}`}
-                        element={children}
-                      />
-                    </Routes>
-                  )}
+                  <SelectedExamplesProvider>
+                    {route === '/' && (
+                      <MockQueryClientProvider>
+                        {children}
+                      </MockQueryClientProvider>
+                    )}
+                    {route !== '/' && (
+                      <Routes>
+                        <Route
+                          path={`${route}${childRoutes ? '/*' : ''}`}
+                          element={children}
+                        />
+                      </Routes>
+                    )}
+                  </SelectedExamplesProvider>
                 </IsFlushingStudentFlashcardUpdatesProvider>
               </SelectedCourseAndLessonsProvider>
             </ActiveStudentProvider>

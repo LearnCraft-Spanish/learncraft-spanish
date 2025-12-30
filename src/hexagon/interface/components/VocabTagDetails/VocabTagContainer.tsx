@@ -15,6 +15,7 @@ export default function VocabTagContainer({
   lessonPopup,
   handleSelect,
   isSelected,
+  removeButton,
 }: {
   exampleId: number;
   vocabulary: Vocabulary;
@@ -24,6 +25,7 @@ export default function VocabTagContainer({
   lessonPopup: LessonPopup;
   handleSelect: (id: number | null) => void;
   isSelected: boolean;
+  removeButton?: React.ReactNode;
 }) {
   const { course } = useSelectedCourseAndLessons();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -149,6 +151,7 @@ export default function VocabTagContainer({
         }}
       >
         {vocabulary.word}
+        {removeButton}
       </div>
       {contextual === `vocabInfo-${exampleId}-${vocabulary.id}` && (
         <div
