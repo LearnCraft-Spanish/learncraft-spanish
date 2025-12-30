@@ -19,6 +19,12 @@ import {
 import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
 import { useCallback, useMemo } from 'react';
 
+// ============================================================================
+// IMPORTANT: This hook is intended to service the EditableTable component.
+// It is not consumed directly by the interface layer, but always composed by a use case.
+// The composition pattern is documented fully in the EditableTable README.md file.
+// ============================================================================
+
 /**
  * Edit table hook interface
  * For tables that allow editing existing records
