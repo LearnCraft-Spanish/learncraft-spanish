@@ -29,11 +29,7 @@ const exampleDisplayConfig: ColumnDisplayConfig[] = [
 ];
 
 export function ExampleEditor() {
-  const {
-    tableProps,
-    saveError,
-    audioErrorHandlers,
-  } = useExampleEditor();
+  const { tableProps, saveError, audioErrorHandlers } = useExampleEditor();
 
   const { vocabulary: vocabularyList } = useVocabulary();
 
@@ -82,7 +78,11 @@ export function ExampleEditor() {
       })();
 
       const newIds = currentIds.filter((id) => id !== vocabId);
-      tableProps.onCellChange(rowId, 'relatedVocabulary', JSON.stringify(newIds));
+      tableProps.onCellChange(
+        rowId,
+        'relatedVocabulary',
+        JSON.stringify(newIds),
+      );
     },
     [tableProps],
   );

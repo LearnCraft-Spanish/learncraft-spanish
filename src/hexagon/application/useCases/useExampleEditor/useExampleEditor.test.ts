@@ -60,7 +60,7 @@ describe('useExampleEditor', () => {
       });
 
       // Should have 3 rows (default mock returns 3)
-      expect(result.current.editTable.data.rows).toHaveLength(3);
+      expect(result.current.tableProps.rows).toHaveLength(3);
     });
 
     it('should not have unsaved changes initially', () => {
@@ -68,8 +68,8 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      expect(result.current.editTable.hasUnsavedChanges).toBe(false);
-      expect(result.current.isSaving).toBe(false);
+      expect(result.current.tableProps.hasUnsavedChanges).toBe(false);
+      expect(result.current.tableProps.isSaving).toBe(false);
       expect(result.current.saveError).toBeNull();
     });
 
@@ -78,7 +78,9 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const columnIds = result.current.editTable.data.columns.map((c) => c.id);
+      const columnIds = result.current.tableProps.columns.map(
+        (c: { id: string }) => c.id,
+      );
       expect(columnIds).toContain('id');
       expect(columnIds).toContain('spanish');
       expect(columnIds).toContain('english');
@@ -99,7 +101,7 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const row = result.current.editTable.data.rows[0];
+      const row = result.current.tableProps.rows[0];
       expect(row.cells.hasAudio).toBe('true');
     });
 
@@ -114,7 +116,7 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const row = result.current.editTable.data.rows[0];
+      const row = result.current.tableProps.rows[0];
       expect(row.cells.hasAudio).toBe('false');
     });
 
@@ -132,7 +134,7 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const row = result.current.editTable.data.rows[0];
+      const row = result.current.tableProps.rows[0];
       expect(row.cells.hasAudio).toBe('false');
     });
 
@@ -150,7 +152,7 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const row = result.current.editTable.data.rows[0];
+      const row = result.current.tableProps.rows[0];
       expect(row.cells.hasAudio).toBe('false');
     });
 
@@ -169,7 +171,7 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rows = result.current.editTable.data.rows;
+      const rows = result.current.tableProps.rows;
       expect(rows[0].cells.hasAudio).toBe('true');
       expect(rows[1].cells.hasAudio).toBe('false');
       expect(rows[2].cells.hasAudio).toBe('true');
@@ -196,7 +198,8 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const row = result.current.editTable.data.rows[0];
+      const row = result.current.tableProps.rows[0];
+
       expect(row.cells.id).toBe('42');
       expect(row.cells.spanish).toBe('Hola mundo');
       expect(row.cells.english).toBe('Hello world');
@@ -212,14 +215,14 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', 'Nuevo texto');
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'Nuevo texto');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
     });
 
@@ -228,14 +231,14 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'english', 'New text');
+        result.current.tableProps.onCellChange(rowId, 'english', 'New text');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
     });
 
@@ -250,14 +253,14 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'hasAudio', 'false');
+        result.current.tableProps.onCellChange(rowId, 'hasAudio', 'false');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
     });
   });
@@ -274,24 +277,22 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', 'Modified');
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'Modified');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       act(() => {
-        result.current.editTable.discardChanges();
+        result.current.tableProps.onDiscard?.();
       });
 
-      expect(result.current.editTable.data.rows[0].cells.spanish).toBe(
-        'Original',
-      );
-      expect(result.current.editTable.hasUnsavedChanges).toBe(false);
+      expect(result.current.tableProps.rows[0].cells.spanish).toBe('Original');
+      expect(result.current.tableProps.hasUnsavedChanges).toBe(false);
     });
 
     it('should revert multiple modified rows', async () => {
@@ -299,12 +300,12 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rows = result.current.editTable.data.rows;
+      const rows = result.current.tableProps.rows;
       const originalValues = rows.map((r) => r.cells.spanish);
 
       act(() => {
         rows.forEach((row, i) => {
-          result.current.editTable.updateCell(
+          result.current.tableProps.onCellChange(
             row.id,
             'spanish',
             `Modified ${i}`,
@@ -313,14 +314,14 @@ describe('useExampleEditor', () => {
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       act(() => {
-        result.current.editTable.discardChanges();
+        result.current.tableProps.onDiscard?.();
       });
 
-      result.current.editTable.data.rows.forEach((row, i) => {
+      result.current.tableProps.rows.forEach((row, i) => {
         expect(row.cells.spanish).toBe(originalValues[i]);
       });
     });
@@ -343,18 +344,18 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', 'Modified');
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'Modified');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       await act(async () => {
-        await result.current.editTable.applyChanges();
+        await result.current.tableProps.onSave?.();
       });
 
       expect(updateExamplesSpy).toHaveBeenCalled();
@@ -377,18 +378,18 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'hasAudio', 'true');
+        result.current.tableProps.onCellChange(rowId, 'hasAudio', 'true');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       await act(async () => {
-        await result.current.editTable.applyChanges();
+        await result.current.tableProps.onSave?.();
       });
 
       const calledWith = updateExamplesSpy.mock.calls[0][0];
@@ -409,18 +410,18 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'hasAudio', 'false');
+        result.current.tableProps.onCellChange(rowId, 'hasAudio', 'false');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       await act(async () => {
-        await result.current.editTable.applyChanges();
+        await result.current.tableProps.onSave?.();
       });
 
       const calledWith = updateExamplesSpy.mock.calls[0][0];
@@ -447,18 +448,22 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const secondRowId = result.current.editTable.data.rows[1].id;
+      const secondRowId = result.current.tableProps.rows[1].id;
 
       act(() => {
-        result.current.editTable.updateCell(secondRowId, 'spanish', 'Modified');
+        result.current.tableProps.onCellChange(
+          secondRowId,
+          'spanish',
+          'Modified',
+        );
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       await act(async () => {
-        await result.current.editTable.applyChanges();
+        await result.current.tableProps.onSave?.();
       });
 
       const calledWith = updateExamplesSpy.mock.calls[0][0];
@@ -476,29 +481,29 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', 'Modified');
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'Modified');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       let applyPromise: Promise<void>;
       act(() => {
-        applyPromise = result.current.editTable.applyChanges();
+        applyPromise = result.current.tableProps.onSave!();
       });
 
-      expect(result.current.isSaving).toBe(true);
+      expect(result.current.tableProps.isSaving).toBe(true);
 
       await act(async () => {
         resolvePromise!();
         await applyPromise;
       });
 
-      expect(result.current.isSaving).toBe(false);
+      expect(result.current.tableProps.isSaving).toBe(false);
     });
   });
 
@@ -514,19 +519,19 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', 'Modified');
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'Modified');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       try {
         await act(async () => {
-          await result.current.editTable.applyChanges();
+          await result.current.tableProps.onSave?.();
         });
       } catch {
         // Expected to throw
@@ -536,7 +541,7 @@ describe('useExampleEditor', () => {
 
       expect(result.current.saveError).toBeInstanceOf(Error);
       expect(result.current.saveError?.message).toBe('Network error');
-      expect(result.current.isSaving).toBe(false);
+      expect(result.current.tableProps.isSaving).toBe(false);
     });
 
     it('should clear saveError on next save attempt', async () => {
@@ -555,19 +560,19 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', 'Modified');
+        result.current.tableProps.onCellChange(rowId, 'spanish', 'Modified');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       try {
         await act(async () => {
-          await result.current.editTable.applyChanges();
+          await result.current.tableProps.onSave?.();
         });
       } catch {
         // Expected to throw
@@ -578,7 +583,7 @@ describe('useExampleEditor', () => {
       expect(result.current.saveError).not.toBeNull();
 
       await act(async () => {
-        await result.current.editTable.applyChanges();
+        await result.current.tableProps.onSave?.();
       });
 
       expect(result.current.saveError).toBeNull();
@@ -591,7 +596,7 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      expect(result.current.editTable.validationState.isValid).toBe(true);
+      expect(result.current.tableProps.isValid).toBe(true);
     });
 
     it('should detect invalid state when spanish is cleared', async () => {
@@ -599,14 +604,14 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', '');
+        result.current.tableProps.onCellChange(rowId, 'spanish', '');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.validationState.isValid).toBe(false);
+        expect(result.current.tableProps.isValid).toBe(false);
       });
     });
 
@@ -615,14 +620,14 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'english', '');
+        result.current.tableProps.onCellChange(rowId, 'english', '');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.validationState.isValid).toBe(false);
+        expect(result.current.tableProps.isValid).toBe(false);
       });
     });
 
@@ -634,21 +639,21 @@ describe('useExampleEditor', () => {
         wrapper: MockAllProviders,
       });
 
-      const rowId = result.current.editTable.data.rows[0].id;
+      const rowId = result.current.tableProps.rows[0].id;
 
       act(() => {
-        result.current.editTable.updateCell(rowId, 'spanish', '');
+        result.current.tableProps.onCellChange(rowId, 'spanish', '');
       });
 
       await waitFor(() => {
-        expect(result.current.editTable.hasUnsavedChanges).toBe(true);
+        expect(result.current.tableProps.hasUnsavedChanges).toBe(true);
       });
 
       // Validation state should reflect the error
-      expect(result.current.validationState.isValid).toBe(false);
-      expect(result.current.validationState.errors[rowId]).toBeDefined();
+      expect(result.current.tableProps.isValid).toBe(false);
+      expect(result.current.tableProps.validationErrors[rowId]).toBeDefined();
       expect(
-        result.current.validationState.errors[rowId].spanish,
+        result.current.tableProps.validationErrors[rowId].spanish,
       ).toBeDefined();
 
       // Note: applyChanges does not throw - validation is handled at UI level
