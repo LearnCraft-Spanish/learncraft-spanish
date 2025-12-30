@@ -2,6 +2,7 @@ import type { UseVerbCreationResult } from '@application/useCases/useVerbCreatio
 import type { CreateVerbVocabulary } from '@learncraft-spanish/shared';
 import { useSubcategories } from '@application/queries/useSubcategories';
 import useVocabulary from '@application/units/useVocabulary';
+import { normalizeError } from '@application/utils/queryUtils';
 import { useCallback, useMemo, useState } from 'react';
 
 /**
@@ -41,7 +42,7 @@ export default function useVerbCreation(): UseVerbCreationResult {
         const createdIds = await createVerbInVocabulary(verbData);
         return createdIds;
       } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
+        const error = normalizeError(err);
         setCreationError(error);
         return [];
       }

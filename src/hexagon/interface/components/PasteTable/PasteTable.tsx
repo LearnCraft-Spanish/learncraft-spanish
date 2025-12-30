@@ -1,12 +1,36 @@
-import type { TableHook } from '@domain/PasteTable/General';
+import type {
+  ColumnDefinition,
+  TableRow as TableRowType,
+  ValidationState,
+} from '@domain/PasteTable';
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import { PasteTableErrorBoundary } from '@interface/components/PasteTable/PasteTableErrorBoundary';
 import { TableRow } from '@interface/components/PasteTable/TableRow';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import './PasteTable.scss';
 
+/**
+ * Common interface for table hooks (edit or create mode)
+ */
+interface TableHookBase<_T> {
+  data: {
+    rows: TableRowType[];
+    columns: ColumnDefinition[];
+  };
+  updateCell: (rowId: string, columnId: string, value: string) => string | null;
+  handlePaste: (e: React.ClipboardEvent<Element>) => void;
+  setActiveCellInfo: (rowId: string, columnId: string) => void;
+  clearActiveCellInfo: () => void;
+  validationState: ValidationState;
+  // Optional - only in edit mode
+  discardChanges?: () => void;
+}
+
 export interface PasteTableProps<T> {
   /** Core table hook from application layer */
-  hook: TableHook<T>;
+  hook: TableHookBase<T>;
+  /** Display configuration for columns (labels, widths, etc.) */
+  displayConfig: ColumnDisplayConfig[];
   /** Optional text for the clear button */
   clearButtonText?: string;
   /** Optional hint text for paste functionality */
@@ -27,6 +51,7 @@ function findIndex<T>(array: T[], predicate: (item: T) => boolean): number {
 
 export function PasteTable<T>({
   hook,
+  displayConfig,
   clearButtonText = 'Clear',
   pasteHint = 'Paste tab-separated values',
   validationHint = 'Fields are validated in real-time',
@@ -35,7 +60,7 @@ export function PasteTable<T>({
   const {
     data: { rows, columns },
     updateCell,
-    resetTable,
+    discardChanges,
     handlePaste,
     setActiveCellInfo,
     clearActiveCellInfo,
@@ -51,15 +76,26 @@ export function PasteTable<T>({
   } | null>(null);
 
   // Refs for cell elements
-  const cellRefs = useRef<Map<string, HTMLInputElement | HTMLSelectElement>>(
-    new Map(),
+  const cellRefs = useRef<
+    Map<string, HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  >(new Map());
+
+  // Helper to get display config for a column
+  const getDisplay = useCallback(
+    (columnId: string) =>
+      displayConfig.find((d) => d.id === columnId) ?? {
+        id: columnId,
+        label: columnId,
+      },
+    [displayConfig],
   );
 
   // Process column widths for grid template
   const gridTemplateColumnsValue = useMemo(() => {
     return columns
       .map((col) => {
-        const width = col.width || '1fr';
+        const display = getDisplay(col.id);
+        const width = display.width || '1fr';
         return width.endsWith('fr') ||
           width.endsWith('px') ||
           width.endsWith('%')
@@ -67,7 +103,7 @@ export function PasteTable<T>({
           : `${width}fr`;
       })
       .join(' ');
-  }, [columns]);
+  }, [columns, getDisplay]);
 
   // Create inline style with CSS variable for grid
   const tableStyle = useMemo(() => {
@@ -78,7 +114,14 @@ export function PasteTable<T>({
 
   // Register cell refs
   const registerCellRef = useCallback(
-    (key: string, element: HTMLInputElement | HTMLSelectElement | null) => {
+    (
+      key: string,
+      element:
+        | HTMLInputElement
+        | HTMLSelectElement
+        | HTMLTextAreaElement
+        | null,
+    ) => {
       if (element) {
         cellRefs.current.set(key, element);
       } else {
@@ -95,7 +138,11 @@ export function PasteTable<T>({
 
     if (element) {
       element.focus();
-      if (element instanceof HTMLInputElement && element.value) {
+      if (
+        (element instanceof HTMLInputElement ||
+          element instanceof HTMLTextAreaElement) &&
+        element.value
+      ) {
         const length = element.value.length;
         element.setSelectionRange(length, length);
       }
@@ -105,8 +152,8 @@ export function PasteTable<T>({
   // Generate ARIA labels
   const getAriaLabel = useCallback(
     (columnId: string, rowId: string) => {
-      const column = columns.find((col) => col.id === columnId);
-      return `${column?.label || columnId} input for row ${rowId}`;
+      const display = getDisplay(columnId);
+      return `${display.label} input for row ${rowId}`;
     },
     [columns],
   );
@@ -151,6 +198,9 @@ export function PasteTable<T>({
             (e.target instanceof HTMLInputElement &&
               e.target.type !== 'number' &&
               e.target.selectionStart === 0 &&
+              e.target.selectionEnd === 0) ||
+            (e.target instanceof HTMLTextAreaElement &&
+              e.target.selectionStart === 0 &&
               e.target.selectionEnd === 0);
 
           if (shouldNavigateLeft) {
@@ -174,6 +224,9 @@ export function PasteTable<T>({
               e.target.type === 'number') ||
             (e.target instanceof HTMLInputElement &&
               e.target.type !== 'number' &&
+              e.target.selectionStart === e.target.value.length &&
+              e.target.selectionEnd === e.target.value.length) ||
+            (e.target instanceof HTMLTextAreaElement &&
               e.target.selectionStart === e.target.value.length &&
               e.target.selectionEnd === e.target.value.length);
 
@@ -262,10 +315,8 @@ export function PasteTable<T>({
 
   // Enhanced reset handler to completely clear all state
   const handleReset = useCallback(() => {
-    console.error('Starting UI reset'); // Debugging
-
     // Reset table data via application hook
-    resetTable();
+    discardChanges?.();
 
     // Fully reset UI state
     setActiveCell(null);
@@ -279,9 +330,7 @@ export function PasteTable<T>({
     if (tableEl instanceof HTMLElement) {
       tableEl.focus();
     }
-
-    console.error('UI reset complete'); // Debugging
-  }, [resetTable]);
+  }, [discardChanges]);
 
   return (
     <PasteTableErrorBoundary>
@@ -298,16 +347,19 @@ export function PasteTable<T>({
         <div className="paste-table__table-grid" role="presentation">
           {/* Header row */}
           <div className="paste-table__header" role="row" aria-rowindex={1}>
-            {columns.map((column, colIndex) => (
-              <div
-                key={column.id || `column-${column.label}`}
-                className="paste-table__column-header"
-                role="columnheader"
-                aria-colindex={colIndex + 1}
-              >
-                {column.label}
-              </div>
-            ))}
+            {columns.map((column, colIndex) => {
+              const display = getDisplay(column.id);
+              return (
+                <div
+                  key={column.id}
+                  className="paste-table__column-header"
+                  role="columnheader"
+                  aria-colindex={colIndex + 1}
+                >
+                  {display.label}
+                </div>
+              );
+            })}
           </div>
 
           {/* Body rows */}
@@ -325,6 +377,7 @@ export function PasteTable<T>({
                   key={rowKey}
                   row={row}
                   columns={columns}
+                  displayConfig={displayConfig}
                   activeCell={activeCell}
                   validationState={validationState}
                   getAriaLabel={getAriaLabel}

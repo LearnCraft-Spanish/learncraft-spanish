@@ -5,7 +5,6 @@ import type {
   ListVocabularyFullResponse,
   ListVocabularyResponse,
   Vocabulary,
-  VocabularyAbbreviation,
   VocabularyRelatedRecords,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
@@ -40,7 +39,7 @@ export function createVocabularyInfrastructure(
   const httpClient = createHttpClient(apiUrl, auth);
 
   return {
-    getVocabulary: async (): Promise<VocabularyAbbreviation[]> => {
+    getVocabulary: async (): Promise<Vocabulary[]> => {
       const response = await httpClient.get<ListVocabularyResponse>(
         listVocabularyEndpoint.path,
         listVocabularyEndpoint.requiredScopes,

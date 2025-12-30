@@ -1,6 +1,6 @@
 import { overrideMockExampleAdapter } from '@application/adapters/exampleAdapter.mock';
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -39,12 +39,7 @@ describe('useExampleMutations', () => {
       expect(result.current.createExamples).toBeDefined();
 
       // Execute mutation
-      result.current.createExamples.mutate([] as any);
-
-      // Wait for success
-      await waitFor(() =>
-        expect(result.current.createExamples.isSuccess).toBe(true),
-      );
+      await result.current.createExamples([]);
 
       expect(toast.success).toHaveBeenCalledWith(
         'All examples created successfully',
@@ -66,18 +61,12 @@ describe('useExampleMutations', () => {
         wrapper: TestQueryClientProvider,
       });
 
-      // Execute mutation
-      result.current.createExamples.mutate([] as any);
-
-      // Wait for error
-      await waitFor(() =>
-        expect(result.current.createExamples.isError).toBe(true),
-      );
+      // Execute mutation and expect error
+      await expect(result.current.createExamples([])).rejects.toThrow();
 
       expect(toast.error).toHaveBeenCalledWith(
         'Failed to create some examples',
       );
-      expect(result.current.createExamples.error).toBeInstanceOf(Error);
     });
   });
 
@@ -99,12 +88,7 @@ describe('useExampleMutations', () => {
       expect(result.current.updateExamples).toBeDefined();
 
       // Execute mutation
-      result.current.updateExamples.mutate([] as any);
-
-      // Wait for success
-      await waitFor(() =>
-        expect(result.current.updateExamples.isSuccess).toBe(true),
-      );
+      await result.current.updateExamples([]);
 
       expect(toast.success).toHaveBeenCalledWith(
         'All examples updated successfully',
@@ -126,18 +110,12 @@ describe('useExampleMutations', () => {
         wrapper: TestQueryClientProvider,
       });
 
-      // Execute mutation
-      result.current.updateExamples.mutate([] as any);
-
-      // Wait for error
-      await waitFor(() =>
-        expect(result.current.updateExamples.isError).toBe(true),
-      );
+      // Execute mutation and expect error
+      await expect(result.current.updateExamples([])).rejects.toThrow();
 
       expect(toast.error).toHaveBeenCalledWith(
         'Failed to update some examples',
       );
-      expect(result.current.updateExamples.error).toBeInstanceOf(Error);
     });
   });
 
@@ -159,12 +137,7 @@ describe('useExampleMutations', () => {
       expect(result.current.deleteExamples).toBeDefined();
 
       // Execute mutation
-      result.current.deleteExamples.mutate([1, 2, 3]);
-
-      // Wait for success
-      await waitFor(() =>
-        expect(result.current.deleteExamples.isSuccess).toBe(true),
-      );
+      await result.current.deleteExamples([1, 2, 3]);
 
       expect(toast.success).toHaveBeenCalledWith(
         'All examples deleted successfully',
@@ -186,18 +159,12 @@ describe('useExampleMutations', () => {
         wrapper: TestQueryClientProvider,
       });
 
-      // Execute mutation
-      result.current.deleteExamples.mutate([1, 2, 3]);
-
-      // Wait for error
-      await waitFor(() =>
-        expect(result.current.deleteExamples.isError).toBe(true),
-      );
+      // Execute mutation and expect error
+      await expect(result.current.deleteExamples([1, 2, 3])).rejects.toThrow();
 
       expect(toast.error).toHaveBeenCalledWith(
         'Failed to delete some examples',
       );
-      expect(result.current.deleteExamples.error).toBeInstanceOf(Error);
     });
   });
 });

@@ -15,6 +15,7 @@ import {
   deleteExamplesEndpoint,
   getExamplesByIdsWithTechnicalDataEndpoint,
   getExamplesByIdsWithVocabularyEndpoint,
+  getExamplesByMostRecentlyModifiedEndpoint,
   queryExamplesEndpoint,
   searchExamplesByTextEndpoint,
   updateExamplesEndpoint,
@@ -60,10 +61,8 @@ export function createExampleInfrastructure(
 
     getExamplesByIds: async (
       ids: number[],
-    ): Promise<{ examples: ExampleWithVocabulary[] }> => {
-      const response = await httpClient.post<{
-        examples: ExampleWithVocabulary[];
-      }>(
+    ): Promise<ExampleWithVocabulary[]> => {
+      const response = await httpClient.post<ExampleWithVocabulary[]>(
         getExamplesByIdsWithVocabularyEndpoint.path,
         getExamplesByIdsWithVocabularyEndpoint.requiredScopes,
         {
@@ -75,10 +74,8 @@ export function createExampleInfrastructure(
 
     getExamplesForEditingByIds: async (
       ids: number[],
-    ): Promise<{ examples: ExampleTechnical[] }> => {
-      const response = await httpClient.post<{
-        examples: ExampleTechnical[];
-      }>(
+    ): Promise<ExampleTechnical[]> => {
+      const response = await httpClient.post<ExampleTechnical[]>(
         getExamplesByIdsWithTechnicalDataEndpoint.path,
         getExamplesByIdsWithTechnicalDataEndpoint.requiredScopes,
         { ids },
@@ -86,19 +83,38 @@ export function createExampleInfrastructure(
       return response;
     },
     searchExamplesByText: async (
-      searchText: ExampleTextSearch,
+      search: ExampleTextSearch,
       page: number,
       limit: number,
-    ): Promise<{ examples: ExampleWithVocabulary[] }> => {
+      vocabularyComplete?: boolean,
+    ): Promise<{ examples: ExampleWithVocabulary[]; totalCount: number }> => {
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
+        totalCount: number;
       }>(
         searchExamplesByTextEndpoint.path,
         searchExamplesByTextEndpoint.requiredScopes,
         {
-          searchText,
+          search,
           page,
           limit,
+          vocabularyComplete,
+        },
+      );
+      return response;
+    },
+    getExamplesByRecentlyModified: async (
+      page: number,
+      limit: number,
+      vocabularyComplete?: boolean,
+    ): Promise<ExampleTechnical[]> => {
+      const response = await httpClient.post<ExampleTechnical[]>(
+        getExamplesByMostRecentlyModifiedEndpoint.path,
+        getExamplesByMostRecentlyModifiedEndpoint.requiredScopes,
+        {
+          page,
+          limit,
+          vocabularyComplete,
         },
       );
       return response;
@@ -109,17 +125,17 @@ export function createExampleInfrastructure(
       const response = await httpClient.post<{
         examples: ExampleWithVocabulary[];
       }>(createExamplesEndpoint.path, createExamplesEndpoint.requiredScopes, {
-        body: exampleCreates,
+        exampleCreates,
       });
       return response.examples;
     },
     updateExamples: async (
-      exampleEdits: UpdateExamplesCommand,
+      exampleUpdates: UpdateExamplesCommand,
     ): Promise<ExampleWithVocabulary[]> => {
       const response = await httpClient.put<{
         examples: ExampleWithVocabulary[];
       }>(updateExamplesEndpoint.path, updateExamplesEndpoint.requiredScopes, {
-        body: exampleEdits,
+        exampleUpdates,
       });
       return response.examples;
     },

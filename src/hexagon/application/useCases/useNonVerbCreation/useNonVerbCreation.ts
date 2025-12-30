@@ -5,10 +5,7 @@ import { useVocabularyTable } from '@application/implementations/vocabularyTable
 import { useSubcategories } from '@application/queries/useSubcategories';
 import useVocabulary from '@application/units/useVocabulary';
 import useVocabularyPage from '@application/units/useVocabularyPage';
-import {
-  CreateNonVerbVocabularySchema,
-  validateWithSchema,
-} from '@learncraft-spanish/shared';
+import { normalizeError } from '@application/utils/queryUtils';
 import { useCallback, useMemo, useState } from 'react';
 
 /**
@@ -119,6 +116,7 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
   }, []);
 
   // Create vocabulary batch - internal implementation
+  // Data is already validated by tableHook.saveData(), we just add subcategoryId
   const createVocabularyBatch = useCallback(
     async (data: CreateNonVerbVocabulary[]) => {
       if (!selectedSubcategoryId) {
@@ -129,29 +127,8 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
       try {
         setCreationError(null);
 
-        // Validate all entries before processing
-        const validationErrors: string[] = [];
-        data.forEach((entry, index) => {
-          const command = {
-            ...entry,
-            subcategoryId: Number(selectedSubcategoryId),
-          };
-          const result = validateWithSchema(
-            CreateNonVerbVocabularySchema,
-            command,
-          );
-          if (!result.isValid) {
-            validationErrors.push(
-              `Row ${index + 1}: ${result.errors.join(', ')}`,
-            );
-          }
-        });
-
-        if (validationErrors.length > 0) {
-          throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
-        }
-
-        // Use our new vocabulary unit to create the batch
+        // Data is already validated by tableHook.saveData()
+        // Just add subcategoryId to each entry
         const commands = data.map((entry) => ({
           ...entry,
           subcategoryId: Number(selectedSubcategoryId),
@@ -161,7 +138,7 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
 
         return createdIds;
       } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
+        const error = normalizeError(err);
         setCreationError(error);
         return [];
       }
@@ -182,6 +159,7 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
 
     try {
       // Validate and save the table data
+      // saveData() returns T[] | undefined (validated and complete)
       const tableData = await tableHook.saveData();
 
       // If table validation failed or no data
@@ -190,9 +168,11 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
       }
 
       // Create the vocabulary batch
+      // tableData is already validated and complete (T[]), but doesn't include subcategoryId
+      // createVocabularyBatch adds subcategoryId and validates the command
       return await createVocabularyBatch(tableData);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
+      const error = normalizeError(err);
       setCreationError(error);
       return [];
     }

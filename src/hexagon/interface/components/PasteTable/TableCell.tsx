@@ -1,9 +1,21 @@
-import type { TableColumn } from '@domain/PasteTable/General';
-import React from 'react';
+import type { ColumnDefinition } from '@domain/PasteTable';
+import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
+import {
+  isBooleanColumn,
+  isDateColumn,
+  isMultiSelectColumn,
+  isSelectColumn,
+  isTextAreaColumn,
+} from '@domain/PasteTable';
+import { BooleanCell } from '@interface/components/PasteTable/TableCell/BooleanCell';
+import { SelectCell } from '@interface/components/PasteTable/TableCell/SelectCell';
+import { TextAreaCell } from '@interface/components/PasteTable/TableCell/TextAreaCell';
+import './TableCell.scss';
 
-// TableCellInput component to handle rendering different input types for table cells
 interface TableCellInputProps {
-  column: TableColumn;
+  cellKey: string;
+  column: ColumnDefinition;
+  display: ColumnDisplayConfig;
   cellValue: string;
   hasError: boolean;
   ariaLabel: string;
@@ -13,11 +25,15 @@ interface TableCellInputProps {
     onFocus: () => void;
     onBlur: () => void;
   };
-  cellRef: (el: HTMLInputElement | HTMLSelectElement | null) => void;
+  cellRef: (
+    el: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null,
+  ) => void;
 }
 
 export function TableCellInput({
+  cellKey,
   column,
+  display,
   cellValue,
   hasError,
   ariaLabel,
@@ -25,7 +41,9 @@ export function TableCellInput({
   cellRef,
 }: TableCellInputProps) {
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     handlers.onChange(e.target.value);
   };
@@ -37,51 +55,111 @@ export function TableCellInput({
     onPaste: handlers.onPaste,
     onFocus: handlers.onFocus,
     onBlur: handlers.onBlur,
-    placeholder: column.placeholder,
+    placeholder: display.placeholder,
   };
 
-  const columnType = column.type || 'text';
-
-  switch (columnType) {
-    case 'select':
-      return (
-        <select
-          ref={(el) => cellRef(el)}
-          value={cellValue}
-          onChange={handleChange}
-          {...commonProps}
-        >
-          <option value="">Select...</option>
-          {column.options?.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      );
-
-    case 'number':
-      return (
-        <input
-          ref={(el) => cellRef(el)}
-          type="number"
-          value={cellValue}
-          onChange={handleChange}
-          min={column.min}
-          max={column.max}
-          {...commonProps}
-        />
-      );
-
-    default:
-      return (
-        <input
-          ref={(el) => cellRef(el)}
-          type="text"
-          value={cellValue}
-          onChange={handleChange}
-          {...commonProps}
-        />
-      );
+  // Readonly column
+  if (column.editable === false) {
+    return <div className="paste-table__cell-readonly">{cellValue}</div>;
   }
+
+  // Select column
+  if (isSelectColumn(column) && column.options) {
+    return (
+      <SelectCell
+        cellValue={cellValue}
+        handleChange={handleChange}
+        options={column.options}
+        commonProps={commonProps}
+        cellRef={cellRef}
+      />
+    );
+  }
+
+  // Multi-select column
+  if (isMultiSelectColumn(column)) {
+    return (
+      <input
+        ref={(el) => cellRef(el)}
+        type="text"
+        value={cellValue}
+        onChange={handleChange}
+        {...commonProps}
+        placeholder="Comma-separated values"
+      />
+    );
+  }
+  if (isTextAreaColumn(column)) {
+    return (
+      <TextAreaCell
+        cellValue={cellValue}
+        handleChange={handleChange}
+        commonProps={commonProps}
+        cellRef={cellRef}
+      />
+    );
+  }
+
+  // Boolean column
+  if (isBooleanColumn(column)) {
+    // Boolean: checkbox or select based on format
+    const format = column.booleanFormat || 'auto';
+    if (format === 'auto') {
+      return (
+        <BooleanCell
+          cellKey={cellKey}
+          ariaLabel={ariaLabel}
+          cellValue={cellValue}
+          handlers={handlers}
+        />
+      );
+    }
+    // For other formats, use text input
+    return (
+      <input
+        ref={(el) => cellRef(el)}
+        type="text"
+        value={cellValue}
+        onChange={handleChange}
+        {...commonProps}
+      />
+    );
+  }
+
+  // Date column
+  if (isDateColumn(column)) {
+    return (
+      <input
+        ref={(el) => cellRef(el)}
+        type="date"
+        value={cellValue}
+        onChange={handleChange}
+        {...commonProps}
+      />
+    );
+  }
+
+  // Number column
+  if (column.type === 'number') {
+    return (
+      <input
+        ref={(el) => cellRef(el)}
+        type="number"
+        value={cellValue}
+        onChange={handleChange}
+        {...commonProps}
+      />
+    );
+  }
+
+  // Default: text input
+  return (
+    <input
+      ref={(el) => cellRef(el)}
+      type="text"
+      value={cellValue}
+      onChange={handleChange}
+      {...commonProps}
+    />
+  );
 }

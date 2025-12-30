@@ -1,27 +1,36 @@
-import type { TableColumn, TableHook } from '@domain/PasteTable/General';
+import type { ColumnDefinition } from '@domain/PasteTable';
+import type { z } from 'zod';
 import {
   useTablePaste,
   useTableRows,
   useTableValidation,
 } from '@application/units/pasteTable/hooks';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
-import { useCallback } from 'react';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
+import {
+  mapAndParseTableRowsToDomain,
+  mapDomainToTableRows,
+  mapTableRowsToDomain,
+} from '@domain/PasteTable/functions/mappers';
+import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
+import { useCallback, useMemo } from 'react';
 
-interface UsePasteTableOptions<T> {
-  columns: TableColumn[];
-  validateRow: (row: T) => Record<string, string>;
+interface UsePasteTableOptions<T extends Record<string, unknown>> {
+  columns: ColumnDefinition[];
+  /** Full row Zod schema for row-level validation (preferred) */
+  rowSchema?: z.ZodType<T, any, any>;
   initialData?: T[]; // Allow providing initial data
 }
 
 /**
  * Main hook for paste table functionality
  * Validation is purely derived from row data
+ * Requires Zod schemas (column-level or row-level) for validation
  */
-export function usePasteTable<T>({
+export function usePasteTable<T extends Record<string, unknown>>({
   columns,
-  validateRow,
+  rowSchema,
   initialData = [],
-}: UsePasteTableOptions<T>): TableHook<T> {
+}: UsePasteTableOptions<T>) {
   // Core row management
   const {
     rows,
@@ -31,13 +40,30 @@ export function usePasteTable<T>({
     convertGhostRow,
   } = useTableRows<T>({ columns, initialData });
 
+  // Generate validateRow function from Zod schemas
+  // Requires either column schemas or row schema to be provided
+  const validateRow = useMemo(() => {
+    // Check if we have column schemas or row schema
+    const hasColumnSchemas = columns.some((col) => col.schema);
+    const hasRowSchema = !!rowSchema;
+
+    // Require at least one schema to be provided
+    if (!hasColumnSchemas && !hasRowSchema) {
+      throw new Error(
+        'Either rowSchema or column schemas must be provided for validation',
+      );
+    }
+
+    // Generate validator from schemas (handles normalization and mapping internally)
+    return createCombinedValidateRow<T>(columns, rowSchema);
+  }, [columns, rowSchema]);
+
   // Validation - now purely derived from row data
-  const { validationState, isSaveEnabled, validateAll } = useTableValidation<T>(
-    {
-      rows,
-      validateRow,
-    },
-  );
+  // validateRow function operates on TableRow (normalized, typed)
+  const { validationState } = useTableValidation({
+    rows,
+    validateRow,
+  });
 
   // Paste handling
   const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(
@@ -65,62 +91,43 @@ export function usePasteTable<T>({
     [convertGhostRow, updateCellBase],
   );
 
-  // Import data from an external source
+  // Import data from external source
   const importData = useCallback(
     (newData: T[]) => {
-      // Convert data to rows with our internal row ID generation
-      const rows = newData.map((item) => {
-        const cells = {} as Record<string, string>;
-        columns.forEach((col) => {
-          const key = col.id as keyof T;
-          const value = item[key];
-          cells[col.id] = value !== undefined ? String(value) : '';
-        });
-        return cells;
-      });
+      // Map domain entities to TableRows
+      const newRows = mapDomainToTableRows(newData, columns);
 
-      // Set the rows
+      // Set rows, preserving ghost row
       setRows((currentRows) => {
-        // Find ghost row to preserve it
         const ghostRow = currentRows.find((row) => row.id === GHOST_ROW_ID);
-
-        // Convert rows to TableRows using updateCellBase
-        const newRows = rows.map((cells) => ({
-          id: `row-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-          cells,
-        }));
-
-        // Return with ghost row at the end
         return [...newRows, ...(ghostRow ? [ghostRow] : [])];
       });
     },
     [columns, setRows],
   );
 
-  // Handle save operation
-  const saveData = useCallback(async () => {
-    // Get fresh validation state
-    const { isValid } = validateAll();
+  // Save operation - returns data for external save
+  // If rowSchema is provided, parses through schema to get complete T[]
+  // Otherwise returns Partial<T>[] (column schemas alone can't guarantee completeness)
+  const saveData = useCallback(async (): Promise<T[] | undefined> => {
+    // Filter out ghost row
+    const dataRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
 
-    // If validation state says we're valid, we can proceed
-    if (isValid) {
-      return rows
-        .filter((row) => row.id !== GHOST_ROW_ID)
-        .map((row) => {
-          // Just like in validation, convert frequency to number
-          return {
-            ...row.cells,
-            // Convert frequency to number if it exists
-            frequency:
-              row.cells.frequency !== undefined
-                ? Number(row.cells.frequency)
-                : undefined,
-          } as T;
-        });
+    // If we have a rowSchema, parse through it to get complete T[]
+    if (rowSchema) {
+      return mapAndParseTableRowsToDomain<T>(
+        dataRows,
+        columns,
+        rowSchema,
+        GHOST_ROW_ID,
+      );
     }
 
-    return undefined;
-  }, [rows, validateAll]);
+    // Without rowSchema, we can't guarantee completeness
+    // This shouldn't happen since we require at least one schema, but handle it gracefully
+    const data = mapTableRowsToDomain<T>(dataRows, columns);
+    return data as T[]; // Type assertion needed here - caller should provide rowSchema
+  }, [rows, columns, rowSchema]);
 
   // Reset the table to completely empty state
   const resetTable = useCallback(() => {
@@ -132,8 +139,6 @@ export function usePasteTable<T>({
 
     // No need to reset validation explicitly - it will be recalculated
     // by our derived validation mechanism as soon as rows change
-
-    console.error('Table completely reset'); // Debugging
   }, [resetRows, clearActiveCellInfo]);
 
   // Return a clean, focused API
@@ -149,7 +154,6 @@ export function usePasteTable<T>({
     handlePaste,
     setActiveCellInfo,
     clearActiveCellInfo,
-    isSaveEnabled,
     validationState,
   };
 }

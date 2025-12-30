@@ -8,9 +8,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 describe('useExampleByIdsQuery', () => {
   beforeEach(() => {
     overrideMockExampleAdapter({
-      getExamplesByIds: async () => ({
-        examples: createMockExampleWithVocabularyList(2),
-      }),
+      getExamplesByIds: async () => createMockExampleWithVocabularyList(2),
     });
   });
 
@@ -18,9 +16,7 @@ describe('useExampleByIdsQuery', () => {
     // Arrange
     const mockData = createMockExampleWithVocabularyList(2);
     overrideMockExampleAdapter({
-      getExamplesByIds: async () => ({
-        examples: mockData,
-      }),
+      getExamplesByIds: async () => mockData,
     });
 
     // Act
@@ -34,7 +30,7 @@ describe('useExampleByIdsQuery', () => {
 
     // After data loads
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.examples?.examples).toEqual(mockData);
+    expect(result.current.examples).toEqual(mockData);
     expect(result.current.error).toBeNull();
   });
 
@@ -62,9 +58,7 @@ describe('useExampleByIdsQuery', () => {
   it('should return undefined examples when ids array is empty', async () => {
     // Arrange
     overrideMockExampleAdapter({
-      getExamplesByIds: async () => ({
-        examples: [],
-      }),
+      getExamplesByIds: async () => createMockExampleWithVocabularyList(0),
     });
 
     // Act
@@ -74,7 +68,7 @@ describe('useExampleByIdsQuery', () => {
 
     // Assert
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.examples?.examples).toEqual([]);
+    expect(result.current.examples).toEqual([]);
     expect(result.current.error).toBeNull();
   });
 });
