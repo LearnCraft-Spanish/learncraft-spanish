@@ -30,12 +30,9 @@ const exampleDisplayConfig: ColumnDisplayConfig[] = [
 
 export function ExampleEditor() {
   const {
-    editTable,
-    isLoading,
-    isSaving,
+    tableProps,
     saveError,
     audioErrorHandlers,
-    validationState,
   } = useExampleEditor();
 
   const { vocabulary: vocabularyList } = useVocabulary();
@@ -44,7 +41,7 @@ export function ExampleEditor() {
   // The cell value is stored as JSON string "[1,2,3]" which we parse/stringify
   const handleVocabularyAdd = useCallback(
     (rowId: string, vocabId: number) => {
-      const row = editTable.data.rows.find((r) => r.id === rowId);
+      const row = tableProps.rows.find((r) => r.id === rowId);
       if (!row) return;
 
       const currentIds: number[] = (() => {
@@ -59,19 +56,19 @@ export function ExampleEditor() {
 
       if (!currentIds.includes(vocabId)) {
         const newIds = [...currentIds, vocabId];
-        editTable.updateCell(
+        tableProps.onCellChange(
           rowId,
           'relatedVocabulary',
           JSON.stringify(newIds),
         );
       }
     },
-    [editTable],
+    [tableProps],
   );
 
   const handleVocabularyRemove = useCallback(
     (rowId: string, vocabId: number) => {
-      const row = editTable.data.rows.find((r) => r.id === rowId);
+      const row = tableProps.rows.find((r) => r.id === rowId);
       if (!row) return;
 
       const currentIds: number[] = (() => {
@@ -85,9 +82,9 @@ export function ExampleEditor() {
       })();
 
       const newIds = currentIds.filter((id) => id !== vocabId);
-      editTable.updateCell(rowId, 'relatedVocabulary', JSON.stringify(newIds));
+      tableProps.onCellChange(rowId, 'relatedVocabulary', JSON.stringify(newIds));
     },
-    [editTable],
+    [tableProps],
   );
 
   /**
@@ -145,21 +142,8 @@ export function ExampleEditor() {
         </div>
       )}
       <EditableTable
-        rows={editTable.data.rows}
-        columns={editTable.data.columns}
+        {...tableProps}
         displayConfig={exampleDisplayConfig}
-        dirtyRowIds={editTable.dirtyRowIds}
-        validationErrors={validationState.errors}
-        onCellChange={editTable.updateCell}
-        onPaste={editTable.handlePaste}
-        setActiveCellInfo={editTable.setActiveCellInfo}
-        clearActiveCellInfo={editTable.clearActiveCellInfo}
-        hasUnsavedChanges={editTable.hasUnsavedChanges}
-        onSave={editTable.applyChanges}
-        onDiscard={editTable.discardChanges}
-        isLoading={isLoading}
-        isSaving={isSaving}
-        isValid={validationState.isValid}
         renderCell={renderCellWithSpecialHandlers}
       />
     </div>

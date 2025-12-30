@@ -1,6 +1,6 @@
-import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
 import type { ColumnDefinition } from '@domain/PasteTable';
 import type { ValidationState } from '@domain/PasteTable/validationTypes';
+import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
 import type {
   ExampleTechnical,
   UpdateExampleCommand,
@@ -130,16 +130,10 @@ function mapEditRowToUpdateCommand(
  * Return type for the useExampleEditor hook
  */
 export interface UseExampleEditorResult {
-  /** The edit table hook with all table operations */
-  editTable: EditTableHook<ExampleEditRow>;
-  /** Whether data is currently loading */
-  isLoading: boolean;
-  /** Whether save operation is in progress */
-  isSaving: boolean;
+  /** Pre-composed table props - satisfies EditableTableUseCaseProps contract */
+  tableProps: EditableTableUseCaseProps;
   /** Error from save operation, if any */
   saveError: Error | null;
-  /** Combined validation that includes audio load errors */
-  validationState: ValidationState;
   /** Handlers to track audio load success/failure */
   audioErrorHandlers: {
     onAudioError: (rowId: string, columnId: string) => void;
@@ -404,12 +398,45 @@ export function useExampleEditor(): UseExampleEditorResult {
     [mergedValidationState.errors, updateExamples],
   );
 
+  // 6. Compose table props before returning (following codebase pattern)
+  const tableProps = useMemo<EditableTableUseCaseProps>(
+    () => ({
+      rows: editTable.data.rows,
+      columns: editTable.data.columns,
+      dirtyRowIds: editTable.dirtyRowIds,
+      validationErrors: mergedValidationState.errors,
+      onCellChange: editTable.updateCell,
+      onPaste: editTable.handlePaste,
+      setActiveCellInfo: editTable.setActiveCellInfo,
+      clearActiveCellInfo: editTable.clearActiveCellInfo,
+      hasUnsavedChanges: editTable.hasUnsavedChanges,
+      onSave: editTable.applyChanges,
+      onDiscard: editTable.discardChanges,
+      isSaving,
+      isLoading: isLoadingExamplesToEdit,
+      isValid: mergedValidationState.isValid,
+    }),
+    [
+      editTable.data.rows,
+      editTable.data.columns,
+      editTable.dirtyRowIds,
+      editTable.updateCell,
+      editTable.handlePaste,
+      editTable.setActiveCellInfo,
+      editTable.clearActiveCellInfo,
+      editTable.hasUnsavedChanges,
+      editTable.applyChanges,
+      editTable.discardChanges,
+      mergedValidationState.errors,
+      mergedValidationState.isValid,
+      isSaving,
+      isLoadingExamplesToEdit,
+    ],
+  );
+
   return {
-    editTable,
-    isLoading: isLoadingExamplesToEdit,
-    isSaving,
+    tableProps,
     saveError,
-    validationState: mergedValidationState,
     audioErrorHandlers: {
       onAudioError: registerAudioError,
       onAudioSuccess: clearAudioError,

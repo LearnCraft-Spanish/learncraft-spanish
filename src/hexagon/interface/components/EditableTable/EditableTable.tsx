@@ -1,8 +1,4 @@
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import type {
-  CellRenderProps,
-  ColumnDisplayConfig,
-} from '@interface/components/EditableTable/types';
+import type { EditableTableProps } from '@interface/components/EditableTable/types';
 import {
   EditableTableFooter,
   EditableTableHeader,
@@ -15,48 +11,6 @@ import {
 import { PasteTableErrorBoundary } from '@interface/components/PasteTable/PasteTableErrorBoundary';
 import React, { useCallback, useMemo, useState } from 'react';
 import './EditableTable.scss';
-
-export interface EditableTableProps {
-  rows: TableRow[];
-  columns: ColumnDefinition[];
-  displayConfig: ColumnDisplayConfig[];
-  dirtyRowIds: Set<string>;
-  validationErrors: Record<string, Record<string, string>>;
-  onCellChange: (rowId: string, columnId: string, value: string) => void;
-  /**
-   * Cell renderer function - determines which component to render for each cell
-   *
-   * This function is called by EditableTableRow for every cell, allowing
-   * interface-layer customization of cell rendering (e.g., custom components
-   * for specific column types).
-   *
-   * The function receives CellRenderProps containing all cell state and handlers.
-   * Return a React component (typically StandardCell or a custom cell component).
-   *
-   * Default behavior: If not provided, StandardCell is used for all cells.
-   */
-  renderCell: (props: CellRenderProps) => React.ReactNode;
-  /** Paste handler from hook */
-  onPaste?: (e: React.ClipboardEvent<Element>) => void;
-  /** Set active cell info (for paste operations) */
-  setActiveCellInfo?: (rowId: string, columnId: string) => void;
-  /** Clear active cell info */
-  clearActiveCellInfo?: () => void;
-  /** Whether there are unsaved changes */
-  hasUnsavedChanges?: boolean;
-  /** Save handler */
-  onSave?: () => Promise<void>;
-  /** Discard changes handler */
-  onDiscard?: () => void;
-  /** Whether save is in progress */
-  isSaving?: boolean;
-  /** Whether data is currently loading */
-  isLoading?: boolean;
-  /** Validation state - whether all rows are valid */
-  isValid?: boolean;
-  /** Optional class name */
-  className?: string;
-}
 
 export function EditableTable({
   rows,

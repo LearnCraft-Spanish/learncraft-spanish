@@ -1,11 +1,7 @@
 /**
- * EditableTable Interface Contract
+ * EditableTable Component Types
  *
- * Types that define what the interface layer expects from any use case
- * that wants to use the EditableTable component.
- *
- * The use case decides HOW to compute dirty/validation state.
- * The interface just renders based on WHAT it receives.
+ * Shared types for EditableTable and related components.
  */
 
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
@@ -29,60 +25,6 @@ export interface ColumnDisplayConfig {
   placeholder?: string;
   /** Whether to show this column in the table UI (default: true) */
   visible?: boolean;
-}
-
-// =============================================================================
-// USE CASE CONTRACT
-// =============================================================================
-
-/**
- * Contract that any use case must satisfy to use EditableTable
- *
- * The use case owns:
- * - Local table state (tableRows)
- * - Dirty detection logic (comparing to server state)
- * - Validation logic (via Zod or other)
- * - Save/discard actions
- *
- * The interface receives the RESULTS of these computations.
- */
-export interface EditableTableContract {
-  // Data
-  rows: TableRow[];
-
-  // Derived state (use case computes these however it wants)
-  dirtyRowIds: Set<string>;
-  validationErrors: Record<string, Record<string, string>>; // rowId -> columnId -> message
-
-  // Actions
-  updateCell: (rowId: string, columnId: string, value: string) => void;
-
-  // Paste support (optional - table can handle if not provided)
-  handlePaste?: (e: ClipboardEvent<Element>) => void;
-
-  // Focus tracking for paste operations
-  setActiveCellInfo?: (rowId: string, columnId: string) => void;
-  clearActiveCellInfo?: () => void;
-}
-
-/**
- * Extended contract for edit mode (has save/discard)
- */
-export interface EditModeContract extends EditableTableContract {
-  hasUnsavedChanges: boolean;
-  save: () => Promise<void>;
-  discard: () => void;
-  isSaving?: boolean;
-}
-
-/**
- * Extended contract for create mode (has different save semantics)
- */
-export interface CreateModeContract extends EditableTableContract {
-  hasData: boolean;
-  save: () => Promise<void>;
-  reset: () => void;
-  isSaving?: boolean;
 }
 
 // =============================================================================
@@ -124,20 +66,81 @@ export interface CellRenderProps {
 // =============================================================================
 
 /**
- * Props for the EditableTable component
+ * Contract for what a use case must provide to use EditableTable
+ * Defines the data, state, and actions that come from the use case layer
+ *
+ * Organized by concern:
+ * - Data: Core table data (rows, columns)
+ * - State: Derived state (dirty tracking, validation, loading states)
+ * - Actions: User interactions (cell changes, paste, save, discard)
+ * - Focus: Focus management for paste operations
  */
-export interface EditableTableProps {
-  /** Use case contract - provides data and actions */
-  contract: EditableTableContract;
-  /** Column definitions (domain) */
+export interface EditableTableUseCaseProps {
+  // =============================================================================
+  // DATA
+  // =============================================================================
+  /** Table rows with current cell values */
+  rows: TableRow[];
+  /** Column definitions (domain layer) */
   columns: ColumnDefinition[];
-  /** Column display config (interface) */
+
+  // =============================================================================
+  // STATE
+  // =============================================================================
+  /** Set of row IDs that have unsaved changes */
+  dirtyRowIds: Set<string>;
+  /** Validation errors by rowId -> columnId -> error message */
+  validationErrors: Record<string, Record<string, string>>;
+  /** Whether data is currently loading from server */
+  isLoading: boolean;
+  /** Whether save operation is in progress */
+  isSaving: boolean;
+  /** Whether all rows pass validation */
+  isValid: boolean;
+  /** Whether there are any unsaved changes */
+  hasUnsavedChanges?: boolean;
+
+  // =============================================================================
+  // ACTIONS
+  // =============================================================================
+  /** Handler for cell value changes */
+  onCellChange: (rowId: string, columnId: string, value: string) => void;
+  /** Handler for paste operations */
+  onPaste?: (e: ClipboardEvent<Element>) => void;
+  /** Handler to save changes */
+  onSave?: () => Promise<void>;
+  /** Handler to discard unsaved changes */
+  onDiscard?: () => void;
+
+  // =============================================================================
+  // FOCUS MANAGEMENT
+  // =============================================================================
+  /** Set active cell info (for paste operations) */
+  setActiveCellInfo?: (rowId: string, columnId: string) => void;
+  /** Clear active cell info */
+  clearActiveCellInfo?: () => void;
+}
+
+/**
+ * Props for the EditableTable component
+ * Combines use case props with interface-layer presentation concerns
+ */
+export interface EditableTableProps extends EditableTableUseCaseProps {
+  /** Column display configuration - presentation concern (interface layer) */
   displayConfig: ColumnDisplayConfig[];
   /**
-   * Cell renderer - receives props for each cell
-   * Return null to use default StandardCell renderer
+   * Cell renderer function - determines which component to render for each cell
+   *
+   * This function is called by EditableTableRow for every cell, allowing
+   * interface-layer customization of cell rendering (e.g., custom components
+   * for specific column types).
+   *
+   * The function receives CellRenderProps containing all cell state and handlers.
+   * Return a React component (typically StandardCell or a custom cell component).
+   *
+   * Default behavior: If not provided, StandardCell is used for all cells.
    */
-  renderCell?: (props: CellRenderProps) => React.ReactNode | null;
-  /** Optional class name for the table container */
+  renderCell: (props: CellRenderProps) => React.ReactNode;
+  /** Optional class name */
   className?: string;
 }
