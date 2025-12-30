@@ -1,7 +1,8 @@
 import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
 
 import { overrideMockActiveStudent } from '@application/coordinators/hooks/useActiveStudent.mock';
-import mockSelectedCourseAndLessons, {
+import {
+  mockSelectedCourseAndLessons,
   overrideMockSelectedCourseAndLessons,
 } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import {
@@ -188,7 +189,9 @@ describe('useOfficialQuizSetupMenu', () => {
     );
 
     beforeEach(() => {
-      mockSelectedCourseAndLessons.updateUserSelectedCourseId.mockClear();
+      overrideMockSelectedCourseAndLessons({
+        updateUserSelectedCourseId: vi.fn(),
+      });
     });
 
     it('converts lcspx to lcsp, updates coordinator', async () => {

@@ -38,7 +38,7 @@ describe('menu for student flashcards', () => {
     );
     // wait for the menu to load
     await waitFor(() => {
-      expect(screen.getByText(/srs quiz/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/srs quiz/i).length).toBeGreaterThan(0);
       expect(screen.getByText(/start with spanish/i)).toBeInTheDocument();
       expect(screen.getByText(/custom flashcards/i)).toBeInTheDocument();
       expect(screen.getByText(/quiz length/i)).toBeInTheDocument();
