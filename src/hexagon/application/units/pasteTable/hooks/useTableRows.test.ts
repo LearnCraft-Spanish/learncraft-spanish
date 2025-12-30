@@ -1,12 +1,12 @@
-import type { TableColumn } from '@domain/PasteTable/General';
+import type { ColumnDefinition } from '@domain/PasteTable';
 import { useTableRows } from '@application/units/pasteTable/hooks/useTableRows';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { act, renderHook } from '@testing-library/react';
 
 // Test columns
-const testColumns: TableColumn[] = [
-  { id: 'name', label: 'Name', width: '1fr', type: 'text' },
-  { id: 'value', label: 'Value', width: '1fr', type: 'number' },
+const testColumns: ColumnDefinition[] = [
+  { id: 'name', type: 'text' },
+  { id: 'value', type: 'number' },
 ];
 
 // Test initial data

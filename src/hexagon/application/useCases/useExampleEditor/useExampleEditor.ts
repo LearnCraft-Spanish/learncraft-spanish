@@ -1,46 +1,144 @@
-import type { EditTableHook } from '@application/units/pasteTable/useEditTable';
-import type { ExampleEditRow } from '@domain/PasteTable/exampleEditRow';
-import type { TableColumn } from '@domain/PasteTable/General';
-import type { ExampleTechnical } from '@learncraft-spanish/shared';
-import { useExampleAdapter } from '@application/adapters/exampleAdapter';
+import type { ColumnDefinition } from '@domain/PasteTable';
+import type { ValidationState } from '@domain/PasteTable/validationTypes';
+import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
+import type {
+  ExampleTechnical,
+  UpdateExampleCommand,
+} from '@learncraft-spanish/shared';
+import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
+import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
+import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
 import { useEditTable } from '@application/units/pasteTable/useEditTable';
-import {
-  mapEditRowToUpdateCommand,
-  mapExampleToEditRow,
-} from '@domain/PasteTable/exampleEditRow';
-import { createAudioUrlAdapter } from '@domain/PasteTable/functions/audioUrlAdapter';
+import { normalizeError } from '@application/utils/queryUtils';
+import { generateAudioUrls } from '@domain/PasteTable/functions/audioUrlAdapter';
 import { updateExampleCommandSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
 
-export type { ExampleEditRow };
+// ============================================================================
+// Example Edit Row - use-case specific type and mappers
+// ============================================================================
 
 /**
- * Props for the useExampleEditor hook
+ * Table row type for editing examples
+ * Uses hasAudio boolean instead of two separate URL fields for editing
+ * Includes audio URLs for playback (derived/display-only)
  */
-export interface UseExampleEditorProps {
-  /** Source examples from TanStack query */
-  examples: ExampleTechnical[];
-  /** Callback when examples are saved */
-  onSave?: () => void;
+export interface ExampleEditRow extends Record<string, unknown> {
+  id: number;
+  spanish: string;
+  english: string;
+  hasAudio: boolean;
+  spanishAudio?: string; // For audio playback (derived, display-only)
+  englishAudio?: string; // For audio playback (derived, display-only)
+  relatedVocabulary: number[];
+  vocabularyComplete: boolean;
+}
+
+/**
+ * Compute spanglish status from spanish text
+ * Spanglish is true if the text contains one or more asterisks (*)
+ */
+function computeSpanglish(spanish: string): boolean {
+  return spanish.includes('*');
+}
+
+/**
+ * Compute derived fields for a row based on current cell values
+ * Pure function that computes audio URLs and spanglish from row data
+ */
+function computeDerivedFields(row: { cells: Record<string, string> }): {
+  spanishAudio: string;
+  englishAudio: string;
+  spanglish: string;
+} {
+  const domainId = Number(row.cells.id);
+  const hasAudio = row.cells.hasAudio === 'true';
+  const spanish = row.cells.spanish || '';
+
+  // Compute audio URLs from hasAudio boolean
+  const audioUrls = generateAudioUrls(hasAudio, domainId);
+
+  // Compute spanglish from spanish text (contains asterisks)
+  const spanglish = computeSpanglish(spanish);
+
+  return {
+    spanishAudio: audioUrls.spanishAudioLa,
+    englishAudio: audioUrls.englishAudio,
+    spanglish: String(spanglish),
+  };
+}
+
+/**
+ * Map ExampleTechnical to ExampleEditRow
+ *
+ * Derives:
+ * - hasAudio: true if both audio URLs exist
+ * - spanishAudio/englishAudio: Generated from hasAudio using generateAudioUrls
+ * - spanglish: Computed from spanish text (contains asterisks)
+ */
+function mapExampleToEditRow(example: ExampleTechnical): ExampleEditRow {
+  const hasAudio = !!(example.spanishAudio && example.englishAudio);
+  const audioUrls = generateAudioUrls(hasAudio, example.id);
+  const relatedVocabulary = example.vocabulary.map(
+    (vocabulary) => vocabulary.id,
+  );
+
+  return {
+    id: example.id,
+    spanish: example.spanish,
+    english: example.english,
+    hasAudio,
+    // Audio URLs are derived from hasAudio boolean
+    spanishAudio: audioUrls.spanishAudioLa,
+    englishAudio: audioUrls.englishAudio,
+    // The ids of the vocabulary items that are related to this example
+    relatedVocabulary,
+    vocabularyComplete: example.vocabularyComplete,
+  };
+}
+
+/**
+ * Map ExampleEditRow back to UpdateExampleCommand
+ *
+ * Note: `row.id` here is the domain entity ID (number), not the table row ID (string).
+ * The table system's `mapTableRowsToDomain` extracts the domain ID from `row.cells.id`
+ * and converts it to the appropriate type, so `dirtyData` contains domain entities.
+ */
+function mapEditRowToUpdateCommand(
+  row: Partial<ExampleEditRow>,
+): UpdateExampleCommand {
+  if (!row.id) {
+    throw new Error('Row ID is required to update example');
+  }
+
+  const exampleId = Number(row.id);
+  const audioUrls = generateAudioUrls(row.hasAudio ?? false, exampleId);
+
+  return {
+    exampleId,
+    spanish: row.spanish,
+    english: row.english,
+    spanishAudio: audioUrls.spanishAudioLa,
+    englishAudio: audioUrls.englishAudio,
+    relatedVocabulary: row.relatedVocabulary,
+    vocabularyComplete: row.vocabularyComplete,
+  };
 }
 
 /**
  * Return type for the useExampleEditor hook
  */
 export interface UseExampleEditorResult {
-  /** The edit table hook with all table operations */
-  tableHook: EditTableHook<ExampleEditRow>;
-  /** Discard all changes and revert to source data */
-  discardChanges: () => void;
-  /** Apply changes - saves dirty rows */
-  applyChanges: () => Promise<void>;
-  /** Whether the table has unsaved changes */
-  hasUnsavedChanges: boolean;
-  /** Whether save is in progress */
-  isSaving: boolean;
-  /** Error from save operation */
+  /** Pre-composed table props - satisfies EditableTableUseCaseProps contract */
+  tableProps: EditableTableUseCaseProps;
+  /** Error from save operation, if any */
   saveError: Error | null;
+  /** Handlers to track audio load success/failure */
+  audioErrorHandlers: {
+    onAudioError: (rowId: string, columnId: string) => void;
+    onAudioSuccess: (rowId: string, columnId: string) => void;
+  };
 }
 
 /**
@@ -48,8 +146,8 @@ export interface UseExampleEditorResult {
  * Derived from updateExampleCommandSchema, adapted for table UI:
  * - Renames exampleId -> id
  * - Replaces audio URL fields with hasAudio boolean
- * - Adds spanglish (display-only, computed server-side)
  * - Makes vocabularyComplete required (has default in UI)
+ *
  */
 const exampleEditRowSchema = updateExampleCommandSchema
   .omit({
@@ -64,51 +162,33 @@ const exampleEditRowSchema = updateExampleCommandSchema
     spanish: z.string().min(1, 'Spanish text is required'),
     english: z.string().min(1, 'English translation is required'),
     hasAudio: z.coerce.boolean(),
-    spanglish: z.coerce.boolean(),
+    relatedVocabulary: z.array(z.coerce.number()),
     vocabularyComplete: z.coerce.boolean(),
   });
 
 /**
  * Column definitions for the example edit table
+ *
+ * These definitions control:
+ * - Data types and validation (via rowSchema)
+ * - Editability (editable: false = read-only)
+ * - Display behavior (derived: true = computed/display-only)
+ *
+ * Note: Custom cell rendering (e.g., AudioPlaybackCell for audio columns) is
+ * handled in the interface layer (ExampleEditor component) via the renderCell
+ * function. The column definitions here mark audio columns as 'derived' to
+ * indicate they're display-only, but the actual component selection happens
+ * in the interface layer based on column.id.
  */
-const exampleEditColumns: TableColumn[] = [
-  {
-    id: 'id',
-    label: 'ID',
-    width: '80px',
-    type: 'number',
-    editable: false, // ID is readonly
-  },
-  {
-    id: 'spanish',
-    label: 'Spanish',
-    width: '2fr',
-    type: 'text',
-  },
-  {
-    id: 'english',
-    label: 'English',
-    width: '2fr',
-    type: 'text',
-  },
-  {
-    id: 'hasAudio',
-    label: 'Audio',
-    width: '80px',
-    type: 'boolean',
-  },
-  {
-    id: 'spanglish',
-    label: 'Spanglish',
-    width: '100px',
-    type: 'boolean',
-  },
-  {
-    id: 'vocabularyComplete',
-    label: 'Vocab Complete',
-    width: '120px',
-    type: 'boolean',
-  },
+const exampleEditColumns: ColumnDefinition[] = [
+  { id: 'id', type: 'read-only', editable: false },
+  { id: 'spanish', type: 'textarea', required: true },
+  { id: 'english', type: 'textarea', required: true },
+  { id: 'hasAudio', type: 'boolean' },
+  { id: 'spanishAudio', type: 'text', editable: false, derived: true },
+  { id: 'englishAudio', type: 'text', editable: false, derived: true },
+  { id: 'relatedVocabulary', type: 'custom', editable: false, derived: true },
+  { id: 'vocabularyComplete', type: 'boolean' },
 ];
 
 /**
@@ -121,69 +201,245 @@ const exampleEditColumns: TableColumn[] = [
  * - Validation
  * - Save dirty changes to server
  */
-export function useExampleEditor({
-  examples,
-  onSave,
-}: UseExampleEditorProps): UseExampleEditorResult {
+export function useExampleEditor(): UseExampleEditorResult {
   // State for save operation
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<Error | null>(null);
-
-  // Get the example adapter for saving
-  const exampleAdapter = useExampleAdapter();
-
-  // Create audio URL adapter for generating URLs from hasAudio
-  const audioUrlAdapter = useMemo(() => createAudioUrlAdapter(), []);
-
-  // Map source examples to edit rows
-  const sourceData = useMemo(
-    () => examples.map(mapExampleToEditRow),
-    [examples],
+  // Track audio errors by row/column so we can block save
+  const [audioErrors, setAudioErrors] = useState<Map<string, Set<string>>>(
+    () => new Map(),
   );
 
-  // Handle applying changes - maps back to UpdateExamplesCommand
-  const handleApplyChanges = useCallback(
+  const { selectedExampleIds } = useSelectedExamplesContext();
+
+  const { examples: examplesToEdit, isLoading: isLoadingExamplesToEdit } =
+    useExamplesToEditQuery(selectedExampleIds);
+
+  const { updateExamples } = useExampleMutations();
+
+  // 1. Source data is always true and fresh (from server)
+  // Map source examples to edit rows with initial derived field computation
+  const sourceData = useMemo(
+    () => examplesToEdit?.map(mapExampleToEditRow) ?? [],
+    [examplesToEdit],
+  );
+
+  // 2. Handle applying changes - maps back to UpdateExampleCommand
+  // Note: This will be updated to check validation after mergedValidationState is computed
+  let handleApplyChanges = useCallback(
     async (dirtyData: Partial<ExampleEditRow>[]) => {
       setIsSaving(true);
       setSaveError(null);
 
       try {
         // Map dirty rows to update commands
+        // Derived fields (audio URLs) are computed here from hasAudio
         const updateCommands = dirtyData.map((row) =>
-          mapEditRowToUpdateCommand(row, audioUrlAdapter),
+          mapEditRowToUpdateCommand(row),
         );
-
-        // Call the adapter to save
-        await exampleAdapter.updateExamples(updateCommands);
-
-        // Call onSave callback if provided
-        onSave?.();
+        // Call the mutation to save changes
+        await updateExamples(updateCommands);
       } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
+        const error = normalizeError(err);
         setSaveError(error);
         throw error; // Re-throw so useEditTable knows it failed
       } finally {
         setIsSaving(false);
       }
     },
-    [audioUrlAdapter, exampleAdapter, onSave],
+    [updateExamples],
   );
 
-  // Use the edit table hook
+  // 3. Compute derived fields function - computes from current cell values
+  // This ensures derived fields stay in sync with current row values (source + user edits)
+  const computeDerivedFieldsForRow = useCallback(
+    (row: { cells: Record<string, string> }): Record<string, string> => {
+      const computedFields = computeDerivedFields(row);
+      return computedFields;
+    },
+    [],
+  );
+
+  // 4. Use edit table hook - merges source + diffs and computes derived fields
   const editTable = useEditTable<ExampleEditRow>({
     columns: exampleEditColumns,
     sourceData,
     rowSchema: exampleEditRowSchema,
     idColumnId: 'id',
     onApplyChanges: handleApplyChanges,
+    computeDerivedFields: computeDerivedFieldsForRow,
   });
 
+  const registerAudioError = useCallback((rowId: string, columnId: string) => {
+    setAudioErrors((prev) => {
+      const next = new Map(prev);
+      const existing = next.get(rowId) ?? new Set<string>();
+      existing.add(columnId);
+      next.set(rowId, existing);
+      return next;
+    });
+  }, []);
+
+  const clearAudioError = useCallback((rowId: string, columnId: string) => {
+    setAudioErrors((prev) => {
+      const next = new Map(prev);
+      const existing = next.get(rowId);
+      if (existing) {
+        existing.delete(columnId);
+        if (existing.size === 0) {
+          next.delete(rowId);
+        } else {
+          next.set(rowId, existing);
+        }
+      }
+      return next;
+    });
+  }, []);
+
+  const mergedValidationState: ValidationState = useMemo(() => {
+    const mergedErrors: Record<string, Record<string, string>> = {
+      ...editTable.validationState.errors,
+    };
+
+    const rowsWithAudio = new Set(
+      editTable.data.rows
+        .filter((row) => String(row.cells.hasAudio).toLowerCase() === 'true')
+        .map((row) => row.id),
+    );
+
+    let hasAudioErrors = false;
+
+    audioErrors.forEach((columnIds, rowId) => {
+      if (!rowsWithAudio.has(rowId)) {
+        return;
+      }
+      if (!mergedErrors[rowId]) mergedErrors[rowId] = {};
+      columnIds.forEach((columnId) => {
+        mergedErrors[rowId][columnId] = 'Audio failed to load';
+        hasAudioErrors = true;
+      });
+    });
+
+    // Custom validation for relatedVocabulary: must be valid JSON array of numbers
+    let hasRelatedVocabularyErrors = false;
+    editTable.data.rows.forEach((row) => {
+      const value = row.cells.relatedVocabulary || '';
+      if (!value.trim()) {
+        // Empty is valid (no vocabulary selected)
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(value);
+        if (!Array.isArray(parsed)) {
+          if (!mergedErrors[row.id]) mergedErrors[row.id] = {};
+          mergedErrors[row.id].relatedVocabulary =
+            'Related vocabulary must be an array';
+          hasRelatedVocabularyErrors = true;
+          return;
+        }
+
+        // Validate all items are numbers
+        const invalidItems = parsed.filter(
+          (item) => typeof item !== 'number' || Number.isNaN(item),
+        );
+        if (invalidItems.length > 0) {
+          if (!mergedErrors[row.id]) mergedErrors[row.id] = {};
+          mergedErrors[row.id].relatedVocabulary =
+            'All vocabulary IDs must be valid numbers';
+          hasRelatedVocabularyErrors = true;
+        }
+      } catch {
+        // Invalid JSON
+        if (!mergedErrors[row.id]) mergedErrors[row.id] = {};
+        mergedErrors[row.id].relatedVocabulary =
+          'Invalid format: must be a valid array';
+        hasRelatedVocabularyErrors = true;
+      }
+    });
+
+    return {
+      isValid:
+        editTable.validationState.isValid &&
+        !hasAudioErrors &&
+        !hasRelatedVocabularyErrors,
+      errors: mergedErrors,
+    };
+  }, [audioErrors, editTable.data.rows, editTable.validationState]);
+
+  // 5. Update handleApplyChanges to check validation before calling updateExamples
+  // Defined after mergedValidationState so it can access it directly
+  handleApplyChanges = useCallback(
+    async (dirtyData: Partial<ExampleEditRow>[]) => {
+      // Check validation before proceeding
+      if (Object.keys(mergedValidationState.errors).length > 0) {
+        throw new Error('validation failed');
+      }
+
+      setIsSaving(true);
+      setSaveError(null);
+
+      try {
+        // Map dirty rows to update commands
+        // Derived fields (audio URLs) are computed here from hasAudio
+        const updateCommands = dirtyData.map((row) =>
+          mapEditRowToUpdateCommand(row),
+        );
+        // Call the mutation to save changes
+        await updateExamples(updateCommands);
+      } catch (err) {
+        const error = normalizeError(err);
+        setSaveError(error);
+        throw error; // Re-throw so useEditTable knows it failed
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [mergedValidationState.errors, updateExamples],
+  );
+
+  // 6. Compose table props before returning (following codebase pattern)
+  const tableProps = useMemo<EditableTableUseCaseProps>(
+    () => ({
+      rows: editTable.data.rows,
+      columns: editTable.data.columns,
+      dirtyRowIds: editTable.dirtyRowIds,
+      validationErrors: mergedValidationState.errors,
+      onCellChange: editTable.updateCell,
+      onPaste: editTable.handlePaste,
+      setActiveCellInfo: editTable.setActiveCellInfo,
+      clearActiveCellInfo: editTable.clearActiveCellInfo,
+      hasUnsavedChanges: editTable.hasUnsavedChanges,
+      onSave: editTable.applyChanges,
+      onDiscard: editTable.discardChanges,
+      isSaving,
+      isLoading: isLoadingExamplesToEdit,
+      isValid: mergedValidationState.isValid,
+    }),
+    [
+      editTable.data.rows,
+      editTable.data.columns,
+      editTable.dirtyRowIds,
+      editTable.updateCell,
+      editTable.handlePaste,
+      editTable.setActiveCellInfo,
+      editTable.clearActiveCellInfo,
+      editTable.hasUnsavedChanges,
+      editTable.applyChanges,
+      editTable.discardChanges,
+      mergedValidationState.errors,
+      mergedValidationState.isValid,
+      isSaving,
+      isLoadingExamplesToEdit,
+    ],
+  );
+
   return {
-    tableHook: editTable,
-    discardChanges: editTable.discardChanges,
-    applyChanges: editTable.applyChanges,
-    hasUnsavedChanges: editTable.hasUnsavedChanges,
-    isSaving,
+    tableProps,
     saveError,
+    audioErrorHandlers: {
+      onAudioError: registerAudioError,
+      onAudioSuccess: clearAudioError,
+    },
   };
 }

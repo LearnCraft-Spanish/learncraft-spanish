@@ -8,11 +8,13 @@ const PAGE_SIZE = 25;
 export interface UseSearchByQuizResultsParams {
   courseCode: string;
   quizNumber: number | undefined;
+  vocabularyComplete?: boolean;
 }
 
 export function useSearchByQuizResults({
   courseCode,
   quizNumber,
+  vocabularyComplete,
 }: UseSearchByQuizResultsParams) {
   const { getOfficialQuizExamples } = useOfficialQuizAdapter();
   const {
@@ -20,9 +22,19 @@ export function useSearchByQuizResults({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['examples', 'by quiz', courseCode, quizNumber],
+    queryKey: [
+      'examples',
+      'by quiz',
+      courseCode,
+      quizNumber,
+      vocabularyComplete,
+    ],
     queryFn: () =>
-      getOfficialQuizExamples({ courseCode, quizNumber: quizNumber! }),
+      getOfficialQuizExamples({
+        courseCode,
+        quizNumber: quizNumber!,
+        vocabularyComplete,
+      }),
     enabled: !!courseCode && !!quizNumber,
   });
 

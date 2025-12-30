@@ -2,7 +2,6 @@ import type { VocabularyPort } from '@application/ports/vocabularyPort';
 import type { CreateVocabulary } from '@learncraft-spanish/shared';
 import {
   createMockVocabulary,
-  createMockVocabularyAbbreviationList,
   createMockVocabularyList,
   createMockVocabularyRelatedRecords,
 } from '@testing/factories/vocabularyFactories';
@@ -10,7 +9,7 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation matching the port exactly
 const defaultMockAdapter: VocabularyPort = {
-  getVocabulary: () => Promise.resolve(createMockVocabularyAbbreviationList()),
+  getVocabulary: () => Promise.resolve(createMockVocabularyList()),
   getVocabularyBySubcategory: (_subcategoryId, _page, _limit) =>
     Promise.resolve(createMockVocabularyList()),
   getVocabularyById: (id) => Promise.resolve(createMockVocabulary({ id })),

@@ -5,6 +5,7 @@ import { useVocabularyTable } from '@application/implementations/vocabularyTable
 import { useSubcategories } from '@application/queries/useSubcategories';
 import useVocabulary from '@application/units/useVocabulary';
 import useVocabularyPage from '@application/units/useVocabularyPage';
+import { normalizeError } from '@application/utils/queryUtils';
 import { useCallback, useMemo, useState } from 'react';
 
 /**
@@ -137,7 +138,7 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
 
         return createdIds;
       } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
+        const error = normalizeError(err);
         setCreationError(error);
         return [];
       }
@@ -171,7 +172,7 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
       // createVocabularyBatch adds subcategoryId and validates the command
       return await createVocabularyBatch(tableData);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
+      const error = normalizeError(err);
       setCreationError(error);
       return [];
     }

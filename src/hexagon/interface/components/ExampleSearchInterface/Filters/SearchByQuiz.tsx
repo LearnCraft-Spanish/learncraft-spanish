@@ -1,10 +1,13 @@
 import { useSearchByQuizFilter } from '@application/units/ExampleSearchInterface/Filters/useSearchByQuizFilter';
+import { VocabularyCompleteFilter } from '@interface/components/ExampleSearchInterface/Filters/VocabularyCompleteFilter';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 export interface SearchByQuizProps {
   courseCode: string;
   quizNumber: number | '';
   onCourseCodeChange: (value: string) => void;
   onQuizNumberChange: (value: number | '') => void;
+  vocabularyComplete: boolean | undefined;
+  onVocabularyCompleteChange: (value: boolean | undefined) => void;
 }
 
 export function SearchByQuiz({
@@ -12,6 +15,8 @@ export function SearchByQuiz({
   quizNumber,
   onCourseCodeChange,
   onQuizNumberChange,
+  vocabularyComplete,
+  onVocabularyCompleteChange,
 }: SearchByQuizProps) {
   const { quizOptions } = useSearchByQuizFilter({ courseCode });
 
@@ -19,7 +24,7 @@ export function SearchByQuiz({
     <div>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
         <select
-          className="quizMenu"
+          className="quizMenu required"
           role="select"
           aria-label="Select Course"
           value={courseCode}
@@ -36,7 +41,7 @@ export function SearchByQuiz({
           ))}
         </select>
         <select
-          className="quizMenu"
+          className="quizMenu required"
           role="select"
           aria-label="Select Quiz"
           value={quizNumber}
@@ -52,6 +57,11 @@ export function SearchByQuiz({
           ))}
         </select>
       </div>
+
+      <VocabularyCompleteFilter
+        value={vocabularyComplete}
+        onChange={onVocabularyCompleteChange}
+      />
     </div>
   );
 }

@@ -64,9 +64,12 @@ describe('useExampleSearch', () => {
     const { result } = renderHook(() => useExampleSearch());
 
     expect(mockUseCombinedFilters).toHaveBeenCalledWith({});
-    expect(result.current.mode).toBe('filter');
+    expect(result.current.mode).toBe('ids');
     expect(result.current.searchIsTriggered).toBe(false);
-    expect(result.current.isValidSearch).toBe(false); // selectedCourseId is 0
+    expect(result.current.isValidSearch).toBe(false);
+    expect(result.current.nonValidSearchErrorMessage).toBe(
+      'ERROR: Please enter at least one ID.',
+    );
   });
 
   it('handleChangeMode resets searchIsTriggered', () => {

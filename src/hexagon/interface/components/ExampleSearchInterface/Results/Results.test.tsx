@@ -42,6 +42,7 @@ vi.mock(
 
 describe('component: Results', () => {
   const mockProps = {
+    recentlyEditedResultsProps: {} as any,
     localFilterResultsProps: {} as any,
     quizResultsProps: {} as any,
     textResultsProps: {} as any,

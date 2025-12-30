@@ -1,5 +1,4 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
-import type { ColumnDefinition } from '@domain/PasteTable/types';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import { generateRowId } from '@application/units/pasteTable/utils/rowCreation';
 import { normalizeRowCells } from '@domain/PasteTable/functions/normalization';
 
@@ -117,19 +116,17 @@ export function parseDelimitedText(text: string): string[][] {
  */
 export function detectHeaderRow(
   firstRow: string[],
-  columns: TableColumn[],
+  columns: ColumnDefinition[],
 ): { hasHeaderRow: boolean; headerColumnMap: Record<number, string> } {
   const headerColumnMap: Record<number, string> = {};
 
-  // Check if header row matches column labels
+  // Check if header row matches column IDs (case-insensitive)
   const matchCount = firstRow.filter((cellValue, index) => {
-    // Find a column with matching label
     const matchingColumn = columns.find(
-      (col) => col.label.toLowerCase() === cellValue.trim().toLowerCase(),
+      (col) => col.id.toLowerCase() === cellValue.trim().toLowerCase(),
     );
 
     if (matchingColumn) {
-      // Store the mapping between column index and column ID
       headerColumnMap[index] = matchingColumn.id;
       return true;
     }
@@ -155,18 +152,12 @@ export function detectHeaderRow(
  */
 export function convertTsvToRows(
   parsedRows: string[][], // [rowIndex][cellIndex] = cellValue
-  columns: TableColumn[],
+  columns: ColumnDefinition[],
   hasHeaderRow: boolean,
   headerColumnMap: Record<number, string>,
 ): TableRow[] {
   // Skip the header row if detected
   const dataRows = hasHeaderRow ? parsedRows.slice(1) : parsedRows;
-
-  // Extract domain columns (without UI properties) for normalization
-  const domainColumns: ColumnDefinition[] = columns.map((col) => {
-    const { label, width, placeholder, ...domainCol } = col;
-    return domainCol;
-  });
 
   return dataRows.map((rowCells) => {
     // rowCells is an array of cell values: ['value1', 'value2', ...]
@@ -199,7 +190,7 @@ export function convertTsvToRows(
     }
 
     // Normalize cell values to canonical format
-    const normalizedCells = normalizeRowCells(cellsObj, domainColumns);
+    const normalizedCells = normalizeRowCells(cellsObj, columns);
 
     return {
       id: rowId,

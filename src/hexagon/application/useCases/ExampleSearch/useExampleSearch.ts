@@ -16,6 +16,10 @@ export interface SearchComponentProps {
   searchByQuizProps: SearchByQuizProps;
   searchByTextProps: SearchByTextProps;
   searchByIdsProps: SearchByIdsProps;
+  searchByRecentlyEditedProps: {
+    vocabularyComplete: boolean | undefined;
+    onVocabularyCompleteChange: (value: boolean | undefined) => void;
+  };
 }
 
 export interface SearchResultProps {
@@ -23,12 +27,15 @@ export interface SearchResultProps {
   quizResultsProps: SearchByQuizResultsProps;
   textResultsProps: SearchByTextResultsProps;
   idsResultsProps: SearchByIdsResultsProps;
+  recentlyEditedResultsProps: { vocabularyComplete: boolean | undefined };
 }
 
 export function useExampleSearch() {
   // Mode state
-  const [mode, setMode] = useState<ExampleSearchMode>('filter');
+  const [mode, setMode] = useState<ExampleSearchMode>('ids');
   const [searchIsTriggered, setSearchIsTriggered] = useState(false);
+  const [nonValidSearchErrorMessage, setNonValidSearchErrorMessage] =
+    useState('');
 
   // Text search state
   const [spanishInput, setSpanishInput] = useState('');
@@ -41,10 +48,15 @@ export function useExampleSearch() {
   const [courseCode, setCourseCode] = useState('');
   const [quizNumber, setQuizNumber] = useState<number | ''>('');
 
+  // Shared vocabulary complete filter (for text, quiz, and recentlyEdited modes)
+  const [vocabularyComplete, setVocabularyComplete] = useState<
+    boolean | undefined
+  >(undefined);
+
   // Filter panel state
-  const [selectedCourseId, setSelectedCourseId] = useState<number>(0);
+  const [selectedCourseId, setSelectedCourseId] = useState<number>(2); // Default to LearnCraft Spanish
   const [fromLessonNumber, setFromLessonNumber] = useState<number>(0);
-  const [toLessonNumber, setToLessonNumber] = useState<number>(0);
+  const [toLessonNumber, setToLessonNumber] = useState<number>(250); // Default to last lesson of the course
 
   // Combined filters for filter panel
   const filtersForUI = useCombinedFilters({});
@@ -62,7 +74,7 @@ export function useExampleSearch() {
   const trimmedEnglishInput = englishInput.trim();
   const trimmedIdsInput = idsInput.trim();
   const parsedIds = trimmedIdsInput
-    .split(',')
+    .split(/[\t\n\r, ]/)
     .map((val) => Number(val.trim()))
     .filter((val) => val > 0 && !Number.isNaN(val));
 
@@ -77,23 +89,49 @@ export function useExampleSearch() {
   // Validation
   const isValidSearch = useMemo(() => {
     if (mode === 'text') {
-      return trimmedSpanishInput.length > 0 || trimmedEnglishInput.length > 0;
+      if (
+        trimmedSpanishInput.length === 0 &&
+        trimmedEnglishInput.length === 0
+      ) {
+        setNonValidSearchErrorMessage(
+          'ERROR: Please enter at least one charcter in either the Spanish or English field.',
+        );
+        return false;
+      }
+      return true;
     }
     if (mode === 'ids') {
-      return parsedIds.length > 0;
+      if (parsedIds.length === 0) {
+        setNonValidSearchErrorMessage('ERROR: Please enter at least one ID.');
+        return false;
+      }
+      return true;
     }
     if (mode === 'quiz') {
-      return (
-        courseCode.trim().length > 0 &&
-        typeof quizNumber === 'number' &&
-        quizNumber > 0
-      );
+      if (
+        courseCode.trim().length === 0 ||
+        typeof quizNumber !== 'number' ||
+        quizNumber <= 0
+      ) {
+        setNonValidSearchErrorMessage(
+          'ERROR: Please select a course and quiz.',
+        );
+        return false;
+      }
+      return true;
     }
     if (mode === 'recentlyEdited') {
       return true;
     }
     if (mode === 'filter') {
-      return selectedCourseId > 0;
+      if (selectedCourseId <= 0 || toLessonNumber <= 0) {
+        setNonValidSearchErrorMessage(
+          'ERROR: Please select a course and To Lesson.',
+        );
+        return false;
+      }
+
+      return true;
     }
     return true;
   }, [
@@ -145,16 +183,24 @@ export function useExampleSearch() {
         quizNumber: quizNumber ?? 0,
         onCourseCodeChange: withSearchReset(setCourseCode),
         onQuizNumberChange: withSearchReset(setQuizNumber),
+        vocabularyComplete,
+        onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
       searchByTextProps: {
         spanishInput,
         englishInput,
         onSpanishInputChange: withSearchReset(setSpanishInput),
         onEnglishInputChange: withSearchReset(setEnglishInput),
+        vocabularyComplete,
+        onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
       searchByIdsProps: {
         input: idsInput,
         onInputChange: withSearchReset(setIdsInput),
+      },
+      searchByRecentlyEditedProps: {
+        vocabularyComplete,
+        onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
     }),
     [
@@ -167,6 +213,7 @@ export function useExampleSearch() {
       spanishInput,
       englishInput,
       idsInput,
+      vocabularyComplete,
       withSearchReset,
     ],
   );
@@ -182,10 +229,15 @@ export function useExampleSearch() {
       quizResultsProps: {
         courseCode,
         quizNumber: typeof quizNumber === 'number' ? quizNumber : undefined,
+        vocabularyComplete,
       },
       textResultsProps: {
         spanishString: spanishInput,
         englishString: englishInput,
+        vocabularyComplete,
+      },
+      recentlyEditedResultsProps: {
+        vocabularyComplete,
       },
       idsResultsProps: {
         ids: parsedIds,
@@ -201,11 +253,13 @@ export function useExampleSearch() {
       spanishInput,
       englishInput,
       parsedIds,
+      vocabularyComplete,
     ],
   );
 
   const handleChangeMode = useCallback((newMode: ExampleSearchMode) => {
     setSearchIsTriggered(false);
+    setVocabularyComplete(undefined);
     setMode(newMode);
   }, []);
 
@@ -218,6 +272,7 @@ export function useExampleSearch() {
     mode,
     searchIsTriggered,
     isValidSearch,
+    nonValidSearchErrorMessage,
 
     // Actions
     handleChangeMode,

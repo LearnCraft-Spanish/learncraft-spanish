@@ -27,7 +27,7 @@ vi.mock('@application/coordinators/hooks/useSelectedExamplesContext', () => ({
 describe('searchByRecentlyEditedResults', () => {
   it('should render', () => {
     render(<SearchByRecentlyEditedResults />);
-    expect(screen.getByText('Search Results')).toBeInTheDocument();
+    expect(screen.getAllByText('Select')[0]).toHaveTextContent('Select');
   });
 
   it('uses useExamplesByRecentlyModified hook', () => {

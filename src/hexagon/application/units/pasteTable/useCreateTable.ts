@@ -1,9 +1,8 @@
 import type {
   ColumnDefinition,
-  TableColumn,
   TableRow,
   ValidationState,
-} from '@domain/PasteTable/types';
+} from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import type { z } from 'zod';
 import {
@@ -31,7 +30,7 @@ export interface CreateTableHook<T> {
   // Data
   data: {
     rows: TableRow[];
-    columns: TableColumn[];
+    columns: ColumnDefinition[];
   };
 
   // Operations
@@ -45,7 +44,6 @@ export interface CreateTableHook<T> {
   clearActiveCellInfo: () => void;
 
   // State
-  isSaveEnabled: boolean;
   validationState: ValidationState;
 
   // Save operation (returns data for external save)
@@ -54,7 +52,7 @@ export interface CreateTableHook<T> {
 }
 
 interface UseCreateTableOptions<T extends Record<string, unknown>> {
-  columns: TableColumn[];
+  columns: ColumnDefinition[];
   /** Full row Zod schema for row-level validation (preferred) */
   rowSchema?: z.ZodType<T, any, any>;
   initialData?: T[];
@@ -70,16 +68,6 @@ export function useCreateTable<T extends Record<string, unknown>>({
   rowSchema,
   initialData = [],
 }: UseCreateTableOptions<T>): CreateTableHook<T> {
-  // Extract domain columns for mapping
-  const domainColumns: ColumnDefinition[] = useMemo(
-    () =>
-      columns.map((col) => {
-        const { label, width, placeholder, ...domainCol } = col;
-        return domainCol;
-      }),
-    [columns],
-  );
-
   // Core row management (includes ghost row handling)
   const {
     rows,
@@ -93,7 +81,7 @@ export function useCreateTable<T extends Record<string, unknown>>({
   // Requires either column schemas or row schema to be provided
   const validateRow = useMemo(() => {
     // Check if we have column schemas or row schema
-    const hasColumnSchemas = domainColumns.some((col) => col.schema);
+    const hasColumnSchemas = columns.some((col) => col.schema);
     const hasRowSchema = !!rowSchema;
 
     // Require at least one schema to be provided
@@ -104,11 +92,11 @@ export function useCreateTable<T extends Record<string, unknown>>({
     }
 
     // Generate validator from schemas (handles normalization and mapping internally)
-    return createCombinedValidateRow<T>(domainColumns, rowSchema);
-  }, [domainColumns, rowSchema]);
+    return createCombinedValidateRow<T>(columns, rowSchema);
+  }, [columns, rowSchema]);
 
   // Validation - derived from row data
-  const { validationState, isSaveEnabled, validateAll } = useTableValidation({
+  const { validationState } = useTableValidation({
     rows,
     validateRow,
   });
@@ -144,7 +132,7 @@ export function useCreateTable<T extends Record<string, unknown>>({
   const importData = useCallback(
     (newData: T[]) => {
       // Map domain entities to TableRows
-      const newRows = mapDomainToTableRows(newData, domainColumns);
+      const newRows = mapDomainToTableRows(newData, columns);
 
       // Set rows, preserving ghost row
       setRows((currentRows) => {
@@ -152,20 +140,12 @@ export function useCreateTable<T extends Record<string, unknown>>({
         return [...newRows, ...(ghostRow ? [ghostRow] : [])];
       });
     },
-    [domainColumns, setRows],
+    [columns, setRows],
   );
 
   // Save operation - returns data for external save
   // Parses through schema to get complete T[] (not Partial<T>[])
   const saveData = useCallback(async (): Promise<T[] | undefined> => {
-    // Get fresh validation state
-    const { isValid } = validateAll();
-
-    // Only return data if valid
-    if (!isValid) {
-      return undefined;
-    }
-
     // Require rowSchema for complete type (can't guarantee completeness with column schemas alone)
     if (!rowSchema) {
       throw new Error(
@@ -177,11 +157,11 @@ export function useCreateTable<T extends Record<string, unknown>>({
     const dataRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
     return mapAndParseTableRowsToDomain<T>(
       dataRows,
-      domainColumns,
+      columns,
       rowSchema,
       GHOST_ROW_ID,
     );
-  }, [rows, domainColumns, rowSchema, validateAll]);
+  }, [rows, columns, rowSchema]);
 
   // Reset table to empty state
   const resetTable = useCallback(() => {
@@ -201,7 +181,6 @@ export function useCreateTable<T extends Record<string, unknown>>({
     resetTable,
     setActiveCellInfo,
     clearActiveCellInfo,
-    isSaveEnabled,
     validationState,
     saveData,
   };

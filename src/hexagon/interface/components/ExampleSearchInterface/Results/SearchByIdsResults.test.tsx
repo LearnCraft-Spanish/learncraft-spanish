@@ -36,7 +36,7 @@ describe('component: SearchByIdsResults', () => {
 
   it('should render', () => {
     render(<SearchByIdsResults ids={[1, 2, 3]} />);
-    expect(screen.getByText('Search Results')).toBeInTheDocument();
+    expect(screen.getAllByText('Select')[0]).toHaveTextContent('Select');
   });
 
   it('uses useSearchByIdsResults hook and passes props', () => {

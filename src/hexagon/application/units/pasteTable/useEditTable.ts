@@ -1,25 +1,29 @@
+import type { DiffsMap } from '@application/units/pasteTable/hooks/useDiffs';
 import type {
   ColumnDefinition,
-  TableColumn,
   TableRow,
   ValidationState,
-} from '@domain/PasteTable/types';
+} from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import type { z } from 'zod';
 import {
-  useCleanStateSync,
-  useDirtyStateTracking,
+  useDiffs,
   useTablePaste,
-  useTableRows,
   useTableValidation,
 } from '@application/units/pasteTable/hooks';
 import {
   mapDomainToTableRows,
   mapTableRowsToDomain,
-} from '@domain/PasteTable/functions/mappers';
-import { cellsEqual } from '@domain/PasteTable/functions/rowComparison';
+  mergeSourceWithDiffs,
+} from '@domain/PasteTable/functions';
 import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
 import { useCallback, useMemo } from 'react';
+
+// ============================================================================
+// IMPORTANT: This hook is intended to service the EditableTable component.
+// It is not consumed directly by the interface layer, but always composed by a use case.
+// The composition pattern is documented fully in the EditableTable README.md file.
+// ============================================================================
 
 /**
  * Edit table hook interface
@@ -29,11 +33,11 @@ export interface EditTableHook<T> {
   // Data
   data: {
     rows: TableRow[];
-    columns: TableColumn[];
+    columns: ColumnDefinition[];
   };
 
   // Operations
-  updateCell: (rowId: string, columnId: string, value: string) => void;
+  updateCell: (rowId: string, columnId: string, value: string) => null;
   handlePaste: (e: ClipboardEvent<Element>) => void;
   importData: (data: T[]) => void;
   discardChanges: () => void;
@@ -43,7 +47,9 @@ export interface EditTableHook<T> {
   clearActiveCellInfo: () => void;
 
   // State
-  hasUnsavedChanges: boolean; // Alias for isDirty
+  hasUnsavedChanges: boolean;
+  dirtyRowIds: Set<string>;
+  diffs: DiffsMap;
   validationState: ValidationState;
 
   // Save operation
@@ -51,8 +57,8 @@ export interface EditTableHook<T> {
 }
 
 interface UseEditTableOptions<T extends Record<string, unknown>> {
-  columns: TableColumn[];
-  /** Initial data (required for edit mode) */
+  columns: ColumnDefinition[];
+  /** Source data from server (required for edit mode) */
   sourceData: T[];
   /** Full row Zod schema for row-level validation (preferred) */
   rowSchema?: z.ZodType<T, any, any>;
@@ -60,13 +66,17 @@ interface UseEditTableOptions<T extends Record<string, unknown>> {
   idColumnId?: string;
   /** Callback when changes are applied (for external persistence) */
   onApplyChanges?: (dirtyData: Partial<T>[]) => Promise<void>;
+  /**
+   * Optional function to compute derived fields for merged rows
+   * Called after source + diffs are merged, allows recomputing derived fields
+   * based on current cell values (e.g., audio URLs from hasAudio boolean)
+   */
+  computeDerivedFields?: (row: TableRow) => Record<string, string>;
 }
 
 /**
  * Hook for edit table functionality
- * Allows editing existing records via paste/editing
- * Tracks dirty state and supports discard/apply operations
- * Implements EditTableHook<T> interface
+ * Uses diffs-only state model - only stores changes from source.
  */
 export function useEditTable<T extends Record<string, unknown>>({
   columns,
@@ -74,188 +84,142 @@ export function useEditTable<T extends Record<string, unknown>>({
   rowSchema,
   idColumnId = 'id',
   onApplyChanges,
+  computeDerivedFields,
 }: UseEditTableOptions<T>): EditTableHook<T> {
-  // Extract domain columns for mapping
-  const domainColumns: ColumnDefinition[] = useMemo(
+  // Map source data to TableRows (reactive - updates when React Query updates)
+  // Uses idColumnId for deterministic row IDs
+  const sourceRows = useMemo(
+    () => mapDomainToTableRows(sourceData, columns, idColumnId),
+    [sourceData, columns, idColumnId],
+  );
+
+  // Get editable column IDs
+  const editableColumnIds = useMemo(
     () =>
-      columns.map((col) => {
-        const { label, width, placeholder, ...domainCol } = col;
-        return domainCol;
-      }),
+      columns
+        .filter((col) => col.editable !== false && !col.derived)
+        .map((col) => col.id),
     [columns],
   );
 
-  // Derive clean rows from sourceData (reactive - updates when React Query updates)
-  const cleanRows = useMemo(() => {
-    return mapDomainToTableRows(sourceData, domainColumns);
-  }, [sourceData, domainColumns]);
-
-  // Core row management (no ghost row in edit mode)
-  const {
-    rows,
-    updateCell: updateCellBase,
-    setRows,
-  } = useTableRows<T>({
-    columns,
-    initialData: cleanRows.length > 0 ? sourceData : [],
-    includeGhostRow: false, // Edit mode doesn't allow creating new rows
-  });
-
-  // Track dirty state by comparing rows to cleanRows
-  const { dirtyRowIds, markRowDirty, clearDirtyRows, clearAllDirty } =
-    useDirtyStateTracking({
-      rows,
-      cleanRows,
-      idColumnId,
+  // Diffs-only state management
+  const { diffs, dirtyRowIds, updateDiff, setRowsViaDiffs, clearDiffs } =
+    useDiffs({
+      sourceRows,
+      editableColumnIds,
     });
 
-  // Sync non-dirty rows to clean state when sourceData updates
-  const { syncRowsToCleanState } = useCleanStateSync({
-    cleanRows,
-    rows,
-    dirtyRowIds,
-    idColumnId,
-    setRows,
-  });
+  // Derive display rows by merging source with diffs
+  // If computeDerivedFields is provided, recompute derived fields after merging
+  const rows = useMemo(() => {
+    const merged = mergeSourceWithDiffs(sourceRows, diffs);
+
+    if (computeDerivedFields) {
+      // Recompute derived fields from current merged cell values
+      return merged.map((row) => {
+        const derived = computeDerivedFields(row);
+        return {
+          ...row,
+          cells: {
+            ...row.cells,
+            ...derived,
+          },
+        };
+      });
+    }
+
+    return merged;
+  }, [sourceRows, diffs, computeDerivedFields]);
 
   // Generate validateRow function from Zod schemas
-  // Requires either column schemas or row schema to be provided
   const validateRow = useMemo(() => {
-    // Check if we have column schemas or row schema
-    const hasColumnSchemas = domainColumns.some((col) => col.schema);
+    const hasColumnSchemas = columns.some((col) => col.schema);
     const hasRowSchema = !!rowSchema;
 
-    // Require at least one schema to be provided
     if (!hasColumnSchemas && !hasRowSchema) {
       throw new Error(
         'Either rowSchema or column schemas must be provided for validation',
       );
     }
 
-    // Generate validator from schemas (handles normalization and mapping internally)
-    return createCombinedValidateRow<T>(domainColumns, rowSchema);
-  }, [domainColumns, rowSchema]);
+    return createCombinedValidateRow<T>(columns, rowSchema);
+  }, [columns, rowSchema]);
 
-  // Validation - derived from row data
-  const { validationState, validateAll } = useTableValidation({
+  // Validation - derived from merged rows
+  const { validationState } = useTableValidation({
     rows,
     validateRow,
   });
 
-  // Track dirty state when rows are updated (from paste operations)
-  const handleRowUpdated = useCallback(
-    (rowId: string, _domainId: number) => {
-      markRowDirty(rowId);
+  // Cell update wrapper that updates diffs
+  const updateCellForPaste = useCallback(
+    (rowId: string, columnId: string, value: string) => {
+      updateDiff(rowId, columnId, value);
     },
-    [markRowDirty],
+    [updateDiff],
   );
 
-  // Paste handling - edit mode (updates existing rows only)
+  // Paste handling - uses setRowsViaDiffs for bulk operations
   const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(
     {
       columns,
       rows,
-      updateCell: updateCellBase,
-      setRows,
-      mode: 'edit', // Explicitly set edit mode
+      updateCell: updateCellForPaste,
+      setRows: setRowsViaDiffs,
+      mode: 'edit',
       idColumnId,
-      onRowUpdated: handleRowUpdated,
     },
   );
 
-  // Cell update - tracks dirty state against current cleanRows
+  // Cell update - returns null (no ghost row conversion in edit mode)
   const updateCell = useCallback(
     (rowId: string, columnId: string, value: string) => {
-      updateCellBase(rowId, columnId, value);
-
-      // Check if row changed from clean state (reactive to initialData)
-      const currentRow = rows.find((r) => r.id === rowId);
-      const cleanRow = cleanRows.find(
-        (r) =>
-          r.id === rowId ||
-          Number(r.cells[idColumnId]) === Number(currentRow?.cells[idColumnId]),
-      );
-
-      if (currentRow && cleanRow) {
-        // Update cell in current row for comparison
-        const updatedRow = {
-          ...currentRow,
-          cells: { ...currentRow.cells, [columnId]: value },
-        };
-
-        const hasChanged = !cellsEqual(cleanRow.cells, updatedRow.cells);
-        if (hasChanged) {
-          markRowDirty(rowId);
-        } else {
-          // If row matches clean state, remove from dirty set
-          clearDirtyRows([rowId]);
-        }
-      }
+      updateDiff(rowId, columnId, value);
+      return null;
     },
-    [updateCellBase, rows, cleanRows, idColumnId, markRowDirty, clearDirtyRows],
+    [updateDiff],
   );
 
-  // Import data (replaces current state and resets dirty tracking)
+  // Import data - computes diffs from imported data
   const importData = useCallback(
     (newData: T[]) => {
-      const newRows = mapDomainToTableRows(newData, domainColumns);
-      setRows(newRows);
-      clearAllDirty();
+      const newRows = mapDomainToTableRows(newData, columns, idColumnId);
+      setRowsViaDiffs(newRows);
     },
-    [domainColumns, setRows, clearAllDirty],
+    [columns, idColumnId, setRowsViaDiffs],
   );
 
-  // Discard changes - revert to clean state (from current sourceData)
+  // Discard changes - just clear diffs
   const discardChanges = useCallback(() => {
-    // Revert to current cleanRows (reactive to sourceData)
-    setRows([...cleanRows]);
-    clearAllDirty();
+    clearDiffs();
     clearActiveCellInfo();
-  }, [cleanRows, setRows, clearAllDirty, clearActiveCellInfo]);
+  }, [clearDiffs, clearActiveCellInfo]);
 
   // Apply changes - save dirty rows
-  // After save, React Query will update sourceData, which will reactively update cleanRows
-  // Sync rows to clean state after save completes
+  // NOTE: USE CASE SHOULD HANDLE VALIDATION
+  // Validation is not handled here. Use case must ensure that onApplyChanges
+  // is called with valid data.
   const applyChanges = useCallback(async () => {
     if (!onApplyChanges) {
       throw new Error('onApplyChanges callback is required for applyChanges');
     }
 
-    // Get fresh validation state
-    const { isValid } = validateAll();
+    // Get only dirty rows from merged state
+    // Use diffs.keys() directly to ensure fresh state
+    const currentDirtyIds = new Set(diffs.keys());
+    const dirtyRows = rows.filter((row) => currentDirtyIds.has(row.id));
 
-    if (!isValid) {
-      throw new Error('Cannot apply changes: validation failed');
-    }
+    // Map to domain entities
+    const dirtyData = mapTableRowsToDomain<T>(dirtyRows, columns);
 
-    // Get only dirty rows
-    const dirtyRows = rows.filter((row) => dirtyRowIds.has(row.id));
-
-    // Map to domain entities (returns Partial<T>[] since TableRow may not have all fields)
-    const dirtyData = mapTableRowsToDomain<T>(dirtyRows, domainColumns);
-
-    // Call external save handler with partial data
-    // The mutation handler should handle partial data appropriately
+    // Call external save handler
     await onApplyChanges(dirtyData);
 
-    // After save, sync rows to clean state (React Query will update sourceData)
-    // This syncs non-dirty rows and clears dirty state for saved rows
-    syncRowsToCleanState();
-    clearDirtyRows(dirtyRows.map((row) => row.id));
-  }, [
-    rows,
-    dirtyRowIds,
-    domainColumns,
-    validateAll,
-    onApplyChanges,
-    syncRowsToCleanState,
-    clearDirtyRows,
-  ]);
+    // After successful save, React Query will refetch and update sourceData
+    // When sourceData updates, sourceRows updates, and diffs that match
+    // the new source will effectively be "clean" (though we could also clear them)
+  }, [rows, diffs, columns, onApplyChanges]);
 
-  // Check if there are unsaved changes
-  const hasUnsavedChanges = dirtyRowIds.size > 0;
-
-  // Return EditTableHook interface
   return {
     data: {
       rows,
@@ -267,7 +231,9 @@ export function useEditTable<T extends Record<string, unknown>>({
     discardChanges,
     setActiveCellInfo,
     clearActiveCellInfo,
-    hasUnsavedChanges,
+    hasUnsavedChanges: dirtyRowIds.size > 0,
+    dirtyRowIds,
+    diffs,
     validationState,
     applyChanges,
   };

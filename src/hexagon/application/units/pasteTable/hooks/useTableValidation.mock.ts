@@ -1,4 +1,4 @@
-import type { TableRow, ValidationState } from '@domain/PasteTable/General';
+import type { TableRow, ValidationState } from '@domain/PasteTable';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Define the hook result interface

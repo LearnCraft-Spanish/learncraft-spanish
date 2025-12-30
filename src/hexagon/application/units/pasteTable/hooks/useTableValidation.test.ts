@@ -1,7 +1,7 @@
-import type { TableRow } from '@domain/PasteTable/General';
+import type { TableRow } from '@domain/PasteTable';
 import { useTableValidation } from '@application/units/pasteTable/hooks/useTableValidation';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
-import { act, renderHook } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 
 // Helper to create test rows
 const createTestRow = (
@@ -35,21 +35,6 @@ describe('useTableValidation', () => {
 
       expect(result.current.validationState.isValid).toBe(true);
       expect(result.current.validationState.errors).toEqual({});
-    });
-
-    it('should return isSaveEnabled true when rows exist and are valid', () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { name: 'Item 1', value: '10' }),
-        createGhostRow(),
-      ];
-
-      const validateRow = (): Record<string, string> => ({});
-
-      const { result } = renderHook(() =>
-        useTableValidation({ rows, validateRow }),
-      );
-
-      expect(result.current.isSaveEnabled).toBe(true);
     });
   });
 
@@ -106,24 +91,6 @@ describe('useTableValidation', () => {
         name: 'Name is required',
       });
     });
-
-    it('should return isSaveEnabled false when validation fails', () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { name: '', value: '10' }),
-        createGhostRow(),
-      ];
-
-      const validateRow = (row: TableRow): Record<string, string> => {
-        if (!row.cells.name) return { name: 'Required' };
-        return {};
-      };
-
-      const { result } = renderHook(() =>
-        useTableValidation({ rows, validateRow }),
-      );
-
-      expect(result.current.isSaveEnabled).toBe(false);
-    });
   });
 
   describe('ghost row handling', () => {
@@ -150,78 +117,6 @@ describe('useTableValidation', () => {
       expect(
         result.current.validationState.errors[GHOST_ROW_ID],
       ).toBeUndefined();
-    });
-  });
-
-  describe('empty table handling', () => {
-    it('should return isSaveEnabled false when only ghost row exists', () => {
-      const rows: TableRow[] = [createGhostRow()];
-      const validateRow = (): Record<string, string> => ({});
-
-      const { result } = renderHook(() =>
-        useTableValidation({ rows, validateRow }),
-      );
-
-      expect(result.current.isSaveEnabled).toBe(false);
-      expect(result.current.validationState.isValid).toBe(true); // Valid but nothing to save
-    });
-
-    it('should return isSaveEnabled false when no rows exist', () => {
-      const rows: TableRow[] = [];
-      const validateRow = (): Record<string, string> => ({});
-
-      const { result } = renderHook(() =>
-        useTableValidation({ rows, validateRow }),
-      );
-
-      expect(result.current.isSaveEnabled).toBe(false);
-    });
-  });
-
-  describe('validateAll function', () => {
-    it('should return current validation state', () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { name: 'Item 1', value: '10' }),
-        createGhostRow(),
-      ];
-
-      const validateRow = (): Record<string, string> => ({});
-
-      const { result } = renderHook(() =>
-        useTableValidation({ rows, validateRow }),
-      );
-
-      let validationResult: ReturnType<typeof result.current.validateAll>;
-      act(() => {
-        validationResult = result.current.validateAll();
-      });
-
-      expect(validationResult!.isValid).toBe(true);
-      expect(validationResult!.errors).toEqual({});
-    });
-
-    it('should return errors when validation fails', () => {
-      const rows: TableRow[] = [
-        createTestRow('row-1', { name: '', value: '10' }),
-        createGhostRow(),
-      ];
-
-      const validateRow = (row: TableRow): Record<string, string> => {
-        if (!row.cells.name) return { name: 'Required' };
-        return {};
-      };
-
-      const { result } = renderHook(() =>
-        useTableValidation({ rows, validateRow }),
-      );
-
-      let validationResult: ReturnType<typeof result.current.validateAll>;
-      act(() => {
-        validationResult = result.current.validateAll();
-      });
-
-      expect(validationResult!.isValid).toBe(false);
-      expect(validationResult!.errors['row-1']).toEqual({ name: 'Required' });
     });
   });
 

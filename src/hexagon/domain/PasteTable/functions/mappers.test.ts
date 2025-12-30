@@ -1,4 +1,4 @@
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import {
   mapDomainToTableRow,
   mapDomainToTableRows,
@@ -25,9 +25,9 @@ describe('mappers', () => {
         birthday: '2024-01-15',
       };
 
-      const result = mapDomainToTableRow(entity, columns);
+      const result = mapDomainToTableRow(entity, columns, 'id');
 
-      expect(result.id).toBe('entity-1');
+      expect(result.id).toBe('row-entity-1');
       expect(result.cells.name).toBe('John');
       expect(result.cells.age).toBe('30');
       expect(result.cells.active).toBe('true');
@@ -127,12 +127,12 @@ describe('mappers', () => {
         },
       ];
 
-      const result = mapDomainToTableRows(entities, columns);
+      const result = mapDomainToTableRows(entities, columns, 'id');
 
       expect(result).toHaveLength(2);
-      expect(result[0].id).toBe('1');
+      expect(result[0].id).toBe('row-1');
       expect(result[0].cells.name).toBe('John');
-      expect(result[1].id).toBe('2');
+      expect(result[1].id).toBe('row-2');
       expect(result[1].cells.name).toBe('Jane');
     });
   });

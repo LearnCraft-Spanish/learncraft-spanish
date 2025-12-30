@@ -3,17 +3,30 @@ import { Filters } from '@interface/components/ExampleSearchInterface/Filters/Fi
 import { Results } from '@interface/components/ExampleSearchInterface/Results/Results';
 import { SearchModeNav } from '@interface/components/ExampleSearchInterface/SearchModeNav';
 import { SelectedExamples } from '@interface/components/ExampleSearchInterface/SelectedExamples';
+import SectionHeader from '@interface/components/general/SectionHeader/SectionHeader';
+import { useCallback, useState } from 'react';
 import '@interface/components/ExampleSearchInterface/ExampleSearch.scss';
-export default function ExampleSearch() {
+export default function ExampleSearch({
+  activateEdit,
+}: {
+  activateEdit: () => void;
+}) {
+  const [showSearchResults, setShowSearchResults] = useState(false);
   const {
     mode,
     searchIsTriggered,
     isValidSearch,
+    nonValidSearchErrorMessage,
     handleChangeMode,
     triggerSearch,
     searchComponentProps,
     searchResultProps,
   } = useExampleSearch();
+
+  const triggerSearchWrapper = useCallback(() => {
+    triggerSearch();
+    setShowSearchResults(true);
+  }, [triggerSearch]);
 
   return (
     <div>
@@ -24,24 +37,43 @@ export default function ExampleSearch() {
         <Filters mode={mode} {...searchComponentProps} />
       </div>
 
-      {!searchIsTriggered &&
-        (!isValidSearch ? (
-          <div className="notValidSearchError">
-            ERROR: Fill required fields to see search results.
-          </div>
-        ) : (
+      {!searchIsTriggered && (
+        <>
           <button
             type="button"
             className="searchButton"
-            onClick={triggerSearch}
+            onClick={triggerSearchWrapper}
+            disabled={!isValidSearch}
           >
             Search
           </button>
-        ))}
+          {!isValidSearch && (
+            <div className="notValidSearchError">
+              {nonValidSearchErrorMessage}
+            </div>
+          )}
+        </>
+      )}
       <div style={{ marginTop: '1rem' }}>
-        {searchIsTriggered && <Results mode={mode} {...searchResultProps} />}
+        {searchIsTriggered && (
+          <>
+            <SectionHeader
+              title="Search Results"
+              isOpen={showSearchResults}
+              openFunction={() => setShowSearchResults(!showSearchResults)}
+            />
+            {showSearchResults && (
+              <Results mode={mode} {...searchResultProps} />
+            )}
+          </>
+        )}
+        {/* <Results mode={mode} {...searchResultProps} />} */}
       </div>
+
       <SelectedExamples />
+      <button type="button" className="editButton" onClick={activateEdit}>
+        Edit
+      </button>
     </div>
   );
 }

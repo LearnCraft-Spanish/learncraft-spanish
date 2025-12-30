@@ -34,6 +34,7 @@ vi.mock(
 describe('component: Filters', () => {
   const mockProps = {
     localFilterProps: {} as any,
+    searchByRecentlyEditedProps: {} as any,
     searchByQuizProps: {} as any,
     searchByTextProps: {} as any,
     searchByIdsProps: {} as any,

@@ -6,7 +6,7 @@
  * The flow is: TableRow (strings) → normalize → map to domain entity → validate against schema
  */
 
-import type { ColumnDefinition, TableRow } from '@domain/PasteTable/types';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import { mapTableRowToDomain } from '@domain/PasteTable/functions/mappers';
 import { normalizeRowCells } from '@domain/PasteTable/functions/normalization';
 import { z } from 'zod';
