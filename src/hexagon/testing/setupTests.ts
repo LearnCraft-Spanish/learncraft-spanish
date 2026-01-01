@@ -10,6 +10,10 @@ import {
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
 import {
+  mockCoachAdapter,
+  resetMockCoachAdapter,
+} from '@application/adapters/coachAdapter.mock';
+import {
   mockCourseAdapter,
   resetMockCourseAdapter,
 } from '@application/adapters/ courseAdapter.mock';
@@ -41,7 +45,6 @@ import {
   mockVocabularyAdapter,
   resetMockVocabularyAdapter,
 } from '@application/adapters/vocabularyAdapter.mock';
-
 import {
   mockActiveStudent,
   resetMockActiveStudent,
@@ -68,6 +71,10 @@ import '@testing-library/jest-dom';
 // Replace real adapter implementations with mocks for all tests
 vi.mock('@application/adapters/courseAdapter', () => ({
   useCourseAdapter: vi.fn(() => mockCourseAdapter),
+}));
+
+vi.mock('@application/adapters/coachAdapter', () => ({
+  useCoachAdapter: vi.fn(() => mockCoachAdapter),
 }));
 
 vi.mock('@application/adapters/vocabularyAdapter', () => ({
@@ -123,6 +130,7 @@ const resetGlobalMocks = () => {
   resetMockAuthAdapter();
 
   // adapter mocks
+  resetMockCoachAdapter();
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
   resetMockExampleAdapter();
