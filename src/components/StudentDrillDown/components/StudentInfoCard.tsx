@@ -1,4 +1,5 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
+import CoachStudentDrillDown from '@interface/components/CoachStudentDrillDown/CoachStudentDrillDown';
 import React, { useEffect, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
 import {
@@ -143,6 +144,7 @@ export default function StudentInfoCard({
           </div>
         </div>
         {/* only show to users who are admins */}
+        {isAdmin && <CoachStudentDrillDown studentId={student.recordId} />}
         {isAdmin && (
           <>
             <h3>Billing Information</h3>
