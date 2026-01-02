@@ -1,0 +1,23 @@
+.coachStudentDrillDown {
+  display: flex;
+  flex-direction: column;
+
+  width: auto;
+
+  .coach-item-container {
+    border-top: 1px solid #ccc;
+    margin-top: 0.5rem;
+
+    max-width: 250px;
+    text-wrap: wrap;
+    width: auto;
+    p {
+      margin: 0.25rem;
+    }
+    span.coach-drilldown-label {
+      padding-right: 0.25rem;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+}
