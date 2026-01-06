@@ -1,0 +1,616 @@
+========================================
+FILES OUTSIDE HEXAGON - DETAILED LIST
+========================================
+
+Total files: 346
+
+
+components/
+-----------
+  Nav.test.tsx
+  Nav.tsx
+  NoDueFlashcards.tsx
+  ProtectedRoute.tsx
+  StudentSearch.tsx
+  SubHeader.tsx
+
+components/AdminDashboard/
+--------------------------
+  index.ts
+  recentLesson200Students.tsx
+
+components/AdminDashboard/ActiveMemberships/
+--------------------------------------------
+  ActiveMemberships.tsx
+  index.ts
+  types.ts
+
+components/AdminDashboard/AssignmentsCompletedByWeek/
+-----------------------------------------------------
+  AssignmentsCompletedByWeek.tsx
+  index.ts
+  types.ts
+
+components/AdminDashboard/CallsByCoach/
+---------------------------------------
+  CallsByCoach.tsx
+  GroupCallsDrilldownTable.tsx
+  PrivateCallsDrilldownTable.tsx
+  index.ts
+  useCallsDrilldownTable.ts
+
+components/AdminDashboard/CallsByCoach/GroupCallsByCoach/
+---------------------------------------------------------
+  GroupCallsByCoach.tsx
+  index.ts
+  types.ts
+
+components/AdminDashboard/CallsByCoach/PrivateCallsByCoach/
+-----------------------------------------------------------
+  PrivateCallsByCoach.tsx
+  index.ts
+  types.ts
+
+components/AdminDashboard/DropoutsByLevel/
+------------------------------------------
+  DropoutsByLevel.tsx
+  index.ts
+  types.ts
+
+components/AdminDashboard/StudentsBySalariedCoach/
+--------------------------------------------------
+  CurrentStudentsDrilldownTable.tsx
+  CurrentStuentsBySalariedCoach.tsx
+  StudentsBySalariedCoach.tsx
+  StudentsBySalariedCoach2WeeksOut.tsx
+  TwoWeeksOutDrilldownTable.tsx
+  types.ts
+
+components/AdminDashboard/WeeklyCoachSummaries/
+-----------------------------------------------
+  WeeklySummaries.tsx
+  WeeksDrilldownTable.tsx
+  types.ts
+  useWeeksDrilldownTable.ts
+
+components/AdminDashboard/WeeklyCoachSummaries/LastWeekCoachSummary/
+--------------------------------------------------------------------
+  LastWeekCoachSummary.tsx
+  index.ts
+
+components/AdminDashboard/WeeklyCoachSummaries/WeekCoachSummary/
+----------------------------------------------------------------
+  WeekCoachSummary.tsx
+  index.ts
+
+components/Coaching/
+--------------------
+  coaching.scss
+
+components/Coaching/WeeksRecords/
+---------------------------------
+  DateRangeContext.ts
+  DateRangeProvider.tsx
+  ViewWeekRecord.test.tsx
+  ViewWeekRecord.tsx
+  WeeksRecords.test.tsx
+  WeeksRecords.tsx
+  useDateRange.tsx
+
+components/Coaching/WeeksRecords/Filter/
+----------------------------------------
+  WeeksFilter.test.tsx
+  WeeksFilter.tsx
+
+components/Coaching/WeeksRecords/Table/
+---------------------------------------
+  AssignmentsCell.test.tsx
+  AssignmentsCell.tsx
+  GroupSessionsCell.test.tsx
+  GroupSessionsCell.tsx
+  PrivateCallsCell.test.tsx
+  PrivateCallsCell.tsx
+  StudentCell.test.tsx
+  StudentCell.tsx
+  WeeksTable.test.tsx
+  WeeksTable.tsx
+  WeeksTableItem.tsx
+
+components/Coaching/general/
+----------------------------
+  CustomGroupAttendeeSelector.tsx
+  CustomGroupSessionTopicSelector.scss
+  CustomGroupSessionTopicSelector.tsx
+  CustomStudentSelector.tsx
+  index.ts
+
+components/Coaching/general/functions/
+--------------------------------------
+  dateRange.test.ts
+  dateRange.ts
+  getLoggedInCoach.ts
+  getWeekEnds.ts
+
+components/CoachingDashboard/
+-----------------------------
+  CoachingDashboard.scss
+  CoachingDashboard.tsx
+  index.ts
+  useCoachingDashboard.ts
+
+components/CoachingDashboard/components/
+----------------------------------------
+  SectionHeader.tsx
+  SubSectionHeader.tsx
+
+components/CoachingDashboard/components/IncompleteRecords/
+----------------------------------------------------------
+  IncompleteRecords.tsx
+  index.ts
+
+components/CoachingDashboard/components/MyStudents/
+---------------------------------------------------
+  MyStudents.tsx
+  index.ts
+
+components/CoachingDashboard/components/RecentRecords/
+------------------------------------------------------
+  AssignmentRecordRow.tsx
+  DisplayOnlyTable.tsx
+  GroupCallRecordRow.tsx
+  MonthYearSelector.tsx
+  PrivateCallRecordRow.tsx
+  RecentRecords.scss
+  RecentRecords.tsx
+  index.ts
+
+components/CoachingDashboard/hooks/
+-----------------------------------
+  useActiveCoach.ts
+  useMyIncompleteWeeklyRecords.ts
+  useMyRecentRecords.ts
+
+components/DatabaseTables/
+--------------------------
+  index.ts
+
+components/DatabaseTables/StudentRecords/
+-----------------------------------------
+  index.ts
+
+components/DatabaseTables/StudentRecords/CoursesTable/
+------------------------------------------------------
+  CoursesTable.scss
+  CoursesTable.tsx
+  index.ts
+  useCoursesTable.ts
+
+components/DatabaseTables/StudentRecords/CoursesTable/components/
+-----------------------------------------------------------------
+  CourseTableRow.tsx
+  EditCourseView.scss
+  EditCourseView.tsx
+  FilterCoursesTable.tsx
+  index.ts
+
+components/DatabaseTables/StudentRecords/CoursesTable/constants/
+----------------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/StudentRecords/CoursesTable/functions/
+----------------------------------------------------------------
+  filterFunction.ts
+  index.ts
+  renderCourseRow.tsx
+  sortFunction.ts
+
+components/DatabaseTables/StudentRecords/CoursesTable/types/
+------------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/StudentRecords/LessonsTable/
+------------------------------------------------------
+  LessonsTable.scss
+  LessonsTable.tsx
+  index.ts
+  useLessonsTable.ts
+
+components/DatabaseTables/StudentRecords/LessonsTable/components/
+-----------------------------------------------------------------
+  EditLessonView.tsx
+  FilterLessonsTable.tsx
+  LessonTableRow.tsx
+  index.ts
+
+components/DatabaseTables/StudentRecords/LessonsTable/constants/
+----------------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/StudentRecords/LessonsTable/functions/
+----------------------------------------------------------------
+  filterFunction.ts
+  index.ts
+  renderLessonRow.ts
+  sortFunction.ts
+
+components/DatabaseTables/StudentRecords/LessonsTable/types/
+------------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/
+--------------------------------------
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/ProgramsTable/
+----------------------------------------------------
+  ProgramsTable.scss
+  ProgramsTable.tsx
+  index.ts
+  useProgramsTable.ts
+
+components/DatabaseTables/VocabQuizDb/ProgramsTable/components/
+---------------------------------------------------------------
+  EditProgramView.tsx
+  FilterProgramsTable.tsx
+  ProgramTableRow.tsx
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/ProgramsTable/constants/
+--------------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/ProgramsTable/functions/
+--------------------------------------------------------------
+  filterFunction.ts
+  index.ts
+  renderProgramRow.ts
+  sortFunction.ts
+
+components/DatabaseTables/VocabQuizDb/ProgramsTable/types/
+----------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/QuizzesTable/
+---------------------------------------------------
+  QuizzesTable.scss
+  QuizzesTable.tsx
+  index.ts
+  types.ts
+  useQuizTable.ts
+
+components/DatabaseTables/VocabQuizDb/QuizzesTable/components/
+--------------------------------------------------------------
+  FilterQuizTable.tsx
+  QuizTableRow.tsx
+  QuizView.tsx
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/QuizzesTable/constants/
+-------------------------------------------------------------
+  index.ts
+  quizName.ts
+
+components/DatabaseTables/VocabQuizDb/QuizzesTable/functions/
+-------------------------------------------------------------
+  filterFunction.ts
+  index.ts
+  renderQuizRow.tsx
+  sortFunction.ts
+
+components/DatabaseTables/VocabQuizDb/StudentsTable/
+----------------------------------------------------
+  StudentsTable.scss
+  StudentsTable.tsx
+  index.ts
+  useStudentsTable.ts
+
+components/DatabaseTables/VocabQuizDb/StudentsTable/components/
+---------------------------------------------------------------
+  EditStudentView.tsx
+  FilterStudentsTable.tsx
+  StudentTableRow.tsx
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/StudentsTable/constants/
+--------------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/VocabQuizDb/StudentsTable/functions/
+--------------------------------------------------------------
+  filterFunction.ts
+  index.ts
+  renderStudentRow.ts
+  sortFunction.ts
+
+components/DatabaseTables/VocabQuizDb/StudentsTable/types/
+----------------------------------------------------------
+  index.ts
+
+components/DatabaseTables/general/
+----------------------------------
+  BackButton.tsx
+
+components/ExampleCreator/
+--------------------------
+  ExampleSetCreator.tsx
+
+components/ExampleManager/
+--------------------------
+  AudioControl.tsx
+  ConfirmationDialog.tsx
+  ExampleAssignmentPanel.tsx
+  ExampleCreator.test.tsx
+  ExampleEditForm.tsx
+  ExampleManager.css
+  ExampleManager.tsx
+  ExamplePasteArea.tsx
+  ExampleSetCreator.test.tsx
+  ExampleSetCreator.tsx
+  ExampleUpdateForm.tsx
+  SingleExampleCreator.tsx
+  VocabTag.tsx
+
+components/ExamplesTable/
+-------------------------
+  ExampleListItem.tsx
+  ExamplesTable.scss
+  ExamplesTable.test.tsx
+  ExamplesTable.tsx
+
+components/ExamplesTable/general/
+---------------------------------
+  AddAddingRemoveCustom.tsx
+  SelectExampleButton.tsx
+  VocabularyButton.tsx
+  index.ts
+
+components/FormComponents/
+--------------------------
+  Checkbox.tsx
+  DateInput.test.tsx
+  DateInput.tsx
+  DeleteRecord.test.tsx
+  DeleteRecord.tsx
+  Dropdowns.test.tsx
+  Dropdowns.tsx
+  FormControls.test.tsx
+  FormControls.tsx
+  SearchableDropdown.css
+  SearchableDropdown.tsx
+  Switch.tsx
+  TextInput.test.tsx
+  TextInput.tsx
+  index.ts
+
+components/FormComponents/functions/
+------------------------------------
+  inputValidation.test.ts
+  inputValidation.ts
+
+components/PMFPopup/
+--------------------
+  PMFPopup.css
+  PMFPopup.test.tsx
+  PMFPopup.tsx
+
+components/Quizzing/
+--------------------
+  .DS_Store
+  AddToMyFlashcardsButtons.tsx
+  quizzing.css
+
+components/Quizzing/AudioQuiz/
+------------------------------
+  AudioBasedReview.css
+  AudioFlashcard.test.tsx
+  AudioFlashcard.tsx
+  AudioQuiz.test.tsx
+  AudioQuiz.tsx
+  AudioQuizButtons.test.tsx
+  AudioQuizButtons.tsx
+  AudioQuizSetupMenu.test.tsx
+  AudioQuizSetupMenu.tsx
+
+components/StudentDrillDown/
+----------------------------
+  StudentDrillDown.scss
+  StudentDrillDown.tsx
+
+components/StudentDrillDown/components/
+---------------------------------------
+  BundleCreditsSection.tsx
+  CoachStudents.tsx
+  MembershipWeeks.tsx
+  StudentDrillDownSearch.tsx
+  StudentInfoCard.tsx
+  StudentMemberships.tsx
+  index.ts
+
+components/StudentDrillDown/components/general/
+-----------------------------------------------
+  AssignmentsCell_Modificed.tsx
+  GroupSessionsCell_Modified.tsx
+  PrivateCallsCell_Modificed.tsx
+
+components/Table/
+-----------------
+  Table.scss
+  Table.tsx
+  index.ts
+  types.ts
+
+components/Table/components/
+----------------------------
+  HeaderCell.tsx
+  Pagination.tsx
+  index.ts
+  quantifyingRecords.tsx
+
+components/Table/hooks/
+-----------------------
+  index.ts
+  useFilter.ts
+  usePaginatedTable.ts
+  useSort.ts
+  useTable.ts
+
+components/VocabManager/
+------------------------
+  VocabManager.tsx
+
+functions/
+----------
+  camelize.ts
+  formatDateLikeQB.ts
+  formatFlashcardText.tsx
+  showToast.ts
+
+hooks/
+------
+  useBackend.test.ts
+  useBackend.ts
+
+hooks/AdminData/
+----------------
+  useActiveMembershipsReport.ts
+  useAssignmentsCompletedByWeek.ts
+  useCurrentStudentsBySalariedCoach.ts
+  useDropoutsByLevelReport.ts
+  useGroupCallsByCoach.ts
+  useLastWeekCoachSummary.ts
+  usePrivateCallsByCoach.ts
+  useRecentLesson200Students.ts
+  useReportCallsDrilldown.ts
+  useReportWeeksDrilldown.ts
+  useStudentsBySalariedCoach2WeeksOut.ts
+  useWeeklyCoachSummary.ts
+
+hooks/CoachingData/
+-------------------
+  helperFunctions.test.ts
+  helperFunctions.ts
+  useBundleCredits.ts
+  useCoaching.test.tsx
+  useCoaching.ts
+
+hooks/CoachingData/queries/
+---------------------------
+  StudentRecordsBackendFunctions.tsx
+  index.ts
+  useActiveMemberships.ts
+  useActiveStudents.ts
+  useAssignments.ts
+  useCoachList.ts
+  useCourseList.ts
+  useGroupAttendees.ts
+  useGroupSessions.ts
+  usePrivateCalls.ts
+  useStudentRecordsLessons.ts
+  useWeeks.ts
+
+hooks/CoachingData/queries/CoachingDashboard/
+---------------------------------------------
+  BackendFunctions.ts
+  index.ts
+  useMyRecentRecords.ts
+
+hooks/CoachingData/queries/StudentDrillDown/
+--------------------------------------------
+  BackendFunctions.ts
+  index.ts
+  useAllStudents.ts
+  useMembershipWeeks.ts
+  useStudentMemberships.ts
+
+hooks/CourseData/
+-----------------
+  OLD_useOfficialQuizzes.test.tsx
+  OLD_useOfficialQuizzes.ts
+  useProgramTable.test.tsx
+  useProgramTable.ts
+  useSubcategories.ts
+  useVerbs.ts
+  useVocabulary.test.tsx
+  useVocabulary.ts
+
+hooks/ExampleData/
+------------------
+  useAudioExamples.test.tsx
+  useAudioExamples.ts
+  useExampleUpdate.ts
+  useRecentlyEditedExamples.test.tsx
+  useRecentlyEditedExamples.ts
+  useSingleExample.test.tsx
+  useSingleExample.ts
+  useUnverifiedExamples.test.tsx
+  useUnverifiedExamples.ts
+  useVerifiedExamples.test.tsx
+  useVerifiedExamples.ts
+
+hooks/StudentRecordsData/
+-------------------------
+  useCoursesTable.ts
+  useLessonsTable.ts
+
+hooks/StudentRecordsData/queries/
+---------------------------------
+  BackendFunctions.ts
+
+hooks/UserData/
+---------------
+  usePMFData.test.tsx
+  usePMFData.ts
+  useStudentFlashcards.test.tsx
+  useStudentFlashcards.ts
+
+hooks/VocabQuizDbData/
+----------------------
+  useProgramsTable.ts
+  useQuizzesTable.ts
+  useStudentsTable.ts
+
+hooks/VocabQuizDbData/queries/
+------------------------------
+  BackendFunctions.ts
+
+routes/
+-------
+  AppRoutes.tsx
+  SentryRoutes.ts
+
+sections/
+---------
+  Menu.test.tsx
+  Menu.tsx
+
+sections/AdminDashboard/
+------------------------
+  AdminDashboard.scss
+  AdminDashboard.tsx
+  index.ts
+  useAdminDashboard.ts
+
+sections/DatabaseTables/
+------------------------
+  DatabaseTables.scss
+  DatabaseTables.tsx
+  index.ts
+  useDatabaseTables.ts
+
+src (root)/
+-----------
+  .DS_Store
+  App.css
+  App.test.tsx
+  App.tsx
+  NotFoundPage.test.tsx
+  NotFoundPage.tsx
+  contextual.scss
+  index.css
+  index.tsx
+
+types/
+------
+  CoachingTypes.ts
+  VocabQuizDbTypes.ts
+  interfaceDefinitions.tsx
