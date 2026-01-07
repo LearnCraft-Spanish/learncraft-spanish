@@ -250,22 +250,6 @@ export function useBackend() {
     return getFactory<types.Spelling[]>('public/spellings');
   }, [getFactory]);
 
-  // UNUSED -- CONSIDER DELETING
-  const getExamplesFromBackend = useCallback((): Promise<types.Flashcard[]> => {
-    return getFactory<types.Flashcard[]>('public/examples');
-  }, [getFactory]);
-  // unused
-  const getVerifiedExamplesFromBackend = useCallback((): Promise<
-    types.Flashcard[]
-  > => {
-    return getFactory<types.Flashcard[]>('public/verified-examples');
-  }, [getFactory]);
-  // unused
-  const getAudioExamplesFromBackend = useCallback((): Promise<
-    types.Flashcard[]
-  > => {
-    return getFactory<types.Flashcard[]>('public/audio-examples');
-  }, [getFactory]);
   // used
   const getLcspQuizzesFromBackend = useCallback((): Promise<types.Quiz[]> => {
     return getFactory<types.Quiz[]>('public/quizzes');
@@ -289,25 +273,13 @@ export function useBackend() {
     },
     [getFactory],
   );
-  // unused
-  const getUnverifiedExamplesFromBackend = useCallback((): Promise<
-    types.Flashcard[]
-  > => {
-    return getFactory<types.Flashcard[]>('unverified-examples');
-  }, [getFactory]);
+
   // used in 1 context
   const getRecentlyEditedExamples = useCallback((): Promise<
     types.Flashcard[]
   > => {
     return getFactory<types.Flashcard[]>('recently-edited-examples');
   }, [getFactory]);
-  // unused
-  const getSingleExample = useCallback(
-    (exampleId: number): Promise<types.Flashcard> => {
-      return getFactory<types.Flashcard>(`single-example/${exampleId}`);
-    },
-    [getFactory],
-  );
 
   /*      Coaching API      */
 
@@ -707,10 +679,8 @@ export function useBackend() {
     getActiveExamplesFromBackend,
     getActiveMemberships,
     getActiveStudents,
-    getAudioExamplesFromBackend,
     getCoachList,
     getCourseList,
-    getExamplesFromBackend,
 
     getLcspQuizzesFromBackend,
     getLessonList,
@@ -720,12 +690,9 @@ export function useBackend() {
     getPMFDataForUser,
     getProgramsFromBackend,
     getQuizExamplesFromBackend,
-    getSingleExample,
     getExampleSetBySpanishText,
     getSpellingsFromBackend,
-    getUnverifiedExamplesFromBackend,
     getRecentlyEditedExamples,
-    getVerifiedExamplesFromBackend,
     getVocabFromBackend,
     getVerbsFromBackend,
     getSubcategoriesFromBackend,

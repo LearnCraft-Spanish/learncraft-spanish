@@ -222,23 +222,8 @@ describe('useBackend Hook', () => {
   });
 
   testArrayFetchFunction({
-    functionName: 'getVerifiedExamplesFromBackend',
-    requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
-  });
-
-  testArrayFetchFunction({
-    functionName: 'getAudioExamplesFromBackend',
-    requiredFields: ['recordId', 'spanishAudioLa', 'englishAudio'],
-  });
-
-  testArrayFetchFunction({
     functionName: 'getLcspQuizzesFromBackend',
     requiredFields: ['recordId', 'quizNickname'],
-  });
-
-  testArrayFetchFunction({
-    functionName: 'getUnverifiedExamplesFromBackend',
-    requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
   });
 
   testObjectFetchFunction({

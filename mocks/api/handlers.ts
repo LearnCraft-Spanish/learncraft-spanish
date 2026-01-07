@@ -6,7 +6,7 @@ import newData from '../data/serverlike/serverlikeData';
 
 import { generatedMockData } from '../data/serverlike/studentRecords/studentRecordsMockData';
 
-import { appUserTable, getAppUserFromName } from '../data/serverlike/userTable';
+import { getAppUserFromName } from '../data/serverlike/userTable';
 
 // import mockDataHardCoded from '../data/serverlike/studentRecords/studentRecordsMockData';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -82,24 +82,9 @@ export const handlers = [
   http.get(`${backendUrl}all-students`, () => {
     return HttpResponse.json(apiData.appUserTable);
   }),
-  // unused
-  http.get(`${backendUrl}unverified-examples`, () => {
-    return HttpResponse.json(apiData.verifiedExamplesTable);
-  }),
 
   http.get(`${backendUrl}recently-edited-examples`, () => {
     return HttpResponse.json(apiData.verifiedExamplesTable);
-  }),
-  // unused
-  http.get(`${backendUrl}single-example/:exampleId`, ({ params }) => {
-    const exampleId = params.exampleId;
-    const foundExample = apiData.verifiedExamplesTable.find((example) => {
-      return example.recordId === Number(exampleId);
-    });
-    if (!foundExample) {
-      throw new Error('Example not found');
-    }
-    return HttpResponse.json(foundExample);
   }),
 
   http.get(`${backendUrl}my-examples`, ({ request }) => {
@@ -343,14 +328,6 @@ export const handlers = [
       return HttpResponse.json([]);
     },
   ),
-  // unused
-  http.get(`/api/app-user/my-data`, ({ request }) => {
-    const email = getEmailFromRequest(request);
-    const student = appUserTable.find((student) => {
-      return student.emailAddress === email;
-    });
-    return HttpResponse.json(student);
-  }),
 
   http.get(`/api/courses-with-lessons`, () => {
     return HttpResponse.json(
