@@ -1,3 +1,4 @@
+// used outside hexagon, some places where it can be replaced with hexagon implementation or removed
 import type {
   Flashcard,
   StudentExample,

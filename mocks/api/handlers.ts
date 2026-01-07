@@ -82,7 +82,7 @@ export const handlers = [
   http.get(`${backendUrl}all-students`, () => {
     return HttpResponse.json(apiData.appUserTable);
   }),
-
+  // unused
   http.get(`${backendUrl}unverified-examples`, () => {
     return HttpResponse.json(apiData.verifiedExamplesTable);
   }),
@@ -90,7 +90,7 @@ export const handlers = [
   http.get(`${backendUrl}recently-edited-examples`, () => {
     return HttpResponse.json(apiData.verifiedExamplesTable);
   }),
-
+  // unused
   http.get(`${backendUrl}single-example/:exampleId`, ({ params }) => {
     const exampleId = params.exampleId;
     const foundExample = apiData.verifiedExamplesTable.find((example) => {
@@ -343,7 +343,7 @@ export const handlers = [
       return HttpResponse.json([]);
     },
   ),
-
+  // unused
   http.get(`/api/app-user/my-data`, ({ request }) => {
     const email = getEmailFromRequest(request);
     const student = appUserTable.find((student) => {

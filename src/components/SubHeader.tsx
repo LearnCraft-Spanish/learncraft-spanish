@@ -1,3 +1,4 @@
+// canidate for refactor & move to hexagon
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useState } from 'react';

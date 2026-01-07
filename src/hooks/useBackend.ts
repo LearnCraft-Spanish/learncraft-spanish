@@ -1,3 +1,4 @@
+// used in some contexts, possibly consider using inside hexagon implementation
 import type { QueryFunctionContext } from '@tanstack/react-query';
 import type * as StudentRecordsTypes from 'src/types/CoachingTypes';
 import type * as types from 'src/types/interfaceDefinitions';
@@ -220,31 +221,31 @@ export function useBackend() {
 
   /*      GET Requests      */
   const { getAccessToken } = useAuthAdapter();
-
+  // used
   const getProgramsFromBackend = useCallback((): Promise<
     types.ProgramUnparsed[]
   > => {
     return getFactory<types.ProgramUnparsed[]>('public/programs');
   }, [getFactory]);
-
+  // used
   const getLessonsFromBackend = useCallback((): Promise<types.Lesson[]> => {
     return getFactory<types.Lesson[]>('public/lessons');
   }, [getFactory]);
-
+  // used
   const getVocabFromBackend = useCallback((): Promise<types.Vocabulary[]> => {
     return getFactory<types.Vocabulary[]>('public/vocabulary');
   }, [getFactory]);
-
+  // used
   const getVerbsFromBackend = useCallback((): Promise<types.Verb[]> => {
     return getFactory<types.Verb[]>('admin/verbs');
   }, [getFactory]);
-
+  // used
   const getSubcategoriesFromBackend = useCallback((): Promise<
     types.Subcategory[]
   > => {
     return getFactory<types.Subcategory[]>('admin/subcategories');
   }, [getFactory]);
-
+  // used
   const getSpellingsFromBackend = useCallback((): Promise<types.Spelling[]> => {
     return getFactory<types.Spelling[]>('public/spellings');
   }, [getFactory]);
@@ -253,54 +254,54 @@ export function useBackend() {
   const getExamplesFromBackend = useCallback((): Promise<types.Flashcard[]> => {
     return getFactory<types.Flashcard[]>('public/examples');
   }, [getFactory]);
-
+  // unused
   const getVerifiedExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
     return getFactory<types.Flashcard[]>('public/verified-examples');
   }, [getFactory]);
-
+  // unused
   const getAudioExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
     return getFactory<types.Flashcard[]>('public/audio-examples');
   }, [getFactory]);
-
+  // used
   const getLcspQuizzesFromBackend = useCallback((): Promise<types.Quiz[]> => {
     return getFactory<types.Quiz[]>('public/quizzes');
   }, [getFactory]);
-
+  // used - but possibly remove
   const getMyExamplesFromBackend =
     useCallback((): Promise<types.StudentFlashcardData> => {
       return getFactory<types.StudentFlashcardData>('my-examples');
     }, [getFactory]);
-
+  // used
   const getQuizExamplesFromBackend = useCallback(
     (quizId: number): Promise<types.Flashcard[]> => {
       return getFactory<types.Flashcard[]>(`public/quizExamples/${quizId}`);
     },
     [getFactory],
   );
-
+  // used, but not for long
   const getActiveExamplesFromBackend = useCallback(
     (studentId: number): Promise<types.StudentFlashcardData> => {
       return getFactory<types.StudentFlashcardData>(`${studentId}/examples`);
     },
     [getFactory],
   );
-
+  // unused
   const getUnverifiedExamplesFromBackend = useCallback((): Promise<
     types.Flashcard[]
   > => {
     return getFactory<types.Flashcard[]>('unverified-examples');
   }, [getFactory]);
-
+  // used in 1 context
   const getRecentlyEditedExamples = useCallback((): Promise<
     types.Flashcard[]
   > => {
     return getFactory<types.Flashcard[]>('recently-edited-examples');
   }, [getFactory]);
-
+  // unused
   const getSingleExample = useCallback(
     (exampleId: number): Promise<types.Flashcard> => {
       return getFactory<types.Flashcard>(`single-example/${exampleId}`);
@@ -400,7 +401,7 @@ export function useBackend() {
   //   return getFactory('coaching/private-calls');
   // }, [getFactory]);
   /*      POST Requests      */
-
+  // used
   const createMyStudentExample = useCallback(
     (exampleId: number): Promise<number[]> => {
       return postFactory<number[]>('create-my-student-example', {
@@ -409,7 +410,7 @@ export function useBackend() {
     },
     [postFactory],
   );
-
+  // used
   const createStudentExample = useCallback(
     (studentId: number, exampleId: number): Promise<number[]> => {
       return postFactory<number[]>('create-student-example', {
@@ -419,7 +420,7 @@ export function useBackend() {
     },
     [postFactory],
   );
-
+  // used
   const updateMyStudentExample = useCallback(
     (updateId: number, newInterval: number): Promise<number> => {
       return postFactory<number>('update-my-student-example', {
@@ -429,7 +430,7 @@ export function useBackend() {
     },
     [postFactory],
   );
-
+  // used
   const updateStudentExample = useCallback(
     (updateId: number, newInterval: number): Promise<number> => {
       return postFactory<number>('update-student-example', {
@@ -441,6 +442,7 @@ export function useBackend() {
   );
 
   // Complex queryies have to be sent as POST since GET doesn't allow body
+  // used
   const getExampleSetBySpanishText = useCallback(
     (spanishText: string[]): Promise<types.Flashcard[]> => {
       return newPostFactory<types.Flashcard[]>({
@@ -455,21 +457,21 @@ export function useBackend() {
   );
 
   /*      DELETE Requests      */
-
+  // used
   const deleteMyStudentExample = useCallback(
     (recordId: number): Promise<number> => {
       return deleteFactory('delete-my-student-example', { deleteid: recordId });
     },
     [deleteFactory],
   );
-
+  // used
   const deleteStudentExample = useCallback(
     (recordId: number): Promise<number> => {
       return deleteFactory('delete-student-example', { deleteid: recordId });
     },
     [deleteFactory],
   );
-
+  // used
   const removeVocabFromExample = useCallback(
     (exampleId: number, vocabIdList: number[]): Promise<number> => {
       return newDeleteFactory({
@@ -479,14 +481,14 @@ export function useBackend() {
     },
     [newDeleteFactory],
   );
-
+  // used, but not for long
   const getPMFDataForUser = useCallback(
     (userId: number): Promise<types.PMFData> => {
       return getFactory(`pmf/${userId}`);
     },
     [getFactory],
   );
-
+  // used, but not for long
   const createPMFDataForUser = useCallback(
     (studentId: number, hasTakenSurvey: boolean): Promise<number> => {
       return newPostFactory({
@@ -496,6 +498,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
+  // used, but not for long
   const updatePMFDataForUser = useCallback(
     ({
       studentId,
@@ -517,7 +520,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const createUnverifiedExample = useCallback(
     (example: types.NewFlashcard): Promise<number> => {
       return newPostFactory<number>({
@@ -529,7 +532,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const createMultipleUnverifiedExamples = useCallback(
     (examples: types.NewFlashcard[]): Promise<number[]> => {
       return newPostFactory<number[]>({
@@ -541,7 +544,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const updateExample = useCallback(
     (example: Partial<types.Flashcard>): Promise<number> => {
       return newPostFactory<number>({
@@ -553,7 +556,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const addVocabularyToExample = useCallback(
     (exampleId: number, vocabIdList: number[]): Promise<number> => {
       return newPostFactory<number>({
@@ -566,7 +569,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const createMultipleStudentExamples = useCallback(
     (studentId: number, exampleIdList: number[]): Promise<number[]> => {
       return newPostFactory<number[]>({
@@ -576,7 +579,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const createMultipleQuizExamples = useCallback(
     (quizId: number, exampleIdList: number[]): Promise<number[]> => {
       return newPostFactory<number[]>({
@@ -586,7 +589,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const createVocabulary = useCallback(
     (vocabulary: Omit<types.Vocabulary, 'recordId'>): Promise<number> => {
       return newPostFactory({
@@ -597,6 +600,7 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  // used
   const updateVocabulary = useCallback(
     (vocabulary: types.Vocabulary): Promise<number> => {
       return newPostFactory({
@@ -607,6 +611,7 @@ export function useBackend() {
     [newPostFactory],
   );
 
+  // used
   const deleteVocabulary = useCallback(
     (recordId: number): Promise<number> => {
       return newDeleteFactory({
@@ -615,7 +620,7 @@ export function useBackend() {
     },
     [newDeleteFactory],
   );
-
+  // used
   const createSpelling = useCallback(
     (spelling: Omit<types.Spelling, 'recordId'>): Promise<number> => {
       return newPostFactory({
@@ -625,7 +630,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const deleteSpelling = useCallback(
     (spelling: types.Spelling): Promise<number> => {
       return newDeleteFactory({
@@ -635,7 +640,7 @@ export function useBackend() {
     },
     [newDeleteFactory],
   );
-
+  // used
   const createSubcategory = useCallback(
     (
       subcategory: Omit<types.Subcategory, 'recordId'>,
@@ -647,7 +652,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const updateSubcategory = useCallback(
     (subcategory: types.Subcategory): Promise<types.Subcategory> => {
       return newPutFactory({
@@ -657,7 +662,7 @@ export function useBackend() {
     },
     [newPutFactory],
   );
-
+  // used
   const deleteSubcategory = useCallback(
     (recordId: number): Promise<number> => {
       return newDeleteFactory({
@@ -666,7 +671,7 @@ export function useBackend() {
     },
     [newDeleteFactory],
   );
-
+  // used
   const createVerb = useCallback(
     (verb: Omit<types.Verb, 'recordId'>): Promise<types.Verb> => {
       return newPostFactory({
@@ -676,7 +681,7 @@ export function useBackend() {
     },
     [newPostFactory],
   );
-
+  // used
   const updateVerb = useCallback(
     (verb: types.Verb): Promise<types.Verb> => {
       return newPutFactory({
@@ -686,7 +691,7 @@ export function useBackend() {
     },
     [newPutFactory],
   );
-
+  // used
   const deleteVerb = useCallback(
     (recordId: number): Promise<number> => {
       return newDeleteFactory({

@@ -1,3 +1,4 @@
+// UNUSED -- CONSIDER DELETING
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';
 import { useBackend } from 'src/hooks/useBackend';

@@ -1,3 +1,4 @@
+// coaching interface
 import type { Vocabulary } from 'src/types/interfaceDefinitions';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React, { useRef, useState } from 'react';

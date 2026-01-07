@@ -1,3 +1,4 @@
+// UNUSED -- CONSIDER DELETING
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import React from 'react';
 

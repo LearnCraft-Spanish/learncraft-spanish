@@ -1,3 +1,5 @@
+// used in Coaching interfaces
+
 import type { EditableProgram } from 'src/components/DatabaseTables/VocabQuizDb/ProgramsTable/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';

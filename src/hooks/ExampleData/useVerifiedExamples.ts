@@ -1,3 +1,4 @@
+// UNUSED
 import type { Flashcard } from 'src/types/interfaceDefinitions';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';
