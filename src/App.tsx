@@ -1,10 +1,10 @@
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcardUpdatesOnLoad';
 import { Loading } from '@interface/components/Loading';
+import Nav from '@interface/components/Nav/Nav';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
-import Nav from './components/Nav';
 import SubHeader from './components/SubHeader';
 import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
 import AppRoutes from './routes/AppRoutes';

@@ -9,7 +9,7 @@ import { useActiveStudent } from '@application/coordinators/hooks/useActiveStude
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { useCallback, useRef } from 'react';
-import { showErrorToast, showSuccessToast } from 'src/functions/showToast';
+import { toast } from 'react-toastify';
 import { toISODateTime } from 'src/hexagon/domain/functions/dateUtils';
 import { useBackend } from 'src/hooks/useBackend';
 
@@ -288,7 +288,7 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (data, _variables, context) => {
-      showSuccessToast('Flashcard added successfully');
+      toast.success('Flashcard added successfully', { autoClose: 1000 });
 
       queryClient.setQueryData(
         ['flashcardData', activeStudentId],
@@ -325,7 +325,7 @@ export function useStudentFlashcards() {
     },
 
     onError: (error, _variables, context) => {
-      showErrorToast('Failed to add Flashcard');
+      toast.error('Failed to add Flashcard', { autoClose: 1000 });
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized ID number to rollback the cache
@@ -457,12 +457,13 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (_data, _variables, _context) => {
-      showSuccessToast('Flashcard removed successfully');
+      toast.success('Flashcard removed successfully', { autoClose: 1000 });
+
       queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
-      showErrorToast('Failed to remove Flashcard');
+      toast.error('Failed to remove Flashcard', { autoClose: 1000 });
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized objects to rollback the cache
@@ -607,11 +608,11 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (_data, _variables) => {
-      showSuccessToast('Flashcard updated successfully');
+      toast.success('Flashcard updated successfully', { autoClose: 1000 });
     },
 
     onError: (error, _variables, context) => {
-      showErrorToast('Failed to update Flashcard');
+      toast.error('Failed to update Flashcard', { autoClose: 1000 });
       console.error(error);
       // Make sure both necessary values are defined
       if (
@@ -806,10 +807,11 @@ export function useStudentFlashcards() {
       const totalCount = data.length;
 
       if (successCount === totalCount) {
-        showSuccessToast('All flashcards added successfully');
+        toast.success('All flashcards added successfully', { autoClose: 1000 });
       } else {
-        showSuccessToast(
+        toast.success(
           `Added ${successCount} of ${totalCount} flashcards successfully`,
+          { autoClose: 1000 },
         );
       }
 
@@ -844,7 +846,7 @@ export function useStudentFlashcards() {
       _variables: Flashcard[],
       context?: AddMultipleFlashcardsContext,
     ) => {
-      showErrorToast('Failed to add some flashcards');
+      toast.error('Failed to add some flashcards', { autoClose: 1000 });
       console.error(error);
       if (!context) return;
       // Roll back the cache for just the affected flashcards
