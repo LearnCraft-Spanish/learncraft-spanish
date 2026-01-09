@@ -27,8 +27,6 @@ export function useStudentFlashcards() {
     createMyStudentExample,
     deleteStudentExample,
     deleteMyStudentExample,
-    updateStudentExample,
-    updateMyStudentExample,
     createMultipleStudentExamples,
   } = useBackend();
 
@@ -496,181 +494,6 @@ export function useStudentFlashcards() {
     onSettled: () => debouncedRefetch(),
   });
 
-  const updateActiveStudentFlashcards = useCallback(
-    async (studentExampleId: number, newInterval: number) => {
-      let updatePromise;
-      if ((isAdmin || isCoach) && activeStudentId) {
-        updatePromise = updateStudentExample(studentExampleId, newInterval);
-      } else if (isStudent) {
-        updatePromise = updateMyStudentExample(studentExampleId, newInterval);
-      }
-      if (!updatePromise) {
-        throw new Error('No active student');
-      }
-      const updateResponse = updatePromise.then(
-        (result: number | undefined | string) => {
-          if (typeof result === 'string') {
-            result = Number.parseInt(result);
-          }
-          if (result !== studentExampleId) {
-            throw new Error('Failed to update Flashcard');
-          }
-          return result;
-        },
-      );
-      return updateResponse;
-    },
-    [
-      isAdmin,
-      isCoach,
-      isStudent,
-      activeStudentId,
-      updateStudentExample,
-      updateMyStudentExample,
-    ],
-  );
-
-  const updateFlashcardMutation = useMutation({
-    mutationFn: ({
-      studentExampleId,
-      newInterval,
-    }: {
-      studentExampleId: number;
-      newInterval: number;
-      difficulty: 'easy' | 'hard';
-    }) => updateActiveStudentFlashcards(studentExampleId, newInterval),
-    onMutate: async ({ studentExampleId, newInterval, difficulty }) => {
-      // Cancel any in-flight queries
-      await queryClient.cancelQueries({
-        queryKey: ['flashcardData', activeStudentId],
-      });
-
-      // Memoize the old interval for rollback
-      let oldInterval: number | undefined;
-
-      // Optimistically update the flashcards cache
-      queryClient.setQueryData(
-        ['flashcardData', activeStudentId],
-        (oldFlashcards: StudentFlashcardData) => {
-          const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
-          // Foreign Key lookup, form data in backend
-          const studentFlashcard = oldFlashcardsCopy.find(
-            (studentFlashcard) =>
-              studentFlashcard.recordId === studentExampleId,
-          );
-          // Foreign Key lookup, form data in backend
-          const flashcard = oldFlashcards.examples.find(
-            (flashcard) =>
-              flashcard.recordId === studentFlashcard?.relatedExample,
-          );
-
-          // Only update the cache if both are found
-          if (studentFlashcard && flashcard) {
-            oldInterval = studentFlashcard.reviewInterval
-              ? studentFlashcard.reviewInterval
-              : undefined;
-
-            // Define new flashcard and studentFlashcard objects
-            const newStudentFlashcard = {
-              ...studentFlashcard,
-              reviewInterval: newInterval,
-            };
-            const newFlashcard = { ...flashcard, difficulty };
-
-            // Replace the flashcards in copy of array
-            const newStudentFlashcardsArray = oldFlashcardsCopy.map(
-              (studentFlashcard) =>
-                // Foreign Key lookup, form data in backend
-                studentFlashcard.recordId === studentExampleId
-                  ? newStudentFlashcard
-                  : studentFlashcard,
-            );
-            const newFlashcardsArray = oldFlashcards.examples.map((flashcard) =>
-              // Foreign Key lookup, form data in backend
-              flashcard.recordId === studentFlashcard.relatedExample
-                ? newFlashcard
-                : flashcard,
-            );
-
-            // Trim the arrays to match
-            const trimmedNewFlashcardData = matchAndTrimArrays({
-              examples: newFlashcardsArray,
-              studentExamples: newStudentFlashcardsArray,
-            });
-            return trimmedNewFlashcardData;
-          }
-        },
-      );
-
-      // Return the studentExampleId and the previous interval and difficulty
-      // These are for rollback context in the case of an error
-      return { studentExampleId, oldInterval, difficulty };
-    },
-
-    onSuccess: (_data, _variables) => {
-      toast.success('Flashcard updated successfully', { autoClose: 1000 });
-    },
-
-    onError: (error, _variables, context) => {
-      toast.error('Failed to update Flashcard', { autoClose: 1000 });
-      console.error(error);
-      // Make sure both necessary values are defined
-      if (
-        context?.studentExampleId === undefined ||
-        context?.oldInterval === undefined
-      ) {
-        return;
-      }
-      // Destructure the context
-      const { studentExampleId, oldInterval, difficulty } = context;
-
-      // Roll back the cache for just the affected flashcard
-      queryClient.setQueryData(
-        ['flashcardData', activeStudentId],
-        (oldFlashcards: StudentFlashcardData) => {
-          const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
-          // Foreign Key lookup, form data in backend
-          const studentFlashcard = oldFlashcardsCopy.find(
-            (studentFlashcard) =>
-              studentFlashcard.recordId === studentExampleId,
-          );
-          // Foreign Key lookup, form data in backend
-          const flashcard = oldFlashcards.examples.find(
-            (flashcard) =>
-              flashcard.recordId === studentFlashcard?.relatedExample,
-          );
-          if (studentFlashcard && flashcard) {
-            const newStudentFlashcard: StudentExample = {
-              ...studentFlashcard,
-              reviewInterval: oldInterval,
-            };
-            const newFlashcard: Flashcard = { ...flashcard, difficulty };
-            const newStudentFlashcardsArray = oldFlashcardsCopy.map(
-              (studentFlashcard) =>
-                // Foreign Key lookup, form data in backend
-                studentFlashcard.recordId === studentExampleId
-                  ? newStudentFlashcard
-                  : studentFlashcard,
-            );
-            const newFlashcardsArray = oldFlashcards.examples.map((flashcard) =>
-              // Foreign Key lookup, form data in backend
-              flashcard.recordId === studentFlashcard.relatedExample
-                ? newFlashcard
-                : flashcard,
-            );
-            const trimmedNewFlashcardData = matchAndTrimArrays({
-              examples: newFlashcardsArray,
-              studentExamples: newStudentFlashcardsArray,
-            });
-            return trimmedNewFlashcardData;
-          }
-          return oldFlashcards;
-        },
-      );
-    },
-    onSettled: () => debouncedRefetch(),
-  });
-
   // Function to return promise that will either give success data or throw an error.
   const addMultipleToActiveStudentFlashcards = useCallback(
     async (flashcards: Flashcard[]) => {
@@ -887,6 +710,5 @@ export function useStudentFlashcards() {
     addFlashcardMutation,
     addMultipleFlashcardsMutation,
     removeFlashcardMutation,
-    updateFlashcardMutation,
   };
 }

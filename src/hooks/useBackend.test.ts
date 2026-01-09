@@ -272,26 +272,6 @@ describe('useBackend Hook', () => {
       expect(response).toBe('0');
     });
   });
-  describe('updateMyStudentExample function', () => {
-    it('updates a student example', async () => {
-      const response = await hookResult.updateMyStudentExample(1, 2);
-      expect(response).toBe('1');
-    });
-    it('returns 0 when updating a student example with bad updateId', async () => {
-      const response = await hookResult.updateMyStudentExample(-1, 2);
-      expect(response).toBe('0');
-    });
-  });
-  describe('updateStudentExample function', () => {
-    it('updates a student example', async () => {
-      const response = await hookResult.updateStudentExample(1, 2);
-      expect(response).toBe('1');
-    });
-    it('returns 0 when updating a student example with bad updateId', async () => {
-      const response = await hookResult.updateStudentExample(-1, 2);
-      expect(response).toBe('0');
-    });
-  });
 
   describe('deleteMyStudentExample function', () => {
     it('deletes a student example', async () => {

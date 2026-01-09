@@ -392,26 +392,6 @@ export function useBackend() {
     },
     [postFactory],
   );
-  // used
-  const updateMyStudentExample = useCallback(
-    (updateId: number, newInterval: number): Promise<number> => {
-      return postFactory<number>('update-my-student-example', {
-        updateid: updateId,
-        newinterval: newInterval,
-      });
-    },
-    [postFactory],
-  );
-  // used
-  const updateStudentExample = useCallback(
-    (updateId: number, newInterval: number): Promise<number> => {
-      return postFactory<number>('update-student-example', {
-        updateid: updateId,
-        newinterval: newInterval,
-      });
-    },
-    [postFactory],
-  );
 
   // Complex queryies have to be sent as POST since GET doesn't allow body
   // used
@@ -709,9 +689,7 @@ export function useBackend() {
     createMultipleQuizExamples,
     createVocabulary,
     updateExample,
-    updateMyStudentExample,
     updatePMFDataForUser,
-    updateStudentExample,
     updateVocabulary,
 
     // DELETE Requests
