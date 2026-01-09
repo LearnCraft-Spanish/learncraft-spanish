@@ -2,10 +2,10 @@ import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useFlushFlashcardUpdatesOnLoad } from '@application/units/flushFlashcardUpdatesOnLoad';
 import { Loading } from '@interface/components/Loading';
 import Nav from '@interface/components/Nav/Nav';
+import { SubHeaderComponent } from '@interface/components/SubHeader';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer, Zoom } from 'react-toastify';
-import SubHeader from './components/SubHeader';
 import ExtraCoachingCTA from './hexagon/interface/components/BuyMoreCoachingSessionsBanner/BuyMoreCoachingSessionsBanner';
 import AppRoutes from './routes/AppRoutes';
 import './App.css';
@@ -27,7 +27,9 @@ export const App: React.FC = () => {
         location.pathname !== '/customquiz' &&
         location.pathname !== '/myflashcards' &&
         location.pathname !== '/coaching-dashboard' &&
-        location.pathname.split('/')[1] !== 'officialquizzes' && <SubHeader />}
+        location.pathname.split('/')[1] !== 'officialquizzes' && (
+          <SubHeaderComponent />
+        )}
 
       {isLoading && !isAuthenticated ? (
         <Loading message="Logging in..." />
