@@ -12,6 +12,7 @@ export function SearchByIdsResults({ ids }: SearchByIdsResultsProps) {
 
   return (
     <BaseResultsComponent
+      bulkOption="selectAll"
       isLoading={isLoading}
       error={error}
       examples={examples}

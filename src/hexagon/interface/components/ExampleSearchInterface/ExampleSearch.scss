@@ -10,3 +10,16 @@
   display: block;
   font-size: 1.2rem;
 }
+
+.selectAllButton,
+.clearSelectionButton {
+  margin-left: 30px;
+  display: block;
+}
+
+.selectAllButton {
+  background-color: darkgreen;
+}
+.clearSelectionButton {
+  background-color: darkred;
+}
