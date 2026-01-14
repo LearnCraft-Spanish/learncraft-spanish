@@ -1,9 +1,10 @@
 import {
   defaultMockImplementation,
+  overrideMockUseSelectedExamplesContext,
   resetMockUseSelectedExamplesContext,
 } from '@application/coordinators/hooks/useSelectedExamplesContext.mock';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -195,6 +196,63 @@ describe('component: BaseResultsComponent', () => {
       );
 
       expect(screen.queryByText(/page/i)).not.toBeInTheDocument();
+    });
+  });
+  describe('bulk selection controls', () => {
+    it('selects all examples on the page when the button is clicked', async () => {
+      const mockExamples = createMockExampleWithVocabularyList(2);
+      // cange mock examples to have different ids
+      mockExamples.forEach((example, index) => {
+        example.id = index + 1;
+      });
+      const updateSelectedExamples = vi.fn();
+
+      overrideMockUseSelectedExamplesContext(() => ({
+        ...defaultMockImplementation,
+        selectedExampleIds: [],
+        updateSelectedExamples,
+      }));
+
+      render(
+        <BaseResultsComponent
+          isLoading={false}
+          error={null}
+          examples={mockExamples}
+          bulkOption="selectAll"
+        />,
+      );
+
+      const button = screen.getByRole('button', {
+        name: /Select All on Page/i,
+      });
+
+      await waitFor(async () => {
+        fireEvent.click(button);
+      });
+      waitFor(() => {
+        expect(updateSelectedExamples).toHaveBeenCalledWith(
+          mockExamples.map((example) => example.id),
+        );
+      });
+    });
+
+    it('clears the selection when the clear button is clicked', () => {
+      const mockExamples = createMockExampleWithVocabularyList(1);
+
+      render(
+        <BaseResultsComponent
+          isLoading={false}
+          error={null}
+          examples={mockExamples}
+          bulkOption="deselectAll"
+        />,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /Clear Selection/i }));
+
+      expect(
+        defaultMockImplementation.clearSelectedExamples,
+      ).toHaveBeenCalled();
     });
   });
 });

@@ -1,5 +1,6 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
+import { useBulkButton } from '@application/units/ExampleSearchInterface/useBulkButton';
 import ExampleListItemFactory from '@interface/components/ExampleListItem/ExampleListItemFactory';
 import BulkAddButton from '@interface/components/ExampleListItem/units/BulkAddButton';
 import Pagination from '@interface/components/general/Pagination/Pagination';
@@ -13,6 +14,7 @@ export interface PaginationProps {
 }
 
 export interface BaseResultsComponentProps {
+  bulkOption?: 'selectAll' | 'deselectAll' | undefined;
   isLoading: boolean;
   error: Error | null;
   examples: ExampleWithVocabulary[] | undefined;
@@ -25,6 +27,7 @@ export interface BaseResultsComponentProps {
  * all implementations will be a wrapper fetching, then displaying the results.
  */
 export function BaseResultsComponent({
+  bulkOption = undefined,
   isLoading,
   error,
   examples,
@@ -32,9 +35,16 @@ export function BaseResultsComponent({
   pagination,
   title,
 }: BaseResultsComponentProps) {
-  const { addSelectedExample, removeSelectedExample, selectedExampleIds } =
-    useSelectedExamplesContext();
+  const {
+    addSelectedExample,
+    removeSelectedExample,
+    selectedExampleIds,
+    clearSelectedExamples,
+  } = useSelectedExamplesContext();
 
+  const { allAlreadySelected, selectAllExamplesOnPage } = useBulkButton(
+    examples ?? [],
+  );
   if (info) {
     return <p>{info}</p>;
   }
@@ -68,6 +78,26 @@ export function BaseResultsComponent({
           previousPage={pagination.previousPage}
         />
       )}
+      {bulkOption === 'selectAll' && (
+        <button
+          onClick={selectAllExamplesOnPage}
+          type="button"
+          className="selectAllButton"
+          disabled={allAlreadySelected}
+        >
+          Select All on Page
+        </button>
+      )}
+      {bulkOption === 'deselectAll' && (
+        <button
+          onClick={clearSelectedExamples}
+          type="button"
+          className="clearSelectionButton"
+        >
+          Clear Selection
+        </button>
+      )}
+
       <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
         {examples.map((example) => (
           <li key={example.id}>

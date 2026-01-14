@@ -18,6 +18,7 @@ export function SelectedExamples() {
       />
       {showSelectedExamples && (
         <BaseResultsComponent
+          bulkOption="deselectAll"
           title={`${selectedExamples.length} Selected Examples`}
           examples={selectedExamples}
           isLoading={false}
