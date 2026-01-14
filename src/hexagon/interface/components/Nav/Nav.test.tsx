@@ -1,9 +1,9 @@
 import { overrideMockAuthAdapter } from '@application/adapters/authAdapter.mock';
-import { cleanup, render, screen } from '@testing-library/react';
+import Nav from '@interface/components/Nav/Nav';
 
+import { cleanup, render, screen } from '@testing-library/react';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import Nav from './Nav';
 
 describe('component Nav', () => {
   afterEach(() => {

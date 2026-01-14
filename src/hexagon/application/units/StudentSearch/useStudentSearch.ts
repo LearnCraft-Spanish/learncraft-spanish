@@ -2,11 +2,11 @@ import { useActiveStudent } from '@application/coordinators/hooks/useActiveStude
 import { useAppStudentList } from '@application/queries/useAppStudentList';
 import { useCallback, useMemo, useState } from 'react';
 
-interface StudentSearchProps {
+export default function useStudentSearch({
+  closeMenu,
+}: {
   closeMenu: () => void;
-}
-
-export default function StudentSearch({ closeMenu }: StudentSearchProps) {
+}) {
   const { changeActiveStudent } = useActiveStudent();
   const { appStudentList } = useAppStudentList();
 
@@ -48,30 +48,10 @@ export default function StudentSearch({ closeMenu }: StudentSearchProps) {
     });
     return matchesSearch;
   }, [listOfStudents, searchString]);
-
-  return (
-    <div id="searchStudentWrapper">
-      <input
-        type="text"
-        placeholder="Search for a student by name or email"
-        value={searchString}
-        onChange={(e) => setSearchString(e.target.value)}
-      />
-      {searchStudentOptions.length > 0 && (
-        <div id="optionsWrapper">
-          <div onClick={() => selectStudent(null)}> – Clear Selection – </div>
-          {searchStudentOptions.map((student) => (
-            <div
-              key={student.emailAddress}
-              className="searchResultItem"
-              onClick={() => selectStudent(student.emailAddress)}
-            >
-              {student.name ? `${student.name} -- ` : ''}
-              {student.emailAddress}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  return {
+    searchStudentOptions,
+    searchString,
+    setSearchString,
+    selectStudent,
+  };
 }

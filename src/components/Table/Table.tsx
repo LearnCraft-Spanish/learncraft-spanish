@@ -1,3 +1,4 @@
+// coaching interface
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import type { FilterConfig, HeaderObject, SortConfig } from './types';
 import React from 'react';

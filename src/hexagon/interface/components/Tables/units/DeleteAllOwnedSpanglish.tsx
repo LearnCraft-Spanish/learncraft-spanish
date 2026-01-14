@@ -1,7 +1,7 @@
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { useModal } from '@interface/hooks/useModal';
 import { useMemo } from 'react';
-import { showErrorToast } from 'src/functions/showToast';
+import { toast } from 'react-toastify';
 
 export default function DeleteAllOwnedSpanglish() {
   const { deleteFlashcards, flashcards } = useStudentFlashcards();
@@ -16,7 +16,7 @@ export default function DeleteAllOwnedSpanglish() {
       type="button"
       onClick={() => {
         if (spanglishFlashcards?.length === 0) {
-          showErrorToast('You do not have any spanglish flashcards.', {
+          toast.error('You do not have any spanglish flashcards.', {
             autoClose: 3000,
           });
           return;

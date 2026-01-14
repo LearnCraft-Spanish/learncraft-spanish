@@ -6,8 +6,8 @@ import {
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import home from '../assets/icons/home.svg';
-import logo from '../assets/typelogosmall.png';
+import home from 'src/assets/icons/home.svg';
+import logo from 'src/assets/typelogosmall.png';
 
 export default function Nav(): React.JSX.Element {
   const navigate = useNavigate();

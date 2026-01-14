@@ -10,8 +10,8 @@ import {
 } from '@interface/components/Quizzing/general';
 import { SRSButtons } from '@interface/components/Quizzing/general/SRSButtons';
 import TextQuizEnd from '@interface/components/Quizzing/general/TextQuizEnd';
+import NoDueFlashcards from '@interface/components/Quizzing/TextQuiz/NoDueFlashcards';
 import React, { useCallback, useEffect } from 'react';
-import NoDueFlashcards from 'src/components/NoDueFlashcards';
 import PMFPopup from 'src/components/PMFPopup/PMFPopup';
 
 export interface TextQuizComponentProps {
