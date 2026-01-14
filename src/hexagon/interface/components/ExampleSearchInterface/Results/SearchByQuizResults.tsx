@@ -20,6 +20,7 @@ export function SearchByQuizResults({
 
   return (
     <BaseResultsComponent
+      bulkOption="selectAll"
       isLoading={isLoading}
       error={error}
       examples={examples}
