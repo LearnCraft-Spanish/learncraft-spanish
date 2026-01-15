@@ -144,7 +144,12 @@ export default function Menu() {
               </div>
               <div className="buttonBox">
                 <Link className="linkButton" to="/examplemanager">
-                  Example Manager
+                  Example Manager (old)
+                </Link>
+              </div>
+              <div className="buttonBox">
+                <Link className="linkButton" to="/example-manager/search">
+                  Example Manager (new)
                 </Link>
               </div>
               <div className="buttonBox">
@@ -155,11 +160,6 @@ export default function Menu() {
               <div className="buttonBox">
                 <Link className="linkButton" to="/vocabularymanager">
                   Create Vocabulary
-                </Link>
-              </div>
-              <div className="buttonBox">
-                <Link className="linkButton" to="/example-search">
-                  Example Search Interface (beta)
                 </Link>
               </div>
             </>
