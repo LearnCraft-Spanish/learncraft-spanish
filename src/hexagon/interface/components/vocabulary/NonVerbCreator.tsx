@@ -5,6 +5,9 @@ import { PaginatedVocabularyTable } from '@interface/components/VocabularyTable/
 import React from 'react';
 import './VocabularyCreator.scss';
 
+/**
+ * @deprecated Display configuration for the vocabulary table.
+ */
 const vocabularyDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'word', label: 'Word', width: '1fr' },
   { id: 'descriptor', label: 'Descriptor', width: '2fr' },
@@ -12,10 +15,16 @@ const vocabularyDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'notes', label: 'Notes', width: '1fr' },
 ];
 
+/**
+ * @deprecated Props for the NonVerbCreator component.
+ */
 interface NonVerbCreatorProps {
   onBack: () => void;
 }
 
+/**
+ * @deprecated NonVerbCreator component.
+ */
 export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
   // Use a single hook that implements the Façade pattern
   const {
@@ -84,7 +93,7 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
       <div className="nonverb-creator__add-new">
         <h4>Add new vocabulary:</h4>
         <PasteTable
-          tableHook={tableHook}
+          hook={tableHook}
           displayConfig={vocabularyDisplayConfig}
           clearButtonText="Clear Table"
           pasteHint="Paste vocabulary data (tab-separated) or edit cells directly"
