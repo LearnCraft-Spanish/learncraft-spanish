@@ -1,7 +1,7 @@
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { useTablePaste } from '@application/units/pasteTable/hooks/useTablePaste';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { act, renderHook } from '@testing-library/react';
 import { vi } from 'vitest';
 
