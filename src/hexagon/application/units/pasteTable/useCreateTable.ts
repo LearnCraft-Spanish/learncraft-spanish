@@ -5,15 +5,15 @@ import type {
 } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import type { z } from 'zod';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { useTableValidation } from '@application/units/pasteTable/hooks';
+import { useCreateTableState } from '@application/units/pasteTable/useCreateTableState';
 import {
   mapAndParseTableRowsToDomain,
   mapDomainToTableRows,
 } from '@domain/PasteTable/functions/mappers';
 import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
 import { useCallback, useMemo } from 'react';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
-import { useCreateTableState } from '@application/units/pasteTable/useCreateTableState';
 
 /**
  * Create table hook interface
@@ -120,9 +120,9 @@ export function useCreateTable<T extends Record<string, unknown>>({
     }
 
     // Map and parse through schema to get complete T[]
-    const dataRows = tableState.getRows().filter(
-      (row) => row.id !== GHOST_ROW_ID,
-    );
+    const dataRows = tableState
+      .getRows()
+      .filter((row) => row.id !== GHOST_ROW_ID);
     return mapAndParseTableRowsToDomain<T>(
       dataRows,
       columns,
