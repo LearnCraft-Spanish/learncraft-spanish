@@ -5,26 +5,20 @@ import type {
 } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import type { z } from 'zod';
-import {
-  useTablePaste,
-  useTableRows,
-  useTableValidation,
-} from '@application/units/pasteTable/hooks';
+import { useTableValidation } from '@application/units/pasteTable/hooks';
 import {
   mapAndParseTableRowsToDomain,
   mapDomainToTableRows,
 } from '@domain/PasteTable/functions/mappers';
 import { createCombinedValidateRow } from '@domain/PasteTable/functions/schemaValidation';
 import { useCallback, useMemo } from 'react';
-
-/**
- * ID used for the ghost row that appears at the bottom of create tables
- */
-export const GHOST_ROW_ID = 'ghost-row';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
+import { useCreateTableState } from '@application/units/pasteTable/useCreateTableState';
 
 /**
  * Create table hook interface
  * For tables that allow creating new records via paste/editing
+ * @deprecated Use useCreateTableState + explicit validation composition in use case
  */
 export interface CreateTableHook<T> {
   // Data
@@ -62,91 +56,63 @@ interface UseCreateTableOptions<T extends Record<string, unknown>> {
  * Hook for create table functionality
  * Allows creating new records via paste/editing
  * Implements CreateTableHook<T> interface
+ *
+ * @deprecated This hook is kept for backward compatibility.
+ * New code should use useCreateTableState and compose validation explicitly in the use case.
  */
 export function useCreateTable<T extends Record<string, unknown>>({
   columns,
   rowSchema,
   initialData = [],
 }: UseCreateTableOptions<T>): CreateTableHook<T> {
-  // Core row management (includes ghost row handling)
-  const {
-    rows,
-    updateCell: updateCellBase,
-    setRows,
-    resetRows,
-    convertGhostRow,
-  } = useTableRows<T>({ columns, initialData });
+  // Map initial data to TableRows
+  const initialRows = useMemo(
+    () => mapDomainToTableRows(initialData, columns),
+    [initialData, columns],
+  );
+
+  // Use state hook (focused on state only)
+  const tableState = useCreateTableState({
+    initialRows,
+    columns,
+  });
 
   // Generate validateRow function from Zod schemas
-  // Requires either column schemas or row schema to be provided
   const validateRow = useMemo(() => {
-    // Check if we have column schemas or row schema
     const hasColumnSchemas = columns.some((col) => col.schema);
     const hasRowSchema = !!rowSchema;
 
-    // Require at least one schema to be provided
     if (!hasColumnSchemas && !hasRowSchema) {
       throw new Error(
         'Either rowSchema or column schemas must be provided for validation',
       );
     }
 
-    // Generate validator from schemas (handles normalization and mapping internally)
+    // Use convenience function (does normalize + map + validate internally)
     return createCombinedValidateRow<T>(columns, rowSchema);
   }, [columns, rowSchema]);
 
   // Validation - derived from row data
   const { validationState } = useTableValidation({
-    rows,
+    rows: tableState.data.rows,
     validateRow,
   });
 
-  // Paste handling - create mode (always creates new rows)
-  const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(
-    {
-      columns,
-      rows,
-      updateCell: updateCellBase,
-      setRows,
-      mode: 'create', // Explicitly set create mode
-    },
-  );
-
-  // Cell update - handles ghost row conversion
-  const updateCell = useCallback(
-    (rowId: string, columnId: string, value: string): string | null => {
-      // Handle ghost row conversion
-      if (rowId === GHOST_ROW_ID && value.trim() !== '') {
-        // Convert ghost row to real row, returns new row ID
-        return convertGhostRow(rowId, columnId, value);
-      }
-
-      // Regular cell update
-      updateCellBase(rowId, columnId, value);
-      return null;
-    },
-    [convertGhostRow, updateCellBase],
-  );
-
-  // Import data from external source
+  // Import data - maps domain to table and sets rows
   const importData = useCallback(
     (newData: T[]) => {
-      // Map domain entities to TableRows
       const newRows = mapDomainToTableRows(newData, columns);
-
-      // Set rows, preserving ghost row
-      setRows((currentRows) => {
-        const ghostRow = currentRows.find((row) => row.id === GHOST_ROW_ID);
+      tableState.setRows((currentRows) => {
+        const ghostRow = currentRows.find((r) => r.id === GHOST_ROW_ID);
         return [...newRows, ...(ghostRow ? [ghostRow] : [])];
       });
     },
-    [columns, setRows],
+    [columns, tableState],
   );
 
   // Save operation - returns data for external save
-  // Parses through schema to get complete T[] (not Partial<T>[])
   const saveData = useCallback(async (): Promise<T[] | undefined> => {
-    // Require rowSchema for complete type (can't guarantee completeness with column schemas alone)
+    // Require rowSchema for complete type
     if (!rowSchema) {
       throw new Error(
         'rowSchema is required for saveData to return complete T[]',
@@ -154,34 +120,33 @@ export function useCreateTable<T extends Record<string, unknown>>({
     }
 
     // Map and parse through schema to get complete T[]
-    const dataRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
+    const dataRows = tableState.getRows().filter(
+      (row) => row.id !== GHOST_ROW_ID,
+    );
     return mapAndParseTableRowsToDomain<T>(
       dataRows,
       columns,
       rowSchema,
       GHOST_ROW_ID,
     );
-  }, [rows, columns, rowSchema]);
-
-  // Reset table to empty state
-  const resetTable = useCallback(() => {
-    resetRows();
-    clearActiveCellInfo();
-  }, [resetRows, clearActiveCellInfo]);
+  }, [tableState, columns, rowSchema]);
 
   // Return CreateTableHook interface
   return {
     data: {
-      rows,
-      columns,
+      rows: tableState.data.rows,
+      columns: tableState.data.columns,
     },
-    updateCell,
-    handlePaste,
+    updateCell: tableState.updateCell,
+    handlePaste: tableState.handlePaste,
     importData,
-    resetTable,
-    setActiveCellInfo,
-    clearActiveCellInfo,
+    resetTable: tableState.resetTable,
+    setActiveCellInfo: tableState.setActiveCellInfo,
+    clearActiveCellInfo: tableState.clearActiveCellInfo,
     validationState,
     saveData,
   };
 }
+
+// Re-export for backward compatibility
+export { GHOST_ROW_ID } from '@application/units/pasteTable/constants';

@@ -1,5 +1,5 @@
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import { convertDataToRows } from '@application/units/pasteTable/General/utils/rowCreation';
+import { convertDataToRows } from '@application/units/pasteTable/utils/rowCreation';
 import { describe, expect, it } from 'vitest';
 
 const testColumns: ColumnDefinition[] = [

@@ -1,6 +1,6 @@
 import type { TableRow } from '@domain/PasteTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { useTableValidation } from '@application/units/pasteTable/hooks/useTableValidation';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
 import { renderHook } from '@testing-library/react';
 
 // Helper to create test rows

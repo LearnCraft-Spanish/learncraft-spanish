@@ -1,6 +1,5 @@
 // Re-export mode-specific hooks
-export * from '@application/units/pasteTable/useCreateTable';
-
-export * from '@application/units/pasteTable/useEditTable';
-// Re-export the main hook (generic, backward compatible)
-export * from '@application/units/pasteTable/usePasteTable';
+export { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
+export * from '@application/units/pasteTable/useCreateTable'; // Legacy - kept for backward compatibility
+export * from '@application/units/pasteTable/useCreateTableState';
+export * from '@application/units/pasteTable/useEditTableState';

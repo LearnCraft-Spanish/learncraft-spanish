@@ -11,6 +11,7 @@ import { useCallback, useMemo, useState } from 'react';
 /**
  * Use case for non-verb vocabulary creation.
  * Implements the Façade pattern by composing multiple units into a unified API.
+ * @deprecated Needs rewrite to use CreateTableStateHook
  */
 export default function useNonVerbCreation(): UseNonVerbCreationResult {
   // State
