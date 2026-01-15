@@ -20,3 +20,24 @@ export const createGhostRow = (columns: ColumnDefinition[]): TableRow => ({
   id: GHOST_ROW_ID,
   cells: columns.reduce((acc, col) => ({ ...acc, [col.id]: '' }), {}),
 });
+/**
+ * Converts typed data to table rows
+ */
+export const convertDataToRows = <T>(
+  data: T[],
+  columns: ColumnDefinition[],
+): TableRow[] => {
+  return data.map((item) => {
+    const cells: Record<string, string> = {};
+    columns.forEach((column) => {
+      const key = column.id as keyof T;
+      const value = item[key];
+      cells[column.id] =
+        value === undefined || value === null ? '' : String(value);
+    });
+    return {
+      id: generateRowId(),
+      cells,
+    };
+  });
+};
