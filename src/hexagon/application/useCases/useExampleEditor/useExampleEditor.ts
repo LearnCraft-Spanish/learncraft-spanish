@@ -1,4 +1,4 @@
-import type { ColumnDefinition } from '@domain/PasteTable';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { ValidationState } from '@domain/PasteTable/validationTypes';
 import type { EditableTableUseCaseProps } from '@interface/components/EditableTable/types';
 import type {
@@ -8,9 +8,19 @@ import type {
 import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
 import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
-import { useEditTable } from '@application/units/pasteTable/useEditTable';
+import { useEditTableState } from '@application/units/pasteTable';
+import { useTableValidation } from '@application/units/pasteTable/hooks';
 import { normalizeError } from '@application/utils/queryUtils';
+import {
+  mapTableRowToDomain,
+  normalizeRowCells,
+} from '@domain/PasteTable/functions';
 import { generateAudioUrls } from '@domain/PasteTable/functions/audioUrlAdapter';
+import { validateEntity } from '@domain/PasteTable/functions/entityValidation';
+import {
+  mapDomainToTableRows,
+  mapTableRowsToDomain,
+} from '@domain/PasteTable/functions/mappers';
 import { updateExampleCommandSchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { z } from 'zod';
@@ -224,30 +234,10 @@ export function useExampleEditor(): UseExampleEditorResult {
     [examplesToEdit],
   );
 
-  // 2. Handle applying changes - maps back to UpdateExampleCommand
-  // Note: This will be updated to check validation after mergedValidationState is computed
-  let handleApplyChanges = useCallback(
-    async (dirtyData: Partial<ExampleEditRow>[]) => {
-      setIsSaving(true);
-      setSaveError(null);
-
-      try {
-        // Map dirty rows to update commands
-        // Derived fields (audio URLs) are computed here from hasAudio
-        const updateCommands = dirtyData.map((row) =>
-          mapEditRowToUpdateCommand(row),
-        );
-        // Call the mutation to save changes
-        await updateExamples(updateCommands);
-      } catch (err) {
-        const error = normalizeError(err);
-        setSaveError(error);
-        throw error; // Re-throw so useEditTable knows it failed
-      } finally {
-        setIsSaving(false);
-      }
-    },
-    [updateExamples],
+  // 2. Map domain → table before calling state hook
+  const sourceRows = useMemo(
+    () => mapDomainToTableRows(sourceData, exampleEditColumns, 'id'),
+    [sourceData],
   );
 
   // 3. Compute derived fields function - computes from current cell values
@@ -260,14 +250,35 @@ export function useExampleEditor(): UseExampleEditorResult {
     [],
   );
 
-  // 4. Use edit table hook - merges source + diffs and computes derived fields
-  const editTable = useEditTable<ExampleEditRow>({
+  // 4. Use edit table state hook (focused on state only - no mapping, no validation)
+  const editTableState = useEditTableState({
+    sourceRows,
     columns: exampleEditColumns,
-    sourceData,
-    rowSchema: exampleEditRowSchema,
-    idColumnId: 'id',
-    onApplyChanges: handleApplyChanges,
     computeDerivedFields: computeDerivedFieldsForRow,
+  });
+
+  // 5. Compose validation explicitly: normalize → map → validate (domain-side)
+  const validateRow = useMemo(() => {
+    return (row: TableRow) => {
+      // 1. Normalize strings
+      const normalized = normalizeRowCells(row.cells, exampleEditColumns);
+
+      // 2. Map to domain entity (typed)
+      const domainEntity = mapTableRowToDomain<ExampleEditRow>(
+        { ...row, cells: normalized },
+        exampleEditColumns,
+      );
+
+      // 3. Validate domain entity (typed validation)
+      const result = validateEntity(domainEntity, exampleEditRowSchema);
+      return result.errors;
+    };
+  }, []); // exampleEditColumns and exampleEditRowSchema are constants
+
+  // 6. Base validation (focused unit)
+  const baseValidation = useTableValidation({
+    rows: editTableState.data.rows,
+    validateRow,
   });
 
   const registerAudioError = useCallback((rowId: string, columnId: string) => {
@@ -296,13 +307,14 @@ export function useExampleEditor(): UseExampleEditorResult {
     });
   }, []);
 
+  // 7. Merge validation: base validation + custom validation (audio, relatedVocabulary)
   const mergedValidationState: ValidationState = useMemo(() => {
     const mergedErrors: Record<string, Record<string, string>> = {
-      ...editTable.validationState.errors,
+      ...baseValidation.validationState.errors,
     };
 
     const rowsWithAudio = new Set(
-      editTable.data.rows
+      editTableState.data.rows
         .filter((row) => String(row.cells.hasAudio).toLowerCase() === 'true')
         .map((row) => row.id),
     );
@@ -322,7 +334,7 @@ export function useExampleEditor(): UseExampleEditorResult {
 
     // Custom validation for relatedVocabulary: must be valid JSON array of numbers
     let hasRelatedVocabularyErrors = false;
-    editTable.data.rows.forEach((row) => {
+    editTableState.data.rows.forEach((row) => {
       const value = row.cells.relatedVocabulary || '';
       if (!value.trim()) {
         // Empty is valid (no vocabulary selected)
@@ -360,73 +372,84 @@ export function useExampleEditor(): UseExampleEditorResult {
 
     return {
       isValid:
-        editTable.validationState.isValid &&
+        baseValidation.validationState.isValid &&
         !hasAudioErrors &&
         !hasRelatedVocabularyErrors,
       errors: mergedErrors,
     };
-  }, [audioErrors, editTable.data.rows, editTable.validationState]);
+  }, [audioErrors, editTableState.data.rows, baseValidation.validationState]);
 
-  // 5. Update handleApplyChanges to check validation before calling updateExamples
-  // Defined after mergedValidationState so it can access it directly
-  handleApplyChanges = useCallback(
-    async (dirtyData: Partial<ExampleEditRow>[]) => {
-      // Check validation before proceeding
-      if (Object.keys(mergedValidationState.errors).length > 0) {
-        throw new Error('validation failed');
-      }
+  // 8. Handle applying changes - get dirty rows, map to domain, then save
+  const handleApplyChanges = useCallback(async () => {
+    // Check validation before proceeding
+    if (Object.keys(mergedValidationState.errors).length > 0) {
+      throw new Error('validation failed');
+    }
 
-      setIsSaving(true);
-      setSaveError(null);
+    setIsSaving(true);
+    setSaveError(null);
 
-      try {
-        // Map dirty rows to update commands
-        // Derived fields (audio URLs) are computed here from hasAudio
-        const updateCommands = dirtyData.map((row) =>
-          mapEditRowToUpdateCommand(row),
-        );
-        // Call the mutation to save changes
-        await updateExamples(updateCommands);
-      } catch (err) {
-        const error = normalizeError(err);
-        setSaveError(error);
-        throw error; // Re-throw so useEditTable knows it failed
-      } finally {
-        setIsSaving(false);
-      }
-    },
-    [mergedValidationState.errors, updateExamples],
-  );
+    try {
+      // Get dirty rows from state
+      const dirtyRows = editTableState.getDirtyRows();
 
-  // 6. Compose table props before returning (following codebase pattern)
+      // Map table → domain
+      const dirtyData = mapTableRowsToDomain<ExampleEditRow>(
+        dirtyRows,
+        exampleEditColumns,
+      );
+
+      // Map to update commands
+      // Derived fields (audio URLs) are computed here from hasAudio
+      const updateCommands = dirtyData.map((row) =>
+        mapEditRowToUpdateCommand(row),
+      );
+
+      // Call the mutation to save changes
+      await updateExamples(updateCommands);
+    } catch (err) {
+      const error = normalizeError(err);
+      setSaveError(error);
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  }, [
+    mergedValidationState.errors,
+    editTableState,
+    updateExamples,
+    // exampleEditColumns is a constant, not a dependency
+  ]);
+
+  // 9. Compose table props before returning (following codebase pattern)
   const tableProps = useMemo<EditableTableUseCaseProps>(
     () => ({
-      rows: editTable.data.rows,
-      columns: editTable.data.columns,
-      dirtyRowIds: editTable.dirtyRowIds,
+      rows: editTableState.data.rows,
+      columns: editTableState.data.columns,
+      dirtyRowIds: editTableState.dirtyRowIds,
       validationErrors: mergedValidationState.errors,
-      onCellChange: editTable.updateCell,
-      onPaste: editTable.handlePaste,
-      setActiveCellInfo: editTable.setActiveCellInfo,
-      clearActiveCellInfo: editTable.clearActiveCellInfo,
-      hasUnsavedChanges: editTable.hasUnsavedChanges,
-      onSave: editTable.applyChanges,
-      onDiscard: editTable.discardChanges,
+      onCellChange: editTableState.updateCell,
+      onPaste: editTableState.handlePaste,
+      setActiveCellInfo: editTableState.setActiveCellInfo,
+      clearActiveCellInfo: editTableState.clearActiveCellInfo,
+      hasUnsavedChanges: editTableState.hasUnsavedChanges,
+      onSave: handleApplyChanges,
+      onDiscard: editTableState.discardChanges,
       isSaving,
       isLoading: isLoadingExamplesToEdit,
       isValid: mergedValidationState.isValid,
     }),
     [
-      editTable.data.rows,
-      editTable.data.columns,
-      editTable.dirtyRowIds,
-      editTable.updateCell,
-      editTable.handlePaste,
-      editTable.setActiveCellInfo,
-      editTable.clearActiveCellInfo,
-      editTable.hasUnsavedChanges,
-      editTable.applyChanges,
-      editTable.discardChanges,
+      editTableState.data.rows,
+      editTableState.data.columns,
+      editTableState.dirtyRowIds,
+      editTableState.updateCell,
+      editTableState.handlePaste,
+      editTableState.setActiveCellInfo,
+      editTableState.clearActiveCellInfo,
+      editTableState.hasUnsavedChanges,
+      editTableState.discardChanges,
+      handleApplyChanges,
       mergedValidationState.errors,
       mergedValidationState.isValid,
       isSaving,

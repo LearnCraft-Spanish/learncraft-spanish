@@ -1,6 +1,5 @@
-import type { CreateTableHook } from '@application/units/pasteTable/useCreateTable';
-import type { TableRow, ValidationState } from '@domain/PasteTable';
-import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
+import type { CreateTableStateHook } from '@application/units/pasteTable/useCreateTableState';
+import type { TableRow } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
 import { VOCABULARY_COLUMNS } from '@application/implementations/vocabularyTable/constants';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
@@ -16,14 +15,8 @@ const defaultRow: TableRow = {
   },
 };
 
-// Default validation state (valid)
-const defaultValidationState: ValidationState = {
-  isValid: true,
-  errors: {},
-};
-
 // Default mock implementation that provides happy-path data
-export const defaultMockResult: CreateTableHook<CreateNonVerbVocabulary> = {
+export const defaultMockResult: CreateTableStateHook = {
   // Core data structure
   data: {
     rows: [defaultRow],
@@ -32,28 +25,20 @@ export const defaultMockResult: CreateTableHook<CreateNonVerbVocabulary> = {
 
   // Core operations
   updateCell: (_rowId: string, _columnId: string, _value: string) => null,
-  saveData: () =>
-    Promise.resolve([
-      {
-        word: 'hola',
-        descriptor: 'hello',
-        frequency: 100,
-        notes: 'greeting',
-        subcategoryId: 1,
-      },
-    ]),
   resetTable: () => {},
 
   // Data import
-  importData: (_data: CreateNonVerbVocabulary[]) => {},
   handlePaste: (_e: ClipboardEvent<Element>) => {},
 
   // Cell focus tracking
   setActiveCellInfo: (_rowId: string, _columnId: string) => {},
   clearActiveCellInfo: () => {},
 
-  // State flags and validation
-  validationState: defaultValidationState,
+  // Expose rows for use case to map
+  getRows: () => [defaultRow],
+  setRows: (
+    _rows: TableRow[] | ((currentRows: TableRow[]) => TableRow[]),
+  ) => {},
 };
 
 // Create an overrideable mock with the default implementation
@@ -61,9 +46,7 @@ export const {
   mock: mockUseVocabularyTable,
   override: overrideMockUseVocabularyTable,
   reset: resetMockUseVocabularyTable,
-} = createOverrideableMock<() => CreateTableHook<CreateNonVerbVocabulary>>(
-  () => defaultMockResult,
-);
+} = createOverrideableMock<() => CreateTableStateHook>(() => defaultMockResult);
 
 // Export default for global mocking
 export default mockUseVocabularyTable;

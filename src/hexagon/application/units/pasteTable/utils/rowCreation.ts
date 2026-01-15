@@ -1,5 +1,5 @@
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { generateRowId } from '@domain/PasteTable/functions/rowId';
 
 // Re-export for backward compatibility

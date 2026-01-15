@@ -1,6 +1,6 @@
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { ClipboardEvent } from 'react';
-import { GHOST_ROW_ID } from '@application/units/pasteTable/useCreateTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import {
   convertTsvToRows,
   detectHeaderRow,

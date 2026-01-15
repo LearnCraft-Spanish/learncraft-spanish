@@ -1,9 +1,6 @@
-import type { CreateTableHook } from '@application/units/pasteTable/useCreateTable';
+import type { CreateTableStateHook } from '@application/units/pasteTable/useCreateTableState';
 import type { VocabularyPaginationState } from '@application/useCases/types';
-import type {
-  CreateNonVerbVocabulary,
-  Subcategory,
-} from '@learncraft-spanish/shared';
+import type { Subcategory } from '@learncraft-spanish/shared';
 
 export interface UseNonVerbCreationResult {
   // Subcategory selection
@@ -17,7 +14,7 @@ export interface UseNonVerbCreationResult {
   creationError: Error | null;
 
   // Table hook API - exposed through the façade
-  tableHook: CreateTableHook<CreateNonVerbVocabulary>;
+  tableHook: CreateTableStateHook;
 
   // Unified save action that handles validation, table save, and creation
   saveVocabulary: () => Promise<number[]>;
