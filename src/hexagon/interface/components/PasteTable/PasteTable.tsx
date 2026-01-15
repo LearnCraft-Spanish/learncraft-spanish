@@ -10,7 +10,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import './PasteTable.scss';
 
 /**
- * Common interface for table hooks (edit or create mode)
+ * @deprecated Common interface for table hooks (edit or create mode)
  */
 interface TableHookBase<_T> {
   data: {
@@ -26,6 +26,9 @@ interface TableHookBase<_T> {
   discardChanges?: () => void;
 }
 
+/**
+ * @deprecated Common interface for table hooks (edit or create mode)
+ */
 export interface PasteTableProps<T> {
   /** Core table hook from application layer */
   hook: TableHookBase<T>;
@@ -49,6 +52,9 @@ function findIndex<T>(array: T[], predicate: (item: T) => boolean): number {
   return -1;
 }
 
+/**
+ * @deprecated Common interface for table hooks (edit or create mode)
+ */
 export function PasteTable<T>({
   hook,
   displayConfig,
@@ -155,7 +161,7 @@ export function PasteTable<T>({
       const display = getDisplay(columnId);
       return `${display.label} input for row ${rowId}`;
     },
-    [columns],
+    [getDisplay],
   );
 
   // Handle keyboard navigation

@@ -5,6 +5,9 @@ import type {
   Subcategory,
 } from '@learncraft-spanish/shared';
 
+/**
+ * @deprecated Needs rewrite to use CreateTableStateHook
+ */
 export interface UseNonVerbCreationResult {
   // Subcategory selection
   nonVerbSubcategories: Subcategory[];

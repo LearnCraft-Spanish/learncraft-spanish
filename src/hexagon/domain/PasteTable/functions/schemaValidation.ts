@@ -4,6 +4,14 @@
  *
  * Validation operates on normalized, typed domain entities (not raw string cells).
  * The flow is: TableRow (strings) → normalize → map to domain entity → validate against schema
+ *
+ * NOTE: These are convenience functions that perform normalize + map + validate internally.
+ * For better control and clarity, use cases should compose validation explicitly:
+ *   1. normalizeRowCells(row.cells, columns)
+ *   2. mapTableRowToDomain(normalizedRow, columns)
+ *   3. validateEntity(domainEntity, schema)
+ *
+ * This allows the use case to own validation and compose it with custom validation logic.
  */
 
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';

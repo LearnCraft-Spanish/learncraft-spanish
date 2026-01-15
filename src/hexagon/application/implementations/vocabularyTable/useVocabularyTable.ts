@@ -11,6 +11,8 @@ import { CreateNonVerbVocabularySchema } from '@learncraft-spanish/shared';
  * Custom hook for managing vocabulary data in a table format.
  * This hook provides a bridge between the table UI and the vocabulary domain models.
  * It handles table-specific concerns like column configuration and basic data validation.
+ *
+ * @deprecated This uses the legacy useCreateTable hook. Will be refactored to use the new composition pattern.
  */
 export function useVocabularyTable(): CreateTableHook<CreateNonVerbVocabulary> {
   return useCreateTable<CreateNonVerbVocabulary>({

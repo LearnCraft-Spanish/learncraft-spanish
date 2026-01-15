@@ -16,12 +16,6 @@ const defaultRow: TableRow = {
   },
 };
 
-// Default validation state (valid)
-const defaultValidationState: ValidationState = {
-  isValid: true,
-  errors: {},
-};
-
 // Default mock implementation that provides happy-path data
 export const defaultMockResult: CreateTableHook<CreateNonVerbVocabulary> = {
   // Core data structure
@@ -32,28 +26,24 @@ export const defaultMockResult: CreateTableHook<CreateNonVerbVocabulary> = {
 
   // Core operations
   updateCell: (_rowId: string, _columnId: string, _value: string) => null,
-  saveData: () =>
-    Promise.resolve([
-      {
-        word: 'hola',
-        descriptor: 'hello',
-        frequency: 100,
-        notes: 'greeting',
-        subcategoryId: 1,
-      },
-    ]),
   resetTable: () => {},
+  importData: (_data: CreateNonVerbVocabulary[]) => {},
 
   // Data import
-  importData: (_data: CreateNonVerbVocabulary[]) => {},
   handlePaste: (_e: ClipboardEvent<Element>) => {},
 
   // Cell focus tracking
   setActiveCellInfo: (_rowId: string, _columnId: string) => {},
   clearActiveCellInfo: () => {},
 
-  // State flags and validation
-  validationState: defaultValidationState,
+  // Validation state
+  validationState: {
+    isValid: true,
+    errors: {},
+  } as ValidationState,
+
+  // Save operation
+  saveData: async () => [],
 };
 
 // Create an overrideable mock with the default implementation
