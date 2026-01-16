@@ -1,11 +1,11 @@
 import type { EditableStudent, NewStudent } from '../types';
-import { Dropdown } from '@interface/components/FormComponents';
-import { useMemo, useState } from 'react';
 import {
-  FormControls,
+  Dropdown,
   GenericDropdown,
-  TextInput,
-} from 'src/components/FormComponents';
+} from '@interface/components/FormComponents';
+import { useMemo, useState } from 'react';
+import { FormControls, TextInput } from 'src/components/FormComponents';
+
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';

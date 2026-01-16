@@ -1,7 +1,7 @@
 import Checkbox from './Checkbox';
 import DateInput from './DateInput';
 import DeleteRecord from './DeleteRecord';
-import { CoachDropdown, GenericDropdown } from './Dropdowns';
+import { CoachDropdown } from './Dropdowns';
 import FormControls from './FormControls';
 import verifyRequiredInputs from './functions/inputValidation';
 import SearchableDropdown from './SearchableDropdown';
@@ -13,7 +13,6 @@ export {
   DateInput,
   DeleteRecord,
   FormControls,
-  GenericDropdown,
   LinkInput,
   SearchableDropdown,
   Switch,
