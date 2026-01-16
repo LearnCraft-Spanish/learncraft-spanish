@@ -1,57 +1,5 @@
 import { useMemo } from 'react';
-
-import camelize from 'src/functions/camelize';
 import { useCoachList } from 'src/hooks/CoachingData/queries';
-
-export default function Dropdown({
-  label,
-  value,
-  onChange,
-  options,
-  editMode,
-  defaultOptionText,
-  required = false,
-}: {
-  label: string;
-  value: string | undefined;
-  onChange: (value: string) => void;
-  options: string[];
-  editMode: boolean;
-  defaultOptionText?: string;
-  required?: boolean;
-}) {
-  const camelLabel = camelize(label);
-  return (
-    <div className="lineWrapper">
-      <label
-        className={`label ${required && editMode ? 'required' : ''}`}
-        htmlFor={`dropdown-${camelLabel}`}
-      >
-        {`${label}:`}
-      </label>
-      {editMode ? (
-        <select
-          id={`dropdown-${camelLabel}`}
-          className="content"
-          value={value}
-          onChange={(e) => {
-            e.preventDefault();
-            onChange(e.target.value);
-          }}
-        >
-          <option value={''}>{defaultOptionText || 'Select'}</option>
-          {options.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <p className="content">{value}</p>
-      )}
-    </div>
-  );
-}
 
 export function CoachDropdown({
   coachEmail,
@@ -117,60 +65,5 @@ export function CoachDropdown({
         )}
       </div>
     )
-  );
-}
-
-export interface DropdownOption {
-  value: string;
-  text: string;
-}
-
-export function GenericDropdown({
-  label,
-  selectedValue,
-  onChange,
-  options,
-  editMode = true,
-  defaultOptionText = 'Select',
-  required = false,
-}: {
-  label: string;
-  selectedValue: string;
-  onChange: (value: string) => void;
-  options: DropdownOption[];
-  editMode?: boolean;
-  defaultOptionText?: string;
-  required?: boolean;
-}) {
-  const camelLabel = camelize(label);
-
-  return (
-    <div className="lineWrapper">
-      <label
-        className={`label ${required && editMode ? 'required' : ''}`}
-        htmlFor={`dropdown-${camelLabel}`}
-      >
-        {`${label}:`}
-      </label>
-      {editMode ? (
-        <select
-          id={`dropdown-${camelLabel}`}
-          className="content"
-          value={selectedValue}
-          onChange={(e) => onChange(e.target.value)}
-        >
-          <option value="">{defaultOptionText}</option>
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.text}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <p className="content">
-          {options.find((opt) => opt.value === selectedValue)?.text || ''}
-        </p>
-      )}
-    </div>
   );
 }

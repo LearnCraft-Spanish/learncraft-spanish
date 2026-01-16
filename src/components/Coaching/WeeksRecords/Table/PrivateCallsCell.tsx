@@ -1,5 +1,6 @@
 import type { PrivateCall, Student, Week } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { Dropdown } from '@interface/components/FormComponents';
 import { getWeekEnds } from 'mocks/data/serverlike/studentRecords/scripts/functions';
 import React, { useEffect, useMemo, useState } from 'react';
 import x_dark from 'src/assets/icons/x_dark.svg';
@@ -9,7 +10,6 @@ import {
   CoachDropdown,
   DateInput,
   DeleteRecord,
-  Dropdown,
   FormControls,
   LinkInput,
   TextAreaInput,

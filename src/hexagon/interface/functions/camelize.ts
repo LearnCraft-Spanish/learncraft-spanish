@@ -1,4 +1,3 @@
-// move inside hexagon
 export default function camelize(str: string): string {
   const strArr = str.replaceAll(/[^\w\s]/g, ' ');
   const strArr2 = strArr.split(' ');

@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { FilterConfig } from 'src/components/Table/types';
-import { TextInput } from 'src/components/FormComponents/TextInput';
+import { TextInput } from '@interface/components/FormComponents';
 
 export default function FilterProgramsTable({
   filterConfig,

@@ -1,8 +1,9 @@
 import type { Program } from 'src/types/interfaceDefinitions';
 import type { CohortField, CohortLetter, EditableProgram } from '../types';
+import { TextInput } from '@interface/components/FormComponents';
 import { useModal } from '@interface/hooks/useModal';
 import { useState } from 'react';
-import { FormControls, TextInput } from 'src/components/FormComponents';
+import { FormControls } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import useProgramsTable from 'src/hooks/VocabQuizDbData/useProgramsTable';
