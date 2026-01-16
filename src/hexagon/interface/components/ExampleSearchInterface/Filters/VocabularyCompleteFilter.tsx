@@ -31,25 +31,6 @@ export function VocabularyCompleteFilter({
         editMode={true}
         required={false}
       />
-      {/* <label
-        htmlFor="vocabularyCompleteFilter"
-        style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}
-      >
-        Vocabulary Complete
-      </label>
-      <select
-        id="vocabularyCompleteFilter"
-        className="quizMenu"
-        role="select"
-        aria-label="Filter by Vocabulary Complete"
-        value={selectValue}
-        onChange={handleChange}
-        style={{ padding: '0.5rem' }}
-      >
-        <option value="">All (no filter)</option>
-        <option value="true">Complete</option>
-        <option value="false">Incomplete</option>
-      </select> */}
     </div>
   );
 }

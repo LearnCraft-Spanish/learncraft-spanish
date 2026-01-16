@@ -20,7 +20,7 @@ export function SearchByIds({ input, onInputChange }: SearchByIdsProps) {
   };
 
   return (
-    <div>
+    <div className="searchByIdsFilterWrapper">
       <input
         type="text"
         value={input}
