@@ -1,4 +1,4 @@
-import camelize from 'src/functions/camelize';
+import { camelize } from '@interface/functions';
 
 export function TextAreaInput({
   label,
