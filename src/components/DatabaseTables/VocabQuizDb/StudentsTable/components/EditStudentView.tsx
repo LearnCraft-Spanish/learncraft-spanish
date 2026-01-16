@@ -1,7 +1,7 @@
 import type { EditableStudent, NewStudent } from '../types';
+import { Dropdown } from '@interface/components/FormComponents';
 import { useMemo, useState } from 'react';
 import {
-  Dropdown,
   FormControls,
   GenericDropdown,
   TextInput,

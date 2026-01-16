@@ -1,11 +1,8 @@
 import type { Course } from 'src/types/CoachingTypes';
 import type { EditableCourse, NewCourse } from '../types';
+import { Dropdown } from '@interface/components/FormComponents';
 import React, { useState } from 'react';
-import {
-  Dropdown,
-  FormControls,
-  TextInput,
-} from 'src/components/FormComponents';
+import { FormControls, TextInput } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';

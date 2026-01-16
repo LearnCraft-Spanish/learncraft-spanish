@@ -1,12 +1,8 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { FilterConfig } from 'src/components/Table/types';
-
+import { Dropdown } from '@interface/components/FormComponents';
 import { useEffect, useState } from 'react';
-import {
-  Dropdown,
-  GenericDropdown,
-  TextInput,
-} from 'src/components/FormComponents';
+import { GenericDropdown, TextInput } from 'src/components/FormComponents';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useStudentsTable from '../useStudentsTable';
 

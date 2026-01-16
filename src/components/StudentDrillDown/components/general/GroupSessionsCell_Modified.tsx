@@ -1,11 +1,10 @@
 import type { GroupSessionWithAttendees } from 'src/types/CoachingTypes';
+import { Dropdown } from '@interface/components/FormComponents';
 import {
   DateInput,
-  Dropdown,
   LinkInput,
   TextAreaInput,
 } from 'src/components/FormComponents';
-
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
