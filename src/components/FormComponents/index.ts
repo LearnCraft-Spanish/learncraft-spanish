@@ -6,7 +6,7 @@ import FormControls from './FormControls';
 import verifyRequiredInputs from './functions/inputValidation';
 import SearchableDropdown from './SearchableDropdown';
 import Switch from './Switch';
-import { LinkInput, TextAreaInput, TextInput } from './TextInput';
+import { LinkInput, TextAreaInput } from './TextInput';
 export {
   Checkbox,
   CoachDropdown,
@@ -17,6 +17,5 @@ export {
   SearchableDropdown,
   Switch,
   TextAreaInput,
-  TextInput,
   verifyRequiredInputs,
 };

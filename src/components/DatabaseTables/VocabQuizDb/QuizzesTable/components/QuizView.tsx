@@ -1,9 +1,12 @@
 import type { Quiz } from 'src/types/interfaceDefinitions';
 import type { QuizNameObj, QuizSubNameObj } from '../constants';
 import type { NewQuiz, QuizObjForUpdate } from '../types';
-import { GenericDropdown } from '@interface/components/FormComponents';
+import {
+  GenericDropdown,
+  TextInput,
+} from '@interface/components/FormComponents';
 import React, { useEffect, useMemo, useState } from 'react';
-import { FormControls, TextInput } from 'src/components/FormComponents';
+import { FormControls } from 'src/components/FormComponents';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';

@@ -3,9 +3,9 @@ import type { FilterConfig } from 'src/components/Table/types';
 import {
   Dropdown,
   GenericDropdown,
+  TextInput,
 } from '@interface/components/FormComponents';
 import { useEffect, useState } from 'react';
-import { TextInput } from 'src/components/FormComponents';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useStudentsTable from '../useStudentsTable';
 
