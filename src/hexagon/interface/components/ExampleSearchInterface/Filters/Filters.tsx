@@ -1,25 +1,24 @@
-import type { LocalFilterPanelProps } from '@interface/components/ExampleSearchInterface/Filters/LocalFilterPanel';
 import type { SearchByIdsProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
 import type { SearchByQuizProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import type { SearchByRecentlyEditedProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByRecentlyEdited';
 import type { SearchByTextProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
-import { LocalFilterPanel } from '@interface/components/ExampleSearchInterface/Filters/LocalFilterPanel';
 import { SearchByIds } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
 import { SearchByQuiz } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import { SearchByRecentlyEdited } from '@interface/components/ExampleSearchInterface/Filters/SearchByRecentlyEdited';
 import { SearchByText } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
+import { FilterPanel } from '@interface/components/Filters/FilterPanel';
 import './Filters.scss';
 export function Filters({
   mode,
-  localFilterProps,
+  onFilterChange,
   searchByQuizProps,
   searchByTextProps,
   searchByIdsProps,
   searchByRecentlyEditedProps,
 }: {
   mode: ExampleSearchMode;
-  localFilterProps: LocalFilterPanelProps;
+  onFilterChange: () => void;
   searchByQuizProps: SearchByQuizProps;
   searchByTextProps: SearchByTextProps;
   searchByIdsProps: SearchByIdsProps;
@@ -28,7 +27,11 @@ export function Filters({
   if (mode === 'filter') {
     return (
       <div className="searchInterfaceFilterPanel">
-        <LocalFilterPanel {...localFilterProps} />
+        <FilterPanel
+          onFilterChange={onFilterChange}
+          requireAudioOnly={false}
+          requireNoSpanglish={false}
+        />
       </div>
     );
   } else if (mode === 'recentlyEdited') {

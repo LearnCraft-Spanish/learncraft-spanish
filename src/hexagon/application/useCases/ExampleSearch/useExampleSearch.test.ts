@@ -4,9 +4,14 @@ import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mockUseCombinedFilters = vi.fn();
+const mockUseCoursesWithLessons = vi.fn();
 
 vi.mock('@application/units/Filtering/useCombinedFilters', () => ({
   useCombinedFilters: (props: any) => mockUseCombinedFilters(props),
+}));
+
+vi.mock('@application/queries/useCoursesWithLessons', () => ({
+  useCoursesWithLessons: () => mockUseCoursesWithLessons(),
 }));
 
 const createDefaultCombinedFilters = (): UseCombinedFiltersReturnType => ({
@@ -57,13 +62,20 @@ const createDefaultCombinedFilters = (): UseCombinedFiltersReturnType => ({
 describe('useExampleSearch', () => {
   beforeEach(() => {
     mockUseCombinedFilters.mockReturnValue(createDefaultCombinedFilters());
+    mockUseCoursesWithLessons.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    });
     vi.clearAllMocks();
   });
 
   it('initializes with default state', () => {
     const { result } = renderHook(() => useExampleSearch());
 
-    expect(mockUseCombinedFilters).toHaveBeenCalledWith({});
+    expect(mockUseCombinedFilters).toHaveBeenCalledWith({
+      onFilterChange: expect.any(Function),
+    });
     expect(result.current.mode).toBe('ids');
     expect(result.current.searchIsTriggered).toBe(false);
     expect(result.current.isValidSearch).toBe(false);
@@ -151,15 +163,31 @@ describe('useExampleSearch', () => {
   });
 
   it('validates filter mode when course is selected and builds lessonRanges', () => {
+    const mockUpdateToLessonNumber = vi.fn();
+    const mockUpdateFromLessonNumber = vi.fn();
+    const mockUpdateUserSelectedCourseId = vi.fn();
+
+    mockUseCombinedFilters.mockReturnValue({
+      ...createDefaultCombinedFilters(),
+      courseId: 7,
+      toLessonNumber: 10,
+      updateToLessonNumber: mockUpdateToLessonNumber,
+      updateFromLessonNumber: mockUpdateFromLessonNumber,
+      updateUserSelectedCourseId: mockUpdateUserSelectedCourseId,
+      filterState: {
+        lessonRanges: [
+          { courseId: 7, fromLessonNumber: 1, toLessonNumber: 10 },
+        ],
+        excludeSpanglish: false,
+        audioOnly: false,
+        skillTags: [],
+      },
+    });
+
     const { result } = renderHook(() => useExampleSearch());
 
     act(() => {
       result.current.handleChangeMode('filter');
-      result.current.searchComponentProps.localFilterProps.onCourseChange(7);
-      result.current.searchComponentProps.localFilterProps.onFromLessonChange(
-        1,
-      );
-      result.current.searchComponentProps.localFilterProps.onToLessonChange(10);
     });
 
     expect(result.current.isValidSearch).toBe(true);
