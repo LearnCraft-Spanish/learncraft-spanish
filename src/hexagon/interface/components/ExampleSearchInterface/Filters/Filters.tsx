@@ -9,7 +9,7 @@ import { SearchByIds } from '@interface/components/ExampleSearchInterface/Filter
 import { SearchByQuiz } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import { SearchByRecentlyEdited } from '@interface/components/ExampleSearchInterface/Filters/SearchByRecentlyEdited';
 import { SearchByText } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
-
+import './Filters.scss';
 export function Filters({
   mode,
   localFilterProps,
@@ -26,15 +26,35 @@ export function Filters({
   searchByRecentlyEditedProps: SearchByRecentlyEditedProps;
 }) {
   if (mode === 'filter') {
-    return <LocalFilterPanel {...localFilterProps} />;
+    return (
+      <div className="searchInterfaceFilterPanel">
+        <LocalFilterPanel {...localFilterProps} />
+      </div>
+    );
   } else if (mode === 'recentlyEdited') {
-    return <SearchByRecentlyEdited {...searchByRecentlyEditedProps} />;
+    return (
+      <div className="searchInterfaceFilterPanel">
+        <SearchByRecentlyEdited {...searchByRecentlyEditedProps} />
+      </div>
+    );
   } else if (mode === 'quiz') {
-    return <SearchByQuiz {...searchByQuizProps} />;
+    return (
+      <div className="searchInterfaceFilterPanel">
+        <SearchByQuiz {...searchByQuizProps} />
+      </div>
+    );
   } else if (mode === 'text') {
-    return <SearchByText {...searchByTextProps} />;
+    return (
+      <div className="searchInterfaceFilterPanel">
+        <SearchByText {...searchByTextProps} />
+      </div>
+    );
   } else if (mode === 'ids') {
-    return <SearchByIds {...searchByIdsProps} />;
+    return (
+      <div className="searchInterfaceFilterPanel">
+        <SearchByIds {...searchByIdsProps} />
+      </div>
+    );
   }
   return <p>ERROR: Invalid mode</p>;
 }
