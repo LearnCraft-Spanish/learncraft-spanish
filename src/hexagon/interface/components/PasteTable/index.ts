@@ -1,1 +1,1 @@
-export { PasteTable } from '@interface/components/PasteTable/PasteTable';
+export { PasteTableErrorBoundary } from '@interface/components/PasteTable/PasteTableErrorBoundary';
