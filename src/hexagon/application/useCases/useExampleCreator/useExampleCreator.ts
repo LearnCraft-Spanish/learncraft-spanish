@@ -1,6 +1,7 @@
 import type { CreateTableUseCaseProps } from '@application/useCases/types';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
 import type { CreateExampleCommand } from '@learncraft-spanish/shared';
+import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { useTableValidation } from '@application/units/pasteTable/hooks';
@@ -8,7 +9,6 @@ import { useCreateTableState } from '@application/units/pasteTable/useCreateTabl
 import {
   mapAndParseTableRowsToDomain,
   mapTableRowToDomain,
-  normalizeRowCells,
 } from '@domain/PasteTable/functions';
 import { validateEntity } from '@domain/PasteTable/functions/entityValidation';
 import { createExampleCommandSchema } from '@learncraft-spanish/shared';
@@ -25,7 +25,10 @@ const exampleColumns: ColumnDefinition[] = [
 ];
 
 export function useExampleCreator(): UseExampleCreatorResult {
-  const {createExamples , examplesCreating, examplesCreatingError} = useExampleMutations();
+  const { createExamples, examplesCreating, examplesCreatingError } =
+    useExampleMutations();
+  const { updateSelectedExamples, selectedExampleIds } =
+    useSelectedExamplesContext();
 
   // 1. Create table state (focused on state only - no mapping, no validation)
   const tableState = useCreateTableState({
@@ -33,38 +36,73 @@ export function useExampleCreator(): UseExampleCreatorResult {
     columns: exampleColumns,
   });
 
-  // 2. Compose validation: normalize → map → validate (domain-side)
+  // 2. Compose validation: map → validate (normalization happens in mapper)
   const validateRow = useMemo(() => {
     return (row: TableRow) => {
-      // 1. Normalize strings
-      const normalized = normalizeRowCells(row.cells, exampleColumns);
-
-      // 2. Map to domain entity (typed)
+      // 1. Map to domain entity (normalization happens internally)
       const domainEntity = mapTableRowToDomain<CreateExampleCommand>(
-        { ...row, cells: normalized },
+        row,
         exampleColumns,
       );
 
-      // 3. Validate domain entity (typed validation)
+      // 2. Validate domain entity (typed validation)
       const result = validateEntity(domainEntity, createExampleCommandSchema);
       return result.errors;
     };
   }, []);
 
-  // 3. Base validation (focused unit)
+  // 3. Additional validation: ensure unique spanish text within table
+  const validateUniqueSpanish = useMemo(() => {
+    return (row: TableRow): Record<string, string> => {
+      const spanishText = row.cells.spanish?.trim() || '';
+      if (!spanishText) {
+        return {}; // Empty is handled by schema validation
+      }
+
+      // Check if this spanish text appears in other rows
+      const allRows = tableState.data.rows;
+      const duplicates = allRows.filter(
+        (r) =>
+          r.id !== row.id && // Don't compare with self
+          r.id !== GHOST_ROW_ID && // Don't compare with ghost row
+          r.cells.spanish?.trim() === spanishText,
+      );
+
+      if (duplicates.length > 0) {
+        return {
+          spanish: 'This spanish text is already in the table',
+        };
+      }
+
+      return {};
+    };
+  }, [tableState.data.rows]);
+
+  // Combine domain validation with uniqueness validation
+  const validateRowCombined = useMemo(() => {
+    return (row: TableRow): Record<string, string> => {
+      const domainErrors = validateRow(row);
+      const uniqueErrors = validateUniqueSpanish(row);
+
+      // Merge errors (uniqueness takes precedence if both exist)
+      return { ...domainErrors, ...uniqueErrors };
+    };
+  }, [validateRow, validateUniqueSpanish]);
+
+  // 4. Base validation (focused unit)
   const baseValidation = useTableValidation({
     rows: tableState.data.rows,
-    validateRow,
+    validateRow: validateRowCombined,
   });
 
-  // 4. Get data rows (excluding ghost row) - used by both save and tableProps
+  // 5. Get data rows (excluding ghost row) - used by both save and tableProps
   const dataRows = useMemo(() => {
     return tableState.getRows().filter((row) => row.id !== GHOST_ROW_ID);
   }, [tableState]);
 
   const hasData = dataRows.length > 0;
 
-  // 5. Handle save - get rows, map to domain, validate, then create
+  // 6. Handle save - get rows, map to domain, validate, then create
   const handleSave = useCallback(async () => {
     // Check validation before proceeding
     if (!baseValidation.validationState.isValid) {
@@ -83,14 +121,46 @@ export function useExampleCreator(): UseExampleCreatorResult {
       GHOST_ROW_ID,
     );
 
-    // Create the examples batch
-    await createExamples(domainEntities);
+    // Create the examples batch (may be partial success)
+    const createdExamples = await createExamples(domainEntities);
 
-    // Reset table after successful creation
-    tableState.resetTable();
-  }, [baseValidation.validationState.isValid, dataRows, createExamples, tableState]);
+    // On successful save (partial or complete):
+    // 1. Extract IDs from created examples
+    const newExampleIds = createdExamples.map((example) => example.id);
 
-  // 6. Compose tableProps to satisfy CreateTableUseCaseProps contract
+    // 2. Add to selected examples (combine with existing selections)
+    const updatedSelection = [...selectedExampleIds, ...newExampleIds];
+    updateSelectedExamples(updatedSelection);
+
+    // 3. Remove only the rows that were successfully created
+    // Match by spanish text (unique identifier for examples)
+    const createdSpanishTexts = new Set(
+      createdExamples.map((example) => example.spanish.trim()),
+    );
+
+    // Filter out successful rows, keep failed ones
+    const remainingRows = tableState
+      .getRows()
+      .filter((row) => {
+        if (row.id === GHOST_ROW_ID) return true; // Keep ghost row
+        const spanishText = row.cells.spanish?.trim() || '';
+        return !createdSpanishTexts.has(spanishText); // Keep if not created
+      });
+
+    // Update table state with remaining rows (and ghost row)
+    const ghostRow = remainingRows.find((r) => r.id === GHOST_ROW_ID);
+    const dataRowsRemaining = remainingRows.filter((r) => r.id !== GHOST_ROW_ID);
+    tableState.setRows(ghostRow ? [...dataRowsRemaining, ghostRow] : dataRowsRemaining);
+  }, [
+    baseValidation.validationState.isValid,
+    dataRows,
+    createExamples,
+    selectedExampleIds,
+    updateSelectedExamples,
+    tableState,
+  ]);
+
+  // 7. Compose tableProps to satisfy CreateTableUseCaseProps contract
   const tableProps = useMemo(() => {
     return {
       rows: tableState.data.rows,
