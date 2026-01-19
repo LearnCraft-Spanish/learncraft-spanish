@@ -1,7 +1,10 @@
 import type { VocabularyPaginationState } from '@application/useCases/types';
-import type { CreateTableUseCaseProps } from '@interface/components/CreateTable/types';
 import type { TableRow } from '@domain/PasteTable';
-import type { CreateNonVerbVocabulary, Subcategory } from '@learncraft-spanish/shared';
+import type { CreateTableUseCaseProps } from '@interface/components/CreateTable/types';
+import type {
+  CreateNonVerbVocabulary,
+  Subcategory,
+} from '@learncraft-spanish/shared';
 import { VOCABULARY_COLUMNS } from '@application/implementations/vocabularyTable/constants';
 import { useVocabularyTable } from '@application/implementations/vocabularyTable/useVocabularyTable';
 import { useSubcategories } from '@application/queries/useSubcategories';

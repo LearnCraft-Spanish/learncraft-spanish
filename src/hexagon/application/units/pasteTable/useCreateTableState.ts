@@ -92,8 +92,8 @@ export function useCreateTableState({
     [columns],
   );
 
-  // Derive cleaned rows (remove empty rows except ghost row) - memoized for display
-  // State may contain empty rows, but we display cleaned version
+  // Derive cleaned rows (remove empty rows except ghost row) - memoized for return
+  // State may contain empty rows, but we return the cleaned version
   const cleanedRows = useMemo(() => {
     const nonGhostRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
     const emptyRows = nonGhostRows.filter((row) => isRowEmpty(row));
@@ -120,7 +120,7 @@ export function useCreateTableState({
   } | null>(null);
 
   // Paste handling - create mode (always creates new rows)
-  // Use cleanedRows for display, but setRowsInternal for updates
+  // Use cleanedRows for return, but setRowsInternal for updates
   const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(
     {
       columns,
@@ -177,7 +177,7 @@ export function useCreateTableState({
 
   return {
     data: {
-      rows: cleanedRows, // Display cleaned rows (empty rows removed)
+      rows: cleanedRows, // Return cleaned rows (empty rows removed)
       columns,
     },
     updateCell,

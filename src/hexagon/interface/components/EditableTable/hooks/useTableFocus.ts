@@ -2,16 +2,16 @@ import { useCallback, useRef } from 'react';
 
 /**
  * Hook for managing cell focus and refs in EditableTable
- * 
+ *
  * PURPOSE:
  * - Provides programmatic focus control for table cells (keyboard navigation, ghost row conversion)
  * - Maintains a registry of all cell DOM elements for efficient lookup by rowId/columnId
- * 
+ *
  * USAGE:
  * 1. Table component calls `createCellRef(rowId, columnId)` for each cell
  * 2. Cell components attach the ref to their input element
  * 3. When focus is needed (e.g., arrow key pressed), call `focusCell(rowId, columnId)`
- * 
+ *
  * WHY A MAP:
  * - Tables can have 100s of cells; a Map is more efficient than individual refs
  * - Allows dynamic lookup by rowId/columnId without knowing structure ahead of time
@@ -45,7 +45,7 @@ export function useTableFocus() {
     if (element) {
       // Move DOM focus to the element
       element.focus();
-      
+
       // For text inputs, position cursor at the end of existing value
       // NOTE: Only works for type="text"; number/email/etc don't support selection
       if (element instanceof HTMLInputElement && element.value) {
