@@ -5,6 +5,7 @@ import type {
 import { useExampleCreator } from '@application/useCases/useExampleCreator';
 import { CreateTable } from '@interface/components/CreateTable/CreateTable';
 import { StandardCell } from '@interface/components/EditableTable';
+import { ExampleCreatorHelpContextual } from '@interface/components/ExampleCreatorInterface/ExampleCreatorHelpContextual';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
 
 const exampleDisplayConfig: ColumnDisplayConfig[] = [
@@ -20,6 +21,7 @@ export default function ExampleCreator() {
   return (
     <div>
       <h2>Example Creator</h2>
+      <ExampleCreatorHelpContextual />
       <CreateTable
         displayConfig={exampleDisplayConfig}
         renderCell={renderCell}
