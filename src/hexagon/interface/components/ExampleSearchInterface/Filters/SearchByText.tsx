@@ -18,7 +18,7 @@ export function SearchByText({
   onVocabularyCompleteChange,
 }: SearchByTextProps) {
   return (
-    <div>
+    <div className="searchByTextFilterWrapper">
       <div style={{ marginBottom: '0.75rem' }}>
         <label
           htmlFor="spanishSearchInput"
@@ -31,7 +31,7 @@ export function SearchByText({
           type="text"
           value={spanishInput}
           onChange={(event) => onSpanishInputChange(event.target.value)}
-          placeholder="Search Spanish text (comma-separated for multiple)"
+          placeholder="Search Spanish text"
           style={{ width: '100%', padding: '0.5rem' }}
         />
       </div>
@@ -48,7 +48,7 @@ export function SearchByText({
           type="text"
           value={englishInput}
           onChange={(event) => onEnglishInputChange(event.target.value)}
-          placeholder="Search English text (comma-separated for multiple)"
+          placeholder="Search English text"
           style={{ width: '100%', padding: '0.5rem' }}
         />
       </div>

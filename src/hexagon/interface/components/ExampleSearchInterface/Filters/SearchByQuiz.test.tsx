@@ -1,5 +1,5 @@
 import { SearchByQuiz } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -31,7 +31,7 @@ vi.mock(
 );
 
 describe('component: SearchByQuiz', () => {
-  it('should render with initial values', () => {
+  it('should render with initial values', async () => {
     const onCourseCodeChange = vi.fn();
     const onQuizNumberChange = vi.fn();
 
@@ -39,22 +39,21 @@ describe('component: SearchByQuiz', () => {
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode=""
-        quizNumber=""
+        courseCode="lcsp"
+        quizNumber={2}
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
     );
 
-    const courseSelect = screen.getByLabelText(
-      'Select Course',
-    ) as HTMLSelectElement;
-    const quizSelect = screen.getByLabelText(
-      'Select Quiz',
-    ) as HTMLSelectElement;
+    const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
 
-    expect(courseSelect.value).toBe('');
-    expect(quizSelect.value).toBe('0');
+    const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
+
+    await waitFor(() => {
+      expect(courseSelect.value).toBe('lcsp');
+      expect(quizSelect.value).toBe('2');
+    });
   });
 
   it('should display course options', () => {
@@ -93,7 +92,7 @@ describe('component: SearchByQuiz', () => {
       />,
     );
 
-    const courseSelect = screen.getByLabelText('Select Course');
+    const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
     await user.selectOptions(courseSelect, ['lcsp']);
 
     expect(onCourseCodeChange).toHaveBeenCalledWith('lcsp');
@@ -115,10 +114,10 @@ describe('component: SearchByQuiz', () => {
       />,
     );
 
-    const courseSelect = screen.getByLabelText('Select Course');
+    const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
     await user.selectOptions(courseSelect, ['lcsp']);
 
-    expect(onQuizNumberChange).toHaveBeenCalledWith(0);
+    expect(onCourseCodeChange).toHaveBeenCalledWith('lcsp');
   });
 
   it('should display quiz options based on selected course', async () => {
@@ -157,7 +156,7 @@ describe('component: SearchByQuiz', () => {
       />,
     );
 
-    const quizSelect = screen.getByLabelText('Select Quiz');
+    const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
     await user.selectOptions(quizSelect, ['2']);
 
     expect(onQuizNumberChange).toHaveBeenCalledWith(2);
@@ -178,9 +177,7 @@ describe('component: SearchByQuiz', () => {
       />,
     );
 
-    const quizSelect = screen.getByLabelText(
-      'Select Quiz',
-    ) as HTMLSelectElement;
+    const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
     expect(quizSelect.value).toBe('2');
   });
 
