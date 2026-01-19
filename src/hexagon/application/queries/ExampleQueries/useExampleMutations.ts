@@ -56,7 +56,13 @@ export const useExampleMutations = () => {
 
   return {
     createExamples: createExamplesMutation.mutateAsync,
+    examplesCreating: createExamplesMutation.isPending,
+    examplesCreatingError: createExamplesMutation.error,
     updateExamples: updateExamplesMutation.mutateAsync,
+    examplesUpdating: updateExamplesMutation.isPending,
+    examplesUpdatingError: updateExamplesMutation.error,
     deleteExamples: deleteExamplesMutation.mutateAsync,
+    examplesDeleting: deleteExamplesMutation.isPending,
+    examplesDeletingError: deleteExamplesMutation.error,
   };
 };
