@@ -2,12 +2,14 @@ import type { CellRenderProps, ColumnDisplayConfig } from '@interface/components
 import {useExampleCreator} from '@application/useCases/useExampleCreator';
 import {CreateTable} from '@interface/components/CreateTable/CreateTable';
 import { StandardCell } from '@interface/components/EditableTable';
+import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
+
 const exampleDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'spanish', label: 'Spanish', width: '50%' },
   { id: 'english', label: 'English', width: '50%' },
 ];
 export default function ExampleCreator() {
-  const { tableProps } = useExampleCreator();
+  const { tableProps, selectedExamplesQuery } = useExampleCreator();
 
   const renderCell = (props: CellRenderProps) => {
     return <StandardCell {...props} />;
@@ -18,6 +20,13 @@ export default function ExampleCreator() {
     displayConfig={exampleDisplayConfig}
     renderCell={renderCell}
     {...tableProps}
+    />
+    <BaseResultsComponent
+      bulkOption="deselectAll"
+      title={`${selectedExamplesQuery.examples?.length} Selected Examples`}
+      examples={selectedExamplesQuery.examples}
+      isLoading={selectedExamplesQuery.isLoading}
+      error={selectedExamplesQuery.error}
     />
   </div>;
 }
