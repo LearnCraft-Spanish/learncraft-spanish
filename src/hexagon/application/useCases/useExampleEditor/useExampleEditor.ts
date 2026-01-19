@@ -258,8 +258,8 @@ export function useExampleEditor(): UseExampleEditorResult {
   });
 
   // 5. Compose validation explicitly: normalize → map → validate (domain-side)
-  const validateRow = useMemo(() => {
-    return (row: TableRow) => {
+  const validateRow = useCallback(
+    (row: TableRow) => {
       // 1. Normalize strings
       const normalized = normalizeRowCells(row.cells, exampleEditColumns);
 
@@ -272,8 +272,9 @@ export function useExampleEditor(): UseExampleEditorResult {
       // 3. Validate domain entity (typed validation)
       const result = validateEntity(domainEntity, exampleEditRowSchema);
       return result.errors;
-    };
-  }, []); // exampleEditColumns and exampleEditRowSchema are constants
+    },
+    [], // exampleEditColumns and exampleEditRowSchema are constants
+  );
 
   // 6. Base validation (focused unit)
   const baseValidation = useTableValidation({

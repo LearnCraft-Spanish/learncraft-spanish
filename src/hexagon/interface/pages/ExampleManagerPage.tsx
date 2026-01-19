@@ -1,21 +1,19 @@
 import { SelectedExamplesProvider } from '@application/coordinators/providers/SelectedExamplesProvider';
 import { ExampleEditor } from '@interface/components/ExampleEditorInterface/ExampleEditor';
+import ExampleManagerNav from '@interface/components/ExampleManager/ExampleManagerNav';
 import ExampleSearch from '@interface/components/ExampleSearchInterface/ExampleSearch';
-import { useState } from 'react';
-export default function ExampleManagerPage() {
-  const [searchOrEdit, setSearchOrEdit] = useState<'search' | 'edit'>('search');
+import { Route, Routes } from 'react-router-dom';
+export function ExampleManagerRouter() {
   return (
     <SelectedExamplesProvider>
-      {searchOrEdit === 'search' ? (
-        <ExampleSearch activateEdit={() => setSearchOrEdit('edit')} />
-      ) : (
-        <div>
-          <ExampleEditor />
-          <button type="button" onClick={() => setSearchOrEdit('search')}>
-            Back to Search
-          </button>
-        </div>
-      )}
+      <ExampleManagerNav />
+      <Routes>
+        {/* <Route path="/" element={<ExampleManagerSetupMenu />} /> */}
+        <Route path="search" element={<ExampleSearch />} />
+        {/* <Route path="/create" element={<ExampleCreator />} /> */}
+        <Route path="edit" element={<ExampleEditor />} />
+        {/* <Route path="assign" element={<ExampleAssigner />} /> */}
+      </Routes>
     </SelectedExamplesProvider>
   );
 }

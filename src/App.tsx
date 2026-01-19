@@ -27,6 +27,7 @@ export const App: React.FC = () => {
         location.pathname !== '/customquiz' &&
         location.pathname !== '/myflashcards' &&
         location.pathname !== '/coaching-dashboard' &&
+        location.pathname.split('/')[1] !== 'example-manager' &&
         location.pathname.split('/')[1] !== 'officialquizzes' && (
           <SubHeaderComponent />
         )}
