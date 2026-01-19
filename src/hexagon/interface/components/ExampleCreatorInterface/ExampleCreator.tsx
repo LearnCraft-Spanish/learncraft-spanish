@@ -1,6 +1,9 @@
-import type { CellRenderProps, ColumnDisplayConfig } from '@interface/components/EditableTable/types';
-import {useExampleCreator} from '@application/useCases/useExampleCreator';
-import {CreateTable} from '@interface/components/CreateTable/CreateTable';
+import type {
+  CellRenderProps,
+  ColumnDisplayConfig,
+} from '@interface/components/EditableTable/types';
+import { useExampleCreator } from '@application/useCases/useExampleCreator';
+import { CreateTable } from '@interface/components/CreateTable/CreateTable';
 import { StandardCell } from '@interface/components/EditableTable';
 import { BaseResultsComponent } from '@interface/components/ExampleSearchInterface/Results/BaseResultsComponent';
 
@@ -14,19 +17,21 @@ export default function ExampleCreator() {
   const renderCell = (props: CellRenderProps) => {
     return <StandardCell {...props} />;
   };
-  return <div>
-    <h2>Example Creator</h2>
-    <CreateTable
-    displayConfig={exampleDisplayConfig}
-    renderCell={renderCell}
-    {...tableProps}
-    />
-    <BaseResultsComponent
-      bulkOption="deselectAll"
-      title={`${selectedExamplesQuery.examples?.length} Selected Examples`}
-      examples={selectedExamplesQuery.examples}
-      isLoading={selectedExamplesQuery.isLoading}
-      error={selectedExamplesQuery.error}
-    />
-  </div>;
+  return (
+    <div>
+      <h2>Example Creator</h2>
+      <CreateTable
+        displayConfig={exampleDisplayConfig}
+        renderCell={renderCell}
+        {...tableProps}
+      />
+      <BaseResultsComponent
+        bulkOption="deselectAll"
+        title={`${selectedExamplesQuery.examples?.length} Selected Examples`}
+        examples={selectedExamplesQuery.examples}
+        isLoading={selectedExamplesQuery.isLoading}
+        error={selectedExamplesQuery.error}
+      />
+    </div>
+  );
 }

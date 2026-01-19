@@ -32,7 +32,7 @@ export function useExampleCreator(): UseExampleCreatorResult {
     useExampleMutations();
   const { updateSelectedExamples, selectedExampleIds } =
     useSelectedExamplesContext();
-    const selectedExamplesQuery = useExamplesToEditQuery(selectedExampleIds);
+  const selectedExamplesQuery = useExamplesToEditQuery(selectedExampleIds);
 
   // 1. Create table state (focused on state only - no mapping, no validation)
   const tableState = useCreateTableState({
@@ -143,18 +143,20 @@ export function useExampleCreator(): UseExampleCreatorResult {
     );
 
     // Filter out successful rows, keep failed ones
-    const remainingRows = tableState
-      .getRows()
-      .filter((row) => {
-        if (row.id === GHOST_ROW_ID) return true; // Keep ghost row
-        const spanishText = row.cells.spanish?.trim() || '';
-        return !createdSpanishTexts.has(spanishText); // Keep if not created
-      });
+    const remainingRows = tableState.getRows().filter((row) => {
+      if (row.id === GHOST_ROW_ID) return true; // Keep ghost row
+      const spanishText = row.cells.spanish?.trim() || '';
+      return !createdSpanishTexts.has(spanishText); // Keep if not created
+    });
 
     // Update table state with remaining rows (and ghost row)
     const ghostRow = remainingRows.find((r) => r.id === GHOST_ROW_ID);
-    const dataRowsRemaining = remainingRows.filter((r) => r.id !== GHOST_ROW_ID);
-    tableState.setRows(ghostRow ? [...dataRowsRemaining, ghostRow] : dataRowsRemaining);
+    const dataRowsRemaining = remainingRows.filter(
+      (r) => r.id !== GHOST_ROW_ID,
+    );
+    tableState.setRows(
+      ghostRow ? [...dataRowsRemaining, ghostRow] : dataRowsRemaining,
+    );
   }, [
     baseValidation.validationState.isValid,
     dataRows,

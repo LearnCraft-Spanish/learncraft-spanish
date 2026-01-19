@@ -77,7 +77,7 @@ export function VocabTagEditor({
         vocabularyList={vocabularyList}
         onVocabularySelect={onVocabularyAdd}
         selectedVocabIds={selectedVocabularyIds}
-        hideSelectedDisplay={true}
+        hideSelectedDisplay
       />
     </div>
   );

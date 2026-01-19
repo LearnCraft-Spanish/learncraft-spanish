@@ -122,9 +122,13 @@ export function createExampleInfrastructure(
     createExamples: async (
       exampleCreates: CreateExamplesCommand,
     ): Promise<ExampleWithVocabulary[]> => {
-      const response = await httpClient.post<ExampleWithVocabulary[]>(createExamplesEndpoint.path, createExamplesEndpoint.requiredScopes, {
-        exampleCreates,
-      });
+      const response = await httpClient.post<ExampleWithVocabulary[]>(
+        createExamplesEndpoint.path,
+        createExamplesEndpoint.requiredScopes,
+        {
+          exampleCreates,
+        },
+      );
       return response;
     },
     updateExamples: async (

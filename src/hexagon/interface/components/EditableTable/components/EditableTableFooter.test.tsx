@@ -6,11 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 describe('editableTableFooter', () => {
   it('should not render when no handlers are provided', () => {
     const { container } = render(
-      <EditableTableFooter
-        hasUnsavedChanges={true}
-        isValid={true}
-        isSaving={false}
-      />,
+      <EditableTableFooter hasUnsavedChanges isValid isSaving={false} />,
     );
 
     expect(container.firstChild).toBeNull();
@@ -19,7 +15,7 @@ describe('editableTableFooter', () => {
   it('should show validation error hint and disable save button when invalid', () => {
     render(
       <EditableTableFooter
-        hasUnsavedChanges={true}
+        hasUnsavedChanges
         isValid={false}
         isSaving={false}
         onSave={vi.fn()}
@@ -35,8 +31,8 @@ describe('editableTableFooter', () => {
   it('should show unsaved changes hint and enable buttons when valid with changes', () => {
     render(
       <EditableTableFooter
-        hasUnsavedChanges={true}
-        isValid={true}
+        hasUnsavedChanges
+        isValid
         isSaving={false}
         onSave={vi.fn()}
         onDiscard={vi.fn()}
@@ -52,7 +48,7 @@ describe('editableTableFooter', () => {
     render(
       <EditableTableFooter
         hasUnsavedChanges={false}
-        isValid={true}
+        isValid
         isSaving={false}
         onSave={vi.fn()}
         onDiscard={vi.fn()}
@@ -66,9 +62,9 @@ describe('editableTableFooter', () => {
   it('should show saving state and disable buttons when saving', () => {
     render(
       <EditableTableFooter
-        hasUnsavedChanges={true}
-        isValid={true}
-        isSaving={true}
+        hasUnsavedChanges
+        isValid
+        isSaving
         onSave={vi.fn()}
         onDiscard={vi.fn()}
       />,
@@ -85,8 +81,8 @@ describe('editableTableFooter', () => {
 
     render(
       <EditableTableFooter
-        hasUnsavedChanges={true}
-        isValid={true}
+        hasUnsavedChanges
+        isValid
         isSaving={false}
         onSave={mockOnSave}
         onDiscard={mockOnDiscard}

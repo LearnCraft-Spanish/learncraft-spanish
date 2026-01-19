@@ -141,7 +141,7 @@ export function RecentRecords() {
               <div className="sortingComponentWrapper">
                 <Dropdown
                   label="Sort by"
-                  editMode={true}
+                  editMode
                   options={['Date', 'Assignment Name']}
                   value={assignmentsSorting}
                   onChange={(value) =>
@@ -197,7 +197,7 @@ export function RecentRecords() {
               <div className="sortingComponentWrapper">
                 <Dropdown
                   label="Sort by"
-                  editMode={true}
+                  editMode
                   options={['Student Name', 'Date']}
                   value={privateCallsSorting}
                   onChange={(value) =>
