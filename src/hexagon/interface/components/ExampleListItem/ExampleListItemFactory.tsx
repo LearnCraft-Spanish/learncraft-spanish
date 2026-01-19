@@ -1,4 +1,5 @@
 import type {
+  Example,
   ExampleWithVocabulary,
   Flashcard,
 } from '@learncraft-spanish/shared';
@@ -12,15 +13,17 @@ export default function ExampleListItemFactory({
   preTextComponents,
   postTextComponents,
 }: {
-  example: ExampleWithVocabulary | Flashcard;
+  example: ExampleWithVocabulary | Flashcard | Example;
   preTextComponents?: ReactNode[]; // should this be ReactElement (jsx only)?
   postTextComponents?: ReactNode[]; // should this be ReactElement (jsx only)?
 }) {
-  let exampleWithVocabulary: ExampleWithVocabulary;
-  if ('vocabulary' in example) {
-    exampleWithVocabulary = example;
+  let exampleWithVocabulary: ExampleWithVocabulary | Example;
+  if ('vocabulary' in example ) {
+    exampleWithVocabulary = example as ExampleWithVocabulary;
+  } else if ('example' in example) {
+    exampleWithVocabulary = example.example as ExampleWithVocabulary;
   } else {
-    exampleWithVocabulary = example.example;
+    exampleWithVocabulary = example as Example;
   }
 
   return (
