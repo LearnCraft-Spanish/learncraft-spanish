@@ -6,7 +6,7 @@ import {
   useTableRows,
 } from '@application/units/pasteTable/hooks';
 import { createGhostRow } from '@application/units/pasteTable/utils';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 /**
  * Create table state hook interface
@@ -23,6 +23,10 @@ export interface CreateTableStateHook {
   updateCell: (rowId: string, columnId: string, value: string) => string | null;
   handlePaste: (e: ClipboardEvent<Element>) => void;
   resetTable: () => void;
+
+  // Focus state management
+  activeCell: { rowId: string; columnId: string } | null;
+  setActiveCell: (cell: { rowId: string; columnId: string } | null) => void;
 
   // Focus tracking (for paste operations)
   setActiveCellInfo: (rowId: string, columnId: string) => void;
@@ -77,11 +81,50 @@ export function useCreateTableState({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only on mount - initialRows should be stable
 
+  // Helper to check if a row is empty (all cells are empty strings)
+  const isRowEmpty = useCallback(
+    (row: TableRow): boolean => {
+      return columns.every((col) => {
+        const cellValue = row.cells[col.id] ?? '';
+        return cellValue.trim() === '';
+      });
+    },
+    [columns],
+  );
+
+  // Derive cleaned rows (remove empty rows except ghost row) - memoized for return
+  // State may contain empty rows, but we return the cleaned version
+  const cleanedRows = useMemo(() => {
+    const nonGhostRows = rows.filter((row) => row.id !== GHOST_ROW_ID);
+    const emptyRows = nonGhostRows.filter((row) => isRowEmpty(row));
+
+    // If there are empty rows, remove them (preserving ghost row)
+    if (emptyRows.length === 0) {
+      return rows; // No cleanup needed
+    }
+
+    const emptyRowIds = new Set(emptyRows.map((row) => row.id));
+    const ghostRow = rows.find((row) => row.id === GHOST_ROW_ID);
+    const nonGhostCleaned = rows.filter(
+      (row) => row.id !== GHOST_ROW_ID && !emptyRowIds.has(row.id),
+    );
+
+    // Ensure ghost row is always at the end
+    return ghostRow ? [...nonGhostCleaned, ghostRow] : nonGhostCleaned;
+  }, [rows, isRowEmpty]);
+
+  // Focus state management
+  const [activeCell, setActiveCell] = useState<{
+    rowId: string;
+    columnId: string;
+  } | null>(null);
+
   // Paste handling - create mode (always creates new rows)
+  // Use cleanedRows for return, but setRowsInternal for updates
   const { setActiveCellInfo, clearActiveCellInfo, handlePaste } = useTablePaste(
     {
       columns,
-      rows,
+      rows: cleanedRows,
       updateCell: updateCellBase,
       setRows: setRowsInternal,
       mode: 'create', // Explicitly set create mode
@@ -94,26 +137,33 @@ export function useCreateTableState({
       // Handle ghost row conversion
       if (rowId === GHOST_ROW_ID && value.trim() !== '') {
         // Convert ghost row to real row, returns new row ID
-        return convertGhostRow(rowId, columnId, value);
+        const newRowId = convertGhostRow(rowId, columnId, value);
+        // Update focus state to point to the new row
+        if (newRowId) {
+          setActiveCell({ rowId: newRowId, columnId });
+          setActiveCellInfo(newRowId, columnId);
+        }
+        return newRowId;
       }
 
       // Regular cell update
       updateCellBase(rowId, columnId, value);
       return null;
     },
-    [convertGhostRow, updateCellBase],
+    [convertGhostRow, updateCellBase, setActiveCellInfo],
   );
 
   // Reset table to empty state
   const resetTable = useCallback(() => {
     resetRows();
+    setActiveCell(null);
     clearActiveCellInfo();
   }, [resetRows, clearActiveCellInfo]);
 
-  // Expose rows for use case to map
+  // Expose rows for use case to map (cleaned rows, excluding ghost)
   const getRows = useCallback(() => {
-    return rows;
-  }, [rows]);
+    return cleanedRows.filter((row) => row.id !== GHOST_ROW_ID);
+  }, [cleanedRows]);
 
   // Expose setRows for use case to set rows after mapping
   const setRows = useCallback(
@@ -127,12 +177,14 @@ export function useCreateTableState({
 
   return {
     data: {
-      rows,
+      rows: cleanedRows, // Return cleaned rows (empty rows removed)
       columns,
     },
     updateCell,
     handlePaste,
     resetTable,
+    activeCell,
+    setActiveCell,
     setActiveCellInfo,
     clearActiveCellInfo,
     getRows,

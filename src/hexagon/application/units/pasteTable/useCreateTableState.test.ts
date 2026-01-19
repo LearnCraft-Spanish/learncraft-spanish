@@ -221,7 +221,7 @@ describe('useCreateTableState', () => {
       );
 
       const rows = result.current.getRows();
-      expect(rows).toHaveLength(2); // 1 data + ghost
+      expect(rows).toHaveLength(1); // 1 data row (ghost filtered by getRows)
       expect(rows[0].cells.name).toBe('Item 1');
     });
   });

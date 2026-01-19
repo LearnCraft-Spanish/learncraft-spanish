@@ -1,6 +1,7 @@
 import type { ColumnDisplayConfig } from '@interface/components/EditableTable/types';
 import useNonVerbCreation from '@application/useCases/useNonVerbCreation';
-import { PasteTable } from '@interface/components/PasteTable/PasteTable';
+import { CreateTable } from '@interface/components/CreateTable';
+import { StandardCell } from '@interface/components/EditableTable';
 import { PaginatedVocabularyTable } from '@interface/components/VocabularyTable/PaginatedVocabularyTable';
 import React from 'react';
 import './VocabularyCreator.scss';
@@ -34,8 +35,7 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
     setSelectedSubcategoryId,
     creating,
     creationError,
-    tableHook,
-    saveVocabulary,
+    tableProps,
     currentVocabularyPagination,
   } = useNonVerbCreation();
 
@@ -44,9 +44,11 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
   };
 
   const handleSave = async () => {
-    const success = await saveVocabulary();
-    if (success) {
+    try {
+      await tableProps.onSave?.();
       onBack(); // Return to previous screen on success
+    } catch {
+      // Error is already set in creationError
     }
   };
 
@@ -92,24 +94,12 @@ export const NonVerbCreator: React.FC<NonVerbCreatorProps> = ({ onBack }) => {
       {/* Add new vocabulary section - always shown */}
       <div className="nonverb-creator__add-new">
         <h4>Add new vocabulary:</h4>
-        <PasteTable
-          hook={tableHook}
+        <CreateTable
+          {...tableProps}
           displayConfig={vocabularyDisplayConfig}
-          clearButtonText="Clear Table"
-          pasteHint="Paste vocabulary data (tab-separated) or edit cells directly"
+          renderCell={StandardCell}
+          onSave={handleSave}
         />
-      </div>
-
-      {/* Save button */}
-      <div className="nonverb-creator__actions">
-        <button
-          type="button"
-          className="nonverb-creator__save-button"
-          onClick={handleSave}
-          disabled={!selectedSubcategoryId || creating || loadingSubcategories}
-        >
-          {creating ? 'Saving...' : 'Save All Vocabulary'}
-        </button>
       </div>
 
       {/* Display existing vocabulary if a subcategory is selected */}
