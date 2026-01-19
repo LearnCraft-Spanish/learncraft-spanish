@@ -1,16 +1,17 @@
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
-import { useQueryClient } from '@tanstack/react-query';
+import { useIsFetching,useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 export function useSelectedExamples() {
   const { selectedExampleIds } = useSelectedExamplesContext();
   const queryClient = useQueryClient();
+  const isFetchingExamples = useIsFetching({ queryKey: ['examples'] });
 
   // Search across all cached 'examples' queries to find selected examples
   const selectedExamples = useMemo(() => {
-    if (selectedExampleIds.length === 0) return [];
-
+    if (selectedExampleIds.length === 0 || isFetchingExamples > 0) return [];
+    
     const cachedQueries = queryClient.getQueriesData<
       { examples: ExampleWithVocabulary[] } | ExampleWithVocabulary[]
     >({
@@ -33,7 +34,7 @@ export function useSelectedExamples() {
         return null;
       })
       .filter((ex): ex is ExampleWithVocabulary => ex !== null);
-  }, [selectedExampleIds, queryClient]);
+  }, [selectedExampleIds, queryClient, isFetchingExamples]);
 
   return {
     selectedExamples,
