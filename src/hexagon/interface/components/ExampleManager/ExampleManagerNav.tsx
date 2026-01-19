@@ -1,10 +1,10 @@
-import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
+import { useSelectedExamples } from '@application/units/ExampleSearchInterface/useSelectedExamples';
 import { SafeLink } from '@interface/components/general';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import './ExampleManager.scss';
 export default function ExampleManagerNav() {
-  const { selectedExampleIds } = useSelectedExamplesContext();
+  const { selectedExamples } = useSelectedExamples();
   const location = useLocation();
 
   // Get the active segment from the location pathname
@@ -26,8 +26,8 @@ export default function ExampleManagerNav() {
 
   // Check if no examples are selected, disables interfaces requiring examples
   const noExamplesSelected = useMemo(
-    () => selectedExampleIds.length === 0,
-    [selectedExampleIds],
+    () => selectedExamples.length === 0,
+    [selectedExamples],
   );
   return (
     <div className="exampleManagerNav">
