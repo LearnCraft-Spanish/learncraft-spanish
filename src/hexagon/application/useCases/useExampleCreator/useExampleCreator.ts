@@ -1,10 +1,10 @@
-import type { UseExamplesToEditQueryReturnType } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
+
 import type { CreateTableUseCaseProps } from '@application/useCases/types';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import type { CreateExampleCommand } from '@learncraft-spanish/shared';
+import type { CreateExampleCommand, ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
-import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
+import { useSelectedExamples } from '@application/units/ExampleSearchInterface/useSelectedExamples';
 import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { useTableValidation } from '@application/units/pasteTable/hooks';
 import { useCreateTableState } from '@application/units/pasteTable/useCreateTableState';
@@ -19,7 +19,8 @@ import { useCallback, useMemo } from 'react';
 export interface UseExampleCreatorResult {
   tableProps: CreateTableUseCaseProps;
   creationError: Error | null;
-  selectedExamplesQuery: UseExamplesToEditQueryReturnType;
+  selectedExamples: ExampleWithVocabulary[];
+  isFetchingExamples: boolean;
 }
 
 const exampleColumns: ColumnDefinition[] = [
@@ -32,7 +33,9 @@ export function useExampleCreator(): UseExampleCreatorResult {
     useExampleMutations();
   const { updateSelectedExamples, selectedExampleIds } =
     useSelectedExamplesContext();
-  const selectedExamplesQuery = useExamplesToEditQuery(selectedExampleIds);
+    const { selectedExamples, isFetchingExamples: isFetching } = useSelectedExamples();
+    const isFetchingExamples = isFetching > 0;
+
 
   // 1. Create table state (focused on state only - no mapping, no validation)
   const tableState = useCreateTableState({
@@ -195,6 +198,7 @@ export function useExampleCreator(): UseExampleCreatorResult {
   return {
     tableProps,
     creationError: examplesCreatingError,
-    selectedExamplesQuery,
+    selectedExamples,
+    isFetchingExamples,
   };
 }

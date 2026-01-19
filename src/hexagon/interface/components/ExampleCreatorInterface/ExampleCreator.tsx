@@ -12,7 +12,7 @@ const exampleDisplayConfig: ColumnDisplayConfig[] = [
   { id: 'english', label: 'English', width: '50%' },
 ];
 export default function ExampleCreator() {
-  const { tableProps, selectedExamplesQuery } = useExampleCreator();
+  const { tableProps, selectedExamples, isFetchingExamples } = useExampleCreator();
 
   const renderCell = (props: CellRenderProps) => {
     return <StandardCell {...props} />;
@@ -27,10 +27,10 @@ export default function ExampleCreator() {
       />
       <BaseResultsComponent
         bulkOption="deselectAll"
-        title={`${selectedExamplesQuery.examples?.length} Selected Examples`}
-        examples={selectedExamplesQuery.examples}
-        isLoading={selectedExamplesQuery.isLoading}
-        error={selectedExamplesQuery.error}
+        title={`${selectedExamples.length} Selected Examples`}
+        examples={selectedExamples}
+        isLoading={isFetchingExamples}
+        error={null}
       />
     </div>
   );

@@ -38,5 +38,6 @@ export function useSelectedExamples() {
 
   return {
     selectedExamples,
+    isFetchingExamples,
   };
 }
