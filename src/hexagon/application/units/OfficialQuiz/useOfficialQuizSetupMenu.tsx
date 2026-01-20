@@ -18,9 +18,9 @@ export function getCourseCodeFromName(courseName: string) {
     case 'LearnCraft Spanish':
       return 'lcsp';
     case 'Spanish in One Month':
-      return 'si1m';
-    case 'Post-1MC Cohort':
-      return 'post-1mc';
+      return 'si1m';  
+    case 'Post-Challenge Lessons':
+      return 'post-challenge';
     case 'Post-Podcast Lessons':
       return 'lcsp';
     case 'Ser Estar Mini Course':
