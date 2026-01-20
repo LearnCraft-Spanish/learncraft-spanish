@@ -4,7 +4,7 @@ This system provides an extensible way to handle course prerequisites in the les
 
 ## Overview
 
-When a user is selecting lessons for a course that has prerequisites (like Post-1MC Cohort), they can now choose virtual lesson options that represent entire prerequisite courses (like "All Spanish in One Month Lessons 1-30").
+When a user is selecting lessons for a course that has prerequisites (like Post-Challenge Lessons), they can now choose virtual lesson options that represent entire prerequisite courses (like "All Spanish in One Month Lessons 1-20").
 
 ## Architecture
 
@@ -54,8 +54,8 @@ To add a new course prerequisite relationship:
 
 ## Current Prerequisites
 
-- **Post-1MC Cohort** (Course ID: 5)
-  - Prerequisite: Spanish in One Month Lessons 1-30 (Course ID: 3)
+- **Post-Challenge Lessons** (Course ID: 5)
+  - Prerequisite: Spanish in One Month Lessons 1-20 (Course ID: 3)
 
 ## Virtual Lesson ID System
 

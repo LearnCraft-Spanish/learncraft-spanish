@@ -228,37 +228,37 @@ export function createRealisticCourseWithLessonsList(): CourseWithLessons[] {
     },
     {
       id: 5,
-      name: 'Post-1MC Cohort',
+      name: 'Post-Challenge Lessons',
       lessons: [
         {
           id: 350,
           lessonNumber: 1,
-          courseName: 'Post-1MC Cohort',
+          courseName: 'Post-Challenge Lessons',
         },
         {
           id: 351,
           lessonNumber: 2,
-          courseName: 'Post-1MC Cohort',
+          courseName: 'Post-Challenge Lessons',
         },
         {
           id: 352,
           lessonNumber: 3,
-          courseName: 'Post-1MC Cohort',
+          courseName: 'Post-Challenge Lessons',
         },
         {
           id: 353,
           lessonNumber: 4,
-          courseName: 'Post-1MC Cohort',
+          courseName: 'Post-Challenge Lessons',
         },
         {
           id: 354,
           lessonNumber: 5,
-          courseName: 'Post-1MC Cohort',
+          courseName: 'Post-Challenge Lessons',
         },
         {
           id: 355,
           lessonNumber: 6,
-          courseName: 'Post-1MC Cohort',
+          courseName: 'Post-Challenge Lessons',
         },
       ],
     },
