@@ -215,20 +215,20 @@ describe('useOfficialQuizSetupMenu', () => {
     });
 
     it('calls coordinator with courseId for a valid course', async () => {
-      const si1mCourseId =
-        officialQuizCourses.find((course) => course.code === 'si1m')
+      const postChallengeCourseId =
+        officialQuizCourses.find((course) => course.code === 'post-challenge')
           ?.courseId ?? null;
 
       const { result } = renderHook(() => useOfficialQuizSetupMenu(), {
         wrapper: Wrapper,
       });
 
-      result.current.setUserSelectedCourseCode('si1m');
+      result.current.setUserSelectedCourseCode('post-challenge');
 
       await waitFor(() =>
         expect(
           mockSelectedCourseAndLessons.updateUserSelectedCourseId,
-        ).toHaveBeenCalledWith(si1mCourseId),
+        ).toHaveBeenCalledWith(postChallengeCourseId),
       );
     });
   });
@@ -243,8 +243,8 @@ describe('useOfficialQuizSetupMenu', () => {
       expect(getCourseCodeFromName('Spanish in One Month')).toBe('si1m');
     });
 
-    it('returns post-1mc for Post-1MC Cohort', () => {
-      expect(getCourseCodeFromName('Post-1MC Cohort')).toBe('post-1mc');
+    it('returns post-challenge for Post-Challenge Lessons', () => {
+      expect(getCourseCodeFromName('Post-Challenge Lessons')).toBe('post-challenge');
     });
 
     it('returns lcsp for Post-Podcast Lessons', () => {
