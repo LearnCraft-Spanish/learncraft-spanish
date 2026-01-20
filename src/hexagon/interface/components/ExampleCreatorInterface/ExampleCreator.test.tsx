@@ -5,9 +5,10 @@ import { describe, expect, it } from 'vitest';
 
 describe('component ExampleCreator', () => {
   it('should render', () => {
-    render(<MockAllProviders route="/example-creator">
-      <ExampleCreator setHasUnsavedCreatedExamples={() => {}} />
-    </MockAllProviders>,
+    render(
+      <MockAllProviders route="/example-creator">
+        <ExampleCreator setHasUnsavedCreatedExamples={() => {}} />
+      </MockAllProviders>,
     );
     expect(screen.getByText('Example Creator')).toBeInTheDocument();
   });
