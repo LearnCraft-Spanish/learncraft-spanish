@@ -18,7 +18,7 @@ export default function ExampleListItemFactory({
   postTextComponents?: ReactNode[]; // should this be ReactElement (jsx only)?
 }) {
   let exampleWithVocabulary: ExampleWithVocabulary | Example;
-  if ('vocabulary' in example ) {
+  if ('vocabulary' in example) {
     exampleWithVocabulary = example as ExampleWithVocabulary;
   } else if ('example' in example) {
     exampleWithVocabulary = example.example as ExampleWithVocabulary;

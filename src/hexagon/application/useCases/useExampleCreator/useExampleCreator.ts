@@ -1,7 +1,9 @@
-
 import type { CreateTableUseCaseProps } from '@application/useCases/types';
 import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
-import type { CreateExampleCommand, ExampleWithVocabulary } from '@learncraft-spanish/shared';
+import type {
+  CreateExampleCommand,
+  ExampleWithVocabulary,
+} from '@learncraft-spanish/shared';
 import { useSelectedExamplesContext } from '@application/coordinators/hooks/useSelectedExamplesContext';
 import { useExampleMutations } from '@application/queries/ExampleQueries/useExampleMutations';
 import { useSelectedExamples } from '@application/units/ExampleSearchInterface/useSelectedExamples';
@@ -33,9 +35,9 @@ export function useExampleCreator(): UseExampleCreatorResult {
     useExampleMutations();
   const { updateSelectedExamples, selectedExampleIds } =
     useSelectedExamplesContext();
-    const { selectedExamples, isFetchingExamples: isFetching } = useSelectedExamples();
-    const isFetchingExamples = isFetching > 0;
-
+  const { selectedExamples, isFetchingExamples: isFetching } =
+    useSelectedExamples();
+  const isFetchingExamples = isFetching > 0;
 
   // 1. Create table state (focused on state only - no mapping, no validation)
   const tableState = useCreateTableState({
