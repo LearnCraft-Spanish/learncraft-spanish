@@ -23,7 +23,7 @@ describe('component ExampleManagerNav', () => {
     it('renders all four navigation links', () => {
       render(
         <MockAllProviders route="/example-manager/search">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -38,7 +38,7 @@ describe('component ExampleManagerNav', () => {
     it('marks "search" as active when on /example-manager/search', () => {
       render(
         <MockAllProviders route="/example-manager/search">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -49,7 +49,7 @@ describe('component ExampleManagerNav', () => {
     it('marks "search" as active when on /example-manager with no segment', () => {
       render(
         <MockAllProviders route="/example-manager">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -60,7 +60,7 @@ describe('component ExampleManagerNav', () => {
     it('marks "edit" as active when on /example-manager/edit', () => {
       render(
         <MockAllProviders route="/example-manager/edit">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -71,7 +71,7 @@ describe('component ExampleManagerNav', () => {
     it('marks "create" as active when on /example-manager/create', () => {
       render(
         <MockAllProviders route="/example-manager/create">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -82,7 +82,7 @@ describe('component ExampleManagerNav', () => {
     it('marks "assign" as active when on /example-manager/assign', () => {
       render(
         <MockAllProviders route="/example-manager/assign">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -93,7 +93,7 @@ describe('component ExampleManagerNav', () => {
     it('handles nested routes correctly', () => {
       render(
         <MockAllProviders route="/some/prefix/example-manager/edit">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -104,7 +104,7 @@ describe('component ExampleManagerNav', () => {
     it('only marks one link as active at a time', () => {
       render(
         <MockAllProviders route="/example-manager/edit">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -124,7 +124,7 @@ describe('component ExampleManagerNav', () => {
     it('disables "edit" and "assign" links when no examples are selected', () => {
       render(
         <MockAllProviders route="/example-manager/search">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -138,7 +138,7 @@ describe('component ExampleManagerNav', () => {
     it('does not disable "search" and "create" links when no examples are selected', () => {
       render(
         <MockAllProviders route="/example-manager/search">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -162,7 +162,7 @@ describe('component ExampleManagerNav', () => {
     it('enables "edit" and "assign" links when examples are selected', () => {
       render(
         <MockAllProviders route="/example-manager/search">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -176,7 +176,7 @@ describe('component ExampleManagerNav', () => {
     it('keeps "search" and "create" links enabled when examples are selected', () => {
       render(
         <MockAllProviders route="/example-manager/search">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}}  />
         </MockAllProviders>,
       );
 
@@ -192,7 +192,7 @@ describe('component ExampleManagerNav', () => {
     it('can be both active and disabled on /example-manager/edit with no examples', () => {
       render(
         <MockAllProviders route="/example-manager/edit">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
@@ -208,7 +208,7 @@ describe('component ExampleManagerNav', () => {
 
       render(
         <MockAllProviders route="/example-manager/edit">
-          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} setHasUnsavedCreatedExamples={() => {}} />
         </MockAllProviders>,
       );
 
