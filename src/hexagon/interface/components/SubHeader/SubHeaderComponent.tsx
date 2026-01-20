@@ -30,7 +30,7 @@ export default function SubHeader() {
       {/* Student User */}
       {studentUser && appUser && <p>Welcome back, {appUser.name}!</p>}
       {/* Coach or Admin */}
-      {(isCoachOrAdmin && !activeStudentLoading) && (
+      {isCoachOrAdmin && !activeStudentLoading && (
         <>
           {/* Student selector closed */}
           {!studentSelectorOpen ? (
