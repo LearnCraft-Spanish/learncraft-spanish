@@ -17,3 +17,10 @@
   border-radius: 0.5rem;
   text-align: center;
 }
+
+// mobile
+@media (max-width: 768px) {
+  .modal {
+    width: 90%;
+  }
+}
