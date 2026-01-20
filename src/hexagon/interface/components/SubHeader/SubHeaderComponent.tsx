@@ -30,7 +30,7 @@ export default function SubHeader() {
       {/* Student User */}
       {studentUser && appUser && <p>Welcome back, {appUser.name}!</p>}
       {/* Coach or Admin */}
-      {isCoachOrAdmin && (
+      {(isCoachOrAdmin && !activeStudentLoading) && (
         <>
           {/* Student selector closed */}
           {!studentSelectorOpen ? (
@@ -38,7 +38,7 @@ export default function SubHeader() {
               {appUser && (
                 <p>
                   {`Using as ${appUser.name}
-                  ${isOwnUser && ' (yourself)'}`}
+                  ${isOwnUser ? ' (yourself)' : ''}`}
                 </p>
               )}
               {!appUser && <p>No student Selected</p>}
