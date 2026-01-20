@@ -6,11 +6,7 @@ import { SelectedExamples } from '@interface/components/ExampleSearchInterface/S
 import SectionHeader from '@interface/components/general/SectionHeader/SectionHeader';
 import { useCallback, useState } from 'react';
 import '@interface/components/ExampleSearchInterface/ExampleSearch.scss';
-export default function ExampleSearch({
-  activateEdit,
-}: {
-  activateEdit: () => void;
-}) {
+export default function ExampleSearch() {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const {
     mode,
@@ -30,7 +26,6 @@ export default function ExampleSearch({
 
   return (
     <div>
-      <h2>Example Search</h2>
       <SearchModeNav activeMode={mode} onModeChange={handleChangeMode} />
 
       <div style={{ marginTop: '1rem' }}>
@@ -71,9 +66,6 @@ export default function ExampleSearch({
       </div>
 
       <SelectedExamples />
-      <button type="button" className="editButton" onClick={activateEdit}>
-        Edit
-      </button>
     </div>
   );
 }

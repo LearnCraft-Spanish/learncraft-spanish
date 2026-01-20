@@ -1,3 +1,4 @@
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/domain/example/core-types';
 import { useExampleAdapter } from '@application/adapters/exampleAdapter';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
@@ -8,8 +9,19 @@ export const useExampleMutations = () => {
     useExampleAdapter();
   const createExamplesMutation = useMutation({
     mutationFn: createExamples,
-    onSuccess: () => {
+    onSuccess: (data: ExampleWithVocabulary[]) => {
       toast.success('All examples created successfully');
+      queryClient.setQueryData(
+        ['examples', 'newExamples'],
+        (oldData: ExampleWithVocabulary[] | undefined) => {
+          // If no existing data, return the new examples
+          if (!oldData || oldData.length === 0) {
+            return data;
+          }
+          // Merge new examples with existing
+          return [...oldData, ...data];
+        },
+      );
     },
     onError: (error) => {
       toast.error('Failed to create some examples');
@@ -56,7 +68,13 @@ export const useExampleMutations = () => {
 
   return {
     createExamples: createExamplesMutation.mutateAsync,
+    examplesCreating: createExamplesMutation.isPending,
+    examplesCreatingError: createExamplesMutation.error,
     updateExamples: updateExamplesMutation.mutateAsync,
+    examplesUpdating: updateExamplesMutation.isPending,
+    examplesUpdatingError: updateExamplesMutation.error,
     deleteExamples: deleteExamplesMutation.mutateAsync,
+    examplesDeleting: deleteExamplesMutation.isPending,
+    examplesDeletingError: deleteExamplesMutation.error,
   };
 };

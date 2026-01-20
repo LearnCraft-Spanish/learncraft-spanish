@@ -37,11 +37,7 @@ describe('component: BaseResultsComponent', () => {
   describe('loading state', () => {
     it('should display loading message when isLoading is true', () => {
       render(
-        <BaseResultsComponent
-          isLoading={true}
-          error={null}
-          examples={undefined}
-        />,
+        <BaseResultsComponent isLoading error={null} examples={undefined} />,
       );
 
       expect(screen.getByText('Loading results...')).toBeInTheDocument();

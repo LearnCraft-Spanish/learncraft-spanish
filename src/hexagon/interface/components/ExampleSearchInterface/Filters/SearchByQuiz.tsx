@@ -1,5 +1,6 @@
 import { useSearchByQuizFilter } from '@application/units/ExampleSearchInterface/Filters/useSearchByQuizFilter';
 import { VocabularyCompleteFilter } from '@interface/components/ExampleSearchInterface/Filters/VocabularyCompleteFilter';
+import { GenericDropdown } from '@interface/components/FormComponents';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 export interface SearchByQuizProps {
   courseCode: string;
@@ -20,43 +21,37 @@ export function SearchByQuiz({
 }: SearchByQuizProps) {
   const { quizOptions } = useSearchByQuizFilter({ courseCode });
 
+  const handleQuizNumberChange = (value: string) => {
+    onQuizNumberChange(Number.parseInt(value) || 0);
+  };
+
   return (
-    <div>
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.75rem' }}>
-        <select
-          className="quizMenu required"
-          role="select"
-          aria-label="Select Course"
-          value={courseCode}
-          onChange={(e) => {
-            onCourseCodeChange(e.target.value);
-            onQuizNumberChange(0);
-          }}
-        >
-          <option value="">Select a Course</option>
-          {officialQuizCourses.map((course) => (
-            <option key={course.code} value={course.code}>
-              {course.name}
-            </option>
-          ))}
-        </select>
-        <select
-          className="quizMenu required"
-          role="select"
-          aria-label="Select Quiz"
-          value={quizNumber}
-          onChange={(e) =>
-            onQuizNumberChange(Number.parseInt(e.target.value) || 0)
-          }
-        >
-          <option value={0}>Select a Quiz</option>
-          {quizOptions.map((quiz) => (
-            <option key={quiz.id} value={quiz.quizNumber}>
-              {quiz.quizTitle}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="searchByQuizFilterWrapper">
+      <GenericDropdown
+        label="Course"
+        selectedValue={courseCode}
+        onChange={onCourseCodeChange}
+        options={officialQuizCourses.map((course) => ({
+          value: course.code,
+          text: course.name,
+        }))}
+        defaultOptionText="Select a Course"
+        editMode
+        required
+      />
+
+      <GenericDropdown
+        label="Quiz"
+        selectedValue={quizNumber.toString()}
+        onChange={handleQuizNumberChange}
+        options={quizOptions.map((quiz) => ({
+          value: quiz.quizNumber.toString(),
+          text: quiz.quizTitle,
+        }))}
+        defaultOptionText="Select a Quiz"
+        editMode
+        required
+      />
 
       <VocabularyCompleteFilter
         value={vocabularyComplete}

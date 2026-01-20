@@ -26,7 +26,7 @@ describe('component AddPendingRemove', () => {
     });
 
     it('should render Remove button when collected and not pending', () => {
-      render(<AddPendingRemove {...mockProps} isCollected={true} />);
+      render(<AddPendingRemove {...mockProps} isCollected />);
 
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('component AddPendingRemove', () => {
     });
 
     it('should render Adding... disabled button when adding', () => {
-      render(<AddPendingRemove {...mockProps} isAdding={true} />);
+      render(<AddPendingRemove {...mockProps} isAdding />);
 
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
@@ -44,13 +44,7 @@ describe('component AddPendingRemove', () => {
     });
 
     it('should render Removing... disabled button when removing', () => {
-      render(
-        <AddPendingRemove
-          {...mockProps}
-          isCollected={true}
-          isRemoving={true}
-        />,
-      );
+      render(<AddPendingRemove {...mockProps} isCollected isRemoving />);
 
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
@@ -73,7 +67,7 @@ describe('component AddPendingRemove', () => {
     });
 
     it('should call handleRemove when Remove button is clicked', () => {
-      render(<AddPendingRemove {...mockProps} isCollected={true} />);
+      render(<AddPendingRemove {...mockProps} isCollected />);
 
       const button = screen.getByRole('button');
       act(() => {
@@ -85,7 +79,7 @@ describe('component AddPendingRemove', () => {
     });
 
     it('should not call any handlers when clicking disabled Adding button', () => {
-      render(<AddPendingRemove {...mockProps} isAdding={true} />);
+      render(<AddPendingRemove {...mockProps} isAdding />);
 
       const button = screen.getByRole('button');
       act(() => {
@@ -97,13 +91,7 @@ describe('component AddPendingRemove', () => {
     });
 
     it('should not call any handlers when clicking disabled Removing button', () => {
-      render(
-        <AddPendingRemove
-          {...mockProps}
-          isCollected={true}
-          isRemoving={true}
-        />,
-      );
+      render(<AddPendingRemove {...mockProps} isCollected isRemoving />);
 
       const button = screen.getByRole('button');
       act(() => {

@@ -20,7 +20,7 @@ export function SearchByIds({ input, onInputChange }: SearchByIdsProps) {
   };
 
   return (
-    <div>
+    <div className="searchByIdsFilterWrapper">
       <input
         type="text"
         value={input}
@@ -34,7 +34,7 @@ export function SearchByIds({ input, onInputChange }: SearchByIdsProps) {
           onInputChange(event.target.value);
         }}
         onPaste={(event) => onPaste(event)}
-        placeholder="e.g. 10, 23, 42"
+        placeholder="type or paste IDs separated by commas, tabs, or newlines (e.g. 10, 23, 42)"
         style={{ width: '100%', padding: '0.5rem', marginBottom: '0.75rem' }}
       />
 

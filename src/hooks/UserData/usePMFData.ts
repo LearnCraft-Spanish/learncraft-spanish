@@ -1,3 +1,4 @@
+// used outside hexagon, candidate for hexagon implementation
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useActiveStudent } from '@application/coordinators/hooks/useActiveStudent';
 import { useQuery } from '@tanstack/react-query';

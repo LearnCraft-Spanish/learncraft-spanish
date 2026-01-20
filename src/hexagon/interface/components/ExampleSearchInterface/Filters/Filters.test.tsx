@@ -3,12 +3,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 // Mock all the filter components
-vi.mock(
-  '@interface/components/ExampleSearchInterface/Filters/LocalFilterPanel',
-  () => ({
-    LocalFilterPanel: () => <div>Local Filter Panel</div>,
-  }),
-);
+vi.mock('@interface/components/Filters/FilterPanel', () => ({
+  FilterPanel: () => <div>Filter Panel</div>,
+}));
 
 vi.mock(
   '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz',
@@ -33,7 +30,7 @@ vi.mock(
 
 describe('component: Filters', () => {
   const mockProps = {
-    localFilterProps: {} as any,
+    onFilterChange: vi.fn(),
     searchByRecentlyEditedProps: {} as any,
     searchByQuizProps: {} as any,
     searchByTextProps: {} as any,
@@ -41,10 +38,10 @@ describe('component: Filters', () => {
   };
 
   describe('mode routing', () => {
-    it('should render LocalFilterPanel when mode is "filter"', () => {
+    it('should render FilterPanel when mode is "filter"', () => {
       render(<Filters mode="filter" {...mockProps} />);
 
-      expect(screen.getByText('Local Filter Panel')).toBeInTheDocument();
+      expect(screen.getByText('Filter Panel')).toBeInTheDocument();
     });
 
     it('should render SearchByQuiz when mode is "quiz"', () => {
@@ -76,14 +73,14 @@ describe('component: Filters', () => {
     it('should only render one filter component at a time', () => {
       const { rerender } = render(<Filters mode="filter" {...mockProps} />);
 
-      expect(screen.getByText('Local Filter Panel')).toBeInTheDocument();
+      expect(screen.getByText('Filter Panel')).toBeInTheDocument();
       expect(screen.queryByText('Search By Quiz')).not.toBeInTheDocument();
       expect(screen.queryByText('Search By Text')).not.toBeInTheDocument();
       expect(screen.queryByText('Search By Ids')).not.toBeInTheDocument();
 
       rerender(<Filters mode="text" {...mockProps} />);
 
-      expect(screen.queryByText('Local Filter Panel')).not.toBeInTheDocument();
+      expect(screen.queryByText('Filter Panel')).not.toBeInTheDocument();
       expect(screen.getByText('Search By Text')).toBeInTheDocument();
     });
   });
