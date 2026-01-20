@@ -1,4 +1,3 @@
-import type { LocalFilterPanelProps } from '@interface/components/ExampleSearchInterface/Filters/LocalFilterPanel';
 import type { SearchByIdsProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByIds';
 import type { SearchByQuizProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import type { SearchByTextProps } from '@interface/components/ExampleSearchInterface/Filters/SearchByText';
@@ -7,12 +6,12 @@ import type { SearchByIdsResultsProps } from '@interface/components/ExampleSearc
 import type { SearchByQuizResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByQuizResults';
 import type { SearchByTextResultsProps } from '@interface/components/ExampleSearchInterface/Results/SearchByTextResults';
 import type { ExampleSearchMode } from '@interface/components/ExampleSearchInterface/SearchModeNav';
+import { useCoursesWithLessons } from '@application/queries/useCoursesWithLessons';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
-import { transformToLessonRanges } from '@domain/coursePrerequisites';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export interface SearchComponentProps {
-  localFilterProps: LocalFilterPanelProps;
+  onFilterChange: () => void;
   searchByQuizProps: SearchByQuizProps;
   searchByTextProps: SearchByTextProps;
   searchByIdsProps: SearchByIdsProps;
@@ -53,22 +52,31 @@ export function useExampleSearch() {
     boolean | undefined
   >(undefined);
 
-  // Filter panel state
-  const [selectedCourseId, setSelectedCourseId] = useState<number>(2); // Default to LearnCraft Spanish
-  const [fromLessonNumber, setFromLessonNumber] = useState<number>(0);
-  const [toLessonNumber, setToLessonNumber] = useState<number>(250); // Default to last lesson of the course
-
   // Combined filters for filter panel
-  const filtersForUI = useCombinedFilters({});
+  const filtersForUI = useCombinedFilters({
+    onFilterChange: () => setSearchIsTriggered(false),
+  });
 
-  // Computed values
-  const lessonRanges = useMemo(() => {
-    return transformToLessonRanges({
-      courseId: selectedCourseId ?? null,
-      fromLessonNumber: fromLessonNumber ?? null,
-      toLessonNumber: toLessonNumber ?? null,
-    });
-  }, [selectedCourseId, fromLessonNumber, toLessonNumber]);
+  // Get course data for lesson calculations
+  const { data: coursesWithLessons } = useCoursesWithLessons();
+
+  // Extract values needed for useEffect to avoid dependency issues
+  const courseId = filtersForUI.courseId;
+  const updateToLessonNumber = filtersForUI.updateToLessonNumber;
+
+  // Effect to set toLessonNumber to last lesson when course changes
+  useEffect(() => {
+    if (!courseId || !coursesWithLessons) return;
+
+    const newCourse = coursesWithLessons.find((c) => c.id === courseId);
+    if (!newCourse || !newCourse.lessons.length) return;
+
+    const lastLesson =
+      newCourse.lessons[newCourse.lessons.length - 1]?.lessonNumber ?? 0;
+    if (lastLesson > 0) {
+      updateToLessonNumber(lastLesson);
+    }
+  }, [courseId, coursesWithLessons, updateToLessonNumber]);
 
   const trimmedSpanishInput = spanishInput.trim();
   const trimmedEnglishInput = englishInput.trim();
@@ -124,7 +132,12 @@ export function useExampleSearch() {
       return true;
     }
     if (mode === 'filter') {
-      if (selectedCourseId <= 0 || toLessonNumber <= 0) {
+      if (
+        !filtersForUI.courseId ||
+        filtersForUI.courseId <= 0 ||
+        !filtersForUI.toLessonNumber ||
+        filtersForUI.toLessonNumber <= 0
+      ) {
         setNonValidSearchErrorMessage(
           'ERROR: Please select a course and To Lesson.',
         );
@@ -141,43 +154,19 @@ export function useExampleSearch() {
     trimmedEnglishInput.length,
     courseCode,
     quizNumber,
-    selectedCourseId,
+    filtersForUI.courseId,
+    filtersForUI.toLessonNumber,
   ]);
+
+  // Callback to reset search when filters change
+  const handleFilterChange = useCallback(() => {
+    setSearchIsTriggered(false);
+  }, []);
 
   // Build props objects
   const searchComponentProps: SearchComponentProps = useMemo(
     () => ({
-      localFilterProps: {
-        excludeSpanglish: filtersForUI.excludeSpanglish,
-        audioOnly: filtersForUI.audioOnly,
-        onExcludeSpanglishChange: withSearchReset(
-          filtersForUI.updateExcludeSpanglish,
-        ),
-        onAudioOnlyChange: withSearchReset(filtersForUI.updateAudioOnly),
-        tagSearchTerm: filtersForUI.skillTagSearch.tagSearchTerm,
-        tagSuggestions: filtersForUI.skillTagSearch.tagSuggestions,
-        onTagSearchTermChange: (value) =>
-          filtersForUI.skillTagSearch.updateTagSearchTerm(
-            value
-              ? ({ value } as unknown as EventTarget & HTMLInputElement)
-              : undefined,
-          ),
-        onAddTag: withSearchReset(filtersForUI.addSkillTagToFilters),
-        onRemoveTagFromSuggestions:
-          filtersForUI.skillTagSearch.removeTagFromSuggestions,
-        onAddTagBackToSuggestions:
-          filtersForUI.skillTagSearch.addTagBackToSuggestions,
-        selectedSkillTags: filtersForUI.selectedSkillTags,
-        onRemoveSkillTag: withSearchReset(
-          filtersForUI.removeSkillTagFromFilters,
-        ),
-        selectedCourseId,
-        fromLessonNumber,
-        toLessonNumber,
-        onCourseChange: withSearchReset(setSelectedCourseId),
-        onFromLessonChange: withSearchReset(setFromLessonNumber),
-        onToLessonChange: withSearchReset(setToLessonNumber),
-      },
+      onFilterChange: handleFilterChange,
       searchByQuizProps: {
         courseCode: courseCode ?? '',
         quizNumber: quizNumber ?? 0,
@@ -204,10 +193,7 @@ export function useExampleSearch() {
       },
     }),
     [
-      filtersForUI,
-      selectedCourseId,
-      fromLessonNumber,
-      toLessonNumber,
+      handleFilterChange,
       courseCode,
       quizNumber,
       spanishInput,
@@ -224,7 +210,7 @@ export function useExampleSearch() {
         skillTags: filtersForUI.selectedSkillTags,
         excludeSpanglish: filtersForUI.excludeSpanglish,
         audioOnly: filtersForUI.audioOnly,
-        lessonRanges,
+        lessonRanges: filtersForUI.filterState.lessonRanges,
       },
       quizResultsProps: {
         courseCode,
@@ -247,7 +233,7 @@ export function useExampleSearch() {
       filtersForUI.selectedSkillTags,
       filtersForUI.excludeSpanglish,
       filtersForUI.audioOnly,
-      lessonRanges,
+      filtersForUI.filterState.lessonRanges,
       courseCode,
       quizNumber,
       spanishInput,

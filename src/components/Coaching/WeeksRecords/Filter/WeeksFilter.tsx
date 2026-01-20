@@ -1,8 +1,8 @@
 import type { Coach, Course } from 'src/types/CoachingTypes';
 
+import { Dropdown } from '@interface/components/FormComponents';
 import React, { useMemo, useState } from 'react';
-
-import { CoachDropdown, Dropdown } from 'src/components/FormComponents';
+import { CoachDropdown } from 'src/components/FormComponents';
 import { toReadableMonthDay } from 'src/hexagon/domain/functions/dateUtils';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import useCoaching from 'src/hooks/CoachingData/useCoaching';

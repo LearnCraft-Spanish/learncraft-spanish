@@ -49,9 +49,7 @@ describe('component: SearchByText', () => {
       />,
     );
 
-    const spanishInput = screen.getByPlaceholderText(
-      'Search Spanish text (comma-separated for multiple)',
-    );
+    const spanishInput = screen.getByPlaceholderText('Search Spanish text');
 
     const newInput = 'test spanish';
     await user.type(spanishInput, newInput);
@@ -80,9 +78,7 @@ describe('component: SearchByText', () => {
       />,
     );
 
-    const englishInput = screen.getByPlaceholderText(
-      'Search English text (comma-separated for multiple)',
-    );
+    const englishInput = screen.getByPlaceholderText('Search English text');
 
     const newInput = 'test english';
     await user.type(englishInput, newInput);

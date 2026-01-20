@@ -24,9 +24,7 @@ describe('customVocabulary', () => {
   });
 
   it('should render the correct button text when addManualVocabulary is true', () => {
-    render(
-      <CustomVocabulary {...defaultStateProps} addManualVocabulary={true} />,
-    );
+    render(<CustomVocabulary {...defaultStateProps} addManualVocabulary />);
     expect(screen.getByText('Cancel Extra Vocabulary')).toBeInTheDocument();
   });
 
@@ -40,9 +38,7 @@ describe('customVocabulary', () => {
   });
 
   it('should call the disableManualVocabulary function when the cancel button is clicked', async () => {
-    render(
-      <CustomVocabulary {...defaultStateProps} addManualVocabulary={true} />,
-    );
+    render(<CustomVocabulary {...defaultStateProps} addManualVocabulary />);
     const cancelButton = screen.getByText('Cancel Extra Vocabulary');
     userEvent.click(cancelButton);
     await waitFor(() => {
@@ -51,16 +47,12 @@ describe('customVocabulary', () => {
   });
 
   it('should render the textarea when addManualVocabulary is true', () => {
-    render(
-      <CustomVocabulary {...defaultStateProps} addManualVocabulary={true} />,
-    );
+    render(<CustomVocabulary {...defaultStateProps} addManualVocabulary />);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('should not populate the textarea with userAddedVocabulary when addManualVocabulary is true', () => {
-    render(
-      <CustomVocabulary {...defaultStateProps} addManualVocabulary={true} />,
-    );
+    render(<CustomVocabulary {...defaultStateProps} addManualVocabulary />);
     expect(screen.getByRole('textbox')).toHaveValue(mockUserAddedVocabulary);
   });
 });

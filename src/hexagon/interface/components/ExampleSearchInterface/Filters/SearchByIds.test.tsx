@@ -20,7 +20,9 @@ describe('component: SearchByIds', () => {
 
     render(<SearchByIds input="" onInputChange={onInputChange} />);
 
-    const input = screen.getByPlaceholderText('e.g. 10, 23, 42');
+    const input = screen.getByPlaceholderText(
+      'type or paste IDs separated by commas, tabs, or newlines (e.g. 10, 23, 42)',
+    );
 
     const newInput = '10, 23, 42';
     await user.type(input, newInput);
