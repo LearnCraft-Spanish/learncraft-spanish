@@ -1,11 +1,17 @@
 import { useSelectedExamples } from '@application/units/ExampleSearchInterface/useSelectedExamples';
-import { SafeLink } from '@interface/components/general';
+import { useModal } from '@interface/hooks/useModal';
 import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './ExampleManager.scss';
-export default function ExampleManagerNav() {
+export default function ExampleManagerNav({
+  hasUnsavedCreatedExamples,
+}: {
+  hasUnsavedCreatedExamples: boolean;
+}) {
   const { selectedExamples } = useSelectedExamples();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { openModal, closeModal } = useModal();
 
   // Get the active segment from the location pathname
   const activeSegment = useMemo(() => {
@@ -29,28 +35,55 @@ export default function ExampleManagerNav() {
     () => selectedExamples.length === 0,
     [selectedExamples],
   );
+
+  const handleNavigate = (path: string) => {
+    if (resolvedActiveSegment === 'create' && hasUnsavedCreatedExamples) {
+      openModal({
+        title: 'Warning: Unsaved Examples',
+        body: 'You have unsaved examples. If you continue, you will lose your unsaved examples.',
+        type: 'confirm',
+        confirmFunction: () => {
+          navigate(path);
+          closeModal();
+        },
+        cancelFunction: () => {},
+      });
+      return;
+    }
+    navigate(path);
+  };
   return (
     <div className="exampleManagerNav">
-      <SafeLink to="search" className={getNavOptionClassName('search')}>
+      <button
+        type="button"
+        className={getNavOptionClassName('search')}
+        onClick={() => handleNavigate('search')}
+      >
         Select Examples
-      </SafeLink>
-      <SafeLink to="create" className={getNavOptionClassName('create')}>
+      </button>
+      <button
+        type="button"
+        className={getNavOptionClassName('create')}
+        onClick={() => handleNavigate('create')}
+      >
         Create New Examples
-      </SafeLink>
-      <SafeLink
-        to="edit"
+      </button>
+      <button
         disabled={noExamplesSelected}
-        className={`${getNavOptionClassName('edit')} ${noExamplesSelected && 'disabled'}`}
+        type="button"
+        className={` ${getNavOptionClassName('edit')} ${noExamplesSelected && 'disabled'}`}
+        onClick={() => handleNavigate('edit')}
       >
         Edit Selected Examples
-      </SafeLink>
-      <SafeLink
-        to="assign"
+      </button>
+      <button
         disabled={noExamplesSelected}
-        className={`${getNavOptionClassName('assign')} ${noExamplesSelected && 'disabled'}`}
+        type="button"
+        className={` ${getNavOptionClassName('assign')} ${noExamplesSelected && 'disabled'}`}
+        onClick={() => handleNavigate('assign')}
       >
         Assign Selected Examples
-      </SafeLink>
+      </button>
     </div>
   );
 }

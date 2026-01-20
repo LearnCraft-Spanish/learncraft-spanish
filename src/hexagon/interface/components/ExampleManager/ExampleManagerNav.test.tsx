@@ -1,6 +1,6 @@
 import ExampleManagerNav from '@interface/components/ExampleManager/ExampleManagerNav';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock useSelectedExamples
@@ -22,9 +22,9 @@ describe('component ExampleManagerNav', () => {
   describe('renders all navigation links', () => {
     it('renders all four navigation links', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/search']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/search">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       expect(screen.getByText('Select Examples')).toBeInTheDocument();
@@ -37,9 +37,9 @@ describe('component ExampleManagerNav', () => {
   describe('active segment styling', () => {
     it('marks "search" as active when on /example-manager/search', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/search']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/search">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const searchLink = screen.getByText('Select Examples');
@@ -48,9 +48,9 @@ describe('component ExampleManagerNav', () => {
 
     it('marks "search" as active when on /example-manager with no segment', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const searchLink = screen.getByText('Select Examples');
@@ -59,9 +59,9 @@ describe('component ExampleManagerNav', () => {
 
     it('marks "edit" as active when on /example-manager/edit', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/edit']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/edit">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const editLink = screen.getByText('Edit Selected Examples');
@@ -70,9 +70,9 @@ describe('component ExampleManagerNav', () => {
 
     it('marks "create" as active when on /example-manager/create', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/create']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/create">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const createLink = screen.getByText('Create New Examples');
@@ -81,9 +81,9 @@ describe('component ExampleManagerNav', () => {
 
     it('marks "assign" as active when on /example-manager/assign', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/assign']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/assign">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const assignLink = screen.getByText('Assign Selected Examples');
@@ -92,9 +92,9 @@ describe('component ExampleManagerNav', () => {
 
     it('handles nested routes correctly', () => {
       render(
-        <MemoryRouter initialEntries={['/some/prefix/example-manager/edit']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/some/prefix/example-manager/edit">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const editLink = screen.getByText('Edit Selected Examples');
@@ -103,9 +103,9 @@ describe('component ExampleManagerNav', () => {
 
     it('only marks one link as active at a time', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/edit']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/edit">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const searchLink = screen.getByText('Select Examples');
@@ -123,9 +123,9 @@ describe('component ExampleManagerNav', () => {
   describe('disabled state when no examples selected', () => {
     it('disables "edit" and "assign" links when no examples are selected', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/search']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/search">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const editLink = screen.getByText('Edit Selected Examples');
@@ -137,9 +137,9 @@ describe('component ExampleManagerNav', () => {
 
     it('does not disable "search" and "create" links when no examples are selected', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/search']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/search">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const searchLink = screen.getByText('Select Examples');
@@ -161,9 +161,9 @@ describe('component ExampleManagerNav', () => {
 
     it('enables "edit" and "assign" links when examples are selected', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/search']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/search">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const editLink = screen.getByText('Edit Selected Examples');
@@ -175,9 +175,9 @@ describe('component ExampleManagerNav', () => {
 
     it('keeps "search" and "create" links enabled when examples are selected', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/search']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/search">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const searchLink = screen.getByText('Select Examples');
@@ -191,9 +191,9 @@ describe('component ExampleManagerNav', () => {
   describe('combines active and disabled states correctly', () => {
     it('can be both active and disabled on /example-manager/edit with no examples', () => {
       render(
-        <MemoryRouter initialEntries={['/example-manager/edit']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/edit">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const editLink = screen.getByText('Edit Selected Examples');
@@ -207,9 +207,9 @@ describe('component ExampleManagerNav', () => {
       mockSelectedExamples.push({ id: 1, exampleText: 'Example 1' });
 
       render(
-        <MemoryRouter initialEntries={['/example-manager/edit']}>
-          <ExampleManagerNav />
-        </MemoryRouter>,
+        <MockAllProviders route="/example-manager/edit">
+          <ExampleManagerNav hasUnsavedCreatedExamples={false} />
+        </MockAllProviders>,
       );
 
       const editLink = screen.getByText('Edit Selected Examples');

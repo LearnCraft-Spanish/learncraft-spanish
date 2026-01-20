@@ -27,6 +27,9 @@
     &.isActive {
       background-color: var(--brand);
       color: var(--light);
+      &:hover {
+        background-color: var(--brand);
+      }
     }
     &.disabled {
       background-color: var(--dark);

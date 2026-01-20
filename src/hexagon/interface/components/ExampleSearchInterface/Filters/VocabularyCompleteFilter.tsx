@@ -28,7 +28,7 @@ export function VocabularyCompleteFilter({
           { value: 'false', text: 'Incomplete' },
         ]}
         defaultOptionText="All (no filter)"
-        editMode={true}
+        editMode
         required={false}
       />
     </div>

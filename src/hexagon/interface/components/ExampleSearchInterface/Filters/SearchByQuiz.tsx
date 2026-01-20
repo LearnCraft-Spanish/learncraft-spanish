@@ -36,8 +36,8 @@ export function SearchByQuiz({
           text: course.name,
         }))}
         defaultOptionText="Select a Course"
-        editMode={true}
-        required={true}
+        editMode
+        required
       />
 
       <GenericDropdown
@@ -49,8 +49,8 @@ export function SearchByQuiz({
           text: quiz.quizTitle,
         }))}
         defaultOptionText="Select a Quiz"
-        editMode={true}
-        required={true}
+        editMode
+        required
       />
 
       <VocabularyCompleteFilter

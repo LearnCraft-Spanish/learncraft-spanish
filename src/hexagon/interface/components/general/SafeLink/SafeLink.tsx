@@ -13,7 +13,7 @@ export function SafeLink(props: SafeLinkProps) {
   const { disabled, className, ...rest } = props;
   if (disabled) {
     return (
-      <span className={`linkButton disabled ${className}`} aria-disabled={true}>
+      <span className={`linkButton disabled ${className}`} aria-disabled>
         {rest.children}
       </span>
     );

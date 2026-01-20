@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 describe('createTableFooter component', () => {
   it('should not render when no handlers are provided', () => {
     const { container } = render(
-      <CreateTableFooter hasData={true} isValid={true} isSaving={false} />,
+      <CreateTableFooter hasData isValid isSaving={false} />,
     );
 
     expect(container.firstChild).toBeNull();
@@ -15,7 +15,7 @@ describe('createTableFooter component', () => {
   it('should show validation error hint and disable save button when invalid', () => {
     render(
       <CreateTableFooter
-        hasData={true}
+        hasData
         isValid={false}
         isSaving={false}
         onSave={vi.fn()}
@@ -31,8 +31,8 @@ describe('createTableFooter component', () => {
   it('should show ready to save hint and enable buttons when valid with data', () => {
     render(
       <CreateTableFooter
-        hasData={true}
-        isValid={true}
+        hasData
+        isValid
         isSaving={false}
         onSave={vi.fn()}
         onReset={vi.fn()}
@@ -48,7 +48,7 @@ describe('createTableFooter component', () => {
     render(
       <CreateTableFooter
         hasData={false}
-        isValid={true}
+        isValid
         isSaving={false}
         onSave={vi.fn()}
         onReset={vi.fn()}
@@ -65,9 +65,9 @@ describe('createTableFooter component', () => {
   it('should show saving state and disable buttons when saving', () => {
     render(
       <CreateTableFooter
-        hasData={true}
-        isValid={true}
-        isSaving={true}
+        hasData
+        isValid
+        isSaving
         onSave={vi.fn()}
         onReset={vi.fn()}
       />,
@@ -83,8 +83,8 @@ describe('createTableFooter component', () => {
 
     render(
       <CreateTableFooter
-        hasData={true}
-        isValid={true}
+        hasData
+        isValid
         isSaving={false}
         onSave={mockOnSave}
       />,
@@ -100,8 +100,8 @@ describe('createTableFooter component', () => {
 
     render(
       <CreateTableFooter
-        hasData={true}
-        isValid={true}
+        hasData
+        isValid
         isSaving={false}
         onReset={mockOnReset}
       />,
@@ -113,12 +113,7 @@ describe('createTableFooter component', () => {
 
   it('should render only save button when onReset is not provided', () => {
     render(
-      <CreateTableFooter
-        hasData={true}
-        isValid={true}
-        isSaving={false}
-        onSave={vi.fn()}
-      />,
+      <CreateTableFooter hasData isValid isSaving={false} onSave={vi.fn()} />,
     );
 
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
@@ -129,12 +124,7 @@ describe('createTableFooter component', () => {
 
   it('should render only reset button when onSave is not provided', () => {
     render(
-      <CreateTableFooter
-        hasData={true}
-        isValid={true}
-        isSaving={false}
-        onReset={vi.fn()}
-      />,
+      <CreateTableFooter hasData isValid isSaving={false} onReset={vi.fn()} />,
     );
 
     expect(

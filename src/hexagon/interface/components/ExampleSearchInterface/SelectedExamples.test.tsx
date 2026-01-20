@@ -35,6 +35,7 @@ describe('component: SelectedExamples', () => {
   it('should return null when no examples are selected', () => {
     vi.mocked(useSelectedExamples).mockReturnValue({
       selectedExamples: [],
+      isFetchingExamples: 0,
     });
 
     const { container } = render(<SelectedExamples />);

@@ -89,7 +89,7 @@ describe('createTable component', () => {
 
   it('should render footer when onSave is provided', () => {
     const { container } = render(
-      <CreateTable {...defaultProps} onSave={vi.fn()} hasData={true} />,
+      <CreateTable {...defaultProps} onSave={vi.fn()} hasData />,
     );
 
     expect(container.querySelector('.paste-table__footer')).toBeInTheDocument();
@@ -114,7 +114,7 @@ describe('createTable component', () => {
     render(
       <CreateTable
         {...defaultProps}
-        hasData={true}
+        hasData
         isValid={false}
         isSaving={false}
         onSave={vi.fn()}
