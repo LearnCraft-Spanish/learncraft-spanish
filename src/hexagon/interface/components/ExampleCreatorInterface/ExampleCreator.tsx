@@ -26,6 +26,8 @@ export default function ExampleCreator({
   useEffect(() => {
     if (tableProps.rows.filter((row) => row.id !== GHOST_ROW_ID).length > 0) {
       setHasUnsavedCreatedExamples(true);
+    } else {
+      setHasUnsavedCreatedExamples(false);
     }
   }, [tableProps.rows, setHasUnsavedCreatedExamples]);
 

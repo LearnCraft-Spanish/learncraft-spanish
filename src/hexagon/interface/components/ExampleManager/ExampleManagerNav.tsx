@@ -5,8 +5,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './ExampleManager.scss';
 export default function ExampleManagerNav({
   hasUnsavedCreatedExamples,
+  setHasUnsavedCreatedExamples,
 }: {
   hasUnsavedCreatedExamples: boolean;
+  setHasUnsavedCreatedExamples: (hasUnsavedCreatedExamples: boolean) => void;
 }) {
   const { selectedExamples } = useSelectedExamples();
   const location = useLocation();
@@ -44,6 +46,7 @@ export default function ExampleManagerNav({
         type: 'confirm',
         confirmFunction: () => {
           navigate(path);
+          setHasUnsavedCreatedExamples(false);
           closeModal();
         },
         cancelFunction: () => {},

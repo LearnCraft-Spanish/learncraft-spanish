@@ -19,6 +19,7 @@ export function ExampleManagerRouter() {
     <SelectedExamplesProvider>
       <ExampleManagerNav
         hasUnsavedCreatedExamples={hasUnsavedCreatedExamples}
+        setHasUnsavedCreatedExamples={handleSetHasUnsavedCreatedExamples}
       />
       <Routes>
         {/* <Route path="/" element={<ExampleManagerSetupMenu />} /> */}
