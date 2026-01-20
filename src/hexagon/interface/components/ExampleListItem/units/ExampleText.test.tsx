@@ -81,7 +81,7 @@ describe('component ExampleText', () => {
   });
 
   it('should pass isSpanglish prop correctly to formatSpanishText', () => {
-    render(<ExampleText {...mockProps} isSpanglish={true} />);
+    render(<ExampleText {...mockProps} isSpanglish />);
 
     expect(helpers.formatSpanishText).toHaveBeenCalledWith(
       true,

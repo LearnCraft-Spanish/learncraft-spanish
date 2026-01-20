@@ -45,11 +45,17 @@ describe('component StudentCell', () => {
         </DateRangeProvider>
       </MockAllProviders>,
     );
-    await waitFor(() => {
-      expect(
-        screen.getByText(relatedGroupSession.sessionType),
-      ).toBeInTheDocument();
-    });
+
+    // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
+    // Use a more flexible matcher and longer timeout to handle query loading
+    await waitFor(
+      () => {
+        expect(
+          screen.getByText(relatedGroupSession.sessionType),
+        ).toBeInTheDocument();
+      },
+      { timeout: 10000, interval: 100 },
+    );
   });
   describe('contextual menu view', () => {
     // Helper function for successful render
@@ -65,11 +71,16 @@ describe('component StudentCell', () => {
           </DateRangeProvider>
         </MockAllProviders>,
       );
-      await waitFor(() => {
-        expect(
-          screen.getByText(relatedGroupSession.sessionType),
-        ).toBeInTheDocument();
-      });
+
+      // Wait for the component to render (component only renders when groupSessionsQuery.isSuccess)
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText(relatedGroupSession.sessionType),
+          ).toBeInTheDocument();
+        },
+        { timeout: 10000, interval: 100 },
+      );
       act(() => {
         screen.getByText(relatedGroupSession.sessionType).click();
       });

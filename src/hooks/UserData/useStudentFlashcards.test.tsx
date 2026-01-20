@@ -23,7 +23,6 @@ async function renderHookSuccessfully() {
     exampleIsPending: result.current.exampleIsPending,
     addFlashcardMutation: result.current.addFlashcardMutation,
     removeFlashcardMutation: result.current.removeFlashcardMutation,
-    updateFlashcardMutation: result.current.updateFlashcardMutation,
   };
 }
 
@@ -53,7 +52,6 @@ describe('test by role', () => {
           exampleIsPending,
           addFlashcardMutation,
           removeFlashcardMutation,
-          updateFlashcardMutation,
         } = await renderHookSuccessfully();
         // assertions
         expect(flashcardDataQuery.isSuccess).toBeTruthy();
@@ -61,7 +59,6 @@ describe('test by role', () => {
         expect(exampleIsPending).toBeDefined();
         expect(addFlashcardMutation).toBeDefined();
         expect(removeFlashcardMutation).toBeDefined();
-        expect(updateFlashcardMutation).toBeDefined();
         await waitFor(() => {
           // Check for length
           expect(flashcardDataQuery.data?.examples.length).toBeGreaterThan(0);
@@ -230,81 +227,6 @@ describe('addFlashcardMutation', () => {
   });
 });
 
-describe('updateFlashcardMutation', () => {
-  beforeEach(() => {
-    overrideAuthAndAppUser({
-      authUser: getAuthUserFromEmail('student-lcsp@fake.not')!,
-      isAuthenticated: true,
-      isAdmin: false,
-      isCoach: false,
-      isStudent: true,
-      isLimited: false,
-    });
-  });
-  it("updates a flashcard's review interval successfully", async () => {
-    // Initial Render
-    const { result } = renderHook(useStudentFlashcards, {
-      wrapper: MockAllProviders,
-    });
-    await waitFor(() => {
-      expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
-      expect(result.current.updateFlashcardMutation).toBeDefined();
-    });
-    // Setup
-    const flashcardDataQuery = result.current.flashcardDataQuery;
-
-    const initalLength = flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error('No flashcards to update');
-
-    const flashcardToUpdate = flashcardDataQuery.data?.studentExamples.find(
-      (example) => example.reviewInterval === 2,
-    );
-    if (!flashcardToUpdate) throw new Error('No flashcard to update');
-    // Update a flashcard
-    result.current.updateFlashcardMutation.mutate({
-      studentExampleId: flashcardToUpdate.recordId,
-      newInterval: 1,
-      difficulty: 'easy',
-    });
-    // Assertions
-    await waitFor(() => {
-      const updatedFlashcard =
-        result.current.flashcardDataQuery.data?.studentExamples.find(
-          (example) => example.recordId === flashcardToUpdate.recordId,
-        );
-      expect(updatedFlashcard?.reviewInterval).toBe(1);
-    });
-  });
-
-  it('throws error when updating a flashcard that does not exist', async () => {
-    // Initial Render
-    const { result } = renderHook(useStudentFlashcards, {
-      wrapper: MockAllProviders,
-    });
-    await waitFor(() => {
-      expect(result.current.flashcardDataQuery.isSuccess).toBeTruthy();
-      expect(result.current.updateFlashcardMutation).toBeDefined();
-    });
-    // Setup
-    const flashcardDataQuery = result.current.flashcardDataQuery;
-
-    const initalLength = flashcardDataQuery.data?.studentExamples.length;
-    if (!initalLength) throw new Error('No flashcards to update');
-
-    // const flashcardToUpdate = flashcardDataQuery.data?.studentExamples.find((example) => example.reviewInterval === null);
-    // if (!flashcardToUpdate) throw new Error("No flashcard to update");
-    // Update a flashcard
-    result.current.updateFlashcardMutation.mutate({
-      studentExampleId: -1,
-      newInterval: 1,
-      difficulty: 'easy',
-    });
-    // Assertions
-    await waitFor(() => {
-      expect(result.current.updateFlashcardMutation.isError).toBeTruthy();
-    });
-  });
-});
 describe('exampleIsCollected', () => {
   beforeEach(() => {
     overrideAuthAndAppUser({

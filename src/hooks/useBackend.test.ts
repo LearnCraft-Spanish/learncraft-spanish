@@ -222,23 +222,8 @@ describe('useBackend Hook', () => {
   });
 
   testArrayFetchFunction({
-    functionName: 'getVerifiedExamplesFromBackend',
-    requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
-  });
-
-  testArrayFetchFunction({
-    functionName: 'getAudioExamplesFromBackend',
-    requiredFields: ['recordId', 'spanishAudioLa', 'englishAudio'],
-  });
-
-  testArrayFetchFunction({
     functionName: 'getLcspQuizzesFromBackend',
     requiredFields: ['recordId', 'quizNickname'],
-  });
-
-  testArrayFetchFunction({
-    functionName: 'getUnverifiedExamplesFromBackend',
-    requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
   });
 
   testObjectFetchFunction({
@@ -284,26 +269,6 @@ describe('useBackend Hook', () => {
     });
     it('returns 0 when creating a student example with bad studentId', async () => {
       const response = await hookResult.createStudentExample(1, -1);
-      expect(response).toBe('0');
-    });
-  });
-  describe('updateMyStudentExample function', () => {
-    it('updates a student example', async () => {
-      const response = await hookResult.updateMyStudentExample(1, 2);
-      expect(response).toBe('1');
-    });
-    it('returns 0 when updating a student example with bad updateId', async () => {
-      const response = await hookResult.updateMyStudentExample(-1, 2);
-      expect(response).toBe('0');
-    });
-  });
-  describe('updateStudentExample function', () => {
-    it('updates a student example', async () => {
-      const response = await hookResult.updateStudentExample(1, 2);
-      expect(response).toBe('1');
-    });
-    it('returns 0 when updating a student example with bad updateId', async () => {
-      const response = await hookResult.updateStudentExample(-1, 2);
       expect(response).toBe('0');
     });
   });

@@ -1,3 +1,4 @@
+// used in 1 context
 import type { Flashcard, NewFlashcard } from 'src/types/interfaceDefinitions';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useQuery } from '@tanstack/react-query';

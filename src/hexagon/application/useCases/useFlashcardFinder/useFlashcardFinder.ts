@@ -8,7 +8,7 @@ import type { ExampleWithVocabulary } from '@learncraft-spanish/shared/dist/doma
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useExampleQuery } from '@application/queries/ExampleQueries/useExampleQuery';
 import { useCombinedFilters } from '@application/units/Filtering/useCombinedFilters';
-import useQueryPagination from '@application/units/Pagination/useQueryPagination';
+import { useQueryPagination } from '@application/units/Pagination/useQueryPagination';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';

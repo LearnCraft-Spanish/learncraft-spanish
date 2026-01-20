@@ -12,19 +12,21 @@ export interface QueryPaginationState {
   previousPage: () => void;
   resetPagination: () => void;
 }
-export default function useQueryPagination({
-  queryPage,
-  pageSize = 25,
-  queryPageSize = 100,
-  totalCount,
-  changeQueryPage,
-}: {
+
+export interface UseQueryPaginationParams {
   queryPage: number;
   pageSize: number;
   queryPageSize: number;
   totalCount: number | undefined;
   changeQueryPage: (page: number) => void;
-}): QueryPaginationState {
+}
+export function useQueryPagination({
+  queryPage,
+  pageSize,
+  queryPageSize,
+  totalCount,
+  changeQueryPage,
+}: UseQueryPaginationParams): QueryPaginationState {
   const [page, setPage] = useState(1);
   const maxPageNumber: number = totalCount
     ? Math.ceil(totalCount / pageSize)

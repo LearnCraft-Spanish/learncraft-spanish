@@ -1,5 +1,5 @@
-import type { TableColumn, TableRow } from '@domain/PasteTable/General';
-import { GHOST_ROW_ID } from '@domain/PasteTable/CreateTable';
+import type { ColumnDefinition, TableRow } from '@domain/PasteTable';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Define the hook result interface
@@ -53,7 +53,7 @@ export const {
   reset: resetMockUseTableRows,
 } = createOverrideableMock<
   <T>(options: {
-    columns: TableColumn[];
+    columns: ColumnDefinition[];
     initialData?: T[];
   }) => TableRowsResult<T>
 >(() => createMockTableRowsResult());

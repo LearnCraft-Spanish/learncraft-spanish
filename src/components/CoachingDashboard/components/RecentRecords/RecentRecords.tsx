@@ -4,6 +4,7 @@ import type {
   PrivateCall,
 } from 'src/types/CoachingTypes';
 
+import { Dropdown } from '@interface/components/FormComponents';
 import { InlineLoading } from '@interface/components/Loading';
 import { useMemo, useState } from 'react';
 import {
@@ -15,7 +16,6 @@ import {
   NewPrivateCallView,
   PrivateCallView,
 } from 'src/components/Coaching/WeeksRecords/Table/PrivateCallsCell';
-import { Dropdown } from 'src/components/FormComponents';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 // import Table from 'src/components/Table/Table';
 import useMyRecentRecords from '../../hooks/useMyRecentRecords';
@@ -141,7 +141,7 @@ export function RecentRecords() {
               <div className="sortingComponentWrapper">
                 <Dropdown
                   label="Sort by"
-                  editMode={true}
+                  editMode
                   options={['Date', 'Assignment Name']}
                   value={assignmentsSorting}
                   onChange={(value) =>
@@ -197,7 +197,7 @@ export function RecentRecords() {
               <div className="sortingComponentWrapper">
                 <Dropdown
                   label="Sort by"
-                  editMode={true}
+                  editMode
                   options={['Student Name', 'Date']}
                   value={privateCallsSorting}
                   onChange={(value) =>

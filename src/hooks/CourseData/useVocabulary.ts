@@ -1,3 +1,4 @@
+// used in a few contexts
 import type {
   Spelling,
   VocabTag,

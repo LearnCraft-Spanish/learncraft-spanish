@@ -11,6 +11,7 @@ describe('useSearchExamplesQuery', () => {
     overrideMockExampleAdapter({
       searchExamplesByText: async () => ({
         examples: createMockExampleWithVocabularyList(5),
+        totalCount: 5,
       }),
     });
   });
@@ -25,11 +26,12 @@ describe('useSearchExamplesQuery', () => {
     overrideMockExampleAdapter({
       searchExamplesByText: async () => ({
         examples: mockData,
+        totalCount: mockData.length,
       }),
     });
 
     // Act
-    const { result } = renderHook(() => useSearchExamplesQuery(searchText), {
+    const { result } = renderHook(() => useSearchExamplesQuery(searchText, 1), {
       wrapper: TestQueryClientProvider,
     });
 
@@ -40,8 +42,8 @@ describe('useSearchExamplesQuery', () => {
     // After data loads
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.examples).toEqual(mockData);
+    expect(result.current.totalCount).toBe(5);
     expect(result.current.error).toBeNull();
-    expect(result.current.page).toBe(1);
   });
 
   it('should handle fetch errors correctly', async () => {
@@ -58,7 +60,7 @@ describe('useSearchExamplesQuery', () => {
     });
 
     // Act
-    const { result } = renderHook(() => useSearchExamplesQuery(searchText), {
+    const { result } = renderHook(() => useSearchExamplesQuery(searchText, 1), {
       wrapper: TestQueryClientProvider,
     });
 
@@ -81,49 +83,58 @@ describe('useSearchExamplesQuery', () => {
     overrideMockExampleAdapter({
       searchExamplesByText: async (_searchText, page, _limit) => {
         if (page === 1) {
-          return { examples: page1Data };
+          return { examples: page1Data, totalCount: 10 };
         }
-        return { examples: page2Data };
+        return { examples: page2Data, totalCount: 10 };
       },
     });
 
-    // Act
-    const { result } = renderHook(() => useSearchExamplesQuery(searchText), {
-      wrapper: TestQueryClientProvider,
-    });
+    // Act - Test page 1
+    const { result: result1 } = renderHook(
+      () => useSearchExamplesQuery(searchText, 1),
+      {
+        wrapper: TestQueryClientProvider,
+      },
+    );
 
-    // Assert - Initial page
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.examples).toEqual(page1Data);
-    expect(result.current.page).toBe(1);
+    // Assert - Page 1
+    await waitFor(() => expect(result1.current.isLoading).toBe(false));
+    expect(result1.current.examples).toEqual(page1Data);
+    expect(result1.current.totalCount).toBe(10);
 
-    // Change page
-    result.current.changePage(2);
-    await waitFor(() => expect(result.current.page).toBe(2));
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.examples).toEqual(page2Data);
+    // Act - Test page 2
+    const { result: result2 } = renderHook(
+      () => useSearchExamplesQuery(searchText, 2),
+      {
+        wrapper: TestQueryClientProvider,
+      },
+    );
+
+    // Assert - Page 2
+    await waitFor(() => expect(result2.current.isLoading).toBe(false));
+    expect(result2.current.examples).toEqual(page2Data);
+    expect(result2.current.totalCount).toBe(10);
   });
 
-  it('should return undefined examples when search returns empty', async () => {
+  it('should return empty array when search returns no results', async () => {
     // Arrange
     const searchText: ExampleTextSearch = {
       spanishText: 'nonexistent',
       englishText: 'nonexistent',
     };
     overrideMockExampleAdapter({
-      searchExamplesByText: async () => ({
-        examples: [],
-      }),
+      searchExamplesByText: async () => ({ examples: [], totalCount: 0 }),
     });
 
     // Act
-    const { result } = renderHook(() => useSearchExamplesQuery(searchText), {
+    const { result } = renderHook(() => useSearchExamplesQuery(searchText, 1), {
       wrapper: TestQueryClientProvider,
     });
 
     // Assert
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.examples).toEqual([]);
+    expect(result.current.totalCount).toBe(0);
     expect(result.current.error).toBeNull();
   });
 });

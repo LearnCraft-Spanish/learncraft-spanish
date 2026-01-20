@@ -1,0 +1,24 @@
+.searchInterfaceFilterPanel {
+  width: 100%;
+  padding: 0px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: start;
+
+  // Text inputs
+  .textInput {
+    max-width: 500px;
+  }
+}
+
+.vocabularyCompleteFilterWrapper {
+  max-width: 700px;
+}
+
+.searchByQuizFilterWrapper,
+.searchByTextFilterWrapper,
+.searchByRecentlyEditedFilterWrapper,
+.searchByIdsFilterWrapper {
+  max-width: 700px;
+}

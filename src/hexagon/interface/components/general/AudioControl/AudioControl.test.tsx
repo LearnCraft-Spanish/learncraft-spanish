@@ -14,7 +14,7 @@ describe('audioControl', () => {
     render(<AudioControl audioLink={'not-a-valid-audio-link'} />);
 
     expect(screen.queryByLabelText('Play/Pause')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('audioError')).toBeInTheDocument();
+    expect(screen.queryByText('error')).toBeInTheDocument();
   });
   it('should render nothing if audioLink is not provided', () => {
     render(<AudioControl audioLink={''} />);

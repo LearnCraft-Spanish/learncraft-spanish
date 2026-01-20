@@ -1,3 +1,4 @@
+// used in 1 context (Coaching)
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';

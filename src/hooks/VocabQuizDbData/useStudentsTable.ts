@@ -1,3 +1,5 @@
+// used in Coaching interfaces
+
 import type {
   EditableStudent,
   NewStudent,

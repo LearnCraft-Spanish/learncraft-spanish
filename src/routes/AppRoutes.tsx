@@ -20,6 +20,7 @@ import {
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
+import { ExampleManagerRouter } from 'src/hexagon/interface/pages/ExampleManagerPage';
 import AdminDashboard from 'src/sections/AdminDashboard';
 import DatabaseTables from 'src/sections/DatabaseTables';
 import NotFoundPage from '../NotFoundPage';
@@ -83,6 +84,7 @@ export default function AppRoutes() {
         <Route path="courses" element={<CoursesTable />} />
         <Route path="quizzes" element={<QuizzesTable />} />
       </Route>
+      <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
       <Route path="/*" element={<NotFoundPage />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
     </SentryRoutes>

@@ -5,6 +5,7 @@ import type {
 } from 'src/types/CoachingTypes';
 
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { Dropdown } from '@interface/components/FormComponents';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import CustomGroupAttendeeSelector from 'src/components/Coaching/general/CustomGroupAttendeeSelector';
 import getWeekEnds from 'src/components/Coaching/general/functions/getWeekEnds';
@@ -12,7 +13,6 @@ import {
   CoachDropdown,
   DateInput,
   DeleteRecord,
-  Dropdown,
   FormControls,
   LinkInput,
   TextAreaInput,

@@ -1,3 +1,4 @@
+// move inside hexagon/use inside hexagon function
 import React from 'react';
 
 export function formatSpanishText(spanishText: string): React.JSX.Element {

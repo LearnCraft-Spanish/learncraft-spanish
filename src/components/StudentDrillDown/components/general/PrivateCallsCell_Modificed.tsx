@@ -1,10 +1,7 @@
 import type { PrivateCall } from 'src/types/CoachingTypes';
+import { Dropdown } from '@interface/components/FormComponents';
 import React from 'react';
-import {
-  Dropdown,
-  LinkInput,
-  TextAreaInput,
-} from 'src/components/FormComponents';
+import { LinkInput, TextAreaInput } from 'src/components/FormComponents';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 

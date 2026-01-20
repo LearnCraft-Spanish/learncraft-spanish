@@ -24,10 +24,10 @@ describe('initial render', () => {
         goToHint={() => {}}
         restartCurrentStep={restartCurrentStep}
         closeQuiz={unReadyQuiz}
-        isFirstExample={true}
+        isFirstExample
         isLastExample={false}
-        nextExampleReady={true}
-        previousExampleReady={true}
+        nextExampleReady
+        previousExampleReady
       />,
     );
     expect(screen.getByText('Previous')).toBeTruthy();
@@ -50,10 +50,10 @@ describe('audioOrComprehension is audio', () => {
         goToHint={() => {}}
         restartCurrentStep={restartCurrentStep}
         closeQuiz={unReadyQuiz}
-        isFirstExample={true}
+        isFirstExample
         isLastExample={false}
-        nextExampleReady={true}
-        previousExampleReady={true}
+        nextExampleReady
+        previousExampleReady
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();
@@ -74,10 +74,10 @@ describe('audioOrComprehension is comprehension', () => {
         goToHint={() => {}}
         restartCurrentStep={restartCurrentStep}
         closeQuiz={unReadyQuiz}
-        isFirstExample={true}
+        isFirstExample
         isLastExample={false}
-        nextExampleReady={true}
-        previousExampleReady={true}
+        nextExampleReady
+        previousExampleReady
       />,
     );
     expect(screen.getByText('Skip to Guess')).toBeTruthy();

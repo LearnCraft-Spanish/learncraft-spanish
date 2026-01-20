@@ -14,13 +14,15 @@ export interface PaginationState {
   goToFirstPage: () => void;
 }
 
-export function usePagination({
-  itemsPerPage = 50,
-  totalItems,
-}: {
+export interface UsePaginationParams {
   itemsPerPage: number;
   totalItems: number;
-}): PaginationState {
+}
+
+export function usePagination({
+  itemsPerPage,
+  totalItems,
+}: UsePaginationParams): PaginationState {
   const [selectedPageNumber, setSelectedPageNumber] = useState(1);
   const previousTotalItems = useRef(0);
   const maxPage = Math.ceil(totalItems / itemsPerPage);

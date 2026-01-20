@@ -26,7 +26,7 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should render Select button when collected and not selected', () => {
-    render(<BulkRemoveButton {...mockProps} isCollected={true} />);
+    render(<BulkRemoveButton {...mockProps} isCollected />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Select');
@@ -34,9 +34,7 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should render Selected button when collected and selected', () => {
-    render(
-      <BulkRemoveButton {...mockProps} isCollected={true} isSelected={true} />,
-    );
+    render(<BulkRemoveButton {...mockProps} isCollected isSelected />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Selected');
@@ -44,7 +42,7 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should render Adding... when pending and not collected', () => {
-    render(<BulkRemoveButton {...mockProps} isAdding={true} />);
+    render(<BulkRemoveButton {...mockProps} isAdding />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Adding...');
@@ -52,7 +50,7 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should render Removing... when removing', () => {
-    render(<BulkRemoveButton {...mockProps} isRemoving={true} />);
+    render(<BulkRemoveButton {...mockProps} isRemoving />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Removing...');
@@ -60,7 +58,7 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should call handleSelect when Select button is clicked', () => {
-    render(<BulkRemoveButton {...mockProps} isCollected={true} />);
+    render(<BulkRemoveButton {...mockProps} isCollected />);
 
     const button = screen.getByRole('button');
     act(() => {
@@ -72,9 +70,7 @@ describe('component BulkRemoveButton', () => {
   });
 
   it('should call handleRemoveSelected when Selected button is clicked', () => {
-    render(
-      <BulkRemoveButton {...mockProps} isCollected={true} isSelected={true} />,
-    );
+    render(<BulkRemoveButton {...mockProps} isCollected isSelected />);
 
     const button = screen.getByRole('button');
     act(() => {

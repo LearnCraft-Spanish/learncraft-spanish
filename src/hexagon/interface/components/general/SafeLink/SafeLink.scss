@@ -1,0 +1,10 @@
+.linkButton.disabled {
+  background-color: var(--dark);
+  cursor: disabled;
+
+  // reset hover styles
+  &:hover {
+    background-color: var(--dark);
+    cursor: disabled;
+  }
+}

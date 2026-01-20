@@ -708,36 +708,24 @@ export function useAudioQuiz({
 
     return {
       isAdding: isAddingFlashcard({ exampleId: currentExampleMemo?.id ?? 0 }),
-
       isRemoving: isRemovingFlashcard({
         exampleId: currentExampleMemo?.id ?? 0,
       }),
-
       isCollected: isExampleCollected({
         exampleId: currentExampleMemo?.id ?? 0,
       }),
-
       isCustom: isCustomFlashcard({ exampleId: currentExampleMemo?.id ?? 0 }),
-
       addFlashcard,
-
       removeFlashcard,
     };
   }, [
     isStudent,
-
     currentExampleMemo,
-
     addFlashcard,
-
     removeFlashcard,
-
     isAddingFlashcard,
-
     isRemovingFlashcard,
-
     isExampleCollected,
-
     isCustomFlashcard,
   ]);
 

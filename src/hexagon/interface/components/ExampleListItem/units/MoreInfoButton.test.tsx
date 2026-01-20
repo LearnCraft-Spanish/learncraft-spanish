@@ -21,7 +21,7 @@ describe('component MoreInfoButton', () => {
   });
 
   it('should render Collapse button when open', () => {
-    render(<MoreInfoButton {...mockProps} isOpen={true} />);
+    render(<MoreInfoButton {...mockProps} isOpen />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Collapse');

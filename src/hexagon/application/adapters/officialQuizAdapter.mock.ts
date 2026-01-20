@@ -11,6 +11,7 @@ const defaultMockAdapter: OfficialQuizPort = {
   getOfficialQuizExamples: (_args: {
     courseCode: string;
     quizNumber: number;
+    vocabularyComplete?: boolean;
   }) => Promise.resolve(createMockExampleWithVocabularyList(3)),
 };
 

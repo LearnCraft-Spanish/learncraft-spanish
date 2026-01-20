@@ -1,5 +1,6 @@
 import type { VocabularyPaginationState } from '@application/useCases/types';
-import type { UseNonVerbCreationResult } from '@application/useCases/useNonVerbCreation/useNonVerbCreation.types';
+import type { UseNonVerbCreationResult } from '@application/useCases/useNonVerbCreation/useNonVerbCreation';
+import type { CreateTableUseCaseProps } from '@interface/components/CreateTable/types';
 import { defaultMockResult as defaultTableHook } from '@application/implementations/vocabularyTable/useVocabularyTable.mock';
 import { mockUseVocabularyPage } from '@application/units/useVocabularyPage/useVocabularyPage.mock';
 import { createMockSubcategoryList } from '@testing/factories/subcategoryFactories';
@@ -12,12 +13,10 @@ const mockSubcategories = createMockSubcategoryList(5).filter(
 );
 
 // Create simple mocks
-const mockSaveVocabulary = vi
-  .fn<() => Promise<number[]>>()
-  .mockResolvedValue([1, 2, 3]);
 const mockSetSubcategoryId = vi.fn<(id: string) => void>();
 const mockGoToNextPage = vi.fn<() => void>();
 const mockGoToPreviousPage = vi.fn<() => void>();
+const mockOnSave = vi.fn<() => Promise<void>>().mockResolvedValue(undefined);
 
 // ---- Create a proper pagination state that matches VocabularyPaginationState
 const vocabularyPageResult = mockUseVocabularyPage();
@@ -36,6 +35,24 @@ const mockPagination: VocabularyPaginationState = {
   goToPreviousPage: mockGoToPreviousPage,
 };
 
+// Create mock table props
+const mockTableProps: CreateTableUseCaseProps = {
+  rows: defaultTableHook.data.rows,
+  columns: defaultTableHook.data.columns,
+  validationErrors: {},
+  isValid: true,
+  isSaving: false,
+  hasData: true,
+  onCellChange: defaultTableHook.updateCell,
+  onPaste: defaultTableHook.handlePaste,
+  activeCell: null,
+  setActiveCell: () => {},
+  onSave: mockOnSave,
+  onReset: defaultTableHook.resetTable,
+  setActiveCellInfo: defaultTableHook.setActiveCellInfo,
+  clearActiveCellInfo: defaultTableHook.clearActiveCellInfo,
+};
+
 // ---- Default mock result
 const defaultResult: UseNonVerbCreationResult = {
   nonVerbSubcategories: mockSubcategories,
@@ -46,10 +63,8 @@ const defaultResult: UseNonVerbCreationResult = {
   creating: false,
   creationError: null,
 
-  // Use the static default table hook instead of calling the mock
-  tableHook: defaultTableHook,
-
-  saveVocabulary: mockSaveVocabulary,
+  // Table props - ready to pass to CreateTable component
+  tableProps: mockTableProps,
 
   currentVocabularyPagination: mockPagination,
 };

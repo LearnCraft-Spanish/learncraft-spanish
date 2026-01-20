@@ -204,13 +204,19 @@ describe('component Menu', () => {
           if (hasAdminStaffTools) {
             expect(screen.queryByText('Admin Tools')).toBeInTheDocument();
             expect(screen.queryByText('Admin Dashboard')).toBeInTheDocument();
-            expect(screen.queryByText('Example Manager')).toBeInTheDocument();
+            expect(
+              screen.queryByText('Example Manager (old)'),
+            ).toBeInTheDocument();
+            expect(
+              screen.queryByText('Example Manager (new)'),
+            ).toBeInTheDocument();
             expect(screen.queryByText('Database Tables')).toBeInTheDocument();
             expect(screen.queryByText('Create Vocabulary')).toBeInTheDocument();
           } else {
             expect(screen.queryByText('Admin Tools')).toBeNull();
             expect(screen.queryByText('Admin Dashboard')).toBeNull();
-            expect(screen.queryByText('Example Manager')).toBeNull();
+            expect(screen.queryByText('Example Manager (old)')).toBeNull();
+            expect(screen.queryByText('Example Manager (new)')).toBeNull();
             expect(screen.queryByText('Database Tables')).toBeNull();
             expect(screen.queryByText('Create Vocabulary')).toBeNull();
           }

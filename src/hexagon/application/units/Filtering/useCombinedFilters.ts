@@ -11,7 +11,7 @@ import {
 import { usePresetFilters } from '@application/units/Filtering/FilterPresets/usePresetFilters';
 import { useSkillTagSearch } from '@application/units/useSkillTagSearch';
 import { transformToLessonRanges } from '@domain/coursePrerequisites';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 export type UseCombinedFiltersReturnType =
   UseExampleFilterCoordinatorReturnType &
@@ -70,14 +70,61 @@ export function useCombinedFilters({
       toLessonNumber: toLesson?.lessonNumber,
     });
 
-    onFilterChange();
-
     return {
       excludeSpanglish,
       audioOnly,
       skillTags: selectedSkillTags,
       lessonRanges,
     };
+  }, [
+    excludeSpanglish,
+    audioOnly,
+    selectedSkillTags,
+    course,
+    fromLesson,
+    toLesson,
+  ]);
+
+  // Track previous filter values to detect actual changes
+  const prevFilterRef = useRef({
+    excludeSpanglish,
+    audioOnly,
+    selectedSkillTags,
+    courseId: course?.id,
+    fromLessonNumber: fromLesson?.lessonNumber,
+    toLessonNumber: toLesson?.lessonNumber,
+  });
+
+  // Call onFilterChange when filter state actually changes (but not on initial render)
+  useEffect(() => {
+    const current = {
+      excludeSpanglish,
+      audioOnly,
+      selectedSkillTags,
+      courseId: course?.id,
+      fromLessonNumber: fromLesson?.lessonNumber,
+      toLessonNumber: toLesson?.lessonNumber,
+    };
+
+    const prev = prevFilterRef.current;
+
+    // Check if any filter value actually changed
+    const hasChanged =
+      prev.excludeSpanglish !== current.excludeSpanglish ||
+      prev.audioOnly !== current.audioOnly ||
+      prev.selectedSkillTags.length !== current.selectedSkillTags.length ||
+      prev.selectedSkillTags.some(
+        (tag, index) => tag.key !== current.selectedSkillTags[index]?.key,
+      ) ||
+      prev.courseId !== current.courseId ||
+      prev.fromLessonNumber !== current.fromLessonNumber ||
+      prev.toLessonNumber !== current.toLessonNumber;
+
+    // Only call onFilterChange if something actually changed
+    if (hasChanged) {
+      prevFilterRef.current = current;
+      onFilterChange();
+    }
   }, [
     excludeSpanglish,
     audioOnly,

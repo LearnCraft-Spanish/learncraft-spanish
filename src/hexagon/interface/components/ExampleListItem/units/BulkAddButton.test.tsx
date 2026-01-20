@@ -25,7 +25,7 @@ describe('component BulkAddButton', () => {
   });
 
   it('should render Selected button when selected', () => {
-    render(<BulkAddButton {...mockProps} isSelected={true} />);
+    render(<BulkAddButton {...mockProps} isSelected />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Selected');
@@ -33,7 +33,7 @@ describe('component BulkAddButton', () => {
   });
 
   it('should render Owned button when collected', () => {
-    render(<BulkAddButton {...mockProps} isCollected={true} />);
+    render(<BulkAddButton {...mockProps} isCollected />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Owned');
@@ -41,7 +41,7 @@ describe('component BulkAddButton', () => {
   });
 
   it('should render Adding... when pending and not collected', () => {
-    render(<BulkAddButton {...mockProps} isPending={true} />);
+    render(<BulkAddButton {...mockProps} isPending />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Adding...');
@@ -49,9 +49,7 @@ describe('component BulkAddButton', () => {
   });
 
   it('should render Removing... when pending and collected', () => {
-    render(
-      <BulkAddButton {...mockProps} isCollected={true} isPending={true} />,
-    );
+    render(<BulkAddButton {...mockProps} isCollected isPending />);
 
     const button = screen.getByRole('button');
     expect(button).toHaveTextContent('Removing...');
@@ -71,7 +69,7 @@ describe('component BulkAddButton', () => {
   });
 
   it('should call handleRemoveSelected when Selected button is clicked', () => {
-    render(<BulkAddButton {...mockProps} isSelected={true} />);
+    render(<BulkAddButton {...mockProps} isSelected />);
 
     const button = screen.getByRole('button');
     act(() => {

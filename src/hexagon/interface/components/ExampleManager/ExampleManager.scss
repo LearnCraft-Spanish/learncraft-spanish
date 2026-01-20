@@ -1,0 +1,40 @@
+/* ------------------- Example Manager Nav ------------------- */
+.exampleManagerNav {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+
+  .exampleManagerNavOption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+    padding: 1rem;
+
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: 1px solid var(--dark);
+
+    color: var(--dark);
+    background-color: var(--light);
+
+    &:not(.disabled):hover {
+      background-color: var(--accent);
+    }
+
+    &.isActive {
+      background-color: var(--brand);
+      color: var(--light);
+      &:hover {
+        background-color: var(--brand);
+      }
+    }
+    &.disabled {
+      background-color: var(--dark);
+      color: var(--light);
+      cursor: not-allowed;
+    }
+  }
+}

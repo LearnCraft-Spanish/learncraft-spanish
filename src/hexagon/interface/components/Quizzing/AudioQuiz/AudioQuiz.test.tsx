@@ -277,7 +277,7 @@ describe('component AudioQuiz', () => {
         <MockAudioQuizWrapper
           examplesToQuiz={unknownAudioExamples}
           audioQuizType={AudioQuizType.Speaking}
-          autoplay={true}
+          autoplay
         />,
         {
           wrapper: MockAllProviders,

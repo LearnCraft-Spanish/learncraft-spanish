@@ -4,14 +4,16 @@
   border-radius: 4px;
   overflow: hidden; /* Ensure border radius applies to child borders */
 
-  /* Container for the actual table grid that holds both header and rows */
-  &__table-grid {
-    display: grid;
-    grid-template-columns: var(--grid-template-columns);
+  /* Semantic HTML table - class applied directly to <table> element */
+  &__table {
     width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    table-layout: fixed; /* Allows column width control */
     border-bottom: 1px solid var(--dark); /* Add border to separate table from footer */
     position: relative; /* Establish a stacking context for error tooltips */
     z-index: 0; /* Base z-index for the stacking context */
+    margin: 0; // Remove default margins
   }
 
   &--error {
@@ -33,30 +35,32 @@
     }
   }
 
-  &__header {
-    display: contents; /* Makes the header part of the parent grid */
-  }
-
+  /* Class applied directly to <th> element */
   &__column-header {
-    font-weight: 600;
+    margin: 0; // Remove default margins
     padding: 0.5rem;
+    font-weight: 600;
     text-align: left;
+    vertical-align: top; // Match cell-container alignment
     border-right: 1px solid var(--light);
     background-color: var(--theme);
     color: var(--light);
     border-bottom: 1px solid var(--dark);
+    box-sizing: border-box;
 
     &:last-child {
       border-right: none;
     }
   }
 
-  &__body {
-    display: contents; /* Make rows part of the parent grid */
+  /* Class applied directly to <tr> element in header */
+  &__header {
+    margin: 0; // Remove default margins
   }
 
+  /* Class applied directly to <tr> element in body */
   &__row {
-    display: contents; /* Makes cells direct children of the grid */
+    margin: 0; // Remove default margins
 
     /* Apply special styling to the last row's cells to remove bottom borders */
     &:last-child .paste-table__cell-container {
@@ -64,53 +68,92 @@
     }
   }
 
+  /* Class applied directly to <td> element */
   &__cell-container {
     position: relative;
+    margin: 0; // Remove default margins
+    padding: 0; // Remove default td padding - we handle spacing in wrapper
     border-right: 1px solid var(--dark);
     border-bottom: 1px solid var(--dark);
-    padding: 0;
     box-sizing: border-box;
-    display: flex;
-    align-items: stretch;
-    background-color: var(--light);
+    vertical-align: top; // Align content to top for consistent row heights
+    background-color: var(--light); // Base background color at cell level
 
     &:last-child {
       border-right: none;
     }
 
+    // Active state - background color at cell level
     &--active {
-      input {
-        background-color: rgba(68, 154, 194, 0.1);
+      background-color: rgba(68, 154, 194, 0.25);
+    }
+
+    // Error state - background color at cell level
+    &--error {
+      background-color: rgba(255, 0, 0, 0.25);
+
+      // Error + active state
+      &--active {
+        background-color: rgba(255, 0, 0, 0.5);
       }
     }
+
+    // Readonly cells - grey background and centering at cell level
+    &:has(.paste-table__cell-readonly) {
+      background-color: lightgray;
+      vertical-align: middle; // Center vertically
+      text-align: center; // Center horizontally
+    }
+
+    // Boolean cells - center content
+    &:has(.paste-table__cell-boolean-wrapper) {
+      vertical-align: middle; // Center vertically
+      text-align: center; // Center horizontally
+    }
+  }
+
+  // Cell wrapper - consistent structure for all cells
+  // No background colors here - they're handled at the cell-container level
+  &__cell-wrapper {
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    align-items: stretch;
   }
 
   &__cell {
     width: 100%;
     height: 100%;
     min-height: 1.5rem;
+    margin: 0; // Remove default input margins
     padding: 0.5rem;
     font-family: inherit;
     font-size: inherit;
-    background-color: white;
+    background-color: transparent; // No background - cell-container handles it
     border: none;
     cursor: text;
     white-space: pre-wrap;
     word-break: break-word;
     box-sizing: border-box;
+    outline: none; // Remove default focus outline (we handle it with our active state)
 
-    &:focus {
-      outline: none;
-      background-color: rgba(68, 154, 194, 0.25);
+    // Ensure all input types have no margins
+    &[type='text'],
+    &[type='number'],
+    &[type='date'] {
+      margin: 0;
     }
+  }
 
-    &--error {
-      background-color: rgba(255, 0, 0, 0.25);
-
-      &:focus {
-        background-color: rgba(255, 0, 0, 0.5);
-      }
-    }
+  // Active state for boolean cell wrapper (special case - wrapper is the focusable element)
+  // No background colors here - they're handled at the cell-container level
+  &__cell-boolean-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none; // Remove browser default focus outline - cell-container handles active state
   }
 
   &__cell-error {

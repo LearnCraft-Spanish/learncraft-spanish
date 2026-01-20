@@ -1,3 +1,5 @@
+// coaching interface
+
 import type { Student } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
 import { Loading } from '@interface/components/Loading';
