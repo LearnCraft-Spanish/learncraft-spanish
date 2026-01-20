@@ -1,4 +1,3 @@
-// consider moving to hexagon
 import { MenuButton } from '@interface/components/general/Buttons';
 
 export default function NoDueFlashcards() {
