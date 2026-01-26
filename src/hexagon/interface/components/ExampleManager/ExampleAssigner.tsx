@@ -41,13 +41,8 @@ export default function ExampleAssigner() {
       body: `Are you sure you want to assign ${unassignedExamplesProps.examples.length} example${unassignedExamplesProps.examples.length !== 1 ? 's' : ''} to ${targetName}?`,
       type: 'confirm',
       confirmFunction: async () => {
-        try {
-          await assignExamples();
-          closeModal();
-        } catch (error) {
-          // Error is already captured in assigningError and displayed to user
-          // No need to log here as it's handled by the mutation
-        }
+        closeModal();
+        await assignExamples();
       },
       cancelFunction: () => {
         closeModal();

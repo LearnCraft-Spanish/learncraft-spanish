@@ -174,6 +174,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   ]);
 
   // Conditional queries based on assignment type - always enabled to show current state
+  // Queries are enabled immediately when student/quiz is selected to provide real-time feedback
   const {
     flashcards,
     isLoading: isLoadingFlashcards,
@@ -197,6 +198,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   // For quiz mode: use quiz examples (ExampleTable expects ExampleWithVocabulary[])
 
   // Filter out examples that are already assigned (for unassigned list)
+  // Uses Set-based deduplication for O(1) lookup performance when filtering large lists
   const unassignedExamples = useMemo(() => {
     if (assignmentType === 'students' && flashcards) {
       // Filter selected examples that aren't already flashcards
