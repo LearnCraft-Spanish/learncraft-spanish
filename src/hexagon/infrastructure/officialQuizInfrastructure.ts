@@ -5,6 +5,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  addExamplesToOfficialQuizEndpoint,
   getOfficialQuizExamplesEndpoint,
   listOfficialQuizzesEndpoint,
 } from '@learncraft-spanish/shared';
@@ -45,6 +46,28 @@ export function createOfficialQuizInfrastructure(
       const response = await httpClient.get<ExampleWithVocabulary[]>(
         pathWithParams,
         getOfficialQuizExamplesEndpoint.requiredScopes,
+      );
+      return response;
+    },
+    addExamplesToOfficialQuiz: async ({
+      courseCode,
+      quizNumber,
+      exampleIds,
+    }: {
+      courseCode: string;
+      quizNumber: number;
+      exampleIds: number[];
+    }) => {
+      const path = addExamplesToOfficialQuizEndpoint.path
+        .replace(':courseCode', courseCode)
+        .replace(':quizNumber', quizNumber.toString());
+
+      const response = await httpClient.post<number>(
+        path,
+        addExamplesToOfficialQuizEndpoint.requiredScopes,
+        {
+          exampleIds,
+        },
       );
       return response;
     },

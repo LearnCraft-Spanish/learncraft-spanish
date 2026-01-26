@@ -1,6 +1,7 @@
 import { SelectedExamplesProvider } from '@application/coordinators/providers/SelectedExamplesProvider';
 import ExampleCreator from '@interface/components/ExampleCreatorInterface/ExampleCreator';
 import { ExampleEditor } from '@interface/components/ExampleEditorInterface/ExampleEditor';
+import ExampleAssigner from '@interface/components/ExampleManager/ExampleAssigner';
 import ExampleManagerNav from '@interface/components/ExampleManager/ExampleManagerNav';
 import ExampleSearch from '@interface/components/ExampleSearchInterface/ExampleSearch';
 import { useCallback, useState } from 'react';
@@ -33,7 +34,7 @@ export function ExampleManagerRouter() {
           }
         />
         <Route path="edit" element={<ExampleEditor />} />
-        {/* <Route path="assign" element={<ExampleAssigner />} /> */}
+        <Route path="assign" element={<ExampleAssigner />} />
       </Routes>
     </SelectedExamplesProvider>
   );

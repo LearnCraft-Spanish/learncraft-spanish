@@ -14,4 +14,13 @@ export interface OfficialQuizPort {
     quizNumber: number;
     vocabularyComplete?: boolean;
   }) => Promise<ExampleWithVocabulary[]>;
+  addExamplesToOfficialQuiz: ({
+    courseCode,
+    quizNumber,
+    exampleIds,
+  }: {
+    courseCode: string;
+    quizNumber: number;
+    exampleIds: number[];
+  }) => Promise<number>;
 }
