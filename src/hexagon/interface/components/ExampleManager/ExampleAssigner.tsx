@@ -1,6 +1,7 @@
 import { useExampleAssigner } from '@application/useCases/useExampleAssigner/useExampleAssigner';
 import { AssignButton } from '@interface/components/ExampleManager/AssignButton';
-import { AssignedExamplesTable } from '@interface/components/ExampleManager/AssignedExamplesTable';
+import { AssignedQuizExamplesTable } from '@interface/components/ExampleManager/AssignedExamplesTable';
+import { AssignedStudentFlashcardsTable } from '@interface/components/ExampleManager/AssignedStudentFlashcardsTable';
 import { AssignmentTypeSelector } from '@interface/components/ExampleManager/AssignmentTypeSelector';
 import { ExamplesToAssignTable } from '@interface/components/ExampleManager/ExamplesToAssignTable';
 import { QuizAssignmentSelector } from '@interface/components/ExampleManager/QuizAssignmentSelector';
@@ -10,57 +11,42 @@ import './ExampleManager.scss';
 
 export default function ExampleAssigner() {
   const {
-    assignmentType,
-    toggleAssignmentType,
-    selectedCourseCode,
-    setSelectedCourseCode,
-    selectedQuizRecordId,
-    setSelectedQuizRecordId,
-    selectedQuizRecord,
-    availableQuizzes,
     selectedExamples,
     isFetchingSelectedExamples,
-    assignedExamples,
-    isLoadingAssignedExamples,
-    assignedExamplesError,
-    activeStudent,
-    isLoadingActiveStudent,
+    assignmentTypeSelectorProps,
+    studentSelectionProps,
+    quizSelectionProps,
+    assignedStudentFlashcardsProps,
+    assignedQuizExamplesProps,
+    unassignedExamplesProps,
+    assignButtonProps,
     assignExamples,
-    isAssigning,
     assigningError,
-    courseOptions,
   } = useExampleAssigner();
 
   const { openModal, closeModal } = useModal();
 
-  // Filter out examples that are already assigned
-  const unassignedExamples = selectedExamples.filter((example) => {
-    if (!assignedExamples) return true;
-    return !assignedExamples.some((assigned) => assigned.id === example.id);
-  });
-
-  const targetName =
-    assignmentType === 'students'
-      ? activeStudent?.name || 'Student'
-      : selectedQuizRecord?.quizNickname ||
-        `Quiz ${selectedQuizRecord?.quizNumber}` ||
-        'Quiz';
-
   const handleAssign = () => {
-    if (unassignedExamples.length === 0) {
+    if (unassignedExamplesProps.examples.length === 0) {
       return;
     }
 
+    const targetName =
+      assignmentTypeSelectorProps.assignmentType === 'students'
+        ? assignedStudentFlashcardsProps?.targetName || 'Student'
+        : assignedQuizExamplesProps?.targetName || 'Quiz';
+
     openModal({
       title: 'Confirm Assignment',
-      body: `Are you sure you want to assign ${unassignedExamples.length} example${unassignedExamples.length !== 1 ? 's' : ''} to ${targetName}?`,
+      body: `Are you sure you want to assign ${unassignedExamplesProps.examples.length} example${unassignedExamplesProps.examples.length !== 1 ? 's' : ''} to ${targetName}?`,
       type: 'confirm',
       confirmFunction: async () => {
         try {
           await assignExamples();
           closeModal();
         } catch (error) {
-          console.error('Failed to assign examples:', error);
+          // Error is already captured in assigningError and displayed to user
+          // No need to log here as it's handled by the mutation
         }
       },
       cancelFunction: () => {
@@ -68,13 +54,6 @@ export default function ExampleAssigner() {
       },
     });
   };
-
-  const canAssign: boolean =
-    selectedExamples.length > 0 &&
-    unassignedExamples.length > 0 &&
-    !isAssigning &&
-    ((assignmentType === 'students' && activeStudent !== null) ||
-      (assignmentType === 'quiz' && selectedQuizRecord !== undefined));
 
   if (isFetchingSelectedExamples) {
     return <div>Loading selected examples...</div>;
@@ -95,49 +74,27 @@ export default function ExampleAssigner() {
     <div className="assignment-section">
       <h3>Assign Examples</h3>
 
-      <AssignmentTypeSelector
-        assignmentType={assignmentType}
-        onToggle={toggleAssignmentType}
-      />
+      <AssignmentTypeSelector {...assignmentTypeSelectorProps} />
 
-      {assignmentType === 'students' && (
-        <StudentAssignmentSelector isLoading={isLoadingActiveStudent} />
+      {assignmentTypeSelectorProps.assignmentType === 'students' && (
+        <StudentAssignmentSelector {...studentSelectionProps} />
       )}
 
-      {assignmentType === 'quiz' && (
-        <QuizAssignmentSelector
-          selectedCourseCode={selectedCourseCode}
-          onCourseCodeChange={setSelectedCourseCode}
-          selectedQuizRecordId={selectedQuizRecordId}
-          onQuizRecordIdChange={setSelectedQuizRecordId}
-          availableQuizzes={availableQuizzes}
-          courseOptions={courseOptions}
-        />
+      {assignmentTypeSelectorProps.assignmentType === 'quiz' && (
+        <QuizAssignmentSelector {...quizSelectionProps} />
       )}
 
-      <ExamplesToAssignTable examples={unassignedExamples} />
+      <ExamplesToAssignTable {...unassignedExamplesProps} />
 
-      <AssignButton
-        assignmentType={assignmentType}
-        unassignedCount={unassignedExamples.length}
-        isAssigning={isAssigning}
-        canAssign={canAssign}
-        activeStudentName={activeStudent?.name}
-        quizName={
-          selectedQuizRecord?.quizNickname ||
-          (selectedQuizRecord?.quizNumber
-            ? `Quiz ${selectedQuizRecord.quizNumber}`
-            : null)
-        }
-        onClick={handleAssign}
-      />
+      <AssignButton {...assignButtonProps} onClick={handleAssign} />
 
-      <AssignedExamplesTable
-        examples={assignedExamples}
-        isLoading={isLoadingAssignedExamples}
-        error={assignedExamplesError}
-        targetName={targetName}
-      />
+      {assignedStudentFlashcardsProps && (
+        <AssignedStudentFlashcardsTable {...assignedStudentFlashcardsProps} />
+      )}
+
+      {assignedQuizExamplesProps && (
+        <AssignedQuizExamplesTable {...assignedQuizExamplesProps} />
+      )}
 
       {assigningError && (
         <div className="error">

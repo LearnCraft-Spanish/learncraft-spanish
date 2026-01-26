@@ -1,20 +1,21 @@
 import type { QueryPaginationState } from '@application/units/Pagination/useQueryPagination';
+import type { LessonPopup } from '@application/units/useLessonPopup';
+import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import useLessonPopup from '@application/units/useLessonPopup';
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { ExampleTable } from '@interface/components/Tables';
 import { useMemo } from 'react';
 
 interface ExamplesToAssignTableProps {
   examples: ExampleWithVocabulary[];
+  studentFlashcards: UseStudentFlashcardsReturn;
+  lessonPopup: LessonPopup;
 }
 
 export function ExamplesToAssignTable({
   examples,
+  studentFlashcards,
+  lessonPopup,
 }: ExamplesToAssignTableProps) {
-  const studentFlashcards = useStudentFlashcards();
-  const { lessonPopup } = useLessonPopup();
-
   const paginationState = useMemo<QueryPaginationState>(
     () => ({
       page: 1,

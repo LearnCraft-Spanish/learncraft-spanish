@@ -12,6 +12,7 @@ export function useQuizExamplesQuery({
   const quizExamplesQuery = useQuery({
     queryKey: ['quizExamples', courseCode, quizNumber],
     queryFn: () => getOfficialQuizExamples({ courseCode, quizNumber }),
+    enabled: courseCode !== '' && quizNumber > 0,
   });
   return {
     quizExamples: quizExamplesQuery.data,
