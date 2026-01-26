@@ -1,5 +1,4 @@
-import type { AppUser, ExampleWithVocabulary } from '@learncraft-spanish/shared';
-import { createMockAppUser } from '@testing/factories/appUserFactories';
+import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import {
   mockActiveStudent,
   overrideMockActiveStudent,
@@ -10,19 +9,19 @@ import {
   overrideMockUseOfficialQuizzesQuery,
   resetMockUseOfficialQuizzesQuery,
 } from '@application/queries/useOfficialQuizzesQuery.mock';
-import { useExampleAssigner } from '@application/useCases/useExampleAssigner/useExampleAssigner';
 import {
   mockUseStudentFlashcards,
-  overrideMockUseStudentFlashcards,
   resetMockUseStudentFlashcards,
 } from '@application/units/useStudentFlashcards.mock';
+import { useExampleAssigner } from '@application/useCases/useExampleAssigner/useExampleAssigner';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { createMockAppUser } from '@testing/factories/appUserFactories';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import {
   createMockFlashcard,
   createMockFlashcardList,
 } from '@testing/factories/flashcardFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock all dependencies
@@ -71,9 +70,12 @@ const mockUsePagination = vi.fn(() => ({
   goToFirstPage: vi.fn(),
 }));
 
-vi.mock('@application/units/ExampleSearchInterface/useSelectedExamples', () => ({
-  useSelectedExamples: () => mockUseSelectedExamples(),
-}));
+vi.mock(
+  '@application/units/ExampleSearchInterface/useSelectedExamples',
+  () => ({
+    useSelectedExamples: () => mockUseSelectedExamples(),
+  }),
+);
 
 vi.mock('@application/queries/useFlashcardsQuery', () => ({
   useFlashcardsQuery: () => mockUseFlashcardsQuery(),
@@ -193,18 +195,18 @@ describe('useExampleAssigner', () => {
         wrapper: MockAllProviders,
       });
 
-      expect(
-        result.current.assignmentTypeSelectorProps.assignmentType,
-      ).toBe('students');
+      expect(result.current.assignmentTypeSelectorProps.assignmentType).toBe(
+        'students',
+      );
 
       await act(async () => {
         result.current.assignmentTypeSelectorProps.onToggle();
       });
 
       await waitFor(() => {
-        expect(
-          result.current.assignmentTypeSelectorProps.assignmentType,
-        ).toBe('quiz');
+        expect(result.current.assignmentTypeSelectorProps.assignmentType).toBe(
+          'quiz',
+        );
       });
     });
   });
@@ -229,12 +231,10 @@ describe('useExampleAssigner', () => {
         wrapper: MockAllProviders,
       });
 
-      expect(
-        result.current.assignedStudentFlashcardsProps,
-      ).toBeDefined();
-      expect(
-        result.current.assignedStudentFlashcardsProps?.targetName,
-      ).toBe('Test Student');
+      expect(result.current.assignedStudentFlashcardsProps).toBeDefined();
+      expect(result.current.assignedStudentFlashcardsProps?.targetName).toBe(
+        'Test Student',
+      );
     });
 
     it('should filter out already assigned examples', () => {

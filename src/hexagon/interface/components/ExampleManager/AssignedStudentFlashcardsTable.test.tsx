@@ -1,25 +1,18 @@
 import { AssignedStudentFlashcardsTable } from '@interface/components/ExampleManager/AssignedStudentFlashcardsTable';
-import {
-  createMockFlashcard,
-  createMockFlashcardList,
-} from '@testing/factories/flashcardFactory';
 import { render, screen } from '@testing-library/react';
+import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import { vi } from 'vitest';
 
 // Mock FlashcardTable
 vi.mock('@interface/components/Tables', () => ({
-  FlashcardTable: ({
-    displayFlashcards,
-  }: {
-    displayFlashcards: unknown[];
-  }) => (
+  FlashcardTable: ({ displayFlashcards }: { displayFlashcards: unknown[] }) => (
     <div data-testid="flashcard-table">
       {displayFlashcards.length} flashcards in table
     </div>
   ),
 }));
 
-describe('AssignedStudentFlashcardsTable', () => {
+describe('assignedStudentFlashcardsTable', () => {
   const mockPaginationState = {
     totalItems: 5,
     pageNumber: 1,
@@ -79,7 +72,7 @@ describe('AssignedStudentFlashcardsTable', () => {
         allFlashcards={[]}
         displayFlashcards={[]}
         paginationState={mockPaginationState}
-        isLoading={true}
+        isLoading
         error={null}
         targetName="Test Student"
         onGoingToQuiz={vi.fn()}
@@ -89,7 +82,9 @@ describe('AssignedStudentFlashcardsTable', () => {
     expect(
       screen.getByText('Examples Already Assigned to Test Student'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Loading assigned flashcards...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Loading assigned flashcards...'),
+    ).toBeInTheDocument();
   });
 
   it('should return null when no flashcards and not loading', () => {
@@ -125,7 +120,9 @@ describe('AssignedStudentFlashcardsTable', () => {
     );
 
     expect(
-      screen.getByText('Error loading assigned flashcards: Failed to load flashcards'),
+      screen.getByText(
+        'Error loading assigned flashcards: Failed to load flashcards',
+      ),
     ).toBeInTheDocument();
   });
 });

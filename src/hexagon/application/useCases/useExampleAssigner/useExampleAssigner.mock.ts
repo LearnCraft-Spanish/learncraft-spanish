@@ -1,6 +1,6 @@
-import type { UseExampleAssignerReturn } from '@application/useCases/useExampleAssigner/useExampleAssigner';
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
+import type { UseExampleAssignerReturn } from '@application/useCases/useExampleAssigner/useExampleAssigner';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import {
   createMockFlashcard,
@@ -61,16 +61,16 @@ const defaultResult: UseExampleAssignerReturn = {
   isFetchingSelectedExamples: false,
   assignmentTypeSelectorProps: {
     assignmentType: 'students',
-    onToggle: vi.fn(),
+    onToggle: vi.fn<() => void>(),
   },
   studentSelectionProps: {
     isLoading: false,
   },
   quizSelectionProps: {
     selectedCourseCode: 'none',
-    onCourseCodeChange: vi.fn(),
+    onCourseCodeChange: vi.fn<(code: string) => void>(),
     selectedQuizRecordId: undefined,
-    onQuizRecordIdChange: vi.fn(),
+    onQuizRecordIdChange: vi.fn<(id: number | undefined) => void>(),
     availableQuizzes: undefined,
     courseOptions: [],
   },
@@ -86,14 +86,14 @@ const defaultResult: UseExampleAssignerReturn = {
       pageSize: 50,
       isOnFirstPage: true,
       isOnLastPage: true,
-      previousPage: vi.fn(),
-      nextPage: vi.fn(),
-      goToFirstPage: vi.fn(),
+      previousPage: vi.fn<() => void>(),
+      nextPage: vi.fn<() => void>(),
+      goToFirstPage: vi.fn<() => void>(),
     },
     isLoading: false,
     error: null,
     targetName: 'Student',
-    onGoingToQuiz: vi.fn(),
+    onGoingToQuiz: vi.fn<() => void>(),
   },
   assignedQuizExamplesProps: undefined,
   unassignedExamplesProps: {
@@ -108,9 +108,9 @@ const defaultResult: UseExampleAssignerReturn = {
     canAssign: true,
     activeStudentName: 'Test Student',
     quizName: null,
-    onClick: vi.fn(),
+    onClick: vi.fn<() => void>(),
   },
-  assignExamples: vi.fn(async () => Promise.resolve()),
+  assignExamples: vi.fn<() => Promise<void>>(async () => Promise.resolve()),
   assigningError: null,
 };
 

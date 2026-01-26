@@ -1,24 +1,21 @@
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
+import { mockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import { AssignedQuizExamplesTable } from '@interface/components/ExampleManager/AssignedExamplesTable';
-import {
-  mockUseStudentFlashcards,
-} from '@application/units/useStudentFlashcards.mock';
-import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { render, screen } from '@testing-library/react';
+import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { vi } from 'vitest';
 
 // Mock ExampleTable
 vi.mock('@interface/components/Tables', () => ({
   ExampleTable: ({ examples }: { examples: unknown[] }) => (
-    <div data-testid="example-table">
-      {examples.length} examples in table
-    </div>
+    <div data-testid="example-table">{examples.length} examples in table</div>
   ),
 }));
 
-describe('AssignedQuizExamplesTable', () => {
-  const mockStudentFlashcards: UseStudentFlashcardsReturn = mockUseStudentFlashcards;
+describe('assignedQuizExamplesTable', () => {
+  const mockStudentFlashcards: UseStudentFlashcardsReturn =
+    mockUseStudentFlashcards;
   const mockLessonPopup: LessonPopup = {
     lessonsByVocabulary: [],
     lessonsLoading: false,
@@ -65,7 +62,7 @@ describe('AssignedQuizExamplesTable', () => {
     render(
       <AssignedQuizExamplesTable
         examples={undefined}
-        isLoading={true}
+        isLoading
         error={null}
         targetName="Quiz 1"
         studentFlashcards={mockStudentFlashcards}
@@ -76,7 +73,9 @@ describe('AssignedQuizExamplesTable', () => {
     expect(
       screen.getByText('Examples Already Assigned to Quiz 1'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Loading assigned examples...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Loading assigned examples...'),
+    ).toBeInTheDocument();
   });
 
   it('should return null when no examples and not loading', () => {
@@ -110,7 +109,9 @@ describe('AssignedQuizExamplesTable', () => {
     );
 
     expect(
-      screen.getByText('Error loading assigned examples: Failed to load examples'),
+      screen.getByText(
+        'Error loading assigned examples: Failed to load examples',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -120,7 +121,7 @@ describe('AssignedQuizExamplesTable', () => {
     render(
       <AssignedQuizExamplesTable
         examples={examples}
-        isLoading={true}
+        isLoading
         error={null}
         targetName="Quiz 1"
         studentFlashcards={mockStudentFlashcards}
@@ -128,6 +129,8 @@ describe('AssignedQuizExamplesTable', () => {
       />,
     );
 
-    expect(screen.getByText('Loading assigned examples...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Loading assigned examples...'),
+    ).toBeInTheDocument();
   });
 });

@@ -2,7 +2,7 @@ import { AssignButton } from '@interface/components/ExampleManager/AssignButton'
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-describe('AssignButton', () => {
+describe('assignButton', () => {
   it('should render button text for student assignment', () => {
     const onClick = vi.fn();
 
@@ -11,7 +11,7 @@ describe('AssignButton', () => {
         assignmentType="students"
         unassignedCount={5}
         isAssigning={false}
-        canAssign={true}
+        canAssign
         activeStudentName="Test Student"
         quizName={null}
         onClick={onClick}
@@ -31,14 +31,16 @@ describe('AssignButton', () => {
         assignmentType="quiz"
         unassignedCount={3}
         isAssigning={false}
-        canAssign={true}
+        canAssign
         activeStudentName={null}
         quizName="Quiz 1"
         onClick={onClick}
       />,
     );
 
-    expect(screen.getByText('Assign 3 Examples to Quiz: Quiz 1')).toBeInTheDocument();
+    expect(
+      screen.getByText('Assign 3 Examples to Quiz: Quiz 1'),
+    ).toBeInTheDocument();
   });
 
   it('should show "Assigning..." when isAssigning is true', () => {
@@ -48,8 +50,8 @@ describe('AssignButton', () => {
       <AssignButton
         assignmentType="students"
         unassignedCount={5}
-        isAssigning={true}
-        canAssign={true}
+        isAssigning
+        canAssign
         activeStudentName="Test Student"
         quizName={null}
         onClick={onClick}
@@ -74,7 +76,9 @@ describe('AssignButton', () => {
       />,
     );
 
-    expect(screen.getByText('Please select a student first')).toBeInTheDocument();
+    expect(
+      screen.getByText('Please select a student first'),
+    ).toBeInTheDocument();
   });
 
   it('should show "Please select a quiz first" when no quiz is selected', () => {
@@ -122,7 +126,7 @@ describe('AssignButton', () => {
         assignmentType="students"
         unassignedCount={5}
         isAssigning={false}
-        canAssign={true}
+        canAssign
         activeStudentName="Test Student"
         quizName={null}
         onClick={onClick}

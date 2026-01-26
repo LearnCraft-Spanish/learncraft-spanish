@@ -1,24 +1,21 @@
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
+import { mockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import { ExamplesToAssignTable } from '@interface/components/ExampleManager/ExamplesToAssignTable';
-import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
-import {
-  mockUseStudentFlashcards,
-} from '@application/units/useStudentFlashcards.mock';
 import { render, screen } from '@testing-library/react';
+import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { vi } from 'vitest';
 
 // Mock ExampleTable
 vi.mock('@interface/components/Tables', () => ({
   ExampleTable: ({ examples }: { examples: unknown[] }) => (
-    <div data-testid="example-table">
-      {examples.length} examples in table
-    </div>
+    <div data-testid="example-table">{examples.length} examples in table</div>
   ),
 }));
 
-describe('ExamplesToAssignTable', () => {
-  const mockStudentFlashcards: UseStudentFlashcardsReturn = mockUseStudentFlashcards;
+describe('examplesToAssignTable', () => {
+  const mockStudentFlashcards: UseStudentFlashcardsReturn =
+    mockUseStudentFlashcards;
   const mockLessonPopup: LessonPopup = {
     lessonsByVocabulary: [],
     lessonsLoading: false,

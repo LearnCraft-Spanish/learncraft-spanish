@@ -2,7 +2,7 @@ import { QuizAssignmentSelector } from '@interface/components/ExampleManager/Qui
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-describe('QuizAssignmentSelector', () => {
+describe('quizAssignmentSelector', () => {
   const defaultProps = {
     selectedCourseCode: 'none',
     onCourseCodeChange: vi.fn(),

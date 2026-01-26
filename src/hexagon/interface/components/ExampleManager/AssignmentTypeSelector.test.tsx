@@ -2,7 +2,7 @@ import { AssignmentTypeSelector } from '@interface/components/ExampleManager/Ass
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-describe('AssignmentTypeSelector', () => {
+describe('assignmentTypeSelector', () => {
   it('should render with student assignment type', () => {
     const onToggle = vi.fn();
 
@@ -10,9 +10,7 @@ describe('AssignmentTypeSelector', () => {
       <AssignmentTypeSelector assignmentType="students" onToggle={onToggle} />,
     );
 
-    expect(
-      screen.getByText('Switch to Quiz Assignment'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Switch to Quiz Assignment')).toBeInTheDocument();
   });
 
   it('should render with quiz assignment type', () => {

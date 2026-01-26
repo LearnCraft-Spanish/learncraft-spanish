@@ -4,13 +4,10 @@ import {
   resetMockUseExampleAssigner,
 } from '@application/useCases/useExampleAssigner/useExampleAssigner.mock';
 import ExampleAssigner from '@interface/components/ExampleManager/ExampleAssigner';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
-import {
-  createMockFlashcard,
-  createMockFlashcardList,
-} from '@testing/factories/flashcardFactory';
+import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the use case hook
@@ -29,7 +26,7 @@ vi.mock('@interface/hooks/useModal', () => ({
   }),
 }));
 
-describe('ExampleAssigner', () => {
+describe('exampleAssigner', () => {
   beforeEach(() => {
     resetMockUseExampleAssigner();
     mockOpenModal.mockClear();
@@ -48,7 +45,9 @@ describe('ExampleAssigner', () => {
       </MockAllProviders>,
     );
 
-    expect(screen.getByText('Loading selected examples...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Loading selected examples...'),
+    ).toBeInTheDocument();
   });
 
   it('should show message when no examples are selected', () => {
@@ -119,9 +118,7 @@ describe('ExampleAssigner', () => {
     );
 
     expect(screen.getByText('Assign Examples')).toBeInTheDocument();
-    expect(
-      screen.getByText('Switch to Quiz Assignment'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Switch to Quiz Assignment')).toBeInTheDocument();
   });
 
   it('should show student assignment selector when in student mode', () => {
