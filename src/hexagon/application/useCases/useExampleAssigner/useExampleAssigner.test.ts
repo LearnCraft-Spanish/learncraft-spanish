@@ -233,7 +233,6 @@ describe('useExampleAssigner', () => {
         'Test Student',
       );
     });
-
   });
 
   describe('quiz assignment mode', () => {

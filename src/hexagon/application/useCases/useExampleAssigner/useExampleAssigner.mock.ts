@@ -151,11 +151,17 @@ export const overrideMockUseExampleAssigner = (
     ...config,
     assignmentTypeSelectorProps:
       config.assignmentTypeSelectorProps != null
-        ? { ...defaultResult.assignmentTypeSelectorProps, ...config.assignmentTypeSelectorProps }
+        ? {
+            ...defaultResult.assignmentTypeSelectorProps,
+            ...config.assignmentTypeSelectorProps,
+          }
         : defaultResult.assignmentTypeSelectorProps,
     studentSelectionProps:
       config.studentSelectionProps != null
-        ? { ...defaultResult.studentSelectionProps, ...config.studentSelectionProps }
+        ? {
+            ...defaultResult.studentSelectionProps,
+            ...config.studentSelectionProps,
+          }
         : defaultResult.studentSelectionProps,
     quizSelectionProps:
       config.quizSelectionProps != null
