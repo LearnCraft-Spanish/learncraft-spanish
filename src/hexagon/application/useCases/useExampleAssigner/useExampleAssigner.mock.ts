@@ -180,17 +180,17 @@ export const overrideMockUseExampleAssigner = (
         : defaultResult.assignButtonProps,
     assignedStudentFlashcardsProps:
       config.assignedStudentFlashcardsProps != null
-        ? {
+        ? ({
             ...defaultResult.assignedStudentFlashcardsProps,
             ...config.assignedStudentFlashcardsProps,
-          }
+          } as AssignedStudentFlashcardsProps)
         : defaultResult.assignedStudentFlashcardsProps,
     assignedQuizExamplesProps:
       config.assignedQuizExamplesProps !== undefined
-        ? {
+        ? ({
             ...(defaultResult.assignedQuizExamplesProps ?? {}),
             ...config.assignedQuizExamplesProps,
-          }
+          } as AssignedQuizExamplesProps)
         : defaultResult.assignedQuizExamplesProps,
   };
   mockUseExampleAssigner.mockReturnValue(mockResult);
