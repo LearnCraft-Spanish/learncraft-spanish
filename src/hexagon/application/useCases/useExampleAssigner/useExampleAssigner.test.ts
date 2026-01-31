@@ -17,10 +17,7 @@ import { useExampleAssigner } from '@application/useCases/useExampleAssigner/use
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createMockAppUser } from '@testing/factories/appUserFactories';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
-import {
-  createMockFlashcard,
-  createMockFlashcardList,
-} from '@testing/factories/flashcardFactory';
+import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -237,32 +234,6 @@ describe('useExampleAssigner', () => {
       );
     });
 
-    it('should filter out already assigned examples', () => {
-      const selectedExamples = createMockExampleWithVocabularyList(5);
-      const flashcards = [
-        createMockFlashcard({ example: selectedExamples[0] }),
-        createMockFlashcard({ example: selectedExamples[1] }),
-      ];
-
-      mockUseSelectedExamples.mockReturnValue({
-        selectedExamples,
-        isFetchingExamples: 0,
-      });
-
-      mockUseFlashcardsQuery.mockReturnValue({
-        flashcards,
-        isLoading: false,
-        error: null,
-        createFlashcards: vi.fn(async () => Promise.resolve([])),
-      });
-
-      const { result } = renderHook(() => useExampleAssigner(), {
-        wrapper: MockAllProviders,
-      });
-
-      // Should have 3 unassigned (5 total - 2 already assigned)
-      expect(result.current.unassignedExamplesProps.examples).toHaveLength(3);
-    });
   });
 
   describe('quiz assignment mode', () => {

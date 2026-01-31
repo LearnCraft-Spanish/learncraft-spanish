@@ -12,7 +12,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the use case hook
 vi.mock('@application/useCases/useExampleAssigner/useExampleAssigner', () => ({
-  useExampleAssigner: () => mockUseExampleAssigner,
+  useExampleAssigner: () => mockUseExampleAssigner(),
 }));
 
 // Mock useModal
@@ -91,14 +91,7 @@ describe('exampleAssigner', () => {
         availableQuizzes: undefined,
         courseOptions: [],
       },
-      unassignedExamplesProps: {
-        examples,
-        studentFlashcards: {} as any,
-        lessonPopup: {
-          lessonsByVocabulary: [],
-          lessonsLoading: false,
-        },
-      },
+      unassignedExamplesProps: { examples },
       assignButtonProps: {
         assignmentType: 'students',
         unassignedCount: 3,
@@ -142,14 +135,7 @@ describe('exampleAssigner', () => {
         availableQuizzes: undefined,
         courseOptions: [],
       },
-      unassignedExamplesProps: {
-        examples,
-        studentFlashcards: {} as any,
-        lessonPopup: {
-          lessonsByVocabulary: [],
-          lessonsLoading: false,
-        },
-      },
+      unassignedExamplesProps: { examples },
       assignButtonProps: {
         assignmentType: 'students',
         unassignedCount: 2,
@@ -201,14 +187,7 @@ describe('exampleAssigner', () => {
         ],
         courseOptions: [{ code: 'SP101', name: 'Spanish 101' }],
       },
-      unassignedExamplesProps: {
-        examples,
-        studentFlashcards: {} as any,
-        lessonPopup: {
-          lessonsByVocabulary: [],
-          lessonsLoading: false,
-        },
-      },
+      unassignedExamplesProps: { examples },
       assignButtonProps: {
         assignmentType: 'quiz',
         unassignedCount: 2,
@@ -275,14 +254,7 @@ describe('exampleAssigner', () => {
         targetName: 'Test Student',
         onGoingToQuiz: vi.fn(),
       },
-      unassignedExamplesProps: {
-        examples,
-        studentFlashcards: {} as any,
-        lessonPopup: {
-          lessonsByVocabulary: [],
-          lessonsLoading: false,
-        },
-      },
+      unassignedExamplesProps: { examples },
       assignButtonProps: {
         assignmentType: 'students',
         unassignedCount: 3,
@@ -336,14 +308,7 @@ describe('exampleAssigner', () => {
         availableQuizzes: undefined,
         courseOptions: [],
       },
-      unassignedExamplesProps: {
-        examples,
-        studentFlashcards: {} as any,
-        lessonPopup: {
-          lessonsByVocabulary: [],
-          lessonsLoading: false,
-        },
-      },
+      unassignedExamplesProps: { examples },
       assignButtonProps: {
         assignmentType: 'students',
         unassignedCount: 2,

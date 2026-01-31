@@ -13,6 +13,7 @@ import { useSelectedExamples } from '@application/units/ExampleSearchInterface/u
 import { usePagination } from '@application/units/Pagination/usePagination';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
+import { getUnassignedExamples } from '@application/useCases/useExampleAssigner/helpers';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -198,21 +199,18 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   // For quiz mode: use quiz examples (ExampleTable expects ExampleWithVocabulary[])
 
   // Filter out examples that are already assigned (for unassigned list)
-  // Uses Set-based deduplication for O(1) lookup performance when filtering large lists
   const unassignedExamples = useMemo(() => {
     if (assignmentType === 'students' && flashcards) {
-      // Filter selected examples that aren't already flashcards
       const flashcardExampleIds = new Set(
         flashcards.map((fc) => fc.example.id),
       );
-      return selectedExamples.filter((ex) => !flashcardExampleIds.has(ex.id));
+      return getUnassignedExamples(selectedExamples, flashcardExampleIds);
     }
     if (assignmentType === 'quiz' && quizExamples) {
-      // Filter selected examples that aren't already in quiz
       const quizExampleIds = new Set(quizExamples.map((ex) => ex.id));
-      return selectedExamples.filter((ex) => !quizExampleIds.has(ex.id));
+      return getUnassignedExamples(selectedExamples, quizExampleIds);
     }
-    return selectedExamples;
+    return getUnassignedExamples(selectedExamples, undefined);
   }, [assignmentType, flashcards, quizExamples, selectedExamples]);
 
   // Mutations

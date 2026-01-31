@@ -1,15 +1,38 @@
 import type { LessonPopup } from '@application/units/useLessonPopup';
 import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
-import type { UseExampleAssignerReturn } from '@application/useCases/useExampleAssigner/useExampleAssigner';
+import type {
+  AssignButtonProps,
+  AssignedQuizExamplesProps,
+  AssignedStudentFlashcardsProps,
+  AssignmentTypeSelectorProps,
+  QuizSelectionProps,
+  StudentSelectionProps,
+  UnassignedExamplesProps,
+  UseExampleAssignerReturn,
+} from '@application/useCases/useExampleAssigner/useExampleAssigner';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import {
   createMockFlashcard,
   createMockFlashcardList,
 } from '@testing/factories/flashcardFactory';
-import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 
-const defaultMockStudentFlashcards: UseStudentFlashcardsReturn = {
+/** Override config: top-level and nested props are partial; defaults fill the rest. */
+export interface UseExampleAssignerOverrideConfig {
+  selectedExamples?: UseExampleAssignerReturn['selectedExamples'];
+  isFetchingSelectedExamples?: UseExampleAssignerReturn['isFetchingSelectedExamples'];
+  assignmentTypeSelectorProps?: Partial<AssignmentTypeSelectorProps>;
+  studentSelectionProps?: Partial<StudentSelectionProps>;
+  quizSelectionProps?: Partial<QuizSelectionProps>;
+  assignedStudentFlashcardsProps?: Partial<AssignedStudentFlashcardsProps>;
+  assignedQuizExamplesProps?: Partial<AssignedQuizExamplesProps>;
+  unassignedExamplesProps?: Partial<UnassignedExamplesProps>;
+  assignButtonProps?: Partial<AssignButtonProps>;
+  assignExamples?: UseExampleAssignerReturn['assignExamples'];
+  assigningError?: UseExampleAssignerReturn['assigningError'];
+}
+
+export const defaultMockStudentFlashcards: UseStudentFlashcardsReturn = {
   flashcards: createMockFlashcardList()(3),
   flashcardsDueForReview: createMockFlashcardList()(2),
   customFlashcards: createMockFlashcardList()(1),
@@ -51,7 +74,7 @@ const defaultMockStudentFlashcards: UseStudentFlashcardsReturn = {
   },
 };
 
-const defaultMockLessonPopup: LessonPopup = {
+export const defaultMockLessonPopup: LessonPopup = {
   lessonsByVocabulary: [],
   lessonsLoading: false,
 };
@@ -114,10 +137,62 @@ const defaultResult: UseExampleAssignerReturn = {
   assigningError: null,
 };
 
-export const {
-  mock: mockUseExampleAssigner,
-  override: overrideMockUseExampleAssigner,
-  reset: resetMockUseExampleAssigner,
-} = createOverrideableMock<UseExampleAssignerReturn>(defaultResult);
+// Create function mock following useFrequensay pattern for interface component tests
+export const mockUseExampleAssigner = vi
+  .fn<() => UseExampleAssignerReturn>()
+  .mockReturnValue(defaultResult);
+
+export const overrideMockUseExampleAssigner = (
+  config: UseExampleAssignerOverrideConfig = {},
+) => {
+  // Partial overrides; defaults fill the rest (same pattern as createOverrideableMock / useFrequensay).
+  const mockResult: UseExampleAssignerReturn = {
+    ...defaultResult,
+    ...config,
+    assignmentTypeSelectorProps:
+      config.assignmentTypeSelectorProps != null
+        ? { ...defaultResult.assignmentTypeSelectorProps, ...config.assignmentTypeSelectorProps }
+        : defaultResult.assignmentTypeSelectorProps,
+    studentSelectionProps:
+      config.studentSelectionProps != null
+        ? { ...defaultResult.studentSelectionProps, ...config.studentSelectionProps }
+        : defaultResult.studentSelectionProps,
+    quizSelectionProps:
+      config.quizSelectionProps != null
+        ? { ...defaultResult.quizSelectionProps, ...config.quizSelectionProps }
+        : defaultResult.quizSelectionProps,
+    unassignedExamplesProps:
+      config.unassignedExamplesProps != null
+        ? {
+            ...defaultResult.unassignedExamplesProps,
+            ...config.unassignedExamplesProps,
+          }
+        : defaultResult.unassignedExamplesProps,
+    assignButtonProps:
+      config.assignButtonProps != null
+        ? { ...defaultResult.assignButtonProps, ...config.assignButtonProps }
+        : defaultResult.assignButtonProps,
+    assignedStudentFlashcardsProps:
+      config.assignedStudentFlashcardsProps != null
+        ? {
+            ...defaultResult.assignedStudentFlashcardsProps,
+            ...config.assignedStudentFlashcardsProps,
+          }
+        : defaultResult.assignedStudentFlashcardsProps,
+    assignedQuizExamplesProps:
+      config.assignedQuizExamplesProps !== undefined
+        ? {
+            ...(defaultResult.assignedQuizExamplesProps ?? {}),
+            ...config.assignedQuizExamplesProps,
+          }
+        : defaultResult.assignedQuizExamplesProps,
+  };
+  mockUseExampleAssigner.mockReturnValue(mockResult);
+  return mockResult;
+};
+
+export const resetMockUseExampleAssigner = () => {
+  mockUseExampleAssigner.mockReturnValue(defaultResult);
+};
 
 export default mockUseExampleAssigner;
