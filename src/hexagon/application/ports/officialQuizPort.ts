@@ -9,10 +9,12 @@ export interface OfficialQuizPort {
     courseCode,
     quizNumber,
     vocabularyComplete,
+    ignoreCache,
   }: {
     courseCode: string;
     quizNumber: number;
     vocabularyComplete?: boolean;
+    ignoreCache?: boolean;
   }) => Promise<ExampleWithVocabulary[]>;
   addExamplesToOfficialQuiz: ({
     courseCode,

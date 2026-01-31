@@ -27,10 +27,12 @@ export function createOfficialQuizInfrastructure(
       courseCode,
       quizNumber,
       vocabularyComplete,
+      ignoreCache,
     }: {
       courseCode: string;
       quizNumber: number;
       vocabularyComplete?: boolean;
+      ignoreCache?: boolean;
     }) => {
       const params = new URLSearchParams();
       if (vocabularyComplete !== undefined) {
@@ -43,8 +45,11 @@ export function createOfficialQuizInfrastructure(
           .replace(':quizNumber', quizNumber.toString()) +
         (params.toString() ? `?${params.toString()}` : '');
 
+      const pathWithQueryParams =
+        pathWithParams + (ignoreCache ? '?ignoreCache=true' : '');
+
       const response = await httpClient.get<ExampleWithVocabulary[]>(
-        pathWithParams,
+        pathWithQueryParams,
         getOfficialQuizExamplesEndpoint.requiredScopes,
       );
       return response;

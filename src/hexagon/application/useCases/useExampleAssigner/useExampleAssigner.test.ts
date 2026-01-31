@@ -1,3 +1,4 @@
+import type { UseQuizExampleMutationsReturn } from '@application/queries/useQuizExampleMutations';
 import type { ExampleWithVocabulary } from '@learncraft-spanish/shared';
 import {
   mockActiveStudent,
@@ -34,17 +35,31 @@ const mockUseFlashcardsQuery = vi.fn(() => ({
   createFlashcards: vi.fn(async () => Promise.resolve([])),
 }));
 
-const mockUseQuizExamplesQuery = vi.fn(() => ({
+interface QuizExamplesQueryReturn {
+  quizExamples: ExampleWithVocabulary[] | undefined;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+const defaultQuizExamplesQueryReturn: QuizExamplesQueryReturn = {
   quizExamples: undefined,
   isLoading: false,
   error: null,
-}));
+};
 
-const mockUseQuizExampleMutations = vi.fn(() => ({
+const mockUseQuizExamplesQuery = vi.fn(
+  (): QuizExamplesQueryReturn => defaultQuizExamplesQueryReturn,
+);
+
+const defaultQuizExampleMutationsReturn: UseQuizExampleMutationsReturn = {
   addExamplesToQuiz: vi.fn(async () => Promise.resolve(1)),
   isAddingExamples: false,
   addingExamplesError: null,
-}));
+};
+
+const mockUseQuizExampleMutations = vi.fn(
+  (): UseQuizExampleMutationsReturn => defaultQuizExampleMutationsReturn,
+);
 
 const mockUseLessonPopup = vi.fn(() => ({
   lessonPopup: {
@@ -236,7 +251,7 @@ describe('useExampleAssigner', () => {
   });
 
   describe('quiz assignment mode', () => {
-    it('should show quiz examples when quiz is selected', () => {
+    it('should show quiz examples when quiz is selected', async () => {
       const quizExamples = createMockExampleWithVocabularyList(2);
       const officialQuizzes = [
         {
@@ -252,12 +267,11 @@ describe('useExampleAssigner', () => {
         isLoading: false,
       });
 
-      // Mock returns data which can be undefined, so we need to cast
       mockUseQuizExamplesQuery.mockReturnValue({
-        quizExamples: quizExamples as ExampleWithVocabulary[] | undefined,
+        quizExamples,
         isLoading: false,
         error: null,
-      } as ReturnType<typeof mockUseQuizExamplesQuery>);
+      });
 
       const { result } = renderHook(() => useExampleAssigner(), {
         wrapper: MockAllProviders,
@@ -274,7 +288,7 @@ describe('useExampleAssigner', () => {
         result.current.quizSelectionProps.onQuizRecordIdChange(1);
       });
 
-      waitFor(() => {
+      await waitFor(() => {
         expect(result.current.assignedQuizExamplesProps).toBeDefined();
         expect(result.current.assignedQuizExamplesProps?.examples).toHaveLength(
           2,
@@ -377,8 +391,8 @@ describe('useExampleAssigner', () => {
       mockUseQuizExampleMutations.mockReturnValue({
         addExamplesToQuiz: vi.fn(async () => Promise.resolve(1)),
         isAddingExamples: false,
-        addingExamplesError: error as Error | null,
-      } as ReturnType<typeof mockUseQuizExampleMutations>);
+        addingExamplesError: error,
+      });
 
       const { result } = renderHook(() => useExampleAssigner(), {
         wrapper: MockAllProviders,

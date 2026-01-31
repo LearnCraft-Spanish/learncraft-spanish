@@ -190,6 +190,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   } = useQuizExamplesQuery({
     courseCode: selectedQuizRecord?.courseCode || '',
     quizNumber: selectedQuizRecord?.quizNumber || 0,
+    ignoreCache: true,
   });
 
   // Query flashcards when a student is active (always enabled to show current state)

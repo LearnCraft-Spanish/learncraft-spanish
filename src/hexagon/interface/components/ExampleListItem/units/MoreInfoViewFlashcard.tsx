@@ -71,7 +71,7 @@ export default function MoreInfoViewFlashcard({
           </div>
         </div>
         <div className="vocabTagsList">
-          {flashcard.example.vocabulary.map((vocab) => (
+          {(flashcard.example.vocabulary ?? []).map((vocab) => (
             <VocabTagContainer
               key={vocab.id}
               exampleId={flashcard.example.id}
