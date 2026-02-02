@@ -36,7 +36,7 @@ export function AssignedQuizExamplesTable({
       previousPage: () => {},
       resetPagination: () => {},
     };
-  }, [examples?.length]);
+  }, [examples]);
 
   // Show loading state even when no examples yet (to provide real-time feedback)
   if (isLoading && !examples) {
