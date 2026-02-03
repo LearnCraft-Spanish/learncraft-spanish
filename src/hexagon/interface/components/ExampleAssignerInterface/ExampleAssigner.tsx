@@ -1,13 +1,12 @@
 import { useExampleAssigner } from '@application/useCases/useExampleAssigner/useExampleAssigner';
-import { AssignButton } from '@interface/components/ExampleManager/AssignButton';
-import { AssignedQuizExamplesTable } from '@interface/components/ExampleManager/AssignedExamplesTable';
-import { AssignedStudentFlashcardsTable } from '@interface/components/ExampleManager/AssignedStudentFlashcardsTable';
-import { AssignmentTypeSelector } from '@interface/components/ExampleManager/AssignmentTypeSelector';
-import { ExamplesToAssignTable } from '@interface/components/ExampleManager/ExamplesToAssignTable';
-import { QuizAssignmentSelector } from '@interface/components/ExampleManager/QuizAssignmentSelector';
-import { StudentAssignmentSelector } from '@interface/components/ExampleManager/StudentAssignmentSelector';
+import { AssignButton } from '@interface/components/ExampleAssignerInterface/AssignButton';
+import { AssignedQuizExamplesTable } from '@interface/components/ExampleAssignerInterface/AssignedQuizExamplesTable';
+import { AssignedStudentFlashcardsTable } from '@interface/components/ExampleAssignerInterface/AssignedStudentFlashcardsTable';
+import { AssignmentTypeSelector } from '@interface/components/ExampleAssignerInterface/AssignmentTypeSelector';
+import { ExamplesToAssignTable } from '@interface/components/ExampleAssignerInterface/ExamplesToAssignTable';
+import { QuizAssignmentSelector } from '@interface/components/ExampleAssignerInterface/QuizAssignmentSelector';
+import { StudentAssignmentSelector } from '@interface/components/ExampleAssignerInterface/StudentAssignmentSelector';
 import { useModal } from '@interface/hooks/useModal';
-import './ExampleManager.scss';
 
 export default function ExampleAssigner() {
   const {

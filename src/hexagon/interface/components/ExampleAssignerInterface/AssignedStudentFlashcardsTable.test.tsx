@@ -1,4 +1,4 @@
-import { AssignedStudentFlashcardsTable } from '@interface/components/ExampleManager/AssignedStudentFlashcardsTable';
+import { AssignedStudentFlashcardsTable } from '@interface/components/ExampleAssignerInterface/AssignedStudentFlashcardsTable';
 import { render, screen } from '@testing-library/react';
 import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import { vi } from 'vitest';

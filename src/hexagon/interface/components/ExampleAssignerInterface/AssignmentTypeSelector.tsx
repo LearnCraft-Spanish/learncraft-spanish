@@ -1,5 +1,3 @@
-import './ExampleManager.scss';
-
 interface AssignmentTypeSelectorProps {
   assignmentType: 'students' | 'quiz';
   onToggle: () => void;

@@ -1,4 +1,4 @@
-import { AssignButton } from '@interface/components/ExampleManager/AssignButton';
+import { AssignButton } from '@interface/components/ExampleAssignerInterface/AssignButton';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 

@@ -1,4 +1,4 @@
-import { StudentAssignmentSelector } from '@interface/components/ExampleManager/StudentAssignmentSelector';
+import { StudentAssignmentSelector } from '@interface/components/ExampleAssignerInterface/StudentAssignmentSelector';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 

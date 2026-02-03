@@ -1,7 +1,7 @@
 import { SelectedExamplesProvider } from '@application/coordinators/providers/SelectedExamplesProvider';
+import ExampleAssigner from '@interface/components/ExampleAssignerInterface/ExampleAssigner';
 import ExampleCreator from '@interface/components/ExampleCreatorInterface/ExampleCreator';
 import { ExampleEditor } from '@interface/components/ExampleEditorInterface/ExampleEditor';
-import ExampleAssigner from '@interface/components/ExampleManager/ExampleAssigner';
 import ExampleManagerNav from '@interface/components/ExampleManager/ExampleManagerNav';
 import ExampleSearch from '@interface/components/ExampleSearchInterface/ExampleSearch';
 import { useCallback, useState } from 'react';

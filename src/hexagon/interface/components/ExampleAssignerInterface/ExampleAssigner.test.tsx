@@ -3,7 +3,7 @@ import {
   overrideMockUseExampleAssigner,
   resetMockUseExampleAssigner,
 } from '@application/useCases/useExampleAssigner/useExampleAssigner.mock';
-import ExampleAssigner from '@interface/components/ExampleManager/ExampleAssigner';
+import ExampleAssigner from '@interface/components/ExampleAssignerInterface/ExampleAssigner';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockFlashcardList } from '@testing/factories/flashcardFactory';

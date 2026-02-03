@@ -1,4 +1,4 @@
-import { QuizAssignmentSelector } from '@interface/components/ExampleManager/QuizAssignmentSelector';
+import { QuizAssignmentSelector } from '@interface/components/ExampleAssignerInterface/QuizAssignmentSelector';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
