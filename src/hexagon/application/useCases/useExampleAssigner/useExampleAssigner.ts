@@ -13,6 +13,7 @@ import useLessonPopup from '@application/units/useLessonPopup';
 import { getUnassignedExamples } from '@application/useCases/useExampleAssigner/helpers';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
+import { toast } from 'react-toastify';
 
 export type AssignmentType = 'students' | 'quiz';
 
@@ -64,6 +65,7 @@ export interface AssignedQuizExamplesProps {
 export interface UnassignedExamplesProps {
   examples: ExampleWithVocabulary[];
   studentFlashcards: Flashcard[] | undefined;
+  totalSelectedExamplesCount: number;
   lessonPopup: LessonPopup;
 }
 
@@ -165,6 +167,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   const {
     flashcards: studentFlashcards,
     isLoading: isLoadingFlashcards,
+    isFetchingFlashcards,
     error: flashcardsError,
   } = useFlashcardsQuery();
 
@@ -172,6 +175,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   const {
     quizExamples,
     isLoading: isLoadingQuizExamples,
+    isFetching: isFetchingQuizExamples,
     error: quizExamplesError,
   } = useQuizExamplesQuery({
     courseCode: selectedQuizRecord?.courseCode || '',
@@ -218,17 +222,29 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       if (!appUser?.recordId) {
         throw new Error('No active student selected');
       }
-      await createFlashcards(selectedExamples);
+      const createFlashcardsPromise = createFlashcards(selectedExamples);
+      toast.promise(createFlashcardsPromise, {
+        pending: 'Assigning flashcards...',
+        success: 'Flashcards assigned',
+        error: 'Failed to assign flashcards',
+      });
+      await createFlashcardsPromise;
     } else if (assignmentType === 'quiz') {
       if (!selectedQuizRecord) {
         throw new Error('No quiz selected');
       }
       const exampleIds = selectedExamples.map((ex) => ex.id);
-      await addExamplesToQuiz({
+      const addExamplesToQuizPromise = addExamplesToQuiz({
         courseCode: selectedQuizRecord.courseCode,
         quizNumber: selectedQuizRecord.quizNumber,
         exampleIds,
       });
+      toast.promise(addExamplesToQuizPromise, {
+        pending: 'Adding examples to quiz...',
+        success: 'Examples added to quiz',
+        error: 'Failed to add examples to quiz',
+      });
+      await addExamplesToQuizPromise;
     }
   }, [
     selectedExamples,
@@ -268,7 +284,12 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       unassignedExamples.length > 0 &&
       !isAddingExamples &&
       ((assignmentType === 'students' && appUser !== null) ||
-        (assignmentType === 'quiz' && selectedQuizRecord !== undefined)),
+        (assignmentType === 'quiz' && selectedQuizRecord !== undefined)) &&
+      !isLoadingFlashcards &&
+      !isFetchingFlashcards &&
+      !isLoadingQuizExamples &&
+      !isFetchingQuizExamples &&
+      !isLoadingQuizzes,
     [
       selectedExamples.length,
       unassignedExamples.length,
@@ -276,6 +297,11 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       assignmentType,
       appUser,
       selectedQuizRecord,
+      isLoadingFlashcards,
+      isFetchingFlashcards,
+      isLoadingQuizExamples,
+      isFetchingQuizExamples,
+      isLoadingQuizzes,
     ],
   );
 
@@ -321,7 +347,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     if (assignmentType !== 'students' || !studentFlashcards) return undefined;
     return {
       studentFlashcards,
-      isLoading: isLoadingFlashcards,
+      isLoading: isLoadingFlashcards || isFetchingFlashcards,
       error: flashcardsError,
       targetName,
       lessonPopup,
@@ -330,6 +356,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     assignmentType,
     studentFlashcards,
     isLoadingFlashcards,
+    isFetchingFlashcards,
     flashcardsError,
     targetName,
     lessonPopup,
@@ -342,7 +369,8 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     if (assignmentType !== 'quiz' || !quizExamples) return undefined;
     return {
       examples: quizExamples,
-      isLoading: isLoadingQuizExamples || isLoadingQuizzes,
+      isLoading:
+        isLoadingQuizExamples || isLoadingQuizzes || isFetchingQuizExamples,
       error: quizExamplesError,
       targetName,
       studentFlashcards,
@@ -353,6 +381,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     quizExamples,
     isLoadingQuizExamples,
     isLoadingQuizzes,
+    isFetchingQuizExamples,
     quizExamplesError,
     targetName,
     studentFlashcards,
@@ -363,9 +392,24 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     () => ({
       examples: unassignedExamples,
       studentFlashcards: studentFlashcards || [],
+      totalSelectedExamplesCount: selectedExamples.length,
       lessonPopup,
+      isLoading:
+        isLoadingFlashcards ||
+        isFetchingFlashcards ||
+        isFetchingQuizExamples ||
+        isLoadingQuizExamples,
     }),
-    [unassignedExamples, studentFlashcards, lessonPopup],
+    [
+      unassignedExamples,
+      studentFlashcards,
+      lessonPopup,
+      selectedExamples.length,
+      isLoadingFlashcards,
+      isFetchingFlashcards,
+      isFetchingQuizExamples,
+      isLoadingQuizExamples,
+    ],
   );
 
   const assignButtonProps = useMemo<AssignButtonProps>(

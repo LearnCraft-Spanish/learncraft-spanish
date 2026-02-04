@@ -1,5 +1,5 @@
 import type { AssignedQuizExamplesProps } from '@application/useCases/useExampleAssigner/useExampleAssigner';
-
+import { InlineLoading } from '@interface/components/Loading';
 import SimpleExampleTable from '@interface/components/Tables/SimpleExampleTable';
 // interface AssignedQuizExamplesTableProps {
 //   examples: ExampleWithVocabulary[] | undefined;
@@ -17,38 +17,34 @@ export function AssignedQuizExamplesTable({
   lessonPopup,
 }: AssignedQuizExamplesProps) {
   // Show loading state even when no examples yet (to provide real-time feedback)
-  if (isLoading && !examples) {
+  if (isLoading) {
     return (
       <>
-        <h4>Examples Already Assigned to {targetName}</h4>
-        <div>Loading assigned examples...</div>
+        <InlineLoading message="Loading quiz examples..." />
       </>
     );
   }
 
   // Don't show table if no examples and not loading
-  if (!examples || examples.length === 0) {
+  if (!examples && !isLoading) {
     return null;
   }
 
   return (
     <>
       <h4>
-        Examples Already Assigned to {targetName} ({examples.length})
+        Examples Already Assigned to {targetName} ({examples?.length || 0})
       </h4>
       {error && (
         <div className="error">
           Error loading assigned examples: {error.message}
         </div>
       )}
-      {isLoading ? (
-        <div>Loading assigned examples...</div>
-      ) : (
-        <SimpleExampleTable
-          examples={examples}
-          lessonPopupProps={lessonPopup}
-        />
-      )}
+
+      <SimpleExampleTable
+        examples={examples || []}
+        lessonPopupProps={lessonPopup}
+      />
     </>
   );
 }

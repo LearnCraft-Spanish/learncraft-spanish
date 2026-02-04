@@ -1,5 +1,5 @@
 import type { AssignedStudentFlashcardsProps } from '@application/useCases/useExampleAssigner/useExampleAssigner';
-
+import { InlineLoading } from '@interface/components/Loading';
 import SimpleExampleTable from '@interface/components/Tables/SimpleExampleTable';
 // interface AssignedStudentFlashcardsTableProps {
 //   studentFlashcards: Flashcard[];
@@ -21,8 +21,7 @@ export function AssignedStudentFlashcardsTable({
   if (isLoading) {
     return (
       <>
-        {/* <h4>Examples Already Assigned to {targetName}</h4> */}
-        <div>Loading assigned flashcards...</div>
+        <InlineLoading message="Loading student flashcards..." />
       </>
     );
   }

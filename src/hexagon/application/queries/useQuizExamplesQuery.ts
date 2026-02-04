@@ -20,6 +20,7 @@ export function useQuizExamplesQuery({
   return {
     quizExamples: quizExamplesQuery.data,
     isLoading: quizExamplesQuery.isLoading,
+    isFetching: quizExamplesQuery.isFetching,
     error: quizExamplesQuery.error,
   };
 }
