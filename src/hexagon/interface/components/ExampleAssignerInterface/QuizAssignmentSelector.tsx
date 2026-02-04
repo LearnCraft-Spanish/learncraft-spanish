@@ -1,3 +1,5 @@
+import { GenericDropdown } from '@interface/components/FormComponents';
+import './QuizAssignmentSelector.scss';
 interface QuizAssignmentSelectorProps {
   selectedCourseCode: string;
   onCourseCodeChange: (code: string) => void;
@@ -22,44 +24,39 @@ export function QuizAssignmentSelector({
   availableQuizzes,
   courseOptions,
 }: QuizAssignmentSelectorProps) {
+  const handleQuizNumberChange = (value: string) => {
+    onQuizRecordIdChange(Number.parseInt(value) || 0);
+  };
+
   return (
-    <div>
-      <p>Select a quiz to assign these examples to:</p>
-      <div className="quiz-selector">
-        <select
-          value={selectedCourseCode}
-          onChange={(e) => {
-            onCourseCodeChange(e.target.value);
-            onQuizRecordIdChange(undefined);
-          }}
-          className="styledInput"
-        >
-          <option value="none">Select Course</option>
-          {courseOptions.map((course) => (
-            <option key={course.code} value={course.code}>
-              {course.name}
-            </option>
-          ))}
-        </select>
-        {selectedCourseCode !== 'none' && availableQuizzes && (
-          <select
-            value={selectedQuizRecordId || ''}
-            onChange={(e) =>
-              onQuizRecordIdChange(
-                e.target.value ? Number(e.target.value) : undefined,
-              )
-            }
-            className="styledInput"
-          >
-            <option value="">Select a Quiz</option>
-            {availableQuizzes.map((quiz) => (
-              <option key={quiz.recordId} value={quiz.recordId}>
-                {quiz.quizNickname || `Quiz ${quiz.quizNumber}`}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
+    <div className="quiz-assignment-selector-container">
+      <GenericDropdown
+        label="Course"
+        selectedValue={selectedCourseCode}
+        onChange={onCourseCodeChange}
+        options={courseOptions.map((course) => ({
+          value: course.code,
+          text: course.name,
+        }))}
+        defaultOptionText="Select a Course"
+        editMode
+        required
+      />
+
+      <GenericDropdown
+        label="Quiz"
+        selectedValue={selectedQuizRecordId?.toString() || ''}
+        onChange={handleQuizNumberChange}
+        options={
+          availableQuizzes?.map((quiz) => ({
+            value: quiz.recordId.toString(),
+            text: quiz.quizNickname || `Quiz ${quiz.quizNumber}`,
+          })) || []
+        }
+        defaultOptionText="Select a Quiz"
+        editMode
+        required
+      />
     </div>
   );
 }

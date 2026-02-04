@@ -212,7 +212,7 @@ describe('useExampleAssigner', () => {
       );
 
       await act(async () => {
-        result.current.assignmentTypeSelectorProps.onToggle();
+        result.current.assignmentTypeSelectorProps.onTypeChange('quiz');
       });
 
       await waitFor(() => {
@@ -279,7 +279,7 @@ describe('useExampleAssigner', () => {
 
       // Switch to quiz mode
       act(() => {
-        result.current.assignmentTypeSelectorProps.onToggle();
+        result.current.assignmentTypeSelectorProps.onTypeChange('quiz');
       });
 
       // Select course and quiz
@@ -363,7 +363,7 @@ describe('useExampleAssigner', () => {
 
       // Switch to quiz mode and select quiz
       act(() => {
-        result.current.assignmentTypeSelectorProps.onToggle();
+        result.current.assignmentTypeSelectorProps.onTypeChange('quiz');
         result.current.quizSelectionProps.onCourseCodeChange('SP101');
         result.current.quizSelectionProps.onQuizRecordIdChange(1);
       });

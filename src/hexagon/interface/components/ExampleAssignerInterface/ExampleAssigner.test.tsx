@@ -78,7 +78,7 @@ describe('exampleAssigner', () => {
       isFetchingSelectedExamples: false,
       assignmentTypeSelectorProps: {
         assignmentType: 'students',
-        onToggle: vi.fn(),
+        onTypeChange: vi.fn(),
       },
       studentSelectionProps: {
         isLoading: false,
@@ -121,7 +121,7 @@ describe('exampleAssigner', () => {
     );
 
     expect(screen.getByText('Assign Examples')).toBeInTheDocument();
-    expect(screen.getByText('Switch to Quiz Assignment')).toBeInTheDocument();
+    expect(screen.getByText('Quiz Assignment')).toBeInTheDocument();
   });
 
   it('should show student assignment selector when in student mode', () => {
@@ -132,7 +132,7 @@ describe('exampleAssigner', () => {
       isFetchingSelectedExamples: false,
       assignmentTypeSelectorProps: {
         assignmentType: 'students',
-        onToggle: vi.fn(),
+        onTypeChange: vi.fn(),
       },
       studentSelectionProps: {
         isLoading: false,
@@ -187,7 +187,7 @@ describe('exampleAssigner', () => {
       isFetchingSelectedExamples: false,
       assignmentTypeSelectorProps: {
         assignmentType: 'quiz',
-        onToggle: vi.fn(),
+        onTypeChange: vi.fn(),
       },
       studentSelectionProps: {
         isLoading: false,
@@ -236,9 +236,8 @@ describe('exampleAssigner', () => {
       </MockAllProviders>,
     );
 
-    expect(
-      screen.getByText('Select a quiz to assign these examples to:'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Course:')).toBeInTheDocument();
+    expect(screen.getByText('Quiz:')).toBeInTheDocument();
   });
 
   it('should open modal when assign button is clicked', () => {
@@ -250,7 +249,7 @@ describe('exampleAssigner', () => {
       isFetchingSelectedExamples: false,
       assignmentTypeSelectorProps: {
         assignmentType: 'students',
-        onToggle: vi.fn(),
+        onTypeChange: vi.fn(),
       },
       studentSelectionProps: {
         isLoading: false,
@@ -314,7 +313,7 @@ describe('exampleAssigner', () => {
       isFetchingSelectedExamples: false,
       assignmentTypeSelectorProps: {
         assignmentType: 'students',
-        onToggle: vi.fn(),
+        onTypeChange: vi.fn(),
       },
       studentSelectionProps: {
         isLoading: false,

@@ -84,7 +84,7 @@ const defaultResult: UseExampleAssignerReturn = {
   isFetchingSelectedExamples: false,
   assignmentTypeSelectorProps: {
     assignmentType: 'students',
-    onToggle: vi.fn<() => void>(),
+    onTypeChange: vi.fn<() => void>(),
   },
   studentSelectionProps: {
     isLoading: false,

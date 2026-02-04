@@ -4,37 +4,48 @@ import { describe, expect, it, vi } from 'vitest';
 
 describe('assignmentTypeSelector', () => {
   it('should render with student assignment type', () => {
-    const onToggle = vi.fn();
+    const onTypeChange = vi.fn();
 
     render(
-      <AssignmentTypeSelector assignmentType="students" onToggle={onToggle} />,
+      <AssignmentTypeSelector
+        assignmentType="students"
+        onTypeChange={onTypeChange}
+      />,
     );
 
-    expect(screen.getByText('Switch to Quiz Assignment')).toBeInTheDocument();
+    const studentRadio = screen.getByRole('radio', {
+      name: 'Student Assignment',
+    });
+    expect(studentRadio).toBeChecked();
   });
 
   it('should render with quiz assignment type', () => {
-    const onToggle = vi.fn();
+    const onTypeChange = vi.fn();
 
     render(
-      <AssignmentTypeSelector assignmentType="quiz" onToggle={onToggle} />,
+      <AssignmentTypeSelector
+        assignmentType="quiz"
+        onTypeChange={onTypeChange}
+      />,
     );
 
-    expect(
-      screen.getByText('Switch to Student Assignment'),
-    ).toBeInTheDocument();
+    const quizRadio = screen.getByRole('radio', { name: 'Quiz Assignment' });
+    expect(quizRadio).toBeChecked();
   });
 
   it('should call onToggle when button is clicked', () => {
-    const onToggle = vi.fn();
+    const onTypeChange = vi.fn();
 
     render(
-      <AssignmentTypeSelector assignmentType="students" onToggle={onToggle} />,
+      <AssignmentTypeSelector
+        assignmentType="students"
+        onTypeChange={onTypeChange}
+      />,
     );
 
-    const button = screen.getByText('Switch to Quiz Assignment');
-    fireEvent.click(button);
+    const quizRadio = screen.getByRole('radio', { name: 'Quiz Assignment' });
+    fireEvent.click(quizRadio);
 
-    expect(onToggle).toHaveBeenCalledTimes(1);
+    expect(onTypeChange).toHaveBeenCalledWith('quiz');
   });
 });

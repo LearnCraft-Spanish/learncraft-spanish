@@ -18,16 +18,16 @@ describe('quizAssignmentSelector', () => {
   it('should render quiz selection message', () => {
     render(<QuizAssignmentSelector {...defaultProps} />);
 
-    expect(
-      screen.getByText('Select a quiz to assign these examples to:'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Course:')).toBeInTheDocument();
+    expect(screen.getByText('Quiz:')).toBeInTheDocument();
   });
 
   it('should render course selector', () => {
     render(<QuizAssignmentSelector {...defaultProps} />);
 
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
-    expect(screen.getByText('Select Course')).toBeInTheDocument();
+    const selects = screen.getAllByRole('combobox');
+    expect(selects).toHaveLength(2);
+    expect(screen.getByText('Select a Course')).toBeInTheDocument();
   });
 
   it('should call onCourseCodeChange when course is selected', () => {
@@ -42,11 +42,11 @@ describe('quizAssignmentSelector', () => {
       />,
     );
 
-    const select = screen.getByRole('combobox');
-    fireEvent.change(select, { target: { value: 'SP101' } });
+    const selects = screen.getAllByRole('combobox');
+    const courseSelect = selects[0];
+    fireEvent.change(courseSelect, { target: { value: 'SP101' } });
 
     expect(onCourseCodeChange).toHaveBeenCalledWith('SP101');
-    expect(onQuizRecordIdChange).toHaveBeenCalledWith(undefined);
   });
 
   it('should render quiz selector when course is selected', () => {

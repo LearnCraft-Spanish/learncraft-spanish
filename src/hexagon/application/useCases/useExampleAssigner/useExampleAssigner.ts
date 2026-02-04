@@ -19,7 +19,7 @@ export type AssignmentType = 'students' | 'quiz';
 
 export interface AssignmentTypeSelectorProps {
   assignmentType: AssignmentType;
-  onToggle: () => void;
+  onTypeChange: (type: AssignmentType) => void;
 }
 
 export interface StudentSelectionProps {
@@ -256,11 +256,13 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     addExamplesToQuiz,
   ]);
 
-  const toggleAssignmentType = useCallback(() => {
-    setAssignmentType((prev) => (prev === 'students' ? 'quiz' : 'students'));
+  const handleTypeChange = useCallback((type: AssignmentType) => {
+    setAssignmentType(type);
     // Reset quiz selection when switching
-    setSelectedCourseCode('none');
-    setSelectedQuizRecordId(undefined);
+    if (type === 'students') {
+      setSelectedCourseCode('none');
+      setSelectedQuizRecordId(undefined);
+    }
   }, []);
 
   const courseOptions = officialQuizCourses;
@@ -310,9 +312,9 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   const assignmentTypeSelectorProps = useMemo<AssignmentTypeSelectorProps>(
     () => ({
       assignmentType,
-      onToggle: toggleAssignmentType,
+      onTypeChange: handleTypeChange,
     }),
-    [assignmentType, toggleAssignmentType],
+    [assignmentType, handleTypeChange],
   );
 
   const studentSelectionProps = useMemo<StudentSelectionProps>(
