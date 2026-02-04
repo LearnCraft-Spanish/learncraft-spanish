@@ -1,5 +1,4 @@
 import type { LessonPopup } from '@application/units/useLessonPopup';
-import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
 import type {
   ExampleWithVocabulary,
   Flashcard,
@@ -10,9 +9,7 @@ import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzes
 import { useQuizExampleMutations } from '@application/queries/useQuizExampleMutations';
 import { useQuizExamplesQuery } from '@application/queries/useQuizExamplesQuery';
 import { useSelectedExamples } from '@application/units/ExampleSearchInterface/useSelectedExamples';
-import { usePagination } from '@application/units/Pagination/usePagination';
 import useLessonPopup from '@application/units/useLessonPopup';
-import { useStudentFlashcards } from '@application/units/useStudentFlashcards';
 import { getUnassignedExamples } from '@application/useCases/useExampleAssigner/helpers';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
@@ -45,39 +42,28 @@ export interface QuizSelectionProps {
 }
 
 export interface AssignedStudentFlashcardsProps {
-  allFlashcards: Flashcard[];
-  displayFlashcards: Flashcard[];
-  paginationState: {
-    totalItems: number;
-    pageNumber: number;
-    maxPageNumber: number;
-    startIndex: number;
-    endIndex: number;
-    pageSize: number;
-    isOnFirstPage: boolean;
-    isOnLastPage: boolean;
-    previousPage: () => void;
-    nextPage: () => void;
-    goToFirstPage: () => void;
-  };
+  studentFlashcards: Flashcard[];
+
   isLoading: boolean;
   error: Error | null;
   targetName: string;
-  onGoingToQuiz: () => void;
+
+  lessonPopup: LessonPopup;
 }
 
 export interface AssignedQuizExamplesProps {
   examples: ExampleWithVocabulary[] | undefined;
+
   isLoading: boolean;
   error: Error | null;
   targetName: string;
-  studentFlashcards: UseStudentFlashcardsReturn;
+
   lessonPopup: LessonPopup;
 }
 
 export interface UnassignedExamplesProps {
   examples: ExampleWithVocabulary[];
-  studentFlashcards: UseStudentFlashcardsReturn;
+  studentFlashcards: Flashcard[] | undefined;
   lessonPopup: LessonPopup;
 }
 
@@ -177,7 +163,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   // Conditional queries based on assignment type - always enabled to show current state
   // Queries are enabled immediately when student/quiz is selected to provide real-time feedback
   const {
-    flashcards,
+    flashcards: studentFlashcards,
     isLoading: isLoadingFlashcards,
     error: flashcardsError,
   } = useFlashcardsQuery();
@@ -201,9 +187,9 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
 
   // Filter out examples that are already assigned (for unassigned list)
   const unassignedExamples = useMemo(() => {
-    if (assignmentType === 'students' && flashcards) {
+    if (assignmentType === 'students' && studentFlashcards) {
       const flashcardExampleIds = new Set(
-        flashcards.map((fc) => fc.example.id),
+        studentFlashcards.map((fc) => fc.example.id),
       );
       return getUnassignedExamples(selectedExamples, flashcardExampleIds);
     }
@@ -212,7 +198,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       return getUnassignedExamples(selectedExamples, quizExampleIds);
     }
     return getUnassignedExamples(selectedExamples, undefined);
-  }, [assignmentType, flashcards, quizExamples, selectedExamples]);
+  }, [assignmentType, studentFlashcards, quizExamples, selectedExamples]);
 
   // Mutations
   const { addExamplesToQuiz, isAddingExamples, addingExamplesError } =
@@ -220,7 +206,6 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   const { createFlashcards } = useFlashcardsQuery();
 
   // Provide studentFlashcards and lessonPopup for child components
-  const studentFlashcards = useStudentFlashcards();
   const { lessonPopup } = useLessonPopup();
 
   // Assignment function
@@ -329,46 +314,25 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     ],
   );
 
-  // Pagination for student flashcards
-  const studentFlashcardsPagination = usePagination({
-    itemsPerPage: 50,
-    totalItems: flashcards?.length || 0,
-  });
-
-  const displayFlashcards = useMemo(() => {
-    if (!flashcards) return [];
-    return flashcards.slice(
-      studentFlashcardsPagination.startIndex,
-      studentFlashcardsPagination.endIndex,
-    );
-  }, [
-    flashcards,
-    studentFlashcardsPagination.startIndex,
-    studentFlashcardsPagination.endIndex,
-  ]);
-
   // Props for student flashcards (FlashcardTable)
   const assignedStudentFlashcardsProps = useMemo<
     AssignedStudentFlashcardsProps | undefined
   >(() => {
-    if (assignmentType !== 'students' || !flashcards) return undefined;
+    if (assignmentType !== 'students' || !studentFlashcards) return undefined;
     return {
-      allFlashcards: flashcards,
-      displayFlashcards,
-      paginationState: studentFlashcardsPagination,
+      studentFlashcards,
       isLoading: isLoadingFlashcards,
       error: flashcardsError,
       targetName,
-      onGoingToQuiz: () => {}, // No-op for assigner context
+      lessonPopup,
     };
   }, [
     assignmentType,
-    flashcards,
-    displayFlashcards,
-    studentFlashcardsPagination,
+    studentFlashcards,
     isLoadingFlashcards,
     flashcardsError,
     targetName,
+    lessonPopup,
   ]);
 
   // Props for quiz examples (ExampleTable)
@@ -398,7 +362,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   const unassignedExamplesProps = useMemo<UnassignedExamplesProps>(
     () => ({
       examples: unassignedExamples,
-      studentFlashcards,
+      studentFlashcards: studentFlashcards || [],
       lessonPopup,
     }),
     [unassignedExamples, studentFlashcards, lessonPopup],

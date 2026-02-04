@@ -1,30 +1,22 @@
+import type { LessonPopup } from '@application/units/useLessonPopup';
 import { AssignedStudentFlashcardsTable } from '@interface/components/ExampleAssignerInterface/AssignedStudentFlashcardsTable';
 import { render, screen } from '@testing-library/react';
 import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import { vi } from 'vitest';
 
-// Mock FlashcardTable
-vi.mock('@interface/components/Tables', () => ({
-  FlashcardTable: ({ displayFlashcards }: { displayFlashcards: unknown[] }) => (
-    <div data-testid="flashcard-table">
-      {displayFlashcards.length} flashcards in table
+// Mock SimpleExampleTable
+vi.mock('@interface/components/Tables/SimpleExampleTable', () => ({
+  default: ({ examples }: { examples: unknown[] }) => (
+    <div data-testid="simple-example-table">
+      {examples.length} examples in table
     </div>
   ),
 }));
 
 describe('assignedStudentFlashcardsTable', () => {
-  const mockPaginationState = {
-    totalItems: 5,
-    pageNumber: 1,
-    maxPageNumber: 1,
-    startIndex: 0,
-    endIndex: 5,
-    pageSize: 50,
-    isOnFirstPage: true,
-    isOnLastPage: true,
-    previousPage: vi.fn(),
-    nextPage: vi.fn(),
-    goToFirstPage: vi.fn(),
+  const mockLessonPopup: LessonPopup = {
+    lessonsByVocabulary: [],
+    lessonsLoading: false,
   };
 
   it('should render heading with flashcard count', () => {
@@ -32,13 +24,11 @@ describe('assignedStudentFlashcardsTable', () => {
 
     render(
       <AssignedStudentFlashcardsTable
-        allFlashcards={flashcards}
-        displayFlashcards={flashcards}
-        paginationState={mockPaginationState}
+        studentFlashcards={flashcards}
         isLoading={false}
         error={null}
         targetName="Test Student"
-        onGoingToQuiz={vi.fn()}
+        lessonPopup={mockLessonPopup}
       />,
     );
 
@@ -47,41 +37,34 @@ describe('assignedStudentFlashcardsTable', () => {
     ).toBeInTheDocument();
   });
 
-  it('should render FlashcardTable with flashcards', () => {
+  it('should render SimpleExampleTable with examples', () => {
     const flashcards = createMockFlashcardList()(3);
 
     render(
       <AssignedStudentFlashcardsTable
-        allFlashcards={flashcards}
-        displayFlashcards={flashcards}
-        paginationState={mockPaginationState}
+        studentFlashcards={flashcards}
         isLoading={false}
         error={null}
         targetName="Test Student"
-        onGoingToQuiz={vi.fn()}
+        lessonPopup={mockLessonPopup}
       />,
     );
 
-    expect(screen.getByTestId('flashcard-table')).toBeInTheDocument();
-    expect(screen.getByText('3 flashcards in table')).toBeInTheDocument();
+    expect(screen.getByTestId('simple-example-table')).toBeInTheDocument();
+    expect(screen.getByText('3 examples in table')).toBeInTheDocument();
   });
 
   it('should show loading state when loading and no flashcards', () => {
     render(
       <AssignedStudentFlashcardsTable
-        allFlashcards={[]}
-        displayFlashcards={[]}
-        paginationState={mockPaginationState}
+        studentFlashcards={[]}
         isLoading
         error={null}
         targetName="Test Student"
-        onGoingToQuiz={vi.fn()}
+        lessonPopup={mockLessonPopup}
       />,
     );
 
-    expect(
-      screen.getByText('Examples Already Assigned to Test Student'),
-    ).toBeInTheDocument();
     expect(
       screen.getByText('Loading assigned flashcards...'),
     ).toBeInTheDocument();
@@ -90,13 +73,11 @@ describe('assignedStudentFlashcardsTable', () => {
   it('should return null when no flashcards and not loading', () => {
     const { container } = render(
       <AssignedStudentFlashcardsTable
-        allFlashcards={[]}
-        displayFlashcards={[]}
-        paginationState={mockPaginationState}
+        studentFlashcards={[]}
         isLoading={false}
         error={null}
         targetName="Test Student"
-        onGoingToQuiz={vi.fn()}
+        lessonPopup={mockLessonPopup}
       />,
     );
 
@@ -109,13 +90,11 @@ describe('assignedStudentFlashcardsTable', () => {
 
     render(
       <AssignedStudentFlashcardsTable
-        allFlashcards={flashcards}
-        displayFlashcards={flashcards}
-        paginationState={mockPaginationState}
+        studentFlashcards={flashcards}
         isLoading={false}
         error={error}
         targetName="Test Student"
-        onGoingToQuiz={vi.fn()}
+        lessonPopup={mockLessonPopup}
       />,
     );
 

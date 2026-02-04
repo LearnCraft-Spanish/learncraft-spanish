@@ -1,21 +1,19 @@
 import type { LessonPopup } from '@application/units/useLessonPopup';
-import type { UseStudentFlashcardsReturn } from '@application/units/useStudentFlashcards';
-import { mockUseStudentFlashcards } from '@application/units/useStudentFlashcards.mock';
 import { AssignedQuizExamplesTable } from '@interface/components/ExampleAssignerInterface/AssignedQuizExamplesTable';
 import { render, screen } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { vi } from 'vitest';
 
-// Mock ExampleTable
-vi.mock('@interface/components/Tables', () => ({
-  ExampleTable: ({ examples }: { examples: unknown[] }) => (
-    <div data-testid="example-table">{examples.length} examples in table</div>
+// Mock SimpleExampleTable
+vi.mock('@interface/components/Tables/SimpleExampleTable', () => ({
+  default: ({ examples }: { examples: unknown[] }) => (
+    <div data-testid="simple-example-table">
+      {examples.length} examples in table
+    </div>
   ),
 }));
 
 describe('assignedQuizExamplesTable', () => {
-  const mockStudentFlashcards: UseStudentFlashcardsReturn =
-    mockUseStudentFlashcards;
   const mockLessonPopup: LessonPopup = {
     lessonsByVocabulary: [],
     lessonsLoading: false,
@@ -30,7 +28,6 @@ describe('assignedQuizExamplesTable', () => {
         isLoading={false}
         error={null}
         targetName="Quiz 1"
-        studentFlashcards={mockStudentFlashcards}
         lessonPopup={mockLessonPopup}
       />,
     );
@@ -40,7 +37,7 @@ describe('assignedQuizExamplesTable', () => {
     ).toBeInTheDocument();
   });
 
-  it('should render ExampleTable with examples', () => {
+  it('should render SimpleExampleTable with examples', () => {
     const examples = createMockExampleWithVocabularyList(2);
 
     render(
@@ -49,12 +46,11 @@ describe('assignedQuizExamplesTable', () => {
         isLoading={false}
         error={null}
         targetName="Quiz 1"
-        studentFlashcards={mockStudentFlashcards}
         lessonPopup={mockLessonPopup}
       />,
     );
 
-    expect(screen.getByTestId('example-table')).toBeInTheDocument();
+    expect(screen.getByTestId('simple-example-table')).toBeInTheDocument();
     expect(screen.getByText('2 examples in table')).toBeInTheDocument();
   });
 
@@ -65,7 +61,6 @@ describe('assignedQuizExamplesTable', () => {
         isLoading
         error={null}
         targetName="Quiz 1"
-        studentFlashcards={mockStudentFlashcards}
         lessonPopup={mockLessonPopup}
       />,
     );
@@ -85,7 +80,6 @@ describe('assignedQuizExamplesTable', () => {
         isLoading={false}
         error={null}
         targetName="Quiz 1"
-        studentFlashcards={mockStudentFlashcards}
         lessonPopup={mockLessonPopup}
       />,
     );
@@ -103,7 +97,6 @@ describe('assignedQuizExamplesTable', () => {
         isLoading={false}
         error={error}
         targetName="Quiz 1"
-        studentFlashcards={mockStudentFlashcards}
         lessonPopup={mockLessonPopup}
       />,
     );
@@ -124,7 +117,6 @@ describe('assignedQuizExamplesTable', () => {
         isLoading
         error={null}
         targetName="Quiz 1"
-        studentFlashcards={mockStudentFlashcards}
         lessonPopup={mockLessonPopup}
       />,
     );

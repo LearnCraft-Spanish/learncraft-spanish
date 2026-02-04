@@ -101,6 +101,16 @@ describe('exampleAssigner', () => {
         quizName: null,
         onClick: vi.fn(),
       },
+      assignedStudentFlashcardsProps: {
+        studentFlashcards: createMockFlashcardList()(2),
+        isLoading: false,
+        error: null,
+        targetName: 'Test Student',
+        lessonPopup: {
+          lessonsByVocabulary: [],
+          lessonsLoading: false,
+        },
+      },
       assigningError: null,
     });
 
@@ -136,6 +146,16 @@ describe('exampleAssigner', () => {
         courseOptions: [],
       },
       unassignedExamplesProps: { examples },
+      assignedStudentFlashcardsProps: {
+        studentFlashcards: createMockFlashcardList()(2),
+        isLoading: false,
+        error: null,
+        targetName: 'Test Student',
+        lessonPopup: {
+          lessonsByVocabulary: [],
+          lessonsLoading: false,
+        },
+      },
       assignButtonProps: {
         assignmentType: 'students',
         unassignedCount: 2,
@@ -188,6 +208,16 @@ describe('exampleAssigner', () => {
         courseOptions: [{ code: 'SP101', name: 'Spanish 101' }],
       },
       unassignedExamplesProps: { examples },
+      assignedStudentFlashcardsProps: {
+        studentFlashcards: createMockFlashcardList()(2),
+        isLoading: false,
+        error: null,
+        targetName: 'Test Student',
+        lessonPopup: {
+          lessonsByVocabulary: [],
+          lessonsLoading: false,
+        },
+      },
       assignButtonProps: {
         assignmentType: 'quiz',
         unassignedCount: 2,
@@ -234,25 +264,14 @@ describe('exampleAssigner', () => {
         courseOptions: [],
       },
       assignedStudentFlashcardsProps: {
-        allFlashcards: createMockFlashcardList()(2),
-        displayFlashcards: createMockFlashcardList()(2),
-        paginationState: {
-          totalItems: 2,
-          pageNumber: 1,
-          maxPageNumber: 1,
-          startIndex: 0,
-          endIndex: 2,
-          pageSize: 50,
-          isOnFirstPage: true,
-          isOnLastPage: true,
-          previousPage: vi.fn(),
-          nextPage: vi.fn(),
-          goToFirstPage: vi.fn(),
-        },
+        studentFlashcards: createMockFlashcardList()(2),
         isLoading: false,
         error: null,
         targetName: 'Test Student',
-        onGoingToQuiz: vi.fn(),
+        lessonPopup: {
+          lessonsByVocabulary: [],
+          lessonsLoading: false,
+        },
       },
       unassignedExamplesProps: { examples },
       assignButtonProps: {
@@ -299,6 +318,16 @@ describe('exampleAssigner', () => {
       },
       studentSelectionProps: {
         isLoading: false,
+      },
+      assignedStudentFlashcardsProps: {
+        studentFlashcards: createMockFlashcardList()(2),
+        isLoading: false,
+        error: null,
+        targetName: 'Test Student',
+        lessonPopup: {
+          lessonsByVocabulary: [],
+          lessonsLoading: false,
+        },
       },
       quizSelectionProps: {
         selectedCourseCode: 'none',
