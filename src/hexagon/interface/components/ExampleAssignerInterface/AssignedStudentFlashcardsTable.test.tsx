@@ -66,7 +66,7 @@ describe('assignedStudentFlashcardsTable', () => {
     );
 
     expect(
-      screen.getByText('Loading assigned flashcards...'),
+      screen.getByText('Loading student flashcards...'),
     ).toBeInTheDocument();
   });
 

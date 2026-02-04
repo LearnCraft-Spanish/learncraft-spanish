@@ -108,6 +108,8 @@ const defaultResult: UseExampleAssignerReturn = {
   assignedQuizExamplesProps: undefined,
   unassignedExamplesProps: {
     examples: createMockExampleWithVocabularyList(3),
+    totalSelectedExamplesCount: 3,
+    isLoading: false,
     studentFlashcards: defaultMockStudentFlashcards.flashcards,
     lessonPopup: defaultMockLessonPopup,
   },

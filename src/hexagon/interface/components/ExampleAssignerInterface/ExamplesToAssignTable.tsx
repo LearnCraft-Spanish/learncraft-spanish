@@ -23,7 +23,7 @@ export function ExamplesToAssignTable({
   return (
     <>
       <h4>
-        Examples to be Assigned ({examples.length} reamining of{' '}
+        Examples to be Assigned ({examples.length} remaining of{' '}
         {totalSelectedExamplesCount} selected)
       </h4>
       <SimpleExampleTable examples={examples} lessonPopupProps={lessonPopup} />

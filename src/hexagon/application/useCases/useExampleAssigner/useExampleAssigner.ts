@@ -66,6 +66,7 @@ export interface UnassignedExamplesProps {
   examples: ExampleWithVocabulary[];
   studentFlashcards: Flashcard[] | undefined;
   totalSelectedExamplesCount: number;
+  isLoading: boolean;
   lessonPopup: LessonPopup;
 }
 

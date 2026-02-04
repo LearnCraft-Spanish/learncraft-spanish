@@ -65,12 +65,7 @@ describe('assignedQuizExamplesTable', () => {
       />,
     );
 
-    expect(
-      screen.getByText('Examples Already Assigned to Quiz 1'),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('Loading assigned examples...'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Loading quiz examples...')).toBeInTheDocument();
   });
 
   it('should return null when no examples and not loading', () => {
@@ -121,8 +116,6 @@ describe('assignedQuizExamplesTable', () => {
       />,
     );
 
-    expect(
-      screen.getByText('Loading assigned examples...'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Loading quiz examples...')).toBeInTheDocument();
   });
 });

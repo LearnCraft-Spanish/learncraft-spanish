@@ -25,11 +25,13 @@ describe('examplesToAssignTable', () => {
       <ExamplesToAssignTable
         examples={examples}
         lessonPopup={mockLessonPopup}
+        isLoading={false}
+        totalSelectedExamplesCount={examples.length}
       />,
     );
 
     expect(
-      screen.getByText('Examples to be Assigned (5 remaining)'),
+      screen.getByText('Examples to be Assigned (5 remaining of 5 selected)'),
     ).toBeInTheDocument();
   });
 
@@ -40,6 +42,8 @@ describe('examplesToAssignTable', () => {
       <ExamplesToAssignTable
         examples={examples}
         lessonPopup={mockLessonPopup}
+        isLoading={false}
+        totalSelectedExamplesCount={examples.length}
       />,
     );
 
@@ -49,11 +53,16 @@ describe('examplesToAssignTable', () => {
 
   it('should handle empty examples list', () => {
     render(
-      <ExamplesToAssignTable examples={[]} lessonPopup={mockLessonPopup} />,
+      <ExamplesToAssignTable
+        examples={[]}
+        lessonPopup={mockLessonPopup}
+        isLoading={false}
+        totalSelectedExamplesCount={0}
+      />,
     );
 
     expect(
-      screen.getByText('Examples to be Assigned (0 remaining)'),
+      screen.getByText('Examples to be Assigned (0 remaining of 0 selected)'),
     ).toBeInTheDocument();
   });
 });
