@@ -1,3 +1,4 @@
+// used in Coaching interfaces
 import type { Course } from 'src/types/CoachingTypes';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';

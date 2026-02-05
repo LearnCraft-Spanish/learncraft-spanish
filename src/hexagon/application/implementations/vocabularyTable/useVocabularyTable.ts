@@ -1,45 +1,18 @@
-import type { TableHook } from '@domain/PasteTable/General';
-import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
+import type { CreateTableStateHook } from '@application/units/pasteTable/useCreateTableState';
 import {
   SCHEMA_FIELD_CONFIG,
   VOCABULARY_COLUMNS,
 } from '@application/implementations/vocabularyTable/constants';
-import { usePasteTable } from '@application/units/pasteTable';
-import { validateCreateNonVerbVocabulary } from '@learncraft-spanish/shared';
+import { useCreateTableState } from '@application/units/pasteTable';
 
 /**
  * Custom hook for managing vocabulary data in a table format.
- * This hook provides a bridge between the table UI and the vocabulary domain models.
- * It handles table-specific concerns like column configuration and basic data validation.
+ * Returns focused state hook (no mapping, no validation).
+ * Use case composes mapping and validation separately.
  */
-export function useVocabularyTable(): TableHook<CreateNonVerbVocabulary> {
-  return usePasteTable<CreateNonVerbVocabulary>({
+export function useVocabularyTable(): CreateTableStateHook {
+  return useCreateTableState({
     columns: VOCABULARY_COLUMNS,
-    validateRow: (row) => {
-      const errors: Record<string, string> = {};
-
-      // Create a copy with frequency as number for validation
-      const dataForValidation = {
-        ...row,
-        // Convert frequency to number if it exists and is a valid number
-        frequency:
-          row.frequency !== undefined ? Number(row.frequency) : undefined,
-      };
-
-      // Use shared validation function
-      const result = validateCreateNonVerbVocabulary(dataForValidation);
-      if (!result.valid) {
-        // Map validation errors to field errors
-        result.errors.forEach((error) => {
-          const field = error.split(':')[0].trim();
-          if (field in SCHEMA_FIELD_CONFIG) {
-            errors[field] = error;
-          }
-        });
-      }
-
-      return errors;
-    },
   });
 }
 

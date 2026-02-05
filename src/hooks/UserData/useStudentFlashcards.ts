@@ -1,3 +1,4 @@
+// used outside hexagon, some places where it can be replaced with hexagon implementation or removed
 import type {
   Flashcard,
   StudentExample,
@@ -8,7 +9,7 @@ import { useActiveStudent } from '@application/coordinators/hooks/useActiveStude
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
 import { useCallback, useRef } from 'react';
-import { showErrorToast, showSuccessToast } from 'src/functions/showToast';
+import { toast } from 'react-toastify';
 import { toISODateTime } from 'src/hexagon/domain/functions/dateUtils';
 import { useBackend } from 'src/hooks/useBackend';
 
@@ -26,8 +27,6 @@ export function useStudentFlashcards() {
     createMyStudentExample,
     deleteStudentExample,
     deleteMyStudentExample,
-    updateStudentExample,
-    updateMyStudentExample,
     createMultipleStudentExamples,
   } = useBackend();
 
@@ -287,7 +286,7 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (data, _variables, context) => {
-      showSuccessToast('Flashcard added successfully');
+      toast.success('Flashcard added successfully', { autoClose: 1000 });
 
       queryClient.setQueryData(
         ['flashcardData', activeStudentId],
@@ -324,7 +323,7 @@ export function useStudentFlashcards() {
     },
 
     onError: (error, _variables, context) => {
-      showErrorToast('Failed to add Flashcard');
+      toast.error('Failed to add Flashcard', { autoClose: 1000 });
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized ID number to rollback the cache
@@ -456,12 +455,13 @@ export function useStudentFlashcards() {
     },
 
     onSuccess: (_data, _variables, _context) => {
-      showSuccessToast('Flashcard removed successfully');
+      toast.success('Flashcard removed successfully', { autoClose: 1000 });
+
       queryClient.invalidateQueries({ queryKey: ['flashcards', userId] }); // refetch inside hexagon flashcard query
     },
 
     onError: (error, _variables, context) => {
-      showErrorToast('Failed to remove Flashcard');
+      toast.error('Failed to remove Flashcard', { autoClose: 1000 });
       console.error(error);
       // Roll back the cache for just the affected flashcard
       // Use the memoized objects to rollback the cache
@@ -490,181 +490,6 @@ export function useStudentFlashcards() {
           },
         );
       }
-    },
-    onSettled: () => debouncedRefetch(),
-  });
-
-  const updateActiveStudentFlashcards = useCallback(
-    async (studentExampleId: number, newInterval: number) => {
-      let updatePromise;
-      if ((isAdmin || isCoach) && activeStudentId) {
-        updatePromise = updateStudentExample(studentExampleId, newInterval);
-      } else if (isStudent) {
-        updatePromise = updateMyStudentExample(studentExampleId, newInterval);
-      }
-      if (!updatePromise) {
-        throw new Error('No active student');
-      }
-      const updateResponse = updatePromise.then(
-        (result: number | undefined | string) => {
-          if (typeof result === 'string') {
-            result = Number.parseInt(result);
-          }
-          if (result !== studentExampleId) {
-            throw new Error('Failed to update Flashcard');
-          }
-          return result;
-        },
-      );
-      return updateResponse;
-    },
-    [
-      isAdmin,
-      isCoach,
-      isStudent,
-      activeStudentId,
-      updateStudentExample,
-      updateMyStudentExample,
-    ],
-  );
-
-  const updateFlashcardMutation = useMutation({
-    mutationFn: ({
-      studentExampleId,
-      newInterval,
-    }: {
-      studentExampleId: number;
-      newInterval: number;
-      difficulty: 'easy' | 'hard';
-    }) => updateActiveStudentFlashcards(studentExampleId, newInterval),
-    onMutate: async ({ studentExampleId, newInterval, difficulty }) => {
-      // Cancel any in-flight queries
-      await queryClient.cancelQueries({
-        queryKey: ['flashcardData', activeStudentId],
-      });
-
-      // Memoize the old interval for rollback
-      let oldInterval: number | undefined;
-
-      // Optimistically update the flashcards cache
-      queryClient.setQueryData(
-        ['flashcardData', activeStudentId],
-        (oldFlashcards: StudentFlashcardData) => {
-          const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
-          // Foreign Key lookup, form data in backend
-          const studentFlashcard = oldFlashcardsCopy.find(
-            (studentFlashcard) =>
-              studentFlashcard.recordId === studentExampleId,
-          );
-          // Foreign Key lookup, form data in backend
-          const flashcard = oldFlashcards.examples.find(
-            (flashcard) =>
-              flashcard.recordId === studentFlashcard?.relatedExample,
-          );
-
-          // Only update the cache if both are found
-          if (studentFlashcard && flashcard) {
-            oldInterval = studentFlashcard.reviewInterval
-              ? studentFlashcard.reviewInterval
-              : undefined;
-
-            // Define new flashcard and studentFlashcard objects
-            const newStudentFlashcard = {
-              ...studentFlashcard,
-              reviewInterval: newInterval,
-            };
-            const newFlashcard = { ...flashcard, difficulty };
-
-            // Replace the flashcards in copy of array
-            const newStudentFlashcardsArray = oldFlashcardsCopy.map(
-              (studentFlashcard) =>
-                // Foreign Key lookup, form data in backend
-                studentFlashcard.recordId === studentExampleId
-                  ? newStudentFlashcard
-                  : studentFlashcard,
-            );
-            const newFlashcardsArray = oldFlashcards.examples.map((flashcard) =>
-              // Foreign Key lookup, form data in backend
-              flashcard.recordId === studentFlashcard.relatedExample
-                ? newFlashcard
-                : flashcard,
-            );
-
-            // Trim the arrays to match
-            const trimmedNewFlashcardData = matchAndTrimArrays({
-              examples: newFlashcardsArray,
-              studentExamples: newStudentFlashcardsArray,
-            });
-            return trimmedNewFlashcardData;
-          }
-        },
-      );
-
-      // Return the studentExampleId and the previous interval and difficulty
-      // These are for rollback context in the case of an error
-      return { studentExampleId, oldInterval, difficulty };
-    },
-
-    onSuccess: (_data, _variables) => {
-      showSuccessToast('Flashcard updated successfully');
-    },
-
-    onError: (error, _variables, context) => {
-      showErrorToast('Failed to update Flashcard');
-      console.error(error);
-      // Make sure both necessary values are defined
-      if (
-        context?.studentExampleId === undefined ||
-        context?.oldInterval === undefined
-      ) {
-        return;
-      }
-      // Destructure the context
-      const { studentExampleId, oldInterval, difficulty } = context;
-
-      // Roll back the cache for just the affected flashcard
-      queryClient.setQueryData(
-        ['flashcardData', activeStudentId],
-        (oldFlashcards: StudentFlashcardData) => {
-          const oldFlashcardsCopy = [...oldFlashcards.studentExamples];
-          // Foreign Key lookup, form data in backend
-          const studentFlashcard = oldFlashcardsCopy.find(
-            (studentFlashcard) =>
-              studentFlashcard.recordId === studentExampleId,
-          );
-          // Foreign Key lookup, form data in backend
-          const flashcard = oldFlashcards.examples.find(
-            (flashcard) =>
-              flashcard.recordId === studentFlashcard?.relatedExample,
-          );
-          if (studentFlashcard && flashcard) {
-            const newStudentFlashcard: StudentExample = {
-              ...studentFlashcard,
-              reviewInterval: oldInterval,
-            };
-            const newFlashcard: Flashcard = { ...flashcard, difficulty };
-            const newStudentFlashcardsArray = oldFlashcardsCopy.map(
-              (studentFlashcard) =>
-                // Foreign Key lookup, form data in backend
-                studentFlashcard.recordId === studentExampleId
-                  ? newStudentFlashcard
-                  : studentFlashcard,
-            );
-            const newFlashcardsArray = oldFlashcards.examples.map((flashcard) =>
-              // Foreign Key lookup, form data in backend
-              flashcard.recordId === studentFlashcard.relatedExample
-                ? newFlashcard
-                : flashcard,
-            );
-            const trimmedNewFlashcardData = matchAndTrimArrays({
-              examples: newFlashcardsArray,
-              studentExamples: newStudentFlashcardsArray,
-            });
-            return trimmedNewFlashcardData;
-          }
-          return oldFlashcards;
-        },
-      );
     },
     onSettled: () => debouncedRefetch(),
   });
@@ -805,10 +630,11 @@ export function useStudentFlashcards() {
       const totalCount = data.length;
 
       if (successCount === totalCount) {
-        showSuccessToast('All flashcards added successfully');
+        toast.success('All flashcards added successfully', { autoClose: 1000 });
       } else {
-        showSuccessToast(
+        toast.success(
           `Added ${successCount} of ${totalCount} flashcards successfully`,
+          { autoClose: 1000 },
         );
       }
 
@@ -843,7 +669,7 @@ export function useStudentFlashcards() {
       _variables: Flashcard[],
       context?: AddMultipleFlashcardsContext,
     ) => {
-      showErrorToast('Failed to add some flashcards');
+      toast.error('Failed to add some flashcards', { autoClose: 1000 });
       console.error(error);
       if (!context) return;
       // Roll back the cache for just the affected flashcards
@@ -884,6 +710,5 @@ export function useStudentFlashcards() {
     addFlashcardMutation,
     addMultipleFlashcardsMutation,
     removeFlashcardMutation,
-    updateFlashcardMutation,
   };
 }

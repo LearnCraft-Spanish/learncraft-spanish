@@ -4,10 +4,10 @@ import type {
   Flashcard,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
+import { SubHeaderComponent } from '@interface/components/SubHeader';
 import { officialQuizCourses } from '@learncraft-spanish/shared';
 import React, { useMemo } from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
-import SubHeader from '../SubHeader';
 
 interface ExampleAssignmentPanelProps {
   assignmentType: 'students' | 'quiz';
@@ -89,7 +89,7 @@ export function ExampleAssignmentPanel({
       {assignmentType === 'students' && (
         <div>
           <p>Select a student to assign these examples to:</p>
-          <SubHeader />
+          <SubHeaderComponent />
         </div>
       )}
 

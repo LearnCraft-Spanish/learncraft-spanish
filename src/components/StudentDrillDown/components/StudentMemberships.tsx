@@ -1,5 +1,6 @@
 import type { Membership } from 'src/types/CoachingTypes';
 import { useAuthAdapter } from '@application/adapters/authAdapter';
+import { Dropdown, TextInput } from '@interface/components/FormComponents';
 import { InlineLoading } from '@interface/components/Loading';
 import React, { useMemo, useState } from 'react';
 import downArrow from 'src/assets/icons/down-arrow.svg';
@@ -7,9 +8,7 @@ import pencilIcon from 'src/assets/icons/pencil.svg';
 import {
   Checkbox,
   DateInput,
-  Dropdown,
   FormControls,
-  TextInput,
 } from 'src/components/FormComponents';
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';

@@ -1,0 +1,42 @@
+/* ------------------- Example Manager Sub Nav ------------------- */
+// used in ExampleSearchInterface (SearchModeNav) and ExampleAssignerInterface (AssignmentTypeSelector)
+.ExampleManagerSubNav {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: center;
+  margin: 1rem;
+
+  .ExampleManagerSubNavOption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex: 1;
+
+    border: 1px solid var(--dark);
+    padding: 1rem;
+    cursor: pointer;
+    background-color: var(--light);
+
+    &:hover {
+      background-color: var(--accent);
+    }
+
+    &.selected {
+      background-color: var(--brand);
+      color: var(--light);
+    }
+
+    input {
+      display: none;
+    }
+
+    span {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 600;
+      width: 100%;
+    }
+  }
+}

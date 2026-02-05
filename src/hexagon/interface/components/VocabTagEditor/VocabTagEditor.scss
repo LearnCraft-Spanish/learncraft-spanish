@@ -1,0 +1,51 @@
+.vocabTagEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    align-items: flex-start;
+  }
+
+  &__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background-color: var(--light);
+    border: 2px solid var(--brand);
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--brand);
+      color: var(--light);
+    }
+  }
+
+  &__remove {
+    background: none;
+    border: none;
+    color: var(--dark);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-left: 2px;
+
+    &:hover {
+      font-weight: bold;
+      color: var(--brand);
+    }
+  }
+}

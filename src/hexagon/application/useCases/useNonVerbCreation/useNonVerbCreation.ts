@@ -1,15 +1,44 @@
 import type { VocabularyPaginationState } from '@application/useCases/types';
-import type { UseNonVerbCreationResult } from '@application/useCases/useNonVerbCreation/useNonVerbCreation.types';
-import type { CreateNonVerbVocabulary } from '@learncraft-spanish/shared';
+import type { TableRow } from '@domain/PasteTable';
+import type { CreateTableUseCaseProps } from '@interface/components/CreateTable/types';
+import type {
+  CreateNonVerbVocabulary,
+  Subcategory,
+} from '@learncraft-spanish/shared';
+import { VOCABULARY_COLUMNS } from '@application/implementations/vocabularyTable/constants';
 import { useVocabularyTable } from '@application/implementations/vocabularyTable/useVocabularyTable';
 import { useSubcategories } from '@application/queries/useSubcategories';
+import { GHOST_ROW_ID } from '@application/units/pasteTable/constants';
+import { useTableValidation } from '@application/units/pasteTable/hooks';
 import useVocabulary from '@application/units/useVocabulary';
 import useVocabularyPage from '@application/units/useVocabularyPage';
+import { normalizeError } from '@application/utils/queryUtils';
 import {
-  CreateNonVerbVocabularySchema,
-  validateWithSchema,
-} from '@learncraft-spanish/shared';
+  mapAndParseTableRowsToDomain,
+  mapTableRowToDomain,
+  normalizeRowCells,
+} from '@domain/PasteTable/functions';
+import { validateEntity } from '@domain/PasteTable/functions/entityValidation';
+import { CreateNonVerbVocabularySchema } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
+
+export interface UseNonVerbCreationResult {
+  // Subcategory selection
+  nonVerbSubcategories: Subcategory[];
+  loadingSubcategories: boolean;
+  selectedSubcategoryId: string;
+  setSelectedSubcategoryId: (id: string) => void;
+
+  // Creation status
+  creating: boolean;
+  creationError: Error | null;
+
+  // Table props - ready to pass to CreateTable component
+  tableProps: CreateTableUseCaseProps;
+
+  // Vocabulary list for currently selected subcategory
+  currentVocabularyPagination: VocabularyPaginationState | null;
+}
 
 /**
  * Use case for non-verb vocabulary creation.
@@ -33,8 +62,8 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
     createNonVerbVocabulary,
   } = useVocabulary();
 
-  // Create the table hook internally
-  const tableHook = useVocabularyTable();
+  // 1. Use create table state hook (focused on state only - no mapping, no validation)
+  const tableState = useVocabularyTable();
 
   // Filter for non-verb subcategories only
   const nonVerbSubcategories = useMemo(() => {
@@ -112,91 +141,125 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
       page,
     ]);
 
+  // 2. Compose validation explicitly: normalize → map → validate (domain-side)
+  const validateRow = useMemo(() => {
+    return (row: TableRow) => {
+      // 1. Normalize strings
+      const normalized = normalizeRowCells(row.cells, VOCABULARY_COLUMNS);
+
+      // 2. Map to domain entity (typed)
+      const domainEntity = mapTableRowToDomain<CreateNonVerbVocabulary>(
+        { ...row, cells: normalized },
+        VOCABULARY_COLUMNS,
+      );
+
+      // 3. Validate domain entity (typed validation)
+      const result = validateEntity(
+        domainEntity,
+        CreateNonVerbVocabularySchema,
+      );
+      return result.errors;
+    };
+  }, []); // VOCABULARY_COLUMNS and CreateNonVerbVocabularySchema are constants
+
+  // 3. Base validation (focused unit)
+  const baseValidation = useTableValidation({
+    rows: tableState.data.rows,
+    validateRow,
+  });
+
   // Reset pagination when changing subcategory
   const handleSubcategoryChange = useCallback((id: string) => {
     setSelectedSubcategoryId(id);
     setPage(1); // Reset to first page when subcategory changes
   }, []);
 
-  // Create vocabulary batch - internal implementation
-  const createVocabularyBatch = useCallback(
-    async (data: CreateNonVerbVocabulary[]) => {
-      if (!selectedSubcategoryId) {
-        setCreationError(new Error('No subcategory selected'));
-        return [];
-      }
-
-      try {
-        setCreationError(null);
-
-        // Validate all entries before processing
-        const validationErrors: string[] = [];
-        data.forEach((entry, index) => {
-          const command = {
-            ...entry,
-            subcategoryId: Number(selectedSubcategoryId),
-          };
-          const result = validateWithSchema(
-            CreateNonVerbVocabularySchema,
-            command,
-          );
-          if (!result.isValid) {
-            validationErrors.push(
-              `Row ${index + 1}: ${result.errors.join(', ')}`,
-            );
-          }
-        });
-
-        if (validationErrors.length > 0) {
-          throw new Error(`Validation errors:\n${validationErrors.join('\n')}`);
-        }
-
-        // Use our new vocabulary unit to create the batch
-        const commands = data.map((entry) => ({
-          ...entry,
-          subcategoryId: Number(selectedSubcategoryId),
-        }));
-
-        const createdIds = await createNonVerbVocabulary(commands);
-
-        return createdIds;
-      } catch (err) {
-        const error = err instanceof Error ? err : new Error(String(err));
-        setCreationError(error);
-        return [];
-      }
-    },
-    [selectedSubcategoryId, createNonVerbVocabulary],
-  );
-
-  /**
-   * Unified save method exposed to the interface.
-   * Handles all the steps: validation, table save, and creation.
-   */
-  const saveVocabulary = useCallback(async (): Promise<number[]> => {
+  // 4. Handle save - get rows, map to domain, validate, then create
+  const handleSave = useCallback(async () => {
     // Validate subcategory is selected
     if (!selectedSubcategoryId) {
       setCreationError(new Error('No subcategory selected'));
-      return [];
+      return;
+    }
+
+    // Check validation before proceeding
+    if (!baseValidation.validationState.isValid) {
+      setCreationError(new Error('Please fix validation errors before saving'));
+      return;
     }
 
     try {
-      // Validate and save the table data
-      const tableData = await tableHook.saveData();
+      setCreationError(null);
 
-      // If table validation failed or no data
-      if (!tableData || tableData.length === 0) {
-        return [];
+      // Get rows from state (excluding ghost row)
+      const dataRows = tableState
+        .getRows()
+        .filter((row) => row.id !== GHOST_ROW_ID);
+
+      if (dataRows.length === 0) {
+        return;
       }
 
+      // Map table → domain (with parsing/validation to ensure completeness)
+      // This validates and returns complete T[] (not Partial<T>[])
+      // Will throw if validation fails, which we catch below
+      const domainEntities =
+        mapAndParseTableRowsToDomain<CreateNonVerbVocabulary>(
+          dataRows,
+          VOCABULARY_COLUMNS,
+          CreateNonVerbVocabularySchema,
+          GHOST_ROW_ID,
+        );
+
+      // Add subcategoryId to each entry
+      const commands = domainEntities.map((entry) => ({
+        ...entry,
+        subcategoryId: Number(selectedSubcategoryId),
+      }));
+
       // Create the vocabulary batch
-      return await createVocabularyBatch(tableData);
+      await createNonVerbVocabulary(commands);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error(String(err));
+      const error = normalizeError(err);
       setCreationError(error);
-      return [];
+      throw error;
     }
-  }, [selectedSubcategoryId, createVocabularyBatch, tableHook]);
+  }, [
+    selectedSubcategoryId,
+    baseValidation.validationState.isValid,
+    tableState,
+    createNonVerbVocabulary,
+  ]);
+
+  // 5. Compose tableProps to satisfy CreateTableUseCaseProps contract
+  const tableProps = useMemo(() => {
+    const dataRows = tableState
+      .getRows()
+      .filter((row) => row.id !== GHOST_ROW_ID);
+    const hasData = dataRows.length > 0;
+
+    return {
+      rows: tableState.data.rows,
+      columns: tableState.data.columns,
+      validationErrors: baseValidation.validationState.errors,
+      isValid: baseValidation.validationState.isValid,
+      isSaving: creatingVocabulary,
+      hasData,
+      onCellChange: tableState.updateCell,
+      onPaste: tableState.handlePaste,
+      onSave: handleSave,
+      onReset: tableState.resetTable,
+      activeCell: tableState.activeCell,
+      setActiveCell: tableState.setActiveCell,
+      setActiveCellInfo: tableState.setActiveCellInfo,
+      clearActiveCellInfo: tableState.clearActiveCellInfo,
+    };
+  }, [
+    tableState,
+    baseValidation.validationState,
+    creatingVocabulary,
+    handleSave,
+  ]);
 
   // Combine errors from both sources
   const combinedError = creationError || vocabCreationError;
@@ -212,11 +275,8 @@ export default function useNonVerbCreation(): UseNonVerbCreationResult {
     creating: creatingVocabulary,
     creationError: combinedError,
 
-    // Expose table hook through the façade
-    tableHook,
-
-    // Unified save action
-    saveVocabulary,
+    // Table props - ready to pass to CreateTable component
+    tableProps,
 
     // Paginated vocabulary data
     currentVocabularyPagination,

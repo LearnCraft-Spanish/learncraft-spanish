@@ -206,7 +206,7 @@ export default function FlashcardTable(props: UseFlashcardTableProps) {
             <ExampleListItem
               key={flashcard.example.id}
               flashcard={flashcard}
-              isCollected={true}
+              isCollected
               isAdding={false}
               isRemoving={isRemovingFlashcard(flashcard.example.id)}
               isCustom={flashcard.custom}

@@ -11,7 +11,13 @@ const defaultMockAdapter: OfficialQuizPort = {
   getOfficialQuizExamples: (_args: {
     courseCode: string;
     quizNumber: number;
+    vocabularyComplete?: boolean;
   }) => Promise.resolve(createMockExampleWithVocabularyList(3)),
+  addExamplesToOfficialQuiz: (_args: {
+    courseCode: string;
+    quizNumber: number;
+    exampleIds: number[];
+  }) => Promise.resolve(0),
 };
 
 // Create an overrideable mock with the default implementation

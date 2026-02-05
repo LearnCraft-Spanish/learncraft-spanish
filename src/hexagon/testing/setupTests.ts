@@ -10,6 +10,10 @@ import {
   resetMockAuthAdapter,
 } from '@application/adapters/authAdapter.mock';
 import {
+  mockCoachAdapter,
+  resetMockCoachAdapter,
+} from '@application/adapters/coachAdapter.mock';
+import {
   mockCourseAdapter,
   resetMockCourseAdapter,
 } from '@application/adapters/ courseAdapter.mock';
@@ -30,6 +34,10 @@ import {
   resetMockOfficialQuizAdapter,
 } from '@application/adapters/officialQuizAdapter.mock';
 import {
+  mockSkillTagsAdapter,
+  resetMockSkillTagsAdapter,
+} from '@application/adapters/skillTagsAdapter.mock';
+import {
   mockSubcategoryAdapter,
   resetMockSubcategoryAdapter,
 } from '@application/adapters/subcategoryAdapter.mock';
@@ -37,7 +45,6 @@ import {
   mockVocabularyAdapter,
   resetMockVocabularyAdapter,
 } from '@application/adapters/vocabularyAdapter.mock';
-
 import {
   mockActiveStudent,
   resetMockActiveStudent,
@@ -66,6 +73,10 @@ vi.mock('@application/adapters/courseAdapter', () => ({
   useCourseAdapter: vi.fn(() => mockCourseAdapter),
 }));
 
+vi.mock('@application/adapters/coachAdapter', () => ({
+  useCoachAdapter: vi.fn(() => mockCoachAdapter),
+}));
+
 vi.mock('@application/adapters/vocabularyAdapter', () => ({
   useVocabularyAdapter: vi.fn(() => mockVocabularyAdapter),
 }));
@@ -84,6 +95,10 @@ vi.mock('@application/adapters/flashcardAdapter', () => ({
 
 vi.mock('@application/adapters/officialQuizAdapter', () => ({
   useOfficialQuizAdapter: vi.fn(() => mockOfficialQuizAdapter),
+}));
+
+vi.mock('@application/adapters/skillTagsAdapter', () => ({
+  useSkillTagsAdapter: vi.fn(() => mockSkillTagsAdapter),
 }));
 
 vi.mock('@application/adapters/authAdapter', () => ({
@@ -115,6 +130,7 @@ const resetGlobalMocks = () => {
   resetMockAuthAdapter();
 
   // adapter mocks
+  resetMockCoachAdapter();
   resetMockVocabularyAdapter();
   resetMockSubcategoryAdapter();
   resetMockExampleAdapter();
@@ -123,6 +139,7 @@ const resetGlobalMocks = () => {
   resetMockFlashcardAdapter();
   resetMockLocalStorageAdapter();
   resetMockOfficialQuizAdapter();
+  resetMockSkillTagsAdapter();
   resetMockUseStudentFlashcards();
   resetMockUseSpellingsKnownForLesson();
 

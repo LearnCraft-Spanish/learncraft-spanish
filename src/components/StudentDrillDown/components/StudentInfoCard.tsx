@@ -1,12 +1,12 @@
 import type { Coach, Student } from 'src/types/CoachingTypes';
+import CoachStudentDrillDown from '@interface/components/CoachStudentDrillDown/CoachStudentDrillDown';
+import { Dropdown, TextInput } from '@interface/components/FormComponents';
 import React, { useEffect, useState } from 'react';
 import pencil from 'src/assets/icons/pencil.svg';
 import {
   Checkbox,
   CoachDropdown,
-  Dropdown,
   FormControls,
-  TextInput,
 } from 'src/components/FormComponents';
 import { toISODate } from 'src/hexagon/domain/functions/dateUtils';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
@@ -143,6 +143,7 @@ export default function StudentInfoCard({
           </div>
         </div>
         {/* only show to users who are admins */}
+        {isAdmin && <CoachStudentDrillDown studentId={student.recordId} />}
         {isAdmin && (
           <>
             <h3>Billing Information</h3>

@@ -1,26 +1,22 @@
 import { overrideMockExampleAdapter } from '@application/adapters/exampleAdapter.mock';
 import { useExamplesToEditQuery } from '@application/queries/ExampleQueries/useExamplesToEditQuery';
 import { renderHook, waitFor } from '@testing-library/react';
-import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
+import { createMockExampleTechnicalList } from '@testing/factories/exampleFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('useExamplesToEditQuery', () => {
   beforeEach(() => {
     overrideMockExampleAdapter({
-      getExamplesForEditingByIds: async () => ({
-        examples: createMockExampleWithVocabularyList(2) as any,
-      }),
+      getExamplesForEditingByIds: async () => createMockExampleTechnicalList(2),
     });
   });
 
   it('should fetch examples for editing by ids correctly', async () => {
     // Arrange
-    const mockData = createMockExampleWithVocabularyList(2);
+    const mockData = createMockExampleTechnicalList(2);
     overrideMockExampleAdapter({
-      getExamplesForEditingByIds: async () => ({
-        examples: mockData as any,
-      }),
+      getExamplesForEditingByIds: async () => mockData,
     });
 
     // Act
@@ -34,7 +30,7 @@ describe('useExamplesToEditQuery', () => {
 
     // After data loads
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.examples?.examples).toEqual(mockData);
+    expect(result.current.examples).toEqual(mockData);
     expect(result.current.error).toBeNull();
   });
 
@@ -64,9 +60,7 @@ describe('useExamplesToEditQuery', () => {
   it('should return undefined examples when ids array is empty', async () => {
     // Arrange
     overrideMockExampleAdapter({
-      getExamplesForEditingByIds: async () => ({
-        examples: [],
-      }),
+      getExamplesForEditingByIds: async () => createMockExampleTechnicalList(0),
     });
 
     // Act
@@ -76,7 +70,7 @@ describe('useExamplesToEditQuery', () => {
 
     // Assert
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(result.current.examples?.examples).toEqual([]);
+    expect(result.current.examples).toEqual([]);
     expect(result.current.error).toBeNull();
   });
 });

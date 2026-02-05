@@ -5,6 +5,7 @@ import type {
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  addExamplesToOfficialQuizEndpoint,
   getOfficialQuizExamplesEndpoint,
   listOfficialQuizzesEndpoint,
 } from '@learncraft-spanish/shared';
@@ -25,15 +26,53 @@ export function createOfficialQuizInfrastructure(
     getOfficialQuizExamples: async ({
       courseCode,
       quizNumber,
+      vocabularyComplete,
+      ignoreCache,
     }: {
       courseCode: string;
       quizNumber: number;
+      vocabularyComplete?: boolean;
+      ignoreCache?: boolean;
     }) => {
-      const response = await httpClient.get<ExampleWithVocabulary[]>(
+      const params = new URLSearchParams();
+      if (vocabularyComplete !== undefined) {
+        params.append('vocabularyComplete', String(vocabularyComplete));
+      }
+
+      const pathWithParams =
         getOfficialQuizExamplesEndpoint.path
           .replace(':courseCode', courseCode)
-          .replace(':quizNumber', quizNumber.toString()),
+          .replace(':quizNumber', quizNumber.toString()) +
+        (params.toString() ? `?${params.toString()}` : '');
+
+      const pathWithQueryParams =
+        pathWithParams + (ignoreCache ? '?ignoreCache=true' : '');
+
+      const response = await httpClient.get<ExampleWithVocabulary[]>(
+        pathWithQueryParams,
         getOfficialQuizExamplesEndpoint.requiredScopes,
+      );
+      return response;
+    },
+    addExamplesToOfficialQuiz: async ({
+      courseCode,
+      quizNumber,
+      exampleIds,
+    }: {
+      courseCode: string;
+      quizNumber: number;
+      exampleIds: number[];
+    }) => {
+      const path = addExamplesToOfficialQuizEndpoint.path
+        .replace(':courseCode', courseCode)
+        .replace(':quizNumber', quizNumber.toString());
+
+      const response = await httpClient.post<number>(
+        path,
+        addExamplesToOfficialQuizEndpoint.requiredScopes,
+        {
+          exampleIds,
+        },
       );
       return response;
     },
