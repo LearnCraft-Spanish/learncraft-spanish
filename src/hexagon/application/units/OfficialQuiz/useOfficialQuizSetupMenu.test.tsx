@@ -244,7 +244,9 @@ describe('useOfficialQuizSetupMenu', () => {
     });
 
     it('returns post-challenge for Post-Challenge Lessons', () => {
-      expect(getCourseCodeFromName('Post-Challenge Lessons')).toBe('post-challenge');
+      expect(getCourseCodeFromName('Post-Challenge Lessons')).toBe(
+        'post-challenge',
+      );
     });
 
     it('returns lcsp for Post-Podcast Lessons', () => {
