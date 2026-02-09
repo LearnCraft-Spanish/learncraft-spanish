@@ -6,10 +6,10 @@ Guidance for AI assistants working in this codebase.
 
 ## What This Project Is
 
-**LearnCraft Spanish** is a web application for learning Spanish vocabulary. It is a **React SPA** (frontend only).
+**LearnCraft Spanish** is a web application to help English Speakers become fluent in Spanish. It assists students in reviewing grammatical concepts and supports the coaching staff that work with the students.
 
-- **This repo** = Frontend (React, Vite, TypeScript)
-- **Backend & shared** = Separate codebases. Shared types and contracts live in `@learncraft-spanish/shared` (npm package); the backend is not in this repo but serves the contracts defined in the shared package, as well as legacy routes.
+- **This repository** = Frontend (React, Vite, TypeScript)
+- **Backend & shared** = Separate codebases. Shared domain types and contracts live in `@learncraft-spanish/shared` (npm package); the backend is not in this repo but serves the contracts defined in the shared package, as well as legacy routes.
 
 ---
 
