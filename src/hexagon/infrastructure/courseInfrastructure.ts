@@ -4,10 +4,10 @@ import type { CourseWithLessons, Lesson } from '@learncraft-spanish/shared';
 
 import { createHttpClient } from '@infrastructure/http/client';
 import {
-  getCoursesWithLessonsEndpoint,
   getLessonRangeVocabRequiredEndpoint,
   getLessonsByVocabularyEndpoint,
   getLessonVocabKnownEndpoint,
+  getPublishedCoursesWithLessonsEndpoint,
 } from '@learncraft-spanish/shared';
 
 export function createCourseInfrastructure(
@@ -17,10 +17,10 @@ export function createCourseInfrastructure(
   const httpClient = createHttpClient(apiUrl, auth);
 
   return {
-    getCoursesWithLessons: async (): Promise<CourseWithLessons[]> => {
+    getPublishedCoursesWithLessons: async (): Promise<CourseWithLessons[]> => {
       const response = await httpClient.get<CourseWithLessons[]>(
-        getCoursesWithLessonsEndpoint.path,
-        getCoursesWithLessonsEndpoint.requiredScopes,
+        getPublishedCoursesWithLessonsEndpoint.path,
+        getPublishedCoursesWithLessonsEndpoint.requiredScopes,
       );
       return response;
     },

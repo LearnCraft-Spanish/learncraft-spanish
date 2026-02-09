@@ -25,6 +25,7 @@ export function createRealisticCourseWithLessonsList(): CourseWithLessons[] {
     {
       id: 2,
       name: 'LearnCraft Spanish',
+      published: true,
       lessons: [
         {
           id: 334,
@@ -91,6 +92,7 @@ export function createRealisticCourseWithLessonsList(): CourseWithLessons[] {
     {
       id: 3,
       name: 'Spanish in One Month',
+      published: true,
       lessons: [
         {
           id: 1,
@@ -198,6 +200,7 @@ export function createRealisticCourseWithLessonsList(): CourseWithLessons[] {
     {
       id: 4,
       name: 'Ser Estar Mini Course',
+      published: true,
       lessons: [
         {
           id: 345,
@@ -229,6 +232,7 @@ export function createRealisticCourseWithLessonsList(): CourseWithLessons[] {
     {
       id: 5,
       name: 'Post-1MC Cohort',
+      published: true,
       lessons: [
         {
           id: 350,
