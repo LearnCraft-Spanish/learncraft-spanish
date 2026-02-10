@@ -19,6 +19,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { createMockAppUser } from '@testing/factories/appUserFactories';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
 import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
+import { createMockQuizGroup } from '@testing/factories/quizFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -258,12 +259,24 @@ describe('useExampleAssigner', () => {
           id: 1,
           courseCode: 'SP101',
           quizNumber: 1,
+          relatedQuizGroupId: 1,
           quizTitle: 'Quiz 1',
+          published: true,
         },
+      ];
+      const mockQuizGroups = [
+        createMockQuizGroup({
+          id: 1,
+          name: 'SP101',
+          urlSlug: 'SP101',
+          courseId: 1,
+          quizzes: officialQuizzes,
+        }),
       ];
 
       overrideMockUseOfficialQuizzesQuery({
         officialQuizRecords: officialQuizzes,
+        quizGroups: mockQuizGroups,
         isLoading: false,
       });
 
@@ -342,11 +355,23 @@ describe('useExampleAssigner', () => {
           id: 1,
           courseCode: 'SP101',
           quizNumber: 1,
+          relatedQuizGroupId: 1,
           quizTitle: 'Quiz 1',
+          published: true,
         },
+      ];
+      const mockQuizGroups = [
+        createMockQuizGroup({
+          id: 1,
+          name: 'SP101',
+          urlSlug: 'SP101',
+          courseId: 1,
+          quizzes: officialQuizzes,
+        }),
       ];
 
       overrideMockUseOfficialQuizzesQuery({
+        quizGroups: mockQuizGroups,
         officialQuizRecords: officialQuizzes,
         isLoading: false,
       });
