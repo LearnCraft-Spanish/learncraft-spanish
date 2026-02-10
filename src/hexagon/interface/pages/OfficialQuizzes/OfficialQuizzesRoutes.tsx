@@ -17,20 +17,15 @@ function LegacyQuizRedirect() {
 }
 
 export function OfficialQuizzesRoutes() {
-  const {
-    isLoading,
-    error,
-    officialQuizCourses,
-    quizSetupMenuProps,
-    isLoggedIn,
-  } = useOfficialQuizzes();
+  const { isLoading, error, quizGroups, quizSetupMenuProps, isLoggedIn } =
+    useOfficialQuizzes();
 
   return (
     <Routes>
-      {officialQuizCourses.map((course) => (
+      {quizGroups.map((group) => (
         <Route
-          key={course.code}
-          path={`${course.url}/*`}
+          key={group.urlSlug}
+          path={`${group.urlSlug}/*`}
           element={
             <Routes>
               <Route path=":number" element={<OfficialQuiz />} />

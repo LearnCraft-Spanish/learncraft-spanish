@@ -3,7 +3,7 @@ import type {
   NewFlashcard,
   Vocabulary,
 } from 'src/types/interfaceDefinitions';
-import { officialQuizCourses } from '@learncraft-spanish/shared';
+import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
 import React, {
   useCallback,
   useEffect,
@@ -43,6 +43,7 @@ export default function SingleExampleCreator({
   const [quizId, setQuizId] = useState<number | undefined>(undefined);
   const { quizExamplesQuery, officialQuizzesQuery, updateQuizExample } =
     useOfficialQuizzes(quizId);
+  const { quizGroups } = useOfficialQuizzesQuery();
   const [tableOption, setTableOption] = useState('none');
   const [vocabIncluded, setVocabIncluded] = useState<string[]>([]);
   const [vocabSearchTerm, setVocabSearchTerm] = useState('');
@@ -57,6 +58,14 @@ export default function SingleExampleCreator({
   const [errorCoachReport, setErrorCoachReport] = useState(false);
 
   const { vocabularyQuery } = useVocabulary();
+
+  const courseOptions = useMemo(() => {
+    if (!quizGroups) return [];
+    return quizGroups.map((group) => ({
+      code: group.urlSlug,
+      name: group.name,
+    }));
+  }, [quizGroups]);
 
   const exampleToSave = useMemo<Flashcard>(() => {
     return {
@@ -413,7 +422,7 @@ export default function SingleExampleCreator({
           onChange={(e) => setTableOption(e.target.value)}
         >
           <option value="none">Recently Edited</option>
-          {officialQuizCourses.map((course) => (
+          {courseOptions.map((course) => (
             <option key={course.code} value={course.code}>
               {course.name}
             </option>
