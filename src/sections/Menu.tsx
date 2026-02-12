@@ -143,13 +143,8 @@ export default function Menu() {
                 </Link>
               </div>
               <div className="buttonBox">
-                <Link className="linkButton" to="/examplemanager">
-                  Example Manager (old)
-                </Link>
-              </div>
-              <div className="buttonBox">
                 <Link className="linkButton" to="/example-manager/search">
-                  Example Manager (new)
+                  Example Manager
                 </Link>
               </div>
               <div className="buttonBox">
