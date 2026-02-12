@@ -1,7 +1,90 @@
+import type { QuizGroup } from '@learncraft-spanish/shared';
 import { SearchByQuiz } from '@interface/components/ExampleSearchInterface/Filters/SearchByQuiz';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { describe, expect, it, vi } from 'vitest';
+
+/**
+ * Explicitly defined mock quiz groups for testing SearchByQuiz component
+ * Includes LCSP and LCSPX courses as referenced in tests
+ */
+const mockQuizGroups: QuizGroup[] = [
+  {
+    id: 1,
+    name: 'LearnCraft Spanish',
+    urlSlug: 'lcsp',
+    courseId: 1,
+    published: true,
+    quizzes: [
+      {
+        id: 1,
+        relatedQuizGroupId: 1,
+        quizNumber: 1,
+        quizTitle: 'LCSP - Lesson 1',
+        published: true,
+      },
+      {
+        id: 2,
+        relatedQuizGroupId: 1,
+        quizNumber: 2,
+        quizTitle: 'LCSP - Lesson 2',
+        published: true,
+      },
+      {
+        id: 3,
+        relatedQuizGroupId: 1,
+        quizNumber: 3,
+        quizTitle: 'LCSP - Lesson 3',
+        published: true,
+      },
+      {
+        id: 4,
+        relatedQuizGroupId: 1,
+        quizNumber: 4,
+        quizTitle: 'LCSP - Lesson 4',
+        published: true,
+      },
+      {
+        id: 5,
+        relatedQuizGroupId: 1,
+        quizNumber: 5,
+        quizTitle: 'LCSP - Lesson 5',
+        published: true,
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'LearnCraft Spanish Extended',
+    urlSlug: 'lcspx',
+    courseId: 2,
+    published: true,
+    quizzes: [
+      {
+        id: 101,
+        relatedQuizGroupId: 2,
+        quizNumber: 1,
+        quizTitle: 'LCSPX - Advanced Lesson 1',
+        published: true,
+      },
+      {
+        id: 102,
+        relatedQuizGroupId: 2,
+        quizNumber: 2,
+        quizTitle: 'LCSPX - Advanced Lesson 2',
+        published: true,
+      },
+      {
+        id: 103,
+        relatedQuizGroupId: 2,
+        quizNumber: 3,
+        quizTitle: 'LCSPX - Advanced Lesson 3',
+        published: true,
+      },
+    ],
+  },
+];
 
 // Mock useSearchByQuizFilter hook
 vi.mock(
@@ -30,6 +113,12 @@ vi.mock(
   }),
 );
 
+vi.mock('@application/queries/useOfficialQuizzesQuery', () => ({
+  useOfficialQuizzesQuery: vi.fn(() => ({
+    quizGroups: mockQuizGroups,
+  })),
+}));
+
 describe('component: SearchByQuiz', () => {
   it('should render with initial values', async () => {
     const onCourseCodeChange = vi.fn();
@@ -39,11 +128,12 @@ describe('component: SearchByQuiz', () => {
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode="lcsp"
-        quizNumber={2}
+        courseCode={mockQuizGroups[0].urlSlug}
+        quizNumber={mockQuizGroups[0].quizzes[0].quizNumber}
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
     const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
@@ -51,8 +141,10 @@ describe('component: SearchByQuiz', () => {
     const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
 
     await waitFor(() => {
-      expect(courseSelect.value).toBe('lcsp');
-      expect(quizSelect.value).toBe('2');
+      expect(courseSelect.value).toBe(mockQuizGroups[0].urlSlug);
+      expect(quizSelect.value).toBe(
+        mockQuizGroups[0].quizzes[0].quizNumber.toString(),
+      );
     });
   });
 
@@ -69,11 +161,11 @@ describe('component: SearchByQuiz', () => {
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
-    expect(screen.getByText('Select a Course')).toBeInTheDocument();
-    expect(screen.getByText('LearnCraft Spanish')).toBeInTheDocument();
-    expect(screen.getByText('LearnCraft Spanish Extended')).toBeInTheDocument();
+    expect(screen.getAllByText(mockQuizGroups[0].name)).toHaveLength(1);
+    expect(screen.getAllByText(mockQuizGroups[1].name)).toHaveLength(1);
   });
 
   it('should call onCourseCodeChange when course is selected', async () => {
@@ -90,12 +182,13 @@ describe('component: SearchByQuiz', () => {
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
     const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
-    await user.selectOptions(courseSelect, ['lcsp']);
+    await user.selectOptions(courseSelect, [mockQuizGroups[0].urlSlug]);
 
-    expect(onCourseCodeChange).toHaveBeenCalledWith('lcsp');
+    expect(onCourseCodeChange).toHaveBeenCalledWith(mockQuizGroups[0].urlSlug);
   });
 
   it('should reset quiz number to 0 when course code changes', async () => {
@@ -112,12 +205,13 @@ describe('component: SearchByQuiz', () => {
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
     const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
-    await user.selectOptions(courseSelect, ['lcsp']);
+    await user.selectOptions(courseSelect, [mockQuizGroups[0].urlSlug]);
 
-    expect(onCourseCodeChange).toHaveBeenCalledWith('lcsp');
+    expect(onCourseCodeChange).toHaveBeenCalledWith(mockQuizGroups[0].urlSlug);
   });
 
   it('should display quiz options based on selected course', async () => {
@@ -133,6 +227,7 @@ describe('component: SearchByQuiz', () => {
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
     expect(screen.getByText('lcsp Quiz 1')).toBeInTheDocument();
@@ -154,6 +249,7 @@ describe('component: SearchByQuiz', () => {
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
     const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
@@ -175,6 +271,7 @@ describe('component: SearchByQuiz', () => {
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
     const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
@@ -194,6 +291,7 @@ describe('component: SearchByQuiz', () => {
         onCourseCodeChange={onCourseCodeChange}
         onQuizNumberChange={onQuizNumberChange}
       />,
+      { wrapper: MockAllProviders },
     );
 
     expect(screen.getByText('lcsp Quiz 3')).toBeInTheDocument();

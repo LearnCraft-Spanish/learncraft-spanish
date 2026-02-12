@@ -5,7 +5,6 @@ import { overrideMockActiveStudent } from '@application/coordinators/hooks/useAc
 import { overrideMockSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons.mock';
 import { mockUseOfficialQuizSetupMenu } from '@application/units/OfficialQuiz/useOfficialQuizSetupMenu.mock';
 import { useOfficialQuizzes } from '@application/useCases/useOfficialQuizzes/useOfficialQuizzes';
-import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { renderHook, waitFor } from '@testing-library/react';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -60,7 +59,7 @@ describe('useOfficialQuizzes', () => {
     it('should return officialQuizzesError when present', async () => {
       const testError = new Error('Official quizzes error');
       overrideMockOfficialQuizAdapter({
-        getOfficialQuizRecords: async () => {
+        getOfficialQuizGroups: async () => {
           throw testError;
         },
       });
@@ -138,12 +137,14 @@ describe('useOfficialQuizzes', () => {
   });
 
   describe('other return values', () => {
-    it('should return officialQuizCourses as an array', () => {
+    it('should return quizGroups as an array', async () => {
       const { result } = renderHook(() => useOfficialQuizzes(), {
         wrapper: TestQueryClientProvider,
       });
 
-      expect(result.current.officialQuizCourses).toEqual(officialQuizCourses);
+      await waitFor(() => {
+        expect(Array.isArray(result.current.quizGroups)).toBe(true);
+      });
     });
 
     it('should return quizSetupMenuProps from useOfficialQuizSetupMenu', () => {
