@@ -11,7 +11,6 @@ import { useQuizExamplesQuery } from '@application/queries/useQuizExamplesQuery'
 import { useSelectedExamples } from '@application/units/ExampleSearchInterface/useSelectedExamples';
 import useLessonPopup from '@application/units/useLessonPopup';
 import { getUnassignedExamples } from '@application/useCases/useExampleAssigner/helpers';
-import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -116,22 +115,28 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
   const { appUser, isLoading: isLoadingActiveStudent } = useActiveStudent();
 
   // Get official quizzes
-  const { officialQuizRecords, isLoading: isLoadingQuizzes } =
-    useOfficialQuizzesQuery();
+  const {
+    quizGroups,
+    officialQuizRecords,
+    isLoading: isLoadingQuizzes,
+  } = useOfficialQuizzesQuery();
 
   // Filter quizzes by selected course
   const availableQuizzes = useMemo(() => {
     if (!officialQuizRecords || selectedCourseCode === 'none') return undefined;
+    const quizGroup = quizGroups?.find(
+      (group) => group.urlSlug === selectedCourseCode,
+    );
 
-    return officialQuizRecords
-      .filter((quiz) => quiz.courseCode === selectedCourseCode)
-      .map((quiz) => ({
+    return (
+      quizGroup?.quizzes.map((quiz) => ({
         recordId: quiz.id,
         quizNickname: quiz.quizTitle,
         quizNumber: quiz.quizNumber,
-        courseCode: quiz.courseCode,
-      }));
-  }, [officialQuizRecords, selectedCourseCode]);
+        courseCode: quizGroup.urlSlug,
+      })) ?? []
+    );
+  }, [quizGroups, selectedCourseCode, officialQuizRecords]);
 
   // Get selected quiz record
   const selectedQuizRecord = useMemo(() => {
@@ -265,7 +270,14 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     }
   }, []);
 
-  const courseOptions = officialQuizCourses;
+  // Map quiz groups to course options (code and name format)
+  const courseOptions = useMemo(() => {
+    if (!quizGroups) return [];
+    return quizGroups.map((group) => ({
+      code: group.urlSlug,
+      name: group.name,
+    }));
+  }, [quizGroups]);
 
   // Determine target name for display
   const targetName = useMemo(() => {
