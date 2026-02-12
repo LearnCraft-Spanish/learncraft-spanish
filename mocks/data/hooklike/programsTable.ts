@@ -3044,11 +3044,11 @@ const programsTable: Program[] = [
   },
   {
     recordId: 5,
-    name: 'Post-1MC Cohort',
+    name: 'Post-Challenge Lessons',
     lessons: [
       {
         recordId: 350,
-        lesson: 'post 1mc 21',
+        lesson: 'post challenge 1',
         vocabIncluded: [],
         sortReference: null,
         relatedProgram: 5,
@@ -3280,11 +3280,11 @@ const programsTable: Program[] = [
           'por favor/Cluster, Idiom/',
         ],
         lessonNumber: 1,
-        courseName: 'Post Podcast Lessons',
+        courseName: 'Post-Challenge Lessons',
       },
       {
         recordId: 351,
-        lesson: 'post 1mc 22',
+        lesson: 'post challenge 2',
         vocabIncluded: [
           'estuve/Verb, Verb/estar preterite//1st person singular "yo" ; Preterite',
           'estuvo/Verb, Verb/estar preterite//3rd person singular "él/ella/eso" ; Preterite',
@@ -3521,11 +3521,11 @@ const programsTable: Program[] = [
           'estuvo/Verb, Verb/estar preterite//3rd person singular "él/ella/eso" ; Preterite',
         ],
         lessonNumber: 2,
-        courseName: 'Post Podcast Lessons',
+        courseName: 'Post-Challenge Lessons',
       },
       {
         recordId: 352,
-        lesson: 'post 1mc 23',
+        lesson: 'post challenge 3',
         vocabIncluded: [
           'será/Verb, Verb/future/',
           'sería/Verb, Verb/I would be/',
@@ -3535,7 +3535,7 @@ const programsTable: Program[] = [
           'serías/Verb, Verb//2nd person singular "tú" ; Conditional',
         ],
         lessonNumber: 3,
-        courseName: 'Post Podcast Lessons',
+        courseName: 'Post-Challenge Lessons',
         sortReference: null,
         relatedProgram: 5,
         vocabKnown: [

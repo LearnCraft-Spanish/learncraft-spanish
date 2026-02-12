@@ -4,7 +4,10 @@ import {
 } from '@application/queries/useOfficialQuizzesQuery.mock';
 import { useSearchByQuizFilter } from '@application/units/ExampleSearchInterface/Filters/useSearchByQuizFilter';
 import { renderHook } from '@testing-library/react';
-import { createMockOfficialQuizRecord } from '@testing/factories/quizFactory';
+import {
+  createMockOfficialQuizRecord,
+  createMockQuizGroup,
+} from '@testing/factories/quizFactory';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the useOfficialQuizzesQuery hook
@@ -19,29 +22,40 @@ describe('useSearchByQuizFilter', () => {
 
   it('should filter quizzes by course code correctly', () => {
     // Arrange
+
     const mockQuizRecords = [
       createMockOfficialQuizRecord({
         id: 1,
-        courseCode: 'lcsp',
+        relatedQuizGroupId: 1,
         quizNumber: 1,
         quizTitle: 'LCSP Quiz 1',
       }),
       createMockOfficialQuizRecord({
         id: 2,
-        courseCode: 'lcsp',
+        relatedQuizGroupId: 1,
         quizNumber: 2,
         quizTitle: 'LCSP Quiz 2',
       }),
       createMockOfficialQuizRecord({
         id: 3,
-        courseCode: 'other',
+        relatedQuizGroupId: 2,
         quizNumber: 1,
         quizTitle: 'Other Quiz 1',
+      }),
+    ];
+    const mockQuizGroups = [
+      createMockQuizGroup({
+        id: 1,
+        name: 'LCSP',
+        urlSlug: 'lcsp',
+        courseId: 1,
+        quizzes: mockQuizRecords,
       }),
     ];
 
     overrideMockUseOfficialQuizzesQuery({
       officialQuizRecords: mockQuizRecords,
+      quizGroups: mockQuizGroups,
       isLoading: false,
       error: null,
     });
@@ -52,9 +66,9 @@ describe('useSearchByQuizFilter', () => {
     );
 
     // Assert
-    expect(result.current.quizOptions).toHaveLength(2);
-    expect(result.current.quizOptions[0].courseCode).toBe('lcsp');
-    expect(result.current.quizOptions[1].courseCode).toBe('lcsp');
+    expect(result.current.quizOptions).toHaveLength(3);
+    expect(result.current.quizOptions[0].relatedQuizGroupId).toBe(1);
+    expect(result.current.quizOptions[1].relatedQuizGroupId).toBe(1);
     expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
   });

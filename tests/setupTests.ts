@@ -31,7 +31,7 @@ import { server } from 'mocks/api/server';
 import {
   mockCourseAdapter,
   resetMockCourseAdapter,
-} from 'src/hexagon/application/adapters/ courseAdapter.mock';
+} from 'src/hexagon/application/adapters/courseAdapter.mock';
 
 import { resetTestQueryClient } from 'src/hexagon/testing/utils/testQueryClient';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';

@@ -1,40 +1,41 @@
-import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
+import type { OfficialQuizRecord, QuizGroup } from '@learncraft-spanish/shared';
 import { useSelectedCourseAndLessons } from '@application/coordinators/hooks/useSelectedCourseAndLessons';
 import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
-import { officialQuizCourses } from '@learncraft-spanish/shared';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
+
 export interface UseOfficialQuizSetupMenuReturnType {
-  courseCode: string;
-  setUserSelectedCourseCode: (courseCode: string) => void;
+  selectedQuizGroup: QuizGroup | null;
+  setSelectedQuizGroup: (quizGroupId: number) => void;
   quizNumber: number;
   setUserSelectedQuizNumber: (quizNumber: number) => void;
   quizOptions: OfficialQuizRecord[];
+  quizGroups: QuizGroup[];
   startQuiz: () => void;
 }
-export function getCourseCodeFromName(courseName: string) {
-  switch (courseName) {
-    case 'LearnCraft Spanish':
-      return 'lcsp';
-    case 'Spanish in One Month':
-      return 'si1m';
-    case 'Post-1MC Cohort':
-      return 'post-1mc';
-    case 'Post-Podcast Lessons':
-      return 'lcsp';
-    case 'Ser Estar Mini Course':
-      return 'ser-estar';
-    case 'Subjunctives Challenge':
-      return 'subjunctive';
-    default:
-      return 'lcsp';
-  }
-}
+// export function getCourseCodeFromName(courseName: string) {
+//   switch (courseName) {
+//     case 'LearnCraft Spanish':
+//       return 'lcsp';
+//     case 'Spanish in One Month':
+//       return 'si1m';
+//     case 'Post-Challenge Lessons':
+//       return 'post-challenge';
+//     case 'Post-Podcast Lessons':
+//       return 'lcsp';
+//     case 'Ser Estar Mini Course':
+//       return 'ser-estar';
+//     case 'Subjunctives Challenge':
+//       return 'subjunctive';
+//     default:
+//       return 'lcsp';
+//   }
+// }
 
 export function useOfficialQuizSetupMenu(): UseOfficialQuizSetupMenuReturnType {
   const {
-    officialQuizRecords,
+    quizGroups,
     isLoading: officialQuizzesLoading,
     error,
   } = useOfficialQuizzesQuery();
@@ -42,88 +43,81 @@ export function useOfficialQuizSetupMenu(): UseOfficialQuizSetupMenuReturnType {
     useSelectedCourseAndLessons();
 
   const navigate = useNavigate();
+  const [userSelectedQuizGroup, setUserSelectedQuizGroup] =
+    useState<QuizGroup | null>(null);
 
-  const [userSelectedCourseCode, setUserSelectedCourseCodeState] = useState('');
   const [userSelectedQuizNumber, setUserSelectedQuizNumber] = useState(0); //quizNumber
 
   // useMemo to memoize the courseCode and quizNumber
-  const courseCode = useMemo(() => {
-    if (userSelectedCourseCode) {
-      return userSelectedCourseCode;
+  const selectedQuizGroup = useMemo(() => {
+    if (userSelectedQuizGroup) {
+      return userSelectedQuizGroup;
     }
-    return getCourseCodeFromName(course?.name ?? '');
-  }, [userSelectedCourseCode, course]);
+    return quizGroups?.find((group) => group.courseId === course?.id) ?? null;
+  }, [userSelectedQuizGroup, quizGroups, course]);
 
   const quizNumber = useMemo(() => {
     if (userSelectedQuizNumber) {
       return userSelectedQuizNumber;
-    }
-    if (courseCode === 'subjunctive') {
-      const firstMatchingQuiz = officialQuizRecords?.find(
-        (quiz) =>
-          quiz.courseCode === courseCode &&
-          Math.floor(quiz.quizNumber / 100) === toLesson?.lessonNumber,
+    } else if (toLesson && selectedQuizGroup?.courseId === course?.id) {
+      const selectedQuiz = selectedQuizGroup?.quizzes.find(
+        (quiz) => quiz.quizNumber === toLesson.lessonNumber,
       );
-
-      return firstMatchingQuiz?.quizNumber ?? 0;
+      if (selectedQuiz) {
+        return selectedQuiz.quizNumber;
+      }
     }
-    // find first
-    return toLesson?.lessonNumber ?? 0;
-  }, [userSelectedQuizNumber, toLesson, courseCode, officialQuizRecords]);
+
+    return selectedQuizGroup?.quizzes[0]?.quizNumber ?? 0;
+  }, [userSelectedQuizNumber, selectedQuizGroup, toLesson, course]);
 
   // quizOptions are the quizzes for the selected course
   const quizOptions = useMemo(() => {
-    if (!officialQuizRecords || officialQuizzesLoading || error) {
+    if (!quizGroups || officialQuizzesLoading || error) {
       return [];
     }
-    const filteredQuizzes = officialQuizRecords.filter(
-      (quiz) => quiz.courseCode === courseCode,
-    );
-    return filteredQuizzes;
-  }, [courseCode, officialQuizRecords, officialQuizzesLoading, error]);
+    return selectedQuizGroup?.quizzes ?? [];
+  }, [selectedQuizGroup, quizGroups, officialQuizzesLoading, error]);
 
   // startQuiz navigates to the quiz
   const startQuiz = useCallback(() => {
-    if (quizNumber && courseCode) {
-      // get course
-      const course = officialQuizCourses.find(
-        (course) => course.code === courseCode,
-      );
-      if (!course) {
-        console.error('Course not found');
-        return;
-      }
-      const navigateTarget = `/officialquizzes/${course.url}/${quizNumber.toString()}`;
+    if (quizNumber && selectedQuizGroup && quizGroups) {
+      // Find the quiz group by matching quizzes with the courseCode
+
+      const navigateTarget = `/officialquizzes/${selectedQuizGroup.urlSlug}/${quizNumber.toString()}`;
       navigate(navigateTarget);
     }
-  }, [courseCode, quizNumber, navigate]);
+  }, [selectedQuizGroup, quizNumber, quizGroups, navigate]);
 
-  const setUserSelectedCourseCode = useCallback(
-    (newCourseCode: string) => {
-      // if courseCode is lcspx, convert to lcsp JUST for updateUserSelectedCourseId
-      const stableCourseCode =
-        newCourseCode === 'lcspx' ? 'lcsp' : newCourseCode;
-      const course = officialQuizCourses.find(
-        (course) => course.code === stableCourseCode,
-      );
+  const setSelectedQuizGroup = useCallback(
+    (newQuizGroupId: number) => {
+      if (!quizGroups) return;
+
+      // Find the quiz group by matching quizzes with the courseCode
+      const quizGroup = quizGroups.find((group) => group.id === newQuizGroupId);
+
       // update Coordinator context
-      if (!course || !course.courseId) {
-        console.error('Course not found');
+      if (!quizGroup) {
+        console.error('Quiz group not found');
+        return;
+      } else if (!quizGroup.courseId) {
+        console.error('Quiz group has no course id');
       } else {
-        updateUserSelectedCourseId(course.courseId);
+        updateUserSelectedCourseId(quizGroup.courseId);
       }
       // update local state
-      setUserSelectedCourseCodeState(newCourseCode);
+      setUserSelectedQuizGroup(quizGroup);
       setUserSelectedQuizNumber(0);
     },
-    [updateUserSelectedCourseId],
+    [updateUserSelectedCourseId, quizGroups],
   );
   return {
-    courseCode,
-    setUserSelectedCourseCode,
+    selectedQuizGroup: selectedQuizGroup ?? null,
+    setSelectedQuizGroup,
     quizNumber,
     setUserSelectedQuizNumber,
     quizOptions,
+    quizGroups: quizGroups ?? [],
     startQuiz,
   };
 }

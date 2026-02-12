@@ -14,9 +14,9 @@ export function useCoursesWithLessons(): UseCoursesWithLessonsReturn {
   const { appUser, isLoading } = useActiveStudent();
 
   return useQuery({
-    queryKey: ['coursesWithLessons'],
+    queryKey: ['publishedCoursesWithLessons'],
     queryFn: () => {
-      return adapter.getCoursesWithLessons().then((courses) => {
+      return adapter.getPublishedCoursesWithLessons().then((courses) => {
         // Filter out the Subjunctives Challenge course for non-admin/coach users
         // and users not enrolled in the course
         if (isAdmin || isCoach || appUser?.courseId === 10) {

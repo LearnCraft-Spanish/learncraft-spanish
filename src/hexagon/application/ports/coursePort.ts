@@ -8,9 +8,9 @@ export interface LessonRange {
 
 export interface CoursePort {
   /**
-   * Get the courses with lessons
+   * Get the published courses with lessons
    */
-  getCoursesWithLessons: () => Promise<CourseWithLessons[]>;
+  getPublishedCoursesWithLessons: () => Promise<CourseWithLessons[]>;
 
   getLessonVocabKnown: ({
     lessonRanges,
