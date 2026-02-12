@@ -1,18 +1,11 @@
-import type {
-  QuizExamplesTable,
-  QuizUnparsed,
-} from 'src/types/interfaceDefinitions';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import serverlikeData from 'mocks/data/serverlike/serverlikeData';
 import { getAuthUserFromEmail } from 'mocks/data/serverlike/userTable';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { act } from 'react';
 import { overrideAuthAndAppUser } from 'src/hexagon/testing/utils/overrideAuthAndAppUser';
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { useBackend } from './useBackend';
-
-const { api } = serverlikeData();
 
 describe('useBackend Hook', () => {
   let hookResult: ReturnType<typeof useBackend>;
@@ -221,30 +214,9 @@ describe('useBackend Hook', () => {
     requiredFields: ['relatedWordIdiom', 'spellingOption'],
   });
 
-  testArrayFetchFunction({
-    functionName: 'getLcspQuizzesFromBackend',
-    requiredFields: ['recordId', 'quizNickname'],
-  });
-
   testObjectFetchFunction({
     functionName: 'getMyExamplesFromBackend',
     requiredFields: ['examples', 'studentExamples'],
-  });
-
-  const quizExamplesTableArray = api.quizExamplesTableArray;
-  quizExamplesTableArray.forEach((quizExamplesObject: QuizExamplesTable) => {
-    const quizNickname = quizExamplesObject.quizNickname;
-    const quizId = api.quizzesTable.find(
-      (quiz: QuizUnparsed) => quiz.quizNickname === quizNickname,
-    )?.recordId;
-    if (!quizId) {
-      throw new Error('Quiz ID not found');
-    }
-    testArrayFetchFunction({
-      functionName: 'getQuizExamplesFromBackend',
-      functionParams: quizId,
-      requiredFields: ['recordId', 'spanishExample', 'englishTranslation'],
-    });
   });
 
   describe('createMyStudentExample function', () => {
