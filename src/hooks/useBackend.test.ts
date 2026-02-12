@@ -204,16 +204,6 @@ describe('useBackend Hook', () => {
     requiredFields: ['recordId', 'lesson'],
   });
 
-  testArrayFetchFunction({
-    functionName: 'getVocabFromBackend',
-    requiredFields: ['recordId', 'wordIdiom'],
-  });
-
-  testArrayFetchFunction({
-    functionName: 'getSpellingsFromBackend',
-    requiredFields: ['relatedWordIdiom', 'spellingOption'],
-  });
-
   testObjectFetchFunction({
     functionName: 'getMyExamplesFromBackend',
     requiredFields: ['examples', 'studentExamples'],

@@ -210,14 +210,8 @@ export function useBackendHelpers() {
 }
 
 export function useBackend() {
-  const {
-    getFactory,
-    postFactory,
-    deleteFactory,
-    newDeleteFactory,
-    newPostFactory,
-    newPutFactory,
-  } = useBackendHelpers();
+  const { getFactory, postFactory, deleteFactory, newPostFactory } =
+    useBackendHelpers();
 
   /*      GET Requests      */
   const { getAccessToken } = useAuthAdapter();
@@ -230,24 +224,6 @@ export function useBackend() {
   // used
   const getLessonsFromBackend = useCallback((): Promise<types.Lesson[]> => {
     return getFactory<types.Lesson[]>('public/lessons');
-  }, [getFactory]);
-  // used
-  const getVocabFromBackend = useCallback((): Promise<types.Vocabulary[]> => {
-    return getFactory<types.Vocabulary[]>('public/vocabulary');
-  }, [getFactory]);
-  // used
-  const getVerbsFromBackend = useCallback((): Promise<types.Verb[]> => {
-    return getFactory<types.Verb[]>('admin/verbs');
-  }, [getFactory]);
-  // used
-  const getSubcategoriesFromBackend = useCallback((): Promise<
-    types.Subcategory[]
-  > => {
-    return getFactory<types.Subcategory[]>('admin/subcategories');
-  }, [getFactory]);
-  // used
-  const getSpellingsFromBackend = useCallback((): Promise<types.Spelling[]> => {
-    return getFactory<types.Spelling[]>('public/spellings');
   }, [getFactory]);
 
   // used - but possibly remove
@@ -410,118 +386,6 @@ export function useBackend() {
     [newPostFactory],
   );
 
-  // used
-  const createVocabulary = useCallback(
-    (vocabulary: Omit<types.Vocabulary, 'recordId'>): Promise<number> => {
-      return newPostFactory({
-        path: 'admin/vocabulary',
-        body: vocabulary,
-      });
-    },
-    [newPostFactory],
-  );
-
-  // used
-  const updateVocabulary = useCallback(
-    (vocabulary: types.Vocabulary): Promise<number> => {
-      return newPostFactory({
-        path: `admin/vocabulary/${vocabulary.recordId}`,
-        body: vocabulary,
-      });
-    },
-    [newPostFactory],
-  );
-
-  // used
-  const deleteVocabulary = useCallback(
-    (recordId: number): Promise<number> => {
-      return newDeleteFactory({
-        path: `admin/vocabulary/${recordId}`,
-      });
-    },
-    [newDeleteFactory],
-  );
-  // used
-  const createSpelling = useCallback(
-    (spelling: Omit<types.Spelling, 'recordId'>): Promise<number> => {
-      return newPostFactory({
-        path: 'admin/spellings',
-        body: spelling,
-      });
-    },
-    [newPostFactory],
-  );
-  // used
-  const deleteSpelling = useCallback(
-    (spelling: types.Spelling): Promise<number> => {
-      return newDeleteFactory({
-        path: 'admin/spellings',
-        body: spelling,
-      });
-    },
-    [newDeleteFactory],
-  );
-  // used
-  const createSubcategory = useCallback(
-    (
-      subcategory: Omit<types.Subcategory, 'recordId'>,
-    ): Promise<types.Subcategory> => {
-      return newPostFactory({
-        path: 'admin/subcategories',
-        body: subcategory,
-      });
-    },
-    [newPostFactory],
-  );
-  // used
-  const updateSubcategory = useCallback(
-    (subcategory: types.Subcategory): Promise<types.Subcategory> => {
-      return newPutFactory({
-        path: `admin/subcategories/${subcategory.recordId}`,
-        body: subcategory,
-      });
-    },
-    [newPutFactory],
-  );
-  // used
-  const deleteSubcategory = useCallback(
-    (recordId: number): Promise<number> => {
-      return newDeleteFactory({
-        path: `admin/subcategories/${recordId}`,
-      });
-    },
-    [newDeleteFactory],
-  );
-  // used
-  const createVerb = useCallback(
-    (verb: Omit<types.Verb, 'recordId'>): Promise<types.Verb> => {
-      return newPostFactory({
-        path: 'admin/verbs',
-        body: verb,
-      });
-    },
-    [newPostFactory],
-  );
-  // used
-  const updateVerb = useCallback(
-    (verb: types.Verb): Promise<types.Verb> => {
-      return newPutFactory({
-        path: `admin/verbs/${verb.recordId}`,
-        body: verb,
-      });
-    },
-    [newPutFactory],
-  );
-  // used
-  const deleteVerb = useCallback(
-    (recordId: number): Promise<number> => {
-      return newDeleteFactory({
-        path: `admin/verbs/${recordId}`,
-      });
-    },
-    [newDeleteFactory],
-  );
-
   return {
     getAccessToken,
     // GET Requests
@@ -537,31 +401,16 @@ export function useBackend() {
 
     getPMFDataForUser,
     getProgramsFromBackend,
-    getSpellingsFromBackend,
-    getVocabFromBackend,
-    getVerbsFromBackend,
-    getSubcategoriesFromBackend,
 
     // POST Requests
     createMyStudentExample,
     createPMFDataForUser,
-    createSpelling,
     createStudentExample,
     createMultipleStudentExamples,
-    createVocabulary,
     updatePMFDataForUser,
-    updateVocabulary,
 
     // DELETE Requests
     deleteMyStudentExample,
-    deleteSpelling,
     deleteStudentExample,
-    deleteVocabulary,
-    createSubcategory,
-    updateSubcategory,
-    deleteSubcategory,
-    createVerb,
-    updateVerb,
-    deleteVerb,
   };
 }
