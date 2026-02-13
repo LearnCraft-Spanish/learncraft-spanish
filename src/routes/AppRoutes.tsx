@@ -18,6 +18,7 @@ import {
   QuizGroupsTable,
   QuizzesTable,
   StudentsTable,
+  VqdLessonsTable,
 } from 'src/components/DatabaseTables';
 import ExampleManager from 'src/components/ExampleManager/ExampleManager';
 import StudentDrillDown from 'src/components/StudentDrillDown/StudentDrillDown';
@@ -82,9 +83,10 @@ export default function AppRoutes() {
         <Route path="students" element={<StudentsTable />} />
         <Route path="programs" element={<ProgramsTable />} />
         <Route path="quiz-groups" element={<QuizGroupsTable />} />
+        <Route path="vqd-lessons" element={<VqdLessonsTable />} />
+        <Route path="quizzes" element={<QuizzesTable />} />
         <Route path="lessons" element={<LessonsTable />} />
         <Route path="courses" element={<CoursesTable />} />
-        <Route path="quizzes" element={<QuizzesTable />} />
       </Route>
       <Route path="/example-manager/*" element={<ExampleManagerRouter />} />
       <Route path="/*" element={<NotFoundPage />} />

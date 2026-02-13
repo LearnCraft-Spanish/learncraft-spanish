@@ -4,6 +4,7 @@ import {
   QuizGroupsTable,
   QuizzesTable,
   StudentsTable,
+  VqdLessonsTable,
 } from './VocabQuizDb';
 
 export {
@@ -13,4 +14,5 @@ export {
   QuizGroupsTable,
   QuizzesTable,
   StudentsTable,
+  VqdLessonsTable,
 };

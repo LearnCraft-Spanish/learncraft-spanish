@@ -16,3 +16,15 @@ export interface QuizGroup {
   relatedProgram: number;
   programName: string;
 }
+
+export interface Lesson {
+  recordId: number;
+  lesson: string;
+  lessonNumber: number;
+  subtitle: string;
+
+  programName: string;
+  relatedProgram: number;
+
+  published: boolean;
+}
