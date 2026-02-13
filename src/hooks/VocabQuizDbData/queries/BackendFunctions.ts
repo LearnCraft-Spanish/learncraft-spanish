@@ -1,8 +1,5 @@
-import type {
-  FlashcardStudent,
-  Program,
-  Quiz,
-} from 'src/types/interfaceDefinitions';
+import type { QbQuiz } from 'src/types/DatabaseTables';
+import type { FlashcardStudent, Program } from 'src/types/interfaceDefinitions';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 
 export default function useVocabQuizDbBackend() {
@@ -24,7 +21,7 @@ export default function useVocabQuizDbBackend() {
 
   // get quizzes table
   const getQuizzesTable = () => {
-    return getFactory<Quiz[]>('vocab-quiz/quizzes');
+    return getFactory<QbQuiz[]>('vocab-quiz/quizzes');
   };
 
   return {

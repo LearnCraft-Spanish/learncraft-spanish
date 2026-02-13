@@ -1,7 +1,7 @@
 import type { SortConfig } from 'src/components/Table/types';
-import type { Quiz } from 'src/types/interfaceDefinitions';
+import type { QbQuiz } from 'src/types/DatabaseTables';
 
-export default function sortFunction(data: Quiz[], sortConfig: SortConfig) {
+export default function sortFunction(data: QbQuiz[], sortConfig: SortConfig) {
   if (sortConfig.key === 'Quiz Nickname') {
     return [...data].sort((a, b) => {
       return sortConfig.direction === 'ascending'

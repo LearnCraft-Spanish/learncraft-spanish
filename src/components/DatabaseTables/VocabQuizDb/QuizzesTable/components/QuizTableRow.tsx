@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
-import type { Quiz } from 'src/types/interfaceDefinitions';
+import type { QbQuiz } from 'src/types/DatabaseTables';
 import pencilIcon from 'src/assets/icons/pencil.svg';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 
-export default function QuizTableRow({ quiz }: { quiz: Quiz }): ReactNode {
+export default function QuizTableRow({ quiz }: { quiz: QbQuiz }): ReactNode {
   const { openContextual } = useContextualMenu();
-  const { quizNickname, recordId } = quiz;
+  const { quizNickname, recordId, published } = quiz;
 
   return (
     <tr>
@@ -18,6 +18,7 @@ export default function QuizTableRow({ quiz }: { quiz: Quiz }): ReactNode {
         </div>
       </td>
       <td style={{ whiteSpace: 'nowrap' }}>{quizNickname}</td>
+      <td style={{ whiteSpace: 'nowrap' }}>{published ? 'Yes' : 'No'}</td>
     </tr>
   );
 }
