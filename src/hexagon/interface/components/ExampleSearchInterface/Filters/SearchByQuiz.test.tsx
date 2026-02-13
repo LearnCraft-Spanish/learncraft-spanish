@@ -91,75 +91,115 @@ vi.mock(
   '@application/units/ExampleSearchInterface/Filters/useSearchByQuizFilter',
   () => ({
     useSearchByQuizFilter: vi.fn((props) => {
-      // Return different quiz options based on course code
-      const quizOptionsByCode: Record<
-        string,
-        Array<{ id: number; quizNumber: number; quizTitle: string }>
+      // Return different quiz options based on quizGroupId
+      const quizOptionsByGroupId: Record<
+        number,
+        Array<{
+          id: number;
+          quizNumber: number;
+          quizTitle: string;
+          published: boolean;
+          relatedQuizGroupId: number;
+        }>
       > = {
-        lcsp: [
-          { id: 1, quizNumber: 1, quizTitle: 'lcsp Quiz 1' },
-          { id: 2, quizNumber: 2, quizTitle: 'lcsp Quiz 2' },
-          { id: 3, quizNumber: 3, quizTitle: 'lcsp Quiz 3' },
+        1: [
+          {
+            id: 1,
+            quizNumber: 1,
+            quizTitle: 'LCSP - Lesson 1',
+            published: true,
+            relatedQuizGroupId: 1,
+          },
+          {
+            id: 2,
+            quizNumber: 2,
+            quizTitle: 'LCSP - Lesson 2',
+            published: true,
+            relatedQuizGroupId: 1,
+          },
+          {
+            id: 3,
+            quizNumber: 3,
+            quizTitle: 'LCSP - Lesson 3',
+            published: true,
+            relatedQuizGroupId: 1,
+          },
         ],
-        lcspx: [
-          { id: 4, quizNumber: 1, quizTitle: 'lcspx Quiz 1' },
-          { id: 5, quizNumber: 2, quizTitle: 'lcspx Quiz 2' },
+        2: [
+          {
+            id: 101,
+            quizNumber: 1,
+            quizTitle: 'LCSPX - Advanced Lesson 1',
+            published: true,
+            relatedQuizGroupId: 2,
+          },
+          {
+            id: 102,
+            quizNumber: 2,
+            quizTitle: 'LCSPX - Advanced Lesson 2',
+            published: true,
+            relatedQuizGroupId: 2,
+          },
         ],
       };
       return {
-        quizOptions: quizOptionsByCode[props.courseCode] || [],
+        quizOptions:
+          props.quizGroupId !== undefined
+            ? quizOptionsByGroupId[props.quizGroupId] || []
+            : [],
+        isLoading: false,
+        error: null,
       };
     }),
   }),
 );
 
-vi.mock('@application/queries/useOfficialQuizzesQuery', () => ({
-  useOfficialQuizzesQuery: vi.fn(() => ({
+vi.mock('@application/queries/useAllQuizGroups', () => ({
+  useAllQuizGroups: vi.fn(() => ({
     quizGroups: mockQuizGroups,
+    isLoading: false,
+    error: null,
   })),
 }));
 
 describe('component: SearchByQuiz', () => {
   it('should render with initial values', async () => {
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode={mockQuizGroups[0].urlSlug}
-        quizNumber={mockQuizGroups[0].quizzes[0].quizNumber}
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={mockQuizGroups[0].id}
+        quizId={mockQuizGroups[0].quizzes[0].id}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
 
     const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
-
     const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
 
     await waitFor(() => {
-      expect(courseSelect.value).toBe(mockQuizGroups[0].urlSlug);
-      expect(quizSelect.value).toBe(
-        mockQuizGroups[0].quizzes[0].quizNumber.toString(),
-      );
+      expect(courseSelect.value).toBe(mockQuizGroups[0].id.toString());
+      expect(quizSelect.value).toBe(mockQuizGroups[0].quizzes[0].id.toString());
     });
   });
 
   it('should display course options', () => {
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode=""
-        quizNumber=""
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={undefined}
+        quizId={undefined}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
@@ -168,86 +208,86 @@ describe('component: SearchByQuiz', () => {
     expect(screen.getAllByText(mockQuizGroups[1].name)).toHaveLength(1);
   });
 
-  it('should call onCourseCodeChange when course is selected', async () => {
+  it('should call onQuizGroupIdChange when course is selected', async () => {
     const user = userEvent.setup();
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode=""
-        quizNumber=""
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={undefined}
+        quizId={undefined}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
 
     const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
-    await user.selectOptions(courseSelect, [mockQuizGroups[0].urlSlug]);
+    await user.selectOptions(courseSelect, [mockQuizGroups[0].id.toString()]);
 
-    expect(onCourseCodeChange).toHaveBeenCalledWith(mockQuizGroups[0].urlSlug);
+    expect(onQuizGroupIdChange).toHaveBeenCalledWith(mockQuizGroups[0].id);
   });
 
-  it('should reset quiz number to 0 when course code changes', async () => {
+  it('should reset quiz id when quiz group changes', async () => {
     const user = userEvent.setup();
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode=""
-        quizNumber=""
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={undefined}
+        quizId={undefined}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
 
     const courseSelect = screen.getByLabelText('Course:') as HTMLSelectElement;
-    await user.selectOptions(courseSelect, [mockQuizGroups[0].urlSlug]);
+    await user.selectOptions(courseSelect, [mockQuizGroups[0].id.toString()]);
 
-    expect(onCourseCodeChange).toHaveBeenCalledWith(mockQuizGroups[0].urlSlug);
+    expect(onQuizGroupIdChange).toHaveBeenCalledWith(mockQuizGroups[0].id);
   });
 
   it('should display quiz options based on selected course', async () => {
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode="lcsp"
-        quizNumber=""
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={1}
+        quizId={undefined}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
 
-    expect(screen.getByText('lcsp Quiz 1')).toBeInTheDocument();
-    expect(screen.getByText('lcsp Quiz 2')).toBeInTheDocument();
-    expect(screen.getByText('lcsp Quiz 3')).toBeInTheDocument();
+    expect(screen.getByText('LCSP - Lesson 1')).toBeInTheDocument();
+    expect(screen.getByText('LCSP - Lesson 2')).toBeInTheDocument();
+    expect(screen.getByText('LCSP - Lesson 3')).toBeInTheDocument();
   });
 
-  it('should call onQuizNumberChange when quiz is selected', async () => {
+  it('should call onQuizIdChange when quiz is selected', async () => {
     const user = userEvent.setup();
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode="lcsp"
-        quizNumber=""
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={1}
+        quizId={undefined}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
@@ -255,21 +295,21 @@ describe('component: SearchByQuiz', () => {
     const quizSelect = screen.getByLabelText('Quiz:') as HTMLSelectElement;
     await user.selectOptions(quizSelect, ['2']);
 
-    expect(onQuizNumberChange).toHaveBeenCalledWith(2);
+    expect(onQuizIdChange).toHaveBeenCalledWith(2);
   });
 
-  it('should display selected quiz number value', () => {
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+  it('should display selected quiz id value', () => {
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode="lcsp"
-        quizNumber={2}
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={1}
+        quizId={2}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
@@ -279,36 +319,36 @@ describe('component: SearchByQuiz', () => {
   });
 
   it('should display different quiz options when course changes', async () => {
-    const onCourseCodeChange = vi.fn();
-    const onQuizNumberChange = vi.fn();
+    const onQuizGroupIdChange = vi.fn();
+    const onQuizIdChange = vi.fn();
 
     const { rerender } = render(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode="lcsp"
-        quizNumber=""
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={1}
+        quizId={undefined}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
       { wrapper: MockAllProviders },
     );
 
-    expect(screen.getByText('lcsp Quiz 3')).toBeInTheDocument();
+    expect(screen.getByText('LCSP - Lesson 3')).toBeInTheDocument();
 
     rerender(
       <SearchByQuiz
         vocabularyComplete={undefined}
         onVocabularyCompleteChange={vi.fn()}
-        courseCode="lcspx"
-        quizNumber=""
-        onCourseCodeChange={onCourseCodeChange}
-        onQuizNumberChange={onQuizNumberChange}
+        quizGroupId={2}
+        quizId={undefined}
+        onQuizGroupIdChange={onQuizGroupIdChange}
+        onQuizIdChange={onQuizIdChange}
       />,
     );
 
-    expect(screen.queryByText('lcsp Quiz 3')).not.toBeInTheDocument();
-    expect(screen.getByText('lcspx Quiz 1')).toBeInTheDocument();
-    expect(screen.getByText('lcspx Quiz 2')).toBeInTheDocument();
+    expect(screen.queryByText('LCSP - Lesson 3')).not.toBeInTheDocument();
+    expect(screen.getByText('LCSPX - Advanced Lesson 1')).toBeInTheDocument();
+    expect(screen.getByText('LCSPX - Advanced Lesson 2')).toBeInTheDocument();
   });
 });

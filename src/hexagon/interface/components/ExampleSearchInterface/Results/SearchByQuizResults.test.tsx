@@ -35,21 +35,35 @@ describe('component: SearchByQuizResults', () => {
   });
 
   it('should render', () => {
-    render(<SearchByQuizResults courseCode="spanish-1" quizNumber={1} />);
+    render(<SearchByQuizResults quizId={1} />);
     expect(screen.getAllByText('Select')[0]).toHaveTextContent('Select');
   });
 
   it('uses useSearchByQuizResults hook and passes props', () => {
-    const courseCode = 'spanish-2';
-    const quizNumber = 7;
+    const quizId = 7;
+    const vocabularyComplete = true;
 
     render(
-      <SearchByQuizResults courseCode={courseCode} quizNumber={quizNumber} />,
+      <SearchByQuizResults
+        quizId={quizId}
+        vocabularyComplete={vocabularyComplete}
+      />,
     );
 
     expect(useSearchByQuizResults).toHaveBeenCalledWith({
-      courseCode,
-      quizNumber,
+      quizId,
+      vocabularyComplete,
+    });
+  });
+
+  it('should pass quizId without vocabularyComplete when not provided', () => {
+    const quizId = 5;
+
+    render(<SearchByQuizResults quizId={quizId} />);
+
+    expect(useSearchByQuizResults).toHaveBeenCalledWith({
+      quizId,
+      vocabularyComplete: undefined,
     });
   });
 });
