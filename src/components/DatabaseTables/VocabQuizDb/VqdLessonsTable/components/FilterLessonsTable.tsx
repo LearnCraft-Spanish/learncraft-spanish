@@ -57,9 +57,7 @@ export default function FilterLessonsTable({
 
       <TextInput
         label="Filter by Program Name"
-        value={
-          filterConfig.field === 'Program Name' ? filterConfig.value : ''
-        }
+        value={filterConfig.field === 'Program Name' ? filterConfig.value : ''}
         onChange={handleProgramNameFilterChange}
         editMode
       />

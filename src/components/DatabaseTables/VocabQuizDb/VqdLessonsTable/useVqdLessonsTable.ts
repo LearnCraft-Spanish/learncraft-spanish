@@ -5,11 +5,8 @@ import useVqdLessonsTableQueries from 'src/hooks/VocabQuizDbData/useVqdLessonsTa
 export default function useVqdLessonsTable() {
   const { contextual } = useContextualMenu();
 
-  const {
-    vqdLessonsTableQuery,
-    createLessonMutation,
-    updateLessonMutation,
-  } = useVqdLessonsTableQueries();
+  const { vqdLessonsTableQuery, createLessonMutation, updateLessonMutation } =
+    useVqdLessonsTableQueries();
 
   const lessonToEdit = useMemo(() => {
     if (!contextual.startsWith('edit-vqd-lesson-')) {
