@@ -9,5 +9,13 @@ export default function sortFunction(data: QbQuiz[], sortConfig: SortConfig) {
         : b.quizNickname.localeCompare(a.quizNickname);
     });
   }
+
+  if (sortConfig.key === 'Published') {
+    return [...data].sort((a, b) => {
+      return sortConfig.direction === 'ascending'
+        ? Number(a.published) - Number(b.published)
+        : Number(b.published) - Number(a.published);
+    });
+  }
   return [...data];
 }
