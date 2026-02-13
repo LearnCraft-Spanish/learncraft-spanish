@@ -23,6 +23,11 @@ export default function DatabaseTables() {
               </Link>
             </div>
             <div className="buttonBox">
+              <Link className="linkButton" to="/database-tables/quiz-groups">
+                Quiz Groups Table
+              </Link>
+            </div>
+            <div className="buttonBox">
               <Link className="linkButton" to="/database-tables/quizzes">
                 Quizzes Table
               </Link>

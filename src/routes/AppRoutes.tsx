@@ -15,6 +15,7 @@ import {
   CoursesTable,
   LessonsTable,
   ProgramsTable,
+  QuizGroupsTable,
   QuizzesTable,
   StudentsTable,
 } from 'src/components/DatabaseTables';
@@ -80,6 +81,7 @@ export default function AppRoutes() {
       <Route path="/database-tables/*" element={isAdmin && <DatabaseTables />}>
         <Route path="students" element={<StudentsTable />} />
         <Route path="programs" element={<ProgramsTable />} />
+        <Route path="quiz-groups" element={<QuizGroupsTable />} />
         <Route path="lessons" element={<LessonsTable />} />
         <Route path="courses" element={<CoursesTable />} />
         <Route path="quizzes" element={<QuizzesTable />} />

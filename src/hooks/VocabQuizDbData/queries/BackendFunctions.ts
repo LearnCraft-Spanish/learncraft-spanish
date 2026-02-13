@@ -1,4 +1,4 @@
-import type { QbQuiz } from 'src/types/DatabaseTables';
+import type { QbQuiz, QuizGroup } from 'src/types/DatabaseTables';
 import type { FlashcardStudent, Program } from 'src/types/interfaceDefinitions';
 import { useBackendHelpers } from 'src/hooks/useBackend';
 
@@ -24,10 +24,16 @@ export default function useVocabQuizDbBackend() {
     return getFactory<QbQuiz[]>('vocab-quiz/quizzes');
   };
 
+  // get quiz groups table
+  const getQuizGroupsTable = () => {
+    return getFactory<QuizGroup[]>('vocab-quiz/quiz-groups');
+  };
+
   return {
     getStudentsTable,
     getStudentsTableCohortFieldOptions,
     getProgramsTable,
     getQuizzesTable,
+    getQuizGroupsTable,
   };
 }

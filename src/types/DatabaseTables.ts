@@ -6,3 +6,13 @@ export interface QbQuiz {
   relatedQuizGroup: number;
   quizGroupName: string;
 }
+
+export interface QuizGroup {
+  recordId: number;
+  name: string;
+  urlSlug: string;
+  published: boolean;
+
+  relatedProgram: number;
+  programName: string;
+}
