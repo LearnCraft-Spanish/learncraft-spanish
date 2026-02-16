@@ -4,71 +4,73 @@ import { describe, expect, it, vi } from 'vitest';
 
 describe('quizAssignmentSelector', () => {
   const defaultProps = {
-    selectedCourseCode: 'none',
-    onCourseCodeChange: vi.fn(),
+    selectedQuizGroupId: undefined,
+    onQuizGroupIdChange: vi.fn(),
     selectedQuizRecordId: undefined,
     onQuizRecordIdChange: vi.fn(),
     availableQuizzes: undefined,
-    courseOptions: [
-      { code: 'SP101', name: 'Spanish 101' },
-      { code: 'SP102', name: 'Spanish 102' },
+    quizGroupOptions: [
+      { id: 1, name: 'Spanish 101' },
+      { id: 2, name: 'Spanish 102' },
     ],
   };
 
   it('should render quiz selection message', () => {
     render(<QuizAssignmentSelector {...defaultProps} />);
 
-    expect(screen.getByText('Course:')).toBeInTheDocument();
+    expect(screen.getByText('Quiz Group:')).toBeInTheDocument();
     expect(screen.getByText('Quiz:')).toBeInTheDocument();
   });
 
-  it('should render course selector', () => {
+  it('should render quiz group selector', () => {
     render(<QuizAssignmentSelector {...defaultProps} />);
 
     const selects = screen.getAllByRole('combobox');
     expect(selects).toHaveLength(2);
-    expect(screen.getByText('Select a Course')).toBeInTheDocument();
+    expect(screen.getByText('Select a Quiz Group')).toBeInTheDocument();
   });
 
-  it('should call onCourseCodeChange when course is selected', () => {
-    const onCourseCodeChange = vi.fn();
+  it('should call onQuizGroupIdChange when quiz group is selected', () => {
+    const onQuizGroupIdChange = vi.fn();
     const onQuizRecordIdChange = vi.fn();
 
     render(
       <QuizAssignmentSelector
         {...defaultProps}
-        onCourseCodeChange={onCourseCodeChange}
+        onQuizGroupIdChange={onQuizGroupIdChange}
         onQuizRecordIdChange={onQuizRecordIdChange}
       />,
     );
 
     const selects = screen.getAllByRole('combobox');
-    const courseSelect = selects[0];
-    fireEvent.change(courseSelect, { target: { value: 'SP101' } });
+    const quizGroupSelect = selects[0];
+    fireEvent.change(quizGroupSelect, { target: { value: '1' } });
 
-    expect(onCourseCodeChange).toHaveBeenCalledWith('SP101');
+    expect(onQuizGroupIdChange).toHaveBeenCalledWith(1);
   });
 
-  it('should render quiz selector when course is selected', () => {
+  it('should render quiz selector when quiz group is selected', () => {
     const availableQuizzes = [
       {
-        recordId: 1,
-        quizNickname: 'Quiz 1',
+        id: 1,
+        published: true,
+        quizTitle: 'Quiz 1',
         quizNumber: 1,
-        courseCode: 'SP101',
+        relatedQuizGroupId: 1,
       },
       {
-        recordId: 2,
-        quizNickname: 'Quiz 2',
+        id: 2,
+        published: true,
+        quizTitle: 'Quiz 2',
         quizNumber: 2,
-        courseCode: 'SP101',
+        relatedQuizGroupId: 1,
       },
     ];
 
     render(
       <QuizAssignmentSelector
         {...defaultProps}
-        selectedCourseCode="SP101"
+        selectedQuizGroupId={1}
         availableQuizzes={availableQuizzes}
       />,
     );
@@ -82,17 +84,18 @@ describe('quizAssignmentSelector', () => {
     const onQuizRecordIdChange = vi.fn();
     const availableQuizzes = [
       {
-        recordId: 1,
-        quizNickname: 'Quiz 1',
+        id: 1,
+        published: true,
+        quizTitle: 'Quiz 1',
         quizNumber: 1,
-        courseCode: 'SP101',
+        relatedQuizGroupId: 1,
       },
     ];
 
     render(
       <QuizAssignmentSelector
         {...defaultProps}
-        selectedCourseCode="SP101"
+        selectedQuizGroupId={1}
         availableQuizzes={availableQuizzes}
         onQuizRecordIdChange={onQuizRecordIdChange}
       />,
@@ -105,20 +108,21 @@ describe('quizAssignmentSelector', () => {
     expect(onQuizRecordIdChange).toHaveBeenCalledWith(1);
   });
 
-  it('should display quiz nickname when available', () => {
+  it('should display quiz title when available', () => {
     const availableQuizzes = [
       {
-        recordId: 1,
-        quizNickname: 'Midterm Exam',
+        id: 1,
+        published: true,
+        quizTitle: 'Midterm Exam',
         quizNumber: 1,
-        courseCode: 'SP101',
+        relatedQuizGroupId: 1,
       },
     ];
 
     render(
       <QuizAssignmentSelector
         {...defaultProps}
-        selectedCourseCode="SP101"
+        selectedQuizGroupId={1}
         availableQuizzes={availableQuizzes}
       />,
     );
@@ -126,20 +130,21 @@ describe('quizAssignmentSelector', () => {
     expect(screen.getByText('Midterm Exam')).toBeInTheDocument();
   });
 
-  it('should display quiz number when nickname is not available', () => {
+  it('should display quiz number when title is not available', () => {
     const availableQuizzes = [
       {
-        recordId: 1,
-        quizNickname: undefined,
+        id: 1,
+        published: true,
+        quizTitle: undefined,
         quizNumber: 5,
-        courseCode: 'SP101',
+        relatedQuizGroupId: 1,
       },
     ];
 
     render(
       <QuizAssignmentSelector
         {...defaultProps}
-        selectedCourseCode="SP101"
+        selectedQuizGroupId={1}
         availableQuizzes={availableQuizzes}
       />,
     );

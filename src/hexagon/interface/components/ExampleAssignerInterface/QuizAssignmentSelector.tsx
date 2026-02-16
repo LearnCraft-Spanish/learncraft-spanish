@@ -1,44 +1,48 @@
 import { GenericDropdown } from '@interface/components/FormComponents';
 import './QuizAssignmentSelector.scss';
 interface QuizAssignmentSelectorProps {
-  selectedCourseCode: string;
-  onCourseCodeChange: (code: string) => void;
+  selectedQuizGroupId: number | undefined;
+  onQuizGroupIdChange: (id: number | undefined) => void;
   selectedQuizRecordId: number | undefined;
   onQuizRecordIdChange: (id: number | undefined) => void;
   availableQuizzes:
     | Array<{
-        recordId: number;
-        quizNickname?: string;
+        id: number;
+        published: boolean;
+        quizTitle?: string;
         quizNumber?: number;
-        courseCode: string;
+        relatedQuizGroupId: number | null;
       }>
     | undefined;
-  courseOptions: Array<{ code: string; name: string }>;
+  quizGroupOptions: Array<{ id: number; name: string }>;
 }
 
 export function QuizAssignmentSelector({
-  selectedCourseCode,
-  onCourseCodeChange,
+  selectedQuizGroupId,
+  onQuizGroupIdChange,
   selectedQuizRecordId,
   onQuizRecordIdChange,
   availableQuizzes,
-  courseOptions,
+  quizGroupOptions,
 }: QuizAssignmentSelectorProps) {
   const handleQuizNumberChange = (value: string) => {
     onQuizRecordIdChange(Number.parseInt(value) || 0);
+  };
+  const handleQuizGroupIdChange = (value: string) => {
+    onQuizGroupIdChange(Number.parseInt(value) || 0);
   };
 
   return (
     <div className="quiz-assignment-selector-container">
       <GenericDropdown
-        label="Course"
-        selectedValue={selectedCourseCode}
-        onChange={onCourseCodeChange}
-        options={courseOptions.map((course) => ({
-          value: course.code,
-          text: course.name,
+        label="Quiz Group"
+        selectedValue={selectedQuizGroupId?.toString() || ''}
+        onChange={handleQuizGroupIdChange}
+        options={quizGroupOptions.map((quizGroupOptions) => ({
+          value: quizGroupOptions.id.toString(),
+          text: quizGroupOptions.name,
         }))}
-        defaultOptionText="Select a Course"
+        defaultOptionText="Select a Quiz Group"
         editMode
         required
       />
@@ -49,8 +53,8 @@ export function QuizAssignmentSelector({
         onChange={handleQuizNumberChange}
         options={
           availableQuizzes?.map((quiz) => ({
-            value: quiz.recordId.toString(),
-            text: quiz.quizNickname || `Quiz ${quiz.quizNumber}`,
+            value: quiz.id.toString(),
+            text: quiz.quizTitle || `Quiz ${quiz.quizNumber}`,
           })) || []
         }
         defaultOptionText="Select a Quiz"

@@ -38,6 +38,7 @@ export type Program = Expanded<{
   cohortHCurrentLesson: number;
   cohortICurrentLesson: number;
   cohortJCurrentLesson: number;
+  published: boolean;
 }>;
 
 export type ProgramUnparsed = Expanded<{
@@ -54,6 +55,7 @@ export type ProgramUnparsed = Expanded<{
   cohortHCurrentLesson: number;
   cohortICurrentLesson: number;
   cohortJCurrentLesson: number;
+  published: boolean;
 }>;
 
 export type UserData = Expanded<{

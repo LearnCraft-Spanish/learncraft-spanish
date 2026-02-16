@@ -30,6 +30,13 @@ export default function ProgramTableRow({
       [field]: numValue,
     });
   };
+  const handlePublishedChange = (value: boolean) => {
+    if (!updateProgramInActiveData) return;
+    updateProgramInActiveData({
+      ...program,
+      published: value,
+    });
+  };
 
   return (
     <tr>
@@ -59,6 +66,17 @@ export default function ProgramTableRow({
           )}
         </td>
       ))}
+      {tableEditMode ? (
+        <td>
+          <input
+            type="checkbox"
+            checked={program.published}
+            onChange={(e) => handlePublishedChange(e.target.checked)}
+          />
+        </td>
+      ) : (
+        <td>{program.published ? 'Yes' : 'No'}</td>
+      )}
     </tr>
   );
 }
