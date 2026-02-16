@@ -1,131 +1,131 @@
 # CLAUDE.md — LearnCraft Spanish
 
-Guidance for AI assistants working in this codebase.
+Quick reference guide for AI assistants working in this codebase.
 
 ---
 
 ## What This Project Is
 
-**LearnCraft Spanish** is a web application to help English Speakers become fluent in Spanish. It assists students in reviewing grammatical concepts and supports the coaching staff that work with the students.
+**LearnCraft Spanish** - React/TypeScript frontend for Spanish language learning (students, coaches, admins).
 
 - **This repository** = Frontend (React, Vite, TypeScript)
-- **Backend & shared** = Separate codebases. Shared domain types and contracts live in `@learncraft-spanish/shared` (npm package); the backend is not in this repo but serves the contracts defined in the shared package, as well as legacy routes.
+- **Backend & shared** = Separate repos. Domain types in `@learncraft-spanish/shared` npm package
+- **Architecture** = Hexagonal (see `src/hexagon/ARCHITECTURE.md`)
+- **Status** = Active migration from legacy to hexagon structure
 
 ---
 
-## Architectural Principles
+## 🚨 Critical Rules
 
-**Dependencies flow inward only.** Domain → application → infrastructure/interface → composition. No layer imports upward. See `src/hexagon/ARCHITECTURE.md`.
+⚠️ **BOUNDARIES.md files are authoritative** - NOT the linter. Always verify against BOUNDARIES.md for architecture compliance.
 
-| Layer              | Role                               | Rule of thumb                                                                                 |
-| ------------------ | ---------------------------------- | --------------------------------------------------------------------------------------------- |
-| **Domain**         | Pure transforms, frontend adapters | No React, no IO, no imports. Stateless only. Core types live in `@learncraft-spanish/shared`. |
-| **Application**    | Runtime behavior, orchestration    | Use-cases, units, coordinators, queries. _All behavior flows through use-cases._              |
-| **Infrastructure** | External service bindings          | Thin wrappers matching ports. No business logic.                                              |
-| **Interface**      | React UI                           | Components and pages. One use-case hook per page; no business logic.                          |
-| **Composition**    | Bootstrap                          | Static wiring only. No conditionals or effects.                                               |
+⚠️ **Explicit return types required** - All hooks must have explicit return types (no inference, no `typeof`, no `ReturnType<>`).
 
-**Testing:** Tests and mocks colocated: `example.test.ts`, `example.mock.ts`. Typed mocks (use `createTypedMock`); never untyped `vi.fn()`. Don't mock domain, invoke it.
+⚠️ **Dependencies flow inward only** - Domain → Application → Infrastructure/Interface → Composition.
 
-**Code style:** Explicit return types on all hooks — no inferred types, no `typeof`, no `ReturnType<>`.
+⚠️ **One use case per page** - Interface pages call exactly one use case hook.
 
-**Where domain lives:** Business logic and core type definitions live in `@learncraft-spanish/shared`. The frontend is not about business logic — it consumes shared types and focuses on orchestration, UI, and frontend-specific transforms.
+📖 **Full details:** See `src/hexagon/ARCHITECTURE.md` and `documentation/ENGINEERING_DOCTRINE.md`
 
 ---
 
-## How to Get Around
+## 📚 Documentation Map
 
-| Directory                             | Purpose                                                                                          |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `src/hexagon/`                        | Main architecture — domain, application, infrastructure, interface, composition, testing         |
-| `src/hexagon/domain/`                 | Pure transforms, frontend adapters for shared types (core types in `@learncraft-spanish/shared`) |
-| `src/hexagon/application/`            | Use-cases, units, coordinators, queries, ports, adapters                                         |
-| `src/hexagon/infrastructure/`         | HTTP, auth, API bindings                                                                         |
-| `src/hexagon/interface/`              | React components, pages, routes                                                                  |
-| `src/components/`, `src/hooks/`, etc. | Legacy code outside hexagon (being migrated over time)                                           |
-| `documentation/`                      | PR standards, testing standards, prod checklist                                                  |
-| `mocks/`                              | Shared mock data and providers                                                                   |
+**Start here:**
+- 📖 [`README.md`](./README.md) - Project overview and quick start
+- 🏗️ [`src/hexagon/ARCHITECTURE.md`](./src/hexagon/ARCHITECTURE.md) - Hexagonal architecture guide
+- 📋 [`documentation/ONBOARDING.md`](./documentation/ONBOARDING.md) - New developer setup
 
----
+**For development:**
+- 🔨 [`documentation/FEATURE_WORKFLOW.md`](./documentation/FEATURE_WORKFLOW.md) - Building features step-by-step
+- 🎯 [`documentation/COMMON_PATTERNS.md`](./documentation/COMMON_PATTERNS.md) - Code conventions and patterns
+- 📊 [`documentation/DATA_FLOW.md`](./documentation/DATA_FLOW.md) - State management and data flow
+- 🔄 [`documentation/MIGRATION_GUIDE.md`](./documentation/MIGRATION_GUIDE.md) - Legacy to hexagon migration
+- 📚 [`documentation/DOMAIN_GLOSSARY.md`](./documentation/DOMAIN_GLOSSARY.md) - Business terminology
 
-## Further Documentation
+**For quality:**
+- 🧪 [`documentation/TESTING_STANDARDS.md`](./documentation/TESTING_STANDARDS.md) - Testing requirements
+- ✅ [`documentation/PR_STANDARDS.md`](./documentation/PR_STANDARDS.md) - PR checklist
+- 🔍 [`documentation/PR_REVIEW_GUIDE.md`](./documentation/PR_REVIEW_GUIDE.md) - Detailed review steps
+- 🔧 [`documentation/TROUBLESHOOTING.md`](./documentation/TROUBLESHOOTING.md) - Common issues
+- 📜 [`documentation/SCRIPTS.md`](./documentation/SCRIPTS.md) - All npm/pnpm scripts explained
 
-| Doc                                        | Purpose                                           |
-| ------------------------------------------ | ------------------------------------------------- |
-| `src/hexagon/ARCHITECTURE.md`              | Hexagonal architecture, layer roles, import rules |
-| `documentation/TESTING_STANDARDS.md`       | Testing rules, mocking, cleanup                   |
-| `documentation/PR_STANDARDS.md`            | PR checklist, architecture compliance             |
-| `documentation/INTERNAL_PROD_CHECKLIST.md` | Production release process                        |
-| `src/hexagon/**/BOUNDARIES.md`             | Per-layer boundary rules                          |
-| `src/hexagon/**/README.md`                 | Component/subsystem-specific docs                 |
-
----
-
-## Preferred Scripts
-
-| Script                    | Use                                                     |
-| ------------------------- | ------------------------------------------------------- |
-| `pnpm start`              | Start dev server                                        |
-| `pnpm test`               | Run legacy tests (outside hexagon only)                 |
-| `pnpm test:hexagon`       | Run tests inside hexagonal architecture                 |
-| `pnpm test:hexagon:watch` | Tests inside hexagonal in watch mode                    |
-| `pnpm lint`               | Run ESLint                                              |
-| `pnpm lint:fix`           | Run ESLint in fix mode (use by default)                 |
-| `pnpm typecheck`          | TypeScript check                                        |
-| `pnpm validate`           | Lint, format, typecheck                                 |
-| `pnpm mutate:hexagon`     | Mutation testing for hexagon (only for CI, takes hours) |
+**For architecture:**
+- 📐 [`documentation/ENGINEERING_DOCTRINE.md`](./documentation/ENGINEERING_DOCTRINE.md) - Core principles
+- 🔒 `src/hexagon/**/BOUNDARIES.md` - Per-layer boundary rules (authoritative)
 
 ---
 
-## Operating Modes
+## 🎭 Operating Modes
 
-### 1. Explain Non-Technical (No Code Gen)
+### Mode 1: PR Review (CI Context)
 
-**Typical use:** Often used from cloud / non-IDE contexts. User wants understanding, not edits.
+**Priority:** Follow `documentation/PR_STANDARDS.md` checklist + `documentation/PR_REVIEW_GUIDE.md` detailed steps.
 
-**Focus on:**
+**CRITICAL:** Verify architecture against `BOUNDARIES.md` files - linter is NOT authoritative.
 
-- **Design** — How features fit together, UX flows, product intent
-- **History** — Why decisions were made, migration context, legacy vs hexagon
-- **Tradeoffs** — Pros and cons of specific design choices
-- **Future Options** — What is feasible under current design constraints
-
-**Avoid:**
-
-- Technical details
-- Code generation
-- Suggesting edits or refactors
-- Implementation details unless asked
-
-**STRICT REQUIREMENT** Translate all descriptions to non-technical language. The user is not a developer.
-
-**Example prompts:** "What does our technical debt look like?" "Why is this feature taking so long?" "Is there an easy way to implement this new feature?"
+**Principle:** We do not bypass systems, we enrich or divide them.
 
 ---
 
-### 2. PR Review
+### Mode 2: Feature Development (Local Context)
 
-**Typical Use:** Called from CI, make go/no-go call before approval.
+**Workflow:** Follow `documentation/FEATURE_WORKFLOW.md` step-by-step.
 
-**TOP PRIORITY:** Complete the "PR Review Checklist" found at `documentation/PR_STANDARDS.md`. Step through each item one at a time.
+**Pattern:** Domain (pure logic) → Application (orchestration) → Infrastructure (I/O) → Interface (UI) → Composition (wiring).
 
-**Focus on**
-
-- Correctness (explicit types, dependency direction, etc.)
-- Compliance (architecture, test coverage, etc.)
-- Clarity and Legibility (descriptive names, comments, JSDoc)
-- Maintainibility (file size, tight coupling, indirection)
-
-**Important:** We do not bypass systems, we enrich or divide them.
+**Testing:** All new code requires tests (see `documentation/TESTING_STANDARDS.md`).
 
 ---
 
-### 3. Feature Work
+### Mode 3: Explain Non-Technical (Cloud Context)
 
-**Typical Use:** Used locally to build new features in codebase.
+**Audience:** Non-developers (product, stakeholders).
+
+**Focus:** Design, UX, tradeoffs, feasibility - NO technical details, NO code.
+
+**Requirement:** Translate ALL descriptions to plain language.
 
 ---
 
-### 4. Explain Technical
+### Mode 4: Explain Technical (Architecture Review)
 
-**Typical Use:** Revisiting or updating architectural decisions for long-term stability.
+**Purpose:** Architectural decisions, long-term stability, technical debt assessment.
+
+**Reference:** `documentation/ENGINEERING_DOCTRINE.md` and `src/hexagon/ARCHITECTURE.md`
+
+---
+
+## ⚡ Quick Commands
+
+```bash
+pnpm start              # Dev server
+pnpm test:hexagon:watch # Test in watch mode
+pnpm validate           # Lint + format + typecheck
+```
+
+📖 **All commands:** See [`documentation/SCRIPTS.md`](./documentation/SCRIPTS.md)
+
+---
+
+## 🗺️ Codebase Structure
+
+```
+src/hexagon/          # Modern architecture (use for all new code)
+  ├── domain/         # Pure logic, no dependencies
+  ├── application/    # Use cases, queries, orchestration
+  ├── infrastructure/ # API clients, external services
+  ├── interface/      # React components, pages
+  └── composition/    # App bootstrap, providers
+
+src/components/       # Legacy (being migrated)
+src/hooks/            # Legacy (being migrated)
+
+documentation/        # All project documentation
+```
+
+📖 **Full details:** See `src/hexagon/ARCHITECTURE.md`
+
+---
+
+**Remember:** This is a quick reference. For detailed information, always consult the specific documentation files linked above.

@@ -251,6 +251,50 @@ Dependencies flow inward only. See the [Dependency Flow](#-dependency-flow) diag
 
 > ✅ No layer may import upward. Only `composition/` may reference everything to wire the app together.
 
+### ⚠️ BOUNDARIES.md Files Are Authoritative
+
+**CRITICAL**: The `BOUNDARIES.md` files in each layer directory are the **authoritative source of truth** for what is and isn't allowed in that layer.
+
+- ✅ **BOUNDARIES.md is authoritative** - These define the actual rules
+- 🔧 **Linter is a helper** - ESLint catches common violations but is NOT authoritative
+- ❌ **Passing lint ≠ Correct architecture** - The linter cannot catch all boundary violations
+
+**Why This Matters:**
+
+The linter uses pattern matching and cannot understand semantic context. It will catch obvious violations (like importing from a parent layer), but it cannot detect:
+
+- Logic that belongs in a different layer
+- Business rules in UI components
+- Mixed concerns within a layer
+- Inappropriate use of exceptions
+- Semantic dependency violations
+
+**In Code Review:**
+
+When reviewing PRs, **always check against BOUNDARIES.md files**, not just lint results. Ask:
+
+1. Is this code in the right layer for its responsibility?
+2. Are dependencies flowing in the correct direction?
+3. Does this follow the semantic intent of the layer boundaries?
+4. Are any exceptions to the rules justified and documented?
+
+**Location of BOUNDARIES.md Files:**
+
+- `src/hexagon/domain/BOUNDARIES.md`
+- `src/hexagon/application/BOUNDARIES.md`
+- `src/hexagon/application/useCases/BOUNDARIES.md`
+- `src/hexagon/application/units/BOUNDARIES.md`
+- `src/hexagon/application/coordinators/BOUNDARIES.md`
+- `src/hexagon/application/queries/BOUNDARIES.md`
+- `src/hexagon/application/ports/BOUNDARIES.md`
+- `src/hexagon/application/adapters/BOUNDARIES.md`
+- `src/hexagon/infrastructure/BOUNDARIES.md`
+- `src/hexagon/interface/BOUNDARIES.md`
+- `src/hexagon/composition/BOUNDARIES.md`
+- `src/hexagon/testing/BOUNDARIES.md`
+
+> 📖 **Read these files** before working in a new layer. They contain the specific rules and patterns for that layer.
+
 ---
 
 ## 📊 Test Coverage Standards

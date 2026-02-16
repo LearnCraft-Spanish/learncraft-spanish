@@ -92,6 +92,7 @@ See [Testing Standards](./TESTING_STANDARDS.md) for detailed testing requirement
 1. **Before Creating PR:**
    - Test your changes thoroughly
    - Review your own code first
+   - Verify architecture compliance with BOUNDARIES.md files
 
 2. **Creating the PR:**
    - Write a clear, descriptive title & description
@@ -106,10 +107,12 @@ See [Testing Standards](./TESTING_STANDARDS.md) for detailed testing requirement
 
 ### For Reviewers
 
+📖 **See [`PR_REVIEW_GUIDE.md`](./PR_REVIEW_GUIDE.md) for detailed step-by-step review instructions.**
+
 1. **Review Focus Areas:**
    - Logic correctness and edge cases
    - Test coverage and quality
-   - Architecture compliance
+   - **Architecture compliance (check BOUNDARIES.md files, not just linter)**
    - Code readability and maintainability
 
 2. **Providing Feedback:**
@@ -122,7 +125,31 @@ See [Testing Standards](./TESTING_STANDARDS.md) for detailed testing requirement
    - All checklist items are satisfied
    - Tests are comprehensive and passing
    - Code meets quality standards
+   - **Architecture boundaries respected (per BOUNDARIES.md)**
    - No outstanding blocking concerns
+
+### ⚠️ Architecture Review: BOUNDARIES.md is Authoritative
+
+**CRITICAL**: When reviewing architecture compliance:
+
+- ✅ **BOUNDARIES.md files are the source of truth** for what's allowed in each layer
+- 🔧 **Linter is a helper tool** - useful but NOT authoritative
+- ❌ **Passing lint does NOT mean architecture is correct**
+
+The linter catches obvious violations but cannot detect:
+- Logic in the wrong layer
+- Business rules in UI components  
+- Semantic dependency violations
+- Inappropriate use of exceptions
+
+**Always verify against the relevant BOUNDARIES.md files:**
+- `src/hexagon/domain/BOUNDARIES.md`
+- `src/hexagon/application/BOUNDARIES.md`
+- `src/hexagon/infrastructure/BOUNDARIES.md`
+- `src/hexagon/interface/BOUNDARIES.md`
+- And subdirectory BOUNDARIES.md files
+
+📖 See [`ARCHITECTURE.md`](../src/hexagon/ARCHITECTURE.md#-boundariesmd-files-are-authoritative) for more details.
 
 ---
 
@@ -141,6 +168,7 @@ See [Testing Standards](./TESTING_STANDARDS.md) for detailed testing requirement
 
 ## 📚 Related Documentation
 
+- [PR Review Guide](./PR_REVIEW_GUIDE.md) - **Detailed step-by-step review instructions**
 - [Testing Standards](./TESTING_STANDARDS.md) - Detailed testing requirements and practices
 - [Internal Production Checklist](./INTERNAL_PROD_CHECKLIST.md) - Additional requirements for production releases
 - [Hexagonal Architecture](../src/hexagon/ARCHITECTURE.md) - Architecture pattern documentation
