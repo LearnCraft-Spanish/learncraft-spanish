@@ -37,6 +37,7 @@ export function SearchByQuiz({
     } else {
       onQuizGroupIdChange(numValue);
     }
+    onQuizIdChange(undefined);
   };
 
   return (

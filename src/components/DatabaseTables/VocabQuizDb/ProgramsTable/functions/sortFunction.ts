@@ -47,6 +47,9 @@ export default function sortFunction(data: Program[], sortConfig: SortConfig) {
       case 'Cohort J Current':
         result = a.cohortJCurrentLesson - b.cohortJCurrentLesson;
         break;
+      case 'Published':
+        result = a.published ? 1 : 0 - (b.published ? 1 : 0);
+        break;
     }
 
     return sortConfig.direction === 'ascending' ? result : -result;
