@@ -23,14 +23,6 @@ export default function FilterLessonsTable({
     });
   };
 
-  const handleSubtitleFilterChange = (value: string) => {
-    setFilterConfig({
-      field: 'Subtitle',
-      value,
-      operator: 'contains',
-    });
-  };
-
   const handleProgramNameFilterChange = (value: string) => {
     setFilterConfig({
       field: 'Program Name',
@@ -45,13 +37,6 @@ export default function FilterLessonsTable({
         label="Filter by Lesson"
         value={filterConfig.field === 'Lesson' ? filterConfig.value : ''}
         onChange={handleLessonFilterChange}
-        editMode
-      />
-
-      <TextInput
-        label="Filter by Subtitle"
-        value={filterConfig.field === 'Subtitle' ? filterConfig.value : ''}
-        onChange={handleSubtitleFilterChange}
         editMode
       />
 
