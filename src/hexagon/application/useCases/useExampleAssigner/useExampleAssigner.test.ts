@@ -407,6 +407,7 @@ describe('useExampleAssigner', () => {
       });
 
       expect(addExamplesToQuizMock).toHaveBeenCalledWith({
+        quizId: 1,
         quizNumber: 1,
         courseCode: 'SP101',
         exampleIds: result.current.selectedExamples.map((ex) => ex.id),

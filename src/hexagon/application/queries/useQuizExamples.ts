@@ -9,7 +9,7 @@ export function useQuizExamples({
 }) {
   const { getQuizExamples } = useQuizAdapter();
   const { data, isLoading, error, isFetching } = useQuery({
-    queryKey: ['quizExamples', quizId],
+    queryKey: ['quizExamples', quizId, vocabularyComplete],
     queryFn: () => getQuizExamples({ quizId, vocabularyComplete }),
     enabled: !!quizId,
   });

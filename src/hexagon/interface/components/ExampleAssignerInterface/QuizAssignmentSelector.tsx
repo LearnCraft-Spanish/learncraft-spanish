@@ -26,10 +26,10 @@ export function QuizAssignmentSelector({
   quizGroupOptions,
 }: QuizAssignmentSelectorProps) {
   const handleQuizNumberChange = (value: string) => {
-    onQuizRecordIdChange(Number.parseInt(value) || 0);
+    onQuizRecordIdChange(Number.parseInt(value) || undefined);
   };
   const handleQuizGroupIdChange = (value: string) => {
-    onQuizGroupIdChange(Number.parseInt(value) || 0);
+    onQuizGroupIdChange(Number.parseInt(value) || undefined);
   };
 
   return (
