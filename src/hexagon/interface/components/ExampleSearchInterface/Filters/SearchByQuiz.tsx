@@ -23,10 +23,20 @@ export function SearchByQuiz({
   const { quizOptions } = useSearchByQuizFilter({ quizGroupId });
 
   const handleQuizIdChange = (value: string) => {
-    onQuizIdChange(Number.parseInt(value));
+    const numValue = Number.parseInt(value);
+    if (Number.isNaN(numValue)) {
+      onQuizIdChange(undefined);
+    } else {
+      onQuizIdChange(numValue);
+    }
   };
   const handleQuizGroupIdChange = (value: string) => {
-    onQuizGroupIdChange(Number.parseInt(value));
+    const numValue = Number.parseInt(value);
+    if (Number.isNaN(numValue)) {
+      onQuizGroupIdChange(undefined);
+    } else {
+      onQuizGroupIdChange(numValue);
+    }
   };
 
   return (
