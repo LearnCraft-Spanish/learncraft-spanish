@@ -33,7 +33,12 @@ export function useQuizExampleMutations(): UseQuizExampleMutationsReturn {
       quizNumber: number;
       courseCode: string;
       exampleIds: number[];
-    }) => addExamplesToOfficialQuiz({ courseCode, quizNumber, exampleIds }) as Promise<number>,
+    }) =>
+      addExamplesToOfficialQuiz({
+        courseCode,
+        quizNumber,
+        exampleIds,
+      }) as Promise<number>,
     onSuccess: (_data, variables) => {
       toast.success('Examples assigned to quiz successfully');
       // Invalidate quiz examples query to refresh the list
