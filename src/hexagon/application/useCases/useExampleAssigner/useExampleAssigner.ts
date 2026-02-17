@@ -145,7 +145,11 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
     ) {
       return undefined;
     }
-    return availableQuizzes.find((q) => q.id === selectedQuizRecordId);
+    const quiz = availableQuizzes.find((q) => q.id === selectedQuizRecordId);
+    if (!quiz) {
+      return undefined;
+    }
+    return quiz;
   }, [
     assignmentType,
     selectedQuizGroupId,
