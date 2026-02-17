@@ -229,6 +229,7 @@ export function useExampleAssigner(): UseExampleAssignerReturn {
       }
       const exampleIds = selectedExamples.map((ex) => ex.id);
       const addExamplesToQuizPromise = addExamplesToQuiz({
+        quizId: selectedQuizRecord.id,
         courseCode: selectedQuizGroup?.urlSlug || '',
         quizNumber: selectedQuizRecord.quizNumber,
         exampleIds,

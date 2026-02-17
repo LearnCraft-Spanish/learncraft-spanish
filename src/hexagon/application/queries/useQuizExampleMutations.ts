@@ -4,12 +4,14 @@ import { toast } from 'react-toastify';
 
 export interface UseQuizExampleMutationsReturn {
   addExamplesToQuiz: ({
-    courseCode,
+    quizId,
     quizNumber,
+    courseCode,
     exampleIds,
   }: {
-    courseCode: string;
+    quizId: number;
     quizNumber: number;
+    courseCode: string;
     exampleIds: number[];
   }) => Promise<number>;
   isAddingExamples: boolean;
@@ -25,16 +27,21 @@ export function useQuizExampleMutations(): UseQuizExampleMutationsReturn {
       courseCode,
       quizNumber,
       exampleIds,
+      quizId: _quizId,
     }: {
-      courseCode: string;
+      quizId: number;
       quizNumber: number;
+      courseCode: string;
       exampleIds: number[];
-    }) => addExamplesToOfficialQuiz({ courseCode, quizNumber, exampleIds }),
+    }) => addExamplesToOfficialQuiz({ courseCode, quizNumber, exampleIds }) as Promise<number>,
     onSuccess: (_data, variables) => {
       toast.success('Examples assigned to quiz successfully');
       // Invalidate quiz examples query to refresh the list
       queryClient.invalidateQueries({
-        queryKey: ['quizExamples', variables.courseCode, variables.quizNumber],
+        queryKey: ['quizExamples', variables.quizId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['examples', 'by quiz id', variables.quizId],
       });
     },
     onError: (error) => {
