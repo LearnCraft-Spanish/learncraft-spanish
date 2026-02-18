@@ -1,4 +1,4 @@
-import { useOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter';
+import { useQuizAdapter } from '@application/adapters/quizAdapter';
 import { usePagination } from '@application/units/Pagination/usePagination';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -6,36 +6,23 @@ import { useMemo } from 'react';
 const PAGE_SIZE = 25;
 
 export interface UseSearchByQuizResultsParams {
-  courseCode: string;
-  quizNumber: number | undefined;
+  quizId: number | undefined;
   vocabularyComplete?: boolean;
 }
 
 export function useSearchByQuizResults({
-  courseCode,
-  quizNumber,
+  quizId,
   vocabularyComplete,
 }: UseSearchByQuizResultsParams) {
-  const { getOfficialQuizExamples } = useOfficialQuizAdapter();
+  const { getQuizExamples } = useQuizAdapter();
   const {
     data: results,
     isLoading,
     error,
   } = useQuery({
-    queryKey: [
-      'examples',
-      'by quiz',
-      courseCode,
-      quizNumber,
-      vocabularyComplete,
-    ],
-    queryFn: () =>
-      getOfficialQuizExamples({
-        courseCode,
-        quizNumber: quizNumber!,
-        vocabularyComplete,
-      }),
-    enabled: !!courseCode && !!quizNumber,
+    queryKey: ['examples', 'by quiz id', quizId, vocabularyComplete],
+    queryFn: () => getQuizExamples({ quizId: quizId!, vocabularyComplete }),
+    enabled: !!quizId,
   });
 
   const paginationState = usePagination({

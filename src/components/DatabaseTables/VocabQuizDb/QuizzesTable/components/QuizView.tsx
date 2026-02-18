@@ -1,4 +1,4 @@
-import type { Quiz } from 'src/types/interfaceDefinitions';
+import type { QbQuiz } from 'src/types/DatabaseTables';
 import type { QuizNameObj, QuizSubNameObj } from '../constants';
 import type { NewQuiz, QuizObjForUpdate } from '../types';
 import {
@@ -6,7 +6,7 @@ import {
   TextInput,
 } from '@interface/components/FormComponents';
 import React, { useEffect, useMemo, useState } from 'react';
-import { FormControls } from 'src/components/FormComponents';
+import { Checkbox, FormControls } from 'src/components/FormComponents';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import { useContextualMenu } from 'src/hexagon/interface/hooks/useContextualMenu';
 import { useModal } from 'src/hexagon/interface/hooks/useModal';
@@ -27,6 +27,8 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
   const [quizSubType, setQuizSubType] = useState<QuizSubNameObj | undefined>(
     undefined,
   );
+
+  const [quizPublished, setQuizPublished] = useState<boolean>(quiz.published);
 
   const quizNickname = useMemo(() => {
     if (quizType?.code === 'ser-estar') {
@@ -59,6 +61,7 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
       onAction({
         quizNickname,
         recordId: quiz.recordId,
+        published: quizPublished,
       });
     } catch (error) {
       console.error('Error updating quiz:', error);
@@ -154,6 +157,19 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
             required
           />
         )}
+        {editMode ? (
+          <Checkbox
+            labelText="Published"
+            labelFor="published"
+            value={quizPublished}
+            onChange={(value) => setQuizPublished(value)}
+          />
+        ) : (
+          <div className="lineWrapper">
+            <p className="label">Published</p>
+            <p className="content">{quiz.published ? 'Yes' : 'No'}</p>
+          </div>
+        )}
         <FormControls
           editMode={editMode}
           cancelEdit={cancelEdit}
@@ -164,12 +180,13 @@ export function QuizView({ quiz, onAction, createMode }: EditQuizProps) {
   );
 }
 
-export function EditQuiz({ quiz }: { quiz: Quiz }) {
+export function EditQuiz({ quiz }: { quiz: QbQuiz }) {
   const { updateQuizMutation } = useQuizTable();
 
   const editableQuizObj: QuizObjForUpdate = {
     quizNickname: quiz.quizNickname,
     recordId: quiz.recordId,
+    published: quiz.published,
   };
 
   const onAction = (quiz: QuizObjForUpdate) => {
@@ -185,13 +202,16 @@ export function CreateQuiz() {
   const onAction = (quiz: QuizObjForUpdate) => {
     const newQuiz: NewQuiz = {
       quizNickname: quiz.quizNickname,
+      published: quiz.published,
     };
     createQuizMutation.mutate(newQuiz);
   };
 
   return (
     <QuizView
-      quiz={{ quizNickname: '', recordId: 0 } as QuizObjForUpdate}
+      quiz={
+        { quizNickname: '', recordId: 0, published: false } as QuizObjForUpdate
+      }
       onAction={onAction}
       createMode
     />

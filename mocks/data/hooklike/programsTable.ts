@@ -3,6 +3,7 @@ const programsTable: Program[] = [
   {
     recordId: 2,
     name: 'LearnCraft Spanish',
+    published: true,
     lessons: [
       {
         recordId: 334,
@@ -516,6 +517,7 @@ const programsTable: Program[] = [
   {
     recordId: 3,
     name: 'Spanish in One Month',
+    published: true,
     lessons: [
       {
         recordId: 1,
@@ -2961,6 +2963,7 @@ const programsTable: Program[] = [
   {
     recordId: 4,
     name: 'Ser Estar Mini Course',
+    published: true,
     lessons: [
       {
         recordId: 345,
@@ -3045,6 +3048,7 @@ const programsTable: Program[] = [
   {
     recordId: 5,
     name: 'Post-Challenge Lessons',
+    published: true,
     lessons: [
       {
         recordId: 350,

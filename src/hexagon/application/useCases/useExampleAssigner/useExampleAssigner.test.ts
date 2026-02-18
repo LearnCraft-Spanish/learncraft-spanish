@@ -6,10 +6,14 @@ import {
   resetMockActiveStudent,
 } from '@application/coordinators/hooks/useActiveStudent.mock';
 import {
-  mockUseOfficialQuizzesQuery,
-  overrideMockUseOfficialQuizzesQuery,
-  resetMockUseOfficialQuizzesQuery,
-} from '@application/queries/useOfficialQuizzesQuery.mock';
+  mockUseAllQuizGroups,
+  overrideMockUseAllQuizGroups,
+  resetMockUseAllQuizGroups,
+} from '@application/queries/useAllQuizGroups.mock';
+import {
+  mockUseQuizExamples,
+  overrideMockUseQuizExamples,
+} from '@application/queries/useQuizExamples.mock';
 import {
   mockUseStudentFlashcards,
   resetMockUseStudentFlashcards,
@@ -22,7 +26,6 @@ import { createMockFlashcardList } from '@testing/factories/flashcardFactory';
 import { createMockQuizGroup } from '@testing/factories/quizFactory';
 import MockAllProviders from 'mocks/Providers/MockAllProviders';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
 // Mock all dependencies
 const mockUseSelectedExamples = vi.fn(() => ({
   selectedExamples: createMockExampleWithVocabularyList(3),
@@ -114,18 +117,22 @@ vi.mock('@application/coordinators/hooks/useActiveStudent', () => ({
   useActiveStudent: () => mockActiveStudent,
 }));
 
-vi.mock('@application/queries/useOfficialQuizzesQuery', () => ({
-  useOfficialQuizzesQuery: () => mockUseOfficialQuizzesQuery,
+vi.mock('@application/queries/useAllQuizGroups', () => ({
+  useAllQuizGroups: () => mockUseAllQuizGroups,
 }));
 
 vi.mock('@application/units/useStudentFlashcards', () => ({
   useStudentFlashcards: () => mockUseStudentFlashcards,
 }));
 
+vi.mock('@application/queries/useQuizExamples', () => ({
+  useQuizExamples: () => mockUseQuizExamples,
+}));
+
 describe('useExampleAssigner', () => {
   beforeEach(() => {
     resetMockActiveStudent();
-    resetMockUseOfficialQuizzesQuery();
+    resetMockUseAllQuizGroups();
     resetMockUseStudentFlashcards();
 
     // Reset all mocks to default values
@@ -254,12 +261,11 @@ describe('useExampleAssigner', () => {
   describe('quiz assignment mode', () => {
     it('should show quiz examples when quiz is selected', async () => {
       const quizExamples = createMockExampleWithVocabularyList(2);
-      const officialQuizzes = [
+      const quizzes = [
         {
           id: 1,
-          courseCode: 'SP101',
-          quizNumber: 1,
           relatedQuizGroupId: 1,
+          quizNumber: 1,
           quizTitle: 'Quiz 1',
           published: true,
         },
@@ -270,19 +276,19 @@ describe('useExampleAssigner', () => {
           name: 'SP101',
           urlSlug: 'SP101',
           courseId: 1,
-          quizzes: officialQuizzes,
+          quizzes,
         }),
       ];
 
-      overrideMockUseOfficialQuizzesQuery({
-        officialQuizRecords: officialQuizzes,
+      overrideMockUseAllQuizGroups({
         quizGroups: mockQuizGroups,
         isLoading: false,
+        error: null,
       });
-
-      mockUseQuizExamplesQuery.mockReturnValue({
-        quizExamples,
+      overrideMockUseQuizExamples({
+        data: quizExamples,
         isLoading: false,
+        isFetching: false,
         error: null,
       });
 
@@ -295,9 +301,9 @@ describe('useExampleAssigner', () => {
         result.current.assignmentTypeSelectorProps.onTypeChange('quiz');
       });
 
-      // Select course and quiz
+      // Select quiz group and quiz
       act(() => {
-        result.current.quizSelectionProps.onCourseCodeChange('SP101');
+        result.current.quizSelectionProps.onQuizGroupIdChange(1);
         result.current.quizSelectionProps.onQuizRecordIdChange(1);
       });
 
@@ -350,12 +356,11 @@ describe('useExampleAssigner', () => {
 
     it('should call addExamplesToQuiz for quiz assignment', async () => {
       const addExamplesToQuizMock = vi.fn(async () => Promise.resolve(1));
-      const officialQuizzes = [
+      const quizzes = [
         {
           id: 1,
-          courseCode: 'SP101',
-          quizNumber: 1,
           relatedQuizGroupId: 1,
+          quizNumber: 1,
           quizTitle: 'Quiz 1',
           published: true,
         },
@@ -366,14 +371,14 @@ describe('useExampleAssigner', () => {
           name: 'SP101',
           urlSlug: 'SP101',
           courseId: 1,
-          quizzes: officialQuizzes,
+          quizzes,
         }),
       ];
 
-      overrideMockUseOfficialQuizzesQuery({
+      overrideMockUseAllQuizGroups({
         quizGroups: mockQuizGroups,
-        officialQuizRecords: officialQuizzes,
         isLoading: false,
+        error: null,
       });
 
       mockUseQuizExampleMutations.mockReturnValue({
@@ -389,7 +394,7 @@ describe('useExampleAssigner', () => {
       // Switch to quiz mode and select quiz
       act(() => {
         result.current.assignmentTypeSelectorProps.onTypeChange('quiz');
-        result.current.quizSelectionProps.onCourseCodeChange('SP101');
+        result.current.quizSelectionProps.onQuizGroupIdChange(1);
         result.current.quizSelectionProps.onQuizRecordIdChange(1);
       });
 
@@ -402,8 +407,9 @@ describe('useExampleAssigner', () => {
       });
 
       expect(addExamplesToQuizMock).toHaveBeenCalledWith({
-        courseCode: 'SP101',
+        quizId: 1,
         quizNumber: 1,
+        courseCode: 'SP101',
         exampleIds: result.current.selectedExamples.map((ex) => ex.id),
       });
     });

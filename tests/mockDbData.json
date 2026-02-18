@@ -24,7 +24,8 @@
       "cohortJCurrentLesson": 1,
       "name": "LearnCraft Spanish",
       "recordId": 2,
-      "lessons": []
+      "lessons": [],
+      "published": true
     },
     {
       "cohortACurrentLesson": 1,
@@ -39,7 +40,8 @@
       "cohortJCurrentLesson": 1,
       "name": "SI1M",
       "recordId": 3,
-      "lessons": []
+      "lessons": [],
+      "published": true
     },
     {
       "cohortACurrentLesson": 1,
@@ -54,7 +56,8 @@
       "cohortJCurrentLesson": 1,
       "name": "Ser Estar Mini Course",
       "recordId": 4,
-      "lessons": []
+      "lessons": [],
+      "published": true
     }
   ],
   "sampleStudentFlashcardData": {

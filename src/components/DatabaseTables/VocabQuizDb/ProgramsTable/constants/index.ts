@@ -14,6 +14,7 @@ const headers: HeaderObject[] = [
   { header: 'Cohort H Current', sortable: true },
   { header: 'Cohort I Current', sortable: true },
   { header: 'Cohort J Current', sortable: true },
+  { header: 'Published', sortable: true },
 ];
 
 /* ------------------ EditProgramView ------------------ */

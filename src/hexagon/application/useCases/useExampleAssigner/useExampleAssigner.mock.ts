@@ -90,12 +90,12 @@ const defaultResult: UseExampleAssignerReturn = {
     isLoading: false,
   },
   quizSelectionProps: {
-    selectedCourseCode: 'none',
-    onCourseCodeChange: vi.fn<(code: string) => void>(),
+    selectedQuizGroupId: undefined,
+    onQuizGroupIdChange: vi.fn<(id: number | undefined) => void>(),
     selectedQuizRecordId: undefined,
     onQuizRecordIdChange: vi.fn<(id: number | undefined) => void>(),
     availableQuizzes: undefined,
-    courseOptions: [],
+    quizGroupOptions: [],
   },
   assignedStudentFlashcardsProps: {
     studentFlashcards: createMockFlashcardList()(3),

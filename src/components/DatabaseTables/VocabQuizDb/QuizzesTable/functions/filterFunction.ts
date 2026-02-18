@@ -1,8 +1,8 @@
 import type { FilterConfig } from 'src/components/Table/types';
-import type { Quiz } from 'src/types/interfaceDefinitions';
+import type { QbQuiz } from 'src/types/DatabaseTables';
 
 export default function filterFunction(
-  data: Quiz[],
+  data: QbQuiz[],
   filterConfig: FilterConfig,
 ) {
   if (!filterConfig.value) return data;
