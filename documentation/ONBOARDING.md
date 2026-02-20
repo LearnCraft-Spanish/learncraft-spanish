@@ -62,11 +62,15 @@ The codebase uses **hexagonal architecture** (ports and adapters). Six layers, e
 
 ---
 
-## 4. Boundaries
+## 4. Documentation Colocated with Code
 
-Each layer has a `BOUNDARIES.md` file that defines what is and isn't allowed in that layer.
+Three types of markdown files live alongside the source code in `src/hexagon/`:
 
-**These are the authoritative source of truth for architecture rules.** Not the linter. The linter catches common import violations, but passing lint does not mean the architecture is correct. `BOUNDARIES.md` defines the actual rules — including semantic boundaries the linter can't enforce (e.g., "business logic doesn't belong in infrastructure").
+- **BOUNDARIES.md** — Rules. What is and isn't allowed in this directory. These are the **authoritative source of truth** for architecture rules — not the linter. Passing lint does not mean the architecture is correct.
+- **README.md** — Explanation. What this directory contains and how it works.
+- **DECISIONS.md** — Rationale. Why we chose this approach, what tradeoffs were accepted.
+
+Not every directory has all three. BOUNDARIES.md files are the most common and exist at every layer and most subdirectories. DECISIONS.md files exist where non-obvious architectural choices were made.
 
 Read the BOUNDARIES.md in each layer:
 - `src/hexagon/domain/BOUNDARIES.md`

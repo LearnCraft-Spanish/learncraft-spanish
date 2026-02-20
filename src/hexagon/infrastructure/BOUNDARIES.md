@@ -40,13 +40,3 @@ Thin wrappers around external services:
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/adapters/` (wrapped)
 
-## Relationship to Application Layer
-
-```
-Application Layer defines:          Infrastructure Layer implements:
-─────────────────────────           ───────────────────────────────
-ports/VocabularyPort.ts    →       vocabularyInfrastructure.ts
-  (interface)                         (thin wrapper around HTTP)
-```
-
-The application layer's `adapters/` directory wraps infrastructure implementations to match the ports.

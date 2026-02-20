@@ -14,7 +14,7 @@ Static application bootstrap and wiring:
 - Instantiating root render
 - **NO business logic, NO conditionals, NO effects** - just static composition and context access
 
-**Note:** This layer exports provider-accessing hooks that `application/coordinators/` imports. This is a documented exception to the dependency rule (see ARCHITECTURE.md) - coordinators access composition context via hooks, not provider composition.
+See DECISIONS.md for why provider-accessing hooks exist and how they relate to coordinators.
 
 ## Structure
 
@@ -46,25 +46,21 @@ composition/
 - **NO useEffect or useMemo** (no dynamic behavior)
 - **NO side effects** (just provider composition)
 
-## Provider-Accessing Hooks
+## Provider-Accessing Hook Rules
 
-Provider-accessing hooks are defined in `composition/context/` and provide the **ONLY** way to access composition-layer context. They are **pure context accessors** with zero business logic.
-
-**Allowed operations:**
+**Allowed:**
 
 - ✅ Access React context using `use()` or `useContext()`
 - ✅ Check if context exists (null check)
 - ✅ Throw error if context is missing
 - ✅ Return context value directly (no transformations)
 
-**Forbidden operations:**
+**Forbidden:**
 
 - ❌ NO calculations, transformations, or business logic
 - ❌ NO useMemo, useEffect, or other hooks
 - ❌ NO conditional logic beyond null check
 - ❌ NO side effects
-
-Business logic using composition context belongs in `application/coordinators/`.
 
 ## Dependency Rules
 
@@ -79,6 +75,3 @@ Business logic using composition context belongs in `application/coordinators/`.
 - ✅ `application/coordinators/` - Coordinators import provider-accessing hooks from composition (exception to dependency rule - see ARCHITECTURE.md)
 - ✅ Root entry point - App bootstrap
 
-## Relationship to Other Layers
-
-The composition layer is the **entry point** that assembles the root application. It composes providers and exports provider-accessing hooks for `application/coordinators/` to use.

@@ -50,24 +50,10 @@ coordinators/
 - ✅ `application/adapters/` - Infrastructure wrappers
 - ✅ `application/queries/` - Data fetching (for shared data)
 - ✅ `domain/` - Pure business logic
-- ✅ `composition/context/` - Provider-accessing hooks (exception - see ARCHITECTURE.md)
+- ✅ `composition/context/` - Provider-accessing hooks (exception - see DECISIONS.md and ARCHITECTURE.md)
 - ✅ React context APIs
 - ❌ Cannot import from `application/useCases/` (avoid circular dependencies)
 - ❌ Cannot import from `application/units/` directly (avoid circular dependencies)
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/useCases/` and `application/units`
 
-## When to Use Coordinators
-
-Use coordinators when:
-
-- ✅ State is needed by multiple use-cases
-- ✅ State represents global application state
-- ✅ State needs to persist across route changes
-- ✅ State coordinates between features
-
-Don't use coordinators for:
-
-- ❌ Feature-specific state (use use-case)
-- ❌ Component-specific UI state (use interface)
-- ❌ Local transformations (use unit)

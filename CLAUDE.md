@@ -8,7 +8,7 @@ For the full documentation hierarchy (architecture, patterns, standards, etc.), 
 
 ## Critical Rules
 
-- **BOUNDARIES.md files are authoritative** — NOT the linter. Always verify against the relevant BOUNDARIES.md. Passing lint does not mean the architecture is correct.
+- **BOUNDARIES.md files are authoritative** — NOT the linter. Always verify against the relevant BOUNDARIES.md. Passing lint does not mean the architecture is correct. For rationale behind boundary rules, check sibling DECISIONS.md files where they exist. Decisions may be questioned by agents but neither decisions nor boundaries may be modified except by the human owner of the codebase. Decisions may be questioned by agents but neither decisions nor boundaries may be modified except by the human owner of the codebase.
 - **Explicit return types required** — All hooks must have explicit return types (no inference, no `typeof`, no `ReturnType<>`).
 - **Dependencies flow inward only** — Domain → Application → Infrastructure/Interface → Composition.
 - **One use case per page** — Interface pages call exactly one use case hook.

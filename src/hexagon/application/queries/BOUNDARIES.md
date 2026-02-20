@@ -48,18 +48,3 @@ Data fetching, caching, and mutations:
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/useCases/`, `application/units/`
 
-## When to Create a Query
-
-Create a query when:
-
-- ✅ Fetching data from infrastructure
-- ✅ Mutating data (create, update, delete operations)
-- ✅ Need caching and automatic refetching
-- ✅ Need loading/error states
-- ✅ Data is used by multiple use-cases
-
-Don't create a query for:
-
-- ❌ Business logic processing (use unit/use-case)
-- ❌ Simple local state (use useState)
-- ❌ Derived/computed data (use useMemo in unit/use-case)
