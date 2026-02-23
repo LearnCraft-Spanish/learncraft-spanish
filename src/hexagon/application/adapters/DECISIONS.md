@@ -14,7 +14,7 @@
 
 **Decision**: Infrastructure implementations are plain functions or factory functions — no React hooks, no `useState`, no `useEffect`. Adapters wrap them as hooks when needed.
 
-**Consequences**: Infrastructure is independently testable without `renderHook`. It can be reused in non-React contexts (CLIs, server-side, shared libraries). The adapter layer exists specifically to be the React/non-React boundary. This enforces Doctrine principle 4b (portability).
+**Consequences**: Infrastructure is independently testable without `renderHook`. It can be reused in non-React contexts (CLIs, server-side, shared libraries). The adapter layer exists specifically to be the React/non-React boundary. This enforces Doctrine principle 6 (Portability = Ownership).
 
 ## How the Adapter Pattern Works
 

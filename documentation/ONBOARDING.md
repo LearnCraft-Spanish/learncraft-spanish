@@ -31,13 +31,17 @@ If anything fails, see [`TROUBLESHOOTING.md`](./TROUBLESHOOTING.md).
 
 Read [`ENGINEERING_DOCTRINE.md`](./ENGINEERING_DOCTRINE.md) first. Everything else derives from it.
 
-It defines five non-negotiable principles for the system:
+Its core principles (numbered 0-8):
 
-0. **Explicit dependency direction** — No circular authority. If cause and effect can't be drawn as a directed graph, the system is decaying.
-1. **Explicit boundaries and interfaces** — Modules have defined responsibility. Every boundary is crossed through declared interfaces.
-2. **Testability** — Every module has verifiable behavioral expectations. If it can't be tested in isolation, it isn't owned.
-3. **Maintainability** — The cost of understanding and modifying behavior must remain low.
-4. **Extensibility and portability** — New features don't destabilize. The system can move across frameworks without rewriting.
+0. **Explicit dependency direction** — No circular authority.
+1. **Explicit boundaries and interfaces** — Modules crossed only through declared interfaces.
+2. **Composition over inheritance** — No action at a distance.
+3. **Testability** — If it can't be tested in isolation, it isn't owned.
+4. **Maintainability** — The cost of understanding and modifying behavior must remain low.
+5. **Extensibility** — New features don't destabilize what exists.
+6. **Portability = Ownership** — External dependencies confined to the edges.
+7. **Never bypass the system** — Enrich or divide it instead.
+8. **Sustainability** — Emerges when everything above remains intact.
 
 These are structural, not stylistic. They drive every architectural and process decision below.
 
