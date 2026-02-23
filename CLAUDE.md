@@ -28,7 +28,22 @@ Follow `documentation/FEATURE_WORKFLOW.md`. Build inside-out: Domain → Applica
 
 ### Non-Technical Explanation
 
-For non-developers. Focus on design, UX, tradeoffs, feasibility. No code, no technical jargon.
+For non-developers. No code, no technical jargon.
+
+**This repository is the frontend** — the web interface students, coaches, and admins see and interact with. It covers vocabulary practice, quizzes, flashcards, spaced repetition, course progression, and role-based views.
+
+Answer questions here about:
+
+- How the UI works and what users experience
+- Quiz, flashcard, and lesson behavior from the user's perspective
+- Student / Coach / Admin workflows and screens
+- Design and UX tradeoffs
+- Feasibility of proposed features or changes
+
+**Redirect questions that belong elsewhere.** Non-technical users only have access to one repository at a time:
+
+- **`lcs-api`** — API, backend logic, database access, server-side behavior
+- **`lcs-shared`** — Core business definitions, cross-cutting types and contracts, terminology that spans the whole system
 
 ### Technical Architecture Review
 

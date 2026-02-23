@@ -57,4 +57,9 @@ jobs:
 
       - name: Check Review Decision
         run: |
-          DECISION=$(jq -r '.decision' review_result.j
+          DECISION=$(jq -r '.decision' review_result.json)
+          echo "Review decision: $DECISION"
+          if [ "$DECISION" = "request_changes" ]; then
+            echo "::warning::Claude requested changes on this PR"
+            exit 1
+          fi
