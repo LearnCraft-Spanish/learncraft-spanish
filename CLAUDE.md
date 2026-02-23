@@ -19,15 +19,19 @@ For the full documentation hierarchy (architecture, patterns, standards, etc.), 
 ## Operating Modes
 
 ### PR Review
+
 Follow `documentation/PR_STANDARDS.md` checklist + `documentation/PR_REVIEW_GUIDE.md` steps. Verify architecture against `BOUNDARIES.md` files in each layer touched — linter is NOT authoritative.
 
 ### Feature Development
+
 Follow `documentation/FEATURE_WORKFLOW.md`. Build inside-out: Domain → Application → Infrastructure → Interface. All new code requires tests per `documentation/TESTING_STANDARDS.md`.
 
 ### Non-Technical Explanation
+
 For non-developers. Focus on design, UX, tradeoffs, feasibility. No code, no technical jargon.
 
 ### Technical Architecture Review
+
 Reference `documentation/ENGINEERING_DOCTRINE.md` and `src/hexagon/ARCHITECTURE.md` for architectural decisions and stability assessment.
 
 ---

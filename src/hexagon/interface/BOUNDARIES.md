@@ -54,4 +54,3 @@ interface/
 - ✅ Composition layer providers via context
 - ❌ Cannot import directly from `infrastructure/`
 - ❌ Cannot be imported by `domain/` or `application/`
-

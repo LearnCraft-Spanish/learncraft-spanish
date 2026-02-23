@@ -10,7 +10,7 @@
 
 ## Why Two Separate Setup Files
 
-**Context**: `tests/setupTests.ts` starts the MSW server and mocks a subset of adapters for legacy integration-style tests. `src/hexagon/testing/setupTests.ts` mocks *all* adapters, coordinators, and units globally so hexagon tests operate with full boundary isolation.
+**Context**: `tests/setupTests.ts` starts the MSW server and mocks a subset of adapters for legacy integration-style tests. `src/hexagon/testing/setupTests.ts` mocks _all_ adapters, coordinators, and units globally so hexagon tests operate with full boundary isolation.
 
 **Decision**: Each config points to its own setup file. Hexagon setup mocks every adapter at the module level and resets them after each test. Legacy setup starts MSW and mocks only the adapters that legacy tests use.
 
@@ -37,6 +37,7 @@
 **Context**: Plain `vi.fn()` produces untyped mocks. In a codebase with strict port/adapter boundaries, an untyped mock silently allows the wrong shape to leak through, defeating the purpose of the boundary. Additionally, each test that needs non-default behavior was manually calling `mockImplementation`, leading to boilerplate and inconsistent reset behavior. Every layer — adapters, coordinators, queries, units, use cases — needs mocks, so the pattern must be dead-simple to create and consistent across all of them.
 
 **Decision**: Two complementary utilities:
+
 - `createTypedMock<T>()` — typed wrapper around `vi.fn()` that enforces the function signature at the type level.
 - `createOverrideableMock(defaultImpl)` — returns `{ mock, override, reset }`. Define the happy-path default once, destructure the three exports, done. The same 3-line destructure works whether the mock has 3 fields or 30. Individual tests call `override()` for specific scenarios, and `reset()` restores the default (called globally in `afterEach`).
 

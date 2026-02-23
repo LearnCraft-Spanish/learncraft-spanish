@@ -24,11 +24,13 @@ _Common issues and their solutions for LearnCraft Spanish development_
 **Problem**: pnpm is not installed.
 
 **Solution**:
+
 ```bash
 npm install -g pnpm
 ```
 
 Verify installation:
+
 ```bash
 pnpm --version
 ```
@@ -42,10 +44,11 @@ pnpm --version
 **Solution**:
 
 1. Install nvm (Node Version Manager):
+
    ```bash
    # macOS/Linux
    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-   
+
    # Windows: Download from https://github.com/coreybutler/nvm-windows
    ```
 
@@ -64,6 +67,7 @@ pnpm --version
 **Solution**:
 
 1. Clean install:
+
    ```bash
    rm -rf node_modules pnpm-lock.yaml
    pnpm install:local
@@ -83,10 +87,11 @@ pnpm --version
 **Solution**:
 
 1. Kill the process using the port:
+
    ```bash
    # macOS/Linux
    lsof -ti:5173 | xargs kill -9
-   
+
    # Windows
    netstat -ano | findstr :5173
    taskkill /PID <PID> /F
@@ -108,11 +113,13 @@ pnpm --version
 **Solution**:
 
 1. Ensure `@types` packages are installed:
+
    ```bash
    pnpm install
    ```
 
 2. Check for type errors:
+
    ```bash
    pnpm typecheck
    ```
@@ -131,6 +138,7 @@ pnpm --version
 **Solution**:
 
 1. Verify `tsconfig.json` has correct paths:
+
    ```json
    {
      "compilerOptions": {
@@ -159,6 +167,7 @@ pnpm --version
 **Solution**:
 
 1. Increase Node memory limit:
+
    ```bash
    NODE_OPTIONS=--max_old_space_size=4096 pnpm build
    ```
@@ -185,9 +194,10 @@ pnpm --version
 1. Ensure mock file exists: `myHook.mock.ts`
 
 2. Check mock is properly imported in test:
+
    ```typescript
    import { myHookMock } from './myHook.mock';
-   
+
    vi.mock('./myHook', () => ({
      myHook: vi.fn(() => myHookMock.defaultImplementation()),
    }));
@@ -211,12 +221,14 @@ pnpm --version
 **Solution**:
 
 1. Check if you're using correct lockfile:
+
    ```bash
    # For CI
    pnpm install:ci
    ```
 
 2. Ensure all mocks are reset properly:
+
    ```typescript
    afterEach(() => {
      myHookMock.resetMock();
@@ -234,6 +246,7 @@ pnpm --version
 **Solution**:
 
 1. Check `vitest.config.ts` or `vitest.config-hexagon.ts`:
+
    ```typescript
    export default defineConfig({
      test: {
@@ -256,6 +269,7 @@ pnpm --version
 **Solution**:
 
 1. Increase timeout for specific test:
+
    ```typescript
    it('slow test', async () => {
      // test code
@@ -263,12 +277,13 @@ pnpm --version
    ```
 
 2. Check for missing `await`:
+
    ```typescript
    // ❌ BAD
    it('test', () => {
      renderHook(() => useMyHook());
    });
-   
+
    // ✅ GOOD
    it('test', async () => {
      await waitFor(() => {
@@ -291,20 +306,21 @@ pnpm --version
 **Common Causes**:
 
 1. **API data not loaded yet**:
+
    ```typescript
    // ❌ BAD
    function Component() {
      const { data } = useQuery();
      return <div>{data.name}</div>; // data might be undefined
    }
-   
+
    // ✅ GOOD
    function Component() {
      const { data, isLoading } = useQuery();
-     
+
      if (isLoading) return <Loading />;
      if (!data) return <Error />;
-     
+
      return <div>{data.name}</div>;
    }
    ```
@@ -326,12 +342,13 @@ pnpm --version
 **Common Causes**:
 
 1. **Missing dependencies in useEffect**:
+
    ```typescript
    // ❌ BAD
    useEffect(() => {
      setData(computeData()); // setData causes re-render, useEffect runs again
    }); // No dependency array!
-   
+
    // ✅ GOOD
    useEffect(() => {
      setData(computeData());
@@ -339,13 +356,14 @@ pnpm --version
    ```
 
 2. **Creating new object/array in render**:
+
    ```typescript
    // ❌ BAD
    function Component() {
      const config = { option: 'value' }; // New object every render
      return <Child config={config} />; // Child re-renders every time
    }
-   
+
    // ✅ GOOD
    function Component() {
      const config = useMemo(() => ({ option: 'value' }), []); // Stable reference
@@ -362,6 +380,7 @@ pnpm --version
 **Solution**:
 
 1. Check for direct state updates in render:
+
    ```typescript
    // ❌ BAD
    function Component() {
@@ -369,15 +388,15 @@ pnpm --version
      setCount(count + 1); // Causes infinite loop!
      return <div>{count}</div>;
    }
-   
+
    // ✅ GOOD
    function Component() {
      const [count, setCount] = useState(0);
-     
+
      useEffect(() => {
        setCount(count + 1); // In effect with proper dependencies
      }, []);
-     
+
      return <div>{count}</div>;
    }
    ```
@@ -393,6 +412,7 @@ pnpm --version
 **Solution**:
 
 1. Check `VITE_API_BASE_URL` in `.env`:
+
    ```
    VITE_API_BASE_URL=http://localhost:8000/api
    ```
@@ -422,9 +442,10 @@ pnpm --version
 **Solution**:
 
 1. Check if user is logged in:
+
    ```typescript
    const { isAuthenticated, loginWithRedirect } = useAuth0();
-   
+
    if (!isAuthenticated) {
      return <button onClick={loginWithRedirect}>Log In</button>;
    }
@@ -445,6 +466,7 @@ pnpm --version
 **Solution**:
 
 1. Check `staleTime` configuration:
+
    ```typescript
    useQuery({
      queryKey: ['data'],
@@ -454,15 +476,17 @@ pnpm --version
    ```
 
 2. Manually invalidate query:
+
    ```typescript
    const queryClient = useQueryClient();
    queryClient.invalidateQueries({ queryKey: ['data'] });
    ```
 
 3. Force refetch:
+
    ```typescript
    const { data, refetch } = useQuery({...});
-   
+
    // Later
    refetch();
    ```
@@ -498,6 +522,7 @@ pnpm --version
 **Solution**:
 
 1. Check user's role/permissions:
+
    ```typescript
    const { user } = useAuth0();
    console.log('User roles:', user?.['https://your-domain.com/roles']);
@@ -518,6 +543,7 @@ pnpm --version
 1. **Use React DevTools Profiler** to identify slow components
 
 2. **Memoize expensive computations**:
+
    ```typescript
    const expensiveResult = useMemo(() => {
      return computeExpensiveValue(data);
@@ -525,16 +551,18 @@ pnpm --version
    ```
 
 3. **Virtualize long lists**:
+
    ```typescript
    import { useVirtualizer } from '@tanstack/react-virtual';
-   
+
    // Render only visible items in long list
    ```
 
 4. **Lazy load components**:
+
    ```typescript
    const HeavyComponent = lazy(() => import('./HeavyComponent'));
-   
+
    <Suspense fallback={<Loading />}>
      <HeavyComponent />
    </Suspense>
@@ -549,6 +577,7 @@ pnpm --version
 **Solution**:
 
 1. Adjust `staleTime` and `cacheTime`:
+
    ```typescript
    useQuery({
      queryKey: ['data'],
@@ -577,6 +606,7 @@ pnpm --version
 **Solution**:
 
 1. Pull latest changes:
+
    ```bash
    git fetch origin
    git merge origin/main
@@ -597,6 +627,7 @@ pnpm --version
 **Solution**:
 
 1. If not pushed yet:
+
    ```bash
    # Move commits to new branch
    git branch new-branch-name

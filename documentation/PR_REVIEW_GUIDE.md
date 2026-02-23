@@ -105,6 +105,7 @@ See [`COMMON_PATTERNS.md`](./COMMON_PATTERNS.md) for full conventions.
 - [ ] No circular dependencies
 
 **For each changed file, verify against the relevant `BOUNDARIES.md`:**
+
 - `src/hexagon/domain/BOUNDARIES.md`
 - `src/hexagon/application/BOUNDARIES.md`
 - `src/hexagon/infrastructure/BOUNDARIES.md`
@@ -114,6 +115,7 @@ See [`COMMON_PATTERNS.md`](./COMMON_PATTERNS.md) for full conventions.
 **What the linter catches**: Import direction violations, importing from wrong layers.
 
 **What the linter CAN'T catch** (you must review manually):
+
 - Business logic placed in components instead of domain
 - Orchestration logic in components instead of use cases
 - Branching/transformation logic in infrastructure adapters
@@ -167,6 +169,7 @@ See [`DATA_FLOW.md`](./DATA_FLOW.md) for patterns.
 ## 8. Giving Feedback
 
 Use severity prefixes:
+
 - **Blocking**: Must fix before merge
 - **Suggestion**: Nice to have, not blocking
 - **Question**: Asking for clarification

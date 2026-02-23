@@ -36,13 +36,13 @@ src/
 
 Read the legacy code and classify each piece:
 
-| What it does | Target layer |
-|---|---|
-| Pure business logic, validation, calculations | Domain |
-| Orchestrates operations, manages state | Application (use case) |
-| Calls external APIs | Infrastructure |
-| Renders UI | Interface |
-| Wires things together | Composition |
+| What it does                                  | Target layer           |
+| --------------------------------------------- | ---------------------- |
+| Pure business logic, validation, calculations | Domain                 |
+| Orchestrates operations, manages state        | Application (use case) |
+| Calls external APIs                           | Infrastructure         |
+| Renders UI                                    | Interface              |
+| Wires things together                         | Composition            |
 
 ### Step 2: Build the Hexagon Replacement
 
@@ -67,25 +67,27 @@ Follow the same inside-out process as new features (see [`FEATURE_WORKFLOW.md`](
 
 ## Common Legacy Patterns → Hexagon Equivalents
 
-| Legacy pattern | Hexagon equivalent |
-|---|---|
-| `useEffect` + `fetch` in component | TanStack Query through use case |
-| Business logic in component | Domain pure function |
-| One hook doing everything | Use case composing units |
-| Direct API calls in hooks | Infrastructure adapter behind port |
-| `useState` for server data | TanStack Query cache |
+| Legacy pattern                     | Hexagon equivalent                 |
+| ---------------------------------- | ---------------------------------- |
+| `useEffect` + `fetch` in component | TanStack Query through use case    |
+| Business logic in component        | Domain pure function               |
+| One hook doing everything          | Use case composing units           |
+| Direct API calls in hooks          | Infrastructure adapter behind port |
+| `useState` for server data         | TanStack Query cache               |
 
 ---
 
 ## Migration Checklist
 
 ### Analysis
+
 - [ ] Identified all legacy files involved
 - [ ] Classified each piece by layer
 - [ ] Checked for dependencies on other legacy code
 - [ ] Reviewed existing hexagon code for similar patterns
 
 ### Implementation
+
 - [ ] Extracted pure functions to domain (if any)
 - [ ] Created port and infrastructure adapter
 - [ ] Created queries/mutations
@@ -94,6 +96,7 @@ Follow the same inside-out process as new features (see [`FEATURE_WORKFLOW.md`](
 - [ ] Created mocks for all data-returning hooks
 
 ### Testing
+
 - [ ] Domain functions tested
 - [ ] Use case tested
 - [ ] Components tested
@@ -101,6 +104,7 @@ Follow the same inside-out process as new features (see [`FEATURE_WORKFLOW.md`](
 - [ ] Manual testing complete
 
 ### Cleanup
+
 - [ ] All imports updated
 - [ ] No references to legacy files remain
 - [ ] Legacy files deleted

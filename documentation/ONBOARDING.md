@@ -53,14 +53,14 @@ Read [`src/hexagon/ARCHITECTURE.md`](../src/hexagon/ARCHITECTURE.md). This is th
 
 The codebase uses **hexagonal architecture** (ports and adapters). Six layers, each with a single responsibility:
 
-| Layer | Responsibility | Dependencies |
-|---|---|---|
-| **Domain** | Pure business logic | None |
-| **Application** | Use cases, queries, orchestration | Domain |
-| **Infrastructure** | External APIs, HTTP clients | Domain, Application |
-| **Interface** | React components, pages | Domain, Application |
-| **Composition** | App bootstrap, providers | All layers |
-| **Testing** | Test utilities, factories | All layers |
+| Layer              | Responsibility                    | Dependencies        |
+| ------------------ | --------------------------------- | ------------------- |
+| **Domain**         | Pure business logic               | None                |
+| **Application**    | Use cases, queries, orchestration | Domain              |
+| **Infrastructure** | External APIs, HTTP clients       | Domain, Application |
+| **Interface**      | React components, pages           | Domain, Application |
+| **Composition**    | App bootstrap, providers          | All layers          |
+| **Testing**        | Test utilities, factories         | All layers          |
 
 **Key rule**: Dependencies flow inward only. Interface and Infrastructure depend on Application and Domain — never the reverse.
 
@@ -77,6 +77,7 @@ Three types of markdown files live alongside the source code in `src/hexagon/`:
 Not every directory has all three. BOUNDARIES.md files are the most common and exist at every layer and most subdirectories. DECISIONS.md files exist where non-obvious architectural choices were made.
 
 Read the BOUNDARIES.md in each layer:
+
 - `src/hexagon/domain/BOUNDARIES.md`
 - `src/hexagon/application/BOUNDARIES.md`
 - `src/hexagon/infrastructure/BOUNDARIES.md`

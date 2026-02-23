@@ -74,4 +74,3 @@ composition/
 
 - ✅ `application/coordinators/` - Coordinators import provider-accessing hooks from composition (exception to dependency rule - see ARCHITECTURE.md)
 - ✅ Root entry point - App bootstrap
-

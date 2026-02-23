@@ -39,4 +39,3 @@ Thin wrappers around external services:
 - ❌ Cannot import from `domain/` or `application/` (except ports)
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/adapters/` (wrapped)
-

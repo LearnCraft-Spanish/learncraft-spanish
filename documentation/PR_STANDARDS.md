@@ -137,12 +137,14 @@ See [Testing Standards](./TESTING_STANDARDS.md) for detailed testing requirement
 - ❌ **Passing lint does NOT mean architecture is correct**
 
 The linter catches obvious violations but cannot detect:
+
 - Logic in the wrong layer
-- Business rules in UI components  
+- Business rules in UI components
 - Semantic dependency violations
 - Inappropriate use of exceptions
 
 **Always verify against the relevant BOUNDARIES.md files:**
+
 - `src/hexagon/domain/BOUNDARIES.md`
 - `src/hexagon/application/BOUNDARIES.md`
 - `src/hexagon/infrastructure/BOUNDARIES.md`

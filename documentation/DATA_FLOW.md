@@ -25,6 +25,7 @@ Data from the backend, cached and synchronized automatically.
 Shared state that multiple features need, but doesn't come from the server (e.g., audio player, selected lesson).
 
 **Locations**:
+
 - Contexts: `src/hexagon/composition/context/`
 - Coordinators: `src/hexagon/application/coordinators/`
 
@@ -73,6 +74,7 @@ Use Case
 Coordinators manage cross-cutting concerns accessed by multiple features.
 
 **Examples in codebase**:
+
 - Audio playback coordination
 - Authentication state
 - App user profile

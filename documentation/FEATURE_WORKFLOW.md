@@ -89,8 +89,8 @@ Manual test the feature in the browser.
 
 ## Feature Size Guidelines
 
-| Size   | Scope                           | Timeline |
-| ------ | ------------------------------- | -------- |
-| Small  | 1 use case, 2-3 components     | 1-2 days |
-| Medium | 2-3 use cases, 5-8 components  | 3-5 days |
-| Large  | Multiple use cases, 10+ comps  | 1-2 weeks |
+| Size   | Scope                         | Timeline  |
+| ------ | ----------------------------- | --------- |
+| Small  | 1 use case, 2-3 components    | 1-2 days  |
+| Medium | 2-3 use cases, 5-8 components | 3-5 days  |
+| Large  | Multiple use cases, 10+ comps | 1-2 weeks |

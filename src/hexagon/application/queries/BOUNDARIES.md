@@ -47,4 +47,3 @@ Data fetching, caching, and mutations:
 - ❌ Cannot import from `application/units/` directly (use sparingly)
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/useCases/`, `application/units/`
-

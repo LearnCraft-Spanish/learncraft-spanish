@@ -22,17 +22,17 @@ BOUNDARIES.md                    # Documentation: UPPERCASE
 ### Code
 
 ```typescript
-const studentFlashcards = [];     // camelCase for variables
-function calculateScore() {}      // camelCase for functions
-const MAX_ATTEMPTS = 3;           // SCREAMING_SNAKE_CASE for constants
-interface FlashcardData {}        // PascalCase for types/interfaces
+const studentFlashcards = []; // camelCase for variables
+function calculateScore() {} // camelCase for functions
+const MAX_ATTEMPTS = 3; // SCREAMING_SNAKE_CASE for constants
+interface FlashcardData {} // PascalCase for types/interfaces
 type QuizMode = 'audio' | 'text'; // PascalCase for types
 ```
 
 ### Components and Hooks
 
 ```typescript
-export function FlashcardCard() {}    // PascalCase, descriptive
+export function FlashcardCard() {} // PascalCase, descriptive
 export function useFlashcardManager() {} // 'use' prefix, descriptive
 ```
 
@@ -156,9 +156,12 @@ export function useFlashcardManager(): FlashcardManagerResult {
   const createMutation = useCreateFlashcardMutation();
   const audio = useAudioCoordinator();
 
-  const createFlashcard = useCallback(async (data: FlashcardInput) => {
-    await createMutation.mutateAsync(data);
-  }, [createMutation]);
+  const createFlashcard = useCallback(
+    async (data: FlashcardInput) => {
+      await createMutation.mutateAsync(data);
+    },
+    [createMutation],
+  );
 
   return {
     flashcards: query.data ?? [],

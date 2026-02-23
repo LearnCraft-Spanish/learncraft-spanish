@@ -56,4 +56,3 @@ coordinators/
 - ❌ Cannot import from `application/units/` directly (avoid circular dependencies)
 - ❌ Cannot be imported by `domain/`
 - ✅ Can be imported by `application/useCases/` and `application/units`
-

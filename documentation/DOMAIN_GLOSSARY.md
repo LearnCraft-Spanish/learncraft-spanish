@@ -9,7 +9,9 @@ This glossary defines the key terms, concepts, and business logic specific to th
 ## User Roles
 
 ### Student
+
 A user who is learning Spanish. Students can:
+
 - Take quizzes and review vocabulary
 - Create and study custom flashcards
 - Track their progress through courses and lessons
@@ -17,7 +19,9 @@ A user who is learning Spanish. Students can:
 - Review spaced repetition flashcards
 
 ### Coach
+
 A staff member who assists students. Coaches can:
+
 - View student progress and performance
 - Assign lessons and track completion
 - Review student activity and engagement
@@ -25,7 +29,9 @@ A staff member who assists students. Coaches can:
 - Access coaching dashboard with metrics
 
 ### Admin
+
 System administrators with full access. Admins can:
+
 - Manage users, courses, and content
 - View system-wide metrics and analytics
 - Configure system settings
@@ -37,9 +43,11 @@ System administrators with full access. Admins can:
 ## Learning Content
 
 ### Course
+
 A structured learning path with multiple lessons. A course represents a coherent curriculum (e.g., "Beginner Spanish", "Intermediate Grammar").
 
 **Properties**:
+
 - `id`: Unique identifier
 - `name`: Display name
 - `description`: Course overview
@@ -47,9 +55,11 @@ A structured learning path with multiple lessons. A course represents a coherent
 - `lessons`: Array of associated lessons
 
 ### Lesson
+
 A specific unit of learning within a course. Each lesson focuses on particular vocabulary, grammar, or concepts.
 
 **Properties**:
+
 - `id`: Unique identifier
 - `courseId`: Parent course
 - `lessonNumber`: Order within course
@@ -58,13 +68,16 @@ A specific unit of learning within a course. Each lesson focuses on particular v
 - `endPage`: Ending page in curriculum
 
 **Lesson Range**:
+
 - **Cumulative**: Includes all vocabulary from lesson 1 up to the selected lesson
 - **Range**: Only includes vocabulary from the selected lesson
 
 ### Vocabulary / Vocab
+
 Spanish words or phrases that students learn. Core content unit in the system.
 
 **Properties**:
+
 - `id`: Unique identifier
 - `spanish`: Spanish text
 - `english`: English translation
@@ -74,9 +87,11 @@ Spanish words or phrases that students learn. Core content unit in the system.
 - `category`: Vocabulary category (noun, verb, phrase, etc.)
 
 ### Example
+
 A sentence or phrase demonstrating vocabulary usage in context.
 
 **Properties**:
+
 - `id`: Unique identifier
 - `spanish`: Spanish example sentence
 - `english`: English translation
@@ -88,9 +103,11 @@ A sentence or phrase demonstrating vocabulary usage in context.
 ## Quizzing System
 
 ### Quiz
+
 An interactive session where students practice vocabulary or grammar.
 
 **Quiz Types**:
+
 - **Text Quiz**: Type the correct translation
 - **Audio Quiz**: Listen and type what you hear
 - **Official Quiz**: Pre-defined quiz with specific examples (sentences) created by instructors
@@ -98,15 +115,18 @@ An interactive session where students practice vocabulary or grammar.
 - **Limited Quiz**: Quiz with a limited number of items (e.g., first 50 words from selected range)
 
 **Quiz Modes**:
+
 - **Spanish First**: Spanish prompt shown first (text or audio), provide English response
 - **English First**: English prompt shown first, provide Spanish response
 - **Listening Quiz**: Listen to Spanish audio, type what you hear
 - **Speaking Quiz**: Read Spanish text, record your pronunciation
 
 ### Question
+
 A single item in a quiz session.
 
 **Properties**:
+
 - `prompt`: What the student sees (Spanish or English text, or audio)
 - `correctAnswer`: Expected response
 - `userAnswer`: Student's submitted answer
@@ -114,9 +134,11 @@ A single item in a quiz session.
 - `attemptNumber`: How many times attempted
 
 ### Quiz Result
+
 The outcome of a completed quiz session.
 
 **Properties**:
+
 - `quizId`: Associated quiz
 - `studentId`: Student who took the quiz
 - `score`: Percentage correct
@@ -130,9 +152,11 @@ The outcome of a completed quiz session.
 ## Flashcard System
 
 ### Flashcard
+
 A study card for vocabulary review using spaced repetition.
 
 **Properties**:
+
 - `id`: Unique identifier
 - `vocabularyId`: Associated vocabulary
 - `studentId`: Owner student
@@ -146,9 +170,11 @@ A study card for vocabulary review using spaced repetition.
 Uses a modified SM-2 algorithm to schedule reviews based on student performance.
 
 ### Flashcard Update
+
 A pending change to a flashcard (used for batch operations).
 
 **Update Types**:
+
 - **Add**: Create new flashcard
 - **Remove**: Delete flashcard
 - **Update**: Modify flashcard properties (ease, interval)
@@ -161,23 +187,28 @@ Flashcard changes are queued and flushed on page load or explicit save to optimi
 ## Skill System
 
 ### Skill Tag
+
 A categorization label for vocabulary (e.g., "Transportation", "Food", "Past Tense").
 
 **Properties**:
+
 - `id`: Unique identifier
 - `name`: Tag name
 - `category`: Broader category
 - `description`: What this skill covers
 
 **Usage**:
+
 - Vocabulary items can have multiple skill tags
 - Students can filter quizzes by skill tag
 - Progress can be tracked by skill tag
 
 ### Subcategory
+
 A grouping of related vocabulary or grammar concepts.
 
 **Examples**:
+
 - Verbs: Regular, Irregular, Reflexive
 - Nouns: People, Places, Things
 - Grammar: Tenses, Moods, Articles
@@ -187,9 +218,11 @@ A grouping of related vocabulary or grammar concepts.
 ## Progress Tracking
 
 ### Student Progress
+
 Tracking of student advancement through courses and lessons.
 
 **Metrics**:
+
 - `lessonsCompleted`: Number of lessons finished
 - `vocabularyMastered`: Number of vocabulary items learned
 - `quizzesTaken`: Total quizzes completed
@@ -197,9 +230,11 @@ Tracking of student advancement through courses and lessons.
 - `streakDays`: Consecutive days of activity
 
 ### Assignment
+
 A lesson or quiz assigned by a coach to a student.
 
 **Properties**:
+
 - `id`: Unique identifier
 - `studentId`: Assigned student
 - `coachId`: Assigning coach
@@ -213,9 +248,11 @@ A lesson or quiz assigned by a coach to a student.
 ## Audio System
 
 ### Audio Player
+
 Global audio playback coordinator for pronunciation practice.
 
 **Features**:
+
 - Play vocabulary pronunciation
 - Play example sentence audio
 - Control playback (play, pause, stop)
@@ -223,9 +260,11 @@ Global audio playback coordinator for pronunciation practice.
 - Auto-advance in quiz mode
 
 ### Audio Context
+
 Global state for audio playback across the application.
 
 **State**:
+
 - `currentAudio`: Currently playing audio URL
 - `isPlaying`: Playback status
 - `queue`: Queued audio items
@@ -236,14 +275,17 @@ Global state for audio playback across the application.
 ## Database & API
 
 ### Program
+
 A top-level curriculum structure (may contain multiple courses).
 
 **Note**: This is legacy terminology; "Course" is preferred in modern codebase.
 
 ### Record
+
 Generic term for database entries in admin/coaching interfaces.
 
 **Types**:
+
 - Student Records
 - Course Records
 - Lesson Records
@@ -255,9 +297,11 @@ Generic term for database entries in admin/coaching interfaces.
 ## Quiz Configuration
 
 ### Quiz Config
+
 Settings for a quiz session.
 
 **Properties**:
+
 - `mode`: text | audio | mixed
 - `direction`: spanish-to-english | english-to-spanish
 - `lessonRange`: Which lessons to include
@@ -267,9 +311,11 @@ Settings for a quiz session.
 - `shuffle`: Whether to randomize question order
 
 ### Official Quiz
+
 A pre-configured quiz with specific examples (sentences) and settings, created by instructors.
 
 **Properties**:
+
 - `id`: Unique identifier
 - `name`: Quiz title
 - `description`: What the quiz covers
@@ -282,9 +328,11 @@ A pre-configured quiz with specific examples (sentences) and settings, created b
 ## Coaching Features
 
 ### Coach Dashboard
+
 Interface for coaches to monitor student progress.
 
 **Features**:
+
 - Student list with recent activity
 - Lesson completion rates
 - Quiz performance metrics
@@ -292,9 +340,11 @@ Interface for coaches to monitor student progress.
 - Weekly summaries
 
 ### Weekly Summary
+
 A report of student activity for a specific week.
 
 **Metrics**:
+
 - Lessons completed
 - Quizzes taken
 - Average scores
@@ -306,23 +356,29 @@ A report of student activity for a specific week.
 ## Common Business Rules
 
 ### Vocabulary Inclusion
+
 **Cumulative Mode**: Lessons 1-10 includes all vocabulary from lesson 1 through lesson 10.
 **Range Mode**: Lesson 5-7 includes only vocabulary from lessons 5, 6, and 7.
 
 ### Spaced Repetition Algorithm
+
 Flashcards use a modified SM-2 algorithm:
+
 - **Again**: Reset interval to 1 day, decrease ease
 - **Hard**: Increase interval by 1.2x
 - **Good**: Increase interval by ease factor (default 2.5)
-- **Easy**: Increase interval by ease factor * 1.3, increase ease
+- **Easy**: Increase interval by ease factor \* 1.3, increase ease
 
 ### Quiz Scoring
+
 - **Correct on First Try**: Full points
 - **Correct on Second Try**: Partial points (typically 50%)
 - **Incorrect**: No points, but question may reappear
 
 ### Auto-Save Behavior
+
 Flashcard updates are queued and auto-saved when:
+
 - User navigates away from flashcard page
 - User explicitly clicks "Save"
 - User closes the browser (via beforeunload handler)
@@ -333,13 +389,13 @@ Flashcard updates are queued and auto-saved when:
 
 Some terms have evolved as the codebase has been refactored:
 
-| Legacy Term       | Modern Term        | Notes                                |
-| ----------------- | ------------------ | ------------------------------------ |
-| Program           | Course             | "Course" is preferred                |
-| Vocab Quiz DB     | Vocabulary Service | Old admin table name                 |
-| Student Records   | Student Service    | Legacy admin interface               |
-| useOfficialQuizDB | useOfficialQuizzes | Renamed for clarity                  |
-| Drill Down        | Student Details    | Old name for student detail view     |
+| Legacy Term       | Modern Term        | Notes                            |
+| ----------------- | ------------------ | -------------------------------- |
+| Program           | Course             | "Course" is preferred            |
+| Vocab Quiz DB     | Vocabulary Service | Old admin table name             |
+| Student Records   | Student Service    | Legacy admin interface           |
+| useOfficialQuizDB | useOfficialQuizzes | Renamed for clarity              |
+| Drill Down        | Student Details    | Old name for student detail view |
 
 When working in legacy code, you may see these older terms. New code should use modern terminology.
 
@@ -370,6 +426,7 @@ When working in legacy code, you may see these older terms. New code should use 
 ## Questions?
 
 If you encounter a term not defined here, please:
+
 1. Check the codebase for usage examples
 2. Ask the team for clarification
 3. Update this glossary with the new term

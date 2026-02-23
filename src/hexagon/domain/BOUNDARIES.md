@@ -41,4 +41,3 @@ Pure business logic and data transformations:
 - ✅ External pure utility libraries (date-fns, zod, etc.)
 - ❌ No imports from other hexagon layers
 - ✅ Can be imported by all other layers
-
