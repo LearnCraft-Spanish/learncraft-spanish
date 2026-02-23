@@ -9,6 +9,7 @@ export function useSearchByQuizFilter({
   courseCode,
 }: UseSearchByQuizFilterParams) {
   const {
+    quizGroups,
     officialQuizRecords,
     isLoading: officialQuizzesLoading,
     error,
@@ -19,11 +20,15 @@ export function useSearchByQuizFilter({
     if (!officialQuizRecords || officialQuizzesLoading || error) {
       return [];
     }
-    const filteredQuizzes = officialQuizRecords.filter(
-      (quiz) => quiz.courseCode === courseCode,
-    );
-    return filteredQuizzes;
-  }, [courseCode, officialQuizRecords, officialQuizzesLoading, error]);
+    const quizGroup = quizGroups?.find((group) => group.urlSlug === courseCode);
+    return quizGroup?.quizzes ?? [];
+  }, [
+    courseCode,
+    quizGroups,
+    error,
+    officialQuizzesLoading,
+    officialQuizRecords,
+  ]);
 
   return {
     quizOptions,

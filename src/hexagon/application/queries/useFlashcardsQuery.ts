@@ -25,6 +25,7 @@ export interface UseFlashcardsQueryReturnType {
   updateFlashcards: (
     updates: UpdateFlashcardIntervalCommand[],
   ) => Promise<Flashcard[]>;
+  isFetchingFlashcards: boolean;
 }
 
 export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
@@ -85,6 +86,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   const {
     data: flashcards,
     isLoading,
+    isFetching: isFetchingFlashcards,
     error,
   } = useQuery({
     queryKey: ['flashcards', userId],
@@ -561,6 +563,7 @@ export const useFlashcardsQuery = (): UseFlashcardsQueryReturnType => {
   return {
     flashcards,
     isLoading,
+    isFetchingFlashcards,
     error,
     pendingDeleteExampleIds,
     createFlashcards,

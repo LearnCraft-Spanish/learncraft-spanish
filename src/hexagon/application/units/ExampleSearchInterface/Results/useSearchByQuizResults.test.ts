@@ -67,7 +67,7 @@ describe('useSearchByQuizResults', () => {
   it('should handle quiz fetch errors correctly', async () => {
     const testError = new Error('Failed to fetch quiz examples');
     overrideMockOfficialQuizAdapter({
-      getOfficialQuizRecords: async () => [],
+      getOfficialQuizGroups: async () => [],
       getOfficialQuizExamples: async (_args) => {
         throw testError;
       },

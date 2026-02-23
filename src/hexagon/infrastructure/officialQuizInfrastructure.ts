@@ -1,12 +1,13 @@
 import type { AuthPort } from '@application/ports/authPort';
 import type {
   ExampleWithVocabulary,
-  OfficialQuizRecord,
+  QuizGroup,
 } from '@learncraft-spanish/shared';
 import { createHttpClient } from '@infrastructure/http/client';
 import {
+  addExamplesToOfficialQuizEndpoint,
   getOfficialQuizExamplesEndpoint,
-  listOfficialQuizzesEndpoint,
+  getPublishedQuizGroupsEndpoint,
 } from '@learncraft-spanish/shared';
 export function createOfficialQuizInfrastructure(
   apiUrl: string,
@@ -15,10 +16,10 @@ export function createOfficialQuizInfrastructure(
   const httpClient = createHttpClient(apiUrl, auth);
 
   return {
-    getOfficialQuizRecords: async () => {
-      const response = await httpClient.get<OfficialQuizRecord[]>(
-        listOfficialQuizzesEndpoint.path,
-        listOfficialQuizzesEndpoint.requiredScopes,
+    getOfficialQuizGroups: async () => {
+      const response = await httpClient.get<QuizGroup[]>(
+        getPublishedQuizGroupsEndpoint.path,
+        getPublishedQuizGroupsEndpoint.requiredScopes,
       );
       return response;
     },
@@ -26,10 +27,12 @@ export function createOfficialQuizInfrastructure(
       courseCode,
       quizNumber,
       vocabularyComplete,
+      ignoreCache,
     }: {
       courseCode: string;
       quizNumber: number;
       vocabularyComplete?: boolean;
+      ignoreCache?: boolean;
     }) => {
       const params = new URLSearchParams();
       if (vocabularyComplete !== undefined) {
@@ -42,9 +45,34 @@ export function createOfficialQuizInfrastructure(
           .replace(':quizNumber', quizNumber.toString()) +
         (params.toString() ? `?${params.toString()}` : '');
 
+      const pathWithQueryParams =
+        pathWithParams + (ignoreCache ? '?ignoreCache=true' : '');
+
       const response = await httpClient.get<ExampleWithVocabulary[]>(
-        pathWithParams,
+        pathWithQueryParams,
         getOfficialQuizExamplesEndpoint.requiredScopes,
+      );
+      return response;
+    },
+    addExamplesToOfficialQuiz: async ({
+      courseCode,
+      quizNumber,
+      exampleIds,
+    }: {
+      courseCode: string;
+      quizNumber: number;
+      exampleIds: number[];
+    }) => {
+      const path = addExamplesToOfficialQuizEndpoint.path
+        .replace(':courseCode', courseCode)
+        .replace(':quizNumber', quizNumber.toString());
+
+      const response = await httpClient.post<number>(
+        path,
+        addExamplesToOfficialQuizEndpoint.requiredScopes,
+        {
+          exampleIds,
+        },
       );
       return response;
     },

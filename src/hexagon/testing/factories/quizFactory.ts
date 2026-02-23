@@ -1,4 +1,7 @@
-import { OfficialQuizRecordSchema } from '@learncraft-spanish/shared';
+import {
+  OfficialQuizRecordSchema,
+  QuizGroupSchema,
+} from '@learncraft-spanish/shared';
 import {
   createZodFactory,
   createZodListFactory,
@@ -9,3 +12,7 @@ export const createMockOfficialQuizRecord = createZodFactory(
 );
 export const createMockOfficialQuizRecordList = (count?: number) =>
   createZodListFactory(OfficialQuizRecordSchema, count);
+
+export const createMockQuizGroup = createZodFactory(QuizGroupSchema);
+export const createMockQuizGroupList = (count?: number) =>
+  createZodListFactory(QuizGroupSchema, count);

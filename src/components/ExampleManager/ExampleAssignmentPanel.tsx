@@ -4,8 +4,8 @@ import type {
   Flashcard,
   StudentFlashcardData,
 } from 'src/types/interfaceDefinitions';
+import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
 import { SubHeaderComponent } from '@interface/components/SubHeader';
-import { officialQuizCourses } from '@learncraft-spanish/shared';
 import React, { useMemo } from 'react';
 import ExamplesTable from 'src/components/ExamplesTable/ExamplesTable';
 
@@ -59,6 +59,8 @@ export function ExampleAssignmentPanel({
   flashcardDataQuery,
   quizExamplesQuery,
 }: ExampleAssignmentPanelProps) {
+  const { quizGroups } = useOfficialQuizzesQuery();
+
   // Get already assigned examples based on assignment type
   const assignedExamples = useMemo<Flashcard[]>(() => {
     if (assignmentType === 'students' && flashcardDataQuery?.data) {
@@ -68,6 +70,14 @@ export function ExampleAssignmentPanel({
     }
     return [];
   }, [assignmentType, flashcardDataQuery?.data, quizExamplesQuery?.data]);
+
+  const courseOptions = useMemo(() => {
+    if (!quizGroups) return [];
+    return quizGroups.map((group) => ({
+      code: group.urlSlug,
+      name: group.name,
+    }));
+  }, [quizGroups]);
 
   return (
     <div className="assignment-section">
@@ -103,7 +113,7 @@ export function ExampleAssignmentPanel({
               className="styledInput"
             >
               <option value="none">Select Course</option>
-              {officialQuizCourses.map((course) => (
+              {courseOptions.map((course) => (
                 <option key={course.code} value={course.code}>
                   {course.name}
                 </option>

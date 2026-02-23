@@ -1,18 +1,22 @@
 import type { OfficialQuizPort } from '@application/ports/officialQuizPort';
 
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
-import { createMockOfficialQuizRecordList } from '@testing/factories/quizFactory';
+import { createMockQuizGroupList } from '@testing/factories/quizFactory';
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation matching the QuizPort exactly
 const defaultMockAdapter: OfficialQuizPort = {
-  getOfficialQuizRecords: () =>
-    Promise.resolve(createMockOfficialQuizRecordList(3)()),
+  getOfficialQuizGroups: () => Promise.resolve(createMockQuizGroupList(2)()),
   getOfficialQuizExamples: (_args: {
     courseCode: string;
     quizNumber: number;
     vocabularyComplete?: boolean;
   }) => Promise.resolve(createMockExampleWithVocabularyList(3)),
+  addExamplesToOfficialQuiz: (_args: {
+    courseCode: string;
+    quizNumber: number;
+    exampleIds: number[];
+  }) => Promise.resolve(0),
 };
 
 // Create an overrideable mock with the default implementation

@@ -8,21 +8,17 @@ export function useOfficialQuiz({
   courseCode: string;
   quizNumber: number;
 }) {
-  const { officialQuizRecords } = useOfficialQuizzesQuery();
+  const { quizGroups } = useOfficialQuizzesQuery();
   const { quizExamples, isLoading, error } = useQuizExamplesQuery({
     courseCode,
     quizNumber,
   });
   const quizTitle = useMemo(() => {
-    // identify quiz record by courseCode and quizNumber
-    const quizRecord = officialQuizRecords?.find(
-      (quiz) =>
-        quiz.courseCode === courseCode && quiz.quizNumber === quizNumber,
-    );
-    return quizRecord?.quizTitle;
-  }, [courseCode, quizNumber, officialQuizRecords]);
+    const quizGroup = quizGroups?.find((group) => group.urlSlug === courseCode);
+    return quizGroup?.quizzes.find((quiz) => quiz.quizNumber === quizNumber)
+      ?.quizTitle;
+  }, [courseCode, quizNumber, quizGroups]);
   return {
-    officialQuizRecords,
     quizExamples,
     isLoading,
     error,

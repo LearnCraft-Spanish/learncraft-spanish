@@ -3,7 +3,7 @@ import { createRealisticCourseWithLessonsList } from '@testing/factories/courseF
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 const defaultMockAdapter: CoursePort = {
-  getCoursesWithLessons: () => {
+  getPublishedCoursesWithLessons: () => {
     return Promise.resolve(createRealisticCourseWithLessonsList());
   },
   getLessonsByVocabulary: () => Promise.resolve([]),

@@ -1,7 +1,8 @@
+import { useOfficialQuizzesQuery } from '@application/queries/useOfficialQuizzesQuery';
 import { useSearchByQuizFilter } from '@application/units/ExampleSearchInterface/Filters/useSearchByQuizFilter';
 import { VocabularyCompleteFilter } from '@interface/components/ExampleSearchInterface/Filters/VocabularyCompleteFilter';
 import { GenericDropdown } from '@interface/components/FormComponents';
-import { officialQuizCourses } from '@learncraft-spanish/shared';
+import { useMemo } from 'react';
 export interface SearchByQuizProps {
   courseCode: string;
   quizNumber: number | '';
@@ -19,11 +20,20 @@ export function SearchByQuiz({
   vocabularyComplete,
   onVocabularyCompleteChange,
 }: SearchByQuizProps) {
+  const { quizGroups } = useOfficialQuizzesQuery();
   const { quizOptions } = useSearchByQuizFilter({ courseCode });
 
   const handleQuizNumberChange = (value: string) => {
     onQuizNumberChange(Number.parseInt(value) || 0);
   };
+
+  const courseOptions = useMemo(() => {
+    if (!quizGroups) return [];
+    return quizGroups.map((group) => ({
+      value: group.urlSlug,
+      text: group.name,
+    }));
+  }, [quizGroups]);
 
   return (
     <div className="searchByQuizFilterWrapper">
@@ -31,10 +41,7 @@ export function SearchByQuiz({
         label="Course"
         selectedValue={courseCode}
         onChange={onCourseCodeChange}
-        options={officialQuizCourses.map((course) => ({
-          value: course.code,
-          text: course.name,
-        }))}
+        options={courseOptions}
         defaultOptionText="Select a Course"
         editMode
         required

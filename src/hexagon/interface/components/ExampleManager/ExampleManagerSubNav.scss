@@ -1,11 +1,13 @@
-.searchModeNav {
+/* ------------------- Example Manager Sub Nav ------------------- */
+// used in ExampleSearchInterface (SearchModeNav) and ExampleAssignerInterface (AssignmentTypeSelector)
+.ExampleManagerSubNav {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   justify-content: center;
   margin: 1rem;
 
-  .searchModeNavOption {
+  .ExampleManagerSubNavOption {
     display: flex;
     align-items: center;
     justify-content: center;

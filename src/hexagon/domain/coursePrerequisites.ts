@@ -18,8 +18,8 @@ export interface CourseWithPrerequisites {
  */
 export const COURSES_WITH_PREREQUISITES: CourseWithPrerequisites[] = [
   {
-    targetCourseId: 5, // Post-1MC Cohort
-    targetCourseName: 'Post-1MC Cohort',
+    targetCourseId: 5, // Post-Challenge Lessons
+    targetCourseName: 'Post-Challenge Lessons',
     prerequisites: [
       {
         courseId: 3, // Spanish in One Month

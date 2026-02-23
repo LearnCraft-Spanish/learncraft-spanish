@@ -3,11 +3,12 @@ import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 import { vi } from 'vitest';
 
 const defaultMockState: UseOfficialQuizSetupMenuReturnType = {
-  courseCode: 'lcsp',
-  setUserSelectedCourseCode: vi.fn(),
-  quizNumber: 1,
+  selectedQuizGroup: null,
+  setSelectedQuizGroup: vi.fn(),
+  quizNumber: 0,
   setUserSelectedQuizNumber: vi.fn(),
   quizOptions: [],
+  quizGroups: [],
   startQuiz: vi.fn(),
 };
 
