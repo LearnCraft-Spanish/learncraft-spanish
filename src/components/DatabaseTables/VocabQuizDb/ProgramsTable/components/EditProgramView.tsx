@@ -3,7 +3,7 @@ import type { CohortField, CohortLetter, EditableProgram } from '../types';
 import { TextInput } from '@interface/components/FormComponents';
 import { useModal } from '@interface/hooks/useModal';
 import { useState } from 'react';
-import { FormControls } from 'src/components/FormComponents';
+import { Checkbox, FormControls } from 'src/components/FormComponents';
 import verifyRequiredInputs from 'src/components/FormComponents/functions/inputValidation';
 import ContextualView from 'src/hexagon/interface/components/Contextual/ContextualView';
 import useProgramsTable from 'src/hooks/VocabQuizDbData/useProgramsTable';
@@ -46,6 +46,12 @@ export default function EditProgramView({ program }: { program: Program }) {
       [field]: numValue,
     }));
   };
+  const handlePublishedChange = (value: boolean) => {
+    setEditObject((prev) => ({
+      ...prev,
+      published: value,
+    }));
+  };
 
   return (
     <ContextualView editFunction={() => setEditMode(!editMode)}>
@@ -59,6 +65,19 @@ export default function EditProgramView({ program }: { program: Program }) {
           required
         />
         <div>
+          {editMode ? (
+            <Checkbox
+              labelText="Published"
+              labelFor="published"
+              value={editObject.published}
+              onChange={handlePublishedChange}
+            />
+          ) : (
+            <div className="lineWrapper">
+              <p className="label">Published</p>
+              <p className="content">{editObject.published ? 'Yes' : 'No'}</p>
+            </div>
+          )}
           {cohorts.map((cohort) => (
             <TextInput
               key={cohort}

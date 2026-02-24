@@ -7,7 +7,6 @@ import { MenuButton } from '@interface/components/general/Buttons';
 import { Loading } from '@interface/components/Loading';
 import { AudioQuizMenu, MyTextQuizMenu } from '@interface/components/Quizzing';
 import { ReviewMyFlashcardsAudioQuiz } from '@interface/components/Quizzing/AudioQuiz/ReviewMyFlashcardsAudioQuiz';
-import { TemporaryUpdateNotification } from '@interface/components/Quizzing/TemporaryUpdateNotification';
 import {
   ReviewMyFlashcardsTextQuiz,
   SrsTextQuiz,
@@ -89,7 +88,6 @@ export default function MyFlashcardsQuiz() {
     <div>
       {!quizReady ? (
         <>
-          <TemporaryUpdateNotification />
           <h2>Review My Flashcards</h2>
           <CloseableFilterPanel
             isOpen={filterOwnedFlashcards}

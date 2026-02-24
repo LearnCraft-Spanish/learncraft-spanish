@@ -44,8 +44,8 @@ export function useExampleSearch() {
   const [idsInput, setIdsInput] = useState('');
 
   // Quiz search state
-  const [courseCode, setCourseCode] = useState('');
-  const [quizNumber, setQuizNumber] = useState<number | ''>('');
+  const [quizGroupId, setQuizGroupId] = useState<number | undefined>(undefined);
+  const [quizId, setQuizId] = useState<number | undefined>(undefined);
 
   // Shared vocabulary complete filter (for text, quiz, and recentlyEdited modes)
   const [vocabularyComplete, setVocabularyComplete] = useState<
@@ -116,11 +116,7 @@ export function useExampleSearch() {
       return true;
     }
     if (mode === 'quiz') {
-      if (
-        courseCode.trim().length === 0 ||
-        typeof quizNumber !== 'number' ||
-        quizNumber <= 0
-      ) {
+      if (!quizGroupId || !quizId || quizId <= 0) {
         setNonValidSearchErrorMessage(
           'ERROR: Please select a course and quiz.',
         );
@@ -152,8 +148,8 @@ export function useExampleSearch() {
     parsedIds.length,
     trimmedSpanishInput.length,
     trimmedEnglishInput.length,
-    courseCode,
-    quizNumber,
+    quizGroupId,
+    quizId,
     filtersForUI.courseId,
     filtersForUI.toLessonNumber,
   ]);
@@ -168,10 +164,10 @@ export function useExampleSearch() {
     () => ({
       onFilterChange: handleFilterChange,
       searchByQuizProps: {
-        courseCode: courseCode ?? '',
-        quizNumber: quizNumber ?? 0,
-        onCourseCodeChange: withSearchReset(setCourseCode),
-        onQuizNumberChange: withSearchReset(setQuizNumber),
+        quizGroupId,
+        quizId,
+        onQuizGroupIdChange: withSearchReset(setQuizGroupId),
+        onQuizIdChange: withSearchReset(setQuizId),
         vocabularyComplete,
         onVocabularyCompleteChange: withSearchReset(setVocabularyComplete),
       },
@@ -194,8 +190,8 @@ export function useExampleSearch() {
     }),
     [
       handleFilterChange,
-      courseCode,
-      quizNumber,
+      quizGroupId,
+      quizId,
       spanishInput,
       englishInput,
       idsInput,
@@ -213,8 +209,7 @@ export function useExampleSearch() {
         lessonRanges: filtersForUI.filterState.lessonRanges,
       },
       quizResultsProps: {
-        courseCode,
-        quizNumber: typeof quizNumber === 'number' ? quizNumber : undefined,
+        quizId,
         vocabularyComplete,
       },
       textResultsProps: {
@@ -234,8 +229,7 @@ export function useExampleSearch() {
       filtersForUI.excludeSpanglish,
       filtersForUI.audioOnly,
       filtersForUI.filterState.lessonRanges,
-      courseCode,
-      quizNumber,
+      quizId,
       spanishInput,
       englishInput,
       parsedIds,

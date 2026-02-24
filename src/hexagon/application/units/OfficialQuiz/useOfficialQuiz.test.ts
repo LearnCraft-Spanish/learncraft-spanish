@@ -1,10 +1,16 @@
-import type { OfficialQuizRecord } from '@learncraft-spanish/shared/dist/domain/quiz/core-types';
+import type {
+  OfficialQuizRecord,
+  QuizGroup,
+} from '@learncraft-spanish/shared/dist/domain/quiz/core-types';
 import { overrideMockOfficialQuizAdapter } from '@application/adapters/officialQuizAdapter.mock';
 import { useOfficialQuiz } from '@application/units/OfficialQuiz/useOfficialQuiz';
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { createMockExampleWithVocabularyList } from '@testing/factories/exampleFactory';
-import { createMockOfficialQuizRecord } from '@testing/factories/quizFactory';
+import {
+  createMockOfficialQuizRecord,
+  createMockQuizGroup,
+} from '@testing/factories/quizFactory';
 import { TestQueryClientProvider } from '@testing/providers/TestQueryClientProvider';
 import { describe, expect, it } from 'vitest';
 
@@ -13,30 +19,43 @@ for (let i = 0; i < 10; i++) {
   mockQuizRecords.push(
     createMockOfficialQuizRecord({
       id: i + 1,
-      courseCode: 'lcsp',
+      relatedQuizGroupId: 1,
       quizNumber: i + 1,
       quizTitle: `LCSP ${i + 1}`,
+      published: true,
     }),
   );
 }
+
+const mockQuizGroups: QuizGroup[] = [
+  createMockQuizGroup({
+    id: 1,
+    name: 'LearnCraft Spanish',
+    urlSlug: 'lcsp',
+    courseId: 1,
+    published: true,
+    quizzes: mockQuizRecords,
+  }),
+];
 
 const mockQuizExample = createMockExampleWithVocabularyList(10);
 
 describe('useOfficialQuiz', () => {
   beforeEach(() => {
     overrideMockOfficialQuizAdapter({
-      getOfficialQuizRecords: async () => mockQuizRecords,
+      getOfficialQuizGroups: async () => mockQuizGroups,
       getOfficialQuizExamples: async () => mockQuizExample,
     });
   });
 
   it('returns examples, loading state, error, and derived quizTitle', async () => {
     const selectedQuizRecord = mockQuizRecords[1];
+    const selectedQuizGroup = mockQuizGroups[0];
     // default state already set above
     const { result } = renderHook(
       () =>
         useOfficialQuiz({
-          courseCode: selectedQuizRecord.courseCode,
+          courseCode: selectedQuizGroup.urlSlug,
           quizNumber: selectedQuizRecord.quizNumber,
         }),
       { wrapper: TestQueryClientProvider },

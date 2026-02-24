@@ -65,6 +65,9 @@ export default function ProgramsTable() {
           return true;
         }
       }
+      if (program.published !== originalProgram.published) {
+        return true;
+      }
 
       return false;
     },

@@ -8,7 +8,8 @@ export const quizNames: QuizNameObj[] = [
   { quizName: 'LearnCraft Spanish', code: 'lcsp' },
   { quizName: 'LearnCraft Spanish Extended', code: 'lcspx' },
   { quizName: 'Master Ser vs Estar', code: 'ser-estar' },
-  { quizName: 'Post-1MC Cohort', code: 'post-1mc' },
+  { quizName: 'Post-Challenge Lesson', code: 'post-challenge' },
+  { quizName: 'Spanish in 1 Month Challenge', code: '1mc' },
 ];
 
 export interface QuizSubNameObj {

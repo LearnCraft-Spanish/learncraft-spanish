@@ -1,22 +1,23 @@
-import type { OfficialQuizRecord } from '@learncraft-spanish/shared';
+import type { OfficialQuizRecord, QuizGroup } from '@learncraft-spanish/shared';
 import { MenuButton } from '@interface/components/general/Buttons';
-import { officialQuizCourses } from '@learncraft-spanish/shared';
 import './OfficialQuizSetupMenu.scss';
 
 export interface OfficialQuizSetupMenuProps {
-  courseCode: string;
-  setUserSelectedCourseCode: (courseCode: string) => void;
+  selectedQuizGroup: QuizGroup | null;
+  setSelectedQuizGroup: (quizGroupId: number) => void;
   quizNumber: number;
   setUserSelectedQuizNumber: (quizNumber: number) => void;
   quizOptions: OfficialQuizRecord[];
+  quizGroups: QuizGroup[];
   startQuiz: () => void;
 }
 export function OfficialQuizSetupMenu({
-  courseCode,
-  setUserSelectedCourseCode,
+  selectedQuizGroup,
+  setSelectedQuizGroup,
   quizNumber,
   setUserSelectedQuizNumber,
   quizOptions,
+  quizGroups,
   startQuiz,
 }: OfficialQuizSetupMenuProps) {
   return (
@@ -26,17 +27,20 @@ export function OfficialQuizSetupMenu({
         className="quizMenu"
         role="select"
         aria-label="Select Course"
-        value={courseCode}
+        value={selectedQuizGroup?.id?.toString() ?? ''}
         onChange={(e) => {
-          setUserSelectedCourseCode(e.target.value);
+          setSelectedQuizGroup(Number.parseInt(e.target.value) || 0);
           setUserSelectedQuizNumber(0);
         }}
       >
-        {officialQuizCourses.map((course) => (
-          <option key={course.code} value={course.code}>
-            {course.name}
-          </option>
-        ))}
+        {quizGroups.map((group) => {
+          // Get the courseCode from the first quiz in the group
+          return (
+            <option key={group.id} value={group.id}>
+              {group.name}
+            </option>
+          );
+        })}
       </select>
       <select
         className="quizMenu"

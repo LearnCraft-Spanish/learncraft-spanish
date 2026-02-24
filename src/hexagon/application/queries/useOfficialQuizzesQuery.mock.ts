@@ -1,10 +1,14 @@
 import type { UseOfficialQuizzesQueryReturn } from '@application/queries/useOfficialQuizzesQuery';
-import { createMockOfficialQuizRecordList } from '@testing/factories/quizFactory';
+import {
+  createMockOfficialQuizRecordList,
+  createMockQuizGroupList,
+} from '@testing/factories/quizFactory';
 
 import { createOverrideableMock } from '@testing/utils/createOverrideableMock';
 
 // Create a default mock implementation
 const defaultMockImplementation: UseOfficialQuizzesQueryReturn = {
+  quizGroups: createMockQuizGroupList(2)(),
   officialQuizRecords: createMockOfficialQuizRecordList(3)(),
   isLoading: false,
   error: null,

@@ -1,10 +1,10 @@
 import type {
   ExampleWithVocabulary,
-  OfficialQuizRecord,
+  QuizGroup,
 } from '@learncraft-spanish/shared';
 
 export interface OfficialQuizPort {
-  getOfficialQuizRecords: () => Promise<OfficialQuizRecord[]>;
+  getOfficialQuizGroups: () => Promise<QuizGroup[]>;
   getOfficialQuizExamples: ({
     courseCode,
     quizNumber,

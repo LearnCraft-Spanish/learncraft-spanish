@@ -84,12 +84,12 @@ describe('exampleAssigner', () => {
         isLoading: false,
       },
       quizSelectionProps: {
-        selectedCourseCode: 'none',
-        onCourseCodeChange: vi.fn(),
+        selectedQuizGroupId: undefined,
+        onQuizGroupIdChange: vi.fn(),
         selectedQuizRecordId: undefined,
         onQuizRecordIdChange: vi.fn(),
         availableQuizzes: undefined,
-        courseOptions: [],
+        quizGroupOptions: [],
       },
       unassignedExamplesProps: { examples },
       assignButtonProps: {
@@ -138,12 +138,12 @@ describe('exampleAssigner', () => {
         isLoading: false,
       },
       quizSelectionProps: {
-        selectedCourseCode: 'none',
-        onCourseCodeChange: vi.fn(),
+        selectedQuizGroupId: undefined,
+        onQuizGroupIdChange: vi.fn(),
         selectedQuizRecordId: undefined,
         onQuizRecordIdChange: vi.fn(),
         availableQuizzes: undefined,
-        courseOptions: [],
+        quizGroupOptions: [],
       },
       unassignedExamplesProps: { examples },
       assignedStudentFlashcardsProps: {
@@ -193,19 +193,29 @@ describe('exampleAssigner', () => {
         isLoading: false,
       },
       quizSelectionProps: {
-        selectedCourseCode: 'SP101',
-        onCourseCodeChange: vi.fn(),
+        selectedQuizGroupId: 1,
+        onQuizGroupIdChange: vi.fn(),
         selectedQuizRecordId: 1,
         onQuizRecordIdChange: vi.fn(),
         availableQuizzes: [
           {
-            recordId: 1,
-            quizNickname: 'Quiz 1',
+            id: 1,
+            published: true,
+            quizTitle: 'Quiz 1',
             quizNumber: 1,
-            courseCode: 'SP101',
+            relatedQuizGroupId: 1,
           },
         ],
-        courseOptions: [{ code: 'SP101', name: 'Spanish 101' }],
+        quizGroupOptions: [
+          {
+            id: 1,
+            name: 'Spanish 101',
+          },
+          {
+            id: 2,
+            name: 'Spanish 102',
+          },
+        ],
       },
       unassignedExamplesProps: { examples },
       assignedStudentFlashcardsProps: {
@@ -236,7 +246,7 @@ describe('exampleAssigner', () => {
       </MockAllProviders>,
     );
 
-    expect(screen.getByText('Course:')).toBeInTheDocument();
+    expect(screen.getByText('Quiz Group:')).toBeInTheDocument();
     expect(screen.getByText('Quiz:')).toBeInTheDocument();
   });
 
@@ -255,12 +265,12 @@ describe('exampleAssigner', () => {
         isLoading: false,
       },
       quizSelectionProps: {
-        selectedCourseCode: 'none',
-        onCourseCodeChange: vi.fn(),
+        selectedQuizGroupId: undefined,
+        onQuizGroupIdChange: vi.fn(),
         selectedQuizRecordId: undefined,
         onQuizRecordIdChange: vi.fn(),
         availableQuizzes: undefined,
-        courseOptions: [],
+        quizGroupOptions: [],
       },
       assignedStudentFlashcardsProps: {
         studentFlashcards: createMockFlashcardList()(2),
@@ -329,12 +339,12 @@ describe('exampleAssigner', () => {
         },
       },
       quizSelectionProps: {
-        selectedCourseCode: 'none',
-        onCourseCodeChange: vi.fn(),
+        selectedQuizGroupId: undefined,
+        onQuizGroupIdChange: vi.fn(),
         selectedQuizRecordId: undefined,
         onQuizRecordIdChange: vi.fn(),
         availableQuizzes: undefined,
-        courseOptions: [],
+        quizGroupOptions: [],
       },
       unassignedExamplesProps: { examples },
       assignButtonProps: {

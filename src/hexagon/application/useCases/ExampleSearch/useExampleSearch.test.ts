@@ -132,23 +132,21 @@ describe('useExampleSearch', () => {
     ]);
   });
 
-  it('validates quiz mode when course and quiz number are set', () => {
+  it('validates quiz mode when quiz group and quiz are set', () => {
     const { result } = renderHook(() => useExampleSearch());
 
     act(() => {
       result.current.handleChangeMode('quiz');
-      result.current.searchComponentProps.searchByQuizProps.onCourseCodeChange(
-        'lcsp',
+      result.current.searchComponentProps.searchByQuizProps.onQuizGroupIdChange(
+        1,
       );
-      result.current.searchComponentProps.searchByQuizProps.onQuizNumberChange(
-        2,
-      );
+      result.current.searchComponentProps.searchByQuizProps.onQuizIdChange(2);
     });
 
     expect(result.current.isValidSearch).toBe(true);
     expect(result.current.searchResultProps.quizResultsProps).toEqual({
-      courseCode: 'lcsp',
-      quizNumber: 2,
+      quizId: 2,
+      vocabularyComplete: undefined,
     });
   });
 

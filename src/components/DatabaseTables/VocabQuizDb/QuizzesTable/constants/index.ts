@@ -10,6 +10,10 @@ const headers: HeaderObject[] = [
     header: 'Quiz Nickname',
     sortable: true,
   },
+  {
+    header: 'Published',
+    sortable: true,
+  },
 ];
 
 export { headers, quizNames, serVsEstarQuizSubNames };
