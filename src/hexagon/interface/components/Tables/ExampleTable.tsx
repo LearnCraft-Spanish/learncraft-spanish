@@ -14,7 +14,7 @@ import { useRef, useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 import ellipsis from 'src/assets/icons/ellipsis-svgrepo-com.svg';
-import 'src/components/ExamplesTable/ExamplesTable.scss';
+import './ExamplesTable.scss';
 import './ExampleAndFlashcardTable.scss';
 interface ExamplesTableProps {
   examples: ExampleWithVocabulary[];
