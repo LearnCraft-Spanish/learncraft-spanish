@@ -27,6 +27,9 @@ export function usePagination({
   const maxPage = Math.ceil(totalItems / itemsPerPage);
 
   const safePageNumber = useMemo(() => {
+    if (maxPage === 0) {
+      return 1;
+    }
     if (selectedPageNumber > maxPage) {
       return maxPage;
     }
@@ -41,8 +44,8 @@ export function usePagination({
   }, [safePageNumber, itemsPerPage]);
 
   const endIndex = useMemo(() => {
-    return startIndex + itemsPerPage;
-  }, [startIndex, itemsPerPage]);
+    return Math.min(startIndex + itemsPerPage, totalItems);
+  }, [startIndex, itemsPerPage, totalItems]);
 
   const nextPage = useCallback(() => {
     if (safePageNumber >= maxPage) {
